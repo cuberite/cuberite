@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\WebServer\base64.cpp" />
+    <ClCompile Include="..\WebServer\Socket.cpp" />
+    <ClCompile Include="..\WebServer\StdHelpers.cpp" />
+    <ClCompile Include="..\WebServer\UrlHelper.cpp" />
+    <ClCompile Include="..\WebServer\WebServer.cpp" />
+    <ClCompile Include="..\WebServer\cEvent.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\WebServer\base64.h" />
+    <ClInclude Include="..\WebServer\Socket.h" />
+    <ClInclude Include="..\WebServer\Tracer.h" />
+    <ClInclude Include="..\WebServer\UrlHelper.h" />
+    <ClInclude Include="..\WebServer\WebServer.h" />
+    <ClInclude Include="..\WebServer\StdHelpers.h" />
+    <ClInclude Include="..\WebServer\cEvent.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{5108ca96-8262-4e37-b891-cff8f714210e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,488 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>MCServer</ProjectName>
+    <ProjectGuid>{D8FE2186-4BF0-4B89-913F-6C26818E5AC5}</ProjectGuid>
+    <RootNamespace>tmpl8300c</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/ZI /D_DEBUG %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../$(ProjectName)_debug.exe</OutputFile>
+      <AdditionalLibraryDirectories>VLD;./Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>false</GenerateMapFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions>/ZI /D_DEBUG %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib_d.lib;tolua++-1.0.93_d.lib;lua-5.1.4_d.lib;WebServer_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../$(ProjectName)_debug.exe</OutputFile>
+      <AdditionalLibraryDirectories>VLD;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>false</GenerateMapFile>
+      <SubSystem>Console</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;libCMT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>./Release/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>../$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>false</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\cAuthenticator.cpp" />
+    <ClCompile Include="..\source\cBlockingTCPLink.cpp" />
+    <ClCompile Include="..\Source\cChicken.cpp" />
+    <ClCompile Include="..\source\cChunkLoader.cpp" />
+    <ClCompile Include="..\Source\cChunkMap.cpp" />
+    <ClCompile Include="..\source\cCraftingWindow.cpp" />
+    <ClCompile Include="..\source\cCriticalSection.cpp" />
+    <ClCompile Include="..\source\cCuboid.cpp" />
+    <ClCompile Include="..\source\cEvent.cpp" />
+    <ClCompile Include="..\source\cFurnaceEntity.cpp" />
+    <ClCompile Include="..\Source\cFurnaceRecipe.cpp" />
+    <ClCompile Include="..\source\cFurnaceWindow.cpp" />
+    <ClCompile Include="..\source\cGenSettings.cpp" />
+    <ClCompile Include="..\Source\cGroup.cpp" />
+    <ClCompile Include="..\Source\cGroupManager.cpp" />
+    <ClCompile Include="..\Source\cHeartBeat.cpp" />
+    <ClCompile Include="..\Source\cLuaCommandBinder.cpp" />
+    <ClCompile Include="..\source\cMakeDir.cpp" />
+    <ClCompile Include="..\source\cMCLogger.cpp" />
+    <ClCompile Include="..\Source\cMonster.cpp" />
+    <ClCompile Include="..\source\cMonsterConfig.cpp" />
+    <ClCompile Include="..\source\cNoise.cpp" />
+    <ClCompile Include="..\Source\cPawn.cpp" />
+    <ClCompile Include="..\Source\cPluginManager.cpp" />
+    <ClCompile Include="..\Source\cRecipeChecker.cpp" />
+    <ClCompile Include="..\Source\cReferenceManager.cpp" />
+    <ClCompile Include="..\Source\cRoot.cpp" />
+    <ClCompile Include="..\Source\cSemaphore.cpp" />
+    <ClCompile Include="..\source\cServer.cpp" />
+    <ClCompile Include="..\Source\cSignEntity.cpp" />
+    <ClCompile Include="..\source\cSleep.cpp" />
+    <ClCompile Include="..\source\cSocket.cpp" />
+    <ClCompile Include="..\source\cSpider.cpp" />
+    <ClCompile Include="..\source\cStringMap.cpp" />
+    <ClCompile Include="..\Source\cTCPLink.cpp" />
+    <ClCompile Include="..\source\cThread.cpp" />
+    <ClCompile Include="..\source\cTimer.cpp" />
+    <ClCompile Include="..\source\cTracer.cpp" />
+    <ClCompile Include="..\source\cWaterSimulator.cpp" />
+    <ClCompile Include="..\Source\cWebAdmin.cpp" />
+    <ClCompile Include="..\Source\cWebPlugin.cpp" />
+    <ClCompile Include="..\source\cWindow.cpp" />
+    <ClCompile Include="..\Source\ManualBindings.cpp" />
+    <ClCompile Include="..\source\Matrix4f.cpp" />
+    <ClCompile Include="..\source\md5\md5.cpp" />
+    <ClCompile Include="..\source\cWorld.cpp" />
+    <ClCompile Include="..\source\cChunk.cpp" />
+    <ClCompile Include="..\source\cEntity.cpp" />
+    <ClCompile Include="..\source\cPickup.cpp" />
+    <ClCompile Include="..\source\cPlayer.cpp" />
+    <ClCompile Include="..\source\cInventory.cpp" />
+    <ClCompile Include="..\source\cBlockToPickup.cpp" />
+    <ClCompile Include="..\source\cPlugin.cpp" />
+    <ClCompile Include="..\source\cPlugin_Lua.cpp" />
+    <ClCompile Include="..\source\cChatColor.cpp" />
+    <ClCompile Include="..\source\cClientHandle.cpp" />
+    <ClCompile Include="..\iniFile\iniFile.cpp" />
+    <ClCompile Include="..\source\cChestEntity.cpp" />
+    <ClCompile Include="..\source\cLog.cpp" />
+    <ClCompile Include="..\source\Bindings.cpp" />
+    <ClCompile Include="..\source\main.cpp" />
+    <ClCompile Include="..\source\packets\cPacket.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_13.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_AddToInventory.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_ArmAnim.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_BlockChange.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_BlockDig.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_BlockPlace.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Chat.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_CollectItem.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_DestroyEntity.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Disconnect.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_EntityEquipment.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_EntityLook.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_EntityStatus.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Flying.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Handshake.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_InventoryProgressBar.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_InventorySlot.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_ItemSwitch.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_KeepAlive.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Login.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_MapChunk.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Metadata.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_MultiBlock.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_NamedEntitySpawn.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_PickupSpawn.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_PlayerLook.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_PlayerMoveLook.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_PlayerPosition.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_PreChunk.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_RelativeEntityMove.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_RelativeEntityMoveLook.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Respawn.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_SpawnMob.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_TeleportEntity.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_TimeUpdate.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_UpdateHealth.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_UpdateSign.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_UseEntity.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_WholeInventory.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_WindowClick.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp" />
+    <ClCompile Include="..\source\Vector3d.cpp" />
+    <ClCompile Include="..\source\Vector3f.cpp" />
+    <ClCompile Include="..\source\Vector3i.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\BlockID.h" />
+    <ClInclude Include="..\Source\cAuthenticator.h" />
+    <ClInclude Include="..\source\cBlockingTCPLink.h" />
+    <ClInclude Include="..\Source\cChicken.h" />
+    <ClInclude Include="..\source\cChunkLoader.h" />
+    <ClInclude Include="..\Source\cChunkMap.h" />
+    <ClInclude Include="..\source\cCraftingWindow.h" />
+    <ClInclude Include="..\Source\cCriticalSection.h" />
+    <ClInclude Include="..\source\cEvent.h" />
+    <ClInclude Include="..\source\cFurnaceEntity.h" />
+    <ClInclude Include="..\Source\cFurnaceRecipe.h" />
+    <ClInclude Include="..\source\cFurnaceWindow.h" />
+    <ClInclude Include="..\Source\cGroup.h" />
+    <ClInclude Include="..\Source\cGroupManager.h" />
+    <ClInclude Include="..\Source\cHeartBeat.h" />
+    <ClInclude Include="..\Source\cLadder.h" />
+    <ClInclude Include="..\Source\cLuaCommandBinder.h" />
+    <ClInclude Include="..\source\cMakeDir.h" />
+    <ClInclude Include="..\source\cMCLogger.h" />
+    <ClInclude Include="..\Source\cMonster.h" />
+    <ClInclude Include="..\source\cMonsterConfig.h" />
+    <ClInclude Include="..\source\cNoise.h" />
+    <ClInclude Include="..\Source\cPawn.h" />
+    <ClInclude Include="..\Source\cPluginManager.h" />
+    <ClInclude Include="..\Source\cRecipeChecker.h" />
+    <ClInclude Include="..\Source\cReferenceManager.h" />
+    <ClInclude Include="..\Source\cRoot.h" />
+    <ClInclude Include="..\Source\cSemaphore.h" />
+    <ClInclude Include="..\source\cServer.h" />
+    <ClInclude Include="..\Source\cSign.h" />
+    <ClInclude Include="..\Source\cSignEntity.h" />
+    <ClInclude Include="..\source\cSleep.h" />
+    <ClInclude Include="..\source\cSocket.h" />
+    <ClInclude Include="..\source\cSpider.h" />
+    <ClInclude Include="..\source\cStairs.h" />
+    <ClInclude Include="..\source\cStringMap.h" />
+    <ClInclude Include="..\Source\cTCPLink.h" />
+    <ClInclude Include="..\source\cGenSettings.h" />
+    <ClInclude Include="..\source\cThread.h" />
+    <ClInclude Include="..\source\cTimer.h" />
+    <ClInclude Include="..\source\cTorch.h" />
+    <ClInclude Include="..\source\cTracer.h" />
+    <ClInclude Include="..\source\cCuboid.h" />
+    <ClInclude Include="..\source\cWaterSimulator.h" />
+    <ClInclude Include="..\Source\cWebAdmin.h" />
+    <ClInclude Include="..\Source\cWebPlugin.h" />
+    <ClInclude Include="..\source\cWindow.h" />
+    <ClInclude Include="..\source\cWindowOwner.h" />
+    <ClInclude Include="..\source\Endianness.h" />
+    <ClInclude Include="..\Source\FileDefine.h" />
+    <ClInclude Include="..\Source\LuaFunctions.h" />
+    <ClInclude Include="..\Source\ManualBindings.h" />
+    <ClInclude Include="..\source\Matrix4f.h" />
+    <ClInclude Include="..\source\md5\md5.h" />
+    <ClInclude Include="..\Source\MemoryLeak.h" />
+    <ClInclude Include="..\source\cWorld.h" />
+    <ClInclude Include="..\source\cChunk.h" />
+    <ClInclude Include="..\source\cEntity.h" />
+    <ClInclude Include="..\source\cPickup.h" />
+    <ClInclude Include="..\source\cPlayer.h" />
+    <ClInclude Include="..\source\cInventory.h" />
+    <ClInclude Include="..\source\cBlockToPickup.h" />
+    <ClInclude Include="..\source\cItem.h" />
+    <ClInclude Include="..\source\cPlugin.h" />
+    <ClInclude Include="..\source\cPlugin_Lua.h" />
+    <ClInclude Include="..\source\cChatColor.h" />
+    <ClInclude Include="..\source\cClientHandle.h" />
+    <ClInclude Include="..\iniFile\iniFile.h" />
+    <ClInclude Include="..\source\cBlockEntity.h" />
+    <ClInclude Include="..\source\cChestEntity.h" />
+    <ClInclude Include="..\source\cLog.h" />
+    <ClInclude Include="..\source\Bindings.h" />
+    <ClInclude Include="..\source\Defines.h" />
+    <ClInclude Include="..\source\MCSocket.h" />
+    <ClInclude Include="..\Source\PacketID.h" />
+    <ClInclude Include="..\source\packets\cPacket.h" />
+    <ClInclude Include="..\source\packets\cPacket_13.h" />
+    <ClInclude Include="..\source\packets\cPacket_AddToInventory.h" />
+    <ClInclude Include="..\source\packets\cPacket_ArmAnim.h" />
+    <ClInclude Include="..\source\packets\cPacket_BlockChange.h" />
+    <ClInclude Include="..\source\packets\cPacket_BlockDig.h" />
+    <ClInclude Include="..\source\packets\cPacket_BlockPlace.h" />
+    <ClInclude Include="..\source\packets\cPacket_Chat.h" />
+    <ClInclude Include="..\source\packets\cPacket_CollectItem.h" />
+    <ClInclude Include="..\source\packets\cPacket_DestroyEntity.h" />
+    <ClInclude Include="..\source\packets\cPacket_Disconnect.h" />
+    <ClInclude Include="..\source\packets\cPacket_EntityEquipment.h" />
+    <ClInclude Include="..\source\packets\cPacket_EntityLook.h" />
+    <ClInclude Include="..\source\packets\cPacket_EntityStatus.h" />
+    <ClInclude Include="..\source\packets\cPacket_Flying.h" />
+    <ClInclude Include="..\source\packets\cPacket_Handshake.h" />
+    <ClInclude Include="..\source\packets\cPacket_InventoryProgressBar.h" />
+    <ClInclude Include="..\source\packets\cPacket_InventorySlot.h" />
+    <ClInclude Include="..\source\packets\cPacket_ItemSwitch.h" />
+    <ClInclude Include="..\source\packets\cPacket_KeepAlive.h" />
+    <ClInclude Include="..\source\packets\cPacket_Login.h" />
+    <ClInclude Include="..\source\packets\cPacket_MapChunk.h" />
+    <ClInclude Include="..\source\packets\cPacket_Metadata.h" />
+    <ClInclude Include="..\source\packets\cPacket_MultiBlock.h" />
+    <ClInclude Include="..\source\packets\cPacket_NamedEntitySpawn.h" />
+    <ClInclude Include="..\source\packets\cPacket_PickupSpawn.h" />
+    <ClInclude Include="..\source\packets\cPacket_Ping.h" />
+    <ClInclude Include="..\source\packets\cPacket_PlayerLook.h" />
+    <ClInclude Include="..\source\packets\cPacket_PlayerMoveLook.h" />
+    <ClInclude Include="..\source\packets\cPacket_PlayerPosition.h" />
+    <ClInclude Include="..\source\packets\cPacket_PreChunk.h" />
+    <ClInclude Include="..\source\packets\cPacket_RelativeEntityMove.h" />
+    <ClInclude Include="..\source\packets\cPacket_RelativeEntityMoveLook.h" />
+    <ClInclude Include="..\source\packets\cPacket_Respawn.h" />
+    <ClInclude Include="..\source\packets\cPacket_SpawnMob.h" />
+    <ClInclude Include="..\source\packets\cPacket_TeleportEntity.h" />
+    <ClInclude Include="..\source\packets\cPacket_TimeUpdate.h" />
+    <ClInclude Include="..\source\packets\cPacket_UpdateHealth.h" />
+    <ClInclude Include="..\source\packets\cPacket_UpdateSign.h" />
+    <ClInclude Include="..\source\packets\cPacket_UseEntity.h" />
+    <ClInclude Include="..\source\packets\cPacket_WholeInventory.h" />
+    <ClInclude Include="..\source\packets\cPacket_WindowClick.h" />
+    <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
+    <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
+    <ClInclude Include="..\source\Vector3d.h" />
+    <ClInclude Include="..\source\Vector3f.h" />
+    <ClInclude Include="..\source\Vector3i.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\source\AllToLua.pkg" />
+    <None Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="lua-5.1.4.vcxproj">
+      <Project>{5e511191-6f1f-4d0d-940a-b850780963d2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="tolua++-1.0.93.vcxproj">
+      <Project>{67b50249-6cec-444e-a87a-d476112590ed}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="ZLib.vcxproj">
+      <Project>{f6f43a78-816d-4c37-a07b-68bed529273a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MCServer.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

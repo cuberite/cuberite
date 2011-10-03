@@ -1,0 +1,1015 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="cServer">
+      <UniqueIdentifier>{dfd626b9-e4f3-4e75-8fc7-08f2f16e5a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets">
+      <UniqueIdentifier>{8dc617d0-d278-4929-ab5c-96e029e10fa8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWorld">
+      <UniqueIdentifier>{736bc295-d93a-480b-a463-3ca7524769f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cChunk">
+      <UniqueIdentifier>{b1e02d6b-d435-492e-baca-e919608735dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity">
+      <UniqueIdentifier>{f678fd7d-0d01-4b60-bea3-31343d81ae09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPickup">
+      <UniqueIdentifier>{185cbcd8-b9c7-4dde-8c56-7244f8ca96c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cInventory">
+      <UniqueIdentifier>{9d9f03bb-b693-4ad1-96b9-c481b6486113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cBlockToPickup">
+      <UniqueIdentifier>{df83c426-c43c-4b1f-8fd3-8872e131cfe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cItem">
+      <UniqueIdentifier>{003789eb-c63a-4068-95a7-3bfe11574abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cChatColor">
+      <UniqueIdentifier>{d1c61c1f-14d3-4d6a-b817-325c645a13fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cClientHandle">
+      <UniqueIdentifier>{3ed6a89f-cb09-40d6-a2d2-1926b3437e38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="iniFile">
+      <UniqueIdentifier>{3369cbed-bf83-4051-9cf8-ef096d822e32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cBlockEntity">
+      <UniqueIdentifier>{27d551a4-3ffd-4d3a-b3d0-8baffc53afb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cBlockEntity\cChestEntity">
+      <UniqueIdentifier>{8a057c53-dac0-4491-8ab3-37049e948ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cLog">
+      <UniqueIdentifier>{1d81e40e-c899-4cda-a3e6-d7e64582d061}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaBindings">
+      <UniqueIdentifier>{8dfea38b-e80d-4b72-a35c-6cb4c0d6440c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWindow">
+      <UniqueIdentifier>{c4b39ad7-3767-44b3-aed8-f2cd960b76d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWindow\cWindowOwner">
+      <UniqueIdentifier>{014bf50c-1589-4fda-8b62-1a8100e451f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cRecipeChecker">
+      <UniqueIdentifier>{f7875f7a-f596-4690-8f0d-678989b9d7c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWindow\cCraftingWindow">
+      <UniqueIdentifier>{0047a86b-b12e-4b61-987f-1e558719226f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cPluginManager">
+      <UniqueIdentifier>{83f2a1fe-86d2-4608-afad-171edfdf58f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cPlugin">
+      <UniqueIdentifier>{485a7197-aa2c-4cec-ab77-59ad4b8e1c56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cPlugin\cPlugin_Lua">
+      <UniqueIdentifier>{d659aca9-b068-4b99-aac4-30cc07941378}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HandyStuff">
+      <UniqueIdentifier>{0b01dadd-e636-42d9-b333-9f5c7790bbde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cGroupManager">
+      <UniqueIdentifier>{24ba892c-02aa-47cf-b22d-0f5e19eba0ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWebAdmin">
+      <UniqueIdentifier>{55ca9b0d-4f29-4a3e-a481-81ec8c25ea5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWebAdmin\cWebPlugin">
+      <UniqueIdentifier>{86cbc55d-af57-4205-9ee3-96b05eb2af6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaBindings\cStringMap">
+      <UniqueIdentifier>{e53a8d9d-bde3-41fe-8b96-a4bce2b08529}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{d3a30af7-af8a-486e-9b87-e5ecabd7e21f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading\cEvent">
+      <UniqueIdentifier>{e30c9877-5064-44c6-9c61-da67c424fb38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading\cCriticalSection">
+      <UniqueIdentifier>{ecdbc99b-298d-4c8e-8e81-372f09944150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading\cSemaphore">
+      <UniqueIdentifier>{bf170621-8720-4f31-8327-d19e05f58e2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cBlockEntity\cFurnaceEntity">
+      <UniqueIdentifier>{f396953c-fcef-46cc-b399-3d01f3d730fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWindow\cFurnaceWindow">
+      <UniqueIdentifier>{88313d0b-e533-4170-aa1b-1eceb849451c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cFurnaceRecipe">
+      <UniqueIdentifier>{98dbd620-be8b-4232-b432-1d756a7ffd2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cBlockEntity\cSignEntity">
+      <UniqueIdentifier>{6dd899b9-3440-4dd3-bc49-4b868cc0dfdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cRoot">
+      <UniqueIdentifier>{d645942f-e205-4f34-b978-74ac16a31bdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn">
+      <UniqueIdentifier>{da3509b0-79a0-483b-927b-9868a14c705b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster">
+      <UniqueIdentifier>{e949e40b-2e5d-4839-bd59-1942bc836657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vector3f">
+      <UniqueIdentifier>{41910410-2124-41dc-b6b4-93244a2f538f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_SpawnMob">
+      <UniqueIdentifier>{d1977549-4376-4007-89d6-d086b3201db8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket">
+      <UniqueIdentifier>{52c6d73d-4f3e-4a89-9085-a01ce9a98618}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_EntityLook">
+      <UniqueIdentifier>{fac98dd5-a5b0-436e-97c0-0f330b4f615a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_TeleportEntity">
+      <UniqueIdentifier>{ee80ffce-b3c0-4076-98f3-18864f1dd64c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_RelativeEntityMoveLook">
+      <UniqueIdentifier>{96b4d545-5de5-41ae-8f26-482e31884b80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_RelativeEntityMove">
+      <UniqueIdentifier>{46203afd-ae39-4ebd-8bee-2eec9eeeae85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_NamedEntitySpawn">
+      <UniqueIdentifier>{4273090c-2912-4c24-b524-50fd93398cf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_UpdateHealth">
+      <UniqueIdentifier>{9748a97a-a019-45b9-b198-8c28abe51067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Respawn">
+      <UniqueIdentifier>{b2903385-bb48-4240-8c5b-bd8896f2c5ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_PlayerPosition">
+      <UniqueIdentifier>{c05411e1-a0f1-4528-a8c5-17f5bed4b0da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_DestroyEntity">
+      <UniqueIdentifier>{c06db7ec-cdd8-4ad3-8f9b-9848bf706c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cChunkMap">
+      <UniqueIdentifier>{2f9bd49e-938d-4893-941e-67d4ce831673}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cHeartBeat">
+      <UniqueIdentifier>{47dc8760-81af-4c86-a2d1-4029783dc7a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cTCPLink">
+      <UniqueIdentifier>{5bfd9221-41f8-46f7-857f-c57cfe70b53b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MD5">
+      <UniqueIdentifier>{a7832a46-efc5-4ae8-bfac-5df4f2ed771d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cTracer">
+      <UniqueIdentifier>{28739bb9-c43d-4d99-85e3-d1faa95aa445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cLog\cMCLogger">
+      <UniqueIdentifier>{54cece6b-7e57-42fa-a735-828ff1fa742d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cChicken">
+      <UniqueIdentifier>{a9407461-5b20-44e3-ba8a-2ee41f52f5cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cPlayer">
+      <UniqueIdentifier>{0984e5be-a942-4d04-8e57-ad7d2f82decf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cReferenceManager">
+      <UniqueIdentifier>{d671bac0-d081-4bf4-a99d-1278e7666232}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cPluginManager\cLuaCommandBinder">
+      <UniqueIdentifier>{14aa7565-0853-4e94-96b3-01d85d37bac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cTCPLink\cBlockingTCPLink">
+      <UniqueIdentifier>{fedf2a22-3be0-43a6-8853-4e546869321c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cAuthenticator">
+      <UniqueIdentifier>{5176ae9e-e7ec-41f0-b762-2657d9519857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading\cThread">
+      <UniqueIdentifier>{d7e3856b-ce87-4eb5-a91c-6d4dee991c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cSpider">
+      <UniqueIdentifier>{ea13d4dd-ac46-47fa-91de-a96046b48b0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cMonsterConfig">
+      <UniqueIdentifier>{2fa74dea-5267-4b30-9e29-04d283e2ef41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_MetaData">
+      <UniqueIdentifier>{736a1704-2bdb-464e-8496-145df303bd16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading\cSleep">
+      <UniqueIdentifier>{8a688c48-a815-4927-a05e-f9dfea019960}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cTimer">
+      <UniqueIdentifier>{66ee6654-6760-4100-86cc-9ad8a836366b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Chat">
+      <UniqueIdentifier>{b11fee8b-5a4c-45a0-b02d-6e0d00ddb23a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Login">
+      <UniqueIdentifier>{5511c694-97c4-4842-8298-888db30d87f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_WindowClick">
+      <UniqueIdentifier>{378afb88-8909-455c-aaf9-4d41387b2bea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cChunkLoader">
+      <UniqueIdentifier>{177e25ee-63e6-4382-8560-4f309ae8242d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cNoise">
+      <UniqueIdentifier>{58d6aa00-beab-4654-bbbd-c3b0397a9549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cGenSettings">
+      <UniqueIdentifier>{731dfafd-78a6-47d4-8494-a8e024f24c07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cMakeDir">
+      <UniqueIdentifier>{102fff22-0eb3-4977-9de3-307534954fbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_PlayerMoveLook">
+      <UniqueIdentifier>{91d451ac-766b-44a9-918d-e0876cf99dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_TimeUpdate">
+      <UniqueIdentifier>{3328f163-6be9-4115-aa18-a67419a40b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_WholeInventory">
+      <UniqueIdentifier>{cd2e819d-4dda-486a-baf4-53f6388e85bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_BlockDig">
+      <UniqueIdentifier>{20ed226a-712f-4994-bbbe-0bfffab344ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_KeepAlive">
+      <UniqueIdentifier>{00c90150-d52a-47c8-be5a-29bacf5ac41c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Handshake">
+      <UniqueIdentifier>{dad042ce-6d1a-4a77-8bdd-a2d364e8fcf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_PlayerLook">
+      <UniqueIdentifier>{c8aaae5b-7a57-48a0-ae2f-416211f6e73d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_ArmAnim">
+      <UniqueIdentifier>{8d8b006e-6529-4519-a479-84fb9ecfe6f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_PreChunk">
+      <UniqueIdentifier>{d9788dbc-116a-486a-8548-01e5cdd64610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_BlockPlace">
+      <UniqueIdentifier>{a3d369a6-73f3-4f5c-a49f-eed532a1ab36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Flying">
+      <UniqueIdentifier>{b0206351-425d-4d6f-aedd-f7211648d276}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_BlockChange">
+      <UniqueIdentifier>{3a312916-5878-403d-81ba-0477a78170af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Disconnect">
+      <UniqueIdentifier>{f2a3c185-38de-4e72-a3aa-3cf65745f0e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_PickupSpawn">
+      <UniqueIdentifier>{dc354068-6958-4e5f-a0ad-0c26f7bfd7ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_CollectItem">
+      <UniqueIdentifier>{8c01b7ec-3343-4e01-a74b-9303cdbfab4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_AddToInventory">
+      <UniqueIdentifier>{bcc7495f-ebb5-4603-9afb-007120d6c4d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_ItemSwitch">
+      <UniqueIdentifier>{e4a49287-7305-4e78-8574-2707e3c6c355}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_EntityEquipment">
+      <UniqueIdentifier>{0f48e5f8-ea4d-41dc-ab9e-750c5912c778}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_UseEntity">
+      <UniqueIdentifier>{bff5658b-0806-430c-9929-062f4bd4760b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_MapChunk">
+      <UniqueIdentifier>{8380c807-fcac-4126-8624-6b09ce27f8b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_MultiBlock">
+      <UniqueIdentifier>{234a9644-66cb-4aef-a662-e823e7d6b7b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_WindowOpen">
+      <UniqueIdentifier>{f547aa35-ad02-4062-8aee-2527a1e3d6d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_WindowClose">
+      <UniqueIdentifier>{603d6faf-af75-490b-98ef-5ae50fd351a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_InventorySlot">
+      <UniqueIdentifier>{2ec87aff-ab1b-4b07-a010-8e0dff47308a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_InventoryProgressBar">
+      <UniqueIdentifier>{88a9df03-789c-4ac3-a977-15fdd50bd9d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_13">
+      <UniqueIdentifier>{6431370c-20d2-4fcc-a6ef-3c6d6953d2a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_UpdateSign">
+      <UniqueIdentifier>{b24372d2-16fb-4a9f-b01d-6841ecb78029}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_EntityStatus">
+      <UniqueIdentifier>{dee92edf-fe18-479a-9108-b11353e14913}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cWaterSimulator">
+      <UniqueIdentifier>{02fd457d-3735-4f4b-aaf2-f7701a7ee7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading\cSocket">
+      <UniqueIdentifier>{82fda897-4c61-4ada-9160-8ae3982a72f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Ping">
+      <UniqueIdentifier>{b5725a7d-f912-47c7-b6f0-8efca7c0279c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\cServer.cpp">
+      <Filter>cServer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cWorld.cpp">
+      <Filter>cWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cChunk.cpp">
+      <Filter>cChunk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cEntity.cpp">
+      <Filter>cEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPickup.cpp">
+      <Filter>cEntity\cPickup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPlayer.cpp">
+      <Filter>cEntity\cPawn\cPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cInventory.cpp">
+      <Filter>cInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cBlockToPickup.cpp">
+      <Filter>cBlockToPickup</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPlugin.cpp">
+      <Filter>cPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPlugin_Lua.cpp">
+      <Filter>cPlugin\cPlugin_Lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cChatColor.cpp">
+      <Filter>cChatColor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cClientHandle.cpp">
+      <Filter>cClientHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\iniFile\iniFile.cpp">
+      <Filter>iniFile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cChestEntity.cpp">
+      <Filter>cBlockEntity\cChestEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cLog.cpp">
+      <Filter>cLog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Bindings.cpp">
+      <Filter>LuaBindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\main.cpp" />
+    <ClCompile Include="..\source\cWindow.cpp">
+      <Filter>cWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cRecipeChecker.cpp">
+      <Filter>cRecipeChecker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cCraftingWindow.cpp">
+      <Filter>cWindow\cCraftingWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cPluginManager.cpp">
+      <Filter>cPluginManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cCriticalSection.cpp">
+      <Filter>Threading\cCriticalSection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cEvent.cpp">
+      <Filter>Threading\cEvent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cSemaphore.cpp">
+      <Filter>Threading\cSemaphore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cGroupManager.cpp">
+      <Filter>cGroupManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cGroup.cpp">
+      <Filter>cGroupManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cWebAdmin.cpp">
+      <Filter>cWebAdmin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cWebPlugin.cpp">
+      <Filter>cWebAdmin\cWebPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\ManualBindings.cpp">
+      <Filter>LuaBindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cStringMap.cpp">
+      <Filter>LuaBindings\cStringMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cFurnaceEntity.cpp">
+      <Filter>cBlockEntity\cFurnaceEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cFurnaceWindow.cpp">
+      <Filter>cWindow\cFurnaceWindow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cFurnaceRecipe.cpp">
+      <Filter>cFurnaceRecipe</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cSignEntity.cpp">
+      <Filter>cBlockEntity\cSignEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cRoot.cpp">
+      <Filter>cRoot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cMonster.cpp">
+      <Filter>cEntity\cPawn\cMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cPawn.cpp">
+      <Filter>cEntity\cPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Matrix4f.cpp">
+      <Filter>Vector3f</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Vector3f.cpp">
+      <Filter>Vector3f</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Vector3d.cpp">
+      <Filter>Vector3f</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Vector3i.cpp">
+      <Filter>Vector3f</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_SpawnMob.cpp">
+      <Filter>Packets\cPacket_SpawnMob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket.cpp">
+      <Filter>Packets\cPacket</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_EntityLook.cpp">
+      <Filter>Packets\cPacket_EntityLook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_TeleportEntity.cpp">
+      <Filter>Packets\cPacket_TeleportEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_RelativeEntityMoveLook.cpp">
+      <Filter>Packets\cPacket_RelativeEntityMoveLook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_RelativeEntityMove.cpp">
+      <Filter>Packets\cPacket_RelativeEntityMove</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_NamedEntitySpawn.cpp">
+      <Filter>Packets\cPacket_NamedEntitySpawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_UpdateHealth.cpp">
+      <Filter>Packets\cPacket_UpdateHealth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Respawn.cpp">
+      <Filter>Packets\cPacket_Respawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_PlayerPosition.cpp">
+      <Filter>Packets\cPacket_PlayerPosition</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_DestroyEntity.cpp">
+      <Filter>Packets\cPacket_DestroyEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cChunkMap.cpp">
+      <Filter>cChunkMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cTCPLink.cpp">
+      <Filter>cTCPLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cHeartBeat.cpp">
+      <Filter>cHeartBeat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\md5\md5.cpp">
+      <Filter>MD5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cTracer.cpp">
+      <Filter>cTracer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cMCLogger.cpp">
+      <Filter>cLog\cMCLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cChicken.cpp">
+      <Filter>cEntity\cPawn\cMonster\cChicken</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cReferenceManager.cpp">
+      <Filter>cReferenceManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cLuaCommandBinder.cpp">
+      <Filter>cPluginManager\cLuaCommandBinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cBlockingTCPLink.cpp">
+      <Filter>cTCPLink\cBlockingTCPLink</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cAuthenticator.cpp">
+      <Filter>cAuthenticator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cThread.cpp">
+      <Filter>Threading\cThread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSpider.cpp">
+      <Filter>cEntity\cPawn\cMonster\cSpider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cMonsterConfig.cpp">
+      <Filter>cMonsterConfig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Metadata.cpp">
+      <Filter>Packets\cPacket_MetaData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSleep.cpp">
+      <Filter>Threading\cSleep</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cTimer.cpp">
+      <Filter>cTimer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Chat.cpp">
+      <Filter>Packets\cPacket_Chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Login.cpp">
+      <Filter>Packets\cPacket_Login</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_WindowClick.cpp">
+      <Filter>Packets\cPacket_WindowClick</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cChunkLoader.cpp">
+      <Filter>cChunkLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cCuboid.cpp">
+      <Filter>Vector3f</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cNoise.cpp">
+      <Filter>cNoise</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cGenSettings.cpp">
+      <Filter>cGenSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cMakeDir.cpp">
+      <Filter>cMakeDir</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_PlayerMoveLook.cpp">
+      <Filter>Packets\cPacket_PlayerMoveLook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_TimeUpdate.cpp">
+      <Filter>Packets\cPacket_TimeUpdate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_WholeInventory.cpp">
+      <Filter>Packets\cPacket_WholeInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_BlockDig.cpp">
+      <Filter>Packets\cPacket_BlockDig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_KeepAlive.cpp">
+      <Filter>Packets\cPacket_KeepAlive</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Handshake.cpp">
+      <Filter>Packets\cPacket_Handshake</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_PlayerLook.cpp">
+      <Filter>Packets\cPacket_PlayerLook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_ArmAnim.cpp">
+      <Filter>Packets\cPacket_ArmAnim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_PreChunk.cpp">
+      <Filter>Packets\cPacket_PreChunk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_BlockPlace.cpp">
+      <Filter>Packets\cPacket_BlockPlace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Flying.cpp">
+      <Filter>Packets\cPacket_Flying</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_BlockChange.cpp">
+      <Filter>Packets\cPacket_BlockChange</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Disconnect.cpp">
+      <Filter>Packets\cPacket_Disconnect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_PickupSpawn.cpp">
+      <Filter>Packets\cPacket_PickupSpawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_CollectItem.cpp">
+      <Filter>Packets\cPacket_CollectItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_AddToInventory.cpp">
+      <Filter>Packets\cPacket_AddToInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_ItemSwitch.cpp">
+      <Filter>Packets\cPacket_ItemSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_EntityEquipment.cpp">
+      <Filter>Packets\cPacket_EntityEquipment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_UseEntity.cpp">
+      <Filter>Packets\cPacket_UseEntity</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_MapChunk.cpp">
+      <Filter>Packets\cPacket_MapChunk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_MultiBlock.cpp">
+      <Filter>Packets\cPacket_MultiBlock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp">
+      <Filter>Packets\cPacket_WindowOpen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp">
+      <Filter>Packets\cPacket_WindowClose</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_InventorySlot.cpp">
+      <Filter>Packets\cPacket_InventorySlot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_InventoryProgressBar.cpp">
+      <Filter>Packets\cPacket_InventoryProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_13.cpp">
+      <Filter>Packets\cPacket_13</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_UpdateSign.cpp">
+      <Filter>Packets\cPacket_UpdateSign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_EntityStatus.cpp">
+      <Filter>Packets\cPacket_EntityStatus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cWaterSimulator.cpp">
+      <Filter>cWaterSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSocket.cpp">
+      <Filter>Threading\cSocket</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\cServer.h">
+      <Filter>cServer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cWorld.h">
+      <Filter>cWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cChunk.h">
+      <Filter>cChunk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cEntity.h">
+      <Filter>cEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPickup.h">
+      <Filter>cEntity\cPickup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPlayer.h">
+      <Filter>cEntity\cPawn\cPlayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cInventory.h">
+      <Filter>cInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cBlockToPickup.h">
+      <Filter>cBlockToPickup</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cItem.h">
+      <Filter>cItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPlugin.h">
+      <Filter>cPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPlugin_Lua.h">
+      <Filter>cPlugin\cPlugin_Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cChatColor.h">
+      <Filter>cChatColor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cClientHandle.h">
+      <Filter>cClientHandle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\iniFile\iniFile.h">
+      <Filter>iniFile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cBlockEntity.h">
+      <Filter>cBlockEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cChestEntity.h">
+      <Filter>cBlockEntity\cChestEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cLog.h">
+      <Filter>cLog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Bindings.h">
+      <Filter>LuaBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Defines.h" />
+    <ClInclude Include="..\source\MCSocket.h" />
+    <ClInclude Include="..\source\cWindow.h">
+      <Filter>cWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cWindowOwner.h">
+      <Filter>cWindow\cWindowOwner</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\MemoryLeak.h" />
+    <ClInclude Include="..\Source\cRecipeChecker.h">
+      <Filter>cRecipeChecker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cCraftingWindow.h">
+      <Filter>cWindow\cCraftingWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\LuaFunctions.h">
+      <Filter>LuaBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cPluginManager.h">
+      <Filter>cPluginManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cTorch.h">
+      <Filter>HandyStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cCriticalSection.h">
+      <Filter>Threading\cCriticalSection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cEvent.h">
+      <Filter>Threading\cEvent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cSemaphore.h">
+      <Filter>Threading\cSemaphore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cStairs.h">
+      <Filter>HandyStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cLadder.h">
+      <Filter>HandyStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cGroupManager.h">
+      <Filter>cGroupManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cGroup.h">
+      <Filter>cGroupManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cWebAdmin.h">
+      <Filter>cWebAdmin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cWebPlugin.h">
+      <Filter>cWebAdmin\cWebPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\Source\ManualBindings.h">
+      <Filter>LuaBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\PacketID.h">
+      <Filter>Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\BlockID.h" />
+    <ClInclude Include="..\Source\FileDefine.h" />
+    <ClInclude Include="..\source\cStringMap.h">
+      <Filter>LuaBindings\cStringMap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cFurnaceEntity.h">
+      <Filter>cBlockEntity\cFurnaceEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cFurnaceWindow.h">
+      <Filter>cWindow\cFurnaceWindow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cFurnaceRecipe.h">
+      <Filter>cFurnaceRecipe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cSign.h">
+      <Filter>HandyStuff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cSignEntity.h">
+      <Filter>cBlockEntity\cSignEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cRoot.h">
+      <Filter>cRoot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cMonster.h">
+      <Filter>cEntity\cPawn\cMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cPawn.h">
+      <Filter>cEntity\cPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Matrix4f.h">
+      <Filter>Vector3f</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vector3f.h">
+      <Filter>Vector3f</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vector3d.h">
+      <Filter>Vector3f</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Vector3i.h">
+      <Filter>Vector3f</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_SpawnMob.h">
+      <Filter>Packets\cPacket_SpawnMob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket.h">
+      <Filter>Packets\cPacket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_EntityLook.h">
+      <Filter>Packets\cPacket_EntityLook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_TeleportEntity.h">
+      <Filter>Packets\cPacket_TeleportEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_RelativeEntityMoveLook.h">
+      <Filter>Packets\cPacket_RelativeEntityMoveLook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_RelativeEntityMove.h">
+      <Filter>Packets\cPacket_RelativeEntityMove</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_NamedEntitySpawn.h">
+      <Filter>Packets\cPacket_NamedEntitySpawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_UpdateHealth.h">
+      <Filter>Packets\cPacket_UpdateHealth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Respawn.h">
+      <Filter>Packets\cPacket_Respawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_PlayerPosition.h">
+      <Filter>Packets\cPacket_PlayerPosition</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_DestroyEntity.h">
+      <Filter>Packets\cPacket_DestroyEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cChunkMap.h">
+      <Filter>cChunkMap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cTCPLink.h">
+      <Filter>cTCPLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cHeartBeat.h">
+      <Filter>cHeartBeat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\md5\md5.h">
+      <Filter>MD5</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cTracer.h">
+      <Filter>cTracer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cMCLogger.h">
+      <Filter>cLog\cMCLogger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cChicken.h">
+      <Filter>cEntity\cPawn\cMonster\cChicken</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cReferenceManager.h">
+      <Filter>cReferenceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cLuaCommandBinder.h">
+      <Filter>cPluginManager\cLuaCommandBinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cBlockingTCPLink.h">
+      <Filter>cTCPLink\cBlockingTCPLink</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cAuthenticator.h">
+      <Filter>cAuthenticator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cThread.h">
+      <Filter>Threading\cThread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSpider.h">
+      <Filter>cEntity\cPawn\cMonster\cSpider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cMonsterConfig.h">
+      <Filter>cMonsterConfig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Metadata.h">
+      <Filter>Packets\cPacket_MetaData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSleep.h">
+      <Filter>Threading\cSleep</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cTimer.h">
+      <Filter>cTimer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Chat.h">
+      <Filter>Packets\cPacket_Chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Login.h">
+      <Filter>Packets\cPacket_Login</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_WindowClick.h">
+      <Filter>Packets\cPacket_WindowClick</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cChunkLoader.h">
+      <Filter>cChunkLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cCuboid.h">
+      <Filter>Vector3f</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cNoise.h">
+      <Filter>cNoise</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cGenSettings.h">
+      <Filter>cGenSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cMakeDir.h">
+      <Filter>cMakeDir</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_PlayerMoveLook.h">
+      <Filter>Packets\cPacket_PlayerMoveLook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_TimeUpdate.h">
+      <Filter>Packets\cPacket_TimeUpdate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_WholeInventory.h">
+      <Filter>Packets\cPacket_WholeInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_BlockDig.h">
+      <Filter>Packets\cPacket_BlockDig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_KeepAlive.h">
+      <Filter>Packets\cPacket_KeepAlive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Handshake.h">
+      <Filter>Packets\cPacket_Handshake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_PlayerLook.h">
+      <Filter>Packets\cPacket_PlayerLook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_ArmAnim.h">
+      <Filter>Packets\cPacket_ArmAnim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_PreChunk.h">
+      <Filter>Packets\cPacket_PreChunk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_BlockPlace.h">
+      <Filter>Packets\cPacket_BlockPlace</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Flying.h">
+      <Filter>Packets\cPacket_Flying</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_BlockChange.h">
+      <Filter>Packets\cPacket_BlockChange</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Disconnect.h">
+      <Filter>Packets\cPacket_Disconnect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_PickupSpawn.h">
+      <Filter>Packets\cPacket_PickupSpawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_CollectItem.h">
+      <Filter>Packets\cPacket_CollectItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_AddToInventory.h">
+      <Filter>Packets\cPacket_AddToInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_ItemSwitch.h">
+      <Filter>Packets\cPacket_ItemSwitch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_EntityEquipment.h">
+      <Filter>Packets\cPacket_EntityEquipment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_UseEntity.h">
+      <Filter>Packets\cPacket_UseEntity</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_MapChunk.h">
+      <Filter>Packets\cPacket_MapChunk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_MultiBlock.h">
+      <Filter>Packets\cPacket_MultiBlock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_WindowOpen.h">
+      <Filter>Packets\cPacket_WindowOpen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_WindowClose.h">
+      <Filter>Packets\cPacket_WindowClose</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_InventorySlot.h">
+      <Filter>Packets\cPacket_InventorySlot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_InventoryProgressBar.h">
+      <Filter>Packets\cPacket_InventoryProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_13.h">
+      <Filter>Packets\cPacket_13</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_UpdateSign.h">
+      <Filter>Packets\cPacket_UpdateSign</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_EntityStatus.h">
+      <Filter>Packets\cPacket_EntityStatus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cWaterSimulator.h">
+      <Filter>cWaterSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSocket.h">
+      <Filter>Threading\cSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Endianness.h">
+      <Filter>Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Ping.h">
+      <Filter>Packets\cPacket_Ping</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\source\AllToLua.pkg">
+      <Filter>LuaBindings</Filter>
+    </None>
+    <None Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="MCServer.rc" />
+  </ItemGroup>
+</Project>
