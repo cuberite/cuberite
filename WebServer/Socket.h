@@ -33,9 +33,9 @@
 #define SOCKET_H
 
 #include "../source/MCSocket.h"
-#ifdef _WIN32
-#include <winsock2.h>
-#endif
+// #ifdef _WIN32
+// #include <winsock2.h>
+// #endif
 
 #include <string>
 

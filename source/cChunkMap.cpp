@@ -4,9 +4,12 @@
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cMakeDir.h"
+
 #ifndef _WIN32
 #include <cstring> // memcpy
 #include <cstdlib> // abs
+#include <math.h>  // floorf
+#include <stdio.h> // sprintf and stuff
 #endif
 
 #include "zlib.h"

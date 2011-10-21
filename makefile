@@ -46,12 +46,8 @@ MCServer : \
 		build/cGenSettings.o\
 		build/cCuboid.o\
 		build/cNoise.o\
-		build/cPacket_WindowClick.o\
-		build/cPacket_Login.o\
-		build/cPacket_Chat.o\
 		build/cTimer.o\
 		build/cSleep.o\
-		build/cPacket_Metadata.o\
 		build/cMonsterConfig.o\
 		build/cSpider.o\
 		build/cThread.o\
@@ -99,7 +95,6 @@ MCServer : \
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
-		build/PacketHeader.o\
 		build/Vector3d.o\
 		build/Vector3f.o\
 		build/Vector3i.o\
@@ -107,153 +102,48 @@ MCServer : \
 		build/cTCPLink.o\
 		build/cMCLogger.o\
 		build/cTracer.o\
-		build/cPacket_DestroyEntity.o\
-		build/cPacket_EntityLook.o\
-		build/cPacket_NamedEntitySpawn.o\
-		build/cPacket_PlayerPosition.o\
-		build/cPacket_RelativeEntityMove.o\
-		build/cPacket_RelativeEntityMoveLook.o\
-		build/cPacket_Respawn.o\
-		build/cPacket_SpawnMob.o\
-		build/cPacket_TeleportEntity.o\
-		build/cPacket_UpdateHealth.o\
-		build/cPacket.o\
-		build/base64.o\
-		build/Socket.o\
-		build/StdHelpers.o\
-		build/UrlHelper.o\
-		build/WebServer.o\
-		build/tolua_event.o\
-		build/tolua_is.o\
-		build/tolua_map.o\
-		build/tolua_push.o\
-		build/tolua_to.o\
-		build/lapi.o\
-		build/lauxlib.o\
-		build/lbaselib.o\
-		build/lcode.o\
-		build/ldblib.o\
-		build/ldebug.o\
-		build/ldo.o\
-		build/ldump.o\
-		build/lfunc.o\
-		build/lgc.o\
-		build/linit.o\
-		build/liolib.o\
-		build/llex.o\
-		build/lmathlib.o\
-		build/lmem.o\
-		build/loadlib.o\
-		build/lobject.o\
-		build/lopcodes.o\
-		build/loslib.o\
-		build/lparser.o\
-		build/lstate.o\
-		build/lstring.o\
-		build/lstrlib.o\
-		build/ltable.o\
-		build/ltablib.o\
-		build/ltm.o\
-		build/luac.o\
-		build/lundump.o\
-		build/lvm.o\
-		build/lzio.o\
-		build/print.o\
-		build/adler32.o\
-		build/compress.o\
-		build/crc32.o\
-		build/deflate.o\
-		build/gzclose.o\
-		build/gzlib.o\
-		build/gzread.o\
-		build/gzwrite.o\
-		build/infback.o\
-		build/inffast.o\
-		build/inflate.o\
-		build/inftrees.o\
-		build/trees.o\
-		build/uncompr.o\
-		build/zutil.o\
-		build/iniFile.o
-	$(CC) $(LNK_OPTIONS) \
-		build/json_reader.o\
-		build/json_value.o\
-		build/json_writer.o\
-		build/cMakeDir.o\
-		build/cGenSettings.o\
-		build/cCuboid.o\
-		build/cNoise.o\
-		build/cPacket_WindowClick.o\
-		build/cPacket_Login.o\
+		build/cPacket_13.o\
+		build/cPacket_AddToInventory.o\
+		build/cPacket_ArmAnim.o\
+		build/cPacket_BlockChange.o\
+		build/cPacket_BlockDig.o\
+		build/cPacket_BlockPlace.o\
 		build/cPacket_Chat.o\
-		build/cTimer.o\
-		build/cSleep.o\
-		build/cPacket_Metadata.o\
-		build/cMonsterConfig.o\
-		build/cSpider.o\
-		build/cThread.o\
-		build/cBlockingTCPLink.o\
-		build/cAuthenticator.o\
-		build/cLuaCommandBinder.o\
-		build/cChicken.o\
-		build/md5.o\
-		build/cReferenceManager.o\
-		build/Bindings.o\
-		build/cBlockToPickup.o\
-		build/cChatColor.o\
-		build/cChestEntity.o\
-		build/cChunk.o\
-		build/cChunkMap.o\
-		build/cClientHandle.o\
-		build/cCraftingWindow.o\
-		build/cCriticalSection.o\
-		build/cEntity.o\
-		build/cEvent.o\
-		build/cFurnaceEntity.o\
-		build/cFurnaceRecipe.o\
-		build/cFurnaceWindow.o\
-		build/cGroup.o\
-		build/cGroupManager.o\
-		build/cInventory.o\
-		build/cLog.o\
-		build/cMonster.o\
-		build/cPawn.o\
-		build/cPickup.o\
-		build/cPlayer.o\
-		build/cPlugin_Lua.o\
-		build/cPlugin.o\
-		build/cPluginManager.o\
-		build/cRecipeChecker.o\
-		build/cRoot.o\
-		build/cSemaphore.o\
-		build/cServer.o\
-		build/cSignEntity.o\
-		build/cStringMap.o\
-		build/cWebAdmin.o\
-		build/cWebPlugin.o\
-		build/cWindow.o\
-		build/cWorld.o\
-		build/main.o\
-		build/ManualBindings.o\
-		build/Matrix4f.o\
-		build/PacketHeader.o\
-		build/Vector3d.o\
-		build/Vector3f.o\
-		build/Vector3i.o\
-		build/cHeartBeat.o\
-		build/cTCPLink.o\
-		build/cMCLogger.o\
-		build/cTracer.o\
+		build/cPacket_CollectItem.o\
 		build/cPacket_DestroyEntity.o\
+		build/cPacket_Disconnect.o\
+		build/cPacket_EntityEquipment.o\
 		build/cPacket_EntityLook.o\
+		build/cPacket_EntityStatus.o\
+		build/cPacket_Flying.o\
+		build/cPacket_Handshake.o\
+		build/cPacket_InventoryProgressBar.o\
+		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemSwitch.o\
+		build/cPacket_KeepAlive.o\
+		build/cPacket_Login.o\
+		build/cPacket_MapChunk.o\
+		build/cPacket_Metadata.o\
+		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
+		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerLook.o\
+		build/cPacket_PlayerMoveLook.o\
 		build/cPacket_PlayerPosition.o\
+		build/cPacket_PreChunk.o\
 		build/cPacket_RelativeEntityMove.o\
 		build/cPacket_RelativeEntityMoveLook.o\
 		build/cPacket_Respawn.o\
 		build/cPacket_SpawnMob.o\
 		build/cPacket_TeleportEntity.o\
+		build/cPacket_TimeUpdate.o\
 		build/cPacket_UpdateHealth.o\
+		build/cPacket_UpdateSign.o\
+		build/cPacket_UseEntity.o\
+		build/cPacket_WholeInventory.o\
+		build/cPacket_WindowClick.o\
+		build/cPacket_WindowClose.o\
+		build/cPacket_WindowOpen.o\
 		build/cPacket.o\
 		build/base64.o\
 		build/Socket.o\
@@ -312,6 +202,174 @@ MCServer : \
 		build/uncompr.o\
 		build/zutil.o\
 		build/iniFile.o\
+		build/cSocket.o\
+		build/cWaterSimulator.o
+	$(CC) $(LNK_OPTIONS) \
+		build/json_reader.o\
+		build/json_value.o\
+		build/json_writer.o\
+		build/cMakeDir.o\
+		build/cGenSettings.o\
+		build/cCuboid.o\
+		build/cNoise.o\
+		build/cTimer.o\
+		build/cSleep.o\
+		build/cMonsterConfig.o\
+		build/cSpider.o\
+		build/cThread.o\
+		build/cBlockingTCPLink.o\
+		build/cAuthenticator.o\
+		build/cLuaCommandBinder.o\
+		build/cChicken.o\
+		build/md5.o\
+		build/cReferenceManager.o\
+		build/Bindings.o\
+		build/cBlockToPickup.o\
+		build/cChatColor.o\
+		build/cChestEntity.o\
+		build/cChunk.o\
+		build/cChunkMap.o\
+		build/cClientHandle.o\
+		build/cCraftingWindow.o\
+		build/cCriticalSection.o\
+		build/cEntity.o\
+		build/cEvent.o\
+		build/cFurnaceEntity.o\
+		build/cFurnaceRecipe.o\
+		build/cFurnaceWindow.o\
+		build/cGroup.o\
+		build/cGroupManager.o\
+		build/cInventory.o\
+		build/cLog.o\
+		build/cMonster.o\
+		build/cPawn.o\
+		build/cPickup.o\
+		build/cPlayer.o\
+		build/cPlugin_Lua.o\
+		build/cPlugin.o\
+		build/cPluginManager.o\
+		build/cRecipeChecker.o\
+		build/cRoot.o\
+		build/cSemaphore.o\
+		build/cServer.o\
+		build/cSignEntity.o\
+		build/cStringMap.o\
+		build/cWebAdmin.o\
+		build/cWebPlugin.o\
+		build/cWindow.o\
+		build/cWorld.o\
+		build/main.o\
+		build/ManualBindings.o\
+		build/Matrix4f.o\
+		build/Vector3d.o\
+		build/Vector3f.o\
+		build/Vector3i.o\
+		build/cHeartBeat.o\
+		build/cTCPLink.o\
+		build/cMCLogger.o\
+		build/cTracer.o\
+		build/cPacket_13.o\
+		build/cPacket_AddToInventory.o\
+		build/cPacket_ArmAnim.o\
+		build/cPacket_BlockChange.o\
+		build/cPacket_BlockDig.o\
+		build/cPacket_BlockPlace.o\
+		build/cPacket_Chat.o\
+		build/cPacket_CollectItem.o\
+		build/cPacket_DestroyEntity.o\
+		build/cPacket_Disconnect.o\
+		build/cPacket_EntityEquipment.o\
+		build/cPacket_EntityLook.o\
+		build/cPacket_EntityStatus.o\
+		build/cPacket_Flying.o\
+		build/cPacket_Handshake.o\
+		build/cPacket_InventoryProgressBar.o\
+		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemSwitch.o\
+		build/cPacket_KeepAlive.o\
+		build/cPacket_Login.o\
+		build/cPacket_MapChunk.o\
+		build/cPacket_Metadata.o\
+		build/cPacket_MultiBlock.o\
+		build/cPacket_NamedEntitySpawn.o\
+		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerLook.o\
+		build/cPacket_PlayerMoveLook.o\
+		build/cPacket_PlayerPosition.o\
+		build/cPacket_PreChunk.o\
+		build/cPacket_RelativeEntityMove.o\
+		build/cPacket_RelativeEntityMoveLook.o\
+		build/cPacket_Respawn.o\
+		build/cPacket_SpawnMob.o\
+		build/cPacket_TeleportEntity.o\
+		build/cPacket_TimeUpdate.o\
+		build/cPacket_UpdateHealth.o\
+		build/cPacket_UpdateSign.o\
+		build/cPacket_UseEntity.o\
+		build/cPacket_WholeInventory.o\
+		build/cPacket_WindowClick.o\
+		build/cPacket_WindowClose.o\
+		build/cPacket_WindowOpen.o\
+		build/cPacket.o\
+		build/base64.o\
+		build/Socket.o\
+		build/StdHelpers.o\
+		build/UrlHelper.o\
+		build/WebServer.o\
+		build/tolua_event.o\
+		build/tolua_is.o\
+		build/tolua_map.o\
+		build/tolua_push.o\
+		build/tolua_to.o\
+		build/lapi.o\
+		build/lauxlib.o\
+		build/lbaselib.o\
+		build/lcode.o\
+		build/ldblib.o\
+		build/ldebug.o\
+		build/ldo.o\
+		build/ldump.o\
+		build/lfunc.o\
+		build/lgc.o\
+		build/linit.o\
+		build/liolib.o\
+		build/llex.o\
+		build/lmathlib.o\
+		build/lmem.o\
+		build/loadlib.o\
+		build/lobject.o\
+		build/lopcodes.o\
+		build/loslib.o\
+		build/lparser.o\
+		build/lstate.o\
+		build/lstring.o\
+		build/lstrlib.o\
+		build/ltable.o\
+		build/ltablib.o\
+		build/ltm.o\
+		build/luac.o\
+		build/lundump.o\
+		build/lvm.o\
+		build/lzio.o\
+		build/print.o\
+		build/adler32.o\
+		build/compress.o\
+		build/crc32.o\
+		build/deflate.o\
+		build/gzclose.o\
+		build/gzlib.o\
+		build/gzread.o\
+		build/gzwrite.o\
+		build/infback.o\
+		build/inffast.o\
+		build/inflate.o\
+		build/inftrees.o\
+		build/trees.o\
+		build/uncompr.o\
+		build/zutil.o\
+		build/iniFile.o\
+		build/cSocket.o\
+		build/cWaterSimulator.o\
 		-o MCServer
 
 clean : 
@@ -323,12 +381,8 @@ clean :
 		build/cGenSettings.o\
 		build/cCuboid.o\
 		build/cNoise.o\
-		build/cPacket_WindowClick.o\
-		build/cPacket_Login.o\
-		build/cPacket_Chat.o\
 		build/cTimer.o\
 		build/cSleep.o\
-		build/cPacket_Metadata.o\
 		build/cMonsterConfig.o\
 		build/cSpider.o\
 		build/cThread.o\
@@ -376,7 +430,6 @@ clean :
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
-		build/PacketHeader.o\
 		build/Vector3d.o\
 		build/Vector3f.o\
 		build/Vector3i.o\
@@ -384,16 +437,48 @@ clean :
 		build/cTCPLink.o\
 		build/cMCLogger.o\
 		build/cTracer.o\
+		build/cPacket_13.o\
+		build/cPacket_AddToInventory.o\
+		build/cPacket_ArmAnim.o\
+		build/cPacket_BlockChange.o\
+		build/cPacket_BlockDig.o\
+		build/cPacket_BlockPlace.o\
+		build/cPacket_Chat.o\
+		build/cPacket_CollectItem.o\
 		build/cPacket_DestroyEntity.o\
+		build/cPacket_Disconnect.o\
+		build/cPacket_EntityEquipment.o\
 		build/cPacket_EntityLook.o\
+		build/cPacket_EntityStatus.o\
+		build/cPacket_Flying.o\
+		build/cPacket_Handshake.o\
+		build/cPacket_InventoryProgressBar.o\
+		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemSwitch.o\
+		build/cPacket_KeepAlive.o\
+		build/cPacket_Login.o\
+		build/cPacket_MapChunk.o\
+		build/cPacket_Metadata.o\
+		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
+		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerLook.o\
+		build/cPacket_PlayerMoveLook.o\
 		build/cPacket_PlayerPosition.o\
+		build/cPacket_PreChunk.o\
 		build/cPacket_RelativeEntityMove.o\
 		build/cPacket_RelativeEntityMoveLook.o\
 		build/cPacket_Respawn.o\
 		build/cPacket_SpawnMob.o\
 		build/cPacket_TeleportEntity.o\
+		build/cPacket_TimeUpdate.o\
 		build/cPacket_UpdateHealth.o\
+		build/cPacket_UpdateSign.o\
+		build/cPacket_UseEntity.o\
+		build/cPacket_WholeInventory.o\
+		build/cPacket_WindowClick.o\
+		build/cPacket_WindowClose.o\
+		build/cPacket_WindowOpen.o\
 		build/cPacket.o\
 		build/base64.o\
 		build/Socket.o\
@@ -452,6 +537,8 @@ clean :
 		build/uncompr.o\
 		build/zutil.o\
 		build/iniFile.o\
+		build/cSocket.o\
+		build/cWaterSimulator.o\
 		MCServer
 
 install : MCServer
@@ -671,12 +758,6 @@ build/ManualBindings.o : source/ManualBindings.cpp
 build/Matrix4f.o : source/Matrix4f.cpp
 	$(CC) $(CC_OPTIONS) source/Matrix4f.cpp -c $(INCLUDE) -o build/Matrix4f.o
 
-
-# Item # 44 -- PacketHeader --
-build/PacketHeader.o : source/PacketHeader.cpp
-	$(CC) $(CC_OPTIONS) source/PacketHeader.cpp -c $(INCLUDE) -o build/PacketHeader.o
-
-
 # Item # 45 -- Vector3d --
 build/Vector3d.o : source/Vector3d.cpp
 	$(CC) $(CC_OPTIONS) source/Vector3d.cpp -c $(INCLUDE) -o build/Vector3d.o
@@ -711,56 +792,131 @@ build/cMCLogger.o : source/cMCLogger.cpp
 build/cTracer.o : source/cTracer.cpp
 	$(CC) $(CC_OPTIONS) source/cTracer.cpp -c $(INCLUDE) -o build/cTracer.o
 
+build/cPacket_13.o : source/packets/cPacket_13.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_13.cpp -c $(INCLUDE) -o build/cPacket_13.o
+	
+build/cPacket_AddToInventory.o : source/packets/cPacket_AddToInventory.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_AddToInventory.cpp -c $(INCLUDE) -o build/cPacket_AddToInventory.o
+	
+build/cPacket_ArmAnim.o : source/packets/cPacket_ArmAnim.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_ArmAnim.cpp -c $(INCLUDE) -o build/cPacket_ArmAnim.o
 
-# Item # 52 -- cPacket_DestroyEntity --
+build/cPacket_BlockChange.o : source/packets/cPacket_BlockChange.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_BlockChange.cpp -c $(INCLUDE) -o build/cPacket_BlockChange.o
+	
+build/cPacket_BlockDig.o : source/packets/cPacket_BlockDig.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_BlockDig.cpp -c $(INCLUDE) -o build/cPacket_BlockDig.o
+	
+build/cPacket_BlockPlace.o : source/packets/cPacket_BlockPlace.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_BlockPlace.cpp -c $(INCLUDE) -o build/cPacket_BlockPlace.o
+	
+build/cPacket_Chat.o : source/packets/cPacket_Chat.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Chat.cpp -c $(INCLUDE) -o build/cPacket_Chat.o
+
+build/cPacket_CollectItem.o : source/packets/cPacket_CollectItem.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_CollectItem.cpp -c $(INCLUDE) -o build/cPacket_CollectItem.o
+
 build/cPacket_DestroyEntity.o : source/packets/cPacket_DestroyEntity.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_DestroyEntity.cpp -c $(INCLUDE) -o build/cPacket_DestroyEntity.o
 
+build/cPacket_Disconnect.o : source/packets/cPacket_Disconnect.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Disconnect.cpp -c $(INCLUDE) -o build/cPacket_Disconnect.o
 
-# Item # 53 -- cPacket_EntityLook --
+build/cPacket_EntityEquipment.o : source/packets/cPacket_EntityEquipment.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityEquipment.cpp -c $(INCLUDE) -o build/cPacket_EntityEquipment.o
+
 build/cPacket_EntityLook.o : source/packets/cPacket_EntityLook.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityLook.cpp -c $(INCLUDE) -o build/cPacket_EntityLook.o
 
+build/cPacket_EntityStatus.o : source/packets/cPacket_EntityStatus.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityStatus.cpp -c $(INCLUDE) -o build/cPacket_EntityStatus.o
 
-# Item # 54 -- cPacket_NamedEntitySpawn --
+build/cPacket_Flying.o : source/packets/cPacket_Flying.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Flying.cpp -c $(INCLUDE) -o build/cPacket_Flying.o
+
+build/cPacket_Handshake.o : source/packets/cPacket_Handshake.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Handshake.cpp -c $(INCLUDE) -o build/cPacket_Handshake.o
+
+build/cPacket_InventoryProgressBar.o : source/packets/cPacket_InventoryProgressBar.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_InventoryProgressBar.cpp -c $(INCLUDE) -o build/cPacket_InventoryProgressBar.o
+
+build/cPacket_InventorySlot.o : source/packets/cPacket_InventorySlot.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_InventorySlot.cpp -c $(INCLUDE) -o build/cPacket_InventorySlot.o
+
+build/cPacket_ItemSwitch.o : source/packets/cPacket_ItemSwitch.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_ItemSwitch.cpp -c $(INCLUDE) -o build/cPacket_ItemSwitch.o
+
+build/cPacket_KeepAlive.o : source/packets/cPacket_KeepAlive.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_KeepAlive.cpp -c $(INCLUDE) -o build/cPacket_KeepAlive.o
+
+build/cPacket_Login.o : source/packets/cPacket_Login.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Login.cpp -c $(INCLUDE) -o build/cPacket_Login.o
+
+build/cPacket_MapChunk.o : source/packets/cPacket_MapChunk.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_MapChunk.cpp -c $(INCLUDE) -o build/cPacket_MapChunk.o
+
+build/cPacket_Metadata.o : source/packets/cPacket_Metadata.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Metadata.cpp -c $(INCLUDE) -o build/cPacket_Metadata.o
+
+build/cPacket_MultiBlock.o : source/packets/cPacket_MultiBlock.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_MultiBlock.cpp -c $(INCLUDE) -o build/cPacket_MultiBlock.o
+
 build/cPacket_NamedEntitySpawn.o : source/packets/cPacket_NamedEntitySpawn.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_NamedEntitySpawn.cpp -c $(INCLUDE) -o build/cPacket_NamedEntitySpawn.o
 
+build/cPacket_PickupSpawn.o : source/packets/cPacket_PickupSpawn.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_PickupSpawn.cpp -c $(INCLUDE) -o build/cPacket_PickupSpawn.o
 
-# Item # 55 -- cPacket_PlayerPosition --
+build/cPacket_PlayerLook.o : source/packets/cPacket_PlayerLook.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerLook.cpp -c $(INCLUDE) -o build/cPacket_PlayerLook.o
+
+build/cPacket_PlayerMoveLook.o : source/packets/cPacket_PlayerMoveLook.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerMoveLook.cpp -c $(INCLUDE) -o build/cPacket_PlayerMoveLook.o
+
 build/cPacket_PlayerPosition.o : source/packets/cPacket_PlayerPosition.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerPosition.cpp -c $(INCLUDE) -o build/cPacket_PlayerPosition.o
 
+build/cPacket_PreChunk.o : source/packets/cPacket_PreChunk.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_PreChunk.cpp -c $(INCLUDE) -o build/cPacket_PreChunk.o
 
-# Item # 56 -- cPacket_RelativeEntityMove --
 build/cPacket_RelativeEntityMove.o : source/packets/cPacket_RelativeEntityMove.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_RelativeEntityMove.cpp -c $(INCLUDE) -o build/cPacket_RelativeEntityMove.o
 
-
-# Item # 57 -- cPacket_RelativeEntityMoveLook --
 build/cPacket_RelativeEntityMoveLook.o : source/packets/cPacket_RelativeEntityMoveLook.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_RelativeEntityMoveLook.cpp -c $(INCLUDE) -o build/cPacket_RelativeEntityMoveLook.o
 
-
-# Item # 58 -- cPacket_Respawn --
 build/cPacket_Respawn.o : source/packets/cPacket_Respawn.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_Respawn.cpp -c $(INCLUDE) -o build/cPacket_Respawn.o
 
-
-# Item # 59 -- cPacket_SpawnMob --
 build/cPacket_SpawnMob.o : source/packets/cPacket_SpawnMob.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_SpawnMob.cpp -c $(INCLUDE) -o build/cPacket_SpawnMob.o
 
-
-# Item # 60 -- cPacket_TeleportEntity --
 build/cPacket_TeleportEntity.o : source/packets/cPacket_TeleportEntity.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_TeleportEntity.cpp -c $(INCLUDE) -o build/cPacket_TeleportEntity.o
 
+build/cPacket_TimeUpdate.o : source/packets/cPacket_TimeUpdate.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_TimeUpdate.cpp -c $(INCLUDE) -o build/cPacket_TimeUpdate.o
 
-# Item # 61 -- cPacket_UpdateHealth --
 build/cPacket_UpdateHealth.o : source/packets/cPacket_UpdateHealth.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_UpdateHealth.cpp -c $(INCLUDE) -o build/cPacket_UpdateHealth.o
 
+build/cPacket_UpdateSign.o : source/packets/cPacket_UpdateSign.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_UpdateSign.cpp -c $(INCLUDE) -o build/cPacket_UpdateSign.o
+
+build/cPacket_UseEntity.o : source/packets/cPacket_UseEntity.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_UseEntity.cpp -c $(INCLUDE) -o build/cPacket_UseEntity.o
+
+build/cPacket_WholeInventory.o : source/packets/cPacket_WholeInventory.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_WholeInventory.cpp -c $(INCLUDE) -o build/cPacket_WholeInventory.o
+
+build/cPacket_WindowClick.o : source/packets/cPacket_WindowClick.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_WindowClick.cpp -c $(INCLUDE) -o build/cPacket_WindowClick.o
+
+build/cPacket_WindowClose.o : source/packets/cPacket_WindowClose.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_WindowClose.cpp -c $(INCLUDE) -o build/cPacket_WindowClose.o
+
+build/cPacket_WindowOpen.o : source/packets/cPacket_WindowOpen.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_WindowOpen.cpp -c $(INCLUDE) -o build/cPacket_WindowOpen.o
 
 # Item # 62 -- cPacket --
 build/cPacket.o : source/packets/cPacket.cpp
@@ -1067,23 +1223,11 @@ build/cSpider.o: source/cSpider.cpp
 build/cMonsterConfig.o: source/cMonsterConfig.cpp
 	$(CC) $(CC_OPTIONS) source/cMonsterConfig.cpp -c $(INCLUDE) -o build/cMonsterConfig.o
 
-build/cPacket_Metadata.o: source/packets/cPacket_Metadata.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_Metadata.cpp -c $(INCLUDE) -o build/cPacket_Metadata.o
-
 build/cSleep.o: source/cSleep.cpp
 	$(CC) $(CC_OPTIONS) source/cSleep.cpp -c $(INCLUDE) -o build/cSleep.o
 
 build/cTimer.o: source/cTimer.cpp
 	$(CC) $(CC_OPTIONS) source/cTimer.cpp -c $(INCLUDE) -o build/cTimer.o
-
-build/cPacket_Chat.o : source/packets/cPacket_Chat.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_Chat.cpp -c $(INCLUDE) -o build/cPacket_Chat.o
-
-build/cPacket_Login.o : source/packets/cPacket_Login.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_Login.cpp -c $(INCLUDE) -o build/cPacket_Login.o
-
-build/cPacket_WindowClick.o : source/packets/cPacket_WindowClick.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_WindowClick.cpp -c $(INCLUDE) -o build/cPacket_WindowClick.o
 
 build/cNoise.o : source/cNoise.cpp
 	$(CC) $(CC_OPTIONS) source/cNoise.cpp -c $(INCLUDE) -o build/cNoise.o
@@ -1105,4 +1249,11 @@ build/json_writer.o : jsoncpp-src-0.5.0/src/lib_json/json_writer.cpp
 
 build/cMakeDir.o : source/cMakeDir.cpp
 	$(CC) $(CC_OPTIONS) source/cMakeDir.cpp -c $(INCLUDE) -o build/cMakeDir.o
+
+build/cSocket.o : source/cSocket.cpp
+	$(CC) $(CC_OPTIONS) source/cSocket.cpp -c $(INCLUDE) -o build/cSocket.o	
+	
+build/cWaterSimulator.o : source/cWaterSimulator.cpp
+	$(CC) $(CC_OPTIONS) source/cWaterSimulator.cpp -c $(INCLUDE) -o build/cWaterSimulator.o	
+
 ##### END RUN ####

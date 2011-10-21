@@ -36,6 +36,7 @@
 #ifndef _WIN32 // for mkdir
 #include <sys/stat.h>
 #include <sys/types.h>
+#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
 #endif
 
 extern std::vector< std::string > StringSplit( std::string str, std::string delim);

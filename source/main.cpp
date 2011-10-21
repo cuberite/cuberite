@@ -4,9 +4,9 @@
 #include "cRoot.h"
 #include "cMCLogger.h"
 
-#ifdef _WIN32
+//#ifdef _WIN32
 #include <exception>
-#endif
+//#endif
 
 int main( int argc, char **argv )
 {

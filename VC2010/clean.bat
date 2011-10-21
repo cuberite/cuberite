@@ -6,11 +6,10 @@ del *.map
 del *.pdb
 del *.bsc
 del *.sdf
-del *.opensdf
+del *.opensdf /AH
 del *.insprc
 del *.aps
 del applog.txt
-del tmpl83.00c.vcproj.LAPTOPF.Kevin.user
 del *.suo /AH
 del debug\*.* /Q
 del release\*.* /Q
@@ -23,3 +22,5 @@ rd ipch /Q
 rd x64 /Q
 rd "My Inspector Results" /Q
 rd ipch /Q
+
+pause

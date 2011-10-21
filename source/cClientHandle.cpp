@@ -4,6 +4,8 @@
 #include <errno.h>
 #endif
 
+#include "MCSocket.h"
+
 #include "cClientHandle.h"
 #include "cServer.h"
 #include "cWorld.h"
@@ -67,6 +69,10 @@
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_Ping.h"
 
+
+#ifndef _WIN32
+#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
+#endif
 
 #define MAX_SEMAPHORES (2000)
 
@@ -176,7 +182,7 @@ cClientHandle::~cClientHandle()
 		Disconnect.m_Reason = "Server shut down? Kthnxbai";
 		Disconnect.Send( m_pState->Socket );
 
-		closesocket( m_pState->Socket );
+		m_pState->Socket.CloseSocket();
 		m_pState->Socket = 0;
 	}
 	m_pState->SocketCriticalSection.Unlock();
@@ -218,7 +224,7 @@ void cClientHandle::Destroy()
 	 m_pState->SocketCriticalSection.Lock();
 	 if( m_pState->Socket )
 	 {
-		 closesocket( m_pState->Socket );
+		 m_pState->Socket.CloseSocket();
 		 m_pState->Socket = 0;
 	 }
 	 m_pState->SocketCriticalSection.Unlock();

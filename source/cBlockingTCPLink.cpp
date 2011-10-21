@@ -1,5 +1,6 @@
 #include "cBlockingTCPLink.h"
 #include "packets/cPacket.h"
+#include "MCSocket.h"
 #include <string>
 
 #include "cMCLogger.h"
@@ -30,7 +31,7 @@ void cBlockingTCPLink::CloseSocket()
 {
 	if( m_Socket )
 	{
-		closesocket( m_Socket );
+		m_Socket.CloseSocket();
 		m_Socket = 0;
 	}
 }

@@ -51,6 +51,6 @@ protected:
 	void AppendData		( char* a_Data, unsigned int a_Size, char* a_Dst, unsigned int & a_Iterator );
 
 public:
-	static int SendData( SOCKET a_Socket, const char* a_Message, unsigned int a_Size, int a_Options );
-	static int RecvAll( SOCKET a_Socket, char* a_Data, unsigned int a_Size, int a_Options );
+	static int SendData( cSocket & a_Socket, const char* a_Message, unsigned int a_Size, int a_Options );
+	static int RecvAll( cSocket & a_Socket, char* a_Data, unsigned int a_Size, int a_Options );
 };

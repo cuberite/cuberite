@@ -13,7 +13,7 @@
 //*****************************************************************************
 // Blocking receive all function
 //*****************************************************************************
-int cPacket::RecvAll( SOCKET a_Socket, char* a_Data, unsigned int a_Size, int a_Options )
+int cPacket::RecvAll( cSocket & a_Socket, char* a_Data, unsigned int a_Size, int a_Options )
 {
 	unsigned int RequestSize = a_Size;
 	while(a_Size != 0)
@@ -30,7 +30,7 @@ int cPacket::RecvAll( SOCKET a_Socket, char* a_Data, unsigned int a_Size, int a_
 //*****************************************************************************
 // Own implementation of send()
 //*****************************************************************************
-int cPacket::SendData( SOCKET a_Socket, const char* a_Message, unsigned int a_Size, int a_Options )
+int cPacket::SendData( cSocket & a_Socket, const char* a_Message, unsigned int a_Size, int a_Options )
 {
 	return send(a_Socket, a_Message, a_Size, a_Options | MSG_NOSIGNAL );
 }

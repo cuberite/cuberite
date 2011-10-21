@@ -2,6 +2,7 @@
 #include "cSocket.h"
 #include "cEvent.h"
 #include "cThread.h"
+#include "MCSocket.h"
 
 #include "cMCLogger.h"
 
@@ -37,7 +38,7 @@ void cTCPLink::CloseSocket()
 {
 	if( m_Socket )
 	{
-		closesocket( m_Socket );
+		m_Socket.CloseSocket();
 		m_Socket = 0;
 	}
 }

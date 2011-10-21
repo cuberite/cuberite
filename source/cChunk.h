@@ -7,6 +7,7 @@ namespace Json
 	class Value;
 };
 
+class cCriticalSection;
 class cFurnaceEntity;
 class cPacket;
 class cBlockEntity;
@@ -123,5 +124,5 @@ private:
 	unsigned int m_BlockTickNum;
 	unsigned int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
 
-	void* m_EntitiesCriticalSection;
+	cCriticalSection* m_EntitiesCriticalSection;
 };

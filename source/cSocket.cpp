@@ -1,5 +1,10 @@
 #include "cSocket.h"
 
+#ifndef _WIN32
+#include <netdb.h>
+#include <unistd.h>
+#endif
+
 cSocket::cSocket( xSocket a_Socket )
 	: m_Socket( a_Socket )
 {
@@ -28,3 +33,12 @@ bool cSocket::IsValid()
 #endif
 }
 
+void cSocket::CloseSocket()
+{
+#ifdef _WIN32
+	closesocket(m_Socket);
+#else
+	shutdown(m_Socket, SHUT_RDWR);//SD_BOTH);
+	close(m_Socket);
+#endif
+}

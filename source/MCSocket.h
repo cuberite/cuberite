@@ -1,12 +1,12 @@
 #pragma once
 
 #ifdef _WIN32
-
-#include <winsock2.h>
-#define socklen_t int
-#ifdef SendMessage
-#undef SendMessage
-#endif
+#include <Windows.h>
+#include <WinSock.h>
+// #define socklen_t int
+// #ifdef SendMessage
+// #undef SendMessage
+// #endif
 #else
 
 // Linux threads http://www.yolinux.com/TUTORIALS/LinuxTutorialPosixThreads.html

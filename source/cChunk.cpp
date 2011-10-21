@@ -22,6 +22,7 @@
 #include "cItem.h"
 #include "cNoise.h"
 #include "cRoot.h"
+#include "cCriticalSection.h"
 
 #include "cGenSettings.h"
 
@@ -36,6 +37,10 @@
 #include <list>
 #include <vector>
 #include <map>
+
+#ifndef _WIN32
+#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
+#endif
 
 extern bool g_bWaterPhysics;
 
@@ -77,8 +82,7 @@ cChunk::~cChunk()
 
 	if( m_EntitiesCriticalSection )
 	{
-		DeleteCriticalSection( (CRITICAL_SECTION*)m_EntitiesCriticalSection );
-		delete (CRITICAL_SECTION*)m_EntitiesCriticalSection;
+		delete m_EntitiesCriticalSection;
 		m_EntitiesCriticalSection = 0;
 	}
 	delete m_pState;
@@ -102,8 +106,7 @@ cChunk::cChunk(int a_X, int a_Y, int a_Z)
 	, m_EntitiesCriticalSection( 0 )
 {
 	//LOG("cChunk::cChunk(%i, %i, %i)", a_X, a_Y, a_Z);
-	m_EntitiesCriticalSection = new CRITICAL_SECTION;
-	InitializeCriticalSection( (CRITICAL_SECTION*)m_EntitiesCriticalSection );
+	m_EntitiesCriticalSection = new cCriticalSection();
 }
 
 void cChunk::Initialize()
@@ -1064,12 +1067,12 @@ bool cChunk::RemoveEntity( cEntity & a_Entity, cChunk* a_CalledFrom /* = 0 */ )
 
 void cChunk::LockEntities()
 {
-	EnterCriticalSection( (CRITICAL_SECTION*)m_EntitiesCriticalSection );
+	m_EntitiesCriticalSection->Lock();
 }
 
 void cChunk::UnlockEntities()
 {
-	LeaveCriticalSection( (CRITICAL_SECTION*)m_EntitiesCriticalSection );
+	m_EntitiesCriticalSection->Unlock();
 }
 
 char cChunk::GetBlock( int a_X, int a_Y, int a_Z )

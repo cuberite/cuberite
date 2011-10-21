@@ -32,6 +32,7 @@
 #include <cstring>
 #include <errno.h>
 #include <semaphore.h>
+#include "MCSocket.h"
 #endif
 
 #include <string>

@@ -2,6 +2,7 @@
 
 #include "cPawn.h"
 #include <list>
+#include <string> // TODO - use const char*
 
 class cGroup;
 class cWindow;

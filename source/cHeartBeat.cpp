@@ -8,6 +8,10 @@
 #include "cServer.h"
 #include "cSleep.h"
 
+#ifndef _WIN32
+#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
+#endif
+
 cHeartBeat::cHeartBeat()
 {
 	m_State = 0;

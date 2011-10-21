@@ -6,7 +6,8 @@
 #ifdef SendMessage
 #undef SendMessage
 #endif
-#endif
+#endif	// _WIN32
+
 
 class cSocket
 {
@@ -23,6 +24,7 @@ public:
 	~cSocket();
 
 	bool IsValid();
+	void CloseSocket();
 
 	operator const xSocket() const;
 	xSocket GetSocket() const;
