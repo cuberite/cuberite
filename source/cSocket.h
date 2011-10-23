@@ -1,8 +1,8 @@
 #pragma once
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <WinSock.h>
-#define socklen_t int
 #ifdef SendMessage
 #undef SendMessage
 #endif
@@ -30,6 +30,12 @@ public:
 	xSocket GetSocket() const;
 	void SetSocket( xSocket a_Socket );
 
+	int SetReuseAddress();
+	static int WSAStartup();
+
+	static const char* GetLastErrorString();
+	static cSocket CreateSocket();
+
 	inline static bool IsSocketError( int a_ReturnedValue )
 	{
 #ifdef _WIN32
@@ -39,7 +45,24 @@ public:
 #endif
 	}
 
-	
+	struct SockAddr_In
+	{
+		short Family;
+		unsigned short Port;
+		unsigned long Address;
+	};
+
+	static const short ADDRESS_FAMILY_INTERNET = 2;
+	static const unsigned long INTERNET_ADDRESS_ANY = 0;
+
+	int Bind( SockAddr_In& a_Address );
+	int Listen( int a_Backlog );
+	cSocket Accept();
+	int Receive( char* a_Buffer, unsigned int a_Length, unsigned int a_Flags );
+
+	char* GetIPString() { return m_IPString; }
+
 private:
 	xSocket m_Socket;
+	char* m_IPString;
 };

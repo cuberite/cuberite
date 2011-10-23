@@ -1,11 +1,3 @@
-#ifndef _WIN32
-#include <cstring>
-#include <semaphore.h>
-#include <errno.h>
-#endif
-
-#include "MCSocket.h"
-
 #include "cClientHandle.h"
 #include "cServer.h"
 #include "cWorld.h"
@@ -1023,7 +1015,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 
 	while( self->m_bKeepThreadGoing )
 	{
-		iStat = recv(socket, &temp, 1, 0);
+		iStat = socket.Receive( &temp, 1, 0 );
 		if( cSocket::IsSocketError(iStat) || iStat == 0 )
 		{
 			LOG("CLIENT DISCONNECTED (%i bytes):%s", iStat, GetWSAError().c_str() );
@@ -1041,11 +1033,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 				}
 				else
 				{
-#ifndef _WIN32
-					LOGERROR("Something went wrong during PacketID 0x%02x (%i)", temp, errno );
-#else
-					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, GetWSAError().c_str() );
-#endif
+					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetLastErrorString() );
 					LOG("CLIENT %s DISCONNECTED", self->GetUsername() );
 					break;
 				}
@@ -1056,11 +1044,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 
 
 				char c_Str[128];
-#ifdef _WIN32
-				sprintf_s( c_Str, "[C->S] Unknown PacketID: 0x%2x", (unsigned char)temp );
-#else
-				sprintf( c_Str, "[C->S] Unknown PacketID: 0x%2x", (unsigned char)temp );
-#endif
+				sprintf_s( c_Str, 128, "[C->S] Unknown PacketID: 0x%2x", (unsigned char)temp );
 				cPacket_Disconnect DC(c_Str);
 				DC.Send( socket );
 

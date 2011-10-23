@@ -29,10 +29,7 @@
 #include "packets/cPacket_Chat.h"
 
 #ifndef _WIN32
-#include <cstring>
-#include <errno.h>
-#include <semaphore.h>
-#include "MCSocket.h"
+#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
 #endif
 
 #include <string>
@@ -150,64 +147,40 @@ bool cServer::InitServer( int a_Port )
 
 	LOG("Starting up server.");
 
-#ifdef _WIN32
-	WSADATA wsaData;
-	memset( &wsaData, 0, sizeof( wsaData ) );
-    int wsaret=WSAStartup(/*0x101*/ MAKEWORD(2, 2),&wsaData);
-
-	if(wsaret!=0)
+	if( cSocket::WSAStartup() != 0 ) // Only does anything on Windows, but whatever
 	{
-		LOG("wsaret != 0");
+		LOGERROR("WSAStartup() != 0");
 		return false;
 	}
-#endif
 
-	sockaddr_in local;
-
-	local.sin_family=AF_INET;
-	local.sin_addr.s_addr=INADDR_ANY;
-	local.sin_port=htons((u_short)a_Port);  // 25565
-
-	m_pState->SListenClient = socket(AF_INET,SOCK_STREAM,0);
+	m_pState->SListenClient = cSocket::CreateSocket();
 
 	if( !m_pState->SListenClient.IsValid() )
 	{
-#ifdef _WIN32
-		LOGERROR("m_SListenClient==INVALID_SOCKET (%s)", GetWSAError().c_str() );
-#else
-		LOGERROR("m_SListenClient==INVALID_SOCKET");
-#endif
+		LOGERROR("m_SListenClient==INVALID_SOCKET (%s)", cSocket::GetLastErrorString() );
+		return false;
 	}
 
-
-#ifdef _WIN32
-	char yes = 1;
-#else
-    int yes = 1;
-#endif
-    if (setsockopt( m_pState->SListenClient, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+    if( m_pState->SListenClient.SetReuseAddress() == -1 )
+	{
         LOGERROR("setsockopt == -1");
         return false;
     }
 
-	if( bind( m_pState->SListenClient, (sockaddr*)&local, sizeof(local)) != 0 )
+	cSocket::SockAddr_In local;
+	local.Family = cSocket::ADDRESS_FAMILY_INTERNET;
+	local.Address = cSocket::INTERNET_ADDRESS_ANY;
+	local.Port = (unsigned short)a_Port; // 25565
+
+	if( m_pState->SListenClient.Bind( local ) != 0 )
 	{
-#ifdef _WIN32
-		LOGERROR("bind fail (%s)", GetWSAError().c_str() );
-#else
-        LOGERROR("bind fail (%i)", errno);
-#endif
+		LOGERROR("bind fail (%s)", cSocket::GetLastErrorString() );
 		return false;
 	}
-
-
-	if( listen( m_pState->SListenClient , 10 ) != 0)
+	
+	if( m_pState->SListenClient.Listen( 10 ) != 0)
 	{
-#ifdef _WIN32
-		LOGERROR("listen fail (%s)", GetWSAError().c_str() );
-#else
-		LOGERROR("listen fail (%i)", errno);
-#endif
+		LOGERROR("listen fail (%s)", cSocket::GetLastErrorString() );
 		return false;
 	}
 
@@ -243,7 +216,7 @@ cServer::cServer()
 
 cServer::~cServer()
 {
-    if( m_pState->SListenClient ) closesocket( m_pState->SListenClient );
+    if( m_pState->SListenClient ) m_pState->SListenClient.CloseSocket();
 	m_pState->SListenClient = 0;
 
 	m_pState->bStopListenThread = true;
@@ -277,24 +250,17 @@ void cServer::SendAllEntitiesTo(cClientHandle* a_Target)
 
 void cServer::StartListenClient()
 {
-    sockaddr_in from;
-    socklen_t fromlen=sizeof(from);
+	cSocket SClient = m_pState->SListenClient.Accept();
 
-	cSocket SClient = accept(
-		m_pState->SListenClient,
-        (sockaddr*)&from,
-		&fromlen);
-
-	if( from.sin_addr.s_addr && SClient.IsValid() )
+	if( SClient.IsValid() )
 	{
-		char * ClientIP = 0;
-		if((ClientIP = inet_ntoa(from.sin_addr)) == 0 )
+		char * ClientIP = SClient.GetIPString();
+		if( ClientIP == 0 )
 			return;
 
 		LOG("%s connected!", ClientIP);
 
-		cClientHandle *NewHandle = 0;
-		NewHandle = new cClientHandle( SClient );
+		cClientHandle *NewHandle = new cClientHandle( SClient );
 		cWorld* World = cRoot::Get()->GetWorld();
 		World->LockClientHandle();
 		World->AddClient( NewHandle );

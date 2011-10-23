@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <WinSock.h>
 // #define socklen_t int

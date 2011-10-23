@@ -5,10 +5,10 @@
 #include "MCSocket.h"
 
 #include "cMCLogger.h"
+#include <errno.h>
 
 #ifndef _WIN32
 #include <cstring>
-#include <errno.h>
 #endif
 
 #ifdef _WIN32
@@ -66,11 +66,7 @@ bool cTCPLink::Connect( const char* a_Address, unsigned int a_Port )
 #endif
 
 	m_Socket=socket(AF_INET,SOCK_STREAM,0);
-#ifdef _WIN32
-	if( m_Socket==INVALID_SOCKET )
-#else
-    if( m_Socket < 0 )
-#endif
+	if( !m_Socket.IsValid() )
 	{
 		LOGERROR("cTCPLink: Invalid socket");
 		m_Socket = 0;
