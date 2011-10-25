@@ -55,6 +55,20 @@ MCServer : \
 		build/cAuthenticator.o\
 		build/cLuaCommandBinder.o\
 		build/cChicken.o\
+		build/cCow.o\
+		build/cPig.o\
+		build/cSheep.o\
+		build/cSquid.o\
+		build/cWolf.o\
+		build/cZombie.o\
+		build/cEnderman.o\
+		build/cCreeper.o\
+		build/cGhast.o\
+		build/cCavespider.o\
+		build/cZombiepigman.o\
+		build/cSkeleton.o\
+		build/cSlime.o\
+		build/cSilverfish.o\
 		build/md5.o\
 		build/cReferenceManager.o\
 		build/Bindings.o\
@@ -221,6 +235,20 @@ MCServer : \
 		build/cAuthenticator.o\
 		build/cLuaCommandBinder.o\
 		build/cChicken.o\
+		build/cCow.o\
+		build/cPig.o\
+		build/cSheep.o\
+		build/cSquid.o\
+		build/cWolf.o\
+		build/cZombie.o\
+		build/cEnderman.o\
+		build/cCreeper.o\
+		build/cGhast.o\
+		build/cCavespider.o\
+		build/cZombiepigman.o\
+		build/cSkeleton.o\
+		build/cSlime.o\
+		build/cSilverfish.o\
 		build/md5.o\
 		build/cReferenceManager.o\
 		build/Bindings.o\
@@ -390,6 +418,20 @@ clean :
 		build/cAuthenticator.o\
 		build/cLuaCommandBinder.o\
 		build/cChicken.o\
+		build/cCow.o\
+		build/cPig.o\
+		build/cSheep.o\
+		build/cSquid.o\
+		build/cWolf.o\
+		build/cZombie.o\
+		build/cEnderman.o\
+		build/cCreeper.o\
+		build/cGhast.o\
+		build/cCavespider.o\
+		build/cZombiepigman.o\
+		build/cSkeleton.o\
+		build/cSlime.o\
+		build/cSilverfish.o\
 		build/md5.o\
 		build/cReferenceManager.o\
 		build/Bindings.o\
@@ -1219,6 +1261,48 @@ build/cThread.o: source/cThread.cpp
 
 build/cSpider.o: source/cSpider.cpp
 	$(CC) $(CC_OPTIONS) source/cSpider.cpp -c $(INCLUDE) -o build/cSpider.o
+
+build/cCow.o: source/cCow.cpp
+	$(CC) $(CC_OPTIONS) source/cCow.cpp -c $(INCLUDE) -o build/cCow.o
+
+build/cPig.o: source/cPig.cpp
+	$(CC) $(CC_OPTIONS) source/cPig.cpp -c $(INCLUDE) -o build/cPig.o
+
+build/cSheep.o: source/cSheep.cpp
+	$(CC) $(CC_OPTIONS) source/cSheep.cpp -c $(INCLUDE) -o build/cSheep.o
+
+build/cSquid.o: source/cSquid.cpp
+	$(CC) $(CC_OPTIONS) source/cSquid.cpp -c $(INCLUDE) -o build/cSquid.o
+
+build/cWolf.o: source/cWolf.cpp
+	$(CC) $(CC_OPTIONS) source/cWolf.cpp -c $(INCLUDE) -o build/cWolf.o
+
+build/cZombie.o: source/cZombie.cpp
+	$(CC) $(CC_OPTIONS) source/cZombie.cpp -c $(INCLUDE) -o build/cZombie.o
+
+build/cEnderman.o: source/cEnderman.cpp
+	$(CC) $(CC_OPTIONS) source/cEnderman.cpp -c $(INCLUDE) -o build/cEnderman.o
+
+build/cCreeper.o: source/cCreeper.cpp
+	$(CC) $(CC_OPTIONS) source/cCreeper.cpp -c $(INCLUDE) -o build/cCreeper.o
+
+build/cGhast.o: source/cGhast.cpp
+	$(CC) $(CC_OPTIONS) source/cGhast.cpp -c $(INCLUDE) -o build/cGhast.o
+
+build/cCavespider.o: source/cCavespider.cpp
+	$(CC) $(CC_OPTIONS) source/cCavespider.cpp -c $(INCLUDE) -o build/cCavespider.o
+
+build/cZombiepigman.o: source/cZombiepigman.cpp
+	$(CC) $(CC_OPTIONS) source/cZombiepigman.cpp -c $(INCLUDE) -o build/cZombiepigman.o
+
+build/cSkeleton.o: source/cSkeleton.cpp
+	$(CC) $(CC_OPTIONS) source/cSkeleton.cpp -c $(INCLUDE) -o build/cSkeleton.o
+
+build/cSlime.o: source/cSlime.cpp
+	$(CC) $(CC_OPTIONS) source/cSlime.cpp -c $(INCLUDE) -o build/cSlime.o
+
+build/cSilverfish.o: source/cSilverfish.cpp
+	$(CC) $(CC_OPTIONS) source/cSilverfish.cpp -c $(INCLUDE) -o build/cSilverfish.o
 
 build/cMonsterConfig.o: source/cMonsterConfig.cpp
 	$(CC) $(CC_OPTIONS) source/cMonsterConfig.cpp -c $(INCLUDE) -o build/cMonsterConfig.o
