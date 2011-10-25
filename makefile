@@ -10,7 +10,7 @@
 # Macros
 #
 
-CC = /usr/bin/g++
+CC = /usr/bin/g++ -msse4
 CC_OPTIONS = -O2 -s
 CCE_OPTIONS = -O2 -s -x c
 LNK_OPTIONS = -lstdc++ -pthread

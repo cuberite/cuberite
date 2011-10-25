@@ -1,6 +1,8 @@
 #include "cNoise.h"
 #include <math.h>
 
+#include <smmintrin.h> //_mm_mul_epi32
+
 #define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
 
 cNoise::cNoise( unsigned int a_Seed )
@@ -35,6 +37,41 @@ float cNoise::IntNoise3D( int a_X, int a_Y, int a_Z ) const
     n = (n<<13) ^ n;
     return ( 1.0f - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);  
 }
+
+/****************
+ * SSE Random value generator
+ **/
+__m128 cNoise::SSE_IntNoise2D( int a_X1, int a_Y1, int a_X2, int a_Y2, int a_X3, int a_Y3, int a_X4, int a_Y4 ) const
+{
+	const __m128i X4 = _mm_set_epi32(a_X4, a_X3, a_X2, a_X1);
+	const __m128i Y4 = _mm_set_epi32(a_Y4, a_Y3, a_Y2, a_Y1);
+
+	const __m128 One4 = _mm_set_ps1( 1.f );
+	const __m128i YScale4 = _mm_set1_epi32( 57 );
+
+	const __m128i i15731 = _mm_set1_epi32( 15731 );
+	const __m128i i789221 = _mm_set1_epi32( 789221 );
+	const __m128i i1376312589 = _mm_set1_epi32(1376312589);
+	const __m128i MaskValue4 = _mm_set1_epi32(0x7fffffff);
+	const __m128 f1073741824 = _mm_set_ps1( 1073741824.0f );
+
+	const __m128i Seed4 = _mm_mullo_epi32( _mm_mullo_epi32( _mm_set1_epi32( m_Seed ), YScale4 ), YScale4 );
+
+	const __m128i ScaledY4 = _mm_mullo_epi32( Y4, YScale4 );
+	const __m128i n4 = _mm_add_epi32( _mm_add_epi32( X4, ScaledY4 ), Seed4 );
+	const __m128i nn4 = _mm_slli_epi32( n4, 13 );
+	const __m128i nnn4 = _mm_xor_si128( nn4, n4 );
+
+	const __m128i StepA4 = _mm_mullo_epi32( nnn4, nnn4 );
+	const __m128i StepAA4 = _mm_add_epi32( _mm_mullo_epi32( StepA4, i15731 ), i789221 );
+	const __m128i StepB4 = _mm_add_epi32( _mm_mullo_epi32( nnn4, StepAA4 ), i1376312589 );
+	const __m128i StepC4 = _mm_and_si128( StepB4, MaskValue4 );
+	const __m128 StepD4 = _mm_div_ps( _mm_cvtepi32_ps( StepC4 ), f1073741824 );
+	const __m128 Result4 = _mm_sub_ps( One4, StepD4 );
+
+	return Result4;
+}
+
 
 /***************
  * Interpolated (and 1 smoothed) noise in 1-dimension
@@ -127,6 +164,26 @@ float cNoise::CubicNoise2D( float a_X, float a_Y ) const
 
 	const float	FracY = (a_Y) - BaseY;
 	return CubicInterpolate( interp1, interp2, interp3, interp4, FracY );
+}
+
+float cNoise::SSE_CubicNoise2D( float a_X, float a_Y ) const
+{
+	const int	BaseX = FAST_FLOOR( a_X );
+	const int	BaseY = FAST_FLOOR( a_Y );
+
+	__m128 points4[4] = {
+		SSE_IntNoise2D( BaseX-1, BaseY-1,	BaseX-1, BaseY, BaseX-1, BaseY+1,	BaseX-1, BaseY+2 ),
+		SSE_IntNoise2D( BaseX,	 BaseY-1,	BaseX, BaseY,	BaseX, BaseY+1,		BaseX, BaseY+2 ),
+		SSE_IntNoise2D( BaseX+1, BaseY-1,	BaseX+1, BaseY, BaseX+1, BaseY+1,	BaseX+1, BaseY+2 ),
+		SSE_IntNoise2D( BaseX+2, BaseY-1,	BaseX+2, BaseY,	BaseX+2, BaseY+1,	BaseX+2, BaseY+2 ),
+	};
+
+	const float	FracX = (a_X) - BaseX;
+	union { __m128 p4; float p[4]; } 
+	AllInterp = { CubicInterpolate4( points4[0], points4[1], points4[2], points4[3], FracX ) };
+
+	const float	FracY = (a_Y) - BaseY;
+	return CubicInterpolate( AllInterp.p[0], AllInterp.p[1], AllInterp.p[2], AllInterp.p[3], FracY );
 }
 
 /******************
@@ -238,6 +295,19 @@ float cNoise::CubicInterpolate( float a_A, float a_B, float a_C, float a_D, floa
 	float S = a_B;
 
 	return P*(a_Pct*a_Pct*a_Pct) + Q*(a_Pct*a_Pct) + R*a_Pct + S;
+}
+
+__m128 cNoise::CubicInterpolate4( const __m128 & a_A, const __m128 & a_B, const __m128 & a_C, const __m128 & a_D, float a_Pct ) const
+{
+	const __m128 P = _mm_sub_ps( _mm_sub_ps( a_D, a_C ), _mm_sub_ps( a_A, a_B ) );
+	const __m128 Q = _mm_sub_ps( _mm_sub_ps( a_A, a_B ), P );
+	const __m128 R = _mm_sub_ps( a_C, a_A );
+
+	const __m128 Pct = _mm_set_ps1( a_Pct );
+	const __m128 Pct2 = _mm_mul_ps( Pct, Pct );
+	const __m128 Pct3 = _mm_mul_ps( Pct2, Pct );
+
+	return _mm_add_ps( _mm_add_ps( _mm_add_ps( _mm_mul_ps(P, Pct3), _mm_mul_ps( Q, Pct2 ) ), _mm_mul_ps( R, Pct ) ), a_B );
 }
 
 float cNoise::CosineInterpolate( float a_A, float a_B, float a_Pct ) const

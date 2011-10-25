@@ -678,13 +678,13 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 
 float GetNoise( float x, float y, cNoise & a_Noise )
 {
-	float oct1 = a_Noise.CubicNoise2D( x*cGenSettings::HeightFreq1, y*cGenSettings::HeightFreq1 )*cGenSettings::HeightAmp1;
-	float oct2 = a_Noise.CubicNoise2D( x*cGenSettings::HeightFreq2, y*cGenSettings::HeightFreq2 )*cGenSettings::HeightAmp2;
-	float oct3 = a_Noise.CubicNoise2D( x*cGenSettings::HeightFreq3, y*cGenSettings::HeightFreq3 )*cGenSettings::HeightAmp3;
+	float oct1 = a_Noise.SSE_CubicNoise2D( x*cGenSettings::HeightFreq1, y*cGenSettings::HeightFreq1 )*cGenSettings::HeightAmp1;
+	float oct2 = a_Noise.SSE_CubicNoise2D( x*cGenSettings::HeightFreq2, y*cGenSettings::HeightFreq2 )*cGenSettings::HeightAmp2;
+	float oct3 = a_Noise.SSE_CubicNoise2D( x*cGenSettings::HeightFreq3, y*cGenSettings::HeightFreq3 )*cGenSettings::HeightAmp3;
 
-	float height = a_Noise.CubicNoise2D( x*0.1f, y*0.1f )*2;
+	float height = a_Noise.SSE_CubicNoise2D( x*0.1f, y*0.1f )*2;
 
-	float flatness = ((a_Noise.CubicNoise2D( x*0.5f, y*0.5f ) + 1.f ) * 0.5f) * 1.1f; // 0 ... 1.5
+	float flatness = ((a_Noise.SSE_CubicNoise2D( x*0.5f, y*0.5f ) + 1.f ) * 0.5f) * 1.1f; // 0 ... 1.5
 	flatness *= flatness * flatness;
 
 	return (oct1 + oct2 + oct3) * flatness + height;
@@ -836,8 +836,8 @@ void cChunk::GenerateTerrain()
 //				int yy = TopY;
 				int zz = z + m_PosZ*16;
 				
-				float val1 = m_Noise.CubicNoise2D( xx*0.1f, zz*0.1f );
-				float val2 = m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f );
+				float val1 = m_Noise.SSE_CubicNoise2D( xx*0.1f, zz*0.1f );
+				float val2 = m_Noise.SSE_CubicNoise2D( xx*0.01f, zz*0.01f );
 				if( m_BlockType[index] == SandID )
 				{
 					if( (val1 + val2 > 0.f) && (rand()%128) > 124 && m_BlockType[index] == E_BLOCK_SAND )
@@ -852,8 +852,8 @@ void cChunk::GenerateTerrain()
 				}
 				else if( m_BlockType[index] == GrassID )
 				{
-					float val3 = m_Noise.CubicNoise2D( xx*0.01f+10, zz*0.01f+10 );
-					float val4 = m_Noise.CubicNoise2D( xx*0.05f+20, zz*0.05f+20 );
+					float val3 = m_Noise.SSE_CubicNoise2D( xx*0.01f+10, zz*0.01f+10 );
+					float val4 = m_Noise.SSE_CubicNoise2D( xx*0.05f+20, zz*0.05f+20 );
 					if( val1 + val2 > 0.2f && (rand()%128) > 124 )
 						cRoot::Get()->GetWorld()->GrowTree( xx, TopY, zz );
 					else if( val3 > 0.2f && (rand()%128) > 124 )
