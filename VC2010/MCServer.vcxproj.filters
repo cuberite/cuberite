@@ -322,6 +322,48 @@
     <Filter Include="Packets\cPacket_Ping">
       <UniqueIdentifier>{b5725a7d-f912-47c7-b6f0-8efca7c0279c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cCavespider">
+      <UniqueIdentifier>{e40e3231-e432-48fc-9958-d00f7486ee73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cCow">
+      <UniqueIdentifier>{b07e3ca3-b50d-4c47-8ba3-c2678c0af71a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cCreeper">
+      <UniqueIdentifier>{610c2aba-740a-49cc-ad03-a0613190daf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cEnderman">
+      <UniqueIdentifier>{00cab5c0-0d12-418c-b1a4-20c71db757a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cGhast">
+      <UniqueIdentifier>{0bc1c838-402d-4f7e-81a3-81d184590879}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cPig">
+      <UniqueIdentifier>{bfc926d1-ba9c-48ef-82c8-2e9b41b7119a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cSheep">
+      <UniqueIdentifier>{43e6c131-1a12-4f06-9d71-3cf96e35eae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cSilverfish">
+      <UniqueIdentifier>{1d900af2-8976-4aae-9f6d-35c2debcc049}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cSkeleton">
+      <UniqueIdentifier>{eb718e91-e244-477c-81a7-1648d7b08cde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cSlime">
+      <UniqueIdentifier>{420de544-79bb-4ccb-be49-eec9cf5e5a7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cSquid">
+      <UniqueIdentifier>{ee4c0e9a-7754-4b15-a2c9-abf7f6476ce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cWolf">
+      <UniqueIdentifier>{70bb6f00-107b-483f-9778-b315adbdc7c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cZombie">
+      <UniqueIdentifier>{58339a4b-e78c-48db-b4d5-8bd94fb4a9bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\cZombiepigman">
+      <UniqueIdentifier>{e4620b72-4739-4233-b326-47d4b5ca23d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -426,9 +468,6 @@
     </ClCompile>
     <ClCompile Include="..\Source\cRoot.cpp">
       <Filter>cRoot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\cMonster.cpp">
-      <Filter>cEntity\cPawn\cMonster</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\cPawn.cpp">
       <Filter>cEntity\cPawn</Filter>
@@ -643,6 +682,51 @@
     <ClCompile Include="..\source\cSocket.cpp">
       <Filter>Threading\cSocket</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\cCavespider.cpp">
+      <Filter>cEntity\cPawn\cMonster\cCavespider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cCow.cpp">
+      <Filter>cEntity\cPawn\cMonster\cCow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cCreeper.cpp">
+      <Filter>cEntity\cPawn\cMonster\cCreeper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cEnderman.cpp">
+      <Filter>cEntity\cPawn\cMonster\cEnderman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cGhast.cpp">
+      <Filter>cEntity\cPawn\cMonster\cGhast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\cMonster.cpp">
+      <Filter>cEntity\cPawn\cMonster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPig.cpp">
+      <Filter>cEntity\cPawn\cMonster\cPig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSheep.cpp">
+      <Filter>cEntity\cPawn\cMonster\cSheep</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSilverfish.cpp">
+      <Filter>cEntity\cPawn\cMonster\cSilverfish</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSkeleton.cpp">
+      <Filter>cEntity\cPawn\cMonster\cSkeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSlime.cpp">
+      <Filter>cEntity\cPawn\cMonster\cSlime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSquid.cpp">
+      <Filter>cEntity\cPawn\cMonster\cSquid</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cWolf.cpp">
+      <Filter>cEntity\cPawn\cMonster\cWolf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cZombie.cpp">
+      <Filter>cEntity\cPawn\cMonster\cZombie</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cZombiepigman.cpp">
+      <Filter>cEntity\cPawn\cMonster\cZombiepigman</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -779,9 +863,6 @@
     </ClInclude>
     <ClInclude Include="..\Source\cRoot.h">
       <Filter>cRoot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Source\cMonster.h">
-      <Filter>cEntity\cPawn\cMonster</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\cPawn.h">
       <Filter>cEntity\cPawn</Filter>
@@ -1001,6 +1082,51 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_Ping.h">
       <Filter>Packets\cPacket_Ping</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cCavespider.h">
+      <Filter>cEntity\cPawn\cMonster\cCavespider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cCow.h">
+      <Filter>cEntity\cPawn\cMonster\cCow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cCreeper.h">
+      <Filter>cEntity\cPawn\cMonster\cCreeper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cEnderman.h">
+      <Filter>cEntity\cPawn\cMonster\cEnderman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cGhast.h">
+      <Filter>cEntity\cPawn\cMonster\cGhast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\cMonster.h">
+      <Filter>cEntity\cPawn\cMonster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPig.h">
+      <Filter>cEntity\cPawn\cMonster\cPig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSheep.h">
+      <Filter>cEntity\cPawn\cMonster\cSheep</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSilverfish.h">
+      <Filter>cEntity\cPawn\cMonster\cSilverfish</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSkeleton.h">
+      <Filter>cEntity\cPawn\cMonster\cSkeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSlime.h">
+      <Filter>cEntity\cPawn\cMonster\cSlime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSquid.h">
+      <Filter>cEntity\cPawn\cMonster\cSquid</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cWolf.h">
+      <Filter>cEntity\cPawn\cMonster\cWolf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cZombie.h">
+      <Filter>cEntity\cPawn\cMonster\cZombie</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cZombiepigman.h">
+      <Filter>cEntity\cPawn\cMonster\cZombiepigman</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

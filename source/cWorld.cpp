@@ -330,26 +330,9 @@ void cWorld::Tick(float a_Dt)
 		m_SpawnMonsterTime = m_Time;
 		if( m_pState->m_Players.size() > 0 )
 		{
+			cMonster	*Monster = 0;
 
-			cChicken      *Chicken;
-			cCow          *Cow;
-			cPig          *Pig;
-			cSheep        *Sheep;
-			cSquid        *Squid;
-			cWolf         *Wolf;
-
-			cSpider       *Spider;
-			cZombie       *Zombie;
-			cEnderman     *Enderman;
-			cCreeper      *Creeper;
-			cGhast        *Ghast;
-			cCavespider   *Cavespider;
-			cZombiepigman *Zombiepigman;
-			cSkeleton     *Skeleton;
-			cSlime        *Slime;
-			cSilverfish   *Silverfish;
-
-			srand ( time(NULL) );        //added mob code
+			//srand ( time(NULL) );			// Only seed random ONCE! Is already done in the cWorld constructor
 			int dayRand   = rand() % 6;  //added mob code
 			int nightRand = rand() % 10; //added mob code
 
@@ -363,95 +346,51 @@ void cWorld::Tick(float a_Dt)
 			SpawnPos += Vector3d( (double)(rand()%64)-32, (double)(rand()%64)-32, (double)(rand()%64)-32 );
 			char Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
 
-			//cMonster* Monster = new cChicken();
 			if(m_WorldTime >= 12000 + 1000) {
-				if (nightRand == 0) { //random percent to spawn for night
-					Spider = new cSpider();
-					Spider->Initialize();
-					Spider->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Spider->SpawnOn( 0 );
-				} else if (nightRand == 1) {
-					Zombie = new cZombie();
-					Zombie->Initialize();
-					Zombie->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Zombie->SpawnOn( 0 );
-				} else if (nightRand == 2) {
-					Enderman = new cEnderman();
-					Enderman->Initialize();
-					Enderman->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Enderman->SpawnOn( 0 );
-				} else if (nightRand == 3) {
-					Creeper = new cCreeper();
-					Creeper->Initialize();
-					Creeper->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Creeper->SpawnOn( 0 );
-				} else if (nightRand == 4) {
-					Cavespider = new cCavespider();
-					Cavespider->Initialize();
-					Cavespider->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Cavespider->SpawnOn( 0 );
-				} else if (nightRand == 5) {
-					Ghast = new cGhast();
-					Ghast->Initialize();
-					Ghast->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Ghast->SpawnOn( 0 );
-				} else if (nightRand == 6) {
-					Zombiepigman = new cZombiepigman();
-					Zombiepigman->Initialize();
-					Zombiepigman->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Zombiepigman->SpawnOn( 0 );
-				} else if (nightRand == 7) {
-					Slime = new cSlime();
-					Slime->Initialize();
-					Slime->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Slime->SpawnOn( 0 );
-				} else if (nightRand == 8) {
-					Silverfish = new cSilverfish();
-					Silverfish->Initialize();
-					Silverfish->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Silverfish->SpawnOn( 0 );
-				} else if (nightRand == 9) {
-					Skeleton = new cSkeleton();
-					Skeleton->Initialize();
-					Skeleton->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Skeleton->SpawnOn( 0 );
-				} //end random percent to spawn for night
+				if (nightRand == 0) //random percent to spawn for night
+					Monster = new cSpider();
+				else if (nightRand == 1)
+					Monster = new cZombie();
+				else if (nightRand == 2)
+					Monster = new cEnderman();
+				else if (nightRand == 3)
+					Monster = new cCreeper();
+				else if (nightRand == 4)
+					Monster = new cCavespider();
+				else if (nightRand == 5)
+					Monster = new cGhast();
+				else if (nightRand == 6)
+					Monster = new cZombiepigman();
+				else if (nightRand == 7)
+					Monster = new cSlime();
+				else if (nightRand == 8)
+					Monster = new cSilverfish();
+				else if (nightRand == 9)
+					Monster = new cSkeleton();
+				//end random percent to spawn for night
 				
 			} else {
-				if (dayRand == 0) { //random percent to spawn for day
-					Chicken = new cChicken();
-					Chicken->Initialize();
-					Chicken->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Chicken->SpawnOn( 0 );
-				} else if (dayRand == 1) {
-					Cow = new cCow();
-					Cow->Initialize();
-					Cow->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Cow->SpawnOn( 0 );
-				} else if (dayRand == 2) {
-					Pig = new cPig();
-					Pig->Initialize();
-					Pig->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Pig->SpawnOn( 0 );
-				} else if (dayRand == 3) {
-					Sheep = new cSheep();
-					Sheep->Initialize();
-					Sheep->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Sheep->SpawnOn( 0 );
-				} else if (dayRand == 4) {
-					Squid = new cSquid();
-					Squid->Initialize();
-					Squid->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Squid->SpawnOn( 0 );
-				} else if (dayRand == 5) {
-					Wolf = new cWolf();
-					Wolf->Initialize();
-					Wolf->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-					Wolf->SpawnOn( 0 );
-				} //end random percent to spawn for day
+				if (dayRand == 0) //random percent to spawn for day
+					Monster = new cChicken();
+				else if (dayRand == 1)
+					Monster = new cCow();
+				else if (dayRand == 2)
+					Monster = new cPig();
+				else if (dayRand == 3)
+					Monster = new cSheep();
+				else if (dayRand == 4)
+					Monster = new cSquid();
+				else if (dayRand == 5)
+					Monster = new cWolf();
+				//end random percent to spawn for day
 			}
-			//Monster->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
-			//Monster->SpawnOn( 0 );
+
+			if( Monster )
+			{
+				Monster->Initialize();
+				Monster->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
+				Monster->SpawnOn( 0 );
+			}
 		}
 	}
 }
