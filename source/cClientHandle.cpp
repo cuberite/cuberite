@@ -972,6 +972,7 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 							Packets.erase( itr );
 							bBreak = true;
 							bSignalSemaphore = false; // Because 1 packet is removed, semaphore count is the same
+							delete PacketData;
 							break;
 						}
 					}
