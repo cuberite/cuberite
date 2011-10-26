@@ -127,6 +127,7 @@ MCServer : \
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
+                build/cPacket_CreateInventoryAction.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -307,6 +308,7 @@ MCServer : \
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
+                build/cPacket_CreateInventoryAction.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -490,6 +492,7 @@ clean :
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
+                build/cPacket_CreateInventoryAction.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -866,6 +869,9 @@ build/cPacket_Disconnect.o : source/packets/cPacket_Disconnect.cpp
 
 build/cPacket_EntityEquipment.o : source/packets/cPacket_EntityEquipment.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityEquipment.cpp -c $(INCLUDE) -o build/cPacket_EntityEquipment.o
+
+build/cPacket_CreateInventoryAction.o : source/packets/cPacket_CreateInventoryAction.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_CreateInventoryAction.cpp -c $(INCLUDE) -o build/cPacket_CreateInventoryAction.o
 
 build/cPacket_EntityLook.o : source/packets/cPacket_EntityLook.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityLook.cpp -c $(INCLUDE) -o build/cPacket_EntityLook.o

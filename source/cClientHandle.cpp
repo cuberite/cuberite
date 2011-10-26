@@ -55,6 +55,7 @@
 #include "packets/cPacket_PickupSpawn.h"
 #include "packets/cPacket_ItemSwitch.h"
 #include "packets/cPacket_EntityEquipment.h"
+#include "packets/cPacket_CreateInventoryAction.h"
 #include "packets/cPacket_UseEntity.h"
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_13.h"
@@ -134,6 +135,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->PacketMap[E_DISCONNECT]		= new cPacket_Disconnect;
 	m_pState->PacketMap[E_ITEM_SWITCH]		= new cPacket_ItemSwitch;
 	m_pState->PacketMap[E_ENTITY_EQUIPMENT] = new cPacket_EntityEquipment;
+	m_pState->PacketMap[E_CREATE_INVENTORY_ACTION] = new cPacket_CreateInventoryAction;
 	m_pState->PacketMap[E_PICKUP_SPAWN]		= new cPacket_PickupSpawn;
 	m_pState->PacketMap[E_USE_ENTITY]		= new cPacket_UseEntity;
 	m_pState->PacketMap[E_WINDOW_CLOSE]		= new cPacket_WindowClose;

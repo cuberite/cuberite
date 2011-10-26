@@ -8,6 +8,7 @@
 class cPacket_BlockPlace;
 class cPacket_PickupSpawn;
 class cPacket_EntityEquipment;
+class cPacket_CreateInventoryAction;
 class cPacket_Disconnect;
 class cPacket_Chat;
 class cPacket_BlockDig;

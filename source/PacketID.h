@@ -1,8 +1,8 @@
 #pragma once
 
 //tolua_begin
-enum ENUM_PACKET_ID	
-{													
+enum ENUM_PACKET_ID
+{
 	E_KEEP_ALIVE	= 0x00,
 	E_LOGIN			= 0x01,
 	E_HANDSHAKE		= 0x02,
@@ -45,8 +45,9 @@ enum ENUM_PACKET_ID
 	E_INVENTORY_SLOT	= 0x67,
 	E_INVENTORY_WHOLE	= 0x68,
 	E_INVENTORY_PROGRESS= 0x69,
+	E_CREATE_INVENTORY_ACTION	= 0x6B,
 	E_UPDATE_SIGN	= 0x82,
 	E_PING			= 0xfe,
 	E_DISCONNECT	= 0xff,
-}; 
+};
 //tolua_end

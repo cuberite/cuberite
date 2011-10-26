@@ -283,6 +283,9 @@
     <Filter Include="Packets\cPacket_EntityEquipment">
       <UniqueIdentifier>{0f48e5f8-ea4d-41dc-ab9e-750c5912c778}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets\cPacket_CreateInventoryAction">
+      <UniqueIdentifier>{0c47e5f8-ea4d-40dc-ac8e-740c5512c768}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Packets\cPacket_UseEntity">
       <UniqueIdentifier>{bff5658b-0806-430c-9929-062f4bd4760b}</UniqueIdentifier>
     </Filter>
@@ -645,6 +648,9 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_EntityEquipment.cpp">
       <Filter>Packets\cPacket_EntityEquipment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_CreateInventoryAction.cpp">
+      <Filter>Packets\cPacket_CreateInventoryAction</Filter>
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_UseEntity.cpp">
       <Filter>Packets\cPacket_UseEntity</Filter>
@@ -1040,6 +1046,9 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_EntityEquipment.h">
       <Filter>Packets\cPacket_EntityEquipment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_CreateInventoryAction.h">
+      <Filter>Packets\cPacket_CreateInventoryAction</Filter>
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_UseEntity.h">
       <Filter>Packets\cPacket_UseEntity</Filter>

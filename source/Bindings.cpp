@@ -14816,6 +14816,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_CHAT",E_CHAT);
   tolua_constant(tolua_S,"E_UPDATE_TIME",E_UPDATE_TIME);
   tolua_constant(tolua_S,"E_ENTITY_EQUIPMENT",E_ENTITY_EQUIPMENT);
+  tolua_constant(tolua_S,"E_CREATE_INVENTORY_ACTION",E_CREATE_INVENTORY_ACTION);
   tolua_constant(tolua_S,"E_USE_ENTITY",E_USE_ENTITY);
   tolua_constant(tolua_S,"E_UPDATE_HEALTH",E_UPDATE_HEALTH);
   tolua_constant(tolua_S,"E_RESPAWN",E_RESPAWN);
