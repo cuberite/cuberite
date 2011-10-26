@@ -496,8 +496,75 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						{
 							if( cRoot::Get()->GetWorld()->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
 							{
-								m_Player->GetInventory().GetEquippedItem().m_ItemHealth ++;
-								LOG("Health: %i", m_Player->GetInventory().GetEquippedItem().m_ItemHealth);
+								int helditem = m_Player->GetInventory().GetEquippedItem().m_ItemID;
+								bool itemhasdur = false;
+								switch(helditem)
+								{
+									case 256 : itemhasdur = true; break;
+									case 257 : itemhasdur = true; break;
+									case 258 : itemhasdur = true; break;
+									case 267 : itemhasdur = true; break;
+									case 268 : itemhasdur = true; break;
+									case 269 : itemhasdur = true; break;
+									case 270 : itemhasdur = true; break;
+									case 271 : itemhasdur = true; break;
+									case 272 : itemhasdur = true; break;
+									case 273 : itemhasdur = true; break;
+									case 274 : itemhasdur = true; break;
+									case 275 : itemhasdur = true; break;
+									case 276 : itemhasdur = true; break;
+									case 277 : itemhasdur = true; break;
+									case 278 : itemhasdur = true; break;
+									case 279 : itemhasdur = true; break;
+									case 283 : itemhasdur = true; break;
+									case 284 : itemhasdur = true; break;
+									case 285 : itemhasdur = true; break;
+									case 286 : itemhasdur = true; break;
+									case 290 : itemhasdur = true; break;
+									case 291 : itemhasdur = true; break;
+									case 292 : itemhasdur = true; break;
+									case 293 : itemhasdur = true; break;
+									case 294 : itemhasdur = true; break;
+									case 359 : itemhasdur = true; break;
+								}
+								if (itemhasdur) {
+									int maxhelditemdur = 1563;
+									switch(helditem)
+									{
+										case 256 : maxhelditemdur = 251; break;
+										case 257 : maxhelditemdur = 251; break;
+										case 258 : maxhelditemdur = 251; break;
+										case 267 : maxhelditemdur = 251; break;
+										case 268 : maxhelditemdur = 60; break;
+										case 269 : maxhelditemdur = 60; break;
+										case 270 : maxhelditemdur = 60; break;
+										case 271 : maxhelditemdur = 60; break;
+										case 272 : maxhelditemdur = 132; break;
+										case 273 : maxhelditemdur = 132; break;
+										case 274 : maxhelditemdur = 132; break;
+										case 275 : maxhelditemdur = 132; break;
+										case 276 : maxhelditemdur = 1563; break;
+										case 277 : maxhelditemdur = 1563; break;
+										case 278 : maxhelditemdur = 1563; break;
+										case 279 : maxhelditemdur = 1563; break;
+										case 283 : maxhelditemdur = 32; break;
+										case 284 : maxhelditemdur = 32; break;
+										case 285 : maxhelditemdur = 32; break;
+										case 286 : maxhelditemdur = 32; break;
+										case 290 : maxhelditemdur = 60; break;
+										case 291 : maxhelditemdur = 132; break;
+										case 292 : maxhelditemdur = 251; break;
+										case 293 : maxhelditemdur = 1563; break;
+										case 294 : maxhelditemdur = 32; break;
+										case 359 : maxhelditemdur = 251; break;
+									}
+									m_Player->GetInventory().GetEquippedItem().m_ItemHealth ++;
+									LOG("Health: %i", m_Player->GetInventory().GetEquippedItem().m_ItemHealth);
+									if (m_Player->GetInventory().GetEquippedItem().m_ItemHealth >= maxhelditemdur) {
+										LOG("Player %s Broke ID: %i", GetUsername(), m_Player->GetInventory().GetEquippedItem().m_ItemID);
+                                                                                m_Player->GetInventory().RemoveItem( m_Player->GetInventory().GetEquippedItem());
+									}
+								}
 							}
 						}
 					}
