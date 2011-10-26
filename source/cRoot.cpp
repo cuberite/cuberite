@@ -9,6 +9,7 @@
 #include "cPluginManager.h"
 #include "cMonsterConfig.h"
 #include "cSleep.h"
+#include "cThread.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -34,7 +35,7 @@ cRoot::cRoot()
 	, m_Log( 0 )
 	, m_bStop( false )
 	, m_bRestart( false )
-	, m_hInputThread( 0 )
+	, m_InputThread( 0 )
 {
 	s_Root = this;
 }
@@ -44,40 +45,22 @@ cRoot::~cRoot()
 	s_Root = 0;
 }
 
-#ifdef _WIN32
-DWORD WINAPI cRoot_InputThread(LPVOID lpParam)
-#else
-void *cRoot_InputThread( void *lpParam )
-#endif
+void cRoot::InputThread(void* a_Params)
 {
-	cRoot* Root = (cRoot*)lpParam;
+	cRoot& self = *(cRoot*)a_Params;
 
-	while( 1 )
+	while( !(self.m_bStop || self.m_bRestart) )
 	{
 		std::string Command;
 		std::getline(std::cin, Command);
-		Root->ServerCommand( Command.c_str() );
+		self.ServerCommand( Command.c_str() );
 	}
-	return 0;
 }
 
 void cRoot::Start()
 {
 	if( m_Log ) delete m_Log, m_Log = 0;
 	m_Log = new cMCLogger();
-
-#ifdef _WIN32
-	m_hInputThread = CreateThread(
-		NULL,              // default security
-		0,                 // default stack size
-		cRoot_InputThread,   // name of the thread function
-		this,	                // thread parameters
-		0,                 // default startup flags
-		NULL);
-#else
-	m_hInputThread = new pthread_t;
-	pthread_create( (pthread_t*)m_hInputThread, NULL, cRoot_InputThread, this );
-#endif
 
 	m_bStop = false;
 	while(!m_bStop)
@@ -118,10 +101,15 @@ void cRoot::Start()
 		m_Server->StartListenThread();
 		//cHeartBeat* HeartBeat = new cHeartBeat();
 
+		m_InputThread = new cThread( InputThread, this );
+		m_InputThread->Start( true );
+
 		while( !m_bStop && !m_bRestart ) // These are modified by external threads
 		{
 			cSleep::MilliSleep( 1000 );
 		}
+
+		delete m_InputThread; m_InputThread = 0;
 
 		// Deallocate stuffs
 		m_Server->Shutdown(); // This waits for threads to stop and d/c clients
@@ -135,14 +123,6 @@ void cRoot::Start()
 		//delete HeartBeat; HeartBeat = 0;
 		delete m_Server; m_Server = 0;
 	}
-
-	// No other way to get it to exit
-#ifdef _WIN32
-	TerminateThread( m_hInputThread, 0 );
-#else
-	// TODO: pthread_kill
-	delete (pthread_t*)m_hInputThread;
-#endif
 
 	delete m_Log; m_Log = 0;
 }

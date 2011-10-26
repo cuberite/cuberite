@@ -1,5 +1,6 @@
 #pragma once
 
+class cThread;
 class cMonsterConfig;
 class cMCLogger;
 class cGroupManager;
@@ -46,7 +47,8 @@ private:
 	bool m_bStop;
 	bool m_bRestart;
 
-	void* m_hInputThread;
+	cThread* m_InputThread;
+	static void InputThread(void* a_Params);
 
 	static cRoot*	s_Root;
 };	//tolua_export

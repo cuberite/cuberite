@@ -17,8 +17,8 @@ void cMakeDir::MakeDir( const char* a_Directory )
 	Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
 	Attrib.lpSecurityDescriptor = NULL;
 	Attrib.bInheritHandle = false;
-	::CreateDirectory("world", &Attrib);
+	::CreateDirectory(a_Directory, &Attrib);
 #else
-	mkdir("world", S_IRWXU | S_IRWXG | S_IRWXO);
+	mkdir(a_Directory, S_IRWXU | S_IRWXG | S_IRWXO);
 #endif
 }
