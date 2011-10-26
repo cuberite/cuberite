@@ -10,7 +10,7 @@ public:
 	cPacket_Login()
 		: m_ProtocolVersion( 0 )
 		, m_MapSeed( 0 )
-		, m_ServerMode( 1 ) //0 for survival, 1 for creative
+		, m_ServerMode( GAMEMODE ) //0 for survival, 1 for creative
 		, m_Dimension( 0 )
 		, m_Difficulty( 0 )
 		, m_WorldHeight( 0 )

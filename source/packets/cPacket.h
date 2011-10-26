@@ -22,6 +22,8 @@ public:
 	virtual bool Send( cSocket & a_Socket) { a_Socket=0; printf("ERROR: Undefined NEW Send function %x\n", m_PacketID ); return false; }
 	virtual cPacket* Clone() const = 0;
 
+        static const int GAMEMODE = 1; //0 = Survival, 1 = Creative;
+
 	unsigned char m_PacketID;
 	cSocket m_Socket; // Current socket being used
 protected:

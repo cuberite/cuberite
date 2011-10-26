@@ -472,7 +472,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		case E_BLOCK_DIG:
 			{
 				cPacket_BlockDig* PacketData = reinterpret_cast<cPacket_BlockDig*>(a_Packet);
-				//LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction, PacketData->m_Status );
+				LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction, PacketData->m_Status );
 				if( PacketData->m_Status == 0x04 )	// Drop block
 				{
 					m_Player->TossItem( false );
@@ -482,10 +482,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cWorld* World = cRoot::Get()->GetWorld();
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock];
+					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (GAMEMODE == 1) ); //need to change to check for client's gamemode.
 
 					cItem PickupItem;
-					if( bBroken ) // broken
+					if( bBroken && !(GAMEMODE == 1) ) // broken
 					{
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;

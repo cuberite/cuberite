@@ -20,6 +20,7 @@ public:
 	~cClientHandle();
 
 	static const int VIEWDISTANCE = 13;
+        static const int GAMEMODE = 1; //0 = Survival, 1 = Creative;
 
 	const cSocket & GetSocket();
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
