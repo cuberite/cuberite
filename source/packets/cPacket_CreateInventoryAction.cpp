@@ -6,7 +6,7 @@ cPacket_CreateInventoryAction::cPacket_CreateInventoryAction( const cPacket_Crea
 	m_Slot	 = a_Copy.m_Slot;
 	m_ItemID = a_Copy.m_ItemID;
 	m_Quantity = 0;
-	m_Short = 0;
+	m_Damage = 0;
 }
 
 bool cPacket_CreateInventoryAction::Parse(cSocket & a_Socket)
@@ -15,7 +15,7 @@ bool cPacket_CreateInventoryAction::Parse(cSocket & a_Socket)
 	if( !ReadShort	( m_Slot ) ) return false;
 	if( !ReadShort	( m_ItemID ) ) return false;
 	if( !ReadShort	( m_Quantity ) ) return false;
-	if( !ReadShort	( m_Short ) ) return false;
+	if( !ReadShort	( m_Damage ) ) return false;
 	return true;
 }
 
@@ -34,7 +34,7 @@ bool cPacket_CreateInventoryAction::Send(cSocket & a_Socket)
 	AppendShort  ( m_Slot,		Message, i );
 	AppendShort  ( m_ItemID,	Message, i );
 	AppendShort	 ( m_Quantity,		Message, i );
-	AppendShort	 ( m_Short,		Message, i );
+	AppendShort	 ( m_Damage,		Message, i );
 
 	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
 	delete [] Message;

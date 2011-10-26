@@ -482,10 +482,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cWorld* World = cRoot::Get()->GetWorld();
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (cPacket::GAMEMODE == 1) ); //need to change to check for client's gamemode.
+					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (cRoot::Get()->GetWorld()->GetGameMode() == 1) ); //need to change to check for client's gamemode.
 
 					cItem PickupItem;
-					if( bBroken && !(cPacket::GAMEMODE == 1) ) // broken
+					if( bBroken && !(cRoot::Get()->GetWorld()->GetGameMode() == 1) ) // broken
 					{
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;
@@ -581,7 +581,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			{
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-				if( Equipped.m_ItemID != PacketData->m_ItemType )	// Not valid
+				if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
 					break;
@@ -913,6 +913,7 @@ void cClientHandle::SendLoginResponse()
 	cPacket_Login LoginResponse;
 	LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
 	//LoginResponse.m_Username = "";
+	LoginResponse.m_ServerMode = cRoot::Get()->GetWorld()->GetGameMode(); //set gamemode from world.
 	LoginResponse.m_MapSeed = 0;
 	LoginResponse.m_Dimension = 0;
 	Send( LoginResponse );

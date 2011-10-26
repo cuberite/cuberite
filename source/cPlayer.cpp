@@ -317,7 +317,7 @@ void cPlayer::Heal( int a_Health )
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
-	if ( !(cPacket::GAMEMODE == 1) ) {
+	if ( !(cRoot::Get()->GetWorld()->GetGameMode() == 1) ) {
 		cPawn::TakeDamage( a_Damage, a_Instigator );
 
 		cPacket_UpdateHealth Health;
@@ -356,7 +356,12 @@ void cPlayer::Respawn()
 	m_Health = 20;
 
 	cWorld* World = cRoot::Get()->GetWorld();
-	m_ClientHandle->Send( cPacket_Respawn() );
+	// Create Respawn player packet
+	cPacket_Respawn Packet;
+	//Set Gamemode for packet by looking at world's gamemode (Need to check players gamemode.)
+	Packet.m_CreativeMode = cRoot::Get()->GetWorld()->GetGameMode();
+	//Send Packet
+	m_ClientHandle->Send( Packet );
 	TeleportTo( World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ() );
 	SetVisible( true );
 }

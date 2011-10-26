@@ -9,7 +9,7 @@ public:
 	cPacket_Respawn()
 		: m_World( 0 )
 		, m_Difficulty( 0 )
-		, m_CreativeMode( GAMEMODE )
+		, m_CreativeMode( 0 )
 		, m_WorldHeight( 0 )
 		, m_MapSeed( 0 )
 	{ m_PacketID = E_RESPAWN; }

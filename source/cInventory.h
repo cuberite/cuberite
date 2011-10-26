@@ -9,7 +9,6 @@ class cClientHandle;
 class cPlayer;
 class cPacket_WindowClick;
 class cPacket_EntityEquipment;
-class cPacket_CreateInventoryAction;
 class cInventory										//tolua_export
 	: public cWindowOwner		
 {														//tolua_export

@@ -33,6 +33,9 @@ public:
 		return m_Time;
 	}
 	long long GetWorldTime() { return m_WorldTime; }								//tolua_export
+
+	int GetGameMode() { return m_GameMode; } //return gamemode for world
+
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
 	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
@@ -136,6 +139,7 @@ private:
 	float m_LastSave;
 	static float m_Time;	// Time in seconds
 	long long m_WorldTime; // Time in seconds*20, this is sent to clients (is wrapped)
+	int m_GameMode;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
 	cWaterSimulator* m_WaterSimulator;

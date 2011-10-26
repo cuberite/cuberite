@@ -184,6 +184,7 @@ cWorld::cWorld()
 	m_Time = 0;
 	m_WorldTimeFraction = 0.f;
 	m_WorldTime = 0;
+        m_GameMode = 1;
 	m_LastSave = 0;
 	m_LastUnload = 0;
 	m_ClientHandleCriticalSection = new cCriticalSection();
