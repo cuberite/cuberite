@@ -317,11 +317,13 @@ void cPlayer::Heal( int a_Health )
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
-	cPawn::TakeDamage( a_Damage, a_Instigator );
+	if ( !(cPacket::GAMEMODE == 1) ) {
+		cPawn::TakeDamage( a_Damage, a_Instigator );
 
-	cPacket_UpdateHealth Health;
-	Health.m_Health = m_Health;
-	m_ClientHandle->Send( Health );
+		cPacket_UpdateHealth Health;
+		Health.m_Health = m_Health;
+		m_ClientHandle->Send( Health );
+	}
 }
 
 void cPlayer::KilledBy( cEntity* a_Killer )

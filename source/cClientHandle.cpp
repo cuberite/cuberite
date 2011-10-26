@@ -482,10 +482,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cWorld* World = cRoot::Get()->GetWorld();
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (GAMEMODE == 1) ); //need to change to check for client's gamemode.
+					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (cPacket::GAMEMODE == 1) ); //need to change to check for client's gamemode.
 
 					cItem PickupItem;
-					if( bBroken && !(GAMEMODE == 1) ) // broken
+					if( bBroken && !(cPacket::GAMEMODE == 1) ) // broken
 					{
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;
