@@ -12,6 +12,8 @@
 #include <stdio.h> // sprintf and stuff
 #endif
 
+#include <iostream>
+
 #include "zlib.h"
 #include <json/json.h>
 
@@ -234,7 +236,7 @@ void cChunkMap::CompressChunk( cChunkData* a_ChunkData )
 	{
 		// Delete already present compressed data
 		if( a_ChunkData->m_Compressed ) delete [] a_ChunkData->m_Compressed;
-			
+
 		// Get Json data
 		Json::Value root;
 		std::string JsonData = "";
@@ -363,6 +365,7 @@ cChunk* cChunkMap::GetChunk( int a_X, int a_Y, int a_Z )
 			else
 			{
 				cChunk* Chunk = new cChunk(a_X, a_Y, a_Z);
+				//std::cout << BlockData;
 				memcpy( Chunk->m_BlockData, BlockData, cChunk::c_BlockDataSize ); 
 				Chunk->CalculateHeightmap();
 				Data->m_LiveChunk = Chunk;
@@ -551,14 +554,15 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 	cMakeDir::MakeDir("world");
 
 	char SourceFile[128];
-	
+
 	#ifdef _WIN32
 		sprintf_s(SourceFile, 128, "world/X%i_Z%i.pak", a_Layer->m_X, a_Layer->m_Z );
 	#else
 		sprintf(SourceFile, "world/X%i_Z%i.pak", a_Layer->m_X, a_Layer->m_Z );
+		//std::cout << SourceFile << std::endl;
 	#endif
-	
-	
+
+
 	FILE* f = 0;
 	#ifdef _WIN32
 	if( fopen_s(&f, SourceFile, "wb" ) == 0 )	// no error
@@ -685,6 +689,7 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 			}
 
 			OrderedData[i] = Data;
+			//std::cout << Data;
 		}
 
 		// Loop over chunks again, in the order they were loaded, and load their compressed data
