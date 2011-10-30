@@ -178,10 +178,13 @@ int main () {
 				NBTData->ParseData();
 				NBTData->PrintData();
 
-				//Char* Blocks = 
 				//NBTData->GetByteArray("Blocks");
 				//for(unsigned int i = 0; i < 111; i++) {//re
 					//printf("Blocks?: %i\n", NBTData->cNBTCompound::GetByteArray("Blocks")[0]);
+					printf("xPos: %i\n", NBTData->GetInteger("xPos") );
+					//will print
+					//xPos: 0
+					printf("test: %i\n", NBTData->cNBTCompound::GetByteArray("Blocks")[0] );
 				//}
 				return 1;
                                 fwrite( BlockData, DestSize, 1, wf ); //write contents of uncompressed block data to file to check to see if it's valid... It is! :D
