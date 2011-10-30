@@ -112,15 +112,15 @@ void cNBTData::Compress()
     unsigned char* Compressed = new unsigned char[MAXNBTSIZE];
 
     /* allocate deflate state */
-    strm.zalloc        = Z_NULL;
-    strm.zfree        = Z_NULL;
-    strm.opaque        = Z_NULL;
-    strm.avail_in    = m_BufferSize;
-    strm.avail_out    = MAXNBTSIZE;
+    strm.zalloc     = Z_NULL;
+    strm.zfree      = Z_NULL;
+    strm.opaque     = Z_NULL;
+    strm.avail_in   = m_BufferSize;
+    strm.avail_out  = MAXNBTSIZE;
     strm.next_in    =(Bytef*)m_Buffer;
-    strm.next_out    = Compressed;
-    strm.total_in    = 0;
-    strm.total_out    = 0;
+    strm.next_out   = Compressed;
+    strm.total_in   = 0;
+    strm.total_out  = 0;
     ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 15+MAX_WBITS, 8, Z_DEFAULT_STRATEGY);
     if (ret != Z_OK)
     {
@@ -189,19 +189,19 @@ bool cNBTData::Decompress()
     unsigned char* out = new unsigned char[MAXNBTSIZE];
 
     /* allocate inflate state */
-    strm.zalloc        = Z_NULL;
-    strm.zfree        = Z_NULL;
-    strm.opaque        = Z_NULL;
-    strm.avail_in    = Z_NULL;
+    strm.zalloc     = Z_NULL;
+    strm.zfree      = Z_NULL;
+    strm.opaque     = Z_NULL;
+    strm.avail_in   = Z_NULL;
     strm.next_in    = Z_NULL;
-    strm.avail_in    = m_BufferSize;
-    strm.avail_out    = Z_NULL;
+    strm.avail_in   = m_BufferSize;
+    strm.avail_out  = Z_NULL;
     strm.next_in    = (Bytef*)m_Buffer;
-    strm.next_out    = Z_NULL;
-    strm.avail_out    = MAXNBTSIZE;
-    strm.next_out    = out;
-    strm.total_in    = 0;
-    strm.total_out    = 0;
+    strm.next_out   = Z_NULL;
+    strm.avail_out  = MAXNBTSIZE;
+    strm.next_out   = out;
+    strm.total_in   = 0;
+    strm.total_out  = 0;
 
     ret = inflateInit2(&strm, 16+MAX_WBITS);
     if (ret != Z_OK)
@@ -551,18 +551,20 @@ void cNBTData::ParseByteArray( bool a_bNamed )
     int Length = ReadInt();
     std::string String;
 
-
+    char* ByteArray = new char[ Length ];
     if( Length > 0 )
     {
         for(int i = 0; i < Length; i++, m_Index++)
         {
-            String.push_back( m_Buffer[m_Index] );
+	    ByteArray[i] = m_Buffer[ m_Index ];
+	    //ByteArray[i].push_back( m_Buffer[m_Index] );
+            //String.push_back( m_Buffer[m_Index] );
         }
     }
 
-    PutByteArray( Name, String );
+    PutByteArray( Name, ByteArray );
 
-    printf("VALUE: %s (%s)\n", Name.c_str(), String.c_str() );//re
+    printf("VALUE: %s First 5 Chars: (%i,%i,%i,%i,%i)\n", Name.c_str(), ByteArray[0],ByteArray[1],ByteArray[2],ByteArray[3],ByteArray[4] );//re
 }
 
 std::string cNBTData::ReadName()
