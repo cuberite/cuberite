@@ -357,6 +357,11 @@ void cNBTCompound::PrintData( int a_Depth, std::string a_Name )
         printf("%s BYTE %s (%i)\n", Prefix, itr->first.c_str(), itr->second );
     }
 
+	for( ByteArrayMap::iterator itr = m_ByteArrays.begin(); itr != m_ByteArrays.end(); itr++ )
+	{
+		printf("%s BYTE ARRAY %s (length: %i)\n", Prefix, itr->first.c_str(), sizeof(itr->second) );
+	}
+
     delete Prefix;
 }
 
@@ -524,9 +529,9 @@ void cNBTData::ParseLong( bool a_bNamed )
 {
     std::string Name;
     if( a_bNamed ) Name = ReadName();
-    long Value = ReadLong();
+    long long Value = ReadLong();
 
-    PutInteger( Name, Value );
+    PutInteger( Name, (int)Value );
 
     printf("LONG: %s %li\n", Name.c_str(), Value );//re
 }
@@ -554,12 +559,8 @@ void cNBTData::ParseByteArray( bool a_bNamed )
     char* ByteArray = new char[ Length ];
     if( Length > 0 )
     {
-        for(int i = 0; i < Length; i++, m_Index++)
-        {
-	    ByteArray[i] = m_Buffer[ m_Index ];
-	    //ByteArray[i].push_back( m_Buffer[m_Index] );
-            //String.push_back( m_Buffer[m_Index] );
-        }
+		memcpy( ByteArray, &m_Buffer[ m_Index ], Length );
+        m_Index += Length;
     }
 
     PutByteArray( Name, ByteArray );
@@ -607,11 +608,11 @@ int cNBTData::ReadInt()
     return ntohl( Value );
 }
 
-long cNBTData::ReadLong()
+long long cNBTData::ReadLong()
 {
-    long Value = 0;
-    memcpy( &Value, m_Buffer+m_Index, sizeof(long) );
-    m_Index+=sizeof(long);
+    long long Value = 0;
+    memcpy( &Value, m_Buffer+m_Index, sizeof(long long) );
+    m_Index+=sizeof(long long);
 
     return ntohl( Value );
 }

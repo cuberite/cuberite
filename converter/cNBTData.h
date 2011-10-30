@@ -20,14 +20,16 @@ public:
 #endif
     {
         TAG_End = 0,
-        TAG_Byte,
-        TAG_Short,
-        TAG_Int,
-	TAG_Long,
+        TAG_Byte = 1,
+        TAG_Short = 2,
+        TAG_Int = 3,
+		TAG_Long = 4,
+		TAG_Float = 5,
+		TAG_Double = 6,
         TAG_ByteArray = 7,
-	TAG_String,
-        TAG_List,
-        TAG_Compound,
+		TAG_String = 8,
+        TAG_List = 9,
+        TAG_Compound = 10,
         TAG_NumTags // Not a real tag, but contains number of tags
     };
 
@@ -167,7 +169,7 @@ private:
     std::string ReadName();
     char ReadByte();
     int ReadInt();
-    long ReadLong();
+    long long ReadLong();
 
     cNBTCompound*    m_CurrentCompound;
 

@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebServer", "WebServer.vcxp
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "JsonCpp.vcxproj", "{ADBF25B9-7192-4E54-B35E-8EC47CA5EF86}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Converter", "Converter.vcxproj", "{9AB1FB82-2148-40E4-919F-3B184B4593C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,6 +73,12 @@ Global
 		{ADBF25B9-7192-4E54-B35E-8EC47CA5EF86}.Release|Win32.ActiveCfg = Release|Win32
 		{ADBF25B9-7192-4E54-B35E-8EC47CA5EF86}.Release|Win32.Build.0 = Release|Win32
 		{ADBF25B9-7192-4E54-B35E-8EC47CA5EF86}.Release|x64.ActiveCfg = Release|Win32
+		{9AB1FB82-2148-40E4-919F-3B184B4593C8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9AB1FB82-2148-40E4-919F-3B184B4593C8}.Debug|Win32.Build.0 = Debug|Win32
+		{9AB1FB82-2148-40E4-919F-3B184B4593C8}.Debug|x64.ActiveCfg = Debug|Win32
+		{9AB1FB82-2148-40E4-919F-3B184B4593C8}.Release|Win32.ActiveCfg = Release|Win32
+		{9AB1FB82-2148-40E4-919F-3B184B4593C8}.Release|Win32.Build.0 = Release|Win32
+		{9AB1FB82-2148-40E4-919F-3B184B4593C8}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,7 +7,7 @@
 #include <ctype.h>
 #include "zlib.h"
 #include <time.h>
-#include "cNBTData.cpp"
+#include "cNBTData.h"
 
 void quicksort(int*, int, int);
 int partition(int*, int, int, int);
@@ -32,7 +32,7 @@ int main () {
         FILE* wf = 0;
 	#ifdef _WIN32
 		sprintf_s(SourceFile, 128, "region/%s","r.0.0.mcr"); //replace hard coded file with file array variable
-                sprintf_s(OutputFile, 128, "world/%s","X0_Z0.pak"); //parce x and z from file array variable and place into pak file format
+        sprintf_s(OutputFile, 128, "world/%s","X0_Z0.pak"); //parce x and z from file array variable and place into pak file format
 		if( fopen_s(&wf, OutputFile, "wb" ) == 0 ) {} else { cout << "uhoh!" << endl; return 0; } //open new pak file for writing
 	#else
 		sprintf(SourceFile, "region/%s","r.0.0.mcr"); //same as above but for linux
@@ -48,9 +48,9 @@ int main () {
 		unsigned char byte1 = 0;
 		unsigned char byte2 = 0;
 		unsigned char byte3 = 0;
-                unsigned char byte4 = 0;
-                unsigned char byte5 = 0;
-                unsigned char trash = 0;
+        unsigned char byte4 = 0;
+        unsigned char byte5 = 0;
+        unsigned char trash = 0;
 		unsigned int  frloc = 0;
 		int toffset = 0;
 		int compdlength = 0;
@@ -107,8 +107,8 @@ int main () {
 				//cout << "frloc: " << frloc << endl;
 
 
-
-				char temparr[compdlength]; //can't get fread to read more than one char at a time into a char array... so that's what I'll do.  :(    At least it works.
+				// TODO - delete [] temparr after you're done with it, now it's a memory leak
+				char* temparr = new char[compdlength]; //can't get fread to read more than one char at a time into a char array... so that's what I'll do.  :(    At least it works.
 				if( fread( temparr, compdlength, 1, f) != 1 ) { cout << "ERROR rf22 READING FROM FILE " << SourceFile; fclose(f); return false; }
 				frloc = frloc + compdlength;
 				/*
@@ -173,7 +173,7 @@ int main () {
 
 
 				//testing of nbtparser.
-				cNBTData* NBTData = new cNBTData::cNBTData(BlockData, (testr));
+				cNBTData* NBTData = new cNBTData(BlockData, (testr));
 				//NBTData->m_bDecompressed = true;
 				NBTData->ParseData();
 				NBTData->PrintData();
@@ -181,10 +181,14 @@ int main () {
 				//NBTData->GetByteArray("Blocks");
 				//for(unsigned int i = 0; i < 111; i++) {//re
 					//printf("Blocks?: %i\n", NBTData->cNBTCompound::GetByteArray("Blocks")[0]);
+				NBTData->OpenCompound("");
+				NBTData->OpenCompound("Level"); // You need to open the right compounds before you can access the data in it
 					printf("xPos: %i\n", NBTData->GetInteger("xPos") );
 					//will print
 					//xPos: 0
-					printf("test: %i\n", NBTData->cNBTCompound::GetByteArray("Blocks")[0] );
+					printf("test: %i\n", NBTData->GetByteArray("Blocks")[0] );
+				NBTData->CloseCompound();// Close the compounds after you're done
+				NBTData->CloseCompound();
 				//}
 				return 1;
                                 fwrite( BlockData, DestSize, 1, wf ); //write contents of uncompressed block data to file to check to see if it's valid... It is! :D
