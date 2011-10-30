@@ -145,7 +145,7 @@ void cNBTData::Compress()
 
     if( ret != Z_STREAM_END )
     {
-        printf("WARNING: Compressing didn't go to end of stream\n");//re
+        //printf("WARNING: Compressing didn't go to end of stream\n");//re
     }
 
     if(m_Buffer)
@@ -249,7 +249,7 @@ void cNBTCompound::AppendInteger( std::string & a_Buffer, int a_Value )
 
 void cNBTCompound::Serialize(std::string & a_Buffer)
 {
-    printf("cNBTCompound::Serialize()\n");//re
+    //printf("cNBTCompound::Serialize()\n");//re
     for( CompoundMap::iterator itr = m_Compounds.begin(); itr != m_Compounds.end(); itr++ )
     {
         if( itr->second == 0 ) continue;
@@ -357,10 +357,10 @@ void cNBTCompound::PrintData( int a_Depth, std::string a_Name )
         printf("%s BYTE %s (%i)\n", Prefix, itr->first.c_str(), itr->second );
     }
 
-	for( ByteArrayMap::iterator itr = m_ByteArrays.begin(); itr != m_ByteArrays.end(); itr++ )
-	{
-		printf("%s BYTE ARRAY %s (length: %i)\n", Prefix, itr->first.c_str(), sizeof(itr->second) );
-	}
+    for( ByteArrayMap::iterator itr = m_ByteArrays.begin(); itr != m_ByteArrays.end(); itr++ )
+    {
+	printf("%s BYTE ARRAY %s (length: %li)\n", Prefix, itr->first.c_str(), sizeof(itr->second) );
+    }
 
     delete Prefix;
 }
@@ -383,7 +383,7 @@ void cNBTData::Serialize()
     memcpy( m_Buffer, Buffer.c_str(), Buffer.size() );
     m_BufferSize = Buffer.size();
 
-printf("m_BufferSize1: %i\n", m_BufferSize);//re
+    //printf("m_BufferSize1: %i\n", m_BufferSize);//re
 
      //for(unsigned int i = 0; i < m_BufferSize; i++)//re
      //{//re
@@ -400,18 +400,18 @@ void cNBTData::ParseData()
     }
 
      m_Index = 0;
-     printf("m_BufferSize2: %i\n", m_BufferSize);//re
-     printf("cNBTData::ParseData()\n");//re
+     //printf("m_BufferSize2: %i\n", m_BufferSize);//re
+     //printf("cNBTData::ParseData()\n");//re
      //for(unsigned int i = 0; i < m_BufferSize; i++)//re
-     for(unsigned int i = 0; i < 70; i++)//re
-     {//re
-         printf("echo%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
-     }//re
+     //for(unsigned int i = 0; i < 70; i++)//re
+     //{//re
+     //    printf("echo%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+     //}//re
 
     while( m_Index < m_BufferSize )
     {
-	printf("m_BufferSize3: %i\n", m_BufferSize);
-	printf("m_Index: %i\n", m_Index);
+	//printf("m_BufferSize3: %i\n", m_BufferSize);
+	//printf("m_Index: %i\n", m_Index);
         ParseTags();
     }
 }
@@ -420,20 +420,20 @@ void cNBTData::ParseTags()
 {
     if( m_Index < m_BufferSize )
     {
-        printf("ParseTags idx:%02i %02x %3i %c\n", m_Index, (unsigned char)m_Buffer[m_Index], (unsigned char)m_Buffer[m_Index], m_Buffer[m_Index] );//re
+        //printf("ParseTags idx:%02i %02x %3i %c\n", m_Index, (unsigned char)m_Buffer[m_Index], (unsigned char)m_Buffer[m_Index], m_Buffer[m_Index] );//re
         unsigned char Tag = m_Buffer[m_Index];
         if( Tag > 0 && m_ParseFunctions[ Tag ] )
         {
-        printf("m_BufferSize4: %i\n", m_BufferSize);
-        printf("m_Index1: %i\n\n\n\n", m_Index);
+        //printf("m_BufferSize4: %i\n", m_BufferSize);
+        //printf("m_Index1: %i\n\n\n\n", m_Index);
 
             m_Index++;
-	    printf("Tag: %i\n", Tag);
+	    //printf("Tag: %i\n", Tag);
             (*this.*m_ParseFunctions[ Tag ])(true);
         }
         else if( Tag == TAG_End )
         {
-            printf("Tag End");
+            //printf("Tag End");
             m_Index++;
         }
         else
@@ -453,7 +453,7 @@ void cNBTData::ParseCompound( bool a_bNamed )
 {
     std::string Name;
     if( a_bNamed ) Name = ReadName();
-    printf("OPEN COMPOUND: %s\n", Name.c_str() );//re
+    //printf("OPEN COMPOUND: %s\n", Name.c_str() );//re
 
     PutCompound( Name );
     OpenCompound( Name );
@@ -462,7 +462,7 @@ void cNBTData::ParseCompound( bool a_bNamed )
         ParseTags();
     }
     CloseCompound();
-    printf("CLOSE COMPOUND\n");//re
+    //printf("CLOSE COMPOUND\n");//re
 }
 
 void cNBTData::ParseList( bool a_bNamed )
@@ -471,12 +471,12 @@ void cNBTData::ParseList( bool a_bNamed )
     if( a_bNamed ) Name = ReadName();
     ENUM_TAG TagType = (ENUM_TAG)ReadByte();
     int Length = ReadInt();
-    printf("LIST: %s Type: %02x Length: %i\n", Name.c_str(), TagType, Length );//re
+    //printf("LIST: %s Type: %02x Length: %i\n", Name.c_str(), TagType, Length );//re
 
-     for(unsigned int i = (m_Index-10 > 0)?m_Index-10:0 ; i < m_Index+10 && i < m_BufferSize; i++)//re
-     {//re
-         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
-     }//re
+     //for(unsigned int i = (m_Index-10 > 0)?m_Index-10:0 ; i < m_Index+10 && i < m_BufferSize; i++)//re
+     //{//re
+         //printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+     //}//re
 
     PutList( Name, TagType );
     OpenList( Name );
@@ -500,7 +500,7 @@ void cNBTData::ParseByte( bool a_bNamed )
 
     PutByte( Name, Value );
 
-    printf("BYTE: %s %i\n", Name.c_str(), Value );//re
+    //printf("BYTE: %s %i\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseShort( bool a_bNamed )
@@ -511,7 +511,7 @@ void cNBTData::ParseShort( bool a_bNamed )
 
     PutShort( Name, Value );
 
-    printf("SHORT: %s %i\n", Name.c_str(), Value );//re
+    //printf("SHORT: %s %i\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseInt( bool a_bNamed )
@@ -522,7 +522,7 @@ void cNBTData::ParseInt( bool a_bNamed )
 
     PutInteger( Name, Value );
 
-    printf("INT: %s %i\n", Name.c_str(), Value );//re
+    //printf("INT: %s %i\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseLong( bool a_bNamed )
@@ -533,7 +533,7 @@ void cNBTData::ParseLong( bool a_bNamed )
 
     PutInteger( Name, (int)Value );
 
-    printf("LONG: %s %li\n", Name.c_str(), Value );//re
+    //printf("LONG: %s %lli\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseString( bool a_bNamed )
@@ -544,7 +544,7 @@ void cNBTData::ParseString( bool a_bNamed )
 
     PutString( Name, String );
 
-    printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );//re
+    //printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );//re
 }
 
 void cNBTData::ParseByteArray( bool a_bNamed )
@@ -559,21 +559,21 @@ void cNBTData::ParseByteArray( bool a_bNamed )
     char* ByteArray = new char[ Length ];
     if( Length > 0 )
     {
-		memcpy( ByteArray, &m_Buffer[ m_Index ], Length );
+	memcpy( ByteArray, &m_Buffer[ m_Index ], Length );
         m_Index += Length;
     }
 
     PutByteArray( Name, ByteArray );
 
-    printf("VALUE: %s First 5 Chars: (%i,%i,%i,%i,%i)\n", Name.c_str(), ByteArray[0],ByteArray[1],ByteArray[2],ByteArray[3],ByteArray[4] );//re
+    //printf("VALUE: %s First 5 Chars: (%i,%i,%i,%i,%i)\n", Name.c_str(), ByteArray[0],ByteArray[1],ByteArray[2],ByteArray[3],ByteArray[4] );//re
 }
 
 std::string cNBTData::ReadName()
 {
-printf("crui1 \n");
+    //printf("crui1 \n");
     short Length = ReadShort();
 
-printf("crui Length: %i\n", Length);
+    //printf("crui Length: %i\n", Length);
     std::string Name;
     if( Length > 0 )
     {

@@ -23,11 +23,11 @@ public:
         TAG_Byte = 1,
         TAG_Short = 2,
         TAG_Int = 3,
-		TAG_Long = 4,
-		TAG_Float = 5,
-		TAG_Double = 6,
+	TAG_Long = 4,
+	TAG_Float = 5,
+	TAG_Double = 6,
         TAG_ByteArray = 7,
-		TAG_String = 8,
+	TAG_String = 8,
         TAG_List = 9,
         TAG_Compound = 10,
         TAG_NumTags // Not a real tag, but contains number of tags
@@ -53,8 +53,8 @@ public:
     cNBTCompound*    GetCompound( std::string Name );
     cNBTList*        GetList( std::string Name )      { return m_Lists[Name]; }
 
-    cNBTList*        GetCurrentList() { return m_CurrentList; }
-    cNBTCompound*    GetParentCompound() { return m_ParentCompound; }
+    cNBTList*        GetCurrentList()                 { return m_CurrentList; }
+    cNBTCompound*    GetParentCompound()              { return m_ParentCompound; }
 
     bool OpenList( std::string a_Name );
     bool CloseList();
