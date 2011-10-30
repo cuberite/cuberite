@@ -102,7 +102,7 @@ bool cNBTData::CloseList()
 
 void cNBTData::Compress()
 {
-    //printf("Before Compress size: %i\n", m_BufferSize );
+    printf("Before Compress size: %i\n", m_BufferSize );//re
     const int MAXNBTSIZE = 1024 * 1024 * 120;
 
     int ret;
@@ -144,7 +144,7 @@ void cNBTData::Compress()
 
     if( ret != Z_STREAM_END )
     {
-        //printf("WARNING: Compressing didn't go to end of stream\n");
+        printf("WARNING: Compressing didn't go to end of stream\n");//re
     }
 
     if(m_Buffer)
@@ -153,7 +153,7 @@ void cNBTData::Compress()
         m_Buffer = 0;
     }
 
-    //printf("Compressed size: %i\n", have );
+    printf("Compressed size: %i\n", have );//re
 
     m_BufferSize = have;
     m_Buffer = new char[ m_BufferSize ];
@@ -179,7 +179,7 @@ bool cNBTData::Decompress()
         return false;
     }
 
-    //printf("Before Decompress size: %i\n", m_BufferSize );
+    printf("Before Decompress size: %i\n", m_BufferSize );//re
 
     const int MAXNBTSIZE = 1024 * 1024 * 120 ;
 
@@ -229,7 +229,7 @@ bool cNBTData::Decompress()
         printf("WARNING: NBT Data received was too big! (More than %i bytes)\n", MAXNBTSIZE);
     }
 
-    //printf("Decompressed Size: %i\n", UncompressedSize );
+    printf("Decompressed Size: %i\n", UncompressedSize );//re
     m_bDecompressed = true;
     return (ret == Z_STREAM_END) ? true : false;
 }
@@ -248,7 +248,7 @@ void cNBTCompound::AppendInteger( std::string & a_Buffer, int a_Value )
 
 void cNBTCompound::Serialize(std::string & a_Buffer)
 {
-    //printf("cNBTCompound::Serialize()\n");
+    printf("cNBTCompound::Serialize()\n");//re
     for( CompoundMap::iterator itr = m_Compounds.begin(); itr != m_Compounds.end(); itr++ )
     {
         if( itr->second == 0 ) continue;
@@ -377,10 +377,10 @@ void cNBTData::Serialize()
     memcpy( m_Buffer, Buffer.c_str(), Buffer.size() );
     m_BufferSize = Buffer.size();
 
-//     for(unsigned int i = 0; i < m_BufferSize; i++)
-//     {
-//         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );
-//     }
+     for(unsigned int i = 0; i < m_BufferSize; i++)//re
+     {//re
+         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+     }//re
 }
 
 void cNBTData::ParseData()
@@ -392,11 +392,11 @@ void cNBTData::ParseData()
     }
 
     m_Index = 0;
-//    printf("cNBTData::ParseData()\n");
-//     for(unsigned int i = 0; i < m_BufferSize; i++)
-//     {
-//         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );
-//     }
+    printf("cNBTData::ParseData()\n");//re
+     for(unsigned int i = 0; i < m_BufferSize; i++)//re
+     {//re
+         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+     }//re
 
     while( m_Index < m_BufferSize )
     {
@@ -408,7 +408,7 @@ void cNBTData::ParseTags()
 {
     if( m_Index < m_BufferSize )
     {
-        //printf("ParseTags idx:%02i %02x %3i %c\n", m_Index, (unsigned char)m_Buffer[m_Index], (unsigned char)m_Buffer[m_Index], m_Buffer[m_Index] );
+        printf("ParseTags idx:%02i %02x %3i %c\n", m_Index, (unsigned char)m_Buffer[m_Index], (unsigned char)m_Buffer[m_Index], m_Buffer[m_Index] );//re
         unsigned char Tag = m_Buffer[m_Index];
         if( Tag > 0 && m_ParseFunctions[ Tag ] )
         {
@@ -436,7 +436,7 @@ void cNBTData::ParseCompound( bool a_bNamed )
 {
     std::string Name;
     if( a_bNamed ) Name = ReadName();
-    //printf("OPEN COMPOUND: %s\n", Name.c_str() );
+    printf("OPEN COMPOUND: %s\n", Name.c_str() );//re
 
     PutCompound( Name );
     OpenCompound( Name );
@@ -445,7 +445,7 @@ void cNBTData::ParseCompound( bool a_bNamed )
         ParseTags();
     }
     CloseCompound();
-    //printf("CLOSE COMPOUND\n");
+    printf("CLOSE COMPOUND\n");//re
 }
 
 void cNBTData::ParseList( bool a_bNamed )
@@ -454,12 +454,12 @@ void cNBTData::ParseList( bool a_bNamed )
     if( a_bNamed ) Name = ReadName();
     ENUM_TAG TagType = (ENUM_TAG)ReadByte();
     int Length = ReadInt();
-    //printf("LIST: %s Type: %02x Length: %i\n", Name.c_str(), TagType, Length );
+    printf("LIST: %s Type: %02x Length: %i\n", Name.c_str(), TagType, Length );//re
 
-//     for(unsigned int i = (m_Index-10 > 0)?m_Index-10:0 ; i < m_Index+10 && i < m_BufferSize; i++)
-//     {
-//         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );
-//     }
+     for(unsigned int i = (m_Index-10 > 0)?m_Index-10:0 ; i < m_Index+10 && i < m_BufferSize; i++)//re
+     {//re
+         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+     }//re
 
     PutList( Name, TagType );
     OpenList( Name );
@@ -483,7 +483,7 @@ void cNBTData::ParseByte( bool a_bNamed )
 
     PutByte( Name, Value );
 
-    //printf("BYTE: %s %i\n", Name.c_str(), Value );
+    printf("BYTE: %s %i\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseShort( bool a_bNamed )
@@ -494,7 +494,7 @@ void cNBTData::ParseShort( bool a_bNamed )
 
     PutShort( Name, Value );
 
-    //printf("SHORT: %s %i\n", Name.c_str(), Value );
+    printf("SHORT: %s %i\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseInt( bool a_bNamed )
@@ -505,7 +505,7 @@ void cNBTData::ParseInt( bool a_bNamed )
 
     PutInteger( Name, Value );
 
-    //printf("INT: %s %i\n", Name.c_str(), Value );
+    printf("INT: %s %i\n", Name.c_str(), Value );//re
 }
 
 void cNBTData::ParseString( bool a_bNamed )
@@ -516,7 +516,7 @@ void cNBTData::ParseString( bool a_bNamed )
 
     PutString( Name, String );
 
-    //printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );
+    printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );//re
 }
 
 void cNBTData::ParseByteArray( bool a_bNamed )
@@ -527,7 +527,7 @@ void cNBTData::ParseByteArray( bool a_bNamed )
 
     PutString( Name, String );
 
-    //printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );
+    printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );//re
 }
 
 std::string cNBTData::ReadName()

@@ -23,8 +23,8 @@ public:
         TAG_Byte,
         TAG_Short,
         TAG_Int,
-        TAG_String = 8,
-        TAG_ByteArray,
+        TAG_ByteArray = 7,
+	TAG_String,
         TAG_List,
         TAG_Compound,
         TAG_NumTags // Not a real tag, but contains number of tags

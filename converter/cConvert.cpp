@@ -173,10 +173,10 @@ int main () {
 
 
 				//testing of nbtparser.
-				cNBTData* NBTData = new cNBTData::cNBTData(BlockData, testr);
+				cNBTData* NBTData = new cNBTData::cNBTData(BlockData, testr*2);
 				//NBTData->m_bDecompressed = true;
 				NBTData->ParseData();
-				NBTData->PrintData();
+				//NBTData->PrintData();
 				return 1;
                                 fwrite( BlockData, DestSize, 1, wf ); //write contents of uncompressed block data to file to check to see if it's valid... It is! :D
 				//fwrite( &temparr, compdlength, sizeof(unsigned char), wf );
