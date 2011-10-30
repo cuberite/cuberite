@@ -36,7 +36,7 @@ public:
     void PutShort( std::string Name, short Value ) { m_Shorts[Name] = Value; }
     void PutInteger( std::string Name, int Value ) { m_Integers[Name] = Value; }
     void PutString( std::string Name, std::string Value ) { m_Strings[Name] = Value; }
-    void PutByteArray( std::string Name, char Value ) { m_ByteArrays[Name] = Value; }
+    void PutByteArray( std::string Name, std::string Value ) { m_ByteArrays[Name] = Value; }
     void PutCompound( std::string Name );
     void PutList( std::string Name, ENUM_TAG Type );
 
@@ -44,7 +44,7 @@ public:
     short            GetShort( std::string Name ) { return m_Shorts[Name]; }
     int              GetInteger( std::string Name ) { return m_Integers[Name]; }
     std::string      GetString( std::string Name ) { return m_Strings[Name]; }
-    char             GetByteArray( std::string Name ) { return m_ByteArrays[Name]; }
+    std::string      GetByteArray( std::string Name ) { return m_ByteArrays[Name]; }
     cNBTCompound*    GetCompound( std::string Name );
     cNBTList*        GetList( std::string Name ) { return m_Lists[Name]; }
 
@@ -68,7 +68,7 @@ private:
     typedef std::map<std::string, short>            ShortMap;
     typedef std::map<std::string, int>              IntegerMap;
     typedef std::map<std::string, std::string>      StringMap;
-    typedef std::map<std::string, char>             ByteArrayMap;
+    typedef std::map<std::string, std::string>      ByteArrayMap;
     typedef std::map<std::string, cNBTCompound*>    CompoundMap;
     typedef std::map<std::string, cNBTList*>        ListMap;
     ByteMap            m_Bytes;
@@ -121,17 +121,17 @@ public:
     bool OpenList( std::string a_Name );
     bool CloseList();
 
-    void PutByte( std::string Name, char Value )            { m_CurrentCompound->PutByte( Name, Value ); }
-    void PutShort( std::string Name, short Value )          { m_CurrentCompound->PutShort( Name, Value ); }
-    void PutInteger( std::string Name, int Value )          { m_CurrentCompound->PutInteger( Name, Value ); }
-    void PutString( std::string Name, std::string Value )   { m_CurrentCompound->PutString(Name, Value); }
-    void PutByteArray( std::string Name, char Value )       { m_CurrentCompound->PutByteArray( Name, Value ); }
-    void PutCompound( std::string Name )                    { m_CurrentCompound->PutCompound( Name ); }
-    void PutList( std::string Name, ENUM_TAG Type )         { m_CurrentCompound->PutList( Name, Type ); }
+    void PutByte( std::string Name, char Value )             { m_CurrentCompound->PutByte( Name, Value ); }
+    void PutShort( std::string Name, short Value )           { m_CurrentCompound->PutShort( Name, Value ); }
+    void PutInteger( std::string Name, int Value )           { m_CurrentCompound->PutInteger( Name, Value ); }
+    void PutString( std::string Name, std::string Value )    { m_CurrentCompound->PutString(Name, Value); }
+    void PutByteArray( std::string Name, std::string Value ) { m_CurrentCompound->PutByteArray( Name, Value ); }
+    void PutCompound( std::string Name )                     { m_CurrentCompound->PutCompound( Name ); }
+    void PutList( std::string Name, ENUM_TAG Type )          { m_CurrentCompound->PutList( Name, Type ); }
 
     int              GetInteger( std::string Name )   { return m_CurrentCompound->GetInteger(Name); }
     std::string      GetString( std::string Name )    { return m_CurrentCompound->GetString(Name); }
-    char             GetByteArray( std::string Name ) { return m_CurrentCompound->GetByteArray(Name); }
+    std::string      GetByteArray( std::string Name ) { return m_CurrentCompound->GetByteArray(Name); }
     cNBTCompound*    GetCompound( std::string Name )  { return m_CurrentCompound->GetCompound(Name); }
     cNBTList*        GetList( std::string Name )      { return m_CurrentCompound->GetList(Name); }
 

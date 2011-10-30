@@ -173,7 +173,7 @@ int main () {
 
 
 				//testing of nbtparser.
-				cNBTData* NBTData = new cNBTData::cNBTData(BlockData, testr*2);
+				cNBTData* NBTData = new cNBTData::cNBTData(BlockData, (testr));
 				//NBTData->m_bDecompressed = true;
 				NBTData->ParseData();
 				//NBTData->PrintData();

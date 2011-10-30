@@ -102,7 +102,7 @@ bool cNBTData::CloseList()
 
 void cNBTData::Compress()
 {
-    printf("Before Compress size: %i\n", m_BufferSize );//re
+    //printf("Before Compress size: %i\n", m_BufferSize );//re
     const int MAXNBTSIZE = 1024 * 1024 * 120;
 
     int ret;
@@ -153,7 +153,7 @@ void cNBTData::Compress()
         m_Buffer = 0;
     }
 
-    printf("Compressed size: %i\n", have );//re
+    //printf("Compressed size: %i\n", have );//re
 
     m_BufferSize = have;
     m_Buffer = new char[ m_BufferSize ];
@@ -179,7 +179,7 @@ bool cNBTData::Decompress()
         return false;
     }
 
-    printf("Before Decompress size: %i\n", m_BufferSize );//re
+    //printf("Before Decompress size: %i\n", m_BufferSize );//re
 
     const int MAXNBTSIZE = 1024 * 1024 * 120 ;
 
@@ -229,7 +229,7 @@ bool cNBTData::Decompress()
         printf("WARNING: NBT Data received was too big! (More than %i bytes)\n", MAXNBTSIZE);
     }
 
-    printf("Decompressed Size: %i\n", UncompressedSize );//re
+    //printf("Decompressed Size: %i\n", UncompressedSize );//re
     m_bDecompressed = true;
     return (ret == Z_STREAM_END) ? true : false;
 }
@@ -377,10 +377,12 @@ void cNBTData::Serialize()
     memcpy( m_Buffer, Buffer.c_str(), Buffer.size() );
     m_BufferSize = Buffer.size();
 
-     for(unsigned int i = 0; i < m_BufferSize; i++)//re
-     {//re
-         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
-     }//re
+printf("m_BufferSize1: %i\n", m_BufferSize);//re
+
+     //for(unsigned int i = 0; i < m_BufferSize; i++)//re
+     //{//re
+     //    printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+     //}//re
 }
 
 void cNBTData::ParseData()
@@ -391,15 +393,19 @@ void cNBTData::ParseData()
         return;
     }
 
-    m_Index = 0;
-    printf("cNBTData::ParseData()\n");//re
-     for(unsigned int i = 0; i < m_BufferSize; i++)//re
+     m_Index = 0;
+     printf("m_BufferSize2: %i\n", m_BufferSize);//re
+     printf("cNBTData::ParseData()\n");//re
+     //for(unsigned int i = 0; i < m_BufferSize; i++)//re
+     for(unsigned int i = 0; i < 70; i++)//re
      {//re
-         printf("%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
+         printf("echo%02i %02x %3i %c\n", i, (unsigned char)m_Buffer[i], (unsigned char)m_Buffer[i], m_Buffer[i] );//re
      }//re
 
     while( m_Index < m_BufferSize )
     {
+	printf("m_BufferSize3: %i\n", m_BufferSize);
+	printf("m_Index: %i\n", m_Index);
         ParseTags();
     }
 }
@@ -412,11 +418,16 @@ void cNBTData::ParseTags()
         unsigned char Tag = m_Buffer[m_Index];
         if( Tag > 0 && m_ParseFunctions[ Tag ] )
         {
+        printf("m_BufferSize4: %i\n", m_BufferSize);
+        printf("m_Index1: %i\n\n\n\n", m_Index);
+
             m_Index++;
+	    printf("Tag: %i\n", Tag);
             (*this.*m_ParseFunctions[ Tag ])(true);
         }
         else if( Tag == TAG_End )
         {
+            printf("Tag End");
             m_Index++;
         }
         else
@@ -521,19 +532,33 @@ void cNBTData::ParseString( bool a_bNamed )
 
 void cNBTData::ParseByteArray( bool a_bNamed )
 {
+
     std::string Name;
     if( a_bNamed ) Name = ReadName();
-    std::string String = ReadName();
 
-    PutString( Name, String );
+    int Length = ReadInt();
+    std::string String;
 
-    printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );//re
+
+    if( Length > 0 )
+    {
+        for(int i = 0; i < Length; i++, m_Index++)
+        {
+            String.push_back( m_Buffer[m_Index] );
+        }
+    }
+
+    PutByteArray( Name, String );
+
+    printf("VALUE: %s (%s)\n", Name.c_str(), String.c_str() );//re
 }
 
 std::string cNBTData::ReadName()
 {
+printf("crui1 \n");
     short Length = ReadShort();
 
+printf("crui Length: %i\n", Length);
     std::string Name;
     if( Length > 0 )
     {
