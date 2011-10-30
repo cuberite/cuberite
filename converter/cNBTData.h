@@ -23,6 +23,7 @@ public:
         TAG_Byte,
         TAG_Short,
         TAG_Int,
+	TAG_Long,
         TAG_ByteArray = 7,
 	TAG_String,
         TAG_List,
@@ -32,10 +33,11 @@ public:
 
     void Clear();
 
-    void PutByte( std::string Name, char Value ) { m_Bytes[Name] = Value; }
-    void PutShort( std::string Name, short Value ) { m_Shorts[Name] = Value; }
-    void PutInteger( std::string Name, int Value ) { m_Integers[Name] = Value; }
-    void PutString( std::string Name, std::string Value ) { m_Strings[Name] = Value; }
+    void PutByte( std::string Name, char Value )             { m_Bytes[Name] = Value; }
+    void PutShort( std::string Name, short Value )           { m_Shorts[Name] = Value; }
+    void PutInteger( std::string Name, int Value )           { m_Integers[Name] = Value; }
+    void PutLong( std::string Name, long Value )             { m_Longs[Name] = Value; }
+    void PutString( std::string Name, std::string Value )    { m_Strings[Name] = Value; }
     void PutByteArray( std::string Name, std::string Value ) { m_ByteArrays[Name] = Value; }
     void PutCompound( std::string Name );
     void PutList( std::string Name, ENUM_TAG Type );
@@ -43,6 +45,7 @@ public:
     char             GetByte( std::string Name ) { return m_Bytes[Name]; }
     short            GetShort( std::string Name ) { return m_Shorts[Name]; }
     int              GetInteger( std::string Name ) { return m_Integers[Name]; }
+    long             GetLong( std::string Name ) { return m_Longs[Name]; }
     std::string      GetString( std::string Name ) { return m_Strings[Name]; }
     std::string      GetByteArray( std::string Name ) { return m_ByteArrays[Name]; }
     cNBTCompound*    GetCompound( std::string Name );
@@ -67,6 +70,7 @@ private:
     typedef std::map<std::string, char>             ByteMap;
     typedef std::map<std::string, short>            ShortMap;
     typedef std::map<std::string, int>              IntegerMap;
+    typedef std::map<std::string, long>             LongMap;
     typedef std::map<std::string, std::string>      StringMap;
     typedef std::map<std::string, std::string>      ByteArrayMap;
     typedef std::map<std::string, cNBTCompound*>    CompoundMap;
@@ -74,6 +78,7 @@ private:
     ByteMap            m_Bytes;
     ShortMap           m_Shorts;
     IntegerMap         m_Integers;
+    LongMap            m_Longs;
     StringMap          m_Strings;
     ByteArrayMap       m_ByteArrays;
     CompoundMap        m_Compounds;
@@ -124,12 +129,14 @@ public:
     void PutByte( std::string Name, char Value )             { m_CurrentCompound->PutByte( Name, Value ); }
     void PutShort( std::string Name, short Value )           { m_CurrentCompound->PutShort( Name, Value ); }
     void PutInteger( std::string Name, int Value )           { m_CurrentCompound->PutInteger( Name, Value ); }
+    void PutLong( std::string Name, long Value )             { m_CurrentCompound->PutLong( Name, Value ); }
     void PutString( std::string Name, std::string Value )    { m_CurrentCompound->PutString(Name, Value); }
     void PutByteArray( std::string Name, std::string Value ) { m_CurrentCompound->PutByteArray( Name, Value ); }
     void PutCompound( std::string Name )                     { m_CurrentCompound->PutCompound( Name ); }
     void PutList( std::string Name, ENUM_TAG Type )          { m_CurrentCompound->PutList( Name, Type ); }
 
     int              GetInteger( std::string Name )   { return m_CurrentCompound->GetInteger(Name); }
+    long             GetLong( std::string Name )      { return m_CurrentCompound->GetLong(Name); }
     std::string      GetString( std::string Name )    { return m_CurrentCompound->GetString(Name); }
     std::string      GetByteArray( std::string Name ) { return m_CurrentCompound->GetByteArray(Name); }
     cNBTCompound*    GetCompound( std::string Name )  { return m_CurrentCompound->GetCompound(Name); }
@@ -153,12 +160,14 @@ private:
     void ParseByte( bool a_bNamed );
     void ParseByteArray( bool a_bNamed );
     void ParseInt( bool a_bNamed );
+    void ParseLong( bool a_bNamed );
     void ParseShort( bool a_bNamed );
 
     short ReadShort();
     std::string ReadName();
     char ReadByte();
     int ReadInt();
+    long ReadLong();
 
     cNBTCompound*    m_CurrentCompound;
 

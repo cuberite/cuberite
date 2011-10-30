@@ -30,6 +30,7 @@ cNBTData::cNBTData( char* a_Buffer, unsigned int a_BufferSize )
     m_ParseFunctions[TAG_Byte]      = &cNBTData::ParseByte;
     m_ParseFunctions[TAG_Short]     = &cNBTData::ParseShort;
     m_ParseFunctions[TAG_Int]       = &cNBTData::ParseInt;
+    m_ParseFunctions[TAG_Long]      = &cNBTData::ParseLong;
     m_ParseFunctions[TAG_String]    = &cNBTData::ParseString;
     m_ParseFunctions[TAG_List]      = &cNBTData::ParseList;
     m_ParseFunctions[TAG_Compound]  = &cNBTData::ParseCompound;
@@ -519,6 +520,17 @@ void cNBTData::ParseInt( bool a_bNamed )
     printf("INT: %s %i\n", Name.c_str(), Value );//re
 }
 
+void cNBTData::ParseLong( bool a_bNamed )
+{
+    std::string Name;
+    if( a_bNamed ) Name = ReadName();
+    long Value = ReadLong();
+
+    PutInteger( Name, Value );
+
+    printf("LONG: %s %li\n", Name.c_str(), Value );//re
+}
+
 void cNBTData::ParseString( bool a_bNamed )
 {
     std::string Name;
@@ -589,6 +601,15 @@ int cNBTData::ReadInt()
     int Value = 0;
     memcpy( &Value, m_Buffer+m_Index, sizeof(int) );
     m_Index+=sizeof(int);
+
+    return ntohl( Value );
+}
+
+long cNBTData::ReadLong()
+{
+    long Value = 0;
+    memcpy( &Value, m_Buffer+m_Index, sizeof(long) );
+    m_Index+=sizeof(long);
 
     return ntohl( Value );
 }
