@@ -24,6 +24,7 @@ public:
         TAG_Short,
         TAG_Int,
         TAG_String = 8,
+        TAG_ByteArray,
         TAG_List,
         TAG_Compound,
         TAG_NumTags // Not a real tag, but contains number of tags
@@ -35,13 +36,15 @@ public:
     void PutShort( std::string Name, short Value ) { m_Shorts[Name] = Value; }
     void PutInteger( std::string Name, int Value ) { m_Integers[Name] = Value; }
     void PutString( std::string Name, std::string Value ) { m_Strings[Name] = Value; }
+    void PutByteArray( std::string Name, char Value ) { m_ByteArrays[Name] = Value; }
     void PutCompound( std::string Name );
     void PutList( std::string Name, ENUM_TAG Type );
 
-    char            GetByte( std::string Name ) { return m_Bytes[Name]; }
+    char             GetByte( std::string Name ) { return m_Bytes[Name]; }
     short            GetShort( std::string Name ) { return m_Shorts[Name]; }
-    int                GetInteger( std::string Name ) { return m_Integers[Name]; }
-    std::string        GetString( std::string Name ) { return m_Strings[Name]; }
+    int              GetInteger( std::string Name ) { return m_Integers[Name]; }
+    std::string      GetString( std::string Name ) { return m_Strings[Name]; }
+    char             GetByteArray( std::string Name ) { return m_ByteArrays[Name]; }
     cNBTCompound*    GetCompound( std::string Name );
     cNBTList*        GetList( std::string Name ) { return m_Lists[Name]; }
 
@@ -61,16 +64,18 @@ private:
     cNBTCompound* m_ParentCompound;
     cNBTList*        m_CurrentList;
 
-    typedef std::map<std::string, char>                ByteMap;
+    typedef std::map<std::string, char>             ByteMap;
     typedef std::map<std::string, short>            ShortMap;
-    typedef std::map<std::string, int>                IntegerMap;
-    typedef std::map<std::string, std::string>        StringMap;
+    typedef std::map<std::string, int>              IntegerMap;
+    typedef std::map<std::string, std::string>      StringMap;
+    typedef std::map<std::string, char>             ByteArrayMap;
     typedef std::map<std::string, cNBTCompound*>    CompoundMap;
     typedef std::map<std::string, cNBTList*>        ListMap;
     ByteMap            m_Bytes;
-    ShortMap        m_Shorts;
-    IntegerMap        m_Integers;
-    StringMap        m_Strings;
+    ShortMap           m_Shorts;
+    IntegerMap         m_Integers;
+    StringMap          m_Strings;
+    ByteArrayMap       m_ByteArrays;
     CompoundMap        m_Compounds;
     ListMap            m_Lists;
 };
@@ -117,16 +122,18 @@ public:
     bool CloseList();
 
     void PutByte( std::string Name, char Value )            { m_CurrentCompound->PutByte( Name, Value ); }
-    void PutShort( std::string Name, short Value )            { m_CurrentCompound->PutShort( Name, Value ); }
-    void PutInteger( std::string Name, int Value )            { m_CurrentCompound->PutInteger( Name, Value ); }
-    void PutString( std::string Name, std::string Value )    { m_CurrentCompound->PutString(Name, Value); }
+    void PutShort( std::string Name, short Value )          { m_CurrentCompound->PutShort( Name, Value ); }
+    void PutInteger( std::string Name, int Value )          { m_CurrentCompound->PutInteger( Name, Value ); }
+    void PutString( std::string Name, std::string Value )   { m_CurrentCompound->PutString(Name, Value); }
+    void PutByteArray( std::string Name, char Value )       { m_CurrentCompound->PutByteArray( Name, Value ); }
     void PutCompound( std::string Name )                    { m_CurrentCompound->PutCompound( Name ); }
-    void PutList( std::string Name, ENUM_TAG Type )            { m_CurrentCompound->PutList( Name, Type ); }
+    void PutList( std::string Name, ENUM_TAG Type )         { m_CurrentCompound->PutList( Name, Type ); }
 
-    int                GetInteger( std::string Name )    { return m_CurrentCompound->GetInteger(Name); }
-    std::string        GetString( std::string Name )    { return m_CurrentCompound->GetString(Name); }
-    cNBTCompound*    GetCompound( std::string Name ) { return m_CurrentCompound->GetCompound(Name); }
-    cNBTList*        GetList( std::string Name )        { return m_CurrentCompound->GetList(Name); }
+    int              GetInteger( std::string Name )   { return m_CurrentCompound->GetInteger(Name); }
+    std::string      GetString( std::string Name )    { return m_CurrentCompound->GetString(Name); }
+    char             GetByteArray( std::string Name ) { return m_CurrentCompound->GetByteArray(Name); }
+    cNBTCompound*    GetCompound( std::string Name )  { return m_CurrentCompound->GetCompound(Name); }
+    cNBTList*        GetList( std::string Name )      { return m_CurrentCompound->GetList(Name); }
 
     char* GetBuffer() { return m_Buffer; }
     unsigned int GetBufferSize() { return m_BufferSize; }
@@ -144,6 +151,7 @@ private:
     void ParseList( bool a_bNamed );
     void ParseString( bool a_bNamed );
     void ParseByte( bool a_bNamed );
+    void ParseByteArray( bool a_bNamed );
     void ParseInt( bool a_bNamed );
     void ParseShort( bool a_bNamed );
 

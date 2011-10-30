@@ -109,6 +109,9 @@ int main () {
 
 
 				char temparr[compdlength]; //can't get fread to read more than one char at a time into a char array... so that's what I'll do.  :(    At least it works.
+				if( fread( temparr, compdlength, 1, f) != 1 ) { cout << "ERROR rf22 READING FROM FILE " << SourceFile; fclose(f); return false; }
+				frloc = frloc + compdlength;
+				/*
 				int re = 0;
 				char tempbyte = 0;
 				while (re < compdlength) { //loop through file and read contents into char array a byte at a time.
@@ -118,7 +121,7 @@ int main () {
 					frloc++;
 				}
 
-
+				*/
 
 				//if( fread( comp_data, compdlength, sizeof(unsigned char), f) != 1 ) { cout << "ERROR 1234 READING FROM FILE " << SourceFile <<endl; fclose(f); return false; } //actual compressed chunk data
 				//frloc += compdlength;
@@ -169,6 +172,12 @@ int main () {
 				//cout << BlockDataString << endl;
 
 
+				//testing of nbtparser.
+				cNBTData* NBTData = new cNBTData::cNBTData(BlockData, testr);
+				//NBTData->m_bDecompressed = true;
+				NBTData->ParseData();
+				NBTData->PrintData();
+				return 1;
                                 fwrite( BlockData, DestSize, 1, wf ); //write contents of uncompressed block data to file to check to see if it's valid... It is! :D
 				//fwrite( &temparr, compdlength, sizeof(unsigned char), wf );
 				//cin >> n; //just to see screen output

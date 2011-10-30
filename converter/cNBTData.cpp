@@ -27,12 +27,13 @@ cNBTData::cNBTData( char* a_Buffer, unsigned int a_BufferSize )
     {
         m_ParseFunctions[i] = 0;
     }
-    m_ParseFunctions[TAG_Byte]        = &cNBTData::ParseByte;
-    m_ParseFunctions[TAG_Short]        = &cNBTData::ParseShort;
-    m_ParseFunctions[TAG_Int]        = &cNBTData::ParseInt;
+    m_ParseFunctions[TAG_Byte]      = &cNBTData::ParseByte;
+    m_ParseFunctions[TAG_Short]     = &cNBTData::ParseShort;
+    m_ParseFunctions[TAG_Int]       = &cNBTData::ParseInt;
     m_ParseFunctions[TAG_String]    = &cNBTData::ParseString;
-    m_ParseFunctions[TAG_List]        = &cNBTData::ParseList;
-    m_ParseFunctions[TAG_Compound]    = &cNBTData::ParseCompound;
+    m_ParseFunctions[TAG_List]      = &cNBTData::ParseList;
+    m_ParseFunctions[TAG_Compound]  = &cNBTData::ParseCompound;
+    m_ParseFunctions[TAG_ByteArray] = &cNBTData::ParseByteArray;
 
 
     m_Buffer = a_Buffer;
@@ -41,7 +42,7 @@ cNBTData::cNBTData( char* a_Buffer, unsigned int a_BufferSize )
 
     m_CurrentCompound = this;
 
-    m_bDecompressed = false;
+    m_bDecompressed = true;
 }
 
 bool cNBTData::OpenCompound( std::string a_Name )
@@ -102,7 +103,7 @@ bool cNBTData::CloseList()
 void cNBTData::Compress()
 {
     //printf("Before Compress size: %i\n", m_BufferSize );
-    const int MAXNBTSIZE = 1024 * 2;
+    const int MAXNBTSIZE = 1024 * 1024 * 120;
 
     int ret;
     unsigned have;
@@ -180,7 +181,7 @@ bool cNBTData::Decompress()
 
     //printf("Before Decompress size: %i\n", m_BufferSize );
 
-    const int MAXNBTSIZE = 1024 * 2;
+    const int MAXNBTSIZE = 1024 * 1024 * 120 ;
 
     int ret;
     z_stream strm;
@@ -508,6 +509,17 @@ void cNBTData::ParseInt( bool a_bNamed )
 }
 
 void cNBTData::ParseString( bool a_bNamed )
+{
+    std::string Name;
+    if( a_bNamed ) Name = ReadName();
+    std::string String = ReadName();
+
+    PutString( Name, String );
+
+    //printf("STRING: %s (%s)\n", Name.c_str(), String.c_str() );
+}
+
+void cNBTData::ParseByteArray( bool a_bNamed )
 {
     std::string Name;
     if( a_bNamed ) Name = ReadName();

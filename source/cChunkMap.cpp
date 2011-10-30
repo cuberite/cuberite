@@ -12,8 +12,6 @@
 #include <stdio.h> // sprintf and stuff
 #endif
 
-#include <iostream>
-
 #include "zlib.h"
 #include <json/json.h>
 
@@ -365,7 +363,6 @@ cChunk* cChunkMap::GetChunk( int a_X, int a_Y, int a_Z )
 			else
 			{
 				cChunk* Chunk = new cChunk(a_X, a_Y, a_Z);
-				//std::cout << BlockData;
 				memcpy( Chunk->m_BlockData, BlockData, cChunk::c_BlockDataSize ); 
 				Chunk->CalculateHeightmap();
 				Data->m_LiveChunk = Chunk;
@@ -559,7 +556,6 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 		sprintf_s(SourceFile, 128, "world/X%i_Z%i.pak", a_Layer->m_X, a_Layer->m_Z );
 	#else
 		sprintf(SourceFile, "world/X%i_Z%i.pak", a_Layer->m_X, a_Layer->m_Z );
-		//std::cout << SourceFile << std::endl;
 	#endif
 
 
@@ -689,7 +685,6 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 			}
 
 			OrderedData[i] = Data;
-			//std::cout << Data;
 		}
 
 		// Loop over chunks again, in the order they were loaded, and load their compressed data
