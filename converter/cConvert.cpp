@@ -74,7 +74,7 @@ int main () {
                 quicksort(toffarr, 0, 1023); //sort the array from smallest to larget offset locations so we only have to read through the file once.
 
                 for ( short ia = 0; ia < 1024; ia++ ) {//a region file can hold a maximum of 1024 chunks (32*32)
-			if (ia < 35 ) { //only run chunk # 3
+			if (ia < 3500 ) { //only run chunk # 3
 			if (toffarr[ia] < 8192) { //offsets of less than 8192 are impossible. 0 means there is no chunk in a particular location.
 				if (toffarr[ia] > 0) { cout << "ERROR 2s31 IN COLLECTED CHUNK OFFSETS " << toffarr[ia]; fclose(f); return false; } //values between 0 and 8192 should be impossible. 
 				//This file does not contain the max 1024 chunks, skip until we get to the first
@@ -130,7 +130,7 @@ int main () {
 				//testing of nbtparser.
 				cNBTData* NBTData = new cNBTData(BlockData, (int)DestSize);
 				NBTData->ParseData();
-				//NBTData->PrintData();
+				NBTData->PrintData();
                                 NBTData->OpenCompound("");
                                 NBTData->OpenCompound("Level"); // You need to open the right compounds before you can access the data in it
 

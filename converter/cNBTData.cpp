@@ -46,7 +46,7 @@ cNBTData::cNBTData( char* a_Buffer, unsigned int a_BufferSize )
 
     tm = false; //tm to true will print more information for test mode
     if (m_BufferSize == 82659) {
-	tm = true;
+//	tm = true;
     }
 
     m_CurrentCompound = this;
@@ -552,12 +552,26 @@ void cNBTData::ParseList( bool a_bNamed )
     OpenList( Name );
     for(int i = 0; i < Length && m_Index < m_BufferSize; i++)
     {
+
+        if( (int)TagType == 6 ) {
+
+	    cNBTData::ParseDouble( false );
+
+        } else if( (int)TagType == 5 ) {
+            cNBTData::ParseFloat( false );
+        } else
+
+
         if( m_ParseFunctions[ TagType ] )
         {
             (*this.*m_ParseFunctions[ TagType ] )(false);
             m_Index++;
         }
     }
+    if (tm) {
+        printf("List Done Name, tag, length: %s, %i, %i\n", Name.c_str(), (int)TagType, Length);
+    }
+
     CloseList();
 
 }
