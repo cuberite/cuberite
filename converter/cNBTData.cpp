@@ -362,9 +362,9 @@ void cNBTCompound::PrintData( int a_Depth, std::string a_Name )
     Prefix[ a_Depth*4 ] = 0;
 
     if( a_Name.size() > 0 )
-        printf("%s COMPOUND (%s)\n", Prefix, a_Name.c_str() );
+        printf("%sCOMPOUND (%s)\n", Prefix, a_Name.c_str() );
     else
-        printf("%s COMPOUND\n", Prefix );
+        printf("%sCOMPOUND (...)\n", Prefix );
 
     delete Prefix;
     a_Depth++;
@@ -384,6 +384,11 @@ void cNBTCompound::PrintData( int a_Depth, std::string a_Name )
         if( itr->second == 0 ) continue;
         itr->second->PrintData( a_Depth, itr->first );
     }
+
+	for( StringMap::iterator itr = m_Strings.begin(); itr != m_Strings.end(); itr++ )
+	{
+		printf("%s STRING %s (%s)\n", Prefix, itr->first.c_str(), itr->second.c_str() );
+	}
 
     for( IntegerMap::iterator itr = m_Integers.begin(); itr != m_Integers.end(); itr++ )
     {
@@ -481,7 +486,7 @@ void cNBTData::ParseTags()
     if( m_Index < m_BufferSize )
     {
         //printf("ParseTags idx:%02i %02x %3i %c\n", m_Index, (unsigned char)m_Buffer[m_Index], (unsigned char)m_Buffer[m_Index], m_Buffer[m_Index] );//re
-        unsigned char Tag = m_Buffer[m_Index];
+        ENUM_TAG Tag = (ENUM_TAG)m_Buffer[m_Index];
         if( Tag > 0 && m_ParseFunctions[ Tag ] )
         {
         //printf("m_BufferSize4: %i\n", m_BufferSize);
@@ -528,6 +533,7 @@ void cNBTData::ParseCompound( bool a_bNamed )
         ParseTags();
     }
     CloseCompound();
+	m_Index++;
     //printf("CLOSE COMPOUND\n");//re
 }
 
@@ -552,20 +558,9 @@ void cNBTData::ParseList( bool a_bNamed )
     OpenList( Name );
     for(int i = 0; i < Length && m_Index < m_BufferSize; i++)
     {
-
-        if( (int)TagType == 6 ) {
-
-	    cNBTData::ParseDouble( false );
-
-        } else if( (int)TagType == 5 ) {
-            cNBTData::ParseFloat( false );
-        } else
-
-
         if( m_ParseFunctions[ TagType ] )
         {
             (*this.*m_ParseFunctions[ TagType ] )(false);
-            m_Index++;
         }
     }
     if (tm) {
@@ -772,7 +767,7 @@ float cNBTData::ReadFloat()
     memcpy( &Value, m_Buffer+m_Index, sizeof(float) );
     m_Index+=sizeof(float);
 
-    return Value;
+	return Value;
 }
 
 void cNBTCompound::PutList( std::string Name, ENUM_TAG Type )
@@ -790,6 +785,14 @@ void cNBTCompound::PutCompound( std::string Name )
     {
         m_Compounds[Name] = new cNBTCompound( this );
     }
+}
+
+void cNBTCompound::PutFloat( std::string Name, float Value )
+{
+	if( m_CurrentList )
+		m_CurrentList->AddToList( (void*)((unsigned int*)&Value) );
+	else
+		m_Floats[Name] = Value;
 }
 
 cNBTCompound*    cNBTCompound::GetCompound( std::string Name )

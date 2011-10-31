@@ -40,7 +40,7 @@ public:
     void PutInteger( std::string Name, int Value )           { m_Integers[Name] = Value; }
     void PutLong( std::string Name, long long Value )        { m_Longs[Name] = Value; }
     void PutDouble( std::string Name, double Value )         { m_Doubles[Name] = Value; }
-    void PutFloat( std::string Name, float Value )           { m_Floats[Name] = Value; }
+    void PutFloat( std::string Name, float Value );
     void PutString( std::string Name, std::string Value )    { m_Strings[Name] = Value; }
     void PutByteArray( std::string Name, char* ByteArray )   { m_ByteArrays[Name] = ByteArray; }
     void PutCompound( std::string Name );
