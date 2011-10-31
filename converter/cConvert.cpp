@@ -39,11 +39,11 @@ int main () {
 
 		char* t_FakeHeader;
 		t_FakeHeader = new char[1*1024*1024]; //1MB Temp FakeHeader array
-		int t_FakeHeaderSz  = 0; //Size of data in array
+		int t_FakeHeaderSz  = -1; //Size of data in array
 
                 char* t_CompChunk;
                 t_CompChunk  = new char[5*1024*1024]; //5MB Temp Compressed Chunk Data array
-                int t_CompChunkSz   = 0; //Size of data in array
+                int t_CompChunkSz   = -1; //Size of data in array
 
 		char PakVersion   = 1;
 		char ChunkVersion = 1;
@@ -172,8 +172,8 @@ int main () {
 
 
 				for(unsigned int i = 0; i < sizeof(int); i++) {
-                                        t_FakeHeader[t_FakeHeaderSz+1] = xtemppos[i];
-                                        t_FakeHeaderSz ++;
+					t_FakeHeader[t_FakeHeaderSz+1] = xtemppos[i];
+					t_FakeHeaderSz ++;
 				}
                                 for(unsigned int i = 0; i < sizeof(int); i++) {
                                         t_FakeHeader[t_FakeHeaderSz+1] = ztemppos[i];
@@ -222,7 +222,7 @@ int main () {
                                 }
 
 
-				//printf("Coord(X,Z): %i,%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos") );
+				printf("Coord(X,Z):ChunkSize: %i,%i:%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos"), (int)CompressedSize );
 
 				NBTData->CloseCompound();// Close the compounds after you're done
 				NBTData->CloseCompound();
@@ -245,8 +245,9 @@ int main () {
 		}
                 fwrite( &PakVersion, sizeof(PakVersion), 1, wf );
                 fwrite( &ChunkVersion, sizeof(ChunkVersion), 1, wf );
-                fwrite( t_FakeHeader, t_FakeHeaderSz, 1, wf );
-                fwrite( t_CompChunk, t_CompChunkSz, 1, wf );
+		fwrite( &NumChunks, sizeof(NumChunks), 1, wf );
+                fwrite( t_FakeHeader, t_FakeHeaderSz+1, 1, wf );
+                fwrite( t_CompChunk, t_CompChunkSz+1, 1, wf );
                 delete [] t_FakeHeader;
                 delete [] t_CompChunk;
 
