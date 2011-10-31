@@ -367,6 +367,9 @@
     <Filter Include="cEntity\cPawn\cMonster\cZombiepigman">
       <UniqueIdentifier>{e4620b72-4739-4233-b326-47d4b5ca23d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cFileFormatUpdater">
+      <UniqueIdentifier>{c9b053f2-89dd-475e-a889-5c25a20e6eec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -732,6 +735,12 @@
     </ClCompile>
     <ClCompile Include="..\source\cZombiepigman.cpp">
       <Filter>cEntity\cPawn\cMonster\cZombiepigman</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cFileFormatUpdater.cpp">
+      <Filter>cFileFormatUpdater</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cItem.cpp">
+      <Filter>cItem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1136,6 +1145,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cZombiepigman.h">
       <Filter>cEntity\cPawn\cMonster\cZombiepigman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cFileFormatUpdater.h">
+      <Filter>cFileFormatUpdater</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

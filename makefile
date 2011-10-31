@@ -127,188 +127,7 @@ MCServer : \
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
-                build/cPacket_CreateInventoryAction.o\
-		build/cPacket_EntityLook.o\
-		build/cPacket_EntityStatus.o\
-		build/cPacket_Flying.o\
-		build/cPacket_Handshake.o\
-		build/cPacket_InventoryProgressBar.o\
-		build/cPacket_InventorySlot.o\
-		build/cPacket_ItemSwitch.o\
-		build/cPacket_KeepAlive.o\
-		build/cPacket_Login.o\
-		build/cPacket_MapChunk.o\
-		build/cPacket_Metadata.o\
-		build/cPacket_MultiBlock.o\
-		build/cPacket_NamedEntitySpawn.o\
-		build/cPacket_PickupSpawn.o\
-		build/cPacket_PlayerLook.o\
-		build/cPacket_PlayerMoveLook.o\
-		build/cPacket_PlayerPosition.o\
-		build/cPacket_PreChunk.o\
-		build/cPacket_RelativeEntityMove.o\
-		build/cPacket_RelativeEntityMoveLook.o\
-		build/cPacket_Respawn.o\
-		build/cPacket_SpawnMob.o\
-		build/cPacket_TeleportEntity.o\
-		build/cPacket_TimeUpdate.o\
-		build/cPacket_UpdateHealth.o\
-		build/cPacket_UpdateSign.o\
-		build/cPacket_UseEntity.o\
-		build/cPacket_WholeInventory.o\
-		build/cPacket_WindowClick.o\
-		build/cPacket_WindowClose.o\
-		build/cPacket_WindowOpen.o\
-		build/cPacket.o\
-		build/base64.o\
-		build/Socket.o\
-		build/StdHelpers.o\
-		build/UrlHelper.o\
-		build/WebServer.o\
-		build/tolua_event.o\
-		build/tolua_is.o\
-		build/tolua_map.o\
-		build/tolua_push.o\
-		build/tolua_to.o\
-		build/lapi.o\
-		build/lauxlib.o\
-		build/lbaselib.o\
-		build/lcode.o\
-		build/ldblib.o\
-		build/ldebug.o\
-		build/ldo.o\
-		build/ldump.o\
-		build/lfunc.o\
-		build/lgc.o\
-		build/linit.o\
-		build/liolib.o\
-		build/llex.o\
-		build/lmathlib.o\
-		build/lmem.o\
-		build/loadlib.o\
-		build/lobject.o\
-		build/lopcodes.o\
-		build/loslib.o\
-		build/lparser.o\
-		build/lstate.o\
-		build/lstring.o\
-		build/lstrlib.o\
-		build/ltable.o\
-		build/ltablib.o\
-		build/ltm.o\
-		build/luac.o\
-		build/lundump.o\
-		build/lvm.o\
-		build/lzio.o\
-		build/print.o\
-		build/adler32.o\
-		build/compress.o\
-		build/crc32.o\
-		build/deflate.o\
-		build/gzclose.o\
-		build/gzlib.o\
-		build/gzread.o\
-		build/gzwrite.o\
-		build/infback.o\
-		build/inffast.o\
-		build/inflate.o\
-		build/inftrees.o\
-		build/trees.o\
-		build/uncompr.o\
-		build/zutil.o\
-		build/iniFile.o\
-		build/cSocket.o\
-		build/cWaterSimulator.o
-	$(CC) $(LNK_OPTIONS) \
-		build/json_reader.o\
-		build/json_value.o\
-		build/json_writer.o\
-		build/cMakeDir.o\
-		build/cGenSettings.o\
-		build/cCuboid.o\
-		build/cNoise.o\
-		build/cTimer.o\
-		build/cSleep.o\
-		build/cMonsterConfig.o\
-		build/cSpider.o\
-		build/cThread.o\
-		build/cBlockingTCPLink.o\
-		build/cAuthenticator.o\
-		build/cLuaCommandBinder.o\
-		build/cChicken.o\
-		build/cCow.o\
-		build/cPig.o\
-		build/cSheep.o\
-		build/cSquid.o\
-		build/cWolf.o\
-		build/cZombie.o\
-		build/cEnderman.o\
-		build/cCreeper.o\
-		build/cGhast.o\
-		build/cCavespider.o\
-		build/cZombiepigman.o\
-		build/cSkeleton.o\
-		build/cSlime.o\
-		build/cSilverfish.o\
-		build/md5.o\
-		build/cReferenceManager.o\
-		build/Bindings.o\
-		build/cBlockToPickup.o\
-		build/cChatColor.o\
-		build/cChestEntity.o\
-		build/cChunk.o\
-		build/cChunkMap.o\
-		build/cClientHandle.o\
-		build/cCraftingWindow.o\
-		build/cCriticalSection.o\
-		build/cEntity.o\
-		build/cEvent.o\
-		build/cFurnaceEntity.o\
-		build/cFurnaceRecipe.o\
-		build/cFurnaceWindow.o\
-		build/cGroup.o\
-		build/cGroupManager.o\
-		build/cInventory.o\
-		build/cLog.o\
-		build/cMonster.o\
-		build/cPawn.o\
-		build/cPickup.o\
-		build/cPlayer.o\
-		build/cPlugin_Lua.o\
-		build/cPlugin.o\
-		build/cPluginManager.o\
-		build/cRecipeChecker.o\
-		build/cRoot.o\
-		build/cSemaphore.o\
-		build/cServer.o\
-		build/cSignEntity.o\
-		build/cStringMap.o\
-		build/cWebAdmin.o\
-		build/cWebPlugin.o\
-		build/cWindow.o\
-		build/cWorld.o\
-		build/main.o\
-		build/ManualBindings.o\
-		build/Matrix4f.o\
-		build/Vector3d.o\
-		build/Vector3f.o\
-		build/Vector3i.o\
-		build/cHeartBeat.o\
-		build/cTCPLink.o\
-		build/cMCLogger.o\
-		build/cTracer.o\
-		build/cPacket_13.o\
-		build/cPacket_AddToInventory.o\
-		build/cPacket_ArmAnim.o\
-		build/cPacket_BlockChange.o\
-		build/cPacket_BlockDig.o\
-		build/cPacket_BlockPlace.o\
-		build/cPacket_Chat.o\
-		build/cPacket_CollectItem.o\
-		build/cPacket_DestroyEntity.o\
-		build/cPacket_Disconnect.o\
-		build/cPacket_EntityEquipment.o\
-                build/cPacket_CreateInventoryAction.o\
+		build/cPacket_CreateInventoryAction.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -400,6 +219,191 @@ MCServer : \
 		build/iniFile.o\
 		build/cSocket.o\
 		build/cWaterSimulator.o\
+		build/cFileFormatUpdater.o\
+		build/cItem.o
+	$(CC) $(LNK_OPTIONS) \
+		build/json_reader.o\
+		build/json_value.o\
+		build/json_writer.o\
+		build/cMakeDir.o\
+		build/cGenSettings.o\
+		build/cCuboid.o\
+		build/cNoise.o\
+		build/cTimer.o\
+		build/cSleep.o\
+		build/cMonsterConfig.o\
+		build/cSpider.o\
+		build/cThread.o\
+		build/cBlockingTCPLink.o\
+		build/cAuthenticator.o\
+		build/cLuaCommandBinder.o\
+		build/cChicken.o\
+		build/cCow.o\
+		build/cPig.o\
+		build/cSheep.o\
+		build/cSquid.o\
+		build/cWolf.o\
+		build/cZombie.o\
+		build/cEnderman.o\
+		build/cCreeper.o\
+		build/cGhast.o\
+		build/cCavespider.o\
+		build/cZombiepigman.o\
+		build/cSkeleton.o\
+		build/cSlime.o\
+		build/cSilverfish.o\
+		build/md5.o\
+		build/cReferenceManager.o\
+		build/Bindings.o\
+		build/cBlockToPickup.o\
+		build/cChatColor.o\
+		build/cChestEntity.o\
+		build/cChunk.o\
+		build/cChunkMap.o\
+		build/cClientHandle.o\
+		build/cCraftingWindow.o\
+		build/cCriticalSection.o\
+		build/cEntity.o\
+		build/cEvent.o\
+		build/cFurnaceEntity.o\
+		build/cFurnaceRecipe.o\
+		build/cFurnaceWindow.o\
+		build/cGroup.o\
+		build/cGroupManager.o\
+		build/cInventory.o\
+		build/cLog.o\
+		build/cMonster.o\
+		build/cPawn.o\
+		build/cPickup.o\
+		build/cPlayer.o\
+		build/cPlugin_Lua.o\
+		build/cPlugin.o\
+		build/cPluginManager.o\
+		build/cRecipeChecker.o\
+		build/cRoot.o\
+		build/cSemaphore.o\
+		build/cServer.o\
+		build/cSignEntity.o\
+		build/cStringMap.o\
+		build/cWebAdmin.o\
+		build/cWebPlugin.o\
+		build/cWindow.o\
+		build/cWorld.o\
+		build/main.o\
+		build/ManualBindings.o\
+		build/Matrix4f.o\
+		build/Vector3d.o\
+		build/Vector3f.o\
+		build/Vector3i.o\
+		build/cHeartBeat.o\
+		build/cTCPLink.o\
+		build/cMCLogger.o\
+		build/cTracer.o\
+		build/cPacket_13.o\
+		build/cPacket_AddToInventory.o\
+		build/cPacket_ArmAnim.o\
+		build/cPacket_BlockChange.o\
+		build/cPacket_BlockDig.o\
+		build/cPacket_BlockPlace.o\
+		build/cPacket_Chat.o\
+		build/cPacket_CollectItem.o\
+		build/cPacket_DestroyEntity.o\
+		build/cPacket_Disconnect.o\
+		build/cPacket_EntityEquipment.o\
+		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_EntityLook.o\
+		build/cPacket_EntityStatus.o\
+		build/cPacket_Flying.o\
+		build/cPacket_Handshake.o\
+		build/cPacket_InventoryProgressBar.o\
+		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemSwitch.o\
+		build/cPacket_KeepAlive.o\
+		build/cPacket_Login.o\
+		build/cPacket_MapChunk.o\
+		build/cPacket_Metadata.o\
+		build/cPacket_MultiBlock.o\
+		build/cPacket_NamedEntitySpawn.o\
+		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerLook.o\
+		build/cPacket_PlayerMoveLook.o\
+		build/cPacket_PlayerPosition.o\
+		build/cPacket_PreChunk.o\
+		build/cPacket_RelativeEntityMove.o\
+		build/cPacket_RelativeEntityMoveLook.o\
+		build/cPacket_Respawn.o\
+		build/cPacket_SpawnMob.o\
+		build/cPacket_TeleportEntity.o\
+		build/cPacket_TimeUpdate.o\
+		build/cPacket_UpdateHealth.o\
+		build/cPacket_UpdateSign.o\
+		build/cPacket_UseEntity.o\
+		build/cPacket_WholeInventory.o\
+		build/cPacket_WindowClick.o\
+		build/cPacket_WindowClose.o\
+		build/cPacket_WindowOpen.o\
+		build/cPacket.o\
+		build/base64.o\
+		build/Socket.o\
+		build/StdHelpers.o\
+		build/UrlHelper.o\
+		build/WebServer.o\
+		build/tolua_event.o\
+		build/tolua_is.o\
+		build/tolua_map.o\
+		build/tolua_push.o\
+		build/tolua_to.o\
+		build/lapi.o\
+		build/lauxlib.o\
+		build/lbaselib.o\
+		build/lcode.o\
+		build/ldblib.o\
+		build/ldebug.o\
+		build/ldo.o\
+		build/ldump.o\
+		build/lfunc.o\
+		build/lgc.o\
+		build/linit.o\
+		build/liolib.o\
+		build/llex.o\
+		build/lmathlib.o\
+		build/lmem.o\
+		build/loadlib.o\
+		build/lobject.o\
+		build/lopcodes.o\
+		build/loslib.o\
+		build/lparser.o\
+		build/lstate.o\
+		build/lstring.o\
+		build/lstrlib.o\
+		build/ltable.o\
+		build/ltablib.o\
+		build/ltm.o\
+		build/luac.o\
+		build/lundump.o\
+		build/lvm.o\
+		build/lzio.o\
+		build/print.o\
+		build/adler32.o\
+		build/compress.o\
+		build/crc32.o\
+		build/deflate.o\
+		build/gzclose.o\
+		build/gzlib.o\
+		build/gzread.o\
+		build/gzwrite.o\
+		build/infback.o\
+		build/inffast.o\
+		build/inflate.o\
+		build/inftrees.o\
+		build/trees.o\
+		build/uncompr.o\
+		build/zutil.o\
+		build/iniFile.o\
+		build/cSocket.o\
+		build/cWaterSimulator.o\
+		build/cFileFormatUpdater.o\
+		build/cItem.o\
 		-o MCServer
 
 clean : 
@@ -492,7 +496,7 @@ clean :
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
-                build/cPacket_CreateInventoryAction.o\
+		build/cPacket_CreateInventoryAction.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -584,6 +588,8 @@ clean :
 		build/iniFile.o\
 		build/cSocket.o\
 		build/cWaterSimulator.o\
+		build/cFileFormatUpdater.o\
+		build/cItem.o\
 		MCServer
 
 install : MCServer
@@ -1342,8 +1348,15 @@ build/cMakeDir.o : source/cMakeDir.cpp
 
 build/cSocket.o : source/cSocket.cpp
 	$(CC) $(CC_OPTIONS) source/cSocket.cpp -c $(INCLUDE) -o build/cSocket.o	
-	
+
 build/cWaterSimulator.o : source/cWaterSimulator.cpp
 	$(CC) $(CC_OPTIONS) source/cWaterSimulator.cpp -c $(INCLUDE) -o build/cWaterSimulator.o	
+
+build/cFileFormatUpdater.o : source/cFileFormatUpdater.cpp
+	$(CC) $(CC_OPTIONS) source/cFileFormatUpdater.cpp -c $(INCLUDE) -o build/cFileFormatUpdater.o	
+
+build/cItem.o : source/cItem.cpp
+	$(CC) $(CC_OPTIONS) source/cItem.cpp -c $(INCLUDE) -o build/cItem.o	
+
 
 ##### END RUN ####

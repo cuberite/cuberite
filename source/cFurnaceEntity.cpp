@@ -288,14 +288,7 @@ bool cFurnaceEntity::LoadFromJson( const Json::Value& a_Value )
 	int SlotIdx = 0;
 	for( Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr )
 	{
-		Json::Value & Slot = *itr;
-		cItem & Item = m_Items[ SlotIdx ];
-		Item.m_ItemID = (ENUM_ITEM_ID)Slot.get("ID", -1 ).asInt();
-		if( Item.m_ItemID > 0 )
-		{
-			Item.m_ItemCount = (char)Slot.get("Count", -1 ).asInt();
-			Item.m_ItemHealth = (short)Slot.get("Health", -1 ).asInt();
-		}
+		m_Items[ SlotIdx ].FromJson( *itr );
 		SlotIdx++;
 	}
 
@@ -304,12 +297,7 @@ bool cFurnaceEntity::LoadFromJson( const Json::Value& a_Value )
 	if( !JsonItem.empty() )
 	{
 		cItem Item;
-		Item.m_ItemID = (ENUM_ITEM_ID)JsonItem.get("ID", -1).asInt();
-		if( Item.m_ItemID > 0 )
-		{
-			Item.m_ItemCount = (char)JsonItem.get("Count", -1).asInt();
-			Item.m_ItemHealth = (short)JsonItem.get("Health", -1).asInt();
-		}
+		Item.FromJson( JsonItem );
 		if( !Item.IsEmpty() )
 		{
 			m_CookingItem = new cItem( Item );
@@ -335,13 +323,7 @@ void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 	for(unsigned int i = 0; i < 3; i++)
 	{
 		Json::Value Slot;
-		cItem & Item = m_Items[ i ];
-		Slot["ID"] = Item.m_ItemID;
-		if( Item.m_ItemID > 0 )
-		{
-			Slot["Count"] = Item.m_ItemCount;
-			Slot["Health"] = Item.m_ItemHealth;
-		}
+		 m_Items[ i ].GetJson( Slot );
 		AllSlots.append( Slot );
 	}
 	a_Value["Slots"] = AllSlots;
@@ -350,12 +332,7 @@ void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 	if( m_CookingItem )
 	{
 		Json::Value JsonItem;
-		JsonItem["ID"] = m_CookingItem->m_ItemID;
-		if( m_CookingItem->m_ItemID > 0 )
-		{
-			JsonItem["Count"] = m_CookingItem->m_ItemCount;
-			JsonItem["Health"] = m_CookingItem->m_ItemHealth;
-		}
+		m_CookingItem->GetJson( JsonItem );
 		a_Value["Cooking"] = JsonItem;
 	}
 

@@ -111,14 +111,8 @@ bool cChestEntity::LoadFromJson( const Json::Value& a_Value )
 	int SlotIdx = 0;
 	for( Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr )
 	{
-		Json::Value & Slot = *itr;
 		cItem Item;
-		Item.m_ItemID = (ENUM_ITEM_ID)Slot.get("ID", -1 ).asInt();
-		if( Item.m_ItemID > 0 )
-		{
-			Item.m_ItemCount = (char)Slot.get("Count", -1 ).asInt();
-			Item.m_ItemHealth = (short)Slot.get("Health", -1 ).asInt();
-		}
+		Item.FromJson( *itr );
 		SetSlot( SlotIdx, Item );
 		SlotIdx++;
 	}
@@ -137,15 +131,7 @@ void cChestEntity::SaveToJson( Json::Value& a_Value )
 	{
 		Json::Value Slot;
 		cItem* Item = GetSlot( i );
-		if( Item )
-		{
-			Slot["ID"] = Item->m_ItemID;
-			if( Item->m_ItemID > 0 )
-			{
-				Slot["Count"] = Item->m_ItemCount;
-				Slot["Health"] = Item->m_ItemHealth;
-			}
-		}
+		if( Item ) Item->GetJson( Slot );
 		AllSlots.append( Slot );
 	}
 	a_Value["Slots"] = AllSlots;

@@ -10,6 +10,7 @@
 #include "cMonsterConfig.h"
 #include "cSleep.h"
 #include "cThread.h"
+#include "cFileFormatUpdater.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -66,6 +67,8 @@ void cRoot::Start()
 	while(!m_bStop)
 	{
 		m_bRestart = false;
+
+		cFileFormatUpdater::UpdateFileFormat();
 
 		m_Server = new cServer();
 

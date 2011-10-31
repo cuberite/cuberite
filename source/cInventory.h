@@ -4,6 +4,11 @@
 #include "cWindowOwner.h"
 #include "FileDefine.h"
 
+namespace Json
+{
+	class Value;
+};
+
 class cItem;
 class cClientHandle;
 class cPlayer;
@@ -25,8 +30,8 @@ public:
 	bool RemoveItem( cItem & a_Item );					//tolua_export
 	void DrawInventory();
 
-	void WriteToFile(FILE* a_File);
-	bool LoadFromFile(FILE* a_File);
+	void SaveToJson(Json::Value & a_Value);
+	bool LoadFromJson(Json::Value & a_Value);
 
 	void SendWholeInventory( cClientHandle* a_Client );
 

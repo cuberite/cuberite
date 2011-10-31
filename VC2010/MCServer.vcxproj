@@ -234,6 +234,7 @@
     <ClCompile Include="..\source\cCuboid.cpp" />
     <ClCompile Include="..\source\cEnderman.cpp" />
     <ClCompile Include="..\source\cEvent.cpp" />
+    <ClCompile Include="..\source\cFileFormatUpdater.cpp" />
     <ClCompile Include="..\source\cFurnaceEntity.cpp" />
     <ClCompile Include="..\Source\cFurnaceRecipe.cpp" />
     <ClCompile Include="..\source\cFurnaceWindow.cpp" />
@@ -242,6 +243,7 @@
     <ClCompile Include="..\Source\cGroup.cpp" />
     <ClCompile Include="..\Source\cGroupManager.cpp" />
     <ClCompile Include="..\Source\cHeartBeat.cpp" />
+    <ClCompile Include="..\source\cItem.cpp" />
     <ClCompile Include="..\Source\cLuaCommandBinder.cpp" />
     <ClCompile Include="..\source\cMakeDir.cpp" />
     <ClCompile Include="..\source\cMCLogger.cpp" />
@@ -358,6 +360,7 @@
     <ClInclude Include="..\Source\cCriticalSection.h" />
     <ClInclude Include="..\source\cEnderman.h" />
     <ClInclude Include="..\source\cEvent.h" />
+    <ClInclude Include="..\source\cFileFormatUpdater.h" />
     <ClInclude Include="..\source\cFurnaceEntity.h" />
     <ClInclude Include="..\Source\cFurnaceRecipe.h" />
     <ClInclude Include="..\source\cFurnaceWindow.h" />

@@ -32,6 +32,7 @@
 #include "Vector3f.h"
 
 #include "../iniFile/iniFile.h"
+#include <json/json.h>
 
 #ifndef _WIN32 // for mkdir
 #include <sys/stat.h>
@@ -636,7 +637,7 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/player/%s.bin", m_pState->PlayerName.c_str() );
+	sprintf_s(SourceFile, 128, "world/player/%s.json", m_pState->PlayerName.c_str() );
 
 	FILE* f;
 	#ifdef _WIN32
@@ -645,15 +646,43 @@ bool cPlayer::LoadFromDisk()
 	if( (f = fopen(SourceFile, "rb" ) ) != 0 )	// no error
 	#endif
 	{
-		if( fread( &m_Pos->x, sizeof(double), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &m_Pos->y, sizeof(double), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &m_Pos->z, sizeof(double), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &m_Rot->x, sizeof(float), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &m_Rot->y, sizeof(float), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &m_Rot->z, sizeof(float), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &m_Health, sizeof(m_Health), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( !m_Inventory->LoadFromFile( f ) ) { LOGERROR("ERROR READING INVENTORY FROM FILE %s", SourceFile); fclose(f); return false; }
+		// Get file size
+		fseek (f , 0 , SEEK_END);
+		long FileSize = ftell (f);
+		rewind(f);
+
+		char* buffer = new char[ FileSize ];
+		if( fread( buffer, FileSize, 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
 		fclose(f);
+
+		Json::Value root;
+		Json::Reader reader;
+		if( !reader.parse( buffer, root, false ) )
+		{
+			LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile);
+		}
+
+		delete [] buffer;
+
+		Json::Value & JSON_PlayerPosition = root["position"];
+		if( JSON_PlayerPosition.size() == 3 )
+		{
+			m_Pos->x = JSON_PlayerPosition[(unsigned int)0].asDouble();
+			m_Pos->y = JSON_PlayerPosition[(unsigned int)1].asDouble();
+			m_Pos->z = JSON_PlayerPosition[(unsigned int)2].asDouble();
+		}
+
+		Json::Value & JSON_PlayerRotation = root["rotation"];
+		if( JSON_PlayerRotation.size() == 3 )
+		{
+			m_Rot->x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
+			m_Rot->y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
+			m_Rot->z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
+		}
+
+		m_Health = root.get("health", 0 ).asInt();
+		m_Inventory->LoadFromJson(root["inventory"]);
+		
 		return true;
 	}
 	return false;
@@ -677,8 +706,31 @@ bool cPlayer::SaveToDisk()
 	}
 	#endif
 
+	// create the JSON data
+	Json::Value JSON_PlayerPosition;
+	JSON_PlayerPosition.append( Json::Value( m_Pos->x ) );
+	JSON_PlayerPosition.append( Json::Value( m_Pos->y ) );
+	JSON_PlayerPosition.append( Json::Value( m_Pos->z ) );
+
+	Json::Value JSON_PlayerRotation;
+	JSON_PlayerRotation.append( Json::Value( m_Rot->x ) );
+	JSON_PlayerRotation.append( Json::Value( m_Rot->y ) );
+	JSON_PlayerRotation.append( Json::Value( m_Rot->z ) );
+
+	Json::Value JSON_Inventory;
+	m_Inventory->SaveToJson( JSON_Inventory );
+
+	Json::Value root;
+	root["position"] = JSON_PlayerPosition;
+	root["rotation"] = JSON_PlayerRotation;
+	root["inventory"] = JSON_Inventory;
+	root["health"] = m_Health;
+
+	Json::StyledWriter writer;
+	std::string JsonData = writer.write( root );
+
 	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/player/%s.bin", m_pState->PlayerName.c_str() );
+	sprintf_s(SourceFile, 128, "world/player/%s.json", m_pState->PlayerName.c_str() );
 
 	FILE* f;
 	#ifdef _WIN32
@@ -687,14 +739,7 @@ bool cPlayer::SaveToDisk()
 	if( (f = fopen(SourceFile, "wb" ) ) != 0 )	// no error
 	#endif
 	{
-		fwrite( &m_Pos->x, sizeof(double), 1, f );
-		fwrite( &m_Pos->y, sizeof(double), 1, f );
-		fwrite( &m_Pos->z, sizeof(double), 1, f );
-		fwrite( &m_Rot->x, sizeof(float), 1, f );
-		fwrite( &m_Rot->y, sizeof(float), 1, f );
-		fwrite( &m_Rot->z, sizeof(float), 1, f );
-		fwrite( &m_Health, sizeof(m_Health), 1, f );
-		m_Inventory->WriteToFile( f );
+		if( fwrite( JsonData.c_str(), JsonData.size(), 1, f ) != 1 ) { LOGERROR("ERROR WRITING PLAYER JSON TO FILE %s", SourceFile ); return false; }
 		fclose(f);
 		return true;
 	}

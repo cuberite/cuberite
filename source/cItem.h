@@ -3,6 +3,11 @@
 #include "Defines.h"
 #include "BlockID.h"
 
+namespace Json
+{
+	class Value;
+};
+
 class cItem																								//tolua_export
 {																										//tolua_export
 public:
@@ -27,6 +32,10 @@ public:
 	{																									//tolua_export
 		return ( (m_ItemID == a_Item.m_ItemID) && (m_ItemHealth == a_Item.m_ItemHealth) );
 	}																									//tolua_export
+
+	void GetJson( Json::Value & a_OutValue );															//tolua_export
+	void FromJson( const Json::Value & a_Value );														//tolua_export
+
 	ENUM_ITEM_ID	m_ItemID;																			//tolua_export
 	char			m_ItemCount;																		//tolua_export
 	short			m_ItemHealth;																		//tolua_export

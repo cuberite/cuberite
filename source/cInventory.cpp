@@ -8,6 +8,8 @@
 #include "cRecipeChecker.h"
 #include "cRoot.h"
 
+#include <json/json.h>
+
 #include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_InventorySlot.h"
@@ -340,25 +342,23 @@ void cInventory::DrawInventory()
 	}
 }
 
-void cInventory::WriteToFile(FILE* a_File)
+void cInventory::SaveToJson(Json::Value & a_Value)
 {
 	for(unsigned int i = 0; i < c_NumSlots; i++)
 	{
-		cItem & Item = m_Slots[i];
-		fwrite( &Item.m_ItemID, sizeof(Item.m_ItemID), 1, a_File );
-		fwrite( &Item.m_ItemCount, sizeof(Item.m_ItemCount), 1, a_File );
-		fwrite( &Item.m_ItemHealth, sizeof(Item.m_ItemHealth), 1, a_File );
+		Json::Value JSON_Item;
+		m_Slots[i].GetJson( JSON_Item );
+		a_Value.append( JSON_Item );
 	}
 }
 
-bool cInventory::LoadFromFile(FILE* a_File)
+bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
-	for(unsigned int i = 0; i < c_NumSlots; i++)
+	int SlotIdx = 0;
+	for( Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr )
 	{
-		cItem & Item = m_Slots[i];
-		if( fread( &Item.m_ItemID,		sizeof(Item.m_ItemID), 1, a_File)	 != 1 ) { LOGERROR("ERROR READING INVENTORY FROM FILE"); return false; }
-		if( fread( &Item.m_ItemCount,	sizeof(Item.m_ItemCount), 1, a_File) != 1 ) { LOGERROR("ERROR READING INVENTORY FROM FILE"); return false; }
-		if( fread( &Item.m_ItemHealth,	sizeof(Item.m_ItemHealth), 1, a_File)!= 1 ) { LOGERROR("ERROR READING INVENTORY FROM FILE"); return false; }
+		m_Slots[SlotIdx].FromJson( *itr );
+		SlotIdx++;
 	}
 	return true;
 }
