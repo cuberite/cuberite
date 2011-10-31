@@ -11,8 +11,8 @@
 
 #include <json/json.h>
 
-cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z)
-	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z)
+cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
+	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z, a_Chunk)
 {
 }
 
@@ -65,9 +65,7 @@ void cSignEntity::SendTo( cClientHandle* a_Client )
 	if( a_Client ) a_Client->Send( Sign );
 	else // broadcast of a_Client == 0
 	{
-		cWorld* World = cRoot::Get()->GetWorld();
-		cChunk* Chunk = World->GetChunkOfBlock( m_PosX, m_PosY, m_PosZ );
-		Chunk->Broadcast( Sign );
+		GetChunk()->Broadcast( Sign );
 	}
 }
 

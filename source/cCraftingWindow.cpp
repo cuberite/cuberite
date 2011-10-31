@@ -95,7 +95,7 @@ void cCraftingWindow::Close( cPlayer & a_Player )
 			EulerToVector( -a_Player.GetRotation(), a_Player.GetPitch(), vZ, vX, vY );
 			vY = -vY*2 + 1.f;
 			cPickup* Pickup = new cPickup( (int)(a_Player.GetPosX()*32), (int)(a_Player.GetPosY()*32) + (int)(1.6f*32), (int)(a_Player.GetPosZ()*32), *Item, vX*2, vY*2, vZ*2 );
-			Pickup->Initialize();
+			Pickup->Initialize( a_Player.GetWorld() );
 		}
 		Item->Empty();
 	}

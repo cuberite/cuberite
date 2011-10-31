@@ -7,11 +7,12 @@
 #include "cWindow.h"
 #include "cPickup.h"
 #include "cMCLogger.h"
+#include "cChunk.h"
 
 #include <json/json.h>
 
-cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z)
-	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z ) 
+cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
+	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z, a_Chunk ) 
 {
 	m_Content = new cItem[ c_ChestHeight*c_ChestWidth ];
 }
@@ -37,7 +38,7 @@ void cChestEntity::Destroy()
 		if( !m_Content[i].IsEmpty() )
 		{
 			cPickup* Pickup = new cPickup( m_PosX*32 + 16, m_PosY*32 + 16, m_PosZ*32 + 16, m_Content[i], 0, 1.f, 0 );
-			Pickup->Initialize();
+			Pickup->Initialize( GetChunk()->GetWorld() );
 			m_Content[i].Empty();
 		}
 	}

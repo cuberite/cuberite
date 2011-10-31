@@ -19,12 +19,13 @@
 
 #define LAYER_SIZE (32)
 
-cChunkMap::cChunkMap( int a_Width, int a_Height )
+cChunkMap::cChunkMap( int a_Width, int a_Height, cWorld* a_World )
 	: m_Nodes( new cChunkNode[ a_Width * a_Height ] )
 	, m_Width( a_Width )
 	, m_Height( a_Height )
 	, m_Layers( 0 )
 	, m_NumLayers( 0 )
+	, m_World( a_World )
 {
 }
 
@@ -362,7 +363,7 @@ cChunk* cChunkMap::GetChunk( int a_X, int a_Y, int a_Z )
 			}
 			else
 			{
-				cChunk* Chunk = new cChunk(a_X, a_Y, a_Z);
+				cChunk* Chunk = new cChunk(a_X, a_Y, a_Z, m_World);
 				memcpy( Chunk->m_BlockData, BlockData, cChunk::c_BlockDataSize ); 
 				Chunk->CalculateHeightmap();
 				Data->m_LiveChunk = Chunk;
@@ -426,7 +427,7 @@ void cChunkMap::Tick( float a_Dt )
 
 void cChunkMap::UnloadUnusedChunks()
 {
-	cWorld* World = cRoot::Get()->GetWorld();
+	cWorld* World = m_World;
 	/*	// OLD
 	for( int i = 0; i < m_Width*m_Height; ++i )
 	{

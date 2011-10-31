@@ -83,13 +83,13 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	if( !LoadFromDisk() )
 	{
 		m_Inventory->Clear();
-		SetPosX( cRoot::Get()->GetWorld()->GetSpawnX() );
+		SetPosX( cRoot::Get()->GetWorld()->GetSpawnX() ); // TODO - Get from the correct world?
 		SetPosY( cRoot::Get()->GetWorld()->GetSpawnY() );
 		SetPosZ( cRoot::Get()->GetWorld()->GetSpawnZ() );
 	}
 
-	MoveToCorrectChunk();
-	cRoot::Get()->GetWorld()->AddPlayer( this );
+	//MoveToCorrectChunk();
+	cRoot::Get()->GetWorld()->AddPlayer( this ); // TODO - Add to correct world? Or get rid of this?
 }
 
 cPlayer::~cPlayer(void)
@@ -103,7 +103,7 @@ cPlayer::~cPlayer(void)
 		m_Inventory = 0;
 	}
 	delete m_pState;
-	cRoot::Get()->GetWorld()->RemovePlayer( this );
+	cRoot::Get()->GetWorld()->RemovePlayer( this ); // TODO - Remove from correct world? Or get rid of this?
 }
 
 void cPlayer::SpawnOn( cClientHandle* a_Target )
@@ -121,7 +121,7 @@ void cPlayer::SpawnOn( cClientHandle* a_Target )
 	SpawnPacket.m_CurrentItem = (short)m_Inventory->GetEquippedItem().m_ItemID;
 	if( a_Target == 0 )
 	{
-		cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 		Chunk->Broadcast( SpawnPacket, m_ClientHandle );
 	}
 	else
@@ -132,7 +132,7 @@ void cPlayer::SpawnOn( cClientHandle* a_Target )
 
 void cPlayer::Tick(float a_Dt)
 {
-	cChunk* InChunk = cRoot::Get()->GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+	cChunk* InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		cPacket_EntityLook EntityLook( this );
@@ -192,7 +192,7 @@ void cPlayer::Tick(float a_Dt)
 			m_TimeLastPickupCheck = cWorld::GetTime();
 			// and also check if near a pickup
 			// TODO: Don't only check in current chunks, but also close chunks (chunks within range)
-			cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+			cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 			Chunk->LockEntities();
 			cWorld::EntityList Entities = Chunk->GetEntities();
 			for( cWorld::EntityList::iterator itr = Entities.begin(); itr != Entities.end();++itr)
@@ -219,8 +219,8 @@ void cPlayer::Tick(float a_Dt)
 
 void cPlayer::InStateBurning(float a_Dt) {
 	m_FireDamageInterval += a_Dt;
-	char block = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
+	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
+	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
 	if(m_FireDamageInterval > 1000) {
 		
 		m_FireDamageInterval = 0;
@@ -236,7 +236,7 @@ void cPlayer::InStateBurning(float a_Dt) {
 		
 		if(m_BurnPeriod > 5) {
 			
-			cChunk* InChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 			e_EPMetaState = NORMAL;
 			cPacket_Metadata md(NORMAL, GetUniqueID());
 			//md.m_UniqueID = GetUniqueID();
@@ -251,11 +251,11 @@ void cPlayer::InStateBurning(float a_Dt) {
 
 //----Change Entity MetaData
 void cPlayer::CheckMetaDataBurn() {
-	char block = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
+	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
+	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
 	if(m_bBurnable && e_EPMetaState != BURNING && (block == E_BLOCK_LAVA ||  block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
 				 || bblock == E_BLOCK_LAVA ||  bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)) {
-		cChunk* InChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 		if(!InChunk)
 			return;
 		printf("I should burn");
@@ -271,7 +271,7 @@ void cPlayer::SetTouchGround( bool a_bTouchGround )
 
 	if( !m_bTouchGround )
 	{
-		cWorld* World = cRoot::Get()->GetWorld();
+		cWorld* World = GetWorld();
 		char BlockID = World->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
 		if( BlockID != E_BLOCK_AIR )
 		{
@@ -317,7 +317,7 @@ void cPlayer::Heal( int a_Health )
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
-	if ( !(cRoot::Get()->GetWorld()->GetGameMode() == 1) ) {
+	if ( !(GetWorld()->GetGameMode() == 1) ) {
 		cPawn::TakeDamage( a_Damage, a_Instigator );
 
 		cPacket_UpdateHealth Health;
@@ -344,7 +344,7 @@ void cPlayer::KilledBy( cEntity* a_Killer )
 			float SpeedY = ((rand()%1000))		/100.f;
 			float SpeedZ = ((rand()%1000)-500)	/100.f;
 			cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), Items[i], SpeedX, SpeedY, SpeedZ );
-			Pickup->Initialize();
+			Pickup->Initialize( GetWorld() );
 		}
 		Items[i].Empty();
 	}
@@ -355,14 +355,13 @@ void cPlayer::Respawn()
 {
 	m_Health = 20;
 
-	cWorld* World = cRoot::Get()->GetWorld();
 	// Create Respawn player packet
 	cPacket_Respawn Packet;
 	//Set Gamemode for packet by looking at world's gamemode (Need to check players gamemode.)
-	Packet.m_CreativeMode = cRoot::Get()->GetWorld()->GetGameMode();
+	Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
 	//Send Packet
 	m_ClientHandle->Send( Packet );
-	TeleportTo( World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ() );
+	TeleportTo( GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ() );
 	SetVisible( true );
 }
 
@@ -428,7 +427,7 @@ void cPlayer::SetVisible( bool a_bVisible )
 	{
 		m_bVisible = false;
 		cPacket_DestroyEntity DestroyEntity( this );
-		cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 		if( Chunk )
 		{
 			Chunk->Broadcast( DestroyEntity );	// Destroy on all clients
@@ -576,7 +575,7 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 			EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
 			vY = -vY*2 + 1.f;
 			cPickup* Pickup = new cPickup( (int)(GetPosX()*32), (int)(GetPosY()*32) + (int)(1.6f*32), (int)(GetPosZ()*32), cItem( Item->m_ItemID, (char)a_Amount, Item->m_ItemHealth), vX*2, vY*2, vZ*2 );
-			Pickup->Initialize();
+			Pickup->Initialize( GetWorld() );
 			if( Item->m_ItemCount > a_Amount )
 				Item->m_ItemCount -= (char)a_Amount;
 			else
@@ -597,7 +596,7 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 			EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
 			vY = -vY*2 + 1.f;
 			cPickup* Pickup = new cPickup( (int)(GetPosX()*32), (int)(GetPosY()*32) + (int)(1.6f*32), (int)(GetPosZ()*32), DroppedItem, vX*2, vY*2, vZ*2 );
-			Pickup->Initialize();
+			Pickup->Initialize( GetWorld() );
 		}
 	}
 }

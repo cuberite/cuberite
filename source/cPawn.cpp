@@ -50,7 +50,7 @@ void cPawn::TakeDamage( int a_Damage, cEntity* a_Instigator )
 	cPacket_EntityStatus Status;
 	Status.m_UniqueID = GetUniqueID();
 	Status.m_Status =  cPacket_EntityStatus::STATUS_TAKEDAMAGE;
-	cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+	cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if( Chunk )
 		Chunk->Broadcast( Status );
 
@@ -70,7 +70,7 @@ void cPawn::KilledBy( cEntity* a_Killer )
 	cPacket_EntityStatus Status;
 	Status.m_UniqueID = GetUniqueID();
 	Status.m_Status = cPacket_EntityStatus::STATUS_DIE;
-	cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+	cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if( Chunk )
 		Chunk->Broadcast( Status );	// Die
 }

@@ -48,12 +48,12 @@ void cGhast::KilledBy( cEntity* a_Killer )
 	if( (rand() % 5) == 0 )
 	{
 		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_EGG, 1 ) );
-		Pickup->Initialize();
+		Pickup->Initialize( GetWorld() );
 	}
 	if( (rand() % 1) == 0 )
 	{
 		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_FEATHER, 1 ) );
-		Pickup->Initialize();
+		Pickup->Initialize( GetWorld() );
 	}
 	cMonster::KilledBy( a_Killer );
 }

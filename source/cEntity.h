@@ -27,6 +27,7 @@
 	CLASS_DEF_ISA( classname, superclass ) \
 	CLASS_DEF_GETCLASS( classname )
 
+class cWorld;
 class cReferenceManager;
 class Vector3d;
 class Vector3f;
@@ -37,7 +38,7 @@ public:																						//tolua_export
 	cEntity(const double & a_X, const double & a_Y, const double & a_Z);					//tolua_export
 	virtual ~cEntity();																		//tolua_export
 
-	virtual void Initialize();																//tolua_export
+	virtual void Initialize( cWorld* a_World );												//tolua_export
 
 	enum ENUM_ENTITY_TYPE																	//tolua_export
 	{																						//tolua_export
@@ -50,6 +51,7 @@ public:																						//tolua_export
 	virtual bool IsA( const char* a_EntityType );											//tolua_export
 	virtual const char* GetClass();															//tolua_export
 
+	cWorld* GetWorld() { return m_World; }													//tolua_export
 
 	const Vector3d & GetPosition();															//tolua_export
 	const double & GetPosX();																//tolua_export
@@ -105,4 +107,6 @@ protected:
 	bool m_bDestroyed;
 
 	ENUM_ENTITY_TYPE m_EntityType;
+private:
+	cWorld* m_World;
 }; //tolua_export

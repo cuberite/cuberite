@@ -7,6 +7,7 @@ namespace Json
 	class Value;
 };
 
+class cWorld;
 class cCriticalSection;
 class cFurnaceEntity;
 class cPacket;
@@ -17,16 +18,17 @@ class cServer;
 class cChunk
 {
 public:
-	cChunk(int a_X, int a_Y, int a_Z);
+	cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World);
 	~cChunk();
 
 	void Initialize();
 
 	void Tick(float a_Dt);
 
-	inline int GetPosX() { return m_PosX; }
-	inline int GetPosY() { return m_PosY; }
-	inline int GetPosZ() { return m_PosZ; }
+	int GetPosX() { return m_PosX; }
+	int GetPosY() { return m_PosY; }
+	int GetPosZ() { return m_PosZ; }
+	cWorld* GetWorld() { return m_World; }
 
 	void Send( cClientHandle* a_Client );
 	void AsyncUnload( cClientHandle* a_Client );
@@ -112,6 +114,7 @@ private:
 	bool m_bCalculateHeightmap;
 
 	int m_PosX, m_PosY, m_PosZ;
+	cWorld* m_World;
 
 	char m_BlockData[c_BlockDataSize]; // Chunk data ready to be compressed and sent
 	char *m_BlockType;		// Pointers to an element in m_BlockData

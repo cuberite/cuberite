@@ -103,7 +103,7 @@ void cMonster::SpawnOn( cClientHandle* a_Target )
 	//Spawn.m_MetaData[1] = 0x7f; // terminator
 	if( a_Target == 0 )
 	{
-		cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 		Chunk->Broadcast( Spawn );
 	}
 	else
@@ -166,7 +166,7 @@ void cMonster::Tick(float a_Dt)
 			{
 				Vector3f NormSpeed = m_Speed->NormalizeCopy();
 				Vector3f NextBlock = Vector3f( *m_Pos ) + NormSpeed;
-				double NextHeight = (double)cRoot::Get()->GetWorld()->GetHeight( (int)NextBlock.x, (int)NextBlock.z );
+				double NextHeight = (double)GetWorld()->GetHeight( (int)NextBlock.x, (int)NextBlock.z );
 				if( NextHeight > m_Pos->y - 1.2 && NextHeight - m_Pos->y < 2.5 )
 				{
 					m_bOnGround = false;
@@ -230,7 +230,7 @@ void cMonster::Tick(float a_Dt)
 
 void cMonster::ReplicateMovement()
 {
-	cChunk* InChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+	cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if( !InChunk ) return;
 
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
@@ -288,7 +288,7 @@ void cMonster::HandlePhysics(float a_Dt)
 {
 	if( m_bOnGround ) // check if it's still on the ground
 	{
-		cWorld* World = cRoot::Get()->GetWorld();
+		cWorld* World = GetWorld();
 		if( World->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z ) == E_BLOCK_AIR )
 		{
 			m_bOnGround = false;
@@ -313,7 +313,7 @@ void cMonster::HandlePhysics(float a_Dt)
 
 	if( m_Speed->SqrLength() > 0.f )
 	{
-		cTracer Tracer( cRoot::Get()->GetWorld() );
+		cTracer Tracer( GetWorld() );
 		int Ret = Tracer.Trace( *m_Pos, *m_Speed, 2 );
 		if( Ret ) // Oh noez! we hit something
 		{
@@ -414,7 +414,7 @@ void cMonster::CheckEventSeePlayer() {
 
 void cMonster::CheckEventLostPlayer() {
 	Vector3f pos;
-	cTracer LineOfSight(cRoot::Get()->GetWorld() );
+	cTracer LineOfSight(GetWorld() );
 	
 	//LOG("Checking if I lost my enemy");
 	if(m_Target != 0) {
@@ -464,7 +464,7 @@ void cMonster::InStateIdle(float a_Dt) {
 		{
 			m_Destination->x = (float)(m_Pos->x + Dist.x);
 			m_Destination->z = (float)(m_Pos->z + Dist.z);
-			m_Destination->y = (float)cRoot::Get()->GetWorld()->GetHeight( (int)m_Destination->x, (int)m_Destination->z ) + 1.2f;
+			m_Destination->y = (float)GetWorld()->GetHeight( (int)m_Destination->x, (int)m_Destination->z ) + 1.2f;
 			MoveToPosition( *m_Destination );
 		}
 	}
@@ -473,8 +473,8 @@ void cMonster::InStateIdle(float a_Dt) {
 //What to do if On fire
 void cMonster::InStateBurning(float a_Dt) {
 	m_FireDamageInterval += a_Dt;
-	char block = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );	
+	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
+	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );	
 	if(m_FireDamageInterval > 1) {
 
 		m_FireDamageInterval = 0;
@@ -490,7 +490,7 @@ void cMonster::InStateBurning(float a_Dt) {
 		
 		if(m_BurnPeriod > 5) {
 			
-			cChunk* InChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 			m_EMMetaState = NORMAL;
 			cPacket_Metadata md(NORMAL, GetUniqueID());
 			//md.m_UniqueID = GetUniqueID();
@@ -534,11 +534,11 @@ void cMonster::Attack(float a_Dt) {
 }
 //----Change Entity MetaData
 void cMonster::CheckMetaDataBurn() {
-	char block = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = cRoot::Get()->GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );	
+	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
+	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );	
 	if(m_bBurnable && m_EMMetaState != BURNING && (block == E_BLOCK_LAVA ||  block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
 				 || bblock == E_BLOCK_LAVA ||  bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)) {
-		cChunk* InChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 		if(!InChunk)
 			return;
 		//printf("I should burn");

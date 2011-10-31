@@ -41,7 +41,7 @@ bool cSpider::IsA( const char* a_EntityType )
 void cSpider::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);
-	m_EMPersonality = (cRoot::Get()->GetWorld()->GetWorldTime() < (12000 + 1000) )? PASSIVE:AGGRESSIVE;
+	m_EMPersonality = (GetWorld()->GetWorldTime() < (12000 + 1000) )? PASSIVE:AGGRESSIVE;
 }
 
 void cSpider::KilledBy( cEntity* a_Killer )
@@ -49,12 +49,12 @@ void cSpider::KilledBy( cEntity* a_Killer )
 	if( (rand() % 5) == 0 )
 	{
 		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_EGG, 1 ) );
-		Pickup->Initialize();
+		Pickup->Initialize( GetWorld() );
 	}
 	if( (rand() % 1) == 0 )
 	{
 		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_FEATHER, 1 ) );
-		Pickup->Initialize();
+		Pickup->Initialize( GetWorld() );
 	}
 	cMonster::KilledBy( a_Killer );
 }

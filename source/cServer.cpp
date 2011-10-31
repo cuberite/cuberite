@@ -227,6 +227,7 @@ cServer::~cServer()
 	delete m_pState;
 }
 
+// TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
 void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
 {
 	//m_World->LockClientHandle();
@@ -239,6 +240,7 @@ void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* =
 	//m_World->UnlockClientHandle();
 }
 
+// TODO - Need to move this to cWorld I think
 void cServer::SendAllEntitiesTo(cClientHandle* a_Target)
 {
 	cWorld* World = cRoot::Get()->GetWorld();
@@ -261,7 +263,7 @@ void cServer::StartListenClient()
 		LOG("%s connected!", ClientIP);
 
 		cClientHandle *NewHandle = new cClientHandle( SClient );
-		cWorld* World = cRoot::Get()->GetWorld();
+		cWorld* World = cRoot::Get()->GetWorld();	// TODO - I don't think the world cares for the client at this stage, besides for calling the tick function
 		World->LockClientHandle();
 		World->AddClient( NewHandle );
 		World->UnlockClientHandle();
@@ -282,7 +284,7 @@ bool cServer::Tick(float a_Dt)
 		m_Millisecondsf = m_Millisecondsf - (int)m_Millisecondsf;
 	}
 
-	cWorld* World = cRoot::Get()->GetWorld();
+	cWorld* World = cRoot::Get()->GetWorld(); // TODO - Iterate through all worlds, or give all worlds their own thread
 	World->Tick(a_Dt);
 
 	World->LockClientHandle();
@@ -440,7 +442,7 @@ void cServer::ServerCommand( const char* a_Cmd )
 		}
 		if( split[0].compare( "save-all" ) == 0 )
 		{
-			cRoot::Get()->GetWorld()->SaveAllChunks();
+			cRoot::Get()->GetWorld()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
 			return;
 		}
 		if( split[0].compare( "list" ) == 0 )

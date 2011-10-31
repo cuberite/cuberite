@@ -114,7 +114,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				Content += "</p>";
 				Content += "<h4>Players:</h4><p>";
 
-				cWorld* World = cRoot::Get()->GetWorld();
+				cWorld* World = cRoot::Get()->GetWorld(); // TODO - Create a list of worlds and players
 				cWorld::PlayerList PlayerList = World->GetAllPlayers();
 				for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 				{

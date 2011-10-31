@@ -179,7 +179,7 @@ cWorld::cWorld()
 		m_SpawnMonsterRate = (float)IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10 );
 	}
 
-	m_ChunkMap = new cChunkMap( 32, 32 );
+	m_ChunkMap = new cChunkMap( 32, 32, this );
 
 	m_Time = 0;
 	m_WorldTimeFraction = 0.f;
@@ -388,7 +388,7 @@ void cWorld::Tick(float a_Dt)
 
 			if( Monster )
 			{
-				Monster->Initialize();
+				Monster->Initialize( this );
 				Monster->TeleportTo( SpawnPos.x, (double)(Height)+2, SpawnPos.z );
 				Monster->SpawnOn( 0 );
 			}
@@ -475,7 +475,7 @@ cChunk* cWorld::GetChunk( int a_X, int a_Y, int a_Z )
 	}
 
 	// Found nothing, create a chunk
-	Chunk = new cChunk( a_X, a_Y, a_Z );
+	Chunk = new cChunk( a_X, a_Y, a_Z, this );
 	if(Chunk)
 	{
 		LOGWARN("Created new chunk! %i %i", a_X, a_Z);
@@ -570,7 +570,7 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 		if( !a_PickupItem.IsEmpty() )
 		{
 			cPickup* Pickup = new cPickup( a_X*32 + 16 + (int)fRadRand(16.f), a_Y*32 + 16 + (int)fRadRand(16.f), a_Z*32 + 16 + (int)fRadRand(16.f), a_PickupItem );
-			Pickup->Initialize();
+			Pickup->Initialize( this );
 		}
 	}
 

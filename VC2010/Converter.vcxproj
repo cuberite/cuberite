@@ -13,9 +13,13 @@
   <ItemGroup>
     <ClCompile Include="..\converter\cConvert.cpp" />
     <ClCompile Include="..\converter\cNBTData.cpp" />
+    <ClCompile Include="..\converter\quicksort.cpp" />
+    <ClCompile Include="..\converter\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\converter\cNBTData.h" />
+    <ClInclude Include="..\converter\quicksort.h" />
+    <ClInclude Include="..\converter\timer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9AB1FB82-2148-40E4-919F-3B184B4593C8}</ProjectGuid>

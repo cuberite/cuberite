@@ -17,8 +17,8 @@
 
 #include <json/json.h>
 
-cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z)
-	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z ) 
+cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
+	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z, a_Chunk ) 
 	, m_Items( new cItem[3] )
 	, m_CookingItem( 0 )
 	, m_CookTime( 0 )
@@ -51,15 +51,13 @@ void cFurnaceEntity::Destroy()
 		if( !m_Items[i].IsEmpty() )
 		{
 			cPickup* Pickup = new cPickup( m_PosX*32 + 16, m_PosY*32 + 16, m_PosZ*32 + 16, m_Items[i], 0, 1.f, 0 );
-			Pickup->Initialize();
+			Pickup->Initialize( m_Chunk->GetWorld() );
 			m_Items[i].Empty();
 		}
 	}
 
 	// Remove from tick list
-	cWorld* World = cRoot::Get()->GetWorld();
-	cChunk* Chunk = World->GetChunkOfBlock( m_PosX, m_PosY, m_PosZ );
-	Chunk->RemoveTickBlockEntity( this );
+	GetChunk()->RemoveTickBlockEntity( this );
 }
 
 void cFurnaceEntity::UsedBy( cPlayer & a_Player )
@@ -200,9 +198,7 @@ bool cFurnaceEntity::StartCooking()
 					m_TimeCooked = 0.f;
 					m_CookTime = R->CookTime;
 				}
-				cWorld* World = cRoot::Get()->GetWorld();
-				cChunk* Chunk = World->GetChunkOfBlock( m_PosX, m_PosY, m_PosZ );
-				Chunk->AddTickBlockEntity( this );
+				GetChunk()->AddTickBlockEntity( this );
 				return true;
 			}
 		}
@@ -317,9 +313,7 @@ bool cFurnaceEntity::LoadFromJson( const Json::Value& a_Value )
 		if( !Item.IsEmpty() )
 		{
 			m_CookingItem = new cItem( Item );
-
-			cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunkOfBlock( m_PosX, m_PosY, m_PosZ );
-			Chunk->AddTickBlockEntity( this );
+			GetChunk()->AddTickBlockEntity( this );
 		}
 	}
 

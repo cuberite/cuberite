@@ -130,7 +130,7 @@ void cPickup::Tick(float a_Dt)
 		MoveToCorrectChunk();
 		m_bReplicated = true;
 		m_bDirtyPosition = false;
-		cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 		if( Chunk )
 		{
 			cPacket_TeleportEntity TeleportEntity( this );
@@ -145,7 +145,7 @@ void cPickup::HandlePhysics(float a_Dt)
 {
 	if( m_bOnGround ) // check if it's still on the ground
 	{
-		cWorld* World = cRoot::Get()->GetWorld();
+		cWorld* World = GetWorld();
 		int BlockX = (int)m_Pos->x;
 		if( m_Pos->x < 0 ) BlockX--;
 		int BlockZ = (int)m_Pos->z;
@@ -172,7 +172,7 @@ void cPickup::HandlePhysics(float a_Dt)
 		float Gravity = -9.81f*a_Dt;
 		m_Speed->y += Gravity;
 
-		cTracer Tracer( cRoot::Get()->GetWorld() );
+		cTracer Tracer( GetWorld() );
 		int Ret = Tracer.Trace( *m_Pos, *m_Speed, 2 );
 		if( Ret ) // Oh noez! we hit something
 		{

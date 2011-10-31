@@ -432,7 +432,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				}
 
 				// Now initialize player (adds to entity list etc.)
-				m_Player->Initialize();
+				m_Player->Initialize( cRoot::Get()->GetWorld() ); // TODO - Get correct world for player
 
 				// Broadcasts to all but this ( this is actually handled in cChunk.cpp, after entity is added to the chunk )
 				//m_Player->SpawnOn( 0 );
@@ -479,13 +479,13 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				}
 				else
 				{
-					cWorld* World = cRoot::Get()->GetWorld();
+					cWorld* World = m_Player->GetWorld();
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (cRoot::Get()->GetWorld()->GetGameMode() == 1) ); //need to change to check for client's gamemode.
+					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (World->GetGameMode() == 1) ); //need to change to check for client's gamemode.
 
 					cItem PickupItem;
-					if( bBroken && !(cRoot::Get()->GetWorld()->GetGameMode() == 1) ) // broken
+					if( bBroken && !(World->GetGameMode() == 1) ) // broken
 					{
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;
@@ -496,7 +496,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					{
 						if( bBroken ) // Block broken
 						{
-							if( cRoot::Get()->GetWorld()->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
+							if( World->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
 							{
 								int helditem = m_Player->GetInventory().GetEquippedItem().m_ItemID;
 								bool itemhasdur = false;
@@ -572,7 +572,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					}
 					else
 					{
-						cRoot::Get()->GetWorld()->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
+						World->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
 					}
 				}
 			}
@@ -592,7 +592,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					if( PacketData->m_Direction > -1 )
 					{
 						AddDirection( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction );
-						cRoot::Get()->GetWorld()->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
+						
+						m_Player->GetWorld()->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
 					}
 					break;
 				}
@@ -604,7 +605,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				bool bPlaceBlock = true;
 				if( PacketData->m_Direction >= 0 )
 				{
-					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)cRoot::Get()->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
+					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					switch( BlockID )
 					{
 					case E_BLOCK_WORKBENCH:
@@ -618,7 +619,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_CHEST:
 						{
 							bPlaceBlock = false;
-							cBlockEntity* BlockEntity = cRoot::Get()->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
+							cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 							if( BlockEntity )
 							{
 								BlockEntity->UsedBy( *m_Player );
@@ -727,7 +728,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							int Z = PacketData->m_PosZ;
 							AddDirection( X, Y, Z, PacketData->m_Direction );
 
-							cRoot::Get()->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
+							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
 						}
 					}
 				}
@@ -755,7 +756,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				if( m_Player->GetInventory().RemoveItem( DroppedItem ) )
 				{
 					cPickup* Pickup = new cPickup( PacketData );
-					Pickup->Initialize();
+					Pickup->Initialize( m_Player->GetWorld() );
 				}
 			}
 			break;
@@ -836,7 +837,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		case E_UPDATE_SIGN:
 			{
 				cPacket_UpdateSign* PacketData = reinterpret_cast<cPacket_UpdateSign*>(a_Packet);
-				cWorld* World = cRoot::Get()->GetWorld();
+				cWorld* World = m_Player->GetWorld();
 				cChunk* Chunk = World->GetChunkOfBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 				cBlockEntity* BlockEntity = Chunk->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 				if( BlockEntity && (BlockEntity->GetBlockType() == E_BLOCK_SIGN_POST || BlockEntity->GetBlockType() == E_BLOCK_WALLSIGN ) )
@@ -852,7 +853,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				cPacket_UseEntity* PacketData = reinterpret_cast<cPacket_UseEntity*>(a_Packet);
 				if( PacketData->m_bLeftClick )
 				{
-					cWorld* World = cRoot::Get()->GetWorld();
+					cWorld* World = m_Player->GetWorld();
 					cEntity* Entity = World->GetEntity( PacketData->m_TargetID );
 					if( Entity && Entity->IsA("cPawn") )
 					{
@@ -902,12 +903,12 @@ void cClientHandle::AuthenticateThread( void* a_Param )
 
 void cClientHandle::SendLoginResponse()
 {
-	cWorld* World = cRoot::Get()->GetWorld();
+	cWorld* World = cRoot::Get()->GetWorld(); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
 	World->LockEntities();
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
 
-	cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player );
+	cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player ); // TODO - this function is called from a seperate thread, which might be dangerous
 
 	// Return a server login packet
 	cPacket_Login LoginResponse;

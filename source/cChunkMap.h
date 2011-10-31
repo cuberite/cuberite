@@ -1,11 +1,12 @@
 #pragma once
 
+class cWorld;
 class cEntity;
 class cChunk;
 class cChunkMap
 {
 public:
-	cChunkMap( int a_Width, int a_Height );
+	cChunkMap( int a_Width, int a_Height, cWorld* a_World );
 	~cChunkMap();
 
 	void AddChunk( cChunk* a_Chunk );
@@ -88,4 +89,5 @@ private:
 
 	cChunkNode* m_Nodes;
 	int m_Width, m_Height;
+	cWorld* m_World;
 };

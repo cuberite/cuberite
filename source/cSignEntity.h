@@ -10,10 +10,11 @@ namespace Json
 	class Value;
 }
 
+class cWorld;
 class cSignEntity : public cBlockEntity
 {
 public:
-	cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z);
+	cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cChunk* a_Chunk);
 	virtual ~cSignEntity();
 
 	void WriteToFile(FILE* a_File);

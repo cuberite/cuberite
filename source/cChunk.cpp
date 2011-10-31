@@ -74,7 +74,7 @@ cChunk::~cChunk()
 	{
 		if( (*itr)->GetEntityType() != cEntity::E_PLAYER )
 		{
-			cRoot::Get()->GetWorld()->AddToRemoveEntityQueue( **itr ); // World also destroys the entity
+			m_World->AddToRemoveEntityQueue( **itr ); // World also destroys the entity
 		}
 	}
 	m_pState->m_Entities.clear();
@@ -88,7 +88,7 @@ cChunk::~cChunk()
 	delete m_pState;
 }
 
-cChunk::cChunk(int a_X, int a_Y, int a_Z)
+cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World)
 	: m_pState( new sChunkState )
 	, m_bCalculateLighting( false )
 	, m_bCalculateHeightmap( false )
@@ -104,6 +104,7 @@ cChunk::cChunk(int a_X, int a_Y, int a_Z)
 	, m_BlockTickY( 0 )
 	, m_BlockTickZ( 0 )
 	, m_EntitiesCriticalSection( 0 )
+	, m_World( a_World )
 {
 	//LOG("cChunk::cChunk(%i, %i, %i)", a_X, a_Y, a_Z);
 	m_EntitiesCriticalSection = new cCriticalSection();
@@ -237,7 +238,7 @@ void cChunk::Tick(float a_Dt)
 				{
 					SetBlock( X, Y, Z, 0, 0 );
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
-					Pickup->Initialize();
+					Pickup->Initialize( m_World );
 				}
 			}
 			break;
@@ -251,12 +252,11 @@ void cChunk::Tick(float a_Dt)
 				char YY = (char)Y;
 				int ZZ = Z + m_PosZ*16;
 				AddDirection( XX, YY, ZZ, Dir, true );
-				cWorld* World = cRoot::Get()->GetWorld();
-				if( World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+				if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
 				{
 					SetBlock( X, Y, Z, 0, 0 );
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
-					Pickup->Initialize();
+					Pickup->Initialize( m_World );
 				}
 			}
 			break;
@@ -267,12 +267,11 @@ void cChunk::Tick(float a_Dt)
 				char YY = (char)Y;
 				int ZZ = Z + m_PosZ*16;
 				AddDirection( XX, YY, ZZ, Dir, true );
-				cWorld* World = cRoot::Get()->GetWorld();
-				if( World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+				if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
 				{
 					SetBlock( X, Y, Z, 0, 0 );
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
-					Pickup->Initialize();
+					Pickup->Initialize( m_World );
 				}
 			}
 			break;
@@ -337,7 +336,7 @@ void cChunk::Tick(float a_Dt)
 		case E_BLOCK_SAPLING:
 			{
 				FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_AIR, GetLight( m_BlockMeta, Index ) );
-				cRoot::Get()->GetWorld()->GrowTree( m_BlockTickX + m_PosX*16, m_BlockTickY, m_BlockTickZ + m_PosZ*16 );
+				m_World->GrowTree( m_BlockTickX + m_PosX*16, m_BlockTickY, m_BlockTickZ + m_PosZ*16 );
 			}
 		default:
 			break;
@@ -375,18 +374,18 @@ void cChunk::CreateBlockEntities()
 				{
 				case E_BLOCK_CHEST:
 					{
-						m_pState->m_BlockEntities.push_back( new cChestEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16 ) );
+						m_pState->m_BlockEntities.push_back( new cChestEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
 					}
 					break;
 				case E_BLOCK_FURNACE:
 					{
-						m_pState->m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16 ) );
+						m_pState->m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
 					}
 					break;
 				case E_BLOCK_SIGN_POST:
 				case E_BLOCK_WALLSIGN:
 					{
-						m_pState->m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16 ) );
+						m_pState->m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
 					}
 					break;
 				default:
@@ -595,8 +594,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	bool bCalcLeft, bCalcRight, bCalcFront, bCalcBack;
 	bCalcLeft = bCalcRight = bCalcFront = bCalcBack = false;
 	// Spread to neighbour chunks X-axis
-	cChunk* LeftChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_PosX-1, m_PosY, m_PosZ );
-	cChunk* RightChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_PosX+1, m_PosY, m_PosZ );
+	cChunk* LeftChunk = m_World->GetChunkUnreliable( m_PosX-1, m_PosY, m_PosZ );
+	cChunk* RightChunk = m_World->GetChunkUnreliable( m_PosX+1, m_PosY, m_PosZ );
 	char* LeftSky = 0, *RightSky = 0;
 	if(LeftChunk) LeftSky = (a_LightBuffer==m_BlockSkyLight)?LeftChunk->pGetSkyLight():LeftChunk->pGetLight();
 	if(RightChunk) RightSky = (a_LightBuffer==m_BlockSkyLight)?RightChunk->pGetSkyLight():RightChunk->pGetLight();
@@ -633,8 +632,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	}
 
 	// Spread to neighbour chunks Z-axis
-	cChunk* FrontChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ-1 );
-	cChunk* BackChunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ+1 );
+	cChunk* FrontChunk = m_World->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ-1 );
+	cChunk* BackChunk = m_World->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ+1 );
 	char* FrontSky = 0, *BackSky = 0;
 	if(FrontChunk) FrontSky = (a_LightBuffer==m_BlockSkyLight)?FrontChunk->pGetSkyLight():FrontChunk->pGetLight();
 	if(BackChunk) BackSky = (a_LightBuffer==m_BlockSkyLight)?BackChunk->pGetSkyLight():BackChunk->pGetLight();
@@ -670,10 +669,10 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 		}
 	}
 
-	if( bCalcLeft )		cRoot::Get()->GetWorld()->ReSpreadLighting( LeftChunk );
-	if( bCalcRight )	cRoot::Get()->GetWorld()->ReSpreadLighting( RightChunk );
-	if( bCalcFront )	cRoot::Get()->GetWorld()->ReSpreadLighting( FrontChunk );
-	if( bCalcBack )		cRoot::Get()->GetWorld()->ReSpreadLighting( BackChunk );
+	if( bCalcLeft )		m_World->ReSpreadLighting( LeftChunk );
+	if( bCalcRight )	m_World->ReSpreadLighting( RightChunk );
+	if( bCalcFront )	m_World->ReSpreadLighting( FrontChunk );
+	if( bCalcBack )		m_World->ReSpreadLighting( BackChunk );
 }
 
 float GetNoise( float x, float y, cNoise & a_Noise )
@@ -745,7 +744,7 @@ void cChunk::GenerateTerrain()
 	const ENUM_BLOCK_ID RedID =		E_BLOCK_REDSTONE_ORE;
 	*/
 
-	cNoise m_Noise( cRoot::Get()->GetWorld()->GetWorldSeed() );
+	cNoise m_Noise( m_World->GetWorldSeed() );
 	for(int z = 0; z < 16; z++) 
 	{
 		const float zz = (float)(m_PosZ*16 + z);
@@ -855,7 +854,7 @@ void cChunk::GenerateTerrain()
 					float val3 = m_Noise.SSE_CubicNoise2D( xx*0.01f+10, zz*0.01f+10 );
 					float val4 = m_Noise.SSE_CubicNoise2D( xx*0.05f+20, zz*0.05f+20 );
 					if( val1 + val2 > 0.2f && (rand()%128) > 124 )
-						cRoot::Get()->GetWorld()->GrowTree( xx, TopY, zz );
+						m_World->GrowTree( xx, TopY, zz );
 					else if( val3 > 0.2f && (rand()%128) > 124 )
 						m_BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
 					else if( val4 > 0.2f && (rand()%128) > 124 )
@@ -931,14 +930,14 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 		switch( a_BlockType )
 		{
 		case E_BLOCK_CHEST:
-			AddBlockEntity( new cChestEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16 ) );
+			AddBlockEntity( new cChestEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
 			break;
 		case E_BLOCK_FURNACE:
-			AddBlockEntity( new cFurnaceEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16 ) );
+			AddBlockEntity( new cFurnaceEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
 			break;
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
-			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16 ) );
+			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
 			break;
 		default:
 			break;
@@ -1056,7 +1055,7 @@ bool cChunk::RemoveEntity( cEntity & a_Entity, cChunk* a_CalledFrom /* = 0 */ )
 		if( !a_CalledFrom )
 		{
 			UnlockEntities();
-			return cRoot::Get()->GetWorld()->RemoveEntityFromChunk( a_Entity, this );
+			return m_World->RemoveEntityFromChunk( a_Entity, this );
 		}
 		UnlockEntities();
 		return false;
@@ -1125,7 +1124,7 @@ bool cChunk::LoadFromDisk()
 			{
 			case E_BLOCK_CHEST:
 				{
-					cChestEntity* ChestEntity = new cChestEntity( 0, 0, 0 );
+					cChestEntity* ChestEntity = new cChestEntity( 0, 0, 0, this );
 					if( !ChestEntity->LoadFromFile( f ) )
 					{
 						LOGERROR("ERROR READING CHEST FROM FILE %s", SourceFile );
@@ -1138,7 +1137,7 @@ bool cChunk::LoadFromDisk()
 				break;
 			case E_BLOCK_FURNACE:
 				{
-					cFurnaceEntity* FurnaceEntity = new cFurnaceEntity( 0, 0, 0 );
+					cFurnaceEntity* FurnaceEntity = new cFurnaceEntity( 0, 0, 0, this );
 					if( !FurnaceEntity->LoadFromFile( f ) )
 					{
 						LOGERROR("ERROR READING FURNACE FROM FILE %s", SourceFile );
@@ -1153,7 +1152,7 @@ bool cChunk::LoadFromDisk()
 			case E_BLOCK_SIGN_POST:
 			case E_BLOCK_WALLSIGN:
 				{
-					cSignEntity* SignEntity = new cSignEntity(BlockType, 0, 0, 0 );
+					cSignEntity* SignEntity = new cSignEntity(BlockType, 0, 0, 0, this );
 					if( !SignEntity->LoadFromFile( f ) )
 					{
 						LOGERROR("ERROR READING SIGN FROM FILE %s", SourceFile );
@@ -1275,7 +1274,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 		for( Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
 		{
 			Json::Value & Chest = *itr;
-			cChestEntity* ChestEntity = new cChestEntity(0,0,0);
+			cChestEntity* ChestEntity = new cChestEntity(0,0,0, this);
 			if( !ChestEntity->LoadFromJson( Chest ) )
 			{
 				LOGERROR("ERROR READING CHEST FROM JSON!" );
@@ -1292,7 +1291,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 		for( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
 		{
 			Json::Value & Furnace = *itr;
-			cFurnaceEntity* FurnaceEntity = new cFurnaceEntity(0,0,0);
+			cFurnaceEntity* FurnaceEntity = new cFurnaceEntity(0,0,0, this);
 			if( !FurnaceEntity->LoadFromJson( Furnace ) )
 			{
 				LOGERROR("ERROR READING FURNACE FROM JSON!" );
@@ -1309,7 +1308,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 		for( Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr )
 		{
 			Json::Value & Sign = *itr;
-			cSignEntity* SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0,0,0);
+			cSignEntity* SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0,0,0, this);
 			if( !SignEntity->LoadFromJson( Sign ) )
 			{
 				LOGERROR("ERROR READING SIGN FROM JSON!" );

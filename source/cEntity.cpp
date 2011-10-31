@@ -27,6 +27,7 @@ cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
 	, m_bDirtyOrientation( true )
 	, m_bDestroyed( false )
 	, m_EntityType( E_ENTITY )
+	, m_World( 0 )
 {
 	m_EntityCount++;
 	m_UniqueID = m_EntityCount;
@@ -36,23 +37,27 @@ cEntity::~cEntity()
 {
 	delete m_Referencers;
 	delete m_References;
-	cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if( Chunk )
+	if( m_World )
 	{
-		cPacket_DestroyEntity DestroyEntity( this );
-		Chunk->Broadcast( DestroyEntity );
-		Chunk->RemoveEntity( *this );
+		cChunk* Chunk = m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		if( Chunk )
+		{
+			cPacket_DestroyEntity DestroyEntity( this );
+			Chunk->Broadcast( DestroyEntity );
+			Chunk->RemoveEntity( *this );
+		}
 	}
 	delete m_Pos;
 	delete m_Rot;
 }
 
-void cEntity::Initialize()
+void cEntity::Initialize( cWorld* a_World )
 {
-	cRoot::Get()->GetWorld()->AddEntity( this );
+	m_World = a_World;
+	m_World->AddEntity( this );
 
 	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, m_ChunkX, m_ChunkY, m_ChunkZ );
-	cChunk* Chunk = cRoot::Get()->GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+	cChunk* Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if( Chunk )
 	{
 		//LOG("Adding entity %i to chunk %i %i %i", m_UniqueID, Chunk->GetPosX(), Chunk->GetPosY(), Chunk->GetPosZ() );
@@ -74,9 +79,8 @@ void cEntity::MoveToCorrectChunk()
 	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, ChunkX, ChunkY, ChunkZ );
 	if( m_ChunkX != ChunkX || m_ChunkY != ChunkY || m_ChunkZ != ChunkZ )
 	{
-		cWorld* World = cRoot::Get()->GetWorld();
 		LOG("From %i %i To %i %i", m_ChunkX, m_ChunkZ, ChunkX, ChunkZ );
-		cChunk* Chunk = World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* Chunk = m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 
 		typedef std::list< cClientHandle* > ClientList;
 		ClientList BeforeClients;
@@ -86,7 +90,7 @@ void cEntity::MoveToCorrectChunk()
 			BeforeClients = Chunk->GetClients();
 		}
 		m_ChunkX = ChunkX; m_ChunkY = ChunkY; m_ChunkZ = ChunkZ;
-		cChunk* NewChunk = World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+		cChunk* NewChunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 		ClientList AfterClients;
 		if( NewChunk )
 		{

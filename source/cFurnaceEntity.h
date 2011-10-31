@@ -9,6 +9,7 @@ namespace Json
 	class Value;
 }
 
+class cChunk;
 class cClientHandle;
 class cServer;
 class cItem;
@@ -16,7 +17,7 @@ class cNBTData;
 class cFurnaceEntity : public cBlockEntity, public cWindowOwner
 {
 public:
-	cFurnaceEntity(int a_X, int a_Y, int a_Z);
+	cFurnaceEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk);
 	virtual ~cFurnaceEntity();
 	virtual void Destroy();
 
