@@ -652,13 +652,13 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 	{
 		char PakVersion = 0;
 		char ChunkVersion = 0;
-		if( fread( &PakVersion, sizeof(PakVersion), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+		if( fread( &PakVersion, sizeof(PakVersion), 1, f) != 1 ) { LOGERROR("ERROR 1 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 		if( PakVersion != 1 ) { LOGERROR("WRONG PAK VERSION!"); fclose(f); return 0; }
-		if( fread( &ChunkVersion, sizeof(ChunkVersion), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+		if( fread( &ChunkVersion, sizeof(ChunkVersion), 1, f) != 1 ) { LOGERROR("ERROR 2 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 		if( PakVersion != 1 ) { LOGERROR("WRONG CHUNK VERSION!"); fclose(f); return 0; }
 
 		short NumChunks = 0;
-		if( fread( &NumChunks, sizeof(NumChunks), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+		if( fread( &NumChunks, sizeof(NumChunks), 1, f) != 1 ) { LOGERROR("ERROR 3 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 		LOG("Num chunks: %i", NumChunks );
 
 		cChunkLayer* Layer = new cChunkLayer( LAYER_SIZE*LAYER_SIZE );
@@ -670,13 +670,13 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		{
 			int ChunkX = 0;
 			int ChunkZ = 0;
-			if( fread( &ChunkX, sizeof(ChunkX), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-			if( fread( &ChunkZ, sizeof(ChunkZ), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+			if( fread( &ChunkX, sizeof(ChunkX), 1, f) != 1 ) { LOGERROR("ERROR 4 READING FROM FILE %s", SourceFile); fclose(f); return false; }
+			if( fread( &ChunkZ, sizeof(ChunkZ), 1, f) != 1 ) { LOGERROR("ERROR 5 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 			cChunkData* Data = Layer->GetChunk( ChunkX, ChunkZ );
 			if( Data )
 			{
-				if( fread( &Data->m_CompressedSize, sizeof(Data->m_CompressedSize), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-				if( fread( &Data->m_UncompressedSize, sizeof(Data->m_UncompressedSize), 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+				if( fread( &Data->m_CompressedSize, sizeof(Data->m_CompressedSize), 1, f) != 1 ) { LOGERROR("ERROR 6 READING FROM FILE %s", SourceFile); fclose(f); return false; }
+				if( fread( &Data->m_UncompressedSize, sizeof(Data->m_UncompressedSize), 1, f) != 1 ) { LOGERROR("ERROR 7 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 			}
 			else
 			{
@@ -693,7 +693,8 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		{
 			cChunkData* Data = OrderedData[i];
 			Data->m_Compressed = new char[ Data->m_CompressedSize ];
-			if( fread( Data->m_Compressed, Data->m_CompressedSize, 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+			//printf("Compressed chunk size: %i\n",Data->m_CompressedSize);
+			if( fread( Data->m_Compressed, Data->m_CompressedSize, 1, f) != 1 ) { LOGERROR("ERROR 8 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 
 			/* // Some testing...
 			uLongf DestSize = Data->m_UncompressedSize;

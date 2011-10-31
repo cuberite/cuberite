@@ -2,17 +2,50 @@
 #include <fstream>
 #include <string>
 #include <stdio.h>
-#include <string.h>
+//#include <string.h>
 #include <ctype.h>
 #include "zlib.h"
 #include "cNBTData.h"
 #include "timer.h"
 #include "quicksort.h"
+#include <dirent.h>
+//#include "dircont.h"
 
 using namespace std;
 
 
 int main () {
+
+	string dir;
+	DIR* dp;
+	struct dirent *entry;
+        int found;
+	string entrys;
+        string str2;
+	string str3;
+        string filexPos;
+	string filezPos;
+	string pak_name;
+	//string* dir_array;
+	int dir_num_files = 0;
+	int ctr = 0;
+
+	if(dp = opendir("region/")){
+ 		while(entry = readdir(dp)){
+			entrys = entry->d_name;
+			found = entrys.find(".mcr");
+			if ( (found!=string::npos) && (entry->d_type==8) ) {
+				str2 = entrys.substr (2,sizeof(entrys));
+				filexPos = str2.substr (0,(int)str2.find("."));
+				str3 = str2.substr ((int)str2.find(".")+1, sizeof(str2));
+				filezPos = str3.substr (0,(int)str3.find("."));
+				pak_name = "X" + filexPos + "_Z" + filezPos + ".pak";
+				//printf ("pak_name: %s\n", pak_name.c_str());
+
+	//		} //moving down to test
+ 	//	} //mvong down to test
+	//	closedir(dp); //moving down to test
+	//} //moving down to test
 
 	char SourceFile[128];
         char OutputFile[128];
@@ -25,16 +58,17 @@ int main () {
 	FILE* f  = 0;
         FILE* wf = 0;
 	#ifdef _WIN32
-		sprintf_s(SourceFile, 128, "region/%s","r.0.0.mcr"); //replace hard coded file with file array variable
-        sprintf_s(OutputFile, 128, "world/%s","X0_Z0.pak"); //parce x and z from file array variable and place into pak file format
+		sprintf_s(SourceFile, 128, "region/%s",entrys.c_str()); //replace hard coded file with file array variable
+	        sprintf_s(OutputFile, 128, "world/%s",pak_name.c_str()); //parce x and z from file array variable and place into pak file format
 		if( fopen_s(&wf, OutputFile, "wb" ) == 0 ) {} else { cout << "uhoh!" << endl; return 0; } //open new pak file for writing
 	#else
-		sprintf(SourceFile, "region/%s","r.0.0.mcr"); //same as above but for linux
-                sprintf(OutputFile, "world/%s","X0_Z0.pak");
+		sprintf(SourceFile, "region/%s",entrys.c_str()); //same as above but for linux
+                sprintf(OutputFile, "world/%s",pak_name.c_str());
 		if( (wf = fopen(OutputFile, "wb" )) != 0 ) {} else { cout << "uhoh!" << endl; return 0; }
 	#endif
 
 
+	printf ("Now Converting %s to %s\n", entrys.c_str(), pak_name.c_str() );
 	if( (f = fopen(SourceFile, "rb" )) != 0 ) {	// no error
 
 		char* t_FakeHeader;
@@ -222,7 +256,7 @@ int main () {
                                 }
 
 
-				printf("Coord(X,Z):ChunkSize: %i,%i:%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos"), (int)CompressedSize );
+				//printf("Coord(X,Z):ChunkSize: %i,%i:%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos"), (int)CompressedSize );
 
 				NBTData->CloseCompound();// Close the compounds after you're done
 				NBTData->CloseCompound();
@@ -257,6 +291,13 @@ int main () {
 
 	clock_t end=clock();
 	cout << "Time elapsed: " << double(diffclock(end,begin)) << " ms"<< endl;
+
+
+                      } //moving down to test
+              } //mvong down to test
+              closedir(dp); //moving down to test
+        } //moving down to test
+
 	return 0;
 
 
