@@ -37,8 +37,18 @@ int main () {
 
 	if( (f = fopen(SourceFile, "rb" )) != 0 ) {	// no error
 
-	//loop through notch's header
-		int n;
+		char* t_FakeHeader;
+		t_FakeHeader = new char[1*1024*1024]; //1MB Temp FakeHeader array
+		int t_FakeHeaderSz  = 0; //Size of data in array
+
+                char* t_CompChunk;
+                t_CompChunk  = new char[5*1024*1024]; //5MB Temp Compressed Chunk Data array
+                int t_CompChunkSz   = 0; //Size of data in array
+
+		char PakVersion   = 1;
+		char ChunkVersion = 1;
+		short NumChunks   = 0;
+
 		unsigned char byte1 = 0;
 		unsigned char byte2 = 0;
 		unsigned char byte3 = 0;
@@ -46,16 +56,13 @@ int main () {
 		unsigned char byte5 = 0;
 		unsigned char trash = 0;
 		unsigned int  frloc = 0;
-		int toffset = 0;
-		int compdlength = 0;
-		//string comp_data;
-		string ucomp_date;
-		int toffarr[1024];
-		//unsigned char *BlockData;
-                //unsigned char *comp_data;
 
-		//cout << sizeof(byte1) << endl;
-		//return 0;
+		int toffset     = 0;
+		int compdlength = 0;
+
+		int toffarr[1024];
+
+		//loop through notch's header
 		for( short i = 0; i < 1024 ; ++i ) {//loop through first 4096 bytes of data, 4 bytes at a time
 			//Region files begin with an 8kiB header containing information about which chunks are present in the region file, when they were last updated, and where they can be found. The location in the region file of a chunk at (x, z) (in chunk coordinates) can be found at byte offset 4 * ((x mod 32) + (z mod 32) * 32) in its region file. Its timestamp can be found 4096 bytes later in the file. The remainder of the file consists of data for up to 1024 chunks, interspersed with an arbitrary amount of unused space. 
 			//we are only using the first 4096 bytes. We don't need the timestamps right now.
@@ -80,7 +87,7 @@ int main () {
 				//This file does not contain the max 1024 chunks, skip until we get to the first
 			} else { // found a chunk offset value
 				//Chunk data begins with a (big-endian) four-byte length field which indicates the exact length of the remaining chunk data in bytes. The following byte indicates the compression scheme used for chunk data, and the remaining (length-1) bytes are the compressed chunk data. 
-				printf("Working on chunk %i :: %i\n", ia, toffarr[ia]);
+				//printf("Working on chunk %i :: %i\n", ia, toffarr[ia]);
                         	if( fread( &byte1, sizeof(byte1), 1, f) != 1 ) { cout << "ERROR 2t32 READING FROM FILE " << SourceFile; fclose(f); return false; }
                         	if( fread( &byte2, sizeof(byte2), 1, f) != 1 ) { cout << "ERROR 2y51 READING FROM FILE " << SourceFile; fclose(f); return false; }
                         	if( fread( &byte3, sizeof(byte3), 1, f) != 1 ) { cout << "ERROR 3424 READING FROM FILE " << SourceFile; fclose(f); return false; }
@@ -128,9 +135,10 @@ int main () {
 
 
 				//testing of nbtparser.
+				NumChunks++;
 				cNBTData* NBTData = new cNBTData(BlockData, (int)DestSize);
 				NBTData->ParseData();
-				NBTData->PrintData();
+				//NBTData->PrintData();
                                 NBTData->OpenCompound("");
                                 NBTData->OpenCompound("Level"); // You need to open the right compounds before you can access the data in it
 
@@ -152,20 +160,77 @@ int main () {
         			//	      BYTE ARRAY SkyLight (length: 16384)
 				//=============================
 
+				int UncompressedChunkSz = (32768+16384+16384+16384);
+				char* UncompressedChunk = new char[ UncompressedChunkSz ];
+				uLongf CompressedSize   = compressBound( UncompressedChunkSz );
+				char* CompressedChunk   = new char[ CompressedSize ];
+				int UnChunkArrLoc       = 0;
+				int xPos                = NBTData->GetInteger("xPos");
+				char* xtemppos          = (char *)&xPos;
+				int zPos                = NBTData->GetInteger("zPos");
+                                char* ztemppos          = (char *)&zPos;
 
-				for(unsigned int i = 0; i < 16384; i++) {
-					//printf("array HM: %i\n", NBTData->GetByteArray("HeightMap")[i]);
+
+				for(unsigned int i = 0; i < sizeof(int); i++) {
+                                        t_FakeHeader[t_FakeHeaderSz+1] = xtemppos[i];
+                                        t_FakeHeaderSz ++;
 				}
-				for(unsigned int i = 0; i < 32768; i++) {
-                                        //printf("array Blocks: %i\n", NBTData->GetByteArray("Blocks")[i]);
+                                for(unsigned int i = 0; i < sizeof(int); i++) {
+                                        t_FakeHeader[t_FakeHeaderSz+1] = ztemppos[i];
+                                        t_FakeHeaderSz ++;
                                 }
 
-				printf("Coord(X,Z): %i,%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos") );
+				//todo: inserert json code and add it to chunk data
+                                for(unsigned int i = 0; i < 32768; i++) {
+                                        UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("Blocks")[i];
+                                        UnChunkArrLoc ++;
+                                }
+				for(unsigned int i = 0; i < 16384; i++) {
+                                        UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("Data")[i];
+                                        UnChunkArrLoc ++;
+                                }
+				for(unsigned int i = 0; i < 16384; i++) {
+					UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("BlockLight")[i];
+					UnChunkArrLoc ++;
+				}
+				for(unsigned int i = 0; i < 16384; i++) {
+                                        UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("SkyLight")[i];
+					UnChunkArrLoc ++;
+                                }
+
+				errorcode = compress2( (Bytef*)CompressedChunk, &CompressedSize, (const Bytef*)UncompressedChunk, UncompressedChunkSz, Z_DEFAULT_COMPRESSION);
+				if( errorcode != Z_OK )
+				{
+					printf("Error compressing data (%i)", errorcode );
+                                        break;
+				}
+
+				char* c_sizetemppos  = (char *)&CompressedSize;
+				char* uc_sizetemppos = (char *)&UncompressedChunkSz;
+
+				for(unsigned int i = 0; i < sizeof(int); i++) {
+					t_FakeHeader[t_FakeHeaderSz+1] = c_sizetemppos[i];
+					t_FakeHeaderSz ++;
+				}
+				for(unsigned int i = 0; i < sizeof(int); i++) {
+                                        t_FakeHeader[t_FakeHeaderSz+1] = uc_sizetemppos[i];
+                                        t_FakeHeaderSz ++;
+                                }
+				for(unsigned int i = 0; i < CompressedSize; i++) {
+                                        t_CompChunk[t_CompChunkSz+1] = CompressedChunk[i];
+                                        t_CompChunkSz ++;
+                                }
+
+
+				//printf("Coord(X,Z): %i,%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos") );
 
 				NBTData->CloseCompound();// Close the compounds after you're done
 				NBTData->CloseCompound();
 
-                                fwrite( BlockData, DestSize, 1, wf ); //write contents of uncompressed block data to file to check to see if it's valid... It is! :D
+                                //fwrite( BlockData, DestSize, 1, wf );
+
+				delete [] UncompressedChunk;
+				delete [] CompressedChunk;
 				delete [] compBlockData;
 				delete [] BlockData;
 
@@ -176,22 +241,17 @@ int main () {
 
 			}
 			} //only run chunk # 3
-		//if (ia == 30) { break; }
+
 		}
-                                //return 0;
+                fwrite( &PakVersion, sizeof(PakVersion), 1, wf );
+                fwrite( &ChunkVersion, sizeof(ChunkVersion), 1, wf );
+                fwrite( t_FakeHeader, t_FakeHeaderSz, 1, wf );
+                fwrite( t_CompChunk, t_CompChunkSz, 1, wf );
+                delete [] t_FakeHeader;
+                delete [] t_CompChunk;
 
-		for ( short i = 0; i < 1024; i++ ) {
-			//cout << toffarr[i] << endl;
-		}
-		//cin >> n;
-
-                for ( short i = 0; i < 24; i++ ) {
-                    //    cout << toffarr[i] << endl;
-                }
-
-
-        fclose(wf); //close file.
-	fclose(f); //close file.
+	        fclose(wf); //close file.
+		fclose(f); //close file.
 	}
 
 	clock_t end=clock();
