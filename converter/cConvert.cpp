@@ -74,13 +74,13 @@ int main () {
                 quicksort(toffarr, 0, 1023); //sort the array from smallest to larget offset locations so we only have to read through the file once.
 
                 for ( short ia = 0; ia < 1024; ia++ ) {//a region file can hold a maximum of 1024 chunks (32*32)
-			if (ia == 31) { ia++; }
+			if (ia < 35 ) { //only run chunk # 3
 			if (toffarr[ia] < 8192) { //offsets of less than 8192 are impossible. 0 means there is no chunk in a particular location.
 				if (toffarr[ia] > 0) { cout << "ERROR 2s31 IN COLLECTED CHUNK OFFSETS " << toffarr[ia]; fclose(f); return false; } //values between 0 and 8192 should be impossible. 
 				//This file does not contain the max 1024 chunks, skip until we get to the first
 			} else { // found a chunk offset value
 				//Chunk data begins with a (big-endian) four-byte length field which indicates the exact length of the remaining chunk data in bytes. The following byte indicates the compression scheme used for chunk data, and the remaining (length-1) bytes are the compressed chunk data. 
-				printf("Working on chunk %i\n", ia);
+				printf("Working on chunk %i :: %i\n", ia, toffarr[ia]);
                         	if( fread( &byte1, sizeof(byte1), 1, f) != 1 ) { cout << "ERROR 2t32 READING FROM FILE " << SourceFile; fclose(f); return false; }
                         	if( fread( &byte2, sizeof(byte2), 1, f) != 1 ) { cout << "ERROR 2y51 READING FROM FILE " << SourceFile; fclose(f); return false; }
                         	if( fread( &byte3, sizeof(byte3), 1, f) != 1 ) { cout << "ERROR 3424 READING FROM FILE " << SourceFile; fclose(f); return false; }
@@ -128,7 +128,7 @@ int main () {
 
 
 				//testing of nbtparser.
-				cNBTData* NBTData = new cNBTData(BlockData, (testr));
+				cNBTData* NBTData = new cNBTData(BlockData, (int)DestSize);
 				NBTData->ParseData();
 				//NBTData->PrintData();
                                 NBTData->OpenCompound("");
@@ -160,7 +160,8 @@ int main () {
                                         //printf("array Blocks: %i\n", NBTData->GetByteArray("Blocks")[i]);
                                 }
 
-					//printf("xPos: %i\n", NBTData->GetInteger("xPos") );
+				printf("Coord(X,Z): %i,%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos") );
+
 				NBTData->CloseCompound();// Close the compounds after you're done
 				NBTData->CloseCompound();
 
@@ -174,6 +175,7 @@ int main () {
 				}
 
 			}
+			} //only run chunk # 3
 		//if (ia == 30) { break; }
 		}
                                 //return 0;
