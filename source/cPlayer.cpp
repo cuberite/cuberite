@@ -322,7 +322,7 @@ void cPlayer::Heal( int a_Health )
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
-	if ( !(GetWorld()->GetGameMode() == 1) ) {
+	if ( !(m_GameMode == 1) ) {
 		cPawn::TakeDamage( a_Damage, a_Instigator );
 
 		cPacket_UpdateHealth Health;
