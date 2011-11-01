@@ -941,6 +941,7 @@ void cClientHandle::Tick(float a_Dt)
 		World->LockEntities();
 		// Spawn player (only serversided, so data is loaded)
 		m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
+		m_Player->SetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login.
 
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player ); // TODO - this function is called from a seperate thread, which might be dangerous
 
@@ -948,7 +949,7 @@ void cClientHandle::Tick(float a_Dt)
 		cPacket_Login LoginResponse;
 		LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
 		//LoginResponse.m_Username = "";
-		LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from world.
+		LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from player.
 		LoginResponse.m_MapSeed = 0;
 		LoginResponse.m_Dimension = 0;
 		Send( LoginResponse );
