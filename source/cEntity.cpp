@@ -75,6 +75,8 @@ void cEntity::WrapRotation()
 
 void cEntity::MoveToCorrectChunk()
 {
+	if( !m_World ) return; // Entity needs a world to move to a chunk
+
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, ChunkX, ChunkY, ChunkZ );
 	if( m_ChunkX != ChunkX || m_ChunkY != ChunkY || m_ChunkZ != ChunkZ )

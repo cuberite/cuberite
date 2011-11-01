@@ -48,6 +48,8 @@ extern "C" {
 
 bool g_bWaterPhysics = false;
 
+typedef std::list< cClientHandle* > ClientList;
+
 struct cServer::sServerState
 {
 	sServerState()
@@ -60,6 +62,8 @@ struct cServer::sServerState
 
 	cThread* pListenThread;	bool bStopListenThread;
 	cThread* pTickThread;	bool bStopTickThread;
+
+	ClientList Clients;
 
 	cEvent RestartEvent;
 	std::string ServerID;
@@ -230,14 +234,11 @@ cServer::~cServer()
 // TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
 void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
 {
-	//m_World->LockClientHandle();
-	cWorld* World = cRoot::Get()->GetWorld();
-	for( cWorld::ClientList::iterator itr = World->GetClients().begin(); itr != World->GetClients().end(); ++itr)
+	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
 	{
 		if( *itr == a_Exclude || !(*itr)->IsLoggedIn() ) continue;
 		(*itr)->Send( a_Packet );
 	}
-	//m_World->UnlockClientHandle();
 }
 
 // TODO - Need to move this to cWorld I think
@@ -263,10 +264,7 @@ void cServer::StartListenClient()
 		LOG("%s connected!", ClientIP);
 
 		cClientHandle *NewHandle = new cClientHandle( SClient );
-		cWorld* World = cRoot::Get()->GetWorld();	// TODO - I don't think the world cares for the client at this stage, besides for calling the tick function
-		World->LockClientHandle();
-		World->AddClient( NewHandle );
-		World->UnlockClientHandle();
+		m_pState->Clients.push_back( NewHandle );	// TODO - lock list
 	}
 }
 
@@ -284,11 +282,11 @@ bool cServer::Tick(float a_Dt)
 		m_Millisecondsf = m_Millisecondsf - (int)m_Millisecondsf;
 	}
 
-	cWorld* World = cRoot::Get()->GetWorld(); // TODO - Iterate through all worlds, or give all worlds their own thread
-	World->Tick(a_Dt);
 
-	World->LockClientHandle();
-	for( cWorld::ClientList::iterator itr = World->GetClients().begin(); itr != World->GetClients().end();)
+	cRoot::Get()->TickWorlds( a_Dt ); // TODO - Maybe give all worlds their own thread?
+
+	//World->LockClientHandle(); // TODO - Lock client list
+	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end();)
 	{
 		(*itr)->HandlePendingPackets();
 
@@ -297,13 +295,14 @@ bool cServer::Tick(float a_Dt)
 
 			cClientHandle* RemoveMe = *itr;
 			++itr;
-			cRoot::Get()->GetWorld()->RemoveClient( RemoveMe );
+			m_pState->Clients.remove( RemoveMe );
+			delete RemoveMe;
 			continue;
 		}
 		(*itr)->Tick(a_Dt);
 		++itr;
 	}
-	World->UnlockClientHandle();
+	//World->UnlockClientHandle();
 
 	cRoot::Get()->GetPluginManager()->Tick( a_Dt );
 
@@ -506,13 +505,14 @@ void cServer::Shutdown()
 
 	cRoot::Get()->GetWorld()->SaveAllChunks();
 
-	cWorld* World = cRoot::Get()->GetWorld();
-	World->LockClientHandle();
-	while( World->GetClients().begin() != World->GetClients().end() )
+	//cWorld* World = cRoot::Get()->GetWorld();
+	//World->LockClientHandle();	// TODO - Lock client list
+	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr )
 	{
-		World->RemoveClient( *World->GetClients().begin() );
+		delete *itr;
 	}
-	World->UnlockClientHandle();
+	m_pState->Clients.clear();
+	//World->UnlockClientHandle();
 }
 
 

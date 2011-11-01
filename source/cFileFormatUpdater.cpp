@@ -52,7 +52,7 @@ void cFileFormatUpdater::PlayerBINtoJSON( const char* a_FileName )
 {
 	Vector3d	PlayerPos;
 	Vector3f	PlayerRot;
-	short		PlayerHealth;
+	short		PlayerHealth = 0;
 
 	const unsigned int NumInventorySlots = 45; // At this time the player inventory has/had 45 slots
 	cItem IventoryItems[ NumInventorySlots ];

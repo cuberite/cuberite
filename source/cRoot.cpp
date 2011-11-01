@@ -24,9 +24,15 @@
 
 cRoot* cRoot::s_Root = 0;
 
+typedef std::map< std::string, cWorld* > WorldMap;
+struct cRoot::sRootState
+{
+	cWorld* pDefaultWorld;
+	WorldMap WorldsByName;
+};
+
 cRoot::cRoot()
 	: m_Server( 0 )
-	, m_World( 0 )
 	, m_MonsterConfig( 0 )
 	, m_GroupManager( 0 )
 	, m_RecipeChecker( 0 )
@@ -37,6 +43,7 @@ cRoot::cRoot()
 	, m_bStop( false )
 	, m_bRestart( false )
 	, m_InputThread( 0 )
+	, m_pState( new sRootState )
 {
 	s_Root = this;
 }
@@ -44,6 +51,7 @@ cRoot::cRoot()
 cRoot::~cRoot()
 {
 	s_Root = 0;
+	delete m_pState;
 }
 
 void cRoot::InputThread(void* a_Params)
@@ -93,8 +101,7 @@ void cRoot::Start()
 		m_GroupManager	= new cGroupManager();
 		m_RecipeChecker = new cRecipeChecker();
 		m_FurnaceRecipe = new cFurnaceRecipe();
-		m_World = new cWorld();
-		m_World->InitializeSpawn();
+		LoadWorlds();
 
 		m_PluginManager = new cPluginManager(); // This should be last
 		m_PluginManager->ReloadPluginsNow();
@@ -122,12 +129,79 @@ void cRoot::Start()
 		delete m_FurnaceRecipe; m_FurnaceRecipe = 0;
 		delete m_RecipeChecker; m_RecipeChecker = 0;
 		delete m_GroupManager; m_GroupManager = 0;
-		delete m_World; m_World = 0;
+		UnloadWorlds();
 		//delete HeartBeat; HeartBeat = 0;
 		delete m_Server; m_Server = 0;
 	}
 
 	delete m_Log; m_Log = 0;
+}
+
+void cRoot::LoadWorlds()
+{
+	cIniFile IniFile("settings.ini"); IniFile.ReadFile();
+
+	// First get the default world
+	std::string DefaultWorldName = IniFile.GetValue("Worlds", "DefaultWorld", "world");
+	m_pState->pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
+	m_pState->pDefaultWorld->InitializeSpawn();
+	m_pState->WorldsByName[ DefaultWorldName ] = m_pState->pDefaultWorld;
+
+	// Then load the other worlds
+	unsigned int KeyNum = IniFile.FindKey("Worlds");
+	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum );
+	if( NumWorlds > 0 )
+	{
+		for(unsigned int i = 0; i < NumWorlds; i++)
+		{
+			std::string ValueName = IniFile.GetValueName(KeyNum, i );
+			if( ValueName.compare("World") == 0 )
+			{
+				std::string WorldName = IniFile.GetValue(KeyNum, i );
+				if( WorldName.size() > 0 )
+				{
+					cWorld* NewWorld = new cWorld( WorldName.c_str() );
+					NewWorld->InitializeSpawn();
+					m_pState->WorldsByName[ WorldName ] = NewWorld;
+				}
+			}
+		}
+	}
+}
+
+void cRoot::UnloadWorlds()
+{
+	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	{
+		delete itr->second;
+	}
+	m_pState->WorldsByName.clear();
+}
+
+cWorld* cRoot::GetWorld()
+{
+	return GetDefaultWorld();
+}
+
+cWorld* cRoot::GetDefaultWorld()
+{
+	return m_pState->pDefaultWorld;
+}
+
+cWorld* cRoot::GetWorld( const char* a_WorldName )
+{
+	WorldMap::iterator itr = m_pState->WorldsByName.find( a_WorldName );
+	if( itr != m_pState->WorldsByName.end() )
+		return itr->second;
+	return 0;
+}
+
+void cRoot::TickWorlds( float a_Dt )
+{
+	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	{
+		itr->second->Tick( a_Dt );
+	}
 }
 
 void cRoot::ServerCommand( const char* a_Cmd )

@@ -65,6 +65,7 @@ private:
 	float m_TimeLastPacket;
 
 	bool m_bLoggedIn;
+	bool m_bSendLoginResponse;
 
 	bool m_bKeepThreadGoing;
 };										// tolua_export

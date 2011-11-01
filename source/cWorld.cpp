@@ -30,6 +30,7 @@
 #include "cGhast.h" //Ghast
 #include "cZombiepigman.h" //Zombiepigman
 #include "cGenSettings.h"
+#include "cMakeDir.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -42,7 +43,7 @@
 
 #ifndef _WIN32
 #include <stdlib.h>
-#include <sys/stat.h>   // for mkdir
+//#include <sys/stat.h>   // for mkdir
 #include <sys/types.h>
 #endif
 
@@ -70,6 +71,8 @@ struct cWorld::sWorldState
 	std::vector< unsigned int > m_ChunkBuffer;
 
 	cWorld::ChunkList m_SpreadQueue;
+
+	std::string WorldName;
 };
 
 cWorld* cWorld::GetWorld()
@@ -100,25 +103,14 @@ cWorld::~cWorld()
 	delete m_pState;
 }
 
-cWorld::cWorld()
+cWorld::cWorld( const char* a_WorldName )
 	: m_pState( new sWorldState )
 	, m_SpawnMonsterTime( 0.f )
 {
-	LOG("cWorld::cWorld()");
+	LOG("cWorld::cWorld(%s)", a_WorldName);
+	m_pState->WorldName = a_WorldName;
 
-#ifdef _WIN32
-	{
-		SECURITY_ATTRIBUTES Attrib;
-		Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-		Attrib.lpSecurityDescriptor = NULL;
-		Attrib.bInheritHandle = false;
-		::CreateDirectory("world", &Attrib);
-	}
-#else
-	{
-		mkdir("world", S_IRWXU | S_IRWXG | S_IRWXO);
-	}
-#endif
+	cMakeDir::MakeDir(m_pState->WorldName.c_str());
 
 	srand( (unsigned int) time(0) );
 	m_SpawnX = (double)((rand()%10000)-5000);
@@ -126,7 +118,7 @@ cWorld::cWorld()
 	m_SpawnZ = (double)((rand()%10000)-5000);
 	m_WorldSeed = rand();
 
-	cIniFile IniFile("world/world.ini");
+	cIniFile IniFile( m_pState->WorldName + "/world.ini");
 	if( IniFile.ReadFile() )
 	{
 		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX );
@@ -142,7 +134,7 @@ cWorld::cWorld()
 		IniFile.SetValueI("Seed", "Seed", m_WorldSeed );
 		if( !IniFile.WriteFile() )
 		{
-			LOG("WARNING: Could not write to world/world.ini");
+			LOG("WARNING: Could not write to %s/world.ini", a_WorldName);
 		}
 	}
 	LOGINFO("Seed: %i", m_WorldSeed );
@@ -184,7 +176,7 @@ cWorld::cWorld()
 	m_Time = 0;
 	m_WorldTimeFraction = 0.f;
 	m_WorldTime = 0;
-        m_GameMode = 1;
+	m_GameMode = 0;
 	m_LastSave = 0;
 	m_LastUnload = 0;
 	m_ClientHandleCriticalSection = new cCriticalSection();
@@ -696,15 +688,15 @@ cEntity* cWorld::GetEntity( int a_UniqueID )
 	return 0;
 }
 
-void cWorld::RemoveClient( cClientHandle* a_Client )
-{
-	m_pState->m_Clients.remove( a_Client );
-	if( a_Client )
-	{
-		delete a_Client;
-		a_Client = 0;
-	}
-}
+// void cWorld::RemoveClient( cClientHandle* a_Client )
+// {
+// 	m_pState->m_Clients.remove( a_Client );
+// 	if( a_Client )
+// 	{
+// 		delete a_Client;
+// 		a_Client = 0;
+// 	}
+// }
 
 void cWorld::RemoveEntity( cEntity* a_Entity )
 {
@@ -783,14 +775,14 @@ void cWorld::RemoveSpread( cChunk* a_Chunk )
 /************************************************************************/
 /* Get and set                                                          */
 /************************************************************************/
-void cWorld::AddClient( cClientHandle* a_Client )
-{
-	m_pState->m_Clients.push_back( a_Client );
-}
-cWorld::ClientList & cWorld::GetClients()
-{
-	return m_pState->m_Clients;
-}
+// void cWorld::AddClient( cClientHandle* a_Client )
+// {
+// 	m_pState->m_Clients.push_back( a_Client );
+// }
+// cWorld::ClientList & cWorld::GetClients()
+// {
+// 	return m_pState->m_Clients;
+// }
 cWorld::EntityList & cWorld::GetEntities()
 {
 	return m_pState->m_AllEntities;
@@ -811,4 +803,8 @@ void cWorld::AddToRemoveEntityQueue( cEntity & a_Entity )
 {
 	m_pState->m_AllEntities.remove( &a_Entity);
 	m_pState->m_RemoveEntityQueue.push_back( &a_Entity ); 
+}
+const char* cWorld::GetName()
+{
+	return m_pState->WorldName.c_str();
 }

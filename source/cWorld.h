@@ -25,7 +25,7 @@ public:
 	typedef std::list< cChunk* > ChunkList;
 	typedef std::list< cPlayer* > PlayerList;
 
-	static cWorld* GetWorld();							//tolua_export
+	static cWorld* GetWorld();														//tolua_export
 
 	// Return time in seconds
 	inline static float GetTime()													//tolua_export
@@ -43,9 +43,9 @@ public:
 	cChunk* GetChunkOfBlock( int a_X, int a_Y, int a_Z );
 	char GetHeight( int a_X, int a_Z );												//tolua_export
 
-	void AddClient( cClientHandle* a_Client );
-	void RemoveClient( cClientHandle* a_Client );
-	ClientList & GetClients();
+	//void AddClient( cClientHandle* a_Client );
+	//void RemoveClient( cClientHandle* a_Client );
+	//ClientList & GetClients();
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
@@ -79,6 +79,7 @@ public:
 	void GrowTree( int a_X, int a_Y, int a_Z );										//tolua_export
 
 	unsigned int GetWorldSeed() { return m_WorldSeed; }								//tolua_export
+	const char* GetName();															//tolua_export
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
@@ -122,7 +123,7 @@ public:
 	void InitializeSpawn();
 private:
 	friend class cRoot;
-	cWorld();
+	cWorld( const char* a_WorldName );
 	~cWorld();
 
 	struct sWorldState;

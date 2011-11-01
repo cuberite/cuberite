@@ -112,6 +112,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	, m_TimeLastPacket( cWorld::GetTime() )
 	, m_bLoggedIn( false )
 	, m_bKeepThreadGoing( true )
+	, m_bSendLoginResponse( false )
 	, m_pState( new sClientHandleState )
 {
     LOG("cClientHandle::cClientHandle");
@@ -234,17 +235,16 @@ void cClientHandle::StreamChunks()
 {
 	if( !m_bLoggedIn )
 		return;
-	int ChunkPosX = (int)m_Player->GetPosX() / 16;
-	if( m_Player->GetPosX() < 0 ) ChunkPosX -= 1;
-	int ChunkPosZ = (int)m_Player->GetPosZ() / 16;
-	if( m_Player->GetPosZ() < 0 ) ChunkPosZ -= 1;
+
+	int ChunkPosX = (int)floor(m_Player->GetPosX() / 16);
+	int ChunkPosZ = (int)floor(m_Player->GetPosZ() / 16);
 
 	cChunk* NeededChunks[VIEWDISTANCE*VIEWDISTANCE];
 	for(int x = 0; x < VIEWDISTANCE; x++)
 	{
 		for(int z = 0; z < VIEWDISTANCE; z++)
 		{
-			NeededChunks[x + z*VIEWDISTANCE] = cRoot::Get()->GetWorld()->GetChunk( x + ChunkPosX-(VIEWDISTANCE-1)/2, 0, z + ChunkPosZ-(VIEWDISTANCE-1)/2 );
+			NeededChunks[x + z*VIEWDISTANCE] = m_Player->GetWorld()->GetChunk( x + ChunkPosX-(VIEWDISTANCE-1)/2, 0, z + ChunkPosZ-(VIEWDISTANCE-1)/2 );
 		}
 	}
 
@@ -298,9 +298,9 @@ void cClientHandle::StreamChunks()
 
 void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChunks )
 {
-	int X = (int)m_Player->GetPosX() / 16;
-	int Y = (int)m_Player->GetPosY() / 128;
-	int Z = (int)m_Player->GetPosZ() / 16;
+	int X = (int)floor(m_Player->GetPosX() / 16);
+	int Y = (int)floor(m_Player->GetPosY() / 128);
+	int Z = (int)floor(m_Player->GetPosZ() / 16);
 
 	bool bAllDone = false;
 	while( !bAllDone )
@@ -432,7 +432,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				}
 
 				// Now initialize player (adds to entity list etc.)
-				m_Player->Initialize( cRoot::Get()->GetWorld() ); // TODO - Get correct world for player
+				m_Player->Initialize( cRoot::Get()->GetDefaultWorld() ); // TODO - Get correct world for player
 
 				// Broadcasts to all but this ( this is actually handled in cChunk.cpp, after entity is added to the chunk )
 				//m_Player->SpawnOn( 0 );
@@ -537,7 +537,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 									case 294 : itemhasdur = true; break;
 									case 359 : itemhasdur = true; break;
 								}
-								if (itemhasdur) {
+								if (itemhasdur) 
+								{
 									int maxhelditemdur = 1563;
 									switch(helditem)
 									{
@@ -570,9 +571,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 									}
 									m_Player->GetInventory().GetEquippedItem().m_ItemHealth ++;
 									LOG("Health: %i", m_Player->GetInventory().GetEquippedItem().m_ItemHealth);
-									if (m_Player->GetInventory().GetEquippedItem().m_ItemHealth >= maxhelditemdur) {
+									if (m_Player->GetInventory().GetEquippedItem().m_ItemHealth >= maxhelditemdur)
+									{
 										LOG("Player %s Broke ID: %i", GetUsername(), m_Player->GetInventory().GetEquippedItem().m_ItemID);
-                                                                                m_Player->GetInventory().RemoveItem( m_Player->GetInventory().GetEquippedItem());
+										m_Player->GetInventory().RemoveItem( m_Player->GetInventory().GetEquippedItem());
 									}
 								}
 							}
@@ -914,42 +916,9 @@ void cClientHandle::AuthenticateThread( void* a_Param )
 		return;
 	}
 
-	self->SendLoginResponse();
+	self->m_bSendLoginResponse = true;
 }
 
-void cClientHandle::SendLoginResponse()
-{
-	cWorld* World = cRoot::Get()->GetWorld(); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
-	World->LockEntities();
-	// Spawn player (only serversided, so data is loaded)
-	m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
-
-	cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player ); // TODO - this function is called from a seperate thread, which might be dangerous
-
-	// Return a server login packet
-	cPacket_Login LoginResponse;
-	LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
-	//LoginResponse.m_Username = "";
-	//m_Player->SetGameMode ( 0 );
-	m_Player->SetGameMode ( cRoot::Get()->GetWorld()->GetGameMode() ); //set player's gamemode to server's gamemode at login.
-	LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from player.
-	LoginResponse.m_MapSeed = 0;
-	LoginResponse.m_Dimension = 0;
-	Send( LoginResponse );
-
-	// Send position
-	Send( cPacket_PlayerMoveLook( m_Player ) );
-
-	// Send time
-	Send( cPacket_TimeUpdate( (cRoot::Get()->GetWorld()->GetWorldTime() ) ) );
-
-	// Send inventory
-	m_Player->GetInventory().SendWholeInventory( this );
-
-	// Send health
-	Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
-	World->UnlockEntities();
-}
 
 void cClientHandle::Tick(float a_Dt)
 {
@@ -962,6 +931,40 @@ void cClientHandle::Tick(float a_Dt)
 		cSleep::MilliSleep( 1000 ); // Give packet some time to be received
 
 		Destroy();
+	}
+
+	if( m_bSendLoginResponse )
+	{
+		m_bSendLoginResponse = false;
+
+		cWorld* World = cRoot::Get()->GetDefaultWorld(); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
+		World->LockEntities();
+		// Spawn player (only serversided, so data is loaded)
+		m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
+
+		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player ); // TODO - this function is called from a seperate thread, which might be dangerous
+
+		// Return a server login packet
+		cPacket_Login LoginResponse;
+		LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
+		//LoginResponse.m_Username = "";
+		LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from world.
+		LoginResponse.m_MapSeed = 0;
+		LoginResponse.m_Dimension = 0;
+		Send( LoginResponse );
+
+		// Send position
+		Send( cPacket_PlayerMoveLook( m_Player ) );
+
+		// Send time
+		Send( cPacket_TimeUpdate( World->GetWorldTime() ) );
+
+		// Send inventory
+		m_Player->GetInventory().SendWholeInventory( this );
+
+		// Send health
+		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
+		World->UnlockEntities();
 	}
 }
 

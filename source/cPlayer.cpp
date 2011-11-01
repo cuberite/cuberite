@@ -15,6 +15,7 @@
 #include "cItem.h"
 #include "cTracer.h"
 #include "cRoot.h"
+#include "cMakeDir.h"
 
 #include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_EntityLook.h"
@@ -86,13 +87,16 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	if( !LoadFromDisk() )
 	{
 		m_Inventory->Clear();
-		SetPosX( cRoot::Get()->GetWorld()->GetSpawnX() ); // TODO - Get from the correct world?
-		SetPosY( cRoot::Get()->GetWorld()->GetSpawnY() );
-		SetPosZ( cRoot::Get()->GetWorld()->GetSpawnZ() );
+		SetPosX( cRoot::Get()->GetDefaultWorld()->GetSpawnX() );
+		SetPosY( cRoot::Get()->GetDefaultWorld()->GetSpawnY() );
+		SetPosZ( cRoot::Get()->GetDefaultWorld()->GetSpawnZ() );
 	}
+}
 
-	//MoveToCorrectChunk();
-	cRoot::Get()->GetWorld()->AddPlayer( this ); // TODO - Add to correct world? Or get rid of this?
+void cPlayer::Initialize( cWorld* a_World )
+{
+	cPawn::Initialize( a_World );
+	GetWorld()->AddPlayer( this );
 }
 
 cPlayer::~cPlayer(void)
@@ -618,7 +622,7 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 	}
 }
 
-bool cPlayer::LoadFromDisk()
+bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the correct world for this player
 {
 	cIniFile IniFile("users.ini");
 	if( IniFile.ReadFile() )
@@ -653,7 +657,7 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/player/%s.json", m_pState->PlayerName.c_str() );
+	sprintf_s(SourceFile, 128, "players/%s.json", m_pState->PlayerName.c_str() );
 
 	FILE* f;
 	#ifdef _WIN32
@@ -696,7 +700,7 @@ bool cPlayer::LoadFromDisk()
 			m_Rot->z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
 		}
 
-		m_Health = root.get("health", 0 ).asInt();
+		m_Health = (short)root.get("health", 0 ).asInt();
 		m_Inventory->LoadFromJson(root["inventory"]);
 		
 		return true;
@@ -706,21 +710,7 @@ bool cPlayer::LoadFromDisk()
 
 bool cPlayer::SaveToDisk()
 {
-    #ifdef _WIN32
-	{	// Make sure some folders exist
-		SECURITY_ATTRIBUTES Attrib;
-		Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-		Attrib.lpSecurityDescriptor = NULL;
-		Attrib.bInheritHandle = false;
-		::CreateDirectory("world", &Attrib);
-		::CreateDirectory("world/player", &Attrib);
-	}
-	#else
-	{
-        mkdir("world", S_IRWXU | S_IRWXG | S_IRWXO);
-        mkdir("world/player", S_IRWXU | S_IRWXG | S_IRWXO);
-	}
-	#endif
+	cMakeDir::MakeDir("players");
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
@@ -746,7 +736,7 @@ bool cPlayer::SaveToDisk()
 	std::string JsonData = writer.write( root );
 
 	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/player/%s.json", m_pState->PlayerName.c_str() );
+	sprintf_s(SourceFile, 128, "players/%s.json", m_pState->PlayerName.c_str() );
 
 	FILE* f;
 	#ifdef _WIN32

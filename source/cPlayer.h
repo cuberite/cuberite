@@ -16,6 +16,8 @@ public:
 	cPlayer(cClientHandle* a_Client, const char* a_PlayerName);
 	virtual ~cPlayer();
 
+	virtual void Initialize( cWorld* a_World );								//tolua_export
+
 	virtual void SpawnOn( cClientHandle* a_Target );
 	virtual void Tick(float a_Dt);
 

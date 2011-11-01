@@ -21,7 +21,9 @@ public:
 	void Start();
 
 	cServer* GetServer() { return m_Server; }						//tolua_export
-	cWorld* GetWorld() { return m_World; }							//tolua_export
+	cWorld* GetWorld();												//tolua_export
+	cWorld* GetDefaultWorld();										//tolua_export
+	cWorld* GetWorld( const char* a_WorldName );					//tolua_export
 	cMonsterConfig *GetMonsterConfig() { return m_MonsterConfig;}
 
 	cGroupManager* GetGroupManager() { return m_GroupManager; }		//tolua_export
@@ -31,9 +33,13 @@ public:
 	cPluginManager* GetPluginManager() { return m_PluginManager; }	//tolua_export
 
 	void ServerCommand( const char* a_Cmd );						//tolua_export
+
+	void TickWorlds( float a_Dt );
 private:
+	void LoadWorlds();
+	void UnloadWorlds();
+
 	cServer*		m_Server;
-	cWorld*			m_World;
 	cMonsterConfig *m_MonsterConfig;
 
 	cGroupManager*	m_GroupManager;
@@ -46,6 +52,9 @@ private:
 
 	bool m_bStop;
 	bool m_bRestart;
+
+	struct sRootState;
+	sRootState* m_pState;
 
 	cThread* m_InputThread;
 	static void InputThread(void* a_Params);

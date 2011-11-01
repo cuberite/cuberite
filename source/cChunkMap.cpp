@@ -10,6 +10,9 @@
 #include <cstdlib> // abs
 #include <math.h>  // floorf
 #include <stdio.h> // sprintf and stuff
+
+
+#define sprintf_s( dest, size, format, ... ) sprintf( dest, format, __VA_ARGS__ )
 #endif
 
 #include "zlib.h"
@@ -549,16 +552,12 @@ void cChunkMap::SaveAllChunks()
 
 void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 {
-	cMakeDir::MakeDir("world");
+	std::string WorldName = m_World->GetName();
+	cMakeDir::MakeDir( WorldName.c_str() );
 
 	char SourceFile[128];
 
-	#ifdef _WIN32
-		sprintf_s(SourceFile, 128, "world/X%i_Z%i.pak", a_Layer->m_X, a_Layer->m_Z );
-	#else
-		sprintf(SourceFile, "world/X%i_Z%i.pak", a_Layer->m_X, a_Layer->m_Z );
-	#endif
-
+	sprintf_s(SourceFile, 128, ( WorldName + "/X%i_Z%i.pak").c_str(), a_Layer->m_X, a_Layer->m_Z );
 
 	FILE* f = 0;
 	#ifdef _WIN32
@@ -635,13 +634,10 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 
 cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 {
+	std::string WorldName = m_World->GetName();
 	char SourceFile[128];
 	
-	#ifdef _WIN32
-		sprintf_s(SourceFile, 128, "world/X%i_Z%i.pak", a_LayerX, a_LayerZ );
-	#else
-		sprintf(SourceFile, "world/X%i_Z%i.pak", a_LayerX, a_LayerZ );
-	#endif
+	sprintf_s(SourceFile, 128, (WorldName + "/X%i_Z%i.pak").c_str(), a_LayerX, a_LayerZ );
 	
 	FILE* f = 0;
 	#ifdef _WIN32

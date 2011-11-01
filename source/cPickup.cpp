@@ -27,6 +27,7 @@ CLASS_DEFINITION( cPickup, cEntity )
 cPickup::~cPickup()
 {
 	delete m_Item;
+	delete m_Speed;
 }
 
 cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
@@ -60,6 +61,7 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 
 cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 	:	cEntity( ((double)a_PickupSpawnPacket->m_PosX)/32, ((double)a_PickupSpawnPacket->m_PosY)/32, ((double)a_PickupSpawnPacket->m_PosZ)/32 )
+	, m_Speed( new Vector3f() )
 	, m_bOnGround( false )
 	, m_bReplicated( false )
 	, m_Timer( 0.f )

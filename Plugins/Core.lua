@@ -115,7 +115,7 @@ function CorePlugin:Initialize()
 end
 
 function HandleTopCommand( Split, Player )
-	local World = cRoot:Get():GetWorld()
+	local World = Player:GetWorld()
 	
 	local PlayerPos = Player:GetPosition()
 	local Height = World:GetHeight( math.floor(PlayerPos.x), math.floor(PlayerPos.z) )
@@ -218,7 +218,7 @@ function ShowMOTDTo( Player )
 end
 
 function HandleSpawnCommand( Split, Player )
-	World = cRoot:Get():GetWorld()
+	World = Player:GetWorld()
 	Player:TeleportTo( World:GetSpawnX(), World:GetSpawnY(), World:GetSpawnZ() )
 	LOGINFO( Player:GetName() .. " returned to spawn." )
 	return true
