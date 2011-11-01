@@ -471,6 +471,14 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_DIG:
 			{
+				LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
+				LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
+					LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
+					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+					break;
+				}
+				m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				cPacket_BlockDig* PacketData = reinterpret_cast<cPacket_BlockDig*>(a_Packet);
 				LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction, PacketData->m_Status );
 				if( PacketData->m_Status == 0x04 )	// Drop block
@@ -482,10 +490,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cWorld* World = m_Player->GetWorld();
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (World->GetGameMode() == 1) ); //need to change to check for client's gamemode.
+					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (m_Player->GetGameMode() == 1) );
 
 					cItem PickupItem;
-					if( bBroken && !(World->GetGameMode() == 1) ) // broken
+					if( bBroken && !(m_Player->GetGameMode() == 1) ) // broken
 					{
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;
@@ -579,10 +587,18 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_PLACE:
 			{
+				LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
+                                LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+                                if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
+                                        LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
+					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+                                        break;
+                                }
+                                m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 				//if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
-				if( (Equipped.m_ItemID != PacketData->m_ItemType) && (cRoot::Get()->GetWorld()->GetGameMode() != 1) )	// Not valid
+				if( (Equipped.m_ItemID != PacketData->m_ItemType) && (m_Player->GetGameMode() != 1) )	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
 					break;
@@ -721,7 +737,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 					if( IsValidBlock( PacketData->m_ItemType) )
 					{
-						if( (m_Player->GetInventory().RemoveItem( Item )) || (cRoot::Get()->GetWorld()->GetGameMode() == 1) )
+						if( (m_Player->GetInventory().RemoveItem( Item )) || (m_Player->GetGameMode() == 1) )
 						{
 							int X = PacketData->m_PosX;
 							char Y = PacketData->m_PosY;
@@ -914,7 +930,9 @@ void cClientHandle::SendLoginResponse()
 	cPacket_Login LoginResponse;
 	LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
 	//LoginResponse.m_Username = "";
-	LoginResponse.m_ServerMode = cRoot::Get()->GetWorld()->GetGameMode(); //set gamemode from world.
+	//m_Player->SetGameMode ( 0 );
+	m_Player->SetGameMode ( cRoot::Get()->GetWorld()->GetGameMode() ); //set player's gamemode to server's gamemode at login.
+	LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from player.
 	LoginResponse.m_MapSeed = 0;
 	LoginResponse.m_Dimension = 0;
 	Send( LoginResponse );

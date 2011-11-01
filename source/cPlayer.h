@@ -29,6 +29,11 @@ public:
 	virtual void TeleportTo( cEntity* a_Entity );													//tolua_export
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );	//tolua_export
 
+	int GetGameMode() { return m_GameMode; } //return GameMode for player.
+	float GetLastBlockActionTime() { return m_LastBlockActionTime; } //return LastBlockActionTime for player.
+	void SetLastBlockActionTime();
+	void SetGameMode( int a_GameMode );
+
 	// Tries to move to a new position, with collision checks and stuff
 	virtual void MoveTo( const Vector3d & a_NewPos );												//tolua_export
 
@@ -65,13 +70,13 @@ public:
 
 	bool SaveToDisk();
 	bool LoadFromDisk();
-	
+
 	//Burning logic
 	bool m_bBurnable;
 	enum PMetaState{NORMAL,BURNING,CROUCHED,RIDING} e_EPMetaState;
 	virtual void CheckMetaDataBurn();
 	virtual void InStateBurning(float a_Dt);
-	
+
 protected:
 	struct sPlayerState;
 	sPlayerState* m_pState;
@@ -92,6 +97,9 @@ protected:
 	char m_Color;
 	float m_FireDamageInterval;
 	float m_BurnPeriod;
+
+	float m_LastBlockActionTime;
+	int m_GameMode;
 
 	cClientHandle* m_ClientHandle;
 }; //tolua_export

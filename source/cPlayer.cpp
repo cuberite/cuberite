@@ -58,6 +58,8 @@ struct cPlayer::sPlayerState
 
 cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	: m_bBurnable(true)
+	, m_GameMode( 0 )
+	, m_LastBlockActionTime( 0 )
 	, e_EPMetaState(NORMAL)
 	, m_bVisible( true )
 	, m_LastGroundHeight( 0 )
@@ -106,6 +108,8 @@ cPlayer::~cPlayer(void)
 	delete m_pState;
 	cRoot::Get()->GetWorld()->RemovePlayer( this ); // TODO - Remove from correct world? Or get rid of this?
 }
+
+
 
 void cPlayer::SpawnOn( cClientHandle* a_Target )
 {
@@ -223,7 +227,7 @@ void cPlayer::InStateBurning(float a_Dt) {
 	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
 	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
 	if(m_FireDamageInterval > 1000) {
-		
+
 		m_FireDamageInterval = 0;
 		int rem = rand()%3 + 1; //Burn most of the time
 		if(rem >= 2) {
@@ -234,20 +238,20 @@ void cPlayer::InStateBurning(float a_Dt) {
 		if(block == E_BLOCK_LAVA || block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
 			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)
 			m_BurnPeriod = 0;
-		
+
 		if(m_BurnPeriod > 5) {
-			
+
 			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 			e_EPMetaState = NORMAL;
 			cPacket_Metadata md(NORMAL, GetUniqueID());
 			//md.m_UniqueID = GetUniqueID();
 			InChunk->Broadcast(md);
 			m_BurnPeriod = 0;
-			
-		} 
+
+		}
 
 	}
-	
+
 }
 
 //----Change Entity MetaData
@@ -359,7 +363,8 @@ void cPlayer::Respawn()
 	// Create Respawn player packet
 	cPacket_Respawn Packet;
 	//Set Gamemode for packet by looking at world's gamemode (Need to check players gamemode.)
-	Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
+	//Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
+	Packet.m_CreativeMode = (char)m_GameMode; //Set GameMode packet based on Player's GameMode;
 	//Send Packet
 	m_ClientHandle->Send( Packet );
 	TeleportTo( GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ() );
@@ -388,6 +393,17 @@ void cPlayer::CloseWindow()
 	if( m_CurrentWindow ) m_CurrentWindow->Close( *this );
 	m_CurrentWindow = 0;
 }
+
+void cPlayer::SetLastBlockActionTime()
+{
+	m_LastBlockActionTime = cRoot::Get()->GetWorld()->GetTime();
+}
+
+void cPlayer::SetGameMode( int a_GameMode )
+{
+        m_GameMode = a_GameMode;
+}
+
 
 #ifdef SendMessage	// Cause stupid windows.h defines SendMessage as SendMessageA
 #undef SendMessage
