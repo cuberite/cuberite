@@ -117,6 +117,7 @@ cWorld::cWorld( const char* a_WorldName )
 	m_SpawnY = 128;
 	m_SpawnZ = (double)((rand()%10000)-5000);
 	m_WorldSeed = rand();
+	m_GameMode = 0;
 
 	cIniFile IniFile( m_pState->WorldName + "/world.ini");
 	if( IniFile.ReadFile() )
@@ -125,6 +126,7 @@ cWorld::cWorld( const char* a_WorldName )
 		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY );
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ );
 		m_WorldSeed = IniFile.GetValueI("Seed", "Seed", m_WorldSeed );
+		m_GameMode = IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
 	}
 	else
 	{
@@ -132,6 +134,7 @@ cWorld::cWorld( const char* a_WorldName )
 		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY );
 		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ );
 		IniFile.SetValueI("Seed", "Seed", m_WorldSeed );
+		IniFile.SetValueI("GameMode", "GameMode", m_GameMode );
 		if( !IniFile.WriteFile() )
 		{
 			LOG("WARNING: Could not write to %s/world.ini", a_WorldName);
@@ -176,7 +179,6 @@ cWorld::cWorld( const char* a_WorldName )
 	m_Time = 0;
 	m_WorldTimeFraction = 0.f;
 	m_WorldTime = 0;
-	m_GameMode = 0;
 	m_LastSave = 0;
 	m_LastUnload = 0;
 	m_ClientHandleCriticalSection = new cCriticalSection();
