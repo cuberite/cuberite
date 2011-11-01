@@ -317,7 +317,6 @@ void cWorld::Tick(float a_Dt)
 		RemoveEntity( *m_pState->m_RemoveEntityQueue.begin() );
 	}
 
-
 	if( m_bAnimals && ( m_Time - m_SpawnMonsterTime > m_SpawnMonsterRate ) ) // 10 seconds
 	{
 		m_SpawnMonsterTime = m_Time;
@@ -361,7 +360,6 @@ void cWorld::Tick(float a_Dt)
 				else if (nightRand == 9)
 					Monster = new cSkeleton();
 				//end random percent to spawn for night
-				
 			} else {
 				if (dayRand == 0) //random percent to spawn for day
 					Monster = new cChicken();
@@ -398,7 +396,6 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 	int trunk = rand() % (7 - 5 + 1) + 5;
 	for (int i = 0; i < trunk; i++) 
 	{
-		
 		if( GetBlock( a_X, a_Y + i, a_Z ) == E_BLOCK_AIR )
 			FastSetBlock( a_X, a_Y + i, a_Z, E_BLOCK_LOG, 0 );
 	}
@@ -414,7 +411,6 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 				for (int k = a_Z-radius; k <= a_Z + radius; k++) {
 					// small chance to be missing a block to add a little random
 					if (k != a_Z || i != a_X && (rand() % 100 + 1) > 20) {
-						
 						if( GetBlock( i, a_Y + j, k ) == E_BLOCK_AIR )
 							FastSetBlock(i, a_Y+j, k, E_BLOCK_LEAVES, 0 );
 					}
@@ -426,7 +422,6 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 			}
 			if( GetBlock( a_X, a_Y+j, a_Z ) == E_BLOCK_AIR )
 				FastSetBlock( a_X, a_Y+j, a_Z, E_BLOCK_LOG, 0 );
-			
 		}
 	}
 
