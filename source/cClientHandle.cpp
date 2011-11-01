@@ -581,7 +581,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			{
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-				if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
+				//if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
+				if( (Equipped.m_ItemID != PacketData->m_ItemType) && (cRoot::Get()->GetWorld()->GetGameMode() != 1) )	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
 					break;
@@ -592,7 +593,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					if( PacketData->m_Direction > -1 )
 					{
 						AddDirection( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction );
-						
 						m_Player->GetWorld()->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
 					}
 					break;
@@ -721,7 +721,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 					if( IsValidBlock( PacketData->m_ItemType) )
 					{
-						if( m_Player->GetInventory().RemoveItem( Item ) )
+						if( (m_Player->GetInventory().RemoveItem( Item )) || (cRoot::Get()->GetWorld()->GetGameMode() == 1) )
 						{
 							int X = PacketData->m_PosX;
 							char Y = PacketData->m_PosY;

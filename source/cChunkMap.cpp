@@ -660,6 +660,7 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		short NumChunks = 0;
 		if( fread( &NumChunks, sizeof(NumChunks), 1, f) != 1 ) { LOGERROR("ERROR 3 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 		LOG("Num chunks: %i", NumChunks );
+		LOG("Source File: %s", SourceFile );
 
 		cChunkLayer* Layer = new cChunkLayer( LAYER_SIZE*LAYER_SIZE );
 		Layer->m_X = a_LayerX;
