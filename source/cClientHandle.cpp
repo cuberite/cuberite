@@ -967,7 +967,8 @@ void cClientHandle::Tick(float a_Dt)
 		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
 		//quick bugfix to prevent players from spawning in ground
-		m_Player->TeleportTo( cRoot::Get()->GetWorld()->GetSpawnX(), cRoot::Get()->GetWorld()->GetSpawnY()+1, cRoot::Get()->GetWorld()->GetSpawnZ() );
+//		m_Player->TeleportTo( cRoot::Get()->GetWorld()->GetPosX(), cRoot::Get()->GetWorld()->GetPosY()+1, cRoot::Get()->GetWorld()->GetPosZ() );
+                m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
 
 		World->UnlockEntities();
 	}
