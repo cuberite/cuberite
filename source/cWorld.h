@@ -56,7 +56,6 @@ public:
 	cPlayer* GetPlayer( const char* a_PlayerName );									//tolua_export
 
 	void AddEntity( cEntity* a_Entity );
-	void AddToRemoveEntityQueue( cEntity & a_Entity );
 	bool RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom = 0 );
 	EntityList & GetEntities();
 
@@ -129,6 +128,7 @@ private:
 	struct sWorldState;
 	sWorldState* m_pState;
 
+	void AddToRemoveEntityQueue( cEntity & a_Entity );
 	void RemoveEntity( cEntity* a_Entity );
 	void UnloadUnusedChunks();
 

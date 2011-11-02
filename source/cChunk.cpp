@@ -70,14 +70,19 @@ cChunk::~cChunk()
 	m_pState->m_BlockEntities.clear();
 
 	LockEntities();
-	for( EntityList::iterator itr = m_pState->m_Entities.begin(); itr != m_pState->m_Entities.end(); ++itr)
+	if( m_pState->m_Entities.size() > 0 )
 	{
-		if( (*itr)->GetEntityType() != cEntity::E_PLAYER )
+		EntityList Entities = m_pState->m_Entities; // Copy list to a temporary list
+		for( EntityList::iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
 		{
-			m_World->AddToRemoveEntityQueue( **itr ); // World also destroys the entity
+			if( (*itr)->GetEntityType() != cEntity::E_PLAYER )
+			{
+				(*itr)->RemoveFromChunk( this );
+				(*itr)->Destroy();
+			}
 		}
+		m_pState->m_Entities.clear();
 	}
-	m_pState->m_Entities.clear();
 	UnlockEntities();
 
 	if( m_EntitiesCriticalSection )
@@ -1027,14 +1032,17 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 {
 	m_pState->m_LoadedByClient.remove( a_Client );
 
-	LockEntities();
-	for( EntityList::iterator itr = m_pState->m_Entities.begin(); itr != m_pState->m_Entities.end(); ++itr )
+	if( !a_Client->IsDestroyed() )
 	{
-		LOG("%i %i %i Destroying on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername() );
-		cPacket_DestroyEntity DestroyEntity( *itr );
-		a_Client->Send( DestroyEntity );
+		LockEntities();
+		for( EntityList::iterator itr = m_pState->m_Entities.begin(); itr != m_pState->m_Entities.end(); ++itr )
+		{
+			LOG("%i %i %i Destroying on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername() );
+			cPacket_DestroyEntity DestroyEntity( *itr );
+			a_Client->Send( DestroyEntity );
+		}
+		UnlockEntities();
 	}
-	UnlockEntities();
 }
 
 void cChunk::AddEntity( cEntity & a_Entity )

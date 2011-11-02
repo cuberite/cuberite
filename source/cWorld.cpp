@@ -88,6 +88,7 @@ cWorld::~cWorld()
 	{
 		cEntity* Entity = *m_pState->m_AllEntities.begin();
 		m_pState->m_AllEntities.remove( Entity );
+		if( !Entity->IsDestroyed() ) Entity->Destroy();
 		RemoveEntity( Entity );
 	}
 	UnlockEntities();

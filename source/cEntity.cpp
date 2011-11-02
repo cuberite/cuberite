@@ -28,6 +28,7 @@ cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
 	, m_bDestroyed( false )
 	, m_EntityType( E_ENTITY )
 	, m_World( 0 )
+	, m_bRemovedFromChunk( false )
 {
 	m_EntityCount++;
 	m_UniqueID = m_EntityCount;
@@ -35,18 +36,12 @@ cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
 
 cEntity::~cEntity()
 {
+	if( !m_bDestroyed || !m_bRemovedFromChunk )
+	{
+		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk );
+	}
 	delete m_Referencers;
 	delete m_References;
-	if( m_World )
-	{
-		cChunk* Chunk = m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if( Chunk )
-		{
-			cPacket_DestroyEntity DestroyEntity( this );
-			Chunk->Broadcast( DestroyEntity );
-			Chunk->RemoveEntity( *this );
-		}
-	}
 	delete m_Pos;
 	delete m_Rot;
 }
@@ -143,6 +138,30 @@ void cEntity::MoveToCorrectChunk()
 	}
 }
 
+void cEntity::Destroy()
+{
+	if( !m_bDestroyed )
+	{
+		m_bDestroyed = true;
+		if( !m_bRemovedFromChunk )
+			RemoveFromChunk(0);
+	}
+}
+
+void cEntity::RemoveFromChunk( cChunk* a_Chunk )
+{
+	if( m_World )
+	{
+		cChunk* Chunk = ( a_Chunk ? a_Chunk : m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ ) );
+		if( Chunk )
+		{
+			cPacket_DestroyEntity DestroyEntity( this );
+			Chunk->Broadcast( DestroyEntity );
+			Chunk->RemoveEntity( *this );
+			m_bRemovedFromChunk = true;
+		}
+	}
+}
 
 CLASS_DEF_GETCLASS( cEntity );
 bool cEntity::IsA( const char* a_EntityType )

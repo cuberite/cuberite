@@ -27,6 +27,7 @@
 	CLASS_DEF_ISA( classname, superclass ) \
 	CLASS_DEF_GETCLASS( classname )
 
+class cChunk;
 class cWorld;
 class cReferenceManager;
 class Vector3d;
@@ -76,7 +77,8 @@ public:																						//tolua_export
 	inline int GetUniqueID() { return m_UniqueID; }											//tolua_export
 	inline bool IsDestroyed() { return m_bDestroyed; }										//tolua_export
 
-	void Destroy() { m_bDestroyed = true; }													//tolua_export
+	void Destroy();																			//tolua_export
+	void RemoveFromChunk( cChunk* a_Chunk ); // for internal use in cChunk
 
 	virtual void Tick(float a_Dt) = 0;														//tolua_export
 
@@ -105,6 +107,7 @@ protected:
 	bool m_bDirtyOrientation;
 
 	bool m_bDestroyed;
+	bool m_bRemovedFromChunk;
 
 	ENUM_ENTITY_TYPE m_EntityType;
 private:

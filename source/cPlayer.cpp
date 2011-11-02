@@ -55,6 +55,7 @@ struct cPlayer::sPlayerState
 	cPlayer::GroupList Groups;
 
 	std::string PlayerName;
+	std::string LoadedWorldName;
 };
 
 cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
@@ -110,7 +111,7 @@ cPlayer::~cPlayer(void)
 		m_Inventory = 0;
 	}
 	delete m_pState;
-	cRoot::Get()->GetWorld()->RemovePlayer( this ); // TODO - Remove from correct world? Or get rid of this?
+	GetWorld()->RemovePlayer( this ); // TODO - Remove from correct world? Or get rid of this?
 }
 
 
@@ -702,6 +703,8 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 
 		m_Health = (short)root.get("health", 0 ).asInt();
 		m_Inventory->LoadFromJson(root["inventory"]);
+
+		m_pState->LoadedWorldName = root.get("world", "world").asString();
 		
 		return true;
 	}
@@ -731,6 +734,7 @@ bool cPlayer::SaveToDisk()
 	root["rotation"] = JSON_PlayerRotation;
 	root["inventory"] = JSON_Inventory;
 	root["health"] = m_Health;
+	root["world"] = GetWorld()->GetName();
 
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write( root );
@@ -768,4 +772,9 @@ void cPlayer::SetName( const char* a_Name )
 const cPlayer::GroupList & cPlayer::GetGroups()
 {
 	return m_pState->Groups;
+}
+
+const char* cPlayer::GetLoadedWorldName()
+{
+	return m_pState->LoadedWorldName.c_str();
 }

@@ -432,7 +432,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				}
 
 				// Now initialize player (adds to entity list etc.)
-				m_Player->Initialize( cRoot::Get()->GetDefaultWorld() ); // TODO - Get correct world for player
+				cWorld* PlayerWorld = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
+				if( !PlayerWorld ) PlayerWorld = cRoot::Get()->GetDefaultWorld();
+				m_Player->Initialize( PlayerWorld ); // TODO - Get correct world for player
 
 				// Broadcasts to all but this ( this is actually handled in cChunk.cpp, after entity is added to the chunk )
 				//m_Player->SpawnOn( 0 );
@@ -937,13 +939,15 @@ void cClientHandle::Tick(float a_Dt)
 	{
 		m_bSendLoginResponse = false;
 
-		cWorld* World = cRoot::Get()->GetDefaultWorld(); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
-		World->LockEntities();
 		// Spawn player (only serversided, so data is loaded)
 		m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
+
+		cWorld* World = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() ); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
+		if( !World ) World = cRoot::Get()->GetDefaultWorld();
+		World->LockEntities();
 		m_Player->SetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login.
 
-		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player ); // TODO - this function is called from a seperate thread, which might be dangerous
+		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player );
 
 		// Return a server login packet
 		cPacket_Login LoginResponse;
