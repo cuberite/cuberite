@@ -128,6 +128,8 @@ MCServer : \
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
 		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_NewInvalidState.o\
+		build/cPacket_Thunderbolt.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -311,6 +313,8 @@ MCServer : \
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
 		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_NewInvalidState.o\
+		build/cPacket_Thunderbolt.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -497,6 +501,8 @@ clean :
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
 		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_NewInvalidState.o\
+		build/cPacket_Thunderbolt.o\
 		build/cPacket_EntityLook.o\
 		build/cPacket_EntityStatus.o\
 		build/cPacket_Flying.o\
@@ -878,6 +884,12 @@ build/cPacket_EntityEquipment.o : source/packets/cPacket_EntityEquipment.cpp
 
 build/cPacket_CreateInventoryAction.o : source/packets/cPacket_CreateInventoryAction.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_CreateInventoryAction.cpp -c $(INCLUDE) -o build/cPacket_CreateInventoryAction.o
+
+build/cPacket_NewInvalidState.o : source/packets/cPacket_NewInvalidState.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_NewInvalidState.cpp -c $(INCLUDE) -o build/cPacket_NewInvalidState.o
+
+build/cPacket_Thunderbolt.o : source/packets/cPacket_Thunderbolt.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Thunderbolt.cpp -c $(INCLUDE) -o build/cPacket_Thunderbolt.o
 
 build/cPacket_EntityLook.o : source/packets/cPacket_EntityLook.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityLook.cpp -c $(INCLUDE) -o build/cPacket_EntityLook.o

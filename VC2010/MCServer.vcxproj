@@ -311,6 +311,8 @@
     <ClCompile Include="..\source\packets\cPacket_Disconnect.cpp" />
     <ClCompile Include="..\source\packets\cPacket_EntityEquipment.cpp" />
     <ClCompile Include="..\source\packets\cPacket_CreateInventoryAction.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_NewInvalidState.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Thunderbolt.cpp" />
     <ClCompile Include="..\source\packets\cPacket_EntityLook.cpp" />
     <ClCompile Include="..\source\packets\cPacket_EntityStatus.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Flying.cpp" />
@@ -450,6 +452,8 @@
     <ClInclude Include="..\source\packets\cPacket_Disconnect.h" />
     <ClInclude Include="..\source\packets\cPacket_EntityEquipment.h" />
     <ClInclude Include="..\source\packets\cPacket_CreateInventoryAction.h" />
+    <ClInclude Include="..\source\packets\cPacket_NewInvalidState.h" />
+    <ClInclude Include="..\source\packets\cPacket_Thunderbolt.h" />
     <ClInclude Include="..\source\packets\cPacket_EntityLook.h" />
     <ClInclude Include="..\source\packets\cPacket_EntityStatus.h" />
     <ClInclude Include="..\source\packets\cPacket_Flying.h" />

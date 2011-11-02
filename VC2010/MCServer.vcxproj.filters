@@ -286,6 +286,12 @@
     <Filter Include="Packets\cPacket_CreateInventoryAction">
       <UniqueIdentifier>{0c47e5f8-ea4d-40dc-ac8e-740c5512c768}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets\cPacket_NewInvalidState">
+      <UniqueIdentifier>{0c12e5f5-ea4d-10dc-ac7e-540c5562c767}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_Thunderbolt">
+      <UniqueIdentifier>{0c32e5f8-ea4d-30dc-ac8e-140c4512c668}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Packets\cPacket_UseEntity">
       <UniqueIdentifier>{bff5658b-0806-430c-9929-062f4bd4760b}</UniqueIdentifier>
     </Filter>
@@ -654,6 +660,12 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_CreateInventoryAction.cpp">
       <Filter>Packets\cPacket_CreateInventoryAction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_NewInvalidState.cpp">
+      <Filter>Packets\cPacket_NewInvalidState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Thunderbolt.cpp">
+      <Filter>Packets\cPacket_Thunderbolt</Filter>
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_UseEntity.cpp">
       <Filter>Packets\cPacket_UseEntity</Filter>
@@ -1058,6 +1070,12 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_CreateInventoryAction.h">
       <Filter>Packets\cPacket_CreateInventoryAction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_NewInvalidState.h">
+      <Filter>Packets\cPacket_NewInvalidState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Thunderbolt.h">
+      <Filter>Packets\cPacket_Thunderbolt</Filter>
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_UseEntity.h">
       <Filter>Packets\cPacket_UseEntity</Filter>

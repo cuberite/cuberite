@@ -56,6 +56,7 @@
 #include "packets/cPacket_ItemSwitch.h"
 #include "packets/cPacket_EntityEquipment.h"
 #include "packets/cPacket_CreateInventoryAction.h"
+#include "packets/cPacket_NewInvalidState.h"
 #include "packets/cPacket_UseEntity.h"
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_13.h"
@@ -127,16 +128,17 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->PacketMap[E_LOGIN]			= new cPacket_Login;
 	m_pState->PacketMap[E_PLAYERPOS]		= new cPacket_PlayerPosition;
 	m_pState->PacketMap[E_PLAYERLOOK]		= new cPacket_PlayerLook;
-	m_pState->PacketMap[E_PLAYERMOVELOOK]	= new cPacket_PlayerMoveLook;
-	m_pState->PacketMap[E_CHAT]				= new cPacket_Chat;
+	m_pState->PacketMap[E_PLAYERMOVELOOK]		= new cPacket_PlayerMoveLook;
+	m_pState->PacketMap[E_CHAT]			= new cPacket_Chat;
 	m_pState->PacketMap[E_ANIMATION]		= new cPacket_ArmAnim;
 	m_pState->PacketMap[E_FLYING]			= new cPacket_Flying;
 	m_pState->PacketMap[E_BLOCK_DIG]		= new cPacket_BlockDig;
 	m_pState->PacketMap[E_BLOCK_PLACE]		= new cPacket_BlockPlace;
 	m_pState->PacketMap[E_DISCONNECT]		= new cPacket_Disconnect;
 	m_pState->PacketMap[E_ITEM_SWITCH]		= new cPacket_ItemSwitch;
-	m_pState->PacketMap[E_ENTITY_EQUIPMENT] = new cPacket_EntityEquipment;
-	m_pState->PacketMap[E_CREATE_INVENTORY_ACTION] = new cPacket_CreateInventoryAction;
+	m_pState->PacketMap[E_ENTITY_EQUIPMENT]		= new cPacket_EntityEquipment;
+	m_pState->PacketMap[E_CREATE_INVENTORY_ACTION] 	= new cPacket_CreateInventoryAction;
+	m_pState->PacketMap[E_NEW_INVALID_STATE] 	= new cPacket_NewInvalidState;
 	m_pState->PacketMap[E_PICKUP_SPAWN]		= new cPacket_PickupSpawn;
 	m_pState->PacketMap[E_USE_ENTITY]		= new cPacket_UseEntity;
 	m_pState->PacketMap[E_WINDOW_CLOSE]		= new cPacket_WindowClose;
@@ -144,7 +146,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->PacketMap[E_PACKET_13]		= new cPacket_13;
 	m_pState->PacketMap[E_UPDATE_SIGN]		= new cPacket_UpdateSign;
 	m_pState->PacketMap[E_RESPAWN]			= new cPacket_Respawn;
-	m_pState->PacketMap[E_PING]				= new cPacket_Ping;
+	m_pState->PacketMap[E_PING]			= new cPacket_Ping;
 
 	memset( m_LoadedChunks, 0x00, sizeof(cChunk*)*VIEWDISTANCE*VIEWDISTANCE );
 
@@ -372,12 +374,22 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 	{
 		switch( a_Packet->m_PacketID )
 		{
+		case E_NEW_INVALID_STATE: // New/Invalid State packet received. I'm guessing the client only sends it when there's a problem with the bed?
+                        {
+                                LOGINFO("Got New Invalid State packet");
+                        }
+                        break;
+		case E_CREATE_INVENTORY_ACTION: // I don't think we need to do anything with this packet, but justin case...
+                        {
+                                LOGINFO("Got Create Inventory Action packet");
+                        }
+                        break;
 		case E_PING: // Somebody tries to retreive information about the server
 			{
 				LOGINFO("Got ping");
 				char NumPlayers[8];
 				sprintf_s(NumPlayers, 8, "%i", cRoot::Get()->GetWorld()->GetNumPlayers() );
-				std::string response = std::string("Should be able to connect now!" + cChatColor::Delimiter + NumPlayers + cChatColor::Delimiter + "9001" );
+				std::string response = std::string("MCServer! - It's OVER 9000!" + cChatColor::Delimiter + NumPlayers + cChatColor::Delimiter + "9001" );
 				Kick( response.c_str() );
 			}
 			break;
@@ -630,6 +642,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					{
 					case E_BLOCK_WORKBENCH:
 						{
+							LOG("WorkBench");
+							cPacket_NewInvalidState RainPacket;
+							RainPacket.m_Reason = 1; //begin rain
+							Send( RainPacket );
 							bPlaceBlock = false;
 							cWindow* Window = new cCraftingWindow( 0, true );
 							m_Player->OpenWindow( Window );
@@ -638,6 +654,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_FURNACE:
 					case E_BLOCK_CHEST:
 						{
+							LOG("Chest");
+							cPacket_NewInvalidState RainPacket;
+							RainPacket.m_Reason = 2; //end rain
+							Send( RainPacket );
 							bPlaceBlock = false;
 							cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 							if( BlockEntity )
@@ -971,7 +991,6 @@ void cClientHandle::Tick(float a_Dt)
 		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
 		//quick bugfix to prevent players from spawning in ground
-//		m_Player->TeleportTo( cRoot::Get()->GetWorld()->GetPosX(), cRoot::Get()->GetWorld()->GetPosY()+1, cRoot::Get()->GetWorld()->GetPosZ() );
                 m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
 
 		World->UnlockEntities();
