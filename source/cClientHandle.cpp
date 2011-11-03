@@ -57,6 +57,7 @@
 #include "packets/cPacket_EntityEquipment.h"
 #include "packets/cPacket_CreateInventoryAction.h"
 #include "packets/cPacket_NewInvalidState.h"
+#include "packets/cPacket_Thunderbolt.h" //for testing.
 #include "packets/cPacket_UseEntity.h"
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_13.h"
@@ -485,8 +486,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_DIG:
 			{
-				LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
-				LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+
+				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
+				//LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
 					LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
@@ -603,8 +605,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_PLACE:
 			{
-				LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
-                                LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
+                                //LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
                                 if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
                                         LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
@@ -642,10 +644,17 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					{
 					case E_BLOCK_WORKBENCH:
 						{
-							LOG("WorkBench");
+							////////////// For testing V
 							cPacket_NewInvalidState RainPacket;
 							RainPacket.m_Reason = 1; //begin rain
-							Send( RainPacket );
+                                                        Send( RainPacket );
+							//also strike table with lightning for test purposes
+							cPacket_Thunderbolt ThunderboltPacket;
+							ThunderboltPacket.m_xLBPos = PacketData->m_PosX;
+							ThunderboltPacket.m_yLBPos = PacketData->m_PosY;
+							ThunderboltPacket.m_zLBPos = PacketData->m_PosZ;
+							Send( ThunderboltPacket );
+							////////////// For testing ^
 							bPlaceBlock = false;
 							cWindow* Window = new cCraftingWindow( 0, true );
 							m_Player->OpenWindow( Window );
@@ -654,10 +663,11 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_FURNACE:
 					case E_BLOCK_CHEST:
 						{
-							LOG("Chest");
+							////////////// For testing V
 							cPacket_NewInvalidState RainPacket;
 							RainPacket.m_Reason = 2; //end rain
 							Send( RainPacket );
+							////////////// For testing ^
 							bPlaceBlock = false;
 							cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 							if( BlockEntity )

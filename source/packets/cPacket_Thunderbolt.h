@@ -12,7 +12,8 @@ public:
 		, m_xLBPos( 0 )
 		, m_yLBPos( 0 )
 		, m_zLBPos( 0 )
-	{ m_PacketID = E_THUNDERBOLT;}
+	{ m_PacketID = E_THUNDERBOLT; m_Unknown = true; }
+	cPacket_Thunderbolt( const cPacket_Thunderbolt & a_Copy );
 	virtual cPacket* Clone() const { return new cPacket_Thunderbolt(*this); }
 
 	bool Send(cSocket & a_Socket);
