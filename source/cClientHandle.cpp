@@ -1,3 +1,4 @@
+
 #include "cClientHandle.h"
 #include "cServer.h"
 #include "cWorld.h"
@@ -16,6 +17,7 @@
 #include "cStairs.h"
 #include "cLadder.h"
 #include "cSign.h"
+#include "cRedstoneRepeater.h"
 #include "cBlockToPickup.h"
 #include "cMonster.h"
 #include "cChatColor.h"
@@ -609,7 +611,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
                                 //LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
                                 if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
                                         LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
-					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+						m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
                                         break;
                                 }
                                 m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
@@ -639,21 +641,28 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				bool bPlaceBlock = true;
 				if( PacketData->m_Direction >= 0 )
 				{
+					bool is_redstone_dust = false;
 					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					switch( BlockID )
 					{
+					case E_BLOCK_REDSTONE_REPEATER_ON:
+					case E_BLOCK_REDSTONE_REPEATER_OFF:
+						{
+							//todo: Find meta value of repeater and change it to one step more.
+						}
+						break;
 					case E_BLOCK_WORKBENCH:
 						{
 							////////////// For testing V
 							cPacket_NewInvalidState RainPacket;
 							RainPacket.m_Reason = 1; //begin rain
-                                                        Send( RainPacket );
+                                                        cRoot::Get()->GetServer()->Broadcast( RainPacket );
 							//also strike table with lightning for test purposes
 							cPacket_Thunderbolt ThunderboltPacket;
 							ThunderboltPacket.m_xLBPos = PacketData->m_PosX;
 							ThunderboltPacket.m_yLBPos = PacketData->m_PosY;
 							ThunderboltPacket.m_zLBPos = PacketData->m_PosZ;
-							Send( ThunderboltPacket );
+							cRoot::Get()->GetServer()->Broadcast( ThunderboltPacket );
 							////////////// For testing ^
 							bPlaceBlock = false;
 							cWindow* Window = new cCraftingWindow( 0, true );
@@ -666,7 +675,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							////////////// For testing V
 							cPacket_NewInvalidState RainPacket;
 							RainPacket.m_Reason = 2; //end rain
-							Send( RainPacket );
+							cRoot::Get()->GetServer()->Broadcast( RainPacket );
 							////////////// For testing ^
 							bPlaceBlock = false;
 							cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
@@ -687,7 +696,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cItem Item;
 					Item.m_ItemID = Equipped.m_ItemID;
 					Item.m_ItemCount = 1;
-
+					LOG("PacketData->m_ItemType: %i", (int)PacketData->m_ItemType);
 					// Hacked in edible items go!~
 					bool bEat = false;
 					switch( Item.m_ItemID )
@@ -738,10 +747,26 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						break;
 
 					char MetaData = (char)Equipped.m_ItemHealth;
+					bool is_redstone_dust = false;
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
 					case E_BLOCK_TORCH:
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
+						break;
+					case E_BLOCK_REDSTONE_TORCH_OFF:
+                                                MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
+                                                break;
+					case E_BLOCK_REDSTONE_TORCH_ON:
+                                                MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
+                                                break;
+					case E_ITEM_REDSTONE_DUST:
+                                                is_redstone_dust = true;
+						PacketData->m_ItemType = E_BLOCK_REDSTONE_WIRE;
+						break;
+					case E_ITEM_REDSTONE_REPEATER:
+						LOG(" m_Player->GetRotation(): %f",  m_Player->GetRotation());
+						MetaData = cRedstoneRepeater::RotationToMetaData( m_Player->GetRotation() );
+						PacketData->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
 						break;
 					case E_BLOCK_COBBLESTONE_STAIRS:
 					case E_BLOCK_WOODEN_STAIRS:
@@ -768,7 +793,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					default:
 						break;
 					};
-
 					if( IsValidBlock( PacketData->m_ItemType) )
 					{
 						if( (m_Player->GetInventory().RemoveItem( Item )) || (m_Player->GetGameMode() == 1) )
