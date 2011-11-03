@@ -1,4 +1,3 @@
-
 #include "cClientHandle.h"
 #include "cServer.h"
 #include "cWorld.h"
@@ -764,7 +763,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_WIRE;
 						break;
 					case E_ITEM_REDSTONE_REPEATER:
-						LOG(" m_Player->GetRotation(): %f",  m_Player->GetRotation());
 						MetaData = cRedstoneRepeater::RotationToMetaData( m_Player->GetRotation() );
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
 						break;
