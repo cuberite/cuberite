@@ -1,4 +1,4 @@
-#include "timer.h"
+#include "cTimer.h"
 
 double diffclock(clock_t clock1,clock_t clock2)
 {

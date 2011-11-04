@@ -1,21 +1,11 @@
-#include "quicksort.h"
-
+#include "cQuicksort.h"
+#include <ctype.h>
 
 
 
 // Quicksort controller function, it partitions the different pieces of our array.
-void quicksort(int *arIntegers, int left, int right)
+void cQuicksort::quicksort(int *arIntegers, int left, int right)
 {
-/*    cout << "quicksort ([" << arIntegers[0] << ","
-                          << arIntegers[1] << ","
-                          << arIntegers[2] << ","
-                          << arIntegers[3] << ","
-                          << arIntegers[4] << ","
-                          << arIntegers[5] << ","
-                          << arIntegers[6] << "],"
-                          << left << ","
-                          << right << ")\n";
-*/
     if (right > left)
     {
          int pivotIndex = median3(arIntegers,left,right);
@@ -27,7 +17,7 @@ void quicksort(int *arIntegers, int left, int right)
     }
 }
 
-int median3(int *arIntegers,int left,int right)
+int cQuicksort::median3(int *arIntegers,int left,int right)
 {
         int center = (left+right)/2;
 
@@ -45,18 +35,8 @@ int median3(int *arIntegers,int left,int right)
 
 // This function takes an array (or one half an array) and sorts it.
 // It then returns a new pivot index number back to quicksort.
-int partition(int *arIntegers, int left, int right, int pivot)
+int cQuicksort::partition(int *arIntegers, int left, int right, int pivot)
 {
-/*     cout << "partition ("<< arIntegers[0] << ","
-                          << arIntegers[1] << ","
-                          << arIntegers[2] << ","
-                          << arIntegers[3] << ","
-                          << arIntegers[4] << ","
-                          << arIntegers[5] << ","
-                          << arIntegers[6] << "],"
-                          << left << ","
-                          << right << ")\n";
-*/
      int pivotValue = arIntegers[pivot];
 
      // Swap it out all the way to the end of the array
@@ -79,10 +59,9 @@ int partition(int *arIntegers, int left, int right, int pivot)
 }
 
 // Simple swap function for our in place swapping.
-void swap(int &val1, int &val2)
+void cQuicksort::swap(int &val1, int &val2)
 {
     int temp = val1;
     val1 = val2;
     val2 = temp;
 }
-

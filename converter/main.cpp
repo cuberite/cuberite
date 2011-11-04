@@ -1,13 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <stdio.h>
 //#include <string.h>
 #include <ctype.h>
 #include "zlib.h"
 #include "cNBTData.h"
-#include "timer.h"
-#include "quicksort.h"
+#include "cTimer.h"
+#include "cQuicksort.h"
 #include <dirent.h>
 //#include "dircont.h"
 
@@ -112,7 +113,9 @@ int main () {
 			if( fread( &trash, sizeof(byte4), 1, f) != 1 ) { cout << "ERROR 2jkd READING FROM FILE " << SourceFile; fclose(f); return false; }
 		}
 		frloc = 8192; //current location of fread is at 4096+ 4096 since we read through and collected important info from the header.
-                quicksort(toffarr, 0, 1023); //sort the array from smallest to larget offset locations so we only have to read through the file once.
+
+		cQuicksort Quick;
+                Quick.cQuicksort::quicksort(toffarr, 0, 1023); //sort the array from smallest to larget offset locations so we only have to read through the file once.
 
                 for ( short ia = 0; ia < 1024; ia++ ) {//a region file can hold a maximum of 1024 chunks (32*32)
 			if (ia < 3500 ) { //only run chunk # 3
@@ -129,20 +132,13 @@ int main () {
 				compdlength = ((byte1*256*256*256) + (byte2*256*256) + (byte3*256) + byte4 - 0); //length of compressed chunk data
                                 if( fread( &byte5, sizeof(byte5), 1, f) != 1 ) { cout << "ERROR 2341 READING FROM FILE " << SourceFile; fclose(f); return false; } //compression type, 1 = GZip (RFC1952) (unused in practice) , 2 = Zlib (RFC1950) 
 
-				//printf("byte1: %i\n", byte1);
-                                //printf("byte2: %i\n", byte2);
-                                //printf("byte3: %i\n", byte3);
-                                //printf("byte4: %i\n", byte4);
-                                //printf("byte5: %i\n", byte5);
-
 				frloc += 5; //moved ahead 5 bytes while reading data.
 
-				// TODO - delete [] temparr after you're done with it, now it's a memory leak
-				char* compBlockData = new char[compdlength]; //can't get fread to read more than one char at a time into a char array... so that's what I'll do.  :(    At least it works.
+				char* compBlockData = new char[compdlength];
 				if( fread( compBlockData, compdlength, 1, f) != 1 ) { cout << "ERROR rf22 READING FROM FILE " << SourceFile; fclose(f); return false; }
 				frloc = frloc + compdlength;
 
-				uLongf DestSize = 98576;// uncompressed chunks should never be larger than this
+				uLongf DestSize = 128576;// uncompressed chunks should never be larger than this
 
 				char* BlockData = new char[ DestSize ];
 
@@ -168,7 +164,6 @@ int main () {
 
 
 
-				//testing of nbtparser.
 				NumChunks++;
 				cNBTData* NBTData = new cNBTData(BlockData, (int)DestSize);
 				NBTData->ParseData();
@@ -200,37 +195,18 @@ int main () {
 				char* CompressedChunk   = new char[ CompressedSize ];
 				int UnChunkArrLoc       = 0;
 				int xPos                = NBTData->GetInteger("xPos");
-				char* xtemppos          = (char *)&xPos;
 				int zPos                = NBTData->GetInteger("zPos");
-                                char* ztemppos          = (char *)&zPos;
 
+				memcpy( t_FakeHeader + t_FakeHeaderSz + 1, &xPos, sizeof(int) );t_FakeHeaderSz += sizeof(int);
+				memcpy( t_FakeHeader + t_FakeHeaderSz + 1, &zPos, sizeof(int) );t_FakeHeaderSz += sizeof(int);
 
-				for(unsigned int i = 0; i < sizeof(int); i++) {
-					t_FakeHeader[t_FakeHeaderSz+1] = xtemppos[i];
-					t_FakeHeaderSz ++;
-				}
-                                for(unsigned int i = 0; i < sizeof(int); i++) {
-                                        t_FakeHeader[t_FakeHeaderSz+1] = ztemppos[i];
-                                        t_FakeHeaderSz ++;
-                                }
 
 				//todo: inserert json code and add it to chunk data
-                                for(unsigned int i = 0; i < 32768; i++) {
-                                        UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("Blocks")[i];
-                                        UnChunkArrLoc ++;
-                                }
-				for(unsigned int i = 0; i < 16384; i++) {
-                                        UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("Data")[i];
-                                        UnChunkArrLoc ++;
-                                }
-				for(unsigned int i = 0; i < 16384; i++) {
-					UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("BlockLight")[i];
-					UnChunkArrLoc ++;
-				}
-				for(unsigned int i = 0; i < 16384; i++) {
-                                        UncompressedChunk[ UnChunkArrLoc ] = NBTData->GetByteArray("SkyLight")[i];
-					UnChunkArrLoc ++;
-                                }
+
+				memcpy( UncompressedChunk + UnChunkArrLoc, NBTData->GetByteArray("Blocks"), 32768 );UnChunkArrLoc += 32768;
+				memcpy( UncompressedChunk + UnChunkArrLoc, NBTData->GetByteArray("Data"), 16384 );UnChunkArrLoc += 16384;
+				memcpy( UncompressedChunk + UnChunkArrLoc, NBTData->GetByteArray("BlockLight"), 16384 );UnChunkArrLoc += 16384;
+				memcpy( UncompressedChunk + UnChunkArrLoc, NBTData->GetByteArray("SkyLight"), 16384 );UnChunkArrLoc += 16384;
 
 				errorcode = compress2( (Bytef*)CompressedChunk, &CompressedSize, (const Bytef*)UncompressedChunk, UncompressedChunkSz, Z_DEFAULT_COMPRESSION);
 				if( errorcode != Z_OK )
@@ -239,34 +215,19 @@ int main () {
                                         break;
 				}
 
-				char* c_sizetemppos  = (char *)&CompressedSize;
-				char* uc_sizetemppos = (char *)&UncompressedChunkSz;
+				memcpy( t_FakeHeader + t_FakeHeaderSz + 1, &CompressedSize, sizeof(int) );t_FakeHeaderSz += sizeof(int);
+				memcpy( t_FakeHeader + t_FakeHeaderSz + 1, &UncompressedChunkSz, sizeof(int) );t_FakeHeaderSz += sizeof(int);
+				memcpy( t_CompChunk + t_CompChunkSz + 1, CompressedChunk, CompressedSize );t_CompChunkSz += CompressedSize;
 
-				for(unsigned int i = 0; i < sizeof(int); i++) {
-					t_FakeHeader[t_FakeHeaderSz+1] = c_sizetemppos[i];
-					t_FakeHeaderSz ++;
-				}
-				for(unsigned int i = 0; i < sizeof(int); i++) {
-                                        t_FakeHeader[t_FakeHeaderSz+1] = uc_sizetemppos[i];
-                                        t_FakeHeaderSz ++;
-                                }
-				for(unsigned int i = 0; i < CompressedSize; i++) {
-                                        t_CompChunk[t_CompChunkSz+1] = CompressedChunk[i];
-                                        t_CompChunkSz ++;
-                                }
-
-
-				//printf("Coord(X,Z):ChunkSize: %i,%i:%i\n", NBTData->GetInteger("xPos"), NBTData->GetInteger("zPos"), (int)CompressedSize );
 
 				NBTData->CloseCompound();// Close the compounds after you're done
 				NBTData->CloseCompound();
-
-                                //fwrite( BlockData, DestSize, 1, wf );
 
 				delete [] UncompressedChunk;
 				delete [] CompressedChunk;
 				delete [] compBlockData;
 				delete [] BlockData;
+				delete [] NBTData;
 
 				while ( (frloc < toffarr[ia+1]) && (ia<1023) ) { //loop through Notch's junk data until we get to another chunk offset possition to start the loop again
 					if( fread( &trash, sizeof(byte4), 1, f) != 1 ) { cout << "ERROR 2nkd READING FROM FILE " << SourceFile; fclose(f); return false; }
