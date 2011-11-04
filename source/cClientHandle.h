@@ -7,6 +7,7 @@ class Game;
 class cPacket;
 class cChunk;
 class cPlayer;
+class cRedstone;
 class cClientHandle							// tolua_export
 {											// tolua_export
 public:

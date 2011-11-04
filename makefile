@@ -90,6 +90,7 @@ MCServer : \
 		build/cInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
+		build/cRedstone.o\
 		build/cPawn.o\
 		build/cPickup.o\
 		build/cPlayer.o\
@@ -275,6 +276,7 @@ MCServer : \
 		build/cInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
+		build/cRedstone.o\
 		build/cPawn.o\
 		build/cPickup.o\
 		build/cPlayer.o\
@@ -463,6 +465,7 @@ clean :
 		build/cInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
+		build/cRedstone.o\
 		build/cPawn.o\
 		build/cPickup.o\
 		build/cPlayer.o\
@@ -719,6 +722,11 @@ build/cLog.o : source/cLog.cpp
 # Item # 23 -- cMonster --
 build/cMonster.o : source/cMonster.cpp
 	$(CC) $(CC_OPTIONS) source/cMonster.cpp -c $(INCLUDE) -o build/cMonster.o
+
+
+# Item # 23 -- cRedstone --
+build/cRedstone.o : source/cRedstone.cpp
+	$(CC) $(CC_OPTIONS) source/cRedstone.cpp -c $(INCLUDE) -o build/cRedstone.o
 
 
 # Item # 25 -- cPawn --

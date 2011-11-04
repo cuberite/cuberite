@@ -16,7 +16,7 @@
 #include "cStairs.h"
 #include "cLadder.h"
 #include "cSign.h"
-#include "cRedstoneRepeater.h"
+#include "cRedstone.h"
 #include "cBlockToPickup.h"
 #include "cMonster.h"
 #include "cChatColor.h"
@@ -523,6 +523,16 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						{
 							if( World->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
 							{
+								printf("OldBlock,E_BLOCK_REDSTONE_TORCH_ON: %i,%i\n", OldBlock, E_BLOCK_REDSTONE_TORCH_ON );
+								if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON) {
+									cRedstone Redstone(World);
+									Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+								}
+								if (OldBlock == E_BLOCK_REDSTONE_TORCH_OFF) {
+									cRedstone Redstone(World);
+									Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+								}
+
 								int helditem = m_Player->GetInventory().GetEquippedItem().m_ItemID;
 								bool itemhasdur = false;
 								switch(helditem)
@@ -640,7 +650,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				bool bPlaceBlock = true;
 				if( PacketData->m_Direction >= 0 )
 				{
-					bool is_redstone_dust = false;
 					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					switch( BlockID )
 					{
@@ -746,24 +755,37 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						break;
 
 					char MetaData = (char)Equipped.m_ItemHealth;
-					bool is_redstone_dust = false;
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
 					case E_BLOCK_TORCH:
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
 						break;
 					case E_BLOCK_REDSTONE_TORCH_OFF:
+						{
                                                 MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
+						//check redstone circuit:
+
+						//if( GetBlock( X, Y+1, Z ) == E_BLOCK_AIR )
+						if( g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY+2, PacketData->m_PosZ ) ] == true ) {//if block above is transparent
+							printf("transparent above me\n");
+						} else {
+							printf("transparent not above me\n");
+						}
+
+						cRedstone Redstone(m_Player->GetWorld());
+						Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, true );
+
                                                 break;
+						}
 					case E_BLOCK_REDSTONE_TORCH_ON:
                                                 MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
                                                 break;
 					case E_ITEM_REDSTONE_DUST:
-                                                is_redstone_dust = true;
+						MetaData = 0;
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_WIRE;
 						break;
 					case E_ITEM_REDSTONE_REPEATER:
-						MetaData = cRedstoneRepeater::RotationToMetaData( m_Player->GetRotation() );
+						MetaData = cRedstone::RepeaterRotationToMetaData( m_Player->GetRotation() );
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
 						break;
 					case E_BLOCK_COBBLESTONE_STAIRS:
