@@ -45,10 +45,9 @@ inline long long NetworkToHostLong8( void* a_Value )
 
 inline float NetworkToHostFloat4( void* a_Value )
 {
-	//u_long buf = *(u_long*)a_Value;
-	unsigned long buf = *(unsigned long*)a_Value;
-	buf = ntohl( (unsigned long)buf );
-	(void)printf("",(unsigned long)buf);
-	//(unsigned long)buf;
-	return *(float*)reinterpret_cast<float *>(&buf);
+	u_long buf = *(u_long*)a_Value;
+	buf = ntohl( buf );
+	float x = 0;
+	memcpy( &x, &buf, sizeof(float) );
+	return x;
 }

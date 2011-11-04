@@ -376,6 +376,9 @@
     <Filter Include="cFileFormatUpdater">
       <UniqueIdentifier>{c9b053f2-89dd-475e-a889-5c25a20e6eec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cRedstone">
+      <UniqueIdentifier>{0ee956cb-75b4-4ba5-9d85-f3a3850b8b95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -753,6 +756,9 @@
     </ClCompile>
     <ClCompile Include="..\source\cItem.cpp">
       <Filter>cItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cRedstone.cpp">
+      <Filter>cRedstone</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1166,6 +1172,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cFileFormatUpdater.h">
       <Filter>cFileFormatUpdater</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cRedstone.h">
+      <Filter>cRedstone</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

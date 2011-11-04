@@ -1,7 +1,7 @@
 #include "cRedstone.h"
 #include "cRoot.h"
 #include "cWorld.h"
-
+#include "BlockID.h"
 
 cRedstone::cRedstone( cWorld* a_World )
 	:m_World ( a_World )
