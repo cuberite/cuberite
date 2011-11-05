@@ -323,22 +323,27 @@ void cChunk::Tick(float a_Dt)
 		case E_BLOCK_DIRT:
 			{
 				char AboveBlock = GetBlock( Index+1 );
-				if( AboveBlock == 0 && GetLight( m_BlockSkyLight, Index ) > 0xf/2 ) // Half lit
+				if ( (AboveBlock == 0) && GetLight( m_BlockSkyLight, Index ) > 0xf/2 ) // Half lit //changed to not allow grass if any one hit object is on top
 				{
 					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetLight( m_BlockMeta, Index ) );
 				}
+				if ( (g_BlockOneHitDig[AboveBlock]) && GetLight( m_BlockSkyLight, Index+1 ) > 0xf/2 ) // Half lit //ch$
+                                {
+                                        FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetLight( m_BlockMeta, Index ) );
+                                }
+
 			}
 			break;
 		case E_BLOCK_GRASS:
 			{
 				char AboveBlock = GetBlock( Index+1 );
-				if( AboveBlock != 0 )
+				if (!( (AboveBlock == 0) || (g_BlockOneHitDig[AboveBlock]) ) ) //changed to not allow grass if any one hit object is on top
 				{
 					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_DIRT, GetLight( m_BlockMeta, Index ) );
 				}
 			}
 			break;
-		case E_BLOCK_SAPLING:
+		case E_BLOCK_SAPLING: //todo: check meta of sapling. change m_World->GrowTree to look change trunk and leaves based on meta of sapling
 			{
 				FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_AIR, GetLight( m_BlockMeta, Index ) );
 				m_World->GrowTree( m_BlockTickX + m_PosX*16, m_BlockTickY, m_BlockTickZ + m_PosZ*16 );
@@ -722,7 +727,7 @@ float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
 void cChunk::GenerateTerrain()
 {
 
-	
+
 	const ENUM_BLOCK_ID GrassID =	E_BLOCK_GRASS;
 	const ENUM_BLOCK_ID DirtID =	E_BLOCK_DIRT;
 	const ENUM_BLOCK_ID StoneID =	E_BLOCK_STONE;
@@ -733,8 +738,8 @@ void cChunk::GenerateTerrain()
 	const ENUM_BLOCK_ID IronID =	E_BLOCK_IRON_ORE;
 	const ENUM_BLOCK_ID GoldID =	E_BLOCK_GOLD_ORE;
 	const ENUM_BLOCK_ID DiamondID =	E_BLOCK_DIAMOND_ORE;
-	const ENUM_BLOCK_ID RedID =		E_BLOCK_REDSTONE_ORE;
-	 
+	const ENUM_BLOCK_ID RedID =	E_BLOCK_REDSTONE_ORE;
+
 	 /*
 	const ENUM_BLOCK_ID GrassID =	E_BLOCK_AIR;
 	const ENUM_BLOCK_ID DirtID =	E_BLOCK_AIR;
