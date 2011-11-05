@@ -11,15 +11,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\converter\cConvert.cpp" />
-    <ClCompile Include="..\converter\cNBTData.cpp" />
-    <ClCompile Include="..\converter\quicksort.cpp" />
-    <ClCompile Include="..\converter\timer.cpp" />
+    <ClCompile Include="..\converter\source\cDeNotch.cpp" />
+    <ClCompile Include="..\converter\source\cNBTData.cpp" />
+    <ClCompile Include="..\converter\source\cQuicksort.cpp" />
+    <ClCompile Include="..\converter\source\cTimer.cpp" />
+    <ClCompile Include="..\converter\source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\converter\cNBTData.h" />
-    <ClInclude Include="..\converter\quicksort.h" />
-    <ClInclude Include="..\converter\timer.h" />
+    <ClInclude Include="..\converter\source\cDeNotch.h" />
+    <ClInclude Include="..\converter\source\cNBTData.h" />
+    <ClInclude Include="..\converter\source\cQuicksort.h" />
+    <ClInclude Include="..\converter\source\cTimer.h" />
+    <ClInclude Include="..\converter\source\dirent.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9AB1FB82-2148-40E4-919F-3B184B4593C8}</ProjectGuid>

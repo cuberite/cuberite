@@ -1,7 +1,6 @@
 #include "cDeNotch.h"
 #include <iostream>
 #include <fstream>
-//#include <string>
 #include <cstring>
 #include <stdio.h>
 #include <ctype.h>
@@ -10,17 +9,12 @@
 #include "cTimer.h"
 #include "cQuicksort.h"
 #include "cDeNotch.h"
+#ifdef _WIN32
+#include "dirent.h"
+#else
 #include <dirent.h>
+#endif
 
-
-//int cDeNotch ( std::string, std::string );
-
-//std::string mcrSource;
-//std::string pakOutput;
-
-
-
-//using namespace std;
 
 
 cDeNotch::cDeNotch ( ) {
@@ -35,8 +29,8 @@ int cDeNotch:: Converter ( std::string mcrSource, std::string pakOutput ) {
 	FILE* f  = 0;
         FILE* wf = 0;
 	#ifdef _WIN32
-		sprintf_s(SourceFile, 128, "region/%s", mcrSource.c_str() ); //replace hard coded file with file array variable
-	        sprintf_s(OutputFile, 128, "world/%s", pakOutput.c_str() ); //parce x and z from file array variable and place into pak file format
+		sprintf_s(SourceFile, 128, "region\\%s", mcrSource.c_str() ); //replace hard coded file with file array variable
+	        sprintf_s(OutputFile, 128, "world\\%s", pakOutput.c_str() ); //parce x and z from file array variable and place into pak file format
 		if( fopen_s(&wf, OutputFile, "wb" ) == 0 ) {} else { std::cout << "uhoh!" << std::endl; return false; } //open new pak file for writing
 	#else
 		sprintf(SourceFile, "region/%s", mcrSource.c_str() ); //same as above but for linux

@@ -18,6 +18,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JsonCpp", "JsonCpp.vcxproj", "{ADBF25B9-7192-4E54-B35E-8EC47CA5EF86}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Converter", "Converter.vcxproj", "{9AB1FB82-2148-40E4-919F-3B184B4593C8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F6F43A78-816D-4C37-A07B-68BED529273A} = {F6F43A78-816D-4C37-A07B-68BED529273A}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
