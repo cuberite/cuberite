@@ -252,6 +252,7 @@
     <ClCompile Include="..\source\cNoise.cpp" />
     <ClCompile Include="..\Source\cPawn.cpp" />
     <ClCompile Include="..\source\cPig.cpp" />
+    <ClCompile Include="..\source\cPiston.cpp" />
     <ClCompile Include="..\Source\cPluginManager.cpp" />
     <ClCompile Include="..\Source\cRecipeChecker.cpp" />
     <ClCompile Include="..\source\cRedstone.cpp" />
@@ -380,6 +381,7 @@
     <ClInclude Include="..\source\cNoise.h" />
     <ClInclude Include="..\Source\cPawn.h" />
     <ClInclude Include="..\source\cPig.h" />
+    <ClInclude Include="..\source\cPiston.h" />
     <ClInclude Include="..\Source\cPluginManager.h" />
     <ClInclude Include="..\Source\cRecipeChecker.h" />
     <ClInclude Include="..\source\cRedstone.h" />
