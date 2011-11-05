@@ -10,7 +10,7 @@
 #include "cQuicksort.h"
 #include "cDeNotch.h"
 #ifdef _WIN32
-#include "dirent.h"
+#include "wdirent.h"
 #else
 #include <dirent.h>
 #endif
