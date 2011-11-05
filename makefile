@@ -91,6 +91,7 @@ MCServer : \
 		build/cLog.o\
 		build/cMonster.o\
 		build/cRedstone.o\
+		build/cPiston.o\
 		build/cPawn.o\
 		build/cPickup.o\
 		build/cPlayer.o\
@@ -277,6 +278,7 @@ MCServer : \
 		build/cLog.o\
 		build/cMonster.o\
 		build/cRedstone.o\
+		build/cPiston.o\
 		build/cPawn.o\
 		build/cPickup.o\
 		build/cPlayer.o\
@@ -466,6 +468,7 @@ clean :
 		build/cLog.o\
 		build/cMonster.o\
 		build/cRedstone.o\
+		build/cPiston.o\
 		build/cPawn.o\
 		build/cPickup.o\
 		build/cPlayer.o\
@@ -727,6 +730,11 @@ build/cMonster.o : source/cMonster.cpp
 # Item # 23 -- cRedstone --
 build/cRedstone.o : source/cRedstone.cpp
 	$(CC) $(CC_OPTIONS) source/cRedstone.cpp -c $(INCLUDE) -o build/cRedstone.o
+
+
+# Item # 23 -- cPiston --
+build/cPiston.o : source/cPiston.cpp
+	$(CC) $(CC_OPTIONS) source/cPiston.cpp -c $(INCLUDE) -o build/cPiston.o
 
 
 # Item # 25 -- cPawn --

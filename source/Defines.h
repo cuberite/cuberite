@@ -18,9 +18,9 @@ extern bool g_BlockOneHitDig[];
 inline bool IsValidBlock( int a_BlockID )	//tolua_export
 {											//tolua_export
 	if( a_BlockID > -1 &&
-		a_BlockID <= 96 && 
-		a_BlockID != 29 && 
-		a_BlockID != 33 &&
+		a_BlockID <= 121 && //items to 109 are valid for 1.8.1.. 1.9.5 is up to 121
+		//a_BlockID != 29 && allow pistons
+		//a_BlockID != 33 && allow pistons
 		a_BlockID != 34 &&
 		a_BlockID != 36 )
 	{

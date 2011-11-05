@@ -17,6 +17,7 @@
 #include "cLadder.h"
 #include "cSign.h"
 #include "cRedstone.h"
+#include "cPiston.h"
 #include "cBlockToPickup.h"
 #include "cMonster.h"
 #include "cChatColor.h"
@@ -487,7 +488,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_DIG:
 			{
-
 				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
 				//LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
@@ -788,7 +788,14 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						MetaData = cRedstone::RepeaterRotationToMetaData( m_Player->GetRotation() );
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
 						break;
+					case E_BLOCK_PISTON:
+					case E_BLOCK_STICKY_PISTON:
+						MetaData = cPiston::RotationPitchToMetaData( m_Player->GetRotation(), m_Player->GetPitch() );
+						break;
 					case E_BLOCK_COBBLESTONE_STAIRS:
+					case E_BLOCK_BRICK_STAIRS:
+					case E_BLOCK_STONE_BRICK_STAIRS:
+					case E_BLOCK_NETHER_BRICK_STAIRS:
 					case E_BLOCK_WOODEN_STAIRS:
 						MetaData = cStairs::RotationToMetaData( m_Player->GetRotation() );
 						break;
@@ -1045,9 +1052,10 @@ void cClientHandle::Tick(float a_Dt)
 		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
 		//quick bugfix to prevent players from spawning in ground
-                m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
+                //m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
 
 		World->UnlockEntities();
+		m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
 	}
 }
 
