@@ -647,6 +647,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				//printf("Place Dir:%i %i %i %i : %i\n", PacketData->m_Direction, PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_ItemType);
 				// 'use' useable items instead of placing blocks
 				bool bPlaceBlock = true;
+				bool UpdateRedstone = false;
+				bool AddedCurrent = false;
 				if( PacketData->m_Direction >= 0 )
 				{
 					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
@@ -655,6 +657,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_REDSTONE_REPEATER_ON:
 					case E_BLOCK_REDSTONE_REPEATER_OFF:
 						{
+							//no need to update redstone current with a repeater
 							//todo: Find meta value of repeater and change it to one step more.
 						}
 						break;
@@ -761,35 +764,48 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						break;
 					case E_BLOCK_REDSTONE_TORCH_OFF:
 						{
-                                                MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
+						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
 						//check redstone circuit:
-
 						//if( GetBlock( X, Y+1, Z ) == E_BLOCK_AIR )
 						if( g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY+2, PacketData->m_PosZ ) ] == true ) {//if block above is transparent
 							//printf("transparent above me\n");
 						} else {
 							//printf("transparent not above me\n");
 						}
-
-						cRedstone Redstone(m_Player->GetWorld());
-						Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, true );
-
-                                                break;
+						//PacketData->m_ItemType = E_BLOCK_REDSTONE_TORCH_ON;
+						UpdateRedstone = true;
+						AddedCurrent = true;
+						//cRedstone Redstone(m_Player->GetWorld());
+						//Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, true );
+						break;
 						}
 					case E_BLOCK_REDSTONE_TORCH_ON:
-                                                MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
-                                                break;
+						{
+						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
+						//PacketData->m_ItemType = E_BLOCK_REDSTONE_TORCH_ON;
+						UpdateRedstone = true;
+						AddedCurrent = false;
+						//cRedstone Redstone(m_Player->GetWorld());
+						//Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, true );
+						break;
+						}
 					case E_ITEM_REDSTONE_DUST:
 						MetaData = 0;
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_WIRE;
+						UpdateRedstone = true;
+						AddedCurrent = false;
 						break;
 					case E_ITEM_REDSTONE_REPEATER:
 						MetaData = cRedstone::RepeaterRotationToMetaData( m_Player->GetRotation() );
 						PacketData->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
+						UpdateRedstone = true;
+						AddedCurrent = false;
 						break;
 					case E_BLOCK_PISTON:
 					case E_BLOCK_STICKY_PISTON:
 						MetaData = cPiston::RotationPitchToMetaData( m_Player->GetRotation(), m_Player->GetPitch() );
+						UpdateRedstone = true;
+						AddedCurrent = false;
 						break;
 					case E_BLOCK_COBBLESTONE_STAIRS:
 					case E_BLOCK_BRICK_STAIRS:
@@ -829,6 +845,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							AddDirection( X, Y, Z, PacketData->m_Direction );
 
 							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
+							if (UpdateRedstone) {
+								cRedstone Redstone(m_Player->GetWorld());
+								Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
+							}
 						}
 					}
 				}
