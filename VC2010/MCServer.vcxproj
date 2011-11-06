@@ -244,6 +244,7 @@
     <ClCompile Include="..\Source\cGroupManager.cpp" />
     <ClCompile Include="..\Source\cHeartBeat.cpp" />
     <ClCompile Include="..\source\cItem.cpp" />
+    <ClCompile Include="..\source\cLavaSimulator.cpp" />
     <ClCompile Include="..\Source\cLuaCommandBinder.cpp" />
     <ClCompile Include="..\source\cMakeDir.cpp" />
     <ClCompile Include="..\source\cMCLogger.cpp" />
@@ -373,6 +374,7 @@
     <ClInclude Include="..\Source\cGroupManager.h" />
     <ClInclude Include="..\Source\cHeartBeat.h" />
     <ClInclude Include="..\Source\cLadder.h" />
+    <ClInclude Include="..\source\cLavaSimulator.h" />
     <ClInclude Include="..\Source\cLuaCommandBinder.h" />
     <ClInclude Include="..\source\cMakeDir.h" />
     <ClInclude Include="..\source\cMCLogger.h" />

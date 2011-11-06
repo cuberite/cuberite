@@ -9,6 +9,7 @@ enum ENUM_ITEM_ID;
 #include <list>
 
 class cWaterSimulator;
+class cLavaSimulator;
 class cChunkMap;
 class cItem;
 class cCriticalSection;
@@ -140,10 +141,12 @@ private:
 	float m_LastSave;
 	static float m_Time;	// Time in seconds
 	long long m_WorldTime; // Time in seconds*20, this is sent to clients (is wrapped)
+	unsigned long long CurrentTick;
 	int m_GameMode;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
 	cWaterSimulator* m_WaterSimulator;
+	cLavaSimulator* m_LavaSimulator;
 
 	cCriticalSection* m_ClientHandleCriticalSection;
 	cCriticalSection* m_EntitiesCriticalSection;

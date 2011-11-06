@@ -523,7 +523,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						{
 							if( World->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
 							{
-								printf("OldBlock,E_BLOCK_REDSTONE_TORCH_ON: %i,%i\n", OldBlock, E_BLOCK_REDSTONE_TORCH_ON );
 								if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON) {
 									cRedstone Redstone(World);
 									Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
@@ -767,9 +766,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 						//if( GetBlock( X, Y+1, Z ) == E_BLOCK_AIR )
 						if( g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY+2, PacketData->m_PosZ ) ] == true ) {//if block above is transparent
-							printf("transparent above me\n");
+							//printf("transparent above me\n");
 						} else {
-							printf("transparent not above me\n");
+							//printf("transparent not above me\n");
 						}
 
 						cRedstone Redstone(m_Player->GetWorld());
@@ -1051,11 +1050,10 @@ void cClientHandle::Tick(float a_Dt)
 		// Send health
 		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
-		//quick bugfix to prevent players from spawning in ground
-                //m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
-
 		World->UnlockEntities();
-		m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+1, m_Player->GetPosZ() );
+
+		//quick bugfix to prevent players from spawning in ground
+		m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+2, m_Player->GetPosZ() );
 	}
 }
 

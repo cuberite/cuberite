@@ -474,22 +474,22 @@ void cMonster::InStateIdle(float a_Dt) {
 void cMonster::InStateBurning(float a_Dt) {
 	m_FireDamageInterval += a_Dt;
 	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );	
+	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y +1, (int)m_Pos->z );	
 	if(m_FireDamageInterval > 1) {
 
 		m_FireDamageInterval = 0;
-		int rem = rand()%3 + 1; //Burn most of the time
-		if(rem >= 2) {
-			//printf("OUCH burning!!!\n");
-			TakeDamage(1, this);
-		}
+		TakeDamage(1, this);
+
 		m_BurnPeriod++;
 		if(block == E_BLOCK_LAVA || block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
-			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)
+			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE) {
 			m_BurnPeriod = 0;
+			TakeDamage(6, this);
+		}else{
+			TakeDamage(1, this);
+		}
 		
-		if(m_BurnPeriod > 5) {
-			
+		if(m_BurnPeriod > 8) {
 			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 			m_EMMetaState = NORMAL;
 			cPacket_Metadata md(NORMAL, GetUniqueID());

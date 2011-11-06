@@ -125,7 +125,8 @@ void cPickup::Tick(float a_Dt)
 		return;
 	}
 
-	HandlePhysics( a_Dt );
+	if(!m_bCollected)
+		HandlePhysics( a_Dt );
 
 	if( !m_bReplicated || m_bDirtyPosition )
 	{
@@ -148,13 +149,17 @@ void cPickup::HandlePhysics(float a_Dt)
 	if( m_bOnGround ) // check if it's still on the ground
 	{
 		cWorld* World = GetWorld();
-		int BlockX = (int)m_Pos->x;
-		if( m_Pos->x < 0 ) BlockX--;
-		int BlockZ = (int)m_Pos->z;
-		if( m_Pos->z < 0 ) BlockZ--;
+		int BlockX = (m_Pos->x)<0 ? (int)m_Pos->x-1 : (int)m_Pos->x;
+		int BlockZ = (m_Pos->z)<0 ? (int)m_Pos->z-1 : (int)m_Pos->z;
 		if( World->GetBlock( BlockX, (int)m_Pos->y -1, BlockZ ) == E_BLOCK_AIR )
 		{
 			m_bOnGround = false;
+		}
+		char block = World->GetBlock( BlockX, (int)m_Pos->y - (int)m_bOnGround, BlockZ );
+		if( block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_LAVA ) {
+			m_bCollected = true;
+			m_Timer = 0;
+			return;
 		}
 		if( World->GetBlock( BlockX, (int)m_Pos->y, BlockZ ) != E_BLOCK_AIR ) // If in ground itself, push it out
 		{
@@ -211,7 +216,7 @@ void cPickup::HandlePhysics(float a_Dt)
 bool cPickup::CollectedBy( cPlayer* a_Dest )
 {
 	if(m_bCollected) return false; // It's already collected!
-	if(m_Timer < 1000.f) return false; // Not old enough
+	if(m_Timer < 800.f) return false; // Not old enough
 
 	if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_COLLECT_ITEM, 2, this, a_Dest ) ) return false;
 

@@ -382,6 +382,9 @@
     <Filter Include="cPiston">
       <UniqueIdentifier>{4f551776-009b-4f05-8ab8-748b82279a67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cLavaSimulator">
+      <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -765,6 +768,9 @@
     </ClCompile>
     <ClCompile Include="..\source\cPiston.cpp">
       <Filter>cPiston</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cLavaSimulator.cpp">
+      <Filter>cLavaSimulator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1184,6 +1190,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cPiston.h">
       <Filter>cPiston</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cLavaSimulator.h">
+      <Filter>cLavaSimulator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

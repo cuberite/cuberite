@@ -22,7 +22,7 @@ protected:
 public:
 	virtual ~cBlockEntity() {};
 	virtual void Destroy() {};
-
+	
 	int GetPosX() { return m_PosX; }
 	int GetPosY() { return m_PosY; }
 	int GetPosZ() { return m_PosZ; }

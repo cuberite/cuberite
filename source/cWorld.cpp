@@ -13,6 +13,7 @@
 #include "../iniFile/iniFile.h"
 #include "cChunkMap.h"
 #include "cWaterSimulator.h"
+#include "cLavaSimulator.h"
 #include "cChicken.h"
 #include "cSpider.h"
 #include "cCow.h" //cow
@@ -46,6 +47,8 @@
 //#include <sys/stat.h>   // for mkdir
 #include <sys/types.h>
 #endif
+
+
 
 float cWorld::m_Time = 0.f;
 
@@ -94,6 +97,7 @@ cWorld::~cWorld()
 	UnlockEntities();
 
 	delete m_WaterSimulator;
+	delete m_LavaSimulator;
 
 	UnloadUnusedChunks();
 	delete m_ChunkMap;
@@ -114,9 +118,9 @@ cWorld::cWorld( const char* a_WorldName )
 	cMakeDir::MakeDir(m_pState->WorldName.c_str());
 
 	srand( (unsigned int) time(0) );
-	m_SpawnX = (double)((rand()%10000)-5000);
+	m_SpawnX = (double)((rand()%1000)-500);
 	m_SpawnY = 128;
-	m_SpawnZ = (double)((rand()%10000)-5000);
+	m_SpawnZ = (double)((rand()%1000)-500);
 	m_WorldSeed = rand();
 	m_GameMode = 0;
 
@@ -187,6 +191,7 @@ cWorld::cWorld( const char* a_WorldName )
 	m_ChunksCriticalSection = new cCriticalSection();
 
 	m_WaterSimulator = new cWaterSimulator( this );
+	m_LavaSimulator = new cLavaSimulator( this );
 
 	memset( g_BlockLightValue, 0x0, 128 );
 	memset( g_BlockSpreadLightFalloff, 0xf, 128 ); // 0xf means total falloff
@@ -263,6 +268,8 @@ void cWorld::Tick(float a_Dt)
 {
 	m_Time+=a_Dt/1000.f;
 
+	CurrentTick++;
+
 	bool bSendTime = false;
 	m_WorldTimeFraction+=a_Dt/1000.f;
 	while( m_WorldTimeFraction > 1.f )
@@ -302,7 +309,10 @@ void cWorld::Tick(float a_Dt)
 	}
 
 	m_ChunkMap->Tick(a_Dt);
-	m_WaterSimulator->Simulate(a_Dt);
+	if( CurrentTick % 6 == 0 )
+		m_WaterSimulator->Simulate(a_Dt);
+	if( CurrentTick % 12 == 0 )
+		m_LavaSimulator->Simulate(a_Dt);
 	UnlockChunks();
 
 	if( m_Time - m_LastSave > 60*5 ) // Save each 5 minutes
@@ -499,6 +509,7 @@ cChunk* cWorld::GetChunkOfBlock( int a_X, int a_Y, int a_Z )
 void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
 	m_WaterSimulator->WakeUp( a_X, a_Y, a_Z );
+	m_LavaSimulator->WakeUp( a_X, a_Y, a_Z );
 
 	int ChunkX, ChunkY, ChunkZ;
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
@@ -556,6 +567,7 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 	{
 		DestChunk->SetBlock(PosX, PosY, PosZ, 0, 0 );
 		m_WaterSimulator->WakeUp( a_X, a_Y, a_Z );
+		m_LavaSimulator->WakeUp( a_X, a_Y, a_Z );
 
 		if( !a_PickupItem.IsEmpty() )
 		{

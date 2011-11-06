@@ -40,7 +40,7 @@
 #include <sys/types.h>
 #define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
 #endif
-
+#define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
 extern std::vector< std::string > StringSplit( std::string str, std::string delim);
 
 CLASS_DEFINITION( cPlayer, cPawn );
@@ -81,7 +81,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 
 	m_TimeLastTeleportPacket = cWorld::GetTime();
 	m_TimeLastPickupCheck = cWorld::GetTime();
-
+	
 	m_pState->PlayerName = a_PlayerName;
 	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
 
@@ -104,6 +104,7 @@ cPlayer::~cPlayer(void)
 {
 	SaveToDisk();
 	m_ClientHandle = 0;
+	
 	CloseWindow();
 	if( m_Inventory )
 	{
@@ -149,6 +150,7 @@ void cPlayer::Tick(float a_Dt)
 		InChunk->Broadcast( EntityLook, m_ClientHandle );
 		m_bDirtyOrientation = false;
 	}
+	
 	if(m_bDirtyPosition )
 	{
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_MOVE, 1, this );
@@ -229,22 +231,21 @@ void cPlayer::Tick(float a_Dt)
 
 void cPlayer::InStateBurning(float a_Dt) {
 	m_FireDamageInterval += a_Dt;
-	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
-	if(m_FireDamageInterval > 1000) {
+	char block = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y), float2int(m_Pos->z) );
+	char bblock = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y)+1, float2int(m_Pos->z) );
+	if(m_FireDamageInterval > 800) {
 
 		m_FireDamageInterval = 0;
-		int rem = rand()%3 + 1; //Burn most of the time
-		if(rem >= 2) {
-			//printf("OUCH burning!!!\n");
-			TakeDamage(1, this);
-		}
+		
 		m_BurnPeriod++;
 		if(block == E_BLOCK_LAVA || block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
-			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)
+			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE) {
 			m_BurnPeriod = 0;
-
-		if(m_BurnPeriod > 5) {
+			TakeDamage(6, this);
+		}else{
+			TakeDamage(1, this);
+		}
+		if(m_BurnPeriod > 7) {
 
 			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 			e_EPMetaState = NORMAL;
@@ -261,14 +262,22 @@ void cPlayer::InStateBurning(float a_Dt) {
 
 //----Change Entity MetaData
 void cPlayer::CheckMetaDataBurn() {
-	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );
-	if(m_bBurnable && e_EPMetaState != BURNING && (block == E_BLOCK_LAVA ||  block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
+	char block = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y), float2int(m_Pos->z) );
+	char bblock = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y)+1, float2int(m_Pos->z) );
+	if(e_EPMetaState == BURNING && (block == E_BLOCK_WATER ||  block == E_BLOCK_STATIONARY_WATER
+				 || bblock == E_BLOCK_WATER ||  bblock == E_BLOCK_STATIONARY_WATER)) {
+		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		if(!InChunk)
+			return;
+		e_EPMetaState = NORMAL;
+		cPacket_Metadata md(NORMAL,GetUniqueID());
+		InChunk->Broadcast(md);
+	}else if(m_bBurnable && e_EPMetaState != BURNING && (block == E_BLOCK_LAVA ||  block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
 				 || bblock == E_BLOCK_LAVA ||  bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)) {
 		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 		if(!InChunk)
 			return;
-		printf("I should burn");
+		printf("I should burn\n");
 		e_EPMetaState = BURNING;
 		cPacket_Metadata md(BURNING,GetUniqueID());
 		InChunk->Broadcast(md);
@@ -282,7 +291,7 @@ void cPlayer::SetTouchGround( bool a_bTouchGround )
 	if( !m_bTouchGround )
 	{
 		cWorld* World = GetWorld();
-		char BlockID = World->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
+		char BlockID = World->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y), float2int(m_Pos->z) );
 		if( BlockID != E_BLOCK_AIR )
 		{
 			m_bTouchGround = true;
@@ -371,6 +380,7 @@ void cPlayer::Respawn()
 	//Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
 	Packet.m_CreativeMode = (char)m_GameMode; //Set GameMode packet based on Player's GameMode;
 	//Send Packet
+	e_EPMetaState = NORMAL;
 	m_ClientHandle->Send( Packet );
 	TeleportTo( GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ() );
 	SetVisible( true );
