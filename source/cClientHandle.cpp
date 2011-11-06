@@ -525,11 +525,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							{
 								if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON) {
 									cRedstone Redstone(World);
-									Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+									Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
 								}
 								if (OldBlock == E_BLOCK_REDSTONE_TORCH_OFF) {
 									cRedstone Redstone(World);
-									Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+									Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+								}
+								if (OldBlock == E_BLOCK_REDSTONE_WIRE) {
+									cRedstone Redstone(World);
+									Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
 								}
 
 								int helditem = m_Player->GetInventory().GetEquippedItem().m_ItemID;

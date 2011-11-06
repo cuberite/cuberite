@@ -22,7 +22,7 @@ static char RepeaterRotationToMetaData( float a_Rotation )
 }
 
 
-char LightRedstone( int, int, int, char );
+void LightRedstone( int, int, int );
 void ChangeRedstoneTorch( int, int, int, bool );
 
 
