@@ -9,9 +9,6 @@ cPiston( cWorld* a_World );
 
 static char RotationPitchToMetaData( float a_Rotation, float a_Pitch )
 {
-	//if pitch higher than this value set up
-	//else if pitch lower than this value set down,
-	//else just do rotation:
 	std::printf("pre:a_Rotation %f \n",a_Rotation);
         std::printf("a_Pitch %f \n",a_Pitch);
 
@@ -26,19 +23,20 @@ static char RotationPitchToMetaData( float a_Rotation, float a_Pitch )
 
 	        if( a_Rotation > 360.f ) a_Rotation -= 360.f;
 	        if( a_Rotation >= 0.f && a_Rotation < 90.f )
-	                return 0x4;
+	               { std::printf("1111\n");return 0x4;}
 	        else if( a_Rotation >= 180 && a_Rotation < 270 )
-	                return 0x5;
+	               { std::printf("2222\n");return 0x5;}
 	        else if( a_Rotation >= 90 && a_Rotation < 180 )
-	                return 0x2;
+	               { std::printf("3333\n");return 0x2;}
 	        else
-	                return 0x3;
+	               { std::printf("4444\n");return 0x3;}
 	}
 }
 
-
 void ExtendPiston( int, int, int );
 void RetractPiston( int, int, int );
+void ChainMove( int, int, int, int, int, int );
+int  FindFluidBlock( int, int, int, int, int, int );
 
 cWorld* m_World;
 
