@@ -252,7 +252,7 @@ void cChunk::Tick(float a_Dt)
 					SetBlock( X, Y, Z, 0, 0 );
 					if (isRedstone) {
 						cRedstone Redstone(m_World);
-						Redstone.ChangeRedstone( X, Y, Z, false );
+						Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
 					}
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
 					Pickup->Initialize( m_World );
@@ -275,7 +275,7 @@ void cChunk::Tick(float a_Dt)
 					SetBlock( X, Y, Z, 0, 0 );
 					if (isRedstone) {
 						cRedstone Redstone(m_World);
-						Redstone.ChangeRedstone( X, Y, Z, false );
+						Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
 					}
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
 					Pickup->Initialize( m_World );
