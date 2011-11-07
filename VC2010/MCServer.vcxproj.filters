@@ -385,6 +385,15 @@
     <Filter Include="cLavaSimulator">
       <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets\cPacket_Explosion">
+      <UniqueIdentifier>{0a6d025d-4fb8-4557-a348-004b819ea477}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_BlockAction">
+      <UniqueIdentifier>{e7503f74-0963-428a-a0fc-0b3bc1c81f99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_SoundEffect">
+      <UniqueIdentifier>{faf55c04-f56e-4f41-a948-54232627c3a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -771,6 +780,15 @@
     </ClCompile>
     <ClCompile Include="..\source\cLavaSimulator.cpp">
       <Filter>cLavaSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_Explosion.cpp">
+      <Filter>Packets\cPacket_Explosion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_BlockAction.cpp">
+      <Filter>Packets\cPacket_BlockAction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_SoundEffect.cpp">
+      <Filter>Packets\cPacket_SoundEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1193,6 +1211,15 @@
     </ClInclude>
     <ClInclude Include="..\source\cLavaSimulator.h">
       <Filter>cLavaSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_Explosion.h">
+      <Filter>Packets\cPacket_Explosion</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_BlockAction.h">
+      <Filter>Packets\cPacket_BlockAction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_SoundEffect.h">
+      <Filter>Packets\cPacket_SoundEffect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

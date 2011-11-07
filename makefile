@@ -122,6 +122,9 @@ MCServer : \
 		build/cPacket_AddToInventory.o\
 		build/cPacket_ArmAnim.o\
 		build/cPacket_BlockChange.o\
+		build/cPacket_BlockAction.o\
+		build/cPacket_Explosion.o\
+		build/cPacket_SoundEffect.o\
 		build/cPacket_BlockDig.o\
 		build/cPacket_BlockPlace.o\
 		build/cPacket_Chat.o\
@@ -310,6 +313,9 @@ MCServer : \
 		build/cPacket_AddToInventory.o\
 		build/cPacket_ArmAnim.o\
 		build/cPacket_BlockChange.o\
+		build/cPacket_BlockAction.o\
+		build/cPacket_Explosion.o\
+		build/cPacket_SoundEffect.o\
 		build/cPacket_BlockDig.o\
 		build/cPacket_BlockPlace.o\
 		build/cPacket_Chat.o\
@@ -501,6 +507,9 @@ clean :
 		build/cPacket_AddToInventory.o\
 		build/cPacket_ArmAnim.o\
 		build/cPacket_BlockChange.o\
+		build/cPacket_BlockAction.o\
+		build/cPacket_Explosion.o\
+		build/cPacket_SoundEffect.o\
 		build/cPacket_BlockDig.o\
 		build/cPacket_BlockPlace.o\
 		build/cPacket_Chat.o\
@@ -879,6 +888,15 @@ build/cPacket_ArmAnim.o : source/packets/cPacket_ArmAnim.cpp
 
 build/cPacket_BlockChange.o : source/packets/cPacket_BlockChange.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_BlockChange.cpp -c $(INCLUDE) -o build/cPacket_BlockChange.o
+	
+build/cPacket_BlockAction.o : source/packets/cPacket_BlockAction.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_BlockAction.cpp -c $(INCLUDE) -o build/cPacket_BlockAction.o
+	
+build/cPacket_Explosion.o : source/packets/cPacket_Explosion.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Explosion.cpp -c $(INCLUDE) -o build/cPacket_Explosion.o
+	
+build/cPacket_SoundEffect.o : source/packets/cPacket_SoundEffect.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_SoundEffect.cpp -c $(INCLUDE) -o build/cPacket_SoundEffect.o
 	
 build/cPacket_BlockDig.o : source/packets/cPacket_BlockDig.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_BlockDig.cpp -c $(INCLUDE) -o build/cPacket_BlockDig.o
