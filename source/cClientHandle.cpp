@@ -670,7 +670,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							////////////// For testing V
 							cPacket_NewInvalidState RainPacket;
 							RainPacket.m_Reason = 1; //begin rain
-                                                        cRoot::Get()->GetServer()->Broadcast( RainPacket );
+							cRoot::Get()->GetServer()->Broadcast( RainPacket );
 							//also strike table with lightning for test purposes
 							cPacket_Thunderbolt ThunderboltPacket;
 							ThunderboltPacket.m_xLBPos = PacketData->m_PosX;

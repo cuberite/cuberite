@@ -21,7 +21,7 @@ bool cPacket_BlockAction::Send(cSocket & a_Socket)
 	AppendShort		( m_PosY,  Message, i );
 	AppendInteger	( m_PosZ,  Message, i );
 	AppendByte		( m_Byte1, Message, i );
-	AppendByte		( m_Byte1, Message, i );
+	AppendByte		( m_Byte2, Message, i );
 
 	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
 	delete [] Message;

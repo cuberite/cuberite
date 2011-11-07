@@ -2,6 +2,8 @@
 #include "cRoot.h"
 #include "cWorld.h"
 #include "BlockID.h"
+#include "packets/cPacket_BlockAction.h"
+#include "cServer.h"
 
 cPiston::cPiston( cWorld* a_World )
 	:m_World ( a_World )
@@ -27,12 +29,21 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		metadata = m_World->GetBlockMeta( pistx, pisty, pistz);
 
 		if ((int)metadata < 6) { //piston not extended
+
+			//send blockaction packet
+			cPacket_BlockAction Action;
+		  Action.m_PosX		= (int)pistx;
+		  Action.m_PosY		= (short)pisty;
+		  Action.m_PosZ		= (int)pistz;
+		  Action.m_Byte1	=	0;
+		  
 			switch  ((int)metadata) {
 				case 0:
 					FirstFluidBlock = FindFluidBlock ( pistx, pisty-1, pistz, pistx, pisty-16, pistz );
 					if (FirstFluidBlock > 0) {
 						ChainMove ( pistx, pisty, pistz, pistx, pisty-FirstFluidBlock, pistz );
 					}
+					Action.m_Byte2	=	0;
 					m_World->FastSetBlock( pistx, pisty, pistz, piston, (char)metadata + 8 );
 					m_World->SetBlock( pistx, pisty-1, pistz, E_BLOCK_PISTON_EXTENSION, extmetadata );
 					break;
@@ -41,6 +52,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 					if (FirstFluidBlock > 0) {
 						ChainMove ( pistx, pisty, pistz, pistx, pisty+FirstFluidBlock, pistz );
 					}
+					Action.m_Byte2	=	1;
 					m_World->FastSetBlock( pistx, pisty, pistz, piston, (char)metadata + 8 );
 					m_World->SetBlock( pistx, pisty+1, pistz, E_BLOCK_PISTON_EXTENSION, extmetadata+1 );
 					break;
@@ -49,6 +61,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 					if (FirstFluidBlock > 0) {
 						ChainMove ( pistx, pisty, pistz, pistx, pisty, pistz-FirstFluidBlock );
 					}
+					Action.m_Byte2	=	2;
 					m_World->FastSetBlock( pistx, pisty, pistz, piston, (char)metadata + 8 );
 					m_World->SetBlock( pistx, pisty, pistz-1, E_BLOCK_PISTON_EXTENSION, extmetadata+2 );
 					break;
@@ -57,6 +70,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 					if (FirstFluidBlock > 0) {
 						ChainMove ( pistx, pisty, pistz, pistx, pisty, pistz+FirstFluidBlock );
 					}
+					Action.m_Byte2	=	3;
 					m_World->FastSetBlock( pistx, pisty, pistz, piston, (char)metadata + 8 );
 					m_World->SetBlock( pistx, pisty, pistz+1, E_BLOCK_PISTON_EXTENSION, extmetadata+3 );
 					break;
@@ -65,6 +79,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 					if (FirstFluidBlock > 0) {
 						ChainMove ( pistx, pisty, pistz, pistx-FirstFluidBlock, pisty, pistz );
 					}
+					Action.m_Byte2	=	4;
 					m_World->FastSetBlock( pistx, pisty, pistz, piston, metadata + 8 );
 					m_World->SetBlock( pistx-1, pisty, pistz, E_BLOCK_PISTON_EXTENSION, extmetadata+4 );
 					break;
@@ -73,10 +88,12 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 					if (FirstFluidBlock > 0) {
 						ChainMove ( pistx, pisty, pistz, pistx+FirstFluidBlock, pisty, pistz );
 					}
+					Action.m_Byte2	=	5;
 					m_World->FastSetBlock( pistx, pisty, pistz, piston, metadata + 8 );
 					m_World->SetBlock( pistx+1, pisty, pistz, E_BLOCK_PISTON_EXTENSION, extmetadata+5 );
 					break;
 			}
+			cRoot::Get()->GetServer()->Broadcast( Action );
 		}
 	}
 }
@@ -91,45 +108,59 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 			if (metadata > 5) { //piston retracted
 			metadata -= 8;//set the piston to retracted state.
 
-			m_World->FastSetBlock( pistx, pisty, pistz, m_World->GetBlock( pistx, pisty, pistz ), metadata  );
+			//send blockaction packet
+			cPacket_BlockAction Action;
+		  Action.m_PosX		= (int)pistx;
+		  Action.m_PosY		= (short)pisty;
+		  Action.m_PosZ		= (int)pistz;
+		  Action.m_Byte1	=	1;
+
 			switch  (metadata) {
 			case 0:
+				Action.m_Byte2	=	0;
 				if ( m_World->GetBlock( pistx, pisty-1, pistz ) ==  E_BLOCK_PISTON_EXTENSION ) {
 					m_World->SetBlock( pistx, pisty-1, pistz, 0, 0 );
 				}
 				break;
 
 			case 1:
+				Action.m_Byte2	=	1;
 				if ( m_World->GetBlock( pistx, pisty+1, pistz ) ==  E_BLOCK_PISTON_EXTENSION ) {
 					m_World->SetBlock( pistx, pisty+1, pistz, 0, 0 );
 				}
 				break;
 
 			case 2:
+				Action.m_Byte2	=	2;
 				if ( m_World->GetBlock( pistx, pisty, pistz-1 ) ==  E_BLOCK_PISTON_EXTENSION ) {
 					m_World->SetBlock( pistx, pisty, pistz-1, 0, 0 );
 				}
 				break;
 
 			case 3:
+				Action.m_Byte2	=	3;
 				if ( m_World->GetBlock( pistx, pisty, pistz+1 ) ==  E_BLOCK_PISTON_EXTENSION ) {
 					m_World->SetBlock( pistx, pisty, pistz+1, 0, 0 );
 				}
 				break;
 
 			case 4:
+				Action.m_Byte2	=	4;
 				if ( m_World->GetBlock( pistx-1, pisty, pistz ) ==  E_BLOCK_PISTON_EXTENSION ) {
 					m_World->SetBlock( pistx-1, pisty, pistz, 0, 0 );
 				}
 				break;
 
 			case 5:
+				Action.m_Byte2	=	5;
 				if ( m_World->GetBlock( pistx+1, pisty, pistz ) ==  E_BLOCK_PISTON_EXTENSION ) {
 					m_World->SetBlock( pistx+1, pisty, pistz, 0, 0 );
 				}
 				break;
 
 			}
+			m_World->FastSetBlock( pistx, pisty, pistz, m_World->GetBlock( pistx, pisty, pistz ), metadata  );
+			cRoot::Get()->GetServer()->Broadcast( Action );
 		}
 	}
 
@@ -137,9 +168,17 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	if ( (int)m_World->GetBlock( pistx, pisty, pistz ) == E_BLOCK_STICKY_PISTON ) {
 		if (metadata > 5) { //piston retracted
 			metadata -= 8;//set the piston to retracted state.
-			m_World->FastSetBlock( pistx, pisty, pistz, m_World->GetBlock( pistx, pisty, pistz ), metadata  );
+
+			//send blockaction packet
+			cPacket_BlockAction Action;
+		  Action.m_PosX		= (int)pistx;
+		  Action.m_PosY		= (short)pisty;
+		  Action.m_PosZ		= (int)pistz;
+		  Action.m_Byte1	=	1;
+
 			switch  (metadata) {
 				case 0:
+					Action.m_Byte2	=	0;
 					if ( m_World->GetBlock( pistx, pisty-1, pistz ) ==  E_BLOCK_PISTON_EXTENSION ) {
 						tempblock =  m_World->GetBlock( pistx, pisty-2, pistz );
 						tempmeta = m_World->GetBlockMeta( pistx, pisty-2, pistz );
@@ -150,6 +189,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 					break;
 
 				case 1:
+					Action.m_Byte2	=	1;
 					if ( m_World->GetBlock( pistx, pisty+1, pistz ) == E_BLOCK_PISTON_EXTENSION ) {
 						tempblock = m_World->GetBlock( pistx, pisty+2, pistz );
 						tempmeta = m_World->GetBlockMeta( pistx, pisty+2, pistz );
@@ -159,6 +199,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 					}
 					break;
 				case 2:
+					Action.m_Byte2	=	2;
 					if ( m_World->GetBlock( pistx, pisty, pistz-1) ==  E_BLOCK_PISTON_EXTENSION ) {
 						tempblock = m_World->GetBlock( pistx, pisty, pistz-2 );
 						tempmeta = m_World->GetBlockMeta( pistx, pisty, pistz-2 );
@@ -168,6 +209,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 					}
 					break;
 				case 3:
+					Action.m_Byte2	=	3;
 					if ( m_World->GetBlock( pistx, pisty, pistz+1) ==  E_BLOCK_PISTON_EXTENSION ) {
 						tempblock = m_World->GetBlock( pistx, pisty, pistz+2 );
 						tempmeta = m_World->GetBlockMeta( pistx, pisty, pistz+2 );
@@ -177,6 +219,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 					}
 					break;
 				case 4:
+					Action.m_Byte2	=	4;
 					if ( m_World->GetBlock( pistx-1, pisty, pistz) ==  E_BLOCK_PISTON_EXTENSION ) {
 						tempblock = m_World->GetBlock( pistx-2, pisty, pistz );
 						tempmeta = m_World->GetBlockMeta( pistx-2, pisty, pistz );
@@ -186,6 +229,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 					}
 					break;
 				case 5:
+					Action.m_Byte2	=	5;
 					if ( m_World->GetBlock( pistx+1, pisty, pistz) == E_BLOCK_PISTON_EXTENSION ) {
 						tempblock = m_World->GetBlock( pistx+2, pisty, pistz );
 						tempmeta = m_World->GetBlockMeta( pistx+2, pisty, pistz );
@@ -195,6 +239,8 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 					}
 					break;
 			}
+			m_World->FastSetBlock( pistx, pisty, pistz, m_World->GetBlock( pistx, pisty, pistz ), metadata  );
+			cRoot::Get()->GetServer()->Broadcast( Action );
 		}
 	}
 }
