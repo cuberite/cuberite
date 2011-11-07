@@ -4,6 +4,7 @@
 #include "cBlockToPickup.h"
 #include "cItem.h"
 #include "cRoot.h"
+#include "cClientHandle.h"
 #include "cWorld.h"
 #include "BlockID.h"
 #include "packets/cPacket_BlockAction.h"
@@ -14,6 +15,7 @@ extern bool g_BlockPistonBreakable[];
 #define AddDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
 													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
 													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
+#define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
 
 cPiston::cPiston( cWorld* a_World )
 	:m_World ( a_World )
@@ -71,7 +73,8 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 	Action.m_PosZ		= (int)pistz;
 	Action.m_Byte1	=	0;
 	Action.m_Byte2	=	pistonMeta;
-	cRoot::Get()->GetServer()->Broadcast( Action );
+	cChunk* Chunk 	= m_World->GetChunk( FAST_FLOOR(pistx/16), FAST_FLOOR(pisty/16), FAST_FLOOR(pistz/16)  );
+	Chunk->Broadcast( Action );
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 8 );
 	
 	int extx = pistx;
@@ -94,7 +97,8 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz ) {
 	Action.m_PosZ		= (int)pistz;
 	Action.m_Byte1	=	1;
 	Action.m_Byte1	=	pistonMeta & ~(8);
-	cRoot::Get()->GetServer()->Broadcast( Action );
+	cChunk* Chunk 	= m_World->GetChunk( FAST_FLOOR(pistx/16), FAST_FLOOR(pisty/16), FAST_FLOOR(pistz/16) );
+	Chunk->Broadcast( Action );
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8) );
 	
 	AddDir( pistx, pisty, pistz, pistonMeta & 7, 1 )
