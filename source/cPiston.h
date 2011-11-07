@@ -35,9 +35,11 @@ static char RotationPitchToMetaData( float a_Rotation, float a_Pitch )
 
 void ExtendPiston( int, int, int );
 void RetractPiston( int, int, int );
-void ChainMove( int, int, int, int, int, int );
-int  FindFluidBlock( int, int, int, int, int, int );
 
 cWorld* m_World;
+
+private:
+void ChainMove( int, int, int, char, unsigned short * );
+unsigned short FirstPassthroughBlock( int, int, int, char );
 
 };

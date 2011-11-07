@@ -13,12 +13,24 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		return E_ITEM_COBBLESTONE;
 	case E_BLOCK_GRASS:
 		return E_ITEM_DIRT;
+	case E_BLOCK_GLASS:
+		return E_ITEM_EMPTY;
 	case E_BLOCK_DIRT:
 		return E_ITEM_DIRT;
 	case E_BLOCK_LOG:
 		return E_ITEM_LOG;
+	case E_BLOCK_LEAVES:
+		if( a_UsedItemID == E_ITEM_SHEARS )
+			return E_ITEM_LEAVES;
+		else
+			return E_ITEM_EMPTY;
 	case E_BLOCK_COAL_ORE:
 		return E_ITEM_COAL;
+	case E_BLOCK_LAPIS_ORE:
+		return E_ITEM_DYE;
+	case E_BLOCK_REDSTONE_ORE_GLOWING:
+	case E_BLOCK_REDSTONE_ORE:
+		return E_ITEM_REDSTONE_DUST;
 	case E_BLOCK_DIAMOND_ORE:
 		return E_ITEM_DIAMOND;
 	case E_BLOCK_IRON_BLOCK:
@@ -30,6 +42,12 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 	case E_BLOCK_SIGN_POST:
 	case E_BLOCK_WALLSIGN:
 		return E_ITEM_SIGN;
+	case E_BLOCK_REDSTONE_WIRE:
+		return E_ITEM_REDSTONE_DUST;
+	case E_BLOCK_REDSTONE_TORCH_OFF:
+		return E_ITEM_REDSTONE_TORCH_ON;
+	case E_BLOCK_MELON:
+		return E_ITEM_MELON_SLICE;
 	default:
 		return (ENUM_ITEM_ID)a_BlockID;
 	}

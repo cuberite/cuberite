@@ -56,6 +56,7 @@ char g_BlockLightValue[128];
 char g_BlockSpreadLightFalloff[128];
 bool g_BlockTransparent[128];
 bool g_BlockOneHitDig[128];
+bool g_BlockPistonBreakable[128];
 
 #define RECI_RAND_MAX (1.f/RAND_MAX)
 inline float fRadRand( float a_Radius )
@@ -197,6 +198,7 @@ cWorld::cWorld( const char* a_WorldName )
 	memset( g_BlockSpreadLightFalloff, 0xf, 128 ); // 0xf means total falloff
 	memset( g_BlockTransparent, 0x0, 128 );
 	memset( g_BlockOneHitDig, 0x0, 128 );
+	memset( g_BlockPistonBreakable, 0x0, 128 );
 
 	// Emissive blocks
 	g_BlockLightValue[ E_BLOCK_TORCH ] =			14;
@@ -245,6 +247,42 @@ cWorld::cWorld( const char* a_WorldName )
 	g_BlockOneHitDig[ E_BLOCK_REDSTONE_REPEATER_OFF ]		= true;
 	g_BlockOneHitDig[ E_BLOCK_REDSTONE_REPEATER_ON ]		= true;
 	g_BlockOneHitDig[ E_BLOCK_LOCKED_CHEST ]		= true;
+
+	// Blocks that breaks when pushed by piston
+	g_BlockPistonBreakable[ E_BLOCK_AIR ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_WATER ]	= true;
+	g_BlockPistonBreakable[ E_BLOCK_WATER ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_LAVA ]	= true;
+	g_BlockPistonBreakable[ E_BLOCK_LAVA ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_BED ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_COBWEB ]			= true;
+	g_BlockPistonBreakable[ E_BLOCK_TALL_GRASS ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_YELLOW_FLOWER ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_BROWN_MUSHROOM ]	= true;
+	g_BlockPistonBreakable[ E_BLOCK_RED_ROSE ]			= true;
+	g_BlockPistonBreakable[ E_BLOCK_RED_MUSHROOM ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_DEAD_BUSH ]			= true;
+	g_BlockPistonBreakable[ E_BLOCK_TORCH ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_FIRE ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_REDSTONE_WIRE ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_CROPS ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_LADDER ]			= true;
+	g_BlockPistonBreakable[ E_BLOCK_WOODEN_DOOR ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_IRON_DOOR ]			= true;
+	g_BlockPistonBreakable[ E_BLOCK_LEVER ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_STONE_BUTTON ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_REDSTONE_TORCH_ON ]	= true;
+	g_BlockPistonBreakable[ E_BLOCK_REDSTONE_TORCH_OFF ]= true;
+	g_BlockPistonBreakable[ E_BLOCK_SNOW ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_REEDS ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_PUMPKIN_STEM ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_MELON_STEM ]		= true;
+	g_BlockPistonBreakable[ E_BLOCK_MELON ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_PUMPKIN ]			= true;
+	g_BlockPistonBreakable[ E_BLOCK_JACK_O_LANTERN ]	= true;
+	g_BlockPistonBreakable[ E_BLOCK_VINES ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_STONE_PRESSURE_PLATE ] = true;
+	g_BlockPistonBreakable[ E_BLOCK_WOODEN_PRESSURE_PLATE ] = true;
 
 }
 

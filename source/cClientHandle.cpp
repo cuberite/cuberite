@@ -516,6 +516,16 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						PickupItem.m_ItemID = PickupID;
 						PickupItem.m_ItemHealth = MetaData;
 						PickupItem.m_ItemCount = 1;
+						if( OldBlock == E_BLOCK_LAPIS_ORE ) {
+							PickupItem.m_ItemHealth = 4;
+							PickupItem.m_ItemCount = rand()%5+4;
+						}
+						if( OldBlock == E_BLOCK_REDSTONE_ORE || OldBlock == E_BLOCK_REDSTONE_ORE_GLOWING ) {
+							PickupItem.m_ItemCount = rand()%2+4;
+						}
+						if( OldBlock == E_BLOCK_MELON ) {
+							PickupItem.m_ItemCount = rand()%8+3;
+						}
 					}
 					if(!cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_DIG, 2, PacketData, m_Player, &PickupItem ) )
 					{
@@ -620,16 +630,19 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		case E_BLOCK_PLACE:
 			{
 				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
-                                //LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
-                                if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
-                                        LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
-						m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-                                        break;
-                                }
-                                m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+				//LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
+					LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
+					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+					break;
+				}
+				m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 				//if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
+				if ( ( m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ ) != E_BLOCK_AIR ) && (m_Player->GetGameMode() != 1) ) { //tried to place a block *into* another?
+					break;	//happens when you place a block aiming at side of block like torch or stem
+				}
 				if( (Equipped.m_ItemID != PacketData->m_ItemType) && (m_Player->GetGameMode() != 1) )	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
@@ -776,21 +789,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						} else {
 							//printf("transparent not above me\n");
 						}
-						//PacketData->m_ItemType = E_BLOCK_REDSTONE_TORCH_ON;
 						UpdateRedstone = true;
 						AddedCurrent = true;
-						//cRedstone Redstone(m_Player->GetWorld());
-						//Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, true );
 						break;
 						}
 					case E_BLOCK_REDSTONE_TORCH_ON:
 						{
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
-						//PacketData->m_ItemType = E_BLOCK_REDSTONE_TORCH_ON;
 						UpdateRedstone = true;
 						AddedCurrent = false;
-						//cRedstone Redstone(m_Player->GetWorld());
-						//Redstone.cRedstone::ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, true );
 						break;
 						}
 					case E_ITEM_REDSTONE_DUST:
