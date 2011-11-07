@@ -71,6 +71,10 @@
 #define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
 #endif
 
+#define AddPistonDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
+													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
+													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
+
 #define MAX_SEMAPHORES (2000)
 
 typedef std::list<cPacket*> PacketList;
@@ -535,15 +539,24 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							{
 								if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON) {
 									cRedstone Redstone(World);
-									Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+									Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
 								}
 								if (OldBlock == E_BLOCK_REDSTONE_TORCH_OFF) {
 									cRedstone Redstone(World);
-									Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+									Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
 								}
 								if (OldBlock == E_BLOCK_REDSTONE_WIRE) {
 									cRedstone Redstone(World);
-									Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+									Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
+								}
+								if (( OldBlock == E_BLOCK_PISTON) || (OldBlock == E_BLOCK_STICKY_PISTON) ) {
+									int newX = PacketData->m_PosX;
+									int newY = PacketData->m_PosY;
+									int newZ = PacketData->m_PosZ;
+									AddPistonDir( newX, newY, newZ, MetaData & ~(8), 1 )
+									if (World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION) {
+										World->SetBlock( newX, newY, newZ, E_BLOCK_AIR, 0 );
+									}
 								}
 
 								int helditem = m_Player->GetInventory().GetEquippedItem().m_ItemID;
@@ -629,6 +642,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_PLACE:
 			{
+				
 				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
 				//LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
@@ -640,9 +654,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 				//if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
-				if ( ( m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ ) != E_BLOCK_AIR ) && (m_Player->GetGameMode() != 1) ) { //tried to place a block *into* another?
-					break;	//happens when you place a block aiming at side of block like torch or stem
-				}
+
 				if( (Equipped.m_ItemID != PacketData->m_ItemType) && (m_Player->GetGameMode() != 1) )	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
@@ -776,6 +788,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					char MetaData = (char)Equipped.m_ItemHealth;
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
+					case E_BLOCK_WHITE_CLOTH:
+						MetaData = (char)PacketData->m_Uses;
+						break;
 					case E_BLOCK_TORCH:
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
 						break;
@@ -790,14 +805,14 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							//printf("transparent not above me\n");
 						}
 						UpdateRedstone = true;
-						AddedCurrent = true;
+						AddedCurrent = false;
 						break;
 						}
 					case E_BLOCK_REDSTONE_TORCH_ON:
 						{
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
 						UpdateRedstone = true;
-						AddedCurrent = false;
+						AddedCurrent = true;
 						break;
 						}
 					case E_ITEM_REDSTONE_DUST:
@@ -848,17 +863,21 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					};
 					if( IsValidBlock( PacketData->m_ItemType) )
 					{
-						if( (m_Player->GetInventory().RemoveItem( Item )) || (m_Player->GetGameMode() == 1) )
+						int X = PacketData->m_PosX;
+						char Y = PacketData->m_PosY;
+						int Z = PacketData->m_PosZ;
+						AddDirection( X, Y, Z, PacketData->m_Direction );
+						if( m_Player->GetWorld()->GetBlock( X, Y, Z ) != E_BLOCK_AIR ) { //tried to place a block *into* another?
+							break;	//happens when you place a block aiming at side of block like torch or stem
+						}
+						
+						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) )
 						{
-							int X = PacketData->m_PosX;
-							char Y = PacketData->m_PosY;
-							int Z = PacketData->m_PosZ;
-							AddDirection( X, Y, Z, PacketData->m_Direction );
-
+							
 							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
 							if (UpdateRedstone) {
 								cRedstone Redstone(m_Player->GetWorld());
-								Redstone.ChangeRedstoneTorch( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
+								Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
 							}
 						}
 					}

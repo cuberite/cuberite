@@ -19,10 +19,12 @@
 #include "cTorch.h"
 #include "cLadder.h"
 #include "cPickup.h"
+#include "cRedstone.h"
 #include "cItem.h"
 #include "cNoise.h"
 #include "cRoot.h"
 #include "cCriticalSection.h"
+#include "cBlockToPickup.h"
 
 #include "cGenSettings.h"
 
@@ -215,6 +217,7 @@ void cChunk::Tick(float a_Dt)
 	unsigned int NumTickBlocks = ToTickBlocks.size();
 	if( NumTickBlocks > 0 ) LOG("To tick: %i", NumTickBlocks );
 	m_pState->m_ToTickBlocks.clear();
+	bool isRedstone = false;
 	for( std::map< unsigned int, int>::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
 	{
 		if( (*itr).second < 0 ) continue;
@@ -226,6 +229,12 @@ void cChunk::Tick(float a_Dt)
 		char BlockID = GetBlock( index );
 		switch( BlockID )
 		{
+		case E_BLOCK_REDSTONE_REPEATER_OFF:
+		case E_BLOCK_REDSTONE_REPEATER_ON:
+		case E_BLOCK_REDSTONE_WIRE:
+			{
+				isRedstone = true;
+			}
 		case E_BLOCK_REEDS:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
@@ -236,19 +245,23 @@ void cChunk::Tick(float a_Dt)
 		case E_BLOCK_YELLOW_FLOWER:
 		case E_BLOCK_RED_ROSE:
 		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_REDSTONE_WIRE:		// Stuff that drops when block below is destroyed
+		case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
 			{
 				if( GetBlock( X, Y-1, Z ) == E_BLOCK_AIR )
 				{
 					SetBlock( X, Y, Z, 0, 0 );
-					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
+					if (isRedstone) {
+						cRedstone Redstone(m_World);
+						Redstone.ChangeRedstone( X, Y, Z, false );
+					}
+					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
 					Pickup->Initialize( m_World );
 				}
 			}
 			break;
 		case E_BLOCK_REDSTONE_TORCH_OFF:
 		case E_BLOCK_REDSTONE_TORCH_ON:
+				isRedstone = true;
 		case E_BLOCK_TORCH:
 			{
 				char Dir = cTorch::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
@@ -260,7 +273,11 @@ void cChunk::Tick(float a_Dt)
 				if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
 				{
 					SetBlock( X, Y, Z, 0, 0 );
-					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
+					if (isRedstone) {
+						cRedstone Redstone(m_World);
+						Redstone.ChangeRedstone( X, Y, Z, false );
+					}
+					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
 					Pickup->Initialize( m_World );
 				}
 			}

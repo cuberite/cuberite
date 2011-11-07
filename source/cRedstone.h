@@ -22,8 +22,8 @@ static char RepeaterRotationToMetaData( float a_Rotation )
 }
 
 
-void LightRedstone( int, int, int );
-void ChangeRedstoneTorch( int, int, int, bool );
+void CalculatetRedstone( int, int, int );
+void ChangeRedstone( int, int, int, bool );
 
 
 cWorld* m_World;
