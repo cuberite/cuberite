@@ -787,7 +787,6 @@
     <ClCompile Include="..\source\SquirrelBindings.cpp">
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClCompile>
-  </ItemGroup>
     <ClCompile Include="..\source\packets\cPacket_Explosion.cpp">
       <Filter>Packets\cPacket_Explosion</Filter>
     </ClCompile>
