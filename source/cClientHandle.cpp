@@ -69,6 +69,7 @@
 
 #ifndef _WIN32
 #define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
+#include <stdlib.h> // rand()
 #endif
 
 #define AddPistonDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\

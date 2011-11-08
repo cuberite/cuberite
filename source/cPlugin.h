@@ -41,7 +41,7 @@ public:
 	virtual bool OnDisconnect( std::string a_Reason, cPlayer* a_Player );
 	virtual bool OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player );
 	virtual bool OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) { (void)a_PacketData; (void)a_Player; (void)a_PickupItem; return false; }
-	virtual bool OnChat( std::string a_Chat, cPlayer* a_Player );
+	virtual bool OnChat( const char* a_Chat, cPlayer* a_Player );
 	virtual bool OnLogin( cPacket_Login* a_PacketData );
 	virtual void OnPlayerSpawn( cPlayer* a_Player );
 	virtual bool OnPlayerJoin( cPlayer* a_Player );
@@ -50,8 +50,8 @@ public:
 	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) { (void)a_Killed; (void)a_Killer; return false; }
 
 	// Accessors
-	std::string GetName() const { return m_Name; }
-	void SetName( std::string a_Name ) { m_Name = a_Name; }
+	const char* GetName() const { return m_Name.c_str(); }
+	void SetName( const char* a_Name ) { m_Name = a_Name; }
 
 	int GetVersion() const { return m_Version; }
 	void SetVersion( int a_Version ) { m_Version = a_Version; }
@@ -69,7 +69,19 @@ public:
 	void BindCommand( FuncCommandHandler* a_Function, std::string & a_Command );		// >> EXPORTED IN MANUALBINDINGS <<
 	const std::vector< CommandStruct > & GetCommands() const { return m_Commands; }		// >> EXPORTED IN MANUALBINDINGS <<
 
+
+	/* This should not be exposed to scripting languages */
+	enum PluginLanguage
+	{
+		E_CPP,
+		E_LUA,
+		E_SQUIRREL,
+	};
+	PluginLanguage GetLanguage() { return m_Language; }
+	void SetLanguage( PluginLanguage a_Language ) { m_Language = a_Language; }
+
 private:
+	PluginLanguage m_Language;
 	std::vector< CommandStruct > m_Commands;
 	std::string m_Name;
 	int m_Version;

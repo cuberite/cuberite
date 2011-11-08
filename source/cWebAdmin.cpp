@@ -109,7 +109,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				const cPluginManager::PluginList & List = PM->GetAllPlugins();
 				for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
 				{
-					Content += (*itr)->GetName() + "<br>";
+					Content += std::string( (*itr)->GetName() ) + "<br>";
 				}
 				Content += "</p>";
 				Content += "<h4>Players:</h4><p>";

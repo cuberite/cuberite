@@ -5,6 +5,7 @@
 
 cPlugin::cPlugin()
 	: m_Version( 0 )
+	, m_Language( E_CPP )
 {
 }
 
@@ -44,7 +45,7 @@ bool cPlugin::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
 	return false;
 }
 
-bool cPlugin::OnChat( std::string a_Chat, cPlayer* a_Player )
+bool cPlugin::OnChat( const char* a_Chat, cPlayer* a_Player )
 {
 	(void)a_Chat;
 	(void)a_Player;

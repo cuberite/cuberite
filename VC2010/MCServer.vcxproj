@@ -78,7 +78,7 @@
     <ClCompile>
       <AdditionalOptions>/ZI /D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -94,7 +94,7 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;squirrel_3_0_1_stable.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../$(ProjectName)_debug.exe</OutputFile>
       <AdditionalLibraryDirectories>VLD;./Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -145,10 +145,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ExceptionHandling>Sync</ExceptionHandling>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -161,10 +158,11 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;libCMT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;squirrel_3_0_1_stable.lib;LIBCMT.LIB;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>./Release/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -350,6 +348,7 @@
     <ClCompile Include="..\source\packets\cPacket_WindowClick.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp" />
+    <ClCompile Include="..\source\SquirrelBindings.cpp" />
     <ClCompile Include="..\source\Vector3d.cpp" />
     <ClCompile Include="..\source\Vector3f.cpp" />
     <ClCompile Include="..\source\Vector3i.cpp" />
@@ -498,6 +497,7 @@
     <ClInclude Include="..\source\packets\cPacket_WindowClick.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
+    <ClInclude Include="..\source\SquirrelBindings.h" />
     <ClInclude Include="..\source\Vector3d.h" />
     <ClInclude Include="..\source\Vector3f.h" />
     <ClInclude Include="..\source\Vector3i.h" />

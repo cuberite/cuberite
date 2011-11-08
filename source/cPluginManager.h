@@ -34,7 +34,7 @@ public:																	//tolua_export
 	static cPluginManager * GetPluginManager();							//tolua_export
 
 	typedef std::list< cPlugin* > PluginList;
-	cPlugin* GetPlugin( std::string a_Plugin );							//tolua_export
+	cPlugin* GetPlugin( const char* a_Plugin );							//tolua_export
 	const PluginList & GetAllPlugins();									// >> EXPORTED IN MANUALBINDINGS <<
 
 	void ReloadPlugins();												//tolua_export
@@ -47,6 +47,7 @@ public:																	//tolua_export
 
 	bool CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... );
 
+	void RemoveHooks( cPlugin* a_Plugin );
 	void RemovePlugin( cPlugin* a_Plugin, bool a_bDelete = false );		//tolua_export
 	void RemoveLuaPlugin( std::string a_FileName );						//tolua_export
 	cPlugin_Lua* GetLuaPlugin( lua_State* a_State );					//tolua_export

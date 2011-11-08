@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<!DOCTYPE CodeBlocks_project_file>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="1"/>
+	<Project>
+		<Option title="sqplus"/>
+		<Option makefile="Makefile"/>
+		<Option makefile_is_custom="0"/>
+		<Option default_target="-1"/>
+		<Option compiler="0"/>
+		<Build>
+			<Target title="Debug">
+				<Option output="..\lib\libsqplusD.a"/>
+				<Option working_dir=""/>
+				<Option object_output="Debug"/>
+				<Option deps_output=".deps"/>
+				<Option type="2"/>
+				<Option compiler="0"/>
+				<Option createDefFile="1"/>
+				<Option projectResourceIncludeDirsRelation="2"/>
+				<Compiler>
+					<Add option="-DWIN32"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-D_LIB"/>
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE"/>
+					<Add option="-W"/>
+					<Add option="-O0"/>
+					<Add directory="..\include"/>
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="..\lib\libsqplus.a"/>
+				<Option working_dir=""/>
+				<Option object_output="Release"/>
+				<Option deps_output=".deps"/>
+				<Option type="2"/>
+				<Option compiler="0"/>
+				<Option createDefFile="1"/>
+				<Option projectResourceIncludeDirsRelation="2"/>
+				<Compiler>
+					<Add option="-DWIN32"/>
+					<Add option="-DNDEBUG"/>
+					<Add option="-D_LIB"/>
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE"/>
+					<Add option="-W"/>
+					<Add option="-g"/>
+					<Add directory="..\include"/>
+				</Compiler>
+			</Target>
+			<Target title="Debug - Unicode">
+				<Option output="..\lib\libsqplusDU.a"/>
+				<Option working_dir=""/>
+				<Option object_output="Debug - Unicode"/>
+				<Option deps_output=".deps"/>
+				<Option type="2"/>
+				<Option compiler="0"/>
+				<Option createDefFile="1"/>
+				<Option projectResourceIncludeDirsRelation="2"/>
+				<Compiler>
+					<Add option="-DWIN32"/>
+					<Add option="-D_DEBUG"/>
+					<Add option="-D_LIB"/>
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE"/>
+					<Add option="-D_CRT_NON_CONFORMING_SWPRINTFS"/>
+					<Add option="-W"/>
+					<Add option="-O0"/>
+					<Add directory="..\include"/>
+				</Compiler>
+			</Target>
+			<Target title="Release - Unicode">
+				<Option output="..\lib\libsqplusU.a"/>
+				<Option working_dir=""/>
+				<Option object_output="Release - Unicode"/>
+				<Option deps_output=".deps"/>
+				<Option type="2"/>
+				<Option compiler="0"/>
+				<Option createDefFile="1"/>
+				<Option projectResourceIncludeDirsRelation="2"/>
+				<Compiler>
+					<Add option="-DWIN32"/>
+					<Add option="-DNDEBUG"/>
+					<Add option="-D_LIB"/>
+					<Add option="-D_CRT_SECURE_NO_DEPRECATE"/>
+					<Add option="-D_CRT_NON_CONFORMING_SWPRINTFS"/>
+					<Add option="-W"/>
+					<Add option="-g"/>
+					<Add directory="..\include"/>
+				</Compiler>
+			</Target>
+		</Build>
+		<Unit filename="SqPlus.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SqPlusConst.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelBindingsUtils.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelBindingsUtils.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelBindingsUtilsWin32.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelBindingsUtilsWin32.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelObject.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelObject.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelVM.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="SquirrelVM.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="sqplus.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+		<Unit filename="sqplusWin32.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="Debug"/>
+			<Option target="Release"/>
+			<Option target="Debug - Unicode"/>
+			<Option target="Release - Unicode"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

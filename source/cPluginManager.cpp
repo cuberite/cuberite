@@ -6,10 +6,16 @@
 #include "cItem.h"
 #include "cRoot.h"
 #include "cLuaCommandBinder.h"
-
+#include "../iniFile/iniFile.h"
+#include <string> //strcmp
 #include <stdarg.h>
 
-#include "../iniFile/iniFile.h"
+#include "SquirrelBindings.h"
+#if USE_SQUIRREL
+#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
+#include <sqplus/sqplus.h>
+#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
+#endif
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);
 
@@ -39,6 +45,7 @@ cPluginManager::cPluginManager()
 cPluginManager::~cPluginManager()
 {
 	UnloadPluginsNow();
+	
 	delete m_LuaCommandBinder;
 	delete m_pState;
 }
@@ -54,6 +61,16 @@ void cPluginManager::ReloadPluginsNow()
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
+	
+	
+#if USE_SQUIRREL
+	if( !SquirrelBindings::IsBound )	// Can only do this once apparently, or we're making ambiguous calls in the script
+	{
+		SquirrelVM::Init();
+		SquirrelBindings::Bind( SquirrelVM::GetVMPtr() );
+	}
+#endif
+
 	cIniFile IniFile("settings.ini");
 	if( IniFile.ReadFile() )
 	{
@@ -64,10 +81,10 @@ void cPluginManager::ReloadPluginsNow()
 			for(unsigned int i = 0; i < NumPlugins; i++)
 			{
 				std::string ValueName = IniFile.GetValueName(KeyNum, i );
-				if( ValueName.compare("Plugin") == 0 )
-				{	// It's a plugin
+				if( ValueName.compare("Plugin") == 0 ) // It's a Lua plugin
+				{	
 					std::string PluginFile = IniFile.GetValue(KeyNum, i );
-					if( PluginFile.compare("") != 0 )
+					if( !PluginFile.empty() )
 					{
 						// allow for comma separated plugin list
 						// degrades and works fine for the plugin
@@ -82,6 +99,32 @@ void cPluginManager::ReloadPluginsNow()
 						}
 					}
 				}
+#if USE_SQUIRREL
+				else if( ValueName.compare("Squirrel") == 0 ) // Squirrel plugin
+				{
+					std::string PluginFile = IniFile.GetValue(KeyNum, i );
+					if( !PluginFile.empty() )
+					{
+						LOGINFO("Loading Squirrel plugin: %s", PluginFile.c_str() );
+						try 
+						{
+							SquirrelObject SquirrelScript = SquirrelVM::CompileScript( (std::string("Plugins/") + PluginFile + ".nut").c_str() );
+							try 
+							{
+								SquirrelVM::RunScript( SquirrelScript );
+							} 
+							catch (SquirrelError & e)
+							{
+								LOGERROR("Error: %s, %s\n", e.desc, "SquirrelVM::RunScript");
+							}
+						}
+						catch (SquirrelError & e) 
+						{
+							LOGERROR("Error: %s, %s\n", e.desc, "SquirrelVM::CompileScript");
+						}
+					}
+				}
+#endif
 			}
 		}
 
@@ -98,6 +141,8 @@ void cPluginManager::ReloadPluginsNow()
 	{
 		LOG("WARNING: Can't find settings.ini, so can't load any plugins.");
 	}
+
+
 	LOG("--Done loading plugins--");
 }
 
@@ -291,11 +336,11 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 	return false;
 }
 
-cPlugin* cPluginManager::GetPlugin( std::string a_Plugin )
+cPlugin* cPluginManager::GetPlugin( const char* a_Plugin )
 {
 	for( PluginList::iterator itr = m_pState->Plugins.begin(); itr != m_pState->Plugins.end(); ++itr )
 	{
-		if( (*itr)->GetName().compare( a_Plugin ) == 0 )
+		if( std::string( (*itr)->GetName() ).compare( a_Plugin ) == 0 )
 		{
 			return *itr;
 		}
@@ -328,6 +373,25 @@ void cPluginManager::UnloadPluginsNow()
 	{
 		RemovePlugin( *m_pState->Plugins.begin(), true );
 	}
+
+	//SquirrelVM::Shutdown(); // This breaks shit
+}
+
+void cPluginManager::RemoveHooks( cPlugin* a_Plugin )
+{
+	m_pState->Hooks[ E_PLUGIN_TICK			].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_CHAT			].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_COLLECT_ITEM	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_BLOCK_DIG		].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_BLOCK_PLACE	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_DISCONNECT	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_HANDSHAKE		].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_LOGIN			].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_PLAYER_SPAWN	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_PLAYER_JOIN	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_PLAYER_MOVE	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_TAKE_DAMAGE	].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_KILLED		].remove( a_Plugin );
 }
 
 void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false */ )
@@ -336,8 +400,10 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 	{
 		m_LuaCommandBinder->RemoveBindingsForPlugin( a_Plugin );
 		m_pState->Plugins.remove( a_Plugin );
+		RemoveHooks( a_Plugin );
 		a_Plugin->OnDisable();
-		delete a_Plugin;
+		if( a_Plugin->GetLanguage() != cPlugin::E_SQUIRREL ) // Squirrel needs to clean it up himself!
+			delete a_Plugin;
 	}
 	else
 	{
@@ -356,11 +422,14 @@ bool cPluginManager::AddPlugin( cPlugin* a_Plugin )
 		m_pState->Plugins.push_back( a_Plugin );
 		return true;
 	}
+
+	RemoveHooks( a_Plugin ); // Undo any damage the Initialize() might have done
 	return false;
 }
 
 bool cPluginManager::AddPlugin( lua_State* a_LuaState, cPlugin* a_Plugin )
 {
+	a_Plugin->SetLanguage( cPlugin::E_LUA );
 	cPlugin_Lua* LuaPlugin = GetLuaPlugin( a_LuaState );
 	if( LuaPlugin && a_Plugin->Initialize() )
 	{
@@ -391,8 +460,8 @@ void cPluginManager::RemoveLuaPlugin( std::string a_FileName )
 		if( (*itr)->GetFileName() == a_FileName )
 		{
 			cPlugin_Lua* Plugin = *itr;
-			delete Plugin;
 			m_pState->LuaPlugins.remove( Plugin );
+			delete Plugin;
 			return;
 		}
 	}

@@ -385,6 +385,9 @@
     <Filter Include="cLavaSimulator">
       <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LuaBindings\SquirrelBindings">
+      <UniqueIdentifier>{a71ee043-df55-4d42-a9aa-1643b40e1c22}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Packets\cPacket_Explosion">
       <UniqueIdentifier>{0a6d025d-4fb8-4557-a348-004b819ea477}</UniqueIdentifier>
     </Filter>
@@ -781,6 +784,10 @@
     <ClCompile Include="..\source\cLavaSimulator.cpp">
       <Filter>cLavaSimulator</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\SquirrelBindings.cpp">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClCompile>
+  </ItemGroup>
     <ClCompile Include="..\source\packets\cPacket_Explosion.cpp">
       <Filter>Packets\cPacket_Explosion</Filter>
     </ClCompile>
@@ -1211,6 +1218,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cLavaSimulator.h">
       <Filter>cLavaSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\SquirrelBindings.h">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_Explosion.h">
       <Filter>Packets\cPacket_Explosion</Filter>
