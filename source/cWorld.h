@@ -8,6 +8,7 @@ enum ENUM_ITEM_ID;
 
 #include <list>
 
+class cPacket;
 class cWaterSimulator;
 class cLavaSimulator;
 class cChunkMap;
@@ -47,6 +48,8 @@ public:
 	//void AddClient( cClientHandle* a_Client );
 	//void RemoveClient( cClientHandle* a_Client );
 	//ClientList & GetClients();
+
+	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );

@@ -317,7 +317,7 @@ void cWorld::Tick(float a_Dt)
 		m_WorldTime %= 24000; // 24000 units in a day
 		bSendTime = true;
 	}
-	if( bSendTime ) cRoot::Get()->GetServer()->Broadcast( cPacket_TimeUpdate( (m_WorldTime) ) );
+	if( bSendTime ) Broadcast( cPacket_TimeUpdate( (m_WorldTime) ) );
 
 	LockEntities();
 	for( cWorld::EntityList::iterator itr = GetEntities().begin(); itr != GetEntities().end();)
@@ -649,6 +649,15 @@ const double & cWorld::GetSpawnY()
 {
 	m_SpawnY = (double)GetHeight( (int)m_SpawnX, (int)m_SpawnZ ) + 1.6f; // +1.6f eye height
 	return m_SpawnY;
+}
+
+void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
+{
+	for( PlayerList::iterator itr = m_pState->m_Players.begin(); itr != m_pState->m_Players.end(); ++itr)
+	{
+		if( (*itr)->GetClientHandle() == a_Exclude || !(*itr)->GetClientHandle()->IsLoggedIn() ) continue;
+		(*itr)->GetClientHandle()->Send( a_Packet );
+	}
 }
 
 void cWorld::AddPlayer( cPlayer* a_Player )
