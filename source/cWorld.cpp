@@ -36,6 +36,8 @@
 
 
 #include "packets/cPacket_TimeUpdate.h"
+#include "packets/cPacket_NewInvalidState.h"
+#include "packets/cPacket_Thunderbolt.h"
 
 #include "Vector3d.h"
 
@@ -114,6 +116,7 @@ cWorld::cWorld( const char* a_WorldName )
 	: m_pState( new sWorldState )
 	, m_SpawnMonsterTime( 0.f )
 	, m_RSList ( 0 )
+	, m_Weather ( 0 )
 {
 	LOG("cWorld::cWorld(%s)", a_WorldName);
 	m_pState->WorldName = a_WorldName;
@@ -288,6 +291,37 @@ cWorld::cWorld( const char* a_WorldName )
 
 }
 
+void cWorld::SetWeather( int Weather )
+{
+	if (Weather == 2) { //thunder storm
+		m_Weather = 2;
+		cPacket_NewInvalidState WeatherPacket;
+		WeatherPacket.m_Reason = 1; //begin rain
+		Broadcast ( WeatherPacket );
+		CastThunderbolt ( 0, 0, 0 ); //start thunderstorm with a lightning strike at 0, 0, 0. >:D
+	}
+	if (Weather == 1) { //rainstorm
+		m_Weather = 1;
+		cPacket_NewInvalidState WeatherPacket;
+		WeatherPacket.m_Reason = 1; //begin rain
+		Broadcast ( WeatherPacket );
+	}
+	if (Weather == 0) { //sunny
+		m_Weather = 0;
+		cPacket_NewInvalidState WeatherPacket;
+		WeatherPacket.m_Reason = 2; //stop rain
+		Broadcast ( WeatherPacket );
+	}
+}
+
+void cWorld::CastThunderbolt ( int X, int Y, int Z ) {
+	cPacket_Thunderbolt ThunderboltPacket;
+	ThunderboltPacket.m_xLBPos = X;
+	ThunderboltPacket.m_yLBPos = Y;
+	ThunderboltPacket.m_zLBPos = Z;
+	Broadcast( ThunderboltPacket );
+}
+
 void cWorld::InitializeSpawn()
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
@@ -306,6 +340,7 @@ void cWorld::InitializeSpawn()
 
 void cWorld::Tick(float a_Dt)
 {
+	int randWeather = 0;
 	m_Time+=a_Dt/1000.f;
 
 	CurrentTick++;
@@ -354,6 +389,42 @@ void cWorld::Tick(float a_Dt)
 	if( CurrentTick % 12 == 0 )
 		m_LavaSimulator->Simulate(a_Dt);
 	UnlockChunks();
+
+
+////////////////Weather///////////////////////
+	if ( GetWeather() == 0 ) { //if sunny
+		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
+			randWeather = (rand() %100);
+			if (randWeather == 0) {
+				LOG("Starting Rainstorm!");
+				SetWeather ( 1 );
+			} else if  (randWeather == 1) {
+				LOG("Starting Thunderstorm!");
+				SetWeather ( 2 );
+			}
+		}
+	}
+
+	if ( GetWeather() != 0 ) { //if raining or thunderstorm
+		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
+			randWeather = (rand() %49);
+			if (randWeather == 0) { //2% chance per second
+				LOG("Back to sunny!");
+				SetWeather ( 0 );
+			} else if ( (randWeather > 40) && (GetWeather() != 2) ) { //random chance for rainstorm to turn into thunderstorm.
+				LOG("Starting Thunderstorm!");
+				SetWeather ( 2 );
+			}
+		}
+	}
+
+	if ( GetWeather() == 2 ) { //if thunderstorm
+		if (rand() %99 == 0) { //1% chance per tick of thunderbolt
+			CastThunderbolt ( 0, 0, 0 ); //todo: find random possitions near players to cast thunderbolts.
+		}
+	}
+////////////////Weather///////////////////////
+
 
 	if( m_Time - m_LastSave > 60*5 ) // Save each 5 minutes
 	{

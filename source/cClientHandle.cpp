@@ -59,7 +59,6 @@
 #include "packets/cPacket_EntityEquipment.h"
 #include "packets/cPacket_CreateInventoryAction.h"
 #include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_Thunderbolt.h" //for testing.
 #include "packets/cPacket_UseEntity.h"
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_13.h"
@@ -693,17 +692,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						break;
 					case E_BLOCK_WORKBENCH:
 						{
-							////////////// For testing V
-							cPacket_NewInvalidState RainPacket;
-							RainPacket.m_Reason = 1; //begin rain
-							cRoot::Get()->GetServer()->Broadcast( RainPacket );
-							//also strike table with lightning for test purposes
-							cPacket_Thunderbolt ThunderboltPacket;
-							ThunderboltPacket.m_xLBPos = PacketData->m_PosX;
-							ThunderboltPacket.m_yLBPos = PacketData->m_PosY;
-							ThunderboltPacket.m_zLBPos = PacketData->m_PosZ;
-							cRoot::Get()->GetServer()->Broadcast( ThunderboltPacket );
-							////////////// For testing ^
 							bPlaceBlock = false;
 							cWindow* Window = new cCraftingWindow( 0, true );
 							m_Player->OpenWindow( Window );
@@ -712,11 +700,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_FURNACE:
 					case E_BLOCK_CHEST:
 						{
-							////////////// For testing V
-							cPacket_NewInvalidState RainPacket;
-							RainPacket.m_Reason = 2; //end rain
-							cRoot::Get()->GetServer()->Broadcast( RainPacket );
-							////////////// For testing ^
 							bPlaceBlock = false;
 							cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 							if( BlockEntity )
@@ -1090,6 +1073,13 @@ void cClientHandle::Tick(float a_Dt)
 		LoginResponse.m_MapSeed = 0;
 		LoginResponse.m_Dimension = 0;
 		Send( LoginResponse );
+
+		// Send Weather if raining:
+		if ( (World->GetWeather() == 1) || (World->GetWeather() == 2) ) {
+			cPacket_NewInvalidState RainPacket;
+			RainPacket.m_Reason = 1; //begin rain
+			Send( RainPacket );
+		}
 
 		// Send position
 		Send( cPacket_PlayerMoveLook( m_Player ) );

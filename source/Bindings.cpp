@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/09/11 15:37:09.
+** Generated automatically by tolua++-1.0.92 on 11/09/11 17:20:10.
 */
 
 #ifndef __cplusplus
@@ -8746,6 +8746,108 @@ static int tolua_AllToLua_cWorld_GetName00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: CastThunderbolt of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_CastThunderbolt00
+static int tolua_AllToLua_cWorld_CastThunderbolt00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int tolua_var_1 = ((int)  tolua_tonumber(tolua_S,2,0));
+  int tolua_var_2 = ((int)  tolua_tonumber(tolua_S,3,0));
+  int tolua_var_3 = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CastThunderbolt'", NULL);
+#endif
+  {
+   self->CastThunderbolt(tolua_var_1,tolua_var_2,tolua_var_3);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CastThunderbolt'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetWeather of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetWeather00
+static int tolua_AllToLua_cWorld_SetWeather00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int tolua_var_4 = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWeather'", NULL);
+#endif
+  {
+   self->SetWeather(tolua_var_4);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetWeather'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetWeather of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetWeather00
+static int tolua_AllToLua_cWorld_GetWeather00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWeather'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetWeather();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWeather'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Clear of class  cInventory */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_Clear00
 static int tolua_AllToLua_cInventory_Clear00(lua_State* tolua_S)
@@ -15839,6 +15941,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GetWorldSeed",tolua_AllToLua_cWorld_GetWorldSeed00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cWorld_GetName00);
+   tolua_function(tolua_S,"CastThunderbolt",tolua_AllToLua_cWorld_CastThunderbolt00);
+   tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
+   tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cInventory","cInventory","",NULL);
   tolua_beginmodule(tolua_S,"cInventory");

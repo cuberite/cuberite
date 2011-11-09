@@ -31,7 +31,6 @@ public:
 	std::vector<int> m_RSList;
 
 
-
 	static cWorld* GetWorld();														//tolua_export
 
 	// Return time in seconds
@@ -130,6 +129,11 @@ public:
 
 	void InitializeSpawn();
 
+	void CastThunderbolt ( int, int, int );												//tolua_export
+	void SetWeather ( int );												//tolua_export
+	int GetWeather() { return m_Weather; };												//tolua_export
+
+
 private:
 	friend class cRoot;
 	cWorld( const char* a_WorldName );
@@ -172,4 +176,5 @@ private:
 	float m_SpawnMonsterRate;
 
 	unsigned int m_WorldSeed;
+	int	m_Weather;
 }; //tolua_export
