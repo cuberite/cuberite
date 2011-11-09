@@ -394,7 +394,7 @@ void cWorld::Tick(float a_Dt)
 ////////////////Weather///////////////////////
 	if ( GetWeather() == 0 ) { //if sunny
 		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
-			randWeather = (rand() %100);
+			randWeather = (rand() %1000);
 			if (randWeather == 0) {
 				LOG("Starting Rainstorm!");
 				SetWeather ( 1 );
@@ -407,11 +407,11 @@ void cWorld::Tick(float a_Dt)
 
 	if ( GetWeather() != 0 ) { //if raining or thunderstorm
 		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
-			randWeather = (rand() %49);
+			randWeather = (rand() %499);
 			if (randWeather == 0) { //2% chance per second
 				LOG("Back to sunny!");
 				SetWeather ( 0 );
-			} else if ( (randWeather > 40) && (GetWeather() != 2) ) { //random chance for rainstorm to turn into thunderstorm.
+			} else if ( (randWeather > 400) && (GetWeather() != 2) ) { //random chance for rainstorm to turn into thunderstorm.
 				LOG("Starting Thunderstorm!");
 				SetWeather ( 2 );
 			}
@@ -419,7 +419,7 @@ void cWorld::Tick(float a_Dt)
 	}
 
 	if ( GetWeather() == 2 ) { //if thunderstorm
-		if (rand() %99 == 0) { //1% chance per tick of thunderbolt
+		if (rand() %199 == 0) { //0.5% chance per tick of thunderbolt
 			CastThunderbolt ( 0, 0, 0 ); //todo: find random possitions near players to cast thunderbolts.
 		}
 	}
