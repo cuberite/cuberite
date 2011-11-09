@@ -63,6 +63,7 @@ char before;
 					m_Metadata = 0;
 					m_Direction = 3;
 					CalculatetRedstone( fillx, filly, fillz-1 );
+					m_Direction = 4;
 					break;
 				}
 			case E_BLOCK_REDSTONE_WIRE: //special case for redstone wire.
@@ -75,6 +76,18 @@ char before;
 					CalculatetRedstone( fillx, filly, fillz+1 );
 					m_Direction = 3;
 					CalculatetRedstone( fillx, filly, fillz-1 );
+
+					m_Direction = 4;
+					CalculatetRedstone( fillx+1, filly+1, fillz );
+					CalculatetRedstone( fillx-1, filly+1, fillz );
+					CalculatetRedstone( fillx, filly+1, fillz+1 );
+					CalculatetRedstone( fillx, filly+1, fillz-1 );
+
+					m_Direction = 4;
+					CalculatetRedstone( fillx+1, filly-1, fillz );
+					CalculatetRedstone( fillx-1, filly-1, fillz );
+					CalculatetRedstone( fillx, filly-1, fillz+1 );
+					CalculatetRedstone( fillx, filly-1, fillz-1 );
 					break;
  				}
 		}
@@ -206,6 +219,18 @@ void cRedstone::CalculatetRedstone( int fillx, int filly, int fillz)
 					CalculatetRedstone( fillx, filly, fillz+1 );
 					m_Direction = 3;
 					CalculatetRedstone( fillx, filly, fillz-1 );
+
+					m_Direction = 4;
+					CalculatetRedstone( fillx+1, filly+1, fillz );
+					CalculatetRedstone( fillx-1, filly+1, fillz );
+					CalculatetRedstone( fillx, filly+1, fillz+1 );
+					CalculatetRedstone( fillx, filly+1, fillz-1 );
+
+					m_Direction = 5;
+					CalculatetRedstone( fillx+1, filly-1, fillz );
+					CalculatetRedstone( fillx-1, filly-1, fillz );
+					CalculatetRedstone( fillx, filly-1, fillz+1 );
+					CalculatetRedstone( fillx, filly-1, fillz-1 );
 			}
 
 	} else { //default, check item for torch attached to it. If meta > 0 then turn that torch off, otherwise turn it on. This change needs to be passed to the next world tick.
@@ -215,40 +240,40 @@ void cRedstone::CalculatetRedstone( int fillx, int filly, int fillz)
 			//check for torch to north with meta 4 //turn off
 			//check for torch above with meta 5 //turn off
 		if ( (int)m_World->GetBlock( fillx, filly, fillz ) != E_BLOCK_AIR ) {
-
+			if (m_Direction < 4) { //redstone wire can only power blocks on the same plane or directly below
 				if ( (int)m_Metadata > 0 ) { //wire powered
 
 					//printf("bird: %i dog: %i \n",(int)m_World->GetBlock( fillx, filly+1, fillz ),(int)m_World->GetBlockMeta( fillx, filly+1, fillz));
 					if ( ( (int)m_World->GetBlock( fillx+1, filly, fillz ) == E_BLOCK_REDSTONE_TORCH_ON) && ( (int)m_World->GetBlockMeta( fillx+1, filly, fillz) == 1 ) ) { //east
-						m_World->FastSetBlock( fillx+1, filly, fillz, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx+1, filly, fillz) );
+						//m_World->FastSetBlock( fillx+1, filly, fillz, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx+1, filly, fillz) );
 						m_World->m_RSList.push_back(fillx+1);
 						m_World->m_RSList.push_back(filly);
 						m_World->m_RSList.push_back(fillz);
 						m_World->m_RSList.push_back(00000);
 					}
 					if ( ( (int)m_World->GetBlock( fillx-1, filly, fillz ) == E_BLOCK_REDSTONE_TORCH_ON) && ( (int)m_World->GetBlockMeta( fillx-1, filly, fillz) == 2 ) ) { //west
-						m_World->FastSetBlock( fillx-1, filly, fillz, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx-1, filly, fillz) );
+						//m_World->FastSetBlock( fillx-1, filly, fillz, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx-1, filly, fillz) );
 						m_World->m_RSList.push_back(fillx-1);
 						m_World->m_RSList.push_back(filly);
 						m_World->m_RSList.push_back(fillz);
 						m_World->m_RSList.push_back(00000);
 					}
 					if ( ( (int)m_World->GetBlock( fillx, filly, fillz+1 ) == E_BLOCK_REDSTONE_TORCH_ON) && ( (int)m_World->GetBlockMeta( fillx, filly, fillz+1) == 3 ) ) { //south
-						m_World->FastSetBlock( fillx, filly, fillz+1, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx, filly, fillz+1) );
+						//m_World->FastSetBlock( fillx, filly, fillz+1, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx, filly, fillz+1) );
 						m_World->m_RSList.push_back(fillx);
 						m_World->m_RSList.push_back(filly);
 						m_World->m_RSList.push_back(fillz+1);
 						m_World->m_RSList.push_back(00000);
 					}
 					if ( ( (int)m_World->GetBlock( fillx, filly, fillz-1 ) == E_BLOCK_REDSTONE_TORCH_ON) && ( (int)m_World->GetBlockMeta( fillx, filly, fillz-1) == 4 ) ) {  //north
-						m_World->FastSetBlock( fillx, filly, fillz-1, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx, filly, fillz-1) );
+						//m_World->FastSetBlock( fillx, filly, fillz-1, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx, filly, fillz-1) );
 						m_World->m_RSList.push_back(fillx);
 						m_World->m_RSList.push_back(filly);
 						m_World->m_RSList.push_back(fillz-1);
 						m_World->m_RSList.push_back(00000);
 					}
 					if ( ( (int)m_World->GetBlock( fillx, filly+1, fillz ) == E_BLOCK_REDSTONE_TORCH_ON) && ( (int)m_World->GetBlockMeta( fillx, filly+1, fillz) == 5 ) ) { //top
-						m_World->FastSetBlock( fillx, filly+1, fillz, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx, filly+1, fillz) );
+						//m_World->FastSetBlock( fillx, filly+1, fillz, E_BLOCK_REDSTONE_TORCH_OFF,  m_World->GetBlockMeta( fillx, filly+1, fillz) );
 						m_World->m_RSList.push_back(fillx);
 						m_World->m_RSList.push_back(filly+1);
 						m_World->m_RSList.push_back(fillz);
@@ -262,35 +287,35 @@ void cRedstone::CalculatetRedstone( int fillx, int filly, int fillz)
 
 						//printf("echo: %i cruiser: %i \n",(int)m_World->GetBlock( fillx, filly+1, fillz ),(int)m_World->GetBlockMeta( fillx, filly+1, fillz));
 						if ( ( (int)m_World->GetBlock( fillx+1, filly, fillz ) == E_BLOCK_REDSTONE_TORCH_OFF) && ( (int)m_World->GetBlockMeta( fillx+1, filly, fillz) == 1 ) ) { //east
-						m_World->FastSetBlock( fillx+1, filly, fillz, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx+1, filly, fillz) );
+						//m_World->FastSetBlock( fillx+1, filly, fillz, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx+1, filly, fillz) );
 							m_World->m_RSList.push_back(fillx+1);
 							m_World->m_RSList.push_back(filly);
 							m_World->m_RSList.push_back(fillz);
 							m_World->m_RSList.push_back(11111);
 						}
 						if ( ( (int)m_World->GetBlock( fillx-1, filly, fillz ) == E_BLOCK_REDSTONE_TORCH_OFF) && ( (int)m_World->GetBlockMeta( fillx-1, filly, fillz) == 2 ) ) { //west
-						m_World->FastSetBlock( fillx-1, filly, fillz, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx-1, filly, fillz) );
+						//m_World->FastSetBlock( fillx-1, filly, fillz, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx-1, filly, fillz) );
 							m_World->m_RSList.push_back(fillx-1);
 							m_World->m_RSList.push_back(filly);
 							m_World->m_RSList.push_back(fillz);
 							m_World->m_RSList.push_back(11111);
 						}
 						if ( ( (int)m_World->GetBlock( fillx, filly, fillz+1 ) == E_BLOCK_REDSTONE_TORCH_OFF) && ( (int)m_World->GetBlockMeta( fillx, filly, fillz+1) == 3 ) ) { //south
-						m_World->FastSetBlock( fillx, filly, fillz+1, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx, filly, fillz+1) );
+						//m_World->FastSetBlock( fillx, filly, fillz+1, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx, filly, fillz+1) );
 							m_World->m_RSList.push_back(fillx);
 							m_World->m_RSList.push_back(filly);
 							m_World->m_RSList.push_back(fillz+1);
 							m_World->m_RSList.push_back(11111);;
 						}
 						if ( ( (int)m_World->GetBlock( fillx, filly, fillz-1 ) == E_BLOCK_REDSTONE_TORCH_OFF) && ( (int)m_World->GetBlockMeta( fillx, filly, fillz-1) == 4 ) ) {  //north
-						m_World->FastSetBlock( fillx, filly, fillz-1, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx, filly, fillz-1) );
+						//m_World->FastSetBlock( fillx, filly, fillz-1, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx, filly, fillz-1) );
 							m_World->m_RSList.push_back(fillx);
 							m_World->m_RSList.push_back(filly);
 							m_World->m_RSList.push_back(fillz-1);
 							m_World->m_RSList.push_back(11111);
 						}
 						if ( ( (int)m_World->GetBlock( fillx, filly+1, fillz ) == E_BLOCK_REDSTONE_TORCH_OFF) && ( (int)m_World->GetBlockMeta( fillx, filly+1, fillz) == 5 ) ) { //top
-						m_World->FastSetBlock( fillx, filly+1, fillz, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx, filly+1, fillz) );
+						//m_World->FastSetBlock( fillx, filly+1, fillz, E_BLOCK_REDSTONE_TORCH_ON,  m_World->GetBlockMeta( fillx, filly+1, fillz) );
 							m_World->m_RSList.push_back(fillx);
 							m_World->m_RSList.push_back(filly+1);
 							m_World->m_RSList.push_back(fillz);
@@ -300,6 +325,8 @@ void cRedstone::CalculatetRedstone( int fillx, int filly, int fillz)
 					}
 
 				}
+
+			}
 
 		}
 

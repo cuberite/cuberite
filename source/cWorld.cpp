@@ -457,14 +457,14 @@ void cWorld::Tick(float a_Dt)
 		state = *cii;cii++;
 		
 		//printf ("%i, %i, %i, %i\n",tempX,tempY,tempZ,state) ;
-		if ( (state == 00000) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_OFF ) ) {
-			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta( tempX, tempY, tempZ ) );
-			cRedstone Redstone(this);
-			Redstone.ChangeRedstone( tempX, tempY, tempZ, false );
-		} else if ( (state == 11111) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_ON ) ) {
+		if ( (state == 11111) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_OFF ) ) {
 			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_ON, (int)GetBlockMeta( tempX, tempY, tempZ ) );
 			cRedstone Redstone(this);
 			Redstone.ChangeRedstone( tempX, tempY, tempZ, true );
+		} else if ( (state == 00000) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_ON ) ) {
+			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta( tempX, tempY, tempZ ) );
+			cRedstone Redstone(this);
+			Redstone.ChangeRedstone( tempX, tempY, tempZ, false );
 		}
 
 	}
