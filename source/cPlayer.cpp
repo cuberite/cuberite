@@ -61,6 +61,7 @@ struct cPlayer::sPlayerState
 cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	: m_bBurnable(true)
 	, m_GameMode( 0 )
+	, m_IP("")
 	, m_LastBlockActionTime( 0 )
 	, e_EPMetaState(NORMAL)
 	, m_bVisible( true )
@@ -419,6 +420,10 @@ void cPlayer::SetGameMode( int a_GameMode )
         m_GameMode = a_GameMode;
 }
 
+void cPlayer::SetIP( std::string a_IP )
+{
+        m_IP = a_IP;
+}
 
 #ifdef SendMessage	// Cause stupid windows.h defines SendMessage as SendMessageA
 #undef SendMessage

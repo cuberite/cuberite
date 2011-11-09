@@ -31,10 +31,12 @@ public:
 	virtual void TeleportTo( cEntity* a_Entity );													//tolua_export
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );	//tolua_export
 
-	int GetGameMode() { return m_GameMode; } //return GameMode for player.
+	int GetGameMode() { return m_GameMode; }												//tolua_export
+	std::string GetIP() { return m_IP; }														//tolua_export
 	float GetLastBlockActionTime() { return m_LastBlockActionTime; } //return LastBlockActionTime for player.
 	void SetLastBlockActionTime();
 	void SetGameMode( int a_GameMode );
+	void SetIP( std::string a_IP );
 
 	// Tries to move to a new position, with collision checks and stuff
 	virtual void MoveTo( const Vector3d & a_NewPos );												//tolua_export
@@ -104,6 +106,7 @@ protected:
 
 	float m_LastBlockActionTime;
 	int m_GameMode;
+	std::string m_IP;
 
 	cClientHandle* m_ClientHandle;
 }; //tolua_export

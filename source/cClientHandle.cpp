@@ -1078,6 +1078,8 @@ void cClientHandle::Tick(float a_Dt)
 		World->LockEntities();
 		m_Player->SetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login.
 
+		m_Player->SetIP ( m_pState->Socket.GetIPString() );
+
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player );
 
 		// Return a server login packet

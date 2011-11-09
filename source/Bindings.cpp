@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/08/11 02:11:35.
+** Generated automatically by tolua++-1.0.92 on 11/09/11 15:37:09.
 */
 
 #ifndef __cplusplus
@@ -5096,6 +5096,70 @@ static int tolua_AllToLua_cPlayer_TeleportTo01(lua_State* tolua_S)
  return 3;
 tolua_lerror:
  return tolua_AllToLua_cPlayer_TeleportTo00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetGameMode of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetGameMode00
+static int tolua_AllToLua_cPlayer_GetGameMode00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetGameMode'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetGameMode();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetGameMode'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetIP of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetIP00
+static int tolua_AllToLua_cPlayer_GetIP00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetIP'", NULL);
+#endif
+  {
+   std::string tolua_ret = (std::string)  self->GetIP();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetIP'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -15631,6 +15695,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetInventory",tolua_AllToLua_cPlayer_GetInventory00);
    tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPlayer_TeleportTo00);
    tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPlayer_TeleportTo01);
+   tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cPlayer_GetGameMode00);
+   tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);
    tolua_function(tolua_S,"MoveTo",tolua_AllToLua_cPlayer_MoveTo00);
    tolua_function(tolua_S,"GetClientHandle",tolua_AllToLua_cPlayer_GetClientHandle00);
    tolua_function(tolua_S,"SendMessage",tolua_AllToLua_cPlayer_SendMessage00);
