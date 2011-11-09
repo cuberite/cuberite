@@ -1,5 +1,6 @@
 #include "BlockID.h"
 #include "cWorld.h"
+#include "cRedstone.h"
 #include "cChunk.h"
 #include "cClientHandle.h"
 #include "cPickup.h"
@@ -112,6 +113,7 @@ cWorld::~cWorld()
 cWorld::cWorld( const char* a_WorldName )
 	: m_pState( new sWorldState )
 	, m_SpawnMonsterTime( 0.f )
+	, m_RSList ( 0 )
 {
 	LOG("cWorld::cWorld(%s)", a_WorldName);
 	m_pState->WorldName = a_WorldName;
@@ -435,6 +437,39 @@ void cWorld::Tick(float a_Dt)
 			}
 		}
 	}
+
+
+
+	std::vector<int> m_RSList_copy(m_RSList);
+	//copy(m_RSList.begin(), m_RSList.end(), m_RSList_copy.begin());
+	m_RSList.erase(m_RSList.begin(),m_RSList.end());
+	int tempX;
+	int tempY;
+	int tempZ;
+	int state;
+
+	std::vector<int>::const_iterator cii;
+	for(cii=m_RSList_copy.begin(); cii!=m_RSList_copy.end();)
+	{
+		tempX = *cii;cii++;
+		tempY = *cii;cii++;
+		tempZ = *cii;cii++;
+		state = *cii;cii++;
+		
+		//printf ("%i, %i, %i, %i\n",tempX,tempY,tempZ,state) ;
+		if ( (state == 00000) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_OFF ) ) {
+			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta( tempX, tempY, tempZ ) );
+			cRedstone Redstone(this);
+			Redstone.ChangeRedstone( tempX, tempY, tempZ, false );
+		} else if ( (state == 11111) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_ON ) ) {
+			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_ON, (int)GetBlockMeta( tempX, tempY, tempZ ) );
+			cRedstone Redstone(this);
+			Redstone.ChangeRedstone( tempX, tempY, tempZ, true );
+		}
+
+	}
+	m_RSList_copy.erase(m_RSList_copy.begin(),m_RSList_copy.end());
+
 }
 
 void cWorld::GrowTree( int a_X, int a_Y, int a_Z )

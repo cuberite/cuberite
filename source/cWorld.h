@@ -7,8 +7,10 @@ enum ENUM_ITEM_ID;
 #endif
 
 #include <list>
+#include <vector>
 
 class cPacket;
+class cRedstone;
 class cWaterSimulator;
 class cLavaSimulator;
 class cChunkMap;
@@ -26,6 +28,9 @@ public:
 	typedef std::list< cEntity* > EntityList;
 	typedef std::list< cChunk* > ChunkList;
 	typedef std::list< cPlayer* > PlayerList;
+	std::vector<int> m_RSList;
+
+
 
 	static cWorld* GetWorld();														//tolua_export
 
@@ -124,6 +129,7 @@ public:
 	void RemoveSpread( cChunk* a_Chunk );
 
 	void InitializeSpawn();
+
 private:
 	friend class cRoot;
 	cWorld( const char* a_WorldName );

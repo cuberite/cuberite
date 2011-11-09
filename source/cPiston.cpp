@@ -16,6 +16,7 @@ extern bool g_BlockPistonBreakable[];
 #define AddDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
 													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
 													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
+
 #define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
 
 cPiston::cPiston( cWorld* a_World )
@@ -77,6 +78,8 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 		Action.m_PosZ		= (int)pistz;
 		Action.m_Byte1	=	0;
 		Action.m_Byte2	=	pistonMeta;
+
+		
 		cChunk* Chunk 	= m_World->GetChunk( FAST_FLOOR(pistx/16), FAST_FLOOR(pisty/16), FAST_FLOOR(pistz/16)  );
 		Chunk->Broadcast( Action );
 		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 8 );
@@ -109,7 +112,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz ) {
 		Action.m_PosY		= (short)pisty;
 		Action.m_PosZ		= (int)pistz;
 		Action.m_Byte1	=	1;
-		Action.m_Byte1	=	pistonMeta & ~(8);
+		Action.m_Byte2	=	pistonMeta & ~(8);
 		cChunk* Chunk 	= m_World->GetChunk( FAST_FLOOR(pistx/16), FAST_FLOOR(pisty/16), FAST_FLOOR(pistz/16) );
 		Chunk->Broadcast( Action );
 		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8) );

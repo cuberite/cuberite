@@ -24,10 +24,11 @@ static char RepeaterRotationToMetaData( float a_Rotation )
 
 void CalculatetRedstone( int, int, int );
 void ChangeRedstone( int, int, int, bool );
-
+bool IsBlockPowered( int, int, int );
 
 cWorld* m_World;
 
 char m_Metadata;
-
+char m_Direction;
+	
 };

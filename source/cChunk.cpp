@@ -215,7 +215,7 @@ void cChunk::Tick(float a_Dt)
 
 	std::map< unsigned int, int > ToTickBlocks = m_pState->m_ToTickBlocks;
 	unsigned int NumTickBlocks = ToTickBlocks.size();
-	if( NumTickBlocks > 0 ) LOG("To tick: %i", NumTickBlocks );
+	//if( NumTickBlocks > 0 ) LOG("To tick: %i", NumTickBlocks );
 	m_pState->m_ToTickBlocks.clear();
 	bool isRedstone = false;
 	for( std::map< unsigned int, int>::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
@@ -345,9 +345,9 @@ void cChunk::Tick(float a_Dt)
 					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetLight( m_BlockMeta, Index ) );
 				}
 				if ( (g_BlockOneHitDig[AboveBlock]) && GetLight( m_BlockSkyLight, Index+1 ) > 0xf/2 ) // Half lit //ch$
-                                {
-                                        FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetLight( m_BlockMeta, Index ) );
-                                }
+				{
+					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetLight( m_BlockMeta, Index ) );
+				}
 
 			}
 			break;
