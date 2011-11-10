@@ -450,7 +450,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cPacket_Chat Joined( m_pState->Username + " joined the game!");
 					cRoot::Get()->GetServer()->Broadcast( Joined, this );
 				}
-
+				int posx = m_Player->GetPosX();
+				int posy = m_Player->GetPosY();
+				int posz = m_Player->GetPosZ();
 				// Now initialize player (adds to entity list etc.)
 				cWorld* PlayerWorld = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
 				if( !PlayerWorld ) PlayerWorld = cRoot::Get()->GetDefaultWorld();
@@ -465,6 +467,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				// Then we can start doing more stuffs! :D
 				m_bLoggedIn = true;
 				LOG("%s completely logged in", GetUsername() );
+				m_Player->TeleportTo( posx, posy, posz );
 				StreamChunks();
 			}
 			break;
@@ -1195,9 +1198,6 @@ void cClientHandle::Tick(float a_Dt)
 		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
 		World->UnlockEntities();
-
-		//quick bugfix to prevent players from spawning in ground
-		m_Player->TeleportTo( m_Player->GetPosX(), m_Player->GetPosY()+2, m_Player->GetPosZ() );
 	}
 }
 
