@@ -38,6 +38,7 @@ public:
 	void SetLastBlockActionCnt( int );														//tolua_export
 	void SetLastBlockActionTime();														//tolua_export
 	void SetGameMode( int a_GameMode );														//tolua_export
+	void LoginSetGameMode( int a_GameMode );
 	void SetIP( std::string a_IP );
 
 	// Tries to move to a new position, with collision checks and stuff

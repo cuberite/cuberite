@@ -1160,7 +1160,7 @@ void cClientHandle::Tick(float a_Dt)
 		cWorld* World = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() ); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
 		if( !World ) World = cRoot::Get()->GetDefaultWorld();
 		World->LockEntities();
-		m_Player->SetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login.
+		m_Player->LoginSetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login.
 
 		m_Player->SetIP ( m_pState->Socket.GetIPString() );
 

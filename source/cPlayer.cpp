@@ -28,6 +28,7 @@
 #include "packets/cPacket_DestroyEntity.h"
 #include "packets/cPacket_Metadata.h"
 #include "packets/cPacket_Chat.h"
+#include "packets/cPacket_NewInvalidState.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -423,7 +424,20 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 void cPlayer::SetGameMode( int a_GameMode )
 {
-        m_GameMode = a_GameMode;
+	if ( (a_GameMode < 2) && (a_GameMode >= 0) ) {
+		if (m_GameMode != a_GameMode) {
+			m_GameMode = a_GameMode;
+			cPacket_NewInvalidState GameModePacket;
+			GameModePacket.m_Reason = 3; //GameModeChange
+			GameModePacket.m_GameMode = (char)a_GameMode; //GameModeChange
+			m_ClientHandle->Send ( GameModePacket );
+		}
+	}
+}
+
+void cPlayer::LoginSetGameMode( int a_GameMode )
+{
+	m_GameMode = a_GameMode;
 }
 
 void cPlayer::SetIP( std::string a_IP )
