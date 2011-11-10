@@ -493,14 +493,21 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_DIG:
 			{
-				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
-				//LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+				
+				int LastActionCnt = m_Player->GetLastBlockActionCnt();
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
-					LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-					break;
+					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
+					if (LastActionCnt > 3) { //kick if more than 3 interactions per .1 seconds
+						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
+						Kick("You're a baaaaaad boy!");
+						break;
+					}
+				} else {
+					m_Player->SetLastBlockActionCnt(0); //reset count 
+					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				}
-				m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+
 				cPacket_BlockDig* PacketData = reinterpret_cast<cPacket_BlockDig*>(a_Packet);
 				LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction, PacketData->m_Status );
 				if( PacketData->m_Status == 0x04 )	// Drop block
@@ -643,15 +650,21 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_BLOCK_PLACE:
 			{
-				
-				//LOG("TimeP: %f", m_Player->GetLastBlockActionTime() );
-				//LOG("TimeN: %f", cRoot::Get()->GetWorld()->GetTime() );
+
+				int LastActionCnt = m_Player->GetLastBlockActionCnt();
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
-					LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot)", GetUsername() );
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-					break;
+					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
+					if (LastActionCnt > 3) { //kick if more than 3 interactions per .1 seconds
+						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
+						Kick("You're a baaaaaad boy!");
+						break;
+					}
+				} else {
+					m_Player->SetLastBlockActionCnt(0); //reset count 
+					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				}
-				m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 				//if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
@@ -794,9 +807,31 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					if( PacketData->m_Direction < 0 ) // clicked in air
 						break;
 
+					int clickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					char MetaData = (char)Equipped.m_ItemHealth;
+					bool LavaBucket = false;
+					bool WaterBucket = false;
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
+					case E_ITEM_BUCKET:
+						switch (clickedBlock)
+						{
+							case E_BLOCK_WATER:
+							case E_BLOCK_STATIONARY_WATER:
+								WaterBucket = true;
+								break;
+							case E_BLOCK_LAVA:
+							case E_BLOCK_STATIONARY_LAVA:
+								LavaBucket = true;
+								break;
+						}
+						break;
+					case E_ITEM_LAVA_BUCKET:
+						PacketData->m_ItemType = E_BLOCK_LAVA;
+						break;
+					case E_ITEM_WATER_BUCKET:
+						PacketData->m_ItemType = E_BLOCK_WATER;
+						break;
 					case E_BLOCK_WHITE_CLOTH:
 						MetaData = (char)PacketData->m_Uses;
 						break;
@@ -806,8 +841,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_REDSTONE_TORCH_OFF:
 						{
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
-						//check redstone circuit:
-						//if( GetBlock( X, Y+1, Z ) == E_BLOCK_AIR )
 						if( g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY+2, PacketData->m_PosZ ) ] == true ) {//if block above is transparent
 							//printf("transparent above me\n");
 						} else {
@@ -884,8 +917,29 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					default:
 						break;
 					};
-					if( IsValidBlock( PacketData->m_ItemType) )
-					{
+
+
+					if (LavaBucket) {
+
+						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) ) {
+							cItem NewItem;
+							NewItem.m_ItemID = E_ITEM_LAVA_BUCKET;
+							NewItem.m_ItemCount = 1;
+							m_Player->GetInventory().AddItem( NewItem );
+							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
+						}
+
+					} else if (WaterBucket) {
+
+						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) ) {
+							cItem NewItem;
+							NewItem.m_ItemID = E_ITEM_WATER_BUCKET;
+							NewItem.m_ItemCount = 1;
+							m_Player->GetInventory().AddItem( NewItem );
+							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
+						}
+
+					} else if( IsValidBlock( PacketData->m_ItemType) ) {
 						int X = PacketData->m_PosX;
 						char Y = PacketData->m_PosY;
 						int Z = PacketData->m_PosZ;
@@ -909,6 +963,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 								cRedstone Redstone(m_Player->GetWorld());
 								Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
 							}
+
 						}
 					}
 				}

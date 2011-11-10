@@ -63,6 +63,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	, m_GameMode( 0 )
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
+	, m_LastBlockActionCnt( 0 )
 	, e_EPMetaState(NORMAL)
 	, m_bVisible( true )
 	, m_LastGroundHeight( 0 )
@@ -413,6 +414,11 @@ void cPlayer::CloseWindow()
 void cPlayer::SetLastBlockActionTime()
 {
 	m_LastBlockActionTime = cRoot::Get()->GetWorld()->GetTime();
+}
+
+void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
+{
+	m_LastBlockActionCnt = a_LastBlockActionCnt;
 }
 
 void cPlayer::SetGameMode( int a_GameMode )

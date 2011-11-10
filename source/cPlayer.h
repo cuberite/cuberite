@@ -33,9 +33,11 @@ public:
 
 	int GetGameMode() { return m_GameMode; }												//tolua_export
 	std::string GetIP() { return m_IP; }														//tolua_export
-	float GetLastBlockActionTime() { return m_LastBlockActionTime; } //return LastBlockActionTime for player.
-	void SetLastBlockActionTime();
-	void SetGameMode( int a_GameMode );
+	float GetLastBlockActionTime() { return m_LastBlockActionTime; }														//tolua_export
+	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }														//tolua_export
+	void SetLastBlockActionCnt( int );														//tolua_export
+	void SetLastBlockActionTime();														//tolua_export
+	void SetGameMode( int a_GameMode );														//tolua_export
 	void SetIP( std::string a_IP );
 
 	// Tries to move to a new position, with collision checks and stuff
@@ -105,6 +107,7 @@ protected:
 	float m_BurnPeriod;
 
 	float m_LastBlockActionTime;
+	int m_LastBlockActionCnt;
 	int m_GameMode;
 	std::string m_IP;
 

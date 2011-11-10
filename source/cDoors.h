@@ -51,6 +51,8 @@ public:
 			return 0xA;
 		} else if ( (int)MetaData == 15 ) {
 			return 0xB;
+		} else {
+			return 0x0;
 		}
 	}												//tolua_export
 
