@@ -36,21 +36,21 @@ public:
 		} else if ( (int)MetaData == 7 ) {
 			return 0x3;
 		} else if ( (int)MetaData == 8 ) {
-			return 0x12;
+			return 0xC;
 		} else if ( (int)MetaData == 9 ) {
-			return 0x13;
+			return 0xD;
 		} else if ( (int)MetaData == 10 ) {
-			return 0x14;
+			return 0xE;
 		} else if ( (int)MetaData == 11 ) {
-			return 0x15;
+			return 0xF;
 		} else if ( (int)MetaData == 12 ) {
 			return 0x8;
 		} else if ( (int)MetaData == 13 ) {
 			return 0x9;
 		} else if ( (int)MetaData == 14 ) {
-			return 0x10;
+			return 0xA;
 		} else if ( (int)MetaData == 15 ) {
-			return 0x11;
+			return 0xB;
 		}
 	}												//tolua_export
 
