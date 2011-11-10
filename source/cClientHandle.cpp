@@ -14,6 +14,7 @@
 #include "cItem.h"
 #include "cTorch.h"
 #include "cStairs.h"
+#include "cDoors.h"
 #include "cLadder.h"
 #include "cSign.h"
 #include "cRedstone.h"
@@ -708,6 +709,29 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							}
 						}
 						break;
+					case E_BLOCK_WOODEN_DOOR:
+						{
+							bPlaceBlock = false;
+							char OldMetaData = cRoot::Get()->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
+							char NewMetaData = cDoors::ChangeStateMetaData ( OldMetaData );
+							cRoot::Get()->GetWorld()->FastSetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, E_BLOCK_WOODEN_DOOR, NewMetaData );
+							if ( (int)OldMetaData > 7 ) { //top of door
+								char BottomBlock = cRoot::Get()->GetWorld()->GetBlock(PacketData->m_PosX, PacketData->m_PosY-1, PacketData->m_PosZ);
+								char BottomMeta = cRoot::Get()->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY-1, PacketData->m_PosZ);
+								if ( ( (int)BottomBlock == E_BLOCK_WOODEN_DOOR ) && ( (int)BottomMeta < 8 ) ) {
+									char NewBottomMeta = cDoors::ChangeStateMetaData ( BottomMeta );
+									cRoot::Get()->GetWorld()->FastSetBlock(PacketData->m_PosX, PacketData->m_PosY-1, PacketData->m_PosZ, E_BLOCK_WOODEN_DOOR, NewBottomMeta );
+								}
+							} else if ( (int)OldMetaData < 8 ) { //bottom of door
+								char TopBlock = cRoot::Get()->GetWorld()->GetBlock(PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ);
+								char TopMeta = cRoot::Get()->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ);
+								if ( ( (int)TopBlock == E_BLOCK_WOODEN_DOOR ) && ( (int)TopMeta > 7 ) ) {
+									char NewTopMeta = cDoors::ChangeStateMetaData ( TopMeta );
+									cRoot::Get()->GetWorld()->FastSetBlock(PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, E_BLOCK_WOODEN_DOOR, NewTopMeta );
+								}
+							}
+						}
+						break;
 					default:
 						break;
 					};
@@ -722,6 +746,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					LOG("PacketData->m_ItemType: %i", (int)PacketData->m_ItemType);
 					// Hacked in edible items go!~
 					bool bEat = false;
+					bool isDoor = false;
 					switch( Item.m_ItemID )
 					{
 					case E_ITEM_APPLE:
@@ -817,6 +842,20 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						UpdateRedstone = true;
 						AddedCurrent = false;
 						break;
+					case E_ITEM_IRON_DOOR:
+						{
+							PacketData->m_ItemType = E_BLOCK_IRON_DOOR;
+							MetaData = cDoors::RotationToMetaData( m_Player->GetRotation() );
+							isDoor = true;
+						}
+						break;
+					case E_ITEM_WOODEN_DOOR:
+						{
+							PacketData->m_ItemType = E_BLOCK_WOODEN_DOOR;
+							MetaData = cDoors::RotationToMetaData( m_Player->GetRotation() );
+							isDoor = true;
+						}
+						break;
 					case E_BLOCK_COBBLESTONE_STAIRS:
 					case E_BLOCK_BRICK_STAIRS:
 					case E_BLOCK_STONE_BRICK_STAIRS:
@@ -857,8 +896,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						
 						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) )
 						{
-							
-							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
+							if (isDoor) {
+								if ( ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) || ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) ) {
+									m_Player->GetWorld()->SetBlock( X, Y+1, Z, (char)PacketData->m_ItemType, MetaData + 8 );
+
+									m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
+								}
+							} else {
+								m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
+							}
 							if (UpdateRedstone) {
 								cRedstone Redstone(m_Player->GetWorld());
 								Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
