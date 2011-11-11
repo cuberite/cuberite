@@ -695,8 +695,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				bool bPlaceBlock = true;
 				bool UpdateRedstone = false;
 				bool AddedCurrent = false;
+
 				if( PacketData->m_Direction >= 0 )
 				{
+
 					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					switch( BlockID )
 					{
@@ -814,6 +816,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					char MetaData = (char)Equipped.m_ItemHealth;
 					bool LavaBucket = false;
 					bool WaterBucket = false;
+
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
 					case E_ITEM_BUCKET:
@@ -947,10 +950,12 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						char Y = PacketData->m_PosY;
 						int Z = PacketData->m_PosZ;
 						AddDirection( X, Y, Z, PacketData->m_Direction );
-						if( m_Player->GetWorld()->GetBlock( X, Y, Z ) != E_BLOCK_AIR ) { //tried to place a block *into* another?
+
+						int PlaceBlock = m_Player->GetWorld()->GetBlock( X, Y, Z );
+						if (!( ( PlaceBlock == E_BLOCK_AIR ) || ( PlaceBlock == E_BLOCK_WATER ) || ( PlaceBlock == E_BLOCK_STATIONARY_WATER ) || ( PlaceBlock == E_BLOCK_LAVA ) || ( PlaceBlock == E_BLOCK_STATIONARY_LAVA ) ) ) { //tried to place a block *into* another?
 							break;	//happens when you place a block aiming at side of block like torch or stem
 						}
-						
+
 						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) )
 						{
 							if (isDoor) {
