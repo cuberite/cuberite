@@ -20,7 +20,7 @@ public:
 	cClientHandle(const cSocket & a_Socket);
 	~cClientHandle();
 
-	static const int VIEWDISTANCE = 17;
+	static const int VIEWDISTANCE = 13;
 
 	const cSocket & GetSocket();
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
