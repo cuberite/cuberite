@@ -750,17 +750,18 @@ void cChunk::GenerateTerrain()
 {
 
 
-	const ENUM_BLOCK_ID GrassID =	E_BLOCK_GRASS;
-	const ENUM_BLOCK_ID DirtID =	E_BLOCK_DIRT;
-	const ENUM_BLOCK_ID StoneID =	E_BLOCK_STONE;
-	const ENUM_BLOCK_ID SandID =	E_BLOCK_SAND;
-	const ENUM_BLOCK_ID CaveID =	E_BLOCK_AIR;
-	const ENUM_BLOCK_ID LavaID =	E_BLOCK_STATIONARY_LAVA;
-	const ENUM_BLOCK_ID CoalID =	E_BLOCK_COAL_ORE;
-	const ENUM_BLOCK_ID IronID =	E_BLOCK_IRON_ORE;
-	const ENUM_BLOCK_ID GoldID =	E_BLOCK_GOLD_ORE;
-	const ENUM_BLOCK_ID DiamondID =	E_BLOCK_DIAMOND_ORE;
-	const ENUM_BLOCK_ID RedID =	E_BLOCK_REDSTONE_ORE;
+	const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
+	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
+	const ENUM_BLOCK_ID StoneID 		=	E_BLOCK_STONE;
+	const ENUM_BLOCK_ID SandID 			=	E_BLOCK_SAND;
+	const ENUM_BLOCK_ID SandStoneID =	E_BLOCK_SANDSTONE;
+	const ENUM_BLOCK_ID CaveID 			=	E_BLOCK_AIR;
+	const ENUM_BLOCK_ID LavaID 			=	E_BLOCK_STATIONARY_LAVA;
+	const ENUM_BLOCK_ID CoalID 			=	E_BLOCK_COAL_ORE;
+	const ENUM_BLOCK_ID IronID 			=	E_BLOCK_IRON_ORE;
+	const ENUM_BLOCK_ID GoldID 			=	E_BLOCK_GOLD_ORE;
+	const ENUM_BLOCK_ID DiamondID 	=	E_BLOCK_DIAMOND_ORE;
+	const ENUM_BLOCK_ID RedID 			=	E_BLOCK_REDSTONE_ORE;
 
 	 /*
 	const ENUM_BLOCK_ID GrassID =	E_BLOCK_AIR;
@@ -813,6 +814,8 @@ void cChunk::GenerateTerrain()
 				}
 				else if( y < 61 && Top - y < 3 )
 					m_BlockType[ MakeIndex(x, y, z) ] = SandID;
+				else if( y < 61 && Top - y < 4 )
+					m_BlockType[ MakeIndex(x, y, z) ] = SandStoneID;
 				else if( Top - y > ((WaveNoise+1.5f)*1.5f) ) // rock and ores between 1.5 .. 4.5 deep
 				{
 					if( GetOreNoise( xx, yy, zz, m_Noise ) > 0.5f )
@@ -853,8 +856,30 @@ void cChunk::GenerateTerrain()
 		}
 		if( TopY > 0 )
 		{
-			// Change top dirt into grass
+			// Change top dirt into grass and prevent sand from floating over caves
 			int index = MakeIndex( x, TopY, z );
+			int index1 = MakeIndex( x, TopY-1, z );
+			int index2 = MakeIndex( x, TopY-2, z );
+			int index3 = MakeIndex( x, TopY-3, z );
+			int index4 = MakeIndex( x, TopY-4, z );
+			int index5 = MakeIndex( x, TopY-5, z );
+			
+			if( m_BlockType[index] == SandID ) {
+
+				if( m_BlockType[index1] == CaveID ) {
+					m_BlockType[ index ] = (char)SandStoneID;
+				} else if( m_BlockType[index2] == CaveID ) {
+					m_BlockType[ index1 ] = (char)SandStoneID;
+				} else if( m_BlockType[index3] == CaveID ) {
+					m_BlockType[ index2 ] = (char)SandStoneID;
+				} else if( m_BlockType[index4] == CaveID ) {
+					m_BlockType[ index3 ] = (char)SandStoneID;
+				} else if( m_BlockType[index5] == CaveID ) {
+					m_BlockType[ index4 ] = (char)SandStoneID;
+				}
+
+			}
+				
 			if( m_BlockType[index] == DirtID )
 			{
 				m_BlockType[ index ] = (char)GrassID;
