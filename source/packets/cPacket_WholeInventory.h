@@ -2,6 +2,7 @@
 
 #include "cPacket.h"
 #include "PacketID.h"
+#include "BlockID.h"
 
 class cInventory;
 class cWindow;
@@ -18,6 +19,8 @@ public:
 		, m_Count( 0 )
 		, m_Items( 0 )
 	{ m_PacketID = E_INVENTORY_WHOLE; }
+
+
 	virtual cPacket* Clone() const { return new cPacket_WholeInventory(*this); }
 
 	bool Send(cSocket & a_Socket);

@@ -2,6 +2,7 @@
 
 #include "cPacket.h"
 #include "PacketID.h"
+#include "../BlockID.h"
 
 class cPacket_InventorySlot : public cPacket // Set item [S -> C] ?
 {
@@ -9,7 +10,7 @@ public:
 	cPacket_InventorySlot()
 		: m_WindowID( 0 )
 		, m_SlotNum( 0 )
-		, m_ItemID( 0 )
+		, m_ItemID( E_ITEM_EMPTY )
 		, m_ItemCount( 0 )
 		, m_ItemUses( 0 )
 	{ m_PacketID = E_INVENTORY_SLOT; }
@@ -30,5 +31,5 @@ public:
 	char m_ItemCount;
 	short m_ItemUses;
 
-	static const unsigned int c_Size = 1 + 1 + 2 + 2; // Minimal size ( +1+1  = max)
+	static const unsigned int c_Size = 1 + 1 + 2; // Minimal size ( +1+1  = max)
 };

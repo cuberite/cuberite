@@ -1,5 +1,6 @@
 #include "cBlockToPickup.h"
 #include "BlockID.h"
+#include "stdlib.h"
 
 ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_UsedItemID )
 {
@@ -23,6 +24,8 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		if( a_UsedItemID == E_ITEM_SHEARS )
 			return E_ITEM_LEAVES;
 		else
+			if(rand() % 5 == 0)
+				return E_ITEM_SAPLING;
 			return E_ITEM_EMPTY;
 	case E_BLOCK_COAL_ORE:
 		return E_ITEM_COAL;
@@ -51,5 +54,6 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 	default:
 		return (ENUM_ITEM_ID)a_BlockID;
 	}
+	//TODO: Whats that? :D
 	return E_ITEM_EMPTY;
 }

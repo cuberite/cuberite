@@ -3,6 +3,8 @@
 #include "cPacket.h"
 #include "PacketID.h"
 
+//Sure it´s not Creative Inventory?
+
 class cPacket_CreateInventoryAction : public cPacket
 {
 public:
@@ -20,8 +22,8 @@ public:
 
 	short m_Slot; // 0 = hold 1-4 = armor
 	short m_ItemID;
-	short m_Quantity;
+	char m_Quantity; //Byte not short ;)
 	short m_Damage;
 
-	static const unsigned int c_Size = 1 + 2 + 2 + 2 + 2;
+	static const unsigned int c_Size = 1 + 2;
 };

@@ -8,6 +8,8 @@
 #include "cPlayer.h"
 #include "BlockID.h"
 #include "Defines.h"
+#include "cPickup.h"
+#include "cItem.h"
 
 #include "packets/cPacket_SpawnMob.h"
 #include "packets/cPacket_EntityLook.h"
@@ -606,4 +608,19 @@ void cMonster::SetAttackDamage(float ad) {
 }
 void cMonster::SetSightDistance(float sd) {
 	m_SightDistance = sd;
+}
+
+
+void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
+{
+	if(a_Count > 0)
+	{
+		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( a_Item, a_Count ) );
+		Pickup->Initialize( GetWorld() );
+	}
+}
+
+void cMonster::RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max)
+{
+	return cMonster::DropItem(a_Item, rand() % (a_Max + 1) + a_Min);
 }

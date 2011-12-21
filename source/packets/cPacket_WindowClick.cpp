@@ -1,5 +1,6 @@
 #include "cPacket_WindowClick.h"
-
+#include "cPacket_WholeInventory.h"
+#include "cPacket_ItemData.h"
 
 bool cPacket_WindowClick::Parse(cSocket & a_Socket)
 {
@@ -17,20 +18,15 @@ bool cPacket_WindowClick::Parse(cSocket & a_Socket)
 // 	LOG("Right/Le: %i", m_RightMouse );
 // 	LOG("NumClick: %i", m_NumClicks );
 
-	if( !ReadShort(m_ItemID) ) return false;
-//	LOG("ItemID: %i", m_ItemID );
-	if( m_ItemID > -1 )
-	{
-		if( !ReadByte(m_ItemCount) ) return false;
-		if( !ReadShort(m_ItemUses) ) return false;
-// 		LOG("Count : %i", m_ItemCount );
-// 		LOG("Uses  : %i", m_ItemUses );
-	}
-	else
-	{
-	    m_ItemCount = 0;
-	    m_ItemUses = 0;
-	}
+	cPacket_ItemData Item;
+
+	Item.Parse(m_Socket);
+
+	m_ItemID = Item.m_ItemID;
+	m_ItemCount = Item.m_ItemCount;
+	m_ItemUses = Item.m_ItemUses;
+
+	m_EnchantNums = Item.m_EnchantNums;
 
 	return true;
 }

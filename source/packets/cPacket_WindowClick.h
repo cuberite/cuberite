@@ -15,6 +15,7 @@ public:
 		, m_ItemID( 0 )
 		, m_ItemCount( 0 )
 		, m_ItemUses( 0 )
+		, m_EnchantNums(-1)
 	{ m_PacketID = E_WINDOW_CLICK; }
 	virtual cPacket* Clone() const { return new cPacket_WindowClick(*this); }
 
@@ -30,12 +31,14 @@ public:
 
 	char m_RightMouse;	// 0		= left 1 = Right mb
 	short m_NumClicks;	// Num clicks
-	bool m_Bool; // unkown????????????
+	bool m_Bool; // unkown???????????? SHIFT clicked 
 
 	// Below = item
 	short m_ItemID; // if this is -1 the next stuff dont exist
 	char m_ItemCount;
 	short m_ItemUses;
+
+	short m_EnchantNums;
 
 	static const unsigned int c_Size = 1 + 1 + 2 + 1 + 2 + 2; // Minimal size ( +1+1  = max)
 };

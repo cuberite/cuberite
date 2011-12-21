@@ -54,7 +54,8 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 	PickupSpawn.m_Rotation = (char)(m_Speed->x * 8);
 	PickupSpawn.m_Pitch = (char)(m_Speed->y * 8);
 	PickupSpawn.m_Roll = (char)(m_Speed->z * 8);
-	cRoot::Get()->GetServer()->Broadcast( PickupSpawn );
+	if(PickupSpawn.m_Item != E_ITEM_EMPTY)
+		cRoot::Get()->GetServer()->Broadcast( PickupSpawn );
 
 	m_EntityType = E_PICKUP;
 }
@@ -216,7 +217,8 @@ void cPickup::HandlePhysics(float a_Dt)
 bool cPickup::CollectedBy( cPlayer* a_Dest )
 {
 	if(m_bCollected) return false; // It's already collected!
-	if(m_Timer < 800.f) return false; // Not old enough
+	// 800 is to long
+	if(m_Timer < 500.f) return false; // Not old enough
 
 	if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_COLLECT_ITEM, 2, this, a_Dest ) ) return false;
 

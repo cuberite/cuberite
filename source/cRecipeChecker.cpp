@@ -195,7 +195,7 @@ void cRecipeChecker::ReloadRecipes()
 			if( c == '@' ) bLoadResult = true;
 			if( c != ',' ) bLoadSlot = false;
 
-			if( !isValidItem( ItemID ) )
+			if( !IsValidItem( ItemID ) )
 			{
 				LOGERROR("Error in recipes file (%s): Invalid Item ID %i", a_File, ItemID );
 				bDontAddRecipe = true;
@@ -307,7 +307,7 @@ void cRecipeChecker::ReloadRecipes()
 				f >> c;	if( c != ':' ) { bError=true; break; }
 				f >> Amount;
 				//LOG("%i %i", ItemID, Amount );
-				if( !isValidItem( ItemID ) )
+				if( !IsValidItem( ItemID ) )
 				{
 					LOGERROR("Error in recipes file (%s): Invalid Item ID %i", a_File, ItemID );
 					bDontAddRecipe = true;

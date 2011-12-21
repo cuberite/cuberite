@@ -29,9 +29,11 @@ inline bool IsValidBlock( int a_BlockID )	//tolua_export
 	return false;
 }											//tolua_export
 
-inline bool isValidItem( int a_ItemID )		//tolua_export
+// Was old :o
+// Changed to fit the style ;)
+inline bool IsValidItem( int a_ItemID )		//tolua_export
 {											//tolua_export
-	if( (a_ItemID >= 256 && a_ItemID <= 358)
+	if( (a_ItemID >= 256 && a_ItemID <= 383)
 		|| (a_ItemID == 2256 || a_ItemID == 2257) )
 	{
 		return true;

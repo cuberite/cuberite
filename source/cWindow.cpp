@@ -3,6 +3,7 @@
 #include "cMCLogger.h"
 #include "cClientHandle.h"
 #include "cPlayer.h"
+#include "cPickup.h"
 #include "cInventory.h"
 #include "cWindowOwner.h"
 
@@ -195,6 +196,15 @@ void cWindow::Open( cPlayer & a_Player )
 
 void cWindow::Close( cPlayer & a_Player )
 {
+	//Checks wheather the player is still holding an item
+	if(m_DraggingItem && m_DraggingItem->m_ItemCount > 0)
+	{
+		LOG("Player holds item! Dropping it...");
+		a_Player.TossItem( true, m_DraggingItem->m_ItemCount );
+		
+	}
+	
+
     cPacket_WindowClose WindowClose;
 	WindowClose.m_Close = (char)m_WindowID;
 	cClientHandle* ClientHandle = a_Player.GetClientHandle();
@@ -205,6 +215,8 @@ void cWindow::Close( cPlayer & a_Player )
 	{
 		Destroy();
 	}
+
+
 }
 
 void cWindow::OwnerDestroyed()

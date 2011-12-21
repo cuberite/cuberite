@@ -450,9 +450,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cPacket_Chat Joined( m_pState->Username + " joined the game!");
 					cRoot::Get()->GetServer()->Broadcast( Joined, this );
 				}
-				int posx = m_Player->GetPosX();
-				int posy = m_Player->GetPosY();
-				int posz = m_Player->GetPosZ();
+				int posx = (int) m_Player->GetPosX();
+				int posy = (int) m_Player->GetPosY();
+				int posz = (int) m_Player->GetPosZ();
 				// Now initialize player (adds to entity list etc.)
 				cWorld* PlayerWorld = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
 				if( !PlayerWorld ) PlayerWorld = cRoot::Get()->GetDefaultWorld();
@@ -503,6 +503,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
 					if (LastActionCnt > 3) { //kick if more than 3 interactions per .1 seconds
 						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
+						//To many false-positives :s for example on a minimal server lagg :s should be re checked
 						Kick("You're a baaaaaad boy!");
 						break;
 					}
@@ -812,6 +813,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					if( PacketData->m_Direction < 0 ) // clicked in air
 						break;
 
+					//TODO: Wrong Blocks!
 					int clickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					char MetaData = (char)Equipped.m_ItemHealth;
 					bool LavaBucket = false;
@@ -820,6 +822,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
 					case E_ITEM_BUCKET:
+						//TODO: Change this, it is just a small hack to get it working a little bit. seems like the Client sends the position from the first hitable block :s
+						clickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ );
+						LOG("Bucket Clicked BlockID: %d", clickedBlock);
 						switch (clickedBlock)
 						{
 							case E_BLOCK_WATER:
@@ -833,10 +838,24 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						}
 						break;
 					case E_ITEM_LAVA_BUCKET:
-						PacketData->m_ItemType = E_BLOCK_LAVA;
+						if((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )))
+						{
+							cItem NewItem;
+							NewItem.m_ItemID = E_ITEM_BUCKET;
+							NewItem.m_ItemCount = 1;
+							m_Player->GetInventory().AddItem( NewItem );
+							PacketData->m_ItemType = E_BLOCK_LAVA;
+						}
 						break;
 					case E_ITEM_WATER_BUCKET:
-						PacketData->m_ItemType = E_BLOCK_WATER;
+						if((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )))
+						{
+							cItem NewItem;
+							NewItem.m_ItemID = E_ITEM_BUCKET;
+							NewItem.m_ItemCount = 1;
+							m_Player->GetInventory().AddItem( NewItem );
+							PacketData->m_ItemType = E_BLOCK_WATER;
+						}
 						break;
 					case E_BLOCK_WHITE_CLOTH:
 						MetaData = (char)PacketData->m_Uses;
@@ -932,7 +951,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							NewItem.m_ItemID = E_ITEM_LAVA_BUCKET;
 							NewItem.m_ItemCount = 1;
 							m_Player->GetInventory().AddItem( NewItem );
-							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
+							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
 						}
 
 					} else if (WaterBucket) {
@@ -942,7 +961,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							NewItem.m_ItemID = E_ITEM_WATER_BUCKET;
 							NewItem.m_ItemCount = 1;
 							m_Player->GetInventory().AddItem( NewItem );
-							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
+							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
 						}
 
 					} else if( IsValidBlock( PacketData->m_ItemType) ) {

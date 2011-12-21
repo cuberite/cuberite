@@ -1,5 +1,6 @@
 #pragma once
 #include "cPawn.h"
+#include "BlockID.h"
 
 class Vector3f;
 class cClientHandle;
@@ -82,4 +83,7 @@ protected:
 	float m_AttackInterval;
 	float m_FireDamageInterval;
 	float m_BurnPeriod;
+
+	void DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count);
+	void RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max);
 }; //tolua_export

@@ -73,7 +73,9 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 	}
 	SendWholeWindow( a_Player.GetClientHandle() );
 	a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );
-	// Separate packet for result =/ Don't know why
+	//Separate packet for result =/ Don't know why
+	
+	
 	cPacket_InventorySlot Packet;
 	Packet.m_WindowID = (char)GetWindowID();
 	Packet.m_SlotNum = 0;
@@ -81,6 +83,7 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 	Packet.m_ItemCount = GetSlot(0)->m_ItemCount;
 	Packet.m_ItemUses = (char)GetSlot(0)->m_ItemHealth;
 	a_Player.GetClientHandle()->Send( Packet );
+	
 }
 
 void cCraftingWindow::Close( cPlayer & a_Player )

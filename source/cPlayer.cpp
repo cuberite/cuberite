@@ -325,11 +325,7 @@ void cPlayer::Heal( int a_Health )
 {
 	if( m_Health < 20 )
 	{
-		m_Health += (short)a_Health;
-		if( m_Health > 20 )
-		{
-			m_Health = 20;
-		}
+		m_Health = MIN(a_Health + m_Health, 20);
 
 		cPacket_UpdateHealth Health;
 		Health.m_Health = m_Health;
@@ -344,7 +340,9 @@ void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 
 		cPacket_UpdateHealth Health;
 		Health.m_Health = m_Health;
-		m_ClientHandle->Send( Health );
+		//TODO: Causes problems sometimes O.o (E.G. Disconnecting when attacked)
+		if(m_ClientHandle != 0)
+			m_ClientHandle->Send( Health );
 	}
 }
 

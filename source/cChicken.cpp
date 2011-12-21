@@ -20,6 +20,8 @@
 #include <string>
 
 
+// TODO: Drop egg every 5-10 minutes
+
 
 cChicken::cChicken()
 	: m_ChaseTime( 999999 )
@@ -49,16 +51,15 @@ void cChicken::Tick(float a_Dt)
 
 void cChicken::KilledBy( cEntity* a_Killer )
 {
-	if( (rand() % 5) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_EGG, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
-	if( (rand() % 1) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_FEATHER, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
+	//Drops 0-2 Feathers
+	cMonster::RandomDropItem(E_ITEM_FEATHER, 0, 2);
+
+	// Raw Chicken 
+	// TODO: (Check wheather it is burning to drop cooked Chicken)
+	//Drops 0-2 Lether
+	cMonster::DropItem(E_ITEM_RAW_CHICKEN, 1);
+
+
 	cMonster::KilledBy( a_Killer );
 }
 

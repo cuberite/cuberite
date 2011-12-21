@@ -19,7 +19,7 @@ enum ENUM_PACKET_ID
 	E_BLOCK_DIG					= 0x0e,
 	E_BLOCK_PLACE				= 0x0f,
 	E_ITEM_SWITCH				= 0x10,
-	E_ADD_TO_INV				= 0x11,
+	E_ADD_TO_INV				= 0x11,		//TODO: Sure this is not Use Bed??
 	E_ANIMATION					= 0x12,
 	E_PACKET_13					= 0x13,
 	E_NAMED_ENTITY_SPAWN= 0x14,

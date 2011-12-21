@@ -16,7 +16,7 @@ public:
 		, m_ItemCount	( a_ItemCount )
 		, m_ItemHealth	( a_ItemHealth )
 	{																									//tolua_export
-		if(!isValidItem( m_ItemID ) ) m_ItemID = E_ITEM_EMPTY;
+		if(!IsValidItem( m_ItemID ) ) m_ItemID = E_ITEM_EMPTY;
 	}																									//tolua_export
 	void Empty()																						//tolua_export
 	{																									//tolua_export
@@ -35,6 +35,8 @@ public:
 
 	void GetJson( Json::Value & a_OutValue );															//tolua_export
 	void FromJson( const Json::Value & a_Value );														//tolua_export
+	
+	static bool IsEnchantable(ENUM_ITEM_ID item);
 
 	ENUM_ITEM_ID	m_ItemID;																			//tolua_export
 	char			m_ItemCount;																		//tolua_export

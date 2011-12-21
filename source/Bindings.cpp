@@ -2483,7 +2483,7 @@ static int tolua_AllToLua_isValidItem00(lua_State* tolua_S)
  {
   int a_ItemID = ((int)  tolua_tonumber(tolua_S,1,0));
   {
-   bool tolua_ret = (bool)  isValidItem(a_ItemID);
+   bool tolua_ret = (bool)  IsValidItem(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }

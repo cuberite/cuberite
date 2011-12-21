@@ -49,16 +49,11 @@ void cPig::Tick(float a_Dt)
 
 void cPig::KilledBy( cEntity* a_Killer )
 {
-	if( (rand() % 5) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_EGG, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
-	if( (rand() % 1) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_FEATHER, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
+	//Drops 0-2 meat
+	cMonster::RandomDropItem(E_ITEM_RAW_MEAT, 0, 2);
+
+	//TODO: Check for burning state
+
 	cMonster::KilledBy( a_Killer );
 }
 

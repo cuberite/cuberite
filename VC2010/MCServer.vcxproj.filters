@@ -397,6 +397,9 @@
     <Filter Include="Packets\cPacket_SoundEffect">
       <UniqueIdentifier>{faf55c04-f56e-4f41-a948-54232627c3a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets\cPacket_ItemData">
+      <UniqueIdentifier>{fcc08e08-8dba-47b4-89b0-5dc255bb9b8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -795,6 +798,9 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_SoundEffect.cpp">
       <Filter>Packets\cPacket_SoundEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_ItemData.cpp">
+      <Filter>Packets\cPacket_ItemData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1229,6 +1235,9 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_SoundEffect.h">
       <Filter>Packets\cPacket_SoundEffect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_ItemData.h">
+      <Filter>Packets\cPacket_ItemData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

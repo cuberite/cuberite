@@ -45,16 +45,10 @@ void cCreeper::Tick(float a_Dt)
 
 void cCreeper::KilledBy( cEntity* a_Killer )
 {
-	if( (rand() % 5) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_EGG, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
-	if( (rand() % 1) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_FEATHER, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
+	cMonster::RandomDropItem(E_ITEM_GUNPOWDER, 0, 2);
+
+	//Todo: Check if killed by a skeleton then drop random music disk
+
 	cMonster::KilledBy( a_Killer );
 }
 

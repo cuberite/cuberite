@@ -2,6 +2,7 @@
 #include "../cItem.h"
 #include "../cInventory.h"
 #include "../cWindow.h"
+#include "cPacket_ItemData.h"
 
 cPacket_WholeInventory::cPacket_WholeInventory( const cPacket_WholeInventory & a_Clone )
 {
@@ -39,11 +40,11 @@ bool cPacket_WholeInventory::Send(cSocket & a_Socket)
 {
 	unsigned int TotalSize = c_Size;
 
+	cPacket_ItemData Item;
+
 	for(int i = 0; i < m_Count; i++)
 	{
-		if( m_Items[i].m_ItemID > -1 )
-			TotalSize+=3;
-		TotalSize+=2;
+		TotalSize += Item.GetSize(m_Items[i].m_ItemID);
 	}
 
 	char* Message = new char[TotalSize];
@@ -51,18 +52,16 @@ bool cPacket_WholeInventory::Send(cSocket & a_Socket)
 	unsigned int i = 0;
 	AppendByte		( (char)m_PacketID,			Message, i );
 	AppendByte		( m_WindowID,				Message, i );
-	AppendShort		( m_Count,				Message, i );
+	AppendShort		( m_Count,					Message, i );
+
 	for(int j = 0; j < m_Count; j++)
 	{
-		AppendShort		( (short)m_Items[j].m_ItemID,	Message, i );
-		if( m_Items[j].m_ItemID > -1 )
-		{
-			AppendByte	( m_Items[j].m_ItemCount,	Message, i );
-			AppendShort	( m_Items[j].m_ItemHealth,	Message, i );
-		}
+		Item.AppendItem(Message, i, &(m_Items[j]));
 	}
 
 	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
 	delete [] Message;
 	return RetVal;
 }
+
+ 

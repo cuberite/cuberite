@@ -48,16 +48,12 @@ void cZombiepigman::Tick(float a_Dt)
 
 void cZombiepigman::KilledBy( cEntity* a_Killer )
 {
-	if( (rand() % 5) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_EGG, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
-	if( (rand() % 1) == 0 )
-	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( E_ITEM_FEATHER, 1 ) );
-		Pickup->Initialize( GetWorld() );
-	}
+	//Drops 0-1 Rottenflesh
+	cMonster::RandomDropItem(E_ITEM_ROTTEN_FLESH, 0, 2);
+
+	//Drops 0-1 gold nuggets
+	cMonster::RandomDropItem(E_ITEM_GOLD_NUGGET, 0, 2);
+
 	cMonster::KilledBy( a_Killer );
 }
 
