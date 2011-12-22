@@ -77,6 +77,8 @@ public:
 	void SetLight(char* a_Buffer, int a_BlockIdx, char a_Light);
 	void SetLight(char* a_Buffer, int x, int y, int z, char light);
 
+	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
+
 	void AddTickBlockEntity( cFurnaceEntity* a_Entity );
 	//{
 	//	m_TickBlockEntities.remove( a_Entity );

@@ -217,6 +217,8 @@ void cPickup::HandlePhysics(float a_Dt)
 			*m_Pos += *m_Speed*a_Dt;
 		}
 	}
+
+
 }
 
 bool cPickup::CollectedBy( cPlayer* a_Dest )

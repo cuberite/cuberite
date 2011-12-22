@@ -503,7 +503,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
 					if (LastActionCnt > 3) { //kick if more than 3 interactions per .1 seconds
 						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
-						//To many false-positives :s for example on a minimal server lagg :s should be re checked
+						//TODO Too many false-positives :s for example on a minimal server lagg :s should be re checked
 						Kick("You're a baaaaaad boy!");
 						break;
 					}
@@ -524,6 +524,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (m_Player->GetGameMode() == 1) );
+					if(bBroken == false) bBroken = (m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS && OldBlock == E_BLOCK_LEAVES);
 
 					cItem PickupItem;
 					if( bBroken && !(m_Player->GetGameMode() == 1) ) // broken

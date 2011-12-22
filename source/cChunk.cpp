@@ -5,8 +5,12 @@
 #include <sys/stat.h>   // for mkdir
 #include <sys/types.h>
 #endif
+
+
 #include "cChunk.h"
 #include "cWorld.h"
+#include "cWaterSimulator.h"
+#include "cLavaSimulator.h"
 #include "cClientHandle.h"
 #include "cServer.h"
 #include "zlib.h"
@@ -249,7 +253,13 @@ void cChunk::Tick(float a_Dt)
 			{
 				if( GetBlock( X, Y-1, Z ) == E_BLOCK_AIR )
 				{
-					SetBlock( X, Y, Z, 0, 0 );
+					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
+
+					int wX, wY, wZ;
+					PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
+
+					m_World->GetWaterSimulator()->WakeUp( wX, wY, wZ );
+					m_World->GetLavaSimulator()->WakeUp( wX, wY, wZ );
 					if (isRedstone) {
 						cRedstone Redstone(m_World);
 						Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
@@ -291,7 +301,7 @@ void cChunk::Tick(float a_Dt)
 				AddDirection( XX, YY, ZZ, Dir, true );
 				if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
 				{
-					SetBlock( X, Y, Z, 0, 0 );
+					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
 					Pickup->Initialize( m_World );
 				}
@@ -305,10 +315,19 @@ void cChunk::Tick(float a_Dt)
 		case E_BLOCK_SAND:
 			{
 				char BottomBlock = GetBlock( X, Y-1, Z );
-				if( BottomBlock == E_BLOCK_AIR || BottomBlock == E_BLOCK_WATER || BottomBlock == E_BLOCK_STATIONARY_WATER || BottomBlock == E_BLOCK_LAVA || BottomBlock == E_BLOCK_STATIONARY_LAVA )
+				if( BottomBlock == E_BLOCK_AIR || IsBlockWater(BottomBlock) || IsBlockLava(BottomBlock) )
 				{
-					SetBlock( X, Y, Z, 0, 0 );
+					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
 					SetBlock( X, Y-1, Z, BlockID, 0 );
+					
+					int wX, wY, wZ;
+
+					PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
+
+					m_World->GetWaterSimulator()->WakeUp( wX, wY, wZ );
+					m_World->GetLavaSimulator()->WakeUp( wX, wY, wZ );
+					m_World->GetWaterSimulator()->WakeUp( wX, wY - 1, wZ );
+					m_World->GetLavaSimulator()->WakeUp( wX, wY - 1, wZ );
 				}
 			}
 			break;
@@ -1447,4 +1466,12 @@ void cChunk::AddTickBlockEntity( cFurnaceEntity* a_Entity )
 void cChunk::RemoveTickBlockEntity( cFurnaceEntity* a_Entity )
 {
 	m_pState->m_TickBlockEntities.remove( a_Entity );
+}
+
+
+void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z)
+{
+	a_Y = a_ChunkY;
+	a_X = m_PosX * 16 + a_ChunkX;
+	a_Z = m_PosZ * 16 + a_ChunkZ;
 }

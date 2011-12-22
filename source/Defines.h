@@ -46,9 +46,14 @@ inline bool IsValidItem( int a_ItemID )		//tolua_export
 	return IsValidBlock( a_ItemID );
 }											//tolua_export
 
-inline bool IsBlockWater (char a_BlockID)
+inline bool IsBlockWater(char a_BlockID)
 {
 	return (a_BlockID == E_BLOCK_WATER || a_BlockID == E_BLOCK_STATIONARY_WATER);
+}
+
+inline bool IsBlockLava(char a_BlockID)
+{
+	return (a_BlockID == E_BLOCK_LAVA || a_BlockID == E_BLOCK_STATIONARY_LAVA);
 }
 
 inline void AddDirection( int & a_X, char & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false ) //tolua_export

@@ -81,6 +81,10 @@ public:
 	const double & GetSpawnY();														//tolua_export
 	const double & GetSpawnZ() { return m_SpawnZ; }									//tolua_export
 
+	cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
+	cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
+
+
 	cBlockEntity* GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
 
 	void GrowTree( int a_X, int a_Y, int a_Z );										//tolua_export

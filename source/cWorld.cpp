@@ -255,10 +255,10 @@ cWorld::cWorld( const char* a_WorldName )
 
 	// Blocks that breaks when pushed by piston
 	g_BlockPistonBreakable[ E_BLOCK_AIR ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_WATER ]	= true;
-	g_BlockPistonBreakable[ E_BLOCK_WATER ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_LAVA ]	= true;
-	g_BlockPistonBreakable[ E_BLOCK_LAVA ]				= true;
+	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_WATER ]	= false;		//This gave pistons the ability to drop water :D
+	g_BlockPistonBreakable[ E_BLOCK_WATER ]				= false;
+	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_LAVA ]	= false;
+	g_BlockPistonBreakable[ E_BLOCK_LAVA ]				= false;
 	g_BlockPistonBreakable[ E_BLOCK_BED ]				= true;
 	g_BlockPistonBreakable[ E_BLOCK_COBWEB ]			= true;
 	g_BlockPistonBreakable[ E_BLOCK_TALL_GRASS ]		= true;
@@ -709,7 +709,7 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 	cChunk* DestChunk = GetChunk( ChunkX, ChunkY, ChunkZ );
 	if(DestChunk)
 	{
-		DestChunk->SetBlock(PosX, PosY, PosZ, 0, 0 );
+		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
 		m_WaterSimulator->WakeUp( a_X, a_Y, a_Z );
 		m_LavaSimulator->WakeUp( a_X, a_Y, a_Z );
 
