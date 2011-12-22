@@ -320,9 +320,9 @@ void cInventory::SendSlot( int a_SlotNum )
 	{
 		cPacket_InventorySlot InventorySlot;
 		InventorySlot.m_ItemCount = Item->m_ItemCount;
-		InventorySlot.m_ItemID = Item->m_ItemID;
-		InventorySlot.m_ItemUses = (char)Item->m_ItemHealth;
-		InventorySlot.m_SlotNum = (short)a_SlotNum;
+		InventorySlot.m_ItemID = (short) Item->m_ItemID;
+		InventorySlot.m_ItemUses = (char) Item->m_ItemHealth;
+		InventorySlot.m_SlotNum = (short) a_SlotNum;
 		InventorySlot.m_WindowID = 0; // Inventory window ID
 		m_Owner->GetClientHandle()->Send( InventorySlot );
 	}

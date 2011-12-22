@@ -9,6 +9,8 @@
 #include "cMCLogger.h"
 #include "cEntity.h"
 
+#include "Defines.h"
+
 #ifndef _WIN32
 #include <stdlib.h> // abs()
 #endif
@@ -209,7 +211,8 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 		}
 		
 		char BlockID = m_World->GetBlock( pos->x, pos->y, pos->z );
-		if ( BlockID != E_BLOCK_AIR )
+		//No collision with water ;)
+		if ( BlockID != E_BLOCK_AIR || IsBlockWater(BlockID))
 		{
 			*BlockHitPosition = pos;
 			int Normal = GetHitNormal(a_Start, End, *pos );
@@ -280,7 +283,7 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	Vector3i SmallBlockPos = a_BlockPos;
 	char BlockID = m_World->GetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 
-	if( BlockID == E_BLOCK_AIR )
+	if( BlockID == E_BLOCK_AIR || IsBlockWater(BlockID))
 		return 0;
 
 	Vector3f BlockPos;

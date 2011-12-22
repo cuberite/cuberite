@@ -44,7 +44,7 @@ bool cPacket_WholeInventory::Send(cSocket & a_Socket)
 
 	for(int i = 0; i < m_Count; i++)
 	{
-		TotalSize += Item.GetSize(m_Items[i].m_ItemID);
+		TotalSize +=  Item.GetSize((short) m_Items[i].m_ItemID);
 	}
 
 	char* Message = new char[TotalSize];

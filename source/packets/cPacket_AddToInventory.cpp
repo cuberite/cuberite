@@ -9,14 +9,14 @@ bool cPacket_AddToInventory::Send( cSocket & a_Socket )
 
 	cPacket_ItemData Item;
 
-	TotalSize += Item.GetSize(m_ItemType);
+	TotalSize += Item.GetSize((short) m_ItemType);
 
 	char* Message = new char[TotalSize];
 
 	unsigned int i = 0;
 	AppendByte	 ( (char) m_PacketID,	Message, i );
 	
-	Item.AppendItem(Message, i, m_ItemType, m_Count, this->m_Life);
+	Item.AppendItem(Message, i, (short) m_ItemType, m_Count, this->m_Life);
 
 	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
 	delete [] Message;

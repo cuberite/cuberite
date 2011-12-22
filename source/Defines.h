@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MemoryLeak.h"
+#include "BlockID.h"
 
 //tolua_begin
 // emissive blocks
@@ -44,6 +45,11 @@ inline bool IsValidItem( int a_ItemID )		//tolua_export
 
 	return IsValidBlock( a_ItemID );
 }											//tolua_export
+
+inline bool IsBlockWater (char a_BlockID)
+{
+	return (a_BlockID == E_BLOCK_WATER || a_BlockID == E_BLOCK_STATIONARY_WATER);
+}
 
 inline void AddDirection( int & a_X, char & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false ) //tolua_export
 {//tolua_export

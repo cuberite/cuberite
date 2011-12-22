@@ -615,7 +615,7 @@ void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
 {
 	if(a_Count > 0)
 	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( a_Item, a_Count ) );
+		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( a_Item, (char) a_Count ) );
 		Pickup->Initialize( GetWorld() );
 	}
 }

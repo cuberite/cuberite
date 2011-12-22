@@ -54,6 +54,4 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 	default:
 		return (ENUM_ITEM_ID)a_BlockID;
 	}
-	//TODO: Whats that? :D
-	return E_ITEM_EMPTY;
 }

@@ -325,7 +325,7 @@ void cPlayer::Heal( int a_Health )
 {
 	if( m_Health < 20 )
 	{
-		m_Health = MIN(a_Health + m_Health, 20);
+		m_Health = (short) MIN(a_Health + m_Health, 20);
 
 		cPacket_UpdateHealth Health;
 		Health.m_Health = m_Health;

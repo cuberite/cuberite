@@ -80,7 +80,8 @@ cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 	m_Speed->z = (float)(a_PickupSpawnPacket->m_Roll)		/ 8;
 
 	// Spawn it on clients
-	cRoot::Get()->GetServer()->Broadcast( *a_PickupSpawnPacket );
+	if(a_PickupSpawnPacket->m_Item != E_ITEM_EMPTY)
+		cRoot::Get()->GetServer()->Broadcast( *a_PickupSpawnPacket );
 
 	m_EntityType = E_PICKUP;
 }
@@ -98,12 +99,13 @@ void cPickup::SpawnOn( cClientHandle* a_Target )
 	PickupSpawn.m_Rotation = (char)(m_Speed->x * 8);
 	PickupSpawn.m_Pitch    = (char)(m_Speed->y * 8);
 	PickupSpawn.m_Roll	   = (char)(m_Speed->z * 8);
-	a_Target->Send( PickupSpawn );
+	if(PickupSpawn.m_Item != E_ITEM_EMPTY)
+		a_Target->Send( PickupSpawn );
 }
 
 void cPickup::Tick(float a_Dt)
 {
-	m_Timer+=a_Dt;
+	m_Timer += a_Dt;
 	a_Dt = a_Dt / 1000.f;
 	if(m_bCollected)
 	{
@@ -152,7 +154,9 @@ void cPickup::HandlePhysics(float a_Dt)
 		cWorld* World = GetWorld();
 		int BlockX = (m_Pos->x)<0 ? (int)m_Pos->x-1 : (int)m_Pos->x;
 		int BlockZ = (m_Pos->z)<0 ? (int)m_Pos->z-1 : (int)m_Pos->z;
-		if( World->GetBlock( BlockX, (int)m_Pos->y -1, BlockZ ) == E_BLOCK_AIR )
+		char BlockBelow = World->GetBlock( BlockX, (int)m_Pos->y -1, BlockZ );
+		//Not only air, falls through water ;)
+		if( BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow))
 		{
 			m_bOnGround = false;
 		}
@@ -162,7 +166,8 @@ void cPickup::HandlePhysics(float a_Dt)
 			m_Timer = 0;
 			return;
 		}
-		if( World->GetBlock( BlockX, (int)m_Pos->y, BlockZ ) != E_BLOCK_AIR ) // If in ground itself, push it out
+		char BlockIn = World->GetBlock( BlockX, (int)m_Pos->y, BlockZ );
+		if( BlockIn != E_BLOCK_AIR && !IsBlockWater(BlockIn) ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;
 			m_Pos->y += 0.2;

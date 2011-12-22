@@ -42,7 +42,7 @@ int cPacket_ItemData::GetSize(short a_ItemID)
 
 void cPacket_ItemData::AppendItem(char* a_Message, unsigned int &a_Iterator, cItem *a_Item)
 {
-	return AppendItem(a_Message, a_Iterator, a_Item->m_ItemID, a_Item->m_ItemCount, a_Item->m_ItemHealth);
+	return AppendItem(a_Message, a_Iterator, (short) a_Item->m_ItemID, a_Item->m_ItemCount, a_Item->m_ItemHealth);
 }
 
 void cPacket_ItemData::AppendItem(char* a_Message, unsigned int &a_Iterator, short a_ItemID, char a_Quantity, short a_Damage)
