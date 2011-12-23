@@ -159,8 +159,8 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	memset( m_LoadedChunks, 0x00, sizeof(cChunk*)*VIEWDISTANCE*VIEWDISTANCE );
 
 	//////////////////////////////////////////////////////////////////////////
-	m_pState->pReceiveThread = new cThread( ReceiveThread, this );
-	m_pState->pSendThread = new cThread( SendThread, this );
+	m_pState->pReceiveThread = new cThread( ReceiveThread, this, "cClientHandle::ReceiveThread" );
+	m_pState->pSendThread = new cThread( SendThread, this, "cClientHandle::SendThread" );
 	m_pState->pReceiveThread->Start( true );
 	m_pState->pSendThread->Start( true );
 	//////////////////////////////////////////////////////////////////////////
@@ -433,7 +433,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				}
 
 				if( m_pState->pAuthenticateThread ) delete m_pState->pAuthenticateThread;
-				m_pState->pAuthenticateThread = new cThread( AuthenticateThread, this );
+				m_pState->pAuthenticateThread = new cThread( AuthenticateThread, this, "cClientHandle::AuthenticateThread" );
 				m_pState->pAuthenticateThread->Start( true );
 			}
 			break;

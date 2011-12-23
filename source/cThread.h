@@ -5,7 +5,7 @@ class cThread
 {
 public:
 	typedef void (ThreadFunc)(void*);
-	cThread( ThreadFunc a_ThreadFunction, void* a_Param );
+	cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_ThreadName = 0 );
 	~cThread();
 
 	void Start( bool a_bWaitOnDelete = true );
@@ -22,4 +22,6 @@ private:
 	void* m_Param;
 	cEvent* m_Event;
 	cEvent* m_StopEvent;
+
+	char* m_ThreadName;
 };

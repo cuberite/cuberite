@@ -11,12 +11,48 @@
 #include "cEvent.h"
 #include "cMCLogger.h"
 
-cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param )
+#ifdef _WIN32
+//
+// Usage: SetThreadName (-1, "MainThread");
+//
+typedef struct tagTHREADNAME_INFO
+{
+	DWORD dwType; // must be 0x1000
+	LPCSTR szName; // pointer to name (in user addr space)
+	DWORD dwThreadID; // thread ID (-1=caller thread)
+	DWORD dwFlags; // reserved for future use, must be zero
+} THREADNAME_INFO;
+
+void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
+{
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = szThreadName;
+	info.dwThreadID = dwThreadID;
+	info.dwFlags = 0;
+
+	__try
+	{
+		RaiseException( 0x406D1388, 0, sizeof(info)/sizeof(DWORD), (DWORD*)&info );
+	}
+	__except(EXCEPTION_CONTINUE_EXECUTION)
+	{
+	}
+}
+#endif
+
+cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_ThreadName /* = 0 */ )
 	: m_ThreadFunction( a_ThreadFunction )
 	, m_Param( a_Param )
 	, m_Event( new cEvent() )
 	, m_StopEvent( 0 )
+	, m_ThreadName( 0 )
 {
+	if( a_ThreadName )
+	{
+		m_ThreadName = new char[ strlen(a_ThreadName)+1 ];
+		strcpy(m_ThreadName, a_ThreadName);
+	}
 }
 
 cThread::~cThread()
@@ -28,6 +64,8 @@ cThread::~cThread()
 		m_StopEvent->Wait();
 		delete m_StopEvent;
 	}
+
+	delete [] m_ThreadName;
 }
 
 void cThread::Start( bool a_bWaitOnDelete /* = true */ )
@@ -40,13 +78,19 @@ void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 	if( pthread_create( &SndThread, NULL, MyThread, this) )
 		LOGERROR("ERROR: Could not create thread!");
 #else
+	DWORD ThreadID = 0;
 	HANDLE hThread = CreateThread(	0 // security
 		,0 // stack size
 		, (LPTHREAD_START_ROUTINE) MyThread // function name
 		,this // parameters
 		,0 // flags
-		,0 ); // thread id
+		,&ThreadID ); // thread id
 	CloseHandle( hThread );
+
+	if( m_ThreadName )
+	{
+		SetThreadName(ThreadID, m_ThreadName );
+	}
 #endif
 
 	// Wait until thread has actually been created

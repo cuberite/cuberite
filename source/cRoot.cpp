@@ -111,7 +111,7 @@ void cRoot::Start()
 		m_Server->StartListenThread();
 		//cHeartBeat* HeartBeat = new cHeartBeat();
 
-		m_InputThread = new cThread( InputThread, this );
+		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
 		m_InputThread->Start( true );
 
 		while( !m_bStop && !m_bRestart ) // These are modified by external threads

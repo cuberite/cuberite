@@ -340,8 +340,8 @@ void ServerTickThread( void * a_Param )
 
 void cServer::StartListenThread()
 {
-	m_pState->pListenThread = new cThread( ServerListenThread, this );
-	m_pState->pTickThread = new cThread( ServerTickThread, this );
+	m_pState->pListenThread = new cThread( ServerListenThread, this, "cServer::ServerListenThread" );
+	m_pState->pTickThread = new cThread( ServerTickThread, this, "cServer::ServerTickThread" );
 	m_pState->pListenThread->Start( true );
 	m_pState->pTickThread->Start( true );
 }
