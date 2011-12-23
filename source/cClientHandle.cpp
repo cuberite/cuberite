@@ -395,9 +395,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		case E_PING: // Somebody tries to retreive information about the server
 			{
 				LOGINFO("Got ping");
-				char NumPlayers[8];
-				sprintf_s(NumPlayers, 8, "%i", cRoot::Get()->GetWorld()->GetNumPlayers() );
-				std::string response = std::string("MCServer! - It's OVER 9000!" + cChatColor::Delimiter + NumPlayers + cChatColor::Delimiter + "9001" );
+				char NumPlayers[8], cMaxPlayers[8];
+				sprintf_s(NumPlayers, 8, "%i", cRoot::Get()->GetWorld()->GetNumPlayers());
+				sprintf_s(cMaxPlayers, 8, "%i", cRoot::Get()->GetWorld()->GetMaxPlayers());
+				std::string response = std::string(cRoot::Get()->GetWorld()->GetDescription() + cChatColor::Delimiter + NumPlayers + cChatColor::Delimiter + cMaxPlayers );
 				Kick( response.c_str() );
 			}
 			break;
@@ -407,6 +408,11 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				m_pState->Username = PacketData->m_Username;
 				LOG("HANDSHAKE %s", GetUsername() );
 				cPacket_Chat Connecting(m_pState->Username + " is connecting.");
+
+				if (cRoot::Get()->GetWorld()->GetNumPlayers() == cRoot::Get()->GetWorld()->GetMaxPlayers()) {
+					Kick("The server is currently full :( -- Try again later");
+					break;
+				}
 				cRoot::Get()->GetServer()->Broadcast( Connecting, this );
 
 				// Give a server handshake thingy back

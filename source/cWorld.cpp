@@ -183,6 +183,8 @@ cWorld::cWorld( const char* a_WorldName )
 	{
 		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true );
 		m_SpawnMonsterRate = (float)IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10 );
+		SetMaxPlayers(IniFile2.GetValueI("Server", "MaxPlayers", 9001));
+		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - It's OVER 9000!").c_str();
 	}
 
 	m_ChunkMap = new cChunkMap( 32, 32, this );
@@ -763,6 +765,25 @@ void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 
 	{
 		if( (*itr)->GetClientHandle() == a_Exclude || !(*itr)->GetClientHandle()->IsLoggedIn() ) continue;
 		(*itr)->GetClientHandle()->Send( a_Packet );
+	}
+}
+
+std::string cWorld::GetDescription()
+{
+	return this->m_Description;
+}
+
+unsigned int cWorld::GetMaxPlayers()
+{
+	return this->m_MaxPlayers;
+}
+
+void cWorld::SetMaxPlayers(int iMax)
+{
+	this->m_MaxPlayers = MAX_PLAYERS;
+	if (iMax > 0 && iMax < MAX_PLAYERS)
+	{
+		this->m_MaxPlayers = iMax;
 	}
 }
 

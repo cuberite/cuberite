@@ -6,6 +6,8 @@
 enum ENUM_ITEM_ID;
 #endif
 
+#define MAX_PLAYERS 65535
+
 #include <list>
 #include <vector>
 
@@ -54,6 +56,13 @@ public:
 	//ClientList & GetClients();
 
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
+	
+	// MOTD
+	std::string GetDescription();
+
+	// Max Players
+	unsigned int GetMaxPlayers();
+	void SetMaxPlayers(int iMax);
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
@@ -168,12 +177,11 @@ private:
 	cCriticalSection* m_ClientHandleCriticalSection;
 	cCriticalSection* m_EntitiesCriticalSection;
 	cCriticalSection* m_ChunksCriticalSection;
-
-
+	
+	std::string m_Description;
+	unsigned int m_MaxPlayers;
 
 	cChunkMap* m_ChunkMap;
-
-	
 
 	bool m_bAnimals;
 	float m_SpawnMonsterTime;
