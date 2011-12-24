@@ -33,6 +33,7 @@
 #include "cZombiepigman.h" //Zombiepigman
 #include "cGenSettings.h"
 #include "cMakeDir.h"
+#include "cChunkGenerator.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -67,17 +68,33 @@ inline float fRadRand( float a_Radius )
 	return ((float)rand() * RECI_RAND_MAX)*a_Radius - a_Radius*0.5f;
 }
 
+struct sSetBlockData
+{
+	sSetBlockData( int a_X, int a_Y, int a_Z, char a_BlockID, char a_BlockMeta )
+		: x( a_X )
+		, y( a_Y )
+		, z( a_Z )
+		, BlockID( a_BlockID )
+		, BlockMeta( a_BlockMeta )
+	{}
+	int x, y, z;
+	char BlockID, BlockMeta;
+};
+
+typedef std::list< sSetBlockData > FastSetBlockList;
+
 struct cWorld::sWorldState
 {
-	cWorld::EntityList m_RemoveEntityQueue;
-	cWorld::EntityList m_AllEntities;
-	cWorld::ClientList m_Clients;
-	cWorld::PlayerList m_Players;
+	cWorld::EntityList RemoveEntityQueue;
+	cWorld::EntityList AllEntities;
+	cWorld::ClientList Clients;
+	cWorld::PlayerList Players;
 
-	static const unsigned int CHUNKBUFFER_SIZE = 5;
-	std::vector< unsigned int > m_ChunkBuffer;
+	cWorld::ChunkList SpreadQueue;
 
-	cWorld::ChunkList m_SpreadQueue;
+	FastSetBlockList FastSetBlockQueue;
+
+	cChunkGenerator* pChunkGenerator;
 
 	std::string WorldName;
 };
@@ -91,10 +108,10 @@ cWorld* cWorld::GetWorld()
 cWorld::~cWorld()
 {
 	LockEntities();
-	while( m_pState->m_AllEntities.begin() != m_pState->m_AllEntities.end() )
+	while( m_pState->AllEntities.begin() != m_pState->AllEntities.end() )
 	{
-		cEntity* Entity = *m_pState->m_AllEntities.begin();
-		m_pState->m_AllEntities.remove( Entity );
+		cEntity* Entity = *m_pState->AllEntities.begin();
+		m_pState->AllEntities.remove( Entity );
 		if( !Entity->IsDestroyed() ) Entity->Destroy();
 		RemoveEntity( Entity );
 	}
@@ -104,6 +121,7 @@ cWorld::~cWorld()
 	delete m_LavaSimulator;
 
 	UnloadUnusedChunks();
+	delete m_pState->pChunkGenerator;
 	delete m_ChunkMap;
 
 	delete m_ClientHandleCriticalSection;	m_ClientHandleCriticalSection = 0;
@@ -188,6 +206,7 @@ cWorld::cWorld( const char* a_WorldName )
 	}
 
 	m_ChunkMap = new cChunkMap( 32, 32, this );
+	m_pState->pChunkGenerator = new cChunkGenerator( m_ChunkMap );
 
 	m_Time = 0;
 	m_WorldTimeFraction = 0.f;
@@ -376,13 +395,13 @@ void cWorld::Tick(float a_Dt)
 
 	LockChunks();
 
-	while( !m_pState->m_SpreadQueue.empty() )
+	while( !m_pState->SpreadQueue.empty() )
 	{
-		cChunk* Chunk = (*m_pState->m_SpreadQueue.begin());
+		cChunk* Chunk = (*m_pState->SpreadQueue.begin());
 		//LOG("Spreading: %p", Chunk );
 		Chunk->SpreadLight( Chunk->pGetSkyLight() );
 		Chunk->SpreadLight( Chunk->pGetLight() );
-		m_pState->m_SpreadQueue.remove( &*Chunk );
+		m_pState->SpreadQueue.remove( &*Chunk );
 	}
 
 	m_ChunkMap->Tick(a_Dt);
@@ -427,6 +446,16 @@ void cWorld::Tick(float a_Dt)
 	}
 ////////////////Weather///////////////////////
 
+	// Asynchronously set blocks
+	FastSetBlockList FastSetBlockQueueCopy = m_pState->FastSetBlockQueue;
+	m_pState->FastSetBlockQueue.clear();
+	for( FastSetBlockList::iterator itr = FastSetBlockQueueCopy.begin(); itr != FastSetBlockQueueCopy.end(); ++itr )
+	{
+		sSetBlockData & SetBlockData = *itr;
+		FastSetBlock( SetBlockData.x, SetBlockData.y, SetBlockData.z, SetBlockData.BlockID, SetBlockData.BlockMeta );	// If unable to set block, it's added to FastSetBlockQueue again
+	}
+	if( FastSetBlockQueueCopy.size() != m_pState->FastSetBlockQueue.size() )
+	LOG(" Before: %i, after %i" , FastSetBlockQueueCopy.size(), m_pState->FastSetBlockQueue.size() );
 
 	if( m_Time - m_LastSave > 60*5 ) // Save each 5 minutes
 	{
@@ -438,15 +467,15 @@ void cWorld::Tick(float a_Dt)
 		UnloadUnusedChunks();
 	}
 
-	while( !m_pState->m_RemoveEntityQueue.empty() )
+	while( !m_pState->RemoveEntityQueue.empty() )
 	{
-		RemoveEntity( *m_pState->m_RemoveEntityQueue.begin() );
+		RemoveEntity( *m_pState->RemoveEntityQueue.begin() );
 	}
 
 	if( m_bAnimals && ( m_Time - m_SpawnMonsterTime > m_SpawnMonsterRate ) ) // 10 seconds
 	{
 		m_SpawnMonsterTime = m_Time;
-		if( m_pState->m_Players.size() > 0 )
+		if( m_pState->Players.size() > 0 )
 		{
 			cMonster	*Monster = 0;
 
@@ -454,8 +483,8 @@ void cWorld::Tick(float a_Dt)
 			int dayRand   = rand() % 6;  //added mob code
 			int nightRand = rand() % 10; //added mob code
 
-			int RandomPlayerIdx = rand() & m_pState->m_Players.size();
-			PlayerList::iterator itr = m_pState->m_Players.begin();
+			int RandomPlayerIdx = rand() & m_pState->Players.size();
+			PlayerList::iterator itr = m_pState->Players.begin();
 			for( int i = 1; i < RandomPlayerIdx; i++ )
 				itr++;
 
@@ -516,12 +545,12 @@ void cWorld::Tick(float a_Dt)
 	std::vector<int> m_RSList_copy(m_RSList);
 	//copy(m_RSList.begin(), m_RSList.end(), m_RSList_copy.begin());
 	m_RSList.erase(m_RSList.begin(),m_RSList.end());
-	int tempX;
+	int tempX;	// FIXME - Keep the scope in mind, these variables are not used in this scope at all, move them down into the for loop
 	int tempY;
 	int tempZ;
 	int state;
 
-	std::vector<int>::const_iterator cii;
+	std::vector<int>::const_iterator cii;	// FIXME - Please rename this variable, WTF is cii??? Use human readable variable names or common abbreviations (i, idx, itr, iter)
 	for(cii=m_RSList_copy.begin(); cii!=m_RSList_copy.end();)
 	{
 		tempX = *cii;cii++;
@@ -612,7 +641,7 @@ void cWorld::UnloadUnusedChunks()
 	UnlockChunks();
 }
 
-cChunk* cWorld::GetChunk( int a_X, int a_Y, int a_Z )
+cChunk* cWorld::GetChunkReliable( int a_X, int a_Y, int a_Z )	// TODO - FIXME - WARNING - This can cause a duplicate chunk to be generated!!
 {
 	cChunk* Chunk = GetChunkUnreliable( a_X, a_Y, a_Z );
 	if( Chunk )
@@ -632,7 +661,20 @@ cChunk* cWorld::GetChunk( int a_X, int a_Y, int a_Z )
 		return Chunk;
 	}
 
-	// This should never happen, but yeah
+	// This should never happen since it's reliable, but yeah
+	return 0;
+}
+
+cChunk* cWorld::GetChunk( int a_X, int a_Y, int a_Z )
+{
+	// Get chunk from memory
+	cChunk* Chunk = GetChunkUnreliable( a_X, a_Y, a_Z );
+	if( Chunk )	return Chunk;
+
+	// Generate new chunk asynchronously
+	m_pState->pChunkGenerator->GenerateChunk( a_X, a_Z );
+
+	// Could not find chunk, it's being generated, so return 0
 	return 0;
 }
 
@@ -660,16 +702,37 @@ void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	int ChunkX, ChunkY, ChunkZ;
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
 
-	GetChunk( ChunkX, ChunkY, ChunkZ )->SetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta );
+	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
+	if( Chunk )	Chunk->SetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta );
 }
 
 void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
-	int ChunkX, ChunkY, ChunkZ;
+	int ChunkX, ChunkY, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
 
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
+	AbsoluteToRelative( X, Y, Z, ChunkX, ChunkY, ChunkZ );
 
-	GetChunk( ChunkX, ChunkY, ChunkZ )->FastSetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta );
+	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
+	if( Chunk )	
+	{
+		Chunk->FastSetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+		return;
+	}
+
+	// Could not find chunk, so it has been pushed into the generate chunks queue
+	// Check if currently generating the target chunk
+	m_pState->pChunkGenerator->Lock();
+	Chunk = m_pState->pChunkGenerator->GetCurrentlyGenerating();
+	if( Chunk && Chunk->GetPosX() == ChunkX && Chunk->GetPosZ() == ChunkZ )
+	{
+		Chunk->FastSetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+		m_pState->pChunkGenerator->Unlock();
+		return;
+	}
+	m_pState->pChunkGenerator->Unlock();
+
+	// Unable to set block right now, try again later
+	m_pState->FastSetBlockQueue.push_back( sSetBlockData( a_X, a_Y, a_Z, a_BlockType, a_BlockMeta ) ); 
 }
 
 char cWorld::GetBlock( int a_X, int a_Y, int a_Z )
@@ -678,7 +741,9 @@ char cWorld::GetBlock( int a_X, int a_Y, int a_Z )
 
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
 
-	return GetChunk( ChunkX, ChunkY, ChunkZ )->GetBlock(a_X, a_Y, a_Z);
+	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
+	if( Chunk )	return Chunk->GetBlock(a_X, a_Y, a_Z);
+	return 0;
 }
 
 char cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
@@ -688,7 +753,8 @@ char cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
 
 	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	return Chunk->GetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z );
+	if( Chunk )	return Chunk->GetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z );
+	return 0;
 }
 
 void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
@@ -698,8 +764,11 @@ void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
 
 	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	Chunk->SetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_MetaData );
-	Chunk->SendBlockTo( a_X, a_Y, a_Z, 0 );
+	if( Chunk )	
+	{
+		Chunk->SetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_MetaData );
+		Chunk->SendBlockTo( a_X, a_Y, a_Z, 0 );
+	}
 }
 
 bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
@@ -750,7 +819,8 @@ char cWorld::GetHeight( int a_X, int a_Z )
 	int PosX = a_X, PosY = 0, PosZ = a_Z, ChunkX, ChunkY, ChunkZ;
 	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkY, ChunkZ );
 	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	return Chunk->GetHeight( PosX, PosZ );
+	if( Chunk )	return Chunk->GetHeight( PosX, PosZ );
+	return 0;
 }
 
 const double & cWorld::GetSpawnY()
@@ -761,7 +831,7 @@ const double & cWorld::GetSpawnY()
 
 void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
 {
-	for( PlayerList::iterator itr = m_pState->m_Players.begin(); itr != m_pState->m_Players.end(); ++itr)
+	for( PlayerList::iterator itr = m_pState->Players.begin(); itr != m_pState->Players.end(); ++itr)
 	{
 		if( (*itr)->GetClientHandle() == a_Exclude || !(*itr)->GetClientHandle()->IsLoggedIn() ) continue;
 		(*itr)->GetClientHandle()->Send( a_Packet );
@@ -789,22 +859,22 @@ void cWorld::SetMaxPlayers(int iMax)
 
 void cWorld::AddPlayer( cPlayer* a_Player )
 {
-	m_pState->m_Players.remove( a_Player );
-	m_pState->m_Players.push_back( a_Player );
+	m_pState->Players.remove( a_Player );
+	m_pState->Players.push_back( a_Player );
 }
 
 void cWorld::RemovePlayer( cPlayer* a_Player )
 {
-	m_pState->m_Players.remove( a_Player );
+	m_pState->Players.remove( a_Player );
 }
 
 void cWorld::GetAllPlayers( lua_State* L )
 {
-	lua_createtable(L, m_pState->m_Players.size(), 0);
+	lua_createtable(L, m_pState->Players.size(), 0);
 	int newTable = lua_gettop(L);
 	int index = 1;
-	PlayerList::const_iterator iter = m_pState->m_Players.begin();
-	while(iter != m_pState->m_Players.end()) {
+	PlayerList::const_iterator iter = m_pState->Players.begin();
+	while(iter != m_pState->Players.end()) {
 		tolua_pushusertype( L, (*iter), "cPlayer" );
 		lua_rawseti(L, newTable, index);
 		++iter;
@@ -820,7 +890,7 @@ cPlayer* cWorld::GetPlayer( const char* a_PlayerName )
 	bool bPerfectMatch = false;
 
 	unsigned int NameLength = strlen( a_PlayerName );
-	for( PlayerList::iterator itr = m_pState->m_Players.begin(); itr != m_pState->m_Players.end(); itr++ )
+	for( PlayerList::iterator itr = m_pState->Players.begin(); itr != m_pState->Players.end(); itr++ )
 	{
 		std::string Name = (*itr)->GetName();
 		if( NameLength > Name.length() ) continue; // Definitely not a match
@@ -864,7 +934,7 @@ cPlayer* cWorld::GetPlayer( const char* a_PlayerName )
 
 cEntity* cWorld::GetEntity( int a_UniqueID )
 {
-	for( EntityList::iterator itr = m_pState->m_AllEntities.begin(); itr != m_pState->m_AllEntities.end(); ++itr )
+	for( EntityList::iterator itr = m_pState->AllEntities.begin(); itr != m_pState->AllEntities.end(); ++itr )
 	{
 		if( (*itr)->GetUniqueID() == a_UniqueID )
 			return *itr;
@@ -884,7 +954,7 @@ cEntity* cWorld::GetEntity( int a_UniqueID )
 
 void cWorld::RemoveEntity( cEntity* a_Entity )
 {
-	m_pState->m_RemoveEntityQueue.remove( a_Entity );
+	m_pState->RemoveEntityQueue.remove( a_Entity );
 	if( a_Entity )
 	{
 		delete a_Entity;
@@ -943,15 +1013,15 @@ void cWorld::UnlockChunks()
 void cWorld::ReSpreadLighting( cChunk* a_Chunk )
 {
 	LockChunks();
-	m_pState->m_SpreadQueue.remove( a_Chunk );
-	m_pState->m_SpreadQueue.push_back( a_Chunk );
+	m_pState->SpreadQueue.remove( a_Chunk );
+	m_pState->SpreadQueue.push_back( a_Chunk );
 	UnlockChunks();
 }
 
 void cWorld::RemoveSpread( cChunk* a_Chunk )
 {
 	LockChunks();
-	m_pState->m_SpreadQueue.remove( a_Chunk );
+	m_pState->SpreadQueue.remove( a_Chunk );
 	UnlockChunks();
 }
 
@@ -969,24 +1039,24 @@ void cWorld::RemoveSpread( cChunk* a_Chunk )
 // }
 cWorld::EntityList & cWorld::GetEntities()
 {
-	return m_pState->m_AllEntities;
+	return m_pState->AllEntities;
 }
 void cWorld::AddEntity( cEntity* a_Entity )
 {
-	m_pState->m_AllEntities.push_back( a_Entity ); 
+	m_pState->AllEntities.push_back( a_Entity ); 
 }
 cWorld::PlayerList & cWorld::GetAllPlayers()
 {
-	return m_pState->m_Players; 
+	return m_pState->Players; 
 }
 unsigned int cWorld::GetNumPlayers()
 {
-	return m_pState->m_Players.size(); 
+	return m_pState->Players.size(); 
 }
 void cWorld::AddToRemoveEntityQueue( cEntity & a_Entity )
 {
-	m_pState->m_AllEntities.remove( &a_Entity);
-	m_pState->m_RemoveEntityQueue.push_back( &a_Entity ); 
+	m_pState->AllEntities.remove( &a_Entity);
+	m_pState->RemoveEntityQueue.push_back( &a_Entity ); 
 }
 const char* cWorld::GetName()
 {

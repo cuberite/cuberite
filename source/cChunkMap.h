@@ -20,6 +20,8 @@ public:
 	void UnloadUnusedChunks();
 	bool RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom = 0 );
 	void SaveAllChunks();
+
+	cWorld* GetWorld() { return m_World; }
 private:
 	class cChunkData
 	{

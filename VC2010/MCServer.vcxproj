@@ -27,8 +27,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
-    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -37,7 +36,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -63,13 +61,13 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)..\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)..\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\$(ProjectName)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)..\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)..\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\$(ProjectName)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
@@ -80,21 +78,18 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>false</MinimalRebuild>
+      <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;squirrel_3_0_1_stable.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../$(ProjectName)_debug.exe</OutputFile>
       <AdditionalLibraryDirectories>VLD;./Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -159,10 +154,11 @@
       <DebugInformationFormat>
       </DebugInformationFormat>
       <WholeProgramOptimization>true</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;ZLib.lib;tolua++-1.0.93.lib;lua-5.1.4.lib;WebServer.lib;JsonCpp.lib;squirrel_3_0_1_stable.lib;LIBCMT.LIB;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;ws2_32.lib;Psapi.lib;LIBCMT.LIB;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>./Release/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -170,8 +166,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>
-      </LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -223,6 +218,7 @@
     <ClCompile Include="..\source\cBlockingTCPLink.cpp" />
     <ClCompile Include="..\source\cCavespider.cpp" />
     <ClCompile Include="..\Source\cChicken.cpp" />
+    <ClCompile Include="..\source\cChunkGenerator.cpp" />
     <ClCompile Include="..\source\cChunkLoader.cpp" />
     <ClCompile Include="..\Source\cChunkMap.cpp" />
     <ClCompile Include="..\source\cCow.cpp" />
@@ -360,6 +356,7 @@
     <ClInclude Include="..\source\cBlockingTCPLink.h" />
     <ClInclude Include="..\source\cCavespider.h" />
     <ClInclude Include="..\Source\cChicken.h" />
+    <ClInclude Include="..\source\cChunkGenerator.h" />
     <ClInclude Include="..\source\cChunkLoader.h" />
     <ClInclude Include="..\Source\cChunkMap.h" />
     <ClInclude Include="..\source\cCow.h" />
@@ -510,25 +507,24 @@
     <None Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="JsonCpp.vcxproj">
+      <Project>{adbf25b9-7192-4e54-b35e-8ec47ca5ef86}</Project>
+    </ProjectReference>
     <ProjectReference Include="lua-5.1.4.vcxproj">
       <Project>{5e511191-6f1f-4d0d-940a-b850780963d2}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="squirrel_3_0_1_stable.vcxproj">
+      <Project>{4571ce2d-9e18-452f-90d6-94ae8e2406f4}</Project>
     </ProjectReference>
     <ProjectReference Include="tolua++-1.0.93.vcxproj">
       <Project>{67b50249-6cec-444e-a87a-d476112590ed}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="WebServer.vcxproj">
+      <Project>{2b4bd5c6-91c0-4a74-939f-b28737fb0dc6}</Project>
     </ProjectReference>
     <ProjectReference Include="ZLib.vcxproj">
       <Project>{f6f43a78-816d-4c37-a07b-68bed529273a}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MCServer.rc" />

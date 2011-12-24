@@ -400,6 +400,9 @@
     <Filter Include="Packets\cPacket_ItemData">
       <UniqueIdentifier>{fcc08e08-8dba-47b4-89b0-5dc255bb9b8a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cChunkGenerator">
+      <UniqueIdentifier>{0d6f822b-71eb-406f-b17a-d188c4924283}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -801,6 +804,9 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_ItemData.cpp">
       <Filter>Packets\cPacket_ItemData</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cChunkGenerator.cpp">
+      <Filter>cChunkGenerator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1238,6 +1244,9 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_ItemData.h">
       <Filter>Packets\cPacket_ItemData</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cChunkGenerator.h">
+      <Filter>cChunkGenerator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

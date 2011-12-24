@@ -101,6 +101,7 @@ private:
 	void SaveToJson( Json::Value & a_Value );
 
 	void GenerateTerrain();
+	void GenerateFoliage();
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
 	void SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);

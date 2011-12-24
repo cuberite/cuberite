@@ -69,6 +69,11 @@ struct cChunk::sChunkState
 cChunk::~cChunk()
 {
 	//LOG("~cChunk() %i %i %i", m_PosX, m_PosY, m_PosZ );
+	if( !m_pState->m_LoadedByClient.empty() )
+	{
+		LOGWARN("WARNING: Deleting cChunk while it contains %i clients!", m_pState->m_LoadedByClient.size() );
+	}
+
 	for( std::list<cBlockEntity*>::iterator itr = m_pState->m_BlockEntities.begin(); itr != m_pState->m_BlockEntities.end(); ++itr)
 	{
 		delete *itr;
@@ -128,23 +133,17 @@ void cChunk::Initialize()
 		// Clear memory
 		memset( m_BlockData, 0x00, c_BlockDataSize );
 
-//		LARGE_INTEGER TicksPerSecond;
-//		QueryPerformanceFrequency( &TicksPerSecond );
-
 		GenerateTerrain();
-
-// 		LARGE_INTEGER start;
-// 		QueryPerformanceCounter( &start );
+		GenerateFoliage();
 
 		CalculateHeightmap();
 		CalculateLighting();
 
-// 		LARGE_INTEGER end;
-// 		QueryPerformanceCounter( &end );
-// 		double Time = double( end.QuadPart - start.QuadPart ) / double( TicksPerSecond.QuadPart / 1000 );
-// 		LOG("Calculated light in %f ms", Time );
-
 		CreateBlockEntities();
+
+		// During generation, some blocks might have been set by using (Fast)SetBlock() causing this list to fill.
+		// This chunk has not been sent to anybody yet, so there is no need for separately sending block changes when you can send an entire chunk
+		m_pState->m_PendingSendBlocks.clear();
 	}
 	else
 	{
@@ -218,7 +217,7 @@ void cChunk::Tick(float a_Dt)
 	}
 
 	std::map< unsigned int, int > ToTickBlocks = m_pState->m_ToTickBlocks;
-	unsigned int NumTickBlocks = ToTickBlocks.size();
+	//unsigned int NumTickBlocks = ToTickBlocks.size();
 	//if( NumTickBlocks > 0 ) LOG("To tick: %i", NumTickBlocks );
 	m_pState->m_ToTickBlocks.clear();
 	bool isRedstone = false;
@@ -740,7 +739,7 @@ float GetNoise( float x, float y, cNoise & a_Noise )
 	return (oct1 + oct2 + oct3) * flatness + height;
 }
 
-#define PI_2 (1.57079633)
+#define PI_2 (1.57079633f)
 float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 {
 	float oct1 = (a_Noise.CubicNoise3D( x*0.1f, y*0.1f, z*0.1f ))*4;
@@ -769,7 +768,7 @@ void cChunk::GenerateTerrain()
 {
 
 
-	const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
+	//const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
 	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
 	const ENUM_BLOCK_ID StoneID 		=	E_BLOCK_STONE;
 	const ENUM_BLOCK_ID SandID 			=	E_BLOCK_SAND;
@@ -859,6 +858,17 @@ void cChunk::GenerateTerrain()
 			}
 		}
 	}
+}
+
+void cChunk::GenerateFoliage()
+{
+	const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
+	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
+	const ENUM_BLOCK_ID SandID 			=	E_BLOCK_SAND;
+	const ENUM_BLOCK_ID SandStoneID		=	E_BLOCK_SANDSTONE;
+	const ENUM_BLOCK_ID CaveID 			=	E_BLOCK_AIR;
+
+	cNoise m_Noise( m_World->GetWorldSeed() );
 
 	for(int z = 0; z < 16; z++) for(int x = 0; x < 16; x++)
 	{
@@ -882,7 +892,7 @@ void cChunk::GenerateTerrain()
 			int index3 = MakeIndex( x, TopY-3, z );
 			int index4 = MakeIndex( x, TopY-4, z );
 			int index5 = MakeIndex( x, TopY-5, z );
-			
+
 			if( m_BlockType[index] == SandID ) {
 
 				if( m_BlockType[index1] == CaveID ) {
@@ -898,19 +908,19 @@ void cChunk::GenerateTerrain()
 				}
 
 			}
-				
+
 			if( m_BlockType[index] == DirtID )
 			{
 				m_BlockType[ index ] = (char)GrassID;
 			}
 
-			
+
 			// Plant sum trees
 			{
 				int xx = x + m_PosX*16;
-//				int yy = TopY;
+				//				int yy = TopY;
 				int zz = z + m_PosZ*16;
-				
+
 				float val1 = m_Noise.CubicNoise2D( xx*0.1f, zz*0.1f );
 				float val2 = m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f );
 				if( m_BlockType[index] == SandID )
@@ -941,7 +951,7 @@ void cChunk::GenerateTerrain()
 						m_BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
 				}
 			}
-			
+
 		}
 	}
 }
@@ -1038,7 +1048,7 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	m_pState->m_PendingSendBlocks.push_back( index );
 	SetLight( m_BlockMeta, index, a_BlockMeta );
 
-	// ONLY recalculate lighting if it's nessesary!
+	// ONLY recalculate lighting if it's necessary!
 	if(		g_BlockLightValue[ OldBlock ] != g_BlockLightValue[ a_BlockType ]
 		||	g_BlockSpreadLightFalloff[ OldBlock ] != g_BlockSpreadLightFalloff[ a_BlockType ]
 		||	g_BlockTransparent[ OldBlock ] != g_BlockTransparent[ a_BlockType ] )

@@ -16,11 +16,10 @@ del release\*.* /Q
 del x64\*.* /Q
 del "My Inspector Results"\*.* /Q
 del ipch\*.* /Q
-rd release /Q
-rd debug /Q
-rd ipch /Q
+rd release /S /Q
+rd debug /S /Q
+rd ipch /S /Q
 rd x64 /Q
 rd "My Inspector Results" /Q
-rd ipch /Q
 
 pause

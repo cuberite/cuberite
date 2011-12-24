@@ -27,9 +27,6 @@
     <ClCompile Include="..\zlib-1.2.5\deflate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\zlib-1.2.5\example.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\zlib-1.2.5\gzclose.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,9 +49,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\zlib-1.2.5\inftrees.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\zlib-1.2.5\minigzip.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\zlib-1.2.5\trees.c">

@@ -47,6 +47,7 @@ public:
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
 	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
+	cChunk* GetChunkReliable( int a_X, int a_Y, int a_Z );
 	cChunk* GetChunkUnreliable( int a_X, int a_Y, int a_Z );
 	cChunk* GetChunkOfBlock( int a_X, int a_Y, int a_Z );
 	char GetHeight( int a_X, int a_Z );												//tolua_export

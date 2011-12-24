@@ -147,6 +147,8 @@ void cPlayer::SpawnOn( cClientHandle* a_Target )
 void cPlayer::Tick(float a_Dt)
 {
 	cChunk* InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+	if( !InChunk ) return;
+
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		cPacket_EntityLook EntityLook( this );

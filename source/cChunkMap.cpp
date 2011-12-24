@@ -208,6 +208,8 @@ void cChunkMap::AddChunk( cChunk* a_Chunk )
 	const int LocalZ = a_Chunk->GetPosZ() - LayerZ * LAYER_SIZE;
 	if( FoundLayer->m_Chunks[ LocalX + LocalZ * LAYER_SIZE ].m_LiveChunk )
 		LOGWARN("WARNING: Added chunk to layer while it was already loaded!");
+	if( FoundLayer->m_Chunks[ LocalX + LocalZ * LAYER_SIZE ].m_Compressed )
+		LOGWARN("WARNING: Added chunk to layer while a compressed version exists!");
 	FoundLayer->m_Chunks[ LocalX + LocalZ * LAYER_SIZE ].m_LiveChunk = a_Chunk;
 	FoundLayer->m_NumChunksLoaded++;
 }

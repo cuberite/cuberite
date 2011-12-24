@@ -249,12 +249,19 @@ void cClientHandle::StreamChunks()
 	int ChunkPosX = (int)floor(m_Player->GetPosX() / 16);
 	int ChunkPosZ = (int)floor(m_Player->GetPosZ() / 16);
 
-	cChunk* NeededChunks[VIEWDISTANCE*VIEWDISTANCE];
-	for(int x = 0; x < VIEWDISTANCE; x++)
+	cWorld* World = m_Player->GetWorld();
+
+	cChunk* NeededChunks[VIEWDISTANCE*VIEWDISTANCE] = { 0 };
+	const int MaxDist = VIEWDISTANCE+GENERATEDISTANCE*2;
+	for(int x = 0; x < MaxDist; x++)
 	{
-		for(int z = 0; z < VIEWDISTANCE; z++)
+		for(int z = 0; z < MaxDist; z++)
 		{
-			NeededChunks[x + z*VIEWDISTANCE] = m_Player->GetWorld()->GetChunk( x + ChunkPosX-(VIEWDISTANCE-1)/2, 0, z + ChunkPosZ-(VIEWDISTANCE-1)/2 );
+			int RelX = x - (MaxDist-1)/2;
+			int RelZ = z - (MaxDist-1)/2;
+			cChunk* Chunk = World->GetChunk( ChunkPosX + RelX, 0, ChunkPosZ + RelZ );	// Touch all chunks in wide range, so they get generated
+			if( x >= GENERATEDISTANCE && x < VIEWDISTANCE+GENERATEDISTANCE && z >= GENERATEDISTANCE && z < VIEWDISTANCE+GENERATEDISTANCE ) // but player only needs chunks in view distance
+				NeededChunks[(x-GENERATEDISTANCE) + (z-GENERATEDISTANCE)*VIEWDISTANCE] = Chunk;
 		}
 	}
 
@@ -263,6 +270,9 @@ void cClientHandle::StreamChunks()
 	unsigned int MissIndex = 0;
 	for(int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)	// Handshake loop - touch each chunk once
 	{
+		if( NeededChunks[i] == 0 ) continue;	// Chunk is not yet loaded, so ignore
+												// This can cause MissIndex to be 0 and thus chunks will not be unloaded while they are actually out of range,
+												// which might actually be a good thing, otherwise it would keep trying to unload chunks until the new chunks are fully loaded
 		bool bChunkMissing = true;
 		for(int j = 0; j < VIEWDISTANCE*VIEWDISTANCE; j++)
 		{
@@ -280,7 +290,7 @@ void cClientHandle::StreamChunks()
 	}
 
 	if( MissIndex > 0 )
-	{	// Chunks are gonna be streamed in, so chunks probably also need to be streamed out
+	{	// Chunks are gonna be streamed in, so chunks probably also need to be streamed out <- optimization
 		for(int x = 0; x < VIEWDISTANCE; x++)
 		{
 			for(int z = 0; z < VIEWDISTANCE; z++)
@@ -294,7 +304,10 @@ void cClientHandle::StreamChunks()
 						|| Chunk->GetPosZ() > ChunkPosZ+(VIEWDISTANCE-1)/2 )
 					{
 						Chunk->RemoveClient( this );
-						Chunk->AsyncUnload( this );
+						Chunk->AsyncUnload( this );		// TODO - I think it's possible to unload the chunk immediately instead of next tick
+														// I forgot why I made it happen next tick
+
+						m_LoadedChunks[x + z*VIEWDISTANCE] = 0;
 					}
 				}
 			}
@@ -306,6 +319,7 @@ void cClientHandle::StreamChunks()
 	}
 }
 
+// Sends chunks to the player from the player position outward
 void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChunks )
 {
 	int X = (int)floor(m_Player->GetPosX() / 16);
@@ -392,7 +406,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
                                 LOGINFO("Got Create Inventory Action packet");
                         }
                         break;
-		case E_PING: // Somebody tries to retreive information about the server
+		case E_PING: // Somebody tries to retrieve information about the server
 			{
 				LOGINFO("Got ping");
 				char NumPlayers[8], cMaxPlayers[8];
