@@ -2,6 +2,7 @@
 
 #include "cEntity.h"
 
+
 class cPacket_PickupSpawn;
 class cPlayer;
 class cItem;
@@ -23,6 +24,9 @@ public:
 	void HandlePhysics(float a_Dt);
 private:
 	Vector3f* m_Speed;
+	Vector3f* m_ResultingSpeed;	//Can be used to modify the resulting speed for the current tick ;)
+
+	Vector3f* m_WaterSpeed;
 	bool m_bOnGround;
 	bool m_bReplicated;
 

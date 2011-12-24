@@ -6,6 +6,7 @@
 #include "cClientHandle.h"
 #include "cInventory.h"
 #include "cWorld.h"
+#include "cWaterSimulator.h"
 #include "cServer.h"
 #include "cPlayer.h"
 #include "cPluginManager.h"
@@ -28,11 +29,15 @@ cPickup::~cPickup()
 {
 	delete m_Item;
 	delete m_Speed;
+	delete m_ResultingSpeed;
+	delete m_WaterSpeed;
 }
 
 cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity( ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
 	, m_Speed( new Vector3f( a_SpeedX, a_SpeedY, a_SpeedZ ) )
+	, m_ResultingSpeed(new Vector3f())
+	, m_WaterSpeed(new Vector3f())
 	, m_bOnGround( false )
 	, m_bReplicated( false )
 	, m_Timer( 0.f )
@@ -63,6 +68,8 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 	:	cEntity( ((double)a_PickupSpawnPacket->m_PosX)/32, ((double)a_PickupSpawnPacket->m_PosY)/32, ((double)a_PickupSpawnPacket->m_PosZ)/32 )
 	, m_Speed( new Vector3f() )
+	, m_ResultingSpeed(new Vector3f())
+	, m_WaterSpeed(new Vector3f())
 	, m_bOnGround( false )
 	, m_bReplicated( false )
 	, m_Timer( 0.f )
@@ -149,9 +156,11 @@ void cPickup::Tick(float a_Dt)
 
 void cPickup::HandlePhysics(float a_Dt)
 {
+	m_ResultingSpeed->Set(0.f, 0.f, 0.f);
+	cWorld* World = GetWorld();
+
 	if( m_bOnGround ) // check if it's still on the ground
 	{
-		cWorld* World = GetWorld();
 		int BlockX = (m_Pos->x)<0 ? (int)m_Pos->x-1 : (int)m_Pos->x;
 		int BlockZ = (m_Pos->z)<0 ? (int)m_Pos->z-1 : (int)m_Pos->z;
 		char BlockBelow = World->GetBlock( BlockX, (int)m_Pos->y -1, BlockZ );
@@ -179,18 +188,55 @@ void cPickup::HandlePhysics(float a_Dt)
 		if( fabs(m_Speed->z) < 0.05 ) m_Speed->z = 0;
 	}
 
+
+	//get flowing direction
+	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) m_Pos->x - 1, (int) m_Pos->y, (int) m_Pos->z - 1);
+
+
+	*m_WaterSpeed *= 0.9;		//Keep old speed but lower it
+
+	switch(WaterDir)
+	{
+		case X_PLUS:
+			m_WaterSpeed->x = 1.f;
+			m_bOnGround = false;
+			break;
+		case X_MINUS:
+			m_WaterSpeed->x = -1.f;
+			m_bOnGround = false;
+			break;
+		case Z_PLUS:
+			m_WaterSpeed->z = 1.f;
+			m_bOnGround = false;
+			break;
+		case Z_MINUS:
+			m_WaterSpeed->z = -1.f;
+			m_bOnGround = false;
+			break;
+		
+	default:
+		break;
+	}
+
+	*m_ResultingSpeed += *m_WaterSpeed;
+	
+
 	if( !m_bOnGround )
 	{
 
 		float Gravity = -9.81f*a_Dt;
 		m_Speed->y += Gravity;
 
+		// Set to hit position
+		*m_ResultingSpeed += *m_Speed;
+
 		cTracer Tracer( GetWorld() );
 		int Ret = Tracer.Trace( *m_Pos, *m_Speed, 2 );
 		if( Ret ) // Oh noez! we hit something
 		{
-			// Set to hit position
-			if( (*Tracer.RealHit - Vector3f(*m_Pos)).SqrLength() <= ( *m_Speed * a_Dt ).SqrLength() )
+			
+
+			if( (*Tracer.RealHit - Vector3f(*m_Pos)).SqrLength() <= ( *m_ResultingSpeed * a_Dt ).SqrLength() )
 			{
 				m_bReplicated = false; // It's only interesting to replicate when we actually hit something...
 				if( Ret == 1 )
@@ -210,14 +256,18 @@ void cPickup::HandlePhysics(float a_Dt)
 
 			}
 			else
-				*m_Pos += *m_Speed*a_Dt;
+				*m_Pos += *m_ResultingSpeed*a_Dt;
 		}
 		else
 		{	// We didn't hit anything, so move =]
-			*m_Pos += *m_Speed*a_Dt;
+			*m_Pos += *m_ResultingSpeed * a_Dt;
 		}
 	}
 
+
+	//Usable for debugging
+	//SetPosition(m_Pos->x, m_Pos->y, m_Pos->z);
+	
 
 }
 

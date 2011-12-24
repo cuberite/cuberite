@@ -2,6 +2,7 @@
 #include "cWorld.h"
 #include "Vector3i.h"
 #include "BlockID.h"
+#include "Defines.h"
 #include <vector>
 
 class cWaterSimulator::WaterData
@@ -39,7 +40,7 @@ public:
 				LowerPoints[i].y = a_Y;
 				Points.push_back( LowerPoints[i] );
 			}
-			else if( (Block2 == E_BLOCK_WATER || Block2 == E_BLOCK_STATIONARY_WATER ) && ( Block1 == E_BLOCK_AIR || Block1 == E_BLOCK_WATER || Block1 == E_BLOCK_STATIONARY_WATER ) )
+			else if( IsBlockWater(Block2) && ( Block1 == E_BLOCK_AIR || IsBlockWater(Block1) ) )
 			{
 				bWaterFound = true;
 			}
@@ -127,6 +128,9 @@ void cWaterSimulator::Simulate( float a_Dt )
 {
 	m_Timer += a_Dt;
 
+	if(m_Data->m_ActiveWater->empty())	//Nothing to do if there is no ActiveWater ;) saves very little time ;D
+		return;
+
 	std::swap( m_Data->m_ActiveWater, m_Data->m_Buffer );	// Swap so blocks can be added to empty ActiveWater array
 	m_Data->m_ActiveWater->clear();
 
@@ -213,4 +217,90 @@ void cWaterSimulator::Simulate( float a_Dt )
 bool cWaterSimulator::IsWaterBlock( char a_BlockID )
 {
 	return a_BlockID == E_BLOCK_WATER || a_BlockID == E_BLOCK_STATIONARY_WATER;
+}
+
+//TODO Not working very well yet :s
+Direction cWaterSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
+{
+	char BlockID = m_World->GetBlock(a_X, a_Y, a_Z);
+	if(!IsBlockWater(BlockID))	//No Water -> No Flowing direction :D
+		return NONE;
+	
+
+	/*
+	Disabled because of causing problems and beeing useless atm
+	char BlockBelow = m_World->GetBlock(a_X, a_Y - 1, a_Z);		//If there is nothing or water below it -> dominating flow is down :D
+	if(BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow))
+		return Y_MINUS;
+	*/
+
+	char LowestPoint = m_World->GetBlockMeta(a_X, a_Y, a_Z);	//Current Block Meta so only lower points will be counted
+	int X, Y, Z;												//Lowest Pos will be stored here
+
+	if(IsBlockWater(m_World->GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)		//check for upper block to flow because this also affects the flowing direction
+	{
+		return GetFlowingDirection(a_X, a_Y + 1, a_Z, false);
+	}
+
+	std::vector< Vector3i * > Points;
+
+	//add blocks around the checking pos
+	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
+	Points.push_back(new Vector3i(a_X + 1, a_Y, a_Z));
+	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
+	Points.push_back(new Vector3i(a_X, a_Y, a_Z - 1));
+
+	for(std::vector<Vector3i *>::iterator it = Points.begin(); it < Points.end(); it++)
+	{
+		Vector3i *Pos = (*it);
+		char BlockID = m_World->GetBlock(Pos->x, Pos->y, Pos->z);
+		if(IsBlockWater(BlockID))
+		{
+			char Meta = m_World->GetBlockMeta(Pos->x, Pos->y, Pos->z);
+
+			if(Meta > LowestPoint)
+			{
+				LowestPoint = Meta;
+				X = Pos->x;
+				Y = Pos->y;
+				Z = Pos->z;
+			}
+		}else if(BlockID == E_BLOCK_AIR)
+		{
+			LowestPoint = 9;		//This always dominates
+			X = Pos->x;
+			Y = Pos->y;
+			Z = Pos->z;
+		
+		}
+		delete Pos;
+	}
+
+
+	if(LowestPoint == m_World->GetBlockMeta(a_X, a_Y, a_Z))
+		return NONE;
+
+	if(a_X - X > 0)
+	{
+		return X_MINUS;
+	}
+
+	if(a_X - X < 0)
+	{
+		return X_PLUS;
+	}
+
+	if(a_Z - Z > 0)
+	{
+		return Z_MINUS;
+	}
+
+	if(a_Z - Z < 0)
+	{
+		return Z_PLUS;
+	}
+
+	return NONE;
+
+
 }
