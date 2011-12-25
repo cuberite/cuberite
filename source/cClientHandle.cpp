@@ -1220,6 +1220,7 @@ void cClientHandle::Tick(float a_Dt)
 		LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from player.
 		LoginResponse.m_MapSeed = 0;
 		LoginResponse.m_Dimension = 0;
+		LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetWorld()->GetMaxPlayers();
 		Send( LoginResponse );
 
 		// Send Weather if raining:

@@ -15,7 +15,7 @@ cCraftingWindow::cCraftingWindow( cWindowOwner* a_Owner, bool a_bInventoryVisibl
 	 : cWindow( a_Owner, a_bInventoryVisible )
 {
 	SetWindowID( 1 );
-	SetWindowType( 1 ); // Workbench
+	SetWindowType( cWindow::Workbench ); // Workbench
 
 	cItem* Slots = new cItem[10];
 	SetSlots( Slots, 10 );

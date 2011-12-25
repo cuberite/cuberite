@@ -23,6 +23,8 @@
 #include "cTracer.h"
 #include "cWebAdmin.h"
 
+#include "MersenneTwister.h"
+
 #include "../iniFile/iniFile.h"
 #include "Vector3f.h"
 
@@ -196,6 +198,9 @@ bool cServer::InitServer( int a_Port )
 	if( IniFile.ReadFile() )
 	{
 		g_bWaterPhysics = IniFile.GetValueB("Physics", "Water", false );
+		
+		/* Replaced below with 1.0.0 compatible ServerID generation
+
 		std::string ServerID = IniFile.GetValue("Server", "ServerID");
 		if( ServerID.empty() )
 		{
@@ -203,7 +208,19 @@ bool cServer::InitServer( int a_Port )
 			IniFile.SetValue("Server", "ServerID", ServerID, true );
 			IniFile.WriteFile();
 		}
-		m_pState->ServerID = ServerID;
+		*/
+		m_pState->ServerID = "-";
+		if (IniFile.GetValueB("Authentication", "Authenticate"))
+		{
+			MTRand mtrand1;
+			unsigned int r1 = (mtrand1.randInt()%1147483647) + 1000000000;
+			unsigned int r2 = (mtrand1.randInt()%1147483647) + 1000000000;
+			std::ostringstream sid;
+			sid << std::hex << r1;
+			sid << std::hex << r2;
+			std::string ServerID = sid.str();
+			m_pState->ServerID = ServerID;
+		}
 	}
 	return true;
 }

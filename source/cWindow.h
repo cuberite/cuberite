@@ -17,6 +17,15 @@ public:
 
 	int GetWindowID() { return m_WindowID; }
 	void SetWindowID( int a_WindowID ) { m_WindowID = a_WindowID; }
+	
+	static enum WindowType {
+		Chest,
+		Workbench,
+		Furnace,
+		Dispenser,
+		Enchantment,
+		Brewery
+	};
 
 	int GetWindowType() { return m_WindowType; }
 	void SetWindowType( int a_WindowType ) { m_WindowType = a_WindowType; }

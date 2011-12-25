@@ -12,7 +12,7 @@ cFurnaceWindow::cFurnaceWindow( cFurnaceEntity* a_Owner )
 	, m_Furnace( a_Owner )
 {
 	SetWindowID( 1 );
-	SetWindowType( 2 ); // Furnace
+	SetWindowType( cWindow::Furnace ); // Furnace
 }
 
 void cFurnaceWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )

@@ -156,7 +156,7 @@ void cChestEntity::UsedBy( cPlayer & a_Player )
 		cWindow* Window = new cWindow( this, true );
 		Window->SetSlots( m_Content, c_ChestHeight*c_ChestWidth );
 		Window->SetWindowID( 1 );
-		Window->SetWindowType( 0 );
+		Window->SetWindowType( cWindow::Chest );
 		Window->SetWindowTitle("UberChest");
 		OpenWindow( Window );
 	}

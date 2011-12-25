@@ -23,7 +23,7 @@ cAuthenticator::~cAuthenticator()
 bool cAuthenticator::Authenticate( const char* a_PlayerName, const char* a_ServerID )
 {
 	// Default values
-	std::string Server = "www.minecraft.net";
+	std::string Server = "session.minecraft.net";
 	std::string Address = "/game/checkserver.jsp?user=%USERNAME%&serverId=%SERVERID%";
 	bool bAuthenticate = true;
 
