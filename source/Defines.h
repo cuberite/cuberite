@@ -140,3 +140,35 @@ inline float GetSpecialSignf( float a_Val )
 {
 	return (a_Val <= 0.f)?-1.f:1.f;
 }
+
+
+
+namespace ItemCategory
+{
+	inline bool IsPickaxe(ENUM_ITEM_ID a_ItemID)
+	{
+		return a_ItemID == E_ITEM_WOODEN_PICKAXE
+			|| a_ItemID == E_ITEM_STONE_PICKAXE
+			|| a_ItemID == E_ITEM_IRON_PICKAXE
+			|| a_ItemID == E_ITEM_GOLD_PICKAXE
+			|| a_ItemID == E_ITEM_DIAMOND_PICKAXE;
+	}
+
+	inline bool IsAxe(ENUM_ITEM_ID a_ItemID)
+	{
+		return a_ItemID == E_ITEM_WOODEN_AXE
+			|| a_ItemID == E_ITEM_STONE_AXE
+			|| a_ItemID == E_ITEM_IRON_AXE
+			|| a_ItemID == E_ITEM_GOLD_AXE
+			|| a_ItemID == E_ITEM_DIAMOND_AXE;
+	}
+
+	inline bool IsSword(ENUM_ITEM_ID a_ItemID)
+	{
+		return a_ItemID == E_ITEM_WOODEN_SWORD
+			|| a_ItemID == E_ITEM_STONE_SWORD
+			|| a_ItemID == E_ITEM_IRON_SWORD
+			|| a_ItemID == E_ITEM_GOLD_SWORD
+			|| a_ItemID == E_ITEM_DIAMOND_SWORD;
+	}
+}

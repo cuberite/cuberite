@@ -73,8 +73,9 @@ public:
 
 cFluidSimulator::cFluidSimulator( cWorld* a_World )
 	: m_World(a_World)
-	, m_Data(new FluidData(a_World, this))
+	, m_Data(0)
 {
+	m_Data = new FluidData(a_World, this);
 }
 
 cFluidSimulator::~cFluidSimulator()
