@@ -50,7 +50,27 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		return E_ITEM_REDSTONE_TORCH_ON;
 	case E_BLOCK_MELON:
 		return E_ITEM_MELON_SLICE;
+	case E_BLOCK_WOODEN_DOOR:
+		return E_ITEM_WOODEN_DOOR;
+	case E_BLOCK_IRON_DOOR:
+		return E_ITEM_IRON_DOOR;
 	default:
 		return (ENUM_ITEM_ID)a_BlockID;
+	}
+}
+
+char cBlockToPickup::PickupCount(unsigned char a_BlockID)
+{
+	switch(a_BlockID)
+	{
+	case E_BLOCK_REDSTONE_ORE_GLOWING:
+	case E_BLOCK_REDSTONE_ORE:
+		return rand() % 2 + 4;
+	case E_BLOCK_MELON:
+		return rand() % 8 + 3;
+	case E_BLOCK_LAPIS_ORE:
+		return rand() % 5 + 4;
+	default:
+		return 1;
 	}
 }

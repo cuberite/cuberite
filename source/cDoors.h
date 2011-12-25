@@ -1,4 +1,6 @@
 #pragma once
+#include "cBlockToPickup.h"
+
 
 class cDoors												//tolua_export
 {															//tolua_export
@@ -17,43 +19,44 @@ public:
 			return 0x3;
 	}														//tolua_export
 
-	static char ChangeStateMetaData( char MetaData )		//tolua_export
+	static char ChangeStateMetaData( char a_MetaData )		//tolua_export
 	{														//tolua_export
-		if ( (int)MetaData == 0 ) { //todo, condense this code. lol
-			return 0x4;
-		} else if ( (int)MetaData == 1 ) {
-			return 0x5;
-		} else if ( (int)MetaData == 2 ) {
-			return 0x6;
-		} else if ( (int)MetaData == 3 ) {
-			return 0x7;
-		} else if ( (int)MetaData == 4 ) {
-			return 0x0;
-		} else if ( (int)MetaData == 5 ) {
-			return 0x1;
-		} else if ( (int)MetaData == 6 ) {
-			return 0x2;
-		} else if ( (int)MetaData == 7 ) {
-			return 0x3;
-		} else if ( (int)MetaData == 8 ) {
-			return 0xC;
-		} else if ( (int)MetaData == 9 ) {
-			return 0xD;
-		} else if ( (int)MetaData == 10 ) {
-			return 0xE;
-		} else if ( (int)MetaData == 11 ) {
-			return 0xF;
-		} else if ( (int)MetaData == 12 ) {
-			return 0x8;
-		} else if ( (int)MetaData == 13 ) {
-			return 0x9;
-		} else if ( (int)MetaData == 14 ) {
-			return 0xA;
-		} else if ( (int)MetaData == 15 ) {
-			return 0xB;
-		} else {
-			return 0x0;
+
+		a_MetaData ^= 4;		//XOR bit 2 aka 3. bit (Door open state)
+
+		return a_MetaData;
+	}														//tolua_export
+
+	static void ChangeDoor(cWorld *a_World, int a_X, int a_Y, int a_Z)	//tolua_export
+	{																	//tolua_export
+		char OldMetaData = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+		
+		a_World->SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData ( OldMetaData ) );
+
+		
+		if (OldMetaData & 8)
+		{ //current block is top of the door
+			char BottomBlock = a_World->GetBlock(a_X, a_Y - 1, a_Z);
+			char BottomMeta = a_World->GetBlockMeta(a_X, a_Y - 1, a_Z);
+
+			if (IsDoor(BottomBlock) && !(BottomMeta & 8))
+			{
+				a_World->SetBlockMeta(a_X, a_Y - 1, a_Z, ChangeStateMetaData ( BottomMeta ) );
+			}
+		} else { //current block is bottom of the door
+			char TopBlock = a_World->GetBlock(a_X, a_Y + 1, a_Z);
+			char TopMeta = a_World->GetBlockMeta(a_X, a_Y + 1, a_Z);
+
+			if (IsDoor(TopBlock) && (TopMeta & 8))
+			{
+				a_World->SetBlockMeta(a_X, a_Y + 1, a_Z, ChangeStateMetaData ( TopMeta ) );
+			}
 		}
-	}												//tolua_export
+	}																	//tolua_export
+	
+	inline static bool IsDoor(char a_Block)
+	{
+		return (a_Block == E_BLOCK_WOODEN_DOOR || a_Block == E_BLOCK_IRON_DOOR);
+	}
 
 };															//tolua_export

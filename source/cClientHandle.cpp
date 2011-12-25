@@ -546,22 +546,26 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (m_Player->GetGameMode() == 1) );
 					if(bBroken == false) bBroken = (m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS && OldBlock == E_BLOCK_LEAVES);
 
+					if(OldBlock == E_BLOCK_WOODEN_DOOR && !bBroken)
+					{
+						cDoors::ChangeDoor(m_Player->GetWorld(), PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
+					}
+
 					cItem PickupItem;
 					if( bBroken && !(m_Player->GetGameMode() == 1) ) // broken
 					{
+						
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;
 						PickupItem.m_ItemHealth = MetaData;
-						PickupItem.m_ItemCount = 1;
-						if( OldBlock == E_BLOCK_LAPIS_ORE ) {
+						PickupItem.m_ItemCount = cBlockToPickup::PickupCount(OldBlock);
+						if( OldBlock == E_BLOCK_LAPIS_ORE )
+						{
 							PickupItem.m_ItemHealth = 4;
-							PickupItem.m_ItemCount = rand()%5+4;
 						}
-						if( OldBlock == E_BLOCK_REDSTONE_ORE || OldBlock == E_BLOCK_REDSTONE_ORE_GLOWING ) {
-							PickupItem.m_ItemCount = rand()%2+4;
-						}
-						if( OldBlock == E_BLOCK_MELON ) {
-							PickupItem.m_ItemCount = rand()%8+3;
+						if(cDoors::IsDoor(OldBlock))
+						{
+							PickupItem.m_ItemHealth = 1;	//For a complete door this works :D
 						}
 					}
 					if(!cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_DIG, 2, PacketData, m_Player, &PickupItem ) )
@@ -589,6 +593,18 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 									AddPistonDir( newX, newY, newZ, MetaData & ~(8), 1 )
 									if (World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION) {
 										World->SetBlock( newX, newY, newZ, E_BLOCK_AIR, 0 );
+									}
+								}
+
+								if(cDoors::IsDoor(OldBlock))	//Special actions for destroyed door (Destroy second part)
+								{
+									if(MetaData & 8)	//was Upper part of door
+									{
+										if(cDoors::IsDoor(World->GetBlock(PacketData->m_PosX, PacketData->m_PosY - 1, PacketData->m_PosZ)))
+											World->SetBlock(PacketData->m_PosX, PacketData->m_PosY - 1, PacketData->m_PosZ, E_BLOCK_AIR, 0);
+									}else{	//Was lower part
+										if(cDoors::IsDoor(World->GetBlock(PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ)))
+											World->SetBlock(PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0);
 									}
 								}
 
@@ -752,24 +768,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_BLOCK_WOODEN_DOOR:
 						{
 							bPlaceBlock = false;
-							char OldMetaData = cRoot::Get()->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-							char NewMetaData = cDoors::ChangeStateMetaData ( OldMetaData );
-							cRoot::Get()->GetWorld()->FastSetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, E_BLOCK_WOODEN_DOOR, NewMetaData );
-							if ( (int)OldMetaData > 7 ) { //top of door
-								char BottomBlock = cRoot::Get()->GetWorld()->GetBlock(PacketData->m_PosX, PacketData->m_PosY-1, PacketData->m_PosZ);
-								char BottomMeta = cRoot::Get()->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY-1, PacketData->m_PosZ);
-								if ( ( (int)BottomBlock == E_BLOCK_WOODEN_DOOR ) && ( (int)BottomMeta < 8 ) ) {
-									char NewBottomMeta = cDoors::ChangeStateMetaData ( BottomMeta );
-									cRoot::Get()->GetWorld()->FastSetBlock(PacketData->m_PosX, PacketData->m_PosY-1, PacketData->m_PosZ, E_BLOCK_WOODEN_DOOR, NewBottomMeta );
-								}
-							} else if ( (int)OldMetaData < 8 ) { //bottom of door
-								char TopBlock = cRoot::Get()->GetWorld()->GetBlock(PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ);
-								char TopMeta = cRoot::Get()->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ);
-								if ( ( (int)TopBlock == E_BLOCK_WOODEN_DOOR ) && ( (int)TopMeta > 7 ) ) {
-									char NewTopMeta = cDoors::ChangeStateMetaData ( TopMeta );
-									cRoot::Get()->GetWorld()->FastSetBlock(PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, E_BLOCK_WOODEN_DOOR, NewTopMeta );
-								}
-							}
+							cDoors::ChangeDoor(m_Player->GetWorld(), PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 						}
 						break;
 					default:
