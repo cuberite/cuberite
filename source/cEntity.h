@@ -86,7 +86,7 @@ public:																						//tolua_export
 	void WrapRotation();
 
 protected:
-	void MoveToCorrectChunk();
+	void MoveToCorrectChunk(bool a_IgnoreOldChunk = false);
 
 	friend class cReferenceManager;
 	void AddReference( cEntity*& a_EntityPtr );
