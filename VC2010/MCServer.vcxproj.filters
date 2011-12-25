@@ -322,9 +322,6 @@
     <Filter Include="Packets\cPacket_EntityStatus">
       <UniqueIdentifier>{dee92edf-fe18-479a-9108-b11353e14913}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cWaterSimulator">
-      <UniqueIdentifier>{02fd457d-3735-4f4b-aaf2-f7701a7ee7bc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Threading\cSocket">
       <UniqueIdentifier>{82fda897-4c61-4ada-9160-8ae3982a72f8}</UniqueIdentifier>
     </Filter>
@@ -382,9 +379,6 @@
     <Filter Include="cPiston">
       <UniqueIdentifier>{4f551776-009b-4f05-8ab8-748b82279a67}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cLavaSimulator">
-      <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LuaBindings\SquirrelBindings">
       <UniqueIdentifier>{a71ee043-df55-4d42-a9aa-1643b40e1c22}</UniqueIdentifier>
     </Filter>
@@ -402,6 +396,15 @@
     </Filter>
     <Filter Include="cChunkGenerator">
       <UniqueIdentifier>{0d6f822b-71eb-406f-b17a-d188c4924283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cFluidSimulator">
+      <UniqueIdentifier>{6f92474b-e2a5-4685-abf1-053b09dbc4f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cFluidSimulator\cWaterSimulator">
+      <UniqueIdentifier>{02fd457d-3735-4f4b-aaf2-f7701a7ee7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cFluidSimulator\cLavaSimulator">
+      <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -725,7 +728,7 @@
       <Filter>Packets\cPacket_EntityStatus</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cWaterSimulator.cpp">
-      <Filter>cWaterSimulator</Filter>
+      <Filter>cFluidSimulator\cWaterSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cSocket.cpp">
       <Filter>Threading\cSocket</Filter>
@@ -788,7 +791,7 @@
       <Filter>cPiston</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cLavaSimulator.cpp">
-      <Filter>cLavaSimulator</Filter>
+      <Filter>cFluidSimulator\cLavaSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\SquirrelBindings.cpp">
       <Filter>LuaBindings\SquirrelBindings</Filter>
@@ -807,6 +810,9 @@
     </ClCompile>
     <ClCompile Include="..\source\cChunkGenerator.cpp">
       <Filter>cChunkGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cFluidSimulator.cpp">
+      <Filter>cFluidSimulator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1162,7 +1168,7 @@
       <Filter>Packets\cPacket_EntityStatus</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cWaterSimulator.h">
-      <Filter>cWaterSimulator</Filter>
+      <Filter>cFluidSimulator\cWaterSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cSocket.h">
       <Filter>Threading\cSocket</Filter>
@@ -1228,7 +1234,7 @@
       <Filter>cPiston</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cLavaSimulator.h">
-      <Filter>cLavaSimulator</Filter>
+      <Filter>cFluidSimulator\cLavaSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\SquirrelBindings.h">
       <Filter>LuaBindings\SquirrelBindings</Filter>
@@ -1247,6 +1253,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cChunkGenerator.h">
       <Filter>cChunkGenerator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cFluidSimulator.h">
+      <Filter>cFluidSimulator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
