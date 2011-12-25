@@ -51,6 +51,10 @@ void cEntity::Initialize( cWorld* a_World )
 	m_World = a_World;
 	m_World->AddEntity( this );
 
+	MoveToCorrectChunk();
+
+	/*
+Not needed because it´s covered by the MoveToCorrectChunk function
 	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, m_ChunkX, m_ChunkY, m_ChunkZ );
 	cChunk* Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if( Chunk )
@@ -58,6 +62,7 @@ void cEntity::Initialize( cWorld* a_World )
 		//LOG("Adding entity %i to chunk %i %i %i", m_UniqueID, Chunk->GetPosX(), Chunk->GetPosY(), Chunk->GetPosZ() );
 		Chunk->AddEntity( *this );
 	}
+	*/
 }
 
 void cEntity::WrapRotation()
