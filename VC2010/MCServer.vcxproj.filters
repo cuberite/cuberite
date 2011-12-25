@@ -406,6 +406,18 @@
     <Filter Include="cFluidSimulator\cLavaSimulator">
       <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\Personalities">
+      <UniqueIdentifier>{b0f7c883-e2ca-4bba-89e3-c36656c3de39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\Personalities\Aggressive">
+      <UniqueIdentifier>{dd40c965-2dae-451b-8c78-8946b428a0b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\Personalities\Passive">
+      <UniqueIdentifier>{be4ace95-e07a-4aca-ac63-912de68ba01d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cEntity\cPawn\cMonster\Personalities\PassiveAggressive">
+      <UniqueIdentifier>{71574b1c-a518-4a17-92c1-e3ea340f73bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -813,6 +825,15 @@
     </ClCompile>
     <ClCompile Include="..\source\cFluidSimulator.cpp">
       <Filter>cFluidSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cAggressiveMonster.cpp">
+      <Filter>cEntity\cPawn\cMonster\Personalities\Aggressive</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPassiveAggressiveMonster.cpp">
+      <Filter>cEntity\cPawn\cMonster\Personalities\PassiveAggressive</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPassiveMonster.cpp">
+      <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1256,6 +1277,15 @@
     </ClInclude>
     <ClInclude Include="..\source\cFluidSimulator.h">
       <Filter>cFluidSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cAggressiveMonster.h">
+      <Filter>cEntity\cPawn\cMonster\Personalities\Aggressive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPassiveAggressiveMonster.h">
+      <Filter>cEntity\cPawn\cMonster\Personalities\PassiveAggressive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPassiveMonster.h">
+      <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

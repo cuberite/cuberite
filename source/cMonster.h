@@ -1,5 +1,7 @@
 #pragma once
 #include "cPawn.h"
+#include "Defines.h"
+#include "cWorld.h"
 #include "BlockID.h"
 
 class Vector3f;
@@ -86,4 +88,5 @@ protected:
 
 	void DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count);
 	void RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max);
+
 }; //tolua_export

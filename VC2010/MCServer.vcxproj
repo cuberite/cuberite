@@ -214,6 +214,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\cAggressiveMonster.cpp" />
     <ClCompile Include="..\Source\cAuthenticator.cpp" />
     <ClCompile Include="..\source\cBlockingTCPLink.cpp" />
     <ClCompile Include="..\source\cCavespider.cpp" />
@@ -246,6 +247,8 @@
     <ClCompile Include="..\Source\cMonster.cpp" />
     <ClCompile Include="..\source\cMonsterConfig.cpp" />
     <ClCompile Include="..\source\cNoise.cpp" />
+    <ClCompile Include="..\source\cPassiveAggressiveMonster.cpp" />
+    <ClCompile Include="..\source\cPassiveMonster.cpp" />
     <ClCompile Include="..\Source\cPawn.cpp" />
     <ClCompile Include="..\source\cPig.cpp" />
     <ClCompile Include="..\source\cPiston.cpp" />
@@ -353,6 +356,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\BlockID.h" />
+    <ClInclude Include="..\source\cAggressiveMonster.h" />
     <ClInclude Include="..\Source\cAuthenticator.h" />
     <ClInclude Include="..\source\cBlockingTCPLink.h" />
     <ClInclude Include="..\source\cCavespider.h" />
@@ -383,6 +387,8 @@
     <ClInclude Include="..\Source\cMonster.h" />
     <ClInclude Include="..\source\cMonsterConfig.h" />
     <ClInclude Include="..\source\cNoise.h" />
+    <ClInclude Include="..\source\cPassiveAggressiveMonster.h" />
+    <ClInclude Include="..\source\cPassiveMonster.h" />
     <ClInclude Include="..\Source\cPawn.h" />
     <ClInclude Include="..\source\cPig.h" />
     <ClInclude Include="..\source\cPiston.h" />

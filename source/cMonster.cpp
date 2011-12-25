@@ -10,6 +10,7 @@
 #include "Defines.h"
 #include "cPickup.h"
 #include "cItem.h"
+#include "cMonsterConfig.h"
 
 #include "packets/cPacket_SpawnMob.h"
 #include "packets/cPacket_EntityLook.h"
@@ -47,18 +48,17 @@ cMonster::cMonster()
 	, m_MobType( 0 )
 	, m_EMState(IDLE)
 	, m_SightDistance(25)
-	,m_SeePlayerInterval (0)
-	,m_EMPersonality(AGGRESSIVE)
-	,m_AttackDamage(1.0)
-	,m_AttackRange(5.0)
-	,m_AttackInterval(0)
-	,m_AttackRate(3)
-	,m_bPassiveAggressive(false)
-	,idle_interval(0)
-	,m_bBurnable(true)
-	,m_EMMetaState(NORMAL)
-	,m_FireDamageInterval(0)
-	,m_BurnPeriod(0)
+	, m_SeePlayerInterval (0)
+	, m_EMPersonality(AGGRESSIVE)
+	, m_AttackDamage(1.0)
+	, m_AttackRange(5.0)
+	, m_AttackInterval(0)
+	, m_AttackRate(3)
+	, idle_interval(0)
+	, m_bBurnable(true)
+	, m_EMMetaState(NORMAL)
+	, m_FireDamageInterval(0)
+	, m_BurnPeriod(0)
 {
 	LOG("cMonster::cMonster()");
 	LOG("In state: %s",GetState());
@@ -77,7 +77,6 @@ cMonster::cMonster()
 
 cMonster::~cMonster()
 {
-
 	LOG("cMonster::~cMonster()");
 	delete m_Destination;
 	delete m_Speed;
@@ -85,7 +84,6 @@ cMonster::~cMonster()
 
 bool cMonster::IsA( const char* a_EntityType )
 {
-    //LOG("IsA( cMonster ) : %s", a_EntityType);
 	if( strcmp( a_EntityType, "cMonster" ) == 0 ) return true;
 	return cPawn::IsA( a_EntityType );
 }
@@ -102,7 +100,6 @@ void cMonster::SpawnOn( cClientHandle* a_Target )
 	Spawn.m_MetaDataSize = 1;
 	Spawn.m_MetaData = new char[Spawn.m_MetaDataSize];
 	Spawn.m_MetaData[0] = 0x7f; // not on fire/crouching/riding
-	//Spawn.m_MetaData[1] = 0x7f; // terminator
 	if( a_Target == 0 )
 	{
 		cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
@@ -142,8 +139,7 @@ void cMonster::Tick(float a_Dt)
 		return;
 	}
 
-	//a_Dt/=1000;
-	a_Dt/=1000;
+	a_Dt /= 1000;
 
 	if( m_bMovingToDestination )
 	{
@@ -153,7 +149,7 @@ void cMonster::Tick(float a_Dt)
 		{
 			Distance.y = 0;
 			Distance.Normalize();
-			Distance*=3;
+			Distance *= 3;
 			m_Speed->x = Distance.x;
 			m_Speed->z = Distance.z;
 		}
@@ -209,24 +205,6 @@ void cMonster::Tick(float a_Dt)
 	if(m_EMState == ESCAPING) {
 		InStateEscaping(a_Dt);
 	}
-
-	m_SeePlayerInterval += a_Dt;
-	if(m_SeePlayerInterval > 1) {
-		int rem = rand()%3 + 1; //check most of the time but miss occasionally
-		//LOG("See Player Interval: %3.3f",m_SeePlayerInterval);
-		m_SeePlayerInterval = 0.0;
-		if(rem >= 2) {
-			if(m_EMState == IDLE && m_EMPersonality != PASSIVE) {
-				CheckEventSeePlayer();
-				return;
-			} 
-			if(m_EMState == CHASING || m_EMState == ESCAPING){
-				CheckEventLostPlayer();
-				return;
-			} 
-		}
-	}
-	
 
 }
 
@@ -284,6 +262,8 @@ void cMonster::ReplicateMovement()
 		m_LastPosZ = GetPosZ();
 		m_bDirtyPosition = false;
 	}
+
+	MoveToCorrectChunk();
 }
 
 void cMonster::HandlePhysics(float a_Dt)
@@ -350,20 +330,11 @@ void cMonster::HandlePhysics(float a_Dt)
 	}
 }
 
-void cMonster::TakeDamage( int a_Damage, cEntity* a_Instigator )
+void cMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
 {
 	cPawn::TakeDamage( a_Damage, a_Instigator );
-		m_Target = a_Instigator;
-		AddReference( m_Target );
-		if(m_EMPersonality == AGGRESSIVE) {
-			m_EMState = CHASING;
-		}
-		if(m_EMPersonality == COWARDLY || m_EMPersonality == PASSIVE) {
-			//m_bPassiveAggressive can be set so if the monster based on time of day for example
-			//so the monster will only attack if provoked
-			m_EMState = (m_bPassiveAggressive)? CHASING : ESCAPING;
-		}
-	//LOG("Take damage");
+	m_Target = a_Instigator;
+	AddReference( m_Target );
 }
 
 void cMonster::KilledBy( cEntity* a_Killer )
@@ -392,7 +363,8 @@ const char *cMonster::GetState() {
 }
 
 //for debugging
-void cMonster::SetState(const char* a_str) {
+void cMonster::SetState(const char* a_str)
+{
 	std::string str = a_str;
 	if(str.compare("Idle") == 0 ) {
 		m_EMState = IDLE;
@@ -407,48 +379,38 @@ void cMonster::SetState(const char* a_str) {
 
 //Checks to see if EventSeePlayer should be fired
 //monster sez: Do I see the player
-void cMonster::CheckEventSeePlayer() {
-
-	//LOG("Checking if I see any players");
+void cMonster::CheckEventSeePlayer()
+{
 	cMonster::ListClosePlayers(this);
-	
 }
 
-void cMonster::CheckEventLostPlayer() {
+void cMonster::CheckEventLostPlayer()
+{
 	Vector3f pos;
 	cTracer LineOfSight(GetWorld() );
 	
-	//LOG("Checking if I lost my enemy");
 	if(m_Target != 0) {
 		pos = m_Target->GetPosition();
-		if((pos - *m_Pos).Length() > m_SightDistance || LineOfSight.Trace(*m_Pos,(pos - *m_Pos), (int)(pos - *m_Pos).Length())){
-			//LOG("Losing Player: %5.5f",(pos - *m_Pos).Length());
+		if((pos - *m_Pos).Length() > m_SightDistance || LineOfSight.Trace(*m_Pos,(pos - *m_Pos), (int)(pos - *m_Pos).Length()))
+		{
 			EventLosePlayer();
 		}
 	} else {
-		LOG("Enemy went poof");
 		EventLosePlayer();
 	}
 }
 
 //What to do if player is seen
 //default to change state to chasing
-void cMonster::EventSeePlayer(cEntity *a_SeenPlayer) {
+void cMonster::EventSeePlayer(cEntity *a_SeenPlayer)
+{
 	m_Target = a_SeenPlayer;
 	AddReference( m_Target );
-	if(m_EMPersonality == AGGRESSIVE) {
-		m_EMState = CHASING;
-	}
-	if(m_EMPersonality == COWARDLY) {
-		m_EMState = ESCAPING;
-	}
-	//LOG("Saw Player: %s",GetState());
 }
 
 void cMonster::EventLosePlayer(){
 	Dereference(m_Target);
 	m_Target = 0;
-	//LOG("Lost Player");
 	m_EMState = IDLE;
 }
 
@@ -495,7 +457,6 @@ void cMonster::InStateBurning(float a_Dt) {
 			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 			m_EMMetaState = NORMAL;
 			cPacket_Metadata md(NORMAL, GetUniqueID());
-			//md.m_UniqueID = GetUniqueID();
 			InChunk->Broadcast(md);
 			m_BurnPeriod = 0;
 			
@@ -527,9 +488,8 @@ void cMonster::InStateEscaping(float a_Dt) {
 //Do attack here
 //a_Dt is passed so we can set attack rate
 void cMonster::Attack(float a_Dt) {
-	m_AttackInterval += a_Dt*m_AttackRate;
+	m_AttackInterval += a_Dt * m_AttackRate;
 	if(m_Target != 0 && m_AttackInterval > 3.0) { //Setting this higher gives us more wiggle room for attackrate
-		//LOG("ATTACK!");
 		m_AttackInterval = 0.0;
 		((cPawn *)m_Target)->TakeDamage((int)m_AttackDamage,this);
 	}
@@ -543,7 +503,6 @@ void cMonster::CheckMetaDataBurn() {
 		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 		if(!InChunk)
 			return;
-		//printf("I should burn");
 		m_EMMetaState = BURNING;
 		cPacket_Metadata md(BURNING,GetUniqueID());
 		InChunk->Broadcast(md);
@@ -575,8 +534,8 @@ void cMonster::ListClosePlayers(cMonster *m) {
 		if((*itr)->GetEntityType() == cEntity::E_PLAYER){
 			Vector3f pos = (*itr)->GetPosition();
 			if((pos - *(m->m_Pos)).Length() <= m->m_SightDistance){
-				if(!LineOfSight.Trace(*(m->m_Pos),(pos - *(m->m_Pos)),(int)(pos - *(m->m_Pos)).Length())){
-					//LOG("I SEE PLAYER !!!!!!!!!!!!!!!!!");
+				if(!LineOfSight.Trace(*(m->m_Pos),(pos - *(m->m_Pos)),(int)(pos - *(m->m_Pos)).Length()))
+				{
 					m->EventSeePlayer(*itr);
 					return; //get the first one in sight later we can reiterate and check
 						//for the closest out of all that match and make it more realistic
@@ -585,8 +544,8 @@ void cMonster::ListClosePlayers(cMonster *m) {
 			}
 			
 		}
-		if(tries > 100) {
-			//LOG("I Give Up");
+		if(tries > 100)
+		{
 			m->EventLosePlayer();
 			return;
 		}
@@ -594,7 +553,7 @@ void cMonster::ListClosePlayers(cMonster *m) {
 }
 
 void cMonster::GetMonsterConfig(const char* pm_name) {
-	(void)pm_name;
+	cRoot::Get()->GetMonsterConfig()->Get()->AssignAttributes(this, pm_name);
 }
 
 void cMonster::SetAttackRate(int ar) {
