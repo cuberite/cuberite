@@ -1095,10 +1095,13 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		case E_WINDOW_CLOSE:
 			{
 				cPacket_WindowClose* PacketData = reinterpret_cast<cPacket_WindowClose*>(a_Packet);
+				m_Player->CloseWindow(PacketData->m_Close);
+				/*
 				if( PacketData->m_Close > 0 ) // Don't care about closing inventory
 				{
 					m_Player->CloseWindow();
 				}
+				*/
 			}
 			break;
 		case E_WINDOW_CLICK:
@@ -1176,10 +1179,9 @@ void cClientHandle::AuthenticateThread( void* a_Param )
 	cAuthenticator Authenticator;
 	if( !Authenticator.Authenticate( self->GetUsername(), cRoot::Get()->GetServer()->GetServerID() ) )
 	{
-		self->Kick("You could not be authenticated, sorry buddy!");
+		self->Kick("Failed to verify username!");
 		return;
 	}
-
 	self->m_bSendLoginResponse = true;
 }
 

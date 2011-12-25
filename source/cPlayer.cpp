@@ -108,7 +108,7 @@ cPlayer::~cPlayer(void)
 	SaveToDisk();
 	m_ClientHandle = 0;
 	
-	CloseWindow();
+	CloseWindow(-1);
 	if( m_Inventory )
 	{
 		delete m_Inventory;
@@ -401,14 +401,36 @@ Vector3d cPlayer::GetEyePosition()
 
 void cPlayer::OpenWindow( cWindow* a_Window )
 {
-	CloseWindow();
+	CloseWindow(m_CurrentWindow ? (char)m_CurrentWindow->GetWindowType() : 0);
 	a_Window->Open( *this );
 	m_CurrentWindow = a_Window;
 }
 
-void cPlayer::CloseWindow()
+void cPlayer::CloseWindow(char wID = -1)
 {
 	if( m_CurrentWindow ) m_CurrentWindow->Close( *this );
+	if (wID == 0) {
+		if(GetInventory().GetWindow()->GetDraggingItem() && GetInventory().GetWindow()->GetDraggingItem()->m_ItemCount > 0)
+		{
+			LOG("Player holds item! Dropping it...");
+			TossItem( true, GetInventory().GetWindow()->GetDraggingItem()->m_ItemCount );
+		}
+
+		//Drop whats in the crafting slots (1, 2, 3, 4)
+		for( int i = 1; i <= 4; i++ )
+		{
+			cItem* Item = m_Inventory->GetSlot( i );
+			if( Item->m_ItemID > 0 && Item->m_ItemCount > 0 )
+			{
+				float vX = 0, vY = 0, vZ = 0;
+				EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
+				vY = -vY*2 + 1.f;
+				cPickup* Pickup = new cPickup( (int)(GetPosX()*32), (int)(GetPosY()*32) + (int)(1.6f*32), (int)(GetPosZ()*32), *Item, vX*2, vY*2, vZ*2 );
+				Pickup->Initialize( GetWorld() );
+			}
+			Item->Empty();
+		}
+	}
 	m_CurrentWindow = 0;
 }
 

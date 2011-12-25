@@ -224,9 +224,9 @@ void cWindow::OwnerDestroyed()
 	m_Owner = 0;
 	while( m_OpenedBy.size() > 1 )
 	{
-		(*m_OpenedBy.begin() )->CloseWindow();
+		(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
 	}
-	(*m_OpenedBy.begin() )->CloseWindow();
+	(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
 }
 
 void cWindow::Destroy()

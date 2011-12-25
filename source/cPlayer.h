@@ -46,7 +46,7 @@ public:
 
 	cWindow* GetWindow() { return m_CurrentWindow; }
 	void OpenWindow( cWindow* a_Window );
-	void CloseWindow();
+	void CloseWindow(char wID);
 
 	cClientHandle* GetClientHandle() { return m_ClientHandle; }				//tolua_export
 	void SetClientHandle( cClientHandle* a_Client ) { m_ClientHandle = a_Client; }
