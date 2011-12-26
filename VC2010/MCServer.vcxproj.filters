@@ -421,6 +421,9 @@
     <Filter Include="Packets\cPacket_PlayerListItem">
       <UniqueIdentifier>{b690d7b6-3697-4d91-bab3-21fd652986be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cWorldGenerator">
+      <UniqueIdentifier>{72727ea7-779f-439e-8f30-53bd6985c9e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -840,6 +843,9 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_PlayerListItem.cpp">
       <Filter>Packets\cPacket_PlayerListItem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cWorldGenerator.cpp">
+      <Filter>cWorldGenerator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1295,6 +1301,9 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_PlayerListItem.h">
       <Filter>Packets\cPacket_PlayerListItem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cWorldGenerator.h">
+      <Filter>cWorldGenerator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

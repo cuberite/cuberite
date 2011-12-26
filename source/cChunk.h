@@ -80,15 +80,14 @@ public:
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
 
 	void AddTickBlockEntity( cFurnaceEntity* a_Entity );
-	//{
-	//	m_TickBlockEntities.remove( a_Entity );
-	//	m_TickBlockEntities.push_back( a_Entity );
-	//}
-
 	void RemoveTickBlockEntity( cFurnaceEntity* a_Entity );
-	//{
-	//	m_TickBlockEntities.remove( a_Entity );
-	//}
+
+	inline static unsigned int cChunk::MakeIndex(int x, int y, int z )
+	{
+		if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
+			return y + (z * 128) + (x * 128 * 16);
+		return 0;
+	}
 
 	static const int c_NumBlocks = 16*128*16;
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
@@ -110,13 +109,6 @@ private:
 	void SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
 
 	void CreateBlockEntities();
-
-	inline unsigned int cChunk::MakeIndex(int x, int y, int z )
-	{
-		if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
-			return y + (z * 128) + (x * 128 * 16);
-		return 0;
-	}
 
 	bool m_bCalculateLighting;
 	bool m_bCalculateHeightmap;
