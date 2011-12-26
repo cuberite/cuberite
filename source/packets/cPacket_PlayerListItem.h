@@ -7,6 +7,7 @@ class cPacket_PlayerListItem : public cPacket
 {
 public:
 	cPacket_PlayerListItem() { m_PacketID = E_PLAYER_LIST_ITEM; }
+	cPacket_PlayerListItem(std::string a_PlayerName, bool a_Online, short a_Ping);
 
 	bool Parse(cSocket & a_Socket);
 	bool Send(cSocket & a_Socket);

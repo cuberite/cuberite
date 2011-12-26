@@ -51,6 +51,8 @@ public:
 	static void AuthenticateThread( void* a_Param );
 
 	const char* GetUsername();
+
+	inline short GetPing() { return m_Ping; }
 private:
 	void HandlePacket( cPacket* a_Packet );
 	void RemovePacket( cPacket * a_Packet );
@@ -65,6 +67,9 @@ private:
 	bool m_bKicking;
 
 	float m_TimeLastPacket;
+
+	// TODO: ping calculation per minecraft
+	short m_Ping;
 
 	bool m_bLoggedIn;
 	bool m_bSendLoginResponse;

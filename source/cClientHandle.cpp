@@ -156,7 +156,6 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->PacketMap[E_UPDATE_SIGN]		= new cPacket_UpdateSign;
 	m_pState->PacketMap[E_RESPAWN]			= new cPacket_Respawn;
 	m_pState->PacketMap[E_PING]			= new cPacket_Ping;
-	m_pState->PacketMap[E_PLAYER_LIST_ITEM]	= new cPacket_PlayerListItem;
 
 	memset( m_LoadedChunks, 0x00, sizeof(cChunk*)*VIEWDISTANCE*VIEWDISTANCE );
 
@@ -1166,16 +1165,17 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
 					for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 					{
-						cPacket_PlayerListItem PlayerList;
-						PlayerList.m_PlayerName = GetUsername();
-						PlayerList.m_Online = false;
-						PlayerList.m_Ping = (short)5;
-						(*itr)->GetClientHandle()->Send( PlayerList );
+						cPacket_PlayerListItem *PlayerList = new cPacket_PlayerListItem(m_Player->GetColor() + GetUsername(), false, (short)9999);
+						(*itr)->GetClientHandle()->Send( *PlayerList );
 					}
 				}
 				Destroy();
 				return;
 			}
+			break;
+		case E_KEEP_ALIVE:
+				// TODO: Handle player ping per minecraft
+				//cPacket_KeepAlive* PacketData = reinterpret_cast<cPacket_KeepAlive*>(a_Packet);
 			break;
 			default:
                 break;

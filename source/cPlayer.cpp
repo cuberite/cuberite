@@ -239,11 +239,8 @@ void cPlayer::Tick(float a_Dt)
 	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 	{
 		if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-			cPacket_PlayerListItem PlayerList;
-			PlayerList.m_PlayerName = GetColor() + GetName();
-			PlayerList.m_Online = true;
-			PlayerList.m_Ping = (short)5;
-			(*itr)->GetClientHandle()->Send( PlayerList );
+			cPacket_PlayerListItem *PlayerList = new cPacket_PlayerListItem(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
+			(*itr)->GetClientHandle()->Send( *PlayerList );
 		}
 	}
 
