@@ -37,6 +37,7 @@
 #include "cMakeDir.h"
 #include "cChunkGenerator.h"
 #include "MersenneTwister.h"
+#include "cWorldGenerator_Test.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -141,6 +142,7 @@ cWorld::cWorld( const char* a_WorldName )
 	, m_SpawnMonsterTime( 0.f )
 	, m_RSList ( 0 )
 	, m_Weather ( 0 )
+	, m_WorldGenerator( 0 )
 {
 	LOG("cWorld::cWorld(%s)", a_WorldName);
 	m_pState->WorldName = a_WorldName;
@@ -154,6 +156,8 @@ cWorld::cWorld( const char* a_WorldName )
 	m_WorldSeed = r1.randInt();
 	m_GameMode = 0;
 
+	std::string WorldGeneratorName;
+
 	cIniFile IniFile( m_pState->WorldName + "/world.ini");
 	if( IniFile.ReadFile() )
 	{
@@ -162,6 +166,7 @@ cWorld::cWorld( const char* a_WorldName )
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ );
 		m_WorldSeed = IniFile.GetValueI("Seed", "Seed", m_WorldSeed );
 		m_GameMode = IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
+		WorldGeneratorName = IniFile.GetValue("Generator", "GeneratorName", "Default");
 	}
 	else
 	{
@@ -170,12 +175,18 @@ cWorld::cWorld( const char* a_WorldName )
 		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ );
 		IniFile.SetValueI("Seed", "Seed", m_WorldSeed );
 		IniFile.SetValueI("GameMode", "GameMode", m_GameMode );
+		IniFile.SetValue("Generator", "GeneratorName", "Default" );
 		if( !IniFile.WriteFile() )
 		{
 			LOG("WARNING: Could not write to %s/world.ini", a_WorldName);
 		}
 	}
 	LOGINFO("Seed: %i", m_WorldSeed );
+
+	if( WorldGeneratorName.compare("Test") == 0 )
+		m_WorldGenerator = new cWorldGenerator_Test();
+	else	// Default
+		m_WorldGenerator = new cWorldGenerator();
 
 	cIniFile GenSettings("terrain.ini");
 	if( GenSettings.ReadFile() )
@@ -224,19 +235,14 @@ cWorld::cWorld( const char* a_WorldName )
 	m_ChunksCriticalSection = new cCriticalSection();
 
 	//Simulators:
-	m_SimulatorManager = new cSimulatorManager();
-
 	m_WaterSimulator = new cWaterSimulator( this );
-	m_SimulatorManager->RegisterSimulator(m_WaterSimulator, 6);
-
 	m_LavaSimulator = new cLavaSimulator( this );
-	m_SimulatorManager->RegisterSimulator(m_LavaSimulator, 12);
-
 	m_SandSimulator = new cSandSimulator(this);
 
+	m_SimulatorManager = new cSimulatorManager();
+	m_SimulatorManager->RegisterSimulator(m_WaterSimulator, 6);
+	m_SimulatorManager->RegisterSimulator(m_LavaSimulator, 12);
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
-
-
 
 	memset( g_BlockLightValue, 0x0, 128 );
 	memset( g_BlockSpreadLightFalloff, 0xf, 128 ); // 0xf means total falloff

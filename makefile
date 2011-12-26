@@ -113,6 +113,7 @@ MCServer : \
 		build/cWindow.o\
 		build/cWorld.o\
 		build/cWorldGenerator.o\
+		build/cWorldGenerator_Test.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -315,6 +316,7 @@ MCServer : \
 		build/cWindow.o\
 		build/cWorld.o\
 		build/cWorldGenerator.o\
+		build/cWorldGenerator_Test.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -520,6 +522,7 @@ clean :
 		build/cWindow.o\
 		build/cWorld.o\
 		build/cWorldGenerator.o\
+		build/cWorldGenerator_Test.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -881,6 +884,9 @@ build/cWorld.o : source/cWorld.cpp
 build/cWorldGenerator.o : source/cWorldGenerator.cpp
 	$(CC) $(CC_OPTIONS) source/cWorldGenerator.cpp -c $(INCLUDE) -o build/cWorldGenerator.o
 
+# Item # 40 -- cWorldGenerator_Test --
+build/cWorldGenerator_Test.o : source/cWorldGenerator_Test.cpp
+	$(CC) $(CC_OPTIONS) source/cWorldGenerator_Test.cpp -c $(INCLUDE) -o build/cWorldGenerator_Test.o
 
 # Item # 41 -- main --
 build/main.o : source/main.cpp

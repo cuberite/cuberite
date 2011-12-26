@@ -282,6 +282,7 @@
     <ClCompile Include="..\source\cWindow.cpp" />
     <ClCompile Include="..\source\cWolf.cpp" />
     <ClCompile Include="..\source\cWorldGenerator.cpp" />
+    <ClCompile Include="..\source\cWorldGenerator_Test.cpp" />
     <ClCompile Include="..\source\cZombie.cpp" />
     <ClCompile Include="..\source\cZombiepigman.cpp" />
     <ClCompile Include="..\Source\ManualBindings.cpp" />
@@ -433,6 +434,7 @@
     <ClInclude Include="..\source\cWindowOwner.h" />
     <ClInclude Include="..\source\cWolf.h" />
     <ClInclude Include="..\source\cWorldGenerator.h" />
+    <ClInclude Include="..\source\cWorldGenerator_Test.h" />
     <ClInclude Include="..\source\cZombie.h" />
     <ClInclude Include="..\source\cZombiepigman.h" />
     <ClInclude Include="..\source\Endianness.h" />

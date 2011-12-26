@@ -427,6 +427,9 @@
     <Filter Include="!LuaPlugins">
       <UniqueIdentifier>{4b86e1cf-ea3c-40b6-82b2-82fa9e6eb35e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cWorldGenerator\cWorldGenerator_Test">
+      <UniqueIdentifier>{c86f4c53-af06-4b42-97dd-ffb7035041ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -849,6 +852,12 @@
     </ClCompile>
     <ClCompile Include="..\source\cWorldGenerator.cpp">
       <Filter>cWorldGenerator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSandSimulator.cpp" />
+    <ClCompile Include="..\source\cSimulator.cpp" />
+    <ClCompile Include="..\source\cSimulatorManager.cpp" />
+    <ClCompile Include="..\source\cWorldGenerator_Test.cpp">
+      <Filter>cWorldGenerator\cWorldGenerator_Test</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1308,6 +1317,12 @@
     <ClInclude Include="..\source\cWorldGenerator.h">
       <Filter>cWorldGenerator</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\cSandSimulator.h" />
+    <ClInclude Include="..\source\cSimulator.h" />
+    <ClInclude Include="..\source\cSimulatorManager.h" />
+    <ClInclude Include="..\source\cWorldGenerator_Test.h">
+      <Filter>cWorldGenerator\cWorldGenerator_Test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">
@@ -1316,18 +1331,6 @@
     <None Include="icon.ico" />
     <None Include="..\source\cNoise.inc">
       <Filter>cNoise</Filter>
-    </None>
-    <None Include="..\Plugins\ChatLog.lua">
-      <Filter>!LuaPlugins</Filter>
-    </None>
-    <None Include="..\Plugins\Core.lua">
-      <Filter>!LuaPlugins</Filter>
-    </None>
-    <None Include="..\Plugins\Fire.lua">
-      <Filter>!LuaPlugins</Filter>
-    </None>
-    <None Include="..\Plugins\MagicCarpet.lua">
-      <Filter>!LuaPlugins</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

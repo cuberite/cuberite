@@ -1,3 +1,4 @@
+
 #ifndef _WIN32
 #include <cstring>
 #include <cstdlib>
@@ -133,8 +134,7 @@ void cChunk::Initialize()
 		// Clear memory
 		memset( m_BlockData, 0x00, c_BlockDataSize );
 
-		cWorldGenerator Generator;
-		Generator.GenerateChunk( this );
+		m_World->GetWorldGenerator()->GenerateChunk( this );
 
 		CalculateHeightmap();
 		CalculateLighting();

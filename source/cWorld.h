@@ -27,6 +27,7 @@ class cClientHandle;
 class cChunk;
 class cEntity;
 class cBlockEntity;
+class cWorldGenerator;
 
 
 class cWorld													//tolua_export
@@ -154,7 +155,7 @@ public:
 	void SetWeather ( int );												//tolua_export
 	int GetWeather() { return m_Weather; };												//tolua_export
 
-
+	cWorldGenerator* GetWorldGenerator() { return m_WorldGenerator; }
 private:
 	friend class cRoot;
 	cWorld( const char* a_WorldName );
@@ -184,10 +185,11 @@ private:
 	cWaterSimulator* m_WaterSimulator;
 	cLavaSimulator* m_LavaSimulator;
 	
-
 	cCriticalSection* m_ClientHandleCriticalSection;
 	cCriticalSection* m_EntitiesCriticalSection;
 	cCriticalSection* m_ChunksCriticalSection;
+
+	cWorldGenerator* m_WorldGenerator;
 	
 	std::string m_Description;
 	unsigned int m_MaxPlayers;
