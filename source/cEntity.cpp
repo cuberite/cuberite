@@ -52,17 +52,6 @@ void cEntity::Initialize( cWorld* a_World )
 	m_World->AddEntity( this );
 
 	MoveToCorrectChunk(true);
-
-	/*
-Not needed because it´s covered by the MoveToCorrectChunk function
-	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, m_ChunkX, m_ChunkY, m_ChunkZ );
-	cChunk* Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if( Chunk )
-	{
-		//LOG("Adding entity %i to chunk %i %i %i", m_UniqueID, Chunk->GetPosX(), Chunk->GetPosY(), Chunk->GetPosZ() );
-		Chunk->AddEntity( *this );
-	}
-	*/
 }
 
 void cEntity::WrapRotation()
@@ -73,17 +62,17 @@ void cEntity::WrapRotation()
 	while(m_Rot->y < -180.f) m_Rot->y+=360.f;
 }
 
-void cEntity::MoveToCorrectChunk(bool a_IgnoreOldChunk)
+void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 {
 	if( !m_World ) return; // Entity needs a world to move to a chunk
 
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, ChunkX, ChunkY, ChunkZ );
-	if(a_IgnoreOldChunk || m_ChunkX != ChunkX || m_ChunkY != ChunkY || m_ChunkZ != ChunkZ)
+	if(a_bIgnoreOldChunk || m_ChunkX != ChunkX || m_ChunkY != ChunkY || m_ChunkZ != ChunkZ)
 	{
 		LOG("From %i %i To %i %i", m_ChunkX, m_ChunkZ, ChunkX, ChunkZ );
 		cChunk* Chunk = 0;
-		if(!a_IgnoreOldChunk)
+		if(!a_bIgnoreOldChunk)
 			Chunk = m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
 
 		typedef std::list< cClientHandle* > ClientList;

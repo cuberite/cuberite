@@ -1302,6 +1302,9 @@
       <Filter>LuaBindings</Filter>
     </None>
     <None Include="icon.ico" />
+    <None Include="..\source\cNoise.inc">
+      <Filter>cNoise</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MCServer.rc" />

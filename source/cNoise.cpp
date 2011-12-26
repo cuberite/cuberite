@@ -1,7 +1,9 @@
 #include "cNoise.h"
 #include <math.h>
 
+#if NOISE_USE_SSE
 #include <smmintrin.h> //_mm_mul_epi32
+#endif
 
 #define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
 
@@ -15,29 +17,7 @@ cNoise::~cNoise()
 {
 }
 
-/****************
- * Random value generator
- **/
-float cNoise::IntNoise( int a_X ) const
-{
-	int x = ((a_X*m_Seed)<<13) ^ a_X;
-    return ( 1.0f - ( (x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f); 
-}
-
-float cNoise::IntNoise2D( int a_X, int a_Y ) const
-{
-	int n = a_X + a_Y * 57 + m_Seed*57*57;
-    n = (n<<13) ^ n;
-    return ( 1.0f - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);  
-}
-
-float cNoise::IntNoise3D( int a_X, int a_Y, int a_Z ) const
-{
-	int n = a_X + a_Y * 57 + a_Z * 57*57 + m_Seed*57*57*57;
-    n = (n<<13) ^ n;
-    return ( 1.0f - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);  
-}
-
+#if NOISE_USE_SSE
 /****************
  * SSE Random value generator
  **/
@@ -71,6 +51,7 @@ __m128 cNoise::SSE_IntNoise2D( int a_X1, int a_Y1, int a_X2, int a_Y2, int a_X3,
 
 	return Result4;
 }
+#endif
 
 
 /***************
@@ -166,6 +147,7 @@ float cNoise::CubicNoise2D( float a_X, float a_Y ) const
 	return CubicInterpolate( interp1, interp2, interp3, interp4, FracY );
 }
 
+#if NOISE_USE_SSE
 float cNoise::SSE_CubicNoise2D( float a_X, float a_Y ) const
 {
 	const int	BaseX = FAST_FLOOR( a_X );
@@ -185,6 +167,7 @@ float cNoise::SSE_CubicNoise2D( float a_X, float a_Y ) const
 	const float	FracY = (a_Y) - BaseY;
 	return CubicInterpolate( AllInterp.p[0], AllInterp.p[1], AllInterp.p[2], AllInterp.p[3], FracY );
 }
+#endif
 
 /******************
  * Interpolated (and 1 smoothed) noise in 3-dimensions
@@ -287,16 +270,8 @@ float cNoise::CubicNoise3D( float a_X, float a_Y, float a_Z ) const
 /******************
  * Private
  **/
-float cNoise::CubicInterpolate( float a_A, float a_B, float a_C, float a_D, float a_Pct ) const
-{
-	float P = (a_D - a_C) - (a_A - a_B);
-	float Q = (a_A - a_B) - P;
-	float R = a_C - a_A;
-	float S = a_B;
 
-	return P*(a_Pct*a_Pct*a_Pct) + Q*(a_Pct*a_Pct) + R*a_Pct + S;
-}
-
+#if NOISE_USE_SSE
 __m128 cNoise::CubicInterpolate4( const __m128 & a_A, const __m128 & a_B, const __m128 & a_C, const __m128 & a_D, float a_Pct ) const
 {
 	const __m128 P = _mm_sub_ps( _mm_sub_ps( a_D, a_C ), _mm_sub_ps( a_A, a_B ) );
@@ -309,15 +284,8 @@ __m128 cNoise::CubicInterpolate4( const __m128 & a_A, const __m128 & a_B, const 
 
 	return _mm_add_ps( _mm_add_ps( _mm_add_ps( _mm_mul_ps(P, Pct3), _mm_mul_ps( Q, Pct2 ) ), _mm_mul_ps( R, Pct ) ), a_B );
 }
+#endif
 
-float cNoise::CosineInterpolate( float a_A, float a_B, float a_Pct ) const
-{
-	const float ft = a_Pct * 3.1415927f;
-	const float f = (1.f - cosf(ft)) * 0.5f;
-	return  a_A*(1-f) + a_B*f;
-}
-
-float cNoise::LinearInterpolate( float a_A, float a_B, float a_Pct ) const
-{
-	return  a_A*(1.f-a_Pct) + a_B*a_Pct;
-}
+#if NOISE_USE_INLINE
+# include "cNoise.inc"
+#endif

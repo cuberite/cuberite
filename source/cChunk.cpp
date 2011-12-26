@@ -448,13 +448,6 @@ void cChunk::CreateBlockEntities()
 	}
 }
 
-unsigned int cChunk::MakeIndex(int x, int y, int z )
-{
-	if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
-		return y + (z * 128) + (x * 128 * 16);
-	return 0;
-}
-
 char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
 {
 	if( a_BlockIdx > -1 && a_BlockIdx < c_NumBlocks )

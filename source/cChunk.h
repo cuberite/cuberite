@@ -111,7 +111,12 @@ private:
 
 	void CreateBlockEntities();
 
-	unsigned int MakeIndex(int x, int y, int z );
+	inline unsigned int cChunk::MakeIndex(int x, int y, int z )
+	{
+		if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
+			return y + (z * 128) + (x * 128 * 16);
+		return 0;
+	}
 
 	bool m_bCalculateLighting;
 	bool m_bCalculateHeightmap;

@@ -514,6 +514,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg" />
+    <None Include="..\source\cNoise.inc" />
     <None Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
