@@ -35,7 +35,7 @@ public:
 	virtual void CheckEventSeePlayer();
 	virtual void EventSeePlayer(cEntity *);
 	float m_SightDistance;
-	static void ListClosePlayers(cMonster *);
+	virtual cPlayer *FindClosestPlayer();		//non static is easier. also virtual so other mobs can implement their own searching algo 
 	virtual void GetMonsterConfig(const char* pm_name);
 	virtual void EventLosePlayer();
 	virtual void CheckEventLostPlayer();

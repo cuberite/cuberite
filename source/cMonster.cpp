@@ -154,6 +154,12 @@ void cMonster::Tick(float a_Dt)
 			Distance *= 3;
 			m_Speed->x = Distance.x;
 			m_Speed->z = Distance.z;
+
+			if (m_EMState == ESCAPING)
+			{	//Runs Faster when escaping :D otherwise they just walk away
+				m_Speed->x *= 2.f;
+				m_Speed->z *= 2.f;
+			}
 		}
 		else
 		{
@@ -383,7 +389,12 @@ void cMonster::SetState(const char* a_str)
 //monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer()
 {
-	cMonster::ListClosePlayers(this);
+	cPlayer *Closest = FindClosestPlayer();
+
+	if(Closest)
+	{
+		EventSeePlayer(Closest);
+	}
 }
 
 void cMonster::CheckEventLostPlayer()
@@ -423,7 +434,7 @@ void cMonster::InStateIdle(float a_Dt) {
 		MTRand r1;
 		int rem = r1.randInt()%6 + 1;
 		//LOG("Moving: int: %3.3f rem: %i",idle_interval,rem);
-		idle_interval = 0;
+		idle_interval -= 1;		//So nothing gets dropped when the server hangs for a few seconds
 		Vector3f Dist;
 		Dist.x = (float)((r1.randInt()%11)-5);
 		Dist.z = (float)((r1.randInt()%11)-5);
@@ -444,7 +455,7 @@ void cMonster::InStateBurning(float a_Dt) {
 	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y +1, (int)m_Pos->z );	
 	if(m_FireDamageInterval > 1) {
 
-		m_FireDamageInterval = 0;
+		m_FireDamageInterval -= 1;
 		TakeDamage(1, this);
 
 		m_BurnPeriod++;
@@ -527,42 +538,47 @@ void cMonster::ListMonsters() {
 	cRoot::Get()->GetWorld()->UnlockEntities();
 }
 
-//Checks for Players close by and if they are visible
-void cMonster::ListClosePlayers(cMonster *m) {
-	int tries = 0;
-	cTracer LineOfSight(cRoot::Get()->GetWorld() );
-	cWorld::EntityList Entities = cRoot::Get()->GetWorld()->GetEntities();
-	for( cWorld::EntityList::iterator itr = Entities.begin(); itr != Entities.end(); ++itr) {
-		tries++;
-		if((*itr)->GetEntityType() == cEntity::E_PLAYER){
-			Vector3f pos = (*itr)->GetPosition();
-			if((pos - *(m->m_Pos)).Length() <= m->m_SightDistance){
-				if(!LineOfSight.Trace(*(m->m_Pos),(pos - *(m->m_Pos)),(int)(pos - *(m->m_Pos)).Length()))
-				{
-					m->EventSeePlayer(*itr);
-					return; //get the first one in sight later we can reiterate and check
-						//for the closest out of all that match and make it more realistic
-						
-				}
-			}
-			
-		}
-		if(tries > 100)
+//Checks for Players close by and if they are visible return the closest
+cPlayer *cMonster::FindClosestPlayer()
+{
+	cTracer LineOfSight(cRoot::Get()->GetWorld());
+	cWorld::PlayerList Players = cRoot::Get()->GetWorld()->GetAllPlayers();
+
+	float ClosestDistance = m_SightDistance + 1.f;	//Something that is higher than the max :D
+	cPlayer* ClosestPlayer = 0;
+
+	for( cWorld::PlayerList::iterator itr = Players.begin(); itr != Players.end(); ++itr)
+	{
+		Vector3f Pos = (*itr)->GetPosition();
+		float Distance = (Pos - *(m_Pos)).Length();
+
+		if(Distance <= m_SightDistance)
 		{
-			m->EventLosePlayer();
-			return;
+			if(!LineOfSight.Trace(*(m_Pos),(Pos - *(m_Pos)),(int)(Pos - *(m_Pos)).Length()))
+			{
+				if(Distance < ClosestDistance)
+				{
+					ClosestDistance = Distance;
+					ClosestPlayer = *itr;
+				}						
+			}			
 		}
 	}
+	return ClosestPlayer;
 }
 
-void cMonster::GetMonsterConfig(const char* pm_name) {
+void cMonster::GetMonsterConfig(const char* pm_name)
+{
 	cRoot::Get()->GetMonsterConfig()->Get()->AssignAttributes(this, pm_name);
 }
 
-void cMonster::SetAttackRate(int ar) {
+void cMonster::SetAttackRate(int ar)
+{
 	m_AttackRate = (float)ar;
 }
-void cMonster::SetAttackRange(float ar) {
+
+void cMonster::SetAttackRange(float ar)
+{
 	m_AttackRange = ar;
 }
 void cMonster::SetAttackDamage(float ad) {
