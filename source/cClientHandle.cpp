@@ -65,6 +65,7 @@
 #include "packets/cPacket_13.h"
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_Ping.h"
+#include "packets/cPacket_PlayerListItem.h"
 
 
 #ifndef _WIN32
@@ -155,6 +156,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->PacketMap[E_UPDATE_SIGN]		= new cPacket_UpdateSign;
 	m_pState->PacketMap[E_RESPAWN]			= new cPacket_Respawn;
 	m_pState->PacketMap[E_PING]			= new cPacket_Ping;
+	m_pState->PacketMap[E_PLAYER_LIST_ITEM]	= new cPacket_PlayerListItem;
 
 	memset( m_LoadedChunks, 0x00, sizeof(cChunk*)*VIEWDISTANCE*VIEWDISTANCE );
 
@@ -1161,6 +1163,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				{
 					cPacket_Chat DisconnectMessage( m_pState->Username + " disconnected: " + PacketData->m_Reason );
 					cRoot::Get()->GetServer()->Broadcast( DisconnectMessage );
+					cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+					for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+					{
+						cPacket_PlayerListItem PlayerList;
+						PlayerList.m_PlayerName = GetUsername();
+						PlayerList.m_Online = false;
+						PlayerList.m_Ping = (short)5;
+						(*itr)->GetClientHandle()->Send( PlayerList );
+					}
 				}
 				Destroy();
 				return;

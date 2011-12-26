@@ -21,5 +21,5 @@ const std::string cChatColor::White			= cChatColor::Color + "f";
 
 const std::string cChatColor::MakeColor( char a_Color )
 {
-	return cChatColor::Color + a_Color;
+	return cChatColor::Delimiter + a_Color;
 }

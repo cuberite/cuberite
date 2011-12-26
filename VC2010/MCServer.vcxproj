@@ -316,6 +316,7 @@
     <ClCompile Include="..\source\packets\cPacket_Explosion.cpp" />
     <ClCompile Include="..\source\packets\cPacket_ItemData.cpp" />
     <ClCompile Include="..\source\packets\cPacket_NewInvalidState.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_PlayerListItem.cpp" />
     <ClCompile Include="..\source\packets\cPacket_SoundEffect.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Thunderbolt.cpp" />
     <ClCompile Include="..\source\packets\cPacket_EntityLook.cpp" />
@@ -470,6 +471,7 @@
     <ClInclude Include="..\source\packets\cPacket_Explosion.h" />
     <ClInclude Include="..\source\packets\cPacket_ItemData.h" />
     <ClInclude Include="..\source\packets\cPacket_NewInvalidState.h" />
+    <ClInclude Include="..\source\packets\cPacket_PlayerListItem.h" />
     <ClInclude Include="..\source\packets\cPacket_SoundEffect.h" />
     <ClInclude Include="..\source\packets\cPacket_Thunderbolt.h" />
     <ClInclude Include="..\source\packets\cPacket_EntityLook.h" />

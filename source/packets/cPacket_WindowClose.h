@@ -14,7 +14,7 @@ public:
 	bool Parse(cSocket & a_Socket);
 	bool Send(cSocket & a_Socket);
 
-	char m_Close; // 1 = close
+	char m_Close; // m_Close == cWindow WindowType number
 
 	static const unsigned int c_Size = 1 + 1;
 };

@@ -29,6 +29,7 @@
 #include "packets/cPacket_Metadata.h"
 #include "packets/cPacket_Chat.h"
 #include "packets/cPacket_NewInvalidState.h"
+#include "packets/cPacket_PlayerListItem.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -232,6 +233,20 @@ void cPlayer::Tick(float a_Dt)
 	if(e_EPMetaState == BURNING){
 		InStateBurning(a_Dt);
 	}
+	
+	// Send Player List
+	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+	{
+		if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
+			cPacket_PlayerListItem PlayerList;
+			PlayerList.m_PlayerName = GetColor() + GetName();
+			PlayerList.m_Online = true;
+			PlayerList.m_Ping = (short)5;
+			(*itr)->GetClientHandle()->Send( PlayerList );
+		}
+	}
+
 }
 
 void cPlayer::InStateBurning(float a_Dt) {
@@ -406,10 +421,10 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 	m_CurrentWindow = a_Window;
 }
 
-void cPlayer::CloseWindow(char wID = -1)
+void cPlayer::CloseWindow(char a_WindowType)
 {
 	if( m_CurrentWindow ) m_CurrentWindow->Close( *this );
-	if (wID == 0) {
+	if (a_WindowType == 0) {
 		if(GetInventory().GetWindow()->GetDraggingItem() && GetInventory().GetWindow()->GetDraggingItem()->m_ItemCount > 0)
 		{
 			LOG("Player holds item! Dropping it...");

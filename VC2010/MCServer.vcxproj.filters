@@ -418,6 +418,9 @@
     <Filter Include="cEntity\cPawn\cMonster\Personalities\PassiveAggressive">
       <UniqueIdentifier>{71574b1c-a518-4a17-92c1-e3ea340f73bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets\cPacket_PlayerListItem">
+      <UniqueIdentifier>{b690d7b6-3697-4d91-bab3-21fd652986be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -834,6 +837,9 @@
     </ClCompile>
     <ClCompile Include="..\source\cPassiveMonster.cpp">
       <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_PlayerListItem.cpp">
+      <Filter>Packets\cPacket_PlayerListItem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1286,6 +1292,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cPassiveMonster.h">
       <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_PlayerListItem.h">
+      <Filter>Packets\cPacket_PlayerListItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
