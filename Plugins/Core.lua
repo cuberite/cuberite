@@ -45,6 +45,7 @@ function CorePlugin:Initialize()
 	self:AddCommand("/ban", " - [Player] - Ban a player", 						"core.ban")
 	self:AddCommand("/unban", " - [Player] - Unban a player", 					"core.unban")
 	self:AddCommand("/top", " - Teleport yourself to the top most block",		"core.top")
+	self:AddCommand("/gm", " - [Gamemode (0|1)] - Change your gamemode", 		"core.changegm")
 
 	self:BindCommand( "/help", 		"core.help",		HandleHelpCommand )
 	self:BindCommand( "/pluginlist","core.pluginlist", 	HandlePluginListCommand )
@@ -63,6 +64,7 @@ function CorePlugin:Initialize()
 	self:BindCommand( "/ban", 		"core.ban",			HandleBanCommand )
 	self:BindCommand( "/unban", 	"core.unban",		HandleUnbanCommand )
 	self:BindCommand( "/top",		"core.top",			HandleTopCommand )
+	self:BindCommand( "/gm", 		"core.changegm", 	HandleChangeGMCommand )
 
 	local IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
@@ -405,6 +407,17 @@ function HandleTPCommand( Split, Player )
 		Player:SendMessage( cChatColor.Green .. "You teleported to "..OtherPlayer:GetName().."!" )
 		OtherPlayer:SendMessage( cChatColor.Green .. Player:GetName().." teleported to you!" )
 	end
+	return true
+end
+
+function HandleChangeGMCommand( Split, Player )
+	if( #Split ~= 2 ) then
+		Player:SendMessage( cChatColor.Green .. "Usage: /gm [GameMode (0|1)]" )
+		return true
+	end
+		
+	Player:SetGameMode(Split[2])
+		
 	return true
 end
 
