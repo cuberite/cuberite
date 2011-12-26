@@ -72,7 +72,7 @@ public:
 };
 
 cFluidSimulator::cFluidSimulator( cWorld* a_World )
-	: m_World(a_World)
+	: cSimulator(a_World)
 	, m_Data(0)
 {
 	m_Data = new FluidData(a_World, this);
@@ -80,17 +80,7 @@ cFluidSimulator::cFluidSimulator( cWorld* a_World )
 
 cFluidSimulator::~cFluidSimulator()
 {
-}
-
-void cFluidSimulator::WakeUp( int a_X, int a_Y, int a_Z )
-{
-	AddBlock( a_X, a_Y, a_Z );
-	AddBlock( a_X-1, a_Y, a_Z );
-	AddBlock( a_X+1, a_Y, a_Z );
-	AddBlock( a_X, a_Y-1, a_Z );
-	AddBlock( a_X, a_Y+1, a_Z );
-	AddBlock( a_X, a_Y, a_Z-1 );
-	AddBlock( a_X, a_Y, a_Z+1 );
+	delete m_Data;
 }
 
 void cFluidSimulator::AddBlock( int a_X, int a_Y, int a_Z )
@@ -99,8 +89,8 @@ void cFluidSimulator::AddBlock( int a_X, int a_Y, int a_Z )
 	std::vector< Vector3i > & ActiveFluid = *m_Data->m_ActiveFluid;
 	for( std::vector< Vector3i >::iterator itr = ActiveFluid.begin(); itr != ActiveFluid.end(); ++itr )
 	{
-		Vector3i & pos = *itr;
-		if( pos.x == a_X && pos.y == a_Y && pos.z == a_Z )
+		Vector3i & Pos = *itr;
+		if( Pos.x == a_X && Pos.y == a_Y && Pos.z == a_Z )
 			return;
 	}
 

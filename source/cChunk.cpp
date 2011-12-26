@@ -257,8 +257,7 @@ void cChunk::Tick(float a_Dt)
 					int wX, wY, wZ;
 					PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
 
-					m_World->GetWaterSimulator()->WakeUp( wX, wY, wZ );
-					m_World->GetLavaSimulator()->WakeUp( wX, wY, wZ );
+					m_World->GetSimulatorManager()->WakeUp(wX, wY, wZ);
 					if (isRedstone) {
 						cRedstone Redstone(m_World);
 						Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
@@ -303,30 +302,6 @@ void cChunk::Tick(float a_Dt)
 					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
 					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
 					Pickup->Initialize( m_World );
-				}
-			}
-			break;
-		case E_BLOCK_STATIONARY_WATER:
-		case E_BLOCK_WATER:
-			
-			break;
-		case E_BLOCK_GRAVEL:
-		case E_BLOCK_SAND:
-			{
-				char BottomBlock = GetBlock( X, Y-1, Z );
-				if( BottomBlock == E_BLOCK_AIR || IsBlockWater(BottomBlock) || IsBlockLava(BottomBlock) )
-				{
-					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
-					SetBlock( X, Y-1, Z, BlockID, 0 );
-					
-					int wX, wY, wZ;
-
-					PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
-
-					m_World->GetWaterSimulator()->WakeUp( wX, wY, wZ );
-					m_World->GetLavaSimulator()->WakeUp( wX, wY, wZ );
-					m_World->GetWaterSimulator()->WakeUp( wX, wY - 1, wZ );
-					m_World->GetLavaSimulator()->WakeUp( wX, wY - 1, wZ );
 				}
 			}
 			break;

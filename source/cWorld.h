@@ -12,10 +12,13 @@ enum ENUM_ITEM_ID;
 #include <vector>
 #include <string>
 
+#include "cSimulatorManager.h"
+
 class cPacket;
 class cRedstone;
 class cWaterSimulator;
 class cLavaSimulator;
+class cSandSimulator;
 class cChunkMap;
 class cItem;
 class cCriticalSection;
@@ -24,6 +27,8 @@ class cClientHandle;
 class cChunk;
 class cEntity;
 class cBlockEntity;
+
+
 class cWorld													//tolua_export
 {																//tolua_export
 public:
@@ -92,8 +97,9 @@ public:
 	const double & GetSpawnY();														//tolua_export
 	const double & GetSpawnZ() { return m_SpawnZ; }									//tolua_export
 
-	cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
-	cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
+	inline cSimulatorManager *GetSimulatorManager() { return m_SimulatorManager; }
+	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
+	inline cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
 
 
 	cBlockEntity* GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
@@ -173,8 +179,11 @@ private:
 	int m_GameMode;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
+	cSimulatorManager *m_SimulatorManager;
+	cSandSimulator *m_SandSimulator;
 	cWaterSimulator* m_WaterSimulator;
 	cLavaSimulator* m_LavaSimulator;
+	
 
 	cCriticalSection* m_ClientHandleCriticalSection;
 	cCriticalSection* m_EntitiesCriticalSection;

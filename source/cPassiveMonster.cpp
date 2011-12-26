@@ -14,7 +14,8 @@ cPassiveMonster::~cPassiveMonster()
 void cPassiveMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
 {
 	cMonster::TakeDamage(a_Damage, a_Instigator);
-	m_EMState = ESCAPING;
+	if(a_Instigator != this)
+		m_EMState = ESCAPING;
 }
 
 void cPassiveMonster::Tick(float a_Dt)

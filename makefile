@@ -232,6 +232,9 @@ MCServer : \
 		build/zutil.o\
 		build/iniFile.o\
 		build/cSocket.o\
+		build/cSimulator.o\
+		build/cSimulatorManager.o\
+		build/cSandSimulator.o\
 		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
@@ -431,6 +434,9 @@ MCServer : \
 		build/zutil.o\
 		build/iniFile.o\
 		build/cSocket.o\
+		build/cSimulator.o\
+		build/cSimulatorManager.o\
+		build/cSandSimulator.o\
 		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
@@ -633,6 +639,9 @@ clean :
 		build/zutil.o\
 		build/iniFile.o\
 		build/cSocket.o\
+		build/cSimulator.o\
+		build/cSimulatorManager.o\
+		build/cSandSimulator.o\
 		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
@@ -1447,6 +1456,15 @@ build/cMakeDir.o : source/cMakeDir.cpp
 
 build/cSocket.o : source/cSocket.cpp
 	$(CC) $(CC_OPTIONS) source/cSocket.cpp -c $(INCLUDE) -o build/cSocket.o	
+	
+build/cSimulator.o : source/cSimulator.cpp
+	$(CC) $(CC_OPTIONS) source/cSimulator.cpp -c $(INCLUDE) -o build/cSimulator.o
+	
+build/cSimulatorManager.o : source/cSimulatorManager.cpp
+	$(CC) $(CC_OPTIONS) source/cSimulatorManager.cpp -c $(INCLUDE) -o build/cSimulatorManager.o
+	
+build/cSandSimulator.o : source/cSandSimulator.cpp
+	$(CC) $(CC_OPTIONS) source/cSandSimulator.cpp -c $(INCLUDE) -o build/cSandSimulator.o
 
 build/cFluidSimulator.o : source/cFluidSimulator.cpp
 	$(CC) $(CC_OPTIONS) source/cFluidSimulator.cpp -c $(INCLUDE) -o build/cFluidSimulator.o
@@ -1462,6 +1480,5 @@ build/cFileFormatUpdater.o : source/cFileFormatUpdater.cpp
 
 build/cItem.o : source/cItem.cpp
 	$(CC) $(CC_OPTIONS) source/cItem.cpp -c $(INCLUDE) -o build/cItem.o	
-
 
 ##### END RUN ####

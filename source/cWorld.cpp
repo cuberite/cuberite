@@ -13,8 +13,10 @@
 #include "cRoot.h"
 #include "../iniFile/iniFile.h"
 #include "cChunkMap.h"
+#include "cSimulatorManager.h"
 #include "cWaterSimulator.h"
 #include "cLavaSimulator.h"
+#include "cSandSimulator.h"
 #include "cChicken.h"
 #include "cSpider.h"
 #include "cCow.h" //cow
@@ -119,6 +121,8 @@ cWorld::~cWorld()
 	}
 	UnlockEntities();
 
+	delete m_SimulatorManager;
+	delete m_SandSimulator;
 	delete m_WaterSimulator;
 	delete m_LavaSimulator;
 
@@ -219,8 +223,20 @@ cWorld::cWorld( const char* a_WorldName )
 	m_EntitiesCriticalSection = new cCriticalSection();
 	m_ChunksCriticalSection = new cCriticalSection();
 
+	//Simulators:
+	m_SimulatorManager = new cSimulatorManager();
+
 	m_WaterSimulator = new cWaterSimulator( this );
+	m_SimulatorManager->RegisterSimulator(m_WaterSimulator, 6);
+
 	m_LavaSimulator = new cLavaSimulator( this );
+	m_SimulatorManager->RegisterSimulator(m_LavaSimulator, 12);
+
+	m_SandSimulator = new cSandSimulator(this);
+
+	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
+
+
 
 	memset( g_BlockLightValue, 0x0, 128 );
 	memset( g_BlockSpreadLightFalloff, 0xf, 128 ); // 0xf means total falloff
@@ -407,10 +423,9 @@ void cWorld::Tick(float a_Dt)
 	}
 
 	m_ChunkMap->Tick(a_Dt);
-	if( CurrentTick % 6 == 0 )
-		m_WaterSimulator->Simulate(a_Dt);
-	if( CurrentTick % 12 == 0 )
-		m_LavaSimulator->Simulate(a_Dt);
+	
+	GetSimulatorManager()->Simulate(a_Dt);
+
 	UnlockChunks();
 
 	MTRand r1;
@@ -700,8 +715,7 @@ cChunk* cWorld::GetChunkOfBlock( int a_X, int a_Y, int a_Z )
 
 void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
-	m_WaterSimulator->WakeUp( a_X, a_Y, a_Z );
-	m_LavaSimulator->WakeUp( a_X, a_Y, a_Z );
+	this->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
 
 	int ChunkX, ChunkY, ChunkZ;
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
@@ -785,8 +799,8 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 	if(DestChunk)
 	{
 		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
-		m_WaterSimulator->WakeUp( a_X, a_Y, a_Z );
-		m_LavaSimulator->WakeUp( a_X, a_Y, a_Z );
+
+		GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
 
 		if( !a_PickupItem.IsEmpty() )
 		{
