@@ -239,8 +239,8 @@ void cPlayer::Tick(float a_Dt)
 	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 	{
 		if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-			cPacket_PlayerListItem *PlayerList = new cPacket_PlayerListItem(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
-			(*itr)->GetClientHandle()->Send( *PlayerList );
+			cPacket_PlayerListItem PlayerList(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
+			(*itr)->GetClientHandle()->Send( PlayerList );
 		}
 	}
 

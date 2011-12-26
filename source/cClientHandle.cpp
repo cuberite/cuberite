@@ -124,6 +124,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	, m_bKeepThreadGoing( true )
 	, m_bSendLoginResponse( false )
 	, m_pState( new sClientHandleState )
+	, m_Ping(1000)
 {
     LOG("cClientHandle::cClientHandle");
 
@@ -183,9 +184,16 @@ cClientHandle::~cClientHandle()
 	{
 		if ((*itr) && (*itr)->GetClientHandle() && strlen(GetUsername()) > 0)
 		{
-			cPacket_PlayerListItem *PlayerList = new cPacket_PlayerListItem(m_Player->GetColor() + GetUsername(), false, (short)9999);
-			(*itr)->GetClientHandle()->Send( *PlayerList );
+			cPacket_PlayerListItem PlayerList(m_Player->GetColor() + GetUsername(), false, (short)9999);
+			(*itr)->GetClientHandle()->Send( PlayerList );
 		}
+		
+	}
+	
+	if (m_pState && m_pState->Username.size() > 0)
+	{
+		cPacket_Chat Left( m_pState->Username + " left the game!");
+		cRoot::Get()->GetServer()->Broadcast( Left, this );
 	}
 
 	// First stop sending thread
