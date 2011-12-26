@@ -178,6 +178,16 @@ cClientHandle::~cClientHandle()
 		if( m_LoadedChunks[i] ) m_LoadedChunks[i]->RemoveClient( this );
 	}
 
+	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+	{
+		if ((*itr) && (*itr)->GetClientHandle() && strlen(GetUsername()) > 0)
+		{
+			cPacket_PlayerListItem *PlayerList = new cPacket_PlayerListItem(m_Player->GetColor() + GetUsername(), false, (short)9999);
+			(*itr)->GetClientHandle()->Send( *PlayerList );
+		}
+	}
+
 	// First stop sending thread
 	m_bKeepThreadGoing = false;
 
@@ -1162,12 +1172,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				{
 					cPacket_Chat DisconnectMessage( m_pState->Username + " disconnected: " + PacketData->m_Reason );
 					cRoot::Get()->GetServer()->Broadcast( DisconnectMessage );
-					cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-					for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-					{
-						cPacket_PlayerListItem *PlayerList = new cPacket_PlayerListItem(m_Player->GetColor() + GetUsername(), false, (short)9999);
-						(*itr)->GetClientHandle()->Send( *PlayerList );
-					}
 				}
 				Destroy();
 				return;
