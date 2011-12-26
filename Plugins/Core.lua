@@ -46,6 +46,7 @@ function CorePlugin:Initialize()
 	self:AddCommand("/unban", " - [Player] - Unban a player", 					"core.unban")
 	self:AddCommand("/top", " - Teleport yourself to the top most block",		"core.top")
 	self:AddCommand("/gm", " - [Gamemode (0|1)] - Change your gamemode", 		"core.changegm")
+	self:AddCommand("/gotoworld", " - Move to a different world!",				"core.gotoworld")
 
 	self:BindCommand( "/help", 		"core.help",		HandleHelpCommand )
 	self:BindCommand( "/pluginlist","core.pluginlist", 	HandlePluginListCommand )
@@ -65,6 +66,7 @@ function CorePlugin:Initialize()
 	self:BindCommand( "/unban", 	"core.unban",		HandleUnbanCommand )
 	self:BindCommand( "/top",		"core.top",			HandleTopCommand )
 	self:BindCommand( "/gm", 		"core.changegm", 	HandleChangeGMCommand )
+	self:BindCommand( "/gotoworld",	"core.gotoworld",	HandleGotoWorldCommand )
 
 	local IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
@@ -347,7 +349,7 @@ function HandleItemCommand( Split, Player )
 	foundItem = false
 
 	ItemID = tonumber( Split[2] )
-	if( ItemID == nil or not isValidItem( ItemID ) ) then
+	if( ItemID == nil or not IsValidItem( ItemID ) ) then
 		-- nothing
 	else
 		foundItem = true
@@ -358,7 +360,7 @@ function HandleItemCommand( Split, Player )
 			itemValue = itemsINI:GetValueI('Items', ''..Split[2]..'', 0)
 			if itemValue ~= 0 then
 				ItemID = itemValue
-				if( ItemID == nil or not isValidItem( tonumber(itemValue) ) ) then
+				if( ItemID == nil or not IsValidItem( tonumber(itemValue) ) ) then
 					-- nothing
 				else
 					foundItem = true
@@ -418,6 +420,21 @@ function HandleChangeGMCommand( Split, Player )
 		
 	Player:SetGameMode(Split[2])
 		
+	return true
+end
+function HandleGotoWorldCommand( Split, Player )
+	if( #Split ~= 2 ) then
+		Player:SendMessage( cChatColor.Green .. "Usage: /gotoworld [WorldName]" )
+		return true	
+	end
+	
+	if( Player:MoveToWorld(Split[2]) == false ) then
+		Player:SendMessage( cChatColor.Green .. "Could not move to world '" .. Split[2] .. "'!" )
+		return true
+	end
+	
+	
+	Player:SendMessage( cChatColor.Green .. "Moved successfully to '" .. Split[2] .. "'! :D" )
 	return true
 end
 

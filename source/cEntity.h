@@ -86,6 +86,7 @@ public:																						//tolua_export
 	void WrapRotation();
 
 protected:
+	void SetWorld( cWorld* a_World ) { m_World = a_World; }
 	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);
 
 	friend class cReferenceManager;

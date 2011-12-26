@@ -33,6 +33,7 @@ public:
 
 	void StreamChunks();
 	void StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChunks );
+	void RemoveFromAllChunks();
 
 	inline void SetLoggedIn( bool a_bLoggedIn ) { m_bLoggedIn = a_bLoggedIn; }
 	inline bool IsLoggedIn() { return m_bLoggedIn; }

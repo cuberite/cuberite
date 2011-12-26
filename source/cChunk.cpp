@@ -57,33 +57,33 @@ typedef std::list< cBlockEntity* > BlockEntityList;
 typedef std::list< cEntity* > EntityList;
 struct cChunk::sChunkState
 {
-	std::map< unsigned int, int > m_ToTickBlocks;
-	FurnaceEntityList m_TickBlockEntities;
-	std::vector< unsigned int > m_PendingSendBlocks;
-	ClientHandleList m_LoadedByClient;
-	ClientHandleList m_UnloadQuery;
-	BlockEntityList m_BlockEntities;
-	EntityList m_Entities;
+	std::map< unsigned int, int > ToTickBlocks;
+	FurnaceEntityList TickBlockEntities;
+	std::vector< unsigned int > PendingSendBlocks;
+	ClientHandleList LoadedByClient;
+	ClientHandleList UnloadQuery;
+	BlockEntityList BlockEntities;
+	EntityList Entities;
 };
 
 cChunk::~cChunk()
 {
 	//LOG("~cChunk() %i %i %i", m_PosX, m_PosY, m_PosZ );
-	if( !m_pState->m_LoadedByClient.empty() )
+	if( !m_pState->LoadedByClient.empty() )
 	{
-		LOGWARN("WARNING: Deleting cChunk while it contains %i clients!", m_pState->m_LoadedByClient.size() );
+		LOGWARN("WARNING: Deleting cChunk while it contains %i clients!", m_pState->LoadedByClient.size() );
 	}
 
-	for( std::list<cBlockEntity*>::iterator itr = m_pState->m_BlockEntities.begin(); itr != m_pState->m_BlockEntities.end(); ++itr)
+	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		delete *itr;
 	}
-	m_pState->m_BlockEntities.clear();
+	m_pState->BlockEntities.clear();
 
 	LockEntities();
-	if( m_pState->m_Entities.size() > 0 )
+	if( m_pState->Entities.size() > 0 )
 	{
-		EntityList Entities = m_pState->m_Entities; // Copy list to a temporary list
+		EntityList Entities = m_pState->Entities; // Copy list to a temporary list
 		for( EntityList::iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
 		{
 			if( (*itr)->GetEntityType() != cEntity::E_PLAYER )
@@ -92,7 +92,7 @@ cChunk::~cChunk()
 				(*itr)->Destroy();
 			}
 		}
-		m_pState->m_Entities.clear();
+		m_pState->Entities.clear();
 	}
 	UnlockEntities();
 
@@ -143,7 +143,7 @@ void cChunk::Initialize()
 
 		// During generation, some blocks might have been set by using (Fast)SetBlock() causing this list to fill.
 		// This chunk has not been sent to anybody yet, so there is no need for separately sending block changes when you can send an entire chunk
-		m_pState->m_PendingSendBlocks.clear();
+		m_pState->PendingSendBlocks.clear();
 	}
 	else
 	{
@@ -159,7 +159,7 @@ void cChunk::Tick(float a_Dt)
 	if( m_bCalculateHeightmap )
 		CalculateHeightmap();
 
-	unsigned int PendingSendBlocks = m_pState->m_PendingSendBlocks.size();
+	unsigned int PendingSendBlocks = m_pState->PendingSendBlocks.size();
  	if( PendingSendBlocks > 1 )
  	{
  		cPacket_MultiBlock MultiBlock;
@@ -172,7 +172,7 @@ void cChunk::Tick(float a_Dt)
  		//LOG("Sending multiblock packet for %i blocks", PendingSendBlocks );
  		for( unsigned int i = 0; i < PendingSendBlocks; i++)
  		{
- 			unsigned int index = m_pState->m_PendingSendBlocks[i];
+ 			unsigned int index = m_pState->PendingSendBlocks[i];
  			unsigned int Y = index % 128;
  			unsigned int Z = (index / 128) % 16;
  			unsigned int X = (index / (128*16));
@@ -182,15 +182,15 @@ void cChunk::Tick(float a_Dt)
  			MultiBlock.m_BlockTypes[i] = m_BlockType[index];
  			MultiBlock.m_BlockMetas[i] = GetLight( m_BlockMeta, index );
  		}
- 		m_pState->m_PendingSendBlocks.clear();
- 		PendingSendBlocks = m_pState->m_PendingSendBlocks.size();
+ 		m_pState->PendingSendBlocks.clear();
+ 		PendingSendBlocks = m_pState->PendingSendBlocks.size();
  		Broadcast( MultiBlock );
  	}
 	if( PendingSendBlocks > 0 )
 	{
 		for( unsigned int i = 0; i < PendingSendBlocks; i++)
 		{
-			unsigned int index = m_pState->m_PendingSendBlocks[i];
+			unsigned int index = m_pState->PendingSendBlocks[i];
 			int Y = index % 128;
 			int Z = (index / 128) % 16;
 			int X = (index / (128*16));
@@ -203,23 +203,23 @@ void cChunk::Tick(float a_Dt)
 			BlockChange.m_BlockMeta = GetLight( m_BlockMeta, index );
 			Broadcast( BlockChange );
 		}
-		m_pState->m_PendingSendBlocks.clear();
+		m_pState->PendingSendBlocks.clear();
 	}
 
-	while( !m_pState->m_UnloadQuery.empty() )
+	while( !m_pState->UnloadQuery.empty() )
 	{
 		cPacket_PreChunk UnloadPacket;
 		UnloadPacket.m_PosX = GetPosX();
 		UnloadPacket.m_PosZ = GetPosZ();
 		UnloadPacket.m_bLoad = false; // Unload
-		(*m_pState->m_UnloadQuery.begin())->Send( UnloadPacket );
-		m_pState->m_UnloadQuery.remove( *m_pState->m_UnloadQuery.begin() );
+		(*m_pState->UnloadQuery.begin())->Send( UnloadPacket );
+		m_pState->UnloadQuery.remove( *m_pState->UnloadQuery.begin() );
 	}
 
-	std::map< unsigned int, int > ToTickBlocks = m_pState->m_ToTickBlocks;
+	std::map< unsigned int, int > ToTickBlocks = m_pState->ToTickBlocks;
 	//unsigned int NumTickBlocks = ToTickBlocks.size();
 	//if( NumTickBlocks > 0 ) LOG("To tick: %i", NumTickBlocks );
-	m_pState->m_ToTickBlocks.clear();
+	m_pState->ToTickBlocks.clear();
 	bool isRedstone = false;
 	for( std::map< unsigned int, int>::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
 	{
@@ -369,12 +369,12 @@ void cChunk::Tick(float a_Dt)
 	}
 
 	// Tick block entities (furnace)
-	std::list< cFurnaceEntity* > TickBlockEntites = m_pState->m_TickBlockEntities; // Dangerous stuff, better make a copy.
+	std::list< cFurnaceEntity* > TickBlockEntites = m_pState->TickBlockEntities; // Dangerous stuff, better make a copy.
 	for( std::list< cFurnaceEntity* >::iterator itr = TickBlockEntites.begin(); itr != TickBlockEntites.end(); ++itr )
 	{
 		if( !(*itr)->Tick( a_Dt ) ) // Remove from list
 		{
-			m_pState->m_TickBlockEntities.remove( *itr );
+			m_pState->TickBlockEntities.remove( *itr );
 		}
 	}
 }
@@ -399,18 +399,18 @@ void cChunk::CreateBlockEntities()
 				{
 				case E_BLOCK_CHEST:
 					{
-						m_pState->m_BlockEntities.push_back( new cChestEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
+						m_pState->BlockEntities.push_back( new cChestEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
 					}
 					break;
 				case E_BLOCK_FURNACE:
 					{
-						m_pState->m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
+						m_pState->BlockEntities.push_back( new cFurnaceEntity( x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
 					}
 					break;
 				case E_BLOCK_SIGN_POST:
 				case E_BLOCK_WALLSIGN:
 					{
-						m_pState->m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
+						m_pState->BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX*16, y + m_PosY*128, z + m_PosZ*16, this ) );
 					}
 					break;
 				default:
@@ -695,8 +695,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 
 void cChunk::AsyncUnload( cClientHandle* a_Client )
 {
-	m_pState->m_UnloadQuery.remove( a_Client );	// Make sure this client is only in the list once
-	m_pState->m_UnloadQuery.push_back( a_Client );
+	m_pState->UnloadQuery.remove( a_Client );	// Make sure this client is only in the list once
+	m_pState->UnloadQuery.push_back( a_Client );
 }
 
 void cChunk::Send( cClientHandle* a_Client )
@@ -708,7 +708,7 @@ void cChunk::Send( cClientHandle* a_Client )
 	a_Client->Send( PreChunk );
 	a_Client->Send( cPacket_MapChunk( this ) );
 
-	for( BlockEntityList::iterator itr = m_pState->m_BlockEntities.begin(); itr != m_pState->m_BlockEntities.end(); ++itr )
+	for( BlockEntityList::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr )
 	{
 		(*itr)->SendTo( a_Client );
 	}
@@ -732,15 +732,15 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	if( OldBlockType != a_BlockType || OldBlockMeta != a_BlockMeta )
 	{
 		//LOG("Old: %i %i New: %i %i", OldBlockType, OldBlockMeta, a_BlockType, a_BlockMeta );
-		m_pState->m_PendingSendBlocks.push_back( index );
+		m_pState->PendingSendBlocks.push_back( index );
 
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X+1, a_Y, a_Z ) ]++;
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X-1, a_Y, a_Z ) ]++;
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X, a_Y+1, a_Z ) ]++;
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X, a_Y-1, a_Z ) ]++;
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z+1 ) ]++;
-		m_pState->m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z-1 ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X+1, a_Y, a_Z ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X-1, a_Y, a_Z ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y+1, a_Z ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y-1, a_Z ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z+1 ) ]++;
+		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z-1 ) ]++;
 
 		cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX*16, a_Y+m_PosY*128, a_Z+m_PosZ*16 );
 		if( BlockEntity )
@@ -781,7 +781,7 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	const int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	const char OldBlock = m_BlockType[index];
 	m_BlockType[index] = a_BlockType;
-	m_pState->m_PendingSendBlocks.push_back( index );
+	m_pState->PendingSendBlocks.push_back( index );
 	SetLight( m_BlockMeta, index, a_BlockMeta );
 
 	// ONLY recalculate lighting if it's necessary!
@@ -800,11 +800,11 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 {
 	if( a_Client == 0 )
 	{
-		m_pState->m_PendingSendBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
+		m_pState->PendingSendBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
 		return;
 	}
 
-	for( std::list< cClientHandle* >::iterator itr = m_pState->m_LoadedByClient.begin(); itr != m_pState->m_LoadedByClient.end(); ++itr )
+	for( std::list< cClientHandle* >::iterator itr = m_pState->LoadedByClient.begin(); itr != m_pState->LoadedByClient.end(); ++itr )
 	{
 		if( *itr == a_Client )
 		{
@@ -823,21 +823,21 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 
 void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
 {
-	m_pState->m_BlockEntities.push_back( a_BlockEntity );
+	m_pState->BlockEntities.push_back( a_BlockEntity );
 }
 
 void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 {
-	m_pState->m_BlockEntities.remove( a_BlockEntity );
+	m_pState->BlockEntities.remove( a_BlockEntity );
 }
 
 void cChunk::AddClient( cClientHandle* a_Client )
 {
-	m_pState->m_LoadedByClient.remove( a_Client );
-	m_pState->m_LoadedByClient.push_back( a_Client );
+	m_pState->LoadedByClient.remove( a_Client );
+	m_pState->LoadedByClient.push_back( a_Client );
 
 	LockEntities();
-	for( EntityList::iterator itr = m_pState->m_Entities.begin(); itr != m_pState->m_Entities.end(); ++itr )
+	for( EntityList::iterator itr = m_pState->Entities.begin(); itr != m_pState->Entities.end(); ++itr )
 	{
 		LOG("%i %i %i Spawning on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername() );
 		(*itr)->SpawnOn( a_Client );
@@ -847,12 +847,12 @@ void cChunk::AddClient( cClientHandle* a_Client )
 
 void cChunk::RemoveClient( cClientHandle* a_Client )
 {
-	m_pState->m_LoadedByClient.remove( a_Client );
+	m_pState->LoadedByClient.remove( a_Client );
 
 	if( !a_Client->IsDestroyed() )
 	{
 		LockEntities();
-		for( EntityList::iterator itr = m_pState->m_Entities.begin(); itr != m_pState->m_Entities.end(); ++itr )
+		for( EntityList::iterator itr = m_pState->Entities.begin(); itr != m_pState->Entities.end(); ++itr )
 		{
 			LOG("%i %i %i Destroying on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername() );
 			cPacket_DestroyEntity DestroyEntity( *itr );
@@ -865,16 +865,16 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 void cChunk::AddEntity( cEntity & a_Entity )
 {
 	LockEntities();
-	m_pState->m_Entities.push_back( &a_Entity );
+	m_pState->Entities.push_back( &a_Entity );
 	UnlockEntities();
 }
 
 bool cChunk::RemoveEntity( cEntity & a_Entity, cChunk* a_CalledFrom /* = 0 */ )
 {
 	LockEntities();
-	unsigned int SizeBefore = m_pState->m_Entities.size();
-	m_pState->m_Entities.remove( &a_Entity );
-	if( SizeBefore == m_pState->m_Entities.size() )
+	unsigned int SizeBefore = m_pState->Entities.size();
+	m_pState->Entities.remove( &a_Entity );
+	if( SizeBefore == m_pState->Entities.size() )
 	{
 		LOG("WARNING: Entity was not in chunk %i %i %i", m_PosX, m_PosY, m_PosZ );
 		if( !a_CalledFrom )
@@ -915,7 +915,7 @@ char cChunk::GetBlock( int a_BlockIdx )
 
 cBlockEntity* cChunk::GetBlockEntity( int a_X, int a_Y, int a_Z )
 {
-	for( std::list<cBlockEntity*>::iterator itr = m_pState->m_BlockEntities.begin(); itr != m_pState->m_BlockEntities.end(); ++itr)
+	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		if( (*itr)->GetPosX() == a_X &&
 			(*itr)->GetPosY() == a_Y &&
@@ -957,7 +957,7 @@ bool cChunk::LoadFromDisk()
 						fclose(f);
 						return false;
 					}
-					m_pState->m_BlockEntities.push_back( ChestEntity );
+					m_pState->BlockEntities.push_back( ChestEntity );
 				}
 				break;
 			case E_BLOCK_FURNACE:
@@ -970,8 +970,8 @@ bool cChunk::LoadFromDisk()
 						fclose(f);
 						return false;
 					}
-					m_pState->m_BlockEntities.push_back( FurnaceEntity );
-					m_pState->m_TickBlockEntities.push_back( FurnaceEntity ); // They need tickin'
+					m_pState->BlockEntities.push_back( FurnaceEntity );
+					m_pState->TickBlockEntities.push_back( FurnaceEntity ); // They need tickin'
 				}
 				break;
 			case E_BLOCK_SIGN_POST:
@@ -985,7 +985,7 @@ bool cChunk::LoadFromDisk()
 						fclose(f);
 						return false;
 					}
-					m_pState->m_BlockEntities.push_back( SignEntity );
+					m_pState->BlockEntities.push_back( SignEntity );
 				}
 				break;
 			default:
@@ -1041,7 +1041,7 @@ bool cChunk::SaveToDisk()
 		fwrite( m_BlockData, sizeof(char)*c_BlockDataSize, 1, f );
 
 		// Now write Block Entities
-		for( std::list<cBlockEntity*>::iterator itr = m_pState->m_BlockEntities.begin(); itr != m_pState->m_BlockEntities.end(); ++itr)
+		for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 		{
 			cBlockEntity* BlockEntity = *itr;
 			switch( BlockEntity->GetBlockType() )
@@ -1082,7 +1082,7 @@ bool cChunk::SaveToDisk()
 
 void cChunk::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ ) const
 {
-	for( std::list< cClientHandle* >::const_iterator itr = m_pState->m_LoadedByClient.begin(); itr != m_pState->m_LoadedByClient.end(); ++itr )
+	for( std::list< cClientHandle* >::const_iterator itr = m_pState->LoadedByClient.begin(); itr != m_pState->LoadedByClient.end(); ++itr )
 	{
 		if( *itr == a_Exclude ) continue;
 		(*itr)->Send( a_Packet );
@@ -1105,7 +1105,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 				LOGERROR("ERROR READING CHEST FROM JSON!" );
 				delete ChestEntity;
 			}
-			else m_pState->m_BlockEntities.push_back( ChestEntity );
+			else m_pState->BlockEntities.push_back( ChestEntity );
 		}
 	}
 
@@ -1122,7 +1122,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 				LOGERROR("ERROR READING FURNACE FROM JSON!" );
 				delete FurnaceEntity;
 			}
-			else m_pState->m_BlockEntities.push_back( FurnaceEntity );
+			else m_pState->BlockEntities.push_back( FurnaceEntity );
 		}
 	}
 
@@ -1139,7 +1139,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 				LOGERROR("ERROR READING SIGN FROM JSON!" );
 				delete SignEntity;
 			}
-			else m_pState->m_BlockEntities.push_back( SignEntity );
+			else m_pState->BlockEntities.push_back( SignEntity );
 		}
 	}
 }
@@ -1149,7 +1149,7 @@ void cChunk::SaveToJson( Json::Value & a_Value )
 	Json::Value AllChests;
 	Json::Value AllFurnaces;
 	Json::Value AllSigns;
-	for( std::list<cBlockEntity*>::iterator itr = m_pState->m_BlockEntities.begin(); itr != m_pState->m_BlockEntities.end(); ++itr)
+	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		cBlockEntity* BlockEntity = *itr;
 		switch( BlockEntity->GetBlockType() )
@@ -1194,24 +1194,24 @@ void cChunk::SaveToJson( Json::Value & a_Value )
 
 EntityList & cChunk::GetEntities()
 {
-	return m_pState->m_Entities;
+	return m_pState->Entities;
 }
 
 const ClientHandleList & cChunk::GetClients()
 {
-	return m_pState->m_LoadedByClient;
+	return m_pState->LoadedByClient;
 }
 
 
 void cChunk::AddTickBlockEntity( cFurnaceEntity* a_Entity )
 {
-	m_pState->m_TickBlockEntities.remove( a_Entity );
-	m_pState->m_TickBlockEntities.push_back( a_Entity );
+	m_pState->TickBlockEntities.remove( a_Entity );
+	m_pState->TickBlockEntities.push_back( a_Entity );
 }
 
 void cChunk::RemoveTickBlockEntity( cFurnaceEntity* a_Entity )
 {
-	m_pState->m_TickBlockEntities.remove( a_Entity );
+	m_pState->TickBlockEntities.remove( a_Entity );
 }
 
 

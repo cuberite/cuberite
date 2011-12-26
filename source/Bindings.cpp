@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/10/11 12:27:03.
+** Generated automatically by tolua++-1.0.92 on 12/26/11 15:45:21.
 */
 
 #ifndef __cplusplus
@@ -2467,9 +2467,9 @@ static int tolua_AllToLua_IsValidBlock00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: isValidItem */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_isValidItem00
-static int tolua_AllToLua_isValidItem00(lua_State* tolua_S)
+/* function: IsValidItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_IsValidItem00
+static int tolua_AllToLua_IsValidItem00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -2490,7 +2490,7 @@ static int tolua_AllToLua_isValidItem00(lua_State* tolua_S)
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'isValidItem'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'IsValidItem'.",&tolua_err);
  return 0;
 #endif
 }
@@ -5881,6 +5881,40 @@ static int tolua_AllToLua_cPlayer_IsVisible00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsVisible'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MoveToWorld of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_MoveToWorld00
+static int tolua_AllToLua_cPlayer_MoveToWorld00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const char* a_WorldName = ((const char*)  tolua_tostring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MoveToWorld'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->MoveToWorld(a_WorldName);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MoveToWorld'.",&tolua_err);
  return 0;
 #endif
 }
@@ -15827,6 +15861,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_INVENTORY_PROGRESS",E_INVENTORY_PROGRESS);
   tolua_constant(tolua_S,"E_CREATE_INVENTORY_ACTION",E_CREATE_INVENTORY_ACTION);
   tolua_constant(tolua_S,"E_UPDATE_SIGN",E_UPDATE_SIGN);
+  tolua_constant(tolua_S,"E_PLAYER_LIST_ITEM",E_PLAYER_LIST_ITEM);
   tolua_constant(tolua_S,"E_PING",E_PING);
   tolua_constant(tolua_S,"E_DISCONNECT",E_DISCONNECT);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);
@@ -15834,7 +15869,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);
   tolua_array(tolua_S,"g_BlockOneHitDig",tolua_get_AllToLua_g_BlockOneHitDig,tolua_set_AllToLua_g_BlockOneHitDig);
   tolua_function(tolua_S,"IsValidBlock",tolua_AllToLua_IsValidBlock00);
-  tolua_function(tolua_S,"isValidItem",tolua_AllToLua_isValidItem00);
+  tolua_function(tolua_S,"IsValidItem",tolua_AllToLua_IsValidItem00);
   tolua_function(tolua_S,"AddDirection",tolua_AllToLua_AddDirection00);
   tolua_function(tolua_S,"GetTime",tolua_AllToLua_GetTime00);
   tolua_function(tolua_S,"GetChar",tolua_AllToLua_GetChar00);
@@ -15982,6 +16017,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Respawn",tolua_AllToLua_cPlayer_Respawn00);
    tolua_function(tolua_S,"SetVisible",tolua_AllToLua_cPlayer_SetVisible00);
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);
+   tolua_function(tolua_S,"MoveToWorld",tolua_AllToLua_cPlayer_MoveToWorld00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Lua__cPlayer","Lua__cPlayer","cPlayer",NULL);
   tolua_beginmodule(tolua_S,"Lua__cPlayer");

@@ -397,6 +397,15 @@
     <Filter Include="cChunkGenerator">
       <UniqueIdentifier>{0d6f822b-71eb-406f-b17a-d188c4924283}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cFluidSimulator">
+      <UniqueIdentifier>{6f92474b-e2a5-4685-abf1-053b09dbc4f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cFluidSimulator\cWaterSimulator">
+      <UniqueIdentifier>{02fd457d-3735-4f4b-aaf2-f7701a7ee7bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cFluidSimulator\cLavaSimulator">
+      <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
+    </Filter>
     <Filter Include="cEntity\cPawn\cMonster\Personalities">
       <UniqueIdentifier>{b0f7c883-e2ca-4bba-89e3-c36656c3de39}</UniqueIdentifier>
     </Filter>
@@ -415,20 +424,8 @@
     <Filter Include="cWorldGenerator">
       <UniqueIdentifier>{72727ea7-779f-439e-8f30-53bd6985c9e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cSimulator">
-      <UniqueIdentifier>{0c205a99-5597-4a79-81d1-5b2f882aecf2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="cSimulator\cFluidSimulator">
-      <UniqueIdentifier>{6f92474b-e2a5-4685-abf1-053b09dbc4f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="cSimulator\cFluidSimulator\cWaterSimulator">
-      <UniqueIdentifier>{02fd457d-3735-4f4b-aaf2-f7701a7ee7bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="cSimulator\cFluidSimulator\cLavaSimulator">
-      <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="cSimulator\SandSimulator">
-      <UniqueIdentifier>{b3ebe846-5722-43f3-af56-e874e8fef7a5}</UniqueIdentifier>
+    <Filter Include="!LuaPlugins">
+      <UniqueIdentifier>{4b86e1cf-ea3c-40b6-82b2-82fa9e6eb35e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -752,7 +749,7 @@
       <Filter>Packets\cPacket_EntityStatus</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cWaterSimulator.cpp">
-      <Filter>cSimulator\cFluidSimulator\cWaterSimulator</Filter>
+      <Filter>cFluidSimulator\cWaterSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cSocket.cpp">
       <Filter>Threading\cSocket</Filter>
@@ -815,7 +812,7 @@
       <Filter>cPiston</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cLavaSimulator.cpp">
-      <Filter>cSimulator\cFluidSimulator\cLavaSimulator</Filter>
+      <Filter>cFluidSimulator\cLavaSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\SquirrelBindings.cpp">
       <Filter>LuaBindings\SquirrelBindings</Filter>
@@ -836,7 +833,7 @@
       <Filter>cChunkGenerator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cFluidSimulator.cpp">
-      <Filter>cSimulator\cFluidSimulator</Filter>
+      <Filter>cFluidSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cAggressiveMonster.cpp">
       <Filter>cEntity\cPawn\cMonster\Personalities\Aggressive</Filter>
@@ -852,15 +849,6 @@
     </ClCompile>
     <ClCompile Include="..\source\cWorldGenerator.cpp">
       <Filter>cWorldGenerator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cSimulator.cpp">
-      <Filter>cSimulator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cSandSimulator.cpp">
-      <Filter>cSimulator\SandSimulator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cSimulatorManager.cpp">
-      <Filter>cSimulator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1216,7 +1204,7 @@
       <Filter>Packets\cPacket_EntityStatus</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cWaterSimulator.h">
-      <Filter>cSimulator\cFluidSimulator\cWaterSimulator</Filter>
+      <Filter>cFluidSimulator\cWaterSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cSocket.h">
       <Filter>Threading\cSocket</Filter>
@@ -1282,7 +1270,7 @@
       <Filter>cPiston</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cLavaSimulator.h">
-      <Filter>cSimulator\cFluidSimulator\cLavaSimulator</Filter>
+      <Filter>cFluidSimulator\cLavaSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\SquirrelBindings.h">
       <Filter>LuaBindings\SquirrelBindings</Filter>
@@ -1303,7 +1291,7 @@
       <Filter>cChunkGenerator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cFluidSimulator.h">
-      <Filter>cSimulator\cFluidSimulator</Filter>
+      <Filter>cFluidSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cAggressiveMonster.h">
       <Filter>cEntity\cPawn\cMonster\Personalities\Aggressive</Filter>
@@ -1320,15 +1308,6 @@
     <ClInclude Include="..\source\cWorldGenerator.h">
       <Filter>cWorldGenerator</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\cSimulator.h">
-      <Filter>cSimulator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\cSandSimulator.h">
-      <Filter>cSimulator\SandSimulator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\cSimulatorManager.h">
-      <Filter>cSimulator</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">
@@ -1337,6 +1316,18 @@
     <None Include="icon.ico" />
     <None Include="..\source\cNoise.inc">
       <Filter>cNoise</Filter>
+    </None>
+    <None Include="..\Plugins\ChatLog.lua">
+      <Filter>!LuaPlugins</Filter>
+    </None>
+    <None Include="..\Plugins\Core.lua">
+      <Filter>!LuaPlugins</Filter>
+    </None>
+    <None Include="..\Plugins\Fire.lua">
+      <Filter>!LuaPlugins</Filter>
+    </None>
+    <None Include="..\Plugins\MagicCarpet.lua">
+      <Filter>!LuaPlugins</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -701,6 +701,33 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 	}
 }
 
+bool cPlayer::MoveToWorld( const char* a_WorldName )
+{
+	cWorld* World = cRoot::Get()->GetWorld( a_WorldName );
+	if( World )
+	{
+		/* Remove all links to the old world */
+		GetWorld()->RemovePlayer( this );
+		GetClientHandle()->RemoveFromAllChunks();
+		cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		if( Chunk ) 
+		{
+			Chunk->RemoveEntity( *this );
+			Chunk->Broadcast( cPacket_DestroyEntity( this ) ); // Remove player entity from all clients in old world
+		}
+
+		/* Add player to all the necessary parts of the new world */
+		SetWorld( World );
+		GetWorld()->AddPlayer( this );
+		MoveToCorrectChunk(true);
+		GetClientHandle()->StreamChunks();
+
+		return true;
+	}
+
+	return false;
+}
+
 bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the correct world for this player
 {
 	cIniFile IniFile("users.ini");

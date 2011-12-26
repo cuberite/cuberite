@@ -19,7 +19,6 @@ public:												//tolua_export
 	int RecClient(cClientHandle *sRecSocket); // receive message for a particular socket
 
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
-	void SendAllEntitiesTo( cClientHandle* a_Target );
 
 	bool Tick(float a_Dt);
 

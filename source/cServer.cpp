@@ -258,16 +258,6 @@ void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* =
 	}
 }
 
-// TODO - Need to move this to cWorld I think
-void cServer::SendAllEntitiesTo(cClientHandle* a_Target)
-{
-	cWorld* World = cRoot::Get()->GetWorld();
-	for( cWorld::EntityList::iterator itr = World->GetEntities().begin(); itr != World->GetEntities().end(); ++itr)
-	{
-		(*itr)->SpawnOn( a_Target );
-	}
-}
-
 void cServer::StartListenClient()
 {
 	cSocket SClient = m_pState->SListenClient.Accept();

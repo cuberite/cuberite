@@ -375,6 +375,20 @@ void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChun
 	}
 }
 
+// This removes the client from all chunks. Used when switching worlds
+void cClientHandle::RemoveFromAllChunks()
+{
+	for(int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)
+	{
+		if( m_LoadedChunks[i] )
+		{
+			m_LoadedChunks[i]->RemoveClient( this );
+			m_LoadedChunks[i]->AsyncUnload( this );
+			m_LoadedChunks[i] = 0;
+		}
+	}
+}
+
 void cClientHandle::AddPacket(cPacket * a_Packet)
 {
 	m_pState->CriticalSection.Lock();
