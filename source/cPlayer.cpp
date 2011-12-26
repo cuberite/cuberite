@@ -16,6 +16,7 @@
 #include "cTracer.h"
 #include "cRoot.h"
 #include "cMakeDir.h"
+#include "cTimer.h"
 
 #include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_EntityLook.h"
@@ -82,6 +83,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 {
 	m_EntityType = E_PLAYER;
 	m_Inventory = new cInventory( this );
+	cTimer t1;
+	m_LastPlayerListTime = t1.GetNowTime();
 
 	m_TimeLastTeleportPacket = cWorld::GetTime();
 	m_TimeLastPickupCheck = cWorld::GetTime();
@@ -234,14 +237,18 @@ void cPlayer::Tick(float a_Dt)
 		InStateBurning(a_Dt);
 	}
 	
-	// Send Player List
-	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-	{
-		if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-			cPacket_PlayerListItem PlayerList(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
-			(*itr)->GetClientHandle()->Send( PlayerList );
+	cTimer t1;
+	// Send Player List (Once per m_LastPlayerListTime/1000 second(s))
+	if (m_LastPlayerListTime + cPlayer::E_PLAYER_LIST_TIME <= t1.GetNowTime()) {
+		cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+		{
+			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
+				cPacket_PlayerListItem PlayerList(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
+				(*itr)->GetClientHandle()->Send( PlayerList );
+			}
 		}
+		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
 }
