@@ -82,7 +82,7 @@ public:
 	void AddTickBlockEntity( cFurnaceEntity* a_Entity );
 	void RemoveTickBlockEntity( cFurnaceEntity* a_Entity );
 
-	inline static unsigned int cChunk::MakeIndex(int x, int y, int z )
+	inline static unsigned int MakeIndex(int x, int y, int z )
 	{
 		if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
 			return y + (z * 128) + (x * 128 * 16);

@@ -70,7 +70,6 @@
 
 #ifndef _WIN32
 #define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-#include <stdlib.h> // rand()
 #endif
 
 #define AddPistonDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
@@ -84,7 +83,7 @@ typedef std::list<cPacket*> PacketList;
 struct cClientHandle::sClientHandleState
 {
 	sClientHandleState()
-		: ProtocolVersion( 0 )
+		: ProtocolVersion( 22 )
 		, pReceiveThread( 0 )
 		, pSendThread( 0 )
 		, pAuthenticateThread( 0 )
@@ -458,6 +457,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			{
 				LOG("LOGIN %s", GetUsername() );
 				cPacket_Login* PacketData = reinterpret_cast<cPacket_Login*>(a_Packet);
+				if (PacketData->m_ProtocolVersion != m_pState->ProtocolVersion) {
+					Kick("Your client is outdated!");
+					return;
+				}
 				if( m_pState->Username.compare( PacketData->m_Username ) != 0 )
 				{
 					Kick("Login Username does not match Handshake username!");
@@ -1243,9 +1246,10 @@ void cClientHandle::Tick(float a_Dt)
 		LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
 		//LoginResponse.m_Username = "";
 		LoginResponse.m_ServerMode = m_Player->GetGameMode(); //set gamemode from player.
-		LoginResponse.m_MapSeed = 0;
+		LoginResponse.m_MapSeed = cRoot::Get()->GetWorld()->GetWorldSeed();
 		LoginResponse.m_Dimension = 0;
 		LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetWorld()->GetMaxPlayers();
+		LoginResponse.m_Difficulty = 2;
 		Send( LoginResponse );
 
 		// Send Weather if raining:

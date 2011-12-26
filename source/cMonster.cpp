@@ -11,6 +11,7 @@
 #include "cPickup.h"
 #include "cItem.h"
 #include "cMonsterConfig.h"
+#include "MersenneTwister.h"
 
 #include "packets/cPacket_SpawnMob.h"
 #include "packets/cPacket_EntityLook.h"
@@ -64,7 +65,8 @@ cMonster::cMonster()
 	LOG("In state: %s",GetState());
 	m_Health = 10;
 
-	int RandVal = rand() % 4;
+	MTRand r1;
+	int RandVal = r1.randInt() % 4;
 	if( RandVal == 0 )
 		m_MobType = 90; // Pig
 	else if( RandVal == 1 )
@@ -418,12 +420,13 @@ void cMonster::EventLosePlayer(){
 void cMonster::InStateIdle(float a_Dt) {
 	idle_interval += a_Dt;
 	if(idle_interval > 1) { //at this interval the results are predictable
-		int rem = rand()%6 + 1;
+		MTRand r1;
+		int rem = r1.randInt()%6 + 1;
 		//LOG("Moving: int: %3.3f rem: %i",idle_interval,rem);
 		idle_interval = 0;
 		Vector3f Dist;
-		Dist.x = (float)((rand()%11)-5);
-		Dist.z = (float)((rand()%11)-5);
+		Dist.x = (float)((r1.randInt()%11)-5);
+		Dist.z = (float)((r1.randInt()%11)-5);
 		if( Dist.SqrLength() > 2  && rem >= 3)
 		{
 			m_Destination->x = (float)(m_Pos->x + Dist.x);
@@ -581,5 +584,6 @@ void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
 
 void cMonster::RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max)
 {
-	return cMonster::DropItem(a_Item, rand() % (a_Max + 1) + a_Min);
+	MTRand r1;
+	return cMonster::DropItem(a_Item, r1.randInt() % (a_Max + 1) + a_Min);
 }

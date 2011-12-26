@@ -10,6 +10,7 @@ enum ENUM_ITEM_ID;
 
 #include <list>
 #include <vector>
+#include <string>
 
 class cPacket;
 class cRedstone;

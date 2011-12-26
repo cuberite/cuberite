@@ -17,6 +17,7 @@
 #include "cRoot.h"
 #include "cMakeDir.h"
 #include "cTimer.h"
+#include "MersenneTwister.h"
 
 #include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_EntityLook.h"
@@ -375,15 +376,16 @@ void cPlayer::KilledBy( cEntity* a_Killer )
 
 	m_bVisible = false; // So new clients don't see the player
 
+	MTRand r1;
 	// Puke out all the items
 	cItem* Items = m_Inventory->GetSlots();
 	for( unsigned int i = 1; i < m_Inventory->c_NumSlots; ++i )
 	{
 		if( !Items[i].IsEmpty() )
 		{
-			float SpeedX = ((rand()%1000)-500)	/100.f;
-			float SpeedY = ((rand()%1000))		/100.f;
-			float SpeedZ = ((rand()%1000)-500)	/100.f;
+			float SpeedX = ((r1.randInt()%1000)-500)	/100.f;
+			float SpeedY = ((r1.randInt()%1000))		/100.f;
+			float SpeedZ = ((r1.randInt()%1000)-500)	/100.f;
 			cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), Items[i], SpeedX, SpeedY, SpeedZ );
 			Pickup->Initialize( GetWorld() );
 		}

@@ -3,6 +3,7 @@
 #include "Defines.h"
 #include "cWorld.h"
 #include "BlockID.h"
+#include <string.h>
 
 class Vector3f;
 class cClientHandle;

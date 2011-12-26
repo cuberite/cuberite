@@ -3,6 +3,7 @@
 #include "cWorld.h"
 #include "cChunk.h"
 #include "cGenSettings.h"
+#include "MersenneTwister.h"
 
 #include "BlockID.h"
 #include "Vector3i.h"
@@ -205,7 +206,7 @@ void cWorldGenerator::GenerateFoliage( cChunk* a_Chunk )
 				BlockType[ index ] = (char)GrassID;
 			}
 
-
+			MTRand r1;
 			// Plant sum trees
 			{
 				int xx = x + PosX*16;
@@ -215,10 +216,10 @@ void cWorldGenerator::GenerateFoliage( cChunk* a_Chunk )
 				float val2 = m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f );
 				if( BlockType[index] == SandID )
 				{
-					if( (val1 + val2 > 0.f) && (rand()%128) > 124 && BlockType[index] == E_BLOCK_SAND )
+					if( (val1 + val2 > 0.f) && (r1.randInt()%128) > 124 && BlockType[index] == E_BLOCK_SAND )
 					{
 						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_CACTUS;
-						if( (rand() & 3) == 3 )
+						if( (r1.randInt() & 3) == 3 )
 						{
 							BlockType[ cChunk::MakeIndex(x, TopY+2, z) ] = E_BLOCK_CACTUS;
 						}
@@ -229,15 +230,15 @@ void cWorldGenerator::GenerateFoliage( cChunk* a_Chunk )
 				{
 					float val3 = m_Noise.CubicNoise2D( xx*0.01f+10, zz*0.01f+10 );
 					float val4 = m_Noise.CubicNoise2D( xx*0.05f+20, zz*0.05f+20 );
-					if( val1 + val2 > 0.2f && (rand()%128) > 124 )
+					if( val1 + val2 > 0.2f && (r1.randInt()%128) > 124 )
 						World->GrowTree( xx, TopY, zz );
-					else if( val3 > 0.2f && (rand()%128) > 124 )
+					else if( val3 > 0.2f && (r1.randInt()%128) > 124 )
 						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
-					else if( val4 > 0.2f && (rand()%128) > 124 )
+					else if( val4 > 0.2f && (r1.randInt()%128) > 124 )
 						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_ROSE;
-					else if( val1+val2+val3+val4 > 0.2f && (rand()%128) > 124 )
+					else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
 						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_MUSHROOM;
-					else if( val1+val2+val3+val4 > 0.2f && (rand()%128) > 124 )
+					else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
 						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
 				}
 			}

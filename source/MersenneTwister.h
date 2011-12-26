@@ -63,7 +63,7 @@
 class MTRand {
 // Data
 public:
-	typedef unsigned long uint32;  // unsigned integer type, at least 32 bits
+	typedef long uint32;  // unsigned integer type, at least 32 bits
 	
 	enum { N = 624 };       // length of state vector
 	enum { SAVE = N + 1 };  // length of array for save()

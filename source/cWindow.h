@@ -18,7 +18,7 @@ public:
 	int GetWindowID() { return m_WindowID; }
 	void SetWindowID( int a_WindowID ) { m_WindowID = a_WindowID; }
 	
-	static enum WindowType {
+	enum WindowType {
 		Chest,
 		Workbench,
 		Furnace,

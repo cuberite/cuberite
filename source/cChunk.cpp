@@ -30,6 +30,7 @@
 #include "cCriticalSection.h"
 #include "cWorldGenerator.h"
 #include "cBlockToPickup.h"
+#include "MersenneTwister.h"
 
 #include "packets/cPacket_DestroyEntity.h"
 #include "packets/cPacket_PreChunk.h"
@@ -333,11 +334,11 @@ void cChunk::Tick(float a_Dt)
 			break;
 		};
 	}
-
+	MTRand r1;
 	// Tick dem blocks
-	int RandomX = rand();
-	int RandomY = rand();
-	int RandomZ = rand();
+	int RandomX = r1.randInt();
+	int RandomY = r1.randInt();
+	int RandomZ = r1.randInt();
 
 	for(int i = 0; i < 50; i++)
 	{

@@ -2,9 +2,11 @@
 #include "Defines.h"
 #include "BlockID.h"
 #include "stdlib.h"
+#include "MersenneTwister.h"
 
 ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_UsedItemID )
 {
+	MTRand r1;
 	(void)a_UsedItemID;
 
 	switch( a_BlockID )
@@ -28,7 +30,7 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		if( a_UsedItemID == E_ITEM_SHEARS )
 			return E_ITEM_LEAVES;
 		else
-			if(rand() % 5 == 0) return E_ITEM_SAPLING;
+			if(r1.randInt() % 5 == 0) return E_ITEM_SAPLING;
 		return E_ITEM_EMPTY;
 	case E_BLOCK_COAL_ORE:
 		return E_ITEM_COAL;
@@ -67,17 +69,18 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 
 char cBlockToPickup::PickupCount(unsigned char a_BlockID)
 {
+	MTRand r1;
 	switch(a_BlockID)
 	{
 	case E_BLOCK_REDSTONE_ORE_GLOWING:
 	case E_BLOCK_REDSTONE_ORE:
-		return rand() % 2 + 4;
+		return r1.randInt() % 2 + 4;
 	case E_BLOCK_GLOWSTONE:
-		return rand() % 3 + 2;
+		return r1.randInt() % 3 + 2;
 	case E_BLOCK_MELON:
-		return rand() % 8 + 3;
+		return r1.randInt() % 8 + 3;
 	case E_BLOCK_LAPIS_ORE:
-		return rand() % 5 + 4;
+		return r1.randInt() % 5 + 4;
 	default:
 		return 1;
 	}

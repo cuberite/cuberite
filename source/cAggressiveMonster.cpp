@@ -2,6 +2,7 @@
 
 #include "Vector3f.h"
 #include "cPlayer.h"
+#include "MersenneTwister.h"
 
 
 cAggressiveMonster::cAggressiveMonster()
@@ -58,7 +59,8 @@ void cAggressiveMonster::Tick(float a_Dt)
 
 	if(m_SeePlayerInterval > 1)
 	{
-		int rem = rand() % 3 + 1; //check most of the time but miss occasionally
+		MTRand r1;
+		int rem = r1.randInt() % 3 + 1; //check most of the time but miss occasionally
 
 		m_SeePlayerInterval = 0.0;
 		if(rem >= 2)

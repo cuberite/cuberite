@@ -34,6 +34,7 @@
 #include "cGenSettings.h"
 #include "cMakeDir.h"
 #include "cChunkGenerator.h"
+#include "MersenneTwister.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -65,7 +66,8 @@ bool g_BlockPistonBreakable[128];
 #define RECI_RAND_MAX (1.f/RAND_MAX)
 inline float fRadRand( float a_Radius )
 {
-	return ((float)rand() * RECI_RAND_MAX)*a_Radius - a_Radius*0.5f;
+	MTRand r1;
+	return ((float)r1.rand() * RECI_RAND_MAX)*a_Radius - a_Radius*0.5f;
 }
 
 struct sSetBlockData
@@ -141,11 +143,11 @@ cWorld::cWorld( const char* a_WorldName )
 
 	cMakeDir::MakeDir(m_pState->WorldName.c_str());
 
-	srand( (unsigned int) time(0) );
-	m_SpawnX = (double)((rand()%1000)-500);
+	MTRand r1;
+	m_SpawnX = (double)((r1.randInt()%1000)-500);
 	m_SpawnY = 128;
-	m_SpawnZ = (double)((rand()%1000)-500);
-	m_WorldSeed = rand();
+	m_SpawnZ = (double)((r1.randInt()%1000)-500);
+	m_WorldSeed = r1.randInt();
 	m_GameMode = 0;
 
 	cIniFile IniFile( m_pState->WorldName + "/world.ini");
@@ -411,11 +413,12 @@ void cWorld::Tick(float a_Dt)
 		m_LavaSimulator->Simulate(a_Dt);
 	UnlockChunks();
 
+	MTRand r1;
 
 ////////////////Weather///////////////////////
 	if ( GetWeather() == 0 ) { //if sunny
 		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
-			randWeather = (rand() %10000);
+			randWeather = (r1.randInt() %10000);
 			if (randWeather == 0) {
 				LOG("Starting Rainstorm!");
 				SetWeather ( 1 );
@@ -428,7 +431,7 @@ void cWorld::Tick(float a_Dt)
 
 	if ( GetWeather() != 0 ) { //if raining or thunderstorm
 		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
-			randWeather = (rand() %4999);
+			randWeather = (r1.randInt() %4999);
 			if (randWeather == 0) { //2% chance per second
 				LOG("Back to sunny!");
 				SetWeather ( 0 );
@@ -440,7 +443,7 @@ void cWorld::Tick(float a_Dt)
 	}
 
 	if ( GetWeather() == 2 ) { //if thunderstorm
-		if (rand() %199 == 0) { //0.5% chance per tick of thunderbolt
+		if (r1.randInt() %199 == 0) { //0.5% chance per tick of thunderbolt
 			CastThunderbolt ( 0, 0, 0 ); //todo: find random possitions near players to cast thunderbolts.
 		}
 	}
@@ -480,17 +483,17 @@ void cWorld::Tick(float a_Dt)
 			cMonster	*Monster = 0;
 
 			//srand ( time(NULL) );			// Only seed random ONCE! Is already done in the cWorld constructor
-			int dayRand   = rand() % 6;  //added mob code
-			int nightRand = rand() % 10; //added mob code
+			int dayRand   = r1.randInt() % 6;  //added mob code
+			int nightRand = r1.randInt() % 10; //added mob code
 
-			int RandomPlayerIdx = rand() & m_pState->Players.size();
+			int RandomPlayerIdx = r1.randInt() & m_pState->Players.size();
 			PlayerList::iterator itr = m_pState->Players.begin();
 			for( int i = 1; i < RandomPlayerIdx; i++ )
 				itr++;
 
 			cPlayer* Player = *itr;
 			Vector3d SpawnPos = Player->GetPosition();
-			SpawnPos += Vector3d( (double)(rand()%64)-32, (double)(rand()%64)-32, (double)(rand()%64)-32 );
+			SpawnPos += Vector3d( (double)(r1.randInt()%64)-32, (double)(r1.randInt()%64)-32, (double)(r1.randInt()%64)-32 );
 			char Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
 
 			if(m_WorldTime >= 12000 + 1000) {
@@ -581,7 +584,8 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 	// converted from php to lua then lua to c++
 
 	// build trunk
-	int trunk = rand() % (7 - 5 + 1) + 5;
+	MTRand r1;
+	int trunk = r1.randInt() % (7 - 5 + 1) + 5;
 	for (int i = 0; i < trunk; i++) 
 	{
 		if( GetBlock( a_X, a_Y + i, a_Z ) == E_BLOCK_AIR )
@@ -598,7 +602,7 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 			for (int i = a_X - radius; i <= a_X + radius; i++) {
 				for (int k = a_Z-radius; k <= a_Z + radius; k++) {
 					// small chance to be missing a block to add a little random
-					if (k != a_Z || i != a_X && (rand() % 100 + 1) > 20) {
+					if (k != a_Z || i != a_X && (r1.randInt() % 100 + 1) > 20) {
 						if( GetBlock( i, a_Y + j, k ) == E_BLOCK_AIR )
 							FastSetBlock(i, a_Y+j, k, E_BLOCK_LEAVES, 0 );
 					}

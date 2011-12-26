@@ -77,6 +77,7 @@ MCServer : \
 		build/cChestEntity.o\
 		build/cChunk.o\
 		build/cChunkMap.o\
+		build/cChunkGenerator.o\
 		build/cClientHandle.o\
 		build/cCraftingWindow.o\
 		build/cCriticalSection.o\
@@ -90,6 +91,9 @@ MCServer : \
 		build/cInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
+		build/cAggressiveMonster.o\
+		build/cPassiveMonster.o\
+		build/cPassiveAggressiveMonster.o\
 		build/cRedstone.o\
 		build/cPiston.o\
 		build/cPawn.o\
@@ -108,6 +112,7 @@ MCServer : \
 		build/cWebPlugin.o\
 		build/cWindow.o\
 		build/cWorld.o\
+		build/cWorldGenerator.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -141,6 +146,7 @@ MCServer : \
 		build/cPacket_Handshake.o\
 		build/cPacket_InventoryProgressBar.o\
 		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemData.o\
 		build/cPacket_ItemSwitch.o\
 		build/cPacket_KeepAlive.o\
 		build/cPacket_Login.o\
@@ -149,6 +155,7 @@ MCServer : \
 		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
 		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerListItem.o\
 		build/cPacket_PlayerLook.o\
 		build/cPacket_PlayerMoveLook.o\
 		build/cPacket_PlayerPosition.o\
@@ -225,6 +232,7 @@ MCServer : \
 		build/zutil.o\
 		build/iniFile.o\
 		build/cSocket.o\
+		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
 		build/cFileFormatUpdater.o\
@@ -268,6 +276,7 @@ MCServer : \
 		build/cChestEntity.o\
 		build/cChunk.o\
 		build/cChunkMap.o\
+		build/cChunkGenerator.o\
 		build/cClientHandle.o\
 		build/cCraftingWindow.o\
 		build/cCriticalSection.o\
@@ -281,6 +290,9 @@ MCServer : \
 		build/cInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
+		build/cAggressiveMonster.o\
+		build/cPassiveMonster.o\
+		build/cPassiveAggressiveMonster.o\
 		build/cRedstone.o\
 		build/cPiston.o\
 		build/cPawn.o\
@@ -299,6 +311,7 @@ MCServer : \
 		build/cWebPlugin.o\
 		build/cWindow.o\
 		build/cWorld.o\
+		build/cWorldGenerator.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -332,6 +345,7 @@ MCServer : \
 		build/cPacket_Handshake.o\
 		build/cPacket_InventoryProgressBar.o\
 		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemData.o\
 		build/cPacket_ItemSwitch.o\
 		build/cPacket_KeepAlive.o\
 		build/cPacket_Login.o\
@@ -340,6 +354,7 @@ MCServer : \
 		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
 		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerListItem.o\
 		build/cPacket_PlayerLook.o\
 		build/cPacket_PlayerMoveLook.o\
 		build/cPacket_PlayerPosition.o\
@@ -416,6 +431,7 @@ MCServer : \
 		build/zutil.o\
 		build/iniFile.o\
 		build/cSocket.o\
+		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
 		build/cFileFormatUpdater.o\
@@ -462,6 +478,7 @@ clean :
 		build/cChestEntity.o\
 		build/cChunk.o\
 		build/cChunkMap.o\
+		build/cChunkGenerator.o\
 		build/cClientHandle.o\
 		build/cCraftingWindow.o\
 		build/cCriticalSection.o\
@@ -475,6 +492,9 @@ clean :
 		build/cInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
+		build/cAggressiveMonster.o\
+		build/cPassiveMonster.o\
+		build/cPassiveAggressiveMonster.o\
 		build/cRedstone.o\
 		build/cPiston.o\
 		build/cPawn.o\
@@ -493,6 +513,7 @@ clean :
 		build/cWebPlugin.o\
 		build/cWindow.o\
 		build/cWorld.o\
+		build/cWorldGenerator.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -526,6 +547,7 @@ clean :
 		build/cPacket_Handshake.o\
 		build/cPacket_InventoryProgressBar.o\
 		build/cPacket_InventorySlot.o\
+		build/cPacket_ItemData.o\
 		build/cPacket_ItemSwitch.o\
 		build/cPacket_KeepAlive.o\
 		build/cPacket_Login.o\
@@ -534,6 +556,7 @@ clean :
 		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
 		build/cPacket_PickupSpawn.o\
+		build/cPacket_PlayerListItem.o\
 		build/cPacket_PlayerLook.o\
 		build/cPacket_PlayerMoveLook.o\
 		build/cPacket_PlayerPosition.o\
@@ -610,6 +633,7 @@ clean :
 		build/zutil.o\
 		build/iniFile.o\
 		build/cSocket.o\
+		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
 		build/cFileFormatUpdater.o\
@@ -672,6 +696,10 @@ build/cChunk.o : source/cChunk.cpp
 # Item # 10 -- cChunkMap --
 build/cChunkMap.o : source/cChunkMap.cpp
 	$(CC) $(CC_OPTIONS) source/cChunkMap.cpp -c $(INCLUDE) -o build/cChunkMap.o
+
+# Item # 10 -- cChunkGenerator --
+build/cChunkGenerator.o : source/cChunkGenerator.cpp
+	$(CC) $(CC_OPTIONS) source/cChunkGenerator.cpp -c $(INCLUDE) -o build/cChunkGenerator.o
 
 
 # Item # 11 -- cClientHandle --
@@ -737,6 +765,18 @@ build/cLog.o : source/cLog.cpp
 # Item # 23 -- cMonster --
 build/cMonster.o : source/cMonster.cpp
 	$(CC) $(CC_OPTIONS) source/cMonster.cpp -c $(INCLUDE) -o build/cMonster.o
+
+# Item # 23 -- cAggressiveMonster --
+build/cAggressiveMonster.o : source/cAggressiveMonster.cpp
+	$(CC) $(CC_OPTIONS) source/cAggressiveMonster.cpp -c $(INCLUDE) -o build/cAggressiveMonster.o
+
+# Item # 23 -- cPassiveMonster --
+build/cPassiveMonster.o : source/cPassiveMonster.cpp
+	$(CC) $(CC_OPTIONS) source/cPassiveMonster.cpp -c $(INCLUDE) -o build/cPassiveMonster.o
+
+# Item # 23 -- cPassiveAgressiveMonster --
+build/cPassiveAggressiveMonster.o : source/cPassiveAggressiveMonster.cpp
+	$(CC) $(CC_OPTIONS) source/cPassiveAggressiveMonster.cpp -c $(INCLUDE) -o build/cPassiveAggressiveMonster.o
 
 
 # Item # 23 -- cRedstone --
@@ -827,6 +867,10 @@ build/cWindow.o : source/cWindow.cpp
 # Item # 40 -- cWorld --
 build/cWorld.o : source/cWorld.cpp
 	$(CC) $(CC_OPTIONS) source/cWorld.cpp -c $(INCLUDE) -o build/cWorld.o
+
+# Item # 40 -- cWorldGenerator --
+build/cWorldGenerator.o : source/cWorldGenerator.cpp
+	$(CC) $(CC_OPTIONS) source/cWorldGenerator.cpp -c $(INCLUDE) -o build/cWorldGenerator.o
 
 
 # Item # 41 -- main --
@@ -946,6 +990,9 @@ build/cPacket_InventoryProgressBar.o : source/packets/cPacket_InventoryProgressB
 build/cPacket_InventorySlot.o : source/packets/cPacket_InventorySlot.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_InventorySlot.cpp -c $(INCLUDE) -o build/cPacket_InventorySlot.o
 
+build/cPacket_ItemData.o : source/packets/cPacket_ItemData.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_ItemData.cpp -c $(INCLUDE) -o build/cPacket_ItemData.o
+
 build/cPacket_ItemSwitch.o : source/packets/cPacket_ItemSwitch.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_ItemSwitch.cpp -c $(INCLUDE) -o build/cPacket_ItemSwitch.o
 
@@ -969,6 +1016,9 @@ build/cPacket_NamedEntitySpawn.o : source/packets/cPacket_NamedEntitySpawn.cpp
 
 build/cPacket_PickupSpawn.o : source/packets/cPacket_PickupSpawn.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_PickupSpawn.cpp -c $(INCLUDE) -o build/cPacket_PickupSpawn.o
+
+build/cPacket_PlayerListItem.o : source/packets/cPacket_PlayerListItem.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerListItem.cpp -c $(INCLUDE) -o build/cPacket_PlayerListItem.o
 
 build/cPacket_PlayerLook.o : source/packets/cPacket_PlayerLook.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerLook.cpp -c $(INCLUDE) -o build/cPacket_PlayerLook.o
@@ -1397,6 +1447,9 @@ build/cMakeDir.o : source/cMakeDir.cpp
 
 build/cSocket.o : source/cSocket.cpp
 	$(CC) $(CC_OPTIONS) source/cSocket.cpp -c $(INCLUDE) -o build/cSocket.o	
+
+build/cFluidSimulator.o : source/cFluidSimulator.cpp
+	$(CC) $(CC_OPTIONS) source/cFluidSimulator.cpp -c $(INCLUDE) -o build/cFluidSimulator.o
 
 build/cWaterSimulator.o : source/cWaterSimulator.cpp
 	$(CC) $(CC_OPTIONS) source/cWaterSimulator.cpp -c $(INCLUDE) -o build/cWaterSimulator.o	
