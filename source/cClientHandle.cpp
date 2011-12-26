@@ -415,15 +415,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		switch( a_Packet->m_PacketID )
 		{
 		case E_NEW_INVALID_STATE: // New/Invalid State packet received. I'm guessing the client only sends it when there's a problem with the bed?
-                        {
-                                LOGINFO("Got New Invalid State packet");
-                        }
-                        break;
+			{
+				LOGINFO("Got New Invalid State packet");
+			}
+			break;
 		case E_CREATE_INVENTORY_ACTION: // I don't think we need to do anything with this packet, but justin case...
-                        {
-                                LOGINFO("Got Create Inventory Action packet");
-                        }
-                        break;
+			{
+				LOGINFO("Got Create Inventory Action packet");
+			}
+			break;
 		case E_PING: // Somebody tries to retrieve information about the server
 			{
 				LOGINFO("Got ping");
@@ -441,7 +441,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				LOG("HANDSHAKE %s", GetUsername() );
 				cPacket_Chat Connecting(m_pState->Username + " is connecting.");
 
-				if (cRoot::Get()->GetWorld()->GetNumPlayers() == cRoot::Get()->GetWorld()->GetMaxPlayers()) {
+				if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers()) {
 					Kick("The server is currently full :( -- Try again later");
 					break;
 				}
