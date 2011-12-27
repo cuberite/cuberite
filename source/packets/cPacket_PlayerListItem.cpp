@@ -1,4 +1,5 @@
 #include "cPacket_PlayerListItem.h"
+#include "cChatColor.h"
 
 cPacket_PlayerListItem::cPacket_PlayerListItem(std::string a_PlayerName, bool a_Online, short a_Ping)
 {
@@ -19,7 +20,12 @@ bool cPacket_PlayerListItem::Parse( cSocket & a_Socket )
 
 bool cPacket_PlayerListItem::Send( cSocket & a_Socket )
 {
-	m_PlayerName = m_PlayerName.substr(0,16);
+	int len = m_PlayerName.length();
+	int end = (len <= 16) ? len : 16;
+	m_PlayerName = m_PlayerName.substr(0, end);
+	if (len <= 14)
+		m_PlayerName += cChatColor::MakeColor((char)cChatColor::White.c_str());
+
 	unsigned int TotalSize = c_Size + m_PlayerName.size()*sizeof(short);
 	char* Message = new char[TotalSize];
 
