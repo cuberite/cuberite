@@ -36,12 +36,14 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../zlib-1.2.5</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -65,6 +67,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\cDeNotch.cpp" />
+    <ClCompile Include="source\cMakeDir.cpp" />
     <ClCompile Include="source\cNBTData.cpp" />
     <ClCompile Include="source\cQuicksort.cpp" />
     <ClCompile Include="source\cTimer.cpp" />
@@ -73,9 +76,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\cDeNotch.h" />
+    <ClInclude Include="source\cMakeDir.h" />
     <ClInclude Include="source\cNBTData.h" />
     <ClInclude Include="source\cQuicksort.h" />
     <ClInclude Include="source\cTimer.h" />
+    <ClInclude Include="source\MemoryLeak.h" />
     <ClInclude Include="source\wdirent.h" />
   </ItemGroup>
   <ItemGroup>

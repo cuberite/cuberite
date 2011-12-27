@@ -1,3 +1,5 @@
+#include "MemoryLeak.h"
+
 #include "cNBTData.h"
 #include <string> // memcpy
 #include <stdio.h>
@@ -40,8 +42,10 @@ cNBTData::cNBTData( char* a_Buffer, unsigned int a_BufferSize )
     m_ParseFunctions[TAG_ByteArray] = &cNBTData::ParseByteArray;
 
 
-    m_Buffer = a_Buffer;
-    m_BufferSize = a_BufferSize;
+	m_BufferSize = a_BufferSize;
+    m_Buffer = new char[m_BufferSize]; // Make a copy of the buffer
+	memcpy( m_Buffer, a_Buffer, m_BufferSize );
+
     m_Index = 0;
 
     tm = false; //tm to true will print more information for test mode
@@ -479,6 +483,10 @@ void cNBTData::ParseData()
 	}
         ParseTags();
     }
+
+
+	delete [] m_Buffer;
+	m_Buffer = 0; m_BufferSize = 0;
 }
 
 void cNBTData::ParseTags()
@@ -682,10 +690,11 @@ void cNBTData::ParseByteArray( bool a_bNamed )
     int Length = ReadInt();
     std::string String;
 
-    char* ByteArray = new char[ Length ];
+    char* ByteArray = 0;
     if( Length > 0 )
     {
-	memcpy( ByteArray, &m_Buffer[ m_Index ], Length );
+		ByteArray = new char[ Length ];
+		memcpy( ByteArray, &m_Buffer[ m_Index ], Length );
         m_Index += Length;
     }
 
@@ -856,8 +865,9 @@ void cNBTList::Serialize(std::string & a_Buffer)
 
 void cNBTData::Clear()
 {
-    while( m_CurrentCompound != this ) CloseCompound();
-    m_CurrentCompound->Clear();
+    while( m_CurrentCompound != this ) CloseCompound(); // Close ALL the compounds!!
+
+    m_CurrentCompound->Clear();	// This recursively clears all compounds
 
     if( m_Buffer )
     {
@@ -885,10 +895,23 @@ void cNBTCompound::Clear()
         delete itr->second;
         itr->second = 0;
     }
-    m_Lists.clear();
-    m_Bytes.clear();
+	m_Lists.clear();
+
+	for( ByteArrayMap::iterator itr = m_ByteArrays.begin(); itr != m_ByteArrays.end(); itr++ )
+	{
+		if( itr->second == 0 ) continue;
+		delete [] itr->second;
+		itr->second = 0;
+	}
+	m_ByteArrays.clear();
+
+	// Don't really have to do this, but meh
+	m_Bytes.clear();
     m_Shorts.clear();
     m_Integers.clear();
+	m_Longs.clear();
+	m_Doubles.clear();
+	m_Floats.clear();
     m_Strings.clear();
 }
 

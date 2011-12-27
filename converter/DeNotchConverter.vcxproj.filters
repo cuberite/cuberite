@@ -33,6 +33,9 @@
     <ClCompile Include="source\printdir.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\cMakeDir.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\cDeNotch.h">
@@ -48,6 +51,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\wdirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\cMakeDir.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\MemoryLeak.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

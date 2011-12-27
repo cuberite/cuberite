@@ -13,6 +13,7 @@ denotch: \
 		build/cNBTData.o\
 		build/cTimer.o\
 		build/cQuicksort.o\
+		build/cMakeDir.o\
 		build/adler32.o\
 		build/compress.o\
 		build/crc32.o\
@@ -28,51 +29,54 @@ denotch: \
 		build/trees.o\
 		build/uncompr.o\
 		build/zutil.o
-	$(CC) $(LNK_OPTIONS) \
-                build/main.o\
-                build/cDeNotch.o\
-                build/cNBTData.o\
-                build/cTimer.o\
-                build/cQuicksort.o\
-                build/adler32.o\
-                build/compress.o\
-                build/crc32.o\
-                build/deflate.o\
-                build/gzclose.o\
-                build/gzlib.o\
-                build/gzread.o\
-                build/gzwrite.o\
-                build/infback.o\
-                build/inffast.o\
-                build/inflate.o\
-                build/inftrees.o\
-                build/trees.o\
-                build/uncompr.o\
-                build/zutil.o\
+
+		$(CC) $(LNK_OPTIONS) \
+		build/main.o\
+		build/cDeNotch.o\
+		build/cNBTData.o\
+		build/cTimer.o\
+		build/cQuicksort.o\
+		build/cMakeDir.o\
+		build/adler32.o\
+		build/compress.o\
+		build/crc32.o\
+		build/deflate.o\
+		build/gzclose.o\
+		build/gzlib.o\
+		build/gzread.o\
+		build/gzwrite.o\
+		build/infback.o\
+		build/inffast.o\
+		build/inflate.o\
+		build/inftrees.o\
+		build/trees.o\
+		build/uncompr.o\
+		build/zutil.o\
 		-o denotch
 
 clean:
 		rm \
-                build/main.o\
-                build/cDeNotch.o\
-                build/cNBTData.o\
-                build/cTimer.o\
-                build/cQuicksort.o\
-                build/adler32.o\
-                build/compress.o\
-                build/crc32.o\
-                build/deflate.o\
-                build/gzclose.o\
-                build/gzlib.o\
-                build/gzread.o\
-                build/gzwrite.o\
-                build/infback.o\
-                build/inffast.o\
-                build/inflate.o\
-                build/inftrees.o\
-                build/trees.o\
-                build/uncompr.o\
-                build/zutil.o\
+		build/main.o\
+		build/cDeNotch.o\
+		build/cNBTData.o\
+		build/cTimer.o\
+		build/cQuicksort.o\
+		build/cMakeDir.o\
+		build/adler32.o\
+		build/compress.o\
+		build/crc32.o\
+		build/deflate.o\
+		build/gzclose.o\
+		build/gzlib.o\
+		build/gzread.o\
+		build/gzwrite.o\
+		build/infback.o\
+		build/inffast.o\
+		build/inflate.o\
+		build/inftrees.o\
+		build/trees.o\
+		build/uncompr.o\
+		build/zutil.o\
 
 install : denotch
 	cp denotch denotch
@@ -96,6 +100,8 @@ build/cTimer.o : source/cTimer.cpp
 build/cQuicksort.o : source/cQuicksort.cpp
 	$(CC) $(CC_OPTIONS) source/cQuicksort.cpp -c $(INCLUDE) -o build/cQuicksort.o
 
+build/cMakeDir.o : source/cMakeDir.cpp
+	$(CC) $(CC_OPTIONS) source/cMakeDir.cpp -c $(INCLUDE) -o build/cMakeDir.o
 
 # Item # 104 -- adler32 --
 build/adler32.o : ../zlib-1.2.5/adler32.c
