@@ -136,7 +136,7 @@ function HandleKickCommand( Split, Player )
 		return true
 	end
 
-	local World = cRoot:Get():GetWorld()
+	local World = Player:GetWorld()
 	local OtherPlayer = World:GetPlayer( Split[2] )
 	if( OtherPlayer == nil ) then
 		Player:SendMessage( cChatColor.Green .. "Could not find player " .. Split[2] )
@@ -164,7 +164,7 @@ function HandleBanCommand( Split, Player )
 		return true
 	end
 
-	local World = cRoot:Get():GetWorld()
+	local World = Player:GetWorld()
 	local OtherPlayer = World:GetPlayer( Split[2] )
 	if( OtherPlayer == nil ) then
 		Player:SendMessage( cChatColor.Green .. "Could not find player " .. Split[2] )
@@ -255,7 +255,7 @@ function HandleReloadCommand( Split, Player )
 end
 
 function HandlePlayerListCommand( Split, Player )
-	local World = cRoot:Get():GetWorld()
+	local World = Player:GetWorld()
 	local PlayerList = World:GetAllPlayers()
 
 	local Message = cChatColor.Green .. "Connected players: (".. cChatColor.White.. #PlayerList .. cChatColor.Green .. ")"
@@ -398,7 +398,7 @@ function HandleTPCommand( Split, Player )
 		Player:SendMessage( cChatColor.Green .. "Usage: /tp [PlayerName]" )
 		return true
 	end
-	local World = cRoot:Get():GetWorld()
+	local World = Player:GetWorld()
 	local OtherPlayer = World:GetPlayer( Split[2] )
 	if( OtherPlayer == nil ) then
 		Player:SendMessage( cChatColor.Green .. "Can't find player " .. Split[2] )
@@ -422,6 +422,7 @@ function HandleChangeGMCommand( Split, Player )
 		
 	return true
 end
+
 function HandleGotoWorldCommand( Split, Player )
 	if( #Split ~= 2 ) then
 		Player:SendMessage( cChatColor.Green .. "Usage: /gotoworld [WorldName]" )
@@ -457,7 +458,7 @@ function CorePlugin:OnBlockPlace( Block, Player )
 		end
 
 		local collision = false
-		local World = cRoot:Get():GetWorld()
+		local World = Player:GetWorld()
 		local PlayerList = World:GetAllPlayers()
 
 		-- check if a player occupies the placement location
@@ -602,7 +603,6 @@ function ReloadWeb:new()
 end
 
 function ReloadWeb:HandleRequest( Request )
-	local World = cRoot:Get():GetWorld()
 	local Content = ""
 	
 	if( Request.Params:get("reload") ~= "" ) then
@@ -641,8 +641,6 @@ local function HTMLDeleteButton( name )
 end
 
 function WhiteListWeb:HandleRequest( Request )
-	local World = cRoot:Get():GetWorld()
-	
 	local UpdateMessage = ""
 	if( Request.Params:get("whitelist-add") ~= "" ) then
 		local PlayerName = Request.Params:get("whitelist-add")
