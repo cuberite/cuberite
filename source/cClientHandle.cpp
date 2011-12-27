@@ -24,6 +24,7 @@
 #include "cChatColor.h"
 #include "cThread.h"
 #include "cSocket.h"
+#include "cTimer.h"
 
 #include "cTracer.h"
 #include "Vector3f.h"
@@ -37,6 +38,7 @@
 
 #include "cBlockingTCPLink.h"
 #include "cAuthenticator.h"
+#include "MersenneTwister.h"
 
 #include "packets/cPacket_KeepAlive.h"
 #include "packets/cPacket_PlayerPosition.h"
@@ -126,6 +128,9 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	, m_Ping(1000)
 {
     LOG("cClientHandle::cClientHandle");
+	
+	cTimer t1;
+	m_LastPingTime = t1.GetNowTime();
 
 	m_pState->Socket = a_Socket;
 
@@ -1203,8 +1208,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			}
 			break;
 		case E_KEEP_ALIVE:
-				// TODO: Handle player ping per minecraft
-				//cPacket_KeepAlive* PacketData = reinterpret_cast<cPacket_KeepAlive*>(a_Packet);
+			{
+				cPacket_KeepAlive *PacketData = reinterpret_cast<cPacket_KeepAlive*>(a_Packet);
+				if (PacketData->m_KeepAliveID == m_PingID)
+				{
+					cTimer t1;
+					m_Ping = (short)(t1.GetNowTime() - m_PingStartTime);
+					LOG("%s ping: %d\n", m_Player->GetName(), m_Ping);
+				}
+			}
 			break;
 			default:
                 break;
@@ -1238,6 +1250,18 @@ void cClientHandle::Tick(float a_Dt)
 
 		Destroy();
 	}
+	
+	cTimer t1;
+	// Send ping packet
+	if (m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()) {
+		MTRand r1;
+		m_PingID = r1.randInt();
+		cPacket_KeepAlive Ping(m_PingID);
+		m_PingStartTime = t1.GetNowTime();
+		Send(Ping);
+		m_Ping = 1000; // default if it's > 1 second or they're timed out
+		m_LastPingTime = m_PingStartTime;
+	}
 
 	if( m_bSendLoginResponse )
 	{
@@ -1249,7 +1273,7 @@ void cClientHandle::Tick(float a_Dt)
 		cWorld* World = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() ); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
 		if( !World ) World = cRoot::Get()->GetDefaultWorld();
 		World->LockEntities();
-		m_Player->LoginSetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login.
+		m_Player->LoginSetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
 
 		m_Player->SetIP ( m_pState->Socket.GetIPString() );
 

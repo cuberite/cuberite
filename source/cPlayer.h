@@ -115,7 +115,7 @@ protected:
 	std::string m_IP;
 
 	long long m_LastPlayerListTime;
-	static const unsigned short E_PLAYER_LIST_TIME = 1000; // 1000 = once per second
+	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second
 
 	cClientHandle* m_ClientHandle;
 }; //tolua_export

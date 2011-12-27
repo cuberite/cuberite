@@ -239,14 +239,14 @@ void cPlayer::Tick(float a_Dt)
 	}
 	
 	cTimer t1;
-	// Send Player List (Once per m_LastPlayerListTime/1000 second(s))
-	if (m_LastPlayerListTime + cPlayer::E_PLAYER_LIST_TIME <= t1.GetNowTime()) {
+	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
+	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime()) {
 		cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
 		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 		{
 			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-				cPacket_PlayerListItem PlayerList(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
-				(*itr)->GetClientHandle()->Send( PlayerList );
+				cPacket_PlayerListItem PlayerListItem(GetColor() + GetName(), true, (*itr)->GetClientHandle()->GetPing());
+				(*itr)->GetClientHandle()->Send( PlayerListItem );
 			}
 		}
 		m_LastPlayerListTime = t1.GetNowTime();

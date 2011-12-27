@@ -54,7 +54,7 @@ public:
 	static void AuthenticateThread( void* a_Param );
 
 	const char* GetUsername();
-
+	
 	inline short GetPing() { return m_Ping; }
 private:
 	void HandlePacket( cPacket* a_Packet );
@@ -71,8 +71,11 @@ private:
 
 	float m_TimeLastPacket;
 
-	// TODO: ping calculation per minecraft
 	short m_Ping;
+	int m_PingID;
+	long long m_PingStartTime;
+	long long m_LastPingTime;
+	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
 
 	bool m_bLoggedIn;
 	bool m_bSendLoginResponse;
