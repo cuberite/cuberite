@@ -1258,7 +1258,6 @@ void cClientHandle::Tick(float a_Dt)
 		cPacket_KeepAlive Ping(m_PingID);
 		m_PingStartTime = t1.GetNowTime();
 		Send(Ping);
-		m_Ping = 1000; // default if it's > 1 second or they're timed out
 		m_LastPingTime = m_PingStartTime;
 	}
 
