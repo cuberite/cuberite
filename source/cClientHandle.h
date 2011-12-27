@@ -17,6 +17,8 @@ public:
 		E_PRIORITY_NORMAL
 	};
 
+	static const int MAXBLOCKCHANGEINTERACTIONS = 5;
+
 	cClientHandle(const cSocket & a_Socket);
 	~cClientHandle();
 

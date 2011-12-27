@@ -557,7 +557,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
-					if (LastActionCnt > 5) { //kick if more than 3 interactions per .1 seconds
+					if (LastActionCnt > MAXBLOCKCHANGEINTERACTIONS) { //kick if more than MAXBLOCKCHANGEINTERACTIONS per .1 seconds
 						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
 						//TODO Too many false-positives :s for example on a minimal server lagg :s should be re checked
 						Kick("You're a baaaaaad boy!");
@@ -732,7 +732,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				if ( cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime() < 0.1 ) { //only allow block interactions every 0.1 seconds
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
-					if (LastActionCnt > 5) { //kick if more than 3 interactions per .1 seconds
+					if (LastActionCnt > MAXBLOCKCHANGEINTERACTIONS) { //kick if more than MAXBLOCKCHANGEINTERACTIONS per .1 seconds
 						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
 						Kick("You're a baaaaaad boy!");
 						break;
