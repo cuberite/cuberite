@@ -751,6 +751,7 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 	}
 	else
 	{
+		LOGWARN("WARNING: Failed to read ini file users.ini");
 		AddToGroup("Default");
 	}
 	ResolvePermissions();

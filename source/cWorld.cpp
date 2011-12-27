@@ -419,13 +419,20 @@ void cWorld::Tick(float a_Dt)
 
 	LockChunks();
 
-	while( !m_pState->SpreadQueue.empty() )
+
+	int TimesSpreaded = 0;
+	while( !m_pState->SpreadQueue.empty() && TimesSpreaded < 50 ) // Spread a max of 50 times each tick, otherwise server will hang
 	{
 		cChunk* Chunk = (*m_pState->SpreadQueue.begin());
 		//LOG("Spreading: %p", Chunk );
 		Chunk->SpreadLight( Chunk->pGetSkyLight() );
 		Chunk->SpreadLight( Chunk->pGetLight() );
 		m_pState->SpreadQueue.remove( &*Chunk );
+		TimesSpreaded++;
+	}
+	if( TimesSpreaded >= 50 )
+	{
+		LOGWARN("Lots of lighting to do! At least %i chunks left!", m_pState->SpreadQueue.size() );
 	}
 
 	m_ChunkMap->Tick(a_Dt);

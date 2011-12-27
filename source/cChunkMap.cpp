@@ -653,7 +653,7 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		if( fread( &PakVersion, sizeof(PakVersion), 1, f) != 1 ) { LOGERROR("ERROR 1 READING FROM FILE %s", SourceFile); fclose(f); return false; }
 		if( PakVersion != 1 ) { LOGERROR("WRONG PAK VERSION!"); fclose(f); return 0; }
 		if( fread( &ChunkVersion, sizeof(ChunkVersion), 1, f) != 1 ) { LOGERROR("ERROR 2 READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( PakVersion != 1 ) { LOGERROR("WRONG CHUNK VERSION!"); fclose(f); return 0; }
+		if( ChunkVersion != 1 ) { LOGERROR("WRONG CHUNK VERSION!"); fclose(f); return 0; }
 
 		short NumChunks = 0;
 		if( fread( &NumChunks, sizeof(NumChunks), 1, f) != 1 ) { LOGERROR("ERROR 3 READING FROM FILE %s", SourceFile); fclose(f); return false; }
