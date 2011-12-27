@@ -1214,7 +1214,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				{
 					cTimer t1;
 					m_Ping = (short)(t1.GetNowTime() - m_PingStartTime);
-					LOG("%s ping: %d\n", m_Player->GetName(), m_Ping);
 				}
 			}
 			break;
