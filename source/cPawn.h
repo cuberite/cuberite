@@ -28,7 +28,7 @@ public:
 	enum MetaData {NORMAL, BURNING, CROUCHED, RIDING, SPRINTING, EATING, BLOCKING};
 
 	virtual inline void SetMetaData(MetaData a_MetaData);
-	virtual inline MetaData cPawn::GetMetaData() { return m_MetaData; }
+	virtual inline MetaData GetMetaData() { return m_MetaData; }
 
 	virtual inline void InStateBurning(float a_Dt);
 
