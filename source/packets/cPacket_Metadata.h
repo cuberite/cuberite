@@ -1,6 +1,7 @@
 #pragma once
 #include "cPacket.h"
 #include "PacketID.h"
+#include "cPawn.h"
 
 class cPacket_Metadata : public cPacket 
 {
@@ -13,7 +14,7 @@ public:
 	void FormPacket();
 	virtual cPacket* Clone() const { return new cPacket_Metadata( *this ); }
 	
-	enum MetaState{NORMAL,BURNING,CROUCHED,RIDING} EMetaState;
+	cPawn::MetaData m_EMetaData;
 	
 	static const unsigned int c_Size = 4 + 1;
 	int m_UniqueID;

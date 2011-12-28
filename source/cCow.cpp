@@ -23,10 +23,13 @@ void cCow::KilledBy( cEntity* a_Killer )
 	//Drops 0-2 Lether
 	cMonster::RandomDropItem(E_ITEM_LEATHER, 0, 2);
 
-	//Drops 1-3 Raw beefs
-	cMonster::RandomDropItem(E_ITEM_LEATHER, 1, 3);
+	if(GetMetaData() == BURNING)
+	{
+		cMonster::RandomDropItem(E_ITEM_STEAK, 1, 3);
+	}else{
+		cMonster::RandomDropItem(E_ITEM_RAW_BEEF, 1, 3);
+	}
 	
-	//TODO: Check wheather burning and drop 1-3 steak instead
 
 	cMonster::KilledBy( a_Killer );
 }

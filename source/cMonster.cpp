@@ -56,25 +56,12 @@ cMonster::cMonster()
 	, m_AttackInterval(0)
 	, m_AttackRate(3)
 	, idle_interval(0)
-	, m_bBurnable(true)
-	, m_EMMetaState(NORMAL)
-	, m_FireDamageInterval(0)
-	, m_BurnPeriod(0)
 {
 	LOG("cMonster::cMonster()");
-	LOG("In state: %s",GetState());
-	m_Health = 10;
+	LOG("In state: %s", GetState());
 
-	MTRand r1;
-	int RandVal = r1.randInt() % 4;
-	if( RandVal == 0 )
-		m_MobType = 90; // Pig
-	else if( RandVal == 1 )
-		m_MobType = 91; // Sheep
-	else if( RandVal == 2 )
-		m_MobType = 92; // Cow
-	else
-		m_MobType = 93; // Hen
+	m_bBurnable = true;
+	m_MetaData = NORMAL;
 }
 
 cMonster::~cMonster()
@@ -131,6 +118,8 @@ bool cMonster::ReachedDestination()
 
 void cMonster::Tick(float a_Dt)
 {
+	cPawn::Tick(a_Dt);
+
 	if( m_Health <= 0 )
 	{
 		m_DestroyTimer += a_Dt/1000;
@@ -194,12 +183,6 @@ void cMonster::Tick(float a_Dt)
 		VectorToEuler( Distance.x, Distance.y, Distance.z, Rotation, Pitch );
 		SetRotation( Rotation );
 		SetPitch( Pitch );
-	}
-	
-	CheckMetaDataBurn(); //Check to see if Enemy should burn based on block they are on
-	
-	if(m_EMMetaState == BURNING) {
-		InStateBurning(a_Dt);
 	}
 	
 	if(m_EMState == IDLE) { //If enemy passive we ignore checks for player visibility
@@ -448,37 +431,6 @@ void cMonster::InStateIdle(float a_Dt) {
 	}
 }
 
-//What to do if On fire
-void cMonster::InStateBurning(float a_Dt) {
-	m_FireDamageInterval += a_Dt;
-	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y +1, (int)m_Pos->z );	
-	if(m_FireDamageInterval > 1) {
-
-		m_FireDamageInterval -= 1;
-		TakeDamage(1, this);
-
-		m_BurnPeriod++;
-		if(block == E_BLOCK_LAVA || block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
-			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE) {
-			m_BurnPeriod = 0;
-			TakeDamage(6, this);
-		}else{
-			TakeDamage(1, this);
-		}
-		
-		if(m_BurnPeriod > 8) {
-			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-			m_EMMetaState = NORMAL;
-			cPacket_Metadata md(NORMAL, GetUniqueID());
-			InChunk->Broadcast(md);
-			m_BurnPeriod = 0;
-			
-		}
-	}
-	
-}
-
 //What to do if in Chasing State
 //This state should always be defined in each child class
 void cMonster::InStateChasing(float a_Dt) {
@@ -508,20 +460,7 @@ void cMonster::Attack(float a_Dt) {
 		((cPawn *)m_Target)->TakeDamage((int)m_AttackDamage,this);
 	}
 }
-//----Change Entity MetaData
-void cMonster::CheckMetaDataBurn() {
-	char block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char bblock = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z );	
-	if(m_bBurnable && m_EMMetaState != BURNING && (block == E_BLOCK_LAVA ||  block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
-				 || bblock == E_BLOCK_LAVA ||  bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)) {
-		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if(!InChunk)
-			return;
-		m_EMMetaState = BURNING;
-		cPacket_Metadata md(BURNING,GetUniqueID());
-		InChunk->Broadcast(md);
-	}
-}
+
 
 //----Debug
 
@@ -601,5 +540,5 @@ void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
 void cMonster::RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max)
 {
 	MTRand r1;
-	return cMonster::DropItem(a_Item, r1.randInt() % (a_Max + 1) + a_Min);
+	return cMonster::DropItem(a_Item, r1.randInt() % (a_Max + 1 - a_Min) + a_Min);
 }

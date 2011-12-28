@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/26/11 15:45:21.
+** Generated automatically by tolua++-1.0.92 on 12/28/11 01:31:37.
 */
 
 #ifndef __cplusplus
@@ -5039,38 +5039,6 @@ static int tolua_AllToLua_cPlayer_TeleportTo00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportTo'", NULL);
-#endif
-  {
-   self->TeleportTo(a_Entity);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'TeleportTo'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: TeleportTo of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_TeleportTo01
-static int tolua_AllToLua_cPlayer_TeleportTo01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -5078,6 +5046,7 @@ static int tolua_AllToLua_cPlayer_TeleportTo01(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
+#endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
   const double a_PosX = ((const double)  tolua_tonumber(tolua_S,2,0));
@@ -5094,8 +5063,11 @@ static int tolua_AllToLua_cPlayer_TeleportTo01(lua_State* tolua_S)
   }
  }
  return 3;
-tolua_lerror:
- return tolua_AllToLua_cPlayer_TeleportTo00(tolua_S);
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TeleportTo'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -5930,16 +5902,8 @@ public:
 			return ( void ) cPlayer:: Initialize(a_World);
 		};
 	};
-	 void  TeleportTo( cEntity* a_Entity) {
-		if (push_method("TeleportTo",  tolua_AllToLua_cPlayer_TeleportTo00)) {
-			tolua_pushusertype(lua_state, (void*)a_Entity, "cEntity");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPlayer:: TeleportTo(a_Entity);
-		};
-	};
 	 void  TeleportTo( const double& a_PosX, const double& a_PosY, const double& a_PosZ) {
-		if (push_method("TeleportTo",  tolua_AllToLua_cPlayer_TeleportTo01)) {
+		if (push_method("TeleportTo",  tolua_AllToLua_cPlayer_TeleportTo00)) {
 			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
 			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
 			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
@@ -6035,9 +5999,6 @@ public:
 
 	 void cPlayer__Initialize( cWorld* a_World) {
 		return ( void )cPlayer::Initialize(a_World);
-	};
-	 void cPlayer__TeleportTo( cEntity* a_Entity) {
-		return ( void )cPlayer::TeleportTo(a_Entity);
 	};
 	 void cPlayer__TeleportTo( const double& a_PosX, const double& a_PosY, const double& a_PosZ) {
 		return ( void )cPlayer::TeleportTo(a_PosX,a_PosY,a_PosZ);
@@ -6136,38 +6097,6 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPlayer* self = (Lua__cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlayer__TeleportTo'", NULL);
-#endif
-  {
-   self->cPlayer__TeleportTo(a_Entity);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPlayer__TeleportTo'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPlayer__TeleportTo of class  Lua__cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo01
-static int tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -6175,6 +6104,7 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo01(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
+#endif
  {
   Lua__cPlayer* self = (Lua__cPlayer*)  tolua_tousertype(tolua_S,1,0);
   const double a_PosX = ((const double)  tolua_tonumber(tolua_S,2,0));
@@ -6191,8 +6121,11 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo01(lua_State* tolua_S)
   }
  }
  return 3;
-tolua_lerror:
- return tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo00(tolua_S);
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlayer__TeleportTo'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -15992,7 +15925,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetStance",tolua_AllToLua_cPlayer_GetStance00);
    tolua_function(tolua_S,"GetInventory",tolua_AllToLua_cPlayer_GetInventory00);
    tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPlayer_TeleportTo00);
-   tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPlayer_TeleportTo01);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cPlayer_GetGameMode00);
    tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);
    tolua_function(tolua_S,"GetLastBlockActionTime",tolua_AllToLua_cPlayer_GetLastBlockActionTime00);
@@ -16024,7 +15956,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cPlayer_tolua__set_instance00);
    tolua_function(tolua_S,"cPlayer__Initialize",tolua_AllToLua_Lua__cPlayer_cPlayer__Initialize00);
    tolua_function(tolua_S,"cPlayer__TeleportTo",tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo00);
-   tolua_function(tolua_S,"cPlayer__TeleportTo",tolua_AllToLua_Lua__cPlayer_cPlayer__TeleportTo01);
    tolua_function(tolua_S,"cPlayer__MoveTo",tolua_AllToLua_Lua__cPlayer_cPlayer__MoveTo00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginManager","cPluginManager","",NULL);

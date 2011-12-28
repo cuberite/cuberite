@@ -17,6 +17,7 @@ struct cMonsterConfig::sAttributesStruct
 	float m_AttackDamage;
 	float m_AttackRange;
 	float m_AttackRate;
+	int m_MaxHealth;
 };
 
 struct cMonsterConfig::sMonsterConfigState
@@ -68,6 +69,8 @@ void cMonsterConfig::Initialize() {
 			printf("Got SightDistance: %3.3f \n",Attributes.m_SightDistance);
 			Attributes.m_AttackRate = (float)MonstersIniFile.GetValueF(SplitList[i].c_str(),"AttackRate",0);
 			printf("Got AttackRate: %3.3f \n",Attributes.m_AttackRate);
+			Attributes.m_MaxHealth = MonstersIniFile.GetValueI(SplitList[i].c_str(),"MaxHealth",0);
+			printf("Got MaxHealth: %d \n",Attributes.m_MaxHealth);
 			m_pState->AttributesList.push_front(Attributes);
 		}
 	}
@@ -84,6 +87,7 @@ void cMonsterConfig::AssignAttributes(cMonster *m, const char* n)
 			m->SetAttackRange(itr->m_AttackRange);
 			m->SetSightDistance(itr->m_SightDistance);
 			m->SetAttackRate((int)itr->m_AttackRate);
+			m->SetMaxHealth((int)itr->m_AttackRate);
 		}
 	}
 }

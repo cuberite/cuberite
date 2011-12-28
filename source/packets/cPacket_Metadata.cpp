@@ -1,7 +1,7 @@
 #include "cPacket_Metadata.h"
 
 cPacket_Metadata::cPacket_Metadata(int s, int id)
-	: EMetaState( (MetaState)s )
+	: m_EMetaData( (cPawn::MetaData)s )
 	, m_UniqueID( id )
 	, m_Type( 0 )
 	, m_MetaData( 0 )
@@ -11,12 +11,12 @@ cPacket_Metadata::cPacket_Metadata(int s, int id)
 }
 
 cPacket_Metadata::cPacket_Metadata()
-	: EMetaState(NORMAL)
-	, m_UniqueID( 0 )
+	: m_UniqueID( 0 )
 	, m_Type( 0 )
 	, m_MetaData( 0 )
 {
 	m_PacketID = E_METADATA;
+	m_EMetaData = cPawn::NORMAL;
 	FormPacket();
 }
 
@@ -30,20 +30,27 @@ void cPacket_Metadata::FormPacket() {
 	m_MetaDataSize = 3;
 	//m_UniqueID = GetUniqueID();
 	m_MetaData[0] = 0x00;
-	//m_MetaData[1] = 0x01; //Burning
+
 	m_MetaData[2] = 0x7f;
-	switch(EMetaState) {
-		case NORMAL:
+	switch(m_EMetaData) {
+		case cPawn::NORMAL:
 			m_MetaData[1] = 0x00;
 			break;
-		case BURNING:
+		case cPawn::BURNING:
 			m_MetaData[1] = 0x01;
 			break;
-		case CROUCHED:
+		case cPawn::CROUCHED:
 			m_MetaData[1] = 0x02;
 			break;
-		case RIDING:
+		case cPawn::RIDING:
 			m_MetaData[1] = 0x04;
+			break;
+		case cPawn::SPRINTING:
+			m_MetaData[1] = 0x08;
+			break;
+		case cPawn::EATING:
+		case cPawn::BLOCKING:
+			m_MetaData[1] = 0x10;
 			break;
 		default:
 			m_MetaData[1] = 0x00;

@@ -43,7 +43,6 @@ public:
 	virtual void InStateIdle(float a_Dt);
 	virtual void InStateChasing(float a_Dt);
 	virtual void InStateEscaping(float a_Dt);
-	virtual void InStateBurning(float a_Dt);
 	
 	virtual void Attack(float a_Dt);
 	int GetMobType() {return m_MobType;}
@@ -52,11 +51,9 @@ public:
 	void SetAttackRange(float ar);
 	void SetAttackDamage(float ad);
 	void SetSightDistance(float sd);
-	virtual void CheckMetaDataBurn();
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
-	enum MMetaState{NORMAL,BURNING,CROUCHED,RIDING} m_EMMetaState;
 	
 protected:
 	
@@ -67,7 +64,6 @@ protected:
 	Vector3f* m_Destination;
 	bool m_bMovingToDestination;
 	bool m_bPassiveAggressive;
-	bool m_bBurnable;
 
 	Vector3f* m_Speed;
 	float m_DestinationTime;
@@ -84,8 +80,6 @@ protected:
 	float m_AttackDamage;
 	float m_AttackRange;
 	float m_AttackInterval;
-	float m_FireDamageInterval;
-	float m_BurnPeriod;
 
 	void DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count);
 	void RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max);

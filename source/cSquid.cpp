@@ -35,16 +35,9 @@ void cSquid::Tick(float a_Dt)
 
 
 	//TODO Not a real behavior, but cool :D
-	if(!IsBlockWater(GetWorld()->GetBlock(Pos.x, Pos.y, Pos.z)))
+	if(!IsBlockWater(GetWorld()->GetBlock((int) Pos.x, (int) Pos.y, (int) Pos.z)) && GetMetaData() != BURNING)
 	{
-		//Die slowly Muhahaha :D (To prevent all this squids on the land :D)
-		m_NoWater += a_Dt;
-
-		if(m_NoWater > 1000.f)
-		{
-			m_NoWater -= 1000.f;
-			TakeDamage(1, this);
-		}
+		SetMetaData(BURNING);
 	}
 
 }

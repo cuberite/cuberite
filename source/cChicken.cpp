@@ -25,8 +25,12 @@ void cChicken::KilledBy( cEntity* a_Killer )
 	cMonster::RandomDropItem(E_ITEM_FEATHER, 0, 2);
 
 	// Raw Chicken 
-	// TODO: (Check wheather it is burning to drop cooked Chicken)
-	cMonster::DropItem(E_ITEM_RAW_CHICKEN, 1);
+	if(GetMetaData() == BURNING)
+	{
+		cMonster::DropItem(E_ITEM_COOKED_CHICKEN, 1);
+	}else{
+		cMonster::DropItem(E_ITEM_RAW_CHICKEN, 1);
+	}
 
 	cMonster::KilledBy( a_Killer );
 }

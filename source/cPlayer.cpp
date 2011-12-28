@@ -63,12 +63,10 @@ struct cPlayer::sPlayerState
 };
 
 cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
-	: m_bBurnable(true)
-	, m_GameMode( 0 )
+	: m_GameMode( 0 )
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
 	, m_LastBlockActionCnt( 0 )
-	, e_EPMetaState(NORMAL)
 	, m_bVisible( true )
 	, m_LastGroundHeight( 0 )
 	, m_bTouchGround( false )
@@ -77,12 +75,11 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	, m_CurrentWindow( 0 )
 	, m_TimeLastPickupCheck( 0.f )
 	, m_Color('-')
-	, m_FireDamageInterval(0)
-	, m_BurnPeriod(0)
 	, m_ClientHandle( a_Client )
 	, m_pState( new sPlayerState )
 {
 	m_EntityType = E_PLAYER;
+	SetMaxHealth(20);
 	m_Inventory = new cInventory( this );
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
@@ -154,14 +151,14 @@ void cPlayer::Tick(float a_Dt)
 	cChunk* InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 	if( !InChunk ) return;
 
+	cPawn::Tick(a_Dt);
+
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		cPacket_EntityLook EntityLook( this );
 		InChunk->Broadcast( EntityLook, m_ClientHandle );
 		m_bDirtyOrientation = false;
-	}
-	
-	if(m_bDirtyPosition )
+	} else if(m_bDirtyPosition )
 	{
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_MOVE, 1, this );
 
@@ -233,10 +230,6 @@ void cPlayer::Tick(float a_Dt)
 			Chunk->UnlockEntities();
 		}
 	}
-	CheckMetaDataBurn();
-	if(e_EPMetaState == BURNING){
-		InStateBurning(a_Dt);
-	}
 	
 	cTimer t1;
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
@@ -252,61 +245,6 @@ void cPlayer::Tick(float a_Dt)
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
-}
-
-void cPlayer::InStateBurning(float a_Dt) {
-	m_FireDamageInterval += a_Dt;
-	char block = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y), float2int(m_Pos->z) );
-	char bblock = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y)+1, float2int(m_Pos->z) );
-	if(m_FireDamageInterval > 800) {
-
-		m_FireDamageInterval = 0;
-		
-		m_BurnPeriod++;
-		if(block == E_BLOCK_LAVA || block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
-			|| bblock == E_BLOCK_LAVA || bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE) {
-			m_BurnPeriod = 0;
-			TakeDamage(6, this);
-		}else{
-			TakeDamage(1, this);
-		}
-		if(m_BurnPeriod > 7) {
-
-			cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-			e_EPMetaState = NORMAL;
-			cPacket_Metadata md(NORMAL, GetUniqueID());
-			//md.m_UniqueID = GetUniqueID();
-			InChunk->Broadcast(md);
-			m_BurnPeriod = 0;
-
-		}
-
-	}
-
-}
-
-//----Change Entity MetaData
-void cPlayer::CheckMetaDataBurn() {
-	char block = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y), float2int(m_Pos->z) );
-	char bblock = GetWorld()->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y)+1, float2int(m_Pos->z) );
-	if(e_EPMetaState == BURNING && (block == E_BLOCK_WATER ||  block == E_BLOCK_STATIONARY_WATER
-				 || bblock == E_BLOCK_WATER ||  bblock == E_BLOCK_STATIONARY_WATER)) {
-		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if(!InChunk)
-			return;
-		e_EPMetaState = NORMAL;
-		cPacket_Metadata md(NORMAL,GetUniqueID());
-		InChunk->Broadcast(md);
-	}else if(m_bBurnable && e_EPMetaState != BURNING && (block == E_BLOCK_LAVA ||  block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_FIRE
-				 || bblock == E_BLOCK_LAVA ||  bblock == E_BLOCK_STATIONARY_LAVA || bblock == E_BLOCK_FIRE)) {
-		cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if(!InChunk)
-			return;
-		printf("I should burn\n");
-		e_EPMetaState = BURNING;
-		cPacket_Metadata md(BURNING,GetUniqueID());
-		InChunk->Broadcast(md);
-	}
 }
 
 void cPlayer::SetTouchGround( bool a_bTouchGround )
@@ -345,9 +283,9 @@ void cPlayer::SetTouchGround( bool a_bTouchGround )
 
 void cPlayer::Heal( int a_Health )
 {
-	if( m_Health < 20 )
+	if( m_Health < GetMaxHealth() )
 	{
-		m_Health = (short) MIN(a_Health + m_Health, 20);
+		m_Health = (short) MIN(a_Health + m_Health, GetMaxHealth());
 
 		cPacket_UpdateHealth Health;
 		Health.m_Health = m_Health;
@@ -396,17 +334,27 @@ void cPlayer::KilledBy( cEntity* a_Killer )
 
 void cPlayer::Respawn()
 {
-	m_Health = 20;
+	m_Health = GetMaxHealth();
 
 	// Create Respawn player packet
 	cPacket_Respawn Packet;
 	//Set Gamemode for packet by looking at world's gamemode (Need to check players gamemode.)
 	//Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
 	Packet.m_CreativeMode = (char)m_GameMode; //Set GameMode packet based on Player's GameMode;
+
+	//TODO Less hardcoded
+	Packet.m_World = 0;
+
+	Packet.m_MapSeed = GetWorld()->GetWorldSeed();
+
 	//Send Packet
-	e_EPMetaState = NORMAL;
 	m_ClientHandle->Send( Packet );
+	
+	//Set non Burning
+	SetMetaData(NORMAL);
+
 	TeleportTo( GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ() );
+
 	SetVisible( true );
 }
 
@@ -496,17 +444,16 @@ void cPlayer::SendMessage( const char* a_Message )
 	m_ClientHandle->Send( cPacket_Chat( a_Message ) );
 }
 
-void cPlayer::TeleportTo( cEntity* a_Entity )
-{
-	cPawn::TeleportTo( a_Entity );
-	cPacket_PlayerPosition PlayerPosition( this );
-	m_ClientHandle->Send( PlayerPosition );
-}
-
 void cPlayer::TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ )
 {
-	cPawn::TeleportTo( a_PosX, a_PosY, a_PosZ );
+	SetPosition( a_PosX, a_PosY, a_PosZ );
+
+	cPacket_TeleportEntity TeleportEntity( this );
+	cRoot::Get()->GetServer()->Broadcast( TeleportEntity, GetClientHandle() );
+	
+
 	cPacket_PlayerPosition PlayerPosition( this );
+
 	m_ClientHandle->Send( PlayerPosition );
 }
 

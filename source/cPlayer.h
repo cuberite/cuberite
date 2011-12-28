@@ -28,21 +28,21 @@ public:
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline const double & GetStance() { return m_Stance; }					//tolua_export
 	cInventory & GetInventory() { return *m_Inventory; }					//tolua_export
-	virtual void TeleportTo( cEntity* a_Entity );													//tolua_export
-	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );	//tolua_export
 
-	int GetGameMode() { return m_GameMode; }												//tolua_export
-	std::string GetIP() { return m_IP; }														//tolua_export
-	float GetLastBlockActionTime() { return m_LastBlockActionTime; }														//tolua_export
-	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }														//tolua_export
-	void SetLastBlockActionCnt( int );														//tolua_export
-	void SetLastBlockActionTime();														//tolua_export
-	void SetGameMode( int a_GameMode );														//tolua_export
+	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
+
+	int GetGameMode() { return m_GameMode; }															//tolua_export
+	std::string GetIP() { return m_IP; }																//tolua_export
+	float GetLastBlockActionTime() { return m_LastBlockActionTime; }									//tolua_export
+	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }										//tolua_export
+	void SetLastBlockActionCnt( int );																	//tolua_export
+	void SetLastBlockActionTime();																		//tolua_export
+	void SetGameMode( int a_GameMode );																	//tolua_export
 	void LoginSetGameMode( int a_GameMode );
 	void SetIP( std::string a_IP );
 
 	// Tries to move to a new position, with collision checks and stuff
-	virtual void MoveTo( const Vector3d & a_NewPos );												//tolua_export
+	virtual void MoveTo( const Vector3d & a_NewPos );													//tolua_export
 
 	cWindow* GetWindow() { return m_CurrentWindow; }
 	void OpenWindow( cWindow* a_Window );
@@ -81,12 +81,7 @@ public:
 	bool LoadFromDisk();
 
 	const char* GetLoadedWorldName();
-
-	//Burning logic
-	bool m_bBurnable;
-	enum PMetaState{NORMAL,BURNING,CROUCHED,RIDING} e_EPMetaState;
-	virtual void CheckMetaDataBurn();
-	virtual void InStateBurning(float a_Dt);
+	
 
 protected:
 	struct sPlayerState;
@@ -106,8 +101,6 @@ protected:
 
 	void ResolveGroups();
 	char m_Color;
-	float m_FireDamageInterval;
-	float m_BurnPeriod;
 
 	float m_LastBlockActionTime;
 	int m_LastBlockActionCnt;

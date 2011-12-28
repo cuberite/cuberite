@@ -20,9 +20,9 @@ void cZombiepigman::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);
 
-	//TODO Same as noticed in cSkeleton AND Do they really burn? :D In the neather there is no sun :D
-	if (GetWorld()->GetWorldTime() < (12000 + 1000) ) { //if daylight
-		m_EMMetaState = BURNING; // BURN, BABY, BURN!  >:D
+	//TODO Same as noticed in cSkeleton AND Do they really burn by sun?? :D In the neather is no sun :D
+	if (GetWorld()->GetWorldTime() < (12000 + 1000) && GetMetaData() != BURNING ) { //if daylight
+		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
 	}
 }
 
