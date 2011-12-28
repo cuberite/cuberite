@@ -231,6 +231,11 @@ cClientHandle::~cClientHandle()
 		delete *m_pState->PendingNrmSendPackets.begin();
 		m_pState->PendingNrmSendPackets.erase( m_pState->PendingNrmSendPackets.begin() );
 	}
+	while( !m_pState->PendingLowSendPackets.empty() )
+	{
+		delete *m_pState->PendingLowSendPackets.begin();
+		m_pState->PendingLowSendPackets.erase( m_pState->PendingLowSendPackets.begin() );
+	}
 	if(m_Player)
 	{
 		m_Player->SetClientHandle( 0 );

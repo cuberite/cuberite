@@ -15,6 +15,12 @@ public:
 		, m_World( a_World )
 	{}
 
+	~FluidData()
+	{
+		delete m_Buffer;
+		delete m_ActiveFluid;
+	}
+
 	std::vector< Vector3i > GetLowestPoints( int a_X, int a_Y, int a_Z )
 	{
 		std::vector< Vector3i > Points;

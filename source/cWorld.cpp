@@ -135,6 +135,8 @@ cWorld::~cWorld()
 	delete m_EntitiesCriticalSection;		m_EntitiesCriticalSection = 0;
 	delete m_ChunksCriticalSection;			m_ChunksCriticalSection = 0;
 	delete m_pState;
+
+	delete m_WorldGenerator;
 }
 
 cWorld::cWorld( const char* a_WorldName )
