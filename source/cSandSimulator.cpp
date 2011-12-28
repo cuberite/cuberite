@@ -75,3 +75,10 @@ bool cSandSimulator::IsPassable( char a_BlockID )
 		|| IsBlockLava(a_BlockID);
 
 }
+
+void cSandSimulator::WakeUp( int a_X, int a_Y, int a_Z )
+{
+	//Nothing else needs to be simulated :D (Bugs not included :s)
+	AddBlock( a_X, a_Y+1, a_Z );
+	AddBlock( a_X, a_Y, a_Z );
+}
