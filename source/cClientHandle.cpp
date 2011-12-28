@@ -870,6 +870,14 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						m_Player->Heal( 8 );
 						bEat = true;
 						break;
+					case E_ITEM_RAW_BEEF:
+						m_Player->Heal(3);
+						bEat = true;
+						break;
+					case E_ITEM_STEAK:
+						m_Player->Heal( 8 );
+						bEat = true;
+						break;
 					default:
 						break;
 					};
