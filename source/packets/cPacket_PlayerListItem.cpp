@@ -24,7 +24,7 @@ bool cPacket_PlayerListItem::Send( cSocket & a_Socket )
 	int end = (len <= 16) ? len : 16;
 	m_PlayerName = m_PlayerName.substr(0, end);
 	if (len <= 14)
-		m_PlayerName += cChatColor::MakeColor(cChatColor::White.c_str()[0]);
+		m_PlayerName += cChatColor::White; // mistakes happen when you code late night :P
 
 	unsigned int TotalSize = c_Size + m_PlayerName.size()*sizeof(short);
 	char* Message = new char[TotalSize];
