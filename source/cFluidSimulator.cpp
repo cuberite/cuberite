@@ -85,6 +85,9 @@ cFluidSimulator::~cFluidSimulator()
 
 void cFluidSimulator::AddBlock( int a_X, int a_Y, int a_Z )
 {
+	if(!IsAllowedBlock(m_World->GetBlock(a_X, a_Y, a_Z)))		//This should save very much time because it doesn´t have to iterate through all blocks
+		return;
+
 	// Check for duplicates
 	std::vector< Vector3i > & ActiveFluid = *m_Data->m_ActiveFluid;
 	for( std::vector< Vector3i >::iterator itr = ActiveFluid.begin(); itr != ActiveFluid.end(); ++itr )
@@ -100,7 +103,7 @@ void cFluidSimulator::AddBlock( int a_X, int a_Y, int a_Z )
 char cFluidSimulator::GetHighestLevelAround( int a_X, int a_Y, int a_Z )
 {
 	char Max = m_MaxHeight + 1;
-	//TODO Remove define function
+
 #define __HIGHLEVEL_CHECK__( x, y, z ) \
 	if( IsAllowedBlock( m_World->GetBlock( x, y, z ) ) ) \
 	{ \
@@ -131,6 +134,7 @@ void cFluidSimulator::Simulate( float a_Dt )
 	std::vector< Vector3i > & FluidBlocks = *m_Data->m_Buffer;
 	for( std::vector< Vector3i >::iterator itr = FluidBlocks.begin(); itr != FluidBlocks.end(); ++itr )
 	{
+		
 		Vector3i & pos = *itr;
 		char BlockID = m_World->GetBlock( pos.x, pos.y, pos.z );
 		if( IsAllowedBlock( BlockID ) ) // only care about own fluid

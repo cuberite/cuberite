@@ -51,6 +51,9 @@ bool cSandSimulator::IsAllowedBlock( char a_BlockID )
 
 void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 {
+	if(!IsAllowedBlock(m_World->GetBlock(a_X, a_Y, a_Z)))		//This should save very much time because it doesn´t have to iterate through all blocks
+		return;
+
 	Vector3i *Block = new Vector3i(a_X, a_Y, a_Z);
 	
 	//check for duplicates
