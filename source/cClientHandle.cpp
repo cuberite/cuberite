@@ -825,6 +825,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					Item.m_ItemCount = 1;
 					LOG("PacketData->m_ItemType: %i", (int)PacketData->m_ItemType);
 					// Hacked in edible items go!~
+					// TODO: Handle hunger
 					bool bEat = false;
 					bool isDoor = false;
 					switch( Item.m_ItemID )
@@ -859,6 +860,14 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						break;
 					case E_ITEM_COOKED_FISH:
 						m_Player->Heal( 5 ); // 2.5 hearts
+						bEat = true;
+						break;
+					case E_ITEM_RAW_CHICKEN:
+						m_Player->Heal(3);
+						bEat = true;
+						break;
+					case E_ITEM_COOKED_CHICKEN:
+						m_Player->Heal( 8 );
 						bEat = true;
 						break;
 					default:
