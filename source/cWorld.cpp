@@ -16,6 +16,7 @@
 #include "cSimulatorManager.h"
 #include "cWaterSimulator.h"
 #include "cLavaSimulator.h"
+#include "cFireSimulator.h"
 #include "cSandSimulator.h"
 #include "cChicken.h"
 #include "cSpider.h"
@@ -126,6 +127,7 @@ cWorld::~cWorld()
 	delete m_SandSimulator;
 	delete m_WaterSimulator;
 	delete m_LavaSimulator;
+	delete m_FireSimulator;
 
 	UnloadUnusedChunks();
 	delete m_pState->pChunkGenerator;
@@ -240,11 +242,13 @@ cWorld::cWorld( const char* a_WorldName )
 	m_WaterSimulator = new cWaterSimulator( this );
 	m_LavaSimulator = new cLavaSimulator( this );
 	m_SandSimulator = new cSandSimulator(this);
+	m_FireSimulator = new cFireSimulator(this);
 
 	m_SimulatorManager = new cSimulatorManager();
 	m_SimulatorManager->RegisterSimulator(m_WaterSimulator, 6);
 	m_SimulatorManager->RegisterSimulator(m_LavaSimulator, 12);
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
 
 	memset( g_BlockLightValue, 0x0, 128 );
 	memset( g_BlockSpreadLightFalloff, 0xf, 128 ); // 0xf means total falloff
@@ -299,6 +303,7 @@ cWorld::cWorld( const char* a_WorldName )
 	g_BlockOneHitDig[ E_BLOCK_REDSTONE_REPEATER_OFF ]		= true;
 	g_BlockOneHitDig[ E_BLOCK_REDSTONE_REPEATER_ON ]		= true;
 	g_BlockOneHitDig[ E_BLOCK_LOCKED_CHEST ]		= true;
+	g_BlockOneHitDig [ E_BLOCK_FIRE ]				= true;
 
 	// Blocks that breaks when pushed by piston
 	g_BlockPistonBreakable[ E_BLOCK_AIR ]				= true;
@@ -730,13 +735,15 @@ cChunk* cWorld::GetChunkOfBlock( int a_X, int a_Y, int a_Z )
 
 void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
-	this->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
-
-	int ChunkX, ChunkY, ChunkZ;
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
+	int ChunkX, ChunkY, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
+	AbsoluteToRelative( X, Y, Z, ChunkX, ChunkY, ChunkZ );
 
 	cChunk* Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if( Chunk )	Chunk->SetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta );
+	if( Chunk )
+	{
+		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+		this->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
+	}
 }
 
 void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )

@@ -16,6 +16,7 @@ enum ENUM_ITEM_ID;
 
 class cPacket;
 class cRedstone;
+class cFireSimulator;
 class cWaterSimulator;
 class cLavaSimulator;
 class cSandSimulator;
@@ -184,6 +185,7 @@ private:
 	cSandSimulator *m_SandSimulator;
 	cWaterSimulator* m_WaterSimulator;
 	cLavaSimulator* m_LavaSimulator;
+	cFireSimulator* m_FireSimulator;
 	
 	cCriticalSection* m_ClientHandleCriticalSection;
 	cCriticalSection* m_EntitiesCriticalSection;

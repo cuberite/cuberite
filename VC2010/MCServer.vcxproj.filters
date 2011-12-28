@@ -436,7 +436,10 @@
     <Filter Include="Simulator\cSimulator\cFluidSimulator\cLavaSimulator">
       <UniqueIdentifier>{b0401fd9-4021-4ab7-bf61-c8de112b4196}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Simulator\cSimulator\SandSimulator">
+    <Filter Include="Simulator\cSimulator\cFireSimulator">
+      <UniqueIdentifier>{d788a40d-f6f9-4784-8202-25d38386157a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Simulator\cSimulator\cSandSimulator">
       <UniqueIdentifier>{c5389fa9-20dd-4c52-ac16-2ef0a1115cf1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -872,7 +875,10 @@
       <Filter>Simulator\cSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cSandSimulator.cpp">
-      <Filter>Simulator\cSimulator\SandSimulator</Filter>
+      <Filter>Simulator\cSimulator\cSandSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cFireSimulator.cpp">
+      <Filter>Simulator\cSimulator\cFireSimulator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1342,7 +1348,10 @@
       <Filter>Simulator\cSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cSandSimulator.h">
-      <Filter>Simulator\cSimulator\SandSimulator</Filter>
+      <Filter>Simulator\cSimulator\cSandSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cFireSimulator.h">
+      <Filter>Simulator\cSimulator\cFireSimulator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

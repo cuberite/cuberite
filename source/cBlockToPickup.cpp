@@ -20,6 +20,8 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		return E_ITEM_EMPTY;
 	case E_BLOCK_GRASS:
 		return E_ITEM_DIRT;
+	case E_BLOCK_FIRE:
+		return E_ITEM_EMPTY;
 	case E_BLOCK_GLASS:
 		return E_ITEM_EMPTY;
 	case E_BLOCK_DIRT:

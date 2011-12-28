@@ -81,6 +81,8 @@ public:
 	bool LoadFromDisk();
 
 	const char* GetLoadedWorldName();
+
+	void UseEquippedItem();
 	
 
 protected:

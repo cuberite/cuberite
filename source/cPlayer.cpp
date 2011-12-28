@@ -831,3 +831,13 @@ const char* cPlayer::GetLoadedWorldName()
 {
 	return m_pState->LoadedWorldName.c_str();
 }
+
+void cPlayer::UseEquippedItem()
+{
+	if(GetGameMode() != 1)		//No damage in creative
+		if (GetInventory().GetEquippedItem().DamageItem()) 
+		{
+			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername(), GetInventory().GetEquippedItem().m_ItemID);
+			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
+		}
+}

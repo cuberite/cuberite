@@ -239,6 +239,7 @@ MCServer : \
 		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
+		build/cFireSimulator.o\
 		build/cFileFormatUpdater.o\
 		build/cItem.o
 	$(CC) $(LNK_OPTIONS) \
@@ -442,6 +443,7 @@ MCServer : \
 		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
+		build/cFireSimulator.o\
 		build/cFileFormatUpdater.o\
 		build/cItem.o\
 		-o MCServer
@@ -648,6 +650,7 @@ clean :
 		build/cFluidSimulator.o\
 		build/cWaterSimulator.o\
 		build/cLavaSimulator.o\
+		build/cFireSimulator.o\
 		build/cFileFormatUpdater.o\
 		build/cItem.o\
 		MCServer
@@ -1480,6 +1483,9 @@ build/cWaterSimulator.o : source/cWaterSimulator.cpp
 
 build/cLavaSimulator.o : source/cLavaSimulator.cpp
 	$(CC) $(CC_OPTIONS) source/cLavaSimulator.cpp -c $(INCLUDE) -o build/cLavaSimulator.o	
+	
+build/cFireSimulator.o : source/cFireSimulator.cpp
+	$(CC) $(CC_OPTIONS) source/cFireSimulator.cpp -c $(INCLUDE) -o build/cFireSimulator.o	
 
 build/cFileFormatUpdater.o : source/cFileFormatUpdater.cpp
 	$(CC) $(CC_OPTIONS) source/cFileFormatUpdater.cpp -c $(INCLUDE) -o build/cFileFormatUpdater.o	

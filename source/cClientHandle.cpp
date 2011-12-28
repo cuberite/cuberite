@@ -587,8 +587,12 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				else
 				{
 					cWorld* World = m_Player->GetWorld();
+
+
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
+
+
 					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (m_Player->GetGameMode() == 1) );
 					if(bBroken == false) bBroken = (m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS && OldBlock == E_BLOCK_LEAVES);
 
@@ -616,6 +620,20 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					}
 					if(!cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_DIG, 2, PacketData, m_Player, &PickupItem ) )
 					{
+						int pX = PacketData->m_PosX, pY = PacketData->m_PosY, pZ = PacketData->m_PosZ;
+
+						AddDirection(pX, (char &) pY, pZ, PacketData->m_Direction);
+
+						char PossibleBlock = World->GetBlock(pX, pY, pZ);
+
+						if(PossibleBlock == E_BLOCK_FIRE)
+						{
+							PacketData->m_PosX = pX;
+							PacketData->m_PosY = pY;
+							PacketData->m_PosZ = pZ;
+							bBroken = true;
+						}
+
 						if( bBroken ) // Block broken
 						{
 							if( World->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
@@ -653,78 +671,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 											World->SetBlock(PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0);
 									}
 								}
-
-								int helditem = m_Player->GetInventory().GetEquippedItem().m_ItemID;
-								bool itemhasdur = false;
-								switch(helditem)
-								{
-									case 256 : itemhasdur = true; break;
-									case 257 : itemhasdur = true; break;
-									case 258 : itemhasdur = true; break;
-									case 267 : itemhasdur = true; break;
-									case 268 : itemhasdur = true; break;
-									case 269 : itemhasdur = true; break;
-									case 270 : itemhasdur = true; break;
-									case 271 : itemhasdur = true; break;
-									case 272 : itemhasdur = true; break;
-									case 273 : itemhasdur = true; break;
-									case 274 : itemhasdur = true; break;
-									case 275 : itemhasdur = true; break;
-									case 276 : itemhasdur = true; break;
-									case 277 : itemhasdur = true; break;
-									case 278 : itemhasdur = true; break;
-									case 279 : itemhasdur = true; break;
-									case 283 : itemhasdur = true; break;
-									case 284 : itemhasdur = true; break;
-									case 285 : itemhasdur = true; break;
-									case 286 : itemhasdur = true; break;
-									case 290 : itemhasdur = true; break;
-									case 291 : itemhasdur = true; break;
-									case 292 : itemhasdur = true; break;
-									case 293 : itemhasdur = true; break;
-									case 294 : itemhasdur = true; break;
-									case 359 : itemhasdur = true; break;
-								}
-								if (itemhasdur) 
-								{
-									int maxhelditemdur = 1563;
-									switch(helditem)
-									{
-										case 256 : maxhelditemdur = 251; break;
-										case 257 : maxhelditemdur = 251; break;
-										case 258 : maxhelditemdur = 251; break;
-										case 267 : maxhelditemdur = 251; break;
-										case 268 : maxhelditemdur = 60; break;
-										case 269 : maxhelditemdur = 60; break;
-										case 270 : maxhelditemdur = 60; break;
-										case 271 : maxhelditemdur = 60; break;
-										case 272 : maxhelditemdur = 132; break;
-										case 273 : maxhelditemdur = 132; break;
-										case 274 : maxhelditemdur = 132; break;
-										case 275 : maxhelditemdur = 132; break;
-										case 276 : maxhelditemdur = 1563; break;
-										case 277 : maxhelditemdur = 1563; break;
-										case 278 : maxhelditemdur = 1563; break;
-										case 279 : maxhelditemdur = 1563; break;
-										case 283 : maxhelditemdur = 32; break;
-										case 284 : maxhelditemdur = 32; break;
-										case 285 : maxhelditemdur = 32; break;
-										case 286 : maxhelditemdur = 32; break;
-										case 290 : maxhelditemdur = 60; break;
-										case 291 : maxhelditemdur = 132; break;
-										case 292 : maxhelditemdur = 251; break;
-										case 293 : maxhelditemdur = 1563; break;
-										case 294 : maxhelditemdur = 32; break;
-										case 359 : maxhelditemdur = 251; break;
-									}
-									m_Player->GetInventory().GetEquippedItem().m_ItemHealth ++;
-									LOG("Health: %i", m_Player->GetInventory().GetEquippedItem().m_ItemHealth);
-									if (m_Player->GetInventory().GetEquippedItem().m_ItemHealth >= maxhelditemdur)
-									{
-										LOG("Player %s Broke ID: %i", GetUsername(), m_Player->GetInventory().GetEquippedItem().m_ItemID);
-										m_Player->GetInventory().RemoveItem( m_Player->GetInventory().GetEquippedItem());
-									}
-								}
+								
+								m_Player->UseEquippedItem();
 							}
 						}
 					}
@@ -901,6 +849,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					char MetaData = (char)Equipped.m_ItemHealth;
 					bool LavaBucket = false;
 					bool WaterBucket = false;
+					bool bRemoveItem = true;
 
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
@@ -1022,6 +971,11 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							PacketData->m_ItemType = E_BLOCK_WALLSIGN;
 						}
 						break;
+					case E_ITEM_FLINT_AND_STEEL:
+						PacketData->m_ItemType = E_ITEM_FIRE;
+						m_Player->UseEquippedItem();
+						bRemoveItem = false;
+						break;
 					default:
 						break;
 					};
@@ -1058,23 +1012,28 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							break;	//happens when you place a block aiming at side of block like torch or stem
 						}
 
-						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) )
+						if(bRemoveItem)
 						{
-							if (isDoor) {
-								if ( ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) || ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) ) {
-									m_Player->GetWorld()->SetBlock( X, Y+1, Z, (char)PacketData->m_ItemType, MetaData + 8 );
-
-									m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
-								}
-							} else {
+							if((m_Player->GetGameMode() != 1) &&  !m_Player->GetInventory().RemoveItem( Item ))
+								break;
+						}
+						if (isDoor)
+						{
+							if ( ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) || ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) )
+							{
+								m_Player->GetWorld()->SetBlock( X, Y+1, Z, (char)PacketData->m_ItemType, MetaData + 8 );
 								m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
 							}
-							if (UpdateRedstone) {
-								cRedstone Redstone(m_Player->GetWorld());
-								Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
-							}
-
+						} else {
+							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
 						}
+
+						if (UpdateRedstone)
+						{
+							cRedstone Redstone(m_Player->GetWorld());
+							Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
+						}
+
 					}
 				}
 				/*
