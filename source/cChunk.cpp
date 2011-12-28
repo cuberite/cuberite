@@ -58,13 +58,15 @@ typedef std::list< cBlockEntity* > BlockEntityList;
 typedef std::list< cEntity* > EntityList;
 struct cChunk::sChunkState
 {
-	std::map< unsigned int, int > ToTickBlocks;
 	FurnaceEntityList TickBlockEntities;
-	std::vector< unsigned int > PendingSendBlocks;
+	std::map< unsigned int, int > ToTickBlocks;		// Protected by BlockListCriticalSection
+	std::vector< unsigned int > PendingSendBlocks;	// Protected by BlockListCriticalSection
 	ClientHandleList LoadedByClient;
 	ClientHandleList UnloadQuery;
-	BlockEntityList BlockEntities;
+	BlockEntityList BlockEntities;					// Protected by BlockListCriticalSection
 	EntityList Entities;
+
+	cCriticalSection BlockListCriticalSection;
 };
 
 cChunk::~cChunk()
@@ -75,11 +77,13 @@ cChunk::~cChunk()
 		LOGWARN("WARNING: Deleting cChunk while it contains %i clients!", m_pState->LoadedByClient.size() );
 	}
 
+	m_pState->BlockListCriticalSection.Lock();
 	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		delete *itr;
 	}
 	m_pState->BlockEntities.clear();
+	m_pState->BlockListCriticalSection.Unlock();
 
 	LockEntities();
 	if( m_pState->Entities.size() > 0 )
@@ -143,7 +147,9 @@ void cChunk::Initialize()
 
 		// During generation, some blocks might have been set by using (Fast)SetBlock() causing this list to fill.
 		// This chunk has not been sent to anybody yet, so there is no need for separately sending block changes when you can send an entire chunk
+		m_pState->BlockListCriticalSection.Lock();
 		m_pState->PendingSendBlocks.clear();
+		m_pState->BlockListCriticalSection.Unlock();
 	}
 	else
 	{
@@ -159,6 +165,7 @@ void cChunk::Tick(float a_Dt)
 	if( m_bCalculateHeightmap )
 		CalculateHeightmap();
 
+	m_pState->BlockListCriticalSection.Lock();
 	unsigned int PendingSendBlocks = m_pState->PendingSendBlocks.size();
  	if( PendingSendBlocks > 1 )
  	{
@@ -205,6 +212,7 @@ void cChunk::Tick(float a_Dt)
 		}
 		m_pState->PendingSendBlocks.clear();
 	}
+	m_pState->BlockListCriticalSection.Unlock();
 
 	while( !m_pState->UnloadQuery.empty() )
 	{
@@ -216,10 +224,11 @@ void cChunk::Tick(float a_Dt)
 		m_pState->UnloadQuery.remove( *m_pState->UnloadQuery.begin() );
 	}
 
+	m_pState->BlockListCriticalSection.Lock();
 	std::map< unsigned int, int > ToTickBlocks = m_pState->ToTickBlocks;
-	//unsigned int NumTickBlocks = ToTickBlocks.size();
-	//if( NumTickBlocks > 0 ) LOG("To tick: %i", NumTickBlocks );
 	m_pState->ToTickBlocks.clear();
+	m_pState->BlockListCriticalSection.Unlock();
+	
 	bool isRedstone = false;
 	for( std::map< unsigned int, int>::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
 	{
@@ -309,6 +318,7 @@ void cChunk::Tick(float a_Dt)
 			break;
 		};
 	}
+
 	MTRand r1;
 	// Tick dem blocks
 	int RandomX = r1.randInt();
@@ -388,6 +398,7 @@ char cChunk::GetHeight( int a_X, int a_Z )
 
 void cChunk::CreateBlockEntities()
 {
+	m_pState->BlockListCriticalSection.Lock();
 	for(int x = 0; x < 16; x++)
 	{
 		for(int z = 0; z < 16; z++)
@@ -421,6 +432,7 @@ void cChunk::CreateBlockEntities()
 			}
 		}
 	}
+	m_pState->BlockListCriticalSection.Unlock();
 }
 
 char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
@@ -708,10 +720,12 @@ void cChunk::Send( cClientHandle* a_Client )
 	a_Client->Send( PreChunk );
 	a_Client->Send( cPacket_MapChunk( this ) );
 
+	m_pState->BlockListCriticalSection.Lock();
 	for( BlockEntityList::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr )
 	{
 		(*itr)->SendTo( a_Client );
 	}
+	m_pState->BlockListCriticalSection.Unlock();
 }
 
 void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
@@ -732,6 +746,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	if( OldBlockType != a_BlockType || OldBlockMeta != a_BlockMeta )
 	{
 		//LOG("Old: %i %i New: %i %i", OldBlockType, OldBlockMeta, a_BlockType, a_BlockMeta );
+		m_pState->BlockListCriticalSection.Lock();
 		m_pState->PendingSendBlocks.push_back( index );
 
 		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
@@ -764,6 +779,8 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 		default:
 			break;
 		};
+
+		m_pState->BlockListCriticalSection.Unlock();
 	}
 
 	CalculateHeightmap();
@@ -781,7 +798,10 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	const int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	const char OldBlock = m_BlockType[index];
 	m_BlockType[index] = a_BlockType;
+
+	m_pState->BlockListCriticalSection.Lock();
 	m_pState->PendingSendBlocks.push_back( index );
+	m_pState->BlockListCriticalSection.Unlock();
 	SetLight( m_BlockMeta, index, a_BlockMeta );
 
 	// ONLY recalculate lighting if it's necessary!
@@ -800,7 +820,9 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 {
 	if( a_Client == 0 )
 	{
+		m_pState->BlockListCriticalSection.Lock();
 		m_pState->PendingSendBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
+		m_pState->BlockListCriticalSection.Unlock();
 		return;
 	}
 
@@ -823,12 +845,16 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 
 void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
 {
+	m_pState->BlockListCriticalSection.Lock();
 	m_pState->BlockEntities.push_back( a_BlockEntity );
+	m_pState->BlockListCriticalSection.Unlock();
 }
 
 void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 {
+	m_pState->BlockListCriticalSection.Lock();
 	m_pState->BlockEntities.remove( a_BlockEntity );
+	m_pState->BlockListCriticalSection.Unlock();
 }
 
 void cChunk::AddClient( cClientHandle* a_Client )
@@ -915,15 +941,19 @@ char cChunk::GetBlock( int a_BlockIdx )
 
 cBlockEntity* cChunk::GetBlockEntity( int a_X, int a_Y, int a_Z )
 {
+	m_pState->BlockListCriticalSection.Lock();
 	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		if( (*itr)->GetPosX() == a_X &&
 			(*itr)->GetPosY() == a_Y &&
 			(*itr)->GetPosZ() == a_Z )
 		{
-			return *itr;
+			cBlockEntity* BlockEnt = *itr;
+			m_pState->BlockListCriticalSection.Unlock();
+			return BlockEnt;
 		}
 	}
+	m_pState->BlockListCriticalSection.Unlock();
 	return 0;
 }
 
@@ -942,6 +972,7 @@ bool cChunk::LoadFromDisk()
 		if( fread( m_BlockData, sizeof(char)*c_BlockDataSize, 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
 
 		// Now load Block Entities
+		m_pState->BlockListCriticalSection.Lock();
 		ENUM_BLOCK_ID BlockType;
 		while( fread( &BlockType, sizeof(ENUM_BLOCK_ID), 1, f) == 1 )
 		{
@@ -992,6 +1023,7 @@ bool cChunk::LoadFromDisk()
 				break;
 			}
 		}
+		m_pState->BlockListCriticalSection.Unlock();
 
 		fclose(f);
 
@@ -1040,6 +1072,7 @@ bool cChunk::SaveToDisk()
 	{
 		fwrite( m_BlockData, sizeof(char)*c_BlockDataSize, 1, f );
 
+		m_pState->BlockListCriticalSection.Lock();
 		// Now write Block Entities
 		for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 		{
@@ -1069,6 +1102,7 @@ bool cChunk::SaveToDisk()
 				break;
 			}
 		}
+		m_pState->BlockListCriticalSection.Unlock();
 
 		fclose(f);
 		return true;
@@ -1092,6 +1126,7 @@ void cChunk::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 
 
 void cChunk::LoadFromJson( const Json::Value & a_Value )
 {
+	m_pState->BlockListCriticalSection.Lock();
 	// Load chests
 	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
 	if( !AllChests.empty() )
@@ -1142,6 +1177,7 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 			else m_pState->BlockEntities.push_back( SignEntity );
 		}
 	}
+	m_pState->BlockListCriticalSection.Unlock();
 }
 
 void cChunk::SaveToJson( Json::Value & a_Value )
@@ -1149,6 +1185,7 @@ void cChunk::SaveToJson( Json::Value & a_Value )
 	Json::Value AllChests;
 	Json::Value AllFurnaces;
 	Json::Value AllSigns;
+	m_pState->BlockListCriticalSection.Lock();
 	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		cBlockEntity* BlockEntity = *itr;
@@ -1183,6 +1220,7 @@ void cChunk::SaveToJson( Json::Value & a_Value )
 			break;
 		}
 	}
+	m_pState->BlockListCriticalSection.Unlock();
 
 	if( !AllChests.empty() )
 		a_Value["Chests"] = AllChests;
