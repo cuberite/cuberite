@@ -3,7 +3,7 @@
 #include "cBlockEntity.h"
 #include "cWindowOwner.h"
 #include "FileDefine.h"
-#include "packets\cPacket_BlockAction.h"
+#include "packets/cPacket_BlockAction.h"
 
 namespace Json
 {
