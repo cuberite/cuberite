@@ -7,8 +7,8 @@
 
 cSandSimulator::cSandSimulator( cWorld* a_World )
 	: cSimulator(a_World)
-	, m_Blocks(new std::vector <Vector3i *>)
-	, m_Buffer(new std::vector <Vector3i *>)
+	, m_Blocks(new std::list <Vector3i *>)
+	, m_Buffer(new std::list <Vector3i *>)
 {
 
 }
@@ -24,7 +24,7 @@ void cSandSimulator::Simulate( float a_Dt )
 	m_Buffer->clear();
 	std::swap( m_Blocks, m_Buffer );
 
-	for( std::vector<Vector3i *>::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
+	for( std::list<Vector3i *>::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
 	{
 		Vector3i *Pos = *itr;
 		char BlockID = m_World->GetBlock(Pos->x, Pos->y, Pos->z);
@@ -57,7 +57,7 @@ void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 	Vector3i *Block = new Vector3i(a_X, a_Y, a_Z);
 	
 	//check for duplicates
-	for( std::vector<Vector3i *>::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
+	for( std::list<Vector3i *>::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
 	{
 		Vector3i *Pos = *itr;
 		if( Pos->x == a_X && Pos->y == a_Y && Pos->z == a_Z )

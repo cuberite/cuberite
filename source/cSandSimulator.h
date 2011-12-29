@@ -1,7 +1,7 @@
 #pragma once
 #include "cSimulator.h"
 #include "cBlockEntity.h"
-#include "vector"
+#include <list>
 
 class Vector3i;
 class cWorld;
@@ -20,6 +20,6 @@ public:
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z);
 
-	std::vector <Vector3i *> *m_Blocks;
-	std::vector <Vector3i *> *m_Buffer;
+	std::list <Vector3i *> *m_Blocks;
+	std::list <Vector3i *> *m_Buffer;
 };

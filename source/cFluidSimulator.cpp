@@ -9,9 +9,9 @@ class cFluidSimulator::FluidData
 {
 public:
 	FluidData( cWorld* a_World, cFluidSimulator *a_Simulator )
-		: m_ActiveFluid( new std::vector< Vector3i >() )
+		: m_ActiveFluid( new std::list < Vector3i >() )
 		, m_Simulator (a_Simulator)
-		, m_Buffer( new std::vector< Vector3i >() )
+		, m_Buffer( new std::list< Vector3i >() )
 		, m_World( a_World )
 	{}
 
@@ -71,8 +71,8 @@ public:
 		return Points;
 	}
 
-	std::vector< Vector3i >* m_ActiveFluid;
-	std::vector< Vector3i >* m_Buffer;
+	std::list< Vector3i >* m_ActiveFluid;
+	std::list< Vector3i >* m_Buffer;
 	cWorld* m_World;
 	cFluidSimulator *m_Simulator;
 };
@@ -95,8 +95,8 @@ void cFluidSimulator::AddBlock( int a_X, int a_Y, int a_Z )
 		return;
 
 	// Check for duplicates
-	std::vector< Vector3i > & ActiveFluid = *m_Data->m_ActiveFluid;
-	for( std::vector< Vector3i >::iterator itr = ActiveFluid.begin(); itr != ActiveFluid.end(); ++itr )
+	std::list< Vector3i > & ActiveFluid = *m_Data->m_ActiveFluid;
+	for( std::list< Vector3i >::iterator itr = ActiveFluid.begin(); itr != ActiveFluid.end(); ++itr )
 	{
 		Vector3i & Pos = *itr;
 		if( Pos.x == a_X && Pos.y == a_Y && Pos.z == a_Z )
@@ -137,8 +137,8 @@ void cFluidSimulator::Simulate( float a_Dt )
 	std::swap( m_Data->m_ActiveFluid, m_Data->m_Buffer );	// Swap so blocks can be added to empty ActiveFluid array
 	m_Data->m_ActiveFluid->clear();
 
-	std::vector< Vector3i > & FluidBlocks = *m_Data->m_Buffer;
-	for( std::vector< Vector3i >::iterator itr = FluidBlocks.begin(); itr != FluidBlocks.end(); ++itr )
+	std::list< Vector3i > & FluidBlocks = *m_Data->m_Buffer;
+	for( std::list< Vector3i >::iterator itr = FluidBlocks.begin(); itr != FluidBlocks.end(); ++itr )
 	{
 		
 		Vector3i & pos = *itr;
@@ -250,6 +250,8 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	}
 
 	std::vector< Vector3i * > Points;
+
+	Points.reserve(4);	//Already allocate 4 places :D
 
 	//add blocks around the checking pos
 	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));

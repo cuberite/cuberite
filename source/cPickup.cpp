@@ -169,13 +169,17 @@ void cPickup::HandlePhysics(float a_Dt)
 		{
 			m_bOnGround = false;
 		}
-		char block = World->GetBlock( BlockX, (int)m_Pos->y - (int)m_bOnGround, BlockZ );
-		if( block == E_BLOCK_STATIONARY_LAVA || block == E_BLOCK_LAVA ) {
+		char Block = World->GetBlock( BlockX, (int)m_Pos->y - (int)m_bOnGround, BlockZ );
+		char BlockIn = World->GetBlock( BlockX, (int)m_Pos->y, BlockZ );
+
+		if( IsBlockLava(Block) || Block == E_BLOCK_FIRE
+			|| IsBlockLava(BlockIn) || BlockIn == E_BLOCK_FIRE)
+		{
 			m_bCollected = true;
 			m_Timer = 0;
 			return;
 		}
-		char BlockIn = World->GetBlock( BlockX, (int)m_Pos->y, BlockZ );
+
 		if( BlockIn != E_BLOCK_AIR && !IsBlockWater(BlockIn) ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;

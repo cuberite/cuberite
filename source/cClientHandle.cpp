@@ -872,21 +872,28 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					case E_ITEM_LAVA_BUCKET:
 						if((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )))
 						{
+							PacketData->m_ItemType = E_BLOCK_LAVA;
+							if(m_Player->GetGameMode() == 1)
+								break;						//No new Bucket for creative players
+
 							cItem NewItem;
 							NewItem.m_ItemID = E_ITEM_BUCKET;
 							NewItem.m_ItemCount = 1;
 							m_Player->GetInventory().AddItem( NewItem );
-							PacketData->m_ItemType = E_BLOCK_LAVA;
+							
 						}
 						break;
 					case E_ITEM_WATER_BUCKET:
 						if((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )))
 						{
+							PacketData->m_ItemType = E_BLOCK_WATER;
+							if(m_Player->GetGameMode() == 1)
+								break;						//No new Bucket for creative players
 							cItem NewItem;
 							NewItem.m_ItemID = E_ITEM_BUCKET;
 							NewItem.m_ItemCount = 1;
 							m_Player->GetInventory().AddItem( NewItem );
-							PacketData->m_ItemType = E_BLOCK_WATER;
+							
 						}
 						break;
 					case E_BLOCK_WHITE_CLOTH:
