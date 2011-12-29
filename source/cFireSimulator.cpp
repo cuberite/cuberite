@@ -30,13 +30,15 @@ void cFireSimulator::Simulate( float a_Dt )
 	{
 		Vector3i *Pos = *itr;
 
-		if(!IsAllowedBlock(m_World->GetBlock(Pos->x, Pos->y, Pos->z)))	//Check wheather the block is still burning
+		char BlockID = m_World->GetBlock(Pos->x, Pos->y, Pos->z);
+
+		if(!IsAllowedBlock(BlockID))	//Check wheather the block is still burning
 			continue;
 
 		if(BurnBlockAround(Pos->x, Pos->y, Pos->z))	//Burn single block and if there was one -> next time again
 			_AddBlock(Pos->x, Pos->y, Pos->z);
 		else
-			if(!IsForeverBurnable(m_World->GetBlock(Pos->x, Pos->y - 1, Pos->z)))
+			if(!IsForeverBurnable(m_World->GetBlock(Pos->x, Pos->y - 1, Pos->z)) && !FiresForever(BlockID))
 				m_World->SetBlock(Pos->x, Pos->y, Pos->z, E_BLOCK_AIR, 0);
 
 	}
@@ -89,6 +91,11 @@ bool cFireSimulator::IsBurnable( char a_BlockID )
 		|| a_BlockID == E_BLOCK_BOOKCASE
 		|| a_BlockID == E_BLOCK_FENCE
 		|| a_BlockID == E_BLOCK_TNT;
+}
+
+bool cFireSimulator::FiresForever( char a_BlockID )
+{
+	return a_BlockID != E_BLOCK_FIRE;
 }
 
 bool cFireSimulator::BurnBlockAround(int a_X, int a_Y, int a_Z)

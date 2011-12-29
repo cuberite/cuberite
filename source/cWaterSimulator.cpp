@@ -16,8 +16,3 @@ bool cWaterSimulator::IsAllowedBlock(char a_BlockID)
 	return IsBlockWater(a_BlockID);
 }
 
-
-bool cWaterSimulator::IsPassableForFluid(char a_BlockID)
-{
-	return ( a_BlockID == E_BLOCK_AIR || IsAllowedBlock(a_BlockID) );
-}

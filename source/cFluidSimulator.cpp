@@ -218,6 +218,14 @@ void cFluidSimulator::Simulate( float a_Dt )
 	}
 }
 
+
+bool cFluidSimulator::IsPassableForFluid(char a_BlockID)
+{
+	return a_BlockID == E_BLOCK_AIR
+		|| a_BlockID == E_BLOCK_FIRE
+		|| IsAllowedBlock(a_BlockID);
+}
+
 //TODO Not working very well yet :s
 Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
 {

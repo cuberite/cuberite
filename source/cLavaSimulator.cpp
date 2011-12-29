@@ -15,9 +15,3 @@ bool cLavaSimulator::IsAllowedBlock(char a_BlockID)
 {
 	return IsBlockLava(a_BlockID);
 }
-
-
-bool cLavaSimulator::IsPassableForFluid(char a_BlockID)
-{
-	return ( a_BlockID == E_BLOCK_AIR || IsAllowedBlock(a_BlockID) );
-}

@@ -29,7 +29,7 @@ public:
 	Direction GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over = true);
 
 	virtual inline bool IsAllowedBlock( char a_BlockID ) = 0;
-	virtual inline bool IsPassableForFluid( char a_BlockID ) = 0;
+	virtual inline bool IsPassableForFluid( char a_BlockID );
 
 protected:
 	virtual void AddBlock( int a_X, int a_Y, int a_Z);

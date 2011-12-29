@@ -14,9 +14,10 @@ public:
 	virtual void Simulate( float a_Dt );
 
 	virtual inline bool IsAllowedBlock( char a_BlockID );
-	virtual inline bool IsBurnable( char a_BlockID );
 
+	virtual inline bool IsBurnable( char a_BlockID );
 	virtual inline bool IsForeverBurnable( char a_BlockID );
+	virtual inline bool FiresForever( char a_BlockID );
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z);
