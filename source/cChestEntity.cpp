@@ -5,14 +5,21 @@
 #include "cMCLogger.h"
 #include "cPlayer.h"
 #include "cWindow.h"
+#include "cWorld.h"
+#include "cRoot.h"
 #include "cPickup.h"
 #include "cMCLogger.h"
 #include "cChunk.h"
+
+class cWorld;
+class cRoot;
 
 #include <json/json.h>
 
 cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
 	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z, a_Chunk ) 
+	, m_TopChest( false )
+	, m_JoinedChest( 0 )
 {
 	m_Content = new cItem[ c_ChestHeight*c_ChestWidth ];
 }
@@ -33,7 +40,7 @@ cChestEntity::~cChestEntity()
 void cChestEntity::Destroy()
 {
 	// Drop items
-	for( int i = 0; i < c_ChestHeight*c_ChestWidth; ++i )
+	for( int i = 0; i < c_ChestHeight * c_ChestWidth; ++i )
 	{
 		if( !m_Content[i].IsEmpty() )
 		{
@@ -42,6 +49,8 @@ void cChestEntity::Destroy()
 			m_Content[i].Empty();
 		}
 	}
+	if (m_JoinedChest)
+		m_JoinedChest->RemoveJoinedChest(this);
 }
 
 cItem * cChestEntity::GetSlot( int a_Slot )
@@ -154,19 +163,54 @@ void cChestEntity::UsedBy( cPlayer & a_Player )
 	if( !GetWindow() )
 	{
 		cWindow* Window = new cWindow( this, true );
-		Window->SetSlots( m_Content, c_ChestHeight*c_ChestWidth );
+		Window->SetSlots( GetContents(), GetChestHeight()*c_ChestWidth );
 		Window->SetWindowID( 1 );
 		Window->SetWindowType( cWindow::Chest );
 		Window->SetWindowTitle("UberChest");
+		Window->GetOwner()->SetEntity(this);
 		OpenWindow( Window );
 	}
-	if( GetWindow() )
+	if ( GetWindow() )
 	{
 		if( a_Player.GetWindow() != GetWindow() )
 		{
 			a_Player.OpenWindow( GetWindow() );
-
 			GetWindow()->SendWholeWindow( a_Player.GetClientHandle() );
 		}
 	}
+	cPacket_BlockAction ChestOpen;
+	ChestOpen.m_PosX = GetPosX();
+	ChestOpen.m_PosY = (short)GetPosY();
+	ChestOpen.m_PosZ = GetPosZ();
+	ChestOpen.m_Byte1 = (char)1;
+	ChestOpen.m_Byte2 = (char)1;
+	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+	{
+		if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
+			(*itr)->GetClientHandle()->Send( ChestOpen );
+		}
+	}
+}
+
+cItem *cChestEntity::GetContents(bool a_OnlyThis)
+{
+	if (m_JoinedChest && !a_OnlyThis)
+	{
+		cItem *Combined = new cItem[GetChestHeight()*c_ChestWidth];
+		int i;
+		cItem *first = (m_TopChest) ? GetContents(true) : m_JoinedChest->GetContents(true);
+		cItem *second = (!m_TopChest) ? GetContents(true) :  m_JoinedChest->GetContents(true);
+		for (i=0; i < GetChestHeight()*c_ChestWidth; i++)
+		{
+			int index = i % c_ChestHeight*c_ChestWidth;
+			if (i < c_ChestHeight*c_ChestWidth)
+				Combined[index] = first[index];
+			else
+				Combined[index] = second[index];
+		}
+		return Combined;
+	}
+	else
+		return m_Content;
 }

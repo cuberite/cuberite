@@ -629,7 +629,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						if(PossibleBlock == E_BLOCK_FIRE)
 						{
 							PacketData->m_PosX = pX;
-							PacketData->m_PosY = pY;
+							PacketData->m_PosY = (char)pY;
 							PacketData->m_PosZ = pZ;
 							bBroken = true;
 						}

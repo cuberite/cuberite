@@ -3,6 +3,7 @@
 #include "cBlockEntity.h"
 #include "cWindowOwner.h"
 #include "FileDefine.h"
+#include "packets\cPacket_BlockAction.h"
 
 namespace Json
 {
@@ -35,8 +36,17 @@ public:
 
 	virtual void UsedBy( cPlayer & a_Player );
 
+	cChestEntity *GetJoinedChest() { return m_JoinedChest; }
+	void SetJoinedChest(cChestEntity *a_Chest) { m_JoinedChest = a_Chest; }
+	void RemoveJoinedChest(cChestEntity *a_Chest) { if (m_JoinedChest && m_JoinedChest == a_Chest) { m_JoinedChest = NULL; m_TopChest = false; } }
+
+	int GetChestHeight() { return ((m_JoinedChest) ? c_ChestHeight * 2 : c_ChestHeight); }
+	cItem *GetContents(bool a_OnlyThis = false);
+
 	static const int c_ChestWidth = 9;
 	static const int c_ChestHeight = 3;
 private:
 	cItem* m_Content;
+	bool m_TopChest;
+	cChestEntity *m_JoinedChest;
 };

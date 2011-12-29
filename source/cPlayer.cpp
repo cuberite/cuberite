@@ -32,6 +32,7 @@
 #include "packets/cPacket_Chat.h"
 #include "packets/cPacket_NewInvalidState.h"
 #include "packets/cPacket_PlayerListItem.h"
+#include "packets/cPacket_BlockAction.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -377,8 +378,7 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 
 void cPlayer::CloseWindow(char a_WindowType)
 {
-	if( m_CurrentWindow ) m_CurrentWindow->Close( *this );
-	if (a_WindowType == 0) {
+	if (a_WindowType == 0) { // Inventory
 		if(GetInventory().GetWindow()->GetDraggingItem() && GetInventory().GetWindow()->GetDraggingItem()->m_ItemCount > 0)
 		{
 			LOG("Player holds item! Dropping it...");
@@ -400,6 +400,23 @@ void cPlayer::CloseWindow(char a_WindowType)
 			Item->Empty();
 		}
 	}
+	if (a_WindowType == 1 && strcmp(m_CurrentWindow->GetWindowTitle().c_str(), "UberChest") == 0) { // Chest
+		cBlockEntity *block = m_CurrentWindow->GetOwner()->GetEntity();
+		cPacket_BlockAction ChestClose;
+		ChestClose.m_PosX = block->GetPosX();
+		ChestClose.m_PosY = (short)block->GetPosY();
+		ChestClose.m_PosZ = block->GetPosZ();
+		ChestClose.m_Byte1 = 1;
+		ChestClose.m_Byte2 = 0;
+		cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+		{
+			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
+				(*itr)->GetClientHandle()->Send( ChestClose );
+			}
+		}
+	}
+	if( m_CurrentWindow ) m_CurrentWindow->Close( *this );
 	m_CurrentWindow = 0;
 }
 

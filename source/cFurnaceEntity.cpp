@@ -69,6 +69,7 @@ void cFurnaceEntity::UsedBy( cPlayer & a_Player )
 		cWindow* Window = new cFurnaceWindow( this );
 		Window->SetSlots( m_Items, 3 );
 		Window->SetWindowTitle("UberFurnace");
+		Window->GetOwner()->SetEntity(this);
 		OpenWindow( Window );
 	}
 	if( GetWindow() )
