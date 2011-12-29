@@ -72,7 +72,8 @@ bool cSandSimulator::IsPassable( char a_BlockID )
 {
 	return a_BlockID == E_BLOCK_AIR
 		|| IsBlockWater(a_BlockID)
-		|| IsBlockLava(a_BlockID);
+		|| IsBlockLava(a_BlockID)
+		|| a_BlockID == E_BLOCK_FIRE;
 
 }
 

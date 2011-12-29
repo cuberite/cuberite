@@ -26,6 +26,7 @@ cPawn::cPawn()
 	, m_bBurnable(true)
 	, m_MetaData(NORMAL)
 	, m_FireDamageInterval(0.f)
+	, m_BurnPeriod(0.f)
 {
 	SetMaxHealth(20);
 	SetMaxFoodLevel(125);
@@ -125,17 +126,20 @@ void cPawn::SetMetaData(MetaData a_MetaData)
 void cPawn::CheckMetaDataBurn()
 {
 	char Block = GetWorld()->GetBlock((int) m_Pos->x, (int) m_Pos->y, (int) m_Pos->z);
-
 	char BlockAbove = GetWorld()->GetBlock((int) m_Pos->x, (int) m_Pos->y + 1, (int) m_Pos->z);
+	char BlockBelow = GetWorld()->GetBlock((int) m_Pos->x, (int) m_Pos->y - 1, (int) m_Pos->z);
+	
 	if(GetMetaData() == BURNING
 		&& (IsBlockWater(Block)
-		|| IsBlockWater(BlockAbove)))
+		|| IsBlockWater(BlockAbove)
+		|| IsBlockWater(BlockBelow)))
 	{
 		SetMetaData(NORMAL);
-	}else if(m_bBurnable && GetMetaData() != BURNING
+ 	}else if(m_bBurnable && GetMetaData() != BURNING
 		&& (IsBlockLava(Block) || Block == E_BLOCK_FIRE
-		|| IsBlockLava(BlockAbove) || BlockAbove == E_BLOCK_FIRE)) {
-		SetMetaData(BURNING);
+		|| IsBlockLava(BlockAbove) || BlockAbove == E_BLOCK_FIRE
+		|| IsBlockLava(BlockBelow) || BlockBelow == E_BLOCK_FIRE)) {
+		SetMetaData(BURNING);  
 	}
 }
 

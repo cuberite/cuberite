@@ -87,7 +87,7 @@ void cMonsterConfig::AssignAttributes(cMonster *m, const char* n)
 			m->SetAttackRange(itr->m_AttackRange);
 			m->SetSightDistance(itr->m_SightDistance);
 			m->SetAttackRate((int)itr->m_AttackRate);
-			m->SetMaxHealth((int)itr->m_AttackRate);
+			m->SetMaxHealth((int)itr->m_MaxHealth);
 		}
 	}
 }
