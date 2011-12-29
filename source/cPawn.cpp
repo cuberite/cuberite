@@ -28,6 +28,7 @@ cPawn::cPawn()
 	, m_FireDamageInterval(0.f)
 {
 	SetMaxHealth(20);
+	SetMaxFoodLevel(125);
 }
 
 cPawn::~cPawn()
@@ -175,4 +176,10 @@ void cPawn::SetMaxHealth(short a_MaxHealth)
 	m_Health = a_MaxHealth;
 }
 
+void cPawn::SetMaxFoodLevel(short a_MaxFoodLevel)
+{
+	m_MaxFoodLevel = a_MaxFoodLevel;
 
+	//Reset food level
+	m_FoodLevel = a_MaxFoodLevel;
+}

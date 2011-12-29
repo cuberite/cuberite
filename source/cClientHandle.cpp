@@ -784,51 +784,63 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					switch( Item.m_ItemID )
 					{
 					case E_ITEM_APPLE:
-						m_Player->Heal( 4 ); // 2 hearts
+						//m_Player->Heal( 4 ); // 2 hearts
+						m_Player->Feed( 24 ); // 2 food bars
 						bEat = true;
 						break;
 					case E_ITEM_GOLDEN_APPLE:
-						m_Player->Heal( 20 ); // 10 hearts
+						//m_Player->Heal( 20 ); // 10 hearts
+						m_Player->Feed(60); // 5 food
 						bEat = true;
 						break;
 					case E_ITEM_MUSHROOM_SOUP:
-						m_Player->Heal( 10 ); // 5 hearts
+						///m_Player->Heal( 10 ); // 5 hearts
+						m_Player->Feed( 48 ); // 4 food
 						bEat = true;
 						break;
 					case E_ITEM_BREAD:
-						m_Player->Heal( 5 ); // 2.5 hearts
+						//m_Player->Heal( 5 ); // 2.5 hearts
+						m_Player->Feed( 30 ); // 2.5 food
 						bEat = true;
 						break;
 					case E_ITEM_RAW_MEAT:
-						m_Player->Heal( 3 ); // 1.5 hearts
+						//m_Player->Heal( 3 ); // 1.5 hearts
+						m_Player->Feed( 18 ); // 1.5 food
 						bEat = true;
 						break;
 					case E_ITEM_COOKED_MEAT:
-						m_Player->Heal( 8 ); // 4 hearts
+						//m_Player->Heal( 8 ); // 4 hearts
+						m_Player->Feed( 48 ); // 4 food
 						bEat = true;
 						break;
 					case E_ITEM_RAW_FISH:
-						m_Player->Heal( 2 ); // 1 heart
+						//m_Player->Heal( 2 ); // 1 heart
+						m_Player->Feed( 12 ); // 1 food
 						bEat = true;
 						break;
 					case E_ITEM_COOKED_FISH:
-						m_Player->Heal( 5 ); // 2.5 hearts
+						//m_Player->Heal( 5 ); // 2.5 hearts
+						m_Player->Feed( 30 ); // 2.5 food
 						bEat = true;
 						break;
 					case E_ITEM_RAW_CHICKEN:
-						m_Player->Heal(3);
+						//m_Player->Heal(3);
+						m_Player->Feed( 12 ); // 1 food
 						bEat = true;
 						break;
 					case E_ITEM_COOKED_CHICKEN:
-						m_Player->Heal( 8 );
+						//m_Player->Heal( 8 );
+						m_Player->Feed( 36 ); // 3 food
 						bEat = true;
 						break;
 					case E_ITEM_RAW_BEEF:
-						m_Player->Heal(3);
+						//m_Player->Heal(3);
+						m_Player->Feed( 18 ); // 1.5 food
 						bEat = true;
 						break;
 					case E_ITEM_STEAK:
-						m_Player->Heal( 8 );
+						//m_Player->Heal( 8 );
+						m_Player->Feed( 48 ); // 4 food
 						bEat = true;
 						break;
 					default:
@@ -1293,7 +1305,12 @@ void cClientHandle::Tick(float a_Dt)
 		m_Player->GetInventory().SendWholeInventory( this );
 
 		// Send health
-		Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
+		cPacket_UpdateHealth Health;
+		Health.m_Health = (short)m_Player->GetHealth();
+		Health.m_Food = m_Player->GetFood();
+		Health.m_Saturation = m_Player->GetFoodSaturation();
+		Send(Health);
+		//Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
 		World->UnlockEntities();
 	}

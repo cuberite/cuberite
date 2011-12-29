@@ -81,6 +81,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 {
 	m_EntityType = E_PLAYER;
 	SetMaxHealth(20);
+	SetMaxFoodLevel(125);
 	m_Inventory = new cInventory( this );
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
@@ -290,6 +291,22 @@ void cPlayer::Heal( int a_Health )
 
 		cPacket_UpdateHealth Health;
 		Health.m_Health = m_Health;
+		Health.m_Food = GetFood();
+		Health.m_Saturation = GetFoodSaturation();
+		m_ClientHandle->Send( Health );
+	}
+}
+
+void cPlayer::Feed( short a_Food )
+{
+	if( m_FoodLevel < GetMaxFoodLevel() )
+	{
+		m_FoodLevel = MIN(a_Food + m_FoodLevel, GetMaxFoodLevel());
+
+		cPacket_UpdateHealth Health;
+		Health.m_Health = m_Health;
+		Health.m_Food = GetFood();
+		Health.m_Saturation = GetFoodSaturation();
 		m_ClientHandle->Send( Health );
 	}
 }
@@ -301,6 +318,8 @@ void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 
 		cPacket_UpdateHealth Health;
 		Health.m_Health = m_Health;
+		Health.m_Food = GetFood();
+		Health.m_Saturation = GetFoodSaturation();
 		//TODO: Causes problems sometimes O.o (E.G. Disconnecting when attacked)
 		if(m_ClientHandle != 0)
 			m_ClientHandle->Send( Health );
@@ -772,6 +791,7 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 		}
 
 		m_Health = (short)root.get("health", 0 ).asInt();
+		m_FoodLevel = (short)root.get("food", 0 ).asInt();
 		m_Inventory->LoadFromJson(root["inventory"]);
 
 		m_pState->LoadedWorldName = root.get("world", "world").asString();
@@ -804,6 +824,7 @@ bool cPlayer::SaveToDisk()
 	root["rotation"] = JSON_PlayerRotation;
 	root["inventory"] = JSON_Inventory;
 	root["health"] = m_Health;
+	root["food"] = m_FoodLevel;
 	root["world"] = GetWorld()->GetName();
 
 	Json::StyledWriter writer;
