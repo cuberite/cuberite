@@ -1362,6 +1362,9 @@
     <None Include="..\source\cNoise.inc">
       <Filter>cNoise</Filter>
     </None>
+    <None Include="..\source\cChunk.inl.h">
+      <Filter>cChunk</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MCServer.rc" />

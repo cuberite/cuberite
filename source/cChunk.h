@@ -1,5 +1,14 @@
 #pragma once
 
+#define C_CHUNK_USE_INLINE 1
+
+// Do not touch
+#if C_CHUNK_USE_INLINE
+# define __C_CHUNK_INLINE__ inline
+#else
+# define __C_CHUNK_INLINE__
+#endif
+
 #include <list>
 
 namespace Json
@@ -129,3 +138,7 @@ private:
 
 	cCriticalSection* m_EntitiesCriticalSection;
 };
+
+#if C_CHUNK_USE_INLINE
+# include "cChunk.inl.h"
+#endif

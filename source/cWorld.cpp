@@ -415,8 +415,8 @@ void cWorld::Tick(float a_Dt)
 		{
 			LOG("Destroy that entity! %i", (*itr)->GetUniqueID() );
 			cEntity* RemoveMe = *itr;
-			itr++;
-			AddToRemoveEntityQueue( *RemoveMe );
+			itr = m_pState->AllEntities.erase( itr );
+			m_pState->RemoveEntityQueue.push_back( RemoveMe ); 
 			continue;
 		}
 		(*itr)->Tick(a_Dt);

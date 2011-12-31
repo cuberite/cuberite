@@ -526,6 +526,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg" />
+    <None Include="..\source\cChunk.inl.h" />
     <None Include="..\source\cNoise.inc" />
     <None Include="icon.ico" />
   </ItemGroup>

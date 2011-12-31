@@ -516,25 +516,19 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cPacket_Chat Joined( m_pState->Username + " joined the game!");
 					cRoot::Get()->GetServer()->Broadcast( Joined, this );
 				}
-				int posx = (int) m_Player->GetPosX();
-				int posy = (int) m_Player->GetPosY();
-				int posz = (int) m_Player->GetPosZ();
+
 				// Now initialize player (adds to entity list etc.)
 				cWorld* PlayerWorld = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
 				if( !PlayerWorld ) PlayerWorld = cRoot::Get()->GetDefaultWorld();
-				m_Player->Initialize( PlayerWorld ); // TODO - Get correct world for player
-
-				// Broadcasts to all but this ( this is actually handled in cChunk.cpp, after entity is added to the chunk )
-				//m_Player->SpawnOn( 0 );
-
-				// Send all already connected players to new player
-				//cRoot::Get()->GetServer()->SendAllEntitiesTo( this );
+				m_Player->Initialize( PlayerWorld );
 
 				// Then we can start doing more stuffs! :D
 				m_bLoggedIn = true;
 				LOG("%s completely logged in", GetUsername() );
-				m_Player->TeleportTo( posx, posy, posz );
 				StreamChunks();
+
+				// Send position
+				Send( cPacket_PlayerMoveLook( m_Player ) );
 			}
 			break;
 		case E_KEEP_ALIVE:
@@ -1268,7 +1262,7 @@ void cClientHandle::Tick(float a_Dt)
 		// Spawn player (only serversided, so data is loaded)
 		m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
 
-		cWorld* World = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() ); // TODO - Get the correct world or better yet, move this to the main thread so we don't have to lock anything
+		cWorld* World = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
 		if( !World ) World = cRoot::Get()->GetDefaultWorld();
 		World->LockEntities();
 		m_Player->LoginSetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
@@ -1295,9 +1289,6 @@ void cClientHandle::Tick(float a_Dt)
 			Send( RainPacket );
 		}
 
-		// Send position
-		Send( cPacket_PlayerMoveLook( m_Player ) );
-
 		// Send time
 		Send( cPacket_TimeUpdate( World->GetWorldTime() ) );
 
@@ -1310,7 +1301,6 @@ void cClientHandle::Tick(float a_Dt)
 		Health.m_Food = m_Player->GetFood();
 		Health.m_Saturation = m_Player->GetFoodSaturation();
 		Send(Health);
-		//Send( cPacket_UpdateHealth( (short)m_Player->GetHealth() ) );
 
 		World->UnlockEntities();
 	}
