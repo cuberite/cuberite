@@ -3,8 +3,7 @@
 #include "cInventory.h"
 
 class cSurvivalInventory										//tolua_export
-	: public cInventory	
-	, public cWindowOwner	
+	: public cInventory
 {														//tolua_export
 public:
 	cSurvivalInventory(cPlayer* a_Owner);

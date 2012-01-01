@@ -11,20 +11,13 @@
 
 cSurvivalInventory::~cSurvivalInventory()
 {
-	if( GetWindow() ) GetWindow()->Close( *m_Owner );
-	CloseWindow();
+	
 }
 
 cSurvivalInventory::cSurvivalInventory(cPlayer* a_Owner)
 	: cInventory(a_Owner)
 {
-	if( !GetWindow() )
-	{
-		cWindow* Window = new cWindow( this, false );
-		Window->SetSlots( m_Slots, c_NumSlots );
-		Window->SetWindowID( 0 );
-		OpenWindow( Window );
-	}
+	
 }
 
 void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )

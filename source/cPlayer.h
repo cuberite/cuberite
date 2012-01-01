@@ -31,8 +31,7 @@ public:
 	Vector3d GetEyePosition();												//tolua_export
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline const double & GetStance() { return m_Stance; }					//tolua_export
-	cInventory & GetInventory() { if(GetGameMode() == 0) return *m_Inventory; else return *m_CreativeInventory; }					//tolua_export
-	cSurvivalInventory & GetSurvivalInventory() { return *m_Inventory; }					//tolua_export
+	inline cInventory & GetInventory() { if(GetGameMode() == 0) return *m_Inventory; else return *m_CreativeInventory; }					//tolua_export
 
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
 

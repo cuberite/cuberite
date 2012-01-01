@@ -48,7 +48,7 @@ cItem* cWindow::GetDraggingItem( cPlayer * a_Player /* = 0 */ )
 {
 	if( m_bInventoryVisible && a_Player )
 	{
-		cWindow* Window = a_Player->GetSurvivalInventory().GetWindow();
+		cWindow* Window = a_Player->GetInventory().GetWindow();
 		if( Window )
 		{
 			return Window->GetDraggingItem();
@@ -68,7 +68,7 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 
 	if( m_bInventoryVisible )
 	{
-		cWindow* Window = a_Player.GetSurvivalInventory().GetWindow();
+		cWindow* Window = a_Player.GetInventory().GetWindow();
 		if( Window )
 		{
 			m_DraggingItem = Window->GetDraggingItem();
@@ -170,7 +170,7 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 	{
 		a_ClickPacket->m_WindowID = 0;
 		a_ClickPacket->m_SlotNum -= (short)(m_NumSlots - 9);
-		cWindow* Window = a_Player.GetSurvivalInventory().GetWindow();
+		cWindow* Window = a_Player.GetInventory().GetWindow();
 		if( Window )
 		{
 			Window->Clicked( a_ClickPacket, a_Player );

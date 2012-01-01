@@ -18,6 +18,8 @@ cInventory::~cInventory()
 {
 	delete [] m_Slots;
 	delete m_EquippedItem;
+	if( GetWindow() ) GetWindow()->Close( *m_Owner );
+	CloseWindow();
 }
 
 cInventory::cInventory(cPlayer* a_Owner)
@@ -35,6 +37,14 @@ cInventory::cInventory(cPlayer* a_Owner)
 
 	m_EquippedItem = new cItem();
 	m_EquippedSlot = 0;
+
+	if( !GetWindow() )
+	{
+		cWindow* Window = new cWindow( this, false );
+		Window->SetSlots( m_Slots, c_NumSlots );
+		Window->SetWindowID( 0 );
+		OpenWindow( Window );
+	}
 }
 
 bool cInventory::AddItem( cItem & a_Item )

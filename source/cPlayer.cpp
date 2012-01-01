@@ -97,6 +97,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	if( !LoadFromDisk() )
 	{
 		m_Inventory->Clear();
+		m_CreativeInventory->Clear();
 		SetPosX( cRoot::Get()->GetDefaultWorld()->GetSpawnX() );
 		SetPosY( cRoot::Get()->GetDefaultWorld()->GetSpawnY() );
 		SetPosZ( cRoot::Get()->GetDefaultWorld()->GetSpawnZ() );
@@ -425,23 +426,27 @@ void cPlayer::CloseWindow(char a_WindowType)
 			Item->Empty();
 		}
 	}
-	if (a_WindowType == 1 && strcmp(m_CurrentWindow->GetWindowTitle().c_str(), "UberChest") == 0) { // Chest
-		cBlockEntity *block = m_CurrentWindow->GetOwner()->GetEntity();
-		cPacket_BlockAction ChestClose;
-		ChestClose.m_PosX = block->GetPosX();
-		ChestClose.m_PosY = (short)block->GetPosY();
-		ChestClose.m_PosZ = block->GetPosZ();
-		ChestClose.m_Byte1 = 1;
-		ChestClose.m_Byte2 = 0;
-		cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-		{
-			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-				(*itr)->GetClientHandle()->Send( ChestClose );
+	if (m_CurrentWindow)
+	{
+		if (a_WindowType == 1 && strcmp(m_CurrentWindow->GetWindowTitle().c_str(), "UberChest") == 0) { // Chest
+			cBlockEntity *block = m_CurrentWindow->GetOwner()->GetEntity();
+			cPacket_BlockAction ChestClose;
+			ChestClose.m_PosX = block->GetPosX();
+			ChestClose.m_PosY = (short)block->GetPosY();
+			ChestClose.m_PosZ = block->GetPosZ();
+			ChestClose.m_Byte1 = 1;
+			ChestClose.m_Byte2 = 0;
+			cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
+			for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+			{
+				if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
+					(*itr)->GetClientHandle()->Send( ChestClose );
+				}
 			}
 		}
+		
+		m_CurrentWindow->Close( *this );
 	}
-	if( m_CurrentWindow ) m_CurrentWindow->Close( *this );
 	m_CurrentWindow = 0;
 }
 
@@ -457,14 +462,24 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 void cPlayer::SetGameMode( int a_GameMode )
 {
-	if ( (a_GameMode < 2) && (a_GameMode >= 0) ) {
-		if (m_GameMode != a_GameMode) {
+	if ( (a_GameMode < 2) && (a_GameMode >= 0) )
+	{
+		if (m_GameMode != a_GameMode)
+		{
+			cInventory *OldInventory = 0;
+			if(m_GameMode == 0)
+				OldInventory = m_Inventory;
+			else
+				OldInventory = m_CreativeInventory;
+
 			m_GameMode = a_GameMode;
 			cPacket_NewInvalidState GameModePacket;
 			GameModePacket.m_Reason = 3; //GameModeChange
 			GameModePacket.m_GameMode = (char)a_GameMode; //GameModeChange
 			m_ClientHandle->Send ( GameModePacket );
 			GetInventory().SendWholeInventory(m_ClientHandle);
+			
+			OldInventory->SetEquippedSlot(GetInventory().GetEquippedSlot());
 		}
 	}
 }
@@ -658,7 +673,7 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 {
 	if( a_bDraggingItem )
 	{
-		cItem* Item = GetSurvivalInventory().GetWindow()->GetDraggingItem();
+		cItem* Item = GetInventory().GetWindow()->GetDraggingItem();
 		if( Item->m_ItemID > 0 && Item->m_ItemCount >= a_Amount )
 		{
 			float vX = 0, vY = 0, vZ = 0;
@@ -778,7 +793,7 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 		{
 			LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile);
 		}
-
+		
 		delete [] buffer;
 
 		Json::Value & JSON_PlayerPosition = root["position"];
@@ -800,6 +815,7 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 		m_Health = (short)root.get("health", 0 ).asInt();
 		m_FoodLevel = (short)root.get("food", 0 ).asInt();
 		m_Inventory->LoadFromJson(root["inventory"]);
+		m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
 
 		m_pState->LoadedWorldName = root.get("world", "world").asString();
 		
@@ -826,10 +842,14 @@ bool cPlayer::SaveToDisk()
 	Json::Value JSON_Inventory;
 	m_Inventory->SaveToJson( JSON_Inventory );
 
+	Json::Value JSON_CreativeInventory;
+	m_CreativeInventory->SaveToJson( JSON_CreativeInventory );
+
 	Json::Value root;
 	root["position"] = JSON_PlayerPosition;
 	root["rotation"] = JSON_PlayerRotation;
 	root["inventory"] = JSON_Inventory;
+	root["creativeinventory"] = JSON_CreativeInventory;
 	root["health"] = m_Health;
 	root["food"] = m_FoodLevel;
 	root["world"] = GetWorld()->GetName();

@@ -15,6 +15,7 @@ class cPlayer;
 class cPacket;
 class cPacket_EntityEquipment;
 class cInventory										//tolua_export	
+	: public cWindowOwner	
 {														//tolua_export
 public:
 	cInventory(cPlayer* a_Owner);
@@ -39,6 +40,7 @@ public:
 
 	cItem & GetEquippedItem();							//tolua_export
 	void SetEquippedSlot( int a_SlotNum );				//tolua_export
+	short GetEquippedSlot() { return m_EquippedSlot; }	//tolua_export
 
 	virtual void Clicked( cPacket* a_ClickPacket ) = 0;
 
