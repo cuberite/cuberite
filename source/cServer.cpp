@@ -470,7 +470,7 @@ void cServer::ServerCommand( const char* a_Cmd )
 		}
 		if( split[0].compare( "numchunks" ) == 0 )
 		{
-			//printf("Num loaded chunks: %i\n", cRoot::Get()->GetWorld()->GetChunks().size() );
+			printf("Num loaded chunks: %i\n", cRoot::Get()->GetWorld()->GetNumChunks() );
 			return;
 		}
 		if(split[0].compare("monsters") == 0 ){

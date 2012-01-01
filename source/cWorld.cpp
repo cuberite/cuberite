@@ -434,7 +434,8 @@ void cWorld::Tick(float a_Dt)
 		//LOG("Spreading: %p", Chunk );
 		Chunk->SpreadLight( Chunk->pGetSkyLight() );
 		Chunk->SpreadLight( Chunk->pGetLight() );
-		m_pState->SpreadQueue.remove( &*Chunk );
+		m_pState->SpreadQueue.remove( Chunk );
+		Chunk->RemoveReference();
 		TimesSpreaded++;
 	}
 	if( TimesSpreaded >= 50 )
@@ -676,6 +677,7 @@ void cWorld::UnloadUnusedChunks()
 	m_LastUnload = m_Time;
 
 	LockChunks();
+	LOGINFO("Unloading unused chunks");
 	m_ChunkMap->UnloadUnusedChunks();
 	UnlockChunks();
 }
@@ -1055,13 +1057,18 @@ void cWorld::ReSpreadLighting( cChunk* a_Chunk )
 	LockChunks();
 	m_pState->SpreadQueue.remove( a_Chunk );
 	m_pState->SpreadQueue.push_back( a_Chunk );
+#define STRINGIZE(x) #x
+	a_Chunk->AddReference( __FILE__ ": " STRINGIZE(__LINE__) );
 	UnlockChunks();
 }
 
 void cWorld::RemoveSpread( cChunk* a_Chunk )
 {
 	LockChunks();
+	size_t SizeBefore = m_pState->SpreadQueue.size();
 	m_pState->SpreadQueue.remove( a_Chunk );
+	if( SizeBefore != m_pState->SpreadQueue.size() )
+		a_Chunk->RemoveReference();
 	UnlockChunks();
 }
 
@@ -1101,4 +1108,11 @@ void cWorld::AddToRemoveEntityQueue( cEntity & a_Entity )
 const char* cWorld::GetName()
 {
 	return m_pState->WorldName.c_str();
+}
+int cWorld::GetNumChunks()
+{
+	LockChunks();
+	int NumChunks = m_ChunkMap->GetNumChunks();
+	UnlockChunks();
+	return NumChunks;
 }

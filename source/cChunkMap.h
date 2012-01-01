@@ -22,6 +22,8 @@ public:
 	void SaveAllChunks();
 
 	cWorld* GetWorld() { return m_World; }
+
+	int GetNumChunks();
 private:
 	class cChunkData
 	{

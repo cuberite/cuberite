@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/01/12 05:42:24.
+** Generated automatically by tolua++-1.0.92 on 01/01/12 17:14:14.
 */
 
 #ifndef __cplusplus
@@ -8907,6 +8907,69 @@ static int tolua_AllToLua_cWorld_GetName00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SaveAllChunks of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SaveAllChunks00
+static int tolua_AllToLua_cWorld_SaveAllChunks00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SaveAllChunks'", NULL);
+#endif
+  {
+   self->SaveAllChunks();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SaveAllChunks'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetNumChunks of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetNumChunks00
+static int tolua_AllToLua_cWorld_GetNumChunks00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetNumChunks'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetNumChunks();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetNumChunks'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: CastThunderbolt of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_CastThunderbolt00
 static int tolua_AllToLua_cWorld_CastThunderbolt00(lua_State* tolua_S)
@@ -16108,6 +16171,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GetWorldSeed",tolua_AllToLua_cWorld_GetWorldSeed00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cWorld_GetName00);
+   tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cWorld_SaveAllChunks00);
+   tolua_function(tolua_S,"GetNumChunks",tolua_AllToLua_cWorld_GetNumChunks00);
    tolua_function(tolua_S,"CastThunderbolt",tolua_AllToLua_cWorld_CastThunderbolt00);
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
    tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);

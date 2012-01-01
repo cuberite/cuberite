@@ -462,7 +462,7 @@ void cChunkMap::UnloadUnusedChunks()
 		for( int i = 0; i < LAYER_SIZE*LAYER_SIZE; ++i )
 		{
 			cChunk* Chunk = Layer.m_Chunks[i].m_LiveChunk;
-			if( Chunk && Chunk->GetClients().size() == 0 )
+			if( Chunk && Chunk->GetClients().size() == 0 && Chunk->GetReferenceCount() <= 0 )
 			{
 			    Chunk->SaveToDisk();
 				World->RemoveSpread( Chunk );
@@ -715,4 +715,14 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		//LOGWARN("Could not open file %s", SourceFile );
 	}
 	return 0;
+}
+
+int cChunkMap::GetNumChunks()
+{
+	int NumChunks = 0;
+	for( int i = 0; i < m_NumLayers; ++i )
+	{
+		NumChunks += m_Layers[i].m_NumChunksLoaded;
+	}
+	return NumChunks;
 }

@@ -127,7 +127,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	, m_pState( new sClientHandleState )
 	, m_Ping(1000)
 {
-    LOG("cClientHandle::cClientHandle");
+	LOG("cClientHandle::cClientHandle");
 	
 	cTimer t1;
 	m_LastPingTime = t1.GetNowTime();
@@ -239,9 +239,9 @@ cClientHandle::~cClientHandle()
 	if(m_Player)
 	{
 		m_Player->SetClientHandle( 0 );
- 		m_Player->Destroy();
- 		m_Player = 0;
- 	}
+		m_Player->Destroy();
+		m_Player = 0;
+	}
 	for(int i = 0; i < 256; i++)
 	{
 		if( m_pState->PacketMap[i] )
@@ -990,7 +990,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						LOG("Dir: %i", PacketData->m_Direction);
 						if( PacketData->m_Direction == 1 )
 						{
-						    LOG("Player Rotation: %f", m_Player->GetRotation() );
+							LOG("Player Rotation: %f", m_Player->GetRotation() );
 							MetaData = cSign::RotationToMetaData( m_Player->GetRotation() );
 							LOG("Sign rotation %i", MetaData);
 							PacketData->m_ItemType = E_BLOCK_SIGN_POST;
@@ -1215,7 +1215,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_DISCONNECT:
 			{
-			    LOG("Received d/c packet from %s", GetUsername() );
+				LOG("Received d/c packet from %s", GetUsername() );
 				cPacket_Disconnect* PacketData = reinterpret_cast<cPacket_Disconnect*>(a_Packet);
 				if( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_DISCONNECT, 2, PacketData->m_Reason.c_str(), m_Player ) )
 				{
@@ -1237,7 +1237,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			}
 			break;
 			default:
-                break;
+				break;
 		}
 	}
 }
@@ -1362,7 +1362,7 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 						}
 					}
 					break;
-                default:
+				default:
 					break;
 				}
 				if( bBreak )

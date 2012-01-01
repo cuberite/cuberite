@@ -134,7 +134,8 @@ public:
 		if(a_Z < 0 && a_Z % 16 != 0) a_ChunkZ--;
 	}
 
-	void SaveAllChunks();
+	void SaveAllChunks();	//tolua_export
+	int GetNumChunks();		//tolua_export
 
 	void Tick(float a_Dt);
 

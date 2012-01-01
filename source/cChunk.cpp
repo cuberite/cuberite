@@ -52,12 +52,18 @@
 extern bool g_bWaterPhysics;
 
 
+typedef std::map< int, std::string > ReferenceMap;
 typedef std::list< cFurnaceEntity* > FurnaceEntityList;
 typedef std::list< cClientHandle* > ClientHandleList;
 typedef std::list< cBlockEntity* > BlockEntityList;
 typedef std::list< cEntity* > EntityList;
 struct cChunk::sChunkState
 {
+	sChunkState()
+		: TotalReferencesEver( 0 )
+		, MinusReferences( 0 )
+	{}
+
 	FurnaceEntityList TickBlockEntities;
 	std::map< unsigned int, int > ToTickBlocks;		// Protected by BlockListCriticalSection
 	std::vector< unsigned int > PendingSendBlocks;	// Protected by BlockListCriticalSection
@@ -67,6 +73,12 @@ struct cChunk::sChunkState
 	EntityList Entities;
 
 	cCriticalSection BlockListCriticalSection;
+
+	// Reference counting
+	cCriticalSection ReferenceCriticalSection;
+	ReferenceMap References;
+	int MinusReferences;	// References.size() - MinusReferences = Actual amount of references. This is due to removal of reference without an ID (don't know which to remove, so remove none)
+	int TotalReferencesEver; // For creating a unique reference ID
 };
 
 cChunk::~cChunk()
@@ -76,6 +88,13 @@ cChunk::~cChunk()
 	{
 		LOGWARN("WARNING: Deleting cChunk while it contains %i clients!", m_pState->LoadedByClient.size() );
 	}
+
+	m_pState->ReferenceCriticalSection.Lock();
+	if( GetReferenceCount() > 0 )
+	{
+		LOGWARN("WARNING: Deleting cChunk while it still has %i references!", GetReferenceCount() );
+	}
+	m_pState->ReferenceCriticalSection.Unlock();
 
 	m_pState->BlockListCriticalSection.Lock();
 	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
@@ -1158,6 +1177,63 @@ void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, i
 	a_Z = m_PosZ * 16 + a_ChunkZ;
 }
 
+int cChunk::AddReference( const char* a_Info /* = 0 */ )
+{
+	m_pState->ReferenceCriticalSection.Lock();
+
+	m_pState->TotalReferencesEver++;
+
+	std::string Info;
+	if( a_Info ) Info = a_Info;
+
+	m_pState->References[ m_pState->TotalReferencesEver ] = Info;
+	
+	int ID = m_pState->TotalReferencesEver;
+	m_pState->ReferenceCriticalSection.Unlock();
+	return ID;
+}
+
+void cChunk::RemoveReference( int a_ID )
+{
+	m_pState->ReferenceCriticalSection.Lock();
+
+	if( a_ID > -1 )	// Remove reference with an ID
+	{
+		bool bFound = false;
+		for( ReferenceMap::iterator itr = m_pState->References.begin(); itr != m_pState->References.end(); ++itr )
+		{
+			if( itr->first == a_ID )
+			{
+				bFound = true;
+				m_pState->References.erase( itr );
+				break;
+			}
+		}
+
+		if( !bFound )
+		{
+			LOGWARN("WARNING: cChunk: Tried to remove reference %i but it could not be found! May cause memory leak", a_ID );
+		}
+	}
+	else		// No ID so add one to MinusReferences
+	{
+		m_pState->MinusReferences++;
+		if( (int)m_pState->References.size() - m_pState->MinusReferences < 0 )
+		{
+			LOGWARN("WARNING: cChunk: Tried to remove reference %i, but the chunk is not referenced!", a_ID);
+		}
+	}
+
+	m_pState->ReferenceCriticalSection.Unlock();
+}
+
+int cChunk::GetReferenceCount()
+{
+	m_pState->ReferenceCriticalSection.Unlock();
+	int Refs = (int)m_pState->References.size() - m_pState->MinusReferences;
+	m_pState->ReferenceCriticalSection.Lock();
+	return Refs;
+}
 
 #if !C_CHUNK_USE_INLINE
 # include "cChunk.inc"
