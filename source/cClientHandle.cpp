@@ -959,6 +959,11 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							isDoor = true;
 						}
 						break;
+					case E_BLOCK_CHEST:
+					case E_BLOCK_FURNACE:
+					case E_BLOCK_DISPENSER:
+						MetaData = cPiston::RotationPitchToMetaData( m_Player->GetRotation(), 0 ); // Same orientation as pistons, just ignore pitch
+						break;
 					case E_BLOCK_COBBLESTONE_STAIRS:
 					case E_BLOCK_BRICK_STAIRS:
 					case E_BLOCK_STONE_BRICK_STAIRS:
