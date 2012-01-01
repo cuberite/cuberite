@@ -12,10 +12,9 @@ namespace Json
 class cItem;
 class cClientHandle;
 class cPlayer;
-class cPacket_WindowClick;
+class cPacket;
 class cPacket_EntityEquipment;
-class cInventory										//tolua_export
-	: public cWindowOwner		
+class cInventory										//tolua_export	
 {														//tolua_export
 public:
 	cInventory(cPlayer* a_Owner);
@@ -28,7 +27,6 @@ public:
 
 	bool AddItem( cItem & a_Item );						//tolua_export
 	bool RemoveItem( cItem & a_Item );					//tolua_export
-	void DrawInventory();
 
 	void SaveToJson(Json::Value & a_Value);
 	bool LoadFromJson(Json::Value & a_Value);
@@ -42,7 +40,7 @@ public:
 	cItem & GetEquippedItem();							//tolua_export
 	void SetEquippedSlot( int a_SlotNum );				//tolua_export
 
-	void Clicked( cPacket_WindowClick* a_ClickPacket );
+	virtual void Clicked( cPacket* a_ClickPacket ) = 0;
 
 	void SendSlot( int a_SlotNum );						//tolua_export
 
@@ -56,7 +54,8 @@ public:
 	static const unsigned int c_ArmorOffset = 5;
 	static const unsigned int c_MainOffset = 9;
 	static const unsigned int c_HotOffset = 36;
-private:
+
+protected:
 	bool AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode = 0 );
 
 	cItem* m_Slots;

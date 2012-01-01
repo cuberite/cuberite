@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/28/11 01:31:37.
+** Generated automatically by tolua++-1.0.92 on 01/01/12 05:42:24.
 */
 
 #ifndef __cplusplus
@@ -162,50 +162,51 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"Json::Value");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
+ tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
- tolua_usertype(tolua_S,"cRecipeChecker");
- tolua_usertype(tolua_S,"cPacket_Login");
- tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
+ tolua_usertype(tolua_S,"cPacket_Login");
+ tolua_usertype(tolua_S,"cSurvivalInventory");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cMCLogger");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cPacket_PickupSpawn");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cPlugin_Lua");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"Lua__cPlayer");
  tolua_usertype(tolua_S,"cPacket");
  tolua_usertype(tolua_S,"cPacket_BlockDig");
  tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cBlockEntity");
- tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cTCPLink");
- tolua_usertype(tolua_S,"Lua__cPlugin");
  tolua_usertype(tolua_S,"cTCPLink");
+ tolua_usertype(tolua_S,"Lua__cPlugin");
+ tolua_usertype(tolua_S,"cRecipeChecker");
  tolua_usertype(tolua_S,"cPacket_BlockPlace");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"cGroupManager");
- tolua_usertype(tolua_S,"cWorld");
- tolua_usertype(tolua_S,"cIniFile");
+ tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"cIniFile");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
- tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cEntity");
- tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"Lua__cEntity");
+ tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"Vector3d");
 }
@@ -5026,6 +5027,38 @@ static int tolua_AllToLua_cPlayer_GetInventory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetInventory'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetSurvivalInventory of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetSurvivalInventory00
+static int tolua_AllToLua_cPlayer_GetSurvivalInventory00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSurvivalInventory'", NULL);
+#endif
+  {
+   cSurvivalInventory& tolua_ret = (cSurvivalInventory&)  self->GetSurvivalInventory();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cSurvivalInventory");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetSurvivalInventory'.",&tolua_err);
  return 0;
 #endif
 }
@@ -15792,7 +15825,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_INVENTORY_SLOT",E_INVENTORY_SLOT);
   tolua_constant(tolua_S,"E_INVENTORY_WHOLE",E_INVENTORY_WHOLE);
   tolua_constant(tolua_S,"E_INVENTORY_PROGRESS",E_INVENTORY_PROGRESS);
-  tolua_constant(tolua_S,"E_CREATE_INVENTORY_ACTION",E_CREATE_INVENTORY_ACTION);
+  tolua_constant(tolua_S,"E_CREATIVE_INVENTORY_ACTION",E_CREATIVE_INVENTORY_ACTION);
   tolua_constant(tolua_S,"E_UPDATE_SIGN",E_UPDATE_SIGN);
   tolua_constant(tolua_S,"E_PLAYER_LIST_ITEM",E_PLAYER_LIST_ITEM);
   tolua_constant(tolua_S,"E_PING",E_PING);
@@ -15924,6 +15957,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetFlying",tolua_AllToLua_cPlayer_GetFlying00);
    tolua_function(tolua_S,"GetStance",tolua_AllToLua_cPlayer_GetStance00);
    tolua_function(tolua_S,"GetInventory",tolua_AllToLua_cPlayer_GetInventory00);
+   tolua_function(tolua_S,"GetSurvivalInventory",tolua_AllToLua_cPlayer_GetSurvivalInventory00);
    tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPlayer_TeleportTo00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cPlayer_GetGameMode00);
    tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);

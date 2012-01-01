@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cPawn.h"
+#include "cSurvivalInventory.h"
+#include "cCreativeInventory.h"
 #include <list>
 #include <string> // TODO - use const char*
 
@@ -8,6 +10,8 @@ class cGroup;
 class cWindow;
 class cInventory;
 class cClientHandle;
+
+
 class cPlayer :	public cPawn												//tolua_export
 {																			//tolua_export
 public:
@@ -27,7 +31,8 @@ public:
 	Vector3d GetEyePosition();												//tolua_export
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline const double & GetStance() { return m_Stance; }					//tolua_export
-	cInventory & GetInventory() { return *m_Inventory; }					//tolua_export
+	cInventory & GetInventory() { if(GetGameMode() == 0) return *m_Inventory; else return *m_CreativeInventory; }					//tolua_export
+	cSurvivalInventory & GetSurvivalInventory() { return *m_Inventory; }					//tolua_export
 
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
 
@@ -95,7 +100,8 @@ protected:
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
-	cInventory* m_Inventory;
+	cSurvivalInventory* m_Inventory;
+	cCreativeInventory* m_CreativeInventory;
 	cWindow* m_CurrentWindow;
 
 	float m_TimeLastPickupCheck;

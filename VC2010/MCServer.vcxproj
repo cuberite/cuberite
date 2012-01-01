@@ -224,6 +224,7 @@
     <ClCompile Include="..\Source\cChunkMap.cpp" />
     <ClCompile Include="..\source\cCow.cpp" />
     <ClCompile Include="..\source\cCraftingWindow.cpp" />
+    <ClCompile Include="..\source\cCreativeInventory.cpp" />
     <ClCompile Include="..\source\cCreeper.cpp" />
     <ClCompile Include="..\source\cCriticalSection.cpp" />
     <ClCompile Include="..\source\cCuboid.cpp" />
@@ -273,6 +274,7 @@
     <ClCompile Include="..\source\cSpider.cpp" />
     <ClCompile Include="..\source\cSquid.cpp" />
     <ClCompile Include="..\source\cStringMap.cpp" />
+    <ClCompile Include="..\source\cSurvivalInventory.cpp" />
     <ClCompile Include="..\Source\cTCPLink.cpp" />
     <ClCompile Include="..\source\cThread.cpp" />
     <ClCompile Include="..\source\cTimer.cpp" />
@@ -318,7 +320,7 @@
     <ClCompile Include="..\source\packets\cPacket_DestroyEntity.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Disconnect.cpp" />
     <ClCompile Include="..\source\packets\cPacket_EntityEquipment.cpp" />
-    <ClCompile Include="..\source\packets\cPacket_CreateInventoryAction.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_CreativeInventoryAction.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Explosion.cpp" />
     <ClCompile Include="..\source\packets\cPacket_ItemData.cpp" />
     <ClCompile Include="..\source\packets\cPacket_NewInvalidState.cpp" />
@@ -373,6 +375,7 @@
     <ClInclude Include="..\Source\cChunkMap.h" />
     <ClInclude Include="..\source\cCow.h" />
     <ClInclude Include="..\source\cCraftingWindow.h" />
+    <ClInclude Include="..\source\cCreativeInventory.h" />
     <ClInclude Include="..\source\cCreeper.h" />
     <ClInclude Include="..\Source\cCriticalSection.h" />
     <ClInclude Include="..\source\cEnderman.h" />
@@ -422,6 +425,7 @@
     <ClInclude Include="..\source\cSquid.h" />
     <ClInclude Include="..\source\cStairs.h" />
     <ClInclude Include="..\source\cStringMap.h" />
+    <ClInclude Include="..\source\cSurvivalInventory.h" />
     <ClInclude Include="..\Source\cTCPLink.h" />
     <ClInclude Include="..\source\cGenSettings.h" />
     <ClInclude Include="..\source\cThread.h" />
@@ -479,7 +483,7 @@
     <ClInclude Include="..\source\packets\cPacket_DestroyEntity.h" />
     <ClInclude Include="..\source\packets\cPacket_Disconnect.h" />
     <ClInclude Include="..\source\packets\cPacket_EntityEquipment.h" />
-    <ClInclude Include="..\source\packets\cPacket_CreateInventoryAction.h" />
+    <ClInclude Include="..\source\packets\cPacket_CreativeInventoryAction.h" />
     <ClInclude Include="..\source\packets\cPacket_Explosion.h" />
     <ClInclude Include="..\source\packets\cPacket_ItemData.h" />
     <ClInclude Include="..\source\packets\cPacket_NewInvalidState.h" />

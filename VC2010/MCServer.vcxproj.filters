@@ -283,9 +283,6 @@
     <Filter Include="Packets\cPacket_EntityEquipment">
       <UniqueIdentifier>{0f48e5f8-ea4d-41dc-ab9e-750c5912c778}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Packets\cPacket_CreateInventoryAction">
-      <UniqueIdentifier>{0c47e5f8-ea4d-40dc-ac8e-740c5512c768}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Packets\cPacket_NewInvalidState">
       <UniqueIdentifier>{0c12e5f5-ea4d-10dc-ac7e-540c5562c767}</UniqueIdentifier>
     </Filter>
@@ -441,6 +438,15 @@
     </Filter>
     <Filter Include="Simulator\cSimulator\cSandSimulator">
       <UniqueIdentifier>{c5389fa9-20dd-4c52-ac16-2ef0a1115cf1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\cPacket_CreativeInventoryAction">
+      <UniqueIdentifier>{0c47e5f8-ea4d-40dc-ac8e-740c5512c768}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cInventory\cSurvivalInventory">
+      <UniqueIdentifier>{a471def4-c86d-4cc1-bcbb-1004731690bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cInventory\cCreativeInventory">
+      <UniqueIdentifier>{69e6a927-8e49-4d39-af88-f587d17bb8a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -724,9 +730,6 @@
     <ClCompile Include="..\source\packets\cPacket_EntityEquipment.cpp">
       <Filter>Packets\cPacket_EntityEquipment</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\packets\cPacket_CreateInventoryAction.cpp">
-      <Filter>Packets\cPacket_CreateInventoryAction</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_NewInvalidState.cpp">
       <Filter>Packets\cPacket_NewInvalidState</Filter>
     </ClCompile>
@@ -879,6 +882,15 @@
     </ClCompile>
     <ClCompile Include="..\source\cFireSimulator.cpp">
       <Filter>Simulator\cSimulator\cFireSimulator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\packets\cPacket_CreativeInventoryAction.cpp">
+      <Filter>Packets\cPacket_CreativeInventoryAction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cCreativeInventory.cpp">
+      <Filter>cInventory\cCreativeInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cSurvivalInventory.cpp">
+      <Filter>cInventory\cSurvivalInventory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1194,9 +1206,6 @@
     <ClInclude Include="..\source\packets\cPacket_EntityEquipment.h">
       <Filter>Packets\cPacket_EntityEquipment</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\packets\cPacket_CreateInventoryAction.h">
-      <Filter>Packets\cPacket_CreateInventoryAction</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_NewInvalidState.h">
       <Filter>Packets\cPacket_NewInvalidState</Filter>
     </ClInclude>
@@ -1352,6 +1361,15 @@
     </ClInclude>
     <ClInclude Include="..\source\cFireSimulator.h">
       <Filter>Simulator\cSimulator\cFireSimulator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\packets\cPacket_CreativeInventoryAction.h">
+      <Filter>Packets\cPacket_CreativeInventoryAction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cCreativeInventory.h">
+      <Filter>cInventory\cCreativeInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cSurvivalInventory.h">
+      <Filter>cInventory\cSurvivalInventory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

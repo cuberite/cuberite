@@ -60,7 +60,7 @@
 #include "packets/cPacket_PickupSpawn.h"
 #include "packets/cPacket_ItemSwitch.h"
 #include "packets/cPacket_EntityEquipment.h"
-#include "packets/cPacket_CreateInventoryAction.h"
+#include "packets/cPacket_CreativeInventoryAction.h"
 #include "packets/cPacket_NewInvalidState.h"
 #include "packets/cPacket_UseEntity.h"
 #include "packets/cPacket_WindowClose.h"
@@ -151,7 +151,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->PacketMap[E_DISCONNECT]		= new cPacket_Disconnect;
 	m_pState->PacketMap[E_ITEM_SWITCH]		= new cPacket_ItemSwitch;
 	m_pState->PacketMap[E_ENTITY_EQUIPMENT]		= new cPacket_EntityEquipment;
-	m_pState->PacketMap[E_CREATE_INVENTORY_ACTION] 	= new cPacket_CreateInventoryAction;
+	m_pState->PacketMap[E_CREATIVE_INVENTORY_ACTION] 	= new cPacket_CreativeInventoryAction;
 	m_pState->PacketMap[E_NEW_INVALID_STATE] 	= new cPacket_NewInvalidState;
 	m_pState->PacketMap[E_PICKUP_SPAWN]		= new cPacket_PickupSpawn;
 	m_pState->PacketMap[E_USE_ENTITY]		= new cPacket_UseEntity;
@@ -443,11 +443,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				LOGINFO("Got New Invalid State packet");
 			}
 			break;
-		case E_CREATE_INVENTORY_ACTION: // I don't think we need to do anything with this packet, but justin case...
-			{
-				LOGINFO("Got Create Inventory Action packet");
-			}
-			break;
+		
 		case E_PING: // Somebody tries to retrieve information about the server
 			{
 				LOGINFO("Got ping");
@@ -545,6 +541,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 	{
 		switch( a_Packet->m_PacketID )
 		{
+			case E_CREATIVE_INVENTORY_ACTION: // This is for creative Inventory changes
+			{
+				if(m_Player->GetGameMode() == 1)	//Just to be sure
+				{
+					m_Player->GetInventory().Clicked(a_Packet);
+				}
+				break;
+			}
+			break;
 		case E_PLAYERPOS:
 			{
 				cPacket_PlayerPosition* PacketData = reinterpret_cast<cPacket_PlayerPosition*>(a_Packet);
@@ -696,9 +701,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-				//if( (Equipped.m_ItemID != PacketData->m_ItemType) )	// Not valid
 
-				if( (Equipped.m_ItemID != PacketData->m_ItemType) && (m_Player->GetGameMode() != 1) )	// Not valid
+				if( (Equipped.m_ItemID != PacketData->m_ItemType))	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
 					break;
@@ -851,19 +855,30 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						break;
 
 					//TODO: Wrong Blocks!
-					int clickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
+					int ClickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 					char MetaData = (char)Equipped.m_ItemHealth;
 					bool LavaBucket = false;
 					bool WaterBucket = false;
 					bool bRemoveItem = true;
+					bool bIgnoreCollision = false;
+
+					if(ClickedBlock == E_BLOCK_STEP)
+					{
+						if(MetaData == m_Player->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ) && PacketData->m_Direction == 1)	//only make double slab if meta values are the same and if player clicked on top of the block (Dir = 1)
+						{
+							PacketData->m_ItemType = E_BLOCK_DOUBLE_STEP;
+							PacketData->m_PosY--;
+							bIgnoreCollision = true;
+						}
+					}
 
 					switch( PacketData->m_ItemType )	// Special handling for special items
 					{
 					case E_ITEM_BUCKET:
 						//TODO: Change this, it is just a small hack to get it working a little bit. seems like the Client sends the position from the first hitable block :s
-						clickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ );
-						LOG("Bucket Clicked BlockID: %d", clickedBlock);
-						switch (clickedBlock)
+						ClickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ );
+						LOG("Bucket Clicked BlockID: %d", ClickedBlock);
+						switch (ClickedBlock)
 						{
 							case E_BLOCK_WATER:
 							case E_BLOCK_STATIONARY_WATER:
@@ -901,9 +916,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							m_Player->GetInventory().AddItem( NewItem );
 							
 						}
-						break;
-					case E_BLOCK_WHITE_CLOTH:
-						MetaData = (char)PacketData->m_Uses;
 						break;
 					case E_BLOCK_TORCH:
 						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
@@ -1026,7 +1038,12 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						AddDirection( X, Y, Z, PacketData->m_Direction );
 
 						int PlaceBlock = m_Player->GetWorld()->GetBlock( X, Y, Z );
-						if (!( ( PlaceBlock == E_BLOCK_AIR ) || ( PlaceBlock == E_BLOCK_WATER ) || ( PlaceBlock == E_BLOCK_STATIONARY_WATER ) || ( PlaceBlock == E_BLOCK_LAVA ) || ( PlaceBlock == E_BLOCK_STATIONARY_LAVA ) ) ) { //tried to place a block *into* another?
+						if (PlaceBlock != E_BLOCK_AIR
+							&& PlaceBlock != E_BLOCK_WATER
+							&& PlaceBlock != E_BLOCK_STATIONARY_WATER
+							&& PlaceBlock != E_BLOCK_LAVA
+							&& PlaceBlock != E_BLOCK_STATIONARY_LAVA
+							&& !bIgnoreCollision ) { //tried to place a block *into* another?
 							break;	//happens when you place a block aiming at side of block like torch or stem
 						}
 
@@ -1035,6 +1052,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							if((m_Player->GetGameMode() != 1) &&  !m_Player->GetInventory().RemoveItem( Item ))
 								break;
 						}
+
+
 						if (isDoor)
 						{
 							if ( ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) || ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) )
@@ -1045,6 +1064,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						} else {
 							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
 						}
+
 
 						if (UpdateRedstone)
 						{

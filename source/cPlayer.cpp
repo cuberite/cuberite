@@ -1,6 +1,7 @@
 #include "cPlayer.h"
 #include "cServer.h"
-#include "cInventory.h"
+#include "cCreativeInventory.h"
+#include "cSurvivalInventory.h"
 #include "cClientHandle.h"
 #include "cWorld.h"
 #include "cPickup.h"
@@ -82,7 +83,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
 	m_EntityType = E_PLAYER;
 	SetMaxHealth(20);
 	SetMaxFoodLevel(125);
-	m_Inventory = new cInventory( this );
+	m_Inventory = new cSurvivalInventory( this );
+	m_CreativeInventory = new cCreativeInventory(this);
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
 
@@ -117,6 +119,10 @@ cPlayer::~cPlayer(void)
 	{
 		delete m_Inventory;
 		m_Inventory = 0;
+	}
+	if(m_CreativeInventory)
+	{
+		delete m_CreativeInventory;
 	}
 	delete m_pState;
 	GetWorld()->RemovePlayer( this ); // TODO - Remove from correct world? Or get rid of this?
@@ -398,10 +404,10 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 void cPlayer::CloseWindow(char a_WindowType)
 {
 	if (a_WindowType == 0) { // Inventory
-		if(GetInventory().GetWindow()->GetDraggingItem() && GetInventory().GetWindow()->GetDraggingItem()->m_ItemCount > 0)
+		if(m_Inventory->GetWindow()->GetDraggingItem() && m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount > 0)
 		{
 			LOG("Player holds item! Dropping it...");
-			TossItem( true, GetInventory().GetWindow()->GetDraggingItem()->m_ItemCount );
+			TossItem( true, m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount );
 		}
 
 		//Drop whats in the crafting slots (1, 2, 3, 4)
@@ -458,6 +464,7 @@ void cPlayer::SetGameMode( int a_GameMode )
 			GameModePacket.m_Reason = 3; //GameModeChange
 			GameModePacket.m_GameMode = (char)a_GameMode; //GameModeChange
 			m_ClientHandle->Send ( GameModePacket );
+			GetInventory().SendWholeInventory(m_ClientHandle);
 		}
 	}
 }
@@ -651,7 +658,7 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 {
 	if( a_bDraggingItem )
 	{
-		cItem* Item = GetInventory().GetWindow()->GetDraggingItem();
+		cItem* Item = GetSurvivalInventory().GetWindow()->GetDraggingItem();
 		if( Item->m_ItemID > 0 && Item->m_ItemCount >= a_Amount )
 		{
 			float vX = 0, vY = 0, vZ = 0;

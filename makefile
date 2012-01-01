@@ -89,6 +89,8 @@ MCServer : \
 		build/cGroup.o\
 		build/cGroupManager.o\
 		build/cInventory.o\
+		build/cCreativeInventory.o\
+		build/cSurvivalInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
 		build/cAggressiveMonster.o\
@@ -138,7 +140,7 @@ MCServer : \
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
-		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_CreativeInventoryAction.o\
 		build/cPacket_NewInvalidState.o\
 		build/cPacket_Thunderbolt.o\
 		build/cPacket_EntityLook.o\
@@ -293,6 +295,8 @@ MCServer : \
 		build/cGroup.o\
 		build/cGroupManager.o\
 		build/cInventory.o\
+		build/cCreativeInventory.o\
+		build/cSurvivalInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
 		build/cAggressiveMonster.o\
@@ -342,7 +346,7 @@ MCServer : \
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
-		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_CreativeInventoryAction.o\
 		build/cPacket_NewInvalidState.o\
 		build/cPacket_Thunderbolt.o\
 		build/cPacket_EntityLook.o\
@@ -500,6 +504,8 @@ clean :
 		build/cGroup.o\
 		build/cGroupManager.o\
 		build/cInventory.o\
+		build/cCreativeInventory.o\
+		build/cSurvivalInventory.o\
 		build/cLog.o\
 		build/cMonster.o\
 		build/cAggressiveMonster.o\
@@ -549,7 +555,7 @@ clean :
 		build/cPacket_DestroyEntity.o\
 		build/cPacket_Disconnect.o\
 		build/cPacket_EntityEquipment.o\
-		build/cPacket_CreateInventoryAction.o\
+		build/cPacket_CreativeInventoryAction.o\
 		build/cPacket_NewInvalidState.o\
 		build/cPacket_Thunderbolt.o\
 		build/cPacket_EntityLook.o\
@@ -770,6 +776,12 @@ build/cGroupManager.o : source/cGroupManager.cpp
 # Item # 21 -- cInventory --
 build/cInventory.o : source/cInventory.cpp
 	$(CC) $(CC_OPTIONS) source/cInventory.cpp -c $(INCLUDE) -o build/cInventory.o
+	
+build/cCreativeInventory.o : source/cCreativeInventory.cpp
+	$(CC) $(CC_OPTIONS) source/cCreativeInventory.cpp -c $(INCLUDE) -o build/cCreativeInventory.o
+	
+build/cSurvivalInventory.o : source/cSurvivalInventory.cpp
+	$(CC) $(CC_OPTIONS) source/cSurvivalInventory.cpp -c $(INCLUDE) -o build/cSurvivalInventory.o
 
 
 # Item # 22 -- cLog --
@@ -981,8 +993,8 @@ build/cPacket_Disconnect.o : source/packets/cPacket_Disconnect.cpp
 build/cPacket_EntityEquipment.o : source/packets/cPacket_EntityEquipment.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_EntityEquipment.cpp -c $(INCLUDE) -o build/cPacket_EntityEquipment.o
 
-build/cPacket_CreateInventoryAction.o : source/packets/cPacket_CreateInventoryAction.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_CreateInventoryAction.cpp -c $(INCLUDE) -o build/cPacket_CreateInventoryAction.o
+build/cPacket_CreativeInventoryAction.o : source/packets/cPacket_CreativeInventoryAction.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_CreativeInventoryAction.cpp -c $(INCLUDE) -o build/cPacket_CreativeInventoryAction.o
 
 build/cPacket_NewInvalidState.o : source/packets/cPacket_NewInvalidState.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_NewInvalidState.cpp -c $(INCLUDE) -o build/cPacket_NewInvalidState.o

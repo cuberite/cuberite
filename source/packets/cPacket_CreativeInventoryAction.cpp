@@ -1,24 +1,19 @@
-#include "cPacket_CreateInventoryAction.h"
+#include "cPacket_CreativeInventoryAction.h"
 #include "cPacket_ItemData.h"
 
-cPacket_CreateInventoryAction::cPacket_CreateInventoryAction( const cPacket_CreateInventoryAction & a_Copy )
+cPacket_CreativeInventoryAction::cPacket_CreativeInventoryAction( const cPacket_CreativeInventoryAction & a_Copy )
 {
-	m_PacketID = E_CREATE_INVENTORY_ACTION;
+	m_PacketID = E_CREATIVE_INVENTORY_ACTION;
 	m_Slot	 = a_Copy.m_Slot;
 	m_ItemID = a_Copy.m_ItemID;
-	m_Quantity = 0;
-	m_Damage = 0;
+	m_Quantity = a_Copy.m_Quantity;
+	m_Damage = a_Copy.m_Damage;
 }
 
-bool cPacket_CreateInventoryAction::Parse(cSocket & a_Socket)
+bool cPacket_CreativeInventoryAction::Parse(cSocket & a_Socket)
 {
 	m_Socket = a_Socket;
 	if( !ReadShort	( m_Slot ) ) return false;
-	/*
-	if( !ReadShort	( m_ItemID ) ) return false;
-	if( !ReadShort	( m_Quantity ) ) return false;
-	if( !ReadShort	( m_Damage ) ) return false;
-	*/
 
 	cPacket_ItemData Item;
 
@@ -32,7 +27,7 @@ bool cPacket_CreateInventoryAction::Parse(cSocket & a_Socket)
 	return true;
 }
 
-bool cPacket_CreateInventoryAction::Send(cSocket & a_Socket)
+bool cPacket_CreativeInventoryAction::Send(cSocket & a_Socket)
 {
 	//LOG("InventoryChange:");
 	unsigned int TotalSize = c_Size;

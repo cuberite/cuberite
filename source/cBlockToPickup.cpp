@@ -64,6 +64,8 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		return E_ITEM_IRON_DOOR;
 	case E_BLOCK_GLOWSTONE:
 		return E_ITEM_GLOWSTONE_DUST;
+	case E_BLOCK_DOUBLE_STEP:
+		return E_ITEM_STEP;
 	default:
 		return (ENUM_ITEM_ID)a_BlockID;
 	}
@@ -83,6 +85,8 @@ char cBlockToPickup::PickupCount(unsigned char a_BlockID)
 		return r1.randInt() % 8 + 3;
 	case E_BLOCK_LAPIS_ORE:
 		return r1.randInt() % 5 + 4;
+	case E_BLOCK_DOUBLE_STEP:
+		return 2;
 	default:
 		return 1;
 	}
