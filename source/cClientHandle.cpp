@@ -183,12 +183,14 @@ cClientHandle::~cClientHandle()
 		if( m_LoadedChunks[i] ) m_LoadedChunks[i]->RemoveClient( this );
 	}
 
+
 	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
 	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 	{
 		if ((*itr) && (*itr)->GetClientHandle() && strlen(GetUsername()) > 0)
 		{
-			cPacket_PlayerListItem PlayerList(m_Player->GetColor() + GetUsername(), false, (short)9999);
+			std::string NameColor = ( m_Player ? m_Player->GetColor() : "" );
+			cPacket_PlayerListItem PlayerList(NameColor + GetUsername(), false, (short)9999);
 			(*itr)->GetClientHandle()->Send( PlayerList );
 		}
 		
