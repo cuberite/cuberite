@@ -277,7 +277,7 @@ void cServer::StartListenClient()
 
 bool cServer::Tick(float a_Dt)
 {
-    //LOG("Tick");
+    //LOG("1. Tick");
 	if( a_Dt > 100.f ) a_Dt = 100.f; // Don't go over 1/10 second
 
 	cSleep::MilliSleep( 50 ); // Don't tick too much
@@ -288,7 +288,6 @@ bool cServer::Tick(float a_Dt)
 		m_Milliseconds += (int)m_Millisecondsf;
 		m_Millisecondsf = m_Millisecondsf - (int)m_Millisecondsf;
 	}
-
 
 	cRoot::Get()->TickWorlds( a_Dt ); // TODO - Maybe give all worlds their own thread?
 

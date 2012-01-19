@@ -45,6 +45,8 @@
 #include "packets/cPacket_NewInvalidState.h"
 #include "packets/cPacket_Thunderbolt.h"
 
+#include "ptr_cChunk.h"
+
 #include "Vector3d.h"
 
 #include <time.h>
@@ -430,12 +432,11 @@ void cWorld::Tick(float a_Dt)
 	int TimesSpreaded = 0;
 	while( !m_pState->SpreadQueue.empty() && TimesSpreaded < 50 ) // Spread a max of 50 times each tick, otherwise server will hang
 	{
-		cChunk* Chunk = (*m_pState->SpreadQueue.begin());
+		ptr_cChunk& Chunk = *m_pState->SpreadQueue.begin();
 		//LOG("Spreading: %p", Chunk );
 		Chunk->SpreadLight( Chunk->pGetSkyLight() );
 		Chunk->SpreadLight( Chunk->pGetLight() );
 		m_pState->SpreadQueue.remove( Chunk );
-		Chunk->RemoveReference();
 		TimesSpreaded++;
 	}
 	if( TimesSpreaded >= 50 )
@@ -494,7 +495,7 @@ void cWorld::Tick(float a_Dt)
 		FastSetBlock( SetBlockData.x, SetBlockData.y, SetBlockData.z, SetBlockData.BlockID, SetBlockData.BlockMeta );	// If unable to set block, it's added to FastSetBlockQueue again
 	}
 	if( FastSetBlockQueueCopy.size() != m_pState->FastSetBlockQueue.size() )
-	LOG(" Before: %i, after %i" , FastSetBlockQueueCopy.size(), m_pState->FastSetBlockQueue.size() );
+		LOG(" Before: %i, after %i" , FastSetBlockQueueCopy.size(), m_pState->FastSetBlockQueue.size() );
 
 	if( m_Time - m_LastSave > 60*5 ) // Save each 5 minutes
 	{
@@ -712,20 +713,36 @@ cChunk* cWorld::GetChunk( int a_X, int a_Y, int a_Z )
 	cChunk* Chunk = GetChunkUnreliable( a_X, a_Y, a_Z );
 	if( Chunk )	return Chunk;
 
+#if 1 // Current thread chunk generation
+
+	// Found nothing, create a chunk
+	Chunk = new cChunk( a_X, a_Y, a_Z, this );
+	if(Chunk)
+	{
+		LOGWARN("Created new chunk! %i %i", a_X, a_Z);
+		LockChunks();
+		m_ChunkMap->AddChunk( Chunk );
+		UnlockChunks();
+		Chunk->Initialize();
+		return Chunk;
+	}
+	return 0;
+#else // Async thread generation
+
 	// Generate new chunk asynchronously
 	m_pState->pChunkGenerator->GenerateChunk( a_X, a_Z );
 
 	// Could not find chunk, it's being generated, so return 0
 	return 0;
+#endif
 }
 
-cChunk* cWorld::GetChunkUnreliable( int a_X, int a_Y, int a_Z )
+ptr_cChunk cWorld::GetChunkUnreliable( int a_X, int a_Y, int a_Z )
 {
 	LockChunks();
-	cChunk* Chunk = m_ChunkMap->GetChunk( a_X, a_Y, a_Z );
+	ptr_cChunk Chunk( m_ChunkMap->GetChunk( a_X, a_Y, a_Z ) );
 	UnlockChunks();
-	if( Chunk ) return Chunk;
-	return 0;
+	return Chunk;
 }
 
 cChunk* cWorld::GetChunkOfBlock( int a_X, int a_Y, int a_Z )
@@ -760,18 +777,6 @@ void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 		Chunk->FastSetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
 		return;
 	}
-
-	// Could not find chunk, so it has been pushed into the generate chunks queue
-	// Check if currently generating the target chunk
-	m_pState->pChunkGenerator->Lock();
-	Chunk = m_pState->pChunkGenerator->GetCurrentlyGenerating();
-	if( Chunk && Chunk->GetPosX() == ChunkX && Chunk->GetPosZ() == ChunkZ )
-	{
-		Chunk->FastSetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
-		m_pState->pChunkGenerator->Unlock();
-		return;
-	}
-	m_pState->pChunkGenerator->Unlock();
 
 	// Unable to set block right now, try again later
 	m_pState->FastSetBlockQueue.push_back( sSetBlockData( a_X, a_Y, a_Z, a_BlockType, a_BlockMeta ) ); 
@@ -1052,23 +1057,20 @@ void cWorld::UnlockChunks()
 	m_ChunksCriticalSection->Unlock();
 }
 
-void cWorld::ReSpreadLighting( cChunk* a_Chunk )
+void cWorld::ReSpreadLighting( const ptr_cChunk& a_Chunk )
 {
 	LockChunks();
-	m_pState->SpreadQueue.remove( a_Chunk );
+	m_pState->SpreadQueue.remove( a_Chunk ); 
 	m_pState->SpreadQueue.push_back( a_Chunk );
-#define STRINGIZE(x) #x
-	a_Chunk->AddReference( __FILE__ ": " STRINGIZE(__LINE__) );
+	//#define STRINGIZE(x) #x
+	//a_Chunk->AddReference( __FILE__ ": " STRINGIZE(__LINE__) );
 	UnlockChunks();
 }
 
-void cWorld::RemoveSpread( cChunk* a_Chunk )
+void cWorld::RemoveSpread( const ptr_cChunk& a_Chunk )
 {
 	LockChunks();
-	size_t SizeBefore = m_pState->SpreadQueue.size();
 	m_pState->SpreadQueue.remove( a_Chunk );
-	if( SizeBefore != m_pState->SpreadQueue.size() )
-		a_Chunk->RemoveReference();
 	UnlockChunks();
 }
 

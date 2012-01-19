@@ -448,6 +448,9 @@
     <Filter Include="cInventory\cCreativeInventory">
       <UniqueIdentifier>{69e6a927-8e49-4d39-af88-f587d17bb8a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="!Smart_Pointers">
+      <UniqueIdentifier>{9bd7a65c-b60f-4905-ae2b-7c3c7586eaef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -1370,6 +1373,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cSurvivalInventory.h">
       <Filter>cInventory\cSurvivalInventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\ptr_cChunk.h">
+      <Filter>!Smart_Pointers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

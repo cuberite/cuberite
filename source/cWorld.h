@@ -13,6 +13,7 @@ enum ENUM_ITEM_ID;
 #include <string>
 
 #include "cSimulatorManager.h"
+#include "ptr_cChunk.h"
 
 class cPacket;
 class cRedstone;
@@ -36,7 +37,7 @@ class cWorld													//tolua_export
 public:
 	typedef std::list< cClientHandle* > ClientList;
 	typedef std::list< cEntity* > EntityList;
-	typedef std::list< cChunk* > ChunkList;
+	typedef std::list< ptr_cChunk > ChunkList;
 	typedef std::list< cPlayer* > PlayerList;
 	std::vector<int> m_RSList;
 
@@ -56,7 +57,7 @@ public:
 
 	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
 	cChunk* GetChunkReliable( int a_X, int a_Y, int a_Z );
-	cChunk* GetChunkUnreliable( int a_X, int a_Y, int a_Z );
+	ptr_cChunk GetChunkUnreliable( int a_X, int a_Y, int a_Z );
 	cChunk* GetChunkOfBlock( int a_X, int a_Y, int a_Z );
 	char GetHeight( int a_X, int a_Z );												//tolua_export
 
@@ -148,14 +149,14 @@ public:
 	void LockChunks();
 	void UnlockChunks();
 
-	void ReSpreadLighting( cChunk* a_Chunk );
-	void RemoveSpread( cChunk* a_Chunk );
+	void ReSpreadLighting( const ptr_cChunk& a_Chunk );
+	void RemoveSpread( const ptr_cChunk& a_Chunk );
 
 	void InitializeSpawn();
 
-	void CastThunderbolt ( int, int, int );												//tolua_export
+	void CastThunderbolt ( int, int, int );									//tolua_export
 	void SetWeather ( int );												//tolua_export
-	int GetWeather() { return m_Weather; };												//tolua_export
+	int GetWeather() { return m_Weather; };									//tolua_export
 
 	cWorldGenerator* GetWorldGenerator() { return m_WorldGenerator; }
 private:

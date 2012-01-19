@@ -522,6 +522,7 @@
     <ClInclude Include="..\source\packets\cPacket_WindowClick.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
+    <ClInclude Include="..\source\ptr_cChunk.h" />
     <ClInclude Include="..\source\SquirrelBindings.h" />
     <ClInclude Include="..\source\Vector3d.h" />
     <ClInclude Include="..\source\Vector3f.h" />

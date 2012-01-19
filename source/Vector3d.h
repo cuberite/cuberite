@@ -22,6 +22,8 @@ public:			//tolua_export
 	inline double Dot( const Vector3d & a_V ) const { return x * a_V.x + y * a_V.y + z * a_V.z; }										//tolua_export
 	inline Vector3d Cross( const Vector3d & v ) const { return Vector3d( y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x ); }	//tolua_export
 
+	inline bool Equals( const Vector3d & v ) const { return (x == v.x && y == v.y && z == v.z ); }										//tolua_export
+
 	void operator += ( const Vector3d& a_V ) { x += a_V.x; y += a_V.y; z += a_V.z; }
 	void operator += ( Vector3d* a_V ) { x += a_V->x; y += a_V->y; z += a_V->z; }
 	void operator -= ( const Vector3d& a_V ) { x -= a_V.x; y -= a_V.y; z -= a_V.z; }

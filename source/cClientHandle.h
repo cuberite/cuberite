@@ -78,6 +78,7 @@ private:
 	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
 
 	bool m_bLoggedIn;
+	bool m_bPositionConfirmed;
 	bool m_bSendLoginResponse;
 
 	bool m_bKeepThreadGoing;

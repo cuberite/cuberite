@@ -148,7 +148,7 @@ void cEntity::RemoveFromChunk( cChunk* a_Chunk )
 {
 	if( m_World )
 	{
-		cChunk* Chunk = ( a_Chunk ? a_Chunk : m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ ) );
+		cChunk* Chunk = ( a_Chunk ? a_Chunk : (cChunk*)m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ ) );
 		if( Chunk )
 		{
 			cPacket_DestroyEntity DestroyEntity( this );

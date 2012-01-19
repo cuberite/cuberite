@@ -113,6 +113,8 @@ struct cClientHandle::sClientHandleState
 	cCriticalSection SocketCriticalSection;
 	cSemaphore* pSemaphore;
 
+	Vector3d ConfirmPosition;
+
 	cPacket* PacketMap[256];
 };
 
@@ -126,6 +128,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	, m_bSendLoginResponse( false )
 	, m_pState( new sClientHandleState )
 	, m_Ping(1000)
+	, m_bPositionConfirmed( false )
 {
 	LOG("cClientHandle::cClientHandle");
 	
@@ -382,6 +385,7 @@ void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChun
 		{
 			a_Chunks[ClosestIdx]->Send( this );
 			a_Chunks[ClosestIdx]->AddClient( this );
+			//LOGINFO("CCC: Sending chunk %i %i", a_Chunks[ClosestIdx]->GetPosX(), a_Chunks[ClosestIdx]->GetPosZ() );
 			a_Chunks[ClosestIdx] = 0;
 		}
 	}
@@ -526,6 +530,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				StreamChunks();
 
 				// Send position
+				m_pState->ConfirmPosition = m_Player->GetPosition();
 				Send( cPacket_PlayerMoveLook( m_Player ) );
 			}
 			break;
@@ -539,7 +544,32 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		}
 	}
-	else // m_bLoggedIn == true
+	else if( !m_bPositionConfirmed ) // m_bLoggedIn == true
+	{
+		switch( a_Packet->m_PacketID )
+		{
+		case E_PLAYERMOVELOOK:
+			{
+				cPacket_PlayerMoveLook* PacketData = reinterpret_cast<cPacket_PlayerMoveLook*>(a_Packet);
+				Vector3d ReceivedPosition = Vector3d( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
+
+				// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
+				if( ( ReceivedPosition - m_pState->ConfirmPosition ).SqrLength() < 1.0 )
+				{
+					// Test
+					if( ReceivedPosition.Equals( m_pState->ConfirmPosition ) )
+					{
+						LOGINFO("Exact position confirmed by client!");
+					}
+					m_bPositionConfirmed = true;
+				}
+			}
+			break;
+		}
+		
+	}
+
+	if( m_bPositionConfirmed )
 	{
 		switch( a_Packet->m_PacketID )
 		{
@@ -1434,6 +1464,7 @@ void cClientHandle::SendThread( void *lpParam )
 			m_pState->SocketCriticalSection.Unlock();
 			break;
 		}
+		//LOG("Send packet: 0x%2x", Packet->m_PacketID );
 		bool bSuccess = Packet->Send( m_pState->Socket );
 		m_pState->SocketCriticalSection.Unlock();
 		if( !bSuccess )
@@ -1481,6 +1512,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 		}
 		else
 		{
+			//LOG("Recv packet: 0x%2x", (unsigned char)temp );
 			cPacket* pPacket = self->m_pState->PacketMap[ (unsigned char)temp ];
 			if( pPacket )
 			{

@@ -197,7 +197,7 @@ void cPickup::HandlePhysics(float a_Dt)
 	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) m_Pos->x - 1, (int) m_Pos->y, (int) m_Pos->z - 1);
 
 
-	*m_WaterSpeed *= 0.9;		//Keep old speed but lower it
+	*m_WaterSpeed *= 0.9f;		//Keep old speed but lower it
 
 	switch(WaterDir)
 	{
@@ -256,7 +256,7 @@ void cPickup::HandlePhysics(float a_Dt)
 					}
 				}
 				*m_Pos = Tracer.RealHit;
-				*m_Pos += *Tracer.HitNormal * 0.2;
+				*m_Pos += *Tracer.HitNormal * 0.2f;
 
 			}
 			else

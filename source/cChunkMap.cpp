@@ -465,7 +465,7 @@ void cChunkMap::UnloadUnusedChunks()
 			if( Chunk && Chunk->GetClients().size() == 0 && Chunk->GetReferenceCount() <= 0 )
 			{
 			    Chunk->SaveToDisk();
-				World->RemoveSpread( Chunk );
+				World->RemoveSpread( ptr_cChunk( Chunk ) );
 				RemoveChunk( Chunk );
 				delete Chunk;
 			}

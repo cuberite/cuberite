@@ -62,6 +62,7 @@ struct cChunk::sChunkState
 	sChunkState()
 		: TotalReferencesEver( 0 )
 		, MinusReferences( 0 )
+		, NumRefs( 0 )
 	{}
 
 	FurnaceEntityList TickBlockEntities;
@@ -79,6 +80,7 @@ struct cChunk::sChunkState
 	ReferenceMap References;
 	int MinusReferences;	// References.size() - MinusReferences = Actual amount of references. This is due to removal of reference without an ID (don't know which to remove, so remove none)
 	int TotalReferencesEver; // For creating a unique reference ID
+	int NumRefs;
 };
 
 cChunk::~cChunk()
@@ -541,8 +543,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	bool bCalcLeft, bCalcRight, bCalcFront, bCalcBack;
 	bCalcLeft = bCalcRight = bCalcFront = bCalcBack = false;
 	// Spread to neighbour chunks X-axis
-	cChunk* LeftChunk = m_World->GetChunkUnreliable( m_PosX-1, m_PosY, m_PosZ );
-	cChunk* RightChunk = m_World->GetChunkUnreliable( m_PosX+1, m_PosY, m_PosZ );
+	ptr_cChunk LeftChunk = m_World->GetChunkUnreliable( m_PosX-1, m_PosY, m_PosZ );
+	ptr_cChunk RightChunk = m_World->GetChunkUnreliable( m_PosX+1, m_PosY, m_PosZ );
 	char* LeftSky = 0, *RightSky = 0;
 	if(LeftChunk) LeftSky = (a_LightBuffer==m_BlockSkyLight)?LeftChunk->pGetSkyLight():LeftChunk->pGetLight();
 	if(RightChunk) RightSky = (a_LightBuffer==m_BlockSkyLight)?RightChunk->pGetSkyLight():RightChunk->pGetLight();
@@ -579,8 +581,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	}
 
 	// Spread to neighbour chunks Z-axis
-	cChunk* FrontChunk = m_World->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ-1 );
-	cChunk* BackChunk = m_World->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ+1 );
+	ptr_cChunk FrontChunk = m_World->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ-1 );
+	ptr_cChunk BackChunk = m_World->GetChunkUnreliable( m_PosX, m_PosY, m_PosZ+1 );
 	char* FrontSky = 0, *BackSky = 0;
 	if(FrontChunk) FrontSky = (a_LightBuffer==m_BlockSkyLight)?FrontChunk->pGetSkyLight():FrontChunk->pGetLight();
 	if(BackChunk) BackSky = (a_LightBuffer==m_BlockSkyLight)?BackChunk->pGetSkyLight():BackChunk->pGetLight();
@@ -1177,60 +1179,28 @@ void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, i
 	a_Z = m_PosZ * 16 + a_ChunkZ;
 }
 
-int cChunk::AddReference( const char* a_Info /* = 0 */ )
+void cChunk::AddReference()
 {
 	m_pState->ReferenceCriticalSection.Lock();
-
-	m_pState->TotalReferencesEver++;
-
-	std::string Info;
-	if( a_Info ) Info = a_Info;
-
-	m_pState->References[ m_pState->TotalReferencesEver ] = Info;
-	
-	int ID = m_pState->TotalReferencesEver;
+	m_pState->NumRefs++;
 	m_pState->ReferenceCriticalSection.Unlock();
-	return ID;
 }
 
-void cChunk::RemoveReference( int a_ID )
+void cChunk::RemoveReference()
 {
 	m_pState->ReferenceCriticalSection.Lock();
-
-	if( a_ID > -1 )	// Remove reference with an ID
+	m_pState->NumRefs--;
+	if( m_pState->NumRefs < 0 )
 	{
-		bool bFound = false;
-		for( ReferenceMap::iterator itr = m_pState->References.begin(); itr != m_pState->References.end(); ++itr )
-		{
-			if( itr->first == a_ID )
-			{
-				bFound = true;
-				m_pState->References.erase( itr );
-				break;
-			}
-		}
-
-		if( !bFound )
-		{
-			LOGWARN("WARNING: cChunk: Tried to remove reference %i but it could not be found! May cause memory leak", a_ID );
-		}
+		LOGWARN("WARNING: cChunk: Tried to remove reference, but the chunk is not referenced!");
 	}
-	else		// No ID so add one to MinusReferences
-	{
-		m_pState->MinusReferences++;
-		if( (int)m_pState->References.size() - m_pState->MinusReferences < 0 )
-		{
-			LOGWARN("WARNING: cChunk: Tried to remove reference %i, but the chunk is not referenced!", a_ID);
-		}
-	}
-
 	m_pState->ReferenceCriticalSection.Unlock();
 }
 
 int cChunk::GetReferenceCount()
 {
 	m_pState->ReferenceCriticalSection.Unlock();
-	int Refs = (int)m_pState->References.size() - m_pState->MinusReferences;
+	int Refs = m_pState->NumRefs;
 	m_pState->ReferenceCriticalSection.Lock();
 	return Refs;
 }

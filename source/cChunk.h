@@ -102,8 +102,8 @@ public:
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
 
 	// Reference counting
-	int AddReference( const char* a_Info = 0 ); // a_Info is for debugging
-	void RemoveReference( int a_ID = -1 );
+	void AddReference();
+	void RemoveReference();
 	int GetReferenceCount();
 private:
 	struct sChunkState;
