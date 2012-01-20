@@ -85,7 +85,7 @@ typedef std::list<cPacket*> PacketList;
 struct cClientHandle::sClientHandleState
 {
 	sClientHandleState()
-		: ProtocolVersion( 22 )
+		: ProtocolVersion( 23 )
 		, pReceiveThread( 0 )
 		, pSendThread( 0 )
 		, pAuthenticateThread( 0 )
@@ -483,8 +483,12 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			{
 				LOG("LOGIN %s", GetUsername() );
 				cPacket_Login* PacketData = reinterpret_cast<cPacket_Login*>(a_Packet);
-				if (PacketData->m_ProtocolVersion != m_pState->ProtocolVersion) {
+				if (PacketData->m_ProtocolVersion < m_pState->ProtocolVersion) {
 					Kick("Your client is outdated!");
+					return;
+				}
+				else if( PacketData->m_ProtocolVersion > m_pState->ProtocolVersion ) {
+					Kick("Your client version is higher than the server!");
 					return;
 				}
 				if( m_pState->Username.compare( PacketData->m_Username ) != 0 )
