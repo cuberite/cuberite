@@ -219,6 +219,7 @@ bool cServer::InitServer( int a_Port )
 			sid << std::hex << r1;
 			sid << std::hex << r2;
 			std::string ServerID = sid.str();
+			ServerID.resize(16, '0');
 			m_pState->ServerID = ServerID;
 		}
 	}
