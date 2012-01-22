@@ -1,6 +1,6 @@
 #include "cChatColor.h"
 
-const std::string cChatColor::Color = "§";
+const std::string cChatColor::Color = "\xa7"; // Old color was "\xc2\xa7" or in other words: "§"
 const std::string cChatColor::Delimiter = "\xa7";
 const std::string cChatColor::Black			= cChatColor::Color + "0";
 const std::string cChatColor::Navy			= cChatColor::Color + "1";
@@ -21,5 +21,5 @@ const std::string cChatColor::White			= cChatColor::Color + "f";
 
 const std::string cChatColor::MakeColor( char a_Color )
 {
-	return cChatColor::Delimiter + a_Color;
+	return cChatColor::Color + a_Color;
 }
