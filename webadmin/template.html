@@ -252,6 +252,17 @@
 		padding: 0 0 0 10px;
 		margin: 20px 0 10px;
 	}
+	
+	h4 {
+		padding: 0 0 0 10px;
+		margin: 20px 0 10px;
+	}
+	
+	#main ul {
+		padding: 0 0 0 10px;
+		list-style-type: circle;
+		list-style-position: inside;
+	}
 
 	#main table {
 		border-top: 1px solid #ddd;
@@ -340,8 +351,9 @@
                 <h2>Welcome {USERNAME}</h2>
                 
                 <div id="main">
-	
-					<p>{CONTENT}</p>
+					<h3>{PLUGIN_NAME}</h3>
+					
+					{CONTENT}
 					
 				</div>
                 <!-- // #main -->

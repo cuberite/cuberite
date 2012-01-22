@@ -99,28 +99,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				std::string Menu;
 				std::string Content;
 				std::string Template = WebAdmin->GetTemplate();
-
-				Content += "<h3>Current Game</h3>";
-				Content += "<h4>Server Name:</h4>";
-				Content += "<p>" + std::string( cRoot::Get()->GetServer()->GetServerID() ) + "</p>";
-
-				Content += "<h4>Plugins:</h4><p>";
-				cPluginManager* PM = cRoot::Get()->GetPluginManager();
-				const cPluginManager::PluginList & List = PM->GetAllPlugins();
-				for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
-				{
-					Content += std::string( (*itr)->GetName() ) + "<br>";
-				}
-				Content += "</p>";
-				Content += "<h4>Players:</h4><p>";
-
-				cWorld* World = cRoot::Get()->GetWorld(); // TODO - Create a list of worlds and players
-				cWorld::PlayerList PlayerList = World->GetAllPlayers();
-				for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-				{
-					Content += std::string( (*itr)->GetName() ) + "<br>";
-				}
-				Content += "</p>";
+				std::string FoundPlugin;
 
 				for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
 				{
@@ -133,9 +112,11 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				Request.Params = new cStringMap(r->params_);
 				Request.Path = r->path_;
 
+				
+
 				if( Split.size() > 1 )
 				{
-					std::string FoundPlugin = "";
+					
 					for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
 					{
 						if( (*itr)->GetName() == Split[1] )
@@ -145,14 +126,40 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 							break;
 						}
 					}
-
-					if( FoundPlugin.compare("") != 0 )	// Add some header
-					{
-						Content = "<h3>" + FoundPlugin + "</h3>\n<p>" + Content + "</p>";
-					}
 				}
 
 				delete Request.Params;
+
+				if( FoundPlugin.empty() )	// Default page
+				{
+					Content.clear();
+					FoundPlugin = "Current Game";
+					Content += "<h4>Server Name:</h4>";
+					Content += "<p>" + std::string( cRoot::Get()->GetServer()->GetServerID() ) + "</p>";
+
+					Content += "<h4>Plugins:</h4><ul>";
+					cPluginManager* PM = cRoot::Get()->GetPluginManager();
+					if( PM )
+					{
+						const cPluginManager::PluginList & List = PM->GetAllPlugins();
+						for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
+						{
+							Content += std::string("<li>") + std::string( (*itr)->GetName() ) + "</li>";
+						}
+					}
+					Content += "</ul>";
+					Content += "<h4>Players:</h4><ul>";
+
+					cWorld* World = cRoot::Get()->GetWorld(); // TODO - Create a list of worlds and players
+					cWorld::PlayerList PlayerList = World->GetAllPlayers();
+					for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+					{
+						Content += std::string("<li>") + std::string( (*itr)->GetName() ) + "</li>";
+					}
+					Content += "</ul><br>";
+				}
+
+				
 
 				if( Split.size() > 1 )
 				{
@@ -192,6 +199,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 				ReplaceString( Template, std::string("{USERNAME}"), r->username_ );
 				ReplaceString( Template, std::string("{MENU}"), Menu );
+				ReplaceString( Template, std::string("{PLUGIN_NAME}"), FoundPlugin );
 				ReplaceString( Template, std::string("{CONTENT}"), Content );
 				ReplaceString( Template, std::string("{TITLE}"), "MCServer" );
 

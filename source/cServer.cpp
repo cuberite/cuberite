@@ -278,10 +278,8 @@ void cServer::StartListenClient()
 
 bool cServer::Tick(float a_Dt)
 {
-    //LOG("1. Tick");
+    //LOG("1. Tick %0.2f", a_Dt);
 	if( a_Dt > 100.f ) a_Dt = 100.f; // Don't go over 1/10 second
-
-	cSleep::MilliSleep( 50 ); // Don't tick too much
 
 	m_Millisecondsf += a_Dt;
 	if( m_Millisecondsf > 1.f )
@@ -331,6 +329,7 @@ void ServerTickThread( void * a_Param )
 
 	cTimer Timer;
 
+	long long msPerTick = 50;	// TODO - Put this in server config file
 	long long LastTime = Timer.GetNowTime();
 
 	bool bKeepGoing = true;
@@ -339,6 +338,13 @@ void ServerTickThread( void * a_Param )
 		long long NowTime = Timer.GetNowTime();
 		float DeltaTime = (float)(NowTime-LastTime);
 		bKeepGoing = CServerObj->Tick( DeltaTime );
+		long long TickTime = Timer.GetNowTime() - NowTime;
+		
+		if( TickTime < msPerTick )	// Stretch tick time until it's at least msPerTick
+		{
+			cSleep::MilliSleep( (unsigned int)( msPerTick - TickTime ) );
+		}
+
 		LastTime = NowTime;
 	}
 

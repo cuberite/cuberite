@@ -572,15 +572,33 @@ end
 function PlayerListWeb:HandleRequest( Request )
 	local World = cRoot:Get():GetWorld()
 	local Content = ""
-	Content = Content .. "<br>Connected Players: <b>" .. World:GetNumPlayers() .. "</b><br>"
-	Content = Content .. "<ul>"
+	
+	if( Request.Params:get("playerlist-kick") ~= "" ) then
+		local KickPlayerName = Request.Params:get("playerlist-kick")
+		local Player = World:GetPlayer( KickPlayerName )
+		if( Player == nil ) then
+			Content = Content .. "<p>Could not find player " .. KickPlayerName .. " !</p>"
+		elseif( Player:GetName() == KickPlayerName ) then
+			Player:GetClientHandle():Kick("You were kicked from the game!")
+			Content = Content .. "<p>" .. KickPlayerName .. " has been kicked from the game!</p>"
+		end
+	end
+	
+	Content = Content .. "<p>Connected Players: <b>" .. World:GetNumPlayers() .. "</b></p>"
+	Content = Content .. "<table>"
+	
 
 	local PlayerList = World:GetAllPlayers()
 	for i, Player in ipairs( PlayerList ) do
-		Content = Content .. "<li>" .. Player:GetName()
+		Content = Content .. "<tr>"
+		Content = Content .. "<td style='width: 10px;'>" .. i .. ".</td>"
+		Content = Content .. "<td>" .. Player:GetName() .. "</td>"
+		Content = Content .. "<td><a href='?playerlist-kick=" .. Player:GetName() .. "'>Kick</a></td>"
+		Content = Content .. "</tr>"
 	end
 
-	Content = Content .. "</ul>"
+	Content = Content .. "</table>"
+	Content = Content .. "<br>"
 	return Content
 end
 
@@ -607,12 +625,12 @@ function ReloadWeb:HandleRequest( Request )
 	
 	if( Request.Params:get("reload") ~= "" ) then
 		Content = Content .. "<head><meta http-equiv=\"refresh\" content=\"1;././\"></head>"
-		Content = Content .. "<br>Reloading plugins...<br>"
+		Content = Content .. "<p>Reloading plugins...</p>"
 		cRoot:Get():GetPluginManager():ReloadPlugins()
 	else
-		Content = Content .. "<br>Click the reload button to reload all plugins!<br>"
 		Content = Content .. "<form method=GET>"
-		Content = Content .. "<input type=\"submit\" name=\"reload\" value=\"Reload!\">"
+		Content = Content .. "<p>Click the reload button to reload all plugins!<br>"
+		Content = Content .. "<input type=\"submit\" name=\"reload\" value=\"Reload!\"></p>"
 		Content = Content .. "</form>"
 	end
 	return Content
@@ -661,19 +679,43 @@ function WhiteListWeb:HandleRequest( Request )
 		WhiteListIni:Erase() -- Empty entire loaded ini first, otherwise weird shit goes down
 		WhiteListIni:ReadFile()
 		UpdateMessage = "Loaded from disk"
+	elseif( Request.Params:get("whitelist-setenable") ~= "" ) then
+		local Enabled = Request.Params:get("whitelist-setenable");
+		local CreateNewValue = false;
+		if( WhiteListIni:FindValue( WhiteListIni:FindKey("WhiteListSettings"), "WhiteListOn" ) == cIniFile.noID ) then -- Find out whether the value is in the ini
+			CreateNewValue = true
+		end
+		
+		if( Enabled == "1" ) then
+			WhiteListIni:SetValueB("WhiteListSettings", "WhiteListOn", true, CreateNewValue )
+		else
+			WhiteListIni:SetValueB("WhiteListSettings", "WhiteListOn", false, CreateNewValue )
+		end
+		WhiteListIni:WriteFile()
 	end
 	
 	
 	local Content = ""
+	
+	local WhiteListEnabled = WhiteListIni:GetValueB("WhiteListSettings", "WhiteListOn", false)
+	if( WhiteListEnabled == false ) then
+		Content = Content .. "<p>Whitelist is currently disabled! Click <a href='?whitelist-setenable=1'>here</a> to enable.</p>"
+	end
+	
+	
 	Content = Content .. "<h4>Whitelisted players</h4>"
 	Content = Content .. "<table>"
 	local KeyNum = WhiteListIni:FindKey("WhiteList")
 	local NumValues = WhiteListIni:GetNumValues(KeyNum)
-	for Num = 0, NumValues-1 do
-		if( WhiteListIni:GetValue(KeyNum, Num, "0") == "1" ) then
-			local PlayerName = WhiteListIni:GetValueName(KeyNum, Num )
-			Content = Content .. "<tr><td>" .. PlayerName .. "</td><td>" .. HTMLDeleteButton( PlayerName ) .. "</td></tr>"
+	if( NumValues > 0 ) then
+		for Num = 0, NumValues-1 do
+			if( WhiteListIni:GetValue(KeyNum, Num, "0") == "1" ) then
+				local PlayerName = WhiteListIni:GetValueName(KeyNum, Num )
+				Content = Content .. "<tr><td>" .. PlayerName .. "</td><td>" .. HTMLDeleteButton( PlayerName ) .. "</td></tr>"
+			end
 		end
+	else
+		Content = Content .. "<tr><td>None</td></tr>"
 	end
 	Content = Content .. "</table>"
 	Content = Content .. "<br><h4>Add player to whitelist</h4>"
@@ -684,6 +726,11 @@ function WhiteListWeb:HandleRequest( Request )
 	Content = Content .. "<input type=\"submit\" name=\"whitelist-reload\" value=\"Reload from disk\">"
 	Content = Content .. "</form>"
 	Content = Content .. "<br>"..UpdateMessage
+	
+	if( WhiteListEnabled == true ) then
+		Content = Content .. "<br><br><p>Whitelist is currently enabled, click <a href='?whitelist-setenable=0'>here</a> to disable.</p>"
+	end
+	
 	return Content
 end
 

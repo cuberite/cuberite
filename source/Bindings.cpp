@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/01/12 19:41:18.
+** Generated automatically by tolua++-1.0.92 on 01/22/12 20:44:42.
 */
 
 #ifndef __cplusplus
@@ -12820,6 +12820,40 @@ static int tolua_AllToLua_Vector3d_Cross00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: Equals of class  Vector3d */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d_Equals00
+static int tolua_AllToLua_Vector3d_Equals00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const Vector3d* self = (const Vector3d*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Equals'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->Equals(*v);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Equals'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: operator+ of class  Vector3d */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3d__add00
 static int tolua_AllToLua_Vector3d__add00(lua_State* tolua_S)
@@ -14628,6 +14662,36 @@ static int tolua_set_cPacket_Login_m_MapSeed(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: m_LevelType of class  cPacket_Login */
+#ifndef TOLUA_DISABLE_tolua_get_cPacket_Login_m_LevelType
+static int tolua_get_cPacket_Login_m_LevelType(lua_State* tolua_S)
+{
+  cPacket_Login* self = (cPacket_Login*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_LevelType'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->m_LevelType);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: m_LevelType of class  cPacket_Login */
+#ifndef TOLUA_DISABLE_tolua_set_cPacket_Login_m_LevelType
+static int tolua_set_cPacket_Login_m_LevelType(lua_State* tolua_S)
+{
+  cPacket_Login* self = (cPacket_Login*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_LevelType'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->m_LevelType = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: m_ServerMode of class  cPacket_Login */
 #ifndef TOLUA_DISABLE_tolua_get_cPacket_Login_m_ServerMode
 static int tolua_get_cPacket_Login_m_ServerMode(lua_State* tolua_S)
@@ -15407,6 +15471,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cIniFile","cIniFile","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"cIniFile");
+   tolua_constant(tolua_S,"noID",cIniFile::noID);
    tolua_function(tolua_S,"new",tolua_AllToLua_cIniFile_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cIniFile_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cIniFile_new00_local);
@@ -16375,6 +16440,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SqrLength",tolua_AllToLua_Vector3d_SqrLength00);
    tolua_function(tolua_S,"Dot",tolua_AllToLua_Vector3d_Dot00);
    tolua_function(tolua_S,"Cross",tolua_AllToLua_Vector3d_Cross00);
+   tolua_function(tolua_S,"Equals",tolua_AllToLua_Vector3d_Equals00);
    tolua_function(tolua_S,".add",tolua_AllToLua_Vector3d__add00);
    tolua_function(tolua_S,".add",tolua_AllToLua_Vector3d__add01);
    tolua_function(tolua_S,".sub",tolua_AllToLua_Vector3d__sub00);
@@ -16474,6 +16540,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"m_ProtocolVersion",tolua_get_cPacket_Login_m_ProtocolVersion,tolua_set_cPacket_Login_m_ProtocolVersion);
    tolua_variable(tolua_S,"m_Username",tolua_get_cPacket_Login_m_Username,tolua_set_cPacket_Login_m_Username);
    tolua_variable(tolua_S,"m_MapSeed",tolua_get_cPacket_Login_m_MapSeed,tolua_set_cPacket_Login_m_MapSeed);
+   tolua_variable(tolua_S,"m_LevelType",tolua_get_cPacket_Login_m_LevelType,tolua_set_cPacket_Login_m_LevelType);
    tolua_variable(tolua_S,"m_ServerMode",tolua_get_cPacket_Login_m_ServerMode,tolua_set_cPacket_Login_m_ServerMode);
    tolua_variable(tolua_S,"m_Dimension",tolua_get_cPacket_Login_m_Dimension,tolua_set_cPacket_Login_m_Dimension);
    tolua_variable(tolua_S,"m_Difficulty",tolua_get_cPacket_Login_m_Difficulty,tolua_set_cPacket_Login_m_Difficulty);

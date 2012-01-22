@@ -45,7 +45,7 @@ private:
   std::string CheckCase( std::string s) const;
 
 public:
-  enum errors{ noID = -1};
+  enum errors{ noID = -1};									//tolua_export
   cIniFile( const std::string iniPath = "");				//tolua_export
   virtual ~cIniFile()                            {}
 
