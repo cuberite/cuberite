@@ -268,6 +268,7 @@ void cChunk::Tick(float a_Dt)
 			{
 				isRedstone = true;
 			}
+		case E_BLOCK_CACTUS:
 		case E_BLOCK_REEDS:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:

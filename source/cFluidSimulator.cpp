@@ -4,6 +4,8 @@
 #include "BlockID.h"
 #include "Defines.h"
 #include <vector>
+#include "cPickup.h"
+#include "cItem.h"
 
 class cFluidSimulator::FluidData
 {
@@ -170,8 +172,15 @@ void cFluidSimulator::Simulate( float a_Dt )
 			if( bIsFed )
 			{
 				char DownID = m_World->GetBlock( pos.x, pos.y-1, pos.z );
-				if( IsPassableForFluid(DownID) ) // free for fluid 
+				bool bWashedAwayItem = CanWashAway( DownID );
+				if( IsPassableForFluid(DownID) || bWashedAwayItem ) // free for fluid 
 				{
+					if( bWashedAwayItem )
+					{
+						cPickup* Pickup = new cPickup( pos.x * 32 + 16, (pos.y-1) * 32 + 16, pos.z * 32 + 16, cItem( (ENUM_ITEM_ID)DownID, 1, m_World->GetBlockMeta( pos.x, pos.y-1, pos.z ) ) );
+						Pickup->Initialize( m_World );
+					}
+
 					m_World->FastSetBlock( pos.x, pos.y-1, pos.z, m_FluidBlock, 8 ); // falling
 					AddBlock( pos.x, pos.y-1, pos.z );
 				}
@@ -189,8 +198,15 @@ void cFluidSimulator::Simulate( float a_Dt )
 						{
 							Vector3i & p = *itr;
 							char BlockID = m_World->GetBlock( p.x, p.y, p.z );
+							bool bWashedAwayItem = CanWashAway( BlockID );
 							if( !IsAllowedBlock( BlockID ) )
 							{
+								if( bWashedAwayItem )
+								{
+									cPickup* Pickup = new cPickup( p.x * 32 + 16, p.y * 32 + 16, p.z * 32 + 16, cItem( (ENUM_ITEM_ID)BlockID, 1, m_World->GetBlockMeta( p.x, p.y, p.z ) ) );
+									Pickup->Initialize( m_World );
+								}
+
 								if( p.y == pos.y )
 									m_World->FastSetBlock(p.x, p.y, p.z, m_FluidBlock, Meta + m_FlowReduction);
 								else
@@ -223,7 +239,23 @@ bool cFluidSimulator::IsPassableForFluid(char a_BlockID)
 {
 	return a_BlockID == E_BLOCK_AIR
 		|| a_BlockID == E_BLOCK_FIRE
-		|| IsAllowedBlock(a_BlockID);
+		|| IsAllowedBlock(a_BlockID)
+		|| CanWashAway(a_BlockID);
+}
+
+bool cFluidSimulator::CanWashAway( char a_BlockID )
+{
+	switch( a_BlockID )
+	{
+	case E_BLOCK_YELLOW_FLOWER:
+	case E_BLOCK_RED_ROSE:
+	case E_BLOCK_RED_MUSHROOM:
+	case E_BLOCK_BROWN_MUSHROOM:
+	case E_BLOCK_CACTUS:
+		return true;
+	default:
+		return false;
+	};
 }
 
 //TODO Not working very well yet :s

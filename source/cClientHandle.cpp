@@ -496,7 +496,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					Kick("Login Username does not match Handshake username!");
 					return;
 				}
-				//m_Password = PacketData->m_Password;
 
 				if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_LOGIN, 1, PacketData ) )
 				{
@@ -1082,6 +1081,59 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 							&& !bIgnoreCollision ) { //tried to place a block *into* another?
 							break;	//happens when you place a block aiming at side of block like torch or stem
 						}
+
+						// Check whether selected item is allowed to be placed on specific surface
+						bool bIllegalSurface = false;
+						ENUM_BLOCK_ID SurfaceBlock = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( X, Y-1, Z );
+						switch( PacketData->m_ItemType )
+						{
+						case E_BLOCK_YELLOW_FLOWER:	// Can ONLY be placed on dirt/grass
+						case E_BLOCK_RED_ROSE:
+						case E_BLOCK_SAPLING:
+							switch( SurfaceBlock )
+							{
+							case E_BLOCK_DIRT:
+							case E_BLOCK_GRASS:
+								bIllegalSurface = false;
+								break;
+							default:
+								bIllegalSurface = true;
+								break;
+							};
+							break;
+						case E_BLOCK_BROWN_MUSHROOM:	// Can be placed on pretty much anything, with exceptions
+						case E_BLOCK_RED_MUSHROOM:
+							switch( SurfaceBlock )
+							{
+							case E_BLOCK_GLASS:
+							case E_BLOCK_YELLOW_FLOWER:
+							case E_BLOCK_RED_ROSE:
+							case E_BLOCK_BROWN_MUSHROOM:
+							case E_BLOCK_RED_MUSHROOM:
+							case E_BLOCK_CACTUS:
+								bIllegalSurface = true;
+								break;
+							}
+							break;
+						case E_BLOCK_CACTUS:
+							if( SurfaceBlock != E_BLOCK_SAND && SurfaceBlock != E_BLOCK_CACTUS )	// Cactus can only be placed on sand and itself
+								bIllegalSurface = true;
+
+							// Check surroundings. Cacti may ONLY be surrounded by air
+							cWorld* World = m_Player->GetWorld();
+							if(		World->GetBlock( X-1, Y, Z ) != E_BLOCK_AIR 
+								||	World->GetBlock( X+1, Y, Z ) != E_BLOCK_AIR 
+								||	World->GetBlock( X, Y, Z-1 ) != E_BLOCK_AIR 
+								||	World->GetBlock( X, Y, Z+1 ) != E_BLOCK_AIR 
+								)
+							{
+								bIllegalSurface = true;
+							}
+							break;
+						};
+
+						if( bIllegalSurface )
+							break;
 
 						if(bRemoveItem)
 						{
