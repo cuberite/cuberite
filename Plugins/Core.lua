@@ -5,6 +5,7 @@ SHOW_PLUGIN_NAMES = true	-- If true, plugin name will be shown before commands
 
 local BannedPlayersIni = {}
 local WhiteListIni = {}
+local ItemsTable = {}
 
 CorePlugin = {}
 CorePlugin.__index = CorePlugin
@@ -24,7 +25,7 @@ end
 
 function CorePlugin:Initialize()
 	self:SetName( "Core" )
-	self:SetVersion( 6 )
+	self:SetVersion( 7 )
 
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook( self, cPluginManager.E_PLUGIN_PLAYER_JOIN )
@@ -73,9 +74,32 @@ function CorePlugin:Initialize()
 		SHOW_PLUGIN_NAMES = IniFile:GetValueB("HelpPlugin", "ShowPluginNames", true )
 	end
 
-	itemsINI = cIniFile("items.ini")
+	local itemsINI = cIniFile("items.ini")
 	if ( itemsINI:ReadFile() == true ) then
-		LOGINFO("Core: loaded "  .. itemsINI:GetNumValues('Items') .. " item names.")
+		local KeyID = itemsINI:FindKey('Items')
+	
+		LOGINFO("Core: loaded "  .. itemsINI:GetNumValues( KeyID ) .. " item names.")
+		
+		for i = 0, itemsINI:GetNumValues('Items') do
+			local ItemName = itemsINI:GetValueName( KeyID, i )
+			local ItemSyntax = itemsINI:GetValue(KeyID, i, "0")
+			
+			local ItemData = StringSplit(ItemSyntax, ":") -- [1] = ID, [2] = perhaps meta/dmg
+			--LOGINFO( "#ItemData: " .. #ItemData )
+			if( #ItemData > 0 ) then	
+				--LOGINFO("ItemData[0]: "..ItemData[1])
+				local ItemID = tonumber( ItemData[1] )
+				if( ItemID > 0 ) then
+					local ItemMeta = 0
+					if( #ItemData > 1 ) then
+						ItemMeta = tonumber( ItemData[2] )
+					end
+					ItemsTable[ ItemName ] = cItem( ItemID, 1, ItemMeta )
+					LOGINFO("Got item: " .. ItemName .. "-> " .. ItemsTable[ ItemName ].m_ItemID ..":" .. ItemsTable[ ItemName ].m_ItemHealth )
+				end
+			end
+		end
+		
 		HAVE_ITEM_NAMES = true
 	end
 	
@@ -342,51 +366,64 @@ end
 
 function HandleItemCommand( Split, Player )
 	if( #Split ~= 2 and #Split ~=3 ) then
-		Player:SendMessage( cChatColor.Green .. "Usage: /item [ItemID/Name] <Amount>" )
+		Player:SendMessage( cChatColor.Green .. "Usage: /item [ItemID/Name:Dmg] <Amount>" )
 		return true
 	end
 
-	foundItem = false
+	local FoundItem = false
+	
+	local ItemSyntax = Split[2]	-- Contains item string with optional metadata
+	local ItemData = StringSplit( Split[2], ":" )
 
-	ItemID = tonumber( Split[2] )
-	if( ItemID == nil or not IsValidItem( ItemID ) ) then
-		-- nothing
-	else
-		foundItem = true
+	-- Default item values
+	local ItemID = 0
+	local ItemMeta = 0
+	local ItemAmount = 1
+	
+	if( #ItemData > 0 ) then
+		ItemID = ItemData[1]
 	end
-
-	if not foundItem then
-		if ( HAVE_ITEM_NAMES == true ) then
-			itemValue = itemsINI:GetValueI('Items', ''..Split[2]..'', 0)
-			if itemValue ~= 0 then
-				ItemID = itemValue
-				if( ItemID == nil or not IsValidItem( tonumber(itemValue) ) ) then
-					-- nothing
-				else
-					foundItem = true
-				end
-			end
+	
+	if( tonumber(ItemID) ~= nil ) then -- Definitely a number
+		ItemID = tonumber(ItemID)
+		if( IsValidItem( ItemID ) ) then
+			FoundItem = true
 		end
 	end
 
-	if not foundItem then
+	if( FoundItem == false ) then
+		if ( HAVE_ITEM_NAMES == true ) then
+			local Item = ItemsTable[ ItemID ]
+			if( Item ~= nil ) then
+				ItemID = Item.m_ItemID
+				ItemMeta = Item.m_ItemHealth
+				FoundItem = true
+			end
+		end
+	end
+	
+	-- Override metadata from item in list, if metadata was given
+	if( #ItemData > 1 and tonumber( ItemData[2] ) ~= nil ) then	-- Metadata is given, and is a number
+		ItemMeta = tonumber( ItemData[2] )
+	end
+
+	if( FoundItem == false ) then
 		Player:SendMessage( cChatColor.Green .. "Invalid Item ID / Name !" )
 		return true
 	end
 
-	local Amount = 1
 	if( #Split == 3 ) then
-		Amount = tonumber( Split[3] )
-		if( Amount == nil or Amount < 1 or Amount > 512 ) then
+		ItemAmount = tonumber( Split[3] )
+		if( ItemAmount == nil or ItemAmount < 1 or ItemAmount > 512 ) then
 			Player:SendMessage( cChatColor.Green .. "Invalid Amount !" )
 			return true
 		end
 	end
 
-	local NewItem = cItem( ItemID, Amount )
+	local NewItem = cItem( ItemID, ItemAmount, ItemMeta )
 	if( Player:GetInventory():AddItem( NewItem ) == true ) then
 		Player:SendMessage( cChatColor.Green .. "There you go !" )
-		LOG("Gave " .. Player:GetName() .. " " .. Amount .. " times " .. ItemID )
+		LOG("Gave " .. Player:GetName() .. " " .. ItemAmount .. " times " .. ItemID .. ":" .. ItemMeta)
 	else
 		Player:SendMessage( cChatColor.Green .. "Not enough space in inventory !" )
 	end
