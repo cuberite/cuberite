@@ -451,6 +451,9 @@
     <Filter Include="!Smart_Pointers">
       <UniqueIdentifier>{9bd7a65c-b60f-4905-ae2b-7c3c7586eaef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cPlugin\cPlugin_NewLua">
+      <UniqueIdentifier>{fb282bd3-cf18-44b3-8ccc-9a5a89701a6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -894,6 +897,9 @@
     </ClCompile>
     <ClCompile Include="..\source\cSurvivalInventory.cpp">
       <Filter>cInventory\cSurvivalInventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPlugin_NewLua.cpp">
+      <Filter>cPlugin\cPlugin_NewLua</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1376,6 +1382,9 @@
     </ClInclude>
     <ClInclude Include="..\source\ptr_cChunk.h">
       <Filter>!Smart_Pointers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPlugin_NewLua.h">
+      <Filter>cPlugin\cPlugin_NewLua</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -255,6 +255,7 @@
     <ClCompile Include="..\source\cPig.cpp" />
     <ClCompile Include="..\source\cPiston.cpp" />
     <ClCompile Include="..\Source\cPluginManager.cpp" />
+    <ClCompile Include="..\source\cPlugin_NewLua.cpp" />
     <ClCompile Include="..\Source\cRecipeChecker.cpp" />
     <ClCompile Include="..\source\cRedstone.cpp" />
     <ClCompile Include="..\Source\cReferenceManager.cpp" />
@@ -404,6 +405,7 @@
     <ClInclude Include="..\source\cPig.h" />
     <ClInclude Include="..\source\cPiston.h" />
     <ClInclude Include="..\Source\cPluginManager.h" />
+    <ClInclude Include="..\source\cPlugin_NewLua.h" />
     <ClInclude Include="..\Source\cRecipeChecker.h" />
     <ClInclude Include="..\source\cRedstone.h" />
     <ClInclude Include="..\Source\cReferenceManager.h" />

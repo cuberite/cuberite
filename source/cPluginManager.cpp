@@ -1,6 +1,7 @@
 #include "cPluginManager.h"
 #include "cPlugin.h"
 #include "cPlugin_Lua.h"
+#include "cPlugin_NewLua.h"
 #include "cMCLogger.h"
 #include "cWebAdmin.h"
 #include "cItem.h"
@@ -96,6 +97,18 @@ void cPluginManager::ReloadPluginsNow()
 							{
 								delete Plugin;
 							}
+						}
+					}
+				}
+				else if( ValueName.compare("NewPlugin") == 0 ) // New plugin style
+				{
+					std::string PluginFile = IniFile.GetValue(KeyNum, i );
+					if( !PluginFile.empty() )
+					{
+						cPlugin_NewLua* Plugin = new cPlugin_NewLua( PluginFile.c_str() );
+						if( !AddPlugin( Plugin ) )
+						{
+							delete Plugin;
 						}
 					}
 				}
@@ -481,6 +494,11 @@ cPlugin_Lua* cPluginManager::GetLuaPlugin( lua_State* a_State )
 
 void cPluginManager::AddHook( cPlugin* a_Plugin, PluginHook a_Hook )
 {
+	if( !a_Plugin )
+	{
+		LOGWARN("Called cPluginManager::AddHook while a_Plugin is NULL");
+		return;
+	}
 	PluginList & Plugins = m_pState->Hooks[ a_Hook ];
 	Plugins.remove( a_Plugin );
 	Plugins.push_back( a_Plugin );

@@ -188,32 +188,32 @@ void cChunk::Tick(float a_Dt)
 
 	m_pState->BlockListCriticalSection.Lock();
 	unsigned int PendingSendBlocks = m_pState->PendingSendBlocks.size();
- 	if( PendingSendBlocks > 1 )
- 	{
- 		cPacket_MultiBlock MultiBlock;
- 		MultiBlock.m_ChunkX = m_PosX;
- 		MultiBlock.m_ChunkZ = m_PosZ;
- 		MultiBlock.m_NumBlocks = (short)PendingSendBlocks;
- 		MultiBlock.m_BlockCoordinates = new unsigned short[PendingSendBlocks];
- 		MultiBlock.m_BlockTypes = new char[PendingSendBlocks];
- 		MultiBlock.m_BlockMetas = new char[PendingSendBlocks];
- 		//LOG("Sending multiblock packet for %i blocks", PendingSendBlocks );
- 		for( unsigned int i = 0; i < PendingSendBlocks; i++)
- 		{
- 			unsigned int index = m_pState->PendingSendBlocks[i];
- 			unsigned int Y = index % 128;
- 			unsigned int Z = (index / 128) % 16;
- 			unsigned int X = (index / (128*16));
+	if( PendingSendBlocks > 1 )
+	{
+		cPacket_MultiBlock MultiBlock;
+		MultiBlock.m_ChunkX = m_PosX;
+		MultiBlock.m_ChunkZ = m_PosZ;
+		MultiBlock.m_NumBlocks = (short)PendingSendBlocks;
+		MultiBlock.m_BlockCoordinates = new unsigned short[PendingSendBlocks];
+		MultiBlock.m_BlockTypes = new char[PendingSendBlocks];
+		MultiBlock.m_BlockMetas = new char[PendingSendBlocks];
+		//LOG("Sending multiblock packet for %i blocks", PendingSendBlocks );
+		for( unsigned int i = 0; i < PendingSendBlocks; i++)
+		{
+			unsigned int index = m_pState->PendingSendBlocks[i];
+			unsigned int Y = index % 128;
+			unsigned int Z = (index / 128) % 16;
+			unsigned int X = (index / (128*16));
 
- 			MultiBlock.m_BlockCoordinates[i] = (Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;
- 			//LOG("X: %i Y: %i Z: %i Combo: 0x%04x", X, Y, Z, MultiBlock.m_BlockCoordinates[i] );
- 			MultiBlock.m_BlockTypes[i] = m_BlockType[index];
- 			MultiBlock.m_BlockMetas[i] = GetLight( m_BlockMeta, index );
- 		}
- 		m_pState->PendingSendBlocks.clear();
- 		PendingSendBlocks = m_pState->PendingSendBlocks.size();
- 		Broadcast( MultiBlock );
- 	}
+			MultiBlock.m_BlockCoordinates[i] = (Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;
+			//LOG("X: %i Y: %i Z: %i Combo: 0x%04x", X, Y, Z, MultiBlock.m_BlockCoordinates[i] );
+			MultiBlock.m_BlockTypes[i] = m_BlockType[index];
+			MultiBlock.m_BlockMetas[i] = GetLight( m_BlockMeta, index );
+		}
+		m_pState->PendingSendBlocks.clear();
+		PendingSendBlocks = m_pState->PendingSendBlocks.size();
+		Broadcast( MultiBlock );
+	}
 	if( PendingSendBlocks > 0 )
 	{
 		for( unsigned int i = 0; i < PendingSendBlocks; i++)
@@ -969,7 +969,7 @@ bool cChunk::SaveToDisk()
 	char SourceFile[128];
 	sprintf_s(SourceFile, 128, "world/X%i_Y%i_Z%i.bin", m_PosX, m_PosY, m_PosZ );
 
-    #ifdef _WIN32
+	#ifdef _WIN32
 	{
 		SECURITY_ATTRIBUTES Attrib;
 		Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -979,7 +979,7 @@ bool cChunk::SaveToDisk()
 	}
 	#else
 	{
-        mkdir("world", S_IRWXU | S_IRWXG | S_IRWXO);
+		mkdir("world", S_IRWXU | S_IRWXG | S_IRWXO);
 	}
 	#endif
 
