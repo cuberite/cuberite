@@ -80,11 +80,8 @@ bool cPlugin_NewLua::Initialize()
 
 
 	// Call intialize function
-	lua_getglobal(m_LuaState, "Initialize");
-	if(!lua_isfunction(m_LuaState,-1))
+	if( !PushFunction("Initialize") )
 	{
-		LOGWARN("Error in plugin %s: Could not find function Initialize()", m_Directory.c_str() );
-		lua_pop(m_LuaState,1);
 		lua_close( m_LuaState );
 		m_LuaState = 0;
 		return false;
@@ -92,11 +89,9 @@ bool cPlugin_NewLua::Initialize()
 
 	tolua_pushusertype(m_LuaState, this, "cPlugin_NewLua");
 
-	// do the call (1 arguments, 1 result)
-	int s = lua_pcall(m_LuaState, 1, 1, 0);
-	if( report_errors( m_LuaState, s ) ) 
+	
+	if( !CallFunction(1, 1, "Initialize") ) 
 	{
-		LOGWARN("Error in plugin %s calling function Initialize()", m_Directory.c_str() );
 		lua_close( m_LuaState );
 		m_LuaState = 0;
 		return false;
@@ -116,20 +111,95 @@ bool cPlugin_NewLua::Initialize()
 
 void cPlugin_NewLua::Tick(float a_Dt)
 {
-	lua_getglobal(m_LuaState, "Tick");
-	if(!lua_isfunction(m_LuaState,-1))
-	{
-		LOGWARN("Error in plugin %s: Could not find function Tick()", m_Directory.c_str() );
-		lua_pop(m_LuaState,1);
+	if( !PushFunction("Tick") )
 		return;
-	}
 
 	tolua_pushnumber( m_LuaState, a_Dt );
 
-	// do the call (1 arguments, 0 result)/
-	int s = lua_pcall(m_LuaState, 1, 0, 0);
+	CallFunction(1, 0, "Tick");
+}
+
+bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
+{
+	if( !PushFunction("OnPlayerJoin") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	if( !CallFunction(1, 1, "OnPlayerJoin") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
+{
+	if( !PushFunction("OnLogin") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_Login");
+
+	if( !CallFunction(1, 1, "OnLogin") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player )
+{
+	if( !PushFunction("OnBlockPlace") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_BlockPlace");
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	if( !CallFunction(2, 1, "OnBlockPlace") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
+{
+	if( !PushFunction("OnKilled") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_Killed, "cPawn");
+	tolua_pushusertype(m_LuaState, a_Killer, "cEntity");
+
+	if( !CallFunction(2, 1, "OnKilled") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+// Helper functions
+bool cPlugin_NewLua::PushFunction( const char* a_FunctionName )
+{
+	lua_getglobal(m_LuaState, a_FunctionName);
+	if(!lua_isfunction(m_LuaState,-1))
+	{
+		LOGWARN("Error in plugin %s: Could not find function %s()", m_Directory.c_str(), a_FunctionName );
+		lua_pop(m_LuaState,1);
+		return false;
+	}
+	return true;
+}
+
+bool cPlugin_NewLua::CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName )
+{
+	int s = lua_pcall(m_LuaState, a_NumArgs, a_NumResults, 0);
 	if( report_errors( m_LuaState, s ) )
 	{
-		LOGWARN("Error in plugin %s calling function Tick()", m_Directory.c_str() );
+		LOGWARN("Error in plugin %s calling function %s()", m_Directory.c_str(), a_FunctionName );
+		return false;
 	}
+	return true;
 }

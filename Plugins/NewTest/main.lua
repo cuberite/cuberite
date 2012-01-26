@@ -1,12 +1,19 @@
-LOGINFO("main.lua!!")
-LOOLOL = "12345"
-PLUGIN = {}
+---- Some settings -----
+SHOW_PLUGIN_NAMES = true	-- If true, plugin name will be shown before commands
+							-- This is overwritten in the Initialize() function
+------------------------
+
+-- Global variables
+PLUGIN = {}	-- Reference to own plugin object
+BannedPlayersIni = {}
+WhiteListIni = {}
+ItemsTable = {}
 
 function Initialize( Plugin )
-	LOGINFO("Initialize in main.lua")
 	PLUGIN = Plugin
 	
-	Plugin:SetName("LOLOL new plugin!")
+	Plugin:SetName( "NewCore" )
+	Plugin:SetVersion( 8 )
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_PLAYER_JOIN )
@@ -14,43 +21,112 @@ function Initialize( Plugin )
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_BLOCK_PLACE )
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_KILLED )
 	
-	Plugin:AddCommand("/help", " - [Page] Show this message", 					"core.help")
+	Plugin:AddCommand("/help", " - [Page] Show this message", 						"core.help")
 	Plugin:AddCommand("/pluginlist", " - Show list of plugins", 					"core.pluginlist")
 	Plugin:AddCommand("/tp", " - [Player] - Teleport yourself to a player", 		"core.teleport")
 	Plugin:AddCommand("/item", " - [ItemID/Name] <Amount> - Spawn an item for yourself", "core.item")
 	Plugin:AddCommand("/list", " - Shows list of connected players", 				"core.playerlist")
 	Plugin:AddCommand("/motd", " - Show message of the day", 						"core.motd")
-	Plugin:AddCommand("/reload", " - Reload all plugins", 						"core.reload")
+	Plugin:AddCommand("/reload", " - Reload all plugins", 							"core.reload")
 	Plugin:AddCommand("/time", " - [Day/Night] - Sets the time of day", 			"core.time")
-	Plugin:AddCommand("/spawn", " - Return to the spawn", 						"core.spawn")
-	Plugin:AddCommand("/kick", " - [Player] - Kick a player", 					"core.kick")
+	Plugin:AddCommand("/spawn", " - Return to the spawn", 							"core.spawn")
+	Plugin:AddCommand("/kick", " - [Player] - Kick a player", 						"core.kick")
 	Plugin:AddCommand("/ban", " - [Player] - Ban a player", 						"core.ban")
 	Plugin:AddCommand("/unban", " - [Player] - Unban a player", 					"core.unban")
-	Plugin:AddCommand("/top", " - Teleport yourself to the top most block",		"core.top")
-	Plugin:AddCommand("/gm", " - [Gamemode (0|1)] - Change your gamemode", 		"core.changegm")
+	Plugin:AddCommand("/top", " - Teleport yourself to the top most block",			"core.top")
+	Plugin:AddCommand("/gm", " - [Gamemode (0|1)] - Change your gamemode", 			"core.changegm")
 	Plugin:AddCommand("/gotoworld", " - Move to a different world!",				"core.gotoworld")
 
 	Plugin:BindCommand( "/help", 		"core.help",		HandleHelpCommand )
-	Plugin:BindCommand( "/pluginlist","core.pluginlist", 	HandlePluginListCommand )
-	Plugin:BindCommand( "/tp", 		"core.teleport",	HandleTPCommand )
+	Plugin:BindCommand( "/pluginlist",	"core.pluginlist", 	HandlePluginListCommand )
+	Plugin:BindCommand( "/tp", 			"core.teleport",	HandleTPCommand )
 	Plugin:BindCommand( "/item", 		"core.item",		HandleItemCommand )
-	Plugin:BindCommand( "/i", 		"core.item",		HandleItemCommand )
+	Plugin:BindCommand( "/i", 			"core.item",		HandleItemCommand )
 	Plugin:BindCommand( "/list", 		"core.playerlist",	HandlePlayerListCommand )
 	Plugin:BindCommand( "/who", 		"core.playerlist",	HandlePlayerListCommand )
-	Plugin:BindCommand( "/playerlist","core.playerlist", 	HandlePlayerListCommand )
+	Plugin:BindCommand( "/playerlist",	"core.playerlist", 	HandlePlayerListCommand )
 	Plugin:BindCommand( "/motd", 		"core.motd",		HandleMOTDCommand )
-	Plugin:BindCommand( "/reload", 	"core.reload",		HandleReloadCommand )
+	Plugin:BindCommand( "/reload", 		"core.reload",		HandleReloadCommand )
 	Plugin:BindCommand( "/time", 		"core.time", 		HandleTimeCommand )
-	Plugin:BindCommand( "/spawn", 	"core.spawn",		HandleSpawnCommand )
+	Plugin:BindCommand( "/spawn", 		"core.spawn",		HandleSpawnCommand )
 	Plugin:BindCommand( "/home", 		"core.spawn",		HandleSpawnCommand )
 	Plugin:BindCommand( "/kick", 		"core.kick",		HandleKickCommand )
 	Plugin:BindCommand( "/ban", 		"core.ban",			HandleBanCommand )
-	Plugin:BindCommand( "/unban", 	"core.unban",		HandleUnbanCommand )
-	Plugin:BindCommand( "/top",		"core.top",			HandleTopCommand )
-	Plugin:BindCommand( "/gm", 		"core.changegm", 	HandleChangeGMCommand )
+	Plugin:BindCommand( "/unban", 		"core.unban",		HandleUnbanCommand )
+	Plugin:BindCommand( "/top",			"core.top",			HandleTopCommand )
+	Plugin:BindCommand( "/gm", 			"core.changegm", 	HandleChangeGMCommand )
 	Plugin:BindCommand( "/gotoworld",	"core.gotoworld",	HandleGotoWorldCommand )
 	
-	LOGINFO("Plugin name is: " .. Plugin:GetName() )
+
+	local IniFile = cIniFile("settings.ini")
+	if ( IniFile:ReadFile() == true ) then
+		SHOW_PLUGIN_NAMES = IniFile:GetValueB("HelpPlugin", "ShowPluginNames", true )
+	end
+
+	local itemsINI = cIniFile("items.ini")
+	if ( itemsINI:ReadFile() == true ) then
+		local KeyID = itemsINI:FindKey('Items')
 	
+		LOGINFO("Core: loaded "  .. itemsINI:GetNumValues( KeyID ) .. " item names.")
+		
+		for i = 0, itemsINI:GetNumValues('Items') do
+			local ItemName = itemsINI:GetValueName( KeyID, i )
+			local ItemSyntax = itemsINI:GetValue(KeyID, i, "0")
+			
+			local ItemData = StringSplit(ItemSyntax, ":") -- [1] = ID, [2] = perhaps meta/dmg
+			--LOGINFO( "#ItemData: " .. #ItemData )
+			if( #ItemData > 0 ) then	
+				--LOGINFO("ItemData[0]: "..ItemData[1])
+				local ItemID = tonumber( ItemData[1] )
+				if( ItemID > 0 ) then
+					local ItemMeta = 0
+					if( #ItemData > 1 ) then
+						ItemMeta = tonumber( ItemData[2] )
+					end
+					ItemsTable[ ItemName ] = cItem( ItemID, 1, ItemMeta )
+					LOGINFO("Got item: " .. ItemName .. "-> " .. ItemsTable[ ItemName ].m_ItemID ..":" .. ItemsTable[ ItemName ].m_ItemHealth )
+				end
+			end
+		end
+		
+		HAVE_ITEM_NAMES = true
+	end
+	
+	-- Load whitelist, and add default values and stuff
+	WhiteListIni = cIniFile("whitelist.ini")
+	if ( WhiteListIni:ReadFile() == true ) then
+		if( WhiteListIni:GetValueB("WhiteListSettings", "WhiteListOn", false) == true ) then
+			if( WhiteListIni:GetNumValues("WhiteList") > 0 ) then
+				LOGINFO("Core: loaded "  .. WhiteListIni:GetNumValues('WhiteList') .. " whitelisted players.")
+			else
+				LOGWARN("WARNING: WhiteList is on, but there are no people in the whitelist!")
+			end
+		end
+	else
+		WhiteListIni:SetValueB("WhiteListSettings", "WhiteListOn", false )
+		WhiteListIni:SetValue("WhiteList", "", "")	-- So it adds an empty header
+		WhiteListIni:DeleteValue("WhiteList", "") -- And remove the value
+		WhiteListIni:KeyComment("WhiteList", "PlayerName=1")
+		if( WhiteListIni:WriteFile() == false ) then
+			LOGWARN("WARNING: Could not write to whitelist.ini")
+		end
+	end
+	
+	-- Load banned players, and add default values and stuff
+	BannedPlayersIni = cIniFile("banned.ini")
+	if ( BannedPlayersIni:ReadFile() == true ) then
+		if( BannedPlayersIni:GetNumValues("Banned") > 0 ) then
+			LOGINFO("Core: loaded "  .. BannedPlayersIni:GetNumValues("Banned") .. " banned players.")
+		end
+	else
+		BannedPlayersIni:SetValue("Banned", "", "")	-- So it adds an empty header
+		BannedPlayersIni:DeleteValue("Banned", "") -- And remove the value
+		BannedPlayersIni:KeyComment("Banned", "PlayerName=1")
+		if( BannedPlayersIni:WriteFile() == false ) then
+			LOGWARN("WARNING: Could not write to banned.ini")
+		end
+	end
+	
+	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
 end
