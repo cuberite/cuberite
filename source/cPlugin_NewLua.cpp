@@ -11,6 +11,12 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 
+#ifdef _WIN32
+#include "wdirent.h"
+#else
+#include <dirent.h>
+#endif
+
 extern bool report_errors(lua_State* lua, int status);
 
 cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
@@ -38,29 +44,37 @@ bool cPlugin_NewLua::Initialize()
 		ManualBindings::Bind( m_LuaState );
 	}
 
-	std::string PluginFiles[] = {	 std::string("Plugins/") + m_Directory + "/tick.lua"
-									,std::string("Plugins/") + m_Directory + "/main.lua" };
-
+	std::string PluginPath = std::string("Plugins/") + m_Directory + "/";
 
 	// Load all files for this plugin, and execute them
-	for( int i = 0; i < 2; ++i )
+	DIR* dp;
+	struct dirent *entry;
+	if(dp = opendir( PluginPath.c_str() ))
 	{
-		int s = luaL_loadfile(m_LuaState, PluginFiles[i].c_str() );
-		if( report_errors( m_LuaState, s ) )
+		while(entry = readdir(dp))
 		{
-			LOGERROR("Can't load plugin %s because of an error in file %s", m_Directory.c_str(), PluginFiles[i].c_str() );
-			lua_close( m_LuaState );
-			m_LuaState = 0;
-			return false;
-		}
+			std::string FileName = entry->d_name;
+			if( FileName.find(".lua") != std::string::npos )
+			{
+				std::string Path = PluginPath + FileName;
+				int s = luaL_loadfile(m_LuaState, Path.c_str() );
+				if( report_errors( m_LuaState, s ) )
+				{
+					LOGERROR("Can't load plugin %s because of an error in file %s", m_Directory.c_str(), Path.c_str() );
+					lua_close( m_LuaState );
+					m_LuaState = 0;
+					return false;
+				}
 
-		s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
-		if( report_errors( m_LuaState, s ) )
-		{
-			LOGERROR("Error in plugin %s in file %s", m_Directory.c_str(), PluginFiles[i].c_str() );
-			lua_close( m_LuaState );
-			m_LuaState = 0;
-			return false;
+				s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+				if( report_errors( m_LuaState, s ) )
+				{
+					LOGERROR("Error in plugin %s in file %s", m_Directory.c_str(), Path.c_str() );
+					lua_close( m_LuaState );
+					m_LuaState = 0;
+					return false;
+				}
+			}
 		}
 	}
 
