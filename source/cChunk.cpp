@@ -1200,9 +1200,9 @@ void cChunk::RemoveReference()
 
 int cChunk::GetReferenceCount()
 {
-	m_pState->ReferenceCriticalSection.Unlock();
-	int Refs = m_pState->NumRefs;
 	m_pState->ReferenceCriticalSection.Lock();
+	int Refs = m_pState->NumRefs;
+	m_pState->ReferenceCriticalSection.Unlock();
 	return Refs;
 }
 
