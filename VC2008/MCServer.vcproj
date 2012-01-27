@@ -1438,6 +1438,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cPlugin_NewLua.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPlugin_NewLua.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\ManualBindings.cpp"
 					>
 				</File>
