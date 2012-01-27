@@ -1,6 +1,6 @@
 #include "cPacket.h"
-#include "cMCLogger.h"
-#include "Endianness.h"
+#include "../cMCLogger.h"
+#include "../Endianness.h"
 
 #ifdef _WIN32
 #define MSG_NOSIGNAL (0)

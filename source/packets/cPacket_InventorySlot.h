@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cPacket.h"
-#include "PacketID.h"
+
 #include "../BlockID.h"
 
 class cPacket_InventorySlot : public cPacket // Set item [S -> C] ?

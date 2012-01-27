@@ -1,7 +1,7 @@
 #pragma once
 #include "cPacket.h"
-#include "PacketID.h"
-#include "cPawn.h"
+
+#include "../cPawn.h"
 
 class cPacket_Metadata : public cPacket 
 {

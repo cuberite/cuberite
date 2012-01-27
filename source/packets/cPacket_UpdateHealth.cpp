@@ -1,6 +1,6 @@
 #include "cPacket_UpdateHealth.h"
 
-#include "cMCLogger.h"
+#include "../cMCLogger.h"
 
 bool cPacket_UpdateHealth::Send(cSocket & a_Socket)
 {

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "cPacket.h"
-#include "PacketID.h"
-#include "BlockID.h"
+
+#include "../BlockID.h"
 
 class cInventory;
 class cWindow;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "PacketID.h"
+
 #include "cPacket.h"
-#include "cItem.h"
+#include "../cItem.h"
 
 class cPacket_ItemData : public cPacket
 {

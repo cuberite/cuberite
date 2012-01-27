@@ -4,11 +4,11 @@
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cMakeDir.h"
+#include <math.h>  // floorf
 
 #ifndef _WIN32
 #include <cstring> // memcpy
 #include <cstdlib> // abs
-#include <math.h>  // floorf
 #include <stdio.h> // sprintf and stuff
 
 

@@ -1,5 +1,5 @@
 #include "cPacket_PlayerPosition.h"
-#include "cPlayer.h"
+#include "../cPlayer.h"
 
 cPacket_PlayerPosition::cPacket_PlayerPosition( cPlayer* a_Player )
 {

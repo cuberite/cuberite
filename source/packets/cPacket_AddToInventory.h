@@ -1,7 +1,7 @@
 #pragma once
 
 #include "cPacket.h"
-#include "PacketID.h"
+
 #include "../BlockID.h"
 
 class cPacket_AddToInventory : public cPacket

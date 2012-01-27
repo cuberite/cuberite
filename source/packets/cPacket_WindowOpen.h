@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cPacket.h"
-#include "PacketID.h"
 
 class cPacket_WindowOpen : public cPacket
 {

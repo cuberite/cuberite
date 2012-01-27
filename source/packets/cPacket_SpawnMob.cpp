@@ -1,7 +1,7 @@
 #include "cPacket_SpawnMob.h"
-#include "Vector3i.h"
+#include "../Vector3i.h"
 
-#include "cMCLogger.h"
+#include "../cMCLogger.h"
 
 cPacket_SpawnMob::~cPacket_SpawnMob()
 {

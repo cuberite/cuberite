@@ -1,5 +1,5 @@
 #include "cPacket_PlayerListItem.h"
-#include "cChatColor.h"
+#include "../cChatColor.h"
 
 cPacket_PlayerListItem::cPacket_PlayerListItem(std::string a_PlayerName, bool a_Online, short a_Ping)
 {

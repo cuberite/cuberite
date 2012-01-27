@@ -1,6 +1,6 @@
 #include "cPacket_AddToInventory.h"
 #include "cPacket_WholeInventory.h"
-#include "cItem.h"
+#include "../cItem.h"
 #include "cPacket_ItemData.h"
 
 bool cPacket_AddToInventory::Send( cSocket & a_Socket )

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "cSocket.h"
+#include "../cSocket.h"
+#include "../PacketID.h"
+
 #ifdef _WIN32
 #include <xstring>
 #else

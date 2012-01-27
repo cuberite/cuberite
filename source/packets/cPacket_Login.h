@@ -2,7 +2,7 @@
 
 #include "cPacket.h"
 #include <string>
-#include "PacketID.h"
+
 
 class cPacket_Login : public cPacket											//tolua_export
 {																				//tolua_export

@@ -1,5 +1,5 @@
 #include "cPacket_DestroyEntity.h"
-#include "cEntity.h"
+#include "../cEntity.h"
 
 cPacket_DestroyEntity::cPacket_DestroyEntity(cEntity* a_Entity)
 {

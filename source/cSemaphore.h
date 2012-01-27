@@ -12,6 +12,6 @@ private:
 	void* m_Handle; // HANDLE pointer
 
 #ifndef _WIN32
-    bool m_bNamed;
+	bool m_bNamed;
 #endif
 };

@@ -1,6 +1,6 @@
 #include "cPacket_TeleportEntity.h"
 
-#include "cEntity.h"
+#include "../cEntity.h"
 
 cPacket_TeleportEntity::cPacket_TeleportEntity(cEntity* a_Client)
 {

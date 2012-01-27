@@ -1,6 +1,6 @@
 #include "cPacket_EntityLook.h"
 
-#include "cEntity.h"
+#include "../cEntity.h"
 
 cPacket_EntityLook::cPacket_EntityLook(cEntity* a_Entity)
 {
