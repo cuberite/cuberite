@@ -10,10 +10,10 @@
 # Macros
 #
 
-CC = /usr/bin/g++ -msse4
-CC_OPTIONS = -O2 -s
-CCE_OPTIONS = -O2 -s -x c
-LNK_OPTIONS = -lstdc++ -pthread
+CC = /usr/bin/g++
+CC_OPTIONS = -s -O3
+CCE_OPTIONS = -s -x c -O3
+LNK_OPTIONS = -lstdc++ -O3
 
 
 #
@@ -243,7 +243,9 @@ MCServer : \
 		build/cLavaSimulator.o\
 		build/cFireSimulator.o\
 		build/cFileFormatUpdater.o\
-		build/cItem.o
+		build/cItem.o\
+		build/cPlugin_NewLua.o\
+		build/cWebPlugin_Lua.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -450,6 +452,8 @@ MCServer : \
 		build/cFireSimulator.o\
 		build/cFileFormatUpdater.o\
 		build/cItem.o\
+		build/cPlugin_NewLua.o\
+		build/cWebPlugin_Lua.o\
 		-o MCServer
 
 clean : 
@@ -659,6 +663,8 @@ clean :
 		build/cFireSimulator.o\
 		build/cFileFormatUpdater.o\
 		build/cItem.o\
+		build/cPlugin_NewLua.o\
+		build/cWebPlugin_Lua.o\
 		MCServer
 
 install : MCServer
@@ -1504,5 +1510,11 @@ build/cFileFormatUpdater.o : source/cFileFormatUpdater.cpp
 
 build/cItem.o : source/cItem.cpp
 	$(CC) $(CC_OPTIONS) source/cItem.cpp -c $(INCLUDE) -o build/cItem.o	
+
+build/cPlugin_NewLua.o : source/cPlugin_NewLua.cpp
+	$(CC) $(CC_OPTIONS) source/cPlugin_NewLua.cpp -c $(INCLUDE) -o build/cPlugin_NewLua.o	
+
+build/cWebPlugin_Lua.o : source/cWebPlugin_Lua.cpp
+	$(CC) $(CC_OPTIONS) source/cWebPlugin_Lua.cpp -c $(INCLUDE) -o build/cWebPlugin_Lua.o	
 
 ##### END RUN ####

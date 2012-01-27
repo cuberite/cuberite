@@ -12,7 +12,7 @@ ItemsTable = {}
 function Initialize( Plugin )
 	PLUGIN = Plugin
 	
-	Plugin:SetName( "NewCore" )
+	Plugin:SetName( "Core" )
 	Plugin:SetVersion( 8 )
 	
 	PluginManager = cRoot:Get():GetPluginManager()
@@ -126,6 +126,12 @@ function Initialize( Plugin )
 			LOGWARN("WARNING: Could not write to banned.ini")
 		end
 	end
+	
+	local WebPlugin = Plugin:CreateWebPlugin()
+	WebPlugin:SetName( Plugin:GetName() )
+	WebPlugin:AddTab( "Whitelist", HandleRequest_WhiteList )
+	WebPlugin:AddTab( "Reload", HandleRequest_Reload )
+	WebPlugin:AddTab( "Playerlist", HandleRequest_PlayerList )
 	
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true

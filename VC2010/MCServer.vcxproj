@@ -374,6 +374,7 @@
     <ClCompile Include="..\source\cWaterSimulator.cpp" />
     <ClCompile Include="..\Source\cWebAdmin.cpp" />
     <ClCompile Include="..\Source\cWebPlugin.cpp" />
+    <ClCompile Include="..\source\cWebPlugin_Lua.cpp" />
     <ClCompile Include="..\source\cWindow.cpp" />
     <ClCompile Include="..\source\cWolf.cpp" />
     <ClCompile Include="..\source\cWorldGenerator.cpp" />
@@ -529,6 +530,7 @@
     <ClInclude Include="..\source\cWaterSimulator.h" />
     <ClInclude Include="..\Source\cWebAdmin.h" />
     <ClInclude Include="..\Source\cWebPlugin.h" />
+    <ClInclude Include="..\source\cWebPlugin_Lua.h" />
     <ClInclude Include="..\source\cWindow.h" />
     <ClInclude Include="..\source\cWindowOwner.h" />
     <ClInclude Include="..\source\cWolf.h" />

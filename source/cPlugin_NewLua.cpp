@@ -1,6 +1,7 @@
 #define LUA_USE_POSIX
 #include "cPlugin_NewLua.h"
 #include "cMCLogger.h"
+#include "cWebPlugin_Lua.h"
 
 extern "C"
 {
@@ -27,6 +28,12 @@ cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
 
 cPlugin_NewLua::~cPlugin_NewLua()
 {
+	for( WebPluginList::iterator itr = m_WebPlugins.begin(); itr != m_WebPlugins.end(); ++itr )
+	{
+		delete *itr;
+	}
+	m_WebPlugins.clear();
+
 	if( m_LuaState )
 	{
 		lua_close( m_LuaState );
@@ -76,6 +83,7 @@ bool cPlugin_NewLua::Initialize()
 				}
 			}
 		}
+		closedir( dp );
 	}
 
 
@@ -177,7 +185,19 @@ bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 	return bRetVal;
 }
 
+cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
+{
+	if( a_LuaState != m_LuaState )
+	{
+		LOGERROR("Not allowed to create a WebPlugin from another plugin but your own!");
+		return 0;
+	}
+	cWebPlugin_Lua* WebPlugin = new cWebPlugin_Lua( this );
 
+	m_WebPlugins.push_back( WebPlugin );
+
+	return WebPlugin;
+}
 
 
 // Helper functions

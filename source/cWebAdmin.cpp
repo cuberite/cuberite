@@ -3,6 +3,7 @@
 #include "cStringMap.h"
 
 #include "cWebPlugin.h"
+#include "cWebPlugin_Lua.h"
 
 #include "cPluginManager.h"
 #include "cPlugin.h"
@@ -96,6 +97,16 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 			std::string UserPassword = WebAdmin->m_IniFile->GetValue( "User:"+r->username_, "Password", "");
 			if (UserPassword != "" && r->password_ == UserPassword)
 			{
+				std::string BaseURL = "./";
+				if( Split.size() > 1 )
+				{
+					for( unsigned int i = 0; i < Split.size(); i++)
+					{
+						BaseURL += "../";
+					}
+					BaseURL += "webadmin/";
+				}
+
 				std::string Menu;
 				std::string Content;
 				std::string Template = WebAdmin->GetTemplate();
@@ -103,7 +114,20 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 				for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
 				{
-					Menu += "<li><a href='" + (*itr)->GetName() + "'>" + (*itr)->GetName() + "</a></li>";
+					cWebPlugin* WebPlugin = *itr;
+					cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
+					if( LuaPlugin )
+					{
+						std::list< std::string > NameList = LuaPlugin->GetTabNames();
+						for( std::list< std::string >::iterator Name = NameList.begin(); Name != NameList.end(); ++Name )
+						{
+							Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "/" + (*Name) + "'>" + (*Name) + "</a></li>";
+						}
+					}
+					else
+					{
+						Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "'>" + WebPlugin->GetName() + "</a></li>";
+					}
 				}
 
 				HTTPRequest Request;
@@ -112,17 +136,20 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				Request.Params = new cStringMap(r->params_);
 				Request.Path = r->path_;
 
-				
-
 				if( Split.size() > 1 )
 				{
-					
 					for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
 					{
 						if( (*itr)->GetName() == Split[1] )
 						{
 							Content = (*itr)->HandleRequest( &Request );
-							FoundPlugin = (*itr)->GetName();
+							cWebPlugin* WebPlugin = *itr;
+							FoundPlugin = WebPlugin->GetName();
+							cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
+							if( LuaPlugin )
+							{
+								FoundPlugin += " - " + LuaPlugin->GetTabNameForRequest( &Request );
+							}
 							break;
 						}
 					}
@@ -144,7 +171,10 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 						const cPluginManager::PluginList & List = PM->GetAllPlugins();
 						for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
 						{
-							Content += std::string("<li>") + std::string( (*itr)->GetName() ) + "</li>";
+							char c_VersionNum[32]; // 32 digits should be enough? XD
+							sprintf_s( c_VersionNum, 32, "%i", (*itr)->GetVersion() );
+							Content += std::string("<li>") + std::string( (*itr)->GetName() ) + " V. " + std::string( c_VersionNum ) + "</li>";
+							
 						}
 					}
 					Content += "</ul>";
@@ -163,13 +193,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 				if( Split.size() > 1 )
 				{
-					Content += "\n<p><a href='";
-					for( unsigned int i = 0; i < Split.size(); i++)
-					{
-						Content += "../";
-					}
-					Content += "webadmin/";
-					Content += "'>Go back</a></p>";
+					Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
 				}
 
 				// mem usage

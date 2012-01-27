@@ -454,6 +454,9 @@
     <Filter Include="cPlugin\cPlugin_NewLua">
       <UniqueIdentifier>{fb282bd3-cf18-44b3-8ccc-9a5a89701a6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cWebAdmin\cWebPlugin\cWebPlugin">
+      <UniqueIdentifier>{31f2d7f9-9684-456b-9d70-011a10e894fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -900,6 +903,9 @@
     </ClCompile>
     <ClCompile Include="..\source\cPlugin_NewLua.cpp">
       <Filter>cPlugin\cPlugin_NewLua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cWebPlugin_Lua.cpp">
+      <Filter>cWebAdmin\cWebPlugin\cWebPlugin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1385,6 +1391,9 @@
     </ClInclude>
     <ClInclude Include="..\source\cPlugin_NewLua.h">
       <Filter>cPlugin\cPlugin_NewLua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cWebPlugin_Lua.h">
+      <Filter>cWebAdmin\cWebPlugin\cWebPlugin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

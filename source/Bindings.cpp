@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/26/12 18:52:03.
+** Generated automatically by tolua++-1.0.92 on 01/27/12 00:53:11.
 */
 
 #ifndef __cplusplus
@@ -38,6 +38,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "cItem.h"
 #include "cWebAdmin.h"
 #include "cWebPlugin.h"
+#include "cWebPlugin_Lua.h"
 #include "cPickup.h"
 #include "cRoot.h"
 #include "cTCPLink.h"
@@ -167,24 +168,25 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cPacket_Login");
  tolua_usertype(tolua_S,"cClientHandle");
- tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cGroup");
- tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"cPacket_PickupSpawn");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cMCLogger");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cPlugin_Lua");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cWebPlugin_Lua");
  tolua_usertype(tolua_S,"Lua__cPlayer");
  tolua_usertype(tolua_S,"cPacket");
  tolua_usertype(tolua_S,"cPacket_BlockDig");
@@ -197,8 +199,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cPacket_BlockPlace");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"Lua__cPlugin_NewLua");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"HTTPRequest");
@@ -8043,6 +8045,212 @@ static int tolua_AllToLua_cPlugin_NewLua_Initialize00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: Tick of class  cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_NewLua_Tick00
+static int tolua_AllToLua_cPlugin_NewLua_Tick00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  float a_Dt = ((float)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Tick'", NULL);
+#endif
+  {
+   self->Tick(a_Dt);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Tick'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnPlayerJoin of class  cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_NewLua_OnPlayerJoin00
+static int tolua_AllToLua_cPlugin_NewLua_OnPlayerJoin00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnPlayerJoin'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnPlayerJoin(a_Player);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnPlayerJoin'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnLogin of class  cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_NewLua_OnLogin00
+static int tolua_AllToLua_cPlugin_NewLua_OnLogin00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPacket_Login",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPacket_Login* a_PacketData = ((cPacket_Login*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnLogin'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnLogin(a_PacketData);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnLogin'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnBlockPlace of class  cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_NewLua_OnBlockPlace00
+static int tolua_AllToLua_cPlugin_NewLua_OnBlockPlace00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPacket_BlockPlace",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPacket_BlockPlace* a_PacketData = ((cPacket_BlockPlace*)  tolua_tousertype(tolua_S,2,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnBlockPlace'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnBlockPlace(a_PacketData,a_Player);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnBlockPlace'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnKilled of class  cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_NewLua_OnKilled00
+static int tolua_AllToLua_cPlugin_NewLua_OnKilled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPawn",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPawn* a_Killed = ((cPawn*)  tolua_tousertype(tolua_S,2,0));
+  cEntity* a_Killer = ((cEntity*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnKilled'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnKilled(a_Killed,a_Killer);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnKilled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CreateWebPlugin of class  cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_NewLua_CreateWebPlugin00
+static int tolua_AllToLua_cPlugin_NewLua_CreateWebPlugin00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  lua_State* a_LuaState =  tolua_S;
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CreateWebPlugin'", NULL);
+#endif
+  {
+   cWebPlugin_Lua* tolua_ret = (cWebPlugin_Lua*)  self->CreateWebPlugin(a_LuaState);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWebPlugin_Lua");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CreateWebPlugin'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
  class Lua__cPlugin_NewLua : public cPlugin_NewLua, public ToluaBase {
 public:
 	 bool  Initialize( void ) {
@@ -8055,19 +8263,65 @@ public:
 			return ( bool ) cPlugin_NewLua:: Initialize();
 		};
 	};
+	 void  Tick( float a_Dt) {
+		if (push_method("Tick",  tolua_AllToLua_cPlugin_NewLua_Tick00)) {
+			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cPlugin_NewLua:: Tick(a_Dt);
+		};
+	};
+	 bool  OnPlayerJoin( cPlayer* a_Player) {
+		if (push_method("OnPlayerJoin",  tolua_AllToLua_cPlugin_NewLua_OnPlayerJoin00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnPlayerJoin(a_Player);
+		};
+	};
+	 bool  OnLogin( cPacket_Login* a_PacketData) {
+		if (push_method("OnLogin",  tolua_AllToLua_cPlugin_NewLua_OnLogin00)) {
+			tolua_pushusertype(lua_state, (void*)a_PacketData, "cPacket_Login");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnLogin(a_PacketData);
+		};
+	};
+	 bool  OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player) {
+		if (push_method("OnBlockPlace",  tolua_AllToLua_cPlugin_NewLua_OnBlockPlace00)) {
+			tolua_pushusertype(lua_state, (void*)a_PacketData, "cPacket_BlockPlace");
+			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			ToluaBase::dbcall(lua_state, 3, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnBlockPlace(a_PacketData,a_Player);
+		};
+	};
+	 bool  OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
+		if (push_method("OnKilled",  tolua_AllToLua_cPlugin_NewLua_OnKilled00)) {
+			tolua_pushusertype(lua_state, (void*)a_Killed, "cPawn");
+			tolua_pushusertype(lua_state, (void*)a_Killer, "cEntity");
+			ToluaBase::dbcall(lua_state, 3, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnKilled(a_Killed,a_Killer);
+		};
+	};
 	 void  OnDisable( void ) {
 		if (push_method("OnDisable",  tolua_AllToLua_cPlugin_OnDisable00)) {
 			ToluaBase::dbcall(lua_state, 1, 0);
 		} else {
 			return ( void ) cPlugin_NewLua:: OnDisable();
-		};
-	};
-	 void  Tick( float a_Dt) {
-		if (push_method("Tick",  tolua_AllToLua_cPlugin_Tick00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPlugin_NewLua:: Tick(a_Dt);
 		};
 	};
 	 bool  OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player) {
@@ -8092,18 +8346,6 @@ public:
 			return tolua_ret;
 		} else {
 			return ( bool ) cPlugin_NewLua:: OnDisconnect(a_Reason,a_Player);
-		};
-	};
-	 bool  OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player) {
-		if (push_method("OnBlockPlace",  tolua_AllToLua_cPlugin_OnBlockPlace00)) {
-			tolua_pushusertype(lua_state, (void*)a_PacketData, "cPacket_BlockPlace");
-			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
-			ToluaBase::dbcall(lua_state, 3, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPlugin_NewLua:: OnBlockPlace(a_PacketData,a_Player);
 		};
 	};
 	 bool  OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem) {
@@ -8131,34 +8373,12 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnChat(a_Chat,a_Player);
 		};
 	};
-	 bool  OnLogin( cPacket_Login* a_PacketData) {
-		if (push_method("OnLogin",  tolua_AllToLua_cPlugin_OnLogin00)) {
-			tolua_pushusertype(lua_state, (void*)a_PacketData, "cPacket_Login");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPlugin_NewLua:: OnLogin(a_PacketData);
-		};
-	};
 	 void  OnPlayerSpawn( cPlayer* a_Player) {
 		if (push_method("OnPlayerSpawn",  tolua_AllToLua_cPlugin_OnPlayerSpawn00)) {
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
 			ToluaBase::dbcall(lua_state, 2, 0);
 		} else {
 			return ( void ) cPlugin_NewLua:: OnPlayerSpawn(a_Player);
-		};
-	};
-	 bool  OnPlayerJoin( cPlayer* a_Player) {
-		if (push_method("OnPlayerJoin",  tolua_AllToLua_cPlugin_OnPlayerJoin00)) {
-			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPlugin_NewLua:: OnPlayerJoin(a_Player);
 		};
 	};
 	 void  OnPlayerMove( cPlayer* a_Player) {
@@ -8178,27 +8398,27 @@ public:
 			return ( void ) cPlugin_NewLua:: OnTakeDamage(a_Pawn,a_TakeDamageInfo);
 		};
 	};
-	 bool  OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
-		if (push_method("OnKilled",  tolua_AllToLua_cPlugin_OnKilled00)) {
-			tolua_pushusertype(lua_state, (void*)a_Killed, "cPawn");
-			tolua_pushusertype(lua_state, (void*)a_Killer, "cEntity");
-			ToluaBase::dbcall(lua_state, 3, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPlugin_NewLua:: OnKilled(a_Killed,a_Killer);
-		};
-	};
 
 	 bool cPlugin_NewLua__Initialize( void ) {
 		return ( bool )cPlugin_NewLua::Initialize();
 	};
-	 void cPlugin_NewLua__OnDisable( void ) {
-		return ( void )cPlugin_NewLua::OnDisable();
-	};
 	 void cPlugin_NewLua__Tick( float a_Dt) {
 		return ( void )cPlugin_NewLua::Tick(a_Dt);
+	};
+	 bool cPlugin_NewLua__OnPlayerJoin( cPlayer* a_Player) {
+		return ( bool )cPlugin_NewLua::OnPlayerJoin(a_Player);
+	};
+	 bool cPlugin_NewLua__OnLogin( cPacket_Login* a_PacketData) {
+		return ( bool )cPlugin_NewLua::OnLogin(a_PacketData);
+	};
+	 bool cPlugin_NewLua__OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player) {
+		return ( bool )cPlugin_NewLua::OnBlockPlace(a_PacketData,a_Player);
+	};
+	 bool cPlugin_NewLua__OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
+		return ( bool )cPlugin_NewLua::OnKilled(a_Killed,a_Killer);
+	};
+	 void cPlugin_NewLua__OnDisable( void ) {
+		return ( void )cPlugin_NewLua::OnDisable();
 	};
 	 bool cPlugin_NewLua__OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player) {
 		return ( bool )cPlugin_NewLua::OnCollectItem(a_Pickup,a_Player);
@@ -8206,32 +8426,20 @@ public:
 	 bool cPlugin_NewLua__OnDisconnect( std::string a_Reason, cPlayer* a_Player) {
 		return ( bool )cPlugin_NewLua::OnDisconnect(a_Reason,a_Player);
 	};
-	 bool cPlugin_NewLua__OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player) {
-		return ( bool )cPlugin_NewLua::OnBlockPlace(a_PacketData,a_Player);
-	};
 	 bool cPlugin_NewLua__OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem) {
 		return ( bool )cPlugin_NewLua::OnBlockDig(a_PacketData,a_Player,a_PickupItem);
 	};
 	 bool cPlugin_NewLua__OnChat( const char* a_Chat, cPlayer* a_Player) {
 		return ( bool )cPlugin_NewLua::OnChat(a_Chat,a_Player);
 	};
-	 bool cPlugin_NewLua__OnLogin( cPacket_Login* a_PacketData) {
-		return ( bool )cPlugin_NewLua::OnLogin(a_PacketData);
-	};
 	 void cPlugin_NewLua__OnPlayerSpawn( cPlayer* a_Player) {
 		return ( void )cPlugin_NewLua::OnPlayerSpawn(a_Player);
-	};
-	 bool cPlugin_NewLua__OnPlayerJoin( cPlayer* a_Player) {
-		return ( bool )cPlugin_NewLua::OnPlayerJoin(a_Player);
 	};
 	 void cPlugin_NewLua__OnPlayerMove( cPlayer* a_Player) {
 		return ( void )cPlugin_NewLua::OnPlayerMove(a_Player);
 	};
 	 void cPlugin_NewLua__OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo) {
 		return ( void )cPlugin_NewLua::OnTakeDamage(a_Pawn,a_TakeDamageInfo);
-	};
-	 bool cPlugin_NewLua__OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
-		return ( bool )cPlugin_NewLua::OnKilled(a_Killed,a_Killer);
 	};
 };
 
@@ -8295,6 +8503,179 @@ static int tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__Initialize00(lua_S
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'cPlugin_NewLua__Initialize'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin_NewLua__Tick of class  Lua__cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__Tick00
+static int tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__Tick00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin_NewLua* self = (Lua__cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  float a_Dt = ((float)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin_NewLua__Tick'", NULL);
+#endif
+  {
+   self->cPlugin_NewLua__Tick(a_Dt);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin_NewLua__Tick'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin_NewLua__OnPlayerJoin of class  Lua__cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnPlayerJoin00
+static int tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnPlayerJoin00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin_NewLua* self = (Lua__cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin_NewLua__OnPlayerJoin'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin_NewLua__OnPlayerJoin(a_Player);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin_NewLua__OnPlayerJoin'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin_NewLua__OnLogin of class  Lua__cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnLogin00
+static int tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnLogin00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPacket_Login",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin_NewLua* self = (Lua__cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPacket_Login* a_PacketData = ((cPacket_Login*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin_NewLua__OnLogin'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin_NewLua__OnLogin(a_PacketData);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin_NewLua__OnLogin'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin_NewLua__OnBlockPlace of class  Lua__cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnBlockPlace00
+static int tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnBlockPlace00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPacket_BlockPlace",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin_NewLua* self = (Lua__cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPacket_BlockPlace* a_PacketData = ((cPacket_BlockPlace*)  tolua_tousertype(tolua_S,2,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin_NewLua__OnBlockPlace'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin_NewLua__OnBlockPlace(a_PacketData,a_Player);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin_NewLua__OnBlockPlace'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin_NewLua__OnKilled of class  Lua__cPlugin_NewLua */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnKilled00
+static int tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnKilled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin_NewLua",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPawn",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin_NewLua* self = (Lua__cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+  cPawn* a_Killed = ((cPawn*)  tolua_tousertype(tolua_S,2,0));
+  cEntity* a_Killer = ((cEntity*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin_NewLua__OnKilled'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin_NewLua__OnKilled(a_Killed,a_Killer);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin_NewLua__OnKilled'.",&tolua_err);
  return 0;
 #endif
 }
@@ -16496,11 +16877,22 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cPlugin_NewLua","cPlugin_NewLua","cPlugin",NULL);
   tolua_beginmodule(tolua_S,"cPlugin_NewLua");
    tolua_function(tolua_S,"Initialize",tolua_AllToLua_cPlugin_NewLua_Initialize00);
+   tolua_function(tolua_S,"Tick",tolua_AllToLua_cPlugin_NewLua_Tick00);
+   tolua_function(tolua_S,"OnPlayerJoin",tolua_AllToLua_cPlugin_NewLua_OnPlayerJoin00);
+   tolua_function(tolua_S,"OnLogin",tolua_AllToLua_cPlugin_NewLua_OnLogin00);
+   tolua_function(tolua_S,"OnBlockPlace",tolua_AllToLua_cPlugin_NewLua_OnBlockPlace00);
+   tolua_function(tolua_S,"OnKilled",tolua_AllToLua_cPlugin_NewLua_OnKilled00);
+   tolua_function(tolua_S,"CreateWebPlugin",tolua_AllToLua_cPlugin_NewLua_CreateWebPlugin00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Lua__cPlugin_NewLua","Lua__cPlugin_NewLua","cPlugin_NewLua",NULL);
   tolua_beginmodule(tolua_S,"Lua__cPlugin_NewLua");
    tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cPlugin_NewLua_tolua__set_instance00);
    tolua_function(tolua_S,"cPlugin_NewLua__Initialize",tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__Initialize00);
+   tolua_function(tolua_S,"cPlugin_NewLua__Tick",tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__Tick00);
+   tolua_function(tolua_S,"cPlugin_NewLua__OnPlayerJoin",tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnPlayerJoin00);
+   tolua_function(tolua_S,"cPlugin_NewLua__OnLogin",tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnLogin00);
+   tolua_function(tolua_S,"cPlugin_NewLua__OnBlockPlace",tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnBlockPlace00);
+   tolua_function(tolua_S,"cPlugin_NewLua__OnKilled",tolua_AllToLua_Lua__cPlugin_NewLua_cPlugin_NewLua__OnKilled00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPlugin_Lua","cPlugin_Lua","",NULL);
   tolua_beginmodule(tolua_S,"cPlugin_Lua");
@@ -16601,6 +16993,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cWebPlugin_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_Lua__cWebPlugin_new00_local);
    tolua_function(tolua_S,"delete",tolua_AllToLua_Lua__cWebPlugin_delete00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cWebPlugin_Lua","cWebPlugin_Lua","cWebPlugin",NULL);
+  tolua_beginmodule(tolua_S,"cWebPlugin_Lua");
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",tolua_collect_cPickup);

@@ -6,6 +6,7 @@
 #include "cWorld.h"
 #include "cPlugin.h"
 #include "cPluginManager.h"
+#include "cWebPlugin_Lua.h"
 #include "cLuaCommandBinder.h"
 #include "cPlayer.h"
 #include "md5/md5.h"
@@ -191,6 +192,49 @@ static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
 	return 0;
 }
 
+static int tolua_cWebPlugin_Lua_AddTab(lua_State* tolua_S)
+{
+	cWebPlugin_Lua* self = (cWebPlugin_Lua*)  tolua_tousertype(tolua_S,1,0);
+
+	tolua_Error tolua_err;
+	tolua_err.array = 0;
+	tolua_err.index = 0;
+	tolua_err.type = 0;
+
+	std::string Title = "";
+	int Reference = LUA_REFNIL;
+
+	if( tolua_isstring( tolua_S, 2, 0, &tolua_err ) &&
+		lua_isfunction( tolua_S, 3 ) )
+	{
+		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+		Title = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+	}
+	else
+	{
+		if( tolua_err.type == 0 )
+		{
+			tolua_err.type = "function";
+		}
+		tolua_error(tolua_S,"#ferror in function 'AddTab'.",&tolua_err);
+		return 0;
+	}
+
+	if( Reference != LUA_REFNIL )
+	{
+		if( !self->AddTab( Title.c_str(), tolua_S, Reference ) )
+		{
+			luaL_unref( tolua_S, LUA_REGISTRYINDEX, Reference );
+		}
+	}
+	else
+	{
+		LOGERROR("ERROR: cWebPlugin_Lua:AddTab invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str() );
+	}
+
+	return 0;
+}
+
 static int tolua_md5(lua_State* tolua_S)
 {
 	std::string SourceString = tolua_tostring(tolua_S, 1, 0);
@@ -221,6 +265,9 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_endmodule(tolua_S);
 		tolua_beginmodule(tolua_S,"cPlayer");
 			tolua_function(tolua_S,"GetGroups",tolua_cPlayer_GetGroups);
+		tolua_endmodule(tolua_S);
+		tolua_beginmodule(tolua_S,"cWebPlugin_Lua");
+			tolua_function(tolua_S,"AddTab",tolua_cWebPlugin_Lua_AddTab);
 		tolua_endmodule(tolua_S);
 			
 		tolua_function(tolua_S,"md5",tolua_md5);
