@@ -405,6 +405,19 @@
 			<File
 				RelativePath="..\source\cNoise.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						Optimization="2"
+						EnableIntrinsicFunctions="true"
+						FavorSizeOrSpeed="1"
+						OmitFramePointers="true"
+						BasicRuntimeChecks="0"
+						DebugInformationFormat="3"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\source\cNoise.h"
