@@ -23,6 +23,7 @@
 #include <psapi.h>
 #else
 #include <sys/resource.h>
+#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
 #endif
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);
