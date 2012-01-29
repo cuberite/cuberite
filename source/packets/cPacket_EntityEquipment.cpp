@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_EntityEquipment.h"
+
+
+
+
 
 cPacket_EntityEquipment::cPacket_EntityEquipment( const cPacket_EntityEquipment & a_Copy )
 {

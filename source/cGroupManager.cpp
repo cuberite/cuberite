@@ -1,8 +1,10 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cGroupManager.h"
 #include "cGroup.h"
 #include "../iniFile/iniFile.h"
 #include "cChatColor.h"
-#include "cMCLogger.h"
 #include "cRoot.h"
 
 extern std::vector< std::string > StringSplit( std::string str, std::string delim);

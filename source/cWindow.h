@@ -1,8 +1,5 @@
 #pragma once
 
-#include "MemoryLeak.h"
-#include <list>
-#include <string>
 
 class cPacket_WindowClick;
 class cPlayer;

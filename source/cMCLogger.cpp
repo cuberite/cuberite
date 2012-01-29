@@ -1,16 +1,13 @@
-#include "cMCLogger.h"
-#include "cLog.h"
-#include "cCriticalSection.h"
 
-#include <stdio.h>
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include <cstdarg>
 #include <time.h>
+#include "cLog.h"
 
-#ifndef _WIN32
-#define	sprintf_s(buffer, buffer_size, stringbuffer, ...) (sprintf(buffer, stringbuffer, __VA_ARGS__))
-#else
-#include <Windows.h>
-#endif
+
+
+
 
 cMCLogger* cMCLogger::s_MCLogger = 0;
 

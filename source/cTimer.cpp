@@ -1,11 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cTimer.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <sys/time.h>
-#include <time.h>
-#endif
+
+
+
+
 
 cTimer::cTimer()
 #ifdef _WIN32

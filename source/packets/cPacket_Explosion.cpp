@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_Explosion.h"
+
+
+
+
 
 cPacket_Explosion::~cPacket_Explosion()
 {

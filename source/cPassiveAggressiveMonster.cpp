@@ -1,6 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPassiveAggressiveMonster.h"
 
 #include "cPlayer.h"
+
+
+
 
 
 cPassiveAggressiveMonster::cPassiveAggressiveMonster()

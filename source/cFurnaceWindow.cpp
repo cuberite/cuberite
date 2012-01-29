@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cFurnaceWindow.h"
 #include "cItem.h"
 #include "cFurnaceEntity.h"
@@ -5,7 +8,9 @@
 
 #include "packets/cPacket_WindowClick.h"
 
-#include "cMCLogger.h"
+
+
+
 
 cFurnaceWindow::cFurnaceWindow( cFurnaceEntity* a_Owner )
 	: cWindow( a_Owner, true )

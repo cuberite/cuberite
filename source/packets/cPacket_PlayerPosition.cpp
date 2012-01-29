@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_PlayerPosition.h"
 #include "../cPlayer.h"
+
+
+
+
 
 cPacket_PlayerPosition::cPacket_PlayerPosition( cPlayer* a_Player )
 {

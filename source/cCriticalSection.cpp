@@ -1,12 +1,5 @@
-#include "cCriticalSection.h"
-#include "cMCLogger.h"
-#include <assert.h>
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <pthread.h>
-#endif
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 
 

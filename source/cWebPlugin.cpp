@@ -1,10 +1,14 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWebPlugin.h"
 #include "cWebAdmin.h"
 #include "cServer.h"
-#include "cMCLogger.h"
 #include "cRoot.h"
 
-#include "MemoryLeak.h"
+
+
+
 
 cWebPlugin::cWebPlugin( lua_State* L )
 {

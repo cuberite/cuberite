@@ -1,14 +1,20 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket.h"
-#include "../cMCLogger.h"
 #include "../Endianness.h"
 
 #ifdef _WIN32
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
 
 #ifdef __MAC_NA
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
+
+
+
+
 
 //*****************************************************************************
 // Blocking receive all function

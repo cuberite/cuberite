@@ -1,24 +1,10 @@
+
+#include "Globals.h"
+
 #include "cFileFormatUpdater.h"
 #include "cMCLogger.h"
 #include "Vector3d.h"
 #include "Vector3f.h"
-#include <string>
-#include <list>
-#include <stdio.h>
-
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#else
-#include <sys/types.h>
-#include <dirent.h>
-#include <errno.h>
-#include <vector>
-#include <string>
-#include <iostream>
-
-#include <cstdio>
-#endif
 
 #include "cItem.h"
 #include <json/json.h>

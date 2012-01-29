@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_PlayerMoveLook.h"
 #include "../cPlayer.h"
+
+
+
+
 
 cPacket_PlayerMoveLook::cPacket_PlayerMoveLook( cPlayer* a_Player )
 {

@@ -1,9 +1,13 @@
+
+// A std::map<string, string> interface for Lua
+
 #pragma once
 
 #include "tolua++.h"
-#include <string>
-#include <map>
-// A std::map<string, string> interface for Lua
+
+
+
+
 
 class cStringMap					// tolua_export
 {									// tolua_export
@@ -17,3 +21,7 @@ public:								// tolua_export
 private:
 	std::map< std::string, std::string > m_StringMap;
 };									// tolua_export
+
+
+
+

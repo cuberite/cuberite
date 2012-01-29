@@ -76,6 +76,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -103,6 +105,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -128,7 +132,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\WebServer\base64.cpp" />
-    <ClCompile Include="..\WebServer\cEvent.cpp" />
+    <ClCompile Include="..\WebServer\cEvents.cpp" />
+    <ClCompile Include="..\WebServer\Globals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\WebServer\Socket.cpp" />
     <ClCompile Include="..\WebServer\StdHelpers.cpp" />
     <ClCompile Include="..\WebServer\UrlHelper.cpp" />
@@ -136,7 +144,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WebServer\base64.h" />
-    <ClInclude Include="..\WebServer\cEvent.h" />
+    <ClInclude Include="..\WebServer\cEvents.h" />
+    <ClInclude Include="..\WebServer\Globals.h" />
     <ClInclude Include="..\WebServer\Socket.h" />
     <ClInclude Include="..\WebServer\StdHelpers.h" />
     <ClInclude Include="..\WebServer\Tracer.h" />

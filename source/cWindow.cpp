@@ -1,6 +1,8 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWindow.h"
 #include "cItem.h"
-#include "cMCLogger.h"
 #include "cClientHandle.h"
 #include "cPlayer.h"
 #include "cPickup.h"
@@ -12,7 +14,9 @@
 #include "packets/cPacket_WindowOpen.h"
 #include "packets/cPacket_WindowClose.h"
 
-#include <list>
+
+
+
 
 cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 	: m_WindowID( 0 )

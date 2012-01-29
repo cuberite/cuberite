@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cReferenceManager.h"
 #include "cEntity.h"
+
+
+
+
 
 cReferenceManager::cReferenceManager( ENUM_REFERENCE_MANAGER_TYPE a_Type )
 	: m_Type( a_Type )

@@ -1,9 +1,10 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "SquirrelBindings.h"
 #if USE_SQUIRREL
 #pragma warning(disable:4100) // Getting A LOT of these warnings from SqPlus
 #pragma warning(disable:4127)
-
-#include "cMCLogger.h"
 
 #include <sqplus/sqplus.h>
 #include <sqplus/SquirrelObject.h>
@@ -15,6 +16,10 @@
 #include "cPluginManager.h"
 #include "cRoot.h"
 #include "cPlayer.h"
+
+
+
+
 
 bool SquirrelBindings::IsBound = false;
 

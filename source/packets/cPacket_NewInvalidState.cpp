@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_NewInvalidState.h"
+
+
+
+
 
 cPacket_NewInvalidState::cPacket_NewInvalidState( const cPacket_NewInvalidState & a_Copy )
 {

@@ -1,20 +1,27 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cChestEntity.h"
 #include "cItem.h"
-#include <string>
 #include "cClientHandle.h"
-#include "cMCLogger.h"
 #include "cPlayer.h"
 #include "cWindow.h"
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cPickup.h"
-#include "cMCLogger.h"
 #include "cChunk.h"
+#include <json/json.h>
+
+
+
+
 
 class cWorld;
 class cRoot;
 
-#include <json/json.h>
+
+
+
 
 cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
 	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z, a_Chunk ) 

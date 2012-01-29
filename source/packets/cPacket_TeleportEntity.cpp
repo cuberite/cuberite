@@ -1,6 +1,13 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_TeleportEntity.h"
 
 #include "../cEntity.h"
+
+
+
+
 
 cPacket_TeleportEntity::cPacket_TeleportEntity(cEntity* a_Client)
 {

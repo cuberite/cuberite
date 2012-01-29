@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cNoise.h"
 #include <math.h>
 
@@ -6,6 +9,10 @@
 #endif
 
 #define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
+
+
+
+
 
 cNoise::cNoise( unsigned int a_Seed )
 	: m_Seed( a_Seed )

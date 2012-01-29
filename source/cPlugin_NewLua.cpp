@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #define LUA_USE_POSIX
 #include "cPlugin_NewLua.h"
 #include "cMCLogger.h"

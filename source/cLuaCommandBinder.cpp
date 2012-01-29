@@ -1,9 +1,15 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cLuaCommandBinder.h"
-#include "cMCLogger.h"
 #include "cPlayer.h"
 #include "cPlugin_Lua.h"
 
 #include "tolua++.h"
+
+
+
+
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);
 extern bool report_errors(lua_State* lua, int status);

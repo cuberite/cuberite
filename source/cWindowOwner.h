@@ -1,6 +1,5 @@
 #pragma once
 
-#include "MemoryLeak.h"
 
 class cWindow;
 class cBlockEntity;

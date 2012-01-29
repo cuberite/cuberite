@@ -1,6 +1,5 @@
-#pragma once
 
-#include <string>
+#pragma once
 
 struct lua_State;
 struct HTTPRequest;

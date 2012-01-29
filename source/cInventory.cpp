@@ -1,8 +1,9 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cInventory.h"
-#include <string> //memset
 #include "cPlayer.h"
 #include "cClientHandle.h"
-#include "cMCLogger.h"
 #include "cWindow.h"
 #include "cItem.h"
 #include "cRecipeChecker.h"
@@ -13,6 +14,10 @@
 #include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_InventorySlot.h"
+
+
+
+
 
 cInventory::~cInventory()
 {

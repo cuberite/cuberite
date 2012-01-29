@@ -1,11 +1,16 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cRedstone.h"
 #include "cPiston.h"
 #include "cRoot.h"
 #include "cWorld.h"
 #include "BlockID.h"
 #include <iostream>
-#include <vector>
-#include <string>
+
+
+
+
 
 cRedstone::cRedstone( cWorld* a_World )
 	:m_World ( a_World )

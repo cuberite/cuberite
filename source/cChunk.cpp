@@ -1,8 +1,9 @@
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #ifndef _WIN32
 #include <cstring>
 #include <cstdlib>
-#include <stdio.h>
 #include <sys/stat.h>   // for mkdir
 #include <sys/types.h>
 #endif
@@ -16,11 +17,9 @@
 #include "cServer.h"
 #include "zlib.h"
 #include "Defines.h"
-#include <string> // memset
 #include "cChestEntity.h"
 #include "cFurnaceEntity.h"
 #include "cSignEntity.h"
-#include "cMCLogger.h"
 #include "cTorch.h"
 #include "cLadder.h"
 #include "cPickup.h"
@@ -28,7 +27,6 @@
 #include "cItem.h"
 #include "cNoise.h"
 #include "cRoot.h"
-#include "cCriticalSection.h"
 #include "cWorldGenerator.h"
 #include "cBlockToPickup.h"
 #include "MersenneTwister.h"
@@ -41,13 +39,9 @@
 
 #include <json/json.h>
 
-#include <list>
-#include <vector>
-#include <map>
 
-#ifndef _WIN32
-#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-#endif
+
+
 
 extern bool g_bWaterPhysics;
 
@@ -57,6 +51,7 @@ typedef std::list< cFurnaceEntity* > FurnaceEntityList;
 typedef std::list< cClientHandle* > ClientHandleList;
 typedef std::list< cBlockEntity* > BlockEntityList;
 typedef std::list< cEntity* > EntityList;
+
 struct cChunk::sChunkState
 {
 	sChunkState()

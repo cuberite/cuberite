@@ -1,9 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cMonster.h"
 #include "cRoot.h"
 #include "cServer.h"
 #include "cClientHandle.h"
 #include "cWorld.h"
-#include "cMCLogger.h"
 #include "cChunk.h"
 #include "cPlayer.h"
 #include "BlockID.h"
@@ -28,12 +30,12 @@
 #include "../iniFile/iniFile.h"
 
 #ifndef _WIN32
-#include <cstdlib> // rand
-#include <unistd.h>
-#include <string.h>
+	#include <cstdlib> // rand
+	#include <unistd.h>
 #endif
 
-#include <string>
+
+
 
 
 cMonster::cMonster()

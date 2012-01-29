@@ -1,14 +1,9 @@
-#include "cSemaphore.h"
-#include "cMCLogger.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <semaphore.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#endif
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
+
+
+
 
 cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* = 0 */ )
 #ifndef _WIN32

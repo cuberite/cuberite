@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_BlockPlace.h"
 #include "cPacket_ItemData.h"
+
+
+
+
 
 bool cPacket_BlockPlace::Parse(cSocket & a_Socket)
 {

@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cFurnaceEntity.h"
 #include "BlockID.h"
 #include "cItem.h"
@@ -12,8 +15,6 @@
 #include "cRoot.h"
 
 #include "packets/cPacket_InventoryProgressBar.h"
-
-#include "cMCLogger.h"
 
 #include <json/json.h>
 

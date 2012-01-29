@@ -4,7 +4,10 @@
 #pragma warning(disable:4800) // This file is ONLY included by Bindings.cpp and it throws lots of C4800 warnings
 
 #include "tolua++.h"
-#include "cMCLogger.h"
+
+
+
+
 
 class ToluaBase {
 

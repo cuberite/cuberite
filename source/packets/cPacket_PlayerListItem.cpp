@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_PlayerListItem.h"
 #include "../cChatColor.h"
+
+
+
+
 
 cPacket_PlayerListItem::cPacket_PlayerListItem(std::string a_PlayerName, bool a_Online, short a_Ping)
 {

@@ -1,19 +1,15 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cLog.h"
+
 #include <fstream>
 #include <ctime>
 #include <stdarg.h>
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <sys/stat.h>   // for mkdir
-#include <sys/types.h>
 
-#define	sprintf_s(buffer, buffer_size, stringbuffer, ...) (sprintf(buffer, stringbuffer, __VA_ARGS__))
-#define	vsnprintf_s(buffer, buffer_size, maxcount, stringbuffer, ...) (vsnprintf(buffer, maxcount, stringbuffer, __VA_ARGS__))
-#endif
 
-#include <string>
+
 
 cLog* cLog::s_Log = NULL;
 

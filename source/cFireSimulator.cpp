@@ -1,9 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cFireSimulator.h"
 #include "cWorld.h"
 #include "Vector3i.h"
 #include "BlockID.h"
 #include "Defines.h"
-#include <vector>
 
 cFireSimulator::cFireSimulator( cWorld* a_World )
 	: cSimulator(a_World)

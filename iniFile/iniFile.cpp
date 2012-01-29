@@ -15,6 +15,8 @@
 	!! MODIFIED BY FAKETRUTH !!
 */
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 // C++ Includes
 #include <iostream>
 #include <fstream>
@@ -23,7 +25,6 @@
 using namespace std;
 
 // C Includes
-#include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
 

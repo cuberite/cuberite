@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "BlockID.h"
 #include "cWorld.h"
 #include "cRedstone.h"
@@ -5,10 +8,8 @@
 #include "cClientHandle.h"
 #include "cPickup.h"
 #include "cBlockToPickup.h"
-#include "cMCLogger.h"
 #include "cPlayer.h"
 #include "cServer.h"
-#include "cCriticalSection.h"
 #include "cItem.h"
 #include "cRoot.h"
 #include "../iniFile/iniFile.h"
@@ -54,10 +55,10 @@
 #include "tolua++.h"
 
 #ifndef _WIN32
-#include <stdlib.h>
-//#include <sys/stat.h>   // for mkdir
-#include <sys/types.h>
+	#include <stdlib.h>
 #endif
+
+
 
 
 

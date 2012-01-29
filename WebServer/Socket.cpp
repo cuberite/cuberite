@@ -29,7 +29,7 @@
 		THIS IS NOT THE ORIGINAL SOURCE1!!1!!!~!!~`1ONE!!`1
 */
 
-#include "../source/cMCLogger.h"
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Socket.h"
 #include <iostream>
@@ -38,11 +38,11 @@
 #include <cstring>
 #include <sys/time.h>
 #else
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
 
 #ifdef __MAC_NA
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
 
 using namespace std;

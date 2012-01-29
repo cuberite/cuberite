@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_TimeUpdate.h"
+
+
+
+
 
 bool cPacket_TimeUpdate::Parse(cSocket & a_Socket)
 {

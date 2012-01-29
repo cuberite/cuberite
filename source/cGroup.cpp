@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cGroup.h"
 
 void cGroup::AddCommand( std::string a_Command )

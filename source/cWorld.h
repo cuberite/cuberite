@@ -8,12 +8,12 @@ enum ENUM_ITEM_ID;
 
 #define MAX_PLAYERS 65535
 
-#include <list>
-#include <vector>
-#include <string>
-
 #include "cSimulatorManager.h"
 #include "ptr_cChunk.h"
+
+
+
+
 
 class cPacket;
 class cRedstone;

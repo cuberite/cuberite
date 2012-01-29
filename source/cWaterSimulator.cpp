@@ -1,5 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWaterSimulator.h"
 #include "Defines.h"
+
+
+
 
 
 cWaterSimulator::cWaterSimulator(cWorld *a_World)

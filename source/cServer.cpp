@@ -1,10 +1,10 @@
+
 // ReDucTor is an awesome guy who helped me a lot
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cServer.h"
 #include "cClientHandle.h"
-#include "cMCLogger.h"
-#include "cThread.h"
-#include "cEvent.h"
 #include "cSleep.h"
 #include "cTimer.h"
 #include "cMonster.h"
@@ -30,22 +30,18 @@
 
 #include "packets/cPacket_Chat.h"
 
-#ifndef _WIN32
-#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-#endif
-
-#include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+
+
+
+
 
 extern "C" {
 	#include "zlib.h"
 }
 
-#ifdef SendMessage
-#undef SendMessage
-#endif
 
 
 bool g_bWaterPhysics = false;

@@ -1,9 +1,15 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cSimulator.h"
 #include "cWorld.h"
 #include "Vector3i.h"
 #include "BlockID.h"
 #include "Defines.h"
-#include <vector>
+
+
+
+
 
 cSimulator::cSimulator( cWorld* a_World )
 	: m_World(a_World)

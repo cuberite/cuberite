@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_Metadata.h"
+
+
+
+
 
 cPacket_Metadata::cPacket_Metadata(int s, int id)
 	: m_EMetaData( (cPawn::MetaData)s )

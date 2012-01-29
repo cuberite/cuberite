@@ -1,9 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cFluidSimulator.h"
 #include "cWorld.h"
 #include "Vector3i.h"
 #include "BlockID.h"
 #include "Defines.h"
-#include <vector>
 #include "cPickup.h"
 #include "cItem.h"
 

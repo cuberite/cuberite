@@ -1,5 +1,7 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cSignEntity.h"
-#include "cMCLogger.h"
 
 #include "cPlayer.h"
 #include "cClientHandle.h"
@@ -10,6 +12,10 @@
 #include "packets/cPacket_UpdateSign.h"
 
 #include <json/json.h>
+
+
+
+
 
 cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
 	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z, a_Chunk)

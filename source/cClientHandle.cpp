@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cClientHandle.h"
 #include "cServer.h"
 #include "cWorld.h"
@@ -8,7 +11,6 @@
 #include "cInventory.h"
 #include "cChestEntity.h"
 #include "cSignEntity.h"
-#include "cMCLogger.h"
 #include "cWindow.h"
 #include "cCraftingWindow.h"
 #include "cItem.h"
@@ -30,9 +32,6 @@
 #include "Vector3f.h"
 #include "Vector3d.h"
 
-#include "cCriticalSection.h"
-#include "cSemaphore.h"
-#include "cEvent.h"
 #include "cSleep.h"
 #include "cRoot.h"
 
@@ -69,10 +68,6 @@
 #include "packets/cPacket_Ping.h"
 #include "packets/cPacket_PlayerListItem.h"
 
-
-#ifndef _WIN32
-#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-#endif
 
 #define AddPistonDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
 													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\

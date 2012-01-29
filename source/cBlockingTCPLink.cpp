@@ -1,17 +1,17 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cBlockingTCPLink.h"
 #include "packets/cPacket.h"
 #include "MCSocket.h"
-#include <string>
-
-#include "cMCLogger.h"
 
 #ifndef _WIN32
-#include <cstring>
-#include <errno.h>
+	#include <cstring>
+	#include <errno.h>
 #endif
 
 #ifdef _WIN32
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
 #ifdef __MACH__
 #define MSG_NOSIGNAL (0)

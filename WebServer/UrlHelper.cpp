@@ -29,13 +29,11 @@
 		THIS IS NOT THE ORIGINAL SOURCE1!!1!!!~!!~`1ONE!!`1
 */
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "UrlHelper.h"
 #include "Tracer.h"
 #include "StdHelpers.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include <sstream>
 #include <iostream>

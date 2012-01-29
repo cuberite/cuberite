@@ -1,14 +1,9 @@
-#include "cEvent.h"
-#include "cMCLogger.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <semaphore.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
-#endif
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
+
+
+
 
 cEvent::cEvent( unsigned int a_NumEvents /* = 1 */ )
 	: m_NumEvents( a_NumEvents )

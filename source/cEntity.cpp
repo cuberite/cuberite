@@ -1,7 +1,9 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cEntity.h"
 #include "cWorld.h"
 #include "cChunk.h"
-#include "cMCLogger.h"
 #include "cServer.h"
 #include "cRoot.h"
 #include "Vector3d.h"

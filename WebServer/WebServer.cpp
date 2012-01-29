@@ -31,23 +31,21 @@
 		THIS IS NOT THE ORIGINAL SOURCE1!!1!!!~!!~`1ONE!!`1
 */
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include <ctime>
 #ifdef _WIN32
-#include <process.h>
+	#include <process.h>
 #endif
 #include <iostream>
-#include <string>
-#include <map>
 #include <sstream>
 
 
 #include "WebServer.h"
+#include "cEvents.h"
 #include "Socket.h"
 #include "UrlHelper.h"
 #include "base64.h"
-
-#include "cEvent.h"
-
 
 webserver::request_func webserver::request_func_=0;
 
@@ -178,7 +176,7 @@ void webserver::Stop()
 {
 	m_bStop = true;
 	m_Socket->Close();
-	m_Event->Wait();
+	m_Events->Wait();
 }
 
 void webserver::Begin()
@@ -209,18 +207,18 @@ void webserver::Begin()
 		pthread_create( hHandle, NULL, Request, ptr_s);
 		#endif
 	}
-	m_Event->Set();
+	m_Events->Set();
 }
 
 webserver::webserver(unsigned int port_to_listen, request_func r) {
   m_Socket = new SocketServer(port_to_listen,1);
 
   request_func_ = r;
-  m_Event = new cEvent();
+  m_Events = new cEvents();
 }
 
 webserver::~webserver()
 {
 	delete m_Socket;
-	delete m_Event;
+	delete m_Events;
 }

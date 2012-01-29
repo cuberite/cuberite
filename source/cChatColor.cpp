@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cChatColor.h"
 
 const std::string cChatColor::Color = "\xa7"; // Old color was "\xc2\xa7" or in other words: "§"

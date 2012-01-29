@@ -1,16 +1,13 @@
-#include "cEvent.h"
-#include "../source/cMCLogger.h"
 
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <semaphore.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h> // sprintf()
-#endif
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-cEvent::cEvent( unsigned int a_NumEvents /* = 1 */ )
+#include "cEvents.h"
+
+
+
+
+
+cEvents::cEvents( unsigned int a_NumEvents /* = 1 */ )
 	: m_NumEvents( a_NumEvents )
 #ifndef _WIN32
 	, m_bNamed( false )
@@ -34,24 +31,28 @@ cEvent::cEvent( unsigned int a_NumEvents /* = 1 */ )
 
         if( sem_init( HandlePtr, 0, 0 ) )
         {
-            LOG("WARNING cEvent: Could not create unnamed semaphore, fallback to named.");
+            LOG("WARNING cEvents: Could not create unnamed semaphore, fallback to named.");
             m_bNamed = true;
             delete HandlePtr;   // named semaphores return their own address
 
             char c_Str[32];
-            sprintf( c_Str, "cEvent%p", &HandlePtr );
+            sprintf( c_Str, "cEvents%p", &HandlePtr );
             HandlePtr = sem_open( c_Str, O_CREAT, 777, 0 );
             if( HandlePtr == SEM_FAILED )
                 LOG("ERROR: Could not create Event. (%i)", errno);
             else
                 if( sem_unlink( c_Str ) != 0 )
-                    LOG("ERROR: Could not unlink cEvent. (%i)", errno);
+                    LOG("ERROR: Could not unlink cEvents. (%i)", errno);
         }
 	}
 #endif
 }
 
-cEvent::~cEvent()
+
+
+
+
+cEvents::~cEvents()
 {
 #ifdef _WIN32
     for( unsigned int i = 0; i < m_NumEvents; i++ )
@@ -66,12 +67,12 @@ cEvent::~cEvent()
         {
             sem_t* & HandlePtr = ((sem_t**)m_Handle)[i];
             char c_Str[32];
-            sprintf( c_Str, "cEvent%p", &HandlePtr );
+            sprintf( c_Str, "cEvents%p", &HandlePtr );
     //        LOG("Closing event: %s", c_Str );
     //        LOG("Sem ptr: %p", HandlePtr );
 	    if( sem_close( HandlePtr ) != 0 )
             {
-                LOG("ERROR: Could not close cEvent. (%i)", errno);
+                LOG("ERROR: Could not close cEvents. (%i)", errno);
             }
         }
         else
@@ -84,7 +85,11 @@ cEvent::~cEvent()
 #endif
 }
 
-void cEvent::Wait()
+
+
+
+
+void cEvents::Wait()
 {
 #ifdef _WIN32
 	WaitForMultipleObjects( m_NumEvents, (HANDLE*)m_Handle, true, INFINITE );
@@ -93,20 +98,28 @@ void cEvent::Wait()
     {
         if( sem_wait( ((sem_t**)m_Handle)[i] ) != 0 )
         {
-            LOG("ERROR: Could not wait for cEvent. (%i)", errno);
+            LOG("ERROR: Could not wait for cEvents. (%i)", errno);
         }
     }
 #endif
 }
 
-void cEvent::Set(unsigned int a_EventNum /* = 0 */)
+
+
+
+
+void cEvents::Set(unsigned int a_EventNum /* = 0 */)
 {
 #ifdef _WIN32
 	SetEvent( ((HANDLE*)m_Handle)[a_EventNum] );
 #else
     if( sem_post( ((sem_t**)m_Handle)[a_EventNum] ) != 0 )
     {
-        LOG("ERROR: Could not set cEvent. (%i)", errno);
+        LOG("ERROR: Could not set cEvents. (%i)", errno);
     }
 #endif
 }
+
+
+
+

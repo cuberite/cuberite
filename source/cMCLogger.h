@@ -4,7 +4,6 @@
 #include <stdarg.h>
 #endif
 
-class cCriticalSection;
 class cLog;
 class cMCLogger														//tolua_export
 {																	//tolua_export

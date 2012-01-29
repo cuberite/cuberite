@@ -1,10 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPawn.h"
 #include "cRoot.h"
 #include "cServer.h"
 #include "cWorld.h"
 #include "cPlayer.h"
 #include "cChunk.h"
-#include "cMCLogger.h"
 #include "cPluginManager.h"
 #include "Vector3d.h"
 #include "BlockID.h"

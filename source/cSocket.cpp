@@ -1,16 +1,21 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cSocket.h"
-#include "cMCLogger.h"
 
 #ifndef _WIN32
-#include <netdb.h>
-#include <unistd.h>
-#include <errno.h>
-//#include <sys/socket.h>
-//#include <netinet/in.h>
-#include <arpa/inet.h>		//inet_ntoa()
+	#include <netdb.h>
+	#include <unistd.h>
+	// #include <sys/socket.h>
+	// #include <netinet/in.h>
+	#include <arpa/inet.h>		//inet_ntoa()
 #else
-#define socklen_t int
+	#define socklen_t int
 #endif
+
+
+
+
 
 cSocket::cSocket( xSocket a_Socket )
 	: m_Socket( a_Socket )

@@ -1,16 +1,12 @@
-#include "MemoryLeak.h"
+
+#include "Globals.h"
+
 #include "cChunkGenerator.h"
 #include "cChunkMap.h"
 #include "cChunk.h"
 #include "cWorld.h"
 
-#include "cThread.h"
-#include "cCriticalSection.h"
-#include "cSemaphore.h"
-
 #include "cMCLogger.h"
-
-#include <list>
 
 typedef std::pair<int, int> ChunkCoord;
 typedef std::list< ChunkCoord > ChunkCoordList;

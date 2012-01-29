@@ -1,7 +1,14 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_MapChunk.h"
 #include "../cChunk.h"
 
 #include "zlib.h"
+
+
+
+
 
 cPacket_MapChunk::~cPacket_MapChunk()
 {

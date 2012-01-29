@@ -1,5 +1,7 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWebAdmin.h"
-#include "cMCLogger.h"
 #include "cStringMap.h"
 
 #include "cWebPlugin.h"
@@ -8,23 +10,22 @@
 #include "cPluginManager.h"
 #include "cPlugin.h"
 
-#include "cEvent.h"
 #include "cWorld.h"
 #include "cPlayer.h"
 #include "cServer.h"
 #include "cRoot.h"
 
-#include <vector>
-
 #include "../iniFile/iniFile.h"
 
-#include "MemoryLeak.h"
 #ifdef _WIN32
-#include <psapi.h>
+	#include <psapi.h>
 #else
-#include <sys/resource.h>
-#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
+	#include <sys/resource.h>
 #endif
+
+
+
+
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);
 

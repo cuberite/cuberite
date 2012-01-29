@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cChunkMap.h"
 #include "cChunk.h"
 #include "cMCLogger.h"
@@ -7,12 +10,8 @@
 #include <math.h>  // floorf
 
 #ifndef _WIN32
-#include <cstring> // memcpy
-#include <cstdlib> // abs
-#include <stdio.h> // sprintf and stuff
-
-
-#define sprintf_s( dest, size, format, ... ) sprintf( dest, format, __VA_ARGS__ )
+	#include <cstring> // memcpy
+	#include <cstdlib> // abs
 #endif
 
 #include "zlib.h"
@@ -21,6 +20,10 @@
 #define USE_MEMCPY
 
 #define LAYER_SIZE (32)
+
+
+
+
 
 cChunkMap::cChunkMap( int a_Width, int a_Height, cWorld* a_World )
 	: m_Nodes( new cChunkNode[ a_Width * a_Height ] )

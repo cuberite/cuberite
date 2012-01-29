@@ -1,5 +1,7 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cRoot.h"
-#include "cMCLogger.h"
 #include "cServer.h"
 #include "cWorld.h"
 #include "cWebAdmin.h"

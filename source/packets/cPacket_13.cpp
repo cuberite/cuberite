@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_13.h"
+
+
+
+
 
 bool cPacket_13::Parse(cSocket & a_Socket)
 {

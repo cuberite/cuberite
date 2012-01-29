@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPluginManager.h"
 #include "cPlugin.h"
 #include "cPlugin_Lua.h"
@@ -8,7 +11,6 @@
 #include "cRoot.h"
 #include "cLuaCommandBinder.h"
 #include "../iniFile/iniFile.h"
-#include <string> //strcmp
 #include <stdarg.h>
 
 #include "SquirrelBindings.h"
@@ -17,6 +19,10 @@
 #include <sqplus/sqplus.h>
 #pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
 #endif
+
+
+
+
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);
 

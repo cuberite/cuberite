@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_RelativeEntityMove.h"
+
+
+
+
 
 bool cPacket_RelativeEntityMove::Send( cSocket & a_Socket )
 {

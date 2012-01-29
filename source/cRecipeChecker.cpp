@@ -1,10 +1,10 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cRecipeChecker.h"
 
 #include <fstream>
 #include <sstream>
-#include <vector>
-#include <string>
-#include <list>
 
 #ifndef _WIN32
 #include <cstring>
@@ -12,8 +12,11 @@
 #endif
 
 #include "Defines.h"
-#include "cMCLogger.h"
 #include "cRoot.h"
+
+
+
+
 
 typedef std::list< cRecipeChecker::Recipe* > RecipeList;
 struct cRecipeChecker::sRecipeCheckerState

@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "Vector3f.h"
 #include "Vector3d.h"
 #include "Vector3i.h"

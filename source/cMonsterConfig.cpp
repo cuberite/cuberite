@@ -1,11 +1,16 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cMonsterConfig.h"
 #include "cMonster.h"
 #include "../iniFile/iniFile.h"
-#include <list>
-#include <vector>
 #include <cstdio>
 //#include "../source/cprintf.h"
-#include <string>
+
+
+
+
+
 using namespace std;
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);

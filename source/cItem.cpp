@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cItem.h"
 #include <json/json.h>
+
+
+
+
 
 void cItem::GetJson( Json::Value & a_OutValue )
 {

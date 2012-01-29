@@ -1,6 +1,8 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cFurnaceRecipe.h"
 #include "cItem.h"
-#include "cMCLogger.h"
 
 #include <fstream>
 #include <sstream>

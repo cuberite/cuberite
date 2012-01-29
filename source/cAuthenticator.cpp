@@ -1,13 +1,14 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cAuthenticator.h"
 #include "cBlockingTCPLink.h"
-#include "cMCLogger.h"
 
 #include "../iniFile/iniFile.h"
 #ifndef _WIN32
 #include <cstring>
 #endif
 
-#include <string>
 #include <sstream>
 
 extern void ReplaceString( std::string & a_HayStack, const std::string & a_Needle, const std::string & a_ReplaceWith );

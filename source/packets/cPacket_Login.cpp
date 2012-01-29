@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_Login.h"
+
+
+
+
 
 const std::string cPacket_Login::LEVEL_TYPE_DEFAULT = "DEFAULT";
 const std::string cPacket_Login::LEVEL_TYPE_SUPERFLAT = "SUPERFLAT";

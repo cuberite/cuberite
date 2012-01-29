@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_BlockAction.h"
+
+
+
+
 
 cPacket_BlockAction::cPacket_BlockAction( const cPacket_BlockAction & a_Copy )
 {

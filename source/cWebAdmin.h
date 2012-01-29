@@ -1,6 +1,5 @@
 #pragma once
 
-#include <list>
 #include "../WebServer/WebServer.h"
 #include "cSocket.h"
 

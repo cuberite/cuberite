@@ -1,8 +1,15 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_WholeInventory.h"
 #include "../cItem.h"
 #include "../cInventory.h"
 #include "../cWindow.h"
 #include "cPacket_ItemData.h"
+
+
+
+
 
 cPacket_WholeInventory::cPacket_WholeInventory( const cPacket_WholeInventory & a_Clone )
 {

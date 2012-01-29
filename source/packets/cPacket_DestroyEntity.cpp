@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_DestroyEntity.h"
 #include "../cEntity.h"
+
+
+
+
 
 cPacket_DestroyEntity::cPacket_DestroyEntity(cEntity* a_Entity)
 {

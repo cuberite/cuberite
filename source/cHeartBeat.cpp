@@ -1,16 +1,17 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cHeartBeat.h"
 #include "cMCLogger.h"
 #include "md5/md5.h"
-
-#include <stdio.h>
 
 #include "cRoot.h"
 #include "cServer.h"
 #include "cSleep.h"
 
-#ifndef _WIN32
-#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-#endif
+
+
+
 
 cHeartBeat::cHeartBeat()
 {

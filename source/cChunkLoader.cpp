@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #if 0 // ignore all contents of this file
 #include "cChunkLoader.h"
 #include "cChunk.h"

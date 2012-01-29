@@ -3,6 +3,8 @@
 ** Generated automatically by tolua++-1.0.92 on 01/27/12 00:53:11.
 */
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #ifndef __cplusplus
 #include "stdlib.h"
 #endif

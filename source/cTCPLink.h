@@ -2,7 +2,6 @@
 
 #include "cSocket.h"
 
-class cEvent;
 class cTCPLink																	//tolua_export
 {																				//tolua_export
 public:																			//tolua_export

@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #ifndef _WIN32
 #include <cstdlib>
 #endif
@@ -12,7 +15,6 @@
 #include "cPluginManager.h"
 #include "cItem.h"
 #include "cRoot.h"
-#include "cMCLogger.h"
 #include "cTracer.h"
 #include "cChunk.h"
 
@@ -22,6 +24,10 @@
 
 #include "Vector3d.h"
 #include "Vector3f.h"
+
+
+
+
 
 CLASS_DEFINITION( cPickup, cEntity )
 

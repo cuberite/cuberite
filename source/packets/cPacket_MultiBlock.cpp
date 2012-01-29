@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_MultiBlock.h"
+
+
+
+
 
 cPacket_MultiBlock::cPacket_MultiBlock( const cPacket_MultiBlock & a_Copy )
 {

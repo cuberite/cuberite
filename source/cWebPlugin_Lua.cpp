@@ -1,10 +1,15 @@
-#include "cMCLogger.h"
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWebPlugin_Lua.h"
 #include "cPlugin_NewLua.h"
 
-#include <string>
 #include "tolua++.h"
 #include "cWebAdmin.h"
+
+
+
+
 
 extern bool report_errors(lua_State* lua, int status);
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);

@@ -46,7 +46,8 @@
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="Globals.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -115,7 +116,8 @@
 				AdditionalIncludeDirectories="../zlib-1.2.5;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="Globals.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -288,14 +290,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cEvent.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cEvent.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cFileFormatUpdater.cpp"
 				>
 			</File>
@@ -416,7 +410,16 @@
 						FavorSizeOrSpeed="1"
 						OmitFramePointers="true"
 						BasicRuntimeChecks="0"
+						UsePrecompiledHeader="0"
 						DebugInformationFormat="3"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
 					/>
 				</FileConfiguration>
 			</File>
@@ -545,14 +548,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cSleep.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSleep.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cSocket.cpp"
 				>
 			</File>
@@ -658,6 +653,30 @@
 			</File>
 			<File
 				RelativePath="..\source\FileDefine.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Globals.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\source\Globals.h"
 				>
 			</File>
 			<File
@@ -1416,11 +1435,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cEvent.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cEvent.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cSemaphore.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\cSemaphore.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSleep.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSleep.h"
 					>
 				</File>
 			</Filter>
@@ -1509,62 +1544,6 @@
 				</File>
 				<File
 					RelativePath="..\source\md5\md5.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="WebServer"
-				>
-				<File
-					RelativePath="..\WebServer\base64.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\base64.h"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\cEvent.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\cEvent.h"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\Socket.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\Socket.h"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\StdHelpers.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\StdHelpers.h"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\Tracer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\UrlHelper.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\UrlHelper.h"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\WebServer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\WebServer\WebServer.h"
 					>
 				</File>
 			</Filter>

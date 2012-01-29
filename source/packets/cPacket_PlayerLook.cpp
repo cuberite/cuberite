@@ -1,5 +1,12 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_PlayerLook.h"
 #include "../cPlayer.h"
+
+
+
+
 
 cPacket_PlayerLook::cPacket_PlayerLook( cPlayer* a_Player )
 {

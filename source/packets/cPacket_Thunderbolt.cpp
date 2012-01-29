@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_Thunderbolt.h"
+
+
+
+
 
 cPacket_Thunderbolt::cPacket_Thunderbolt( const cPacket_Thunderbolt & a_Copy )
 {

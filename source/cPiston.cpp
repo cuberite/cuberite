@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPiston.h"
 #include "cRedstone.h"
 #include "cChunk.h"
@@ -18,6 +21,10 @@ extern bool g_BlockPistonBreakable[];
 													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
 
 #define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
+
+
+
+
 
 cPiston::cPiston( cWorld* a_World )
 	:m_World ( a_World )

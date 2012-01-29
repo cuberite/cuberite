@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPlayer.h"
 #include "cServer.h"
 #include "cCreativeInventory.h"
@@ -7,7 +10,6 @@
 #include "cPickup.h"
 #include "cPluginManager.h"
 #include "cChunk.h"
-#include "cMCLogger.h"
 #include "cWindow.h"
 #include "cBlockEntity.h"
 #include "cGroupManager.h"
@@ -494,9 +496,6 @@ void cPlayer::SetIP( std::string a_IP )
         m_IP = a_IP;
 }
 
-#ifdef SendMessage	// Cause stupid windows.h defines SendMessage as SendMessageA
-#undef SendMessage
-#endif
 void cPlayer::SendMessage( const char* a_Message )
 {
 	m_ClientHandle->Send( cPacket_Chat( a_Message ) );

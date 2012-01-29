@@ -1,8 +1,9 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cCreativeInventory.h"
-#include <string> //memset
 #include "cPlayer.h"
 #include "cClientHandle.h"
-#include "cMCLogger.h"
 #include "cWindow.h"
 #include "cItem.h"
 #include "cRecipeChecker.h"

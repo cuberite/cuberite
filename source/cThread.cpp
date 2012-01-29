@@ -1,17 +1,12 @@
-#ifndef _WIN32
-#include <cstring>
-#include <semaphore.h>
-#include <errno.h>
-#include <pthread.h>
-#else
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#endif
-#include "cThread.h"
-#include "cEvent.h"
-#include "cMCLogger.h"
 
-#ifdef _WIN32
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
+
+
+
+
+// When in MSVC, the debugger provides "thread naming" by catching special exceptions. Interface here:
+#ifdef _MSC_VER
 //
 // Usage: SetThreadName (-1, "MainThread");
 //
@@ -39,7 +34,11 @@ void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
 	{
 	}
 }
-#endif
+#endif  // _MSC_VER
+
+
+
+
 
 cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_ThreadName /* = 0 */ )
 	: m_ThreadFunction( a_ThreadFunction )

@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_SoundEffect.h"
+
+
+
+
 
 cPacket_SoundEffect::cPacket_SoundEffect( const cPacket_SoundEffect & a_Copy )
 {

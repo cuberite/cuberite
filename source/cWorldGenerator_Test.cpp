@@ -1,6 +1,13 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWorldGenerator_Test.h"
 #include "cChunk.h"
 #include "BlockID.h"
+
+
+
+
 
 void cWorldGenerator_Test::GenerateTerrain( cChunk* a_Chunk )
 {

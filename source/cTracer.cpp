@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cTracer.h"
 #include "cWorld.h"
 
@@ -6,13 +9,12 @@
 #include "Vector3d.h"
 
 #include "BlockID.h"
-#include "cMCLogger.h"
 #include "cEntity.h"
 
 #include "Defines.h"
 
 #ifndef _WIN32
-#include <stdlib.h> // abs()
+	#include <stdlib.h> // abs()
 #endif
 
 cTracer::cTracer(cWorld* a_World)

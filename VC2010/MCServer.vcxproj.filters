@@ -907,6 +907,7 @@
     <ClCompile Include="..\source\cWebPlugin_Lua.cpp">
       <Filter>cWebAdmin\cWebPlugin\cWebPlugin</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Globals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1395,6 +1396,7 @@
     <ClInclude Include="..\source\cWebPlugin_Lua.h">
       <Filter>cWebAdmin\cWebPlugin\cWebPlugin</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\Globals.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

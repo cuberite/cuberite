@@ -1,4 +1,11 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cPacket_KeepAlive.h"
+
+
+
+
 
 bool cPacket_KeepAlive::Send(cSocket & a_Socket)
 {

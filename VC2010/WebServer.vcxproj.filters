@@ -6,9 +6,8 @@
     <ClCompile Include="..\WebServer\StdHelpers.cpp" />
     <ClCompile Include="..\WebServer\UrlHelper.cpp" />
     <ClCompile Include="..\WebServer\WebServer.cpp" />
-    <ClCompile Include="..\WebServer\cEvent.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
+    <ClCompile Include="..\WebServer\cEvents.cpp" />
+    <ClCompile Include="..\WebServer\Globals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WebServer\base64.h" />
@@ -17,13 +16,7 @@
     <ClInclude Include="..\WebServer\UrlHelper.h" />
     <ClInclude Include="..\WebServer\WebServer.h" />
     <ClInclude Include="..\WebServer\StdHelpers.h" />
-    <ClInclude Include="..\WebServer\cEvent.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Threading">
-      <UniqueIdentifier>{5108ca96-8262-4e37-b891-cff8f714210e}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="..\WebServer\Globals.h" />
+    <ClInclude Include="..\WebServer\cEvents.h" />
   </ItemGroup>
 </Project>

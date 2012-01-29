@@ -29,8 +29,9 @@
 		THIS IS NOT THE ORIGINAL SOURCE1!!1!!!~!!~`1ONE!!`1
 */
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "StdHelpers.h"
-#include <algorithm>
 #include <cctype>
 
 std::string ReplaceInStr(const std::string& in, const std::string& search_for, const std::string& replace_with) {

@@ -3,8 +3,10 @@
 #include "cPawn.h"
 #include "cSurvivalInventory.h"
 #include "cCreativeInventory.h"
-#include <list>
-#include <string> // TODO - use const char*
+
+
+
+
 
 class cGroup;
 class cWindow;

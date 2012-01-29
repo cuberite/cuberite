@@ -2,8 +2,6 @@
 
 #include "cWebPlugin.h"
 
-#include <list>
-#include <string>
 class cPlugin_NewLua;
 typedef struct lua_State lua_State;
 

@@ -1,6 +1,8 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "ManualBindings.h"
 #include "tolua++.h"
-#include "cMCLogger.h"
 
 #include "cRoot.h"
 #include "cWorld.h"

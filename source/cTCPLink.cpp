@@ -1,22 +1,26 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cTCPLink.h"
 #include "cSocket.h"
-#include "cEvent.h"
-#include "cThread.h"
 #include "MCSocket.h"
 
 #include "cMCLogger.h"
-#include <errno.h>
 
 #ifndef _WIN32
-#include <cstring>
+	#include <cstring>
 #endif
 
 #ifdef _WIN32
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
 #ifdef __MACH__
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
+
+
+
+
 
 cTCPLink::cTCPLink()
 	: m_Socket( 0 )

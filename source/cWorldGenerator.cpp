@@ -1,3 +1,6 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cWorldGenerator.h"
 #include "cNoise.h"
 #include "cWorld.h"
@@ -7,6 +10,10 @@
 
 #include "BlockID.h"
 #include "Vector3i.h"
+
+
+
+
 
 cWorldGenerator::cWorldGenerator()
 {

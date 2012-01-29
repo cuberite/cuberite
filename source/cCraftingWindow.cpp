@@ -1,6 +1,8 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
 #include "cCraftingWindow.h"
 #include "cItem.h"
-#include "cMCLogger.h"
 #include "cRecipeChecker.h"
 #include "cPlayer.h"
 #include "cClientHandle.h"

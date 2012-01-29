@@ -1,11 +1,10 @@
 #pragma once
 
-#include <string>
 #ifdef _WIN32
-#include <WinSock.h>
+	#include <WinSock.h>
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
 #endif
 
 // Changes endianness

@@ -109,6 +109,8 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
@@ -138,6 +140,8 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
@@ -230,8 +234,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <BrowseInformation>
       </BrowseInformation>
       <WarningLevel>Level4</WarningLevel>
@@ -239,6 +242,7 @@
       </DebugInformationFormat>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeaderFile>Globals.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalOptions>/IGNORE:4078 %(AdditionalOptions)</AdditionalOptions>
@@ -339,6 +343,7 @@
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Speed</FavorSizeOrSpeed>
       <OmitFramePointers Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">true</OmitFramePointers>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Default</BasicRuntimeChecks>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\source\cPassiveAggressiveMonster.cpp" />
     <ClCompile Include="..\source\cPassiveMonster.cpp" />
@@ -381,6 +386,11 @@
     <ClCompile Include="..\source\cWorldGenerator_Test.cpp" />
     <ClCompile Include="..\source\cZombie.cpp" />
     <ClCompile Include="..\source\cZombiepigman.cpp" />
+    <ClCompile Include="..\source\Globals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\Source\ManualBindings.cpp" />
     <ClCompile Include="..\source\Matrix4f.cpp" />
     <ClCompile Include="..\source\md5\md5.cpp" />
@@ -540,6 +550,7 @@
     <ClInclude Include="..\source\cZombiepigman.h" />
     <ClInclude Include="..\source\Endianness.h" />
     <ClInclude Include="..\Source\FileDefine.h" />
+    <ClInclude Include="..\source\Globals.h" />
     <ClInclude Include="..\Source\LuaFunctions.h" />
     <ClInclude Include="..\Source\ManualBindings.h" />
     <ClInclude Include="..\source\Matrix4f.h" />

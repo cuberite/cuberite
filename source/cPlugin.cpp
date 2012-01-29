@@ -1,7 +1,11 @@
-#include "cPlugin.h"
-#include <stdio.h>
 
-#include "cMCLogger.h"
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
+#include "cPlugin.h"
+
+
+
+
 
 cPlugin::cPlugin()
 	: m_Version( 0 )

@@ -4,11 +4,10 @@
 #include "../PacketID.h"
 
 #ifdef _WIN32
-#include <xstring>
+	// #include <xstring>
 #else
-#include <cstring> // Silly Linux doesn't have xstring...
-#include <string>
-#include <cstdio>
+	#include <cstring> // Silly Linux doesn't have xstring...
+	#include <cstdio>
 #endif
 
 class cSocket;
