@@ -79,9 +79,11 @@ void cCriticalSection::Unlock()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCSLock
 
-cCSLock::cCSLock(cCriticalSection * a_CS) :
-	m_CS(a_CS),
-	m_IsLocked(false)
+cCSLock::cCSLock(cCriticalSection * a_CS) 
+	: m_CS(a_CS)
+	#ifdef _DEBUG
+	, m_IsLocked(false)
+	#endif
 {
 	Lock();
 }
