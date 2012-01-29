@@ -13,7 +13,7 @@
 CC = /usr/bin/g++
 CC_OPTIONS = -s -O3
 CCE_OPTIONS = -s -x c -O3
-LNK_OPTIONS = -lstdc++ -O3
+LNK_OPTIONS = -lstdc++ -pthread -O3
 
 
 #
