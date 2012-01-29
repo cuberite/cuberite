@@ -396,13 +396,14 @@ cChunk* cChunkMap::GetChunk( int a_X, int a_Y, int a_Z )
 				delete [] Data->m_Compressed; Data->m_Compressed = 0; Data->m_CompressedSize = 0;
 				return Chunk;
 			}
-
-			
 		}
 	}
-
 	return 0;
 }
+
+
+
+
 
 void cChunkMap::Tick( float a_Dt )
 {

@@ -1,11 +1,19 @@
 #include "cCriticalSection.h"
 #include "cMCLogger.h"
+#include <assert.h>
 
 #ifdef _WIN32
 #include <Windows.h>
 #else
 #include <pthread.h>
 #endif
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCriticalSection:
 
 cCriticalSection::cCriticalSection()
 {
@@ -25,6 +33,10 @@ cCriticalSection::cCriticalSection()
 #endif
 }
 
+
+
+
+
 cCriticalSection::~cCriticalSection()
 {
 #ifdef _WIN32
@@ -41,6 +53,10 @@ cCriticalSection::~cCriticalSection()
 #endif
 }
 
+
+
+
+
 void cCriticalSection::Lock()
 {
 #ifdef _WIN32
@@ -50,6 +66,10 @@ void cCriticalSection::Lock()
 #endif
 }
 
+
+
+
+
 void cCriticalSection::Unlock()
 {
 #ifdef _WIN32
@@ -58,3 +78,80 @@ void cCriticalSection::Unlock()
     pthread_mutex_unlock( (pthread_mutex_t*)m_CriticalSectionPtr );
 #endif
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCSLock
+
+cCSLock::cCSLock(cCriticalSection * a_CS) :
+	m_CS(a_CS),
+	m_IsLocked(false)
+{
+	Lock();
+}
+
+
+
+
+
+cCSLock::~cCSLock()
+{
+	Unlock();
+}
+
+
+
+
+
+void cCSLock::Lock(void)
+{
+	#ifdef _DEBUG
+	assert(!m_IsLocked);
+	m_IsLocked = true;
+	#endif  // _DEBUG
+	
+	m_CS->Lock();
+}
+
+
+
+
+
+void cCSLock::Unlock(void)
+{
+	#ifdef _DEBUG
+	assert(m_IsLocked);
+	m_IsLocked = false;
+	#endif  // _DEBUG
+	
+	m_CS->Unlock();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCSUnlock:
+
+cCSUnlock::cCSUnlock(cCSLock & a_Lock) :
+	m_Lock(a_Lock)
+{
+	m_Lock.Unlock();
+}
+
+
+
+
+
+cCSUnlock::~cCSUnlock()
+{
+	m_Lock.Lock();
+}
+
+
+
+
