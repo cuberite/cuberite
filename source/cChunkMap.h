@@ -6,7 +6,7 @@ class cChunk;
 class cChunkMap
 {
 public:
-	cChunkMap( int a_Width, int a_Height, cWorld* a_World );
+	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
 	void AddChunk( cChunk* a_Chunk );
@@ -72,26 +72,5 @@ private:
 	int m_NumLayers;
 	cChunkLayer* m_Layers;
 
-	class cChunkNode
-	{
-	public:
-		cChunkNode();
-		~cChunkNode();
-		void push_back( cChunk* a_Chunk );
-		unsigned int size() { return m_Size; }
-		unsigned int allocated() { return m_Allocated; }
-		void resize( unsigned int a_NewSize );
-
-		void erase( cChunk* a_Chunk );
-
-		cChunk** GetChunks() { return m_Chunks; }
-	private:
-		unsigned int m_Size;
-		unsigned int m_Allocated;
-		cChunk** m_Chunks;
-	};
-
-	cChunkNode* m_Nodes;
-	int m_Width, m_Height;
 	cWorld* m_World;
 };

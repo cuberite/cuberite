@@ -229,7 +229,7 @@ cWorld::cWorld( const char* a_WorldName )
 		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - It's OVER 9000!").c_str();
 	}
 
-	m_ChunkMap = new cChunkMap( 32, 32, this );
+	m_ChunkMap = new cChunkMap(this );
 	m_pState->pChunkGenerator = new cChunkGenerator( m_ChunkMap );
 
 	m_Time = 0;

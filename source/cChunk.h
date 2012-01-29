@@ -9,8 +9,6 @@
 # define __C_CHUNK_INLINE__
 #endif
 
-#include <list>
-
 namespace Json
 {
 	class Value;
