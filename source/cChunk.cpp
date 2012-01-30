@@ -249,7 +249,7 @@ void cChunk::Tick(float a_Dt)
 		}
 		m_pState->PendingSendBlocks.clear();
 	}
-	cCSUnlock Unlock( Lock );
+	Lock.Unlock();
 
 	while( !m_pState->UnloadQuery.empty() )
 	{
@@ -261,10 +261,10 @@ void cChunk::Tick(float a_Dt)
 		m_pState->UnloadQuery.remove( *m_pState->UnloadQuery.begin() );
 	}
 
-	m_pState->BlockListCriticalSection.Lock();
+	cCSLock Lock2(m_pState->BlockListCriticalSection);
 	std::map< unsigned int, int > ToTickBlocks = m_pState->ToTickBlocks;
 	m_pState->ToTickBlocks.clear();
-	m_pState->BlockListCriticalSection.Unlock();
+	Lock2.Unlock();
 	
 	bool isRedstone = false;
 	for( std::map< unsigned int, int>::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )

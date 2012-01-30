@@ -107,6 +107,12 @@ cCSLock::cCSLock(cCriticalSection & a_CS)
 
 cCSLock::~cCSLock()
 {
+	#ifdef _DEBUG
+	if (!m_IsLocked)
+	{
+		return;
+	}
+	#endif  // _DEBUG
 	Unlock();
 }
 
