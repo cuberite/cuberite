@@ -55,8 +55,9 @@ private:
 			, m_Z( 0 )
 			, m_NumChunksLoaded( 0 )
 		{}
-		cChunkData* GetChunk( int a_X, int a_Z );
-		cChunkData* m_Chunks;
+		cChunkData * GetChunk( int a_X, int a_Z );
+		
+		cChunkData * m_Chunks;
 		int m_X, m_Z;
 		int m_NumChunksLoaded;
 	};

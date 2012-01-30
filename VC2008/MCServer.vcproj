@@ -1443,6 +1443,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cFile.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cSemaphore.cpp"
 					>
 				</File>

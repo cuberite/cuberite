@@ -84,6 +84,7 @@ MCServer : \
 		build/cEntity.o\
 		build/cEvent.o\
 		build/cEvents.o\
+		build/cFile.o\
 		build/cFurnaceEntity.o\
 		build/cFurnaceRecipe.o\
 		build/cFurnaceWindow.o\
@@ -293,6 +294,7 @@ MCServer : \
 		build/cEntity.o\
 		build/cEvent.o\
 		build/cEvents.o\
+		build/cFile.o\
 		build/cFurnaceEntity.o\
 		build/cFurnaceRecipe.o\
 		build/cFurnaceWindow.o\
@@ -1522,5 +1524,7 @@ build/cWebPlugin_Lua.o : source/cWebPlugin_Lua.cpp
 build/cEvents.o : webserver/cEvents.cpp
 	$(CC) $(CC_OPTIONS) webserver/cEvents.cpp -c $(INCLUDE) -o build/cEvents.o
 
+build/cFile.o : source/cFile.cpp
+	$(CC) $(CC_OPTIONS) source/cFile.cpp -c $(INCLUDE) -o build/cFile.o
 
 ##### END RUN ####

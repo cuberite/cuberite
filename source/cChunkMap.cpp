@@ -16,6 +16,11 @@
 #include "zlib.h"
 #include <json/json.h>
 
+
+// TODO: Move this into Globals.h after cFile has been finalized
+#include "cFile.h"
+
+
 #define USE_MEMCPY
 
 #define LAYER_SIZE (32)
@@ -23,6 +28,28 @@
 
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// cChunkMap::cChunkLayer:
+
+cChunkMap::cChunkData* cChunkMap::cChunkLayer::GetChunk( int a_X, int a_Z )
+{
+	const int LocalX = a_X - m_X * LAYER_SIZE;
+	const int LocalZ = a_Z - m_Z * LAYER_SIZE;
+	//LOG("LocalX:%i LocalZ:%i", LocalX, LocalZ );
+	if ((LocalX < LAYER_SIZE) && (LocalZ < LAYER_SIZE) && (LocalX > -1) && (LocalZ > -1))
+	{
+		return &m_Chunks[ LocalX + LocalZ * LAYER_SIZE ];
+	}
+	return 0;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cChunkMap:
 
 cChunkMap::cChunkMap(cWorld* a_World )
 	: m_Layers( 0 )
@@ -37,20 +64,6 @@ cChunkMap::cChunkMap(cWorld* a_World )
 
 cChunkMap::~cChunkMap()
 {
-}
-
-
-
-
-
-cChunkMap::cChunkData* cChunkMap::cChunkLayer::GetChunk( int a_X, int a_Z )
-{
-	const int LocalX = a_X - m_X * LAYER_SIZE;
-	const int LocalZ = a_Z - m_Z * LAYER_SIZE;
-	//LOG("LocalX:%i LocalZ:%i", LocalX, LocalZ );
-	if( LocalX < LAYER_SIZE && LocalZ < LAYER_SIZE && LocalX > -1 && LocalZ > -1 )
-		return &m_Chunks[ LocalX + LocalZ * LAYER_SIZE ];
-	return 0;
 }
 
 
@@ -449,14 +462,10 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 
 	char SourceFile[128];
 
-	sprintf_s(SourceFile, 128, ( WorldName + "/X%i_Z%i.pak").c_str(), a_Layer->m_X, a_Layer->m_Z );
+	sprintf_s(SourceFile, ARRAYCOUNT(SourceFile), ( WorldName + "/X%i_Z%i.pak").c_str(), a_Layer->m_X, a_Layer->m_Z );
 
-	FILE* f = 0;
-	#ifdef _WIN32
-	if (fopen_s(&f, SourceFile, "wb" ) != 0 )	// no error
-	#else
-	if( (f = fopen(SourceFile, "wb" )) == 0 )	// no error
-	#endif
+	cFile f;
+	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
 		LOGERROR("ERROR: Could not write to file %s", SourceFile );
 		return;
@@ -466,8 +475,8 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 	// Header
 	char PakVersion = 1;
 	char ChunkVersion = 1;
-	fwrite( &PakVersion, sizeof(PakVersion), 1, f );	// pak version
-	fwrite( &ChunkVersion, sizeof(ChunkVersion), 1, f );	// chunk version
+	f.Write(&PakVersion,   sizeof(PakVersion));    // pak version
+	f.Write(&ChunkVersion, sizeof(ChunkVersion));  // chunk version
 
 	// Count number of chunks in layer
 	short NumChunks = 0;
@@ -479,120 +488,118 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 		}
 	}
 
-	fwrite( &NumChunks, sizeof( NumChunks ), 1, f );
-	LOG("Num Chunks in layer: %i", NumChunks );
+	f.Write(&NumChunks, sizeof(NumChunks));
+	LOG("Num Chunks in layer [%d, %d]: %i", a_Layer->m_X, a_Layer->m_Z, NumChunks);
 
-	//---------------
 	// Chunk headers
-	for( int z = 0; z < LAYER_SIZE; ++z )
+	for (int z = 0; z < LAYER_SIZE; ++z)
 	{
-		for( int x = 0; x < LAYER_SIZE; ++x )
+		for (int x = 0; x < LAYER_SIZE; ++x)
 		{
-			cChunkData & Data = a_Layer->m_Chunks[x + z*LAYER_SIZE];
-			CompressChunk( &Data );
-			if( Data.m_Compressed || Data.m_LiveChunk )
+			cChunkData & Data = a_Layer->m_Chunks[x + z * LAYER_SIZE];
+			CompressChunk(&Data);
+			if (Data.m_Compressed != NULL)
 			{
-				int ChunkX = a_Layer->m_X*LAYER_SIZE + x;
-				int ChunkZ = a_Layer->m_Z*LAYER_SIZE + z;
+				int ChunkX = a_Layer->m_X * LAYER_SIZE + x;
+				int ChunkZ = a_Layer->m_Z * LAYER_SIZE + z;
 				unsigned int Size = Data.m_CompressedSize; // Needs to be size of compressed data
 				unsigned int USize = Data.m_UncompressedSize;	// Uncompressed size
-				fwrite( &ChunkX, sizeof( ChunkX ), 1, f );
-				fwrite( &ChunkZ, sizeof( ChunkZ ), 1, f );
-				fwrite( &Size, sizeof( Size ), 1, f );
-				fwrite( &USize, sizeof( USize ), 1, f );
+				f.Write(&ChunkX, sizeof(ChunkX));
+				f.Write(&ChunkZ, sizeof(ChunkZ));
+				f.Write(&Size,   sizeof(Size));
+				f.Write(&USize,  sizeof(USize));
 			}
-		}
-	}
+		}  // for x - a_Layer->mChunks[x]
+	}  // for z - a_Layer->m_Chunks[z]
 
-	//----------------
 	// Chunk data
-	for( int i = 0; i < LAYER_SIZE*LAYER_SIZE; ++i )
+	for (int i = 0; i < LAYER_SIZE*LAYER_SIZE; ++i)
 	{
-		char* Compressed = a_Layer->m_Chunks[i].m_Compressed;
-		if( Compressed )
+		char * Compressed = a_Layer->m_Chunks[i].m_Compressed;
+		if (Compressed != NULL)
 		{
-			fwrite( Compressed, a_Layer->m_Chunks[i].m_CompressedSize, 1, f );
-			if(a_Layer->m_Chunks[i].m_LiveChunk)	// If there's a live chunk we have no need for compressed data
+			f.Write(Compressed, a_Layer->m_Chunks[i].m_CompressedSize);
+			if (a_Layer->m_Chunks[i].m_LiveChunk != NULL)  // If there's a live chunk we have no need for compressed data
 			{
 				delete [] a_Layer->m_Chunks[i].m_Compressed;
 				a_Layer->m_Chunks[i].m_Compressed = 0;
 				a_Layer->m_Chunks[i].m_CompressedSize = 0;
 			}
 		}
-	}
-
-	fclose(f);
+	}  // for i - a_Layer->m_Chunks[]
 }
 
 
 
 
 
+#define READ(File, Var) \
+	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
+	{ \
+		LOGERROR("ERROR READING %s FROM FILE %s (line %d)", #Var, SourceFile, __LINE__); \
+		return NULL; \
+	}
+
 cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 {
 	std::string WorldName = m_World->GetName();
 	char SourceFile[128];
 	
-	sprintf_s(SourceFile, 128, (WorldName + "/X%i_Z%i.pak").c_str(), a_LayerX, a_LayerZ );
+	sprintf_s(SourceFile, ARRAYCOUNT(SourceFile), (WorldName + "/X%i_Z%i.pak").c_str(), a_LayerX, a_LayerZ );
 	
-	FILE* f = 0;
-	#ifdef _WIN32
-	if (fopen_s(&f, SourceFile, "rb" ) != 0 )	// no error
-	#else
-	if ((f = fopen(SourceFile, "rb" )) == 0 )	// no error
-	#endif
+	cFile f(SourceFile, cFile::fmRead);
+	if (!f.IsOpen())
 	{
 		return NULL;
 	}
 	
 	char PakVersion = 0;
 	char ChunkVersion = 0;
-	if( fread( &PakVersion, sizeof(PakVersion), 1, f) != 1 ) { LOGERROR("ERROR 1 READING FROM FILE %s", SourceFile); fclose(f); return false; }
-	if( PakVersion != 1 ) { LOGERROR("WRONG PAK VERSION!"); fclose(f); return 0; }
-	if( fread( &ChunkVersion, sizeof(ChunkVersion), 1, f) != 1 ) { LOGERROR("ERROR 2 READING FROM FILE %s", SourceFile); fclose(f); return false; }
-	if( ChunkVersion != 1 )
+
+	READ(f, PakVersion);
+	if (PakVersion != 1)
 	{
-		LOGERROR("WRONG CHUNK VERSION!");
-		fclose(f);
+		LOGERROR("WRONG PAK VERSION in file \"%s\"!", SourceFile);
+		return NULL;
+	}
+	
+	READ(f, ChunkVersion);
+	if (ChunkVersion != 1 )
+	{
+		LOGERROR("WRONG CHUNK VERSION in file \"%s\"!", SourceFile);
 		return NULL;
 	}
 
 	short NumChunks = 0;
-	if( fread( &NumChunks, sizeof(NumChunks), 1, f) != 1 ) 
-	{
-		LOGERROR("ERROR 3 READING FROM FILE %s", SourceFile);
-		fclose(f);
-		return NULL;
-	}
+	READ(f, NumChunks);
 	
-	LOG("Num chunks: %i", NumChunks );
-	LOG("Source File: %s", SourceFile );
+	LOG("Num chunks in file \"%s\": %i", SourceFile, NumChunks);
 
-	cChunkLayer* Layer = new cChunkLayer( LAYER_SIZE*LAYER_SIZE );
+	std::auto_ptr<cChunkLayer> Layer(new cChunkLayer(LAYER_SIZE * LAYER_SIZE));  // The auto_ptr deletes the Layer if we exit with an error
 	Layer->m_X = a_LayerX;
 	Layer->m_Z = a_LayerZ;
-	cChunkData** OrderedData = new cChunkData*[ NumChunks ]; // So we can loop over the chunks in the order they were loaded
+	
+	cChunkData * OrderedData[LAYER_SIZE * LAYER_SIZE]; // So we can loop over the chunks in the order they were loaded
 	
 	// Loop over all chunk headers
 	for( short i = 0; i < NumChunks; ++i )
 	{
 		int ChunkX = 0;
 		int ChunkZ = 0;
-		if( fread( &ChunkX, sizeof(ChunkX), 1, f) != 1 ) { LOGERROR("ERROR 4 READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		if( fread( &ChunkZ, sizeof(ChunkZ), 1, f) != 1 ) { LOGERROR("ERROR 5 READING FROM FILE %s", SourceFile); fclose(f); return false; }
+		READ(f, ChunkX);
+		READ(f, ChunkZ);
 		cChunkData* Data = Layer->GetChunk( ChunkX, ChunkZ );
-		if( Data )
+		
+		if (Data == NULL)
 		{
-			if( fread( &Data->m_CompressedSize, sizeof(Data->m_CompressedSize), 1, f) != 1 ) { LOGERROR("ERROR 6 READING FROM FILE %s", SourceFile); fclose(f); return false; }
-			if( fread( &Data->m_UncompressedSize, sizeof(Data->m_UncompressedSize), 1, f) != 1 ) { LOGERROR("ERROR 7 READING FROM FILE %s", SourceFile); fclose(f); return false; }
+			LOGERROR("Chunk with wrong coordinates in pak file! %i %i", ChunkX, ChunkZ );
+			return NULL;
 		}
 		else
 		{
-			LOGERROR("Chunk with wrong coordinates in pak file! %i %i", ChunkX, ChunkZ );
-			fclose(f);
-			return NULL;
+			READ(f, Data->m_CompressedSize);
+			READ(f, Data->m_UncompressedSize);
 		}
-
 		OrderedData[i] = Data;
 	}
 
@@ -601,18 +608,13 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 	{
 		cChunkData* Data = OrderedData[i];
 		Data->m_Compressed = new char[ Data->m_CompressedSize ];
-		//printf("Compressed chunk size: %i\n",Data->m_CompressedSize);
-		if( fread( Data->m_Compressed, Data->m_CompressedSize, 1, f) != 1 )
+		if (f.Read(Data->m_Compressed, Data->m_CompressedSize) != Data->m_CompressedSize)
 		{
 			LOGERROR("ERROR 8 READING FROM FILE %s", SourceFile); 
-			fclose(f); 
 			return NULL;
 		}
 	}
-	delete [] OrderedData;
-
-	fclose(f);
-	return Layer;
+	return Layer.release();
 }
 
 
