@@ -18,14 +18,17 @@ function HandleRequest_PlayerList( Request )
 	
 
 	local PlayerList = World:GetAllPlayers()
-	for i, Player in ipairs( PlayerList ) do
-		Content = Content .. "<tr>"
-		Content = Content .. "<td style='width: 10px;'>" .. i .. ".</td>"
-		Content = Content .. "<td>" .. Player:GetName() .. "</td>"
-		Content = Content .. "<td><a href='?playerlist-kick=" .. Player:GetName() .. "'>Kick</a></td>"
-		Content = Content .. "</tr>"
+	if( #PlayerList > 0 ) then
+		for i, Player in ipairs( PlayerList ) do
+			Content = Content .. "<tr>"
+			Content = Content .. "<td style='width: 10px;'>" .. i .. ".</td>"
+			Content = Content .. "<td>" .. Player:GetName() .. "</td>"
+			Content = Content .. "<td><a href='?playerlist-kick=" .. Player:GetName() .. "'>Kick</a></td>"
+			Content = Content .. "</tr>"
+		end
+	else
+		Content = Content .. "<tr><td>None</td></tr>"
 	end
-
 	Content = Content .. "</table>"
 	Content = Content .. "<br>"
 	return Content

@@ -63,10 +63,12 @@ public:
 	void SetName( const char* a_Name );										//tolua_export
 
 	typedef std::list< cGroup* > GroupList;
+	typedef std::list< std::string > StringList;
 	void AddToGroup( const char* a_GroupName );								//tolua_export
 	bool CanUseCommand( const char* a_Command );							//tolua_export
 	bool HasPermission( const char* a_Permission );							//tolua_export
 	const GroupList & GetGroups();											// >> EXPORTED IN MANUALBINDINGS <<
+	StringList GetResolvedPermissions();								// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const char* a_Group );									//tolua_export
 
 	std::string GetColor();													//tolua_export
@@ -86,6 +88,7 @@ public:
 
 	bool SaveToDisk();
 	bool LoadFromDisk();
+	void LoadPermissionsFromDisk();											//tolua_export
 
 	const char* GetLoadedWorldName();
 

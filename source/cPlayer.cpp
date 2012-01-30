@@ -732,8 +732,11 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 	return false;
 }
 
-bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the correct world for this player
+void cPlayer::LoadPermissionsFromDisk()
 {
+	m_pState->Groups.clear();
+	m_pState->Permissions.clear();
+
 	cIniFile IniFile("users.ini");
 	if( IniFile.ReadFile() )
 	{
@@ -759,6 +762,11 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 		AddToGroup("Default");
 	}
 	ResolvePermissions();
+}
+
+bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the correct world for this player
+{
+	LoadPermissionsFromDisk();
 
 	// Log player permissions, cause it's what the cool kids do
 	LOGINFO("Player %s has permissions:", m_pState->PlayerName.c_str() );
@@ -889,6 +897,19 @@ void cPlayer::SetName( const char* a_Name )
 const cPlayer::GroupList & cPlayer::GetGroups()
 {
 	return m_pState->Groups;
+}
+
+cPlayer::StringList cPlayer::GetResolvedPermissions()
+{
+	StringList Permissions;
+
+	const PermissionMap& ResolvedPermissions = m_pState->ResolvedPermissions;
+	for( PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr )
+	{
+		if( itr->second ) Permissions.push_back( itr->first );
+	}
+
+	return Permissions;
 }
 
 const char* cPlayer::GetLoadedWorldName()

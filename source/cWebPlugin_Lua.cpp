@@ -84,18 +84,21 @@ std::string cWebPlugin_Lua::HandleRequest( HTTPRequest* a_Request )
 		tolua_pushusertype( LuaState, a_Request, "HTTPRequest" );
 		LOGINFO("Calling bound function! :D");
 		int s = lua_pcall( LuaState, 1, 1, 0);
-		if( report_errors( LuaState, s ) )
-		{
-			LOGINFO("error. Stack size: %i", lua_gettop(LuaState) );
-			return false;
-		}
 
+		if ( s != 0 )
+		{
+			std::string err = lua_tostring(LuaState, -1);
+			LOGERROR("-- %s", err.c_str() );
+			lua_pop(LuaState, 1);
+			LOGINFO("error. Stack size: %i", lua_gettop(LuaState) );
+			return err;	// Show the error message in the web page, looks cool
+		}
 
 		if( !lua_isstring( LuaState, -1 ) )
 		{
 			LOGWARN("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str() );
 			lua_pop(LuaState, 1); // Pop return value
-			return "";
+			return std::string("WARNING: WebPlugin tab '") + Tab->Title + std::string("' did not return a string!");
 		}
 
 		RetVal += tolua_tostring(LuaState, -1, 0);

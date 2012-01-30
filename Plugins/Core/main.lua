@@ -129,9 +129,10 @@ function Initialize( Plugin )
 	
 	local WebPlugin = Plugin:CreateWebPlugin()
 	WebPlugin:SetName( Plugin:GetName() )
+	WebPlugin:AddTab( "Playerlist", HandleRequest_PlayerList )
 	WebPlugin:AddTab( "Whitelist", HandleRequest_WhiteList )
 	WebPlugin:AddTab( "Reload", HandleRequest_Reload )
-	WebPlugin:AddTab( "Playerlist", HandleRequest_PlayerList )
+	WebPlugin:AddTab( "Permissions", HandleRequest_Permissions )
 	
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true

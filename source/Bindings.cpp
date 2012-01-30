@@ -1,9 +1,7 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/27/12 00:53:11.
+** Generated automatically by tolua++-1.0.92 on 01/30/12 17:26:14.
 */
-
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifndef __cplusplus
 #include "stdlib.h"
@@ -15,6 +13,7 @@
 /* Exported function */
 TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "tolua_base.h"
 #include "cTorch.h"
 #include "cStairs.h"
@@ -5894,6 +5893,37 @@ static int tolua_AllToLua_cPlayer_MoveToWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'MoveToWorld'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: LoadPermissionsFromDisk of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_LoadPermissionsFromDisk00
+static int tolua_AllToLua_cPlayer_LoadPermissionsFromDisk00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LoadPermissionsFromDisk'", NULL);
+#endif
+  {
+   self->LoadPermissionsFromDisk();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'LoadPermissionsFromDisk'.",&tolua_err);
  return 0;
 #endif
 }
@@ -16785,6 +16815,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetVisible",tolua_AllToLua_cPlayer_SetVisible00);
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);
    tolua_function(tolua_S,"MoveToWorld",tolua_AllToLua_cPlayer_MoveToWorld00);
+   tolua_function(tolua_S,"LoadPermissionsFromDisk",tolua_AllToLua_cPlayer_LoadPermissionsFromDisk00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Lua__cPlayer","Lua__cPlayer","cPlayer",NULL);
   tolua_beginmodule(tolua_S,"Lua__cPlayer");

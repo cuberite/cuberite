@@ -249,7 +249,7 @@ void cChunk::Tick(float a_Dt)
 		}
 		m_pState->PendingSendBlocks.clear();
 	}
-	Lock.Unlock();
+	cCSUnlock Unlock( Lock );
 
 	while( !m_pState->UnloadQuery.empty() )
 	{

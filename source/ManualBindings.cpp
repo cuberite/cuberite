@@ -140,6 +140,27 @@ static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 	return 1;
 }
 
+static int tolua_cPlayer_GetResolvedPermissions(lua_State* tolua_S)
+{
+	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+
+	cPlayer::StringList AllPermissions = self->GetResolvedPermissions();
+
+	lua_createtable(tolua_S, AllPermissions.size(), 0);
+	int newTable = lua_gettop(tolua_S);
+	int index = 1;
+	cPlayer::StringList::iterator iter = AllPermissions.begin();
+	while(iter != AllPermissions.end())
+	{
+		std::string& Permission = *iter;
+		tolua_pushstring( tolua_S, Permission.c_str() );
+		lua_rawseti(tolua_S, newTable, index);
+		++iter;
+		++index;
+	}
+	return 1;
+}
+
 static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
 {
 	cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
@@ -267,6 +288,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_endmodule(tolua_S);
 		tolua_beginmodule(tolua_S,"cPlayer");
 			tolua_function(tolua_S,"GetGroups",tolua_cPlayer_GetGroups);
+			tolua_function(tolua_S,"GetResolvedPermissions",tolua_cPlayer_GetResolvedPermissions);
 		tolua_endmodule(tolua_S);
 		tolua_beginmodule(tolua_S,"cWebPlugin_Lua");
 			tolua_function(tolua_S,"AddTab",tolua_cWebPlugin_Lua_AddTab);
