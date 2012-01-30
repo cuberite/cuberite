@@ -33,6 +33,17 @@ void cFileFormatUpdater::UpdatePlayersOfWorld( const char* a_WorldName )
 	}
 }
 
+
+
+
+
+#define READ(File, Var) \
+	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
+	{ \
+		LOGERROR("ERROR READING \"%s\" FROM FILE \"%s\"", #Var, a_FileName); \
+		return; \
+	}
+
 // Converts player binary files to human readable JSON
 void cFileFormatUpdater::PlayerBINtoJSON( const char* a_FileName )
 {
@@ -43,33 +54,30 @@ void cFileFormatUpdater::PlayerBINtoJSON( const char* a_FileName )
 	const unsigned int NumInventorySlots = 45; // At this time the player inventory has/had 45 slots
 	cItem IventoryItems[ NumInventorySlots ];
 
-	FILE* f;
-#ifdef _WIN32
-	if( fopen_s(&f, a_FileName, "rb" ) == 0 )	// no error
-#else
-	if( (f = fopen(a_FileName, "rb" ) ) != 0 )	// no error
-#endif
+	cFile f;
+	if (!f.Open(a_FileName, cFile::fmRead))
 	{
-		// First read player position, rotation and health
-		if( fread( &PlayerPos.x, sizeof(double), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-		if( fread( &PlayerPos.y, sizeof(double), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-		if( fread( &PlayerPos.z, sizeof(double), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-		if( fread( &PlayerRot.x, sizeof(float), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-		if( fread( &PlayerRot.y, sizeof(float), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-		if( fread( &PlayerRot.z, sizeof(float), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-		if( fread( &PlayerHealth, sizeof(short), 1, f) != 1 )	{ LOGERROR("ERROR READING FROM FILE %s", a_FileName); fclose(f); return; }
-
-
-		for(unsigned int i = 0; i < NumInventorySlots; i++)
-		{
-			cItem & Item = IventoryItems[i];
-			if( fread( &Item.m_ItemID,		sizeof(Item.m_ItemID), 1, f)	 != 1 ) { LOGERROR("ERROR READING INVENTORY FROM FILE"); return; }
-			if( fread( &Item.m_ItemCount,	sizeof(Item.m_ItemCount), 1, f) != 1 )	{ LOGERROR("ERROR READING INVENTORY FROM FILE"); return; }
-			if( fread( &Item.m_ItemHealth,	sizeof(Item.m_ItemHealth), 1, f)!= 1 )	{ LOGERROR("ERROR READING INVENTORY FROM FILE"); return; }
-		}
-
-		fclose(f);
+		return;
 	}
+
+	// First read player position, rotation and health
+	READ(f, PlayerPos.x);
+	READ(f, PlayerPos.y);
+	READ(f, PlayerPos.z);
+	READ(f, PlayerRot.x);
+	READ(f, PlayerRot.y);
+	READ(f, PlayerRot.z);
+	READ(f, PlayerHealth);
+
+
+	for(unsigned int i = 0; i < NumInventorySlots; i++)
+	{
+		cItem & Item = IventoryItems[i];
+		READ(f, Item.m_ItemID);
+		READ(f, Item.m_ItemCount);
+		READ(f, Item.m_ItemHealth);
+	}
+	f.Close();
 
 	// Loaded all the data, now create the JSON data
 	Json::Value JSON_PlayerPosition;
@@ -105,24 +113,25 @@ void cFileFormatUpdater::PlayerBINtoJSON( const char* a_FileName )
 	std::string FileNameJson = FileNameWithoutExt + ".json";
 
 	// Write to file
-#ifdef _WIN32
-	if( fopen_s(&f, FileNameJson.c_str(), "wb" ) == 0 )	// no error
-#else
-	if( (f = fopen(FileNameJson.c_str(), "wb" ) ) != 0 )	// no error
-#endif
+	if (!f.Open(FileNameJson.c_str(), cFile::fmWrite))
 	{
-		if( fwrite( JsonData.c_str(), JsonData.size(), 1, f ) != 1 )	{ LOGERROR("ERROR WRITING PLAYER JSON TO FILE %s", FileNameJson.c_str() ); return; }
-		fclose( f );
+		return;
 	}
+	if (f.Write(JsonData.c_str(), JsonData.size()) != JsonData.size())
+	{
+		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", FileNameJson.c_str());
+		return;
+	}
+	f.Close();
 
 	// Delete old format file, only do this when conversion has succeeded
-	if( std::remove( a_FileName ) != 0 )
+	if (std::remove(a_FileName) != 0)
 	{
-		LOGERROR("COULD NOT DELETE FILE %s", a_FileName );
+		LOGERROR("COULD NOT DELETE old format file \"%s\"", a_FileName);
 		return;
 	}
 
-	LOGINFO("Successfully converted binary to Json %s", FileNameJson.c_str() );
+	LOGINFO("Successfully converted binary to Json \"%s\"", FileNameJson.c_str() );
 }
 
 

@@ -19,10 +19,15 @@
 
 
 typedef std::list< cRecipeChecker::Recipe* > RecipeList;
+
 struct cRecipeChecker::sRecipeCheckerState
 {
 	RecipeList Recipes;
 };
+
+
+
+
 
 cRecipeChecker* cRecipeChecker::GetRecipeChecker()
 {
@@ -30,11 +35,19 @@ cRecipeChecker* cRecipeChecker::GetRecipeChecker()
 	return cRoot::Get()->GetRecipeChecker();
 }
 
+
+
+
+
 cRecipeChecker::Recipe::~Recipe()
 {
 	delete [] Slots;
 	Slots = 0;
 }
+
+
+
+
 
 cRecipeChecker::~cRecipeChecker()
 {
@@ -42,11 +55,19 @@ cRecipeChecker::~cRecipeChecker()
 	delete m_pState;
 }
 
+
+
+
+
 cRecipeChecker::cRecipeChecker()
 	: m_pState( new sRecipeCheckerState )
 {
 	ReloadRecipes();
 }
+
+
+
+
 
 void cRecipeChecker::ClearRecipes()
 {
@@ -57,6 +78,10 @@ void cRecipeChecker::ClearRecipes()
 	}
 }
 
+
+
+
+
 void PrintRecipe( std::vector< cRecipeChecker::RecipeSlot > & RecipeSlots )
 {
 	LOG("Recipe:");
@@ -66,6 +91,10 @@ void PrintRecipe( std::vector< cRecipeChecker::RecipeSlot > & RecipeSlots )
 		LOG("x:%i y:%i id:%i #%i", Slot.x, Slot.y, Slot.Item.m_ItemID, Slot.Item.m_ItemCount );
 	}
 }
+
+
+
+
 
 void PrintNear( std::ifstream & f, int a_History = 64 )
 {
@@ -91,34 +120,14 @@ void PrintNear( std::ifstream & f, int a_History = 64 )
 	LOGERROR("Error near: \"%s\"", Near.c_str() );
 }
 
+
+
+
+
 void cRecipeChecker::ReloadRecipes()
 {
 	LOG("--Loading recipes--");
 	ClearRecipes();
-
-	/*
-	char a_File[] = "recipes.txt";
-
-	FILE* f = 0;
-	#ifdef _WIN32
-	if( fopen_s(&f, a_File, "rb" ) == 0 )	// no error
-	#else
-	if( (f = fopen(a_File, "rb" )) != 0 )	// no error
-	#endif
-	{
-	char c;
-	while( fread( &c, sizeof(char), 1, f) == 1 )
-	{
-
-	}
-	}
-	else
-	{
-	LOG("Could not open file for recipes: %s", a_File);
-	return;
-	}
-	*/
-
 
 	std::ifstream f;
 
@@ -361,18 +370,12 @@ void cRecipeChecker::ReloadRecipes()
 	}
 	f.close();
 
- 	LOG("Found %i recipes", m_pState->Recipes.size() );
-// 	for(RecipeList::iterator itr = m_pState->Recipes.begin(); itr != m_pState->Recipes.end(); ++itr )
-// 	{
-// 		LOG("Recipe for %i times %i", (*itr)->Result.m_ItemCount, (*itr)->Result.m_ItemID );
-// 		for(unsigned int j = 0; j < (*itr)->NumItems; j++)
-// 		{
-// 			RecipeSlot Slot = (*itr)->Slots[j];
-// 			LOG("%i %i %i %i", Slot.x, Slot.y, Slot.Item.m_ItemID, Slot.Item.m_ItemCount );
-// 		}
-// 	}
-	LOG("--Done loading recipes--");
+ 	LOG("--Done loading recipes, found %i recipes", m_pState->Recipes.size() );
 }
+
+
+
+
 
 cItem cRecipeChecker::CookIngredients( cItem* a_Items, int a_Width, int a_Height, bool a_bConsumeIngredients /* = false */ )
 {
@@ -459,3 +462,7 @@ cItem cRecipeChecker::CookIngredients( cItem* a_Items, int a_Width, int a_Height
 	}
 	return cItem();
 }
+
+
+
+

@@ -764,6 +764,10 @@ void cPlayer::LoadPermissionsFromDisk()
 	ResolvePermissions();
 }
 
+
+
+
+
 bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the correct world for this player
 {
 	LoadPermissionsFromDisk();
@@ -778,58 +782,61 @@ bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the cor
 	char SourceFile[128];
 	sprintf_s(SourceFile, 128, "players/%s.json", m_pState->PlayerName.c_str() );
 
-	FILE* f;
-	#ifdef _WIN32
-	if( fopen_s(&f, SourceFile, "rb" ) == 0 )	// no error
-	#else
-	if( (f = fopen(SourceFile, "rb" ) ) != 0 )	// no error
-	#endif
+	cFile f;
+	if (!f.Open(SourceFile, cFile::fmRead))
 	{
-		// Get file size
-		fseek (f , 0 , SEEK_END);
-		long FileSize = ftell (f);
-		rewind(f);
-
-		char* buffer = new char[ FileSize ];
-		if( fread( buffer, FileSize, 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
-		fclose(f);
-
-		Json::Value root;
-		Json::Reader reader;
-		if( !reader.parse( buffer, root, false ) )
-		{
-			LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile);
-		}
-		
-		delete [] buffer;
-
-		Json::Value & JSON_PlayerPosition = root["position"];
-		if( JSON_PlayerPosition.size() == 3 )
-		{
-			m_Pos->x = JSON_PlayerPosition[(unsigned int)0].asDouble();
-			m_Pos->y = JSON_PlayerPosition[(unsigned int)1].asDouble();
-			m_Pos->z = JSON_PlayerPosition[(unsigned int)2].asDouble();
-		}
-
-		Json::Value & JSON_PlayerRotation = root["rotation"];
-		if( JSON_PlayerRotation.size() == 3 )
-		{
-			m_Rot->x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
-			m_Rot->y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
-			m_Rot->z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
-		}
-
-		m_Health = (short)root.get("health", 0 ).asInt();
-		m_FoodLevel = (short)root.get("food", 0 ).asInt();
-		m_Inventory->LoadFromJson(root["inventory"]);
-		m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
-
-		m_pState->LoadedWorldName = root.get("world", "world").asString();
-		
-		return true;
+		return false;
 	}
-	return false;
+
+	// Get file size
+	long FileSize = f.GetSize();
+
+	char * buffer = new char[FileSize];
+	if (f.Read(buffer, FileSize) != FileSize )
+	{
+		LOGERROR("ERROR READING FROM FILE \"%s\"", SourceFile); 
+		return false;
+	}
+	f.Close();
+
+	Json::Value root;
+	Json::Reader reader;
+	if( !reader.parse( buffer, root, false ) )
+	{
+		LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile);
+	}
+		
+	delete [] buffer;
+
+	Json::Value & JSON_PlayerPosition = root["position"];
+	if( JSON_PlayerPosition.size() == 3 )
+	{
+		m_Pos->x = JSON_PlayerPosition[(unsigned int)0].asDouble();
+		m_Pos->y = JSON_PlayerPosition[(unsigned int)1].asDouble();
+		m_Pos->z = JSON_PlayerPosition[(unsigned int)2].asDouble();
+	}
+
+	Json::Value & JSON_PlayerRotation = root["rotation"];
+	if( JSON_PlayerRotation.size() == 3 )
+	{
+		m_Rot->x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
+		m_Rot->y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
+		m_Rot->z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
+	}
+
+	m_Health = (short)root.get("health", 0 ).asInt();
+	m_FoodLevel = (short)root.get("food", 0 ).asInt();
+	m_Inventory->LoadFromJson(root["inventory"]);
+	m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
+
+	m_pState->LoadedWorldName = root.get("world", "world").asString();
+	
+	return true;
 }
+
+
+
+
 
 bool cPlayer::SaveToDisk()
 {
@@ -867,21 +874,22 @@ bool cPlayer::SaveToDisk()
 	char SourceFile[128];
 	sprintf_s(SourceFile, 128, "players/%s.json", m_pState->PlayerName.c_str() );
 
-	FILE* f;
-	#ifdef _WIN32
-	if( fopen_s(&f, SourceFile, "wb" ) == 0 )	// no error
-	#else
-	if( (f = fopen(SourceFile, "wb" ) ) != 0 )	// no error
-	#endif
+	cFile f;
+	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		if( fwrite( JsonData.c_str(), JsonData.size(), 1, f ) != 1 ) { LOGERROR("ERROR WRITING PLAYER JSON TO FILE %s", SourceFile ); return false; }
-		fclose(f);
-		return true;
+		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_pState->PlayerName.c_str(), SourceFile);
+		return false;
 	}
-
-	LOGERROR("ERROR WRITING PLAYER %s TO FILE %s", m_pState->PlayerName.c_str(), SourceFile);
-	return false;
+	if (f.Write(JsonData.c_str(), JsonData.size()) != JsonData.size())
+	{
+		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile); 
+		return false;
+	}
+	return true;
 }
+
+
+
 
 
 const char* cPlayer::GetName()

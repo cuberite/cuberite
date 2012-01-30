@@ -198,3 +198,34 @@ int cFile::Tell (void) const
 
 
 
+
+/// Returns the size of file, in bytes, or -1 for failure; asserts if not open
+int cFile::GetSize(void) const
+{
+	assert(IsOpen());
+	
+	if (!IsOpen())
+	{
+		return -1;
+	}
+	
+	int CurPos = ftell(m_File);
+	if (CurPos < 0)
+	{
+		return -1;
+	}
+	if (fseek(m_File, 0, SEEK_END) != 0)
+	{
+		return -1;
+	}
+	int res = ftell(m_File);
+	if (fseek(m_File, CurPos, SEEK_SET) != 0)
+	{
+		return -1;
+	}
+	return res;
+}
+
+
+
+

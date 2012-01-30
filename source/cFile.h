@@ -80,6 +80,9 @@ public:
 	/// Returns the current position (bytes from file start) or -1 for failure; asserts if not open
 	int Tell (void) const;
 	
+	/// Returns the size of file, in bytes, or -1 for failure; asserts if not open
+	int GetSize(void) const;
+	
 private:
 	#ifdef USE_STDIO_FILE
 	FILE * m_File;

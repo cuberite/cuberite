@@ -245,6 +245,10 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 	}
 }
 
+
+
+
+
 bool cWebAdmin::Init( int a_Port )
 {
 	m_Port = a_Port;
@@ -289,43 +293,42 @@ void *cWebAdmin::ListenThread( void *lpParam )
 	return 0;
 }
 
+
+
+
+
 std::string cWebAdmin::GetTemplate()
 {
 	std::string retVal = "";
 
 	char SourceFile[] = "webadmin/template.html";
 
-	FILE* f;
-#ifdef _WIN32
-	if( fopen_s(&f, SourceFile, "rb" ) == 0 )	// no error
-#else
-	if( (f = fopen(SourceFile, "rb" ) ) != 0 )	// no error
-#endif
+	cFile f;
+	if (!f.Open(SourceFile, cFile::fmRead))
 	{
-		// obtain file size:
-		fseek (f , 0 , SEEK_END);
-		long lSize = ftell (f);
-		rewind (f);
-
-		// allocate memory to contain the whole file:
-		char* buffer = (char*) malloc (sizeof(char)*lSize);
-
-		// copy the file into the buffer:
-		size_t result = fread (buffer, 1, lSize, f);
-		if ((long)result != lSize)
-		{
-			LOG ("WEBADMIN: Could not read file %s", SourceFile);
-			free( buffer );
-			return "";
-		}
-
-		retVal.assign( buffer, lSize );
-
-		free( buffer );
-		fclose(f);
+		return "";
 	}
+
+	// obtain file size:
+	int lSize = f.GetSize();
+
+	// allocate memory to contain the whole file:
+	std::auto_ptr<char> buffer(new char[lSize]);  // auto_ptr deletes the memory in its destructor
+
+	// copy the file into the buffer:
+	if (f.Read(buffer.get(), lSize) != lSize)
+	{
+		LOG ("WEBADMIN: Could not read file \"%s\"", SourceFile);
+		return "";
+	}
+
+	retVal.assign(buffer.get(), lSize );
+
 	return retVal;
 }
+
+
+
 
 
 void cWebAdmin::RemovePlugin( lua_State* L )

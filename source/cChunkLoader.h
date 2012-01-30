@@ -1,7 +1,5 @@
 #pragma once
 
-class cCriticalSection;
-class cEvent;
 class cChunk;
 class cChunkLoader
 {
