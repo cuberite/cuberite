@@ -219,66 +219,53 @@ void cFurnaceEntity::ResetCookTimer()
 	m_CookTime = 0.f;
 }
 
-void cFurnaceEntity::WriteToFile(FILE* a_File)
-{
-	fwrite( &m_BlockType, sizeof( ENUM_BLOCK_ID ), 1, a_File );
-	fwrite( &m_PosX, sizeof( int ), 1, a_File );
-	fwrite( &m_PosY, sizeof( int ), 1, a_File );
-	fwrite( &m_PosZ, sizeof( int ), 1, a_File );
 
-	unsigned int NumSlots = 3;
-	fwrite( &NumSlots, sizeof(unsigned int), 1, a_File );
-	for(unsigned int i = 0; i < NumSlots; i++)
-	{
-		cItem* Item = &m_Items[i];
-		if( Item )
-		{
-			fwrite( &Item->m_ItemID, sizeof(Item->m_ItemID), 1, a_File );
-			fwrite( &Item->m_ItemCount, sizeof(Item->m_ItemCount), 1, a_File );
-			fwrite( &Item->m_ItemHealth, sizeof(Item->m_ItemHealth), 1, a_File );
-		}
+
+
+
+#define READ(File, Var) \
+	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
+	{ \
+		LOGERROR("ERROR READING cFurnaceEntity %s FROM FILE (line %d)", #Var, __LINE__); \
+		return false; \
 	}
-	cItem Item;
-	if( m_CookingItem ) Item = *m_CookingItem;
-	fwrite( &Item.m_ItemID,		sizeof(Item.m_ItemID),		1, a_File );
-	fwrite( &Item.m_ItemCount,	sizeof(Item.m_ItemCount),	1, a_File );
-	fwrite( &Item.m_ItemHealth, sizeof(Item.m_ItemHealth),	1, a_File );
 
-	fwrite( &m_CookTime,	sizeof(float), 1, a_File );
-	fwrite( &m_TimeCooked,	sizeof(float), 1, a_File );
-	fwrite( &m_BurnTime,	sizeof(float), 1, a_File );
-	fwrite( &m_TimeBurned,	sizeof(float), 1, a_File );
-}
-
-bool cFurnaceEntity::LoadFromFile(FILE* a_File)
+bool cFurnaceEntity::LoadFromFile(cFile & f)
 {
-	if( fread( &m_PosX, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &m_PosY, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &m_PosZ, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
+	READ(f, m_PosX);
+	READ(f, m_PosY);
+	READ(f, m_PosZ);
 
 	unsigned int NumSlots = 0;
-	if( fread( &NumSlots, sizeof(unsigned int), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
+	READ(f, NumSlots);
 	m_Items = new cItem[ NumSlots ];
 	for(unsigned int i = 0; i < NumSlots; i++)
 	{
-		cItem & Item = m_Items[ i ];
-		if( fread( &Item.m_ItemID,		sizeof(Item.m_ItemID), 1, a_File)	 != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-		if( fread( &Item.m_ItemCount,	sizeof(Item.m_ItemCount), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-		if( fread( &Item.m_ItemHealth,	sizeof(Item.m_ItemHealth), 1, a_File)!= 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
+		cItem & Item = m_Items[i];
+		READ(f, Item.m_ItemID);
+		READ(f, Item.m_ItemCount);
+		READ(f, Item.m_ItemHealth);
 	}
-	cItem Item;
-	if( fread( &Item.m_ItemID,		sizeof(Item.m_ItemID), 1, a_File)	 != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &Item.m_ItemCount,	sizeof(Item.m_ItemCount), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &Item.m_ItemHealth,	sizeof(Item.m_ItemHealth), 1, a_File)!= 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( !Item.IsEmpty() ) m_CookingItem = new cItem( Item );
+	cItem CookingItem;
+	READ(f, CookingItem.m_ItemID);
+	READ(f, CookingItem.m_ItemCount);
+	READ(f, CookingItem.m_ItemHealth);
+	if (!CookingItem.IsEmpty())
+	{
+		m_CookingItem = new cItem(CookingItem);
+	}
 
-	if( fread( &m_CookTime,		sizeof(float), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &m_TimeCooked,	sizeof(float), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &m_BurnTime,		sizeof(float), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
-	if( fread( &m_TimeBurned,	sizeof(float), 1, a_File) != 1 ) { LOGERROR("ERROR READING FURNACE FROM FILE"); return false; }
+	READ(f, m_CookTime);
+	READ(f, m_TimeCooked);
+	READ(f, m_BurnTime);
+	READ(f, m_TimeBurned);
 
 	return true;
 }
+
+
+
+
 
 bool cFurnaceEntity::LoadFromJson( const Json::Value& a_Value )
 {

@@ -17,10 +17,6 @@
 #include <json/json.h>
 
 
-// TODO: Move this into Globals.h after cFile has been finalized
-#include "cFile.h"
-
-
 #define USE_MEMCPY
 
 #define LAYER_SIZE (32)

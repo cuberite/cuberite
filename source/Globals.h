@@ -59,6 +59,7 @@
 #include "cSemaphore.h"
 #include "cEvent.h"
 #include "cThread.h"
+#include "cFile.h"
 #include "cMCLogger.h"
 
 

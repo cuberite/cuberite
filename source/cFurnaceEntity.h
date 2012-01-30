@@ -21,11 +21,10 @@ public:
 	virtual ~cFurnaceEntity();
 	virtual void Destroy();
 
-	void WriteToFile(FILE* a_File);
-	bool LoadFromFile(FILE* a_File);
+	bool LoadFromFile(cFile & a_File);  // deprecated format
 
-	bool LoadFromJson( const Json::Value& a_Value );
-	void SaveToJson( Json::Value& a_Value );
+	bool LoadFromJson(const Json::Value& a_Value );
+	void SaveToJson  (Json::Value& a_Value );
 
 	bool Tick( float a_Dt );
 	virtual void UsedBy( cPlayer & a_Player );

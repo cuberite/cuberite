@@ -92,6 +92,19 @@ cCSLock::cCSLock(cCriticalSection * a_CS)
 
 
 
+cCSLock::cCSLock(cCriticalSection & a_CS) 
+	: m_CS(&a_CS)
+	#ifdef _DEBUG
+	, m_IsLocked(false)
+	#endif
+{
+	Lock();
+}
+
+
+
+
+
 cCSLock::~cCSLock()
 {
 	Unlock();

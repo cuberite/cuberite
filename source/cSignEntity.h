@@ -3,12 +3,18 @@
 #include "cBlockEntity.h"
 #include "FileDefine.h"
 
-#include <string>
+
+
+
 
 namespace Json
 {
 	class Value;
 }
+
+
+
+
 
 class cWorld;
 class cSignEntity : public cBlockEntity
@@ -17,8 +23,7 @@ public:
 	cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cChunk* a_Chunk);
 	virtual ~cSignEntity();
 
-	void WriteToFile(FILE* a_File);
-	bool LoadFromFile(FILE* a_File);
+	bool LoadFromFile(cFile & a_File);  // deprecated format
 
 	bool LoadFromJson( const Json::Value& a_Value );
 	void SaveToJson( Json::Value& a_Value );
@@ -33,3 +38,7 @@ public:
 private:
 	std::string m_Line[4];
 };
+
+
+
+

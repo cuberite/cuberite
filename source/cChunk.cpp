@@ -4,8 +4,6 @@
 #ifndef _WIN32
 #include <cstring>
 #include <cstdlib>
-#include <sys/stat.h>   // for mkdir
-#include <sys/types.h>
 #endif
 
 
@@ -52,6 +50,10 @@ typedef std::list< cClientHandle* > ClientHandleList;
 typedef std::list< cBlockEntity* > BlockEntityList;
 typedef std::list< cEntity* > EntityList;
 
+
+
+
+
 struct cChunk::sChunkState
 {
 	sChunkState()
@@ -77,6 +79,36 @@ struct cChunk::sChunkState
 	int TotalReferencesEver; // For creating a unique reference ID
 	int NumRefs;
 };
+
+
+
+
+
+cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World)
+	: m_pState( new sChunkState )
+	, m_bCalculateLighting( false )
+	, m_bCalculateHeightmap( false )
+	, m_PosX( a_X )
+	, m_PosY( a_Y )
+	, m_PosZ( a_Z )
+	, m_BlockType( m_BlockData ) // Offset the pointers
+	, m_BlockMeta( m_BlockType + c_NumBlocks )
+	, m_BlockLight( m_BlockMeta + c_NumBlocks/2 )
+	, m_BlockSkyLight( m_BlockLight + c_NumBlocks/2 )
+	, m_BlockTickNum( 0 )
+	, m_BlockTickX( 0 )
+	, m_BlockTickY( 0 )
+	, m_BlockTickZ( 0 )
+	, m_EntitiesCriticalSection( 0 )
+	, m_World( a_World )
+{
+	//LOG("cChunk::cChunk(%i, %i, %i)", a_X, a_Y, a_Z);
+	m_EntitiesCriticalSection = new cCriticalSection();
+}
+
+
+
+
 
 cChunk::~cChunk()
 {
@@ -125,31 +157,13 @@ cChunk::~cChunk()
 	delete m_pState;
 }
 
-cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World)
-	: m_pState( new sChunkState )
-	, m_bCalculateLighting( false )
-	, m_bCalculateHeightmap( false )
-	, m_PosX( a_X )
-	, m_PosY( a_Y )
-	, m_PosZ( a_Z )
-	, m_BlockType( m_BlockData ) // Offset the pointers
-	, m_BlockMeta( m_BlockType + c_NumBlocks )
-	, m_BlockLight( m_BlockMeta + c_NumBlocks/2 )
-	, m_BlockSkyLight( m_BlockLight + c_NumBlocks/2 )
-	, m_BlockTickNum( 0 )
-	, m_BlockTickX( 0 )
-	, m_BlockTickY( 0 )
-	, m_BlockTickZ( 0 )
-	, m_EntitiesCriticalSection( 0 )
-	, m_World( a_World )
-{
-	//LOG("cChunk::cChunk(%i, %i, %i)", a_X, a_Y, a_Z);
-	m_EntitiesCriticalSection = new cCriticalSection();
-}
+
+
+
 
 void cChunk::Initialize()
 {
-	if( !LoadFromDisk() )
+	if (!LoadFromDisk())
 	{
 		// Clear memory
 		memset( m_BlockData, 0x00, c_BlockDataSize );
@@ -163,9 +177,8 @@ void cChunk::Initialize()
 
 		// During generation, some blocks might have been set by using (Fast)SetBlock() causing this list to fill.
 		// This chunk has not been sent to anybody yet, so there is no need for separately sending block changes when you can send an entire chunk
-		m_pState->BlockListCriticalSection.Lock();
+		cCSLock Lock(m_pState->BlockListCriticalSection);
 		m_pState->PendingSendBlocks.clear();
-		m_pState->BlockListCriticalSection.Unlock();
 	}
 	else
 	{
@@ -174,14 +187,22 @@ void cChunk::Initialize()
 	}
 }
 
+
+
+
+
 void cChunk::Tick(float a_Dt)
 {
-	if( m_bCalculateLighting )
+	if (m_bCalculateLighting)
+	{
 		CalculateLighting();
-	if( m_bCalculateHeightmap )
+	}
+	if (m_bCalculateHeightmap)
+	{
 		CalculateHeightmap();
+	}
 
-	m_pState->BlockListCriticalSection.Lock();
+	cCSLock Lock(m_pState->BlockListCriticalSection);
 	unsigned int PendingSendBlocks = m_pState->PendingSendBlocks.size();
 	if( PendingSendBlocks > 1 )
 	{
@@ -228,7 +249,7 @@ void cChunk::Tick(float a_Dt)
 		}
 		m_pState->PendingSendBlocks.clear();
 	}
-	m_pState->BlockListCriticalSection.Unlock();
+	Lock.Unlock();
 
 	while( !m_pState->UnloadQuery.empty() )
 	{
@@ -872,179 +893,137 @@ cBlockEntity* cChunk::GetBlockEntity( int a_X, int a_Y, int a_Z )
 	return 0;
 }
 
+
+
+
+
+/// Loads the chunk from the old-format disk file, erases the file afterwards. Returns true if successful
 bool cChunk::LoadFromDisk()
 {
 	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/X%i_Y%i_Z%i.bin", m_PosX, m_PosY, m_PosZ );
+	sprintf_s(SourceFile, ARRAYCOUNT(SourceFile), "world/X%i_Y%i_Z%i.bin", m_PosX, m_PosY, m_PosZ );
 
-	FILE* f = 0;
-	#ifdef _WIN32
-	if( fopen_s(&f, SourceFile, "rb" ) == 0 )	// no error
-	#else
-	if( (f = fopen(SourceFile, "rb" )) != 0 )	// no error
-	#endif
+	cFile f;
+	if (!f.Open(SourceFile, cFile::fmRead))
 	{
-		if( fread( m_BlockData, sizeof(char)*c_BlockDataSize, 1, f) != 1 ) { LOGERROR("ERROR READING FROM FILE %s", SourceFile); fclose(f); return false; }
+		return false;
+	}
 
-		// Now load Block Entities
-		m_pState->BlockListCriticalSection.Lock();
-		ENUM_BLOCK_ID BlockType;
-		while( fread( &BlockType, sizeof(ENUM_BLOCK_ID), 1, f) == 1 )
+	if (f.Read(m_BlockData, sizeof(m_BlockData)) != sizeof(m_BlockData))
+	{
+		LOGERROR("ERROR READING FROM FILE %s", SourceFile); 
+		return false;
+	}
+
+	// Now load Block Entities
+	cCSLock Lock(m_pState->BlockListCriticalSection);
+
+	ENUM_BLOCK_ID BlockType;
+	while (f.Read(&BlockType, sizeof(ENUM_BLOCK_ID)) == sizeof(ENUM_BLOCK_ID))
+	{
+		switch (BlockType)
 		{
-			switch( BlockType )
-			{
 			case E_BLOCK_CHEST:
+			{
+				cChestEntity * ChestEntity = new cChestEntity( 0, 0, 0, this );
+				if (!ChestEntity->LoadFromFile(f))
 				{
-					cChestEntity* ChestEntity = new cChestEntity( 0, 0, 0, this );
-					if( !ChestEntity->LoadFromFile( f ) )
-					{
-						LOGERROR("ERROR READING CHEST FROM FILE %s", SourceFile );
-						delete ChestEntity;
-						fclose(f);
-						return false;
-					}
-					m_pState->BlockEntities.push_back( ChestEntity );
+					LOGERROR("ERROR READING CHEST FROM FILE %s", SourceFile );
+					delete ChestEntity;
+					return false;
 				}
+				m_pState->BlockEntities.push_back( ChestEntity );
 				break;
+			}
+			
 			case E_BLOCK_FURNACE:
+			{
+				cFurnaceEntity* FurnaceEntity = new cFurnaceEntity( 0, 0, 0, this );
+				if (!FurnaceEntity->LoadFromFile(f))
 				{
-					cFurnaceEntity* FurnaceEntity = new cFurnaceEntity( 0, 0, 0, this );
-					if( !FurnaceEntity->LoadFromFile( f ) )
-					{
-						LOGERROR("ERROR READING FURNACE FROM FILE %s", SourceFile );
-						delete FurnaceEntity;
-						fclose(f);
-						return false;
-					}
-					m_pState->BlockEntities.push_back( FurnaceEntity );
-					m_pState->TickBlockEntities.push_back( FurnaceEntity ); // They need tickin'
+					LOGERROR("ERROR READING FURNACE FROM FILE %s", SourceFile );
+					delete FurnaceEntity;
+					return false;
 				}
+				m_pState->BlockEntities.push_back( FurnaceEntity );
+				m_pState->TickBlockEntities.push_back( FurnaceEntity ); // They need tickin'
 				break;
+			}
+			
 			case E_BLOCK_SIGN_POST:
 			case E_BLOCK_WALLSIGN:
+			{
+				cSignEntity * SignEntity = new cSignEntity(BlockType, 0, 0, 0, this );
+				if (!SignEntity->LoadFromFile( f ) )
 				{
-					cSignEntity* SignEntity = new cSignEntity(BlockType, 0, 0, 0, this );
-					if( !SignEntity->LoadFromFile( f ) )
-					{
-						LOGERROR("ERROR READING SIGN FROM FILE %s", SourceFile );
-						delete SignEntity;
-						fclose(f);
-						return false;
-					}
-					m_pState->BlockEntities.push_back( SignEntity );
+					LOGERROR("ERROR READING SIGN FROM FILE %s", SourceFile );
+					delete SignEntity;
+					return false;
 				}
+				m_pState->BlockEntities.push_back( SignEntity );
 				break;
+			}
+			
 			default:
+			{
+				assert(!"Unhandled block entity in file");
 				break;
 			}
 		}
-		m_pState->BlockListCriticalSection.Unlock();
+	}
+	Lock.Unlock();
+	f.Close();
 
-		fclose(f);
-
-		// Delete old format file
-		if( std::remove( SourceFile ) != 0 )
-			LOGERROR("Could not delete file %s", SourceFile );
-		else
-			LOGINFO("Successfully deleted olf format file %s", SourceFile );
-
-		return true;
+	// Delete old format file
+	if (std::remove(SourceFile) != 0)
+	{
+		LOGERROR("Could not delete file %s", SourceFile );
 	}
 	else
 	{
-		//LOGWARN("COULD NOT OPEN FILE %s\n", SourceFile);
-		return false;
+		LOGINFO("Successfully deleted old format file \"%s\"", SourceFile );
 	}
+	return true;
 }
+
+
+
+
 
 bool cChunk::SaveToDisk()
 {
+	assert(!"Old save format not supported anymore");  // Remove the call to this function
+	
 	return true; //no more saving old format!
-
-	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/X%i_Y%i_Z%i.bin", m_PosX, m_PosY, m_PosZ );
-
-	#ifdef _WIN32
-	{
-		SECURITY_ATTRIBUTES Attrib;
-		Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-		Attrib.lpSecurityDescriptor = NULL;
-		Attrib.bInheritHandle = false;
-		::CreateDirectory("world", &Attrib);
-	}
-	#else
-	{
-		mkdir("world", S_IRWXU | S_IRWXG | S_IRWXO);
-	}
-	#endif
-
-	FILE* f = 0;
-#ifdef _WIN32
-	if( fopen_s(&f, SourceFile, "wb" ) == 0 )	// no error
-	#else
-	if( (f = fopen(SourceFile, "wb" )) != 0 )	// no error
-	#endif
-	{
-		fwrite( m_BlockData, sizeof(char)*c_BlockDataSize, 1, f );
-
-		m_pState->BlockListCriticalSection.Lock();
-		// Now write Block Entities
-		for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
-		{
-			cBlockEntity* BlockEntity = *itr;
-			switch( BlockEntity->GetBlockType() )
-			{
-			case E_BLOCK_CHEST:
-				{
-					cChestEntity* ChestEntity = reinterpret_cast< cChestEntity* >( BlockEntity );
-					ChestEntity->WriteToFile( f );
-				}
-				break;
-			case E_BLOCK_FURNACE:
-				{
-					cFurnaceEntity* FurnaceEntity = reinterpret_cast< cFurnaceEntity* >( BlockEntity );
-					FurnaceEntity->WriteToFile( f );
-				}
-				break;
-			case E_BLOCK_SIGN_POST:
-			case E_BLOCK_WALLSIGN:
-				{
-					cSignEntity* SignEntity = reinterpret_cast< cSignEntity* >( BlockEntity );
-					SignEntity->WriteToFile( f );
-				}
-				break;
-			default:
-				break;
-			}
-		}
-		m_pState->BlockListCriticalSection.Unlock();
-
-		fclose(f);
-		return true;
-	}
-	else
-	{
-		LOGERROR("ERROR WRITING TO FILE %s", SourceFile);
-		return false;
-	}
 }
+
+
+
+
 
 void cChunk::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ ) const
 {
 	for( std::list< cClientHandle* >::const_iterator itr = m_pState->LoadedByClient.begin(); itr != m_pState->LoadedByClient.end(); ++itr )
 	{
-		if( *itr == a_Exclude ) continue;
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
 		(*itr)->Send( a_Packet );
-	}
+	}  // for itr - LoadedByClient[]
 }
+
+
+
 
 
 void cChunk::LoadFromJson( const Json::Value & a_Value )
 {
-	m_pState->BlockListCriticalSection.Lock();
+	cCSLock Lock(m_pState->BlockListCriticalSection);
+
 	// Load chests
 	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
-	if( !AllChests.empty() )
+	if (!AllChests.empty())
 	{
 		for( Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
 		{
@@ -1092,50 +1071,58 @@ void cChunk::LoadFromJson( const Json::Value & a_Value )
 			else m_pState->BlockEntities.push_back( SignEntity );
 		}
 	}
-	m_pState->BlockListCriticalSection.Unlock();
 }
+
+
+
+
 
 void cChunk::SaveToJson( Json::Value & a_Value )
 {
 	Json::Value AllChests;
 	Json::Value AllFurnaces;
 	Json::Value AllSigns;
-	m_pState->BlockListCriticalSection.Lock();
-	for( std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
+	cCSLock Lock(m_pState->BlockListCriticalSection);
+	for (std::list<cBlockEntity*>::iterator itr = m_pState->BlockEntities.begin(); itr != m_pState->BlockEntities.end(); ++itr)
 	{
 		cBlockEntity* BlockEntity = *itr;
 		switch( BlockEntity->GetBlockType() )
 		{
-		case E_BLOCK_CHEST:
+			case E_BLOCK_CHEST:
 			{
 				cChestEntity* ChestEntity = reinterpret_cast< cChestEntity* >( BlockEntity );
 				Json::Value NewChest;
 				ChestEntity->SaveToJson( NewChest );
 				AllChests.append( NewChest );
+				break;
 			}
-			break;
-		case E_BLOCK_FURNACE:
+			
+			case E_BLOCK_FURNACE:
 			{
 				cFurnaceEntity* FurnaceEntity = reinterpret_cast< cFurnaceEntity* >( BlockEntity );
 				Json::Value NewFurnace;
 				FurnaceEntity->SaveToJson( NewFurnace );
 				AllFurnaces.append( NewFurnace );
+				break;
 			}
-			break;
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:
+			
+			case E_BLOCK_SIGN_POST:
+			case E_BLOCK_WALLSIGN:
 			{
 				cSignEntity* SignEntity = reinterpret_cast< cSignEntity* >( BlockEntity );
 				Json::Value NewSign;
 				SignEntity->SaveToJson( NewSign );
 				AllSigns.append( NewSign );
+				break;
 			}
-			break;
-		default:
-			break;
-		}
-	}
-	m_pState->BlockListCriticalSection.Unlock();
+			
+			default:
+			{
+				assert(!"Unhandled blocktype in BlockEntities list while saving to JSON");
+				break;
+			}
+		}  // switch (BlockEntity->GetBlockType())
+	}  // for itr - BlockEntities[]
 
 	if( !AllChests.empty() )
 		a_Value["Chests"] = AllChests;
@@ -1145,15 +1132,26 @@ void cChunk::SaveToJson( Json::Value & a_Value )
 		a_Value["Signs"] = AllSigns;
 }
 
+
+
+
+
 EntityList & cChunk::GetEntities()
 {
 	return m_pState->Entities;
 }
 
+
+
+
+
 const ClientHandleList & cChunk::GetClients()
 {
 	return m_pState->LoadedByClient;
 }
+
+
+
 
 
 void cChunk::AddTickBlockEntity( cFurnaceEntity* a_Entity )
@@ -1162,10 +1160,17 @@ void cChunk::AddTickBlockEntity( cFurnaceEntity* a_Entity )
 	m_pState->TickBlockEntities.push_back( a_Entity );
 }
 
+
+
+
+
 void cChunk::RemoveTickBlockEntity( cFurnaceEntity* a_Entity )
 {
 	m_pState->TickBlockEntities.remove( a_Entity );
 }
+
+
+
 
 
 void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z)
@@ -1175,32 +1180,50 @@ void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, i
 	a_Z = m_PosZ * 16 + a_ChunkZ;
 }
 
+
+
+
+
 void cChunk::AddReference()
 {
-	m_pState->ReferenceCriticalSection.Lock();
+	cCSLock Lock(m_pState->ReferenceCriticalSection);
 	m_pState->NumRefs++;
-	m_pState->ReferenceCriticalSection.Unlock();
 }
+
+
+
+
 
 void cChunk::RemoveReference()
 {
-	m_pState->ReferenceCriticalSection.Lock();
+	cCSLock Lock(m_pState->ReferenceCriticalSection);
 	m_pState->NumRefs--;
-	if( m_pState->NumRefs < 0 )
+	assert (m_pState->NumRefs >= 0);
+	if (m_pState->NumRefs < 0)
 	{
 		LOGWARN("WARNING: cChunk: Tried to remove reference, but the chunk is not referenced!");
 	}
-	m_pState->ReferenceCriticalSection.Unlock();
 }
+
+
+
+
 
 int cChunk::GetReferenceCount()
 {
-	m_pState->ReferenceCriticalSection.Lock();
+	cCSLock Lock(m_pState->ReferenceCriticalSection);
 	int Refs = m_pState->NumRefs;
-	m_pState->ReferenceCriticalSection.Unlock();
 	return Refs;
 }
+
+
+
+
 
 #if !C_CHUNK_USE_INLINE
 # include "cChunk.inc"
 #endif
+
+
+
+

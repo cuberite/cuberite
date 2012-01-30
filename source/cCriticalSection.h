@@ -30,6 +30,7 @@ class cCSLock
 	
 public:
 	cCSLock(cCriticalSection * a_CS);
+	cCSLock(cCriticalSection & a_CS);
 	~cCSLock();
 	
 	// Temporarily unlock or re-lock:

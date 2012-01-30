@@ -22,15 +22,27 @@ cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, c
 {
 }
 
+
+
+
+
 cSignEntity::~cSignEntity()
 {
 }
+
+
+
+
 
 // It don't do anything when 'used'
 void cSignEntity::UsedBy( cPlayer & a_Player )
 {
 	(void)a_Player;
 }
+
+
+
+
 
 void cSignEntity::SetLines( const std::string & a_Line1, const std::string & a_Line2, const std::string & a_Line3, const std::string & a_Line4 )
 {
@@ -40,6 +52,10 @@ void cSignEntity::SetLines( const std::string & a_Line1, const std::string & a_L
 	m_Line[3] = a_Line4;
 }
 
+
+
+
+
 void cSignEntity::SetLine( int a_Index, std::string a_Line )
 {
 	if( a_Index < 4 && a_Index > -1 )
@@ -47,6 +63,10 @@ void cSignEntity::SetLine( int a_Index, std::string a_Line )
 		m_Line[a_Index] = a_Line;
 	}
 }
+
+
+
+
 
 std::string cSignEntity::GetLine( int a_Index )
 {
@@ -56,6 +76,10 @@ std::string cSignEntity::GetLine( int a_Index )
 	}
 	return "";
 }
+
+
+
+
 
 void cSignEntity::SendTo( cClientHandle* a_Client )
 {
@@ -68,50 +92,57 @@ void cSignEntity::SendTo( cClientHandle* a_Client )
 	Sign.m_Line3 = m_Line[2];
 	Sign.m_Line4 = m_Line[3];
 
-	if( a_Client ) a_Client->Send( Sign );
+	if( a_Client )
+	{
+		a_Client->Send( Sign );
+	}
 	else // broadcast of a_Client == 0
 	{
 		GetChunk()->Broadcast( Sign );
 	}
 }
 
-void cSignEntity::WriteToFile(FILE* a_File)
-{
-	fwrite( &m_BlockType, sizeof( ENUM_BLOCK_ID ), 1, a_File );
-	fwrite( &m_PosX, sizeof( int ), 1, a_File );
-	fwrite( &m_PosY, sizeof( int ), 1, a_File );
-	fwrite( &m_PosZ, sizeof( int ), 1, a_File );
 
-	for( int i = 0; i < 4; i++ )
-	{
-		short Size = (short)m_Line[i].size();
-		fwrite( &Size, sizeof(short), 1, a_File );
-		fwrite( m_Line[i].c_str(), Size * sizeof(char), 1, a_File );
+
+
+
+#define READ(File, Var) \
+	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
+	{ \
+		LOGERROR("ERROR READING cSignEntity %s FROM FILE (line %d)", #Var, __LINE__); \
+		return false; \
 	}
-}
 
-bool cSignEntity::LoadFromFile(FILE* a_File)
+bool cSignEntity::LoadFromFile(cFile & f)
 {
-	if( fread( &m_PosX, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING SIGN FROM FILE"); return false; }
-	if( fread( &m_PosY, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING SIGN FROM FILE"); return false; }
-	if( fread( &m_PosZ, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING SIGN FROM FILE"); return false; }
+	READ(f, m_PosX);
+	READ(f, m_PosY);
+	READ(f, m_PosZ);
 
 	for( int i = 0; i < 4; i++ )
 	{
 		short Size = 0;
-		if( fread( &Size, sizeof(short), 1, a_File) != 1 ) { LOGERROR("ERROR READING SIGN FROM FILE"); return false; }
-		if( Size > 0 )
+		READ(f, Size);
+		if (Size > 0)
 		{
-			char* c_Str = new char[Size];
-			if( fread( c_Str, Size * sizeof(char), 1, a_File) != 1 ) { LOGERROR("ERROR READING SIGN FROM FILE"); delete [] c_Str; return false; }
+			char * c_Str = new char[Size];
+			if (f.Read(c_Str, Size) != Size )
+			{
+				LOGERROR("ERROR READING SIGN FROM FILE");
+				delete [] c_Str;
+				return false;
+			}
 			m_Line[i].assign( c_Str, Size );
 			delete [] c_Str;
 		}
-		LOG("Line %i: %s", i+1, m_Line[i].c_str() );
 	}
 
 	return true;
 }
+
+
+
+
 
 bool cSignEntity::LoadFromJson( const Json::Value & a_Value )
 {
@@ -138,3 +169,7 @@ void cSignEntity::SaveToJson( Json::Value & a_Value )
 	a_Value["Line3"] = m_Line[2];
 	a_Value["Line4"] = m_Line[3];
 }
+
+
+
+

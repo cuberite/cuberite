@@ -77,45 +77,39 @@ void cChestEntity::SetSlot( int a_Slot, cItem & a_Item )
 	}
 }
 
-void cChestEntity::WriteToFile(FILE* a_File)
-{
-	fwrite( &m_BlockType, sizeof( ENUM_BLOCK_ID ), 1, a_File );
-	fwrite( &m_PosX, sizeof( int ), 1, a_File );
-	fwrite( &m_PosY, sizeof( int ), 1, a_File );
-	fwrite( &m_PosZ, sizeof( int ), 1, a_File );
 
-	unsigned int NumSlots = c_ChestHeight*c_ChestWidth;
-	fwrite( &NumSlots, sizeof(unsigned int), 1, a_File );
-	for(unsigned int i = 0; i < NumSlots; i++)
-	{
-		cItem* Item = GetSlot( i );
-		if( Item )
-		{
-			fwrite( &Item->m_ItemID, sizeof(Item->m_ItemID), 1, a_File );
-			fwrite( &Item->m_ItemCount, sizeof(Item->m_ItemCount), 1, a_File );
-			fwrite( &Item->m_ItemHealth, sizeof(Item->m_ItemHealth), 1, a_File );
-		}
+
+
+
+#define READ(File, Var) \
+	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
+	{ \
+		LOGERROR("ERROR READING cChestEntity %s FROM FILE (line %d)", #Var, __LINE__); \
+		return false; \
 	}
-}
 
-bool cChestEntity::LoadFromFile(FILE* a_File)
+bool cChestEntity::LoadFromFile(cFile & f)
 {
-	if( fread( &m_PosX, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
-	if( fread( &m_PosY, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
-	if( fread( &m_PosZ, sizeof(int), 1, a_File) != 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
+	READ(f, m_PosX);
+	READ(f, m_PosY);
+	READ(f, m_PosZ);
 
 	unsigned int NumSlots = 0;
-	if( fread( &NumSlots, sizeof(unsigned int), 1, a_File) != 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
+	READ(f, NumSlots);
 	for(unsigned int i = 0; i < NumSlots; i++)
 	{
 		cItem Item;
-		if( fread( &Item.m_ItemID,		sizeof(Item.m_ItemID), 1, a_File)	 != 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
-		if( fread( &Item.m_ItemCount,	sizeof(Item.m_ItemCount), 1, a_File) != 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
-		if( fread( &Item.m_ItemHealth,	sizeof(Item.m_ItemHealth), 1, a_File)!= 1 ) { LOGERROR("ERROR READING CHEST FROM FILE"); return false; }
+		READ(f, Item.m_ItemID);
+		READ(f, Item.m_ItemCount);
+		READ(f, Item.m_ItemHealth);
 		SetSlot( i, Item );
 	}
 	return true;
 }
+
+
+
+
 
 bool cChestEntity::LoadFromJson( const Json::Value& a_Value )
 {

@@ -17,7 +17,7 @@ class cNBTData;
 class cChestEntity : public cBlockEntity, public cWindowOwner
 {
 public:
-	cChestEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk);
+	cChestEntity(int a_X, int a_Y, int a_Z, cChunk * a_Chunk);
 	virtual ~cChestEntity();
 	virtual void Destroy();
 
@@ -26,8 +26,7 @@ public:
 	cItem *	GetSlot( int a_Slot );
 	void	SetSlot( int a_Slot, cItem & a_Item );
 
-	void WriteToFile(FILE* a_File);
-	bool LoadFromFile(FILE* a_File);
+	bool LoadFromFile(cFile & a_File);  // deprecated format
 
 	bool LoadFromJson( const Json::Value& a_Value );
 	void SaveToJson( Json::Value& a_Value );
