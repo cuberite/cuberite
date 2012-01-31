@@ -1,107 +1,120 @@
 
+// cEvent.cpp
+
+// Implements the cEvent object representing an OS-specific synchronization primitive that can be waited-for
+// Implemented as an Event on Win and as a 1-semaphore on *nix
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+#include "cEvent.h"
 
 
 
 
-cEvent::cEvent( unsigned int a_NumEvents /* = 1 */ )
-	: m_NumEvents( a_NumEvents )
-#ifndef _WIN32
-	, m_bNamed( false )
-#endif
+
+cEvent::cEvent(void)
 {
-    if( m_NumEvents < 1 ) m_NumEvents = 1;
-
 #ifdef _WIN32
-    m_Handle = new HANDLE[ m_NumEvents ];
-	for( unsigned int i = 0; i < m_NumEvents; i++)
+	m_Event = CreateEvent( 0, FALSE, FALSE, 0 );
+	if (m_Event == NULL)
 	{
-		((HANDLE*)m_Handle)[i] = CreateEvent( 0, FALSE, FALSE, 0 );
+		LOGERROR("cEvent: cannot create event, GLE = %d. Aborting server.", GetLastError());
+		abort();
 	}
-#else
-    m_Handle = new sem_t*[ m_NumEvents ];
-	for( unsigned int i = 0; i < m_NumEvents; i++)
+#else  // *nix
+	m_bIsNamed = false;
+	if (sem_init(m_Event, 0, 0))
 	{
+		LOGWARN("WARNING cEvent: Could not create unnamed semaphore, fallback to named.");
+		
+		// _X: I'm unconvinced about using sem_unlink() just after a successful sem_open(), it seems wrong - why destroy the object just after creating?
+		assert(!"This codepath is really weird, if it is ever used, please check that everything works.");
+		
+		m_bIsNamed = true;
 
-	    sem_t* & HandlePtr = ((sem_t**)m_Handle)[i];
-	    HandlePtr = new sem_t;
-
-        if( sem_init( HandlePtr, 0, 0 ) )
-        {
-            LOG("WARNING cEvent: Could not create unnamed semaphore, fallback to named.");
-            m_bNamed = true;
-            delete HandlePtr;   // named semaphores return their own address
-
-            char c_Str[32];
-            sprintf( c_Str, "cEvent%p", &HandlePtr );
-            HandlePtr = sem_open( c_Str, O_CREAT, 777, 0 );
-            if( HandlePtr == SEM_FAILED )
-                LOG("ERROR: Could not create Event. (%i)", errno);
-            else
-                if( sem_unlink( c_Str ) != 0 )
-                    LOG("ERROR: Could not unlink cEvent. (%i)", errno);
-        }
+		char c_Str[64];
+		sprintf(c_Str, "cEvent%p", this);
+		m_Event = sem_open( c_Str, O_CREAT, 777, 0 );
+		if (m_Event == SEM_FAILED)
+		{
+			LOGERROR("cEvent: Cannot create event, errno = %i. Aborting server.", errno);
+			abort();
+		}
+		else
+		{
+			if( sem_unlink( c_Str ) != 0 )
+			{
+				LOGWARN("ERROR: Could not unlink cEvent. (%i)", errno);
+			}
+		}
 	}
-#endif
+#endif  // *nix
 }
+
+
+
+
 
 cEvent::~cEvent()
 {
 #ifdef _WIN32
-    for( unsigned int i = 0; i < m_NumEvents; i++ )
-    {
-        CloseHandle( ((HANDLE*)m_Handle)[i] );
-    }
-    delete [] (HANDLE*)m_Handle;
+	CloseHandle(m_Event);
 #else
-    for( unsigned int i = 0; i < m_NumEvents; i++ )
-    {
-        if( m_bNamed )
-        {
-            sem_t* & HandlePtr = ((sem_t**)m_Handle)[i];
-            char c_Str[32];
-            sprintf( c_Str, "cEvent%p", &HandlePtr );
-    //        LOG("Closing event: %s", c_Str );
-    //        LOG("Sem ptr: %p", HandlePtr );
-	    if( sem_close( HandlePtr ) != 0 )
-            {
-                LOG("ERROR: Could not close cEvent. (%i)", errno);
-            }
-        }
-        else
-        {
-            sem_destroy( ((sem_t**)m_Handle)[i] );
-            delete ((sem_t**)m_Handle)[i];
-        }
-    }
-    delete [] (sem_t**)m_Handle; m_Handle = 0;
+	if (m_bIsNamed)
+	{
+		if (sem_close(m_Event) != 0)
+		{
+			LOGERROR("ERROR: Could not close cEvent. (%i)", errno);
+		}
+	}
+	else
+	{
+		sem_destroy(m_Event);
+	}
 #endif
 }
 
-void cEvent::Wait()
+
+
+
+
+void cEvent::Wait(void)
 {
 #ifdef _WIN32
-	WaitForMultipleObjects( m_NumEvents, (HANDLE*)m_Handle, true, INFINITE );
+	DWORD res = WaitForSingleObject(m_Event, INFINITE);
+	if (res != WAIT_OBJECT_0)
+	{
+		LOGWARN("cEvent: waiting for the event failed: %d, GLE = %d. Continuing, but server may be unstable.", res, GetLastError());
+	}
 #else
-    for(unsigned int i = 0; i < m_NumEvents; i++)
-    {
-        if( sem_wait( ((sem_t**)m_Handle)[i] ) != 0 )
-        {
-            LOG("ERROR: Could not wait for cEvent. (%i)", errno);
-        }
-    }
+	int res = sem_wait(m_Event);
+	if (res != 0 )
+	{
+		LOGWARN("cEvent: waiting for the event failed: %i, errno = %i. Continuing, but server may be unstable.", res, errno);
+	}
 #endif
 }
 
-void cEvent::Set(unsigned int a_EventNum /* = 0 */)
+
+
+
+
+void cEvent::Set(void)
 {
 #ifdef _WIN32
-	SetEvent( ((HANDLE*)m_Handle)[a_EventNum] );
+	if (SetEvent(m_Event))
+	{
+		LOGWARN("cEvent: Could not set cEvent: GLE = %d", GetLastError());
+	}
 #else
-    if( sem_post( ((sem_t**)m_Handle)[a_EventNum] ) != 0 )
-    {
-        LOG("ERROR: Could not set cEvent. (%i)", errno);
-    }
+	int res = sem_post(m_Event);
+	if (res != 0)
+	{
+		LOGWARN("cEvent: Could not set cEvent: %i, errno = %d", res, errno);
+	}
 #endif
 }
+
+
+
+

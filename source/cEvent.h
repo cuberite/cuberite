@@ -1,18 +1,47 @@
+
+// cEvent.h
+
+// Interfaces to the cEvent object representing an OS-specific synchronization primitive that can be waited-for
+// Implemented as an Event on Win and as a 1-semaphore on *nix
+
+
+
+
+
 #pragma once
+#ifndef CEVENT_H_INCLUDED
+#define CEVENT_H_INCLUDED
+
+
+
+
 
 class cEvent
 {
 public:
-	cEvent( unsigned int a_NumEvents = 1 );
+	cEvent(void);
 	~cEvent();
 
-	void Wait();
-	void Set(unsigned int a_EventNum = 0);
+	void Wait(void);
+	void Set (void);
+	
 private:
-	unsigned int m_NumEvents;
-	void* m_Handle; // HANDLE[] pointer
 
-#ifndef _WIN32
-    bool m_bNamed;
-#endif
-};
+	#ifdef _WIN32
+	HANDLE m_Event;
+	#else
+	sem_t * m_Event;
+	bool    m_bIsNamed;
+	#endif
+} ;
+
+
+
+
+
+
+#endif  // CEVENT_H_INCLUDED
+
+
+
+
