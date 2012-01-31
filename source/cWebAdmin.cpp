@@ -136,6 +136,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				Request.Username = r->username_;
 				Request.Method = r->method_;
 				Request.Params = new cStringMap(r->params_);
+				Request.PostParams = new cStringMap(r->params_post_);
 				Request.Path = r->path_;
 
 				if( Split.size() > 1 )
@@ -158,6 +159,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				}
 
 				delete Request.Params;
+				delete Request.PostParams;
 
 				if( FoundPlugin.empty() )	// Default page
 				{

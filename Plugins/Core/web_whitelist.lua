@@ -1,11 +1,11 @@
 local function HTMLDeleteButton( name )
-	return "<form method=GET><input type=\"hidden\" name=\"whitelist-delete\" value=\"".. name .."\"><input type=\"submit\" value=\"Remove from whitelist\"></form>"
+	return "<form method=\"POST\"><input type=\"hidden\" name=\"whitelist-delete\" value=\"".. name .."\"><input type=\"submit\" value=\"Remove from whitelist\"></form>"
 end
 
 function HandleRequest_WhiteList( Request )
 	local UpdateMessage = ""
-	if( Request.Params:get("whitelist-add") ~= "" ) then
-		local PlayerName = Request.Params:get("whitelist-add")
+	if( Request.PostParams:get("whitelist-add") ~= "" ) then
+		local PlayerName = Request.PostParams:get("whitelist-add")
 		
 		if( WhiteListIni:GetValueB("WhiteList", PlayerName, false) == true ) then
 			UpdateMessage = "<b>".. PlayerName.."</b> is already on the whitelist"
@@ -14,12 +14,12 @@ function HandleRequest_WhiteList( Request )
 			UpdateMessage = "Added <b>" .. PlayerName .. "</b> to whitelist."
 			WhiteListIni:WriteFile()
 		end
-	elseif( Request.Params:get("whitelist-delete") ~= "" ) then
-		local PlayerName = Request.Params:get("whitelist-delete")
+	elseif( Request.PostParams:get("whitelist-delete") ~= "" ) then
+		local PlayerName = Request.PostParams:get("whitelist-delete")
 		WhiteListIni:DeleteValue( "WhiteList", PlayerName )
 		UpdateMessage = "Removed <b>" .. PlayerName .. "</b> from whitelist."
 		WhiteListIni:WriteFile()
-	elseif( Request.Params:get("whitelist-reload") ~= "" ) then
+	elseif( Request.PostParams:get("whitelist-reload") ~= "" ) then
 		WhiteListIni:Erase() -- Empty entire loaded ini first, otherwise weird shit goes down
 		WhiteListIni:ReadFile()
 		UpdateMessage = "Loaded from disk"
@@ -63,10 +63,10 @@ function HandleRequest_WhiteList( Request )
 	end
 	Content = Content .. "</table>"
 	Content = Content .. "<br><h4>Add player to whitelist</h4>"
-	Content = Content .. "<form method=\"GET\">"
+	Content = Content .. "<form method=\"POST\">"
 	Content = Content .. "<input type=\"text\" name=\"whitelist-add\"><input type=\"submit\" value=\"Add player\">"
 	Content = Content .. "</form>"
-	Content = Content .. "<form method=\"GET\">"
+	Content = Content .. "<form method=\"POST\">"
 	Content = Content .. "<input type=\"submit\" name=\"whitelist-reload\" value=\"Reload from disk\">"
 	Content = Content .. "</form>"
 	Content = Content .. "<br>"..UpdateMessage

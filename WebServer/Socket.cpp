@@ -118,11 +118,20 @@ Socket& Socket::operator=(Socket& o) {
   return *this;
 }
 
-void Socket::Close() {
+void Socket::Close( bool a_WaitSend /* = false */ )
+{
 	if( s_ )
 	{
-	  closesocket(s_);
-	  s_ = 0;
+		if( a_WaitSend )
+		{
+			assert( shutdown(s_, SD_SEND ) == 0 );
+			char c;
+			while( recv(s_, &c, 1, 0 ) != 0 )
+			{}
+		}
+
+		closesocket(s_);
+		s_ = 0;
 	}
 }
 
@@ -135,10 +144,23 @@ std::string Socket::ReceiveLine() {
     {
         return "";
     }
-
     ret += r;
     if (r == '\n')  return ret;
   }
+}
+
+std::string Socket::ReceiveBytes( unsigned int a_Length ) {
+	std::string ret;
+	while( ret.size() < a_Length ) {
+		char r;
+
+		if (recv(s_, &r, 1, 0) <= 0 )
+		{
+			return "";
+		}
+		ret += r;
+	}
+	return ret;
 }
 
 void Socket::SendLine(std::string s) {

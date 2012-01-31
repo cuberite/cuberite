@@ -41,17 +41,21 @@ public:
 		http_request()
 			: s_( 0 )
 			, authentication_given_(false)
+			, content_length_( 0 )
 		{}
 
 		Socket*                            s_;
 		std::string                        method_;
 		std::string                        path_;
 		std::map<std::string, std::string> params_;
+		std::map<std::string, std::string> params_post_;
 
 		std::string                        accept_;
 		std::string                        accept_language_;
 		std::string                        accept_encoding_;
 		std::string                        user_agent_;
+		int                                content_length_;
+		std::string                        content_type_;
 
 		/* status_: used to transmit server's error status, such as
 		o  202 OK

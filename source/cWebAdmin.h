@@ -10,6 +10,7 @@ struct HTTPRequest
 	std::string Method;
 	std::string Path;
 	cStringMap* Params;
+	cStringMap* PostParams;
 	std::string Username;
 };
 //tolua_end

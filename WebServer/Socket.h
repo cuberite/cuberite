@@ -34,8 +34,10 @@
 
 #include "../source/MCSocket.h"
 // #ifdef _WIN32
-// #include <winsock2.h>
-// #endif
+// #include <winsock2.h>
+
+// #endif
+
 
 #include <string>
 
@@ -49,9 +51,9 @@ public:
   Socket& operator=(Socket&);
 
   std::string ReceiveLine();
-  std::string ReceiveBytes();
+  std::string ReceiveBytes( unsigned int a_Length );
 
-  void   Close();
+  void   Close( bool a_WaitSend = false );
 
   // The parameter of SendLine is not a const reference
   // because SendLine modifes the std::string passed.

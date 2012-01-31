@@ -76,13 +76,13 @@ std::string cWebPlugin_Lua::HandleRequest( HTTPRequest* a_Request )
 
 	if( Tab )
 	{
-		LOGINFO("1. Stack size: %i", lua_gettop(LuaState) );
+		//LOGINFO("1. Stack size: %i", lua_gettop(LuaState) );
 		lua_rawgeti( LuaState, LUA_REGISTRYINDEX, Tab->Reference); // same as lua_getref()
 
-		LOGINFO("2. Stack size: %i", lua_gettop(LuaState) );
+		//LOGINFO("2. Stack size: %i", lua_gettop(LuaState) );
 		// Push HTTPRequest
 		tolua_pushusertype( LuaState, a_Request, "HTTPRequest" );
-		LOGINFO("Calling bound function! :D");
+		//LOGINFO("Calling bound function! :D");
 		int s = lua_pcall( LuaState, 1, 1, 0);
 
 		if ( s != 0 )
@@ -103,7 +103,7 @@ std::string cWebPlugin_Lua::HandleRequest( HTTPRequest* a_Request )
 
 		RetVal += tolua_tostring(LuaState, -1, 0);
 		lua_pop(LuaState, 1); // Pop return value
-		LOGINFO("ok. Stack size: %i", lua_gettop(LuaState) );
+		//LOGINFO("ok. Stack size: %i", lua_gettop(LuaState) );
 	}
 
 	return RetVal;

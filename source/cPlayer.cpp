@@ -767,8 +767,7 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-
-bool cPlayer::LoadFromDisk() // TODO - This should also get/set/whatever the correct world for this player
+bool cPlayer::LoadFromDisk()
 {
 	LoadPermissionsFromDisk();
 
