@@ -31,6 +31,7 @@ private:
 	HANDLE m_Event;
 	#else
 	sem_t * m_Event;
+	bool    m_bIsNamed;
 	#endif
 } ;
 
