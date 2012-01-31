@@ -77,18 +77,19 @@
 
 typedef std::list<cPacket*> PacketList;
 
+
+
+
+
+// fwd: cServer.cpp:
+extern std::string GetWSAError();
+
+
+
+
+
 struct cClientHandle::sClientHandleState
 {
-	sClientHandleState()
-		: ProtocolVersion( 23 )
-		, pReceiveThread( 0 )
-		, pSendThread( 0 )
-		, pAuthenticateThread( 0 )
-		, pSemaphore( 0 )
-	{
-		for( int i = 0; i < 256; ++i )
-			PacketMap[i] = 0;
-	}
 	int ProtocolVersion;
 	std::string Username;
 	std::string Password;
@@ -111,7 +112,25 @@ struct cClientHandle::sClientHandleState
 	Vector3d ConfirmPosition;
 
 	cPacket* PacketMap[256];
-};
+
+	sClientHandleState(void)
+		: ProtocolVersion( 23 )
+		, pReceiveThread( 0 )
+		, pSendThread( 0 )
+		, pAuthenticateThread( 0 )
+		, pSemaphore( 0 )
+	{
+		for( int i = 0; i < 256; ++i )
+			PacketMap[i] = 0;
+	}
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket & a_Socket)
 	: m_bDestroyed( false )
@@ -135,30 +154,30 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_pState->pSemaphore = new cSemaphore( MAX_SEMAPHORES, 0 );
 
 	// All the packets that can be received from the client
-	m_pState->PacketMap[E_KEEP_ALIVE]		= new cPacket_KeepAlive;
-	m_pState->PacketMap[E_HANDSHAKE]		= new cPacket_Handshake;
-	m_pState->PacketMap[E_LOGIN]			= new cPacket_Login;
-	m_pState->PacketMap[E_PLAYERPOS]		= new cPacket_PlayerPosition;
-	m_pState->PacketMap[E_PLAYERLOOK]		= new cPacket_PlayerLook;
-	m_pState->PacketMap[E_PLAYERMOVELOOK]		= new cPacket_PlayerMoveLook;
-	m_pState->PacketMap[E_CHAT]			= new cPacket_Chat;
-	m_pState->PacketMap[E_ANIMATION]		= new cPacket_ArmAnim;
-	m_pState->PacketMap[E_FLYING]			= new cPacket_Flying;
-	m_pState->PacketMap[E_BLOCK_DIG]		= new cPacket_BlockDig;
-	m_pState->PacketMap[E_BLOCK_PLACE]		= new cPacket_BlockPlace;
-	m_pState->PacketMap[E_DISCONNECT]		= new cPacket_Disconnect;
-	m_pState->PacketMap[E_ITEM_SWITCH]		= new cPacket_ItemSwitch;
-	m_pState->PacketMap[E_ENTITY_EQUIPMENT]		= new cPacket_EntityEquipment;
-	m_pState->PacketMap[E_CREATIVE_INVENTORY_ACTION] 	= new cPacket_CreativeInventoryAction;
-	m_pState->PacketMap[E_NEW_INVALID_STATE] 	= new cPacket_NewInvalidState;
-	m_pState->PacketMap[E_PICKUP_SPAWN]		= new cPacket_PickupSpawn;
-	m_pState->PacketMap[E_USE_ENTITY]		= new cPacket_UseEntity;
-	m_pState->PacketMap[E_WINDOW_CLOSE]		= new cPacket_WindowClose;
-	m_pState->PacketMap[E_WINDOW_CLICK]		= new cPacket_WindowClick;
-	m_pState->PacketMap[E_PACKET_13]		= new cPacket_13;
-	m_pState->PacketMap[E_UPDATE_SIGN]		= new cPacket_UpdateSign;
-	m_pState->PacketMap[E_RESPAWN]			= new cPacket_Respawn;
-	m_pState->PacketMap[E_PING]			= new cPacket_Ping;
+	m_pState->PacketMap[E_KEEP_ALIVE]                = new cPacket_KeepAlive;
+	m_pState->PacketMap[E_HANDSHAKE]                 = new cPacket_Handshake;
+	m_pState->PacketMap[E_LOGIN]                     = new cPacket_Login;
+	m_pState->PacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
+	m_pState->PacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
+	m_pState->PacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
+	m_pState->PacketMap[E_CHAT]                      = new cPacket_Chat;
+	m_pState->PacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
+	m_pState->PacketMap[E_FLYING]                    = new cPacket_Flying;
+	m_pState->PacketMap[E_BLOCK_DIG]                 = new cPacket_BlockDig;
+	m_pState->PacketMap[E_BLOCK_PLACE]               = new cPacket_BlockPlace;
+	m_pState->PacketMap[E_DISCONNECT]                = new cPacket_Disconnect;
+	m_pState->PacketMap[E_ITEM_SWITCH]               = new cPacket_ItemSwitch;
+	m_pState->PacketMap[E_ENTITY_EQUIPMENT]          = new cPacket_EntityEquipment;
+	m_pState->PacketMap[E_CREATIVE_INVENTORY_ACTION] = new cPacket_CreativeInventoryAction;
+	m_pState->PacketMap[E_NEW_INVALID_STATE]         = new cPacket_NewInvalidState;
+	m_pState->PacketMap[E_PICKUP_SPAWN]              = new cPacket_PickupSpawn;
+	m_pState->PacketMap[E_USE_ENTITY]                = new cPacket_UseEntity;
+	m_pState->PacketMap[E_WINDOW_CLOSE]              = new cPacket_WindowClose;
+	m_pState->PacketMap[E_WINDOW_CLICK]              = new cPacket_WindowClick;
+	m_pState->PacketMap[E_PACKET_13]                 = new cPacket_13;
+	m_pState->PacketMap[E_UPDATE_SIGN]               = new cPacket_UpdateSign;
+	m_pState->PacketMap[E_RESPAWN]                   = new cPacket_Respawn;
+	m_pState->PacketMap[E_PING]                      = new cPacket_Ping;
 
 	memset( m_LoadedChunks, 0x00, sizeof(cChunk*)*VIEWDISTANCE*VIEWDISTANCE );
 
@@ -171,6 +190,10 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 
 	LOG("New ClientHandle" );
 }
+
+
+
+
 
 cClientHandle::~cClientHandle()
 {
@@ -251,6 +274,10 @@ cClientHandle::~cClientHandle()
 	delete m_pState;
 }
 
+
+
+
+
 void cClientHandle::Destroy()
 {
 	 m_bDestroyed = true;
@@ -263,11 +290,19 @@ void cClientHandle::Destroy()
 	 m_pState->SocketCriticalSection.Unlock();
 }
 
+
+
+
+
 void cClientHandle::Kick( const char* a_Reason )
 {
 	Send( cPacket_Disconnect( a_Reason ) );
 	m_bKicking = true;
 }
+
+
+
+
 
 void cClientHandle::StreamChunks()
 {
@@ -347,6 +382,10 @@ void cClientHandle::StreamChunks()
 	}
 }
 
+
+
+
+
 // Sends chunks to the player from the player position outward
 void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChunks )
 {
@@ -386,6 +425,10 @@ void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChun
 	}
 }
 
+
+
+
+
 // This removes the client from all chunks. Used when switching worlds
 void cClientHandle::RemoveFromAllChunks()
 {
@@ -400,6 +443,10 @@ void cClientHandle::RemoveFromAllChunks()
 	}
 }
 
+
+
+
+
 void cClientHandle::AddPacket(cPacket * a_Packet)
 {
 	m_pState->CriticalSection.Lock();
@@ -407,11 +454,19 @@ void cClientHandle::AddPacket(cPacket * a_Packet)
 	m_pState->CriticalSection.Unlock();
 }
 
+
+
+
+
 void cClientHandle::RemovePacket( cPacket * a_Packet )
 {
 	delete a_Packet;
 	m_pState->PendingParsePackets.remove( a_Packet );
 }
+
+
+
+
 
 void cClientHandle::HandlePendingPackets()
 {
@@ -424,12 +479,16 @@ void cClientHandle::HandlePendingPackets()
 	m_pState->CriticalSection.Unlock();
 }
 
+
+
+
+
 void cClientHandle::HandlePacket( cPacket* a_Packet )
 {
 	m_TimeLastPacket = cWorld::GetTime();
 
-// 	cPacket* CopiedPacket = a_Packet->Clone();
-// 	a_Packet = CopiedPacket;
+	// cPacket* CopiedPacket = a_Packet->Clone();
+	// a_Packet = CopiedPacket;
 
 	//LOG("Packet: 0x%02x", a_Packet->m_PacketID );
 
@@ -1325,6 +1384,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 	}
 }
 
+
+
+
+
 void cClientHandle::AuthenticateThread( void* a_Param )
 {
 	cClientHandle* self = (cClientHandle*)a_Param;
@@ -1337,6 +1400,9 @@ void cClientHandle::AuthenticateThread( void* a_Param )
 	}
 	self->m_bSendLoginResponse = true;
 }
+
+
+
 
 
 void cClientHandle::Tick(float a_Dt)
@@ -1414,6 +1480,10 @@ void cClientHandle::Tick(float a_Dt)
 	}
 }
 
+
+
+
+
 void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* = E_PRIORITY_NORMAL */ )
 {
 	if( m_bKicking ) return; // Don't add more packets if player is getting kicked anyway
@@ -1459,6 +1529,10 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 	if( bSignalSemaphore )
 		m_pState->pSemaphore->Signal();
 }
+
+
+
+
 
 void cClientHandle::SendThread( void *lpParam )
 {
@@ -1539,7 +1613,8 @@ void cClientHandle::SendThread( void *lpParam )
 }
 
 
-extern std::string GetWSAError();
+
+
 
 void cClientHandle::ReceiveThread( void *lpParam )
 {
@@ -1581,11 +1656,11 @@ void cClientHandle::ReceiveThread( void *lpParam )
 			}
 			else
 			{
-				LOG("Unknown packet: 0x%2x %c %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp );
+				LOG("Unknown packet: 0x%02x \'%c\' %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp );
 
 
 				char c_Str[128];
-				sprintf_s( c_Str, 128, "[C->S] Unknown PacketID: 0x%2x", (unsigned char)temp );
+				sprintf_s( c_Str, 128, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp );
 				cPacket_Disconnect DC(c_Str);
 				DC.Send( socket );
 
@@ -1602,12 +1677,23 @@ void cClientHandle::ReceiveThread( void *lpParam )
 }
 
 
+
+
+
 const char* cClientHandle::GetUsername()
 {
 	return m_pState->Username.c_str();
 }
 
+
+
+
+
 const cSocket & cClientHandle::GetSocket()
 {
 	return m_pState->Socket;
 }
+
+
+
+

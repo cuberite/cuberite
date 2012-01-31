@@ -5,8 +5,6 @@
 #include "cSocket.h"
 #include "MCSocket.h"
 
-#include "cMCLogger.h"
-
 #ifndef _WIN32
 	#include <cstring>
 #endif
