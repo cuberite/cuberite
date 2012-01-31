@@ -68,7 +68,7 @@ public:
 	bool CanUseCommand( const char* a_Command );							//tolua_export
 	bool HasPermission( const char* a_Permission );							//tolua_export
 	const GroupList & GetGroups();											// >> EXPORTED IN MANUALBINDINGS <<
-	StringList GetResolvedPermissions();								// >> EXPORTED IN MANUALBINDINGS <<
+	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const char* a_Group );									//tolua_export
 
 	std::string GetColor();													//tolua_export

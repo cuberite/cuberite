@@ -49,6 +49,206 @@
 
 webserver::request_func webserver::request_func_=0;
 
+static std::vector< std::string > StringSplit(std::string str, std::string delim)
+{
+	std::vector< std::string > results;
+	size_t cutAt;
+	while( (cutAt = str.find_first_of(delim)) != str.npos )
+	{
+		if(cutAt > 0)
+		{
+			results.push_back(str.substr(0,cutAt));
+		}
+		str = str.substr(cutAt+1);
+	}
+	if(str.length() > 0)
+	{
+		results.push_back(str);
+	}
+	return results;
+}
+
+static std::string EatLine( std::string& a_String )
+{
+	std::string RetVal = "";
+	unsigned int StringSize = a_String.size();
+	const char* c = a_String.c_str();
+	
+	for( unsigned int i = 0; i < StringSize; ++i, ++c)
+	{
+		if( *c == '\n' )
+		{
+			RetVal += *c;
+// 			++i; ++c;
+// 			if( i < StringSize )
+// 			{
+// 				if( *c == '\r' )
+// 				{
+// 					RetVal += *c;
+// 				}
+// 			}
+			break;
+		}
+		RetVal += *c;
+	}
+	a_String = a_String.substr( RetVal.size() );
+	return RetVal;
+}
+
+// Turns 
+// "blabla my string with \"quotes\"!" 
+// into 
+// blabla my string with "quotes"!
+static std::string GetQuotedString( const std::string& a_String )
+{
+	std::string RetVal;
+
+	bool bGotFirstQuote = false;
+	bool bIgnoreNext = false;
+	unsigned int StrLen = a_String.size();
+	for( unsigned int i = 0; i < StrLen; ++i )
+	{
+		if( bIgnoreNext == false )
+		{
+			if( a_String[i] == '\"' )
+			{
+				if( bGotFirstQuote == false )
+				{
+					bGotFirstQuote = true;
+				}
+				else
+				{
+					break;
+				}
+				continue;
+			}
+			else if( a_String[i] == '\\' ) // Escape character
+			{
+				bIgnoreNext = true;
+				continue;
+			}
+		}
+		RetVal.push_back( a_String[i] );
+		bIgnoreNext = false;
+	}
+
+	return RetVal;
+}
+
+void ParseMultipartFormData( webserver::http_request& req, Socket* s)
+{
+	static const std::string multipart_form_data = "multipart/form-data";
+	if(req.content_type_.substr(0, multipart_form_data.size()) == multipart_form_data)  // Difficult data... :(
+	{
+		typedef std::vector< std::string > StringVector;
+		StringVector ContentTypeData = StringSplit( req.content_type_, "; " ); 
+
+		std::string boundary;
+		// Find boundary
+		for( unsigned int i = 0; i < ContentTypeData.size(); ++i )
+		{
+			static const std::string boundary_ = "boundary=";
+			if( ContentTypeData[i].substr(0, boundary_.size()) == boundary_ ) // Found boundary
+			{
+				boundary = ContentTypeData[i].substr( boundary_.size() );
+			}
+		}
+
+		//LOGINFO("Boundary: %s", boundary.c_str() );
+		std::string boundary_start = "--" + boundary;
+		std::string boundary_end = boundary_start + "--";
+
+		std::string Content = s->ReceiveBytes( req.content_length_ );
+
+		//printf("Total content: \n%s\n", Content.c_str() );
+
+		// Should start with boundary!
+		std::string line = EatLine( Content );
+		if( line.substr(0, boundary_start.size() ) != boundary_start )
+		{
+			// Something was wrong! :(
+			Content.clear();
+		}
+
+		while( !Content.empty() )
+		{
+			webserver::formdata FormData;
+
+			static const std::string content_disposition = "Content-Disposition: ";
+			static const std::string content_type		 = "Content-Type: ";
+
+			std::string f_disposition;
+
+			while( 1 )
+			{
+				std::string line = EatLine( Content );
+				if( line.empty() )
+					break;
+
+				unsigned int pos_cr_lf = line.find_first_of("\x0a\x0d");
+				if (pos_cr_lf == 0) break;	// Empty line, indicates end of mime thingy
+
+				if( line.substr(0, content_disposition.size() ) == content_disposition )
+				{
+					f_disposition = line.substr(content_disposition.size());
+					LOGINFO("Disposition: %s", f_disposition.c_str() );
+				}
+				else if( line.substr(0, content_type.size() ) == content_type )
+				{
+					FormData.content_type_ = line.substr(content_type.size());
+				}
+
+				//LOGINFO("Got line: '%s'", line.c_str() );
+			}
+
+			// Check if we got the proper headers
+			if( !f_disposition.empty() )
+			{
+				static const std::string disp_name = "name=";
+				static const std::string disp_filename = "filename=";
+
+				// Parse the disposition
+				StringVector DispositionData = StringSplit( f_disposition, "; " );
+				for( unsigned int i = 0; i < DispositionData.size(); ++i )
+				{
+					if( DispositionData[i].substr(0, disp_name.size()) == disp_name )
+					{
+						FormData.name_ = GetQuotedString( DispositionData[i].substr(disp_name.size()) );
+					}
+					else if( DispositionData[i].substr(0, disp_filename.size()) == disp_filename )
+					{
+						FormData.filename_ = GetQuotedString( DispositionData[i].substr(disp_filename.size()) );
+					}
+				}
+
+				std::string ContentValue;
+				// Parse until boundary_end is found
+				while( 1 )
+				{
+					std::string line = EatLine( Content );
+					if( line.empty() )
+						break;
+
+					if( line.substr(0, boundary_end.size() ) == boundary_end )
+					{
+						break;
+					}
+					else if( line.substr(0, boundary_start.size() ) == boundary_start )
+					{
+						break;
+					}
+					ContentValue.append( line.c_str(), line.size() );
+				}
+
+
+				FormData.value_ = ContentValue;
+			}
+
+			req.multipart_formdata_.push_back( FormData );
+		}
+	}
+}
+
 #ifdef _WIN32
 unsigned webserver::Request(void* ptr_s)
 #else
@@ -99,7 +299,10 @@ void* webserver::Request(void* ptr_s)
 	while(1)
 	{
 		line=s->ReceiveLine();
-		if (line.empty()) break;
+		if (line.empty())
+		{
+			break;
+		}
 
 		unsigned int pos_cr_lf = line.find_first_of("\x0a\x0d");
 		if (pos_cr_lf == 0) break;
@@ -143,22 +346,23 @@ void* webserver::Request(void* ptr_s)
 		}
 	}
 
-	if( req.method_.compare("POST") == 0 )
+	if( (req.method_.compare("POST") == 0) && (req.content_length_ > 0) )
 	{
-		if( req.content_length_ > 0 )
+		// The only content type we can parse at the moment, the default HTML post data
+		if( req.content_type_.compare( "application/x-www-form-urlencoded" ) == 0 )
 		{
-			// The only content type we can parse at the moment, the default HTML post data
-			if( req.content_type_.compare( "application/x-www-form-urlencoded" ) == 0 )
-			{
-				std::string Content = s->ReceiveBytes( req.content_length_ );
-				Content.insert( 0, "/ ?" ); // Little hack, inserts dummy URL so that SplitGetReq() can work with this content
+			std::string Content = s->ReceiveBytes( req.content_length_ );
+			Content.insert( 0, "/ ?" ); // Little hack, inserts dummy URL so that SplitGetReq() can work with this content
 
-				std::string dummy;
-				std::map<std::string, std::string> post_params;
-				SplitGetReq(Content, dummy, post_params);
+			std::string dummy;
+			std::map<std::string, std::string> post_params;
+			SplitGetReq(Content, dummy, post_params);
 
-				req.params_post_ = post_params;
-			}
+			req.params_post_ = post_params;
+		}
+		else 
+		{
+			ParseMultipartFormData( req, s );
 		}
 	}
 

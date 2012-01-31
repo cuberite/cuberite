@@ -4,16 +4,25 @@
 #include "cSocket.h"
 
 class cStringMap;
-//tolua_begin
-struct HTTPRequest
-{
-	std::string Method;
-	std::string Path;
-	cStringMap* Params;
-	cStringMap* PostParams;
-	std::string Username;
-};
-//tolua_end
+
+struct HTTPFormData		//tolua_export
+{						//tolua_export
+	std::string Name;	//tolua_export
+	std::string Value;	//tolua_export
+	std::string Type;	//tolua_export
+};//tolua_export
+
+struct HTTPRequest	//tolua_export
+{					//tolua_export
+	typedef std::map< std::string, std::string > StringStringMap;
+	typedef std::map< std::string, HTTPFormData > FormDataMap;
+	std::string Method;			//tolua_export
+	std::string Path;			//tolua_export
+	StringStringMap Params;		// >> EXPORTED IN MANUALBINDINGS <<
+	StringStringMap PostParams;	// >> EXPORTED IN MANUALBINDINGS <<
+	std::string Username;		//tolua_export
+	FormDataMap FormData;		// >> EXPORTED IN MANUALBINDINGS <<
+}; //tolua_export
 
 struct lua_State;
 class cEvent;

@@ -2,8 +2,8 @@ function HandleRequest_PlayerList( Request )
 	local World = cRoot:Get():GetWorld()
 	local Content = ""
 	
-	if( Request.Params:get("playerlist-kick") ~= "" ) then
-		local KickPlayerName = Request.Params:get("playerlist-kick")
+	if( Request.Params["playerlist-kick"] ~= nil ) then
+		local KickPlayerName = Request.Params["playerlist-kick"]
 		local Player = World:GetPlayer( KickPlayerName )
 		if( Player == nil ) then
 			Content = Content .. "<p>Could not find player " .. KickPlayerName .. " !</p>"

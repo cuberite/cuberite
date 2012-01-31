@@ -36,6 +36,14 @@ class Socket;
 class SocketServer;
 class webserver {
 public:
+	struct formdata
+	{
+		std::string name_;
+		std::string filename_;
+		std::string content_type_;
+		std::string value_;
+	};
+
 	struct http_request {
 
 		http_request()
@@ -56,6 +64,7 @@ public:
 		std::string                        user_agent_;
 		int                                content_length_;
 		std::string                        content_type_;
+		std::vector< formdata >            multipart_formdata_;
 
 		/* status_: used to transmit server's error status, such as
 		o  202 OK

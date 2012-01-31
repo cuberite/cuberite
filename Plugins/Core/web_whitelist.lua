@@ -4,8 +4,8 @@ end
 
 function HandleRequest_WhiteList( Request )
 	local UpdateMessage = ""
-	if( Request.PostParams:get("whitelist-add") ~= "" ) then
-		local PlayerName = Request.PostParams:get("whitelist-add")
+	if( Request.PostParams["whitelist-add"] ~= nil ) then
+		local PlayerName = Request.PostParams["whitelist-add"]
 		
 		if( WhiteListIni:GetValueB("WhiteList", PlayerName, false) == true ) then
 			UpdateMessage = "<b>".. PlayerName.."</b> is already on the whitelist"
@@ -14,18 +14,18 @@ function HandleRequest_WhiteList( Request )
 			UpdateMessage = "Added <b>" .. PlayerName .. "</b> to whitelist."
 			WhiteListIni:WriteFile()
 		end
-	elseif( Request.PostParams:get("whitelist-delete") ~= "" ) then
-		local PlayerName = Request.PostParams:get("whitelist-delete")
+	elseif( Request.PostParams["whitelist-delete"] ~= nil ) then
+		local PlayerName = Request.PostParams["whitelist-delete"]
 		WhiteListIni:DeleteValue( "WhiteList", PlayerName )
 		UpdateMessage = "Removed <b>" .. PlayerName .. "</b> from whitelist."
 		WhiteListIni:WriteFile()
-	elseif( Request.PostParams:get("whitelist-reload") ~= "" ) then
+	elseif( Request.PostParams["whitelist-reload"] ~= nil ) then
 		WhiteListIni:Erase() -- Empty entire loaded ini first, otherwise weird shit goes down
 		WhiteListIni:ReadFile()
 		UpdateMessage = "Loaded from disk"
-	elseif( Request.Params:get("whitelist-setenable") ~= "" ) then
-		local Enabled = Request.Params:get("whitelist-setenable");
-		local CreateNewValue = false;
+	elseif( Request.Params["whitelist-setenable"] ~= nil ) then
+		local Enabled = Request.Params["whitelist-setenable"]
+		local CreateNewValue = false
 		if( WhiteListIni:FindValue( WhiteListIni:FindKey("WhiteListSettings"), "WhiteListOn" ) == cIniFile.noID ) then -- Find out whether the value is in the ini
 			CreateNewValue = true
 		end

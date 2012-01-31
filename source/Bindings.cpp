@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/31/12 01:23:11.
+** Generated automatically by tolua++-1.0.92 on 01/31/12 19:40:39.
 */
 
 #ifndef __cplusplus
@@ -164,53 +164,54 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"Json::Value");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
+ tolua_usertype(tolua_S,"Lua__cTCPLink");
  tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
- tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cPacket_Login");
  tolua_usertype(tolua_S,"cClientHandle");
- tolua_usertype(tolua_S,"cGroup");
- tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cMCLogger");
+ tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cPacket_PickupSpawn");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cPlugin_Lua");
  tolua_usertype(tolua_S,"cWebPlugin_Lua");
- tolua_usertype(tolua_S,"Lua__cPlayer");
+ tolua_usertype(tolua_S,"Lua__cPlugin_NewLua");
  tolua_usertype(tolua_S,"cPacket");
  tolua_usertype(tolua_S,"cPacket_BlockDig");
  tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"Lua__cTCPLink");
- tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cTCPLink");
+ tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cRecipeChecker");
- tolua_usertype(tolua_S,"Lua__cPlugin");
  tolua_usertype(tolua_S,"cGroupManager");
+ tolua_usertype(tolua_S,"Lua__cPlugin");
+ tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cPacket_BlockPlace");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"Lua__cPlugin_NewLua");
  tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"Lua__cPlayer");
  tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"Lua__cEntity");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
  tolua_usertype(tolua_S,"cEntity");
- tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"cPlugin_NewLua");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"Vector3d");
@@ -10363,6 +10364,96 @@ static int tolua_set_cItem_m_ItemHealth(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: Name of class  HTTPFormData */
+#ifndef TOLUA_DISABLE_tolua_get_HTTPFormData_Name
+static int tolua_get_HTTPFormData_Name(lua_State* tolua_S)
+{
+  HTTPFormData* self = (HTTPFormData*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->Name);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Name of class  HTTPFormData */
+#ifndef TOLUA_DISABLE_tolua_set_HTTPFormData_Name
+static int tolua_set_HTTPFormData_Name(lua_State* tolua_S)
+{
+  HTTPFormData* self = (HTTPFormData*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Name'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Name = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Value of class  HTTPFormData */
+#ifndef TOLUA_DISABLE_tolua_get_HTTPFormData_Value
+static int tolua_get_HTTPFormData_Value(lua_State* tolua_S)
+{
+  HTTPFormData* self = (HTTPFormData*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Value'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->Value);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Value of class  HTTPFormData */
+#ifndef TOLUA_DISABLE_tolua_set_HTTPFormData_Value
+static int tolua_set_HTTPFormData_Value(lua_State* tolua_S)
+{
+  HTTPFormData* self = (HTTPFormData*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Value'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Value = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Type of class  HTTPFormData */
+#ifndef TOLUA_DISABLE_tolua_get_HTTPFormData_Type
+static int tolua_get_HTTPFormData_Type(lua_State* tolua_S)
+{
+  HTTPFormData* self = (HTTPFormData*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Type'",NULL);
+#endif
+  tolua_pushcppstring(tolua_S,(const char*)self->Type);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Type of class  HTTPFormData */
+#ifndef TOLUA_DISABLE_tolua_set_HTTPFormData_Type
+static int tolua_set_HTTPFormData_Type(lua_State* tolua_S)
+{
+  HTTPFormData* self = (HTTPFormData*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Type'",NULL);
+  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Type = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* get function: Method of class  HTTPRequest */
 #ifndef TOLUA_DISABLE_tolua_get_HTTPRequest_Method
 static int tolua_get_HTTPRequest_Method(lua_State* tolua_S)
@@ -10418,66 +10509,6 @@ static int tolua_set_HTTPRequest_Path(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->Path = ((std::string)  tolua_tocppstring(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: Params of class  HTTPRequest */
-#ifndef TOLUA_DISABLE_tolua_get_HTTPRequest_Params_ptr
-static int tolua_get_HTTPRequest_Params_ptr(lua_State* tolua_S)
-{
-  HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Params'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)self->Params,"cStringMap");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Params of class  HTTPRequest */
-#ifndef TOLUA_DISABLE_tolua_set_HTTPRequest_Params_ptr
-static int tolua_set_HTTPRequest_Params_ptr(lua_State* tolua_S)
-{
-  HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Params'",NULL);
-  if (!tolua_isusertype(tolua_S,2,"cStringMap",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Params = ((cStringMap*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: PostParams of class  HTTPRequest */
-#ifndef TOLUA_DISABLE_tolua_get_HTTPRequest_PostParams_ptr
-static int tolua_get_HTTPRequest_PostParams_ptr(lua_State* tolua_S)
-{
-  HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'PostParams'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)self->PostParams,"cStringMap");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: PostParams of class  HTTPRequest */
-#ifndef TOLUA_DISABLE_tolua_set_HTTPRequest_PostParams_ptr
-static int tolua_set_HTTPRequest_PostParams_ptr(lua_State* tolua_S)
-{
-  HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'PostParams'",NULL);
-  if (!tolua_isusertype(tolua_S,2,"cStringMap",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->PostParams = ((cStringMap*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -17026,12 +17057,16 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"m_ItemCount",tolua_get_cItem_m_ItemCount,tolua_set_cItem_m_ItemCount);
    tolua_variable(tolua_S,"m_ItemHealth",tolua_get_cItem_m_ItemHealth,tolua_set_cItem_m_ItemHealth);
   tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"HTTPFormData","HTTPFormData","",NULL);
+  tolua_beginmodule(tolua_S,"HTTPFormData");
+   tolua_variable(tolua_S,"Name",tolua_get_HTTPFormData_Name,tolua_set_HTTPFormData_Name);
+   tolua_variable(tolua_S,"Value",tolua_get_HTTPFormData_Value,tolua_set_HTTPFormData_Value);
+   tolua_variable(tolua_S,"Type",tolua_get_HTTPFormData_Type,tolua_set_HTTPFormData_Type);
+  tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);
   tolua_beginmodule(tolua_S,"HTTPRequest");
    tolua_variable(tolua_S,"Method",tolua_get_HTTPRequest_Method,tolua_set_HTTPRequest_Method);
    tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
-   tolua_variable(tolua_S,"Params",tolua_get_HTTPRequest_Params_ptr,tolua_set_HTTPRequest_Params_ptr);
-   tolua_variable(tolua_S,"PostParams",tolua_get_HTTPRequest_PostParams_ptr,tolua_set_HTTPRequest_PostParams_ptr);
    tolua_variable(tolua_S,"Username",tolua_get_HTTPRequest_Username,tolua_set_HTTPRequest_Username);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus

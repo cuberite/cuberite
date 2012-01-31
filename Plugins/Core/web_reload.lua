@@ -1,7 +1,7 @@
 function HandleRequest_Reload( Request )
 	local Content = ""
 	
-	if( Request.PostParams:get("reload") ~= "" ) then
+	if( Request.PostParams["reload"] ~= nil ) then
 		Content = Content .. "<head><meta http-equiv=\"refresh\" content=\"2;././\"></head>"
 		Content = Content .. "<p>Reloading plugins... This can take a while depending on the plugins you're using.</p>"
 		cRoot:Get():GetPluginManager():ReloadPlugins()

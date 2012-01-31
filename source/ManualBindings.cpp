@@ -11,6 +11,8 @@
 #include "cWebPlugin_Lua.h"
 #include "cLuaCommandBinder.h"
 #include "cPlayer.h"
+#include "cWebAdmin.h"
+#include "cStringMap.h"
 #include "md5/md5.h"
 
 extern std::vector<std::string> StringSplit(std::string str, std::string delim);
@@ -266,6 +268,54 @@ static int tolua_md5(lua_State* tolua_S)
 	return 1;
 }
 
+static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string, std::string >& a_StringStringMap )
+{
+	lua_newtable(tolua_S);
+	int top = lua_gettop(tolua_S);
+
+	for( std::map< std::string, std::string >::iterator it = a_StringStringMap.begin(); it != a_StringStringMap.end(); ++it )
+	{
+		const char* key = it->first.c_str();
+		const char* value = it->second.c_str();
+		lua_pushstring(tolua_S, key);
+		lua_pushstring(tolua_S, value);
+		lua_settable(tolua_S, top);
+	}
+
+	return 1;
+}
+
+static int tolua_get_HTTPRequest_Params(lua_State* tolua_S)
+{
+	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
+	return tolua_push_StringStringMap(tolua_S, self->Params);
+}
+
+static int tolua_get_HTTPRequest_PostParams(lua_State* tolua_S)
+{
+	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
+	return tolua_push_StringStringMap(tolua_S, self->PostParams);
+}
+
+static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
+{
+	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
+	std::map< std::string, HTTPFormData >& FormData = self->FormData;
+
+	lua_newtable(tolua_S);
+	int top = lua_gettop(tolua_S);
+
+	for( std::map< std::string, HTTPFormData >::iterator it = FormData.begin(); it != FormData.end(); ++it )
+	{
+		lua_pushstring(tolua_S, it->first.c_str() );
+		tolua_pushusertype(tolua_S, &(it->second), "HTTPFormData" );
+		//lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size() ); // Might contain binary data
+		lua_settable(tolua_S, top);
+	}
+
+	return 1;
+}
+
 void ManualBindings::Bind( lua_State* tolua_S )
 {
 	tolua_beginmodule(tolua_S,NULL);
@@ -292,6 +342,15 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_endmodule(tolua_S);
 		tolua_beginmodule(tolua_S,"cWebPlugin_Lua");
 			tolua_function(tolua_S,"AddTab",tolua_cWebPlugin_Lua_AddTab);
+		tolua_endmodule(tolua_S);
+
+		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);
+		tolua_beginmodule(tolua_S,"HTTPRequest");
+			//tolua_variable(tolua_S,"Method",tolua_get_HTTPRequest_Method,tolua_set_HTTPRequest_Method);
+			//tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
+			tolua_variable(tolua_S,"Params",tolua_get_HTTPRequest_Params,0);
+			tolua_variable(tolua_S,"PostParams",tolua_get_HTTPRequest_PostParams,0);
+			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
 		tolua_endmodule(tolua_S);
 			
 		tolua_function(tolua_S,"md5",tolua_md5);

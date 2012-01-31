@@ -136,9 +136,21 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				HTTPRequest Request;
 				Request.Username = r->username_;
 				Request.Method = r->method_;
-				Request.Params = new cStringMap(r->params_);
-				Request.PostParams = new cStringMap(r->params_post_);
+				Request.Params = r->params_;
+				Request.PostParams = r->params_post_;
 				Request.Path = r->path_;
+
+				for( unsigned int i = 0; i < r->multipart_formdata_.size(); ++i )
+				{
+					webserver::formdata& fd = r->multipart_formdata_[i];
+
+					HTTPFormData HTTPfd;//( fd.value_ );
+					HTTPfd.Value = fd.value_;
+					HTTPfd.Type = fd.content_type_;
+					HTTPfd.Name = fd.name_;
+					LOGINFO("Form data name: %s", fd.name_.c_str() );
+					Request.FormData[ fd.name_ ] = HTTPfd;
+				}
 
 				if( Split.size() > 1 )
 				{
@@ -158,9 +170,6 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 						}
 					}
 				}
-
-				delete Request.Params;
-				delete Request.PostParams;
 
 				if( FoundPlugin.empty() )	// Default page
 				{
