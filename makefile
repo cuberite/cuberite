@@ -506,6 +506,8 @@ clean :
 		build/cCriticalSection.o\
 		build/cEntity.o\
 		build/cEvent.o\
+		build/cEvents.o\
+		build/cFile.o\
 		build/cFurnaceEntity.o\
 		build/cFurnaceRecipe.o\
 		build/cFurnaceWindow.o\
@@ -757,6 +759,11 @@ build/cEntity.o : source/cEntity.cpp
 build/cEvent.o : source/cEvent.cpp
 	$(CC) $(CC_OPTIONS) source/cEvent.cpp -c $(INCLUDE) -o build/cEvent.o
 
+build/cEvents.o : WebServer/cEvents.cpp
+	$(CC) $(CC_OPTIONS) WebServer/cEvents.cpp -c $(INCLUDE) -o build/cEvents.o
+
+build/cFile.o : source/cFile.cpp
+	$(CC) $(CC_OPTIONS) source/cFile.cpp -c $(INCLUDE) -o build/cFile.o
 
 # Item # 16 -- cFurnaceEntity --
 build/cFurnaceEntity.o : source/cFurnaceEntity.cpp
@@ -1520,11 +1527,5 @@ build/cPlugin_NewLua.o : source/cPlugin_NewLua.cpp
 
 build/cWebPlugin_Lua.o : source/cWebPlugin_Lua.cpp
 	$(CC) $(CC_OPTIONS) source/cWebPlugin_Lua.cpp -c $(INCLUDE) -o build/cWebPlugin_Lua.o	
-
-build/cEvents.o : webserver/cEvents.cpp
-	$(CC) $(CC_OPTIONS) webserver/cEvents.cpp -c $(INCLUDE) -o build/cEvents.o
-
-build/cFile.o : source/cFile.cpp
-	$(CC) $(CC_OPTIONS) source/cFile.cpp -c $(INCLUDE) -o build/cFile.o
 
 ##### END RUN ####

@@ -21,6 +21,7 @@
 	#include <psapi.h>
 #else
 	#include <sys/resource.h>
+	#include <memory> // auto_ptr
 #endif
 
 
