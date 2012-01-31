@@ -23,6 +23,7 @@ cEvent::cEvent(void)
 	}
 #else  // *nix
 	m_bIsNamed = false;
+	m_Event = new sem_t;
 	if (sem_init(m_Event, 0, 0))
 	{
 		LOGWARN("WARNING cEvent: Could not create unnamed semaphore, fallback to named.");
@@ -30,6 +31,7 @@ cEvent::cEvent(void)
 		// _X: I'm unconvinced about using sem_unlink() just after a successful sem_open(), it seems wrong - why destroy the object just after creating?
 		assert(!"This codepath is really weird, if it is ever used, please check that everything works.");
 		
+		delete m_Event;
 		m_bIsNamed = true;
 
 		char c_Str[64];
@@ -70,6 +72,7 @@ cEvent::~cEvent()
 	else
 	{
 		sem_destroy(m_Event);
+		delete m_Event;
 	}
 #endif
 }
