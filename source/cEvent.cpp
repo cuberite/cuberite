@@ -105,7 +105,7 @@ void cEvent::Wait(void)
 void cEvent::Set(void)
 {
 #ifdef _WIN32
-	if (SetEvent(m_Event))
+	if (!SetEvent(m_Event))
 	{
 		LOGWARN("cEvent: Could not set cEvent: GLE = %d", GetLastError());
 	}
