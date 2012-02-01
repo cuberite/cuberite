@@ -342,6 +342,20 @@ unsigned cIniFile::GetValueV( const string & keyname, const string & valuename, 
   return nVals;
 }
 
+bool cIniFile::DeleteValueByID( const unsigned keyID, const unsigned valueID )
+{
+	if ( keyID < keys.size() && valueID < keys[keyID].names.size())
+	{
+		// This looks strange, but is neccessary.
+		vector<string>::iterator npos = keys[keyID].names.begin() + valueID;
+		vector<string>::iterator vpos = keys[keyID].values.begin() + valueID;
+		keys[keyID].names.erase( npos, npos + 1);
+		keys[keyID].values.erase( vpos, vpos + 1);
+		return true;
+	}
+	return false;
+}
+
 bool cIniFile::DeleteValue( const string & keyname, const string & valuename)
 {
   long keyID = FindKey( keyname);
@@ -352,13 +366,7 @@ bool cIniFile::DeleteValue( const string & keyname, const string & valuename)
   if ( valueID == noID)
     return false;
 
-  // This looks strange, but is neccessary.
-  vector<string>::iterator npos = keys[keyID].names.begin() + valueID;
-  vector<string>::iterator vpos = keys[keyID].values.begin() + valueID;
-  keys[keyID].names.erase( npos, npos + 1);
-  keys[keyID].values.erase( vpos, vpos + 1);
-
-  return true;
+  return DeleteValueByID( keyID, valueID );
 }
 
 bool cIniFile::DeleteKey( const string & keyname)

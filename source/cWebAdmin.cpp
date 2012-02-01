@@ -121,10 +121,10 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 					cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
 					if( LuaPlugin )
 					{
-						std::list< std::string > NameList = LuaPlugin->GetTabNames();
-						for( std::list< std::string >::iterator Name = NameList.begin(); Name != NameList.end(); ++Name )
+						std::list< std::pair<std::string, std::string> > NameList = LuaPlugin->GetTabNames();
+						for( std::list< std::pair<std::string, std::string> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
 						{
-							Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "/" + (*Name) + "'>" + (*Name) + "</a></li>";
+							Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
 						}
 					}
 					else
@@ -164,7 +164,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 							cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
 							if( LuaPlugin )
 							{
-								FoundPlugin += " - " + LuaPlugin->GetTabNameForRequest( &Request );
+								FoundPlugin += " - " + LuaPlugin->GetTabNameForRequest( &Request ).first;
 							}
 							break;
 						}

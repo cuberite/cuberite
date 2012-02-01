@@ -8,7 +8,20 @@
 #include "cWebAdmin.h"
 
 
-
+static std::string SafeString( const std::string& a_String )
+{
+	std::string RetVal;
+	for( unsigned int i = 0; i < a_String.size(); ++i )
+	{
+		char c = a_String[i];
+		if( c == ' ' ) 
+		{
+			c = '_';
+		}
+		RetVal.push_back( c );
+	}
+	return RetVal;
+}
 
 
 extern bool report_errors(lua_State* lua, int status);
@@ -47,7 +60,7 @@ bool cWebPlugin_Lua::AddTab( const char* a_Title, lua_State * a_LuaState, int a_
 	}
 	sWebPluginTab* Tab = new sWebPluginTab();
 	Tab->Title = a_Title;
-	Tab->SafeTitle = a_Title; // TODO - Convert all non alphabet/digit letters to underscores
+	Tab->SafeTitle = SafeString( a_Title );
 
 	Tab->Reference = a_FunctionReference;
 
@@ -60,14 +73,15 @@ std::string cWebPlugin_Lua::HandleRequest( HTTPRequest* a_Request )
 	lua_State* LuaState = m_Plugin->GetLuaState();
 	std::string RetVal = "";
 
-	std::string TabName = GetTabNameForRequest(a_Request);
-	if( TabName.empty() )
+	std::pair< std::string, std::string > TabName = GetTabNameForRequest(a_Request);
+	std::string SafeTabName = TabName.second;
+	if( SafeTabName.empty() )
 		return "";
 
 	sWebPluginTab* Tab = 0;
 	for( TabList::iterator itr = m_Tabs.begin(); itr != m_Tabs.end(); ++itr )
 	{
-		if( (*itr)->Title.compare( TabName ) == 0 ) // This is the one! Rawr
+		if( (*itr)->SafeTitle.compare( SafeTabName ) == 0 ) // This is the one! Rawr
 		{
 			Tab = *itr;
 			break;
@@ -113,8 +127,9 @@ void cWebPlugin_Lua::Initialize()
 {
 }
 
-std::string cWebPlugin_Lua::GetTabNameForRequest( HTTPRequest* a_Request )
+std::pair< std::string, std::string > cWebPlugin_Lua::GetTabNameForRequest( HTTPRequest* a_Request )
 {
+	std::pair< std::string, std::string > Names;
 	std::vector<std::string> Split = StringSplit( a_Request->Path, "/" );
 
 	if( Split.size() > 1 )
@@ -139,19 +154,23 @@ std::string cWebPlugin_Lua::GetTabNameForRequest( HTTPRequest* a_Request )
 
 		if( Tab )
 		{
-			return Tab->Title;
+			Names.first = Tab->Title;
+			Names.second = Tab->SafeTitle;
 		}
 	}
 
-	return "";
+	return Names;
 }
 
-std::list< std::string > cWebPlugin_Lua::GetTabNames()
+std::list< std::pair<std::string, std::string> > cWebPlugin_Lua::GetTabNames()
 {
-	std::list< std::string > NameList;
+	std::list< std::pair< std::string, std::string > > NameList;
 	for( TabList::iterator itr = m_Tabs.begin(); itr != m_Tabs.end(); ++itr )
 	{
-		NameList.push_back( (*itr)->Title );
+		std::pair< std::string, std::string > StringPair;
+		StringPair.first = (*itr)->Title;
+		StringPair.second = (*itr)->SafeTitle;
+		NameList.push_back( StringPair );
 	}
 	return NameList;
 }

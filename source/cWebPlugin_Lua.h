@@ -17,9 +17,9 @@ public:										//tolua_export
 	virtual std::string HandleRequest( HTTPRequest* a_Request );
 	virtual void Initialize();
 
-	std::string GetTabNameForRequest( HTTPRequest* a_Request );
+	std::pair< std::string, std::string > GetTabNameForRequest( HTTPRequest* a_Request );
 
-	std::list< std::string > GetTabNames();
+	std::list< std::pair<std::string, std::string> > GetTabNames();
 private:
 	cPlugin_NewLua* m_Plugin;
 	

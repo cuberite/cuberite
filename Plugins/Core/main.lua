@@ -131,8 +131,8 @@ function Initialize( Plugin )
 	WebPlugin:SetName( Plugin:GetName() )
 	WebPlugin:AddTab( "Playerlist", HandleRequest_PlayerList )
 	WebPlugin:AddTab( "Whitelist", HandleRequest_WhiteList )
-	WebPlugin:AddTab( "Reload", HandleRequest_Reload )
 	WebPlugin:AddTab( "Permissions", HandleRequest_Permissions )
+	WebPlugin:AddTab( "Manage Plugins", HandleRequest_ManagePlugins )
 	
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true

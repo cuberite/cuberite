@@ -138,6 +138,7 @@ public:
 
   // Deletes specified value.
   // Returns true if value existed and deleted, false otherwise.
+  bool DeleteValueByID( const unsigned keyID, const unsigned valueID );																	//tolua_export
   bool DeleteValue( const std::string & keyname, const std::string & valuename);														//tolua_export
   
   // Deletes specified key and all values contained within.
