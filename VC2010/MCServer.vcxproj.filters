@@ -910,6 +910,7 @@
     <ClCompile Include="..\source\Globals.cpp" />
     <ClCompile Include="..\source\cFile.cpp" />
     <ClCompile Include="..\source\StringUtils.cpp" />
+    <ClCompile Include="..\source\cIsThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1401,6 +1402,7 @@
     <ClInclude Include="..\source\Globals.h" />
     <ClInclude Include="..\source\cFile.h" />
     <ClInclude Include="..\source\StringUtils.h" />
+    <ClInclude Include="..\source\cIsThread.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

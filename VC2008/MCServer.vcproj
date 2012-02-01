@@ -436,10 +436,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cSign.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cSimulator.cpp"
 				>
 			</File>
@@ -1291,6 +1287,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cSign.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cSignEntity.cpp"
 					>
 				</File>
@@ -1432,6 +1432,14 @@
 				</File>
 				<File
 					RelativePath="..\source\cFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cIsThread.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cIsThread.h"
 					>
 				</File>
 				<File

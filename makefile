@@ -248,7 +248,8 @@ MCServer : \
 		build/cItem.o\
 		build/cPlugin_NewLua.o\
 		build/cWebPlugin_Lua.o\
-		build/StringUtils.o
+		build/StringUtils.o\
+		build/cIsThread.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -460,6 +461,7 @@ MCServer : \
 		build/cPlugin_NewLua.o\
 		build/cWebPlugin_Lua.o\
 		build/StringUtils.o\
+		build/cIsThread.o\
 		-o MCServer
 
 clean : 
@@ -1533,5 +1535,8 @@ build/cWebPlugin_Lua.o : source/cWebPlugin_Lua.cpp
 
 build/StringUtils.o : source/StringUtils.cpp
 	$(CC) $(CC_OPTIONS) source/StringUtils.cpp -c $(INCLUDE) -o build/StringUtils.o	
+
+build/cIsThread.o : source/cIsThread.cpp
+	$(CC) $(CC_OPTIONS) source/cIsThread.cpp -c $(INCLUDE) -o build/cIsThread.o	
 
 ##### END RUN ####

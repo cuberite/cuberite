@@ -330,6 +330,7 @@
     <ClCompile Include="..\Source\cGroup.cpp" />
     <ClCompile Include="..\Source\cGroupManager.cpp" />
     <ClCompile Include="..\Source\cHeartBeat.cpp" />
+    <ClCompile Include="..\source\cIsThread.cpp" />
     <ClCompile Include="..\source\cItem.cpp" />
     <ClCompile Include="..\source\cLavaSimulator.cpp" />
     <ClCompile Include="..\Source\cLuaCommandBinder.cpp" />
@@ -496,6 +497,7 @@
     <ClInclude Include="..\Source\cGroup.h" />
     <ClInclude Include="..\Source\cGroupManager.h" />
     <ClInclude Include="..\Source\cHeartBeat.h" />
+    <ClInclude Include="..\source\cIsThread.h" />
     <ClInclude Include="..\Source\cLadder.h" />
     <ClInclude Include="..\source\cLavaSimulator.h" />
     <ClInclude Include="..\Source\cLuaCommandBinder.h" />
