@@ -28,7 +28,6 @@
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
-	#include <memory.h>
 #endif
 
 
@@ -56,6 +55,7 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <memory>
 
 
 
