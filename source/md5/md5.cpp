@@ -35,12 +35,8 @@ documentation and/or software.
 /* interface header */
 #include "md5.h"
 
-/* system implementation headers */
-#include <stdio.h>
 
-#ifndef _WIN32
-#include <cstring>
-#endif
+
 
 
 // Constants for MD5Transform routine.

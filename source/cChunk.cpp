@@ -2,8 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifndef _WIN32
-#include <cstring>
-#include <cstdlib>
+	#include <cstdlib>
 #endif
 
 

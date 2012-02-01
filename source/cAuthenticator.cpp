@@ -5,13 +5,18 @@
 #include "cBlockingTCPLink.h"
 
 #include "../iniFile/iniFile.h"
-#ifndef _WIN32
-#include <cstring>
-#endif
 
 #include <sstream>
 
+
+
+
+
 extern void ReplaceString( std::string & a_HayStack, const std::string & a_Needle, const std::string & a_ReplaceWith );
+
+
+
+
 
 cAuthenticator::cAuthenticator()
 {

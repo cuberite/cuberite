@@ -9,9 +9,7 @@
 #include <math.h>  // floorf
 
 #ifndef _WIN32
-	#include <cstring> // memcpy
 	#include <cstdlib> // abs
-	#include <memory> // auto_ptr
 #endif
 
 #include "zlib.h"

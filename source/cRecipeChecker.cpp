@@ -7,8 +7,7 @@
 #include <sstream>
 
 #ifndef _WIN32
-#include <cstring>
-#include <cstdlib>
+	#include <cstdlib>
 #endif
 
 #include "Defines.h"

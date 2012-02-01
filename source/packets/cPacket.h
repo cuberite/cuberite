@@ -3,12 +3,9 @@
 #include "../cSocket.h"
 #include "../PacketID.h"
 
-#ifdef _WIN32
-	// #include <xstring>
-#else
-	#include <cstring> // Silly Linux doesn't have xstring...
-	#include <cstdio>
-#endif
+
+
+
 
 class cSocket;
 class cPacket
@@ -55,3 +52,7 @@ public:
 	static int SendData( cSocket & a_Socket, const char* a_Message, unsigned int a_Size, int a_Options );
 	static int RecvAll( cSocket & a_Socket, char* a_Data, unsigned int a_Size, int a_Options );
 };
+
+
+
+

@@ -5,9 +5,9 @@
 #include "cSocket.h"
 #include "MCSocket.h"
 
-#ifndef _WIN32
-	#include <cstring>
-#endif
+
+
+
 
 #ifdef _WIN32
 	#define MSG_NOSIGNAL (0)

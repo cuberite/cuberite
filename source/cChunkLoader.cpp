@@ -17,16 +17,8 @@
 
 #include <iostream>
 #ifndef _WIN32
-#include <cstring>
 #include <cstdlib>
-#include <stdio.h>
-#include <sys/stat.h>   // for mkdir
-#include <sys/types.h>
-#else
-#include <Windows.h>
 #endif
-
-#include <list>
 
 struct ChunkData
 {

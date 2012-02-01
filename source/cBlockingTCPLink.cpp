@@ -5,17 +5,16 @@
 #include "packets/cPacket.h"
 #include "MCSocket.h"
 
-#ifndef _WIN32
-	#include <cstring>
-	#include <errno.h>
-#endif
-
 #ifdef _WIN32
 	#define MSG_NOSIGNAL (0)
 #endif
 #ifdef __MACH__
 #define MSG_NOSIGNAL (0)
 #endif
+
+
+
+
 
 cBlockingTCPLink::cBlockingTCPLink()
 	: m_Socket( 0 )

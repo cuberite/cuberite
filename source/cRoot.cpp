@@ -17,12 +17,10 @@
 #include "../iniFile/iniFile.h"
 
 #include <iostream>
-#include <time.h>
-#include <cstdio>
 
-#ifndef _WIN32
-#include <cstring>
-#endif
+
+
+
 
 cRoot* cRoot::s_Root = 0;
 
