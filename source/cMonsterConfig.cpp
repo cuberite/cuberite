@@ -13,7 +13,9 @@
 
 using namespace std;
 
-extern std::vector<std::string> StringSplit(std::string str, std::string delim);
+
+
+
 
 struct cMonsterConfig::sAttributesStruct
 {
@@ -61,7 +63,7 @@ void cMonsterConfig::Initialize() {
 		return;
 	}
 	
-	vector<string> SplitList = StringSplit(m_pState->MonsterTypes,",");
+	AStringVector SplitList = StringSplit(m_pState->MonsterTypes,",");
 	for(unsigned int i = 0; i < SplitList.size(); ++i) {
 		if(!SplitList[i].empty()) {
 			printf("Getting Attributes for: %s \n",SplitList[i].c_str());

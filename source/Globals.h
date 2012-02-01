@@ -28,6 +28,7 @@
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
+	#include <memory.h>
 #endif
 
 
@@ -37,6 +38,13 @@
 // CRT stuff:
 #include <assert.h>
 #include <stdio.h>
+
+
+
+
+
+// Compatibility:
+#define ASSERT assert
 
 
 
@@ -54,6 +62,7 @@
 
 
 // Common headers:
+#include "StringUtils.h"
 #include "cSleep.h"
 #include "cCriticalSection.h"
 #include "cSemaphore.h"

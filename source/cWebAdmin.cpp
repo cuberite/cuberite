@@ -21,16 +21,17 @@
 	#include <psapi.h>
 #else
 	#include <sys/resource.h>
-	#include <memory> // auto_ptr
 #endif
 
 
 
 
 
-extern std::vector<std::string> StringSplit(std::string str, std::string delim);
+cWebAdmin * WebAdmin = 0;
 
-cWebAdmin* WebAdmin = 0;
+
+
+
 
 cWebAdmin::cWebAdmin( int a_Port /* = 8080 */ )
 	: m_Port( a_Port )
@@ -75,12 +76,16 @@ void cWebAdmin::RemovePlugin( cWebPlugin* a_Plugin )
 	m_Plugins.remove( a_Plugin );
 }
 
+
+
+
+
 void cWebAdmin::Request_Handler(webserver::http_request* r)
 {
 	if( WebAdmin == 0 ) return;
 	LOG("Path: %s", r->path_.c_str() );
 
-	std::vector< std::string > Split = StringSplit( r->path_, "/" );
+	AStringVector Split = StringSplit( r->path_, "/" );
 
 	if(r->path_ == "/")
 	{

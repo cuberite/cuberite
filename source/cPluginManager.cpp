@@ -5,7 +5,6 @@
 #include "cPlugin.h"
 #include "cPlugin_Lua.h"
 #include "cPlugin_NewLua.h"
-#include "cMCLogger.h"
 #include "cWebAdmin.h"
 #include "cItem.h"
 #include "cRoot.h"
@@ -15,16 +14,14 @@
 
 #include "SquirrelBindings.h"
 #if USE_SQUIRREL
-#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
-#include <sqplus/sqplus.h>
-#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
+	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
+	#include <sqplus/sqplus.h>
+	#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
 #endif
 
 
 
 
-
-extern std::vector<std::string> StringSplit(std::string str, std::string delim);
 
 typedef std::list< cPlugin_Lua* > LuaPluginList;
 typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
@@ -96,7 +93,7 @@ void cPluginManager::ReloadPluginsNow()
 						// allow for comma separated plugin list
 						// degrades and works fine for the plugin
 						// per line
-						std::vector< std::string > split = StringSplit( PluginFile, "," );
+						AStringVector split = StringSplit( PluginFile, "," );
 						for (unsigned int j = 0; j < split.size(); j++) {
 							cPlugin_Lua* Plugin = new cPlugin_Lua( (split[j] + std::string(".lua") ).c_str() );
 							if( !AddLuaPlugin( Plugin ) )

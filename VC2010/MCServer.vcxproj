@@ -463,6 +463,7 @@
     <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp" />
     <ClCompile Include="..\source\SquirrelBindings.cpp" />
+    <ClCompile Include="..\source\StringUtils.cpp" />
     <ClCompile Include="..\source\Vector3d.cpp" />
     <ClCompile Include="..\source\Vector3f.cpp" />
     <ClCompile Include="..\source\Vector3i.cpp" />
@@ -632,6 +633,7 @@
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
     <ClInclude Include="..\source\ptr_cChunk.h" />
     <ClInclude Include="..\source\SquirrelBindings.h" />
+    <ClInclude Include="..\source\StringUtils.h" />
     <ClInclude Include="..\source\Vector3d.h" />
     <ClInclude Include="..\source\Vector3f.h" />
     <ClInclude Include="..\source\Vector3i.h" />

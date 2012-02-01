@@ -8,6 +8,15 @@
 #include "cWebAdmin.h"
 
 
+
+
+
+extern bool report_errors(lua_State* lua, int status);
+
+
+
+
+
 static std::string SafeString( const std::string& a_String )
 {
 	std::string RetVal;
@@ -24,8 +33,8 @@ static std::string SafeString( const std::string& a_String )
 }
 
 
-extern bool report_errors(lua_State* lua, int status);
-extern std::vector<std::string> StringSplit(std::string str, std::string delim);
+
+
 
 struct cWebPlugin_Lua::sWebPluginTab
 {
@@ -130,7 +139,7 @@ void cWebPlugin_Lua::Initialize()
 std::pair< std::string, std::string > cWebPlugin_Lua::GetTabNameForRequest( HTTPRequest* a_Request )
 {
 	std::pair< std::string, std::string > Names;
-	std::vector<std::string> Split = StringSplit( a_Request->Path, "/" );
+	AStringVector Split = StringSplit(a_Request->Path, "/");
 
 	if( Split.size() > 1 )
 	{

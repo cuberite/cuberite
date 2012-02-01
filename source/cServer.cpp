@@ -347,6 +347,10 @@ void ServerTickThread( void * a_Param )
 	LOG("TICK THREAD STOPPED");
 }
 
+
+
+
+
 void cServer::StartListenThread()
 {
 	m_pState->pListenThread = new cThread( ServerListenThread, this, "cServer::ServerListenThread" );
@@ -355,50 +359,24 @@ void cServer::StartListenThread()
 	m_pState->pTickThread->Start( true );
 }
 
-std::vector< std::string > StringSplit(std::string str, std::string delim)
-{
-	std::vector< std::string > results;
-	size_t cutAt;
-	while( (cutAt = str.find_first_of(delim)) != str.npos )
-	{
-		if(cutAt > 0)
-		{
-			results.push_back(str.substr(0,cutAt));
-		}
-		str = str.substr(cutAt+1);
-	}
-	if(str.length() > 0)
-	{
-		results.push_back(str);
-	}
-	return results;
-}
+
+
+
 
 template <class T>
-bool from_string(T& t,
-				 const std::string& s,
-				 std::ios_base& (*f)(std::ios_base&))
+bool from_string(
+	T& t,
+	const std::string& s,
+	std::ios_base& (*f)(std::ios_base&)
+)
 {
 	std::istringstream iss(s);
 	return !(iss >> f >> t).fail();
 }
 
-std::string & StrToUpper(std::string& s)
-{
-		std::string::iterator i = s.begin();
-		std::string::iterator end = s.end();
 
-		while (i != end) {
-				*i = (char)toupper(*i);
-				++i;
-		}
-		return s;
-}
 
-int NoCaseCompare( std::string s1, std::string  s2 )
-{
-	return StrToUpper( s1 ).compare( StrToUpper( s2 ) );
-}
+
 
 bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 {
@@ -410,11 +388,11 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 	if( Command.length() <= 0 ) return false;
 	if( Command[0] != '/' ) return false;
 
-	std::vector< std::string > split = StringSplit( Command, " " );
+	AStringVector split = StringSplit( Command, " " );
 	if( split.size() == 0 )
 		return false;
 
-	if( split[0].compare("/coords") == 0 )
+	if (split[0].compare("/coords") == 0)
 	{
 		char c_Str[128];
 		sprintf_s( c_Str, 128, "[X:%0.2f] [Y:%0.2f] [Z:%0.2f]", a_Client.GetPlayer()->GetPosX(), a_Client.GetPlayer()->GetPosY(), a_Client.GetPlayer()->GetPosZ() );
@@ -426,8 +404,8 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 
 void cServer::ServerCommand( const char* a_Cmd )
 {
-	std::string Command( a_Cmd );
-	std::vector< std::string > split = StringSplit( Command, " " );
+	AString Command( a_Cmd );
+	AStringVector split = StringSplit( Command, " " );
 	if( split.size() > 0 )
 	{
 		if( split[0].compare( "help" ) == 0 )

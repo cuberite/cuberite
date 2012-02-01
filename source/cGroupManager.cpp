@@ -7,7 +7,9 @@
 #include "cChatColor.h"
 #include "cRoot.h"
 
-extern std::vector< std::string > StringSplit( std::string str, std::string delim);
+
+
+
 
 typedef std::map< std::string, cGroup* > GroupMap;
 struct cGroupManager::sGroupManagerState
@@ -57,7 +59,7 @@ cGroupManager::cGroupManager()
 			std::string Commands = IniFile.GetValue( KeyName, "Commands", "" );
 			if( Commands.size() > 0 )
 			{
-				std::vector< std::string > Split = StringSplit( Commands, "," );
+				AStringVector Split = StringSplit( Commands, "," );
 				for( unsigned int i = 0; i < Split.size(); i++)
 				{
 					Group->AddCommand( Split[i] );
@@ -68,7 +70,7 @@ cGroupManager::cGroupManager()
 			std::string Permissions = IniFile.GetValue( KeyName, "Permissions", "" );
 			if( Permissions.size() > 0 )
 			{
-				std::vector< std::string > Split = StringSplit( Permissions, "," );
+				AStringVector Split = StringSplit( Permissions, "," );
 				for( unsigned int i = 0; i < Split.size(); i++)
 				{
 					Group->AddPermission( Split[i] );
@@ -79,7 +81,7 @@ cGroupManager::cGroupManager()
 			std::string Groups = IniFile.GetValue( KeyName, "Inherits", "" );
 			if( Groups.size() > 0 )
 			{
-				std::vector< std::string > Split = StringSplit( Groups, "," );
+				AStringVector Split = StringSplit( Groups, "," );
 				for( unsigned int i = 0; i < Split.size(); i++)
 				{
 					Group->InheritFrom( GetGroup( Split[i].c_str() ) );

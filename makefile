@@ -247,7 +247,8 @@ MCServer : \
 		build/cFileFormatUpdater.o\
 		build/cItem.o\
 		build/cPlugin_NewLua.o\
-		build/cWebPlugin_Lua.o
+		build/cWebPlugin_Lua.o\
+		build/StringUtils.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -458,6 +459,7 @@ MCServer : \
 		build/cItem.o\
 		build/cPlugin_NewLua.o\
 		build/cWebPlugin_Lua.o\
+		build/StringUtils.o\
 		-o MCServer
 
 clean : 
@@ -671,6 +673,7 @@ clean :
 		build/cItem.o\
 		build/cPlugin_NewLua.o\
 		build/cWebPlugin_Lua.o\
+		build/StringUtils.o\
 		MCServer
 
 install : MCServer
@@ -1527,5 +1530,8 @@ build/cPlugin_NewLua.o : source/cPlugin_NewLua.cpp
 
 build/cWebPlugin_Lua.o : source/cWebPlugin_Lua.cpp
 	$(CC) $(CC_OPTIONS) source/cWebPlugin_Lua.cpp -c $(INCLUDE) -o build/cWebPlugin_Lua.o	
+
+build/StringUtils.o : source/StringUtils.cpp
+	$(CC) $(CC_OPTIONS) source/StringUtils.cpp -c $(INCLUDE) -o build/StringUtils.o	
 
 ##### END RUN ####

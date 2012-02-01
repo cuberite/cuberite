@@ -909,6 +909,7 @@
     </ClCompile>
     <ClCompile Include="..\source\Globals.cpp" />
     <ClCompile Include="..\source\cFile.cpp" />
+    <ClCompile Include="..\source\StringUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1399,6 +1400,7 @@
     </ClInclude>
     <ClInclude Include="..\source\Globals.h" />
     <ClInclude Include="..\source\cFile.h" />
+    <ClInclude Include="..\source\StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

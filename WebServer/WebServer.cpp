@@ -49,25 +49,6 @@
 
 webserver::request_func webserver::request_func_=0;
 
-static std::vector< std::string > StringSplit(std::string str, std::string delim)
-{
-	std::vector< std::string > results;
-	size_t cutAt;
-	while( (cutAt = str.find_first_of(delim)) != str.npos )
-	{
-		if(cutAt > 0)
-		{
-			results.push_back(str.substr(0,cutAt));
-		}
-		str = str.substr(cutAt+1);
-	}
-	if(str.length() > 0)
-	{
-		results.push_back(str);
-	}
-	return results;
-}
-
 static std::string EatLine( std::string& a_String )
 {
 	std::string RetVal = "";
@@ -140,8 +121,7 @@ void ParseMultipartFormData( webserver::http_request& req, Socket* s)
 	static const std::string multipart_form_data = "multipart/form-data";
 	if(req.content_type_.substr(0, multipart_form_data.size()) == multipart_form_data)  // Difficult data... :(
 	{
-		typedef std::vector< std::string > StringVector;
-		StringVector ContentTypeData = StringSplit( req.content_type_, "; " ); 
+		AStringVector ContentTypeData = StringSplit( req.content_type_, "; " ); 
 
 		std::string boundary;
 		// Find boundary
@@ -208,7 +188,7 @@ void ParseMultipartFormData( webserver::http_request& req, Socket* s)
 				static const std::string disp_filename = "filename=";
 
 				// Parse the disposition
-				StringVector DispositionData = StringSplit( f_disposition, "; " );
+				AStringVector DispositionData = StringSplit( f_disposition, "; " );
 				for( unsigned int i = 0; i < DispositionData.size(); ++i )
 				{
 					if( DispositionData[i].substr(0, disp_name.size()) == disp_name )

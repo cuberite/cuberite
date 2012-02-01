@@ -54,6 +54,7 @@
 
 
 // Common headers:
+#include "../source/StringUtils.h"
 #include "../source/cCriticalSection.h"
 #include "../source/cMCLogger.h"
 

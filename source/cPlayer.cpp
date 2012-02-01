@@ -43,13 +43,11 @@
 #include "../iniFile/iniFile.h"
 #include <json/json.h>
 
-#ifndef _WIN32 // for mkdir
-#include <sys/stat.h>
-#include <sys/types.h>
-#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-#endif
 #define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
-extern std::vector< std::string > StringSplit( std::string str, std::string delim);
+
+
+
+
 
 CLASS_DEFINITION( cPlayer, cPawn );
 
@@ -557,9 +555,13 @@ bool cPlayer::CanUseCommand( const char* a_Command )
 	return false;
 }
 
+
+
+
+
 bool cPlayer::HasPermission( const char* a_Permission )
 {
-	std::vector< std::string > Split = StringSplit( a_Permission, "." );
+	AStringVector Split = StringSplit( a_Permission, "." );
 	PermissionMap Possibilities = m_pState->ResolvedPermissions;
 	// Now search the namespaces
 	while( Possibilities.begin() != Possibilities.end() )
@@ -567,7 +569,7 @@ bool cPlayer::HasPermission( const char* a_Permission )
 		PermissionMap::iterator itr = Possibilities.begin();
 		if( itr->second )
 		{
-			std::vector< std::string > OtherSplit = StringSplit( itr->first, "." );
+			AStringVector OtherSplit = StringSplit( itr->first, "." );
 			if( OtherSplit.size() <= Split.size() )
 			{
 				unsigned int i;
@@ -588,6 +590,10 @@ bool cPlayer::HasPermission( const char* a_Permission )
 	// Nothing that matched :(
 	return false;
 }
+
+
+
+
 
 bool cPlayer::IsInGroup( const char* a_Group )
 {
@@ -743,7 +749,7 @@ void cPlayer::LoadPermissionsFromDisk()
 		std::string Groups = IniFile.GetValue(m_pState->PlayerName, "Groups", "");
 		if( Groups.size() > 0 )
 		{
-			std::vector< std::string > Split = StringSplit( Groups, "," );
+			AStringVector Split = StringSplit( Groups, "," );
 			for( unsigned int i = 0; i < Split.size(); i++ )
 			{
 				AddToGroup( Split[i].c_str() );

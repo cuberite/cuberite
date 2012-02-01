@@ -11,7 +11,6 @@
 
 
 
-extern std::vector<std::string> StringSplit(std::string str, std::string delim);
 extern bool report_errors(lua_State* lua, int status);
 
 cLuaCommandBinder::cLuaCommandBinder()
@@ -58,8 +57,11 @@ bool cLuaCommandBinder::BindCommand( const std::string & a_Command, const std::s
 
 bool cLuaCommandBinder::HandleCommand( const std::string & a_Command, cPlayer* a_Player )
 {
-	std::vector<std::string> Split = StringSplit( a_Command, " ");
-	if( Split.size() == 0 ) return false;
+	AStringVector Split = StringSplit(a_Command, " ");
+	if (Split.size() == 0)
+	{
+		return false;
+	}
 	
 	CommandMap::iterator FoundCommand = m_BoundCommands.find( Split[0] );
 	if( FoundCommand != m_BoundCommands.end() )

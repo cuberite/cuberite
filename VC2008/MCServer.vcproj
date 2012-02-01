@@ -198,18 +198,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cBlockEntity.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cBlockToPickup.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cBlockToPickup.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cChatColor.cpp"
 				>
 			</File>
@@ -278,31 +266,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cDoors.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cEntity.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cEntity.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cFileFormatUpdater.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\source\cFileFormatUpdater.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cFurnaceEntity.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cFurnaceEntity.h"
 				>
 			</File>
 			<File
@@ -354,31 +322,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cItem.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cItem.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cLadder.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cLog.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\source\cLog.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cMakeDir.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cMakeDir.h"
 				>
 			</File>
 			<File
@@ -429,38 +377,6 @@
 			</File>
 			<File
 				RelativePath="..\source\cNoise.inc"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPawn.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPawn.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPickup.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPickup.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPiston.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPiston.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPlayer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPlayer.h"
 				>
 			</File>
 			<File
@@ -524,14 +440,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cSignEntity.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSignEntity.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cSimulator.cpp"
 				>
 			</File>
@@ -556,18 +464,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cStairs.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cStringMap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cStringMap.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cTCPLink.cpp"
 				>
 			</File>
@@ -576,23 +472,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cThread.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cTimer.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\source\cTimer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTorch.h"
 				>
 			</File>
 			<File
@@ -713,6 +597,14 @@
 			</File>
 			<File
 				RelativePath="..\source\ptr_cChunk.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\StringUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\StringUtils.h"
 				>
 			</File>
 			<File
@@ -1320,8 +1212,100 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Items"
+				Name="Entities"
 				>
+				<File
+					RelativePath="..\source\cBlockEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cBlockToPickup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cBlockToPickup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cDoors.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cFurnaceEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cFurnaceEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cItem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cLadder.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPawn.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPawn.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPickup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPickup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPiston.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPiston.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPlayer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPlayer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSignEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSignEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cStairs.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cTorch.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="UI"
@@ -1451,6 +1435,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cMakeDir.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cMakeDir.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cSemaphore.cpp"
 					>
 				</File>
@@ -1464,6 +1456,14 @@
 				</File>
 				<File
 					RelativePath="..\source\cSleep.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cThread.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cThread.h"
 					>
 				</File>
 			</Filter>
@@ -1500,6 +1500,14 @@
 				</File>
 				<File
 					RelativePath="..\source\cPlugin_NewLua.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cStringMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cStringMap.h"
 					>
 				</File>
 				<File

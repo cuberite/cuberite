@@ -15,7 +15,9 @@
 #include "cStringMap.h"
 #include "md5/md5.h"
 
-extern std::vector<std::string> StringSplit(std::string str, std::string delim);
+
+
+
 
 /****************************
  * Lua bound functions with special return types
@@ -26,7 +28,7 @@ static int tolua_StringSplit(lua_State* tolua_S)
 	std::string str = ((std::string)  tolua_tocppstring(tolua_S,1,0));
 	std::string delim = ((std::string)  tolua_tocppstring(tolua_S,2,0));
 
-	std::vector<std::string> Split = StringSplit( str, delim );
+	AStringVector Split = StringSplit( str, delim );
 
 	lua_createtable(tolua_S, Split.size(), 0);
 	int newTable = lua_gettop(tolua_S);
@@ -41,12 +43,20 @@ static int tolua_StringSplit(lua_State* tolua_S)
 	return 1;
 }
 
+
+
+
+
 static int tolua_LOG(lua_State* tolua_S)
 {
 	const char* str = tolua_tocppstring(tolua_S,1,0);
 	cMCLogger::GetInstance()->LogSimple( str, 0 );
 	return 0;
 }
+
+
+
+
 
 static int tolua_LOGINFO(lua_State* tolua_S)
 {
@@ -55,6 +65,10 @@ static int tolua_LOGINFO(lua_State* tolua_S)
 	return 0;
 }
 
+
+
+
+
 static int tolua_LOGWARN(lua_State* tolua_S)
 {
 	const char* str = tolua_tocppstring(tolua_S,1,0);
@@ -62,12 +76,20 @@ static int tolua_LOGWARN(lua_State* tolua_S)
 	return 0;
 }
 
+
+
+
+
 static int tolua_LOGERROR(lua_State* tolua_S)
 {
 	const char* str = tolua_tocppstring(tolua_S,1,0);
 	cMCLogger::GetInstance()->LogSimple( str, 3 );
 	return 0;
 }
+
+
+
+
 
 static int tolua_cWorld_GetAllPlayers(lua_State* tolua_S)
 {
@@ -78,6 +100,10 @@ static int tolua_cWorld_GetAllPlayers(lua_State* tolua_S)
 
 	return 1;
 }
+
+
+
+
 
 static int tolua_cPlugin_GetCommands(lua_State* tolua_S)
 {
@@ -100,6 +126,10 @@ static int tolua_cPlugin_GetCommands(lua_State* tolua_S)
 	return 1;
 }
 
+
+
+
+
 static int tolua_cPluginManager_GetAllPlugins(lua_State* tolua_S)
 {
 	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
@@ -120,6 +150,10 @@ static int tolua_cPluginManager_GetAllPlugins(lua_State* tolua_S)
 	}
 	return 1;
 }
+
+
+
+
 
 static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 {
@@ -142,6 +176,10 @@ static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 	return 1;
 }
 
+
+
+
+
 static int tolua_cPlayer_GetResolvedPermissions(lua_State* tolua_S)
 {
 	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
@@ -162,6 +200,10 @@ static int tolua_cPlayer_GetResolvedPermissions(lua_State* tolua_S)
 	}
 	return 1;
 }
+
+
+
+
 
 static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
 {
@@ -217,6 +259,10 @@ static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
 	return 0;
 }
 
+
+
+
+
 static int tolua_cWebPlugin_Lua_AddTab(lua_State* tolua_S)
 {
 	cWebPlugin_Lua* self = (cWebPlugin_Lua*)  tolua_tousertype(tolua_S,1,0);
@@ -260,6 +306,10 @@ static int tolua_cWebPlugin_Lua_AddTab(lua_State* tolua_S)
 	return 0;
 }
 
+
+
+
+
 static int tolua_md5(lua_State* tolua_S)
 {
 	std::string SourceString = tolua_tostring(tolua_S, 1, 0);
@@ -267,6 +317,10 @@ static int tolua_md5(lua_State* tolua_S)
 	tolua_pushstring( tolua_S, CryptedString.c_str() );
 	return 1;
 }
+
+
+
+
 
 static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string, std::string >& a_StringStringMap )
 {
@@ -285,17 +339,29 @@ static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string,
 	return 1;
 }
 
+
+
+
+
 static int tolua_get_HTTPRequest_Params(lua_State* tolua_S)
 {
 	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
 	return tolua_push_StringStringMap(tolua_S, self->Params);
 }
 
+
+
+
+
 static int tolua_get_HTTPRequest_PostParams(lua_State* tolua_S)
 {
 	HTTPRequest* self = (HTTPRequest*)  tolua_tousertype(tolua_S,1,0);
 	return tolua_push_StringStringMap(tolua_S, self->PostParams);
 }
+
+
+
+
 
 static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 {
@@ -315,6 +381,10 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 
 	return 1;
 }
+
+
+
+
 
 void ManualBindings::Bind( lua_State* tolua_S )
 {
@@ -357,3 +427,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 
 	tolua_endmodule(tolua_S);
 }
+
+
+
+
