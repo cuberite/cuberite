@@ -105,8 +105,8 @@ bool cChunkLoader::SaveChunk( const cChunk & a_Chunk )
 
 cChunk* cChunkLoader::LoadOldFormat( int a_X, int a_Y, int a_Z )
 {
-	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/X%i_Y%i_Z%i.bin", a_X, a_Y, a_Z );
+	AString SourceFile;
+	Printf(SourceFile, "world/X%i_Y%i_Z%i.bin", a_X, a_Y, a_Z );
 
 	FILE* f = 0;
 	#ifdef _WIN32
@@ -181,10 +181,10 @@ cChunk* cChunkLoader::LoadOldFormat( int a_X, int a_Y, int a_Z )
 
 bool cChunkLoader::SaveOldFormat( const cChunk & a_Chunk )
 {
-	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/X%i_Y%i_Z%i.bin", a_Chunk.m_PosX, a_Chunk.m_PosY, a_Chunk.m_PosZ );
+	AString SourceFile;
+	Printf(SourceFile, "world/X%i_Y%i_Z%i.bin", a_Chunk.m_PosX, a_Chunk.m_PosY, a_Chunk.m_PosZ );
 
-    #ifdef _WIN32
+	#ifdef _WIN32
 	{
 		SECURITY_ATTRIBUTES Attrib;
 		Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -310,8 +310,8 @@ cChunk* cChunkLoader::LoadFormat1( int a_X, int a_Y, int a_Z )
 
 cChunkLoader::ChunkPack* cChunkLoader::LoadPak1( int PakX, int PakY, int PakZ )
 {
-	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "world/X%i_Y%i_Z%i.pak", PakX, PakY, PakZ );
+	AString SourceFile;
+	Printf(SourceFile, "world/X%i_Y%i_Z%i.pak", PakX, PakY, PakZ );
 
 	FILE* f = 0;
 	#ifdef _WIN32

@@ -80,11 +80,12 @@
 /// Evaluates to the number of elements in an array (compile-time!)
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-// sprintf_s is the preferred call in MSVC ("secure"); make it *nix-compatible:
-#ifndef _WIN32
-	#define sprintf_s(dst, size, format, ...) sprintf(dst, format, __VA_ARGS__ )
-	#define	vsnprintf_s(buffer, buffer_size, maxcount, stringbuffer, ...) (vsnprintf(buffer, maxcount, stringbuffer, __VA_ARGS__))
-#endif  // _WIN32
+#ifdef _MSC_VER
+	#define OBSOLETE __declspec(deprecated)
+#else
+	// TODO: how do other compilers mark functions as obsolete, so that their usage results in a compile-time warning?
+	#define OBSOLETE
+#endif
 
 
 

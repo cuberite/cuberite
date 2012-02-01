@@ -784,8 +784,8 @@ bool cPlayer::LoadFromDisk()
 		if( itr->second ) LOGINFO("%s", itr->first.c_str() );
 	}
 
-	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "players/%s.json", m_pState->PlayerName.c_str() );
+	AString SourceFile;
+	Printf(SourceFile, "players/%s.json", m_pState->PlayerName.c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
@@ -796,8 +796,8 @@ bool cPlayer::LoadFromDisk()
 	// Get file size
 	long FileSize = f.GetSize();
 
-	char * buffer = new char[FileSize];
-	if (f.Read(buffer, FileSize) != FileSize )
+	std::auto_ptr<char> buffer(new char[FileSize]);
+	if (f.Read(buffer.get(), FileSize) != FileSize)
 	{
 		LOGERROR("ERROR READING FROM FILE \"%s\"", SourceFile); 
 		return false;
@@ -806,12 +806,12 @@ bool cPlayer::LoadFromDisk()
 
 	Json::Value root;
 	Json::Reader reader;
-	if( !reader.parse( buffer, root, false ) )
+	if (!reader.parse(buffer.get(), root, false))
 	{
 		LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile);
 	}
 		
-	delete [] buffer;
+	buffer.reset();
 
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if( JSON_PlayerPosition.size() == 3 )
@@ -876,8 +876,8 @@ bool cPlayer::SaveToDisk()
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write( root );
 
-	char SourceFile[128];
-	sprintf_s(SourceFile, 128, "players/%s.json", m_pState->PlayerName.c_str() );
+	AString SourceFile;
+	Printf(SourceFile, "players/%s.json", m_pState->PlayerName.c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))

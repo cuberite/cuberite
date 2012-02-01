@@ -507,11 +507,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 		case E_PING: // Somebody tries to retrieve information about the server
 			{
 				LOGINFO("Got ping");
-				char NumPlayers[8], cMaxPlayers[8];
-				sprintf_s(NumPlayers, 8, "%i", cRoot::Get()->GetWorld()->GetNumPlayers());
-				sprintf_s(cMaxPlayers, 8, "%i", cRoot::Get()->GetWorld()->GetMaxPlayers());
-				std::string response = std::string(cRoot::Get()->GetWorld()->GetDescription() + cChatColor::Delimiter + NumPlayers + cChatColor::Delimiter + cMaxPlayers );
-				Kick( response.c_str() );
+				AString Reply;
+				Printf(Reply, "%s%s%i%s%i", 
+					cRoot::Get()->GetWorld()->GetDescription().c_str(), 
+					cChatColor::Delimiter.c_str(), 
+					cRoot::Get()->GetWorld()->GetNumPlayers(),
+					cChatColor::Delimiter.c_str(), 
+					cRoot::Get()->GetWorld()->GetMaxPlayers()
+				);
+				Kick(Reply.c_str());
 			}
 			break;
 		case E_HANDSHAKE:
@@ -1659,9 +1663,9 @@ void cClientHandle::ReceiveThread( void *lpParam )
 				LOG("Unknown packet: 0x%02x \'%c\' %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp );
 
 
-				char c_Str[128];
-				sprintf_s( c_Str, 128, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp );
-				cPacket_Disconnect DC(c_Str);
+				AString Reason;
+				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp );
+				cPacket_Disconnect DC(Reason);
 				DC.Send( socket );
 
 				cSleep::MilliSleep( 1000 ); // Give packet some time to be received

@@ -899,8 +899,8 @@ cBlockEntity* cChunk::GetBlockEntity( int a_X, int a_Y, int a_Z )
 /// Loads the chunk from the old-format disk file, erases the file afterwards. Returns true if successful
 bool cChunk::LoadFromDisk()
 {
-	char SourceFile[128];
-	sprintf_s(SourceFile, ARRAYCOUNT(SourceFile), "world/X%i_Y%i_Z%i.bin", m_PosX, m_PosY, m_PosZ );
+	AString SourceFile;
+	Printf(SourceFile, "world/X%i_Y%i_Z%i.bin", m_PosX, m_PosY, m_PosZ );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
@@ -974,7 +974,7 @@ bool cChunk::LoadFromDisk()
 	f.Close();
 
 	// Delete old format file
-	if (std::remove(SourceFile) != 0)
+	if (std::remove(SourceFile.c_str()) != 0)
 	{
 		LOGERROR("Could not delete file %s", SourceFile );
 	}

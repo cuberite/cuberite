@@ -4,19 +4,21 @@
 #include "FileDefine.h"
 
 #ifndef _WIN32
-#include <stdarg.h>
+	#include <stdarg.h>
 #endif
 
-class cLog {	// tolua_export
+
+
+
+
+class cLog
+{	// tolua_export
 private:
-	FILE* m_File;
-	static cLog* s_Log;
+	FILE * m_File;
+	static cLog * s_Log;
 
-#ifdef _WIN32
-	typedef char* va_list;
-#endif
 public:
-	cLog( const char* a_FileName );
+	cLog(const AString & a_FileName);
 	~cLog();
 	void Log(const char* a_Format, va_list argList );
 	void Log(const char* a_Format, ...);
@@ -28,3 +30,7 @@ public:
 	static cLog* GetInstance();
 };
 //tolua_end
+
+
+
+

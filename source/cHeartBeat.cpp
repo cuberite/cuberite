@@ -19,9 +19,17 @@ cHeartBeat::cHeartBeat()
 	Authenticate();
 }
 
+
+
+
+
 cHeartBeat::~cHeartBeat()
 {
 }
+
+
+
+
 
 void cHeartBeat::ReceivedData( char a_Data[256], int a_Size )
 {
@@ -97,28 +105,40 @@ void cHeartBeat::ReceivedData( char a_Data[256], int a_Size )
 	} while( bLoop );
 }
 
+
+
+
+
 void cHeartBeat::SendUpdate()
 {
 	CloseSocket();
 	if( Connect( "mc-server.org", 80 ) )
 	{
 		int Port = cRoot::Get()->GetServer()->GetPort();
-		char c_Port[16];
-		sprintf_s( c_Port, 16, "%i", Port );
-
-		std::string sPort = std::string( c_Port );
-		std::string sChecksum = md5( m_ServerID + sPort );
-		SendMessage( (std::string("GET http://master.mc-server.org/?update=") + m_ServerID + std::string("&checksum=") + sChecksum + std::string("&port=") + sPort + "\n").c_str() );
+		AString Msg;
+		AString sPort;
+		Printf(sPort, "%i", Port);
+		AString sChecksum = md5( m_ServerID + sPort );
+		Printf(Msg, "GET http://master.mc-server.org/?update=%s&checksum=%s&port=%d\n", m_ServerID, sChecksum , Port); 
+		SendMessage(Msg.c_str());
 	}
 }
+
+
+
+
 
 void cHeartBeat::Authenticate()
 {
 	CloseSocket();
-	if( Connect( "mc-server.org", 80 ) )
+	if (Connect( "mc-server.org", 80))
 	{
 		m_State = 1;
 		int RetVal = SendMessage( "GET http://master.mc-server.org/\r\n\r\n");
-		LOGINFO("Returned %i", RetVal );
+		LOGINFO("Returned %i", RetVal);
 	}
 }
+
+
+
+

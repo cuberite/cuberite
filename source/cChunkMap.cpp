@@ -455,9 +455,8 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 	std::string WorldName = m_World->GetName();
 	cMakeDir::MakeDir( WorldName.c_str() );
 
-	char SourceFile[128];
-
-	sprintf_s(SourceFile, ARRAYCOUNT(SourceFile), ( WorldName + "/X%i_Z%i.pak").c_str(), a_Layer->m_X, a_Layer->m_Z );
+	AString SourceFile;
+	Printf(SourceFile, "%s/X%i_Z%i.pak", WorldName.c_str(), a_Layer->m_X, a_Layer->m_Z );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
@@ -538,9 +537,9 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 {
 	std::string WorldName = m_World->GetName();
-	char SourceFile[128];
-	
-	sprintf_s(SourceFile, ARRAYCOUNT(SourceFile), (WorldName + "/X%i_Z%i.pak").c_str(), a_LayerX, a_LayerZ );
+
+	AString SourceFile;
+	Printf(SourceFile, "%s/X%i_Z%i.pak", WorldName.c_str(), a_LayerX, a_LayerZ);
 	
 	cFile f(SourceFile, cFile::fmRead);
 	if (!f.IsOpen())

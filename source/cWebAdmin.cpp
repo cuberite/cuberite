@@ -224,18 +224,18 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				}
 				else
 				{
-					char MemUsage[32];
-					sprintf( MemUsage, "%0.2f", ((double)resource_usage.ru_maxrss / 1024 / 1024) );
-					ReplaceString( Template, std::string("{MEM}"), MemUsage );
+					AString MemUsage;
+					Printf(MemUsage, "%0.2f", ((double)resource_usage.ru_maxrss / 1024 / 1024) );
+					ReplaceString(Template, std::string("{MEM}"), MemUsage);
 				}
 #else
 				HANDLE hProcess = GetCurrentProcess();
 				PROCESS_MEMORY_COUNTERS pmc;
 				if( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc) ) )
 				{
-					char MemUsage[32];
-					sprintf( MemUsage, "%0.2f", (pmc.WorkingSetSize / 1024.f / 1024.f) );
-					ReplaceString( Template, std::string("{MEM}"), MemUsage );
+					AString MemUsage;
+					Printf(MemUsage, "%0.2f", (pmc.WorkingSetSize / 1024.f / 1024.f) );
+					ReplaceString( Template, "{MEM}", MemUsage );
 				}
 #endif
 				// end mem usage

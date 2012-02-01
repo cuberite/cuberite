@@ -34,9 +34,9 @@ cEvent::cEvent(void)
 		delete m_Event;
 		m_bIsNamed = true;
 
-		char c_Str[64];
-		sprintf(c_Str, "cEvent%p", this);
-		m_Event = sem_open( c_Str, O_CREAT, 777, 0 );
+		AString EventName;
+		Printf(EventName, "cEvent%p", this);
+		m_Event = sem_open(EventName.c_str(), O_CREAT, 777, 0 );
 		if (m_Event == SEM_FAILED)
 		{
 			LOGERROR("cEvent: Cannot create event, errno = %i. Aborting server.", errno);

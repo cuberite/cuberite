@@ -13,7 +13,7 @@
 
 
 // When in MSVC, the debugger provides "thread naming" by catching special exceptions. Interface here:
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && defined(_DEBUG)
 //
 // Usage: SetThreadName (-1, "MainThread");
 //
@@ -41,7 +41,7 @@ static void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
 	{
 	}
 }
-#endif  // _MSC_VER
+#endif  // _MSC_VER && _DEBUG
 
 
 

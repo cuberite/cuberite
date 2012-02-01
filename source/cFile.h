@@ -58,12 +58,12 @@ public:
 	cFile(void);
 	
 	/// Constructs and opens / creates the file specified, use IsOpen() to check for success
-	cFile(const char * iFileName, EMode iMode);
+	cFile(const AString & iFileName, EMode iMode);
 	
 	/// Auto-closes the file, if open
 	~cFile();
 	
-	bool Open(const char * iFileName, EMode iMode);
+	bool Open(const AString & iFileName, EMode iMode);
 	void Close(void);
 	bool IsOpen(void) const;
 	bool IsEOF(void) const;

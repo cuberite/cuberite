@@ -16,16 +16,24 @@ cMCLogger* cMCLogger::GetInstance()
 	return s_MCLogger;
 }
 
+
+
+
+
 cMCLogger::cMCLogger()
 {
 	m_CriticalSection = new cCriticalSection();
-	char c_Buffer[128];
-	sprintf_s(c_Buffer, 128, "LOG_%d.txt", (int)time(0) );
-	m_Log = new cLog(c_Buffer);
+	AString FileName;
+	Printf(FileName, "LOG_%d.txt", (int)time(0) );
+	m_Log = new cLog(FileName);
 	m_Log->Log("--- Started Log ---");
 
 	s_MCLogger = this;
 }
+
+
+
+
 
 cMCLogger::cMCLogger( char* a_File )
 {

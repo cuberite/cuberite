@@ -6,6 +6,7 @@
 #include <fstream>
 #include <ctime>
 #include <stdarg.h>
+#include "cMakeDir.h"
 
 
 
@@ -13,34 +14,30 @@
 
 cLog* cLog::s_Log = NULL;
 
-cLog::cLog( const char* a_FileName )
+cLog::cLog(const AString & a_FileName )
 	: m_File(NULL)
 {
 	s_Log = this;
 
 	// create logs directory
-#ifdef _WIN32
-	{
-		SECURITY_ATTRIBUTES Attrib;
-		Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
-		Attrib.lpSecurityDescriptor = NULL;
-		Attrib.bInheritHandle = false;
-		::CreateDirectory("logs", &Attrib);
-	}
-#else
-	{
-		mkdir("logs", S_IRWXU | S_IRWXG | S_IRWXO);
-	}
-#endif
+	cMakeDir::MakeDir("logs");
 
-	OpenLog( (std::string("logs/") + std::string(a_FileName)).c_str() );
+	OpenLog( (std::string("logs/") + a_FileName).c_str() );
 }
+
+
+
+
 
 cLog::~cLog()
 {
 	CloseLog();
 	s_Log = NULL;
 }
+
+
+
+
 
 cLog* cLog::GetInstance()
 {
@@ -51,12 +48,20 @@ cLog* cLog::GetInstance()
 	return s_Log;
 }
 
+
+
+
+
 void cLog::CloseLog()
 {
 	if( m_File )
 		fclose (m_File);
 	m_File = 0;
 }
+
+
+
+
 
 void cLog::OpenLog( const char* a_FileName )
 {
@@ -68,9 +73,13 @@ void cLog::OpenLog( const char* a_FileName )
 	#endif
 }
 
+
+
+
+
 void cLog::ClearLog()
 {
-    #ifdef _WIN32
+	#ifdef _WIN32
 	if( fopen_s( &m_File, "log.txt", "w" ) == 0)
 		fclose (m_File);
 	#else
@@ -81,42 +90,42 @@ void cLog::ClearLog()
 	m_File = 0;
 }
 
-void cLog::Log(const char* a_Format, va_list argList )
-{
-	char c_Buffer[1024];
 
-	if( argList != 0 )
-	{
-		vsnprintf_s(c_Buffer, 1024, 1024, a_Format, argList );
-	}
-	else
-	{
-		sprintf_s( c_Buffer, 1024, "%s", a_Format );
-	}
+
+
+
+void cLog::Log(const char* a_Format, va_list argList)
+{
+	AString Message;
+	AppendVPrintf(Message, a_Format, argList);
 
 	time_t rawtime;
 	time ( &rawtime );
-#ifdef _WIN32
-	struct tm timeinfo;
-	localtime_s( &timeinfo, &rawtime );
-#else
+	
 	struct tm* timeinfo;
+#ifdef _WIN32
+	struct tm timeinforeal;
+	timeinfo = &timeinforeal;
+	localtime_s(timeinfo, &rawtime );
+#else
 	timeinfo = localtime( &rawtime );
 #endif
-	char c_Buffer2[1024];
-#ifdef _WIN32
-	sprintf_s(c_Buffer2, 1024, "[%02d:%02d:%02d] %s\n", timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec, c_Buffer);
-#else
-	sprintf(c_Buffer2, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, c_Buffer);
-#endif
-	if(m_File){
-		fputs(c_Buffer2, m_File);
+
+	AString Line;
+	Printf(Line, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	if (m_File)
+	{
+		fputs(Line.c_str(), m_File);
 		fflush(m_File);
 	}
 
 
-	printf("%s", c_Buffer2 );
+	printf("%s", Line.c_str());
 }
+
+
+
+
 
 void cLog::Log(const char* a_Format, ...)
 {
@@ -126,7 +135,15 @@ void cLog::Log(const char* a_Format, ...)
 	va_end(argList);
 }
 
+
+
+
+
 void cLog::SimpleLog(const char* a_String)
 {
 	Log("%s", a_String );
 }
+
+
+
+

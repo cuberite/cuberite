@@ -38,10 +38,12 @@ using namespace std;
 #endif
 
 #ifndef _WIN32
-#define	sprintf_s(buffer, buffer_size, stringbuffer, ...) (sprintf(buffer, stringbuffer, __VA_ARGS__))
-#define	vsprintf_s(buffer, stringbuffer, ...) (vsprintf(buffer, stringbuffer, __VA_ARGS__))
 #define	sscanf_s(buffer, stringbuffer, ...) (sscanf(buffer, stringbuffer, __VA_ARGS__))
 #endif
+
+
+
+
 
 cIniFile::cIniFile( const string iniPath)
 {
@@ -115,6 +117,10 @@ bool cIniFile::ReadFile()
   return false;
 }
 
+
+
+
+
 bool cIniFile::WriteFile()
 {
   unsigned commentID, keyID, valueID;
@@ -148,6 +154,10 @@ bool cIniFile::WriteFile()
   return true;
 }
 
+
+
+
+
 long cIniFile::FindKey( const string & keyname) const
 {
   for ( unsigned keyID = 0; keyID < names.size(); ++keyID)
@@ -155,6 +165,10 @@ long cIniFile::FindKey( const string & keyname) const
       return long(keyID);
   return noID;
 }
+
+
+
+
 
 long cIniFile::FindValue( unsigned const keyID, const string & valuename) const
 {
@@ -167,12 +181,20 @@ long cIniFile::FindValue( unsigned const keyID, const string & valuename) const
   return noID;
 }
 
+
+
+
+
 unsigned cIniFile::AddKeyName( const string & keyname)
 {
   names.resize( names.size() + 1, keyname);
   keys.resize( keys.size() + 1);
   return names.size() - 1;
 }
+
+
+
+
 
 string cIniFile::KeyName( unsigned const keyID) const
 {
@@ -182,12 +204,20 @@ string cIniFile::KeyName( unsigned const keyID) const
     return "";
 }
 
+
+
+
+
 unsigned cIniFile::NumValues( unsigned const keyID)
 {
   if ( keyID < keys.size())
     return keys[keyID].names.size();
   return 0;
 }
+
+
+
+
 
 unsigned cIniFile::NumValues( const string & keyname)
 {
@@ -197,12 +227,20 @@ unsigned cIniFile::NumValues( const string & keyname)
   return keys[keyID].names.size();
 }
 
+
+
+
+
 string cIniFile::ValueName( unsigned const keyID, unsigned const valueID) const
 {
   if ( keyID < keys.size() && valueID < keys[keyID].names.size())
     return keys[keyID].names[valueID];
   return "";
 }
+
+
+
+
 
 string cIniFile::ValueName( const string & keyname, unsigned const valueID) const
 {
@@ -212,6 +250,10 @@ string cIniFile::ValueName( const string & keyname, unsigned const valueID) cons
   return ValueName( keyID, valueID);
 }
 
+
+
+
+
 bool cIniFile::SetValue( unsigned const keyID, unsigned const valueID, const string & value)
 {
   if ( keyID < keys.size() && valueID < keys[keyID].names.size())
@@ -219,6 +261,10 @@ bool cIniFile::SetValue( unsigned const keyID, unsigned const valueID, const str
 
   return false;
 }
+
+
+
+
 
 bool cIniFile::SetValue( const string & keyname, const string & valuename, const string & value, bool const create)
 {
@@ -250,32 +296,47 @@ bool cIniFile::SetValue( const string & keyname, const string & valuename, const
   return true;
 }
 
+
+
+
+
 bool cIniFile::SetValueI( const string & keyname, const string & valuename, int const value, bool const create)
 {
-  char svalue[MAX_VALUEDATA];
-
-  sprintf_s( svalue, MAX_VALUEDATA, "%d", value);
-  return SetValue( keyname, valuename, svalue, create);
+  AString Data;
+  Printf(Data, "%d", value);
+  return SetValue( keyname, valuename, Data, create);
 }
+
+
+
+
 
 bool cIniFile::SetValueF( const string & keyname, const string & valuename, double const value, bool const create)
 {
-  char svalue[MAX_VALUEDATA];
-
-  sprintf_s( svalue, MAX_VALUEDATA, "%f", value);
-  return SetValue( keyname, valuename, svalue, create);
+  AString Data;
+  Printf(Data, "%f", value);
+  return SetValue( keyname, valuename, Data, create);
 }
+
+
+
+
 
 bool cIniFile::SetValueV( const string & keyname, const string & valuename, char *format, ...)
 {
   va_list args;
-  char value[MAX_VALUEDATA];
 
   va_start( args, format);
-  vsprintf_s( value, format, args);
+  
+  AString Data;
+  AppendVPrintf(Data, format, args);
   va_end( args);
-  return SetValue( keyname, valuename, value );
+  return SetValue( keyname, valuename, Data);
 }
+
+
+
+
 
 string cIniFile::GetValue( unsigned const keyID, unsigned const valueID, const string & defValue) const
 {
@@ -283,6 +344,10 @@ string cIniFile::GetValue( unsigned const keyID, unsigned const valueID, const s
     return keys[keyID].values[valueID];
   return defValue;
 }
+
+
+
+
 
 string cIniFile::GetValue( const string & keyname, const string & valuename, const string & defValue) const
 {
@@ -297,21 +362,31 @@ string cIniFile::GetValue( const string & keyname, const string & valuename, con
   return keys[keyID].values[valueID];
 }
 
+
+
+
+
 int cIniFile::GetValueI(const string & keyname, const string & valuename, int const defValue) const
 {
-  char svalue[MAX_VALUEDATA];
-
-  sprintf_s( svalue, MAX_VALUEDATA, "%d", defValue);
-  return atoi( GetValue( keyname, valuename, svalue).c_str());
+	AString Data;
+	Printf(Data, "%d", defValue);
+  return atoi( GetValue( keyname, valuename, Data).c_str());
 }
+
+
+
+
 
 double cIniFile::GetValueF(const string & keyname, const string & valuename, double const defValue) const
 {
-  char svalue[MAX_VALUEDATA];
-
-  sprintf_s( svalue, MAX_VALUEDATA, "%f", defValue);
-  return atof( GetValue( keyname, valuename, svalue).c_str());
+  AString Data;
+  Printf(Data, "%f", defValue);
+  return atof( GetValue( keyname, valuename, Data).c_str());
 }
+
+
+
+
 
 // 16 variables may be a bit of over kill, but hey, it's only code.
 unsigned cIniFile::GetValueV( const string & keyname, const string & valuename, char *format,
@@ -341,6 +416,10 @@ unsigned cIniFile::GetValueV( const string & keyname, const string & valuename, 
 
   return nVals;
 }
+
+
+
+
 
 bool cIniFile::DeleteValueByID( const unsigned keyID, const unsigned valueID )
 {
