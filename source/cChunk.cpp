@@ -910,7 +910,7 @@ bool cChunk::LoadFromDisk()
 
 	if (f.Read(m_BlockData, sizeof(m_BlockData)) != sizeof(m_BlockData))
 	{
-		LOGERROR("ERROR READING FROM FILE %s", SourceFile); 
+		LOGERROR("ERROR READING FROM FILE %s", SourceFile.c_str()); 
 		return false;
 	}
 
@@ -927,7 +927,7 @@ bool cChunk::LoadFromDisk()
 				cChestEntity * ChestEntity = new cChestEntity( 0, 0, 0, this );
 				if (!ChestEntity->LoadFromFile(f))
 				{
-					LOGERROR("ERROR READING CHEST FROM FILE %s", SourceFile );
+					LOGERROR("ERROR READING CHEST FROM FILE %s", SourceFile.c_str());
 					delete ChestEntity;
 					return false;
 				}
@@ -940,7 +940,7 @@ bool cChunk::LoadFromDisk()
 				cFurnaceEntity* FurnaceEntity = new cFurnaceEntity( 0, 0, 0, this );
 				if (!FurnaceEntity->LoadFromFile(f))
 				{
-					LOGERROR("ERROR READING FURNACE FROM FILE %s", SourceFile );
+					LOGERROR("ERROR READING FURNACE FROM FILE %s", SourceFile.c_str());
 					delete FurnaceEntity;
 					return false;
 				}
@@ -955,7 +955,7 @@ bool cChunk::LoadFromDisk()
 				cSignEntity * SignEntity = new cSignEntity(BlockType, 0, 0, 0, this );
 				if (!SignEntity->LoadFromFile( f ) )
 				{
-					LOGERROR("ERROR READING SIGN FROM FILE %s", SourceFile );
+					LOGERROR("ERROR READING SIGN FROM FILE %s", SourceFile.c_str());
 					delete SignEntity;
 					return false;
 				}
@@ -976,11 +976,11 @@ bool cChunk::LoadFromDisk()
 	// Delete old format file
 	if (std::remove(SourceFile.c_str()) != 0)
 	{
-		LOGERROR("Could not delete file %s", SourceFile );
+		LOGERROR("Could not delete file %s", SourceFile.c_str());
 	}
 	else
 	{
-		LOGINFO("Successfully deleted old format file \"%s\"", SourceFile );
+		LOGINFO("Successfully deleted old format file \"%s\"", SourceFile.c_str());
 	}
 	return true;
 }
@@ -993,7 +993,7 @@ bool cChunk::SaveToDisk()
 {
 	assert(!"Old save format not supported anymore");  // Remove the call to this function
 	
-	return true; //no more saving old format!
+	return false; //no more saving old format!
 }
 
 
