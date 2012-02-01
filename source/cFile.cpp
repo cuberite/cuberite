@@ -94,6 +94,7 @@ void cFile::Close(void)
 	}
 
 	fclose(m_File);
+	m_File = NULL;
 }
 
 
