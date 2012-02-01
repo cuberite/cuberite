@@ -190,10 +190,8 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 						const cPluginManager::PluginList & List = PM->GetAllPlugins();
 						for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
 						{
-							char c_VersionNum[32]; // 32 digits should be enough? XD
-							sprintf_s( c_VersionNum, 32, "%i", (*itr)->GetVersion() );
-							Content += std::string("<li>") + std::string( (*itr)->GetName() ) + " V. " + std::string( c_VersionNum ) + "</li>";
-							
+							AString VersionNum;
+							AppendPrintf(Content, "<li>%s V.%i</li>", (*itr)->GetName(), (*itr)->GetVersion());
 						}
 					}
 					Content += "</ul>";

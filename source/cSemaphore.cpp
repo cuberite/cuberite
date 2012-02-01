@@ -28,7 +28,7 @@ cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* 
 		}
 		else
 		{
-			if( sem_unlink( c_Str ) != 0 )
+			if( sem_unlink(Name.c_str()) != 0 )
 			{
 				LOG("ERROR: Could not unlink cSemaphore. (%i)", errno);
 			}

@@ -44,7 +44,7 @@ cEvent::cEvent(void)
 		}
 		else
 		{
-			if( sem_unlink( c_Str ) != 0 )
+			if( sem_unlink(EventName.c_str()) != 0 )
 			{
 				LOGWARN("ERROR: Could not unlink cEvent. (%i)", errno);
 			}

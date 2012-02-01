@@ -799,7 +799,7 @@ bool cPlayer::LoadFromDisk()
 	std::auto_ptr<char> buffer(new char[FileSize]);
 	if (f.Read(buffer.get(), FileSize) != FileSize)
 	{
-		LOGERROR("ERROR READING FROM FILE \"%s\"", SourceFile); 
+		LOGERROR("ERROR READING FROM FILE \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
 	f.Close();
@@ -808,7 +808,7 @@ bool cPlayer::LoadFromDisk()
 	Json::Reader reader;
 	if (!reader.parse(buffer.get(), root, false))
 	{
-		LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile);
+		LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile.c_str());
 	}
 		
 	buffer.reset();
@@ -882,12 +882,12 @@ bool cPlayer::SaveToDisk()
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_pState->PlayerName.c_str(), SourceFile);
+		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_pState->PlayerName.c_str(), SourceFile.c_str());
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != JsonData.size())
 	{
-		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile); 
+		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
 	return true;

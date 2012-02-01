@@ -119,7 +119,7 @@ void cHeartBeat::SendUpdate()
 		AString sPort;
 		Printf(sPort, "%i", Port);
 		AString sChecksum = md5( m_ServerID + sPort );
-		Printf(Msg, "GET http://master.mc-server.org/?update=%s&checksum=%s&port=%d\n", m_ServerID, sChecksum , Port); 
+		Printf(Msg, "GET http://master.mc-server.org/?update=%s&checksum=%s&port=%d\n", m_ServerID.c_str(), sChecksum.c_str(), Port); 
 		SendMessage(Msg.c_str());
 	}
 }

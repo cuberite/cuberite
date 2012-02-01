@@ -69,7 +69,7 @@ void cLog::OpenLog( const char* a_FileName )
 	#ifdef _WIN32
 	fopen_s( &m_File, a_FileName, "a+" );
 	#else
-    m_File = fopen(a_FileName, "a+" );
+	m_File = fopen(a_FileName, "a+" );
 	#endif
 }
 
@@ -94,10 +94,18 @@ void cLog::ClearLog()
 
 
 
-void cLog::Log(const char* a_Format, va_list argList)
+void cLog::Log(const char * a_Format, va_list argList)
 {
 	AString Message;
-	AppendVPrintf(Message, a_Format, argList);
+	if (argList != NULL)
+	{
+		AppendVPrintf(Message, a_Format, argList);
+	}
+	else
+	{
+		// This branch needs to be here because of *nix crashing in vsnprintf() when argList is NULL
+		Message.assign(a_Format);
+	}
 
 	time_t rawtime;
 	time ( &rawtime );

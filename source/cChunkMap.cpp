@@ -461,7 +461,7 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR: Could not write to file %s", SourceFile );
+		LOGERROR("ERROR: Could not write to file %s", SourceFile.c_str());
 		return;
 	}
 
@@ -530,7 +530,7 @@ void cChunkMap::SaveLayer( cChunkLayer* a_Layer )
 #define READ(File, Var) \
 	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
 	{ \
-		LOGERROR("ERROR READING %s FROM FILE %s (line %d)", #Var, SourceFile, __LINE__); \
+		LOGERROR("ERROR READING %s FROM FILE %s (line %d)", #Var, SourceFile.c_str(), __LINE__); \
 		return NULL; \
 	}
 
@@ -553,21 +553,21 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 	READ(f, PakVersion);
 	if (PakVersion != 1)
 	{
-		LOGERROR("WRONG PAK VERSION in file \"%s\"!", SourceFile);
+		LOGERROR("WRONG PAK VERSION in file \"%s\"!", SourceFile.c_str());
 		return NULL;
 	}
 	
 	READ(f, ChunkVersion);
 	if (ChunkVersion != 1 )
 	{
-		LOGERROR("WRONG CHUNK VERSION in file \"%s\"!", SourceFile);
+		LOGERROR("WRONG CHUNK VERSION in file \"%s\"!", SourceFile.c_str());
 		return NULL;
 	}
 
 	short NumChunks = 0;
 	READ(f, NumChunks);
 	
-	LOG("Num chunks in file \"%s\": %i", SourceFile, NumChunks);
+	LOG("Num chunks in file \"%s\": %i", SourceFile.c_str(), NumChunks);
 
 	std::auto_ptr<cChunkLayer> Layer(new cChunkLayer(LAYER_SIZE * LAYER_SIZE));  // The auto_ptr deletes the Layer if we exit with an error
 	Layer->m_X = a_LayerX;
@@ -586,7 +586,7 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		
 		if (Data == NULL)
 		{
-			LOGERROR("Chunk with wrong coordinates in pak file! %i %i", ChunkX, ChunkZ );
+			LOGERROR("Chunk with wrong coordinates [%i, %i] in pak file \"%s\"!", ChunkX, ChunkZ, SourceFile.c_str());
 			return NULL;
 		}
 		else
@@ -604,7 +604,7 @@ cChunkMap::cChunkLayer* cChunkMap::LoadLayer(int a_LayerX, int a_LayerZ )
 		Data->m_Compressed = new char[ Data->m_CompressedSize ];
 		if (f.Read(Data->m_Compressed, Data->m_CompressedSize) != Data->m_CompressedSize)
 		{
-			LOGERROR("ERROR 8 READING FROM FILE %s", SourceFile); 
+			LOGERROR("ERROR reading compressed data for chunk #%i from file \"%s\"", i, SourceFile.c_str()); 
 			return NULL;
 		}
 	}
