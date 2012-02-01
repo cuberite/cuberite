@@ -120,6 +120,14 @@ bool cPlugin_NewLua::Initialize()
 	return bSuccess;
 }
 
+void cPlugin_NewLua::OnDisable()
+{
+	if( !PushFunction("OnDisable", false) ) // false = don't log error if not found
+		return;
+
+	CallFunction(0, 0, "OnDisable");
+}
+
 void cPlugin_NewLua::Tick(float a_Dt)
 {
 	if( !PushFunction("Tick") )
@@ -130,28 +138,30 @@ void cPlugin_NewLua::Tick(float a_Dt)
 	CallFunction(1, 0, "Tick");
 }
 
-bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
+bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 {
-	if( !PushFunction("OnPlayerJoin") )
+	if( !PushFunction("OnCollectItem") )
 		return false;
 
+	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 
-	if( !CallFunction(1, 1, "OnPlayerJoin") )
+	if( !CallFunction(2, 1, "OnCollectItem") )
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bRetVal;
 }
 
-bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
+bool cPlugin_NewLua::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
 {
-	if( !PushFunction("OnLogin") )
+	if( !PushFunction("OnDisconnect") )
 		return false;
 
-	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_Login");
+	tolua_pushstring( m_LuaState, a_Reason.c_str() );
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 
-	if( !CallFunction(1, 1, "OnLogin") )
+	if( !CallFunction(2, 1, "OnDisconnect") )
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
@@ -173,6 +183,96 @@ bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_
 	return bRetVal;
 }
 
+bool cPlugin_NewLua::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem )
+{
+	if( !PushFunction("OnBlockDig") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_BlockDig");
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, a_PickupItem, "cItem");
+
+	if( !CallFunction(3, 1, "OnBlockDig") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
+{
+	if( !PushFunction("OnChat") )
+		return false;
+
+	tolua_pushstring( m_LuaState, a_Chat );
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	if( !CallFunction(2, 1, "OnChat") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
+{
+	if( !PushFunction("OnLogin") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_Login");
+
+	if( !CallFunction(1, 1, "OnLogin") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+void cPlugin_NewLua::OnPlayerSpawn( cPlayer* a_Player )
+{
+	if( !PushFunction("OnPlayerSpawn") )
+		return;
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	CallFunction(1, 0, "OnPlayerSpawn");
+}
+
+bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
+{
+	if( !PushFunction("OnPlayerJoin") )
+		return false;
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	if( !CallFunction(1, 1, "OnPlayerJoin") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
+{
+	if( !PushFunction("OnPlayerMove") )
+		return;
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	CallFunction(1, 0, "OnPlayerMove");
+}
+
+void cPlugin_NewLua::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo )
+{
+	if( !PushFunction("OnTakeDamage") )
+		return;
+
+	tolua_pushusertype(m_LuaState, a_Pawn, "cPawn");
+	tolua_pushusertype(m_LuaState, a_TakeDamageInfo, "TakeDamageInfo");
+
+	CallFunction(2, 0, "OnTakeDamage");
+}
+
 bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 {
 	if( !PushFunction("OnKilled") )
@@ -187,6 +287,7 @@ bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bRetVal;
 }
+
 
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 {
@@ -204,12 +305,15 @@ cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 
 
 // Helper functions
-bool cPlugin_NewLua::PushFunction( const char* a_FunctionName )
+bool cPlugin_NewLua::PushFunction( const char* a_FunctionName, bool a_bLogError /* = true */ )
 {
 	lua_getglobal(m_LuaState, a_FunctionName);
 	if(!lua_isfunction(m_LuaState,-1))
 	{
-		LOGWARN("Error in plugin %s: Could not find function %s()", m_Directory.c_str(), a_FunctionName );
+		if( a_bLogError )
+		{
+			LOGWARN("Error in plugin %s: Could not find function %s()", m_Directory.c_str(), a_FunctionName );
+		}
 		lua_pop(m_LuaState,1);
 		return false;
 	}

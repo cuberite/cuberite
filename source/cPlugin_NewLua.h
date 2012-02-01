@@ -13,18 +13,30 @@ public:														//tolua_export
 	cPlugin_NewLua( const char* a_PluginName );
 	~cPlugin_NewLua();
 
-	virtual bool Initialize();								//tolua_export
-	virtual void Tick(float a_Dt);							//tolua_export
-	virtual bool OnPlayerJoin( cPlayer* a_Player );			//tolua_export
-	virtual bool OnLogin( cPacket_Login* a_PacketData );	//tolua_export
-	virtual bool OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player ); // tolua_export
-	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ); //tolua_export
+	virtual void OnDisable();	//tolua_export
+	virtual bool Initialize();	//tolua_export
+
+	virtual void Tick(float a_Dt);	//tolua_export
+
+	//tolua_begin
+	virtual bool OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player );
+	virtual bool OnDisconnect( std::string a_Reason, cPlayer* a_Player );
+	virtual bool OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player );
+	virtual bool OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem );
+	virtual bool OnChat( const char* a_Chat, cPlayer* a_Player );
+	virtual bool OnLogin( cPacket_Login* a_PacketData );
+	virtual void OnPlayerSpawn( cPlayer* a_Player );
+	virtual bool OnPlayerJoin( cPlayer* a_Player );
+	virtual void OnPlayerMove( cPlayer* a_Player );
+	virtual void OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo );
+	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer );
+	//tolua_end
 
 	lua_State* GetLuaState() { return m_LuaState; }
 
 	cWebPlugin_Lua* CreateWebPlugin(lua_State* a_LuaState);	//tolua_export
 private:
-	bool PushFunction( const char* a_FunctionName );
+	bool PushFunction( const char* a_FunctionName, bool a_bLogError = true );
 	bool CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName ); // a_FunctionName is only used for error messages, nothing else
 
 	typedef std::list< cWebPlugin_Lua* > WebPluginList;
