@@ -1,15 +1,18 @@
-local FirePlugin = {}
-FirePlugin.__index = FirePlugin
+local FireBlocks = {} -- List of blocks that are currently burning!
 
-FireBlocks = {}
+function Initialize( Plugin )
+	
+	Plugin:SetName( "Fire" )
+	Plugin:SetVersion( 2 )
+	
+	PluginManager = cRoot:Get():GetPluginManager()
+	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_TICK )
+	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_BLOCK_PLACE )
+	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_BLOCK_DIG )
 
-function FirePlugin:new()
-   local t = {}
-   setmetatable(t, FirePlugin)
-   local w = Lua__cPlugin:new()
-   tolua.setpeer(w, t)
-   w:tolua__set_instance(w)
-   return w
+	Log( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
+	
+	return true
 end
 
 function IsForeverBurnable( BlockID )
@@ -53,24 +56,8 @@ function FindBurnableAround( X, Y, Z )
 	return ListBurnables
 end
 
-function FirePlugin:OnDisable()
-	Log( self:GetName() .. " v." .. self:GetVersion() .. " is shutting down..." )
-end
 
-function FirePlugin:Initialize()
-	self:SetName( "Fire" )
-	self:SetVersion( 1 )
-
-	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook( self, cPluginManager.E_PLUGIN_TICK )
-	PluginManager:AddHook( self, cPluginManager.E_PLUGIN_BLOCK_PLACE )
-	PluginManager:AddHook( self, cPluginManager.E_PLUGIN_BLOCK_DIG )
-
-	Log( "Initialized " .. self:GetName() .. " v." .. self:GetVersion() )
-	return true
-end
-
-function FirePlugin:OnBlockPlace( PacketData, Player )
+function OnBlockPlace( PacketData, Player )
 
 	if( PacketData.m_ItemType == E_BLOCK_FIRE or PacketData.m_ItemType == E_ITEM_FLINT_AND_STEEL ) then
 		if( PacketData.m_Direction > -1 ) then
@@ -79,10 +66,10 @@ function FirePlugin:OnBlockPlace( PacketData, Player )
 			local Z = PacketData.m_PosZ
 
 			X, Y, Z = AddDirection( X, Y, Z, PacketData.m_Direction )
-
+			local World = cRoot:Get():GetWorld()
+			
 			--Since flint and steel doesn't do anything on the server side yet
 			if( PacketData.m_ItemType == E_ITEM_FLINT_AND_STEEL ) then
-				local World = cRoot:Get():GetWorld()
 				World:SetBlock( X, Y, Z, E_BLOCK_FIRE, 0 )
 			end
 
@@ -96,7 +83,7 @@ function FirePlugin:OnBlockPlace( PacketData, Player )
 end
 
 -- To put out fires! :D
-function FirePlugin:OnBlockDig( PacketData, Player )
+function OnBlockDig( PacketData, Player )
 	if( PacketData.m_Direction < 0 ) then
 		return false
 	end
@@ -115,26 +102,26 @@ function FirePlugin:OnBlockDig( PacketData, Player )
 	return false
 end
 
-NumTicks = 0
-function FirePlugin:Tick( DeltaTime )
+local NumTicks = 0
+function Tick( DeltaTime )
 	if( NumTicks < 10 ) then	-- Only spread every 10 ticks, to make sure it doesnt happen too fast
 		NumTicks = NumTicks + 1
 		return
 	end
 	NumTicks = 0
 
-	World = cRoot:Get():GetWorld()
+	local World = cRoot:Get():GetWorld()
 
-	NewTable = {}
+	local NewTable = {}
 	for key,val in pairs(FireBlocks) do
 		X = val["x"]
 		Y = val["y"]
 		Z = val["z"]
-		Burnables = FindBurnableAround(X, Y, Z)
+		local Burnables = FindBurnableAround(X, Y, Z)
 		if( math.random(10) > 5 ) then
 			table.insert( NewTable, val )
 		elseif( #Burnables > 0 ) then
-			ToBurn = Burnables[ math.random( #Burnables ) ]
+			local ToBurn = Burnables[ math.random( #Burnables ) ]
 			World:SetBlock( ToBurn["x"], ToBurn["y"], ToBurn["z"], E_BLOCK_FIRE, 0 )
 			table.insert( NewTable, ToBurn )
 			table.insert( NewTable, val )
@@ -144,6 +131,3 @@ function FirePlugin:Tick( DeltaTime )
 	end
 	FireBlocks = NewTable
 end
-
-Plugin = FirePlugin:new()
-cRoot:Get():GetPluginManager():AddPlugin( Plugin )
