@@ -15,27 +15,46 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	
 	char buffer[2048];
 	size_t len;
+	#ifdef _MSC_VER
+	// MS CRT provides secure printf that doesn't behave like in the C99 standard
 	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, args)) != -1)
+	#else  // _MSC_VER
+	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, args)) < ARRAYCOUNT(buffer))
+	#endif  // else _MSC_VER
 	{
+		// The result did fit into the static buffer
 		str.append(buffer, len);
 		return str;
 	}
+	
+	// The result did not fit into the static buffer
+	#ifdef _MSC_VER
+	// for MS CRT, we need to calculate the result length
 	len = _vscprintf(format, args);
 	if (len == -1)
 	{
 		return str;
 	}
+	#endif  // _MSC_VER
+	
+	// Allocate a buffer and printf into it:
 	std::auto_ptr<char> tmp(new char[len + 1]);
 	ASSERT(tmp.get() != NULL);  // Why not alloced? Is the length reasonable?
 	if (tmp.get() == NULL)
 	{
 		throw std::bad_alloc();
 	}
+	#ifdef _MSC_VER
 	if ((len = vsprintf_s(tmp.get(), len + 1, format, args)) != -1)
 	{
 		str.append(tmp.get(), len);
 	}
 	ASSERT(len != -1);
+	#else  // _MSC_VER
+	vsnprintf(tmp.get(), len + 1, format, args);
+	str.append(tmp.get(), len);
+	#endif  // else _MSC_VER
+	
 	return str;
 }
 
@@ -79,7 +98,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	{
 		if (cutAt > 0)
 		{
-			results.push_back(str.substr(0, cutAt));
+			results.push_back(str.substr(Prev, cutAt - Prev));
 		}
 		Prev = cutAt + delim.length();
 	}
@@ -114,7 +133,7 @@ int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER
 	// MSVC has stricmp that compares case-insensitive:
-	return stricmp(s1.c_str(), s2.c_str());
+	return _stricmp(s1.c_str(), s2.c_str());
 	#else 
 	// Do it the hard way:
 	AString s1Copy(s1);
