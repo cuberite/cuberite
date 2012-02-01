@@ -48,6 +48,10 @@ bool g_bWaterPhysics = false;
 
 typedef std::list< cClientHandle* > ClientList;
 
+
+
+
+
 struct cServer::sServerState
 {
 	sServerState()
@@ -67,11 +71,19 @@ struct cServer::sServerState
 	std::string ServerID;
 };
 
-cServer*cServer::GetServer()
+
+
+
+
+cServer * cServer::GetServer()
 {
 	LOGWARN("WARNING: Using deprecated function cServer::GetServer() use cRoot::Get()->GetServer() instead!");
 	return cRoot::Get()->GetServer();
 }
+
+
+
+
 
 void cServer::ServerListenThread( void *a_Args )
 {
@@ -83,6 +95,10 @@ void cServer::ServerListenThread( void *a_Args )
 		self->StartListenClient();
 	}
 }
+
+
+
+
 
 std::string GetWSAError()
 {
@@ -126,6 +142,10 @@ std::string GetWSAError()
 	return "No Error";
 }
 
+
+
+
+
 bool cServer::InitServer( int a_Port )
 {
 	if( m_bIsConnected )
@@ -135,7 +155,7 @@ bool cServer::InitServer( int a_Port )
 	}
 
 	printf("/============================\\\n");
-	printf("|   Minecraft Alpha Server   |\n");
+	printf("|   Custom Minecraft Server  |\n");
 	printf("|  Created by Kevin Bansberg |\n");
 	printf("|           A.K.A.           |\n");
 	printf("|         FakeTruth          |\n");
@@ -222,6 +242,10 @@ bool cServer::InitServer( int a_Port )
 	return true;
 }
 
+
+
+
+
 cServer::cServer()
 	: m_pState( new sServerState )
 	, m_Millisecondsf( 0 )
@@ -231,6 +255,10 @@ cServer::cServer()
 	, m_bRestarting( false )
 {
 }
+
+
+
+
 
 cServer::~cServer()
 {
@@ -245,6 +273,10 @@ cServer::~cServer()
 	delete m_pState;
 }
 
+
+
+
+
 // TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
 void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
 {
@@ -254,6 +286,10 @@ void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* =
 		(*itr)->Send( a_Packet );
 	}
 }
+
+
+
+
 
 void cServer::StartListenClient()
 {
@@ -271,6 +307,10 @@ void cServer::StartListenClient()
 		m_pState->Clients.push_back( NewHandle );	// TODO - lock list
 	}
 }
+
+
+
+
 
 bool cServer::Tick(float a_Dt)
 {
@@ -317,6 +357,10 @@ bool cServer::Tick(float a_Dt)
 		return false;
 	}
 }
+
+
+
+
 
 void ServerTickThread( void * a_Param )
 {
@@ -394,13 +438,17 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 
 	if (split[0].compare("/coords") == 0)
 	{
-		char c_Str[128];
-		sprintf_s( c_Str, 128, "[X:%0.2f] [Y:%0.2f] [Z:%0.2f]", a_Client.GetPlayer()->GetPosX(), a_Client.GetPlayer()->GetPosY(), a_Client.GetPlayer()->GetPosZ() );
-		a_Client.Send( cPacket_Chat( cChatColor::Green + c_Str ) );
+		AString Pos;
+		Printf(Pos, "[X:%0.2f] [Y:%0.2f] [Z:%0.2f]", a_Client.GetPlayer()->GetPosX(), a_Client.GetPlayer()->GetPosY(), a_Client.GetPlayer()->GetPosZ() );
+		a_Client.Send( cPacket_Chat(cChatColor::Green + Pos));
 		return true;
 	}
 	return false;
 }
+
+
+
+
 
 void cServer::ServerCommand( const char* a_Cmd )
 {
@@ -472,6 +520,10 @@ void cServer::ServerCommand( const char* a_Cmd )
 	//LOG("You didn't enter anything? (%s)", a_Cmd.c_str() );
 }
 
+
+
+
+
 void cServer::SendMessage( const char* a_Message, cPlayer* a_Player /* = 0 */, bool a_bExclude /* = false */ )
 {
 	cPacket_Chat Chat( a_Message );
@@ -484,6 +536,10 @@ void cServer::SendMessage( const char* a_Message, cPlayer* a_Player /* = 0 */, b
 
 	Broadcast( Chat, (a_Player)?a_Player->GetClientHandle():0 );
 }
+
+
+
+
 
 void cServer::Shutdown()
 {
@@ -503,7 +559,44 @@ void cServer::Shutdown()
 }
 
 
-const char* cServer::GetServerID()
+
+
+
+const AString & cServer::GetServerID(void) const
 {
-	return m_pState->ServerID.c_str();
+	return m_pState->ServerID;
 }
+
+
+
+
+
+void cServer::KickUser(const AString & iUserName, const AString & iReason)
+{
+	for (ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
+	{
+		if ((*itr)->GetUsername() == iUserName)
+		{
+			(*itr)->Kick(iReason);
+		}
+	}  // for itr - m_pState->Clients[]
+}
+
+
+
+
+
+void cServer::AuthenticateUser(const AString & iUserName)
+{
+	for (ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
+	{
+		if ((*itr)->GetUsername() == iUserName)
+		{
+			(*itr)->Authenticate();
+		}
+	}  // for itr - m_pState->Clients[]
+}
+
+
+
+

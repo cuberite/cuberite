@@ -16,80 +16,75 @@
 
 
 
-cBlockingTCPLink::cBlockingTCPLink()
-	: m_Socket( 0 )
+cBlockingTCPLink::cBlockingTCPLink(void)
 {
 }
+
+
+
+
 
 cBlockingTCPLink::~cBlockingTCPLink()
 {
 	CloseSocket();
 }
 
+
+
+
+
 void cBlockingTCPLink::CloseSocket()
 {
-	if( m_Socket )
+	if (m_Socket.IsValid())
 	{
 		m_Socket.CloseSocket();
-		m_Socket = 0;
 	}
 }
 
-bool cBlockingTCPLink::Connect( const char* a_Address, unsigned int a_Port )
+
+
+
+
+bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 {
-	if( m_Socket )
+	assert(!m_Socket.IsValid());
+	if (m_Socket.IsValid())
 	{
-		LOGWARN("WARNING: cTCPLink Connect() called while still connected. ALWAYS disconnect before re-connecting!");
+		LOGWARN("WARNING: cTCPLink Connect() called while still connected.");
+		m_Socket.CloseSocket();
 	}
 
 	struct hostent *hp;
 	unsigned int addr;
 	struct sockaddr_in server;
 
-#ifdef _WIN32
-	WSADATA wsaData;
-	int wsaret=WSAStartup(/*0x101*/ MAKEWORD(2, 2),&wsaData);
-
-	if(wsaret!=0)
+	m_Socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (!m_Socket.IsValid())
 	{
-		LOGERROR("cTCPLink: WSAStartup returned error");
-		return false;
-	}
-#endif
-
-	m_Socket=socket(AF_INET,SOCK_STREAM,0);
-#ifdef _WIN32
-	if( m_Socket==INVALID_SOCKET )
-#else
-	if( m_Socket < 0 )
-#endif
-	{
-		LOGERROR("cTCPLink: Invalid socket");
-		m_Socket = 0;
+		LOGERROR("cTCPLink: Cannot create a socket");
 		return false;
 	}
 
-
-	addr=inet_addr( a_Address );
-	hp=gethostbyaddr((char*)&addr,sizeof(addr),AF_INET);
-	if(hp==NULL)
+	addr = inet_addr(iAddress);
+	hp = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
+	if (hp == NULL)
 	{
 		//LOGWARN("cTCPLink: gethostbyaddr returned NULL");
-		hp = gethostbyname( a_Address );
-		if( hp == NULL )
+		hp = gethostbyname(iAddress);
+		if (hp == NULL)
 		{
-			LOGWARN("cTCPLink: Could not resolve %s", a_Address);
+			LOGWARN("cTCPLink: Could not resolve %s", iAddress);
 			CloseSocket();
 			return false;
 		}
 	}
 
-	server.sin_addr.s_addr=*((unsigned long*)hp->h_addr);
-	server.sin_family=AF_INET;
-	server.sin_port=htons( (unsigned short)a_Port );
-	if( connect( m_Socket, (struct sockaddr*)&server, sizeof(server) ) )
+	server.sin_addr.s_addr = *((unsigned long *)hp->h_addr);
+	server.sin_family = AF_INET;
+	server.sin_port = htons( (unsigned short)iPort);
+	if (connect(m_Socket, (struct sockaddr *)&server, sizeof(server)))
 	{
-		LOGWARN("cTCPLink: No response from server (%i)", errno);
+		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort, m_Socket.GetLastErrorString());
 		CloseSocket();
 		return false;
 	}
@@ -97,19 +92,29 @@ bool cBlockingTCPLink::Connect( const char* a_Address, unsigned int a_Port )
 	return true;
 }
 
-int cBlockingTCPLink::Send( char* a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
+
+
+
+
+int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
 {
-	if( !m_Socket )
+	assert(m_Socket.IsValid());
+	if (!m_Socket.IsValid())
 	{
-		LOGWARN("cBlockingTCPLink: Trying to send data without a valid connection!");
+		LOGERROR("cBlockingTCPLink: Trying to send data without a valid connection!");
 		return -1;
 	}
 	return cPacket::SendData( m_Socket, a_Data, a_Size, a_Flags );
 }
 
+
+
+
+
 int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ )
 {
-	if( !m_Socket )
+	assert(m_Socket.IsValid());
+	if (!m_Socket.IsValid())
 	{
 		LOGWARN("cBlockingTCPLink: Trying to send message without a valid connection!");
 		return -1;
@@ -117,21 +122,26 @@ int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ 
 	return cPacket::SendData( m_Socket, a_Message, strlen(a_Message), a_Flags );
 }
 
-std::string cBlockingTCPLink::ReceiveData()
+
+
+
+
+void cBlockingTCPLink::ReceiveData(AString & oData)
 {
-	if( !m_Socket ) return "";
+	assert(m_Socket.IsValid());
+	if (!m_Socket.IsValid())
+	{
+		return;
+	}
 
 	int Received = 0;
 	char Buffer[256];
-	std::string Data;
-	while( (Received = recv(m_Socket, Buffer, 256, 0) ) > 0 )
+	while ((Received = recv(m_Socket, Buffer, sizeof(Buffer), 0)) > 0)
 	{
-		//LOGINFO("Recv: %i", Received);
-		//LOG("%s", Buffer );
-		Data.append( Buffer, Received );
-		memset( Buffer, 0, 256 );
+		oData.append(Buffer, Received);
 	}
-
-	//LOGINFO("Received returned: %i", Received );
-	return Data;
 }
+
+
+
+

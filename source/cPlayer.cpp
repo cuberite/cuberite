@@ -64,7 +64,7 @@ struct cPlayer::sPlayerState
 	std::string LoadedWorldName;
 };
 
-cPlayer::cPlayer(cClientHandle* a_Client, const char* a_PlayerName)
+cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: m_GameMode( 0 )
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
@@ -134,7 +134,7 @@ cPlayer::~cPlayer(void)
 void cPlayer::SpawnOn( cClientHandle* a_Target )
 {
 	if( a_Target == m_ClientHandle || !m_bVisible ) return;
-	LOG("cPlayer::SpawnOn -> Sending %s to %s", m_pState->PlayerName.c_str(), (a_Target)?a_Target->GetUsername():"Everybody" );
+	LOG("cPlayer::SpawnOn -> Sending %s to %s", m_pState->PlayerName.c_str(), (a_Target) ? a_Target->GetUsername().c_str() : "Everybody" );
 	cPacket_NamedEntitySpawn SpawnPacket;
 	SpawnPacket.m_UniqueID = m_UniqueID;
 	SpawnPacket.m_PlayerName = m_pState->PlayerName;
@@ -897,15 +897,23 @@ bool cPlayer::SaveToDisk()
 
 
 
-const char* cPlayer::GetName()
+const AString & cPlayer::GetName(void) const
 {
-	return m_pState->PlayerName.c_str();
+	return m_pState->PlayerName;
 }
 
-void cPlayer::SetName( const char* a_Name )
+
+
+
+
+void cPlayer::SetName(const AString & a_Name )
 {
 	m_pState->PlayerName = a_Name;
 }
+
+
+
+
 
 const cPlayer::GroupList & cPlayer::GetGroups()
 {
@@ -935,7 +943,7 @@ void cPlayer::UseEquippedItem()
 	if(GetGameMode() != 1)		//No damage in creative
 		if (GetInventory().GetEquippedItem().DamageItem()) 
 		{
-			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername(), GetInventory().GetEquippedItem().m_ItemID);
+			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername().c_str(), GetInventory().GetEquippedItem().m_ItemID);
 			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
 		}
 }

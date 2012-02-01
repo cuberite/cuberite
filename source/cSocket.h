@@ -10,15 +10,15 @@ class cSocket
 	typedef SOCKET xSocket;
 #else
 	typedef int xSocket;
+	static const int INVALID_SOCKET = 0;
 #endif
 
 public:
-	cSocket() : m_Socket( 0 ) {}
-
-	cSocket( xSocket a_Socket );
+	cSocket(void) : m_Socket(INVALID_SOCKET) {}
+	cSocket(xSocket a_Socket);
 	~cSocket();
 
-	bool IsValid();
+	bool IsValid(void) const {return (m_Socket != INVALID_SOCKET); }
 	void CloseSocket();
 
 	operator const xSocket() const;

@@ -19,7 +19,7 @@ class cPlayer :	public cPawn												//tolua_export
 public:
 	CLASS_PROTOTYPE();
 
-	cPlayer(cClientHandle* a_Client, const char* a_PlayerName);
+	cPlayer(cClientHandle* a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();
 
 	virtual void Initialize( cWorld* a_World );								//tolua_export
@@ -59,8 +59,8 @@ public:
 
 	void SendMessage( const char* a_Message );								//tolua_export
 
-	const char* GetName();													//tolua_export
-	void SetName( const char* a_Name );										//tolua_export
+	const AString & GetName(void) const;													//tolua_export
+	void SetName(const AString & a_Name);										//tolua_export
 
 	typedef std::list< cGroup* > GroupList;
 	typedef std::list< std::string > StringList;

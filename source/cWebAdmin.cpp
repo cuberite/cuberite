@@ -59,12 +59,6 @@ cWebAdmin::~cWebAdmin()
 	delete m_Event;
 }
 
-void ReplaceString( std::string & a_HayStack, const std::string & a_Needle, const std::string & a_ReplaceWith )
-{
-	size_t pos1 = a_HayStack.find( a_Needle );
-	a_HayStack.replace( pos1, a_Needle.size(), a_ReplaceWith );
-}
-
 void cWebAdmin::AddPlugin( cWebPlugin* a_Plugin )
 {
 	m_Plugins.remove( a_Plugin );

@@ -22,13 +22,14 @@ public:
 	cClientHandle(const cSocket & a_Socket);
 	~cClientHandle();
 
-	static const int VIEWDISTANCE = 13; // MUST be odd number or CRASH!
+	static const int VIEWDISTANCE = 15; // MUST be odd number or CRASH!
 	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight.
 
 	const cSocket & GetSocket();
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
-	void Kick( const char* a_Reason ); //tolua_export
+	void Kick(const AString & a_Reason); //tolua_export
+	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
 
 	void AddPacket( cPacket * a_Packet );
 	void HandlePendingPackets();
@@ -51,9 +52,8 @@ public:
 
 	static void SendThread( void *lpParam );
 	static void ReceiveThread( void *lpParam );
-	static void AuthenticateThread( void* a_Param );
 
-	const char* GetUsername();
+	const AString & GetUsername(void) const;
 	
 	inline short GetPing() { return m_Ping; }
 private:

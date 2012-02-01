@@ -800,7 +800,7 @@ void cChunk::AddClient( cClientHandle* a_Client )
 	LockEntities();
 	for( EntityList::iterator itr = m_pState->Entities.begin(); itr != m_pState->Entities.end(); ++itr )
 	{
-		LOG("%i %i %i Spawning on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername() );
+		LOG("%i %i %i Spawning on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
 		(*itr)->SpawnOn( a_Client );
 	}
 	UnlockEntities();
@@ -815,7 +815,7 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 		LockEntities();
 		for( EntityList::iterator itr = m_pState->Entities.begin(); itr != m_pState->Entities.end(); ++itr )
 		{
-			LOG("%i %i %i Destroying on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername() );
+			LOG("%i %i %i Destroying on %s", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
 			cPacket_DestroyEntity DestroyEntity( *itr );
 			a_Client->Send( DestroyEntity );
 		}

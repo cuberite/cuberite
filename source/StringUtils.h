@@ -38,6 +38,9 @@ extern AString & StrToUpper(AString & s);
 /// Case-insensitive string comparison; returns 0 if the strings are the same
 extern int NoCaseCompare(const AString & s1, const AString & s2);
 
+/// Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith
+extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);
+
 
 // If you have any other string helper functions, declare them here
 

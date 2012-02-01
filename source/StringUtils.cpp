@@ -146,3 +146,16 @@ int NoCaseCompare(const AString & s1, const AString & s2)
 
 
 
+void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith)
+{
+	size_t pos1 = iHayStack.find(iNeedle);
+	while (pos1 != AString::npos)
+	{
+		iHayStack.replace( pos1, iNeedle.size(), iReplaceWith);
+		pos1 = iHayStack.find(iNeedle, pos1);
+	}
+}
+
+
+
+

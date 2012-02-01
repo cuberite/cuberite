@@ -8,6 +8,16 @@
 
 
 
+// Compiler-dependent stuff:
+#ifndef _MSC_VER
+	// Non-MS compilers don't know the override keyword
+	#define override
+#endif  // _MSC_VER
+
+
+
+
+
 // OS-dependent stuff:
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
@@ -52,6 +62,7 @@
 // STL stuff:
 #include <vector>
 #include <list>
+#include <deque>
 #include <string>
 #include <map>
 #include <algorithm>

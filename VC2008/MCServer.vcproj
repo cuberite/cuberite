@@ -452,30 +452,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cSocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSocket.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTCPLink.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTCPLink.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTimer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTimer.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cTracer.cpp"
 				>
 			</File>
@@ -1467,11 +1443,35 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSocket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cTCPLink.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cTCPLink.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cThread.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\cThread.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cTimer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cTimer.h"
 					>
 				</File>
 			</Filter>

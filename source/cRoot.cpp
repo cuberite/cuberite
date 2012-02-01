@@ -31,6 +31,10 @@ struct cRoot::sRootState
 	WorldMap WorldsByName;
 };
 
+
+
+
+
 cRoot::cRoot()
 	: m_Server( 0 )
 	, m_MonsterConfig( 0 )
@@ -48,11 +52,19 @@ cRoot::cRoot()
 	s_Root = this;
 }
 
+
+
+
+
 cRoot::~cRoot()
 {
 	s_Root = 0;
 	delete m_pState;
 }
+
+
+
+
 
 void cRoot::InputThread(void* a_Params)
 {
@@ -65,6 +77,10 @@ void cRoot::InputThread(void* a_Params)
 		self.ServerCommand( Command.c_str() );
 	}
 }
+
+
+
+
 
 void cRoot::Start()
 {
@@ -88,7 +104,6 @@ void cRoot::Start()
 			return;
 		}
 
-
 		cIniFile WebIniFile("webadmin.ini");
 		if( WebIniFile.ReadFile() )
 		{
@@ -108,6 +123,7 @@ void cRoot::Start()
 		m_MonsterConfig = new cMonsterConfig(2);
 
 		// This sets stuff in motion
+		m_Authenticator.Start();
 		m_Server->StartListenThread();
 		//cHeartBeat* HeartBeat = new cHeartBeat();
 
@@ -136,6 +152,10 @@ void cRoot::Start()
 
 	delete m_Log; m_Log = 0;
 }
+
+
+
+
 
 void cRoot::LoadWorlds()
 {
@@ -169,6 +189,10 @@ void cRoot::LoadWorlds()
 	}
 }
 
+
+
+
+
 void cRoot::UnloadWorlds()
 {
 	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
@@ -178,15 +202,27 @@ void cRoot::UnloadWorlds()
 	m_pState->WorldsByName.clear();
 }
 
+
+
+
+
 cWorld* cRoot::GetWorld()
 {
 	return GetDefaultWorld();
 }
 
+
+
+
+
 cWorld* cRoot::GetDefaultWorld()
 {
 	return m_pState->pDefaultWorld;
 }
+
+
+
+
 
 cWorld* cRoot::GetWorld( const char* a_WorldName )
 {
@@ -196,6 +232,10 @@ cWorld* cRoot::GetWorld( const char* a_WorldName )
 	return 0;
 }
 
+
+
+
+
 void cRoot::TickWorlds( float a_Dt )
 {
 	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
@@ -203,6 +243,10 @@ void cRoot::TickWorlds( float a_Dt )
 		itr->second->Tick( a_Dt );
 	}
 }
+
+
+
+
 
 void cRoot::ServerCommand( const char* a_Cmd )
 {
@@ -217,3 +261,25 @@ void cRoot::ServerCommand( const char* a_Cmd )
 		m_bRestart = true;
 	}
 }
+
+
+
+
+
+void cRoot::KickUser(const AString & iUserName, const AString & iReason)
+{
+	m_Server->KickUser(iUserName, iReason);
+}
+
+
+
+
+
+void cRoot::AuthenticateUser(const AString & iUserName)
+{
+	m_Server->AuthenticateUser(iUserName);
+}
+
+
+
+

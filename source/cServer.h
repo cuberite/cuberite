@@ -29,10 +29,13 @@ public:												//tolua_export
 	void Shutdown();
 
 	void SendMessage( const char* a_Message, cPlayer* a_Player = 0, bool a_bExclude = false ); //tolua_export
+	
+	void KickUser(const AString & iUserName, const AString & iReason);
+	void AuthenticateUser(const AString & iUserName);  // Called by cAuthenticator to auth the specified user
 
 	static void ServerListenThread( void* a_Args );
 
-	const char* GetServerID();
+	const AString & GetServerID(void) const;
 private:
 	friend class cRoot; // so cRoot can create and destroy cServer
 	cServer();

@@ -308,7 +308,7 @@ void cMonster::HandlePhysics(float a_Dt)
 					}
 				}
 				*m_Pos = Tracer.RealHit;
-				*m_Pos += *Tracer.HitNormal * 0.2;
+				*m_Pos += *Tracer.HitNormal * 0.2f;
 
 			}
 			else

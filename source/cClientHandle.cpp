@@ -197,24 +197,22 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 
 cClientHandle::~cClientHandle()
 {
-	LOG("Deleting client %s", GetUsername() );
+	LOG("Deleting client %s", GetUsername().c_str() );
 
 	for(unsigned int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)
 	{
 		if( m_LoadedChunks[i] ) m_LoadedChunks[i]->RemoveClient( this );
 	}
 
-
 	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
 	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
 	{
-		if ((*itr) && (*itr)->GetClientHandle() && strlen(GetUsername()) > 0)
+		if ((*itr) && (*itr)->GetClientHandle() && !GetUsername().empty())
 		{
 			std::string NameColor = ( m_Player ? m_Player->GetColor() : "" );
 			cPacket_PlayerListItem PlayerList(NameColor + GetUsername(), false, (short)9999);
-			(*itr)->GetClientHandle()->Send( PlayerList );
+			(*itr)->GetClientHandle()->Send(PlayerList);
 		}
-		
 	}
 	
 	if (m_pState && m_pState->Username.size() > 0)
@@ -239,7 +237,6 @@ cClientHandle::~cClientHandle()
 	m_pState->SocketCriticalSection.Unlock();
 
 	m_pState->pSemaphore->Signal();
-	delete m_pState->pAuthenticateThread;
 	delete m_pState->pReceiveThread;
 	delete m_pState->pSendThread;
 	delete m_pState->pSemaphore;
@@ -294,9 +291,9 @@ void cClientHandle::Destroy()
 
 
 
-void cClientHandle::Kick( const char* a_Reason )
+void cClientHandle::Kick(const AString & a_Reason)
 {
-	Send( cPacket_Disconnect( a_Reason ) );
+	Send(cPacket_Disconnect(a_Reason));
 	m_bKicking = true;
 }
 
@@ -304,7 +301,16 @@ void cClientHandle::Kick( const char* a_Reason )
 
 
 
-void cClientHandle::StreamChunks()
+void cClientHandle::Authenticate(void)
+{
+	m_bSendLoginResponse = true;
+}
+
+
+
+
+
+void cClientHandle::StreamChunks(void)
 {
 	if( !m_bLoggedIn )
 		return;
@@ -522,7 +528,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			{
 				cPacket_Handshake* PacketData = reinterpret_cast<cPacket_Handshake*>(a_Packet);
 				m_pState->Username = PacketData->m_Username;
-				LOG("HANDSHAKE %s", GetUsername() );
+				LOG("HANDSHAKE %s", GetUsername().c_str());
 				cPacket_Chat Connecting(m_pState->Username + " is connecting.");
 
 				if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers()) {
@@ -539,7 +545,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_LOGIN:
 			{
-				LOG("LOGIN %s", GetUsername() );
+				LOG("LOGIN %s", GetUsername().c_str());
 				cPacket_Login* PacketData = reinterpret_cast<cPacket_Login*>(a_Packet);
 				if (PacketData->m_ProtocolVersion < m_pState->ProtocolVersion) {
 					Kick("Your client is outdated!");
@@ -561,9 +567,8 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					return;
 				}
 
-				if( m_pState->pAuthenticateThread ) delete m_pState->pAuthenticateThread;
-				m_pState->pAuthenticateThread = new cThread( AuthenticateThread, this, "cClientHandle::AuthenticateThread" );
-				m_pState->pAuthenticateThread->Start( true );
+				// Schedule for authentication; until then, let them wait (but do not block)
+				cRoot::Get()->GetAuthenticator().Authenticate(m_pState->Username, cRoot::Get()->GetServer()->GetServerID());
 			}
 			break;
 		case E_PLAYERMOVELOOK:	// After this is received we're safe to send anything
@@ -587,7 +592,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 				// Then we can start doing more stuffs! :D
 				m_bLoggedIn = true;
-				LOG("%s completely logged in", GetUsername() );
+				LOG("%s completely logged in", GetUsername().c_str());
 				StreamChunks();
 
 				// Send position
@@ -660,7 +665,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
 					if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS) { //kick if more than MAXBLOCKCHANGEINTERACTIONS per .1 seconds
-						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
+						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername().c_str());
 						//TODO Too many false-positives :s for example on a minimal server lagg :s should be re checked
 						Kick("You're a baaaaaad boy!");
 						break;
@@ -783,7 +788,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
 					if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS) { //kick if more than MAXBLOCKCHANGEINTERACTIONS per .1 seconds
-						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername() );
+						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername().c_str());
 						Kick("You're a baaaaaad boy!");
 						break;
 					}
@@ -797,7 +802,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 				if( (Equipped.m_ItemID != PacketData->m_ItemType))	// Not valid
 				{
-					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername() );
+					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername().c_str());
 					break;
 				}
 
@@ -1361,7 +1366,7 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 			break;
 		case E_DISCONNECT:
 			{
-				LOG("Received d/c packet from %s", GetUsername() );
+				LOG("Received d/c packet from %s", GetUsername().c_str());
 				cPacket_Disconnect* PacketData = reinterpret_cast<cPacket_Disconnect*>(a_Packet);
 				if( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_DISCONNECT, 2, PacketData->m_Reason.c_str(), m_Player ) )
 				{
@@ -1386,23 +1391,6 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				break;
 		}
 	}
-}
-
-
-
-
-
-void cClientHandle::AuthenticateThread( void* a_Param )
-{
-	cClientHandle* self = (cClientHandle*)a_Param;
-
-	cAuthenticator Authenticator;
-	if( !Authenticator.Authenticate( self->GetUsername(), cRoot::Get()->GetServer()->GetServerID() ) )
-	{
-		self->Kick("Failed to verify username!");
-		return;
-	}
-	self->m_bSendLoginResponse = true;
 }
 
 
@@ -1553,7 +1541,7 @@ void cClientHandle::SendThread( void *lpParam )
 		//LOG("Pending packets: %i", m_PendingPackets.size() );
 		if( NrmSendPackets.size() + LowSendPackets.size() > MAX_SEMAPHORES )
 		{
-			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->GetUsername() );
+			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->GetUsername().c_str());
 			cPacket_Disconnect DC("Too many packets in queue.");
 			DC.Send( m_pState->Socket );
 
@@ -1654,7 +1642,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 				else
 				{
 					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetLastErrorString() );
-					LOG("CLIENT %s DISCONNECTED", self->GetUsername() );
+					LOG("CLIENT %s DISCONNECTED", self->GetUsername().c_str());
 					break;
 				}
 			}
@@ -1684,9 +1672,9 @@ void cClientHandle::ReceiveThread( void *lpParam )
 
 
 
-const char* cClientHandle::GetUsername()
+const AString & cClientHandle::GetUsername(void) const
 {
-	return m_pState->Username.c_str();
+	return m_pState->Username;
 }
 
 

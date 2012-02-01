@@ -23,28 +23,35 @@ cSocket::cSocket( xSocket a_Socket )
 {
 }
 
+
+
+
+
 cSocket::~cSocket()
 {
 }
+
+
+
+
 
 cSocket::operator const cSocket::xSocket() const
 {
 	return m_Socket;
 }
 
+
+
+
+
 cSocket::xSocket cSocket::GetSocket() const
 {
 	return m_Socket;
 }
 
-bool cSocket::IsValid()
-{
-#ifdef _WIN32
-	return ( m_Socket != INVALID_SOCKET);
-#else
-	return ( m_Socket >= 0);
-#endif
-}
+
+
+
 
 void cSocket::CloseSocket()
 {
@@ -57,6 +64,10 @@ void cSocket::CloseSocket()
 		LOGWARN("Error closing socket (%s)", m_IPString );
 #endif
 }
+
+
+
+
 
 const char* cSocket::GetLastErrorString()
 {
@@ -88,6 +99,10 @@ const char* cSocket::GetLastErrorString()
 #endif
 }
 
+
+
+
+
 int cSocket::SetReuseAddress()
 {
 #ifdef _WIN32
@@ -97,6 +112,10 @@ int cSocket::SetReuseAddress()
 #endif
 	return setsockopt( m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int) );
 }
+
+
+
+
 
 int cSocket::WSAStartup()
 {
@@ -109,10 +128,18 @@ int cSocket::WSAStartup()
 #endif
 }
 
+
+
+
+
 cSocket cSocket::CreateSocket()
 {
 	return socket(AF_INET,SOCK_STREAM,0);
 }
+
+
+
+
 
 int cSocket::Bind( SockAddr_In& a_Address )
 {
@@ -129,10 +156,18 @@ int cSocket::Bind( SockAddr_In& a_Address )
 	return bind( m_Socket, (sockaddr*)&local, sizeof(local));
 }
 
+
+
+
+
 int cSocket::Listen( int a_Backlog )
 {
 	return listen( m_Socket, a_Backlog );
 }
+
+
+
+
 
 cSocket cSocket::Accept()
 {
@@ -150,7 +185,15 @@ cSocket cSocket::Accept()
 	return SClient;
 }
 
+
+
+
+
 int cSocket::Receive( char* a_Buffer, unsigned int a_Length, unsigned int a_Flags )
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
 }
+
+
+
+

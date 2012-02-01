@@ -980,6 +980,10 @@ cPlayer* cWorld::GetPlayer( const char* a_PlayerName )
 	return 0;
 }
 
+
+
+
+
 cEntity* cWorld::GetEntity( int a_UniqueID )
 {
 	for( EntityList::iterator itr = m_pState->AllEntities.begin(); itr != m_pState->AllEntities.end(); ++itr )
