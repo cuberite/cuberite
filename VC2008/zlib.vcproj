@@ -173,10 +173,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\zlib-1.2.5\example.c"
-				>
-			</File>
-			<File
 				RelativePath="..\zlib-1.2.5\gzclose.c"
 				>
 			</File>
