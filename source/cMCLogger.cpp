@@ -22,7 +22,6 @@ cMCLogger* cMCLogger::GetInstance()
 
 cMCLogger::cMCLogger()
 {
-	m_CriticalSection = new cCriticalSection();
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(0) );
 	m_Log = new cLog(FileName);
@@ -37,52 +36,66 @@ cMCLogger::cMCLogger()
 
 cMCLogger::cMCLogger( char* a_File )
 {
-	m_CriticalSection = new cCriticalSection();
 	m_Log = new cLog( a_File );
 }
+
+
+
+
 
 cMCLogger::~cMCLogger()
 {
 	m_Log->Log("--- Stopped Log ---");
 	delete m_Log;
-	delete m_CriticalSection;
-	if( this == s_MCLogger )
-		s_MCLogger = 0;
+	if (this == s_MCLogger)
+		s_MCLogger = NULL;
 }
+
+
+
+
 
 void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
 {
 	switch( a_LogType )
 	{
-	case 0:
-		Log(a_Text, 0);
-		break;
-	case 1:
-		Info(a_Text, 0);
-		break;
-	case 2:
-		Warn(a_Text, 0);
-		break;
-	case 3:
-		Error(a_Text, 0);
-		break;
-	default:
-		Log(a_Text, 0);
-		break;
+		case 0:
+			Log(a_Text, 0);
+			break;
+		case 1:
+			Info(a_Text, 0);
+			break;
+		case 2:
+			Warn(a_Text, 0);
+			break;
+		case 3:
+			Error(a_Text, 0);
+			break;
+		default:
+			Log(a_Text, 0);
+			break;
 	}
 }
 
+
+
+
+
 void cMCLogger::Log(const char* a_Format, va_list a_ArgList)
 {
-	m_CriticalSection->Lock();
+	cCSLock Lock(m_CriticalSection);
 	SetColor( 0x7 );	 // 0x7 is default grey color
 	m_Log->Log( a_Format, a_ArgList );
-	m_CriticalSection->Unlock();
+	SetColor(0x07);  // revert color back
 }
+
+
+
+
 
 void cMCLogger::Info(const char* a_Format, va_list a_ArgList)
 {
-	m_CriticalSection->Lock();
+	cCSLock Lock(m_CriticalSection);
 // 	for( int i = 0; i < 16; i++)
 // 	{
 // 		for( int j = 0; j < 16; j++ )
@@ -95,24 +108,36 @@ void cMCLogger::Info(const char* a_Format, va_list a_ArgList)
 
 	SetColor( 0xe );	 // 0xe is yellow
 	m_Log->Log( a_Format, a_ArgList );
-	m_CriticalSection->Unlock();
+	SetColor(0x07);  // revert color back
 }
+
+
+
+
 
 void cMCLogger::Warn(const char* a_Format, va_list a_ArgList)
 {
-	m_CriticalSection->Lock();
+	cCSLock Lock(m_CriticalSection);
 	SetColor( 0xc );	 // 0xc is red
 	m_Log->Log( a_Format, a_ArgList );
-	m_CriticalSection->Unlock();
+	SetColor(0x07);  // revert color back
 }
+
+
+
+
 
 void cMCLogger::Error(const char* a_Format, va_list a_ArgList)
 {
-	m_CriticalSection->Lock();
+	cCSLock Lock(m_CriticalSection);
 	SetColor( 0xc0 );	// 0xc0 is red bg and black text
 	m_Log->Log( a_Format, a_ArgList );
-	m_CriticalSection->Unlock();
+	SetColor(0x07);  // revert color back
 }
+
+
+
+
 
 void cMCLogger::SetColor( unsigned char a_Color )
 {
@@ -123,6 +148,9 @@ void cMCLogger::SetColor( unsigned char a_Color )
 	(void)a_Color;
 #endif
 }
+
+
+
 
 
 //////////////////////////////////////////////////////////////////////////

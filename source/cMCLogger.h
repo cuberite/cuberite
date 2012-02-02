@@ -1,7 +1,8 @@
+
 #pragma once
 
 #ifndef _WIN32
-#include <stdarg.h>
+	#include <stdarg.h>
 #endif
 
 class cLog;
@@ -27,7 +28,7 @@ public:																//tolua_export
 private:
 	void SetColor( unsigned char a_Color );
 
-	cCriticalSection* m_CriticalSection;
+	cCriticalSection m_CriticalSection;
 	cLog* m_Log;
 	static cMCLogger* s_MCLogger;
 };																	//tolua_export
@@ -36,3 +37,9 @@ extern void LOG(const char* a_Format, ...);
 extern void LOGINFO(const char* a_Format, ...);
 extern void LOGWARN(const char* a_Format, ...);
 extern void LOGERROR(const char* a_Format, ...);
+
+#define LOGWARNING LOGWARN
+
+
+
+

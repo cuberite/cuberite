@@ -19,7 +19,6 @@
 
 cSocket::cSocket( xSocket a_Socket )
 	: m_Socket( a_Socket )
-	, m_IPString( 0 )
 {
 }
 
@@ -59,9 +58,9 @@ void cSocket::CloseSocket()
 	closesocket(m_Socket);
 #else
 	if( shutdown(m_Socket, SHUT_RDWR) != 0 )//SD_BOTH);
-		LOGWARN("Error on shutting down socket (%s)", m_IPString );
+		LOGWARN("Error on shutting down socket (%s)", m_IPString.c_str() );
 	if( close(m_Socket) != 0 )
-		LOGWARN("Error closing socket (%s)", m_IPString );
+		LOGWARN("Error closing socket (%s)", m_IPString.c_str() );
 #endif
 }
 

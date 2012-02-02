@@ -55,9 +55,9 @@ public:
 	cSocket Accept();
 	int Receive( char* a_Buffer, unsigned int a_Length, unsigned int a_Flags );
 
-	char* GetIPString() { return m_IPString; }
+	const AString & GetIPString(void) const { return m_IPString; }
 
 private:
 	xSocket m_Socket;
-	char* m_IPString;
+	AString m_IPString;
 };

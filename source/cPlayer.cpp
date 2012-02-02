@@ -920,6 +920,10 @@ const cPlayer::GroupList & cPlayer::GetGroups()
 	return m_pState->Groups;
 }
 
+
+
+
+
 cPlayer::StringList cPlayer::GetResolvedPermissions()
 {
 	StringList Permissions;
@@ -933,17 +937,31 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 	return Permissions;
 }
 
+
+
+
+
 const char* cPlayer::GetLoadedWorldName()
 {
 	return m_pState->LoadedWorldName.c_str();
 }
 
+
+
+
+
 void cPlayer::UseEquippedItem()
 {
 	if(GetGameMode() != 1)		//No damage in creative
+	{
 		if (GetInventory().GetEquippedItem().DamageItem()) 
 		{
 			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername().c_str(), GetInventory().GetEquippedItem().m_ItemID);
 			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
 		}
+	}
 }
+
+
+
+

@@ -295,17 +295,23 @@ void cServer::StartListenClient()
 {
 	cSocket SClient = m_pState->SListenClient.Accept();
 
-	if( SClient.IsValid() )
+	if (!SClient.IsValid())
 	{
-		char * ClientIP = SClient.GetIPString();
-		if( ClientIP == 0 )
-			return;
-
-		LOG("%s connected!", ClientIP);
-
-		cClientHandle *NewHandle = new cClientHandle( SClient );
-		m_pState->Clients.push_back( NewHandle );	// TODO - lock list
+		return;
 	}
+	
+	const AString & ClientIP = SClient.GetIPString();
+	if (ClientIP.empty())
+	{
+		LOGWARN("cServer: A client connected, but didn't present its IP, disconnecting.");
+		SClient.CloseSocket();
+		return;
+	}
+
+	LOG("%s connected!", ClientIP.c_str());
+
+	cClientHandle *NewHandle = new cClientHandle( SClient );
+	m_pState->Clients.push_back( NewHandle );	// TODO - lock list
 }
 
 
