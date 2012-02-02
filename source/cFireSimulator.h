@@ -13,17 +13,17 @@ public:
 
 	virtual void Simulate( float a_Dt );
 
-	virtual inline bool IsAllowedBlock( char a_BlockID );
+	virtual bool IsAllowedBlock( char a_BlockID );
 
-	virtual inline bool IsBurnable( char a_BlockID );
-	virtual inline bool IsForeverBurnable( char a_BlockID );
-	virtual inline bool FiresForever( char a_BlockID );
+	virtual bool IsBurnable( char a_BlockID );
+	virtual bool IsForeverBurnable( char a_BlockID );
+	virtual bool FiresForever( char a_BlockID );
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z);
 	virtual void _AddBlock(int a_X, int a_Y, int a_Z);
-	virtual inline bool BurnBlockAround(int a_X, int a_Y, int a_Z);
-	virtual inline bool BurnBlock(int a_X, int a_Y, int a_Z);
+	virtual bool BurnBlockAround(int a_X, int a_Y, int a_Z);
+	virtual bool BurnBlock(int a_X, int a_Y, int a_Z);
 
 	std::vector <Vector3i *> *m_Blocks;
 	std::vector <Vector3i *> *m_Buffer;

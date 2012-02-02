@@ -28,26 +28,26 @@ public:
 
 	enum MetaData {NORMAL, BURNING, CROUCHED, RIDING, SPRINTING, EATING, BLOCKING};
 
-	virtual inline void SetMetaData(MetaData a_MetaData);
-	virtual inline MetaData GetMetaData() { return m_MetaData; }
+	virtual void SetMetaData(MetaData a_MetaData);
+	virtual MetaData GetMetaData() { return m_MetaData; }
 
-	virtual inline void InStateBurning(float a_Dt);
+	virtual void InStateBurning(float a_Dt);
 
 	virtual void CheckMetaDataBurn();
 
-	virtual inline void SetMaxHealth(short a_MaxHealth);
-	virtual inline short GetMaxHealth() { return m_MaxHealth; }
+	virtual void SetMaxHealth(short a_MaxHealth);
+	virtual short GetMaxHealth() { return m_MaxHealth; }
 
-	//virtual inline void SetMaxFood(short a_MaxFood);
-	virtual inline short GetMaxFood() { return m_MaxFoodLevel/6; }
-	virtual inline short GetFood() { return m_FoodLevel/6; }
+	//virtual void SetMaxFood(short a_MaxFood);
+	virtual short GetMaxFood() { return m_MaxFoodLevel/6; }
+	virtual short GetFood() { return m_FoodLevel/6; }
 
-	//virtual inline void SetMaxFoodSaturation(float a_MaxFoodSaturation);
-	virtual inline float GetMaxFoodSaturation() { return fmod(m_MaxFoodLevel, 6.f); }
-	virtual inline float GetFoodSaturation() { return fmod(m_FoodLevel, 6.f); }
+	//virtual void SetMaxFoodSaturation(float a_MaxFoodSaturation);
+	virtual float GetMaxFoodSaturation() { return fmod(m_MaxFoodLevel, 6.f); }
+	virtual float GetFoodSaturation() { return fmod(m_FoodLevel, 6.f); }
 
-	virtual inline void SetMaxFoodLevel(short a_MaxFoodLevel);
-	virtual inline short GetMaxFoodLevel() { return m_MaxFoodLevel; }
+	virtual void SetMaxFoodLevel(short a_MaxFoodLevel);
+	virtual short GetMaxFoodLevel() { return m_MaxFoodLevel; }
 
 protected:
 	short m_Health;

@@ -28,8 +28,8 @@ public:
 	//Gets the flowing direction. if a_Over is true also the block over the current block affects the direction (standard)
 	Direction GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over = true);
 
-	virtual inline bool IsAllowedBlock( char a_BlockID ) = 0;
-	virtual inline bool IsPassableForFluid( char a_BlockID );
+	virtual bool IsAllowedBlock( char a_BlockID ) = 0;
+	virtual bool IsPassableForFluid( char a_BlockID );
 	bool CanWashAway( char a_BlockID );
 protected:
 	virtual void AddBlock( int a_X, int a_Y, int a_Z);

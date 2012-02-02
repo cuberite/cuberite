@@ -9,9 +9,9 @@ public:
 	~cSimulator();
 
 	virtual void Simulate( float a_Dt ) = 0;
-	virtual inline void WakeUp( int a_X, int a_Y, int a_Z );	//Used often so inline saves some calls
+	virtual void WakeUp( int a_X, int a_Y, int a_Z );
 
-	virtual inline bool IsAllowedBlock( char a_BlockID ) = 0;
+	virtual bool IsAllowedBlock( char a_BlockID ) = 0;
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z) = 0;

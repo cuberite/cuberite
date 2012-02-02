@@ -7,6 +7,6 @@ class cWaterSimulator : public cFluidSimulator
 public:
 	cWaterSimulator( cWorld* a_World );
 
-	virtual inline bool IsAllowedBlock( char a_BlockID );
+	virtual bool IsAllowedBlock( char a_BlockID );
 
 };
