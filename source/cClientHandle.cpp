@@ -75,8 +75,6 @@
 
 #define MAX_SEMAPHORES (2000)
 
-typedef std::list<cPacket*> PacketList;
-
 
 
 
@@ -88,59 +86,22 @@ extern std::string GetWSAError();
 
 
 
-struct cClientHandle::sClientHandleState
-{
-	int ProtocolVersion;
-	std::string Username;
-	std::string Password;
-
-	PacketList PendingParsePackets;
-	PacketList PendingNrmSendPackets;
-	PacketList PendingLowSendPackets;
-
-	cThread* pReceiveThread;
-	cThread* pSendThread;
-	cThread* pAuthenticateThread;
-
-	cSocket Socket;
-
-	cCriticalSection CriticalSection;
-	cCriticalSection SendCriticalSection;
-	cCriticalSection SocketCriticalSection;
-	cSemaphore* pSemaphore;
-
-	Vector3d ConfirmPosition;
-
-	cPacket* PacketMap[256];
-
-	sClientHandleState(void)
-		: ProtocolVersion( 23 )
-		, pReceiveThread( 0 )
-		, pSendThread( 0 )
-		, pAuthenticateThread( 0 )
-		, pSemaphore( 0 )
-	{
-		for( int i = 0; i < 256; ++i )
-			PacketMap[i] = 0;
-	}
-} ;
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket & a_Socket)
-	: m_bDestroyed( false )
-	, m_Player( 0 )
+	: mProtocolVersion( 23 )
+	, pReceiveThread(NULL)
+	, pSendThread(NULL)
+	, mSocket(a_Socket)
+	, mSemaphore(MAX_SEMAPHORES)
+	, m_bDestroyed( false )
+	, m_Player(NULL)
 	, m_bKicking( false )
 	, m_TimeLastPacket( cWorld::GetTime() )
 	, m_bLoggedIn( false )
 	, m_bKeepThreadGoing( true )
 	, m_bSendLoginResponse( false )
-	, m_pState( new sClientHandleState )
 	, m_Ping(1000)
 	, m_bPositionConfirmed( false )
 {
@@ -149,43 +110,43 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	cTimer t1;
 	m_LastPingTime = t1.GetNowTime();
 
-	m_pState->Socket = a_Socket;
-
-	m_pState->pSemaphore = new cSemaphore( MAX_SEMAPHORES, 0 );
-
 	// All the packets that can be received from the client
-	m_pState->PacketMap[E_KEEP_ALIVE]                = new cPacket_KeepAlive;
-	m_pState->PacketMap[E_HANDSHAKE]                 = new cPacket_Handshake;
-	m_pState->PacketMap[E_LOGIN]                     = new cPacket_Login;
-	m_pState->PacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
-	m_pState->PacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
-	m_pState->PacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
-	m_pState->PacketMap[E_CHAT]                      = new cPacket_Chat;
-	m_pState->PacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
-	m_pState->PacketMap[E_FLYING]                    = new cPacket_Flying;
-	m_pState->PacketMap[E_BLOCK_DIG]                 = new cPacket_BlockDig;
-	m_pState->PacketMap[E_BLOCK_PLACE]               = new cPacket_BlockPlace;
-	m_pState->PacketMap[E_DISCONNECT]                = new cPacket_Disconnect;
-	m_pState->PacketMap[E_ITEM_SWITCH]               = new cPacket_ItemSwitch;
-	m_pState->PacketMap[E_ENTITY_EQUIPMENT]          = new cPacket_EntityEquipment;
-	m_pState->PacketMap[E_CREATIVE_INVENTORY_ACTION] = new cPacket_CreativeInventoryAction;
-	m_pState->PacketMap[E_NEW_INVALID_STATE]         = new cPacket_NewInvalidState;
-	m_pState->PacketMap[E_PICKUP_SPAWN]              = new cPacket_PickupSpawn;
-	m_pState->PacketMap[E_USE_ENTITY]                = new cPacket_UseEntity;
-	m_pState->PacketMap[E_WINDOW_CLOSE]              = new cPacket_WindowClose;
-	m_pState->PacketMap[E_WINDOW_CLICK]              = new cPacket_WindowClick;
-	m_pState->PacketMap[E_PACKET_13]                 = new cPacket_13;
-	m_pState->PacketMap[E_UPDATE_SIGN]               = new cPacket_UpdateSign;
-	m_pState->PacketMap[E_RESPAWN]                   = new cPacket_Respawn;
-	m_pState->PacketMap[E_PING]                      = new cPacket_Ping;
+	for (int i = 0; i < ARRAYCOUNT(mPacketMap); ++i)
+	{
+		mPacketMap[i] = NULL;
+	}
+	mPacketMap[E_KEEP_ALIVE]                = new cPacket_KeepAlive;
+	mPacketMap[E_HANDSHAKE]                 = new cPacket_Handshake;
+	mPacketMap[E_LOGIN]                     = new cPacket_Login;
+	mPacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
+	mPacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
+	mPacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
+	mPacketMap[E_CHAT]                      = new cPacket_Chat;
+	mPacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
+	mPacketMap[E_FLYING]                    = new cPacket_Flying;
+	mPacketMap[E_BLOCK_DIG]                 = new cPacket_BlockDig;
+	mPacketMap[E_BLOCK_PLACE]               = new cPacket_BlockPlace;
+	mPacketMap[E_DISCONNECT]                = new cPacket_Disconnect;
+	mPacketMap[E_ITEM_SWITCH]               = new cPacket_ItemSwitch;
+	mPacketMap[E_ENTITY_EQUIPMENT]          = new cPacket_EntityEquipment;
+	mPacketMap[E_CREATIVE_INVENTORY_ACTION] = new cPacket_CreativeInventoryAction;
+	mPacketMap[E_NEW_INVALID_STATE]         = new cPacket_NewInvalidState;
+	mPacketMap[E_PICKUP_SPAWN]              = new cPacket_PickupSpawn;
+	mPacketMap[E_USE_ENTITY]                = new cPacket_UseEntity;
+	mPacketMap[E_WINDOW_CLOSE]              = new cPacket_WindowClose;
+	mPacketMap[E_WINDOW_CLICK]              = new cPacket_WindowClick;
+	mPacketMap[E_PACKET_13]                 = new cPacket_13;
+	mPacketMap[E_UPDATE_SIGN]               = new cPacket_UpdateSign;
+	mPacketMap[E_RESPAWN]                   = new cPacket_Respawn;
+	mPacketMap[E_PING]                      = new cPacket_Ping;
 
-	memset( m_LoadedChunks, 0x00, sizeof(cChunk*)*VIEWDISTANCE*VIEWDISTANCE );
+	memset(m_LoadedChunks, 0x00, sizeof(m_LoadedChunks));
 
 	//////////////////////////////////////////////////////////////////////////
-	m_pState->pReceiveThread = new cThread( ReceiveThread, this, "cClientHandle::ReceiveThread" );
-	m_pState->pSendThread = new cThread( SendThread, this, "cClientHandle::SendThread" );
-	m_pState->pReceiveThread->Start( true );
-	m_pState->pSendThread->Start( true );
+	pReceiveThread = new cThread( ReceiveThread, this, "cClientHandle::ReceiveThread" );
+	pSendThread = new cThread( SendThread, this, "cClientHandle::SendThread" );
+	pReceiveThread->Start( true );
+	pSendThread->Start( true );
 	//////////////////////////////////////////////////////////////////////////
 
 	LOG("New ClientHandle" );
@@ -215,60 +176,55 @@ cClientHandle::~cClientHandle()
 		}
 	}
 	
-	if (m_pState && m_pState->Username.size() > 0)
+	if (mUsername.size() > 0)
 	{
-		cPacket_Chat Left( m_pState->Username + " left the game!");
+		cPacket_Chat Left(mUsername + " left the game!");
 		cRoot::Get()->GetServer()->Broadcast( Left, this );
 	}
 
 	// First stop sending thread
 	m_bKeepThreadGoing = false;
 
-	m_pState->SocketCriticalSection.Lock();
-	if( m_pState->Socket )
+	cCSLock Lock(mSocketCriticalSection);
+	if (mSocket.IsValid())
 	{
 		cPacket_Disconnect Disconnect;
 		Disconnect.m_Reason = "Server shut down? Kthnxbai";
-		Disconnect.Send( m_pState->Socket );
+		Disconnect.Send(mSocket);
 
-		m_pState->Socket.CloseSocket();
-		m_pState->Socket = 0;
+		mSocket.CloseSocket();
 	}
-	m_pState->SocketCriticalSection.Unlock();
+	Lock.Unlock();
 
-	m_pState->pSemaphore->Signal();
-	delete m_pState->pReceiveThread;
-	delete m_pState->pSendThread;
-	delete m_pState->pSemaphore;
+	mSemaphore.Signal();
+	delete pReceiveThread;
+	delete pSendThread;
 
-	while( !m_pState->PendingParsePackets.empty() )
+	while (!mPendingParsePackets.empty())
 	{
-		delete *m_pState->PendingParsePackets.begin();
-		m_pState->PendingParsePackets.erase( m_pState->PendingParsePackets.begin() );
+		delete *mPendingParsePackets.begin();
+		mPendingParsePackets.erase(mPendingParsePackets.begin());
 	}
-	while( !m_pState->PendingNrmSendPackets.empty() )
+	while (!mPendingNrmSendPackets.empty())
 	{
-		delete *m_pState->PendingNrmSendPackets.begin();
-		m_pState->PendingNrmSendPackets.erase( m_pState->PendingNrmSendPackets.begin() );
+		delete *mPendingNrmSendPackets.begin();
+		mPendingNrmSendPackets.erase(mPendingNrmSendPackets.begin());
 	}
-	while( !m_pState->PendingLowSendPackets.empty() )
+	while (!mPendingLowSendPackets.empty())
 	{
-		delete *m_pState->PendingLowSendPackets.begin();
-		m_pState->PendingLowSendPackets.erase( m_pState->PendingLowSendPackets.begin() );
+		delete *mPendingLowSendPackets.begin();
+		mPendingLowSendPackets.erase(mPendingLowSendPackets.begin());
 	}
-	if(m_Player)
+	if (m_Player != NULL)
 	{
-		m_Player->SetClientHandle( 0 );
+		m_Player->SetClientHandle(NULL);
 		m_Player->Destroy();
-		m_Player = 0;
+		m_Player = NULL;
 	}
-	for(int i = 0; i < 256; i++)
+	for (int i = 0; i < ARRAYCOUNT(mPacketMap); i++)
 	{
-		if( m_pState->PacketMap[i] )
-			delete m_pState->PacketMap[i];
+		delete mPacketMap[i];
 	}
-
-	delete m_pState;
 }
 
 
@@ -278,13 +234,11 @@ cClientHandle::~cClientHandle()
 void cClientHandle::Destroy()
 {
 	 m_bDestroyed = true;
-	 m_pState->SocketCriticalSection.Lock();
-	 if( m_pState->Socket )
+	 cCSLock Lock(mSocketCriticalSection);
+	 if (mSocket.IsValid())
 	 {
-		 m_pState->Socket.CloseSocket();
-		 m_pState->Socket = 0;
+		 mSocket.CloseSocket();
 	 }
-	 m_pState->SocketCriticalSection.Unlock();
 }
 
 
@@ -312,32 +266,43 @@ void cClientHandle::Authenticate(void)
 
 void cClientHandle::StreamChunks(void)
 {
-	if( !m_bLoggedIn )
+	if (!m_bLoggedIn)
+	{
 		return;
+	}
 
+	assert(m_Player != NULL);
+	
 	int ChunkPosX = (int)floor(m_Player->GetPosX() / 16);
 	int ChunkPosZ = (int)floor(m_Player->GetPosZ() / 16);
 
-	cWorld* World = m_Player->GetWorld();
+	cWorld * World = m_Player->GetWorld();
 
-	cChunk* NeededChunks[VIEWDISTANCE*VIEWDISTANCE] = { 0 };
-	const int MaxDist = VIEWDISTANCE+GENERATEDISTANCE*2;
-	for(int x = 0; x < MaxDist; x++)
+	cChunk * NeededChunks[VIEWDISTANCE * VIEWDISTANCE] = { 0 };
+	const int MaxDist = VIEWDISTANCE + GENERATEDISTANCE * 2;
+	for (int x = 0; x < MaxDist; x++)
 	{
-		for(int z = 0; z < MaxDist; z++)
+		for (int z = 0; z < MaxDist; z++)
 		{
-			int RelX = x - (MaxDist-1)/2;
-			int RelZ = z - (MaxDist-1)/2;
-			cChunk* Chunk = World->GetChunk( ChunkPosX + RelX, 0, ChunkPosZ + RelZ );	// Touch all chunks in wide range, so they get generated
-			if( x >= GENERATEDISTANCE && x < VIEWDISTANCE+GENERATEDISTANCE && z >= GENERATEDISTANCE && z < VIEWDISTANCE+GENERATEDISTANCE ) // but player only needs chunks in view distance
-				NeededChunks[(x-GENERATEDISTANCE) + (z-GENERATEDISTANCE)*VIEWDISTANCE] = Chunk;
+			int RelX = x - (MaxDist - 1) / 2;
+			int RelZ = z - (MaxDist - 1) / 2;
+			cChunk * Chunk = World->GetChunk( ChunkPosX + RelX, 0, ChunkPosZ + RelZ );	// Touch all chunks in wide range, so they get generated
+			if (
+				(x >= GENERATEDISTANCE) && 
+				(x < VIEWDISTANCE + GENERATEDISTANCE) && 
+				(z >= GENERATEDISTANCE) && 
+				(z < VIEWDISTANCE + GENERATEDISTANCE)
+			) // but player only needs chunks in view distance
+			{
+				NeededChunks[(x - GENERATEDISTANCE) + (z - GENERATEDISTANCE) * VIEWDISTANCE] = Chunk;
+			}
 		}
 	}
 
-	cChunk* MissingChunks[VIEWDISTANCE*VIEWDISTANCE];
-	memset( MissingChunks, 0, VIEWDISTANCE*VIEWDISTANCE*sizeof(cChunk*) );
+	cChunk * MissingChunks[VIEWDISTANCE * VIEWDISTANCE];
+	memset(MissingChunks, 0, sizeof(MissingChunks));
 	unsigned int MissIndex = 0;
-	for(int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)	// Handshake loop - touch each chunk once
+	for(int i = 0; i < VIEWDISTANCE * VIEWDISTANCE; i++)	// Handshake loop - touch each chunk once
 	{
 		if( NeededChunks[i] == 0 ) continue;	// Chunk is not yet loaded, so ignore
 												// This can cause MissIndex to be 0 and thus chunks will not be unloaded while they are actually out of range,
@@ -358,25 +323,27 @@ void cClientHandle::StreamChunks(void)
 		}
 	}
 
-	if( MissIndex > 0 )
-	{	// Chunks are gonna be streamed in, so chunks probably also need to be streamed out <- optimization
+	if (MissIndex > 0)
+	{
+		// Chunks are gonna be streamed in, so chunks probably also need to be streamed out <- optimization
 		for(int x = 0; x < VIEWDISTANCE; x++)
 		{
 			for(int z = 0; z < VIEWDISTANCE; z++)
 			{
 				cChunk* Chunk = m_LoadedChunks[x + z*VIEWDISTANCE];
-				if( Chunk )
+				if (Chunk != NULL)
 				{
-					if( Chunk->GetPosX() < ChunkPosX-(VIEWDISTANCE-1)/2
-						|| Chunk->GetPosX() > ChunkPosX+(VIEWDISTANCE-1)/2
-						|| Chunk->GetPosZ() < ChunkPosZ-(VIEWDISTANCE-1)/2
-						|| Chunk->GetPosZ() > ChunkPosZ+(VIEWDISTANCE-1)/2 )
+					if ( (Chunk->GetPosX() < ChunkPosX - (VIEWDISTANCE - 1) / 2)
+						|| (Chunk->GetPosX() > ChunkPosX + (VIEWDISTANCE - 1) / 2)
+						|| (Chunk->GetPosZ() < ChunkPosZ - (VIEWDISTANCE - 1) / 2)
+						|| (Chunk->GetPosZ() > ChunkPosZ + (VIEWDISTANCE - 1) / 2)
+					)
 					{
 						Chunk->RemoveClient( this );
 						Chunk->AsyncUnload( this );		// TODO - I think it's possible to unload the chunk immediately instead of next tick
 														// I forgot why I made it happen next tick
 
-						m_LoadedChunks[x + z*VIEWDISTANCE] = 0;
+						m_LoadedChunks[x + z * VIEWDISTANCE] = NULL;
 					}
 				}
 			}
@@ -384,7 +351,7 @@ void cClientHandle::StreamChunks(void)
 
 		StreamChunksSmart( MissingChunks, MissIndex );
 
-		memcpy( m_LoadedChunks, NeededChunks, VIEWDISTANCE*VIEWDISTANCE*sizeof(cChunk*) );
+		memcpy(m_LoadedChunks, NeededChunks, sizeof(NeededChunks));
 	}
 }
 
@@ -455,9 +422,8 @@ void cClientHandle::RemoveFromAllChunks()
 
 void cClientHandle::AddPacket(cPacket * a_Packet)
 {
-	m_pState->CriticalSection.Lock();
-	m_pState->PendingParsePackets.push_back( a_Packet->Clone() );
-	m_pState->CriticalSection.Unlock();
+	cCSLock Lock(mCriticalSection);
+	mPendingParsePackets.push_back(a_Packet->Clone());
 }
 
 
@@ -467,7 +433,7 @@ void cClientHandle::AddPacket(cPacket * a_Packet)
 void cClientHandle::RemovePacket( cPacket * a_Packet )
 {
 	delete a_Packet;
-	m_pState->PendingParsePackets.remove( a_Packet );
+	mPendingParsePackets.remove( a_Packet );
 }
 
 
@@ -476,13 +442,12 @@ void cClientHandle::RemovePacket( cPacket * a_Packet )
 
 void cClientHandle::HandlePendingPackets()
 {
-	m_pState->CriticalSection.Lock();
-	while( m_pState->PendingParsePackets.begin() != m_pState->PendingParsePackets.end() )
+	cCSLock Lock(mCriticalSection);
+	while (!mPendingParsePackets.empty())
 	{
-		HandlePacket( *m_pState->PendingParsePackets.begin() );
-		RemovePacket( *m_pState->PendingParsePackets.begin() );
+		HandlePacket( *mPendingParsePackets.begin() );
+		RemovePacket( *mPendingParsePackets.begin() );
 	}
-	m_pState->CriticalSection.Unlock();
 }
 
 
@@ -498,19 +463,22 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 	//LOG("Packet: 0x%02x", a_Packet->m_PacketID );
 
-	if( m_bKicking ) return;
-
-	if(!m_bLoggedIn)
+	if (m_bKicking)
 	{
-		switch( a_Packet->m_PacketID )
+		return;
+	}
+
+	if (!m_bLoggedIn)
+	{
+		switch (a_Packet->m_PacketID)
 		{
-		case E_NEW_INVALID_STATE: // New/Invalid State packet received. I'm guessing the client only sends it when there's a problem with the bed?
+			case E_NEW_INVALID_STATE: // New/Invalid State packet received. I'm guessing the client only sends it when there's a problem with the bed?
 			{
 				LOGINFO("Got New Invalid State packet");
+				break;
 			}
-			break;
 		
-		case E_PING: // Somebody tries to retrieve information about the server
+			case E_PING: // Somebody tries to retrieve information about the server
 			{
 				LOGINFO("Got ping");
 				AString Reply;
@@ -522,66 +490,78 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cRoot::Get()->GetWorld()->GetMaxPlayers()
 				);
 				Kick(Reply.c_str());
+				break;
 			}
-			break;
-		case E_HANDSHAKE:
+			
+			case E_HANDSHAKE:
 			{
-				cPacket_Handshake* PacketData = reinterpret_cast<cPacket_Handshake*>(a_Packet);
-				m_pState->Username = PacketData->m_Username;
+				cPacket_Handshake * PacketData = reinterpret_cast<cPacket_Handshake*>(a_Packet);
+				mUsername = PacketData->m_Username;
 				LOG("HANDSHAKE %s", GetUsername().c_str());
-				cPacket_Chat Connecting(m_pState->Username + " is connecting.");
 
-				if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers()) {
+				if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers())
+				{
 					Kick("The server is currently full :( -- Try again later");
 					break;
 				}
+				cPacket_Chat Connecting(mUsername + " is connecting.");
 				cRoot::Get()->GetServer()->Broadcast( Connecting, this );
 
 				// Give a server handshake thingy back
 				cPacket_Handshake Handshake;
 				Handshake.m_Username = cRoot::Get()->GetServer()->GetServerID();//ServerID;//"2e66f1dc032ab5f0";
 				Send( Handshake );
+				break;
 			}
-			break;
-		case E_LOGIN:
+			
+			case E_LOGIN:
 			{
 				LOG("LOGIN %s", GetUsername().c_str());
-				cPacket_Login* PacketData = reinterpret_cast<cPacket_Login*>(a_Packet);
-				if (PacketData->m_ProtocolVersion < m_pState->ProtocolVersion) {
+				cPacket_Login * PacketData = reinterpret_cast<cPacket_Login*>(a_Packet);
+				if (PacketData->m_ProtocolVersion < mProtocolVersion)
+				{
 					Kick("Your client is outdated!");
 					return;
 				}
-				else if( PacketData->m_ProtocolVersion > m_pState->ProtocolVersion ) {
+				else if( PacketData->m_ProtocolVersion > mProtocolVersion )
+				{
 					Kick("Your client version is higher than the server!");
 					return;
 				}
-				if( m_pState->Username.compare( PacketData->m_Username ) != 0 )
+				if (mUsername.compare(PacketData->m_Username) != 0)
 				{
-					Kick("Login Username does not match Handshake username!");
+					LOGWARNING("Login Username does not match Handshake username (\"%s\" / \"%s\" for client \"%s\")",
+						mUsername.c_str(),
+						PacketData->m_Username.c_str(),
+						mSocket.GetIPString().c_str()
+					);
+					Kick("Hacked client");  // Don't tell them why we don't want them
 					return;
 				}
 
-				if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_LOGIN, 1, PacketData ) )
+				if (cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_LOGIN, 1, PacketData))
 				{
 					Destroy();
 					return;
 				}
 
 				// Schedule for authentication; until then, let them wait (but do not block)
-				cRoot::Get()->GetAuthenticator().Authenticate(m_pState->Username, cRoot::Get()->GetServer()->GetServerID());
+				cRoot::Get()->GetAuthenticator().Authenticate(mUsername, cRoot::Get()->GetServer()->GetServerID());
+				break;
 			}
-			break;
-		case E_PLAYERMOVELOOK:	// After this is received we're safe to send anything
+			
+			case E_PLAYERMOVELOOK:	// After this is received we're safe to send anything
 			{
-				if( !m_Player )
+				if (m_Player == NULL)
 				{
-					Kick("Received wrong packet! Check your login sequence!");
+					LOGWARNING("Received PlayerMoveLook packet for NULL player from client \"%s\", kicking.", mSocket.GetIPString().c_str());
+					Kick("Hacked client");  // Don't tell them why we don't want them
 					return;
 				}
-				if( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_JOIN, 1, m_Player ) )
+				if ( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_JOIN, 1, m_Player))
 				{
 					// Broadcast that this player has joined the game! Yay~
-					cPacket_Chat Joined( m_pState->Username + " joined the game!");
+					cPacket_Chat Joined(mUsername + " joined the game!");
 					cRoot::Get()->GetServer()->Broadcast( Joined, this );
 				}
 
@@ -592,52 +572,60 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 
 				// Then we can start doing more stuffs! :D
 				m_bLoggedIn = true;
-				LOG("%s completely logged in", GetUsername().c_str());
+				LOG("Player \"%s\" completely logged in", GetUsername().c_str());
 				StreamChunks();
 
 				// Send position
-				m_pState->ConfirmPosition = m_Player->GetPosition();
+				mConfirmPosition = m_Player->GetPosition();
 				Send( cPacket_PlayerMoveLook( m_Player ) );
+				break;
 			}
-			break;
-		case E_KEEP_ALIVE:
-			break;
-		default:
+			
+			case E_KEEP_ALIVE:
 			{
-				LOG("INVALID RESPONSE FOR LOGIN: needed 0x%02x got 0x%02x", E_PLAYERMOVELOOK, a_Packet->m_PacketID );
-				Kick("INVALID RESPONSE FOR LOGIN: needed 0x0d!");
+				break;
 			}
-			break;
-		}
+			
+			default:
+			{
+				LOG("INVALID RESPONSE FOR LOGIN: needed 0x%02x, got 0x%02x from client \"%s\", username \"%s\"", 
+					E_PLAYERMOVELOOK, 
+					a_Packet->m_PacketID,
+					mSocket.GetIPString().c_str(),
+					mUsername.c_str()
+				);
+				Kick("Hacked client");  // Don't tell them why we don't like them
+				break;
+			}
+		}  // switch (Packet type)
 	}
-	else if( !m_bPositionConfirmed ) // m_bLoggedIn == true
+	else if (!m_bPositionConfirmed)  // m_bLoggedIn is true
 	{
-		switch( a_Packet->m_PacketID )
+		switch (a_Packet->m_PacketID)
 		{
-		case E_PLAYERMOVELOOK:
+			case E_PLAYERMOVELOOK:
 			{
 				cPacket_PlayerMoveLook* PacketData = reinterpret_cast<cPacket_PlayerMoveLook*>(a_Packet);
-				Vector3d ReceivedPosition = Vector3d( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
+				Vector3d ReceivedPosition = Vector3d(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 
 				// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
-				if( ( ReceivedPosition - m_pState->ConfirmPosition ).SqrLength() < 1.0 )
+				if ((ReceivedPosition - mConfirmPosition).SqrLength() < 1.0)
 				{
 					// Test
-					if( ReceivedPosition.Equals( m_pState->ConfirmPosition ) )
+					if( ReceivedPosition.Equals(mConfirmPosition))
 					{
 						LOGINFO("Exact position confirmed by client!");
 					}
 					m_bPositionConfirmed = true;
 				}
-			}
-			break;
-		}
-		
-	}
+				break;
+			}  // case E_PLAYERMOVELOOK
+		}  // switch (Packet type)
+	}  // if (! position confirmed)
 
-	if( m_bPositionConfirmed )
+	if (m_bPositionConfirmed)
 	{
-		switch( a_Packet->m_PacketID )
+		switch (a_Packet->m_PacketID)
 		{
 			case E_CREATIVE_INVENTORY_ACTION: // This is for creative Inventory changes
 			{
@@ -647,19 +635,19 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				}
 				break;
 			}
-			break;
-		case E_PLAYERPOS:
+
+			case E_PLAYERPOS:
 			{
 				cPacket_PlayerPosition* PacketData = reinterpret_cast<cPacket_PlayerPosition*>(a_Packet);
 				//LOG("recv player pos: %0.2f %0.2f %0.2f", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
 				m_Player->MoveTo( Vector3d( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ ) );
 				m_Player->SetStance( PacketData->m_Stance );
 				m_Player->SetTouchGround( PacketData->m_bFlying );
+				break;
 			}
-			break;
-		case E_BLOCK_DIG:
+			
+			case E_BLOCK_DIG:
 			{
-				
 				int LastActionCnt = m_Player->GetLastBlockActionCnt();
 				if ( (cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1 ) { //only allow block interactions every 0.1 seconds
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
@@ -670,7 +658,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						Kick("You're a baaaaaad boy!");
 						break;
 					}
-				} else {
+				}
+				else
+				{
 					m_Player->SetLastBlockActionCnt(0); //reset count 
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				}
@@ -685,23 +675,20 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				{
 					cWorld* World = m_Player->GetWorld();
 
-
 					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 
-
 					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (m_Player->GetGameMode() == 1) );
-					if(bBroken == false) bBroken = (m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS && OldBlock == E_BLOCK_LEAVES);
+					if (bBroken == false) bBroken = (m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS && OldBlock == E_BLOCK_LEAVES);
 
-					if(OldBlock == E_BLOCK_WOODEN_DOOR && !bBroken)
+					if (OldBlock == E_BLOCK_WOODEN_DOOR && !bBroken)
 					{
 						cDoors::ChangeDoor(m_Player->GetWorld(), PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
 					}
 
 					cItem PickupItem;
-					if( bBroken && !(m_Player->GetGameMode() == 1) ) // broken
+					if (bBroken && !(m_Player->GetGameMode() == 1) ) // broken
 					{
-						
 						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
 						PickupItem.m_ItemID = PickupID;
 						PickupItem.m_ItemHealth = MetaData;
@@ -778,11 +765,11 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						World->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
 					}
 				}
-			}
-			break;
-		case E_BLOCK_PLACE:
+				break;
+			}  // case E_BLOCK_DIG
+			
+			case E_BLOCK_PLACE:
 			{
-
 				int LastActionCnt = m_Player->GetLastBlockActionCnt();
 				if ( (cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1 ) { //only allow block interactions every 0.1 seconds
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
@@ -792,7 +779,9 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						Kick("You're a baaaaaad boy!");
 						break;
 					}
-				} else {
+				}
+				else
+				{
 					m_Player->SetLastBlockActionCnt(0); //reset count 
 					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
 				}
@@ -800,15 +789,15 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
 				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 
-				if( (Equipped.m_ItemID != PacketData->m_ItemType))	// Not valid
+				if ((Equipped.m_ItemID != PacketData->m_ItemType))	// Not valid
 				{
 					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername().c_str());
 					break;
 				}
 
-				if(cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_PLACE, 2, PacketData, m_Player ) )
+				if (cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_PLACE, 2, PacketData, m_Player ) )
 				{
-					if( PacketData->m_Direction > -1 )
+					if (PacketData->m_Direction > -1)
 					{
 						AddDirection( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction );
 						m_Player->GetWorld()->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
@@ -1235,9 +1224,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					}
 				}
 				*/
-			}
-			break;
-		case E_PICKUP_SPAWN:
+				break;
+			}  // case E_BLOCK_PLACE
+			
+			case E_PICKUP_SPAWN:
 			{
 				LOG("Received packet E_PICKUP_SPAWN");
 				cPacket_PickupSpawn* PacketData = reinterpret_cast<cPacket_PickupSpawn*>(a_Packet);
@@ -1251,28 +1241,31 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cPickup* Pickup = new cPickup( PacketData );
 					Pickup->Initialize( m_Player->GetWorld() );
 				}
-			}
-			break;
-		case E_CHAT:
+				break;
+			}  // case E_PICKUP_SPAWN
+			
+			case E_CHAT:
 			{
 				cPacket_Chat* PacketData = reinterpret_cast<cPacket_Chat*>(a_Packet);
-				if( !cRoot::Get()->GetServer()->Command( *this, PacketData->m_Message.c_str() ) )
+				if (!cRoot::Get()->GetServer()->Command( *this, PacketData->m_Message.c_str()))
 				{
-					PacketData->m_Message.insert( 0, "<"+m_Player->GetColor() + m_pState->Username + cChatColor::White + "> " );
+					PacketData->m_Message.insert( 0, "<" + m_Player->GetColor() + mUsername + cChatColor::White + "> " );
 					cRoot::Get()->GetServer()->Broadcast( *PacketData );
 				}
-			}
-			break;
-		case E_PLAYERLOOK:
+				break;
+			}  // case E_CHAT
+			
+			case E_PLAYERLOOK:
 			{
 				cPacket_PlayerLook* PacketData = reinterpret_cast<cPacket_PlayerLook*>(a_Packet);
 				m_Player->SetRotation( PacketData->m_Rotation );
 				m_Player->SetPitch( PacketData->m_Pitch );
 				m_Player->SetTouchGround( PacketData->m_bFlying );
 				m_Player->WrapRotation();
-			}
-			break;
-		case E_PLAYERMOVELOOK:
+				break;
+			}  // case E_PLAYERLOOK
+			
+			case E_PLAYERMOVELOOK:
 			{
 				cPacket_PlayerMoveLook* PacketData = reinterpret_cast<cPacket_PlayerMoveLook*>(a_Packet);
 				m_Player->MoveTo( Vector3d( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ ) );
@@ -1281,16 +1274,18 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				m_Player->SetRotation( PacketData->m_Rotation );
 				m_Player->SetPitch( PacketData->m_Pitch );
 				m_Player->WrapRotation();
-			}
-			break;
-		case E_ANIMATION:
+				break;
+			}  // case E_PLAYERMOVELOOK
+			
+			case E_ANIMATION:
 			{
 				cPacket_ArmAnim* PacketData = reinterpret_cast<cPacket_ArmAnim*>(a_Packet);
 				PacketData->m_EntityID = m_Player->GetUniqueID();
 				cRoot::Get()->GetServer()->Broadcast( *PacketData, this );
-			}
-			break;
-		case E_ITEM_SWITCH:
+				break;
+			}  // case E_ANIMATION
+			
+			case E_ITEM_SWITCH:
 			{
 				cPacket_ItemSwitch* PacketData = reinterpret_cast<cPacket_ItemSwitch*>(a_Packet);
 
@@ -1301,21 +1296,17 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				Equipment.m_Slot = 0;
 				Equipment.m_UniqueID = m_Player->GetUniqueID();
 				cRoot::Get()->GetServer()->Broadcast( Equipment, this );
-			}
-			break;
-		case E_WINDOW_CLOSE:
+				break;
+			}  // case E_ITEM_SWITCH
+			
+			case E_WINDOW_CLOSE:
 			{
 				cPacket_WindowClose* PacketData = reinterpret_cast<cPacket_WindowClose*>(a_Packet);
 				m_Player->CloseWindow(PacketData->m_Close);
-				/*
-				if( PacketData->m_Close > 0 ) // Don't care about closing inventory
-				{
-					m_Player->CloseWindow();
-				}
-				*/
-			}
-			break;
-		case E_WINDOW_CLICK:
+				break;
+			}  // case E_WINDOW_CLOSE
+			
+			case E_WINDOW_CLICK:
 			{
 				cPacket_WindowClick* PacketData = reinterpret_cast<cPacket_WindowClick*>(a_Packet);
 				if( PacketData->m_WindowID == 0 )
@@ -1328,9 +1319,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					if( Window ) Window->Clicked( PacketData, *m_Player );
 					else LOG("No 'other' window! WTF");
 				}
-			}
-			break;
-		case E_UPDATE_SIGN:
+				break;
+			}  // case E_WINDOW_CLICK
+			
+			case E_UPDATE_SIGN:
 			{
 				cPacket_UpdateSign* PacketData = reinterpret_cast<cPacket_UpdateSign*>(a_Packet);
 				cWorld* World = m_Player->GetWorld();
@@ -1342,9 +1334,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					Sign->SetLines( PacketData->m_Line1, PacketData->m_Line2, PacketData->m_Line3, PacketData->m_Line4 );
 					Sign->SendTo( 0 ); // Broadcast to all players in chunk
 				}
-			}
-			break;
-		case E_USE_ENTITY:
+				break;
+			}  // case E_UPDATE_SIGN
+			
+			case E_USE_ENTITY:
 			{
 				cPacket_UseEntity* PacketData = reinterpret_cast<cPacket_UseEntity*>(a_Packet);
 				if( PacketData->m_bLeftClick )
@@ -1357,27 +1350,30 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 						Pawn->TakeDamage( 1, m_Player );
 					}
 				}
-			}
-			break;
-		case E_RESPAWN:
+				break;
+			}  // case E_USE_ENTITY
+			
+			case E_RESPAWN:
 			{
 				m_Player->Respawn();
-			}
-			break;
-		case E_DISCONNECT:
+				break;
+			}  // case E_RESPAWN
+			
+			case E_DISCONNECT:
 			{
-				LOG("Received d/c packet from %s", GetUsername().c_str());
+				LOG("Received d/c packet from \"%s\"", GetUsername().c_str());
 				cPacket_Disconnect* PacketData = reinterpret_cast<cPacket_Disconnect*>(a_Packet);
 				if( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_DISCONNECT, 2, PacketData->m_Reason.c_str(), m_Player ) )
 				{
-					cPacket_Chat DisconnectMessage( m_pState->Username + " disconnected: " + PacketData->m_Reason );
+					cPacket_Chat DisconnectMessage(mUsername + " disconnected: " + PacketData->m_Reason);
 					cRoot::Get()->GetServer()->Broadcast( DisconnectMessage );
 				}
 				Destroy();
 				return;
-			}
-			break;
-		case E_KEEP_ALIVE:
+				break;
+			}  // case E_DISCONNECT
+			
+			case E_KEEP_ALIVE:
 			{
 				cPacket_KeepAlive *PacketData = reinterpret_cast<cPacket_KeepAlive*>(a_Packet);
 				if (PacketData->m_KeepAliveID == m_PingID)
@@ -1385,12 +1381,10 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 					cTimer t1;
 					m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
 				}
-			}
-			break;
-			default:
 				break;
-		}
-	}
+			}  // case E_KEEP_ALIVE
+		}  // switch (Packet type)
+	}  // if (normal game)
 }
 
 
@@ -1400,19 +1394,21 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 void cClientHandle::Tick(float a_Dt)
 {
 	(void)a_Dt;
-	if( cWorld::GetTime() - m_TimeLastPacket > 30.f ) // 30 seconds time-out
+	if (cWorld::GetTime() - m_TimeLastPacket > 30.f)  // 30 seconds time-out
 	{
 		cPacket_Disconnect DC("Nooooo!! You timed out! D: Come back!");
-		DC.Send( m_pState->Socket );
+		DC.Send(mSocket);
 
-		cSleep::MilliSleep( 1000 ); // Give packet some time to be received
+		cSleep::MilliSleep(1000);  // Give packet some time to be received
 
 		Destroy();
 	}
 	
 	cTimer t1;
 	// Send ping packet
-	if (m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()) {
+	if (m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
+	{
+		// TODO: why a random ping ID, can't we just use normal ascending numbers?
 		MTRand r1;
 		m_PingID = r1.randInt();
 		cPacket_KeepAlive Ping(m_PingID);
@@ -1421,7 +1417,7 @@ void cClientHandle::Tick(float a_Dt)
 		m_LastPingTime = m_PingStartTime;
 	}
 
-	if( m_bSendLoginResponse )
+	if (m_bSendLoginResponse)
 	{
 		m_bSendLoginResponse = false;
 
@@ -1433,7 +1429,7 @@ void cClientHandle::Tick(float a_Dt)
 		World->LockEntities();
 		m_Player->LoginSetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
 
-		m_Player->SetIP ( m_pState->Socket.GetIPString() );
+		m_Player->SetIP (mSocket.GetIPString());
 
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player );
 
@@ -1481,18 +1477,18 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 	if( m_bKicking ) return; // Don't add more packets if player is getting kicked anyway
 
 	bool bSignalSemaphore = true;
-	m_pState->SendCriticalSection.Lock();
-	if( a_Priority == E_PRIORITY_NORMAL )
+	cCSLock Lock(mSendCriticalSection);
+	if (a_Priority == E_PRIORITY_NORMAL)
 	{
-		if( a_Packet.m_PacketID == E_REL_ENT_MOVE_LOOK )
+		if (a_Packet.m_PacketID == E_REL_ENT_MOVE_LOOK)
 		{
-			PacketList & Packets = m_pState->PendingNrmSendPackets;
-			for( std::list<cPacket*>::iterator itr = Packets.begin(); itr != Packets.end(); ++itr )
+			PacketList & Packets = mPendingNrmSendPackets;
+			for (PacketList::iterator itr = Packets.begin(); itr != Packets.end(); ++itr)
 			{
 				bool bBreak = false;
-				switch( (*itr)->m_PacketID )
+				switch ((*itr)->m_PacketID)
 				{
-				case E_REL_ENT_MOVE_LOOK:
+					case E_REL_ENT_MOVE_LOOK:
 					{
 						const cPacket_RelativeEntityMoveLook* ThisPacketData = reinterpret_cast< const cPacket_RelativeEntityMoveLook* >(&a_Packet);
 						cPacket_RelativeEntityMoveLook* PacketData = reinterpret_cast< cPacket_RelativeEntityMoveLook* >(*itr);
@@ -1505,21 +1501,26 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 							delete PacketData;
 							break;
 						}
-					}
-					break;
-				default:
+						break;
+					}  // case E_REL_END_MOVE_LOOK
+				}  // switch (*itr -> Packet type)
+				if (bBreak)
+				{
 					break;
 				}
-				if( bBreak )
-					break;
-			}
-		}
-		m_pState->PendingNrmSendPackets.push_back( a_Packet.Clone() );
+			}  // for itr - Packets[]
+		}  // if (E_REL_ENT_MOVE_LOOK
+		mPendingNrmSendPackets.push_back(a_Packet.Clone());
 	}
-	else if( a_Priority == E_PRIORITY_LOW ) m_pState->PendingLowSendPackets.push_back( a_Packet.Clone() );
-	m_pState->SendCriticalSection.Unlock();
-	if( bSignalSemaphore )
-		m_pState->pSemaphore->Signal();
+	else if( a_Priority == E_PRIORITY_LOW )
+	{
+		mPendingLowSendPackets.push_back( a_Packet.Clone() );
+	}
+	Lock.Unlock();
+	if (bSignalSemaphore)
+	{
+		mSemaphore.Signal();
+	}
 }
 
 
@@ -1529,71 +1530,73 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 void cClientHandle::SendThread( void *lpParam )
 {
 	cClientHandle* self = (cClientHandle*)lpParam;
-	sClientHandleState* m_pState = self->m_pState;
-	PacketList & NrmSendPackets = m_pState->PendingNrmSendPackets;
-	PacketList & LowSendPackets = m_pState->PendingLowSendPackets;
+	PacketList & NrmSendPackets = self->mPendingNrmSendPackets;
+	PacketList & LowSendPackets = self->mPendingLowSendPackets;
 
 
-	while( self->m_bKeepThreadGoing && m_pState->Socket )
+	while (self->m_bKeepThreadGoing && self->mSocket.IsValid())
 	{
-		m_pState->pSemaphore->Wait();
-		m_pState->SendCriticalSection.Lock();
-		//LOG("Pending packets: %i", m_PendingPackets.size() );
-		if( NrmSendPackets.size() + LowSendPackets.size() > MAX_SEMAPHORES )
+		self->mSemaphore.Wait();
+		cCSLock Lock(self->mSendCriticalSection);
+		if (NrmSendPackets.size() + LowSendPackets.size() > MAX_SEMAPHORES)
 		{
-			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->GetUsername().c_str());
+			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->mUsername.c_str());
 			cPacket_Disconnect DC("Too many packets in queue.");
-			DC.Send( m_pState->Socket );
+			DC.Send(self->mSocket);
 
 			cSleep::MilliSleep( 1000 ); // Give packet some time to be received
 
+			Lock.Unlock();
 			self->Destroy();
-			m_pState->SendCriticalSection.Unlock();
 			break;
 		}
-		if( NrmSendPackets.size() == 0 && LowSendPackets.size() == 0 )
+		
+		if (NrmSendPackets.size() == 0 && LowSendPackets.size() == 0)
 		{
-			if( self->m_bKeepThreadGoing ) LOGERROR("ERROR: Semaphore was signaled while PendingSendPackets.size == 0");
-			m_pState->SendCriticalSection.Unlock();
+			assert(!self->m_bKeepThreadGoing);
+			if (self->m_bKeepThreadGoing)
+			{
+				LOGERROR("ERROR: Semaphore was signaled while no packets to send");
+			}
 			continue;
 		}
-		if( NrmSendPackets.size() > MAX_SEMAPHORES/2 )
+		if (NrmSendPackets.size() > MAX_SEMAPHORES / 2)
 		{
 			LOGINFO("Pending packets: %i Last: 0x%02x", NrmSendPackets.size(), (*NrmSendPackets.rbegin())->m_PacketID );
 		}
 
-		cPacket* Packet = 0;
-		if( NrmSendPackets.size() > 0 )
+		cPacket * Packet = NULL;
+		if (!NrmSendPackets.empty())
 		{
 			Packet = *NrmSendPackets.begin();
 			NrmSendPackets.erase( NrmSendPackets.begin() );
 		}
-		else if( LowSendPackets.size() > 0 )
+		else if (!LowSendPackets.empty())
 		{
 			Packet = *LowSendPackets.begin();
 			LowSendPackets.erase( LowSendPackets.begin() );
 		}
-		m_pState->SendCriticalSection.Unlock();
+		Lock.Unlock();
 
-		m_pState->SocketCriticalSection.Lock();
-		if( !m_pState->Socket )
+		cCSLock SocketLock(self->mSocketCriticalSection);
+		if (!self->mSocket.IsValid())
 		{
-			m_pState->SocketCriticalSection.Unlock();
 			break;
 		}
-		//LOG("Send packet: 0x%2x", Packet->m_PacketID );
-		bool bSuccess = Packet->Send( m_pState->Socket );
-		m_pState->SocketCriticalSection.Unlock();
-		if( !bSuccess )
+
+		bool bSuccess = Packet->Send(self->mSocket);
+		SocketLock.Unlock();
+		
+		if (!bSuccess)
 		{
-			LOGERROR("ERROR: While sending packet 0x%02x", Packet->m_PacketID );
+			LOGERROR("ERROR: While sending packet 0x%02x to client \"%s\"", Packet->m_PacketID, self->mUsername.c_str());
 			delete Packet;
 			self->Destroy();
 			break;
 		}
 		delete Packet;
 
-		if( self->m_bKicking && (NrmSendPackets.size() + LowSendPackets.size() == 0) ) // Disconnect player after all packets have been sent
+		if (self->m_bKicking && (NrmSendPackets.size() + LowSendPackets.size() == 0) ) // Disconnect player after all packets have been sent
 		{
 			cSleep::MilliSleep( 1000 ); // Give all packets some time to be received
 			self->Destroy();
@@ -1630,26 +1633,24 @@ void cClientHandle::ReceiveThread( void *lpParam )
 		}
 		else
 		{
-			//LOG("Recv packet: 0x%2x", (unsigned char)temp );
-			cPacket* pPacket = self->m_pState->PacketMap[ (unsigned char)temp ];
-			if( pPacket )
+			cPacket* pPacket = self->mPacketMap[(unsigned char)temp];
+			if (pPacket)
 			{
-				if( pPacket->Parse( socket ) )
+				if (pPacket->Parse(socket))
 				{
-					self->AddPacket( pPacket );
+					self->AddPacket(pPacket);
 					//self->HandlePendingPackets();
 				}
 				else
 				{
 					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetLastErrorString() );
-					LOG("CLIENT %s DISCONNECTED", self->GetUsername().c_str());
+					LOG("CLIENT %s DISCONNECTED", self->mUsername.c_str());
 					break;
 				}
 			}
 			else
 			{
 				LOG("Unknown packet: 0x%02x \'%c\' %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp );
-
 
 				AString Reason;
 				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp );
@@ -1674,7 +1675,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 
 const AString & cClientHandle::GetUsername(void) const
 {
-	return m_pState->Username;
+	return mUsername;
 }
 
 
@@ -1683,7 +1684,7 @@ const AString & cClientHandle::GetUsername(void) const
 
 const cSocket & cClientHandle::GetSocket()
 {
-	return m_pState->Socket;
+	return mSocket;
 }
 
 

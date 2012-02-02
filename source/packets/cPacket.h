@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "../cSocket.h"
@@ -7,7 +8,6 @@
 
 
 
-class cSocket;
 class cPacket
 {
 public:
@@ -52,6 +52,9 @@ public:
 	static int SendData( cSocket & a_Socket, const char* a_Message, unsigned int a_Size, int a_Options );
 	static int RecvAll( cSocket & a_Socket, char* a_Data, unsigned int a_Size, int a_Options );
 };
+
+typedef std::list <cPacket*>  PacketList;
+typedef std::deque<cPacket *> PacketQueue;
 
 
 

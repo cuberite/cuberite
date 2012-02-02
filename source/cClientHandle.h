@@ -1,13 +1,32 @@
-#pragma once
 
-class cSocket;
-class cSemaphore;
-class cEvent;
-class Game;
-class cPacket;
+// cClientHandle.h
+
+// Interfaces to the cClientHandle class representing a client connected to this server. The client need not be a player yet
+
+
+
+
+
+#pragma once
+#ifndef CCLIENTHANDLE_H_INCLUDED
+#define CCLIENTHANDLE_H_INCLUDED
+
+#include "Packets/cPacket.h"
+#include "Vector3d.h"
+
+
+
+
+
+// class Game;
 class cChunk;
 class cPlayer;
 class cRedstone;
+
+
+
+
+
 class cClientHandle							// tolua_export
 {											// tolua_export
 public:
@@ -22,7 +41,7 @@ public:
 	cClientHandle(const cSocket & a_Socket);
 	~cClientHandle();
 
-	static const int VIEWDISTANCE = 15; // MUST be odd number or CRASH!
+	static const int VIEWDISTANCE = 17; // MUST be odd number or CRASH!
 	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight.
 
 	const cSocket & GetSocket();
@@ -62,12 +81,31 @@ private:
 
 	void SendLoginResponse();
 
-	struct sClientHandleState;
-	sClientHandleState* m_pState;
+	int mProtocolVersion;
+	AString mUsername;
+	AString mPassword;
 
-	bool m_bDestroyed;
-	cPlayer* m_Player;
-	bool m_bKicking;
+	PacketList mPendingParsePackets;
+	PacketList mPendingNrmSendPackets;
+	PacketList mPendingLowSendPackets;
+
+	cThread* pReceiveThread;
+	cThread* pSendThread;
+
+	cSocket mSocket;
+
+	cCriticalSection mCriticalSection;
+	cCriticalSection mSendCriticalSection;
+	cCriticalSection mSocketCriticalSection;
+	cSemaphore       mSemaphore;
+
+	Vector3d mConfirmPosition;
+
+	cPacket * mPacketMap[256];
+
+	bool      m_bDestroyed;
+	cPlayer * m_Player;
+	bool      m_bKicking;
 
 	float m_TimeLastPacket;
 
@@ -83,3 +121,12 @@ private:
 
 	bool m_bKeepThreadGoing;
 };										// tolua_export
+
+
+
+
+#endif  // CCLIENTHANDLE_H_INCLUDED
+
+
+
+

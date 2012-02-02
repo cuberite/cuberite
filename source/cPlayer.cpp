@@ -158,16 +158,17 @@ void cPlayer::SpawnOn( cClientHandle* a_Target )
 void cPlayer::Tick(float a_Dt)
 {
 	cChunk* InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if( !InChunk ) return;
+	if ( !InChunk ) return;
 
 	cPawn::Tick(a_Dt);
 
-	if(m_bDirtyOrientation && !m_bDirtyPosition)
+	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		cPacket_EntityLook EntityLook( this );
 		InChunk->Broadcast( EntityLook, m_ClientHandle );
 		m_bDirtyOrientation = false;
-	} else if(m_bDirtyPosition )
+	}
+	else if(m_bDirtyPosition )
 	{
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_MOVE, 1, this );
 
@@ -242,12 +243,14 @@ void cPlayer::Tick(float a_Dt)
 	
 	cTimer t1;
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
-	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime()) {
+	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
+	{
 		cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
 		{
-			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-				cPacket_PlayerListItem PlayerListItem(GetColor() + GetName(), true, GetClientHandle()->GetPing());
+			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed()))
+			{
+				cPacket_PlayerListItem PlayerListItem(GetColor() + m_pState->PlayerName, true, GetClientHandle()->GetPing());
 				(*itr)->GetClientHandle()->Send( PlayerListItem );
 			}
 		}
