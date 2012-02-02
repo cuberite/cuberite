@@ -11,9 +11,19 @@
 #
 
 CC = /usr/bin/g++
+
+# _X: These settings produce a debug build, with gdb symbols:
+# CC_OPTIONS = -s -ggdb
+# CCE_OPTIONS = -s -x c -ggdb
+# LNK_OPTIONS = -lstdc++ -pthread -ggdb
+
+
+# _X: these settings should be used for the release build:
 CC_OPTIONS = -s -O3
 CCE_OPTIONS = -s -x c -O3
 LNK_OPTIONS = -lstdc++ -pthread -O3
+
+
 
 
 #
