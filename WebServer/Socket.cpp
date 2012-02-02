@@ -127,7 +127,7 @@ void Socket::Close( bool a_WaitSend /* = false */ )
 		{
 			assert( shutdown(s_, SD_SEND ) == 0 );
 			char c;
-			while( recv(s_, &c, 1, 0 ) != 0 )
+			while( recv(s_, &c, 1, 0 ) > 0 )
 			{}
 		}
 
