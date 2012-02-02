@@ -35,7 +35,7 @@ cBlockingTCPLink::~cBlockingTCPLink()
 
 void cBlockingTCPLink::CloseSocket()
 {
-	if (m_Socket.IsValid())
+	if (!m_Socket.IsValid())
 	{
 		m_Socket.CloseSocket();
 	}

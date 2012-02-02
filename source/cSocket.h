@@ -10,7 +10,7 @@ class cSocket
 	typedef SOCKET xSocket;
 #else
 	typedef int xSocket;
-	static const int INVALID_SOCKET = 0;
+	static const int INVALID_SOCKET = -1;
 #endif
 
 public:
@@ -18,7 +18,7 @@ public:
 	cSocket(xSocket a_Socket);
 	~cSocket();
 
-	bool IsValid(void) const {return (m_Socket != INVALID_SOCKET); }
+	bool IsValid(void) const;
 	void CloseSocket();
 
 	operator const xSocket() const;

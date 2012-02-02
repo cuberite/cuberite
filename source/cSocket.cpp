@@ -52,16 +52,40 @@ cSocket::xSocket cSocket::GetSocket() const
 
 
 
+bool cSocket::IsValid(void) const
+{
+	#ifdef _WIN32
+	return (m_Socket != INVALID_SOCKET);
+	#else  // _WIN32
+	return (m_Socket >= 0);
+	#endif  // else _WIN32
+}
+
+
+
+
+
 void cSocket::CloseSocket()
 {
-#ifdef _WIN32
+	#ifdef _WIN32
+	
 	closesocket(m_Socket);
-#else
+	
+	#else  // _WIN32
+	
 	if( shutdown(m_Socket, SHUT_RDWR) != 0 )//SD_BOTH);
+	{
 		LOGWARN("Error on shutting down socket (%s)", m_IPString.c_str() );
+	}
 	if( close(m_Socket) != 0 )
+	{
 		LOGWARN("Error closing socket (%s)", m_IPString.c_str() );
-#endif
+	}
+	
+	#endif  // else _WIN32
+
+	// Invalidate the socket so that this object can be re-used for another connection
+	m_Socket = INVALID_SOCKET;
 }
 
 
