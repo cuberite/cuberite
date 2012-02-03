@@ -14,6 +14,33 @@
 #include "Packets/cPacket.h"
 #include "Vector3d.h"
 
+#include "packets/cPacket_KeepAlive.h"
+#include "packets/cPacket_PlayerPosition.h"
+#include "packets/cPacket_Respawn.h"
+#include "packets/cPacket_RelativeEntityMoveLook.h"
+#include "packets/cPacket_Chat.h"
+#include "packets/cPacket_Login.h"
+#include "packets/cPacket_WindowClick.h"
+#include "packets/cPacket_PlayerMoveLook.h"
+#include "packets/cPacket_TimeUpdate.h"
+#include "packets/cPacket_BlockDig.h"
+#include "packets/cPacket_Handshake.h"
+#include "packets/cPacket_PlayerLook.h"
+#include "packets/cPacket_ArmAnim.h"
+#include "packets/cPacket_BlockPlace.h"
+#include "packets/cPacket_Flying.h"
+#include "packets/cPacket_Disconnect.h"
+#include "packets/cPacket_PickupSpawn.h"
+#include "packets/cPacket_ItemSwitch.h"
+#include "packets/cPacket_EntityEquipment.h"
+#include "packets/cPacket_CreativeInventoryAction.h"
+#include "packets/cPacket_NewInvalidState.h"
+#include "packets/cPacket_UseEntity.h"
+#include "packets/cPacket_WindowClose.h"
+#include "packets/cPacket_UpdateSign.h"
+#include "packets/cPacket_Ping.h"
+#include "packets/cPacket_PlayerListItem.h"
+
 
 
 
@@ -75,33 +102,30 @@ public:
 	const AString & GetUsername(void) const;
 	
 	inline short GetPing() { return m_Ping; }
+
 private:
-	void HandlePacket( cPacket* a_Packet );
-	void RemovePacket( cPacket * a_Packet );
 
-	void SendLoginResponse();
+	int m_ProtocolVersion;
+	AString m_Username;
+	AString m_Password;
 
-	int mProtocolVersion;
-	AString mUsername;
-	AString mPassword;
+	PacketList m_PendingParsePackets;
+	PacketList m_PendingNrmSendPackets;
+	PacketList m_PendingLowSendPackets;
 
-	PacketList mPendingParsePackets;
-	PacketList mPendingNrmSendPackets;
-	PacketList mPendingLowSendPackets;
+	cThread * m_pReceiveThread;
+	cThread * m_pSendThread;
 
-	cThread* pReceiveThread;
-	cThread* pSendThread;
+	cSocket m_Socket;
 
-	cSocket mSocket;
+	cCriticalSection m_CriticalSection;
+	cCriticalSection m_SendCriticalSection;
+	cCriticalSection m_SocketCriticalSection;
+	cSemaphore       m_Semaphore;
 
-	cCriticalSection mCriticalSection;
-	cCriticalSection mSendCriticalSection;
-	cCriticalSection mSocketCriticalSection;
-	cSemaphore       mSemaphore;
+	Vector3d m_ConfirmPosition;
 
-	Vector3d mConfirmPosition;
-
-	cPacket * mPacketMap[256];
+	cPacket * m_PacketMap[256];
 
 	bool      m_bDestroyed;
 	cPlayer * m_Player;
@@ -110,7 +134,7 @@ private:
 	float m_TimeLastPacket;
 
 	short m_Ping;
-	int m_PingID;
+	int   m_PingID;
 	long long m_PingStartTime;
 	long long m_LastPingTime;
 	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
@@ -120,6 +144,42 @@ private:
 	bool m_bSendLoginResponse;
 
 	bool m_bKeepThreadGoing;
+
+	void HandlePacket(cPacket * a_Packet);
+	
+	// Packets handled while !m_bLoggedIn:
+	void HandlePing         (void);
+	void HandleHandshake    (cPacket_Handshake *      a_Packet);
+	void HandleLogin        (cPacket_Login *          a_Packet);
+	void HandleMoveLookLogin(cPacket_PlayerMoveLook * a_Packet);  // While !m_bLoggedIn
+	void HandleDefaultLogin (cPacket *                a_Packet);  // the default case
+	
+	// Packets handled while !m_bPositionConfirmed:
+	void HandleMoveLookConfirm(cPacket_PlayerMoveLook * a_Packet);  // While !m_bPositionConfirmed
+	
+	// Packets handled while m_bPositionConfirmed (normal gameplay):
+	void HandleCreativeInventory(cPacket_CreativeInventoryAction * a_Packet);
+	void HandlePlayerPos        (cPacket_PlayerPosition *          a_Packet);
+	void HandleBlockDig         (cPacket_BlockDig *                a_Packet);
+	void HandleBlockPlace       (cPacket_BlockPlace *              a_Packet);
+	void HandlePickupSpawn      (cPacket_PickupSpawn *             a_Packet);
+	void HandleChat             (cPacket_Chat *                    a_Packet);
+	void HandlePlayerLook       (cPacket_PlayerLook *              a_Packet);
+	void HandlePlayerMoveLook   (cPacket_PlayerMoveLook *          a_Packet);  // While m_bPositionConfirmed (normal gameplay)
+	void HandleAnimation        (cPacket_ArmAnim *                 a_Packet);
+	void HandleItemSwitch       (cPacket_ItemSwitch *              a_Packet);
+	void HandleWindowClose      (cPacket_WindowClose *             a_Packet);
+	void HandleWindowClick      (cPacket_WindowClick *             a_Packet);
+	void HandleUpdateSign       (cPacket_UpdateSign *              a_Packet);
+	void HandleUseEntity        (cPacket_UseEntity *               a_Packet);
+	void HandleRespawn          (void);
+	void HandleDisconnect       (cPacket_Disconnect *              a_Packet);
+	void HandleKeepAlive        (cPacket_KeepAlive *               a_Packet);
+
+	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
+	bool CheckBlockInteractionsRate(void);
+	
+	void SendLoginResponse();
 };										// tolua_export
 
 

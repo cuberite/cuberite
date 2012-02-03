@@ -69,7 +69,7 @@
 #include "packets/cPacket_PlayerListItem.h"
 
 
-#define AddPistonDir( x, y, z, dir, amount ) switch(dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
+#define AddPistonDir(x, y, z, dir, amount) switch (dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
 													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
 													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
 
@@ -90,20 +90,20 @@ extern std::string GetWSAError();
 // cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket & a_Socket)
-	: mProtocolVersion( 23 )
-	, pReceiveThread(NULL)
-	, pSendThread(NULL)
-	, mSocket(a_Socket)
-	, mSemaphore(MAX_SEMAPHORES)
-	, m_bDestroyed( false )
+	: m_ProtocolVersion(23)
+	, m_pReceiveThread(NULL)
+	, m_pSendThread(NULL)
+	, m_Socket(a_Socket)
+	, m_Semaphore(MAX_SEMAPHORES)
+	, m_bDestroyed(false)
 	, m_Player(NULL)
-	, m_bKicking( false )
-	, m_TimeLastPacket( cWorld::GetTime() )
-	, m_bLoggedIn( false )
-	, m_bKeepThreadGoing( true )
-	, m_bSendLoginResponse( false )
+	, m_bKicking(false)
+	, m_TimeLastPacket(cWorld::GetTime())
+	, m_bLoggedIn(false)
+	, m_bKeepThreadGoing(true)
+	, m_bSendLoginResponse(false)
 	, m_Ping(1000)
-	, m_bPositionConfirmed( false )
+	, m_bPositionConfirmed(false)
 {
 	LOG("cClientHandle::cClientHandle");
 	
@@ -111,45 +111,45 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	m_LastPingTime = t1.GetNowTime();
 
 	// All the packets that can be received from the client
-	for (int i = 0; i < ARRAYCOUNT(mPacketMap); ++i)
+	for (int i = 0; i < ARRAYCOUNT(m_PacketMap); ++i)
 	{
-		mPacketMap[i] = NULL;
+		m_PacketMap[i] = NULL;
 	}
-	mPacketMap[E_KEEP_ALIVE]                = new cPacket_KeepAlive;
-	mPacketMap[E_HANDSHAKE]                 = new cPacket_Handshake;
-	mPacketMap[E_LOGIN]                     = new cPacket_Login;
-	mPacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
-	mPacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
-	mPacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
-	mPacketMap[E_CHAT]                      = new cPacket_Chat;
-	mPacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
-	mPacketMap[E_FLYING]                    = new cPacket_Flying;
-	mPacketMap[E_BLOCK_DIG]                 = new cPacket_BlockDig;
-	mPacketMap[E_BLOCK_PLACE]               = new cPacket_BlockPlace;
-	mPacketMap[E_DISCONNECT]                = new cPacket_Disconnect;
-	mPacketMap[E_ITEM_SWITCH]               = new cPacket_ItemSwitch;
-	mPacketMap[E_ENTITY_EQUIPMENT]          = new cPacket_EntityEquipment;
-	mPacketMap[E_CREATIVE_INVENTORY_ACTION] = new cPacket_CreativeInventoryAction;
-	mPacketMap[E_NEW_INVALID_STATE]         = new cPacket_NewInvalidState;
-	mPacketMap[E_PICKUP_SPAWN]              = new cPacket_PickupSpawn;
-	mPacketMap[E_USE_ENTITY]                = new cPacket_UseEntity;
-	mPacketMap[E_WINDOW_CLOSE]              = new cPacket_WindowClose;
-	mPacketMap[E_WINDOW_CLICK]              = new cPacket_WindowClick;
-	mPacketMap[E_PACKET_13]                 = new cPacket_13;
-	mPacketMap[E_UPDATE_SIGN]               = new cPacket_UpdateSign;
-	mPacketMap[E_RESPAWN]                   = new cPacket_Respawn;
-	mPacketMap[E_PING]                      = new cPacket_Ping;
+	m_PacketMap[E_KEEP_ALIVE]                = new cPacket_KeepAlive;
+	m_PacketMap[E_HANDSHAKE]                 = new cPacket_Handshake;
+	m_PacketMap[E_LOGIN]                     = new cPacket_Login;
+	m_PacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
+	m_PacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
+	m_PacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
+	m_PacketMap[E_CHAT]                      = new cPacket_Chat;
+	m_PacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
+	m_PacketMap[E_FLYING]                    = new cPacket_Flying;
+	m_PacketMap[E_BLOCK_DIG]                 = new cPacket_BlockDig;
+	m_PacketMap[E_BLOCK_PLACE]               = new cPacket_BlockPlace;
+	m_PacketMap[E_DISCONNECT]                = new cPacket_Disconnect;
+	m_PacketMap[E_ITEM_SWITCH]               = new cPacket_ItemSwitch;
+	m_PacketMap[E_ENTITY_EQUIPMENT]          = new cPacket_EntityEquipment;
+	m_PacketMap[E_CREATIVE_INVENTORY_ACTION] = new cPacket_CreativeInventoryAction;
+	m_PacketMap[E_NEW_INVALID_STATE]         = new cPacket_NewInvalidState;
+	m_PacketMap[E_PICKUP_SPAWN]              = new cPacket_PickupSpawn;
+	m_PacketMap[E_USE_ENTITY]                = new cPacket_UseEntity;
+	m_PacketMap[E_WINDOW_CLOSE]              = new cPacket_WindowClose;
+	m_PacketMap[E_WINDOW_CLICK]              = new cPacket_WindowClick;
+	m_PacketMap[E_PACKET_13]                 = new cPacket_13;
+	m_PacketMap[E_UPDATE_SIGN]               = new cPacket_UpdateSign;
+	m_PacketMap[E_RESPAWN]                   = new cPacket_Respawn;
+	m_PacketMap[E_PING]                      = new cPacket_Ping;
 
 	memset(m_LoadedChunks, 0x00, sizeof(m_LoadedChunks));
 
 	//////////////////////////////////////////////////////////////////////////
-	pReceiveThread = new cThread( ReceiveThread, this, "cClientHandle::ReceiveThread" );
-	pSendThread = new cThread( SendThread, this, "cClientHandle::SendThread" );
-	pReceiveThread->Start( true );
-	pSendThread->Start( true );
+	m_pReceiveThread = new cThread(ReceiveThread, this, "cClientHandle::ReceiveThread");
+	m_pSendThread    = new cThread(SendThread,    this, "cClientHandle::SendThread");
+	m_pReceiveThread->Start(true);
+	m_pSendThread->Start   (true);
 	//////////////////////////////////////////////////////////////////////////
 
-	LOG("New ClientHandle" );
+	LOG("New ClientHandle");
 }
 
 
@@ -158,62 +158,62 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 
 cClientHandle::~cClientHandle()
 {
-	LOG("Deleting client %s", GetUsername().c_str() );
+	LOG("Deleting client %s", GetUsername().c_str());
 
 	for(unsigned int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)
 	{
-		if( m_LoadedChunks[i] ) m_LoadedChunks[i]->RemoveClient( this );
+		if (m_LoadedChunks[i]) m_LoadedChunks[i]->RemoveClient(this);
 	}
 
 	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
+	for(cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
 	{
 		if ((*itr) && (*itr)->GetClientHandle() && !GetUsername().empty())
 		{
-			std::string NameColor = ( m_Player ? m_Player->GetColor() : "" );
+			std::string NameColor = (m_Player ? m_Player->GetColor() : "");
 			cPacket_PlayerListItem PlayerList(NameColor + GetUsername(), false, (short)9999);
 			(*itr)->GetClientHandle()->Send(PlayerList);
 		}
 	}
 	
-	if (mUsername.size() > 0)
+	if (m_Username.size() > 0)
 	{
-		cPacket_Chat Left(mUsername + " left the game!");
-		cRoot::Get()->GetServer()->Broadcast( Left, this );
+		cPacket_Chat Left(m_Username + " left the game!");
+		cRoot::Get()->GetServer()->Broadcast(Left, this);
 	}
 
 	// First stop sending thread
 	m_bKeepThreadGoing = false;
 
-	cCSLock Lock(mSocketCriticalSection);
-	if (mSocket.IsValid())
+	cCSLock Lock(m_SocketCriticalSection);
+	if (m_Socket.IsValid())
 	{
 		cPacket_Disconnect Disconnect;
 		Disconnect.m_Reason = "Server shut down? Kthnxbai";
-		Disconnect.Send(mSocket);
+		Disconnect.Send(m_Socket);
 
-		mSocket.CloseSocket();
+		m_Socket.CloseSocket();
 	}
 	Lock.Unlock();
 
-	mSemaphore.Signal();
-	delete pReceiveThread;
-	delete pSendThread;
+	m_Semaphore.Signal();
+	delete m_pReceiveThread;
+	delete m_pSendThread;
 
-	while (!mPendingParsePackets.empty())
+	while (!m_PendingParsePackets.empty())
 	{
-		delete *mPendingParsePackets.begin();
-		mPendingParsePackets.erase(mPendingParsePackets.begin());
+		delete *m_PendingParsePackets.begin();
+		m_PendingParsePackets.erase(m_PendingParsePackets.begin());
 	}
-	while (!mPendingNrmSendPackets.empty())
+	while (!m_PendingNrmSendPackets.empty())
 	{
-		delete *mPendingNrmSendPackets.begin();
-		mPendingNrmSendPackets.erase(mPendingNrmSendPackets.begin());
+		delete *m_PendingNrmSendPackets.begin();
+		m_PendingNrmSendPackets.erase(m_PendingNrmSendPackets.begin());
 	}
-	while (!mPendingLowSendPackets.empty())
+	while (!m_PendingLowSendPackets.empty())
 	{
-		delete *mPendingLowSendPackets.begin();
-		mPendingLowSendPackets.erase(mPendingLowSendPackets.begin());
+		delete *m_PendingLowSendPackets.begin();
+		m_PendingLowSendPackets.erase(m_PendingLowSendPackets.begin());
 	}
 	if (m_Player != NULL)
 	{
@@ -221,9 +221,9 @@ cClientHandle::~cClientHandle()
 		m_Player->Destroy();
 		m_Player = NULL;
 	}
-	for (int i = 0; i < ARRAYCOUNT(mPacketMap); i++)
+	for (int i = 0; i < ARRAYCOUNT(m_PacketMap); i++)
 	{
-		delete mPacketMap[i];
+		delete m_PacketMap[i];
 	}
 }
 
@@ -234,10 +234,10 @@ cClientHandle::~cClientHandle()
 void cClientHandle::Destroy()
 {
 	 m_bDestroyed = true;
-	 cCSLock Lock(mSocketCriticalSection);
-	 if (mSocket.IsValid())
+	 cCSLock Lock(m_SocketCriticalSection);
+	 if (m_Socket.IsValid())
 	 {
-		 mSocket.CloseSocket();
+		 m_Socket.CloseSocket();
 	 }
 }
 
@@ -286,7 +286,7 @@ void cClientHandle::StreamChunks(void)
 		{
 			int RelX = x - (MaxDist - 1) / 2;
 			int RelZ = z - (MaxDist - 1) / 2;
-			cChunk * Chunk = World->GetChunk( ChunkPosX + RelX, 0, ChunkPosZ + RelZ );	// Touch all chunks in wide range, so they get generated
+			cChunk * Chunk = World->GetChunk(ChunkPosX + RelX, 0, ChunkPosZ + RelZ);	// Touch all chunks in wide range, so they get generated
 			if (
 				(x >= GENERATEDISTANCE) && 
 				(x < VIEWDISTANCE + GENERATEDISTANCE) && 
@@ -304,19 +304,19 @@ void cClientHandle::StreamChunks(void)
 	unsigned int MissIndex = 0;
 	for(int i = 0; i < VIEWDISTANCE * VIEWDISTANCE; i++)	// Handshake loop - touch each chunk once
 	{
-		if( NeededChunks[i] == 0 ) continue;	// Chunk is not yet loaded, so ignore
+		if (NeededChunks[i] == 0) continue;	// Chunk is not yet loaded, so ignore
 												// This can cause MissIndex to be 0 and thus chunks will not be unloaded while they are actually out of range,
 												// which might actually be a good thing, otherwise it would keep trying to unload chunks until the new chunks are fully loaded
 		bool bChunkMissing = true;
 		for(int j = 0; j < VIEWDISTANCE*VIEWDISTANCE; j++)
 		{
-			if( m_LoadedChunks[j] == NeededChunks[i] )
+			if (m_LoadedChunks[j] == NeededChunks[i])
 			{
 				bChunkMissing = false;
 				break;
 			}
 		}
-		if(bChunkMissing)
+		if (bChunkMissing)
 		{
 			MissingChunks[MissIndex] = NeededChunks[i];
 			MissIndex++;
@@ -333,14 +333,14 @@ void cClientHandle::StreamChunks(void)
 				cChunk* Chunk = m_LoadedChunks[x + z*VIEWDISTANCE];
 				if (Chunk != NULL)
 				{
-					if ( (Chunk->GetPosX() < ChunkPosX - (VIEWDISTANCE - 1) / 2)
+					if ((Chunk->GetPosX() < ChunkPosX - (VIEWDISTANCE - 1) / 2)
 						|| (Chunk->GetPosX() > ChunkPosX + (VIEWDISTANCE - 1) / 2)
 						|| (Chunk->GetPosZ() < ChunkPosZ - (VIEWDISTANCE - 1) / 2)
 						|| (Chunk->GetPosZ() > ChunkPosZ + (VIEWDISTANCE - 1) / 2)
 					)
 					{
-						Chunk->RemoveClient( this );
-						Chunk->AsyncUnload( this );		// TODO - I think it's possible to unload the chunk immediately instead of next tick
+						Chunk->RemoveClient(this);
+						Chunk->AsyncUnload(this);		// TODO - I think it's possible to unload the chunk immediately instead of next tick
 														// I forgot why I made it happen next tick
 
 						m_LoadedChunks[x + z * VIEWDISTANCE] = NULL;
@@ -349,7 +349,7 @@ void cClientHandle::StreamChunks(void)
 			}
 		}
 
-		StreamChunksSmart( MissingChunks, MissIndex );
+		StreamChunksSmart(MissingChunks, MissIndex);
 
 		memcpy(m_LoadedChunks, NeededChunks, sizeof(NeededChunks));
 	}
@@ -360,39 +360,39 @@ void cClientHandle::StreamChunks(void)
 
 
 // Sends chunks to the player from the player position outward
-void cClientHandle::StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChunks )
+void cClientHandle::StreamChunksSmart(cChunk** a_Chunks, unsigned int a_NumChunks)
 {
 	int X = (int)floor(m_Player->GetPosX() / 16);
 	int Y = (int)floor(m_Player->GetPosY() / 128);
 	int Z = (int)floor(m_Player->GetPosZ() / 16);
 
 	bool bAllDone = false;
-	while( !bAllDone )
+	while(!bAllDone)
 	{
 		bAllDone = true;
 		int ClosestIdx = -1;
 		unsigned int ClosestSqrDist = (unsigned int)-1; // wraps around, becomes biggest number possible
 		for(unsigned int i = 0; i < a_NumChunks; ++i)
 		{
-			if( a_Chunks[i] )
+			if (a_Chunks[i])
 			{
 				bAllDone = false;
 				int DistX = a_Chunks[i]->GetPosX()-X;
 				int DistY = a_Chunks[i]->GetPosY()-Y;
 				int DistZ = a_Chunks[i]->GetPosZ()-Z;
 				unsigned int SqrDist = (DistX*DistX)+(DistY*DistY)+(DistZ*DistZ);
-				if( SqrDist < ClosestSqrDist )
+				if (SqrDist < ClosestSqrDist)
 				{
 					ClosestSqrDist = SqrDist;
 					ClosestIdx = i;
 				}
 			}
 		}
-		if(ClosestIdx > -1)
+		if (ClosestIdx > -1)
 		{
-			a_Chunks[ClosestIdx]->Send( this );
-			a_Chunks[ClosestIdx]->AddClient( this );
-			//LOGINFO("CCC: Sending chunk %i %i", a_Chunks[ClosestIdx]->GetPosX(), a_Chunks[ClosestIdx]->GetPosZ() );
+			a_Chunks[ClosestIdx]->Send(this);
+			a_Chunks[ClosestIdx]->AddClient(this);
+			//LOGINFO("CCC: Sending chunk %i %i", a_Chunks[ClosestIdx]->GetPosX(), a_Chunks[ClosestIdx]->GetPosZ());
 			a_Chunks[ClosestIdx] = 0;
 		}
 	}
@@ -407,10 +407,10 @@ void cClientHandle::RemoveFromAllChunks()
 {
 	for(int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)
 	{
-		if( m_LoadedChunks[i] )
+		if (m_LoadedChunks[i])
 		{
-			m_LoadedChunks[i]->RemoveClient( this );
-			m_LoadedChunks[i]->AsyncUnload( this );
+			m_LoadedChunks[i]->RemoveClient(this);
+			m_LoadedChunks[i]->AsyncUnload(this);
 			m_LoadedChunks[i] = 0;
 		}
 	}
@@ -422,18 +422,8 @@ void cClientHandle::RemoveFromAllChunks()
 
 void cClientHandle::AddPacket(cPacket * a_Packet)
 {
-	cCSLock Lock(mCriticalSection);
-	mPendingParsePackets.push_back(a_Packet->Clone());
-}
-
-
-
-
-
-void cClientHandle::RemovePacket( cPacket * a_Packet )
-{
-	delete a_Packet;
-	mPendingParsePackets.remove( a_Packet );
+	cCSLock Lock(m_CriticalSection);
+	m_PendingParsePackets.push_back(a_Packet->Clone());
 }
 
 
@@ -442,26 +432,27 @@ void cClientHandle::RemovePacket( cPacket * a_Packet )
 
 void cClientHandle::HandlePendingPackets()
 {
-	cCSLock Lock(mCriticalSection);
-	while (!mPendingParsePackets.empty())
+	cCSLock Lock(m_CriticalSection);
+	for (PacketList::iterator itr = m_PendingParsePackets.begin(); itr != m_PendingParsePackets.end(); ++itr)
 	{
-		HandlePacket( *mPendingParsePackets.begin() );
-		RemovePacket( *mPendingParsePackets.begin() );
+		HandlePacket(*itr);
+		delete *itr;
 	}
+	m_PendingParsePackets.clear();
 }
 
 
 
 
 
-void cClientHandle::HandlePacket( cPacket* a_Packet )
+void cClientHandle::HandlePacket(cPacket * a_Packet)
 {
 	m_TimeLastPacket = cWorld::GetTime();
 
 	// cPacket* CopiedPacket = a_Packet->Clone();
 	// a_Packet = CopiedPacket;
 
-	//LOG("Packet: 0x%02x", a_Packet->m_PacketID );
+	//LOG("Packet: 0x%02x", a_Packet->m_PacketID);
 
 	if (m_bKicking)
 	{
@@ -478,148 +469,20 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 				break;
 			}
 		
-			case E_PING: // Somebody tries to retrieve information about the server
-			{
-				LOGINFO("Got ping");
-				AString Reply;
-				Printf(Reply, "%s%s%i%s%i", 
-					cRoot::Get()->GetWorld()->GetDescription().c_str(), 
-					cChatColor::Delimiter.c_str(), 
-					cRoot::Get()->GetWorld()->GetNumPlayers(),
-					cChatColor::Delimiter.c_str(), 
-					cRoot::Get()->GetWorld()->GetMaxPlayers()
-				);
-				Kick(Reply.c_str());
-				break;
-			}
-			
-			case E_HANDSHAKE:
-			{
-				cPacket_Handshake * PacketData = reinterpret_cast<cPacket_Handshake*>(a_Packet);
-				mUsername = PacketData->m_Username;
-				LOG("HANDSHAKE %s", GetUsername().c_str());
-
-				if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers())
-				{
-					Kick("The server is currently full :( -- Try again later");
-					break;
-				}
-				cPacket_Chat Connecting(mUsername + " is connecting.");
-				cRoot::Get()->GetServer()->Broadcast( Connecting, this );
-
-				// Give a server handshake thingy back
-				cPacket_Handshake Handshake;
-				Handshake.m_Username = cRoot::Get()->GetServer()->GetServerID();//ServerID;//"2e66f1dc032ab5f0";
-				Send( Handshake );
-				break;
-			}
-			
-			case E_LOGIN:
-			{
-				LOG("LOGIN %s", GetUsername().c_str());
-				cPacket_Login * PacketData = reinterpret_cast<cPacket_Login*>(a_Packet);
-				if (PacketData->m_ProtocolVersion < mProtocolVersion)
-				{
-					Kick("Your client is outdated!");
-					return;
-				}
-				else if( PacketData->m_ProtocolVersion > mProtocolVersion )
-				{
-					Kick("Your client version is higher than the server!");
-					return;
-				}
-				if (mUsername.compare(PacketData->m_Username) != 0)
-				{
-					LOGWARNING("Login Username does not match Handshake username (\"%s\" / \"%s\" for client \"%s\")",
-						mUsername.c_str(),
-						PacketData->m_Username.c_str(),
-						mSocket.GetIPString().c_str()
-					);
-					Kick("Hacked client");  // Don't tell them why we don't want them
-					return;
-				}
-
-				if (cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_LOGIN, 1, PacketData))
-				{
-					Destroy();
-					return;
-				}
-
-				// Schedule for authentication; until then, let them wait (but do not block)
-				cRoot::Get()->GetAuthenticator().Authenticate(mUsername, cRoot::Get()->GetServer()->GetServerID());
-				break;
-			}
-			
-			case E_PLAYERMOVELOOK:	// After this is received we're safe to send anything
-			{
-				if (m_Player == NULL)
-				{
-					LOGWARNING("Received PlayerMoveLook packet for NULL player from client \"%s\", kicking.", mSocket.GetIPString().c_str());
-					Kick("Hacked client");  // Don't tell them why we don't want them
-					return;
-				}
-				if ( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_JOIN, 1, m_Player))
-				{
-					// Broadcast that this player has joined the game! Yay~
-					cPacket_Chat Joined(mUsername + " joined the game!");
-					cRoot::Get()->GetServer()->Broadcast( Joined, this );
-				}
-
-				// Now initialize player (adds to entity list etc.)
-				cWorld* PlayerWorld = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
-				if( !PlayerWorld ) PlayerWorld = cRoot::Get()->GetDefaultWorld();
-				m_Player->Initialize( PlayerWorld );
-
-				// Then we can start doing more stuffs! :D
-				m_bLoggedIn = true;
-				LOG("Player \"%s\" completely logged in", GetUsername().c_str());
-				StreamChunks();
-
-				// Send position
-				mConfirmPosition = m_Player->GetPosition();
-				Send( cPacket_PlayerMoveLook( m_Player ) );
-				break;
-			}
-			
-			case E_KEEP_ALIVE:
-			{
-				break;
-			}
-			
-			default:
-			{
-				LOG("INVALID RESPONSE FOR LOGIN: needed 0x%02x, got 0x%02x from client \"%s\", username \"%s\"", 
-					E_PLAYERMOVELOOK, 
-					a_Packet->m_PacketID,
-					mSocket.GetIPString().c_str(),
-					mUsername.c_str()
-				);
-				Kick("Hacked client");  // Don't tell them why we don't like them
-				break;
-			}
+			case E_PING:           HandlePing(); break;
+			case E_HANDSHAKE:      HandleHandshake    (reinterpret_cast<cPacket_Handshake *>     (a_Packet)); break;
+			case E_LOGIN:          HandleLogin        (reinterpret_cast<cPacket_Login *>         (a_Packet)); break;
+			case E_PLAYERMOVELOOK: HandleMoveLookLogin(reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet)); break;
+			case E_KEEP_ALIVE:     break;
+			default:               HandleDefaultLogin (a_Packet); break;
 		}  // switch (Packet type)
 	}
 	else if (!m_bPositionConfirmed)  // m_bLoggedIn is true
 	{
 		switch (a_Packet->m_PacketID)
 		{
-			case E_PLAYERMOVELOOK:
-			{
-				cPacket_PlayerMoveLook* PacketData = reinterpret_cast<cPacket_PlayerMoveLook*>(a_Packet);
-				Vector3d ReceivedPosition = Vector3d(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-
-				// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
-				if ((ReceivedPosition - mConfirmPosition).SqrLength() < 1.0)
-				{
-					// Test
-					if( ReceivedPosition.Equals(mConfirmPosition))
-					{
-						LOGINFO("Exact position confirmed by client!");
-					}
-					m_bPositionConfirmed = true;
-				}
-				break;
-			}  // case E_PLAYERMOVELOOK
+			case E_PLAYERMOVELOOK: HandleMoveLookConfirm(reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet)); break;
+			// No default handling, ignore everything else
 		}  // switch (Packet type)
 	}  // if (! position confirmed)
 
@@ -627,764 +490,1090 @@ void cClientHandle::HandlePacket( cPacket* a_Packet )
 	{
 		switch (a_Packet->m_PacketID)
 		{
-			case E_CREATIVE_INVENTORY_ACTION: // This is for creative Inventory changes
-			{
-				if(m_Player->GetGameMode() == 1)	//Just to be sure
-				{
-					m_Player->GetInventory().Clicked(a_Packet);
-				}
-				break;
-			}
-
-			case E_PLAYERPOS:
-			{
-				cPacket_PlayerPosition* PacketData = reinterpret_cast<cPacket_PlayerPosition*>(a_Packet);
-				//LOG("recv player pos: %0.2f %0.2f %0.2f", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-				m_Player->MoveTo( Vector3d( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ ) );
-				m_Player->SetStance( PacketData->m_Stance );
-				m_Player->SetTouchGround( PacketData->m_bFlying );
-				break;
-			}
-			
-			case E_BLOCK_DIG:
-			{
-				int LastActionCnt = m_Player->GetLastBlockActionCnt();
-				if ( (cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1 ) { //only allow block interactions every 0.1 seconds
-					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
-					if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS) { //kick if more than MAXBLOCKCHANGEINTERACTIONS per .1 seconds
-						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername().c_str());
-						//TODO Too many false-positives :s for example on a minimal server lagg :s should be re checked
-						Kick("You're a baaaaaad boy!");
-						break;
-					}
-				}
-				else
-				{
-					m_Player->SetLastBlockActionCnt(0); //reset count 
-					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-				}
-
-				cPacket_BlockDig* PacketData = reinterpret_cast<cPacket_BlockDig*>(a_Packet);
-				LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction, PacketData->m_Status );
-				if( PacketData->m_Status == 0x04 )	// Drop block
-				{
-					m_Player->TossItem( false );
-				}
-				else
-				{
-					cWorld* World = m_Player->GetWorld();
-
-					char OldBlock = World->GetBlock(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					char MetaData = World->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-
-					bool bBroken = (PacketData->m_Status == 0x02) || g_BlockOneHitDig[(int)OldBlock] || ( (PacketData->m_Status == 0x00) && (m_Player->GetGameMode() == 1) );
-					if (bBroken == false) bBroken = (m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS && OldBlock == E_BLOCK_LEAVES);
-
-					if (OldBlock == E_BLOCK_WOODEN_DOOR && !bBroken)
-					{
-						cDoors::ChangeDoor(m_Player->GetWorld(), PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-					}
-
-					cItem PickupItem;
-					if (bBroken && !(m_Player->GetGameMode() == 1) ) // broken
-					{
-						ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID );
-						PickupItem.m_ItemID = PickupID;
-						PickupItem.m_ItemHealth = MetaData;
-						PickupItem.m_ItemCount = cBlockToPickup::PickupCount(OldBlock);
-						if( OldBlock == E_BLOCK_LAPIS_ORE )
-						{
-							PickupItem.m_ItemHealth = 4;
-						}
-						if(cDoors::IsDoor(OldBlock))
-						{
-							PickupItem.m_ItemHealth = 1;	//For a complete door this works :D
-						}
-					}
-					if(!cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_DIG, 2, PacketData, m_Player, &PickupItem ) )
-					{
-						int pX = PacketData->m_PosX, pY = PacketData->m_PosY, pZ = PacketData->m_PosZ;
-
-						AddDirection(pX, (char &) pY, pZ, PacketData->m_Direction);
-
-						char PossibleBlock = World->GetBlock(pX, pY, pZ);
-
-						if(PossibleBlock == E_BLOCK_FIRE)
-						{
-							PacketData->m_PosX = pX;
-							PacketData->m_PosY = (char)pY;
-							PacketData->m_PosZ = pZ;
-							bBroken = true;
-						}
-
-						if( bBroken ) // Block broken
-						{
-							if( World->DigBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PickupItem ) )
-							{
-								if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON) {
-									cRedstone Redstone(World);
-									Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
-								}
-								if (OldBlock == E_BLOCK_REDSTONE_TORCH_OFF) {
-									cRedstone Redstone(World);
-									Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
-								}
-								if (OldBlock == E_BLOCK_REDSTONE_WIRE) {
-									cRedstone Redstone(World);
-									Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, false );
-								}
-								if (( OldBlock == E_BLOCK_PISTON) || (OldBlock == E_BLOCK_STICKY_PISTON) ) {
-									int newX = PacketData->m_PosX;
-									int newY = PacketData->m_PosY;
-									int newZ = PacketData->m_PosZ;
-									AddPistonDir( newX, newY, newZ, MetaData & ~(8), 1 )
-									if (World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION) {
-										World->SetBlock( newX, newY, newZ, E_BLOCK_AIR, 0 );
-									}
-								}
-
-								if(cDoors::IsDoor(OldBlock))	//Special actions for destroyed door (Destroy second part)
-								{
-									if(MetaData & 8)	//was Upper part of door
-									{
-										if(cDoors::IsDoor(World->GetBlock(PacketData->m_PosX, PacketData->m_PosY - 1, PacketData->m_PosZ)))
-											World->SetBlock(PacketData->m_PosX, PacketData->m_PosY - 1, PacketData->m_PosZ, E_BLOCK_AIR, 0);
-									}else{	//Was lower part
-										if(cDoors::IsDoor(World->GetBlock(PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ)))
-											World->SetBlock(PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0);
-									}
-								}
-								
-								m_Player->UseEquippedItem();
-							}
-						}
-					}
-					else
-					{
-						World->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
-					}
-				}
-				break;
-			}  // case E_BLOCK_DIG
-			
-			case E_BLOCK_PLACE:
-			{
-				int LastActionCnt = m_Player->GetLastBlockActionCnt();
-				if ( (cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1 ) { //only allow block interactions every 0.1 seconds
-					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-					m_Player->SetLastBlockActionCnt(LastActionCnt+1);
-					if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS) { //kick if more than MAXBLOCKCHANGEINTERACTIONS per .1 seconds
-						LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", GetUsername().c_str());
-						Kick("You're a baaaaaad boy!");
-						break;
-					}
-				}
-				else
-				{
-					m_Player->SetLastBlockActionCnt(0); //reset count 
-					m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
-				}
-
-				cPacket_BlockPlace* PacketData = reinterpret_cast<cPacket_BlockPlace*>(a_Packet);
-				cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-
-				if ((Equipped.m_ItemID != PacketData->m_ItemType))	// Not valid
-				{
-					LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", GetUsername().c_str());
-					break;
-				}
-
-				if (cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_BLOCK_PLACE, 2, PacketData, m_Player ) )
-				{
-					if (PacketData->m_Direction > -1)
-					{
-						AddDirection( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_Direction );
-						m_Player->GetWorld()->SendBlockTo( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, m_Player );
-					}
-					break;
-				}
-
-				//LOG("%i %i %i %i %i %i", PacketData->m_Count, PacketData->m_Direction, PacketData->m_ItemType, PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-
-				//printf("Place Dir:%i %i %i %i : %i\n", PacketData->m_Direction, PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, PacketData->m_ItemType);
-				// 'use' useable items instead of placing blocks
-				bool bPlaceBlock = true;
-				bool UpdateRedstone = false;
-				bool AddedCurrent = false;
-
-				if( PacketData->m_Direction >= 0 )
-				{
-
-					ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-					switch( BlockID )
-					{
-					case E_BLOCK_REDSTONE_REPEATER_ON:
-					case E_BLOCK_REDSTONE_REPEATER_OFF:
-						{
-							//no need to update redstone current with a repeater
-							//todo: Find meta value of repeater and change it to one step more.
-						}
-						break;
-					case E_BLOCK_WORKBENCH:
-						{
-							bPlaceBlock = false;
-							cWindow* Window = new cCraftingWindow( 0, true );
-							m_Player->OpenWindow( Window );
-						}
-						break;
-					case E_BLOCK_FURNACE:
-					case E_BLOCK_CHEST:
-						{
-							bPlaceBlock = false;
-							cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-							if( BlockEntity )
-							{
-								BlockEntity->UsedBy( *m_Player );
-							}
-						}
-						break;
-					case E_BLOCK_WOODEN_DOOR:
-						{
-							bPlaceBlock = false;
-							cDoors::ChangeDoor(m_Player->GetWorld(), PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-						}
-						break;
-					default:
-						break;
-					};
-				}
-
-				// Some checks to see if it's a placeable item :P
-				if( bPlaceBlock )
-				{
-					cItem Item;
-					Item.m_ItemID = Equipped.m_ItemID;
-					Item.m_ItemCount = 1;
-					LOG("PacketData->m_ItemType: %i", (int)PacketData->m_ItemType);
-					// Hacked in edible items go!~
-					// TODO: Handle hunger
-					bool bEat = false;
-					bool isDoor = false;
-					switch( Item.m_ItemID )
-					{
-					case E_ITEM_APPLE:
-						//m_Player->Heal( 4 ); // 2 hearts
-						m_Player->Feed( 24 ); // 2 food bars
-						bEat = true;
-						break;
-					case E_ITEM_GOLDEN_APPLE:
-						//m_Player->Heal( 20 ); // 10 hearts
-						m_Player->Feed(60); // 5 food
-						bEat = true;
-						break;
-					case E_ITEM_MUSHROOM_SOUP:
-						///m_Player->Heal( 10 ); // 5 hearts
-						m_Player->Feed( 48 ); // 4 food
-						bEat = true;
-						break;
-					case E_ITEM_BREAD:
-						//m_Player->Heal( 5 ); // 2.5 hearts
-						m_Player->Feed( 30 ); // 2.5 food
-						bEat = true;
-						break;
-					case E_ITEM_RAW_MEAT:
-						//m_Player->Heal( 3 ); // 1.5 hearts
-						m_Player->Feed( 18 ); // 1.5 food
-						bEat = true;
-						break;
-					case E_ITEM_COOKED_MEAT:
-						//m_Player->Heal( 8 ); // 4 hearts
-						m_Player->Feed( 48 ); // 4 food
-						bEat = true;
-						break;
-					case E_ITEM_RAW_FISH:
-						//m_Player->Heal( 2 ); // 1 heart
-						m_Player->Feed( 12 ); // 1 food
-						bEat = true;
-						break;
-					case E_ITEM_COOKED_FISH:
-						//m_Player->Heal( 5 ); // 2.5 hearts
-						m_Player->Feed( 30 ); // 2.5 food
-						bEat = true;
-						break;
-					case E_ITEM_RAW_CHICKEN:
-						//m_Player->Heal(3);
-						m_Player->Feed( 12 ); // 1 food
-						bEat = true;
-						break;
-					case E_ITEM_COOKED_CHICKEN:
-						//m_Player->Heal( 8 );
-						m_Player->Feed( 36 ); // 3 food
-						bEat = true;
-						break;
-					case E_ITEM_RAW_BEEF:
-						//m_Player->Heal(3);
-						m_Player->Feed( 18 ); // 1.5 food
-						bEat = true;
-						break;
-					case E_ITEM_STEAK:
-						//m_Player->Heal( 8 );
-						m_Player->Feed( 48 ); // 4 food
-						bEat = true;
-						break;
-					default:
-						break;
-					};
-
-					if( bEat )
-					{
-						m_Player->GetInventory().RemoveItem( Item );
-						break;
-					}
-
-					if( PacketData->m_Direction < 0 ) // clicked in air
-						break;
-
-					//TODO: Wrong Blocks!
-					int ClickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-					char MetaData = (char)Equipped.m_ItemHealth;
-					bool LavaBucket = false;
-					bool WaterBucket = false;
-					bool bRemoveItem = true;
-					bool bIgnoreCollision = false;
-
-					if(ClickedBlock == E_BLOCK_STEP)
-					{
-						if(MetaData == m_Player->GetWorld()->GetBlockMeta(PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ) && PacketData->m_Direction == 1)	//only make double slab if meta values are the same and if player clicked on top of the block (Dir = 1)
-						{
-							PacketData->m_ItemType = E_BLOCK_DOUBLE_STEP;
-							PacketData->m_PosY--;
-							bIgnoreCollision = true;
-						}
-					}
-
-					switch( PacketData->m_ItemType )	// Special handling for special items
-					{
-					case E_ITEM_BUCKET:
-						//TODO: Change this, it is just a small hack to get it working a little bit. seems like the Client sends the position from the first hitable block :s
-						ClickedBlock = (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ );
-						LOG("Bucket Clicked BlockID: %d", ClickedBlock);
-						switch (ClickedBlock)
-						{
-							case E_BLOCK_WATER:
-							case E_BLOCK_STATIONARY_WATER:
-								WaterBucket = true;
-								break;
-							case E_BLOCK_LAVA:
-							case E_BLOCK_STATIONARY_LAVA:
-								LavaBucket = true;
-								break;
-						}
-						break;
-					case E_ITEM_LAVA_BUCKET:
-						if((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )))
-						{
-							PacketData->m_ItemType = E_BLOCK_LAVA;
-							if(m_Player->GetGameMode() == 1)
-								break;						//No new Bucket for creative players
-
-							cItem NewItem;
-							NewItem.m_ItemID = E_ITEM_BUCKET;
-							NewItem.m_ItemCount = 1;
-							m_Player->GetInventory().AddItem( NewItem );
-							
-						}
-						break;
-					case E_ITEM_WATER_BUCKET:
-						if((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )))
-						{
-							PacketData->m_ItemType = E_BLOCK_WATER;
-							if(m_Player->GetGameMode() == 1)
-								break;						//No new Bucket for creative players
-							cItem NewItem;
-							NewItem.m_ItemID = E_ITEM_BUCKET;
-							NewItem.m_ItemCount = 1;
-							m_Player->GetInventory().AddItem( NewItem );
-							
-						}
-						break;
-					case E_BLOCK_TORCH:
-						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
-						break;
-					case E_BLOCK_REDSTONE_TORCH_OFF:
-						{
-						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
-						if( g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock( PacketData->m_PosX, PacketData->m_PosY+2, PacketData->m_PosZ ) ] == true ) {//if block above is transparent
-							//printf("transparent above me\n");
-						} else {
-							//printf("transparent not above me\n");
-						}
-						UpdateRedstone = true;
-						AddedCurrent = false;
-						break;
-						}
-					case E_BLOCK_REDSTONE_TORCH_ON:
-						{
-						MetaData = cTorch::DirectionToMetaData( PacketData->m_Direction );
-						UpdateRedstone = true;
-						AddedCurrent = true;
-						break;
-						}
-					case E_ITEM_REDSTONE_DUST:
-						MetaData = 0;
-						PacketData->m_ItemType = E_BLOCK_REDSTONE_WIRE;
-						UpdateRedstone = true;
-						AddedCurrent = false;
-						break;
-					case E_ITEM_REDSTONE_REPEATER:
-						MetaData = cRedstone::RepeaterRotationToMetaData( m_Player->GetRotation() );
-						PacketData->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
-						UpdateRedstone = true;
-						AddedCurrent = false;
-						break;
-					case E_BLOCK_PISTON:
-					case E_BLOCK_STICKY_PISTON:
-						MetaData = cPiston::RotationPitchToMetaData( m_Player->GetRotation(), m_Player->GetPitch() );
-						UpdateRedstone = true;
-						AddedCurrent = false;
-						break;
-					case E_ITEM_IRON_DOOR:
-						{
-							PacketData->m_ItemType = E_BLOCK_IRON_DOOR;
-							MetaData = cDoors::RotationToMetaData( m_Player->GetRotation() );
-							isDoor = true;
-						}
-						break;
-					case E_ITEM_WOODEN_DOOR:
-						{
-							PacketData->m_ItemType = E_BLOCK_WOODEN_DOOR;
-							MetaData = cDoors::RotationToMetaData( m_Player->GetRotation() );
-							isDoor = true;
-						}
-						break;
-					case E_BLOCK_CHEST:
-					case E_BLOCK_FURNACE:
-					case E_BLOCK_DISPENSER:
-						MetaData = cPiston::RotationPitchToMetaData( m_Player->GetRotation(), 0 ); // Same orientation as pistons, just ignore pitch
-						break;
-					case E_BLOCK_COBBLESTONE_STAIRS:
-					case E_BLOCK_BRICK_STAIRS:
-					case E_BLOCK_STONE_BRICK_STAIRS:
-					case E_BLOCK_NETHER_BRICK_STAIRS:
-					case E_BLOCK_WOODEN_STAIRS:
-						MetaData = cStairs::RotationToMetaData( m_Player->GetRotation() );
-						break;
-					case E_BLOCK_LADDER:
-						MetaData = cLadder::DirectionToMetaData( PacketData->m_Direction );
-						break;
-					case E_ITEM_SIGN:
-						LOG("Dir: %i", PacketData->m_Direction);
-						if( PacketData->m_Direction == 1 )
-						{
-							LOG("Player Rotation: %f", m_Player->GetRotation() );
-							MetaData = cSign::RotationToMetaData( m_Player->GetRotation() );
-							LOG("Sign rotation %i", MetaData);
-							PacketData->m_ItemType = E_BLOCK_SIGN_POST;
-						}
-						else
-						{
-							MetaData = cSign::DirectionToMetaData( PacketData->m_Direction );
-							PacketData->m_ItemType = E_BLOCK_WALLSIGN;
-						}
-						break;
-					case E_ITEM_FLINT_AND_STEEL:
-						PacketData->m_ItemType = E_ITEM_FIRE;
-						m_Player->UseEquippedItem();
-						bRemoveItem = false;
-						break;
-					default:
-						break;
-					};
-
-
-					if (LavaBucket) {
-
-						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) ) {
-							cItem NewItem;
-							NewItem.m_ItemID = E_ITEM_LAVA_BUCKET;
-							NewItem.m_ItemCount = 1;
-							m_Player->GetInventory().AddItem( NewItem );
-							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
-						}
-
-					} else if (WaterBucket) {
-
-						if( (m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem( Item )) ) {
-							cItem NewItem;
-							NewItem.m_ItemID = E_ITEM_WATER_BUCKET;
-							NewItem.m_ItemCount = 1;
-							m_Player->GetInventory().AddItem( NewItem );
-							m_Player->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY + 1, PacketData->m_PosZ, E_BLOCK_AIR, 0 );
-						}
-
-					} else if( IsValidBlock( PacketData->m_ItemType) ) {
-						int X = PacketData->m_PosX;
-						char Y = PacketData->m_PosY;
-						int Z = PacketData->m_PosZ;
-						AddDirection( X, Y, Z, PacketData->m_Direction );
-
-						int PlaceBlock = m_Player->GetWorld()->GetBlock( X, Y, Z );
-						if (PlaceBlock != E_BLOCK_AIR
-							&& PlaceBlock != E_BLOCK_WATER
-							&& PlaceBlock != E_BLOCK_STATIONARY_WATER
-							&& PlaceBlock != E_BLOCK_LAVA
-							&& PlaceBlock != E_BLOCK_STATIONARY_LAVA
-							&& !bIgnoreCollision ) { //tried to place a block *into* another?
-							break;	//happens when you place a block aiming at side of block like torch or stem
-						}
-
-						// Check whether selected item is allowed to be placed on specific surface
-						bool bIllegalSurface = false;
-						ENUM_BLOCK_ID SurfaceBlock = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock( X, Y-1, Z );
-						switch( PacketData->m_ItemType )
-						{
-						case E_BLOCK_YELLOW_FLOWER:	// Can ONLY be placed on dirt/grass
-						case E_BLOCK_RED_ROSE:
-						case E_BLOCK_SAPLING:
-							switch( SurfaceBlock )
-							{
-							case E_BLOCK_DIRT:
-							case E_BLOCK_GRASS:
-								bIllegalSurface = false;
-								break;
-							default:
-								bIllegalSurface = true;
-								break;
-							};
-							break;
-						case E_BLOCK_BROWN_MUSHROOM:	// Can be placed on pretty much anything, with exceptions
-						case E_BLOCK_RED_MUSHROOM:
-							switch( SurfaceBlock )
-							{
-							case E_BLOCK_GLASS:
-							case E_BLOCK_YELLOW_FLOWER:
-							case E_BLOCK_RED_ROSE:
-							case E_BLOCK_BROWN_MUSHROOM:
-							case E_BLOCK_RED_MUSHROOM:
-							case E_BLOCK_CACTUS:
-								bIllegalSurface = true;
-								break;
-							}
-							break;
-						case E_BLOCK_CACTUS:
-							if( SurfaceBlock != E_BLOCK_SAND && SurfaceBlock != E_BLOCK_CACTUS )	// Cactus can only be placed on sand and itself
-								bIllegalSurface = true;
-
-							// Check surroundings. Cacti may ONLY be surrounded by air
-							cWorld* World = m_Player->GetWorld();
-							if(		World->GetBlock( X-1, Y, Z ) != E_BLOCK_AIR 
-								||	World->GetBlock( X+1, Y, Z ) != E_BLOCK_AIR 
-								||	World->GetBlock( X, Y, Z-1 ) != E_BLOCK_AIR 
-								||	World->GetBlock( X, Y, Z+1 ) != E_BLOCK_AIR 
-								)
-							{
-								bIllegalSurface = true;
-							}
-							break;
-						};
-
-						if( bIllegalSurface )
-							break;
-
-						if(bRemoveItem)
-						{
-							if((m_Player->GetGameMode() != 1) &&  !m_Player->GetInventory().RemoveItem( Item ))
-								break;
-						}
-
-
-						if (isDoor)
-						{
-							if ( ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) || ( m_Player->GetWorld()->GetBlock( X, Y+1, Z ) == E_BLOCK_AIR ) )
-							{
-								m_Player->GetWorld()->SetBlock( X, Y+1, Z, (char)PacketData->m_ItemType, MetaData + 8 );
-								m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
-							}
-						} else {
-							m_Player->GetWorld()->SetBlock( X, Y, Z, (char)PacketData->m_ItemType, MetaData );
-						}
-
-
-						if (UpdateRedstone)
-						{
-							cRedstone Redstone(m_Player->GetWorld());
-							Redstone.ChangeRedstone( PacketData->m_PosX, PacketData->m_PosY+1, PacketData->m_PosZ, AddedCurrent );
-						}
-
-					}
-				}
-				/*
-				// Remove stuff with stick! :D
-				if( m_Username.compare("FakeTruth") == 0 )
-				{	// It's me! :D
-					if( PacketData->m_ItemType == 280 )
-					{
-						cRoot::Get()->GetWorld()->SetBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ, 0, 0 );
-					}
-				}
-				*/
-				break;
-			}  // case E_BLOCK_PLACE
-			
-			case E_PICKUP_SPAWN:
-			{
-				LOG("Received packet E_PICKUP_SPAWN");
-				cPacket_PickupSpawn* PacketData = reinterpret_cast<cPacket_PickupSpawn*>(a_Packet);
-
-				cItem DroppedItem;
-				DroppedItem.m_ItemID = (ENUM_ITEM_ID)PacketData->m_Item;
-				DroppedItem.m_ItemCount = PacketData->m_Count;
-				DroppedItem.m_ItemHealth = 0x0; // TODO: Somehow figure out what item was dropped, and apply correct health
-				if( m_Player->GetInventory().RemoveItem( DroppedItem ) )
-				{
-					cPickup* Pickup = new cPickup( PacketData );
-					Pickup->Initialize( m_Player->GetWorld() );
-				}
-				break;
-			}  // case E_PICKUP_SPAWN
-			
-			case E_CHAT:
-			{
-				cPacket_Chat* PacketData = reinterpret_cast<cPacket_Chat*>(a_Packet);
-				if (!cRoot::Get()->GetServer()->Command( *this, PacketData->m_Message.c_str()))
-				{
-					PacketData->m_Message.insert( 0, "<" + m_Player->GetColor() + mUsername + cChatColor::White + "> " );
-					cRoot::Get()->GetServer()->Broadcast( *PacketData );
-				}
-				break;
-			}  // case E_CHAT
-			
-			case E_PLAYERLOOK:
-			{
-				cPacket_PlayerLook* PacketData = reinterpret_cast<cPacket_PlayerLook*>(a_Packet);
-				m_Player->SetRotation( PacketData->m_Rotation );
-				m_Player->SetPitch( PacketData->m_Pitch );
-				m_Player->SetTouchGround( PacketData->m_bFlying );
-				m_Player->WrapRotation();
-				break;
-			}  // case E_PLAYERLOOK
-			
-			case E_PLAYERMOVELOOK:
-			{
-				cPacket_PlayerMoveLook* PacketData = reinterpret_cast<cPacket_PlayerMoveLook*>(a_Packet);
-				m_Player->MoveTo( Vector3d( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ ) );
-				m_Player->SetStance( PacketData->m_Stance );
-				m_Player->SetTouchGround( PacketData->m_bFlying );
-				m_Player->SetRotation( PacketData->m_Rotation );
-				m_Player->SetPitch( PacketData->m_Pitch );
-				m_Player->WrapRotation();
-				break;
-			}  // case E_PLAYERMOVELOOK
-			
-			case E_ANIMATION:
-			{
-				cPacket_ArmAnim* PacketData = reinterpret_cast<cPacket_ArmAnim*>(a_Packet);
-				PacketData->m_EntityID = m_Player->GetUniqueID();
-				cRoot::Get()->GetServer()->Broadcast( *PacketData, this );
-				break;
-			}  // case E_ANIMATION
-			
-			case E_ITEM_SWITCH:
-			{
-				cPacket_ItemSwitch* PacketData = reinterpret_cast<cPacket_ItemSwitch*>(a_Packet);
-
-				m_Player->GetInventory().SetEquippedSlot( PacketData->m_SlotNum );
-
-				cPacket_EntityEquipment Equipment;
-				Equipment.m_ItemID = (short)m_Player->GetInventory().GetEquippedItem().m_ItemID;
-				Equipment.m_Slot = 0;
-				Equipment.m_UniqueID = m_Player->GetUniqueID();
-				cRoot::Get()->GetServer()->Broadcast( Equipment, this );
-				break;
-			}  // case E_ITEM_SWITCH
-			
-			case E_WINDOW_CLOSE:
-			{
-				cPacket_WindowClose* PacketData = reinterpret_cast<cPacket_WindowClose*>(a_Packet);
-				m_Player->CloseWindow(PacketData->m_Close);
-				break;
-			}  // case E_WINDOW_CLOSE
-			
-			case E_WINDOW_CLICK:
-			{
-				cPacket_WindowClick* PacketData = reinterpret_cast<cPacket_WindowClick*>(a_Packet);
-				if( PacketData->m_WindowID == 0 )
-				{
-					m_Player->GetInventory().Clicked( PacketData );
-				}
-				else
-				{
-					cWindow* Window = m_Player->GetWindow();
-					if( Window ) Window->Clicked( PacketData, *m_Player );
-					else LOG("No 'other' window! WTF");
-				}
-				break;
-			}  // case E_WINDOW_CLICK
-			
-			case E_UPDATE_SIGN:
-			{
-				cPacket_UpdateSign* PacketData = reinterpret_cast<cPacket_UpdateSign*>(a_Packet);
-				cWorld* World = m_Player->GetWorld();
-				cChunk* Chunk = World->GetChunkOfBlock( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-				cBlockEntity* BlockEntity = Chunk->GetBlockEntity( PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ );
-				if( BlockEntity && (BlockEntity->GetBlockType() == E_BLOCK_SIGN_POST || BlockEntity->GetBlockType() == E_BLOCK_WALLSIGN ) )
-				{
-					cSignEntity* Sign = reinterpret_cast< cSignEntity* >(BlockEntity);
-					Sign->SetLines( PacketData->m_Line1, PacketData->m_Line2, PacketData->m_Line3, PacketData->m_Line4 );
-					Sign->SendTo( 0 ); // Broadcast to all players in chunk
-				}
-				break;
-			}  // case E_UPDATE_SIGN
-			
-			case E_USE_ENTITY:
-			{
-				cPacket_UseEntity* PacketData = reinterpret_cast<cPacket_UseEntity*>(a_Packet);
-				if( PacketData->m_bLeftClick )
-				{
-					cWorld* World = m_Player->GetWorld();
-					cEntity* Entity = World->GetEntity( PacketData->m_TargetID );
-					if( Entity && Entity->IsA("cPawn") )
-					{
-						cPawn* Pawn = (cPawn*)Entity;
-						Pawn->TakeDamage( 1, m_Player );
-					}
-				}
-				break;
-			}  // case E_USE_ENTITY
-			
-			case E_RESPAWN:
-			{
-				m_Player->Respawn();
-				break;
-			}  // case E_RESPAWN
-			
-			case E_DISCONNECT:
-			{
-				LOG("Received d/c packet from \"%s\"", GetUsername().c_str());
-				cPacket_Disconnect* PacketData = reinterpret_cast<cPacket_Disconnect*>(a_Packet);
-				if( !cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_DISCONNECT, 2, PacketData->m_Reason.c_str(), m_Player ) )
-				{
-					cPacket_Chat DisconnectMessage(mUsername + " disconnected: " + PacketData->m_Reason);
-					cRoot::Get()->GetServer()->Broadcast( DisconnectMessage );
-				}
-				Destroy();
-				return;
-				break;
-			}  // case E_DISCONNECT
-			
-			case E_KEEP_ALIVE:
-			{
-				cPacket_KeepAlive *PacketData = reinterpret_cast<cPacket_KeepAlive*>(a_Packet);
-				if (PacketData->m_KeepAliveID == m_PingID)
-				{
-					cTimer t1;
-					m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
-				}
-				break;
-			}  // case E_KEEP_ALIVE
+			case E_CREATIVE_INVENTORY_ACTION: HandleCreativeInventory(reinterpret_cast<cPacket_CreativeInventoryAction *>(a_Packet)); break;
+			case E_PLAYERPOS:                 HandlePlayerPos        (reinterpret_cast<cPacket_PlayerPosition *>         (a_Packet)); break;
+			case E_BLOCK_DIG:                 HandleBlockDig         (reinterpret_cast<cPacket_BlockDig *>               (a_Packet)); break;
+			case E_BLOCK_PLACE:               HandleBlockPlace       (reinterpret_cast<cPacket_BlockPlace *>             (a_Packet)); break;
+			case E_PICKUP_SPAWN:              HandlePickupSpawn      (reinterpret_cast<cPacket_PickupSpawn *>            (a_Packet)); break;
+			case E_CHAT:                      HandleChat             (reinterpret_cast<cPacket_Chat *>                   (a_Packet)); break;
+			case E_PLAYERLOOK:                HandlePlayerLook       (reinterpret_cast<cPacket_PlayerLook *>             (a_Packet)); break;
+			case E_PLAYERMOVELOOK:            HandlePlayerMoveLook   (reinterpret_cast<cPacket_PlayerMoveLook *>         (a_Packet)); break;
+			case E_ANIMATION:                 HandleAnimation        (reinterpret_cast<cPacket_ArmAnim *>                (a_Packet)); break;
+			case E_ITEM_SWITCH:               HandleItemSwitch       (reinterpret_cast<cPacket_ItemSwitch *>             (a_Packet)); break;
+			case E_WINDOW_CLOSE:              HandleWindowClose      (reinterpret_cast<cPacket_WindowClose *>            (a_Packet)); break;
+			case E_WINDOW_CLICK:              HandleWindowClick      (reinterpret_cast<cPacket_WindowClick *>            (a_Packet)); break;
+			case E_UPDATE_SIGN:               HandleUpdateSign       (reinterpret_cast<cPacket_UpdateSign *>             (a_Packet)); break;
+			case E_USE_ENTITY:                HandleUseEntity        (reinterpret_cast<cPacket_UseEntity *>              (a_Packet)); break;
+			case E_RESPAWN:                   HandleRespawn();
+			case E_DISCONNECT:                HandleDisconnect       (reinterpret_cast<cPacket_Disconnect *>             (a_Packet)); break;
+			case E_KEEP_ALIVE:                HandleKeepAlive        (reinterpret_cast<cPacket_KeepAlive *>              (a_Packet)); break;
 		}  // switch (Packet type)
 	}  // if (normal game)
+}
+
+
+
+
+
+void cClientHandle::HandlePing(void)
+{
+	// Somebody tries to retrieve information about the server
+	LOGINFO("Got ping from \"%s\"", m_Socket.GetIPString().c_str());
+	AString Reply;
+	Printf(Reply, "%s%s%i%s%i", 
+		cRoot::Get()->GetWorld()->GetDescription().c_str(), 
+		cChatColor::Delimiter.c_str(), 
+		cRoot::Get()->GetWorld()->GetNumPlayers(),
+		cChatColor::Delimiter.c_str(), 
+		cRoot::Get()->GetWorld()->GetMaxPlayers()
+	);
+	Kick(Reply.c_str());
+}
+
+
+
+
+
+void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
+{
+	m_Username = a_Packet->m_Username;
+	LOG("HANDSHAKE %s", m_Username.c_str());
+
+	if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers())
+	{
+		Kick("The server is currently full :(-- Try again later");
+		return;
+	}
+	cPacket_Chat Connecting(m_Username + " is connecting.");
+	cRoot::Get()->GetServer()->Broadcast(Connecting, this);
+
+	// Give a server handshake thingy back
+	cPacket_Handshake Handshake;
+	Handshake.m_Username = cRoot::Get()->GetServer()->GetServerID();
+	Send(Handshake);
+}
+
+
+
+
+
+void cClientHandle::HandleLogin(cPacket_Login * a_Packet)
+{
+	LOG("LOGIN %s", m_Username.c_str());
+	if (a_Packet->m_ProtocolVersion < m_ProtocolVersion)
+	{
+		Kick("Your client is outdated!");
+		return;
+	}
+	else if (a_Packet->m_ProtocolVersion > m_ProtocolVersion)
+	{
+		Kick("Your client version is higher than the server!");
+		return;
+	}
+	if (m_Username.compare(a_Packet->m_Username) != 0)
+	{
+		LOGWARNING("Login Username (\"%s\") does not match Handshake username (\"%s\") for client \"%s\")",
+			a_Packet->m_Username.c_str(),
+			m_Username.c_str(),
+			m_Socket.GetIPString().c_str()
+		);
+		Kick("Hacked client");  // Don't tell them why we don't want them
+		return;
+	}
+
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_LOGIN, 1, a_Packet))
+	{
+		Destroy();
+		return;
+	}
+
+	// Schedule for authentication; until then, let them wait (but do not block)
+	cRoot::Get()->GetAuthenticator().Authenticate(m_Username, cRoot::Get()->GetServer()->GetServerID());
+}
+
+
+
+
+
+void cClientHandle::HandleMoveLookLogin(cPacket_PlayerMoveLook * a_Packet)
+{
+	// After this is received we're safe to send anything
+	if (m_Player == NULL)
+	{
+		LOGWARNING("Received PlayerMoveLook packet for NULL player from client \"%s\", kicking.", m_Socket.GetIPString().c_str());
+		Kick("Hacked client");  // Don't tell them why we don't want them
+		return;
+	}
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_PLAYER_JOIN, 1, m_Player))
+	{
+		// Broadcast that this player has joined the game! Yay~
+		cPacket_Chat Joined(m_Username + " joined the game!");
+		cRoot::Get()->GetServer()->Broadcast(Joined, this);
+	}
+
+	// Now initialize player (adds to entity list etc.)
+	cWorld* PlayerWorld = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
+	if (!PlayerWorld)
+	{
+		PlayerWorld = cRoot::Get()->GetDefaultWorld();
+	}
+	m_Player->Initialize(PlayerWorld);
+
+	// Then we can start doing more stuffs! :D
+	m_bLoggedIn = true;
+	LOG("Player \"%s\" completely logged in", m_Username.c_str());
+	StreamChunks();
+
+	// Send position
+	m_ConfirmPosition = m_Player->GetPosition();
+	Send(cPacket_PlayerMoveLook(m_Player));
+}
+
+
+
+
+
+void cClientHandle::HandleDefaultLogin(cPacket * a_Packet)
+{
+	LOGWARNING(
+		"Invalid packet in login state: 0x%02x from client \"%s\", username \"%s\"", 
+		a_Packet->m_PacketID,
+		m_Socket.GetIPString().c_str(),
+		m_Username.c_str()
+	);
+	Kick("Hacked client");  // Don't tell them why we don't like them
+}
+
+
+
+
+
+void cClientHandle::HandleMoveLookConfirm(cPacket_PlayerMoveLook * a_Packet)
+{
+	Vector3d ReceivedPosition = Vector3d(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+
+	// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
+	double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
+	if (Dist < 1.0)
+	{
+		// Test
+		if (ReceivedPosition.Equals(m_ConfirmPosition))
+		{
+			LOGINFO("Exact position confirmed by client!");
+		}
+		m_bPositionConfirmed = true;
+	}
+	else
+	{
+		LOGWARNING("Player \"%s\" sent a weird position confirmation %.2 blocks away, waiting for another confirmation", m_Username.c_str(), Dist);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleCreativeInventory(cPacket_CreativeInventoryAction * a_Packet)
+{
+	// This is for creative Inventory changes
+	if (m_Player->GetGameMode() == 1)
+	{
+		m_Player->GetInventory().Clicked(a_Packet);
+	}
+	else
+	{
+		LOGWARNING("Got a CreativeInventoryAction packet from user \"%s\" while not in creative mode. Ignoring.", m_Username.c_str());
+	}
+}
+
+
+
+
+
+void cClientHandle::HandlePlayerPos(cPacket_PlayerPosition * a_Packet)
+{
+	// LOG("recv player pos: %0.2f %0.2f %0.2f", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
+	m_Player->MoveTo(Vector3d(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
+	m_Player->SetStance(a_Packet->m_Stance);
+	m_Player->SetTouchGround(a_Packet->m_bFlying);
+}
+
+
+
+
+
+void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
+{
+	if (!CheckBlockInteractionsRate())
+	{
+		return;
+	}
+
+	LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction, a_Packet->m_Status);
+	if (a_Packet->m_Status == 0x04)	// Drop block
+	{
+		m_Player->TossItem(false);
+		return;
+	}
+	
+	cWorld* World = m_Player->GetWorld();
+
+	char OldBlock = World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	char MetaData = World->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+
+	bool bBroken = (
+		(a_Packet->m_Status == 0x02) || 
+		(g_BlockOneHitDig[(int)OldBlock]) || 
+		((a_Packet->m_Status == 0x00) && (m_Player->GetGameMode() == 1)) ||
+		((m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS) && (OldBlock == E_BLOCK_LEAVES))
+	);
+
+	if ((OldBlock == E_BLOCK_WOODEN_DOOR) && !bBroken)
+	{
+		cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	}
+
+	cItem PickupItem;
+	if (bBroken && !(m_Player->GetGameMode() == 1)) // broken
+	{
+		ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup((ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID);
+		PickupItem.m_ItemID = PickupID;
+		PickupItem.m_ItemHealth = MetaData;
+		PickupItem.m_ItemCount = cBlockToPickup::PickupCount(OldBlock);
+		if (OldBlock == E_BLOCK_LAPIS_ORE)
+		{
+			PickupItem.m_ItemHealth = 4;
+		}
+		if (cDoors::IsDoor(OldBlock))
+		{
+			PickupItem.m_ItemHealth = 1;	//For a complete door this works :D
+		}
+	}
+	
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_BLOCK_DIG, 2, a_Packet, m_Player, &PickupItem))
+	{
+		World->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
+		return;
+	}
+	
+	int pX = a_Packet->m_PosX, pY = a_Packet->m_PosY, pZ = a_Packet->m_PosZ;
+
+	AddDirection(pX, (char &) pY, pZ, a_Packet->m_Direction);
+
+	char PossibleBlock = World->GetBlock(pX, pY, pZ);
+
+	if (PossibleBlock == E_BLOCK_FIRE)
+	{
+		a_Packet->m_PosX = pX;
+		a_Packet->m_PosY = (char)pY;
+		a_Packet->m_PosZ = pZ;
+		bBroken = true;
+	}
+
+	if (!bBroken)
+	{
+		return;
+	}
+	
+	if (!World->DigBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, PickupItem))
+	{
+		return;
+	}
+	
+	if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON)
+	{
+		cRedstone Redstone(World);
+		Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
+	}
+	if (OldBlock == E_BLOCK_REDSTONE_TORCH_OFF)
+	{
+		cRedstone Redstone(World);
+		Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
+	}
+	if (OldBlock == E_BLOCK_REDSTONE_WIRE)
+	{
+		cRedstone Redstone(World);
+		Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
+	}
+	if ((OldBlock == E_BLOCK_PISTON) || (OldBlock == E_BLOCK_STICKY_PISTON))
+	{
+		int newX = a_Packet->m_PosX;
+		int newY = a_Packet->m_PosY;
+		int newZ = a_Packet->m_PosZ;
+		AddPistonDir(newX, newY, newZ, MetaData & ~(8), 1);
+		if (World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
+		{
+			World->SetBlock(newX, newY, newZ, E_BLOCK_AIR, 0);
+		}
+	}
+
+	if (cDoors::IsDoor(OldBlock))
+	{
+		// Special actions for destroyed door (Destroy second part)
+		if (MetaData & 8)
+		{
+			// Was upper part of door
+			if (cDoors::IsDoor(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY - 1, a_Packet->m_PosZ)))
+			{
+				World->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY - 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
+			}
+		}
+		else
+		{
+			// Was lower part
+			if (cDoors::IsDoor(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ)))
+			{
+				World->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
+			}
+		}
+	}
+	
+	m_Player->UseEquippedItem();
+}
+
+
+
+
+
+void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
+{
+	if (!CheckBlockInteractionsRate())
+	{
+		return;
+	}
+	
+	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
+
+	if ((Equipped.m_ItemID != a_Packet->m_ItemType))	// Not valid
+	{
+		LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", m_Username.c_str());
+		// TODO: We should probably send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
+		return;
+	}
+
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_BLOCK_PLACE, 2, a_Packet, m_Player))
+	{
+		if (a_Packet->m_Direction > -1)
+		{
+			AddDirection(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction);
+			m_Player->GetWorld()->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
+		}
+		return;
+	}
+
+	//LOG("%i %i %i %i %i %i", a_Packet->m_Count, a_Packet->m_Direction, a_Packet->m_ItemType, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+
+	//printf("Place Dir:%i %i %i %i : %i\n", a_Packet->m_Direction, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_ItemType);
+	// 'use' useable items instead of placing blocks
+	bool bPlaceBlock = true;
+	bool UpdateRedstone = false;
+	bool AddedCurrent = false;
+
+	if (a_Packet->m_Direction >= 0)
+	{
+		ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		switch (BlockID)
+		{
+		case E_BLOCK_REDSTONE_REPEATER_ON:
+		case E_BLOCK_REDSTONE_REPEATER_OFF:
+			{
+				//no need to update redstone current with a repeater
+				//todo: Find meta value of repeater and change it to one step more.
+			}
+			break;
+		case E_BLOCK_WORKBENCH:
+			{
+				bPlaceBlock = false;
+				cWindow* Window = new cCraftingWindow(0, true);
+				m_Player->OpenWindow(Window);
+			}
+			break;
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_CHEST:
+			{
+				bPlaceBlock = false;
+				cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+				if (BlockEntity)
+				{
+					BlockEntity->UsedBy(*m_Player);
+				}
+			}
+			break;
+		case E_BLOCK_WOODEN_DOOR:
+			{
+				bPlaceBlock = false;
+				cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+			}
+			break;
+		default:
+			break;
+		};
+	}
+
+	// Some checks to see if it's a placeable item :P
+	if (bPlaceBlock)
+	{
+		cItem Item;
+		Item.m_ItemID = Equipped.m_ItemID;
+		Item.m_ItemCount = 1;
+		LOG("a_Packet->m_ItemType: %i", (int)a_Packet->m_ItemType);
+
+		// Hacked in edible items go!~
+		// TODO: Handle hunger
+		bool bEat = false;
+		bool isDoor = false;
+		switch (Item.m_ItemID)
+		{
+		case E_ITEM_APPLE:
+			//m_Player->Heal(4); // 2 hearts
+			m_Player->Feed(24); // 2 food bars
+			bEat = true;
+			break;
+		case E_ITEM_GOLDEN_APPLE:
+			//m_Player->Heal(20); // 10 hearts
+			m_Player->Feed(60); // 5 food
+			bEat = true;
+			break;
+		case E_ITEM_MUSHROOM_SOUP:
+			///m_Player->Heal(10); // 5 hearts
+			m_Player->Feed(48); // 4 food
+			bEat = true;
+			break;
+		case E_ITEM_BREAD:
+			//m_Player->Heal(5); // 2.5 hearts
+			m_Player->Feed(30); // 2.5 food
+			bEat = true;
+			break;
+		case E_ITEM_RAW_MEAT:
+			//m_Player->Heal(3); // 1.5 hearts
+			m_Player->Feed(18); // 1.5 food
+			bEat = true;
+			break;
+		case E_ITEM_COOKED_MEAT:
+			//m_Player->Heal(8); // 4 hearts
+			m_Player->Feed(48); // 4 food
+			bEat = true;
+			break;
+		case E_ITEM_RAW_FISH:
+			//m_Player->Heal(2); // 1 heart
+			m_Player->Feed(12); // 1 food
+			bEat = true;
+			break;
+		case E_ITEM_COOKED_FISH:
+			//m_Player->Heal(5); // 2.5 hearts
+			m_Player->Feed(30); // 2.5 food
+			bEat = true;
+			break;
+		case E_ITEM_RAW_CHICKEN:
+			//m_Player->Heal(3);
+			m_Player->Feed(12); // 1 food
+			bEat = true;
+			break;
+		case E_ITEM_COOKED_CHICKEN:
+			//m_Player->Heal(8);
+			m_Player->Feed(36); // 3 food
+			bEat = true;
+			break;
+		case E_ITEM_RAW_BEEF:
+			//m_Player->Heal(3);
+			m_Player->Feed(18); // 1.5 food
+			bEat = true;
+			break;
+		case E_ITEM_STEAK:
+			//m_Player->Heal(8);
+			m_Player->Feed(48); // 4 food
+			bEat = true;
+			break;
+		default:
+			break;
+		};
+
+		if (bEat)
+		{
+			m_Player->GetInventory().RemoveItem(Item);
+			return;
+		}
+
+		if (a_Packet->m_Direction < 0)
+		{
+			// clicked in air
+			return;
+		}
+
+		//TODO: Wrong Blocks!
+		int ClickedBlock = (int)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		char MetaData = (char)Equipped.m_ItemHealth;
+		bool LavaBucket = false;
+		bool WaterBucket = false;
+		bool bRemoveItem = true;
+		bool bIgnoreCollision = false;
+
+		if (ClickedBlock == E_BLOCK_STEP)
+		{
+			if (MetaData == m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) && a_Packet->m_Direction == 1)	//only make double slab if meta values are the same and if player clicked on top of the block (Dir = 1)
+			{
+				a_Packet->m_ItemType = E_BLOCK_DOUBLE_STEP;
+				a_Packet->m_PosY--;
+				bIgnoreCollision = true;
+			}
+		}
+
+		// Special handling for special items:
+		switch (a_Packet->m_ItemType)  
+		{
+			case E_ITEM_BUCKET:
+			{
+				// TODO: Change this, it is just a small hack to get it working a little bit. seems like the Client sends the position from the first hitable block :s
+				ClickedBlock = (int)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ);
+				LOG("Bucket Clicked BlockID: %d", ClickedBlock);
+				switch (ClickedBlock)
+				{
+					case E_BLOCK_WATER:
+					case E_BLOCK_STATIONARY_WATER:
+					{
+						WaterBucket = true;
+						break;
+					}
+					case E_BLOCK_LAVA:
+					case E_BLOCK_STATIONARY_LAVA:
+					{
+						LavaBucket = true;
+						break;
+					}
+				}
+				break;
+			}  // case E_ITEM_BUCKET			
+			
+			case E_ITEM_LAVA_BUCKET:
+			{
+				if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item)))
+				{
+					a_Packet->m_ItemType = E_BLOCK_LAVA;
+					if (m_Player->GetGameMode() == 1)
+					{
+						break;						//No new Bucket for creative players
+					}
+
+					cItem NewItem;
+					NewItem.m_ItemID = E_ITEM_BUCKET;
+					NewItem.m_ItemCount = 1;
+					m_Player->GetInventory().AddItem(NewItem);
+				}
+				break;
+			}  // case E_ITEM_LAVA_BUCKET
+			
+			case E_ITEM_WATER_BUCKET:
+			{
+				if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item)))
+				{
+					a_Packet->m_ItemType = E_BLOCK_WATER;
+					if (m_Player->GetGameMode() == 1)
+					{
+						break;						//No new Bucket for creative players
+					}
+					cItem NewItem;
+					NewItem.m_ItemID = E_ITEM_BUCKET;
+					NewItem.m_ItemCount = 1;
+					m_Player->GetInventory().AddItem(NewItem);
+				}
+				break;
+			}
+			
+			case E_BLOCK_TORCH:
+			{
+				MetaData = cTorch::DirectionToMetaData(a_Packet->m_Direction);
+				break;
+			}
+			
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			{
+				MetaData = cTorch::DirectionToMetaData(a_Packet->m_Direction);
+				if (g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY+2, a_Packet->m_PosZ) ] == true) 
+				{
+					//if block above is transparent
+					//printf("transparent above me\n");
+				}
+				else
+				{
+					//printf("transparent not above me\n");
+				}
+				UpdateRedstone = true;
+				AddedCurrent = false;
+				break;
+			}
+			
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			{
+				MetaData = cTorch::DirectionToMetaData(a_Packet->m_Direction);
+				UpdateRedstone = true;
+				AddedCurrent = true;
+				break;
+			}
+			
+			case E_ITEM_REDSTONE_DUST:
+			{
+				MetaData = 0;
+				a_Packet->m_ItemType = E_BLOCK_REDSTONE_WIRE;
+				UpdateRedstone = true;
+				AddedCurrent = false;
+				break;
+			}
+			
+			case E_ITEM_REDSTONE_REPEATER:
+			{
+				MetaData = cRedstone::RepeaterRotationToMetaData(m_Player->GetRotation());
+				a_Packet->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
+				UpdateRedstone = true;
+				AddedCurrent = false;
+				break;
+			}
+
+			case E_BLOCK_PISTON:
+			case E_BLOCK_STICKY_PISTON:
+			{
+				MetaData = cPiston::RotationPitchToMetaData(m_Player->GetRotation(), m_Player->GetPitch());
+				UpdateRedstone = true;
+				AddedCurrent = false;
+				break;
+			}
+			
+			case E_ITEM_IRON_DOOR:
+			{
+				a_Packet->m_ItemType = E_BLOCK_IRON_DOOR;
+				MetaData = cDoors::RotationToMetaData(m_Player->GetRotation());
+				isDoor = true;
+				break;
+			}
+			
+			case E_ITEM_WOODEN_DOOR:
+			{
+				a_Packet->m_ItemType = E_BLOCK_WOODEN_DOOR;
+				MetaData = cDoors::RotationToMetaData(m_Player->GetRotation());
+				isDoor = true;
+				break;
+			}
+			
+			case E_BLOCK_CHEST:
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_DISPENSER:
+			{
+				MetaData = cPiston::RotationPitchToMetaData(m_Player->GetRotation(), 0); // Same orientation as pistons, just ignore pitch
+				break;
+			}
+			
+			case E_BLOCK_COBBLESTONE_STAIRS:
+			case E_BLOCK_BRICK_STAIRS:
+			case E_BLOCK_STONE_BRICK_STAIRS:
+			case E_BLOCK_NETHER_BRICK_STAIRS:
+			case E_BLOCK_WOODEN_STAIRS:
+			{
+				MetaData = cStairs::RotationToMetaData(m_Player->GetRotation());
+				break;
+			}
+			case E_BLOCK_LADDER:
+			{
+				MetaData = cLadder::DirectionToMetaData(a_Packet->m_Direction);
+				break;
+			}
+			case E_ITEM_SIGN:
+			{
+				LOG("Sign Dir: %i", a_Packet->m_Direction);
+				if (a_Packet->m_Direction == 1)
+				{
+					LOG("Player Rotation: %f", m_Player->GetRotation());
+					MetaData = cSign::RotationToMetaData(m_Player->GetRotation());
+					LOG("Sign rotation %i", MetaData);
+					a_Packet->m_ItemType = E_BLOCK_SIGN_POST;
+				}
+				else
+				{
+					MetaData = cSign::DirectionToMetaData(a_Packet->m_Direction);
+					a_Packet->m_ItemType = E_BLOCK_WALLSIGN;
+				}
+				break;
+			}
+		
+			case E_ITEM_FLINT_AND_STEEL:
+			{
+				a_Packet->m_ItemType = E_ITEM_FIRE;
+				m_Player->UseEquippedItem();
+				bRemoveItem = false;
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}  // switch (a_Packet->m_ItemType)
+
+
+		if (LavaBucket)
+		{
+			if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item))) {
+				cItem NewItem;
+				NewItem.m_ItemID = E_ITEM_LAVA_BUCKET;
+				NewItem.m_ItemCount = 1;
+				m_Player->GetInventory().AddItem(NewItem);
+				m_Player->GetWorld()->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
+			}
+		}
+		else if (WaterBucket)
+		{
+			if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item)))
+			{
+				cItem NewItem;
+				NewItem.m_ItemID = E_ITEM_WATER_BUCKET;
+				NewItem.m_ItemCount = 1;
+				m_Player->GetInventory().AddItem(NewItem);
+				m_Player->GetWorld()->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
+			}
+		}
+		else if (IsValidBlock(a_Packet->m_ItemType))
+		{
+			int X = a_Packet->m_PosX;
+			char Y = a_Packet->m_PosY;
+			int Z = a_Packet->m_PosZ;
+			AddDirection(X, Y, Z, a_Packet->m_Direction);
+
+			int PlaceBlock = m_Player->GetWorld()->GetBlock(X, Y, Z);
+			if (
+				(PlaceBlock != E_BLOCK_AIR)
+				&& (PlaceBlock != E_BLOCK_WATER)
+				&& (PlaceBlock != E_BLOCK_STATIONARY_WATER)
+				&& (PlaceBlock != E_BLOCK_LAVA)
+				&& (PlaceBlock != E_BLOCK_STATIONARY_LAVA)
+				&& !bIgnoreCollision
+			)
+			{
+				//tried to place a block *into* another?
+				return;  // happens when you place a block aiming at side of block like torch or stem
+			}
+
+			// Check whether selected item is allowed to be placed on specific surface
+			bool bIllegalSurface = false;
+			ENUM_BLOCK_ID SurfaceBlock = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock(X, Y-1, Z);
+			switch (a_Packet->m_ItemType)
+			{
+				case E_BLOCK_YELLOW_FLOWER:	// Can ONLY be placed on dirt/grass
+				case E_BLOCK_RED_ROSE:
+				case E_BLOCK_SAPLING:
+				{
+					switch (SurfaceBlock)
+					{
+						case E_BLOCK_DIRT:
+						case E_BLOCK_GRASS:
+						{
+							bIllegalSurface = false;
+							break;
+						}
+						default:
+						{
+							bIllegalSurface = true;
+							break;
+						}
+					};
+					break;
+				}
+				
+				case E_BLOCK_BROWN_MUSHROOM:	// Can be placed on pretty much anything, with exceptions
+				case E_BLOCK_RED_MUSHROOM:
+				{
+					switch (SurfaceBlock)
+					{
+						case E_BLOCK_GLASS:
+						case E_BLOCK_YELLOW_FLOWER:
+						case E_BLOCK_RED_ROSE:
+						case E_BLOCK_BROWN_MUSHROOM:
+						case E_BLOCK_RED_MUSHROOM:
+						case E_BLOCK_CACTUS:
+						{
+							bIllegalSurface = true;
+							break;
+						}
+					}
+					break;
+				}
+				
+				case E_BLOCK_CACTUS:
+				{
+					bIllegalSurface = (SurfaceBlock != E_BLOCK_SAND) && (SurfaceBlock != E_BLOCK_CACTUS);  // Cactus can only be placed on sand and itself
+
+					// Check surroundings. Cacti may ONLY be surrounded by air
+					cWorld * World = m_Player->GetWorld();
+					if (
+						(World->GetBlock(X - 1, Y, Z)     != E_BLOCK_AIR) ||
+						(World->GetBlock(X + 1, Y, Z)     != E_BLOCK_AIR) ||
+						(World->GetBlock(X,     Y, Z - 1) != E_BLOCK_AIR) ||
+						(World->GetBlock(X,     Y, Z + 1) != E_BLOCK_AIR)
+					)
+					{
+						bIllegalSurface = true;
+					}
+					break;
+				}
+			}  // switch (a_Packet->m_ItemType)
+
+			if (bIllegalSurface)
+			{
+				return;
+			}
+
+			if (bRemoveItem)
+			{
+				if ((m_Player->GetGameMode() != 1) && !m_Player->GetInventory().RemoveItem(Item))
+				{
+					return;
+				}
+			}
+
+
+			if (isDoor)
+			{
+				if ((m_Player->GetWorld()->GetBlock(X, Y + 1, Z) == E_BLOCK_AIR) || (m_Player->GetWorld()->GetBlock(X, Y + 1, Z) == E_BLOCK_AIR))
+				{
+					m_Player->GetWorld()->SetBlock(X, Y + 1, Z, (char)a_Packet->m_ItemType, MetaData + 8);
+					m_Player->GetWorld()->SetBlock(X, Y,     Z, (char)a_Packet->m_ItemType, MetaData);
+				}
+			}
+			else
+			{
+				m_Player->GetWorld()->SetBlock(X, Y, Z, (char)a_Packet->m_ItemType, MetaData);
+			}
+
+			if (UpdateRedstone)
+			{
+				cRedstone Redstone(m_Player->GetWorld());
+				Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, AddedCurrent);
+			}
+		}
+	}
+
+	/*
+	// FakeTruth's "magic stick of removal" :D
+	// TODO: Turn this into a plugin
+	if (m_Username.compare("FakeTruth") == 0)
+	{
+		if (a_Packet->m_ItemType == 280)
+		{
+			cRoot::Get()->GetWorld()->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, 0, 0);
+		}
+	}
+	*/
+}
+
+
+
+
+
+void cClientHandle::HandlePickupSpawn(cPacket_PickupSpawn * a_Packet)
+{
+	LOG("Received packet E_PICKUP_SPAWN");
+
+	cItem DroppedItem;
+	DroppedItem.m_ItemID = (ENUM_ITEM_ID)a_Packet->m_Item;
+	DroppedItem.m_ItemCount = a_Packet->m_Count;
+	DroppedItem.m_ItemHealth = 0x0; // TODO: Somehow figure out what item was dropped, and apply correct health
+	if (m_Player->GetInventory().RemoveItem(DroppedItem))
+	{
+		cPickup * Pickup = new cPickup(a_Packet);
+		Pickup->Initialize(m_Player->GetWorld());
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleChat(cPacket_Chat * a_Packet)
+{
+	if (!cRoot::Get()->GetServer()->Command(*this, a_Packet->m_Message.c_str()))
+	{
+		a_Packet->m_Message.insert(0, "<" + m_Player->GetColor() + m_Username + cChatColor::White + "> ");
+		cRoot::Get()->GetServer()->Broadcast(*a_Packet);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandlePlayerLook(cPacket_PlayerLook * a_Packet)
+{
+	m_Player->SetRotation   (a_Packet->m_Rotation);
+	m_Player->SetPitch      (a_Packet->m_Pitch);
+	m_Player->SetTouchGround(a_Packet->m_bFlying);
+	m_Player->WrapRotation();
+}
+
+
+
+
+
+void cClientHandle::HandlePlayerMoveLook(cPacket_PlayerMoveLook * a_Packet)
+{
+	m_Player->MoveTo(Vector3d(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
+	m_Player->SetStance     (a_Packet->m_Stance);
+	m_Player->SetTouchGround(a_Packet->m_bFlying);
+	m_Player->SetRotation   (a_Packet->m_Rotation);
+	m_Player->SetPitch      (a_Packet->m_Pitch);
+	m_Player->WrapRotation();
+}
+
+
+
+
+
+void cClientHandle::HandleAnimation(cPacket_ArmAnim * a_Packet)
+{
+	a_Packet->m_EntityID = m_Player->GetUniqueID();
+	cRoot::Get()->GetServer()->Broadcast(*a_Packet, this);
+}
+
+
+
+
+
+void cClientHandle::HandleItemSwitch(cPacket_ItemSwitch * a_Packet)
+{
+	m_Player->GetInventory().SetEquippedSlot(a_Packet->m_SlotNum);
+
+	cPacket_EntityEquipment Equipment;
+	Equipment.m_ItemID = (short)m_Player->GetInventory().GetEquippedItem().m_ItemID;
+	Equipment.m_Slot = 0;
+	Equipment.m_UniqueID = m_Player->GetUniqueID();
+	cRoot::Get()->GetServer()->Broadcast(Equipment, this);
+}
+
+
+
+
+
+void cClientHandle::HandleWindowClose(cPacket_WindowClose * a_Packet)
+{
+	m_Player->CloseWindow(a_Packet->m_Close);
+}
+
+
+
+
+
+void cClientHandle::HandleWindowClick(cPacket_WindowClick * a_Packet)
+{
+	if (a_Packet->m_WindowID == 0)
+	{
+		m_Player->GetInventory().Clicked(a_Packet);
+		return;
+	}
+	
+	cWindow * Window = m_Player->GetWindow();
+	if (Window == NULL)
+	{
+		LOGWARNING("Player \"%s\" clicked in a non-existent window. Ignoring", m_Username.c_str());
+		return;
+	}
+	
+	Window->Clicked(a_Packet, *m_Player);
+}
+
+
+
+
+
+void cClientHandle::HandleUpdateSign(cPacket_UpdateSign * a_Packet)
+{
+	cWorld * World = m_Player->GetWorld();
+	cChunk * Chunk = World->GetChunkOfBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	cBlockEntity * BlockEntity = Chunk->GetBlockEntity(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	if ((BlockEntity != NULL) && ((BlockEntity->GetBlockType() == E_BLOCK_SIGN_POST) || (BlockEntity->GetBlockType() == E_BLOCK_WALLSIGN)))
+	{
+		cSignEntity * Sign = reinterpret_cast<cSignEntity *>(BlockEntity);
+		Sign->SetLines(a_Packet->m_Line1, a_Packet->m_Line2, a_Packet->m_Line3, a_Packet->m_Line4);
+		Sign->SendTo(NULL); // Broadcast to all players in chunk
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleUseEntity(cPacket_UseEntity * a_Packet)
+{
+	if (!a_Packet->m_bLeftClick)
+	{
+		return;
+	}
+	cWorld * World = m_Player->GetWorld();
+	cEntity * Entity = World->GetEntity(a_Packet->m_TargetID);
+	if ((Entity != NULL) && Entity->IsA("cPawn"))
+	{
+		cPawn * Pawn = (cPawn *)Entity;
+		Pawn->TakeDamage(1, m_Player);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleRespawn(void)
+{
+	m_Player->Respawn();
+}
+
+
+
+
+
+void cClientHandle::HandleDisconnect(cPacket_Disconnect * a_Packet)
+{
+	LOG("Received d/c packet from \"%s\"", m_Username.c_str());
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_DISCONNECT, 2, a_Packet->m_Reason.c_str(), m_Player))
+	{
+		cPacket_Chat DisconnectMessage(m_Username + " disconnected: " + a_Packet->m_Reason);
+		cRoot::Get()->GetServer()->Broadcast(DisconnectMessage);
+	}
+	Destroy();
+}
+
+
+
+
+
+void cClientHandle::HandleKeepAlive(cPacket_KeepAlive * a_Packet)
+{
+	if (a_Packet->m_KeepAliveID == m_PingID)
+	{
+		cTimer t1;
+		m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
+	}
+}
+
+
+
+
+
+bool cClientHandle::CheckBlockInteractionsRate(void)
+{
+	int LastActionCnt = m_Player->GetLastBlockActionCnt();
+	if ((cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
+	{
+		// Limit the number of block interactions per tick
+		m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.
+		m_Player->SetLastBlockActionCnt(LastActionCnt + 1);
+		if (m_Player->GetLastBlockActionCnt() > MAXBLOCKCHANGEINTERACTIONS)
+		{
+			// Kick if more than MAXBLOCKCHANGEINTERACTIONS per tick
+			LOGWARN("Player %s tried to interact with a block too quickly! (could indicate bot) Was Kicked.", m_Username.c_str());
+			Kick("You're a baaaaaad boy!");
+			return false;
+		}
+	}
+	else
+	{
+		m_Player->SetLastBlockActionCnt(0);  // Reset count 
+		m_Player->SetLastBlockActionTime();  // Player tried to interact with a block. Reset last block interation time.
+	}
+	return true;
 }
 
 
@@ -1397,7 +1586,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (cWorld::GetTime() - m_TimeLastPacket > 30.f)  // 30 seconds time-out
 	{
 		cPacket_Disconnect DC("Nooooo!! You timed out! D: Come back!");
-		DC.Send(mSocket);
+		DC.Send(m_Socket);
 
 		cSleep::MilliSleep(1000);  // Give packet some time to be received
 
@@ -1422,16 +1611,16 @@ void cClientHandle::Tick(float a_Dt)
 		m_bSendLoginResponse = false;
 
 		// Spawn player (only serversided, so data is loaded)
-		m_Player = new cPlayer( this, GetUsername() );	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
+		m_Player = new cPlayer(this, GetUsername());	// !!DO NOT INITIALIZE!! <- is done after receiving MoveLook Packet
 
-		cWorld* World = cRoot::Get()->GetWorld( m_Player->GetLoadedWorldName() );
-		if( !World ) World = cRoot::Get()->GetDefaultWorld();
+		cWorld* World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
+		if (!World) World = cRoot::Get()->GetDefaultWorld();
 		World->LockEntities();
-		m_Player->LoginSetGameMode ( World->GetGameMode() ); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
+		m_Player->LoginSetGameMode (World->GetGameMode()); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
 
-		m_Player->SetIP (mSocket.GetIPString());
+		m_Player->SetIP (m_Socket.GetIPString());
 
-		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player );
+		cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player);
 
 		// Return a server login packet
 		cPacket_Login LoginResponse;
@@ -1442,20 +1631,20 @@ void cClientHandle::Tick(float a_Dt)
 		LoginResponse.m_Dimension = 0;
 		LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetWorld()->GetMaxPlayers();
 		LoginResponse.m_Difficulty = 2;
-		Send( LoginResponse );
+		Send(LoginResponse);
 
 		// Send Weather if raining:
-		if ( (World->GetWeather() == 1) || (World->GetWeather() == 2) ) {
+		if ((World->GetWeather() == 1) || (World->GetWeather() == 2)) {
 			cPacket_NewInvalidState RainPacket;
 			RainPacket.m_Reason = 1; //begin rain
-			Send( RainPacket );
+			Send(RainPacket);
 		}
 
 		// Send time
-		Send( cPacket_TimeUpdate( World->GetWorldTime() ) );
+		Send(cPacket_TimeUpdate(World->GetWorldTime()));
 
 		// Send inventory
-		m_Player->GetInventory().SendWholeInventory( this );
+		m_Player->GetInventory().SendWholeInventory(this);
 
 		// Send health
 		cPacket_UpdateHealth Health;
@@ -1472,17 +1661,17 @@ void cClientHandle::Tick(float a_Dt)
 
 
 
-void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* = E_PRIORITY_NORMAL */ )
+void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* = E_PRIORITY_NORMAL */)
 {
-	if( m_bKicking ) return; // Don't add more packets if player is getting kicked anyway
+	if (m_bKicking) return; // Don't add more packets if player is getting kicked anyway
 
 	bool bSignalSemaphore = true;
-	cCSLock Lock(mSendCriticalSection);
+	cCSLock Lock(m_SendCriticalSection);
 	if (a_Priority == E_PRIORITY_NORMAL)
 	{
 		if (a_Packet.m_PacketID == E_REL_ENT_MOVE_LOOK)
 		{
-			PacketList & Packets = mPendingNrmSendPackets;
+			PacketList & Packets = m_PendingNrmSendPackets;
 			for (PacketList::iterator itr = Packets.begin(); itr != Packets.end(); ++itr)
 			{
 				bool bBreak = false;
@@ -1492,10 +1681,10 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 					{
 						const cPacket_RelativeEntityMoveLook* ThisPacketData = reinterpret_cast< const cPacket_RelativeEntityMoveLook* >(&a_Packet);
 						cPacket_RelativeEntityMoveLook* PacketData = reinterpret_cast< cPacket_RelativeEntityMoveLook* >(*itr);
-						if( ThisPacketData->m_UniqueID == PacketData->m_UniqueID )
+						if (ThisPacketData->m_UniqueID == PacketData->m_UniqueID)
 						{
 							//LOGINFO("Optimized by removing double packet");
-							Packets.erase( itr );
+							Packets.erase(itr);
 							bBreak = true;
 							bSignalSemaphore = false; // Because 1 packet is removed, semaphore count is the same
 							delete PacketData;
@@ -1510,16 +1699,16 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 				}
 			}  // for itr - Packets[]
 		}  // if (E_REL_ENT_MOVE_LOOK
-		mPendingNrmSendPackets.push_back(a_Packet.Clone());
+		m_PendingNrmSendPackets.push_back(a_Packet.Clone());
 	}
-	else if( a_Priority == E_PRIORITY_LOW )
+	else if (a_Priority == E_PRIORITY_LOW)
 	{
-		mPendingLowSendPackets.push_back( a_Packet.Clone() );
+		m_PendingLowSendPackets.push_back(a_Packet.Clone());
 	}
 	Lock.Unlock();
 	if (bSignalSemaphore)
 	{
-		mSemaphore.Signal();
+		m_Semaphore.Signal();
 	}
 }
 
@@ -1527,24 +1716,24 @@ void cClientHandle::Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* 
 
 
 
-void cClientHandle::SendThread( void *lpParam )
+void cClientHandle::SendThread(void *lpParam)
 {
 	cClientHandle* self = (cClientHandle*)lpParam;
-	PacketList & NrmSendPackets = self->mPendingNrmSendPackets;
-	PacketList & LowSendPackets = self->mPendingLowSendPackets;
+	PacketList & NrmSendPackets = self->m_PendingNrmSendPackets;
+	PacketList & LowSendPackets = self->m_PendingLowSendPackets;
 
 
-	while (self->m_bKeepThreadGoing && self->mSocket.IsValid())
+	while (self->m_bKeepThreadGoing && self->m_Socket.IsValid())
 	{
-		self->mSemaphore.Wait();
-		cCSLock Lock(self->mSendCriticalSection);
+		self->m_Semaphore.Wait();
+		cCSLock Lock(self->m_SendCriticalSection);
 		if (NrmSendPackets.size() + LowSendPackets.size() > MAX_SEMAPHORES)
 		{
-			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->mUsername.c_str());
+			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->m_Username.c_str());
 			cPacket_Disconnect DC("Too many packets in queue.");
-			DC.Send(self->mSocket);
+			DC.Send(self->m_Socket);
 
-			cSleep::MilliSleep( 1000 ); // Give packet some time to be received
+			cSleep::MilliSleep(1000); // Give packet some time to be received
 
 			Lock.Unlock();
 			self->Destroy();
@@ -1562,43 +1751,43 @@ void cClientHandle::SendThread( void *lpParam )
 		}
 		if (NrmSendPackets.size() > MAX_SEMAPHORES / 2)
 		{
-			LOGINFO("Pending packets: %i Last: 0x%02x", NrmSendPackets.size(), (*NrmSendPackets.rbegin())->m_PacketID );
+			LOGINFO("Pending packets: %i Last: 0x%02x", NrmSendPackets.size(), (*NrmSendPackets.rbegin())->m_PacketID);
 		}
 
 		cPacket * Packet = NULL;
 		if (!NrmSendPackets.empty())
 		{
 			Packet = *NrmSendPackets.begin();
-			NrmSendPackets.erase( NrmSendPackets.begin() );
+			NrmSendPackets.erase(NrmSendPackets.begin());
 		}
 		else if (!LowSendPackets.empty())
 		{
 			Packet = *LowSendPackets.begin();
-			LowSendPackets.erase( LowSendPackets.begin() );
+			LowSendPackets.erase(LowSendPackets.begin());
 		}
 		Lock.Unlock();
 
-		cCSLock SocketLock(self->mSocketCriticalSection);
-		if (!self->mSocket.IsValid())
+		cCSLock SocketLock(self->m_SocketCriticalSection);
+		if (!self->m_Socket.IsValid())
 		{
 			break;
 		}
 
-		bool bSuccess = Packet->Send(self->mSocket);
+		bool bSuccess = Packet->Send(self->m_Socket);
 		SocketLock.Unlock();
 		
 		if (!bSuccess)
 		{
-			LOGERROR("ERROR: While sending packet 0x%02x to client \"%s\"", Packet->m_PacketID, self->mUsername.c_str());
+			LOGERROR("ERROR: While sending packet 0x%02x to client \"%s\"", Packet->m_PacketID, self->m_Username.c_str());
 			delete Packet;
 			self->Destroy();
 			break;
 		}
 		delete Packet;
 
-		if (self->m_bKicking && (NrmSendPackets.size() + LowSendPackets.size() == 0) ) // Disconnect player after all packets have been sent
+		if (self->m_bKicking && (NrmSendPackets.size() + LowSendPackets.size() == 0)) // Disconnect player after all packets have been sent
 		{
-			cSleep::MilliSleep( 1000 ); // Give all packets some time to be received
+			cSleep::MilliSleep(1000); // Give all packets some time to be received
 			self->Destroy();
 			break;
 		}
@@ -1611,7 +1800,7 @@ void cClientHandle::SendThread( void *lpParam )
 
 
 
-void cClientHandle::ReceiveThread( void *lpParam )
+void cClientHandle::ReceiveThread(void *lpParam)
 {
 	LOG("ReceiveThread");
 
@@ -1623,17 +1812,17 @@ void cClientHandle::ReceiveThread( void *lpParam )
 
 	cSocket socket = self->GetSocket();
 
-	while( self->m_bKeepThreadGoing )
+	while(self->m_bKeepThreadGoing)
 	{
-		iStat = socket.Receive( &temp, 1, 0 );
-		if( cSocket::IsSocketError(iStat) || iStat == 0 )
+		iStat = socket.Receive(&temp, 1, 0);
+		if (cSocket::IsSocketError(iStat) || iStat == 0)
 		{
-			LOG("CLIENT DISCONNECTED (%i bytes):%s", iStat, GetWSAError().c_str() );
+			LOG("CLIENT DISCONNECTED (%i bytes):%s", iStat, GetWSAError().c_str());
 			break;
 		}
 		else
 		{
-			cPacket* pPacket = self->mPacketMap[(unsigned char)temp];
+			cPacket* pPacket = self->m_PacketMap[(unsigned char)temp];
 			if (pPacket)
 			{
 				if (pPacket->Parse(socket))
@@ -1643,21 +1832,21 @@ void cClientHandle::ReceiveThread( void *lpParam )
 				}
 				else
 				{
-					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetLastErrorString() );
-					LOG("CLIENT %s DISCONNECTED", self->mUsername.c_str());
+					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetLastErrorString());
+					LOG("CLIENT %s DISCONNECTED", self->m_Username.c_str());
 					break;
 				}
 			}
 			else
 			{
-				LOG("Unknown packet: 0x%02x \'%c\' %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp );
+				LOG("Unknown packet: 0x%02x \'%c\' %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp);
 
 				AString Reason;
-				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp );
+				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp);
 				cPacket_Disconnect DC(Reason);
-				DC.Send( socket );
+				DC.Send(socket);
 
-				cSleep::MilliSleep( 1000 ); // Give packet some time to be received
+				cSleep::MilliSleep(1000); // Give packet some time to be received
 				break;
 			}
 		}
@@ -1675,7 +1864,7 @@ void cClientHandle::ReceiveThread( void *lpParam )
 
 const AString & cClientHandle::GetUsername(void) const
 {
-	return mUsername;
+	return m_Username;
 }
 
 
@@ -1684,7 +1873,7 @@ const AString & cClientHandle::GetUsername(void) const
 
 const cSocket & cClientHandle::GetSocket()
 {
-	return mSocket;
+	return m_Socket;
 }
 
 
