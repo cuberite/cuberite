@@ -3,8 +3,8 @@
 
 #include "SquirrelBindings.h"
 #if USE_SQUIRREL
-#pragma warning(disable:4100) // Getting A LOT of these warnings from SqPlus
-#pragma warning(disable:4127)
+//#pragma warning(disable:4100) // Getting A LOT of these warnings from SqPlus
+//#pragma warning(disable:4127)
 
 #include <sqplus/sqplus.h>
 #include <sqplus/SquirrelObject.h>

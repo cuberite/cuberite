@@ -11,7 +11,7 @@
 #ifndef CCLIENTHANDLE_H_INCLUDED
 #define CCLIENTHANDLE_H_INCLUDED
 
-#include "Packets/cPacket.h"
+#include "packets/cPacket.h"
 #include "Vector3d.h"
 
 #include "packets/cPacket_KeepAlive.h"
