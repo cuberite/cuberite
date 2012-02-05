@@ -92,7 +92,7 @@ void cSocket::CloseSocket()
 
 
 
-const char * cSocket::GetLastErrorString()
+AString cSocket::GetErrorString( int a_ErrNo )
 {
 #define CASE_AND_RETURN(x) case x: return #x
 
@@ -118,7 +118,27 @@ const char * cSocket::GetLastErrorString()
 	}
 	return "No Error";
 #else
-	return "GetLastErrorString() only works on Windows";
+	char buffer[ 256 ];
+	if( strerror_r( errno, buffer, 256 ) == 0 )
+	{
+		return AString( buffer );
+	}
+	else
+	{
+		return "Error on getting error string!";
+	}
+#endif
+}
+
+
+
+
+int cSocket::GetLastError()
+{
+#ifdef _WIN32
+	return WSAGetLastError();
+#else
+	return errno;
 #endif
 }
 
@@ -176,16 +196,7 @@ int cSocket::Bind(SockAddr_In& a_Address)
 
 	local.sin_port=htons((u_short)a_Address.Port);
 
-	int res = bind(m_Socket, (sockaddr*)&local, sizeof(local));
-	if (res != 0)
-	{
-		#ifdef _WIN32
-		LOGWARNING("bind() failed for port %d, WSAGLE = %d", a_Address.Port, WSAGetLastError());
-		#else  // _WIN32
-		LOGWARNING("bind() failed for port %d, errno = %d", a_Address.Port, errno);
-		#endif  // else _WIN32
-	}
-	return res;
+	return bind(m_Socket, (sockaddr*)&local, sizeof(local));
 }
 
 

@@ -84,7 +84,7 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 	server.sin_port = htons( (unsigned short)iPort);
 	if (connect(m_Socket, (struct sockaddr *)&server, sizeof(server)))
 	{
-		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort, m_Socket.GetLastErrorString());
+		LOGWARN("cTCPLink: Connection to \"%s:%d\" failed (%s)", iAddress, iPort, cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
 		CloseSocket();
 		return false;
 	}

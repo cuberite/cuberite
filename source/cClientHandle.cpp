@@ -1832,7 +1832,7 @@ void cClientHandle::ReceiveThread(void *lpParam)
 				}
 				else
 				{
-					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetLastErrorString());
+					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetErrorString( cSocket::GetLastError() ).c_str());
 					LOG("CLIENT %s DISCONNECTED", self->m_Username.c_str());
 					break;
 				}

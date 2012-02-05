@@ -179,7 +179,7 @@ bool cServer::InitServer( int a_Port )
 
 	if( !m_pState->SListenClient.IsValid() )
 	{
-		LOGERROR("m_SListenClient==INVALID_SOCKET (%s)", cSocket::GetLastErrorString() );
+		LOGERROR("m_SListenClient==INVALID_SOCKET (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
 		return false;
 	}
 
@@ -196,13 +196,13 @@ bool cServer::InitServer( int a_Port )
 
 	if( m_pState->SListenClient.Bind( local ) != 0 )
 	{
-		LOGERROR("bind fail (%s)", cSocket::GetLastErrorString() );
+		LOGERROR("bind fail (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
 		return false;
 	}
 	
 	if( m_pState->SListenClient.Listen( 10 ) != 0)
 	{
-		LOGERROR("listen fail (%s)", cSocket::GetLastErrorString() );
+		LOGERROR("listen fail (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
 		return false;
 	}
 

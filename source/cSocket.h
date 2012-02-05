@@ -28,7 +28,8 @@ public:
 	int SetReuseAddress();
 	static int WSAStartup();
 
-	static const char* GetLastErrorString();
+	static AString GetErrorString( int a_ErrNo );
+	static int GetLastError();
 	static cSocket CreateSocket();
 
 	inline static bool IsSocketError( int a_ReturnedValue )
