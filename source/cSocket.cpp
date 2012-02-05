@@ -17,8 +17,8 @@
 
 
 
-cSocket::cSocket( xSocket a_Socket )
-	: m_Socket( a_Socket )
+cSocket::cSocket(xSocket a_Socket)
+	: m_Socket(a_Socket)
 {
 }
 
@@ -73,13 +73,13 @@ void cSocket::CloseSocket()
 	
 	#else  // _WIN32
 	
-	if( shutdown(m_Socket, SHUT_RDWR) != 0 )//SD_BOTH);
+	if (shutdown(m_Socket, SHUT_RDWR) != 0)//SD_BOTH);
 	{
-		LOGWARN("Error on shutting down socket (%s)", m_IPString.c_str() );
+		LOGWARN("Error on shutting down socket (%s)", m_IPString.c_str());
 	}
-	if( close(m_Socket) != 0 )
+	if (close(m_Socket) != 0)
 	{
-		LOGWARN("Error closing socket (%s)", m_IPString.c_str() );
+		LOGWARN("Error closing socket (%s)", m_IPString.c_str());
 	}
 	
 	#endif  // else _WIN32
@@ -92,29 +92,29 @@ void cSocket::CloseSocket()
 
 
 
-const char* cSocket::GetLastErrorString()
+const char * cSocket::GetLastErrorString()
 {
-#define CASE_AND_RETURN( x ) case x: return #x
+#define CASE_AND_RETURN(x) case x: return #x
 
 #ifdef _WIN32
-	switch( WSAGetLastError() )
+	switch (WSAGetLastError())
 	{
-		CASE_AND_RETURN( WSANOTINITIALISED );
-		CASE_AND_RETURN( WSAENETDOWN );
-		CASE_AND_RETURN( WSAEFAULT );
-		CASE_AND_RETURN( WSAENOTCONN );
-		CASE_AND_RETURN( WSAEINTR );
-		CASE_AND_RETURN( WSAEINPROGRESS );
-		CASE_AND_RETURN( WSAENETRESET );
-		CASE_AND_RETURN( WSAENOTSOCK );
-		CASE_AND_RETURN( WSAEOPNOTSUPP );
-		CASE_AND_RETURN( WSAESHUTDOWN );
-		CASE_AND_RETURN( WSAEWOULDBLOCK );
-		CASE_AND_RETURN( WSAEMSGSIZE );
-		CASE_AND_RETURN( WSAEINVAL );
-		CASE_AND_RETURN( WSAECONNABORTED );
-		CASE_AND_RETURN( WSAETIMEDOUT );
-		CASE_AND_RETURN( WSAECONNRESET );
+		CASE_AND_RETURN(WSANOTINITIALISED);
+		CASE_AND_RETURN(WSAENETDOWN);
+		CASE_AND_RETURN(WSAEFAULT);
+		CASE_AND_RETURN(WSAENOTCONN);
+		CASE_AND_RETURN(WSAEINTR);
+		CASE_AND_RETURN(WSAEINPROGRESS);
+		CASE_AND_RETURN(WSAENETRESET);
+		CASE_AND_RETURN(WSAENOTSOCK);
+		CASE_AND_RETURN(WSAEOPNOTSUPP);
+		CASE_AND_RETURN(WSAESHUTDOWN);
+		CASE_AND_RETURN(WSAEWOULDBLOCK);
+		CASE_AND_RETURN(WSAEMSGSIZE);
+		CASE_AND_RETURN(WSAEINVAL);
+		CASE_AND_RETURN(WSAECONNABORTED);
+		CASE_AND_RETURN(WSAETIMEDOUT);
+		CASE_AND_RETURN(WSAECONNRESET);
 	}
 	return "No Error";
 #else
@@ -133,7 +133,7 @@ int cSocket::SetReuseAddress()
 #else
 	int yes = 1;
 #endif
-	return setsockopt( m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int) );
+	return setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 }
 
 
@@ -144,8 +144,8 @@ int cSocket::WSAStartup()
 {
 #ifdef _WIN32
 	WSADATA wsaData;
-	memset( &wsaData, 0, sizeof( wsaData ) );
-	return ::WSAStartup( MAKEWORD(2, 2),&wsaData);
+	memset(&wsaData, 0, sizeof(wsaData));
+	return ::WSAStartup(MAKEWORD(2, 2),&wsaData);
 #else
 	return 0;
 #endif
@@ -164,28 +164,37 @@ cSocket cSocket::CreateSocket()
 
 
 
-int cSocket::Bind( SockAddr_In& a_Address )
+int cSocket::Bind(SockAddr_In& a_Address)
 {
 	sockaddr_in local;
 
-	if( a_Address.Family == ADDRESS_FAMILY_INTERNET )
+	if (a_Address.Family == ADDRESS_FAMILY_INTERNET)
 		local.sin_family = AF_INET;
 
-	if( a_Address.Address == INTERNET_ADDRESS_ANY )
+	if (a_Address.Address == INTERNET_ADDRESS_ANY)
 		local.sin_addr.s_addr = INADDR_ANY;
 
-	local.sin_port=htons( (u_short)a_Address.Port );
+	local.sin_port=htons((u_short)a_Address.Port);
 
-	return bind( m_Socket, (sockaddr*)&local, sizeof(local));
+	int res = bind(m_Socket, (sockaddr*)&local, sizeof(local));
+	if (res != 0)
+	{
+		#ifdef _WIN32
+		LOGWARNING("bind() failed for port %d, WSAGLE = %d", a_Address.Port, WSAGetLastError());
+		#else  // _WIN32
+		LOGWARNING("bind() failed for port %d, errno = %d", a_Address.Port, errno);
+		#endif  // else _WIN32
+	}
+	return res;
 }
 
 
 
 
 
-int cSocket::Listen( int a_Backlog )
+int cSocket::Listen(int a_Backlog)
 {
-	return listen( m_Socket, a_Backlog );
+	return listen(m_Socket, a_Backlog);
 }
 
 
@@ -197,12 +206,12 @@ cSocket cSocket::Accept()
 	sockaddr_in from;
 	socklen_t fromlen=sizeof(from);
 
-	cSocket SClient = accept( m_Socket, (sockaddr*)&from, &fromlen);
+	cSocket SClient = accept(m_Socket, (sockaddr*)&from, &fromlen);
 
-	if( from.sin_addr.s_addr && SClient.IsValid() )	// Get IP in string form
+	if (from.sin_addr.s_addr && SClient.IsValid())	// Get IP in string form
 	{
 		SClient.m_IPString = inet_ntoa(from.sin_addr);
-		//LOG("cSocket::Accept() %s", SClient.m_IPString );
+		//LOG("cSocket::Accept() %s", SClient.m_IPString);
 	}
 
 	return SClient;
@@ -212,7 +221,7 @@ cSocket cSocket::Accept()
 
 
 
-int cSocket::Receive( char* a_Buffer, unsigned int a_Length, unsigned int a_Flags )
+int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags)
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
 }
