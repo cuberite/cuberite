@@ -94,22 +94,43 @@ void cSocket::CloseSocket()
 
 AString cSocket::GetErrorString( int a_ErrNo )
 {
+	char buffer[ 1024 ];
+	AString Out;
+
 	#ifdef _WIN32
 
-	char Buffer[1024];
-	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, a_ErrNo, 0, Buffer, ARRAYCOUNT(Buffer), NULL);
-	return AString(Buffer);
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), NULL);
+	Printf(Out, "%d: %s", a_ErrNo, buffer);
+	return Out;
 	
 	#else  // _WIN32
-
-	char buffer[ 256 ];
-	if( strerror_r( errno, buffer, 256 ) == 0 )
+	
+	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
+	
+	#if (((_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)) && ! _GNU_SOURCE)  // XSI version of strerror_r():
+	
+	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
+	if( res == 0 )
 	{
-		return AString( buffer );
+		Printf(Out, "%d: %s", a_ErrNo, buffer);
+		return Out;
 	}
+	
+	#else  // GNU version of strerror_r()
+	
+	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
+	if( res != NULL )
+	{
+		Printf(Out, "%d: %s", a_ErrNo, res);
+		return Out;
+	}
+	
+	#endif  // strerror_r() version
+	
 	else
 	{
-		return "Error on getting error string!";
+		Printf(Out, "Error %d while getting error string for error #%d!", errno, a_ErrNo);
+		return Out;
 	}
 	
 	#endif  // else _WIN32
