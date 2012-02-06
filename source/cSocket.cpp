@@ -94,30 +94,14 @@ void cSocket::CloseSocket()
 
 AString cSocket::GetErrorString( int a_ErrNo )
 {
-#define CASE_AND_RETURN(x) case x: return #x
+	#ifdef _WIN32
 
-#ifdef _WIN32
-	switch (WSAGetLastError())
-	{
-		CASE_AND_RETURN(WSANOTINITIALISED);
-		CASE_AND_RETURN(WSAENETDOWN);
-		CASE_AND_RETURN(WSAEFAULT);
-		CASE_AND_RETURN(WSAENOTCONN);
-		CASE_AND_RETURN(WSAEINTR);
-		CASE_AND_RETURN(WSAEINPROGRESS);
-		CASE_AND_RETURN(WSAENETRESET);
-		CASE_AND_RETURN(WSAENOTSOCK);
-		CASE_AND_RETURN(WSAEOPNOTSUPP);
-		CASE_AND_RETURN(WSAESHUTDOWN);
-		CASE_AND_RETURN(WSAEWOULDBLOCK);
-		CASE_AND_RETURN(WSAEMSGSIZE);
-		CASE_AND_RETURN(WSAEINVAL);
-		CASE_AND_RETURN(WSAECONNABORTED);
-		CASE_AND_RETURN(WSAETIMEDOUT);
-		CASE_AND_RETURN(WSAECONNRESET);
-	}
-	return "No Error";
-#else
+	char Buffer[1024];
+	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, a_ErrNo, 0, Buffer, ARRAYCOUNT(Buffer), NULL);
+	return AString(Buffer);
+	
+	#else  // _WIN32
+
 	char buffer[ 256 ];
 	if( strerror_r( errno, buffer, 256 ) == 0 )
 	{
@@ -127,7 +111,8 @@ AString cSocket::GetErrorString( int a_ErrNo )
 	{
 		return "Error on getting error string!";
 	}
-#endif
+	
+	#endif  // else _WIN32
 }
 
 
