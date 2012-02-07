@@ -15,12 +15,13 @@ public:
 	{ m_PacketID = E_BLOCK_CHANGE;  }
 	virtual cPacket* Clone() const { return new cPacket_BlockChange(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
-	int m_PosX;
+	int  m_PosX;
 	char m_PosY;
-	int m_PosZ;
+	int  m_PosZ;
 	char m_BlockType;
 	char m_BlockMeta;
+	
 	static const unsigned int c_Size = 1 + 4 + 1 + 4 + 1 + 1;
 };

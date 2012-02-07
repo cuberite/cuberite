@@ -7,9 +7,13 @@
 
 
 
-bool cPacket_Flying::Parse(cSocket & a_Socket)
+int cPacket_Flying::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadBool( m_bFlying ) ) return false;
-	return true;
+	int TotalBytes= 0;
+	HANDLE_PACKET_READ(ReadBool, m_bFlying, TotalBytes);
+	return TotalBytes;
 }
+
+
+
+

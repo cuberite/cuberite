@@ -3,6 +3,9 @@
 #include "cPacket.h"
 
 
+
+
+
 class cPacket_EntityEquipment : public cPacket
 {
 public:
@@ -15,8 +18,8 @@ public:
 	cPacket_EntityEquipment( const cPacket_EntityEquipment & a_Copy );
 	virtual cPacket* Clone() const { return new cPacket_EntityEquipment(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_UniqueID;
 	short m_Slot; // 0 = hold 1-4 = armor
@@ -25,3 +28,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 4 + 2 + 2 + 2;
 };
+
+
+
+

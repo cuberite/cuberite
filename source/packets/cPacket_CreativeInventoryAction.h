@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 //Sure it´s not Creative Inventory?
@@ -17,8 +21,8 @@ public:
 	cPacket_CreativeInventoryAction( const cPacket_CreativeInventoryAction & a_Copy );
 	virtual cPacket* Clone() const { return new cPacket_CreativeInventoryAction(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	short m_Slot; // 0 = hold 1-4 = armor
 	short m_ItemID;
@@ -27,3 +31,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 2;
 };
+
+
+
+

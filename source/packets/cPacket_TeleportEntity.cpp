@@ -17,25 +17,25 @@ cPacket_TeleportEntity::cPacket_TeleportEntity(cEntity* a_Client)
 	m_PosX = (int)(a_Client->GetPosX() * 32);
 	m_PosY = (int)(a_Client->GetPosY() * 32);
 	m_PosZ = (int)(a_Client->GetPosZ() * 32);
-	m_Rotation = (char)((a_Client->GetRotation()/360.f)*256);
-	m_Pitch    = (char)((a_Client->GetPitch()/360.f)*256);
+	m_Rotation = (char)((a_Client->GetRotation() / 360.f) * 256);
+	m_Pitch    = (char)((a_Client->GetPitch() / 360.f) * 256);
 }
 
-bool cPacket_TeleportEntity::Send( cSocket & a_Socket )
+
+
+
+
+void cPacket_TeleportEntity::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,		Message, i );
-	AppendInteger( m_UniqueID,		Message, i );
-	AppendInteger( m_PosX,			Message, i );
-	AppendInteger( m_PosY,			Message, i );
-	AppendInteger( m_PosZ,			Message, i );
-	AppendByte   ( m_Rotation,		Message, i );
-	AppendByte   ( m_Pitch,			Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte   (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_UniqueID);
+	AppendInteger(a_Data, m_PosX);
+	AppendInteger(a_Data, m_PosY);
+	AppendInteger(a_Data, m_PosZ);
+	AppendByte   (a_Data, m_Rotation);
+	AppendByte   (a_Data, m_Pitch);
 }
+
+
+
+

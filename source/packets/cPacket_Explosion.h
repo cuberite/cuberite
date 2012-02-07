@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_Explosion : public cPacket
@@ -18,7 +22,7 @@ public:
 	~cPacket_Explosion();
 	virtual cPacket* Clone() const { return new cPacket_Explosion(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	double	m_PosX; // The entity ID of the thunderbolt
 	double	m_PosY; 	// Always true. Might have a meaning in the future...
@@ -30,3 +34,7 @@ public:
 
 	char*		m_Records;
 };
+
+
+
+

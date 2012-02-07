@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_UseEntity : public cPacket
@@ -13,11 +17,15 @@ public:
 	{ m_PacketID = E_USE_ENTITY;  }
 	virtual cPacket* Clone() const { return new cPacket_UseEntity(*this); }
 
-	bool Parse(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
 
-	int m_UniqueID;
-	int m_TargetID;
+	int  m_UniqueID;
+	int  m_TargetID;
 	bool m_bLeftClick;
 
 	static const unsigned int c_Size = 1 + 4 + 4 + 1;
 };
+
+
+
+

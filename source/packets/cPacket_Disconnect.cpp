@@ -7,23 +7,23 @@
 
 
 
-bool cPacket_Disconnect::Parse( cSocket & a_Socket )
+int cPacket_Disconnect::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadString16(m_Reason) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadString16, m_Reason, TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_Disconnect::Send( cSocket & a_Socket )
+
+
+
+
+void cPacket_Disconnect::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size + m_Reason.size()*sizeof(short);
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID, Message, i );
-	AppendString16 ( m_Reason,   Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte    (a_Data, m_PacketID);
+	AppendString16(a_Data, m_Reason);
 }
+
+
+
+

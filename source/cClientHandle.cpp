@@ -190,8 +190,7 @@ cClientHandle::~cClientHandle()
 	{
 		cPacket_Disconnect Disconnect;
 		Disconnect.m_Reason = "Server shut down? Kthnxbai";
-		Disconnect.Send(m_Socket);
-
+		m_Socket.Send(&Disconnect);
 		m_Socket.CloseSocket();
 	}
 	Lock.Unlock();
@@ -1586,7 +1585,7 @@ void cClientHandle::Tick(float a_Dt)
 	if (cWorld::GetTime() - m_TimeLastPacket > 30.f)  // 30 seconds time-out
 	{
 		cPacket_Disconnect DC("Nooooo!! You timed out! D: Come back!");
-		DC.Send(m_Socket);
+		m_Socket.Send(&DC);
 
 		cSleep::MilliSleep(1000);  // Give packet some time to be received
 
@@ -1731,7 +1730,7 @@ void cClientHandle::SendThread(void *lpParam)
 		{
 			LOGERROR("ERROR: Too many packets in queue for player %s !!", self->m_Username.c_str());
 			cPacket_Disconnect DC("Too many packets in queue.");
-			DC.Send(self->m_Socket);
+			self->m_Socket.Send(DC);
 
 			cSleep::MilliSleep(1000); // Give packet some time to be received
 
@@ -1773,7 +1772,7 @@ void cClientHandle::SendThread(void *lpParam)
 			break;
 		}
 
-		bool bSuccess = Packet->Send(self->m_Socket);
+		bool bSuccess = self->m_Socket.Send(Packet);
 		SocketLock.Unlock();
 		
 		if (!bSuccess)
@@ -1806,51 +1805,67 @@ void cClientHandle::ReceiveThread(void *lpParam)
 
 	cClientHandle* self = (cClientHandle*)lpParam;
 
-
 	char temp = 0;
 	int iStat = 0;
 
 	cSocket socket = self->GetSocket();
 
-	while(self->m_bKeepThreadGoing)
+	AString Received;
+	while (self->m_bKeepThreadGoing)
 	{
-		iStat = socket.Receive(&temp, 1, 0);
-		if (cSocket::IsSocketError(iStat) || iStat == 0)
+		char Buffer[1024];
+		iStat = socket.Receive(Buffer, sizeof(Buffer), 0);
+		if (cSocket::IsSocketError(iStat) || (iStat == 0))
 		{
-			LOG("CLIENT DISCONNECTED (%i bytes):%s", iStat, GetWSAError().c_str());
+			LOG("CLIENT DISCONNECTED (%i bytes):%s", iStat, cSocket::GetLastErrorString().c_str());
 			break;
 		}
-		else
+		Received.append(Buffer, iStat);
+
+		// Parse all complete packets in Received:
+		while (!Received.empty())
 		{
-			cPacket* pPacket = self->m_PacketMap[(unsigned char)temp];
+			cPacket* pPacket = self->m_PacketMap[(unsigned char)Received[0]];
 			if (pPacket)
 			{
-				if (pPacket->Parse(socket))
+				int NumBytes = pPacket->Parse(Received.data() + 1, Received.size() - 1);
+				if (NumBytes == PACKET_ERROR)
 				{
-					self->AddPacket(pPacket);
-					//self->HandlePendingPackets();
+					LOGERROR("Protocol error while parsing packet type 0x%x; disconnecting client \"%s\"", Received[0], self->m_Username.c_str());
+					cPacket_Disconnect DC("Protocol error");
+					socket.Send(&DC);
+
+					cSleep::MilliSleep(1000); // Give packet some time to be received
+					return;
+				}
+				else if (NumBytes == PACKET_INCOMPLETE)
+				{
+					// Not a complete packet
+					break;
 				}
 				else
 				{
-					LOGERROR("Something went wrong during PacketID 0x%02x (%s)", temp, cSocket::GetErrorString( cSocket::GetLastError() ).c_str());
-					LOG("CLIENT %s DISCONNECTED", self->m_Username.c_str());
-					break;
+					// Packet parsed successfully, add it to internal queue:
+					self->AddPacket(pPacket);
+					// Erase the packet from the buffer:
+					assert(Received.size() > (size_t)NumBytes);
+					Received.erase(0, NumBytes + 1);
 				}
 			}
 			else
 			{
-				LOG("Unknown packet: 0x%02x \'%c\' %i", (unsigned char)temp, (unsigned char)temp, (unsigned char)temp);
+				LOGERROR("Unknown packet type: 0x%2x", Received[0]);
 
 				AString Reason;
-				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)temp);
+				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", Received[0]);
 				cPacket_Disconnect DC(Reason);
-				DC.Send(socket);
+				socket.Send(&DC);
 
 				cSleep::MilliSleep(1000); // Give packet some time to be received
 				break;
 			}
-		}
-	}
+		}  // while (!Received.empty())
+	}  // while (self->m_bKeepThreadGoing)
 
 	self->Destroy();
 

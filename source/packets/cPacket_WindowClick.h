@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_WindowClick : public cPacket // [C -> S]
@@ -19,9 +23,9 @@ public:
 	{ m_PacketID = E_WINDOW_CLICK; }
 	virtual cPacket* Clone() const { return new cPacket_WindowClick(*this); }
 
-	bool Parse(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
 
-	char m_WindowID;
+	char  m_WindowID;
 	short m_SlotNum;	// Slot
 	// 0		= craft result
 	// 1-4		= crafting table
@@ -29,16 +33,20 @@ public:
 	// 9-35		= inventory
 	// 36-44	= Hot bar
 
-	char m_RightMouse;	// 0		= left 1 = Right mb
+	char  m_RightMouse;	// 0		= left 1 = Right mb
 	short m_NumClicks;	// Num clicks
-	bool m_Bool; // unkown???????????? SHIFT clicked 
+	bool  m_Bool; // unkown???????????? SHIFT clicked 
 
 	// Below = item
 	short m_ItemID; // if this is -1 the next stuff dont exist
-	char m_ItemCount;
+	char  m_ItemCount;
 	short m_ItemUses;
 
 	short m_EnchantNums;
 
 	static const unsigned int c_Size = 1 + 1 + 2 + 1 + 2 + 2; // Minimal size ( +1+1  = max)
 };
+
+
+
+

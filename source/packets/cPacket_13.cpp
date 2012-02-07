@@ -7,11 +7,14 @@
 
 
 
-bool cPacket_13::Parse(cSocket & a_Socket)
+int cPacket_13::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-
-	if( !ReadInteger( m_EntityID ) )	return false;
-	if( !ReadByte	( m_ActionID ) )	return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadInteger, m_EntityID, TotalBytes);
+	HANDLE_PACKET_READ(ReadByte   , m_ActionID, TotalBytes);
+	return TotalBytes;
 }
+
+
+
+

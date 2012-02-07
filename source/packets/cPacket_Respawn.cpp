@@ -7,34 +7,33 @@
 
 
 
-bool cPacket_Respawn::Send(cSocket & a_Socket)
+void cPacket_Respawn::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size + m_LevelType.size() * sizeof(short);
-
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte		( (char)m_PacketID,	Message, i );
-	AppendByte		( m_World, Message, i );
-	AppendByte		( m_Difficulty, Message, i );
-	AppendByte		( m_CreativeMode, Message, i );
-	AppendShort		( m_WorldHeight, Message, i );
-	AppendLong		( m_MapSeed, Message, i );
-	AppendString16	( m_LevelType, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte    (a_Data, m_PacketID);
+	AppendByte    (a_Data, m_World);
+	AppendByte    (a_Data, m_Difficulty);
+	AppendByte    (a_Data, m_CreativeMode);
+	AppendShort   (a_Data, m_WorldHeight);
+	AppendLong    (a_Data, m_MapSeed);
+	AppendString16(a_Data, m_LevelType);
 }
 
-bool cPacket_Respawn::Parse(cSocket & a_Socket)
+
+
+
+
+int cPacket_Respawn::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadByte( m_World ) ) return false;
-	if( !ReadByte( m_Difficulty ) ) return false;
-	if( !ReadByte( m_CreativeMode ) ) return false;
-	if( !ReadShort( m_WorldHeight ) ) return false;
-	if( !ReadLong( m_MapSeed ) ) return false;
-	if( !ReadString16( m_LevelType ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadByte,     m_World, TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,     m_Difficulty, TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,     m_CreativeMode, TotalBytes);
+	HANDLE_PACKET_READ(ReadShort,    m_WorldHeight, TotalBytes);
+	HANDLE_PACKET_READ(ReadLong,     m_MapSeed, TotalBytes);
+	HANDLE_PACKET_READ(ReadString16, m_LevelType, TotalBytes);
+	return TotalBytes;
 }
+
+
+
+

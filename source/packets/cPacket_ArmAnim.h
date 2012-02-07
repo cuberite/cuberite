@@ -12,8 +12,8 @@ public:
 	{ m_PacketID = E_ANIMATION; }
 	virtual cPacket* Clone() const { return new cPacket_ArmAnim(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_EntityID;
 	char m_Animation;

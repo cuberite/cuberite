@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_InventoryProgressBar : public cPacket
@@ -13,7 +17,7 @@ public:
 	{ m_PacketID = E_INVENTORY_PROGRESS; }
 	virtual cPacket* Clone() const { return new cPacket_InventoryProgressBar(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	char m_WindowID;
 	short m_ProgressBar;
@@ -21,3 +25,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 1 + 2 + 2;
 };
+
+
+
+

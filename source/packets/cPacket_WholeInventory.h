@@ -1,12 +1,22 @@
+
 #pragma once
 
 #include "cPacket.h"
 
 #include "../BlockID.h"
 
+
+
+
+
 class cInventory;
 class cWindow;
 class cItem;
+
+
+
+
+
 class cPacket_WholeInventory : public cPacket // full inventory [S -> C] ?
 {
 public:
@@ -23,12 +33,15 @@ public:
 
 	virtual cPacket* Clone() const { return new cPacket_WholeInventory(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
-	char m_WindowID;	// WTF?
-	short m_Count;	// Number of items
-
-	cItem* m_Items; // Array of m_Count items
+	char    m_WindowID;	// WTF?
+	short   m_Count;	// Number of items
+	cItem * m_Items; // Array of m_Count items
 
 	static const unsigned int c_Size = 1 + 1 + 2; // Minimal size
 };
+
+
+
+

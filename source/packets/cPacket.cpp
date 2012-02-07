@@ -4,226 +4,303 @@
 #include "cPacket.h"
 #include "../Endianness.h"
 
-#ifdef _WIN32
-	#define MSG_NOSIGNAL (0)
+
+
+
+
+/*
+// These checks cannot be done in preprocessor, since sizeof() is evaluated while compiling, so in preprocessing it's unknown.
+// Check some basic type assumptions:
+#if (sizeof(int) != 4)
+	#error "Bad size for int, protocol won't work"
 #endif
 
-#ifdef __MAC_NA
-	#define MSG_NOSIGNAL (0)
+#if (sizeof(float) != 4)
+	#error "Bad size for float, protocol won't work"
 #endif
 
+#if (sizeof(double) != 8)
+	#error "Bad size for double, protocol won't work"
+#endif
+*/
 
 
 
 
-//*****************************************************************************
-// Blocking receive all function
-//*****************************************************************************
-int cPacket::RecvAll( cSocket & a_Socket, char* a_Data, unsigned int a_Size, int a_Options )
+
+int cPacket::ReadString16(const char * a_Data, int a_Size, AString & a_OutString )
 {
-	unsigned int RequestSize = a_Size;
-	while(a_Size != 0)
-	{
-		int Num = recv(a_Socket, a_Data, a_Size, a_Options);
-		if( cSocket::IsSocketError( Num ) )
-			return Num;
-		a_Size -= Num;
-		a_Data += Num;
-	}
-	return RequestSize - a_Size;
-}
-
-//*****************************************************************************
-// Own implementation of send()
-//*****************************************************************************
-int cPacket::SendData( cSocket & a_Socket, const char* a_Message, unsigned int a_Size, int a_Options )
-{
-	return send(a_Socket, a_Message, a_Size, a_Options | MSG_NOSIGNAL );
-}
-
-
-//*****************************************************************************
-// New packets
-//*****************************************************************************
-
-bool cPacket::ReadString( std::string & a_OutString )
-{
+	int TotalBytes = 0;
 	short StrLen;
-	if(!ReadShort( StrLen )) return false;
+	HANDLE_PACKET_READ(ReadShort, StrLen, TotalBytes);
 
-	if( StrLen == 0 )
+	if (2 * StrLen > a_Size - TotalBytes)
 	{
-		a_OutString.clear();
-		return true;
+		// The string is not yet complete in the buffer
+		return PACKET_INCOMPLETE;
 	}
 
-	char* cString = new char[StrLen];
-	if( cSocket::IsSocketError( RecvAll( m_Socket, cString, StrLen, 0 ) ) ) return false;
-
-	a_OutString.assign( cString, StrLen );
-
-	//printf("Discoved string: %s size: %i\n", a_OutString.c_str(), a_OutString.size() );
-	delete [] cString;
-	return true;
-}
-
-bool cPacket::ReadString16( std::string & a_OutString )
-{
-	short StrLen;
-	if(!ReadShort( StrLen )) return false;
-
+	// Simple UTF-16 to UTF-8 conversion - discard higher bits, ignore multishort sequences:
 	a_OutString.clear();
-	if( StrLen == 0 )
+	a_OutString.reserve(StrLen);
+	short * UTF16 = (short *)(a_Data + TotalBytes);
+	for ( int i = 0; i < StrLen; ++i )
 	{
-		return true;
+		a_OutString.push_back( (char)ntohs(UTF16[i]) );
 	}
 
-	char* UTF16 = new char[StrLen*sizeof( short )];
-	if( cSocket::IsSocketError( RecvAll( m_Socket, UTF16, StrLen * sizeof( short ), 0 ) ) ) return false;
-
-	for( int i = 0; i < StrLen; ++i )
-		a_OutString.push_back( (char)UTF16[i*sizeof( short )+1] );
-
-	//printf("Discoved string: %s size: %i\n", a_OutString.c_str(), a_OutString.size() );
-	delete [] UTF16;
-	return true;
+	return TotalBytes + StrLen * sizeof(short);
 }
 
-bool cPacket::ReadShort( short & a_OutShort )
+
+
+
+
+int cPacket::ReadShort(const char * a_Data, int a_Size, short & a_OutShort )
 {
-	if( cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutShort, sizeof(short), 0 ) ) ) return false;
-	a_OutShort = ntohs(a_OutShort);
-	return true;
+	if (a_Size < 2)
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutShort = ntohs(*((short *)a_Data));
+	return 2;
 }
 
-bool cPacket::ReadInteger( int & a_OutInteger )
+
+
+
+
+int cPacket::ReadInteger(const char * a_Data, int a_Size, int & a_OutInteger )
 {
-	if( cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutInteger, sizeof(int), 0 ) ) ) return false;
-	a_OutInteger = ntohl(a_OutInteger);
-	return true;
+	if (a_Size < 4)
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutInteger = ntohl(*((int *)a_Data));
+	return 4;
 }
 
-bool cPacket::ReadInteger( unsigned int & a_OutInteger )
+
+
+
+
+int cPacket::ReadInteger(const char * a_Data, int a_Size, unsigned int & a_OutInteger )
 {
-	if( cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutInteger, sizeof(unsigned int), 0 ) ) ) return false;
-	a_OutInteger = ntohl(a_OutInteger);
-	return true;
+	if (a_Size < 4)
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutInteger = ntohl(*((unsigned int *)a_Data));
+	return 4;
 }
 
-bool cPacket::ReadFloat( float & a_OutFloat )
+
+
+
+
+int cPacket::ReadFloat(const char * a_Data, int a_Size, float & a_OutFloat )
 {
-	if( cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutFloat, sizeof(float), 0 ) ) ) return false;
-	a_OutFloat = NetworkToHostFloat4( &a_OutFloat );
-	return true;
+	if (a_Size < sizeof(float))
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutFloat = NetworkToHostFloat4(a_Data);
+	return sizeof(float);
 }
 
-bool cPacket::ReadDouble( double & a_OutDouble )
+
+
+
+
+int cPacket::ReadDouble(const char * a_Data, int a_Size, double & a_OutDouble )
 {
-	if( cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutDouble, sizeof(double), 0 ) ) ) return false;
-	a_OutDouble = NetworkToHostDouble8( &a_OutDouble );
-	return true;
+	if (a_Size < sizeof(double))
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutDouble = NetworkToHostDouble8(a_Data);
+	return sizeof(double);
 }
 
-bool cPacket::ReadByte( char & a_OutByte )
+
+
+
+
+int cPacket::ReadByte(const char * a_Data, int a_Size, char & a_OutByte )
 {
-	return !cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutByte, sizeof(char), 0 ) );
+	if (a_Size < 1)
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutByte = *a_Data;
+	return 1;
 }
 
-bool cPacket::ReadByte( unsigned char & a_OutByte )
+
+
+
+
+int cPacket::ReadByte(const char * a_Data, int a_Size, unsigned char & a_OutByte )
 {
-	return !cSocket::IsSocketError(RecvAll( m_Socket, (char*)&a_OutByte, sizeof(char), 0 ) );
+	if (a_Size < 1)
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutByte = *((unsigned char *)a_Data);
+	return 1;
 }
 
-bool cPacket::ReadLong( long long & a_OutLong )
+
+
+
+
+int cPacket::ReadLong(const char * a_Data, int a_Size, long long & a_OutLong )
 {
-	if( cSocket::IsSocketError( RecvAll( m_Socket, (char*)&a_OutLong, sizeof(long long), 0 ) ) ) return false;
-	a_OutLong = NetworkToHostLong8( &a_OutLong );
-	return true;
+	if (a_Size < sizeof(a_OutLong))
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutLong = NetworkToHostLong8(a_Data);
+	return sizeof(a_OutLong);
 }
 
-bool cPacket::ReadBool( bool & a_OutBool )
+
+
+
+
+int cPacket::ReadBool(const char * a_Data, int a_Size, bool & a_OutBool )
 {
-	if( cSocket::IsSocketError(RecvAll( m_Socket, (char*)&a_OutBool, sizeof(bool), 0 ) ) ) return false;
-	return true;
+	if (a_Size < sizeof(bool))
+	{
+		return PACKET_INCOMPLETE;
+	}
+	a_OutBool = (*a_Data != 0);
+	return sizeof(bool);
 }
 
-//*****************************************************************************
-// Append variables to a c-String
-//*****************************************************************************
-void cPacket::AppendString( std::string & a_String, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendString(AString & a_Dst, const AString & a_String)
 {
-	AppendShort( (unsigned short)a_String.size(), a_Dst, a_Iterator );
-	memcpy( a_Dst + a_Iterator, a_String.c_str(), a_String.size() ); a_Iterator += a_String.size();
+	AppendShort(a_Dst, (unsigned short)a_String.size());
+	a_Dst.append(a_String);
 }
 
-void cPacket::AppendString16( std::string & a_String, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendString16(AString & a_Dst, const AString & a_String)
 {
-	AppendShort( (unsigned short)a_String.size(), a_Dst, a_Iterator );
-	char* UTF16 = new char[ a_String.size() * sizeof( short ) ];
+	AppendShort(a_Dst, (unsigned short)a_String.size());
+	std::auto_ptr<char> UTF16(new char[a_String.size() * sizeof( short ) ]);
 	for( unsigned int i = 0; i < a_String.size(); ++i )
 	{
-		UTF16[i*sizeof( short )]	= 0x00;//a_String[i];
-		UTF16[i*sizeof( short )+1]	= a_String[i];
+		UTF16.get()[i * sizeof( short )]     = 0x00;
+		UTF16.get()[i * sizeof( short ) + 1] = a_String[i];
 	}
-	memcpy( a_Dst + a_Iterator, UTF16, a_String.size() * sizeof( short ) ); a_Iterator += a_String.size() * sizeof( short );
-	delete [] UTF16;
+	a_Dst.append(UTF16.get(), a_String.size() * sizeof(short));
 }
 
-void cPacket::AppendShort( short a_Short, char *a_Dst, unsigned int &a_Iterator )
+
+
+
+
+void cPacket::AppendShort(AString & a_Dst, short a_Short)
 {
 	short ConvertedShort = htons( a_Short );
-	memcpy( a_Dst + a_Iterator, &ConvertedShort, sizeof( short ) ); a_Iterator+=sizeof( short );
+	a_Dst.append((const char *)&ConvertedShort, sizeof(short));
 }
 
-void cPacket::AppendShort( unsigned short a_Short, char *a_Dst, unsigned int &a_Iterator )
+
+
+
+
+void cPacket::AppendShort(AString & a_Dst, unsigned short a_Short)
 {
 	short ConvertedShort = htons( a_Short );
-	memcpy( a_Dst + a_Iterator, &ConvertedShort, sizeof( unsigned short ) ); a_Iterator+=sizeof( unsigned short );
+	a_Dst.append((const char *)&ConvertedShort, sizeof(short));
 }
 
 
-void cPacket::AppendInteger( int a_Integer, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+void cPacket::AppendInteger(AString & a_Dst, int a_Integer)
 {
 	int ConvertedInt = htonl( a_Integer );
-	memcpy( a_Dst + a_Iterator, &ConvertedInt, sizeof( int ) ); a_Iterator+=sizeof( int );
+	a_Dst.append((const char *)&ConvertedInt, sizeof(int));
 }
 
-void cPacket::AppendInteger( unsigned int a_Integer, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendInteger(AString & a_Dst, unsigned int a_Integer)
 {
 	unsigned int ConvertedInt = htonl( a_Integer );
-	memcpy( a_Dst + a_Iterator, &ConvertedInt, sizeof( unsigned int ) ); a_Iterator+=sizeof( unsigned int );
+	a_Dst.append((const char *)&ConvertedInt, sizeof(int));
 }
 
-void cPacket::AppendFloat( float a_Float, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendFloat(AString & a_Dst, float a_Float)
 {
 	unsigned int ConvertedFloat = HostToNetwork4(&a_Float);
-	memcpy( a_Dst + a_Iterator, &ConvertedFloat, sizeof(float) ); a_Iterator += sizeof(float);
+	a_Dst.append((const char *)&ConvertedFloat, sizeof(int));
 }
 
-void cPacket::AppendDouble( double & a_Double, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendDouble(AString & a_Dst, const double & a_Double)
 {
 	unsigned long long ConvertedDouble = HostToNetwork8(&a_Double);
-	memcpy( a_Dst + a_Iterator, &ConvertedDouble, sizeof(double) ); a_Iterator += sizeof(double);
+	a_Dst.append((const char *)&ConvertedDouble, 8);
 }
 
-void cPacket::AppendByte( char a_Byte, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendByte(AString & a_Dst, char a_Byte)
 {
-	a_Dst[a_Iterator] = a_Byte; a_Iterator+=sizeof(char);
+	a_Dst.append(&a_Byte, 1);
 }
 
-void cPacket::AppendLong( long long & a_Long, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendLong(AString & a_Dst, const long long & a_Long)
 {
 	unsigned long long ConvertedLong = HostToNetwork8(&a_Long);
-	memcpy( a_Dst + a_Iterator, &ConvertedLong, sizeof(long long) );
-	a_Iterator += sizeof( long long );
+	a_Dst.append((const char *)&ConvertedLong, sizeof(a_Long));
 }
 
-void cPacket::AppendBool( bool a_Bool, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendBool(AString & a_Dst, bool a_Bool)
 {
-	a_Dst[a_Iterator] = (char)a_Bool; a_Iterator+=sizeof(bool);
+	a_Dst.append((const char *)&a_Bool, 1);
 }
 
-void cPacket::AppendData( char* a_Data, unsigned int a_Size, char* a_Dst, unsigned int & a_Iterator )
+
+
+
+
+void cPacket::AppendData(AString & a_Dst, const char * a_Data, unsigned int a_Size)
 {
-	memcpy( a_Dst + a_Iterator, a_Data, a_Size ); a_Iterator += a_Size;
+	a_Dst.append(a_Data, a_Size);
 }
+
+
+
+

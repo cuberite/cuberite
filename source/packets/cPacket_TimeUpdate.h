@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_TimeUpdate : public cPacket
@@ -12,9 +16,14 @@ public:
 	cPacket_TimeUpdate( long long a_Time ) { m_PacketID = E_UPDATE_TIME;  m_Time = a_Time; }
 	virtual cPacket* Clone() const { return new cPacket_TimeUpdate(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	long long m_Time;
+	
 	static const unsigned int c_Size = 1 + 8;
 };
+
+
+
+

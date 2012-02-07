@@ -7,41 +7,41 @@
 
 
 
-bool cPacket_PickupSpawn::Parse( cSocket & a_Socket )
+int cPacket_PickupSpawn::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadInteger( m_UniqueID ) ) return false;
-	if( !ReadShort	( m_Item	 ) ) return false;
-	if( !ReadByte	( m_Count	 ) ) return false;
-	if( !ReadShort	( m_Health	 ) ) return false;
-	if( !ReadInteger( m_PosX	 ) ) return false;
-	if( !ReadInteger( m_PosY	 ) ) return false;
-	if( !ReadInteger( m_PosZ	 ) ) return false;
-	if( !ReadByte	( m_Rotation ) ) return false;
-	if( !ReadByte	( m_Pitch	 ) ) return false;
-	if( !ReadByte	( m_Roll	 ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadInteger, m_UniqueID, TotalBytes);
+	HANDLE_PACKET_READ(ReadShort,   m_Item,     TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,    m_Count,    TotalBytes);
+	HANDLE_PACKET_READ(ReadShort,   m_Health,   TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger, m_PosX,     TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger, m_PosY,     TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger, m_PosZ,     TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,    m_Rotation, TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,    m_Pitch,    TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,    m_Roll,     TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_PickupSpawn::Send( cSocket & a_Socket )
+
+
+
+
+void cPacket_PickupSpawn::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendInteger( m_UniqueID,	Message, i );
-	AppendShort  ( m_Item,		Message, i );
-	AppendByte	 ( m_Count,		Message, i );
-	AppendShort	 ( m_Health,	Message, i );
-	AppendInteger( m_PosX,		Message, i );
-	AppendInteger( m_PosY,		Message, i );
-	AppendInteger( m_PosZ,		Message, i );
-	AppendByte	 ( m_Rotation,	Message, i );
-	AppendByte	 ( m_Pitch,		Message, i );
-	AppendByte	 ( m_Roll,		Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte   (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_UniqueID);
+	AppendShort  (a_Data, m_Item);
+	AppendByte   (a_Data, m_Count);
+	AppendShort  (a_Data, m_Health);
+	AppendInteger(a_Data, m_PosX);
+	AppendInteger(a_Data, m_PosY);
+	AppendInteger(a_Data, m_PosZ);
+	AppendByte   (a_Data, m_Rotation);
+	AppendByte   (a_Data, m_Pitch);
+	AppendByte   (a_Data, m_Roll);
 }
+
+
+
+

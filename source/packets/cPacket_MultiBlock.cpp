@@ -21,6 +21,10 @@ cPacket_MultiBlock::cPacket_MultiBlock( const cPacket_MultiBlock & a_Copy )
 	memcpy( m_BlockMetas, a_Copy.m_BlockMetas, m_NumBlocks );
 }
 
+
+
+
+
 cPacket_MultiBlock::~cPacket_MultiBlock()
 {
 	if( m_BlockCoordinates ) delete [] m_BlockCoordinates;
@@ -28,22 +32,22 @@ cPacket_MultiBlock::~cPacket_MultiBlock()
 	if( m_BlockMetas ) delete [] m_BlockMetas;
 }
 
-bool cPacket_MultiBlock::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_MultiBlock::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size + m_NumBlocks * ( sizeof(short) + 2*sizeof(char) );
-	char* Message = new char[TotalSize];
+	AppendByte   (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_ChunkX);
+	AppendInteger(a_Data, m_ChunkZ);
+	AppendShort  (a_Data, m_NumBlocks);
 
-	unsigned int i = 0;
-	AppendByte		( (char)m_PacketID,		Message, i );
-	AppendInteger	( m_ChunkX,			Message, i );
-	AppendInteger	( m_ChunkZ,			Message, i );
-	AppendShort		( m_NumBlocks,		Message, i );
-
-	AppendData		( (char*)m_BlockCoordinates,sizeof(short)*m_NumBlocks, Message, i );
-	AppendData		( m_BlockTypes,				sizeof(char)*m_NumBlocks, Message, i );
-	AppendData		( m_BlockMetas,				sizeof(char)*m_NumBlocks, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendData   (a_Data, (char *)m_BlockCoordinates, sizeof(short) * m_NumBlocks);
+	AppendData   (a_Data, m_BlockTypes,	m_NumBlocks);
+	AppendData   (a_Data, m_BlockMetas,	m_NumBlocks);
 }
+
+
+
+

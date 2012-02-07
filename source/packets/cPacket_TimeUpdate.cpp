@@ -7,23 +7,23 @@
 
 
 
-bool cPacket_TimeUpdate::Parse(cSocket & a_Socket)
+int cPacket_TimeUpdate::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadLong(m_Time) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadLong, m_Time, TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_TimeUpdate::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_TimeUpdate::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	( (char)m_PacketID, Message, i );
-	AppendLong	( m_Time, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte(a_Data, m_PacketID);
+	AppendLong(a_Data, m_Time);
 }
+
+
+
+

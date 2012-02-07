@@ -7,23 +7,23 @@
 
 
 
-bool cPacket_KeepAlive::Send(cSocket & a_Socket)
+void cPacket_KeepAlive::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID, Message, i );
-	AppendInteger( m_KeepAliveID, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte   (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_KeepAliveID);
 }
 
-bool cPacket_KeepAlive::Parse(cSocket & a_Socket)
+
+
+
+
+int cPacket_KeepAlive::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadInteger( m_KeepAliveID ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadInteger, m_KeepAliveID, TotalBytes);
+	return TotalBytes;
 }
+
+
+
+

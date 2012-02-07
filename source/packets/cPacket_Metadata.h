@@ -1,7 +1,12 @@
+
 #pragma once
 #include "cPacket.h"
 
 #include "../cPawn.h"
+
+
+
+
 
 class cPacket_Metadata : public cPacket 
 {
@@ -10,7 +15,8 @@ public:
 	cPacket_Metadata();
 	~cPacket_Metadata();
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
+	
 	void FormPacket();
 	virtual cPacket* Clone() const { return new cPacket_Metadata( *this ); }
 	
@@ -22,3 +28,7 @@ public:
 	unsigned int m_MetaDataSize;
 	char* m_MetaData;
 };
+
+
+
+

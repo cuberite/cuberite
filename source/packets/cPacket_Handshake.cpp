@@ -7,25 +7,23 @@
 
 
 
-bool cPacket_Handshake::Parse(cSocket & a_Socket)
+int cPacket_Handshake::Parse(const char * a_Data, int a_Size)
 {
-	//printf("Parse: NEW Handshake\n");
-	m_Socket = a_Socket;
-	if( !ReadString16( m_Username ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadString16, m_Username, TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_Handshake::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_Handshake::Serialize(AString & a_Data) const
 {
-	//LOG("Send: NEW Handshake %s", m_Username.c_str() );
-	unsigned int TotalSize = c_Size + m_Username.size() * sizeof(short);
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	( (char)m_PacketID, Message, i );
-	AppendString16( m_Username, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( cPacket::SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte    (a_Data, m_PacketID);
+	AppendString16(a_Data, m_Username);
 }
+
+
+
+

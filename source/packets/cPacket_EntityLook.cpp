@@ -14,22 +14,22 @@ cPacket_EntityLook::cPacket_EntityLook(cEntity* a_Entity)
 	m_PacketID = E_ENT_LOOK;
 
 	m_UniqueID = a_Entity->GetUniqueID();
-	m_Rotation = (char)((a_Entity->GetRotation()/360.f)*256);
-	m_Pitch    = (char)((a_Entity->GetPitch()/360.f)*256);
+	m_Rotation = (char)((a_Entity->GetRotation() / 360.f) * 256);
+	m_Pitch    = (char)((a_Entity->GetPitch()    / 360.f) * 256);
 }
 
-bool cPacket_EntityLook::Send( cSocket & a_Socket )
+
+
+
+
+void cPacket_EntityLook::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,		Message, i );
-	AppendInteger( m_UniqueID,		Message, i );
-	AppendByte   ( m_Rotation,		Message, i );
-	AppendByte   ( m_Pitch,			Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte   (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_UniqueID);
+	AppendByte   (a_Data, m_Rotation);
+	AppendByte   (a_Data, m_Pitch);
 }
+
+
+
+

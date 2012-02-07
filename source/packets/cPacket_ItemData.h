@@ -15,16 +15,14 @@ public:
 	{
 	}
 
-	bool Parse(cSocket & a_Socket);
-
 	virtual cPacket* Clone() const { return new cPacket_ItemData(*this); }
 
-	void AppendItem(char* a_Message, unsigned int &a_Iterator, short a_ItemID, char a_Quantity, short a_Damage);
+	virtual int Parse(const char * a_Data, int a_Size) override;
 
-	void AppendItem(char* a_Message, unsigned int &a_Iterator, cItem *a_Item);
+	static void AppendItem(AString & a_Data, short a_ItemID, char a_Quantity, short a_Damage);
+	static void AppendItem(AString & a_Data, const cItem * a_Item);
 
 	int GetSize(short a_ItemID);
-
 
 	// Below = item
 	short m_ItemID; // if this is -1 the next stuff dont exist

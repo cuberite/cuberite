@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_NamedEntitySpawn : public cPacket
@@ -17,10 +21,10 @@ public:
 	{ m_PacketID = E_NAMED_ENTITY_SPAWN;  }
 	virtual cPacket* Clone() const { return new cPacket_NamedEntitySpawn(*this); }
 
-	bool Send( cSocket & a_Socket );
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_UniqueID;
-	std::string m_PlayerName;
+	AString m_PlayerName;
 	int m_PosX;	// Pixel position, devide by 32 for block position
 	int m_PosY;
 	int m_PosZ;
@@ -30,3 +34,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 4 + 2 + 4 + 4 + 4 + 1 + 1 + 2; // Minimum size
 };
+
+
+
+

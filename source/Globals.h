@@ -27,6 +27,8 @@
 	#include <sys/types.h>
 	#include <sys/stat.h>   // for mkdir
 	#include <sys/time.h>
+	#include <sys/socket.h>
+	#include <netinet/in.h>
 	#include <time.h>
 	#include <dirent.h>
 	#include <errno.h>

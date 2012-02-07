@@ -10,44 +10,45 @@
 const std::string cPacket_Login::LEVEL_TYPE_DEFAULT = "DEFAULT";
 const std::string cPacket_Login::LEVEL_TYPE_SUPERFLAT = "SUPERFLAT";
 
-bool cPacket_Login::Parse( cSocket & a_Socket )
+
+
+
+
+int cPacket_Login::Parse(const char * a_Data, int a_Size)
 {
 	//printf("Parse: NEW Login\n");
-	m_Socket = a_Socket;
-
+	int TotalBytes = 0;
 	m_Username.clear();
-
-	if( !ReadInteger( m_ProtocolVersion ) ) return false;
-	if( !ReadString16( m_Username		) ) return false;
-	if( !ReadLong	( m_MapSeed			) ) return false;
-	if( !ReadString16( m_LevelType		) ) return false;
-	if( !ReadInteger( m_ServerMode		) ) return false;
-	if( !ReadByte	( m_Dimension		) ) return false;
-	if( !ReadByte	( m_Difficulty		) ) return false;
-	if( !ReadByte	( m_WorldHeight		) ) return false;
-	if( !ReadByte	( m_MaxPlayers		) ) return false;
-	return true;
+	HANDLE_PACKET_READ(ReadInteger,  m_ProtocolVersion, TotalBytes);
+	HANDLE_PACKET_READ(ReadString16, m_Username,        TotalBytes);
+	HANDLE_PACKET_READ(ReadLong,     m_MapSeed,         TotalBytes);
+	HANDLE_PACKET_READ(ReadString16, m_LevelType,       TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger,  m_ServerMode,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,     m_Dimension,       TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,     m_Difficulty,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,     m_WorldHeight,     TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,     m_MaxPlayers,      TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_Login::Send( cSocket & a_Socket )
+
+
+
+
+void cPacket_Login::Serialize(AString & a_Data) const
 {
-	//printf("Send: NEW Login\n");
-	unsigned int TotalSize = c_Size + m_Username.size() * sizeof(short) + m_LevelType.size() * sizeof(short);
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendInteger( m_ProtocolVersion,	Message, i );
-	AppendString16 ( m_Username,		Message, i );
-	AppendLong	 ( m_MapSeed,			Message, i );
-	AppendString16( m_LevelType,		Message, i );
-	AppendInteger( m_ServerMode,		Message, i );
-	AppendByte	 ( m_Dimension,			Message, i );
-	AppendByte	 ( m_Difficulty,		Message, i );
-	AppendByte	 ( m_WorldHeight,		Message, i );
-	AppendByte	 ( m_MaxPlayers,		Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( cPacket::SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte    (a_Data, m_PacketID);
+	AppendInteger (a_Data, m_ProtocolVersion);
+	AppendString16(a_Data, m_Username);
+	AppendLong    (a_Data, m_MapSeed);
+	AppendString16(a_Data, m_LevelType);
+	AppendInteger (a_Data, m_ServerMode);
+	AppendByte    (a_Data, m_Dimension);
+	AppendByte    (a_Data, m_Difficulty);
+	AppendByte    (a_Data, m_WorldHeight);
+	AppendByte    (a_Data, m_MaxPlayers);
 }
+
+
+
+

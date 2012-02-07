@@ -1,9 +1,13 @@
+
 #pragma once
 
 #include "cPacket.h"
 
 #include "cPacket_Login.h"
-#include <string>
+
+
+
+
 
 class cPacket_Respawn : public cPacket
 {
@@ -18,15 +22,19 @@ public:
 	{ m_PacketID = E_RESPAWN; }
 	virtual cPacket* Clone() const { return new cPacket_Respawn( *this ); }
 
-	bool Send(cSocket & a_Socket);
-	bool Parse(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	char m_World;
 	char m_Difficulty;
 	char m_CreativeMode;
 	short m_WorldHeight;
 	long long m_MapSeed;
-	std::string m_LevelType;
+	AString m_LevelType;
 
 	static const unsigned int c_Size = 1 + 1 + 1 + 1 + 2 + 8 + 2;
 };
+
+
+
+

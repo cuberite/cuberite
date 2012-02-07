@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_ItemSwitch : public cPacket
@@ -11,9 +15,14 @@ public:
 	{ m_PacketID = E_ITEM_SWITCH; }
 	virtual cPacket* Clone() const { return new cPacket_ItemSwitch(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	short m_SlotNum;
+	
 	static const unsigned int c_Size = 1 + 2;
 };
+
+
+
+

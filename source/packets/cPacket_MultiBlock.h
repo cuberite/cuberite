@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_MultiBlock : public cPacket
@@ -18,7 +22,7 @@ public:
 	~cPacket_MultiBlock();
 	virtual cPacket* Clone() const { return new cPacket_MultiBlock(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_ChunkX;
 	int m_ChunkZ;
@@ -30,3 +34,7 @@ public:
 	char* m_BlockTypes;
 	char* m_BlockMetas;
 };
+
+
+
+

@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_PickupSpawn : public cPacket
@@ -20,8 +24,8 @@ public:
 	{ m_PacketID = E_PICKUP_SPAWN;  }
 	virtual cPacket* Clone() const { return new cPacket_PickupSpawn(*this); }
 
-	bool Parse( cSocket & a_Socket );
-	bool Send( cSocket & a_Socket );
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_UniqueID;
 	short m_Item;
@@ -36,3 +40,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 4 + 2 + 1 + 2 + 4 + 4 + 4 + 1 + 1 + 1;
 };
+
+
+
+

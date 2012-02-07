@@ -19,31 +19,35 @@ cPacket_PlayerPosition::cPacket_PlayerPosition( cPlayer* a_Player )
 	m_bFlying = a_Player->GetFlying();
 }
 
-bool cPacket_PlayerPosition::Parse(cSocket & a_Socket)
+
+
+
+
+int cPacket_PlayerPosition::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadDouble( m_PosX ) ) return false;
-	if( !ReadDouble( m_PosY ) ) return false;
-	if( !ReadDouble( m_Stance ) ) return false;
-	if( !ReadDouble( m_PosZ ) ) return false;
-	if( !ReadBool( m_bFlying ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadDouble, m_PosX,    TotalBytes);
+	HANDLE_PACKET_READ(ReadDouble, m_PosY,    TotalBytes);
+	HANDLE_PACKET_READ(ReadDouble, m_Stance,  TotalBytes);
+	HANDLE_PACKET_READ(ReadDouble, m_PosZ,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,   m_bFlying, TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_PlayerPosition::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_PlayerPosition::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendDouble ( m_PosX,		Message, i );
-	AppendDouble ( m_PosY,		Message, i );
-	AppendDouble ( m_Stance,	Message, i );
-	AppendDouble ( m_PosZ,		Message, i );
-	AppendBool	 ( m_bFlying,	Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte	 (a_Data, m_PacketID);
+	AppendDouble (a_Data, m_PosX);
+	AppendDouble (a_Data, m_PosY);
+	AppendDouble (a_Data, m_Stance);
+	AppendDouble (a_Data, m_PosZ);
+	AppendBool	 (a_Data, m_bFlying);
 }
+
+
+
+

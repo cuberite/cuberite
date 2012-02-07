@@ -7,26 +7,28 @@
 
 
 
-bool cPacket_NamedEntitySpawn::Send( cSocket & a_Socket )
+void cPacket_NamedEntitySpawn::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size + m_PlayerName.size() * sizeof( short );
-	char* Message = new char[TotalSize];
+	short CurrentItem = m_CurrentItem;
+	assert(CurrentItem > 0);
+	if (CurrentItem <= 0)
+	{
+		CurrentItem = 0;
+		// Fix, to make sure no invalid values are sent.
+		// WARNING: HERE ITS 0, BUT IN EQUIP PACKET ITS -1 !!
+	}
 
-	if( m_CurrentItem <= 0 ) m_CurrentItem = 0; // Fix, to make sure no invalid values are sent.
-	// WARNING: HERE ITS 0, BUT IN EQUIP PACKET ITS -1 !!
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,		Message, i );
-	AppendInteger( m_UniqueID,		Message, i );
-	AppendString16( m_PlayerName,	Message, i );
-	AppendInteger( m_PosX,			Message, i );
-	AppendInteger( m_PosY,			Message, i );
-	AppendInteger( m_PosZ,			Message, i );
-	AppendByte   ( m_Rotation,		Message, i );
-	AppendByte   ( m_Pitch,			Message, i );
-	AppendShort  ( m_CurrentItem,	Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte	  (a_Data, m_PacketID);
+	AppendInteger (a_Data, m_UniqueID);
+	AppendString16(a_Data, m_PlayerName);
+	AppendInteger (a_Data, m_PosX);
+	AppendInteger (a_Data, m_PosY);
+	AppendInteger (a_Data, m_PosZ);
+	AppendByte    (a_Data, m_Rotation);
+	AppendByte    (a_Data, m_Pitch);
+	AppendShort   (a_Data, CurrentItem);
 }
+
+
+
+

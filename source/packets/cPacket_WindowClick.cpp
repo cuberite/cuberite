@@ -9,31 +9,35 @@
 
 
 
-bool cPacket_WindowClick::Parse(cSocket & a_Socket)
+int cPacket_WindowClick::Parse(const char * a_Data, int a_Size)
 {
-//	LOG("-----------INV66-----------");
-	m_Socket = a_Socket;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadByte,  m_WindowID, TotalBytes);
+	HANDLE_PACKET_READ(ReadShort, m_SlotNum, TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,  m_RightMouse, TotalBytes);
+	HANDLE_PACKET_READ(ReadShort, m_NumClicks, TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,  m_Bool, TotalBytes);
 
-	if( !ReadByte(m_WindowID) ) return false;
-	if( !ReadShort(m_SlotNum) ) return false;
-	if( !ReadByte(m_RightMouse) ) return false;
-	if( !ReadShort(m_NumClicks) ) return false;
-	if( !ReadBool(m_Bool) )	return false;
-
-// 	LOG("WindowID  : %i", m_Type );
-// 	LOG("FromSlot: %i", m_SlotNum );
-// 	LOG("Right/Le: %i", m_RightMouse );
-// 	LOG("NumClick: %i", m_NumClicks );
+	// LOG("WindowClick: WindowID: %i; FromSlot: %i; Right/Le: %i; NumClick: %i", m_Type, m_SlotNum, m_RightMouse, m_NumClicks );
 
 	cPacket_ItemData Item;
 
-	Item.Parse(m_Socket);
+	int res = Item.Parse(a_Data + TotalBytes, a_Size - TotalBytes);
+	if (res < 0)
+	{
+		return res;
+	}
+	TotalBytes += res;
 
-	m_ItemID = Item.m_ItemID;
+	m_ItemID    = Item.m_ItemID;
 	m_ItemCount = Item.m_ItemCount;
-	m_ItemUses = Item.m_ItemUses;
+	m_ItemUses  = Item.m_ItemUses;
 
 	m_EnchantNums = Item.m_EnchantNums;
 
-	return true;
+	return TotalBytes;
 }
+
+
+
+

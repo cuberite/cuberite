@@ -9,28 +9,28 @@
 
 cPacket_Thunderbolt::cPacket_Thunderbolt( const cPacket_Thunderbolt & a_Copy )
 {
-        m_PacketID = E_THUNDERBOLT;
-        m_UniqueID = 237183; //just a random Ent ID. I don't think this matters at all.
-				m_Unknown  = true;
-        m_xLBPos   = a_Copy.m_xLBPos;
-        m_yLBPos   = a_Copy.m_yLBPos;
-        m_zLBPos   = a_Copy.m_zLBPos;
+	m_PacketID = E_THUNDERBOLT;
+	m_UniqueID = 237183; //just a random Ent ID. I don't think this matters at all.
+	m_Unknown  = true;
+	m_xLBPos   = a_Copy.m_xLBPos;
+	m_yLBPos   = a_Copy.m_yLBPos;
+	m_zLBPos   = a_Copy.m_zLBPos;
 }
 
-bool cPacket_Thunderbolt::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_Thunderbolt::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte    ( (char)m_PacketID, Message, i );
-	AppendInteger ( m_UniqueID, Message, i );
-	AppendBool    ( m_Unknown, Message, i );
-	AppendInteger ( m_xLBPos*32, Message, i );
-	AppendInteger ( m_yLBPos*32, Message, i );
-	AppendInteger ( m_zLBPos*32, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte    (a_Data, m_PacketID);
+	AppendInteger (a_Data, m_UniqueID);
+	AppendBool    (a_Data, m_Unknown);
+	AppendInteger (a_Data, m_xLBPos * 32);
+	AppendInteger (a_Data, m_yLBPos * 32);
+	AppendInteger (a_Data, m_zLBPos * 32);
 }
+
+
+
+

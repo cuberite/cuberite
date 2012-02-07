@@ -1,6 +1,11 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
+
 
 class cPacket_WindowOpen : public cPacket
 {
@@ -12,12 +17,16 @@ public:
 	{ m_PacketID = E_WINDOW_OPEN; }
 	virtual cPacket* Clone() const { return new cPacket_WindowOpen(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
-	char m_WindowID;
-	char m_InventoryType;
-	std::string m_WindowTitle;
-	char m_NumSlots;
+	char    m_WindowID;
+	char    m_InventoryType;
+	AString m_WindowTitle;
+	char    m_NumSlots;
 
 	static const unsigned int c_Size = 1 + 1 + 1 + 2 + 1; // + sizeof(string)
 };
+
+
+
+

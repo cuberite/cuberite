@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cChunk;
@@ -22,7 +26,7 @@ public:
 	~cPacket_MapChunk();
 	virtual cPacket* Clone() const { return new cPacket_MapChunk(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_PosX; // In block coordinates
 	short m_PosY;
@@ -33,5 +37,9 @@ public:
 	int m_CompressedSize;
 	static const unsigned int c_Size = 1 + 4 + 2 + 4 + 1 + 1 + 1 + 4;
 
-	char* m_CompressedData;
+	char * m_CompressedData;
 };
+
+
+
+

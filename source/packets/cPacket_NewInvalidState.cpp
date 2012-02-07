@@ -10,28 +10,33 @@
 cPacket_NewInvalidState::cPacket_NewInvalidState( const cPacket_NewInvalidState & a_Copy )
 {
 	m_PacketID = E_NEW_INVALID_STATE;
-	m_Reason = a_Copy.m_Reason;
+	m_Reason   = a_Copy.m_Reason;
 	m_GameMode = a_Copy.m_GameMode;
 }
 
-bool cPacket_NewInvalidState::Parse(cSocket & a_Socket) {
-	m_Socket = a_Socket;
-	if( !ReadByte	( m_Reason ) ) return false;
-	if( !ReadByte	( m_GameMode ) ) return false;
-	return true;
-}
 
-bool cPacket_NewInvalidState::Send(cSocket & a_Socket)
+
+
+
+int cPacket_NewInvalidState::Parse(const char * a_Data, int a_Size)
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	( (char)m_PacketID,	Message, i );
-	AppendByte ( m_Reason, Message, i );
-	AppendByte ( m_GameMode, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadByte, m_Reason, TotalBytes);
+	HANDLE_PACKET_READ(ReadByte, m_GameMode, TotalBytes);
+	return TotalBytes;
 }
+
+
+
+
+
+void cPacket_NewInvalidState::Serialize(AString & a_Data) const
+{
+	AppendByte(a_Data, m_PacketID);
+	AppendByte(a_Data, m_Reason);
+	AppendByte(a_Data, m_GameMode);
+}
+
+
+
+

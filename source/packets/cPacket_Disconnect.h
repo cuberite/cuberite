@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_Disconnect : public cPacket
@@ -10,9 +14,13 @@ public:
 	cPacket_Disconnect(const AString & a_Reason) { m_PacketID = E_DISCONNECT; m_Reason = a_Reason;  }
 	virtual cPacket* Clone() const { return new cPacket_Disconnect(*this); }
 
-	bool Parse( cSocket & a_Socket );
-	bool Send( cSocket & a_Socket );
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	AString m_Reason;
 	static const unsigned int c_Size = 3; // Minimum size
 };
+
+
+
+

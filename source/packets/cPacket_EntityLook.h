@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cEntity;
@@ -15,7 +19,7 @@ public:
 	cPacket_EntityLook(cEntity* a_Entity);
 	virtual cPacket* Clone() const { return new cPacket_EntityLook(*this); }
 
-	bool Send( cSocket & a_Socket );
+	virtual void Serialize(AString & a_Data) const override;
 
 	int m_UniqueID;
 	char m_Rotation;
@@ -23,3 +27,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 4 + 1 + 1;
 };
+
+
+
+

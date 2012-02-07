@@ -7,18 +7,14 @@
 
 
 
-bool cPacket_PreChunk::Send(cSocket & a_Socket)
+void cPacket_PreChunk::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendInteger( m_PosX,		Message, i );
-	AppendInteger( m_PosZ,		Message, i );
-	AppendBool   ( m_bLoad,		Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte	 (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_PosX);
+	AppendInteger(a_Data, m_PosZ);
+	AppendBool   (a_Data, m_bLoad);
 }
+
+
+
+

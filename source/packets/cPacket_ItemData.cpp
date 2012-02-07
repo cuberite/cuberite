@@ -7,35 +7,36 @@
 
 
 
-bool cPacket_ItemData::Parse(cSocket & a_Socket)
+int cPacket_ItemData::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadShort, m_ItemID, TotalBytes);
 
-	if( !ReadShort(m_ItemID) ) return false;
-
-	if( m_ItemID > -1 )
+	if (m_ItemID <= -1)
 	{
-		if( !ReadByte(m_ItemCount) ) return false;
-		if( !ReadShort(m_ItemUses) ) return false;
+		m_ItemCount = 0;
+		m_ItemUses = 0;
+		return TotalBytes;
+	}
 
-		if(cItem::IsEnchantable((ENUM_ITEM_ID) m_ItemID))
+	HANDLE_PACKET_READ(ReadByte , m_ItemCount, TotalBytes);
+	HANDLE_PACKET_READ(ReadShort, m_ItemUses,  TotalBytes);
+
+	if (cItem::IsEnchantable((ENUM_ITEM_ID) m_ItemID))
+	{
+		HANDLE_PACKET_READ(ReadShort, m_EnchantNums, TotalBytes);
+		
+		if ( m_EnchantNums > -1 )
 		{
-			if( !ReadShort(m_EnchantNums) ) return false;
-			if( m_EnchantNums > -1 )
-			{
-				//TODO Not implemented yet!
-			}
+			// TODO: Enchantment not implemented yet!
 		}
-
 	}
-	else
-	{
-	    m_ItemCount = 0;
-	    m_ItemUses = 0;
-	}
-
-	return true;
+	return TotalBytes;
 }
+
+
+
+
 
 int cPacket_ItemData::GetSize(short a_ItemID)
 {
@@ -47,20 +48,34 @@ int cPacket_ItemData::GetSize(short a_ItemID)
 }
 
 
-void cPacket_ItemData::AppendItem(char* a_Message, unsigned int &a_Iterator, cItem *a_Item)
+
+
+
+void cPacket_ItemData::AppendItem(AString & a_Data, const cItem * a_Item)
 {
-	return AppendItem(a_Message, a_Iterator, (short) a_Item->m_ItemID, a_Item->m_ItemCount, a_Item->m_ItemHealth);
+	return AppendItem(a_Data, a_Item->m_ItemID, a_Item->m_ItemCount, a_Item->m_ItemHealth);
 }
 
-void cPacket_ItemData::AppendItem(char* a_Message, unsigned int &a_Iterator, short a_ItemID, char a_Quantity, short a_Damage)
+
+
+
+
+void cPacket_ItemData::AppendItem(AString & a_Data, short a_ItemID, char a_Quantity, short a_Damage)
 {
-	
-	AppendShort	 ( (short) a_ItemID,	a_Message, a_Iterator );
-	if(a_ItemID > -1)
+	AppendShort(a_Data, (short) a_ItemID);
+	if (a_ItemID > -1)
 	{
-		AppendByte	 ( a_Quantity,			a_Message, a_Iterator );
-		AppendShort	 ( a_Damage,			a_Message, a_Iterator );
-		if(cItem::IsEnchantable((ENUM_ITEM_ID) a_ItemID))
-			AppendShort ( (short) -1,		a_Message, a_Iterator );
+		AppendByte (a_Data, a_Quantity);
+		AppendShort(a_Data, a_Damage);
+		
+		if (cItem::IsEnchantable((ENUM_ITEM_ID) a_ItemID))
+		{
+			// TODO: Implement enchantments
+			AppendShort(a_Data, (short) -1);
+		}
 	}
 }
+
+
+
+

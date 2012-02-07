@@ -16,34 +16,33 @@ cPacket_EntityEquipment::cPacket_EntityEquipment( const cPacket_EntityEquipment 
 	m_Short = 0;
 }
 
-bool cPacket_EntityEquipment::Parse(cSocket & a_Socket)
+
+
+
+
+int cPacket_EntityEquipment::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadInteger( m_UniqueID ) ) return false;
-	if( !ReadShort	( m_Slot ) ) return false;
-	if( !ReadShort	( m_ItemID ) ) return false;
-	if( !ReadShort	( m_Short ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadInteger, m_UniqueID, TotalBytes);
+	HANDLE_PACKET_READ(ReadShort,   m_Slot,     TotalBytes);
+	HANDLE_PACKET_READ(ReadShort,   m_ItemID,   TotalBytes);
+	HANDLE_PACKET_READ(ReadShort,   m_Short,    TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_EntityEquipment::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_EntityEquipment::Serialize(AString & a_Data) const
 {
-	//LOG("InventoryChange:");
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	if( m_ItemID <= 0 ) m_ItemID = -1; // Fix, to make sure no invalid values are sent.
-                        // WARNING: HERE ITS -1, BUT IN NAMED ENTITY SPAWN PACKET ITS 0 !!
-	//LOG("cPacket_EntityEquipment: Sending equipped item ID: %i", m_ItemID );
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendInteger( m_UniqueID,	Message, i );
-	AppendShort  ( m_Slot,		Message, i );
-	AppendShort  ( m_ItemID,	Message, i );
-	AppendShort	 ( m_Short,		Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte   (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_UniqueID);
+	AppendShort  (a_Data, m_Slot);
+	AppendShort  (a_Data, m_ItemID);
+	AppendShort  (a_Data, m_Short);
 }
+
+
+
+

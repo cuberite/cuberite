@@ -21,10 +21,14 @@ public:
 	{ m_PacketID = E_PACKET_13; }
 	virtual cPacket* Clone() const { return new cPacket_13( *this ); }
 
-	bool Parse(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
 
-	int m_EntityID;
+	int  m_EntityID;
 	char m_ActionID;
 
 	static const unsigned int c_Size = 1;
 };
+
+
+
+

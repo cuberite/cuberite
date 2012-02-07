@@ -7,24 +7,23 @@
 
 
 
-bool cPacket_ItemSwitch::Parse( cSocket & a_Socket )
+int cPacket_ItemSwitch::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-
-	if( !ReadShort  ( m_SlotNum ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadShort, m_SlotNum, TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_ItemSwitch::Send( cSocket & a_Socket )
+
+
+
+
+void cPacket_ItemSwitch::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID, Message, i );
-	AppendShort  ( m_SlotNum, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte (a_Data, m_PacketID);
+	AppendShort(a_Data, m_SlotNum);
 }
+
+
+
+

@@ -8,6 +8,28 @@
 
 
 
+#define PACKET_INCOMPLETE -2
+#define PACKET_ERROR      -1
+
+
+
+
+
+// Use this macro to simplify handling several ReadXXX in a row. It assumes that you want [a_Data, a_Size] parsed (which is true for all Parse() functions)
+#define HANDLE_PACKET_READ(Proc, Var, TotalBytes) \
+	{ \
+		int res = Proc(a_Data + TotalBytes, a_Size - TotalBytes, Var); \
+		if (res < 0) \
+		{ \
+			return res; \
+		} \
+		TotalBytes += res; \
+	}
+
+
+
+
+
 class cPacket
 {
 public:
@@ -16,41 +38,52 @@ public:
 	{}
 	virtual ~cPacket() {}
 
-	virtual bool Parse( cSocket & a_Socket) {a_Socket.CloseSocket(); LOGERROR("Undefined NEW Parse function %x\n", m_PacketID ); return false; }
-	virtual bool Send( cSocket & a_Socket)  {a_Socket.CloseSocket(); LOGERROR("Undefined NEW Send function %x\n",  m_PacketID ); return false; }
-	virtual cPacket* Clone() const = 0;
+	/// Called to parse the packet. Packet type has already been read and the correct packet type created. Return the number of characters processed, PACKET_INCOMPLETE for incomplete data, PACKET_ERROR for error
+	virtual int Parse(const char * a_Data, int a_Size)
+	{
+		LOGERROR("Undefined Parse function for packet type 0x%x\n", m_PacketID );
+		assert(!"Undefined Parse function");
+		return -1;
+	}
+	
+	/// Called to serialize the packet into a string. Append all packet data to a_Data, including the packet type!
+	virtual void Serialize(AString & a_Data) const
+	{
+		LOGERROR("Undefined Serialize function for packet type 0x%x\n",  m_PacketID );
+		assert(!"Undefined Serialize function");
+	}
+	
+	virtual cPacket * Clone() const = 0;
 
 	unsigned char m_PacketID;
-	cSocket m_Socket; // Current socket being used
+
 protected:
-	bool ReadString	( std::string & a_OutString );
-	bool ReadString16( std::string & a_OutString );
-	bool ReadShort	( short & a_Short );
-	bool ReadInteger(int & a_OutInteger );
-	bool ReadInteger(unsigned int & a_OutInteger );
-	bool ReadFloat	( float & a_OutFloat );
-	bool ReadDouble	( double & a_OutDouble );
-	bool ReadByte	( char & a_OutByte );
-	bool ReadByte	( unsigned char & a_OutByte );
-	bool ReadLong	( long long & a_OutLong );
-	bool ReadBool	( bool & a_OutBool );
 
-	void AppendString	( std::string & a_String,	char* a_Dst, unsigned int & a_Iterator );
-	void AppendString16 ( std::string & a_String,	char* a_Dst, unsigned int & a_Iterator );
-	void AppendShort	( short a_Short,			char* a_Dst, unsigned int & a_Iterator );
-	void AppendShort	( unsigned short a_Short,	char* a_Dst, unsigned int & a_Iterator );
-	void AppendInteger	( int a_Integer,			char* a_Dst, unsigned int & a_Iterator );
-	void AppendInteger	( unsigned int a_Integer,	char* a_Dst, unsigned int & a_Iterator );
-	void AppendFloat	( float a_Float,			char* a_Dst, unsigned int & a_Iterator );
-	void AppendDouble	( double & a_Double,		char* a_Dst, unsigned int & a_Iterator );
-	void AppendByte		( char a_Byte,				char* a_Dst, unsigned int & a_Iterator );
-	void AppendLong		( long long & a_Long,		char* a_Dst, unsigned int & a_Iterator );
-	void AppendBool		( bool a_Bool,				char* a_Dst, unsigned int & a_Iterator );
-	void AppendData		( char* a_Data, unsigned int a_Size, char* a_Dst, unsigned int & a_Iterator );
+	// These return the number of characters processed, PACKET_INCOMPLETE for incomplete data, PACKET_ERROR for error:
+	static int ReadString16(const char * a_Data, int a_Size, AString & a_OutString );
+	static int ReadShort   (const char * a_Data, int a_Size, short & a_Short );
+	static int ReadInteger (const char * a_Data, int a_Size, int & a_OutInteger );
+	static int ReadInteger (const char * a_Data, int a_Size, unsigned int & a_OutInteger );
+	static int ReadFloat   (const char * a_Data, int a_Size, float & a_OutFloat );
+	static int ReadDouble  (const char * a_Data, int a_Size, double & a_OutDouble );
+	static int ReadByte    (const char * a_Data, int a_Size, char & a_OutByte );
+	static int ReadByte    (const char * a_Data, int a_Size, unsigned char & a_OutByte );
+	static int ReadLong    (const char * a_Data, int a_Size, long long & a_OutLong );
+	static int ReadBool    (const char * a_Data, int a_Size, bool & a_OutBool );
 
-public:
-	static int SendData( cSocket & a_Socket, const char* a_Message, unsigned int a_Size, int a_Options );
-	static int RecvAll( cSocket & a_Socket, char* a_Data, unsigned int a_Size, int a_Options );
+	// These append the data into the a_Dst string:
+	static void AppendString  ( AString & a_Dst, const AString & a_String);
+	static void AppendString16( AString & a_Dst, const AString & a_String);
+	static void AppendShort   ( AString & a_Dst, short a_Short);
+	static void AppendShort   ( AString & a_Dst, unsigned short a_Short);
+	static void AppendInteger ( AString & a_Dst, int a_Integer);
+	static void AppendInteger ( AString & a_Dst, unsigned int a_Integer);
+	static void AppendFloat   ( AString & a_Dst, float a_Float);
+	static void AppendDouble  ( AString & a_Dst, const double & a_Double);
+	static void AppendByte    ( AString & a_Dst, char a_Byte);
+	static void AppendLong    ( AString & a_Dst, const long long & a_Long);
+	static void AppendBool    ( AString & a_Dst, bool a_Bool);
+	static void AppendData    ( AString & a_Dst, const char * a_Data, unsigned int a_Size);
 };
 
 typedef std::list <cPacket*>  PacketList;

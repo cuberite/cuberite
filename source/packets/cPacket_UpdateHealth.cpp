@@ -7,19 +7,14 @@
 
 
 
-bool cPacket_UpdateHealth::Send(cSocket & a_Socket)
+void cPacket_UpdateHealth::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte		( (char)m_PacketID,	Message, i );
-	AppendShort		( m_Health,		Message, i );
-	AppendShort		( m_Food,		Message, i );
-	AppendFloat		( m_Saturation, Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte (a_Data, m_PacketID);
+	AppendShort(a_Data, m_Health);
+	AppendShort(a_Data, m_Food);
+	AppendFloat(a_Data, m_Saturation);
 }
+
+
+
+

@@ -8,29 +8,29 @@
 
 
 
-bool cPacket_BlockPlace::Parse(cSocket & a_Socket)
+int cPacket_BlockPlace::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadInteger( m_PosX ) ) return false;
-	if( !ReadByte	( m_PosY ) ) return false;
-	if( !ReadInteger( m_PosZ ) ) return false;
-	if( !ReadByte	( m_Direction ) ) return false;
-
-	/*
-	if( !ReadShort	( m_ItemType ) ) return false;
-	if( m_ItemType > -1 )
-	{
-		if( !ReadByte	( m_Count ) ) return false;
-		if( !ReadShort	( m_Uses ) ) return false;
-	}*/
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadInteger, m_PosX,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,    m_PosY,      TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger, m_PosZ,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,    m_Direction, TotalBytes);
 
 	cPacket_ItemData Item;
-
-	Item.Parse(m_Socket);
+	int res = Item.Parse(a_Data + TotalBytes, a_Size - TotalBytes);
+	if (res < 0)
+	{
+		return res;
+	}
+	TotalBytes += res;
 
 	m_ItemType = Item.m_ItemID;
-	m_Count = Item.m_ItemCount;
-	m_Uses = Item.m_ItemUses;
+	m_Count    = Item.m_ItemCount;
+	m_Uses     = Item.m_ItemUses;
 
-	return true;
+	return TotalBytes;
 }
+
+
+
+

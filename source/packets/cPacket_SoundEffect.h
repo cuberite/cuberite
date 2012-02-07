@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_SoundEffect : public cPacket
@@ -16,7 +20,7 @@ public:
 	cPacket_SoundEffect( const cPacket_SoundEffect & a_Copy );
 	virtual cPacket* Clone() const { return new cPacket_SoundEffect(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	int 	m_SoundID; 	// Sound ID
 	int 	m_PosX; 		// Block X Coordinate 
@@ -26,3 +30,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 4 + 4 + 1 + 4 + 4;
 };
+
+
+
+

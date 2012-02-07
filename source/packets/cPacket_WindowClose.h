@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_WindowClose : public cPacket
@@ -11,10 +15,14 @@ public:
 	{ m_PacketID = E_WINDOW_CLOSE; }
 	virtual cPacket* Clone() const { return new cPacket_WindowClose(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
 	char m_Close; // m_Close == cWindow WindowType number
 
 	static const unsigned int c_Size = 1 + 1;
 };
+
+
+
+

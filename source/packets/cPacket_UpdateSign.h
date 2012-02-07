@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_UpdateSign : public cPacket
@@ -13,16 +17,20 @@ public:
 	{ m_PacketID = E_UPDATE_SIGN; }
 	virtual cPacket* Clone() const { return new cPacket_UpdateSign( *this ); }
 
-	bool Parse( cSocket & a_Socket );
-	bool Send( cSocket & a_Socket );
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
-	int m_PosX;
-	short m_PosY;
-	int m_PosZ;
-	std::string m_Line1;
-	std::string m_Line2;
-	std::string m_Line3;
-	std::string m_Line4;
+	int     m_PosX;
+	short   m_PosY;
+	int     m_PosZ;
+	AString m_Line1;
+	AString m_Line2;
+	AString m_Line3;
+	AString m_Line4;
 
 	static const unsigned int c_Size = 1 + 4 + 2 + 4 + 2 + 2 + 2 + 2; // minimum size
 };
+
+
+
+

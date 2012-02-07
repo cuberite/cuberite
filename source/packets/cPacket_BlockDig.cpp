@@ -7,30 +7,30 @@
 
 
 
-bool cPacket_BlockDig::Send(cSocket & a_Socket)
+void cPacket_BlockDig::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendInteger( m_PosX,				Message, i );
-	AppendByte	 ( m_PosY,				Message, i );
-	AppendInteger( m_PosZ,				Message, i );
-	AppendByte   ( m_Direction,			Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte	 (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_PosX);
+	AppendByte	 (a_Data, m_PosY);
+	AppendInteger(a_Data, m_PosZ);
+	AppendByte   (a_Data, m_Direction);
 }
 
-bool cPacket_BlockDig::Parse(cSocket & a_Socket)
+
+
+
+
+int cPacket_BlockDig::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadByte	( m_Status ) ) return false;
-	if( !ReadInteger( m_PosX ) ) return false;
-	if( !ReadByte	( m_PosY ) ) return false;
-	if( !ReadInteger( m_PosZ ) ) return false;
-	if( !ReadByte	( m_Direction ) ) return false;
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadByte,	  m_Status,    TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger, m_PosX,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,	  m_PosY,      TotalBytes);
+	HANDLE_PACKET_READ(ReadInteger, m_PosZ,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,	  m_Direction, TotalBytes);
+	return TotalBytes;
 }
+
+
+
+

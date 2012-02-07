@@ -10,9 +10,13 @@ public:
 	cPacket_Chat( const std::string & a_Message ) : m_Message( a_Message) { m_PacketID = E_CHAT; }
 	virtual cPacket* Clone() const { return new cPacket_Chat(*this); }
 
-	bool Parse(cSocket & a_Socket);
-	bool Send(cSocket & a_Socket);
+	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual void Serialize(AString & a_Data) const override;
 
-	std::string m_Message;
+	AString m_Message;
 	static const unsigned int c_Size = 3; // Minimum size
 };
+
+
+
+

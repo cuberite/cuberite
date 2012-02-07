@@ -20,6 +20,10 @@ cPacket_WholeInventory::cPacket_WholeInventory( const cPacket_WholeInventory & a
 	memcpy( m_Items, a_Clone.m_Items, sizeof(cItem)*m_Count );
 }
 
+
+
+
+
 cPacket_WholeInventory::cPacket_WholeInventory( cInventory* a_Inventory )
 {
 	m_PacketID = E_INVENTORY_WHOLE;
@@ -28,6 +32,10 @@ cPacket_WholeInventory::cPacket_WholeInventory( cInventory* a_Inventory )
 	m_Items = new cItem[m_Count];
 	memcpy( m_Items, a_Inventory->GetSlots(), sizeof(cItem)*m_Count );
 }
+
+
+
+
 
 cPacket_WholeInventory::cPacket_WholeInventory( cWindow* a_Window )
 {
@@ -38,37 +46,32 @@ cPacket_WholeInventory::cPacket_WholeInventory( cWindow* a_Window )
 	memcpy( m_Items, a_Window->GetSlots(), sizeof(cItem)*m_Count );
 }
 
+
+
+
+
 cPacket_WholeInventory::~cPacket_WholeInventory()
 {
 	delete [] m_Items;
 }
 
-bool cPacket_WholeInventory::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_WholeInventory::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
+	AppendByte (a_Data, m_PacketID);
+	AppendByte (a_Data, m_WindowID);
+	AppendShort(a_Data, m_Count);
 
-	cPacket_ItemData Item;
-
-	for(int i = 0; i < m_Count; i++)
+	for (int j = 0; j < m_Count; j++)
 	{
-		TotalSize +=  Item.GetSize((short) m_Items[i].m_ItemID);
+		cPacket_ItemData::AppendItem(a_Data, &(m_Items[j]));
 	}
-
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte		( (char)m_PacketID,			Message, i );
-	AppendByte		( m_WindowID,				Message, i );
-	AppendShort		( m_Count,					Message, i );
-
-	for(int j = 0; j < m_Count; j++)
-	{
-		Item.AppendItem(Message, i, &(m_Items[j]));
-	}
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
 }
+
+
+
 
  

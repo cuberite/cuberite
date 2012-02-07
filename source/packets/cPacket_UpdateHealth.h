@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "cPacket.h"
+
+
+
 
 
 class cPacket_UpdateHealth : public cPacket
@@ -14,7 +18,7 @@ public:
 	cPacket_UpdateHealth( short a_Health ) { m_Health = a_Health; m_PacketID = E_UPDATE_HEALTH; }
 	virtual cPacket* Clone() const { return new cPacket_UpdateHealth( *this ); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	short m_Health;
 	short m_Food;
@@ -22,3 +26,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 2 + 2 + 4;
 };
+
+
+
+

@@ -17,45 +17,52 @@ cPacket_CreativeInventoryAction::cPacket_CreativeInventoryAction( const cPacket_
 	m_Damage = a_Copy.m_Damage;
 }
 
-bool cPacket_CreativeInventoryAction::Parse(cSocket & a_Socket)
+
+
+
+
+int cPacket_CreativeInventoryAction::Parse(const char * a_Data, int a_Size)
 {
-	m_Socket = a_Socket;
-	if( !ReadShort	( m_Slot ) ) return false;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadShort, m_Slot, TotalBytes);
 
 	cPacket_ItemData Item;
-
-	Item.Parse(m_Socket);
+	int res = Item.Parse(a_Data + TotalBytes, a_Size - TotalBytes);
+	if (res < 0)
+	{
+		return res;
+	}
+	TotalBytes += res;
 
 	m_ItemID = Item.m_ItemID;
 	m_Quantity = Item.m_ItemCount;
 	m_Damage = Item.m_ItemUses;
 
-
-	return true;
+	return TotalBytes;
 }
 
-bool cPacket_CreativeInventoryAction::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_CreativeInventoryAction::Serialize(AString & a_Data) const
 {
-	//LOG("InventoryChange:");
-	unsigned int TotalSize = c_Size;
-
-	cPacket_ItemData Item;
-
-	TotalSize += Item.GetSize(m_ItemID);
-
-	char* Message = new char[TotalSize];
-
-	if( m_ItemID <= 0 ) m_ItemID = -1; // Fix, to make sure no invalid values are sent.
-                        // WARNING: HERE ITS -1, BUT IN NAMED ENTITY SPAWN PACKET ITS 0 !!
-	//LOG("cPacket_CreateInventoryAction: Sending Creative item ID: %i", m_ItemID );
+	short ItemID = m_ItemID;
+	assert(ItemID >= -1);  // Check validity of packets in debug runtime
+	if (ItemID <= 0)
+	{
+		ItemID = -1;
+		// Fix, to make sure no invalid values are sent.
+		// WARNING: HERE ITS -1, BUT IN NAMED ENTITY SPAWN PACKET ITS 0 !!
+	}
 
 	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendShort  ( m_Slot,		Message, i );
+	AppendByte	 (a_Data, m_PacketID);
+	AppendShort  (a_Data, m_Slot);
 
-	Item.AppendItem(Message, i, m_ItemID, m_Quantity, m_Damage);
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	cPacket_ItemData::AppendItem(a_Data, ItemID, m_Quantity, m_Damage);
 }
+
+
+
+

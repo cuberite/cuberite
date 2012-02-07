@@ -2,12 +2,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cSocket.h"
+#include "packets/cPacket.h"
 
 #ifndef _WIN32
 	#include <netdb.h>
 	#include <unistd.h>
-	// #include <sys/socket.h>
-	// #include <netinet/in.h>
 	#include <arpa/inet.h>		//inet_ntoa()
 #else
 	#define socklen_t int
@@ -267,6 +266,28 @@ int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags
 int cSocket::Send(const char * a_Buffer, unsigned int a_Length)
 {
 	return send(m_Socket, a_Buffer, a_Length, 0);
+}
+
+
+
+
+
+int cSocket::Send(const cPacket * a_Packet)
+{
+	AString Serialized;
+	a_Packet->Serialize(Serialized);
+	return Send(Serialized.data(), Serialized.size());
+}
+
+
+
+
+
+int cSocket::Send(const cPacket & a_Packet)
+{
+	AString Serialized;
+	a_Packet.Serialize(Serialized);
+	return Send(Serialized.data(), Serialized.size());
 }
 
 

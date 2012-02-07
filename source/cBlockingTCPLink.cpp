@@ -104,7 +104,7 @@ int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 
 		LOGERROR("cBlockingTCPLink: Trying to send data without a valid connection!");
 		return -1;
 	}
-	return cPacket::SendData( m_Socket, a_Data, a_Size, a_Flags );
+	return m_Socket.Send(a_Data, a_Size);
 }
 
 
@@ -119,7 +119,7 @@ int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ 
 		LOGWARN("cBlockingTCPLink: Trying to send message without a valid connection!");
 		return -1;
 	}
-	return cPacket::SendData( m_Socket, a_Message, strlen(a_Message), a_Flags );
+	return m_Socket.Send(a_Message, strlen(a_Message));
 }
 
 

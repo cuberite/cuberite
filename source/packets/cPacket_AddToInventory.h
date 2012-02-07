@@ -14,8 +14,10 @@ public:
 	{ m_PacketID = E_ADD_TO_INV;  }
 	virtual cPacket* Clone() const { return new cPacket_AddToInventory(*this); }
 
-	bool Parse( cSocket & a_Socket );
-	bool Send( cSocket & a_Socket );
+	// _X: This was unimplemented, do we need it?:
+	// bool Parse( cSocket & a_Socket );
+	
+	virtual void Serialize(AString & a_Data) const override;
 
 	ENUM_ITEM_ID m_ItemType;
 	char m_Count;

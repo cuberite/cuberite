@@ -1,8 +1,13 @@
+
 #pragma once
 
 #include "cPacket.h"
 
 #include "../BlockID.h"
+
+
+
+
 
 class cPacket_InventorySlot : public cPacket // Set item [S -> C] ?
 {
@@ -16,7 +21,7 @@ public:
 	{ m_PacketID = E_INVENTORY_SLOT; }
 	virtual cPacket* Clone() const { return new cPacket_InventorySlot(*this); }
 
-	bool Send(cSocket & a_Socket);
+	virtual void Serialize(AString & a_Data) const override;
 
 	char m_WindowID;
 	short m_SlotNum;	// Slot
@@ -33,3 +38,7 @@ public:
 
 	static const unsigned int c_Size = 1 + 1 + 2; // Minimal size ( +1+1  = max)
 };
+
+
+
+

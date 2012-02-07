@@ -7,28 +7,23 @@
 
 
 
-bool cPacket_WindowClose::Parse(cSocket & a_Socket)
+int cPacket_WindowClose::Parse(const char * a_Data, int a_Size)
 {
-	//LOG("CLOSE INVENTORY PACKET");
-	m_Socket = a_Socket;
-
-	if( !ReadByte(m_Close) ) return false;
-
-	//LOG("Closed inventory?: %i", m_Close );
-
-	return true;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadByte, m_Close, TotalBytes);
+	return TotalBytes;
 }
 
-bool cPacket_WindowClose::Send(cSocket & a_Socket)
+
+
+
+
+void cPacket_WindowClose::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendByte	( m_Close,		Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte(a_Data, m_PacketID);
+	AppendByte(a_Data, m_Close);
 }
+
+
+
+

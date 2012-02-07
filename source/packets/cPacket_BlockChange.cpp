@@ -7,20 +7,16 @@
 
 
 
-bool cPacket_BlockChange::Send(cSocket & a_Socket)
+void cPacket_BlockChange::Serialize(AString & a_Data) const
 {
-	unsigned int TotalSize = c_Size;
-	char* Message = new char[TotalSize];
-
-	unsigned int i = 0;
-	AppendByte	 ( (char)m_PacketID,	Message, i );
-	AppendInteger( m_PosX,		Message, i );
-	AppendByte	 ( m_PosY,		Message, i );
-	AppendInteger( m_PosZ,		Message, i );
-	AppendByte   ( m_BlockType,	Message, i );
-	AppendByte   ( m_BlockMeta,	Message, i );
-
-	bool RetVal = !cSocket::IsSocketError( SendData( a_Socket, Message, TotalSize, 0 ) );
-	delete [] Message;
-	return RetVal;
+	AppendByte	 (a_Data, m_PacketID);
+	AppendInteger(a_Data, m_PosX);
+	AppendByte	 (a_Data, m_PosY);
+	AppendInteger(a_Data, m_PosZ);
+	AppendByte   (a_Data, m_BlockType);
+	AppendByte   (a_Data, m_BlockMeta);
 }
+
+
+
+
