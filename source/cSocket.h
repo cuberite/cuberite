@@ -61,7 +61,7 @@ public:
 
 	static const short ADDRESS_FAMILY_INTERNET = 2;
 	static const unsigned long INTERNET_ADDRESS_ANY = 0;
-	static unsigned long INTERNET_ADDRESS_LOCALHOST;  // 127.0.0.1 represented in network byteorder
+	static unsigned long INTERNET_ADDRESS_LOCALHOST(void);  // 127.0.0.1 represented in network byteorder; must be a function due to GCC :(
 
 	int Bind( SockAddr_In& a_Address );
 	int Listen( int a_Backlog );

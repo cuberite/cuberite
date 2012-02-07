@@ -16,12 +16,6 @@
 
 
 
- unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST = 127; // TODO: Linux won't accept this: htonl((127 << 24) | 1);
- 
- 
- 
- 
- 
 cSocket::cSocket(xSocket a_Socket)
 	: m_Socket(a_Socket)
 {
@@ -189,6 +183,20 @@ int cSocket::WSAStartup()
 cSocket cSocket::CreateSocket()
 {
 	return socket(AF_INET,SOCK_STREAM,0);
+}
+
+
+
+
+
+unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST(void)
+{
+	static unsigned long LocalHost = 0;
+	if (LocalHost == 0)
+	{
+		LocalHost = inet_addr("127.0.0.1");  // GCC won't accept this as a global var assignment
+	}
+	return LocalHost;
 }
 
 
