@@ -279,7 +279,7 @@ bool cSocketThreads::cSocketThread::Start(void)
 	}
 	cSocket::SockAddr_In Addr;
 	Addr.Family = cSocket::ADDRESS_FAMILY_INTERNET;
-	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST;
+	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST();
 	Addr.Port = 0;  // Any free port is okay
 	if (m_ControlSocket1.Bind(Addr) != 0)
 	{
@@ -324,7 +324,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 	// Connect the "client" part of the Control socket:
 	cSocket::SockAddr_In Addr;
 	Addr.Family = cSocket::ADDRESS_FAMILY_INTERNET;
-	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST;
+	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST();
 	Addr.Port = m_ControlSocket1.GetPort();
 	assert(Addr.Port != 0);  // We checked in the Start() method, but let's be sure
 	if (m_ControlSocket2.Connect(Addr) != 0)
@@ -464,7 +464,7 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 			return;
 		}
 		m_Slots[i].m_Outgoing.erase(0, Sent);
-	}
+	}  // for i - m_Slots[i]
 }
 
 
