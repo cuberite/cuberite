@@ -17,6 +17,12 @@
 
 
 
+ unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST = htonl((127 << 24) | 1);
+ 
+ 
+ 
+ 
+ 
 cSocket::cSocket(xSocket a_Socket)
 	: m_Socket(a_Socket)
 {
@@ -194,13 +200,9 @@ int cSocket::Bind(SockAddr_In& a_Address)
 {
 	sockaddr_in local;
 
-	if (a_Address.Family == ADDRESS_FAMILY_INTERNET)
-		local.sin_family = AF_INET;
-
-	if (a_Address.Address == INTERNET_ADDRESS_ANY)
-		local.sin_addr.s_addr = INADDR_ANY;
-
-	local.sin_port=htons((u_short)a_Address.Port);
+	local.sin_family = a_Address.Family;
+	local.sin_addr.s_addr = a_Address.Address;
+	local.sin_port = htons((u_short)a_Address.Port);
 
 	return bind(m_Socket, (sockaddr*)&local, sizeof(local));
 }
@@ -238,9 +240,50 @@ cSocket cSocket::Accept()
 
 
 
+int cSocket::Connect(SockAddr_In & a_Address)
+{
+	sockaddr_in local;
+
+	local.sin_family = a_Address.Family;
+	local.sin_addr.s_addr = a_Address.Address;
+	local.sin_port = htons((u_short)a_Address.Port);
+
+	return connect(m_Socket, (sockaddr *)&local, sizeof(local));
+}
+
+
+
+
+
 int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags)
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
+}
+
+
+
+
+
+int cSocket::Send(const char * a_Buffer, unsigned int a_Length)
+{
+	return send(m_Socket, a_Buffer, a_Length, 0);
+}
+
+
+
+
+
+unsigned short cSocket::GetPort(void) const
+{
+	assert(IsValid());
+	
+	sockaddr_in Addr;
+	socklen_t AddrSize = sizeof(Addr);
+	if (getsockname(m_Socket, (sockaddr *)&Addr, &AddrSize) != 0)
+	{
+		return 0;
+	}
+	return Addr.sin_port;
 }
 
 

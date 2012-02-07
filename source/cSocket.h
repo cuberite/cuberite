@@ -6,6 +6,7 @@
 
 class cSocket
 {
+public:
 #ifdef _WIN32
 	typedef SOCKET xSocket;
 #else
@@ -13,7 +14,6 @@ class cSocket
 	static const int INVALID_SOCKET = -1;
 #endif
 
-public:
 	cSocket(void) : m_Socket(INVALID_SOCKET) {}
 	cSocket(xSocket a_Socket);
 	~cSocket();
@@ -55,11 +55,16 @@ public:
 
 	static const short ADDRESS_FAMILY_INTERNET = 2;
 	static const unsigned long INTERNET_ADDRESS_ANY = 0;
+	static unsigned long INTERNET_ADDRESS_LOCALHOST;  // 127.0.0.1 represented in network byteorder
 
 	int Bind( SockAddr_In& a_Address );
 	int Listen( int a_Backlog );
 	cSocket Accept();
+	int Connect(SockAddr_In & a_Address);  // Returns 0 on success, !0 on failure
 	int Receive( char* a_Buffer, unsigned int a_Length, unsigned int a_Flags );
+	int Send   (const char * a_Buffer, unsigned int a_Length);
+	
+	unsigned short GetPort(void) const;  // Returns 0 on failure
 
 	const AString & GetIPString(void) const { return m_IPString; }
 
