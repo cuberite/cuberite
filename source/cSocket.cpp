@@ -16,7 +16,7 @@
 
 
 
- unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST = htonl((127 << 24) | 1);
+ unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST = 127; // TODO: Linux won't accept this: htonl((127 << 24) | 1);
  
  
  
