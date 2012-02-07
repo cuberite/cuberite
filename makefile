@@ -259,7 +259,8 @@ MCServer : \
 		build/cPlugin_NewLua.o\
 		build/cWebPlugin_Lua.o\
 		build/StringUtils.o\
-		build/cIsThread.o
+		build/cIsThread.o\
+		build/cSocketThreads.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -472,6 +473,7 @@ MCServer : \
 		build/cWebPlugin_Lua.o\
 		build/StringUtils.o\
 		build/cIsThread.o\
+		build/cSocketThreads.o\
 		-o MCServer
 
 clean : 
@@ -686,6 +688,8 @@ clean :
 		build/cPlugin_NewLua.o\
 		build/cWebPlugin_Lua.o\
 		build/StringUtils.o\
+		build/cIsThread.o\
+		build/cSocketThreads.o\
 		MCServer
 
 install : MCServer
@@ -1548,5 +1552,8 @@ build/StringUtils.o : source/StringUtils.cpp
 
 build/cIsThread.o : source/cIsThread.cpp
 	$(CC) $(CC_OPTIONS) source/cIsThread.cpp -c $(INCLUDE) -o build/cIsThread.o	
+
+build/cSocketThreads.o : source/cSocketThreads.cpp
+	$(CC) $(CC_OPTIONS) source/cSocketThreads.cpp -c $(INCLUDE) -o build/cSocketThreads.o	
 
 ##### END RUN ####

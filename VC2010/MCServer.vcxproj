@@ -370,6 +370,7 @@
     <ClCompile Include="..\source\cSleep.cpp" />
     <ClCompile Include="..\source\cSlime.cpp" />
     <ClCompile Include="..\source\cSocket.cpp" />
+    <ClCompile Include="..\source\cSocketThreads.cpp" />
     <ClCompile Include="..\source\cSpider.cpp" />
     <ClCompile Include="..\source\cSquid.cpp" />
     <ClCompile Include="..\source\cStringMap.cpp" />
@@ -530,6 +531,7 @@
     <ClInclude Include="..\source\cSleep.h" />
     <ClInclude Include="..\source\cSlime.h" />
     <ClInclude Include="..\source\cSocket.h" />
+    <ClInclude Include="..\source\cSocketThreads.h" />
     <ClInclude Include="..\source\cSpider.h" />
     <ClInclude Include="..\source\cSquid.h" />
     <ClInclude Include="..\source\cStairs.h" />

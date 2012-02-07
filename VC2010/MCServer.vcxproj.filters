@@ -911,6 +911,7 @@
     <ClCompile Include="..\source\cFile.cpp" />
     <ClCompile Include="..\source\StringUtils.cpp" />
     <ClCompile Include="..\source\cIsThread.cpp" />
+    <ClCompile Include="..\source\cSocketThreads.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1403,6 +1404,7 @@
     <ClInclude Include="..\source\cFile.h" />
     <ClInclude Include="..\source\StringUtils.h" />
     <ClInclude Include="..\source\cIsThread.h" />
+    <ClInclude Include="..\source\cSocketThreads.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">
