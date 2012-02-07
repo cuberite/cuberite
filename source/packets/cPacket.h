@@ -16,8 +16,8 @@ public:
 	{}
 	virtual ~cPacket() {}
 
-	virtual bool Parse( cSocket & a_Socket) { a_Socket=0; printf("ERROR: Undefined NEW Parse function %x\n", m_PacketID ); return false; }
-	virtual bool Send( cSocket & a_Socket) { a_Socket=0; printf("ERROR: Undefined NEW Send function %x\n", m_PacketID ); return false; }
+	virtual bool Parse( cSocket & a_Socket) {a_Socket.CloseSocket(); LOGERROR("Undefined NEW Parse function %x\n", m_PacketID ); return false; }
+	virtual bool Send( cSocket & a_Socket)  {a_Socket.CloseSocket(); LOGERROR("Undefined NEW Send function %x\n",  m_PacketID ); return false; }
 	virtual cPacket* Clone() const = 0;
 
 	unsigned char m_PacketID;

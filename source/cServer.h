@@ -1,8 +1,6 @@
+
 #pragma once
 
-class cEvent;
-class cSemaphore;
-class cCriticalSection;
 class cPlayer;
 class cClientHandle;
 class cPacket;
