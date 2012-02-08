@@ -26,6 +26,10 @@
 typedef std::list< cPlugin_Lua* > LuaPluginList;
 typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
 
+
+
+
+
 struct cPluginManager::sPluginManagerState
 {
 	LuaPluginList LuaPlugins;
@@ -33,11 +37,19 @@ struct cPluginManager::sPluginManagerState
 	HookMap Hooks;
 };
 
+
+
+
+
 cPluginManager* cPluginManager::GetPluginManager()
 {
 	LOGWARN("WARNING: Using deprecated function cPluginManager::GetPluginManager() use cRoot::Get()->GetPluginManager() instead!");
 	return cRoot::Get()->GetPluginManager();
 }
+
+
+
+
 
 cPluginManager::cPluginManager()
 	: m_pState( new sPluginManagerState )
@@ -45,6 +57,10 @@ cPluginManager::cPluginManager()
 	, m_bReloadPlugins(false)
 {
 }
+
+
+
+
 
 cPluginManager::~cPluginManager()
 {
@@ -54,113 +70,121 @@ cPluginManager::~cPluginManager()
 	delete m_pState;
 }
 
+
+
+
+
 void cPluginManager::ReloadPlugins()
 {
 	m_bReloadPlugins = true;
 }
 
+
+
+
+
 void cPluginManager::ReloadPluginsNow()
 {
-	LOG("--Loading plugins--");
+	LOG("Loading plugins");
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
-	
-	
-#if USE_SQUIRREL
+	#if USE_SQUIRREL
 	if( !SquirrelBindings::IsBound )	// Can only do this once apparently, or we're making ambiguous calls in the script
 	{
 		SquirrelVM::Init();
 		SquirrelBindings::Bind( SquirrelVM::GetVMPtr() );
 	}
-#endif
+	#endif  // USE_SQUIRREL
 
 	cIniFile IniFile("settings.ini");
-	if( IniFile.ReadFile() )
+	if (!IniFile.ReadFile() )
 	{
-		unsigned int KeyNum = IniFile.FindKey("Plugins");
-		unsigned int NumPlugins = IniFile.GetNumValues( KeyNum );
-		if( NumPlugins > 0 )
+		LOGWARNING("cPluginManager: Can't find settings.ini, so can't load any plugins.");
+	}
+		
+	unsigned int KeyNum = IniFile.FindKey("Plugins");
+	unsigned int NumPlugins = IniFile.GetNumValues( KeyNum );
+	if( NumPlugins > 0 )
+	{
+		for(unsigned int i = 0; i < NumPlugins; i++)
 		{
-			for(unsigned int i = 0; i < NumPlugins; i++)
-			{
-				std::string ValueName = IniFile.GetValueName(KeyNum, i );
-				if( ValueName.compare("Plugin") == 0 ) // It's a Lua plugin
-				{	
-					std::string PluginFile = IniFile.GetValue(KeyNum, i );
-					if( !PluginFile.empty() )
-					{
-						// allow for comma separated plugin list
-						// degrades and works fine for the plugin
-						// per line
-						AStringVector split = StringSplit( PluginFile, "," );
-						for (unsigned int j = 0; j < split.size(); j++) {
-							cPlugin_Lua* Plugin = new cPlugin_Lua( (split[j] + std::string(".lua") ).c_str() );
-							if( !AddLuaPlugin( Plugin ) )
-							{
-								delete Plugin;
-							}
-						}
-					}
-				}
-				else if( ValueName.compare("NewPlugin") == 0 ) // New plugin style
+			AString ValueName = IniFile.GetValueName(KeyNum, i );
+			if( ValueName.compare("Plugin") == 0 ) // It's a Lua plugin
+			{	
+				AString PluginFile = IniFile.GetValue(KeyNum, i );
+				if( !PluginFile.empty() )
 				{
-					std::string PluginFile = IniFile.GetValue(KeyNum, i );
-					if( !PluginFile.empty() )
+					// allow for comma separated plugin list
+					// degrades and works fine for the plugin
+					// per line
+					AStringVector split = StringSplit( PluginFile, "," );
+					for (unsigned int j = 0; j < split.size(); j++)
 					{
-						cPlugin_NewLua* Plugin = new cPlugin_NewLua( PluginFile.c_str() );
-						if( !AddPlugin( Plugin ) )
+						cPlugin_Lua* Plugin = new cPlugin_Lua( (split[j] + AString(".lua") ).c_str() );
+						if( !AddLuaPlugin( Plugin ) )
 						{
 							delete Plugin;
 						}
 					}
 				}
-#if USE_SQUIRREL
-				else if( ValueName.compare("Squirrel") == 0 ) // Squirrel plugin
+			}
+			else if( ValueName.compare("NewPlugin") == 0 ) // New plugin style
+			{
+				AString PluginFile = IniFile.GetValue(KeyNum, i );
+				if( !PluginFile.empty() )
 				{
-					std::string PluginFile = IniFile.GetValue(KeyNum, i );
-					if( !PluginFile.empty() )
+					cPlugin_NewLua* Plugin = new cPlugin_NewLua( PluginFile.c_str() );
+					if( !AddPlugin( Plugin ) )
 					{
-						LOGINFO("Loading Squirrel plugin: %s", PluginFile.c_str() );
-						try 
-						{
-							SquirrelObject SquirrelScript = SquirrelVM::CompileScript( (std::string("Plugins/") + PluginFile + ".nut").c_str() );
-							try 
-							{
-								SquirrelVM::RunScript( SquirrelScript );
-							} 
-							catch (SquirrelError & e)
-							{
-								LOGERROR("Error: %s, %s\n", e.desc, "SquirrelVM::RunScript");
-							}
-						}
-						catch (SquirrelError & e) 
-						{
-							LOGERROR("Error: %s, %s\n", e.desc, "SquirrelVM::CompileScript");
-						}
+						delete Plugin;
 					}
 				}
-#endif
 			}
+			
+			#if USE_SQUIRREL
+			else if( ValueName.compare("Squirrel") == 0 ) // Squirrel plugin
+			{
+				AString PluginFile = IniFile.GetValue(KeyNum, i );
+				if( !PluginFile.empty() )
+				{
+					LOGINFO("Loading Squirrel plugin: %s", PluginFile.c_str() );
+					try 
+					{
+						SquirrelObject SquirrelScript = SquirrelVM::CompileScript( (AString("Plugins/") + PluginFile + ".nut").c_str() );
+						try 
+						{
+							SquirrelVM::RunScript( SquirrelScript );
+						} 
+						catch (SquirrelError & e)
+						{
+							LOGERROR("SquirrelScript error: %s, %s\n", e.desc, "SquirrelVM::RunScript");
+						}
+					}
+					catch (SquirrelError & e) 
+					{
+						LOGERROR("SquirrelScript error: %s, %s\n", e.desc, "SquirrelVM::CompileScript");
+					}
+				}
+			}
+			#endif  // USE_SQUIRREL
+			
 		}
+	}
 
-		if( GetNumPlugins() == 0 )
-		{
-			LOG("No plugins loaded");
-		}
-		else
-		{
-			LOG("Loaded %i plugin(s)", GetNumPlugins() );
-		}
+	if( GetNumPlugins() == 0 )
+	{
+		LOG("No plugins loaded");
 	}
 	else
 	{
-		LOG("WARNING: Can't find settings.ini, so can't load any plugins.");
+		LOG("Loaded %i plugin(s)", GetNumPlugins() );
 	}
-
-
-	LOG("--Done loading plugins--");
 }
+
+
+
+
 
 void cPluginManager::Tick(float a_Dt)
 {
@@ -168,7 +192,6 @@ void cPluginManager::Tick(float a_Dt)
 	{
 		ReloadPluginsNow();
 	}
-
 
 	HookMap::iterator Plugins = m_pState->Hooks.find( E_PLUGIN_TICK );
 	if( Plugins != m_pState->Hooks.end() )
@@ -179,6 +202,10 @@ void cPluginManager::Tick(float a_Dt)
 		}
 	}
 }
+
+
+
+
 
 bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 {
@@ -209,154 +236,171 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 		return false;
 	}
 
-	if( Plugins != m_pState->Hooks.end() )
+	if( Plugins == m_pState->Hooks.end() )
 	{
-		switch( a_Hook )
-		{
+		return false;
+	}
+	
+	switch( a_Hook )
+	{
 		case E_PLUGIN_COLLECT_ITEM:
+		{
+			if( a_NumArgs != 2 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPickup* Pickup = va_arg(argptr, cPickup* );
+			cPlayer* Player = va_arg(argptr, cPlayer* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
 			{
-				if( a_NumArgs != 2 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPickup* Pickup = va_arg(argptr, cPickup* );
-				cPlayer* Player = va_arg(argptr, cPlayer* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnCollectItem( Pickup, Player ) )
-						return true;
-				}
+				if( (*itr)->OnCollectItem( Pickup, Player ) )
+					return true;
 			}
-			break;
-		case E_PLUGIN_BLOCK_DIG:
-			{
-				if( a_NumArgs != 2 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPacket_BlockDig* Packet = va_arg(argptr, cPacket_BlockDig* );
-				cPlayer* Player = va_arg(argptr, cPlayer* );
-				cItem* Item = va_arg( argptr, cItem* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnBlockDig( Packet, Player, Item ) )
-						return true;
-				}
-			}
-			break;
-		case E_PLUGIN_BLOCK_PLACE:
-			{
-				if( a_NumArgs != 2 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPacket_BlockPlace* Packet = va_arg(argptr, cPacket_BlockPlace* );
-				cPlayer* Player = va_arg(argptr, cPlayer* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnBlockPlace( Packet, Player ) )
-						return true;
-				}
-			}
-			break;
-		case E_PLUGIN_DISCONNECT:
-			{
-				if( a_NumArgs != 2 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				const char* Reason = va_arg(argptr, const char* );
-				cPlayer* Player = va_arg(argptr, cPlayer* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnDisconnect( Reason, Player ) )
-						return true;
-				}
-			}
-			break;
-		case E_PLUGIN_LOGIN:
-			{
-				if( a_NumArgs != 1 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPacket_Login* Packet = va_arg(argptr, cPacket_Login* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnLogin( Packet ) )
-						return true;
-				}
-			}
-			break;
-		case E_PLUGIN_PLAYER_JOIN:
-			{
-				if( a_NumArgs != 1 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPlayer* Player = va_arg(argptr, cPlayer* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnPlayerJoin( Player ) )
-						return true;
-				}
-			}
-			break;
-		case E_PLUGIN_PLAYER_MOVE:
-			{
-				if( a_NumArgs != 1 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPlayer* Player = va_arg(argptr, cPlayer* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					(*itr)->OnPlayerMove( Player );
-				}
-			}
-			break;
-		case E_PLUGIN_TAKE_DAMAGE:
-			{
-				if( a_NumArgs != 2 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPawn* Pawn = va_arg(argptr, cPawn* );
-				TakeDamageInfo* TDI = va_arg(argptr, TakeDamageInfo* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					(*itr)->OnTakeDamage( Pawn, TDI );
-				}
-			}
-			break;
-		case E_PLUGIN_KILLED:
-			{
-				if( a_NumArgs != 2 ) break;
-				va_list argptr;
-				va_start( argptr, a_NumArgs);
-				cPawn* Killed = va_arg(argptr, cPawn* );
-				cEntity* Killer = va_arg(argptr, cEntity* );
-				va_end (argptr);
-				for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-				{
-					if( (*itr)->OnKilled( Killed, Killer ) )
-						return true;
-				}
-			}
-			break;
-		default:
-			LOG("WARNING: Calling Unknown hook: %i", a_Hook );
 			break;
 		}
-	}
+		
+		case E_PLUGIN_BLOCK_DIG:
+		{
+			if( a_NumArgs != 2 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPacket_BlockDig* Packet = va_arg(argptr, cPacket_BlockDig* );
+			cPlayer* Player = va_arg(argptr, cPlayer* );
+			cItem* Item = va_arg( argptr, cItem* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnBlockDig( Packet, Player, Item ) )
+					return true;
+			}
+			break;
+		}
+		
+		case E_PLUGIN_BLOCK_PLACE:
+		{
+			if( a_NumArgs != 2 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPacket_BlockPlace* Packet = va_arg(argptr, cPacket_BlockPlace* );
+			cPlayer* Player = va_arg(argptr, cPlayer* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnBlockPlace( Packet, Player ) )
+					return true;
+			}
+			break;
+		}
+		
+		case E_PLUGIN_DISCONNECT:
+		{
+			if( a_NumArgs != 2 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			const char* Reason = va_arg(argptr, const char* );
+			cPlayer* Player = va_arg(argptr, cPlayer* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnDisconnect( Reason, Player ) )
+					return true;
+			}
+			break;
+		}
+
+		case E_PLUGIN_LOGIN:
+		{
+			if( a_NumArgs != 1 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPacket_Login* Packet = va_arg(argptr, cPacket_Login* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnLogin( Packet ) )
+					return true;
+			}
+			break;
+		}
+
+		case E_PLUGIN_PLAYER_JOIN:
+		{
+			if( a_NumArgs != 1 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPlayer* Player = va_arg(argptr, cPlayer* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnPlayerJoin( Player ) )
+					return true;
+			}
+			break;
+		}
+
+		case E_PLUGIN_PLAYER_MOVE:
+		{
+			if( a_NumArgs != 1 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPlayer* Player = va_arg(argptr, cPlayer* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				(*itr)->OnPlayerMove( Player );
+			}
+			break;
+		}
+
+		case E_PLUGIN_TAKE_DAMAGE:
+		{
+			if( a_NumArgs != 2 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPawn* Pawn = va_arg(argptr, cPawn* );
+			TakeDamageInfo* TDI = va_arg(argptr, TakeDamageInfo* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				(*itr)->OnTakeDamage( Pawn, TDI );
+			}
+			break;
+		}
+
+		case E_PLUGIN_KILLED:
+		{
+			if( a_NumArgs != 2 ) break;
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPawn* Killed = va_arg(argptr, cPawn* );
+			cEntity* Killer = va_arg(argptr, cEntity* );
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnKilled( Killed, Killer ) )
+					return true;
+			}
+			break;
+		}
+		
+		default:
+		{
+			LOGWARNING("cPluginManager: Calling Unknown hook: %i", a_Hook );
+			break;
+		}
+	}  // switch (a_Hook)
 	return false;
 }
+
+
+
+
 
 cPlugin* cPluginManager::GetPlugin( const char* a_Plugin )
 {
 	for( PluginList::iterator itr = m_pState->Plugins.begin(); itr != m_pState->Plugins.end(); ++itr )
 	{
-		if( std::string( (*itr)->GetName() ).compare( a_Plugin ) == 0 )
+		if (strcmp((*itr)->GetName(), a_Plugin) == 0 )
 		{
 			return *itr;
 		}
@@ -364,10 +408,18 @@ cPlugin* cPluginManager::GetPlugin( const char* a_Plugin )
 	return 0;
 }
 
+
+
+
+
 const cPluginManager::PluginList & cPluginManager::GetAllPlugins()
 {
 	return m_pState->Plugins;
 }
+
+
+
+
 
 void cPluginManager::UnloadPluginsNow()
 {
@@ -393,22 +445,30 @@ void cPluginManager::UnloadPluginsNow()
 	//SquirrelVM::Shutdown(); // This breaks shit
 }
 
+
+
+
+
 void cPluginManager::RemoveHooks( cPlugin* a_Plugin )
 {
-	m_pState->Hooks[ E_PLUGIN_TICK			].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_CHAT			].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_COLLECT_ITEM	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_BLOCK_DIG		].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_BLOCK_PLACE	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_DISCONNECT	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_HANDSHAKE		].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_LOGIN			].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_PLAYER_SPAWN	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_PLAYER_JOIN	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_PLAYER_MOVE	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_TAKE_DAMAGE	].remove( a_Plugin );
-	m_pState->Hooks[ E_PLUGIN_KILLED		].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_TICK].remove        ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_CHAT].remove        ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_COLLECT_ITEM].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_BLOCK_DIG].remove   ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_BLOCK_PLACE].remove ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_DISCONNECT].remove  ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_HANDSHAKE].remove   ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_LOGIN].remove       ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_PLAYER_SPAWN].remove( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_PLAYER_JOIN].remove ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_PLAYER_MOVE].remove ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_TAKE_DAMAGE].remove ( a_Plugin );
+	m_pState->Hooks[ E_PLUGIN_KILLED].remove      ( a_Plugin );
 }
+
+
+
+
 
 void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false */ )
 {
@@ -419,7 +479,9 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 		RemoveHooks( a_Plugin );
 		a_Plugin->OnDisable();
 		if( a_Plugin->GetLanguage() != cPlugin::E_SQUIRREL ) // Squirrel needs to clean it up himself!
+		{
 			delete a_Plugin;
+		}
 	}
 	else
 	{
@@ -429,6 +491,10 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 		}
 	}
 }
+
+
+
+
 
 bool cPluginManager::AddPlugin( cPlugin* a_Plugin )
 {
@@ -442,6 +508,10 @@ bool cPluginManager::AddPlugin( cPlugin* a_Plugin )
 	RemoveHooks( a_Plugin ); // Undo any damage the Initialize() might have done
 	return false;
 }
+
+
+
+
 
 bool cPluginManager::AddPlugin( lua_State* a_LuaState, cPlugin* a_Plugin )
 {
@@ -457,6 +527,10 @@ bool cPluginManager::AddPlugin( lua_State* a_LuaState, cPlugin* a_Plugin )
 	return false;
 }
 
+
+
+
+
 bool cPluginManager::AddLuaPlugin( cPlugin_Lua* a_Plugin )
 {
 	m_pState->LuaPlugins.push_back( a_Plugin ); // It HAS to be in here before calling Initialize, so it can be found by AddPlugin()
@@ -468,6 +542,10 @@ bool cPluginManager::AddLuaPlugin( cPlugin_Lua* a_Plugin )
 	m_pState->LuaPlugins.remove( a_Plugin );
 	return false;
 }
+
+
+
+
 
 void cPluginManager::RemoveLuaPlugin( std::string a_FileName )
 {
@@ -483,6 +561,10 @@ void cPluginManager::RemoveLuaPlugin( std::string a_FileName )
 	}
 }
 
+
+
+
+
 cPlugin_Lua* cPluginManager::GetLuaPlugin( lua_State* a_State )
 {
 	for( LuaPluginList::iterator itr = m_pState->LuaPlugins.begin(); itr != m_pState->LuaPlugins.end(); ++itr )
@@ -494,6 +576,10 @@ cPlugin_Lua* cPluginManager::GetLuaPlugin( lua_State* a_State )
 	}
 	return 0;
 }
+
+
+
+
 
 void cPluginManager::AddHook( cPlugin* a_Plugin, PluginHook a_Hook )
 {
@@ -507,7 +593,15 @@ void cPluginManager::AddHook( cPlugin* a_Plugin, PluginHook a_Hook )
 	Plugins.push_back( a_Plugin );
 }
 
+
+
+
+
 unsigned int cPluginManager::GetNumPlugins()
 {
 	return m_pState->Plugins.size(); 
 }
+
+
+
+
