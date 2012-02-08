@@ -10,7 +10,7 @@
 
 
 /// How many clients should one thread handle? (must be less than FD_SETSIZE - 1 for your platform)
-#define MAX_SLOTS 1
+#define MAX_SLOTS 63
 
 
 
@@ -65,17 +65,17 @@ public:
 	cSocketThreads(void);
 	~cSocketThreads();
 	
-	/// Add a (socket, client) pair for processing, data from a_Socket is to be sent to a_Client
-	void AddClient(cSocket * a_Socket, cCallback * a_Client);
+	/// Add a (socket, client) pair for processing, data from a_Socket is to be sent to a_Client; returns true if successful
+	bool AddClient(cSocket * a_Socket, cCallback * a_Client);
 	
 	/// Remove the socket (and associated client) from processing
-	void RemoveClient(cSocket * a_Socket);
+	void RemoveClient(const cSocket * a_Socket);
 	
 	/// Remove the associated socket and the client from processing
-	void RemoveClient(cCallback * a_Client);
+	void RemoveClient(const cCallback * a_Client);
 	
 	/// Notify the thread responsible for a_Client that the client has something to write
-	void NotifyWrite(cCallback * a_Client);
+	void NotifyWrite(const cCallback * a_Client);
 
 private:
 
@@ -92,14 +92,16 @@ private:
 		bool HasEmptySlot(void) const {return m_NumSlots < MAX_SLOTS; }
 		bool IsEmpty     (void) const {return m_NumSlots == 0; }
 
-		void AddClient   (cSocket *   a_Socket, cCallback * a_Client);
-		bool RemoveClient(cCallback * a_Client);  // Returns true if removed, false if not found
-		bool RemoveSocket(cSocket *   a_Socket);  // Returns true if removed, false if not found
-		bool HasClient   (cCallback * a_Client) const;
-		bool HasSocket   (cSocket *   a_Socket) const;
-		bool NotifyWrite (cCallback * a_Client);  // Returns true if client handled by this thread
+		void AddClient   (cSocket *         a_Socket, cCallback * a_Client);
+		bool RemoveClient(const cCallback * a_Client);  // Returns true if removed, false if not found
+		bool RemoveSocket(const cSocket *   a_Socket);  // Returns true if removed, false if not found
+		bool HasClient   (const cCallback * a_Client) const;
+		bool HasSocket   (const cSocket *   a_Socket) const;
+		bool NotifyWrite (const cCallback * a_Client);  // Returns true if client handled by this thread
 		
 		bool Start(void);  // Hide the cIsThread's Start method, we need to provide our own startup to create the control socket
+		
+		bool IsValid(void) const {return m_ControlSocket2.IsValid(); }  // If the Control socket dies, the thread is not valid anymore
 		
 	private:
 	
@@ -127,6 +129,7 @@ private:
 		void PrepareSet     (fd_set * a_Set, cSocket::xSocket & a_Highest);  // Puts all sockets into the set, along with m_ControlSocket1
 		void ReadFromSockets(fd_set * a_Read);  // Reads from sockets indicated in a_Read
 		void WriteToSockets (fd_set * a_Write);  // Writes to sockets indicated in a_Write
+		void RemoveClosedSockets(void);  // Removes sockets that have closed from m_Slots[]
 	} ;
 	
 	typedef std::list<cSocketThread *> cSocketThreadList;

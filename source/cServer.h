@@ -1,9 +1,30 @@
 
+// cServer.h
+
+// Interfaces to the cServer object representing the network server
+
+
+
+
+
 #pragma once
+#ifndef CSERVER_H_INCLUDED
+#define CSERVER_H_INCLUDED
+
+#include "cSocketThreads.h"
+
+
+
+
 
 class cPlayer;
 class cClientHandle;
 class cPacket;
+
+
+
+
+
 class cServer										//tolua_export
 {													//tolua_export
 public:												//tolua_export
@@ -34,13 +55,20 @@ public:												//tolua_export
 	static void ServerListenThread( void* a_Args );
 
 	const AString & GetServerID(void) const;
+	
+	void ClientDestroying(const cClientHandle * a_Client);  // Called by cClientHandle::Destroy(); removes the client from m_SocketThreads
+	
 private:
+
 	friend class cRoot; // so cRoot can create and destroy cServer
+	
 	cServer();
 	~cServer();
 
 	struct sServerState;
 	sServerState* m_pState;
+	
+	cSocketThreads m_SocketThreads;
 
 	// Time since server was started
 	float m_Millisecondsf;
@@ -51,3 +79,13 @@ private:
 
 	bool m_bRestarting;
 }; //tolua_export
+
+
+
+
+
+#endif  // CSERVER_H_INCLUDED
+
+
+
+

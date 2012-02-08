@@ -27,6 +27,7 @@ cSocket::cSocket(xSocket a_Socket)
 
 cSocket::~cSocket()
 {
+	// Do NOT close the socket; this class is an API wrapper, not a RAII!
 }
 
 
@@ -100,6 +101,10 @@ AString cSocket::GetErrorString( int a_ErrNo )
 
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, a_ErrNo, 0, buffer, ARRAYCOUNT(buffer), NULL);
 	Printf(Out, "%d: %s", a_ErrNo, buffer);
+	if (!Out.empty() && (Out[Out.length() - 1] == '\n'))
+	{
+		Out.erase(Out.length() - 2);
+	}
 	return Out;
 	
 	#else  // _WIN32
@@ -312,7 +317,7 @@ unsigned short cSocket::GetPort(void) const
 	{
 		return 0;
 	}
-	return Addr.sin_port;
+	return ntohs(Addr.sin_port);
 }
 
 

@@ -13,6 +13,7 @@
 
 #include "packets/cPacket.h"
 #include "Vector3d.h"
+#include "cSocketThreads.h"
 
 #include "packets/cPacket_KeepAlive.h"
 #include "packets/cPacket_PlayerPosition.h"
@@ -54,7 +55,8 @@ class cRedstone;
 
 
 
-class cClientHandle							// tolua_export
+class cClientHandle :  // tolua_export
+	public cSocketThreads::cCallback
 {											// tolua_export
 public:
 	enum ENUM_PRIORITY
@@ -71,14 +73,13 @@ public:
 	static const int VIEWDISTANCE = 17; // MUST be odd number or CRASH!
 	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight.
 
-	const cSocket & GetSocket();
+	const cSocket & GetSocket(void) const {return m_Socket; }
+	cSocket &       GetSocket(void)       {return m_Socket; }
+	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
 	void Kick(const AString & a_Reason); //tolua_export
 	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
-
-	void AddPacket( cPacket * a_Packet );
-	void HandlePendingPackets();
 
 	void StreamChunks();
 	void StreamChunksSmart( cChunk** a_Chunks, unsigned int a_NumChunks );
@@ -97,7 +98,6 @@ public:
 	void Send( const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL );
 
 	static void SendThread( void *lpParam );
-	static void ReceiveThread( void *lpParam );
 
 	const AString & GetUsername(void) const;
 	
@@ -108,19 +108,19 @@ private:
 	int m_ProtocolVersion;
 	AString m_Username;
 	AString m_Password;
+	
+	AString m_ReceivedData;  // Accumulator for the data received from the socket, waiting to be parsed; accessed from the cSocketThreads' thread only!
 
-	PacketList m_PendingParsePackets;
 	PacketList m_PendingNrmSendPackets;
 	PacketList m_PendingLowSendPackets;
 
-	cThread * m_pReceiveThread;
 	cThread * m_pSendThread;
 
 	cSocket m_Socket;
 
 	cCriticalSection m_CriticalSection;
 	cCriticalSection m_SendCriticalSection;
-	cCriticalSection m_SocketCriticalSection;
+	// cCriticalSection m_SocketCriticalSection;
 	cSemaphore       m_Semaphore;
 
 	Vector3d m_ConfirmPosition;
@@ -180,6 +180,12 @@ private:
 	bool CheckBlockInteractionsRate(void);
 	
 	void SendLoginResponse();
+	
+	// cSocketThreads::cCallback overrides:
+	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
+	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
+	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
+
 };										// tolua_export
 
 

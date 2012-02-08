@@ -100,46 +100,9 @@ void cServer::ServerListenThread( void *a_Args )
 
 
 
-std::string GetWSAError()
+void cServer::ClientDestroying(const cClientHandle * a_Client)
 {
-#ifdef _WIN32
-	switch( WSAGetLastError() )
-	{
-	case WSANOTINITIALISED:
-		return "WSANOTINITIALISED";
-	case WSAENETDOWN:
-		return "WSAENETDOWN";
-	case WSAEFAULT:
-		return "WSAEFAULT";
-	case WSAENOTCONN:
-		return "WSAENOTCONN";
-	case WSAEINTR:
-		return "WSAEINTR";
-	case WSAEINPROGRESS:
-		return "WSAEINPROGRESS";
-	case WSAENETRESET:
-		return "WSAENETRESET";
-	case WSAENOTSOCK:
-		return "WSAENOTSOCK";
-	case WSAEOPNOTSUPP:
-		return "WSAEOPNOTSUPP";
-	case WSAESHUTDOWN:
-		return "WSAESHUTDOWN";
-	case WSAEWOULDBLOCK:
-		return "WSAEWOULDBLOCK";
-	case WSAEMSGSIZE:
-		return "WSAEMSGSIZE";
-	case WSAEINVAL:
-		return "WSAEINVAL";
-	case WSAECONNABORTED:
-		return "WSAECONNABORTED";
-	case WSAETIMEDOUT:
-		return "WSAETIMEDOUT";
-	case WSAECONNRESET:
-		return "WSAECONNRESET";
-	}
-#endif
-	return "No Error";
+	m_SocketThreads.RemoveClient(a_Client);
 }
 
 
@@ -183,11 +146,11 @@ bool cServer::InitServer( int a_Port )
 		return false;
 	}
 
-    if( m_pState->SListenClient.SetReuseAddress() == -1 )
+	if( m_pState->SListenClient.SetReuseAddress() == -1 )
 	{
-        LOGERROR("setsockopt == -1");
-        return false;
-    }
+		LOGERROR("setsockopt == -1");
+		return false;
+	}
 
 	cSocket::SockAddr_In local;
 	local.Family = cSocket::ADDRESS_FAMILY_INTERNET;
@@ -308,9 +271,16 @@ void cServer::StartListenClient()
 		return;
 	}
 
-	LOG("%s connected!", ClientIP.c_str());
+	LOG("Client \"%s\" connected!", ClientIP.c_str());
 
-	cClientHandle *NewHandle = new cClientHandle( SClient );
+	cClientHandle *NewHandle = new cClientHandle(SClient);
+	if (!m_SocketThreads.AddClient(&(NewHandle->GetSocket()), NewHandle))
+	{
+		// For some reason SocketThreads have rejected the handle, clean it up
+		SClient.CloseSocket();
+		delete NewHandle;
+		return;
+	}
 	m_pState->Clients.push_back( NewHandle );	// TODO - lock list
 }
 
@@ -335,11 +305,8 @@ bool cServer::Tick(float a_Dt)
 	//World->LockClientHandle(); // TODO - Lock client list
 	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end();)
 	{
-		(*itr)->HandlePendingPackets();
-
 		if( (*itr)->IsDestroyed() )
 		{
-
 			cClientHandle* RemoveMe = *itr;
 			++itr;
 			m_pState->Clients.remove( RemoveMe );
@@ -464,7 +431,7 @@ void cServer::ServerCommand( const char* a_Cmd )
 	{
 		if( split[0].compare( "help" ) == 0 )
 		{
-			printf("===================ALL COMMANDS====================\n");
+			printf("================== ALL COMMANDS ===================\n");
 			printf("help      - Shows this message\n");
 			printf("save-all  - Saves all loaded chunks to disk\n");
 			printf("list      - Lists all players currently in server\n");

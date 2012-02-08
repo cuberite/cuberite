@@ -91,7 +91,6 @@ extern std::string GetWSAError();
 
 cClientHandle::cClientHandle(const cSocket & a_Socket)
 	: m_ProtocolVersion(23)
-	, m_pReceiveThread(NULL)
 	, m_pSendThread(NULL)
 	, m_Socket(a_Socket)
 	, m_Semaphore(MAX_SEMAPHORES)
@@ -105,8 +104,6 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	, m_Ping(1000)
 	, m_bPositionConfirmed(false)
 {
-	LOG("cClientHandle::cClientHandle");
-	
 	cTimer t1;
 	m_LastPingTime = t1.GetNowTime();
 
@@ -143,13 +140,11 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 	memset(m_LoadedChunks, 0x00, sizeof(m_LoadedChunks));
 
 	//////////////////////////////////////////////////////////////////////////
-	m_pReceiveThread = new cThread(ReceiveThread, this, "cClientHandle::ReceiveThread");
 	m_pSendThread    = new cThread(SendThread,    this, "cClientHandle::SendThread");
-	m_pReceiveThread->Start(true);
 	m_pSendThread->Start   (true);
 	//////////////////////////////////////////////////////////////////////////
 
-	LOG("New ClientHandle");
+	LOG("New ClientHandle created at %p", this);
 }
 
 
@@ -158,7 +153,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket)
 
 cClientHandle::~cClientHandle()
 {
-	LOG("Deleting client %s", GetUsername().c_str());
+	LOG("Deleting client \"%s\"", GetUsername().c_str());
 
 	for(unsigned int i = 0; i < VIEWDISTANCE*VIEWDISTANCE; i++)
 	{
@@ -185,7 +180,6 @@ cClientHandle::~cClientHandle()
 	// First stop sending thread
 	m_bKeepThreadGoing = false;
 
-	cCSLock Lock(m_SocketCriticalSection);
 	if (m_Socket.IsValid())
 	{
 		cPacket_Disconnect Disconnect;
@@ -193,17 +187,10 @@ cClientHandle::~cClientHandle()
 		m_Socket.Send(&Disconnect);
 		m_Socket.CloseSocket();
 	}
-	Lock.Unlock();
 
 	m_Semaphore.Signal();
-	delete m_pReceiveThread;
 	delete m_pSendThread;
 
-	while (!m_PendingParsePackets.empty())
-	{
-		delete *m_PendingParsePackets.begin();
-		m_PendingParsePackets.erase(m_PendingParsePackets.begin());
-	}
 	while (!m_PendingNrmSendPackets.empty())
 	{
 		delete *m_PendingNrmSendPackets.begin();
@@ -224,6 +211,8 @@ cClientHandle::~cClientHandle()
 	{
 		delete m_PacketMap[i];
 	}
+	
+	LOG("ClientHandle at %p destroyed", this);
 }
 
 
@@ -233,11 +222,13 @@ cClientHandle::~cClientHandle()
 void cClientHandle::Destroy()
 {
 	 m_bDestroyed = true;
-	 cCSLock Lock(m_SocketCriticalSection);
 	 if (m_Socket.IsValid())
 	 {
 		 m_Socket.CloseSocket();
 	 }
+	 
+	 // Synchronize with the cSocketThreads (so that they don't call us anymore)
+	 cRoot::Get()->GetServer()->ClientDestroying(this);
 }
 
 
@@ -413,31 +404,6 @@ void cClientHandle::RemoveFromAllChunks()
 			m_LoadedChunks[i] = 0;
 		}
 	}
-}
-
-
-
-
-
-void cClientHandle::AddPacket(cPacket * a_Packet)
-{
-	cCSLock Lock(m_CriticalSection);
-	m_PendingParsePackets.push_back(a_Packet->Clone());
-}
-
-
-
-
-
-void cClientHandle::HandlePendingPackets()
-{
-	cCSLock Lock(m_CriticalSection);
-	for (PacketList::iterator itr = m_PendingParsePackets.begin(); itr != m_PendingParsePackets.end(); ++itr)
-	{
-		HandlePacket(*itr);
-		delete *itr;
-	}
-	m_PendingParsePackets.clear();
 }
 
 
@@ -1766,14 +1732,11 @@ void cClientHandle::SendThread(void *lpParam)
 		}
 		Lock.Unlock();
 
-		cCSLock SocketLock(self->m_SocketCriticalSection);
 		if (!self->m_Socket.IsValid())
 		{
 			break;
 		}
-
 		bool bSuccess = self->m_Socket.Send(Packet);
-		SocketLock.Unlock();
 		
 		if (!bSuccess)
 		{
@@ -1799,84 +1762,6 @@ void cClientHandle::SendThread(void *lpParam)
 
 
 
-void cClientHandle::ReceiveThread(void *lpParam)
-{
-	LOG("ReceiveThread");
-
-	cClientHandle* self = (cClientHandle*)lpParam;
-
-	char temp = 0;
-	int iStat = 0;
-
-	cSocket socket = self->GetSocket();
-
-	AString Received;
-	while (self->m_bKeepThreadGoing)
-	{
-		char Buffer[1024];
-		iStat = socket.Receive(Buffer, sizeof(Buffer), 0);
-		if (cSocket::IsSocketError(iStat) || (iStat == 0))
-		{
-			LOG("CLIENT DISCONNECTED (%i bytes):%s", iStat, cSocket::GetLastErrorString().c_str());
-			break;
-		}
-		Received.append(Buffer, iStat);
-
-		// Parse all complete packets in Received:
-		while (!Received.empty())
-		{
-			cPacket* pPacket = self->m_PacketMap[(unsigned char)Received[0]];
-			if (pPacket)
-			{
-				int NumBytes = pPacket->Parse(Received.data() + 1, Received.size() - 1);
-				if (NumBytes == PACKET_ERROR)
-				{
-					LOGERROR("Protocol error while parsing packet type 0x%x; disconnecting client \"%s\"", Received[0], self->m_Username.c_str());
-					cPacket_Disconnect DC("Protocol error");
-					socket.Send(&DC);
-
-					cSleep::MilliSleep(1000); // Give packet some time to be received
-					return;
-				}
-				else if (NumBytes == PACKET_INCOMPLETE)
-				{
-					// Not a complete packet
-					break;
-				}
-				else
-				{
-					// Packet parsed successfully, add it to internal queue:
-					self->AddPacket(pPacket);
-					// Erase the packet from the buffer:
-					assert(Received.size() > (size_t)NumBytes);
-					Received.erase(0, NumBytes + 1);
-				}
-			}
-			else
-			{
-				LOGERROR("Unknown packet type: 0x%2x", Received[0]);
-
-				AString Reason;
-				Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", Received[0]);
-				cPacket_Disconnect DC(Reason);
-				socket.Send(&DC);
-
-				cSleep::MilliSleep(1000); // Give packet some time to be received
-				break;
-			}
-		}  // while (!Received.empty())
-	}  // while (self->m_bKeepThreadGoing)
-
-	self->Destroy();
-
-	LOG("ReceiveThread STOPPED");
-	return;
-}
-
-
-
-
-
 const AString & cClientHandle::GetUsername(void) const
 {
 	return m_Username;
@@ -1886,9 +1771,79 @@ const AString & cClientHandle::GetUsername(void) const
 
 
 
-const cSocket & cClientHandle::GetSocket()
+void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
-	return m_Socket;
+	// Data is received from the client
+
+	m_ReceivedData.append(a_Data, a_Size);
+
+	// Parse and handle all complete packets in m_ReceivedData:
+	while (!m_ReceivedData.empty())
+	{
+		cPacket* pPacket = m_PacketMap[(unsigned char)m_ReceivedData[0]];
+		if (pPacket == NULL)
+		{
+			LOGERROR("Unknown packet type 0x%02x from client \"%s\"", (unsigned char)m_ReceivedData[0], m_Username.c_str());
+
+			AString Reason;
+			Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", m_ReceivedData[0]);
+			cPacket_Disconnect DC(Reason);
+			m_Socket.Send(&DC);
+			cSleep::MilliSleep(1000); // Give packet some time to be received
+			Destroy();
+			return;
+		}
+		
+		int NumBytes = pPacket->Parse(m_ReceivedData.data() + 1, m_ReceivedData.size() - 1);
+		if (NumBytes == PACKET_ERROR)
+		{
+			LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", (unsigned char)m_ReceivedData[0], m_Username.c_str());
+			cPacket_Disconnect DC("Protocol error");
+			m_Socket.Send(&DC);
+			cSleep::MilliSleep(1000); // Give packet some time to be received
+			Destroy();
+			return;
+		}
+		else if (NumBytes == PACKET_INCOMPLETE)
+		{
+			// Not a complete packet
+			break;
+		}
+		else
+		{
+			// Packet parsed successfully, add it to internal queue:
+			HandlePacket(pPacket);
+			// Erase the packet from the buffer:
+			assert(m_ReceivedData.size() > (size_t)NumBytes);
+			m_ReceivedData.erase(0, NumBytes + 1);
+		}
+	}  // while (!Received.empty())
+}
+
+
+
+
+
+void cClientHandle::GetOutgoingData(AString & a_Data)
+{
+	// Data can be sent to client
+	
+	// TODO
+}
+
+
+
+
+
+void cClientHandle::SocketClosed(void)
+{
+	// The socket has been closed for any reason
+	
+	// TODO
+	/*
+	self->Destroy();
+	LOG("Client \"%s\" disconnected", GetLogName().c_str());
+	*/
 }
 
 
