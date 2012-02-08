@@ -59,6 +59,7 @@ cChunkMap::cChunkMap(cWorld* a_World )
 
 cChunkMap::~cChunkMap()
 {
+	// TODO: delete layers
 }
 
 
@@ -127,11 +128,6 @@ cChunkMap::cChunkLayer* cChunkMap::AddLayer( const cChunkLayer & a_Layer )
 
 void cChunkMap::AddChunk( cChunk* a_Chunk )
 {
-	/* // OLD
-	m_Nodes[ MakeHash( a_Chunk->GetPosX(), a_Chunk->GetPosZ() ) ].push_back( a_Chunk );
-	*/
-
-	// NEW
 	const int LayerX = (int)(floorf((float)a_Chunk->GetPosX() / (float)(LAYER_SIZE)));
 	const int LayerZ = (int)(floorf((float)a_Chunk->GetPosZ() / (float)(LAYER_SIZE)));
 	cChunkLayer* FoundLayer = GetLayer( LayerX, LayerZ );
@@ -141,16 +137,20 @@ void cChunkMap::AddChunk( cChunk* a_Chunk )
 		NewLayer.m_X = LayerX;
 		NewLayer.m_Z = LayerZ;
 		FoundLayer = AddLayer( NewLayer );
-		LOGWARN("Created new layer %i %i (total layers %i)", LayerX, LayerZ, m_NumLayers );
+		LOG("Created new layer [%i %i] (total layers %i)", LayerX, LayerZ, m_NumLayers );
 	}
 
 	//Get local coordinates in layer
 	const int LocalX = a_Chunk->GetPosX() - LayerX * LAYER_SIZE;
 	const int LocalZ = a_Chunk->GetPosZ() - LayerZ * LAYER_SIZE;
 	if( FoundLayer->m_Chunks[ LocalX + LocalZ * LAYER_SIZE ].m_LiveChunk )
+	{
 		LOGWARN("WARNING: Added chunk to layer while it was already loaded!");
+	}
 	if( FoundLayer->m_Chunks[ LocalX + LocalZ * LAYER_SIZE ].m_Compressed )
+	{
 		LOGWARN("WARNING: Added chunk to layer while a compressed version exists!");
+	}
 	FoundLayer->m_Chunks[ LocalX + LocalZ * LAYER_SIZE ].m_LiveChunk = a_Chunk;
 	FoundLayer->m_NumChunksLoaded++;
 }
@@ -161,11 +161,6 @@ void cChunkMap::AddChunk( cChunk* a_Chunk )
 
 void cChunkMap::RemoveChunk( cChunk* a_Chunk )
 {
-	/* // OLD
-	m_Nodes[ MakeHash( a_Chunk->GetPosX(), a_Chunk->GetPosZ() ) ].erase( a_Chunk );
-	*/
-
-	// NEW
 	cChunkLayer* Layer = GetLayerForChunk( a_Chunk->GetPosX(), a_Chunk->GetPosZ() );
 	if( Layer )
 	{
@@ -392,10 +387,8 @@ void cChunkMap::UnloadUnusedChunks()
 			SaveLayer( &Layer );
 			for( int i = 0; i < LAYER_SIZE*LAYER_SIZE; ++i ) // Free all chunk data for layer
 			{
-				if( Layer.m_Chunks[i].m_Compressed )
-					delete [] Layer.m_Chunks[i].m_Compressed;
-				if( Layer.m_Chunks[i].m_LiveChunk )
-					delete Layer.m_Chunks[i].m_LiveChunk;
+				delete [] Layer.m_Chunks[i].m_Compressed;
+				delete Layer.m_Chunks[i].m_LiveChunk;
 			}
 			if( RemoveLayer( &Layer ) ) l--;
 		}

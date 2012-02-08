@@ -436,6 +436,10 @@ char cChunk::GetHeight( int a_X, int a_Z )
 	return 0;
 }
 
+
+
+
+
 void cChunk::CreateBlockEntities()
 {
 	m_pState->BlockListCriticalSection.Lock();
@@ -475,6 +479,10 @@ void cChunk::CreateBlockEntities()
 	m_pState->BlockListCriticalSection.Unlock();
 }
 
+
+
+
+
 void cChunk::CalculateHeightmap()
 {
 	m_bCalculateHeightmap = false;
@@ -494,6 +502,10 @@ void cChunk::CalculateHeightmap()
 		}
 	}
 }
+
+
+
+
 
 void cChunk::CalculateLighting()
 {
@@ -537,6 +549,10 @@ void cChunk::CalculateLighting()
 	// Stop it from calculating again :P
 	m_bCalculateLighting = false;
 }
+
+
+
+
 
 void cChunk::SpreadLight(char* a_LightBuffer)
 {
@@ -643,11 +659,19 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	if( bCalcBack )		m_World->ReSpreadLighting( BackChunk );
 }
 
+
+
+
+
 void cChunk::AsyncUnload( cClientHandle* a_Client )
 {
 	m_pState->UnloadQuery.remove( a_Client );	// Make sure this client is only in the list once
 	m_pState->UnloadQuery.push_back( a_Client );
 }
+
+
+
+
 
 void cChunk::Send( cClientHandle* a_Client )
 {
@@ -666,12 +690,15 @@ void cChunk::Send( cClientHandle* a_Client )
 	m_pState->BlockListCriticalSection.Unlock();
 }
 
+
+
+
+
 void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
-	if(a_X < 0 || a_X >= 16 || a_Y < 0 || a_Y >= 128 || a_Z < 0 || a_Z >= 16)
+	if (a_X < 0 || a_X >= 16 || a_Y < 0 || a_Y >= 128 || a_Z < 0 || a_Z >= 16)
 	{
-		//printf(">>>>>>>>>>>>>>>> CLIPPED SETBLOCK %i %i %i\n", a_X, a_Y, a_Z );
-		return; // Clip
+		return;  // Clip
 	}
 
 	int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
@@ -681,49 +708,54 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 	SetLight( m_BlockMeta, index, a_BlockMeta );
 
-	if( OldBlockType != a_BlockType || OldBlockMeta != a_BlockMeta )
+	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
-		//LOG("Old: %i %i New: %i %i", OldBlockType, OldBlockMeta, a_BlockType, a_BlockMeta );
-		m_pState->BlockListCriticalSection.Lock();
-		m_pState->PendingSendBlocks.push_back( index );
-
-		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
-		m_pState->ToTickBlocks[ MakeIndex( a_X+1, a_Y, a_Z ) ]++;
-		m_pState->ToTickBlocks[ MakeIndex( a_X-1, a_Y, a_Z ) ]++;
-		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y+1, a_Z ) ]++;
-		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y-1, a_Z ) ]++;
-		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z+1 ) ]++;
-		m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z-1 ) ]++;
-
-		cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX*16, a_Y+m_PosY*128, a_Z+m_PosZ*16 );
-		if( BlockEntity )
-		{
-			BlockEntity->Destroy();
-			RemoveBlockEntity( BlockEntity );
-			delete BlockEntity;
-		}
-		switch( a_BlockType )
-		{
-		case E_BLOCK_CHEST:
-			AddBlockEntity( new cChestEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
-			break;
-		case E_BLOCK_FURNACE:
-			AddBlockEntity( new cFurnaceEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
-			break;
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:
-			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
-			break;
-		default:
-			break;
-		};
-
-		m_pState->BlockListCriticalSection.Unlock();
+		return;
 	}
 
-	//RecalculateHeightmap();
-	//RecalculateLighting();
+	//LOG("Old: %i %i New: %i %i", OldBlockType, OldBlockMeta, a_BlockType, a_BlockMeta );
+	cCSLock Lock(m_pState->BlockListCriticalSection);
+	m_pState->PendingSendBlocks.push_back( index );
+
+	m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
+	m_pState->ToTickBlocks[ MakeIndex( a_X+1, a_Y, a_Z ) ]++;
+	m_pState->ToTickBlocks[ MakeIndex( a_X-1, a_Y, a_Z ) ]++;
+	m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y+1, a_Z ) ]++;
+	m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y-1, a_Z ) ]++;
+	m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z+1 ) ]++;
+	m_pState->ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z-1 ) ]++;
+
+	cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX*16, a_Y+m_PosY*128, a_Z+m_PosZ*16 );
+	if( BlockEntity )
+	{
+		BlockEntity->Destroy();
+		RemoveBlockEntity( BlockEntity );
+		delete BlockEntity;
+	}
+	switch( a_BlockType )
+	{
+		case E_BLOCK_CHEST:
+		{
+			AddBlockEntity( new cChestEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
+			break;
+		}
+		case E_BLOCK_FURNACE:
+		{
+			AddBlockEntity( new cFurnaceEntity( a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
+			break;
+		}
+		case E_BLOCK_SIGN_POST:
+		case E_BLOCK_WALLSIGN:
+		{
+			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, a_X + m_PosX*16, a_Y + m_PosY*128, a_Z + m_PosZ*16, this ) );
+			break;
+		}
+	}  // switch (a_BlockType)
 }
+
+
+
+
 
 void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
@@ -754,6 +786,10 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	RecalculateHeightmap();
 }
 
+
+
+
+
 void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 {
 	if( a_Client == 0 )
@@ -781,6 +817,10 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 	}
 }
 
+
+
+
+
 void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
 {
 	m_pState->BlockListCriticalSection.Lock();
@@ -788,12 +828,20 @@ void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
 	m_pState->BlockListCriticalSection.Unlock();
 }
 
+
+
+
+
 void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 {
 	m_pState->BlockListCriticalSection.Lock();
 	m_pState->BlockEntities.remove( a_BlockEntity );
 	m_pState->BlockListCriticalSection.Unlock();
 }
+
+
+
+
 
 void cChunk::AddClient( cClientHandle* a_Client )
 {
@@ -808,6 +856,10 @@ void cChunk::AddClient( cClientHandle* a_Client )
 	}
 	UnlockEntities();
 }
+
+
+
+
 
 void cChunk::RemoveClient( cClientHandle* a_Client )
 {
@@ -826,12 +878,20 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 	}
 }
 
+
+
+
+
 void cChunk::AddEntity( cEntity & a_Entity )
 {
 	LockEntities();
 	m_pState->Entities.push_back( &a_Entity );
 	UnlockEntities();
 }
+
+
+
+
 
 bool cChunk::RemoveEntity( cEntity & a_Entity, cChunk* a_CalledFrom /* = 0 */ )
 {
@@ -853,15 +913,27 @@ bool cChunk::RemoveEntity( cEntity & a_Entity, cChunk* a_CalledFrom /* = 0 */ )
 	return true;
 }
 
+
+
+
+
 void cChunk::LockEntities()
 {
 	m_EntitiesCriticalSection->Lock();
 }
 
+
+
+
+
 void cChunk::UnlockEntities()
 {
 	m_EntitiesCriticalSection->Unlock();
 }
+
+
+
+
 
 char cChunk::GetBlock( int a_X, int a_Y, int a_Z )
 {
@@ -871,11 +943,19 @@ char cChunk::GetBlock( int a_X, int a_Y, int a_Z )
 	return m_BlockType[index];
 }
 
+
+
+
+
 char cChunk::GetBlock( int a_BlockIdx )
 {
 	if( a_BlockIdx < 0 || a_BlockIdx >= c_NumBlocks ) return 0;
 	return m_BlockType[ a_BlockIdx ];
 }
+
+
+
+
 
 cBlockEntity* cChunk::GetBlockEntity( int a_X, int a_Y, int a_Z )
 {
@@ -986,17 +1066,6 @@ bool cChunk::LoadFromDisk()
 		LOGINFO("Successfully deleted old format file \"%s\"", SourceFile.c_str());
 	}
 	return true;
-}
-
-
-
-
-
-bool cChunk::SaveToDisk()
-{
-	assert(!"Old save format not supported anymore");  // Remove the call to this function
-	
-	return false; //no more saving old format!
 }
 
 

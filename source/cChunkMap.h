@@ -21,7 +21,6 @@ public:
 	~cChunkMap();
 
 	void AddChunk( cChunk* a_Chunk );
-	unsigned int MakeHash( int a_X, int a_Z );
 
 	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
 	void RemoveChunk( cChunk* a_Chunk );

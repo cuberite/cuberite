@@ -77,7 +77,6 @@ public:
 	inline void RecalculateHeightmap() { m_bCalculateHeightmap = true; } // Recalculate heightmap next tick
 	void SpreadLight(char* a_LightBuffer);
 
-	bool SaveToDisk();
 	bool LoadFromDisk();
 
 	// Broadcasts to all clients that have loaded this chunk
@@ -121,8 +120,6 @@ private:
 	void LoadFromJson( const Json::Value & a_Value );
 	void SaveToJson( Json::Value & a_Value );
 
-	void GenerateTerrain();
-	void GenerateFoliage();
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
 	void SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
@@ -151,6 +148,11 @@ private:
 
 	cCriticalSection* m_EntitiesCriticalSection;
 };
+
+
+
+
+
 
 #if C_CHUNK_USE_INLINE
 # include "cChunk.inl.h"
