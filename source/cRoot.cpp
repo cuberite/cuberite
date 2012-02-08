@@ -283,3 +283,17 @@ void cRoot::AuthenticateUser(const AString & iUserName)
 
 
 
+
+int cRoot::GetTotalChunkCount(void)
+{
+	int res = 0;
+	for ( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	{
+		res += itr->second->GetNumChunks();
+	}
+	return res;
+}
+
+
+
+

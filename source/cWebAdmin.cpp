@@ -232,11 +232,15 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 #endif
 				// end mem usage
 
-				ReplaceString( Template, std::string("{USERNAME}"), r->username_ );
-				ReplaceString( Template, std::string("{MENU}"), Menu );
-				ReplaceString( Template, std::string("{PLUGIN_NAME}"), FoundPlugin );
-				ReplaceString( Template, std::string("{CONTENT}"), Content );
-				ReplaceString( Template, std::string("{TITLE}"), "MCServer" );
+				ReplaceString( Template, "{USERNAME}",    r->username_ );
+				ReplaceString( Template, "{MENU}",        Menu );
+				ReplaceString( Template, "{PLUGIN_NAME}", FoundPlugin );
+				ReplaceString( Template, "{CONTENT}",     Content );
+				ReplaceString( Template, "{TITLE}",       "MCServer" );
+
+				AString NumChunks;
+				Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
+				ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
 
 				r->answer_ = Template;
 			}

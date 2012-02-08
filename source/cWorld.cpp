@@ -945,16 +945,28 @@ void cWorld::SetMaxPlayers(int iMax)
 	}
 }
 
+
+
+
+
 void cWorld::AddPlayer( cPlayer* a_Player )
 {
 	m_pState->Players.remove( a_Player );
 	m_pState->Players.push_back( a_Player );
 }
 
+
+
+
+
 void cWorld::RemovePlayer( cPlayer* a_Player )
 {
 	m_pState->Players.remove( a_Player );
 }
+
+
+
+
 
 void cWorld::GetAllPlayers( lua_State* L )
 {
@@ -969,6 +981,10 @@ void cWorld::GetAllPlayers( lua_State* L )
 		++index;
 	}
 }
+
+
+
+
 
 cPlayer* cWorld::GetPlayer( const char* a_PlayerName )
 {
@@ -1034,6 +1050,10 @@ cEntity* cWorld::GetEntity( int a_UniqueID )
 	return 0;
 }
 
+
+
+
+
 // void cWorld::RemoveClient( cClientHandle* a_Client )
 // {
 // 	m_pState->m_Clients.remove( a_Client );
@@ -1043,6 +1063,10 @@ cEntity* cWorld::GetEntity( int a_UniqueID )
 // 		a_Client = 0;
 // 	}
 // }
+
+
+
+
 
 void cWorld::RemoveEntity( cEntity* a_Entity )
 {
@@ -1054,6 +1078,10 @@ void cWorld::RemoveEntity( cEntity* a_Entity )
 	}
 }
 
+
+
+
+
 bool cWorld::RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom /* = 0 */ )
 {
 	LockChunks();
@@ -1061,6 +1089,10 @@ bool cWorld::RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom /* 
 	UnlockChunks();
 	return retVal;
 }
+
+
+
+
 
 void cWorld::SaveAllChunks()
 {
@@ -1072,35 +1104,63 @@ void cWorld::SaveAllChunks()
 	LOG("Done saving chunks");
 }
 
+
+
+
+
 void cWorld::LockClientHandle()
 {
 	m_ClientHandleCriticalSection->Lock();
 }
+
+
+
+
 
 void cWorld::UnlockClientHandle()
 {
 	m_ClientHandleCriticalSection->Unlock();
 }
 
+
+
+
+
 void cWorld::LockEntities()
 {
 	m_EntitiesCriticalSection->Lock();
 }
+
+
+
+
 
 void cWorld::UnlockEntities()
 {
 	m_EntitiesCriticalSection->Unlock();
 }
 
+
+
+
+
 void cWorld::LockChunks()
 {
 	m_ChunksCriticalSection->Lock();
 }
 
+
+
+
+
 void cWorld::UnlockChunks()
 {
 	m_ChunksCriticalSection->Unlock();
 }
+
+
+
+
 
 void cWorld::ReSpreadLighting( const ptr_cChunk& a_Chunk )
 {
@@ -1112,12 +1172,19 @@ void cWorld::ReSpreadLighting( const ptr_cChunk& a_Chunk )
 	UnlockChunks();
 }
 
+
+
+
+
 void cWorld::RemoveSpread( const ptr_cChunk& a_Chunk )
 {
 	LockChunks();
 	m_pState->SpreadQueue.remove( a_Chunk );
 	UnlockChunks();
 }
+
+
+
 
 
 /************************************************************************/
@@ -1131,35 +1198,74 @@ void cWorld::RemoveSpread( const ptr_cChunk& a_Chunk )
 // {
 // 	return m_pState->m_Clients;
 // }
+
+
+
+
+
 cWorld::EntityList & cWorld::GetEntities()
 {
 	return m_pState->AllEntities;
 }
+
+
+
+
+
 void cWorld::AddEntity( cEntity* a_Entity )
 {
 	m_pState->AllEntities.push_back( a_Entity ); 
 }
+
+
+
+
+
 cWorld::PlayerList & cWorld::GetAllPlayers()
 {
 	return m_pState->Players; 
 }
+
+
+
+
+
 unsigned int cWorld::GetNumPlayers()
 {
 	return m_pState->Players.size(); 
 }
+
+
+
+
+
 void cWorld::AddToRemoveEntityQueue( cEntity & a_Entity )
 {
 	m_pState->AllEntities.remove( &a_Entity);
 	m_pState->RemoveEntityQueue.push_back( &a_Entity ); 
 }
+
+
+
+
+
 const char* cWorld::GetName()
 {
 	return m_pState->WorldName.c_str();
 }
-int cWorld::GetNumChunks()
+
+
+
+
+
+int cWorld::GetNumChunks(void)
 {
 	LockChunks();
 	int NumChunks = m_ChunkMap->GetNumChunks();
 	UnlockChunks();
 	return NumChunks;
 }
+
+
+
+

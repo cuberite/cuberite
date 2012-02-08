@@ -51,6 +51,8 @@ public:
 
 	void TickWorlds( float a_Dt );
 	
+	int GetTotalChunkCount(void);  // tolua_export
+	
 private:
 
 	void LoadWorlds();
