@@ -114,6 +114,10 @@ cWorld* cWorld::GetWorld()
 	return cRoot::Get()->GetWorld();
 }
 
+
+
+
+
 cWorld::~cWorld()
 {
 	LockEntities();
@@ -143,6 +147,10 @@ cWorld::~cWorld()
 
 	delete m_WorldGenerator;
 }
+
+
+
+
 
 cWorld::cWorld( const char* a_WorldName )
 	: m_pState( new sWorldState )
@@ -343,8 +351,11 @@ cWorld::cWorld( const char* a_WorldName )
 	g_BlockPistonBreakable[ E_BLOCK_VINES ]				= true;
 	g_BlockPistonBreakable[ E_BLOCK_STONE_PRESSURE_PLATE ] = true;
 	g_BlockPistonBreakable[ E_BLOCK_WOODEN_PRESSURE_PLATE ] = true;
-
 }
+
+
+
+
 
 void cWorld::SetWeather( int Weather )
 {
@@ -377,6 +388,10 @@ void cWorld::CastThunderbolt ( int X, int Y, int Z ) {
 	Broadcast( ThunderboltPacket );
 }
 
+
+
+
+
 void cWorld::InitializeSpawn()
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
@@ -392,6 +407,10 @@ void cWorld::InitializeSpawn()
 		LOG("Loaded %0.2f", ((float)x / (float)ViewDist)*100 );
 	}
 }
+
+
+
+
 
 void cWorld::Tick(float a_Dt)
 {
@@ -445,47 +464,13 @@ void cWorld::Tick(float a_Dt)
 		LOGWARN("Lots of lighting to do! At least %i chunks left!", m_pState->SpreadQueue.size() );
 	}
 
-	m_ChunkMap->Tick(a_Dt);
+	m_ChunkMap->Tick(a_Dt, m_TickRand);
 	
 	GetSimulatorManager()->Simulate(a_Dt);
 
 	UnlockChunks();
 
-	MTRand r1;
-
-////////////////Weather///////////////////////
-	if ( GetWeather() == 0 ) { //if sunny
-		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
-			randWeather = (r1.randInt() %10000);
-			if (randWeather == 0) {
-				LOG("Starting Rainstorm!");
-				SetWeather ( 1 );
-			} else if  (randWeather == 1) {
-				LOG("Starting Thunderstorm!");
-				SetWeather ( 2 );
-			}
-		}
-	}
-
-	if ( GetWeather() != 0 ) { //if raining or thunderstorm
-		if( CurrentTick % 19 == 0 ) { //every 20 ticks random weather
-			randWeather = (r1.randInt() %4999);
-			if (randWeather == 0) { //2% chance per second
-				LOG("Back to sunny!");
-				SetWeather ( 0 );
-			} else if ( (randWeather > 4000) && (GetWeather() != 2) ) { //random chance for rainstorm to turn into thunderstorm.
-				LOG("Starting Thunderstorm!");
-				SetWeather ( 2 );
-			}
-		}
-	}
-
-	if ( GetWeather() == 2 ) { //if thunderstorm
-		if (r1.randInt() %199 == 0) { //0.5% chance per tick of thunderbolt
-			CastThunderbolt ( 0, 0, 0 ); //todo: find random possitions near players to cast thunderbolts.
-		}
-	}
-////////////////Weather///////////////////////
+	TickWeather(a_Dt);
 
 	// Asynchronously set blocks
 	FastSetBlockList FastSetBlockQueueCopy = m_pState->FastSetBlockQueue;
@@ -521,17 +506,17 @@ void cWorld::Tick(float a_Dt)
 			cMonster	*Monster = 0;
 
 			//srand ( time(NULL) );			// Only seed random ONCE! Is already done in the cWorld constructor
-			int dayRand   = r1.randInt() % 6;  //added mob code
-			int nightRand = r1.randInt() % 10; //added mob code
+			int dayRand   = m_TickRand.randInt() % 6;  //added mob code
+			int nightRand = m_TickRand.randInt() % 10; //added mob code
 
-			int RandomPlayerIdx = r1.randInt() & m_pState->Players.size();
+			int RandomPlayerIdx = m_TickRand.randInt() & m_pState->Players.size();
 			PlayerList::iterator itr = m_pState->Players.begin();
 			for( int i = 1; i < RandomPlayerIdx; i++ )
 				itr++;
 
 			cPlayer* Player = *itr;
 			Vector3d SpawnPos = Player->GetPosition();
-			SpawnPos += Vector3d( (double)(r1.randInt()%64)-32, (double)(r1.randInt()%64)-32, (double)(r1.randInt()%64)-32 );
+			SpawnPos += Vector3d( (double)(m_TickRand.randInt()%64)-32, (double)(m_TickRand.randInt()%64)-32, (double)(m_TickRand.randInt()%64)-32 );
 			char Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
 
 			if(m_WorldTime >= 12000 + 1000) {
@@ -582,7 +567,6 @@ void cWorld::Tick(float a_Dt)
 	}
 
 
-
 	std::vector<int> m_RSList_copy(m_RSList);
 	//copy(m_RSList.begin(), m_RSList.end(), m_RSList_copy.begin());
 	m_RSList.erase(m_RSList.begin(),m_RSList.end());
@@ -614,6 +598,62 @@ void cWorld::Tick(float a_Dt)
 	m_RSList_copy.erase(m_RSList_copy.begin(),m_RSList_copy.end());
 
 }
+
+
+
+
+
+void cWorld::TickWeather(float a_Dt)
+{
+	////////////////Weather///////////////////////
+	if ( GetWeather() == 0 )  // if sunny
+	{
+		if( CurrentTick % 19 == 0 )  //every 20 ticks random weather
+		{
+			unsigned randWeather = (m_TickRand.randInt() % 10000);
+			if (randWeather == 0)
+			{
+				LOG("Starting Rainstorm!");
+				SetWeather ( 1 );
+			}
+			else if  (randWeather == 1)
+			{
+				LOG("Starting Thunderstorm!");
+				SetWeather ( 2 );
+			}
+		}
+	}
+
+	if ( GetWeather() != 0 )  // if raining or thunderstorm
+	{
+		if ( CurrentTick % 19 == 0 ) // every 20 ticks random weather
+		{
+			unsigned randWeather = (m_TickRand.randInt() % 4999);
+			if (randWeather == 0)  //2% chance per second
+			{
+				LOG("Back to sunny!");
+				SetWeather ( 0 );
+			}
+			else if ( (randWeather > 4000) && (GetWeather() != 2) )  // random chance for rainstorm to turn into thunderstorm.
+			{
+				LOG("Starting Thunderstorm!");
+				SetWeather ( 2 );
+			}
+		}
+	}
+
+	if ( GetWeather() == 2 )  // if thunderstorm
+	{
+		if (m_TickRand.randInt() % 199 == 0)  // 0.5% chance per tick of thunderbolt
+		{
+			CastThunderbolt ( 0, 0, 0 );  // todo: find random possitions near players to cast thunderbolts.
+		}
+	}
+}
+
+
+
+
 
 void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 {

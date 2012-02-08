@@ -349,7 +349,7 @@ cChunk* cChunkMap::GetChunk( int a_X, int a_Y, int a_Z )
 
 
 
-void cChunkMap::Tick( float a_Dt )
+void cChunkMap::Tick( float a_Dt, MTRand & a_TickRandom )
 {
 	for( int lay = 0; lay < m_NumLayers; ++lay )
 	{
@@ -358,7 +358,7 @@ void cChunkMap::Tick( float a_Dt )
 			cChunk* Chunk = m_Layers[lay].m_Chunks[i].m_LiveChunk;
 			if ( Chunk != NULL)
 			{
-				Chunk->Tick( a_Dt );
+				Chunk->Tick( a_Dt, a_TickRandom );
 			}
 		}
 	}  // for lay - m_Layers[]

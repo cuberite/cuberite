@@ -162,7 +162,7 @@ void cRoot::LoadWorlds()
 	cIniFile IniFile("settings.ini"); IniFile.ReadFile();
 
 	// First get the default world
-	std::string DefaultWorldName = IniFile.GetValue("Worlds", "DefaultWorld", "world");
+	AString DefaultWorldName = IniFile.GetValue("Worlds", "DefaultWorld", "world");
 	m_pState->pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
 	m_pState->pDefaultWorld->InitializeSpawn();
 	m_pState->WorldsByName[ DefaultWorldName ] = m_pState->pDefaultWorld;

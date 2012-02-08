@@ -1,8 +1,19 @@
+
 #pragma once
+
+
+
+
 
 class cWorld;
 class cEntity;
 class cChunk;
+class MTRand;
+
+
+
+
+
 class cChunkMap
 {
 public:
@@ -15,7 +26,7 @@ public:
 	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
 	void RemoveChunk( cChunk* a_Chunk );
 
-	void Tick( float a_Dt );
+	void Tick( float a_Dt, MTRand & a_TickRand );
 
 	void UnloadUnusedChunks();
 	bool RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom = 0 );
@@ -24,7 +35,9 @@ public:
 	cWorld* GetWorld() { return m_World; }
 
 	int GetNumChunks();
+	
 private:
+
 	class cChunkData
 	{
 	public:
@@ -75,3 +88,7 @@ private:
 
 	cWorld* m_World;
 };
+
+
+
+

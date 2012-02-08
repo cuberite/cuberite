@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/02/12 15:03:55.
+** Generated automatically by tolua++-1.0.92 on 02/08/12 12:55:58.
 */
 
 #ifndef __cplusplus
@@ -15986,7 +15986,7 @@ static int tolua_set_cPacket_Login_m_Username(lua_State* tolua_S)
   if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->m_Username = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+  self->m_Username = ((AString)  tolua_tocppstring(tolua_S,2,0))
 ;
  return 0;
 }
@@ -16046,7 +16046,7 @@ static int tolua_set_cPacket_Login_m_LevelType(lua_State* tolua_S)
   if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->m_LevelType = ((std::string)  tolua_tocppstring(tolua_S,2,0))
+  self->m_LevelType = ((AString)  tolua_tocppstring(tolua_S,2,0))
 ;
  return 0;
 }

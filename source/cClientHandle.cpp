@@ -221,14 +221,14 @@ cClientHandle::~cClientHandle()
 
 void cClientHandle::Destroy()
 {
-	 m_bDestroyed = true;
-	 if (m_Socket.IsValid())
-	 {
-		 m_Socket.CloseSocket();
-	 }
-	 
-	 // Synchronize with the cSocketThreads (so that they don't call us anymore)
-	 cRoot::Get()->GetServer()->ClientDestroying(this);
+	m_bDestroyed = true;
+	if (m_Socket.IsValid())
+	{
+		m_Socket.CloseSocket();
+	}
+	
+	// Synchronize with the cSocketThreads (so that they don't call us anymore)
+	cRoot::Get()->GetServer()->ClientDestroying(this);
 }
 
 
@@ -237,6 +237,7 @@ void cClientHandle::Destroy()
 
 void cClientHandle::Kick(const AString & a_Reason)
 {
+	LOG("Kicking user \"%s\" for \"%s\"", m_Username.c_str(), a_Reason.c_str());
 	Send(cPacket_Disconnect(a_Reason));
 	m_bKicking = true;
 }
@@ -512,10 +513,10 @@ void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 	cPacket_Chat Connecting(m_Username + " is connecting.");
 	cRoot::Get()->GetServer()->Broadcast(Connecting, this);
 
-	// Give a server handshake thingy back
 	cPacket_Handshake Handshake;
 	Handshake.m_Username = cRoot::Get()->GetServer()->GetServerID();
 	Send(Handshake);
+	LOG("User \"%s\" was sent a handshake", m_Username.c_str());
 }
 
 

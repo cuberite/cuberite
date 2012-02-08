@@ -1,3 +1,4 @@
+
 #pragma once
 
 #define C_CHUNK_USE_INLINE 1
@@ -14,14 +15,23 @@ namespace Json
 	class Value;
 };
 
+
+
+
+
 class cWorld;
-class cCriticalSection;
 class cFurnaceEntity;
 class cPacket;
 class cBlockEntity;
 class cEntity;
 class cClientHandle;
 class cServer;
+class MTRand;
+
+
+
+
+
 class cChunk
 {
 public:
@@ -30,7 +40,7 @@ public:
 
 	void Initialize();
 
-	void Tick(float a_Dt);
+	void Tick(float a_Dt, MTRand & a_TickRandom);
 
 	int GetPosX() { return m_PosX; }
 	int GetPosY() { return m_PosY; }

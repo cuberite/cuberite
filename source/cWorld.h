@@ -1,3 +1,4 @@
+
 #pragma once
 
 #ifndef _WIN32
@@ -10,6 +11,7 @@ enum ENUM_ITEM_ID;
 
 #include "cSimulatorManager.h"
 #include "ptr_cChunk.h"
+#include "MersenneTwister.h"
 
 
 
@@ -23,7 +25,6 @@ class cLavaSimulator;
 class cSandSimulator;
 class cChunkMap;
 class cItem;
-class cCriticalSection;
 class cPlayer;
 class cClientHandle;
 class cChunk;
@@ -159,17 +160,19 @@ public:
 	int GetWeather() { return m_Weather; };									//tolua_export
 
 	cWorldGenerator* GetWorldGenerator() { return m_WorldGenerator; }
+	
 private:
+
 	friend class cRoot;
+	
 	cWorld( const char* a_WorldName );
 	~cWorld();
 
 	struct sWorldState;
 	sWorldState* m_pState;
-
-	void AddToRemoveEntityQueue( cEntity & a_Entity );
-	void RemoveEntity( cEntity* a_Entity );
-	void UnloadUnusedChunks();
+	
+	// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
+	MTRand m_TickRand;
 
 	double m_SpawnX;
 	double m_SpawnY;
@@ -206,4 +209,15 @@ private:
 
 	unsigned int m_WorldSeed;
 	int	m_Weather;
+	
+	void TickWeather(float a_Dt);  // Handles weather each tick
+
+	void AddToRemoveEntityQueue( cEntity & a_Entity );
+	void RemoveEntity( cEntity* a_Entity );
+	void UnloadUnusedChunks();
+
 }; //tolua_export
+
+
+
+

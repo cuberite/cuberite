@@ -190,7 +190,7 @@ void cChunk::Initialize()
 
 
 
-void cChunk::Tick(float a_Dt)
+void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	if (m_bCalculateLighting)
 	{
@@ -356,11 +356,10 @@ void cChunk::Tick(float a_Dt)
 		};
 	}
 
-	MTRand r1;
 	// Tick dem blocks
-	int RandomX = r1.randInt();
-	int RandomY = r1.randInt();
-	int RandomZ = r1.randInt();
+	int RandomX = a_TickRandom.randInt();
+	int RandomY = a_TickRandom.randInt();
+	int RandomZ = a_TickRandom.randInt();
 
 	for(int i = 0; i < 50; i++)
 	{
@@ -425,6 +424,10 @@ void cChunk::Tick(float a_Dt)
 		}
 	}
 }
+
+
+
+
 
 char cChunk::GetHeight( int a_X, int a_Z )
 {
