@@ -1,9 +1,13 @@
+
 #pragma once
 
 #include "cBlockEntity.h"
 #include "cWindowOwner.h"
-#include "FileDefine.h"
 #include "packets/cPacket_BlockAction.h"
+
+
+
+
 
 namespace Json
 {
@@ -14,10 +18,17 @@ class cClientHandle;
 class cServer;
 class cItem;
 class cNBTData;
-class cChestEntity : public cBlockEntity, public cWindowOwner
+
+
+
+
+
+class cChestEntity :
+	public cBlockEntity,
+	public cWindowOwner
 {
 public:
-	cChestEntity(int a_X, int a_Y, int a_Z, cChunk * a_Chunk);
+	cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cChestEntity();
 	virtual void Destroy();
 
@@ -44,8 +55,14 @@ public:
 
 	static const int c_ChestWidth = 9;
 	static const int c_ChestHeight = 3;
+	
 private:
-	cItem* m_Content;
-	bool m_TopChest;
-	cChestEntity *m_JoinedChest;
+
+	cItem *        m_Content;
+	bool           m_TopChest;
+	cChestEntity * m_JoinedChest;
 };
+
+
+
+

@@ -20,8 +20,6 @@ extern bool g_BlockPistonBreakable[];
 													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
 													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
 
-#define FAST_FLOOR( x ) ( (x) < 0 ? ((int)x)-1 : ((int)x) )
-
 
 
 
@@ -48,6 +46,10 @@ unsigned short cPiston::FirstPassthroughBlock( int pistonX, int pistonY, int pis
 	}
 	return 9001;
 }
+
+
+
+
 
 void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 	char pistonBlock = m_World->GetBlock( pistx, pisty, pistz );
@@ -87,7 +89,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 		Action.m_Byte2	=	pistonMeta;
 
 		
-		cChunk* Chunk 	= m_World->GetChunk( FAST_FLOOR(pistx/16), FAST_FLOOR(pisty/16), FAST_FLOOR(pistz/16)  );
+		cChunkPtr Chunk = m_World->GetChunkOfBlock(pistx, pisty, pistz);
 		Chunk->Broadcast( Action );
 		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 8 );
 
@@ -109,33 +111,53 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 
 }
 
-void cPiston::RetractPiston( int pistx, int pisty, int pistz ) {
+
+
+
+
+void cPiston::RetractPiston( int pistx, int pisty, int pistz )
+{
 	char pistonBlock = m_World->GetBlock( pistx, pisty, pistz );
 	char pistonMeta = m_World->GetBlockMeta( pistx, pisty, pistz );
-	if (pistonMeta > 6) {// only retract if piston is not already retracted
-		//send blockaction packet
-		cPacket_BlockAction Action;
-		Action.m_PosX		= (int)pistx;
-		Action.m_PosY		= (short)pisty;
-		Action.m_PosZ		= (int)pistz;
-		Action.m_Byte1	=	1;
-		Action.m_Byte2	=	pistonMeta & ~(8);
-		cChunk* Chunk 	= m_World->GetChunk( FAST_FLOOR(pistx/16), FAST_FLOOR(pisty/16), FAST_FLOOR(pistz/16) );
-		Chunk->Broadcast( Action );
-		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8) );
-		
-		AddDir( pistx, pisty, pistz, pistonMeta & 7, 1 )
-		if( m_World->GetBlock( pistx, pisty, pistz ) == E_BLOCK_PISTON_EXTENSION ) {
-			if( pistonBlock == E_BLOCK_STICKY_PISTON ) {
-				int tempx = pistx, tempy = pisty, tempz = pistz;
-				AddDir( tempx, tempy, tempz, pistonMeta&7, 1 )
-				char tempblock = m_World->GetBlock( tempx, tempy, tempz );
-				if(tempblock == E_BLOCK_OBSIDIAN || tempblock == E_BLOCK_BEDROCK || tempblock == E_BLOCK_PISTON_EXTENSION) {return;}
-				m_World->SetBlock( pistx, pisty, pistz, tempblock, m_World->GetBlockMeta( tempx, tempy, tempz ) );
-				m_World->SetBlock( tempx, tempy, tempz, E_BLOCK_AIR, 0 );
-			}else{
-				m_World->SetBlock( pistx, pisty, pistz, E_BLOCK_AIR, 0 );
+	if (pistonMeta <= 6)  // only retract if piston is not already retracted
+	{
+		return;
+	}
+	
+	//send blockaction packet
+	cPacket_BlockAction Action;
+	Action.m_PosX   = (int)pistx;
+	Action.m_PosY   = (short)pisty;
+	Action.m_PosZ   = (int)pistz;
+	Action.m_Byte1  = 1;
+	Action.m_Byte2  = pistonMeta & ~(8);
+	cChunkPtr Chunk = m_World->GetChunkOfBlock(pistx, pisty, pistz);
+	Chunk->Broadcast( Action );
+	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8) );
+	
+	AddDir( pistx, pisty, pistz, pistonMeta & 7, 1 )
+	if ( m_World->GetBlock( pistx, pisty, pistz ) == E_BLOCK_PISTON_EXTENSION )
+	{
+		if ( pistonBlock == E_BLOCK_STICKY_PISTON )
+		{
+			int tempx = pistx, tempy = pisty, tempz = pistz;
+			AddDir( tempx, tempy, tempz, pistonMeta & 7, 1 )
+			char tempblock = m_World->GetBlock( tempx, tempy, tempz );
+			if (
+				(tempblock == E_BLOCK_OBSIDIAN) || 
+				(tempblock == E_BLOCK_BEDROCK) || 
+				(tempblock == E_BLOCK_PISTON_EXTENSION)
+			)
+			{
+				// These cannot be moved by the sticky piston, bail out
+				return;
 			}
+			m_World->SetBlock( pistx, pisty, pistz, tempblock, m_World->GetBlockMeta( tempx, tempy, tempz ) );
+			m_World->SetBlock( tempx, tempy, tempz, E_BLOCK_AIR, 0 );
+		}
+		else
+		{
+			m_World->SetBlock( pistx, pisty, pistz, E_BLOCK_AIR, 0 );
 		}
 	}
 }

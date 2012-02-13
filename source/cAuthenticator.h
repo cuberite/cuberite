@@ -34,6 +34,7 @@ class cAuthenticator :
 	
 public:
 	cAuthenticator(void);
+	~cAuthenticator();
 
 	/// (Re-)read server and address from INI:
 	void ReadINI(void);

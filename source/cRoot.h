@@ -12,7 +12,6 @@
 
 class cThread;
 class cMonsterConfig;
-class cMCLogger;
 class cGroupManager;
 class cRecipeChecker;
 class cFurnaceRecipe;
@@ -20,6 +19,10 @@ class cWebAdmin;
 class cPluginManager;
 class cServer;
 class cWorld;
+
+
+
+
 
 class cRoot	//tolua_export
 {			//tolua_export
@@ -32,7 +35,7 @@ public:
 	void Start();
 
 	cServer* GetServer() { return m_Server; }						//tolua_export
-	cWorld* GetWorld();												//tolua_export
+	OBSOLETE cWorld* GetWorld();												//tolua_export
 	cWorld* GetDefaultWorld();										//tolua_export
 	cWorld* GetWorld( const char* a_WorldName );					//tolua_export
 	cMonsterConfig *GetMonsterConfig() { return m_MonsterConfig;}

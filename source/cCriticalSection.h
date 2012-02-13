@@ -1,18 +1,27 @@
+
 #pragma once
+
+
+
+
 
 class cCriticalSection
 {
 public:
-	cCriticalSection();
+	cCriticalSection(void);
 	~cCriticalSection();
 
-	void Lock();
-	void Unlock();
+	void Lock(void);
+	void Unlock(void);
+	
 private:
-	void* m_CriticalSectionPtr; // Pointer to a CRITICAL_SECTION object
-#ifndef _WIN32
-	void* m_Attributes;
-#endif
+
+	#ifdef _WIN32
+		CRITICAL_SECTION m_CriticalSection;
+	#else  // _WIN32
+		void* m_CriticalSectionPtr; // Pointer to a CRITICAL_SECTION object
+		void* m_Attributes;
+	#endif  // else _WIN32
 };
 
 
@@ -23,10 +32,10 @@ class cCSLock
 {
 	cCriticalSection * m_CS;
 
-	#ifdef _DEBUG
 	// Unlike a cCriticalSection, this object should be used from a single thread, therefore access to m_IsLocked is not threadsafe
+	// In Windows, it is an error to call cCriticalSection::Unlock() multiple times if the lock is not held, 
+	// therefore we need to check this value whether we are locked or not.
 	bool m_IsLocked;
-	#endif  // _DEBUG
 	
 public:
 	cCSLock(cCriticalSection * a_CS);

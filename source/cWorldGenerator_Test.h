@@ -1,10 +1,20 @@
+
 #pragma once
 
 #include "cWorldGenerator.h"
 
-class cWorldGenerator_Test : public cWorldGenerator
+
+
+
+
+class cWorldGenerator_Test :
+	public cWorldGenerator
 {
 protected:
-	virtual void GenerateTerrain( cChunk* a_Chunk );
-	virtual void GenerateFoliage( cChunk* a_Chunk );
+	virtual void GenerateTerrain( cChunkPtr a_Chunk ) override;
+	virtual void GenerateFoliage( cChunkPtr a_Chunk ) override;
 };
+
+
+
+

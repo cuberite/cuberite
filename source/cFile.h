@@ -51,7 +51,7 @@ public:
 	{
 		fmRead,   // Read-only. If the file doesn't exist, object will not be valid
 		fmWrite,  // Write-only. If the file already exists, it will be overwritten
-		fmReadWrite,  // Read/write. If the file already exists, it will be left intact
+		fmReadWrite,  // Read/write. If the file already exists, it will be left intact; writing will overwrite the data from the beginning
 	} ;
 	
 	/// Simple constructor - creates an unopened file object, use Open() to open / create a real file
@@ -82,6 +82,9 @@ public:
 	
 	/// Returns the size of file, in bytes, or -1 for failure; asserts if not open
 	int GetSize(void) const;
+	
+	/// Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error
+	int ReadRestOfFile(AString & a_Contents);
 	
 private:
 	#ifdef USE_STDIO_FILE

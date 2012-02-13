@@ -16,9 +16,10 @@ public:
 
 	virtual bool IsA( const char* a_EntityType );
 
-	virtual void SpawnOn( cClientHandle* a_Target );
+	virtual cPacket * GetSpawnPacket(void) const override;
 
-	virtual void Tick(float a_Dt);
+	virtual void Tick(float a_Dt) override;
+	
 	virtual void HandlePhysics(float a_Dt);
 	virtual void ReplicateMovement();
 

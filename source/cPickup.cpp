@@ -54,22 +54,21 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 	//LOG("New pickup: ID(%i) Amount(%i) Health(%i)", m_Item.m_ItemID, m_Item.m_ItemCount, m_Item.m_ItemHealth );
 
 	// Spawn it on clients
-	cPacket_PickupSpawn PickupSpawn;
-	PickupSpawn.m_UniqueID = m_UniqueID;
-	PickupSpawn.m_Item = (short)m_Item->m_ItemID;
-	PickupSpawn.m_Count = m_Item->m_ItemCount;
-	PickupSpawn.m_Health = m_Item->m_ItemHealth;
-	PickupSpawn.m_PosX = a_X;
-	PickupSpawn.m_PosY = a_Y;
-	PickupSpawn.m_PosZ = a_Z;
-	PickupSpawn.m_Rotation = (char)(m_Speed->x * 8);
-	PickupSpawn.m_Pitch = (char)(m_Speed->y * 8);
-	PickupSpawn.m_Roll = (char)(m_Speed->z * 8);
-	if(PickupSpawn.m_Item != E_ITEM_EMPTY)
-		cRoot::Get()->GetServer()->Broadcast( PickupSpawn );
+	if (!a_Item.IsEmpty())
+	{
+		std::auto_ptr<cPacket> PickupSpawn(GetSpawnPacket());
+		if (PickupSpawn.get() != NULL)
+		{
+			cRoot::Get()->GetServer()->Broadcast( PickupSpawn.get() );
+		}
+	}
 
 	m_EntityType = E_PICKUP;
 }
+
+
+
+
 
 cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 	:	cEntity( ((double)a_PickupSpawnPacket->m_PosX)/32, ((double)a_PickupSpawnPacket->m_PosY)/32, ((double)a_PickupSpawnPacket->m_PosZ)/32 )
@@ -93,28 +92,42 @@ cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 	m_Speed->z = (float)(a_PickupSpawnPacket->m_Roll)		/ 8;
 
 	// Spawn it on clients
-	if(a_PickupSpawnPacket->m_Item != E_ITEM_EMPTY)
+	if (a_PickupSpawnPacket->m_Item != E_ITEM_EMPTY)
+	{
 		cRoot::Get()->GetServer()->Broadcast( *a_PickupSpawnPacket );
+	}
 
 	m_EntityType = E_PICKUP;
 }
 
-void cPickup::SpawnOn( cClientHandle* a_Target )
+
+
+
+
+cPacket * cPickup::GetSpawnPacket(void) const
 {
-	cPacket_PickupSpawn PickupSpawn;
-	PickupSpawn.m_UniqueID = m_UniqueID;
-	PickupSpawn.m_Item = (short)m_Item->m_ItemID;
-	PickupSpawn.m_Count = m_Item->m_ItemCount;
-	PickupSpawn.m_Health = m_Item->m_ItemHealth;
-	PickupSpawn.m_PosX = (int)(m_Pos->x * 32);
-	PickupSpawn.m_PosY = (int)(m_Pos->y * 32);
-	PickupSpawn.m_PosZ = (int)(m_Pos->z * 32);
-	PickupSpawn.m_Rotation = (char)(m_Speed->x * 8);
-	PickupSpawn.m_Pitch    = (char)(m_Speed->y * 8);
-	PickupSpawn.m_Roll	   = (char)(m_Speed->z * 8);
-	if(PickupSpawn.m_Item != E_ITEM_EMPTY)
-		a_Target->Send( PickupSpawn );
+	if (m_Item->IsEmpty())
+	{
+		return NULL;
+	}
+	
+	cPacket_PickupSpawn * PickupSpawn = new cPacket_PickupSpawn;
+	PickupSpawn->m_UniqueID = m_UniqueID;
+	PickupSpawn->m_Item     = (short)m_Item->m_ItemID;
+	PickupSpawn->m_Count    = m_Item->m_ItemCount;
+	PickupSpawn->m_Health   = m_Item->m_ItemHealth;
+	PickupSpawn->m_PosX     = (int) (m_Pos->x * 32);
+	PickupSpawn->m_PosY     = (int) (m_Pos->y * 32);
+	PickupSpawn->m_PosZ     = (int) (m_Pos->z * 32);
+	PickupSpawn->m_Rotation = (char)(m_Speed->x * 8);
+	PickupSpawn->m_Pitch    = (char)(m_Speed->y * 8);
+	PickupSpawn->m_Roll     = (char)(m_Speed->z * 8);
+	return PickupSpawn;
 }
+
+
+
+
 
 void cPickup::Tick(float a_Dt)
 {
@@ -142,28 +155,28 @@ void cPickup::Tick(float a_Dt)
 	}
 
 	if(!m_bCollected)
+	{
 		HandlePhysics( a_Dt );
+	}
 
 	if( !m_bReplicated || m_bDirtyPosition )
 	{
 		MoveToCorrectChunk();
 		m_bReplicated = true;
 		m_bDirtyPosition = false;
-		cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if( Chunk )
-		{
-			cPacket_TeleportEntity TeleportEntity( this );
-			Chunk->Broadcast( TeleportEntity );
-		}
+		cPacket_TeleportEntity TeleportEntity( this );
+		GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ )->Broadcast( &TeleportEntity );
 	}
-
-	//printf("YSpeed: %f, OnGround: %i\n", m_SpeedY, m_bOnGround );
 }
+
+
+
+
 
 void cPickup::HandlePhysics(float a_Dt)
 {
 	m_ResultingSpeed->Set(0.f, 0.f, 0.f);
-	cWorld* World = GetWorld();
+	cWorld * World = GetWorld();
 
 	if( m_bOnGround ) // check if it's still on the ground
 	{
@@ -273,13 +286,13 @@ void cPickup::HandlePhysics(float a_Dt)
 			*m_Pos += *m_ResultingSpeed * a_Dt;
 		}
 	}
-
-
 	//Usable for debugging
 	//SetPosition(m_Pos->x, m_Pos->y, m_Pos->z);
-	
-
 }
+
+
+
+
 
 bool cPickup::CollectedBy( cPlayer* a_Dest )
 {
@@ -303,3 +316,7 @@ bool cPickup::CollectedBy( cPlayer* a_Dest )
 
 	return false;
 }
+
+
+
+

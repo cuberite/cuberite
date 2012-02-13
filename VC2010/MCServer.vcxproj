@@ -394,6 +394,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\source\LeakFinder.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\Source\ManualBindings.cpp" />
     <ClCompile Include="..\source\Matrix4f.cpp" />
     <ClCompile Include="..\source\md5\md5.cpp" />
@@ -465,10 +471,18 @@
     <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp" />
     <ClCompile Include="..\source\SquirrelBindings.cpp" />
+    <ClCompile Include="..\source\StackWalker.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\source\StringUtils.cpp" />
     <ClCompile Include="..\source\Vector3d.cpp" />
     <ClCompile Include="..\source\Vector3f.cpp" />
     <ClCompile Include="..\source\Vector3i.cpp" />
+    <ClCompile Include="..\source\WorldStorage.cpp" />
+    <ClCompile Include="..\source\WSSCompact.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\BlockID.h" />
@@ -558,6 +572,7 @@
     <ClInclude Include="..\source\Endianness.h" />
     <ClInclude Include="..\Source\FileDefine.h" />
     <ClInclude Include="..\source\Globals.h" />
+    <ClInclude Include="..\source\LeakFinder.h" />
     <ClInclude Include="..\Source\LuaFunctions.h" />
     <ClInclude Include="..\Source\ManualBindings.h" />
     <ClInclude Include="..\source\Matrix4f.h" />
@@ -637,10 +652,13 @@
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
     <ClInclude Include="..\source\ptr_cChunk.h" />
     <ClInclude Include="..\source\SquirrelBindings.h" />
+    <ClInclude Include="..\source\StackWalker.h" />
     <ClInclude Include="..\source\StringUtils.h" />
     <ClInclude Include="..\source\Vector3d.h" />
     <ClInclude Include="..\source\Vector3f.h" />
     <ClInclude Include="..\source\Vector3i.h" />
+    <ClInclude Include="..\source\WorldStorage.h" />
+    <ClInclude Include="..\source\WSSCompact.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

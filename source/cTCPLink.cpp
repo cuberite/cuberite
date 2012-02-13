@@ -3,7 +3,6 @@
 
 #include "cTCPLink.h"
 #include "cSocket.h"
-#include "MCSocket.h"
 
 
 
@@ -45,58 +44,24 @@ void cTCPLink::CloseSocket()
 	}
 }
 
-bool cTCPLink::Connect( const char* a_Address, unsigned int a_Port )
+bool cTCPLink::Connect( const AString & a_Address, unsigned int a_Port )
 {
 	if( m_Socket )
 	{
 		LOGWARN("WARNING: cTCPLink Connect() called while still connected. ALWAYS disconnect before re-connecting!");
 	}
 
-	struct hostent *hp;
-	unsigned int addr;
-	struct sockaddr_in server;
-
-#ifdef _WIN32
-	WSADATA wsaData;
-	int wsaret=WSAStartup(/*0x101*/ MAKEWORD(2, 2),&wsaData);
-
-	if(wsaret!=0)
-	{
-		LOGERROR("cTCPLink: WSAStartup returned error");
-		return false;
-	}
-#endif
-
-	m_Socket=socket(AF_INET,SOCK_STREAM,0);
+	m_Socket = cSocket::CreateSocket();
 	if( !m_Socket.IsValid() )
 	{
-		LOGERROR("cTCPLink: Invalid socket");
-		m_Socket = 0;
+		LOGERROR("cTCPLink: Failed to create socket");
 		return false;
 	}
 
-
-	addr=inet_addr( a_Address );
-	hp=gethostbyaddr((char*)&addr,sizeof(addr),AF_INET);
-	if(hp==NULL)
+	if (m_Socket.Connect(a_Address, a_Port) != 0)
 	{
-		//LOGWARN("cTCPLink: gethostbyaddr returned NULL");
-		hp = gethostbyname( a_Address );
-		if( hp == NULL )
-		{
-			LOGWARN("cTCPLink: Could not resolve %s", a_Address);
-			CloseSocket();
-			return false;
-		}
-	}
-
-	server.sin_addr.s_addr=*((unsigned long*)hp->h_addr);
-	server.sin_family=AF_INET;
-	server.sin_port=htons( (unsigned short)a_Port );
-	if( connect( m_Socket, (struct sockaddr*)&server, sizeof(server) ) )
-	{
-		LOGWARN("cTCPLink: No response from server (%i)", errno);
-		CloseSocket();
+		LOGWARN("cTCPLink: Cannot connect to server \"%s\" (%s)", m_Socket.GetLastErrorString().c_str());
+		m_Socket.CloseSocket();
 		return false;
 	}
 
@@ -105,41 +70,60 @@ bool cTCPLink::Connect( const char* a_Address, unsigned int a_Port )
 	return true;
 }
 
-int cTCPLink::Send( char* a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
+
+
+
+
+int cTCPLink::Send(const char * a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
 {
-	//LOG("TCPLink::Send()");
-	if( !m_Socket )
+	(void)a_Flags;
+	if (!m_Socket.IsValid())
 	{
 		LOGWARN("cTCPLink: Trying to send data without a valid connection!");
 		return -1;
 	}
-	return send( m_Socket, a_Data, a_Size, a_Flags | MSG_NOSIGNAL );
+	return m_Socket.Send(a_Data, a_Size);
 }
 
-int cTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ )
+
+
+
+
+int cTCPLink::SendMessage(const char * a_Message, int a_Flags /* = 0 */ )
 {
-	//LOG("TCPLink::SendMessage()");
-	if( !m_Socket )
+	(void)a_Flags;
+	if (!m_Socket.IsValid())
 	{
 		LOGWARN("cTCPLink: Trying to send message without a valid connection!");
 		return -1;
 	}
-	return send( m_Socket, a_Message, strlen(a_Message), a_Flags | MSG_NOSIGNAL );
+	return m_Socket.Send(a_Message, strlen(a_Message));
 }
+
+
+
+
 
 void cTCPLink::ReceiveThread( void* a_Param)
 {
 	cTCPLink* self = (cTCPLink*)a_Param;
-	SOCKET Socket = self->m_Socket;
+	cSocket Socket = self->m_Socket;
 	int Received = 0;
 	do
 	{
 		char Data[256];
-		Received = recv(Socket, Data, 256, 0);
-		self->ReceivedData( Data, (Received>0?Received:-1) );
+		Received = Socket.Receive(Data, sizeof(Data), 0);
+		self->ReceivedData( Data, ((Received > 0) ? Received : -1) );
 	} while ( Received > 0 );
 
 	LOGINFO("cTCPLink Disconnected (%i)", Received );
 
-	if( Socket == self->m_Socket ) self->m_StopEvent->Set();
+	if (Socket == self->m_Socket)
+	{
+		self->m_StopEvent->Set();
+	}
 }
+
+
+
+

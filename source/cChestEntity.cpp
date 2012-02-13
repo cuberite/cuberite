@@ -23,13 +23,17 @@ class cRoot;
 
 
 
-cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
-	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z, a_Chunk ) 
+cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
+	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z, a_World)
 	, m_TopChest( false )
-	, m_JoinedChest( 0 )
+	, m_JoinedChest( NULL )
 {
 	m_Content = new cItem[ c_ChestHeight*c_ChestWidth ];
 }
+
+
+
+
 
 cChestEntity::~cChestEntity()
 {
@@ -44,6 +48,10 @@ cChestEntity::~cChestEntity()
 	}
 }
 
+
+
+
+
 void cChestEntity::Destroy()
 {
 	// Drop items
@@ -51,14 +59,20 @@ void cChestEntity::Destroy()
 	{
 		if( !m_Content[i].IsEmpty() )
 		{
-			cPickup* Pickup = new cPickup( m_PosX*32 + 16, m_PosY*32 + 16, m_PosZ*32 + 16, m_Content[i], 0, 1.f, 0 );
-			Pickup->Initialize( GetChunk()->GetWorld() );
+			cPickup * Pickup = new cPickup( m_PosX * 32 + 16, m_PosY * 32 + 16, m_PosZ * 32 + 16, m_Content[i], 0, 1.f, 0 );
+			Pickup->Initialize(m_World);
 			m_Content[i].Empty();
 		}
 	}
 	if (m_JoinedChest)
+	{
 		m_JoinedChest->RemoveJoinedChest(this);
+	}
 }
+
+
+
+
 
 cItem * cChestEntity::GetSlot( int a_Slot )
 {
@@ -68,6 +82,10 @@ cItem * cChestEntity::GetSlot( int a_Slot )
 	}
 	return 0;
 }
+
+
+
+
 
 void cChestEntity::SetSlot( int a_Slot, cItem & a_Item )
 {
@@ -129,6 +147,10 @@ bool cChestEntity::LoadFromJson( const Json::Value& a_Value )
 	return true;
 }
 
+
+
+
+
 void cChestEntity::SaveToJson( Json::Value& a_Value )
 {
 	a_Value["x"] = m_PosX;
@@ -147,12 +169,20 @@ void cChestEntity::SaveToJson( Json::Value& a_Value )
 	a_Value["Slots"] = AllSlots;
 }
 
+
+
+
+
 void cChestEntity::SendTo( cClientHandle* a_Client, cServer* a_Server )
 {
 	(void)a_Client;
 	(void)a_Server;
 	return;
 }
+
+
+
+
 
 void cChestEntity::UsedBy( cPlayer & a_Player )
 {
@@ -185,14 +215,12 @@ void cChestEntity::UsedBy( cPlayer & a_Player )
 	ChestOpen.m_PosZ = GetPosZ();
 	ChestOpen.m_Byte1 = (char)1;
 	ChestOpen.m_Byte2 = (char)1;
-	cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-	for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-	{
-		if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-			(*itr)->GetClientHandle()->Send( ChestOpen );
-		}
-	}
+	m_World->GetChunkOfBlock(m_PosX, m_PosY, m_PosZ)->Broadcast(&ChestOpen);
 }
+
+
+
+
 
 cItem *cChestEntity::GetContents(bool a_OnlyThis)
 {
@@ -215,3 +243,7 @@ cItem *cChestEntity::GetContents(bool a_OnlyThis)
 	else
 		return m_Content;
 }
+
+
+
+

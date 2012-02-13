@@ -25,7 +25,7 @@ public:			//tolua_export
 	typedef std::map< std::string, bool > CommandMap;
 	const CommandMap & GetCommands() const { return m_Commands; }
 
-	std::string GetColor() const { return m_Color; }					//tolua_export
+	const AString & GetColor() const { return m_Color; }					//tolua_export
 
 	typedef std::list< cGroup* > GroupList;
 	const GroupList & GetInherits() const { return m_Inherits; }

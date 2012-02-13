@@ -126,39 +126,39 @@ cPlayer::~cPlayer(void)
 		delete m_CreativeInventory;
 	}
 	delete m_pState;
-	GetWorld()->RemovePlayer( this ); // TODO - Remove from correct world? Or get rid of this?
+	m_World->RemovePlayer( this );
 }
 
 
 
-void cPlayer::SpawnOn( cClientHandle* a_Target )
+
+
+cPacket * cPlayer::GetSpawnPacket(void) const
 {
-	if( a_Target == m_ClientHandle || !m_bVisible ) return;
-	LOG("cPlayer::SpawnOn -> Sending %s to %s", m_pState->PlayerName.c_str(), (a_Target) ? a_Target->GetUsername().c_str() : "Everybody" );
-	cPacket_NamedEntitySpawn SpawnPacket;
-	SpawnPacket.m_UniqueID = m_UniqueID;
-	SpawnPacket.m_PlayerName = m_pState->PlayerName;
-	SpawnPacket.m_PosX = (int)(m_Pos->x * 32);
-	SpawnPacket.m_PosY = (int)(m_Pos->y * 32);
-	SpawnPacket.m_PosZ = (int)(m_Pos->z * 32);
-	SpawnPacket.m_Rotation = (char)((m_Rot->x/360.f)*256);
-	SpawnPacket.m_Pitch    = (char)((m_Rot->y/360.f)*256);
-	SpawnPacket.m_CurrentItem = (short)m_Inventory->GetEquippedItem().m_ItemID;
-	if( a_Target == 0 )
+	if (!m_bVisible )
 	{
-		cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-		Chunk->Broadcast( SpawnPacket, m_ClientHandle );
+		return NULL;
 	}
-	else
-	{
-		a_Target->Send( SpawnPacket );
-	}
+	
+	cPacket_NamedEntitySpawn * SpawnPacket = new cPacket_NamedEntitySpawn;
+	SpawnPacket->m_UniqueID    = m_UniqueID;
+	SpawnPacket->m_PlayerName  = m_pState->PlayerName;
+	SpawnPacket->m_PosX        = (int)(m_Pos->x * 32);
+	SpawnPacket->m_PosY        = (int)(m_Pos->y * 32);
+	SpawnPacket->m_PosZ        = (int)(m_Pos->z * 32);
+	SpawnPacket->m_Rotation    = (char)((m_Rot->x / 360.f) * 256);
+	SpawnPacket->m_Pitch       = (char)((m_Rot->y / 360.f) * 256);
+	SpawnPacket->m_CurrentItem = (short)m_Inventory->GetEquippedItem().m_ItemID;
+	return SpawnPacket;
 }
+
+
+
+
 
 void cPlayer::Tick(float a_Dt)
 {
-	cChunk* InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if ( !InChunk ) return;
+	cChunkPtr InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
 
 	cPawn::Tick(a_Dt);
 
@@ -168,16 +168,18 @@ void cPlayer::Tick(float a_Dt)
 		InChunk->Broadcast( EntityLook, m_ClientHandle );
 		m_bDirtyOrientation = false;
 	}
-	else if(m_bDirtyPosition )
+	else if (m_bDirtyPosition )
 	{
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_MOVE, 1, this );
 
 		float DiffX = (float)(GetPosX() - m_LastPosX );
 		float DiffY = (float)(GetPosY() - m_LastPosY );
 		float DiffZ = (float)(GetPosZ() - m_LastPosZ );
-		float SqrDist = DiffX*DiffX + DiffY*DiffY + DiffZ*DiffZ;
-		if( SqrDist > 4*4 // 4 blocks is max Relative Move
-			|| cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
+		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
+		if (
+			(SqrDist > 4 * 4) ||  // 4 blocks is max Relative Move
+			(cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
+		)
 		{
 			//LOG("Teleported %f", sqrtf(SqrDist) );
 			cPacket_TeleportEntity TeleportEntity( this );
@@ -216,48 +218,22 @@ void cPlayer::Tick(float a_Dt)
 
 	if( m_Health > 0 ) // make sure player is alive
 	{
-		if( cWorld::GetTime() - m_TimeLastPickupCheck > 0.5f ) // Each 0.5 second, check for pickups
-		{
-			m_TimeLastPickupCheck = cWorld::GetTime();
-			// and also check if near a pickup
-			// TODO: Don't only check in current chunks, but also close chunks (chunks within range)
-			cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-			Chunk->LockEntities();
-			cWorld::EntityList Entities = Chunk->GetEntities();
-			for( cWorld::EntityList::iterator itr = Entities.begin(); itr != Entities.end();++itr)
-			{
-				if( (*itr)->GetEntityType() != cEntity::E_PICKUP ) continue; // Only pickups
-				float DiffX = (float)((*itr)->GetPosX() - GetPosX() );
-				float DiffY = (float)((*itr)->GetPosY() - GetPosY() );
-				float DiffZ = (float)((*itr)->GetPosZ() - GetPosZ() );
-				float SqrDist = DiffX*DiffX + DiffY*DiffY + DiffZ*DiffZ;
-				if(SqrDist < 1.5f*1.5f) // 1.5 block
-				{
-					cPickup* Pickup = reinterpret_cast<cPickup*>(*itr);
-					Pickup->CollectedBy( this );
-				}
-			}
-			Chunk->UnlockEntities();
-		}
+		// TODO: Don't only check in current chunks, but also close chunks (chunks within range)
+		GetWorld()->GetChunk(m_ChunkX, m_ChunkY, m_ChunkZ)->CollectPickupsByPlayer(this);
 	}
 	
 	cTimer t1;
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
 	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
-		cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-		for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-		{
-			if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed()))
-			{
-				cPacket_PlayerListItem PlayerListItem(GetColor() + m_pState->PlayerName, true, GetClientHandle()->GetPing());
-				(*itr)->GetClientHandle()->Send( PlayerListItem );
-			}
-		}
+		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
-
 }
+
+
+
+
 
 void cPlayer::SetTouchGround( bool a_bTouchGround )
 {
@@ -439,29 +415,35 @@ void cPlayer::CloseWindow(char a_WindowType)
 			ChestClose.m_PosZ = block->GetPosZ();
 			ChestClose.m_Byte1 = 1;
 			ChestClose.m_Byte2 = 0;
-			cWorld::PlayerList PlayerList = cRoot::Get()->GetWorld()->GetAllPlayers();
-			for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-			{
-				if ((*itr) && (*itr)->GetClientHandle() && !((*itr)->GetClientHandle()->IsDestroyed())) {
-					(*itr)->GetClientHandle()->Send( ChestClose );
-				}
-			}
+			m_World->Broadcast(ChestClose);
 		}
 		
 		m_CurrentWindow->Close( *this );
 	}
-	m_CurrentWindow = 0;
+	m_CurrentWindow = NULL;
 }
+
+
+
+
 
 void cPlayer::SetLastBlockActionTime()
 {
 	m_LastBlockActionTime = cRoot::Get()->GetWorld()->GetTime();
 }
 
+
+
+
+
 void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 {
 	m_LastBlockActionCnt = a_LastBlockActionCnt;
 }
+
+
+
+
 
 void cPlayer::SetGameMode( int a_GameMode )
 {
@@ -487,20 +469,36 @@ void cPlayer::SetGameMode( int a_GameMode )
 	}
 }
 
+
+
+
+
 void cPlayer::LoginSetGameMode( int a_GameMode )
 {
 	m_GameMode = a_GameMode;
 }
 
+
+
+
+
 void cPlayer::SetIP( std::string a_IP )
 {
-        m_IP = a_IP;
+	m_IP = a_IP;
 }
+
+
+
+
 
 void cPlayer::SendMessage( const char* a_Message )
 {
 	m_ClientHandle->Send( cPacket_Chat( a_Message ) );
 }
+
+
+
+
 
 void cPlayer::TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ )
 {
@@ -515,30 +513,42 @@ void cPlayer::TeleportTo( const double & a_PosX, const double & a_PosY, const do
 	m_ClientHandle->Send( PlayerPosition );
 }
 
+
+
+
+
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
 	// TODO: should do some checks to see if player is not moving through terrain
 	SetPosition( a_NewPos );
 }
 
+
+
+
+
 void cPlayer::SetVisible( bool a_bVisible )
 {
-	if( a_bVisible == true && m_bVisible == false ) // Make visible
+	if (a_bVisible && !m_bVisible) // Make visible
 	{
 		m_bVisible = true;
-		SpawnOn( 0 ); // Spawn on everybody
+		SpawnOn( NULL ); // Spawn on everybody
 	}
-	if( a_bVisible == false && m_bVisible == true )
+	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
 		cPacket_DestroyEntity DestroyEntity( this );
-		cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if( Chunk )
+		cChunkPtr Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+		if ( Chunk != NULL )
 		{
 			Chunk->Broadcast( DestroyEntity );	// Destroy on all clients
 		}
 	}
 }
+
+
+
+
 
 void cPlayer::AddToGroup( const char* a_GroupName )
 {
@@ -628,6 +638,10 @@ void cPlayer::ResolvePermissions()
 	}
 }
 
+
+
+
+
 void cPlayer::ResolveGroups()
 {
 	// Clear resolved groups first
@@ -666,16 +680,28 @@ void cPlayer::ResolveGroups()
 	}
 }
 
-std::string cPlayer::GetColor()
-{
-	if( m_Color != '-' )
-		return cChatColor::MakeColor( m_Color );
 
-	if( m_pState->Groups.size() < 1 )
+
+
+
+AString cPlayer::GetColor(void) const
+{
+	if ( m_Color != '-' )
+	{
+		return cChatColor::MakeColor( m_Color );
+	}
+
+	if ( m_pState->Groups.size() < 1 )
+	{
 		return cChatColor::White;
+	}
 
 	return (*m_pState->Groups.begin())->GetColor();
 }
+
+
+
+
 
 void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 {
@@ -714,18 +740,22 @@ void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 	}
 }
 
+
+
+
+
 bool cPlayer::MoveToWorld( const char* a_WorldName )
 {
-	cWorld* World = cRoot::Get()->GetWorld( a_WorldName );
-	if( World )
+	cWorld * World = cRoot::Get()->GetWorld( a_WorldName );
+	if ( World )
 	{
 		/* Remove all links to the old world */
-		GetWorld()->RemovePlayer( this );
-		GetClientHandle()->RemoveFromAllChunks();
-		cChunk* Chunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if( Chunk ) 
+		m_World->RemovePlayer( this );
+		m_ClientHandle->RemoveFromAllChunks();
+		cChunkPtr Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+		if ( Chunk != NULL ) 
 		{
-			Chunk->RemoveEntity( *this );
+			Chunk->RemoveEntity( this );
 			Chunk->Broadcast( cPacket_DestroyEntity( this ) ); // Remove player entity from all clients in old world
 		}
 
@@ -740,6 +770,10 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 
 	return false;
 }
+
+
+
+
 
 void cPlayer::LoadPermissionsFromDisk()
 {

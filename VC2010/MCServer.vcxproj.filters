@@ -912,6 +912,10 @@
     <ClCompile Include="..\source\StringUtils.cpp" />
     <ClCompile Include="..\source\cIsThread.cpp" />
     <ClCompile Include="..\source\cSocketThreads.cpp" />
+    <ClCompile Include="..\source\LeakFinder.cpp" />
+    <ClCompile Include="..\source\StackWalker.cpp" />
+    <ClCompile Include="..\source\WorldStorage.cpp" />
+    <ClCompile Include="..\source\WSSCompact.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1405,6 +1409,10 @@
     <ClInclude Include="..\source\StringUtils.h" />
     <ClInclude Include="..\source\cIsThread.h" />
     <ClInclude Include="..\source\cSocketThreads.h" />
+    <ClInclude Include="..\source\WSSCompact.h" />
+    <ClInclude Include="..\source\LeakFinder.h" />
+    <ClInclude Include="..\source\StackWalker.h" />
+    <ClInclude Include="..\source\WorldStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

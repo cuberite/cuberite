@@ -32,14 +32,19 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-#include "../source/MCSocket.h"
-// #ifdef _WIN32
-// #include <winsock2.h>
-
-// #endif
 
 
-#include <string>
+
+
+#ifndef _WIN32
+	typedef int SOCKET;
+	#define SOCKET_ERROR (-1)
+	#define closesocket close
+#endif  // !_WIN32
+
+
+
+
 
 enum TypeSocket {BlockingSocket, NonBlockingSocket};
 

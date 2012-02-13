@@ -241,7 +241,7 @@ cServer::~cServer()
 
 
 // TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
-void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
+void cServer::Broadcast( const cPacket * a_Packet, cClientHandle* a_Exclude /* = 0 */ )
 {
 	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
 	{
@@ -277,6 +277,7 @@ void cServer::StartListenClient()
 	if (!m_SocketThreads.AddClient(&(NewHandle->GetSocket()), NewHandle))
 	{
 		// For some reason SocketThreads have rejected the handle, clean it up
+		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", SClient.GetIPString().c_str());
 		SClient.CloseSocket();
 		delete NewHandle;
 		return;
@@ -423,7 +424,7 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 
 
 
-void cServer::ServerCommand( const char* a_Cmd )
+void cServer::ServerCommand( const char * a_Cmd )
 {
 	AString Command( a_Cmd );
 	AStringVector split = StringSplit( Command, " " );
@@ -454,30 +455,29 @@ void cServer::ServerCommand( const char* a_Cmd )
 		}
 		if( split[0].compare( "list" ) == 0 )
 		{
-			cWorld::EntityList Entities = cRoot::Get()->GetWorld()->GetEntities();
-			std::string PlayerString;
-			int NumPlayers = 0;
-			cRoot::Get()->GetWorld()->LockEntities();
-			for( cWorld::EntityList::iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
+			class cPlayerLogger : public cPlayerListCallback
 			{
-				if( (*itr)->GetEntityType() != cEntity::E_PLAYER ) continue;
-				PlayerString.push_back(' ');
-				PlayerString += ((cPlayer*)*itr)->GetName();
-				NumPlayers++;
-			}
-			cRoot::Get()->GetWorld()->UnlockEntities();
-			printf( "Players (%i):%s\n", NumPlayers, PlayerString.c_str() );
+				virtual bool Item(cPlayer * a_Player) override
+				{
+					LOG("\t%s @ %s", a_Player->GetName().c_str(), a_Player->GetClientHandle()->GetSocket().GetIPString());
+					return false;
+				}
+			} Logger;
+			cRoot::Get()->GetWorld()->ForEachPlayer(&Logger);
 			return;
 		}
 		if( split[0].compare( "numchunks" ) == 0 )
 		{
-			printf("Num loaded chunks: %i\n", cRoot::Get()->GetWorld()->GetNumChunks() );
+			printf("Num loaded chunks: %i\n", cRoot::Get()->GetTotalChunkCount() );
 			return;
 		}
-		if(split[0].compare("monsters") == 0 ){
-			cMonster::ListMonsters();
+		
+		if(split[0].compare("monsters") == 0 )
+		{
+			// TODO: cWorld::ListMonsters();
 			return;
 		}
+		
 		if(split.size() > 1)
 		{
 			if( split[0].compare( "say" ) == 0 )

@@ -35,6 +35,20 @@ cPacket_Metadata::cPacket_Metadata()
 
 
 
+cPacket_Metadata::cPacket_Metadata(const cPacket_Metadata & a_Other) 
+	: m_EMetaData( a_Other.m_EMetaData )
+	, m_UniqueID( a_Other.m_UniqueID )
+	, m_Type( a_Other.m_Type )
+	, m_MetaData( NULL )
+{
+	m_PacketID = E_METADATA;
+	FormPacket();
+}
+
+
+
+
+
 cPacket_Metadata::~cPacket_Metadata()
 {
 	delete [] m_MetaData;

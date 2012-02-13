@@ -154,7 +154,8 @@ int cFile::Write(const void * iBuffer, int iNumBytes)
 		return -1;
 	}
 
-	return fwrite(iBuffer, 1, iNumBytes, m_File);  // fwrite() returns the portion of Count parameter actually written, so we need to send iNumBytes as Count
+	int res = fwrite(iBuffer, 1, iNumBytes, m_File);  // fwrite() returns the portion of Count parameter actually written, so we need to send iNumBytes as Count
+	return res;
 }
 
 
@@ -225,6 +226,26 @@ int cFile::GetSize(void) const
 		return -1;
 	}
 	return res;
+}
+
+
+
+
+
+int cFile::ReadRestOfFile(AString & a_Contents)
+{
+	assert(IsOpen());
+	
+	if (!IsOpen())
+	{
+		return -1;
+	}
+	
+	int DataSize = GetSize() - Tell();
+	
+	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
+	a_Contents.assign(DataSize, '\0');
+	return Read((void *)a_Contents.data(), DataSize);
 }
 
 

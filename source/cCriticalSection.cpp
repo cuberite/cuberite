@@ -11,8 +11,7 @@
 cCriticalSection::cCriticalSection()
 {
 #ifdef _WIN32
-	m_CriticalSectionPtr = new CRITICAL_SECTION;
-	InitializeCriticalSection( (CRITICAL_SECTION*)m_CriticalSectionPtr );
+	InitializeCriticalSection( &m_CriticalSection );
 #else
 	m_Attributes = new pthread_mutexattr_t;
 	pthread_mutexattr_init((pthread_mutexattr_t*)m_Attributes);
@@ -33,8 +32,7 @@ cCriticalSection::cCriticalSection()
 cCriticalSection::~cCriticalSection()
 {
 #ifdef _WIN32
-	DeleteCriticalSection( (CRITICAL_SECTION*)m_CriticalSectionPtr );
-	delete (CRITICAL_SECTION*)m_CriticalSectionPtr;
+	DeleteCriticalSection( &m_CriticalSection );
 #else
     if( pthread_mutex_destroy( (pthread_mutex_t*)m_CriticalSectionPtr ) != 0 )
     {
@@ -53,7 +51,7 @@ cCriticalSection::~cCriticalSection()
 void cCriticalSection::Lock()
 {
 #ifdef _WIN32
-	EnterCriticalSection( (CRITICAL_SECTION*)m_CriticalSectionPtr );
+	EnterCriticalSection( &m_CriticalSection );
 #else
     pthread_mutex_lock( (pthread_mutex_t*)m_CriticalSectionPtr );
 #endif
@@ -66,7 +64,7 @@ void cCriticalSection::Lock()
 void cCriticalSection::Unlock()
 {
 #ifdef _WIN32
-	LeaveCriticalSection( (CRITICAL_SECTION*)m_CriticalSectionPtr );
+	LeaveCriticalSection( &m_CriticalSection );
 #else
     pthread_mutex_unlock( (pthread_mutex_t*)m_CriticalSectionPtr );
 #endif
@@ -81,9 +79,7 @@ void cCriticalSection::Unlock()
 
 cCSLock::cCSLock(cCriticalSection * a_CS) 
 	: m_CS(a_CS)
-	#ifdef _DEBUG
 	, m_IsLocked(false)
-	#endif
 {
 	Lock();
 }
@@ -94,9 +90,7 @@ cCSLock::cCSLock(cCriticalSection * a_CS)
 
 cCSLock::cCSLock(cCriticalSection & a_CS) 
 	: m_CS(&a_CS)
-	#ifdef _DEBUG
 	, m_IsLocked(false)
-	#endif
 {
 	Lock();
 }
@@ -107,12 +101,10 @@ cCSLock::cCSLock(cCriticalSection & a_CS)
 
 cCSLock::~cCSLock()
 {
-	#ifdef _DEBUG
 	if (!m_IsLocked)
 	{
 		return;
 	}
-	#endif  // _DEBUG
 	Unlock();
 }
 
@@ -122,11 +114,8 @@ cCSLock::~cCSLock()
 
 void cCSLock::Lock(void)
 {
-	#ifdef _DEBUG
 	assert(!m_IsLocked);
 	m_IsLocked = true;
-	#endif  // _DEBUG
-	
 	m_CS->Lock();
 }
 
@@ -136,11 +125,8 @@ void cCSLock::Lock(void)
 
 void cCSLock::Unlock(void)
 {
-	#ifdef _DEBUG
 	assert(m_IsLocked);
 	m_IsLocked = false;
-	#endif  // _DEBUG
-	
 	m_CS->Unlock();
 }
 

@@ -20,8 +20,8 @@ public:
 
 	static char RotationPitchToMetaData( float a_Rotation, float a_Pitch )
 	{
-		std::printf("pre:a_Rotation %f \n",a_Rotation);
-		std::printf("a_Pitch %f \n",a_Pitch);
+		LOG("pre:a_Rotation %f \n",a_Rotation);
+		LOG("a_Pitch %f \n",a_Pitch);
 
 		if (a_Pitch >= 50.f ){
 			return 0x1;
@@ -34,13 +34,13 @@ public:
 
 			if( a_Rotation > 360.f ) a_Rotation -= 360.f;
 			if( a_Rotation >= 0.f && a_Rotation < 90.f )
-			{ std::printf("1111\n");return 0x4;}
+			{ LOG("1111\n");return 0x4;}
 			else if( a_Rotation >= 180 && a_Rotation < 270 )
-			{ std::printf("2222\n");return 0x5;}
+			{ LOG("2222\n");return 0x5;}
 			else if( a_Rotation >= 90 && a_Rotation < 180 )
-			{ std::printf("3333\n");return 0x2;}
+			{ LOG("3333\n");return 0x2;}
 			else
-			{ std::printf("4444\n");return 0x3;}
+			{ LOG("4444\n");return 0x3;}
 		}
 	}
 

@@ -35,9 +35,9 @@ public:												//tolua_export
 	int GetPort() { return m_iServerPort; }
 	bool IsConnected(){return m_bIsConnected;} // returns connection status
 	void StartListenClient(); // Listen to client
-	int RecClient(cClientHandle *sRecSocket); // receive message for a particular socket
 
-	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
+	void Broadcast(const cPacket & a_Packet, cClientHandle* a_Exclude = NULL) { Broadcast(&a_Packet, a_Exclude); }
+	void Broadcast(const cPacket * a_Packet, cClientHandle* a_Exclude = NULL);
 
 	bool Tick(float a_Dt);
 

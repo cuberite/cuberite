@@ -1,7 +1,5 @@
-#pragma once
 
-#include <list>
-#include <string> // TODO - use const char*
+#pragma once
 
 struct lua_State;
 class cLuaCommandBinder;

@@ -1,5 +1,11 @@
 
+// cChunkMap.h
+
+// Interfaces to the cChunkMap class representing the chunk storage for a single world
+
 #pragma once
+
+#include "cChunk.h"
 
 
 
@@ -7,9 +13,7 @@
 
 class cWorld;
 class cEntity;
-class cChunk;
 class MTRand;
-
 
 
 
@@ -17,75 +21,64 @@ class MTRand;
 class cChunkMap
 {
 public:
+
+	static const int LAYER_SIZE = 32;
+
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
-	void AddChunk( cChunk* a_Chunk );
-
-	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
-	void RemoveChunk( cChunk* a_Chunk );
+	cChunkPtr GetChunk     ( int a_X, int a_Y, int a_Z );  // Also queues the chunk for loading / generating if not valid
+	cChunkPtr GetChunkNoGen( int a_X, int a_Y, int a_Z );  // Also queues the chunk for loading if not valid; doesn't generate
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
 	void UnloadUnusedChunks();
-	bool RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom = 0 );
 	void SaveAllChunks();
 
 	cWorld* GetWorld() { return m_World; }
 
-	int GetNumChunks();
+	int GetNumChunks(void);
 	
 private:
-
-	class cChunkData
-	{
-	public:
-		cChunkData()
-			: m_Compressed( 0 )
-			, m_LiveChunk( 0 )
-			, m_CompressedSize( 0 )
-			, m_UncompressedSize( 0 )
-		{}
-		char* m_Compressed;
-		unsigned int m_CompressedSize;
-		unsigned int m_UncompressedSize;
-		cChunk* m_LiveChunk;
-	};
 
 	class cChunkLayer
 	{
 	public:
-		cChunkLayer()
-			: m_Chunks( 0 )
-			, m_X( 0 )
-			, m_Z( 0 )
-			, m_NumChunksLoaded( 0 )
-		{}
-		cChunkLayer( int a_NumChunks )
-			: m_Chunks( new cChunkData[a_NumChunks] )
-			, m_X( 0 )
-			, m_Z( 0 )
-			, m_NumChunksLoaded( 0 )
-		{}
-		cChunkData * GetChunk( int a_X, int a_Z );
+		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent);
+
+		/// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ );
 		
-		cChunkData * m_Chunks;
-		int m_X, m_Z;
+		int GetX(void) const {return m_LayerX; }
+		int GetZ(void) const {return m_LayerZ; }
+		int GetNumChunksLoaded(void) const {return m_NumChunksLoaded; }
+		
+		void Save(void);
+		void UnloadUnusedChunks(void);
+		
+		void Tick( float a_Dt, MTRand & a_TickRand );
+		
+	protected:
+	
+		cChunkPtr m_Chunks[LAYER_SIZE * LAYER_SIZE];
+		int m_LayerX;
+		int m_LayerZ;
+		cChunkMap * m_Parent;
 		int m_NumChunksLoaded;
 	};
+	
+	typedef std::list<cChunkLayer *> cChunkLayerList;
+	// TODO: Use smart pointers for cChunkLayerList as well, so that ticking and saving needn't lock the entire layerlist
+	// This however means that cChunkLayer needs to interlock its m_Chunks[]
 
-	void SaveLayer( cChunkLayer* a_Layer );
-	cChunkLayer* LoadLayer( int a_LayerX, int a_LayerZ );
-	cChunkLayer* GetLayerForChunk( int a_ChunkX, int a_ChunkZ );
-	cChunkLayer* GetLayer( int a_LayerX, int a_LayerZ );
-	cChunkLayer* AddLayer( const cChunkLayer & a_Layer );
-	bool RemoveLayer( cChunkLayer* a_Layer );
-	void CompressChunk( cChunkData* a_ChunkData );
+	cChunkLayer * GetLayerForChunk( int a_ChunkX, int a_ChunkZ );  // Creates the layer if it doesn't already exist
+	cChunkLayer * GetLayer( int a_LayerX, int a_LayerZ );  // Creates the layer if it doesn't already exist
+	void RemoveLayer( cChunkLayer* a_Layer );
 
-	int m_NumLayers;
-	cChunkLayer* m_Layers;
+	cCriticalSection m_CSLayers;
+	cChunkLayerList  m_Layers;
 
-	cWorld* m_World;
+	cWorld * m_World;
 };
 
 

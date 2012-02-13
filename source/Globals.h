@@ -29,6 +29,8 @@
 	#include <sys/time.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
+	#include <arpa/inet.h>
+	#include <netdb.h>
 	#include <time.h>
 	#include <dirent.h>
 	#include <errno.h>
@@ -40,6 +42,7 @@
 	#include <semaphore.h>
 	#include <errno.h>
 	#include <fcntl.h>
+	#include <tr1/memory>
 #endif
 
 
@@ -49,6 +52,7 @@
 // CRT stuff:
 #include <assert.h>
 #include <stdio.h>
+#include <math.h>
 
 
 
@@ -95,11 +99,28 @@
 
 #ifdef _MSC_VER
 	#define OBSOLETE __declspec(deprecated)
+	#define ABSTRACT abstract
 #else
 	// TODO: how do other compilers mark functions as obsolete, so that their usage results in a compile-time warning?
 	#define OBSOLETE
+	// TODO: Can other compilers explicitly mark classes as abstract (no instances can be created)?
+	#define ABSTRACT
 #endif
 
+/// Faster than (int)floorf((float)x / (float)div)
+#define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
+
+
+
+
+
+/// A generic interface used in ForEach() functions
+template <typename Type> class cListCallback
+{
+public:
+	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
+	virtual bool Item(Type * a_Type) = 0;
+} ;
 
 
 

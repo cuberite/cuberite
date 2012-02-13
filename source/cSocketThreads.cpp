@@ -8,7 +8,7 @@
 #include "Globals.h"
 #include "cSocketThreads.h"
 #include "cClientHandle.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
+// #include "packets/cPacket_RelativeEntityMoveLook.h"
 
 
 
@@ -19,6 +19,7 @@
 
 cSocketThreads::cSocketThreads(void)
 {
+	LOG("cSocketThreads startup");
 }
 
 
@@ -60,6 +61,7 @@ bool cSocketThreads::AddClient(cSocket * a_Socket, cCallback * a_Client)
 	if (!Thread->Start())
 	{
 		// There was an error launching the thread (but it was already logged along with the reason)
+		LOGERROR("A new cSocketThread failed to start");
 		delete Thread;
 		return false;
 	}
@@ -135,6 +137,17 @@ cSocketThreads::cSocketThread::cSocketThread(cSocketThreads * a_Parent) :
 	m_NumSlots(0)
 {
 	// Nothing needed yet
+}
+
+
+
+
+
+cSocketThreads::cSocketThread::~cSocketThread()
+{
+	mShouldTerminate = true;
+	m_ControlSocket1.CloseSocket();
+	m_ControlSocket2.CloseSocket();
 }
 
 
@@ -310,6 +323,7 @@ bool cSocketThreads::cSocketThread::Start(void)
 	// Start the thread
 	if (!super::Start())
 	{
+		LOGERROR("Cannot start new cSocketThread");
 		m_ControlSocket2.CloseSocket();
 		return false;
 	}
@@ -383,8 +397,6 @@ void cSocketThreads::cSocketThread::Execute(void)
 		
 		RemoveClosedSockets();
 	}  // while (!mShouldTerminate)
-	
-	LOG("cSocketThread %p is terminating", this);
 }
 
 

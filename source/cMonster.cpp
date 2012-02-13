@@ -79,28 +79,27 @@ bool cMonster::IsA( const char* a_EntityType )
 	return cPawn::IsA( a_EntityType );
 }
 
-void cMonster::SpawnOn( cClientHandle* a_Target )
+
+
+
+
+cPacket * cMonster::GetSpawnPacket(void) const
 {
-	LOG("Spawn monster on client");
-	cPacket_SpawnMob Spawn;
-	Spawn.m_UniqueID = GetUniqueID();
-	Spawn.m_Type = m_MobType;
-	*Spawn.m_Pos = Vector3i((*m_Pos)*32);
-	Spawn.m_Yaw = 0;
-	Spawn.m_Pitch = 0;
-	Spawn.m_MetaDataSize = 1;
-	Spawn.m_MetaData = new char[Spawn.m_MetaDataSize];
-	Spawn.m_MetaData[0] = 0x7f; // not on fire/crouching/riding
-	if( a_Target == 0 )
-	{
-		cChunk* Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-		Chunk->Broadcast( Spawn );
-	}
-	else
-	{
-		a_Target->Send( Spawn );
-	}
+	cPacket_SpawnMob * Spawn = new cPacket_SpawnMob;
+	Spawn->m_UniqueID = GetUniqueID();
+	Spawn->m_Type = m_MobType;
+	*Spawn->m_Pos = Vector3i((*m_Pos) * 32);
+	Spawn->m_Yaw = 0;
+	Spawn->m_Pitch = 0;
+	Spawn->m_MetaDataSize = 1;
+	Spawn->m_MetaData = new char[Spawn->m_MetaDataSize];
+	Spawn->m_MetaData[0] = 0x7f; // not on fire/crouching/riding
+	return Spawn;
 }
+
+
+
+
 
 void cMonster::MoveToPosition( const Vector3f & a_Position )
 {
@@ -117,6 +116,10 @@ bool cMonster::ReachedDestination()
 
 	return false;
 }
+
+
+
+
 
 void cMonster::Tick(float a_Dt)
 {
@@ -201,10 +204,17 @@ void cMonster::Tick(float a_Dt)
 
 }
 
+
+
+
+
 void cMonster::ReplicateMovement()
 {
-	cChunk* InChunk = GetWorld()->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if( !InChunk ) return;
+	cChunkPtr InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+	if ( !InChunk->IsValid() )
+	{
+		return;
+	}
 
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
 	{
@@ -258,6 +268,10 @@ void cMonster::ReplicateMovement()
 
 	MoveToCorrectChunk();
 }
+
+
+
+
 
 void cMonster::HandlePhysics(float a_Dt)
 {
@@ -464,9 +478,13 @@ void cMonster::Attack(float a_Dt) {
 }
 
 
-//----Debug
 
-void cMonster::ListMonsters() {
+
+
+#if 0
+// TODO: Implement this debug function inside cWorld instead - the world owns the entities
+void cMonster::ListMonsters()
+{
 
 	cWorld::EntityList Entities = cRoot::Get()->GetWorld()->GetEntities();
 	cRoot::Get()->GetWorld()->LockEntities();
@@ -478,66 +496,79 @@ void cMonster::ListMonsters() {
 	}
 	cRoot::Get()->GetWorld()->UnlockEntities();
 }
+#endif
+
+
+
+
 
 //Checks for Players close by and if they are visible return the closest
-cPlayer *cMonster::FindClosestPlayer()
+cPlayer * cMonster::FindClosestPlayer(void)
 {
-	cTracer LineOfSight(cRoot::Get()->GetWorld());
-	cWorld::PlayerList Players = cRoot::Get()->GetWorld()->GetAllPlayers();
-
-	float ClosestDistance = m_SightDistance + 1.f;	//Something that is higher than the max :D
-	cPlayer* ClosestPlayer = 0;
-
-	for( cWorld::PlayerList::iterator itr = Players.begin(); itr != Players.end(); ++itr)
-	{
-		Vector3f Pos = (*itr)->GetPosition();
-		float Distance = (Pos - *(m_Pos)).Length();
-
-		if(Distance <= m_SightDistance)
-		{
-			if(!LineOfSight.Trace(*(m_Pos),(Pos - *(m_Pos)),(int)(Pos - *(m_Pos)).Length()))
-			{
-				if(Distance < ClosestDistance)
-				{
-					ClosestDistance = Distance;
-					ClosestPlayer = *itr;
-				}						
-			}			
-		}
-	}
-	return ClosestPlayer;
+	return m_World->FindClosestPlayer(m_Pos, m_SightDistance);
 }
+
+
+
+
 
 void cMonster::GetMonsterConfig(const char* pm_name)
 {
 	cRoot::Get()->GetMonsterConfig()->Get()->AssignAttributes(this, pm_name);
 }
 
+
+
+
+
 void cMonster::SetAttackRate(int ar)
 {
 	m_AttackRate = (float)ar;
 }
 
+
+
+
+
 void cMonster::SetAttackRange(float ar)
 {
 	m_AttackRange = ar;
 }
-void cMonster::SetAttackDamage(float ad) {
+
+
+
+
+
+void cMonster::SetAttackDamage(float ad)
+{
 	m_AttackDamage = ad;
 }
-void cMonster::SetSightDistance(float sd) {
+
+
+
+
+
+void cMonster::SetSightDistance(float sd)
+{
 	m_SightDistance = sd;
 }
 
 
+
+
+
 void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
 {
-	if(a_Count > 0)
+	if (a_Count > 0)
 	{
-		cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), cItem( a_Item, (char) a_Count ) );
+		cPickup * Pickup = new cPickup( (int)(m_Pos->x * 32), (int)(m_Pos->y * 32), (int)(m_Pos->z * 32), cItem( a_Item, (char) a_Count ) );
 		Pickup->Initialize( GetWorld() );
 	}
 }
+
+
+
+
 
 void cMonster::RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max)
 {

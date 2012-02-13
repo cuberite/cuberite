@@ -267,6 +267,34 @@ int cSocket::Connect(SockAddr_In & a_Address)
 
 
 
+int cSocket::Connect(const AString & a_HostNameOrAddr, unsigned short a_Port)
+{
+	// First try IP Address string to hostent conversion, because it's faster
+	unsigned long addr = inet_addr(a_HostNameOrAddr.c_str());
+	hostent * hp = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
+	if (hp == NULL)
+	{
+		// It is not an IP Address string, but rather a regular hostname, resolve:
+		hp = gethostbyname(a_HostNameOrAddr.c_str());
+		if (hp == NULL)
+		{
+			LOGWARN("cTCPLink: Could not resolve hostname \"%s\"", a_HostNameOrAddr.c_str());
+			CloseSocket();
+			return false;
+		}
+	}
+
+	sockaddr_in server;
+	server.sin_addr.s_addr = *((unsigned long*)hp->h_addr);
+	server.sin_family = AF_INET;
+	server.sin_port = htons( (unsigned short)a_Port );
+	return connect(m_Socket, (sockaddr *)&server, sizeof(server));
+}
+
+
+
+
+
 int cSocket::Receive(char* a_Buffer, unsigned int a_Length, unsigned int a_Flags)
 {
 	return recv(m_Socket, a_Buffer, a_Length, a_Flags);

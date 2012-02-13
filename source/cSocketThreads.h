@@ -87,6 +87,7 @@ private:
 	public:
 	
 		cSocketThread(cSocketThreads * a_Parent);
+		~cSocketThread();
 		
 		// All these methods assume parent's m_CS is locked
 		bool HasEmptySlot(void) const {return m_NumSlots < MAX_SLOTS; }

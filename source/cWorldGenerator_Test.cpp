@@ -9,7 +9,7 @@
 
 
 
-void cWorldGenerator_Test::GenerateTerrain( cChunk* a_Chunk )
+void cWorldGenerator_Test::GenerateTerrain( cChunkPtr a_Chunk )
 {
 	char* BlockType = a_Chunk->pGetType();
 
@@ -26,7 +26,7 @@ void cWorldGenerator_Test::GenerateTerrain( cChunk* a_Chunk )
 	}
 }
 
-void cWorldGenerator_Test::GenerateFoliage( cChunk* a_Chunk )
+void cWorldGenerator_Test::GenerateFoliage( cChunkPtr a_Chunk )
 {
 	(void)a_Chunk;
 }

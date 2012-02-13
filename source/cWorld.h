@@ -2,16 +2,18 @@
 #pragma once
 
 #ifndef _WIN32
-#include "BlockID.h"
+	#include "BlockID.h"
 #else
-enum ENUM_ITEM_ID;
+	enum ENUM_ITEM_ID;
 #endif
 
 #define MAX_PLAYERS 65535
 
 #include "cSimulatorManager.h"
-#include "ptr_cChunk.h"
 #include "MersenneTwister.h"
+#include "cChunkMap.h"
+#include "WorldStorage.h"
+#include "cChunkGenerator.h"
 
 
 
@@ -23,25 +25,23 @@ class cFireSimulator;
 class cWaterSimulator;
 class cLavaSimulator;
 class cSandSimulator;
-class cChunkMap;
 class cItem;
 class cPlayer;
 class cClientHandle;
-class cChunk;
 class cEntity;
 class cBlockEntity;
-class cWorldGenerator;
+class cWorldGenerator;  // The generator that actually generates the chunks for a single world
+class cChunkGenerator;  // The thread responsible for generating chunks
+typedef std::list< cPlayer * > cPlayerList;
+typedef cListCallback<cPlayer> cPlayerListCallback;
+
+
+
 
 
 class cWorld													//tolua_export
 {																//tolua_export
 public:
-	typedef std::list< cClientHandle* > ClientList;
-	typedef std::list< cEntity* > EntityList;
-	typedef std::list< ptr_cChunk > ChunkList;
-	typedef std::list< cPlayer* > PlayerList;
-	std::vector<int> m_RSList;
-
 
 	static cWorld* GetWorld();														//tolua_export
 
@@ -50,16 +50,15 @@ public:
 	{
 		return m_Time;
 	}
-	long long GetWorldTime() { return m_WorldTime; }								//tolua_export
+	long long GetWorldTime(void) const { return m_WorldTime; }								//tolua_export
 
-	int GetGameMode() { return m_GameMode; } //return gamemode for world
+	int GetGameMode(void) const { return m_GameMode; } //return gamemode for world
 
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
-	cChunk* GetChunk( int a_X, int a_Y, int a_Z );
-	cChunk* GetChunkReliable( int a_X, int a_Y, int a_Z );
-	ptr_cChunk GetChunkUnreliable( int a_X, int a_Y, int a_Z );
-	cChunk* GetChunkOfBlock( int a_X, int a_Y, int a_Z );
+	cChunkPtr GetChunk       ( int a_ChunkX, int a_ChunkY, int a_ChunkZ ) {return m_ChunkMap->GetChunk     (a_ChunkX, a_ChunkY, a_ChunkZ); }
+	cChunkPtr GetChunkNoGen  ( int a_ChunkX, int a_ChunkY, int a_ChunkZ ) {return m_ChunkMap->GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ); }
+	cChunkPtr GetChunkOfBlock( int a_X, int a_Y, int a_Z );
 	char GetHeight( int a_X, int a_Z );												//tolua_export
 
 	//void AddClient( cClientHandle* a_Client );
@@ -69,25 +68,38 @@ public:
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
 	
 	// MOTD
-	std::string GetDescription();
+	const AString & GetDescription(void) const {return m_Description; }
 
 	// Max Players
-	unsigned int GetMaxPlayers();
+	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }
 	void SetMaxPlayers(int iMax);
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
-	PlayerList & GetAllPlayers();
+	bool ForEachPlayer(cPlayerListCallback * a_Callback);  // Calls the callback for each player in the list
+	
+	// TODO: This interface is dangerous!
+	cPlayerList & GetAllPlayers() {return m_Players; }
+	
 	typedef struct lua_State lua_State;
 	void GetAllPlayers( lua_State* L );												// >> EXPORTED IN MANUALBINDINGS <<
 	unsigned int GetNumPlayers();													//tolua_export
-	cPlayer* GetPlayer( const char* a_PlayerName );									//tolua_export
+	
+	// TODO: This interface is dangerous
+	cPlayer * GetPlayer( const char * a_PlayerName );									//tolua_export
+	
+	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
+	
+	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	void AddEntity( cEntity* a_Entity );
-	bool RemoveEntityFromChunk( cEntity & a_Entity, cChunk* a_CalledFrom = 0 );
-	EntityList & GetEntities();
+	void RemoveEntityFromChunk( cEntity * a_Entity);
+	
+	// TODO: This interface is dangerous!
+	cEntityList & GetEntities(void) {return m_AllEntities; }
 
-	cEntity* GetEntity( int a_UniqueID );											//tolua_export
+	// TODO: This interface is dangerous!
+	cEntity * GetEntity( int a_UniqueID );											//tolua_export
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
 	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
@@ -105,13 +117,13 @@ public:
 	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
 	inline cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
 
-
-	cBlockEntity* GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
+	// TODO: This interface is dangerous!
+	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
 
 	void GrowTree( int a_X, int a_Y, int a_Z );										//tolua_export
 
-	unsigned int GetWorldSeed() { return m_WorldSeed; }								//tolua_export
-	const char* GetName();															//tolua_export
+	unsigned int GetWorldSeed(void) const { return m_WorldSeed; }								//tolua_export
+	const AString & GetName(void) const {return m_WorldName; }															//tolua_export
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
@@ -126,6 +138,7 @@ public:
 		//a_Y = a_Y - a_ChunkY*16;
 		a_Z = a_Z - a_ChunkZ*16;
 	}
+	
 	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
 		(void)a_Y; // not unused anymore
@@ -137,21 +150,12 @@ public:
 	}
 
 	void SaveAllChunks();	//tolua_export
-	int GetNumChunks();		//tolua_export
+	int GetNumChunks() const;		//tolua_export
 
 	void Tick(float a_Dt);
 
-	void LockClientHandle();
-	void UnlockClientHandle();
-
-	void LockEntities();
-	void UnlockEntities();
-
-	void LockChunks();
-	void UnlockChunks();
-
-	void ReSpreadLighting( const ptr_cChunk& a_Chunk );
-	void RemoveSpread( const ptr_cChunk& a_Chunk );
+	void ReSpreadLighting(const cChunkPtr & a_Chunk );
+	void RemoveSpread(const cChunkPtr & a_Chunk );
 
 	void InitializeSpawn();
 
@@ -159,18 +163,28 @@ public:
 	void SetWeather ( int );												//tolua_export
 	int GetWeather() { return m_Weather; };									//tolua_export
 
-	cWorldGenerator* GetWorldGenerator() { return m_WorldGenerator; }
+	cChunkGenerator & GetGenerator(void) { return m_Generator; }
+	cWorldStorage &   GetStorage  (void) { return m_Storage; }
 	
 private:
 
 	friend class cRoot;
 	
-	cWorld( const char* a_WorldName );
-	~cWorld();
+	struct sSetBlockData
+	{
+		sSetBlockData( int a_X, int a_Y, int a_Z, char a_BlockID, char a_BlockMeta )
+			: x( a_X )
+			, y( a_Y )
+			, z( a_Z )
+			, BlockID( a_BlockID )
+			, BlockMeta( a_BlockMeta )
+		{}
+		int x, y, z;
+		char BlockID, BlockMeta;
+	};
 
-	struct sWorldState;
-	sWorldState* m_pState;
-	
+	typedef std::list< sSetBlockData > FastSetBlockList;
+
 	// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
 	MTRand m_TickRand;
 
@@ -186,36 +200,59 @@ private:
 	int m_GameMode;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
-	cSimulatorManager *m_SimulatorManager;
-	cSandSimulator *m_SandSimulator;
-	cWaterSimulator* m_WaterSimulator;
-	cLavaSimulator* m_LavaSimulator;
-	cFireSimulator* m_FireSimulator;
-	
-	cCriticalSection* m_ClientHandleCriticalSection;
-	cCriticalSection* m_EntitiesCriticalSection;
-	cCriticalSection* m_ChunksCriticalSection;
+	// The cRedstone class simulates redstone and needs access to m_RSList
+	friend class cRedstone;
+	std::vector<int> m_RSList;
 
-	cWorldGenerator* m_WorldGenerator;
+	cSimulatorManager * m_SimulatorManager;
+	cSandSimulator *    m_SandSimulator;
+	cWaterSimulator *   m_WaterSimulator;
+	cLavaSimulator *    m_LavaSimulator;
+	cFireSimulator *    m_FireSimulator;
 	
-	std::string m_Description;
+	cCriticalSection m_CSClients;
+	cCriticalSection m_CSEntities;
+	cCriticalSection m_CSPlayers;
+
+	cWorldStorage     m_Storage;
+	
+	AString m_Description;
+	
 	unsigned int m_MaxPlayers;
 
-	cChunkMap* m_ChunkMap;
+	cChunkMap * m_ChunkMap;
 
 	bool m_bAnimals;
 	float m_SpawnMonsterTime;
 	float m_SpawnMonsterRate;
 
 	unsigned int m_WorldSeed;
+	
 	int	m_Weather;
 	
+	cEntityList       m_RemoveEntityQueue;
+	cEntityList       m_AllEntities;
+	cClientHandleList m_Clients;
+	cPlayerList       m_Players;
+
+	cCriticalSection  m_CSLighting;
+	cChunkPtrList     m_SpreadQueue;
+
+	cCriticalSection m_CSFastSetBlock;
+	FastSetBlockList m_FastSetBlockQueue;
+
+	cChunkGenerator  m_Generator;
+
+	AString m_WorldName;
+
+	cWorld(const AString & a_WorldName);
+	~cWorld();
+
 	void TickWeather(float a_Dt);  // Handles weather each tick
-
-	void AddToRemoveEntityQueue( cEntity & a_Entity );
-	void RemoveEntity( cEntity* a_Entity );
+	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
+	
+	void RemoveEntity( cEntity * a_Entity );
 	void UnloadUnusedChunks();
-
 }; //tolua_export
 
 

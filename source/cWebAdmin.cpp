@@ -27,7 +27,28 @@
 
 
 
-cWebAdmin * WebAdmin = 0;
+/// Helper class - appends all player names together in a HTML list
+class cPlayerAccum :
+	public cPlayerListCallback
+{
+	virtual bool Item(cPlayer * a_Player) override
+	{
+		m_Contents.append("<li>");
+		m_Contents.append(a_Player->GetName());
+		m_Contents.append("</li>");
+		return false;
+	}
+	
+public:
+
+	AString m_Contents;
+} ;
+
+
+
+
+
+cWebAdmin * WebAdmin = NULL;
 
 
 
@@ -191,12 +212,10 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 					Content += "</ul>";
 					Content += "<h4>Players:</h4><ul>";
 
-					cWorld* World = cRoot::Get()->GetWorld(); // TODO - Create a list of worlds and players
-					cWorld::PlayerList PlayerList = World->GetAllPlayers();
-					for( cWorld::PlayerList::iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr )
-					{
-						Content += std::string("<li>") + std::string( (*itr)->GetName() ) + "</li>";
-					}
+					cPlayerAccum PlayerAccum;
+					cWorld * World = cRoot::Get()->GetWorld(); // TODO - Create a list of worlds and players
+					World->ForEachPlayer(&PlayerAccum);
+					Content.append(PlayerAccum.m_Contents);
 					Content += "</ul><br>";
 				}
 

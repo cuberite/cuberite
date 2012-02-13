@@ -14,15 +14,24 @@
 
 #include "packets/cPacket_DestroyEntity.h"
 
+
+
+
+
 int cEntity::m_EntityCount = 0;
+cCriticalSection cEntity::m_CSCount;
+
+
+
+
 
 cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
-    : m_UniqueID( 0 )
+	: m_UniqueID( 0 )
 	, m_Referencers( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCERS ) )
 	, m_References( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCES ) )
-    , m_ChunkX( 0 )
-    , m_ChunkY( 0 )
-    , m_ChunkZ( 0 )
+	, m_ChunkX( 0 )
+	, m_ChunkY( 0 )
+	, m_ChunkZ( 0 )
 	, m_Pos( new Vector3d( a_X, a_Y, a_Z ) )
 	, m_bDirtyPosition( true )
 	, m_Rot( new Vector3f() )
@@ -32,12 +41,24 @@ cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
 	, m_World( 0 )
 	, m_bRemovedFromChunk( false )
 {
+	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
 	m_UniqueID = m_EntityCount;
 }
 
+
+
+
+
 cEntity::~cEntity()
 {
+	LOG("Deleting entity %d at pos {%.2f, %.2f} ~ [%d, %d]; ptr %p", 
+		m_UniqueID,
+		m_Pos->x, m_Pos->z,
+		(int)(m_Pos->x / 16), (int)(m_Pos->z / 16),
+		this
+	);
+	
 	if( !m_bDestroyed || !m_bRemovedFromChunk )
 	{
 		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk );
@@ -48,6 +69,10 @@ cEntity::~cEntity()
 	delete m_Rot;
 }
 
+
+
+
+
 void cEntity::Initialize( cWorld* a_World )
 {
 	m_World = a_World;
@@ -56,85 +81,60 @@ void cEntity::Initialize( cWorld* a_World )
 	MoveToCorrectChunk(true);
 }
 
+
+
+
+
 void cEntity::WrapRotation()
 {
-	while(m_Rot->x > 180.f)  m_Rot->x-=360.f; // Wrap it
-	while(m_Rot->x < -180.f) m_Rot->x+=360.f;
-	while(m_Rot->y > 180.f)  m_Rot->y-=360.f;
-	while(m_Rot->y < -180.f) m_Rot->y+=360.f;
+	while (m_Rot->x > 180.f)  m_Rot->x-=360.f; // Wrap it
+	while (m_Rot->x < -180.f) m_Rot->x+=360.f;
+	while (m_Rot->y > 180.f)  m_Rot->y-=360.f;
+	while (m_Rot->y < -180.f) m_Rot->y+=360.f;
 }
+
+
+
+
 
 void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 {
-	if( !m_World ) return; // Entity needs a world to move to a chunk
+	assert(m_World != NULL);  // Entity needs a world to move to a chunk
+	if( !m_World ) return;
 
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	cWorld::BlockToChunk( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z, ChunkX, ChunkY, ChunkZ );
-	if(a_bIgnoreOldChunk || m_ChunkX != ChunkX || m_ChunkY != ChunkY || m_ChunkZ != ChunkZ)
+	if (!a_bIgnoreOldChunk && (m_ChunkX == ChunkX) && (m_ChunkY == ChunkY) && (m_ChunkZ == ChunkZ))
 	{
-		LOG("From %i %i To %i %i", m_ChunkX, m_ChunkZ, ChunkX, ChunkZ );
-		cChunk* Chunk = 0;
-		if(!a_bIgnoreOldChunk)
-			Chunk = m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ );
+		return;
+	}
+	
+	if (!a_bIgnoreOldChunk)
+	{
+		cChunkPtr OldChunk = m_World->GetChunk(m_ChunkX, m_ChunkY, m_ChunkZ);
+		OldChunk->RemoveEntity(this);
+		cPacket_DestroyEntity DestroyEntity( this );
+		OldChunk->Broadcast(DestroyEntity);
+	}
 
-		typedef std::list< cClientHandle* > ClientList;
-		ClientList BeforeClients;
-		if( Chunk )
+	m_ChunkX = ChunkX;
+	m_ChunkY = ChunkY;
+	m_ChunkZ = ChunkZ;
+	cChunkPtr NewChunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+	if ( NewChunk != NULL )
+	{
+		NewChunk->AddEntity( this );
+		std::auto_ptr<cPacket> SpawnPacket(GetSpawnPacket());
+		if (SpawnPacket.get() != NULL)
 		{
-			Chunk->RemoveEntity( *this );
-			BeforeClients = Chunk->GetClients();
-		}
-		m_ChunkX = ChunkX; m_ChunkY = ChunkY; m_ChunkZ = ChunkZ;
-		cChunk* NewChunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-		ClientList AfterClients;
-		if( NewChunk )
-		{
-			NewChunk->AddEntity( *this );
-			AfterClients = NewChunk->GetClients();
-		}
-
-
-		/********************
-		 * I reaalllyyyy don't like this piece of code, but it's needed I guess (maybe there's a way to optimize this)
-		 **/
-		// Now compare clients before with after
-		for( ClientList::iterator itr = BeforeClients.begin(); itr != BeforeClients.end(); ++itr )
-		{
-			bool bFound = false;
-			for( ClientList::iterator itr2 = AfterClients.begin(); itr2 != AfterClients.end(); ++itr2 )
-			{
-				if( *itr2 == *itr )
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if( !bFound )	// Client was in old chunk, but not new, so destroy on that client
-			{
-				cPacket_DestroyEntity DestroyEntity( this );
-				(*itr)->Send( DestroyEntity );
-			}
-		}
-
-		// Now compare clients after with before
-		for( ClientList::iterator itr = AfterClients.begin(); itr != AfterClients.end(); ++itr )
-		{
-			bool bFound = false;
-			for( ClientList::iterator itr2 = BeforeClients.begin(); itr2 != BeforeClients.end(); ++itr2 )
-			{
-				if( *itr2 == *itr )
-				{
-					bFound = true;
-					break;
-				}
-			}
-			if( !bFound )	// Client is in the new chunk, but not in old, so spawn on the client
-			{
-				SpawnOn( *itr );
-			}
+			NewChunk->Broadcast(SpawnPacket.get());
 		}
 	}
 }
+
+
+
+
 
 void cEntity::Destroy()
 {
@@ -142,24 +142,62 @@ void cEntity::Destroy()
 	{
 		m_bDestroyed = true;
 		if( !m_bRemovedFromChunk )
-			RemoveFromChunk(0);
-	}
-}
-
-void cEntity::RemoveFromChunk( cChunk* a_Chunk )
-{
-	if( m_World )
-	{
-		cChunk* Chunk = ( a_Chunk ? a_Chunk : (cChunk*)m_World->GetChunkUnreliable( m_ChunkX, m_ChunkY, m_ChunkZ ) );
-		if( Chunk )
 		{
-			cPacket_DestroyEntity DestroyEntity( this );
-			Chunk->Broadcast( DestroyEntity );
-			Chunk->RemoveEntity( *this );
-			m_bRemovedFromChunk = true;
+			RemoveFromChunk();
 		}
 	}
 }
+
+
+
+
+
+void cEntity::RemoveFromChunk(void)
+{
+	if ( m_World == NULL )
+	{
+		return;
+	}
+	
+	cChunkPtr Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+	if ( Chunk != NULL )
+	{
+		cPacket_DestroyEntity DestroyEntity( this );
+		Chunk->Broadcast( DestroyEntity );
+		Chunk->RemoveEntity( this );
+		m_bRemovedFromChunk = true;
+	}
+}
+
+
+
+
+
+void cEntity::SpawnOn(cClientHandle * a_Client)
+{
+	std::auto_ptr<cPacket> SpawnPacket(GetSpawnPacket());
+	if (SpawnPacket.get() == NULL)
+	{
+		return;
+	}
+	
+	if (a_Client == NULL)
+	{
+		cChunkPtr Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
+		if ( Chunk != NULL )
+		{
+			Chunk->Broadcast(SpawnPacket.get());
+		}
+	}
+	else
+	{
+		a_Client->Send(SpawnPacket.get());
+	}
+}
+
+
+
+
 
 CLASS_DEF_GETCLASS( cEntity );
 bool cEntity::IsA( const char* a_EntityType )
@@ -169,6 +207,10 @@ bool cEntity::IsA( const char* a_EntityType )
 	return false;
 }
 
+
+
+
+
 //////////////////////////////////////////////////////////////////////////
 // Set orientations
 void cEntity::SetRot( const Vector3f & a_Rot )
@@ -177,11 +219,19 @@ void cEntity::SetRot( const Vector3f & a_Rot )
 	m_bDirtyOrientation = true;
 }
 
+
+
+
+
 void cEntity::SetRotation( float a_Rotation )
 {
 	m_Rot->x = a_Rotation;
 	m_bDirtyOrientation = true;
 }
+
+
+
+
 
 void cEntity::SetPitch( float a_Pitch )
 {
@@ -189,33 +239,19 @@ void cEntity::SetPitch( float a_Pitch )
 	m_bDirtyOrientation = true;
 }
 
+
+
+
+
 void cEntity::SetRoll( float a_Roll )
 {
 	m_Rot->z = a_Roll;
 	m_bDirtyOrientation = true;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Get orientations
-const Vector3f & cEntity::GetRot()
-{
-	return *m_Rot;
-}
 
-float cEntity::GetRotation()
-{
-	return m_Rot->x;
-}
 
-float cEntity::GetPitch()
-{
-	return m_Rot->y;
-}
 
-float cEntity::GetRoll()
-{
-	return m_Rot->z;
-}
 
 //////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
@@ -228,6 +264,10 @@ Vector3f cEntity::GetLookVector()
 	return Look;
 }
 
+
+
+
+
 //////////////////////////////////////////////////////////////////////////
 // Set position
 void cEntity::SetPosition( const Vector3d & a_Pos )
@@ -237,12 +277,20 @@ void cEntity::SetPosition( const Vector3d & a_Pos )
 	m_bDirtyPosition = true;
 }
 
+
+
+
+
 void cEntity::SetPosition( const double & a_PosX, const double & a_PosY, const double & a_PosZ )
 {
 	m_Pos->Set( a_PosX, a_PosY, a_PosZ );
 	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
+
+
+
+
 
 void cEntity::SetPosX( const double & a_PosX )
 {
@@ -251,12 +299,20 @@ void cEntity::SetPosX( const double & a_PosX )
 	m_bDirtyPosition = true;
 }
 
+
+
+
+
 void cEntity::SetPosY( const double & a_PosY )
 {
 	m_Pos->y = a_PosY;
 	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
+
+
+
+
 
 void cEntity::SetPosZ( const double & a_PosZ )
 {
@@ -265,27 +321,9 @@ void cEntity::SetPosZ( const double & a_PosZ )
 	m_bDirtyPosition = true;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Get position
-const Vector3d & cEntity::GetPosition()
-{
-	return *m_Pos;
-}
 
-const double & cEntity::GetPosX()
-{
-	return m_Pos->x;
-}
 
-const double & cEntity::GetPosY()
-{
-	return m_Pos->y;
-}
 
-const double & cEntity::GetPosZ()
-{
-	return m_Pos->z;
-}
 
 //////////////////////////////////////////////////////////////////////////
 // Reference stuffs
@@ -295,12 +333,24 @@ void cEntity::AddReference( cEntity*& a_EntityPtr )
 	a_EntityPtr->ReferencedBy( a_EntityPtr );
 }
 
+
+
+
+
 void cEntity::ReferencedBy( cEntity*& a_EntityPtr )
 {
 	m_Referencers->AddReference( a_EntityPtr );
 }
 
+
+
+
+
 void cEntity::Dereference( cEntity*& a_EntityPtr )
 {
 	m_Referencers->Dereference( a_EntityPtr );
 }
+
+
+
+

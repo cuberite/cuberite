@@ -17,8 +17,8 @@
 
 
 
-cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
-	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z, a_Chunk)
+cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World)
+	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z, a_World)
 {
 }
 
@@ -44,7 +44,7 @@ void cSignEntity::UsedBy( cPlayer & a_Player )
 
 
 
-void cSignEntity::SetLines( const std::string & a_Line1, const std::string & a_Line2, const std::string & a_Line3, const std::string & a_Line4 )
+void cSignEntity::SetLines( const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4 )
 {
 	m_Line[0] = a_Line1;
 	m_Line[1] = a_Line2;
@@ -56,7 +56,7 @@ void cSignEntity::SetLines( const std::string & a_Line1, const std::string & a_L
 
 
 
-void cSignEntity::SetLine( int a_Index, std::string a_Line )
+void cSignEntity::SetLine( int a_Index, const AString & a_Line )
 {
 	if( a_Index < 4 && a_Index > -1 )
 	{
@@ -68,7 +68,7 @@ void cSignEntity::SetLine( int a_Index, std::string a_Line )
 
 
 
-std::string cSignEntity::GetLine( int a_Index )
+AString cSignEntity::GetLine( int a_Index ) const
 {
 	if( a_Index < 4 && a_Index > -1 )
 	{
@@ -92,13 +92,13 @@ void cSignEntity::SendTo( cClientHandle* a_Client )
 	Sign.m_Line3 = m_Line[2];
 	Sign.m_Line4 = m_Line[3];
 
-	if( a_Client )
+	if ( a_Client != NULL )
 	{
 		a_Client->Send( Sign );
 	}
 	else // broadcast of a_Client == 0
 	{
-		GetChunk()->Broadcast( Sign );
+		m_World->GetChunkOfBlock(m_PosX, m_PosY, m_PosZ)->Broadcast( Sign );
 	}
 }
 

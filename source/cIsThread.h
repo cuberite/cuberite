@@ -39,7 +39,6 @@ public:
 	
 private:
 	AString mThreadName;
-	cEvent  mEvent;  // This event is set when the thread begins executing
 	
 	#ifdef _WIN32
 	

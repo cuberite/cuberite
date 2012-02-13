@@ -35,6 +35,17 @@ cAuthenticator::cAuthenticator(void) :
 
 
 
+cAuthenticator::~cAuthenticator()
+{
+	mShouldTerminate = true;
+	mQueueNonempty.Set();
+	Wait();
+}
+
+
+
+
+
 /// Read custom values from INI
 void cAuthenticator::ReadINI(void)
 {

@@ -206,14 +206,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cChestEntity.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChestEntity.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cChunk.cpp"
 				>
 			</File>
@@ -380,6 +372,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\cPiston.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\cPiston.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\cPlugin.cpp"
 				>
 			</File>
@@ -512,10 +512,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\FileDefine.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\Globals.cpp"
 				>
 				<FileConfiguration
@@ -540,6 +536,31 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\LeakFinder.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\source\LeakFinder.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\LuaFunctions.h"
 				>
 			</File>
@@ -556,10 +577,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\MCSocket.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\MemoryLeak.h"
 				>
 			</File>
@@ -568,11 +585,28 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\PacketID.h"
+				RelativePath="..\source\StackWalker.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\source\ptr_cChunk.h"
+				RelativePath="..\source\StackWalker.h"
 				>
 			</File>
 			<File
@@ -1022,6 +1056,10 @@
 					RelativePath="..\source\packets\cPacket_WindowOpen.h"
 					>
 				</File>
+				<File
+					RelativePath="..\source\PacketID.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Mobs"
@@ -1203,6 +1241,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cChestEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cChestEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cDoors.h"
 					>
 				</File>
@@ -1248,14 +1294,6 @@
 				</File>
 				<File
 					RelativePath="..\source\cPickup.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPiston.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPiston.h"
 					>
 				</File>
 				<File
@@ -1489,6 +1527,22 @@
 				<File
 					RelativePath="..\source\Bindings.cpp"
 					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\source\Bindings.h"
@@ -1576,6 +1630,26 @@
 				</File>
 				<File
 					RelativePath="..\source\md5\md5.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="World storage"
+				>
+				<File
+					RelativePath="..\source\WorldStorage.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WorldStorage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WSSCompact.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WSSCompact.h"
 					>
 				</File>
 			</Filter>

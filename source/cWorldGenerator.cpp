@@ -6,7 +6,6 @@
 #include "cWorld.h"
 #include "cChunk.h"
 #include "cGenSettings.h"
-#include "MersenneTwister.h"
 
 #include "BlockID.h"
 #include "Vector3i.h"
@@ -19,16 +18,32 @@ cWorldGenerator::cWorldGenerator()
 {
 }
 
+
+
+
+
 cWorldGenerator::~cWorldGenerator()
 {
 }
 
 
-void cWorldGenerator::GenerateChunk( cChunk* a_Chunk )
+
+
+
+void cWorldGenerator::GenerateChunk( cChunkPtr a_Chunk )
 {
+	assert(!a_Chunk->IsValid());
+	
+	memset(a_Chunk->pGetBlockData(), 0, cChunk::c_BlockDataSize);
 	GenerateTerrain( a_Chunk );
 	GenerateFoliage( a_Chunk );
+	a_Chunk->CalculateHeightmap();
+	a_Chunk->CalculateLighting();
 }
+
+
+
+
 
 static float GetNoise( float x, float y, cNoise & a_Noise )
 {
@@ -44,6 +59,10 @@ static float GetNoise( float x, float y, cNoise & a_Noise )
 	return (oct1 + oct2 + oct3) * flatness + height;
 }
 
+
+
+
+
 #define PI_2 (1.57079633f)
 static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 {
@@ -55,6 +74,10 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 
 	return oct1;
 }
+
+
+
+
 
 static float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
 {
@@ -69,7 +92,11 @@ static float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
 	return oct1;
 }
 
-void cWorldGenerator::GenerateTerrain( cChunk* a_Chunk )
+
+
+
+
+void cWorldGenerator::GenerateTerrain( cChunkPtr a_Chunk )
 {
 	Vector3i ChunkPos( a_Chunk->GetPosX(), a_Chunk->GetPosY(), a_Chunk->GetPosZ() );
 	char* BlockType = a_Chunk->pGetType();
@@ -154,7 +181,9 @@ void cWorldGenerator::GenerateTerrain( cChunk* a_Chunk )
 
 
 
-void cWorldGenerator::GenerateFoliage( cChunk* a_Chunk )
+
+
+void cWorldGenerator::GenerateFoliage( cChunkPtr a_Chunk )
 {
 	const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
 	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
@@ -213,7 +242,6 @@ void cWorldGenerator::GenerateFoliage( cChunk* a_Chunk )
 				BlockType[ index ] = (char)GrassID;
 			}
 
-			MTRand r1;
 			// Plant sum trees
 			{
 				int xx = x + PosX*16;
@@ -253,3 +281,7 @@ void cWorldGenerator::GenerateFoliage( cChunk* a_Chunk )
 		}
 	}
 }
+
+
+
+

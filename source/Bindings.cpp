@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/08/12 12:55:58.
+** Generated automatically by tolua++-1.0.92 on 02/13/12 11:40:58.
 */
 
 #ifndef __cplusplus
@@ -3160,14 +3160,14 @@ static int tolua_AllToLua_cEntity_GetWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWorld'", NULL);
 #endif
@@ -3192,14 +3192,14 @@ static int tolua_AllToLua_cEntity_GetPosition00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPosition'", NULL);
 #endif
@@ -3224,14 +3224,14 @@ static int tolua_AllToLua_cEntity_GetPosX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPosX'", NULL);
 #endif
@@ -3256,14 +3256,14 @@ static int tolua_AllToLua_cEntity_GetPosY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPosY'", NULL);
 #endif
@@ -3288,14 +3288,14 @@ static int tolua_AllToLua_cEntity_GetPosZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPosZ'", NULL);
 #endif
@@ -3320,14 +3320,14 @@ static int tolua_AllToLua_cEntity_GetRot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRot'", NULL);
 #endif
@@ -3352,14 +3352,14 @@ static int tolua_AllToLua_cEntity_GetRotation00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRotation'", NULL);
 #endif
@@ -3384,14 +3384,14 @@ static int tolua_AllToLua_cEntity_GetPitch00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPitch'", NULL);
 #endif
@@ -3416,14 +3416,14 @@ static int tolua_AllToLua_cEntity_GetRoll00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRoll'", NULL);
 #endif
@@ -3792,14 +3792,14 @@ static int tolua_AllToLua_cEntity_GetUniqueID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetUniqueID'", NULL);
 #endif
@@ -3824,14 +3824,14 @@ static int tolua_AllToLua_cEntity_IsDestroyed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsDestroyed'", NULL);
 #endif
@@ -3929,12 +3929,12 @@ static int tolua_AllToLua_cEntity_SpawnOn00(lua_State* tolua_S)
 #endif
  {
   cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  cClientHandle* a_Target = ((cClientHandle*)  tolua_tousertype(tolua_S,2,0));
+  cClientHandle* a_Client = ((cClientHandle*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnOn'", NULL);
 #endif
   {
-   self->SpawnOn(a_Target);
+   self->SpawnOn(a_Client);
   }
  }
  return 0;
@@ -3996,20 +3996,6 @@ public:
 				LOG("pure-virtual method cEntity::Tick not implemented.");
 			else {
 				LOG("pure-virtual method cEntity::Tick called with no lua_state. Aborting");
-				::abort();
-			};
-			return ( void )0;
-		};
-	};
-	 void  SpawnOn( cClientHandle* a_Target) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)a_Target, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			if (lua_state)
-				LOG("pure-virtual method cEntity::SpawnOn not implemented.");
-			else {
-				LOG("pure-virtual method cEntity::SpawnOn called with no lua_state. Aborting");
 				::abort();
 			};
 			return ( void )0;
@@ -4657,20 +4643,6 @@ public:
 				LOG("pure-virtual method cPawn::Tick not implemented.");
 			else {
 				LOG("pure-virtual method cPawn::Tick called with no lua_state. Aborting");
-				::abort();
-			};
-			return ( void )0;
-		};
-	};
-	 void  SpawnOn( cClientHandle* a_Target) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)a_Target, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			if (lua_state)
-				LOG("pure-virtual method cPawn::SpawnOn not implemented.");
-			else {
-				LOG("pure-virtual method cPawn::SpawnOn called with no lua_state. Aborting");
 				::abort();
 			};
 			return ( void )0;
@@ -5646,19 +5618,19 @@ static int tolua_AllToLua_cPlayer_GetColor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetColor'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->GetColor();
+   AString tolua_ret = (AString)  self->GetColor();
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }
@@ -6053,20 +6025,6 @@ public:
 				LOG("pure-virtual method cPlayer::Tick not implemented.");
 			else {
 				LOG("pure-virtual method cPlayer::Tick called with no lua_state. Aborting");
-				::abort();
-			};
-			return ( void )0;
-		};
-	};
-	 void  SpawnOn( cClientHandle* a_Target) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)a_Target, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			if (lua_state)
-				LOG("pure-virtual method cPlayer::SpawnOn not implemented.");
-			else {
-				LOG("pure-virtual method cPlayer::SpawnOn called with no lua_state. Aborting");
 				::abort();
 			};
 			return ( void )0;
@@ -10117,14 +10075,14 @@ static int tolua_AllToLua_cWorld_GetWorldSeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWorldSeed'", NULL);
 #endif
@@ -10149,20 +10107,20 @@ static int tolua_AllToLua_cWorld_GetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetName'", NULL);
 #endif
   {
-   const char* tolua_ret = (const char*)  self->GetName();
-   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+   const AString tolua_ret = (const AString)  self->GetName();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }
  return 1;
@@ -10212,14 +10170,14 @@ static int tolua_AllToLua_cWorld_GetNumChunks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetNumChunks'", NULL);
 #endif
@@ -10743,14 +10701,14 @@ static int tolua_AllToLua_cItem_IsEmpty00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
+  const cItem* self = (const cItem*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEmpty'", NULL);
 #endif
@@ -10775,7 +10733,7 @@ static int tolua_AllToLua_cItem_Equals00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -10783,7 +10741,7 @@ static int tolua_AllToLua_cItem_Equals00(lua_State* tolua_S)
  else
 #endif
  {
-  cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
+  const cItem* self = (const cItem*)  tolua_tousertype(tolua_S,1,0);
   cItem* a_Item = ((cItem*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Equals'", NULL);
@@ -11763,20 +11721,6 @@ public:
 			return ( void )0;
 		};
 	};
-	 void  SpawnOn( cClientHandle* a_Target) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)a_Target, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			if (lua_state)
-				LOG("pure-virtual method cPickup::SpawnOn not implemented.");
-			else {
-				LOG("pure-virtual method cPickup::SpawnOn called with no lua_state. Aborting");
-				::abort();
-			};
-			return ( void )0;
-		};
-	};
 
 	 bool cPickup__CollectedBy( cPlayer* a_Dest) {
 		return ( bool )cPickup::CollectedBy(a_Dest);
@@ -12120,7 +12064,7 @@ static int tolua_AllToLua_cRoot_GetWorld00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWorld'", NULL);
 #endif
   {
-   cWorld* tolua_ret = (cWorld*)  self->GetWorld();
+   OBSOLETE cWorld* tolua_ret = (OBSOLETE cWorld*)  self->GetWorld();
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
   }
  }
@@ -12387,6 +12331,38 @@ static int tolua_AllToLua_cRoot_ServerCommand00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetTotalChunkCount of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetTotalChunkCount00
+static int tolua_AllToLua_cRoot_GetTotalChunkCount00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetTotalChunkCount'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetTotalChunkCount();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetTotalChunkCount'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: delete of class  cTCPLink */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cTCPLink_delete00
 static int tolua_AllToLua_cTCPLink_delete00(lua_State* tolua_S)
@@ -12424,7 +12400,7 @@ static int tolua_AllToLua_cTCPLink_Connect00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cTCPLink",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
@@ -12433,7 +12409,7 @@ static int tolua_AllToLua_cTCPLink_Connect00(lua_State* tolua_S)
 #endif
  {
   cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Address = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Address = ((const AString)  tolua_tocppstring(tolua_S,2,0));
   unsigned int a_Port = ((unsigned int)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Connect'", NULL);
@@ -12441,9 +12417,10 @@ static int tolua_AllToLua_cTCPLink_Connect00(lua_State* tolua_S)
   {
    bool tolua_ret = (bool)  self->Connect(a_Address,a_Port);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Address);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Connect'.",&tolua_err);
@@ -12470,7 +12447,7 @@ static int tolua_AllToLua_cTCPLink_Send00(lua_State* tolua_S)
 #endif
  {
   cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-  char* a_Data = ((char*)  tolua_tostring(tolua_S,2,0));
+  const char* a_Data = ((const char*)  tolua_tostring(tolua_S,2,0));
   unsigned int a_Size = ((unsigned int)  tolua_tonumber(tolua_S,3,0));
   int a_Flags = ((int)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
@@ -15919,7 +15896,7 @@ static int tolua_AllToLua_cGroup_GetColor00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetColor'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->GetColor();
+   const AString tolua_ret = (const AString)  self->GetColor();
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }
@@ -17752,6 +17729,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetWebAdmin",tolua_AllToLua_cRoot_GetWebAdmin00);
    tolua_function(tolua_S,"GetPluginManager",tolua_AllToLua_cRoot_GetPluginManager00);
    tolua_function(tolua_S,"ServerCommand",tolua_AllToLua_cRoot_ServerCommand00);
+   tolua_function(tolua_S,"GetTotalChunkCount",tolua_AllToLua_cRoot_GetTotalChunkCount00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cTCPLink","cTCPLink","",tolua_collect_cTCPLink);

@@ -18,8 +18,12 @@
 
 #include <json/json.h>
 
-cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
-	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z, a_Chunk ) 
+
+
+
+
+cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
+	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z, a_World ) 
 	, m_Items( new cItem[3] )
 	, m_CookingItem( 0 )
 	, m_CookTime( 0 )
@@ -28,6 +32,10 @@ cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cChunk* a_Chunk)
 	, m_TimeBurned( 0 )
 {
 }
+
+
+
+
 
 cFurnaceEntity::~cFurnaceEntity()
 {
@@ -44,6 +52,10 @@ cFurnaceEntity::~cFurnaceEntity()
 	}
 }
 
+
+
+
+
 void cFurnaceEntity::Destroy()
 {
 	// Drop items
@@ -51,15 +63,16 @@ void cFurnaceEntity::Destroy()
 	{
 		if( !m_Items[i].IsEmpty() )
 		{
-			cPickup* Pickup = new cPickup( m_PosX*32 + 16, m_PosY*32 + 16, m_PosZ*32 + 16, m_Items[i], 0, 1.f, 0 );
-			Pickup->Initialize( m_Chunk->GetWorld() );
+			cPickup* Pickup = new cPickup( m_PosX * 32 + 16, m_PosY * 32 + 16, m_PosZ * 32 + 16, m_Items[i], 0, 1.f, 0 );
+			Pickup->Initialize(m_World);
 			m_Items[i].Empty();
 		}
 	}
-
-	// Remove from tick list
-	GetChunk()->RemoveTickBlockEntity( this );
 }
+
+
+
+
 
 void cFurnaceEntity::UsedBy( cPlayer & a_Player )
 {
@@ -83,6 +96,10 @@ void cFurnaceEntity::UsedBy( cPlayer & a_Player )
 		}
 	}
 }
+
+
+
+
 
 bool cFurnaceEntity::Tick( float a_Dt )
 {
@@ -173,6 +190,10 @@ bool cFurnaceEntity::Tick( float a_Dt )
 	return ((m_CookingItem != 0) || (m_TimeBurned < m_BurnTime)) && m_BurnTime > 0.f; // Keep on ticking, if there's more to cook, or if it's cooking
 }
 
+
+
+
+
 bool cFurnaceEntity::StartCooking()
 {
 	cFurnaceRecipe* FR = cRoot::Get()->GetFurnaceRecipe();
@@ -200,7 +221,6 @@ bool cFurnaceEntity::StartCooking()
 					m_TimeCooked = 0.f;
 					m_CookTime = R->CookTime;
 				}
-				GetChunk()->AddTickBlockEntity( this );
 				return true;
 			}
 		}
@@ -208,13 +228,14 @@ bool cFurnaceEntity::StartCooking()
 	return false;
 }
 
+
+
+
+
 void cFurnaceEntity::ResetCookTimer()
 {
-	if( m_CookingItem )
-	{
-		delete m_CookingItem;
-		m_CookingItem = 0;
-	}
+	delete m_CookingItem;
+	m_CookingItem = NULL;
 	m_TimeCooked = 0.f;
 	m_CookTime = 0.f;
 }
@@ -290,17 +311,20 @@ bool cFurnaceEntity::LoadFromJson( const Json::Value& a_Value )
 		if( !Item.IsEmpty() )
 		{
 			m_CookingItem = new cItem( Item );
-			GetChunk()->AddTickBlockEntity( this );
 		}
 	}
 
-	m_CookTime = (float)a_Value.get("CookTime", 0).asDouble();
+	m_CookTime   = (float)a_Value.get("CookTime",   0).asDouble();
 	m_TimeCooked = (float)a_Value.get("TimeCooked", 0).asDouble();
-	m_BurnTime = (float)a_Value.get("BurnTime", 0).asDouble();
+	m_BurnTime   = (float)a_Value.get("BurnTime",   0).asDouble();
 	m_TimeBurned = (float)a_Value.get("TimeBurned", 0).asDouble();
 
 	return true;
 }
+
+
+
+
 
 void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 {
@@ -330,3 +354,7 @@ void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 	a_Value["BurnTime"] = m_BurnTime;
 	a_Value["TimeBurned"] = m_TimeBurned;
 }
+
+
+
+

@@ -3,13 +3,16 @@
 
 #include "cBlockingTCPLink.h"
 #include "packets/cPacket.h"
-#include "MCSocket.h"
+
+
+
+
 
 #ifdef _WIN32
 	#define MSG_NOSIGNAL (0)
 #endif
 #ifdef __MACH__
-#define MSG_NOSIGNAL (0)
+	#define MSG_NOSIGNAL (0)
 #endif
 
 

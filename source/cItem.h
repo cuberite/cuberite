@@ -24,11 +24,11 @@ public:
 		m_ItemCount = 0;
 		m_ItemHealth = 0;
 	}																									//tolua_export
-	bool IsEmpty()																						//tolua_export
+	bool IsEmpty(void) const																	//tolua_export
 	{																									//tolua_export
 		return (m_ItemID <= 0 || m_ItemCount <= 0);
 	}																									//tolua_export
-	bool Equals( cItem & a_Item )																		//tolua_export
+	bool Equals( cItem & a_Item ) const														//tolua_export
 	{																									//tolua_export
 		return ( (m_ItemID == a_Item.m_ItemID) && (m_ItemHealth == a_Item.m_ItemHealth) );
 	}																									//tolua_export

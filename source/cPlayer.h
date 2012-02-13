@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "cPawn.h"
@@ -14,7 +15,10 @@ class cInventory;
 class cClientHandle;
 
 
-class cPlayer :	public cPawn												//tolua_export
+
+
+
+class cPlayer : public cPawn												//tolua_export
 {																			//tolua_export
 public:
 	CLASS_PROTOTYPE();
@@ -24,8 +28,8 @@ public:
 
 	virtual void Initialize( cWorld* a_World );								//tolua_export
 
-	virtual void SpawnOn( cClientHandle* a_Target );
-	virtual void Tick(float a_Dt);
+	virtual cPacket * GetSpawnPacket(void) const override;
+	virtual void Tick(float a_Dt) override;
 
 	void SetTouchGround( bool a_bTouchGround );
 	inline void SetStance( const double & a_Stance ) { m_Stance = a_Stance; }
@@ -71,7 +75,7 @@ public:
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const char* a_Group );									//tolua_export
 
-	std::string GetColor();													//tolua_export
+	AString GetColor(void) const;													//tolua_export
 
 	void TossItem( bool a_bDraggingItem, int a_Amount = 1 );				//tolua_export
 

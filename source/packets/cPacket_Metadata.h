@@ -13,6 +13,7 @@ class cPacket_Metadata : public cPacket
 public:
 	cPacket_Metadata(int s, int id);
 	cPacket_Metadata();
+	cPacket_Metadata(const cPacket_Metadata & a_Other);
 	~cPacket_Metadata();
 
 	virtual void Serialize(AString & a_Data) const override;
