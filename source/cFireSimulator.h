@@ -1,7 +1,7 @@
 #pragma once
 #include "cSimulator.h"
 #include "cBlockEntity.h"
-#include "vector"
+#include <list>
 
 class Vector3i;
 class cWorld;
@@ -25,7 +25,7 @@ protected:
 	virtual bool BurnBlockAround(int a_X, int a_Y, int a_Z);
 	virtual bool BurnBlock(int a_X, int a_Y, int a_Z);
 
-	typedef std::vector <Vector3i> BlockList;
+	typedef std::list <Vector3i> BlockList;
 	BlockList *m_Blocks;
 	BlockList *m_Buffer;
 
