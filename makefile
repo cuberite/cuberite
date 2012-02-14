@@ -260,7 +260,9 @@ MCServer : \
 		build/cWebPlugin_Lua.o\
 		build/StringUtils.o\
 		build/cIsThread.o\
-		build/cSocketThreads.o
+		build/cSocketThreads.o\
+		build/WorldStorage.o\
+		build/WSSCompact.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -474,6 +476,8 @@ MCServer : \
 		build/StringUtils.o\
 		build/cIsThread.o\
 		build/cSocketThreads.o\
+		build/WorldStorage.o\
+		build/WSSCompact.o\
 		-o MCServer
 
 clean : 
@@ -1556,4 +1560,14 @@ build/cIsThread.o : source/cIsThread.cpp
 build/cSocketThreads.o : source/cSocketThreads.cpp
 	$(CC) $(CC_OPTIONS) source/cSocketThreads.cpp -c $(INCLUDE) -o build/cSocketThreads.o	
 
+build/WorldStorage.o : source/WorldStorage.cpp
+	$(CC) $(CC_OPTIONS) source/WorldStorage.cpp -c $(INCLUDE) -o build/WorldStorage.o	
+
+build/WSSCompact.o : source/WSSCompact.cpp
+	$(CC) $(CC_OPTIONS) source/WSSCompact.cpp -c $(INCLUDE) -o build/WSSCompact.o	
+
+
+# Template: copy and delete the "# "; insert filenames
+# build/.o : source/.cpp
+# 	$(CC) $(CC_OPTIONS) source/.cpp -c $(INCLUDE) -o build/.o	
 ##### END RUN ####
