@@ -16,7 +16,17 @@
 #include "md5/md5.h"
 
 
-
+static bool report_errors(lua_State* lua, int status)
+{
+	if ( status!=0 )
+	{
+		std::string s = lua_tostring(lua, -1);
+		LOGERROR("-- %s", s.c_str() );
+		lua_pop(lua, 1);
+		return true;
+	}
+	return false;
+}
 
 
 /****************************
@@ -91,13 +101,59 @@ static int tolua_LOGERROR(lua_State* tolua_S)
 
 
 
-static int tolua_cWorld_GetAllPlayers(lua_State* tolua_S)
+static int tolua_cWorld_ForEachPlayer(lua_State* tolua_S)
 {
 	cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-	lua_State* L =  tolua_S;
 
-	self->GetAllPlayers(L);
+	if( !lua_isfunction( tolua_S, 2 ) )
+	{
+		LOGWARN("Error in function call 'ForEachPlayer': Expected a function for parameter #1");
+		return 0;
+	}
 
+
+	int Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+	if( Reference == LUA_REFNIL )
+	{
+		LOGWARN("Error in function call 'ForEachPlayer': Could not get function reference");
+		return 0;
+	}
+	
+	class cLuaPlayerCallback : public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, Reference);
+			tolua_pushusertype( LuaState, a_Player, "cPlayer" );
+				
+			int s = lua_pcall( LuaState, 1, 1, 0);
+			if( report_errors( LuaState, s ) )
+			{
+				return false;
+			}
+
+			if( lua_isboolean( LuaState, -1 ) )
+			{
+				return (tolua_toboolean( LuaState, -1, 0) > 0);
+			}
+
+			LOGINFO("Stack size: %i", lua_gettop(LuaState) );
+
+			return false;
+		}
+	public:
+		lua_State* LuaState;
+		int Reference;
+	} Callback;
+
+	Callback.LuaState = tolua_S;
+	Callback.Reference = Reference;
+
+	bool bRetVal = self->ForEachPlayer( &Callback );
+
+	luaL_unref( tolua_S, LUA_REGISTRYINDEX, Reference );
+
+	tolua_pushboolean( tolua_S, bRetVal );
 	return 1;
 }
 
@@ -397,7 +453,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_function(tolua_S,"Log",tolua_LOG); // Deprecated
 
 		tolua_beginmodule(tolua_S,"cWorld");
-			tolua_function(tolua_S,"GetAllPlayers",tolua_cWorld_GetAllPlayers);
+			tolua_function(tolua_S,"ForEachPlayer",tolua_cWorld_ForEachPlayer);
 		tolua_endmodule(tolua_S);
 		tolua_beginmodule(tolua_S,"cPlugin");
 			tolua_function(tolua_S,"GetCommands",tolua_cPlugin_GetCommands);

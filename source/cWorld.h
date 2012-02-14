@@ -76,13 +76,10 @@ public:
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
-	bool ForEachPlayer(cPlayerListCallback * a_Callback);  // Calls the callback for each player in the list
-	
-	// TODO: This interface is dangerous!
-	cPlayerList & GetAllPlayers() {return m_Players; }
-	
+
 	typedef struct lua_State lua_State;
-	void GetAllPlayers( lua_State* L );												// >> EXPORTED IN MANUALBINDINGS <<
+	bool ForEachPlayer(cPlayerListCallback * a_Callback);	// Calls the callback for each player in the list
+															// >> EXPORTED IN MANUALBINDINGS <<
 	unsigned int GetNumPlayers();													//tolua_export
 	
 	// TODO: This interface is dangerous

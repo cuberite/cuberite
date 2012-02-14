@@ -989,26 +989,6 @@ bool cWorld::ForEachPlayer(cPlayerListCallback * a_Callback)
 
 
 
-
-void cWorld::GetAllPlayers( lua_State* L )
-{
-	lua_createtable(L, m_Players.size(), 0);
-	int newTable = lua_gettop(L);
-	int index = 1;
-	cPlayerList::const_iterator iter = m_Players.begin();
-	while(iter != m_Players.end())
-	{
-		tolua_pushusertype( L, (*iter), "cPlayer" );
-		lua_rawseti(L, newTable, index);
-		++iter;
-		++index;
-	}
-}
-
-
-
-
-
 // TODO: This interface is dangerous!
 cPlayer* cWorld::GetPlayer( const char* a_PlayerName )
 {
