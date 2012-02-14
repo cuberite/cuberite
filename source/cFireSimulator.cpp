@@ -9,9 +9,9 @@
 
 cFireSimulator::cFireSimulator( cWorld* a_World )
 	: cSimulator(a_World)
-	, m_Blocks(new std::vector <Vector3i *>)
-	, m_Buffer(new std::vector <Vector3i *>)
-	, m_BurningBlocks(new std::vector <Vector3i *>)
+	, m_Blocks(new BlockList)
+	, m_Buffer(new BlockList)
+	, m_BurningBlocks(new BlockList)
 {
 
 }
@@ -28,20 +28,20 @@ void cFireSimulator::Simulate( float a_Dt )
 	m_Buffer->clear();
 	std::swap( m_Blocks, m_Buffer );
 
-	for( std::vector<Vector3i *>::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
+	for( BlockList::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
 	{
-		Vector3i *Pos = *itr;
+		Vector3i Pos = *itr;
 
-		char BlockID = m_World->GetBlock(Pos->x, Pos->y, Pos->z);
+		char BlockID = m_World->GetBlock(Pos.x, Pos.y, Pos.z);
 
 		if(!IsAllowedBlock(BlockID))	//Check wheather the block is still burning
 			continue;
 
-		if(BurnBlockAround(Pos->x, Pos->y, Pos->z))	//Burn single block and if there was one -> next time again
-			_AddBlock(Pos->x, Pos->y, Pos->z);
+		if(BurnBlockAround(Pos.x, Pos.y, Pos.z))	//Burn single block and if there was one -> next time again
+			_AddBlock(Pos.x, Pos.y, Pos.z);
 		else
-			if(!IsForeverBurnable(m_World->GetBlock(Pos->x, Pos->y - 1, Pos->z)) && !FiresForever(BlockID))
-				m_World->SetBlock(Pos->x, Pos->y, Pos->z, E_BLOCK_AIR, 0);
+			if(!IsForeverBurnable(m_World->GetBlock(Pos.x, Pos.y - 1, Pos.z)) && !FiresForever(BlockID))
+				m_World->SetBlock(Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0);
 
 	}
 		
@@ -61,10 +61,10 @@ void cFireSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 		return;
 	
 	//check for duplicates
-	for( std::vector<Vector3i *>::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
+	for( BlockList::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
 	{
-		Vector3i *Pos = *itr;
-		if( Pos->x == a_X && Pos->y == a_Y && Pos->z == a_Z )
+		Vector3i Pos = *itr;
+		if( Pos.x == a_X && Pos.y == a_Y && Pos.z == a_Z )
 			return;
 	}
 
@@ -74,8 +74,7 @@ void cFireSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 
 void cFireSimulator::_AddBlock(int a_X, int a_Y, int a_Z)
 {
-	Vector3i *Block = new Vector3i(a_X, a_Y, a_Z);
-	m_Blocks->push_back(Block);
+	m_Blocks->push_back( Vector3i(a_X, a_Y, a_Z) );
 
 }
 

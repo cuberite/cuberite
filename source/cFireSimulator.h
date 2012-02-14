@@ -25,8 +25,9 @@ protected:
 	virtual bool BurnBlockAround(int a_X, int a_Y, int a_Z);
 	virtual bool BurnBlock(int a_X, int a_Y, int a_Z);
 
-	std::vector <Vector3i *> *m_Blocks;
-	std::vector <Vector3i *> *m_Buffer;
+	typedef std::vector <Vector3i> BlockList;
+	BlockList *m_Blocks;
+	BlockList *m_Buffer;
 
-	std::vector <Vector3i *> *m_BurningBlocks;
+	BlockList *m_BurningBlocks;
 };
