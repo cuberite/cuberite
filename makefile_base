@@ -1,30 +1,14 @@
 ###################################################
 #
-# Makefile for MCServer
-# Creator [Xcode -> Makefile Ver: Feb 14 2007 09:18:41]
-# Created: [Thu Feb 24 19:53:17 2011]
+# Base for MCServer Makefile
+# This file only declares per-file dependencies; if a source file is added to the project, it needs to be added here
+# Do not make using this file directly, instead use the makefile.* wrappers, depending on what build you want
+# To use this file, either copy makefile.debug or makefile.release as makefile, or run "make -f makefile.debug" or "make -f makefile.release"
 #
 ###################################################
 
-#
-# Macros
-#
 
 CC = /usr/bin/g++
-
-# _X: These settings produce a debug build, with gdb symbols:
-# CC_OPTIONS = -s -ggdb
-# CCE_OPTIONS = -s -x c -ggdb
-# LNK_OPTIONS = -lstdc++ -pthread -ggdb
-
-
-# _X: these settings should be used for the release build:
-CC_OPTIONS = -s -O3
-CCE_OPTIONS = -s -x c -O3
-LNK_OPTIONS = -lstdc++ -pthread -O3
-
-
-
 
 #
 # INCLUDE directories for MCServer
@@ -1570,4 +1554,4 @@ build/WSSCompact.o : source/WSSCompact.cpp
 # Template: copy and delete the "# "; insert filenames
 # build/.o : source/.cpp
 # 	$(CC) $(CC_OPTIONS) source/.cpp -c $(INCLUDE) -o build/.o	
-##### END RUN ####
+

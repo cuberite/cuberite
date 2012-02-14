@@ -1,0 +1,25 @@
+###################################################
+#
+# Makefile template for MCServer
+# This makefile makes the debug version of MCServer (with gdb symbols, little to no optimizations)
+# To use this file, either copy it as makefile or run "make -f makefile.debug"
+#
+# Do NOT add file dependencies here, add them to makefile_base instead
+#
+###################################################
+
+
+# _X: These settings produce a debug build, with gdb symbols:
+CC_OPTIONS = -s -ggdb
+CCE_OPTIONS = -s -x c -ggdb
+LNK_OPTIONS = -lstdc++ -pthread -ggdb
+
+
+
+
+
+include makefile_base
+
+
+
+
