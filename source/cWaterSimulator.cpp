@@ -1,10 +1,7 @@
-
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-
+#include "Globals.h"
 #include "cWaterSimulator.h"
 #include "Defines.h"
-
-
+#include "cWorld.h"
 
 
 
@@ -12,6 +9,7 @@ cWaterSimulator::cWaterSimulator(cWorld *a_World)
 	: cFluidSimulator(a_World)
 {
 	m_FluidBlock = E_BLOCK_WATER;
+	m_StationaryFluidBlock = E_BLOCK_STATIONARY_WATER;
 	m_MaxHeight = 7;
 	m_FlowReduction = 1;
 }

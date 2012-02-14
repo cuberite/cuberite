@@ -1,5 +1,4 @@
 #pragma once
-
 #include "cFluidSimulator.h"
 
 class cWaterSimulator : public cFluidSimulator

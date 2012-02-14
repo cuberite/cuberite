@@ -32,6 +32,7 @@ public:			//tolua_export
 	friend Vector3i operator * ( const Vector3i& v, const int f ) { return Vector3i( v.x * f, v.y * f, v.z * f ); }
 	friend Vector3i operator * ( const Vector3i& v1, const Vector3i& v2 ) { return Vector3i( v1.x * v2.x, v1.y * v2.y, v1.z * v2.z ); }
 	friend Vector3i operator * ( const int f, const Vector3i& v ) { return Vector3i( v.x * f, v.y * f, v.z * f ); }
+	friend bool operator < ( const Vector3i& v1, const Vector3i& v2 ) { return (v1.x<v2.x)||(v1.x==v2.x && v1.y<v2.y)||(v1.x==v2.x && v1.y == v2.y && v1.z<v2.z); }
 
 	int x, y, z;	//tolua_export
 };	//tolua_export
