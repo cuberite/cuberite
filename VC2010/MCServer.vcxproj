@@ -308,7 +308,6 @@
     <ClCompile Include="..\source\cCavespider.cpp" />
     <ClCompile Include="..\Source\cChicken.cpp" />
     <ClCompile Include="..\source\cChunkGenerator.cpp" />
-    <ClCompile Include="..\source\cChunkLoader.cpp" />
     <ClCompile Include="..\Source\cChunkMap.cpp" />
     <ClCompile Include="..\source\cCow.cpp" />
     <ClCompile Include="..\source\cCraftingWindow.cpp" />
@@ -492,7 +491,6 @@
     <ClInclude Include="..\source\cCavespider.h" />
     <ClInclude Include="..\Source\cChicken.h" />
     <ClInclude Include="..\source\cChunkGenerator.h" />
-    <ClInclude Include="..\source\cChunkLoader.h" />
     <ClInclude Include="..\Source\cChunkMap.h" />
     <ClInclude Include="..\source\cCow.h" />
     <ClInclude Include="..\source\cCraftingWindow.h" />

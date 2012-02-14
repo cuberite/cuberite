@@ -52,7 +52,6 @@ public:
 	cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World);
 	~cChunk();
 
-	void Initialize();
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk is valid (loaded / generated)
 	void SetValid(bool a_SendToClients = true);   // Also wakes up all clients attached to this chunk to let them finish logging in
 	bool CanUnload(void);
@@ -87,9 +86,6 @@ public:
 	void AddEntity( cEntity * a_Entity );
 	void RemoveEntity( cEntity * a_Entity);
 
-	// TODO: This interface is dangerous
-	OBSOLETE const std::list< cClientHandle* > & GetClients();// { return m_LoadedByClient; }
-
 	inline void RecalculateLighting() { m_bCalculateLighting = true; } // Recalculate lighting next tick
 	inline void RecalculateHeightmap() { m_bCalculateHeightmap = true; } // Recalculate heightmap next tick
 	void SpreadLight(char* a_LightBuffer);
@@ -102,6 +98,10 @@ public:
 	void Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude = NULL) {Broadcast(&a_Packet, a_Exclude); }
 	void Broadcast( const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 
+	// TODO: These functions are dangerous - rewrite to:
+	//   Loaded(blockdata, lightdata, blockentities, entities),
+	//   Generated(blockdata, lightdata, blockentities, entities),
+	//   GetBlockData(blockdatadest) etc.
 	char* pGetBlockData() { return m_BlockData; }
 	char* pGetType() { return m_BlockType; }
 	char* pGetMeta() { return m_BlockMeta; }
@@ -109,6 +109,8 @@ public:
 	char* pGetSkyLight() { return m_BlockSkyLight; }
 	
 	void CopyBlockDataFrom(const char * a_NewBlockData);  // Copies all blockdata, recalculates heightmap (used by chunk loaders)
+	
+	// TODO: Move this into the specific WSSchema:
 	void LoadFromJson( const Json::Value & a_Value );
 	void SaveToJson( Json::Value & a_Value );
 
@@ -122,18 +124,15 @@ public:
 	inline static unsigned int MakeIndex(int x, int y, int z )
 	{
 		if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
+		{
 			return y + (z * 128) + (x * 128 * 16);
+		}
 		return 0;
 	}
 
 	static const int c_NumBlocks = 16*128*16;
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
-
-	// Reference counting
-	void AddReference();
-	void RemoveReference();
-	int GetReferenceCount();
-
+	
 private:
 
 	bool m_IsValid;  // True if the chunk is loaded / generated

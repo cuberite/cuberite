@@ -217,9 +217,6 @@
     <Filter Include="Packets\cPacket_WindowClick">
       <UniqueIdentifier>{378afb88-8909-455c-aaf9-4d41387b2bea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cChunkLoader">
-      <UniqueIdentifier>{177e25ee-63e6-4382-8560-4f309ae8242d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="cNoise">
       <UniqueIdentifier>{58d6aa00-beab-4654-bbbd-c3b0397a9549}</UniqueIdentifier>
     </Filter>
@@ -669,9 +666,6 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_WindowClick.cpp">
       <Filter>Packets\cPacket_WindowClick</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cChunkLoader.cpp">
-      <Filter>cChunkLoader</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cCuboid.cpp">
       <Filter>Vector3f</Filter>
@@ -1160,9 +1154,6 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_WindowClick.h">
       <Filter>Packets\cPacket_WindowClick</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\cChunkLoader.h">
-      <Filter>cChunkLoader</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cCuboid.h">
       <Filter>Vector3f</Filter>

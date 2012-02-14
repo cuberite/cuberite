@@ -27,8 +27,8 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
-	cChunkPtr GetChunk     ( int a_X, int a_Y, int a_Z );  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen( int a_X, int a_Y, int a_Z );  // Also queues the chunk for loading if not valid; doesn't generate
+	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
+	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 

@@ -226,14 +226,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cChunkLoader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChunkLoader.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cChunkMap.cpp"
 				>
 			</File>

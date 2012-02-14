@@ -82,9 +82,10 @@ public:
 															// >> EXPORTED IN MANUALBINDINGS <<
 	unsigned int GetNumPlayers();													//tolua_export
 	
-	// TODO: This interface is dangerous
+	// TODO: This interface is dangerous - rewrite to DoWithPlayer(playername, action)
 	cPlayer * GetPlayer( const char * a_PlayerName );									//tolua_export
 	
+	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
