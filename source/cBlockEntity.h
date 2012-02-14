@@ -27,6 +27,7 @@ protected:
 		, m_PosY( a_Y )
 		, m_PosZ( a_Z )
 		, m_BlockType( a_BlockType ) 
+		, m_World( a_World )
 	{}
 public:
 	virtual ~cBlockEntity() {};
