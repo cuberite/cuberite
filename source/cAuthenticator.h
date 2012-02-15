@@ -41,6 +41,9 @@ public:
 
 	/// Queues a request for authenticating a user. If the auth fails, the user is kicked
 	void Authenticate(const AString & iUserName, const AString & iServerHash);
+
+	// Stops the authenticator thread
+	void Stop(void);
 	
 private:
 

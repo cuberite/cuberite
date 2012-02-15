@@ -37,9 +37,7 @@ cAuthenticator::cAuthenticator(void) :
 
 cAuthenticator::~cAuthenticator()
 {
-	mShouldTerminate = true;
-	mQueueNonempty.Set();
-	Wait();
+	Stop();
 }
 
 
@@ -96,6 +94,17 @@ void cAuthenticator::Authenticate(const AString & iUserName, const AString & iSe
 	cCSLock Lock(mCS);
 	mQueue.push_back(cUser(iUserName, iServerID));
 	mQueueNonempty.Set();
+}
+
+
+
+
+
+void cAuthenticator::Stop(void)
+{
+	mShouldTerminate = true;
+	mQueueNonempty.Set();
+	Wait();
 }
 
 

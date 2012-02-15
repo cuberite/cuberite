@@ -139,6 +139,7 @@ void cRoot::Start()
 
 		// Deallocate stuffs
 		m_Server->Shutdown(); // This waits for threads to stop and d/c clients
+		m_Authenticator.Stop();
 		delete m_PluginManager; m_PluginManager = 0;  // This should be first
 		delete m_MonsterConfig; m_MonsterConfig = 0;
 		if( m_WebAdmin ) { delete m_WebAdmin; m_WebAdmin = 0; }
