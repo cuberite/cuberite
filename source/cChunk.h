@@ -85,6 +85,8 @@ public:
 
 	void AddEntity( cEntity * a_Entity );
 	void RemoveEntity( cEntity * a_Entity);
+	
+	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	inline void RecalculateLighting() { m_bCalculateLighting = true; } // Recalculate lighting next tick
 	inline void RecalculateHeightmap() { m_bCalculateHeightmap = true; } // Recalculate heightmap next tick

@@ -41,7 +41,7 @@ public:
 	
 	cWorld * GetWorld(void) const {return m_World; }
 
-	virtual void UsedBy( cPlayer & a_Player ) = 0;
+	virtual void UsedBy( cPlayer * a_Player ) = 0;
 	virtual void SendTo( cClientHandle* a_Client ) { (void)a_Client; }
 
 protected:

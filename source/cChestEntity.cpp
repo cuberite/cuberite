@@ -184,7 +184,7 @@ void cChestEntity::SendTo( cClientHandle* a_Client, cServer* a_Server )
 
 
 
-void cChestEntity::UsedBy( cPlayer & a_Player )
+void cChestEntity::UsedBy( cPlayer * a_Player )
 {
 	LOG("Used a chest");
 // 	m_Content[0].m_ItemCount	= 1;
@@ -203,10 +203,10 @@ void cChestEntity::UsedBy( cPlayer & a_Player )
 	}
 	if ( GetWindow() )
 	{
-		if( a_Player.GetWindow() != GetWindow() )
+		if( a_Player->GetWindow() != GetWindow() )
 		{
-			a_Player.OpenWindow( GetWindow() );
-			GetWindow()->SendWholeWindow( a_Player.GetClientHandle() );
+			a_Player->OpenWindow( GetWindow() );
+			GetWindow()->SendWholeWindow( a_Player->GetClientHandle() );
 		}
 	}
 	cPacket_BlockAction ChestOpen;
@@ -215,7 +215,7 @@ void cChestEntity::UsedBy( cPlayer & a_Player )
 	ChestOpen.m_PosZ = GetPosZ();
 	ChestOpen.m_Byte1 = (char)1;
 	ChestOpen.m_Byte2 = (char)1;
-	m_World->GetChunkOfBlock(m_PosX, m_PosY, m_PosZ)->Broadcast(&ChestOpen);
+	m_World->BroadcastToChunkOfBlock(m_PosX, m_PosY, m_PosZ, &ChestOpen);
 }
 
 

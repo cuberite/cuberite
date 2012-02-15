@@ -27,18 +27,51 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
+	// TODO: Get rid of these in favor of the direct action methods:
 	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
+	
+	// Direct action methods:
+	/// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
+	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
+	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // a_Player rclked block entity at the coords specified, handle it
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
 	void UnloadUnusedChunks();
 	void SaveAllChunks();
 
-	cWorld* GetWorld() { return m_World; }
+	cWorld * GetWorld() { return m_World; }
 
 	int GetNumChunks(void);
 	
+	/// Converts absolute block coords into relative (chunk + block) coords:
+	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
+	{
+		BlockToChunk(a_X, a_Y, a_Z, a_ChunkX, a_ChunkZ);
+
+		a_X = a_X - a_ChunkX * 16;
+		a_Z = a_Z - a_ChunkZ*16;
+	}
+	
+	/// Converts absolute block coords to chunk coords:
+	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkZ )
+	{
+		(void)a_Y;
+		a_ChunkX = a_X / 16;
+		if ((a_X < 0) && (a_X % 16 != 0))
+		{
+			a_ChunkX--;
+		}
+		a_ChunkZ = a_Z / 16;
+		if ((a_Z < 0) && (a_Z % 16 != 0))
+		{
+			a_ChunkZ--;
+		}
+	}
+
+
+
 private:
 
 	class cChunkLayer

@@ -35,7 +35,7 @@ cSignEntity::~cSignEntity()
 
 
 // It don't do anything when 'used'
-void cSignEntity::UsedBy( cPlayer & a_Player )
+void cSignEntity::UsedBy( cPlayer * a_Player )
 {
 	(void)a_Player;
 }

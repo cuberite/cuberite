@@ -466,9 +466,6 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 {
 	m_TimeLastPacket = cWorld::GetTime();
 
-	// cPacket* CopiedPacket = a_Packet->Clone();
-	// a_Packet = CopiedPacket;
-
 	// LOG("Recv packet 0x%02x from client \"%s\" (\"%s\")", a_Packet->m_PacketID, m_Socket.GetIPString().c_str(), m_Username.c_str());
 
 	if (m_bKicking)
@@ -908,41 +905,42 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 		switch (BlockID)
 		{
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			{
-				//no need to update redstone current with a repeater
-				//todo: Find meta value of repeater and change it to one step more.
+				// no need to update redstone current with a repeater
+				// TODO: Find meta value of repeater and change it to one step more.
+				break;
 			}
-			break;
-		case E_BLOCK_WORKBENCH:
+			
+			case E_BLOCK_WORKBENCH:
 			{
 				bPlaceBlock = false;
 				cWindow* Window = new cCraftingWindow(0, true);
 				m_Player->OpenWindow(Window);
+				break;
 			}
-			break;
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_CHEST:
+
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_CHEST:
 			{
 				bPlaceBlock = false;
-				cBlockEntity* BlockEntity = m_Player->GetWorld()->GetBlockEntity(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-				if (BlockEntity)
-				{
-					BlockEntity->UsedBy(*m_Player);
-				}
+				m_Player->GetWorld()->UseBlockEntity(m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+				break;
 			}
-			break;
-		case E_BLOCK_WOODEN_DOOR:
+			
+			case E_BLOCK_WOODEN_DOOR:
 			{
 				bPlaceBlock = false;
 				cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+				break;
 			}
-			break;
-		default:
-			break;
-		};
-	}
+			default:
+			{
+				break;
+			}
+		}  // switch (BlockID)
+	}  // if (Direction >= 0)
 
 	// Some checks to see if it's a placeable item :P
 	if (bPlaceBlock)
@@ -950,7 +948,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		cItem Item;
 		Item.m_ItemID = Equipped.m_ItemID;
 		Item.m_ItemCount = 1;
-		LOG("a_Packet->m_ItemType: %i", (int)a_Packet->m_ItemType);
+		LOG("Placing item of type: %i", (int)a_Packet->m_ItemType);
 
 		// Hacked in edible items go!~
 		// TODO: Handle hunger
@@ -958,68 +956,68 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		bool isDoor = false;
 		switch (Item.m_ItemID)
 		{
-		case E_ITEM_APPLE:
-			//m_Player->Heal(4); // 2 hearts
-			m_Player->Feed(24); // 2 food bars
-			bEat = true;
-			break;
-		case E_ITEM_GOLDEN_APPLE:
-			//m_Player->Heal(20); // 10 hearts
-			m_Player->Feed(60); // 5 food
-			bEat = true;
-			break;
-		case E_ITEM_MUSHROOM_SOUP:
-			///m_Player->Heal(10); // 5 hearts
-			m_Player->Feed(48); // 4 food
-			bEat = true;
-			break;
-		case E_ITEM_BREAD:
-			//m_Player->Heal(5); // 2.5 hearts
-			m_Player->Feed(30); // 2.5 food
-			bEat = true;
-			break;
-		case E_ITEM_RAW_MEAT:
-			//m_Player->Heal(3); // 1.5 hearts
-			m_Player->Feed(18); // 1.5 food
-			bEat = true;
-			break;
-		case E_ITEM_COOKED_MEAT:
-			//m_Player->Heal(8); // 4 hearts
-			m_Player->Feed(48); // 4 food
-			bEat = true;
-			break;
-		case E_ITEM_RAW_FISH:
-			//m_Player->Heal(2); // 1 heart
-			m_Player->Feed(12); // 1 food
-			bEat = true;
-			break;
-		case E_ITEM_COOKED_FISH:
-			//m_Player->Heal(5); // 2.5 hearts
-			m_Player->Feed(30); // 2.5 food
-			bEat = true;
-			break;
-		case E_ITEM_RAW_CHICKEN:
-			//m_Player->Heal(3);
-			m_Player->Feed(12); // 1 food
-			bEat = true;
-			break;
-		case E_ITEM_COOKED_CHICKEN:
-			//m_Player->Heal(8);
-			m_Player->Feed(36); // 3 food
-			bEat = true;
-			break;
-		case E_ITEM_RAW_BEEF:
-			//m_Player->Heal(3);
-			m_Player->Feed(18); // 1.5 food
-			bEat = true;
-			break;
-		case E_ITEM_STEAK:
-			//m_Player->Heal(8);
-			m_Player->Feed(48); // 4 food
-			bEat = true;
-			break;
-		default:
-			break;
+			case E_ITEM_APPLE:
+				//m_Player->Heal(4); // 2 hearts
+				m_Player->Feed(24); // 2 food bars
+				bEat = true;
+				break;
+			case E_ITEM_GOLDEN_APPLE:
+				//m_Player->Heal(20); // 10 hearts
+				m_Player->Feed(60); // 5 food
+				bEat = true;
+				break;
+			case E_ITEM_MUSHROOM_SOUP:
+				///m_Player->Heal(10); // 5 hearts
+				m_Player->Feed(48); // 4 food
+				bEat = true;
+				break;
+			case E_ITEM_BREAD:
+				//m_Player->Heal(5); // 2.5 hearts
+				m_Player->Feed(30); // 2.5 food
+				bEat = true;
+				break;
+			case E_ITEM_RAW_MEAT:
+				//m_Player->Heal(3); // 1.5 hearts
+				m_Player->Feed(18); // 1.5 food
+				bEat = true;
+				break;
+			case E_ITEM_COOKED_MEAT:
+				//m_Player->Heal(8); // 4 hearts
+				m_Player->Feed(48); // 4 food
+				bEat = true;
+				break;
+			case E_ITEM_RAW_FISH:
+				//m_Player->Heal(2); // 1 heart
+				m_Player->Feed(12); // 1 food
+				bEat = true;
+				break;
+			case E_ITEM_COOKED_FISH:
+				//m_Player->Heal(5); // 2.5 hearts
+				m_Player->Feed(30); // 2.5 food
+				bEat = true;
+				break;
+			case E_ITEM_RAW_CHICKEN:
+				//m_Player->Heal(3);
+				m_Player->Feed(12); // 1 food
+				bEat = true;
+				break;
+			case E_ITEM_COOKED_CHICKEN:
+				//m_Player->Heal(8);
+				m_Player->Feed(36); // 3 food
+				bEat = true;
+				break;
+			case E_ITEM_RAW_BEEF:
+				//m_Player->Heal(3);
+				m_Player->Feed(18); // 1.5 food
+				bEat = true;
+				break;
+			case E_ITEM_STEAK:
+				//m_Player->Heal(8);
+				m_Player->Feed(48); // 4 food
+				bEat = true;
+				break;
+			default:
+				break;
 		};
 
 		if (bEat)

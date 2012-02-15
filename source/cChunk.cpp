@@ -835,6 +835,19 @@ cBlockEntity * cChunk::GetBlockEntity(int a_X, int a_Y, int a_Z)
 
 
 
+void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
+{
+	cBlockEntity * be = GetBlockEntity(a_X, a_Y, a_Z);
+	if (be != NULL)
+	{
+		be->UsedBy(a_Player);
+	}
+}
+
+
+
+
+
 void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 {
 	cCSLock Lock(m_CSEntities);

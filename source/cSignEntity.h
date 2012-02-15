@@ -33,8 +33,8 @@ public:
 
 	AString GetLine( int a_Index ) const;
 
-	virtual void UsedBy( cPlayer & a_Player );
-	virtual void SendTo( cClientHandle* a_Client );
+	virtual void UsedBy( cPlayer * a_Player ) override;
+	virtual void SendTo( cClientHandle* a_Client ) override;
 	
 private:
 

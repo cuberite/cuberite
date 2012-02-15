@@ -67,6 +67,8 @@ public:
 
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
 	
+	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL) {return m_ChunkMap->BroadcastToChunkOfBlock(a_X, a_Y, a_Z, a_Packet, a_Exclude); }
+	
 	// MOTD
 	const AString & GetDescription(void) const {return m_Description; }
 
@@ -117,6 +119,9 @@ public:
 
 	// TODO: This interface is dangerous!
 	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
+	
+	/// a_Player is using block entity at [x, y, z], handle that:
+	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z) {m_ChunkMap->UseBlockEntity(a_Player, a_X, a_Y, a_Z); }
 
 	void GrowTree( int a_X, int a_Y, int a_Z );										//tolua_export
 

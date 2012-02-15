@@ -74,7 +74,7 @@ void cFurnaceEntity::Destroy()
 
 
 
-void cFurnaceEntity::UsedBy( cPlayer & a_Player )
+void cFurnaceEntity::UsedBy( cPlayer * a_Player )
 {
 	LOG("Used a furnace");
 
@@ -88,11 +88,11 @@ void cFurnaceEntity::UsedBy( cPlayer & a_Player )
 	}
 	if( GetWindow() )
 	{
-		if( a_Player.GetWindow() != GetWindow() )
+		if( a_Player->GetWindow() != GetWindow() )
 		{
-			a_Player.OpenWindow( GetWindow() );
+			a_Player->OpenWindow( GetWindow() );
 
-			GetWindow()->SendWholeWindow( a_Player.GetClientHandle() );
+			GetWindow()->SendWholeWindow( a_Player->GetClientHandle() );
 		}
 	}
 }

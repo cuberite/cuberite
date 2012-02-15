@@ -37,7 +37,8 @@ public:
 	void SaveToJson  (Json::Value& a_Value );
 
 	bool Tick( float a_Dt );
-	virtual void UsedBy( cPlayer & a_Player );
+	
+	virtual void UsedBy( cPlayer * a_Player ) override;
 
 	bool StartCooking();
 
