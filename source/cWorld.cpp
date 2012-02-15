@@ -177,7 +177,7 @@ cWorld::cWorld( const AString & a_WorldName )
 		IniFile.SetValue("Generator", "GeneratorName", "Default" );
 		if( !IniFile.WriteFile() )
 		{
-			LOG("WARNING: Could not write to %s/world.ini", a_WorldName);
+			LOG("WARNING: Could not write to %s/world.ini", a_WorldName.c_str());
 		}
 	}
 	LOGINFO("Seed: %i", m_WorldSeed );
