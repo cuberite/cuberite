@@ -78,9 +78,11 @@ void cWorldStorage::WaitForFinish(void)
 {
 	LOG("Waiting for the world storage to finish saving");
 	
-	// Cancel all loading requests:
-	cCSLock Lock(m_CSLoadQueue);
-	m_LoadQueue.clear();
+	{
+		// Cancel all loading requests:
+		cCSLock Lock(m_CSLoadQueue);
+		m_LoadQueue.clear();
+	}
 	
 	// Wait for the thread to finish:
 	mShouldTerminate = true;
