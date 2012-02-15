@@ -62,11 +62,11 @@ protected:
 	float m_AttackRate;
 	float idle_interval;
 
-	Vector3f* m_Destination;
+	Vector3f m_Destination;
 	bool m_bMovingToDestination;
 	bool m_bPassiveAggressive;
 
-	Vector3f* m_Speed;
+	Vector3f m_Speed;
 	float m_DestinationTime;
 
 	float m_Gravity;

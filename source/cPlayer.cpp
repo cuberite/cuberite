@@ -98,9 +98,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	{
 		m_Inventory->Clear();
 		m_CreativeInventory->Clear();
-		m_Pos->x = cRoot::Get()->GetDefaultWorld()->GetSpawnX();
-		m_Pos->y = cRoot::Get()->GetDefaultWorld()->GetSpawnY();
-		m_Pos->z = cRoot::Get()->GetDefaultWorld()->GetSpawnZ();
+		m_Pos.x = cRoot::Get()->GetDefaultWorld()->GetSpawnX();
+		m_Pos.y = cRoot::Get()->GetDefaultWorld()->GetSpawnY();
+		m_Pos.z = cRoot::Get()->GetDefaultWorld()->GetSpawnZ();
 	}
 }
 
@@ -143,11 +143,11 @@ cPacket * cPlayer::GetSpawnPacket(void) const
 	cPacket_NamedEntitySpawn * SpawnPacket = new cPacket_NamedEntitySpawn;
 	SpawnPacket->m_UniqueID    = m_UniqueID;
 	SpawnPacket->m_PlayerName  = m_pState->PlayerName;
-	SpawnPacket->m_PosX        = (int)(m_Pos->x * 32);
-	SpawnPacket->m_PosY        = (int)(m_Pos->y * 32);
-	SpawnPacket->m_PosZ        = (int)(m_Pos->z * 32);
-	SpawnPacket->m_Rotation    = (char)((m_Rot->x / 360.f) * 256);
-	SpawnPacket->m_Pitch       = (char)((m_Rot->y / 360.f) * 256);
+	SpawnPacket->m_PosX        = (int)(m_Pos.x * 32);
+	SpawnPacket->m_PosY        = (int)(m_Pos.y * 32);
+	SpawnPacket->m_PosZ        = (int)(m_Pos.z * 32);
+	SpawnPacket->m_Rotation    = (char)((m_Rot.x / 360.f) * 256);
+	SpawnPacket->m_Pitch       = (char)((m_Rot.y / 360.f) * 256);
 	SpawnPacket->m_CurrentItem = (short)m_Inventory->GetEquippedItem().m_ItemID;
 	return SpawnPacket;
 }
@@ -242,20 +242,20 @@ void cPlayer::SetTouchGround( bool a_bTouchGround )
 	if( !m_bTouchGround )
 	{
 		cWorld* World = GetWorld();
-		char BlockID = World->GetBlock( float2int(m_Pos->x), float2int(m_Pos->y), float2int(m_Pos->z) );
+		char BlockID = World->GetBlock( float2int(m_Pos.x), float2int(m_Pos.y), float2int(m_Pos.z) );
 		if( BlockID != E_BLOCK_AIR )
 		{
 			m_bTouchGround = true;
 		}
 		if( BlockID == E_BLOCK_WATER || BlockID == E_BLOCK_STATIONARY_WATER || BlockID == E_BLOCK_LADDER || BlockID == E_BLOCK_TORCH )
 		{
-			m_LastGroundHeight = (float)m_Pos->y;
+			m_LastGroundHeight = (float)m_Pos.y;
 		}
 	}
 
 	if( m_bTouchGround )
 	{
-		float Dist = (float)(m_LastGroundHeight - m_Pos->y);
+		float Dist = (float)(m_LastGroundHeight - m_Pos.y);
 		if( Dist > 4.f ) // Player dropped
 		{
 			int Damage = (int)(Dist - 4.f);
@@ -265,7 +265,7 @@ void cPlayer::SetTouchGround( bool a_bTouchGround )
 			}
 		}
 
-		m_LastGroundHeight = (float)m_Pos->y;
+		m_LastGroundHeight = (float)m_Pos.y;
 	}
 }
 
@@ -330,7 +330,7 @@ void cPlayer::KilledBy( cEntity* a_Killer )
 			float SpeedX = ((r1.randInt()%1000)-500)	/100.f;
 			float SpeedY = ((r1.randInt()%1000))		/100.f;
 			float SpeedZ = ((r1.randInt()%1000)-500)	/100.f;
-			cPickup* Pickup = new cPickup( (int)(m_Pos->x*32), (int)(m_Pos->y*32), (int)(m_Pos->z*32), Items[i], SpeedX, SpeedY, SpeedZ );
+			cPickup* Pickup = new cPickup( (int)(m_Pos.x*32), (int)(m_Pos.y*32), (int)(m_Pos.z*32), Items[i], SpeedX, SpeedY, SpeedZ );
 			Pickup->Initialize( GetWorld() );
 		}
 		Items[i].Empty();
@@ -371,7 +371,7 @@ double cPlayer::GetEyeHeight()
 
 Vector3d cPlayer::GetEyePosition()
 {
-	return Vector3d( m_Pos->x, m_Stance, m_Pos->z );
+	return Vector3d( m_Pos.x, m_Stance, m_Pos.z );
 }
 
 void cPlayer::OpenWindow( cWindow* a_Window )
@@ -853,17 +853,17 @@ bool cPlayer::LoadFromDisk()
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if( JSON_PlayerPosition.size() == 3 )
 	{
-		m_Pos->x = JSON_PlayerPosition[(unsigned int)0].asDouble();
-		m_Pos->y = JSON_PlayerPosition[(unsigned int)1].asDouble();
-		m_Pos->z = JSON_PlayerPosition[(unsigned int)2].asDouble();
+		m_Pos.x = JSON_PlayerPosition[(unsigned int)0].asDouble();
+		m_Pos.y = JSON_PlayerPosition[(unsigned int)1].asDouble();
+		m_Pos.z = JSON_PlayerPosition[(unsigned int)2].asDouble();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if( JSON_PlayerRotation.size() == 3 )
 	{
-		m_Rot->x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
-		m_Rot->y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
-		m_Rot->z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
+		m_Rot.x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
+		m_Rot.y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
+		m_Rot.z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
 	}
 
 	m_Health = (short)root.get("health", 0 ).asInt();
@@ -886,14 +886,14 @@ bool cPlayer::SaveToDisk()
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
-	JSON_PlayerPosition.append( Json::Value( m_Pos->x ) );
-	JSON_PlayerPosition.append( Json::Value( m_Pos->y ) );
-	JSON_PlayerPosition.append( Json::Value( m_Pos->z ) );
+	JSON_PlayerPosition.append( Json::Value( m_Pos.x ) );
+	JSON_PlayerPosition.append( Json::Value( m_Pos.y ) );
+	JSON_PlayerPosition.append( Json::Value( m_Pos.z ) );
 
 	Json::Value JSON_PlayerRotation;
-	JSON_PlayerRotation.append( Json::Value( m_Rot->x ) );
-	JSON_PlayerRotation.append( Json::Value( m_Rot->y ) );
-	JSON_PlayerRotation.append( Json::Value( m_Rot->z ) );
+	JSON_PlayerRotation.append( Json::Value( m_Rot.x ) );
+	JSON_PlayerRotation.append( Json::Value( m_Rot.y ) );
+	JSON_PlayerRotation.append( Json::Value( m_Rot.z ) );
 
 	Json::Value JSON_Inventory;
 	m_Inventory->SaveToJson( JSON_Inventory );

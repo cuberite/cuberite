@@ -40,9 +40,7 @@
 
 cMonster::cMonster()
 	: m_Target(0)
-	, m_Destination( new Vector3f() )
 	, m_bMovingToDestination(false)
-	, m_Speed( new Vector3f() )
 	, m_DestinationTime( 0 )
 	, m_Gravity( -9.81f)
 	, m_bOnGround( false )
@@ -69,8 +67,6 @@ cMonster::cMonster()
 cMonster::~cMonster()
 {
 	LOG("cMonster::~cMonster()");
-	delete m_Destination;
-	delete m_Speed;
 }
 
 bool cMonster::IsA( const char* a_EntityType )
@@ -88,7 +84,7 @@ cPacket * cMonster::GetSpawnPacket(void) const
 	cPacket_SpawnMob * Spawn = new cPacket_SpawnMob;
 	Spawn->m_UniqueID = GetUniqueID();
 	Spawn->m_Type = m_MobType;
-	*Spawn->m_Pos = Vector3i((*m_Pos) * 32);
+	*Spawn->m_Pos = Vector3i((m_Pos) * 32);
 	Spawn->m_Yaw = 0;
 	Spawn->m_Pitch = 0;
 	Spawn->m_MetaDataSize = 1;
@@ -105,12 +101,12 @@ void cMonster::MoveToPosition( const Vector3f & a_Position )
 {
 	m_bMovingToDestination = true;
 
-	*m_Destination = a_Position;
+	m_Destination = a_Position;
 }
 
 bool cMonster::ReachedDestination()
 {
-	Vector3f Distance = (*m_Destination) - Vector3f( m_Pos );
+	Vector3f Distance = (m_Destination) - Vector3f( m_Pos );
 	if( Distance.SqrLength() < 2.f )
 		return true;
 
@@ -140,19 +136,19 @@ void cMonster::Tick(float a_Dt)
 	if( m_bMovingToDestination )
 	{
 		Vector3f Pos( m_Pos );
-		Vector3f Distance = *m_Destination - Pos;
+		Vector3f Distance = m_Destination - Pos;
 		if( !ReachedDestination() )
 		{
 			Distance.y = 0;
 			Distance.Normalize();
 			Distance *= 3;
-			m_Speed->x = Distance.x;
-			m_Speed->z = Distance.z;
+			m_Speed.x = Distance.x;
+			m_Speed.z = Distance.z;
 
 			if (m_EMState == ESCAPING)
 			{	//Runs Faster when escaping :D otherwise they just walk away
-				m_Speed->x *= 2.f;
-				m_Speed->z *= 2.f;
+				m_Speed.x *= 2.f;
+				m_Speed.z *= 2.f;
 			}
 		}
 		else
@@ -160,17 +156,17 @@ void cMonster::Tick(float a_Dt)
 			m_bMovingToDestination = false;
 		}
 
-		if( m_Speed->SqrLength() > 0.f )
+		if( m_Speed.SqrLength() > 0.f )
 		{
 			if( m_bOnGround )
 			{
-				Vector3f NormSpeed = m_Speed->NormalizeCopy();
-				Vector3f NextBlock = Vector3f( *m_Pos ) + NormSpeed;
+				Vector3f NormSpeed = m_Speed.NormalizeCopy();
+				Vector3f NextBlock = Vector3f( m_Pos ) + NormSpeed;
 				double NextHeight = (double)GetWorld()->GetHeight( (int)NextBlock.x, (int)NextBlock.z );
-				if( NextHeight > m_Pos->y - 1.2 && NextHeight - m_Pos->y < 2.5 )
+				if( NextHeight > m_Pos.y - 1.2 && NextHeight - m_Pos.y < 2.5 )
 				{
 					m_bOnGround = false;
-					m_Speed->y = 7.f; // Jump!!
+					m_Speed.y = 7.f; // Jump!!
 				}
 			}
 		}
@@ -180,7 +176,7 @@ void cMonster::Tick(float a_Dt)
 
 	ReplicateMovement();
 	
-	Vector3f Distance = *m_Destination - Vector3f( m_Pos );
+	Vector3f Distance = m_Destination - Vector3f( m_Pos );
 	if( Distance.SqrLength() > 0.1f )
 	{
 		float Rotation, Pitch;
@@ -278,59 +274,59 @@ void cMonster::HandlePhysics(float a_Dt)
 	if( m_bOnGround ) // check if it's still on the ground
 	{
 		cWorld* World = GetWorld();
-		if( World->GetBlock( (int)m_Pos->x, (int)m_Pos->y -1, (int)m_Pos->z ) == E_BLOCK_AIR )
+		if( World->GetBlock( (int)m_Pos.x, (int)m_Pos.y -1, (int)m_Pos.z ) == E_BLOCK_AIR )
 		{
 			m_bOnGround = false;
 		}
-		if( World->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z ) != E_BLOCK_AIR ) // If in ground itself, push it out
+		if( World->GetBlock( (int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z ) != E_BLOCK_AIR ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;
-			m_Pos->y += 0.2;
+			m_Pos.y += 0.2;
 			m_bDirtyPosition = true;
 		}
-		m_Speed->x *= 0.7f/(1+a_Dt);
-		if( fabs(m_Speed->x) < 0.05 ) m_Speed->x = 0;
-		m_Speed->z *= 0.7f/(1+a_Dt);
-		if( fabs(m_Speed->z) < 0.05 ) m_Speed->z = 0;
+		m_Speed.x *= 0.7f/(1+a_Dt);
+		if( fabs(m_Speed.x) < 0.05 ) m_Speed.x = 0;
+		m_Speed.z *= 0.7f/(1+a_Dt);
+		if( fabs(m_Speed.z) < 0.05 ) m_Speed.z = 0;
 	}
 
 	if( !m_bOnGround )
 	{
 		float Gravity = -9.81f*a_Dt;
-		m_Speed->y += Gravity;
+		m_Speed.y += Gravity;
 	}
 
-	if( m_Speed->SqrLength() > 0.f )
+	if( m_Speed.SqrLength() > 0.f )
 	{
 		cTracer Tracer( GetWorld() );
-		int Ret = Tracer.Trace( *m_Pos, *m_Speed, 2 );
+		int Ret = Tracer.Trace( m_Pos, m_Speed, 2 );
 		if( Ret ) // Oh noez! we hit something
 		{
 			// Set to hit position
-			if( (*Tracer.RealHit - Vector3f(*m_Pos)).SqrLength() <= ( *m_Speed * a_Dt ).SqrLength() )
+			if( (Tracer.RealHit - Vector3f(m_Pos)).SqrLength() <= ( m_Speed * a_Dt ).SqrLength() )
 			{
 				if( Ret == 1 )
 				{
 
-					if( Tracer.HitNormal->x != 0.f ) m_Speed->x = 0.f;
-					if( Tracer.HitNormal->y != 0.f ) m_Speed->y = 0.f;
-					if( Tracer.HitNormal->z != 0.f ) m_Speed->z = 0.f;
+					if( Tracer.HitNormal.x != 0.f ) m_Speed.x = 0.f;
+					if( Tracer.HitNormal.y != 0.f ) m_Speed.y = 0.f;
+					if( Tracer.HitNormal.z != 0.f ) m_Speed.z = 0.f;
 
-					if( Tracer.HitNormal->y > 0 ) // means on ground
+					if( Tracer.HitNormal.y > 0 ) // means on ground
 					{
 						m_bOnGround = true;
 					}
 				}
-				*m_Pos = Tracer.RealHit;
-				*m_Pos += *Tracer.HitNormal * 0.2f;
+				m_Pos = Tracer.RealHit;
+				m_Pos += Tracer.HitNormal * 0.2f;
 
 			}
 			else
-				*m_Pos += *m_Speed*a_Dt;
+				m_Pos += m_Speed*a_Dt;
 		}
 		else
 		{	// We didn't hit anything, so move =]
-			*m_Pos += *m_Speed*a_Dt;
+			m_Pos += m_Speed*a_Dt;
 		}
 
 		m_bDirtyPosition = true;
@@ -403,7 +399,7 @@ void cMonster::CheckEventLostPlayer()
 	
 	if(m_Target != 0) {
 		pos = m_Target->GetPosition();
-		if((pos - *m_Pos).Length() > m_SightDistance || LineOfSight.Trace(*m_Pos,(pos - *m_Pos), (int)(pos - *m_Pos).Length()))
+		if((pos - m_Pos).Length() > m_SightDistance || LineOfSight.Trace(m_Pos,(pos - m_Pos), (int)(pos - m_Pos).Length()))
 		{
 			EventLosePlayer();
 		}
@@ -439,10 +435,10 @@ void cMonster::InStateIdle(float a_Dt) {
 		Dist.z = (float)((r1.randInt()%11)-5);
 		if( Dist.SqrLength() > 2  && rem >= 3)
 		{
-			m_Destination->x = (float)(m_Pos->x + Dist.x);
-			m_Destination->z = (float)(m_Pos->z + Dist.z);
-			m_Destination->y = (float)GetWorld()->GetHeight( (int)m_Destination->x, (int)m_Destination->z ) + 1.2f;
-			MoveToPosition( *m_Destination );
+			m_Destination.x = (float)(m_Pos.x + Dist.x);
+			m_Destination.z = (float)(m_Pos.z + Dist.z);
+			m_Destination.y = (float)GetWorld()->GetHeight( (int)m_Destination.x, (int)m_Destination.z ) + 1.2f;
+			MoveToPosition( m_Destination );
 		}
 	}
 }
@@ -457,7 +453,7 @@ void cMonster::InStateChasing(float a_Dt) {
 void cMonster::InStateEscaping(float a_Dt) {
 	(void)a_Dt;
 	if(m_Target) {
-		Vector3d newloc = *m_Pos;
+		Vector3d newloc = m_Pos;
 		newloc.x = (m_Target->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
 		newloc.z = (m_Target->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
 		MoveToPosition(newloc);
@@ -561,7 +557,7 @@ void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
 {
 	if (a_Count > 0)
 	{
-		cPickup * Pickup = new cPickup( (int)(m_Pos->x * 32), (int)(m_Pos->y * 32), (int)(m_Pos->z * 32), cItem( a_Item, (char) a_Count ) );
+		cPickup * Pickup = new cPickup( (int)(m_Pos.x * 32), (int)(m_Pos.y * 32), (int)(m_Pos.z * 32), cItem( a_Item, (char) a_Count ) );
 		Pickup->Initialize( GetWorld() );
 	}
 }

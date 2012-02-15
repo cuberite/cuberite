@@ -68,16 +68,16 @@ public:																						//tolua_export
 	virtual bool IsA( const char* a_EntityType );											//tolua_export
 	virtual const char* GetClass();															//tolua_export
 
-	cWorld * GetWorld(void) const { return m_World; }													//tolua_export
+	cWorld * GetWorld(void) const { return m_World; }										//tolua_export
 
-	const Vector3d & GetPosition(void) const {return *m_Pos; }															//tolua_export
-	const double &   GetPosX    (void) const {return m_Pos->x; }																//tolua_export
-	const double &   GetPosY    (void) const {return m_Pos->y; }																//tolua_export
-	const double &   GetPosZ    (void) const {return m_Pos->z; }																//tolua_export
-	const Vector3f & GetRot     (void) const {return *m_Rot; }																//tolua_export
-	float GetRotation(void) const {return m_Rot->x; }																	//tolua_export
-	float GetPitch   (void) const {return m_Rot->y; }																		//tolua_export
-	float GetRoll    (void) const {return m_Rot->z; }																		//tolua_export
+	const Vector3d & GetPosition(void) const {return m_Pos; }								//tolua_export
+	const double &   GetPosX    (void) const {return m_Pos.x; }								//tolua_export
+	const double &   GetPosY    (void) const {return m_Pos.y; }								//tolua_export
+	const double &   GetPosZ    (void) const {return m_Pos.z; }								//tolua_export
+	const Vector3f & GetRot     (void) const {return m_Rot; }								//tolua_export
+	float GetRotation(void) const {return m_Rot.x; }										//tolua_export
+	float GetPitch   (void) const {return m_Rot.y; }										//tolua_export
+	float GetRoll    (void) const {return m_Rot.z; }										//tolua_export
 	Vector3f GetLookVector();																//tolua_export
 
 	void SetPosX( const double & a_PosX );													//tolua_export
@@ -122,10 +122,10 @@ protected:
 	cReferenceManager* m_References;
 
 	int m_ChunkX, m_ChunkY, m_ChunkZ;
-	Vector3d* m_Pos;
+	Vector3d m_Pos;
 	bool m_bDirtyPosition;
 
-	Vector3f* m_Rot;
+	Vector3f m_Rot;
 	bool m_bDirtyOrientation;
 
 	bool m_bDestroyed;

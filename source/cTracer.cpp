@@ -20,48 +20,16 @@
 cTracer::cTracer(cWorld* a_World)
 	: m_World( a_World )
 {
-	m_NormalTable[0] = new Vector3f(-1, 0, 0);
-	m_NormalTable[1] = new Vector3f( 0, 0,-1);
-	m_NormalTable[2] = new Vector3f( 1, 0, 0);
-	m_NormalTable[3] = new Vector3f( 0, 0, 1);
-	m_NormalTable[4] = new Vector3f( 0, 1, 0);
-	m_NormalTable[5] = new Vector3f( 0,-1, 0);
-
-	DotPos = new Vector3f();
-	BoxOffset = new Vector3f();
-	BlockHitPosition = new Vector3f();
-	HitNormal = new Vector3f();
-	RealHit = new Vector3f();
-
-
-	dir = new Vector3f();
-	tDelta = new Vector3f();
-	pos =  new Vector3i();
-	end1 = new Vector3i();
-	step = new Vector3i();
-	tMax = new Vector3f();
+	m_NormalTable[0].Set(-1, 0, 0);
+	m_NormalTable[1].Set( 0, 0,-1);
+	m_NormalTable[2].Set( 1, 0, 0);
+	m_NormalTable[3].Set( 0, 0, 1);
+	m_NormalTable[4].Set( 0, 1, 0);
+	m_NormalTable[5].Set( 0,-1, 0);
 }
 
 cTracer::~cTracer()
 {
-	for( int i = 0; i < 6; ++i )
-	{
-		delete m_NormalTable[i];
-		m_NormalTable[i] = 0;
-	}
-
-	delete DotPos;				DotPos = 0;
-	delete BoxOffset;			BoxOffset = 0;
-	delete BlockHitPosition;	BlockHitPosition = 0;
-	delete HitNormal;			HitNormal = 0;
-	delete RealHit;				RealHit = 0;
-
-	delete dir;					dir = 0;
-	delete tDelta;				tDelta = 0;
-	delete pos;					pos = 0;
-	delete end1;				end1 = 0;
-	delete step;				step = 0;
-	delete tMax;				tMax = 0;
 }
 
 float cTracer::SigNum( float a_Num )
@@ -74,60 +42,60 @@ float cTracer::SigNum( float a_Num )
 void cTracer::SetValues( const Vector3f & a_Start, const Vector3f & a_Direction )
 {
 	// calculate the direction of the ray (linear algebra)
-	*dir = a_Direction;
+	dir = a_Direction;
 
 	// decide which direction to start walking in
-	step->x = (int) SigNum(dir->x);
-	step->y = (int) SigNum(dir->y);
-	step->z = (int) SigNum(dir->z);
+	step.x = (int) SigNum(dir.x);
+	step.y = (int) SigNum(dir.y);
+	step.z = (int) SigNum(dir.z);
 
 	// normalize the direction vector
-	if( dir->SqrLength() > 0.f ) dir->Normalize();
+	if( dir.SqrLength() > 0.f ) dir.Normalize();
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
 	// same but y-direction
-	if( dir->x != 0.f ) tDelta->x = 1/fabs(dir->x);
-	else tDelta->x = 0;
-	if( dir->y != 0.f ) tDelta->y = 1/fabs(dir->y);
-	else tDelta->y = 0;
-	if( dir->z != 0.f )	tDelta->z = 1/fabs(dir->z);
-	else tDelta->z = 0;
+	if( dir.x != 0.f ) tDelta.x = 1/fabs(dir.x);
+	else tDelta.x = 0;
+	if( dir.y != 0.f ) tDelta.y = 1/fabs(dir.y);
+	else tDelta.y = 0;
+	if( dir.z != 0.f )	tDelta.z = 1/fabs(dir.z);
+	else tDelta.z = 0;
 
 	// start voxel coordinates
 	// use your
 	// transformer
 	// function here
-	pos->x = (int)floorf(a_Start.x);
-	pos->y = (int)floorf(a_Start.y);
-	pos->z = (int)floorf(a_Start.z);
+	pos.x = (int)floorf(a_Start.x);
+	pos.y = (int)floorf(a_Start.y);
+	pos.z = (int)floorf(a_Start.z);
 
 	// calculate distance to first intersection in the voxel we start from
-	if(dir->x < 0)
+	if(dir.x < 0)
 	{
-		tMax->x = ((float)pos->x - a_Start.x) / dir->x;
+		tMax.x = ((float)pos.x - a_Start.x) / dir.x;
 	}
 	else
 	{
-		tMax->x = (((float)pos->x + 1) - a_Start.x) / dir->x;
+		tMax.x = (((float)pos.x + 1) - a_Start.x) / dir.x;
 	}
 
-	if(dir->y < 0)
+	if(dir.y < 0)
 	{
-		tMax->y = ((float)pos->y - a_Start.y) / dir->y;
+		tMax.y = ((float)pos.y - a_Start.y) / dir.y;
 	}
 	else
 	{
-		tMax->y = (((float)pos->y + 1) - a_Start.y) / dir->y;
+		tMax.y = (((float)pos.y + 1) - a_Start.y) / dir.y;
 	}
 
-	if(dir->z < 0)
+	if(dir.z < 0)
 	{
-		tMax->z = ((float)pos->z - a_Start.z) / dir->z;
+		tMax.z = ((float)pos.z - a_Start.z) / dir.z;
 	}
 	else
 	{
-		tMax->z = (((float)pos->z + 1) - a_Start.z) / dir->z;
+		tMax.z = (((float)pos.z + 1) - a_Start.z) / dir.z;
 	}
 }
 
@@ -135,15 +103,15 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 {
 	SetValues( a_Start, a_Direction );
 
-	const Vector3f End = a_Start + ((*dir) * (float)a_Distance);
+	const Vector3f End = a_Start + (dir * (float)a_Distance);
 
 	// end voxel coordinates
-	end1->x = (int)floorf(End.x);
-	end1->y = (int)floorf(End.y);
-	end1->z = (int)floorf(End.z);
+	end1.x = (int)floorf(End.x);
+	end1.y = (int)floorf(End.y);
+	end1.z = (int)floorf(End.z);
 
 	// check if first is occupied
-	if( pos->Equals( end1 ) )
+	if( pos.Equals( end1 ) )
 	{
 		LOG("WARNING: cTracer: Start and end in same block");
 		return 0;
@@ -155,54 +123,54 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	while ( Iterations < a_Distance )
 	{
 		Iterations++;
-		if(tMax->x < tMax->y && tMax->x < tMax->z)
+		if(tMax.x < tMax.y && tMax.x < tMax.z)
 		{
-			tMax->x += tDelta->x;
-			pos->x += step->x;
+			tMax.x += tDelta.x;
+			pos.x += step.x;
 		}
-		else if(tMax->y < tMax->z)
+		else if(tMax.y < tMax.z)
 		{
-			tMax->y += tDelta->y;
-			pos->y += step->y;
+			tMax.y += tDelta.y;
+			pos.y += step.y;
 		}
 		else
 		{
-			tMax->z += tDelta->z;
-			pos->z += step->z;
+			tMax.z += tDelta.z;
+			pos.z += step.z;
 		}
 
-		if(step->x > 0.0f)
+		if(step.x > 0.0f)
 		{
-			if(pos->x >= end1->x)
+			if(pos.x >= end1.x)
 			{
 				reachedX = true;
 			}
 		}
-		else if(pos->x <= end1->x)
+		else if(pos.x <= end1.x)
 		{
 			reachedX = true;
 		}
 
-		if(step->y > 0.0f)
+		if(step.y > 0.0f)
 		{
-			if(pos->y >= end1->y)
+			if(pos.y >= end1.y)
 			{
 				reachedY = true;
 			}
 		}
-		else if(pos->y <= end1->y)
+		else if(pos.y <= end1.y)
 		{
 			reachedY = true;
 		}
 
-		if(step->z > 0.0f)
+		if(step.z > 0.0f)
 		{
-			if(pos->z >= end1->z)
+			if(pos.z >= end1.z)
 			{
 				reachedZ = true;
 			}
 		}
-		else if(pos->z <= end1->z)
+		else if(pos.z <= end1.z)
 		{
 			reachedZ = true;
 		}
@@ -212,15 +180,15 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			return false;
 		}
 		
-		char BlockID = m_World->GetBlock( pos->x, pos->y, pos->z );
+		char BlockID = m_World->GetBlock( pos.x, pos.y, pos.z );
 		//No collision with water ;)
 		if ( BlockID != E_BLOCK_AIR || IsBlockWater(BlockID))
 		{
-			*BlockHitPosition = pos;
-			int Normal = GetHitNormal(a_Start, End, *pos );
+			BlockHitPosition = pos;
+			int Normal = GetHitNormal(a_Start, End, pos );
 			if(Normal > 0)
 			{
-				*HitNormal = *m_NormalTable[Normal-1];
+				HitNormal = m_NormalTable[Normal-1];
 			}
 			return 1;
 		}
@@ -276,7 +244,7 @@ int cTracer::intersect3D_SegmentPlane( const Vector3f & a_Origin, const Vector3f
 		return 0;                       // no intersection
 
 	//Vector3f I ( a_Ray->GetOrigin() + sI * u );//S.P0 + sI * u;                 // compute segment intersect point
-	*RealHit = a_Origin + u * sI;
+	RealHit = a_Origin + u * sI;
 	return 1;
 }
 

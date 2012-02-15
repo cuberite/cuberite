@@ -34,16 +34,11 @@ CLASS_DEFINITION( cPickup, cEntity )
 cPickup::~cPickup()
 {
 	delete m_Item;
-	delete m_Speed;
-	delete m_ResultingSpeed;
-	delete m_WaterSpeed;
 }
 
 cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity( ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
-	, m_Speed( new Vector3f( a_SpeedX, a_SpeedY, a_SpeedZ ) )
-	, m_ResultingSpeed(new Vector3f())
-	, m_WaterSpeed(new Vector3f())
+	, m_Speed( a_SpeedX, a_SpeedY, a_SpeedZ )
 	, m_bOnGround( false )
 	, m_bReplicated( false )
 	, m_Timer( 0.f )
@@ -87,9 +82,9 @@ cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 	m_Item->m_ItemCount = a_PickupSpawnPacket->m_Count;
 	m_Item->m_ItemHealth = 0x0;
 
-	m_Speed->x = (float)(a_PickupSpawnPacket->m_Rotation)	/ 8;
-	m_Speed->y = (float)(a_PickupSpawnPacket->m_Pitch)		/ 8;
-	m_Speed->z = (float)(a_PickupSpawnPacket->m_Roll)		/ 8;
+	m_Speed.x = (float)(a_PickupSpawnPacket->m_Rotation)	/ 8;
+	m_Speed.y = (float)(a_PickupSpawnPacket->m_Pitch)		/ 8;
+	m_Speed.z = (float)(a_PickupSpawnPacket->m_Roll)		/ 8;
 
 	// Spawn it on clients
 	if (a_PickupSpawnPacket->m_Item != E_ITEM_EMPTY)
@@ -116,12 +111,12 @@ cPacket * cPickup::GetSpawnPacket(void) const
 	PickupSpawn->m_Item     = (short)m_Item->m_ItemID;
 	PickupSpawn->m_Count    = m_Item->m_ItemCount;
 	PickupSpawn->m_Health   = m_Item->m_ItemHealth;
-	PickupSpawn->m_PosX     = (int) (m_Pos->x * 32);
-	PickupSpawn->m_PosY     = (int) (m_Pos->y * 32);
-	PickupSpawn->m_PosZ     = (int) (m_Pos->z * 32);
-	PickupSpawn->m_Rotation = (char)(m_Speed->x * 8);
-	PickupSpawn->m_Pitch    = (char)(m_Speed->y * 8);
-	PickupSpawn->m_Roll     = (char)(m_Speed->z * 8);
+	PickupSpawn->m_PosX     = (int) (m_Pos.x * 32);
+	PickupSpawn->m_PosY     = (int) (m_Pos.y * 32);
+	PickupSpawn->m_PosZ     = (int) (m_Pos.z * 32);
+	PickupSpawn->m_Rotation = (char)(m_Speed.x * 8);
+	PickupSpawn->m_Pitch    = (char)(m_Speed.y * 8);
+	PickupSpawn->m_Roll     = (char)(m_Speed.z * 8);
 	return PickupSpawn;
 }
 
@@ -148,7 +143,7 @@ void cPickup::Tick(float a_Dt)
 		return;
 	}
 
-	if( m_Pos->y < 0 ) // Out of this world!
+	if( m_Pos.y < 0 ) // Out of this world!
 	{
 		Destroy();
 		return;
@@ -175,21 +170,21 @@ void cPickup::Tick(float a_Dt)
 
 void cPickup::HandlePhysics(float a_Dt)
 {
-	m_ResultingSpeed->Set(0.f, 0.f, 0.f);
+	m_ResultingSpeed.Set(0.f, 0.f, 0.f);
 	cWorld * World = GetWorld();
 
 	if( m_bOnGround ) // check if it's still on the ground
 	{
-		int BlockX = (m_Pos->x)<0 ? (int)m_Pos->x-1 : (int)m_Pos->x;
-		int BlockZ = (m_Pos->z)<0 ? (int)m_Pos->z-1 : (int)m_Pos->z;
-		char BlockBelow = World->GetBlock( BlockX, (int)m_Pos->y -1, BlockZ );
+		int BlockX = (m_Pos.x)<0 ? (int)m_Pos.x-1 : (int)m_Pos.x;
+		int BlockZ = (m_Pos.z)<0 ? (int)m_Pos.z-1 : (int)m_Pos.z;
+		char BlockBelow = World->GetBlock( BlockX, (int)m_Pos.y -1, BlockZ );
 		//Not only air, falls through water ;)
 		if( BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow))
 		{
 			m_bOnGround = false;
 		}
-		char Block = World->GetBlock( BlockX, (int)m_Pos->y - (int)m_bOnGround, BlockZ );
-		char BlockIn = World->GetBlock( BlockX, (int)m_Pos->y, BlockZ );
+		char Block = World->GetBlock( BlockX, (int)m_Pos.y - (int)m_bOnGround, BlockZ );
+		char BlockIn = World->GetBlock( BlockX, (int)m_Pos.y, BlockZ );
 
 		if( IsBlockLava(Block) || Block == E_BLOCK_FIRE
 			|| IsBlockLava(BlockIn) || BlockIn == E_BLOCK_FIRE)
@@ -202,38 +197,38 @@ void cPickup::HandlePhysics(float a_Dt)
 		if( BlockIn != E_BLOCK_AIR && !IsBlockWater(BlockIn) ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;
-			m_Pos->y += 0.2;
+			m_Pos.y += 0.2;
 			m_bReplicated = false;
 		}
-		m_Speed->x *= 0.7f/(1+a_Dt);
-		if( fabs(m_Speed->x) < 0.05 ) m_Speed->x = 0;
-		m_Speed->z *= 0.7f/(1+a_Dt);
-		if( fabs(m_Speed->z) < 0.05 ) m_Speed->z = 0;
+		m_Speed.x *= 0.7f/(1+a_Dt);
+		if( fabs(m_Speed.x) < 0.05 ) m_Speed.x = 0;
+		m_Speed.z *= 0.7f/(1+a_Dt);
+		if( fabs(m_Speed.z) < 0.05 ) m_Speed.z = 0;
 	}
 
 
 	//get flowing direction
-	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) m_Pos->x - 1, (int) m_Pos->y, (int) m_Pos->z - 1);
+	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) m_Pos.x - 1, (int) m_Pos.y, (int) m_Pos.z - 1);
 
 
-	*m_WaterSpeed *= 0.9f;		//Keep old speed but lower it
+	m_WaterSpeed *= 0.9f;		//Keep old speed but lower it
 
 	switch(WaterDir)
 	{
 		case X_PLUS:
-			m_WaterSpeed->x = 1.f;
+			m_WaterSpeed.x = 1.f;
 			m_bOnGround = false;
 			break;
 		case X_MINUS:
-			m_WaterSpeed->x = -1.f;
+			m_WaterSpeed.x = -1.f;
 			m_bOnGround = false;
 			break;
 		case Z_PLUS:
-			m_WaterSpeed->z = 1.f;
+			m_WaterSpeed.z = 1.f;
 			m_bOnGround = false;
 			break;
 		case Z_MINUS:
-			m_WaterSpeed->z = -1.f;
+			m_WaterSpeed.z = -1.f;
 			m_bOnGround = false;
 			break;
 		
@@ -241,53 +236,53 @@ void cPickup::HandlePhysics(float a_Dt)
 		break;
 	}
 
-	*m_ResultingSpeed += *m_WaterSpeed;
+	m_ResultingSpeed += m_WaterSpeed;
 	
 
 	if( !m_bOnGround )
 	{
 
 		float Gravity = -9.81f*a_Dt;
-		m_Speed->y += Gravity;
+		m_Speed.y += Gravity;
 
 		// Set to hit position
-		*m_ResultingSpeed += *m_Speed;
+		m_ResultingSpeed += m_Speed;
 
 		cTracer Tracer( GetWorld() );
-		int Ret = Tracer.Trace( *m_Pos, *m_Speed, 2 );
+		int Ret = Tracer.Trace( m_Pos, m_Speed, 2 );
 		if( Ret ) // Oh noez! we hit something
 		{
 			
 
-			if( (*Tracer.RealHit - Vector3f(*m_Pos)).SqrLength() <= ( *m_ResultingSpeed * a_Dt ).SqrLength() )
+			if( (Tracer.RealHit - Vector3f(m_Pos)).SqrLength() <= ( m_ResultingSpeed * a_Dt ).SqrLength() )
 			{
 				m_bReplicated = false; // It's only interesting to replicate when we actually hit something...
 				if( Ret == 1 )
 				{
 
-					if( Tracer.HitNormal->x != 0.f ) m_Speed->x = 0.f;
-					if( Tracer.HitNormal->y != 0.f ) m_Speed->y = 0.f;
-					if( Tracer.HitNormal->z != 0.f ) m_Speed->z = 0.f;
+					if( Tracer.HitNormal.x != 0.f ) m_Speed.x = 0.f;
+					if( Tracer.HitNormal.y != 0.f ) m_Speed.y = 0.f;
+					if( Tracer.HitNormal.z != 0.f ) m_Speed.z = 0.f;
 
-					if( Tracer.HitNormal->y > 0 ) // means on ground
+					if( Tracer.HitNormal.y > 0 ) // means on ground
 					{
 						m_bOnGround = true;
 					}
 				}
-				*m_Pos = Tracer.RealHit;
-				*m_Pos += *Tracer.HitNormal * 0.2f;
+				m_Pos = Tracer.RealHit;
+				m_Pos += Tracer.HitNormal * 0.2f;
 
 			}
 			else
-				*m_Pos += *m_ResultingSpeed*a_Dt;
+				m_Pos += m_ResultingSpeed*a_Dt;
 		}
 		else
 		{	// We didn't hit anything, so move =]
-			*m_Pos += *m_ResultingSpeed * a_Dt;
+			m_Pos += m_ResultingSpeed * a_Dt;
 		}
 	}
 	//Usable for debugging
-	//SetPosition(m_Pos->x, m_Pos->y, m_Pos->z);
+	//SetPosition(m_Pos.x, m_Pos.y, m_Pos.z);
 }
 
 

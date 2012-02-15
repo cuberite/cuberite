@@ -167,9 +167,9 @@ void cPawn::SetMetaData(MetaData a_MetaData)
 //----Change Entity MetaData
 void cPawn::CheckMetaDataBurn()
 {
-	char Block = GetWorld()->GetBlock((int) m_Pos->x, (int) m_Pos->y, (int) m_Pos->z);
-	char BlockAbove = GetWorld()->GetBlock((int) m_Pos->x, (int) m_Pos->y + 1, (int) m_Pos->z);
-	char BlockBelow = GetWorld()->GetBlock((int) m_Pos->x, (int) m_Pos->y - 1, (int) m_Pos->z);
+	char Block = GetWorld()->GetBlock((int) m_Pos.x, (int) m_Pos.y, (int) m_Pos.z);
+	char BlockAbove = GetWorld()->GetBlock((int) m_Pos.x, (int) m_Pos.y + 1, (int) m_Pos.z);
+	char BlockBelow = GetWorld()->GetBlock((int) m_Pos.x, (int) m_Pos.y - 1, (int) m_Pos.z);
 	
 	if (
 		(GetMetaData() == BURNING) &&
@@ -200,8 +200,8 @@ void cPawn::CheckMetaDataBurn()
 void cPawn::InStateBurning(float a_Dt)
 {
 	m_FireDamageInterval += a_Dt;
-	char Block = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y, (int)m_Pos->z );
-	char BlockAbove = GetWorld()->GetBlock( (int)m_Pos->x, (int)m_Pos->y + 1, (int)m_Pos->z );	
+	char Block = GetWorld()->GetBlock( (int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z );
+	char BlockAbove = GetWorld()->GetBlock( (int)m_Pos.x, (int)m_Pos.y + 1, (int)m_Pos.z );	
 	if (m_FireDamageInterval > 800)
 	{
 
