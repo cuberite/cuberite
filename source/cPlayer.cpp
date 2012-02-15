@@ -98,9 +98,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	{
 		m_Inventory->Clear();
 		m_CreativeInventory->Clear();
-		SetPosX( cRoot::Get()->GetDefaultWorld()->GetSpawnX() );
-		SetPosY( cRoot::Get()->GetDefaultWorld()->GetSpawnY() );
-		SetPosZ( cRoot::Get()->GetDefaultWorld()->GetSpawnZ() );
+		m_Pos->x = cRoot::Get()->GetDefaultWorld()->GetSpawnX();
+		m_Pos->y = cRoot::Get()->GetDefaultWorld()->GetSpawnY();
+		m_Pos->z = cRoot::Get()->GetDefaultWorld()->GetSpawnZ();
 	}
 }
 
