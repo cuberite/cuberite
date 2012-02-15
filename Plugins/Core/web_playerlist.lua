@@ -1,6 +1,3 @@
-local PlayerHTML = ""
-local PlayerNum = 0
-
 function HandleRequest_PlayerList( Request )
 	local World = cRoot:Get():GetWorld()
 	local Content = ""
@@ -19,25 +16,21 @@ function HandleRequest_PlayerList( Request )
 	Content = Content .. "<p>Connected Players: <b>" .. World:GetNumPlayers() .. "</b></p>"
 	Content = Content .. "<table>"
 	
-	PlayerNum = 0
-	PlayerHTML = ""
-	World:ForEachPlayer( CreatePlayerList )
+	local PlayerNum = 0
+	local AddPlayerToTable = function( Player )
+		PlayerNum = PlayerNum + 1
+		Content = Content .. "<tr>"
+		Content = Content .. "<td style='width: 10px;'>" .. PlayerNum .. ".</td>"
+		Content = Content .. "<td>" .. Player:GetName() .. "</td>"
+		Content = Content .. "<td><a href='?playerlist-kick=" .. Player:GetName() .. "'>Kick</a></td>"
+		Content = Content .. "</tr>"
+	end
+	World:ForEachPlayer( AddPlayerToTable )
 
-	if( PlayerHTML ~= "" ) then
-		Content = Content .. PlayerHTML
-	else
+	if( PlayerNum == 0 ) then
 		Content = Content .. "<tr><td>None</td></tr>"
 	end
 	Content = Content .. "</table>"
 	Content = Content .. "<br>"
 	return Content
-end
-
-function CreatePlayerList( Player, Data )
-	PlayerNum = PlayerNum + 1
-	PlayerHTML = PlayerHTML .. "<tr>"
-	PlayerHTML = PlayerHTML .. "<td style='width: 10px;'>" .. PlayerNum .. ".</td>"
-	PlayerHTML = PlayerHTML .. "<td>" .. Player:GetName() .. "</td>"
-	PlayerHTML = PlayerHTML .. "<td><a href='?playerlist-kick=" .. Player:GetName() .. "'>Kick</a></td>"
-	PlayerHTML = PlayerHTML .. "</tr>"
 end

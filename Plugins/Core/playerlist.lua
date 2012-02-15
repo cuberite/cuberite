@@ -1,7 +1,9 @@
-local PlayerTable = {}
-
 function HandlePlayerListCommand( Split, Player )
-	PlayerTable = {}
+
+	local PlayerTable = {}
+	local AppendToTable = function( Player )
+		table.insert(PlayerTable, Player:GetName() )
+	end
 	Player:GetWorld():ForEachPlayer( AppendToTable )
 
 	local Message = cChatColor.Green .. "Connected players: (".. cChatColor.White.. #PlayerTable .. cChatColor.Green .. ")"
@@ -9,8 +11,4 @@ function HandlePlayerListCommand( Split, Player )
 	
 	Player:SendMessage( table.concat(PlayerTable, " ") )
 	return true
-end
-
-function AppendToTable( Player )
-	table.insert(PlayerTable, Player:GetName() )
 end
