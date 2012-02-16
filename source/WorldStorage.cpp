@@ -308,9 +308,17 @@ bool cWorldStorage::SaveOneChunk(void)
 		}
 		HasMore = (m_SaveQueue.size() > 0);
 	}
-	if (ShouldSave && !m_SaveSchema->SaveChunk(Save))
+	if (ShouldSave)
 	{
-		LOGWARNING("Cannot save chunk [%d, %d]", Save.m_ChunkX, Save.m_ChunkZ);
+		m_World->MarkChunkSaving(Save.m_ChunkX, 0, Save.m_ChunkZ);
+		if (m_SaveSchema->SaveChunk(Save))
+		{
+			m_World->MarkChunkSaved(Save.m_ChunkX, 0, Save.m_ChunkZ);
+		}
+		else
+		{
+			LOGWARNING("Cannot save chunk [%d, %d]", Save.m_ChunkX, Save.m_ChunkZ);
+		}
 	}
 	return HasMore;
 }
