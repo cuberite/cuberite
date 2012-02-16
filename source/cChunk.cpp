@@ -238,6 +238,8 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	
 	// Create block entities that the loader didn't load; fill them with defaults
 	CreateBlockEntities();
+
+	CalculateHeightmap();
 }
 
 
