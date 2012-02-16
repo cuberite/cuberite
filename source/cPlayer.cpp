@@ -148,7 +148,8 @@ cPacket * cPlayer::GetSpawnPacket(void) const
 	SpawnPacket->m_PosZ        = (int)(m_Pos.z * 32);
 	SpawnPacket->m_Rotation    = (char)((m_Rot.x / 360.f) * 256);
 	SpawnPacket->m_Pitch       = (char)((m_Rot.y / 360.f) * 256);
-	SpawnPacket->m_CurrentItem = (short)m_Inventory->GetEquippedItem().m_ItemID;
+	short ItemID = (short)m_Inventory->GetEquippedItem().m_ItemID;
+	SpawnPacket->m_CurrentItem = (ItemID > 0) ? ItemID : 0;  // Unlike -1 in inventory, the named entity packet uses 0 for "none"
 	return SpawnPacket;
 }
 
