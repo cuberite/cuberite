@@ -91,7 +91,7 @@ public:
 	void RemovePlayer( cPlayer* a_Player );
 
 	typedef struct lua_State lua_State;
-	bool ForEachPlayer(cPlayerListCallback * a_Callback);	// Calls the callback for each player in the list
+	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// Calls the callback for each player in the list
 															// >> EXPORTED IN MANUALBINDINGS <<
 	unsigned int GetNumPlayers();													//tolua_export
 	

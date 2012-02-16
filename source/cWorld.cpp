@@ -1052,13 +1052,13 @@ void cWorld::RemovePlayer( cPlayer* a_Player )
 
 
 
-bool cWorld::ForEachPlayer(cPlayerListCallback * a_Callback)
+bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
 	// Calls the callback for each player in the list
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if (a_Callback->Item(*itr))
+		if (a_Callback.Item(*itr))
 		{
 			return false;
 		}

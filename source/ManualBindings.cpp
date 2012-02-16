@@ -174,7 +174,7 @@ static int tolua_cWorld_ForEachPlayer(lua_State* tolua_S)
 		int TableRef;
 	} Callback( tolua_S, FuncRef, TableRef );
 
-	bool bRetVal = self->ForEachPlayer( &Callback );
+	bool bRetVal = self->ForEachPlayer( Callback );
 
 	// Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references
 	luaL_unref( tolua_S, LUA_REGISTRYINDEX, TableRef );

@@ -471,7 +471,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 					return false;
 				}
 			} Logger;
-			cRoot::Get()->GetWorld()->ForEachPlayer(&Logger);
+			cRoot::Get()->GetWorld()->ForEachPlayer(Logger);
 			return;
 		}
 		if( split[0].compare( "numchunks" ) == 0 )
