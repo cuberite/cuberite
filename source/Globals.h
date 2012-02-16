@@ -12,7 +12,23 @@
 #ifndef _MSC_VER
 	// Non-MS compilers don't know the override keyword
 	#define override
+#else
+	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
+	#pragma warning(disable:4481)
+	
+	// Disable some warnings that we don't care about:
+	#pragma warning(disable:4100)
 #endif  // _MSC_VER
+
+
+
+
+
+// A macro to disallow the copy constructor and operator= functions
+// This should be used in the private: declarations for any class that shouldn't allow copying itself
+#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+	TypeName(const TypeName &); \
+	void operator=(const TypeName &)
 
 
 
@@ -114,8 +130,8 @@
 
 
 
-/// A generic interface used in ForEach() functions
-template <typename Type> class cListCallback
+/// A generic interface used mainly in ForEach() functions
+template <typename Type> class cItemCallback
 {
 public:
 	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating

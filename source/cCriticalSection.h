@@ -45,6 +45,9 @@ public:
 	// Temporarily unlock or re-lock:
 	void Lock(void);
 	void Unlock(void);
+
+private:
+	DISALLOW_COPY_AND_ASSIGN(cCSLock);
 } ;
 
 
@@ -58,6 +61,9 @@ class cCSUnlock
 public:
 	cCSUnlock(cCSLock & a_Lock);
 	~cCSUnlock();
+	
+private:
+	DISALLOW_COPY_AND_ASSIGN(cCSUnlock);
 } ;
 
 

@@ -910,6 +910,7 @@
     <ClCompile Include="..\source\StackWalker.cpp" />
     <ClCompile Include="..\source\WorldStorage.cpp" />
     <ClCompile Include="..\source\WSSCompact.cpp" />
+    <ClCompile Include="..\source\StringCompression.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1404,6 +1405,7 @@
     <ClInclude Include="..\source\LeakFinder.h" />
     <ClInclude Include="..\source\StackWalker.h" />
     <ClInclude Include="..\source\WorldStorage.h" />
+    <ClInclude Include="..\source\StringCompression.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

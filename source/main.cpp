@@ -9,9 +9,10 @@
 
 #include "SquirrelBindings.h"
 #if USE_SQUIRREL
+	#pragma warning(push)
 	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
 	#include <sqplus/sqplus.h>
-	#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
+	#pragma warning(pop)
 #endif
 
 
@@ -26,7 +27,10 @@
 
 #if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	#define XML_LEAK_FINDER
+	#pragma warning(push)
+	#pragma warning(disable:4100)
 	#include "LeakFinder.h"
+	#pragma warning(pop)
 #endif
 
 

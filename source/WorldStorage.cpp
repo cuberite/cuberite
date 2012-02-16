@@ -10,6 +10,9 @@
 #include "WSSCompact.h"
 #include "cWorld.h"
 #include "cChunkGenerator.h"
+#include "cEntity.h"
+#include "cBlockEntity.h"
+#include "BlockID.h"
 
 
 
@@ -24,10 +27,74 @@ public:
 	
 protected:
 	// cWSSchema overrides:
-	virtual bool LoadChunk(const cChunkPtr & a_Chunk) override {return false; }
-	virtual bool SaveChunk(const cChunkPtr & a_Chunk) override {return true; }
+	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override {return false; }
+	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override {return true; }
 	virtual const AString GetName(void) const override {return "forgetful"; }
 } ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cJsonChunkSerializer:
+
+cJsonChunkSerializer::cJsonChunkSerializer(void) :
+	m_HasJsonData(false)
+{
+	m_Root["Chests"]   = m_AllChests;
+	m_Root["Furnaces"] = m_AllFurnaces;
+	m_Root["Signs"]    = m_AllSigns;
+}
+
+
+
+
+
+void cJsonChunkSerializer::BlockData(const char * a_Data)
+{
+	m_BlockData.assign(a_Data, cChunk::c_BlockDataSize);
+}
+
+
+
+
+
+void cJsonChunkSerializer::Entity(cEntity * a_Entity)
+{
+	// TODO: a_Entity->SaveToJson(m_Root);
+}
+
+
+
+
+
+void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
+{
+	const char * SaveInto = NULL;
+	switch (a_BlockEntity->GetBlockType())
+	{
+		case E_BLOCK_CHEST:     SaveInto = "Chests";   break;
+		case E_BLOCK_FURNACE:   SaveInto = "Furnaces"; break;
+		case E_BLOCK_SIGN_POST: SaveInto = "Signs";    break;
+		case E_BLOCK_WALLSIGN:  SaveInto = "Signs";    break;
+		
+		default:
+		{
+			assert(!"Unhandled blocktype in BlockEntities list while saving to JSON");
+			break;
+		}
+	}  // switch (BlockEntity->GetBlockType())
+	if (SaveInto == NULL)
+	{
+		return;
+	}
+	
+	Json::Value val;
+	a_BlockEntity->SaveToJson(val);
+	m_Root[SaveInto].append(val);
+	m_HasJsonData = true;
+}
 
 
 
@@ -94,12 +161,12 @@ void cWorldStorage::WaitForFinish(void)
 
 
 
-void cWorldStorage::QueueLoadChunk(cChunkPtr & a_Chunk)
+void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	// Queues the chunk for loading; if not loaded, the chunk will be generated
 	cCSLock Lock(m_CSLoadQueue);
-	m_LoadQueue.remove(a_Chunk);  // Don't add twice
-	m_LoadQueue.push_back(a_Chunk);
+	m_LoadQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkZ));  // Don't add twice
+	m_LoadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -107,11 +174,11 @@ void cWorldStorage::QueueLoadChunk(cChunkPtr & a_Chunk)
 
 
 
-void cWorldStorage::QueueSaveChunk(cChunkPtr & a_Chunk)
+void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSSaveQueue);
-	m_SaveQueue.remove(a_Chunk);  // Don't add twice
-	m_SaveQueue.push_back(a_Chunk);
+	m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkZ));  // Don't add twice
+	m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -119,7 +186,7 @@ void cWorldStorage::QueueSaveChunk(cChunkPtr & a_Chunk)
 
 
 
-void cWorldStorage::UnqueueLoad(const cChunkPtr & a_Chunk)
+void cWorldStorage::UnqueueLoad(const cChunkCoords & a_Chunk)
 {
 	cCSLock Lock(m_CSLoadQueue);
 	m_LoadQueue.remove(a_Chunk);
@@ -129,7 +196,7 @@ void cWorldStorage::UnqueueLoad(const cChunkPtr & a_Chunk)
 
 
 
-void cWorldStorage::UnqueueSave(const cChunkPtr & a_Chunk)
+void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 {
 	cCSLock Lock(m_CSSaveQueue);
 	m_SaveQueue.remove(a_Chunk);
@@ -189,38 +256,8 @@ void cWorldStorage::Execute(void)
 				return;
 			}
 			
-			// Load 1 chunk:
-			cChunkPtr ToLoad;
-			{
-				cCSLock Lock(m_CSLoadQueue);
-				if (m_LoadQueue.size() > 0)
-				{
-					ToLoad = m_LoadQueue.front();
-					m_LoadQueue.pop_front();
-				}
-				HasMore = (m_LoadQueue.size() > 0);
-			}
-			if ((ToLoad != NULL) && !LoadChunk(ToLoad))
-			{
-				// The chunk couldn't be loaded, generate it:
-				m_World->GetGenerator().GenerateChunk(ToLoad->GetPosX(), ToLoad->GetPosZ());
-			}
-			
-			// Save 1 chunk:
-			cChunkPtr Save;
-			{
-				cCSLock Lock(m_CSSaveQueue);
-				if (m_SaveQueue.size() > 0)
-				{
-					Save = m_SaveQueue.front();
-					m_SaveQueue.pop_front();
-				}
-				HasMore = HasMore || (m_SaveQueue.size() > 0);
-			}
-			if ((Save != NULL) && (!m_SaveSchema->SaveChunk(Save)))
-			{
-				LOGWARNING("Cannot save chunk [%d, %d]", Save->GetPosX(), Save->GetPosZ());
-			}
+			HasMore = LoadOneChunk();
+			HasMore = HasMore | SaveOneChunk();
 		} while (HasMore);
 	}
 }
@@ -229,9 +266,62 @@ void cWorldStorage::Execute(void)
 
 
 
-bool cWorldStorage::LoadChunk(const cChunkPtr & a_Chunk)
+bool cWorldStorage::LoadOneChunk(void)
 {
-	if (a_Chunk->IsValid())
+	cChunkCoords ToLoad(0, 0);
+	bool HasMore;
+	bool ShouldLoad = false;
+	{
+		cCSLock Lock(m_CSLoadQueue);
+		if (m_LoadQueue.size() > 0)
+		{
+			ToLoad = m_LoadQueue.front();
+			m_LoadQueue.pop_front();
+			ShouldLoad = true;
+		}
+		HasMore = (m_LoadQueue.size() > 0);
+	}
+	if (ShouldLoad && !LoadChunk(ToLoad))
+	{
+		// The chunk couldn't be loaded, generate it:
+		m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
+	}
+	return HasMore;
+}
+
+
+
+
+
+bool cWorldStorage::SaveOneChunk(void)
+{
+	cChunkCoords Save(0, 0);
+	bool HasMore;
+	bool ShouldSave = false;
+	{
+		cCSLock Lock(m_CSSaveQueue);
+		if (m_SaveQueue.size() > 0)
+		{
+			Save = m_SaveQueue.front();
+			m_SaveQueue.pop_front();
+			ShouldSave = true;
+		}
+		HasMore = (m_SaveQueue.size() > 0);
+	}
+	if (ShouldSave && !m_SaveSchema->SaveChunk(Save))
+	{
+		LOGWARNING("Cannot save chunk [%d, %d]", Save.m_ChunkX, Save.m_ChunkZ);
+	}
+	return HasMore;
+}
+
+
+
+
+
+bool cWorldStorage::LoadChunk(const cChunkCoords & a_Chunk)
+{
+	if (m_World->IsChunkValid(a_Chunk.m_ChunkX, 0, a_Chunk.m_ChunkZ))
 	{
 		// Already loaded (can happen, since the queue is async)
 		return true;
@@ -244,7 +334,7 @@ bool cWorldStorage::LoadChunk(const cChunkPtr & a_Chunk)
 	
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
 	{
-		if ((*itr)->LoadChunk(a_Chunk))
+		if (((*itr) != m_SaveSchema) && (*itr)->LoadChunk(a_Chunk))
 		{
 			return true;
 		}
@@ -252,6 +342,7 @@ bool cWorldStorage::LoadChunk(const cChunkPtr & a_Chunk)
 	
 	return false;
 }
+
 
 
 

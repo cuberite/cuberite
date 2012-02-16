@@ -398,7 +398,6 @@ void cWorld::InitializeSpawn()
 
 void cWorld::Tick(float a_Dt)
 {
-	int randWeather = 0;
 	m_Time += a_Dt / 1000.f;
 
 	CurrentTick++;
@@ -932,6 +931,78 @@ void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude)
 		}
 		(*itr)->GetClientHandle()->Send( a_Packet );
 	}
+}
+
+
+
+
+
+void cWorld::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastToChunkOfBlock(a_X, a_Y, a_Z, a_Packet, a_Exclude);
+}
+
+
+
+
+
+void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->MarkChunkSaving(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->MarkChunkSaved (a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+{
+	m_ChunkMap->ChunkDataLoaded(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+}
+
+
+
+
+
+void cWorld::SetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+{
+	m_ChunkMap->SetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+}
+
+
+
+
+
+void cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback)
+{
+	m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
+{
+	return m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
 

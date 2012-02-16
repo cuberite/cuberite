@@ -246,7 +246,8 @@ MCServer : \
 		build/cIsThread.o\
 		build/cSocketThreads.o\
 		build/WorldStorage.o\
-		build/WSSCompact.o
+		build/WSSCompact.o\
+		build/StringCompression.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -462,6 +463,7 @@ MCServer : \
 		build/cSocketThreads.o\
 		build/WorldStorage.o\
 		build/WSSCompact.o\
+		build/StringCompression.o\
 		-o MCServer
 
 clean : 
@@ -1549,6 +1551,9 @@ build/WorldStorage.o : source/WorldStorage.cpp
 
 build/WSSCompact.o : source/WSSCompact.cpp
 	$(CC) $(CC_OPTIONS) source/WSSCompact.cpp -c $(INCLUDE) -o build/WSSCompact.o	
+
+build/StringCompression.o : source/StringCompression.cpp
+	$(CC) $(CC_OPTIONS) source/StringCompression.cpp -c $(INCLUDE) -o build/StringCompression.o	
 
 
 # Template: copy and delete the "# "; insert filenames

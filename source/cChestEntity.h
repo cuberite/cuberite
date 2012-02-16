@@ -37,10 +37,10 @@ public:
 	cItem *	GetSlot( int a_Slot );
 	void	SetSlot( int a_Slot, cItem & a_Item );
 
-	bool LoadFromFile(cFile & a_File);  // deprecated format
+	OBSOLETE bool LoadFromFile(cFile & a_File);  // deprecated format
 
 	bool LoadFromJson( const Json::Value& a_Value );
-	void SaveToJson( Json::Value& a_Value );
+	virtual void SaveToJson(Json::Value& a_Value ) override;
 
 	void SendTo( cClientHandle* a_Client, cServer* a_Server );
 

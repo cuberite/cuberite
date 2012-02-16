@@ -27,7 +27,7 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
-	// TODO: Get rid of these in favor of the direct action methods:
+	// TODO: Get rid of these (put into Private section) in favor of the direct action methods:
 	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
 	
@@ -35,6 +35,14 @@ public:
 	/// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // a_Player rclked block entity at the coords specified, handle it
+
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void SetChunkData   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void GetChunkData   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
+	bool IsChunkValid   (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
@@ -51,7 +59,7 @@ public:
 		BlockToChunk(a_X, a_Y, a_Z, a_ChunkX, a_ChunkZ);
 
 		a_X = a_X - a_ChunkX * 16;
-		a_Z = a_Z - a_ChunkZ*16;
+		a_Z = a_Z - a_ChunkZ * 16;
 	}
 	
 	/// Converts absolute block coords to chunk coords:

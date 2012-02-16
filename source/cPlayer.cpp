@@ -922,7 +922,7 @@ bool cPlayer::SaveToDisk()
 		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_pState->PlayerName.c_str(), SourceFile.c_str());
 		return false;
 	}
-	if (f.Write(JsonData.c_str(), JsonData.size()) != JsonData.size())
+	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
 	{
 		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
 		return false;

@@ -33,7 +33,7 @@ class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
 typedef std::list< cPlayer * > cPlayerList;
-typedef cListCallback<cPlayer> cPlayerListCallback;
+typedef cItemCallback<cPlayer> cPlayerListCallback;
 
 
 
@@ -67,7 +67,15 @@ public:
 
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
 	
-	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL) {return m_ChunkMap->BroadcastToChunkOfBlock(a_X, a_Y, a_Z, a_Packet, a_Exclude); }
+	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
+	
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void SetChunkData   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void GetChunkData   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
+	bool IsChunkValid   (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	
 	// MOTD
 	const AString & GetDescription(void) const {return m_Description; }
@@ -117,7 +125,7 @@ public:
 	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
 	inline cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
 
-	// TODO: This interface is dangerous!
+	// TODO: This interface is dangerous! Export as a set of specific action functions for Lua: GetChestItem, GetFurnaceItem, SetFurnaceItem, SetSignLines etc.
 	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
 	
 	/// a_Player is using block entity at [x, y, z], handle that:

@@ -34,7 +34,7 @@ public:
 	bool LoadFromFile(cFile & a_File);  // deprecated format
 
 	bool LoadFromJson(const Json::Value& a_Value );
-	void SaveToJson  (Json::Value& a_Value );
+	virtual void SaveToJson(Json::Value& a_Value ) override;
 
 	bool Tick( float a_Dt );
 	

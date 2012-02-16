@@ -186,11 +186,6 @@ void cChestEntity::SendTo( cClientHandle* a_Client, cServer* a_Server )
 
 void cChestEntity::UsedBy( cPlayer * a_Player )
 {
-	LOG("Used a chest");
-// 	m_Content[0].m_ItemCount	= 1;
-// 	m_Content[0].m_ItemID		= E_ITEM_STONE;
-// 	m_Content[0].m_ItemHealth	= 0;
-
 	if( !GetWindow() )
 	{
 		cWindow* Window = new cWindow( this, true );

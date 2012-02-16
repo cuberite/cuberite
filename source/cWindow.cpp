@@ -30,6 +30,10 @@ cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 	if( !m_bInventoryVisible ) m_DraggingItem = new cItem();
 }
 
+
+
+
+
 cWindow::~cWindow()
 {
 	if( !m_bInventoryVisible && m_DraggingItem )
@@ -39,6 +43,10 @@ cWindow::~cWindow()
 	}
 }
 
+
+
+
+
 cItem* cWindow::GetSlot( int a_Slot )
 {
 	if(a_Slot > -1 && a_Slot < m_NumSlots)
@@ -47,6 +55,10 @@ cItem* cWindow::GetSlot( int a_Slot )
 	}
 	return 0;
 }
+
+
+
+
 
 cItem* cWindow::GetDraggingItem( cPlayer * a_Player /* = 0 */ )
 {
@@ -61,9 +73,12 @@ cItem* cWindow::GetDraggingItem( cPlayer * a_Player /* = 0 */ )
 	return m_DraggingItem;
 }
 
+
+
+
+
 void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 {
-	//LOG("cWindow click");
 	if( a_ClickPacket->m_WindowID != m_WindowID )
 	{
 		LOG("WRONG WINDOW ID!");
@@ -183,6 +198,10 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 	if( m_DraggingItem ) LOG("Dragging: %i", m_DraggingItem->m_ItemCount );
 }
 
+
+
+
+
 void cWindow::Open( cPlayer & a_Player )
 {
 	// If player is already in OpenedBy remove player first
@@ -198,6 +217,10 @@ void cWindow::Open( cPlayer & a_Player )
 	a_Player.GetClientHandle()->Send( WindowOpen );
 }
 
+
+
+
+
 void cWindow::Close( cPlayer & a_Player )
 {
 	//Checks wheather the player is still holding an item
@@ -205,11 +228,9 @@ void cWindow::Close( cPlayer & a_Player )
 	{
 		LOG("Player holds item! Dropping it...");
 		a_Player.TossItem( true, m_DraggingItem->m_ItemCount );
-		
 	}
-	
 
-    cPacket_WindowClose WindowClose;
+	cPacket_WindowClose WindowClose;
 	WindowClose.m_Close = (char)m_WindowID;
 	cClientHandle* ClientHandle = a_Player.GetClientHandle();
 	if( ClientHandle ) ClientHandle->Send( WindowClose );
@@ -219,9 +240,11 @@ void cWindow::Close( cPlayer & a_Player )
 	{
 		Destroy();
 	}
-
-
 }
+
+
+
+
 
 void cWindow::OwnerDestroyed()
 {
@@ -232,6 +255,10 @@ void cWindow::OwnerDestroyed()
 	}
 	(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
 }
+
+
+
+
 
 void cWindow::Destroy()
 {
@@ -244,8 +271,16 @@ void cWindow::Destroy()
 	delete this;
 }
 
+
+
+
+
 void cWindow::SendWholeWindow( cClientHandle* a_Client )
 {
 	cPacket_WholeInventory Inventory( this );
 	a_Client->Send( Inventory );
 }
+
+
+
+

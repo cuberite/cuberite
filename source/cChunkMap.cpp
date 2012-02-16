@@ -106,7 +106,7 @@ cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkZ);
 	if (!(Chunk->IsValid()))
 	{
-		m_World->GetStorage().QueueLoadChunk(Chunk);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
 	}
 	return Chunk;
 }
@@ -168,6 +168,108 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 		return;
 	}
 	Chunk->UseBlockEntity(a_Player, a_X, a_Y, a_Z);
+}
+
+
+
+
+
+void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->MarkDirty();
+}
+
+
+
+
+
+void cChunkMap::MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->MarkSaving();
+}
+
+
+
+
+
+void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->MarkSaved();
+}
+
+
+
+
+
+void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	Chunk->SetAllData(a_BlockData, a_Entities, a_BlockEntities);
+	Chunk->MarkLoaded();
+}
+
+
+
+
+
+void cChunkMap::SetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	Chunk->SetAllData(a_BlockData, a_Entities, a_BlockEntities);
+}
+
+
+
+
+
+void cChunkMap::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->GetAllData(a_Callback);
+}
+
+
+
+
+
+bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	return (Chunk != NULL) && Chunk->IsValid();
 }
 
 
@@ -274,9 +376,9 @@ void cChunkMap::cChunkLayer::Save(void)
 	cWorld * World = m_Parent->GetWorld();
 	for (int i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
-		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid())
+		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->IsDirty())
 		{
-			World->GetStorage().QueueSaveChunk(m_Chunks[i]);
+			World->GetStorage().QueueSaveChunk(m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ());
 		}
 	}  // for i - m_Chunks[]
 }
@@ -292,9 +394,6 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 	{
 		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))
 		{
-			// TODO: Save the chunk if it was changed
-			World->GetStorage().QueueSaveChunk(m_Chunks[i]); // _FT: FIXME: Right now it saves chunks even though it might not have changed.
-															 // Also I'm not sure what's going on when I queue this chunks and the next line says reset the pointer.. =/
 			m_Chunks[i].reset();
 		}
 	}  // for i - m_Chunks[]

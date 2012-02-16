@@ -63,6 +63,8 @@ cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	, m_BlockTickZ( 0 )
 	, m_World( a_World )
 	, m_IsValid(false)
+	, m_IsDirty(false)
+	, m_IsSaving(false)
 {
 	// LOGINFO("### new cChunk (%i, %i) at %p, thread 0x%x ###", a_X, a_Z, this, GetCurrentThreadId());
 }
@@ -143,7 +145,120 @@ void cChunk::SetValid(bool a_SendToClients)
 bool cChunk::CanUnload(void)
 {
 	cCSLock Lock(m_CSClients);
-	return m_LoadedByClient.empty();
+	return m_LoadedByClient.empty() && !m_IsDirty;
+}
+
+
+
+
+
+void cChunk::MarkSaving(void)
+{
+	m_IsSaving = true;
+}
+
+
+
+
+
+void cChunk::MarkSaved(void)
+{
+	if (!m_IsSaving)
+	{
+		return;
+	}
+	m_IsDirty = false;
+}
+
+
+
+
+
+void cChunk::MarkLoaded(void)
+{
+	m_IsDirty = false;
+	m_IsValid = true;
+}
+
+
+
+
+
+void cChunk::GetAllData(cChunkDataCallback * a_Callback)
+{
+	a_Callback->BlockData(m_BlockData);
+	
+	cCSLock Lock(m_CSEntities);
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	{
+		a_Callback->Entity(*itr);
+	}
+	
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		a_Callback->BlockEntity(*itr);
+	}
+}
+
+
+
+
+
+void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+{
+	memcpy(m_BlockData, a_BlockData, sizeof(m_BlockData));
+
+	// Clear the internal entities:
+	cCSLock Lock(m_CSEntities);
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	{
+		if ((*itr)->GetEntityType() == cEntity::E_PLAYER)
+		{
+			// Move players into the new entity list
+			a_Entities.push_back(*itr);
+		}
+		else
+		{
+			// Delete other entities (there should not be any, since we're now loading / generating the chunk)
+			LOGWARNING("cChunk: There is an unexpected entity #%d of type %s in chunk [%d, %d]; it will be deleted",
+				(*itr)->GetUniqueID(), (*itr)->GetClass(),
+				m_PosX, m_PosZ
+			);
+			delete *itr;
+		}
+	}
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		delete *itr;
+	}
+	
+	// Swap the entity lists:
+	std::swap(a_Entities, m_Entities);
+	std::swap(a_BlockEntities, m_BlockEntities);
+	
+	// Create block entities that the loader didn't load; fill them with defaults
+	CreateBlockEntities();
+}
+
+
+
+
+
+/// Returns true if there is a block entity at the coords specified
+bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		if (
+			((*itr)->GetPosX() == a_BlockX) &&
+			((*itr)->GetPosY() == a_BlockY) &&
+			((*itr)->GetPosZ() == a_BlockZ)
+		)
+		{
+			return true;
+		}
+	}  // for itr - m_BlockEntities[]
+	return false;
 }
 
 
@@ -405,9 +520,8 @@ char cChunk::GetHeight( int a_X, int a_Z )
 
 
 
-void cChunk::CreateBlockEntities()
+void cChunk::CreateBlockEntities(void)
 {
-	cCSLock Lock(m_CSBlockLists);
 	for (int x = 0; x < 16; x++)
 	{
 		for (int z = 0; z < 16; z++)
@@ -419,20 +533,29 @@ void cChunk::CreateBlockEntities()
 				{
 					case E_BLOCK_CHEST:
 					{
-						m_BlockEntities.push_back( new cChestEntity( x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16, m_World) );
+						if (!HasBlockEntityAt(x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16))
+						{
+							m_BlockEntities.push_back( new cChestEntity( x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16, m_World) );
+						}
 						break;
 					}
 					
 					case E_BLOCK_FURNACE:
 					{
-						m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16, m_World) );
+						if (!HasBlockEntityAt(x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16))
+						{
+							m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16, m_World) );
+						}
 						break;
 					}
 					
 					case E_BLOCK_SIGN_POST:
 					case E_BLOCK_WALLSIGN:
 					{
-						m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16, m_World) );
+						if (!HasBlockEntityAt(x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16))
+						{
+							m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX * 16, y + m_PosY * 128, z + m_PosZ * 16, m_World) );
+						}
 						break;
 					}
 				}  // switch (BlockType)
@@ -678,6 +801,8 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 	assert(IsValid());  // Is this chunk loaded / generated?
 	
+	MarkDirty();
+	
 	int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	char OldBlockMeta = GetLight( m_BlockMeta, index );
 	char OldBlockType = m_BlockType[index];
@@ -741,6 +866,8 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	}
 
 	assert(IsValid());
+	
+	MarkDirty();
 	
 	const int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	const char OldBlock = m_BlockType[index];
@@ -868,6 +995,7 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
+			MarkDirty();
 			(reinterpret_cast<cPickup *>(*itr))->CollectedBy( a_Player );
 		}
 	}
@@ -893,6 +1021,7 @@ void cChunk::UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Li
 			)
 		)
 		{
+			MarkDirty();
 			(reinterpret_cast<cSignEntity *>(*itr))->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
 			(*itr)->SendTo(NULL);
 		}
@@ -906,6 +1035,7 @@ void cChunk::UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Li
 void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 {
 	cCSLock Lock(m_CSBlockLists);
+	MarkDirty();
 	m_BlockEntities.remove( a_BlockEntity );
 }
 
@@ -924,7 +1054,7 @@ void cChunk::AddClient( cClientHandle* a_Client )
 	cCSLock Lock(m_CSEntities);
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 	{
-		LOG("Entity at [%i %i %i] spawning for player \"%s\"", m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
+		LOG("Entity #%d (%s) at [%i %i %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
 		(*itr)->SpawnOn( a_Client );
 	}
 }
@@ -986,6 +1116,10 @@ bool cChunk::HasAnyClient(void)
 void cChunk::AddEntity( cEntity * a_Entity )
 {
 	cCSLock Lock(m_CSEntities);
+	if (a_Entity->GetEntityType() != cEntity::E_PLAYER)
+	{
+		MarkDirty();
+	}
 	m_Entities.push_back( a_Entity );
 }
 
@@ -1001,6 +1135,10 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 		SizeBefore = m_Entities.size();
 		m_Entities.remove(a_Entity);
 		SizeAfter = m_Entities.size();
+	}
+	if ((a_Entity->GetEntityType() != cEntity::E_PLAYER) && (SizeBefore != SizeAfter))
+	{
+		MarkDirty();
 	}
 }
 
@@ -1115,6 +1253,7 @@ bool cChunk::LoadFromDisk()
 	{
 		LOGINFO("Successfully deleted old format file \"%s\"", SourceFile.c_str());
 	}
+	m_IsDirty = false;
 	return true;
 }
 

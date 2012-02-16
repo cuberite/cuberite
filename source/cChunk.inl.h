@@ -1,9 +1,14 @@
+
 #ifndef __C_CHUNK_INL_H__
 #define __C_CHUNK_INL_H__
 
 #ifndef MAX
 # define MAX(a,b) (((a)>(b))?(a):(b))
 #endif
+
+
+
+
 
 __C_CHUNK_INLINE__
 char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
@@ -23,6 +28,10 @@ char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
 	return 0;
 }
 
+
+
+
+
 __C_CHUNK_INLINE__
 char cChunk::GetLight(char* a_Buffer, int x, int y, int z)
 {
@@ -41,6 +50,10 @@ char cChunk::GetLight(char* a_Buffer, int x, int y, int z)
 	return 0;
 }
 
+
+
+
+
 __C_CHUNK_INLINE__
 void cChunk::SetLight(char* a_Buffer, int a_BlockIdx, char a_Light)
 {
@@ -57,8 +70,13 @@ void cChunk::SetLight(char* a_Buffer, int a_BlockIdx, char a_Light)
 			a_Buffer[cindex] &= 0x0f; // Set second half to 0
 			a_Buffer[cindex] |= (a_Light << 4) & 0xf0;
 		}
+		MarkDirty();
 	}
 }
+
+
+
+
 
 __C_CHUNK_INLINE__
 void cChunk::SetLight(char* a_Buffer, int x, int y, int z, char light)
@@ -76,8 +94,13 @@ void cChunk::SetLight(char* a_Buffer, int x, int y, int z, char light)
 			a_Buffer[cindex] &= 0x0f; // Set second half to 0
 			a_Buffer[cindex] |= (light << 4) & 0xf0;
 		}
+		MarkDirty();
 	}
 }
+
+
+
+
 
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff)
@@ -91,6 +114,10 @@ void cChunk::SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, 
 	SetLight( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z+1 ), MAX(0,CurrentLight-a_Falloff) ) );
 }
 
+
+
+
+
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 {
@@ -98,6 +125,10 @@ void cChunk::SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 	SetLight( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetLight( a_LightBuffer, a_X-1, a_Y, a_Z ), CurrentLight-1) );
 	SetLight( a_LightBuffer, a_X+1, a_Y, a_Z, MAX(GetLight( a_LightBuffer, a_X+1, a_Y, a_Z ), CurrentLight-1) );
 }
+
+
+
+
 
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
@@ -107,6 +138,10 @@ void cChunk::SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 	SetLight( a_LightBuffer, a_X, a_Y+1, a_Z, MAX(GetLight( a_LightBuffer, a_X, a_Y+1, a_Z ), CurrentLight-1) );
 }
 
+
+
+
+
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 {
@@ -114,5 +149,9 @@ void cChunk::SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 	SetLight( a_LightBuffer, a_X, a_Y, a_Z-1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z-1 ), CurrentLight-1) );
 	SetLight( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z+1 ), CurrentLight-1) );
 }
+
+
+
+
 
 #endif

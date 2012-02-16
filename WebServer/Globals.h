@@ -8,6 +8,29 @@
 
 
 
+// Compiler-dependent stuff:
+#ifndef _MSC_VER
+	// Non-MS compilers don't know the override keyword
+	#define override
+#else
+	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
+	#pragma warning(disable:4481)
+#endif  // _MSC_VER
+
+
+
+
+
+// A macro to disallow the copy constructor and operator= functions
+// This should be used in the private: declarations for any class that shouldn't allow copying itself
+#define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+	TypeName(const TypeName &); \
+	void operator=(const TypeName &)
+
+
+
+
+
 // OS-dependent stuff:
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN

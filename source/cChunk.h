@@ -38,9 +38,24 @@ class cServer;
 class MTRand;
 class cPlayer;
 
-typedef std::list<cFurnaceEntity *> cFurnaceEntityList;
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef std::list<cBlockEntity *>   cBlockEntityList;
+
+/** Interface class used for getting data out of a chunk using the GetAllData() function.
+Implementation must use the pointers immediately and NOT store any of them for later use
+*/
+class cChunkDataCallback
+{
+public:
+	/// Called once to export blockdata
+	virtual void BlockData(const char * a_Data) = 0;
+	
+	/// Called for each entity in the chunk
+	virtual void Entity(cEntity * a_Entity) = 0;
+	
+	/// Called for each blockentity in the chunk
+	virtual void BlockEntity(cBlockEntity * a_Entity) = 0;
+} ;
 
 
 
@@ -54,14 +69,35 @@ public:
 
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk is valid (loaded / generated)
 	void SetValid(bool a_SendToClients = true);   // Also wakes up all clients attached to this chunk to let them finish logging in
+	bool IsDirty(void) const {return m_IsDirty; }  // Returns true if the chunk has changed since it was last saved
 	bool CanUnload(void);
+	
+	/*
+	To save a chunk, the WSSchema must:
+	1. Mark the chunk as being saved (MarkSaving() )
+	2. Get the chunk's data using GetAllData()
+	3. Mark the chunk as saved (MarkSaved() )
+	If anywhere inside this sequence another thread mmodifies the chunk, the chunk will not get marked as saved in MarkSaved()
+	*/
+	void MarkSaving(void);  // Marks the chunk as being saved. 
+	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
+	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
+	
+	/// Gets all chunk data, calls the a_Callback's methods for each data type
+	void GetAllData(cChunkDataCallback * a_Callback);
+	
+	/// Sets all chunk data
+	void SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	
+	/// Returns true if there is a block entity at the coords specified
+	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	void Tick(float a_Dt, MTRand & a_TickRandom);
 
 	int GetPosX() { return m_PosX; }
 	int GetPosY() { return m_PosY; }
 	int GetPosZ() { return m_PosZ; }
-	cWorld* GetWorld() { return m_World; }
+	cWorld * GetWorld() { return m_World; }
 
 	void Send( cClientHandle* a_Client );
 	void AsyncUnload( cClientHandle* a_Client );
@@ -131,6 +167,12 @@ public:
 		}
 		return 0;
 	}
+	
+	inline void MarkDirty(void)
+	{
+		m_IsDirty = true;
+		m_IsSaving = false;
+	}
 
 	static const int c_NumBlocks = 16*128*16;
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
@@ -138,15 +180,19 @@ public:
 private:
 
 	bool m_IsValid;  // True if the chunk is loaded / generated
+	bool m_IsDirty;  // True if the chunk has changed since it was last saved
+	bool m_IsSaving;  // True if the chunk is being saved
 	
 	cCriticalSection              m_CSBlockLists;
 	std::map< unsigned int, int > m_ToTickBlocks;
 	std::vector< unsigned int >   m_PendingSendBlocks;
 	
+	// TODO: This CS will soon not be needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cCriticalSection  m_CSClients;
 	cClientHandleList m_LoadedByClient;
 	cClientHandleList m_UnloadQuery;
 
+	// TODO: This CS will soon not be needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cCriticalSection   m_CSEntities;
 	cEntityList        m_Entities;
 	cBlockEntityList   m_BlockEntities;
@@ -177,7 +223,7 @@ private:
 	void SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
 	void SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
 
-	void CreateBlockEntities();
+	void CreateBlockEntities(void);
 };
 
 typedef std::tr1::shared_ptr<cChunk> cChunkPtr;
