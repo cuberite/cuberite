@@ -240,6 +240,8 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	CreateBlockEntities();
 
 	CalculateHeightmap();
+	
+	MarkDirty();
 }
 
 
