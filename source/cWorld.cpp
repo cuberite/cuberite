@@ -1009,6 +1009,15 @@ bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
 
 
 
+bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
+{
+	return m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
 void cWorld::SetMaxPlayers(int iMax)
 {
 	m_MaxPlayers = MAX_PLAYERS;

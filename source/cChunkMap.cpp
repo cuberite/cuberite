@@ -276,6 +276,17 @@ bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
+bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	return (Chunk != NULL) && Chunk->HasAnyClients();
+}
+
+
+
+
+
 void cChunkMap::Tick( float a_Dt, MTRand & a_TickRandom )
 {
 	cCSLock Lock(m_CSLayers);
@@ -389,7 +400,6 @@ void cChunkMap::cChunkLayer::Save(void)
 
 void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 {
-	cWorld * World = m_Parent->GetWorld();
 	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))

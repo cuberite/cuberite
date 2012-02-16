@@ -70,13 +70,14 @@ public:
 	
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
-	void SetChunkData   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
-	void GetChunkData   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
-	bool IsChunkValid   (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
+	void MarkChunkDirty    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaving   (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaved    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkDataLoaded   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void SetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
+	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
+	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	
 	// MOTD
 	const AString & GetDescription(void) const {return m_Description; }

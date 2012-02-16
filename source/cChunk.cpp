@@ -805,8 +805,6 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 	assert(IsValid());  // Is this chunk loaded / generated?
 	
-	MarkDirty();
-	
 	int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	char OldBlockMeta = GetLight( m_BlockMeta, index );
 	char OldBlockType = m_BlockType[index];
@@ -819,6 +817,8 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 		return;
 	}
 
+	MarkDirty();
+	
 	cCSLock Lock(m_CSBlockLists);
 	m_PendingSendBlocks.push_back( index );
 
@@ -871,14 +871,15 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 
 	assert(IsValid());
 	
-	MarkDirty();
-	
 	const int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	const char OldBlock = m_BlockType[index];
 	if (OldBlock == a_BlockType)
 	{
 		return;
 	}
+
+	MarkDirty();
+	
 	m_BlockType[index] = a_BlockType;
 
 	{
@@ -1107,7 +1108,7 @@ bool cChunk::HasClient( cClientHandle* a_Client )
 
 
 
-bool cChunk::HasAnyClient(void)
+bool cChunk::HasAnyClients(void)
 {
 	cCSLock Lock(m_CSClients);
 	return !m_LoadedByClient.empty();

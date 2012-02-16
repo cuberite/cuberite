@@ -53,11 +53,11 @@ bool cChunkGenerator::Start(cWorld * a_World, const AString & a_WorldGeneratorNa
 	
 	if (a_WorldGeneratorName.compare("Test") == 0 )
 	{
-		m_pWorldGenerator = new cWorldGenerator_Test();
+		m_pWorldGenerator = new cWorldGenerator_Test(a_World);
 	}
 	else	// Default
 	{
-		m_pWorldGenerator = new cWorldGenerator();
+		m_pWorldGenerator = new cWorldGenerator(a_World);
 	}
 	
 	return super::Start();
@@ -129,17 +129,22 @@ void cChunkGenerator::Execute(void)
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
 		Lock.Unlock();			// Unlock ASAP
 
-		cChunkPtr Chunk = m_World->GetChunk(coords.m_ChunkX, 0, coords.m_ChunkZ);
-		if ((Chunk != NULL) && (Chunk->IsValid() || (SkipEnabled && !Chunk->HasAnyClient())))
+		if (
+			m_World->IsChunkValid(coords.m_ChunkX, 0, coords.m_ChunkZ) ||
+			(SkipEnabled && m_World->HasChunkAnyClients(coords.m_ChunkX, 0, coords.m_ChunkZ))
+		)
 		{
 			// Already generated / overload-skip, ignore request
 			continue;
 		}
-
-		LOG("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
-		m_pWorldGenerator->GenerateChunk(Chunk);
 		
-		Chunk->SetValid();
+		LOG("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
+		m_pWorldGenerator->GenerateChunk(coords.m_ChunkX, 0, coords.m_ChunkZ);
+		
+		// Chunk->SetValid();
+
+		// Save the chunk right after generating, so that we don't have to generate it again on next run
+		m_World->GetStorage().QueueSaveChunk(coords.m_ChunkX, coords.m_ChunkZ);
 	}  // while (!bStop)
 }
 

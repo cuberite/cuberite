@@ -14,7 +14,8 @@
 
 
 
-cWorldGenerator::cWorldGenerator()
+cWorldGenerator::cWorldGenerator(cWorld * a_World) :
+	m_World(a_World)
 {
 }
 
@@ -30,15 +31,19 @@ cWorldGenerator::~cWorldGenerator()
 
 
 
-void cWorldGenerator::GenerateChunk( cChunkPtr a_Chunk )
+void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	assert(!a_Chunk->IsValid());
+	// TODO: use a raw char array instead of the entire chunk, then set it as chunk's blockdata
 	
-	memset(a_Chunk->pGetBlockData(), 0, cChunk::c_BlockDataSize);
-	GenerateTerrain( a_Chunk );
-	GenerateFoliage( a_Chunk );
-	a_Chunk->CalculateHeightmap();
-	a_Chunk->CalculateLighting();
+	cChunkPtr Chunk = m_World->GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	assert(!Chunk->IsValid());
+	
+	memset(Chunk->pGetBlockData(), 0, cChunk::c_BlockDataSize);
+	GenerateTerrain(Chunk);
+	GenerateFoliage(Chunk);
+	Chunk->CalculateHeightmap();
+	Chunk->CalculateLighting();
+	Chunk->SetValid();
 }
 
 

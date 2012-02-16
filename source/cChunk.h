@@ -114,10 +114,10 @@ public:
 
 	void SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client );
 
-	void AddClient   ( cClientHandle* a_Client );
-	void RemoveClient( cClientHandle* a_Client );
-	bool HasClient   ( cClientHandle* a_Client );
-	bool HasAnyClient(void);  // Returns true if theres any client in the chunk; false otherwise
+	void AddClient    (cClientHandle* a_Client );
+	void RemoveClient (cClientHandle* a_Client );
+	bool HasClient    (cClientHandle* a_Client );
+	bool HasAnyClients(void);  // Returns true if theres any client in the chunk; false otherwise
 
 	void AddEntity( cEntity * a_Entity );
 	void RemoveEntity( cEntity * a_Entity);
