@@ -74,9 +74,7 @@ function Initialize( Plugin )
 			local ItemSyntax = itemsINI:GetValue(KeyID, i, "0")
 			
 			local ItemData = StringSplit(ItemSyntax, ":") -- [1] = ID, [2] = perhaps meta/dmg
-			--LOGINFO( "#ItemData: " .. #ItemData )
 			if( #ItemData > 0 ) then	
-				--LOGINFO("ItemData[0]: "..ItemData[1])
 				local ItemID = tonumber( ItemData[1] )
 				if( ItemID > 0 ) then
 					local ItemMeta = 0
@@ -84,7 +82,7 @@ function Initialize( Plugin )
 						ItemMeta = tonumber( ItemData[2] )
 					end
 					ItemsTable[ ItemName ] = cItem( ItemID, 1, ItemMeta )
-					LOGINFO("Got item: " .. ItemName .. "-> " .. ItemsTable[ ItemName ].m_ItemID ..":" .. ItemsTable[ ItemName ].m_ItemHealth )
+					--LOGINFO("Got item: " .. ItemName .. "-> " .. ItemsTable[ ItemName ].m_ItemID ..":" .. ItemsTable[ ItemName ].m_ItemHealth )
 				end
 			end
 		end
