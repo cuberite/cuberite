@@ -459,7 +459,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 			{
 				virtual bool Item(cPlayer * a_Player) override
 				{
-					LOG("\t%s @ %s", a_Player->GetName().c_str(), a_Player->GetClientHandle()->GetSocket().GetIPString());
+					LOG("\t%s @ %s", a_Player->GetName().c_str(), a_Player->GetClientHandle()->GetSocket().GetIPString().c_str());
 					return false;
 				}
 			} Logger;
