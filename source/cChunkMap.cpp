@@ -287,11 +287,14 @@ void cChunkMap::cChunkLayer::Save(void)
 
 void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 {
+	cWorld * World = m_Parent->GetWorld();
 	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
 		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))
 		{
 			// TODO: Save the chunk if it was changed
+			World->GetStorage().QueueSaveChunk(m_Chunks[i]); // _FT: FIXME: Right now it saves chunks even though it might not have changed.
+															 // Also I'm not sure what's going on when I queue this chunks and the next line says reset the pointer.. =/
 			m_Chunks[i].reset();
 		}
 	}  // for i - m_Chunks[]

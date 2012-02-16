@@ -84,7 +84,14 @@ private:
 		
 		int GetX(void) const {return m_LayerX; }
 		int GetZ(void) const {return m_LayerZ; }
-		int GetNumChunksLoaded(void) const {return m_NumChunksLoaded; }
+		int GetNumChunksLoaded(void) const 
+		{
+			int NumChunks = 0;
+			for( int i = 0; i < LAYER_SIZE*LAYER_SIZE; ++i )
+				if( m_Chunks[i].get() )
+					NumChunks++;
+			return NumChunks; 
+		}
 		
 		void Save(void);
 		void UnloadUnusedChunks(void);
