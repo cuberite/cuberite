@@ -436,6 +436,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 			printf("help      - Shows this message\n");
 			printf("save-all  - Saves all loaded chunks to disk\n");
 			printf("list      - Lists all players currently in server\n");
+			printf("unload    - Unloads all unused chunks\n");
 			printf("numchunks - Shows number of chunks currently loaded\n");
 			printf("say       - Sends a chat message to all players\n");
 			printf("restart   - Kicks all clients, and saves everything\n");
@@ -453,6 +454,13 @@ void cServer::ServerCommand( const char * a_Cmd )
 			cRoot::Get()->GetWorld()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
 			return;
 		}
+		if (split[0].compare("unload") == 0)
+		{
+			LOG("Num loaded chunks before: %i", cRoot::Get()->GetTotalChunkCount() );
+			cRoot::Get()->GetDefaultWorld()->UnloadUnusedChunks();  // TODO: Iterate through ALL worlds
+			LOG("Num loaded chunks after: %i", cRoot::Get()->GetTotalChunkCount() );
+			return;
+		}
 		if( split[0].compare( "list" ) == 0 )
 		{
 			class cPlayerLogger : public cPlayerListCallback
@@ -468,7 +476,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 		}
 		if( split[0].compare( "numchunks" ) == 0 )
 		{
-			printf("Num loaded chunks: %i\n", cRoot::Get()->GetTotalChunkCount() );
+			LOG("Num loaded chunks: %i\n", cRoot::Get()->GetTotalChunkCount() );
 			return;
 		}
 		

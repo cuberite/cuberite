@@ -78,7 +78,8 @@ public:
 	void GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
-	
+	void UnloadUnusedChunks(void);
+
 	// MOTD
 	const AString & GetDescription(void) const {return m_Description; }
 
@@ -262,7 +263,6 @@ private:
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
 	
 	void RemoveEntity( cEntity * a_Entity );
-	void UnloadUnusedChunks();
 }; //tolua_export
 
 
