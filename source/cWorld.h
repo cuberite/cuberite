@@ -34,6 +34,7 @@ class cWorldGenerator;  // The generator that actually generates the chunks for 
 class cChunkGenerator;  // The thread responsible for generating chunks
 typedef std::list< cPlayer * > cPlayerList;
 typedef cItemCallback<cPlayer> cPlayerListCallback;
+typedef cItemCallback<cEntity> cEntityCallback;
 
 
 
@@ -102,12 +103,9 @@ public:
 
 	void AddEntity( cEntity* a_Entity );
 	void RemoveEntityFromChunk( cEntity * a_Entity);
-	
-	// TODO: This interface is dangerous!
-	cEntityList & GetEntities(void) {return m_AllEntities; }
 
-	// TODO: This interface is dangerous!
-	cEntity * GetEntity( int a_UniqueID );											//tolua_export
+	// TODO: Export to Lua
+	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
 	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export

@@ -11,7 +11,7 @@ local function ShowUsersTable()
 	Content = Content .. "<table>"
 	
 	if( NumUsers > 0 ) then
-		Content = Content .. "<tr><td></td><td>User</td><td>Groups</td></tr>"
+		Content = Content .. "<tr><th></th><th>User</th><th>Groups</th></tr>"
 	
 		for i=0, NumUsers-1 do
 			local UserName = UsersIni:GetKeyName( i )
@@ -45,7 +45,7 @@ local function ShowGroupsTable()
 	
 	Content = Content .. "<table>"
 	if( NumGroups > 0 ) then
-		Content = Content .. "<tr><td></td><td>Name</td><td>Permissions</td><td>Color</td></tr>"
+		Content = Content .. "<tr><th></th><th>Name</th><th>Permissions</th><th>Color</th></tr>"
 		
 		for i=0, NumGroups-1 do
 			local GroupName = GroupsIni:GetKeyName( i )

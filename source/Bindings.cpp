@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/15/12 23:43:42.
+** Generated automatically by tolua++-1.0.92 on 02/16/12 18:16:16.
 */
 
 #ifndef __cplusplus
@@ -9587,40 +9587,6 @@ static int tolua_AllToLua_cWorld_GetPlayer00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetEntity of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetEntity00
-static int tolua_AllToLua_cWorld_GetEntity00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_UniqueID = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEntity'", NULL);
-#endif
-  {
-   cEntity* tolua_ret = (cEntity*)  self->GetEntity(a_UniqueID);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEntity");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEntity'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: SetBlock of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetBlock00
 static int tolua_AllToLua_cWorld_SetBlock00(lua_State* tolua_S)
@@ -17594,7 +17560,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"GetNumPlayers",tolua_AllToLua_cWorld_GetNumPlayers00);
    tolua_function(tolua_S,"GetPlayer",tolua_AllToLua_cWorld_GetPlayer00);
-   tolua_function(tolua_S,"GetEntity",tolua_AllToLua_cWorld_GetEntity00);
    tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cWorld_SetBlock00);
    tolua_function(tolua_S,"FastSetBlock",tolua_AllToLua_cWorld_FastSetBlock00);
    tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock00);

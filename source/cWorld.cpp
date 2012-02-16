@@ -1168,18 +1168,17 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 
 
 
-// TODO: This interface is dangerous!
-cEntity * cWorld::GetEntity( int a_UniqueID )
+bool cWorld::DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback )
 {
 	cCSLock Lock(m_CSEntities);
 	for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end(); ++itr )
 	{
 		if( (*itr)->GetUniqueID() == a_UniqueID )
 		{
-			return *itr;
+			return a_Callback.Item(*itr);
 		}
-	}
-	return NULL;
+	} // for itr - m_AllEntities[]
+	return false;
 }
 
 

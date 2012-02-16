@@ -1532,13 +1532,27 @@ void cClientHandle::HandleUseEntity(cPacket_UseEntity * a_Packet)
 	{
 		return;
 	}
-	cWorld * World = m_Player->GetWorld();
-	cEntity * Entity = World->GetEntity(a_Packet->m_TargetID);
-	if ((Entity != NULL) && Entity->IsA("cPawn"))
+
+	class cDamageEntity : public cEntityCallback
 	{
-		cPawn * Pawn = (cPawn *)Entity;
-		Pawn->TakeDamage(1, m_Player);
-	}
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			if( a_Entity->IsA("cPawn") )
+			{
+				reinterpret_cast< cPawn* >( a_Entity )->TakeDamage(Damage, Instigator );
+			}
+			return true;
+		}
+	public:
+		int Damage;
+		cEntity * Instigator;
+	} Callback;
+
+	Callback.Damage = 1; // TODO: Find proper damage from current item equipped
+	Callback.Instigator = m_Player;
+
+	cWorld * World = m_Player->GetWorld();
+	World->DoWithEntity( a_Packet->m_TargetID, Callback );
 }
 
 
