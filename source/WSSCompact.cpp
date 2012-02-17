@@ -64,6 +64,7 @@ bool cWSSCompact::LoadChunk(const cChunkCoords & a_Chunk)
 	if (f == NULL)
 	{
 		// For some reason we couldn't locate the file
+		LOG("Cannot locate a proper PAK file for chunk [%d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	
@@ -80,6 +81,7 @@ bool cWSSCompact::SaveChunk(const cChunkCoords & a_Chunk)
 	if (f == NULL)
 	{
 		// For some reason we couldn't locate the file
+		LOG("Cannot locate a proper PAK file for chunk [%d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	return f->SaveChunk(a_Chunk, m_World);
@@ -299,7 +301,6 @@ bool cWSSCompact::cPAKFile::LoadChunk(const cChunkCoords & a_Chunk, int a_Offset
 	
 	if (a_Header->m_UncompressedSize > cChunk::c_BlockDataSize )	// We gots some extra data :D
 	{
-		LOGINFO("Parsing trailing JSON");
 		Json::Value root;   // will contain the root value after parsing.
 		Json::Reader reader;
 		if ( !reader.parse( UncompressedData.data() + cChunk::c_BlockDataSize, root, false ) )
@@ -351,6 +352,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	if (Serializer.GetBlockData().empty())
 	{
 		// Chunk not valid
+		LOG("cWSSCompact: Trying to save chunk [%d, %d] that has no data, ignoring request.", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 
@@ -380,6 +382,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	sChunkHeader * Header = new sChunkHeader;
 	if (Header == NULL)
 	{
+		LOGWARNING("Cannot create a new chunk header to save chunk [%d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	Header->m_CompressedSize = (int)CompressedData.size();

@@ -4,9 +4,11 @@ class cMonster;
 class cMonsterConfig
 {
 public:
-	cMonsterConfig(int TypeC);
+	cMonsterConfig(void);
 	~cMonsterConfig();
-	cMonsterConfig *Get();
+	
+	// _X: WTF? shouldn't this be static? Setting to OBSOLETE
+	OBSOLETE cMonsterConfig *Get();
 	
 	void AssignAttributes(cMonster *m, const char* n);
 	

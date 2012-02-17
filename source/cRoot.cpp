@@ -94,8 +94,10 @@ void cRoot::Start()
 
 		cFileFormatUpdater::UpdateFileFormat();
 
+		LOG("Creating new server instance...");
 		m_Server = new cServer();
 
+		LOG("Starting server...");
 		cIniFile IniFile("settings.ini"); IniFile.ReadFile();
 		int Port = IniFile.GetValueI("Server", "Port", 25565 );
 		if(!m_Server->InitServer( Port ))
@@ -109,27 +111,39 @@ void cRoot::Start()
 		{
 			if( WebIniFile.GetValueB("WebAdmin", "Enabled", false ) == true )
 			{
+				LOG("Creating WebAdmin...");
 				m_WebAdmin = new cWebAdmin(8080);
 			}
 		}
 
+		LOG("Loading settings...");
 		m_GroupManager	= new cGroupManager();
 		m_RecipeChecker = new cRecipeChecker();
 		m_FurnaceRecipe = new cFurnaceRecipe();
+		
+		LOG("Loading worlds...");
 		LoadWorlds();
 
+		LOG("Loading plugin manager...");
 		m_PluginManager = new cPluginManager(); // This should be last
 		m_PluginManager->ReloadPluginsNow();
-		m_MonsterConfig = new cMonsterConfig(2);
+		
+		LOG("Loading MonsterConfig...");
+		m_MonsterConfig = new cMonsterConfig;
 
 		// This sets stuff in motion
+		LOG("Starting Authenticator...");
 		m_Authenticator.Start();
+		
+		LOG("Starting server...");
 		m_Server->StartListenThread();
 		//cHeartBeat* HeartBeat = new cHeartBeat();
 
+		LOG("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
 		m_InputThread->Start( true );
 
+		LOG("Initialization done, server running now.");
 		while( !m_bStop && !m_bRestart ) // These are modified by external threads
 		{
 			cSleep::MilliSleep( 1000 );
@@ -138,17 +152,27 @@ void cRoot::Start()
 		delete m_InputThread; m_InputThread = 0;
 
 		// Deallocate stuffs
+		LOG("Shutting down server...");
 		m_Server->Shutdown(); // This waits for threads to stop and d/c clients
+		LOG("Stopping authenticator...");
 		m_Authenticator.Stop();
+		LOG("Stopping plugin manager...");
 		delete m_PluginManager; m_PluginManager = 0;  // This should be first
+		LOG("Freeing MonsterConfig...");
 		delete m_MonsterConfig; m_MonsterConfig = 0;
-		if( m_WebAdmin ) { delete m_WebAdmin; m_WebAdmin = 0; }
+		LOG("Stopping WebAdmin...");
+		delete m_WebAdmin; m_WebAdmin = 0;
+		LOG("Unloading recipes...");
 		delete m_FurnaceRecipe; m_FurnaceRecipe = 0;
 		delete m_RecipeChecker; m_RecipeChecker = 0;
+		LOG("Forgetting groups...");
 		delete m_GroupManager; m_GroupManager = 0;
+		LOG("Unloading worlds...");
 		UnloadWorlds();
+		LOG("Destroying server...");
 		//delete HeartBeat; HeartBeat = 0;
 		delete m_Server; m_Server = 0;
+		LOG("Shutdown done.");
 	}
 
 	delete m_Log; m_Log = 0;
@@ -249,9 +273,9 @@ void cRoot::TickWorlds( float a_Dt )
 
 
 
-void cRoot::ServerCommand( const char* a_Cmd )
+void cRoot::ServerCommand( const char * a_Cmd )
 {
-	//LOG("Command: %s", a_Cmd );
+	LOG("Server console command: \"%s\"", a_Cmd );
 	m_Server->ServerCommand( a_Cmd );
 	if( strcmp(a_Cmd, "stop") == 0 )
 	{

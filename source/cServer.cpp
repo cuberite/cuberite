@@ -476,7 +476,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 		}
 		if( split[0].compare( "numchunks" ) == 0 )
 		{
-			LOG("Num loaded chunks: %i\n", cRoot::Get()->GetTotalChunkCount() );
+			LOG("Num loaded chunks: %i", cRoot::Get()->GetTotalChunkCount() );
 			return;
 		}
 		

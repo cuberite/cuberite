@@ -127,8 +127,13 @@ void cLog::Log(const char * a_Format, va_list argList)
 		fflush(m_File);
 	}
 
-
+	// Print to console:
 	printf("%s", Line.c_str());
+	
+	#if defined (_WIN32) && defined(_DEBUG)
+	// In a Windows Debug build, output the log to debug console as well:
+	OutputDebugString(Line.c_str());
+	#endif  // _WIN32
 }
 
 

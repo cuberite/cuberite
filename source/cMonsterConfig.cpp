@@ -26,7 +26,6 @@ struct cMonsterConfig::sAttributesStruct
 
 struct cMonsterConfig::sMonsterConfigState
 {
-	int TypeCount;
 	AString MonsterTypes;
 	std::list< sAttributesStruct > AttributesList;
 };
@@ -35,10 +34,9 @@ struct cMonsterConfig::sMonsterConfigState
 
 
 
-cMonsterConfig::cMonsterConfig(int TypeC)
+cMonsterConfig::cMonsterConfig(void)
 	: m_pState( new sMonsterConfigState )
 {
-	m_pState->TypeCount = TypeC;
 	Initialize();
 }
 
@@ -114,6 +112,7 @@ void cMonsterConfig::AssignAttributes(cMonster *m, const char* n)
 
 
 
+// _X: WTF?
 cMonsterConfig *cMonsterConfig::Get() {
 	return this;
 }
