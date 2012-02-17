@@ -386,7 +386,6 @@ void cWorld::InitializeSpawn()
 		{
 			GetChunk( x + ChunkX-(ViewDist - 1) / 2, 0, z + ChunkZ-(ViewDist - 1) / 2 );  // Queue the chunk in the generator / loader
 		}
-		LOG("Queued %0.2f %% of spawn area", ((float)x / (float)ViewDist) * 100 );
 	}
 	
 	// TODO: Wait for the generator to finish generating these chunks
