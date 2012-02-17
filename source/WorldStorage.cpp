@@ -161,12 +161,12 @@ void cWorldStorage::WaitForFinish(void)
 
 
 
-void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
+void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	// Queues the chunk for loading; if not loaded, the chunk will be generated
 	cCSLock Lock(m_CSLoadQueue);
-	m_LoadQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkZ));  // Don't add twice
-	m_LoadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	m_LoadQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
+	m_LoadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -174,11 +174,11 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
+void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSSaveQueue);
-	m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkZ));  // Don't add twice
-	m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
+	m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -268,7 +268,7 @@ void cWorldStorage::Execute(void)
 
 bool cWorldStorage::LoadOneChunk(void)
 {
-	cChunkCoords ToLoad(0, 0);
+	cChunkCoords ToLoad(0, 0, 0);
 	bool HasMore;
 	bool ShouldLoad = false;
 	{
@@ -284,7 +284,7 @@ bool cWorldStorage::LoadOneChunk(void)
 	if (ShouldLoad && !LoadChunk(ToLoad))
 	{
 		// The chunk couldn't be loaded, generate it:
-		m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
+		m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
 	}
 	return HasMore;
 }
@@ -295,7 +295,7 @@ bool cWorldStorage::LoadOneChunk(void)
 
 bool cWorldStorage::SaveOneChunk(void)
 {
-	cChunkCoords Save(0, 0);
+	cChunkCoords Save(0, 0, 0);
 	bool HasMore;
 	bool ShouldSave = false;
 	{
@@ -308,16 +308,16 @@ bool cWorldStorage::SaveOneChunk(void)
 		}
 		HasMore = (m_SaveQueue.size() > 0);
 	}
-	if (ShouldSave)
+	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ))
 	{
-		m_World->MarkChunkSaving(Save.m_ChunkX, 0, Save.m_ChunkZ);
+		m_World->MarkChunkSaving(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
 		if (m_SaveSchema->SaveChunk(Save))
 		{
-			m_World->MarkChunkSaved(Save.m_ChunkX, 0, Save.m_ChunkZ);
+			m_World->MarkChunkSaved(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
 		}
 		else
 		{
-			LOGWARNING("Cannot save chunk [%d, %d]", Save.m_ChunkX, Save.m_ChunkZ);
+			LOGWARNING("Cannot save chunk [%d, %d, %d]", Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
 		}
 	}
 	return HasMore;
@@ -329,7 +329,7 @@ bool cWorldStorage::SaveOneChunk(void)
 
 bool cWorldStorage::LoadChunk(const cChunkCoords & a_Chunk)
 {
-	if (m_World->IsChunkValid(a_Chunk.m_ChunkX, 0, a_Chunk.m_ChunkZ))
+	if (m_World->IsChunkValid(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ))
 	{
 		// Already loaded (can happen, since the queue is async)
 		return true;

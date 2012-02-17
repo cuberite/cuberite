@@ -201,7 +201,7 @@ private:
 	void SendConfirmPosition(void);
 	
 	/// Adds a single chunk to be streamed to the client; used by StreamChunks()
-	void StreamChunk(int a_ChunkX, int a_ChunkZ);
+	void StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client

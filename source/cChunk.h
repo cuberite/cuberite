@@ -20,6 +20,15 @@
 
 
 
+/** This is really only a placeholder to be used in places where we need to "make up" a chunk's Y coord.
+It will help us when the new chunk format comes out and we need to patch everything up for compatibility.
+*/
+#define ZERO_CHUNK_Y 0
+
+
+
+
+
 namespace Json
 {
 	class Value;
@@ -238,13 +247,14 @@ class cChunkCoords
 {
 public:
 	int m_ChunkX;
+	int m_ChunkY;
 	int m_ChunkZ;
 	
-	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
+	cChunkCoords(int a_ChunkX, int a_ChunkY, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ) {}
 	
 	bool operator == (const cChunkCoords & a_Other)
 	{
-		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkY == a_Other.m_ChunkY) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
 } ;
 

@@ -42,12 +42,9 @@ public:
 	bool Start(cWorld * a_World, const AString & a_WorldGeneratorName);
 	void Stop(void);
 
-	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // Queues the chunk for generation; removes duplicate requests
+	void GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Queues the chunk for generation; removes duplicate requests
 
 private:
-
-	// cIsThread override:
-	virtual void Execute(void) override;
 
 	cWorld * m_World;
 	cWorldGenerator * m_pWorldGenerator;
@@ -55,6 +52,11 @@ private:
 	cCriticalSection m_CS;
 	cChunkCoordsList m_Queue;
 	cEvent           m_Event;  // Set when an item is added to the queue or the thread should terminate
+
+	// cIsThread override:
+	virtual void Execute(void) override;
+
+	void DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 };
 
 

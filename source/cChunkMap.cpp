@@ -103,10 +103,10 @@ cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 		return cChunkPtr();
 	}
 	
-	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkZ);
+	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if (!(Chunk->IsValid()))
 	{
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 	}
 	return Chunk;
 }
@@ -125,7 +125,7 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 		return cChunkPtr();
 	}
 	
-	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkZ);
+	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 	
 	// TODO: Load, but do not generate, if not valid
 	
@@ -341,7 +341,7 @@ cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Pa
 
 
 
-cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkZ )
+cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
 	// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
 	
@@ -371,11 +371,29 @@ void cChunkMap::cChunkLayer::Tick(float a_Dt, MTRand & a_TickRand)
 {
 	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
-		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->IsValid()))
+		// Only tick chunks that are valid and have clients:
+		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
 		{
 			m_Chunks[i]->Tick(a_Dt, a_TickRand);
 		}
 	}  // for i - m_Chunks[]
+}
+
+
+
+
+
+int cChunkMap::cChunkLayer::GetNumChunksLoaded(void) const
+{
+	int NumChunks = 0;
+	for ( int i = 0; i < ARRAYCOUNT(m_Chunks); ++i )
+	{
+		if (m_Chunks[i] != NULL)
+		{
+			NumChunks++;
+		}
+	}  // for i - m_Chunks[]
+	return NumChunks; 
 }
 
 
@@ -389,7 +407,7 @@ void cChunkMap::cChunkLayer::Save(void)
 	{
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->IsDirty())
 		{
-			World->GetStorage().QueueSaveChunk(m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ());
+			World->GetStorage().QueueSaveChunk(m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosY(), m_Chunks[i]->GetPosZ());
 		}
 	}  // for i - m_Chunks[]
 }

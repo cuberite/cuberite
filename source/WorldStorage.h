@@ -97,8 +97,8 @@ public:
 	cWorldStorage(void);
 	~cWorldStorage();
 	
-	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ);  // Queues the chunk for loading; if not loaded, the chunk will be generated
-	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ);
+	void QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Queues the chunk for loading; if not loaded, the chunk will be generated
+	void QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
 	void UnqueueLoad(const cChunkCoords & a_Chunk);
 	void UnqueueSave(const cChunkCoords & a_Chunk);

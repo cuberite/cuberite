@@ -342,7 +342,7 @@ void cClientHandle::StreamChunks(void)
 			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
 			if ((RelX > VIEWDISTANCE) || (RelX < -VIEWDISTANCE) || (RelZ > VIEWDISTANCE) || (RelZ < -VIEWDISTANCE))
 			{
-				World->GetChunk((*itr).m_ChunkX, 0, (*itr).m_ChunkZ)->RemoveClient(this);
+				World->GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(this);
 				itr = m_LoadedChunks.erase(itr);
 			}
 			else
@@ -372,13 +372,13 @@ void cClientHandle::StreamChunks(void)
 		// For each distance add chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
 		{
-			StreamChunk(ChunkPosX + d, ChunkPosZ + i);
-			StreamChunk(ChunkPosX - d, ChunkPosZ + i);
+			StreamChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			StreamChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
 		}  // for i
 		for (int i = -d + 1; i < d; ++i)
 		{
-			StreamChunk(ChunkPosX + i, ChunkPosZ + d);
-			StreamChunk(ChunkPosX + i, ChunkPosZ - d);
+			StreamChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
+			StreamChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
 		}  // for i
 	}  // for d
 	
@@ -388,13 +388,13 @@ void cClientHandle::StreamChunks(void)
 		// For each distance touch chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
 		{
-			World->GetChunk(ChunkPosX + d, 0, ChunkPosZ + i);
-			World->GetChunk(ChunkPosX - d, 0, ChunkPosZ + i);
+			World->GetChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			World->GetChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
 		}  // for i
 		for (int i = -d + 1; i < d; ++i)
 		{
-			World->GetChunk(ChunkPosX + i, 0, ChunkPosZ + d);
-			World->GetChunk(ChunkPosX + i, 0, ChunkPosZ - d);
+			World->GetChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
+			World->GetChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
 		}  // for i
 	}  // for d
 }
@@ -402,7 +402,7 @@ void cClientHandle::StreamChunks(void)
 
 
 
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
+void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cWorld * World = m_Player->GetWorld();
 	assert(World != NULL);
@@ -412,8 +412,8 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		Chunk->AddClient(this);
 		cCSLock Lock(m_CSChunkLists);
-		m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
-		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+		m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	}
 }
 
@@ -430,7 +430,7 @@ void cClientHandle::RemoveFromAllChunks()
 	{
 		for (cChunkCoordsList::iterator itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end(); ++itr)
 		{
-			World->GetChunk(itr->m_ChunkX, 0, itr->m_ChunkZ)->RemoveClient(this);
+			World->GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(this);
 		}
 	}
 	m_LoadedChunks.clear();
@@ -1656,7 +1656,7 @@ void cClientHandle::Tick(float a_Dt)
 		int NumSent = 0;
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
 		{
-			cChunkPtr Chunk = World->GetChunk(itr->m_ChunkX, 0, itr->m_ChunkZ);
+			cChunkPtr Chunk = World->GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
 			if (!Chunk->IsValid())
 			{
 				++itr;

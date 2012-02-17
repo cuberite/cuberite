@@ -81,14 +81,14 @@ void cChunkGenerator::Stop(void)
 
 
 
-void cChunkGenerator::GenerateChunk(int a_ChunkX, int a_ChunkZ)
+void cChunkGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CS);
 	
 	// Check if it is already in the queue:
 	for (cChunkCoordsList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
 		{
 			// Already in the queue, bail out
 			return;
@@ -100,7 +100,7 @@ void cChunkGenerator::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (%i)", a_ChunkX, a_ChunkZ, m_Queue.size());
 	}
-	m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	
 	m_Event.Set();
 }
@@ -130,22 +130,30 @@ void cChunkGenerator::Execute(void)
 		Lock.Unlock();			// Unlock ASAP
 
 		if (
-			m_World->IsChunkValid(coords.m_ChunkX, 0, coords.m_ChunkZ) ||
-			(SkipEnabled && m_World->HasChunkAnyClients(coords.m_ChunkX, 0, coords.m_ChunkZ))
+			m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ) ||
+			(SkipEnabled && m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
 		)
 		{
 			// Already generated / overload-skip, ignore request
 			continue;
 		}
 		
-		LOG("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
-		m_pWorldGenerator->GenerateChunk(coords.m_ChunkX, 0, coords.m_ChunkZ);
+		LOG("Generating chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
+		DoGenerate(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 		
-		// Chunk->SetValid();
-
 		// Save the chunk right after generating, so that we don't have to generate it again on next run
-		m_World->GetStorage().QueueSaveChunk(coords.m_ChunkX, coords.m_ChunkZ);
+		m_World->GetStorage().QueueSaveChunk(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 	}  // while (!bStop)
+}
+
+
+
+
+void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	// TODO: Convert this not to require the actual cChunkPtr (generate into raw char array)
+	// char BlockData[cChunk::c_BlockDataSize];
+	m_pWorldGenerator->GenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
 

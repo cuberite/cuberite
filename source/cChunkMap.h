@@ -89,18 +89,12 @@ private:
 		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent);
 
 		/// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ );
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
 		
 		int GetX(void) const {return m_LayerX; }
 		int GetZ(void) const {return m_LayerZ; }
-		int GetNumChunksLoaded(void) const 
-		{
-			int NumChunks = 0;
-			for( int i = 0; i < LAYER_SIZE*LAYER_SIZE; ++i )
-				if( m_Chunks[i].get() )
-					NumChunks++;
-			return NumChunks; 
-		}
+		
+		int GetNumChunksLoaded(void) const ;
 		
 		void Save(void);
 		void UnloadUnusedChunks(void);

@@ -273,6 +273,8 @@ cWorld::cWorld( const AString & a_WorldName )
 	g_BlockTransparent[ E_BLOCK_TORCH ]		= true;
 	g_BlockTransparent[ E_BLOCK_SIGN_POST ] = true;
 	g_BlockTransparent[ E_BLOCK_WALLSIGN ]	= true;
+	
+	// TODO: Also set flowers, mushrooms etc as transparent
 
 	// One hit break blocks
 	g_BlockOneHitDig[ E_BLOCK_SAPLING ]				= true;
