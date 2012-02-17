@@ -399,6 +399,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\source\LightingThread.cpp" />
     <ClCompile Include="..\Source\ManualBindings.cpp" />
     <ClCompile Include="..\source\Matrix4f.cpp" />
     <ClCompile Include="..\source\md5\md5.cpp" />
@@ -572,6 +573,7 @@
     <ClInclude Include="..\Source\FileDefine.h" />
     <ClInclude Include="..\source\Globals.h" />
     <ClInclude Include="..\source\LeakFinder.h" />
+    <ClInclude Include="..\source\LightingThread.h" />
     <ClInclude Include="..\Source\LuaFunctions.h" />
     <ClInclude Include="..\Source\ManualBindings.h" />
     <ClInclude Include="..\source\Matrix4f.h" />
