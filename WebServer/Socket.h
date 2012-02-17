@@ -39,6 +39,7 @@
 #ifndef _WIN32
 	typedef int SOCKET;
 	#define SOCKET_ERROR (-1)
+	#define INVALID_SOCKET (-1)
 	#define closesocket close
 #endif  // !_WIN32
 
@@ -48,66 +49,79 @@
 
 enum TypeSocket {BlockingSocket, NonBlockingSocket};
 
-class Socket {
+
+
+
+
+class Socket
+{
 public:
 
-  virtual ~Socket();
-  Socket(const Socket&);
-  Socket& operator=(Socket&);
+	virtual ~Socket();
+	Socket(const Socket&);
+	Socket& operator=(Socket&);
 
-  std::string ReceiveLine();
-  std::string ReceiveBytes( unsigned int a_Length );
+	std::string ReceiveLine();
+	std::string ReceiveBytes( unsigned int a_Length );
+	
+	bool IsValid(void) const;
 
-  void   Close( bool a_WaitSend = false );
+	void   Close( bool a_WaitSend = false );
 
-  // The parameter of SendLine is not a const reference
-  // because SendLine modifes the std::string passed.
-  void   SendLine (std::string);
+	// The parameter of SendLine is not a const reference
+	// because SendLine modifes the std::string passed.
+	void   SendLine (std::string);
 
-  // The parameter of SendBytes is a const reference
-  // because SendBytes does not modify the std::string passed
-  // (in contrast to SendLine).
-  void   SendBytes(const std::string&);
+	// The parameter of SendBytes is a const reference
+	// because SendBytes does not modify the std::string passed
+	// (in contrast to SendLine).
+	void   SendBytes(const std::string&);
 
 protected:
-  friend class SocketServer;
-  friend class SocketSelect;
+	friend class SocketServer;
+	friend class SocketSelect;
 
-  Socket(SOCKET s);
-  Socket();
+	Socket(SOCKET s);
+	Socket();
 
 
-  SOCKET s_;
+	SOCKET s_;
 
-  int* refCounter_;
+	int* refCounter_;
 
 private:
-  static void Start();
-  static void End();
-  static int  nofSockets_;
+	static void Start();
+	static void End();
+	static int  nofSockets_;
 };
 
-class SocketClient : public Socket {
+
+
+
+
+class SocketServer :
+	public Socket
+{
 public:
-  SocketClient(const std::string& host, int port);
+	SocketServer(int port, int connections, TypeSocket type=BlockingSocket);
+
+	Socket* Accept();
 };
 
-class SocketServer : public Socket {
-public:
-  SocketServer(int port, int connections, TypeSocket type=BlockingSocket);
 
-  Socket* Accept();
-};
+
+
 
 // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winsock/wsapiref_2tiq.asp
-class SocketSelect {
-  public:
-    SocketSelect(Socket const * const s1, Socket const * const s2=NULL, TypeSocket type=BlockingSocket);
+class SocketSelect
+{
+public:
+	SocketSelect(Socket const * const s1, Socket const * const s2=NULL, TypeSocket type=BlockingSocket);
 
-    bool Readable(Socket const * const s);
+	bool Readable(Socket const * const s);
 
-  private:
-    fd_set fds_;
+private:
+	fd_set fds_;
 };
 
 #endif
