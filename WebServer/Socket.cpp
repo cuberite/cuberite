@@ -359,7 +359,7 @@ SocketSelect::SocketSelect(Socket const * const s1, Socket const * const s2, Typ
 
 bool SocketSelect::Readable(Socket const* const s)
 {
-	return (FD_ISSET(s->s_,&fds_));
+	return (FD_ISSET(s->s_,&fds_) != 0);
 }
 
 
