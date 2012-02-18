@@ -1,7 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include <cstdarg>
 #include <time.h>
 #include "cLog.h"
 
@@ -186,3 +185,7 @@ void LOGERROR(const char* a_Format, ...)
 	cMCLogger::GetInstance()->Error( a_Format, argList );
 	va_end(argList);
 }
+
+
+
+

@@ -1,11 +1,7 @@
+
 #pragma once
 
-#include "MemoryLeak.h"
 #include "FileDefine.h"
-
-#ifndef _WIN32
-	#include <stdarg.h>
-#endif
 
 
 
