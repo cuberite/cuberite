@@ -37,6 +37,8 @@ public:
 	bool Start(void);  // Starts the thread
 	bool Wait(void);   // Waits for the thread to finish
 	
+	static unsigned long GetCurrentID(void);  // Returns the OS-dependent thread ID for the caller's thread
+
 private:
 	AString mThreadName;
 	

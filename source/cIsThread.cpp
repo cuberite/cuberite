@@ -149,3 +149,16 @@ bool cIsThread::Wait(void)
 
 
 
+
+unsigned long cIsThread::GetCurrentID(void)
+{
+	#ifdef _WIN32
+		return (unsigned long) GetCurrentThreadId();
+	#else
+		return (unsigned long) pthread_self();
+	#endif
+}
+
+
+
+
