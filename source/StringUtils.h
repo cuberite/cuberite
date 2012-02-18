@@ -11,10 +11,6 @@
 
 
 
-#ifndef _WIN32
-#include <stdarg.h>
-#endif
-
 
 
 typedef std::string AString;

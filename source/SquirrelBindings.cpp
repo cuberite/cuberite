@@ -10,7 +10,6 @@
 #include <sqplus/SquirrelObject.h>
 #include <../squirrel/sqstate.h>
 #include <../squirrel/sqvm.h>
-#include <stdarg.h>
 
 #include "cPlugin.h"
 #include "cPluginManager.h"
