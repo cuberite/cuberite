@@ -47,6 +47,26 @@ extern bool g_bWaterPhysics;
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// sSetBlock:
+
+sSetBlock::sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )  // absolute block position
+	: x( a_X )
+	, y( a_Y )
+	, z( a_Z )
+	, BlockType( a_BlockType )
+	, BlockMeta( a_BlockMeta )
+{
+	cChunkMap::AbsoluteToRelative(x, y, z, ChunkX, ChunkZ);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cChunk:
+
 cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	: m_bCalculateLighting( false )
 	, m_bCalculateHeightmap( false )
@@ -872,12 +892,9 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 
 
-void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
+void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta)
 {
-	if(a_X < 0 || a_X >= 16 || a_Y < 0 || a_Y >= 128 || a_Z < 0 || a_Z >= 16)
-	{
-		return; // Clip
-	}
+	assert(!((a_X < 0 || a_X >= 16 || a_Y < 0 || a_Y >= 128 || a_Z < 0 || a_Z >= 16)));
 
 	assert(IsValid());
 	
@@ -897,12 +914,15 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 		m_PendingSendBlocks.push_back( index );
 	}
 	
+	// It's called SetLight(), but it sets the Meta when passed the BlockMeta workspace
 	SetLight( m_BlockMeta, index, a_BlockMeta );
 
 	// ONLY recalculate lighting if it's necessary!
-	if(		g_BlockLightValue[ OldBlock ] != g_BlockLightValue[ a_BlockType ]
-		||	g_BlockSpreadLightFalloff[ OldBlock ] != g_BlockSpreadLightFalloff[ a_BlockType ]
-		||	g_BlockTransparent[ OldBlock ] != g_BlockTransparent[ a_BlockType ] )
+	if(
+		(g_BlockLightValue[ OldBlock ] != g_BlockLightValue[ a_BlockType ]) ||
+		(g_BlockSpreadLightFalloff[ OldBlock ] != g_BlockSpreadLightFalloff[ a_BlockType ]) ||
+		(g_BlockTransparent[ OldBlock ] != g_BlockTransparent[ a_BlockType ] )
+	)
 	{
 		RecalculateLighting();
 	}

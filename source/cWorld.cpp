@@ -503,17 +503,18 @@ void cWorld::Tick(float a_Dt)
 
 	TickWeather(a_Dt);
 
-	// Asynchronously set blocks
-	FastSetBlockList FastSetBlockQueueCopy;
+	// Asynchronously set blocks:
+	sSetBlockList FastSetBlockQueueCopy;
 	{
 		cCSLock Lock(m_CSFastSetBlock);
-		FastSetBlockQueueCopy = m_FastSetBlockQueue;
-		m_FastSetBlockQueue.clear();
+		std::swap(FastSetBlockQueueCopy, m_FastSetBlockQueue);
 	}
-	for ( FastSetBlockList::iterator itr = FastSetBlockQueueCopy.begin(); itr != FastSetBlockQueueCopy.end(); ++itr )
+	m_ChunkMap->FastSetBlocks(FastSetBlockQueueCopy);
+	if (FastSetBlockQueueCopy.size() > 0)
 	{
-		sSetBlockData & SetBlockData = *itr;
-		FastSetBlock( SetBlockData.x, SetBlockData.y, SetBlockData.z, SetBlockData.BlockID, SetBlockData.BlockMeta );	// If unable to set block, it's added to FastSetBlockQueue again
+		// Some blocks failed, store them for next tick:
+		cCSLock Lock(m_CSFastSetBlock);
+		m_FastSetBlockQueue.splice(m_FastSetBlockQueue.end(), FastSetBlockQueueCopy);
 	}
 
 	if( m_Time - m_LastSave > 60 * 5 ) // Save each 5 minutes
@@ -847,20 +848,8 @@ void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
-	int ChunkX, ChunkY, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
-
-	AbsoluteToRelative( X, Y, Z, ChunkX, ChunkY, ChunkZ );
-
-	cChunkPtr Chunk = GetChunkNoGen( ChunkX, ChunkY, ChunkZ );
-	if (Chunk->IsValid())	
-	{
-		Chunk->FastSetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
-		return;
-	}
-
-	// Unable to set block right now, try again later
 	cCSLock Lock(m_CSFastSetBlock);
-	m_FastSetBlockQueue.push_back( sSetBlockData( a_X, a_Y, a_Z, a_BlockType, a_BlockMeta ) ); 
+	m_FastSetBlockQueue.push_back(sSetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta)); 
 }
 
 

@@ -351,6 +351,57 @@ int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 
 
 
+void cChunkMap::FastSetBlocks(sSetBlockList & a_BlockList)
+{
+	sSetBlockList Failed;
+	
+	// Process all items from a_BlockList, either successfully or by placing into Failed
+	while (!a_BlockList.empty())
+	{
+		int ChunkX = a_BlockList.front().ChunkX;
+		int ChunkZ = a_BlockList.front().ChunkZ;
+		cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+		if ((Chunk != NULL) && Chunk->IsValid())
+		{
+			for (sSetBlockList::iterator itr = a_BlockList.begin(); itr != a_BlockList.end();)
+			{
+				if ((itr->ChunkX == ChunkX) && (itr->ChunkZ == ChunkZ))
+				{
+					Chunk->FastSetBlock(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
+					itr = a_BlockList.erase(itr);
+				}
+				else
+				{
+					++itr;
+				}
+			}  // for itr - a_BlockList[]
+		}
+		else
+		{
+			// The chunk is not valid, move all blocks within this chunk to Failed
+			for (sSetBlockList::iterator itr = a_BlockList.begin(); itr != a_BlockList.end();)
+			{
+				if ((itr->ChunkX == ChunkX) && (itr->ChunkZ == ChunkZ))
+				{
+					Failed.push_back(*itr);
+					itr = a_BlockList.erase(itr);
+				}
+				else
+				{
+					++itr;
+				}
+			}  // for itr - a_BlockList[]
+		}
+	}
+	
+	// Return the failed:
+	std::swap(Failed, a_BlockList);
+}
+
+
+
+
+
 void cChunkMap::Tick( float a_Dt, MTRand & a_TickRandom )
 {
 	cCSLock Lock(m_CSLayers);

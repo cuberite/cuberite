@@ -47,6 +47,7 @@ public:
 	bool HasChunkAnyClients (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	int  GetHeight          (int a_BlockX, int a_BlockZ);
+	void FastSetBlocks      (sSetBlockList & a_BlockList);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 

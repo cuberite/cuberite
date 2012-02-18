@@ -70,6 +70,21 @@ public:
 
 
 
+struct sSetBlock
+{
+	int x, y, z;
+	int ChunkX, ChunkZ;
+	char BlockType, BlockMeta;
+
+	sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );  // absolute block position
+};
+
+typedef std::list< sSetBlock > sSetBlockList;
+
+
+
+
+
 class cChunk
 {
 public:
@@ -118,7 +133,7 @@ public:
 	void AsyncUnload( cClientHandle* a_Client );
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );
-	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, char a_BlockType, char a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	char GetBlock( int a_X, int a_Y, int a_Z );
 	char GetBlock( int a_BlockIdx );
 	

@@ -183,21 +183,6 @@ private:
 
 	friend class cRoot;
 	
-	struct sSetBlockData
-	{
-		sSetBlockData( int a_X, int a_Y, int a_Z, char a_BlockID, char a_BlockMeta )
-			: x( a_X )
-			, y( a_Y )
-			, z( a_Z )
-			, BlockID( a_BlockID )
-			, BlockMeta( a_BlockMeta )
-		{}
-		int x, y, z;
-		char BlockID, BlockMeta;
-	};
-
-	typedef std::list< sSetBlockData > FastSetBlockList;
-
 	// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
 	MTRand m_TickRand;
 
@@ -252,7 +237,7 @@ private:
 	cChunkCoordsList  m_SpreadQueue;
 
 	cCriticalSection m_CSFastSetBlock;
-	FastSetBlockList m_FastSetBlockQueue;
+	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
 
