@@ -248,6 +248,16 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 
 
 
+/// Copies m_BlockData into a_Blocks, only the block types
+void cChunk::GetBlocks(char * a_Blocks)
+{
+	memcpy(a_Blocks, m_BlockData, cChunk::c_NumBlocks);
+}
+
+
+
+
+
 /// Returns true if there is a block entity at the coords specified
 bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {

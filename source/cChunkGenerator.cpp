@@ -182,6 +182,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cBlockEntityList BlockEntities;
 	m_pWorldGenerator->GenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ, BlockData, Entities, BlockEntities);
 	m_World->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, BlockData, Entities, BlockEntities);
+	m_pWorldGenerator->PostGenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
 

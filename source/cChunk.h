@@ -73,6 +73,9 @@ public:
 class cChunk
 {
 public:
+	static const int c_NumBlocks = 16 * 128 * 16;
+	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
+	
 	cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World);
 	~cChunk();
 
@@ -97,6 +100,9 @@ public:
 	
 	/// Sets all chunk data
 	void SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	
+	/// Copies m_BlockData into a_Blocks, only the block types
+	void GetBlocks(char a_Blocks[cChunk::c_NumBlocks]);
 	
 	/// Returns true if there is a block entity at the coords specified
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -183,9 +189,6 @@ public:
 		m_IsSaving = false;
 	}
 
-	static const int c_NumBlocks = 16*128*16;
-	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
-	
 private:
 
 	bool m_IsValid;  // True if the chunk is loaded / generated

@@ -25,9 +25,11 @@ void cWorldGenerator_Test::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_Chu
 
 
 
-void cWorldGenerator_Test::GenerateFoliage( cChunkPtr & a_Chunk )
+void cWorldGenerator_Test::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	(void)a_Chunk;
+	(void)a_ChunkX;
+	(void)a_ChunkY;
+	(void)a_ChunkZ;
 }
 
 

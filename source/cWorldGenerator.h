@@ -19,6 +19,8 @@ public:
 	~cWorldGenerator();
 
 	virtual void GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	
+	virtual void PostGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Called when the chunk has been already generated and set valid
 
 protected:
 
@@ -31,8 +33,10 @@ protected:
 
 	virtual void GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData);
 	
-	virtual void GenerateFoliage(cChunkPtr & a_Chunk );
+	virtual void GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 
+	/// Checks if the chunk has all 8 neighbors valid, if so, foliage is generated on that chunk
+	void CheckNeighbors(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 };
 
 

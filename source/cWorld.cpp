@@ -431,7 +431,9 @@ void cWorld::InitializeSpawn()
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	BlockToChunk( (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ );
 	
-	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+	// DEBUG:
+	// int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+	int ViewDist = 5;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
 	
 	LOG("Preparing spawn area in world \"%s\"", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)
@@ -744,32 +746,42 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 	int trunk = r1.randInt() % (7 - 5 + 1) + 5;
 	for (int i = 0; i < trunk; i++) 
 	{
-		if( GetBlock( a_X, a_Y + i, a_Z ) == E_BLOCK_AIR )
-			FastSetBlock( a_X, a_Y + i, a_Z, E_BLOCK_LOG, 0 );
+		FastSetBlock( a_X, a_Y + i, a_Z, E_BLOCK_LOG, 0 );
 	}
 
 	// build tree
-	for (int j = 0; j < trunk; j++) {
+	for (int j = 0; j < trunk; j++)
+	{
 		int radius = trunk - j;
-		if (radius < 4) {
-			if (radius > 2) {
+		if (radius < 4)
+		{
+			if (radius > 2)
+			{
 				radius = 2;
 			}
-			for (int i = a_X - radius; i <= a_X + radius; i++) {
-				for (int k = a_Z-radius; k <= a_Z + radius; k++) {
+			for (int i = a_X - radius; i <= a_X + radius; i++)
+			{
+				for (int k = a_Z-radius; k <= a_Z + radius; k++)
+				{
 					// small chance to be missing a block to add a little random
-					if (k != a_Z || i != a_X && (r1.randInt() % 100 + 1) > 20) {
+					if (k != a_Z || i != a_X && (r1.randInt() % 100 + 1) > 20)
+					{
 						if( GetBlock( i, a_Y + j, k ) == E_BLOCK_AIR )
+						{
 							FastSetBlock(i, a_Y+j, k, E_BLOCK_LEAVES, 0 );
+						}
 					}
-					else {
+					else
+					{
 						//if( m_BlockType[ MakeIndex(i, TopY+j, k) ] == E_BLOCK_AIR )
 						//	m_BlockType[ MakeIndex(i, TopY+j, k) ] = E_BLOCK_LEAVES;
 					}
 				}
 			}
-			if( GetBlock( a_X, a_Y+j, a_Z ) == E_BLOCK_AIR )
+			if (GetBlock( a_X, a_Y+j, a_Z ) == E_BLOCK_AIR )
+			{
 				FastSetBlock( a_X, a_Y+j, a_Z, E_BLOCK_LOG, 0 );
+			}
 		}
 	}
 
@@ -1063,6 +1075,15 @@ void cWorld::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const 
 void cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback)
 {
 	m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks)
+{
+	return m_ChunkMap->GetChunkBlocks(a_ChunkX, a_ChunkY, a_ChunkZ, a_Blocks);
 }
 
 

@@ -14,6 +14,27 @@
 
 
 
+// An array describing an 8-way neighbor coords deltas
+static struct 
+{
+	int m_X;
+	int m_Z;
+} g_NeighborCoords[] = 
+{
+	{-1, -1},
+	{-1, 0},
+	{-1, 1},
+	{0, -1},
+	{0, 1},
+	{1, -1},
+	{1, 0},
+	{1, 1},
+} ;
+
+
+
+
+
 cWorldGenerator::cWorldGenerator(cWorld * a_World) :
 	m_World(a_World)
 {
@@ -34,6 +55,46 @@ cWorldGenerator::~cWorldGenerator()
 void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	GenerateTerrain(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData);
+}
+
+
+
+
+
+void cWorldGenerator::PostGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	// Check the chunk just generated and all its 8-way neighbors
+	CheckNeighbors(a_ChunkX, a_ChunkY, a_ChunkZ);
+	for (int i = 0; i < ARRAYCOUNT(g_NeighborCoords); i++)
+	{
+		CheckNeighbors(a_ChunkX + g_NeighborCoords[i].m_X, a_ChunkY, a_ChunkZ + g_NeighborCoords[i].m_Z);
+	}  // for i - g_NeighborCoords[]
+}
+
+
+
+
+
+void cWorldGenerator::CheckNeighbors(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	if (!m_World->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
+	{
+		return;
+	}
+	
+	// Check all 8-way neighbors, if they are all valid, generate foliage in this chunk:
+	int NumNeighbors = 0;
+	for (int i = 0; i < ARRAYCOUNT(g_NeighborCoords); i++)
+	{
+		if (m_World->IsChunkValid(a_ChunkX + g_NeighborCoords[i].m_X, a_ChunkY, a_ChunkZ + g_NeighborCoords[i].m_Z))
+		{
+			NumNeighbors++;
+		}
+	}  // for i - g_NeighborCoords[]
+	if (NumNeighbors == 8)
+	{
+		GenerateFoliage(a_ChunkX, a_ChunkY, a_ChunkZ);
+	}
 }
 
 
@@ -187,7 +248,8 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 				{
 					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_DIRT;
 				}
-			}
+			}  // for y
+			
 			if (Top + 1 >= WATER_LEVEL + SAND_LEVEL)
 			{
 				// Replace top dirt with grass:
@@ -201,111 +263,84 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STATIONARY_WATER;
 				}
 			}
-		}
-	}
+			
+			// Generate small foliage (1-block):
+			int index = MakeIndex(x, Top - 1, z);
+			int TopY = Top - 1;
+			float val1 = Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
+			float val2 = Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
+			if( a_BlockData[index] == E_BLOCK_SAND )
+			{
+				if ((val1 + val2 > 0.f) && ((r1.randInt() % 128) > 124))
+				{
+					a_BlockData[ MakeIndex(x, TopY + 1, z) ] = E_BLOCK_CACTUS;
+					if ((r1.randInt() & 3) == 3)
+					{
+						a_BlockData[ MakeIndex(x, TopY + 2, z) ] = E_BLOCK_CACTUS;
+					}
+					continue;
+				}
+			}
+			else if( a_BlockData[index] == E_BLOCK_GRASS )
+			{
+				float val3 = Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10 );
+				float val4 = Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20 );
+				if( val3 > 0.2f && (r1.randInt()%128) > 124 )
+				{
+					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
+				}
+				else if( val4 > 0.2f && (r1.randInt()%128) > 124 )
+				{
+					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_ROSE;
+				}
+				else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
+				{
+					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_MUSHROOM;
+				}
+				else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
+				{
+					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
+				}
+			}
+		}  // for x
+	}  // for z
 }
 
 
 
 
 
-void cWorldGenerator::GenerateFoliage( cChunkPtr & a_Chunk )
+void cWorldGenerator::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
-	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
-	const ENUM_BLOCK_ID SandID 			=	E_BLOCK_SAND;
-	const ENUM_BLOCK_ID SandStoneID		=	E_BLOCK_SANDSTONE;
-	const ENUM_BLOCK_ID CaveID 			=	E_BLOCK_AIR;
-
-	int PosX = a_Chunk->GetPosX();
-	int PosZ = a_Chunk->GetPosZ();
-
-	cWorld* World = a_Chunk->GetWorld();
-	cNoise m_Noise( World->GetWorldSeed() );
-	char* BlockType = a_Chunk->pGetType();
-
-	for(int z = 0; z < 16; z++) for(int x = 0; x < 16; x++)
+	char BlockType[cChunk::c_NumBlocks];
+	
+	if (!m_World->GetChunkBlocks(a_ChunkX, a_ChunkY, a_ChunkZ, BlockType))
 	{
-		// Find top most Y
-		int TopY = -1;
-		for(int y = 127; y > 0; y--)
-		{
-			int index =  MakeIndex( x, y, z );
-			if( BlockType[index] != E_BLOCK_AIR )
-			{
-				TopY = y;
-				break;
-			}
-		}
-		if( TopY > 0 )
-		{
-			// Change top dirt into grass and prevent sand from floating over caves
-			int index = MakeIndex( x, TopY, z );
-			int index1 = MakeIndex( x, TopY-1, z );
-			int index2 = MakeIndex( x, TopY-2, z );
-			int index3 = MakeIndex( x, TopY-3, z );
-			int index4 = MakeIndex( x, TopY-4, z );
-			int index5 = MakeIndex( x, TopY-5, z );
-
-			if( BlockType[index] == SandID ) {
-
-				if( BlockType[index1] == CaveID ) {
-					BlockType[ index ] = (char)SandStoneID;
-				} else if( BlockType[index2] == CaveID ) {
-					BlockType[ index1 ] = (char)SandStoneID;
-				} else if( BlockType[index3] == CaveID ) {
-					BlockType[ index2 ] = (char)SandStoneID;
-				} else if( BlockType[index4] == CaveID ) {
-					BlockType[ index3 ] = (char)SandStoneID;
-				} else if( BlockType[index5] == CaveID ) {
-					BlockType[ index4 ] = (char)SandStoneID;
-				}
-
-			}
-
-			if( BlockType[index] == DirtID )
-			{
-				BlockType[ index ] = (char)GrassID;
-			}
-
-			// Plant sum trees
-			{
-				int xx = x + PosX*16;
-				int zz = z + PosZ*16;
-
-				float val1 = m_Noise.CubicNoise2D( xx*0.1f, zz*0.1f );
-				float val2 = m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f );
-				if( BlockType[index] == SandID )
-				{
-					if( (val1 + val2 > 0.f) && (r1.randInt()%128) > 124 && BlockType[index] == E_BLOCK_SAND )
-					{
-						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_CACTUS;
-						if( (r1.randInt() & 3) == 3 )
-						{
-							BlockType[ MakeIndex(x, TopY+2, z) ] = E_BLOCK_CACTUS;
-						}
-						continue;
-					}
-				}
-				else if( BlockType[index] == GrassID )
-				{
-					float val3 = m_Noise.CubicNoise2D( xx*0.01f+10, zz*0.01f+10 );
-					float val4 = m_Noise.CubicNoise2D( xx*0.05f+20, zz*0.05f+20 );
-					if( val1 + val2 > 0.2f && (r1.randInt()%128) > 124 )
-						World->GrowTree( xx, TopY, zz );
-					else if( val3 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
-					else if( val4 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_ROSE;
-					else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_MUSHROOM;
-					else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
-				}
-			}
-
-		}
+		LOGWARNING("Cannot generate foliage on chunk [%d, %d]", a_ChunkX, a_ChunkZ);
+		return;
 	}
+	
+	cNoise Noise(m_World->GetWorldSeed());
+	for (int z = 0; z < 16; z++) 
+	{
+		int zz = z + a_ChunkZ * 16;
+		for (int x = 0; x < 16; x++)
+		{
+			int xx = x + a_ChunkX * 16;
+
+			int TopY = m_World->GetHeight(xx, zz);
+			int index = MakeIndex(x, TopY - 1, z);
+			if (BlockType[index] == E_BLOCK_GRASS )
+			{
+				float val1 = Noise.CubicNoise2D( xx * 0.1f, zz * 0.1f );
+				float val2 = Noise.CubicNoise2D( xx * 0.01f, zz * 0.01f );
+				if ((val1 + val2 > 0.2f) && ((r1.randInt() % 128) > 124))
+				{
+					m_World->GrowTree( xx, TopY, zz );
+				}
+			}  // if (Grass)
+		}  // for x
+	}  // for z
 }
 
 
