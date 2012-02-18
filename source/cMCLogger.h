@@ -1,11 +1,15 @@
 
 #pragma once
 
-#ifndef _WIN32
-	#include <stdarg.h>
-#endif
+
+
 
 class cLog;
+
+
+
+
+
 class cMCLogger														//tolua_export
 {																	//tolua_export
 private:
@@ -37,6 +41,21 @@ extern void LOG(const char* a_Format, ...);
 extern void LOGINFO(const char* a_Format, ...);
 extern void LOGWARN(const char* a_Format, ...);
 extern void LOGERROR(const char* a_Format, ...);
+
+
+
+
+
+// In debug builds, translate LOGD to LOG, otherwise leave it out altogether:
+#ifdef _DEBUG
+	#define LOGD LOG
+#else
+	#define LOGD(...)
+#endif  // _DEBUG
+
+
+
+
 
 #define LOGWARNING LOGWARN
 
