@@ -109,6 +109,8 @@ void cChunk::SetValid(bool a_SendToClients)
 {
 	m_IsValid = true;
 	
+	m_World->GetChunkMap()->ChunkValidated();
+	
 	if (!a_SendToClients)
 	{
 		return;
@@ -177,7 +179,7 @@ void cChunk::MarkSaved(void)
 void cChunk::MarkLoaded(void)
 {
 	m_IsDirty = false;
-	m_IsValid = true;
+	SetValid();
 }
 
 
@@ -240,8 +242,6 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	CreateBlockEntities();
 
 	CalculateHeightmap();
-	
-	MarkDirty();
 }
 
 
@@ -511,7 +511,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 
 
 
-char cChunk::GetHeight( int a_X, int a_Z )
+int cChunk::GetHeight( int a_X, int a_Z )
 {
 	if( a_X >= 0 && a_X < 16 && a_Z >= 0 && a_Z < 16 )
 	{
@@ -756,10 +756,10 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 		}
 	}
 
-	if( bCalcLeft )		m_World->ReSpreadLighting( LeftChunk );
-	if( bCalcRight )	m_World->ReSpreadLighting( RightChunk );
-	if( bCalcFront )	m_World->ReSpreadLighting( FrontChunk );
-	if( bCalcBack )		m_World->ReSpreadLighting( BackChunk );
+	if( bCalcLeft )		m_World->ReSpreadLighting( m_PosX - 1, m_PosY, m_PosZ );
+	if( bCalcRight )	m_World->ReSpreadLighting( m_PosX + 1, m_PosY, m_PosZ );
+	if( bCalcFront )	m_World->ReSpreadLighting( m_PosX, m_PosY, m_PosZ - 1 );
+	if( bCalcBack )		m_World->ReSpreadLighting( m_PosX, m_PosY, m_PosZ + 1 );
 }
 
 

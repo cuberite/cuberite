@@ -91,6 +91,55 @@ inline float fRadRand( float a_Radius )
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorldLoadProgress:
+
+/// A simple thread that displays the progress of world loading / saving in cWorld::InitializeSpawn()
+class cWorldLoadProgress :
+	public cIsThread
+{
+public:
+	cWorldLoadProgress(cWorld * a_World) :
+		cIsThread("cWorldLoadProgress"),
+		m_World(a_World)
+	{
+		Start();
+	}
+	
+protected:
+
+	cWorld * m_World;
+	
+	virtual void Execute(void) override
+	{
+		for (;;)
+		{
+			LOG("%d chunks to load, %d chunks to generate", 
+				m_World->GetStorage().GetLoadQueueLength(),
+				m_World->GetGenerator().GetQueueLength()
+			);
+			
+			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
+			for (int i = 0; i < 20; i++)
+			{
+				cSleep::MilliSleep(100);
+				if (mShouldTerminate)
+				{
+					return;
+				}
+			}
+		}  // for (-ever)
+	}
+	
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld:
+
 cWorld* cWorld::GetWorld()
 {
 	LOGWARN("WARNING: Using deprecated function cWorld::GetWorld() use cRoot::Get()->GetWorld() instead!");
@@ -154,7 +203,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_GameMode = 0;
 
 	AString GeneratorName;
-	AString StorageSchema;
+	AString StorageSchema("Default");
 
 	cIniFile IniFile( m_WorldName + "/world.ini");
 	if( IniFile.ReadFile() )
@@ -164,8 +213,8 @@ cWorld::cWorld( const AString & a_WorldName )
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ );
 		m_WorldSeed = IniFile.GetValueI("Seed", "Seed", m_WorldSeed );
 		m_GameMode = IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
-		GeneratorName = IniFile.GetValue("Generator", "GeneratorName", "Default");
-		StorageSchema = IniFile.GetValue("Storage", "Schema", "Default");
+		GeneratorName = IniFile.GetValue("Generator", "GeneratorName", GeneratorName);
+		StorageSchema = IniFile.GetValue("Storage", "Schema", StorageSchema);
 	}
 	else
 	{
@@ -174,7 +223,8 @@ cWorld::cWorld( const AString & a_WorldName )
 		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ );
 		IniFile.SetValueI("Seed", "Seed", m_WorldSeed );
 		IniFile.SetValueI("GameMode", "GameMode", m_GameMode );
-		IniFile.SetValue("Generator", "GeneratorName", "Default" );
+		IniFile.SetValue("Generator", "GeneratorName", GeneratorName);
+		IniFile.SetValue("Storage", "Schema", StorageSchema);
 		if( !IniFile.WriteFile() )
 		{
 			LOG("WARNING: Could not write to %s/world.ini", a_WorldName.c_str());
@@ -380,7 +430,9 @@ void cWorld::InitializeSpawn()
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	BlockToChunk( (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ );
+	
 	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+	
 	LOG("Preparing spawn area in world \"%s\"", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)
 	{
@@ -390,7 +442,16 @@ void cWorld::InitializeSpawn()
 		}
 	}
 	
-	// TODO: Wait for the generator to finish generating these chunks
+	// Display progress during this process:
+	cWorldLoadProgress Progress(this);
+	
+	// Wait for the loader to finish loading
+	m_Storage.WaitForQueuesEmpty();
+	
+	// Wait for the generator to finish generating
+	m_Generator.WaitForQueueEmpty();
+	
+	m_SpawnY = (double)GetHeight( (int)m_SpawnX, (int)m_SpawnZ ) + 1.6f; // +1.6f eye height
 }
 
 
@@ -434,23 +495,7 @@ void cWorld::Tick(float a_Dt)
 		}
 	}
 
-	{
-		cCSLock Lock(m_CSLighting);
-		if (m_SpreadQueue.size() >= 50 )
-		{
-			LOGWARN("cWorld: Lots of lighting to do! Still %i chunks left!", m_SpreadQueue.size() );
-		}
-		int TimesSpreaded = 0;
-		while ( !m_SpreadQueue.empty() && TimesSpreaded < MAX_LIGHTING_SPREAD_PER_TICK ) // Do not choke the tick thread
-		{
-			cChunkPtr & Chunk = *m_SpreadQueue.begin();
-			//LOG("Spreading: %p", Chunk );
-			Chunk->SpreadLight( Chunk->pGetSkyLight() );
-			Chunk->SpreadLight( Chunk->pGetLight() );
-			m_SpreadQueue.pop_front();
-			TimesSpreaded++;
-		}
-	}
+	TickLighting();
 
 	m_ChunkMap->Tick(a_Dt, m_TickRand);
 	
@@ -602,7 +647,7 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	int nightRand = m_TickRand.randInt() % 10;
 
 	SpawnPos += Vector3d( (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32 );
-	char Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
+	int Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
 
 	if (m_WorldTime >= 12000 + 1000)
 	{
@@ -650,6 +695,37 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		Monster->Initialize( this );
 		Monster->TeleportTo( SpawnPos.x, (double)(Height) + 2, SpawnPos.z );
 		Monster->SpawnOn(0);
+	}
+}
+
+
+
+
+
+void cWorld::TickLighting(void)
+{
+	// To avoid a deadlock, we lock the spread queue only long enough to pick the chunk coords to spread
+	// The spreading itself will run unlocked
+	cChunkCoordsList SpreadQueue;
+	{
+		cCSLock Lock(m_CSLighting);
+		if (m_SpreadQueue.size() == 0)
+		{
+			return;
+		}
+		if (m_SpreadQueue.size() >= MAX_LIGHTING_SPREAD_PER_TICK )
+		{
+			LOGWARN("cWorld: Lots of lighting to do! Still %i chunks left!", m_SpreadQueue.size() );
+		}
+		// Move up to MAX_LIGHTING_SPREAD_PER_TICK elements from m_SpreadQueue out into SpreadQueue:
+		cChunkCoordsList::iterator itr = m_SpreadQueue.begin();
+		std::advance(itr, MIN(m_SpreadQueue.size(), MAX_LIGHTING_SPREAD_PER_TICK));
+		SpreadQueue.splice(SpreadQueue.begin(), m_SpreadQueue, m_SpreadQueue.begin(), itr);
+	}
+	
+	for (cChunkCoordsList::iterator itr = SpreadQueue.begin(); itr != SpreadQueue.end(); ++itr)
+	{
+		m_ChunkMap->SpreadChunkLighting(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
 	}
 }
 
@@ -896,16 +972,9 @@ cBlockEntity * cWorld::GetBlockEntity( int a_X, int a_Y, int a_Z )
 
 
 
-char cWorld::GetHeight( int a_X, int a_Z )
+int cWorld::GetHeight( int a_X, int a_Z )
 {
-	int PosX = a_X, PosY = 0, PosZ = a_Z, ChunkX, ChunkY, ChunkZ;
-	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkY, ChunkZ );
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if ( Chunk->IsValid())
-	{
-		return Chunk->GetHeight( PosX, PosZ );
-	}
-	return 0;
+	return m_ChunkMap->GetHeight(a_X, a_Z);
 }
 
 
@@ -914,7 +983,6 @@ char cWorld::GetHeight( int a_X, int a_Z )
 
 const double & cWorld::GetSpawnY(void)
 {
-	m_SpawnY = (double)GetHeight( (int)m_SpawnX, (int)m_SpawnZ ) + 1.6f; // +1.6f eye height
 	return m_SpawnY;
 }
 
@@ -983,9 +1051,9 @@ void cWorld::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cha
 
 
 
-void cWorld::SetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cWorld::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
-	m_ChunkMap->SetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+	m_ChunkMap->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
 }
 
 
@@ -1217,21 +1285,21 @@ void cWorld::SaveAllChunks()
 
 
 
-void cWorld::ReSpreadLighting( const cChunkPtr & a_Chunk )
+void cWorld::ReSpreadLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLighting);
-	m_SpreadQueue.remove( a_Chunk ); 
-	m_SpreadQueue.push_back( a_Chunk );
+	m_SpreadQueue.remove(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)); 
+	m_SpreadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 }
 
 
 
 
 
-void cWorld::RemoveSpread( const cChunkPtr & a_Chunk )
+void cWorld::RemoveSpread(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLighting);
-	m_SpreadQueue.remove( a_Chunk );
+	m_SpreadQueue.remove(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 }
 
 

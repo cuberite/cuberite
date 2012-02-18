@@ -31,19 +31,9 @@ cWorldGenerator::~cWorldGenerator()
 
 
 
-void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
-	// TODO: use a raw char array instead of the entire chunk, then set it as chunk's blockdata
-	
-	cChunkPtr Chunk = m_World->GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
-	assert(!Chunk->IsValid());
-	
-	memset(Chunk->pGetBlockData(), 0, cChunk::c_BlockDataSize);
-	GenerateTerrain(Chunk);
-	GenerateFoliage(Chunk);
-	Chunk->CalculateHeightmap();
-	Chunk->CalculateLighting();
-	Chunk->SetValid();
+	GenerateTerrain(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData);
 }
 
 
@@ -101,40 +91,44 @@ static float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
 
 
 
-void cWorldGenerator::GenerateTerrain( cChunkPtr a_Chunk )
+unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 {
-	Vector3i ChunkPos( a_Chunk->GetPosX(), a_Chunk->GetPosY(), a_Chunk->GetPosZ() );
-	char* BlockType = a_Chunk->pGetType();
+	assert((x < 16) && (x > -1) && (y < 128) && (y > -1) && (z < 16) && (z > -1));
 
-	//const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
-	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
-	const ENUM_BLOCK_ID StoneID 		=	E_BLOCK_STONE;
-	const ENUM_BLOCK_ID SandID 			=	E_BLOCK_SAND;
-	const ENUM_BLOCK_ID SandStoneID		=	E_BLOCK_SANDSTONE;
-	const ENUM_BLOCK_ID CaveID 			=	E_BLOCK_AIR;
-	const ENUM_BLOCK_ID LavaID 			=	E_BLOCK_STATIONARY_LAVA;
-	const ENUM_BLOCK_ID CoalID 			=	E_BLOCK_COAL_ORE;
-	const ENUM_BLOCK_ID IronID 			=	E_BLOCK_IRON_ORE;
-	const ENUM_BLOCK_ID GoldID 			=	E_BLOCK_GOLD_ORE;
-	const ENUM_BLOCK_ID DiamondID 		=	E_BLOCK_DIAMOND_ORE;
-	const ENUM_BLOCK_ID RedID 			=	E_BLOCK_REDSTONE_ORE;
+	return y + (z * 128) + (x * 128 * 16);
+}
 
-	cNoise Noise( a_Chunk->GetWorld()->GetWorldSeed() );
-	for(int z = 0; z < 16; z++) 
+
+
+
+
+void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+{
+	const int WATER_LEVEL = 60;
+	const int SAND_LEVEL = 3;
+	
+	memset(a_BlockData, E_BLOCK_AIR, cChunk::c_BlockDataSize);
+
+	cNoise Noise(m_World->GetWorldSeed());
+	
+	for (int z = 0; z < 16; z++) 
 	{
-		const float zz = (float)(ChunkPos.z*16 + z);
-		for(int x = 0; x < 16; x++)
+		const float zz = (float)(a_ChunkZ * 16 + z);
+		for (int x = 0; x < 16; x++)
 		{
 			// Place bedrock on bottom layer
-			BlockType[ cChunk::MakeIndex(x, 0, z) ] = E_BLOCK_BEDROCK;
+			a_BlockData[MakeIndex(x, 0, z)] = E_BLOCK_BEDROCK;
 
-			const float xx = (float)(ChunkPos.x*16 + x);
+			const float xx = (float)(a_ChunkX * 16 + x);
 			
-			int Height = (int)(GetNoise( xx*0.05f, zz*0.05f, Noise )*16);
+			int Height = (int)(GetNoise( xx * 0.05f, zz * 0.05f, Noise ) * 16);
 			const int Lower = 64;
-			if( Height+Lower > 127 ) Height = 127-Lower;
-			const int Top = Lower+Height;
-			const float WaveNoise = 1;//m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f ) + 0.5f;
+			if ( Height + Lower > 127 )
+			{
+				Height = 127 - Lower;
+			}
+			const int Top = Lower + Height;
+			const float WaveNoise = 1;  // m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f ) + 0.5f;
 			for( int y = 1; y < Top; ++y )
 			{
 				const float yy = (float)y;
@@ -143,42 +137,69 @@ void cWorldGenerator::GenerateTerrain( cChunkPtr a_Chunk )
 				{
 					if( y > 4 )
 					{
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = CaveID;
-						if( z > 0 ) BlockType[ cChunk::MakeIndex(x, y, z-1) ] = CaveID;
-						if( z < 15 ) BlockType[ cChunk::MakeIndex(x, y, z+1) ] = CaveID;
-						if( x > 0 ) BlockType[ cChunk::MakeIndex(x-1, y, z) ] = CaveID;
-						if( x < 15 ) BlockType[ cChunk::MakeIndex(x+1, y, z) ] = CaveID;
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_AIR;
+						if( z > 0 ) a_BlockData[ MakeIndex(x, y, z-1) ] = E_BLOCK_AIR;
+						if( z < 15 ) a_BlockData[ MakeIndex(x, y, z+1) ] = E_BLOCK_AIR;
+						if( x > 0 ) a_BlockData[ MakeIndex(x-1, y, z) ] = E_BLOCK_AIR;
+						if( x < 15 ) a_BlockData[ MakeIndex(x+1, y, z) ] = E_BLOCK_AIR;
 					}
 					else
 					{
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = LavaID;
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STATIONARY_LAVA;
 					}
 				}
-				else if( y < 61 && Top - y < 3 )
-					BlockType[ cChunk::MakeIndex(x, y, z) ] = SandID;
-				else if( y < 61 && Top - y < 4 )
-					BlockType[ cChunk::MakeIndex(x, y, z) ] = SandStoneID;
-				else if( Top - y > ((WaveNoise+1.5f)*1.5f) ) // rock and ores between 1.5 .. 4.5 deep
+				else if ((y < 61) && (Top - y < SAND_LEVEL ))
 				{
-					if( GetOreNoise( xx, yy, zz, Noise ) > 0.5f )
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = CoalID;
-					else if( GetOreNoise( xx, yy+100.f, zz, Noise ) > 0.6f )
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = IronID;
-					else if( yy < 20 && GetOreNoise( xx*1.5f, yy+300.f, zz*1.5f, Noise ) > 0.6f )
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = RedID;
-					else if( yy < 30 && GetOreNoise( xx*2, yy+200.f, zz*2, Noise ) > 0.75f )
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = DiamondID;
-					else if( yy < 40 && GetOreNoise( xx*2, yy+100.f, zz*2, Noise ) > 0.75f )
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = GoldID;
+					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_SAND;
+				}
+				else if ((y < 61) && (Top - y < 4 ))
+				{
+					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_SANDSTONE;
+				}
+				else if (Top - y > ((WaveNoise + 1.5f) * 1.5f)) // rock and ores between 1.5 .. 4.5 deep
+				{
+					if ( GetOreNoise( xx, yy, zz, Noise ) > 0.5f )
+					{
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_COAL_ORE;
+					}
+					else if ( GetOreNoise( xx, yy+100.f, zz, Noise ) > 0.6f )
+					{
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_IRON_ORE;
+					}
+					else if (( yy < 20) && (GetOreNoise( xx * 1.5f, yy + 300.f, zz * 1.5f, Noise ) > 0.6f ))
+					{
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_REDSTONE_ORE;
+					}
+					else if (( yy < 30) && (GetOreNoise( xx * 2, yy + 200.f, zz * 2, Noise ) > 0.75f ))
+					{
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_DIAMOND_ORE;
+					}
+					else if (( yy < 40) && (GetOreNoise( xx * 2, yy + 100.f, zz * 2, Noise ) > 0.75f ))
+					{
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_GOLD_ORE;
+					}
 					else
-						BlockType[ cChunk::MakeIndex(x, y, z) ] = StoneID;
+					{
+						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STONE;
+					}
 				}
 				else
-					BlockType[ cChunk::MakeIndex(x, y, z) ] = DirtID;
+				{
+					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_DIRT;
+				}
 			}
-			for( int y = Lower+Height; y < 60; ++y )
+			if (Top + 1 >= WATER_LEVEL + SAND_LEVEL)
 			{
-				BlockType[ cChunk::MakeIndex(x, y, z) ] = E_BLOCK_STATIONARY_WATER;
+				// Replace top dirt with grass:
+				a_BlockData[MakeIndex(x, Top - 1, z)] = E_BLOCK_GRASS;
+			}
+			else
+			{
+				// Add water up to the WATER_LEVEL:
+				for (int y = Top; y < WATER_LEVEL; ++y )
+				{
+					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STATIONARY_WATER;
+				}
 			}
 		}
 	}
@@ -188,7 +209,7 @@ void cWorldGenerator::GenerateTerrain( cChunkPtr a_Chunk )
 
 
 
-void cWorldGenerator::GenerateFoliage( cChunkPtr a_Chunk )
+void cWorldGenerator::GenerateFoliage( cChunkPtr & a_Chunk )
 {
 	const ENUM_BLOCK_ID GrassID 		=	E_BLOCK_GRASS;
 	const ENUM_BLOCK_ID DirtID 			=	E_BLOCK_DIRT;
@@ -209,7 +230,7 @@ void cWorldGenerator::GenerateFoliage( cChunkPtr a_Chunk )
 		int TopY = -1;
 		for(int y = 127; y > 0; y--)
 		{
-			int index =  cChunk::MakeIndex( x, y, z );
+			int index =  MakeIndex( x, y, z );
 			if( BlockType[index] != E_BLOCK_AIR )
 			{
 				TopY = y;
@@ -219,12 +240,12 @@ void cWorldGenerator::GenerateFoliage( cChunkPtr a_Chunk )
 		if( TopY > 0 )
 		{
 			// Change top dirt into grass and prevent sand from floating over caves
-			int index = cChunk::MakeIndex( x, TopY, z );
-			int index1 = cChunk::MakeIndex( x, TopY-1, z );
-			int index2 = cChunk::MakeIndex( x, TopY-2, z );
-			int index3 = cChunk::MakeIndex( x, TopY-3, z );
-			int index4 = cChunk::MakeIndex( x, TopY-4, z );
-			int index5 = cChunk::MakeIndex( x, TopY-5, z );
+			int index = MakeIndex( x, TopY, z );
+			int index1 = MakeIndex( x, TopY-1, z );
+			int index2 = MakeIndex( x, TopY-2, z );
+			int index3 = MakeIndex( x, TopY-3, z );
+			int index4 = MakeIndex( x, TopY-4, z );
+			int index5 = MakeIndex( x, TopY-5, z );
 
 			if( BlockType[index] == SandID ) {
 
@@ -258,10 +279,10 @@ void cWorldGenerator::GenerateFoliage( cChunkPtr a_Chunk )
 				{
 					if( (val1 + val2 > 0.f) && (r1.randInt()%128) > 124 && BlockType[index] == E_BLOCK_SAND )
 					{
-						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_CACTUS;
+						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_CACTUS;
 						if( (r1.randInt() & 3) == 3 )
 						{
-							BlockType[ cChunk::MakeIndex(x, TopY+2, z) ] = E_BLOCK_CACTUS;
+							BlockType[ MakeIndex(x, TopY+2, z) ] = E_BLOCK_CACTUS;
 						}
 						continue;
 					}
@@ -273,13 +294,13 @@ void cWorldGenerator::GenerateFoliage( cChunkPtr a_Chunk )
 					if( val1 + val2 > 0.2f && (r1.randInt()%128) > 124 )
 						World->GrowTree( xx, TopY, zz );
 					else if( val3 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
+						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
 					else if( val4 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_ROSE;
+						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_ROSE;
 					else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_MUSHROOM;
+						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_MUSHROOM;
 					else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
-						BlockType[ cChunk::MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
+						BlockType[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
 				}
 			}
 

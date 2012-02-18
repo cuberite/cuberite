@@ -43,6 +43,10 @@ public:
 	void Stop(void);
 
 	void GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Queues the chunk for generation; removes duplicate requests
+	
+	void WaitForQueueEmpty(void);
+	
+	int GetQueueLength(void);
 
 private:
 
@@ -52,6 +56,7 @@ private:
 	cCriticalSection m_CS;
 	cChunkCoordsList m_Queue;
 	cEvent           m_Event;  // Set when an item is added to the queue or the thread should terminate
+	cEvent           m_evtRemoved;  // Set when an item is removed from the queue
 
 	// cIsThread override:
 	virtual void Execute(void) override;

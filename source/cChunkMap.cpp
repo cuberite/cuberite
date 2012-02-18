@@ -235,7 +235,7 @@ void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const 
 
 
 
-void cChunkMap::SetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cChunkMap::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -244,6 +244,12 @@ void cChunkMap::SetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cha
 		return;
 	}
 	Chunk->SetAllData(a_BlockData, a_Entities, a_BlockEntities);
+
+	// TODO: This has to go - lighting takes way too long to execute in a locked ChunkMap!
+	Chunk->CalculateLighting();
+	
+	Chunk->SetValid();
+	Chunk->MarkDirty();
 }
 
 
@@ -281,6 +287,48 @@ bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
 	return (Chunk != NULL) && Chunk->HasAnyClients();
+}
+
+
+
+
+
+void cChunkMap::SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		// TODO: Rewrite this to call Chunk's lighting without any parameters
+		Chunk->SpreadLight( Chunk->pGetSkyLight() );
+		Chunk->SpreadLight( Chunk->pGetLight() );
+	}
+}
+
+
+
+
+
+int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ, BlockY = 0;
+	AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return 0;
+	}
+	
+	// Wait for the chunk to become valid:
+	while (!Chunk->IsValid())
+	{
+		GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);  // Re-queue (in case it managed to get unloaded before we caught it
+		cCSUnlock Unlock(Lock);
+		m_evtChunkValid.Wait();
+	}
+	
+	return Chunk->GetHeight(a_BlockX, a_BlockZ);
 }
 
 
@@ -440,6 +488,15 @@ int cChunkMap::GetNumChunks(void)
 		NumChunks += (*itr)->GetNumChunksLoaded();
 	}
 	return NumChunks;
+}
+
+
+
+
+
+void cChunkMap::ChunkValidated(void)
+{
+	m_evtChunkValid.Set();
 }
 
 

@@ -10,7 +10,6 @@
 #include "cRoot.h"
 #include "cLuaCommandBinder.h"
 #include "../iniFile/iniFile.h"
-#include <stdarg.h>
 
 #include "SquirrelBindings.h"
 #if USE_SQUIRREL

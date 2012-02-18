@@ -71,6 +71,7 @@ void cChunkGenerator::Stop(void)
 {
 	mShouldTerminate = true;
 	m_Event.Set();
+	m_evtRemoved.Set();  // Wake up anybody waiting for empty queue
 	Wait();
 	
 	delete m_pWorldGenerator;
@@ -109,6 +110,30 @@ void cChunkGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
+void cChunkGenerator::WaitForQueueEmpty(void)
+{
+	cCSLock Lock(m_CS);
+	while (!mShouldTerminate && !m_Queue.empty())
+	{
+		cCSUnlock Unlock(Lock);
+		m_evtRemoved.Wait();
+	}
+}
+
+
+
+
+
+int cChunkGenerator::GetQueueLength(void)
+{
+	cCSLock Lock(m_CS);
+	return (int)m_Queue.size();
+}
+
+
+
+
+
 void cChunkGenerator::Execute(void)
 {
 	while (!mShouldTerminate)
@@ -128,6 +153,7 @@ void cChunkGenerator::Execute(void)
 		m_Queue.erase( m_Queue.begin() );	// Remove coordinate from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
 		Lock.Unlock();			// Unlock ASAP
+		m_evtRemoved.Set();
 
 		if (
 			m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ) ||
@@ -138,7 +164,7 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 		
-		LOG("Generating chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
+		LOGD("Generating chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 		DoGenerate(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 		
 		// Save the chunk right after generating, so that we don't have to generate it again on next run
@@ -151,9 +177,11 @@ void cChunkGenerator::Execute(void)
 
 void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	// TODO: Convert this not to require the actual cChunkPtr (generate into raw char array)
-	// char BlockData[cChunk::c_BlockDataSize];
-	m_pWorldGenerator->GenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	char BlockData[cChunk::c_BlockDataSize];
+	cEntityList Entities;
+	cBlockEntityList BlockEntities;
+	m_pWorldGenerator->GenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ, BlockData, Entities, BlockEntities);
+	m_World->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, BlockData, Entities, BlockEntities);
 }
 
 

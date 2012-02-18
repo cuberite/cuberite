@@ -113,7 +113,7 @@ void cAuthenticator::Stop(void)
 
 void cAuthenticator::Execute(void)
 {
-	while (true)
+	for (;;)
 	{
 		cCSLock Lock(mCS);
 		while (!mShouldTerminate && (mQueue.size() == 0))
@@ -142,7 +142,7 @@ void cAuthenticator::Execute(void)
 		{
 			cRoot::Get()->AuthenticateUser(UserName);
 		}
-	}
+	}  // for (-ever)
 }
 
 

@@ -147,14 +147,49 @@ void cWorldStorage::WaitForFinish(void)
 	
 	{
 		// Cancel all loading requests:
-		cCSLock Lock(m_CSLoadQueue);
+		cCSLock Lock(m_CSQueues);
 		m_LoadQueue.clear();
 	}
 	
 	// Wait for the thread to finish:
 	mShouldTerminate = true;
 	m_Event.Set();
+	m_evtRemoved.Set();  // Wake up anybody waiting in the WaitForQueuesEmpty() method
 	super::Wait();
+}
+
+
+
+
+
+void cWorldStorage::WaitForQueuesEmpty(void)
+{
+	cCSLock Lock(m_CSQueues);
+	while (!mShouldTerminate && (!m_LoadQueue.empty() || !m_SaveQueue.empty()))
+	{
+		cCSUnlock Unlock(Lock);
+		m_evtRemoved.Wait();
+	}
+}
+
+
+
+
+
+int cWorldStorage::GetLoadQueueLength(void)
+{
+	cCSLock Lock(m_CSQueues);
+	return (int)m_LoadQueue.size();
+}
+
+
+
+
+
+int cWorldStorage::GetSaveQueueLength(void)
+{
+	cCSLock Lock(m_CSQueues);
+	return (int)m_SaveQueue.size();
 }
 
 
@@ -164,7 +199,7 @@ void cWorldStorage::WaitForFinish(void)
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	// Queues the chunk for loading; if not loaded, the chunk will be generated
-	cCSLock Lock(m_CSLoadQueue);
+	cCSLock Lock(m_CSQueues);
 	m_LoadQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
 	m_LoadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	m_Event.Set();
@@ -176,7 +211,7 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cCSLock Lock(m_CSSaveQueue);
+	cCSLock Lock(m_CSQueues);
 	m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
 	m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	m_Event.Set();
@@ -188,8 +223,9 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cWorldStorage::UnqueueLoad(const cChunkCoords & a_Chunk)
 {
-	cCSLock Lock(m_CSLoadQueue);
+	cCSLock Lock(m_CSQueues);
 	m_LoadQueue.remove(a_Chunk);
+	m_evtRemoved.Set();
 }
 
 
@@ -198,8 +234,9 @@ void cWorldStorage::UnqueueLoad(const cChunkCoords & a_Chunk)
 
 void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 {
-	cCSLock Lock(m_CSSaveQueue);
+	cCSLock Lock(m_CSQueues);
 	m_SaveQueue.remove(a_Chunk);
+	m_evtRemoved.Set();
 }
 
 
@@ -258,6 +295,7 @@ void cWorldStorage::Execute(void)
 			
 			HasMore = LoadOneChunk();
 			HasMore = HasMore | SaveOneChunk();
+			m_evtRemoved.Set();
 		} while (HasMore);
 	}
 }
@@ -272,7 +310,7 @@ bool cWorldStorage::LoadOneChunk(void)
 	bool HasMore;
 	bool ShouldLoad = false;
 	{
-		cCSLock Lock(m_CSLoadQueue);
+		cCSLock Lock(m_CSQueues);
 		if (m_LoadQueue.size() > 0)
 		{
 			ToLoad = m_LoadQueue.front();
@@ -299,7 +337,7 @@ bool cWorldStorage::SaveOneChunk(void)
 	bool HasMore;
 	bool ShouldSave = false;
 	{
-		cCSLock Lock(m_CSSaveQueue);
+		cCSLock Lock(m_CSQueues);
 		if (m_SaveQueue.size() > 0)
 		{
 			Save = m_SaveQueue.front();

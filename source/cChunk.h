@@ -119,7 +119,7 @@ public:
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	void UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);  // Also sends update packets to all clients in the chunk
 
-	char GetHeight( int a_X, int a_Z );
+	int  GetHeight( int a_X, int a_Z );
 
 	void SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client );
 

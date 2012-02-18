@@ -105,19 +105,23 @@ public:
 	
 	bool Start(cWorld * a_World, const AString & a_StorageSchemaName);  // Hide the cIsThread's Start() method, we need to provide args
 	void WaitForFinish(void);
+	void WaitForQueuesEmpty(void);
+	
+	int GetLoadQueueLength(void);
+	int GetSaveQueueLength(void);
 	
 protected:
 
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
 	
-	cCriticalSection m_CSLoadQueue;
-	cChunkCoordsList    m_LoadQueue;
+	// Both queues are locked by the same CS
+	cCriticalSection m_CSQueues;
+	cChunkCoordsList m_LoadQueue;
+	cChunkCoordsList m_SaveQueue;
 	
-	cCriticalSection m_CSSaveQueue;
-	cChunkCoordsList    m_SaveQueue;
-	
-	cEvent m_Event;  // Set when there's any addition to the queues
+	cEvent m_Event;       // Set when there's any addition to the queues
+	cEvent m_evtRemoved;  // Set when an item has been removed from the queue, either by the worker thread or the Unqueue methods
 	
 	/// All the storage schemas (all used for loading)
 	cWSSchemaList m_Schemas;

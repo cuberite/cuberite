@@ -60,7 +60,7 @@ public:
 	cChunkPtr GetChunk       ( int a_ChunkX, int a_ChunkY, int a_ChunkZ ) {return m_ChunkMap->GetChunk     (a_ChunkX, a_ChunkY, a_ChunkZ); }
 	cChunkPtr GetChunkNoGen  ( int a_ChunkX, int a_ChunkY, int a_ChunkZ ) {return m_ChunkMap->GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ); }
 	cChunkPtr GetChunkOfBlock( int a_X, int a_Y, int a_Z );
-	char GetHeight( int a_X, int a_Z );												//tolua_export
+	int GetHeight( int a_X, int a_Z );												//tolua_export
 
 	//void AddClient( cClientHandle* a_Client );
 	//void RemoveClient( cClientHandle* a_Client );
@@ -74,7 +74,7 @@ public:
 	void MarkChunkSaving   (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaved    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void ChunkDataLoaded   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
-	void SetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	void GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
@@ -165,8 +165,8 @@ public:
 
 	void Tick(float a_Dt);
 
-	void ReSpreadLighting(const cChunkPtr & a_Chunk );
-	void RemoveSpread(const cChunkPtr & a_Chunk );
+	void ReSpreadLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void RemoveSpread(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 
 	void InitializeSpawn();
 
@@ -176,6 +176,7 @@ public:
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
+	cChunkMap *       GetChunkMap (void) { return m_ChunkMap; }
 	
 private:
 
@@ -247,7 +248,7 @@ private:
 	cPlayerList       m_Players;
 
 	cCriticalSection  m_CSLighting;
-	cChunkPtrList     m_SpreadQueue;
+	cChunkCoordsList  m_SpreadQueue;
 
 	cCriticalSection m_CSFastSetBlock;
 	FastSetBlockList m_FastSetBlockQueue;
@@ -261,6 +262,7 @@ private:
 
 	void TickWeather(float a_Dt);  // Handles weather each tick
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
+	void TickLighting(void);  // Handles lighting re-spreading
 	
 	void RemoveEntity( cEntity * a_Entity );
 }; //tolua_export
