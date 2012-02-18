@@ -431,9 +431,7 @@ void cWorld::InitializeSpawn()
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	BlockToChunk( (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ );
 	
-	// DEBUG:
-	// int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
-	int ViewDist = 5;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
 	
 	LOG("Preparing spawn area in world \"%s\"", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)
