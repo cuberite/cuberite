@@ -65,6 +65,7 @@
 // CRT stuff:
 #include <assert.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 
 

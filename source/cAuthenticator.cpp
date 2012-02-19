@@ -125,7 +125,7 @@ void cAuthenticator::Execute(void)
 		{
 			return;
 		}
-		assert(mQueue.size() > 0);
+		ASSERT(mQueue.size() > 0);
 		
 		AString UserName = mQueue.front().mName;
 		AString ActualAddress = mAddress;

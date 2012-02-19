@@ -833,7 +833,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 		return;  // Clip
 	}
 
-	assert(IsValid());  // Is this chunk loaded / generated?
+	ASSERT(IsValid());  // Is this chunk loaded / generated?
 	
 	int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	char OldBlockMeta = GetLight( m_BlockMeta, index );
@@ -894,9 +894,9 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta)
 {
-	assert(!((a_X < 0 || a_X >= 16 || a_Y < 0 || a_Y >= 128 || a_Z < 0 || a_Z >= 16)));
+	ASSERT(!((a_X < 0 || a_X >= 16 || a_Y < 0 || a_Y >= 128 || a_Z < 0 || a_Z >= 16)));
 
-	assert(IsValid());
+	ASSERT(IsValid());
 	
 	const int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	const char OldBlock = m_BlockType[index];
@@ -1271,7 +1271,7 @@ bool cChunk::LoadFromDisk()
 			
 			default:
 			{
-				assert(!"Unhandled block entity in file");
+				ASSERT(!"Unhandled block entity in file");
 				break;
 			}
 		}
@@ -1425,7 +1425,7 @@ void cChunk::SaveToJson( Json::Value & a_Value )
 			
 			default:
 			{
-				assert(!"Unhandled blocktype in BlockEntities list while saving to JSON");
+				ASSERT(!"Unhandled blocktype in BlockEntities list while saving to JSON");
 				break;
 			}
 		}  // switch (BlockEntity->GetBlockType())

@@ -96,7 +96,7 @@ void cEntity::WrapRotation()
 
 void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 {
-	assert(m_World != NULL);  // Entity needs a world to move to a chunk
+	ASSERT(m_World != NULL);  // Entity needs a world to move to a chunk
 	if( !m_World ) return;
 
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;

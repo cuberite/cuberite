@@ -48,7 +48,7 @@ int cPacket_CreativeInventoryAction::Parse(const char * a_Data, int a_Size)
 void cPacket_CreativeInventoryAction::Serialize(AString & a_Data) const
 {
 	short ItemID = m_ItemID;
-	assert(ItemID >= -1);  // Check validity of packets in debug runtime
+	ASSERT(ItemID >= -1);  // Check validity of packets in debug runtime
 	if (ItemID <= 0)
 	{
 		ItemID = -1;

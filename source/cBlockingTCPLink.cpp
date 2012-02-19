@@ -50,7 +50,7 @@ void cBlockingTCPLink::CloseSocket()
 
 bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 {
-	assert(!m_Socket.IsValid());
+	ASSERT(!m_Socket.IsValid());
 	if (m_Socket.IsValid())
 	{
 		LOGWARN("WARNING: cTCPLink Connect() called while still connected.");
@@ -101,7 +101,7 @@ bool cBlockingTCPLink::Connect(const char * iAddress, unsigned int iPort)
 
 int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 0 */ )
 {
-	assert(m_Socket.IsValid());
+	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{
 		LOGERROR("cBlockingTCPLink: Trying to send data without a valid connection!");
@@ -116,7 +116,7 @@ int cBlockingTCPLink::Send(char * a_Data, unsigned int a_Size, int a_Flags /* = 
 
 int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ )
 {
-	assert(m_Socket.IsValid());
+	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{
 		LOGWARN("cBlockingTCPLink: Trying to send message without a valid connection!");
@@ -131,7 +131,7 @@ int cBlockingTCPLink::SendMessage( const char* a_Message, int a_Flags /* = 0 */ 
 
 void cBlockingTCPLink::ReceiveData(AString & oData)
 {
-	assert(m_Socket.IsValid());
+	ASSERT(m_Socket.IsValid());
 	if (!m_Socket.IsValid())
 	{
 		return;

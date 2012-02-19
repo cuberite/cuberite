@@ -315,7 +315,7 @@ void cClientHandle::StreamChunks(void)
 		return;
 	}
 
-	assert(m_Player != NULL);
+	ASSERT(m_Player != NULL);
 	
 	int ChunkPosX = FAST_FLOOR_DIV(m_Player->GetPosX(), 16);
 	int ChunkPosZ = FAST_FLOOR_DIV(m_Player->GetPosZ(), 16);
@@ -331,7 +331,7 @@ void cClientHandle::StreamChunks(void)
 	LOGINFO("Streaming chunks centered on [%d, %d]", ChunkPosX, ChunkPosZ);
 	
 	cWorld * World = m_Player->GetWorld();
-	assert(World != NULL);
+	ASSERT(World != NULL);
 
 	// Remove all loaded chunks that are no longer in range:
 	{
@@ -405,7 +405,7 @@ void cClientHandle::StreamChunks(void)
 void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cWorld * World = m_Player->GetWorld();
-	assert(World != NULL);
+	ASSERT(World != NULL);
 
 	cChunkPtr Chunk = World->GetChunk(a_ChunkX, 0, a_ChunkZ);
 	if (!Chunk->HasClient(this))
@@ -1829,7 +1829,7 @@ void cClientHandle::SendThread(void *lpParam)
 		
 		if (NrmSendPackets.size() == 0 && LowSendPackets.size() == 0)
 		{
-			assert(!self->m_bKeepThreadGoing);
+			ASSERT(!self->m_bKeepThreadGoing);
 			if (self->m_bKeepThreadGoing)
 			{
 				LOGERROR("ERROR: Semaphore was signaled while no packets to send");
@@ -1939,7 +1939,7 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 			// Packet parsed successfully, add it to internal queue:
 			HandlePacket(pPacket);
 			// Erase the packet from the buffer:
-			assert(m_ReceivedData.size() > (size_t)NumBytes);
+			ASSERT(m_ReceivedData.size() > (size_t)NumBytes);
 			m_ReceivedData.erase(0, NumBytes + 1);
 		}
 	}  // while (!Received.empty())

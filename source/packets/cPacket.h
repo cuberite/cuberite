@@ -42,7 +42,7 @@ public:
 	virtual int Parse(const char * a_Data, int a_Size)
 	{
 		LOGERROR("Undefined Parse function for packet type 0x%x\n", m_PacketID );
-		assert(!"Undefined Parse function");
+		ASSERT(!"Undefined Parse function");
 		return -1;
 	}
 	
@@ -50,7 +50,7 @@ public:
 	virtual void Serialize(AString & a_Data) const
 	{
 		LOGERROR("Undefined Serialize function for packet type 0x%x\n",  m_PacketID );
-		assert(!"Undefined Serialize function");
+		ASSERT(!"Undefined Serialize function");
 	}
 	
 	virtual cPacket * Clone() const = 0;

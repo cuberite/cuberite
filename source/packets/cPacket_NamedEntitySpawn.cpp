@@ -10,7 +10,7 @@
 void cPacket_NamedEntitySpawn::Serialize(AString & a_Data) const
 {
 	short CurrentItem = m_CurrentItem;
-	assert(CurrentItem >= 0);
+	ASSERT(CurrentItem >= 0);
 	if (CurrentItem <= 0)
 	{
 		CurrentItem = 0;

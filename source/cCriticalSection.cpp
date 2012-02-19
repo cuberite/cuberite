@@ -114,7 +114,7 @@ cCSLock::~cCSLock()
 
 void cCSLock::Lock(void)
 {
-	assert(!m_IsLocked);
+	ASSERT(!m_IsLocked);
 	m_IsLocked = true;
 	m_CS->Lock();
 }
@@ -125,7 +125,7 @@ void cCSLock::Lock(void)
 
 void cCSLock::Unlock(void)
 {
-	assert(m_IsLocked);
+	ASSERT(m_IsLocked);
 	m_IsLocked = false;
 	m_CS->Unlock();
 }

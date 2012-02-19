@@ -21,7 +21,7 @@ cPacket_MapChunk::~cPacket_MapChunk()
 
 cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 {
-	assert(a_Chunk->IsValid());
+	ASSERT(a_Chunk->IsValid());
 	m_PacketID = E_MAP_CHUNK;
 
 	m_PosX = a_Chunk->GetPosX() * 16; // It has to be block coordinates

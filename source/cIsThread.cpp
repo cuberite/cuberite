@@ -78,7 +78,7 @@ cIsThread::~cIsThread()
 bool cIsThread::Start(void)
 {
 	#ifdef _WIN32
-		assert(mHandle == NULL);  // Has already started one thread?
+		ASSERT(mHandle == NULL);  // Has already started one thread?
 		
 		// Create the thread suspended, so that the mHandle variable is valid in the thread procedure
 		DWORD ThreadID = 0;
@@ -99,7 +99,7 @@ bool cIsThread::Start(void)
 		#endif  // _DEBUG and _MSC_VER
 		
 	#else  // _WIN32
-		assert(!mHasStarted);
+		ASSERT(!mHasStarted);
 		
 		if (pthread_create(&mHandle, NULL, thrExecute, this))
 		{

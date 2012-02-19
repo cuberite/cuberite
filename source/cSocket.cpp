@@ -337,7 +337,7 @@ int cSocket::Send(const cPacket & a_Packet)
 
 unsigned short cSocket::GetPort(void) const
 {
-	assert(IsValid());
+	ASSERT(IsValid());
 	
 	sockaddr_in Addr;
 	socklen_t AddrSize = sizeof(Addr);

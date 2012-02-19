@@ -466,7 +466,7 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 	
 	if (!((LocalX < LAYER_SIZE) && (LocalZ < LAYER_SIZE) && (LocalX > -1) && (LocalZ > -1)))
 	{
-		assert(!"Asking a cChunkLayer for a chunk that doesn't belong to it!");
+		ASSERT(!"Asking a cChunkLayer for a chunk that doesn't belong to it!");
 		return cChunkPtr();
 	}
 	

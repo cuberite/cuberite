@@ -75,13 +75,6 @@
 
 
 
-// Compatibility:
-#define ASSERT assert
-
-
-
-
-
 // STL stuff:
 #include <vector>
 #include <list>
@@ -127,6 +120,7 @@
 /// Faster than (int)floorf((float)x / (float)div)
 #define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
 
+#define ASSERT( x ) { if( !(x) ) { LOGERROR("Assertion failed: \"%s\", file %s, line %i", #x, __FILE__, __LINE__ ); assert( !#x ); } }
 
 
 

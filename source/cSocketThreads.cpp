@@ -156,7 +156,7 @@ cSocketThreads::cSocketThread::~cSocketThread()
 
 void cSocketThreads::cSocketThread::AddClient(cSocket * a_Socket, cCallback * a_Client)
 {
-	assert(m_NumSlots < MAX_SLOTS);  // Use HasEmptySlot() to check before adding
+	ASSERT(m_NumSlots < MAX_SLOTS);  // Use HasEmptySlot() to check before adding
 	
 	m_Slots[m_NumSlots].m_Client = a_Client;
 	m_Slots[m_NumSlots].m_Socket = a_Socket;
@@ -164,7 +164,7 @@ void cSocketThreads::cSocketThread::AddClient(cSocket * a_Socket, cCallback * a_
 	m_NumSlots++;
 	
 	// Notify the thread of the change:
-	assert(m_ControlSocket2.IsValid());
+	ASSERT(m_ControlSocket2.IsValid());
 	m_ControlSocket2.Send("a", 1);
 }
 
@@ -193,7 +193,7 @@ bool cSocketThreads::cSocketThread::RemoveClient(const cCallback * a_Client)
 		m_NumSlots--;
 		
 		// Notify the thread of the change:
-		assert(m_ControlSocket2.IsValid());
+		ASSERT(m_ControlSocket2.IsValid());
 		m_ControlSocket2.Send("r", 1);
 		return true;
 	}  // for i - m_Slots[]
@@ -227,7 +227,7 @@ bool cSocketThreads::cSocketThread::RemoveSocket(const cSocket * a_Socket)
 		m_NumSlots--;
 		
 		// Notify the thread of the change:
-		assert(m_ControlSocket2.IsValid());
+		ASSERT(m_ControlSocket2.IsValid());
 		m_ControlSocket2.Send("r", 1);
 		return true;
 	}  // for i - m_Slots[]
@@ -245,7 +245,7 @@ bool cSocketThreads::cSocketThread::NotifyWrite(const cCallback * a_Client)
 	if (HasClient(a_Client))
 	{
 		// Notify the thread that there's another packet in the queue:
-		assert(m_ControlSocket2.IsValid());
+		ASSERT(m_ControlSocket2.IsValid());
 		m_ControlSocket2.Send("q", 1);
 		return true;
 	}
@@ -354,7 +354,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 	Addr.Family = cSocket::ADDRESS_FAMILY_INTERNET;
 	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST();
 	Addr.Port = m_ControlSocket2.GetPort();
-	assert(Addr.Port != 0);  // We checked in the Start() method, but let's be sure
+	ASSERT(Addr.Port != 0);  // We checked in the Start() method, but let's be sure
 	if (m_ControlSocket1.Connect(Addr) != 0)
 	{
 		LOGERROR("Cannot connect Control sockets for a cSocketThread (\"%s\"); continuing, but the server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
@@ -509,7 +509,7 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 		// If there's any data left, signalize the Control socket:
 		if (!m_Slots[i].m_Outgoing.empty())
 		{
-			assert(m_ControlSocket2.IsValid());
+			ASSERT(m_ControlSocket2.IsValid());
 			m_ControlSocket2.Send("q", 1);
 		}
 		*/

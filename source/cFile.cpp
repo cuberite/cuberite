@@ -57,7 +57,7 @@ cFile::~cFile()
 
 bool cFile::Open(const AString & iFileName, EMode iMode)
 {
-	assert(!IsOpen());  // You should close the file before opening another one
+	ASSERT(!IsOpen());  // You should close the file before opening another one
 	
 	if (IsOpen())
 	{
@@ -72,7 +72,7 @@ bool cFile::Open(const AString & iFileName, EMode iMode)
 		case fmReadWrite: Mode = "ab+"; break;
 		default:
 		{
-			assert(!"Unhandled file mode");
+			ASSERT(!"Unhandled file mode");
 			return false;
 		}
 	}
@@ -86,7 +86,7 @@ bool cFile::Open(const AString & iFileName, EMode iMode)
 
 void cFile::Close(void)
 {
-	assert(IsOpen());  // You should not close file objects that don't have an open file.
+	ASSERT(IsOpen());  // You should not close file objects that don't have an open file.
 	
 	if (!IsOpen())
 	{
@@ -112,7 +112,7 @@ bool cFile::IsOpen(void) const
 
 bool cFile::IsEOF(void) const
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{
@@ -130,7 +130,7 @@ bool cFile::IsEOF(void) const
 /// Reads  up to iNumBytes bytes into iBuffer, returns the number of bytes actually read,    or -1 on failure; asserts if not open
 int cFile::Read (void * iBuffer, int iNumBytes)
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{
@@ -147,7 +147,7 @@ int cFile::Read (void * iBuffer, int iNumBytes)
 /// Writes up to iNumBytes bytes from iBuffer, returns the number of bytes actually written, or -1 on failure; asserts if not open
 int cFile::Write(const void * iBuffer, int iNumBytes)
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{
@@ -165,7 +165,7 @@ int cFile::Write(const void * iBuffer, int iNumBytes)
 /// Seeks to iPosition bytes from file start, returns old position or -1 for failure
 int cFile::Seek (int iPosition)
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{
@@ -187,7 +187,7 @@ int cFile::Seek (int iPosition)
 /// Returns the current position (bytes from file start)
 int cFile::Tell (void) const
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{
@@ -204,7 +204,7 @@ int cFile::Tell (void) const
 /// Returns the size of file, in bytes, or -1 for failure; asserts if not open
 int cFile::GetSize(void) const
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{
@@ -234,7 +234,7 @@ int cFile::GetSize(void) const
 
 int cFile::ReadRestOfFile(AString & a_Contents)
 {
-	assert(IsOpen());
+	ASSERT(IsOpen());
 	
 	if (!IsOpen())
 	{

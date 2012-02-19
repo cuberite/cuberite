@@ -81,7 +81,7 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 		
 		default:
 		{
-			assert(!"Unhandled blocktype in BlockEntities list while saving to JSON");
+			ASSERT(!"Unhandled blocktype in BlockEntities list while saving to JSON");
 			break;
 		}
 	}  // switch (BlockEntity->GetBlockType())

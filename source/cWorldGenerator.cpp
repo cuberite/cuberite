@@ -154,7 +154,7 @@ static float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
 
 unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 {
-	assert((x < 16) && (x > -1) && (y < 128) && (y > -1) && (z < 16) && (z > -1));
+	ASSERT((x < 16) && (x > -1) && (y < 128) && (y > -1) && (z < 16) && (z > -1));
 
 	return y + (z * 128) + (x * 128 * 16);
 }

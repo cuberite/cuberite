@@ -12,10 +12,6 @@ class cLog;
 
 class cMCLogger														//tolua_export
 {																	//tolua_export
-private:
-#ifdef _WIN32
-	typedef char* va_list;
-#endif
 public:																//tolua_export
 	cMCLogger();
 	cMCLogger( char* a_File );										//tolua_export

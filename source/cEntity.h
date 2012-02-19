@@ -98,7 +98,7 @@ public:																						//tolua_export
 
 	virtual void Tick(float a_Dt) = 0;														//tolua_export
 
-	virtual cPacket * GetSpawnPacket(void) const {assert(!"GetSpawnedPacket unimplemented!"); return NULL; };  // _X: Needs to be implemented due to Lua bindings
+	virtual cPacket * GetSpawnPacket(void) const {ASSERT(!"GetSpawnedPacket unimplemented!"); return NULL; };  // _X: Needs to be implemented due to Lua bindings
 	void SpawnOn (cClientHandle * a_Client);  // tolua_export
 	
 	void WrapRotation();
