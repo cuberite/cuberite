@@ -206,31 +206,27 @@ void cMonster::Tick(float a_Dt)
 
 void cMonster::ReplicateMovement()
 {
-	cChunkPtr InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if ( !InChunk->IsValid() )
-	{
-		return;
-	}
-
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		cPacket_EntityLook EntityLook( this );
-		InChunk->Broadcast( EntityLook );
+		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityLook );
 		m_bDirtyOrientation = false;
 	}
+	
 	if( m_bDirtyPosition )
 	{
-
 		float DiffX = (float)(GetPosX() - m_LastPosX );
 		float DiffY = (float)(GetPosY() - m_LastPosY );
 		float DiffZ = (float)(GetPosZ() - m_LastPosZ );
 		float SqrDist = DiffX*DiffX + DiffY*DiffY + DiffZ*DiffZ;
-		if( SqrDist > 4*4 // 4 blocks is max Relative Move
-			|| cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
+		if (
+			(SqrDist > 4 * 4) // 4 blocks is max Relative Move
+			|| (cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
+		)
 		{
 			//LOG("Teleported %f", sqrtf(SqrDist) );
 			cPacket_TeleportEntity TeleportEntity( this );
-			InChunk->Broadcast( TeleportEntity );
+			m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, TeleportEntity);
 			m_TimeLastTeleportPacket = cWorld::GetTime();
 		}
 		else
@@ -239,21 +235,21 @@ void cMonster::ReplicateMovement()
 			{
 				cPacket_RelativeEntityMoveLook RelativeEntityMoveLook;
 				RelativeEntityMoveLook.m_UniqueID = GetUniqueID();
-				RelativeEntityMoveLook.m_MoveX = (char)(DiffX*32);
-				RelativeEntityMoveLook.m_MoveY = (char)(DiffY*32);
-				RelativeEntityMoveLook.m_MoveZ = (char)(DiffZ*32);
-				RelativeEntityMoveLook.m_Yaw = (char)((GetRotation()/360.f)*256);
+				RelativeEntityMoveLook.m_MoveX    = (char)(DiffX*32);
+				RelativeEntityMoveLook.m_MoveY    = (char)(DiffY*32);
+				RelativeEntityMoveLook.m_MoveZ    = (char)(DiffZ*32);
+				RelativeEntityMoveLook.m_Yaw      = (char)((GetRotation()/360.f)*256);
 				RelativeEntityMoveLook.m_Pitch    = (char)((GetPitch()/360.f)*256);
-				InChunk->Broadcast( RelativeEntityMoveLook );
+				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMoveLook );
 			}
 			else
 			{
 				cPacket_RelativeEntityMove RelativeEntityMove;
 				RelativeEntityMove.m_UniqueID = GetUniqueID();
-				RelativeEntityMove.m_MoveX = (char)(DiffX*32);
-				RelativeEntityMove.m_MoveY = (char)(DiffY*32);
-				RelativeEntityMove.m_MoveZ = (char)(DiffZ*32);
-				InChunk->Broadcast( RelativeEntityMove );
+				RelativeEntityMove.m_MoveX    = (char)(DiffX*32);
+				RelativeEntityMove.m_MoveY    = (char)(DiffY*32);
+				RelativeEntityMove.m_MoveZ    = (char)(DiffZ*32);
+				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMove );
 			}
 		}
 		m_LastPosX = GetPosX();

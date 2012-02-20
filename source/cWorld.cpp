@@ -431,7 +431,12 @@ void cWorld::InitializeSpawn()
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	BlockToChunk( (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ );
 	
+	// For the debugging builds, don't make the server build too much world upon start:
+	#ifdef _DEBUG
+	int ViewDist = 9;
+	#else
 	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
+	#endif  // _DEBUG
 	
 	LOG("Preparing spawn area in world \"%s\"", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)
@@ -807,16 +812,6 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 
 
 
-void cWorld::UnloadUnusedChunks()
-{
-	m_LastUnload = m_Time;
-	m_ChunkMap->UnloadUnusedChunks();
-}
-
-
-
-
-
 cChunkPtr cWorld::GetChunkOfBlock( int a_X, int a_Y, int a_Z )
 {
 	int ChunkX, ChunkY, ChunkZ;
@@ -1005,6 +1000,15 @@ void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude)
 
 
 
+void cWorld::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Packet, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastToChunkOfBlock(a_X, a_Y, a_Z, a_Packet, a_Exclude);
@@ -1089,6 +1093,25 @@ bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
 bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
 {
 	return m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::UnloadUnusedChunks(void )
+{
+	m_LastUnload = m_Time;
+	m_ChunkMap->UnloadUnusedChunks();
+}
+
+
+
+
+
+void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
+{
+	m_ChunkMap->CollectPickupsByPlayer(a_Player);
 }
 
 
@@ -1271,10 +1294,27 @@ bool cWorld::DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback )
 
 
 
-void cWorld::RemoveEntityFromChunk(cEntity * a_Entity)
+void cWorld::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cChunkPtr Chunk = GetChunkOfBlock((int)(a_Entity->GetPosX()), (int)(a_Entity->GetPosY()), (int)(a_Entity->GetPosZ()));
-	Chunk->RemoveEntity(a_Entity);
+	m_ChunkMap->RemoveEntityFromChunk(a_Entity, a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->MoveEntityToChunk(a_Entity, a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
+{
+	m_ChunkMap->CompareChunkClients(a_ChunkX1, a_ChunkY1, a_ChunkZ1, a_ChunkX2, a_ChunkY2, a_ChunkZ2, a_Callback);
 }
 
 
@@ -1286,7 +1326,6 @@ void cWorld::SaveAllChunks()
 	LOG("Saving all chunks...");
 	m_LastSave = m_Time;
 	m_ChunkMap->SaveAllChunks();
-	LOG("Done saving chunks");
 }
 
 

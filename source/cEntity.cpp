@@ -106,27 +106,60 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 		return;
 	}
 	
-	if (!a_bIgnoreOldChunk)
+	class cMover :
+		public cClientDiffCallback
 	{
-		cChunkPtr OldChunk = m_World->GetChunk(m_ChunkX, m_ChunkY, m_ChunkZ);
-		OldChunk->RemoveEntity(this);
-		cPacket_DestroyEntity DestroyEntity( this );
-		OldChunk->Broadcast(DestroyEntity);
-	}
+		virtual void Removed(cClientHandle * a_Client) override
+		{
+			if (m_IgnoreOldChunk)
+			{
+				return;
+			}
+			if (m_Destroy == NULL)
+			{
+				m_Destroy = new cPacket_DestroyEntity(m_Entity);
+			}
+			a_Client->Send(m_Destroy);
+		}
+		
+		virtual void Added(cClientHandle * a_Client) override
+		{
+			if (m_Spawn == NULL)
+			{
+				m_Spawn = m_Entity->GetSpawnPacket();  // Only create the packet when needed
+			}
+			if (m_Spawn != NULL)
+			{
+				a_Client->Send(m_Spawn);
+			}
+		}
 
+		cPacket * m_Destroy;
+		cPacket * m_Spawn;
+		bool      m_IgnoreOldChunk;
+		cEntity * m_Entity;
+		
+	public:
+		cMover(cEntity * a_Entity, bool a_IgnoreOldChunk) :
+			m_Destroy(NULL),
+			m_Spawn(NULL),
+			m_IgnoreOldChunk(a_IgnoreOldChunk),
+			m_Entity(a_Entity)
+		{}
+		
+		~cMover()
+		{
+			delete m_Spawn;
+			delete m_Destroy;
+		}
+	} Mover(this, a_bIgnoreOldChunk);
+	
+	m_World->CompareChunkClients(m_ChunkX, m_ChunkY, m_ChunkZ, ChunkX, ChunkY, ChunkZ, Mover);
+	m_World->MoveEntityToChunk(this, ChunkX, ChunkY, ChunkZ);
+	
 	m_ChunkX = ChunkX;
 	m_ChunkY = ChunkY;
 	m_ChunkZ = ChunkZ;
-	cChunkPtr NewChunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if ( NewChunk != NULL )
-	{
-		NewChunk->AddEntity( this );
-		std::auto_ptr<cPacket> SpawnPacket(GetSpawnPacket());
-		if (SpawnPacket.get() != NULL)
-		{
-			NewChunk->Broadcast(SpawnPacket.get());
-		}
-	}
 }
 
 
@@ -151,19 +184,13 @@ void cEntity::Destroy()
 
 void cEntity::RemoveFromChunk(void)
 {
-	if ( m_World == NULL )
+	if (m_World == NULL)
 	{
 		return;
 	}
 	
-	cChunkPtr Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	if ( Chunk != NULL )
-	{
-		cPacket_DestroyEntity DestroyEntity( this );
-		Chunk->Broadcast( DestroyEntity );
-		Chunk->RemoveEntity( this );
-		m_bRemovedFromChunk = true;
-	}
+	m_World->RemoveEntityFromChunk(this, m_ChunkX, m_ChunkY, m_ChunkZ);
+	m_bRemovedFromChunk = true;
 }
 
 
@@ -180,11 +207,7 @@ void cEntity::SpawnOn(cClientHandle * a_Client)
 	
 	if (a_Client == NULL)
 	{
-		cChunkPtr Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if ( Chunk != NULL )
-		{
-			Chunk->Broadcast(SpawnPacket.get());
-		}
+		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, *SpawnPacket.get(), NULL);
 	}
 	else
 	{

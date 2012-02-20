@@ -79,6 +79,10 @@ public:																						//tolua_export
 	float GetPitch   (void) const {return m_Rot.y; }										//tolua_export
 	float GetRoll    (void) const {return m_Rot.z; }										//tolua_export
 	Vector3f GetLookVector();																//tolua_export
+	
+	int GetChunkX(void) const {return m_ChunkX; }
+	int GetChunkY(void) const {return m_ChunkY; }
+	int GetChunkZ(void) const {return m_ChunkZ; }
 
 	void SetPosX( const double & a_PosX );													//tolua_export
 	void SetPosY( const double & a_PosY );													//tolua_export

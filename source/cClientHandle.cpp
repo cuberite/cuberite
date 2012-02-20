@@ -66,6 +66,7 @@
 #include "packets/cPacket_Ping.h"
 #include "packets/cPacket_PlayerListItem.h"
 #include "packets/cPacket_NamedEntitySpawn.h"
+#include "packets/cPacket_MapChunk.h"
 
 
 
@@ -1784,7 +1785,9 @@ void cClientHandle::CheckIfWorldDownloaded(void)
 
 void cClientHandle::SendConfirmPosition(void)
 {
-	LOG("Spawning player \"%s\"", m_Username.c_str());
+	LOG("Spawning player \"%s\" at {%.2f, %.2f, %.2f}",
+		m_Username.c_str(), m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ()
+	);
 	
 	m_State = csConfirmingPos;
 

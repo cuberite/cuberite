@@ -6,6 +6,7 @@
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cMakeDir.h"
+#include "cPlayer.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -13,9 +14,6 @@
 
 #include "zlib.h"
 #include <json/json.h>
-
-
-#define USE_MEMCPY
 
 
 
@@ -136,6 +134,24 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 
 
 
+void cChunkMap::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude)
+{
+	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
+	
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->Broadcast(a_Packet, a_Exclude);
+}
+
+
+
+
+
 void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude)
 {
 	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
@@ -143,13 +159,13 @@ void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_P
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 	BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if (Chunk == NULL)
 	{
 		return;
 	}
-	// Packets can be broadcasted even to invalid chunks!
-	Chunk->Broadcast(a_Packet);
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->Broadcast(a_Packet, a_Exclude);
 }
 
 
@@ -396,6 +412,122 @@ void cChunkMap::FastSetBlocks(sSetBlockList & a_BlockList)
 	
 	// Return the failed:
 	std::swap(Failed, a_BlockList);
+}
+
+
+
+
+
+void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
+{
+	int BlockX = (int)(a_Player->GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
+	int BlockY = (int)(a_Player->GetPosY());
+	int BlockZ = (int)(a_Player->GetPosZ());
+	int ChunkX, ChunkZ, ChunkY = ZERO_CHUNK_Y;
+	AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	int OtherChunkX = ChunkX + ((BlockX > 8) ? 1 : -1);
+	int OtherChunkZ = ChunkZ + ((BlockZ > 8) ? 1 : -1);
+	
+	cCSLock Lock(m_CSLayers);
+	GetChunkNoGen(ChunkX, ChunkY, ChunkZ)->CollectPickupsByPlayer(a_Player);
+
+	// Check the neighboring chunks as well:
+	GetChunkNoGen(OtherChunkX, ChunkY, ChunkZ     )->CollectPickupsByPlayer(a_Player);
+	GetChunkNoGen(OtherChunkX, ChunkY, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
+	GetChunkNoGen(ChunkX,      ChunkY, ChunkZ     )->CollectPickupsByPlayer(a_Player);
+	GetChunkNoGen(ChunkX,      ChunkY, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
+}
+
+
+
+
+
+void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk1 = GetChunkNoGen(a_ChunkX1, a_ChunkY1, a_ChunkZ1);
+	if (Chunk1 == NULL)
+	{
+		return;
+	}
+	cChunkPtr Chunk2 = GetChunkNoGen(a_ChunkX2, a_ChunkY2, a_ChunkZ2);
+	if (Chunk2 == NULL)
+	{
+		return;
+	}
+
+	cClientHandleList Clients1(Chunk1->GetAllClients());
+	cClientHandleList Clients2(Chunk2->GetAllClients());
+	
+	// Find "removed" clients:
+	for (cClientHandleList::iterator itr1 = Clients1.begin(); itr1 != Clients1.end(); ++itr1)
+	{
+		bool Found = false;
+		for (cClientHandleList::iterator itr2 = Clients2.begin(); itr2 != Clients2.end(); ++itr2)
+		{
+			if (*itr1 == *itr2)
+			{
+				Found = true;
+				break;
+			}
+		}  // for itr2 - Clients2[]
+		if (!Found)
+		{
+			a_Callback.Removed(*itr1);
+		}
+	}  // for itr1 - Clients1[]
+	
+	// Find "added" clients:
+	for (cClientHandleList::iterator itr2 = Clients2.begin(); itr2 != Clients2.end(); ++itr2)
+	{
+		bool Found = false;
+		for (cClientHandleList::iterator itr1 = Clients1.begin(); itr1 != Clients1.end(); ++itr1)
+		{
+			if (*itr1 == *itr2)
+			{
+				Found = true;
+				break;
+			}
+		}  // for itr1 - Clients1[]
+		if (!Found)
+		{
+			a_Callback.Added(*itr2);
+		}
+	}  // for itr2 - Clients2[]
+}
+
+
+
+
+
+void cChunkMap::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr OldChunk = GetChunkNoGen(a_Entity->GetChunkX(), a_Entity->GetChunkY(), a_Entity->GetChunkZ());
+	if (OldChunk != NULL)
+	{
+		OldChunk->RemoveEntity(a_Entity);
+	}
+	cChunkPtr NewChunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (NewChunk != NULL)
+	{
+		NewChunk->AddEntity(a_Entity);
+	}
+}
+
+
+
+
+
+void cChunkMap::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->RemoveEntity(a_Entity);
 }
 
 

@@ -32,9 +32,14 @@ public:
 	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
 	
 	// Direct action methods:
+	/// Broadcast a_Packet to all clients in the chunk specified
+	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
+	
 	/// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
-	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // a_Player rclked block entity at the coords specified, handle it
+	
+	/// a_Player rclked block entity at the coords specified, handle it
+	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -48,6 +53,16 @@ public:
 	void SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	int  GetHeight          (int a_BlockX, int a_BlockZ);
 	void FastSetBlocks      (sSetBlockList & a_BlockList);
+	void CollectPickupsByPlayer(cPlayer * a_Player);
+	
+	/// Compares clients of two chunks, calls the callback accordingly
+	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
+
+	/// Moves the entity from its current chunk to the new chunk specified
+	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+
+	/// Removes the entity from the chunk specified
+	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 

@@ -80,8 +80,7 @@ void cPawn::TakeDamage( int a_Damage, cEntity* a_Instigator )
 	cPacket_EntityStatus Status;
 	Status.m_UniqueID = GetUniqueID();
 	Status.m_Status =  cPacket_EntityStatus::STATUS_TAKEDAMAGE;
-	cChunkPtr Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	Chunk->Broadcast( Status );
+	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, Status);
 
 	if (m_Health <= 0)
 	{
@@ -105,8 +104,7 @@ void cPawn::KilledBy( cEntity* a_Killer )
 	cPacket_EntityStatus Status;
 	Status.m_UniqueID = GetUniqueID();
 	Status.m_Status = cPacket_EntityStatus::STATUS_DIE;
-	cChunkPtr Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-	Chunk->Broadcast( Status );	// Die
+	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, Status);
 }
 
 
@@ -152,12 +150,10 @@ void cPawn::Tick(float a_Dt)
 
 void cPawn::SetMetaData(MetaData a_MetaData)
 {
-	cChunkPtr InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-
 	//Broadcast new status to clients in the chunk
 	m_MetaData = a_MetaData;
 	cPacket_Metadata md(a_MetaData, GetUniqueID());
-	InChunk->Broadcast(md);
+	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, md);
 }
 
 

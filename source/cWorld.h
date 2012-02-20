@@ -68,6 +68,8 @@ public:
 
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
 	
+	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
+	
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
 	void MarkChunkDirty    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -80,6 +82,7 @@ public:
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	void UnloadUnusedChunks(void);
+	void CollectPickupsByPlayer(cPlayer * a_Player);
 
 	// MOTD
 	const AString & GetDescription(void) const {return m_Description; }
@@ -105,7 +108,18 @@ public:
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	void AddEntity( cEntity* a_Entity );
-	void RemoveEntityFromChunk( cEntity * a_Entity);
+	
+	/// Add an entity to the chunk specified; broadcasts the a_SpawnPacket to all clients of that chunk
+	void AddEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket * a_SpawnPacket);
+	
+	/// Removes the entity from the chunk specified
+	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	/// Moves the entity from its current chunk to the new chunk specified
+	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+
+	/// Compares clients of two chunks, calls the callback accordingly
+	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
 
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );

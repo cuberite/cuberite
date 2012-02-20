@@ -1148,7 +1148,7 @@ bool cChunk::HasAnyClients(void)
 
 
 
-void cChunk::AddEntity( cEntity * a_Entity )
+void cChunk::AddEntity( cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSEntities);
 	if (a_Entity->GetEntityType() != cEntity::E_PLAYER)
@@ -1171,9 +1171,13 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 		m_Entities.remove(a_Entity);
 		SizeAfter = m_Entities.size();
 	}
-	if ((a_Entity->GetEntityType() != cEntity::E_PLAYER) && (SizeBefore != SizeAfter))
+	if (SizeBefore != SizeAfter)
 	{
-		MarkDirty();
+		// Mark as dirty if it was a server-generated entity:
+		if (a_Entity->GetEntityType() != cEntity::E_PLAYER)
+		{
+			MarkDirty();
+		}
 	}
 }
 

@@ -70,6 +70,23 @@ public:
 
 
 
+/** Interface class used for comparing clients of two chunks.
+Used primarily for entity moving while both chunks are locked.
+*/
+class cClientDiffCallback
+{
+public:
+	/// Called for clients that are in Chunk1 and not in Chunk2,
+	virtual void Removed(cClientHandle * a_Client) = 0;
+	
+	/// Called for clients that are in Chunk2 and not in Chunk1.
+	virtual void Added(cClientHandle * a_Client) = 0;
+} ;
+
+
+
+
+
 struct sSetBlock
 {
 	int x, y, z;
@@ -121,7 +138,7 @@ public:
 	
 	/// Returns true if there is a block entity at the coords specified
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
-
+	
 	void Tick(float a_Dt, MTRand & a_TickRandom);
 
 	int GetPosX() { return m_PosX; }
@@ -149,7 +166,7 @@ public:
 	bool HasClient    (cClientHandle* a_Client );
 	bool HasAnyClients(void);  // Returns true if theres any client in the chunk; false otherwise
 
-	void AddEntity( cEntity * a_Entity );
+	void AddEntity( cEntity * a_Entity);
 	void RemoveEntity( cEntity * a_Entity);
 	
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
@@ -206,6 +223,8 @@ public:
 
 private:
 
+	friend class cChunkMap;
+	
 	bool m_IsValid;  // True if the chunk is loaded / generated
 	bool m_IsDirty;  // True if the chunk has changed since it was last saved
 	bool m_IsSaving;  // True if the chunk is being saved
@@ -251,6 +270,9 @@ private:
 	void SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
 
 	void CreateBlockEntities(void);
+	
+	// Makes a copy of the list
+	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 };
 
 typedef std::tr1::shared_ptr<cChunk> cChunkPtr;

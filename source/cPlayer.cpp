@@ -101,14 +101,26 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 		m_Pos.x = cRoot::Get()->GetDefaultWorld()->GetSpawnX();
 		m_Pos.y = cRoot::Get()->GetDefaultWorld()->GetSpawnY();
 		m_Pos.z = cRoot::Get()->GetDefaultWorld()->GetSpawnZ();
+		
+		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
+			a_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
+		);
 	}
 }
+
+
+
+
 
 void cPlayer::Initialize( cWorld* a_World )
 {
 	cPawn::Initialize( a_World );
 	GetWorld()->AddPlayer( this );
 }
+
+
+
+
 
 cPlayer::~cPlayer(void)
 {
@@ -135,6 +147,10 @@ cPlayer::~cPlayer(void)
 
 cPacket * cPlayer::GetSpawnPacket(void) const
 {
+	LOGD("cPlayer::GetSpawnPacket for \"%s\" at pos {%.2f, %.2f, %.2f}",
+		m_pState->PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
+	);
+	
 	if (!m_bVisible )
 	{
 		return NULL;
@@ -159,14 +175,12 @@ cPacket * cPlayer::GetSpawnPacket(void) const
 
 void cPlayer::Tick(float a_Dt)
 {
-	cChunkPtr InChunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-
 	cPawn::Tick(a_Dt);
 
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		cPacket_EntityLook EntityLook( this );
-		InChunk->Broadcast( EntityLook, m_ClientHandle );
+		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityLook, m_ClientHandle );
 		m_bDirtyOrientation = false;
 	}
 	else if (m_bDirtyPosition )
@@ -184,7 +198,7 @@ void cPlayer::Tick(float a_Dt)
 		{
 			//LOG("Teleported %f", sqrtf(SqrDist) );
 			cPacket_TeleportEntity TeleportEntity( this );
-			InChunk->Broadcast( TeleportEntity, m_ClientHandle );
+			m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, TeleportEntity, m_ClientHandle);
 			m_TimeLastTeleportPacket = cWorld::GetTime();
 		}
 		else
@@ -198,7 +212,7 @@ void cPlayer::Tick(float a_Dt)
 				RelativeEntityMoveLook.m_MoveZ = (char)(DiffZ*32);
 				RelativeEntityMoveLook.m_Yaw = (char)((GetRotation()/360.f)*256);
 				RelativeEntityMoveLook.m_Pitch    = (char)((GetPitch()/360.f)*256);
-				InChunk->Broadcast( RelativeEntityMoveLook, m_ClientHandle );
+				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMoveLook, m_ClientHandle );
 			}
 			else
 			{
@@ -207,7 +221,7 @@ void cPlayer::Tick(float a_Dt)
 				RelativeEntityMove.m_MoveX = (char)(DiffX*32);
 				RelativeEntityMove.m_MoveY = (char)(DiffY*32);
 				RelativeEntityMove.m_MoveZ = (char)(DiffZ*32);
-				InChunk->Broadcast( RelativeEntityMove, m_ClientHandle );
+				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMove, m_ClientHandle );
 			}
 		}
 		m_LastPosX = GetPosX();
@@ -217,10 +231,9 @@ void cPlayer::Tick(float a_Dt)
 		m_ClientHandle->StreamChunks();
 	}
 
-	if( m_Health > 0 ) // make sure player is alive
+	if ( m_Health > 0 ) // make sure player is alive
 	{
-		// TODO: Don't only check in current chunks, but also close chunks (chunks within range)
-		GetWorld()->GetChunk(m_ChunkX, m_ChunkY, m_ChunkZ)->CollectPickupsByPlayer(this);
+		m_World->CollectPickupsByPlayer(this);
 	}
 	
 	cTimer t1;
@@ -521,6 +534,8 @@ void cPlayer::TeleportTo( const double & a_PosX, const double & a_PosY, const do
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
 	// TODO: should do some checks to see if player is not moving through terrain
+	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
+	
 	SetPosition( a_NewPos );
 }
 
@@ -539,11 +554,7 @@ void cPlayer::SetVisible( bool a_bVisible )
 	{
 		m_bVisible = false;
 		cPacket_DestroyEntity DestroyEntity( this );
-		cChunkPtr Chunk = GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if ( Chunk != NULL )
-		{
-			Chunk->Broadcast( DestroyEntity );	// Destroy on all clients
-		}
+		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, DestroyEntity );	// Destroy on all clients
 	}
 }
 
@@ -559,6 +570,10 @@ void cPlayer::AddToGroup( const char* a_GroupName )
 	ResolveGroups();
 	ResolvePermissions();
 }
+
+
+
+
 
 bool cPlayer::CanUseCommand( const char* a_Command )
 {
@@ -753,12 +768,7 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 		/* Remove all links to the old world */
 		m_World->RemovePlayer( this );
 		m_ClientHandle->RemoveFromAllChunks();
-		cChunkPtr Chunk = m_World->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ );
-		if ( Chunk != NULL ) 
-		{
-			Chunk->RemoveEntity( this );
-			Chunk->Broadcast( cPacket_DestroyEntity( this ) ); // Remove player entity from all clients in old world
-		}
+		m_World->RemoveEntityFromChunk(this, m_ChunkX, m_ChunkY, m_ChunkZ);
 
 		/* Add player to all the necessary parts of the new world */
 		SetWorld( World );
@@ -831,11 +841,8 @@ bool cPlayer::LoadFromDisk()
 		return false;
 	}
 
-	// Get file size
-	long FileSize = f.GetSize();
-
-	std::auto_ptr<char> buffer(new char[FileSize]);
-	if (f.Read(buffer.get(), FileSize) != FileSize)
+	AString buffer;
+	if (f.ReadRestOfFile(buffer) != f.GetSize())
 	{
 		LOGERROR("ERROR READING FROM FILE \"%s\"", SourceFile.c_str()); 
 		return false;
@@ -844,12 +851,10 @@ bool cPlayer::LoadFromDisk()
 
 	Json::Value root;
 	Json::Reader reader;
-	if (!reader.parse(buffer.get(), root, false))
+	if (!reader.parse(buffer, root, false))
 	{
 		LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile.c_str());
 	}
-		
-	buffer.reset();
 
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if( JSON_PlayerPosition.size() == 3 )
@@ -873,6 +878,10 @@ bool cPlayer::LoadFromDisk()
 	m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
 
 	m_pState->LoadedWorldName = root.get("world", "world").asString();
+	
+	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
+		m_pState->PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z, m_pState->LoadedWorldName.c_str()
+	);
 	
 	return true;
 }

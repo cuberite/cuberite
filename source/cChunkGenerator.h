@@ -6,7 +6,8 @@
 // The object takes requests for generating chunks and processes them in a separate thread one by one.
 // The requests are not added to the queue if there is already a request with the same coords
 // Before generating, the thread checks if the chunk hasn't been already generated.
-// It is theoretically possible to have multiple generator threads by having multiple instances of this object (if the cChunkPtr is thread-safe)
+// It is theoretically possible to have multiple generator threads by having multiple instances of this object
+//   but then it MAY happen that the chunk is generated twice
 // If the generator queue is overloaded, the generator skips chunks with no clients in them
 
 
