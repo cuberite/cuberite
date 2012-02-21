@@ -1,8 +1,7 @@
 ###################################################
 #
 # Makefile for MCServer
-# Creator ZFalt
-# Created: [Thu Feb 24 19:53:17 2011]
+# Creator: tedik
 #
 ###################################################
 #
@@ -64,7 +63,7 @@ SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))
 
--include $(OBJECTS:.o=.d)
+-include $(patsubst %.o,%.d,$(OBJECTS))
 
 MCServer : $(OBJECTS)
 	$(CC) $(LNK_OPTIONS) $(OBJECTS) -o MCServer
@@ -84,7 +83,7 @@ $(BUILDDIR)%.o: %.c
 	$(CC) $(CCE_OPTIONS) -c $(INCLUDE) $< -o $@
 	@$(CC) $(CC_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %.o,%.d,$@).tmp
-	@sed -e 's|.*:|$*.o:|' < $(patsubst %.o,%.d,$@).tmp > $(patsubst %.o,%.d,$@)
+	@sed -e "s|.*:|$(BUILDDIR)$*.o:|" < $(patsubst %.o,%.d,$@).tmp > $(patsubst %.o,%.d,$@)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
 
@@ -93,6 +92,6 @@ $(BUILDDIR)%.o: %.cpp
 	$(CC) $(CC_OPTIONS) -c $(INCLUDE) $< -o $@
 	@$(CC) $(CC_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %.o,%.d,$@).tmp
-	@sed -e 's|.*:|$*.o:|' < $(patsubst %.o,%.d,$@).tmp > $(patsubst %.o,%.d,$@)
+	@sed -e "s|.*:|$(BUILDDIR)$*.o:|" < $(patsubst %.o,%.d,$@).tmp > $(patsubst %.o,%.d,$@)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
 	@rm -f $(patsubst %.o,%.d,$@).tmp
