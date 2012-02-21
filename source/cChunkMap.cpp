@@ -537,6 +537,51 @@ void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1,
 
 
 
+bool cChunkMap::AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	return Chunk->AddClient(a_Client);
+}
+
+
+
+
+
+void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
+{
+	cCSLock Lock(m_CSLayers);
+	
+	for (cChunkCoordsList::const_iterator itr = a_Chunks.begin(); itr != a_Chunks.end(); ++itr)
+	{
+		GetChunkNoGen(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(a_Client);
+	}
+}
+
+
+
+
+
+bool cChunkMap::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return false;
+	}
+	Chunk->SendTo(a_Client);
+	return true;
+}
+
+
+
+
+
 void cChunkMap::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);

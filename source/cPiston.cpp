@@ -88,9 +88,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 		Action.m_Byte1	=	0;
 		Action.m_Byte2	=	pistonMeta;
 
-		
-		cChunkPtr Chunk = m_World->GetChunkOfBlock(pistx, pisty, pistz);
-		Chunk->Broadcast( Action );
+		m_World->BroadcastToChunkOfBlock(pistx, pisty, pistz, &Action);
 		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 8 );
 
 		int extx = pistx;
@@ -106,9 +104,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 			Redstone.ChangeRedstone( extx, exty, extz, false ); //recalculate redstone around current device.			
 			Redstone.ChangeRedstone( pistx, pisty, pistz, false ); //recalculate redstone around current device.			
 		}
-
 	}
-
 }
 
 
@@ -131,8 +127,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	Action.m_PosZ   = (int)pistz;
 	Action.m_Byte1  = 1;
 	Action.m_Byte2  = pistonMeta & ~(8);
-	cChunkPtr Chunk = m_World->GetChunkOfBlock(pistx, pisty, pistz);
-	Chunk->Broadcast( Action );
+	m_World->BroadcastToChunkOfBlock(pistx, pisty, pistz, &Action );
 	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8) );
 	
 	AddDir( pistx, pisty, pistz, pistonMeta & 7, 1 )
@@ -161,3 +156,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 		}
 	}
 }
+
+
+
+

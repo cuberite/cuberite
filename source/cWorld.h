@@ -120,6 +120,15 @@ public:
 
 	/// Compares clients of two chunks, calls the callback accordingly
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
+	
+	/// Adds client to a chunk, if not already present; returns true if added, false if present
+	bool AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	
+	/// Removes the client from all chunks specified
+	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
+	
+	/// Sends a chunk to client, returns true if successful, false if not sent
+	bool SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );

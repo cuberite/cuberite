@@ -408,10 +408,8 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cWorld * World = m_Player->GetWorld();
 	ASSERT(World != NULL);
 
-	cChunkPtr Chunk = World->GetChunk(a_ChunkX, 0, a_ChunkZ);
-	if (!Chunk->HasClient(this))
+	if (World->AddChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, this))
 	{
-		Chunk->AddClient(this);
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
@@ -429,10 +427,7 @@ void cClientHandle::RemoveFromAllChunks()
 	cWorld * World = m_Player->GetWorld();
 	if (World != NULL)
 	{
-		for (cChunkCoordsList::iterator itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end(); ++itr)
-		{
-			World->GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(this);
-		}
+		World->RemoveClientFromChunks(this, m_LoadedChunks);
 	}
 	m_LoadedChunks.clear();
 	m_ChunksToSend.clear();
@@ -1657,14 +1652,11 @@ void cClientHandle::Tick(float a_Dt)
 		int NumSent = 0;
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
 		{
-			cChunkPtr Chunk = World->GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
-			if (!Chunk->IsValid())
+			if (!World->SendChunkTo(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this))
 			{
 				++itr;
 				continue;
 			}
-			// The chunk has become valid, send it and remove it from the list:
-			Chunk->Send(this);
 			itr = m_ChunksToSend.erase(itr);
 			NumSent++;
 			if (NumSent > 10)

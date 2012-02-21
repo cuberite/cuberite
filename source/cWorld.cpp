@@ -1331,6 +1331,33 @@ void cWorld::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, in
 
 
 
+bool cWorld::AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	return m_ChunkMap->AddChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+}
+
+
+
+
+
+void cWorld::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
+{
+	m_ChunkMap->RemoveClientFromChunks(a_Client, a_Chunks);
+}
+
+
+
+
+
+bool cWorld::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	return m_ChunkMap->SendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+}
+
+
+
+
+
 void cWorld::SaveAllChunks()
 {
 	LOG("Saving all chunks...");

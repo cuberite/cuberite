@@ -146,8 +146,7 @@ public:
 	int GetPosZ() { return m_PosZ; }
 	cWorld * GetWorld() { return m_World; }
 
-	void Send( cClientHandle* a_Client );
-	void AsyncUnload( cClientHandle* a_Client );
+	void SendTo( cClientHandle * a_Client );
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, char a_BlockType, char a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
@@ -161,7 +160,9 @@ public:
 
 	void SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client );
 
-	void AddClient    (cClientHandle* a_Client );
+	/// Adds a client to the chunk; returns true if added, false if already there
+	bool AddClient    (cClientHandle* a_Client );
+	
 	void RemoveClient (cClientHandle* a_Client );
 	bool HasClient    (cClientHandle* a_Client );
 	bool HasAnyClients(void);  // Returns true if theres any client in the chunk; false otherwise

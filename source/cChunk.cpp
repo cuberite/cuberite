@@ -798,17 +798,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 
 
 
-void cChunk::AsyncUnload( cClientHandle* a_Client )
-{
-	m_UnloadQuery.remove( a_Client );	// Make sure this client is only in the list once
-	m_UnloadQuery.push_back( a_Client );
-}
-
-
-
-
-
-void cChunk::Send( cClientHandle* a_Client )
+void cChunk::SendTo(cClientHandle* a_Client)
 {
 	cPacket_PreChunk PreChunk;
 	PreChunk.m_PosX = m_PosX;
@@ -870,7 +860,21 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	// Update heightmap, if needed:
 	if (a_Y >= m_HeightMap[a_X + a_Z * 16])
 	{
-		m_HeightMap[a_X + a_Z * 16] = (a_BlockType == E_BLOCK_AIR) ? (a_Y - 1) : a_Y;
+		if (a_BlockType != E_BLOCK_AIR)
+		{
+			m_HeightMap[a_X + a_Z * 16] = a_Y;
+		}
+		else
+		{
+			for (int y = a_Y - 1; y > 0; --y)
+			{
+				if (m_BlockData[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
+				{
+					m_HeightMap[a_X + a_Z * 16] = y;
+					break;
+				}
+			}  // for y - column in m_BlockData
+		}
 	}
 
 	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
@@ -951,7 +955,21 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	// Update heightmap, if needed:
 	if (a_Y >= m_HeightMap[a_X + a_Z * 16])
 	{
-		m_HeightMap[a_X + a_Z * 16] = (a_BlockType == E_BLOCK_AIR) ? (a_Y - 1) : a_Y;
+		if (a_BlockType != E_BLOCK_AIR)
+		{
+			m_HeightMap[a_X + a_Z * 16] = a_Y;
+		}
+		else
+		{
+			for (int y = a_Y - 1; y > 0; --y)
+			{
+				if (m_BlockData[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
+				{
+					m_HeightMap[a_X + a_Z * 16] = y;
+					break;
+				}
+			}  // for y - column in m_BlockData
+		}
 	}
 }
 
@@ -1102,20 +1120,28 @@ void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 
 
 
-void cChunk::AddClient( cClientHandle* a_Client )
+bool cChunk::AddClient(cClientHandle* a_Client)
 {
 	{
 		cCSLock Lock(m_CSClients);
-		m_LoadedByClient.remove( a_Client );
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+		{
+			if (a_Client == *itr)
+			{
+				// Already there, nothing needed
+				return false;
+			}
+		}
 		m_LoadedByClient.push_back( a_Client );
 	}
 
 	cCSLock Lock(m_CSEntities);
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 	{
-		LOG("Entity #%d (%s) at [%i %i %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
+		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
 		(*itr)->SpawnOn( a_Client );
 	}
+	return true;
 }
 
 
