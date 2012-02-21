@@ -7,6 +7,10 @@
 #include <csignal>   //std::signal
 #include <stdlib.h>  //exit()
 
+#ifdef _WIN32
+	#include <dbghelp.h>
+#endif  // _WIN32
+
 #include "SquirrelBindings.h"
 #if USE_SQUIRREL
 	#pragma warning(push)
@@ -51,6 +55,72 @@ void ShowCrashReport(int)
 
 
 
+#ifdef _WIN32
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Windows stuff: when the server crashes, create a "dump file" containing the callstack of each thread and some variables; let the user send us that crash file for analysis
+
+typedef BOOL  (WINAPI *pMiniDumpWriteDump)(
+	HANDLE hProcess,
+	DWORD ProcessId,
+	HANDLE hFile,
+	MINIDUMP_TYPE DumpType,
+	PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+	PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+	PMINIDUMP_CALLBACK_INFORMATION CallbackParam
+);
+
+pMiniDumpWriteDump g_WriteMiniDump;  // The function in dbghlp DLL that creates dump files
+
+char g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
+char g_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
+MINIDUMP_TYPE DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
+
+
+
+
+
+/** This function gets called just before the "program executed an illegal instruction and will be terminated" or similar.
+Its purpose is to create the crashdump using the dbghlp DLLs
+*/
+LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_ExceptionInfo)
+{
+	char * newStack = &g_ExceptionStack[sizeof(g_ExceptionStack)];
+	char * oldStack;
+
+	// Use the substitute stack:
+	_asm
+	{
+		mov oldStack, esp
+		mov esp, newStack
+	}
+
+	MINIDUMP_EXCEPTION_INFORMATION  ExcInformation;
+	ExcInformation.ThreadId = GetCurrentThreadId();
+	ExcInformation.ExceptionPointers = a_ExceptionInfo;
+	ExcInformation.ClientPointers = 0;
+
+	// Write the dump file:
+	HANDLE dumpFile = CreateFile(g_DumpFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, DumpFlags, (a_ExceptionInfo) ? &ExcInformation : NULL, NULL, NULL);
+	CloseHandle(dumpFile);
+
+	// Revert to old stack:
+	_asm
+	{
+		mov esp, oldStack
+	}
+
+	return 0;
+}
+
+#endif  // _WIN32
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// main:
+
 int main( int argc, char **argv )
 {
 	(void)argc;
@@ -59,6 +129,18 @@ int main( int argc, char **argv )
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	InitLeakFinder();
 	#endif
+	
+	// Magic code to produce dump-files on Windows if the server crashes:
+	#ifdef _WIN32
+	HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
+	g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
+	if (g_WriteMiniDump != NULL)
+	{
+		_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
+		SetUnhandledExceptionFilter(LastChanceExceptionFilter);
+	}
+	#endif  // _WIN32
+	// End of dump-file magic
 	
 	#ifdef _DEBUG
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -73,6 +155,9 @@ int main( int argc, char **argv )
 	std::signal(SIGSEGV, ShowCrashReport);
 	#endif
 
+	// DEBUG: test the dumpfile creation:
+	// *((int *)0) = 0;
+	
 	try
 	{
 		cRoot Root;	
