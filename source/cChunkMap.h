@@ -54,6 +54,8 @@ public:
 	int  GetHeight          (int a_BlockX, int a_BlockZ);
 	void FastSetBlocks      (sSetBlockList & a_BlockList);
 	void CollectPickupsByPlayer(cPlayer * a_Player);
+	char GetBlock           (int a_X, int a_Y, int a_Z);
+	char GetBlockMeta       (int a_X, int a_Y, int a_Z);
 	
 	/// Compares clients of two chunks, calls the callback accordingly
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);

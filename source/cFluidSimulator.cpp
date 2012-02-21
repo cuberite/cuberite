@@ -199,8 +199,6 @@ public:
 		}
 
 		return Points;
-
-
 	}
 
 	std::set< Vector3i >* m_ActiveFluid;
@@ -228,6 +226,10 @@ public:
 	unsigned char m_CurResult;
 };
 
+
+
+
+
 cFluidSimulator::cFluidSimulator( cWorld* a_World )
 	: cSimulator(a_World)
 	, m_Data(0)
@@ -235,19 +237,34 @@ cFluidSimulator::cFluidSimulator( cWorld* a_World )
 	m_Data = new FluidData(a_World, this);
 }
 
+
+
+
+
 cFluidSimulator::~cFluidSimulator()
 {
 	delete m_Data;
 }
 
+
+
+
+
 void cFluidSimulator::AddBlock( int a_X, int a_Y, int a_Z )
 {
-	if(!IsAllowedBlock(m_World->GetBlock(a_X, a_Y, a_Z)))		//This should save very much time because it doesn´t have to iterate through all blocks
+	char BlockType = m_World->GetBlock(a_X, a_Y, a_Z);
+	if (!IsAllowedBlock(BlockType))		//This should save very much time because it doesn´t have to iterate through all blocks
+	{
 		return;
+	}
 
 	std::set< Vector3i > & ActiveFluid = *m_Data->m_ActiveFluid;
 	ActiveFluid.insert( Vector3i( a_X, a_Y, a_Z ) );
 }
+
+
+
+
 
 char cFluidSimulator::GetHighestLevelAround( int a_X, int a_Y, int a_Z )
 {
@@ -270,12 +287,18 @@ char cFluidSimulator::GetHighestLevelAround( int a_X, int a_Y, int a_Z )
 	return Max;
 }
 
+
+
+
+
 void cFluidSimulator::Simulate( float a_Dt )
 {
 	m_Timer += a_Dt;
 
-	if(m_Data->m_ActiveFluid->empty())	//Nothing to do if there is no active fluid ;) saves very little time ;D
+	if (m_Data->m_ActiveFluid->empty())	//Nothing to do if there is no active fluid ;) saves very little time ;D
+	{
 		return;
+	}
 
 	std::swap( m_Data->m_ActiveFluid, m_Data->m_Buffer );	// Swap so blocks can be added to empty ActiveFluid array
 	m_Data->m_ActiveFluid->clear();
@@ -393,6 +416,9 @@ void cFluidSimulator::Simulate( float a_Dt )
 }
 
 
+
+
+
 bool cFluidSimulator::IsPassableForFluid(char a_BlockID)
 {
 	return a_BlockID == E_BLOCK_AIR
@@ -401,10 +427,18 @@ bool cFluidSimulator::IsPassableForFluid(char a_BlockID)
 		|| CanWashAway(a_BlockID);
 }
 
+
+
+
+
 bool cFluidSimulator::IsStationaryBlock (char a_BlockID)
 {
 	return a_BlockID == m_StationaryFluidBlock;
 }
+
+
+
+
 
 bool cFluidSimulator::CanWashAway( char a_BlockID )
 {
@@ -421,6 +455,10 @@ bool cFluidSimulator::CanWashAway( char a_BlockID )
 	};
 }
 
+
+
+
+
 bool cFluidSimulator::IsSolidBlock( char a_BlockID )
 {
 	return !(a_BlockID == E_BLOCK_AIR
@@ -429,6 +467,10 @@ bool cFluidSimulator::IsSolidBlock( char a_BlockID )
 		|| IsBlockWater(a_BlockID)
 		|| CanWashAway(a_BlockID));
 }
+
+
+
+
 
 //TODO Not working very well yet :s
 Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
@@ -489,7 +531,6 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 		delete Pos;
 	}
 
-
 	if(LowestPoint == m_World->GetBlockMeta(a_X, a_Y, a_Z))
 		return NONE;
 
@@ -514,9 +555,11 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	}
 
 	return NONE;
-
-
 }
+
+
+
+
 
 bool cFluidSimulator::UniqueSituation(Vector3i a_Pos)
 {
@@ -607,6 +650,10 @@ bool cFluidSimulator::UniqueSituation(Vector3i a_Pos)
 	return result;
 }
 
+
+
+
+
 void cFluidSimulator::ApplyUniqueToNearest(Vector3i a_Pos)
 {
 	Vector3i NearPoints [] = {
@@ -622,3 +669,7 @@ void cFluidSimulator::ApplyUniqueToNearest(Vector3i a_Pos)
 		UniqueSituation(NearPoints[i]);
 	}
 }
+
+
+
+

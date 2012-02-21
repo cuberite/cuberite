@@ -16,5 +16,5 @@ public:
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z) = 0;
 
-	cWorld *m_World;
+	cWorld * m_World;
 };

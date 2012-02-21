@@ -188,6 +188,10 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 			{
 				Height = 127 - Lower;
 			}
+			if (Height < -63)
+			{
+				Height = -63;
+			}
 			const int Top = Lower + Height;
 			const float WaveNoise = 1;  // m_Noise.CubicNoise2D( xx*0.01f, zz*0.01f ) + 0.5f;
 			for( int y = 1; y < Top; ++y )

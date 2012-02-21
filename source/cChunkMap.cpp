@@ -442,6 +442,43 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
 
 
 
+char cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
+{
+	int ChunkX, ChunkZ;
+	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		return Chunk->GetBlock(a_X, a_Y, a_Z);
+	}
+	return 0;
+}
+
+
+
+
+
+char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
+{
+	int ChunkX, ChunkZ;
+	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid() )
+	{
+		// Although it is called GetLight(), it actually gets meta when passed the Meta field
+		return Chunk->GetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z );
+	}
+	return 0;
+}
+
+
+
+
+
 void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);

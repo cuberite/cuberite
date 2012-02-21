@@ -853,16 +853,23 @@ void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 
 char cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 {
-	int ChunkX, ChunkY, ChunkZ;
-
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
-
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if ( Chunk->IsValid() )
+	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
-		return Chunk->GetBlock(a_X, a_Y, a_Z);
+		int X = a_X, Y = a_Y, Z = a_Z;
+		int ChunkX, ChunkY, ChunkZ;
+		AbsoluteToRelative(X, Y, Z, ChunkX, ChunkY, ChunkZ);
+		
+		cCSLock Lock(m_CSFastSetBlock);
+		for (sSetBlockList::iterator itr = m_FastSetBlockQueue.begin(); itr != m_FastSetBlockQueue.end(); ++itr)
+		{
+			if ((itr->x == X) && (itr->y == Y) && (itr->z == Z) && (itr->ChunkX == ChunkX) && (itr->ChunkZ == ChunkZ))
+			{
+				return itr->BlockType;
+			}
+		}  // for itr - m_FastSetBlockQueue[]
 	}
-	return 0;
+	
+	return m_ChunkMap->GetBlock(a_X, a_Y, a_Z);
 }
 
 
@@ -871,16 +878,19 @@ char cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 
 char cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
 {
-	int ChunkX, ChunkY, ChunkZ;
-
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
-
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if ( Chunk->IsValid() )
+	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
-		return Chunk->GetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z );
+		cCSLock Lock(m_CSFastSetBlock);
+		for (sSetBlockList::iterator itr = m_FastSetBlockQueue.begin(); itr != m_FastSetBlockQueue.end(); ++itr)
+		{
+			if ((itr->x == a_X) && (itr->y == a_Y) && (itr->y == a_Y))
+			{
+				return itr->BlockMeta;
+			}
+		}  // for itr - m_FastSetBlockQueue[]
 	}
-	return 0;
+	
+	return m_ChunkMap->GetBlockMeta(a_X, a_Y, a_Z);
 }
 
 
