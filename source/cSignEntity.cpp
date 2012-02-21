@@ -98,7 +98,7 @@ void cSignEntity::SendTo( cClientHandle* a_Client )
 	}
 	else // broadcast of a_Client == 0
 	{
-		m_World->GetChunkOfBlock(m_PosX, m_PosY, m_PosZ)->Broadcast( Sign );
+		m_World->BroadcastToChunkOfBlock(m_PosX, m_PosY, m_PosZ, &Sign );
 	}
 }
 

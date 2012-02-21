@@ -57,9 +57,6 @@ public:
 
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
-	cChunkPtr GetChunk       ( int a_ChunkX, int a_ChunkY, int a_ChunkZ ) {return m_ChunkMap->GetChunk     (a_ChunkX, a_ChunkY, a_ChunkZ); }
-	cChunkPtr GetChunkNoGen  ( int a_ChunkX, int a_ChunkY, int a_ChunkZ ) {return m_ChunkMap->GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ); }
-	cChunkPtr GetChunkOfBlock( int a_X, int a_Y, int a_Z );
 	int GetHeight( int a_X, int a_Z );												//tolua_export
 
 	//void AddClient( cClientHandle* a_Client );
@@ -124,11 +121,19 @@ public:
 	/// Adds client to a chunk, if not already present; returns true if added, false if present
 	bool AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 	
+	/// Removes client from the chunk specified
+	void RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	
 	/// Removes the client from all chunks specified
 	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
 	
 	/// Sends a chunk to client, returns true if successful, false if not sent
 	bool SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	
+	/// Touches the chunk, causing it to be loaded or generated
+	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
@@ -150,7 +155,8 @@ public:
 	inline cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
 
 	// TODO: This interface is dangerous! Export as a set of specific action functions for Lua: GetChestItem, GetFurnaceItem, SetFurnaceItem, SetSignLines etc.
-	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
+	// _X 2012_02_21: This function always returns NULL
+	OBSOLETE cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
 	
 	/// a_Player is using block entity at [x, y, z], handle that:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z) {m_ChunkMap->UseBlockEntity(a_Player, a_X, a_Y, a_Z); }

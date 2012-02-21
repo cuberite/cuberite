@@ -80,17 +80,6 @@ bool g_BlockPistonBreakable[128];
 
 
 
-#define RECI_RAND_MAX (1.f/RAND_MAX)
-inline float fRadRand( float a_Radius )
-{
-	MTRand r1;
-	return ((float)r1.rand() * RECI_RAND_MAX)*a_Radius - a_Radius*0.5f;
-}
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorldLoadProgress:
 
@@ -443,7 +432,7 @@ void cWorld::InitializeSpawn()
 	{
 		for (int z = 0; z < ViewDist; z++)
 		{
-			GetChunk( x + ChunkX-(ViewDist - 1) / 2, 0, z + ChunkZ-(ViewDist - 1) / 2 );  // Queue the chunk in the generator / loader
+			m_ChunkMap->TouchChunk( x + ChunkX-(ViewDist - 1) / 2, 0, z + ChunkZ-(ViewDist - 1) / 2 );  // Queue the chunk in the generator / loader
 		}
 	}
 	
@@ -812,29 +801,11 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 
 
 
-cChunkPtr cWorld::GetChunkOfBlock( int a_X, int a_Y, int a_Z )
-{
-	int ChunkX, ChunkY, ChunkZ;
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
-	return GetChunk( ChunkX, ChunkY, ChunkZ );
-}
-
-
-
-
-
 void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
-	int ChunkX, ChunkY, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
-	AbsoluteToRelative( X, Y, Z, ChunkX, ChunkY, ChunkZ );
+	m_ChunkMap->SetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
 
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if ( Chunk->IsValid() )
-	{
-		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
-		this->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
-	}
-	// The chunk is not yet initialized, so it's probably far away from all players, no need to store this Meta change
+	GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
 }
 
 
@@ -899,17 +870,7 @@ char cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
 
 void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
 {
-	int ChunkX, ChunkY, ChunkZ;
-
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
-
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if ( Chunk->IsValid() )	
-	{
-		Chunk->SetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_MetaData );
-		Chunk->SendBlockTo( a_X, a_Y, a_Z, NULL );
-	}
-	// The chunk is not yet initialized, so it's probably far away from all players, no need to store this Meta change
+	m_ChunkMap->SetBlockMeta(a_X, a_Y, a_Z, a_MetaData);
 }
 
 
@@ -918,24 +879,12 @@ void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
 
 bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 {
-	int PosX = a_X, PosY = a_Y, PosZ = a_Z, ChunkX, ChunkY, ChunkZ;
-
-	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkY, ChunkZ );
-
-	cChunkPtr DestChunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if (DestChunk->IsValid())
+	bool res = m_ChunkMap->DigBlock(a_X, a_Y, a_Z, a_PickupItem);
+	if (res)
 	{
-		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
-
 		GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
-
-		if ( !a_PickupItem.IsEmpty() )
-		{
-			cPickup * Pickup = new cPickup( a_X * 32 + 16 + (int)fRadRand(16.f), a_Y * 32 + 16 + (int)fRadRand(16.f), a_Z * 32 + 16 + (int)fRadRand(16.f), a_PickupItem );
-			Pickup->Initialize( this );
-		}
 	}
-	return true;
+	return res;
 }
 
 
@@ -944,13 +893,7 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 
 void cWorld::SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer * a_Player )
 {
-	int ChunkX, ChunkY, ChunkZ;
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkY, ChunkZ );
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if (Chunk->IsValid())
-	{
-		Chunk->SendBlockTo( a_X, a_Y, a_Z, a_Player->GetClientHandle() );
-	}
+	m_ChunkMap->SendBlockTo(a_X, a_Y, a_Z, a_Player);
 }
 
 
@@ -960,15 +903,6 @@ void cWorld::SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer * a_Player )
 // TODO: This interface is dangerous!
 cBlockEntity * cWorld::GetBlockEntity( int a_X, int a_Y, int a_Z )
 {
-	int PosX = a_X, PosY = a_Y, PosZ = a_Z, ChunkX, ChunkY, ChunkZ;
-
-	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkY, ChunkZ );
-
-	cChunkPtr Chunk = GetChunk( ChunkX, ChunkY, ChunkZ );
-	if (Chunk->IsValid())
-	{
-		// TODO: return Chunk->GetBlockEntity( a_X, a_Y, a_Z );
-	}
 	return NULL;
 }
 
@@ -1340,6 +1274,15 @@ bool cWorld::AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHan
 
 
 
+void cWorld::RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	m_ChunkMap->RemoveChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+}
+
+
+
+
+
 void cWorld::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
 {
 	m_ChunkMap->RemoveClientFromChunks(a_Client, a_Chunks);
@@ -1352,6 +1295,24 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoords
 bool cWorld::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
 {
 	return m_ChunkMap->SendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+}
+
+
+
+
+
+void cWorld::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+{
+	m_ChunkMap->UpdateSign(a_X, a_Y, a_Z, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
 

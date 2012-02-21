@@ -67,7 +67,7 @@ sSetBlock::sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockM
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cChunk:
 
-cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld * a_World)
+cChunk::cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World)
 	: m_bCalculateLighting( false )
 	, m_bCalculateHeightmap( false )
 	, m_PosX( a_X )
@@ -82,6 +82,7 @@ cChunk::cChunk(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	, m_BlockTickY( 0 )
 	, m_BlockTickZ( 0 )
 	, m_World( a_World )
+	, m_ChunkMap(a_ChunkMap)
 	, m_IsValid(false)
 	, m_IsDirty(false)
 	, m_IsSaving(false)
@@ -700,8 +701,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	bCalcLeft = bCalcRight = bCalcFront = bCalcBack = false;
 	
 	// Spread to neighbour chunks X-axis
-	cChunkPtr LeftChunk  = m_World->GetChunkNoGen( m_PosX - 1, m_PosY, m_PosZ );
-	cChunkPtr RightChunk = m_World->GetChunkNoGen( m_PosX + 1, m_PosY, m_PosZ );
+	cChunkPtr LeftChunk  = m_ChunkMap->GetChunkNoGen( m_PosX - 1, m_PosY, m_PosZ );
+	cChunkPtr RightChunk = m_ChunkMap->GetChunkNoGen( m_PosX + 1, m_PosY, m_PosZ );
 	char * LeftSky = NULL, *RightSky = NULL;
 	if (LeftChunk->IsValid())
 	{
@@ -745,8 +746,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	}
 
 	// Spread to neighbour chunks Z-axis
-	cChunkPtr FrontChunk = m_World->GetChunkNoGen( m_PosX, m_PosY, m_PosZ - 1 );
-	cChunkPtr BackChunk  = m_World->GetChunkNoGen( m_PosX, m_PosY, m_PosZ + 1 );
+	cChunkPtr FrontChunk = m_ChunkMap->GetChunkNoGen( m_PosX, m_PosY, m_PosZ - 1 );
+	cChunkPtr BackChunk  = m_ChunkMap->GetChunkNoGen( m_PosX, m_PosY, m_PosZ + 1 );
 	char * FrontSky = NULL, * BackSky = NULL;
 	if (FrontChunk->IsValid())
 	{

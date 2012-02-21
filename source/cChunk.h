@@ -46,9 +46,14 @@ class cClientHandle;
 class cServer;
 class MTRand;
 class cPlayer;
+class cChunkMap;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef std::list<cBlockEntity *>   cBlockEntityList;
+
+
+
+
 
 /** Interface class used for getting data out of a chunk using the GetAllData() function.
 Implementation must use the pointers immediately and NOT store any of them for later use
@@ -108,7 +113,7 @@ public:
 	static const int c_NumBlocks = 16 * 128 * 16;
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
 	
-	cChunk(int a_X, int a_Y, int a_Z, cWorld* a_World);
+	cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World);
 	~cChunk();
 
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk is valid (loaded / generated)
@@ -248,7 +253,8 @@ private:
 	bool m_bCalculateHeightmap;
 
 	int m_PosX, m_PosY, m_PosZ;
-	cWorld * m_World;
+	cWorld *    m_World;
+	cChunkMap * m_ChunkMap;
 
 	char m_BlockData[c_BlockDataSize]; // Chunk data ready to be compressed and sent
 	char *m_BlockType;		// Pointers to an element in m_BlockData

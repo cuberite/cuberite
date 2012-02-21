@@ -160,7 +160,7 @@ void cPickup::Tick(float a_Dt)
 		m_bReplicated = true;
 		m_bDirtyPosition = false;
 		cPacket_TeleportEntity TeleportEntity( this );
-		GetWorld()->GetChunk( m_ChunkX, m_ChunkY, m_ChunkZ )->Broadcast( &TeleportEntity );
+		GetWorld()->BroadcastToChunk( m_ChunkX, m_ChunkY, m_ChunkZ, TeleportEntity );
 	}
 }
 

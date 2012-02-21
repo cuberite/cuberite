@@ -343,7 +343,7 @@ void cClientHandle::StreamChunks(void)
 			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
 			if ((RelX > VIEWDISTANCE) || (RelX < -VIEWDISTANCE) || (RelZ > VIEWDISTANCE) || (RelZ < -VIEWDISTANCE))
 			{
-				World->GetChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(this);
+				World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
 				itr = m_LoadedChunks.erase(itr);
 			}
 			else
@@ -389,13 +389,13 @@ void cClientHandle::StreamChunks(void)
 		// For each distance touch chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
 		{
-			World->GetChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
-			World->GetChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			World->TouchChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			World->TouchChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
 		}  // for i
 		for (int i = -d + 1; i < d; ++i)
 		{
-			World->GetChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
-			World->GetChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
+			World->TouchChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
+			World->TouchChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
 		}  // for i
 	}  // for d
 }
@@ -1510,12 +1510,7 @@ void cClientHandle::HandleWindowClick(cPacket_WindowClick * a_Packet)
 void cClientHandle::HandleUpdateSign(cPacket_UpdateSign * a_Packet)
 {
 	cWorld * World = m_Player->GetWorld();
-	cChunkPtr Chunk = World->GetChunkOfBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
-	{
-		return;
-	}
-	Chunk->UpdateSign(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Line1, a_Packet->m_Line2, a_Packet->m_Line3, a_Packet->m_Line4);
+	World->UpdateSign(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Line1, a_Packet->m_Line2, a_Packet->m_Line3, a_Packet->m_Line4);
 }
 
 
@@ -1664,8 +1659,10 @@ void cClientHandle::Tick(float a_Dt)
 				// Only send up to 10 chunks per tick, otherwise we'd choke the tick thread
 				break;
 			}
-			CheckIfWorldDownloaded();
 		}  // for itr - m_ChunksToSend[]
+		
+		// Check even if we didn't send anything - a chunk may have sent a notification that we'd miss otherwise
+		CheckIfWorldDownloaded();
 	}
 }
 

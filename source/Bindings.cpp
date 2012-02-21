@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/16/12 18:16:16.
+** Generated automatically by tolua++-1.0.92 on 02/21/12 17:01:49.
 */
 
 #ifndef __cplusplus
@@ -9508,7 +9508,7 @@ static int tolua_AllToLua_cWorld_GetHeight00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHeight'", NULL);
 #endif
   {
-   char tolua_ret = (char)  self->GetHeight(a_X,a_Z);
+   int tolua_ret = (int)  self->GetHeight(a_X,a_Z);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -9984,7 +9984,7 @@ static int tolua_AllToLua_cWorld_GetBlockEntity00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockEntity'", NULL);
 #endif
   {
-   cBlockEntity* tolua_ret = (cBlockEntity*)  self->GetBlockEntity(a_X,a_Y,a_Z);
+   OBSOLETE cBlockEntity* tolua_ret = (OBSOLETE cBlockEntity*)  self->GetBlockEntity(a_X,a_Y,a_Z);
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockEntity");
   }
  }

@@ -2,11 +2,13 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cChunkMap.h"
-#include "cChunk.h"
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cMakeDir.h"
 #include "cPlayer.h"
+#include "BlockID.h"
+#include "cItem.h"
+#include "cPickup.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -14,6 +16,17 @@
 
 #include "zlib.h"
 #include <json/json.h>
+
+
+
+
+
+#define RECI_RAND_MAX (1.f/RAND_MAX)
+inline float fRadRand( float a_Radius )
+{
+	MTRand r1;
+	return ((float)r1.rand() * RECI_RAND_MAX)*a_Radius - a_Radius*0.5f;
+}
 
 
 
@@ -479,6 +492,88 @@ char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 
 
 
+void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
+{
+	int ChunkX, ChunkZ;
+	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid() )	
+	{
+		// Although it is called SetLight(), it actually sets meta when passed the Meta field
+		Chunk->SetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_BlockMeta );
+		Chunk->SendBlockTo( a_X, a_Y, a_Z, NULL );
+	}
+}
+
+
+
+
+
+void cChunkMap::SetBlock(int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta)
+{
+	int ChunkX, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
+	AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+	}
+}
+
+
+
+
+
+bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z, cItem & a_PickupItem)
+{
+	int PosX = a_X, PosY = a_Y, PosZ = a_Z, ChunkX, ChunkZ;
+
+	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr DestChunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((DestChunk == NULL) || !DestChunk->IsValid())
+	{
+		return false;
+	}
+	
+	DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
+
+	m_World->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
+
+	if ( !a_PickupItem.IsEmpty() )
+	{
+		cPickup * Pickup = new cPickup( a_X * 32 + 16 + (int)fRadRand(16.f), a_Y * 32 + 16 + (int)fRadRand(16.f), a_Z * 32 + 16 + (int)fRadRand(16.f), a_PickupItem );
+		Pickup->Initialize(m_World);
+	}
+	return true;
+}
+
+
+
+
+
+void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
+{
+	int ChunkX, ChunkZ;
+	AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk->IsValid())
+	{
+		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player->GetClientHandle());
+	}
+}
+
+
+
+
+
 void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
@@ -552,6 +647,21 @@ bool cChunkMap::AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClient
 
 
 
+void cChunkMap::RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	Chunk->RemoveClient(a_Client);
+}
+
+
+
+
+
 void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
 {
 	cCSLock Lock(m_CSLayers);
@@ -569,7 +679,7 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoo
 bool cChunkMap::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
@@ -610,6 +720,33 @@ void cChunkMap::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_Ch
 		return;
 	}
 	Chunk->RemoveEntity(a_Entity);
+}
+
+
+
+
+
+void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cChunkMap::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+	BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->UpdateSign(a_X, a_Y, a_Z, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
 
@@ -687,7 +824,7 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 	int Index = LocalX + LocalZ * LAYER_SIZE;
 	if (m_Chunks[Index].get() == NULL)
 	{
-		m_Chunks[Index].reset(new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent->GetWorld()));
+		m_Chunks[Index].reset(new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld()));
 	}
 	return m_Chunks[Index];
 }

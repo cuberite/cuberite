@@ -13,6 +13,7 @@
 
 class cWorld;
 class cEntity;
+class cItem;
 class MTRand;
 
 
@@ -27,10 +28,6 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
-	// TODO: Get rid of these (put into Private section) in favor of the direct action methods:
-	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
-	
 	// Direct action methods:
 	/// Broadcast a_Packet to all clients in the chunk specified
 	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
@@ -56,6 +53,10 @@ public:
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	char GetBlock           (int a_X, int a_Y, int a_Z);
 	char GetBlockMeta       (int a_X, int a_Y, int a_Z);
+	void SetBlockMeta       (int a_X, int a_Y, int a_Z, char a_BlockMeta);
+	void SetBlock           (int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta);
+	bool DigBlock           (int a_X, int a_Y, int a_Z, cItem & a_PickupItem);
+	void SendBlockTo        (int a_X, int a_Y, int a_Z, cPlayer * a_Player);
 	
 	/// Compares clients of two chunks, calls the callback accordingly
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -63,6 +64,9 @@ public:
 	/// Adds client to a chunk, if not already present; returns true if added, false if present
 	bool AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 
+	/// Removes the client from the chunk
+	void RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	
 	/// Removes the client from all chunks specified
 	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
 
@@ -74,6 +78,11 @@ public:
 
 	/// Removes the entity from the chunk specified
 	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	/// Touches the chunk, causing it to be loaded or generated
+	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
@@ -112,6 +121,8 @@ public:
 	void ChunkValidated(void);  // Called by chunks that have become valid
 
 private:
+
+	friend class cChunk;  // Temporary (until we have a separate Lighting thread), so that cChunk's lighting calc can ask for neighbor chunks
 
 	class cChunkLayer
 	{
@@ -153,6 +164,9 @@ private:
 	cEvent           m_evtChunkValid;  // Set whenever any chunk becomes valid, via ChunkValidated()
 
 	cWorld * m_World;
+
+	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
+	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
 };
 
 
