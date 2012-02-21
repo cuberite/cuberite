@@ -543,9 +543,11 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 
 int cChunk::GetHeight( int a_X, int a_Z )
 {
-	if( a_X >= 0 && a_X < 16 && a_Z >= 0 && a_Z < 16 )
+	ASSERT((a_X >= 0) && (a_X < 16) && (a_Z >= 0) && (a_Z < 16));
+	
+	if ((a_X >= 0) && (a_X < 16) && (a_Z >= 0) && (a_Z < 16))
 	{
-		return m_HeightMap[a_X + a_Z*16];
+		return m_HeightMap[a_X + a_Z * 16];
 	}
 	return 0;
 }
@@ -840,6 +842,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	char OldBlockType = m_BlockType[index];
 	m_BlockType[index] = a_BlockType;
 
+	// It's called SetLight(), but it sets the Meta when passed the BlockMeta workspace
 	SetLight( m_BlockMeta, index, a_BlockMeta );
 
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
@@ -849,8 +852,26 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 	MarkDirty();
 	
-	cCSLock Lock(m_CSBlockLists);
-	m_PendingSendBlocks.push_back( index );
+	{
+		cCSLock Lock(m_CSBlockLists);
+		m_PendingSendBlocks.push_back( index );
+	}
+
+	// ONLY recalculate lighting if it's necessary!
+	if(
+		(g_BlockLightValue[ OldBlockType ] != g_BlockLightValue[ a_BlockType ]) ||
+		(g_BlockSpreadLightFalloff[ OldBlockType ] != g_BlockSpreadLightFalloff[ a_BlockType ]) ||
+		(g_BlockTransparent[ OldBlockType ] != g_BlockTransparent[ a_BlockType ] )
+	)
+	{
+		RecalculateLighting();
+	}
+
+	// Update heightmap, if needed:
+	if (a_Y >= m_HeightMap[a_X + a_Z * 16])
+	{
+		m_HeightMap[a_X + a_Z * 16] = (a_BlockType == E_BLOCK_AIR) ? (a_Y - 1) : a_Y;
+	}
 
 	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
 	m_ToTickBlocks[ MakeIndex( a_X+1, a_Y, a_Z ) ]++;
@@ -860,7 +881,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z+1 ) ]++;
 	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z-1 ) ]++;
 
-	cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX*16, a_Y+m_PosY*128, a_Z+m_PosZ*16 );
+	cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX * 16, a_Y + m_PosY * 128, a_Z + m_PosZ * 16 );
 	if( BlockEntity )
 	{
 		BlockEntity->Destroy();
@@ -927,8 +948,11 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 		RecalculateLighting();
 	}
 
-	// Recalculate next tick
-	RecalculateHeightmap();
+	// Update heightmap, if needed:
+	if (a_Y >= m_HeightMap[a_X + a_Z * 16])
+	{
+		m_HeightMap[a_X + a_Z * 16] = (a_BlockType == E_BLOCK_AIR) ? (a_Y - 1) : a_Y;
+	}
 }
 
 
