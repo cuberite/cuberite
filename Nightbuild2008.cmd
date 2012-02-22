@@ -1,13 +1,13 @@
-rem @echo off
+@echo off
 :: Nightbbuild2008.cmd
 :: This script is run every night to produce a new version of MCServer, backup its PDB files and upload the packages to web.
 :: These sub-scripts are used:
 ::  - WCRev.cmd together with subwcrev templating to obtain the version number as an environment var
-::  - UploadVersion.ftp FTP command template for uploading the version to the web (not included in the SVN, because it contains confidential passwords! Use your own)
+::  - UploadVersion.ftp FTP command template for uploading the version to the web (not included in the SVN, because it contains confidential passwords! Use your own :)
 :: When run without parameters, this script pauses at the end and waits for a keypress.
 :: To run in an automated scheduler, add any parameter to disable waiting for a keystroke
 ::
-:: This script expects a few tools on specific paths, you can pass the correct paths for your system as env vars "7z", "vc" and "tsvn"
+:: This script expects a few tools on specific paths, you can pass the correct paths for your system as env vars "zip", "vc" and "tsvn"
 
 
 :: 7-zip executable (by default it should be on PATH):
@@ -24,6 +24,8 @@ if %subwcrev%a == a set subwcrev=subwcrev
 
 
 
+
+echo Performing nightbuild of MC-Server
 
 
 set DONOTPAUSE=y
@@ -45,6 +47,16 @@ call Install\WCVersion.cmd
 echo WCREV = %WCREV%
  
 
+:: Test if the version is already present
+if exist MCServer_Win_%WCREV%.7z (
+	echo Latest version already present, bailing out
+	goto end
+)
+
+
+
+
+:: Compile using VC2008 Express. Do a full rebuild.
 echo Setting up VS environment...
 call "%VS90COMNTOOLS%\vsvars32.bat"
 echo Compiling MCServer...
