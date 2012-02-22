@@ -129,18 +129,21 @@ float cNoise::CosineNoise2D( float a_X, float a_Y ) const
 	return CosineInterpolate( interp1, interp2, FracY );
 }
 
+
+
+
+
 float cNoise::CubicNoise2D( float a_X, float a_Y ) const
 {
 	const int	BaseX = FAST_FLOOR( a_X );
 	const int	BaseY = FAST_FLOOR( a_Y );
 	
-	const float points[4][4] = { 
-		
-		IntNoise2D( BaseX-1, BaseY-1 ), IntNoise2D( BaseX, BaseY-1 ),	IntNoise2D( BaseX+1, BaseY-1 ), IntNoise2D( BaseX+2, BaseY-1 ),
-		IntNoise2D( BaseX-1, BaseY ),	IntNoise2D( BaseX, BaseY ),		IntNoise2D( BaseX+1, BaseY ),	IntNoise2D( BaseX+2, BaseY ),
-		IntNoise2D( BaseX-1, BaseY+1 ), IntNoise2D( BaseX, BaseY+1 ),	IntNoise2D( BaseX+1, BaseY+1 ), IntNoise2D( BaseX+2, BaseY+1 ),
-		IntNoise2D( BaseX-1, BaseY+2 ), IntNoise2D( BaseX, BaseY+2 ),	IntNoise2D( BaseX+1, BaseY+2 ), IntNoise2D( BaseX+2, BaseY+2 ),
-
+	const float points[4][4] =
+	{
+		IntNoise2D( BaseX-1, BaseY-1 ), IntNoise2D( BaseX, BaseY-1 ), IntNoise2D( BaseX+1, BaseY-1 ), IntNoise2D( BaseX+2, BaseY-1 ),
+		IntNoise2D( BaseX-1, BaseY ),   IntNoise2D( BaseX, BaseY ),   IntNoise2D( BaseX+1, BaseY ),   IntNoise2D( BaseX+2, BaseY ),
+		IntNoise2D( BaseX-1, BaseY+1 ), IntNoise2D( BaseX, BaseY+1 ), IntNoise2D( BaseX+1, BaseY+1 ), IntNoise2D( BaseX+2, BaseY+1 ),
+		IntNoise2D( BaseX-1, BaseY+2 ), IntNoise2D( BaseX, BaseY+2 ), IntNoise2D( BaseX+1, BaseY+2 ), IntNoise2D( BaseX+2, BaseY+2 ),
 	};
 
 	const float	FracX = (a_X) - BaseX;
@@ -153,6 +156,10 @@ float cNoise::CubicNoise2D( float a_X, float a_Y ) const
 	const float	FracY = (a_Y) - BaseY;
 	return CubicInterpolate( interp1, interp2, interp3, interp4, FracY );
 }
+
+
+
+
 
 #if NOISE_USE_SSE
 float cNoise::SSE_CubicNoise2D( float a_X, float a_Y ) const

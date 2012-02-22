@@ -36,7 +36,7 @@ float cNoise::CubicInterpolate( float a_A, float a_B, float a_C, float a_D, floa
 	float R = a_C - a_A;
 	float S = a_B;
 
-	return P*(a_Pct*a_Pct*a_Pct) + Q*(a_Pct*a_Pct) + R*a_Pct + S;
+	return ((P * a_Pct + Q) * a_Pct + R) * a_Pct + S;
 }
 
 float cNoise::CosineInterpolate( float a_A, float a_B, float a_Pct ) const

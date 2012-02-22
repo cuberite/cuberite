@@ -6,14 +6,22 @@
 
 // Do not touch
 #if NOISE_USE_INLINE
-# define __NOISE_INLINE__ inline
+	#ifdef _MSC_VER
+		#define __NOISE_INLINE__ __forceinline
+	#else
+		#define __NOISE_INLINE__ inline
+	#endif  // _MSC_VER
 #else
-# define __NOISE_INLINE__
+	#define __NOISE_INLINE__
 #endif
 
 #if NOISE_USE_SSE
 # include <emmintrin.h>
 #endif
+
+
+
+
 
 class cNoise
 {
@@ -55,6 +63,14 @@ private:
 	unsigned int m_Seed;
 };
 
+
+
+
+
 #if NOISE_USE_INLINE
 # include "cNoise.inc"
 #endif
+
+
+
+
