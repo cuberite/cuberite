@@ -60,7 +60,7 @@ cEntity::~cEntity()
 	
 	if( !m_bDestroyed || !m_bRemovedFromChunk )
 	{
-		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk );
+		ASSERT(!"Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk );
 	}
 	delete m_Referencers;
 	delete m_References;

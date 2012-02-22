@@ -247,7 +247,11 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 				(*itr)->GetUniqueID(), (*itr)->GetClass(),
 				m_PosX, m_PosZ
 			);
-			delete *itr;
+
+			// Assert because this is a very curious case. These lines were executed once before, when a player died, re spawned, and walked around a bit. It's uncertain why an entity would be in the chunk in this case.
+			ASSERT(!"Unexpected entity in chunk!");
+
+			(*itr)->Destroy();
 		}
 	}
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
