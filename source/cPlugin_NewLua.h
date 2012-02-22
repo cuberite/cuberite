@@ -42,6 +42,8 @@ private:
 	typedef std::list< cWebPlugin_Lua* > WebPluginList;
 	WebPluginList m_WebPlugins;
 
+	cCriticalSection m_CriticalSection;
+
 	std::string m_Directory;
 	lua_State* m_LuaState;
 };//tolua_export

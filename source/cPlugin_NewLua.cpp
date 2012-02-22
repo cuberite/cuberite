@@ -31,6 +31,7 @@ cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
 
 cPlugin_NewLua::~cPlugin_NewLua()
 {
+	cCSLock Lock( m_CriticalSection );
 	for( WebPluginList::iterator itr = m_WebPlugins.begin(); itr != m_WebPlugins.end(); ++itr )
 	{
 		delete *itr;
@@ -46,6 +47,7 @@ cPlugin_NewLua::~cPlugin_NewLua()
 
 bool cPlugin_NewLua::Initialize()
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !m_LuaState ) 
 	{	
 		m_LuaState = lua_open();
@@ -122,6 +124,7 @@ bool cPlugin_NewLua::Initialize()
 
 void cPlugin_NewLua::OnDisable()
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnDisable", false) ) // false = don't log error if not found
 		return;
 
@@ -130,6 +133,7 @@ void cPlugin_NewLua::OnDisable()
 
 void cPlugin_NewLua::Tick(float a_Dt)
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("Tick") )
 		return;
 
@@ -140,6 +144,7 @@ void cPlugin_NewLua::Tick(float a_Dt)
 
 bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnCollectItem") )
 		return false;
 
@@ -155,6 +160,7 @@ bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 
 bool cPlugin_NewLua::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnDisconnect") )
 		return false;
 
@@ -170,6 +176,7 @@ bool cPlugin_NewLua::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
 
 bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnBlockPlace") )
 		return false;
 
@@ -185,6 +192,7 @@ bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_
 
 bool cPlugin_NewLua::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnBlockDig") )
 		return false;
 
@@ -201,6 +209,7 @@ bool cPlugin_NewLua::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Play
 
 bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnChat") )
 		return false;
 
@@ -216,6 +225,7 @@ bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
 
 bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnLogin") )
 		return false;
 
@@ -230,6 +240,7 @@ bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
 
 void cPlugin_NewLua::OnPlayerSpawn( cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnPlayerSpawn") )
 		return;
 
@@ -240,6 +251,7 @@ void cPlugin_NewLua::OnPlayerSpawn( cPlayer* a_Player )
 
 bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnPlayerJoin") )
 		return false;
 
@@ -254,6 +266,7 @@ bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
 
 void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnPlayerMove") )
 		return;
 
@@ -264,6 +277,7 @@ void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
 
 void cPlugin_NewLua::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnTakeDamage") )
 		return;
 
@@ -275,6 +289,7 @@ void cPlugin_NewLua::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageIn
 
 bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 {
+	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnKilled") )
 		return false;
 
@@ -291,6 +306,7 @@ bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 {
+	cCSLock Lock( m_CriticalSection );
 	if( a_LuaState != m_LuaState )
 	{
 		LOGERROR("Not allowed to create a WebPlugin from another plugin but your own!");
