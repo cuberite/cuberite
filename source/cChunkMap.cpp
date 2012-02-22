@@ -534,14 +534,16 @@ bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z, cItem & a_PickupItem)
 
 	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkZ );
 
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr DestChunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
-	if ((DestChunk == NULL) || !DestChunk->IsValid())
 	{
-		return false;
+		cCSLock Lock(m_CSLayers);
+		cChunkPtr DestChunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+		if ((DestChunk == NULL) || !DestChunk->IsValid())
+		{
+			return false;
+		}
+		
+		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
 	}
-	
-	DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
 
 	m_World->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
 
