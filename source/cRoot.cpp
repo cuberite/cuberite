@@ -13,6 +13,8 @@
 #include "cSleep.h"
 #include "cThread.h"
 #include "cFileFormatUpdater.h"
+#include "cGenSettings.h"
+#include "cRedstone.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -91,6 +93,8 @@ void cRoot::Start()
 	while(!m_bStop)
 	{
 		m_bRestart = false;
+
+		LoadGlobalSettings();
 
 		cFileFormatUpdater::UpdateFileFormat();
 
@@ -176,6 +180,44 @@ void cRoot::Start()
 	}
 
 	delete m_Log; m_Log = 0;
+}
+
+
+
+
+
+void cRoot::LoadGlobalSettings()
+{
+	cIniFile IniFile("settings.ini"); 
+	if( IniFile.ReadFile() )
+	{
+		cRedstone::s_UseRedstone = IniFile.GetValueB("Redstone", "SimulateRedstone", true );
+	}
+
+
+	// I think this should be removed? I can't believe anybody is using it anyway
+	cIniFile GenSettings("terrain.ini");
+	if( GenSettings.ReadFile() )
+	{
+#define READ_INI_TERRAIN_VAL( var, type ) cGenSettings::var = (type)GenSettings.GetValueF("Terrain", #var, cGenSettings::var )
+		READ_INI_TERRAIN_VAL( HeightFreq1, float );
+		READ_INI_TERRAIN_VAL( HeightFreq2, float );
+		READ_INI_TERRAIN_VAL( HeightFreq3, float );
+		READ_INI_TERRAIN_VAL( HeightAmp1, float );
+		READ_INI_TERRAIN_VAL( HeightAmp2, float );
+		READ_INI_TERRAIN_VAL( HeightAmp3, float );
+	}
+	else
+	{
+#define SET_INI_TERRAIN_VAL( var ) GenSettings.SetValueF("Terrain", #var, cGenSettings::var )
+		SET_INI_TERRAIN_VAL( HeightFreq1 );
+		SET_INI_TERRAIN_VAL( HeightFreq2 );
+		SET_INI_TERRAIN_VAL( HeightFreq3 );
+		SET_INI_TERRAIN_VAL( HeightAmp1 );
+		SET_INI_TERRAIN_VAL( HeightAmp2 );
+		SET_INI_TERRAIN_VAL( HeightAmp3 );
+		GenSettings.WriteFile();
+	}
 }
 
 

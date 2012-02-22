@@ -57,6 +57,7 @@ public:
 	int GetTotalChunkCount(void);  // tolua_export
 	
 private:
+	void LoadGlobalSettings();
 
 	void LoadWorlds();
 	void UnloadWorlds();

@@ -223,28 +223,6 @@ cWorld::cWorld( const AString & a_WorldName )
 
 	m_Storage.Start(this, StorageSchema);
 	m_Generator.Start(this, GeneratorName);
-	cIniFile GenSettings("terrain.ini");
-	if( GenSettings.ReadFile() )
-	{
-#define READ_INI_TERRAIN_VAL( var, type ) cGenSettings::var = (type)GenSettings.GetValueF("Terrain", #var, cGenSettings::var )
-		READ_INI_TERRAIN_VAL( HeightFreq1, float );
-		READ_INI_TERRAIN_VAL( HeightFreq2, float );
-		READ_INI_TERRAIN_VAL( HeightFreq3, float );
-		READ_INI_TERRAIN_VAL( HeightAmp1, float );
-		READ_INI_TERRAIN_VAL( HeightAmp2, float );
-		READ_INI_TERRAIN_VAL( HeightAmp3, float );
-	}
-	else
-	{
-#define SET_INI_TERRAIN_VAL( var ) GenSettings.SetValueF("Terrain", #var, cGenSettings::var )
-		SET_INI_TERRAIN_VAL( HeightFreq1 );
-		SET_INI_TERRAIN_VAL( HeightFreq2 );
-		SET_INI_TERRAIN_VAL( HeightFreq3 );
-		SET_INI_TERRAIN_VAL( HeightAmp1 );
-		SET_INI_TERRAIN_VAL( HeightAmp2 );
-		SET_INI_TERRAIN_VAL( HeightAmp3 );
-		GenSettings.WriteFile();
-	}
 
 	m_bAnimals = true;
 	m_SpawnMonsterRate = 10;
