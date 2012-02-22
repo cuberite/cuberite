@@ -111,7 +111,7 @@ void cPawn::KilledBy( cEntity* a_Killer )
 
 
 
-void cPawn::TeleportTo( cEntity* a_Entity )
+void cPawn::TeleportToEntity( cEntity* a_Entity )
 {
 	TeleportTo( a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ() );
 }

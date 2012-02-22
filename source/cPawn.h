@@ -25,7 +25,7 @@ public:
 	cPawn();
 	virtual ~cPawn();
 
-	virtual void TeleportTo( cEntity* a_Entity );														//tolua_export
+	virtual void TeleportToEntity( cEntity* a_Entity );													//tolua_export
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
 
 	virtual void Tick(float a_Dt) override;

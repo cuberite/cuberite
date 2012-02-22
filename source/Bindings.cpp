@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/21/12 17:01:49.
+** Generated automatically by tolua++-1.0.92 on 02/22/12 16:44:22.
 */
 
 #ifndef __cplusplus
@@ -4357,9 +4357,9 @@ static int tolua_set_TakeDamageInfo_Instigator_ptr(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: TeleportTo of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TeleportTo00
-static int tolua_AllToLua_cPawn_TeleportTo00(lua_State* tolua_S)
+/* method: TeleportToEntity of class  cPawn */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TeleportToEntity00
+static int tolua_AllToLua_cPawn_TeleportToEntity00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -4375,25 +4375,26 @@ static int tolua_AllToLua_cPawn_TeleportTo00(lua_State* tolua_S)
   cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
   cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportTo'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportToEntity'", NULL);
 #endif
   {
-   self->TeleportTo(a_Entity);
+   self->TeleportToEntity(a_Entity);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'TeleportTo'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'TeleportToEntity'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: TeleportTo of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TeleportTo01
-static int tolua_AllToLua_cPawn_TeleportTo01(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TeleportTo00
+static int tolua_AllToLua_cPawn_TeleportTo00(lua_State* tolua_S)
 {
+#ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
@@ -4404,6 +4405,7 @@ static int tolua_AllToLua_cPawn_TeleportTo01(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
+#endif
  {
   cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
   const double a_PosX = ((const double)  tolua_tonumber(tolua_S,2,0));
@@ -4420,8 +4422,11 @@ static int tolua_AllToLua_cPawn_TeleportTo01(lua_State* tolua_S)
   }
  }
  return 3;
-tolua_lerror:
- return tolua_AllToLua_cPawn_TeleportTo00(tolua_S);
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TeleportTo'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -4560,16 +4565,16 @@ static int tolua_AllToLua_cPawn_GetHealth00(lua_State* tolua_S)
 
  class Lua__cPawn : public cPawn, public ToluaBase {
 public:
-	 void  TeleportTo( cEntity* a_Entity) {
-		if (push_method("TeleportTo",  tolua_AllToLua_cPawn_TeleportTo00)) {
+	 void  TeleportToEntity( cEntity* a_Entity) {
+		if (push_method("TeleportToEntity",  tolua_AllToLua_cPawn_TeleportToEntity00)) {
 			tolua_pushusertype(lua_state, (void*)a_Entity, "cEntity");
 			ToluaBase::dbcall(lua_state, 2, 0);
 		} else {
-			return ( void ) cPawn:: TeleportTo(a_Entity);
+			return ( void ) cPawn:: TeleportToEntity(a_Entity);
 		};
 	};
 	 void  TeleportTo( const double& a_PosX, const double& a_PosY, const double& a_PosZ) {
-		if (push_method("TeleportTo",  tolua_AllToLua_cPawn_TeleportTo01)) {
+		if (push_method("TeleportTo",  tolua_AllToLua_cPawn_TeleportTo00)) {
 			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
 			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
 			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
@@ -4649,8 +4654,8 @@ public:
 		};
 	};
 
-	 void cPawn__TeleportTo( cEntity* a_Entity) {
-		return ( void )cPawn::TeleportTo(a_Entity);
+	 void cPawn__TeleportToEntity( cEntity* a_Entity) {
+		return ( void )cPawn::TeleportToEntity(a_Entity);
 	};
 	 void cPawn__TeleportTo( const double& a_PosX, const double& a_PosY, const double& a_PosZ) {
 		return ( void )cPawn::TeleportTo(a_PosX,a_PosY,a_PosZ);
@@ -4708,9 +4713,9 @@ static int tolua_AllToLua_Lua__cPawn_tolua__set_instance00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: cPawn__TeleportTo of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00
-static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00(lua_State* tolua_S)
+/* method: cPawn__TeleportToEntity of class  Lua__cPawn */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__TeleportToEntity00
+static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportToEntity00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -4726,25 +4731,26 @@ static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00(lua_State* tolua_S)
   Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
   cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__TeleportTo'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__TeleportToEntity'", NULL);
 #endif
   {
-   self->cPawn__TeleportTo(a_Entity);
+   self->cPawn__TeleportToEntity(a_Entity);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__TeleportTo'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'cPawn__TeleportToEntity'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: cPawn__TeleportTo of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo01
-static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo01(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00
+static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00(lua_State* tolua_S)
 {
+#ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
@@ -4755,6 +4761,7 @@ static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo01(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
+#endif
  {
   Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
   const double a_PosX = ((const double)  tolua_tonumber(tolua_S,2,0));
@@ -4771,8 +4778,11 @@ static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo01(lua_State* tolua_S)
   }
  }
  return 3;
-tolua_lerror:
- return tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00(tolua_S);
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPawn__TeleportTo'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -5968,6 +5978,14 @@ public:
 			return ( void ) cPlayer:: MoveTo(a_NewPos);
 		};
 	};
+	 void  TeleportToEntity( cEntity* a_Entity) {
+		if (push_method("TeleportToEntity",  tolua_AllToLua_cPawn_TeleportToEntity00)) {
+			tolua_pushusertype(lua_state, (void*)a_Entity, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cPlayer:: TeleportToEntity(a_Entity);
+		};
+	};
 	 void  TakeDamage( int a_Damage, cEntity* a_Instigator) {
 		if (push_method("TakeDamage",  tolua_AllToLua_cPawn_TakeDamage00)) {
 			tolua_pushnumber(lua_state, (lua_Number)a_Damage);
@@ -6039,6 +6057,9 @@ public:
 	};
 	 void cPlayer__MoveTo( const Vector3d& a_NewPos) {
 		return ( void )cPlayer::MoveTo(a_NewPos);
+	};
+	 void cPlayer__TeleportToEntity( cEntity* a_Entity) {
+		return ( void )cPlayer::TeleportToEntity(a_Entity);
 	};
 	 void cPlayer__TakeDamage( int a_Damage, cEntity* a_Instigator) {
 		return ( void )cPlayer::TakeDamage(a_Damage,a_Instigator);
@@ -17365,8 +17386,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPawn","cPawn","cEntity",NULL);
   tolua_beginmodule(tolua_S,"cPawn");
+   tolua_function(tolua_S,"TeleportToEntity",tolua_AllToLua_cPawn_TeleportToEntity00);
    tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPawn_TeleportTo00);
-   tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPawn_TeleportTo01);
    tolua_function(tolua_S,"Heal",tolua_AllToLua_cPawn_Heal00);
    tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cPawn_TakeDamage00);
    tolua_function(tolua_S,"KilledBy",tolua_AllToLua_cPawn_KilledBy00);
@@ -17375,8 +17396,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"Lua__cPawn","Lua__cPawn","cPawn",NULL);
   tolua_beginmodule(tolua_S,"Lua__cPawn");
    tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cPawn_tolua__set_instance00);
+   tolua_function(tolua_S,"cPawn__TeleportToEntity",tolua_AllToLua_Lua__cPawn_cPawn__TeleportToEntity00);
    tolua_function(tolua_S,"cPawn__TeleportTo",tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00);
-   tolua_function(tolua_S,"cPawn__TeleportTo",tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo01);
    tolua_function(tolua_S,"cPawn__TakeDamage",tolua_AllToLua_Lua__cPawn_cPawn__TakeDamage00);
    tolua_function(tolua_S,"cPawn__KilledBy",tolua_AllToLua_Lua__cPawn_cPawn__KilledBy00);
   tolua_endmodule(tolua_S);

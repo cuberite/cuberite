@@ -10,7 +10,7 @@ function HandleTPCommand( Split, Player )
 	elseif( OtherPlayer == Player ) then
 		Player:SendMessage( cChatColor.Green .. "Already there :)" )
 	else
-		Player:TeleportTo( OtherPlayer )
+		Player:TeleportToEntity( OtherPlayer )
 		Player:SendMessage( cChatColor.Green .. "You teleported to "..OtherPlayer:GetName().."!" )
 		OtherPlayer:SendMessage( cChatColor.Green .. Player:GetName().." teleported to you!" )
 	end
