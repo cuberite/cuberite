@@ -1,0 +1,16 @@
+MCServer.exe
+Plugins
+webadmin
+banned.example.ini
+furnace.txt
+groups.example.ini
+items.ini
+Lua-LICENSE.txt
+MersenneTwister-LICENSE.txt
+monsters.ini
+recipes.txt
+settings.example.ini
+terrain.ini
+users.example.ini
+webadmin.example.ini
+whitelist.example.ini
