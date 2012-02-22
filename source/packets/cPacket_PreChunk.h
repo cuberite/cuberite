@@ -15,6 +15,11 @@ public:
 		, m_PosZ( 0 )
 		, m_bLoad( false )
 	{ m_PacketID = E_PRE_CHUNK;  }
+	cPacket_PreChunk( int a_PosX, int a_PosZ, bool a_bLoad )
+		: m_PosX( a_PosX )
+		, m_PosZ( a_PosZ )
+		, m_bLoad( a_bLoad )
+	{ m_PacketID = E_PRE_CHUNK; }
 	virtual cPacket* Clone() const { return new cPacket_PreChunk(*this); }
 
 	virtual void Serialize(AString & a_Data) const override;

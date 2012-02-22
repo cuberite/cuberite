@@ -67,6 +67,7 @@
 #include "packets/cPacket_PlayerListItem.h"
 #include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_MapChunk.h"
+#include "packets/cPacket_PreChunk.h"
 
 
 
@@ -344,6 +345,7 @@ void cClientHandle::StreamChunks(void)
 			if ((RelX > VIEWDISTANCE) || (RelX < -VIEWDISTANCE) || (RelZ > VIEWDISTANCE) || (RelZ < -VIEWDISTANCE))
 			{
 				World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
+				Send( cPacket_PreChunk( itr->m_ChunkX, itr->m_ChunkZ, false ) );
 				itr = m_LoadedChunks.erase(itr);
 			}
 			else
