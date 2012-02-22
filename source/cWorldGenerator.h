@@ -28,6 +28,8 @@ protected:
 	
 	// Thread-unsafe:
 	MTRand r1;
+	
+	void GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, char * a_BlockData);
 
 	static unsigned int MakeIndex(int x, int y, int z );
 

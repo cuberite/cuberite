@@ -35,6 +35,36 @@ static struct
 
 
 
+// You can use GLASS for these instead for debugging ore generation ;)
+// Beware though, client has problems with this much glass!
+const char BLOCK_STONE = E_BLOCK_STONE;
+const char BLOCK_DIRT = E_BLOCK_DIRT;
+const char BLOCK_GRASS = E_BLOCK_GRASS;
+
+const int MAX_HEIGHT_COAL = 127;
+const int NUM_NESTS_COAL = 40;
+const int NEST_SIZE_COAL = 10;
+
+const int MAX_HEIGHT_IRON = 70;
+const int NUM_NESTS_IRON = 10;
+const int NEST_SIZE_IRON = 6;
+
+const int MAX_HEIGHT_REDSTONE = 40;
+const int NUM_NESTS_REDSTONE = 10;
+const int NEST_SIZE_REDSTONE = 6;
+
+const int MAX_HEIGHT_GOLD = 35;
+const int NUM_NESTS_GOLD = 6;
+const int NEST_SIZE_GOLD = 6;
+
+const int MAX_HEIGHT_DIAMOND = 16;
+const int NUM_NESTS_DIAMOND = 6;
+const int NEST_SIZE_DIAMOND = 5;
+
+
+
+
+
 cWorldGenerator::cWorldGenerator(cWorld * a_World) :
 	m_World(a_World)
 {
@@ -223,41 +253,20 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 				}
 				else if (Top - y > ((WaveNoise + 1.5f) * 1.5f)) // rock and ores between 1.5 .. 4.5 deep
 				{
-					if ( GetOreNoise( xx, yy, zz, Noise ) > 0.5f )
 					{
-						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_COAL_ORE;
-					}
-					else if ( GetOreNoise( xx, yy+100.f, zz, Noise ) > 0.6f )
-					{
-						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_IRON_ORE;
-					}
-					else if (( yy < 20) && (GetOreNoise( xx * 1.5f, yy + 300.f, zz * 1.5f, Noise ) > 0.6f ))
-					{
-						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_REDSTONE_ORE;
-					}
-					else if (( yy < 30) && (GetOreNoise( xx * 2, yy + 200.f, zz * 2, Noise ) > 0.75f ))
-					{
-						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_DIAMOND_ORE;
-					}
-					else if (( yy < 40) && (GetOreNoise( xx * 2, yy + 100.f, zz * 2, Noise ) > 0.75f ))
-					{
-						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_GOLD_ORE;
-					}
-					else
-					{
-						a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STONE;
+						a_BlockData[ MakeIndex(x, y, z) ] = BLOCK_STONE;
 					}
 				}
 				else
 				{
-					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_DIRT;
+					a_BlockData[ MakeIndex(x, y, z) ] = BLOCK_DIRT;
 				}
 			}  // for y
 			
 			if (Top + 1 >= WATER_LEVEL + SAND_LEVEL)
 			{
 				// Replace top dirt with grass:
-				a_BlockData[MakeIndex(x, Top - 1, z)] = E_BLOCK_GRASS;
+				a_BlockData[MakeIndex(x, Top - 1, z)] = BLOCK_GRASS;
 			
 				// Generate small foliage (1-block):
 				int TopY = Top - 1;
@@ -309,6 +318,81 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 			}  // else (Top is under waterlevel)
 		}  // for x
 	}  // for z
+	
+	// Generate ores:
+	GenerateOre(E_BLOCK_COAL_ORE,     MAX_HEIGHT_COAL,     NUM_NESTS_COAL,     NEST_SIZE_COAL,     a_BlockData);
+	GenerateOre(E_BLOCK_IRON_ORE,     MAX_HEIGHT_IRON,     NUM_NESTS_IRON,     NEST_SIZE_IRON,     a_BlockData);
+	GenerateOre(E_BLOCK_REDSTONE_ORE, MAX_HEIGHT_REDSTONE, NUM_NESTS_REDSTONE, NEST_SIZE_REDSTONE, a_BlockData);
+	GenerateOre(E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     a_BlockData);
+	GenerateOre(E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  a_BlockData);
+}
+
+
+
+
+
+void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, char * a_BlockData)
+{
+	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent to each other.
+	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
+	// Only stone gets replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
+	for (int i = 0; i < a_NumNests; i++)
+	{
+		int BaseX = r1.randInt(16);
+		int BaseY = r1.randInt(a_MaxHeight);
+		int BaseZ = r1.randInt(16);
+		sSetBlockList OreBlocks;
+		size_t NestSize = (size_t)(a_NestSize + r1.randInt(a_NestSize / 4));  // The actual nest size may be up to 1/4 larger
+		while (OreBlocks.size() < NestSize)
+		{
+			// Put a cuboid around [BaseX, BaseY, BaseZ]
+			for (int x = r1.randInt(2); x >= 0; --x)
+			{
+				for (int y = r1.randInt(2); y >= 0; --y)
+				{
+					for (int z = r1.randInt(2); z >= 0; --z)
+					{
+						if (OreBlocks.size() < NestSize)
+						{
+							OreBlocks.push_back(sSetBlock(BaseX + x, BaseY + y, BaseZ + z, a_OreType, 0));
+						}
+					}  // for z
+				}  // for y
+			}  // for x
+			
+			// Move the base to a neighbor voxel
+			switch (r1.randInt(4))
+			{
+				case 0: BaseX--; break;
+				case 1: BaseX++; break;
+			}
+			switch (r1.randInt(4))
+			{
+				case 0: BaseY--; break;
+				case 1: BaseY++; break;
+			}
+			switch (r1.randInt(4))
+			{
+				case 0: BaseZ--; break;
+				case 1: BaseZ++; break;
+			}
+		}  // while (OreBlocks.size() < NumBlocks)
+		
+		// Replace stone with the queued ore blocks:
+		for (sSetBlockList::iterator itr = OreBlocks.begin(); itr != OreBlocks.end(); ++itr)
+		{
+			if ((itr->x < 0) || (itr->y < 0) || (itr->z < 0) || (itr->x >= 16) || (itr->y >= 127) || (itr->z >= 16))
+			{
+				continue;
+			}
+			int Index = MakeIndex(itr->x, itr->y, itr->z);
+			if (a_BlockData[Index] == BLOCK_STONE)
+			{
+				a_BlockData[Index] = a_OreType;
+			}
+		}  // for itr - OreBlocks[]
+		OreBlocks.clear();
+	}  // for i
 }
 
 
@@ -335,7 +419,7 @@ void cWorldGenerator::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 			int TopY = m_World->GetHeight(xx, zz);
 			int index = MakeIndex(x, TopY - 1, z);
-			if (BlockType[index] == E_BLOCK_GRASS )
+			if (BlockType[index] == BLOCK_GRASS)
 			{
 				float val1 = Noise.CubicNoise2D( xx * 0.1f, zz * 0.1f );
 				float val2 = Noise.CubicNoise2D( xx * 0.01f, zz * 0.01f );
