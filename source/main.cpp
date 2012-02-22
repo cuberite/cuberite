@@ -55,9 +55,9 @@ void ShowCrashReport(int)
 
 
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_WIN64)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Windows stuff: when the server crashes, create a "dump file" containing the callstack of each thread and some variables; let the user send us that crash file for analysis
+// Windows 32-bit stuff: when the server crashes, create a "dump file" containing the callstack of each thread and some variables; let the user send us that crash file for analysis
 
 typedef BOOL  (WINAPI *pMiniDumpWriteDump)(
 	HANDLE hProcess,
@@ -88,6 +88,7 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 	char * oldStack;
 
 	// Use the substitute stack:
+	// This code is the reason why we don't support 64-bit (yet)
 	_asm
 	{
 		mov oldStack, esp
@@ -113,7 +114,7 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 	return 0;
 }
 
-#endif  // _WIN32
+#endif  // _WIN32 && !_WIN64
 
 
 
@@ -131,7 +132,7 @@ int main( int argc, char **argv )
 	#endif
 	
 	// Magic code to produce dump-files on Windows if the server crashes:
-	#ifdef _WIN32
+	#if defined(_WIN32) && !defined(_WIN64)
 	HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
 	g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
 	if (g_WriteMiniDump != NULL)
@@ -139,7 +140,7 @@ int main( int argc, char **argv )
 		_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
 		SetUnhandledExceptionFilter(LastChanceExceptionFilter);
 	}
-	#endif  // _WIN32
+	#endif  // _WIN32 && !_WIN64
 	// End of dump-file magic
 	
 	#ifdef _DEBUG
