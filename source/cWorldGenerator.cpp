@@ -258,23 +258,37 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 			{
 				// Replace top dirt with grass:
 				a_BlockData[MakeIndex(x, Top - 1, z)] = E_BLOCK_GRASS;
-			}
-			else
-			{
-				// Add water up to the WATER_LEVEL:
-				for (int y = Top; y < WATER_LEVEL; ++y )
-				{
-					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STATIONARY_WATER;
-				}
-			}
 			
-			// Generate small foliage (1-block):
-			int index = MakeIndex(x, Top - 1, z);
-			int TopY = Top - 1;
-			float val1 = Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
-			float val2 = Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
-			if( a_BlockData[index] == E_BLOCK_SAND )
+				// Generate small foliage (1-block):
+				int TopY = Top - 1;
+				float val1 = Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
+				float val2 = Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
+				float val3 = Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10 );
+				float val4 = Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20 );
+				if ((val3 > 0.2f) && ((r1.randInt()%128) > 124))
+				{
+					a_BlockData[ MakeIndex(x, TopY + 1, z) ] = E_BLOCK_YELLOW_FLOWER;
+				}
+				else if ((val4 > 0.2f) && ((r1.randInt() % 128) > 124))
+				{
+					a_BlockData[ MakeIndex(x, TopY + 1, z) ] = E_BLOCK_RED_ROSE;
+				}
+				else if ((val1 + val2 + val3 + val4 > 0.2f) && ((r1.randInt() % 128) > 124))
+				{
+					a_BlockData[ MakeIndex(x, TopY + 1, z) ] = E_BLOCK_RED_MUSHROOM;
+				}
+				else if ((val1 + val2 + val3 + val4 > 0.2f) && ((r1.randInt() % 128) > 124))
+				{
+					a_BlockData[ MakeIndex(x, TopY + 1, z) ] = E_BLOCK_BROWN_MUSHROOM;
+				}
+			}  // if (Top above beach-level)
+			else if (Top > WATER_LEVEL)
 			{
+				// This is the sandy shore, generate cacti here
+				int index = MakeIndex(x, Top - 1, z);
+				int TopY = Top - 1;
+				float val1 = Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
+				float val2 = Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
 				if ((val1 + val2 > 0.f) && ((r1.randInt() % 128) > 124))
 				{
 					a_BlockData[ MakeIndex(x, TopY + 1, z) ] = E_BLOCK_CACTUS;
@@ -285,27 +299,14 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 					continue;
 				}
 			}
-			else if( a_BlockData[index] == E_BLOCK_GRASS )
+			else
 			{
-				float val3 = Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10 );
-				float val4 = Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20 );
-				if( val3 > 0.2f && (r1.randInt()%128) > 124 )
+				// Add water up to the WATER_LEVEL:
+				for (int y = Top; y < WATER_LEVEL; ++y )
 				{
-					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_YELLOW_FLOWER;
+					a_BlockData[ MakeIndex(x, y, z) ] = E_BLOCK_STATIONARY_WATER;
 				}
-				else if( val4 > 0.2f && (r1.randInt()%128) > 124 )
-				{
-					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_ROSE;
-				}
-				else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
-				{
-					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_RED_MUSHROOM;
-				}
-				else if( val1+val2+val3+val4 > 0.2f && (r1.randInt()%128) > 124 )
-				{
-					a_BlockData[ MakeIndex(x, TopY+1, z) ] = E_BLOCK_BROWN_MUSHROOM;
-				}
-			}
+			}  // else (Top is under waterlevel)
 		}  // for x
 	}  // for z
 }
