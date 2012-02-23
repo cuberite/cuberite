@@ -73,7 +73,7 @@ pMiniDumpWriteDump g_WriteMiniDump;  // The function in dbghlp DLL that creates 
 
 char g_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
 char g_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
-MINIDUMP_TYPE DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
+MINIDUMP_TYPE g_DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
 
 
 
@@ -102,7 +102,7 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 
 	// Write the dump file:
 	HANDLE dumpFile = CreateFile(g_DumpFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, DumpFlags, (a_ExceptionInfo) ? &ExcInformation : NULL, NULL, NULL);
+	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, g_DumpFlags, (a_ExceptionInfo) ? &ExcInformation : NULL, NULL, NULL);
 	CloseHandle(dumpFile);
 
 	// Revert to old stack:
@@ -139,6 +139,21 @@ int main( int argc, char **argv )
 	{
 		_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
 		SetUnhandledExceptionFilter(LastChanceExceptionFilter);
+		
+		// Parse arguments for minidump flags:
+		for (int i = 0; i < argc; i++)
+		{
+			if (stricmp(argv[i], "/cdg") == 0)
+			{
+				// Add globals to the dump
+				g_DumpFlags = (MINIDUMP_TYPE)(g_DumpFlags | MiniDumpWithDataSegs);
+			}
+			else if (stricmp(argv[i], "/cdf") == 0)
+			{
+				// Add full memory to the dump (HUUUGE file)
+				g_DumpFlags = (MINIDUMP_TYPE)(g_DumpFlags | MiniDumpWithFullMemory);
+			}
+		}  // for i - argv[]
 	}
 	#endif  // _WIN32 && !_WIN64
 	// End of dump-file magic
