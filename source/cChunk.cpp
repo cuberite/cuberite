@@ -69,7 +69,6 @@ sSetBlock::sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockM
 
 cChunk::cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World)
 	: m_bCalculateLighting( false )
-	, m_bCalculateHeightmap( false )
 	, m_PosX( a_X )
 	, m_PosY( a_Y )
 	, m_PosZ( a_Z )
@@ -309,10 +308,6 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 	if (m_bCalculateLighting)
 	{
 		CalculateLighting();
-	}
-	if (m_bCalculateHeightmap)
-	{
-		CalculateHeightmap();
 	}
 
 	cCSLock Lock(m_CSBlockLists);
@@ -611,7 +606,6 @@ void cChunk::CreateBlockEntities(void)
 
 void cChunk::CalculateHeightmap()
 {
-	m_bCalculateHeightmap = false;
 	for (int x = 0; x < 16; x++)
 	{
 		for (int z = 0; z < 16; z++)

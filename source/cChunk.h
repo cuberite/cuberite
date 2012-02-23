@@ -178,7 +178,6 @@ public:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	inline void RecalculateLighting() { m_bCalculateLighting = true; } // Recalculate lighting next tick
-	inline void RecalculateHeightmap() { m_bCalculateHeightmap = true; } // Recalculate heightmap next tick
 	void SpreadLight(char* a_LightBuffer);
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
@@ -250,7 +249,6 @@ private:
 	cBlockEntityList   m_BlockEntities;
 
 	bool m_bCalculateLighting;
-	bool m_bCalculateHeightmap;
 
 	int m_PosX, m_PosY, m_PosZ;
 	cWorld *    m_World;
