@@ -280,7 +280,7 @@ private:
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 };
 
-typedef std::tr1::shared_ptr<cChunk> cChunkPtr;
+typedef cChunk * cChunkPtr;
 
 typedef std::list<cChunkPtr> cChunkPtrList;
 

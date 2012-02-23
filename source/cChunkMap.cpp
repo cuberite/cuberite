@@ -803,6 +803,7 @@ cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Pa
 	, m_Parent( a_Parent )
 	, m_NumChunksLoaded( 0 )
 {
+	memset(m_Chunks, 0, sizeof(m_Chunks));
 }
 
 
@@ -820,13 +821,13 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 	if (!((LocalX < LAYER_SIZE) && (LocalZ < LAYER_SIZE) && (LocalX > -1) && (LocalZ > -1)))
 	{
 		ASSERT(!"Asking a cChunkLayer for a chunk that doesn't belong to it!");
-		return cChunkPtr();
+		return NULL;
 	}
 	
 	int Index = LocalX + LocalZ * LAYER_SIZE;
-	if (m_Chunks[Index].get() == NULL)
+	if (m_Chunks[Index] == NULL)
 	{
-		m_Chunks[Index].reset(new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld()));
+		m_Chunks[Index] = new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld());
 	}
 	return m_Chunks[Index];
 }
@@ -890,7 +891,8 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 	{
 		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))
 		{
-			m_Chunks[i].reset();
+			delete m_Chunks[i];
+			m_Chunks[i] = NULL;
 		}
 	}  // for i - m_Chunks[]
 }
