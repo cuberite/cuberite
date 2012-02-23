@@ -128,6 +128,7 @@ private:
 	{
 	public:
 		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent);
+		~cChunkLayer();
 
 		/// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
 		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );

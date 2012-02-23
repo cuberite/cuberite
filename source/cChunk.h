@@ -107,6 +107,8 @@ typedef std::list< sSetBlock > sSetBlockList;
 
 
 
+// This class is not to be used directly
+// Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
 class cChunk
 {
 public:
@@ -182,13 +184,10 @@ public:
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
 
-	bool LoadFromDisk();
-
 	// Broadcasts to all clients that have loaded this chunk
 	void Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude = NULL) {Broadcast(&a_Packet, a_Exclude); }
 	void Broadcast( const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 
-	// TODO: These functions are dangerous - rewrite to:
 	//   Loaded(blockdata, lightdata, blockentities, entities),
 	//   Generated(blockdata, lightdata, blockentities, entities),
 	//   GetBlockData(blockdatadest) etc.
@@ -200,10 +199,6 @@ public:
 	
 	void CopyBlockDataFrom(const char * a_NewBlockData);  // Copies all blockdata, recalculates heightmap (used by chunk loaders)
 	
-	// TODO: Move this into the specific WSSchema:
-	void LoadFromJson( const Json::Value & a_Value );
-	void SaveToJson( Json::Value & a_Value );
-
 	char GetLight(char* a_Buffer, int a_BlockIdx);
 	char GetLight(char* a_Buffer, int x, int y, int z);
 	void SetLight(char* a_Buffer, int a_BlockIdx, char a_Light);
@@ -238,13 +233,9 @@ private:
 	std::map< unsigned int, int > m_ToTickBlocks;
 	std::vector< unsigned int >   m_PendingSendBlocks;
 	
-	// TODO: This CS will soon not be needed, because all chunk access is protected by its parent ChunkMap's csLayers
-	cCriticalSection  m_CSClients;
-	cClientHandleList m_LoadedByClient;
-	cClientHandleList m_UnloadQuery;
-
-	// TODO: This CS will soon not be needed, because all chunk access is protected by its parent ChunkMap's csLayers
-	cCriticalSection   m_CSEntities;
+	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
+	cClientHandleList  m_LoadedByClient;
+	cClientHandleList  m_UnloadQuery;
 	cEntityList        m_Entities;
 	cBlockEntityList   m_BlockEntities;
 

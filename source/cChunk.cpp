@@ -97,7 +97,6 @@ cChunk::~cChunk()
 {
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId() );
 	
-	cCSLock Lock(m_CSEntities);
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		delete *itr;
@@ -136,7 +135,6 @@ void cChunk::SetValid(bool a_SendToClients)
 		return;
 	}
 	
-	cCSLock Lock(m_CSClients);
 	if (m_LoadedByClient.empty())
 	{
 		return;
@@ -166,7 +164,6 @@ void cChunk::SetValid(bool a_SendToClients)
 
 bool cChunk::CanUnload(void)
 {
-	cCSLock Lock(m_CSClients);
 	return m_LoadedByClient.empty() && !m_IsDirty;
 }
 
@@ -210,7 +207,6 @@ void cChunk::GetAllData(cChunkDataCallback * a_Callback)
 {
 	a_Callback->BlockData(m_BlockData);
 	
-	cCSLock Lock(m_CSEntities);
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		a_Callback->Entity(*itr);
@@ -231,7 +227,6 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	memcpy(m_BlockData, a_BlockData, sizeof(m_BlockData));
 
 	// Clear the internal entities:
-	cCSLock Lock(m_CSEntities);
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		if ((*itr)->GetEntityType() == cEntity::E_PLAYER)
@@ -1053,8 +1048,6 @@ void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 
 void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 {
-	cCSLock Lock(m_CSEntities);
-
 	double PosX = a_Player->GetPosX();
 	double PosY = a_Player->GetPosY();
 	double PosZ = a_Player->GetPosZ();
@@ -1084,7 +1077,6 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 void cChunk::UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	// Also sends update packets to all clients in the chunk
-	cCSLock Lock(m_CSEntities);
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		if (
@@ -1121,20 +1113,16 @@ void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 
 bool cChunk::AddClient(cClientHandle* a_Client)
 {
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
-		cCSLock Lock(m_CSClients);
-		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+		if (a_Client == *itr)
 		{
-			if (a_Client == *itr)
-			{
-				// Already there, nothing needed
-				return false;
-			}
+			// Already there, nothing needed
+			return false;
 		}
-		m_LoadedByClient.push_back( a_Client );
 	}
+	m_LoadedByClient.push_back( a_Client );
 
-	cCSLock Lock(m_CSEntities);
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 	{
 		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
@@ -1149,14 +1137,10 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 void cChunk::RemoveClient( cClientHandle* a_Client )
 {
-	{
-		cCSLock Lock(m_CSClients);
-		m_LoadedByClient.remove( a_Client );
-	}
+	m_LoadedByClient.remove( a_Client );
 
 	if ( !a_Client->IsDestroyed() )
 	{
-		cCSLock Lock(m_CSEntities);
 		for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 		{
 			LOG("chunk [%i, %i] destroying entity #%i for player \"%s\"", m_PosX, m_PosZ, (*itr)->GetUniqueID(), a_Client->GetUsername().c_str() );
@@ -1172,7 +1156,6 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 
 bool cChunk::HasClient( cClientHandle* a_Client )
 {
-	cCSLock Lock(m_CSClients);
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if ((*itr) == a_Client)
@@ -1189,7 +1172,6 @@ bool cChunk::HasClient( cClientHandle* a_Client )
 
 bool cChunk::HasAnyClients(void)
 {
-	cCSLock Lock(m_CSClients);
 	return !m_LoadedByClient.empty();
 }
 
@@ -1199,7 +1181,6 @@ bool cChunk::HasAnyClients(void)
 
 void cChunk::AddEntity( cEntity * a_Entity)
 {
-	cCSLock Lock(m_CSEntities);
 	if (a_Entity->GetEntityType() != cEntity::E_PLAYER)
 	{
 		MarkDirty();
@@ -1213,13 +1194,10 @@ void cChunk::AddEntity( cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
-	size_t SizeBefore, SizeAfter;
-	{
-		cCSLock Lock(m_CSEntities);
-		SizeBefore = m_Entities.size();
-		m_Entities.remove(a_Entity);
-		SizeAfter = m_Entities.size();
-	}
+	size_t SizeBefore = m_Entities.size();
+	m_Entities.remove(a_Entity);
+	size_t SizeAfter = m_Entities.size();
+	
 	if (SizeBefore != SizeAfter)
 	{
 		// Mark as dirty if it was a server-generated entity:
@@ -1256,6 +1234,8 @@ char cChunk::GetBlock( int a_BlockIdx )
 
 
 
+/*
+// _X 2012_02_23: Loading in old format not supported anymore
 /// Loads the chunk from the old-format disk file, erases the file afterwards. Returns true if successful
 bool cChunk::LoadFromDisk()
 {
@@ -1274,9 +1254,7 @@ bool cChunk::LoadFromDisk()
 		return false;
 	}
 
-	// Now load Block Entities
-	cCSLock Lock(m_CSEntities);
-
+	// Now load Block Entities:
 	ENUM_BLOCK_ID BlockType;
 	while (f.Read(&BlockType, sizeof(ENUM_BLOCK_ID)) == sizeof(ENUM_BLOCK_ID))
 	{
@@ -1329,7 +1307,6 @@ bool cChunk::LoadFromDisk()
 			}
 		}
 	}
-	Lock.Unlock();
 	f.Close();
 
 	// Delete old format file
@@ -1344,6 +1321,7 @@ bool cChunk::LoadFromDisk()
 	m_IsDirty = false;
 	return true;
 }
+*/
 
 
 
@@ -1351,7 +1329,6 @@ bool cChunk::LoadFromDisk()
 
 void cChunk::Broadcast( const cPacket * a_Packet, cClientHandle* a_Exclude)
 {
-	cCSLock Lock(m_CSClients);
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
 		if (*itr == a_Exclude)
@@ -1371,131 +1348,6 @@ void cChunk::CopyBlockDataFrom(const char * a_NewBlockData)
 	// Copies all blockdata, recalculates heightmap (used by chunk loaders)
 	memcpy(m_BlockData, a_NewBlockData, sizeof(m_BlockData));
 	CalculateHeightmap();
-}
-
-
-
-
-
-void cChunk::LoadFromJson( const Json::Value & a_Value )
-{
-	cCSLock Lock(m_CSEntities);
-
-	// Load chests
-	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
-	if (!AllChests.empty())
-	{
-		for ( Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
-		{
-			Json::Value & Chest = *itr;
-			cChestEntity* ChestEntity = new cChestEntity(0, 0, 0, m_World);
-			if ( !ChestEntity->LoadFromJson( Chest ) )
-			{
-				LOGERROR("ERROR READING CHEST FROM JSON!" );
-				delete ChestEntity;
-			}
-			else m_BlockEntities.push_back( ChestEntity );
-		}
-	}
-
-	// Load furnaces
-	Json::Value AllFurnaces = a_Value.get("Furnaces", Json::nullValue);
-	if ( !AllFurnaces.empty() )
-	{
-		for ( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
-		{
-			Json::Value & Furnace = *itr;
-			cFurnaceEntity* FurnaceEntity = new cFurnaceEntity(0, 0, 0, m_World);
-			if ( !FurnaceEntity->LoadFromJson( Furnace ) )
-			{
-				LOGERROR("ERROR READING FURNACE FROM JSON!" );
-				delete FurnaceEntity;
-			}
-			else m_BlockEntities.push_back( FurnaceEntity );
-		}
-	}
-
-	// Load signs
-	Json::Value AllSigns = a_Value.get("Signs", Json::nullValue);
-	if ( !AllSigns.empty() )
-	{
-		for ( Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr )
-		{
-			Json::Value & Sign = *itr;
-			cSignEntity* SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0, 0, 0, m_World);
-			if ( !SignEntity->LoadFromJson( Sign ) )
-			{
-				LOGERROR("ERROR READING SIGN FROM JSON!" );
-				delete SignEntity;
-			}
-			else m_BlockEntities.push_back( SignEntity );
-		}
-	}
-}
-
-
-
-
-
-void cChunk::SaveToJson( Json::Value & a_Value )
-{
-	Json::Value AllChests;
-	Json::Value AllFurnaces;
-	Json::Value AllSigns;
-	cCSLock Lock(m_CSEntities);
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
-	{
-		cBlockEntity * BlockEntity = *itr;
-		switch ( BlockEntity->GetBlockType() )
-		{
-			case E_BLOCK_CHEST:
-			{
-				cChestEntity* ChestEntity = reinterpret_cast< cChestEntity* >( BlockEntity );
-				Json::Value NewChest;
-				ChestEntity->SaveToJson( NewChest );
-				AllChests.append( NewChest );
-				break;
-			}
-			
-			case E_BLOCK_FURNACE:
-			{
-				cFurnaceEntity* FurnaceEntity = reinterpret_cast< cFurnaceEntity* >( BlockEntity );
-				Json::Value NewFurnace;
-				FurnaceEntity->SaveToJson( NewFurnace );
-				AllFurnaces.append( NewFurnace );
-				break;
-			}
-			
-			case E_BLOCK_SIGN_POST:
-			case E_BLOCK_WALLSIGN:
-			{
-				cSignEntity* SignEntity = reinterpret_cast< cSignEntity* >( BlockEntity );
-				Json::Value NewSign;
-				SignEntity->SaveToJson( NewSign );
-				AllSigns.append( NewSign );
-				break;
-			}
-			
-			default:
-			{
-				ASSERT(!"Unhandled blocktype in BlockEntities list while saving to JSON");
-				break;
-			}
-		}  // switch (BlockEntity->GetBlockType())
-	}  // for itr - BlockEntities[]
-
-	if( !AllChests.empty() )
-	{
-		a_Value["Chests"] = AllChests;
-	}
-	if( !AllFurnaces.empty() )
-	{
-		a_Value["Furnaces"] = AllFurnaces;
-	}
-	if( !AllSigns.empty() )
-	{
-		a_Value["Signs"] = AllSigns;
-	}
 }
 
 

@@ -810,6 +810,18 @@ cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Pa
 
 
 
+cChunkMap::cChunkLayer::~cChunkLayer()
+{
+	for (int i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
+	{
+		delete m_Chunks[i];
+	}  // for i - m_Chunks[]
+}
+
+
+
+
+
 cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
 	// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
@@ -891,6 +903,9 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 	{
 		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))
 		{
+			// The chunk destructor calls our GetChunk() while removing its entities
+			// so we still need to be able to return the chunk. Therefore we first delete, then NULLify
+			// Doing otherwise results in bug http://forum.mc-server.org/showthread.php?tid=355
 			delete m_Chunks[i];
 			m_Chunks[i] = NULL;
 		}
