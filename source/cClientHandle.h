@@ -65,8 +65,12 @@ public:
 	};
 
 	static const int MAXBLOCKCHANGEINTERACTIONS = 10; // 5 didn't help, 10 seems to have done the trick
+	
+	static const int DEFAULT_VIEW_DISTANCE = 9;  // The default ViewDistance (used when no value is set in Settings.ini)
+	static const int MAX_VIEW_DISTANCE = 10;
+	static const int MIN_VIEW_DISTANCE = 4;
 
-	cClientHandle(const cSocket & a_Socket);
+	cClientHandle(const cSocket & a_Socket, int a_ViewDistance);
 	~cClientHandle();
 
 	const cSocket & GetSocket(void) const {return m_Socket; }
@@ -99,11 +103,14 @@ public:
 	const AString & GetUsername(void) const;
 	
 	inline short GetPing() { return m_Ping; }
+	
+	void SetViewDistance(int a_ViewDistance);
 
 private:
 
-	static const int VIEWDISTANCE = 4;     // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
-	static const int GENERATEDISTANCE = 1; // Server generates this many chunks AHEAD of player sight.
+	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
+	
+	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight. 2 is the minimum, since foliage is generated 1 step behind chunk terrain generation
 
 	int m_ProtocolVersion;
 	AString m_Username;

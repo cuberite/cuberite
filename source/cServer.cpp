@@ -174,20 +174,10 @@ bool cServer::InitServer( int a_Port )
 	m_bIsConnected = true;
 
 	cIniFile IniFile("settings.ini");
-	if( IniFile.ReadFile() )
+	if (IniFile.ReadFile())
 	{
 		g_bWaterPhysics = IniFile.GetValueB("Physics", "Water", false );
 		
-		/* Replaced below with 1.0.0 compatible ServerID generation
-
-		std::string ServerID = IniFile.GetValue("Server", "ServerID");
-		if( ServerID.empty() )
-		{
-			ServerID = "MCServer";
-			IniFile.SetValue("Server", "ServerID", ServerID, true );
-			IniFile.WriteFile();
-		}
-		*/
 		m_pState->ServerID = "-";
 		if (IniFile.GetValueB("Authentication", "Authenticate"))
 		{
@@ -200,6 +190,23 @@ bool cServer::InitServer( int a_Port )
 			std::string ServerID = sid.str();
 			ServerID.resize(16, '0');
 			m_pState->ServerID = ServerID;
+		}
+		
+		m_ClientViewDistance = IniFile.GetValueI("Server", "DefaultViewDistance", -1);
+		if (m_ClientViewDistance == -1)
+		{
+			m_ClientViewDistance = cClientHandle::DEFAULT_VIEW_DISTANCE;
+			LOG("[Server].DefaultViewDistance not set, using a default of %d", m_ClientViewDistance);
+		}
+		if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
+		{
+			m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
+			LOGINFO("Setting default viewdistance to the minimum of %d", m_ClientViewDistance);
+		}
+		if (m_ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
+		{
+			m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
+			LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 		}
 	}
 	return true;
@@ -273,7 +280,7 @@ void cServer::StartListenClient()
 
 	LOG("Client \"%s\" connected!", ClientIP.c_str());
 
-	cClientHandle *NewHandle = new cClientHandle(SClient);
+	cClientHandle *NewHandle = new cClientHandle(SClient, m_ClientViewDistance);
 	if (!m_SocketThreads.AddClient(&(NewHandle->GetSocket()), NewHandle))
 	{
 		// For some reason SocketThreads have rejected the handle, clean it up
@@ -398,9 +405,11 @@ bool from_string(
 
 bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 {
-    cPluginManager* PM = cRoot::Get()->GetPluginManager();
+	cPluginManager* PM = cRoot::Get()->GetPluginManager();
 	if( PM->CallHook( cPluginManager::E_PLUGIN_CHAT, 2, a_Cmd, a_Client.GetPlayer() ) )
+	{
 		return true;
+	}
 
 	std::string Command( a_Cmd );
 	if( Command.length() <= 0 ) return false;
@@ -415,6 +424,18 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 		AString Pos;
 		Printf(Pos, "[X:%0.2f] [Y:%0.2f] [Z:%0.2f]", a_Client.GetPlayer()->GetPosX(), a_Client.GetPlayer()->GetPosY(), a_Client.GetPlayer()->GetPosZ() );
 		a_Client.Send( cPacket_Chat(cChatColor::Green + Pos));
+		return true;
+	}
+	
+	if (split[0].compare("/viewdistance") == 0)
+	{
+		if (split.size() != 2)
+		{
+			a_Client.Send(cPacket_Chat(cChatColor::Green + "Invalid syntax, expected 1 parameter, the numebr of chunks to stream"));
+			return false;
+		}
+		int dist = atol(split[1].c_str());
+		a_Client.SetViewDistance(dist);
 		return true;
 	}
 	return false;

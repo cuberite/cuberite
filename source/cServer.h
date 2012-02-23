@@ -69,6 +69,8 @@ private:
 	sServerState* m_pState;
 	
 	cSocketThreads m_SocketThreads;
+	
+	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
 	// Time since server was started
 	float m_Millisecondsf;

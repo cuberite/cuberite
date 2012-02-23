@@ -59,14 +59,8 @@ public:
 
 	int GetHeight( int a_X, int a_Z );												//tolua_export
 
-	//void AddClient( cClientHandle* a_Client );
-	//void RemoveClient( cClientHandle* a_Client );
-	//ClientList & GetClients();
-
 	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
-	
 	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
-	
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
 	void MarkChunkDirty    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);

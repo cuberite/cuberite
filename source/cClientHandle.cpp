@@ -86,8 +86,9 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
-cClientHandle::cClientHandle(const cSocket & a_Socket)
-	: m_ProtocolVersion(23)
+cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
+	: m_ViewDistance(a_ViewDistance)
+	, m_ProtocolVersion(23)
 	, m_pSendThread(NULL)
 	, m_Socket(a_Socket)
 	, m_Semaphore(MAX_SEMAPHORES)
@@ -342,7 +343,7 @@ void cClientHandle::StreamChunks(void)
 		{
 			int RelX = (*itr).m_ChunkX - ChunkPosX;
 			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
-			if ((RelX > VIEWDISTANCE) || (RelX < -VIEWDISTANCE) || (RelZ > VIEWDISTANCE) || (RelZ < -VIEWDISTANCE))
+			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
 			{
 				World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
 				Send( cPacket_PreChunk( itr->m_ChunkX, itr->m_ChunkZ, false ) );
@@ -357,7 +358,7 @@ void cClientHandle::StreamChunks(void)
 		{
 			int RelX = (*itr).m_ChunkX - ChunkPosX;
 			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
-			if ((RelX > VIEWDISTANCE) || (RelX < -VIEWDISTANCE) || (RelZ > VIEWDISTANCE) || (RelZ < -VIEWDISTANCE))
+			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
 			{
 				itr = m_ChunksToSend.erase(itr);
 			}
@@ -370,7 +371,7 @@ void cClientHandle::StreamChunks(void)
 	
 	// Add all chunks that are in range and not yet in m_LoadedChunks:
 	// Queue these smartly - from the center out to the edge
-	for (int d = 0; d <= VIEWDISTANCE; ++d)  // cycle through (square) distance, from nearest to furthest
+	for (int d = 0; d <= m_ViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
 		// For each distance add chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
@@ -386,7 +387,7 @@ void cClientHandle::StreamChunks(void)
 	}  // for d
 	
 	// Touch chunks GENERATEDISTANCE ahead to let them generate:
-	for (int d = VIEWDISTANCE + 1; d <= VIEWDISTANCE + GENERATEDISTANCE; ++d)  // cycle through (square) distance, from nearest to furthest
+	for (int d = m_ViewDistance + 1; d <= m_ViewDistance + GENERATEDISTANCE; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
 		// For each distance touch chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
@@ -1884,6 +1885,26 @@ void cClientHandle::SendThread(void *lpParam)
 const AString & cClientHandle::GetUsername(void) const
 {
 	return m_Username;
+}
+
+
+
+
+
+void cClientHandle::SetViewDistance(int a_ViewDistance)
+{
+	if (a_ViewDistance < MIN_VIEW_DISTANCE)
+	{
+		a_ViewDistance = MIN_VIEW_DISTANCE;
+	}
+	if (a_ViewDistance > MAX_VIEW_DISTANCE)
+	{
+		a_ViewDistance = MAX_VIEW_DISTANCE;
+	}
+	m_ViewDistance = a_ViewDistance;
+	
+	// Need to re-stream chunks for the change to become apparent:
+	StreamChunks();
 }
 
 
