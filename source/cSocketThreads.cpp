@@ -85,7 +85,9 @@ void cSocketThreads::RemoveClient(const cSocket * a_Socket)
 		{
 			return;
 		}
-	}
+	}  // for itr - m_Threads[]
+	
+	ASSERT(!"Removing an unknown socket");
 }
 
 
@@ -103,7 +105,9 @@ void cSocketThreads::RemoveClient(const cCallback * a_Client)
 		{
 			return;
 		}
-	}
+	}  // for itr - m_Threads[]
+
+	ASSERT(!"Removing an unknown client");
 }
 
 
@@ -121,7 +125,81 @@ void cSocketThreads::NotifyWrite(const cCallback * a_Client)
 		{
 			return;
 		}
+	}  // for itr - m_Threads[]
+	
+	// Cannot assert - this normally happens if a client disconnects and has pending packets, the cServer::cNotifyWriteThread will call this on invalid clients too
+	// ASSERT(!"Notifying write to an unknown client");
+}
+
+
+
+
+
+void cSocketThreads::Write(const cSocket * a_Socket, const AString & a_Data)
+{
+	// Puts a_Data into outgoing data queue for a_Socket
+	
+	if (!a_Socket->IsValid())
+	{
+		// Socket already closed, ignore the request
+		return;
 	}
+	
+	cCSLock Lock(m_CS);
+	for (cSocketThreadList::iterator itr = m_Threads.begin(); itr != m_Threads.end(); ++itr)
+	{
+		if ((*itr)->Write(a_Socket, a_Data))
+		{
+			return;
+		}
+	}  // for itr - m_Threads[]
+	
+	ASSERT(!"Writing to an unknown socket");
+}
+
+
+
+
+
+/// Stops reading from the socket - when this call returns, no more calls to the callbacks are made
+void cSocketThreads::StopReading(const cCallback * a_Client)
+{
+	cCSLock Lock(m_CS);
+	for (cSocketThreadList::iterator itr = m_Threads.begin(); itr != m_Threads.end(); ++itr)
+	{
+		if ((*itr)->StopReading(a_Client))
+		{
+			return;
+		}
+	}  // for itr - m_Threads[]
+	
+	// Cannot assert, this normally happens if the socket is closed before the client deinitializes
+	// ASSERT(!"Stopping reading on an unknown client");
+}
+
+
+
+
+
+/// Queues the socket for closing, as soon as its outgoing data is sent
+void cSocketThreads::QueueClose(const cSocket * a_Socket)
+{
+	if (!a_Socket->IsValid())
+	{
+		// Already closed, ignore the request
+		return;
+	}
+	
+	cCSLock Lock(m_CS);
+	for (cSocketThreadList::iterator itr = m_Threads.begin(); itr != m_Threads.end(); ++itr)
+	{
+		if ((*itr)->QueueClose(a_Socket))
+		{
+			return;
+		}
+	}  // for itr - m_Threads[]
+	
+	ASSERT(!"Queueing close of an unknown socket");
 }
 
 
@@ -189,8 +267,7 @@ bool cSocketThreads::cSocketThread::RemoveClient(const cCallback * a_Client)
 		}
 		
 		// Found, remove it:
-		m_Slots[i] = m_Slots[m_NumSlots - 1];
-		m_NumSlots--;
+		m_Slots[i] = m_Slots[--m_NumSlots];
 		
 		// Notify the thread of the change:
 		ASSERT(m_ControlSocket2.IsValid());
@@ -210,11 +287,6 @@ bool cSocketThreads::cSocketThread::RemoveSocket(const cSocket * a_Socket)
 {
 	// Returns true if removed, false if not found
 
-	if (m_NumSlots == 0)
-	{
-		return false;
-	}
-	
 	for (int i = m_NumSlots - 1; i >= 0 ; --i)
 	{
 		if (m_Slots[i].m_Socket != a_Socket)
@@ -223,8 +295,7 @@ bool cSocketThreads::cSocketThread::RemoveSocket(const cSocket * a_Socket)
 		}
 		
 		// Found, remove it:
-		m_Slots[i] = m_Slots[m_NumSlots - 1];
-		m_NumSlots--;
+		m_Slots[i] = m_Slots[--m_NumSlots];
 		
 		// Notify the thread of the change:
 		ASSERT(m_ControlSocket2.IsValid());
@@ -233,22 +304,6 @@ bool cSocketThreads::cSocketThread::RemoveSocket(const cSocket * a_Socket)
 	}  // for i - m_Slots[]
 	
 	// Not found
-	return false;
-}
-
-
-
-
-
-bool cSocketThreads::cSocketThread::NotifyWrite(const cCallback * a_Client)
-{
-	if (HasClient(a_Client))
-	{
-		// Notify the thread that there's another packet in the queue:
-		ASSERT(m_ControlSocket2.IsValid());
-		m_ControlSocket2.Send("q", 1);
-		return true;
-	}
 	return false;
 }
 
@@ -278,6 +333,93 @@ bool cSocketThreads::cSocketThread::HasSocket(const cSocket * a_Socket) const
 	{
 		if (m_Slots[i].m_Socket->GetSocket() == a_Socket->GetSocket())
 		{
+			return true;
+		}
+	}  // for i - m_Slots[]
+	return false;
+}
+
+
+
+
+
+bool cSocketThreads::cSocketThread::NotifyWrite(const cCallback * a_Client)
+{
+	if (HasClient(a_Client))
+	{
+		// Notify the thread that there's another packet in the queue:
+		ASSERT(m_ControlSocket2.IsValid());
+		m_ControlSocket2.Send("q", 1);
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cSocketThreads::cSocketThread::Write(const cSocket * a_Socket, const AString & a_Data)
+{
+	// Returns true if socket handled by this thread
+	for (int i = m_NumSlots - 1; i >= 0; --i)
+	{
+		if (m_Slots[i].m_Socket == a_Socket)
+		{
+			m_Slots[i].m_Outgoing.append(a_Data);
+			
+			// Notify the thread that there's data in the queue:
+			ASSERT(m_ControlSocket2.IsValid());
+			m_ControlSocket2.Send("q", 1);
+			
+			return true;
+		}
+	}  // for i - m_Slots[]
+	return false;
+}
+
+
+
+
+
+bool cSocketThreads::cSocketThread::StopReading (const cCallback * a_Client)
+{
+	// Returns true if client handled by this thread
+	for (int i = m_NumSlots - 1; i >= 0; --i)
+	{
+		if (m_Slots[i].m_Client == a_Client)
+		{
+			m_Slots[i].m_Client = NULL;
+			m_Slots[i].m_ShouldClose = false;
+
+			// Notify the thread that there's a stop reading request:
+			ASSERT(m_ControlSocket2.IsValid());
+			m_ControlSocket2.Send("s", 1);
+			
+			return true;
+		}
+	}  // for i - m_Slots[]
+	return false;
+}
+
+
+
+
+
+bool cSocketThreads::cSocketThread::QueueClose(const cSocket * a_Socket)
+{
+	// Returns true if socket handled by this thread
+	for (int i = m_NumSlots - 1; i >= 0; --i)
+	{
+		if (m_Slots[i].m_Socket == a_Socket)
+		{
+			ASSERT(m_Slots[i].m_Client == NULL);  // Should have stopped reading first
+			m_Slots[i].m_ShouldClose = true;
+
+			// Notify the thread that there's a close queued (in case its conditions are already met):
+			ASSERT(m_ControlSocket2.IsValid());
+			m_ControlSocket2.Send("c", 1);
+			
 			return true;
 		}
 	}  // for i - m_Slots[]
@@ -453,17 +595,26 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 		{
 			// The socket has been closed by the remote party, close our socket and let it be removed after we process all reading
 			m_Slots[i].m_Socket->CloseSocket();
-			m_Slots[i].m_Client->SocketClosed();
+			if (m_Slots[i].m_Client != NULL)
+			{
+				m_Slots[i].m_Client->SocketClosed();
+			}
 		}
 		else if (Received > 0)
 		{
-			m_Slots[i].m_Client->DataReceived(Buffer, Received);
+			if (m_Slots[i].m_Client != NULL)
+			{
+				m_Slots[i].m_Client->DataReceived(Buffer, Received);
+			}
 		}
 		else
 		{
 			// The socket has encountered an error, close it and let it be removed after we process all reading
 			m_Slots[i].m_Socket->CloseSocket();
-			m_Slots[i].m_Client->SocketClosed();
+			if (m_Slots[i].m_Client != NULL)
+			{
+				m_Slots[i].m_Client->SocketClosed();
+			}
 		}
 	}  // for i - m_Slots[]
 }
@@ -485,10 +636,19 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 		if (m_Slots[i].m_Outgoing.empty())
 		{
 			// Request another chunk of outgoing data:
-			m_Slots[i].m_Client->GetOutgoingData(m_Slots[i].m_Outgoing);
+			if (m_Slots[i].m_Client != NULL)
+			{
+				m_Slots[i].m_Client->GetOutgoingData(m_Slots[i].m_Outgoing);
+			}
 			if (m_Slots[i].m_Outgoing.empty())
 			{
-				// Nothing ready yet
+				// Nothing ready
+				if ((m_Slots[i].m_Client == NULL) && m_Slots[i].m_ShouldClose)
+				{
+					// Socket was queued for closing and there's no more data to send, close it now:
+					m_Slots[i].m_Socket->CloseSocket();
+					m_Slots[i] = m_Slots[--m_NumSlots];
+				}
 				continue;
 			}
 		}  // if (outgoing data is empty)
@@ -496,9 +656,13 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 		int Sent = m_Slots[i].m_Socket->Send(m_Slots[i].m_Outgoing.data(), m_Slots[i].m_Outgoing.size());
 		if (Sent < 0)
 		{
-			LOGWARNING("Error while writing to client \"%s\", disconnecting", m_Slots[i].m_Socket->GetIPString().c_str());
+			int Err = cSocket::GetLastError();
+			LOGWARNING("Error %d while writing to client \"%s\", disconnecting. \"%s\"", Err, m_Slots[i].m_Socket->GetIPString().c_str(), cSocket::GetErrorString(Err).c_str());
 			m_Slots[i].m_Socket->CloseSocket();
-			m_Slots[i].m_Client->SocketClosed();
+			if (m_Slots[i].m_Client != NULL)
+			{
+				m_Slots[i].m_Client->SocketClosed();
+			}
 			return;
 		}
 		m_Slots[i].m_Outgoing.erase(0, Sent);
@@ -531,8 +695,7 @@ void cSocketThreads::cSocketThread::RemoveClosedSockets(void)
 		{
 			continue;
 		}
-		m_Slots[i] = m_Slots[m_NumSlots - 1];
-		m_NumSlots--;
+		m_Slots[i] = m_Slots[--m_NumSlots];
 	}  // for i - m_Slots[]
 }
 

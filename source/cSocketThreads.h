@@ -5,6 +5,16 @@
 // This object takes care of network communication, groups sockets into threads and uses as little threads as possible for full read / write support
 // For more detail, see http://forum.mc-server.org/showthread.php?tid=327
 
+/*
+Additional details:
+When a client is terminating a connection:
+- they call the StopReading() method to disable callbacks for the incoming data
+- they call the Write() method to queue any outstanding outgoing data
+- they call the QueueClose() method to queue the socket to close after outgoing data has been sent.
+When a socket slot is marked as having no callback, it is kept alive until its outgoing data queue is empty and its m_ShouldClose flag is set.
+This means that the socket can be written to several times before finally closing it via QueueClose()
+*/
+
 
 
 
@@ -76,6 +86,15 @@ public:
 	
 	/// Notify the thread responsible for a_Client that the client has something to write
 	void NotifyWrite(const cCallback * a_Client);
+	
+	/// Puts a_Data into outgoing data queue for a_Socket
+	void Write(const cSocket * a_Socket, const AString & a_Data);
+	
+	/// Stops reading from the socket - when this call returns, no more calls to the callbacks are made
+	void StopReading(const cCallback * a_Client);
+	
+	/// Queues the socket for closing, as soon as its outgoing data is sent
+	void QueueClose(const cSocket * a_Socket);
 
 private:
 
@@ -99,6 +118,9 @@ private:
 		bool HasClient   (const cCallback * a_Client) const;
 		bool HasSocket   (const cSocket *   a_Socket) const;
 		bool NotifyWrite (const cCallback * a_Client);  // Returns true if client handled by this thread
+		bool Write       (const cSocket *   a_Socket, const AString & a_Data);  // Returns true if socket handled by this thread
+		bool StopReading (const cCallback * a_Client);  // Returns true if client handled by this thread
+		bool QueueClose  (const cSocket *   a_Socket);  // Returns true if socket handled by this thread
 		
 		bool Start(void);  // Hide the cIsThread's Start method, we need to provide our own startup to create the control socket
 		
@@ -119,6 +141,7 @@ private:
 			cSocket *   m_Socket;
 			cCallback * m_Client;
 			AString     m_Outgoing;  // If sending writes only partial data, the rest is stored here for another send
+			bool        m_ShouldClose;  // If true, the socket is to be closed after sending all outgoing data
 		} ;
 		sSlot m_Slots[MAX_SLOTS];
 		int   m_NumSlots;  // Number of slots actually used

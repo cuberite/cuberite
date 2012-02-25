@@ -102,7 +102,7 @@ void cServer::ServerListenThread( void *a_Args )
 
 void cServer::ClientDestroying(const cClientHandle * a_Client)
 {
-	m_SocketThreads.RemoveClient(a_Client);
+	m_SocketThreads.StopReading(a_Client);
 }
 
 

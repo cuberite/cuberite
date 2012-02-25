@@ -151,7 +151,7 @@ cClientHandle::~cClientHandle()
 {
 	LOG("Deleting client \"%s\"", GetUsername().c_str());
 
-	// Remove from cSocketThreads, just in case
+	// Remove from cSocketThreads, we're not to be called anymore:
 	cRoot::Get()->GetServer()->ClientDestroying(this);
 	
 	m_LoadedChunks.clear();
@@ -225,14 +225,6 @@ void cClientHandle::Destroy()
 	{
 		RemoveFromAllChunks();
 	}
-	
-	if (m_Socket.IsValid())
-	{
-		m_Socket.CloseSocket();
-	}
-	
-	// Synchronize with the cSocketThreads (so that they don't call us anymore)
-	cRoot::Get()->GetServer()->ClientDestroying(this);
 }
 
 
@@ -489,6 +481,7 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 				
 				// Ignored packets:
 				case E_PLAYERLOOK:
+				case E_CHAT:
 				case E_PLAYERMOVELOOK:
 				case E_PLAYERPOS:
 				case E_KEEP_ALIVE:     break;
@@ -504,6 +497,8 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 			{
 				// Ignored packets:
 				case E_KEEP_ALIVE:
+				case E_CHAT:
+				case E_FLYING:
 				case E_PLAYERLOOK:
 				case E_PLAYERMOVELOOK:
 				case E_PLAYERPOS: break;
@@ -520,6 +515,8 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 			{
 				// Ignored packets:
 				case E_KEEP_ALIVE:
+				case E_CHAT:
+				case E_FLYING:
 				case E_PLAYERLOOK:
 				case E_PLAYERMOVELOOK:
 				case E_PLAYERPOS: break;
@@ -535,6 +532,8 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 			{
 				// Ignored packets:
 				case E_KEEP_ALIVE:
+				case E_CHAT:
+				case E_FLYING:
 				case E_PLAYERLOOK:
 				case E_PLAYERPOS: break;
 
