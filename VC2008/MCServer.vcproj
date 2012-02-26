@@ -444,10 +444,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cSocketThreads.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cTracer.cpp"
 				>
 			</File>
@@ -1504,6 +1500,10 @@
 				</File>
 				<File
 					RelativePath="..\source\cSocketThreads.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSocketThreads.h"
 					>
 				</File>
 				<File

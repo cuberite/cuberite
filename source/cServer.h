@@ -21,6 +21,8 @@ class cPlayer;
 class cClientHandle;
 class cPacket;
 
+typedef std::list<cClientHandle *> cClientHandleList;
+
 
 
 
@@ -58,15 +60,47 @@ public:												//tolua_export
 	
 	void ClientDestroying(const cClientHandle * a_Client);  // Called by cClientHandle::Destroy(); removes the client from m_SocketThreads
 	
+	void NotifyClientWrite(const cClientHandle * a_Client);  // Notifies m_SocketThreads that client has something to be written
+	
+	void WriteToClient(const cSocket * a_Socket, const AString & a_Data);  // Queues outgoing data for the socket through m_SocketThreads
+	
+	void QueueClientClose(const cSocket * a_Socket);  // Queues the socket to close when all its outgoing data is sent
+	
 private:
 
 	friend class cRoot; // so cRoot can create and destroy cServer
 	
-	cServer();
-	~cServer();
+	/// When NotifyClientWrite() is called, it is queued for this thread to process (to avoid deadlocks between cSocketThreads, cClientHandle and cChunkMap)
+	class cNotifyWriteThread :
+		public cIsThread
+	{
+		typedef cIsThread super;
+		
+		cEvent    m_Event;  // Set when m_Clients gets appended
+		cServer * m_Server;
 
+		cCriticalSection  m_CS;
+		cClientHandleList m_Clients;
+		
+		virtual void Execute(void);
+		
+	public:	
+	
+		cNotifyWriteThread(void);
+		~cNotifyWriteThread();
+	
+		bool Start(cServer * a_Server);
+		
+		void NotifyClientWrite(const cClientHandle * a_Client);
+	} ;
+	
 	struct sServerState;
 	sServerState* m_pState;
+	
+	cNotifyWriteThread m_NotifyWriteThread;
+	
+	cCriticalSection  m_CSClients;  // Locks client list
+	cClientHandleList m_Clients;         // Clients that are connected to the server
 	
 	cSocketThreads m_SocketThreads;
 	
@@ -80,6 +114,10 @@ private:
 	int m_iServerPort;
 
 	bool m_bRestarting;
+
+	cServer();
+	~cServer();
+
 }; //tolua_export
 
 

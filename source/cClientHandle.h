@@ -98,8 +98,6 @@ public:
 	void Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL) { Send(&a_Packet, a_Priority); }
 	void Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL);
 
-	static void SendThread( void *lpParam );
-
 	const AString & GetUsername(void) const;
 	
 	inline short GetPing() { return m_Ping; }
@@ -118,20 +116,17 @@ private:
 	
 	AString m_ReceivedData;  // Accumulator for the data received from the socket, waiting to be parsed; accessed from the cSocketThreads' thread only!
 
-	PacketList m_PendingNrmSendPackets;
-	PacketList m_PendingLowSendPackets;
+	cCriticalSection m_CSPackets;
+	PacketList       m_PendingNrmSendPackets;
+	PacketList       m_PendingLowSendPackets;
 
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
 	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 
-	cThread * m_pSendThread;
-
 	cSocket m_Socket;
 
 	cCriticalSection m_CriticalSection;
-	cCriticalSection m_SendCriticalSection;
-	cSemaphore       m_Semaphore;
 
 	Vector3d m_ConfirmPosition;
 

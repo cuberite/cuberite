@@ -65,8 +65,6 @@ struct cServer::sServerState
 	cThread* pListenThread;	bool bStopListenThread;
 	cThread* pTickThread;	bool bStopTickThread;
 
-	ClientList Clients;
-
 	cEvent RestartEvent;
 	std::string ServerID;
 };
@@ -103,6 +101,33 @@ void cServer::ServerListenThread( void *a_Args )
 void cServer::ClientDestroying(const cClientHandle * a_Client)
 {
 	m_SocketThreads.StopReading(a_Client);
+}
+
+
+
+
+
+void cServer::NotifyClientWrite(const cClientHandle * a_Client)
+{
+	m_NotifyWriteThread.NotifyClientWrite(a_Client);
+}
+
+
+
+
+
+void cServer::WriteToClient(const cSocket * a_Socket, const AString & a_Data)
+{
+	m_SocketThreads.Write(a_Socket, a_Data);
+}
+
+
+
+
+
+void cServer::QueueClientClose(const cSocket * a_Socket)
+{
+	m_SocketThreads.QueueClose(a_Socket);
 }
 
 
@@ -209,6 +234,9 @@ bool cServer::InitServer( int a_Port )
 			LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 		}
 	}
+	
+	m_NotifyWriteThread.Start(this);
+	
 	return true;
 }
 
@@ -250,9 +278,13 @@ cServer::~cServer()
 // TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
 void cServer::Broadcast( const cPacket * a_Packet, cClientHandle* a_Exclude /* = 0 */ )
 {
-	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
+	cCSLock Lock(m_CSClients);
+	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
-		if( *itr == a_Exclude || !(*itr)->IsLoggedIn() ) continue;
+		if ((*itr == a_Exclude) || !(*itr)->IsLoggedIn())
+		{
+			continue;
+		}
 		(*itr)->Send( a_Packet );
 	}
 }
@@ -289,7 +321,9 @@ void cServer::StartListenClient()
 		delete NewHandle;
 		return;
 	}
-	m_pState->Clients.push_back( NewHandle );	// TODO - lock list
+	
+	cCSLock Lock(m_CSClients);
+	m_Clients.push_back( NewHandle );
 }
 
 
@@ -310,21 +344,21 @@ bool cServer::Tick(float a_Dt)
 
 	cRoot::Get()->TickWorlds( a_Dt ); // TODO - Maybe give all worlds their own thread?
 
-	//World->LockClientHandle(); // TODO - Lock client list
-	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end();)
 	{
-		if( (*itr)->IsDestroyed() )
+		cCSLock Lock(m_CSClients);
+		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
-			cClientHandle* RemoveMe = *itr;
+			if ((*itr)->IsDestroyed())
+			{
+				cClientHandle* RemoveMe = *itr;
+				itr = m_Clients.erase(itr);
+				delete RemoveMe;
+				continue;
+			}
+			(*itr)->Tick(a_Dt);
 			++itr;
-			m_pState->Clients.remove( RemoveMe );
-			delete RemoveMe;
-			continue;
 		}
-		(*itr)->Tick(a_Dt);
-		++itr;
 	}
-	//World->UnlockClientHandle();
 
 	cRoot::Get()->GetPluginManager()->Tick( a_Dt );
 
@@ -550,14 +584,12 @@ void cServer::Shutdown()
 
 	cRoot::Get()->GetWorld()->SaveAllChunks();
 
-	//cWorld* World = cRoot::Get()->GetWorld();
-	//World->LockClientHandle();	// TODO - Lock client list
-	for( ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr )
+	cCSLock Lock(m_CSClients);
+	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )
 	{
 		delete *itr;
 	}
-	m_pState->Clients.clear();
-	//World->UnlockClientHandle();
+	m_Clients.clear();
 }
 
 
@@ -575,13 +607,14 @@ const AString & cServer::GetServerID(void) const
 
 void cServer::KickUser(const AString & iUserName, const AString & iReason)
 {
-	for (ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
+	cCSLock Lock(m_CSClients);
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUsername() == iUserName)
 		{
 			(*itr)->Kick(iReason);
 		}
-	}  // for itr - m_pState->Clients[]
+	}  // for itr - m_Clients[]
 }
 
 
@@ -590,13 +623,92 @@ void cServer::KickUser(const AString & iUserName, const AString & iReason)
 
 void cServer::AuthenticateUser(const AString & iUserName)
 {
-	for (ClientList::iterator itr = m_pState->Clients.begin(); itr != m_pState->Clients.end(); ++itr)
+	cCSLock Lock(m_CSClients);
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUsername() == iUserName)
 		{
 			(*itr)->Authenticate();
 		}
-	}  // for itr - m_pState->Clients[]
+	}  // for itr - m_Clients[]
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cServer::cClientPacketThread:
+
+cServer::cNotifyWriteThread::cNotifyWriteThread(void) :
+	super("ClientPacketThread"),
+	m_Server(NULL)
+{
+}
+
+
+
+
+
+cServer::cNotifyWriteThread::~cNotifyWriteThread()
+{
+	mShouldTerminate = true;
+	m_Event.Set();
+	Wait();
+}
+
+
+
+
+
+bool cServer::cNotifyWriteThread::Start(cServer * a_Server)
+{
+	m_Server = a_Server;
+	return super::Start();
+}
+
+
+
+
+
+void cServer::cNotifyWriteThread::Execute(void)
+{
+	cClientHandleList Clients;
+	while (!mShouldTerminate)
+	{
+		cCSLock Lock(m_CS);
+		while (m_Clients.size() == 0)
+		{
+			cCSUnlock Unlock(Lock);
+			m_Event.Wait();
+			if (mShouldTerminate)
+			{
+				return;
+			}
+		}
+		
+		// Copy the clients to notify and unlock the CS:
+		Clients.splice(Clients.begin(), m_Clients);
+		Lock.Unlock();
+		
+		for (cClientHandleList::iterator itr = Clients.begin(); itr != Clients.end(); ++itr)
+		{
+			m_Server->m_SocketThreads.NotifyWrite(*itr);
+		}  // for itr - Clients[]
+		Clients.clear();
+	}  // while (!mShouldTerminate)
+}
+
+
+
+
+
+void cServer::cNotifyWriteThread::NotifyClientWrite(const cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CS);
+	m_Clients.remove(const_cast<cClientHandle *>(a_Client));  // Put it there only once
+	m_Clients.push_back(const_cast<cClientHandle *>(a_Client));
+	m_Event.Set();
 }
 
 
