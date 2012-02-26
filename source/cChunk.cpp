@@ -85,6 +85,7 @@ cChunk::cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_Wor
 	, m_IsValid(false)
 	, m_IsDirty(false)
 	, m_IsSaving(false)
+	, m_StayCount(0)
 {
 	// LOGINFO("### new cChunk (%i, %i) at %p, thread 0x%x ###", a_X, a_Z, this, GetCurrentThreadId());
 }
@@ -164,7 +165,7 @@ void cChunk::SetValid(bool a_SendToClients)
 
 bool cChunk::CanUnload(void)
 {
-	return m_LoadedByClient.empty() && !m_IsDirty;
+	return m_LoadedByClient.empty() && !m_IsDirty && (m_StayCount == 0);
 }
 
 
@@ -292,6 +293,17 @@ bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 		}
 	}  // for itr - m_BlockEntities[]
 	return false;
+}
+
+
+
+
+
+/// Sets or resets the internal flag that prevents chunk from being unloaded
+void cChunk::Stay(bool a_Stay)
+{
+	m_StayCount += (a_Stay ? 1 : -1);
+	ASSERT(m_StayCount >= 0);
 }
 
 

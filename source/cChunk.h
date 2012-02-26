@@ -146,6 +146,9 @@ public:
 	/// Returns true if there is a block entity at the coords specified
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
+	/// Sets or resets the internal flag that prevents chunk from being unloaded
+	void Stay(bool a_Stay = true);
+	
 	void Tick(float a_Dt, MTRand & a_TickRandom);
 
 	int GetPosX() { return m_PosX; }
@@ -238,6 +241,9 @@ private:
 	cClientHandleList  m_UnloadQuery;
 	cEntityList        m_Entities;
 	cBlockEntityList   m_BlockEntities;
+	
+	/// Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded
+	int m_StayCount;
 
 	bool m_bCalculateLighting;
 

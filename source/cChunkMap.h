@@ -15,6 +15,7 @@ class cWorld;
 class cEntity;
 class cItem;
 class MTRand;
+class cChunkStay;
 
 
 
@@ -83,6 +84,9 @@ public:
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
 	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	
+	/// Marks (a_Stay == true) or unmarks (a_Stay == false) a chunk as non-unloadable; to be used only by cChunkStay!
+	void ChunkStay(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Stay = true);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
@@ -169,6 +173,32 @@ private:
 	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
 };
+
+
+
+
+
+/** Makes chunks stay loaded until this object is cleared or destroyed
+Works by setting internal flags in the cChunk that it should not be unloaded
+*/
+class cChunkStay
+{
+public:
+	cChunkStay(cWorld * a_World);
+	~cChunkStay();
+	
+	void Clear(void);
+	
+	void Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+protected:
+
+	cWorld * m_World;
+	
+	cCriticalSection m_CS;
+	cChunkCoordsList m_Chunks;
+} ;
 
 
 

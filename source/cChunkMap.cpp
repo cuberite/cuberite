@@ -755,6 +755,21 @@ void cChunkMap::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, c
 
 
 
+void cChunkMap::ChunkStay(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Stay)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	Chunk->Stay(a_Stay);
+}
+
+
+
+
+
 void cChunkMap::Tick( float a_Dt, MTRand & a_TickRandom )
 {
 	cCSLock Lock(m_CSLayers);
@@ -934,6 +949,82 @@ int cChunkMap::GetNumChunks(void)
 void cChunkMap::ChunkValidated(void)
 {
 	m_evtChunkValid.Set();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cChunkStay:
+
+cChunkStay::cChunkStay(cWorld * a_World) :
+	m_World(a_World)
+{
+}
+
+
+
+
+
+cChunkStay::~cChunkStay()
+{
+	Clear();
+}
+
+
+
+
+
+void cChunkStay::Clear(void)
+{
+	cChunkCoordsList Chunks;
+	{
+		cCSLock Lock(m_CS);
+		std::swap(Chunks, m_Chunks);
+	}
+	
+	// Un-"stay" all chunks:
+	for (cChunkCoordsList::const_iterator itr = Chunks.begin(); itr != Chunks.end(); ++itr)
+	{
+		m_World->ChunkStay(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, false);
+	}  // for itr - Chunks[]
+}
+
+
+
+
+
+void cChunkStay::Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CS);
+	for (cChunkCoordsList::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
+	{
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
+		{
+			// Already "stayed"
+			return;
+		}
+	}  // for itr - Chunks[]
+	m_World->ChunkStay(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cChunkStay::Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CS);
+	for (cChunkCoordsList::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
+	{
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
+		{
+			// Found, un-"stay"
+			m_World->ChunkStay(a_ChunkX, a_ChunkY, a_ChunkZ, false);
+			return;
+		}
+	}  // for itr - Chunks[]
 }
 
 

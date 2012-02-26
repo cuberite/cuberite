@@ -1297,6 +1297,15 @@ void cWorld::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, cons
 
 
 
+void cWorld::ChunkStay(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Stay)
+{
+	m_ChunkMap->ChunkStay(a_ChunkX, a_ChunkY, a_ChunkZ, a_Stay);
+}
+
+
+
+
+
 void cWorld::SaveAllChunks()
 {
 	LOG("Saving all chunks...");
