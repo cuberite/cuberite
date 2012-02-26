@@ -165,6 +165,10 @@ cClientHandle::~cClientHandle()
 			cPacket_Chat Left(m_Username + " left the game!");
 			World->Broadcast(Left, this);
 		}
+		if (World != NULL)
+		{
+			World->RemovePlayer(m_Player);
+		}
 	}
 
 	if (m_Socket.IsValid())
@@ -208,6 +212,10 @@ cClientHandle::~cClientHandle()
 	
 	// Queue the socket to close as soon as it sends all outgoing data:
 	cRoot::Get()->GetServer()->QueueClientClose(&m_Socket);
+	
+	// We need to remove the socket from SocketThreads because we own it and it gets destroyed after this destructor finishes
+	// TODO: The socket needs to stay alive, someone else has to own it
+	cRoot::Get()->GetServer()->RemoveClient(&m_Socket);
 	
 	LOG("ClientHandle at %p deleted", this);
 }

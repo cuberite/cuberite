@@ -169,14 +169,18 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 
 void cEntity::Destroy()
 {
-	if( !m_bDestroyed )
+	if (m_bDestroyed)
 	{
-		m_bDestroyed = true;
-		if( !m_bRemovedFromChunk )
-		{
-			RemoveFromChunk();
-		}
+		return;
 	}
+	if (!m_bRemovedFromChunk)
+	{
+		RemoveFromChunk();
+	}
+	
+	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, cPacket_DestroyEntity(this));
+	
+	m_bDestroyed = true;
 }
 
 

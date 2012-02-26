@@ -125,18 +125,14 @@ void cPlayer::Initialize( cWorld* a_World )
 cPlayer::~cPlayer(void)
 {
 	SaveToDisk();
-	m_ClientHandle = 0;
+	m_ClientHandle = NULL;
 	
 	CloseWindow(-1);
-	if( m_Inventory )
-	{
-		delete m_Inventory;
-		m_Inventory = 0;
-	}
-	if(m_CreativeInventory)
-	{
-		delete m_CreativeInventory;
-	}
+	delete m_Inventory;
+	m_Inventory = NULL;
+
+	delete m_CreativeInventory;
+
 	delete m_pState;
 	m_World->RemovePlayer( this );
 }

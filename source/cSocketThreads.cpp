@@ -87,7 +87,8 @@ void cSocketThreads::RemoveClient(const cSocket * a_Socket)
 		}
 	}  // for itr - m_Threads[]
 	
-	ASSERT(!"Removing an unknown socket");
+	// Cannot assert here, this may actually happen legally, since cClientHandle has to clean up the socket and it may have already closed in the meantime
+	// ASSERT(!"Removing an unknown socket");
 }
 
 

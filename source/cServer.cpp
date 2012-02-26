@@ -134,6 +134,15 @@ void cServer::QueueClientClose(const cSocket * a_Socket)
 
 
 
+void cServer::RemoveClient(const cSocket * a_Socket)
+{
+	m_SocketThreads.RemoveClient(a_Socket);
+}
+
+
+
+
+
 bool cServer::InitServer( int a_Port )
 {
 	if( m_bIsConnected )

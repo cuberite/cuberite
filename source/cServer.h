@@ -58,13 +58,15 @@ public:												//tolua_export
 
 	const AString & GetServerID(void) const;
 	
-	void ClientDestroying(const cClientHandle * a_Client);  // Called by cClientHandle::Destroy(); removes the client from m_SocketThreads
+	void ClientDestroying(const cClientHandle * a_Client);  // Called by cClientHandle::Destroy(); stop m_SocketThreads from calling back into a_Client
 	
 	void NotifyClientWrite(const cClientHandle * a_Client);  // Notifies m_SocketThreads that client has something to be written
 	
 	void WriteToClient(const cSocket * a_Socket, const AString & a_Data);  // Queues outgoing data for the socket through m_SocketThreads
 	
 	void QueueClientClose(const cSocket * a_Socket);  // Queues the socket to close when all its outgoing data is sent
+	
+	void RemoveClient(const cSocket * a_Socket);  // Removes the socket from m_SocketThreads
 	
 private:
 
