@@ -115,9 +115,13 @@ cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 	}
 	
 	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return NULL;
+	}
 	if (!(Chunk->IsValid()))
 	{
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ, true);
 	}
 	return Chunk;
 }
@@ -137,8 +141,14 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 	}
 	
 	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
-	
-	// TODO: Load, but do not generate, if not valid
+	if (Chunk == NULL)
+	{
+		return NULL;
+	}
+	if (!(Chunk->IsValid()))
+	{
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ, false);
+	}
 	
 	return Chunk;
 }

@@ -196,12 +196,20 @@ int cWorldStorage::GetSaveQueueLength(void)
 
 
 
-void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
 {
 	// Queues the chunk for loading; if not loaded, the chunk will be generated
 	cCSLock Lock(m_CSQueues);
-	m_LoadQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
-	m_LoadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+	
+	// Check if already in the queue:
+	for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
+	{
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_Generate == a_Generate))
+		{
+			return;
+		}
+	}
+	m_LoadQueue.push_back(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
 	m_Event.Set();
 }
 
@@ -221,11 +229,19 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cWorldStorage::UnqueueLoad(const cChunkCoords & a_Chunk)
+void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSQueues);
-	m_LoadQueue.remove(a_Chunk);
-	m_evtRemoved.Set();
+	for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
+	{
+		if ((itr->m_ChunkX != a_ChunkX) || (itr->m_ChunkY != a_ChunkY) || (itr->m_ChunkZ != a_ChunkZ))
+		{
+			continue;
+		}
+		m_LoadQueue.erase(itr);
+		m_evtRemoved.Set();
+		return;
+	}  // for itr - m_LoadQueue[]
 }
 
 
@@ -306,7 +322,7 @@ void cWorldStorage::Execute(void)
 
 bool cWorldStorage::LoadOneChunk(void)
 {
-	cChunkCoords ToLoad(0, 0, 0);
+	sChunkLoad ToLoad(0, 0, 0, false);
 	bool HasMore;
 	bool ShouldLoad = false;
 	{
@@ -319,10 +335,18 @@ bool cWorldStorage::LoadOneChunk(void)
 		}
 		HasMore = (m_LoadQueue.size() > 0);
 	}
-	if (ShouldLoad && !LoadChunk(ToLoad))
+	if (ShouldLoad && !LoadChunk(cChunkCoords(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ)))
 	{
-		// The chunk couldn't be loaded, generate it:
-		m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+		if (ToLoad.m_Generate)
+		{
+			// The chunk couldn't be loaded, generate it:
+			m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+		}
+		else
+		{
+			// TODO: Notify the world that the load has failed:
+			// m_World->ChunkLoadFailed(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+		}
 	}
 	return HasMore;
 }

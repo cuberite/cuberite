@@ -97,10 +97,10 @@ public:
 	cWorldStorage(void);
 	~cWorldStorage();
 	
-	void QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Queues the chunk for loading; if not loaded, the chunk will be generated
+	void QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate);  // Queues the chunk for loading; if not loaded, the chunk will be generated if a_Generate is true
 	void QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	void UnqueueLoad(const cChunkCoords & a_Chunk);
+	void UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void UnqueueSave(const cChunkCoords & a_Chunk);
 	
 	bool Start(cWorld * a_World, const AString & a_StorageSchemaName);  // Hide the cIsThread's Start() method, we need to provide args
@@ -112,12 +112,24 @@ public:
 	
 protected:
 
+	struct sChunkLoad
+	{
+		int m_ChunkX;
+		int m_ChunkY;
+		int m_ChunkZ;
+		bool m_Generate;  // If true, the chunk will be generated if it cannot be loaded
+		
+		sChunkLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ), m_Generate(a_Generate) {}
+	} ;
+	
+	typedef std::list<sChunkLoad> sChunkLoadQueue;
+	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
 	
 	// Both queues are locked by the same CS
 	cCriticalSection m_CSQueues;
-	cChunkCoordsList m_LoadQueue;
+	sChunkLoadQueue  m_LoadQueue;
 	cChunkCoordsList m_SaveQueue;
 	
 	cEvent m_Event;       // Set when there's any addition to the queues
