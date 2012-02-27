@@ -329,7 +329,13 @@ bool cChunkMap::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * 
 bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ );
+	if (Layer == NULL)
+	{
+		// An error must have occurred, since layers are automatically created if they don't exist
+		return false;
+	}
+	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 	return (Chunk != NULL) && Chunk->IsValid();
 }
 
