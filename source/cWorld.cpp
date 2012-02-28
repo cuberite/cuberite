@@ -1288,6 +1288,24 @@ void cWorld::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
+bool cWorld::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	return m_ChunkMap->LoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+	
+
+void cWorld::LoadChunks(const cChunkCoordsList & a_Chunks)
+{
+	m_ChunkMap->LoadChunks(a_Chunks);
+}
+
+
+
+
+
 void cWorld::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	m_ChunkMap->UpdateSign(a_X, a_Y, a_Z, a_Line1, a_Line2, a_Line3, a_Line4);
@@ -1297,9 +1315,9 @@ void cWorld::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, cons
 
 
 
-void cWorld::ChunkStay(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Stay)
+void cWorld::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
 {
-	m_ChunkMap->ChunkStay(a_ChunkX, a_ChunkY, a_ChunkZ, a_Stay);
+	m_ChunkMap->ChunksStay(a_Chunks, a_Stay);
 }
 
 

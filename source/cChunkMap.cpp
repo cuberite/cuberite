@@ -106,12 +106,12 @@ cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk( int a_ChunkX, int a_ChunkZ
 
 cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
-	cCSLock Lock(m_CSLayers);
+	// No need to lock m_CSLayers, since it's already locked by the operation that called us
 	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ );
 	if (Layer == NULL)
 	{
 		// An error must have occurred, since layers are automatically created if they don't exist
-		return cChunkPtr();
+		return NULL;
 	}
 	
 	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -132,12 +132,12 @@ cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 
 cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
-	cCSLock Lock(m_CSLayers);
+	// No need to lock m_CSLayers, since it's already locked by the operation that called us
 	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ );
 	if (Layer == NULL)
 	{
 		// An error must have occurred, since layers are automatically created if they don't exist
-		return cChunkPtr();
+		return NULL;
 	}
 	
 	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -151,6 +151,23 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 	}
 	
 	return Chunk;
+}
+
+
+
+
+
+cChunkPtr cChunkMap::GetChunkNoLoad( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
+{
+	// No need to lock m_CSLayers, since it's already locked by the operation that called us
+	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ );
+	if (Layer == NULL)
+	{
+		// An error must have occurred, since layers are automatically created if they don't exist
+		return NULL;
+	}
+	
+	return Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
 
@@ -261,7 +278,7 @@ void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if (Chunk == NULL)
 	{
 		return;
@@ -277,7 +294,7 @@ void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const 
 void cChunkMap::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if (Chunk == NULL)
 	{
 		return;
@@ -329,13 +346,7 @@ bool cChunkMap::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * 
 bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ );
-	if (Layer == NULL)
-	{
-		// An error must have occurred, since layers are automatically created if they don't exist
-		return false;
-	}
-	cChunkPtr Chunk = Layer->GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
 	return (Chunk != NULL) && Chunk->IsValid();
 }
 
@@ -405,6 +416,7 @@ void cChunkMap::FastSetBlocks(sSetBlockList & a_BlockList)
 	{
 		int ChunkX = a_BlockList.front().ChunkX;
 		int ChunkZ = a_BlockList.front().ChunkZ;
+		cCSLock Lock(m_CSLayers);
 		cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 		if ((Chunk != NULL) && Chunk->IsValid())
 		{
@@ -477,7 +489,7 @@ char cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
 	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
 	
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		return Chunk->GetBlock(a_X, a_Y, a_Z);
@@ -653,7 +665,7 @@ void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1,
 bool cChunkMap::AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if (Chunk == NULL)
 	{
 		return false;
@@ -697,7 +709,7 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoo
 bool cChunkMap::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return false;
@@ -754,6 +766,43 @@ void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
+/// Loads the chunk synchronously, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before)
+bool cChunkMap::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	{
+		cCSLock Lock(m_CSLayers);
+		cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+		if (Chunk == NULL)
+		{
+			// Internal error
+			return false;
+		}
+		if (Chunk->IsValid())
+		{
+			// Already loaded
+			return true;
+		}
+	}
+	return m_World->GetStorage().LoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+/// Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid()
+void cChunkMap::LoadChunks(const cChunkCoordsList & a_Chunks)
+{
+	for (cChunkCoordsList::const_iterator itr = a_Chunks.begin(); itr != a_Chunks.end(); ++itr)
+	{
+		LoadChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
+	}  // for itr - a_Chunks[]
+}
+
+
+
+
+
 void cChunkMap::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	cCSLock Lock(m_CSLayers);
@@ -771,15 +820,18 @@ void cChunkMap::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, c
 
 
 
-void cChunkMap::ChunkStay(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Stay)
+void cChunkMap::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
-	if (Chunk == NULL)
+	for (cChunkCoordsList::const_iterator itr = a_Chunks.begin(); itr != a_Chunks.end(); ++itr)
 	{
-		return;
+		cChunkPtr Chunk = GetChunkNoLoad(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
+		if (Chunk == NULL)
+		{
+			continue;
+		}
+		Chunk->Stay(a_Stay);
 	}
-	Chunk->Stay(a_Stay);
 }
 
 
@@ -856,7 +908,7 @@ cChunkMap::cChunkLayer::~cChunkLayer()
 cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
 	// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
-	
+
 	const int LocalX = a_ChunkX - m_LayerX * LAYER_SIZE;
 	const int LocalZ = a_ChunkZ - m_LayerZ * LAYER_SIZE;
 	
@@ -934,7 +986,7 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 	{
 		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))
 		{
-			// The chunk destructor calls our GetChunk() while removing its entities
+			// The cChunk destructor calls our GetChunk() while removing its entities
 			// so we still need to be able to return the chunk. Therefore we first delete, then NULLify
 			// Doing otherwise results in bug http://forum.mc-server.org/showthread.php?tid=355
 			delete m_Chunks[i];
@@ -975,7 +1027,8 @@ void cChunkMap::ChunkValidated(void)
 // cChunkStay:
 
 cChunkStay::cChunkStay(cWorld * a_World) :
-	m_World(a_World)
+	m_World(a_World),
+	m_IsEnabled(false)
 {
 }
 
@@ -994,17 +1047,11 @@ cChunkStay::~cChunkStay()
 
 void cChunkStay::Clear(void)
 {
-	cChunkCoordsList Chunks;
+	if (m_IsEnabled)
 	{
-		cCSLock Lock(m_CS);
-		std::swap(Chunks, m_Chunks);
+		Disable();
 	}
-	
-	// Un-"stay" all chunks:
-	for (cChunkCoordsList::const_iterator itr = Chunks.begin(); itr != Chunks.end(); ++itr)
-	{
-		m_World->ChunkStay(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, false);
-	}  // for itr - Chunks[]
+	m_Chunks.clear();
 }
 
 
@@ -1013,16 +1060,17 @@ void cChunkStay::Clear(void)
 
 void cChunkStay::Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cCSLock Lock(m_CS);
+	ASSERT(!m_IsEnabled);
+
 	for (cChunkCoordsList::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
 	{
 		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
 		{
-			// Already "stayed"
+			// Already present
 			return;
 		}
 	}  // for itr - Chunks[]
-	m_World->ChunkStay(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_Chunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 }
 
 
@@ -1031,16 +1079,41 @@ void cChunkStay::Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cChunkStay::Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cCSLock Lock(m_CS);
+	ASSERT(!m_IsEnabled);
+
 	for (cChunkCoordsList::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
 	{
 		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
 		{
 			// Found, un-"stay"
-			m_World->ChunkStay(a_ChunkX, a_ChunkY, a_ChunkZ, false);
+			m_Chunks.erase(itr);
 			return;
 		}
 	}  // for itr - Chunks[]
+}
+
+
+
+
+
+void cChunkStay::Enable(void)
+{
+	ASSERT(!m_IsEnabled);
+	
+	m_World->ChunksStay(*this, true);
+	m_IsEnabled = true;
+}
+
+
+
+
+
+void cChunkStay::Disable(void)
+{
+	ASSERT(m_IsEnabled);
+	
+	m_World->ChunksStay(*this, false);
+	m_IsEnabled = false;
 }
 
 

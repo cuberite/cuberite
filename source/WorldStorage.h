@@ -100,6 +100,9 @@ public:
 	void QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate);  // Queues the chunk for loading; if not loaded, the chunk will be generated if a_Generate is true
 	void QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
+	/// Loads the chunk specified; returns true on success, false on failure
+	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+
 	void UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void UnqueueSave(const cChunkCoords & a_Chunk);
 	
@@ -150,9 +153,6 @@ protected:
 	
 	/// Saves one chunk from the queue (if any queued); returns true if there are more chunks in the save queue
 	bool SaveOneChunk(void);
-	
-	/// Loads the chunk specified; returns true on success, false on failure
-	bool LoadChunk(const cChunkCoords & a_Chunk);
 } ;
 
 

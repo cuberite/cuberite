@@ -60,15 +60,15 @@ cWSSCompact::~cWSSCompact()
 
 bool cWSSCompact::LoadChunk(const cChunkCoords & a_Chunk)
 {
-	cPAKFile * f = LoadPAKFile(a_Chunk);
-	if (f == NULL)
+	AString ChunkData;
+	int UncompressedSize = 0;
+	if (!GetChunkData(a_Chunk, UncompressedSize, ChunkData))
 	{
-		// For some reason we couldn't locate the file
-		LOG("Cannot locate a proper PAK file for chunk [%d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		// The reason for failure is already printed in GetChunkData()
 		return false;
 	}
 	
-	return f->LoadChunk(a_Chunk, m_World);
+	return LoadChunkFromData(a_Chunk, UncompressedSize, ChunkData, m_World);
 }
 
 
@@ -77,6 +77,8 @@ bool cWSSCompact::LoadChunk(const cChunkCoords & a_Chunk)
 
 bool cWSSCompact::SaveChunk(const cChunkCoords & a_Chunk)
 {
+	cCSLock Lock(m_CS);
+	
 	cPAKFile * f = LoadPAKFile(a_Chunk);
 	if (f == NULL)
 	{
@@ -93,6 +95,8 @@ bool cWSSCompact::SaveChunk(const cChunkCoords & a_Chunk)
 
 cWSSCompact::cPAKFile * cWSSCompact::LoadPAKFile(const cChunkCoords & a_Chunk)
 {
+	// ASSUMES that m_CS has been locked
+	
 	// We need to retain this weird conversion code, because some edge chunks are in the wrong PAK file
 	const int LayerX = (int)(floorf((float)a_Chunk.m_ChunkX / 32.0f));
 	const int LayerZ = (int)(floorf((float)a_Chunk.m_ChunkZ / 32.0f));
@@ -130,6 +134,121 @@ cWSSCompact::cPAKFile * cWSSCompact::LoadPAKFile(const cChunkCoords & a_Chunk)
 		m_PAKFiles.pop_back();
 	}
 	return f;
+}
+
+
+
+
+
+bool cWSSCompact::GetChunkData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, AString & a_Data)
+{
+	cCSLock Lock(m_CS);
+	cPAKFile * f = LoadPAKFile(a_Chunk);
+	if (f == NULL)
+	{
+		return false;
+	}
+	return f->GetChunkData(a_Chunk, a_UncompressedSize, a_Data);
+}
+
+
+
+
+
+/*
+// TODO: Rewrite saving to use the same principles as loading
+bool cWSSCompact::SetChunkData(const cChunkCoords & a_Chunk, int a_UncompressedSize, const AString & a_Data)
+{
+	cCSLock Lock(m_CS);
+	cPAKFile * f = LoadPAKFile(a_Chunk);
+	if (f == NULL)
+	{
+		return false;
+	}
+	return f->SetChunkData(a_Chunk, a_UncompressedSize, a_Data);
+}
+*/
+
+
+
+
+
+bool cWSSCompact::EraseChunkData(const cChunkCoords & a_Chunk)
+{
+	cCSLock Lock(m_CS);
+	cPAKFile * f = LoadPAKFile(a_Chunk);
+	if (f == NULL)
+	{
+		return false;
+	}
+	return f->EraseChunkData(a_Chunk);
+}
+
+
+
+
+
+void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World)
+{
+	// Load chests
+	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
+	if (!AllChests.empty())
+	{
+		for (Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
+		{
+			Json::Value & Chest = *itr;
+			cChestEntity * ChestEntity = new cChestEntity(0,0,0, a_World);
+			if (!ChestEntity->LoadFromJson( Chest ) )
+			{
+				LOGERROR("ERROR READING CHEST FROM JSON!" );
+				delete ChestEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( ChestEntity );
+			}
+		}  // for itr - AllChests[]
+	}
+
+	// Load furnaces
+	Json::Value AllFurnaces = a_Value.get("Furnaces", Json::nullValue);
+	if( !AllFurnaces.empty() )
+	{
+		for( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
+		{
+			Json::Value & Furnace = *itr;
+			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0,0,0, a_World);
+			if( !FurnaceEntity->LoadFromJson( Furnace ) )
+			{
+				LOGERROR("ERROR READING FURNACE FROM JSON!" );
+				delete FurnaceEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( FurnaceEntity );
+			}
+		}  // for itr - AllFurnaces[]
+	}
+
+	// Load signs
+	Json::Value AllSigns = a_Value.get("Signs", Json::nullValue);
+	if( !AllSigns.empty() )
+	{
+		for( Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr )
+		{
+			Json::Value & Sign = *itr;
+			cSignEntity * SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0,0,0, a_World);
+			if ( !SignEntity->LoadFromJson( Sign ) )
+			{
+				LOGERROR("ERROR READING SIGN FROM JSON!" );
+				delete SignEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( SignEntity );
+			}
+		}  // for itr - AllSigns[]
+	}
 }
 
 
@@ -214,7 +333,7 @@ cWSSCompact::cPAKFile::~cPAKFile()
 
 
 
-bool cWSSCompact::cPAKFile::LoadChunk(const cChunkCoords & a_Chunk, cWorld * a_World)
+bool cWSSCompact::cPAKFile::GetChunkData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, AString & a_Data)
 {
 	int ChunkX = a_Chunk.m_ChunkX;
 	int ChunkZ = a_Chunk.m_ChunkZ;
@@ -235,7 +354,9 @@ bool cWSSCompact::cPAKFile::LoadChunk(const cChunkCoords & a_Chunk, cWorld * a_W
 		return false;
 	}
 
-	return LoadChunk(a_Chunk, Offset, Header, a_World);
+	a_UncompressedSize = Header->m_UncompressedSize;
+	a_Data.assign(m_DataContents, Offset, Header->m_CompressedSize);
+	return true;
 }
 
 
@@ -259,39 +380,36 @@ bool cWSSCompact::cPAKFile::SaveChunk(const cChunkCoords & a_Chunk, cWorld * a_W
 
 
 
-bool cWSSCompact::cPAKFile::LoadChunk(const cChunkCoords & a_Chunk, int a_Offset, sChunkHeader * a_Header, cWorld * a_World)
+bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World)
 {
 	// Crude data integrity check:
-	if (a_Header->m_UncompressedSize < cChunk::c_BlockDataSize)
+	if (a_UncompressedSize < cChunk::c_BlockDataSize)
 	{
-		LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d out of %d needed), erasing",
+		LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-			a_Header->m_UncompressedSize, cChunk::c_BlockDataSize
+			a_UncompressedSize, cChunk::c_BlockDataSize
 		);
-		EraseChunk(a_Chunk);
-		m_NumDirty++;
+		EraseChunkData(a_Chunk);
 		return false;
 	}
 	
 	// Decompress the data:
 	AString UncompressedData;
-	int errorcode = UncompressString(m_DataContents.data() + a_Offset, a_Header->m_CompressedSize, UncompressedData, a_Header->m_UncompressedSize);
+	int errorcode = UncompressString(a_Data.data(), a_Data.size(), UncompressedData, a_UncompressedSize);
 	if (errorcode != Z_OK)
 	{
-		LOGERROR("Error %d decompressing data for chunk [%d, %d] from file \"%s\"", 
+		LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
 			errorcode,
-			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-			m_FileName.c_str()
+			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);
 		return false;
 	}
 	
-	if (a_Header->m_UncompressedSize != (int)UncompressedData.size())
+	if (a_UncompressedSize != (int)UncompressedData.size())
 	{
-		LOGWARNING("Uncompressed data size differs (exp %d, got %d) for chunk [%d, %d] from file \"%s\"",
-			a_Header->m_UncompressedSize, UncompressedData.size(),
-			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-			m_FileName.c_str()
+		LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+			a_UncompressedSize, UncompressedData.size(),
+			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);
 		return false;
 	}
@@ -299,13 +417,15 @@ bool cWSSCompact::cPAKFile::LoadChunk(const cChunkCoords & a_Chunk, int a_Offset
 	cEntityList      Entities;
 	cBlockEntityList BlockEntities;
 	
-	if (a_Header->m_UncompressedSize > cChunk::c_BlockDataSize )	// We gots some extra data :D
+	if (a_UncompressedSize > cChunk::c_BlockDataSize)
 	{
 		Json::Value root;   // will contain the root value after parsing.
 		Json::Reader reader;
 		if ( !reader.parse( UncompressedData.data() + cChunk::c_BlockDataSize, root, false ) )
 		{
-			LOGERROR("Failed to parse trailing JSON!");
+			LOGERROR("Failed to parse trailing JSON in chunk [%d, %d]!",
+				a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
+			);
 		}
 		else
 		{
@@ -322,7 +442,7 @@ bool cWSSCompact::cPAKFile::LoadChunk(const cChunkCoords & a_Chunk, int a_Offset
 
 
 
-void cWSSCompact::cPAKFile::EraseChunk(const cChunkCoords & a_Chunk)
+bool cWSSCompact::cPAKFile::EraseChunkData(const cChunkCoords & a_Chunk)
 {
 	int ChunkX = a_Chunk.m_ChunkX;
 	int ChunkZ = a_Chunk.m_ChunkZ;
@@ -334,10 +454,12 @@ void cWSSCompact::cPAKFile::EraseChunk(const cChunkCoords & a_Chunk)
 			m_DataContents.erase(Offset, (*itr)->m_CompressedSize);
 			delete *itr;
 			itr = m_ChunkHeaders.erase(itr);
-			return;
+			return true;
 		}
 		Offset += (*itr)->m_CompressedSize;
 	}
+	
+	return false;
 }
 
 
@@ -376,7 +498,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	}
 	
 	// Erase any existing data for the chunk:
-	EraseChunk(a_Chunk);
+	EraseChunkData(a_Chunk);
 	
 	// Save the header:
 	sChunkHeader * Header = new sChunkHeader;
@@ -433,73 +555,6 @@ void cWSSCompact::cPAKFile::SynchronizeFile(void)
 		return;
 	}
 	m_NumDirty = 0;
-}
-
-
-
-
-
-void cWSSCompact::cPAKFile::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World)
-{
-	// Load chests
-	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
-	if (!AllChests.empty())
-	{
-		for (Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
-		{
-			Json::Value & Chest = *itr;
-			cChestEntity * ChestEntity = new cChestEntity(0,0,0, a_World);
-			if (!ChestEntity->LoadFromJson( Chest ) )
-			{
-				LOGERROR("ERROR READING CHEST FROM JSON!" );
-				delete ChestEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( ChestEntity );
-			}
-		}  // for itr - AllChests[]
-	}
-
-	// Load furnaces
-	Json::Value AllFurnaces = a_Value.get("Furnaces", Json::nullValue);
-	if( !AllFurnaces.empty() )
-	{
-		for( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
-		{
-			Json::Value & Furnace = *itr;
-			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0,0,0, a_World);
-			if( !FurnaceEntity->LoadFromJson( Furnace ) )
-			{
-				LOGERROR("ERROR READING FURNACE FROM JSON!" );
-				delete FurnaceEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( FurnaceEntity );
-			}
-		}  // for itr - AllFurnaces[]
-	}
-
-	// Load signs
-	Json::Value AllSigns = a_Value.get("Signs", Json::nullValue);
-	if( !AllSigns.empty() )
-	{
-		for( Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr )
-		{
-			Json::Value & Sign = *itr;
-			cSignEntity * SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0,0,0, a_World);
-			if ( !SignEntity->LoadFromJson( Sign ) )
-			{
-				LOGERROR("ERROR READING SIGN FROM JSON!" );
-				delete SignEntity;
-			}
-			else
-			{
-				a_BlockEntities.push_back( SignEntity );
-			}
-		}  // for itr - AllSigns[]
-	}
 }
 
 

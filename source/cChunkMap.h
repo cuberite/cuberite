@@ -83,10 +83,16 @@ public:
 	/// Touches the chunk, causing it to be loaded or generated
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
+	/// Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before)
+	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	/// Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid()
+	void LoadChunks(const cChunkCoordsList & a_Chunks);
+
 	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
-	/// Marks (a_Stay == true) or unmarks (a_Stay == false) a chunk as non-unloadable; to be used only by cChunkStay!
-	void ChunkStay(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Stay = true);
+	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable; to be used only by cChunkStay!
+	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
@@ -170,8 +176,9 @@ private:
 
 	cWorld * m_World;
 
-	cChunkPtr GetChunk     ( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ );  // Also queues the chunk for loading if not valid; doesn't generate
+	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
+	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
+	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Doesn't load, doesn't generate
 };
 
 
@@ -179,7 +186,9 @@ private:
 
 
 /** Makes chunks stay loaded until this object is cleared or destroyed
-Works by setting internal flags in the cChunk that it should not be unloaded
+Works by setting internal flags in the cChunk that it should not be unloaded.
+To optimize for speed, cChunkStay has an Enabled flag, it will "stay" the chunks only when enabled and it will refuse manipulations when enabled
+The object itself is not made thread-safe, it's supposed to be used from a single thread only.
 */
 class cChunkStay
 {
@@ -192,11 +201,18 @@ public:
 	void Add(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
+	void Enable(void);
+	void Disable(void);
+	
+	// Allow cChunkStay be passed to functions expecting a const cChunkCoordsList &
+	operator const cChunkCoordsList(void) const {return m_Chunks; }
+	
 protected:
 
 	cWorld * m_World;
 	
-	cCriticalSection m_CS;
+	bool m_IsEnabled;
+	
 	cChunkCoordsList m_Chunks;
 } ;
 

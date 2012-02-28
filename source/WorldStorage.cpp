@@ -335,7 +335,8 @@ bool cWorldStorage::LoadOneChunk(void)
 		}
 		HasMore = (m_LoadQueue.size() > 0);
 	}
-	if (ShouldLoad && !LoadChunk(cChunkCoords(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ)))
+	
+	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ))
 	{
 		if (ToLoad.m_Generate)
 		{
@@ -389,22 +390,26 @@ bool cWorldStorage::SaveOneChunk(void)
 
 
 
-bool cWorldStorage::LoadChunk(const cChunkCoords & a_Chunk)
+bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	if (m_World->IsChunkValid(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ))
+	if (m_World->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
 	{
 		// Already loaded (can happen, since the queue is async)
 		return true;
 	}
 	
-	if (m_SaveSchema->LoadChunk(a_Chunk))
+	cChunkCoords Coords(a_ChunkX, a_ChunkY, a_ChunkZ);
+
+	// First try the schema that is used for saving
+	if (m_SaveSchema->LoadChunk(Coords))
 	{
 		return true;
 	}
 	
+	// If it didn't have the chunk, try all the other schemas:
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
 	{
-		if (((*itr) != m_SaveSchema) && (*itr)->LoadChunk(a_Chunk))
+		if (((*itr) != m_SaveSchema) && (*itr)->LoadChunk(Coords))
 		{
 			return true;
 		}
