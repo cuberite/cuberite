@@ -1101,7 +1101,7 @@ void cChunkStay::Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	ASSERT(!m_IsEnabled);
 
-	for (cChunkCoordsList::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
+	for (cChunkCoordsList::iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
 	{
 		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
 		{
