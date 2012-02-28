@@ -21,7 +21,7 @@ typedef std::list< ChunkCoord > ChunkCoordList;
 const int QUEUE_WARNING_LIMIT = 1000;
 
 /// If the generation queue size exceeds this number, chunks with no clients will be skipped
-const int QUEUE_SKIP_LIMIT = 50;
+const int QUEUE_SKIP_LIMIT = 500;
 
 
 
@@ -155,12 +155,15 @@ void cChunkGenerator::Execute(void)
 		Lock.Unlock();			// Unlock ASAP
 		m_evtRemoved.Set();
 
-		if (
-			m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ) ||
-			(SkipEnabled && m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
-		)
+		if (m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
 		{
-			// Already generated / overload-skip, ignore request
+			// Already generated, ignore request
+			continue;
+		}
+		
+		if (SkipEnabled && !m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
+		{
+			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d, %d] (HasClients: %d)", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 			continue;
 		}
 		
