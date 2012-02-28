@@ -782,6 +782,11 @@ bool cChunkMap::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 			// Already loaded
 			return true;
 		}
+		if (Chunk->HasLoadFailed())
+		{
+			// Already tried loading and it failed
+			return false;
+		}
 	}
 	return m_World->GetStorage().LoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
@@ -797,6 +802,21 @@ void cChunkMap::LoadChunks(const cChunkCoordsList & a_Chunks)
 	{
 		LoadChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
 	}  // for itr - a_Chunks[]
+}
+
+
+
+
+
+void cChunkMap::ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	Chunk->MarkLoadFailed();
 }
 
 

@@ -121,6 +121,7 @@ public:
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk is valid (loaded / generated)
 	void SetValid(bool a_SendToClients = true);   // Also wakes up all clients attached to this chunk to let them finish logging in
 	bool IsDirty(void) const {return m_IsDirty; }  // Returns true if the chunk has changed since it was last saved
+	bool HasLoadFailed(void) const {return m_HasLoadFailed; }  // Returns true if the chunk failed to load and hasn't been generated since then
 	bool CanUnload(void);
 	
 	/*
@@ -133,6 +134,7 @@ public:
 	void MarkSaving(void);  // Marks the chunk as being saved. 
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
+	void MarkLoadFailed(void);  // Marks the chunk as failed to load. Ignored is the chunk is already valid
 	
 	/// Gets all chunk data, calls the a_Callback's methods for each data type
 	void GetAllData(cChunkDataCallback * a_Callback);
@@ -231,6 +233,7 @@ private:
 	bool m_IsValid;  // True if the chunk is loaded / generated
 	bool m_IsDirty;  // True if the chunk has changed since it was last saved
 	bool m_IsSaving;  // True if the chunk is being saved
+	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 	
 	cCriticalSection              m_CSBlockLists;
 	std::map< unsigned int, int > m_ToTickBlocks;

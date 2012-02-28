@@ -204,6 +204,20 @@ void cChunk::MarkLoaded(void)
 
 
 
+void cChunk::MarkLoadFailed(void)
+{
+	if (m_IsValid)
+	{
+		return;
+	}
+	
+	m_HasLoadFailed = true;
+}
+
+
+
+
+
 void cChunk::GetAllData(cChunkDataCallback * a_Callback)
 {
 	a_Callback->BlockData(m_BlockData);
@@ -262,6 +276,8 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	CreateBlockEntities();
 
 	CalculateHeightmap();
+	
+	m_HasLoadFailed = false;
 }
 
 

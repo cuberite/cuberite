@@ -415,6 +415,9 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 		}
 	}
 	
+	// Notify the chunk owner that the chunk failed to load (sets cChunk::m_HasLoadFailed to true):
+	m_World->ChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
+	
 	return false;
 }
 

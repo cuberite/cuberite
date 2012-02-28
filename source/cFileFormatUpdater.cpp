@@ -2,20 +2,31 @@
 #include "Globals.h"
 
 #include "cFileFormatUpdater.h"
-#include "cMCLogger.h"
 #include "Vector3d.h"
 #include "Vector3f.h"
 
 #include "cItem.h"
 #include <json/json.h>
 
+
+
+
+
 typedef std::list< std::string > StringList;
 StringList GetDirectoryContents( const char* a_Directory );
+
+
+
+
 
 void cFileFormatUpdater::UpdateFileFormat()
 {
 	UpdatePlayersOfWorld("world");
 }
+
+
+
+
 
 // Convert player .bin files to JSON
 void cFileFormatUpdater::UpdatePlayersOfWorld( const char* a_WorldName )
@@ -138,10 +149,6 @@ void cFileFormatUpdater::PlayerBINtoJSON( const char* a_FileName )
 
 
 
-
-
-
-
 // Helper function
 StringList GetDirectoryContents( const char* a_Directory )
 {
@@ -178,3 +185,7 @@ StringList GetDirectoryContents( const char* a_Directory )
 
 	return AllFiles;
 }
+
+
+
+

@@ -94,6 +94,21 @@ void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, ch
 void cWorldGenerator::PostGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	// Check the chunk just generated and all its 8-way neighbors
+
+	// Make the chunks stay loaded in the surrounding 5x5 area:
+	cChunkStay Stay(m_World);
+	Stay.Add(a_ChunkX, a_ChunkY, a_ChunkZ);
+	for (int x = -2; x <= 2; x++)
+	{
+		for (int z = -2; z <= 2; z++)
+		{
+			Stay.Add(a_ChunkX + x, a_ChunkY, a_ChunkZ + z);
+		}  // for z
+	}  // for x
+	Stay.Enable();
+	
+	m_World->LoadChunks(Stay);
+	
 	CheckNeighbors(a_ChunkX, a_ChunkY, a_ChunkZ);
 	for (int i = 0; i < ARRAYCOUNT(g_NeighborCoords); i++)
 	{
