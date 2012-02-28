@@ -922,7 +922,7 @@ void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude)
 
 
 
-void cWorld::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude)
+void cWorld::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Packet, a_Exclude);
 }

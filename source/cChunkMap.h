@@ -31,10 +31,10 @@ public:
 
 	// Direct action methods:
 	/// Broadcast a_Packet to all clients in the chunk specified
-	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
+	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
 	
 	/// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
-	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
+	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
 	/// a_Player rclked block entity at the coords specified, handle it
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);

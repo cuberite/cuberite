@@ -157,7 +157,7 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 
 
 
-void cChunkMap::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket & a_Packet, cClientHandle * a_Exclude)
+void cChunkMap::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude)
 {
 	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
 	
@@ -175,7 +175,7 @@ void cChunkMap::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPack
 
 
 
-void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude)
+void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket * a_Packet, cClientHandle * a_Exclude)
 {
 	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
 	
