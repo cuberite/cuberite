@@ -148,8 +148,11 @@ cClientHandle::~cClientHandle()
 	// Remove from cSocketThreads, we're not to be called anymore:
 	cRoot::Get()->GetServer()->ClientDestroying(this);
 	
-	m_LoadedChunks.clear();
-	m_ChunksToSend.clear();
+	{
+		cCSLock Lock(m_CSChunkLists);
+		m_LoadedChunks.clear();
+		m_ChunksToSend.clear();
+	}
 
 	if (m_Player != NULL)
 	{
@@ -226,12 +229,16 @@ cClientHandle::~cClientHandle()
 
 void cClientHandle::Destroy()
 {
-	m_bDestroyed = true;
+	// Setting m_bDestroyed was moved to the bottom of Destroy(), 
+	// otherwise the destructor may be called within another thread before the client is removed from chunks
+	// http://forum.mc-server.org/showthread.php?tid=366
 	
 	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
 	{
 		RemoveFromAllChunks();
 	}
+
+	m_bDestroyed = true;
 }
 
 
