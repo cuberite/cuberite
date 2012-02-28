@@ -218,14 +218,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cChunkGenerator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChunkGenerator.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cChunkMap.cpp"
 				>
 			</File>
@@ -473,22 +465,6 @@
 			</File>
 			<File
 				RelativePath="..\source\cWorld.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWorldGenerator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWorldGenerator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWorldGenerator_Test.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWorldGenerator_Test.h"
 				>
 			</File>
 			<File
@@ -1660,6 +1636,34 @@
 				</File>
 				<File
 					RelativePath="..\source\WSSCompact.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Generating"
+				>
+				<File
+					RelativePath="..\source\cChunkGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cChunkGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cWorldGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cWorldGenerator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cWorldGenerator_Test.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cWorldGenerator_Test.h"
 					>
 				</File>
 			</Filter>
