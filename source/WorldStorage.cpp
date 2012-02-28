@@ -199,17 +199,20 @@ int cWorldStorage::GetSaveQueueLength(void)
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
 {
 	// Queues the chunk for loading; if not loaded, the chunk will be generated
-	cCSLock Lock(m_CSQueues);
-	
-	// Check if already in the queue:
-	for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_Generate == a_Generate))
+		cCSLock Lock(m_CSQueues);
+		
+		// Check if already in the queue:
+		for (sChunkLoadQueue::iterator itr = m_LoadQueue.begin(); itr != m_LoadQueue.end(); ++itr)
 		{
-			return;
+			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_Generate == a_Generate))
+			{
+				return;
+			}
 		}
+		m_LoadQueue.push_back(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
 	}
-	m_LoadQueue.push_back(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
+	
 	m_Event.Set();
 }
 
@@ -219,9 +222,11 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, boo
 
 void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cCSLock Lock(m_CSQueues);
-	m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
-	m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+	{
+		cCSLock Lock(m_CSQueues);
+		m_SaveQueue.remove   (cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));  // Don't add twice
+		m_SaveQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+	}
 	m_Event.Set();
 }
 
@@ -239,6 +244,7 @@ void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 			continue;
 		}
 		m_LoadQueue.erase(itr);
+		Lock.Unlock();
 		m_evtRemoved.Set();
 		return;
 	}  // for itr - m_LoadQueue[]
@@ -250,8 +256,10 @@ void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 {
-	cCSLock Lock(m_CSQueues);
-	m_SaveQueue.remove(a_Chunk);
+	{
+		cCSLock Lock(m_CSQueues);
+		m_SaveQueue.remove(a_Chunk);
+	}
 	m_evtRemoved.Set();
 }
 

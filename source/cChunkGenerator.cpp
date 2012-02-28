@@ -84,24 +84,26 @@ void cChunkGenerator::Stop(void)
 
 void cChunkGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cCSLock Lock(m_CS);
-	
-	// Check if it is already in the queue:
-	for (cChunkCoordsList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
+		cCSLock Lock(m_CS);
+		
+		// Check if it is already in the queue:
+		for (cChunkCoordsList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 		{
-			// Already in the queue, bail out
-			return;
+			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
+			{
+				// Already in the queue, bail out
+				return;
+			}
+		}  // for itr - m_Queue[]
+		
+		// Add to queue, issue a warning if too many:
+		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
+		{
+			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (%i)", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
-	}  // for itr - m_Queue[]
-	
-	// Add to queue, issue a warning if too many:
-	if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
-	{
-		LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (%i)", a_ChunkX, a_ChunkZ, m_Queue.size());
+		m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	}
-	m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	
 	m_Event.Set();
 }

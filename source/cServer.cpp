@@ -714,9 +714,11 @@ void cServer::cNotifyWriteThread::Execute(void)
 
 void cServer::cNotifyWriteThread::NotifyClientWrite(const cClientHandle * a_Client)
 {
-	cCSLock Lock(m_CS);
-	m_Clients.remove(const_cast<cClientHandle *>(a_Client));  // Put it there only once
-	m_Clients.push_back(const_cast<cClientHandle *>(a_Client));
+	{
+		cCSLock Lock(m_CS);
+		m_Clients.remove(const_cast<cClientHandle *>(a_Client));  // Put it there only once
+		m_Clients.push_back(const_cast<cClientHandle *>(a_Client));
+	}
 	m_Event.Set();
 }
 
