@@ -393,99 +393,105 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 	}
 
 	cCSLock Lock2(m_CSBlockLists);
-	std::map< unsigned int, int > ToTickBlocks = m_ToTickBlocks;
-	m_ToTickBlocks.clear();
+	unsigned int NumTickBlocks = m_ToTickBlocks.size();
 	Lock2.Unlock();
-	
-	bool isRedstone = false;
-	for( std::map< unsigned int, int>::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
+
+	if( NumTickBlocks > 0 )
 	{
-		if( (*itr).second < 0 ) continue;
-		unsigned int index = (*itr).first;
-		int Y = index % 128;
-		int Z = (index / 128) % 16;
-		int X = (index / (128*16));
-
-		char BlockID = GetBlock( index );
-		switch( BlockID )
+		Lock2.Lock();
+		std::deque< unsigned int > ToTickBlocks = m_ToTickBlocks;
+		m_ToTickBlocks.clear();
+		Lock2.Unlock();
+	
+		bool isRedstone = false;
+		for( std::deque< unsigned int >::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
 		{
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_WIRE:
-			{
-				isRedstone = true;
-			}
-		case E_BLOCK_CACTUS:
-		case E_BLOCK_REEDS:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_MINECART_TRACKS:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_CROPS:
-		case E_BLOCK_SAPLING:
-		case E_BLOCK_YELLOW_FLOWER:
-		case E_BLOCK_RED_ROSE:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
-			{
-				if( GetBlock( X, Y-1, Z ) == E_BLOCK_AIR )
-				{
-					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
+			unsigned int index = (*itr);
+			int Y = index % 128;
+			int Z = (index / 128) % 16;
+			int X = (index / (128*16));
 
-					int wX, wY, wZ;
-					PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
+			char BlockID = GetBlock( index );
+			switch( BlockID )
+			{
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_WIRE:
+				{
+					isRedstone = true;
+				}
+			case E_BLOCK_CACTUS:
+			case E_BLOCK_REEDS:
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_MINECART_TRACKS:
+			case E_BLOCK_SIGN_POST:
+			case E_BLOCK_CROPS:
+			case E_BLOCK_SAPLING:
+			case E_BLOCK_YELLOW_FLOWER:
+			case E_BLOCK_RED_ROSE:
+			case E_BLOCK_RED_MUSHROOM:
+			case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
+				{
+					if( GetBlock( X, Y-1, Z ) == E_BLOCK_AIR )
+					{
+						SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
 
-					m_World->GetSimulatorManager()->WakeUp(wX, wY, wZ);
-					if (isRedstone) {
-						cRedstone Redstone(m_World);
-						Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
+						int wX, wY, wZ;
+						PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
+
+						m_World->GetSimulatorManager()->WakeUp(wX, wY, wZ);
+						if (isRedstone) {
+							cRedstone Redstone(m_World);
+							Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
+						}
+						cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
+						Pickup->Initialize( m_World );
 					}
-					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
-					Pickup->Initialize( m_World );
 				}
-			}
-			break;
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON:
-				isRedstone = true;
-		case E_BLOCK_TORCH:
-			{
-				char Dir = cTorch::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
-				LOG("MetaData: %i", Dir );
-				int XX = X + m_PosX*16;
-				char YY = (char)Y;
-				int ZZ = Z + m_PosZ*16;
-				AddDirection( XX, YY, ZZ, Dir, true );
-				if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+				break;
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+					isRedstone = true;
+			case E_BLOCK_TORCH:
 				{
-					SetBlock( X, Y, Z, 0, 0 );
-					if (isRedstone) {
-						cRedstone Redstone(m_World);
-						Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
+					char Dir = cTorch::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
+					LOG("MetaData: %i", Dir );
+					int XX = X + m_PosX*16;
+					char YY = (char)Y;
+					int ZZ = Z + m_PosZ*16;
+					AddDirection( XX, YY, ZZ, Dir, true );
+					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+					{
+						SetBlock( X, Y, Z, 0, 0 );
+						if (isRedstone) {
+							cRedstone Redstone(m_World);
+							Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
+						}
+						cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
+						Pickup->Initialize( m_World );
 					}
-					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
-					Pickup->Initialize( m_World );
 				}
-			}
-			break;
-		case E_BLOCK_LADDER:
-			{
-				char Dir = cLadder::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
-				int XX = X + m_PosX*16;
-				char YY = (char)Y;
-				int ZZ = Z + m_PosZ*16;
-				AddDirection( XX, YY, ZZ, Dir, true );
-				if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+				break;
+			case E_BLOCK_LADDER:
 				{
-					SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
-					cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
-					Pickup->Initialize( m_World );
+					char Dir = cLadder::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
+					int XX = X + m_PosX*16;
+					char YY = (char)Y;
+					int ZZ = Z + m_PosZ*16;
+					AddDirection( XX, YY, ZZ, Dir, true );
+					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+					{
+						SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
+						cPickup* Pickup = new cPickup( (X+m_PosX*16) * 32 + 16, (Y+m_PosY*128) * 32 + 16, (Z+m_PosZ*16) * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
+						Pickup->Initialize( m_World );
+					}
 				}
-			}
-			break;
-		default:
-			break;
-		};
+				break;
+			default:
+				break;
+			};
+		}
 	}
 
 	// Tick dem blocks
@@ -899,13 +905,13 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 		}
 	}
 
-	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z ) ]++;
-	m_ToTickBlocks[ MakeIndex( a_X+1, a_Y, a_Z ) ]++;
-	m_ToTickBlocks[ MakeIndex( a_X-1, a_Y, a_Z ) ]++;
-	m_ToTickBlocks[ MakeIndex( a_X, a_Y+1, a_Z ) ]++;
-	m_ToTickBlocks[ MakeIndex( a_X, a_Y-1, a_Z ) ]++;
-	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z+1 ) ]++;
-	m_ToTickBlocks[ MakeIndex( a_X, a_Y, a_Z-1 ) ]++;
+	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
+	m_ToTickBlocks.push_back( MakeIndex( a_X+1, a_Y, a_Z ) );
+	m_ToTickBlocks.push_back( MakeIndex( a_X-1, a_Y, a_Z ) );
+	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y+1, a_Z ) );
+	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y-1, a_Z ) );
+	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y, a_Z+1 ) );
+	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y, a_Z-1 ) );
 
 	cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX * 16, a_Y + m_PosY * 128, a_Z + m_PosZ * 16 );
 	if( BlockEntity )

@@ -236,7 +236,7 @@ private:
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 	
 	cCriticalSection              m_CSBlockLists;
-	std::map< unsigned int, int > m_ToTickBlocks;
+	std::deque< unsigned int > m_ToTickBlocks;
 	std::vector< unsigned int >   m_PendingSendBlocks;
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
