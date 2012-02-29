@@ -1057,6 +1057,9 @@ void cWorld::SetMaxPlayers(int iMax)
 void cWorld::AddPlayer( cPlayer* a_Player )
 {
 	cCSLock Lock(m_CSPlayers);
+	
+	ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
+	
 	m_Players.remove( a_Player );  // Make sure the player is registered only once
 	m_Players.push_back( a_Player );
 }
