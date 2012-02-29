@@ -905,12 +905,13 @@ const double & cWorld::GetSpawnY(void)
 
 
 
-void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude)
+void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if (((*itr)->GetClientHandle() == a_Exclude) || !(*itr)->GetClientHandle()->IsLoggedIn() )
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -1187,7 +1188,8 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 	cCSLock Lock(m_CSPlayers);
 	for ( cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if (((*itr)->GetClientHandle() != NULL) && !((*itr)->GetClientHandle()->IsDestroyed()))
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch != NULL) && !ch->IsDestroyed())
 		{
 			cPacket_PlayerListItem PlayerListItem((*itr)->GetColor() + (*itr)->GetName(), true, (*itr)->GetClientHandle()->GetPing());
 			a_DestPlayer->GetClientHandle()->Send( PlayerListItem );

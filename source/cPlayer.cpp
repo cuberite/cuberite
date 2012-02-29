@@ -124,7 +124,12 @@ void cPlayer::Initialize( cWorld* a_World )
 
 cPlayer::~cPlayer(void)
 {
+	LOG("Deleting cPlayer \"%s\" @ %p", m_pState->PlayerName.c_str(), this);
+	
 	SaveToDisk();
+
+	m_World->RemovePlayer( this );
+
 	m_ClientHandle = NULL;
 	
 	CloseWindow(-1);
@@ -134,7 +139,8 @@ cPlayer::~cPlayer(void)
 	delete m_CreativeInventory;
 
 	delete m_pState;
-	m_World->RemovePlayer( this );
+	
+	LOG("Player %p deleted", this);
 }
 
 
