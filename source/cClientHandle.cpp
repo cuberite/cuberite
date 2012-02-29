@@ -261,6 +261,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 void cClientHandle::Authenticate(void)
 {
+	ASSERT( m_Player == NULL );
 	// Spawn player (only serversided, so data is loaded)
 	m_Player = new cPlayer(this, GetUsername());
 
