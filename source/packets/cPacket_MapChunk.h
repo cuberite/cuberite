@@ -18,6 +18,15 @@ class cPacket_MapChunk :
 {
 public:
 	cPacket_MapChunk()
+#if (MINECRAFT_1_2_2 == 1 )
+		: m_PosX( 0 )
+		, m_PosZ( 0 )
+		, m_bContiguous( false )
+		, m_BitMap1( 0 )
+		, m_BitMap2( 0 )
+		, m_CompressedSize( 0 )
+		, m_UnusedInt( 0 )
+#else
 		: m_PosX( 0 )
 		, m_PosY( 0 )
 		, m_PosZ( 0 )
@@ -25,6 +34,7 @@ public:
 		, m_SizeY( 0 )
 		, m_SizeZ( 0 )
 		, m_CompressedSize( 0 )
+#endif
 		, m_CompressedData( 0 )
 	{ m_PacketID = E_MAP_CHUNK; m_CompressedData = 0; }
 	
@@ -34,6 +44,16 @@ public:
 
 	virtual void Serialize(AString & a_Data) const override;
 
+#if (MINECRAFT_1_2_2 == 1 )
+	int m_PosX;
+	int m_PosZ;
+	bool m_bContiguous; // le fuck?
+	short m_BitMap1;
+	short m_BitMap2;
+	int m_CompressedSize;
+	int m_UnusedInt;
+	static const unsigned int c_Size = 1 + 4 + 4 + 1 + 2 + 2 + 4 + 4;
+#else
 	int m_PosX; // In block coordinates
 	short m_PosY;
 	int m_PosZ;
@@ -42,6 +62,8 @@ public:
 	char m_SizeZ;
 	int m_CompressedSize;
 	static const unsigned int c_Size = 1 + 4 + 2 + 4 + 1 + 1 + 1 + 4;
+#endif
+
 
 	char * m_CompressedData;
 	
