@@ -36,14 +36,22 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 
 	m_UnusedInt = 0;
 
-	for( int i = 0; i < 16; ++i )
-	{
-		m_BitMap1 |= (1 << i);
-	}
-
 	unsigned int DataSize = 16 * (4096 + 2048 + 2048 + 2048);
 	char* AllData = new char[ DataSize ];
 	memset( AllData, 0, DataSize );
+
+	unsigned int iterator = 0;
+	for( int i = 0; i < 8; ++i ) // Old world is only 8 high
+	{
+		m_BitMap1 |= (1 << i);
+		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
+		{
+			AllData[iterator] = a_Chunk->GetBlock( x, y+i*16, z );
+			++iterator;
+		}
+
+		//iterator+=2048*2; // Ignore light and stuff
+	}
 
 	uLongf CompressedSize = compressBound( DataSize );
 	char * CompressedBlockData = new char[CompressedSize];
