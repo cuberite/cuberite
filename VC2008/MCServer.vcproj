@@ -1383,6 +1383,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cRedstoneSimulator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cRedstoneSimulator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cSandSimulator.cpp"
 					>
 				</File>
