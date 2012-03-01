@@ -454,6 +454,9 @@
     <Filter Include="cWebAdmin\cWebPlugin\cWebPlugin">
       <UniqueIdentifier>{31f2d7f9-9684-456b-9d70-011a10e894fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Simulator\cSimulator\cRedstoneSimulator">
+      <UniqueIdentifier>{4b3b7b43-8e8b-4823-b112-2259fdfff7d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -912,6 +915,9 @@
     <ClCompile Include="..\source\WSSCompact.cpp" />
     <ClCompile Include="..\source\StringCompression.cpp" />
     <ClCompile Include="..\source\LightingThread.cpp" />
+    <ClCompile Include="..\source\cRedstoneSimulator.cpp">
+      <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1408,6 +1414,9 @@
     <ClInclude Include="..\source\WorldStorage.h" />
     <ClInclude Include="..\source\StringCompression.h" />
     <ClInclude Include="..\source\LightingThread.h" />
+    <ClInclude Include="..\source\cRedstoneSimulator.h">
+      <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

@@ -19,6 +19,7 @@
 #include "cLavaSimulator.h"
 #include "cFireSimulator.h"
 #include "cSandSimulator.h"
+#include "cRedstoneSimulator.h"
 #include "cChicken.h"
 #include "cSpider.h"
 #include "cCow.h" //cow
@@ -160,6 +161,7 @@ cWorld::~cWorld()
 	delete m_WaterSimulator;
 	delete m_LavaSimulator;
 	delete m_FireSimulator;
+	delete m_RedstoneSimulator;
 
 	m_Generator.Stop();
 
@@ -248,12 +250,14 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_LavaSimulator = new cLavaSimulator( this );
 	m_SandSimulator = new cSandSimulator(this);
 	m_FireSimulator = new cFireSimulator(this);
+	m_RedstoneSimulator = new cRedstoneSimulator(this);
 
 	m_SimulatorManager = new cSimulatorManager();
 	m_SimulatorManager->RegisterSimulator(m_WaterSimulator, 6);
 	m_SimulatorManager->RegisterSimulator(m_LavaSimulator, 12);
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
+	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
 	memset( g_BlockLightValue, 0x0, 128 );
 	memset( g_BlockSpreadLightFalloff, 0xf, 128 ); // 0xf means total falloff

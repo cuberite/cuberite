@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vector3i.h"
+
 class cTorch												//tolua_export
 {															//tolua_export
 public:
@@ -47,5 +49,46 @@ public:
 		};
 		return 0x0;
 	}														//tolua_export
+
+	static bool IsAttachedTo( const Vector3i & a_TorchPos, char a_TorchMeta, const Vector3i & a_BlockPos )
+	{
+		switch( a_TorchMeta )
+		{
+		case 0x0:
+		case 0x5:	// On floor
+			if( (a_TorchPos - a_BlockPos).Equals( Vector3i(0, 1, 0 ) ) )
+			{
+				return true;
+			}
+			break;
+		case 0x4: // South -Z
+			if( (a_TorchPos - a_BlockPos).Equals( Vector3i(0, 0, -1 ) ) )
+			{
+				return true;
+			}
+			break;
+		case 0x3: // North +Z
+			if( (a_TorchPos - a_BlockPos).Equals( Vector3i(0, 0, 1 ) ) )
+			{
+				return true;
+			}
+			break;
+		case 0x2: // West -X
+			if( (a_TorchPos - a_BlockPos).Equals( Vector3i(-1, 0, 0 ) ) )
+			{
+				return true;
+			}
+			break;
+		case 0x1: // East +X
+			if( (a_TorchPos - a_BlockPos).Equals( Vector3i( 1, 0, 0 ) ) )
+			{
+				return true;
+			}
+			break;
+		default:
+			break;
+		};
+		return false;
+	}
 
 };															//tolua_export

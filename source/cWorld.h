@@ -14,6 +14,7 @@
 #include "cChunkMap.h"
 #include "WorldStorage.h"
 #include "cChunkGenerator.h"
+#include "Vector3i.h"
 
 
 
@@ -25,6 +26,7 @@ class cFireSimulator;
 class cWaterSimulator;
 class cLavaSimulator;
 class cSandSimulator;
+class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
@@ -147,8 +149,11 @@ public:
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
 	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
 	char GetBlock( int a_X, int a_Y, int a_Z );										//tolua_export
+	char GetBlock( const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); } //tolua_export
 	char GetBlockMeta( int a_X, int a_Y, int a_Z );									//tolua_export
+	char GetBlockMeta( const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); } //tolua_export
 	void SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData );				//tolua_export
+	void SetBlockMeta( const Vector3i & a_Pos, char a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
 	bool DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem );				//tolua_export
 	void SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer* a_Player );				//tolua_export
 
@@ -237,11 +242,12 @@ private:
 	friend class cRedstone;
 	std::vector<int> m_RSList;
 
-	cSimulatorManager * m_SimulatorManager;
-	cSandSimulator *    m_SandSimulator;
-	cWaterSimulator *   m_WaterSimulator;
-	cLavaSimulator *    m_LavaSimulator;
-	cFireSimulator *    m_FireSimulator;
+	cSimulatorManager *  m_SimulatorManager;
+	cSandSimulator *     m_SandSimulator;
+	cWaterSimulator *    m_WaterSimulator;
+	cLavaSimulator *     m_LavaSimulator;
+	cFireSimulator *     m_FireSimulator;
+	cRedstoneSimulator * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSClients;
 	cCriticalSection m_CSEntities;

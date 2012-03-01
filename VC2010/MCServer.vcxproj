@@ -355,6 +355,7 @@
     <ClCompile Include="..\source\cPlugin_NewLua.cpp" />
     <ClCompile Include="..\Source\cRecipeChecker.cpp" />
     <ClCompile Include="..\source\cRedstone.cpp" />
+    <ClCompile Include="..\source\cRedstoneSimulator.cpp" />
     <ClCompile Include="..\Source\cReferenceManager.cpp" />
     <ClCompile Include="..\Source\cRoot.cpp" />
     <ClCompile Include="..\source\cSandSimulator.cpp" />
@@ -530,6 +531,7 @@
     <ClInclude Include="..\source\cPlugin_NewLua.h" />
     <ClInclude Include="..\Source\cRecipeChecker.h" />
     <ClInclude Include="..\source\cRedstone.h" />
+    <ClInclude Include="..\source\cRedstoneSimulator.h" />
     <ClInclude Include="..\Source\cReferenceManager.h" />
     <ClInclude Include="..\Source\cRoot.h" />
     <ClInclude Include="..\source\cSandSimulator.h" />

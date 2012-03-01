@@ -1555,6 +1555,8 @@ build/WSSCompact.o : source/WSSCompact.cpp
 build/StringCompression.o : source/StringCompression.cpp
 	$(CC) $(CC_OPTIONS) source/StringCompression.cpp -c $(INCLUDE) -o build/StringCompression.o	
 
+build/cRedstoneSimulator.o : source/cRedstoneSimulator.cpp
+ 	$(CC) $(CC_OPTIONS) source/cRedstoneSimulator.cpp -c $(INCLUDE) -o build/cRedstoneSimulator.o	
 
 # Template: copy and delete the "# "; insert filenames
 # build/.o : source/.cpp

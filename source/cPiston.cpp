@@ -56,7 +56,8 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 	char pistonMeta = m_World->GetBlockMeta( pistx, pisty, pistz );
 	char isSticky = (char)(pistonBlock == E_BLOCK_STICKY_PISTON) * 8;
 	bool recalc = false;
-	if (pistonMeta < 6) {// only extend if piston is not already extended 
+	if ( (pistonMeta & 0x8) == 0x0 ) // only extend if piston is not already extended 
+	{
 		unsigned short dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
 		if(dist>9000) return; // too many blocks
 	
@@ -89,7 +90,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 		Action.m_Byte2	=	pistonMeta;
 
 		m_World->BroadcastToChunkOfBlock(pistx, pisty, pistz, &Action);
-		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 8 );
+		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
 
 		int extx = pistx;
 		int exty = pisty;

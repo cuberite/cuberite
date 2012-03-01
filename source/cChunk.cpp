@@ -464,6 +464,10 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
 					{
 						SetBlock( X, Y, Z, 0, 0 );
+
+						Vector3i wPos = PositionToWorldPosition( Vector3i(X, Y, Z) );
+
+						m_World->GetSimulatorManager()->WakeUp(wPos.x, wPos.y, wPos.z);
 						if (isRedstone) {
 							cRedstone Redstone(m_World);
 							Redstone.ChangeRedstone( (X+m_PosX*16), (Y+m_PosY*16), (Z+m_PosZ*16), false );
@@ -953,7 +957,8 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	
 	const int index = a_Y + (a_Z * 128) + (a_X * 128 * 16);
 	const char OldBlock = m_BlockType[index];
-	if (OldBlock == a_BlockType)
+	const char OldBlockMeta = GetLight( m_BlockMeta, index );
+	if (OldBlock == a_BlockType && OldBlockMeta == a_BlockMeta)
 	{
 		return;
 	}
@@ -1393,6 +1398,15 @@ void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, i
 	a_Y = a_ChunkY;
 	a_X = m_PosX * 16 + a_ChunkX;
 	a_Z = m_PosZ * 16 + a_ChunkZ;
+}
+
+
+
+
+
+Vector3i cChunk::PositionToWorldPosition( const Vector3i & a_InChunkPos )
+{
+	return Vector3i( m_PosX * 16 + a_InChunkPos.x, a_InChunkPos.y, m_PosZ * 16 + a_InChunkPos.z );
 }
 
 
