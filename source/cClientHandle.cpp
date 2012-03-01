@@ -89,7 +89,11 @@
 
 cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
+#if (MINECRAFT_1_2_2 == 1)
+	, m_ProtocolVersion(28)
+#else
 	, m_ProtocolVersion(23)
+#endif
 	, m_Socket(a_Socket)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
@@ -288,7 +292,9 @@ void cClientHandle::Authenticate(void)
 	LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
 	//LoginResponse.m_Username = "";
 	LoginResponse.m_ServerMode = m_Player->GetGameMode();  // set gamemode from player.
+#if (MINECRAFT_1_2_2 != 1)
 	LoginResponse.m_MapSeed = cRoot::Get()->GetWorld()->GetWorldSeed();
+#endif
 	LoginResponse.m_Dimension = 0;
 	LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetWorld()->GetMaxPlayers();
 	LoginResponse.m_Difficulty = 2;
@@ -620,7 +626,18 @@ void cClientHandle::HandlePing(void)
 
 void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 {
+#if (MINECRAFT_1_2_2 == 1)
+	AStringVector UserData = StringSplit( a_Packet->m_Username, ";" ); // "FakeTruth;localhost:25565"
+	if( UserData.size() == 0 )
+	{
+		Kick("Could not receive username");
+		return;
+	}
+	m_Username = UserData[0];
+#else
 	m_Username = a_Packet->m_Username;
+#endif
+
 	LOG("HANDSHAKE %s", m_Username.c_str());
 
 	if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers())
@@ -1786,7 +1803,7 @@ void cClientHandle::CheckIfWorldDownloaded(void)
 		return;
 	}
 	cCSLock Lock(m_CSChunkLists);
-	if (m_ChunksToSend.empty())
+	if (m_ChunksToSend.size() < 4*4)
 	{
 		SendConfirmPosition();
 	}

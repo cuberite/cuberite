@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/22/12 16:44:22.
+** Generated automatically by tolua++-1.0.92 on 03/01/12 18:04:42.
 */
 
 #ifndef __cplusplus
@@ -9728,6 +9728,35 @@ static int tolua_AllToLua_cWorld_GetBlock00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetBlock of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlock01
+static int tolua_AllToLua_cWorld_GetBlock01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3i* a_Pos = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlock'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetBlock(*a_Pos);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cWorld_GetBlock00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetBlockMeta of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlockMeta00
 static int tolua_AllToLua_cWorld_GetBlockMeta00(lua_State* tolua_S)
@@ -9763,6 +9792,35 @@ static int tolua_AllToLua_cWorld_GetBlockMeta00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'GetBlockMeta'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetBlockMeta of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlockMeta01
+static int tolua_AllToLua_cWorld_GetBlockMeta01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3i* a_Pos = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockMeta'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetBlockMeta(*a_Pos);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cWorld_GetBlockMeta00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -9802,6 +9860,36 @@ static int tolua_AllToLua_cWorld_SetBlockMeta00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'SetBlockMeta'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetBlockMeta of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetBlockMeta01
+static int tolua_AllToLua_cWorld_SetBlockMeta01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3i* a_Pos = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
+  char a_MetaData = ((char)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlockMeta'", NULL);
+#endif
+  {
+   self->SetBlockMeta(*a_Pos,a_MetaData);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cWorld_SetBlockMeta00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -15956,36 +16044,6 @@ static int tolua_set_cPacket_Login_m_Username(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: m_MapSeed of class  cPacket_Login */
-#ifndef TOLUA_DISABLE_tolua_get_cPacket_Login_m_MapSeed
-static int tolua_get_cPacket_Login_m_MapSeed(lua_State* tolua_S)
-{
-  cPacket_Login* self = (cPacket_Login*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_MapSeed'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->m_MapSeed);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: m_MapSeed of class  cPacket_Login */
-#ifndef TOLUA_DISABLE_tolua_set_cPacket_Login_m_MapSeed
-static int tolua_set_cPacket_Login_m_MapSeed(lua_State* tolua_S)
-{
-  cPacket_Login* self = (cPacket_Login*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_MapSeed'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->m_MapSeed = ((long long)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: m_LevelType of class  cPacket_Login */
 #ifndef TOLUA_DISABLE_tolua_get_cPacket_Login_m_LevelType
 static int tolua_get_cPacket_Login_m_LevelType(lua_State* tolua_S)
@@ -16041,36 +16099,6 @@ static int tolua_set_cPacket_Login_m_ServerMode(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->m_ServerMode = ((int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: m_Dimension of class  cPacket_Login */
-#ifndef TOLUA_DISABLE_tolua_get_cPacket_Login_m_Dimension
-static int tolua_get_cPacket_Login_m_Dimension(lua_State* tolua_S)
-{
-  cPacket_Login* self = (cPacket_Login*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_Dimension'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->m_Dimension);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: m_Dimension of class  cPacket_Login */
-#ifndef TOLUA_DISABLE_tolua_set_cPacket_Login_m_Dimension
-static int tolua_set_cPacket_Login_m_Dimension(lua_State* tolua_S)
-{
-  cPacket_Login* self = (cPacket_Login*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_Dimension'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->m_Dimension = ((char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -17584,8 +17612,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cWorld_SetBlock00);
    tolua_function(tolua_S,"FastSetBlock",tolua_AllToLua_cWorld_FastSetBlock00);
    tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock00);
+   tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock01);
    tolua_function(tolua_S,"GetBlockMeta",tolua_AllToLua_cWorld_GetBlockMeta00);
+   tolua_function(tolua_S,"GetBlockMeta",tolua_AllToLua_cWorld_GetBlockMeta01);
    tolua_function(tolua_S,"SetBlockMeta",tolua_AllToLua_cWorld_SetBlockMeta00);
+   tolua_function(tolua_S,"SetBlockMeta",tolua_AllToLua_cWorld_SetBlockMeta01);
    tolua_function(tolua_S,"DigBlock",tolua_AllToLua_cWorld_DigBlock00);
    tolua_function(tolua_S,"SendBlockTo",tolua_AllToLua_cWorld_SendBlockTo00);
    tolua_function(tolua_S,"GetSpawnX",tolua_AllToLua_cWorld_GetSpawnX00);
@@ -17909,10 +17940,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cPacket_Login");
    tolua_variable(tolua_S,"m_ProtocolVersion",tolua_get_cPacket_Login_m_ProtocolVersion,tolua_set_cPacket_Login_m_ProtocolVersion);
    tolua_variable(tolua_S,"m_Username",tolua_get_cPacket_Login_m_Username,tolua_set_cPacket_Login_m_Username);
-   tolua_variable(tolua_S,"m_MapSeed",tolua_get_cPacket_Login_m_MapSeed,tolua_set_cPacket_Login_m_MapSeed);
    tolua_variable(tolua_S,"m_LevelType",tolua_get_cPacket_Login_m_LevelType,tolua_set_cPacket_Login_m_LevelType);
    tolua_variable(tolua_S,"m_ServerMode",tolua_get_cPacket_Login_m_ServerMode,tolua_set_cPacket_Login_m_ServerMode);
-   tolua_variable(tolua_S,"m_Dimension",tolua_get_cPacket_Login_m_Dimension,tolua_set_cPacket_Login_m_Dimension);
    tolua_variable(tolua_S,"m_Difficulty",tolua_get_cPacket_Login_m_Difficulty,tolua_set_cPacket_Login_m_Difficulty);
    tolua_variable(tolua_S,"m_WorldHeight",tolua_get_cPacket_Login_unsigned_m_WorldHeight,tolua_set_cPacket_Login_unsigned_m_WorldHeight);
    tolua_variable(tolua_S,"m_MaxPlayers",tolua_get_cPacket_Login_unsigned_m_MaxPlayers,tolua_set_cPacket_Login_unsigned_m_MaxPlayers);

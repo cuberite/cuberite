@@ -144,3 +144,4 @@ public:
 
 
 
+#define MINECRAFT_1_2_2 (1)
