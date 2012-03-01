@@ -27,7 +27,7 @@ public:
 	virtual int Parse(const char * a_Data, int a_Size) override;
 	virtual void Serialize(AString & a_Data) const override;
 
-	// 1.2.2 http://wiki.vg/Protocol#Login_Request_.280x01.29
+	// 1.2.2 http://wiki.vg/Pre-release_protocol#Login_Request_.280x01.29
 	int m_ProtocolVersion;														//tolua_export
 	AString m_Username;														//tolua_export
 #if (MINECRAFT_1_2_2 != 1)
@@ -43,8 +43,12 @@ public:
 	char m_Difficulty;															//tolua_export
 	unsigned char m_WorldHeight;												//tolua_export
 	unsigned char m_MaxPlayers;													//tolua_export
-	
+
+#if (MINECRAFT_1_2_2 == 1 )
+	static const unsigned int c_Size = 1 + 4 + 2 + 2 + 4 + 4 + 1 + 1 + 1;
+#else
 	static const unsigned int c_Size = 1 + 4 + 2 + 8 + 2 + 4 + 1 + 1 + 1 + 1; // Minimal size
+#endif
 
 	static const AString LEVEL_TYPE_DEFAULT;
 	static const AString LEVEL_TYPE_SUPERFLAT;
