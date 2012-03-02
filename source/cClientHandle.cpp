@@ -1803,7 +1803,7 @@ void cClientHandle::CheckIfWorldDownloaded(void)
 		return;
 	}
 	cCSLock Lock(m_CSChunkLists);
-	if (m_ChunksToSend.size() < 4*4)
+	if (m_ChunksToSend.empty())
 	{
 		SendConfirmPosition();
 	}
