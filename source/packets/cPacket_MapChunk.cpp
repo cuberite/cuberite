@@ -41,18 +41,51 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 	memset( AllData, 0, DataSize );
 
 	unsigned int iterator = 0;
-	for( int i = 0; i < 8; ++i ) // Old world is only 8 high
+	for( int i = 0; i < 8; ++i ) // Old world is only 8*16 high (should be 16*16)
 	{
-		m_BitMap1 |= (1 << i);
+		m_BitMap1 |= (1 << i); // This tells what chunks are sent. Use this to NOT send air only chunks (right now everything is sent)
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
 		{
 			AllData[iterator] = a_Chunk->GetBlock( x, y+i*16, z );
 			++iterator;
 		}
 	}
-	//TODO: Send block metadata
-	//TODO: Send block light
-	//TODO: Send sky light
+	//Send block metadata
+	for( int i = 0; i < 8; ++i )
+	{
+		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
+		{
+			for( int x = 0; x < 8; ++x )
+			{
+				AllData[iterator] = a_Chunk->GetLight( a_Chunk->pGetMeta(), x*2+0, y+i*16, z ) | a_Chunk->GetLight( a_Chunk->pGetMeta(), x*2+1, y+i*16, z ) << 4;
+				++iterator;
+			}
+		}
+	}
+	//Send block light
+	for( int i = 0; i < 8; ++i )
+	{
+		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
+		{
+			for( int x = 0; x < 8; ++x )
+			{
+				AllData[iterator] = a_Chunk->GetLight( a_Chunk->pGetLight(), x*2+0, y+i*16, z ) | a_Chunk->GetLight( a_Chunk->pGetLight(), x*2+1, y+i*16, z ) << 4;
+				++iterator;
+			}
+		}
+	}
+	//Send sky light
+	for( int i = 0; i < 8; ++i )
+	{
+		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
+		{
+			for( int x = 0; x < 8; ++x )
+			{
+				AllData[iterator] = a_Chunk->GetLight( a_Chunk->pGetSkyLight(), x*2+0, y+i*16, z ) | a_Chunk->GetLight( a_Chunk->pGetSkyLight(), x*2+1, y+i*16, z ) << 4;
+				++iterator;
+			}
+		}
+	}
 
 	uLongf CompressedSize = compressBound( DataSize );
 	char * CompressedBlockData = new char[CompressedSize];
