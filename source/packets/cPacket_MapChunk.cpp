@@ -49,9 +49,10 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 			AllData[iterator] = a_Chunk->GetBlock( x, y+i*16, z );
 			++iterator;
 		}
-
-		//iterator+=2048*2; // Ignore light and stuff
 	}
+	//TODO: Send block metadata
+	//TODO: Send block light
+	//TODO: Send sky light
 
 	uLongf CompressedSize = compressBound( DataSize );
 	char * CompressedBlockData = new char[CompressedSize];

@@ -341,9 +341,14 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		MultiBlock.m_ChunkX = m_PosX;
 		MultiBlock.m_ChunkZ = m_PosZ;
 		MultiBlock.m_NumBlocks = (short)PendingSendBlocks;
+#if (MINECRAFT_1_2_2 == 1)
+		MultiBlock.m_Data = new cPacket_MultiBlock::sBlockChange[ PendingSendBlocks ];
+		MultiBlock.m_DataSize = PendingSendBlocks * sizeof( cPacket_MultiBlock::sBlockChange );
+#else
 		MultiBlock.m_BlockCoordinates = new unsigned short[PendingSendBlocks];
 		MultiBlock.m_BlockTypes = new char[PendingSendBlocks];
 		MultiBlock.m_BlockMetas = new char[PendingSendBlocks];
+#endif
 		//LOG("Sending multiblock packet for %i blocks", PendingSendBlocks );
 		for( unsigned int i = 0; i < PendingSendBlocks; i++)
 		{
@@ -352,10 +357,18 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			unsigned int Z = (index / 128) % 16;
 			unsigned int X = (index / (128*16));
 
+#if (MINECRAFT_1_2_2 == 1)
+			unsigned int Coords = Z | (X << 4) | (Y << 8);
+			unsigned int Blocks = E_BLOCK_DIRT;//E_BLOCK_STONE;
+			MultiBlock.m_Data[i].Data = Coords | (E_BLOCK_STONE) << 16;
+//			MultiBlock.m_Data[i].Coords = E_BLOCK_STONE;//(Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;//(Y&0xff) | (Z&0xf) << 8 | (X&0xf) << 12;
+
+#else
 			MultiBlock.m_BlockCoordinates[i] = (Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;
 			//LOG("X: %i Y: %i Z: %i Combo: 0x%04x", X, Y, Z, MultiBlock.m_BlockCoordinates[i] );
 			MultiBlock.m_BlockTypes[i] = m_BlockType[index];
 			MultiBlock.m_BlockMetas[i] = GetLight( m_BlockMeta, index );
+#endif
 		}
 		m_PendingSendBlocks.clear();
 		PendingSendBlocks = m_PendingSendBlocks.size();
