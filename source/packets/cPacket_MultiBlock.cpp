@@ -57,7 +57,8 @@ void cPacket_MultiBlock::Serialize(AString & a_Data) const
 
 #if (MINECRAFT_1_2_2 == 1)
 	AppendInteger(a_Data, m_DataSize);
-	AppendData   (a_Data, (const char*)m_Data, m_DataSize);
+	for( int i = 0; i < m_NumBlocks; ++i )
+		AppendInteger(a_Data, m_Data[i].Data);
 #else
 	AppendData   (a_Data, (char *)m_BlockCoordinates, sizeof(short) * m_NumBlocks);
 	AppendData   (a_Data, m_BlockTypes,	m_NumBlocks);

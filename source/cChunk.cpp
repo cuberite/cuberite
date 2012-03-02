@@ -358,11 +358,9 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			unsigned int X = (index / (128*16));
 
 #if (MINECRAFT_1_2_2 == 1)
-			unsigned int Coords = Z | (X << 4) | (Y << 8);
-			unsigned int Blocks = E_BLOCK_DIRT;//E_BLOCK_STONE;
-			MultiBlock.m_Data[i].Data = Coords | (E_BLOCK_STONE) << 16;
-//			MultiBlock.m_Data[i].Coords = E_BLOCK_STONE;//(Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;//(Y&0xff) | (Z&0xf) << 8 | (X&0xf) << 12;
-
+			unsigned int Coords = Y | Z << 8 | X << 12;
+			unsigned int Blocks = GetLight( m_BlockMeta, index ) | (m_BlockType[index]<<4);
+			MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
 #else
 			MultiBlock.m_BlockCoordinates[i] = (Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;
 			//LOG("X: %i Y: %i Z: %i Combo: 0x%04x", X, Y, Z, MultiBlock.m_BlockCoordinates[i] );
