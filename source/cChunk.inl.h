@@ -35,9 +35,9 @@ char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
 __C_CHUNK_INLINE__
 char cChunk::GetLight(char* a_Buffer, int x, int y, int z)
 {
-	if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
+	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 	{
-		const int cindex = (y/2) + (z * 64) + (x * 64 * 16);
+		const int cindex = (y/2) + (z * (c_ChunkHeight/2)) + (x * (c_ChunkHeight/2) * c_ChunkWidth);
 		if( (y & 1) == 0 )
 		{	// First half byte
 			return (a_Buffer[cindex] & 0x0f);
@@ -81,9 +81,9 @@ void cChunk::SetLight(char* a_Buffer, int a_BlockIdx, char a_Light)
 __C_CHUNK_INLINE__
 void cChunk::SetLight(char* a_Buffer, int x, int y, int z, char light)
 {
-	if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
+	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 	{
-		int cindex = (y/2) + (z * 64) + (x * 64 * 16);
+		int cindex = (y/2) + (z * (c_ChunkHeight/2)) + (x * (c_ChunkHeight/2) * c_ChunkWidth);
 		if( (y & 1) == 0 )
 		{	// First half byte
 			a_Buffer[cindex] &= 0xf0; // Set first half to 0

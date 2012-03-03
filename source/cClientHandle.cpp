@@ -339,8 +339,8 @@ void cClientHandle::StreamChunks(void)
 
 	ASSERT(m_Player != NULL);
 	
-	int ChunkPosX = FAST_FLOOR_DIV(m_Player->GetPosX(), 16);
-	int ChunkPosZ = FAST_FLOOR_DIV(m_Player->GetPosZ(), 16);
+	int ChunkPosX = FAST_FLOOR_DIV(m_Player->GetPosX(), cChunk::c_ChunkWidth);
+	int ChunkPosZ = FAST_FLOOR_DIV(m_Player->GetPosZ(), cChunk::c_ChunkWidth);
 	if ((ChunkPosX == m_LastStreamedChunkX) && (ChunkPosZ == m_LastStreamedChunkZ))
 	{
 		// Already streamed for this position

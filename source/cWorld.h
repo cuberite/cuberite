@@ -179,26 +179,29 @@ public:
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
-		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/16;
-		if(a_X < 0 && a_X % 16 != 0) a_ChunkX--;
+		// TODO: Use floor() instead of weird if statements
+		// Also fix Y
+		a_ChunkX = a_X/cChunk::c_ChunkWidth;
+		if(a_X < 0 && a_X % cChunk::c_ChunkWidth != 0) a_ChunkX--;
 		a_ChunkY = 0;
-		a_ChunkZ = a_Z/16;
-		if(a_Z < 0 && a_Z % 16 != 0) a_ChunkZ--;
+		a_ChunkZ = a_Z/cChunk::c_ChunkWidth;
+		if(a_Z < 0 && a_Z % cChunk::c_ChunkWidth != 0) a_ChunkZ--;
 
-		a_X = a_X - a_ChunkX*16;
-		//a_Y = a_Y - a_ChunkY*16;
-		a_Z = a_Z - a_ChunkZ*16;
+		a_X = a_X - a_ChunkX*cChunk::c_ChunkWidth;
+		a_Y = a_Y - a_ChunkY*cChunk::c_ChunkHeight;
+		a_Z = a_Z - a_ChunkZ*cChunk::c_ChunkWidth;
 	}
 	
 	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
+		// TODO: Use floor() instead of weird if statements
+		// Also fix Y
 		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/16;
-		if(a_X < 0 && a_X % 16 != 0) a_ChunkX--;
+		a_ChunkX = a_X/cChunk::c_ChunkWidth;
+		if(a_X < 0 && a_X % cChunk::c_ChunkWidth != 0) a_ChunkX--;
 		a_ChunkY = 0;
-		a_ChunkZ = a_Z/16;
-		if(a_Z < 0 && a_Z % 16 != 0) a_ChunkZ--;
+		a_ChunkZ = a_Z/cChunk::c_ChunkWidth;
+		if(a_Z < 0 && a_Z % cChunk::c_ChunkWidth != 0) a_ChunkZ--;
 	}
 
 	void SaveAllChunks();	//tolua_export

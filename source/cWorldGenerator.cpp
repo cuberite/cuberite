@@ -199,9 +199,9 @@ static float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
 
 unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 {
-	ASSERT((x < 16) && (x > -1) && (y < 128) && (y > -1) && (z < 16) && (z > -1));
+	ASSERT((x < cChunk::c_ChunkWidth) && (x > -1) && (y < cChunk::c_ChunkHeight) && (y > -1) && (z < cChunk::c_ChunkWidth) && (z > -1));
 
-	return y + (z * 128) + (x * 128 * 16);
+	return y + (z * cChunk::c_ChunkHeight) + (x * cChunk::c_ChunkHeight * cChunk::c_ChunkWidth);
 }
 
 
@@ -217,15 +217,15 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 
 	cNoise Noise(m_World->GetWorldSeed());
 	
-	for (int z = 0; z < 16; z++) 
+	for (int z = 0; z < cChunk::c_ChunkWidth; z++) 
 	{
-		const float zz = (float)(a_ChunkZ * 16 + z);
-		for (int x = 0; x < 16; x++)
+		const float zz = (float)(a_ChunkZ * cChunk::c_ChunkWidth + z);
+		for (int x = 0; x < cChunk::c_ChunkWidth; x++)
 		{
 			// Place bedrock on bottom layer
 			a_BlockData[MakeIndex(x, 0, z)] = E_BLOCK_BEDROCK;
 
-			const float xx = (float)(a_ChunkX * 16 + x);
+			const float xx = (float)(a_ChunkX * cChunk::c_ChunkWidth + x);
 			
 			int Height = (int)(GetNoise( xx * 0.05f, zz * 0.05f, Noise ) * 16);
 			const int Lower = 64;
@@ -353,9 +353,9 @@ void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNest
 	// Only stone gets replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
 	for (int i = 0; i < a_NumNests; i++)
 	{
-		int BaseX = r1.randInt(16);
+		int BaseX = r1.randInt(cChunk::c_ChunkWidth);
 		int BaseY = r1.randInt(a_MaxHeight);
-		int BaseZ = r1.randInt(16);
+		int BaseZ = r1.randInt(cChunk::c_ChunkWidth);
 		sSetBlockList OreBlocks;
 		size_t NestSize = (size_t)(a_NestSize + r1.randInt(a_NestSize / 4));  // The actual nest size may be up to 1/4 larger
 		while (OreBlocks.size() < NestSize)
@@ -396,7 +396,7 @@ void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNest
 		// Replace stone with the queued ore blocks:
 		for (sSetBlockList::iterator itr = OreBlocks.begin(); itr != OreBlocks.end(); ++itr)
 		{
-			if ((itr->x < 0) || (itr->y < 0) || (itr->z < 0) || (itr->x >= 16) || (itr->y >= 127) || (itr->z >= 16))
+			if ((itr->x < 0) || (itr->y < 0) || (itr->z < 0) || (itr->x >= cChunk::c_ChunkWidth) || (itr->y >= cChunk::c_ChunkHeight-1) || (itr->z >= cChunk::c_ChunkWidth))
 			{
 				continue;
 			}
@@ -425,12 +425,12 @@ void cWorldGenerator::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	}
 	
 	cNoise Noise(m_World->GetWorldSeed());
-	for (int z = 0; z < 16; z++) 
+	for (int z = 0; z < cChunk::c_ChunkWidth; z++) 
 	{
-		int zz = z + a_ChunkZ * 16;
-		for (int x = 0; x < 16; x++)
+		int zz = z + a_ChunkZ * cChunk::c_ChunkWidth;
+		for (int x = 0; x < cChunk::c_ChunkWidth; x++)
 		{
-			int xx = x + a_ChunkX * 16;
+			int xx = x + a_ChunkX * cChunk::c_ChunkWidth;
 
 			int TopY = m_World->GetHeight(xx, zz);
 			int index = MakeIndex(x, TopY - 1, z);

@@ -36,12 +36,13 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 
 	m_UnusedInt = 0;
 
-	unsigned int DataSize = 16 * (4096 + 2048 + 2048 + 2048);
+	
+	unsigned int DataSize = (cChunk::c_ChunkHeight/16) * (4096 + 2048 + 2048 + 2048);
 	char* AllData = new char[ DataSize ];
 	memset( AllData, 0, DataSize );
 
 	unsigned int iterator = 0;
-	for( int i = 0; i < 8; ++i ) // Old world is only 8*16 high (should be 16*16)
+	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i ) // Old world is only 8*16 high (should be 16*16)
 	{
 		m_BitMap1 |= (1 << i); // This tells what chunks are sent. Use this to NOT send air only chunks (right now everything is sent)
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
@@ -51,7 +52,7 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 		}
 	}
 	//Send block metadata
-	for( int i = 0; i < 8; ++i )
+	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
 	{
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
@@ -63,7 +64,7 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 		}
 	}
 	//Send block light
-	for( int i = 0; i < 8; ++i )
+	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
 	{
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
@@ -75,7 +76,7 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 		}
 	}
 	//Send sky light
-	for( int i = 0; i < 8; ++i )
+	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
 	{
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
@@ -98,9 +99,9 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 	m_CompressedSize = CompressedSize;
 
 #else
-	m_PosX = a_Chunk->GetPosX() * 16; // It has to be block coordinates
-	m_PosY = (short)(a_Chunk->GetPosY() * 128);
-	m_PosZ = a_Chunk->GetPosZ() * 16;
+	m_PosX = a_Chunk->GetPosX() * cChunk::c_ChunkWidth; // It has to be block coordinates
+	m_PosY = (short)(a_Chunk->GetPosY() * cChunk::c_ChunkHeight);
+	m_PosZ = a_Chunk->GetPosZ() * cChunk::c_ChunkWidth;
 
 	m_SizeX = 15;
 	m_SizeY = 127;

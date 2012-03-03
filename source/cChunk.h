@@ -112,7 +112,9 @@ typedef std::list< sSetBlock > sSetBlockList;
 class cChunk
 {
 public:
-	static const int c_NumBlocks = 16 * 128 * 16;
+	static const int c_ChunkWidth = 16;
+	static const int c_ChunkHeight = 128;
+	static const int c_NumBlocks = c_ChunkWidth * c_ChunkHeight * c_ChunkWidth;
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
 	
 	cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World);
@@ -214,9 +216,9 @@ public:
 
 	inline static unsigned int MakeIndex(int x, int y, int z )
 	{
-		if( x < 16 && x > -1 && y < 128 && y > -1 && z < 16 && z > -1 )
+		if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 		{
-			return y + (z * 128) + (x * 128 * 16);
+			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth);
 		}
 		return 0;
 	}
@@ -261,7 +263,7 @@ private:
 	char *m_BlockLight;		// += NumBlocks/2
 	char *m_BlockSkyLight;	// += NumBlocks/2
 
-	unsigned char m_HeightMap[16 * 16];
+	unsigned char m_HeightMap[c_ChunkWidth * c_ChunkWidth];
 
 	unsigned int m_BlockTickNum;
 	unsigned int m_BlockTickX, m_BlockTickY, m_BlockTickZ;

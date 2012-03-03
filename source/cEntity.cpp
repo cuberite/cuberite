@@ -54,7 +54,7 @@ cEntity::~cEntity()
 	LOG("Deleting entity %d at pos {%.2f, %.2f} ~ [%d, %d]; ptr %p", 
 		m_UniqueID,
 		m_Pos.x, m_Pos.z,
-		(int)(m_Pos.x / 16), (int)(m_Pos.z / 16),
+		(int)(m_Pos.x / cChunk::c_ChunkWidth), (int)(m_Pos.z / cChunk::c_ChunkWidth),
 		this
 	);
 	
