@@ -511,6 +511,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 
 		NewDataContents.append( CompressedData );
+		m_NumDirty++;
 	}
 
 	// Done converting
