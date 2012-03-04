@@ -18,7 +18,7 @@ public:
 	virtual void Serialize(AString & a_Data) const override;
 
 	int  m_PosX;
-	char m_PosY;
+	unsigned char m_PosY;
 	int  m_PosZ;
 	char m_BlockType;
 	char m_BlockMeta;

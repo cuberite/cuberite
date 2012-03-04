@@ -24,7 +24,7 @@ public:
 	virtual int Parse(const char * a_Data, int a_Size) override;
 
 	int  m_PosX;			//tolua_export
-	char m_PosY;		//tolua_export
+	unsigned char m_PosY;	//tolua_export
 	int  m_PosZ;			//tolua_export
 	char m_Direction;	//tolua_export
 

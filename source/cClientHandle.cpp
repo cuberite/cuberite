@@ -823,16 +823,18 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		return;
 	}
 	
-	int pX = a_Packet->m_PosX, pY = a_Packet->m_PosY, pZ = a_Packet->m_PosZ;
+	int pX = a_Packet->m_PosX;
+	unsigned char pY = a_Packet->m_PosY;
+	int pZ = a_Packet->m_PosZ;
 
-	AddDirection(pX, (char &) pY, pZ, a_Packet->m_Direction);
+	AddDirection(pX, pY, pZ, a_Packet->m_Direction);
 
 	char PossibleBlock = World->GetBlock(pX, pY, pZ);
 
 	if (PossibleBlock == E_BLOCK_FIRE)
 	{
 		a_Packet->m_PosX = pX;
-		a_Packet->m_PosY = (char)pY;
+		a_Packet->m_PosY = pY;
 		a_Packet->m_PosZ = pZ;
 		bBroken = true;
 	}
@@ -1299,7 +1301,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		else if (IsValidBlock(a_Packet->m_ItemType))
 		{
 			int X = a_Packet->m_PosX;
-			char Y = a_Packet->m_PosY;
+			int Y = a_Packet->m_PosY;
 			int Z = a_Packet->m_PosZ;
 			AddDirection(X, Y, Z, a_Packet->m_Direction);
 

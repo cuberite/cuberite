@@ -55,8 +55,8 @@ inline bool IsBlockLava(char a_BlockID)
 	return (a_BlockID == E_BLOCK_LAVA || a_BlockID == E_BLOCK_STATIONARY_LAVA);
 }
 
-inline void AddDirection( int & a_X, char & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false ) //tolua_export
-{//tolua_export
+inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false )
+{
 	if( !a_bInverse )
 	{
 		switch( a_Direction )
@@ -105,6 +105,15 @@ inline void AddDirection( int & a_X, char & a_Y, int & a_Z, char a_Direction, bo
 			break;
 		};
 	}
+}
+
+inline void AddDirection( int & a_X, unsigned char & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false ) //tolua_export
+{//tolua_export
+	int Y = a_Y;
+	AddDirection( a_X, Y, a_Z, a_Direction, a_bInverse );
+	if( Y < 0 ) a_Y = 0;
+	else if( Y > 255 ) a_Y = 255;
+	else a_Y = (unsigned char)Y;
 }//tolua_export
 
 #include <math.h>

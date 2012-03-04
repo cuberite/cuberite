@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/01/12 18:04:42.
+** Generated automatically by tolua++-1.0.92 on 03/04/12 14:40:53.
 */
 
 #ifndef __cplusplus
@@ -2558,7 +2558,7 @@ static int tolua_AllToLua_AddDirection00(lua_State* tolua_S)
 #endif
  {
   int a_X = ((int)  tolua_tonumber(tolua_S,1,0));
-  char a_Y = ((char)  tolua_tonumber(tolua_S,2,0));
+  unsigned char a_Y = ((unsigned char)  tolua_tonumber(tolua_S,2,0));
   int a_Z = ((int)  tolua_tonumber(tolua_S,3,0));
   char a_Direction = ((char)  tolua_tonumber(tolua_S,4,0));
   bool a_bInverse = ((bool)  tolua_toboolean(tolua_S,5,false));
@@ -16617,8 +16617,8 @@ static int tolua_set_cPacket_BlockPlace_m_PosX(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* get function: m_PosY of class  cPacket_BlockPlace */
-#ifndef TOLUA_DISABLE_tolua_get_cPacket_BlockPlace_m_PosY
-static int tolua_get_cPacket_BlockPlace_m_PosY(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_get_cPacket_BlockPlace_unsigned_m_PosY
+static int tolua_get_cPacket_BlockPlace_unsigned_m_PosY(lua_State* tolua_S)
 {
   cPacket_BlockPlace* self = (cPacket_BlockPlace*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -16630,8 +16630,8 @@ static int tolua_get_cPacket_BlockPlace_m_PosY(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* set function: m_PosY of class  cPacket_BlockPlace */
-#ifndef TOLUA_DISABLE_tolua_set_cPacket_BlockPlace_m_PosY
-static int tolua_set_cPacket_BlockPlace_m_PosY(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_set_cPacket_BlockPlace_unsigned_m_PosY
+static int tolua_set_cPacket_BlockPlace_unsigned_m_PosY(lua_State* tolua_S)
 {
   cPacket_BlockPlace* self = (cPacket_BlockPlace*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
@@ -16640,7 +16640,7 @@ static int tolua_set_cPacket_BlockPlace_m_PosY(lua_State* tolua_S)
   if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->m_PosY = ((char)  tolua_tonumber(tolua_S,2,0))
+  self->m_PosY = ((unsigned char)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -17977,7 +17977,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cPacket_BlockPlace","cPacket_BlockPlace","cPacket",NULL);
   tolua_beginmodule(tolua_S,"cPacket_BlockPlace");
    tolua_variable(tolua_S,"m_PosX",tolua_get_cPacket_BlockPlace_m_PosX,tolua_set_cPacket_BlockPlace_m_PosX);
-   tolua_variable(tolua_S,"m_PosY",tolua_get_cPacket_BlockPlace_m_PosY,tolua_set_cPacket_BlockPlace_m_PosY);
+   tolua_variable(tolua_S,"m_PosY",tolua_get_cPacket_BlockPlace_unsigned_m_PosY,tolua_set_cPacket_BlockPlace_unsigned_m_PosY);
    tolua_variable(tolua_S,"m_PosZ",tolua_get_cPacket_BlockPlace_m_PosZ,tolua_set_cPacket_BlockPlace_m_PosZ);
    tolua_variable(tolua_S,"m_Direction",tolua_get_cPacket_BlockPlace_m_Direction,tolua_set_cPacket_BlockPlace_m_Direction);
    tolua_variable(tolua_S,"m_ItemType",tolua_get_cPacket_BlockPlace_m_ItemType,tolua_set_cPacket_BlockPlace_m_ItemType);

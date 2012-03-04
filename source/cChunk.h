@@ -214,13 +214,14 @@ public:
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
 	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos );
 
+	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
 	inline static unsigned int MakeIndex(int x, int y, int z )
 	{
 		if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 		{
 			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth);
 		}
-		return 0;
+		return INDEX_OUT_OF_RANGE;
 	}
 	
 	inline void MarkDirty(void)

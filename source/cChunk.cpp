@@ -469,7 +469,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 					char Dir = cTorch::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
 					LOG("MetaData: %i", Dir );
 					int XX = X + m_PosX*c_ChunkWidth;
-					char YY = (char)Y;
+					int YY = Y + m_PosY*c_ChunkHeight;
 					int ZZ = Z + m_PosZ*c_ChunkWidth;
 					AddDirection( XX, YY, ZZ, Dir, true );
 					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
@@ -492,7 +492,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 				{
 					char Dir = cLadder::MetaDataToDirection( GetLight( m_BlockMeta, X, Y, Z ) );
 					int XX = X + m_PosX*c_ChunkWidth;
-					char YY = (char)Y;
+					int YY = Y + m_PosY*c_ChunkHeight;
 					int ZZ = Z + m_PosZ*c_ChunkWidth;
 					AddDirection( XX, YY, ZZ, Dir, true );
 					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
@@ -905,7 +905,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_X + a_Z * c_ChunkWidth] = a_Y;
+			m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)a_Y;
 		}
 		else
 		{
@@ -913,7 +913,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 			{
 				if (m_BlockData[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_X + a_Z * c_ChunkWidth] = y;
+					m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)y;
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1001,7 +1001,7 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_X + a_Z * c_ChunkWidth] = a_Y;
+			m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)a_Y;
 		}
 		else
 		{
@@ -1009,7 +1009,7 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 			{
 				if (m_BlockData[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_X + a_Z * c_ChunkWidth] = y;
+					m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)y;
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1026,7 +1026,11 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 	if( a_Client == 0 )
 	{
 		cCSLock Lock(m_CSBlockLists);
-		m_PendingSendBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
+		unsigned int index = MakeIndex( a_X, a_Y, a_Z );
+		if( index != INDEX_OUT_OF_RANGE )
+		{
+			m_PendingSendBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
+		}
 		return;
 	}
 
@@ -1039,8 +1043,11 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 			BlockChange.m_PosX = a_X + m_PosX*c_ChunkWidth;
 			BlockChange.m_PosY = (char)(a_Y + m_PosY*c_ChunkHeight);
 			BlockChange.m_PosZ = a_Z + m_PosZ*c_ChunkWidth;
-			BlockChange.m_BlockType = m_BlockType[ index ];
-			BlockChange.m_BlockMeta = GetLight( m_BlockMeta, index );
+			if( index != INDEX_OUT_OF_RANGE )
+			{
+				BlockChange.m_BlockType = m_BlockType[ index ];
+				BlockChange.m_BlockMeta = GetLight( m_BlockMeta, index );
+			} // else it's both 0
 			a_Client->Send( BlockChange );
 			break;
 		}
