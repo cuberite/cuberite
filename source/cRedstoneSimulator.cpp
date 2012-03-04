@@ -82,17 +82,17 @@ void cRedstoneSimulator::RefreshTorchesAround( const Vector3i & a_BlockPos )
 	if( IsPowered( a_BlockPos, true ) )
 	{
 		TargetBlockID = E_BLOCK_REDSTONE_TORCH_OFF;
-		if( m_World->GetBlock( a_BlockPos ) == E_BLOCK_DIRT )
-		{
-			m_World->FastSetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_STONE, 0 );
-		}
+		//if( m_World->GetBlock( a_BlockPos ) == E_BLOCK_DIRT )
+		//{
+		//	m_World->FastSetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_STONE, 0 );
+		//}
 	}
 	else
 	{
-		if( m_World->GetBlock( a_BlockPos ) == E_BLOCK_STONE )
-		{
-			m_World->FastSetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_DIRT, 0 );
-		}
+		//if( m_World->GetBlock( a_BlockPos ) == E_BLOCK_STONE )
+		//{
+		//	m_World->FastSetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_DIRT, 0 );
+		//}
 	}
 
 	for( unsigned int i = 0; i < ARRAYCOUNT( Surroundings ); ++i )
