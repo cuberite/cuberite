@@ -113,7 +113,7 @@ class cChunk
 {
 public:
 	static const int c_ChunkWidth = 16;
-	static const int c_ChunkHeight = 128;
+	static const int c_ChunkHeight = 128; //256;
 	static const int c_NumBlocks = c_ChunkWidth * c_ChunkHeight * c_ChunkWidth;
 	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
 	

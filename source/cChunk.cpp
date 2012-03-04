@@ -1041,7 +1041,7 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 			unsigned int index = MakeIndex( a_X, a_Y, a_Z );
 			cPacket_BlockChange BlockChange;
 			BlockChange.m_PosX = a_X + m_PosX*c_ChunkWidth;
-			BlockChange.m_PosY = (char)(a_Y + m_PosY*c_ChunkHeight);
+			BlockChange.m_PosY = (unsigned char)(a_Y + m_PosY*c_ChunkHeight);
 			BlockChange.m_PosZ = a_Z + m_PosZ*c_ChunkWidth;
 			if( index != INDEX_OUT_OF_RANGE )
 			{

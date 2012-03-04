@@ -7,7 +7,7 @@ function OnBlockPlace( Block, Player )
 		local Y = Block.m_PosY
 		local Z = Block.m_PosZ
 		X, Y, Z = AddDirection( X, Y, Z, Block.m_Direction )
-		if( Y >= 128 or Y < 0 ) then
+		if( Y >= 256 or Y < 0 ) then
 			return true
 		end
 		
