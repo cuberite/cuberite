@@ -397,11 +397,18 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 	LOGINFO("Updating \"%s\" version 1 to version 2", m_FileName.c_str() );
 	int Offset = 0;
 	AString NewDataContents;
+	int ChunksConverted = 0;
 	for (sChunkHeaders::iterator itr = m_ChunkHeaders.begin(); itr != m_ChunkHeaders.end(); ++itr)
 	{
 		sChunkHeader * Header = *itr;
 
-		LOGINFO("Updating \"%s\" version 1 to version 2: Updating chunk [%d, %d]", m_FileName.c_str(), Header->m_ChunkX, Header->m_ChunkZ );
+		
+		if( ChunksConverted % 32 == 0 )
+		{
+			LOGINFO("Updating \"%s\" version 1 to version 2: %d\%", m_FileName.c_str(), (ChunksConverted*100) / m_ChunkHeaders.size() );
+		}
+		ChunksConverted++;
+		
 
 		AString Data;
 		int UncompressedSize = Header->m_UncompressedSize;
