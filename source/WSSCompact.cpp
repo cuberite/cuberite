@@ -269,7 +269,9 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	m_FileName(a_FileName),
 	m_LayerX(a_LayerX),
 	m_LayerZ(a_LayerZ),
-	m_NumDirty(0)
+	m_NumDirty(0),
+	m_ChunkVersion( PAK_VERSION ), // Init with latest version
+	m_PakVersion( CHUNK_VERSION )
 {
 	cFile f;
 	if (!f.Open(m_FileName, cFile::fmRead))
@@ -278,21 +280,26 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	}
 	
 	// Read headers:
-	char PakVersion = 0;
-	READ(PakVersion);
-	if (PakVersion != 1)
+	READ(m_PakVersion);
+	if (m_PakVersion != 1)
 	{
-		LOGERROR("File \"%s\" is in an unknown pak format (%d)", m_FileName.c_str(), PakVersion);
+		LOGERROR("File \"%s\" is in an unknown pak format (%d)", m_FileName.c_str(), m_PakVersion);
 		return;
 	}
 	
-	char ChunkVersion = 0;
-	READ(ChunkVersion);
-	if (ChunkVersion != 1)
+	READ(m_ChunkVersion);
+	switch( m_ChunkVersion )
 	{
-		LOGERROR("File \"%s\" is in an unknown chunk format (%d)", m_FileName.c_str(), ChunkVersion);
+	case 1:
+		m_ChunkSize.Set(16, 128, 16);
+		break;
+	case 2:
+		m_ChunkSize.Set(16, 256, 16);
+		break;
+	default:
+		LOGERROR("File \"%s\" is in an unknown chunk format (%d)", m_FileName.c_str(), m_ChunkVersion);
 		return;
-	}
+	};
 	
 	short NumChunks = 0;
 	READ(NumChunks);
@@ -310,6 +317,11 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	{
 		LOGERROR("Cannot read file \"%s\" contents", m_FileName.c_str());
 		return;
+	}
+
+	if( m_ChunkVersion == 1 ) // Convert chunks to version 2
+	{
+		UpdateChunk1To2();
 	}
 }
 
@@ -374,6 +386,136 @@ bool cWSSCompact::cPAKFile::SaveChunk(const cChunkCoords & a_Chunk, cWorld * a_W
 		SynchronizeFile();
 	}
 	return true;
+}
+
+
+
+
+
+void cWSSCompact::cPAKFile::UpdateChunk1To2()
+{
+	LOGINFO("Updating \"%s\" version 1 to version 2", m_FileName.c_str() );
+	int Offset = 0;
+	AString NewDataContents;
+	for (sChunkHeaders::iterator itr = m_ChunkHeaders.begin(); itr != m_ChunkHeaders.end(); ++itr)
+	{
+		sChunkHeader * Header = *itr;
+
+		LOGINFO("Updating \"%s\" version 1 to version 2: Updating chunk [%d, %d]", m_FileName.c_str(), Header->m_ChunkX, Header->m_ChunkZ );
+
+		AString Data;
+		int UncompressedSize = Header->m_UncompressedSize;
+		Data.assign(m_DataContents, Offset, Header->m_CompressedSize);
+		Offset += Header->m_CompressedSize;
+
+		// Crude data integrity check:
+		int ExpectedSize = (16*128*16)*2 + (16*128*16)/2; // For version 1
+		if (UncompressedSize < ExpectedSize)
+		{
+			LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
+				Header->m_ChunkX, Header->m_ChunkZ,
+				UncompressedSize, ExpectedSize
+				);
+			Offset += Header->m_CompressedSize;
+			continue;
+		}
+
+		// Decompress the data:
+		AString UncompressedData;
+		{
+			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, UncompressedSize);
+			if (errorcode != Z_OK)
+			{
+				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+					errorcode,
+					Header->m_ChunkX, Header->m_ChunkZ
+					);
+				Offset += Header->m_CompressedSize;
+				continue;
+			}
+		}
+
+		if (UncompressedSize != (int)UncompressedData.size())
+		{
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+				UncompressedSize, UncompressedData.size(),
+				Header->m_ChunkX, Header->m_ChunkZ
+				);
+			Offset += Header->m_CompressedSize;
+			continue;
+		}
+
+
+		// Old version is 128 blocks high with YZX axis order
+		AString ConvertedData;
+		unsigned int InChunkOffset = 0;
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) 
+		{
+			for( int y = 0; y < 128; ++y )
+			{
+				ConvertedData.push_back( UncompressedData[y + z*128 + x*128*16 + InChunkOffset] );
+			}
+			// Add 128 empty blocks after an old y column
+			ConvertedData.append( 128, E_BLOCK_AIR );
+		}
+		InChunkOffset += (16*128*16);
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Metadata
+		{
+			for( int y = 0; y < 64; ++y )
+			{
+				ConvertedData.push_back( UncompressedData[y + z*64 + x*64*16 + InChunkOffset] );
+			}
+			ConvertedData.append( 64, 0 );
+		}
+		InChunkOffset += (16*128*16)/2;
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Block light
+		{
+			for( int y = 0; y < 64; ++y )
+			{
+				ConvertedData.push_back( UncompressedData[y + z*64 + x*64*16 + InChunkOffset] );
+			}
+			ConvertedData.append( 64, 0 );
+		}
+		InChunkOffset += (16*128*16)/2;
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Sky light
+		{
+			for( int y = 0; y < 64; ++y )
+			{
+				ConvertedData.push_back( UncompressedData[y + z*64 + x*64*16 + InChunkOffset] );
+			}
+			ConvertedData.append( 64, 0 );
+		}
+		InChunkOffset += (16*128*16)/2;
+		// Add JSON data afterwards
+		if( UncompressedData.size() > InChunkOffset )
+		{
+			ConvertedData.append( UncompressedData.begin() + InChunkOffset, UncompressedData.end() );
+		}
+
+		// Re-compress data
+		AString CompressedData;
+		{
+			int errorcode = CompressString(ConvertedData.data(), ConvertedData.size(), CompressedData);
+			if (errorcode != Z_OK)
+			{
+				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
+					errorcode,
+					Header->m_ChunkX, Header->m_ChunkZ
+					);
+				continue;
+			}
+		}
+
+		Header->m_UncompressedSize = ConvertedData.size();
+		Header->m_CompressedSize = CompressedData.size();
+
+
+		NewDataContents.append( CompressedData );
+	}
+
+	// Done converting
+	m_DataContents = NewDataContents;
+	m_ChunkVersion = 2;
 }
 
 
@@ -539,10 +681,8 @@ void cWSSCompact::cPAKFile::SynchronizeFile(void)
 		return;
 	}
 	
-	char PakVersion = 1;
-	WRITE(PakVersion);
-	char ChunkVersion = 1;
-	WRITE(ChunkVersion);
+	WRITE(m_PakVersion);
+	WRITE(m_ChunkVersion);
 	short NumChunks = (short)m_ChunkHeaders.size();
 	WRITE(NumChunks);
 	for (sChunkHeaders::iterator itr = m_ChunkHeaders.begin(); itr != m_ChunkHeaders.end(); ++itr)

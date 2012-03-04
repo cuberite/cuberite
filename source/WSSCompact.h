@@ -12,6 +12,7 @@
 #define WSSCOMPACT_H_INCLUDED
 
 #include "WorldStorage.h"
+#include "Vector3i.h"
 
 
 
@@ -47,6 +48,8 @@ protected:
 		int GetLayerX(void) const {return m_LayerX; }
 		int GetLayerZ(void) const {return m_LayerZ; }
 		
+		static const int PAK_VERSION = 1;
+		static const int CHUNK_VERSION = 2;
 	protected:
 	
 		AString m_FileName;
@@ -57,10 +60,16 @@ protected:
 		AString       m_DataContents;  // Data contents of the file, cached
 		
 		int           m_NumDirty;  // Number of chunks that were written into m_DataContents but not into the file
+
+		Vector3i      m_ChunkSize; // Is related to m_ChunkVersion
+		char          m_ChunkVersion;
+		char          m_PakVersion;
 		
 		bool LoadChunk(const cChunkCoords & a_Chunk, int a_Offset, sChunkHeader * a_Header, cWorld * a_World);
 		bool SaveChunkToData(const cChunkCoords & a_Chunk, cWorld * a_World);  // Saves the chunk to m_DataContents, updates headers and m_NumDirty
 		void SynchronizeFile(void);  // Writes m_DataContents along with the headers to file, resets m_NumDirty
+
+		void UpdateChunk1To2(void);
 	} ;
 	
 	typedef std::list<cPAKFile *> cPAKFiles;
