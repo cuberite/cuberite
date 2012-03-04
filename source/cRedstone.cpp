@@ -12,7 +12,7 @@
 
 
 
-bool cRedstone::s_UseRedstone = true;
+bool cRedstone::s_UseRedstone = false;
 
 
 
@@ -32,6 +32,7 @@ cRedstone::cRedstone( cWorld* a_World )
 
 void cRedstone::ChangeRedstone( int fillx, int filly, int fillz, bool added )
 {
+	s_UseRedstone = false;
 	if( !s_UseRedstone ) return;
 
 	char before;
