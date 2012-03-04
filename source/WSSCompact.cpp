@@ -405,7 +405,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 1 to version 2: %d\%", m_FileName.c_str(), (ChunksConverted*100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 1 to version 2: %d%%", m_FileName.c_str(), (ChunksConverted*100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
 		
