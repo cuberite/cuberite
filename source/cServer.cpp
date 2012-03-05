@@ -353,31 +353,36 @@ bool cServer::Tick(float a_Dt)
 
 	cRoot::Get()->TickWorlds( a_Dt ); // TODO - Maybe give all worlds their own thread?
 
+	cClientHandleList RemoveClients;
 	{
 		cCSLock Lock(m_CSClients);
 		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				cClientHandle* RemoveMe = *itr;
+				RemoveClients.push_back(*itr);  // Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
 				itr = m_Clients.erase(itr);
-				delete RemoveMe;
 				continue;
 			}
 			(*itr)->Tick(a_Dt);
 			++itr;
-		}
+		}  // for itr - m_Clients[]
 	}
+	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
+	{
+		delete *itr;
+	} // for itr - RemoveClients[]
 
 	cRoot::Get()->GetPluginManager()->Tick( a_Dt );
 
 	if( !m_bRestarting )
+	{
 		return true;
+	}
 	else
 	{
 		m_bRestarting = false;
 		m_pState->RestartEvent.Set();
-		LOG("<<<<>>>>SIGNALLED SEMAPHORE");
 		return false;
 	}
 }
