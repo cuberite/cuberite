@@ -394,7 +394,6 @@ bool cWSSCompact::cPAKFile::SaveChunk(const cChunkCoords & a_Chunk, cWorld * a_W
 
 void cWSSCompact::cPAKFile::UpdateChunk1To2()
 {
-	LOGINFO("Updating \"%s\" version 1 to version 2", m_FileName.c_str() );
 	int Offset = 0;
 	AString NewDataContents;
 	int ChunksConverted = 0;
@@ -402,13 +401,11 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 	{
 		sChunkHeader * Header = *itr;
 
-		
 		if( ChunksConverted % 32 == 0 )
 		{
-			LOGINFO("Updating \"%s\" version 1 to version 2: %d%%", m_FileName.c_str(), (ChunksConverted*100) / m_ChunkHeaders.size() );
+			LOGINFO("Updating \"%s\" version 1 to version 2: %d %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
 		ChunksConverted++;
-		
 
 		AString Data;
 		int UncompressedSize = Header->m_UncompressedSize;
@@ -454,77 +451,84 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 
 		// Old version is 128 blocks high with YZX axis order
-		AString ConvertedData;
-		ConvertedData.reserve(cChunk::c_BlockDataSize);  // Pre-alloc, so that push_back() and append() don't need to re-alloc
+		char ConvertedData[cChunk::c_BlockDataSize];
+		int Index = 0;
 		unsigned int InChunkOffset = 0;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) 
 		{
 			for( int y = 0; y < 128; ++y )
 			{
-				ConvertedData.push_back( UncompressedData[y + z*128 + x*128*16 + InChunkOffset] );
+				ConvertedData[Index++] = UncompressedData[y + z * 128 + x * 128 * 16 + InChunkOffset];
 			}
 			// Add 128 empty blocks after an old y column
-			ConvertedData.append( 128, E_BLOCK_AIR );
+			memset(ConvertedData + Index, E_BLOCK_AIR, 128);
+			Index += 128;
 		}
-		InChunkOffset += (16*128*16);
+		InChunkOffset += (16 * 128 * 16);
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Metadata
 		{
 			for( int y = 0; y < 64; ++y )
 			{
-				ConvertedData.push_back( UncompressedData[y + z*64 + x*64*16 + InChunkOffset] );
+				ConvertedData[Index++] = UncompressedData[y + z * 64 + x * 64 * 16 + InChunkOffset];
 			}
-			ConvertedData.append( 64, 0 );
+			memset(ConvertedData + Index, 0, 64);
+			Index += 64;
 		}
-		InChunkOffset += (16*128*16)/2;
+		InChunkOffset += (16 * 128 * 16) / 2;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Block light
 		{
 			for( int y = 0; y < 64; ++y )
 			{
-				ConvertedData.push_back( UncompressedData[y + z*64 + x*64*16 + InChunkOffset] );
+				ConvertedData[Index++] = UncompressedData[y + z * 64 + x * 64 * 16 + InChunkOffset];
 			}
-			ConvertedData.append( 64, 0 );
+			memset(ConvertedData + Index, 0, 64);
+			Index += 64;
 		}
 		InChunkOffset += (16*128*16)/2;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Sky light
 		{
 			for( int y = 0; y < 64; ++y )
 			{
-				ConvertedData.push_back( UncompressedData[y + z*64 + x*64*16 + InChunkOffset] );
+				ConvertedData[Index++] = UncompressedData[y + z * 64 + x * 64 * 16 + InChunkOffset];
 			}
-			ConvertedData.append( 64, 0 );
+			memset(ConvertedData + Index, 0, 64);
+			Index += 64;
 		}
-		InChunkOffset += (16*128*16)/2;
+		InChunkOffset += (16 * 128 * 16) / 2;
+
+		AString Converted(ConvertedData, ARRAYCOUNT(ConvertedData));
+		
 		// Add JSON data afterwards
-		if( UncompressedData.size() > InChunkOffset )
+		if (UncompressedData.size() > InChunkOffset)
 		{
-			ConvertedData.append( UncompressedData.begin() + InChunkOffset, UncompressedData.end() );
+			Converted.append( UncompressedData.begin() + InChunkOffset, UncompressedData.end() );
 		}
 
 		// Re-compress data
 		AString CompressedData;
 		{
-			int errorcode = CompressString(ConvertedData.data(), ConvertedData.size(), CompressedData);
+			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData);
 			if (errorcode != Z_OK)
 			{
 				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
-					);
+				);
 				continue;
 			}
 		}
 
-		Header->m_UncompressedSize = ConvertedData.size();
+		// Save into file's cache
+		Header->m_UncompressedSize = Converted.size();
 		Header->m_CompressedSize = CompressedData.size();
-
-
 		NewDataContents.append( CompressedData );
-		m_NumDirty++;
 	}
 
 	// Done converting
 	m_DataContents = NewDataContents;
 	m_ChunkVersion = 2;
+	SynchronizeFile();
+	
 	LOGINFO("Updated \"%s\" version 1 to version 2", m_FileName.c_str() );
 }
 
