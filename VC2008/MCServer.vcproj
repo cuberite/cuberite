@@ -42,7 +42,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="../zlib-1.2.5;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;MINECRAFT_1_2_2=1"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -287,6 +287,14 @@
 			</File>
 			<File
 				RelativePath="..\source\cHeartBeat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ChunkSender.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ChunkSender.h"
 				>
 			</File>
 			<File

@@ -343,6 +343,22 @@ bool cChunkMap::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * 
 
 
 
+bool cChunkMap::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return false;
+	}
+	Chunk->GetBlockData(a_BlockData);
+	return true;
+}
+
+
+
+
+
 bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
@@ -469,14 +485,17 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
 	int OtherChunkX = ChunkX + ((BlockX > 8) ? 1 : -1);
 	int OtherChunkZ = ChunkZ + ((BlockZ > 8) ? 1 : -1);
 	
+	// We suppose that each player keeps their chunks in memory, therefore it makes little sense to try to re-load or even generate them.
+	// The only time the chunks are not valid is when the player is downloading the initial world and they should not call this at that moment
+	
 	cCSLock Lock(m_CSLayers);
-	GetChunkNoGen(ChunkX, ChunkY, ChunkZ)->CollectPickupsByPlayer(a_Player);
+	GetChunkNoLoad(ChunkX, ChunkY, ChunkZ)->CollectPickupsByPlayer(a_Player);
 
 	// Check the neighboring chunks as well:
-	GetChunkNoGen(OtherChunkX, ChunkY, ChunkZ     )->CollectPickupsByPlayer(a_Player);
-	GetChunkNoGen(OtherChunkX, ChunkY, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
-	GetChunkNoGen(ChunkX,      ChunkY, ChunkZ     )->CollectPickupsByPlayer(a_Player);
-	GetChunkNoGen(ChunkX,      ChunkY, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
+	GetChunkNoLoad(OtherChunkX, ChunkY, ChunkZ     )->CollectPickupsByPlayer(a_Player);
+	GetChunkNoLoad(OtherChunkX, ChunkY, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
+	GetChunkNoLoad(ChunkX,      ChunkY, ChunkZ     )->CollectPickupsByPlayer(a_Player);
+	GetChunkNoLoad(ChunkX,      ChunkY, OtherChunkZ)->CollectPickupsByPlayer(a_Player);
 }
 
 
@@ -511,7 +530,7 @@ char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 	if ((Chunk != NULL) && Chunk->IsValid() )
 	{
 		// Although it is called GetLight(), it actually gets meta when passed the Meta field
-		return Chunk->GetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z );
+		return cChunk::GetNibble( Chunk->pGetMeta(), a_X, a_Y, a_Z );
 	}
 	return 0;
 }
@@ -529,8 +548,8 @@ void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid() )	
 	{
-		// Although it is called SetLight(), it actually sets meta when passed the Meta field
-		Chunk->SetLight( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_BlockMeta );
+		cChunk::SetNibble( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_BlockMeta );
+		Chunk->MarkDirty();
 		Chunk->SendBlockTo( a_X, a_Y, a_Z, NULL );
 	}
 }
@@ -700,22 +719,6 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoo
 	{
 		GetChunkNoGen(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(a_Client);
 	}
-}
-
-
-
-
-
-bool cChunkMap::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	Chunk->SendTo(a_Client);
-	return true;
 }
 
 

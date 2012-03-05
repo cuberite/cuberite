@@ -144,4 +144,11 @@ public:
 
 
 
-#define MINECRAFT_1_2_2 (1)
+// TODO: Remove this when 1.2 is the major version out there and we're fully compatible
+#ifndef MINECRAFT_1_2_2
+	#define MINECRAFT_1_2_2 (1)
+#endif
+
+
+
+

@@ -81,25 +81,17 @@ AString cSignEntity::GetLine( int a_Index ) const
 
 
 
-void cSignEntity::SendTo( cClientHandle* a_Client )
+cPacket * cSignEntity::GetPacket(void)
 {
-	cPacket_UpdateSign Sign;
-	Sign.m_PosX = m_PosX;
-	Sign.m_PosY = (short)m_PosY;
-	Sign.m_PosZ = m_PosZ;
-	Sign.m_Line1 = m_Line[0];
-	Sign.m_Line2 = m_Line[1];
-	Sign.m_Line3 = m_Line[2];
-	Sign.m_Line4 = m_Line[3];
-
-	if ( a_Client != NULL )
-	{
-		a_Client->Send( Sign );
-	}
-	else // broadcast of a_Client == 0
-	{
-		m_World->BroadcastToChunkOfBlock(m_PosX, m_PosY, m_PosZ, &Sign );
-	}
+	cPacket_UpdateSign * Sign = new cPacket_UpdateSign;
+	Sign->m_PosX = m_PosX;
+	Sign->m_PosY = (short)m_PosY;
+	Sign->m_PosZ = m_PosZ;
+	Sign->m_Line1 = m_Line[0];
+	Sign->m_Line2 = m_Line[1];
+	Sign->m_Line3 = m_Line[2];
+	Sign->m_Line4 = m_Line[3];
+	return Sign;
 }
 
 

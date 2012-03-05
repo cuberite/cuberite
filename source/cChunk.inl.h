@@ -11,7 +11,7 @@
 
 
 __C_CHUNK_INLINE__
-char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
+char cChunk::GetNibble(char* a_Buffer, int a_BlockIdx)
 {
 	if( a_BlockIdx > -1 && a_BlockIdx < c_NumBlocks )
 	{
@@ -33,7 +33,7 @@ char cChunk::GetLight(char* a_Buffer, int a_BlockIdx)
 
 
 __C_CHUNK_INLINE__
-char cChunk::GetLight(char* a_Buffer, int x, int y, int z)
+char cChunk::GetNibble(char* a_Buffer, int x, int y, int z)
 {
 	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 	{
@@ -55,7 +55,7 @@ char cChunk::GetLight(char* a_Buffer, int x, int y, int z)
 
 
 __C_CHUNK_INLINE__
-void cChunk::SetLight(char* a_Buffer, int a_BlockIdx, char a_Light)
+void cChunk::SetNibble(char* a_Buffer, int a_BlockIdx, char a_Light)
 {
 	if( a_BlockIdx > -1 && a_BlockIdx < c_NumBlocks )
 	{
@@ -70,7 +70,6 @@ void cChunk::SetLight(char* a_Buffer, int a_BlockIdx, char a_Light)
 			a_Buffer[cindex] &= 0x0f; // Set second half to 0
 			a_Buffer[cindex] |= (a_Light << 4) & 0xf0;
 		}
-		MarkDirty();
 	}
 }
 
@@ -79,7 +78,7 @@ void cChunk::SetLight(char* a_Buffer, int a_BlockIdx, char a_Light)
 
 
 __C_CHUNK_INLINE__
-void cChunk::SetLight(char* a_Buffer, int x, int y, int z, char light)
+void cChunk::SetNibble(char* a_Buffer, int x, int y, int z, char light)
 {
 	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 	{
@@ -94,7 +93,6 @@ void cChunk::SetLight(char* a_Buffer, int x, int y, int z, char light)
 			a_Buffer[cindex] &= 0x0f; // Set second half to 0
 			a_Buffer[cindex] |= (light << 4) & 0xf0;
 		}
-		MarkDirty();
 	}
 }
 
@@ -105,13 +103,14 @@ void cChunk::SetLight(char* a_Buffer, int x, int y, int z, char light)
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff)
 {
-	unsigned char CurrentLight = GetLight( a_LightBuffer, a_X, a_Y, a_Z );
-	SetLight( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetLight( a_LightBuffer, a_X-1, a_Y, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
-	SetLight( a_LightBuffer, a_X+1, a_Y, a_Z, MAX(GetLight( a_LightBuffer, a_X+1, a_Y, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
-	SetLight( a_LightBuffer, a_X, a_Y-1, a_Z, MAX(GetLight( a_LightBuffer, a_X, a_Y-1, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
-	SetLight( a_LightBuffer, a_X, a_Y+1, a_Z, MAX(GetLight( a_LightBuffer, a_X, a_Y+1, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
-	SetLight( a_LightBuffer, a_X, a_Y, a_Z-1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z-1 ), MAX(0,CurrentLight-a_Falloff) ) );
-	SetLight( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z+1 ), MAX(0,CurrentLight-a_Falloff) ) );
+	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
+	SetNibble( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X-1, a_Y, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
+	SetNibble( a_LightBuffer, a_X+1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X+1, a_Y, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
+	SetNibble( a_LightBuffer, a_X, a_Y-1, a_Z, MAX(GetNibble( a_LightBuffer, a_X, a_Y-1, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
+	SetNibble( a_LightBuffer, a_X, a_Y+1, a_Z, MAX(GetNibble( a_LightBuffer, a_X, a_Y+1, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
+	SetNibble( a_LightBuffer, a_X, a_Y, a_Z-1, MAX(GetNibble( a_LightBuffer, a_X, a_Y, a_Z-1 ), MAX(0,CurrentLight-a_Falloff) ) );
+	SetNibble( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetNibble( a_LightBuffer, a_X, a_Y, a_Z+1 ), MAX(0,CurrentLight-a_Falloff) ) );
+	MarkDirty();
 }
 
 
@@ -121,9 +120,10 @@ void cChunk::SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, 
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 {
-	unsigned char CurrentLight = GetLight( a_LightBuffer, a_X, a_Y, a_Z );
-	SetLight( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetLight( a_LightBuffer, a_X-1, a_Y, a_Z ), CurrentLight-1) );
-	SetLight( a_LightBuffer, a_X+1, a_Y, a_Z, MAX(GetLight( a_LightBuffer, a_X+1, a_Y, a_Z ), CurrentLight-1) );
+	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
+	SetNibble( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X-1, a_Y, a_Z ), CurrentLight-1) );
+	SetNibble( a_LightBuffer, a_X+1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X+1, a_Y, a_Z ), CurrentLight-1) );
+	MarkDirty();
 }
 
 
@@ -133,9 +133,10 @@ void cChunk::SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 {
-	unsigned char CurrentLight = GetLight( a_LightBuffer, a_X, a_Y, a_Z );
-	SetLight( a_LightBuffer, a_X, a_Y-1, a_Z, MAX(GetLight( a_LightBuffer, a_X, a_Y-1, a_Z ), CurrentLight-1) );
-	SetLight( a_LightBuffer, a_X, a_Y+1, a_Z, MAX(GetLight( a_LightBuffer, a_X, a_Y+1, a_Z ), CurrentLight-1) );
+	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
+	SetNibble( a_LightBuffer, a_X, a_Y-1, a_Z, MAX(GetNibble( a_LightBuffer, a_X, a_Y-1, a_Z ), CurrentLight-1) );
+	SetNibble( a_LightBuffer, a_X, a_Y+1, a_Z, MAX(GetNibble( a_LightBuffer, a_X, a_Y+1, a_Z ), CurrentLight-1) );
+	MarkDirty();
 }
 
 
@@ -145,9 +146,10 @@ void cChunk::SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 __C_CHUNK_INLINE__
 void cChunk::SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
 {
-	unsigned char CurrentLight = GetLight( a_LightBuffer, a_X, a_Y, a_Z );
-	SetLight( a_LightBuffer, a_X, a_Y, a_Z-1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z-1 ), CurrentLight-1) );
-	SetLight( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetLight( a_LightBuffer, a_X, a_Y, a_Z+1 ), CurrentLight-1) );
+	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
+	SetNibble( a_LightBuffer, a_X, a_Y, a_Z-1, MAX(GetNibble( a_LightBuffer, a_X, a_Y, a_Z-1 ), CurrentLight-1) );
+	SetNibble( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetNibble( a_LightBuffer, a_X, a_Y, a_Z+1 ), CurrentLight-1) );
+	MarkDirty();
 }
 
 

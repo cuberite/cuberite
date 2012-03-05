@@ -177,6 +177,12 @@ cPacket * cPlayer::GetSpawnPacket(void) const
 
 void cPlayer::Tick(float a_Dt)
 {
+	if (!m_ClientHandle->IsPlaying())
+	{
+		// We're not yet in the game, ignore everything
+		return;
+	}
+	
 	cPawn::Tick(a_Dt);
 
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
@@ -233,7 +239,7 @@ void cPlayer::Tick(float a_Dt)
 		m_ClientHandle->StreamChunks();
 	}
 
-	if ( m_Health > 0 ) // make sure player is alive
+	if (m_Health > 0) // make sure player is alive
 	{
 		m_World->CollectPickupsByPlayer(this);
 	}

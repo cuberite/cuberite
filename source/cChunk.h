@@ -145,7 +145,10 @@ public:
 	void SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	
 	/// Copies m_BlockData into a_Blocks, only the block types
-	void GetBlocks(char a_Blocks[cChunk::c_NumBlocks]);
+	void GetBlocks(char * a_Blocks);
+	
+	/// Copies m_BlockData into a_Blocks, the entire array
+	void GetBlockData(char * a_BlockData);
 	
 	/// Returns true if there is a block entity at the coords specified
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -160,7 +163,7 @@ public:
 	int GetPosZ() { return m_PosZ; }
 	cWorld * GetWorld() { return m_World; }
 
-	void SendTo( cClientHandle * a_Client );
+	// OBSOLETE void SendTo( cClientHandle * a_Client );
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, char a_BlockType, char a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
@@ -206,10 +209,10 @@ public:
 	
 	void CopyBlockDataFrom(const char * a_NewBlockData);  // Copies all blockdata, recalculates heightmap (used by chunk loaders)
 	
-	char GetLight(char* a_Buffer, int a_BlockIdx);
-	char GetLight(char* a_Buffer, int x, int y, int z);
-	void SetLight(char* a_Buffer, int a_BlockIdx, char a_Light);
-	void SetLight(char* a_Buffer, int x, int y, int z, char light);
+	static char GetNibble(char * a_Buffer, int a_BlockIdx);
+	static char GetNibble(char * a_Buffer, int x, int y, int z);
+	static void SetNibble(char * a_Buffer, int a_BlockIdx, char a_Light);
+	static void SetNibble(char * a_Buffer, int x, int y, int z, char light);
 
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
 	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos );

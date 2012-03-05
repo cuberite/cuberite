@@ -238,6 +238,8 @@ cWorld::cWorld( const AString & a_WorldName )
 	}
 
 	m_ChunkMap = new cChunkMap(this );
+	
+	m_ChunkSender.Start(this);
 
 	m_Time = 0;
 	m_WorldTimeFraction = 0.f;
@@ -975,6 +977,7 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 void cWorld::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	m_ChunkMap->ChunkDataLoaded(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
 
@@ -984,6 +987,7 @@ void cWorld::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cha
 void cWorld::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	m_ChunkMap->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
 
@@ -1002,6 +1006,15 @@ void cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCa
 bool cWorld::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks)
 {
 	return m_ChunkMap->GetChunkBlocks(a_ChunkX, a_ChunkY, a_ChunkZ, a_Blocks);
+}
+
+
+
+
+
+bool cWorld::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+{
+	return m_ChunkMap->GetChunkBlockData(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData);
 }
 
 
@@ -1273,15 +1286,6 @@ void cWorld::RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClient
 void cWorld::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
 {
 	m_ChunkMap->RemoveClientFromChunks(a_Client, a_Chunks);
-}
-
-
-
-
-
-bool cWorld::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
-{
-	return m_ChunkMap->SendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
 }
 
 

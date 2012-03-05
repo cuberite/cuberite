@@ -45,7 +45,13 @@ public:
 	void ChunkDataLoaded    (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	void ChunkDataGenerated (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	void GetChunkData       (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
+	
+	/// Gets the chunk's blocks, only the block types
 	bool GetChunkBlocks     (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks);
+	
+	/// Gets the chunk's blockdata, the entire array
+	bool GetChunkBlockData  (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData);
+	
 	bool IsChunkValid       (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	bool HasChunkAnyClients (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -70,9 +76,6 @@ public:
 	
 	/// Removes the client from all chunks specified
 	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
-
-	/// Sends a chunk to client, returns true if successful, false if not sent
-	bool SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 
 	/// Moves the entity from its current chunk to the new chunk specified
 	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);

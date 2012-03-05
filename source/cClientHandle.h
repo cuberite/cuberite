@@ -94,6 +94,8 @@ public:
 
 	bool IsDestroyed() { return m_bDestroyed; }
 	void Destroy();
+	
+	bool IsPlaying(void) const {return (m_State == csPlaying); }
 
 	void Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL) { Send(&a_Packet, a_Priority); }
 	void Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL);

@@ -19,16 +19,15 @@ cPacket_MapChunk::~cPacket_MapChunk()
 
 
 
-cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
+cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
 {
-	ASSERT(a_Chunk->IsValid());
 	m_PacketID = E_MAP_CHUNK;
 
 #if (MINECRAFT_1_2_2 == 1 )
 
 	// ... 
-	m_PosX = a_Chunk->GetPosX(); // Chunk coordinates now, instead of block coordinates
-	m_PosZ = a_Chunk->GetPosZ();
+	m_PosX = a_ChunkX; // Chunk coordinates now, instead of block coordinates
+	m_PosZ = a_ChunkZ;
 
 	m_bContiguous = false;
 	m_BitMap1 = 0;
@@ -37,52 +36,59 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 	m_UnusedInt = 0;
 
 	
-	unsigned int DataSize = (cChunk::c_ChunkHeight/16) * (4096 + 2048 + 2048 + 2048);
-	char* AllData = new char[ DataSize ];
-	memset( AllData, 0, DataSize );
+	unsigned int DataSize = (cChunk::c_ChunkHeight / 16) * (4096 + 2048 + 2048 + 2048);
+	std::auto_ptr<char> AllData(new char[ DataSize ]);
+	memset( AllData.get(), 0, DataSize );
 
 	unsigned int iterator = 0;
-	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i ) // Old world is only 8*16 high (should be 16*16)
+	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
 	{
 		m_BitMap1 |= (1 << i); // This tells what chunks are sent. Use this to NOT send air only chunks (right now everything is sent)
-		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
+		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
 		{
-			AllData[iterator] = a_Chunk->GetBlock( x, y+i*16, z );
+			int idx = cChunk::MakeIndex(x, y + i * 16, z);
+			AllData.get()[iterator] = a_BlockData[idx];
 			++iterator;
-		}
+		}  // for y, z, x
 	}
-	//Send block metadata
-	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
+	
+	// Send block metadata:
+	char * Meta = a_BlockData + cChunk::c_NumBlocks;
+	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
 	{
-		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
+		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
-			for( int x = 0; x < 8; ++x )
+			for ( int x = 0; x < 8; ++x )
 			{
-				AllData[iterator] = a_Chunk->GetLight( a_Chunk->pGetMeta(), x*2+0, y+i*16, z ) | a_Chunk->GetLight( a_Chunk->pGetMeta(), x*2+1, y+i*16, z ) << 4;
+				AllData.get()[iterator] = cChunk::GetNibble(Meta, x * 2 + 0, y + i * 16, z) | (cChunk::GetNibble(Meta, x * 2 + 1, y + i * 16, z ) << 4);
+				++iterator;
+			}  // for x
+		}  // for y, z
+	}
+	
+	// Send block light:
+	char * Light = Meta + cChunk::c_NumBlocks / 2;
+	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
+	{
+		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
+		{
+			for ( int x = 0; x < 8; ++x )
+			{
+				AllData.get()[iterator] = cChunk::GetNibble(Light, x * 2 + 0, y + i * 16, z ) | (cChunk::GetNibble(Light, x * 2 + 1, y + i * 16, z ) << 4);
 				++iterator;
 			}
 		}
 	}
-	//Send block light
+	
+	// Send sky light:
+	char * SkyLight = Light + cChunk::c_NumBlocks / 2;
 	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
 	{
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
 			for( int x = 0; x < 8; ++x )
 			{
-				AllData[iterator] = a_Chunk->GetLight( a_Chunk->pGetLight(), x*2+0, y+i*16, z ) | a_Chunk->GetLight( a_Chunk->pGetLight(), x*2+1, y+i*16, z ) << 4;
-				++iterator;
-			}
-		}
-	}
-	//Send sky light
-	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
-	{
-		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
-		{
-			for( int x = 0; x < 8; ++x )
-			{
-				AllData[iterator] = a_Chunk->GetLight( a_Chunk->pGetSkyLight(), x*2+0, y+i*16, z ) | a_Chunk->GetLight( a_Chunk->pGetSkyLight(), x*2+1, y+i*16, z ) << 4;
+				AllData.get()[iterator] = cChunk::GetNibble(SkyLight, x * 2 + 0, y + i * 16, z ) | (cChunk::GetNibble(SkyLight, x * 2 + 1, y + i * 16, z ) << 4);
 				++iterator;
 			}
 		}
@@ -91,17 +97,15 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 	uLongf CompressedSize = compressBound( DataSize );
 	char * CompressedBlockData = new char[CompressedSize];
 
-	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)AllData, DataSize, Z_DEFAULT_COMPRESSION);
-
-	delete [] AllData;
+	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)AllData.get(), DataSize, Z_DEFAULT_COMPRESSION);
 
 	m_CompressedData = CompressedBlockData;
 	m_CompressedSize = CompressedSize;
 
 #else
-	m_PosX = a_Chunk->GetPosX() * cChunk::c_ChunkWidth; // It has to be block coordinates
-	m_PosY = (short)(a_Chunk->GetPosY() * cChunk::c_ChunkHeight);
-	m_PosZ = a_Chunk->GetPosZ() * cChunk::c_ChunkWidth;
+	m_PosX = a_ChunkX * cChunk::c_ChunkWidth; // It has to be block coordinates
+	m_PosY = (short)(a_ChunkY * cChunk::c_ChunkHeight);
+	m_PosZ = a_ChunkZ * cChunk::c_ChunkWidth;
 
 	m_SizeX = 15;
 	m_SizeY = 127;
@@ -110,7 +114,7 @@ cPacket_MapChunk::cPacket_MapChunk(cChunk * a_Chunk)
 	uLongf CompressedSize = compressBound( cChunk::c_BlockDataSize );
 	char * CompressedBlockData = new char[CompressedSize];
 
-	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)a_Chunk->pGetBlockData(), cChunk::c_BlockDataSize, Z_DEFAULT_COMPRESSION);
+	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)a_BlockData, cChunk::c_BlockDataSize, Z_DEFAULT_COMPRESSION);
 
 	m_CompressedData = CompressedBlockData;
 	m_CompressedSize = CompressedSize;

@@ -7,12 +7,6 @@
 
 
 
-class cChunk;
-
-
-
-
-
 class cPacket_MapChunk :
 	public cPacket
 {
@@ -39,6 +33,7 @@ public:
 	{ m_PacketID = E_MAP_CHUNK; m_CompressedData = 0; }
 	
 	cPacket_MapChunk( const cPacket_MapChunk & a_Copy );
+	cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData);
 	~cPacket_MapChunk();
 	virtual cPacket* Clone() const { return new cPacket_MapChunk(*this); }
 
@@ -66,12 +61,6 @@ public:
 
 
 	char * m_CompressedData;
-	
-protected:
-	friend class cChunk;
-	
-	cPacket_MapChunk(cChunk * a_Chunk);  // Called only from within cChunk, therefore it CAN receive a direct pointer
-
 };
 
 

@@ -15,6 +15,7 @@
 #include "WorldStorage.h"
 #include "cChunkGenerator.h"
 #include "Vector3i.h"
+#include "ChunkSender.h"
 
 
 
@@ -71,7 +72,13 @@ public:
 	void ChunkDataLoaded   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	void ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	void GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
+	
+	/// Gets the chunk's blocks, only the block types
 	bool GetChunkBlocks    (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks);
+	
+	/// Gets the chunk's blockdata, the entire array
+	bool GetChunkBlockData (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData);
+	
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	void UnloadUnusedChunks(void);
@@ -122,9 +129,6 @@ public:
 	
 	/// Removes the client from all chunks specified
 	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
-	
-	/// Sends a chunk to client, returns true if successful, false if not sent
-	bool SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Touches the chunk, causing it to be loaded or generated
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -284,6 +288,8 @@ private:
 	sSetBlockList    m_FastSetBlockQueue;
 
 	cChunkGenerator  m_Generator;
+	
+	cChunkSender     m_ChunkSender;
 
 	AString m_WorldName;
 

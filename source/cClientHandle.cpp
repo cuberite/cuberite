@@ -1681,35 +1681,6 @@ void cClientHandle::Tick(float a_Dt)
 		Send(Ping);
 		m_LastPingTime = m_PingStartTime;
 	}
-	
-	if (m_State >= csDownloadingWorld)
-	{
-		cWorld * World = m_Player->GetWorld();
-		
-		cCSLock Lock(m_CSChunkLists);
-	
-		// Send the chunks:
-		int NumSent = 0;
-		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
-		{
-			if (!World->SendChunkTo(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this))
-			{
-				++itr;
-				continue;
-			}
-			itr = m_ChunksToSend.erase(itr);
-			NumSent++;
-			if (NumSent > 10)
-			{
-				// Only send up to 10 chunks per tick, otherwise we'd choke the tick thread
-				break;
-			}
-		}  // for itr - m_ChunksToSend[]
-		Lock.Unlock();
-
-		// Check even if we didn't send anything - a chunk may have sent a notification that we'd miss otherwise
-		CheckIfWorldDownloaded();
-	}
 }
 
 
@@ -1737,20 +1708,38 @@ void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* =
 			case E_PLAYERMOVELOOK:
 			case E_KEEP_ALIVE:
 			case E_PRE_CHUNK:
+			case E_MAP_CHUNK:
 			{
 				// Allow
 				break;
 			}
-			case E_MAP_CHUNK:
-			{
-				CheckIfWorldDownloaded();
-				break;
-			}
-			
 			default: return;
 		}
 	}
 	
+	// Check chunks being sent, erase them from m_ChunksToSend:
+	if (a_Packet->m_PacketID == E_MAP_CHUNK)
+	{
+		#if (MINECRAFT_1_2_2 == 1)
+		int ChunkX = ((cPacket_MapChunk *)a_Packet)->m_PosX;
+		int ChunkZ = ((cPacket_MapChunk *)a_Packet)->m_PosZ;
+		#else
+		int ChunkX = ((cPacket_MapChunk *)a_Packet)->m_PosX / cChunk::c_ChunkWidth;
+		int ChunkZ = ((cPacket_MapChunk *)a_Packet)->m_PosZ / cChunk::c_ChunkWidth;
+		#endif
+		cCSLock Lock(m_CSChunkLists);
+		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
+		{
+			if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
+			{
+				m_ChunksToSend.erase(itr);
+				CheckIfWorldDownloaded();
+				break;
+			}
+		}  // for itr - m_ChunksToSend[]
+	}
+	
+	// Optimize away multiple queued RelativeEntityMoveLook packets:
 	cCSLock Lock(m_CSPackets);
 	if (a_Priority == E_PRIORITY_NORMAL)
 	{
