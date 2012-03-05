@@ -455,6 +455,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 		// Old version is 128 blocks high with YZX axis order
 		AString ConvertedData;
+		ConvertedData.reserve(cChunk::c_BlockDataSize);  // Pre-alloc, so that push_back() and append() don't need to re-alloc
 		unsigned int InChunkOffset = 0;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) 
 		{
@@ -524,6 +525,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 	// Done converting
 	m_DataContents = NewDataContents;
 	m_ChunkVersion = 2;
+	LOGINFO("Updated \"%s\" version 1 to version 2", m_FileName.c_str() );
 }
 
 
