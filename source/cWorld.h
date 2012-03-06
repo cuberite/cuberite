@@ -130,6 +130,12 @@ public:
 	/// Removes the client from all chunks specified
 	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
 	
+	/// Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is ignored (ChunkSender will send that chunk when it becomes valid)
+	void SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	
+	/// Removes client from ChunkSender's queue of chunks to be sent
+	void RemoveClientFromChunkSender(cClientHandle * a_Client);
+	
 	/// Touches the chunk, causing it to be loaded or generated
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	

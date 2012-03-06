@@ -62,12 +62,44 @@ void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	ASSERT(a_Client != NULL);
+	{
+		cCSLock Lock(m_CS);
+		m_SendChunks.push_back(sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client));
+	}
+	m_Event.Set();
+}
+
+
+
+
+
+void cChunkSender::RemoveClient(cClientHandle * a_Client)
+{
+	cCSLock Lock(m_CS);
+	for (sSendChunkList::iterator itr = m_SendChunks.begin(); itr != m_SendChunks.end();)
+	{
+		if (itr->m_Client == a_Client)
+		{
+			itr = m_SendChunks.erase(itr);
+			continue;
+		}
+		++itr;
+	}  // for itr - m_SendChunks[]
+}
+
+
+
+
+
 void cChunkSender::Execute(void)
 {
 	while (!mShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
-		while (m_ChunksReady.empty())
+		while (m_ChunksReady.empty() && m_SendChunks.empty())
 		{
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
@@ -77,29 +109,66 @@ void cChunkSender::Execute(void)
 			}
 		}  // while (empty)
 		
-		// Take one from the queue:
-		cChunkCoords Coords(m_ChunksReady.front());
-		m_ChunksReady.pop_front();
-		Lock.Unlock();
-		
-		ASSERT(m_World != NULL);
-		
-		// Send it to anyone waiting:
-		m_World->GetChunkData(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, this);
-		cPacket_PreChunk PreChunk(Coords.m_ChunkX, Coords.m_ChunkZ, true);
-		cPacket_MapChunk MapChunk(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, m_BlockData);
-		m_World->BroadcastToChunk(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, PreChunk);
-		m_World->BroadcastToChunk(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, MapChunk);
-		
-		// Send entity creation packets:
-		for (PacketList::iterator itr = m_Packets.begin(); itr != m_Packets.end(); ++itr)
+		if (!m_ChunksReady.empty())
 		{
-			m_World->BroadcastToChunk(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, **itr);
-			delete *itr;
-		}  // for itr - m_Packets
-		m_Packets.clear();
-		
+			// Take one from the queue:
+			cChunkCoords Coords(m_ChunksReady.front());
+			m_ChunksReady.pop_front();
+			Lock.Unlock();
+			
+			SendChunk(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, NULL);
+		}
+		else
+		{
+			// Take one from the queue:
+			sSendChunk Chunk(m_SendChunks.front());
+			m_SendChunks.pop_front();
+			Lock.Unlock();
+			
+			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkY, Chunk.m_ChunkZ, Chunk.m_Client);
+		}
 	}  // while (!mShouldTerminate)
+}
+
+
+
+
+
+void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	ASSERT(m_World != NULL);
+	
+	// Prepare MapChunk packets:
+	m_World->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, this);
+	cPacket_PreChunk PreChunk(a_ChunkX, a_ChunkZ, true);
+	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData);
+	
+	// Send:
+	if (a_Client == NULL)
+	{
+		m_World->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, PreChunk);
+		m_World->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, MapChunk);
+	}
+	else
+	{
+		a_Client->Send(PreChunk);
+		a_Client->Send(MapChunk);
+	}
+	
+	// Send entity creation packets:
+	for (PacketList::iterator itr = m_Packets.begin(); itr != m_Packets.end(); ++itr)
+	{
+		if (a_Client == NULL)
+		{
+			m_World->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, **itr);
+		}
+		else
+		{
+			a_Client->Send(**itr);
+		}
+		delete *itr;
+	}  // for itr - m_Packets[]
+	m_Packets.clear();
 }
 
 

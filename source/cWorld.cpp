@@ -1292,6 +1292,24 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoords
 
 
 
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+{
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+}
+
+
+
+
+
+void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
+{
+	m_ChunkSender.RemoveClient(a_Client);
+}
+
+
+
+
+
 void cWorld::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkY, a_ChunkZ);

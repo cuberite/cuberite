@@ -240,6 +240,7 @@ void cClientHandle::Destroy()
 	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
 	{
 		RemoveFromAllChunks();
+		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 	}
 
 	m_bDestroyed = true;
@@ -355,7 +356,8 @@ void cClientHandle::StreamChunks(void)
 	cWorld * World = m_Player->GetWorld();
 	ASSERT(World != NULL);
 
-	// Remove all loaded chunks that are no longer in range:
+	// Remove all loaded chunks that are no longer in range; deferred to out-of-CS:
+	cChunkCoordsList RemoveChunks;
 	{
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
@@ -364,8 +366,7 @@ void cClientHandle::StreamChunks(void)
 			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
 			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
 			{
-				World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
-				Send( cPacket_PreChunk( itr->m_ChunkX, itr->m_ChunkZ, false ) );
+				RemoveChunks.push_back(*itr);
 				itr = m_LoadedChunks.erase(itr);
 			}
 			else
@@ -385,8 +386,13 @@ void cClientHandle::StreamChunks(void)
 			{
 				++itr;
 			}
-		}
+		}  // for itr - m_ChunksToSend[]
 	}
+	for (cChunkCoordsList::iterator itr = RemoveChunks.begin(); itr != RemoveChunks.end(); ++itr)
+	{
+		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
+		Send(cPacket_PreChunk(itr->m_ChunkX, itr->m_ChunkZ, false));
+	}  // for itr - RemoveChunks[]
 	
 	// Add all chunks that are in range and not yet in m_LoadedChunks:
 	// Queue these smartly - from the center out to the edge
@@ -435,6 +441,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+		World->SendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, this);
 	}
 }
 
