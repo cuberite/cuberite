@@ -69,6 +69,9 @@ ENUM_ITEM_ID cBlockToPickup::ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_U
 		return E_ITEM_GLOWSTONE_DUST;
 	case E_BLOCK_DOUBLE_STEP:
 		return E_ITEM_STEP;
+	case E_BLOCK_REDSTONE_REPEATER_OFF:
+	case E_BLOCK_REDSTONE_REPEATER_ON:
+		return E_ITEM_REDSTONE_REPEATER;
 	default:
 		return (ENUM_ITEM_ID)a_BlockID;
 	}
