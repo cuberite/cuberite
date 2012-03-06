@@ -274,14 +274,14 @@ void cWorldStorage::InitSchemas(void)
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	
-	if (m_StorageSchemaName == "Default")
+	if (stricmp(m_StorageSchemaName.c_str(), "default") == 0)
 	{
 		m_SaveSchema = m_Schemas.front();
 		return;
 	}
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
 	{
-		if ((*itr)->GetName() == m_StorageSchemaName)
+		if (stricmp((*itr)->GetName().c_str(), m_StorageSchemaName.c_str()) == 0)
 		{
 			m_SaveSchema = *itr;
 			return;
