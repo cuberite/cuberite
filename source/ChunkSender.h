@@ -3,7 +3,19 @@
 
 // Interfaces to the cChunkSender class representing the thread that waits for chunks becoming ready (loaded / generated) and sends them to clients
 
-
+/*
+The whole thing is a thread that runs in a loop, waiting for either:
+	"finished chunks" (ChunkReady()), or
+	"chunks to send" (QueueSendChunkTo() ) 
+to come to a queue. 
+And once they do, it requests the chunk data and sends it all away, either
+	broadcasting (ChunkReady), or
+	sends to a specific client (QueueSendChunkTo)
+Chunk data is queried using the cChunkDataCallback interface.
+It is cached inside the ChunkSender object during the query and then processed after the query ends.
+Note that the data needs to be compressed only *after* the query finishes, 
+because the query callbacks run with ChunkMap's CS locked.
+*/
 
 
 
@@ -79,6 +91,7 @@ protected:
 	virtual void Execute(void) override;
 	
 	// cChunkDataCallback overrides:
+	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
 	virtual void BlockData(const char * a_Data) override;
 	virtual void Entity(cEntity * a_Entity) override;
 	virtual void BlockEntity(cBlockEntity * a_Entity) override;
