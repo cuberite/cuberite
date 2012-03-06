@@ -261,11 +261,11 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
-	memset( g_BlockLightValue, 0x0, ARRAYSIZE( g_BlockLightValue ) );
-	memset( g_BlockSpreadLightFalloff, 0xf, ARRAYSIZE( g_BlockSpreadLightFalloff ) ); // 0xf means total falloff
-	memset( g_BlockTransparent, 0x0, ARRAYSIZE( g_BlockTransparent ) );
-	memset( g_BlockOneHitDig, 0x0, ARRAYSIZE( g_BlockOneHitDig ) );
-	memset( g_BlockPistonBreakable, 0x0, ARRAYSIZE( g_BlockPistonBreakable ) );
+	memset( g_BlockLightValue, 0x0, ARRAYCOUNT( g_BlockLightValue ) );
+	memset( g_BlockSpreadLightFalloff, 0xf, ARRAYCOUNT( g_BlockSpreadLightFalloff ) ); // 0xf means total falloff
+	memset( g_BlockTransparent, 0x0, ARRAYCOUNT( g_BlockTransparent ) );
+	memset( g_BlockOneHitDig, 0x0, ARRAYCOUNT( g_BlockOneHitDig ) );
+	memset( g_BlockPistonBreakable, 0x0, ARRAYCOUNT( g_BlockPistonBreakable ) );
 
 	// Emissive blocks
 	g_BlockLightValue[ E_BLOCK_TORCH ] =			14;
