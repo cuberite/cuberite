@@ -12,6 +12,8 @@
 #ifndef _MSC_VER
 	// Non-MS compilers don't know the override keyword
 	#define override
+	#define abstract
+	#define stricmp strcasecmp
 #else
 	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
 	#pragma warning(disable:4481)
@@ -106,6 +108,9 @@
 
 /// Evaluates to the number of elements in an array (compile-time!)
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
+
+/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
+#define KiB * 1024
 
 #ifdef _MSC_VER
 	#define OBSOLETE __declspec(deprecated)
