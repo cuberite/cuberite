@@ -335,6 +335,7 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 		switch( Block )
 		{
 		case E_BLOCK_PISTON:
+		case E_BLOCK_STICKY_PISTON:
 			if( IsPowered( pos ) )
 			{
 				cPiston Piston( m_World );
@@ -371,6 +372,7 @@ bool cRedstoneSimulator::PowerBlock( const Vector3i & a_BlockPos, const Vector3i
 		}
 		break;
 	case E_BLOCK_PISTON:
+	case E_BLOCK_STICKY_PISTON:
 		{
 			m_RefreshPistons.push_back( a_BlockPos );
 		}
@@ -419,6 +421,7 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 		}
 		break;
 	case E_BLOCK_PISTON:
+	case E_BLOCK_STICKY_PISTON:
 		{
 			m_RefreshPistons.push_back( a_BlockPos );
 		}
