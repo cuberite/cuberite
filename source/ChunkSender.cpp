@@ -186,7 +186,11 @@ void cChunkSender::BlockData(const char * a_Data)
 
 void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
-	m_Packets.push_back(a_Entity->GetPacket());
+	cPacket * Packet = a_Entity->GetPacket();
+	if (Packet != NULL)
+	{
+		m_Packets.push_back(Packet);
+	}
 }
 
 
