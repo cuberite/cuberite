@@ -25,7 +25,7 @@ public:
 
 	static bool IsRepeaterPointingTo( const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos )
 	{
-		switch( a_MetaData )
+		switch( a_MetaData & 0x3 )
 		{
 		case 0x0:
 			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 0, 0, 1 ) ) )
@@ -59,7 +59,7 @@ public:
 
 	static bool IsRepeaterPointingAway( const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos )
 	{
-		switch( a_MetaData )
+		switch( a_MetaData & 0x3 )
 		{
 		case 0x0:
 			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 0, 0,-1 ) ) )
@@ -93,7 +93,7 @@ public:
 
 	static Vector3i GetRepeaterDirection( char a_MetaData )
 	{
-		switch( a_MetaData )
+		switch( a_MetaData & 0x3 )
 		{
 		case 0x0:
 			return Vector3i( 0, 0,-1 );
