@@ -62,8 +62,8 @@ public:
 	
 	static cNBTTag * CreateTag(cNBTTag * a_Parent, eTagType a_Type, const AString & a_Name);  // Creates a new instance of a tag specified by iType, uses the correct class
 	
-	virtual cNBTTag * FindChildByName(const AString & a_Name) {return NULL; }
-	cNBTTag * FindChildByPath(const AString & a_Path);
+	virtual cNBTTag * FindChildByName(const AString & a_Name) const {return NULL; }
+	const cNBTTag * FindChildByPath(const AString & a_Path) const;
 } ;
 
 typedef cNBTTag cNBTTree;
@@ -118,7 +118,7 @@ public:
 	cNBTTag *         GetChildByIdx   (size_t a_Index);
 	const cNBTTags &  GetChildren     (void) const {return m_Children; }
 	size_t            GetChildrenCount(void) const {return m_Children.size(); }
-	virtual cNBTTag * FindChildByName (const AString & a_Name) override;
+	virtual cNBTTag * FindChildByName (const AString & a_Name) const override;
 	
 	int      SetChildrenType(eTagType a_Type);  // Only valid when list empty
 	eTagType GetChildrenType(void) const {return m_ChildrenType; }
@@ -142,7 +142,7 @@ public:
 	cNBTTag *         GetChildByIdx   (size_t a_Index);
 	const cNBTTags &  GetChildren     (void) const {return m_Children; }
 	size_t            GetChildrenCount(void) const {return m_Children.size(); }
-	virtual cNBTTag * FindChildByName (const AString & a_Name) override;
+	virtual cNBTTag * FindChildByName (const AString & a_Name) const override;
 } ;
 
 
@@ -195,6 +195,17 @@ public:
 	/// Returns the parsed tree, or NULL on failure
 	static cNBTTree * Parse(const char * a_Data, int a_Length);
 } ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Dumping the tree (DEBUG-only)
+
+#ifdef _DEBUG
+void DumpTree(const cNBTTree * a_Tree, int a_Level = 0);
+#endif  // _DEBUG
 
 
 

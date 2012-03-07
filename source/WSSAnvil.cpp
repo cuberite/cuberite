@@ -9,6 +9,8 @@
 #include "zlib.h"
 #include "NBT.h"
 #include "BlockID.h"
+#include "cChestEntity.h"
+#include "cItem.h"
 
 
 
@@ -219,7 +221,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	cEntityList Entities;
 	cBlockEntityList BlockEntities;
 	
-	// TODO: Load the entities from NBT
+	// Load the entities from NBT:
+	LoadEntitiesFromNBT     (Entities,      (cNBTList *)(a_NBT.FindChildByPath("Level\\Entities")));
+	LoadBlockEntitiesFromNBT(BlockEntities, (cNBTList *)(a_NBT.FindChildByPath("Level\\TileEntities")));
 	
 	// Reorder the chunk data - walk the MCA-formatted data sequentially and copy it into the right place in the ChunkData:
 	char ChunkData[cChunk::c_BlockDataSize];
@@ -253,6 +257,124 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	}  // for y/z/x
 	
 	m_World->ChunkDataLoaded(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, ChunkData, Entities, BlockEntities);
+	return true;
+}
+
+
+
+
+
+void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * a_NBT)
+{
+	// TODO: Load the entities
+}
+
+
+
+
+
+void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, const cNBTList * a_NBT)
+{
+	if ((a_NBT == NULL) || (a_NBT->GetType() != cNBTTag::TAG_List))
+	{
+		return;
+	}
+	const cNBTTags & Tags = a_NBT->GetChildren();
+	
+	for (cNBTTags::const_iterator itr = Tags.begin(); itr != Tags.end(); ++itr)
+	{
+		if ((*itr)->GetType() != cNBTTag::TAG_Compound)
+		{
+			continue;
+		}
+		cNBTString * sID = (cNBTString *)((*itr)->FindChildByName("id"));
+		if (sID == NULL)
+		{
+			continue;
+		}
+		if (sID->m_Value == "Chest")
+		{
+			LoadChestFromNBT(a_BlockEntities, (cNBTCompound *)(*itr));
+		}
+		// TODO: Other block entities
+	}  // for itr - Tags[]
+}
+
+
+
+
+
+void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cNBTCompound * a_NBT)
+{
+	ASSERT(a_NBT != NULL);
+	ASSERT(a_NBT->GetType() == cNBTTag::TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, x, y, z))
+	{
+		return;
+	}
+	cNBTList * Items = (cNBTList *)(a_NBT->FindChildByName("Items"));
+	if ((Items == NULL) || (Items->GetType() != cNBTTag::TAG_List))
+	{
+		return;  // Make it an empty chest
+	}
+	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World));
+	const cNBTTags & ItemDefs = Items->GetChildren();
+	for (cNBTTags::const_iterator itr = ItemDefs.begin(); itr != ItemDefs.end(); ++itr)
+	{
+		cNBTByte * Slot = (cNBTByte *)((*itr)->FindChildByName("Slot"));
+		if ((Slot == NULL) || (Slot->GetType() != cNBTTag::TAG_Byte))
+		{
+			continue;
+		}
+		cItem Item;
+		cNBTShort * ID = (cNBTShort *)((*itr)->FindChildByName("id"));
+		if ((ID == NULL) || (ID->GetType() != cNBTTag::TAG_Short))
+		{
+			continue;
+		}
+		Item.m_ItemID = (ENUM_ITEM_ID)(ID->m_Value);
+		cNBTShort * Damage = (cNBTShort *)((*itr)->FindChildByName("Damage"));
+		if ((Damage == NULL) || (Damage->GetType() != cNBTTag::TAG_Short))
+		{
+			continue;
+		}
+		Item.m_ItemHealth = Damage->m_Value;
+		cNBTByte * Count = (cNBTByte *)((*itr)->FindChildByName("Count"));
+		if ((Count == NULL) || (Count->GetType() != cNBTTag::TAG_Byte))
+		{
+			continue;
+		}
+		Item.m_ItemCount = Count->m_Value;
+		Chest->SetSlot(Slot->m_Value, Item);
+	}  // for itr - ItemDefs[]
+	a_BlockEntities.push_back(Chest.release());
+}
+
+
+
+
+
+bool cWSSAnvil::GetBlockEntityNBTPos(const cNBTCompound * a_NBT, int & a_X, int & a_Y, int & a_Z)
+{
+	cNBTInt * x = (cNBTInt *)(a_NBT->FindChildByName("x"));
+	if ((x == NULL) || (x->GetType() != cNBTTag::TAG_Int))
+	{
+		return false;
+	}
+	cNBTInt * y = (cNBTInt *)(a_NBT->FindChildByName("y"));
+	if ((y == NULL) || (y->GetType() != cNBTTag::TAG_Int))
+	{
+		return false;
+	}
+	cNBTInt * z = (cNBTInt *)(a_NBT->FindChildByName("z"));
+	if ((z == NULL) || (z->GetType() != cNBTTag::TAG_Int))
+	{
+		return false;
+	}
+	a_X = x->m_Value;
+	a_Y = y->m_Value;
+	a_Z = z->m_Value;
 	return true;
 }
 

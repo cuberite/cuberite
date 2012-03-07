@@ -26,6 +26,8 @@ enum
 
 // fwd: "NBT.h"
 class cNBTTag;
+class cNBTList;
+class cNBTCompound;
 
 
 
@@ -80,6 +82,17 @@ protected:
 	
 	/// Loads the chunk from NBT data (no locking needed)
 	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT);
+	
+	/// Loads the chunk's entities from NBT data (a_NBT is the Level\\Entities list tag; may be NULL)
+	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * a_NBT);
+	
+	/// Loads the chunk's BlockEntities from NBT data (a_NBT is the Level\\TileEntities list tag; may be NULL)
+	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cNBTList * a_NBT);
+	
+	void LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cNBTCompound * a_NBT);
+	
+	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
+	bool GetBlockEntityNBTPos(const cNBTCompound * a_NBT, int & a_X, int & a_Y, int & a_Z);
 	
 	/// Gets the correct MCA file either from cache or from disk, manages the m_MCAFiles cache; assumes m_CS is locked
 	cMCAFile * LoadMCAFile(const cChunkCoords & a_Chunk);

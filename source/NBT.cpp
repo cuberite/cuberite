@@ -88,11 +88,11 @@ cNBTTag * cNBTTag::CreateTag(cNBTTag * a_Parent, eTagType a_Type, const AString 
 
 
 
-cNBTTag * cNBTTag::FindChildByPath(const AString & iPath)
+const cNBTTag * cNBTTag::FindChildByPath(const AString & iPath) const
 {
 	size_t PrevIdx = 0;
 	size_t idx = iPath.find('\\');
-	cNBTTag * res = this;
+	const cNBTTag * res = this;
 	while ((res != NULL) && (idx != AString::npos))
 	{
 		res = res->FindChildByName(AString(iPath, PrevIdx, idx - PrevIdx));
@@ -191,9 +191,9 @@ cNBTTag * cNBTList::GetChildByIdx(size_t iIndex)
 
 
 
-cNBTTag * cNBTList::FindChildByName(const AString & a_Name)
+cNBTTag * cNBTList::FindChildByName(const AString & a_Name) const
 {
-	for (cNBTTags::iterator itr = m_Children.begin(); itr != m_Children.end(); ++itr)
+	for (cNBTTags::const_iterator itr = m_Children.begin(); itr != m_Children.end(); ++itr)
 	{
 		if ((*itr)->GetName() == a_Name)
 		{
@@ -260,9 +260,9 @@ cNBTTag * cNBTCompound::GetChildByIdx(size_t iIndex)
 
 
 
-cNBTTag * cNBTCompound::FindChildByName(const AString & a_Name)
+cNBTTag * cNBTCompound::FindChildByName(const AString & a_Name) const
 {
-	for (cNBTTags::iterator itr = m_Children.begin(); itr != m_Children.end(); ++itr)
+	for (cNBTTags::const_iterator itr = m_Children.begin(); itr != m_Children.end(); ++itr)
 	{
 		if ((*itr)->GetName() == a_Name)
 		{
@@ -580,6 +580,7 @@ int cNBTParser::ReadTag(const char ** a_Data, int * a_Length, cNBTTag::eTagType 
 	return ERROR_PRIVATE_NBTPARSER_BADTYPE;
 }
 
+#undef CASE_SIMPLE_TAG
 
 
 
@@ -614,6 +615,88 @@ cNBTTree * cNBTParser::Parse(const char * a_Data, int a_Length)
 	return NULL;
 }
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Dumping the NBT tree (debug-only)
+
+#ifdef _DEBUG
+
+#define CASE_SIMPLE_TAG(TYPE,FMT) \
+	case cNBTTag::TAG_##TYPE: \
+	{ \
+		AString out; \
+		Printf(out, "%sTAG_" TEXT(#TYPE) TEXT("(\"%hs\"): %") TEXT(FMT) TEXT("\n"), Indent.c_str(), a_Tree->GetName().c_str(), ((cNBT##TYPE *)a_Tree)->m_Value); \
+		OutputDebugString(out.c_str()); \
+		break; \
+	}
+	
+void DumpTree(const cNBTTree * a_Tree, int a_Level)
+{
+	AString Indent(a_Level, TEXT(' '));
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	switch (a_Tree->GetType())
+	{
+		CASE_SIMPLE_TAG(Byte,  "d")
+		CASE_SIMPLE_TAG(Short, "d")
+		CASE_SIMPLE_TAG(Int,   "d")
+		CASE_SIMPLE_TAG(Long,   "I64d")
+		CASE_SIMPLE_TAG(Float,  "f")
+		CASE_SIMPLE_TAG(Double, "f")
+		
+		case cNBTTag::TAG_ByteArray:
+		{
+			AString out;
+			Printf(out, "%sTAG_ByteArray(\"%hs\"): %d bytes\n", Indent.c_str(), a_Tree->GetName().c_str(), ((cNBTByteArray *)a_Tree)->m_Value.size());
+			OutputDebugString(out.c_str());
+			break;
+		}
+		
+		case cNBTTag::TAG_String:
+		{
+			AString out;
+			Printf(out, "%sTAG_String(\"%hs\"): %d bytes: \"%hs\"\n", Indent.c_str(), a_Tree->GetName().c_str(), ((cNBTString *)a_Tree)->m_Value.size(), ((cNBTString *)a_Tree)->m_Value.c_str());
+			OutputDebugString(out.c_str());
+			break;
+		}
+		
+		case cNBTTag::TAG_List:
+		{
+			const cNBTTags & Children = ((cNBTList *)a_Tree)->GetChildren();
+			AString out;
+			Printf(out, "%sTAG_List(\"%hs\"): %d items of type %d\n%s{\n", Indent.c_str(), a_Tree->GetName().c_str(), Children.size(), ((cNBTList *)a_Tree)->GetChildrenType(), Indent.c_str());
+			OutputDebugString(out.c_str());
+			for (cNBTTags::const_iterator itr = Children.begin(); itr != Children.end(); ++itr)
+			{
+				DumpTree(*itr, a_Level + 1);
+			}  // for itr - Children[]
+			Printf(out, "%s}\n", Indent.c_str());
+			OutputDebugString(out.c_str());
+			break;
+		}
+
+		case cNBTTag::TAG_Compound:
+		{
+			const cNBTTags & Children = ((cNBTCompound *)a_Tree)->GetChildren();
+			AString out;
+			Printf(out, "%sTAG_Compound(\"%hs\"): %d items\n%s{\n", Indent.c_str(), a_Tree->GetName().c_str(), Children.size(), Indent.c_str());
+			OutputDebugString(out.c_str());
+			for (cNBTTags::const_iterator itr = Children.begin(); itr != Children.end(); ++itr)
+			{
+				DumpTree(*itr, a_Level + 1);
+			}  // for itr - Children[]
+			Printf(out, "%s}\n", Indent.c_str());
+			OutputDebugString(out.c_str());
+			break;
+		}
+	}
+}
+
+#undef CASE_SIMPLE_TAG
+
+#endif  // _DEBUG
 
 
 
