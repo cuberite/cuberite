@@ -181,6 +181,8 @@ void cEntity::Destroy()
 	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, cPacket_DestroyEntity(this));
 	
 	m_bDestroyed = true;
+
+	Destroyed();
 }
 
 

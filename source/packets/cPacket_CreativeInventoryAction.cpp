@@ -56,7 +56,6 @@ void cPacket_CreativeInventoryAction::Serialize(AString & a_Data) const
 		// WARNING: HERE ITS -1, BUT IN NAMED ENTITY SPAWN PACKET ITS 0 !!
 	}
 
-	unsigned int i = 0;
 	AppendByte	 (a_Data, m_PacketID);
 	AppendShort  (a_Data, m_Slot);
 

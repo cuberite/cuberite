@@ -4,6 +4,7 @@
 #include "cPawn.h"
 #include "cSurvivalInventory.h"
 #include "cCreativeInventory.h"
+#include "Defines.h"
 
 
 
@@ -21,9 +22,10 @@ class cClientHandle;
 class cPlayer : public cPawn												//tolua_export
 {																			//tolua_export
 public:
+	typedef cPawn super;
 	CLASS_PROTOTYPE();
 
-	cPlayer(cClientHandle* a_Client, const AString & a_PlayerName);
+	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();
 
 	virtual void Initialize( cWorld* a_World );								//tolua_export
@@ -37,18 +39,18 @@ public:
 	Vector3d GetEyePosition();												//tolua_export
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline const double & GetStance() { return m_Stance; }					//tolua_export
-	inline cInventory & GetInventory() { if(GetGameMode() == 0) return *m_Inventory; else return *m_CreativeInventory; }					//tolua_export
+	inline cInventory & GetInventory() { if(GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }	//tolua_export
 
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
 
-	int GetGameMode() { return m_GameMode; }															//tolua_export
+	eGameMode GetGameMode() { return m_GameMode; }														//tolua_export
 	std::string GetIP() { return m_IP; }																//tolua_export
 	float GetLastBlockActionTime() { return m_LastBlockActionTime; }									//tolua_export
 	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }										//tolua_export
 	void SetLastBlockActionCnt( int );																	//tolua_export
 	void SetLastBlockActionTime();																		//tolua_export
-	void SetGameMode( int a_GameMode );																	//tolua_export
-	void LoginSetGameMode( int a_GameMode );
+	void SetGameMode( eGameMode a_GameMode );															//tolua_export
+	void LoginSetGameMode( eGameMode a_GameMode );
 	void SetIP( std::string a_IP );
 
 	// Tries to move to a new position, with collision checks and stuff
@@ -58,13 +60,12 @@ public:
 	void OpenWindow( cWindow* a_Window );
 	void CloseWindow(char a_WindowType);
 
-	cClientHandle* GetClientHandle() { return m_ClientHandle; }				//tolua_export
-	void SetClientHandle( cClientHandle* a_Client ) { m_ClientHandle = a_Client; }
+	cClientHandle * GetClientHandle() { return m_ClientHandle; }			//tolua_export
 
 	void SendMessage( const char* a_Message );								//tolua_export
 
-	const AString & GetName(void) const;													//tolua_export
-	void SetName(const AString & a_Name);										//tolua_export
+	const AString & GetName(void) const;									//tolua_export
+	void SetName(const AString & a_Name);									//tolua_export
 
 	typedef std::list< cGroup* > GroupList;
 	typedef std::list< std::string > StringList;
@@ -75,7 +76,7 @@ public:
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const char* a_Group );									//tolua_export
 
-	AString GetColor(void) const;													//tolua_export
+	AString GetColor(void) const;											//tolua_export
 
 	void TossItem( bool a_bDraggingItem, int a_Amount = 1 );				//tolua_export
 
@@ -94,12 +95,14 @@ public:
 	bool LoadFromDisk();
 	void LoadPermissionsFromDisk();											//tolua_export
 
-	const char* GetLoadedWorldName();
+	const AString & GetLoadedWorldName();
 
 	void UseEquippedItem();
 	
 
 protected:
+	virtual void Destroyed();
+
 	struct sPlayerState;
 	sPlayerState* m_pState;
 
@@ -121,7 +124,7 @@ protected:
 
 	float m_LastBlockActionTime;
 	int m_LastBlockActionCnt;
-	int m_GameMode;
+	eGameMode m_GameMode;
 	std::string m_IP;
 
 	long long m_LastPlayerListTime;

@@ -87,15 +87,15 @@ public:																						//tolua_export
 	void SetPosX( const double & a_PosX );													//tolua_export
 	void SetPosY( const double & a_PosY );													//tolua_export
 	void SetPosZ( const double & a_PosZ );													//tolua_export
-	void SetPosition( const double & a_PosX, const double & a_PosY, const double & a_PosZ );	//tolua_export
+	void SetPosition( const double & a_PosX, const double & a_PosY, const double & a_PosZ );//tolua_export
 	void SetPosition( const Vector3d & a_Pos );												//tolua_export
 	void SetRot( const Vector3f & a_Rot );													//tolua_export
 	void SetRotation( float a_Rotation );													//tolua_export
 	void SetPitch( float a_Pitch );															//tolua_export
 	void SetRoll( float a_Roll );															//tolua_export
 
-	inline int  GetUniqueID(void) const { return m_UniqueID; }											//tolua_export
-	inline bool IsDestroyed(void) const { return m_bDestroyed; }										//tolua_export
+	inline int  GetUniqueID(void) const { return m_UniqueID; }								//tolua_export
+	inline bool IsDestroyed(void) const { return m_bDestroyed; }							//tolua_export
 
 	void Destroy();																			//tolua_export
 	void RemoveFromChunk(void); // for internal use in cChunk
@@ -108,6 +108,7 @@ public:																						//tolua_export
 	void WrapRotation();
 
 protected:
+	virtual void Destroyed() {} // Called after the entity has been destroyed
 
 	void SetWorld( cWorld* a_World ) { m_World = a_World; }
 	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);

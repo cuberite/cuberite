@@ -16,6 +16,7 @@
 #include "cChunkGenerator.h"
 #include "Vector3i.h"
 #include "ChunkSender.h"
+#include "Defines.h"
 
 
 
@@ -54,9 +55,9 @@ public:
 	{
 		return m_Time;
 	}
-	long long GetWorldTime(void) const { return m_WorldTime; }								//tolua_export
+	long long GetWorldTime(void) const { return m_WorldTime; }						//tolua_export
 
-	int GetGameMode(void) const { return m_GameMode; } //return gamemode for world
+	eGameMode GetGameMode(void) const { return m_GameMode; }						//tolua_export
 
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
@@ -85,11 +86,11 @@ public:
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
 	// MOTD
-	const AString & GetDescription(void) const {return m_Description; }
+	const AString & GetDescription(void) const {return m_Description; }	// FIXME: This should not be in cWorld
 
 	// Max Players
-	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }
-	void SetMaxPlayers(int iMax);
+	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					//tolua_export
+	void SetMaxPlayers(int iMax);													//tolua_export
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
@@ -100,7 +101,7 @@ public:
 	unsigned int GetNumPlayers();													//tolua_export
 	
 	// TODO: This interface is dangerous - rewrite to DoWithPlayer(playername, action)
-	cPlayer * GetPlayer( const char * a_PlayerName );									//tolua_export
+	cPlayer * GetPlayer( const char * a_PlayerName );								//tolua_export
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
@@ -148,7 +149,7 @@ public:
 	/// Marks the chunk as failed-to-load:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);	//tolua_export
 
 	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable. To be used only by cChunkStay!
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
@@ -156,20 +157,20 @@ public:
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
 
-	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
-	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );	//tolua_export
-	char GetBlock( int a_X, int a_Y, int a_Z );										//tolua_export
-	char GetBlock( const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); } //tolua_export
-	char GetBlockMeta( int a_X, int a_Y, int a_Z );									//tolua_export
-	char GetBlockMeta( const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); } //tolua_export
-	void SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData );				//tolua_export
+	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );						//tolua_export
+	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );					//tolua_export
+	char GetBlock( int a_X, int a_Y, int a_Z );															//tolua_export
+	char GetBlock( const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }			//tolua_export
+	char GetBlockMeta( int a_X, int a_Y, int a_Z );														//tolua_export
+	char GetBlockMeta( const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }	//tolua_export
+	void SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData );									//tolua_export
 	void SetBlockMeta( const Vector3i & a_Pos, char a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
-	bool DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem );				//tolua_export
-	void SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer* a_Player );				//tolua_export
+	bool DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem );									//tolua_export
+	void SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer* a_Player );									//tolua_export
 
-	const double & GetSpawnX() { return m_SpawnX; }									//tolua_export
-	const double & GetSpawnY();														//tolua_export
-	const double & GetSpawnZ() { return m_SpawnZ; }									//tolua_export
+	const double & GetSpawnX() { return m_SpawnX; }														//tolua_export
+	const double & GetSpawnY();																			//tolua_export
+	const double & GetSpawnZ() { return m_SpawnZ; }														//tolua_export
 
 	inline cSimulatorManager *GetSimulatorManager() { return m_SimulatorManager; }
 	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
@@ -182,10 +183,10 @@ public:
 	/// a_Player is using block entity at [x, y, z], handle that:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z) {m_ChunkMap->UseBlockEntity(a_Player, a_X, a_Y, a_Z); }
 
-	void GrowTree( int a_X, int a_Y, int a_Z );										//tolua_export
+	void GrowTree( int a_X, int a_Y, int a_Z );													//tolua_export
 
 	unsigned int GetWorldSeed(void) const { return m_WorldSeed; }								//tolua_export
-	const AString & GetName(void) const {return m_WorldName; }															//tolua_export
+	const AString & GetName(void) const { return m_WorldName; }									//tolua_export
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
@@ -214,7 +215,7 @@ public:
 		if(a_Z < 0 && a_Z % cChunk::c_ChunkWidth != 0) a_ChunkZ--;
 	}
 
-	void SaveAllChunks();	//tolua_export
+	void SaveAllChunks();			//tolua_export
 	int GetNumChunks() const;		//tolua_export
 
 	void Tick(float a_Dt);
@@ -224,9 +225,9 @@ public:
 
 	void InitializeSpawn();
 
-	void CastThunderbolt ( int, int, int );									//tolua_export
-	void SetWeather ( int );												//tolua_export
-	int GetWeather() { return m_Weather; };									//tolua_export
+	void CastThunderbolt (int a_X, int a_Y, int a_Z);						//tolua_export
+	void SetWeather ( eWeather a_Weather );									//tolua_export
+	eWeather GetWeather() { return m_Weather; };							//tolua_export
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
@@ -248,7 +249,7 @@ private:
 	static float m_Time;	// Time in seconds
 	long long m_WorldTime; // Time in seconds*20, this is sent to clients (is wrapped)
 	unsigned long long CurrentTick;
-	int m_GameMode;
+	eGameMode m_GameMode;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
 	// The cRedstone class simulates redstone and needs access to m_RSList
@@ -280,7 +281,7 @@ private:
 
 	unsigned int m_WorldSeed;
 	
-	int	m_Weather;
+	eWeather m_Weather;
 	
 	cEntityList       m_RemoveEntityQueue;
 	cEntityList       m_AllEntities;

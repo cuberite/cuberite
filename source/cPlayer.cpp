@@ -65,7 +65,7 @@ struct cPlayer::sPlayerState
 };
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: m_GameMode( 0 )
+	: m_GameMode( eGameMode_Survival )
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
 	, m_LastBlockActionCnt( 0 )
@@ -132,7 +132,6 @@ cPlayer::~cPlayer(void)
 
 	m_ClientHandle = NULL;
 	
-	CloseWindow(-1);
 	delete m_Inventory;
 	m_Inventory = NULL;
 
@@ -141,6 +140,16 @@ cPlayer::~cPlayer(void)
 	delete m_pState;
 	
 	LOG("Player %p deleted", this);
+}
+
+
+
+
+
+void cPlayer::Destroyed()
+{
+	CloseWindow(-1);
+	m_ClientHandle = NULL;
 }
 
 
@@ -431,6 +440,7 @@ void cPlayer::CloseWindow(char a_WindowType)
 	}
 	if (m_CurrentWindow)
 	{
+		// FIXME: If the player entity is destroyed while having a chest window open, the chest will not close
 		if (a_WindowType == 1 && strcmp(m_CurrentWindow->GetWindowTitle().c_str(), "UberChest") == 0) { // Chest
 			cBlockEntity *block = m_CurrentWindow->GetOwner()->GetEntity();
 			cPacket_BlockAction ChestClose;
@@ -469,14 +479,14 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 
 
-void cPlayer::SetGameMode( int a_GameMode )
+void cPlayer::SetGameMode( eGameMode a_GameMode )
 {
 	if ( (a_GameMode < 2) && (a_GameMode >= 0) )
 	{
 		if (m_GameMode != a_GameMode)
 		{
 			cInventory *OldInventory = 0;
-			if(m_GameMode == 0)
+			if(m_GameMode == eGameMode_Survival)
 				OldInventory = m_Inventory;
 			else
 				OldInventory = m_CreativeInventory;
@@ -497,7 +507,7 @@ void cPlayer::SetGameMode( int a_GameMode )
 
 
 
-void cPlayer::LoginSetGameMode( int a_GameMode )
+void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
 {
 	m_GameMode = a_GameMode;
 }
@@ -998,9 +1008,9 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 
 
-const char* cPlayer::GetLoadedWorldName()
+const AString & cPlayer::GetLoadedWorldName()
 {
-	return m_pState->LoadedWorldName.c_str();
+	return m_pState->LoadedWorldName;
 }
 
 

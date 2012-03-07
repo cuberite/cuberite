@@ -26,7 +26,7 @@
 
 cRoot* cRoot::s_Root = 0;
 
-typedef std::map< std::string, cWorld* > WorldMap;
+typedef std::map< AString, cWorld* > WorldMap;
 struct cRoot::sRootState
 {
 	cWorld* pDefaultWorld;
@@ -291,7 +291,7 @@ cWorld* cRoot::GetDefaultWorld()
 
 
 
-cWorld* cRoot::GetWorld( const char* a_WorldName )
+cWorld* cRoot::GetWorld( const AString & a_WorldName )
 {
 	WorldMap::iterator itr = m_pState->WorldsByName.find( a_WorldName );
 	if( itr != m_pState->WorldsByName.end() )

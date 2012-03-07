@@ -37,7 +37,7 @@ public:
 	cServer* GetServer() { return m_Server; }						//tolua_export
 	OBSOLETE cWorld* GetWorld();												//tolua_export
 	cWorld* GetDefaultWorld();										//tolua_export
-	cWorld* GetWorld( const char* a_WorldName );					//tolua_export
+	cWorld* GetWorld( const AString & a_WorldName );				//tolua_export
 	cMonsterConfig *GetMonsterConfig() { return m_MonsterConfig;}
 
 	cGroupManager* GetGroupManager() { return m_GroupManager; }		//tolua_export

@@ -122,12 +122,12 @@ inline void AddDirection( int & a_X, unsigned char & a_Y, int & a_Z, char a_Dire
 #define MAX(a,b) (((a)>(b))?(a):(b))
 inline void EulerToVector( float a_Pan, float a_Pitch, float & a_X, float & a_Y, float & a_Z )
 {
-// 	a_X = sinf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
-// 	a_Y = -sinf ( a_Pitch / 180 * PI );
-// 	a_Z = -cosf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
-a_X = cos(a_Pan / 180 * PI)*cos(a_Pitch / 180 * PI);
-a_Y = sin(a_Pan / 180 * PI)*cos(a_Pitch / 180 * PI);
-a_Z = sin(a_Pitch / 180 * PI);
+	// 	a_X = sinf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
+	// 	a_Y = -sinf ( a_Pitch / 180 * PI );
+	// 	a_Z = -cosf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
+	a_X = cos(a_Pan / 180 * PI)*cos(a_Pitch / 180 * PI);
+	a_Y = sin(a_Pan / 180 * PI)*cos(a_Pitch / 180 * PI);
+	a_Z = sin(a_Pitch / 180 * PI);
 }
 
 inline void VectorToEuler( float a_X, float a_Y, float a_Z, float & a_Pan, float & a_Pitch )
@@ -180,3 +180,19 @@ namespace ItemCategory
 			|| a_ItemID == E_ITEM_DIAMOND_SWORD;
 	}
 }
+
+//tolua_begin
+enum eGameMode
+{
+	eGameMode_Survival    = 0,
+	eGameMode_Creative    = 1,
+};
+
+enum eWeather
+{
+	eWeather_Sunny		  = 0,
+	eWeather_Rain		  = 1,
+	eWeather_ThunderStorm = 2,
+
+};
+//tolua_end

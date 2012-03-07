@@ -179,7 +179,7 @@ cWorld::~cWorld()
 cWorld::cWorld( const AString & a_WorldName )
 	: m_SpawnMonsterTime( 0.f )
 	, m_RSList ( 0 )
-	, m_Weather ( 0 )
+	, m_Weather ( eWeather_Sunny )
 {
 	LOG("cWorld::cWorld(%s)", a_WorldName.c_str());
 	m_WorldName = a_WorldName;
@@ -191,7 +191,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_SpawnY = cChunk::c_ChunkHeight;
 	m_SpawnZ = (double)((r1.randInt()%1000)-500);
 	m_WorldSeed = r1.randInt();
-	m_GameMode = 0;
+	m_GameMode = eGameMode_Creative;
 
 	AString GeneratorName;
 	AString StorageSchema("Default");
@@ -203,7 +203,7 @@ cWorld::cWorld( const AString & a_WorldName )
 		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY );
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ );
 		m_WorldSeed = IniFile.GetValueI("Seed", "Seed", m_WorldSeed );
-		m_GameMode = IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
+		m_GameMode = (eGameMode)IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
 		GeneratorName = IniFile.GetValue("Generator", "GeneratorName", GeneratorName);
 		StorageSchema = IniFile.GetValue("Storage", "Schema", StorageSchema);
 	}
@@ -359,26 +359,38 @@ cWorld::cWorld( const AString & a_WorldName )
 
 
 
-void cWorld::SetWeather( int Weather )
+void cWorld::SetWeather( eWeather a_Weather )
 {
-	if (Weather == 2) { //thunder storm
-		m_Weather = 2;
-		cPacket_NewInvalidState WeatherPacket;
-		WeatherPacket.m_Reason = 1; //begin rain
-		Broadcast ( WeatherPacket );
-		CastThunderbolt ( 0, 0, 0 ); //start thunderstorm with a lightning strike at 0, 0, 0. >:D
-	}
-	if (Weather == 1) { //rainstorm
-		m_Weather = 1;
-		cPacket_NewInvalidState WeatherPacket;
-		WeatherPacket.m_Reason = 1; //begin rain
-		Broadcast ( WeatherPacket );
-	}
-	if (Weather == 0) { //sunny
-		m_Weather = 0;
-		cPacket_NewInvalidState WeatherPacket;
-		WeatherPacket.m_Reason = 2; //stop rain
-		Broadcast ( WeatherPacket );
+	switch( a_Weather )
+	{
+	case eWeather_Sunny:
+		{
+			m_Weather = a_Weather;
+			cPacket_NewInvalidState WeatherPacket;
+			WeatherPacket.m_Reason = 2; //stop rain
+			Broadcast ( WeatherPacket );
+		}
+		break;
+	case eWeather_Rain:
+		{
+			m_Weather = a_Weather;
+			cPacket_NewInvalidState WeatherPacket;
+			WeatherPacket.m_Reason = 1; //begin rain
+			Broadcast ( WeatherPacket );
+		}
+		break;
+	case eWeather_ThunderStorm:
+		{
+			m_Weather = a_Weather;
+			cPacket_NewInvalidState WeatherPacket;
+			WeatherPacket.m_Reason = 1; //begin rain
+			Broadcast ( WeatherPacket );
+			CastThunderbolt ( 0, 0, 0 ); //start thunderstorm with a lightning strike at 0, 0, 0. >:D
+		}
+		break;
+	default:
+		LOGWARN("Trying to set unknown weather %d", a_Weather );
+		break;
 	}
 }
 
@@ -386,13 +398,13 @@ void cWorld::SetWeather( int Weather )
 
 
 
-void cWorld::CastThunderbolt ( int X, int Y, int Z )
+void cWorld::CastThunderbolt ( int a_X, int a_Y, int a_Z )
 {
 	cPacket_Thunderbolt ThunderboltPacket;
-	ThunderboltPacket.m_xLBPos = X;
-	ThunderboltPacket.m_yLBPos = Y;
-	ThunderboltPacket.m_zLBPos = Z;
-	Broadcast( ThunderboltPacket );
+	ThunderboltPacket.m_xLBPos = a_X;
+	ThunderboltPacket.m_yLBPos = a_Y;
+	ThunderboltPacket.m_zLBPos = a_Z;
+	Broadcast( ThunderboltPacket ); // FIXME: Broadcast to chunk instead of entire world
 }
 
 
@@ -556,12 +568,12 @@ void cWorld::TickWeather(float a_Dt)
 			if (randWeather == 0)
 			{
 				LOG("Starting Rainstorm!");
-				SetWeather ( 1 );
+				SetWeather ( eWeather_Rain );
 			}
 			else if  (randWeather == 1)
 			{
 				LOG("Starting Thunderstorm!");
-				SetWeather ( 2 );
+				SetWeather ( eWeather_ThunderStorm );
 			}
 		}
 	}
@@ -574,12 +586,12 @@ void cWorld::TickWeather(float a_Dt)
 			if (randWeather == 0)  //2% chance per second
 			{
 				LOG("Back to sunny!");
-				SetWeather ( 0 );
+				SetWeather ( eWeather_Sunny );
 			}
 			else if ( (randWeather > 4000) && (GetWeather() != 2) )  // random chance for rainstorm to turn into thunderstorm.
 			{
 				LOG("Starting Thunderstorm!");
-				SetWeather ( 2 );
+				SetWeather ( eWeather_ThunderStorm );
 			}
 		}
 	}
@@ -588,7 +600,7 @@ void cWorld::TickWeather(float a_Dt)
 	{
 		if (m_TickRand.randInt() % 199 == 0)  // 0.5% chance per tick of thunderbolt
 		{
-			CastThunderbolt ( 0, 0, 0 );  // todo: find random possitions near players to cast thunderbolts.
+			CastThunderbolt ( 0, 0, 0 );  // TODO: find random possitions near players to cast thunderbolts.
 		}
 	}
 }

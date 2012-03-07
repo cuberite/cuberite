@@ -187,7 +187,6 @@ cClientHandle::~cClientHandle()
 	
 	if (m_Player != NULL)
 	{
-		m_Player->SetClientHandle(NULL);
 		m_Player->Destroy();
 		m_Player = NULL;
 	}
