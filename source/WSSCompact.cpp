@@ -270,8 +270,8 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	m_LayerX(a_LayerX),
 	m_LayerZ(a_LayerZ),
 	m_NumDirty(0),
-	m_ChunkVersion( PAK_VERSION ), // Init with latest version
-	m_PakVersion( CHUNK_VERSION )
+	m_ChunkVersion( CHUNK_VERSION ), // Init with latest version
+	m_PakVersion( PAK_VERSION )
 {
 	cFile f;
 	if (!f.Open(m_FileName, cFile::fmRead))

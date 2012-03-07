@@ -43,7 +43,6 @@ protected:
 		bool EraseChunkData(const cChunkCoords & a_Chunk);
 		
 		bool SaveChunk(const cChunkCoords & a_Chunk, cWorld * a_World);
-		bool LoadChunk(const cChunkCoords & a_Chunk, cWorld * a_World);
 		
 		int GetLayerX(void) const {return m_LayerX; }
 		int GetLayerZ(void) const {return m_LayerZ; }
@@ -65,7 +64,6 @@ protected:
 		char          m_ChunkVersion;
 		char          m_PakVersion;
 		
-		bool LoadChunk(const cChunkCoords & a_Chunk, int a_Offset, sChunkHeader * a_Header, cWorld * a_World);
 		bool SaveChunkToData(const cChunkCoords & a_Chunk, cWorld * a_World);  // Saves the chunk to m_DataContents, updates headers and m_NumDirty
 		void SynchronizeFile(void);  // Writes m_DataContents along with the headers to file, resets m_NumDirty
 
