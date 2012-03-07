@@ -1,0 +1,109 @@
+TAG_List("TileEntities"): 3 items of type 10
+{
+ TAG_Compound(""): 6 items
+ {
+  TAG_String("id"): 10 bytes: "MobSpawner"
+  TAG_Short("Delay"): 20
+  TAG_Int("z"): 180
+  TAG_String("EntityId"): 6 bytes: "Spider"
+  TAG_Int("y"): 11
+  TAG_Int("x"): -6
+ }
+ TAG_Compound(""): 5 items
+ {
+  TAG_List("Items"): 6 items of type 10
+  {
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 325
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 1
+    TAG_Byte("Slot"): 3
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 296
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 4
+    TAG_Byte("Slot"): 5
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 325
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 1
+    TAG_Byte("Slot"): 11
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 351
+    TAG_Short("Damage"): 3
+    TAG_Byte("Count"): 1
+    TAG_Byte("Slot"): 13
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 296
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 1
+    TAG_Byte("Slot"): 14
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 287
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 2
+    TAG_Byte("Slot"): 15
+   }
+  }
+  TAG_String("id"): 5 bytes: "Chest"
+  TAG_Int("z"): 182
+  TAG_Int("y"): 11
+  TAG_Int("x"): -7
+ }
+ TAG_Compound(""): 5 items
+ {
+  TAG_List("Items"): 5 items of type 10
+  {
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 289
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 1
+    TAG_Byte("Slot"): 5
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 329
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 1
+    TAG_Byte("Slot"): 12
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 265
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 4
+    TAG_Byte("Slot"): 17
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 296
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 4
+    TAG_Byte("Slot"): 21
+   }
+   TAG_Compound(""): 4 items
+   {
+    TAG_Short("id"): 289
+    TAG_Short("Damage"): 0
+    TAG_Byte("Count"): 2
+    TAG_Byte("Slot"): 22
+   }
+  }
+  TAG_String("id"): 5 bytes: "Chest"
+  TAG_Int("z"): 181
+  TAG_Int("y"): 11
+  TAG_Int("x"): -8
+ }
+}

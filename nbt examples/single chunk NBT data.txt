@@ -1,0 +1,71 @@
+TAG_Compound(""): 1 items
+{
+ TAG_Compound("Level"): 10 items
+ {
+  TAG_List("TileTicks"): 0 items of type 1
+  {
+  }
+  TAG_List("Entities"): 0 items of type 1
+  {
+  }
+  TAG_ByteArray("Biomes"): 256 bytes
+  TAG_Long("LastUpdate"): 1041959
+  TAG_Int("xPos"): 0
+  TAG_Int("zPos"): 0
+  TAG_List("TileEntities"): 0 items of type 1
+  {
+  }
+  TAG_Byte("TerrainPopulated"): 1
+  TAG_List("Sections"): 6 items of type 10
+  {
+   TAG_Compound(""): 5 items
+   {
+    TAG_ByteArray("Data"): 2048 bytes
+    TAG_ByteArray("SkyLight"): 2048 bytes
+    TAG_ByteArray("BlockLight"): 2048 bytes
+    TAG_Byte("Y"): 0
+    TAG_ByteArray("Blocks"): 4096 bytes
+   }
+   TAG_Compound(""): 5 items
+   {
+    TAG_ByteArray("Data"): 2048 bytes
+    TAG_ByteArray("SkyLight"): 2048 bytes
+    TAG_ByteArray("BlockLight"): 2048 bytes
+    TAG_Byte("Y"): 1
+    TAG_ByteArray("Blocks"): 4096 bytes
+   }
+   TAG_Compound(""): 5 items
+   {
+    TAG_ByteArray("Data"): 2048 bytes
+    TAG_ByteArray("SkyLight"): 2048 bytes
+    TAG_ByteArray("BlockLight"): 2048 bytes
+    TAG_Byte("Y"): 2
+    TAG_ByteArray("Blocks"): 4096 bytes
+   }
+   TAG_Compound(""): 5 items
+   {
+    TAG_ByteArray("Data"): 2048 bytes
+    TAG_ByteArray("SkyLight"): 2048 bytes
+    TAG_ByteArray("BlockLight"): 2048 bytes
+    TAG_Byte("Y"): 3
+    TAG_ByteArray("Blocks"): 4096 bytes
+   }
+   TAG_Compound(""): 5 items
+   {
+    TAG_ByteArray("Data"): 2048 bytes
+    TAG_ByteArray("SkyLight"): 2048 bytes
+    TAG_ByteArray("BlockLight"): 2048 bytes
+    TAG_Byte("Y"): 4
+    TAG_ByteArray("Blocks"): 4096 bytes
+   }
+   TAG_Compound(""): 5 items
+   {
+    TAG_ByteArray("Data"): 2048 bytes
+    TAG_ByteArray("SkyLight"): 2048 bytes
+    TAG_ByteArray("BlockLight"): 2048 bytes
+    TAG_Byte("Y"): 5
+    TAG_ByteArray("Blocks"): 4096 bytes
+   }
+  }
+ }
+}
