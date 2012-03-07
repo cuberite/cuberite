@@ -31,7 +31,7 @@ cChunkSender::cChunkSender(void) :
 cChunkSender::~cChunkSender()
 {
 	mShouldTerminate = true;
-	m_Event.Set();
+	m_evtQueue.Set();
 }
 
 
@@ -55,7 +55,7 @@ void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 		cCSLock Lock(m_CS);
 		m_ChunksReady.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 	}
-	m_Event.Set();
+	m_evtQueue.Set();
 }
 
 
@@ -69,7 +69,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cC
 		cCSLock Lock(m_CS);
 		m_SendChunks.push_back(sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client));
 	}
-	m_Event.Set();
+	m_evtQueue.Set();
 }
 
 
@@ -78,16 +78,20 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cC
 
 void cChunkSender::RemoveClient(cClientHandle * a_Client)
 {
-	cCSLock Lock(m_CS);
-	for (sSendChunkList::iterator itr = m_SendChunks.begin(); itr != m_SendChunks.end();)
 	{
-		if (itr->m_Client == a_Client)
+		cCSLock Lock(m_CS);
+		for (sSendChunkList::iterator itr = m_SendChunks.begin(); itr != m_SendChunks.end();)
 		{
-			itr = m_SendChunks.erase(itr);
-			continue;
-		}
-		++itr;
-	}  // for itr - m_SendChunks[]
+			if (itr->m_Client == a_Client)
+			{
+				itr = m_SendChunks.erase(itr);
+				continue;
+			}
+			++itr;
+		}  // for itr - m_SendChunks[]
+	}
+	m_evtQueue.Set();
+	m_evtRemoved.Wait();  // Wait for removal confirmation
 }
 
 
@@ -102,7 +106,8 @@ void cChunkSender::Execute(void)
 		while (m_ChunksReady.empty() && m_SendChunks.empty())
 		{
 			cCSUnlock Unlock(Lock);
-			m_Event.Wait();
+			m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
+			m_evtQueue.Wait();
 			if (mShouldTerminate)
 			{
 				return;
@@ -127,6 +132,7 @@ void cChunkSender::Execute(void)
 			
 			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkY, Chunk.m_ChunkZ, Chunk.m_Client);
 		}
+		m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
 	}  // while (!mShouldTerminate)
 }
 

@@ -15,6 +15,10 @@ Chunk data is queried using the cChunkDataCallback interface.
 It is cached inside the ChunkSender object during the query and then processed after the query ends.
 Note that the data needs to be compressed only *after* the query finishes, 
 because the query callbacks run with ChunkMap's CS locked.
+
+A client may remove itself from all direct requests(QueueSendChunkTo()) by calling RemoveClient(); 
+this ensures that the client's Send() won't be called anymore by ChunkSender.
+Note that it may be called by world's BroadcastToChunk() if the client is still in the chunk.
 */
 
 
@@ -78,10 +82,11 @@ protected:
 
 	cWorld * m_World;
 	
-	cCriticalSection m_CS;
-	cChunkCoordsList m_ChunksReady;
-	sSendChunkList   m_SendChunks;
-	cEvent           m_Event;  // Set when anything is added to m_ChunksReady
+	cCriticalSection  m_CS;
+	cChunkCoordsList  m_ChunksReady;
+	sSendChunkList    m_SendChunks;
+	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
+	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	
 	// Data about the chunk that is being sent:
 	char       m_BlockData[cChunk::c_BlockDataSize];
