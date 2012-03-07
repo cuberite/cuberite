@@ -143,7 +143,6 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	strm.avail_out = sizeof(Uncompressed);
 	strm.next_in   = (Bytef *)a_Data.data();
 	strm.avail_in  = a_Data.size();
-	inflateReset(&strm);
 	int res = inflate(&strm, Z_FINISH);
 	inflateEnd(&strm);
 	if (res != Z_STREAM_END)
