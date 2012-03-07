@@ -919,6 +919,8 @@
       <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\ChunkSender.cpp" />
+    <ClCompile Include="..\source\WSSAnvil.cpp" />
+    <ClCompile Include="..\source\NBT.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1419,6 +1421,8 @@
       <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ChunkSender.h" />
+    <ClInclude Include="..\source\WSSAnvil.h" />
+    <ClInclude Include="..\source\NBT.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

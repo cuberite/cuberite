@@ -8,6 +8,7 @@
 #include "Globals.h"
 #include "WorldStorage.h"
 #include "WSSCompact.h"
+#include "WSSAnvil.h"
 #include "cWorld.h"
 #include "cChunkGenerator.h"
 #include "cEntity.h"
@@ -270,7 +271,8 @@ void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 void cWorldStorage::InitSchemas(void)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSCompact(m_World));
+	m_Schemas.push_back(new cWSSCompact  (m_World));
+	m_Schemas.push_back(new cWSSAnvil    (m_World));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	

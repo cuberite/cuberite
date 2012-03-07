@@ -33,7 +33,7 @@ int CompressString(const char * a_Data, int a_Length, AString & a_Compressed)
 
 
 
-/// Uncompresses a_Data into a_Decompressed; returns Z_XXX error constants same as zlib's decompress()
+/// Uncompresses a_Data into a_Decompressed; returns Z_XXX error constants same as zlib's uncompress()
 int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed, int a_UncompressedSize)
 {
 	// HACK: We're assuming that AString returns its internal buffer in its data() call and we're overwriting that buffer!

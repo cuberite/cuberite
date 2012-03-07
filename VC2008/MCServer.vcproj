@@ -566,6 +566,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\NBT.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\NBT.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\StackWalker.cpp"
 				>
 				<FileConfiguration
@@ -1644,6 +1652,14 @@
 				</File>
 				<File
 					RelativePath="..\source\WorldStorage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WSSAnvil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WSSAnvil.h"
 					>
 				</File>
 				<File
