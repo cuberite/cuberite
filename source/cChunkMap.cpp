@@ -312,15 +312,16 @@ void cChunkMap::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 
 
 
-void cChunkMap::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback)
+bool cChunkMap::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
-		return;
+		return false;
 	}
 	Chunk->GetAllData(a_Callback);
+	return true;
 }
 
 

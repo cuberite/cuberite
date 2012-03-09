@@ -619,14 +619,14 @@ const AString & cServer::GetServerID(void) const
 
 
 
-void cServer::KickUser(const AString & iUserName, const AString & iReason)
+void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 {
 	cCSLock Lock(m_CSClients);
 	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
-		if ((*itr)->GetUsername() == iUserName)
+		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Kick(iReason);
+			(*itr)->Kick(a_Reason);
 		}
 	}  // for itr - m_Clients[]
 }
@@ -635,12 +635,12 @@ void cServer::KickUser(const AString & iUserName, const AString & iReason)
 
 
 
-void cServer::AuthenticateUser(const AString & iUserName)
+void cServer::AuthenticateUser(int a_ClientID)
 {
 	cCSLock Lock(m_CSClients);
 	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
-		if ((*itr)->GetUsername() == iUserName)
+		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
 			(*itr)->Authenticate();
 		}

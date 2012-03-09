@@ -36,7 +36,7 @@ cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
 	, m_bDirtyPosition( true )
 	, m_bDirtyOrientation( true )
 	, m_bDestroyed( false )
-	, m_EntityType( E_ENTITY )
+	, m_EntityType( eEntityType_Entity )
 	, m_World( 0 )
 	, m_bRemovedFromChunk( false )
 {

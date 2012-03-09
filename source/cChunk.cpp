@@ -108,7 +108,7 @@ cChunk::~cChunk()
 	cEntityList Entities;
 	for (cEntityList::const_iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		if ((*itr)->GetEntityType() != cEntity::E_PLAYER)
+		if ((*itr)->GetEntityType() != cEntity::eEntityType_Player)
 		{
 			Entities.push_back(*itr);
 		}
@@ -218,18 +218,18 @@ void cChunk::MarkLoadFailed(void)
 
 
 
-void cChunk::GetAllData(cChunkDataCallback * a_Callback)
+void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
-	a_Callback->BlockData(m_BlockData);
+	a_Callback.BlockData(m_BlockData);
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		a_Callback->Entity(*itr);
+		a_Callback.Entity(*itr);
 	}
 	
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
-		a_Callback->BlockEntity(*itr);
+		a_Callback.BlockEntity(*itr);
 	}
 }
 
@@ -244,7 +244,7 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	// Clear the internal entities:
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		if ((*itr)->GetEntityType() == cEntity::E_PLAYER)
+		if ((*itr)->GetEntityType() == cEntity::eEntityType_Player)
 		{
 			// Move players into the new entity list
 			a_Entities.push_back(*itr);
@@ -1102,7 +1102,7 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		if ( (*itr)->GetEntityType() != cEntity::E_PICKUP )
+		if ( (*itr)->GetEntityType() != cEntity::eEntityType_Pickup )
 		{
 			continue; // Only pickups
 		}
@@ -1229,7 +1229,7 @@ bool cChunk::HasAnyClients(void)
 
 void cChunk::AddEntity( cEntity * a_Entity)
 {
-	if (a_Entity->GetEntityType() != cEntity::E_PLAYER)
+	if (a_Entity->GetEntityType() != cEntity::eEntityType_Player)
 	{
 		MarkDirty();
 	}
@@ -1249,7 +1249,7 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 	if (SizeBefore != SizeAfter)
 	{
 		// Mark as dirty if it was a server-generated entity:
-		if (a_Entity->GetEntityType() != cEntity::E_PLAYER)
+		if (a_Entity->GetEntityType() != cEntity::eEntityType_Player)
 		{
 			MarkDirty();
 		}

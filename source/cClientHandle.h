@@ -78,7 +78,7 @@ public:
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
-	void Kick(const AString & a_Reason); //tolua_export
+	void Kick(const AString & a_Reason);		//tolua_export
 	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
 
 	void StreamChunks(void);
@@ -100,11 +100,13 @@ public:
 	void Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL) { Send(&a_Packet, a_Priority); }
 	void Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL);
 
-	const AString & GetUsername(void) const;
+	const AString & GetUsername(void) const;		//tolua_export
 	
-	inline short GetPing() { return m_Ping; }
+	inline short GetPing() const { return m_Ping; }	//tolua_export
 	
-	void SetViewDistance(int a_ViewDistance);
+	void SetViewDistance(int a_ViewDistance);		//tolua_export
+
+	int GetUniqueID() const { return m_UniqueID; }	//tolua_export
 
 private:
 
@@ -212,6 +214,8 @@ private:
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
 
+	static int s_ClientCount;
+	int m_UniqueID;
 };										// tolua_export
 
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/07/12 14:22:38.
+** Generated automatically by tolua++-1.0.92 on 03/09/12 14:38:38.
 */
 
 #ifndef __cplusplus
@@ -2988,6 +2988,135 @@ static int tolua_AllToLua_cClientHandle_Kick00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Kick'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetUsername of class  cClientHandle */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cClientHandle_GetUsername00
+static int tolua_AllToLua_cClientHandle_GetUsername00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cClientHandle* self = (const cClientHandle*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetUsername'", NULL);
+#endif
+  {
+   const AString tolua_ret = (const AString)  self->GetUsername();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetUsername'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetPing of class  cClientHandle */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cClientHandle_GetPing00
+static int tolua_AllToLua_cClientHandle_GetPing00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cClientHandle* self = (const cClientHandle*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPing'", NULL);
+#endif
+  {
+   short tolua_ret = (short)  self->GetPing();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetPing'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetViewDistance of class  cClientHandle */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cClientHandle_SetViewDistance00
+static int tolua_AllToLua_cClientHandle_SetViewDistance00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cClientHandle* self = (cClientHandle*)  tolua_tousertype(tolua_S,1,0);
+  int a_ViewDistance = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetViewDistance'", NULL);
+#endif
+  {
+   self->SetViewDistance(a_ViewDistance);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetViewDistance'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetUniqueID of class  cClientHandle */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cClientHandle_GetUniqueID00
+static int tolua_AllToLua_cClientHandle_GetUniqueID00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cClientHandle* self = (const cClientHandle*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetUniqueID'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetUniqueID();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetUniqueID'.",&tolua_err);
  return 0;
 #endif
 }
@@ -17503,6 +17632,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cClientHandle");
    tolua_function(tolua_S,"GetPlayer",tolua_AllToLua_cClientHandle_GetPlayer00);
    tolua_function(tolua_S,"Kick",tolua_AllToLua_cClientHandle_Kick00);
+   tolua_function(tolua_S,"GetUsername",tolua_AllToLua_cClientHandle_GetUsername00);
+   tolua_function(tolua_S,"GetPing",tolua_AllToLua_cClientHandle_GetPing00);
+   tolua_function(tolua_S,"SetViewDistance",tolua_AllToLua_cClientHandle_SetViewDistance00);
+   tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cClientHandle_GetUniqueID00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cEntity","cEntity","",tolua_collect_cEntity);
@@ -17512,9 +17645,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cEntity");
    tolua_function(tolua_S,"delete",tolua_AllToLua_cEntity_delete00);
    tolua_function(tolua_S,"Initialize",tolua_AllToLua_cEntity_Initialize00);
-   tolua_constant(tolua_S,"E_ENTITY",cEntity::E_ENTITY);
-   tolua_constant(tolua_S,"E_PLAYER",cEntity::E_PLAYER);
-   tolua_constant(tolua_S,"E_PICKUP",cEntity::E_PICKUP);
+   tolua_constant(tolua_S,"eEntityType_Entity",cEntity::eEntityType_Entity);
+   tolua_constant(tolua_S,"eEntityType_Player",cEntity::eEntityType_Player);
+   tolua_constant(tolua_S,"eEntityType_Pickup",cEntity::eEntityType_Pickup);
    tolua_function(tolua_S,"GetEntityType",tolua_AllToLua_cEntity_GetEntityType00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);

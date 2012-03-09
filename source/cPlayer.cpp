@@ -80,7 +80,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_ClientHandle( a_Client )
 	, m_pState( new sPlayerState )
 {
-	m_EntityType = E_PLAYER;
+	m_EntityType = eEntityType_Player;
 	SetMaxHealth(20);
 	SetMaxFoodLevel(125);
 	m_Inventory = new cSurvivalInventory( this );

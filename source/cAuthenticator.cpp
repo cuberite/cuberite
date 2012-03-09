@@ -83,16 +83,16 @@ void cAuthenticator::ReadINI(void)
 
 
 /// Queues a request for authenticating a user. If the auth fails, the user is kicked
-void cAuthenticator::Authenticate(const AString & iUserName, const AString & iServerID)
+void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash)
 {
 	if (!mShouldAuthenticate)
 	{
-		cRoot::Get()->AuthenticateUser(iUserName);
+		cRoot::Get()->AuthenticateUser(a_ClientID);
 		return;
 	}
 
 	cCSLock Lock(mCS);
-	mQueue.push_back(cUser(iUserName, iServerID));
+	mQueue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
 	mQueueNonempty.Set();
 }
 
@@ -127,6 +127,7 @@ void cAuthenticator::Execute(void)
 		}
 		ASSERT(mQueue.size() > 0);
 		
+		int ClientID = mQueue.front().mClientID;
 		AString UserName = mQueue.front().mName;
 		AString ActualAddress = mAddress;
 		ReplaceString(ActualAddress, "%USERNAME%", UserName);
@@ -136,11 +137,11 @@ void cAuthenticator::Execute(void)
 
 		if (!AuthFromAddress(mServer, ActualAddress, UserName))
 		{
-			cRoot::Get()->KickUser(UserName, "auth failed");
+			cRoot::Get()->KickUser(ClientID, "Failed to authenticate account!");
 		}
 		else
 		{
-			cRoot::Get()->AuthenticateUser(UserName);
+			cRoot::Get()->AuthenticateUser(ClientID);
 		}
 	}  // for (-ever)
 }
@@ -149,18 +150,18 @@ void cAuthenticator::Execute(void)
 
 
 
-bool cAuthenticator::AuthFromAddress(const AString & iServer, const AString & iAddress, const AString & iUserName, int iLevel)
+bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a_Address, const AString & a_UserName, int a_Level /* = 1 */)
 {
 	// Returns true if the user authenticated okay, false on error; iLevel is the recursion deptht (bails out if too deep)
 
 	cBlockingTCPLink Link;
-	if (!Link.Connect(iServer.c_str(), 80))
+	if (!Link.Connect(a_Server.c_str(), 80))
 	{
-		LOGERROR("cAuthenticator: cannot connect to auth server \"%s\", kicking user \"%s\"", iServer.c_str(), iUserName.c_str());
+		LOGERROR("cAuthenticator: cannot connect to auth server \"%s\", kicking user \"%s\"", a_Server.c_str(), a_Server.c_str());
 		return false;
 	}
 	
-	Link.SendMessage( AString( "GET " + iAddress + " HTTP/1.0\r\n\r\n" ).c_str());
+	Link.SendMessage( AString( "GET " + a_Address + " HTTP/1.0\r\n\r\n" ).c_str());
 	AString DataRecvd;
 	Link.ReceiveData(DataRecvd);
 	Link.CloseSocket();
@@ -180,9 +181,9 @@ bool cAuthenticator::AuthFromAddress(const AString & iServer, const AString & iA
 		{
 			// redirect blabla
 			LOGINFO("Need to redirect!");
-			if (iLevel > MAX_REDIRECTS)
+			if (a_Level > MAX_REDIRECTS)
 			{
-				LOGERROR("cAuthenticator: received too many levels of redirection from auth server \"%s\" for user \"%s\", bailing out and kicking the user", iServer.c_str(), iUserName.c_str());
+				LOGERROR("cAuthenticator: received too many levels of redirection from auth server \"%s\" for user \"%s\", bailing out and kicking the user", a_Server.c_str(), a_UserName.c_str());
 				return false;
 			}
 			bRedirect = true;
@@ -195,7 +196,7 @@ bool cAuthenticator::AuthFromAddress(const AString & iServer, const AString & iA
 	}
 	else
 	{
-		LOGERROR("cAuthenticator: cannot parse auth reply from server \"%s\" for user \"%s\", kicking the user.", iServer.c_str(), iUserName.c_str());
+		LOGERROR("cAuthenticator: cannot parse auth reply from server \"%s\" for user \"%s\", kicking the user.", a_Server.c_str(), a_UserName.c_str());
 		return false;
 	}
 
@@ -221,19 +222,19 @@ bool cAuthenticator::AuthFromAddress(const AString & iServer, const AString & iA
 		}
 		if (!bFoundLocation)
 		{
-			LOGERROR("cAuthenticator: received invalid redirection from auth server \"%s\" for user \"%s\", kicking user.", iServer.c_str(), iUserName.c_str());
+			LOGERROR("cAuthenticator: received invalid redirection from auth server \"%s\" for user \"%s\", kicking user.", a_Server.c_str(), a_UserName.c_str());
 			return false;
 		}
 
 		Location = Location.substr(strlen("http://"), std::string::npos); // Strip http://
 		std::string Server = Location.substr( 0, Location.find( "/" ) ); // Only leave server address
 		Location = Location.substr( Server.length(), std::string::npos);
-		return AuthFromAddress(Server, Location, iUserName, iLevel + 1);
+		return AuthFromAddress(Server, Location, a_UserName, a_Level + 1);
 	}
 
 	if (!bOK)
 	{
-		LOGERROR("cAuthenticator: received an error from auth server \"%s\" for user \"%s\", kicking user.", iServer.c_str(), iUserName.c_str());
+		LOGERROR("cAuthenticator: received an error from auth server \"%s\" for user \"%s\", kicking user.", a_Server.c_str(), a_UserName.c_str());
 		return false;
 	}
 
@@ -252,7 +253,7 @@ bool cAuthenticator::AuthFromAddress(const AString & iServer, const AString & iA
 	}
 	if (!ss.good())
 	{
-		LOGERROR("cAuthenticator: error while parsing response body from auth server \"%s\" for user \"%s\", kicking user.", iServer.c_str(), iUserName.c_str());
+		LOGERROR("cAuthenticator: error while parsing response body from auth server \"%s\" for user \"%s\", kicking user.", a_Server.c_str(), a_UserName.c_str());
 		return false;
 	}
 

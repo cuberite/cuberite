@@ -72,7 +72,7 @@ public:
 	void MarkChunkSaved    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void ChunkDataLoaded   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	void ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
-	void GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback);
+	bool GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
 	
 	/// Gets the chunk's blocks, only the block types
 	bool GetChunkBlocks    (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks);

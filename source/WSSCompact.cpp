@@ -626,7 +626,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 {
 	// Serialize the chunk:
 	cJsonChunkSerializer Serializer;
-	a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, &Serializer);
+	a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer);
 	if (Serializer.GetBlockData().empty())
 	{
 		// Chunk not valid

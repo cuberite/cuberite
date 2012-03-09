@@ -333,18 +333,18 @@ void cRoot::ServerCommand( const char * a_Cmd )
 
 
 
-void cRoot::KickUser(const AString & iUserName, const AString & iReason)
+void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 {
-	m_Server->KickUser(iUserName, iReason);
+	m_Server->KickUser(a_ClientID, a_Reason);
 }
 
 
 
 
 
-void cRoot::AuthenticateUser(const AString & iUserName)
+void cRoot::AuthenticateUser(int a_ClientID)
 {
-	m_Server->AuthenticateUser(iUserName);
+	m_Server->AuthenticateUser(a_ClientID);
 }
 
 

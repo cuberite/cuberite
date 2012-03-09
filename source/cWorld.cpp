@@ -1006,9 +1006,9 @@ void cWorld::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const 
 
 
 
-void cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback * a_Callback)
+bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback)
 {
-	m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_Callback);
+	return m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_Callback);
 }
 
 

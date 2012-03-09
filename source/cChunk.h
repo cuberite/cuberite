@@ -139,7 +139,7 @@ public:
 	void MarkLoadFailed(void);  // Marks the chunk as failed to load. Ignored is the chunk is already valid
 	
 	/// Gets all chunk data, calls the a_Callback's methods for each data type
-	void GetAllData(cChunkDataCallback * a_Callback);
+	void GetAllData(cChunkDataCallback & a_Callback);
 	
 	/// Sets all chunk data
 	void SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);

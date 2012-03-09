@@ -84,6 +84,12 @@
 
 
 
+int cClientHandle::s_ClientCount = 0;
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
@@ -104,7 +110,11 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	, m_State(csConnected)
 	, m_LastStreamedChunkX(0x7fffffff)  // bogus chunk coords to force streaming upon login
 	, m_LastStreamedChunkZ(0x7fffffff)
+	, m_UniqueID(0)
 {
+	s_ClientCount++;	// Not protected by CS because clients are always constructed from the same thread
+	m_UniqueID = s_ClientCount;
+
 	cTimer t1;
 	m_LastPingTime = t1.GetNowTime();
 
@@ -696,7 +706,7 @@ void cClientHandle::HandleLogin(cPacket_Login * a_Packet)
 
 	// Schedule for authentication; until then, let them wait (but do not block)
 	m_State = csAuthenticating;
-	cRoot::Get()->GetAuthenticator().Authenticate(m_Username, cRoot::Get()->GetServer()->GetServerID());
+	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), cRoot::Get()->GetServer()->GetServerID());
 }
 
 

@@ -145,7 +145,10 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 	ASSERT(m_World != NULL);
 	
 	// Prepare MapChunk packets:
-	m_World->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, this);
+	if( !m_World->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, *this) )
+	{
+		return;
+	}
 	cPacket_PreChunk PreChunk(a_ChunkX, a_ChunkZ, true);
 	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData);
 	

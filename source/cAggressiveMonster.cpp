@@ -24,7 +24,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt) {
 	m_ChaseTime += a_Dt;
 	if( m_Target )
 	{
-		if(m_Target->GetEntityType() == cEntity::E_PLAYER)
+		if(m_Target->GetEntityType() == cEntity::eEntityType_Player)
 		{
 			cPlayer * Player = (cPlayer *) m_Target;
 			if(Player->GetGameMode() == 1)

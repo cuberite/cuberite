@@ -51,8 +51,8 @@ public:												//tolua_export
 
 	void SendMessage( const char* a_Message, cPlayer* a_Player = 0, bool a_bExclude = false ); //tolua_export
 	
-	void KickUser(const AString & iUserName, const AString & iReason);
-	void AuthenticateUser(const AString & iUserName);  // Called by cAuthenticator to auth the specified user
+	void KickUser(int a_ClientID, const AString & a_Reason);
+	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
 
 	static void ServerListenThread( void* a_Args );
 

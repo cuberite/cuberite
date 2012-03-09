@@ -40,7 +40,7 @@ public:
 	void ReadINI(void);
 
 	/// Queues a request for authenticating a user. If the auth fails, the user is kicked
-	void Authenticate(const AString & iUserName, const AString & iServerHash);
+	void Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash);
 
 	// Stops the authenticator thread
 	void Stop(void);
@@ -50,10 +50,11 @@ private:
 	class cUser
 	{
 	public:
+		int mClientID;
 		AString mName;
 		AString mServerHash;
 		
-		cUser(const AString & iName, const AString & iServerHash) : mName(iName), mServerHash(iServerHash) {}
+		cUser(int a_ClientID, const AString & a_Name, const AString & a_ServerHash) : mClientID(a_ClientID), mName(a_Name), mServerHash(a_ServerHash) {}
 	} ;
 	
 	typedef std::deque<cUser> cUserList;
@@ -70,7 +71,7 @@ private:
 	virtual void Execute(void) override;
 	
 	// Returns true if the user authenticated okay, false on error; iLevel is the recursion deptht (bails out if too deep)
-	bool AuthFromAddress(const AString & iServer, const AString & iAddress, const AString & iUserName, int iLevel = 1);
+	bool AuthFromAddress(const AString & a_Server, const AString & a_Address, const AString & a_UserName, int a_Level = 1);
 };
 
 

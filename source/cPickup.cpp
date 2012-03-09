@@ -58,7 +58,7 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 		}
 	}
 
-	m_EntityType = E_PICKUP;
+	m_EntityType = eEntityType_Pickup;
 }
 
 
@@ -92,7 +92,7 @@ cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
 		cRoot::Get()->GetServer()->Broadcast( *a_PickupSpawnPacket );
 	}
 
-	m_EntityType = E_PICKUP;
+	m_EntityType = eEntityType_Pickup;
 }
 
 

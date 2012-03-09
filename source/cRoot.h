@@ -49,8 +49,8 @@ public:
 
 	void ServerCommand(const char* a_Cmd );						//tolua_export
 	
-	void KickUser(const AString & iUserName, const AString & iReason);  // Kicks the user, no matter in what world they are. Used from cAuthenticator
-	void AuthenticateUser(const AString & iUserName);  // Called by cAuthenticator to auth the specified user
+	void KickUser(int a_ClientID, const AString & a_Reason);  // Kicks the user, no matter in what world they are. Used from cAuthenticator
+	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
 
 	void TickWorlds( float a_Dt );
 	

@@ -21,7 +21,7 @@ cPassiveAggressiveMonster::~cPassiveAggressiveMonster()
 void cPassiveAggressiveMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
 {
 	cMonster::TakeDamage(a_Damage, a_Instigator);
-	if(m_Target->GetEntityType() == cEntity::E_PLAYER)
+	if(m_Target->GetEntityType() == cEntity::eEntityType_Player)
 	{
 		cPlayer * Player = (cPlayer *) m_Target;
 		if(Player->GetGameMode() != 1)

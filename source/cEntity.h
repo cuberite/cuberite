@@ -57,11 +57,11 @@ public:																						//tolua_export
 
 	virtual void Initialize( cWorld* a_World );												//tolua_export
 
-	enum ENUM_ENTITY_TYPE																	//tolua_export
+	enum eEntityType																		//tolua_export
 	{																						//tolua_export
-		E_ENTITY,																			//tolua_export
-		E_PLAYER,																			//tolua_export
-		E_PICKUP																			//tolua_export
+		eEntityType_Entity,																	//tolua_export
+		eEntityType_Player,																	//tolua_export
+		eEntityType_Pickup																	//tolua_export
 	};																						//tolua_export
 
 	virtual unsigned int GetEntityType() { return m_EntityType; }							//tolua_export
@@ -136,7 +136,7 @@ protected:
 	bool m_bDestroyed;
 	bool m_bRemovedFromChunk;
 
-	ENUM_ENTITY_TYPE m_EntityType;
+	eEntityType m_EntityType;
 	
 	cWorld* m_World;
 }; //tolua_export
