@@ -10,8 +10,8 @@
 
 
 # _X: These settings produce a debug build, with gdb symbols:
-CC_OPTIONS = -s -ggdb
-CCE_OPTIONS = -s -x c -ggdb
+CC_OPTIONS = -s -ggdb -D_DEBUG
+CCE_OPTIONS = -s -x c -ggdb -D_DEBUG
 LNK_OPTIONS = -lstdc++ -pthread -ggdb
 
 

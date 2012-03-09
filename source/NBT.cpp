@@ -622,7 +622,7 @@ cNBTTree * cNBTParser::Parse(const char * a_Data, int a_Length)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dumping the NBT tree (debug-only)
 
-#ifdef _DEBUG
+#if (defined(_DEBUG) && defined(_WIN32))
 
 #define CASE_SIMPLE_TAG(TYPE,FMT) \
 	case cNBTTag::TAG_##TYPE: \
@@ -696,7 +696,7 @@ void DumpTree(const cNBTTree * a_Tree, int a_Level)
 
 #undef CASE_SIMPLE_TAG
 
-#endif  // _DEBUG
+#endif  // (_DEBUG && _WIN32)
 
 
 

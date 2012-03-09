@@ -203,9 +203,9 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dumping the tree (DEBUG-only)
 
-#ifdef _DEBUG
+#if (defined(_DEBUG) && defined(_WIN32))
 void DumpTree(const cNBTTree * a_Tree, int a_Level = 0);
-#endif  // _DEBUG
+#endif  // (_DEBUG && _WIN32)
 
 
 

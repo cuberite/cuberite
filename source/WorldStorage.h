@@ -31,7 +31,7 @@ class cBlockEntity;
 
 
 /// Interface that all the world storage schemas need to implement
-class cWSSchema ABSTRACT
+class cWSSchema abstract
 {
 public:
 	cWSSchema(cWorld * a_World) : m_World(a_World) {}

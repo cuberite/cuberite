@@ -9,18 +9,57 @@
 
 
 // Compiler-dependent stuff:
-#ifndef _MSC_VER
-	// Non-MS compilers don't know the override keyword
-	#define override
-	#define abstract
-	#define stricmp strcasecmp
-#else
+#if defined(_MSC_VER)
 	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
 	#pragma warning(disable:4481)
 	
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)
-#endif  // _MSC_VER
+
+	#define OBSOLETE __declspec(deprecated)
+	
+	// No alignment needed in MSVC
+	#define ALIGN_8
+	#define ALIGN_16
+	
+#elif defined(__GNUC__)
+
+	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
+	#define abstract
+	
+	// TODO: Can GCC mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
+	#define override
+	
+	#define OBSOLETE __attribute__((deprecated))
+
+	#define ALIGN_8 __attribute__((aligned(8)))
+	#define ALIGN_16 __attribute__((aligned(16)))
+
+	// Some portability macros :)
+	#define stricmp strcasecmp
+
+#else
+
+	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
+	
+	/*
+	// Copy and uncomment this into another #elif section based on your compiler identification
+	
+	// Explicitly mark classes as abstract (no instances can be created)
+	#define abstract
+	
+	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
+	#define override
+
+	// Mark functions as obsolete, so that their usage results in a compile-time warning
+	#define OBSOLETE
+
+	// Mark types / variables for alignment. Do the platforms need it?
+	#define ALIGN_8
+	#define ALIGN_16
+	*/
+
+#endif
 
 
 
@@ -40,7 +79,7 @@
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
-	#include <winsock.h>
+	#include <winsock2.h>
 #else
 	#include <sys/types.h>
 	#include <sys/stat.h>   // for mkdir
@@ -111,16 +150,6 @@
 
 /// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
 #define KiB * 1024
-
-#ifdef _MSC_VER
-	#define OBSOLETE __declspec(deprecated)
-	#define ABSTRACT abstract
-#else
-	// TODO: how do other compilers mark functions as obsolete, so that their usage results in a compile-time warning?
-	#define OBSOLETE
-	// TODO: Can other compilers explicitly mark classes as abstract (no instances can be created)?
-	#define ABSTRACT
-#endif
 
 /// Faster than (int)floorf((float)x / (float)div)
 #define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )

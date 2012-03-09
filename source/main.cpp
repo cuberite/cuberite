@@ -158,14 +158,14 @@ int main( int argc, char **argv )
 	#endif  // _WIN32 && !_WIN64
 	// End of dump-file magic
 	
-	#ifdef _DEBUG
+	#if defined(_DEBUG) && defined(_MSC_VER)
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 	
 	// _X: The simple built-in CRT leak finder - simply break when allocating the Nth block ({N} is listed in the leak output)
 	// Only useful when the leak is in the same sequence all the time
 	// _CrtSetBreakAlloc(85950);
 	
-	#endif
+	#endif  // _DEBUG && _MSC_VER
 
 	#ifndef _DEBUG
 	std::signal(SIGSEGV, ShowCrashReport);

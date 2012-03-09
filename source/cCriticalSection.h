@@ -19,10 +19,10 @@ private:
 	#ifdef _WIN32
 		CRITICAL_SECTION m_CriticalSection;
 	#else  // _WIN32
-		void* m_CriticalSectionPtr; // Pointer to a CRITICAL_SECTION object
-		void* m_Attributes;
+		void* m_CriticalSectionPtr ALIGN_8; // Pointer to a CRITICAL_SECTION object
+		void* m_Attributes ALIGN_8;
 	#endif  // else _WIN32
-};
+} ALIGN_8;
 
 
 
