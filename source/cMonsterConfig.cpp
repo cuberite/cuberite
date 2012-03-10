@@ -112,11 +112,3 @@ void cMonsterConfig::AssignAttributes(cMonster *m, const char* n)
 
 
 
-// _X: WTF?
-cMonsterConfig *cMonsterConfig::Get() {
-	return this;
-}
-
-
-
-

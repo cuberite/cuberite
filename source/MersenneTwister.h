@@ -58,7 +58,6 @@
 #include <cstdio>
 #include <ctime>
 #include <cmath>
-#pragma warning(disable:4996;disable:4800)
 
 class MTRand {
 // Data

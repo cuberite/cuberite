@@ -48,7 +48,7 @@ class cWorld													//tolua_export
 {																//tolua_export
 public:
 
-	static cWorld* GetWorld();														//tolua_export
+	OBSOLETE static cWorld* GetWorld();														//tolua_export
 
 	// Return time in seconds
 	inline static float GetTime()													//tolua_export

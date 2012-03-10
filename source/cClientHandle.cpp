@@ -306,7 +306,7 @@ void cClientHandle::Authenticate(void)
 	LoginResponse.m_MapSeed = cRoot::Get()->GetWorld()->GetWorldSeed();
 #endif
 	LoginResponse.m_Dimension = 0;
-	LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetWorld()->GetMaxPlayers();
+	LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetDefaultWorld()->GetMaxPlayers();
 	LoginResponse.m_Difficulty = 2;
 	Send(LoginResponse);
 
@@ -627,11 +627,11 @@ void cClientHandle::HandlePing(void)
 	// Somebody tries to retrieve information about the server
 	AString Reply;
 	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetWorld()->GetDescription().c_str(), 
+		cRoot::Get()->GetDefaultWorld()->GetDescription().c_str(), 
 		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetWorld()->GetNumPlayers(),
+		cRoot::Get()->GetDefaultWorld()->GetNumPlayers(),
 		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetWorld()->GetMaxPlayers()
+		cRoot::Get()->GetDefaultWorld()->GetMaxPlayers()
 	);
 	Kick(Reply.c_str());
 }
@@ -656,7 +656,7 @@ void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 
 	LOG("HANDSHAKE %s", m_Username.c_str());
 
-	if (cRoot::Get()->GetWorld()->GetNumPlayers() >= cRoot::Get()->GetWorld()->GetMaxPlayers())
+	if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
 	{
 		Kick("The server is currently full :(-- Try again later");
 		return;
@@ -1647,8 +1647,10 @@ void cClientHandle::HandleKeepAlive(cPacket_KeepAlive * a_Packet)
 
 bool cClientHandle::CheckBlockInteractionsRate(void)
 {
+	ASSERT(m_Player != NULL);
+	ASSERT(m_Player->GetWorld() != NULL);
 	int LastActionCnt = m_Player->GetLastBlockActionCnt();
-	if ((cRoot::Get()->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
+	if ((m_Player->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
 	{
 		// Limit the number of block interactions per tick
 		m_Player->SetLastBlockActionTime(); //Player tried to interact with a block. Reset last block interation time.

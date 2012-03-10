@@ -463,7 +463,10 @@ void cPlayer::CloseWindow(char a_WindowType)
 
 void cPlayer::SetLastBlockActionTime()
 {
-	m_LastBlockActionTime = cRoot::Get()->GetWorld()->GetTime();
+	if (m_World != NULL)
+	{
+		m_LastBlockActionTime = m_World->GetTime();
+	}
 }
 
 

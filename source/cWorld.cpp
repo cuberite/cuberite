@@ -132,8 +132,8 @@ protected:
 
 cWorld* cWorld::GetWorld()
 {
-	LOGWARN("WARNING: Using deprecated function cWorld::GetWorld() use cRoot::Get()->GetWorld() instead!");
-	return cRoot::Get()->GetWorld();
+	LOGWARN("WARNING: Using deprecated function cWorld::GetWorld() use cRoot::Get()->GetDefaultWorld() instead!");
+	return cRoot::Get()->GetDefaultWorld();
 }
 
 
@@ -275,29 +275,34 @@ cWorld::cWorld( const AString & a_WorldName )
 	g_BlockLightValue[ E_BLOCK_GLOWSTONE ] =		15;
 
 	// Spread blocks
-	g_BlockSpreadLightFalloff[ E_BLOCK_AIR ]				= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_TORCH ]				= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_FIRE ]				= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_LAVA ]				= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_STATIONARY_LAVA ]	= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_WATER ]				= 4;				// Light in water dissapears faster
-	g_BlockSpreadLightFalloff[ E_BLOCK_STATIONARY_WATER ]	= 4;
-	g_BlockSpreadLightFalloff[ E_BLOCK_LEAVES ]				= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_GLASS ]				= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_GLOWSTONE ]			= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_SIGN_POST ]			= 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_WALLSIGN ]			= 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_AIR ]              = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_TORCH ]            = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_FIRE ]             = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_LAVA ]             = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_STATIONARY_LAVA ]  = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_WATER ]            = 4;  // Light in water dissapears faster
+	g_BlockSpreadLightFalloff[ E_BLOCK_STATIONARY_WATER ] = 4;
+	g_BlockSpreadLightFalloff[ E_BLOCK_LEAVES ]           = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_GLASS ]            = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_GLOWSTONE ]        = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_SIGN_POST ]        = 1;
+	g_BlockSpreadLightFalloff[ E_BLOCK_WALLSIGN ]         = 1;
 
 	// Transparent blocks
-	g_BlockTransparent[ E_BLOCK_AIR ]		= true;
-	g_BlockTransparent[ E_BLOCK_GLASS ]		= true;
-	g_BlockTransparent[ E_BLOCK_FIRE ]		= true;
-	g_BlockTransparent[ E_BLOCK_ICE ] 		= true;
-	g_BlockTransparent[ E_BLOCK_TORCH ]		= true;
-	g_BlockTransparent[ E_BLOCK_SIGN_POST ] = true;
-	g_BlockTransparent[ E_BLOCK_WALLSIGN ]	= true;
-	
-	// TODO: Also set flowers, mushrooms etc as transparent
+	g_BlockTransparent[ E_BLOCK_AIR ]            = true;
+	g_BlockTransparent[ E_BLOCK_GLASS ]          = true;
+	g_BlockTransparent[ E_BLOCK_FIRE ]           = true;
+	g_BlockTransparent[ E_BLOCK_ICE ]            = true;
+	g_BlockTransparent[ E_BLOCK_TORCH ]          = true;
+	g_BlockTransparent[ E_BLOCK_SIGN_POST ]      = true;
+	g_BlockTransparent[ E_BLOCK_WALLSIGN ]       = true;
+	g_BlockTransparent[ E_BLOCK_TALL_GRASS ]     = true;
+	g_BlockTransparent[ E_BLOCK_YELLOW_FLOWER ]  = true;
+	g_BlockTransparent[ E_BLOCK_RED_ROSE ]       = true;
+	g_BlockTransparent[ E_BLOCK_RED_MUSHROOM ]   = true;
+	g_BlockTransparent[ E_BLOCK_BROWN_MUSHROOM ] = true;
+
+	// TODO: Any other transparent blocks?
 
 	// One hit break blocks
 	g_BlockOneHitDig[ E_BLOCK_SAPLING ]				= true;

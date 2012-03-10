@@ -520,7 +520,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 		}
 		if( split[0].compare( "save-all" ) == 0 )
 		{
-			cRoot::Get()->GetWorld()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
+			cRoot::Get()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
 			return;
 		}
 		if (split[0].compare("unload") == 0)
@@ -540,7 +540,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 					return false;
 				}
 			} Logger;
-			cRoot::Get()->GetWorld()->ForEachPlayer(Logger);
+			cRoot::Get()->ForEachPlayer(Logger);
 			return;
 		}
 		if( split[0].compare( "numchunks" ) == 0 )
@@ -596,7 +596,7 @@ void cServer::Shutdown()
 	m_bRestarting = true;
 	m_pState->RestartEvent.Wait();
 
-	cRoot::Get()->GetWorld()->SaveAllChunks();
+	cRoot::Get()->SaveAllChunks();
 
 	cCSLock Lock(m_CSClients);
 	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )

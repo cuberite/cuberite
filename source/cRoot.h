@@ -19,6 +19,8 @@ class cWebAdmin;
 class cPluginManager;
 class cServer;
 class cWorld;
+class cPlayer;
+typedef cItemCallback<cPlayer> cPlayerListCallback;
 
 
 
@@ -55,6 +57,12 @@ public:
 	void TickWorlds( float a_Dt );
 	
 	int GetTotalChunkCount(void);  // tolua_export
+	
+	/// Saves all chunks in all worlds
+	void SaveAllChunks(void);
+	
+	/// Calls the callback for each player in all worlds
+	bool ForEachPlayer(cPlayerListCallback & a_Callback);
 	
 private:
 	void LoadGlobalSettings();

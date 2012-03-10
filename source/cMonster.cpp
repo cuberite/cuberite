@@ -506,7 +506,7 @@ cPlayer * cMonster::FindClosestPlayer(void)
 
 void cMonster::GetMonsterConfig(const char* pm_name)
 {
-	cRoot::Get()->GetMonsterConfig()->Get()->AssignAttributes(this, pm_name);
+	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, pm_name);
 }
 
 

@@ -364,3 +364,31 @@ int cRoot::GetTotalChunkCount(void)
 
 
 
+
+void cRoot::SaveAllChunks(void)
+{
+	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr)
+	{
+		itr->second->SaveAllChunks();
+	}
+}
+
+
+
+
+
+bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
+{
+	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr)
+	{
+		if (!itr->second->ForEachPlayer(a_Callback))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
