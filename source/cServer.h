@@ -38,8 +38,7 @@ public:												//tolua_export
 	bool IsConnected(){return m_bIsConnected;} // returns connection status
 	void StartListenClient(); // Listen to client
 
-	void Broadcast(const cPacket & a_Packet, cClientHandle* a_Exclude = NULL) { Broadcast(&a_Packet, a_Exclude); }
-	void Broadcast(const cPacket * a_Packet, cClientHandle* a_Exclude = NULL);
+	void Broadcast(const cPacket & a_Packet, cClientHandle* a_Exclude = NULL);
 
 	bool Tick(float a_Dt);
 

@@ -1373,7 +1373,7 @@ void cChunk::Broadcast( const cPacket * a_Packet, cClientHandle* a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->Send( a_Packet );
+		(*itr)->Send(*a_Packet);
 	}  // for itr - LoadedByClient[]
 }
 

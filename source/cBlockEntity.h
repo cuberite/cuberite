@@ -66,7 +66,7 @@ public:
 		}
 		if ( a_Client != NULL )
 		{
-			a_Client->Send(Packet.get());
+			a_Client->Send(*(Packet.get()));
 		}
 		else // broadcast to all chunk clients
 		{

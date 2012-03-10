@@ -120,7 +120,7 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 			{
 				m_Destroy = new cPacket_DestroyEntity(m_Entity);
 			}
-			a_Client->Send(m_Destroy);
+			a_Client->Send(*m_Destroy);
 		}
 		
 		virtual void Added(cClientHandle * a_Client) override
@@ -131,7 +131,7 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 			}
 			if (m_Spawn != NULL)
 			{
-				a_Client->Send(m_Spawn);
+				a_Client->Send(*m_Spawn);
 			}
 		}
 
@@ -218,7 +218,7 @@ void cEntity::SpawnOn(cClientHandle * a_Client)
 	}
 	else
 	{
-		a_Client->Send(SpawnPacket.get());
+		a_Client->Send(*(SpawnPacket.get()));
 	}
 }
 

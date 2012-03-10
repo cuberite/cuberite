@@ -1703,14 +1703,14 @@ void cClientHandle::Tick(float a_Dt)
 
 
 
-void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* = E_PRIORITY_NORMAL */)
+void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* = E_PRIORITY_NORMAL */)
 {
 	if (m_bKicking) return; // Don't add more packets if player is getting kicked anyway
 
 	// If it is the packet spawning myself for myself, drop it silently:
-	if (a_Packet->m_PacketID == E_NAMED_ENTITY_SPAWN)
+	if (a_Packet.m_PacketID == E_NAMED_ENTITY_SPAWN)
 	{
-		if (((cPacket_NamedEntitySpawn *)a_Packet)->m_UniqueID == m_Player->GetUniqueID())
+		if (((cPacket_NamedEntitySpawn &)a_Packet).m_UniqueID == m_Player->GetUniqueID())
 		{
 			return;
 		}
@@ -1719,7 +1719,7 @@ void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* =
 	// Filter out packets that don't belong to a csDownloadingWorld state:
 	if (m_State == csDownloadingWorld)
 	{
-		switch (a_Packet->m_PacketID)
+		switch (a_Packet.m_PacketID)
 		{
 			case E_PLAYERMOVELOOK:
 			case E_KEEP_ALIVE:
@@ -1734,14 +1734,14 @@ void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* =
 	}
 	
 	// Check chunks being sent, erase them from m_ChunksToSend:
-	if (a_Packet->m_PacketID == E_MAP_CHUNK)
+	if (a_Packet.m_PacketID == E_MAP_CHUNK)
 	{
 		#if (MINECRAFT_1_2_2 == 1)
-		int ChunkX = ((cPacket_MapChunk *)a_Packet)->m_PosX;
-		int ChunkZ = ((cPacket_MapChunk *)a_Packet)->m_PosZ;
+		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX;
+		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ;
 		#else
-		int ChunkX = ((cPacket_MapChunk *)a_Packet)->m_PosX / cChunk::c_ChunkWidth;
-		int ChunkZ = ((cPacket_MapChunk *)a_Packet)->m_PosZ / cChunk::c_ChunkWidth;
+		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX / cChunk::c_ChunkWidth;
+		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ / cChunk::c_ChunkWidth;
 		#endif
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
@@ -1759,9 +1759,10 @@ void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* =
 	cCSLock Lock(m_CSPackets);
 	if (a_Priority == E_PRIORITY_NORMAL)
 	{
-		if (a_Packet->m_PacketID == E_REL_ENT_MOVE_LOOK)
+		if (a_Packet.m_PacketID == E_REL_ENT_MOVE_LOOK)
 		{
 			PacketList & Packets = m_PendingNrmSendPackets;
+			const cPacket_RelativeEntityMoveLook & ThisPacketData = reinterpret_cast< const cPacket_RelativeEntityMoveLook &>(a_Packet);
 			for (PacketList::iterator itr = Packets.begin(); itr != Packets.end(); ++itr)
 			{
 				bool bBreak = false;
@@ -1769,9 +1770,8 @@ void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* =
 				{
 					case E_REL_ENT_MOVE_LOOK:
 					{
-						const cPacket_RelativeEntityMoveLook* ThisPacketData = reinterpret_cast< const cPacket_RelativeEntityMoveLook* >(a_Packet);
-						cPacket_RelativeEntityMoveLook* PacketData = reinterpret_cast< cPacket_RelativeEntityMoveLook* >(*itr);
-						if (ThisPacketData->m_UniqueID == PacketData->m_UniqueID)
+						cPacket_RelativeEntityMoveLook * PacketData = reinterpret_cast< cPacket_RelativeEntityMoveLook *>(*itr);
+						if (ThisPacketData.m_UniqueID == PacketData->m_UniqueID)
 						{
 							Packets.erase(itr);
 							bBreak = true;
@@ -1787,11 +1787,11 @@ void cClientHandle::Send(const cPacket * a_Packet, ENUM_PRIORITY a_Priority /* =
 				}
 			}  // for itr - Packets[]
 		}  // if (E_REL_ENT_MOVE_LOOK
-		m_PendingNrmSendPackets.push_back(a_Packet->Clone());
+		m_PendingNrmSendPackets.push_back(a_Packet.Clone());
 	}
 	else if (a_Priority == E_PRIORITY_LOW)
 	{
-		m_PendingLowSendPackets.push_back(a_Packet->Clone());
+		m_PendingLowSendPackets.push_back(a_Packet.Clone());
 	}
 	Lock.Unlock();
 	

@@ -54,7 +54,7 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 		std::auto_ptr<cPacket> PickupSpawn(GetSpawnPacket());
 		if (PickupSpawn.get() != NULL)
 		{
-			cRoot::Get()->GetServer()->Broadcast( PickupSpawn.get() );
+			cRoot::Get()->GetServer()->Broadcast(*(PickupSpawn.get()));
 		}
 	}
 
