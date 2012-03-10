@@ -26,6 +26,10 @@ It will help us when the new chunk format comes out and we need to patch everyth
 */
 #define ZERO_CHUNK_Y 0
 
+// Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
+#define AXIS_ORDER_YZX 1	// Original (1.1-)
+#define AXIS_ORDER_XZY 2	// New (1.2+)
+#define AXIS_ORDER AXIS_ORDER_YZX
 
 
 
@@ -234,23 +238,28 @@ public:
 
 	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
 	{
-		return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth); // 1.1 is YZX
-		//return x + (z * c_ChunkWidth) + (y * c_ChunkWidth * c_ChunkHeight); // 1.2 is XZY
+		#if AXIS_ORDER == AXIS_ORDER_XZY
+			return x + (z * c_ChunkWidth) + (y * c_ChunkWidth * c_ChunkWidth); // 1.2 is XZY
+		#else if AXIS_ORDER == AXIS_ORDER_YZX
+			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth); // 1.1 is YZX
+		#endif
 	}
 
 	inline static Vector3i IndexToCoordinate( unsigned int index )
 	{
-// 		return Vector3i(								// 1.2
-// 			index % c_ChunkWidth,						// X
-// 			index / (c_ChunkHeight * c_ChunkWidth),		// Y
-// 			(index / c_ChunkWidth) % c_ChunkWidth		// Z
-// 			);
-
-		return Vector3i(								// 1.1
-			index / (c_ChunkHeight * c_ChunkWidth),		// X
-			index % c_ChunkHeight,						// Y
-			(index / c_ChunkHeight) % c_ChunkWidth		// Z
-			);
+		#if AXIS_ORDER == AXIS_ORDER_XZY
+			return Vector3i(								// 1.2
+				index % c_ChunkWidth,						// X
+				index / (c_ChunkWidth * c_ChunkWidth),		// Y
+				(index / c_ChunkWidth) % c_ChunkWidth		// Z
+				);
+		#else if AXIS_ORDER == AXIS_ORDER_YZX
+			return Vector3i(								// 1.1
+				index / (c_ChunkHeight * c_ChunkWidth),		// X
+				index % c_ChunkHeight,						// Y
+				(index / c_ChunkHeight) % c_ChunkWidth		// Z
+				);
+		#endif
 	}
 	
 	inline void MarkDirty(void)

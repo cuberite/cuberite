@@ -201,7 +201,7 @@ unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 {
 	ASSERT((x < cChunk::c_ChunkWidth) && (x > -1) && (y < cChunk::c_ChunkHeight) && (y > -1) && (z < cChunk::c_ChunkWidth) && (z > -1));
 
-	return y + (z * cChunk::c_ChunkHeight) + (x * cChunk::c_ChunkHeight * cChunk::c_ChunkWidth);
+	return cChunk::MakeIndexNoCheck( x, y, z );
 }
 
 
@@ -433,7 +433,7 @@ void cWorldGenerator::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 			int xx = x + a_ChunkX * cChunk::c_ChunkWidth;
 
 			int TopY = m_World->GetHeight(xx, zz);
-			int index = MakeIndex(x, TopY - 1, z);
+			int index = cChunk::MakeIndexNoCheck(x, MAX(TopY - 1, 0), z);
 			if (BlockType[index] == BLOCK_GRASS)
 			{
 				float val1 = Noise.CubicNoise2D( xx * 0.1f, zz * 0.1f );

@@ -38,6 +38,8 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 	
 	unsigned int DataSize = (cChunk::c_ChunkHeight / 16) * (4096 + 2048 + 2048 + 2048);
 	std::auto_ptr<char> AllData(new char[ DataSize ]);
+
+#if AXIS_ORDER == AXIS_ORDER_YZX
 	memset( AllData.get(), 0, DataSize );
 
 	unsigned int iterator = 0;
@@ -93,6 +95,13 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 			}
 		}
 	}
+#else if AXIS_ORDER == AXIS_ORDER_XZY
+	for ( int i = 0; i < 16; ++i )
+	{
+		m_BitMap1 |= (1 << i);
+	}
+	memcpy( AllData.get(), a_BlockData, DataSize );
+#endif
 
 	uLongf CompressedSize = compressBound( DataSize );
 	char * CompressedBlockData = new char[CompressedSize];
@@ -159,6 +168,7 @@ cPacket_MapChunk::cPacket_MapChunk( const cPacket_MapChunk & a_Copy )
 
 void cPacket_MapChunk::Serialize(AString & a_Data) const
 {
+	LOG("Sending chunk [%i, %i]", m_PosX, m_PosZ );
 	AppendByte   (a_Data, m_PacketID);
 
 #if (MINECRAFT_1_2_2 == 1 )
