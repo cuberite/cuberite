@@ -323,6 +323,12 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	{
 		UpdateChunk1To2();
 	}
+#if AXIS_ORDER == AXIS_ORDER_XZY
+	if( m_ChunkVersion == 2 ) // Convert chunks to version 3
+	{
+		UpdateChunk2To3();
+	}
+#endif
 }
 
 
@@ -530,6 +536,144 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 	SynchronizeFile();
 	
 	LOGINFO("Updated \"%s\" version 1 to version 2", m_FileName.c_str() );
+}
+
+
+
+
+
+void cWSSCompact::cPAKFile::UpdateChunk2To3()
+{
+	int Offset = 0;
+	AString NewDataContents;
+	int ChunksConverted = 0;
+	for (sChunkHeaders::iterator itr = m_ChunkHeaders.begin(); itr != m_ChunkHeaders.end(); ++itr)
+	{
+		sChunkHeader * Header = *itr;
+
+		if( ChunksConverted % 32 == 0 )
+		{
+			LOGINFO("Updating \"%s\" version 2 to version 3: %d %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
+		}
+		ChunksConverted++;
+
+		AString Data;
+		int UncompressedSize = Header->m_UncompressedSize;
+		Data.assign(m_DataContents, Offset, Header->m_CompressedSize);
+		Offset += Header->m_CompressedSize;
+
+		// Crude data integrity check:
+		int ExpectedSize = (16*256*16)*2 + (16*256*16)/2; // For version 2
+		if (UncompressedSize < ExpectedSize)
+		{
+			LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
+				Header->m_ChunkX, Header->m_ChunkZ,
+				UncompressedSize, ExpectedSize
+				);
+			Offset += Header->m_CompressedSize;
+			continue;
+		}
+
+		// Decompress the data:
+		AString UncompressedData;
+		{
+			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, UncompressedSize);
+			if (errorcode != Z_OK)
+			{
+				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+					errorcode,
+					Header->m_ChunkX, Header->m_ChunkZ
+					);
+				Offset += Header->m_CompressedSize;
+				continue;
+			}
+		}
+
+		if (UncompressedSize != (int)UncompressedData.size())
+		{
+			LOGWARNING("Uncompressed data size differs (exp %d bytes, got %d) for chunk [%d, %d]",
+				UncompressedSize, UncompressedData.size(),
+				Header->m_ChunkX, Header->m_ChunkZ
+				);
+			Offset += Header->m_CompressedSize;
+			continue;
+		}
+
+		std::auto_ptr<char> ConvertedData(new char[ ExpectedSize ]);
+		memset( ConvertedData.get(), 0, ExpectedSize );
+
+		// Cannot use cChunk::MakeIndex because it might change again?????????
+		// For compatibility, use what we know is current
+#define MAKE_2_INDEX( x, y, z ) ( y + (z * 256) + (x * 256 * 16) )
+#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
+
+		unsigned int InChunkOffset = 0;
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y ) // YZX Loop order is important, in 1.1 Y was first then Z then X
+		{
+			ConvertedData.get()[ MAKE_3_INDEX(x, y, z) ] = UncompressedData[InChunkOffset];
+			++InChunkOffset;
+		}  // for y, z, x
+
+		
+		unsigned int index2 = 0;
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
+		{
+			ConvertedData.get()[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
+			++index2;
+		}
+		InChunkOffset += index2/2;
+		index2 = 0;
+
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
+		{
+			ConvertedData.get()[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
+			++index2;
+		}
+		InChunkOffset += index2/2;
+		index2 = 0;
+
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
+		{
+			ConvertedData.get()[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
+			++index2;
+		}
+		InChunkOffset += index2/2;
+		index2 = 0;
+
+		AString Converted(ConvertedData.get(), ExpectedSize);
+
+		// Add JSON data afterwards
+		if (UncompressedData.size() > InChunkOffset)
+		{
+			Converted.append( UncompressedData.begin() + InChunkOffset, UncompressedData.end() );
+		}
+
+		// Re-compress data
+		AString CompressedData;
+		{
+			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData);
+			if (errorcode != Z_OK)
+			{
+				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
+					errorcode,
+					Header->m_ChunkX, Header->m_ChunkZ
+					);
+				continue;
+			}
+		}
+
+		// Save into file's cache
+		Header->m_UncompressedSize = Converted.size();
+		Header->m_CompressedSize = CompressedData.size();
+		NewDataContents.append( CompressedData );
+	}
+
+	// Done converting
+	m_DataContents = NewDataContents;
+	m_ChunkVersion = 3;
+	SynchronizeFile();
+
+	LOGINFO("Updated \"%s\" version 2 to version 3", m_FileName.c_str() );
 }
 
 

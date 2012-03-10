@@ -48,7 +48,11 @@ protected:
 		int GetLayerZ(void) const {return m_LayerZ; }
 		
 		static const int PAK_VERSION = 1;
+#if AXIS_ORDER == AXIS_ORDER_XZY
+		static const int CHUNK_VERSION = 3;
+#elif AXIS_ORDER == AXIS_ORDER_YZX
 		static const int CHUNK_VERSION = 2;
+#endif
 	protected:
 	
 		AString m_FileName;
@@ -67,7 +71,8 @@ protected:
 		bool SaveChunkToData(const cChunkCoords & a_Chunk, cWorld * a_World);  // Saves the chunk to m_DataContents, updates headers and m_NumDirty
 		void SynchronizeFile(void);  // Writes m_DataContents along with the headers to file, resets m_NumDirty
 
-		void UpdateChunk1To2(void);
+		void UpdateChunk1To2(void); // Height from 128 to 256
+		void UpdateChunk2To3(void); // Axis order from YZX to XZY
 	} ;
 	
 	typedef std::list<cPAKFile *> cPAKFiles;
