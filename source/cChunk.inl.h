@@ -37,7 +37,7 @@ char cChunk::GetNibble(char* a_Buffer, int x, int y, int z)
 {
 	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 	{
-		const int cindex = (y/2) + (z * (c_ChunkHeight/2)) + (x * (c_ChunkHeight/2) * c_ChunkWidth);
+		const int cindex = MakeIndexNoCheck(x, y, z)/2;
 		if( (y & 1) == 0 )
 		{	// First half byte
 			return (a_Buffer[cindex] & 0x0f);
@@ -82,7 +82,7 @@ void cChunk::SetNibble(char* a_Buffer, int x, int y, int z, char light)
 {
 	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 	{
-		int cindex = (y/2) + (z * (c_ChunkHeight/2)) + (x * (c_ChunkHeight/2) * c_ChunkWidth);
+		int cindex = MakeIndexNoCheck(x, y, z)/2;
 		if( (y & 1) == 0 )
 		{	// First half byte
 			a_Buffer[cindex] &= 0xf0; // Set first half to 0

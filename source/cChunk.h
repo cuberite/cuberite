@@ -2,6 +2,7 @@
 #pragma once
 
 #include "cEntity.h"
+#include "Vector3i.h"
 
 
 
@@ -166,6 +167,7 @@ public:
 	// OBSOLETE void SendTo( cClientHandle * a_Client );
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );
+	void SetBlock( const Vector3i & a_BlockPos, char a_BlockType, char a_BlockMeta ) { SetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta ); }
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, char a_BlockType, char a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	char GetBlock( int a_X, int a_Y, int a_Z );
 	char GetBlock( int a_BlockIdx );
@@ -211,20 +213,44 @@ public:
 	
 	static char GetNibble(char * a_Buffer, int a_BlockIdx);
 	static char GetNibble(char * a_Buffer, int x, int y, int z);
-	static void SetNibble(char * a_Buffer, int a_BlockIdx, char a_Light);
-	static void SetNibble(char * a_Buffer, int x, int y, int z, char light);
+	static char GetNibble(char * a_Buffer, const Vector3i & a_BlockPos ) { return GetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
+	static void SetNibble(char * a_Buffer, int a_BlockIdx, char a_Value);
+	static void SetNibble(char * a_Buffer, int x, int y, int z, char a_Value);
+	static void SetNibble(char * a_Buffer, const Vector3i & a_BlockPos, char a_Value ) { SetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Value ); }
 
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
-	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos );
+	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos ) { return PositionToWorldPosition( a_InChunkPos.x, a_InChunkPos.y, a_InChunkPos.z ); }
+	Vector3i PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
 
 	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
 	inline static unsigned int MakeIndex(int x, int y, int z )
 	{
 		if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
 		{
-			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth);
+			return MakeIndexNoCheck(x, y, z);
 		}
 		return INDEX_OUT_OF_RANGE;
+	}
+
+	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
+	{
+		return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth); // 1.1 is YZX
+		//return x + (z * c_ChunkWidth) + (y * c_ChunkWidth * c_ChunkHeight); // 1.2 is XZY
+	}
+
+	inline static Vector3i IndexToCoordinate( unsigned int index )
+	{
+// 		return Vector3i(								// 1.2
+// 			index % c_ChunkWidth,						// X
+// 			index / (c_ChunkHeight * c_ChunkWidth),		// Y
+// 			(index / c_ChunkWidth) % c_ChunkWidth		// Z
+// 			);
+
+		return Vector3i(								// 1.1
+			index / (c_ChunkHeight * c_ChunkWidth),		// X
+			index % c_ChunkHeight,						// Y
+			(index / c_ChunkHeight) % c_ChunkWidth		// Z
+			);
 	}
 	
 	inline void MarkDirty(void)
@@ -275,6 +301,7 @@ private:
 	void RemoveBlockEntity( cBlockEntity* a_BlockEntity );
 	void AddBlockEntity( cBlockEntity* a_BlockEntity );
 	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );
+	cBlockEntity * GetBlockEntity( const Vector3i & a_BlockPos ) { return GetBlockEntity( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
 
 	void SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
 	void SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z);

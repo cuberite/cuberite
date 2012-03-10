@@ -363,16 +363,14 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		for( unsigned int i = 0; i < PendingSendBlocks; i++)
 		{
 			unsigned int index = m_PendingSendBlocks[i];
-			unsigned int Y = index % c_ChunkHeight;
-			unsigned int Z = (index / c_ChunkHeight) % c_ChunkWidth;
-			unsigned int X = (index / (c_ChunkHeight*c_ChunkWidth));
+			Vector3i BlockPos = IndexToCoordinate( index );
 
 #if (MINECRAFT_1_2_2 == 1)
-			unsigned int Coords = Y | Z << 8 | X << 12;
+			unsigned int Coords = BlockPos.y | BlockPos.z << 8 | BlockPos.x << 12;
 			unsigned int Blocks = GetNibble( m_BlockMeta, index ) | (m_BlockType[index]<<4);
 			MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
 #else
-			MultiBlock.m_BlockCoordinates[i] = (Z&0xf) | (X&0xf)<<4 | (Y&0xff)<<8;
+			MultiBlock.m_BlockCoordinates[i] = (BlockPos.z&0xf) | (BlockPos.x&0xf)<<4 | (BlockPos.y&0xff)<<8;
 			//LOG("X: %i Y: %i Z: %i Combo: 0x%04x", X, Y, Z, MultiBlock.m_BlockCoordinates[i] );
 			MultiBlock.m_BlockTypes[i] = m_BlockType[index];
 			MultiBlock.m_BlockMetas[i] = GetNibble( m_BlockMeta, index );
@@ -387,14 +385,12 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		for( unsigned int i = 0; i < PendingSendBlocks; i++)
 		{
 			unsigned int index = m_PendingSendBlocks[i];
-			int Y = index % c_ChunkHeight;
-			int Z = (index / c_ChunkHeight) % c_ChunkWidth;
-			int X = (index / (c_ChunkHeight*c_ChunkWidth));
+			Vector3i WorldPos = PositionToWorldPosition( IndexToCoordinate( index ) );
 
 			cPacket_BlockChange BlockChange;
-			BlockChange.m_PosX = X + m_PosX*c_ChunkWidth;
-			BlockChange.m_PosY = (char)(Y + m_PosY*c_ChunkHeight);
-			BlockChange.m_PosZ = Z + m_PosZ*c_ChunkWidth;
+			BlockChange.m_PosX = WorldPos.x;
+			BlockChange.m_PosY = (unsigned char)WorldPos.y;
+			BlockChange.m_PosZ = WorldPos.z;
 			BlockChange.m_BlockType = m_BlockType[index];
 			BlockChange.m_BlockMeta = GetNibble( m_BlockMeta, index );
 			Broadcast( BlockChange );
@@ -428,9 +424,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		for( std::deque< unsigned int >::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
 		{
 			unsigned int index = (*itr);
-			int Y = index % c_ChunkHeight;
-			int Z = (index / c_ChunkHeight) % c_ChunkWidth;
-			int X = (index / (c_ChunkHeight*c_ChunkWidth));
+			Vector3i BlockPos = IndexToCoordinate( index );
 
 			char BlockID = GetBlock( index );
 			switch( BlockID )
@@ -454,19 +448,15 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			case E_BLOCK_RED_MUSHROOM:
 			case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
 				{
-					if( GetBlock( X, Y-1, Z ) == E_BLOCK_AIR )
+					if( GetBlock( BlockPos.x, BlockPos.y-1, BlockPos.z ) == E_BLOCK_AIR )
 					{
-						SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
+						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
 
-						int wX, wY, wZ;
-						PositionToWorldPosition(X, Y, Z, wX, wY, wZ);
+						Vector3i WorldPos = PositionToWorldPosition( BlockPos );
 
-						m_World->GetSimulatorManager()->WakeUp(wX, wY, wZ);
-						if (isRedstone) {
-							cRedstone Redstone(m_World);
-							Redstone.ChangeRedstone( (X+m_PosX*c_ChunkWidth), (Y+m_PosY*c_ChunkWidth), (Z+m_PosZ*c_ChunkWidth), false );
-						}
-						cPickup* Pickup = new cPickup( (X+m_PosX*c_ChunkWidth) * 32 + 16, (Y+m_PosY*c_ChunkHeight) * 32 + 16, (Z+m_PosZ*c_ChunkWidth) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
+						m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
+
+						cPickup* Pickup = new cPickup( WorldPos.x * 32 + 16, WorldPos.y * 32 + 16, WorldPos.z * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
 						Pickup->Initialize( m_World );
 					}
 				}
@@ -476,39 +466,32 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 					isRedstone = true;
 			case E_BLOCK_TORCH:
 				{
-					char Dir = cTorch::MetaDataToDirection( GetNibble( m_BlockMeta, X, Y, Z ) );
-					LOG("MetaData: %i", Dir );
-					int XX = X + m_PosX*c_ChunkWidth;
-					int YY = Y + m_PosY*c_ChunkHeight;
-					int ZZ = Z + m_PosZ*c_ChunkWidth;
-					AddDirection( XX, YY, ZZ, Dir, true );
-					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+					char Dir = cTorch::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
+					Vector3i WorldPos = PositionToWorldPosition( BlockPos );
+
+					Vector3i AttachedTo = WorldPos;
+					AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
+					if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
 					{
-						SetBlock( X, Y, Z, 0, 0 );
+						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
 
-						Vector3i wPos = PositionToWorldPosition( Vector3i(X, Y, Z) );
+						m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
 
-						m_World->GetSimulatorManager()->WakeUp(wPos.x, wPos.y, wPos.z);
-						if (isRedstone) {
-							cRedstone Redstone(m_World);
-							Redstone.ChangeRedstone( (X+m_PosX*c_ChunkWidth), (Y+m_PosY*c_ChunkWidth), (Z+m_PosZ*c_ChunkWidth), false );
-						}
-						cPickup* Pickup = new cPickup( (X+m_PosX*c_ChunkWidth) * 32 + 16, (Y+m_PosY*c_ChunkHeight) * 32 + 16, (Z+m_PosZ*c_ChunkWidth) * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
+						cPickup* Pickup = new cPickup( WorldPos.x * 32 + 16, WorldPos.y * 32 + 16, WorldPos.z * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
 						Pickup->Initialize( m_World );
 					}
 				}
 				break;
 			case E_BLOCK_LADDER:
 				{
-					char Dir = cLadder::MetaDataToDirection( GetNibble( m_BlockMeta, X, Y, Z ) );
-					int XX = X + m_PosX*c_ChunkWidth;
-					int YY = Y + m_PosY*c_ChunkHeight;
-					int ZZ = Z + m_PosZ*c_ChunkWidth;
-					AddDirection( XX, YY, ZZ, Dir, true );
-					if( m_World->GetBlock( XX, YY, ZZ ) == E_BLOCK_AIR )
+					char Dir = cLadder::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
+					Vector3i WorldPos = PositionToWorldPosition( BlockPos );
+					Vector3i AttachedTo = WorldPos;
+					AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
+					if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
 					{
-						SetBlock( X, Y, Z, E_BLOCK_AIR, 0 );
-						cPickup* Pickup = new cPickup( (X+m_PosX*c_ChunkWidth) * 32 + 16, (Y+m_PosY*c_ChunkHeight) * 32 + 16, (Z+m_PosZ*c_ChunkWidth) * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
+						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
+						cPickup* Pickup = new cPickup( WorldPos.x * 32 + 16, WorldPos.y * 32 + 16, WorldPos.z * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
 						Pickup->Initialize( m_World );
 					}
 				}
@@ -530,12 +513,9 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		m_BlockTickY = (m_BlockTickY + RandomY) % c_ChunkHeight;
 		m_BlockTickZ = (m_BlockTickZ + RandomZ) % c_ChunkWidth;
 
-		//LOG("%03i %03i %03i", m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-
 		if( m_BlockTickY > m_HeightMap[ m_BlockTickX + m_BlockTickZ*c_ChunkWidth ] ) continue; // It's all air up here
 
-		//m_BlockTickNum = (m_BlockTickNum + 1 ) % c_NumBlocks;
-		unsigned int Index = MakeIndex( m_BlockTickX, m_BlockTickY, m_BlockTickZ );
+		unsigned int Index = MakeIndexNoCheck( m_BlockTickX, m_BlockTickY, m_BlockTickZ );
 		char ID = m_BlockType[Index];
 		switch( ID )
 		{
@@ -669,7 +649,7 @@ void cChunk::CalculateHeightmap()
 				int index = MakeIndex( x, y, z );
 				if (m_BlockData[index] != E_BLOCK_AIR)
 				{
-					m_HeightMap[x + z * c_ChunkWidth] = (char)y;
+					m_HeightMap[x + z * c_ChunkWidth] = (unsigned char)y;
 					break;
 				}
 			}  // for y
@@ -692,13 +672,13 @@ void cChunk::CalculateLighting()
 			char sunlight = 0xf;
 			for (int y = m_HeightMap[x + z*c_ChunkWidth]; y > -1; y--)
 			{
-				int index = y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth);
+				int index = MakeIndexNoCheck(x, y, z);
 
 				if( g_BlockTransparent[ (int)m_BlockData[index] ] == false )
 				{
 					sunlight = 0x0;
 				}
-				SetNibble( m_BlockSkyLight, x, y, z, sunlight );
+				SetNibble( m_BlockSkyLight, index, sunlight );
 			}
 		}
 	}
@@ -735,7 +715,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	// Spread the sunlight
 	for(int x = 0; x < c_ChunkWidth; x++)	for(int z = 0; z < c_ChunkWidth; z++)	for(int y = 0; y < c_ChunkHeight; y++)
 	{
-		int index = y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth);
+		int index = MakeIndexNoCheck(x, y, z);
 		if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
 		{
 			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockData[index] ]);
@@ -744,7 +724,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 
 	for(int x = c_ChunkWidth-1; x > -1; x--) for(int z = c_ChunkWidth-1; z > -1; z--) for(int y = c_ChunkHeight-1; y > -1; y--)
 	{
-		int index = y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth);
+		int index = MakeIndexNoCheck(x, y, z);
 		if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
 		{
 			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockData[index] ]);
@@ -771,7 +751,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	{
 		if (LeftSky != NULL)
 		{
-			int index = y + (z * c_ChunkHeight) + (0  * c_ChunkHeight * c_ChunkWidth);
+			int index = MakeIndexNoCheck( 0, y, z );
 			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
 			{
 				char CurrentLight = GetNibble( a_LightBuffer, 0, y, z );
@@ -785,7 +765,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 		}
 		if (RightSky != NULL)
 		{
-			int index = y + (z * c_ChunkHeight) + ((c_ChunkWidth-1)  * c_ChunkHeight * c_ChunkWidth);
+			int index = MakeIndexNoCheck( c_ChunkWidth-1, y, z );
 			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
 			{
 				char CurrentLight = GetNibble( a_LightBuffer, c_ChunkWidth-1, y, z );
@@ -815,7 +795,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	{
 		if (FrontSky != NULL)
 		{
-			int index = y + (0 * c_ChunkHeight) + (x  * c_ChunkHeight * c_ChunkWidth);
+			int index = MakeIndexNoCheck( x, y, 0 );
 			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
 			{
 				char CurrentLight = GetNibble( a_LightBuffer, x, y, 0 );
@@ -829,7 +809,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 		}
 		if (BackSky != NULL)
 		{
-			int index = y + ((c_ChunkWidth-1) * c_ChunkHeight) + (x  * c_ChunkHeight * c_ChunkWidth);
+			int index = MakeIndexNoCheck( x, y, c_ChunkWidth-1 );
 			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
 			{
 				char CurrentLight = GetNibble( a_LightBuffer, x, y, c_ChunkWidth-1 );
@@ -863,7 +843,7 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 	ASSERT(IsValid());  // Is this chunk loaded / generated?
 	
-	int index = a_Y + (a_Z * c_ChunkHeight) + (a_X * c_ChunkHeight * c_ChunkWidth);
+	int index = MakeIndexNoCheck( a_X, a_Y, a_Z );
 	char OldBlockMeta = GetNibble( m_BlockMeta, index );
 	char OldBlockType = m_BlockType[index];
 	m_BlockType[index] = a_BlockType;
@@ -920,7 +900,8 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y, a_Z+1 ) );
 	m_ToTickBlocks.push_back( MakeIndex( a_X, a_Y, a_Z-1 ) );
 
-	cBlockEntity* BlockEntity = GetBlockEntity( a_X + m_PosX * c_ChunkWidth, a_Y + m_PosY * c_ChunkHeight, a_Z + m_PosZ * c_ChunkWidth );
+	Vector3i WorldPos = PositionToWorldPosition( a_X, a_Y, a_Z );
+	cBlockEntity* BlockEntity = GetBlockEntity( WorldPos );
 	if( BlockEntity )
 	{
 		BlockEntity->Destroy();
@@ -931,18 +912,18 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	{
 		case E_BLOCK_CHEST:
 		{
-			AddBlockEntity( new cChestEntity( a_X + m_PosX * c_ChunkWidth, a_Y + m_PosY * c_ChunkHeight, a_Z + m_PosZ * c_ChunkWidth, m_World) );
+			AddBlockEntity( new cChestEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
 			break;
 		}
 		case E_BLOCK_FURNACE:
 		{
-			AddBlockEntity( new cFurnaceEntity( a_X + m_PosX * c_ChunkWidth, a_Y + m_PosY * c_ChunkHeight, a_Z + m_PosZ * c_ChunkWidth, m_World) );
+			AddBlockEntity( new cFurnaceEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
 			break;
 		}
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
 		{
-			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, a_X + m_PosX * c_ChunkWidth, a_Y + m_PosY * c_ChunkHeight, a_Z + m_PosZ * c_ChunkWidth, m_World) );
+			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
 			break;
 		}
 	}  // switch (a_BlockType)
@@ -958,7 +939,7 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 
 	ASSERT(IsValid());
 	
-	const int index = a_Y + (a_Z * c_ChunkHeight) + (a_X * c_ChunkHeight * c_ChunkWidth);
+	const int index = MakeIndexNoCheck( a_X, a_Y, a_Z );
 	const char OldBlock = m_BlockType[index];
 	const char OldBlockMeta = GetNibble( m_BlockMeta, index );
 	if (OldBlock == a_BlockType && OldBlockMeta == a_BlockMeta)
@@ -998,7 +979,7 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 		{
 			for (int y = a_Y - 1; y > 0; --y)
 			{
-				if (m_BlockData[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
+				if (m_BlockData[MakeIndexNoCheck(a_X, y, a_Z)] != E_BLOCK_AIR)
 				{
 					m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)y;
 					break;
@@ -1020,7 +1001,11 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 		unsigned int index = MakeIndex( a_X, a_Y, a_Z );
 		if( index != INDEX_OUT_OF_RANGE )
 		{
-			m_PendingSendBlocks.push_back( MakeIndex( a_X, a_Y, a_Z ) );
+			m_PendingSendBlocks.push_back( index );
+		}
+		else
+		{
+			LOGWARN("cChunk::SendBlockTo Index out of range!");
 		}
 		return;
 	}
@@ -1030,10 +1015,11 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 		if ( *itr == a_Client )
 		{
 			unsigned int index = MakeIndex( a_X, a_Y, a_Z );
+			Vector3i WorldPos = PositionToWorldPosition( a_X, a_Y, a_Z );
 			cPacket_BlockChange BlockChange;
-			BlockChange.m_PosX = a_X + m_PosX*c_ChunkWidth;
-			BlockChange.m_PosY = (unsigned char)(a_Y + m_PosY*c_ChunkHeight);
-			BlockChange.m_PosZ = a_Z + m_PosZ*c_ChunkWidth;
+			BlockChange.m_PosX = WorldPos.x;
+			BlockChange.m_PosY = (unsigned char)WorldPos.y;
+			BlockChange.m_PosZ = WorldPos.z;
 			if( index != INDEX_OUT_OF_RANGE )
 			{
 				BlockChange.m_BlockType = m_BlockType[ index ];
@@ -1264,8 +1250,7 @@ char cChunk::GetBlock( int a_X, int a_Y, int a_Z )
 {
 	if ((a_X < 0) || (a_X >= c_ChunkWidth) || (a_Y < 0) || (a_Y >= c_ChunkHeight) || (a_Z < 0) || (a_Z >= c_ChunkWidth)) return 0; // Clip
 
-	int index = a_Y + (a_Z * c_ChunkHeight) + (a_X * c_ChunkHeight * c_ChunkWidth);
-	return m_BlockType[index];
+	return m_BlockType[ MakeIndexNoCheck( a_X, a_Y, a_Z ) ];
 }
 
 
@@ -1413,9 +1398,9 @@ void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, i
 
 
 
-Vector3i cChunk::PositionToWorldPosition( const Vector3i & a_InChunkPos )
+Vector3i cChunk::PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
-	return Vector3i( m_PosX * c_ChunkWidth + a_InChunkPos.x, m_PosY * c_ChunkHeight + a_InChunkPos.y, m_PosZ * c_ChunkWidth + a_InChunkPos.z );
+	return Vector3i( m_PosX * c_ChunkWidth + a_ChunkX, m_PosY * c_ChunkHeight + a_ChunkY, m_PosZ * c_ChunkWidth + a_ChunkZ );
 }
 
 
@@ -1423,7 +1408,7 @@ Vector3i cChunk::PositionToWorldPosition( const Vector3i & a_InChunkPos )
 
 
 #if !C_CHUNK_USE_INLINE
-# include "cChunk.inc"
+# include "cChunk.inl.h"
 #endif
 
 
