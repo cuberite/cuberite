@@ -26,6 +26,7 @@ cPacket_SpawnMob::cPacket_SpawnMob()
 	, m_Pitch( 0 )
 	, m_MetaDataSize( 0 )
 	, m_MetaData( 0 )
+	, m_HeadYaw(0)
 {
 	m_PacketID = E_SPAWN_MOB;
 }
@@ -40,10 +41,11 @@ cPacket_SpawnMob::cPacket_SpawnMob( const cPacket_SpawnMob & a_Clone )
 
 	m_PacketID = E_SPAWN_MOB;
 	m_UniqueID = a_Clone.m_UniqueID;
-	m_Type = a_Clone.m_Type;
-	*m_Pos = *a_Clone.m_Pos;
-	m_Yaw = a_Clone.m_Yaw;
-	m_Pitch = a_Clone.m_Pitch;
+	m_Type     = a_Clone.m_Type;
+	*m_Pos     = *a_Clone.m_Pos;
+	m_Yaw      = a_Clone.m_Yaw;
+	m_Pitch    = a_Clone.m_Pitch;
+	m_HeadYaw  = a_Clone.m_HeadYaw;
 
 	m_MetaDataSize = a_Clone.m_MetaDataSize;
 	m_MetaData = new char[m_MetaDataSize];
@@ -64,6 +66,7 @@ void cPacket_SpawnMob::Serialize(AString & a_Data) const
 	AppendInteger	(a_Data, m_Pos->z);
 	AppendByte		(a_Data, m_Yaw);
 	AppendByte		(a_Data, m_Pitch);
+	AppendByte    (a_Data, m_HeadYaw);
 	AppendData		(a_Data, m_MetaData, m_MetaDataSize);
 }
 

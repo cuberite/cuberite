@@ -28,8 +28,7 @@ public:
 	Vector3i* m_Pos;
 	char      m_Yaw;
 	char      m_Pitch;
-
-	static const unsigned int c_Size = 1 + 4 + 1 + 4 + 4 + 4 + 1 + 1; // + metadata
+	char      m_HeadYaw;
 
 	unsigned int m_MetaDataSize;
 	char * m_MetaData;

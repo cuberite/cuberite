@@ -257,8 +257,9 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 				m_PosX, m_PosZ
 			);
 
-			// Assert because this is a very curious case. These lines were executed once before, when a player died, re spawned, and walked around a bit. It's uncertain why an entity would be in the chunk in this case.
-			ASSERT(!"Unexpected entity in chunk!");
+			// MD 2012_03_10: This may happen if a mob is generated near the edge of loaded chunks and walks off of the edge.
+			// Older: Assert because this is a very curious case. These lines were executed once before, when a player died, re spawned, and walked around a bit. It's uncertain why an entity would be in the chunk in this case.
+			// ASSERT(!"Unexpected entity in chunk!");
 
 			(*itr)->Destroy();
 		}
