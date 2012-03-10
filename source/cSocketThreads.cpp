@@ -155,7 +155,8 @@ void cSocketThreads::Write(const cSocket * a_Socket, const AString & a_Data)
 		}
 	}  // for itr - m_Threads[]
 	
-	ASSERT(!"Writing to an unknown socket");
+	// This may be perfectly legal, if the socket has been destroyed and the client is finishing up
+	// ASSERT(!"Writing to an unknown socket");
 }
 
 
@@ -224,7 +225,7 @@ cSocketThreads::cSocketThread::cSocketThread(cSocketThreads * a_Parent) :
 
 cSocketThreads::cSocketThread::~cSocketThread()
 {
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	m_ControlSocket1.CloseSocket();
 	m_ControlSocket2.CloseSocket();
 }
@@ -506,7 +507,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 	}
 	
 	// The main thread loop:
-	while (!mShouldTerminate)
+	while (!m_ShouldTerminate)
 	{
 		// Put all sockets into the Read set:
 		fd_set fdRead;

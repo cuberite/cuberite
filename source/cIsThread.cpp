@@ -51,12 +51,12 @@ static void SetThreadName( DWORD dwThreadID, LPCSTR szThreadName)
 // cIsThread:
 
 cIsThread::cIsThread(const AString & iThreadName) :
-	mThreadName(iThreadName),
-	mShouldTerminate(false),
+	m_ThreadName(iThreadName),
+	m_ShouldTerminate(false),
 	#ifdef _WIN32
-	mHandle(NULL)
+	m_Handle(NULL)
 	#else  // _WIN32
-	mHasStarted(false)
+	m_HasStarted(false)
 	#endif  // else _WIN32
 {
 }
@@ -67,7 +67,7 @@ cIsThread::cIsThread(const AString & iThreadName) :
 
 cIsThread::~cIsThread()
 {
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	Wait();
 }
 
@@ -78,34 +78,35 @@ cIsThread::~cIsThread()
 bool cIsThread::Start(void)
 {
 	#ifdef _WIN32
-		ASSERT(mHandle == NULL);  // Has already started one thread?
+		ASSERT(m_Handle == NULL);  // Has already started one thread?
 		
 		// Create the thread suspended, so that the mHandle variable is valid in the thread procedure
 		DWORD ThreadID = 0;
-		mHandle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &ThreadID);
-		if (mHandle == NULL)
+		m_Handle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &ThreadID);
+		if (m_Handle == NULL)
 		{
-			LOGERROR("ERROR: Could not create thread \"%s\", GLE = %d!", mThreadName.c_str(), GetLastError());
+			LOGERROR("ERROR: Could not create thread \"%s\", GLE = %d!", m_ThreadName.c_str(), GetLastError());
 			return false;
 		}
-		ResumeThread(mHandle);
+		ResumeThread(m_Handle);
 
 		#if defined(_DEBUG) && defined(_MSC_VER)
 			// Thread naming is available only in MSVC
-			if (!mThreadName.empty())
+			if (!m_ThreadName.empty())
 			{
-				SetThreadName(ThreadID, mThreadName.c_str());
+				SetThreadName(ThreadID, m_ThreadName.c_str());
 			}
 		#endif  // _DEBUG and _MSC_VER
 		
 	#else  // _WIN32
-		ASSERT(!mHasStarted);
+		ASSERT(!m_HasStarted);
 		
-		if (pthread_create(&mHandle, NULL, thrExecute, this))
+		if (pthread_create(&m_Handle, NULL, thrExecute, this))
 		{
-			LOGERROR("ERROR: Could not create thread \"%s\", !", mThreadName.c_str());
+			LOGERROR("ERROR: Could not create thread \"%s\", !", m_ThreadName.c_str());
 			return false;
 		}
+		m_HasStarted = true;
 	#endif  // else _WIN32
 
 	return true;
@@ -119,28 +120,30 @@ bool cIsThread::Wait(void)
 {
 	#ifdef _WIN32
 	
-		if (mHandle == NULL)
+		if (m_Handle == NULL)
 		{
 			return true;
 		}
 		// Cannot log, logger may already be stopped:
-		// LOG("Waiting for thread \"%s\" to terminate.", mThreadName.c_str());
-		int res = WaitForSingleObject(mHandle, INFINITE);
-		mHandle = NULL;
+		// LOG("Waiting for thread \"%s\" to terminate.", m_ThreadName.c_str());
+		int res = WaitForSingleObject(m_Handle, INFINITE);
+		m_Handle = NULL;
 		// Cannot log, logger may already be stopped:
-		// LOG("Thread \"%s\" %s terminated, GLE = %d", mThreadName.c_str(), (res == WAIT_OBJECT_0) ? "" : "not", GetLastError());
+		// LOG("Thread \"%s\" %s terminated, GLE = %d", m_ThreadName.c_str(), (res == WAIT_OBJECT_0) ? "" : "not", GetLastError());
 		return (res == WAIT_OBJECT_0);
 		
 	#else  // _WIN32
 	
-		if (!mHasStarted)
+		if (!m_HasStarted)
 		{
 			return true;
 		}
-		LOG("Waiting for thread \"%s\" to terminate.", mThreadName.c_str());
-		int res = pthread_join(mHandle, NULL);
-		mHasStarted = false;
-		LOG("Thread \"%s\" %s terminated, errno = %d", mThreadName.c_str(), (res == 0) ? "" : "not", errno);
+		// Cannot log, logger may already be stopped:
+		// LOG("Waiting for thread \"%s\" to terminate.", m_ThreadName.c_str());
+		int res = pthread_join(m_Handle, NULL);
+		m_HasStarted = false;
+		// Cannot log, logger may already be stopped:
+		// LOG("Thread \"%s\" %s terminated, errno = %d", m_ThreadName.c_str(), (res == 0) ? "" : "not", errno);
 		return (res == 0);
 		
 	#endif  // else _WIN32

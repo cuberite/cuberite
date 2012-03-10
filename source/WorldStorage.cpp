@@ -153,10 +153,11 @@ void cWorldStorage::WaitForFinish(void)
 	}
 	
 	// Wait for the thread to finish:
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	m_Event.Set();
 	m_evtRemoved.Set();  // Wake up anybody waiting in the WaitForQueuesEmpty() method
 	super::Wait();
+	LOG("World storage thread finished");
 }
 
 
@@ -166,7 +167,7 @@ void cWorldStorage::WaitForFinish(void)
 void cWorldStorage::WaitForQueuesEmpty(void)
 {
 	cCSLock Lock(m_CSQueues);
-	while (!mShouldTerminate && (!m_LoadQueue.empty() || !m_SaveQueue.empty()))
+	while (!m_ShouldTerminate && (!m_LoadQueue.empty() || !m_SaveQueue.empty()))
 	{
 		cCSUnlock Unlock(Lock);
 		m_evtRemoved.Wait();
@@ -305,7 +306,7 @@ void cWorldStorage::InitSchemas(void)
 
 void cWorldStorage::Execute(void)
 {
-	while (!mShouldTerminate)
+	while (!m_ShouldTerminate)
 	{
 		m_Event.Wait();
 		
@@ -314,7 +315,7 @@ void cWorldStorage::Execute(void)
 		do
 		{
 			HasMore = false;
-			if (mShouldTerminate)
+			if (m_ShouldTerminate)
 			{
 				return;
 			}

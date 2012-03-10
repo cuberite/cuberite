@@ -69,7 +69,7 @@ bool cChunkGenerator::Start(cWorld * a_World, const AString & a_WorldGeneratorNa
 
 void cChunkGenerator::Stop(void)
 {
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	m_Event.Set();
 	m_evtRemoved.Set();  // Wake up anybody waiting for empty queue
 	Wait();
@@ -115,7 +115,7 @@ void cChunkGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 void cChunkGenerator::WaitForQueueEmpty(void)
 {
 	cCSLock Lock(m_CS);
-	while (!mShouldTerminate && !m_Queue.empty())
+	while (!m_ShouldTerminate && !m_Queue.empty())
 	{
 		cCSUnlock Unlock(Lock);
 		m_evtRemoved.Wait();
@@ -138,14 +138,14 @@ int cChunkGenerator::GetQueueLength(void)
 
 void cChunkGenerator::Execute(void)
 {
-	while (!mShouldTerminate)
+	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
 		while (m_Queue.size() == 0)
 		{
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
-			if (mShouldTerminate)
+			if (m_ShouldTerminate)
 			{
 				return;
 			}

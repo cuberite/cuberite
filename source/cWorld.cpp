@@ -113,7 +113,7 @@ protected:
 			for (int i = 0; i < 20; i++)
 			{
 				cSleep::MilliSleep(100);
-				if (mShouldTerminate)
+				if (m_ShouldTerminate)
 				{
 					return;
 				}

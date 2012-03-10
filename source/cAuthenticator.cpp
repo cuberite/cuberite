@@ -24,9 +24,9 @@
 
 cAuthenticator::cAuthenticator(void) :
 	super("cAuthenticator"),
-	mServer(DEFAULT_AUTH_SERVER),
-	mAddress(DEFAULT_AUTH_ADDRESS),
-	mShouldAuthenticate(true)
+	m_Server(DEFAULT_AUTH_SERVER),
+	m_Address(DEFAULT_AUTH_ADDRESS),
+	m_ShouldAuthenticate(true)
 {
 	ReadINI();
 }
@@ -53,27 +53,27 @@ void cAuthenticator::ReadINI(void)
 		return;
 	}
 	
-	mServer  = IniFile.GetValue("Authentication", "Server");
-	mAddress = IniFile.GetValue("Authentication", "Address");
-	mShouldAuthenticate = IniFile.GetValueB("Authentication", "Authenticate", true);
+	m_Server  = IniFile.GetValue("Authentication", "Server");
+	m_Address = IniFile.GetValue("Authentication", "Address");
+	m_ShouldAuthenticate = IniFile.GetValueB("Authentication", "Authenticate", true);
 	bool bSave = false;
 	
-	if (mServer.length() == 0)
+	if (m_Server.length() == 0)
 	{
-		mServer = DEFAULT_AUTH_SERVER;
-		IniFile.SetValue("Authentication", "Server", mServer);
+		m_Server = DEFAULT_AUTH_SERVER;
+		IniFile.SetValue("Authentication", "Server", m_Server);
 		bSave = true;
 	}
-	if (mAddress.length() == 0)
+	if (m_Address.length() == 0)
 	{
-		mAddress = DEFAULT_AUTH_ADDRESS;
-		IniFile.SetValue("Authentication", "Address", mAddress);
+		m_Address = DEFAULT_AUTH_ADDRESS;
+		IniFile.SetValue("Authentication", "Address", m_Address);
 		bSave = true;
 	}
 
 	if (bSave)
 	{
-		IniFile.SetValueB("Authentication", "Authenticate", mShouldAuthenticate);
+		IniFile.SetValueB("Authentication", "Authenticate", m_ShouldAuthenticate);
 		IniFile.WriteFile();
 	}
 }
@@ -85,15 +85,15 @@ void cAuthenticator::ReadINI(void)
 /// Queues a request for authenticating a user. If the auth fails, the user is kicked
 void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash)
 {
-	if (!mShouldAuthenticate)
+	if (!m_ShouldAuthenticate)
 	{
 		cRoot::Get()->AuthenticateUser(a_ClientID);
 		return;
 	}
 
-	cCSLock Lock(mCS);
-	mQueue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
-	mQueueNonempty.Set();
+	cCSLock Lock(m_CS);
+	m_Queue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
+	m_QueueNonempty.Set();
 }
 
 
@@ -102,8 +102,8 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 
 void cAuthenticator::Stop(void)
 {
-	mShouldTerminate = true;
-	mQueueNonempty.Set();
+	m_ShouldTerminate = true;
+	m_QueueNonempty.Set();
 	Wait();
 }
 
@@ -115,27 +115,27 @@ void cAuthenticator::Execute(void)
 {
 	for (;;)
 	{
-		cCSLock Lock(mCS);
-		while (!mShouldTerminate && (mQueue.size() == 0))
+		cCSLock Lock(m_CS);
+		while (!m_ShouldTerminate && (m_Queue.size() == 0))
 		{
 			cCSUnlock Unlock(Lock);
-			mQueueNonempty.Wait();
+			m_QueueNonempty.Wait();
 		}
-		if (mShouldTerminate)
+		if (m_ShouldTerminate)
 		{
 			return;
 		}
-		ASSERT(mQueue.size() > 0);
+		ASSERT(m_Queue.size() > 0);
 		
-		int ClientID = mQueue.front().mClientID;
-		AString UserName = mQueue.front().mName;
-		AString ActualAddress = mAddress;
+		int ClientID = m_Queue.front().mClientID;
+		AString UserName = m_Queue.front().mName;
+		AString ActualAddress = m_Address;
 		ReplaceString(ActualAddress, "%USERNAME%", UserName);
 		ReplaceString(ActualAddress, "%SERVERID%", cRoot::Get()->GetServer()->GetServerID());
-		mQueue.pop_front();
+		m_Queue.pop_front();
 		Lock.Unlock();
 
-		if (!AuthFromAddress(mServer, ActualAddress, UserName))
+		if (!AuthFromAddress(m_Server, ActualAddress, UserName))
 		{
 			cRoot::Get()->KickUser(ClientID, "Failed to authenticate account!");
 		}

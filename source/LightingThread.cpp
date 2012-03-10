@@ -40,7 +40,7 @@ void cLightingThread::Stop(void)
 			delete *itr;
 		}  // for itr - m_Queue[]
 	}
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	m_Event.Set();
 	
 	Wait();

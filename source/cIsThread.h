@@ -28,7 +28,7 @@ class cIsThread
 protected:
 	virtual void Execute(void) = 0;  // This function is called in the new thread's context
 
-	volatile bool mShouldTerminate;  // The overriden Execute() method should check this periodically and terminate if this is true
+	volatile bool m_ShouldTerminate;  // The overriden Execute() method should check this periodically and terminate if this is true
 	
 public:
 	cIsThread(const AString & iThreadName);
@@ -40,26 +40,26 @@ public:
 	static unsigned long GetCurrentID(void);  // Returns the OS-dependent thread ID for the caller's thread
 
 private:
-	AString mThreadName;
+	AString m_ThreadName;
 	
 	#ifdef _WIN32
 	
-		HANDLE mHandle;
+		HANDLE m_Handle;
 		
-		static DWORD_PTR __stdcall thrExecute(LPVOID iParam)
+		static DWORD_PTR __stdcall thrExecute(LPVOID a_Param)
 		{
-			((cIsThread *)iParam)->Execute();
+			((cIsThread *)a_Param)->Execute();
 			return 0;
 		}
 		
 	#else  // _WIN32
 	
-		pthread_t mHandle;
-		bool      mHasStarted;
+		pthread_t m_Handle;
+		bool      m_HasStarted;
 		
-		static void * thrExecute(void * iParam)
+		static void * thrExecute(void * a_Param)
 		{
-			((cIsThread *)iParam)->Execute();
+			((cIsThread *)a_Param)->Execute();
 			return NULL;
 		}
 		

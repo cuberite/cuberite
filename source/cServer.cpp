@@ -666,7 +666,7 @@ cServer::cNotifyWriteThread::cNotifyWriteThread(void) :
 
 cServer::cNotifyWriteThread::~cNotifyWriteThread()
 {
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	m_Event.Set();
 	Wait();
 }
@@ -688,14 +688,14 @@ bool cServer::cNotifyWriteThread::Start(cServer * a_Server)
 void cServer::cNotifyWriteThread::Execute(void)
 {
 	cClientHandleList Clients;
-	while (!mShouldTerminate)
+	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
 		while (m_Clients.size() == 0)
 		{
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
-			if (mShouldTerminate)
+			if (m_ShouldTerminate)
 			{
 				return;
 			}

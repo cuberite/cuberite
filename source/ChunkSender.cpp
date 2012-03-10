@@ -30,7 +30,7 @@ cChunkSender::cChunkSender(void) :
 
 cChunkSender::~cChunkSender()
 {
-	mShouldTerminate = true;
+	m_ShouldTerminate = true;
 	m_evtQueue.Set();
 }
 
@@ -100,7 +100,7 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 
 void cChunkSender::Execute(void)
 {
-	while (!mShouldTerminate)
+	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
 		while (m_ChunksReady.empty() && m_SendChunks.empty())
@@ -108,7 +108,7 @@ void cChunkSender::Execute(void)
 			cCSUnlock Unlock(Lock);
 			m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
 			m_evtQueue.Wait();
-			if (mShouldTerminate)
+			if (m_ShouldTerminate)
 			{
 				return;
 			}

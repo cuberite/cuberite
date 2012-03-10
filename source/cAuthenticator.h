@@ -59,13 +59,13 @@ private:
 	
 	typedef std::deque<cUser> cUserList;
 	
-	cCriticalSection mCS;
-	cUserList        mQueue;
-	cEvent           mQueueNonempty;
+	cCriticalSection m_CS;
+	cUserList        m_Queue;
+	cEvent           m_QueueNonempty;
 	
-	AString mServer;
-	AString mAddress;
-	bool    mShouldAuthenticate;
+	AString m_Server;
+	AString m_Address;
+	bool    m_ShouldAuthenticate;
 	
 	// cIsThread override:
 	virtual void Execute(void) override;
