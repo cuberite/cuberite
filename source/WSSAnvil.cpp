@@ -225,6 +225,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	LoadEntitiesFromNBT     (Entities,      (cNBTList *)(a_NBT.FindChildByPath("Level\\Entities")));
 	LoadBlockEntitiesFromNBT(BlockEntities, (cNBTList *)(a_NBT.FindChildByPath("Level\\TileEntities")));
 	
+	#if (AXIS_ORDER == AXIS_ORDER_YZX)
 	// Reorder the chunk data - walk the MCA-formatted data sequentially and copy it into the right place in the ChunkData:
 	char ChunkData[cChunk::c_BlockDataSize];
 	memset(ChunkData, 0, sizeof(ChunkData));
@@ -255,6 +256,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 		cChunk::SetNibble(ChunkSkyLight, x, y, z, SkyLight[Index / 2] >> ((Index % 2) * 4));
 		Index++;
 	}  // for y/z/x
+	#else  // AXIS_ORDER_YZX
+	char * ChunkData = BlockData;
+	#endif  // else AXIS_ORDER_YZX
 	
 	m_World->ChunkDataLoaded(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, ChunkData, Entities, BlockEntities);
 	return true;
