@@ -240,7 +240,7 @@ public:
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return x + (z * c_ChunkWidth) + (y * c_ChunkWidth * c_ChunkWidth); // 1.2 is XZY
-		#else if AXIS_ORDER == AXIS_ORDER_YZX
+		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth); // 1.1 is YZX
 		#endif
 	}
@@ -253,7 +253,7 @@ public:
 				index / (c_ChunkWidth * c_ChunkWidth),		// Y
 				(index / c_ChunkWidth) % c_ChunkWidth		// Z
 				);
-		#else if AXIS_ORDER == AXIS_ORDER_YZX
+		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return Vector3i(								// 1.1
 				index / (c_ChunkHeight * c_ChunkWidth),		// X
 				index % c_ChunkHeight,						// Y

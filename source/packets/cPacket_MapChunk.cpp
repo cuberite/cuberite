@@ -95,7 +95,7 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 			}
 		}
 	}
-#else if AXIS_ORDER == AXIS_ORDER_XZY
+#elif AXIS_ORDER == AXIS_ORDER_XZY
 	for ( int i = 0; i < 16; ++i )
 	{
 		m_BitMap1 |= (1 << i);

@@ -541,7 +541,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			{
 #if AXIS_ORDER == AXIS_ORDER_YZX
 				char AboveBlock = GetBlock( Index+1 );
-#else if AXIS_ORDER == AXIS_ORDER_XZY
+#elif AXIS_ORDER == AXIS_ORDER_XZY
 				char AboveBlock = GetBlock( Index + (c_ChunkWidth*c_ChunkWidth) );
 #endif
 				if (!( (AboveBlock == 0) || (g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock]) ) ) //changed to not allow grass if any one hit object is on top

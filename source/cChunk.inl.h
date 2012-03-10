@@ -40,7 +40,7 @@ char cChunk::GetNibble(char* a_Buffer, int x, int y, int z)
 		const int cindex = MakeIndexNoCheck(x, y, z)/2;
 #if AXIS_ORDER == AXIS_ORDER_XZY
 		if( (x & 1) == 0 )
-#else if AXIS_ORDER == AXIS_ORDER_YZX
+#elif AXIS_ORDER == AXIS_ORDER_YZX
 		if( (y & 1) == 0 )
 #endif
 		{	// First half byte
@@ -89,7 +89,7 @@ void cChunk::SetNibble(char* a_Buffer, int x, int y, int z, char light)
 		int cindex = MakeIndexNoCheck(x, y, z)/2;
 #if AXIS_ORDER == AXIS_ORDER_XZY
 		if( (x & 1) == 0 )
-#else if AXIS_ORDER == AXIS_ORDER_YZX
+#elif AXIS_ORDER == AXIS_ORDER_YZX
 		if( (y & 1) == 0 )
 #endif
 		{	// First half byte
