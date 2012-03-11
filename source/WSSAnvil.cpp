@@ -170,15 +170,13 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 {
 	// The data arrays, in MCA-native y/z/x ordering (will be reordered for the final chunk data)
-	char BlockData[cChunk::c_NumBlocks];
-	char MetaData[cChunk::c_NumBlocks / 2];
-	char BlockLight[cChunk::c_NumBlocks / 2];
-	char SkyLight[cChunk::c_NumBlocks / 2];
+	char BlockData[cChunk::c_BlockDataSize];
+	char * MetaData   = BlockData  + cChunk::c_NumBlocks;
+	char * BlockLight = MetaData   + cChunk::c_NumBlocks / 2;
+	char * SkyLight   = BlockLight + cChunk::c_NumBlocks / 2;
 	
-	memset(BlockData,  E_BLOCK_AIR, sizeof(BlockData));
-	memset(MetaData,   0,           sizeof(MetaData));
-	memset(BlockLight, 0,           sizeof(BlockLight));
-	memset(SkyLight,   0xff,        sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
+	memset(BlockData,  E_BLOCK_AIR, sizeof(BlockData) - cChunk::c_NumBlocks / 2);
+	memset(SkyLight,   0xff,        cChunk::c_NumBlocks / 2);  // By default, data not present in the NBT means air, which means full skylight
 	
 	// Load the blockdata, blocklight and skylight:
 	cNBTList * Sections = (cNBTList *)a_NBT.FindChildByPath("Level\\Sections");
