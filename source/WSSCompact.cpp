@@ -294,6 +294,7 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 		m_ChunkSize.Set(16, 128, 16);
 		break;
 	case 2:
+	case 3:
 		m_ChunkSize.Set(16, 256, 16);
 		break;
 	default:
