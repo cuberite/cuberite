@@ -168,7 +168,6 @@ cPacket_MapChunk::cPacket_MapChunk( const cPacket_MapChunk & a_Copy )
 
 void cPacket_MapChunk::Serialize(AString & a_Data) const
 {
-	LOG("Sending chunk [%i, %i]", m_PosX, m_PosZ );
 	AppendByte   (a_Data, m_PacketID);
 
 #if (MINECRAFT_1_2_2 == 1 )

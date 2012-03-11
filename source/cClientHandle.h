@@ -86,8 +86,6 @@ public:
 	// Removes the client from all chunks. Used when switching worlds or destroying the player
 	void RemoveFromAllChunks(void);
 	
-	void ChunkJustSent(cChunk * a_ChunkSent);  // Called by cChunk when it is loaded / generated and sent to all clients registered in it
-
 	inline bool IsLoggedIn(void) const { return m_State >= csAuthenticating; }
 
 	void Tick(float a_Dt);
@@ -106,6 +104,9 @@ public:
 	void SetViewDistance(int a_ViewDistance);		//tolua_export
 
 	int GetUniqueID() const { return m_UniqueID; }	//tolua_export
+	
+	/// Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend)
+	bool WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 
 private:
 

@@ -77,6 +77,16 @@ protected:
 			m_Client(a_Client)
 		{
 		}
+		
+		bool operator ==(const sSendChunk & a_Other)
+		{
+			return (
+				(a_Other.m_ChunkX == m_ChunkX) && 
+				(a_Other.m_ChunkY == m_ChunkY) &&
+				(a_Other.m_ChunkZ == m_ChunkZ) &&
+				(a_Other.m_Client == m_Client)
+			);
+		}
 	};
 	typedef std::list<sSendChunk> sSendChunkList;
 

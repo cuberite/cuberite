@@ -475,27 +475,6 @@ void cClientHandle::RemoveFromAllChunks()
 
 
 
-void cClientHandle::ChunkJustSent(cChunk * a_ChunkCompleted)
-{
-	cCSLock Lock(m_CSChunkLists);
-	for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
-	{
-		if (((*itr).m_ChunkX == a_ChunkCompleted->GetPosX()) && ((*itr).m_ChunkZ == a_ChunkCompleted->GetPosZ()))
-		{
-			m_ChunksToSend.erase(itr);
-			if ((m_State == csDownloadingWorld) && (m_ChunksToSend.empty()))
-			{
-				CheckIfWorldDownloaded();
-			}
-			return;
-		}
-	}  // for itr - m_ChunksToSend[]
-}
-
-
-
-
-
 void cClientHandle::HandlePacket(cPacket * a_Packet)
 {
 	m_TimeLastPacket = cWorld::GetTime();
@@ -1745,6 +1724,7 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX / cChunk::c_ChunkWidth;
 		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ / cChunk::c_ChunkWidth;
 		#endif
+		bool Found = false;
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
 		{
@@ -1752,9 +1732,14 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 			{
 				m_ChunksToSend.erase(itr);
 				CheckIfWorldDownloaded();
+				Found = true;
 				break;
 			}
 		}  // for itr - m_ChunksToSend[]
+		if (!Found)
+		{
+			return;
+		}
 	}
 	
 	// Optimize away multiple queued RelativeEntityMoveLook packets:
@@ -1868,6 +1853,16 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	
 	// Need to re-stream chunks for the change to become apparent:
 	StreamChunks();
+}
+
+
+
+
+
+bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSChunkLists);
+	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)) != m_ChunksToSend.end());
 }
 
 
