@@ -51,6 +51,8 @@ public:
 	
 	bool Start(cWorld * a_World);
 	
+	void Stop(void);
+	
 	/// Notifies that a chunk has become ready and it should be sent to all its clients
 	void ChunkReady(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	

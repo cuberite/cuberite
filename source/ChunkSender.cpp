@@ -30,8 +30,7 @@ cChunkSender::cChunkSender(void) :
 
 cChunkSender::~cChunkSender()
 {
-	m_ShouldTerminate = true;
-	m_evtQueue.Set();
+	Stop();
 }
 
 
@@ -42,6 +41,17 @@ bool cChunkSender::Start(cWorld * a_World)
 {
 	m_World = a_World;
 	return super::Start();
+}
+
+
+
+
+
+void cChunkSender::Stop(void)
+{
+	m_ShouldTerminate = true;
+	m_evtQueue.Set();
+	Wait();
 }
 
 

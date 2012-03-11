@@ -164,6 +164,7 @@ cWorld::~cWorld()
 	delete m_RedstoneSimulator;
 
 	m_Generator.Stop();
+	m_ChunkSender.Stop();
 
 	UnloadUnusedChunks();
 	
