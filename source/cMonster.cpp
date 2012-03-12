@@ -84,7 +84,7 @@ cPacket * cMonster::GetSpawnPacket(void) const
 	cPacket_SpawnMob * Spawn = new cPacket_SpawnMob;
 	Spawn->m_UniqueID = GetUniqueID();
 	Spawn->m_Type = m_MobType;
-	*Spawn->m_Pos = Vector3i((m_Pos) * 32);
+	*Spawn->m_Pos = ((Vector3i)(m_Pos)) * 32;
 	Spawn->m_Yaw = 0;
 	Spawn->m_Pitch = 0;
 	Spawn->m_MetaDataSize = 1;

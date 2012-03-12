@@ -111,7 +111,7 @@ AString cSocket::GetErrorString( int a_ErrNo )
 	
 	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
 	
-	#if ((((_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)) && ! _GNU_SOURCE) || __CYGWIN32__ )  // XSI version of strerror_r():
+	#if ((((_POSIX_C_SOURCE >= 200112L) || (_XOPEN_SOURCE >= 600)) && ! _GNU_SOURCE && !__APPLE__) || __CYGWIN32__ )  // XSI version of strerror_r():
 	
 	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
 	if( res == 0 )

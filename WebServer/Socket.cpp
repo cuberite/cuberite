@@ -46,6 +46,10 @@
 	#define MSG_NOSIGNAL (0)
 #endif
 
+#ifndef MSG_NOSIGNAL
+	#define MSG_NOSIGNAL 0
+#endif  // MSG_NOSIGNAL
+
 using namespace std;
 
 int Socket::nofSockets_= 0;
