@@ -38,6 +38,12 @@ cEvent::cEvent(void)
 			LOGERROR("cEvent: Cannot create event, errno = %i. Aborting server.", errno);
 			abort();
 		}
+		// Unlink the semaphore immediately - it will continue to function but will not pollute the namespace
+		// We don't store the name, so can't call this in the destructor
+		if (sem_unlink(EventName.c_str()) != 0)
+		{
+			LOGWARN("ERROR: Could not unlink cEvent. (%i)", errno);
+		}
 	}
 #endif  // *nix
 }
@@ -53,10 +59,6 @@ cEvent::~cEvent()
 #else
 	if (m_bIsNamed)
 	{
-		if (sem_unlink(EventName.c_str()) != 0)
-		{
-			LOGWARN("ERROR: Could not unlink cEvent. (%i)", errno);
-		}
 		if (sem_close(m_Event) != 0)
 		{
 			LOGERROR("ERROR: Could not close cEvent. (%i)", errno);
