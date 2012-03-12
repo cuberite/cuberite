@@ -184,6 +184,7 @@ cWorld::cWorld( const AString & a_WorldName )
 {
 	LOG("cWorld::cWorld(%s)", a_WorldName.c_str());
 	m_WorldName = a_WorldName;
+	m_IniFileName = m_WorldName + "/world.ini";
 
 	cMakeDir::MakeDir(m_WorldName.c_str());
 
@@ -197,7 +198,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	AString GeneratorName;
 	AString StorageSchema("Default");
 
-	cIniFile IniFile( m_WorldName + "/world.ini");
+	cIniFile IniFile(m_IniFileName);
 	if( IniFile.ReadFile() )
 	{
 		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX );
@@ -219,7 +220,7 @@ cWorld::cWorld( const AString & a_WorldName )
 		IniFile.SetValue("Storage", "Schema", StorageSchema);
 		if( !IniFile.WriteFile() )
 		{
-			LOG("WARNING: Could not write to %s/world.ini", a_WorldName.c_str());
+			LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
 		}
 	}
 	LOGINFO("Seed: %i", m_WorldSeed );
@@ -302,6 +303,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	g_BlockTransparent[ E_BLOCK_RED_ROSE ]       = true;
 	g_BlockTransparent[ E_BLOCK_RED_MUSHROOM ]   = true;
 	g_BlockTransparent[ E_BLOCK_BROWN_MUSHROOM ] = true;
+	g_BlockTransparent[ E_BLOCK_SNOW ]           = true;
 
 	// TODO: Any other transparent blocks?
 

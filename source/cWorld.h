@@ -187,6 +187,7 @@ public:
 
 	unsigned int GetWorldSeed(void) const { return m_WorldSeed; }								//tolua_export
 	const AString & GetName(void) const { return m_WorldName; }									//tolua_export
+	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
 	{
@@ -299,6 +300,7 @@ private:
 	cChunkSender     m_ChunkSender;
 
 	AString m_WorldName;
+	AString m_IniFileName;
 
 	cWorld(const AString & a_WorldName);
 	~cWorld();

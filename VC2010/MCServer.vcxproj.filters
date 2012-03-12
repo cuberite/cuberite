@@ -921,6 +921,7 @@
     <ClCompile Include="..\source\ChunkSender.cpp" />
     <ClCompile Include="..\source\WSSAnvil.cpp" />
     <ClCompile Include="..\source\NBT.cpp" />
+    <ClCompile Include="..\source\WGFlat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1423,6 +1424,7 @@
     <ClInclude Include="..\source\ChunkSender.h" />
     <ClInclude Include="..\source\WSSAnvil.h" />
     <ClInclude Include="..\source\NBT.h" />
+    <ClInclude Include="..\source\WGFlat.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

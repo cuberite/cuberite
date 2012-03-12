@@ -5,13 +5,7 @@
 #include "cWorld.h"
 #include "cWorldGenerator.h"
 #include "cWorldGenerator_Test.h"
-
-
-
-
-
-typedef std::pair<int, int> ChunkCoord;
-typedef std::list< ChunkCoord > ChunkCoordList;
+#include "WGFlat.h"
 
 
 
@@ -51,9 +45,13 @@ bool cChunkGenerator::Start(cWorld * a_World, const AString & a_WorldGeneratorNa
 {
 	m_World = a_World;
 	
-	if (a_WorldGeneratorName.compare("Test") == 0 )
+	if (NoCaseCompare(a_WorldGeneratorName, "Test") == 0 )
 	{
 		m_pWorldGenerator = new cWorldGenerator_Test(a_World);
+	}
+	else if (NoCaseCompare(a_WorldGeneratorName, "flat") == 0)
+	{
+		m_pWorldGenerator = new cWGFlat(a_World);
 	}
 	else	// Default
 	{

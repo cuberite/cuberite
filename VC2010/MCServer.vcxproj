@@ -485,6 +485,7 @@
     <ClCompile Include="..\source\Vector3d.cpp" />
     <ClCompile Include="..\source\Vector3f.cpp" />
     <ClCompile Include="..\source\Vector3i.cpp" />
+    <ClCompile Include="..\source\WGFlat.cpp" />
     <ClCompile Include="..\source\WorldStorage.cpp" />
     <ClCompile Include="..\source\WSSAnvil.cpp" />
     <ClCompile Include="..\source\WSSCompact.cpp" />
@@ -666,6 +667,7 @@
     <ClInclude Include="..\source\Vector3d.h" />
     <ClInclude Include="..\source\Vector3f.h" />
     <ClInclude Include="..\source\Vector3i.h" />
+    <ClInclude Include="..\source\WGFlat.h" />
     <ClInclude Include="..\source\WorldStorage.h" />
     <ClInclude Include="..\source\WSSAnvil.h" />
     <ClInclude Include="..\source\WSSCompact.h" />
