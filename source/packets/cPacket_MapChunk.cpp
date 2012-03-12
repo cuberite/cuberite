@@ -19,7 +19,7 @@ cPacket_MapChunk::~cPacket_MapChunk()
 
 
 
-cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, const char * a_BiomeData)
 {
 	m_PacketID = E_MAP_CHUNK;
 
@@ -29,18 +29,19 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 	m_PosX = a_ChunkX; // Chunk coordinates now, instead of block coordinates
 	m_PosZ = a_ChunkZ;
 
-	m_bContiguous = false;
+	m_bContiguous = true;  // false = no biome data, true = with biome data
 	m_BitMap1 = 0;
 	m_BitMap2 = 0;
 
 	m_UnusedInt = 0;
 
 	
-	unsigned int DataSize = (cChunk::c_ChunkHeight / 16) * (4096 + 2048 + 2048 + 2048);
-	std::auto_ptr<char> AllData(new char[ DataSize ]);
+	const int BlockDataSize = (cChunk::c_ChunkHeight / 16) * (4096 + 2048 + 2048 + 2048);
+	const int BiomeDataSize = cChunk::c_ChunkWidth * cChunk::c_ChunkWidth;
+	char AllData [ BlockDataSize + BiomeDataSize ];
 
 #if AXIS_ORDER == AXIS_ORDER_YZX
-	memset( AllData.get(), 0, DataSize );
+	memset( AllData, 0, BlockDataSize );
 
 	unsigned int iterator = 0;
 	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
@@ -49,7 +50,7 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
 		{
 			int idx = cChunk::MakeIndex(x, y + i * 16, z);
-			AllData.get()[iterator] = a_BlockData[idx];
+			AllData[iterator] = a_BlockData[idx];
 			++iterator;
 		}  // for y, z, x
 	}
@@ -62,7 +63,7 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 		{
 			for ( int x = 0; x < 8; ++x )
 			{
-				AllData.get()[iterator] = cChunk::GetNibble(Meta, x * 2 + 0, y + i * 16, z) | (cChunk::GetNibble(Meta, x * 2 + 1, y + i * 16, z ) << 4);
+				AllData[iterator] = cChunk::GetNibble(Meta, x * 2 + 0, y + i * 16, z) | (cChunk::GetNibble(Meta, x * 2 + 1, y + i * 16, z ) << 4);
 				++iterator;
 			}  // for x
 		}  // for y, z
@@ -76,7 +77,7 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 		{
 			for ( int x = 0; x < 8; ++x )
 			{
-				AllData.get()[iterator] = cChunk::GetNibble(Light, x * 2 + 0, y + i * 16, z ) | (cChunk::GetNibble(Light, x * 2 + 1, y + i * 16, z ) << 4);
+				AllData[iterator] = cChunk::GetNibble(Light, x * 2 + 0, y + i * 16, z ) | (cChunk::GetNibble(Light, x * 2 + 1, y + i * 16, z ) << 4);
 				++iterator;
 			}
 		}
@@ -90,23 +91,25 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cha
 		{
 			for( int x = 0; x < 8; ++x )
 			{
-				AllData.get()[iterator] = cChunk::GetNibble(SkyLight, x * 2 + 0, y + i * 16, z ) | (cChunk::GetNibble(SkyLight, x * 2 + 1, y + i * 16, z ) << 4);
+				AllData[iterator] = cChunk::GetNibble(SkyLight, x * 2 + 0, y + i * 16, z ) | (cChunk::GetNibble(SkyLight, x * 2 + 1, y + i * 16, z ) << 4);
 				++iterator;
 			}
 		}
 	}
+	memcpy(AllData + BlockDataSize, a_BiomeData, BiomeDataSize);
 #elif AXIS_ORDER == AXIS_ORDER_XZY
 	for ( int i = 0; i < 16; ++i )
 	{
 		m_BitMap1 |= (1 << i);
 	}
-	memcpy( AllData.get(), a_BlockData, DataSize );
-#endif
+	memcpy(AllData, a_BlockData, BlockDataSize);
+	memcpy(AllData + BlockDataSize, a_BiomeData, BiomeDataSize);
+#endif  // AXIS_ORDER
 
-	uLongf CompressedSize = compressBound( DataSize );
+	uLongf CompressedSize = compressBound( sizeof(AllData) );
 	char * CompressedBlockData = new char[CompressedSize];
 
-	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)AllData.get(), DataSize, Z_DEFAULT_COMPRESSION);
+	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)AllData, sizeof(AllData), Z_DEFAULT_COMPRESSION);
 
 	m_CompressedData = CompressedBlockData;
 	m_CompressedSize = CompressedSize;

@@ -102,6 +102,7 @@ protected:
 	
 	// Data about the chunk that is being sent:
 	char       m_BlockData[cChunk::c_BlockDataSize];
+	char       m_BiomeData[cChunk::c_ChunkWidth * cChunk::c_ChunkWidth];
 	PacketList m_Packets;  // Accumulator for the entity-packets to send
 	
 	// cIsThread override:

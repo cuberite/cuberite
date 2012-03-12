@@ -395,3 +395,38 @@ enum ENUM_ITEM_ID
 	E_ITEM_11_DISC = 2266,
 };
 //tolua_end
+
+
+
+
+/// Biome IDs, as stored in the Anvil format and sent in the MapChunk packet
+enum eBiomeID
+{
+	biOcean            = 0,
+	biPlains           = 1,
+	biDesert           = 2,
+	biExtremeHills     = 3,
+	biForest           = 4,
+	biTaiga            = 5,
+	biSwampland        = 6,
+	biRiver            = 7,
+	biHell             = 8,  // Nether?
+	biSky              = 9,
+	biFrozenOcean      = 10,
+	biFrozenRiver      = 11,
+	biIcePlains        = 12,
+	biIceMountains     = 13,
+	biMushroomIsland   = 14,
+	biMushroomShore    = 15,
+	biBeach            = 16,
+	biDesertHills      = 17,
+	biForestHills      = 18,
+	biTaigaHills       = 19,
+	biExtremeHillsEdge = 20,
+	biJungle           = 21,
+	biJungleHills      = 22,
+} ;
+
+
+
+

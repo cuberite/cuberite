@@ -22,6 +22,7 @@ cChunkSender::cChunkSender(void) :
 	super("ChunkSender"),
 	m_World(NULL)
 {
+	memset(m_BiomeData, biPlains, sizeof(m_BiomeData));
 }
 
 
@@ -171,7 +172,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		return;
 	}
 	cPacket_PreChunk PreChunk(a_ChunkX, a_ChunkZ, true);
-	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData);
+	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData, m_BiomeData);
 	
 	// Send:
 	if (a_Client == NULL)
