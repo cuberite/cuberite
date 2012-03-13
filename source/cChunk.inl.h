@@ -11,19 +11,11 @@
 
 
 __C_CHUNK_INLINE__
-char cChunk::GetNibble(char* a_Buffer, int a_BlockIdx)
+char cChunk::GetNibble(char * a_Buffer, int a_BlockIdx)
 {
-	if( a_BlockIdx > -1 && a_BlockIdx < c_NumBlocks )
+	if ((a_BlockIdx > -1) && (a_BlockIdx < c_NumBlocks))
 	{
-		const int cindex = (a_BlockIdx/2);
-		if( (a_BlockIdx & 1) == 0 )
-		{	// First half byte
-			return (a_Buffer[cindex] & 0x0f);
-		}
-		else
-		{
-			return ((a_Buffer[cindex] & 0xf0) >> 4);
-		}
+		return (a_Buffer[a_BlockIdx / 2] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
 	}
 	return 0;
 }
@@ -33,23 +25,12 @@ char cChunk::GetNibble(char* a_Buffer, int a_BlockIdx)
 
 
 __C_CHUNK_INLINE__
-char cChunk::GetNibble(char* a_Buffer, int x, int y, int z)
+char cChunk::GetNibble(char * a_Buffer, int x, int y, int z)
 {
-	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
+	if ((x < c_ChunkWidth) && (x > -1) && (y < c_ChunkHeight) && (y > -1) && (z < c_ChunkWidth) && (z > -1))
 	{
-		const int cindex = MakeIndexNoCheck(x, y, z)/2;
-#if AXIS_ORDER == AXIS_ORDER_XZY
-		if( (x & 1) == 0 )
-#elif AXIS_ORDER == AXIS_ORDER_YZX
-		if( (y & 1) == 0 )
-#endif
-		{	// First half byte
-			return (a_Buffer[cindex] & 0x0f);
-		}
-		else
-		{
-			return ((a_Buffer[cindex] & 0xf0) >> 4);
-		}
+		int Index = MakeIndexNoCheck(x, y, z);
+		return (a_Buffer[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
 	}
 	return 0;
 }
@@ -59,21 +40,14 @@ char cChunk::GetNibble(char* a_Buffer, int x, int y, int z)
 
 
 __C_CHUNK_INLINE__
-void cChunk::SetNibble(char* a_Buffer, int a_BlockIdx, char a_Light)
+void cChunk::SetNibble(char * a_Buffer, int a_BlockIdx, char a_Nibble)
 {
-	if( a_BlockIdx > -1 && a_BlockIdx < c_NumBlocks )
+	if ((a_BlockIdx > -1) && (a_BlockIdx < c_NumBlocks))
 	{
-		const int cindex = (a_BlockIdx/2);
-		if( (a_BlockIdx & 1) == 0 )
-		{	// First half byte
-			a_Buffer[cindex] &= 0xf0; // Set first half to 0
-			a_Buffer[cindex] |= (a_Light) & 0x0f;
-		}
-		else
-		{
-			a_Buffer[cindex] &= 0x0f; // Set second half to 0
-			a_Buffer[cindex] |= (a_Light << 4) & 0xf0;
-		}
+		a_Buffer[a_BlockIdx / 2] = (
+			(a_Buffer[a_BlockIdx / 2] & (0xf0 >> ((a_BlockIdx & 1) * 4))) |  // The untouched nibble
+			((a_Nibble & 0x0f) << ((a_BlockIdx & 1) * 4))  // The nibble being set
+		);
 	}
 }
 
@@ -82,25 +56,15 @@ void cChunk::SetNibble(char* a_Buffer, int a_BlockIdx, char a_Light)
 
 
 __C_CHUNK_INLINE__
-void cChunk::SetNibble(char* a_Buffer, int x, int y, int z, char light)
+void cChunk::SetNibble(char * a_Buffer, int x, int y, int z, char a_Nibble)
 {
-	if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
+	if ((x < c_ChunkWidth) && (x > -1) && (y < c_ChunkHeight) && (y > -1) && (z < c_ChunkWidth) && (z > -1))
 	{
-		int cindex = MakeIndexNoCheck(x, y, z)/2;
-#if AXIS_ORDER == AXIS_ORDER_XZY
-		if( (x & 1) == 0 )
-#elif AXIS_ORDER == AXIS_ORDER_YZX
-		if( (y & 1) == 0 )
-#endif
-		{	// First half byte
-			a_Buffer[cindex] &= 0xf0; // Set first half to 0
-			a_Buffer[cindex] |= (light) & 0x0f;
-		}
-		else
-		{
-			a_Buffer[cindex] &= 0x0f; // Set second half to 0
-			a_Buffer[cindex] |= (light << 4) & 0xf0;
-		}
+		int Index = MakeIndexNoCheck(x, y, z);
+		a_Buffer[Index / 2] = (
+			(a_Buffer[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
+			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
+		);
 	}
 }
 
@@ -109,7 +73,7 @@ void cChunk::SetNibble(char* a_Buffer, int x, int y, int z, char light)
 
 
 __C_CHUNK_INLINE__
-void cChunk::SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff)
+void cChunk::SpreadLightOfBlock(char * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff)
 {
 	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
 	SetNibble( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X-1, a_Y, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );
@@ -125,43 +89,8 @@ void cChunk::SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, 
 
 
 
-__C_CHUNK_INLINE__
-void cChunk::SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
-{
-	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
-	SetNibble( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X-1, a_Y, a_Z ), CurrentLight-1) );
-	SetNibble( a_LightBuffer, a_X+1, a_Y, a_Z, MAX(GetNibble( a_LightBuffer, a_X+1, a_Y, a_Z ), CurrentLight-1) );
-	MarkDirty();
-}
-
-
-
-
-
-__C_CHUNK_INLINE__
-void cChunk::SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
-{
-	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
-	SetNibble( a_LightBuffer, a_X, a_Y-1, a_Z, MAX(GetNibble( a_LightBuffer, a_X, a_Y-1, a_Z ), CurrentLight-1) );
-	SetNibble( a_LightBuffer, a_X, a_Y+1, a_Z, MAX(GetNibble( a_LightBuffer, a_X, a_Y+1, a_Z ), CurrentLight-1) );
-	MarkDirty();
-}
-
-
-
-
-
-__C_CHUNK_INLINE__
-void cChunk::SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z)
-{
-	unsigned char CurrentLight = GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
-	SetNibble( a_LightBuffer, a_X, a_Y, a_Z-1, MAX(GetNibble( a_LightBuffer, a_X, a_Y, a_Z-1 ), CurrentLight-1) );
-	SetNibble( a_LightBuffer, a_X, a_Y, a_Z+1, MAX(GetNibble( a_LightBuffer, a_X, a_Y, a_Z+1 ), CurrentLight-1) );
-	MarkDirty();
-}
-
-
-
-
-
 #endif
+
+
+
+

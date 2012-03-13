@@ -239,6 +239,7 @@ public:
 	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
+			// For some reason, NOT using the Horner schema is faster. Weird.
 			return x + (z * c_ChunkWidth) + (y * c_ChunkWidth * c_ChunkWidth); // 1.2 is XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
 			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth); // 1.1 is YZX
@@ -313,9 +314,6 @@ private:
 	cBlockEntity * GetBlockEntity( const Vector3i & a_BlockPos ) { return GetBlockEntity( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
 
 	void SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
-	void SpreadLightOfBlockX(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
-	void SpreadLightOfBlockY(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
-	void SpreadLightOfBlockZ(char* a_LightBuffer, int a_X, int a_Y, int a_Z);
 
 	void CreateBlockEntities(void);
 	
