@@ -78,8 +78,11 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cC
 	ASSERT(a_Client != NULL);
 	{
 		cCSLock Lock(m_CS);
-		// It should not be already queued:
-		ASSERT(std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client)) == m_SendChunks.end());
+		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client)) != m_SendChunks.end())
+		{
+			// Already queued, bail out
+			return;
+		}
 		m_SendChunks.push_back(sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client));
 	}
 	m_evtQueue.Set();
