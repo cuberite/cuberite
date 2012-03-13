@@ -152,6 +152,9 @@ void cWorldStorage::WaitForFinish(void)
 		m_LoadQueue.clear();
 	}
 	
+	// Wait for the saving to finish:
+	WaitForQueuesEmpty();
+	
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
 	m_Event.Set();
