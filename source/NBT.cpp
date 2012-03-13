@@ -78,7 +78,7 @@ cNBTTag * cNBTTag::CreateTag(cNBTTag * a_Parent, eTagType a_Type, const AString 
 		case TAG_Compound:  return new cNBTCompound (a_Parent, a_Name);
 		default:
 		{
-			ASSERT("Unknown TAG type requested" == NULL);
+			ASSERT(!"Unknown TAG type requested");
 			return NULL;
 		}
 	}
@@ -636,7 +636,6 @@ cNBTTree * cNBTParser::Parse(const char * a_Data, int a_Length)
 void DumpTree(const cNBTTree * a_Tree, int a_Level)
 {
 	AString Indent(a_Level, TEXT(' '));
-	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	switch (a_Tree->GetType())
 	{
 		CASE_SIMPLE_TAG(Byte,  "d")

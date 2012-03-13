@@ -180,23 +180,6 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 
 
 
-static float GetOreNoise( float x, float y, float z, cNoise & a_Noise )
-{
-	float oct1 = a_Noise.CubicNoise3D( x*0.1f, y*0.1f, z*0.1f );
-	float oct2 = a_Noise.CubicNoise3D( x*0.05f, y*0.5f, z*0.05f );
-
-	oct2 *= oct2;
-	oct1 = (1 - (oct1 * oct1 *100)) * oct2;
-	//if( oct1 < 0.5f ) oct1 = 0;
-	//else oct1 = 1.f;
-
-	return oct1;
-}
-
-
-
-
-
 unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 {
 	ASSERT((x < cChunk::c_ChunkWidth) && (x > -1) && (y < cChunk::c_ChunkHeight) && (y > -1) && (z < cChunk::c_ChunkWidth) && (z > -1));
@@ -309,7 +292,6 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 			else if (Top > WATER_LEVEL)
 			{
 				// This is the sandy shore, generate cacti here
-				int index = MakeIndex(x, Top - 1, z);
 				int TopY = Top - 1;
 				float val1 = Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
 				float val2 = Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
