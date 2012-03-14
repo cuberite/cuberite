@@ -19,7 +19,7 @@ cPacket_MapChunk::~cPacket_MapChunk()
 
 
 
-cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, const char * a_BiomeData)
+cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const BLOCKTYPE * a_BlockData, const BIOMETYPE * a_BiomeData)
 {
 	m_PacketID = E_MAP_CHUNK;
 

@@ -182,6 +182,21 @@ cWorld::cWorld( const AString & a_WorldName )
 	, m_RSList ( 0 )
 	, m_Weather ( eWeather_Sunny )
 {
+	/*
+	// DEBUG:
+	DWORD Tick = GetTickCount();
+	for (int i = 0; i < 3000; i++)
+	{
+		BLOCKTYPE Playground[cChunkDef::NumBlocks / 2];
+		for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) for (int y = 0; y < 256; y++)
+		{
+			cChunkDef::SetNibble(Playground, x, y, z, x);
+		}  // for x, y, z
+	}  // for i
+	Tick = GetTickCount() - Tick;
+	LOGINFO("3000 chunkfulls of SetNibble() took %d ticks", Tick);
+	//*/
+	
 	LOG("cWorld::cWorld(%s)", a_WorldName.c_str());
 	m_WorldName = a_WorldName;
 	m_IniFileName = m_WorldName + "/world.ini";

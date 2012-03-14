@@ -25,7 +25,7 @@ public:
 	cWorldGenerator(cWorld * a_World);
 	~cWorldGenerator();
 
-	virtual void GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	virtual void GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
 	
 	virtual void PostGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Called when the chunk has been already generated and set valid
 

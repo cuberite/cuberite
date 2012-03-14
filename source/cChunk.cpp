@@ -735,7 +735,7 @@ void cChunk::CalculateLighting()
 
 
 
-void cChunk::SpreadLight(char* a_LightBuffer)
+void cChunk::SpreadLight(BLOCKTYPE * a_LightBuffer)
 {
 	// Spread the light
 	for(int x = 0; x < Width; x++)	for(int z = 0; z < Width; z++)	for(int y = 0; y < Height; y++)
@@ -762,7 +762,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	// Spread to neighbour chunks X-axis
 	cChunkPtr LeftChunk  = m_ChunkMap->GetChunkNoGen( m_PosX - 1, m_PosY, m_PosZ );
 	cChunkPtr RightChunk = m_ChunkMap->GetChunkNoGen( m_PosX + 1, m_PosY, m_PosZ );
-	char * LeftSky = NULL, *RightSky = NULL;
+	BLOCKTYPE * LeftSky = NULL, *RightSky = NULL;
 	if (LeftChunk->IsValid())
 	{
 		LeftSky = (a_LightBuffer == m_BlockSkyLight) ? LeftChunk->m_BlockSkyLight : LeftChunk->m_BlockLight;
@@ -779,8 +779,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 			int index = MakeIndexNoCheck( 0, y, z );
 			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 			{
-				char CurrentLight = GetNibble( a_LightBuffer, 0, y, z );
-				char LeftLight = GetNibble( LeftSky, Width-1, y, z );
+				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, 0, y, z );
+				BLOCKTYPE LeftLight = GetNibble( LeftSky, Width-1, y, z );
 				if( LeftLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
 				{
 					SetNibble( LeftSky, Width - 1, y, z, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
@@ -793,8 +793,8 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 			int index = MakeIndexNoCheck( Width - 1, y, z );
 			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 			{
-				char CurrentLight = GetNibble( a_LightBuffer, Width-1, y, z );
-				char RightLight = GetNibble( RightSky, 0, y, z );
+				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, Width-1, y, z );
+				BLOCKTYPE RightLight = GetNibble( RightSky, 0, y, z );
 				if( RightLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
 				{
 					SetNibble( RightSky, 0, y, z,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
@@ -807,7 +807,7 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	// Spread to neighbour chunks Z-axis
 	cChunkPtr FrontChunk = m_ChunkMap->GetChunkNoGen( m_PosX, m_PosY, m_PosZ - 1 );
 	cChunkPtr BackChunk  = m_ChunkMap->GetChunkNoGen( m_PosX, m_PosY, m_PosZ + 1 );
-	char * FrontSky = NULL, * BackSky = NULL;
+	BLOCKTYPE * FrontSky = NULL, * BackSky = NULL;
 	if (FrontChunk->IsValid())
 	{
 		FrontSky = (a_LightBuffer == m_BlockSkyLight) ? FrontChunk->m_BlockSkyLight : FrontChunk->m_BlockLight;

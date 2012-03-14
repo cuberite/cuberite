@@ -2,6 +2,7 @@
 #pragma once
 
 #include "cPacket.h"
+#include "../ChunkDef.h"
 
 
 
@@ -33,7 +34,7 @@ public:
 	{ m_PacketID = E_MAP_CHUNK; m_CompressedData = 0; }
 	
 	cPacket_MapChunk( const cPacket_MapChunk & a_Copy );
-	cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, const char * a_BiomeData);
+	cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const BLOCKTYPE * a_BlockData, const BIOMETYPE * a_BiomeData);
 	~cPacket_MapChunk();
 	virtual cPacket* Clone() const { return new cPacket_MapChunk(*this); }
 

@@ -8,7 +8,7 @@
 
 
 
-void cWorldGenerator_Test::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+void cWorldGenerator_Test::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData)
 {
 	memset(a_BlockData, E_BLOCK_DIRT, cChunkDef::NumBlocks);
 	for(int x = 0; x < cChunkDef::Width; x++) 

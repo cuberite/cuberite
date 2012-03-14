@@ -16,7 +16,7 @@ public:
 	
 protected:
 
-	virtual void GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData) override;
+	virtual void GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData) override;
 	virtual void GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ) override;
 };
 

@@ -180,7 +180,7 @@ void cChunkGenerator::Execute(void)
 
 void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	char BlockData[cChunkDef::BlockDataSize];
+	BLOCKTYPE BlockData[cChunkDef::BlockDataSize];
 	cEntityList Entities;
 	cBlockEntityList BlockEntities;
 	m_pWorldGenerator->GenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ, BlockData, Entities, BlockEntities);

@@ -102,7 +102,7 @@ protected:
 	
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
-	BLOCKTYPE  m_BiomeData[cChunkDef::Width * cChunkDef::Width];
+	BIOMETYPE  m_BiomeData[cChunkDef::Width * cChunkDef::Width];
 	PacketList m_Packets;  // Accumulator for the entity-packets to send
 	
 	// cIsThread override:

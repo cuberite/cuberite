@@ -81,7 +81,7 @@ cWorldGenerator::~cWorldGenerator()
 
 
 
-void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cWorldGenerator::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
 	GenerateTerrain(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData);
 }
@@ -190,7 +190,7 @@ unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 
 
 
-void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData)
 {
 	const int WATER_LEVEL = 60;
 	const int SAND_LEVEL = 3;
@@ -327,7 +327,7 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 
 
 
-void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, char * a_BlockData)
+void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, BLOCKTYPE * a_BlockData)
 {
 	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent to each other.
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
@@ -397,7 +397,7 @@ void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNest
 
 void cWorldGenerator::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	char BlockType[cChunkDef::NumBlocks];
+	BLOCKTYPE BlockType[cChunkDef::NumBlocks];
 	
 	if (!m_World->GetChunkBlockTypes(a_ChunkX, a_ChunkY, a_ChunkZ, BlockType))
 	{

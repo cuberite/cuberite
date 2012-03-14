@@ -43,6 +43,7 @@ typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 /// The datatype used by blockdata, metadata, blocklight and skylight
 typedef char BLOCKTYPE;
+typedef char BIOMETYPE;
 
 
 

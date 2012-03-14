@@ -521,7 +521,7 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
 
 
 
-char cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
+BLOCKTYPE cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
@@ -539,7 +539,7 @@ char cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
 
 
 
-char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
+BLOCKTYPE cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
@@ -557,7 +557,7 @@ char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 
 
 
-void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
+void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockMeta)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
@@ -576,7 +576,7 @@ void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
 
 
 
-void cChunkMap::SetBlock(int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta)
+void cChunkMap::SetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
 	int ChunkX, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
 	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );

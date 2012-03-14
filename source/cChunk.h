@@ -211,7 +211,7 @@ private:
 	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );
 	cBlockEntity * GetBlockEntity( const Vector3i & a_BlockPos ) { return GetBlockEntity( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
 
-	void SpreadLightOfBlock(char* a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
+	void SpreadLightOfBlock(BLOCKTYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Falloff);
 
 	void CreateBlockEntities(void);
 	

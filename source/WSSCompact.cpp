@@ -734,12 +734,14 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 		}
 	}
 
+	BLOCKTYPE * BlockData = (BLOCKTYPE *)UncompressedData.data();
+	
 	a_World->ChunkDataLoaded(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
-		UncompressedData.data(),
-		UncompressedData.data() + cChunkDef::MetaOffset,
-		UncompressedData.data() + cChunkDef::LightOffset,
-		UncompressedData.data() + cChunkDef::SkyLightOffset,
+		BlockData,
+		BlockData + cChunkDef::MetaOffset,
+		BlockData + cChunkDef::LightOffset,
+		BlockData + cChunkDef::SkyLightOffset,
 		NULL,
 		Entities,
 		BlockEntities
@@ -788,7 +790,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	}
 
 	AString Data;
-	Data.assign(Serializer.GetBlockData(), cChunkDef::BlockDataSize);
+	Data.assign((const char *)Serializer.GetBlockData(), cChunkDef::BlockDataSize);
 	if (Serializer.HasJsonData())
 	{
 		AString JsonData;
