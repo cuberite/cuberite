@@ -258,6 +258,30 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	BLOCKTYPE * ChunkData = BlockData;
 	#endif  // else AXIS_ORDER_YZX
 	
+	//*
+	// Delete the comment above for really cool stuff :)
+	// DEBUG magic: Invert the underground, so that we can see the MC generator in action :)
+	bool ShouldInvert[cChunkDef::Width * cChunkDef::Width];
+	memset(ShouldInvert, 0, sizeof(ShouldInvert));
+	for (int y = cChunkDef::Height - 1; y >= 0; y--)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			if (ShouldInvert[x + cChunkDef::Width * z])
+			{
+				ChunkData[Index] = (ChunkData[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
+			}
+			else
+			{
+				ShouldInvert[x + cChunkDef::Width * z] = (ChunkData[Index] != E_BLOCK_AIR);
+			}
+		}
+	}  // for y
+	// Set everything alight, so that we can see:
+	memset(ChunkData + cChunkDef::SkyLightOffset, 0xff, cChunkDef::NumBlocks / 2);
+	//*/
+	
 	m_World->ChunkDataLoaded(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
 		ChunkData,
