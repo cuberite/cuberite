@@ -258,7 +258,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	BLOCKTYPE * ChunkData = BlockData;
 	#endif  // else AXIS_ORDER_YZX
 	
-	//*
+	/*
 	// Delete the comment above for really cool stuff :)
 	// DEBUG magic: Invert the underground, so that we can see the MC generator in action :)
 	bool ShouldInvert[cChunkDef::Width * cChunkDef::Width];
