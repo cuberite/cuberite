@@ -3,7 +3,6 @@
 
 #include "cEntity.h"
 #include "cWorld.h"
-#include "cChunk.h"
 #include "cServer.h"
 #include "cRoot.h"
 #include "Vector3d.h"
@@ -54,7 +53,7 @@ cEntity::~cEntity()
 	LOG("Deleting entity %d at pos {%.2f, %.2f} ~ [%d, %d]; ptr %p", 
 		m_UniqueID,
 		m_Pos.x, m_Pos.z,
-		(int)(m_Pos.x / cChunk::c_ChunkWidth), (int)(m_Pos.z / cChunk::c_ChunkWidth),
+		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
 		this
 	);
 	

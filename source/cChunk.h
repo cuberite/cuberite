@@ -2,7 +2,7 @@
 #pragma once
 
 #include "cEntity.h"
-#include "Vector3i.h"
+#include "ChunkDef.h"
 
 
 
@@ -21,19 +21,6 @@
 
 
 
-/** This is really only a placeholder to be used in places where we need to "make up" a chunk's Y coord.
-It will help us when the new chunk format comes out and we need to patch everything up for compatibility.
-*/
-#define ZERO_CHUNK_Y 0
-
-// Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
-#define AXIS_ORDER_YZX 1	// Original (1.1-)
-#define AXIS_ORDER_XZY 2	// New (1.2+)
-#define AXIS_ORDER AXIS_ORDER_XZY
-
-
-
-
 namespace Json
 {
 	class Value;
@@ -46,7 +33,6 @@ namespace Json
 class cWorld;
 class cFurnaceEntity;
 class cPacket;
-class cBlockEntity;
 class cClientHandle;
 class cServer;
 class MTRand;
@@ -54,59 +40,6 @@ class cPlayer;
 class cChunkMap;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
-typedef std::list<cBlockEntity *>   cBlockEntityList;
-
-
-
-
-
-/** Interface class used for getting data out of a chunk using the GetAllData() function.
-Implementation must use the pointers immediately and NOT store any of them for later use
-*/
-class cChunkDataCallback
-{
-public:
-	/// Called once to export blockdata
-	virtual void BlockData(const char * a_Data) = 0;
-	
-	/// Called for each entity in the chunk
-	virtual void Entity(cEntity * a_Entity) = 0;
-	
-	/// Called for each blockentity in the chunk
-	virtual void BlockEntity(cBlockEntity * a_Entity) = 0;
-} ;
-
-
-
-
-
-/** Interface class used for comparing clients of two chunks.
-Used primarily for entity moving while both chunks are locked.
-*/
-class cClientDiffCallback
-{
-public:
-	/// Called for clients that are in Chunk1 and not in Chunk2,
-	virtual void Removed(cClientHandle * a_Client) = 0;
-	
-	/// Called for clients that are in Chunk2 and not in Chunk1.
-	virtual void Added(cClientHandle * a_Client) = 0;
-} ;
-
-
-
-
-
-struct sSetBlock
-{
-	int x, y, z;
-	int ChunkX, ChunkZ;
-	char BlockType, BlockMeta;
-
-	sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );  // absolute block position
-};
-
-typedef std::list< sSetBlock > sSetBlockList;
 
 
 
@@ -114,14 +47,10 @@ typedef std::list< sSetBlock > sSetBlockList;
 
 // This class is not to be used directly
 // Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
-class cChunk
+class cChunk :
+	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
 {
 public:
-	static const int c_ChunkWidth = 16;
-	static const int c_ChunkHeight = 256;
-	static const int c_NumBlocks = c_ChunkWidth * c_ChunkHeight * c_ChunkWidth;
-	static const int c_BlockDataSize = c_NumBlocks * 2 + (c_NumBlocks/2); // 2.5 * numblocks
-	
 	cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World);
 	~cChunk();
 
@@ -147,13 +76,21 @@ public:
 	void GetAllData(cChunkDataCallback & a_Callback);
 	
 	/// Sets all chunk data
-	void SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void SetAllData(
+		const BLOCKTYPE * a_BlockTypes, 
+		const BLOCKTYPE * a_BlockMeta,
+		const BLOCKTYPE * a_BlockLight,
+		const BLOCKTYPE * a_BlockSkyLight,
+		const cChunkDef::HeightMap * a_HeightMap,
+		cEntityList & a_Entities, 
+		cBlockEntityList & a_BlockEntities
+	);
 	
-	/// Copies m_BlockData into a_Blocks, only the block types
-	void GetBlocks(char * a_Blocks);
+	/// Copies m_BlockData into a_BlockTypes, only the block types
+	void GetBlockTypes(BLOCKTYPE  * a_BlockTypes);
 	
-	/// Copies m_BlockData into a_Blocks, the entire array
-	void GetBlockData(char * a_BlockData);
+	/// Copies entire block data into a_BlockData, the entire 4 arrays (Type, Meta, Light, SkyLight)
+	void GetBlockData(BLOCKTYPE  * a_BlockData);
 	
 	/// Returns true if there is a block entity at the coords specified
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -170,11 +107,11 @@ public:
 
 	// OBSOLETE void SendTo( cClientHandle * a_Client );
 
-	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );
-	void SetBlock( const Vector3i & a_BlockPos, char a_BlockType, char a_BlockMeta ) { SetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta ); }
-	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, char a_BlockType, char a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	char GetBlock( int a_X, int a_Y, int a_Z );
-	char GetBlock( int a_BlockIdx );
+	void SetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );
+	void SetBlock( const Vector3i & a_BlockPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta ) { SetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta ); }
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	BLOCKTYPE GetBlock( int a_X, int a_Y, int a_Z );
+	BLOCKTYPE GetBlock( int a_BlockIdx );
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	void UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);  // Also sends update packets to all clients in the chunk
@@ -196,7 +133,7 @@ public:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	inline void RecalculateLighting() { m_bCalculateLighting = true; } // Recalculate lighting next tick
-	void SpreadLight(char* a_LightBuffer);
+
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
 
@@ -207,67 +144,28 @@ public:
 	//   Loaded(blockdata, lightdata, blockentities, entities),
 	//   Generated(blockdata, lightdata, blockentities, entities),
 	//   GetBlockData(blockdatadest) etc.
-	char* pGetBlockData() { return m_BlockData; }
-	char* pGetType() { return m_BlockType; }
-	char* pGetMeta() { return m_BlockMeta; }
-	char* pGetLight() { return m_BlockLight; }
-	char* pGetSkyLight() { return m_BlockSkyLight; }
+	/*
+	BLOCKTYPE * GetBlockTypes   (void) { return m_BlockTypes; }
+	BLOCKTYPE * GetBlockMeta    (void) { return m_BlockMeta; }
+	BLOCKTYPE * GetBlockLight   (void) { return m_BlockLight; }
+	BLOCKTYPE * GetBlockSkyLight(void) { return m_BlockSkyLight; }
+	*/
 	
-	void CopyBlockDataFrom(const char * a_NewBlockData);  // Copies all blockdata, recalculates heightmap (used by chunk loaders)
-	
-	static char GetNibble(char * a_Buffer, int a_BlockIdx);
-	static char GetNibble(char * a_Buffer, int x, int y, int z);
-	static char GetNibble(char * a_Buffer, const Vector3i & a_BlockPos ) { return GetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
-	static void SetNibble(char * a_Buffer, int a_BlockIdx, char a_Value);
-	static void SetNibble(char * a_Buffer, int x, int y, int z, char a_Value);
-	static void SetNibble(char * a_Buffer, const Vector3i & a_BlockPos, char a_Value ) { SetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Value ); }
-
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
 	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos ) { return PositionToWorldPosition( a_InChunkPos.x, a_InChunkPos.y, a_InChunkPos.z ); }
 	Vector3i PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
 
-	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
-	inline static unsigned int MakeIndex(int x, int y, int z )
-	{
-		if( x < c_ChunkWidth && x > -1 && y < c_ChunkHeight && y > -1 && z < c_ChunkWidth && z > -1 )
-		{
-			return MakeIndexNoCheck(x, y, z);
-		}
-		return INDEX_OUT_OF_RANGE;
-	}
-
-	inline static unsigned int MakeIndexNoCheck(int x, int y, int z)
-	{
-		#if AXIS_ORDER == AXIS_ORDER_XZY
-			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * c_ChunkWidth) + (y * c_ChunkWidth * c_ChunkWidth); // 1.2 is XZY
-		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * c_ChunkHeight) + (x * c_ChunkHeight * c_ChunkWidth); // 1.1 is YZX
-		#endif
-	}
-
-	inline static Vector3i IndexToCoordinate( unsigned int index )
-	{
-		#if AXIS_ORDER == AXIS_ORDER_XZY
-			return Vector3i(								// 1.2
-				index % c_ChunkWidth,						// X
-				index / (c_ChunkWidth * c_ChunkWidth),		// Y
-				(index / c_ChunkWidth) % c_ChunkWidth		// Z
-				);
-		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return Vector3i(								// 1.1
-				index / (c_ChunkHeight * c_ChunkWidth),		// X
-				index % c_ChunkHeight,						// Y
-				(index / c_ChunkHeight) % c_ChunkWidth		// Z
-				);
-		#endif
-	}
-	
 	inline void MarkDirty(void)
 	{
 		m_IsDirty = true;
 		m_IsSaving = false;
 	}
+	
+	inline void SpreadBlockSkyLight(void) {SpreadLight(m_BlockSkyLight); }
+	inline void SpreadBlockLight   (void) {SpreadLight(m_BlockLight); }
+	
+	inline BLOCKTYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                   {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
+	inline void      SetMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
 
 private:
 
@@ -278,9 +176,9 @@ private:
 	bool m_IsSaving;  // True if the chunk is being saved
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 	
-	cCriticalSection              m_CSBlockLists;
-	std::deque< unsigned int > m_ToTickBlocks;
-	std::vector< unsigned int >   m_PendingSendBlocks;
+	cCriticalSection            m_CSBlockLists;
+	std::deque< unsigned int >  m_ToTickBlocks;
+	std::vector< unsigned int > m_PendingSendBlocks;
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cClientHandleList  m_LoadedByClient;
@@ -297,13 +195,13 @@ private:
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	char m_BlockData[c_BlockDataSize]; // Chunk data ready to be compressed and sent
-	char *m_BlockType;		// Pointers to an element in m_BlockData
-	char *m_BlockMeta;		// += NumBlocks
-	char *m_BlockLight;		// += NumBlocks/2
-	char *m_BlockSkyLight;	// += NumBlocks/2
+	// TODO: Make these pointers and don't allocate what isn't needed
+	BLOCKTYPE m_BlockTypes   [cChunkDef::NumBlocks];
+	BLOCKTYPE m_BlockMeta    [cChunkDef::NumBlocks / 2];
+	BLOCKTYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
+	BLOCKTYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
 
-	unsigned char m_HeightMap[c_ChunkWidth * c_ChunkWidth];
+	cChunkDef::HeightMap m_HeightMap;
 
 	unsigned int m_BlockTickNum;
 	unsigned int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
@@ -319,32 +217,13 @@ private:
 	
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
+
+	void SpreadLight(BLOCKTYPE * a_LightBuffer);
 };
 
 typedef cChunk * cChunkPtr;
 
 typedef std::list<cChunkPtr> cChunkPtrList;
-
-
-
-
-
-class cChunkCoords
-{
-public:
-	int m_ChunkX;
-	int m_ChunkY;
-	int m_ChunkZ;
-	
-	cChunkCoords(int a_ChunkX, int a_ChunkY, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ) {}
-	
-	bool operator == (const cChunkCoords & a_Other)
-	{
-		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkY == a_Other.m_ChunkY) && (m_ChunkZ == a_Other.m_ChunkZ));
-	}
-} ;
-
-typedef std::list<cChunkCoords> cChunkCoordsList;
 
 
 

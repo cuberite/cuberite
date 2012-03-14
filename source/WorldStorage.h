@@ -14,7 +14,7 @@
 #ifndef WORLDSTORAGE_H_INCLUDED
 #define WORLDSTORAGE_H_INCLUDED
 
-#include "cChunk.h"
+#include "ChunkDef.h"
 #include "cIsThread.h"
 #include <json/json.h>
 
@@ -23,8 +23,7 @@
 
 
 // fwd:
-class cEntity;
-class cBlockEntity;
+class cWorld;
 
 
 
@@ -54,20 +53,19 @@ typedef std::list<cWSSchema *> cWSSchemaList;
 
 /// Helper class for serializing a chunk into Json
 class cJsonChunkSerializer :
-	public cChunkDataCallback
+	public cChunkDataCollector
 {
 public:
 
 	cJsonChunkSerializer(void);
 	
 	Json::Value & GetRoot     (void) {return m_Root; }
-	AString &     GetBlockData(void) {return m_BlockData; }
+	BLOCKTYPE *   GetBlockData(void) {return m_BlockData; }
 	bool          HasJsonData (void) const {return m_HasJsonData; }
 	
 protected:
-
-	// BlockData is serialized into string
-	AString m_BlockData;
+	
+	// NOTE: block data is serialized into inherited cChunkDataCollector's m_BlockData[] array
 	
 	// Entities and BlockEntities are serialized to Json
 	Json::Value m_Root;
@@ -76,10 +74,9 @@ protected:
 	Json::Value m_AllSigns;
 	bool m_HasJsonData;
 	
-	// cChunkDataCallback overrides:
-	virtual void BlockData  (const char * a_Data) override;
-	virtual void Entity     (cEntity * a_Entity) override;
-	virtual void BlockEntity(cBlockEntity * a_Entity) override;
+	// cChunkDataCollector overrides:
+	virtual void Entity       (cEntity *      a_Entity) override;
+	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 } ;
 
 

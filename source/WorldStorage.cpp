@@ -52,15 +52,6 @@ cJsonChunkSerializer::cJsonChunkSerializer(void) :
 
 
 
-void cJsonChunkSerializer::BlockData(const char * a_Data)
-{
-	m_BlockData.assign(a_Data, cChunk::c_BlockDataSize);
-}
-
-
-
-
-
 void cJsonChunkSerializer::Entity(cEntity * a_Entity)
 {
 	// TODO: a_Entity->SaveToJson(m_Root);

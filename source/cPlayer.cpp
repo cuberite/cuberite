@@ -9,7 +9,6 @@
 #include "cWorld.h"
 #include "cPickup.h"
 #include "cPluginManager.h"
-#include "cChunk.h"
 #include "cWindow.h"
 #include "cBlockEntity.h"
 #include "cGroupManager.h"

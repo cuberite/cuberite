@@ -4,7 +4,6 @@
 #include "cWorldGenerator.h"
 #include "cNoise.h"
 #include "cWorld.h"
-#include "cChunk.h"
 #include "cGenSettings.h"
 
 #include "BlockID.h"
@@ -182,9 +181,9 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 
 unsigned int cWorldGenerator::MakeIndex(int x, int y, int z )
 {
-	ASSERT((x < cChunk::c_ChunkWidth) && (x > -1) && (y < cChunk::c_ChunkHeight) && (y > -1) && (z < cChunk::c_ChunkWidth) && (z > -1));
+	ASSERT((x < cChunkDef::Width) && (x > -1) && (y < cChunkDef::Height) && (y > -1) && (z < cChunkDef::Width) && (z > -1));
 
-	return cChunk::MakeIndexNoCheck( x, y, z );
+	return cChunkDef::MakeIndexNoCheck( x, y, z );
 }
 
 
@@ -196,19 +195,19 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 	const int WATER_LEVEL = 60;
 	const int SAND_LEVEL = 3;
 	
-	memset(a_BlockData, E_BLOCK_AIR, cChunk::c_BlockDataSize);
+	memset(a_BlockData, E_BLOCK_AIR, cChunkDef::BlockDataSize);
 
 	cNoise Noise(m_World->GetWorldSeed());
 	
-	for (int z = 0; z < cChunk::c_ChunkWidth; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++) 
 	{
-		const float zz = (float)(a_ChunkZ * cChunk::c_ChunkWidth + z);
-		for (int x = 0; x < cChunk::c_ChunkWidth; x++)
+		const float zz = (float)(a_ChunkZ * cChunkDef::Width + z);
+		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			// Place bedrock on bottom layer
 			a_BlockData[MakeIndex(x, 0, z)] = E_BLOCK_BEDROCK;
 
-			const float xx = (float)(a_ChunkX * cChunk::c_ChunkWidth + x);
+			const float xx = (float)(a_ChunkX * cChunkDef::Width + x);
 			
 			int Height = (int)(GetNoise( xx * 0.05f, zz * 0.05f, Noise ) * 16);
 			const int Lower = 64;
@@ -335,9 +334,9 @@ void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNest
 	// Only stone gets replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
 	for (int i = 0; i < a_NumNests; i++)
 	{
-		int BaseX = r1.randInt(cChunk::c_ChunkWidth);
+		int BaseX = r1.randInt(cChunkDef::Width);
 		int BaseY = r1.randInt(a_MaxHeight);
-		int BaseZ = r1.randInt(cChunk::c_ChunkWidth);
+		int BaseZ = r1.randInt(cChunkDef::Width);
 		sSetBlockList OreBlocks;
 		size_t NestSize = (size_t)(a_NestSize + r1.randInt(a_NestSize / 4));  // The actual nest size may be up to 1/4 larger
 		while (OreBlocks.size() < NestSize)
@@ -378,7 +377,7 @@ void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNest
 		// Replace stone with the queued ore blocks:
 		for (sSetBlockList::iterator itr = OreBlocks.begin(); itr != OreBlocks.end(); ++itr)
 		{
-			if ((itr->x < 0) || (itr->y < 0) || (itr->z < 0) || (itr->x >= cChunk::c_ChunkWidth) || (itr->y >= cChunk::c_ChunkHeight-1) || (itr->z >= cChunk::c_ChunkWidth))
+			if ((itr->x < 0) || (itr->y < 0) || (itr->z < 0) || (itr->x >= cChunkDef::Width) || (itr->y >= cChunkDef::Height-1) || (itr->z >= cChunkDef::Width))
 			{
 				continue;
 			}
@@ -398,24 +397,24 @@ void cWorldGenerator::GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNest
 
 void cWorldGenerator::GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	char BlockType[cChunk::c_NumBlocks];
+	char BlockType[cChunkDef::NumBlocks];
 	
-	if (!m_World->GetChunkBlocks(a_ChunkX, a_ChunkY, a_ChunkZ, BlockType))
+	if (!m_World->GetChunkBlockTypes(a_ChunkX, a_ChunkY, a_ChunkZ, BlockType))
 	{
 		LOGWARNING("Cannot generate foliage on chunk [%d, %d]", a_ChunkX, a_ChunkZ);
 		return;
 	}
 	
 	cNoise Noise(m_World->GetWorldSeed());
-	for (int z = 0; z < cChunk::c_ChunkWidth; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++) 
 	{
-		int zz = z + a_ChunkZ * cChunk::c_ChunkWidth;
-		for (int x = 0; x < cChunk::c_ChunkWidth; x++)
+		int zz = z + a_ChunkZ * cChunkDef::Width;
+		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int xx = x + a_ChunkX * cChunk::c_ChunkWidth;
+			int xx = x + a_ChunkX * cChunkDef::Width;
 
 			int TopY = m_World->GetHeight(xx, zz);
-			int index = cChunk::MakeIndexNoCheck(x, MAX(TopY - 1, 0), z);
+			int index = cChunkDef::MakeIndexNoCheck(x, MAX(TopY - 1, 0), z);
 			if (BlockType[index] == BLOCK_GRASS)
 			{
 				float val1 = Noise.CubicNoise2D( xx * 0.1f, zz * 0.1f );

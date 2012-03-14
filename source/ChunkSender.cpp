@@ -209,15 +209,6 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 
 
 
-void cChunkSender::BlockData(const char * a_Data)
-{
-	memcpy(m_BlockData, a_Data, cChunk::c_BlockDataSize);
-}
-
-
-
-
-
 void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
 	cPacket * Packet = a_Entity->GetPacket();

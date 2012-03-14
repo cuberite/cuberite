@@ -6,7 +6,6 @@
 #include "cPlayer.h"
 #include "cClientHandle.h"
 #include "cWorld.h"
-#include "cChunk.h"
 #include "cRoot.h"
 
 #include "packets/cPacket_UpdateSign.h"

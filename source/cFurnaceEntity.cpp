@@ -7,7 +7,6 @@
 #include "cFurnaceWindow.h"
 #include "cPlayer.h"
 #include "cWorld.h"
-#include "cChunk.h"
 #include "cClientHandle.h"
 #include "cFurnaceRecipe.h"
 #include "cServer.h"

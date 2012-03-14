@@ -15,6 +15,7 @@
 #include "WorldStorage.h"
 #include "cChunkGenerator.h"
 #include "Vector3i.h"
+#include "Vector3f.h"
 #include "ChunkSender.h"
 #include "Defines.h"
 
@@ -67,18 +68,39 @@ public:
 	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
-	void MarkChunkDirty    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaving   (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaved    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void ChunkDataLoaded   (int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
-	void ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	void ChunkDataLoaded(
+		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+		const BLOCKTYPE * a_BlockTypes,
+		const BLOCKTYPE * a_BlockMeta,
+		const BLOCKTYPE * a_BlockLight,
+		const BLOCKTYPE * a_BlockSkyLight,
+		const cChunkDef::HeightMap * a_HeightMap,
+		cEntityList & a_Entities,
+		cBlockEntityList & a_BlockEntities
+	);
+	
+	void ChunkDataGenerated (
+		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+		const BLOCKTYPE * a_BlockTypes,
+		const BLOCKTYPE * a_BlockMeta,
+		const BLOCKTYPE * a_BlockLight,
+		const BLOCKTYPE * a_BlockSkyLight,
+		const cChunkDef::HeightMap * a_HeightMap,
+		cEntityList & a_Entities, 
+		cBlockEntityList & a_BlockEntities
+	);
+	
 	bool GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
 	
 	/// Gets the chunk's blocks, only the block types
-	bool GetChunkBlocks    (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks);
+	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 	
-	/// Gets the chunk's blockdata, the entire array
-	bool GetChunkBlockData (int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData);
+	/// Gets the chunk's blockdata, the entire 4 arrays (Types, Meta, Light, SkyLight)
+	bool GetChunkBlockData (int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData);
 	
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
@@ -193,15 +215,15 @@ public:
 	{
 		// TODO: Use floor() instead of weird if statements
 		// Also fix Y
-		a_ChunkX = a_X/cChunk::c_ChunkWidth;
-		if(a_X < 0 && a_X % cChunk::c_ChunkWidth != 0) a_ChunkX--;
+		a_ChunkX = a_X/cChunkDef::Width;
+		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
 		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunk::c_ChunkWidth;
-		if(a_Z < 0 && a_Z % cChunk::c_ChunkWidth != 0) a_ChunkZ--;
+		a_ChunkZ = a_Z/cChunkDef::Width;
+		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
 
-		a_X = a_X - a_ChunkX*cChunk::c_ChunkWidth;
-		a_Y = a_Y - a_ChunkY*cChunk::c_ChunkHeight;
-		a_Z = a_Z - a_ChunkZ*cChunk::c_ChunkWidth;
+		a_X = a_X - a_ChunkX*cChunkDef::Width;
+		a_Y = a_Y - a_ChunkY*cChunkDef::Height;
+		a_Z = a_Z - a_ChunkZ*cChunkDef::Width;
 	}
 	
 	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
@@ -209,11 +231,11 @@ public:
 		// TODO: Use floor() instead of weird if statements
 		// Also fix Y
 		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/cChunk::c_ChunkWidth;
-		if(a_X < 0 && a_X % cChunk::c_ChunkWidth != 0) a_ChunkX--;
+		a_ChunkX = a_X/cChunkDef::Width;
+		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
 		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunk::c_ChunkWidth;
-		if(a_Z < 0 && a_Z % cChunk::c_ChunkWidth != 0) a_ChunkZ--;
+		a_ChunkZ = a_Z/cChunkDef::Width;
+		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
 	}
 
 	void SaveAllChunks();			//tolua_export

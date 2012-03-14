@@ -458,7 +458,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 
 
 		// Old version is 128 blocks high with YZX axis order
-		char ConvertedData[cChunk::c_BlockDataSize];
+		char ConvertedData[cChunkDef::BlockDataSize];
 		int Index = 0;
 		unsigned int InChunkOffset = 0;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) 
@@ -684,11 +684,11 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World)
 {
 	// Crude data integrity check:
-	if (a_UncompressedSize < cChunk::c_BlockDataSize)
+	if (a_UncompressedSize < cChunkDef::BlockDataSize)
 	{
 		LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-			a_UncompressedSize, cChunk::c_BlockDataSize
+			a_UncompressedSize, cChunkDef::BlockDataSize
 		);
 		EraseChunkData(a_Chunk);
 		return false;
@@ -718,11 +718,11 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 	cEntityList      Entities;
 	cBlockEntityList BlockEntities;
 	
-	if (a_UncompressedSize > cChunk::c_BlockDataSize)
+	if (a_UncompressedSize > cChunkDef::BlockDataSize)
 	{
 		Json::Value root;   // will contain the root value after parsing.
 		Json::Reader reader;
-		if ( !reader.parse( UncompressedData.data() + cChunk::c_BlockDataSize, root, false ) )
+		if ( !reader.parse( UncompressedData.data() + cChunkDef::BlockDataSize, root, false ) )
 		{
 			LOGERROR("Failed to parse trailing JSON in chunk [%d, %d]!",
 				a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
@@ -734,7 +734,16 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 		}
 	}
 
-	a_World->ChunkDataLoaded(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, UncompressedData.data(), Entities, BlockEntities);
+	a_World->ChunkDataLoaded(
+		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
+		UncompressedData.data(),
+		UncompressedData.data() + cChunkDef::MetaOffset,
+		UncompressedData.data() + cChunkDef::LightOffset,
+		UncompressedData.data() + cChunkDef::SkyLightOffset,
+		NULL,
+		Entities,
+		BlockEntities
+	);
 
 	return true;
 }
@@ -771,8 +780,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 {
 	// Serialize the chunk:
 	cJsonChunkSerializer Serializer;
-	a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer);
-	if (Serializer.GetBlockData().empty())
+	if (!a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
 	{
 		// Chunk not valid
 		LOG("cWSSCompact: Trying to save chunk [%d, %d, %d] that has no data, ignoring request.", a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);
@@ -780,7 +788,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	}
 
 	AString Data;
-	std::swap(Serializer.GetBlockData(), Data);
+	Data.assign(Serializer.GetBlockData(), cChunkDef::BlockDataSize);
 	if (Serializer.HasJsonData())
 	{
 		AString JsonData;

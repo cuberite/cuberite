@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cWorldGenerator_Test.h"
-#include "cChunk.h"
 #include "BlockID.h"
 
 
@@ -11,10 +10,10 @@
 
 void cWorldGenerator_Test::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
 {
-	memset(a_BlockData, E_BLOCK_DIRT, cChunk::c_NumBlocks);
-	for(int x = 0; x < cChunk::c_ChunkWidth; x++) 
+	memset(a_BlockData, E_BLOCK_DIRT, cChunkDef::NumBlocks);
+	for(int x = 0; x < cChunkDef::Width; x++) 
 	{
-		for(int z = 0; z < cChunk::c_ChunkWidth; z++)
+		for(int z = 0; z < cChunkDef::Width; z++)
 		{
 			a_BlockData[MakeIndex(x, 0, z)] = E_BLOCK_BEDROCK;
 		}

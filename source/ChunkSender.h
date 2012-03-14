@@ -26,7 +26,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 #pragma once
 
 #include "cIsThread.h"
-#include "cChunk.h"
+#include "ChunkDef.h"
 #include "packets/cPacket.h"
 
 
@@ -42,7 +42,7 @@ class cClientHandle;
 
 class cChunkSender:
 	public cIsThread,
-	public cChunkDataCallback
+	public cChunkDataCollector
 {
 	typedef cIsThread super;
 public:
@@ -101,18 +101,17 @@ protected:
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	
 	// Data about the chunk that is being sent:
-	char       m_BlockData[cChunk::c_BlockDataSize];
-	char       m_BiomeData[cChunk::c_ChunkWidth * cChunk::c_ChunkWidth];
+	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
+	BLOCKTYPE  m_BiomeData[cChunkDef::Width * cChunkDef::Width];
 	PacketList m_Packets;  // Accumulator for the entity-packets to send
 	
 	// cIsThread override:
 	virtual void Execute(void) override;
 	
-	// cChunkDataCallback overrides:
+	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BlockData(const char * a_Data) override;
-	virtual void Entity(cEntity * a_Entity) override;
-	virtual void BlockEntity(cBlockEntity * a_Entity) override;
+	virtual void Entity       (cEntity *      a_Entity) override;
+	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
 	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == NULL
 	void SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);

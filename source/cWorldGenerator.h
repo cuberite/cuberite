@@ -5,8 +5,15 @@
 
 
 
-#include "cChunk.h"
+#include "ChunkDef.h"
 #include "MersenneTwister.h"
+
+
+
+
+
+// fwd:
+class cWorld;
 
 
 
@@ -29,11 +36,11 @@ protected:
 	// Thread-unsafe:
 	MTRand r1;
 	
-	void GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, char * a_BlockData);
+	void GenerateOre(char a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, BLOCKTYPE * a_BlockData);
 
 	static unsigned int MakeIndex(int x, int y, int z );
 
-	virtual void GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData);
+	virtual void GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData);
 	
 	virtual void GenerateFoliage(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 

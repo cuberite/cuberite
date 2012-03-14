@@ -57,7 +57,7 @@ sSetBlock::sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockM
 	, BlockType( a_BlockType )
 	, BlockMeta( a_BlockMeta )
 {
-	cChunkMap::AbsoluteToRelative(x, y, z, ChunkX, ChunkZ);
+	cChunkDef::AbsoluteToRelative(x, y, z, ChunkX, ChunkZ);
 }
 
 
@@ -72,10 +72,6 @@ cChunk::cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_Wor
 	, m_PosX( a_X )
 	, m_PosY( a_Y )
 	, m_PosZ( a_Z )
-	, m_BlockType( m_BlockData ) // Offset the pointers
-	, m_BlockMeta( m_BlockType + c_NumBlocks )
-	, m_BlockLight( m_BlockMeta + c_NumBlocks / 2 )
-	, m_BlockSkyLight( m_BlockLight + c_NumBlocks / 2 )
 	, m_BlockTickNum( 0 )
 	, m_BlockTickX( 0 )
 	, m_BlockTickY( 0 )
@@ -220,7 +216,11 @@ void cChunk::MarkLoadFailed(void)
 
 void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
-	a_Callback.BlockData(m_BlockData);
+	a_Callback.HeightMap    (&m_HeightMap);
+	a_Callback.BlockTypes   (m_BlockTypes);
+	a_Callback.BlockMeta    (m_BlockMeta);
+	a_Callback.BlockLight   (m_BlockLight);
+	a_Callback.BlockSkyLight(m_BlockSkyLight);
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -237,9 +237,30 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 
 
-void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cChunk::SetAllData(
+	const BLOCKTYPE * a_BlockTypes, 
+	const BLOCKTYPE * a_BlockMeta,
+	const BLOCKTYPE * a_BlockLight,
+	const BLOCKTYPE * a_BlockSkyLight,
+	const HeightMap * a_HeightMap,
+	cEntityList & a_Entities, 
+	cBlockEntityList & a_BlockEntities
+)
 {
-	memcpy(m_BlockData, a_BlockData, sizeof(m_BlockData));
+	if (a_HeightMap != NULL)
+	{
+		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
+	}
+	
+	memcpy(m_BlockTypes,    a_BlockTypes,    sizeof(m_BlockTypes));
+	memcpy(m_BlockMeta,     a_BlockMeta,     sizeof(m_BlockMeta));
+	memcpy(m_BlockLight,    a_BlockLight,    sizeof(m_BlockLight));
+	memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
+	
+	if (a_HeightMap == NULL)
+	{
+		CalculateHeightmap();
+	}
 
 	// Clear the internal entities:
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
@@ -276,8 +297,6 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 	// Create block entities that the loader didn't load; fill them with defaults
 	CreateBlockEntities();
 
-	CalculateHeightmap();
-	
 	m_HasLoadFailed = false;
 }
 
@@ -285,20 +304,21 @@ void cChunk::SetAllData(const char * a_BlockData, cEntityList & a_Entities, cBlo
 
 
 
-/// Copies m_BlockData into a_Blocks, only the block types
-void cChunk::GetBlocks(char * a_Blocks)
+void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	memcpy(a_Blocks, m_BlockData, cChunk::c_NumBlocks);
+	memcpy(a_BlockTypes, m_BlockTypes, NumBlocks);
 }
 
 
 
 
 
-/// Copies m_BlockData into a_Blocks, only the block types
-void cChunk::GetBlockData(char * a_BlockData)
+void cChunk::GetBlockData(BLOCKTYPE * a_BlockData)
 {
-	memcpy(a_BlockData, m_BlockData, cChunk::c_BlockDataSize);
+	memcpy(a_BlockData, m_BlockTypes, NumBlocks);
+	memcpy(a_BlockData + MetaOffset,     m_BlockMeta,     NumBlocks / 2);
+	memcpy(a_BlockData + LightOffset,    m_BlockLight,    NumBlocks / 2);
+	memcpy(a_BlockData + SkyLightOffset, m_BlockSkyLight, NumBlocks / 2);
 }
 
 
@@ -367,13 +387,13 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			Vector3i BlockPos = IndexToCoordinate( index );
 
 #if (MINECRAFT_1_2_2 == 1)
-			unsigned int Coords = BlockPos.y | BlockPos.z << 8 | BlockPos.x << 12;
-			unsigned int Blocks = GetNibble( m_BlockMeta, index ) | (m_BlockType[index]<<4);
+			unsigned int Coords = BlockPos.y | (BlockPos.z << 8) | (BlockPos.x << 12);
+			unsigned int Blocks = GetNibble( m_BlockMeta, index ) | (m_BlockTypes[index] << 4);
 			MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
 #else
 			MultiBlock.m_BlockCoordinates[i] = (BlockPos.z&0xf) | (BlockPos.x&0xf)<<4 | (BlockPos.y&0xff)<<8;
 			//LOG("X: %i Y: %i Z: %i Combo: 0x%04x", X, Y, Z, MultiBlock.m_BlockCoordinates[i] );
-			MultiBlock.m_BlockTypes[i] = m_BlockType[index];
+			MultiBlock.m_BlockTypes[i] = m_BlockTypes[index];
 			MultiBlock.m_BlockMetas[i] = GetNibble( m_BlockMeta, index );
 #endif
 		}
@@ -392,7 +412,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			BlockChange.m_PosX = WorldPos.x;
 			BlockChange.m_PosY = (unsigned char)WorldPos.y;
 			BlockChange.m_PosZ = WorldPos.z;
-			BlockChange.m_BlockType = m_BlockType[index];
+			BlockChange.m_BlockType = m_BlockTypes[index];
 			BlockChange.m_BlockMeta = GetNibble( m_BlockMeta, index );
 			Broadcast( BlockChange );
 		}
@@ -510,14 +530,14 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 
 	for(int i = 0; i < 50; i++)
 	{
-		m_BlockTickX = (m_BlockTickX + RandomX) % c_ChunkWidth;
-		m_BlockTickY = (m_BlockTickY + RandomY) % c_ChunkHeight;
-		m_BlockTickZ = (m_BlockTickZ + RandomZ) % c_ChunkWidth;
+		m_BlockTickX = (m_BlockTickX + RandomX) % Width;
+		m_BlockTickY = (m_BlockTickY + RandomY) % Height;
+		m_BlockTickZ = (m_BlockTickZ + RandomZ) % Width;
 
-		if( m_BlockTickY > m_HeightMap[ m_BlockTickX + m_BlockTickZ*c_ChunkWidth ] ) continue; // It's all air up here
+		if( m_BlockTickY > m_HeightMap[ m_BlockTickX + m_BlockTickZ * Width ] ) continue; // It's all air up here
 
 		unsigned int Index = MakeIndexNoCheck( m_BlockTickX, m_BlockTickY, m_BlockTickZ );
-		char ID = m_BlockType[Index];
+		char ID = m_BlockTypes[Index];
 		switch( ID )
 		{
 			/*
@@ -543,7 +563,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 #if AXIS_ORDER == AXIS_ORDER_YZX
 				char AboveBlock = GetBlock( Index+1 );
 #elif AXIS_ORDER == AXIS_ORDER_XZY
-				char AboveBlock = GetBlock( Index + (c_ChunkWidth*c_ChunkWidth) );
+				char AboveBlock = GetBlock( Index + (Width*Width) );
 #endif
 				if (!( (AboveBlock == 0) || (g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock]) ) ) //changed to not allow grass if any one hit object is on top
 				{
@@ -554,7 +574,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		case E_BLOCK_SAPLING: //todo: check meta of sapling. change m_World->GrowTree to look change trunk and leaves based on meta of sapling
 			{
 				FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_AIR, GetNibble( m_BlockMeta, Index ) );
-				m_World->GrowTree( m_BlockTickX + m_PosX*c_ChunkWidth, m_BlockTickY, m_BlockTickZ + m_PosZ*c_ChunkWidth );
+				m_World->GrowTree( m_BlockTickX + m_PosX*Width, m_BlockTickY, m_BlockTickZ + m_PosZ*Width );
 			}
 			break;
 		case E_BLOCK_LEAVES: //todo, http://www.minecraftwiki.net/wiki/Data_values#Leaves
@@ -582,11 +602,11 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 
 int cChunk::GetHeight( int a_X, int a_Z )
 {
-	ASSERT((a_X >= 0) && (a_X < c_ChunkWidth) && (a_Z >= 0) && (a_Z < c_ChunkWidth));
+	ASSERT((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width));
 	
-	if ((a_X >= 0) && (a_X < c_ChunkWidth) && (a_Z >= 0) && (a_Z < c_ChunkWidth))
+	if ((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width))
 	{
-		return m_HeightMap[a_X + a_Z * c_ChunkWidth];
+		return m_HeightMap[a_X + a_Z * Width];
 	}
 	return 0;
 }
@@ -597,29 +617,29 @@ int cChunk::GetHeight( int a_X, int a_Z )
 
 void cChunk::CreateBlockEntities(void)
 {
-	for (int x = 0; x < c_ChunkWidth; x++)
+	for (int x = 0; x < Width; x++)
 	{
-		for (int z = 0; z < c_ChunkWidth; z++)
+		for (int z = 0; z < Width; z++)
 		{
-			for (int y = 0; y < c_ChunkHeight; y++)
+			for (int y = 0; y < Height; y++)
 			{
-				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)m_BlockData[ MakeIndex( x, y, z ) ];
+				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)m_BlockTypes[ MakeIndex( x, y, z ) ];
 				switch ( BlockType )
 				{
 					case E_BLOCK_CHEST:
 					{
-						if (!HasBlockEntityAt(x + m_PosX * c_ChunkWidth, y + m_PosY * c_ChunkHeight, z + m_PosZ * c_ChunkWidth))
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cChestEntity( x + m_PosX * c_ChunkWidth, y + m_PosY * c_ChunkHeight, z + m_PosZ * c_ChunkWidth, m_World) );
+							m_BlockEntities.push_back( new cChestEntity( x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
 						}
 						break;
 					}
 					
 					case E_BLOCK_FURNACE:
 					{
-						if (!HasBlockEntityAt(x + m_PosX * c_ChunkWidth, y + m_PosY * c_ChunkHeight, z + m_PosZ * c_ChunkWidth))
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX * c_ChunkWidth, y + m_PosY * c_ChunkHeight, z + m_PosZ * c_ChunkWidth, m_World) );
+							m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
 						}
 						break;
 					}
@@ -627,9 +647,9 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_SIGN_POST:
 					case E_BLOCK_WALLSIGN:
 					{
-						if (!HasBlockEntityAt(x + m_PosX * c_ChunkWidth, y + m_PosY * c_ChunkHeight, z + m_PosZ * c_ChunkWidth))
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX * c_ChunkWidth, y + m_PosY * c_ChunkHeight, z + m_PosZ * c_ChunkWidth, m_World) );
+							m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
 						}
 						break;
 					}
@@ -645,16 +665,16 @@ void cChunk::CreateBlockEntities(void)
 
 void cChunk::CalculateHeightmap()
 {
-	for (int x = 0; x < c_ChunkWidth; x++)
+	for (int x = 0; x < Width; x++)
 	{
-		for (int z = 0; z < c_ChunkWidth; z++)
+		for (int z = 0; z < Width; z++)
 		{
-			for (int y = c_ChunkHeight-1; y > -1; y--)
+			for (int y = Height - 1; y > -1; y--)
 			{
 				int index = MakeIndex( x, y, z );
-				if (m_BlockData[index] != E_BLOCK_AIR)
+				if (m_BlockTypes[index] != E_BLOCK_AIR)
 				{
-					m_HeightMap[x + z * c_ChunkWidth] = (unsigned char)y;
+					m_HeightMap[x + z * Width] = (unsigned char)y;
 					break;
 				}
 			}  // for y
@@ -669,17 +689,17 @@ void cChunk::CalculateHeightmap()
 void cChunk::CalculateLighting()
 {
 	// Calculate sunlight
-	memset(m_BlockSkyLight, 0xff, c_NumBlocks / 2 ); // Set all to fully lit, so everything above HeightMap is lit
-	for (int x = 0; x < c_ChunkWidth; x++)
+	memset(m_BlockSkyLight, 0xff, NumBlocks / 2 ); // Set all to fully lit, so everything above HeightMap is lit
+	for (int x = 0; x < Width; x++)
 	{
-		for (int z = 0; z < c_ChunkWidth; z++)
+		for (int z = 0; z < Width; z++)
 		{
 			char sunlight = 0xf;
-			for (int y = m_HeightMap[x + z*c_ChunkWidth]; y > -1; y--)
+			for (int y = m_HeightMap[x + z*Width]; y > -1; y--)
 			{
 				int index = MakeIndexNoCheck(x, y, z);
 
-				if( g_BlockTransparent[ (int)m_BlockData[index] ] == false )
+				if( g_BlockTransparent[ (int)m_BlockTypes[index] ] == false )
 				{
 					sunlight = 0x0;
 				}
@@ -689,11 +709,11 @@ void cChunk::CalculateLighting()
 	}
 
 	// Calculate blocklights
-	for (int x = 0; x < c_ChunkWidth; x++)
+	for (int x = 0; x < Width; x++)
 	{
-		for (int z = 0; z < c_ChunkWidth; z++)
+		for (int z = 0; z < Width; z++)
 		{
-			int MaxHeight = m_HeightMap[x + z*c_ChunkWidth];
+			int MaxHeight = m_HeightMap[x + z * Width];
 			for (int y = 0; y < MaxHeight; y++)
 			{
 				char BlockID = GetBlock(x, y, z);
@@ -717,22 +737,22 @@ void cChunk::CalculateLighting()
 
 void cChunk::SpreadLight(char* a_LightBuffer)
 {
-	// Spread the sunlight
-	for(int x = 0; x < c_ChunkWidth; x++)	for(int z = 0; z < c_ChunkWidth; z++)	for(int y = 0; y < c_ChunkHeight; y++)
+	// Spread the light
+	for(int x = 0; x < Width; x++)	for(int z = 0; z < Width; z++)	for(int y = 0; y < Height; y++)
 	{
 		int index = MakeIndexNoCheck(x, y, z);
-		if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
+		if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 		{
-			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockData[index] ]);
+			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]);
 		}
 	}
 
-	for(int x = c_ChunkWidth-1; x > -1; x--) for(int z = c_ChunkWidth-1; z > -1; z--) for(int y = c_ChunkHeight-1; y > -1; y--)
+	for(int x = Width-1; x > -1; x--) for(int z = Width-1; z > -1; z--) for(int y = Height-1; y > -1; y--)
 	{
 		int index = MakeIndexNoCheck(x, y, z);
-		if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
+		if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 		{
-			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockData[index] ]);
+			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]);
 		}
 	}
 
@@ -745,39 +765,39 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	char * LeftSky = NULL, *RightSky = NULL;
 	if (LeftChunk->IsValid())
 	{
-		LeftSky = (a_LightBuffer == m_BlockSkyLight) ? LeftChunk->pGetSkyLight() : LeftChunk->pGetLight();
+		LeftSky = (a_LightBuffer == m_BlockSkyLight) ? LeftChunk->m_BlockSkyLight : LeftChunk->m_BlockLight;
 	}
 	if (RightChunk->IsValid())
 	{
-		RightSky = (a_LightBuffer == m_BlockSkyLight) ? RightChunk->pGetSkyLight() : RightChunk->pGetLight();
+		RightSky = (a_LightBuffer == m_BlockSkyLight) ? RightChunk->m_BlockSkyLight : RightChunk->m_BlockLight;
 	}
 	
-	for (int z = 0; z < c_ChunkWidth; z++) for(int y = 0; y < c_ChunkHeight; y++)
+	for (int z = 0; z < Width; z++) for(int y = 0; y < Height; y++)
 	{
 		if (LeftSky != NULL)
 		{
 			int index = MakeIndexNoCheck( 0, y, z );
-			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
+			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 			{
 				char CurrentLight = GetNibble( a_LightBuffer, 0, y, z );
-				char LeftLight = GetNibble( LeftSky, c_ChunkWidth-1, y, z );
-				if( LeftLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ] )
+				char LeftLight = GetNibble( LeftSky, Width-1, y, z );
+				if( LeftLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
 				{
-					SetNibble( LeftSky, c_ChunkWidth - 1, y, z, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ]) );
+					SetNibble( LeftSky, Width - 1, y, z, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
 					bCalcLeft = true;
 				}
 			}
 		}
 		if (RightSky != NULL)
 		{
-			int index = MakeIndexNoCheck( c_ChunkWidth-1, y, z );
-			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
+			int index = MakeIndexNoCheck( Width - 1, y, z );
+			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 			{
-				char CurrentLight = GetNibble( a_LightBuffer, c_ChunkWidth-1, y, z );
+				char CurrentLight = GetNibble( a_LightBuffer, Width-1, y, z );
 				char RightLight = GetNibble( RightSky, 0, y, z );
-				if( RightLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ] )
+				if( RightLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
 				{
-					SetNibble( RightSky, 0, y, z,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ]) );
+					SetNibble( RightSky, 0, y, z,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
 					bCalcRight = true;
 				}
 			}
@@ -790,38 +810,38 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 	char * FrontSky = NULL, * BackSky = NULL;
 	if (FrontChunk->IsValid())
 	{
-		FrontSky = (a_LightBuffer == m_BlockSkyLight) ? FrontChunk->pGetSkyLight() : FrontChunk->pGetLight();
+		FrontSky = (a_LightBuffer == m_BlockSkyLight) ? FrontChunk->m_BlockSkyLight : FrontChunk->m_BlockLight;
 	}
 	if (BackChunk->IsValid())
 	{
-		BackSky = (a_LightBuffer == m_BlockSkyLight) ? BackChunk->pGetSkyLight() : BackChunk->pGetLight();
+		BackSky = (a_LightBuffer == m_BlockSkyLight) ? BackChunk->m_BlockSkyLight : BackChunk->m_BlockLight;
 	}
-	for(int x = 0; x < c_ChunkWidth; x++)	for(int y = 0; y < c_ChunkHeight; y++)
+	for(int x = 0; x < Width; x++)	for(int y = 0; y < Height; y++)
 	{
 		if (FrontSky != NULL)
 		{
 			int index = MakeIndexNoCheck( x, y, 0 );
-			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
+			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 			{
-				char CurrentLight = GetNibble( a_LightBuffer, x, y, 0 );
-				char FrontLight = GetNibble( FrontSky, x, y, c_ChunkWidth-1 );
-				if( FrontLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ] )
+				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, x, y, 0 );
+				BLOCKTYPE FrontLight = GetNibble( FrontSky, x, y, Width-1 );
+				if( FrontLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
 				{
-					SetNibble( FrontSky, x, y, c_ChunkWidth-1,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ]) );
+					SetNibble( FrontSky, x, y, Width-1,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
 					bCalcFront = true;
 				}
 			}
 		}
 		if (BackSky != NULL)
 		{
-			int index = MakeIndexNoCheck( x, y, c_ChunkWidth-1 );
-			if( g_BlockSpreadLightFalloff[ m_BlockData[index] ] > 0 )
+			int index = MakeIndexNoCheck( x, y, Width-1 );
+			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
 			{
-				char CurrentLight = GetNibble( a_LightBuffer, x, y, c_ChunkWidth-1 );
-				char BackLight = GetNibble( BackSky, x, y, 0 );
-				if ( BackLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ] )
+				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, x, y, Width-1 );
+				BLOCKTYPE BackLight = GetNibble( BackSky, x, y, 0 );
+				if ( BackLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
 				{
-					SetNibble( BackSky, x, y, 0, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockData[index] ]) );
+					SetNibble( BackSky, x, y, 0, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
 					bCalcBack = true;
 				}
 			}
@@ -839,9 +859,9 @@ void cChunk::SpreadLight(char* a_LightBuffer)
 
 
 
-void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
+void cChunk::SetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta )
 {
-	if (a_X < 0 || a_X >= c_ChunkWidth || a_Y < 0 || a_Y >= c_ChunkHeight || a_Z < 0 || a_Z >= c_ChunkWidth)
+	if (a_X < 0 || a_X >= Width || a_Y < 0 || a_Y >= Height || a_Z < 0 || a_Z >= Width)
 	{
 		return;  // Clip
 	}
@@ -849,9 +869,9 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	ASSERT(IsValid());  // Is this chunk loaded / generated?
 	
 	int index = MakeIndexNoCheck( a_X, a_Y, a_Z );
-	char OldBlockMeta = GetNibble( m_BlockMeta, index );
-	char OldBlockType = m_BlockType[index];
-	m_BlockType[index] = a_BlockType;
+	BLOCKTYPE OldBlockMeta = GetNibble( m_BlockMeta, index );
+	BLOCKTYPE OldBlockType = m_BlockTypes[index];
+	m_BlockTypes[index] = a_BlockType;
 
 	SetNibble( m_BlockMeta, index, a_BlockMeta );
 
@@ -878,19 +898,19 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 	}
 
 	// Update heightmap, if needed:
-	if (a_Y >= m_HeightMap[a_X + a_Z * c_ChunkWidth])
+	if (a_Y >= m_HeightMap[a_X + a_Z * Width])
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)a_Y;
+			m_HeightMap[a_X + a_Z * Width] = (unsigned char)a_Y;
 		}
 		else
 		{
 			for (int y = a_Y - 1; y > 0; --y)
 			{
-				if (m_BlockData[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
+				if (m_BlockTypes[MakeIndex(a_X, y, a_Z)] != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)y;
+					m_HeightMap[a_X + a_Z * Width] = (unsigned char)y;
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -938,23 +958,23 @@ void cChunk::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 
 
-void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta)
+void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
-	ASSERT(!((a_X < 0 || a_X >= c_ChunkWidth || a_Y < 0 || a_Y >= c_ChunkHeight || a_Z < 0 || a_Z >= c_ChunkWidth)));
+	ASSERT(!((a_X < 0 || a_X >= Width || a_Y < 0 || a_Y >= Height || a_Z < 0 || a_Z >= Width)));
 
 	ASSERT(IsValid());
 	
 	const int index = MakeIndexNoCheck( a_X, a_Y, a_Z );
-	const char OldBlock = m_BlockType[index];
-	const char OldBlockMeta = GetNibble( m_BlockMeta, index );
-	if (OldBlock == a_BlockType && OldBlockMeta == a_BlockMeta)
+	const BLOCKTYPE OldBlock = m_BlockTypes[index];
+	const BLOCKTYPE OldBlockMeta = GetNibble( m_BlockMeta, index );
+	if ((OldBlock == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
 		return;
 	}
 
 	MarkDirty();
 	
-	m_BlockType[index] = a_BlockType;
+	m_BlockTypes[index] = a_BlockType;
 
 	{
 		cCSLock Lock(m_CSBlockLists);
@@ -974,19 +994,19 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 	}
 
 	// Update heightmap, if needed:
-	if (a_Y >= m_HeightMap[a_X + a_Z * c_ChunkWidth])
+	if (a_Y >= m_HeightMap[a_X + a_Z * Width])
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)a_Y;
+			m_HeightMap[a_X + a_Z * Width] = (unsigned char)a_Y;
 		}
 		else
 		{
 			for (int y = a_Y - 1; y > 0; --y)
 			{
-				if (m_BlockData[MakeIndexNoCheck(a_X, y, a_Z)] != E_BLOCK_AIR)
+				if (m_BlockTypes[MakeIndexNoCheck(a_X, y, a_Z)] != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_X + a_Z * c_ChunkWidth] = (unsigned char)y;
+					m_HeightMap[a_X + a_Z * Width] = (unsigned char)y;
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1027,7 +1047,7 @@ void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
 			BlockChange.m_PosZ = WorldPos.z;
 			if( index != INDEX_OUT_OF_RANGE )
 			{
-				BlockChange.m_BlockType = m_BlockType[ index ];
+				BlockChange.m_BlockType = m_BlockTypes[ index ];
 				BlockChange.m_BlockMeta = GetNibble( m_BlockMeta, index );
 			} // else it's both 0
 			a_Client->Send( BlockChange );
@@ -1251,21 +1271,21 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 
 
-char cChunk::GetBlock( int a_X, int a_Y, int a_Z )
+BLOCKTYPE cChunk::GetBlock( int a_X, int a_Y, int a_Z )
 {
-	if ((a_X < 0) || (a_X >= c_ChunkWidth) || (a_Y < 0) || (a_Y >= c_ChunkHeight) || (a_Z < 0) || (a_Z >= c_ChunkWidth)) return 0; // Clip
+	if ((a_X < 0) || (a_X >= Width) || (a_Y < 0) || (a_Y >= Height) || (a_Z < 0) || (a_Z >= Width)) return 0; // Clip
 
-	return m_BlockType[ MakeIndexNoCheck( a_X, a_Y, a_Z ) ];
+	return m_BlockTypes[ MakeIndexNoCheck( a_X, a_Y, a_Z ) ];
 }
 
 
 
 
 
-char cChunk::GetBlock( int a_BlockIdx )
+BLOCKTYPE cChunk::GetBlock( int a_BlockIdx )
 {
-	if( a_BlockIdx < 0 || a_BlockIdx >= c_NumBlocks ) return 0;
-	return m_BlockType[ a_BlockIdx ];
+	if( a_BlockIdx < 0 || a_BlockIdx >= NumBlocks ) return 0;
+	return m_BlockTypes[ a_BlockIdx ];
 }
 
 
@@ -1381,22 +1401,11 @@ void cChunk::Broadcast( const cPacket * a_Packet, cClientHandle* a_Exclude)
 
 
 
-void cChunk::CopyBlockDataFrom(const char * a_NewBlockData)
-{
-	// Copies all blockdata, recalculates heightmap (used by chunk loaders)
-	memcpy(m_BlockData, a_NewBlockData, sizeof(m_BlockData));
-	CalculateHeightmap();
-}
-
-
-
-
-
 void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z)
 {
 	a_Y = a_ChunkY;
-	a_X = m_PosX * c_ChunkWidth + a_ChunkX;
-	a_Z = m_PosZ * c_ChunkWidth + a_ChunkZ;
+	a_X = m_PosX * Width + a_ChunkX;
+	a_Z = m_PosZ * Width + a_ChunkZ;
 }
 
 
@@ -1405,7 +1414,7 @@ void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, i
 
 Vector3i cChunk::PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
-	return Vector3i( m_PosX * c_ChunkWidth + a_ChunkX, m_PosY * c_ChunkHeight + a_ChunkY, m_PosZ * c_ChunkWidth + a_ChunkZ );
+	return Vector3i( m_PosX * Width + a_ChunkX, m_PosY * Height + a_ChunkY, m_PosZ * Width + a_ChunkZ );
 }
 
 

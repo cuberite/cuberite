@@ -4,7 +4,7 @@
 #include "BlockID.h"
 #include "cWorld.h"
 #include "cRedstone.h"
-#include "cChunk.h"
+#include "ChunkDef.h"
 #include "cClientHandle.h"
 #include "cPickup.h"
 #include "cBlockToPickup.h"
@@ -190,7 +190,7 @@ cWorld::cWorld( const AString & a_WorldName )
 
 	MTRand r1;
 	m_SpawnX = (double)((r1.randInt()%1000)-500);
-	m_SpawnY = cChunk::c_ChunkHeight;
+	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = (double)((r1.randInt()%1000)-500);
 	m_WorldSeed = r1.randInt();
 	m_GameMode = eGameMode_Creative;
@@ -994,9 +994,18 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cWorld::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cWorld::ChunkDataLoaded(
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	const BLOCKTYPE * a_BlockTypes,
+	const BLOCKTYPE * a_BlockMeta,
+	const BLOCKTYPE * a_BlockLight,
+	const BLOCKTYPE * a_BlockSkyLight,
+	const cChunkDef::HeightMap * a_HeightMap,
+	cEntityList & a_Entities, 
+	cBlockEntityList & a_BlockEntities
+)
 {
-	m_ChunkMap->ChunkDataLoaded(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+	m_ChunkMap->ChunkDataLoaded(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
 	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
@@ -1004,9 +1013,18 @@ void cWorld::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cha
 
 
 
-void cWorld::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cWorld::ChunkDataGenerated(
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	const BLOCKTYPE * a_BlockTypes,
+	const BLOCKTYPE * a_BlockMeta,
+	const BLOCKTYPE * a_BlockLight,
+	const BLOCKTYPE * a_BlockSkyLight,
+	const cChunkDef::HeightMap * a_HeightMap,
+	cEntityList & a_Entities, 
+	cBlockEntityList & a_BlockEntities
+)
 {
-	m_ChunkMap->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData, a_Entities, a_BlockEntities);
+	m_ChunkMap->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
 	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
 }
 
@@ -1023,16 +1041,16 @@ bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCa
 
 
 
-bool cWorld::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks)
+bool cWorld::GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
 {
-	return m_ChunkMap->GetChunkBlocks(a_ChunkX, a_ChunkY, a_ChunkZ, a_Blocks);
+	return m_ChunkMap->GetChunkBlockTypes(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockTypes);
 }
 
 
 
 
 
-bool cWorld::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+bool cWorld::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData)
 {
 	return m_ChunkMap->GetChunkBlockData(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData);
 }

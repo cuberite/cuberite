@@ -14,7 +14,7 @@
 #include "packets/cPacket.h"
 #include "Vector3d.h"
 #include "cSocketThreads.h"
-#include "cChunk.h"
+#include "ChunkDef.h"
 
 #include "packets/cPacket_KeepAlive.h"
 #include "packets/cPacket_PlayerPosition.h"

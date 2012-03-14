@@ -16,7 +16,6 @@
 #include "cItem.h"
 #include "cRoot.h"
 #include "cTracer.h"
-#include "cChunk.h"
 
 #include "packets/cPacket_TeleportEntity.h"
 #include "packets/cPacket_PickupSpawn.h"

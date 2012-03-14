@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cPacket_MapChunk.h"
-#include "../cChunk.h"
+#include "../ChunkDef.h"
 
 #include "zlib.h"
 
@@ -36,15 +36,15 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 	m_UnusedInt = 0;
 
 	
-	const int BlockDataSize = (cChunk::c_ChunkHeight / 16) * (4096 + 2048 + 2048 + 2048);
-	const int BiomeDataSize = cChunk::c_ChunkWidth * cChunk::c_ChunkWidth;
+	const int BlockDataSize = (cChunkDef::Height / 16) * (4096 + 2048 + 2048 + 2048);
+	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
 	char AllData [ BlockDataSize + BiomeDataSize ];
 
 #if AXIS_ORDER == AXIS_ORDER_YZX
 	memset( AllData, 0, BlockDataSize );
 
 	unsigned int iterator = 0;
-	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
+	for ( int i = 0; i < (cChunkDef::Height / 16); ++i )
 	{
 		m_BitMap1 |= (1 << i); // This tells what chunks are sent. Use this to NOT send air only chunks (right now everything is sent)
 		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z ) for( int x = 0; x < 16; ++x )
@@ -56,8 +56,8 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 	}
 	
 	// Send block metadata:
-	char * Meta = a_BlockData + cChunk::c_NumBlocks;
-	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
+	char * Meta = a_BlockData + cChunkDef::NumBlocks;
+	for ( int i = 0; i < (cChunkDef::Height / 16); ++i )
 	{
 		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
@@ -70,8 +70,8 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 	}
 	
 	// Send block light:
-	char * Light = Meta + cChunk::c_NumBlocks / 2;
-	for ( int i = 0; i < (cChunk::c_ChunkHeight / 16); ++i )
+	char * Light = Meta + cChunkDef::NumBlocks / 2;
+	for ( int i = 0; i < (cChunkDef::Height / 16); ++i )
 	{
 		for ( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
@@ -84,8 +84,8 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 	}
 	
 	// Send sky light:
-	char * SkyLight = Light + cChunk::c_NumBlocks / 2;
-	for( int i = 0; i < (cChunk::c_ChunkHeight/16); ++i )
+	char * SkyLight = Light + cChunkDef::NumBlocks / 2;
+	for( int i = 0; i < (cChunkDef::Height/16); ++i )
 	{
 		for( int y = 0; y < 16; ++y ) for( int z = 0; z < 16; ++z )
 		{
@@ -115,18 +115,18 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 	m_CompressedSize = CompressedSize;
 
 #else
-	m_PosX = a_ChunkX * cChunk::c_ChunkWidth; // It has to be block coordinates
-	m_PosY = (short)(a_ChunkY * cChunk::c_ChunkHeight);
-	m_PosZ = a_ChunkZ * cChunk::c_ChunkWidth;
+	m_PosX = a_ChunkX * cChunkDef::Width; // It has to be block coordinates
+	m_PosY = (short)(a_ChunkY * cChunkDef::Height);
+	m_PosZ = a_ChunkZ * cChunkDef::Width;
 
 	m_SizeX = 15;
 	m_SizeY = 127;
 	m_SizeZ = 15;
 
-	uLongf CompressedSize = compressBound( cChunk::c_BlockDataSize );
+	uLongf CompressedSize = compressBound( cChunkDef::BlockDataSize );
 	char * CompressedBlockData = new char[CompressedSize];
 
-	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)a_BlockData, cChunk::c_BlockDataSize, Z_DEFAULT_COMPRESSION);
+	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)a_BlockData, cChunkDef::BlockDataSize, Z_DEFAULT_COMPRESSION);
 
 	m_CompressedData = CompressedBlockData;
 	m_CompressedSize = CompressedSize;

@@ -170,13 +170,13 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 {
 	// The data arrays, in MCA-native y/z/x ordering (will be reordered for the final chunk data)
-	char BlockData[cChunk::c_BlockDataSize];
-	char * MetaData   = BlockData  + cChunk::c_NumBlocks;
-	char * BlockLight = MetaData   + cChunk::c_NumBlocks / 2;
-	char * SkyLight   = BlockLight + cChunk::c_NumBlocks / 2;
+	BLOCKTYPE BlockData[cChunkDef::BlockDataSize];
+	BLOCKTYPE * MetaData   = BlockData + cChunkDef::MetaOffset;
+	BLOCKTYPE * BlockLight = BlockData + cChunkDef::LightOffset;
+	BLOCKTYPE * SkyLight   = BlockData + cChunkDef::SkyLightOffset;
 	
-	memset(BlockData,  E_BLOCK_AIR, sizeof(BlockData) - cChunk::c_NumBlocks / 2);
-	memset(SkyLight,   0xff,        cChunk::c_NumBlocks / 2);  // By default, data not present in the NBT means air, which means full skylight
+	memset(BlockData,  E_BLOCK_AIR, sizeof(BlockData) - cChunkDef::NumBlocks / 2);
+	memset(SkyLight,   0xff,        cChunkDef::NumBlocks / 2);  // By default, data not present in the NBT means air, which means full skylight
 	
 	// Load the blockdata, blocklight and skylight:
 	cNBTList * Sections = (cNBTList *)a_NBT.FindChildByPath("Level\\Sections");
@@ -225,40 +225,49 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	
 	#if (AXIS_ORDER == AXIS_ORDER_YZX)
 	// Reorder the chunk data - walk the MCA-formatted data sequentially and copy it into the right place in the ChunkData:
-	char ChunkData[cChunk::c_BlockDataSize];
+	BLOCKTYPE ChunkData[cChunkDef::BlockDataSize];
 	memset(ChunkData, 0, sizeof(ChunkData));
 	int Index = 0;  // Index into the MCA-formatted data, incremented sequentially
-	for (int y = 0; y < cChunk::c_ChunkHeight; y++) for (int z = 0; z < cChunk::c_ChunkWidth; z++) for (int x = 0; x < cChunk::c_ChunkWidth; x++)
+	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 	{
 		ChunkData[cChunk::MakeIndex(x, y, z)] = BlockData[Index];
 		Index++;
 	}  // for y/z/x
-	char * ChunkMeta = ChunkData + cChunk::c_NumBlocks;
+	BLOCKTYPE * ChunkMeta = ChunkData + cChunkDef::NumBlocks;
 	Index = 0;
-	for (int y = 0; y < cChunk::c_ChunkHeight; y++) for (int z = 0; z < cChunk::c_ChunkWidth; z++) for (int x = 0; x < cChunk::c_ChunkWidth; x++)
+	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 	{
 		cChunk::SetNibble(ChunkMeta, x, y, z, MetaData[Index / 2] >> ((Index % 2) * 4));
 		Index++;
 	}  // for y/z/x
-	char * ChunkBlockLight = ChunkMeta + cChunk::c_NumBlocks / 2;
+	BLOCKTYPE * ChunkBlockLight = ChunkMeta + cChunkDef::NumBlocks / 2;
 	Index = 0;
-	for (int y = 0; y < cChunk::c_ChunkHeight; y++) for (int z = 0; z < cChunk::c_ChunkWidth; z++) for (int x = 0; x < cChunk::c_ChunkWidth; x++)
+	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 	{
 		cChunk::SetNibble(ChunkBlockLight, x, y, z, BlockLight[Index / 2] >> ((Index % 2) * 4));
 		Index++;
 	}  // for y/z/x
-	char * ChunkSkyLight = ChunkBlockLight + cChunk::c_NumBlocks / 2;
+	BLOCKTYPE * ChunkSkyLight = ChunkBlockLight + cChunkDef::NumBlocks / 2;
 	Index = 0;
-	for (int y = 0; y < cChunk::c_ChunkHeight; y++) for (int z = 0; z < cChunk::c_ChunkWidth; z++) for (int x = 0; x < cChunk::c_ChunkWidth; x++)
+	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 	{
 		cChunk::SetNibble(ChunkSkyLight, x, y, z, SkyLight[Index / 2] >> ((Index % 2) * 4));
 		Index++;
 	}  // for y/z/x
 	#else  // AXIS_ORDER_YZX
-	char * ChunkData = BlockData;
+	BLOCKTYPE * ChunkData = BlockData;
 	#endif  // else AXIS_ORDER_YZX
 	
-	m_World->ChunkDataLoaded(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, ChunkData, Entities, BlockEntities);
+	m_World->ChunkDataLoaded(
+		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
+		ChunkData,
+		ChunkData + cChunkDef::MetaOffset,
+		ChunkData + cChunkDef::LightOffset,
+		ChunkData + cChunkDef::SkyLightOffset,
+		NULL,
+		Entities,
+		BlockEntities
+	);
 	return true;
 }
 

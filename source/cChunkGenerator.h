@@ -17,7 +17,7 @@
 #pragma once
 
 #include "cIsThread.h"
-#include "cChunk.h"
+#include "ChunkDef.h"
 
 
 

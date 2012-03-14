@@ -349,8 +349,8 @@ void cClientHandle::StreamChunks(void)
 
 	ASSERT(m_Player != NULL);
 	
-	int ChunkPosX = FAST_FLOOR_DIV(m_Player->GetPosX(), cChunk::c_ChunkWidth);
-	int ChunkPosZ = FAST_FLOOR_DIV(m_Player->GetPosZ(), cChunk::c_ChunkWidth);
+	int ChunkPosX = FAST_FLOOR_DIV(m_Player->GetPosX(), cChunkDef::Width);
+	int ChunkPosZ = FAST_FLOOR_DIV(m_Player->GetPosZ(), cChunkDef::Width);
 	if ((ChunkPosX == m_LastStreamedChunkX) && (ChunkPosZ == m_LastStreamedChunkZ))
 	{
 		// Already streamed for this position
@@ -1721,8 +1721,8 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX;
 		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ;
 		#else
-		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX / cChunk::c_ChunkWidth;
-		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ / cChunk::c_ChunkWidth;
+		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX / cChunkDef::Width;
+		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ / cChunkDef::Width;
 		#endif
 		bool Found = false;
 		cCSLock Lock(m_CSChunkLists);

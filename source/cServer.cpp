@@ -11,7 +11,7 @@
 #include "cSocket.h"
 #include "cRoot.h"
 #include "cWorld.h"
-#include "cChunk.h"
+#include "ChunkDef.h"
 #include "cPluginManager.h"
 #include "cGroupManager.h"
 #include "cChatColor.h"

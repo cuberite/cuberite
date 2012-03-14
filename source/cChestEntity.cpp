@@ -9,7 +9,6 @@
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cPickup.h"
-#include "cChunk.h"
 #include <json/json.h>
 
 

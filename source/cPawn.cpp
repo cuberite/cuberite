@@ -6,7 +6,6 @@
 #include "cServer.h"
 #include "cWorld.h"
 #include "cPlayer.h"
-#include "cChunk.h"
 #include "cPluginManager.h"
 #include "Vector3d.h"
 #include "BlockID.h"

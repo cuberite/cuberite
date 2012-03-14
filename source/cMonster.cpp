@@ -6,7 +6,6 @@
 #include "cServer.h"
 #include "cClientHandle.h"
 #include "cWorld.h"
-#include "cChunk.h"
 #include "cPlayer.h"
 #include "BlockID.h"
 #include "Defines.h"

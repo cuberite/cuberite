@@ -3,7 +3,7 @@
 
 #include "cPiston.h"
 #include "cRedstone.h"
-#include "cChunk.h"
+#include "ChunkDef.h"
 #include "cPickup.h"
 #include "cBlockToPickup.h"
 #include "cItem.h"

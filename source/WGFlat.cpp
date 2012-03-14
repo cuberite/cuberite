@@ -35,7 +35,7 @@ cWGFlat::cWGFlat(cWorld * a_World) :
 
 void cWGFlat::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
 {
-	int SliceSize = cChunk::c_ChunkWidth * cChunk::c_ChunkWidth;
+	int SliceSize = cChunkDef::Width * cChunkDef::Width;
 	memset(a_BlockData, E_BLOCK_BEDROCK, SliceSize);
 	switch (m_Height)
 	{
@@ -73,18 +73,18 @@ void cWGFlat::GenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_B
 			break;
 		}
 	}
-	memset(a_BlockData + SliceSize * m_Height, E_BLOCK_AIR, cChunk::c_NumBlocks - SliceSize * m_Height);
+	memset(a_BlockData + SliceSize * m_Height, E_BLOCK_AIR, cChunkDef::NumBlocks - SliceSize * m_Height);
 	
 	SliceSize /= 2;  // Nibbles from now on
-	char * Meta = a_BlockData + cChunk::c_NumBlocks;
-	memset(Meta, 0, cChunk::c_NumBlocks / 2);
+	char * Meta = a_BlockData + cChunkDef::NumBlocks;
+	memset(Meta, 0, cChunkDef::NumBlocks / 2);
 	
-	char * SkyLight = Meta + cChunk::c_NumBlocks / 2;
+	char * SkyLight = Meta + cChunkDef::NumBlocks / 2;
 	memset(SkyLight, 0, m_Height * SliceSize);
-	memset(SkyLight + m_Height * SliceSize, 0xff, cChunk::c_NumBlocks / 2 - m_Height * SliceSize);
+	memset(SkyLight + m_Height * SliceSize, 0xff, cChunkDef::NumBlocks / 2 - m_Height * SliceSize);
 	
-	char * BlockLight = SkyLight + cChunk::c_NumBlocks / 2;
-	memset(BlockLight, 0, cChunk::c_NumBlocks / 2);
+	char * BlockLight = SkyLight + cChunkDef::NumBlocks / 2;
+	memset(BlockLight, 0, cChunkDef::NumBlocks / 2);
 }
 
 

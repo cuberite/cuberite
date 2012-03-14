@@ -9,6 +9,7 @@
 #include "BlockID.h"
 #include "cItem.h"
 #include "cPickup.h"
+#include "cChunk.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -198,7 +199,7 @@ void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket
 	
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -217,7 +218,7 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 	// a_Player rclked block entity at the coords specified, handle it
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
@@ -275,7 +276,16 @@ void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cChunkMap::ChunkDataLoaded(
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	const BLOCKTYPE * a_BlockTypes,
+	const BLOCKTYPE * a_BlockMeta,
+	const BLOCKTYPE * a_BlockLight,
+	const BLOCKTYPE * a_BlockSkyLight,
+	const cChunkDef::HeightMap * a_HeightMap,
+	cEntityList & a_Entities, 
+	cBlockEntityList & a_BlockEntities
+)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -283,7 +293,7 @@ void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const 
 	{
 		return;
 	}
-	Chunk->SetAllData(a_BlockData, a_Entities, a_BlockEntities);
+	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
 	Chunk->MarkLoaded();
 }
 
@@ -291,7 +301,16 @@ void cChunkMap::ChunkDataLoaded(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const 
 
 
 
-void cChunkMap::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const char * a_BlockData, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cChunkMap::ChunkDataGenerated(
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	const BLOCKTYPE * a_BlockTypes,
+	const BLOCKTYPE * a_BlockMeta,
+	const BLOCKTYPE * a_BlockLight,
+	const BLOCKTYPE * a_BlockSkyLight,
+	const cChunkDef::HeightMap * a_HeightMap,
+	cEntityList & a_Entities,
+	cBlockEntityList & a_BlockEntities
+)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -299,7 +318,7 @@ void cChunkMap::ChunkDataGenerated(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 	{
 		return;
 	}
-	Chunk->SetAllData(a_BlockData, a_Entities, a_BlockEntities);
+	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
 
 	// TODO: This has to go - lighting takes way too long to execute in a locked ChunkMap!
 	Chunk->CalculateLighting();
@@ -328,7 +347,7 @@ bool cChunkMap::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDat
 
 
 
-bool cChunkMap::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_Blocks)
+bool cChunkMap::GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -336,7 +355,7 @@ bool cChunkMap::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * 
 	{
 		return false;
 	}
-	Chunk->GetBlocks(a_Blocks);
+	Chunk->GetBlockTypes(a_BlockTypes);
 	return true;
 }
 
@@ -344,7 +363,7 @@ bool cChunkMap::GetChunkBlocks(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * 
 
 
 
-bool cChunkMap::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, char * a_BlockData)
+bool cChunkMap::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -388,9 +407,8 @@ void cChunkMap::SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
-		// TODO: Rewrite this to call Chunk's lighting without any parameters
-		Chunk->SpreadLight( Chunk->pGetSkyLight() );
-		Chunk->SpreadLight( Chunk->pGetLight() );
+		Chunk->SpreadBlockSkyLight();
+		Chunk->SpreadBlockLight();
 	}
 }
 
@@ -402,7 +420,7 @@ int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ, BlockY = 0;
-	AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::AbsoluteToRelative(a_BlockX, BlockY, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -482,7 +500,7 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
 	int BlockY = (int)(a_Player->GetPosY());
 	int BlockZ = (int)(a_Player->GetPosZ());
 	int ChunkX, ChunkZ, ChunkY = ZERO_CHUNK_Y;
-	AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	int OtherChunkX = ChunkX + ((BlockX > 8) ? 1 : -1);
 	int OtherChunkZ = ChunkZ + ((BlockZ > 8) ? 1 : -1);
 	
@@ -506,7 +524,7 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
 char cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
 {
 	int ChunkX, ChunkZ;
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
@@ -524,14 +542,13 @@ char cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
 char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 {
 	int ChunkX, ChunkZ;
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid() )
 	{
-		// Although it is called GetLight(), it actually gets meta when passed the Meta field
-		return cChunk::GetNibble( Chunk->pGetMeta(), a_X, a_Y, a_Z );
+		return Chunk->GetMeta(a_X, a_Y, a_Z);
 	}
 	return 0;
 }
@@ -543,13 +560,13 @@ char cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
 {
 	int ChunkX, ChunkZ;
-	AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
 
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid() )	
 	{
-		cChunk::SetNibble( Chunk->pGetMeta(), a_X, a_Y, a_Z, a_BlockMeta );
+		Chunk->SetMeta(a_X, a_Y, a_Z, a_BlockMeta);
 		Chunk->MarkDirty();
 		Chunk->SendBlockTo( a_X, a_Y, a_Z, NULL );
 	}
@@ -562,7 +579,7 @@ void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
 void cChunkMap::SetBlock(int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta)
 {
 	int ChunkX, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
-	AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
 
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
@@ -580,7 +597,7 @@ bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z, cItem & a_PickupItem)
 {
 	int PosX = a_X, PosY = a_Y, PosZ = a_Z, ChunkX, ChunkZ;
 
-	AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative( PosX, PosY, PosZ, ChunkX, ChunkZ );
 
 	{
 		cCSLock Lock(m_CSLayers);
@@ -610,7 +627,7 @@ bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z, cItem & a_PickupItem)
 void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 {
 	int ChunkX, ChunkZ;
-	AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkDef::AbsoluteToRelative(a_X, a_Y, a_Z, ChunkX, ChunkZ);
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
@@ -831,7 +848,7 @@ void cChunkMap::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, c
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
