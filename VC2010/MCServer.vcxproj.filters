@@ -1425,6 +1425,7 @@
     <ClInclude Include="..\source\WSSAnvil.h" />
     <ClInclude Include="..\source\NBT.h" />
     <ClInclude Include="..\source\WGFlat.h" />
+    <ClInclude Include="..\source\ChunkDef.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">
