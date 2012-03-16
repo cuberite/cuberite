@@ -64,15 +64,15 @@ public:
 
 	void SendMessage( const char* a_Message );								//tolua_export
 
-	const AString & GetName(void) const;									//tolua_export
-	void SetName(const AString & a_Name);									//tolua_export
+	const AString & GetName(void) const { return m_PlayerName; }			//tolua_export
+	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }			//tolua_export
 
 	typedef std::list< cGroup* > GroupList;
 	typedef std::list< std::string > StringList;
 	void AddToGroup( const char* a_GroupName );								//tolua_export
 	bool CanUseCommand( const char* a_Command );							//tolua_export
 	bool HasPermission( const char* a_Permission );							//tolua_export
-	const GroupList & GetGroups();											// >> EXPORTED IN MANUALBINDINGS <<
+	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
 	bool IsInGroup( const char* a_Group );									//tolua_export
 
@@ -95,7 +95,7 @@ public:
 	bool LoadFromDisk();
 	void LoadPermissionsFromDisk();											//tolua_export
 
-	const AString & GetLoadedWorldName();
+	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
 	void UseEquippedItem();
 	
@@ -103,8 +103,15 @@ public:
 protected:
 	virtual void Destroyed();
 
-	struct sPlayerState;
-	sPlayerState* m_pState;
+	typedef std::map< std::string, bool > PermissionMap;
+	PermissionMap m_ResolvedPermissions;
+	PermissionMap m_Permissions;
+
+	GroupList m_ResolvedGroups;
+	GroupList m_Groups;
+
+	std::string m_PlayerName;
+	std::string m_LoadedWorldName;
 
 	bool m_bVisible;
 

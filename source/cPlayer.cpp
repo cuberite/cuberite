@@ -50,18 +50,9 @@
 
 CLASS_DEFINITION( cPlayer, cPawn );
 
-typedef std::map< std::string, bool > PermissionMap;
-struct cPlayer::sPlayerState
-{
-	PermissionMap ResolvedPermissions;
-	PermissionMap Permissions;
 
-	cPlayer::GroupList ResolvedGroups;
-	cPlayer::GroupList Groups;
 
-	std::string PlayerName;
-	std::string LoadedWorldName;
-};
+
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: m_GameMode( eGameMode_Survival )
@@ -77,7 +68,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_TimeLastPickupCheck( 0.f )
 	, m_Color('-')
 	, m_ClientHandle( a_Client )
-	, m_pState( new sPlayerState )
 {
 	m_EntityType = eEntityType_Player;
 	SetMaxHealth(20);
@@ -90,7 +80,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_TimeLastTeleportPacket = cWorld::GetTime();
 	m_TimeLastPickupCheck = cWorld::GetTime();
 	
-	m_pState->PlayerName = a_PlayerName;
+	m_PlayerName = a_PlayerName;
 	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
 
 	if( !LoadFromDisk() )
@@ -123,7 +113,7 @@ void cPlayer::Initialize( cWorld* a_World )
 
 cPlayer::~cPlayer(void)
 {
-	LOG("Deleting cPlayer \"%s\" @ %p", m_pState->PlayerName.c_str(), this);
+	LOG("Deleting cPlayer \"%s\" @ %p", m_PlayerName.c_str(), this);
 	
 	SaveToDisk();
 
@@ -135,8 +125,6 @@ cPlayer::~cPlayer(void)
 	m_Inventory = NULL;
 
 	delete m_CreativeInventory;
-
-	delete m_pState;
 	
 	LOG("Player %p deleted", this);
 }
@@ -158,7 +146,7 @@ void cPlayer::Destroyed()
 cPacket * cPlayer::GetSpawnPacket(void) const
 {
 	LOGD("cPlayer::GetSpawnPacket for \"%s\" at pos {%.2f, %.2f, %.2f}",
-		m_pState->PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
+		m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
 	);
 	
 	if (!m_bVisible )
@@ -168,7 +156,7 @@ cPacket * cPlayer::GetSpawnPacket(void) const
 	
 	cPacket_NamedEntitySpawn * SpawnPacket = new cPacket_NamedEntitySpawn;
 	SpawnPacket->m_UniqueID    = m_UniqueID;
-	SpawnPacket->m_PlayerName  = m_pState->PlayerName;
+	SpawnPacket->m_PlayerName  = m_PlayerName;
 	SpawnPacket->m_PosX        = (int)(m_Pos.x * 32);
 	SpawnPacket->m_PosY        = (int)(m_Pos.y * 32);
 	SpawnPacket->m_PosZ        = (int)(m_Pos.z * 32);
@@ -587,8 +575,8 @@ void cPlayer::SetVisible( bool a_bVisible )
 void cPlayer::AddToGroup( const char* a_GroupName )
 {
 	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
-	m_pState->Groups.push_back( Group );
-	LOG("Added %s to group %s", m_pState->PlayerName.c_str(), a_GroupName );
+	m_Groups.push_back( Group );
+	LOG("Added %s to group %s", m_PlayerName.c_str(), a_GroupName );
 	ResolveGroups();
 	ResolvePermissions();
 }
@@ -599,7 +587,7 @@ void cPlayer::AddToGroup( const char* a_GroupName )
 
 bool cPlayer::CanUseCommand( const char* a_Command )
 {
-	for( GroupList::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr )
+	for( GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr )
 	{
 		if( (*itr)->HasCommand( a_Command ) ) return true;
 	}
@@ -613,7 +601,7 @@ bool cPlayer::CanUseCommand( const char* a_Command )
 bool cPlayer::HasPermission( const char* a_Permission )
 {
 	AStringVector Split = StringSplit( a_Permission, "." );
-	PermissionMap Possibilities = m_pState->ResolvedPermissions;
+	PermissionMap Possibilities = m_ResolvedPermissions;
 	// Now search the namespaces
 	while( Possibilities.begin() != Possibilities.end() )
 	{
@@ -648,7 +636,7 @@ bool cPlayer::HasPermission( const char* a_Permission )
 
 bool cPlayer::IsInGroup( const char* a_Group )
 {
-	for( GroupList::iterator itr = m_pState->ResolvedGroups.begin(); itr != m_pState->ResolvedGroups.end(); ++itr )
+	for( GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr )
 	{
 		if( strcmp( a_Group, (*itr)->GetName().c_str() ) == 0 )
 			return true;
@@ -658,20 +646,20 @@ bool cPlayer::IsInGroup( const char* a_Group )
 
 void cPlayer::ResolvePermissions()
 {
-	m_pState->ResolvedPermissions.clear();	// Start with an empty map yo~
+	m_ResolvedPermissions.clear();	// Start with an empty map yo~
 
 	// Copy all player specific permissions into the resolved permissions map
-	for( PermissionMap::iterator itr = m_pState->Permissions.begin(); itr != m_pState->Permissions.end(); ++itr )
+	for( PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr )
 	{
-		m_pState->ResolvedPermissions[ itr->first ] = itr->second;
+		m_ResolvedPermissions[ itr->first ] = itr->second;
 	}
 
-	for( GroupList::iterator GroupItr = m_pState->ResolvedGroups.begin(); GroupItr != m_pState->ResolvedGroups.end(); ++GroupItr )
+	for( GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr )
 	{
 		const cGroup::PermissionMap & Permissions = (*GroupItr)->GetPermissions();
 		for( cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr )
 		{
-			m_pState->ResolvedPermissions[ itr->first ] = itr->second;
+			m_ResolvedPermissions[ itr->first ] = itr->second;
 		}
 	}
 }
@@ -683,12 +671,12 @@ void cPlayer::ResolvePermissions()
 void cPlayer::ResolveGroups()
 {
 	// Clear resolved groups first
-	m_pState->ResolvedGroups.clear();
+	m_ResolvedGroups.clear();
 
 	// Get a complete resolved list of all groups the player is in
 	std::map< cGroup*, bool > AllGroups;	// Use a map, because it's faster than iterating through a list to find duplicates
 	GroupList ToIterate;
-	for( GroupList::iterator GroupItr = m_pState->Groups.begin(); GroupItr != m_pState->Groups.end(); ++GroupItr )
+	for( GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr )
 	{
 		ToIterate.push_back( *GroupItr );
 	}
@@ -697,18 +685,18 @@ void cPlayer::ResolveGroups()
 		cGroup* CurrentGroup = *ToIterate.begin();
 		if( AllGroups.find( CurrentGroup ) != AllGroups.end() )
 		{
-			LOGERROR("ERROR: Player %s is in the same group multiple times (%s). FIX IT!", m_pState->PlayerName.c_str(), CurrentGroup->GetName().c_str() );
+			LOGERROR("ERROR: Player %s is in the same group multiple times (%s). FIX IT!", m_PlayerName.c_str(), CurrentGroup->GetName().c_str() );
 		}
 		else
 		{
 			AllGroups[ CurrentGroup ] = true;
-			m_pState->ResolvedGroups.push_back( CurrentGroup );	// Add group to resolved list
+			m_ResolvedGroups.push_back( CurrentGroup );	// Add group to resolved list
 			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
 			for( cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr )
 			{
 				if( AllGroups.find( *itr ) != AllGroups.end() )
 				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", m_pState->PlayerName.c_str(), (*itr)->GetName().c_str() );
+					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", m_PlayerName.c_str(), (*itr)->GetName().c_str() );
 					continue;
 				}
 				ToIterate.push_back( *itr );
@@ -729,12 +717,12 @@ AString cPlayer::GetColor(void) const
 		return cChatColor::MakeColor( m_Color );
 	}
 
-	if ( m_pState->Groups.size() < 1 )
+	if ( m_Groups.size() < 1 )
 	{
 		return cChatColor::White;
 	}
 
-	return (*m_pState->Groups.begin())->GetColor();
+	return (*m_Groups.begin())->GetColor();
 }
 
 
@@ -810,13 +798,13 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 
 void cPlayer::LoadPermissionsFromDisk()
 {
-	m_pState->Groups.clear();
-	m_pState->Permissions.clear();
+	m_Groups.clear();
+	m_Permissions.clear();
 
 	cIniFile IniFile("users.ini");
 	if( IniFile.ReadFile() )
 	{
-		std::string Groups = IniFile.GetValue(m_pState->PlayerName, "Groups", "");
+		std::string Groups = IniFile.GetValue(m_PlayerName, "Groups", "");
 		if( Groups.size() > 0 )
 		{
 			AStringVector Split = StringSplit( Groups, "," );
@@ -830,7 +818,7 @@ void cPlayer::LoadPermissionsFromDisk()
 			AddToGroup("Default");
 		}
 
-		m_Color = IniFile.GetValue(m_pState->PlayerName, "Color", "-")[0];
+		m_Color = IniFile.GetValue(m_PlayerName, "Color", "-")[0];
 	}
 	else
 	{
@@ -848,14 +836,14 @@ bool cPlayer::LoadFromDisk()
 	LoadPermissionsFromDisk();
 
 	// Log player permissions, cause it's what the cool kids do
-	LOGINFO("Player %s has permissions:", m_pState->PlayerName.c_str() );
-	for( PermissionMap::iterator itr = m_pState->ResolvedPermissions.begin(); itr != m_pState->ResolvedPermissions.end(); ++itr )
+	LOGINFO("Player %s has permissions:", m_PlayerName.c_str() );
+	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
 	{
 		if( itr->second ) LOGINFO("%s", itr->first.c_str() );
 	}
 
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", m_pState->PlayerName.c_str() );
+	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
@@ -899,10 +887,10 @@ bool cPlayer::LoadFromDisk()
 	m_Inventory->LoadFromJson(root["inventory"]);
 	m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
 
-	m_pState->LoadedWorldName = root.get("world", "world").asString();
+	m_LoadedWorldName = root.get("world", "world").asString();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		m_pState->PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z, m_pState->LoadedWorldName.c_str()
+		m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z, m_LoadedWorldName.c_str()
 	);
 	
 	return true;
@@ -946,12 +934,12 @@ bool cPlayer::SaveToDisk()
 	std::string JsonData = writer.write( root );
 
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", m_pState->PlayerName.c_str() );
+	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_pState->PlayerName.c_str(), SourceFile.c_str());
+		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_PlayerName.c_str(), SourceFile.c_str());
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
@@ -966,53 +954,17 @@ bool cPlayer::SaveToDisk()
 
 
 
-const AString & cPlayer::GetName(void) const
-{
-	return m_pState->PlayerName;
-}
-
-
-
-
-
-void cPlayer::SetName(const AString & a_Name )
-{
-	m_pState->PlayerName = a_Name;
-}
-
-
-
-
-
-const cPlayer::GroupList & cPlayer::GetGroups()
-{
-	return m_pState->Groups;
-}
-
-
-
-
-
 cPlayer::StringList cPlayer::GetResolvedPermissions()
 {
 	StringList Permissions;
 
-	const PermissionMap& ResolvedPermissions = m_pState->ResolvedPermissions;
+	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
 	for( PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr )
 	{
 		if( itr->second ) Permissions.push_back( itr->first );
 	}
 
 	return Permissions;
-}
-
-
-
-
-
-const AString & cPlayer::GetLoadedWorldName()
-{
-	return m_pState->LoadedWorldName;
 }
 
 
