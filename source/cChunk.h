@@ -167,6 +167,9 @@ public:
 	inline BLOCKTYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                   {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
 	inline void      SetMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
 
+	inline BLOCKTYPE GetLight(int a_RelX, int a_RelY, int a_RelZ)					{return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
+	inline BLOCKTYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ)				{return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+
 private:
 
 	friend class cChunkMap;

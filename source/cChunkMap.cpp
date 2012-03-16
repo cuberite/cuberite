@@ -566,7 +566,7 @@ BLOCKTYPE cChunkMap::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid() )
 	{
-		return cChunk::GetNibble( Chunk->pGetSkyLight(), a_X, a_Y, a_Z );
+		return Chunk->GetSkyLight( a_X, a_Y, a_Z );
 	}
 	return 0;
 }
