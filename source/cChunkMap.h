@@ -87,6 +87,7 @@ public:
 	void      CollectPickupsByPlayer(cPlayer * a_Player);
 	BLOCKTYPE GetBlock           (int a_X, int a_Y, int a_Z);
 	BLOCKTYPE GetBlockMeta       (int a_X, int a_Y, int a_Z);
+	BLOCKTYPE GetBlockSkyLight   (int a_X, int a_Y, int a_Z);
 	void      SetBlockMeta       (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockMeta);
 	void      SetBlock           (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
 	bool      DigBlock           (int a_X, int a_Y, int a_Z, cItem & a_PickupItem);

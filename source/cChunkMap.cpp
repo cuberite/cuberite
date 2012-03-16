@@ -557,7 +557,25 @@ BLOCKTYPE cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 
 
 
-void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockMeta)
+BLOCKTYPE cChunkMap::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid() )
+	{
+		return cChunk::GetNibble( Chunk->pGetSkyLight(), a_X, a_Y, a_Z );
+	}
+	return 0;
+}
+
+
+
+
+
+void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );

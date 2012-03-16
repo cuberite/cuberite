@@ -49,7 +49,7 @@ class cWorld													//tolua_export
 {																//tolua_export
 public:
 
-	OBSOLETE static cWorld* GetWorld();														//tolua_export
+	OBSOLETE static cWorld* GetWorld();
 
 	// Return time in seconds
 	inline static float GetTime()													//tolua_export
@@ -187,6 +187,7 @@ public:
 	char GetBlockMeta( const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }	//tolua_export
 	void SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData );									//tolua_export
 	void SetBlockMeta( const Vector3i & a_Pos, char a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
+	char GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
 	bool DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem );									//tolua_export
 	void SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer* a_Player );									//tolua_export
 

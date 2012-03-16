@@ -896,6 +896,15 @@ void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
 
 
 
+char cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
+{
+	return m_ChunkMap->GetBlockSkyLight(a_X, a_Y, a_Z);
+}
+
+
+
+
+
 bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
 {
 	bool res = m_ChunkMap->DigBlock(a_X, a_Y, a_Z, a_PickupItem);
