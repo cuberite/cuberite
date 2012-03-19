@@ -85,7 +85,7 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 {
 	if( a_ClickPacket->m_WindowID != m_WindowID )
 	{
-		LOG("WRONG WINDOW ID!");
+		LOG("WRONG WINDOW ID! (exp %d, got %d)", m_WindowID, a_ClickPacket->m_WindowID);
 		return;
 	}
 
@@ -114,9 +114,9 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 		{
 			if( !((a_ClickPacket->m_ItemID == -1 || a_ClickPacket->m_ItemID == 0) && (Item->m_ItemID == -1 || Item->m_ItemID == 0 )) )
 			{
-				LOG("My ID: %i Their ID: %i", Item->m_ItemID, a_ClickPacket->m_ItemID );
-				LOG("My Count: %i Their Count: %i", Item->m_ItemCount, a_ClickPacket->m_ItemCount );
-				LOG("My Uses: %i Their Uses: %i", Item->m_ItemHealth, a_ClickPacket->m_ItemUses );
+				LOGD("My ID: %i Their ID: %i", Item->m_ItemID, a_ClickPacket->m_ItemID );
+				LOGD("My Count: %i Their Count: %i", Item->m_ItemCount, a_ClickPacket->m_ItemCount );
+				LOGD("My Uses: %i Their Uses: %i", Item->m_ItemHealth, a_ClickPacket->m_ItemUses );
 				bAsync = true;
 			}
 		}
@@ -199,7 +199,7 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 			Window->Clicked( a_ClickPacket, a_Player );
 		}
 	}
-	if( m_DraggingItem ) LOG("Dragging: %i", m_DraggingItem->m_ItemCount );
+	if( m_DraggingItem ) LOGD("Dragging: %i", m_DraggingItem->m_ItemCount );
 }
 
 
@@ -279,7 +279,7 @@ void cWindow::OwnerDestroyed()
 
 void cWindow::Destroy()
 {
-	LOG("Destroying window %p (type %d)", this, m_WindowType);
+	LOGD("Destroying window %p (type %d)", this, m_WindowType);
 	if (m_Owner != NULL)
 	{
 		m_Owner->CloseWindow();
