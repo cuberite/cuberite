@@ -19,6 +19,7 @@ function Initialize( Plugin )
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_PLAYER_JOIN )
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_LOGIN )
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_BLOCK_PLACE )
+	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_BLOCK_DIG )
 	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_KILLED )
 	
 	Plugin:AddCommand("/help", " - [Page] Show this message", 						"core.help")
