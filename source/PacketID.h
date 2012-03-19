@@ -33,6 +33,7 @@ enum ENUM_PACKET_ID
 	E_ENT_LOOK                  = 0x20,
 	E_REL_ENT_MOVE_LOOK         = 0x21,
 	E_ENT_TELEPORT              = 0x22,
+	E_ENT_HEAD_LOOK             = 0x23,
 	E_ENT_STATUS                = 0x26,
 	E_METADATA                  = 0x28,
 	E_PRE_CHUNK                 = 0x32,

@@ -269,13 +269,17 @@ cServer::cServer()
 
 cServer::~cServer()
 {
-    if( m_pState->SListenClient ) m_pState->SListenClient.CloseSocket();
+	// TODO: Shut down the server gracefully
+	if ( m_pState->SListenClient )
+	{
+		m_pState->SListenClient.CloseSocket();
+	}
 	m_pState->SListenClient = 0;
 
 	m_pState->bStopListenThread = true;
-	delete m_pState->pListenThread;	m_pState->pListenThread = 0;
+	delete m_pState->pListenThread;	m_pState->pListenThread = NULL;
 	m_pState->bStopTickThread = true;
-	delete m_pState->pTickThread;	m_pState->pTickThread = 0;
+	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
 
 	delete m_pState;
 }

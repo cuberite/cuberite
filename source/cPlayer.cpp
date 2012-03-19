@@ -69,6 +69,10 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_Color('-')
 	, m_ClientHandle( a_Client )
 {
+	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
+		a_PlayerName.c_str(), a_Client->GetSocket().GetIPString().c_str(),
+		this, GetUniqueID()
+	);
 	m_EntityType = eEntityType_Player;
 	SetMaxHealth(20);
 	SetMaxFoodLevel(125);
@@ -113,7 +117,7 @@ void cPlayer::Initialize( cWorld* a_World )
 
 cPlayer::~cPlayer(void)
 {
-	LOG("Deleting cPlayer \"%s\" @ %p", m_PlayerName.c_str(), this);
+	LOG("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	
 	SaveToDisk();
 
@@ -183,8 +187,10 @@ void cPlayer::Tick(float a_Dt)
 
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
-		cPacket_EntityLook EntityLook( this );
+		cPacket_EntityLook EntityLook(*this);
 		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityLook, m_ClientHandle );
+		cPacket_EntityHeadLook EntityHeadLook(*this);
+		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityHeadLook, m_ClientHandle);
 		m_bDirtyOrientation = false;
 	}
 	else if (m_bDirtyPosition )

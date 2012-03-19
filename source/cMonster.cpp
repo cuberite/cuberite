@@ -207,7 +207,7 @@ void cMonster::ReplicateMovement()
 {
 	if(m_bDirtyOrientation && !m_bDirtyPosition)
 	{
-		cPacket_EntityLook EntityLook( this );
+		cPacket_EntityLook EntityLook(*this);
 		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityLook );
 		m_bDirtyOrientation = false;
 	}
