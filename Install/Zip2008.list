@@ -1,4 +1,5 @@
 MCServer.exe
+MCServer*debug.cmd
 Plugins
 webadmin
 banned.example.ini
