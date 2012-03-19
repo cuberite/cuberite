@@ -1,6 +1,6 @@
+
 #pragma once
 
-#include "MemoryLeak.h"
 #include "cWindowOwner.h"
 #include "FileDefine.h"
 
@@ -14,6 +14,11 @@ class cClientHandle;
 class cPlayer;
 class cPacket;
 class cPacket_EntityEquipment;
+
+
+
+
+
 class cInventory										//tolua_export	
 	: public cWindowOwner	
 {														//tolua_export
@@ -71,3 +76,7 @@ protected:
 
 	cPlayer* m_Owner;
 };	//tolua_export
+
+
+
+

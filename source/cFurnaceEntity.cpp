@@ -122,11 +122,7 @@ bool cFurnaceEntity::Tick( float a_Dt )
 				cWindow* Window = GetWindow();
 				if( Window )
 				{
-					const std::list< cPlayer* > & OpenedBy = Window->GetOpenedBy();
-					for( std::list< cPlayer* >::const_iterator itr = OpenedBy.begin(); itr != OpenedBy.end(); ++itr )
-					{
-						Window->SendWholeWindow( (*itr)->GetClientHandle() );
-					}
+					Window->BroadcastWholeWindow();
 				}
 
 				m_TimeCooked = 0.f;
@@ -135,19 +131,13 @@ bool cFurnaceEntity::Tick( float a_Dt )
 			cWindow* Window = GetWindow();
 			if( Window )
 			{
-				const std::list< cPlayer* > & OpenedBy = Window->GetOpenedBy();
-				for( std::list< cPlayer* >::const_iterator itr = OpenedBy.begin(); itr != OpenedBy.end(); ++itr )
-				{
-					cClientHandle* Client = (*itr)->GetClientHandle();
-
-					cPacket_InventoryProgressBar Progress;
-					Progress.m_ProgressBar = 0;
-					Progress.m_WindowID = (char)Window->GetWindowID();
-					Progress.m_Value = (short)( m_TimeCooked * (180.f/m_CookTime) );
-					if( Progress.m_Value > 180 ) Progress.m_Value = 180;
-					if( Progress.m_Value < 0 ) Progress.m_Value = 0;
-					Client->Send( Progress );
-				}
+				cPacket_InventoryProgressBar Progress;
+				Progress.m_ProgressBar = 0;
+				Progress.m_WindowID = (char)Window->GetWindowID();
+				Progress.m_Value = (short)( m_TimeCooked * (180.f/m_CookTime) );
+				if( Progress.m_Value > 180 ) Progress.m_Value = 180;
+				if( Progress.m_Value < 0 ) Progress.m_Value = 0;
+				Window->Broadcast(Progress);
 			}
 		}
 	}
@@ -161,30 +151,26 @@ bool cFurnaceEntity::Tick( float a_Dt )
 		m_BurnTime = 0;
 		if( StartCooking() && Window )
 		{
-			const std::list< cPlayer* > & OpenedBy = Window->GetOpenedBy();
-			for( std::list< cPlayer* >::const_iterator itr = OpenedBy.begin(); itr != OpenedBy.end(); ++itr )
-			{
-				Window->SendWholeWindow( (*itr)->GetClientHandle() );
-			}
+			Window->BroadcastWholeWindow();
 		}
 	}
 	if( Window )
 	{
-		const std::list< cPlayer* > & OpenedBy = Window->GetOpenedBy();
-		for( std::list< cPlayer* >::const_iterator itr = OpenedBy.begin(); itr != OpenedBy.end(); ++itr )
+		cPacket_InventoryProgressBar Progress;
+		Progress.m_WindowID = (char)Window->GetWindowID();
+		Progress.m_ProgressBar = 1;
+
+		if ( m_BurnTime > 0.f )
 		{
-			cClientHandle* Client = (*itr)->GetClientHandle();
-
-			cPacket_InventoryProgressBar Progress;
-			Progress.m_WindowID = (char)Window->GetWindowID();
-			Progress.m_ProgressBar = 1;
-
-			if( m_BurnTime > 0.f )	Progress.m_Value = (short)( m_TimeBurned * (150.f/m_BurnTime) );
-			else					Progress.m_Value = 0;
-			if( Progress.m_Value > 150 ) Progress.m_Value = 150;
-			if( Progress.m_Value < 0 ) Progress.m_Value = 0;
-			Client->Send( Progress );
+			Progress.m_Value = (short)( m_TimeBurned * (150.f / m_BurnTime) );
+			if ( Progress.m_Value > 150 ) Progress.m_Value = 150;
+			if ( Progress.m_Value < 0 ) Progress.m_Value = 0;
 		}
+		else
+		{
+			Progress.m_Value = 0;
+		}
+		Window->Broadcast( Progress );
 	}
 	return ((m_CookingItem != 0) || (m_TimeBurned < m_BurnTime)) && m_BurnTime > 0.f; // Keep on ticking, if there's more to cook, or if it's cooking
 }

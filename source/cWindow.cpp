@@ -26,7 +26,9 @@ cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 	, m_NumSlots( 0 )
 	, m_Slots( 0 )
 	, m_DraggingItem( 0 )
+	, m_IsDestroyed(false)
 {
+	LOGD("Created a window at %p", this);
 	if( !m_bInventoryVisible ) m_DraggingItem = new cItem();
 }
 
@@ -36,11 +38,13 @@ cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 
 cWindow::~cWindow()
 {
+	LOGD("Deleting a window at %p", this);
 	if( !m_bInventoryVisible && m_DraggingItem )
 	{
 		delete m_DraggingItem;
 		m_DraggingItem = 0;
 	}
+	LOGD("Deleted a window at %p", this);
 }
 
 
@@ -204,10 +208,13 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 
 void cWindow::Open( cPlayer & a_Player )
 {
-	// If player is already in OpenedBy remove player first
-	m_OpenedBy.remove( &a_Player );
-	// Then add player
-	m_OpenedBy.push_back( &a_Player );
+	{
+		cCSLock Lock(m_CS);
+		// If player is already in OpenedBy remove player first
+		m_OpenedBy.remove( &a_Player );
+		// Then add player
+		m_OpenedBy.push_back( &a_Player );
+	}
 
 	cPacket_WindowOpen WindowOpen;
 	WindowOpen.m_WindowID = (char)m_WindowID;
@@ -232,13 +239,23 @@ void cWindow::Close( cPlayer & a_Player )
 
 	cPacket_WindowClose WindowClose;
 	WindowClose.m_Close = (char)m_WindowID;
-	cClientHandle* ClientHandle = a_Player.GetClientHandle();
-	if( ClientHandle ) ClientHandle->Send( WindowClose );
-
-	m_OpenedBy.remove( &a_Player );
-	if( m_OpenedBy.size() == 0 )
+	cClientHandle * ClientHandle = a_Player.GetClientHandle();
+	if ( ClientHandle != NULL)
 	{
-		Destroy();
+		ClientHandle->Send( WindowClose );
+	}
+
+	{
+		cCSLock Lock(m_CS);
+		m_OpenedBy.remove( &a_Player );
+		if( m_OpenedBy.size() == 0 )
+		{
+			Destroy();
+		}
+	}
+	if (m_IsDestroyed)
+	{
+		delete this;
 	}
 }
 
@@ -262,13 +279,13 @@ void cWindow::OwnerDestroyed()
 
 void cWindow::Destroy()
 {
-	LOG("DESTROY WINDOW");
-	if( m_Owner )
+	LOG("Destroying window %p (type %d)", this, m_WindowType);
+	if (m_Owner != NULL)
 	{
 		m_Owner->CloseWindow();
-		m_Owner = 0;
+		m_Owner = NULL;
 	}
-	delete this;
+	m_IsDestroyed = true;
 }
 
 
@@ -279,6 +296,32 @@ void cWindow::SendWholeWindow( cClientHandle* a_Client )
 {
 	cPacket_WholeInventory Inventory( this );
 	a_Client->Send( Inventory );
+}
+
+
+
+
+
+void cWindow::BroadcastWholeWindow(void)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		SendWholeWindow((*itr)->GetClientHandle());
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cWindow::Broadcast(const cPacket & a_Packet)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		(*itr)->GetClientHandle()->Send(a_Packet);
+	}  // for itr - m_OpenedBy[]
 }
 
 

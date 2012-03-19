@@ -6,6 +6,14 @@ class cPlayer;
 class cItem;
 class cWindowOwner;
 class cClientHandle;
+class cPacket;
+
+typedef std::list<cPlayer *> cPlayerList;
+
+
+
+
+
 class cWindow
 {
 public:
@@ -49,25 +57,30 @@ public:
 	void SetOwner( cWindowOwner* a_Owner ) { m_Owner = a_Owner; }
 
 	void SendWholeWindow( cClientHandle* a_Client );
+	void BroadcastWholeWindow(void);
+	void Broadcast(const cPacket & a_Packet);
 
-	const std::string & GetWindowTitle() const { return m_WindowTitle; }
+	const AString & GetWindowTitle() const { return m_WindowTitle; }
 	void SetWindowTitle( const std::string & a_WindowTitle ) { m_WindowTitle = a_WindowTitle; }
 
-	const std::list<cPlayer*> & GetOpenedBy() const { return m_OpenedBy; }
-
 	void OwnerDestroyed();
+	
 private:
+
 	void Destroy();
 
 	int m_WindowID;
 	int m_WindowType;
-	std::string m_WindowTitle;
+	AString m_WindowTitle;
 
-	cWindowOwner* m_Owner;
+	cWindowOwner * m_Owner;
 
-	std::list<cPlayer*> m_OpenedBy;
-	bool m_bInventoryVisible;
-	int m_NumSlots;
-	cItem* m_Slots;
-	cItem* m_DraggingItem;
+	cCriticalSection m_CS;
+	cPlayerList m_OpenedBy;
+	
+	bool    m_bInventoryVisible;
+	int     m_NumSlots;
+	cItem * m_Slots;
+	cItem * m_DraggingItem;
+	bool    m_IsDestroyed;
 };
