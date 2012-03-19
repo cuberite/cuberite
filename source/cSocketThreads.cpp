@@ -226,6 +226,15 @@ cSocketThreads::cSocketThread::cSocketThread(cSocketThreads * a_Parent) :
 cSocketThreads::cSocketThread::~cSocketThread()
 {
 	m_ShouldTerminate = true;
+
+	// Notify the thread:
+	ASSERT(m_ControlSocket2.IsValid());
+	m_ControlSocket2.Send("a", 1);
+
+	// Wait for the thread to finish:
+	Wait();
+	
+	// Close the control sockets:
 	m_ControlSocket1.CloseSocket();
 	m_ControlSocket2.CloseSocket();
 }
