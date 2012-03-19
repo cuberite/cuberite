@@ -199,7 +199,10 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 			Window->Clicked( a_ClickPacket, a_Player );
 		}
 	}
-	if( m_DraggingItem ) LOGD("Dragging: %i", m_DraggingItem->m_ItemCount );
+	if (m_DraggingItem != NULL)
+	{
+		LOGD("Dragging: %i", m_DraggingItem->m_ItemCount );
+	}
 }
 
 
