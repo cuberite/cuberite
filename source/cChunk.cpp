@@ -1196,17 +1196,26 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 void cChunk::RemoveClient( cClientHandle* a_Client )
 {
-	m_LoadedByClient.remove( a_Client );
-
-	if ( !a_Client->IsDestroyed() )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
-		for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
+		if (*itr != a_Client)
 		{
-			LOG("chunk [%i, %i] destroying entity #%i for player \"%s\"", m_PosX, m_PosZ, (*itr)->GetUniqueID(), a_Client->GetUsername().c_str() );
-			cPacket_DestroyEntity DestroyEntity( *itr );
-			a_Client->Send( DestroyEntity );
+			continue;
 		}
-	}
+		
+		m_LoadedByClient.erase(itr);
+
+		if ( !a_Client->IsDestroyed() )
+		{
+			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
+			{
+				LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"", m_PosX, m_PosZ, (*itr)->GetUniqueID(), a_Client->GetUsername().c_str() );
+				cPacket_DestroyEntity DestroyEntity( *itr );
+				a_Client->Send( DestroyEntity );
+			}
+		}
+		return;
+	}  // for itr - m_LoadedByClient[]
 }
 
 

@@ -150,8 +150,8 @@ public:
 	/// Removes client from the chunk specified
 	void RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 	
-	/// Removes the client from all chunks specified
-	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
+	/// Removes the client from all chunks it is present in
+	void RemoveClientFromChunks(cClientHandle * a_Client);
 	
 	/// Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is ignored (ChunkSender will send that chunk when it becomes valid)
 	void SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);

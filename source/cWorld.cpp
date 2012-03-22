@@ -1345,9 +1345,9 @@ void cWorld::RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClient
 
 
 
-void cWorld::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
+void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 {
-	m_ChunkMap->RemoveClientFromChunks(a_Client, a_Chunks);
+	m_ChunkMap->RemoveClientFromChunks(a_Client);
 }
 
 

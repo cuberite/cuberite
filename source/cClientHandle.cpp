@@ -461,14 +461,17 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 // Removes the client from all chunks. Used when switching worlds or destroying the player
 void cClientHandle::RemoveFromAllChunks()
 {
-	cCSLock Lock(m_CSChunkLists);
 	cWorld * World = m_Player->GetWorld();
 	if (World != NULL)
 	{
-		World->RemoveClientFromChunks(this, m_LoadedChunks);
+		World->RemoveClientFromChunks(this);
 	}
-	m_LoadedChunks.clear();
-	m_ChunksToSend.clear();
+	
+	{
+		cCSLock Lock(m_CSChunkLists);
+		m_LoadedChunks.clear();
+		m_ChunksToSend.clear();
+	}
 }
 
 

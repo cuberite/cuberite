@@ -102,8 +102,8 @@ public:
 	/// Removes the client from the chunk
 	void RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 	
-	/// Removes the client from all chunks specified
-	void RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks);
+	/// Removes the client from all chunks it is present in
+	void RemoveClientFromChunks(cClientHandle * a_Client);
 
 	/// Moves the entity from its current chunk to the new chunk specified
 	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -161,6 +161,8 @@ private:
 		void UnloadUnusedChunks(void);
 		
 		void Tick( float a_Dt, MTRand & a_TickRand );
+		
+		void RemoveClient(cClientHandle * a_Client);
 		
 	protected:
 	

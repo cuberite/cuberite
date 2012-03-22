@@ -747,14 +747,14 @@ void cChunkMap::RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cCli
 
 
 
-void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client, const cChunkCoordsList & a_Chunks)
+void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 {
 	cCSLock Lock(m_CSLayers);
 	
-	for (cChunkCoordsList::const_iterator itr = a_Chunks.begin(); itr != a_Chunks.end(); ++itr)
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		GetChunkNoGen(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ)->RemoveClient(a_Client);
-	}
+		(*itr)->RemoveClient(a_Client);
+	}  // for itr - m_Layers[]
 }
 
 
@@ -998,6 +998,21 @@ void cChunkMap::cChunkLayer::Tick(float a_Dt, MTRand & a_TickRand)
 		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
 		{
 			m_Chunks[i]->Tick(a_Dt, a_TickRand);
+		}
+	}  // for i - m_Chunks[]
+}
+
+
+
+
+
+void cChunkMap::cChunkLayer::RemoveClient(cClientHandle * a_Client)
+{
+	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	{
+		if (m_Chunks[i] != NULL)
+		{
+			m_Chunks[i]->RemoveClient(a_Client);
 		}
 	}  // for i - m_Chunks[]
 }
