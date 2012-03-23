@@ -28,6 +28,8 @@ class cFurnaceEntity :
 {
 public:
 	cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
+	cFurnaceEntity(int a_X, int a_Y, int a_Z);
+	
 	virtual ~cFurnaceEntity();
 	virtual void Destroy();
 

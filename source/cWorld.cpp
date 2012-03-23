@@ -1502,3 +1502,101 @@ int cWorld::GetNumChunks(void) const
 
 
 
+
+bool cWorld::WSIIsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	return m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::WSIMarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->MarkChunkSaving(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::WSIMarkChunkSaved(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_ChunkMap->MarkChunkSaved(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::WSIChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	ChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::WSIGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+{
+	m_Generator.GenerateChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+bool cWorld::WSIGetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback)
+{
+	return m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+AString cWorld::WSIGetFolder(void)
+{
+	return m_WorldName;
+}
+
+
+
+
+
+void cWorld::WSIChunkDataLoaded(
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+	const BLOCKTYPE * a_BlockTypes,
+	const BLOCKTYPE * a_BlockMeta,
+	const BLOCKTYPE * a_BlockLight,
+	const BLOCKTYPE * a_BlockSkyLight,
+	const cChunkDef::HeightMap * a_HeightMap,
+	cEntityList & a_Entities,
+	cBlockEntityList & a_BlockEntities
+)
+{
+	// Set all a_Entities' and a_BlockEntities' world to this:
+	for (cEntityList::iterator itr = a_Entities.begin(); itr != a_Entities.end(); ++itr)
+	{
+		(*itr)->SetWorld(this);
+	}  // for itr - a_Entities[]
+	for (cBlockEntityList::iterator itr = a_BlockEntities.begin(); itr != a_BlockEntities.end(); ++itr)
+	{
+		(*itr)->SetWorld(this);
+	}  // for itr - a_BlockEntities[]
+	
+	m_ChunkMap->ChunkDataLoaded(
+		a_ChunkX, a_ChunkY, a_ChunkZ,
+		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
+		a_HeightMap,
+		a_Entities,
+		a_BlockEntities
+	);
+	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+

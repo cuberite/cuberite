@@ -36,6 +36,21 @@ cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 
 
 
+cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z)
+	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z) 
+	, m_Items( new cItem[3] )
+	, m_CookingItem( 0 )
+	, m_CookTime( 0 )
+	, m_TimeCooked( 0 )
+	, m_BurnTime( 0 )
+	, m_TimeBurned( 0 )
+{
+}
+
+
+
+
+
 cFurnaceEntity::~cFurnaceEntity()
 {
 	// Tell window its owner is destroyed

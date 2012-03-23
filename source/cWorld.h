@@ -45,7 +45,8 @@ typedef cItemCallback<cEntity> cEntityCallback;
 
 
 
-class cWorld													//tolua_export
+class cWorld :													//tolua_export
+	public cWSInterface
 {																//tolua_export
 public:
 
@@ -256,6 +257,26 @@ public:
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
 	cChunkMap *       GetChunkMap (void) { return m_ChunkMap; }
+	
+protected:
+	// cWSInterface overrides:
+	virtual bool WSIIsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) override;
+	virtual void WSIMarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ) override;
+	virtual void WSIMarkChunkSaved(int a_ChunkX, int a_ChunkY, int a_ChunkZ) override;
+	virtual void WSIChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ) override;
+	virtual void WSIGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ) override;
+	virtual bool WSIGetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback) override;
+	virtual AString WSIGetFolder(void) override;
+	virtual void WSIChunkDataLoaded(
+		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+		const BLOCKTYPE * a_BlockTypes,
+		const BLOCKTYPE * a_BlockMeta,
+		const BLOCKTYPE * a_BlockLight,
+		const BLOCKTYPE * a_BlockSkyLight,
+		const cChunkDef::HeightMap * a_HeightMap,
+		cEntityList & a_Entities,
+		cBlockEntityList & a_BlockEntities
+	) override;
 	
 private:
 

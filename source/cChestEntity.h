@@ -29,6 +29,8 @@ class cChestEntity :
 {
 public:
 	cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
+	cChestEntity(int a_X, int a_Y, int a_Z);
+	
 	virtual ~cChestEntity();
 	virtual void Destroy();
 

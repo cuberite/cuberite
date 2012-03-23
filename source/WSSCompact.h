@@ -22,7 +22,7 @@ class cWSSCompact :
 	public cWSSchema
 {
 public:
-	cWSSCompact(cWorld * a_World) : cWSSchema(a_World) {}
+	cWSSCompact(cWSInterface * a_WSI) : cWSSchema(a_WSI) {}
 	virtual ~cWSSCompact();
 	
 protected:
@@ -42,7 +42,7 @@ protected:
 		bool SetChunkData(const cChunkCoords & a_Chunk, int a_UncompressedSize, const AString & a_Data);
 		bool EraseChunkData(const cChunkCoords & a_Chunk);
 		
-		bool SaveChunk(const cChunkCoords & a_Chunk, cWorld * a_World);
+		bool SaveChunk(const cChunkCoords & a_Chunk, cWSInterface * a_WSI);
 		
 		int GetLayerX(void) const {return m_LayerX; }
 		int GetLayerZ(void) const {return m_LayerZ; }
@@ -68,7 +68,7 @@ protected:
 		char          m_ChunkVersion;
 		char          m_PakVersion;
 		
-		bool SaveChunkToData(const cChunkCoords & a_Chunk, cWorld * a_World);  // Saves the chunk to m_DataContents, updates headers and m_NumDirty
+		bool SaveChunkToData(const cChunkCoords & a_Chunk, cWSInterface * a_WSI);  // Saves the chunk to m_DataContents, updates headers and m_NumDirty
 		void SynchronizeFile(void);  // Writes m_DataContents along with the headers to file, resets m_NumDirty
 
 		void UpdateChunk1To2(void); // Height from 128 to 256
@@ -93,9 +93,9 @@ protected:
 	bool EraseChunkData(const cChunkCoords & a_Chunk);
 	
 	/// Loads the chunk from the data (no locking needed)
-	bool LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World);
+	bool LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWSInterface * a_WSI);
 		
-	void LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World);
+	void LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWSInterface * a_WSI);
 
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;

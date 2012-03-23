@@ -24,7 +24,7 @@ class cWSSForgetful :
 	public cWSSchema
 {
 public:
-	cWSSForgetful(cWorld * a_World) : cWSSchema(a_World) {}
+	cWSSForgetful(cWSInterface * a_WSI) : cWSSchema(a_WSI) {}
 	
 protected:
 	// cWSSchema overrides:
@@ -97,7 +97,7 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 
 cWorldStorage::cWorldStorage(void) :
 	super("cWorldStorage"),
-	m_World(NULL),
+	m_WSI(NULL),
 	m_SaveSchema(NULL)
 {
 }
@@ -120,9 +120,9 @@ cWorldStorage::~cWorldStorage()
 
 
 
-bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName)
+bool cWorldStorage::Start(cWSInterface * a_WSI, const AString & a_StorageSchemaName)
 {
-	m_World = a_World;
+	m_WSI = a_WSI;
 	m_StorageSchemaName = a_StorageSchemaName;
 	InitSchemas();
 	
@@ -266,9 +266,9 @@ void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 void cWorldStorage::InitSchemas(void)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSCompact  (m_World));
-	m_Schemas.push_back(new cWSSAnvil    (m_World));
-	m_Schemas.push_back(new cWSSForgetful(m_World));
+	m_Schemas.push_back(new cWSSCompact  (m_WSI));
+	m_Schemas.push_back(new cWSSAnvil    (m_WSI));
+	m_Schemas.push_back(new cWSSForgetful(m_WSI));
 	// Add new schemas here
 	
 	if (NoCaseCompare(m_StorageSchemaName, "default") == 0)
@@ -286,7 +286,7 @@ void cWorldStorage::InitSchemas(void)
 	}  // for itr - m_Schemas[]
 	
 	// Unknown schema selected, let the admin know:
-	LOGWARNING("Unknown storage schema name \"%s\". Using default. Available schemas:", m_StorageSchemaName.c_str());
+	LOGWARNING("World \"%s\": Unknown storage schema name \"%s\". Using default. Available schemas:", m_WSI->WSIGetFolder().c_str(), m_StorageSchemaName.c_str());
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
 	{
 		LOGWARNING("\t\"%s\"", (*itr)->GetName().c_str());
@@ -346,7 +346,7 @@ bool cWorldStorage::LoadOneChunk(void)
 		if (ToLoad.m_Generate)
 		{
 			// The chunk couldn't be loaded, generate it:
-			m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+			m_WSI->WSIGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
 		}
 		else
 		{
@@ -376,12 +376,12 @@ bool cWorldStorage::SaveOneChunk(void)
 		}
 		HasMore = (m_SaveQueue.size() > 0);
 	}
-	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ))
+	if (ShouldSave && m_WSI->WSIIsChunkValid(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ))
 	{
-		m_World->MarkChunkSaving(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
+		m_WSI->WSIMarkChunkSaving(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
 		if (m_SaveSchema->SaveChunk(Save))
 		{
-			m_World->MarkChunkSaved(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
+			m_WSI->WSIMarkChunkSaved(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
 		}
 		else
 		{
@@ -397,7 +397,7 @@ bool cWorldStorage::SaveOneChunk(void)
 
 bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	if (m_World->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
+	if (m_WSI->WSIIsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
 	{
 		// Already loaded (can happen, since the queue is async)
 		return true;
@@ -421,7 +421,7 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	}
 	
 	// Notify the chunk owner that the chunk failed to load (sets cChunk::m_HasLoadFailed to true):
-	m_World->ChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_WSI->WSIChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
 	
 	return false;
 }
