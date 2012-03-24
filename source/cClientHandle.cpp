@@ -95,7 +95,7 @@ int cClientHandle::s_ClientCount = 0;
 
 cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
-	, m_ProtocolVersion(28)
+	, m_ProtocolVersion(29)
 	, m_Socket(a_Socket)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
