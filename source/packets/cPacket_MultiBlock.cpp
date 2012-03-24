@@ -13,20 +13,9 @@ cPacket_MultiBlock::cPacket_MultiBlock( const cPacket_MultiBlock & a_Copy )
 	m_ChunkX = a_Copy.m_ChunkX;
 	m_ChunkZ = a_Copy.m_ChunkZ;
 	m_NumBlocks = a_Copy.m_NumBlocks;
-
-#if (MINECRAFT_1_2_2 == 1)
 	m_DataSize = a_Copy.m_DataSize;
-
 	m_Data = new sBlockChange[m_NumBlocks];
 	memcpy( m_Data, a_Copy.m_Data, sizeof(sBlockChange)*m_NumBlocks );
-#else
-	m_BlockCoordinates = new unsigned short[m_NumBlocks];
-	memcpy( m_BlockCoordinates, a_Copy.m_BlockCoordinates, sizeof(short)*m_NumBlocks );
-	m_BlockTypes = new char[m_NumBlocks];
-	memcpy( m_BlockTypes, a_Copy.m_BlockTypes, m_NumBlocks );
-	m_BlockMetas = new char[m_NumBlocks];
-	memcpy( m_BlockMetas, a_Copy.m_BlockMetas, m_NumBlocks );
-#endif
 }
 
 
@@ -35,13 +24,7 @@ cPacket_MultiBlock::cPacket_MultiBlock( const cPacket_MultiBlock & a_Copy )
 
 cPacket_MultiBlock::~cPacket_MultiBlock()
 {
-#if (MINECRAFT_1_2_2 == 1)
 	delete [] m_Data;
-#else
-	if( m_BlockCoordinates ) delete [] m_BlockCoordinates;
-	if( m_BlockTypes ) delete [] m_BlockTypes;
-	if( m_BlockMetas ) delete [] m_BlockMetas;
-#endif
 }
 
 
@@ -55,15 +38,11 @@ void cPacket_MultiBlock::Serialize(AString & a_Data) const
 	AppendInteger(a_Data, m_ChunkZ);
 	AppendShort  (a_Data, m_NumBlocks);
 
-#if (MINECRAFT_1_2_2 == 1)
 	AppendInteger(a_Data, m_DataSize);
 	for( int i = 0; i < m_NumBlocks; ++i )
+	{
 		AppendInteger(a_Data, m_Data[i].Data);
-#else
-	AppendData   (a_Data, (char *)m_BlockCoordinates, sizeof(short) * m_NumBlocks);
-	AppendData   (a_Data, m_BlockTypes,	m_NumBlocks);
-	AppendData   (a_Data, m_BlockMetas,	m_NumBlocks);
-#endif
+	}
 }
 
 

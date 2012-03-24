@@ -372,13 +372,6 @@ void cPlayer::Respawn()
 	//Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
 	Packet.m_CreativeMode = (char)m_GameMode; //Set GameMode packet based on Player's GameMode;
 
-#if (MINECRAFT_1_2_2 != 1 )
-	//TODO Less hardcoded
-	Packet.m_World = 0;
-
-	Packet.m_MapSeed = GetWorld()->GetWorldSeed();
-#endif
-
 	//Send Packet
 	m_ClientHandle->Send( Packet );
 	

@@ -95,11 +95,7 @@ int cClientHandle::s_ClientCount = 0;
 
 cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
-#if (MINECRAFT_1_2_2 == 1)
 	, m_ProtocolVersion(28)
-#else
-	, m_ProtocolVersion(23)
-#endif
 	, m_Socket(a_Socket)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
@@ -302,9 +298,6 @@ void cClientHandle::Authenticate(void)
 	LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
 	//LoginResponse.m_Username = "";
 	LoginResponse.m_ServerMode = m_Player->GetGameMode();  // set gamemode from player.
-#if (MINECRAFT_1_2_2 != 1)
-	LoginResponse.m_MapSeed = cRoot::Get()->GetWorld()->GetWorldSeed();
-#endif
 	LoginResponse.m_Dimension = 0;
 	LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetDefaultWorld()->GetMaxPlayers();
 	LoginResponse.m_Difficulty = 2;
@@ -624,7 +617,6 @@ void cClientHandle::HandlePing(void)
 
 void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 {
-#if (MINECRAFT_1_2_2 == 1)
 	AStringVector UserData = StringSplit( a_Packet->m_Username, ";" ); // "FakeTruth;localhost:25565"
 	if( UserData.size() == 0 )
 	{
@@ -632,9 +624,6 @@ void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 		return;
 	}
 	m_Username = UserData[0];
-#else
-	m_Username = a_Packet->m_Username;
-#endif
 
 	LOG("HANDSHAKE %s", m_Username.c_str());
 
@@ -1720,13 +1709,8 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	if (a_Packet.m_PacketID == E_MAP_CHUNK)
 	{
-		#if (MINECRAFT_1_2_2 == 1)
 		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX;
 		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ;
-		#else
-		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX / cChunkDef::Width;
-		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ / cChunkDef::Width;
-		#endif
 		bool Found = false;
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)

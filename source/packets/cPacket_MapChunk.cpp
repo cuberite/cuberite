@@ -23,9 +23,6 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 {
 	m_PacketID = E_MAP_CHUNK;
 
-#if (MINECRAFT_1_2_2 == 1 )
-
-	// ... 
 	m_PosX = a_ChunkX; // Chunk coordinates now, instead of block coordinates
 	m_PosZ = a_ChunkZ;
 
@@ -113,24 +110,6 @@ cPacket_MapChunk::cPacket_MapChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, con
 
 	m_CompressedData = CompressedBlockData;
 	m_CompressedSize = CompressedSize;
-
-#else
-	m_PosX = a_ChunkX * cChunkDef::Width; // It has to be block coordinates
-	m_PosY = (short)(a_ChunkY * cChunkDef::Height);
-	m_PosZ = a_ChunkZ * cChunkDef::Width;
-
-	m_SizeX = 15;
-	m_SizeY = 127;
-	m_SizeZ = 15;
-
-	uLongf CompressedSize = compressBound( cChunkDef::BlockDataSize );
-	char * CompressedBlockData = new char[CompressedSize];
-
-	compress2( (Bytef*)CompressedBlockData, &CompressedSize, (const Bytef*)a_BlockData, cChunkDef::BlockDataSize, Z_DEFAULT_COMPRESSION);
-
-	m_CompressedData = CompressedBlockData;
-	m_CompressedSize = CompressedSize;
-#endif
 }
 
 
@@ -141,7 +120,6 @@ cPacket_MapChunk::cPacket_MapChunk( const cPacket_MapChunk & a_Copy )
 {
 	m_PacketID = E_MAP_CHUNK;
 
-#if (MINECRAFT_1_2_2 == 1 )
 	m_PosX = a_Copy.m_PosX;
 	m_PosZ = a_Copy.m_PosZ;
 	m_bContiguous = a_Copy.m_bContiguous;
@@ -151,18 +129,6 @@ cPacket_MapChunk::cPacket_MapChunk( const cPacket_MapChunk & a_Copy )
 	m_CompressedSize = a_Copy.m_CompressedSize;
 	m_CompressedData = new char[m_CompressedSize];
 	memcpy( m_CompressedData, a_Copy.m_CompressedData, m_CompressedSize );
-#else
-	m_PosX = a_Copy.m_PosX;
-	m_PosY = a_Copy.m_PosY;
-	m_PosZ = a_Copy.m_PosZ;
-	m_SizeX = a_Copy.m_SizeX;
-	m_SizeY = a_Copy.m_SizeY;
-	m_SizeZ = a_Copy.m_SizeZ;
-
-	m_CompressedSize = a_Copy.m_CompressedSize;
-	m_CompressedData = new char[m_CompressedSize];
-	memcpy( m_CompressedData, a_Copy.m_CompressedData, m_CompressedSize );
-#endif
 }
 
 
@@ -173,7 +139,6 @@ void cPacket_MapChunk::Serialize(AString & a_Data) const
 {
 	AppendByte   (a_Data, m_PacketID);
 
-#if (MINECRAFT_1_2_2 == 1 )
 	AppendInteger(a_Data, m_PosX);
 	AppendInteger(a_Data, m_PosZ);
 	AppendBool   (a_Data, m_bContiguous);
@@ -182,16 +147,6 @@ void cPacket_MapChunk::Serialize(AString & a_Data) const
 	AppendInteger(a_Data, m_CompressedSize);
 	AppendInteger(a_Data, m_UnusedInt);
 	AppendData   (a_Data, m_CompressedData, m_CompressedSize);
-#else
-	AppendInteger(a_Data, m_PosX);
-	AppendShort  (a_Data, m_PosY);
-	AppendInteger(a_Data, m_PosZ);
-	AppendByte   (a_Data, m_SizeX);
-	AppendByte   (a_Data, m_SizeY);
-	AppendByte   (a_Data, m_SizeZ);
-	AppendInteger(a_Data, m_CompressedSize);
-	AppendData   (a_Data, m_CompressedData, m_CompressedSize);
-#endif
 }
 
 

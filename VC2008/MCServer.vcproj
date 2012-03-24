@@ -42,7 +42,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="../zlib-1.2.5;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;MINECRAFT_1_2_2=1"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
