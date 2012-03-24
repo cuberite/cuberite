@@ -17,17 +17,15 @@
 #include "ChunkDef.h"
 
 #include "packets/cPacket_KeepAlive.h"
-#include "packets/cPacket_PlayerPosition.h"
+#include "packets/cPacket_Player.h"
 #include "packets/cPacket_Respawn.h"
 #include "packets/cPacket_RelativeEntityMoveLook.h"
 #include "packets/cPacket_Chat.h"
 #include "packets/cPacket_Login.h"
 #include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_PlayerMoveLook.h"
 #include "packets/cPacket_TimeUpdate.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_Handshake.h"
-#include "packets/cPacket_PlayerLook.h"
 #include "packets/cPacket_ArmAnim.h"
 #include "packets/cPacket_BlockPlace.h"
 #include "packets/cPacket_Flying.h"
@@ -41,7 +39,6 @@
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_Ping.h"
-#include "packets/cPacket_PlayerListItem.h"
 
 
 

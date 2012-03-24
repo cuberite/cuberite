@@ -148,9 +148,6 @@
     <Filter Include="Packets\cPacket_Respawn">
       <UniqueIdentifier>{b2903385-bb48-4240-8c5b-bd8896f2c5ab}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Packets\cPacket_PlayerPosition">
-      <UniqueIdentifier>{c05411e1-a0f1-4528-a8c5-17f5bed4b0da}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Packets\cPacket_DestroyEntity">
       <UniqueIdentifier>{c06db7ec-cdd8-4ad3-8f9b-9848bf706c30}</UniqueIdentifier>
     </Filter>
@@ -226,9 +223,6 @@
     <Filter Include="cMakeDir">
       <UniqueIdentifier>{102fff22-0eb3-4977-9de3-307534954fbc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Packets\cPacket_PlayerMoveLook">
-      <UniqueIdentifier>{91d451ac-766b-44a9-918d-e0876cf99dbb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Packets\cPacket_TimeUpdate">
       <UniqueIdentifier>{3328f163-6be9-4115-aa18-a67419a40b61}</UniqueIdentifier>
     </Filter>
@@ -243,9 +237,6 @@
     </Filter>
     <Filter Include="Packets\cPacket_Handshake">
       <UniqueIdentifier>{dad042ce-6d1a-4a77-8bdd-a2d364e8fcf2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Packets\cPacket_PlayerLook">
-      <UniqueIdentifier>{c8aaae5b-7a57-48a0-ae2f-416211f6e73d}</UniqueIdentifier>
     </Filter>
     <Filter Include="Packets\cPacket_ArmAnim">
       <UniqueIdentifier>{8d8b006e-6529-4519-a479-84fb9ecfe6f6}</UniqueIdentifier>
@@ -402,9 +393,6 @@
     </Filter>
     <Filter Include="cEntity\cPawn\cMonster\Personalities\PassiveAggressive">
       <UniqueIdentifier>{71574b1c-a518-4a17-92c1-e3ea340f73bc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Packets\cPacket_PlayerListItem">
-      <UniqueIdentifier>{b690d7b6-3697-4d91-bab3-21fd652986be}</UniqueIdentifier>
     </Filter>
     <Filter Include="cWorldGenerator">
       <UniqueIdentifier>{72727ea7-779f-439e-8f30-53bd6985c9e7}</UniqueIdentifier>
@@ -604,9 +592,6 @@
     <ClCompile Include="..\source\packets\cPacket_Respawn.cpp">
       <Filter>Packets\cPacket_Respawn</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\packets\cPacket_PlayerPosition.cpp">
-      <Filter>Packets\cPacket_PlayerPosition</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_DestroyEntity.cpp">
       <Filter>Packets\cPacket_DestroyEntity</Filter>
     </ClCompile>
@@ -682,9 +667,6 @@
     <ClCompile Include="..\source\cMakeDir.cpp">
       <Filter>cMakeDir</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\packets\cPacket_PlayerMoveLook.cpp">
-      <Filter>Packets\cPacket_PlayerMoveLook</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_TimeUpdate.cpp">
       <Filter>Packets\cPacket_TimeUpdate</Filter>
     </ClCompile>
@@ -699,9 +681,6 @@
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_Handshake.cpp">
       <Filter>Packets\cPacket_Handshake</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\packets\cPacket_PlayerLook.cpp">
-      <Filter>Packets\cPacket_PlayerLook</Filter>
     </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_ArmAnim.cpp">
       <Filter>Packets\cPacket_ArmAnim</Filter>
@@ -868,9 +847,6 @@
     <ClCompile Include="..\source\cPassiveMonster.cpp">
       <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\packets\cPacket_PlayerListItem.cpp">
-      <Filter>Packets\cPacket_PlayerListItem</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\cWorldGenerator.cpp">
       <Filter>cWorldGenerator</Filter>
     </ClCompile>
@@ -922,6 +898,9 @@
     <ClCompile Include="..\source\WSSAnvil.cpp" />
     <ClCompile Include="..\source\NBT.cpp" />
     <ClCompile Include="..\source\WGFlat.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Player.cpp">
+      <Filter>Packets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1101,9 +1080,6 @@
     <ClInclude Include="..\source\packets\cPacket_Respawn.h">
       <Filter>Packets\cPacket_Respawn</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\packets\cPacket_PlayerPosition.h">
-      <Filter>Packets\cPacket_PlayerPosition</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_DestroyEntity.h">
       <Filter>Packets\cPacket_DestroyEntity</Filter>
     </ClInclude>
@@ -1179,9 +1155,6 @@
     <ClInclude Include="..\source\cMakeDir.h">
       <Filter>cMakeDir</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\packets\cPacket_PlayerMoveLook.h">
-      <Filter>Packets\cPacket_PlayerMoveLook</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_TimeUpdate.h">
       <Filter>Packets\cPacket_TimeUpdate</Filter>
     </ClInclude>
@@ -1196,9 +1169,6 @@
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_Handshake.h">
       <Filter>Packets\cPacket_Handshake</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\packets\cPacket_PlayerLook.h">
-      <Filter>Packets\cPacket_PlayerLook</Filter>
     </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_ArmAnim.h">
       <Filter>Packets\cPacket_ArmAnim</Filter>
@@ -1368,9 +1338,6 @@
     <ClInclude Include="..\source\cPassiveMonster.h">
       <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\packets\cPacket_PlayerListItem.h">
-      <Filter>Packets\cPacket_PlayerListItem</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\cWorldGenerator.h">
       <Filter>cWorldGenerator</Filter>
     </ClInclude>
@@ -1426,6 +1393,9 @@
     <ClInclude Include="..\source\NBT.h" />
     <ClInclude Include="..\source\WGFlat.h" />
     <ClInclude Include="..\source\ChunkDef.h" />
+    <ClInclude Include="..\source\packets\cPacket_Player.h">
+      <Filter>Packets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

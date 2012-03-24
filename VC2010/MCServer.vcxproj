@@ -439,7 +439,7 @@
     <ClCompile Include="..\source\packets\cPacket_Explosion.cpp" />
     <ClCompile Include="..\source\packets\cPacket_ItemData.cpp" />
     <ClCompile Include="..\source\packets\cPacket_NewInvalidState.cpp" />
-    <ClCompile Include="..\source\packets\cPacket_PlayerListItem.cpp" />
+    <ClCompile Include="..\source\packets\cPacket_Player.cpp" />
     <ClCompile Include="..\source\packets\cPacket_SoundEffect.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Thunderbolt.cpp" />
     <ClCompile Include="..\source\packets\cPacket_EntityLook.cpp" />
@@ -456,9 +456,6 @@
     <ClCompile Include="..\source\packets\cPacket_MultiBlock.cpp" />
     <ClCompile Include="..\source\packets\cPacket_NamedEntitySpawn.cpp" />
     <ClCompile Include="..\source\packets\cPacket_PickupSpawn.cpp" />
-    <ClCompile Include="..\source\packets\cPacket_PlayerLook.cpp" />
-    <ClCompile Include="..\source\packets\cPacket_PlayerMoveLook.cpp" />
-    <ClCompile Include="..\source\packets\cPacket_PlayerPosition.cpp" />
     <ClCompile Include="..\source\packets\cPacket_PreChunk.cpp" />
     <ClCompile Include="..\source\packets\cPacket_RelativeEntityMove.cpp" />
     <ClCompile Include="..\source\packets\cPacket_RelativeEntityMoveLook.cpp" />
@@ -625,7 +622,7 @@
     <ClInclude Include="..\source\packets\cPacket_Explosion.h" />
     <ClInclude Include="..\source\packets\cPacket_ItemData.h" />
     <ClInclude Include="..\source\packets\cPacket_NewInvalidState.h" />
-    <ClInclude Include="..\source\packets\cPacket_PlayerListItem.h" />
+    <ClInclude Include="..\source\packets\cPacket_Player.h" />
     <ClInclude Include="..\source\packets\cPacket_SoundEffect.h" />
     <ClInclude Include="..\source\packets\cPacket_Thunderbolt.h" />
     <ClInclude Include="..\source\packets\cPacket_EntityLook.h" />
@@ -643,9 +640,6 @@
     <ClInclude Include="..\source\packets\cPacket_NamedEntitySpawn.h" />
     <ClInclude Include="..\source\packets\cPacket_PickupSpawn.h" />
     <ClInclude Include="..\source\packets\cPacket_Ping.h" />
-    <ClInclude Include="..\source\packets\cPacket_PlayerLook.h" />
-    <ClInclude Include="..\source\packets\cPacket_PlayerMoveLook.h" />
-    <ClInclude Include="..\source\packets\cPacket_PlayerPosition.h" />
     <ClInclude Include="..\source\packets\cPacket_PreChunk.h" />
     <ClInclude Include="..\source\packets\cPacket_RelativeEntityMove.h" />
     <ClInclude Include="..\source\packets\cPacket_RelativeEntityMoveLook.h" />

@@ -902,35 +902,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_PlayerListItem.cpp"
+					RelativePath="..\source\packets\cPacket_Player.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_PlayerListItem.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PlayerLook.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PlayerLook.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PlayerMoveLook.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PlayerMoveLook.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PlayerPosition.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PlayerPosition.h"
+					RelativePath="..\source\packets\cPacket_Player.h"
 					>
 				</File>
 				<File

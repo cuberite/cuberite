@@ -28,12 +28,10 @@
 #include "packets/cPacket_RelativeEntityMoveLook.h"
 #include "packets/cPacket_UpdateHealth.h"
 #include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_PlayerPosition.h"
 #include "packets/cPacket_DestroyEntity.h"
 #include "packets/cPacket_Metadata.h"
 #include "packets/cPacket_Chat.h"
 #include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_PlayerListItem.h"
 #include "packets/cPacket_BlockAction.h"
 
 #include "Vector3d.h"

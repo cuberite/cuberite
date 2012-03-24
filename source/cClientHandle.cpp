@@ -38,18 +38,15 @@
 #include "MersenneTwister.h"
 
 #include "packets/cPacket_KeepAlive.h"
-#include "packets/cPacket_PlayerPosition.h"
 #include "packets/cPacket_Respawn.h"
 #include "packets/cPacket_UpdateHealth.h"
 #include "packets/cPacket_RelativeEntityMoveLook.h"
 #include "packets/cPacket_Chat.h"
 #include "packets/cPacket_Login.h"
 #include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_PlayerMoveLook.h"
 #include "packets/cPacket_TimeUpdate.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_Handshake.h"
-#include "packets/cPacket_PlayerLook.h"
 #include "packets/cPacket_ArmAnim.h"
 #include "packets/cPacket_BlockPlace.h"
 #include "packets/cPacket_Flying.h"
@@ -64,7 +61,6 @@
 #include "packets/cPacket_13.h"
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_Ping.h"
-#include "packets/cPacket_PlayerListItem.h"
 #include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_MapChunk.h"
 #include "packets/cPacket_PreChunk.h"
@@ -125,6 +121,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	m_PacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
 	m_PacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
 	m_PacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
+	m_PacketMap[E_PLAYER_ABILITIES]          = new cPacket_PlayerAbilities;
 	m_PacketMap[E_CHAT]                      = new cPacket_Chat;
 	m_PacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
 	m_PacketMap[E_FLYING]                    = new cPacket_Flying;
@@ -352,8 +349,7 @@ void cClientHandle::StreamChunks(void)
 	m_LastStreamedChunkX = ChunkPosX;
 	m_LastStreamedChunkZ = ChunkPosZ;
 	
-	// DEBUG:
-	LOGINFO("Streaming chunks centered on [%d, %d], view distance %d", ChunkPosX, ChunkPosZ, m_ViewDistance);
+	LOGD("Streaming chunks centered on [%d, %d], view distance %d", ChunkPosX, ChunkPosZ, m_ViewDistance);
 	
 	cWorld * World = m_Player->GetWorld();
 	ASSERT(World != NULL);
@@ -1871,7 +1867,7 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 			LOGERROR("Unknown packet type 0x%02x from client \"%s\"", (unsigned char)m_ReceivedData[0], m_Username.c_str());
 
 			AString Reason;
-			Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", m_ReceivedData[0]);
+			Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)m_ReceivedData[0]);
 			cPacket_Disconnect DC(Reason);
 			m_Socket.Send(&DC);
 			cSleep::MilliSleep(1000); // Give packet some time to be received

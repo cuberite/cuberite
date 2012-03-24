@@ -54,6 +54,7 @@ enum ENUM_PACKET_ID
 	E_CREATIVE_INVENTORY_ACTION = 0x6B,
 	E_UPDATE_SIGN               = 0x82,
 	E_PLAYER_LIST_ITEM          = 0xC9,
+	E_PLAYER_ABILITIES          = 0xca,  // since 1.2.4, protocol version 29
 	E_PING                      = 0xfe,
 	E_DISCONNECT                = 0xff,
 };
