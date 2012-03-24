@@ -40,7 +40,7 @@ class cWSSAnvil :
 	
 public:
 
-	cWSSAnvil(cWSInterface * a_WSI) : super(a_WSI) {}
+	cWSSAnvil(cWorld * a_World) : super(a_World) {}
 	virtual ~cWSSAnvil();
 	
 protected:

@@ -21,7 +21,6 @@ class cSignEntity :
 {
 public:
 	cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
-	cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z);
 	virtual ~cSignEntity();
 
 	OBSOLETE bool LoadFromFile(cFile & a_File);  // deprecated format

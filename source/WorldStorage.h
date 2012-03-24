@@ -22,45 +22,8 @@
 
 
 
-/** Interface between cWorld and cWorldStorage, contains all calls into cWorld that cWorldStorage needs
-Defining this as an interface lets us re-use the cWorldStorage outside of MC-Server's main executable,
-for example for tools such as storage converters or chunk analytics
-*/
-class cWSInterface
-{
-public:
-	/// Asks the world if the chunk is fully valid
-	virtual bool WSIIsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) = 0;
-	
-	/// Marks the chunk as being saved
-	virtual void WSIMarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ) = 0;
-	
-	/// Marks the chunk as having been saved (if there was no change since the last MarkSaving)
-	virtual void WSIMarkChunkSaved(int a_ChunkX, int a_ChunkY, int a_ChunkZ) = 0;
-	
-	/// Marks the chunk as unable to load
-	virtual void WSIChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ) = 0;
-	
-	/// Called when chunk generation has been specified for a chunk that cannot be loaded
-	virtual void WSIGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ) = 0;
-	
-	/// Marks the chunk as having been saved (if there was no change since the last MarkSaving)
-	virtual bool WSIGetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback) = 0;
-
-	/// Gets the folder where the world is saved
-	virtual AString WSIGetFolder(void) = 0;
-
-	virtual void WSIChunkDataLoaded(
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
-		const BLOCKTYPE * a_BlockTypes,
-		const BLOCKTYPE * a_BlockMeta,
-		const BLOCKTYPE * a_BlockLight,
-		const BLOCKTYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		cEntityList & a_Entities,
-		cBlockEntityList & a_BlockEntities
-	) = 0;
-} ;
+// fwd:
+class cWorld;
 
 
 
@@ -70,7 +33,7 @@ public:
 class cWSSchema abstract
 {
 public:
-	cWSSchema(cWSInterface * a_WSI) : m_WSI(a_WSI) {}
+	cWSSchema(cWorld * a_World) : m_World(a_World) {}
 	virtual ~cWSSchema() {}  // Force the descendants' destructors to be virtual
 	
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) = 0;
@@ -79,7 +42,7 @@ public:
 	
 protected:
 
-	cWSInterface * m_WSI;
+	cWorld * m_World;
 } ;
 
 typedef std::list<cWSSchema *> cWSSchemaList;
@@ -140,7 +103,7 @@ public:
 	void UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void UnqueueSave(const cChunkCoords & a_Chunk);
 	
-	bool Start(cWSInterface * a_WSI, const AString & a_StorageSchemaName);  // Hide the cIsThread's Start() method, we need to provide args
+	bool Start(cWorld * a_World, const AString & a_StorageSchemaName);  // Hide the cIsThread's Start() method, we need to provide args
 	void WaitForFinish(void);
 	void WaitForQueuesEmpty(void);
 	
@@ -161,8 +124,7 @@ protected:
 	
 	typedef std::list<sChunkLoad> sChunkLoadQueue;
 	
-	cWSInterface * m_WSI;
-	
+	cWorld * m_World;
 	AString  m_StorageSchemaName;
 	
 	// Both queues are locked by the same CS

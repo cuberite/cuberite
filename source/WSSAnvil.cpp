@@ -111,7 +111,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	
 	// Load it anew:
 	AString FileName;
-	Printf(FileName, "%s/r.%d.%d.mca", m_WSI->WSIGetFolder().c_str(), RegionX, RegionZ);
+	Printf(FileName, "%s/r.%d.%d.mca", m_World->GetName().c_str(), RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(FileName, RegionX, RegionZ);
 	if (f == NULL)
 	{
@@ -282,7 +282,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	memset(ChunkData + cChunkDef::SkyLightOffset, 0xff, cChunkDef::NumBlocks / 2);
 	//*/
 	
-	m_WSI->WSIChunkDataLoaded(
+	m_World->ChunkDataLoaded(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
 		ChunkData,
 		ChunkData + cChunkDef::MetaOffset,
@@ -353,7 +353,7 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cNBTC
 	{
 		return;  // Make it an empty chest
 	}
-	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z));
+	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World));
 	const cNBTTags & ItemDefs = Items->GetChildren();
 	for (cNBTTags::const_iterator itr = ItemDefs.begin(); itr != ItemDefs.end(); ++itr)
 	{

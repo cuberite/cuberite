@@ -25,15 +25,6 @@ cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, c
 
 
 
-cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z)
-	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z)
-{
-}
-
-
-
-
-
 cSignEntity::~cSignEntity()
 {
 }

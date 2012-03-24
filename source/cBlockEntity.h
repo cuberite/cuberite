@@ -41,17 +41,7 @@ protected:
 		, m_BlockType( a_BlockType ) 
 		, m_World( a_World )
 	{}
-	
-	cBlockEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z)
-		: m_PosX( a_X )
-		, m_PosY( a_Y )
-		, m_PosZ( a_Z )
-		, m_BlockType( a_BlockType ) 
-		, m_World(NULL)
-	{}
-	
 public:
-
 	virtual ~cBlockEntity() {};
 	virtual void Destroy() {};
 	
@@ -62,7 +52,6 @@ public:
 	ENUM_BLOCK_ID GetBlockType() { return m_BlockType; }
 	
 	cWorld * GetWorld(void) const {return m_World; }
-	void     SetWorld(cWorld * a_World) {m_World = a_World; }
 
 	virtual void SaveToJson  (Json::Value & a_Value ) = 0;
 	

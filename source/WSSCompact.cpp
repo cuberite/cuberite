@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "WSSCompact.h"
+#include "cWorld.h"
 #include "zlib.h"
 #include <json/json.h>
 #include "StringCompression.h"
@@ -67,7 +68,7 @@ bool cWSSCompact::LoadChunk(const cChunkCoords & a_Chunk)
 		return false;
 	}
 	
-	return LoadChunkFromData(a_Chunk, UncompressedSize, ChunkData, m_WSI);
+	return LoadChunkFromData(a_Chunk, UncompressedSize, ChunkData, m_World);
 }
 
 
@@ -85,7 +86,7 @@ bool cWSSCompact::SaveChunk(const cChunkCoords & a_Chunk)
 		LOG("Cannot locate a proper PAK file for chunk [%d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
-	return f->SaveChunk(a_Chunk, m_WSI);
+	return f->SaveChunk(a_Chunk, m_World);
 }
 
 
@@ -118,7 +119,7 @@ cWSSCompact::cPAKFile * cWSSCompact::LoadPAKFile(const cChunkCoords & a_Chunk)
 	
 	// Load it anew:
 	AString FileName;
-	Printf(FileName, "%s/X%i_Z%i.pak", m_WSI->WSIGetFolder().c_str(), LayerX, LayerZ );
+	Printf(FileName, "%s/X%i_Z%i.pak", m_World->GetName().c_str(), LayerX, LayerZ );
 	cPAKFile * f = new cPAKFile(FileName, LayerX, LayerZ);
 	if (f == NULL)
 	{
@@ -187,7 +188,7 @@ bool cWSSCompact::EraseChunkData(const cChunkCoords & a_Chunk)
 
 
 
-void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWSInterface * a_WSI)
+void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World)
 {
 	// Load chests
 	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
@@ -196,7 +197,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 		for (Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
 		{
 			Json::Value & Chest = *itr;
-			cChestEntity * ChestEntity = new cChestEntity(0, 0, 0);
+			cChestEntity * ChestEntity = new cChestEntity(0,0,0, a_World);
 			if (!ChestEntity->LoadFromJson( Chest ) )
 			{
 				LOGERROR("ERROR READING CHEST FROM JSON!" );
@@ -216,7 +217,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 		for( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
 		{
 			Json::Value & Furnace = *itr;
-			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0, 0, 0);
+			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0,0,0, a_World);
 			if( !FurnaceEntity->LoadFromJson( Furnace ) )
 			{
 				LOGERROR("ERROR READING FURNACE FROM JSON!" );
@@ -236,7 +237,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 		for( Json::Value::iterator itr = AllSigns.begin(); itr != AllSigns.end(); ++itr )
 		{
 			Json::Value & Sign = *itr;
-			cSignEntity * SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0, 0, 0);
+			cSignEntity * SignEntity = new cSignEntity( E_BLOCK_SIGN_POST, 0,0,0, a_World);
 			if ( !SignEntity->LoadFromJson( Sign ) )
 			{
 				LOGERROR("ERROR READING SIGN FROM JSON!" );
@@ -381,7 +382,7 @@ bool cWSSCompact::cPAKFile::GetChunkData(const cChunkCoords & a_Chunk, int & a_U
 
 
 
-bool cWSSCompact::cPAKFile::SaveChunk(const cChunkCoords & a_Chunk, cWSInterface * a_World)
+bool cWSSCompact::cPAKFile::SaveChunk(const cChunkCoords & a_Chunk, cWorld * a_World)
 {
 	if (!SaveChunkToData(a_Chunk, a_World))
 	{
@@ -680,7 +681,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 
 
-bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWSInterface * a_WSI)
+bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_UncompressedSize, const AString & a_Data, cWorld * a_World)
 {
 	// Crude data integrity check:
 	if (a_UncompressedSize < cChunkDef::BlockDataSize)
@@ -729,13 +730,13 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 		}
 		else
 		{
-			LoadEntitiesFromJson(root, Entities, BlockEntities, a_WSI);
+			LoadEntitiesFromJson(root, Entities, BlockEntities, a_World);
 		}
 	}
 
 	BLOCKTYPE * BlockData = (BLOCKTYPE *)UncompressedData.data();
 	
-	a_WSI->WSIChunkDataLoaded(
+	a_World->ChunkDataLoaded(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
 		BlockData,
 		BlockData + cChunkDef::MetaOffset,
@@ -777,11 +778,11 @@ bool cWSSCompact::cPAKFile::EraseChunkData(const cChunkCoords & a_Chunk)
 
 
 
-bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWSInterface * a_WSI)
+bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld * a_World)
 {
 	// Serialize the chunk:
 	cJsonChunkSerializer Serializer;
-	if (!a_WSI->WSIGetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
+	if (!a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
 	{
 		// Chunk not valid
 		LOG("cWSSCompact: Trying to save chunk [%d, %d, %d] that has no data, ignoring request.", a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);

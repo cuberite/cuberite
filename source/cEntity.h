@@ -84,9 +84,6 @@ public:																						//tolua_export
 	int GetChunkY(void) const {return m_ChunkY; }
 	int GetChunkZ(void) const {return m_ChunkZ; }
 
-	// Can be used only once - to set the initial world after loading. Not to be used for moving to another world!
-	void SetWorld( cWorld* a_World ) { ASSERT(m_World == NULL); m_World = a_World; }
-
 	void SetPosX( const double & a_PosX );													//tolua_export
 	void SetPosY( const double & a_PosY );													//tolua_export
 	void SetPosZ( const double & a_PosZ );													//tolua_export
@@ -113,6 +110,7 @@ public:																						//tolua_export
 protected:
 	virtual void Destroyed() {} // Called after the entity has been destroyed
 
+	void SetWorld( cWorld* a_World ) { m_World = a_World; }
 	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);
 
 	friend class cReferenceManager;

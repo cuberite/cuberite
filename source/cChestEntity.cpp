@@ -34,18 +34,6 @@ cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 
 
 
-cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z)
-	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z)
-	, m_TopChest( false )
-	, m_JoinedChest( NULL )
-{
-	m_Content = new cItem[ c_ChestHeight*c_ChestWidth ];
-}
-
-
-
-
-
 cChestEntity::~cChestEntity()
 {
 	if( GetWindow() )
