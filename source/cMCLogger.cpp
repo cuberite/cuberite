@@ -59,19 +59,19 @@ void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
 	switch( a_LogType )
 	{
 		case 0:
-			Log(a_Text, 0);
+			LOG("%s", a_Text);
 			break;
 		case 1:
-			Info(a_Text, 0);
+			LOGINFO("%s", a_Text);
 			break;
 		case 2:
-			Warn(a_Text, 0);
+			LOGWARN("%s", a_Text);
 			break;
 		case 3:
-			Error(a_Text, 0);
+			LOGERROR("%s", a_Text);
 			break;
 		default:
-			Log(a_Text, 0);
+			LOG("(#%d#: %s", a_LogType, a_Text);
 			break;
 	}
 }

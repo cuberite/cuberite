@@ -98,15 +98,7 @@ void cLog::ClearLog()
 void cLog::Log(const char * a_Format, va_list argList)
 {
 	AString Message;
-	if (argList != NULL)
-	{
-		AppendVPrintf(Message, a_Format, argList);
-	}
-	else
-	{
-		// This branch needs to be here because of *nix crashing in vsnprintf() when argList is NULL
-		Message.assign(a_Format);
-	}
+	AppendVPrintf(Message, a_Format, argList);
 
 	time_t rawtime;
 	time ( &rawtime );
