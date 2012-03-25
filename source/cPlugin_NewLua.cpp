@@ -16,7 +16,7 @@ extern "C"
 #include "ManualBindings.h"
 
 #ifdef _WIN32
-#include "wdirent.h"
+// #include "wdirent.h"
 #else
 #include <dirent.h>
 #endif
@@ -59,38 +59,32 @@ bool cPlugin_NewLua::Initialize()
 	std::string PluginPath = std::string("Plugins/") + m_Directory + "/";
 
 	// Load all files for this plugin, and execute them
-	DIR* dp;
-	struct dirent *entry;
-	if(dp = opendir( PluginPath.c_str() ))
+	AStringList Files = GetDirectoryContents(PluginPath.c_str());
+	for (AStringList::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
 	{
-		while(entry = readdir(dp))
+		if (itr->rfind(".lua") == AString::npos)
 		{
-			std::string FileName = entry->d_name;
-			if( FileName.find(".lua") != std::string::npos )
-			{
-				std::string Path = PluginPath + FileName;
-				int s = luaL_loadfile(m_LuaState, Path.c_str() );
-				if( report_errors( m_LuaState, s ) )
-				{
-					LOGERROR("Can't load plugin %s because of an error in file %s", m_Directory.c_str(), Path.c_str() );
-					lua_close( m_LuaState );
-					m_LuaState = 0;
-					return false;
-				}
-
-				s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
-				if( report_errors( m_LuaState, s ) )
-				{
-					LOGERROR("Error in plugin %s in file %s", m_Directory.c_str(), Path.c_str() );
-					lua_close( m_LuaState );
-					m_LuaState = 0;
-					return false;
-				}
-			}
+			continue;
 		}
-		closedir( dp );
-	}
+		AString Path = PluginPath + *itr;
+		int s = luaL_loadfile(m_LuaState, Path.c_str() );
+		if( report_errors( m_LuaState, s ) )
+		{
+			LOGERROR("Can't load plugin %s because of an error in file %s", m_Directory.c_str(), Path.c_str() );
+			lua_close( m_LuaState );
+			m_LuaState = 0;
+			return false;
+		}
 
+		s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
+		if( report_errors( m_LuaState, s ) )
+		{
+			LOGERROR("Error in plugin %s in file %s", m_Directory.c_str(), Path.c_str() );
+			lua_close( m_LuaState );
+			m_LuaState = 0;
+			return false;
+		}
+	}  // for itr - Files[]
 
 	// Call intialize function
 	if( !PushFunction("Initialize") )
@@ -101,7 +95,6 @@ bool cPlugin_NewLua::Initialize()
 	}
 
 	tolua_pushusertype(m_LuaState, this, "cPlugin_NewLua");
-
 	
 	if( !CallFunction(1, 1, "Initialize") ) 
 	{

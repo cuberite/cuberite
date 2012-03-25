@@ -15,6 +15,7 @@
 
 typedef std::string AString;
 typedef std::vector<AString> AStringVector;
+typedef std::list<AString>   AStringList;
 
 
 
@@ -40,6 +41,10 @@ extern int NoCaseCompare(const AString & s1, const AString & s2);
 
 /// Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);
+
+/// Returns the list of all items in the specified directory (files, folders, nix pipes, whatever's there)
+extern AStringList GetDirectoryContents(const char * a_Directory);
+
 
 
 // If you have any other string helper functions, declare them here

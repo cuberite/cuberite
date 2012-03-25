@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/11/12 17:55:41.
+** Generated automatically by tolua++-1.0.92 on 03/25/12 16:23:48.
 */
 
 #ifndef __cplusplus
@@ -17574,6 +17574,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ENT_LOOK",E_ENT_LOOK);
   tolua_constant(tolua_S,"E_REL_ENT_MOVE_LOOK",E_REL_ENT_MOVE_LOOK);
   tolua_constant(tolua_S,"E_ENT_TELEPORT",E_ENT_TELEPORT);
+  tolua_constant(tolua_S,"E_ENT_HEAD_LOOK",E_ENT_HEAD_LOOK);
   tolua_constant(tolua_S,"E_ENT_STATUS",E_ENT_STATUS);
   tolua_constant(tolua_S,"E_METADATA",E_METADATA);
   tolua_constant(tolua_S,"E_PRE_CHUNK",E_PRE_CHUNK);
@@ -17594,6 +17595,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_CREATIVE_INVENTORY_ACTION",E_CREATIVE_INVENTORY_ACTION);
   tolua_constant(tolua_S,"E_UPDATE_SIGN",E_UPDATE_SIGN);
   tolua_constant(tolua_S,"E_PLAYER_LIST_ITEM",E_PLAYER_LIST_ITEM);
+  tolua_constant(tolua_S,"E_PLAYER_ABILITIES",E_PLAYER_ABILITIES);
   tolua_constant(tolua_S,"E_PING",E_PING);
   tolua_constant(tolua_S,"E_DISCONNECT",E_DISCONNECT);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);

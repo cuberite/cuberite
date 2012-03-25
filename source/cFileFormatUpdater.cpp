@@ -12,13 +12,6 @@
 
 
 
-typedef std::list< std::string > StringList;
-StringList GetDirectoryContents( const char* a_Directory );
-
-
-
-
-
 void cFileFormatUpdater::UpdateFileFormat()
 {
 	UpdatePlayersOfWorld("world");
@@ -31,13 +24,13 @@ void cFileFormatUpdater::UpdateFileFormat()
 // Convert player .bin files to JSON
 void cFileFormatUpdater::UpdatePlayersOfWorld( const char* a_WorldName )
 {
-	std::string PlayerDir = std::string( a_WorldName ) + "/player/";
+	AString PlayerDir = AString( a_WorldName ) + "/player/";
 
-	StringList AllFiles = GetDirectoryContents( PlayerDir.c_str() );
-	for( StringList::iterator itr = AllFiles.begin(); itr != AllFiles.end(); ++itr )
+	AStringList AllFiles = GetDirectoryContents( PlayerDir.c_str() );
+	for (AStringList::iterator itr = AllFiles.begin(); itr != AllFiles.end(); ++itr )
 	{
-		std::string & FileName = *itr;
-		if( FileName.rfind(".bin") != std::string::npos ) // Get only the files ending in .bin
+		AString & FileName = *itr;
+		if (FileName.rfind(".bin") != AString::npos) // Get only the files ending in .bin
 		{
 			PlayerBINtoJSON( (PlayerDir + FileName).c_str() );
 		}
@@ -143,47 +136,6 @@ void cFileFormatUpdater::PlayerBINtoJSON( const char* a_FileName )
 	}
 
 	LOGINFO("Successfully converted binary to Json \"%s\"", FileNameJson.c_str() );
-}
-
-
-
-
-
-// Helper function
-StringList GetDirectoryContents( const char* a_Directory )
-{
-	StringList AllFiles;
-#ifdef _WIN32
-	std::string FileFilter = std::string( a_Directory ) + "*.*";
-	HANDLE hFind;
-	WIN32_FIND_DATA FindFileData;
-
-	if( ( hFind = FindFirstFile(FileFilter.c_str(), &FindFileData) ) != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			AllFiles.push_back( FindFileData.cFileName );
-		} while( FindNextFile(hFind, &FindFileData) );
-		FindClose(hFind);
-	}
-#else
-	DIR *dp;
-	struct dirent *dirp;
-	if( (dp  = opendir( a_Directory ) ) == NULL) 
-	{
-		LOGERROR("Error (%i) opening %s\n", errno, a_Directory );
-	}
-	else
-	{
-		while ((dirp = readdir(dp)) != NULL) 
-		{
-			AllFiles.push_back( dirp->d_name );
-		}
-		closedir(dp);
-	}
-#endif
-
-	return AllFiles;
 }
 
 
