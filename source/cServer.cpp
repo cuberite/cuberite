@@ -154,10 +154,11 @@ bool cServer::InitServer( int a_Port )
 	printf("/============================\\\n");
 	printf("|   Custom Minecraft Server  |\n");
 	printf("|  Created by Kevin Bansberg |\n");
-	printf("|           A.K.A.           |\n");
-	printf("|         FakeTruth          |\n");
+	printf("|       A.K.A. FakeTruth     |\n");
 	printf("| Monsters by Alex Sonek     |\n");
-	printf("|           A.K.A. Duralex   |\n");
+	printf("|       A.K.A. Duralex       |\n");
+	printf("| Stuff by Mattes D          |\n");
+	printf("|       A.K.A. _Xoft(o)      |\n");
 	printf("\\============================/\n");
 	printf("More info: WWW.MC-SERVER.ORG\n");
 	printf("           WWW.AE-C.NET\n");
@@ -165,6 +166,7 @@ bool cServer::InitServer( int a_Port )
 	printf("email: faketruth@gmail.com\n\n");
 
 	LOG("Starting up server.");
+	LOGINFO("Compatible clients: %s, protocol version %d", MCS_CLIENT_VERSION, MCS_PROTOCOL_VERSION);
 
 	if( cSocket::WSAStartup() != 0 ) // Only does anything on Windows, but whatever
 	{
