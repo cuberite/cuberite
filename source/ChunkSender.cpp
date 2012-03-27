@@ -105,6 +105,7 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 			}
 			++itr;
 		}  // for itr - m_SendChunks[]
+		m_RemoveCount++;
 	}
 	m_evtQueue.Set();
 	m_evtRemoved.Wait();  // Wait for removal confirmation
@@ -121,8 +122,13 @@ void cChunkSender::Execute(void)
 		cCSLock Lock(m_CS);
 		while (m_ChunksReady.empty() && m_SendChunks.empty())
 		{
+			int RemoveCount = m_RemoveCount;
+			m_RemoveCount = 0;
 			cCSUnlock Unlock(Lock);
-			m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
+			for (int i = 0; i < RemoveCount; i++)
+			{
+				m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
+			}
 			m_evtQueue.Wait();
 			if (m_ShouldTerminate)
 			{
@@ -148,7 +154,14 @@ void cChunkSender::Execute(void)
 			
 			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkY, Chunk.m_ChunkZ, Chunk.m_Client);
 		}
-		m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
+		Lock.Lock();
+		int RemoveCount = m_RemoveCount;
+		m_RemoveCount = 0;
+		Lock.Unlock();
+		for (int i = 0; i < RemoveCount; i++)
+		{
+			m_evtRemoved.Set();  // Notify that the removed clients are safe to be deleted
+		}
 	}  // while (!mShouldTerminate)
 }
 
