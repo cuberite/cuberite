@@ -3,6 +3,7 @@
 
 #include "cLuaCommandBinder.h"
 #include "cPlayer.h"
+#include "cPlugin.h"
 #include "cPlugin_Lua.h"
 
 #include "tolua++.h"
@@ -45,6 +46,11 @@ void cLuaCommandBinder::RemoveBindingsForPlugin( cPlugin* a_Plugin )
 
 bool cLuaCommandBinder::BindCommand( const std::string & a_Command, const std::string & a_Permission, cPlugin* a_Plugin, lua_State * a_LuaState, int a_FunctionReference )
 {
+	if( !a_Plugin->CanBindCommands() )
+	{
+		LOGERROR("ERROR: Trying to bind command \"%s\" to a plugin that is not initialized.", a_Command.c_str() );
+		return false;
+	}
 	if( m_BoundCommands.find( a_Command ) != m_BoundCommands.end() )
 	{
 		LOGERROR("ERROR: Trying to bind command \"%s\" that has already been bound.", a_Command.c_str() );

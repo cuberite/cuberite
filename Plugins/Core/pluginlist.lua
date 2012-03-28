@@ -7,7 +7,7 @@ function HandlePluginListCommand( Split, Player )
 		table.insert(PluginTable, Plugin:GetName() )
 	end
 
-	Player:SendMessage( cChatColor.Green .. "Loaded plugins:" )
+	Player:SendMessage( cChatColor.Green .. "Loaded plugins: (" .. #PluginTable .. ")" )
 	Player:SendMessage( cChatColor.Gold .. table.concat(PluginTable, cChatColor.Gold.." ") )
 	return true
 end

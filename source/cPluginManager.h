@@ -32,8 +32,8 @@ public:																	//tolua_export
 	static cPluginManager * GetPluginManager();							//tolua_export
 
 	typedef std::list< cPlugin* > PluginList;
-	cPlugin* GetPlugin( const char* a_Plugin );							//tolua_export
-	const PluginList & GetAllPlugins();									// >> EXPORTED IN MANUALBINDINGS <<
+	cPlugin* GetPlugin( const char* a_Plugin ) const;					//tolua_export
+	const PluginList & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
 
 	void ReloadPlugins();												//tolua_export
 	bool AddPlugin( cPlugin* a_Plugin );
@@ -41,7 +41,7 @@ public:																	//tolua_export
 	bool AddLuaPlugin( cPlugin_Lua* a_Plugin );
 	void AddHook( cPlugin* a_Plugin, PluginHook a_Hook );				//tolua_export
 
-	unsigned int GetNumPlugins();										//tolua_export
+	unsigned int GetNumPlugins() const;									//tolua_export
 
 	bool CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... );
 
@@ -50,14 +50,20 @@ public:																	//tolua_export
 	void RemoveLuaPlugin( std::string a_FileName );						//tolua_export
 	cPlugin_Lua* GetLuaPlugin( lua_State* a_State );					//tolua_export
 
-	cLuaCommandBinder* GetLuaCommandBinder() { return m_LuaCommandBinder; }
+	cLuaCommandBinder* GetLuaCommandBinder() const { return m_LuaCommandBinder; }
+
+	bool HasPlugin( cPlugin* a_Plugin ) const;
 private:
 	friend class cRoot;
 	cPluginManager();
 	~cPluginManager();
 
-	struct sPluginManagerState;
-	sPluginManagerState* m_pState;
+	typedef std::list< cPlugin_Lua* > LuaPluginList;
+	typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
+
+	LuaPluginList m_LuaPlugins;
+	PluginList m_Plugins;
+	HookMap m_Hooks;
 
 	void ReloadPluginsNow();
 	void UnloadPluginsNow();

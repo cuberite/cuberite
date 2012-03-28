@@ -80,7 +80,11 @@ public:
 	PluginLanguage GetLanguage() { return m_Language; }
 	void SetLanguage( PluginLanguage a_Language ) { m_Language = a_Language; }
 
+	bool CanBindCommands() { return m_bCanBindCommands; }
 private:
+	friend class cPluginManager;
+	bool m_bCanBindCommands;	// Only changed by cPluginManager
+
 	PluginLanguage m_Language;
 	std::vector< CommandStruct > m_Commands;
 	std::string m_Name;

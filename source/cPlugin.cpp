@@ -10,6 +10,7 @@
 cPlugin::cPlugin()
 	: m_Version( 0 )
 	, m_Language( E_CPP )
+	, m_bCanBindCommands( false )
 {
 }
 
