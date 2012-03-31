@@ -350,10 +350,12 @@ void cFluidSimulator::Simulate( float a_Dt )
 						cPickup* Pickup = new cPickup( pos.x * 32 + 16, (pos.y-1) * 32 + 16, pos.z * 32 + 16, cItem( (ENUM_ITEM_ID)DownID, 1, m_World->GetBlockMeta( pos.x, pos.y-1, pos.z ) ) );
 						Pickup->Initialize( m_World );
 					}
-
-					m_World->FastSetBlock( pos.x, pos.y-1, pos.z, m_FluidBlock, 8 ); // falling
-					AddBlock( pos.x, pos.y-1, pos.z );
-					ApplyUniqueToNearest(pos - Vector3i(0, 1, 0));
+					if( pos.y > 0 )
+					{
+						m_World->FastSetBlock( pos.x, pos.y-1, pos.z, m_FluidBlock, 8 ); // falling
+						AddBlock( pos.x, pos.y-1, pos.z );
+						ApplyUniqueToNearest(pos - Vector3i(0, 1, 0));
+					}
 				}
 				if(IsSolidBlock(DownID)||( BlockID == m_StationaryFluidBlock)) // Not falling
 				{
