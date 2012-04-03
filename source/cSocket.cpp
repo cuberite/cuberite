@@ -211,6 +211,7 @@ unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST(void)
 int cSocket::Bind(SockAddr_In& a_Address)
 {
 	sockaddr_in local;
+	memset(&local, 0, sizeof(local));
 
 	local.sin_family = a_Address.Family;
 	local.sin_addr.s_addr = a_Address.Address;
