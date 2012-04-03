@@ -759,7 +759,10 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		return;
 	}
 
-	LOG("OnBlockDig: %i %i %i Dir: %i Stat: %i", a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction, a_Packet->m_Status);
+	LOGD("OnBlockDig: {%i, %i, %i} Dir: %i Stat: %i",
+		a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, 
+		a_Packet->m_Direction, a_Packet->m_Status
+	);
 	if (a_Packet->m_Status == 0x04)	// Drop block
 	{
 		m_Player->TossItem(false);
@@ -969,7 +972,10 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		cItem Item;
 		Item.m_ItemID = Equipped.m_ItemID;
 		Item.m_ItemCount = 1;
-		LOG("Placing item of type: %i", (int)a_Packet->m_ItemType);
+		LOGD("Placing item of type %i at {%d, %d, %d}", 
+			(int)a_Packet->m_ItemType,
+			a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ
+		);
 
 		// Hacked in edible items go!~
 		// TODO: Handle hunger
