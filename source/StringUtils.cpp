@@ -182,9 +182,13 @@ AStringList GetDirectoryContents(const char * a_Directory)
 
 	DIR * dp;
 	struct dirent *dirp;
+	if (*a_Directory == 0)
+	{
+		a_Directory = ".";
+	}
 	if ((dp = opendir(a_Directory)) == NULL) 
 	{
-		LOGERROR("Error (%i) opening %s\n", errno, a_Directory );
+		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, a_Directory );
 	}
 	else
 	{
