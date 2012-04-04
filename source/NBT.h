@@ -201,6 +201,34 @@ public:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// The serializer:
+
+class cNBTSerializer
+{
+	static void WriteTag     (AString & a_Out, const cNBTTag * a_Tag);
+	
+	static void WriteByte     (AString & a_Out, const char      a_Value);
+	static void WriteInt16    (AString & a_Out, const Int16     a_Value);
+	static void WriteInt32    (AString & a_Out, const Int32     a_Value);
+	static void WriteInt64    (AString & a_Out, const Int64     a_Value);
+	static void WriteFloat    (AString & a_Out, const float     a_Value);
+	static void WriteDouble   (AString & a_Out, const double    a_Value);
+	static void WriteByteArray(AString & a_Out, const AString & a_Value);
+	static void WriteString   (AString & a_Out, const AString & a_Value);
+	static void WriteList     (AString & a_Out, const cNBTList     * a_List);
+	static void WriteCompound (AString & a_Out, const cNBTCompound * a_Compound);
+	static void WriteIntArray (AString & a_Out, const cNBTIntArray * a_Array);
+	
+public:
+
+	static void Serialize(const cNBTTree * a_Tree, AString & a_Out);
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Dumping the tree (DEBUG-only)
 
 #if (defined(_DEBUG) && defined(_WIN32))

@@ -367,7 +367,7 @@ int cNBTParser::ReadDouble(const char ** a_Data, int * a_Length, double & a_Valu
 	{
 		return ERROR_PRIVATE_NBTPARSER_TOOSHORT;
 	}
-	a_Value = NetworkToHostDouble8(a_Data);
+	a_Value = NetworkToHostDouble8(*a_Data);
 	*a_Data += 8;
 	*a_Length -= 8;
 	return ERROR_SUCCESS;
@@ -572,6 +572,18 @@ int cNBTParser::ReadTag(const char ** a_Data, int * a_Length, cNBTTag::eTagType 
 		
 		default:
 		{
+			#if (defined(_DEBUG) && defined(_WIN32))
+			OutputDebugString("Unhandled NBT tag type\n");
+			cNBTTag * Parent = a_Parent, * Cur = a_Parent;
+			while (Parent != NULL)
+			{
+				OutputDebugString("Parent:\n");
+				Cur = Parent;
+				Parent = Parent->GetParent();
+				DumpTree(Cur);
+			}
+			OutputDebugString("Done\n");
+			#endif  // _DEBUG
 			ASSERT(!"Unhandled NBT tag type");
 			break;
 		}
@@ -613,6 +625,192 @@ cNBTTree * cNBTParser::Parse(const char * a_Data, int a_Length)
 		return Root.release();
 	}
 	return NULL;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cNBTSerializer:
+
+void cNBTSerializer::WriteByte(AString & a_Out, const char a_Value)
+{
+	a_Out.push_back(a_Value);
+}
+
+
+
+
+
+void cNBTSerializer::WriteInt16(AString & a_Out, const Int16 a_Value)
+{
+	Int16 Val = htons(a_Value);
+	a_Out.append((char *)&Val, 2);
+}
+
+
+
+
+
+void cNBTSerializer::WriteInt32(AString & a_Out, const Int32 a_Value)
+{
+	Int32 Val = htonl(a_Value);
+	a_Out.append((char *)&Val, 4);
+}
+
+
+
+
+
+void cNBTSerializer::WriteInt64(AString & a_Out, const Int64 a_Value)
+{
+	Int64 Val = HostToNetwork8(&a_Value);
+	a_Out.append((char *)&Val, 8);
+}
+
+
+
+
+
+void cNBTSerializer::WriteFloat(AString & a_Out, const float a_Value)
+{
+	Int32 Val = htonl(*((u_long *)&a_Value));
+	a_Out.append((char *)&Val, 4);
+}
+
+
+
+
+
+void cNBTSerializer::WriteDouble(AString & a_Out, const double a_Value)
+{
+	Int64 Val = HostToNetwork8(&a_Value);
+	a_Out.append((char *)&Val, 8);
+}
+
+
+
+
+
+void cNBTSerializer::WriteByteArray(AString & a_Out, const AString & a_Value)
+{
+	WriteInt32(a_Out, a_Value.size());
+	a_Out.append(a_Value);
+}
+
+
+
+
+
+void cNBTSerializer::WriteString(AString & a_Out, const AString & a_String)
+{
+	WriteInt16(a_Out, a_String.length());
+	a_Out.append(a_String);
+}
+
+
+
+
+
+void cNBTSerializer::WriteList(AString & a_Out, const cNBTList * a_List)
+{
+	WriteInt32(a_Out, a_List->GetChildrenCount());
+	const cNBTTags & Children = a_List->GetChildren();
+	for (cNBTTags::const_iterator itr = Children.begin(); itr != Children.end(); ++itr)
+	{
+		WriteTag(a_Out, *itr);
+	}  // for itr - Children[]
+}
+
+
+
+
+
+void cNBTSerializer::WriteIntArray(AString & a_Out, const cNBTIntArray * a_Array)
+{
+	WriteInt32(a_Out, a_Array->GetValues().size());
+	const std::vector<int> & Values = a_Array->GetValues();
+	for (std::vector<int>::const_iterator itr = Values.begin(); itr != Values.end(); ++itr)
+	{
+		WriteInt32(a_Out, *itr);
+	}  // for itr - Values[]
+}
+
+
+
+
+
+void cNBTSerializer::WriteCompound(AString & a_Out, const cNBTCompound * a_Compound)
+{
+	const cNBTTags & Children = a_Compound->GetChildren();
+	for (cNBTTags::const_iterator itr = Children.begin(); itr != Children.end(); ++itr)
+	{
+		a_Out.push_back((*itr)->GetType());
+		WriteString(a_Out, (*itr)->GetName());
+		WriteTag(a_Out, *itr);
+	}  // for itr - Children[]
+	a_Out.push_back(cNBTTag::TAG_End);
+}
+
+
+
+
+
+#define CASE_SIMPLE_TAG(TAGTYPE,CTYPE,FUNC) \
+	case cNBTTag::TAG_##TAGTYPE: \
+	{ \
+		Write##FUNC(a_Out, ((const cNBT##TAGTYPE *)a_Tag)->m_Value ); \
+		return;\
+	}
+
+void cNBTSerializer::WriteTag(AString & a_Out, const cNBTTag * a_Tag)
+{
+	switch (a_Tag->GetType())
+	{
+		CASE_SIMPLE_TAG(Byte,      char,    Byte)
+		CASE_SIMPLE_TAG(Short,     Int16,   Int16)
+		CASE_SIMPLE_TAG(Int,       Int32,   Int32)
+		CASE_SIMPLE_TAG(Long,      Int64,   Int64)
+		CASE_SIMPLE_TAG(Float,     float,   Float)
+		CASE_SIMPLE_TAG(Double,    double,  Double)
+		CASE_SIMPLE_TAG(ByteArray, AString, ByteArray)
+		CASE_SIMPLE_TAG(String,    AString, String)
+		
+		case cNBTTag::TAG_List:
+		{
+			a_Out.push_back((char)((const cNBTList *)a_Tag)->GetChildrenType());
+			WriteList(a_Out, (const cNBTList *)a_Tag);
+			return;
+		}
+		
+		case cNBTTag::TAG_Compound:
+		{
+			WriteCompound(a_Out, (const cNBTCompound *)a_Tag);
+			return;
+		}
+		
+		case cNBTTag::TAG_IntArray:
+		{
+			WriteIntArray(a_Out, (const cNBTIntArray *)a_Tag);
+			return;
+		}
+	}  // switch (iType)
+	
+	ASSERT(!"Unhandled NBT tag type");
+}
+
+#undef CASE_SIMPLE_TAG
+
+
+
+
+void cNBTSerializer::Serialize(const cNBTTree * a_Tree, AString & a_Out)
+{
+	a_Out.clear();
+	a_Out.push_back(cNBTTag::TAG_Compound);
+	WriteString(a_Out, a_Tree->GetName());
+	WriteCompound(a_Out, (const cNBTCompound *)a_Tree);
 }
 
 
