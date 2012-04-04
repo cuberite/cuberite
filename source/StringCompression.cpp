@@ -40,12 +40,13 @@ int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed
 	// It saves us one allocation and one memcpy of the entire compressed data
 	// It may not work on some STL implementations! (Confirmed working on MSVC 2008 & 2010)
 	a_Uncompressed.resize(a_UncompressedSize);
-	int errorcode = uncompress((Bytef*)a_Uncompressed.data(), (uLongf *)&a_UncompressedSize, (const Bytef*)a_Data, a_Length);
+	uLongf UncompressedSize = (uLongf)a_UncompressedSize;  // On some architectures the uLongf is different in size to int, that may be the cause of the -5 error
+	int errorcode = uncompress((Bytef*)a_Uncompressed.data(), &UncompressedSize, (const Bytef*)a_Data, a_Length);
 	if (errorcode != Z_OK)
 	{
 		return errorcode;
 	}
-	a_Uncompressed.resize(a_UncompressedSize);
+	a_Uncompressed.resize(UncompressedSize);
 	return Z_OK;
 }
 
