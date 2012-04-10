@@ -75,11 +75,11 @@ void cSocket::CloseSocket()
 	
 	if (shutdown(m_Socket, SHUT_RDWR) != 0)//SD_BOTH);
 	{
-		LOGWARN("Error on shutting down socket (%s)", m_IPString.c_str());
+		LOGWARN("Error on shutting down socket (%s): %s", m_IPString.c_str(), GetLastErrorString().c_str());
 	}
 	if (close(m_Socket) != 0)
 	{
-		LOGWARN("Error closing socket (%s)", m_IPString.c_str());
+		LOGWARN("Error closing socket (%s): %s", m_IPString.c_str(), GetLastErrorString().c_str());
 	}
 	
 	#endif  // else _WIN32
