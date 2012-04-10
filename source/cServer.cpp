@@ -495,6 +495,11 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 	
 	if (split[0].compare("/regeneratechunk") == 0)
 	{
+		if (!a_Client.GetPlayer()->HasPermission("builtin.regeneratechunk"))
+		{
+			a_Client.Send(cPacket_Chat(cChatColor::Green + "You don't have permissions to regenerate chunks"));
+			return true;
+		}
 		int ChunkX, ChunkZ;
 		if (split.size() == 1)
 		{
