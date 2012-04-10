@@ -127,6 +127,9 @@ public:
 	
 	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable; to be used only by cChunkStay!
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
+	
+	/// Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() )
+	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 

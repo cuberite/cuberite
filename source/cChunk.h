@@ -51,11 +51,12 @@ class cChunk :
 	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
 {
 public:
-	cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World);
+	cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap, cWorld * a_World);
 	~cChunk();
 
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk is valid (loaded / generated)
-	void SetValid(bool a_SendToClients = true);   // Also wakes up all clients attached to this chunk to let them finish logging in
+	void SetValid(void);                           // Also wakes up any calls to cChunkMap::GetHeight()
+	void MarkRegenerating(void);                   // Marks all clients attached to this chunk as wanting this chunk
 	bool IsDirty(void) const {return m_IsDirty; }  // Returns true if the chunk has changed since it was last saved
 	bool HasLoadFailed(void) const {return m_HasLoadFailed; }  // Returns true if the chunk failed to load and hasn't been generated since then
 	bool CanUnload(void);

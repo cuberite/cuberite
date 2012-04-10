@@ -67,11 +67,11 @@ sSetBlock::sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockM
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cChunk:
 
-cChunk::cChunk(int a_X, int a_Y, int a_Z, cChunkMap * a_ChunkMap, cWorld * a_World)
+cChunk::cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap, cWorld * a_World)
 	: m_bCalculateLighting( false )
-	, m_PosX( a_X )
-	, m_PosY( a_Y )
-	, m_PosZ( a_Z )
+	, m_PosX( a_ChunkX )
+	, m_PosY( a_ChunkY )
+	, m_PosZ( a_ChunkZ )
 	, m_BlockTickNum( 0 )
 	, m_BlockTickX( 0 )
 	, m_BlockTickY( 0 )
@@ -121,38 +121,24 @@ cChunk::~cChunk()
 
 
 
-void cChunk::SetValid(bool a_SendToClients)
+void cChunk::SetValid(void)
 {
 	m_IsValid = true;
 	
 	m_World->GetChunkMap()->ChunkValidated();
-	
-	if (!a_SendToClients)
-	{
-		return;
-	}
-	
-	if (m_LoadedByClient.empty())
-	{
-		return;
-	}
-	
-	// Sending the chunk here interferes with the lighting done in the tick thread and results in the "invalid compressed data" on the client
-	/*
-	cPacket_PreChunk PreChunk;
-	PreChunk.m_PosX = m_PosX;
-	PreChunk.m_PosZ = m_PosZ;
-	PreChunk.m_bLoad = true;
-	cPacket_MapChunk MapChunk(this);
-	Broadcast(&PreChunk);
-	Broadcast(&MapChunk);
-	
-	// Let all clients of this chunk know that it has been already sent to the client
+}
+
+
+
+
+
+void cChunk::MarkRegenerating(void)
+{
+	// Tell all clients attached to this chunk that they want this chunk:
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
-		(*itr)->ChunkJustSent(this);
+		(*itr)->AddWantedChunk(m_PosX, m_PosZ);
 	}  // for itr - m_LoadedByClient[]
-	*/
 }
 
 

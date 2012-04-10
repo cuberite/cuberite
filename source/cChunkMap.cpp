@@ -897,6 +897,22 @@ void cChunkMap::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
 
 
 
+void cChunkMap::MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		// Not present
+		return;
+	}
+	Chunk->MarkRegenerating();
+}
+
+
+
+
+
 void cChunkMap::Tick( float a_Dt, MTRand & a_TickRandom )
 {
 	cCSLock Lock(m_CSLayers);
@@ -970,7 +986,6 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 
 	const int LocalX = a_ChunkX - m_LayerX * LAYER_SIZE;
 	const int LocalZ = a_ChunkZ - m_LayerZ * LAYER_SIZE;
-	
 	
 	if (!((LocalX < LAYER_SIZE) && (LocalZ < LAYER_SIZE) && (LocalX > -1) && (LocalZ > -1)))
 	{

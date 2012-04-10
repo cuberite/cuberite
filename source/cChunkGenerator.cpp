@@ -155,15 +155,17 @@ void cChunkGenerator::Execute(void)
 		Lock.Unlock();			// Unlock ASAP
 		m_evtRemoved.Set();
 
-		if (m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
+		// Hack for regenerating chunks: if Y != 0, the chunk is considered invalid, even if it has its data set
+		if ((coords.m_ChunkY == 0) && m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
 		{
+			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
 			// Already generated, ignore request
 			continue;
 		}
 		
 		if (SkipEnabled && !m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
 		{
-			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d, %d] (HasClients: %d)", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
+			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
 			continue;
 		}
 		

@@ -175,6 +175,9 @@ public:
 
 	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable. To be used only by cChunkStay!
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
+	
+	/// Regenerate the given chunk:
+	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);
 
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
@@ -324,7 +327,7 @@ private:
 
 	AString m_WorldName;
 	AString m_IniFileName;
-
+	
 	cWorld(const AString & a_WorldName);
 	~cWorld();
 

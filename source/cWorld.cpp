@@ -1426,6 +1426,18 @@ void cWorld::ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay)
 
 
 
+void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
+{
+	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
+	
+	// Trick: use Y=1 to force the chunk generation even though the chunk data is already present
+	m_Generator.GenerateChunk(a_ChunkX, 1, a_ChunkZ);
+}
+
+
+
+
+
 void cWorld::SaveAllChunks()
 {
 	LOG("Saving all chunks...");

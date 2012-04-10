@@ -111,6 +111,9 @@ public:
 	
 	/// Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend)
 	bool WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	/// Adds the chunk specified to the list of chunks wanted for sending (m_ChunksToSend)
+	void AddWantedChunk(int a_ChunkX, int a_ChunkZ);
 
 private:
 

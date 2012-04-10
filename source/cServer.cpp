@@ -485,11 +485,38 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 	{
 		if (split.size() != 2)
 		{
-			a_Client.Send(cPacket_Chat(cChatColor::Green + "Invalid syntax, expected 1 parameter, the numebr of chunks to stream"));
+			a_Client.Send(cPacket_Chat(cChatColor::Green + "Invalid syntax, expected 1 parameter, the number of chunks to stream"));
 			return false;
 		}
 		int dist = atol(split[1].c_str());
 		a_Client.SetViewDistance(dist);
+		return true;
+	}
+	
+	if (split[0].compare("/regeneratechunk") == 0)
+	{
+		int ChunkX, ChunkZ;
+		if (split.size() == 1)
+		{
+			// Regenerate current chunk
+			ChunkX = a_Client.GetPlayer()->GetChunkX();
+			ChunkZ = a_Client.GetPlayer()->GetChunkZ();
+		}
+		else if (split.size() == 3)
+		{
+			// Regenerate chunk in params
+			ChunkX = atoi(split[1].c_str());
+			ChunkZ = atoi(split[2].c_str());
+		}
+		else
+		{
+			a_Client.Send(cPacket_Chat(cChatColor::Green + "Invalid syntax, expected either 0 (current chunk) or 2 (x, z) parameters"));
+			return false;
+		}
+		AString Msg;
+		Printf(Msg, "Regenerating chunk [%d, %d]", ChunkX, ChunkZ);
+		a_Client.Send(cPacket_Chat(cChatColor::Green + Msg));
+		a_Client.GetPlayer()->GetWorld()->RegenerateChunk(ChunkX, ChunkZ);
 		return true;
 	}
 	return false;

@@ -1708,9 +1708,9 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 		}
 	}
 	
-	// Check chunks being sent, erase them from m_ChunksToSend:
 	if (a_Packet.m_PacketID == E_MAP_CHUNK)
 	{
+		// Check chunks being sent, erase them from m_ChunksToSend:
 		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX;
 		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ;
 		bool Found = false;
@@ -1727,6 +1727,7 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 		}  // for itr - m_ChunksToSend[]
 		if (!Found)
 		{
+			LOGD("Refusing to send chunk [%d, %d] - no longer wanted by client \"%s\".", ChunkX, ChunkZ, m_Username.c_str());
 			return;
 		}
 	}
@@ -1852,6 +1853,20 @@ bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSChunkLists);
 	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)) != m_ChunksToSend.end());
+}
+
+
+
+
+
+void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
+{
+	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, this);
+	cCSLock Lock(m_CSChunkLists);
+	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ)) == m_ChunksToSend.end())
+	{
+		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+	}
 }
 
 
