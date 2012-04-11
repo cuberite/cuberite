@@ -106,6 +106,7 @@ public:
 	inline short GetPing() const { return m_Ping; }	//tolua_export
 	
 	void SetViewDistance(int a_ViewDistance);		//tolua_export
+	int GetViewDistance() { return m_ViewDistance; }//tolua_export
 
 	int GetUniqueID() const { return m_UniqueID; }	//tolua_export
 	

@@ -464,66 +464,6 @@ bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
 	{
 		return true;
 	}
-
-	std::string Command( a_Cmd );
-	if( Command.length() <= 0 ) return false;
-	if( Command[0] != '/' ) return false;
-
-	AStringVector split = StringSplit( Command, " " );
-	if( split.size() == 0 )
-		return false;
-
-	if (split[0].compare("/coords") == 0)
-	{
-		AString Pos;
-		Printf(Pos, "[X:%0.2f] [Y:%0.2f] [Z:%0.2f]", a_Client.GetPlayer()->GetPosX(), a_Client.GetPlayer()->GetPosY(), a_Client.GetPlayer()->GetPosZ() );
-		a_Client.Send( cPacket_Chat(cChatColor::Green + Pos));
-		return true;
-	}
-	
-	if (split[0].compare("/viewdistance") == 0)
-	{
-		if (split.size() != 2)
-		{
-			a_Client.Send(cPacket_Chat(cChatColor::Green + "Invalid syntax, expected 1 parameter, the number of chunks to stream"));
-			return false;
-		}
-		int dist = atol(split[1].c_str());
-		a_Client.SetViewDistance(dist);
-		return true;
-	}
-	
-	if (split[0].compare("/regeneratechunk") == 0)
-	{
-		if (!a_Client.GetPlayer()->HasPermission("builtin.regeneratechunk"))
-		{
-			a_Client.Send(cPacket_Chat(cChatColor::Green + "You don't have permissions to regenerate chunks"));
-			return true;
-		}
-		int ChunkX, ChunkZ;
-		if (split.size() == 1)
-		{
-			// Regenerate current chunk
-			ChunkX = a_Client.GetPlayer()->GetChunkX();
-			ChunkZ = a_Client.GetPlayer()->GetChunkZ();
-		}
-		else if (split.size() == 3)
-		{
-			// Regenerate chunk in params
-			ChunkX = atoi(split[1].c_str());
-			ChunkZ = atoi(split[2].c_str());
-		}
-		else
-		{
-			a_Client.Send(cPacket_Chat(cChatColor::Green + "Invalid syntax, expected either 0 (current chunk) or 2 (x, z) parameters"));
-			return false;
-		}
-		AString Msg;
-		Printf(Msg, "Regenerating chunk [%d, %d]", ChunkX, ChunkZ);
-		a_Client.Send(cPacket_Chat(cChatColor::Green + Msg));
-		a_Client.GetPlayer()->GetWorld()->RegenerateChunk(ChunkX, ChunkZ);
-		return true;
-	}
 	return false;
 }
 

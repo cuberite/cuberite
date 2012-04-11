@@ -37,7 +37,10 @@ function Initialize( Plugin )
 	Plugin:AddCommand("/top", " - Teleport yourself to the top most block",			"core.top")
 	Plugin:AddCommand("/gm", " - [Gamemode (0|1)] - Change your gamemode", 			"core.changegm")
 	Plugin:AddCommand("/gotoworld", " - Move to a different world!",				"core.gotoworld")
-
+	Plugin:AddCommand("/coords", " - Show your current server coordinates",			"core.coords")
+	Plugin:AddCommand("/viewdistance", " - [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance", "core.viewdistance")
+	Plugin:AddCommand("/regeneratechunk", " - <X [Z]> - Regenerates a chunk", "core.regeneratechunk")
+	
 	Plugin:BindCommand( "/help", 		"core.help",		HandleHelpCommand )
 	Plugin:BindCommand( "/pluginlist",	"core.pluginlist", 	HandlePluginListCommand )
 	Plugin:BindCommand( "/tp", 			"core.teleport",	HandleTPCommand )
@@ -57,6 +60,9 @@ function Initialize( Plugin )
 	Plugin:BindCommand( "/top",			"core.top",			HandleTopCommand )
 	Plugin:BindCommand( "/gm", 			"core.changegm", 	HandleChangeGMCommand )
 	Plugin:BindCommand( "/gotoworld",	"core.gotoworld",	HandleGotoWorldCommand )
+	Plugin:BindCommand( "/coords",		"core.coords",	HandleCoordsCommand )
+	Plugin:BindCommand( "/viewdistance","core.viewdistance",	HandleViewDistanceCommand )
+	Plugin:BindCommand( "/regeneratechunk","core.regeneratechunk",	HandleRegenerateChunkCommand )
 	
 
 	local IniFile = cIniFile("settings.ini")

@@ -13,6 +13,7 @@
 #include "cPlayer.h"
 #include "cWebAdmin.h"
 #include "cStringMap.h"
+#include "cClientHandle.h"
 #include "md5/md5.h"
 
 
@@ -507,6 +508,11 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
 		tolua_endmodule(tolua_S);
 			
+		tolua_beginmodule(tolua_S,"cClientHandle");
+			tolua_constant(tolua_S,"MIN_VIEW_DISTANCE",cClientHandle::MIN_VIEW_DISTANCE);
+			tolua_constant(tolua_S,"MAX_VIEW_DISTANCE",cClientHandle::MAX_VIEW_DISTANCE);
+		tolua_endmodule(tolua_S);
+
 		tolua_function(tolua_S,"md5",tolua_md5);
 
 	tolua_endmodule(tolua_S);

@@ -177,7 +177,7 @@ public:
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
 	
 	/// Regenerate the given chunk:
-	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);
+	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													//tolua_export
 
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
