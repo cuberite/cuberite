@@ -60,6 +60,10 @@ const int MAX_HEIGHT_DIAMOND = 16;
 const int NUM_NESTS_DIAMOND = 6;
 const int NEST_SIZE_DIAMOND = 5;
 
+const int MAX_HEIGHT_LAPIS = 16;
+const int NUM_NESTS_LAPIS = 6;
+const int NEST_SIZE_LAPIS = 5;
+
 
 
 
@@ -321,6 +325,7 @@ void cWorldGenerator::GenerateTerrain(int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 	GenerateOre(E_BLOCK_REDSTONE_ORE, MAX_HEIGHT_REDSTONE, NUM_NESTS_REDSTONE, NEST_SIZE_REDSTONE, a_BlockData);
 	GenerateOre(E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     a_BlockData);
 	GenerateOre(E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  a_BlockData);
+	GenerateOre(E_BLOCK_LAPIS_ORE,    MAX_HEIGHT_LAPIS,    NUM_NESTS_LAPIS,    NEST_SIZE_LAPIS,    a_BlockData);
 }
 
 
