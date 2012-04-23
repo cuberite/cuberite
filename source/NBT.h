@@ -109,8 +109,8 @@ class cNBTList :
 	eTagType m_ChildrenType;
 	
 public:
-	cNBTList(cNBTTag * a_Parent) : cNBTTag(a_Parent, TAG_List), m_ChildrenType(TAG_End) {}
-	cNBTList(cNBTTag * a_Parent, const AString & a_Name) : cNBTTag(a_Parent, TAG_List, a_Name), m_ChildrenType(TAG_End) {}
+	cNBTList(cNBTTag * a_Parent, eTagType a_ChildrenType) : cNBTTag(a_Parent, TAG_List), m_ChildrenType(a_ChildrenType) {}
+	cNBTList(cNBTTag * a_Parent, const AString & a_Name, eTagType a_ChildrenType) : cNBTTag(a_Parent, TAG_List, a_Name), m_ChildrenType(a_ChildrenType) {}
 	virtual ~cNBTList() {Clear(); }
 	
 	void              Clear           (void);

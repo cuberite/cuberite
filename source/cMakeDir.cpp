@@ -7,16 +7,16 @@
 
 
 
-void cMakeDir::MakeDir( const char* a_Directory )
+void cMakeDir::MakeDir(const AString & a_Directory)
 {
 #ifdef _WIN32
 	SECURITY_ATTRIBUTES Attrib;
 	Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
 	Attrib.lpSecurityDescriptor = NULL;
 	Attrib.bInheritHandle = false;
-	::CreateDirectory(a_Directory, &Attrib);
+	::CreateDirectory(a_Directory.c_str(), &Attrib);
 #else
-	mkdir(a_Directory, S_IRWXU | S_IRWXG | S_IRWXO);
+	mkdir(a_Directory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 #endif
 }
 

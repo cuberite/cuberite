@@ -74,7 +74,7 @@ cNBTTag * cNBTTag::CreateTag(cNBTTag * a_Parent, eTagType a_Type, const AString 
 		case TAG_Double:    return new cNBTDouble   (a_Parent, a_Name);
 		case TAG_ByteArray: return new cNBTByteArray(a_Parent, a_Name);
 		case TAG_String:    return new cNBTString   (a_Parent, a_Name);
-		case TAG_List:      return new cNBTList     (a_Parent, a_Name);
+		case TAG_List:      return new cNBTList     (a_Parent, a_Name, TAG_End);
 		case TAG_Compound:  return new cNBTCompound (a_Parent, a_Name);
 		default:
 		{
@@ -128,8 +128,8 @@ void cNBTList::Clear(void)
 int cNBTList::Add(cNBTTag * iTag)
 {
 	// Catch usage errors while debugging:
-	ASSERT(m_ChildrenType != TAG_End);
-	ASSERT(iTag->GetType() == m_ChildrenType);
+	ASSERT(m_ChildrenType != TAG_End);  // Didn't call SetChildrenType()
+	ASSERT(iTag->GetType() == m_ChildrenType);  // Child of different type
 	
 	// Catch errors while running:
 	if (m_ChildrenType == TAG_End)
@@ -535,12 +535,11 @@ int cNBTParser::ReadTag(const char ** a_Data, int * a_Length, cNBTTag::eTagType 
 		{
 			char ItemType;
 			RETURN_INT_IF_FAILED(ReadByte (a_Data, a_Length, ItemType));
-			cNBTList * List = new cNBTList(a_Parent, a_Name);
+			cNBTList * List = new cNBTList(a_Parent, a_Name, (cNBTTag::eTagType)ItemType);
 			if (List == NULL)
 			{
 				return ERROR_NOT_ENOUGH_MEMORY;
 			}
-			RETURN_INT_IF_FAILED(List->SetChildrenType((cNBTTag::eTagType)ItemType));
 			RETURN_INT_IF_FAILED(ReadList(a_Data, a_Length, List));
 			*a_Tag = List;
 			return ERROR_SUCCESS;

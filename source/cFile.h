@@ -86,6 +86,9 @@ public:
 	/// Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error
 	int ReadRestOfFile(AString & a_Contents);
 	
+	/// Returns true if the file specified exists
+	static bool Exists(const AString & a_FileName);
+	
 private:
 	#ifdef USE_STDIO_FILE
 	FILE * m_File;

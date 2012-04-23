@@ -16,8 +16,14 @@
 
 enum
 {
-	// The MCA header is 8 KiB
-	MCA_HEADER_SIZE = 8192,
+	/// Maximum number of chunks in an MCA file - also the count of the header items
+	MCA_MAX_CHUNKS = 32 * 32,
+	
+	/// The MCA header is 8 KiB
+	MCA_HEADER_SIZE = MCA_MAX_CHUNKS * 8,
+	
+	/// There are 5 bytes of header in front of each chunk
+	MCA_CHUNK_HEADER_LENGTH = 5,
 } ;
 
 
@@ -40,7 +46,7 @@ class cWSSAnvil :
 	
 public:
 
-	cWSSAnvil(cWorld * a_World) : super(a_World) {}
+	cWSSAnvil(cWorld * a_World);
 	virtual ~cWSSAnvil();
 	
 protected:
@@ -51,7 +57,9 @@ protected:
 	
 		cMCAFile(const AString & a_FileName, int a_RegionX, int a_RegionZ);
 		
-		bool GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data);
+		bool GetChunkData  (const cChunkCoords & a_Chunk, AString & a_Data);
+		bool SetChunkData  (const cChunkCoords & a_Chunk, const AString & a_Data);
+		bool EraseChunkData(const cChunkCoords & a_Chunk);
 		
 		int             GetRegionX (void) const {return m_RegionX; }
 		int             GetRegionZ (void) const {return m_RegionZ; }
@@ -66,22 +74,35 @@ protected:
 		
 		// The header, copied from the file so we don't have to seek to it all the time
 		// First 1024 entries are chunk locations - the 3 + 1 byte sector-offset and sector-count
-		// The next 1024 entries are chunk timestamps - unused in MCS
-		unsigned m_Header[MCA_HEADER_SIZE / sizeof(unsigned)];
+		unsigned m_Header[MCA_MAX_CHUNKS];
+		
+		// Chunk timestamps, following the chunk headers, are unused by MCS
+		
+		/// Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number.
+		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data);
 	} ;
 	typedef std::list<cMCAFile *> cMCAFiles;
 	
 	cCriticalSection m_CS;
 	cMCAFiles        m_Files;  // a MRU cache of MCA files
 
-	/// Gets chunk data from the correct file; locks CS as needed
+	/// Gets chunk data from the correct file; locks file CS as needed
 	bool GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data);
+
+	/// Sets chunk data into the correct file; locks file CS as needed
+	bool SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data);
 
 	/// Loads the chunk from the data (no locking needed)
 	bool LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & a_Data);
 	
+	/// Saves the chunk into datastream (no locking needed)
+	bool SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data);
+	
 	/// Loads the chunk from NBT data (no locking needed)
 	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT);
+	
+	/// Saves the chunk into NBT data; returns NULL for failure
+	cNBTTag * SaveChunkToNBT(const cChunkCoords & a_Chunk);
 	
 	/// Loads the chunk's entities from NBT data (a_NBT is the Level\\Entities list tag; may be NULL)
 	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * a_NBT);

@@ -27,7 +27,7 @@ cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	, m_TopChest( false )
 	, m_JoinedChest( NULL )
 {
-	m_Content = new cItem[ c_ChestHeight*c_ChestWidth ];
+	m_Content = new cItem[ c_ChestHeight * c_ChestWidth ];
 }
 
 

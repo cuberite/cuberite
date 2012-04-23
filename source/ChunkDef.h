@@ -235,8 +235,11 @@ public:
 class cChunkDataCollector :
 	public cChunkDataCallback
 {
-protected:
+public:
+
 	BLOCKTYPE m_BlockData[cChunkDef::BlockDataSize];
+
+protected:
 
 	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
 	{
@@ -259,6 +262,50 @@ protected:
 	virtual void BlockSkyLight(const BLOCKTYPE * a_BlockSkyLight) override
 	{
 		memcpy(m_BlockData + 2 * cChunkDef::NumBlocks, a_BlockSkyLight, cChunkDef::NumBlocks / 2);
+	}
+} ;
+
+
+
+
+
+/** A simple implementation of the cChunkDataCallback interface that collects all block data into a separate buffers
+*/
+class cChunkDataSeparateCollector :
+	public cChunkDataCallback
+{
+public:
+
+	BLOCKTYPE m_BlockTypes[cChunkDef::NumBlocks];
+	
+	// TODO: These should be NIBBLETYPE:
+	BLOCKTYPE m_BlockMetas[cChunkDef::NumBlocks / 2];
+	BLOCKTYPE m_BlockLight[cChunkDef::NumBlocks / 2];
+	BLOCKTYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
+
+protected:
+
+	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
+	{
+		memcpy(m_BlockTypes, a_BlockTypes, sizeof(m_BlockTypes));
+	}
+
+
+	virtual void BlockMeta(const BLOCKTYPE * a_BlockMeta) override
+	{
+		memcpy(m_BlockMetas, a_BlockMeta, sizeof(m_BlockMetas));
+	}
+
+
+	virtual void BlockLight(const BLOCKTYPE * a_BlockLight) override
+	{
+		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
+	}
+
+
+	virtual void BlockSkyLight(const BLOCKTYPE * a_BlockSkyLight) override
+	{
+		memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
 	}
 } ;
 

@@ -69,7 +69,7 @@ bool cFile::Open(const AString & iFileName, EMode iMode)
 	{
 		case fmRead:      Mode = "rb";  break;
 		case fmWrite:     Mode = "wb";  break;
-		case fmReadWrite: Mode = "ab+"; break;
+		case fmReadWrite: Mode = "rb+"; break;
 		default:
 		{
 			ASSERT(!"Unhandled file mode");
@@ -77,6 +77,14 @@ bool cFile::Open(const AString & iFileName, EMode iMode)
 		}
 	}
 	m_File = fopen(iFileName.c_str(), Mode);
+	if ((m_File == NULL) && (iMode == fmReadWrite))
+	{
+		// Fix for MS not following C spec, opening "a" mode files for writing at the end only
+		// The file open operation has been tried with "read update", fails if file not found
+		// So now we know either the file doesn't exist or we don't have rights, no need to worry about file contents.
+		// Simply re-open for read-writing, erasing existing contents:
+		m_File = fopen(iFileName.c_str(), "wb+");
+	}
 	return (m_File != NULL);
 }
 
@@ -246,6 +254,16 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
 	a_Contents.assign(DataSize, '\0');
 	return Read((void *)a_Contents.data(), DataSize);
+}
+
+
+
+
+
+bool cFile::Exists(const AString & a_FileName)
+{
+	cFile test(a_FileName, fmRead);
+	return test.IsOpen();
 }
 
 

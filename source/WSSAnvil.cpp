@@ -11,6 +11,10 @@
 #include "BlockID.h"
 #include "cChestEntity.h"
 #include "cItem.h"
+#include "StringCompression.h"
+#include "cEntity.h"
+#include "cBlockEntity.h"
+#include "cMakeDir.h"
 
 
 
@@ -22,7 +26,7 @@ Since only the header is actually in the memory, this number can be high, but st
 #define MAX_MCA_FILES 32
 
 /// The maximum size of an inflated chunk
-#define CHUNK_INFLATE_MAX 128 KiB
+#define CHUNK_INFLATE_MAX 256 KiB
 
 
 
@@ -30,7 +34,127 @@ Since only the header is actually in the memory, this number can be high, but st
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cNBTChunkSerializer
+
+class cNBTChunkSerializer :
+	public cChunkDataSeparateCollector
+{
+public:
+	cNBTChunkSerializer(cNBTList * a_Entities, cNBTList * a_TileEntities) :
+		m_Entities(a_Entities),
+		m_TileEntities(a_TileEntities)
+	{
+	}
+	
+protected:
+	
+	/* From cChunkDataSeparateCollector we inherit:
+	- m_BlockTypes[]
+	- m_BlockMetas[]
+	- m_BlockLight[]
+	- m_BlockSkyLight[]
+	*/
+	
+	// TODO: Biomes
+	
+	// We need to save entities and blockentities into NBT
+	cNBTList * m_Entities;  // Tag where entities will be saved
+	cNBTList * m_TileEntities;  // Tag where block-entities will be saved
+	
+	
+	cNBTCompound * AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID)
+	{
+		cNBTCompound * res = new cNBTCompound(m_TileEntities);
+		res->Add(new cNBTInt   (res, "x",  a_Entity->GetPosX()));
+		res->Add(new cNBTInt   (res, "y",  a_Entity->GetPosY()));
+		res->Add(new cNBTInt   (res, "z",  a_Entity->GetPosZ()));
+		res->Add(new cNBTString(res, "id", a_EntityTypeID));
+		return res;
+	}
+	
+	
+	void AddItem(cNBTList * a_Items, cItem * a_Item, int a_Slot)
+	{
+		cNBTCompound * Tag = new cNBTCompound(a_Items);
+		Tag->Add(new cNBTShort(Tag, "id",     a_Item->m_ItemID));
+		Tag->Add(new cNBTShort(Tag, "Damage", a_Item->m_ItemHealth));
+		Tag->Add(new cNBTByte (Tag, "Count",  a_Item->m_ItemCount));
+		Tag->Add(new cNBTByte (Tag, "Slot",   a_Slot));
+	}
+	
+	
+	void AddChestEntity(cChestEntity * a_Entity)
+	{
+		cNBTCompound * Base = AddBasicTileEntity(a_Entity, "chest");
+		cNBTList * Items = new cNBTList(Base, "Items", cNBTTag::TAG_Compound);
+		Base->Add(Items);
+		for (int i = 0; i < cChestEntity::c_ChestHeight * cChestEntity::c_ChestWidth; i++)
+		{
+			cItem * Item = a_Entity->GetSlot(i);
+			if ((Item == NULL) || Item->IsEmpty())
+			{
+				continue;
+			}
+			AddItem(Items, Item, i);
+		}
+	}
+
+
+	virtual void Entity(cEntity * a_Entity) override
+	{
+		// TODO: Add entity into NBT:
+	}
+	
+	
+	virtual void BlockEntity(cBlockEntity * a_Entity)
+	{
+		// Add tile-entity into NBT:
+		switch (a_Entity->GetBlockType())
+		{
+			case E_BLOCK_CHEST: AddChestEntity((cChestEntity *)a_Entity); break;
+			default:
+			{
+				ASSERT(!"Unhandled block entity saved into Anvil");
+			}
+		}
+	}
+} ;  // class cNBTChunkSerializer
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
+
+cWSSAnvil::cWSSAnvil(cWorld * a_World) :
+	super(a_World)
+{
+	// Create a level.dat file for mapping tools, if it doesn't already exist:
+	AString fnam;
+	Printf(fnam, "%s/level.dat", a_World->GetName().c_str());
+	if (!cFile::Exists(fnam))
+	{
+		std::auto_ptr<cNBTCompound> Root(new cNBTCompound(NULL));
+		cNBTCompound * Data = new cNBTCompound(Root.get());
+		Root->Add(Data);
+		Data->Add(new cNBTInt(Data, "SpawnX", (int)(a_World->GetSpawnX())));
+		Data->Add(new cNBTInt(Data, "SpawnY", (int)(a_World->GetSpawnY())));
+		Data->Add(new cNBTInt(Data, "SpawnZ", (int)(a_World->GetSpawnZ())));
+		AString Uncompressed;
+		cNBTSerializer::Serialize(Root.get(), Uncompressed);
+		gzFile gz = gzopen(fnam.c_str(), "wb");
+		if (gz != NULL)
+		{
+			gzwrite(gz, Uncompressed.data(), Uncompressed.size());
+		}
+		gzclose(gz);
+	}
+}
+
+
+
+
 
 cWSSAnvil::~cWSSAnvil()
 {
@@ -63,8 +187,18 @@ bool cWSSAnvil::LoadChunk(const cChunkCoords & a_Chunk)
 
 bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 {
-	// TODO: We're read-only for now
-	return false;
+	AString ChunkData;
+	if (!SaveChunkToData(a_Chunk, ChunkData))
+	{
+		return false;
+	}
+	if (!SetChunkData(a_Chunk, ChunkData))
+	{
+		return false;
+	}
+	
+	// Everything successful
+	return true;
 }
 
 
@@ -80,6 +214,21 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
 		return false;
 	}
 	return File->GetChunkData(a_Chunk, a_Data);
+}
+
+
+
+
+
+bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data)
+{
+	cCSLock Lock(m_CS);
+	cMCAFile * File = LoadMCAFile(a_Chunk);
+	if (File == NULL)
+	{
+		return false;
+	}
+	return File->SetChunkData(a_Chunk, a_Data);
 }
 
 
@@ -111,7 +260,9 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	
 	// Load it anew:
 	AString FileName;
-	Printf(FileName, "%s/r.%d.%d.mca", m_World->GetName().c_str(), RegionX, RegionZ);
+	Printf(FileName, "%s/region", m_World->GetName().c_str());
+	cMakeDir::MakeDir(FileName);
+	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(FileName, RegionX, RegionZ);
 	if (f == NULL)
 	{
@@ -161,6 +312,23 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 
 	// Load the data from NBT:
 	return LoadChunkFromNBT(a_Chunk, *Tree.get());
+}
+
+
+
+
+
+bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
+{
+	std::auto_ptr<cNBTTree> Tree(SaveChunkToNBT(a_Chunk));
+	if (Tree.get() == NULL)
+	{
+		return false;
+	}
+	AString Uncompressed;
+	cNBTSerializer::Serialize(Tree.get(), Uncompressed);
+	CompressString(Uncompressed.data(), Uncompressed.size(), a_Data);
+	return true;
 }
 
 
@@ -299,6 +467,50 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 
 
 
+cNBTTag * cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk)
+{
+	std::auto_ptr<cNBTCompound> res(new cNBTCompound(NULL));
+	cNBTCompound * Level = new cNBTCompound(res.get(), "Level");
+	res->Add(Level);
+	cNBTList * Entities = new cNBTList(Level, "Entities", cNBTTag::TAG_Compound);
+	Level->Add(Entities);
+	cNBTList * TileEntities = new cNBTList(Level, "TileEntities", cNBTTag::TAG_Compound);
+	Level->Add(TileEntities);
+	cNBTChunkSerializer Serializer(Entities, TileEntities);
+	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
+	{
+		return NULL;
+	}
+	
+	Level->Add(new cNBTInt(Level, "xPos", a_Chunk.m_ChunkX));
+	Level->Add(new cNBTInt(Level, "zPos", a_Chunk.m_ChunkZ));
+	
+	// TODO: Save biomes:
+	// Level->Add(new cNBTByteArray(Level, "Biomes", AString(Serializer.m_Biomes, sizeof(Serializer.m_Biomes));
+	
+	// Save blockdata:
+	cNBTList * Sections = new cNBTList(Level, "Sections", cNBTTag::TAG_Compound);
+	Level->Add(Sections);
+	int SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
+	int SliceSizeNibble = SliceSizeBlock / 2;
+	for (int Y = 0; Y < 16; Y++)
+	{
+		cNBTCompound * Slice = new cNBTCompound(Sections);
+		Sections->Add(Slice);
+		Slice->Add(new cNBTByteArray(Slice, "Blocks",     AString(Serializer.m_BlockTypes    + Y * SliceSizeBlock,  SliceSizeBlock)));
+		Slice->Add(new cNBTByteArray(Slice, "Data",       AString(Serializer.m_BlockMetas    + Y * SliceSizeNibble, SliceSizeNibble)));
+		Slice->Add(new cNBTByteArray(Slice, "SkyLight",   AString(Serializer.m_BlockSkyLight + Y * SliceSizeNibble, SliceSizeNibble)));
+		Slice->Add(new cNBTByteArray(Slice, "BlockLight", AString(Serializer.m_BlockLight    + Y * SliceSizeNibble, SliceSizeNibble)));
+		Slice->Add(new cNBTByte(Slice, "Y", Y));
+	}
+	
+	return res.release();
+}
+
+
+
+
+
 void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * a_NBT)
 {
 	// TODO: Load the entities
@@ -423,7 +635,7 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cNBTCompound * a_NBT, int & a_X, int 
 cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_RegionZ) :
 	m_RegionX(a_RegionX),
 	m_RegionZ(a_RegionZ),
-	m_File(a_FileName, cFile::fmRead),
+	m_File(a_FileName, cFile::fmReadWrite),
 	m_FileName(a_FileName)
 {
 	if (!m_File.IsOpen())
@@ -434,9 +646,18 @@ cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_R
 	// Load the header:
 	if (m_File.Read(m_Header, sizeof(m_Header)) != sizeof(m_Header))
 	{
-		LOGWARNING("Cannot read MCA header from file \"%s\", chunks in that file will be lost", m_FileName.c_str());
-		m_File.Close();
-		return;
+		// Cannot read the header - perhaps the file has just been created?
+		// Try writing a NULL header (both chunk offsets and timestamps):
+		memset(m_Header, 0, sizeof(m_Header));
+		if (
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))
+		)
+		{
+			LOGWARNING("Cannot process MCA header in file \"%s\", chunks in that file will be lost", m_FileName.c_str());
+			m_File.Close();
+			return;
+		}
 	}
 }
 
@@ -492,3 +713,80 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 
 
 
+
+bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data)
+{
+	if (!m_File.IsOpen())
+	{
+		return false;
+	}
+	int LocalX = a_Chunk.m_ChunkX % 32;
+	if (LocalX < 0)
+	{
+		LocalX = 32 + LocalX;
+	}
+	int LocalZ = a_Chunk.m_ChunkZ % 32;
+	if (LocalZ < 0)
+	{
+		LocalZ = 32 + LocalZ;
+	}
+	
+	unsigned ChunkSector = FindFreeLocation(LocalX, LocalZ, a_Data);
+
+	// Store the chunk data:
+	m_File.Seek(ChunkSector * 4096);
+	unsigned ChunkSize = htonl(a_Data.size() + 1);
+	if (m_File.Write(&ChunkSize, 4) != 4)
+	{
+		return false;
+	}
+	char CompressionType = 2;
+	if (m_File.Write(&CompressionType, 1) != 1)
+	{
+		return false;
+	}
+	if (m_File.Write(a_Data.data(), a_Data.size()) != a_Data.size())
+	{
+		return false;
+	}
+	
+	// Store the header:
+	ChunkSize = (a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
+	ASSERT(ChunkSize < 256);
+	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
+	m_File.Seek(0);
+	if (m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))
+	{
+		return false;
+	}
+	
+	return true;
+}
+
+
+
+
+
+unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data)
+{
+	// See if it fits the current location:
+	unsigned ChunkLocation = ntohl(m_Header[a_LocalX + 32 * a_LocalZ]);
+	unsigned ChunkLen = ChunkLocation & 0xff;
+	if (a_Data.size() + MCA_CHUNK_HEADER_LENGTH <= (ChunkLen * 4096))
+	{
+		return ChunkLocation >> 8;
+	}
+	
+	// Doesn't fit, append to the end of file (we're wasting a lot of space, TODO: fix this later)
+	unsigned MaxLocation = 2 << 8;  // Minimum sector is #2 - after the headers
+	for (int i = 0; i < ARRAYCOUNT(m_Header); i++)
+	{
+		ChunkLocation = ntohl(m_Header[i]);
+		ChunkLocation = ChunkLocation + ((ChunkLocation & 0xff) << 8);  // Add the number of sectors used; don't care about the 4th byte
+		if (MaxLocation < ChunkLocation)
+		{
+			MaxLocation = ChunkLocation;
+		}
+	}  // for i - m_Header[]
+	return MaxLocation >> 8;
+}

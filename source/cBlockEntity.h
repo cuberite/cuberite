@@ -34,10 +34,10 @@ class cPacket;
 class cBlockEntity
 {
 protected:
-	cBlockEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World) 
-		: m_PosX( a_X )
-		, m_PosY( a_Y )
-		, m_PosZ( a_Z )
+	cBlockEntity(ENUM_BLOCK_ID a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) 
+		: m_PosX( a_BlockX )
+		, m_PosY( a_BlockY )
+		, m_PosZ( a_BlockZ )
 		, m_BlockType( a_BlockType ) 
 		, m_World( a_World )
 	{}
@@ -45,6 +45,7 @@ public:
 	virtual ~cBlockEntity() {};
 	virtual void Destroy() {};
 	
+	// Position, in absolute block coordinates:
 	int GetPosX() { return m_PosX; }
 	int GetPosY() { return m_PosY; }
 	int GetPosZ() { return m_PosZ; }
@@ -78,7 +79,7 @@ public:
 	virtual cPacket * GetPacket(void) {return NULL; }
 
 protected:
-	int m_PosX; // Position in block coordinates
+	int m_PosX; // Position in absolute block coordinates
 	int m_PosY;
 	int m_PosZ;
 
