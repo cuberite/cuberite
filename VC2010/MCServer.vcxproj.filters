@@ -445,6 +445,9 @@
     <Filter Include="Simulator\cSimulator\cRedstoneSimulator">
       <UniqueIdentifier>{4b3b7b43-8e8b-4823-b112-2259fdfff7d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Storage">
+      <UniqueIdentifier>{038cf4bd-108e-44e2-bdcb-9d48fb26676e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -887,19 +890,30 @@
     <ClCompile Include="..\source\cSocketThreads.cpp" />
     <ClCompile Include="..\source\LeakFinder.cpp" />
     <ClCompile Include="..\source\StackWalker.cpp" />
-    <ClCompile Include="..\source\WorldStorage.cpp" />
-    <ClCompile Include="..\source\WSSCompact.cpp" />
     <ClCompile Include="..\source\StringCompression.cpp" />
     <ClCompile Include="..\source\LightingThread.cpp" />
     <ClCompile Include="..\source\cRedstoneSimulator.cpp">
       <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\ChunkSender.cpp" />
-    <ClCompile Include="..\source\WSSAnvil.cpp" />
-    <ClCompile Include="..\source\NBT.cpp" />
     <ClCompile Include="..\source\WGFlat.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Player.cpp">
       <Filter>Packets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\NBT.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WorldStorage.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WSSAnvil.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\WSSCompact.cpp">
+      <Filter>Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\FastNBT.cpp">
+      <Filter>Storage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1379,22 +1393,33 @@
     <ClInclude Include="..\source\StringUtils.h" />
     <ClInclude Include="..\source\cIsThread.h" />
     <ClInclude Include="..\source\cSocketThreads.h" />
-    <ClInclude Include="..\source\WSSCompact.h" />
     <ClInclude Include="..\source\LeakFinder.h" />
     <ClInclude Include="..\source\StackWalker.h" />
-    <ClInclude Include="..\source\WorldStorage.h" />
     <ClInclude Include="..\source\StringCompression.h" />
     <ClInclude Include="..\source\LightingThread.h" />
     <ClInclude Include="..\source\cRedstoneSimulator.h">
       <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ChunkSender.h" />
-    <ClInclude Include="..\source\WSSAnvil.h" />
-    <ClInclude Include="..\source\NBT.h" />
     <ClInclude Include="..\source\WGFlat.h" />
     <ClInclude Include="..\source\ChunkDef.h" />
     <ClInclude Include="..\source\packets\cPacket_Player.h">
       <Filter>Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\NBT.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WorldStorage.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WSSAnvil.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\WSSCompact.h">
+      <Filter>Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\FastNBT.h">
+      <Filter>Storage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,7 @@
 #include "cEntity.h"
 #include "cBlockEntity.h"
 #include "cMakeDir.h"
+#include "FastNBT.h"
 
 
 
@@ -143,6 +144,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World) :
 		Data->Add(new cNBTInt(Data, "SpawnZ", (int)(a_World->GetSpawnZ())));
 		AString Uncompressed;
 		cNBTSerializer::Serialize(Root.get(), Uncompressed);
+		
 		gzFile gz = gzopen(fnam.c_str(), "wb");
 		if (gz != NULL)
 		{
@@ -304,14 +306,15 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 	}
 	
 	// Parse the NBT data:
-	std::auto_ptr<cNBTTree> Tree(cNBTParser::Parse(Uncompressed, strm.total_out));
-	if (Tree.get() == NULL)
+	cParsedNBT NBT(Uncompressed, strm.total_out);
+	if (!NBT.IsValid())
 	{
+		// NBT Parsing failed
 		return false;
 	}
 
 	// Load the data from NBT:
-	return LoadChunkFromNBT(a_Chunk, *Tree.get());
+	return LoadChunkFromNBT(a_Chunk, NBT);
 }
 
 
@@ -335,7 +338,7 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 
 
 
-bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
+bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT)
 {
 	// The data arrays, in MCA-native y/z/x ordering (will be reordered for the final chunk data)
 	BLOCKTYPE BlockData[cChunkDef::BlockDataSize];
@@ -347,49 +350,41 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 	memset(SkyLight,   0xff,        cChunkDef::NumBlocks / 2);  // By default, data not present in the NBT means air, which means full skylight
 	
 	// Load the blockdata, blocklight and skylight:
-	cNBTList * Sections = (cNBTList *)a_NBT.FindChildByPath("Level\\Sections");
-	if ((Sections == NULL) || (Sections->GetType() != cNBTTag::TAG_List) || (Sections->GetChildrenType() != cNBTTag::TAG_Compound))
+	int Level = a_NBT.FindChildByName(0, "Level");
+	if (Level < 0)
 	{
 		return false;
 	}
-	const cNBTTags & LevelSections = Sections->GetChildren();
-	for (cNBTTags::const_iterator itr = LevelSections.begin(); itr != LevelSections.end(); ++itr)
+	int Sections = a_NBT.FindChildByName(Level, "Sections");
+	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List) || (a_NBT.GetChildrenType(Sections) != TAG_Compound))
+	{
+		return false;
+	}
+	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
 	{
 		int y = 0;
-		cNBTByte * SectionY = (cNBTByte *)((*itr)->FindChildByName("Y"));
-		if ((SectionY == NULL) || (SectionY->GetType() != cNBTTag::TAG_Byte) || (SectionY->m_Value < 0) || (SectionY->m_Value > 15))
+		int SectionY = a_NBT.FindChildByName(Child, "Y");
+		if ((SectionY < 0) || (a_NBT.GetType(SectionY) != TAG_Byte))
 		{
 			continue;
 		}
-		y = SectionY->m_Value;
-		cNBTByteArray * baBlocks = (cNBTByteArray *)((*itr)->FindChildByName("Blocks"));
-		if ((baBlocks != NULL) && (baBlocks->GetType() == cNBTTag::TAG_ByteArray) && (baBlocks->m_Value.size() == 4096))
+		y = a_NBT.GetByte(SectionY);
+		if ((y < 0) || (y > 15))
 		{
-			memcpy(&(BlockData[y * 4096]), baBlocks->m_Value.data(), 4096);
+			continue;
 		}
-		cNBTByteArray * baMetaData = (cNBTByteArray *)((*itr)->FindChildByName("Data"));
-		if ((baMetaData != NULL) && (baMetaData->GetType() == cNBTTag::TAG_ByteArray) && (baMetaData->m_Value.size() == 2048))
-		{
-			memcpy(&(MetaData[y * 2048]), baMetaData->m_Value.data(), 2048);
-		}
-		cNBTByteArray * baSkyLight = (cNBTByteArray *)((*itr)->FindChildByName("SkyLight"));
-		if ((baSkyLight != NULL) && (baSkyLight->GetType() == cNBTTag::TAG_ByteArray) && (baSkyLight->m_Value.size() == 2048))
-		{
-			memcpy(&(SkyLight[y * 2048]), baSkyLight->m_Value.data(), 2048);
-		}
-		cNBTByteArray * baBlockLight = (cNBTByteArray *)((*itr)->FindChildByName("BlockLight"));
-		if ((baBlockLight != NULL) && (baBlockLight->GetType() == cNBTTag::TAG_ByteArray) && (baBlockLight->m_Value.size() == 2048))
-		{
-			memcpy(&(BlockLight[y * 2048]), baBlockLight->m_Value.data(), 2048);
-		}
+		CopyNBTData(a_NBT, Child, "Blocks",     &(BlockData[y  * 4096]), 4096);
+		CopyNBTData(a_NBT, Child, "Data",       &(MetaData[y   * 2048]), 2048);
+		CopyNBTData(a_NBT, Child, "SkyLight",   &(SkyLight[y   * 2048]), 2048);
+		CopyNBTData(a_NBT, Child, "BlockLight", &(BlockLight[y * 2048]), 2048);
 	}  // for itr - LevelSections[]
 	
 	cEntityList Entities;
 	cBlockEntityList BlockEntities;
 	
 	// Load the entities from NBT:
-	LoadEntitiesFromNBT     (Entities,      (cNBTList *)(a_NBT.FindChildByPath("Level\\Entities")));
-	LoadBlockEntitiesFromNBT(BlockEntities, (cNBTList *)(a_NBT.FindChildByPath("Level\\TileEntities")));
+	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
+	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"));
 	
 	#if (AXIS_ORDER == AXIS_ORDER_YZX)
 	// Reorder the chunk data - walk the MCA-formatted data sequentially and copy it into the right place in the ChunkData:
@@ -466,6 +461,18 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT)
 
 
 
+void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, int a_Length)
+{
+	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
+	if ((Child >= 0) && (a_NBT.GetType(Child) == TAG_ByteArray) && (a_NBT.GetDataLength(Child) == a_Length))
+	{
+		memcpy(a_Destination, a_NBT.GetData(Child), a_Length);
+	}
+}
+
+
+
+
 
 cNBTTag * cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk)
 {
@@ -511,7 +518,7 @@ cNBTTag * cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk)
 
 
 
-void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * a_NBT)
+void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	// TODO: Load the entities
 }
@@ -520,80 +527,77 @@ void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * 
 
 
 
-void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, const cNBTList * a_NBT)
+void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	if ((a_NBT == NULL) || (a_NBT->GetType() != cNBTTag::TAG_List))
+	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List))
 	{
 		return;
 	}
-	const cNBTTags & Tags = a_NBT->GetChildren();
 	
-	for (cNBTTags::const_iterator itr = Tags.begin(); itr != Tags.end(); ++itr)
+	for (int Child = a_NBT.GetFirstChild(a_TagIdx); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
-		if ((*itr)->GetType() != cNBTTag::TAG_Compound)
+		if (a_NBT.GetType(Child) != TAG_Compound)
 		{
 			continue;
 		}
-		cNBTString * sID = (cNBTString *)((*itr)->FindChildByName("id"));
-		if (sID == NULL)
+		int sID = a_NBT.FindChildByName(Child, "id");
+		if (sID < 0)
 		{
 			continue;
 		}
-		if (sID->m_Value == "Chest")
+		if (strncmp(a_NBT.GetData(sID), "Chest", a_NBT.GetDataLength(sID)) == 0)
 		{
-			LoadChestFromNBT(a_BlockEntities, (cNBTCompound *)(*itr));
+			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
 		}
 		// TODO: Other block entities
-	}  // for itr - Tags[]
+	}  // for Child - tag children
 }
 
 
 
 
 
-void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cNBTCompound * a_NBT)
+void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	ASSERT(a_NBT != NULL);
-	ASSERT(a_NBT->GetType() == cNBTTag::TAG_Compound);
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
 	int x, y, z;
-	if (!GetBlockEntityNBTPos(a_NBT, x, y, z))
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
 	{
 		return;
 	}
-	cNBTList * Items = (cNBTList *)(a_NBT->FindChildByName("Items"));
-	if ((Items == NULL) || (Items->GetType() != cNBTTag::TAG_List))
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return;  // Make it an empty chest
+		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
 	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World));
-	const cNBTTags & ItemDefs = Items->GetChildren();
-	for (cNBTTags::const_iterator itr = ItemDefs.begin(); itr != ItemDefs.end(); ++itr)
+	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
-		cNBTByte * Slot = (cNBTByte *)((*itr)->FindChildByName("Slot"));
-		if ((Slot == NULL) || (Slot->GetType() != cNBTTag::TAG_Byte))
+		int Slot = a_NBT.FindChildByName(Child, "Slot");
+		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
 		{
 			continue;
 		}
 		cItem Item;
-		cNBTShort * ID = (cNBTShort *)((*itr)->FindChildByName("id"));
-		if ((ID == NULL) || (ID->GetType() != cNBTTag::TAG_Short))
+		int ID = a_NBT.FindChildByName(Child, "id");
+		if ((ID < 0) || (a_NBT.GetType(ID) != TAG_Short))
 		{
 			continue;
 		}
-		Item.m_ItemID = (ENUM_ITEM_ID)(ID->m_Value);
-		cNBTShort * Damage = (cNBTShort *)((*itr)->FindChildByName("Damage"));
-		if ((Damage == NULL) || (Damage->GetType() != cNBTTag::TAG_Short))
+		Item.m_ItemID = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+		int Damage = a_NBT.FindChildByName(Child, "Damage");
+		if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
 		{
 			continue;
 		}
-		Item.m_ItemHealth = Damage->m_Value;
-		cNBTByte * Count = (cNBTByte *)((*itr)->FindChildByName("Count"));
-		if ((Count == NULL) || (Count->GetType() != cNBTTag::TAG_Byte))
+		Item.m_ItemHealth = a_NBT.GetShort(Damage);
+		int Count = a_NBT.FindChildByName(Child, "Count");
+		if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
 		{
 			continue;
 		}
-		Item.m_ItemCount = Count->m_Value;
-		Chest->SetSlot(Slot->m_Value, Item);
+		Item.m_ItemCount = a_NBT.GetByte(Count);
+		Chest->SetSlot(a_NBT.GetByte(Slot), Item);
 	}  // for itr - ItemDefs[]
 	a_BlockEntities.push_back(Chest.release());
 }
@@ -602,26 +606,26 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cNBTC
 
 
 
-bool cWSSAnvil::GetBlockEntityNBTPos(const cNBTCompound * a_NBT, int & a_X, int & a_Y, int & a_Z)
+bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z)
 {
-	cNBTInt * x = (cNBTInt *)(a_NBT->FindChildByName("x"));
-	if ((x == NULL) || (x->GetType() != cNBTTag::TAG_Int))
+	int x = a_NBT.FindChildByName(a_TagIdx, "x");
+	if ((x < 0) || (a_NBT.GetType(x) != TAG_Int))
 	{
 		return false;
 	}
-	cNBTInt * y = (cNBTInt *)(a_NBT->FindChildByName("y"));
-	if ((y == NULL) || (y->GetType() != cNBTTag::TAG_Int))
+	int y = a_NBT.FindChildByName(a_TagIdx, "y");
+	if ((y < 0) || (a_NBT.GetType(y) != TAG_Int))
 	{
 		return false;
 	}
-	cNBTInt * z = (cNBTInt *)(a_NBT->FindChildByName("z"));
-	if ((z == NULL) || (z->GetType() != cNBTTag::TAG_Int))
+	int z = a_NBT.FindChildByName(a_TagIdx, "z");
+	if ((z < 0) || (a_NBT.GetType(z) != TAG_Int))
 	{
 		return false;
 	}
-	a_X = x->m_Value;
-	a_Y = y->m_Value;
-	a_Z = z->m_Value;
+	a_X = a_NBT.GetInt(x);
+	a_Y = a_NBT.GetInt(y);
+	a_Z = a_NBT.GetInt(z);
 	return true;
 }
 

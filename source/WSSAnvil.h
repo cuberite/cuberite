@@ -9,6 +9,7 @@
 #pragma once
 
 #include "WorldStorage.h"
+#include "FastNBT.h"
 
 
 
@@ -99,24 +100,27 @@ protected:
 	bool SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data);
 	
 	/// Loads the chunk from NBT data (no locking needed)
-	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, cNBTTag & a_NBT);
+	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT);
 	
 	/// Saves the chunk into NBT data; returns NULL for failure
 	cNBTTag * SaveChunkToNBT(const cChunkCoords & a_Chunk);
 	
-	/// Loads the chunk's entities from NBT data (a_NBT is the Level\\Entities list tag; may be NULL)
-	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cNBTList * a_NBT);
+	/// Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1)
+	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag);
 	
-	/// Loads the chunk's BlockEntities from NBT data (a_NBT is the Level\\TileEntities list tag; may be NULL)
-	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cNBTList * a_NBT);
+	/// Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1)
+	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag);
 	
-	void LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cNBTCompound * a_NBT);
+	void LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
-	bool GetBlockEntityNBTPos(const cNBTCompound * a_NBT, int & a_X, int & a_Y, int & a_Z);
+	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z);
 	
 	/// Gets the correct MCA file either from cache or from disk, manages the m_MCAFiles cache; assumes m_CS is locked
 	cMCAFile * LoadMCAFile(const cChunkCoords & a_Chunk);
+	
+	/// Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer
+	void CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, int a_Length);
 		
 	// cWSSchema overrides:
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;

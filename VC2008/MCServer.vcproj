@@ -573,14 +573,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\NBT.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\NBT.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\StackWalker.cpp"
 				>
 				<FileConfiguration
@@ -1629,6 +1621,22 @@
 			<Filter
 				Name="World storage"
 				>
+				<File
+					RelativePath="..\source\FastNBT.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\FastNBT.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\NBT.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\NBT.h"
+					>
+				</File>
 				<File
 					RelativePath="..\source\WorldStorage.cpp"
 					>

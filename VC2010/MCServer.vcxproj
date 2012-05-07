@@ -390,6 +390,7 @@
     <ClCompile Include="..\source\cWorldGenerator_Test.cpp" />
     <ClCompile Include="..\source\cZombie.cpp" />
     <ClCompile Include="..\source\cZombiepigman.cpp" />
+    <ClCompile Include="..\source\FastNBT.cpp" />
     <ClCompile Include="..\source\Globals.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -575,6 +576,7 @@
     <ClInclude Include="..\source\cZombie.h" />
     <ClInclude Include="..\source\cZombiepigman.h" />
     <ClInclude Include="..\source\Endianness.h" />
+    <ClInclude Include="..\source\FastNBT.h" />
     <ClInclude Include="..\Source\FileDefine.h" />
     <ClInclude Include="..\source\Globals.h" />
     <ClInclude Include="..\source\LeakFinder.h" />

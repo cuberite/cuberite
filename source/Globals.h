@@ -65,6 +65,15 @@
 
 
 
+// Integral types with predefined sizes:
+typedef long long Int64;
+typedef int       Int32;
+typedef short     Int16;
+
+
+
+
+
 // A macro to disallow the copy constructor and operator= functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
