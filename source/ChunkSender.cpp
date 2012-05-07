@@ -182,6 +182,11 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		}
 	}
 	
+	if (!m_World->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ))
+	{
+		return;
+	}
+	
 	// Prepare MapChunk packets:
 	if( !m_World->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, *this) )
 	{
