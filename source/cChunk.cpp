@@ -596,7 +596,7 @@ void cChunk::CreateBlockEntities(void)
 		{
 			for (int y = 0; y < Height; y++)
 			{
-				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)m_BlockTypes[ MakeIndex( x, y, z ) ];
+				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)m_BlockTypes[ MakeIndexNoCheck( x, y, z ) ];
 				switch ( BlockType )
 				{
 					case E_BLOCK_CHEST:
@@ -644,7 +644,7 @@ void cChunk::CalculateHeightmap()
 		{
 			for (int y = Height - 1; y > -1; y--)
 			{
-				int index = MakeIndex( x, y, z );
+				int index = MakeIndexNoCheck( x, y, z );
 				if (m_BlockTypes[index] != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * Width] = (unsigned char)y;
