@@ -102,8 +102,8 @@ protected:
 	/// Loads the chunk from NBT data (no locking needed)
 	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT);
 	
-	/// Saves the chunk into NBT data; returns NULL for failure
-	cNBTTag * SaveChunkToNBT(const cChunkCoords & a_Chunk);
+	/// Saves the chunk into NBT data using a_Writer; returns true on success
+	bool SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer);
 	
 	/// Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1)
 	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag);

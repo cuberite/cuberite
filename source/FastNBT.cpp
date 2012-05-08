@@ -17,7 +17,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cFastNBTParser:
+// cParsedNBT:
 
 #define NEEDBYTES(N) \
 	if (m_Length - m_Pos < N) \
@@ -314,6 +314,216 @@ int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
 	return Tag;
 }
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFastNBTWriter:
+
+cFastNBTWriter::cFastNBTWriter(void) :
+	m_CurrentStack(0)
+{
+	m_Stack[0].m_Type = TAG_Compound;
+	m_Result.reserve(100 * 1024);
+	m_Result.push_back(TAG_Compound);
+	WriteString("", 0);
+}
+
+
+
+
+
+void cFastNBTWriter::BeginCompound(const AString & a_Name)
+{
+	if (m_CurrentStack >= MAX_STACK)
+	{
+		ASSERT(!"Stack overflow");
+		return;
+	}
+	
+	TagCommon(a_Name, TAG_Compound);
+	
+	++m_CurrentStack;
+	m_Stack[m_CurrentStack].m_Type = TAG_Compound;
+}
+
+
+
+
+
+void cFastNBTWriter::EndCompound(void)
+{
+	ASSERT(m_CurrentStack > 0);
+	ASSERT(IsStackTopCompound());
+	
+	m_Result.push_back(TAG_End);
+	--m_CurrentStack;
+}
+
+
+
+
+
+void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
+{
+	if (m_CurrentStack >= MAX_STACK)
+	{
+		ASSERT(!"Stack overflow");
+		return;
+	}
+	
+	TagCommon(a_Name, TAG_List);
+		
+	m_Result.push_back((char)a_ChildrenType);
+	m_Result.append(4, (char)0);
+	
+	++m_CurrentStack;
+	m_Stack[m_CurrentStack].m_Type  = TAG_List;
+	m_Stack[m_CurrentStack].m_Pos   = m_Result.size() - 4;
+	m_Stack[m_CurrentStack].m_Count = 0;
+}
+
+
+
+
+
+void cFastNBTWriter::EndList(void)
+{
+	ASSERT(m_CurrentStack > 0);
+	ASSERT(m_Stack[m_CurrentStack].m_Type == TAG_List);
+	
+	// Update the list count:
+	*((int *)(m_Result.c_str() + m_Stack[m_CurrentStack].m_Pos)) = htonl(m_Stack[m_CurrentStack].m_Count);
+
+	--m_CurrentStack;
+}
+
+
+
+
+
+void cFastNBTWriter::AddByte(const AString & a_Name, unsigned char a_Value)
+{
+	TagCommon(a_Name, TAG_Byte);
+	m_Result.push_back(a_Value);
+}
+
+
+
+
+
+void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
+{
+	TagCommon(a_Name, TAG_Short);
+	Int16 Value = htons(a_Value);
+	m_Result.append((const char *)&Value, 2);
+}
+
+
+
+
+
+void cFastNBTWriter::AddInt(const AString & a_Name, Int32 a_Value)
+{
+	TagCommon(a_Name, TAG_Int);
+	Int32 Value = htonl(a_Value);
+	m_Result.append((const char *)&Value, 4);
+}
+
+
+
+
+
+void cFastNBTWriter::AddLong(const AString & a_Name, Int64 a_Value)
+{
+	TagCommon(a_Name, TAG_Long);
+	Int64 Value = HostToNetwork8(&a_Value);
+	m_Result.append((const char *)&Value, 8);
+}
+
+
+
+
+
+void cFastNBTWriter::AddFloat(const AString & a_Name, float a_Value)
+{
+	TagCommon(a_Name, TAG_Float);
+	Int32 Value = HostToNetwork4(&a_Value);
+	m_Result.append((const char *)&Value, 4);
+}
+
+
+
+
+
+void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
+{
+	TagCommon(a_Name, TAG_Double);
+	Int64 Value = HostToNetwork8(&a_Value);
+	m_Result.append((const char *)&Value, 8);
+}
+
+
+
+
+
+void cFastNBTWriter::AddString(const AString & a_Name, const AString & a_Value)
+{
+	TagCommon(a_Name, TAG_String);
+	Int16 len = htons((short)(a_Value.size()));
+	m_Result.append((const char *)&len, 2);
+	m_Result.append(a_Value.c_str(), a_Value.size());
+}
+
+
+
+
+
+void cFastNBTWriter::AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements)
+{
+	TagCommon(a_Name, TAG_ByteArray);
+	Int32 len = htonl(a_NumElements);
+	m_Result.append((const char *)&len, 4);
+	m_Result.append(a_Value, a_NumElements);
+}
+
+
+
+
+
+void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, size_t a_NumElements)
+{
+	TagCommon(a_Name, TAG_IntArray);
+	Int32 len = htonl(a_NumElements);
+	m_Result.append((const char *)&len, 2);
+	int * Elements = (int *)(m_Result.data() + m_Result.size());
+	m_Result.append(a_NumElements * 4, (char)0);
+	for (size_t i = 0; i < a_NumElements; i++)
+	{
+		Elements[i] = htonl(a_Value[i]);
+	}
+}
+
+
+
+
+void cFastNBTWriter::Finish(void)
+{
+	ASSERT(m_CurrentStack == 0);
+	m_Result.push_back(TAG_End);
+}
+
+
+
+
+
+void cFastNBTWriter::WriteString(const char * a_Data, short a_Length)
+{
+	Int16 Len = htons(a_Length);
+	m_Result.append((const char *)&Len, 2);
+	m_Result.append(a_Data, a_Length);
+}
 
 
 

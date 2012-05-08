@@ -41,10 +41,22 @@ class cNBTChunkSerializer :
 	public cChunkDataSeparateCollector
 {
 public:
-	cNBTChunkSerializer(cNBTList * a_Entities, cNBTList * a_TileEntities) :
-		m_Entities(a_Entities),
-		m_TileEntities(a_TileEntities)
+	cNBTChunkSerializer(cFastNBTWriter & a_Writer) :
+		m_Writer(a_Writer),
+		m_IsTagOpen(false),
+		m_HasHadEntity(false),
+		m_HasHadBlockEntity(false)
 	{
+	}
+
+
+	/// Close NBT tags that we've opened
+	void Finish(void)
+	{
+		if (m_IsTagOpen)
+		{
+			m_Writer.EndCompound();
+		}
 	}
 	
 protected:
@@ -58,37 +70,38 @@ protected:
 	
 	// TODO: Biomes
 	
-	// We need to save entities and blockentities into NBT
-	cNBTList * m_Entities;  // Tag where entities will be saved
-	cNBTList * m_TileEntities;  // Tag where block-entities will be saved
+	cFastNBTWriter & m_Writer;
+	
+	bool m_IsTagOpen;  // True if a tag has been opened in the callbacks and not yet closed.
+	bool m_HasHadEntity;  // True if any Entity has already been received and processed
+	bool m_HasHadBlockEntity;  // True if any BlockEntity has already been received and processed
 	
 	
-	cNBTCompound * AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID)
+	void AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID)
 	{
-		cNBTCompound * res = new cNBTCompound(m_TileEntities);
-		res->Add(new cNBTInt   (res, "x",  a_Entity->GetPosX()));
-		res->Add(new cNBTInt   (res, "y",  a_Entity->GetPosY()));
-		res->Add(new cNBTInt   (res, "z",  a_Entity->GetPosZ()));
-		res->Add(new cNBTString(res, "id", a_EntityTypeID));
-		return res;
+		m_Writer.AddInt   ("x",  a_Entity->GetPosX());
+		m_Writer.AddInt   ("y",  a_Entity->GetPosY());
+		m_Writer.AddInt   ("z",  a_Entity->GetPosZ());
+		m_Writer.AddString("id", a_EntityTypeID);
 	}
 	
 	
-	void AddItem(cNBTList * a_Items, cItem * a_Item, int a_Slot)
+	void AddItem(cItem * a_Item, int a_Slot)
 	{
-		cNBTCompound * Tag = new cNBTCompound(a_Items);
-		Tag->Add(new cNBTShort(Tag, "id",     a_Item->m_ItemID));
-		Tag->Add(new cNBTShort(Tag, "Damage", a_Item->m_ItemHealth));
-		Tag->Add(new cNBTByte (Tag, "Count",  a_Item->m_ItemCount));
-		Tag->Add(new cNBTByte (Tag, "Slot",   a_Slot));
+		m_Writer.BeginCompound("");
+		m_Writer.AddShort("id",     a_Item->m_ItemID);
+		m_Writer.AddShort("Damage", a_Item->m_ItemHealth);
+		m_Writer.AddByte ("Count",  a_Item->m_ItemCount);
+		m_Writer.AddByte ("Slot",   a_Slot);
+		m_Writer.EndCompound();
 	}
 	
 	
 	void AddChestEntity(cChestEntity * a_Entity)
 	{
-		cNBTCompound * Base = AddBasicTileEntity(a_Entity, "chest");
-		cNBTList * Items = new cNBTList(Base, "Items", cNBTTag::TAG_Compound);
-		Base->Add(Items);
+		m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Entity, "chest");
+		m_Writer.BeginList("Items", TAG_Compound);
 		for (int i = 0; i < cChestEntity::c_ChestHeight * cChestEntity::c_ChestWidth; i++)
 		{
 			cItem * Item = a_Entity->GetSlot(i);
@@ -96,8 +109,10 @@ protected:
 			{
 				continue;
 			}
-			AddItem(Items, Item, i);
+			AddItem(Item, i);
 		}
+		m_Writer.EndList();
+		m_Writer.EndCompound();
 	}
 
 
@@ -109,6 +124,20 @@ protected:
 	
 	virtual void BlockEntity(cBlockEntity * a_Entity)
 	{
+		if (m_IsTagOpen)
+		{
+			if (!m_HasHadBlockEntity)
+			{
+				m_Writer.EndCompound();
+				m_Writer.BeginCompound("TileEntities");
+			}
+		}
+		else
+		{
+			m_Writer.BeginCompound("TileEntities");
+		}
+		m_IsTagOpen = true;
+		
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
@@ -118,6 +147,7 @@ protected:
 				ASSERT(!"Unhandled block entity saved into Anvil");
 			}
 		}
+		m_HasHadBlockEntity = true;
 	}
 } ;  // class cNBTChunkSerializer
 
@@ -136,19 +166,23 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World) :
 	Printf(fnam, "%s/level.dat", a_World->GetName().c_str());
 	if (!cFile::Exists(fnam))
 	{
-		std::auto_ptr<cNBTCompound> Root(new cNBTCompound(NULL));
-		cNBTCompound * Data = new cNBTCompound(Root.get());
-		Root->Add(Data);
-		Data->Add(new cNBTInt(Data, "SpawnX", (int)(a_World->GetSpawnX())));
-		Data->Add(new cNBTInt(Data, "SpawnY", (int)(a_World->GetSpawnY())));
-		Data->Add(new cNBTInt(Data, "SpawnZ", (int)(a_World->GetSpawnZ())));
-		AString Uncompressed;
-		cNBTSerializer::Serialize(Root.get(), Uncompressed);
+		cFastNBTWriter Writer;
+		Writer.BeginCompound("");
+		Writer.AddInt("SpawnX", (int)(a_World->GetSpawnX()));
+		Writer.AddInt("SpawnY", (int)(a_World->GetSpawnY()));
+		Writer.AddInt("SpawnZ", (int)(a_World->GetSpawnZ()));
+		Writer.EndCompound();
+		Writer.Finish();
+		
+		#ifdef _DEBUG
+		cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+		ASSERT(TestParse.IsValid());
+		#endif  // _DEBUG
 		
 		gzFile gz = gzopen(fnam.c_str(), "wb");
 		if (gz != NULL)
 		{
-			gzwrite(gz, Uncompressed.data(), Uncompressed.size());
+			gzwrite(gz, Writer.GetResult().data(), Writer.GetResult().size());
 		}
 		gzclose(gz);
 	}
@@ -198,6 +232,14 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 	{
 		return false;
 	}
+	
+	// DEBUG: How fast is it?
+	DWORD BeginTick = GetTickCount();
+	for (int i = 0; i < 1000; i++)
+	{
+		SaveChunkToData(a_Chunk, ChunkData);
+	}
+	LOGINFO("1000* SaveChunk took %d ticks.", GetTickCount() - BeginTick);
 	
 	// Everything successful
 	return true;
@@ -323,14 +365,19 @@ bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & 
 
 bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 {
-	std::auto_ptr<cNBTTree> Tree(SaveChunkToNBT(a_Chunk));
-	if (Tree.get() == NULL)
+	cFastNBTWriter Writer;
+	if (!SaveChunkToNBT(a_Chunk, Writer))
 	{
 		return false;
 	}
-	AString Uncompressed;
-	cNBTSerializer::Serialize(Tree.get(), Uncompressed);
-	CompressString(Uncompressed.data(), Uncompressed.size(), a_Data);
+	Writer.Finish();
+	
+	#ifdef _DEBUG
+	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	ASSERT(TestParse.IsValid());
+	#endif  // _DEBUG
+	
+	CompressString(Writer.GetResult().data(), Writer.GetResult().size(), a_Data);
 	return true;
 }
 
@@ -474,44 +521,38 @@ void cWSSAnvil::CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString &
 
 
 
-cNBTTag * cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk)
+bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer)
 {
-	std::auto_ptr<cNBTCompound> res(new cNBTCompound(NULL));
-	cNBTCompound * Level = new cNBTCompound(res.get(), "Level");
-	res->Add(Level);
-	cNBTList * Entities = new cNBTList(Level, "Entities", cNBTTag::TAG_Compound);
-	Level->Add(Entities);
-	cNBTList * TileEntities = new cNBTList(Level, "TileEntities", cNBTTag::TAG_Compound);
-	Level->Add(TileEntities);
-	cNBTChunkSerializer Serializer(Entities, TileEntities);
+	a_Writer.BeginCompound("Level");
+	a_Writer.AddInt("xPos", a_Chunk.m_ChunkX);
+	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
+	cNBTChunkSerializer Serializer(a_Writer);
 	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
 	{
-		return NULL;
+		return false;
 	}
-	
-	Level->Add(new cNBTInt(Level, "xPos", a_Chunk.m_ChunkX));
-	Level->Add(new cNBTInt(Level, "zPos", a_Chunk.m_ChunkZ));
+	Serializer.Finish();  // Close NBT tags
 	
 	// TODO: Save biomes:
 	// Level->Add(new cNBTByteArray(Level, "Biomes", AString(Serializer.m_Biomes, sizeof(Serializer.m_Biomes));
 	
 	// Save blockdata:
-	cNBTList * Sections = new cNBTList(Level, "Sections", cNBTTag::TAG_Compound);
-	Level->Add(Sections);
+	a_Writer.BeginList("Sections", TAG_Compound);
 	int SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
 	int SliceSizeNibble = SliceSizeBlock / 2;
 	for (int Y = 0; Y < 16; Y++)
 	{
-		cNBTCompound * Slice = new cNBTCompound(Sections);
-		Sections->Add(Slice);
-		Slice->Add(new cNBTByteArray(Slice, "Blocks",     AString(Serializer.m_BlockTypes    + Y * SliceSizeBlock,  SliceSizeBlock)));
-		Slice->Add(new cNBTByteArray(Slice, "Data",       AString(Serializer.m_BlockMetas    + Y * SliceSizeNibble, SliceSizeNibble)));
-		Slice->Add(new cNBTByteArray(Slice, "SkyLight",   AString(Serializer.m_BlockSkyLight + Y * SliceSizeNibble, SliceSizeNibble)));
-		Slice->Add(new cNBTByteArray(Slice, "BlockLight", AString(Serializer.m_BlockLight    + Y * SliceSizeNibble, SliceSizeNibble)));
-		Slice->Add(new cNBTByte(Slice, "Y", Y));
+		a_Writer.BeginCompound("");
+		a_Writer.AddByteArray("Blocks",     Serializer.m_BlockTypes    + Y * SliceSizeBlock,  SliceSizeBlock);
+		a_Writer.AddByteArray("Data",       Serializer.m_BlockMetas    + Y * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByteArray("SkyLight",   Serializer.m_BlockSkyLight + Y * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByteArray("BlockLight", Serializer.m_BlockLight    + Y * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByte("Y", Y);
+		a_Writer.EndCompound();
 	}
-	
-	return res.release();
+	a_Writer.EndList();  // "Sections"
+	a_Writer.EndCompound();  // "Level"
+	return true;
 }
 
 

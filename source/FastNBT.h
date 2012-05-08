@@ -214,19 +214,59 @@ public:
 	void EndList(void);
 	
 	void AddByte     (const AString & a_Name, unsigned char a_Value);
-	void AddShort    (const AString & a_Name, unsigned char a_Value);
-	void AddInt      (const AString & a_Name, unsigned char a_Value);
-	void AddLong     (const AString & a_Name, unsigned char a_Value);
-	void AddFloat    (const AString & a_Name, unsigned char a_Value);
-	void AddDouble   (const AString & a_Name, unsigned char a_Value);
-	void AddString   (const AString & a_Name, unsigned char a_Value);
-	void AddByteArray(const AString & a_Name, unsigned char a_Value);
-	void AddIntArray (const AString & a_Name, unsigned char a_Value);
+	void AddShort    (const AString & a_Name, Int16 a_Value);
+	void AddInt      (const AString & a_Name, Int32 a_Value);
+	void AddLong     (const AString & a_Name, Int64 a_Value);
+	void AddFloat    (const AString & a_Name, float a_Value);
+	void AddDouble   (const AString & a_Name, double a_Value);
+	void AddString   (const AString & a_Name, const AString & a_Value);
+	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
+	void AddIntArray (const AString & a_Name, const int *  a_Value, size_t a_NumElements);
 
+	void AddByteArray(const AString & a_Name, const AString & a_Value)
+	{
+		AddByteArray(a_Name, a_Value.data(), a_Value.size());
+	}
+	
 	const AString & GetResult(void) const {return m_Result; }
 	
+	void Finish(void);
+	
 protected:
+
+	struct sParent
+	{
+		int m_Type;   // TAG_Compound or TAG_List
+		int m_Pos;    // for TAG_List, the position of the list count
+		int m_Count;  // for TAG_List, the element count
+	} ;
+	
+	static const int MAX_STACK = 50;  // Highliy doubtful that an NBT would be constructed this many levels deep
+	
+	// These two fields emulate a stack. A raw array is used due to speed issues - no reallocations are allowed.
+	sParent m_Stack[MAX_STACK];
+	int     m_CurrentStack;
+	
 	AString m_Result;
+	
+	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
+	
+	void WriteString(const char * a_Data, short a_Length);
+	
+	inline void TagCommon(const AString & a_Name, eTagType a_Type)
+	{
+		if (IsStackTopCompound())
+		{
+			// Compound: add the type and name:
+			m_Result.push_back((char)a_Type);
+			WriteString(a_Name.c_str(), a_Name.length());
+		}
+		else
+		{
+			// List: add to the counter
+			m_Stack[m_CurrentStack].m_Count++;
+		}
+	}
 } ;
 
 
