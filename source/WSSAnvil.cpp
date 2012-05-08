@@ -233,14 +233,6 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 		return false;
 	}
 	
-	// DEBUG: How fast is it?
-	DWORD BeginTick = GetTickCount();
-	for (int i = 0; i < 1000; i++)
-	{
-		SaveChunkToData(a_Chunk, ChunkData);
-	}
-	LOGINFO("1000* SaveChunk took %d ticks.", GetTickCount() - BeginTick);
-	
 	// Everything successful
 	return true;
 }
