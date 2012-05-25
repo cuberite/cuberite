@@ -1,8 +1,16 @@
+
 #pragma once
 
-#include <list>
+
+
+
 
 class cItem;
+
+
+
+
+
 class cFurnaceRecipe
 {
 public:
@@ -32,3 +40,7 @@ private:
 	struct sFurnaceRecipeState;
 	sFurnaceRecipeState* m_pState;
 };
+
+
+
+

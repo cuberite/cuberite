@@ -1,12 +1,21 @@
+
 #pragma once
+
 #include "cPawn.h"
 #include "Defines.h"
 #include "cWorld.h"
 #include "BlockID.h"
-#include <string.h>
+
+
+
+
 
 class Vector3f;
 class cClientHandle;
+
+
+
+
 class cMonster :	public cPawn											//tolua_export
 {																			//tolua_export
 public:

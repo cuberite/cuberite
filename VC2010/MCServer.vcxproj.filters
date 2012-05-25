@@ -217,9 +217,6 @@
     <Filter Include="cNoise">
       <UniqueIdentifier>{58d6aa00-beab-4654-bbbd-c3b0397a9549}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cGenSettings">
-      <UniqueIdentifier>{731dfafd-78a6-47d4-8494-a8e024f24c07}</UniqueIdentifier>
-    </Filter>
     <Filter Include="cMakeDir">
       <UniqueIdentifier>{102fff22-0eb3-4977-9de3-307534954fbc}</UniqueIdentifier>
     </Filter>
@@ -379,9 +376,6 @@
     <Filter Include="Packets\cPacket_ItemData">
       <UniqueIdentifier>{fcc08e08-8dba-47b4-89b0-5dc255bb9b8a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cChunkGenerator">
-      <UniqueIdentifier>{0d6f822b-71eb-406f-b17a-d188c4924283}</UniqueIdentifier>
-    </Filter>
     <Filter Include="cEntity\cPawn\cMonster\Personalities">
       <UniqueIdentifier>{b0f7c883-e2ca-4bba-89e3-c36656c3de39}</UniqueIdentifier>
     </Filter>
@@ -394,14 +388,8 @@
     <Filter Include="cEntity\cPawn\cMonster\Personalities\PassiveAggressive">
       <UniqueIdentifier>{71574b1c-a518-4a17-92c1-e3ea340f73bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cWorldGenerator">
-      <UniqueIdentifier>{72727ea7-779f-439e-8f30-53bd6985c9e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="!LuaPlugins">
       <UniqueIdentifier>{4b86e1cf-ea3c-40b6-82b2-82fa9e6eb35e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="cWorldGenerator\cWorldGenerator_Test">
-      <UniqueIdentifier>{c86f4c53-af06-4b42-97dd-ffb7035041ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="Simulator">
       <UniqueIdentifier>{ad41fc50-2d3d-4f6f-addd-a8bcb15b8518}</UniqueIdentifier>
@@ -433,9 +421,6 @@
     <Filter Include="cInventory\cCreativeInventory">
       <UniqueIdentifier>{69e6a927-8e49-4d39-af88-f587d17bb8a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="!Smart_Pointers">
-      <UniqueIdentifier>{9bd7a65c-b60f-4905-ae2b-7c3c7586eaef}</UniqueIdentifier>
-    </Filter>
     <Filter Include="cPlugin\cPlugin_NewLua">
       <UniqueIdentifier>{fb282bd3-cf18-44b3-8ccc-9a5a89701a6d}</UniqueIdentifier>
     </Filter>
@@ -444,6 +429,9 @@
     </Filter>
     <Filter Include="Simulator\cSimulator\cRedstoneSimulator">
       <UniqueIdentifier>{4b3b7b43-8e8b-4823-b112-2259fdfff7d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generating">
+      <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Storage">
       <UniqueIdentifier>{038cf4bd-108e-44e2-bdcb-9d48fb26676e}</UniqueIdentifier>
@@ -664,9 +652,6 @@
     <ClCompile Include="..\source\cNoise.cpp">
       <Filter>cNoise</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\cGenSettings.cpp">
-      <Filter>cGenSettings</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\cMakeDir.cpp">
       <Filter>cMakeDir</Filter>
     </ClCompile>
@@ -835,9 +820,6 @@
     <ClCompile Include="..\source\packets\cPacket_ItemData.cpp">
       <Filter>Packets\cPacket_ItemData</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\cChunkGenerator.cpp">
-      <Filter>cChunkGenerator</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\cFluidSimulator.cpp">
       <Filter>Simulator\cSimulator\cFluidSimulator</Filter>
     </ClCompile>
@@ -849,12 +831,6 @@
     </ClCompile>
     <ClCompile Include="..\source\cPassiveMonster.cpp">
       <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cWorldGenerator.cpp">
-      <Filter>cWorldGenerator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cWorldGenerator_Test.cpp">
-      <Filter>cWorldGenerator\cWorldGenerator_Test</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cSimulatorManager.cpp">
       <Filter>Simulator</Filter>
@@ -896,12 +872,30 @@
       <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
     </ClCompile>
     <ClCompile Include="..\source\ChunkSender.cpp" />
-    <ClCompile Include="..\source\WGFlat.cpp" />
     <ClCompile Include="..\source\packets\cPacket_Player.cpp">
       <Filter>Packets</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\NBT.cpp">
-      <Filter>Storage</Filter>
+    <ClCompile Include="..\source\cChunkGenerator.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Trees.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CompoGen.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\HeiGen.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\StructGen.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BioGen.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BlockID.cpp" />
+    <ClCompile Include="..\source\FinishGen.cpp">
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\WorldStorage.cpp">
       <Filter>Storage</Filter>
@@ -1163,9 +1157,6 @@
     <ClInclude Include="..\source\cNoise.h">
       <Filter>cNoise</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\cGenSettings.h">
-      <Filter>cGenSettings</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\cMakeDir.h">
       <Filter>cMakeDir</Filter>
     </ClInclude>
@@ -1337,9 +1328,6 @@
     <ClInclude Include="..\source\packets\cPacket_ItemData.h">
       <Filter>Packets\cPacket_ItemData</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\cChunkGenerator.h">
-      <Filter>cChunkGenerator</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\cFluidSimulator.h">
       <Filter>Simulator\cSimulator\cFluidSimulator</Filter>
     </ClInclude>
@@ -1351,12 +1339,6 @@
     </ClInclude>
     <ClInclude Include="..\source\cPassiveMonster.h">
       <Filter>cEntity\cPawn\cMonster\Personalities\Passive</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\cWorldGenerator.h">
-      <Filter>cWorldGenerator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\cWorldGenerator_Test.h">
-      <Filter>cWorldGenerator\cWorldGenerator_Test</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cSimulatorManager.h">
       <Filter>Simulator</Filter>
@@ -1379,9 +1361,6 @@
     <ClInclude Include="..\source\cSurvivalInventory.h">
       <Filter>cInventory\cSurvivalInventory</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\ptr_cChunk.h">
-      <Filter>!Smart_Pointers</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\cPlugin_NewLua.h">
       <Filter>cPlugin\cPlugin_NewLua</Filter>
     </ClInclude>
@@ -1401,13 +1380,30 @@
       <Filter>Simulator\cSimulator\cRedstoneSimulator</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ChunkSender.h" />
-    <ClInclude Include="..\source\WGFlat.h" />
     <ClInclude Include="..\source\ChunkDef.h" />
     <ClInclude Include="..\source\packets\cPacket_Player.h">
       <Filter>Packets</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\NBT.h">
-      <Filter>Storage</Filter>
+    <ClInclude Include="..\source\cChunkGenerator.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StructGen.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Trees.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CompoGen.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\HeiGen.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BioGen.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\FinishGen.h">
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\WorldStorage.h">
       <Filter>Storage</Filter>

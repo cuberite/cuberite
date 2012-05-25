@@ -1,12 +1,14 @@
-#pragma once
 
-#include <vector>
-#include <string>
-#include <map>
+#pragma once
 
 struct lua_State;
 class cPlugin;
 class cPlayer;
+
+
+
+
+
 class cLuaCommandBinder
 {
 public:
@@ -32,5 +34,9 @@ private:
 
 	typedef std::map< std::string, BoundFunction > CommandMap;
 	CommandMap m_BoundCommands;
-
 };
+
+
+
+
+

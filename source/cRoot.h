@@ -56,6 +56,7 @@ public:
 
 	void TickWorlds( float a_Dt );
 	
+	/// Returns the number of chunks loaded
 	int GetTotalChunkCount(void);  // tolua_export
 	
 	/// Saves all chunks in all worlds

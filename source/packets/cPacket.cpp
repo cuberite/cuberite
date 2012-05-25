@@ -195,13 +195,14 @@ void cPacket::AppendString(AString & a_Dst, const AString & a_String)
 void cPacket::AppendString16(AString & a_Dst, const AString & a_String)
 {
 	AppendShort(a_Dst, (unsigned short)a_String.size());
-	std::auto_ptr<char> UTF16(new char[a_String.size() * sizeof( short ) ]);
+	AString UTF16;
+	UTF16.resize(a_String.size() * sizeof(short));
 	for( unsigned int i = 0; i < a_String.size(); ++i )
 	{
-		UTF16.get()[i * sizeof( short )]     = 0x00;
-		UTF16.get()[i * sizeof( short ) + 1] = a_String[i];
+		UTF16[i * sizeof( short )]     = 0x00;
+		UTF16[i * sizeof( short ) + 1] = a_String[i];
 	}
-	a_Dst.append(UTF16.get(), a_String.size() * sizeof(short));
+	a_Dst.append(UTF16.data(), a_String.size() * sizeof(short));
 }
 
 

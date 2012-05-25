@@ -54,12 +54,14 @@ public:
 	cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap, cWorld * a_World);
 	~cChunk();
 
-	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk is valid (loaded / generated)
+	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk block data is valid (loaded / generated)
 	void SetValid(void);                           // Also wakes up any calls to cChunkMap::GetHeight()
 	void MarkRegenerating(void);                   // Marks all clients attached to this chunk as wanting this chunk
 	bool IsDirty(void) const {return m_IsDirty; }  // Returns true if the chunk has changed since it was last saved
 	bool HasLoadFailed(void) const {return m_HasLoadFailed; }  // Returns true if the chunk failed to load and hasn't been generated since then
 	bool CanUnload(void);
+	
+	bool IsLightValid(void) const {return m_IsLightValid; }
 	
 	/*
 	To save a chunk, the WSSchema must:
@@ -78,13 +80,19 @@ public:
 	
 	/// Sets all chunk data
 	void SetAllData(
-		const BLOCKTYPE * a_BlockTypes, 
-		const BLOCKTYPE * a_BlockMeta,
-		const BLOCKTYPE * a_BlockLight,
-		const BLOCKTYPE * a_BlockSkyLight,
+		const BLOCKTYPE *  a_BlockTypes, 
+		const NIBBLETYPE * a_BlockMeta,
+		const NIBBLETYPE * a_BlockLight,
+		const NIBBLETYPE * a_BlockSkyLight,
 		const cChunkDef::HeightMap * a_HeightMap,
+		const cChunkDef::BiomeMap &  a_BiomeMap,
 		cEntityList & a_Entities, 
 		cBlockEntityList & a_BlockEntities
+	);
+	
+	void SetLight(
+		const cChunkDef::BlockNibbles & a_BlockLight,
+		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 	
 	/// Copies m_BlockData into a_BlockTypes, only the block types
@@ -100,6 +108,7 @@ public:
 	void Stay(bool a_Stay = true);
 	
 	void Tick(float a_Dt, MTRand & a_TickRandom);
+	void TickBlocks(MTRand & a_TickRandom);
 
 	int GetPosX() { return m_PosX; }
 	int GetPosY() { return m_PosY; }
@@ -108,11 +117,14 @@ public:
 
 	// OBSOLETE void SendTo( cClientHandle * a_Client );
 
-	void SetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );
-	void SetBlock( const Vector3i & a_BlockPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta ) { SetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta ); }
+	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );
+	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
+	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta ); }
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	BLOCKTYPE GetBlock( int a_X, int a_Y, int a_Z );
 	BLOCKTYPE GetBlock( int a_BlockIdx );
+	
+	EMCSBiome GetBiomeAt(int a_RelX, int a_RelZ) const {return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ); }
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 	void UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);  // Also sends update packets to all clients in the chunk
@@ -132,8 +144,6 @@ public:
 	void RemoveEntity( cEntity * a_Entity);
 	
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
-
-	inline void RecalculateLighting() { m_bCalculateLighting = true; } // Recalculate lighting next tick
 
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
@@ -165,19 +175,21 @@ public:
 	inline void SpreadBlockSkyLight(void) {SpreadLight(m_BlockSkyLight); }
 	inline void SpreadBlockLight   (void) {SpreadLight(m_BlockLight); }
 	
-	inline BLOCKTYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                   {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
-	inline void      SetMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
+	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                   {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                       {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
+	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
 
-	inline BLOCKTYPE GetLight(int a_RelX, int a_RelY, int a_RelZ)					{return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
-	inline BLOCKTYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ)				{return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetLight(int a_RelX, int a_RelY, int a_RelZ)    {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
 
 private:
 
 	friend class cChunkMap;
 	
-	bool m_IsValid;  // True if the chunk is loaded / generated
-	bool m_IsDirty;  // True if the chunk has changed since it was last saved
-	bool m_IsSaving;  // True if the chunk is being saved
+	bool m_IsValid;        // True if the chunk is loaded / generated
+	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
+	bool m_IsDirty;        // True if the chunk has changed since it was last saved
+	bool m_IsSaving;       // True if the chunk is being saved
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 	
 	cCriticalSection            m_CSBlockLists;
@@ -193,19 +205,18 @@ private:
 	/// Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded
 	int m_StayCount;
 
-	bool m_bCalculateLighting;
-
 	int m_PosX, m_PosY, m_PosZ;
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
 	// TODO: Make these pointers and don't allocate what isn't needed
-	BLOCKTYPE m_BlockTypes   [cChunkDef::NumBlocks];
-	BLOCKTYPE m_BlockMeta    [cChunkDef::NumBlocks / 2];
-	BLOCKTYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
-	BLOCKTYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
+	BLOCKTYPE  m_BlockTypes   [cChunkDef::NumBlocks];
+	NIBBLETYPE m_BlockMeta    [cChunkDef::NumBlocks / 2];
+	NIBBLETYPE m_BlockLight   [cChunkDef::NumBlocks / 2];
+	NIBBLETYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
 
 	cChunkDef::HeightMap m_HeightMap;
+	cChunkDef::BiomeMap  m_BiomeMap;
 
 	unsigned int m_BlockTickNum;
 	unsigned int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
@@ -215,14 +226,14 @@ private:
 	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );
 	cBlockEntity * GetBlockEntity( const Vector3i & a_BlockPos ) { return GetBlockEntity( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
 
-	void SpreadLightOfBlock(BLOCKTYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Falloff);
+	void SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
 
 	void CreateBlockEntities(void);
 	
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 
-	void SpreadLight(BLOCKTYPE * a_LightBuffer);
+	void SpreadLight(NIBBLETYPE * a_LightBuffer);
 };
 
 typedef cChunk * cChunkPtr;

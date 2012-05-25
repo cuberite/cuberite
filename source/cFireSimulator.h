@@ -1,10 +1,20 @@
+
 #pragma once
+
 #include "cSimulator.h"
 #include "cBlockEntity.h"
-#include <list>
+
+
+
+
 
 class Vector3i;
 class cWorld;
+
+
+
+
+
 class cFireSimulator : public cSimulator
 {
 public:
@@ -31,3 +41,7 @@ protected:
 
 	BlockList *m_BurningBlocks;
 };
+
+
+
+

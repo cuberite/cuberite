@@ -44,6 +44,73 @@ const int MAX_DIRTY_CHUNKS = 16;
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cJsonChunkSerializer:
+
+cJsonChunkSerializer::cJsonChunkSerializer(void) :
+	m_HasJsonData(false)
+{
+}
+
+
+
+
+
+void cJsonChunkSerializer::Entity(cEntity * a_Entity)
+{
+	// TODO: a_Entity->SaveToJson(m_Root);
+}
+
+
+
+
+
+void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
+{
+	const char * SaveInto = NULL;
+	switch (a_BlockEntity->GetBlockType())
+	{
+		case E_BLOCK_CHEST:     SaveInto = "Chests";   break;
+		case E_BLOCK_FURNACE:   SaveInto = "Furnaces"; break;
+		case E_BLOCK_SIGN_POST: SaveInto = "Signs";    break;
+		case E_BLOCK_WALLSIGN:  SaveInto = "Signs";    break;
+		
+		default:
+		{
+			ASSERT(!"Unhandled blocktype in BlockEntities list while saving to JSON");
+			break;
+		}
+	}  // switch (BlockEntity->GetBlockType())
+	if (SaveInto == NULL)
+	{
+		return;
+	}
+	
+	Json::Value val;
+	a_BlockEntity->SaveToJson(val);
+	m_Root[SaveInto].append(val);
+	m_HasJsonData = true;
+}
+
+
+
+
+
+bool cJsonChunkSerializer::LightIsValid(bool a_IsLightValid)
+{
+	if (!a_IsLightValid)
+	{
+		return false;
+	}
+	m_Root["IsLightValid"] = true;
+	m_HasJsonData = true;
+	return true;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWSSCompact:
 
 cWSSCompact::~cWSSCompact()
@@ -564,7 +631,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		Offset += Header->m_CompressedSize;
 
 		// Crude data integrity check:
-		int ExpectedSize = (16*256*16)*2 + (16*256*16)/2; // For version 2
+		const int ExpectedSize = (16*256*16)*2 + (16*256*16)/2; // For version 2
 		if (UncompressedSize < ExpectedSize)
 		{
 			LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
@@ -600,18 +667,18 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			continue;
 		}
 
-		std::auto_ptr<char> ConvertedData(new char[ ExpectedSize ]);
-		memset( ConvertedData.get(), 0, ExpectedSize );
+		char ConvertedData[ExpectedSize];
+		memset(ConvertedData, 0, ExpectedSize);
 
 		// Cannot use cChunk::MakeIndex because it might change again?????????
 		// For compatibility, use what we know is current
-#define MAKE_2_INDEX( x, y, z ) ( y + (z * 256) + (x * 256 * 16) )
-#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
+		#define MAKE_2_INDEX( x, y, z ) ( y + (z * 256) + (x * 256 * 16) )
+		#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
 
 		unsigned int InChunkOffset = 0;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y ) // YZX Loop order is important, in 1.1 Y was first then Z then X
 		{
-			ConvertedData.get()[ MAKE_3_INDEX(x, y, z) ] = UncompressedData[InChunkOffset];
+			ConvertedData[ MAKE_3_INDEX(x, y, z) ] = UncompressedData[InChunkOffset];
 			++InChunkOffset;
 		}  // for y, z, x
 
@@ -619,29 +686,29 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		unsigned int index2 = 0;
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
 		{
-			ConvertedData.get()[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
+			ConvertedData[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
 			++index2;
 		}
-		InChunkOffset += index2/2;
+		InChunkOffset += index2 / 2;
 		index2 = 0;
 
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
 		{
-			ConvertedData.get()[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
+			ConvertedData[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
 			++index2;
 		}
-		InChunkOffset += index2/2;
+		InChunkOffset += index2 / 2;
 		index2 = 0;
 
 		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
 		{
-			ConvertedData.get()[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
+			ConvertedData[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
 			++index2;
 		}
-		InChunkOffset += index2/2;
+		InChunkOffset += index2 / 2;
 		index2 = 0;
 
-		AString Converted(ConvertedData.get(), ExpectedSize);
+		AString Converted(ConvertedData, ExpectedSize);
 
 		// Add JSON data afterwards
 		if (UncompressedData.size() > InChunkOffset)
@@ -717,6 +784,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 
 	cEntityList      Entities;
 	cBlockEntityList BlockEntities;
+	bool IsLightValid = false;
 	
 	if (a_UncompressedSize > cChunkDef::BlockDataSize)
 	{
@@ -731,20 +799,23 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 		else
 		{
 			LoadEntitiesFromJson(root, Entities, BlockEntities, a_World);
+			IsLightValid = root.get("IsLightValid", false).asBool();
 		}
 	}
 
-	BLOCKTYPE * BlockData = (BLOCKTYPE *)UncompressedData.data();
+	BLOCKTYPE *  BlockData  = (BLOCKTYPE *)UncompressedData.data();
+	NIBBLETYPE * MetaData   = (NIBBLETYPE *)(BlockData + cChunkDef::MetaOffset);
+	NIBBLETYPE * BlockLight = (NIBBLETYPE *)(BlockData + cChunkDef::LightOffset);
+	NIBBLETYPE * SkyLight   = (NIBBLETYPE *)(BlockData + cChunkDef::SkyLightOffset);
 	
-	a_World->ChunkDataLoaded(
+	a_World->SetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
-		BlockData,
-		BlockData + cChunkDef::MetaOffset,
-		BlockData + cChunkDef::LightOffset,
-		BlockData + cChunkDef::SkyLightOffset,
-		NULL,
-		Entities,
-		BlockEntities
+		BlockData, MetaData,
+		IsLightValid ? BlockLight : NULL,
+		IsLightValid ? SkyLight : NULL,
+		NULL, NULL,
+		Entities, BlockEntities,
+		false
 	);
 
 	return true;

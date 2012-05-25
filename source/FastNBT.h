@@ -259,7 +259,7 @@ protected:
 		{
 			// Compound: add the type and name:
 			m_Result.push_back((char)a_Type);
-			WriteString(a_Name.c_str(), a_Name.length());
+			WriteString(a_Name.c_str(), (short)a_Name.length());
 		}
 		else
 		{

@@ -265,6 +265,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\source\BlockID.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\source\BlockID.h"
 				>
 			</File>
@@ -334,14 +338,6 @@
 			</File>
 			<File
 				RelativePath="..\source\cFurnaceRecipe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cGenSettings.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cGenSettings.h"
 				>
 			</File>
 			<File
@@ -460,22 +456,6 @@
 			</File>
 			<File
 				RelativePath="..\source\cPiston.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPlugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPlugin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPluginManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPluginManager.h"
 				>
 			</File>
 			<File
@@ -1660,6 +1640,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cPlugin.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPlugin.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cPlugin_Lua.cpp"
 					>
 				</File>
@@ -1673,6 +1661,14 @@
 				</File>
 				<File
 					RelativePath="..\source\cPlugin_NewLua.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPluginManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPluginManager.h"
 					>
 				</File>
 				<File
@@ -1748,14 +1744,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\NBT.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\NBT.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\WorldStorage.cpp"
 					>
 				</File>
@@ -1784,6 +1772,14 @@
 				Name="Generating"
 				>
 				<File
+					RelativePath="..\source\BioGen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\BioGen.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cChunkGenerator.cpp"
 					>
 				</File>
@@ -1792,30 +1788,86 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWorldGenerator.cpp"
+					RelativePath="..\source\CompoGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWorldGenerator.h"
+					RelativePath="..\source\CompoGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWorldGenerator_Test.cpp"
+					RelativePath="..\source\FinishGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWorldGenerator_Test.h"
+					RelativePath="..\source\FinishGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WGFlat.cpp"
+					RelativePath="..\source\HeiGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WGFlat.h"
+					RelativePath="..\source\HeiGen.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\StructGen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\StructGen.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Trees.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Trees.h"
 					>
 				</File>
 			</Filter>
+		</Filter>
+		<Filter
+			Name="Config files"
+			>
+			<File
+				RelativePath="..\banned.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\furnace.txt"
+				>
+			</File>
+			<File
+				RelativePath="..\groups.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\items.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\monsters.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\settings.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\users.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\webadmin.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\world\world.ini"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath="..\makefile"

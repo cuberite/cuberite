@@ -310,6 +310,10 @@ bool cWebAdmin::Init( int a_Port )
 	return true;
 }
 
+
+
+
+
 #ifdef _WIN32
 DWORD WINAPI cWebAdmin::ListenThread(LPVOID lpParam)
 #else
@@ -319,7 +323,10 @@ void *cWebAdmin::ListenThread( void *lpParam )
 	cWebAdmin* self = (cWebAdmin*)lpParam;
 
 	self->m_WebServer = new webserver(self->m_Port, Request_Handler );
-	self->m_WebServer->Begin();
+	if (!self->m_WebServer->Begin())
+	{
+		LOGWARN("WebServer failed to start! WebAdmin is disabled");
+	}
 
 	self->m_Event->Set();
 	return 0;
@@ -341,20 +348,8 @@ std::string cWebAdmin::GetTemplate()
 		return "";
 	}
 
-	// obtain file size:
-	int lSize = f.GetSize();
-
-	// allocate memory to contain the whole file:
-	std::auto_ptr<char> buffer(new char[lSize]);  // auto_ptr deletes the memory in its destructor
-
 	// copy the file into the buffer:
-	if (f.Read(buffer.get(), lSize) != lSize)
-	{
-		LOG ("WEBADMIN: Could not read file \"%s\"", SourceFile);
-		return "";
-	}
-
-	retVal.assign(buffer.get(), lSize );
+	f.ReadRestOfFile(retVal);
 
 	return retVal;
 }

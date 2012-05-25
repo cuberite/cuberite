@@ -85,7 +85,7 @@ bool cFireSimulator::IsForeverBurnable( char a_BlockID )
 
 bool cFireSimulator::IsBurnable( char a_BlockID )
 {
-	return a_BlockID == E_BLOCK_WOOD
+	return a_BlockID == E_BLOCK_PLANKS
 		|| a_BlockID == E_BLOCK_LEAVES
 		|| a_BlockID == E_BLOCK_LOG
 		|| a_BlockID == E_BLOCK_WHITE_CLOTH

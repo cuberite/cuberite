@@ -18,6 +18,7 @@
 #include "Vector3f.h"
 #include "ChunkSender.h"
 #include "Defines.h"
+#include "LightingThread.h"
 
 
 
@@ -72,26 +73,29 @@ public:
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	void ChunkDataLoaded(
+	/** Sets the chunk data as either loaded from the storage or generated.
+	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
+	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
+	a_HeightMap is optional, if not present, will be calculated.
+	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
+	*/
+	void SetChunkData(
 		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
-		const BLOCKTYPE * a_BlockTypes,
-		const BLOCKTYPE * a_BlockMeta,
-		const BLOCKTYPE * a_BlockLight,
-		const BLOCKTYPE * a_BlockSkyLight,
+		const BLOCKTYPE *  a_BlockTypes,
+		const NIBBLETYPE * a_BlockMeta,
+		const NIBBLETYPE * a_BlockLight,
+		const NIBBLETYPE * a_BlockSkyLight,
 		const cChunkDef::HeightMap * a_HeightMap,
+		const cChunkDef::BiomeMap  * a_BiomeMap,
 		cEntityList & a_Entities,
-		cBlockEntityList & a_BlockEntities
+		cBlockEntityList & a_BlockEntities,
+		bool a_MarkDirty
 	);
 	
-	void ChunkDataGenerated (
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
-		const BLOCKTYPE * a_BlockTypes,
-		const BLOCKTYPE * a_BlockMeta,
-		const BLOCKTYPE * a_BlockLight,
-		const BLOCKTYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		cEntityList & a_Entities, 
-		cBlockEntityList & a_BlockEntities
+	void ChunkLighted(
+		int a_ChunkX, int a_ChunkZ,
+		const cChunkDef::BlockNibbles & a_BlockLight,
+		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 	
 	bool GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
@@ -153,7 +157,7 @@ public:
 	/// Removes the client from all chunks it is present in
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 	
-	/// Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is ignored (ChunkSender will send that chunk when it becomes valid)
+	/// Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid+lighted)
 	void SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Removes client from ChunkSender's queue of chunks to be sent
@@ -178,6 +182,14 @@ public:
 	
 	/// Regenerate the given chunk:
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													//tolua_export
+	
+	/// Generates the given chunk, if not already generated
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);													//tolua_export
+	
+	/// Queues a chunk for lighting; a_Callback is called after the chunk is lighted
+	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = NULL);
+	
+	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 
 	// TODO: Export to Lua
 	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
@@ -191,6 +203,14 @@ public:
 	void SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData );									//tolua_export
 	void SetBlockMeta( const Vector3i & a_Pos, char a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
 	char GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
+	// TODO: char GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
+	
+	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
+	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
+	
+	/// Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read.
+	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
+	
 	bool DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem );									//tolua_export
 	void SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer* a_Player );									//tolua_export
 
@@ -209,9 +229,14 @@ public:
 	/// a_Player is using block entity at [x, y, z], handle that:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z) {m_ChunkMap->UseBlockEntity(a_Player, a_X, a_Y, a_Z); }
 
-	void GrowTree( int a_X, int a_Y, int a_Z );													//tolua_export
+	void GrowTree           (int a_BlockX, int a_BlockY, int a_BlockZ);                           // tolua_export
+	void GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, char a_SaplingMeta);       // tolua_export
+	void GrowTreeByBiome    (int a_BlockX, int a_BlockY, int a_BlockZ);                           // tolua_export
+	
+	void GrowTreeImage(const sSetBlockVector & a_Blocks);
 
-	unsigned int GetWorldSeed(void) const { return m_WorldSeed; }								//tolua_export
+	int  GetBiomeAt (int a_BlockX, int a_BlockZ);   // tolua_export
+
 	const AString & GetName(void) const { return m_WorldName; }									//tolua_export
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
@@ -242,8 +267,14 @@ public:
 		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
 	}
 
-	void SaveAllChunks();			//tolua_export
+	void SaveAllChunks(void);			//tolua_export
+
+	/// Returns the number of chunks loaded	
 	int GetNumChunks() const;		//tolua_export
+
+	/// Returns the number of chunks loaded and dirty, and in the lighting queue
+	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
+
 
 	void Tick(float a_Dt);
 
@@ -263,7 +294,7 @@ public:
 private:
 
 	friend class cRoot;
-	
+
 	// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
 	MTRand m_TickRand;
 
@@ -306,8 +337,6 @@ private:
 	float m_SpawnMonsterTime;
 	float m_SpawnMonsterRate;
 
-	unsigned int m_WorldSeed;
-	
 	eWeather m_Weather;
 	
 	cEntityList       m_RemoveEntityQueue;
@@ -324,6 +353,7 @@ private:
 	cChunkGenerator  m_Generator;
 	
 	cChunkSender     m_ChunkSender;
+	cLightingThread  m_Lighting;
 
 	AString m_WorldName;
 	AString m_IniFileName;
@@ -333,7 +363,6 @@ private:
 
 	void TickWeather(float a_Dt);  // Handles weather each tick
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
-	void TickLighting(void);  // Handles lighting re-spreading
 	
 	void RemoveEntity( cEntity * a_Entity );
 }; //tolua_export

@@ -7,7 +7,6 @@
 #include "WSSAnvil.h"
 #include "cWorld.h"
 #include "zlib.h"
-#include "NBT.h"
 #include "BlockID.h"
 #include "cChestEntity.h"
 #include "cItem.h"
@@ -26,7 +25,7 @@ Since only the header is actually in the memory, this number can be high, but st
 */
 #define MAX_MCA_FILES 32
 
-/// The maximum size of an inflated chunk
+/// The maximum size of an inflated chunk; raw chunk data is 192 KiB, allow 64 KiB more of entities
 #define CHUNK_INFLATE_MAX 256 KiB
 
 
@@ -45,7 +44,8 @@ public:
 		m_Writer(a_Writer),
 		m_IsTagOpen(false),
 		m_HasHadEntity(false),
-		m_HasHadBlockEntity(false)
+		m_HasHadBlockEntity(false),
+		m_IsLightValid(false)
 	{
 	}
 
@@ -58,6 +58,9 @@ public:
 			m_Writer.EndCompound();
 		}
 	}
+	
+	
+	bool IsLightValid(void) const {return m_IsLightValid; }
 	
 protected:
 	
@@ -75,6 +78,7 @@ protected:
 	bool m_IsTagOpen;  // True if a tag has been opened in the callbacks and not yet closed.
 	bool m_HasHadEntity;  // True if any Entity has already been received and processed
 	bool m_HasHadBlockEntity;  // True if any BlockEntity has already been received and processed
+	bool m_IsLightValid;  // True if the chunk lighting is valid
 	
 	
 	void AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID)
@@ -89,10 +93,10 @@ protected:
 	void AddItem(cItem * a_Item, int a_Slot)
 	{
 		m_Writer.BeginCompound("");
-		m_Writer.AddShort("id",     a_Item->m_ItemID);
+		m_Writer.AddShort("id",     (short)(a_Item->m_ItemID));
 		m_Writer.AddShort("Damage", a_Item->m_ItemHealth);
 		m_Writer.AddByte ("Count",  a_Item->m_ItemCount);
-		m_Writer.AddByte ("Slot",   a_Slot);
+		m_Writer.AddByte ("Slot",   (unsigned char)a_Slot);
 		m_Writer.EndCompound();
 	}
 	
@@ -116,6 +120,13 @@ protected:
 	}
 
 
+	virtual bool LightIsValid(bool a_IsLightValid) override
+	{
+		m_IsLightValid = a_IsLightValid;
+		return a_IsLightValid;  // We want lighting only if it's valid, otherwise don't bother
+	}
+	
+	
 	virtual void Entity(cEntity * a_Entity) override
 	{
 		// TODO: Add entity into NBT:
@@ -363,12 +374,6 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 		return false;
 	}
 	Writer.Finish();
-	
-	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
-	ASSERT(TestParse.IsValid());
-	#endif  // _DEBUG
-	
 	CompressString(Writer.GetResult().data(), Writer.GetResult().size(), a_Data);
 	return true;
 }
@@ -380,13 +385,15 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT)
 {
 	// The data arrays, in MCA-native y/z/x ordering (will be reordered for the final chunk data)
-	BLOCKTYPE BlockData[cChunkDef::BlockDataSize];
-	BLOCKTYPE * MetaData   = BlockData + cChunkDef::MetaOffset;
-	BLOCKTYPE * BlockLight = BlockData + cChunkDef::LightOffset;
-	BLOCKTYPE * SkyLight   = BlockData + cChunkDef::SkyLightOffset;
+	cChunkDef::BlockTypes   BlockTypes;
+	cChunkDef::BlockNibbles MetaData;
+	cChunkDef::BlockNibbles BlockLight;
+	cChunkDef::BlockNibbles SkyLight;
 	
-	memset(BlockData,  E_BLOCK_AIR, sizeof(BlockData) - cChunkDef::NumBlocks / 2);
-	memset(SkyLight,   0xff,        cChunkDef::NumBlocks / 2);  // By default, data not present in the NBT means air, which means full skylight
+	memset(BlockTypes, E_BLOCK_AIR, sizeof(BlockTypes));
+	memset(MetaData,   0,           sizeof(MetaData));
+	memset(SkyLight,   0xff,        sizeof(SkyLight));  // By default, data not present in the NBT means air, which means full skylight
+	memset(BlockLight, 0x00,        sizeof(BlockLight));
 	
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
@@ -412,56 +419,26 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		{
 			continue;
 		}
-		CopyNBTData(a_NBT, Child, "Blocks",     &(BlockData[y  * 4096]), 4096);
-		CopyNBTData(a_NBT, Child, "Data",       &(MetaData[y   * 2048]), 2048);
-		CopyNBTData(a_NBT, Child, "SkyLight",   &(SkyLight[y   * 2048]), 2048);
-		CopyNBTData(a_NBT, Child, "BlockLight", &(BlockLight[y * 2048]), 2048);
+		CopyNBTData(a_NBT, Child, "Blocks",     (char *)&(BlockTypes[y * 4096]), 4096);
+		CopyNBTData(a_NBT, Child, "Data",       (char *)&(MetaData[y   * 2048]), 2048);
+		CopyNBTData(a_NBT, Child, "SkyLight",   (char *)&(SkyLight[y   * 2048]), 2048);
+		CopyNBTData(a_NBT, Child, "BlockLight", (char *)&(BlockLight[y * 2048]), 2048);
 	}  // for itr - LevelSections[]
 	
-	cEntityList Entities;
-	cBlockEntityList BlockEntities;
+	// Load the biomes from NBT, if present and valid:
+	cChunkDef::BiomeMap BiomeMap;
+	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
 	
 	// Load the entities from NBT:
+	cEntityList      Entities;
+	cBlockEntityList BlockEntities;
 	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
 	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"));
 	
-	#if (AXIS_ORDER == AXIS_ORDER_YZX)
-	// Reorder the chunk data - walk the MCA-formatted data sequentially and copy it into the right place in the ChunkData:
-	BLOCKTYPE ChunkData[cChunkDef::BlockDataSize];
-	memset(ChunkData, 0, sizeof(ChunkData));
-	int Index = 0;  // Index into the MCA-formatted data, incremented sequentially
-	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
-	{
-		ChunkData[cChunk::MakeIndex(x, y, z)] = BlockData[Index];
-		Index++;
-	}  // for y/z/x
-	BLOCKTYPE * ChunkMeta = ChunkData + cChunkDef::NumBlocks;
-	Index = 0;
-	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
-	{
-		cChunk::SetNibble(ChunkMeta, x, y, z, MetaData[Index / 2] >> ((Index % 2) * 4));
-		Index++;
-	}  // for y/z/x
-	BLOCKTYPE * ChunkBlockLight = ChunkMeta + cChunkDef::NumBlocks / 2;
-	Index = 0;
-	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
-	{
-		cChunk::SetNibble(ChunkBlockLight, x, y, z, BlockLight[Index / 2] >> ((Index % 2) * 4));
-		Index++;
-	}  // for y/z/x
-	BLOCKTYPE * ChunkSkyLight = ChunkBlockLight + cChunkDef::NumBlocks / 2;
-	Index = 0;
-	for (int y = 0; y < cChunkDef::Height; y++) for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
-	{
-		cChunk::SetNibble(ChunkSkyLight, x, y, z, SkyLight[Index / 2] >> ((Index % 2) * 4));
-		Index++;
-	}  // for y/z/x
-	#else  // AXIS_ORDER_YZX
-	BLOCKTYPE * ChunkData = BlockData;
-	#endif  // else AXIS_ORDER_YZX
+	bool IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
 	
 	/*
-	// Delete the comment above for really cool stuff :)
+	// Uncomment this block for really cool stuff :)
 	// DEBUG magic: Invert the underground, so that we can see the MC generator in action :)
 	bool ShouldInvert[cChunkDef::Width * cChunkDef::Width];
 	memset(ShouldInvert, 0, sizeof(ShouldInvert));
@@ -484,15 +461,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	memset(ChunkData + cChunkDef::SkyLightOffset, 0xff, cChunkDef::NumBlocks / 2);
 	//*/
 	
-	m_World->ChunkDataLoaded(
+	m_World->SetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
-		ChunkData,
-		ChunkData + cChunkDef::MetaOffset,
-		ChunkData + cChunkDef::LightOffset,
-		ChunkData + cChunkDef::SkyLightOffset,
-		NULL,
-		Entities,
-		BlockEntities
+		BlockTypes, MetaData, 
+		IsLightValid ? BlockLight : NULL,
+		IsLightValid ? SkyLight : NULL,
+		NULL, Biomes,
+		Entities, BlockEntities,
+		false
 	);
 	return true;
 }
@@ -525,26 +501,66 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	}
 	Serializer.Finish();  // Close NBT tags
 	
-	// TODO: Save biomes:
+	// TODO: Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
 	// Level->Add(new cNBTByteArray(Level, "Biomes", AString(Serializer.m_Biomes, sizeof(Serializer.m_Biomes));
+	// Level->Add(new cNBTByteArray(Level, "MCSBiomes", AString(Serializer.m_Biomes, sizeof(Serializer.m_Biomes));
 	
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
 	int SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
 	int SliceSizeNibble = SliceSizeBlock / 2;
+	const char * BlockTypes    = (const char *)(Serializer.m_BlockTypes);
+	const char * BlockMetas    = (const char *)(Serializer.m_BlockMetas);
+	const char * BlockLight    = (const char *)(Serializer.m_BlockLight);
+	const char * BlockSkyLight = (const char *)(Serializer.m_BlockSkyLight);
 	for (int Y = 0; Y < 16; Y++)
 	{
 		a_Writer.BeginCompound("");
-		a_Writer.AddByteArray("Blocks",     Serializer.m_BlockTypes    + Y * SliceSizeBlock,  SliceSizeBlock);
-		a_Writer.AddByteArray("Data",       Serializer.m_BlockMetas    + Y * SliceSizeNibble, SliceSizeNibble);
-		a_Writer.AddByteArray("SkyLight",   Serializer.m_BlockSkyLight + Y * SliceSizeNibble, SliceSizeNibble);
-		a_Writer.AddByteArray("BlockLight", Serializer.m_BlockLight    + Y * SliceSizeNibble, SliceSizeNibble);
-		a_Writer.AddByte("Y", Y);
+		a_Writer.AddByteArray("Blocks",     BlockTypes    + Y * SliceSizeBlock,  SliceSizeBlock);
+		a_Writer.AddByteArray("Data",       BlockMetas    + Y * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByteArray("SkyLight",   BlockSkyLight + Y * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByteArray("BlockLight", BlockLight    + Y * SliceSizeNibble, SliceSizeNibble);
+		a_Writer.AddByte("Y", (unsigned char)Y);
 		a_Writer.EndCompound();
 	}
 	a_Writer.EndList();  // "Sections"
+	
+	// Store the information that the lighting is valid. 
+	// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
+	if (Serializer.IsLightValid())
+	{
+		a_Writer.AddByte("MCSIsLightValid", 1);
+	}
+	
 	a_Writer.EndCompound();  // "Level"
 	return true;
+}
+
+
+
+
+
+cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
+	{
+		return NULL;
+	}
+	if (a_NBT.GetDataLength(a_TagIdx) != sizeof(*a_BiomeMap))
+	{
+		// The biomes stored don't match in size
+		return NULL;
+	}
+	memcpy(a_BiomeMap, a_NBT.GetData(a_TagIdx), sizeof(*a_BiomeMap));
+	for (int i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
+	{
+		if ((*a_BiomeMap)[i] == 0xff)
+		{
+			// Unassigned biomes
+			return NULL;
+		}
+	}
+	return a_BiomeMap;
 }
 
 
@@ -672,12 +688,35 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int
 cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_RegionZ) :
 	m_RegionX(a_RegionX),
 	m_RegionZ(a_RegionZ),
-	m_File(a_FileName, cFile::fmReadWrite),
 	m_FileName(a_FileName)
 {
-	if (!m_File.IsOpen())
+}
+
+
+
+
+
+bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
+{
+	if (m_File.IsOpen())
 	{
-		return;
+		// Already open
+		return true;
+	}
+	
+	if (a_IsForReading)
+	{
+		if (!cFile::Exists(m_FileName))
+		{
+			// We want to read and the file doesn't exist. Fail.
+			return false;
+		}
+	}
+	
+	if (!m_File.Open(m_FileName, cFile::fmReadWrite))
+	{
+		// The file failed to open
+		return false;
 	}
 	
 	// Load the header:
@@ -687,15 +726,16 @@ cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_R
 		// Try writing a NULL header (both chunk offsets and timestamps):
 		memset(m_Header, 0, sizeof(m_Header));
 		if (
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Real header - chunk offsets
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))     // Bogus data for the chunk timestamps
 		)
 		{
 			LOGWARNING("Cannot process MCA header in file \"%s\", chunks in that file will be lost", m_FileName.c_str());
 			m_File.Close();
-			return;
+			return false;
 		}
 	}
+	return true;
 }
 
 
@@ -704,10 +744,11 @@ cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_R
 
 bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
 {
-	if (!m_File.IsOpen())
+	if (!OpenFile(true))
 	{
 		return false;
 	}
+	
 	int LocalX = a_Chunk.m_ChunkX % 32;
 	if (LocalX < 0)
 	{
@@ -720,7 +761,6 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	}
 	unsigned ChunkLocation = ntohl(m_Header[LocalX + 32 * LocalZ]);
 	unsigned ChunkOffset = ChunkLocation >> 8;
-	unsigned ChunkLen = ChunkLocation & 0xff;
 	
 	m_File.Seek(ChunkOffset * 4096);
 	
@@ -753,10 +793,11 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 
 bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Data)
 {
-	if (!m_File.IsOpen())
+	if (!OpenFile(false))
 	{
 		return false;
 	}
+
 	int LocalX = a_Chunk.m_ChunkX % 32;
 	if (LocalX < 0)
 	{
@@ -782,7 +823,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	{
 		return false;
 	}
-	if (m_File.Write(a_Data.data(), a_Data.size()) != a_Data.size())
+	if (m_File.Write(a_Data.data(), a_Data.size()) != (int)(a_Data.size()))
 	{
 		return false;
 	}

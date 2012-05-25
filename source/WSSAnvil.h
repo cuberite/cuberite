@@ -35,6 +35,7 @@ enum
 class cNBTTag;
 class cNBTList;
 class cNBTCompound;
+class cNBTByteArray;
 
 
 
@@ -81,6 +82,9 @@ protected:
 		
 		/// Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number.
 		unsigned FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data);
+		
+		/// Opens a MCA file either for a Read operation (fails if doesn't exist) or for a Write operation (creates new if not found)
+		bool OpenFile(bool a_IsForReading);
 	} ;
 	typedef std::list<cMCAFile *> cMCAFiles;
 	
@@ -104,6 +108,9 @@ protected:
 	
 	/// Saves the chunk into NBT data using a_Writer; returns true on success
 	bool SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer);
+	
+	/// Loads the chunk's biome map; returns a_BiomeMap if biomes present and valid, NULL otherwise
+	cChunkDef::BiomeMap * LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1)
 	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag);

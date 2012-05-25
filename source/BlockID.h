@@ -8,7 +8,8 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_GRASS = 2,
 	E_BLOCK_DIRT	= 3,
 	E_BLOCK_COBBLESTONE = 4,
-	E_BLOCK_WOOD = 5,
+	E_BLOCK_PLANKS = 5,
+	E_BLOCK_WOOD = E_BLOCK_PLANKS,
 	E_BLOCK_SAPLING = 6,
 	E_BLOCK_BEDROCK = 7,
 	E_BLOCK_WATER = 8,
@@ -93,7 +94,8 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_BLOODSTONE = 87,
 	E_BLOCK_SOULSAND = 88,
 	E_BLOCK_GLOWSTONE = 89,
-	E_BLOCK_PORT = 90,
+	E_BLOCK_PORT = 90,  // Deprecated, use E_BLOCK_NETHER_PORTAL instead
+	E_BLOCK_NETHER_PORTAL = 90,
 	E_BLOCK_JACK_O_LANTERN = 91,
 	E_BLOCK_CAKE = 92,
 	E_BLOCK_REDSTONE_REPEATER_OFF = 93,
@@ -125,6 +127,9 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_END_PORTAL = 119,
 	E_BLOCK_END_PORTAL_FRAME = 120,
 	E_BLOCK_END_STONE = 121,
+	E_BLOCK_DRAGON_EGG = 122,
+	E_BLOCK_REDSTONE_LAMP_OFF = 123,
+	E_BLOCK_REDSTONE_LAMP_ON = 124,
 	E_BLOCK_ = 121,
 };
 //tolua_end
@@ -394,38 +399,60 @@ enum ENUM_ITEM_ID
 	E_ITEM_WARD_DISC = 2265,
 	E_ITEM_11_DISC = 2266,
 };
+
+
+
+
+
+enum
+{
+	// E_BLOCK_PLANKS metas:
+	E_META_PLANKS_APPLE   = 0,
+	E_META_PLANKS_CONIFER = 1,
+	E_META_PLANKS_BIRCH   = 2,
+	E_META_PLANKS_JUNGLE  = 3,
+	
+	// E_BLOCK_LOG metas:
+	E_META_LOG_APPLE   = 0,
+	E_META_LOG_CONIFER = 1,
+	E_META_LOG_BIRCH   = 2,
+	E_META_LOG_JUNGLE  = 3,
+	
+	// E_BLOCK_LEAVES metas:
+	E_META_LEAVES_APPLE   = 0,
+	E_META_LEAVES_CONIFER = 1,
+	E_META_LEAVES_BIRCH   = 2,
+	E_META_LEAVES_JUNGLE  = 3,
+	
+	// E_BLOCK_SAPLING metas (lowest 3 bits):
+	E_META_SAPLING_APPLE   = 0,
+	E_META_SAPLING_CONIFER = 1,
+	E_META_SAPLING_BIRCH   = 2,
+	E_META_SAPLING_JUNGLE  = 3,
+	
+	// E_BLOCK_TALL_GRASS metas:
+	E_META_TALL_GRASS_DEAD_SHRUB = 0,
+	E_META_TALL_GRASS_GRASS = 1,
+	E_META_TALL_GRASS_FERN = 2,
+} ;
 //tolua_end
 
 
 
 
-/// Biome IDs, as stored in the Anvil format and sent in the MapChunk packet
-enum eBiomeID
-{
-	biOcean            = 0,
-	biPlains           = 1,
-	biDesert           = 2,
-	biExtremeHills     = 3,
-	biForest           = 4,
-	biTaiga            = 5,
-	biSwampland        = 6,
-	biRiver            = 7,
-	biHell             = 8,  // Nether?
-	biSky              = 9,
-	biFrozenOcean      = 10,
-	biFrozenRiver      = 11,
-	biIcePlains        = 12,
-	biIceMountains     = 13,
-	biMushroomIsland   = 14,
-	biMushroomShore    = 15,
-	biBeach            = 16,
-	biDesertHills      = 17,
-	biForestHills      = 18,
-	biTaigaHills       = 19,
-	biExtremeHillsEdge = 20,
-	biJungle           = 21,
-	biJungleHills      = 22,
-} ;
+// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
+extern int BlockStringToType(const AString & a_BlockTypeString);
+
+
+
+
+
+// Block properties:
+extern NIBBLETYPE g_BlockLightValue[256];
+extern NIBBLETYPE g_BlockSpreadLightFalloff[256];
+extern bool       g_BlockTransparent[256];
+extern bool       g_BlockOneHitDig[256];
+extern bool       g_BlockPistonBreakable[256];
 
 
 

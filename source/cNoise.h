@@ -37,6 +37,11 @@ public:
 	__NOISE_INLINE__ float IntNoise2D( int a_X, int a_Y ) const;
 	__NOISE_INLINE__ float IntNoise3D( int a_X, int a_Y, int a_Z ) const;
 
+	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of occurrence. Divide by 8 to rectify.
+	__NOISE_INLINE__ int IntNoise1DInt( int a_X ) const;
+	__NOISE_INLINE__ int IntNoise2DInt( int a_X, int a_Y ) const;
+	__NOISE_INLINE__ int IntNoise3DInt( int a_X, int a_Y, int a_Z ) const;
+
 	float LinearNoise1D( float a_X ) const;
 	float CosineNoise1D( float a_X ) const;
 	float CubicNoise1D( float a_X ) const;

@@ -138,7 +138,7 @@ typedef short     Int16;
 
 
 
-// Common headers:
+// Common headers (part 1, without macros):
 #include "StringUtils.h"
 #include "cSleep.h"
 #include "cCriticalSection.h"
@@ -183,6 +183,14 @@ public:
 	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
 	virtual bool Item(Type * a_Type) = 0;
 } ;
+
+
+
+
+
+// Common headers (part 2, with macros):
+#include "ChunkDef.h"
+#include "BlockID.h"
 
 
 

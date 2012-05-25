@@ -49,26 +49,29 @@ public:
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	void ChunkDataLoaded(
+	/** Sets the chunk data as either loaded from the storage or generated.
+	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
+	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
+	a_HeightMap is optional, if not present, will be calculated.
+	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
+	*/
+	void SetChunkData(
 		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 		const BLOCKTYPE * a_BlockTypes,
-		const BLOCKTYPE * a_BlockMeta,
-		const BLOCKTYPE * a_BlockLight,
-		const BLOCKTYPE * a_BlockSkyLight,
+		const NIBBLETYPE * a_BlockMeta,
+		const NIBBLETYPE * a_BlockLight,
+		const NIBBLETYPE * a_BlockSkyLight,
 		const cChunkDef::HeightMap * a_HeightMap,
+		const cChunkDef::BiomeMap &  a_BiomeMap,
 		cEntityList & a_Entities,
-		cBlockEntityList & a_BlockEntities
+		cBlockEntityList & a_BlockEntities,
+		bool a_MarkDirty
 	);
 	
-	void ChunkDataGenerated (
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
-		const BLOCKTYPE * a_BlockTypes,
-		const BLOCKTYPE * a_BlockMeta,
-		const BLOCKTYPE * a_BlockLight,
-		const BLOCKTYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		cEntityList & a_Entities, 
-		cBlockEntityList & a_BlockEntities
+	void ChunkLighted(
+		int a_ChunkX, int a_ChunkZ,
+		const cChunkDef::BlockNibbles & a_BlockLight,
+		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 	
 	bool GetChunkData       (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
@@ -90,6 +93,18 @@ public:
 	BLOCKTYPE GetBlockSkyLight   (int a_X, int a_Y, int a_Z);
 	void      SetBlockMeta       (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockMeta);
 	void      SetBlock           (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
+
+	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
+	void      ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
+	
+	/// Special function used for growing trees, replaces only blocks that tree may overwrite
+	void      ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
+	
+	EMCSBiome GetBiomeAt (int a_BlockX, int a_BlockZ);
+	
+	/// Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read.
+	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
+
 	bool      DigBlock           (int a_X, int a_Y, int a_Z, cItem & a_PickupItem);
 	void      SendBlockTo        (int a_X, int a_Y, int a_Z, cPlayer * a_Player);
 	
@@ -130,6 +145,11 @@ public:
 	
 	/// Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() )
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
+	
+	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
+	
+	/// Returns the number of valid chunks and the number of dirty chunks
+	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 
@@ -159,6 +179,8 @@ private:
 		int GetZ(void) const {return m_LayerZ; }
 		
 		int GetNumChunksLoaded(void) const ;
+		
+		void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const;
 		
 		void Save(void);
 		void UnloadUnusedChunks(void);
@@ -217,6 +239,9 @@ public:
 	
 	void Enable(void);
 	void Disable(void);
+	
+	/// Queues each chunk in m_Chunks[] for loading / generating
+	void Load(void);
 	
 	// Allow cChunkStay be passed to functions expecting a const cChunkCoordsList &
 	operator const cChunkCoordsList(void) const {return m_Chunks; }

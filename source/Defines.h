@@ -4,9 +4,9 @@
 
 //tolua_begin
 // emissive blocks
-extern char g_BlockLightValue[];
+extern unsigned char g_BlockLightValue[];
 // whether blocks allow spreading
-extern char g_BlockSpreadLightFalloff[];
+extern unsigned char g_BlockSpreadLightFalloff[];
 // whether blocks are transparent (light can shine though)
 extern bool g_BlockTransparent[];
 // one hit break blocks

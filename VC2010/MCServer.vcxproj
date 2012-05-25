@@ -302,6 +302,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\BioGen.cpp" />
+    <ClCompile Include="..\source\BlockID.cpp" />
     <ClCompile Include="..\source\cAggressiveMonster.cpp" />
     <ClCompile Include="..\Source\cAuthenticator.cpp" />
     <ClCompile Include="..\source\cBlockingTCPLink.cpp" />
@@ -324,7 +326,6 @@
     <ClCompile Include="..\source\cFurnaceEntity.cpp" />
     <ClCompile Include="..\Source\cFurnaceRecipe.cpp" />
     <ClCompile Include="..\source\cFurnaceWindow.cpp" />
-    <ClCompile Include="..\source\cGenSettings.cpp" />
     <ClCompile Include="..\source\cGhast.cpp" />
     <ClCompile Include="..\Source\cGroup.cpp" />
     <ClCompile Include="..\Source\cGroupManager.cpp" />
@@ -347,6 +348,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Default</BasicRuntimeChecks>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\source\CompoGen.cpp" />
     <ClCompile Include="..\source\cPassiveAggressiveMonster.cpp" />
     <ClCompile Include="..\source\cPassiveMonster.cpp" />
     <ClCompile Include="..\Source\cPawn.cpp" />
@@ -386,16 +388,16 @@
     <ClCompile Include="..\source\cWebPlugin_Lua.cpp" />
     <ClCompile Include="..\source\cWindow.cpp" />
     <ClCompile Include="..\source\cWolf.cpp" />
-    <ClCompile Include="..\source\cWorldGenerator.cpp" />
-    <ClCompile Include="..\source\cWorldGenerator_Test.cpp" />
     <ClCompile Include="..\source\cZombie.cpp" />
     <ClCompile Include="..\source\cZombiepigman.cpp" />
+    <ClCompile Include="..\source\FinishGen.cpp" />
     <ClCompile Include="..\source\FastNBT.cpp" />
     <ClCompile Include="..\source\Globals.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\source\HeiGen.cpp" />
     <ClCompile Include="..\source\LeakFinder.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -422,7 +424,6 @@
     <ClCompile Include="..\source\cLog.cpp" />
     <ClCompile Include="..\source\Bindings.cpp" />
     <ClCompile Include="..\source\main.cpp" />
-    <ClCompile Include="..\source\NBT.cpp" />
     <ClCompile Include="..\source\packets\cPacket.cpp" />
     <ClCompile Include="..\source\packets\cPacket_13.cpp" />
     <ClCompile Include="..\source\packets\cPacket_AddToInventory.cpp" />
@@ -480,15 +481,17 @@
     </ClCompile>
     <ClCompile Include="..\source\StringCompression.cpp" />
     <ClCompile Include="..\source\StringUtils.cpp" />
+    <ClCompile Include="..\source\StructGen.cpp" />
+    <ClCompile Include="..\source\Trees.cpp" />
     <ClCompile Include="..\source\Vector3d.cpp" />
     <ClCompile Include="..\source\Vector3f.cpp" />
     <ClCompile Include="..\source\Vector3i.cpp" />
-    <ClCompile Include="..\source\WGFlat.cpp" />
     <ClCompile Include="..\source\WorldStorage.cpp" />
     <ClCompile Include="..\source\WSSAnvil.cpp" />
     <ClCompile Include="..\source\WSSCompact.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\BioGen.h" />
     <ClInclude Include="..\Source\BlockID.h" />
     <ClInclude Include="..\source\cAggressiveMonster.h" />
     <ClInclude Include="..\Source\cAuthenticator.h" />
@@ -526,6 +529,7 @@
     <ClInclude Include="..\Source\cMonster.h" />
     <ClInclude Include="..\source\cMonsterConfig.h" />
     <ClInclude Include="..\source\cNoise.h" />
+    <ClInclude Include="..\source\CompoGen.h" />
     <ClInclude Include="..\source\cPassiveAggressiveMonster.h" />
     <ClInclude Include="..\source\cPassiveMonster.h" />
     <ClInclude Include="..\Source\cPawn.h" />
@@ -558,7 +562,6 @@
     <ClInclude Include="..\source\cStringMap.h" />
     <ClInclude Include="..\source\cSurvivalInventory.h" />
     <ClInclude Include="..\Source\cTCPLink.h" />
-    <ClInclude Include="..\source\cGenSettings.h" />
     <ClInclude Include="..\source\cThread.h" />
     <ClInclude Include="..\source\cTimer.h" />
     <ClInclude Include="..\source\cTorch.h" />
@@ -571,14 +574,14 @@
     <ClInclude Include="..\source\cWindow.h" />
     <ClInclude Include="..\source\cWindowOwner.h" />
     <ClInclude Include="..\source\cWolf.h" />
-    <ClInclude Include="..\source\cWorldGenerator.h" />
-    <ClInclude Include="..\source\cWorldGenerator_Test.h" />
     <ClInclude Include="..\source\cZombie.h" />
     <ClInclude Include="..\source\cZombiepigman.h" />
     <ClInclude Include="..\source\Endianness.h" />
     <ClInclude Include="..\source\FastNBT.h" />
     <ClInclude Include="..\Source\FileDefine.h" />
+    <ClInclude Include="..\source\FinishGen.h" />
     <ClInclude Include="..\source\Globals.h" />
+    <ClInclude Include="..\source\HeiGen.h" />
     <ClInclude Include="..\source\LeakFinder.h" />
     <ClInclude Include="..\source\LightingThread.h" />
     <ClInclude Include="..\Source\LuaFunctions.h" />
@@ -605,7 +608,6 @@
     <ClInclude Include="..\source\Bindings.h" />
     <ClInclude Include="..\source\Defines.h" />
     <ClInclude Include="..\source\MCSocket.h" />
-    <ClInclude Include="..\source\NBT.h" />
     <ClInclude Include="..\Source\PacketID.h" />
     <ClInclude Include="..\source\packets\cPacket.h" />
     <ClInclude Include="..\source\packets\cPacket_13.h" />
@@ -656,15 +658,15 @@
     <ClInclude Include="..\source\packets\cPacket_WindowClick.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
-    <ClInclude Include="..\source\ptr_cChunk.h" />
     <ClInclude Include="..\source\SquirrelBindings.h" />
     <ClInclude Include="..\source\StackWalker.h" />
     <ClInclude Include="..\source\StringCompression.h" />
     <ClInclude Include="..\source\StringUtils.h" />
+    <ClInclude Include="..\source\StructGen.h" />
+    <ClInclude Include="..\source\Trees.h" />
     <ClInclude Include="..\source\Vector3d.h" />
     <ClInclude Include="..\source\Vector3f.h" />
     <ClInclude Include="..\source\Vector3i.h" />
-    <ClInclude Include="..\source\WGFlat.h" />
     <ClInclude Include="..\source\WorldStorage.h" />
     <ClInclude Include="..\source\WSSAnvil.h" />
     <ClInclude Include="..\source\WSSCompact.h" />

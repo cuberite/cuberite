@@ -11,7 +11,7 @@
 
 
 __C_CHUNK_INLINE__
-void cChunk::SpreadLightOfBlock(BLOCKTYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Falloff)
+void cChunk::SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff)
 {
 	unsigned char CurrentLight = cChunkDef::GetNibble( a_LightBuffer, a_X, a_Y, a_Z );
 	cChunkDef::SetNibble( a_LightBuffer, a_X-1, a_Y, a_Z, MAX(cChunkDef::GetNibble( a_LightBuffer, a_X-1, a_Y, a_Z ), MAX(0,CurrentLight-a_Falloff) ) );

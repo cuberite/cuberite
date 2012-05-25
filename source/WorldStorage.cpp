@@ -38,61 +38,6 @@ protected:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cJsonChunkSerializer:
-
-cJsonChunkSerializer::cJsonChunkSerializer(void) :
-	m_HasJsonData(false)
-{
-	m_Root["Chests"]   = m_AllChests;
-	m_Root["Furnaces"] = m_AllFurnaces;
-	m_Root["Signs"]    = m_AllSigns;
-}
-
-
-
-
-
-void cJsonChunkSerializer::Entity(cEntity * a_Entity)
-{
-	// TODO: a_Entity->SaveToJson(m_Root);
-}
-
-
-
-
-
-void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
-{
-	const char * SaveInto = NULL;
-	switch (a_BlockEntity->GetBlockType())
-	{
-		case E_BLOCK_CHEST:     SaveInto = "Chests";   break;
-		case E_BLOCK_FURNACE:   SaveInto = "Furnaces"; break;
-		case E_BLOCK_SIGN_POST: SaveInto = "Signs";    break;
-		case E_BLOCK_WALLSIGN:  SaveInto = "Signs";    break;
-		
-		default:
-		{
-			ASSERT(!"Unhandled blocktype in BlockEntities list while saving to JSON");
-			break;
-		}
-	}  // switch (BlockEntity->GetBlockType())
-	if (SaveInto == NULL)
-	{
-		return;
-	}
-	
-	Json::Value val;
-	a_BlockEntity->SaveToJson(val);
-	m_Root[SaveInto].append(val);
-	m_HasJsonData = true;
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
@@ -332,13 +277,13 @@ bool cWorldStorage::LoadOneChunk(void)
 	bool ShouldLoad = false;
 	{
 		cCSLock Lock(m_CSQueues);
-		if (m_LoadQueue.size() > 0)
+		if (!m_LoadQueue.empty())
 		{
 			ToLoad = m_LoadQueue.front();
 			m_LoadQueue.pop_front();
 			ShouldLoad = true;
 		}
-		HasMore = (m_LoadQueue.size() > 0);
+		HasMore = !m_LoadQueue.empty();
 	}
 	
 	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ))
@@ -346,7 +291,7 @@ bool cWorldStorage::LoadOneChunk(void)
 		if (ToLoad.m_Generate)
 		{
 			// The chunk couldn't be loaded, generate it:
-			m_World->GetGenerator().GenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+			m_World->GetGenerator().QueueGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
 		}
 		else
 		{
@@ -368,13 +313,13 @@ bool cWorldStorage::SaveOneChunk(void)
 	bool ShouldSave = false;
 	{
 		cCSLock Lock(m_CSQueues);
-		if (m_SaveQueue.size() > 0)
+		if (!m_SaveQueue.empty())
 		{
 			Save = m_SaveQueue.front();
 			m_SaveQueue.pop_front();
 			ShouldSave = true;
 		}
-		HasMore = (m_SaveQueue.size() > 0);
+		HasMore = !m_SaveQueue.empty();
 	}
 	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ))
 	{

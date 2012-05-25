@@ -475,77 +475,92 @@ void cServer::ServerCommand( const char * a_Cmd )
 {
 	AString Command( a_Cmd );
 	AStringVector split = StringSplit( Command, " " );
-	if( split.size() > 0 )
+	if( split.empty())
 	{
-		if( split[0].compare( "help" ) == 0 )
-		{
-			printf("================== ALL COMMANDS ===================\n");
-			printf("help      - Shows this message\n");
-			printf("save-all  - Saves all loaded chunks to disk\n");
-			printf("list      - Lists all players currently in server\n");
-			printf("unload    - Unloads all unused chunks\n");
-			printf("numchunks - Shows number of chunks currently loaded\n");
-			printf("say       - Sends a chat message to all players\n");
-			printf("restart   - Kicks all clients, and saves everything\n");
-			printf("            and clears memory\n");
-			printf("stop      - Saves everything and closes server\n");
-			printf("===================================================\n");
-			return;
-		}
-		if( split[0].compare( "stop" ) == 0 || split[0].compare( "restart" ) == 0 )
-		{
-			return;
-		}
-		if( split[0].compare( "save-all" ) == 0 )
-		{
-			cRoot::Get()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
-			return;
-		}
-		if (split[0].compare("unload") == 0)
-		{
-			LOG("Num loaded chunks before: %i", cRoot::Get()->GetTotalChunkCount() );
-			cRoot::Get()->GetDefaultWorld()->UnloadUnusedChunks();  // TODO: Iterate through ALL worlds
-			LOG("Num loaded chunks after: %i", cRoot::Get()->GetTotalChunkCount() );
-			return;
-		}
-		if( split[0].compare( "list" ) == 0 )
-		{
-			class cPlayerLogger : public cPlayerListCallback
-			{
-				virtual bool Item(cPlayer * a_Player) override
-				{
-					LOG("\t%s @ %s", a_Player->GetName().c_str(), a_Player->GetClientHandle()->GetSocket().GetIPString().c_str());
-					return false;
-				}
-			} Logger;
-			cRoot::Get()->ForEachPlayer(Logger);
-			return;
-		}
-		if( split[0].compare( "numchunks" ) == 0 )
-		{
-			LOG("Num loaded chunks: %i", cRoot::Get()->GetTotalChunkCount() );
-			return;
-		}
-		
-		if(split[0].compare("monsters") == 0 )
-		{
-			// TODO: cWorld::ListMonsters();
-			return;
-		}
-		
-		if(split.size() > 1)
-		{
-			if( split[0].compare( "say" ) == 0 )
-			{
-				std::string Message = cChatColor::Purple + "[SERVER] " + Command.substr( Command.find_first_of("say") + 4 );
-				LOG("%s", Message.c_str() );
-				Broadcast( cPacket_Chat(Message) );
-				return;
-			}
-		}
-		printf("Unknown command, type 'help' for all commands.\n");
+		return;
 	}
-	//LOG("You didn't enter anything? (%s)", a_Cmd.c_str() );
+	
+	if( split[0].compare( "help" ) == 0 )
+	{
+		printf("================== ALL COMMANDS ===================\n");
+		printf("help       - Shows this message\n");
+		printf("save-all   - Saves all loaded chunks to disk\n");
+		printf("list       - Lists all players currently in server\n");
+		printf("unload     - Unloads all unused chunks\n");
+		printf("numchunks  - Shows number of chunks currently loaded\n");
+		printf("chunkstats - Shows chunks statistics\n");
+		printf("say        - Sends a chat message to all players\n");
+		printf("restart    - Kicks all clients, and saves everything\n");
+		printf("            and clears memory\n");
+		printf("stop       - Saves everything and closes server\n");
+		printf("===================================================\n");
+		return;
+	}
+	if( split[0].compare( "stop" ) == 0 || split[0].compare( "restart" ) == 0 )
+	{
+		return;
+	}
+	if( split[0].compare( "save-all" ) == 0 )
+	{
+		cRoot::Get()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
+		return;
+	}
+	if (split[0].compare("unload") == 0)
+	{
+		LOG("Num loaded chunks before: %i", cRoot::Get()->GetTotalChunkCount() );
+		cRoot::Get()->GetDefaultWorld()->UnloadUnusedChunks();  // TODO: Iterate through ALL worlds
+		LOG("Num loaded chunks after: %i", cRoot::Get()->GetTotalChunkCount() );
+		return;
+	}
+	if( split[0].compare( "list" ) == 0 )
+	{
+		class cPlayerLogger : public cPlayerListCallback
+		{
+			virtual bool Item(cPlayer * a_Player) override
+			{
+				LOG("\t%s @ %s", a_Player->GetName().c_str(), a_Player->GetClientHandle()->GetSocket().GetIPString().c_str());
+				return false;
+			}
+		} Logger;
+		cRoot::Get()->ForEachPlayer(Logger);
+		return;
+	}
+	if( split[0].compare( "numchunks" ) == 0 )
+	{
+		LOG("Num loaded chunks: %i", cRoot::Get()->GetTotalChunkCount() );
+		return;
+	}
+	if (split[0].compare("chunkstats") == 0)
+	{
+		// TODO: For each world
+		int NumValid = 0;
+		int NumDirty = 0;
+		int NumInLighting = 0;
+		cRoot::Get()->GetDefaultWorld()->GetChunkStats(NumValid, NumDirty, NumInLighting);
+		LOG("Num loaded chunks: %d", NumValid);
+		LOG("Num dirty chunks: %d", NumDirty);
+		LOG("Num chunks in lighting queue: %d", NumInLighting);
+		return;
+	}
+	
+	if(split[0].compare("monsters") == 0 )
+	{
+		// TODO: cWorld::ListMonsters();
+		return;
+	}
+	
+	if(split.size() > 1)
+	{
+		if( split[0].compare( "say" ) == 0 )
+		{
+			std::string Message = cChatColor::Purple + "[SERVER] " + Command.substr( Command.find_first_of("say") + 4 );
+			LOG("%s", Message.c_str() );
+			Broadcast( cPacket_Chat(Message) );
+			return;
+		}
+	}
+	printf("Unknown command, type 'help' for all commands.\n");
+	// LOG("You didn't enter anything? (%s)", a_Cmd.c_str() );
 }
 
 

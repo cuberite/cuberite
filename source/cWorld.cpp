@@ -36,12 +36,11 @@
 #include "cCavespider.h" //cavespider
 #include "cGhast.h" //Ghast
 #include "cZombiepigman.h" //Zombiepigman
-#include "cGenSettings.h"
 #include "cMakeDir.h"
 #include "cChunkGenerator.h"
 #include "MersenneTwister.h"
-#include "cWorldGenerator_Test.h"
 #include "cTracer.h"
+#include "Trees.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -71,12 +70,6 @@ const int MAX_LIGHTING_SPREAD_PER_TICK = 10;
 
 float cWorld::m_Time = 0.f;
 
-char g_BlockLightValue[128];
-char g_BlockSpreadLightFalloff[128];
-bool g_BlockTransparent[128];
-bool g_BlockOneHitDig[128];
-bool g_BlockPistonBreakable[128];
-
 
 
 
@@ -96,6 +89,12 @@ public:
 		Start();
 	}
 	
+	void Stop(void)
+	{
+		m_ShouldTerminate = true;
+		Wait();
+	}
+	
 protected:
 
 	cWorld * m_World;
@@ -107,6 +106,53 @@ protected:
 			LOG("%d chunks to load, %d chunks to generate", 
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
+			);
+			
+			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
+			for (int i = 0; i < 20; i++)
+			{
+				cSleep::MilliSleep(100);
+				if (m_ShouldTerminate)
+				{
+					return;
+				}
+			}
+		}  // for (-ever)
+	}
+	
+} ;
+
+
+
+
+
+/// A simple thread that displays the progress of world lighting in cWorld::InitializeSpawn()
+class cWorldLightingProgress :
+	public cIsThread
+{
+public:
+	cWorldLightingProgress(cLightingThread * a_Lighting) :
+		cIsThread("cWorldLightingProgress"),
+		m_Lighting(a_Lighting)
+	{
+		Start();
+	}
+	
+	void Stop(void)
+	{
+		m_ShouldTerminate = true;
+		Wait();
+	}
+	
+protected:
+
+	cLightingThread * m_Lighting;
+	
+	virtual void Execute(void) override
+	{
+		for (;;)
+		{
+			LOG("%d chunks remaining to light", m_Lighting->GetQueueLength()
 			);
 			
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
@@ -182,21 +228,6 @@ cWorld::cWorld( const AString & a_WorldName )
 	, m_RSList ( 0 )
 	, m_Weather ( eWeather_Sunny )
 {
-	/*
-	// DEBUG:
-	DWORD Tick = GetTickCount();
-	for (int i = 0; i < 3000; i++)
-	{
-		BLOCKTYPE Playground[cChunkDef::NumBlocks / 2];
-		for (int x = 0; x < 16; x++) for (int z = 0; z < 16; z++) for (int y = 0; y < 256; y++)
-		{
-			cChunkDef::SetNibble(Playground, x, y, z, x);
-		}  // for x, y, z
-	}  // for i
-	Tick = GetTickCount() - Tick;
-	LOGINFO("3000 chunkfulls of SetNibble() took %d ticks", Tick);
-	//*/
-	
 	LOG("cWorld::cWorld(%s)", a_WorldName.c_str());
 	m_WorldName = a_WorldName;
 	m_IniFileName = m_WorldName + "/world.ini";
@@ -207,10 +238,8 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_SpawnX = (double)((r1.randInt()%1000)-500);
 	m_SpawnY = cChunkDef::Height;
 	m_SpawnZ = (double)((r1.randInt()%1000)-500);
-	m_WorldSeed = r1.randInt();
 	m_GameMode = eGameMode_Creative;
 
-	AString GeneratorName;
 	AString StorageSchema("Default");
 
 	cIniFile IniFile(m_IniFileName);
@@ -219,9 +248,7 @@ cWorld::cWorld( const AString & a_WorldName )
 		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX );
 		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY );
 		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ );
-		m_WorldSeed = IniFile.GetValueI("Seed", "Seed", m_WorldSeed );
 		m_GameMode = (eGameMode)IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
-		GeneratorName = IniFile.GetValue("Generator", "GeneratorName", GeneratorName);
 		StorageSchema = IniFile.GetValue("Storage", "Schema", StorageSchema);
 	}
 	else
@@ -229,19 +256,17 @@ cWorld::cWorld( const AString & a_WorldName )
 		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX );
 		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY );
 		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ );
-		IniFile.SetValueI("Seed", "Seed", m_WorldSeed );
 		IniFile.SetValueI("GameMode", "GameMode", m_GameMode );
-		IniFile.SetValue("Generator", "GeneratorName", GeneratorName);
 		IniFile.SetValue("Storage", "Schema", StorageSchema);
 		if( !IniFile.WriteFile() )
 		{
 			LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
 		}
 	}
-	LOGINFO("Seed: %i", m_WorldSeed );
-
+	
+	m_Lighting.Start(this);
 	m_Storage.Start(this, StorageSchema);
-	m_Generator.Start(this, GeneratorName);
+	m_Generator.Start(this, IniFile);
 
 	m_bAnimals = true;
 	m_SpawnMonsterRate = 10;
@@ -277,105 +302,6 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
-
-	memset( g_BlockLightValue,         0x0, sizeof( g_BlockLightValue ) );
-	memset( g_BlockSpreadLightFalloff, 0xf, sizeof( g_BlockSpreadLightFalloff ) ); // 0xf means total falloff
-	memset( g_BlockTransparent,        0x0, sizeof( g_BlockTransparent ) );
-	memset( g_BlockOneHitDig,          0x0, sizeof( g_BlockOneHitDig ) );
-	memset( g_BlockPistonBreakable,    0x0, sizeof( g_BlockPistonBreakable ) );
-
-	// Emissive blocks
-	g_BlockLightValue[ E_BLOCK_TORCH ] =			14;
-	g_BlockLightValue[ E_BLOCK_FIRE ] =				15;
-	g_BlockLightValue[ E_BLOCK_LAVA ] =				15;
-	g_BlockLightValue[ E_BLOCK_STATIONARY_LAVA ] =	15;
-	g_BlockLightValue[ E_BLOCK_GLOWSTONE ] =		15;
-
-	// Spread blocks
-	g_BlockSpreadLightFalloff[ E_BLOCK_AIR ]              = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_TORCH ]            = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_FIRE ]             = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_LAVA ]             = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_STATIONARY_LAVA ]  = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_WATER ]            = 4;  // Light in water dissapears faster
-	g_BlockSpreadLightFalloff[ E_BLOCK_STATIONARY_WATER ] = 4;
-	g_BlockSpreadLightFalloff[ E_BLOCK_LEAVES ]           = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_GLASS ]            = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_GLOWSTONE ]        = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_SIGN_POST ]        = 1;
-	g_BlockSpreadLightFalloff[ E_BLOCK_WALLSIGN ]         = 1;
-
-	// Transparent blocks
-	g_BlockTransparent[ E_BLOCK_AIR ]            = true;
-	g_BlockTransparent[ E_BLOCK_GLASS ]          = true;
-	g_BlockTransparent[ E_BLOCK_FIRE ]           = true;
-	g_BlockTransparent[ E_BLOCK_ICE ]            = true;
-	g_BlockTransparent[ E_BLOCK_TORCH ]          = true;
-	g_BlockTransparent[ E_BLOCK_SIGN_POST ]      = true;
-	g_BlockTransparent[ E_BLOCK_WALLSIGN ]       = true;
-	g_BlockTransparent[ E_BLOCK_TALL_GRASS ]     = true;
-	g_BlockTransparent[ E_BLOCK_YELLOW_FLOWER ]  = true;
-	g_BlockTransparent[ E_BLOCK_RED_ROSE ]       = true;
-	g_BlockTransparent[ E_BLOCK_RED_MUSHROOM ]   = true;
-	g_BlockTransparent[ E_BLOCK_BROWN_MUSHROOM ] = true;
-	g_BlockTransparent[ E_BLOCK_SNOW ]           = true;
-
-	// TODO: Any other transparent blocks?
-
-	// One hit break blocks
-	g_BlockOneHitDig[ E_BLOCK_SAPLING ]				= true;
-	g_BlockOneHitDig[ E_BLOCK_YELLOW_FLOWER ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_RED_ROSE ]			= true;
-	g_BlockOneHitDig[ E_BLOCK_BROWN_MUSHROOM ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_RED_MUSHROOM ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_TNT ]					= true;
-	g_BlockOneHitDig[ E_BLOCK_TORCH ]				= true;
-	g_BlockOneHitDig[ E_BLOCK_REDSTONE_WIRE ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_CROPS ]				= true;
-	g_BlockOneHitDig[ E_BLOCK_REDSTONE_TORCH_OFF ]	= true;
-	g_BlockOneHitDig[ E_BLOCK_REDSTONE_TORCH_ON ]	= true;
-	g_BlockOneHitDig[ E_BLOCK_REEDS ]				= true;
-	g_BlockOneHitDig[ E_BLOCK_REDSTONE_WIRE ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_REDSTONE_REPEATER_OFF ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_REDSTONE_REPEATER_ON ]		= true;
-	g_BlockOneHitDig[ E_BLOCK_LOCKED_CHEST ]		= true;
-	g_BlockOneHitDig [ E_BLOCK_FIRE ]				= true;
-
-	// Blocks that breaks when pushed by piston
-	g_BlockPistonBreakable[ E_BLOCK_AIR ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_WATER ]	= false;		//This gave pistons the ability to drop water :D
-	g_BlockPistonBreakable[ E_BLOCK_WATER ]				= false;
-	g_BlockPistonBreakable[ E_BLOCK_STATIONARY_LAVA ]	= false;
-	g_BlockPistonBreakable[ E_BLOCK_LAVA ]				= false;
-	g_BlockPistonBreakable[ E_BLOCK_BED ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_COBWEB ]			= true;
-	g_BlockPistonBreakable[ E_BLOCK_TALL_GRASS ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_YELLOW_FLOWER ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_BROWN_MUSHROOM ]	= true;
-	g_BlockPistonBreakable[ E_BLOCK_RED_ROSE ]			= true;
-	g_BlockPistonBreakable[ E_BLOCK_RED_MUSHROOM ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_DEAD_BUSH ]			= true;
-	g_BlockPistonBreakable[ E_BLOCK_TORCH ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_FIRE ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_REDSTONE_WIRE ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_CROPS ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_LADDER ]			= true;
-	g_BlockPistonBreakable[ E_BLOCK_WOODEN_DOOR ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_IRON_DOOR ]			= true;
-	g_BlockPistonBreakable[ E_BLOCK_LEVER ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_STONE_BUTTON ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_REDSTONE_TORCH_ON ]	= true;
-	g_BlockPistonBreakable[ E_BLOCK_REDSTONE_TORCH_OFF ]= true;
-	g_BlockPistonBreakable[ E_BLOCK_SNOW ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_REEDS ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_PUMPKIN_STEM ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_MELON_STEM ]		= true;
-	g_BlockPistonBreakable[ E_BLOCK_MELON ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_PUMPKIN ]			= true;
-	g_BlockPistonBreakable[ E_BLOCK_JACK_O_LANTERN ]	= true;
-	g_BlockPistonBreakable[ E_BLOCK_VINES ]				= true;
-	g_BlockPistonBreakable[ E_BLOCK_STONE_PRESSURE_PLATE ] = true;
-	g_BlockPistonBreakable[ E_BLOCK_WOODEN_PRESSURE_PLATE ] = true;
 }
 
 
@@ -434,7 +360,7 @@ void cWorld::CastThunderbolt ( int a_X, int a_Y, int a_Z )
 
 
 
-void cWorld::InitializeSpawn()
+void cWorld::InitializeSpawn(void)
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	BlockToChunk( (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ );
@@ -446,24 +372,51 @@ void cWorld::InitializeSpawn()
 	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
 	#endif  // _DEBUG
 	
-	LOG("Preparing spawn area in world \"%s\"", m_WorldName.c_str());
+	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)
 		{
-			m_ChunkMap->TouchChunk( x + ChunkX-(ViewDist - 1) / 2, 0, z + ChunkZ-(ViewDist - 1) / 2 );  // Queue the chunk in the generator / loader
+			m_ChunkMap->TouchChunk( x + ChunkX-(ViewDist - 1) / 2, ZERO_CHUNK_Y, z + ChunkZ-(ViewDist - 1) / 2 );  // Queue the chunk in the generator / loader
 		}
 	}
 	
-	// Display progress during this process:
-	cWorldLoadProgress Progress(this);
+	{
+		// Display progress during this process:
+		cWorldLoadProgress Progress(this);
+		
+		// Wait for the loader to finish loading
+		m_Storage.WaitForQueuesEmpty();
+		
+		// Wait for the generator to finish generating
+		m_Generator.WaitForQueueEmpty();
+		
+		Progress.Stop();
+	}
 	
-	// Wait for the loader to finish loading
-	m_Storage.WaitForQueuesEmpty();
+	// Light all chunks that have been newly generated:
+	LOG("Lighting spawn area in world \"%s\"...", m_WorldName.c_str());
 	
-	// Wait for the generator to finish generating
-	m_Generator.WaitForQueueEmpty();
+	for (int x = 0; x < ViewDist; x++)
+	{
+		int ChX = x + ChunkX-(ViewDist - 1) / 2;
+		for (int z = 0; z < ViewDist; z++)
+		{
+			int ChZ = z + ChunkZ-(ViewDist - 1) / 2;
+			if (!m_ChunkMap->IsChunkLighted(ChX, ChZ))
+			{
+				m_Lighting.QueueChunk(ChX, ChZ);  // Queue the chunk in the lighting thread
+			}
+		}  // for z
+	}  // for x
 	
+	{
+		cWorldLightingProgress Progress(&m_Lighting);
+		m_Lighting.WaitForQueueEmpty();
+		Progress.Stop();
+	}
+	
+	// TODO: Better spawn detection - move spawn out of the water if it isn't set in the INI already
 	m_SpawnY = (double)GetHeight( (int)m_SpawnX, (int)m_SpawnZ ) + 1.6f; // +1.6f eye height
 }
 
@@ -508,8 +461,6 @@ void cWorld::Tick(float a_Dt)
 		}
 	}
 
-	TickLighting();
-
 	m_ChunkMap->Tick(a_Dt, m_TickRand);
 	
 	GetSimulatorManager()->Simulate(a_Dt);
@@ -523,7 +474,7 @@ void cWorld::Tick(float a_Dt)
 		std::swap(FastSetBlockQueueCopy, m_FastSetBlockQueue);
 	}
 	m_ChunkMap->FastSetBlocks(FastSetBlockQueueCopy);
-	if (FastSetBlockQueueCopy.size() > 0)
+	if (!FastSetBlockQueueCopy.empty())
 	{
 		// Some blocks failed, store them for next tick:
 		cCSLock Lock(m_CSFastSetBlock);
@@ -716,30 +667,17 @@ void cWorld::TickSpawnMobs(float a_Dt)
 
 
 
-void cWorld::TickLighting(void)
+void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 {
-	// To avoid a deadlock, we lock the spread queue only long enough to pick the chunk coords to spread
-	// The spreading itself will run unlocked
-	cChunkCoordsList SpreadQueue;
+	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
 	{
-		cCSLock Lock(m_CSLighting);
-		if (m_SpreadQueue.size() == 0)
-		{
-			return;
-		}
-		if (m_SpreadQueue.size() >= MAX_LIGHTING_SPREAD_PER_TICK )
-		{
-			LOGWARN("cWorld: Lots of lighting to do! Still %i chunks left!", m_SpreadQueue.size() );
-		}
-		// Move up to MAX_LIGHTING_SPREAD_PER_TICK elements from m_SpreadQueue out into SpreadQueue:
-		cChunkCoordsList::iterator itr = m_SpreadQueue.begin();
-		std::advance(itr, MIN(m_SpreadQueue.size(), MAX_LIGHTING_SPREAD_PER_TICK));
-		SpreadQueue.splice(SpreadQueue.begin(), m_SpreadQueue, m_SpreadQueue.begin(), itr);
+		// There is a sapling here, grow a tree according to its type:
+		GrowTreeFromSapling(a_X, a_Y, a_Z, GetBlockMeta(a_X, a_Y, a_Z));
 	}
-	
-	for (cChunkCoordsList::iterator itr = SpreadQueue.begin(); itr != SpreadQueue.end(); ++itr)
+	else
 	{
-		m_ChunkMap->SpreadChunkLighting(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
+		// There is nothing here, grow a tree based on the current biome here:
+		GrowTreeByBiome(a_X, a_Y, a_Z);
 	}
 }
 
@@ -747,73 +685,84 @@ void cWorld::TickLighting(void)
 
 
 
-void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
+void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, char a_SaplingMeta)
 {
-	// new tree code, looks much better
-	// with help from seanj
-	// converted from php to lua then lua to c++
-
-	// build trunk
-	MTRand r1;
-	int trunk = r1.randInt() % (7 - 5 + 1) + 5;
-	for (int i = 0; i < trunk; i++) 
+	cNoise Noise(m_Generator.GetSeed());
+	sSetBlockVector Blocks;
+	switch (a_SaplingMeta & 0x07)
 	{
-		FastSetBlock( a_X, a_Y + i, a_Z, E_BLOCK_LOG, 0 );
+		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
+		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
+		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
+		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
 	}
+	
+	GrowTreeImage(Blocks);
+}
 
-	// build tree
-	for (int j = 0; j < trunk; j++)
+
+
+
+
+void cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
+{
+	cNoise Noise(m_Generator.GetSeed());
+	sSetBlockVector Blocks;
+	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), (EMCSBiome)GetBiomeAt(a_X, a_Z), Blocks);
+	GrowTreeImage(Blocks);
+}
+
+
+
+
+
+void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
+{
+	// Check that the tree has place to grow
+	
+	// Make a copy of the log blocks:
+	sSetBlockVector b2;
+	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
 	{
-		int radius = trunk - j;
-		if (radius < 4)
+		if (itr->BlockType == E_BLOCK_LOG)
 		{
-			if (radius > 2)
+			b2.push_back(*itr);
+		}
+	}  // for itr - a_Blocks[]
+	
+	// Query blocktypes and metas at those log blocks:
+	if (!GetBlocks(b2, false))
+	{
+		return;
+	}
+	
+	// Check that at each log's coord there's an block allowed to be overwritten:
+	for (sSetBlockVector::const_iterator itr = b2.begin(); itr != b2.end(); ++itr)
+	{
+		switch (itr->BlockType)
+		{
+			CASE_TREE_ALLOWED_BLOCKS:
 			{
-				radius = 2;
+				break;
 			}
-			for (int i = a_X - radius; i <= a_X + radius; i++)
+			default:
 			{
-				for (int k = a_Z-radius; k <= a_Z + radius; k++)
-				{
-					// small chance to be missing a block to add a little random
-					if (k != a_Z || i != a_X && (r1.randInt() % 100 + 1) > 20)
-					{
-						if( GetBlock( i, a_Y + j, k ) == E_BLOCK_AIR )
-						{
-							FastSetBlock(i, a_Y+j, k, E_BLOCK_LEAVES, 0 );
-						}
-					}
-					else
-					{
-						//if( m_BlockType[ MakeIndex(i, TopY+j, k) ] == E_BLOCK_AIR )
-						//	m_BlockType[ MakeIndex(i, TopY+j, k) ] = E_BLOCK_LEAVES;
-					}
-				}
-			}
-			if (GetBlock( a_X, a_Y+j, a_Z ) == E_BLOCK_AIR )
-			{
-				FastSetBlock( a_X, a_Y+j, a_Z, E_BLOCK_LOG, 0 );
+				return;
 			}
 		}
-	}
+	}  // for itr - b2[]
+	
+	// All ok, replace blocks with the tree image:
+	m_ChunkMap->ReplaceTreeBlocks(a_Blocks);
+}
 
-	// do the top
-	if( GetBlock( a_X+1, a_Y+trunk, a_Z ) == E_BLOCK_AIR )
-		FastSetBlock( a_X+1, a_Y+trunk, a_Z, E_BLOCK_LEAVES, 0 );
 
-	if( GetBlock( a_X-1, a_Y+trunk, a_Z ) == E_BLOCK_AIR )
-		FastSetBlock( a_X-1, a_Y+trunk, a_Z, E_BLOCK_LEAVES, 0 );
 
-	if( GetBlock( a_X, a_Y+trunk, a_Z+1 ) == E_BLOCK_AIR )
-		FastSetBlock( a_X, a_Y+trunk, a_Z+1, E_BLOCK_LEAVES, 0 );
 
-	if( GetBlock( a_X, a_Y+trunk, a_Z-1 ) == E_BLOCK_AIR )
-		FastSetBlock( a_X, a_Y+trunk, a_Z-1, E_BLOCK_LEAVES, 0 );
 
-	if( GetBlock( a_X, a_Y+trunk, a_Z ) == E_BLOCK_AIR )
-		FastSetBlock( a_X, a_Y+trunk, a_Z, E_BLOCK_LEAVES, 0 );
-
-	// end new tree code
+int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
+{
+	return m_ChunkMap->GetBiomeAt(a_BlockX, a_BlockZ);
 }
 
 
@@ -899,6 +848,24 @@ void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
 char cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
 {
 	return m_ChunkMap->GetBlockSkyLight(a_X, a_Y, a_Z);
+}
+
+
+
+
+
+void cWorld::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
+{
+	m_ChunkMap->ReplaceBlocks(a_Blocks, a_FilterBlockType);
+}
+
+
+
+
+
+bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
+{
+	return m_ChunkMap->GetBlocks(a_Blocks, a_ContinueOnFailure);
 }
 
 
@@ -1018,38 +985,58 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cWorld::ChunkDataLoaded(
+void cWorld::SetChunkData(
 	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
 	const BLOCKTYPE * a_BlockTypes,
-	const BLOCKTYPE * a_BlockMeta,
-	const BLOCKTYPE * a_BlockLight,
-	const BLOCKTYPE * a_BlockSkyLight,
+	const NIBBLETYPE * a_BlockMeta,
+	const NIBBLETYPE * a_BlockLight,
+	const NIBBLETYPE * a_BlockSkyLight,
 	const cChunkDef::HeightMap * a_HeightMap,
+	const cChunkDef::BiomeMap  * a_BiomeMap,
 	cEntityList & a_Entities, 
-	cBlockEntityList & a_BlockEntities
+	cBlockEntityList & a_BlockEntities,
+	bool a_MarkDirty
 )
 {
-	m_ChunkMap->ChunkDataLoaded(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
-	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
+	// Validate biomes, if needed:
+	cChunkDef::BiomeMap BiomeMap;
+	const cChunkDef::BiomeMap * Biomes = a_BiomeMap;
+	if (a_BiomeMap == NULL)
+	{
+		// The biomes are not assigned, get them from the generator:
+		Biomes = &BiomeMap;
+		m_Generator.GenerateBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
+	}
+	
+	m_ChunkMap->SetChunkData(
+		a_ChunkX, a_ChunkY, a_ChunkZ, 
+		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
+		a_HeightMap, *Biomes,
+		a_Entities, a_BlockEntities,
+		a_MarkDirty
+	);
+	
+	// If a client is requesting this chunk, send it to them:
+	if (m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ))
+	{
+		m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
+	}
+	
+	// Notify the lighting thread that the chunk has become valid (in case it is a neighbor of a postponed chunk):
+	m_Lighting.ChunkReady(a_ChunkX, a_ChunkZ);
 }
 
 
 
 
 
-void cWorld::ChunkDataGenerated(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
-	const BLOCKTYPE * a_BlockTypes,
-	const BLOCKTYPE * a_BlockMeta,
-	const BLOCKTYPE * a_BlockLight,
-	const BLOCKTYPE * a_BlockSkyLight,
-	const cChunkDef::HeightMap * a_HeightMap,
-	cEntityList & a_Entities, 
-	cBlockEntityList & a_BlockEntities
+void cWorld::ChunkLighted(
+	int a_ChunkX, int a_ChunkZ,
+	const cChunkDef::BlockNibbles & a_BlockLight,
+	const cChunkDef::BlockNibbles & a_SkyLight
 )
 {
-	m_ChunkMap->ChunkDataGenerated(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
-	m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->ChunkLighted(a_ChunkX, a_ChunkZ, a_BlockLight, a_SkyLight);
 }
 
 
@@ -1431,14 +1418,41 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
 	
 	// Trick: use Y=1 to force the chunk generation even though the chunk data is already present
-	m_Generator.GenerateChunk(a_ChunkX, 1, a_ChunkZ);
+	m_Generator.QueueGenerateChunk(a_ChunkX, 1, a_ChunkZ);
 }
 
 
 
 
 
-void cWorld::SaveAllChunks()
+void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
+{
+	m_Generator.QueueGenerateChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+{
+	m_Lighting.QueueChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::IsChunkLighted(int a_ChunkX, int a_ChunkZ)
+{
+	return m_ChunkMap->IsChunkLighted(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::SaveAllChunks(void)
 {
 	LOG("Saving all chunks...");
 	m_LastSave = m_Time;
@@ -1509,6 +1523,16 @@ unsigned int cWorld::GetNumPlayers()
 int cWorld::GetNumChunks(void) const
 {
 	return m_ChunkMap->GetNumChunks();
+}
+
+
+
+
+
+void cWorld::GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue)
+{
+	m_ChunkMap->GetChunkStats(a_NumValid, a_NumDirty);
+	a_NumInLightingQueue = (int) m_Lighting.GetQueueLength();
 }
 
 

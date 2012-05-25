@@ -89,16 +89,18 @@ public:
 	webserver(unsigned int port_to_listen, request_func);
 	~webserver();
 
-	void Begin();
+	bool Begin();
 	void Stop();
 
 private:
 	bool m_bStop;
-#ifdef _WIN32
+	
+	#ifdef _WIN32
 	static unsigned __stdcall Request(void*);
-#else
+	#else
 	static void* Request(void*);
-#endif
+	#endif
+	
 	static request_func request_func_;
 
 	cEvents * m_Events;

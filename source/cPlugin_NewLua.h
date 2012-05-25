@@ -1,11 +1,18 @@
+
 #pragma once
 
 #include "cPlugin.h"
-#include <string>
-#include <list>
+
+
+
+
 
 typedef struct lua_State lua_State;
 class cWebPlugin_Lua;
+
+
+
+
 
 class cPlugin_NewLua : public cPlugin						//tolua_export
 {															//tolua_export

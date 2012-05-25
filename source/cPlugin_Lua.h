@@ -1,7 +1,5 @@
-#pragma once
 
-#include <string>
-#include <list>
+#pragma once
 
 class cPickup;
 class cPlayer;

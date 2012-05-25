@@ -51,38 +51,6 @@ typedef std::list<cWSSchema *> cWSSchemaList;
 
 
 
-/// Helper class for serializing a chunk into Json
-class cJsonChunkSerializer :
-	public cChunkDataCollector
-{
-public:
-
-	cJsonChunkSerializer(void);
-	
-	Json::Value & GetRoot     (void) {return m_Root; }
-	BLOCKTYPE *   GetBlockData(void) {return m_BlockData; }
-	bool          HasJsonData (void) const {return m_HasJsonData; }
-	
-protected:
-	
-	// NOTE: block data is serialized into inherited cChunkDataCollector's m_BlockData[] array
-	
-	// Entities and BlockEntities are serialized to Json
-	Json::Value m_Root;
-	Json::Value m_AllChests;
-	Json::Value m_AllFurnaces;
-	Json::Value m_AllSigns;
-	bool m_HasJsonData;
-	
-	// cChunkDataCollector overrides:
-	virtual void Entity       (cEntity *      a_Entity) override;
-	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
-} ;
-
-
-
-
-
 /// The actual world storage class
 class cWorldStorage :
 	public cIsThread

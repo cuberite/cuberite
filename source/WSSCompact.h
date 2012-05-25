@@ -18,6 +18,36 @@
 
 
 
+/// Helper class for serializing a chunk into Json
+class cJsonChunkSerializer :
+	public cChunkDataCollector
+{
+public:
+
+	cJsonChunkSerializer(void);
+	
+	Json::Value & GetRoot     (void) {return m_Root; }
+	BLOCKTYPE *   GetBlockData(void) {return m_BlockData; }
+	bool          HasJsonData (void) const {return m_HasJsonData; }
+	
+protected:
+	
+	// NOTE: block data is serialized into inherited cChunkDataCollector's m_BlockData[] array
+	
+	// Entities and BlockEntities are serialized to Json
+	Json::Value m_Root;
+	bool m_HasJsonData;
+	
+	// cChunkDataCollector overrides:
+	virtual void Entity       (cEntity *      a_Entity) override;
+	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
+	virtual bool LightIsValid (bool a_IsLightValid) override;
+} ;
+
+
+
+
+
 class cWSSCompact :
 	public cWSSchema
 {

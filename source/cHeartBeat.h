@@ -1,8 +1,11 @@
+
 #pragma once
 
 #include "cTCPLink.h"
 
-#include <string>
+
+
+
 
 class cHeartBeat : public cTCPLink
 {
@@ -19,3 +22,7 @@ private:
 
 	std::string m_ServerID;
 };
+
+
+
+

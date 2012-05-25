@@ -18,11 +18,27 @@
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cNotifyChunkSender:
+
+void cNotifyChunkSender::Call(int a_ChunkX, int a_ChunkZ)
+{
+	m_ChunkSender->ChunkReady(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cChunkSender:
+
 cChunkSender::cChunkSender(void) :
 	super("ChunkSender"),
-	m_World(NULL)
+	m_World(NULL),
+	m_Notify(NULL)
 {
-	memset(m_BiomeData, biPlains, sizeof(m_BiomeData));
+	m_Notify.SetChunkSender(this);
 }
 
 
@@ -182,8 +198,22 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		}
 	}
 	
+	// If the chunk has no clients, no need to packetize it:
 	if (!m_World->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ))
 	{
+		return;
+	}
+	
+	// If the chunk is not valid, do nothing - whoever needs it has queued it for loading / generating
+	if (!m_World->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
+	{
+		return;
+	}
+	
+	// If the chunk is not lighted, queue it for relighting and get notified when it's ready:
+	if (!m_World->IsChunkLighted(a_ChunkX, a_ChunkZ))
+	{
+		m_World->QueueLightChunk(a_ChunkX, a_ChunkZ, &m_Notify);
 		return;
 	}
 	
@@ -193,7 +223,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		return;
 	}
 	cPacket_PreChunk PreChunk(a_ChunkX, a_ChunkZ, true);
-	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData, m_BiomeData);
+	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData, m_BiomeMap);
 	
 	// Send:
 	if (a_Client == NULL)
@@ -242,6 +272,27 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 void cChunkSender::Entity(cEntity * a_Entity)
 {
 	// Nothing needed yet, perhaps in the future when we save entities into chunks we'd like to send them upon load, too ;)
+}
+
+
+
+
+
+void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+{
+	for (int i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
+	{
+		if ((*a_BiomeMap)[i] < 255)
+		{
+			// Normal MC biome, copy as-is:
+			m_BiomeMap[i] = (unsigned char)((*a_BiomeMap)[i]);
+		}
+		else
+		{
+			// TODO: MCS-specific biome, need to map to some basic MC biome:
+			ASSERT(!"Unimplemented MCS-specific biome");
+		}
+	}  // for i - m_BiomeMap[]
 }
 
 

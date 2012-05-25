@@ -47,7 +47,15 @@
 #include "UrlHelper.h"
 #include "base64.h"
 
-webserver::request_func webserver::request_func_=0;
+
+
+
+
+webserver::request_func webserver::request_func_ = NULL;
+
+
+
+
 
 static std::string EatLine( std::string& a_String )
 {
@@ -75,6 +83,10 @@ static std::string EatLine( std::string& a_String )
 	a_String = a_String.substr( RetVal.size() );
 	return RetVal;
 }
+
+
+
+
 
 // Turns 
 // "blabla my string with \"quotes\"!" 
@@ -115,6 +127,10 @@ static std::string GetQuotedString( const std::string& a_String )
 
 	return RetVal;
 }
+
+
+
+
 
 void ParseMultipartFormData( webserver::http_request& req, Socket* s)
 {
@@ -228,6 +244,10 @@ void ParseMultipartFormData( webserver::http_request& req, Socket* s)
 		}
 	}
 }
+
+
+
+
 
 #ifdef _WIN32
 unsigned webserver::Request(void* ptr_s)
@@ -395,6 +415,10 @@ void* webserver::Request(void* ptr_s)
 	return 0;
 }
 
+
+
+
+
 void webserver::Stop()
 {
 	m_bStop = true;
@@ -402,46 +426,72 @@ void webserver::Stop()
 	m_Events->Wait();
 }
 
-void webserver::Begin()
+
+
+
+
+bool webserver::Begin()
 {
+	if (!m_Socket->IsValid())
+	{
+		LOGINFO("WebAdmin: The server socket is invalid. Terminating WebAdmin.");
+		return false;
+	}
 	m_bStop = false;
 	while ( !m_bStop )
 	{
-		Socket* ptr_s=m_Socket->Accept();
-		if( m_bStop )
+		Socket * ptr_s = m_Socket->Accept();
+		if (m_bStop)
 		{
-			if( ptr_s != 0 )
+			if (ptr_s != 0)
 			{
 				ptr_s->Close();
 				delete ptr_s;
 			}
 			break;
 		}
+		if (ptr_s == NULL)
+		{
+			LOGINFO("WebAdmin: Accepted socket is NULL. Terminating WebAdmin to avoid busywait.");
+			return false;
+		}
 
-		// unused variable 'ret'
-		//_beginthreadex(0,0,Request,(void*) ptr_s,0,&ret);
-		// Thanks to Frank M. Hoffmann for fixing a HANDLE leak
 		#ifdef _WIN32
 		unsigned ret;
-		HANDLE hHandle = reinterpret_cast<HANDLE>(_beginthreadex(0,0,Request,(void*) ptr_s,0,&ret));
+		HANDLE hHandle = reinterpret_cast<HANDLE>(_beginthreadex(NULL, 0, Request, (void *)ptr_s, 0, &ret));
 		CloseHandle(hHandle);
 		#else
-		pthread_t* hHandle = new pthread_t;
+		// Mattes: TODO: this handle probably leaks!
+		pthread_t * hHandle = new pthread_t;
 		pthread_create( hHandle, NULL, Request, ptr_s);
 		#endif
 	}
 	m_Events->Set();
+	return true;
 }
 
-webserver::webserver(unsigned int port_to_listen, request_func r) {
-  m_Socket = new SocketServer(port_to_listen,1);
+
+
+
+
+webserver::webserver(unsigned int port_to_listen, request_func r)
+{
+  m_Socket = new SocketServer(port_to_listen, 1);
 
   request_func_ = r;
   m_Events = new cEvents();
 }
+
+
+
+
 
 webserver::~webserver()
 {
 	delete m_Socket;
 	delete m_Events;
 }
+
+
+
+

@@ -1,8 +1,16 @@
+
 #pragma once
 
-#include <list>
+
+
+
 
 class cEntity;
+
+
+
+
+
 class cReferenceManager
 {
 public:
@@ -20,3 +28,7 @@ private:
 	ENUM_REFERENCE_MANAGER_TYPE m_Type;
 	std::list< cEntity** > m_References;
 };
+
+
+
+

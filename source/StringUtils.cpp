@@ -38,23 +38,15 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 	#endif  // _MSC_VER
 	
 	// Allocate a buffer and printf into it:
-	std::auto_ptr<char> tmp(new char[len + 1]);
-	ASSERT(tmp.get() != NULL);  // Why not alloced? Is the length reasonable?
-	if (tmp.get() == NULL)
-	{
-		throw std::bad_alloc();
-	}
+	str.resize(len + 1);
+	// HACK: we're accessing AString's internal buffer in a way that is NOT guaranteed to always work. But it works on all STL implementations tested.
+	// I can't think of any other way that is safe, doesn't allocate twice as much space as needed and doesn't use C++11 features like the move constructor
 	#ifdef _MSC_VER
-	if ((len = vsprintf_s(tmp.get(), len + 1, format, args)) != -1)
-	{
-		str.append(tmp.get(), len);
-	}
-	ASSERT(len != -1);
+	vsprintf_s((char *)str.data(), len + 1, format, args);
 	#else  // _MSC_VER
-	vsnprintf(tmp.get(), len + 1, format, args);
-	str.append(tmp.get(), len);
+	vsnprintf((char *)str.data(), len + 1, format, args);
 	#endif  // else _MSC_VER
-	
+	str.resize(len);
 	return str;
 }
 

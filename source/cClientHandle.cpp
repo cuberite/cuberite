@@ -436,9 +436,11 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 	if (World->AddChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, this))
 	{
-		cCSLock Lock(m_CSChunkLists);
-		m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
-		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+		{
+			cCSLock Lock(m_CSChunkLists);
+			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+		}
 		World->SendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, this);
 	}
 }
@@ -1708,6 +1710,7 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 		}
 	}
 	
+	// Filter out map chunks that the client doesn't want anymore:
 	if (a_Packet.m_PacketID == E_MAP_CHUNK)
 	{
 		// Check chunks being sent, erase them from m_ChunksToSend:
@@ -1727,7 +1730,33 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 		}  // for itr - m_ChunksToSend[]
 		if (!Found)
 		{
-			LOGD("Refusing to send chunk [%d, %d] - no longer wanted by client \"%s\".", ChunkX, ChunkZ, m_Username.c_str());
+			// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
+			// It's not a big issue anyway, just means that some chunks may be compressed several times
+			// LOGD("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
+			return;
+		}
+	}
+	
+	// Filter out pre chunks that the client doesn't want anymore:
+	if ((a_Packet.m_PacketID == E_PRE_CHUNK) && ((cPacket_PreChunk &)a_Packet).m_bLoad)
+	{
+		int ChunkX = ((cPacket_PreChunk &)a_Packet).m_PosX;
+		int ChunkZ = ((cPacket_PreChunk &)a_Packet).m_PosZ;
+		bool Found = false;
+		cCSLock Lock(m_CSChunkLists);
+		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
+		{
+			if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
+			{
+				Found = true;
+				break;
+			}
+		}  // for itr - m_ChunksToSend[]
+		if (!Found)
+		{
+			// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
+			// It's not a big issue anyway, just means that some chunks may be compressed several times
+			// LOGD("Refusing to send PREchunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
 			return;
 		}
 	}

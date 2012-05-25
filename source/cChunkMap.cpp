@@ -10,6 +10,7 @@
 #include "cItem.h"
 #include "cPickup.h"
 #include "cChunk.h"
+#include "Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -276,15 +277,17 @@ void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cChunkMap::ChunkDataLoaded(
+void cChunkMap::SetChunkData(
 	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
-	const BLOCKTYPE * a_BlockTypes,
-	const BLOCKTYPE * a_BlockMeta,
-	const BLOCKTYPE * a_BlockLight,
-	const BLOCKTYPE * a_BlockSkyLight,
+	const BLOCKTYPE *  a_BlockTypes,
+	const NIBBLETYPE * a_BlockMeta,
+	const NIBBLETYPE * a_BlockLight,
+	const NIBBLETYPE * a_BlockSkyLight,
 	const cChunkDef::HeightMap * a_HeightMap,
-	cEntityList & a_Entities, 
-	cBlockEntityList & a_BlockEntities
+	const cChunkDef::BiomeMap &  a_BiomeMap,
+	cEntityList & a_Entities,
+	cBlockEntityList & a_BlockEntities,
+	bool a_MarkDirty
 )
 {
 	cCSLock Lock(m_CSLayers);
@@ -293,37 +296,32 @@ void cChunkMap::ChunkDataLoaded(
 	{
 		return;
 	}
-	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
-	Chunk->MarkLoaded();
+	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_BiomeMap, a_Entities, a_BlockEntities);
+	Chunk->SetValid();
+	
+	if (a_MarkDirty)
+	{
+		Chunk->MarkDirty();
+	}
 }
 
 
 
 
 
-void cChunkMap::ChunkDataGenerated(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
-	const BLOCKTYPE * a_BlockTypes,
-	const BLOCKTYPE * a_BlockMeta,
-	const BLOCKTYPE * a_BlockLight,
-	const BLOCKTYPE * a_BlockSkyLight,
-	const cChunkDef::HeightMap * a_HeightMap,
-	cEntityList & a_Entities,
-	cBlockEntityList & a_BlockEntities
+void cChunkMap::ChunkLighted(
+	int a_ChunkX, int a_ChunkZ,
+	const cChunkDef::BlockNibbles & a_BlockLight,
+	const cChunkDef::BlockNibbles & a_SkyLight
 )
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
 	if (Chunk == NULL)
 	{
 		return;
 	}
-	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_Entities, a_BlockEntities);
-
-	// TODO: This has to go - lighting takes way too long to execute in a locked ChunkMap!
-	Chunk->CalculateLighting();
-	
-	Chunk->SetValid();
+	Chunk->SetLight(a_BlockLight, a_SkyLight);
 	Chunk->MarkDirty();
 }
 
@@ -594,9 +592,9 @@ void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
 
 
 
-void cChunkMap::SetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
-	int ChunkX, ChunkZ, X = a_X, Y = a_Y, Z = a_Z;
+	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
 
 	cCSLock Lock(m_CSLayers);
@@ -605,6 +603,100 @@ void cChunkMap::SetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCK
 	{
 		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
 	}
+}
+
+
+
+
+
+void cChunkMap::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
+{
+	cCSLock Lock(m_CSLayers);
+	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
+	{
+		cChunkPtr Chunk = GetChunk(itr->ChunkX, ZERO_CHUNK_Y, itr->ChunkZ );
+		if ((Chunk == NULL) || !Chunk->IsValid())
+		{
+			continue;
+		}
+		if (Chunk->GetBlock(itr->x, itr->y, itr->z) == a_FilterBlockType)
+		{
+			Chunk->SetBlock(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
+		}
+	}
+}
+
+
+
+
+
+void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
+{
+	cCSLock Lock(m_CSLayers);
+	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
+	{
+		cChunkPtr Chunk = GetChunk(itr->ChunkX, ZERO_CHUNK_Y, itr->ChunkZ );
+		if ((Chunk == NULL) || !Chunk->IsValid())
+		{
+			continue;
+		}
+		switch (Chunk->GetBlock(itr->x, itr->y, itr->z))
+		{
+			CASE_TREE_OVERWRITTEN_BLOCKS:
+			{
+				Chunk->SetBlock(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
+				break;
+			}
+		}
+	}  // for itr - a_Blocks[]
+}
+
+
+
+
+
+EMCSBiome cChunkMap::GetBiomeAt (int a_BlockX, int a_BlockZ)
+{
+	int ChunkX, ChunkZ, X = a_BlockX, Y = 0, Z = a_BlockZ;
+	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		return Chunk->GetBiomeAt(X, Z);
+	}
+	else
+	{
+		return m_World->GetGenerator().GetBiomeAt(a_BlockX, a_BlockZ);
+	}
+}
+
+
+
+
+
+bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
+{
+	bool res = true;
+	cCSLock Lock(m_CSLayers);
+	for (sSetBlockVector::iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
+	{
+		cChunkPtr Chunk = GetChunk(itr->ChunkX, ZERO_CHUNK_Y, itr->ChunkZ );
+		if ((Chunk == NULL) || !Chunk->IsValid())
+		{
+			if (!a_ContinueOnFailure)
+			{
+				return false;
+			}
+			res = false;
+			continue;
+		}
+		int idx = cChunkDef::MakeIndexNoCheck(itr->x, itr->y, itr->z);
+		itr->BlockType = Chunk->GetBlock(idx);
+		itr->BlockMeta = Chunk->GetMeta(idx);
+	}
+	return res;
 }
 
 
@@ -913,6 +1005,40 @@ void cChunkMap::MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ)
 
 
 
+bool cChunkMap::IsChunkLighted(int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		// Not present
+		return false;
+	}
+	return Chunk->IsLightValid();
+}
+
+
+
+
+
+void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
+{
+	a_NumChunksValid = 0;
+	a_NumChunksDirty = 0;
+	cCSLock Lock(m_CSLayers);
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		int NumValid = 0, NumDirty = 0;
+		(*itr)->GetChunkStats(NumValid, NumDirty);
+		a_NumChunksValid += NumValid;
+		a_NumChunksDirty += NumDirty;
+	}  // for itr - m_Layers[]
+}
+
+
+
+
+
 void cChunkMap::Tick( float a_Dt, MTRand & a_TickRandom )
 {
 	cCSLock Lock(m_CSLayers);
@@ -1053,6 +1179,30 @@ int cChunkMap::cChunkLayer::GetNumChunksLoaded(void) const
 
 
 
+void cChunkMap::cChunkLayer::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty) const
+{
+	int NumValid = 0;
+	int NumDirty = 0;
+	for ( int i = 0; i < ARRAYCOUNT(m_Chunks); ++i )
+	{
+		if (m_Chunks[i] == NULL)
+		{
+			continue;
+		}
+		NumValid++;
+		if (m_Chunks[i]->IsDirty())
+		{
+			NumDirty++;
+		}
+	}  // for i - m_Chunks[]
+	a_NumChunksValid = NumValid;
+	a_NumChunksDirty = NumDirty;
+}
+
+
+
+
+
 void cChunkMap::cChunkLayer::Save(void)
 {
 	cWorld * World = m_Parent->GetWorld();
@@ -1178,7 +1328,7 @@ void cChunkStay::Remove(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 			m_Chunks.erase(itr);
 			return;
 		}
-	}  // for itr - Chunks[]
+	}  // for itr - m_Chunks[]
 }
 
 
@@ -1191,6 +1341,18 @@ void cChunkStay::Enable(void)
 	
 	m_World->ChunksStay(*this, true);
 	m_IsEnabled = true;
+}
+
+
+
+
+
+void cChunkStay::Load(void)
+{
+	for (cChunkCoordsList::iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
+	{
+		m_World->TouchChunk(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ);
+	}  // for itr - m_Chunks[]
 }
 
 

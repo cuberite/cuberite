@@ -37,6 +37,7 @@
 #ifndef _WIN32
 	#include <cstring>
 	#include <sys/time.h>
+	#include <unistd.h>
 	#define SD_SEND 0x01
 #else
 	#define MSG_NOSIGNAL (0)

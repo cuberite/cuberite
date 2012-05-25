@@ -13,7 +13,6 @@
 #include "cSleep.h"
 #include "cThread.h"
 #include "cFileFormatUpdater.h"
-#include "cGenSettings.h"
 #include "cRedstone.h"
 
 #include "../iniFile/iniFile.h"
@@ -193,31 +192,6 @@ void cRoot::LoadGlobalSettings()
 	{
 		cRedstone::s_UseRedstone = IniFile.GetValueB("Redstone", "SimulateRedstone", true );
 	}
-
-
-	// I think this should be removed? I can't believe anybody is using it anyway
-	cIniFile GenSettings("terrain.ini");
-	if( GenSettings.ReadFile() )
-	{
-#define READ_INI_TERRAIN_VAL( var, type ) cGenSettings::var = (type)GenSettings.GetValueF("Terrain", #var, cGenSettings::var )
-		READ_INI_TERRAIN_VAL( HeightFreq1, float );
-		READ_INI_TERRAIN_VAL( HeightFreq2, float );
-		READ_INI_TERRAIN_VAL( HeightFreq3, float );
-		READ_INI_TERRAIN_VAL( HeightAmp1, float );
-		READ_INI_TERRAIN_VAL( HeightAmp2, float );
-		READ_INI_TERRAIN_VAL( HeightAmp3, float );
-	}
-	else
-	{
-#define SET_INI_TERRAIN_VAL( var ) GenSettings.SetValueF("Terrain", #var, cGenSettings::var )
-		SET_INI_TERRAIN_VAL( HeightFreq1 );
-		SET_INI_TERRAIN_VAL( HeightFreq2 );
-		SET_INI_TERRAIN_VAL( HeightFreq3 );
-		SET_INI_TERRAIN_VAL( HeightAmp1 );
-		SET_INI_TERRAIN_VAL( HeightAmp2 );
-		SET_INI_TERRAIN_VAL( HeightAmp3 );
-		GenSettings.WriteFile();
-	}
 }
 
 
@@ -237,15 +211,15 @@ void cRoot::LoadWorlds()
 	// Then load the other worlds
 	unsigned int KeyNum = IniFile.FindKey("Worlds");
 	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum );
-	if( NumWorlds > 0 )
+	if ( NumWorlds > 0 )
 	{
-		for(unsigned int i = 0; i < NumWorlds; i++)
+		for (unsigned int i = 0; i < NumWorlds; i++)
 		{
 			std::string ValueName = IniFile.GetValueName(KeyNum, i );
 			if( ValueName.compare("World") == 0 )
 			{
 				std::string WorldName = IniFile.GetValue(KeyNum, i );
-				if( WorldName.size() > 0 )
+				if (!WorldName.empty())
 				{
 					cWorld* NewWorld = new cWorld( WorldName.c_str() );
 					NewWorld->InitializeSpawn();

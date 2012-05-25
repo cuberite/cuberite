@@ -1,6 +1,9 @@
+
 #pragma once
 
-#include <string>
+
+
+
 
 // tolua_begin
 class cChatColor
@@ -25,6 +28,7 @@ public:
 	static const std::string LightPurple;
 	static const std::string Yellow;
  	static const std::string White;
+ 	static const std::string Funky;
 
 	static const std::string MakeColor( char a_Color );
 };

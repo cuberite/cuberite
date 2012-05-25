@@ -1,8 +1,9 @@
+
 #pragma once
 
-#include <string>
-#include <map>
-#include <list>
+
+
+
 
 class cGroup	//tolua_export
 {				//tolua_export

@@ -41,9 +41,51 @@ typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 
 
-/// The datatype used by blockdata, metadata, blocklight and skylight
+/// The datatype used by blockdata
 typedef char BLOCKTYPE;
-typedef char BIOMETYPE;
+
+/// The datatype used by nibbledata (meta, light, skylight)
+typedef unsigned char NIBBLETYPE;
+
+/// The type used by the heightmap
+typedef unsigned char HEIGHTTYPE;
+
+
+
+
+
+/** Biome IDs
+The first batch corresponds to the clientside biomes, used by MineCraft.
+BiomeIDs over 255 are used by MCServer internally and are translated to MC biomes before sending them to client
+When adding or deleting, you might want to edit the cBioGenCheckerBoard in BioGen.cpp to 
+include / exclude that biome in that generator.
+*/
+enum EMCSBiome
+{
+	biOcean            = 0,
+	biPlains           = 1,
+	biDesert           = 2,
+	biExtremeHills     = 3,
+	biForest           = 4,
+	biTaiga            = 5,
+	biSwampland        = 6,
+	biRiver            = 7,
+	biHell             = 8,  // Nether?
+	biSky              = 9,
+	biFrozenOcean      = 10,
+	biFrozenRiver      = 11,
+	biIcePlains        = 12,
+	biIceMountains     = 13,
+	biMushroomIsland   = 14,
+	biMushroomShore    = 15,
+	biBeach            = 16,
+	biDesertHills      = 17,
+	biForestHills      = 18,
+	biTaigaHills       = 19,
+	biExtremeHillsEdge = 20,
+	biJungle           = 21,
+	biJungleHills      = 22,
+} ;
 
 
 
@@ -65,7 +107,20 @@ public:
 
 	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
 
-	typedef unsigned char HeightMap[Width * Width];
+	/// The type used for any heightmap operations and storage; idx = x + Width * z
+	typedef HEIGHTTYPE HeightMap[Width * Width];
+	
+	/** The type used for any biomemap operations and storage inside MCServer, 
+	using MCServer biomes (need not correspond to client representation!)
+	idx = x + Width * z  // Need to verify this with the protocol spec, currently unknown!
+	*/
+	typedef EMCSBiome BiomeMap[Width * Width];
+	
+	/// The type used for block type operations and storage, AXIS_ORDER ordering
+	typedef BLOCKTYPE BlockTypes[NumBlocks];
+	
+	/// The type used for block data in nibble format, AXIS_ORDER ordering
+	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
 
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
@@ -134,7 +189,49 @@ public:
 	}
 
 
-	static BLOCKTYPE GetNibble(BLOCKTYPE * a_Buffer, int a_BlockIdx)
+	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
+	{
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Y >= 0) && (a_Y < Height));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
+		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
+	}
+	
+	
+	inline static BLOCKTYPE GetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
+	{
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Y >= 0) && (a_Y < Height));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
+		return a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)];
+	}
+	
+	
+	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
+	{
+		return a_HeightMap[a_X + Width * a_Z];
+	}
+	
+	
+	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, unsigned char a_Height)
+	{
+		a_HeightMap[a_X + Width * a_Z] = a_Height;
+	}
+	
+	
+	inline static EMCSBiome GetBiome(const BiomeMap & a_BiomeMap, int a_X, int a_Z)
+	{
+		return a_BiomeMap[a_X + Width * a_Z];
+	}
+	
+	
+	inline static void SetBiome(BiomeMap & a_BiomeMap, int a_X, int a_Z, EMCSBiome a_Biome)
+	{
+		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
+	}
+	
+	
+	static NIBBLETYPE GetNibble(NIBBLETYPE * a_Buffer, int a_BlockIdx)
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < cChunkDef::NumBlocks))
 		{
@@ -144,7 +241,7 @@ public:
 	}
 	
 	
-	static BLOCKTYPE GetNibble(BLOCKTYPE * a_Buffer, int x, int y, int z)
+	static NIBBLETYPE GetNibble(NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
@@ -155,7 +252,7 @@ public:
 	}
 
 
-	static void SetNibble(BLOCKTYPE * a_Buffer, int a_BlockIdx, BLOCKTYPE a_Nibble)
+	static void SetNibble(NIBBLETYPE * a_Buffer, int a_BlockIdx, NIBBLETYPE a_Nibble)
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < cChunkDef::NumBlocks))
 		{
@@ -167,7 +264,7 @@ public:
 	}
 	
 	
-	static void SetNibble(BLOCKTYPE * a_Buffer, int x, int y, int z, BLOCKTYPE a_Nibble)
+	static void SetNibble(NIBBLETYPE * a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
 	{
 		if ((x < cChunkDef::Width) && (x > -1) && (y < cChunkDef::Height) && (y > -1) && (z < cChunkDef::Width) && (z > -1))
 		{
@@ -180,13 +277,13 @@ public:
 	}
 
 
-	inline static BLOCKTYPE GetNibble(BLOCKTYPE * a_Buffer, const Vector3i & a_BlockPos )
+	inline static char GetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
 	{
 		return GetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 	}
 	
 	
-	inline static void SetNibble(BLOCKTYPE * a_Buffer, const Vector3i & a_BlockPos, char a_Value )
+	inline static void SetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos, char a_Value )
 	{
 		SetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Value );
 	}
@@ -207,17 +304,23 @@ public:
 	/// Called once to provide heightmap data
 	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {};
 	
+	/// Called once to provide biome data
+	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) {};
+	
 	/// Called once to export block types
 	virtual void BlockTypes   (const BLOCKTYPE * a_Type) {};
 	
 	/// Called once to export block meta
-	virtual void BlockMeta    (const BLOCKTYPE * a_Meta) {};
+	virtual void BlockMeta    (const NIBBLETYPE * a_Meta) {};
 	
+	/// Called once to let know if the chunk lighting is valid. Return value is used to control if BlockLight() and BlockSkyLight() are called next
+	virtual bool LightIsValid(bool a_IsLightValid) {return true; };
+
 	/// Called once to export block light
-	virtual void BlockLight   (const BLOCKTYPE * a_Meta) {};
+	virtual void BlockLight   (const NIBBLETYPE * a_Meta) {};
 	
 	/// Called once to export sky light
-	virtual void BlockSkyLight(const BLOCKTYPE * a_Meta) {};
+	virtual void BlockSkyLight(const NIBBLETYPE * a_Meta) {};
 	
 	/// Called for each entity in the chunk
 	virtual void Entity(cEntity * a_Entity) {};
@@ -237,29 +340,30 @@ class cChunkDataCollector :
 {
 public:
 
-	BLOCKTYPE m_BlockData[cChunkDef::BlockDataSize];
+	// Must be char instead of BLOCKTYPE or NIBBLETYPE, because it houses both.
+	char m_BlockData[cChunkDef::BlockDataSize];
 
 protected:
 
 	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
 	{
-		memcpy(m_BlockData, a_BlockTypes, cChunkDef::NumBlocks);
+		memcpy(m_BlockData, a_BlockTypes, sizeof(cChunkDef::BlockTypes));
 	}
 
 
-	virtual void BlockMeta(const BLOCKTYPE * a_BlockMeta) override
+	virtual void BlockMeta(const NIBBLETYPE * a_BlockMeta) override
 	{
 		memcpy(m_BlockData + cChunkDef::NumBlocks, a_BlockMeta, cChunkDef::NumBlocks / 2);
 	}
 
 
-	virtual void BlockLight(const BLOCKTYPE * a_BlockLight) override
+	virtual void BlockLight(const NIBBLETYPE * a_BlockLight) override
 	{
 		memcpy(m_BlockData + 3 * cChunkDef::NumBlocks / 2, a_BlockLight, cChunkDef::NumBlocks / 2);
 	}
 
 
-	virtual void BlockSkyLight(const BLOCKTYPE * a_BlockSkyLight) override
+	virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override
 	{
 		memcpy(m_BlockData + 2 * cChunkDef::NumBlocks, a_BlockSkyLight, cChunkDef::NumBlocks / 2);
 	}
@@ -276,12 +380,10 @@ class cChunkDataSeparateCollector :
 {
 public:
 
-	BLOCKTYPE m_BlockTypes[cChunkDef::NumBlocks];
-	
-	// TODO: These should be NIBBLETYPE:
-	BLOCKTYPE m_BlockMetas[cChunkDef::NumBlocks / 2];
-	BLOCKTYPE m_BlockLight[cChunkDef::NumBlocks / 2];
-	BLOCKTYPE m_BlockSkyLight[cChunkDef::NumBlocks / 2];
+	cChunkDef::BlockTypes   m_BlockTypes;
+	cChunkDef::BlockNibbles m_BlockMetas;
+	cChunkDef::BlockNibbles m_BlockLight;
+	cChunkDef::BlockNibbles m_BlockSkyLight;
 
 protected:
 
@@ -291,19 +393,19 @@ protected:
 	}
 
 
-	virtual void BlockMeta(const BLOCKTYPE * a_BlockMeta) override
+	virtual void BlockMeta(const NIBBLETYPE * a_BlockMeta) override
 	{
 		memcpy(m_BlockMetas, a_BlockMeta, sizeof(m_BlockMetas));
 	}
 
 
-	virtual void BlockLight(const BLOCKTYPE * a_BlockLight) override
+	virtual void BlockLight(const NIBBLETYPE * a_BlockLight) override
 	{
 		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
 	}
 
 
-	virtual void BlockSkyLight(const BLOCKTYPE * a_BlockSkyLight) override
+	virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override
 	{
 		memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
 	}
@@ -334,12 +436,20 @@ struct sSetBlock
 {
 	int x, y, z;
 	int ChunkX, ChunkZ;
-	char BlockType, BlockMeta;
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
 
-	sSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );  // absolute block position
+	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );  // absolute block position
+	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),
+		x(a_X), y(a_Y), z(a_Z),
+		BlockType(a_BlockType),
+		BlockMeta(a_BlockMeta)
+	{}
 };
 
-typedef std::list< sSetBlock > sSetBlockList;
+typedef std::list<sSetBlock> sSetBlockList;
+typedef std::vector<sSetBlock> sSetBlockVector;
 
 
 
@@ -362,6 +472,16 @@ public:
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
 
+
+
+
+
+/// Interface class used as a callback for operations that involve chunk coords
+class cChunkCoordCallback
+{
+public:
+	virtual void Call(int a_ChunkX, int a_ChunkZ) = 0;
+} ;
 
 
 

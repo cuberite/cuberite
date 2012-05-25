@@ -125,7 +125,7 @@ void cAuthenticator::Execute(void)
 		{
 			return;
 		}
-		ASSERT(m_Queue.size() > 0);
+		ASSERT(!m_Queue.empty());
 		
 		int ClientID = m_Queue.front().mClientID;
 		AString UserName = m_Queue.front().mName;

@@ -40,6 +40,33 @@ class cClientHandle;
 
 
 
+// fwd:
+class cChunkSender;
+
+
+
+
+
+/// Callback that can be used to notify chunk sender upon another chunkcoord notification
+class cNotifyChunkSender :
+	public cChunkCoordCallback
+{
+	virtual void Call(int a_ChunkX, int a_ChunkZ) override;
+
+	cChunkSender * m_ChunkSender;
+public:
+	cNotifyChunkSender(cChunkSender * a_ChunkSender) : m_ChunkSender(a_ChunkSender) {}
+	
+	void SetChunkSender(cChunkSender * a_ChunkSender)
+	{
+		m_ChunkSender = a_ChunkSender;
+	}
+} ;
+
+
+
+
+
 class cChunkSender:
 	public cIsThread,
 	public cChunkDataCollector
@@ -101,9 +128,11 @@ protected:
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)
 	
+	cNotifyChunkSender m_Notify;  // Used for chunks that don't have a valid lighting - they will be re-queued after lightcalc
+	
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
-	BIOMETYPE  m_BiomeData[cChunkDef::Width * cChunkDef::Width];
+	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
 	PacketList m_Packets;  // Accumulator for the entity-packets to send
 	
 	// cIsThread override:
@@ -111,6 +140,7 @@ protected:
 	
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
+	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
