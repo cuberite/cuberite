@@ -113,8 +113,13 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	
 	if (NoCaseCompare(BiomeGenName, "constant") == 0)
 	{
-		int Biome = a_IniFile.GetValueI("Generator", "ConstantBiome", biPlains);
-		m_BiomeGen = new cBioGenConstant((EMCSBiome)Biome);
+		AString Biome = a_IniFile.GetValue("Generator", "ConstantBiome", "Plains");
+		EMCSBiome b = StringToBiome(Biome);
+		if (b == -1)
+		{
+			b = biPlains;
+		}
+		m_BiomeGen = new cBioGenConstant(b);
 	}
 	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
 	{
