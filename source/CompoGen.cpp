@@ -67,6 +67,33 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 )
 {
+	static BLOCKTYPE Blocks[] =
+	{
+		E_BLOCK_STONE,
+		E_BLOCK_COBBLESTONE, 
+		E_BLOCK_LOG,
+		E_BLOCK_PLANKS,
+		E_BLOCK_SANDSTONE,
+		E_BLOCK_WHITE_CLOTH,
+		E_BLOCK_COAL_ORE,
+		E_BLOCK_IRON_ORE,
+		E_BLOCK_GOLD_ORE,
+		E_BLOCK_DIAMOND_ORE,
+		E_BLOCK_LAPIS_ORE,
+		E_BLOCK_REDSTONE_ORE,
+		E_BLOCK_IRON_BLOCK,
+		E_BLOCK_GOLD_BLOCK,
+		E_BLOCK_DIAMOND_BLOCK,
+		E_BLOCK_LAPIS_BLOCK,
+		E_BLOCK_BRICK,
+		E_BLOCK_MOSSY_COBBLESTONE,
+		E_BLOCK_OBSIDIAN,
+		E_BLOCK_NETHERRACK,
+		E_BLOCK_SOULSAND,
+		E_BLOCK_NETHER_BRICK,
+		E_BLOCK_BEDROCK,
+	} ;
+	
 	memset(a_BlockTypes, E_BLOCK_AIR, sizeof(a_BlockTypes));
 	memset(a_BlockMeta, 0, sizeof(a_BlockMeta));
 
@@ -77,7 +104,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			BLOCKTYPE BlockType = (BLOCKTYPE)cChunkDef::GetBiome(BiomeMap, x, z);
+			BLOCKTYPE BlockType = Blocks[cChunkDef::GetBiome(BiomeMap, x, z) % ARRAYCOUNT(Blocks)];
 			for (int y = a_HeightMap[x + cChunkDef::Width * z]; y >= 0; y--)
 			{
 				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockType);
