@@ -231,7 +231,9 @@ void cWorldStorage::InitSchemas(void)
 	}  // for itr - m_Schemas[]
 	
 	// Unknown schema selected, let the admin know:
-	LOGWARNING("Unknown storage schema name \"%s\". Using default. Available schemas:", m_StorageSchemaName.c_str());
+	LOGWARNING("Unknown storage schema name \"%s\". Using default (\"%s\"). Available schemas:", 
+		m_StorageSchemaName.c_str(), m_SaveSchema->GetName().c_str()
+	);
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
 	{
 		LOGWARNING("\t\"%s\"", (*itr)->GetName().c_str());

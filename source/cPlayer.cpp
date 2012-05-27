@@ -682,7 +682,9 @@ void cPlayer::ResolveGroups()
 		cGroup* CurrentGroup = *ToIterate.begin();
 		if( AllGroups.find( CurrentGroup ) != AllGroups.end() )
 		{
-			LOGERROR("ERROR: Player %s is in the same group multiple times (%s). FIX IT!", m_PlayerName.c_str(), CurrentGroup->GetName().c_str() );
+			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
+				m_PlayerName.c_str(), CurrentGroup->GetName().c_str()
+			);
 		}
 		else
 		{
