@@ -57,8 +57,6 @@ typedef unsigned char HEIGHTTYPE;
 /** Biome IDs
 The first batch corresponds to the clientside biomes, used by MineCraft.
 BiomeIDs over 255 are used by MCServer internally and are translated to MC biomes before sending them to client
-When adding or deleting, you might want to edit the cBioGenCheckerBoard in BioGen.cpp to 
-include / exclude that biome in that generator.
 */
 enum EMCSBiome
 {
@@ -70,11 +68,13 @@ enum EMCSBiome
 	biTaiga            = 5,
 	biSwampland        = 6,
 	biRiver            = 7,
-	biHell             = 8,  // Nether?
+	biHell             = 8,  // same as Nether
+	biNether           = 8,
 	biSky              = 9,
 	biFrozenOcean      = 10,
 	biFrozenRiver      = 11,
 	biIcePlains        = 12,
+	biTundra           = 12,  // same as Ice Plains
 	biIceMountains     = 13,
 	biMushroomIsland   = 14,
 	biMushroomShore    = 15,
