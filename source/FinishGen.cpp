@@ -126,7 +126,31 @@ void cFinishGenSnow::GenFinish(
 	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
 	)
 {
-	// TODO: Add snow block in snowy biomes onto blocks that can be snowed over
+	// Add a snow block in snowy biomes onto blocks that can be snowed over
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+			{
+				case biIcePlains:
+				case biIceMountains:
+				case biTaiga:
+				case biTaigaHills:
+				case biFrozenRiver:
+				case biFrozenOcean:
+				{
+					int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+					if (g_BlockIsSnowable[cChunkDef::GetBlock(a_BlockTypes, x, Height, z)])
+					{
+						cChunkDef::SetBlock(a_BlockTypes, x, Height + 1, z, E_BLOCK_SNOW);
+						cChunkDef::SetHeight(a_HeightMap, x, z, Height + 1);
+					}
+					break;
+				}
+			}
+		}
+	}  // for z
 }
 
 
