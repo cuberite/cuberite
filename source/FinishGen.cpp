@@ -170,7 +170,35 @@ void cFinishGenIce::GenFinish(
 	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
 	)
 {
-	// TODO: Turn surface water into ice in icy biomes
+	// Turn surface water into ice in icy biomes
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+			{
+				case biIcePlains:
+				case biIceMountains:
+				case biTaiga:
+				case biTaigaHills:
+				case biFrozenRiver:
+				case biFrozenOcean:
+				{
+					int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+					switch (cChunkDef::GetBlock(a_BlockTypes, x, Height, z))
+					{
+						case E_BLOCK_WATER:
+						case E_BLOCK_STATIONARY_WATER:
+						{
+							cChunkDef::SetBlock(a_BlockTypes, x, Height, z, E_BLOCK_ICE);
+							break;
+						}
+					}
+					break;
+				}
+			}
+		}
+	}  // for z
 }
 
 

@@ -247,6 +247,7 @@ public:
 		g_BlockIsSnowable[E_BLOCK_FIRE]                  = false;
 		g_BlockIsSnowable[E_BLOCK_GLASS]                 = false;
 		g_BlockIsSnowable[E_BLOCK_ICE]                   = false;
+		g_BlockIsSnowable[E_BLOCK_LAVA]                  = false;
 		g_BlockIsSnowable[E_BLOCK_LOCKED_CHEST]          = false;
 		g_BlockIsSnowable[E_BLOCK_REDSTONE_REPEATER_OFF] = false;
 		g_BlockIsSnowable[E_BLOCK_REDSTONE_REPEATER_ON]  = false;
@@ -259,10 +260,13 @@ public:
 		g_BlockIsSnowable[E_BLOCK_SAPLING]               = false;
 		g_BlockIsSnowable[E_BLOCK_SIGN_POST]             = false;
 		g_BlockIsSnowable[E_BLOCK_SNOW]                  = false;
+		g_BlockIsSnowable[E_BLOCK_STATIONARY_LAVA]       = false;
+		g_BlockIsSnowable[E_BLOCK_STATIONARY_WATER]      = false;
 		g_BlockIsSnowable[E_BLOCK_TALL_GRASS]            = false;
 		g_BlockIsSnowable[E_BLOCK_TNT]                   = false;
 		g_BlockIsSnowable[E_BLOCK_TORCH]                 = false;
 		g_BlockIsSnowable[E_BLOCK_WALLSIGN]              = false;
+		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
 		g_BlockIsSnowable[E_BLOCK_YELLOW_FLOWER]         = false;
 	}	
 } BlockPropertiesInitializer;
