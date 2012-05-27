@@ -45,9 +45,26 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBioGenCheckerboard:
 
-void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+void cBioGenCheckerboard::InitializeBiomes(const AString & a_Biomes)
 {
-	// The list of biomes we will generate in the checkerboard:
+	AStringVector Split = StringSplit(a_Biomes, ",");
+
+	// Convert each string in the list into biome:
+	for (AStringVector::const_iterator itr = Split.begin(); itr != Split.end(); ++itr)
+	{
+		EMCSBiome Biome = StringToBiome(*itr);
+		if (Biome != -1)
+		{
+			m_Biomes.push_back(Biome);
+		}
+	}  // for itr - Split[]
+	if (!m_Biomes.empty())
+	{
+		m_BiomesCount = (int)m_Biomes.size();
+		return;
+	}
+
+	// There were no biomes, add default biomes:
 	static EMCSBiome Biomes[] =
 	{
 		biOcean,
@@ -72,14 +89,27 @@ void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 		biJungle,
 		biJungleHills,
 	} ;
-	
+	m_Biomes.reserve(ARRAYCOUNT(Biomes));
+	for (int i = 0; i < ARRAYCOUNT(Biomes); i++)
+	{
+		m_Biomes.push_back(Biomes[i]);
+	}
+	m_BiomesCount = (int)m_Biomes.size();
+}
+
+
+
+
+
+void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int Base = cChunkDef::Width * a_ChunkZ + z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int Add = cChunkDef::Width * a_ChunkX + x;
-			a_BiomeMap[x + cChunkDef::Width * z] = Biomes[(Base / m_BiomeSize + Add / m_BiomeSize) % ARRAYCOUNT(Biomes)];
+			a_BiomeMap[x + cChunkDef::Width * z] = m_Biomes[(Base / m_BiomeSize + Add / m_BiomeSize) % m_BiomesCount];
 		}
 	}
 }

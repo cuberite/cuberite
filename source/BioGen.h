@@ -60,11 +60,22 @@ class cBioGenCheckerboard :
 	public cBiomeGen
 {
 public:
-	cBioGenCheckerboard(int a_BiomeSize) : m_BiomeSize((a_BiomeSize < 8) ? 8 : a_BiomeSize) {}
+	cBioGenCheckerboard(int a_BiomeSize, const AString & a_Biomes) :
+		m_BiomeSize((a_BiomeSize < 8) ? 8 : a_BiomeSize)
+	{
+		InitializeBiomes(a_Biomes);
+	}
 	
 protected:
 
 	int m_BiomeSize;
+	
+	// List of biomes that the generator is allowed to generate:
+	typedef std::vector<EMCSBiome> EMCSBiomes;
+	EMCSBiomes m_Biomes;
+	int        m_BiomesCount;
+	
+	void InitializeBiomes(const AString & a_Biomes);
 	
 	// cBiomeGen override:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;

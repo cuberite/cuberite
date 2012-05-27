@@ -440,8 +440,11 @@ enum
 
 
 
-// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
+/// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
 extern int BlockStringToType(const AString & a_BlockTypeString);
+
+/// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
+extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 
 
 

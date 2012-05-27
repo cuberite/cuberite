@@ -119,7 +119,8 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
 	{
 		int BiomeSize = a_IniFile.GetValueI("Generator", "CheckerboardBiomeSize", 64);
-		m_BiomeGen = new cBioGenCheckerboard(BiomeSize);
+		AString Biomes = a_IniFile.GetValue("Generator", "CheckerBoardBiomes", "");
+		m_BiomeGen = new cBioGenCheckerboard(BiomeSize, Biomes);
 	}
 	else
 	{
@@ -218,7 +219,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValue("Generator", "Structures", "Trees,MarbleCaves");
+	AString Structures = a_IniFile.GetValue("Generator", "Structures", "Trees,MarbleCaves,OreNests");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)

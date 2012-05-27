@@ -63,6 +63,62 @@ int BlockStringToType(const AString & a_BlockTypeString)
 
 
 
+EMCSBiome StringToBiome(const AString & a_BiomeString)
+{
+	// If it is a number, return it:
+	int res = atoi(a_BiomeString.c_str());
+	if ((res != 0) || (a_BiomeString.compare("0") == 0))
+	{
+		// It was a valid number
+		return (EMCSBiome)res;
+	}
+	
+	// Convert using the built-in map:
+	static struct {
+		EMCSBiome    m_Biome;
+		const char * m_String;
+	} BiomeMap[] =
+	{
+		{biOcean,            "Ocean"} ,
+		{biPlains,           "Plains"},
+		{biDesert,           "Desert"},
+		{biExtremeHills,     "ExtremeHills"},
+		{biForest,           "Forest"},
+		{biTaiga,            "Taiga"},
+		{biSwampland,        "Swampland"},
+		{biRiver,            "River"},
+		{biHell,             "Hell"},
+		{biHell,             "Nether"},
+		{biSky,              "Sky"},
+		{biFrozenOcean,      "FrozenOcean"},
+		{biFrozenRiver,      "FrozenRiver"},
+		{biIcePlains,        "IcePlains"},
+		{biIceMountains,     "IceMountains"},
+		{biMushroomIsland,   "MushroomIsland"},
+		{biMushroomShore,    "MushroomShore"},
+		{biBeach,            "Beach"},
+		{biDesertHills,      "DesertHills"},
+		{biForestHills,      "ForestHills"},
+		{biTaigaHills,       "TaigaHills"},
+		{biExtremeHillsEdge, "ExtremeHillsEdge "},
+		{biJungle,           "Jungle"},
+		{biJungleHills,      "JungleHills"},
+	} ;
+	
+	for (int i = 0; i < ARRAYCOUNT(BiomeMap); i++)
+	{
+		if (NoCaseCompare(BiomeMap[i].m_String, a_BiomeString) == 0)
+		{
+			return BiomeMap[i].m_Biome;
+		}
+	}  // for i - BiomeMap[]
+	return (EMCSBiome)-1;
+}
+
+
+
+
+
 // This is actually just some code that needs to run at program startup, so it is wrapped into a global var's constructor:
 class cBlockPropertiesInitializer
 {
