@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/24/12 19:47:53.
+** Generated automatically by tolua++-1.0.92 on 05/27/12 16:02:28.
 */
 
 #ifndef __cplusplus
@@ -17493,6 +17493,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_PISTON",E_BLOCK_PISTON);
   tolua_constant(tolua_S,"E_BLOCK_PISTON_EXTENSION",E_BLOCK_PISTON_EXTENSION);
   tolua_constant(tolua_S,"E_BLOCK_WHITE_CLOTH",E_BLOCK_WHITE_CLOTH);
+  tolua_constant(tolua_S,"E_BLOCK_WOOL",E_BLOCK_WOOL);
   tolua_constant(tolua_S,"E_BLOCK_PISTON_MOVED_BLOCK",E_BLOCK_PISTON_MOVED_BLOCK);
   tolua_constant(tolua_S,"E_BLOCK_YELLOW_FLOWER",E_BLOCK_YELLOW_FLOWER);
   tolua_constant(tolua_S,"E_BLOCK_RED_ROSE",E_BLOCK_RED_ROSE);
@@ -17545,6 +17546,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_FENCE",E_BLOCK_FENCE);
   tolua_constant(tolua_S,"E_BLOCK_PUMPKIN",E_BLOCK_PUMPKIN);
   tolua_constant(tolua_S,"E_BLOCK_BLOODSTONE",E_BLOCK_BLOODSTONE);
+  tolua_constant(tolua_S,"E_BLOCK_NETHERRACK",E_BLOCK_NETHERRACK);
   tolua_constant(tolua_S,"E_BLOCK_SOULSAND",E_BLOCK_SOULSAND);
   tolua_constant(tolua_S,"E_BLOCK_GLOWSTONE",E_BLOCK_GLOWSTONE);
   tolua_constant(tolua_S,"E_BLOCK_PORT",E_BLOCK_PORT);
