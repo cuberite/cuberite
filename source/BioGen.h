@@ -56,26 +56,42 @@ protected:
 
 
 
-class cBioGenCheckerboard :
+/// Base class for generators that use a list of available biomes. This class takes care of the list.
+class cBiomeGenList :
 	public cBiomeGen
+{
+protected:
+	cBiomeGenList(const AString & a_Biomes)
+	{
+		InitializeBiomes(a_Biomes);
+	}
+	
+	// List of biomes that the generator is allowed to generate:
+	typedef std::vector<EMCSBiome> EMCSBiomes;
+	EMCSBiomes m_Biomes;
+	int        m_BiomesCount;  // Pulled out of m_Biomes for faster access
+	
+	void InitializeBiomes(const AString & a_Biomes);
+	
+} ;
+
+
+
+
+
+class cBioGenCheckerboard :
+	public cBiomeGenList
 {
 public:
 	cBioGenCheckerboard(int a_BiomeSize, const AString & a_Biomes) :
+		cBiomeGenList(a_Biomes),
 		m_BiomeSize((a_BiomeSize < 8) ? 8 : a_BiomeSize)
 	{
-		InitializeBiomes(a_Biomes);
 	}
 	
 protected:
 
 	int m_BiomeSize;
-	
-	// List of biomes that the generator is allowed to generate:
-	typedef std::vector<EMCSBiome> EMCSBiomes;
-	EMCSBiomes m_Biomes;
-	int        m_BiomesCount;
-	
-	void InitializeBiomes(const AString & a_Biomes);
 	
 	// cBiomeGen override:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;

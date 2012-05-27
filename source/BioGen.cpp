@@ -43,9 +43,9 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cBioGenCheckerboard:
+// cBiomeGenList:
 
-void cBioGenCheckerboard::InitializeBiomes(const AString & a_Biomes)
+void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 {
 	AStringVector Split = StringSplit(a_Biomes, ",");
 
@@ -100,6 +100,9 @@ void cBioGenCheckerboard::InitializeBiomes(const AString & a_Biomes)
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBioGenCheckerboard:
 
 void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
