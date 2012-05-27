@@ -108,7 +108,7 @@ class cBioGenVoronoi :
 public:
 	cBioGenVoronoi(int a_Seed, int a_CellSize, const AString & a_Biomes) :
 		cBiomeGenList(a_Biomes),
-		m_CellSize(a_CellSize),
+		m_CellSize((a_CellSize > 4) ? a_CellSize : 4),
 		m_Noise(a_Seed)
 	{
 	}
