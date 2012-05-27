@@ -127,6 +127,12 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		AString Biomes = a_IniFile.GetValue("Generator", "CheckerBoardBiomes", "");
 		m_BiomeGen = new cBioGenCheckerboard(BiomeSize, Biomes);
 	}
+	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
+	{
+		int CellSize = a_IniFile.GetValueI("Generator", "VoronoiCellSize", 64);
+		AString Biomes = a_IniFile.GetValue("Generator", "VoronoiBiomes", "");
+		m_BiomeGen = new cBioGenVoronoi(m_Seed, CellSize, Biomes);
+	}
 	else
 	{
 		if (NoCaseCompare(BiomeGenName, "distortedvoronoi") != 0)

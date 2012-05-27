@@ -15,6 +15,7 @@ Interfaces to the various biome generators:
 #pragma once
 
 #include "cChunkGenerator.h"
+#include "cNoise.h"
 
 
 
@@ -95,6 +96,33 @@ protected:
 	
 	// cBiomeGen override:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+} ;
+
+
+
+
+
+class cBioGenVoronoi :
+	public cBiomeGenList
+{
+public:
+	cBioGenVoronoi(int a_Seed, int a_CellSize, const AString & a_Biomes) :
+		cBiomeGenList(a_Biomes),
+		m_CellSize(a_CellSize),
+		m_Noise(a_Seed)
+	{
+	}
+	
+protected:
+
+	int m_CellSize;
+	
+	cNoise m_Noise;
+
+	// cBiomeGen override:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	
+	EMCSBiome VoronoiBiome(int a_BlockX, int a_BlockZ);
 } ;
 
 
