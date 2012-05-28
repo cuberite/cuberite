@@ -8,7 +8,7 @@
 
 
 
-void cItem::GetJson( Json::Value & a_OutValue )
+void cItem::GetJson( Json::Value & a_OutValue ) const
 {
 	a_OutValue["ID"] = m_ItemID;
 	if( m_ItemID > 0 )

@@ -102,13 +102,27 @@ void cFurnaceEntity::UsedBy( cPlayer * a_Player )
 
 bool cFurnaceEntity::Tick( float a_Dt )
 {
-	//LOG("Time left: %0.1f Time burned: %0.1f Burn time: %0.1f", m_CookTime - m_TimeCooked, m_TimeBurned, m_BurnTime );
-	if( m_CookingItem && ( (m_TimeBurned < m_BurnTime) || (m_TimeCooked + a_Dt >= m_CookTime) ) )
+	/*
+	// DEBUG:
+	Int16 BurnTime = (Int16)(GetTimeToBurn() / 50.0);
+	Int16 CookTime = (Int16)(GetTimeCooked() / 50.0);
+	LOGD("Furnace: BurnTime %d, CookTime %d", BurnTime, CookTime);
+	*/
+
+	if (m_BurnTime <= 0)
 	{
-		if( m_CookingItem->Equals( m_Items[2] ) || m_Items[2].IsEmpty() )
+		// There is no fuel and no flame, no need to tick at all
+		return false;
+	}
+	
+	// DEBUG: LOGD("Furnace: Left: %0.1f Burned: %0.1f Burn time: %0.1f", m_CookTime - m_TimeCooked, m_TimeBurned, m_BurnTime );
+	
+	if ((m_CookingItem != NULL) && ((m_TimeBurned < m_BurnTime) || (m_TimeCooked + a_Dt >= m_CookTime)))
+	{
+		if (m_CookingItem->Equals(m_Items[2]) || m_Items[2].IsEmpty())
 		{
 			m_TimeCooked += a_Dt;
-			if( m_TimeCooked >= m_CookTime )
+			if ( m_TimeCooked >= m_CookTime )
 			{
 				m_Items[0].m_ItemCount--;
 				if( m_Items[0].IsEmpty() ) m_Items[0].Empty();
@@ -117,26 +131,26 @@ bool cFurnaceEntity::Tick( float a_Dt )
 				m_Items[2].m_ItemID = m_CookingItem->m_ItemID;
 				m_Items[2].m_ItemCount += m_CookingItem->m_ItemCount;
 				delete m_CookingItem;
-				m_CookingItem = 0;
+				m_CookingItem = NULL;
 
-				cWindow* Window = GetWindow();
-				if( Window )
+				cWindow * Window = GetWindow();
+				if (Window != NULL)
 				{
 					Window->BroadcastWholeWindow();
 				}
 
-				m_TimeCooked = 0.f;
+				m_TimeCooked -= m_CookTime;
 				StartCooking();
 			}
-			cWindow* Window = GetWindow();
-			if( Window )
+			cWindow * Window = GetWindow();
+			if (Window != NULL)
 			{
 				cPacket_InventoryProgressBar Progress;
 				Progress.m_ProgressBar = 0;
 				Progress.m_WindowID = (char)Window->GetWindowID();
-				Progress.m_Value = (short)( m_TimeCooked * (180.f/m_CookTime) );
-				if( Progress.m_Value > 180 ) Progress.m_Value = 180;
-				if( Progress.m_Value < 0 ) Progress.m_Value = 0;
+				Progress.m_Value = (short)( m_TimeCooked * (180.f / m_CookTime) );
+				if (Progress.m_Value > 180) Progress.m_Value = 180;
+				if (Progress.m_Value < 0)   Progress.m_Value = 0;
 				Window->Broadcast(Progress);
 			}
 		}
@@ -144,42 +158,42 @@ bool cFurnaceEntity::Tick( float a_Dt )
 
 	m_TimeBurned += a_Dt;
 
-	cWindow* Window = GetWindow();
-	if( m_TimeBurned >= m_BurnTime )
+	cWindow * Window = GetWindow();
+	if (m_TimeBurned >= m_BurnTime)
 	{
 		m_TimeBurned -= m_BurnTime;
 		m_BurnTime = 0;
-		if( StartCooking() && Window )
+		if (StartCooking() && (Window != NULL))
 		{
 			Window->BroadcastWholeWindow();
 		}
 	}
-	if( Window )
+	if (Window != NULL)
 	{
 		cPacket_InventoryProgressBar Progress;
 		Progress.m_WindowID = (char)Window->GetWindowID();
 		Progress.m_ProgressBar = 1;
 
-		if ( m_BurnTime > 0.f )
+		if (m_BurnTime > 0.f)
 		{
-			Progress.m_Value = (short)( m_TimeBurned * (150.f / m_BurnTime) );
-			if ( Progress.m_Value > 150 ) Progress.m_Value = 150;
-			if ( Progress.m_Value < 0 ) Progress.m_Value = 0;
+			Progress.m_Value = 250 - (short)( m_TimeBurned * (250.f / m_BurnTime) );
+			if (Progress.m_Value > 250) Progress.m_Value = 250;
+			if (Progress.m_Value < 0)   Progress.m_Value = 0;
 		}
 		else
 		{
 			Progress.m_Value = 0;
 		}
-		Window->Broadcast( Progress );
+		Window->Broadcast(Progress);
 	}
-	return ((m_CookingItem != 0) || (m_TimeBurned < m_BurnTime)) && m_BurnTime > 0.f; // Keep on ticking, if there's more to cook, or if it's cooking
+	return ((m_CookingItem != NULL) || (m_TimeBurned < m_BurnTime)) && (m_BurnTime > 0.0); // Keep on ticking, if there's more to cook, or if it's cooking
 }
 
 
 
 
 
-bool cFurnaceEntity::StartCooking()
+bool cFurnaceEntity::StartCooking(void)
 {
 	cFurnaceRecipe* FR = cRoot::Get()->GetFurnaceRecipe();
 	float BurnTime = FR->GetBurnTime( m_Items[1] );
@@ -217,12 +231,53 @@ bool cFurnaceEntity::StartCooking()
 
 
 
+bool cFurnaceEntity::ContinueCooking(void)
+{
+	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
+	float BurnTime = FR->GetBurnTime( m_Items[1] );
+	if( (m_TimeBurned < m_BurnTime) || BurnTime > 0.f ) // burnable material
+	{
+		const cFurnaceRecipe::Recipe * R = FR->GetRecipeFrom( m_Items[0] );
+		if (R != NULL) // cook able ingredient
+		{
+			if (m_Items[2].Equals(*R->Out) || m_Items[2].IsEmpty())
+			{
+				// good to go
+				if (m_CookingItem == NULL) // Only cook new item if not already cooking
+				{
+					m_CookingItem = new cItem( *R->Out ); // Resulting item
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+
+
+
 void cFurnaceEntity::ResetCookTimer()
 {
 	delete m_CookingItem;
 	m_CookingItem = NULL;
 	m_TimeCooked = 0.f;
 	m_CookTime = 0.f;
+}
+
+
+
+
+
+void cFurnaceEntity::SetSlot(int a_Slot, const cItem & a_Item)
+{
+	if ((a_Slot < 0) || (a_Slot >= 3))
+	{
+		ASSERT(!"Furnace: slot number out of range");
+		return;
+	}
+	m_Items[a_Slot] = a_Item;
 }
 
 
@@ -321,7 +376,7 @@ void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 	for(unsigned int i = 0; i < 3; i++)
 	{
 		Json::Value Slot;
-		 m_Items[ i ].GetJson( Slot );
+		m_Items[ i ].GetJson( Slot );
 		AllSlots.append( Slot );
 	}
 	a_Value["Slots"] = AllSlots;

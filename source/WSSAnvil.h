@@ -31,16 +31,6 @@ enum
 
 
 
-// fwd: "NBT.h"
-class cNBTTag;
-class cNBTList;
-class cNBTCompound;
-class cNBTByteArray;
-
-
-
-
-
 class cWSSAnvil :
 	public cWSSchema
 {
@@ -118,7 +108,8 @@ protected:
 	/// Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1)
 	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag);
 	
-	void LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadChestFromNBT  (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z);

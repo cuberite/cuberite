@@ -531,7 +531,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 	{
 		if ((*itr)->GetBlockType() == E_BLOCK_FURNACE)
 		{
-			((cFurnaceEntity *)(*itr))->Tick( a_Dt );
+			m_IsDirty = ((cFurnaceEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
 		}
 	}
 }

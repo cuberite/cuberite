@@ -34,7 +34,7 @@ public:
 
 	void HandleData( cNBTData* a_NBTData );
 
-	cItem *	GetSlot( int a_Slot );
+	const cItem * GetSlot( int a_Slot ) const;
 	void	SetSlot( int a_Slot, cItem & a_Item );
 
 	OBSOLETE bool LoadFromFile(cFile & a_File);  // deprecated format

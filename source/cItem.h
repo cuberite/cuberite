@@ -85,7 +85,7 @@ public:
 
 	inline bool HasDuration() { return GetMaxDuration() > 0; }
 
-	void GetJson( Json::Value & a_OutValue );															//tolua_export
+	void GetJson( Json::Value & a_OutValue ) const;															//tolua_export
 	void FromJson( const Json::Value & a_Value );														//tolua_export
 	
 	static bool IsEnchantable(ENUM_ITEM_ID item);

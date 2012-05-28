@@ -73,7 +73,7 @@ void cChestEntity::Destroy()
 
 
 
-cItem * cChestEntity::GetSlot( int a_Slot )
+const cItem * cChestEntity::GetSlot( int a_Slot ) const
 {
 	if( a_Slot > -1 && a_Slot < c_ChestHeight*c_ChestWidth )
 	{
@@ -161,7 +161,7 @@ void cChestEntity::SaveToJson( Json::Value& a_Value )
 	for(unsigned int i = 0; i < NumSlots; i++)
 	{
 		Json::Value Slot;
-		cItem* Item = GetSlot( i );
+		const cItem * Item = GetSlot( i );
 		if( Item ) Item->GetJson( Slot );
 		AllSlots.append( Slot );
 	}
@@ -210,6 +210,14 @@ void cChestEntity::UsedBy( cPlayer * a_Player )
 	ChestOpen.m_Byte1 = (char)1;
 	ChestOpen.m_Byte2 = (char)1;
 	m_World->BroadcastToChunkOfBlock(m_PosX, m_PosY, m_PosZ, &ChestOpen);
+
+	// This is rather a hack
+	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
+	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
+	// The few false positives aren't much to worry about
+	int ChunkX, ChunkY = 0, ChunkZ;
+	cChunkDef::BlockToChunk(m_PosX, m_PosY, m_PosZ, ChunkX, ChunkZ);
+	m_World->MarkChunkDirty(ChunkX, ChunkY, ChunkZ);
 }
 
 

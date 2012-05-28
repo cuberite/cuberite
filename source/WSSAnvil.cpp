@@ -9,6 +9,7 @@
 #include "zlib.h"
 #include "BlockID.h"
 #include "cChestEntity.h"
+#include "cFurnaceEntity.h"
 #include "cItem.h"
 #include "StringCompression.h"
 #include "cEntity.h"
@@ -55,7 +56,7 @@ public:
 	{
 		if (m_IsTagOpen)
 		{
-			m_Writer.EndCompound();
+			m_Writer.EndList();
 		}
 	}
 	
@@ -90,7 +91,7 @@ protected:
 	}
 	
 	
-	void AddItem(cItem * a_Item, int a_Slot)
+	void AddItem(const cItem * a_Item, int a_Slot)
 	{
 		m_Writer.BeginCompound("");
 		m_Writer.AddShort("id",     (short)(a_Item->m_ItemID));
@@ -104,11 +105,11 @@ protected:
 	void AddChestEntity(cChestEntity * a_Entity)
 	{
 		m_Writer.BeginCompound("");
-		AddBasicTileEntity(a_Entity, "chest");
+		AddBasicTileEntity(a_Entity, "Chest");
 		m_Writer.BeginList("Items", TAG_Compound);
 		for (int i = 0; i < cChestEntity::c_ChestHeight * cChestEntity::c_ChestWidth; i++)
 		{
-			cItem * Item = a_Entity->GetSlot(i);
+			const cItem * Item = a_Entity->GetSlot(i);
 			if ((Item == NULL) || Item->IsEmpty())
 			{
 				continue;
@@ -116,6 +117,21 @@ protected:
 			AddItem(Item, i);
 		}
 		m_Writer.EndList();
+		m_Writer.EndCompound();
+	}
+	
+	
+	void AddFurnaceEntity(cFurnaceEntity * a_Furnace)
+	{
+		m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Furnace, "Furnace");
+		m_Writer.BeginList("Items", TAG_Compound);
+		AddItem(&a_Furnace->GetSlot(0), 0);
+		AddItem(&a_Furnace->GetSlot(1), 1);
+		AddItem(&a_Furnace->GetSlot(2), 2);
+		m_Writer.EndList();
+		m_Writer.AddShort("BurnTime", (Int16)(a_Furnace->GetTimeToBurn() / 50.0));
+		m_Writer.AddShort("CookTime", (Int16)(a_Furnace->GetTimeCooked() / 50.0));
 		m_Writer.EndCompound();
 	}
 
@@ -139,20 +155,21 @@ protected:
 		{
 			if (!m_HasHadBlockEntity)
 			{
-				m_Writer.EndCompound();
-				m_Writer.BeginCompound("TileEntities");
+				m_Writer.EndList();
+				m_Writer.BeginList("TileEntities", TAG_Compound);
 			}
 		}
 		else
 		{
-			m_Writer.BeginCompound("TileEntities");
+			m_Writer.BeginList("TileEntities", TAG_Compound);
 		}
 		m_IsTagOpen = true;
 		
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
-			case E_BLOCK_CHEST: AddChestEntity((cChestEntity *)a_Entity); break;
+			case E_BLOCK_CHEST:   AddChestEntity  ((cChestEntity *)  a_Entity); break;
+			case E_BLOCK_FURNACE: AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -598,6 +615,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Furnace", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		// TODO: Other block entities
 	}  // for Child - tag children
 }
@@ -649,6 +670,70 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 		Chest->SetSlot(a_NBT.GetByte(Slot), Item);
 	}  // for itr - ItemDefs[]
 	a_BlockEntities.push_back(Chest.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return;  // Make it an empty furnace - the chunk loader will provide an empty cFurnaceEntity for this
+	}
+	std::auto_ptr<cFurnaceEntity> Furnace(new cFurnaceEntity(x, y, z, m_World));
+	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
+	{
+		int Slot = a_NBT.FindChildByName(Child, "Slot");
+		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
+		{
+			continue;
+		}
+		cItem Item;
+		int ID = a_NBT.FindChildByName(Child, "id");
+		if ((ID < 0) || (a_NBT.GetType(ID) != TAG_Short))
+		{
+			continue;
+		}
+		Item.m_ItemID = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+		int Damage = a_NBT.FindChildByName(Child, "Damage");
+		if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
+		{
+			continue;
+		}
+		Item.m_ItemHealth = a_NBT.GetShort(Damage);
+		int Count = a_NBT.FindChildByName(Child, "Count");
+		if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
+		{
+			continue;
+		}
+		Item.m_ItemCount = a_NBT.GetByte(Count);
+		Furnace->SetSlot(a_NBT.GetByte(Slot), Item);
+	}  // for itr - ItemDefs[]
+	int BurnTime = a_NBT.FindChildByName(a_TagIdx, "BurnTime");
+	if (BurnTime >= 0)
+	{
+		Int16 bt = a_NBT.GetShort(BurnTime);
+		// Anvil doesn't store the time that the fuel can burn. We simply "reset" the current value to be the 100%
+		Furnace->SetBurnTimes((float)(bt * 50.0), (float)(bt * 50.0));
+	}
+	int CookTime = a_NBT.FindChildByName(a_TagIdx, "CookTime");
+	if (CookTime >= 0)
+	{
+		Int16 ct = a_NBT.GetShort(CookTime);
+		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds
+		Furnace->SetCookTimes(10000.0, (float)(ct * 50.0));
+	}
+	Furnace->ContinueCooking();
+	a_BlockEntities.push_back(Furnace.release());
 }
 
 
