@@ -241,6 +241,7 @@ public:
 
 		// Blocks that can be snowed over:
 		g_BlockIsSnowable[E_BLOCK_BROWN_MUSHROOM]        = false;
+		g_BlockIsSnowable[E_BLOCK_CACTUS]                = false;
 		g_BlockIsSnowable[E_BLOCK_CHEST]                 = false;
 		g_BlockIsSnowable[E_BLOCK_CROPS]                 = false;
 		g_BlockIsSnowable[E_BLOCK_FIRE]                  = false;
