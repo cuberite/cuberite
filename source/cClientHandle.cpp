@@ -986,7 +986,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			m_Player->GetInventory().RemoveItem(Item);
 			return;
 		}
-
+		
 		if (a_Packet->m_Direction < 0)
 		{
 			// clicked in air
@@ -995,7 +995,17 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		bool isDoor = false;
 
 		//TODO: Wrong Blocks!
-		int ClickedBlock = (int)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		BLOCKTYPE ClickedBlock = m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+
+		if (ItemCategory::IsHoe(Item.m_ItemID))
+		{
+			if ((ClickedBlock == E_BLOCK_DIRT) || (ClickedBlock == E_BLOCK_GRASS))
+			{
+				m_Player->GetWorld()->FastSetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, E_BLOCK_FARMLAND, 0);
+			}
+			return;
+		}
+
 		char MetaData = (char)Equipped.m_ItemHealth;
 		bool LavaBucket = false;
 		bool WaterBucket = false;

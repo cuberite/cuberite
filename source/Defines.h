@@ -15,6 +15,10 @@ extern bool g_BlockOneHitDig[];
 
 //--DO NOT DELETE THIS COMMENT-- //tolua_export
 
+
+
+
+
 inline bool IsValidBlock( int a_BlockID )	//tolua_export
 {											//tolua_export
 	if( a_BlockID > -1 &&
