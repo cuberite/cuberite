@@ -81,7 +81,10 @@ public:
 	void TossItem( bool a_bDraggingItem, int a_Amount = 1 );				//tolua_export
 
 	void Heal( int a_Health );												//tolua_export
-	void Feed( short a_Food );
+	
+	/// Returns true if any food has been consumed, false if player "full"
+	bool Feed(short a_Food);
+	
 	void TakeDamage( int a_Damage, cEntity* a_Instigator );					//tolua_export
 	void KilledBy( cEntity* a_Killer );										//tolua_export
 	void Respawn();															//tolua_export
@@ -97,8 +100,10 @@ public:
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
-	void UseEquippedItem();
+	void UseEquippedItem(void);
 	
+	/// Returns true if the item type is edible && it has been consumed, false otherwise
+	bool EatItem(int a_ItemType);
 
 protected:
 	virtual void Destroyed();

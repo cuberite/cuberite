@@ -305,19 +305,30 @@ void cPlayer::Heal( int a_Health )
 	}
 }
 
-void cPlayer::Feed( short a_Food )
-{
-	if( m_FoodLevel < GetMaxFoodLevel() )
-	{
-		m_FoodLevel = MIN(a_Food + m_FoodLevel, GetMaxFoodLevel());
 
-		cPacket_UpdateHealth Health;
-		Health.m_Health = m_Health;
-		Health.m_Food = GetFood();
-		Health.m_Saturation = GetFoodSaturation();
-		m_ClientHandle->Send( Health );
+
+
+
+bool cPlayer::Feed(short a_Food)
+{
+	if (m_FoodLevel >= GetMaxFoodLevel())
+	{
+		return false;
 	}
+	
+	m_FoodLevel = MIN(a_Food + m_FoodLevel, GetMaxFoodLevel());
+
+	cPacket_UpdateHealth Health;
+	Health.m_Health = m_Health;
+	Health.m_Food = GetFood();
+	Health.m_Saturation = GetFoodSaturation();
+	m_ClientHandle->Send( Health );
+	return true;
 }
+
+
+
+
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
@@ -980,6 +991,49 @@ void cPlayer::UseEquippedItem()
 			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
 		}
 	}
+}
+
+
+
+
+
+bool cPlayer::EatItem(int a_ItemType)
+{
+	// TODO: Handle hunger
+	switch (a_ItemType)
+	{
+		case E_ITEM_APPLE:          return Feed(24); // 2 food bars
+		case E_ITEM_GOLDEN_APPLE:   return Feed(60); // 5 food
+		case E_ITEM_MUSHROOM_SOUP:  return Feed(48); // 4 food
+		case E_ITEM_BREAD:          return Feed(30); // 2.5 food
+		case E_ITEM_RAW_MEAT:       return Feed(18); // 1.5 food
+		case E_ITEM_COOKED_MEAT:    return Feed(48); // 4 food
+		case E_ITEM_RAW_FISH:       return Feed(12); // 1 food
+		case E_ITEM_COOKED_FISH:    return Feed(30); // 2.5 food
+		case E_ITEM_COOKED_CHICKEN: return Feed(36); // 3 food
+		case E_ITEM_RAW_BEEF:       return Feed(18); // 1.5 food
+		case E_ITEM_STEAK:          return Feed(48); // 4 food
+		case E_ITEM_RAW_CHICKEN:
+		{
+			if (!Feed(12)) // 1 food
+			{
+				return false;
+			}
+			// TODO: A random chance to get food-poisoned
+			return true;
+		}
+		
+		case E_ITEM_ROTTEN_FLESH:
+		{
+			if (!Feed(24))
+			{
+				return false;
+			}
+			// TODO: Food-poisoning
+			return true;
+		}
+	}
+	return false;
 }
 
 
