@@ -176,6 +176,65 @@ cChunkPtr cChunkMap::GetChunkNoLoad( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 
 
 
+bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+{
+	// We already have m_CSLayers locked since this can be called only from within the tick thread
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	
+	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
+	a_BlockType = Chunk->GetBlock(Index);
+	a_BlockMeta = Chunk->GetMeta(Index);
+	return true;
+}
+
+
+
+
+
+bool cChunkMap::LockedSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE   a_BlockType, NIBBLETYPE   a_BlockMeta)
+{
+	// We already have m_CSLayers locked since this can be called only from within the tick thread
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	
+	Chunk->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	return true;
+}
+
+
+
+
+
+bool cChunkMap::LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	// We already have m_CSLayers locked since this can be called only from within the tick thread
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	
+	Chunk->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	return true;
+}
+
+
+
+
+
 void cChunkMap::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude)
 {
 	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
@@ -393,21 +452,6 @@ bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
 	return (Chunk != NULL) && Chunk->HasAnyClients();
-}
-
-
-
-
-
-void cChunkMap::SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
-	if ((Chunk != NULL) && Chunk->IsValid())
-	{
-		Chunk->SpreadBlockSkyLight();
-		Chunk->SpreadBlockLight();
-	}
 }
 
 

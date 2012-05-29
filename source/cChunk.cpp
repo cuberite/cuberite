@@ -542,6 +542,16 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 void cChunk::TickBlocks(MTRand & a_TickRandom)
 {
 	// Tick dem blocks
+	/*
+	// DEBUG:
+	int RandomX = 0;
+	int RandomY = 1;
+	int RandomZ = 0;
+	m_BlockTickX = 0;
+	m_BlockTickY = 40;
+	m_BlockTickZ = 0;
+	*/
+	
 	int RandomX = a_TickRandom.randInt();
 	int RandomY = a_TickRandom.randInt();
 	int RandomZ = a_TickRandom.randInt();
@@ -552,41 +562,43 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 		m_BlockTickY = (m_BlockTickY + RandomY) % Height;
 		m_BlockTickZ = (m_BlockTickZ + RandomZ) % Width;
 
-		if( m_BlockTickY > m_HeightMap[ m_BlockTickX + m_BlockTickZ * Width ] ) continue; // It's all air up here
+		if (m_BlockTickY > m_HeightMap[ m_BlockTickX + m_BlockTickZ * Width])
+		{
+			continue; // It's all air up here
+		}
 
 		unsigned int Index = MakeIndexNoCheck( m_BlockTickX, m_BlockTickY, m_BlockTickZ );
-		char ID = m_BlockTypes[Index];
+		BLOCKTYPE ID = m_BlockTypes[Index];
 		switch( ID )
 		{
-			/*
-			// TODO: re-enable
-			case E_BLOCK_DIRT:
-			{
-				char AboveBlock = GetBlock( Index+1 );
-				if ( (AboveBlock == 0) && GetNibble( m_BlockSkyLight, Index ) > 0xf/2 ) // Half lit //changed to not allow grass if any one hit object is on top
-				{
-					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetNibble( m_BlockMeta, Index ) );
-				}
-				if ( (g_BlockOneHitDig[AboveBlock]) && GetNibble( m_BlockSkyLight, Index+1 ) > 0xf/2 ) // Half lit //ch$
-				{
-					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_GRASS, GetNibble( m_BlockMeta, Index ) );
-				}
-
-				break;
-			}
-			*/
-			
 			case E_BLOCK_GRASS:
 			{
-				char AboveBlock = GetBlock( Index + (Width * Width) );
+				// Grass turns into dirt if there's another block on top of it:
+				BLOCKTYPE AboveBlock = GetBlock(Index + (Width * Width) );
 				if (!( (AboveBlock == E_BLOCK_AIR) || (g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock]) ) )
 				{
 					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_DIRT, GetNibble( m_BlockMeta, Index ) );
 				}
+				
+				// TODO: Grass spreads to nearby blocks if there's enough light and free space above that block
+				// Ref.: http://www.minecraftwiki.net/wiki/Grass_Block#Growth
 				break;
 			}
 			
-			case E_BLOCK_SAPLING: //todo: check meta of sapling. change m_World->GrowTree to look change trunk and leaves based on meta of sapling
+			case E_BLOCK_CROPS:
+			{
+				NIBBLETYPE Meta = GetMeta(Index);
+				if (Meta < 7)
+				{
+					FastSetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_CROPS, ++Meta);
+				}
+				break;
+			}
+			
+			case E_BLOCK_PUMPKIN_STEM:
+			case E_BLOCK_MELON_STEM: TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
+			
+			case E_BLOCK_SAPLING:
 			{
 				// Check the highest bit, if set, grow the tree, if not, set it (1-bit delay):
 				NIBBLETYPE Meta = GetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
@@ -612,6 +624,151 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			}
 		}
 	}
+}
+
+
+
+
+
+void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+{
+	NIBBLETYPE Meta = GetMeta(a_BlockIdx);
+	if (Meta < 7)
+	{
+		FastSetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_BlockType, ++Meta);
+		return;
+	}
+	
+	// Convert the stem BlockType into produce BlockType
+	BLOCKTYPE ProduceType;
+	switch (a_BlockType)
+	{
+		case E_BLOCK_MELON_STEM:   ProduceType = E_BLOCK_MELON;   break;
+		case E_BLOCK_PUMPKIN_STEM: ProduceType = E_BLOCK_PUMPKIN; break;
+		default:
+		{
+			ASSERT(!"Unhandled blocktype in TickMelonPumpkin()");
+			return;
+		}
+	}
+
+	// Check if there's another melon / pumpkin around that stem, if so, abort:
+	bool IsValid;
+	BLOCKTYPE BlockType[4];
+	NIBBLETYPE BlockMeta;  // unused
+	IsValid =            UnboundedRelGetBlock(a_RelX + 1, a_RelY, a_RelZ,     BlockType[0], BlockMeta);
+	IsValid = IsValid && UnboundedRelGetBlock(a_RelX - 1, a_RelY, a_RelZ,     BlockType[1], BlockMeta);
+	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ + 1, BlockType[2], BlockMeta);
+	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ - 1, BlockType[3], BlockMeta);
+	if (
+		!IsValid || 
+		(BlockType[0] == ProduceType) || 
+		(BlockType[1] == ProduceType) || 
+		(BlockType[2] == ProduceType) || 
+		(BlockType[3] == ProduceType)
+	)
+	{
+		// Neighbors not valid or already taken by the same produce
+		return;
+	}
+	
+	// Pick a direction in which to place the produce:
+	int x = 0, z = 0;
+	int CheckType = a_TickRandom.randInt(4);  // The index to the neighbors array which should be checked for emptiness
+	switch (CheckType)
+	{
+		case 0: x =  1; break;
+		case 1: x = -1; break;
+		case 2: z =  1; break;
+		case 3: z = -1; break;
+	}
+	
+	// Check that the block in that direction is empty:
+	switch (BlockType[CheckType])
+	{
+		case E_BLOCK_AIR:
+		case E_BLOCK_SNOW:
+		case E_BLOCK_TALL_GRASS:
+		case E_BLOCK_DEAD_BUSH:
+		{
+			break;
+		}
+		default: return;
+	}
+	
+	// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
+	BLOCKTYPE Soil;
+	UnboundedRelGetBlock(a_RelX + x, a_RelY, a_RelZ + z, Soil, BlockMeta);
+	switch (Soil)
+	{
+		case E_BLOCK_DIRT:
+		case E_BLOCK_GRASS:
+		case E_BLOCK_FARMLAND:
+		{
+			// Place a randomly-facing produce:
+			UnboundedRelFastSetBlock(a_RelX + x, a_RelY, a_RelZ + z, ProduceType, (NIBBLETYPE)(a_TickRandom.randInt(4) % 4));
+			break;
+		}
+	}
+}
+
+
+
+
+
+bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+{
+	if ((a_RelX >= 0) && (a_RelX <= cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ <= cChunkDef::Width))
+	{
+		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
+		a_BlockType = GetBlock(BlockIdx);
+		a_BlockMeta = GetMeta(BlockIdx);
+		return true;
+	}
+	return m_ChunkMap->LockedGetBlock(
+		m_PosX * cChunkDef::Width + a_RelX,
+		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
+		m_PosZ * cChunkDef::Width + a_RelZ,
+		a_BlockType, a_BlockMeta
+	);
+}
+
+
+
+
+
+bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	if ((a_RelX >= 0) && (a_RelX <= cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ <= cChunkDef::Width))
+	{
+		SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+		return true;
+	}
+	return m_ChunkMap->LockedSetBlock(
+		m_PosX * cChunkDef::Width + a_RelX,
+		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
+		m_PosZ * cChunkDef::Width + a_RelZ,
+		a_BlockType, a_BlockMeta
+	);
+}
+
+
+
+
+
+bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	if ((a_RelX >= 0) && (a_RelX <= cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ <= cChunkDef::Width))
+	{
+		FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+		return true;
+	}
+	return m_ChunkMap->LockedFastSetBlock(
+		m_PosX * cChunkDef::Width + a_RelX,
+		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
+		m_PosZ * cChunkDef::Width + a_RelZ,
+		a_BlockType, a_BlockMeta
+	);
 }
 
 
@@ -698,176 +855,6 @@ void cChunk::CalculateHeightmap()
 			}  // for y
 		}  // for z
 	}  // for x
-}
-
-
-
-
-
-void cChunk::CalculateLighting()
-{
-	// Calculate sunlight
-	memset(m_BlockSkyLight, 0xff, NumBlocks / 2 ); // Set all to fully lit, so everything above HeightMap is lit
-	for (int x = 0; x < Width; x++)
-	{
-		for (int z = 0; z < Width; z++)
-		{
-			char sunlight = 0xf;
-			for (int y = m_HeightMap[x + z*Width]; y > -1; y--)
-			{
-				int index = MakeIndexNoCheck(x, y, z);
-
-				if( g_BlockTransparent[ (int)m_BlockTypes[index] ] == false )
-				{
-					sunlight = 0x0;
-				}
-				SetNibble( m_BlockSkyLight, index, sunlight );
-			}
-		}
-	}
-
-	// Calculate blocklights
-	for (int x = 0; x < Width; x++)
-	{
-		for (int z = 0; z < Width; z++)
-		{
-			int MaxHeight = m_HeightMap[x + z * Width];
-			for (int y = 0; y < MaxHeight; y++)
-			{
-				char BlockID = GetBlock(x, y, z);
-				SetNibble( m_BlockLight, x, y, z, g_BlockLightValue[(int)BlockID] );
-			}
-		}
-	}
-
-	SpreadLight(m_BlockSkyLight);
-	SpreadLight(m_BlockLight);
-
-	MarkDirty();
-}
-
-
-
-
-
-void cChunk::SpreadLight(NIBBLETYPE * a_LightBuffer)
-{
-	// Spread the light
-	for(int x = 0; x < Width; x++)	for(int z = 0; z < Width; z++)	for(int y = 0; y < Height; y++)
-	{
-		int index = MakeIndexNoCheck(x, y, z);
-		if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
-		{
-			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]);
-		}
-	}
-
-	for(int x = Width-1; x > -1; x--) for(int z = Width-1; z > -1; z--) for(int y = Height-1; y > -1; y--)
-	{
-		int index = MakeIndexNoCheck(x, y, z);
-		if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
-		{
-			SpreadLightOfBlock(a_LightBuffer, x, y, z, g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]);
-		}
-	}
-
-	bool bCalcLeft, bCalcRight, bCalcFront, bCalcBack;
-	bCalcLeft = bCalcRight = bCalcFront = bCalcBack = false;
-	
-	// Spread to neighbour chunks X-axis
-	cChunkPtr LeftChunk  = m_ChunkMap->GetChunkNoGen( m_PosX - 1, m_PosY, m_PosZ );
-	cChunkPtr RightChunk = m_ChunkMap->GetChunkNoGen( m_PosX + 1, m_PosY, m_PosZ );
-	NIBBLETYPE * LeftSky = NULL, * RightSky = NULL;
-	if (LeftChunk->IsValid())
-	{
-		LeftSky = (a_LightBuffer == m_BlockSkyLight) ? LeftChunk->m_BlockSkyLight : LeftChunk->m_BlockLight;
-	}
-	if (RightChunk->IsValid())
-	{
-		RightSky = (a_LightBuffer == m_BlockSkyLight) ? RightChunk->m_BlockSkyLight : RightChunk->m_BlockLight;
-	}
-	
-	for (int z = 0; z < Width; z++) for(int y = 0; y < Height; y++)
-	{
-		if (LeftSky != NULL)
-		{
-			int index = MakeIndexNoCheck( 0, y, z );
-			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
-			{
-				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, 0, y, z );
-				BLOCKTYPE LeftLight = GetNibble( LeftSky, Width-1, y, z );
-				if( LeftLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
-				{
-					SetNibble( LeftSky, Width - 1, y, z, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
-					bCalcLeft = true;
-				}
-			}
-		}
-		if (RightSky != NULL)
-		{
-			int index = MakeIndexNoCheck( Width - 1, y, z );
-			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
-			{
-				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, Width-1, y, z );
-				BLOCKTYPE RightLight = GetNibble( RightSky, 0, y, z );
-				if( RightLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
-				{
-					SetNibble( RightSky, 0, y, z,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
-					bCalcRight = true;
-				}
-			}
-		}
-	}
-
-	// Spread to neighbour chunks Z-axis
-	cChunkPtr FrontChunk = m_ChunkMap->GetChunkNoGen( m_PosX, m_PosY, m_PosZ - 1 );
-	cChunkPtr BackChunk  = m_ChunkMap->GetChunkNoGen( m_PosX, m_PosY, m_PosZ + 1 );
-	NIBBLETYPE * FrontSky = NULL, * BackSky = NULL;
-	if (FrontChunk->IsValid())
-	{
-		FrontSky = (a_LightBuffer == m_BlockSkyLight) ? FrontChunk->m_BlockSkyLight : FrontChunk->m_BlockLight;
-	}
-	if (BackChunk->IsValid())
-	{
-		BackSky = (a_LightBuffer == m_BlockSkyLight) ? BackChunk->m_BlockSkyLight : BackChunk->m_BlockLight;
-	}
-	for(int x = 0; x < Width; x++)	for(int y = 0; y < Height; y++)
-	{
-		if (FrontSky != NULL)
-		{
-			int index = MakeIndexNoCheck( x, y, 0 );
-			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
-			{
-				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, x, y, 0 );
-				BLOCKTYPE FrontLight = GetNibble( FrontSky, x, y, Width-1 );
-				if( FrontLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
-				{
-					SetNibble( FrontSky, x, y, Width-1,  MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
-					bCalcFront = true;
-				}
-			}
-		}
-		if (BackSky != NULL)
-		{
-			int index = MakeIndexNoCheck( x, y, Width-1 );
-			if( g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] > 0 )
-			{
-				BLOCKTYPE CurrentLight = GetNibble( a_LightBuffer, x, y, Width-1 );
-				BLOCKTYPE BackLight = GetNibble( BackSky, x, y, 0 );
-				if ( BackLight < CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ] )
-				{
-					SetNibble( BackSky, x, y, 0, MAX(0, CurrentLight-g_BlockSpreadLightFalloff[ m_BlockTypes[index] ]) );
-					bCalcBack = true;
-				}
-			}
-		}
-	}
-
-	if ( bCalcLeft )  m_World->ReSpreadLighting( m_PosX - 1, m_PosY, m_PosZ );
-	if ( bCalcRight ) m_World->ReSpreadLighting( m_PosX + 1, m_PosY, m_PosZ );
-	if ( bCalcFront ) m_World->ReSpreadLighting( m_PosX, m_PosY, m_PosZ - 1 );
-	if ( bCalcBack )  m_World->ReSpreadLighting( m_PosX, m_PosY, m_PosZ + 1 );
-	// No need to set those neighbors dirty, they will recalc their light anyway so they'll get marked dirty there
 }
 
 

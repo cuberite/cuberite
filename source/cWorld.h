@@ -278,9 +278,6 @@ public:
 
 	void Tick(float a_Dt);
 
-	void ReSpreadLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void RemoveSpread(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-
 	void InitializeSpawn();
 
 	void CastThunderbolt (int a_X, int a_Y, int a_Z);						//tolua_export
@@ -290,6 +287,8 @@ public:
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
 	cChunkMap *       GetChunkMap (void) { return m_ChunkMap; }
+	
+	bool IsPlacingItemLegal(Int16 a_ItemType, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 private:
 
@@ -343,9 +342,6 @@ private:
 	cEntityList       m_AllEntities;
 	cClientHandleList m_Clients;
 	cPlayerList       m_Players;
-
-	cCriticalSection  m_CSLighting;
-	cChunkCoordsList  m_SpreadQueue;
 
 	cCriticalSection m_CSFastSetBlock;
 	sSetBlockList    m_FastSetBlockQueue;

@@ -18,7 +18,7 @@ extern bool g_BlockOneHitDig[];
 inline bool IsValidBlock( int a_BlockID )	//tolua_export
 {											//tolua_export
 	if( a_BlockID > -1 &&
-		a_BlockID <= 121 && //items to 109 are valid for 1.8.1.. 1.9.5 is up to 121
+		a_BlockID <= 126 && //items to 109 are valid for Beta1.8.1.. 1.2.5 is up to 126
 		//a_BlockID != 29 && allow pistons
 		//a_BlockID != 33 && allow pistons
 		a_BlockID != 34 &&
@@ -28,6 +28,10 @@ inline bool IsValidBlock( int a_BlockID )	//tolua_export
 	}
 	return false;
 }											//tolua_export
+
+
+
+
 
 // Was old :o
 // Changed to fit the style ;)
@@ -45,15 +49,27 @@ inline bool IsValidItem( int a_ItemID )		//tolua_export
 	return IsValidBlock( a_ItemID );
 }											//tolua_export
 
+
+
+
+
 inline bool IsBlockWater(char a_BlockID)
 {
 	return (a_BlockID == E_BLOCK_WATER || a_BlockID == E_BLOCK_STATIONARY_WATER);
 }
 
+
+
+
+
 inline bool IsBlockLava(char a_BlockID)
 {
 	return (a_BlockID == E_BLOCK_LAVA || a_BlockID == E_BLOCK_STATIONARY_LAVA);
 }
+
+
+
+
 
 inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false )
 {
@@ -107,6 +123,10 @@ inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, boo
 	}
 }
 
+
+
+
+
 inline void AddDirection( int & a_X, unsigned char & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false ) //tolua_export
 {//tolua_export
 	int Y = a_Y;
@@ -115,6 +135,10 @@ inline void AddDirection( int & a_X, unsigned char & a_Y, int & a_Z, char a_Dire
 	else if( Y > 255 ) a_Y = 255;
 	else a_Y = (unsigned char)Y;
 }//tolua_export
+
+
+
+
 
 #include <math.h>
 #define PI				3.14159265358979323846264338327950288419716939937510582097494459072381640628620899862803482534211706798f
@@ -130,6 +154,10 @@ inline void EulerToVector( float a_Pan, float a_Pitch, float & a_X, float & a_Y,
 	a_Z = sin(a_Pitch / 180 * PI);
 }
 
+
+
+
+
 inline void VectorToEuler( float a_X, float a_Y, float a_Z, float & a_Pan, float & a_Pitch )
 {
 	if( a_X != 0 )
@@ -139,10 +167,18 @@ inline void VectorToEuler( float a_X, float a_Y, float a_Z, float & a_Pan, float
 	a_Pitch = atan2(a_Y, sqrtf((a_X * a_X) + (a_Z * a_Z))) * 180 / PI;
 }
 
+
+
+
+
 inline float GetSignf( float a_Val )
 {
 	return (a_Val < 0.f)?-1.f:1.f;
 }
+
+
+
+
 
 inline float GetSpecialSignf( float a_Val )
 {
@@ -151,35 +187,67 @@ inline float GetSpecialSignf( float a_Val )
 
 
 
+
+
 namespace ItemCategory
 {
 	inline bool IsPickaxe(ENUM_ITEM_ID a_ItemID)
 	{
-		return a_ItemID == E_ITEM_WOODEN_PICKAXE
-			|| a_ItemID == E_ITEM_STONE_PICKAXE
-			|| a_ItemID == E_ITEM_IRON_PICKAXE
-			|| a_ItemID == E_ITEM_GOLD_PICKAXE
-			|| a_ItemID == E_ITEM_DIAMOND_PICKAXE;
+		return (a_ItemID == E_ITEM_WOODEN_PICKAXE)
+			|| (a_ItemID == E_ITEM_STONE_PICKAXE)
+			|| (a_ItemID == E_ITEM_IRON_PICKAXE)
+			|| (a_ItemID == E_ITEM_GOLD_PICKAXE)
+			|| (a_ItemID == E_ITEM_DIAMOND_PICKAXE);
 	}
+
+
 
 	inline bool IsAxe(ENUM_ITEM_ID a_ItemID)
 	{
-		return a_ItemID == E_ITEM_WOODEN_AXE
-			|| a_ItemID == E_ITEM_STONE_AXE
-			|| a_ItemID == E_ITEM_IRON_AXE
-			|| a_ItemID == E_ITEM_GOLD_AXE
-			|| a_ItemID == E_ITEM_DIAMOND_AXE;
+		return (a_ItemID == E_ITEM_WOODEN_AXE)
+			|| (a_ItemID == E_ITEM_STONE_AXE)
+			|| (a_ItemID == E_ITEM_IRON_AXE)
+			|| (a_ItemID == E_ITEM_GOLD_AXE)
+			|| (a_ItemID == E_ITEM_DIAMOND_AXE);
 	}
+
+
 
 	inline bool IsSword(ENUM_ITEM_ID a_ItemID)
 	{
-		return a_ItemID == E_ITEM_WOODEN_SWORD
-			|| a_ItemID == E_ITEM_STONE_SWORD
-			|| a_ItemID == E_ITEM_IRON_SWORD
-			|| a_ItemID == E_ITEM_GOLD_SWORD
-			|| a_ItemID == E_ITEM_DIAMOND_SWORD;
+		return (a_ItemID == E_ITEM_WOODEN_SWORD)
+			|| (a_ItemID == E_ITEM_STONE_SWORD)
+			|| (a_ItemID == E_ITEM_IRON_SWORD)
+			|| (a_ItemID == E_ITEM_GOLD_SWORD)
+			|| (a_ItemID == E_ITEM_DIAMOND_SWORD);
+	}
+
+
+
+	inline bool IsHoe(ENUM_ITEM_ID a_ItemID)
+	{
+		return (a_ItemID == E_ITEM_WOODEN_HOE)
+			|| (a_ItemID == E_ITEM_STONE_HOE)
+			|| (a_ItemID == E_ITEM_IRON_HOE)
+			|| (a_ItemID == E_ITEM_GOLD_HOE)
+			|| (a_ItemID == E_ITEM_DIAMOND_HOE);
+	}
+	
+	
+	
+	inline bool IsShovel(ENUM_ITEM_ID a_ItemID)
+	{
+		return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
+			|| (a_ItemID == E_ITEM_STONE_SHOVEL)
+			|| (a_ItemID == E_ITEM_IRON_SHOVEL)
+			|| (a_ItemID == E_ITEM_GOLD_SHOVEL)
+			|| (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
 	}
 }
+
+
+
+
 
 //tolua_begin
 enum eGameMode
@@ -188,6 +256,10 @@ enum eGameMode
 	eGameMode_Creative    = 1,
 };
 
+
+
+
+
 enum eWeather
 {
 	eWeather_Sunny		  = 0,
@@ -195,4 +267,12 @@ enum eWeather
 	eWeather_ThunderStorm = 2,
 
 };
+
+
+
+
 //tolua_end
+
+
+
+

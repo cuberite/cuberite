@@ -108,7 +108,6 @@ public:
 	void Stay(bool a_Stay = true);
 	
 	void Tick(float a_Dt, MTRand & a_TickRandom);
-	void TickBlocks(MTRand & a_TickRandom);
 
 	int GetPosX() { return m_PosX; }
 	int GetPosY() { return m_PosY; }
@@ -172,12 +171,9 @@ public:
 		m_IsSaving = false;
 	}
 	
-	inline void SpreadBlockSkyLight(void) {SpreadLight(m_BlockSkyLight); }
-	inline void SpreadBlockLight   (void) {SpreadLight(m_BlockLight); }
-	
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                   {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                       {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
+	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                    {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                        {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
+	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
 
 	inline NIBBLETYPE GetLight(int a_RelX, int a_RelY, int a_RelZ)    {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
 	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
@@ -233,7 +229,17 @@ private:
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 
-	void SpreadLight(NIBBLETYPE * a_LightBuffer);
+	void TickBlocks(MTRand & a_TickRandom);
+	void TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom);
+	
+	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	
+	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 };
 
 typedef cChunk * cChunkPtr;

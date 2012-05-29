@@ -360,6 +360,81 @@ void cWorld::CastThunderbolt ( int a_X, int a_Y, int a_Z )
 
 
 
+bool cWorld::IsPlacingItemLegal(Int16 a_ItemType, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	BLOCKTYPE SurfaceBlock = GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
+	switch (a_ItemType)
+	{
+		case E_BLOCK_YELLOW_FLOWER:	// Can ONLY be placed on dirt/grass
+		case E_BLOCK_RED_ROSE:
+		case E_BLOCK_SAPLING:
+		{
+			switch (SurfaceBlock)
+			{
+				case E_BLOCK_DIRT:
+				case E_BLOCK_GRASS:
+				case E_BLOCK_FARMLAND:
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		case E_BLOCK_BROWN_MUSHROOM:	// Can be placed on pretty much anything, with exceptions
+		case E_BLOCK_RED_MUSHROOM:
+		{
+			switch (SurfaceBlock)
+			{
+				case E_BLOCK_GLASS:
+				case E_BLOCK_YELLOW_FLOWER:
+				case E_BLOCK_RED_ROSE:
+				case E_BLOCK_BROWN_MUSHROOM:
+				case E_BLOCK_RED_MUSHROOM:
+				case E_BLOCK_CACTUS:
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		case E_BLOCK_CACTUS:
+		{
+			if ((SurfaceBlock != E_BLOCK_SAND) && (SurfaceBlock != E_BLOCK_CACTUS))
+			{
+				// Cactus can only be placed on sand and itself
+				return false;
+			}
+
+			// Check surroundings. Cacti may ONLY be surrounded by air
+			if (
+				(GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ)     != E_BLOCK_AIR) ||
+				(GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ)     != E_BLOCK_AIR) ||
+				(GetBlock(a_BlockX,     a_BlockY, a_BlockZ - 1) != E_BLOCK_AIR) ||
+				(GetBlock(a_BlockX,     a_BlockY, a_BlockZ + 1) != E_BLOCK_AIR)
+			)
+			{
+				return false;
+			}
+			return true;
+		}
+		
+		case E_ITEM_SEEDS:
+		case E_ITEM_MELON_SEEDS:
+		case E_ITEM_PUMPKIN_SEEDS:
+		{
+			// Seeds can go only on the farmland block:
+			return (SurfaceBlock == E_BLOCK_FARMLAND);
+		}
+	}  // switch (a_Packet->m_ItemType)
+	return true;
+}
+
+
+
+
+
 void cWorld::InitializeSpawn(void)
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
@@ -1457,27 +1532,6 @@ void cWorld::SaveAllChunks(void)
 	LOG("Saving all chunks...");
 	m_LastSave = m_Time;
 	m_ChunkMap->SaveAllChunks();
-}
-
-
-
-
-
-void cWorld::ReSpreadLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSLighting);
-	m_SpreadQueue.remove(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)); 
-	m_SpreadQueue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
-}
-
-
-
-
-
-void cWorld::RemoveSpread(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSLighting);
-	m_SpreadQueue.remove(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
 }
 
 

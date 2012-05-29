@@ -903,7 +903,9 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 
 	if ((Equipped.m_ItemID != a_Packet->m_ItemType))	// Not valid
 	{
-		LOGWARN("Player %s tried to place a block that was not selected! (could indicate bot)", m_Username.c_str());
+		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
+			m_Username.c_str(), Equipped.m_ItemID, a_Packet->m_ItemType
+		);
 		// TODO: We should probably send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
 		return;
 	}
@@ -1311,70 +1313,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			}
 
 			// Check whether selected item is allowed to be placed on specific surface
-			bool bIllegalSurface = false;
-			ENUM_BLOCK_ID SurfaceBlock = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock(X, Y-1, Z);
-			switch (a_Packet->m_ItemType)
-			{
-				case E_BLOCK_YELLOW_FLOWER:	// Can ONLY be placed on dirt/grass
-				case E_BLOCK_RED_ROSE:
-				case E_BLOCK_SAPLING:
-				{
-					switch (SurfaceBlock)
-					{
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						{
-							bIllegalSurface = false;
-							break;
-						}
-						default:
-						{
-							bIllegalSurface = true;
-							break;
-						}
-					};
-					break;
-				}
-				
-				case E_BLOCK_BROWN_MUSHROOM:	// Can be placed on pretty much anything, with exceptions
-				case E_BLOCK_RED_MUSHROOM:
-				{
-					switch (SurfaceBlock)
-					{
-						case E_BLOCK_GLASS:
-						case E_BLOCK_YELLOW_FLOWER:
-						case E_BLOCK_RED_ROSE:
-						case E_BLOCK_BROWN_MUSHROOM:
-						case E_BLOCK_RED_MUSHROOM:
-						case E_BLOCK_CACTUS:
-						{
-							bIllegalSurface = true;
-							break;
-						}
-					}
-					break;
-				}
-				
-				case E_BLOCK_CACTUS:
-				{
-					bIllegalSurface = (SurfaceBlock != E_BLOCK_SAND) && (SurfaceBlock != E_BLOCK_CACTUS);  // Cactus can only be placed on sand and itself
-
-					// Check surroundings. Cacti may ONLY be surrounded by air
-					cWorld * World = m_Player->GetWorld();
-					if (
-						(World->GetBlock(X - 1, Y, Z)     != E_BLOCK_AIR) ||
-						(World->GetBlock(X + 1, Y, Z)     != E_BLOCK_AIR) ||
-						(World->GetBlock(X,     Y, Z - 1) != E_BLOCK_AIR) ||
-						(World->GetBlock(X,     Y, Z + 1) != E_BLOCK_AIR)
-					)
-					{
-						bIllegalSurface = true;
-					}
-					break;
-				}
-			}  // switch (a_Packet->m_ItemType)
-
-			if (bIllegalSurface)
+			if (!m_Player->GetWorld()->IsPlacingItemLegal(a_Packet->m_ItemType, X, Y, Z))
 			{
 				return;
 			}

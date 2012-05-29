@@ -84,7 +84,6 @@ public:
 	
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void      SpreadChunkLighting(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	int       GetHeight          (int a_BlockX, int a_BlockZ);
 	void      FastSetBlocks      (sSetBlockList & a_BlockList);
 	void      CollectPickupsByPlayer(cPlayer * a_Player);
@@ -164,7 +163,7 @@ public:
 
 private:
 
-	friend class cChunk;  // Temporary (until we have a separate Lighting thread), so that cChunk's lighting calc can ask for neighbor chunks
+	friend class cChunk;  // The chunks can manipulate neighbors while in their Tick() method, using LockedGetBlock() and LockedSetBlock()
 
 	class cChunkLayer
 	{
@@ -215,6 +214,15 @@ private:
 	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
 	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Doesn't load, doesn't generate
+	
+	/// Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	
+	/// Sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	bool LockedSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE   a_BlockType, NIBBLETYPE   a_BlockMeta);
+
+	/// Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
+	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE   a_BlockType, NIBBLETYPE   a_BlockMeta);
 };
 
 
