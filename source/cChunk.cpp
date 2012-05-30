@@ -69,7 +69,6 @@ cChunk::cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap,
 	: m_PosX( a_ChunkX )
 	, m_PosY( a_ChunkY )
 	, m_PosZ( a_ChunkZ )
-	, m_BlockTickNum( 0 )
 	, m_BlockTickX( 0 )
 	, m_BlockTickY( 0 )
 	, m_BlockTickZ( 0 )
@@ -533,14 +532,23 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 	int RandomX = a_TickRandom.randInt();
 	int RandomY = a_TickRandom.randInt();
 	int RandomZ = a_TickRandom.randInt();
+	int TickX = m_BlockTickX;
+	int TickY = m_BlockTickY;
+	int TickZ = m_BlockTickZ;
 
 	for (int i = 0; i < 50; i++)
 	{
-		m_BlockTickX = (m_BlockTickX + RandomX) % Width;
-		m_BlockTickY = (m_BlockTickY + RandomY) % Height;
-		m_BlockTickZ = (m_BlockTickZ + RandomZ) % Width;
+		// This weird construct (*2, then /2) is needed,
+		// otherwise the blocktick distribution is too biased towards even coords!
+		
+		TickX = (TickX + RandomX) % (Width * 2);
+		TickY = (TickY + RandomY) % (Height * 2);
+		TickZ = (TickZ + RandomZ) % (Width * 2);
+		m_BlockTickX = TickX / 2;
+		m_BlockTickY = TickY / 2;
+		m_BlockTickZ = TickZ / 2;
 
-		if (m_BlockTickY > m_HeightMap[ m_BlockTickX + m_BlockTickZ * Width])
+		if (m_BlockTickY > cChunkDef::GetHeight(m_HeightMap, m_BlockTickX, m_BlockTickZ))
 		{
 			continue; // It's all air up here
 		}

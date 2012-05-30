@@ -151,16 +151,6 @@ public:
 	void Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude = NULL) {Broadcast(&a_Packet, a_Exclude); }
 	void Broadcast( const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 
-	//   Loaded(blockdata, lightdata, blockentities, entities),
-	//   Generated(blockdata, lightdata, blockentities, entities),
-	//   GetBlockData(blockdatadest) etc.
-	/*
-	BLOCKTYPE * GetBlockTypes   (void) { return m_BlockTypes; }
-	BLOCKTYPE * GetBlockMeta    (void) { return m_BlockMeta; }
-	BLOCKTYPE * GetBlockLight   (void) { return m_BlockLight; }
-	BLOCKTYPE * GetBlockSkyLight(void) { return m_BlockSkyLight; }
-	*/
-	
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
 	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos ) { return PositionToWorldPosition( a_InChunkPos.x, a_InChunkPos.y, a_InChunkPos.z ); }
 	Vector3i PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
@@ -214,8 +204,7 @@ private:
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;
 
-	unsigned int m_BlockTickNum;
-	unsigned int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
+	int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
 
 	void RemoveBlockEntity( cBlockEntity* a_BlockEntity );
 	void AddBlockEntity( cBlockEntity* a_BlockEntity );
