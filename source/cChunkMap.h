@@ -149,6 +149,9 @@ public:
 	
 	/// Returns the number of valid chunks and the number of dirty chunks
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
+	
+		/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
+	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	void Tick( float a_Dt, MTRand & a_TickRand );
 

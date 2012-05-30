@@ -295,6 +295,9 @@ public:
 	
 	bool IsPlacingItemLegal(Int16 a_ItemType, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
+	/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
+	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
+	
 private:
 
 	friend class cRoot;

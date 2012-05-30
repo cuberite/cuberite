@@ -161,6 +161,14 @@ public:
 		m_IsSaving = false;
 	}
 	
+	/// Sets the blockticking to start at the specified block. Only one blocktick may be set, second call overwrites the first call
+	inline void SetNextBlockTick(int a_RelX, int a_RelY, int a_RelZ)
+	{
+		m_BlockTickX = a_RelX;
+		m_BlockTickY = a_RelY;
+		m_BlockTickZ = a_RelZ;
+	}
+	
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                    {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
 	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                        {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }

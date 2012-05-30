@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/30/12 20:19:21.
+** Generated automatically by tolua++-1.0.92 on 05/30/12 23:28:27.
 */
 
 #ifndef __cplusplus
@@ -11072,6 +11072,43 @@ static int tolua_AllToLua_cWorld_GetWeather00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetNextBlockTick of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetNextBlockTick00
+static int tolua_AllToLua_cWorld_SetNextBlockTick00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetNextBlockTick'", NULL);
+#endif
+  {
+   self->SetNextBlockTick(a_BlockX,a_BlockY,a_BlockZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetNextBlockTick'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Clear of class  cInventory */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_Clear00
 static int tolua_AllToLua_cInventory_Clear00(lua_State* tolua_S)
@@ -18387,6 +18424,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"CastThunderbolt",tolua_AllToLua_cWorld_CastThunderbolt00);
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
    tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);
+   tolua_function(tolua_S,"SetNextBlockTick",tolua_AllToLua_cWorld_SetNextBlockTick00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cInventory","cInventory","",NULL);
   tolua_beginmodule(tolua_S,"cInventory");

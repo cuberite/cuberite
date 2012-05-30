@@ -519,16 +519,6 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 void cChunk::TickBlocks(MTRand & a_TickRandom)
 {
 	// Tick dem blocks
-	/*
-	// DEBUG:
-	int RandomX = 0;
-	int RandomY = 1;
-	int RandomZ = 0;
-	m_BlockTickX = 0;
-	m_BlockTickY = 40;
-	m_BlockTickZ = 0;
-	*/
-	
 	int RandomX = a_TickRandom.randInt();
 	int RandomY = a_TickRandom.randInt();
 	int RandomZ = a_TickRandom.randInt();
@@ -536,17 +526,21 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 	int TickY = m_BlockTickY;
 	int TickZ = m_BlockTickZ;
 
-	for (int i = 0; i < 50; i++)
-	{
+	// This for loop looks disgusting, but it actually does a simple thing - first processes m_BlockTick, then adds random to it
+	// This is so that SetNextBlockTick() works
+	for (int i = 0; i < 50; i++,
+	
 		// This weird construct (*2, then /2) is needed,
 		// otherwise the blocktick distribution is too biased towards even coords!
 		
-		TickX = (TickX + RandomX) % (Width * 2);
-		TickY = (TickY + RandomY) % (Height * 2);
-		TickZ = (TickZ + RandomZ) % (Width * 2);
-		m_BlockTickX = TickX / 2;
-		m_BlockTickY = TickY / 2;
-		m_BlockTickZ = TickZ / 2;
+		TickX = (TickX + RandomX) % (Width * 2),
+		TickY = (TickY + RandomY) % (Height * 2),
+		TickZ = (TickZ + RandomZ) % (Width * 2),
+		m_BlockTickX = TickX / 2,
+		m_BlockTickY = TickY / 2,
+		m_BlockTickZ = TickZ / 2
+	)
+	{
 
 		if (m_BlockTickY > cChunkDef::GetHeight(m_HeightMap, m_BlockTickX, m_BlockTickZ))
 		{

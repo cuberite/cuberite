@@ -435,6 +435,15 @@ bool cWorld::IsPlacingItemLegal(Int16 a_ItemType, int a_BlockX, int a_BlockY, in
 
 
 
+void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 void cWorld::InitializeSpawn(void)
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
