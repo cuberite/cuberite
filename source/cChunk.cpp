@@ -686,7 +686,7 @@ void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx
 	
 	// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
 	BLOCKTYPE Soil;
-	UnboundedRelGetBlock(a_RelX + x, a_RelY, a_RelZ + z, Soil, BlockMeta);
+	UnboundedRelGetBlock(a_RelX + x, a_RelY - 1, a_RelZ + z, Soil, BlockMeta);
 	switch (Soil)
 	{
 		case E_BLOCK_DIRT:
