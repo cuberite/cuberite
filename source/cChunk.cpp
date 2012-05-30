@@ -576,6 +576,8 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			case E_BLOCK_PUMPKIN_STEM:
 			case E_BLOCK_MELON_STEM: TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
 			
+			case E_BLOCK_FARMLAND: TickFarmland(m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
+			
 			case E_BLOCK_SAPLING:
 			{
 				// Check the highest bit, if set, grow the tree, if not, set it (1-bit delay):
@@ -694,9 +696,79 @@ void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx
 
 
 
+void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
+{
+	// TODO: Rain hydrates blocks, too. Check world weather, don't search for water if raining.
+	
+	// Search for water in a close proximity:
+	// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+	bool Found = false;
+	for (int y = a_RelY; y <= a_RelY + 1; y++)
+	{
+		for (int z = a_RelZ - 4; z <= a_RelZ + 4; z++)
+		{
+			for (int x = a_RelX - 4; x <= a_RelX + 4; x++)
+			{
+				BLOCKTYPE BlockType;
+				NIBBLETYPE Meta;  // unused
+				
+				if (!UnboundedRelGetBlock(x, y, z, BlockType, Meta))
+				{
+					// Too close to an unloaded chunk, we might miss a water block there, so don't tick at all
+					return;
+				}
+				if (
+					(BlockType == E_BLOCK_WATER) ||
+					(BlockType == E_BLOCK_STATIONARY_WATER)
+				)
+				{
+					Found = true;
+					break;
+				}
+			}  // for x
+			if (Found)
+			{
+				break;
+			}
+		}  // for z
+		if (Found)
+		{
+			break;
+		}
+	}  // for y
+	
+	NIBBLETYPE BlockMeta = GetMeta(a_RelX, a_RelY, a_RelZ);
+	
+	if (Found)
+	{
+		// Water was found, hydrate the block until hydration reaches 7:
+		if (BlockMeta < 7)
+		{
+			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, ++BlockMeta);
+		}
+		return;
+	}
+
+	// Water wasn't found, de-hydrate block:
+	if (BlockMeta > 0)
+	{
+		FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, --BlockMeta);
+		return;
+	}
+	
+	// Farmland too dry. Turn back to dirt:
+	FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+	
+	// TODO: Uproot whatever was growing on top:
+}
+
+
+
+
+
 bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	if ((a_RelX >= 0) && (a_RelX <= cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ <= cChunkDef::Width))
+	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 		a_BlockType = GetBlock(BlockIdx);
@@ -717,7 +789,7 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelX >= 0) && (a_RelX <= cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ <= cChunkDef::Width))
+	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 		return true;
@@ -736,7 +808,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelX >= 0) && (a_RelX <= cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ <= cChunkDef::Width))
+	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 		return true;
