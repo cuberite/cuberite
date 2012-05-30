@@ -1006,7 +1006,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			return;
 		}
 
-		char MetaData = (char)Equipped.m_ItemHealth;
+		NIBBLETYPE MetaData = (NIBBLETYPE)Equipped.m_ItemHealth;  // This generally works for logs & planks, others will override
 		bool LavaBucket = false;
 		bool WaterBucket = false;
 		bool bRemoveItem = true;
@@ -1202,6 +1202,33 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				a_Packet->m_ItemType = E_ITEM_FIRE;
 				m_Player->UseEquippedItem();
 				bRemoveItem = false;
+				break;
+			}
+			case E_ITEM_SEEDS:
+			{
+				if (ClickedBlock != E_BLOCK_FARMLAND)
+				{
+					return;
+				}
+				a_Packet->m_ItemType = E_BLOCK_CROPS;
+				break;
+			}
+			case E_ITEM_MELON_SEEDS:
+			{
+				if (ClickedBlock != E_BLOCK_FARMLAND)
+				{
+					return;
+				}
+				a_Packet->m_ItemType = E_BLOCK_MELON_STEM;
+				break;
+			}
+			case E_ITEM_PUMPKIN_SEEDS: 
+			{
+				if (ClickedBlock != E_BLOCK_FARMLAND)
+				{
+					return;
+				}
+				a_Packet->m_ItemType = E_BLOCK_PUMPKIN_STEM;
 				break;
 			}
 			default:
