@@ -259,36 +259,14 @@ void cChunk::SetAllData(
 		CalculateHeightmap();
 	}
 
-	// Clear the internal entities:
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
-	{
-		if ((*itr)->GetEntityType() == cEntity::eEntityType_Player)
-		{
-			// Move players into the new entity list
-			a_Entities.push_back(*itr);
-		}
-		else
-		{
-			// Delete other entities (there should not be any, since we're now loading / generating the chunk)
-			LOGWARNING("cChunk: There is an unexpected entity #%d of type %s in chunk [%d, %d]; it will be deleted",
-				(*itr)->GetUniqueID(), (*itr)->GetClass(),
-				m_PosX, m_PosZ
-			);
-
-			// MD 2012_03_10: This may happen if a mob is generated near the edge of loaded chunks and walks off of the edge.
-			// Older: Assert because this is a very curious case. These lines were executed once before, when a player died, re spawned, and walked around a bit. It's uncertain why an entity would be in the chunk in this case.
-			// ASSERT(!"Unexpected entity in chunk!");
-
-			(*itr)->Destroy();
-		}
-	}
+	// Append entities to current entity list:
+	m_Entities.splice(m_Entities.end(), a_Entities);
+	
+	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		delete *itr;
 	}
-	
-	// Swap the entity lists:
-	std::swap(a_Entities, m_Entities);
 	std::swap(a_BlockEntities, m_BlockEntities);
 	
 	// Create block entities that the loader didn't load; fill them with defaults
