@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/27/12 16:02:28.
+** Generated automatically by tolua++-1.0.92 on 05/30/12 20:19:21.
 */
 
 #ifndef __cplusplus
@@ -10842,6 +10842,134 @@ static int tolua_AllToLua_cWorld_GetNumChunks00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetGeneratorQueueLength of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetGeneratorQueueLength00
+static int tolua_AllToLua_cWorld_GetGeneratorQueueLength00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetGeneratorQueueLength'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetGeneratorQueueLength();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetGeneratorQueueLength'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetLightingQueueLength of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetLightingQueueLength00
+static int tolua_AllToLua_cWorld_GetLightingQueueLength00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLightingQueueLength'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetLightingQueueLength();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetLightingQueueLength'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetStorageLoadQueueLength of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetStorageLoadQueueLength00
+static int tolua_AllToLua_cWorld_GetStorageLoadQueueLength00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetStorageLoadQueueLength'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetStorageLoadQueueLength();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetStorageLoadQueueLength'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetStorageSaveQueueLength of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetStorageSaveQueueLength00
+static int tolua_AllToLua_cWorld_GetStorageSaveQueueLength00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetStorageSaveQueueLength'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetStorageSaveQueueLength();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetStorageSaveQueueLength'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: CastThunderbolt of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_CastThunderbolt00
 static int tolua_AllToLua_cWorld_CastThunderbolt00(lua_State* tolua_S)
@@ -11414,7 +11542,7 @@ static int tolua_AllToLua_cItem_GetJson00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Json::Value",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -11422,7 +11550,7 @@ static int tolua_AllToLua_cItem_GetJson00(lua_State* tolua_S)
  else
 #endif
  {
-  cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
+  const cItem* self = (const cItem*)  tolua_tousertype(tolua_S,1,0);
   Json::Value* a_OutValue = ((Json::Value*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetJson'", NULL);
@@ -17519,6 +17647,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_WORKBENCH",E_BLOCK_WORKBENCH);
   tolua_constant(tolua_S,"E_BLOCK_CROPS",E_BLOCK_CROPS);
   tolua_constant(tolua_S,"E_BLOCK_SOIL",E_BLOCK_SOIL);
+  tolua_constant(tolua_S,"E_BLOCK_FARMLAND",E_BLOCK_FARMLAND);
   tolua_constant(tolua_S,"E_BLOCK_FURNACE",E_BLOCK_FURNACE);
   tolua_constant(tolua_S,"E_BLOCK_BURNING_FURNACE",E_BLOCK_BURNING_FURNACE);
   tolua_constant(tolua_S,"E_BLOCK_SIGN_POST",E_BLOCK_SIGN_POST);
@@ -18251,6 +18380,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cWorld_GetName00);
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cWorld_SaveAllChunks00);
    tolua_function(tolua_S,"GetNumChunks",tolua_AllToLua_cWorld_GetNumChunks00);
+   tolua_function(tolua_S,"GetGeneratorQueueLength",tolua_AllToLua_cWorld_GetGeneratorQueueLength00);
+   tolua_function(tolua_S,"GetLightingQueueLength",tolua_AllToLua_cWorld_GetLightingQueueLength00);
+   tolua_function(tolua_S,"GetStorageLoadQueueLength",tolua_AllToLua_cWorld_GetStorageLoadQueueLength00);
+   tolua_function(tolua_S,"GetStorageSaveQueueLength",tolua_AllToLua_cWorld_GetStorageSaveQueueLength00);
    tolua_function(tolua_S,"CastThunderbolt",tolua_AllToLua_cWorld_CastThunderbolt00);
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
    tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);
