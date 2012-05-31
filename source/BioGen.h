@@ -39,24 +39,6 @@ protected:
 
 
 
-class cBioGenDistortedVoronoi :
-	public cBiomeGen
-{
-public:
-	cBioGenDistortedVoronoi(int a_Seed) : m_Seed(a_Seed) {}
-
-protected:
-
-	int m_Seed;
-
-	// cBiomeGen override:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-} ;
-
-
-
-
-
 /// Base class for generators that use a list of available biomes. This class takes care of the list.
 class cBiomeGenList :
 	public cBiomeGen
@@ -124,6 +106,29 @@ protected:
 	
 	EMCSBiome VoronoiBiome(int a_BlockX, int a_BlockZ);
 } ;
+
+
+
+
+
+class cBioGenDistortedVoronoi :
+	public cBioGenVoronoi
+{
+public:
+	cBioGenDistortedVoronoi(int a_Seed, int a_CellSize, const AString & a_Biomes) :
+		cBioGenVoronoi(a_Seed, a_CellSize, a_Biomes)
+	{
+	}
+
+protected:
+
+	// cBiomeGen override:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	
+	/// Distorts the coords using a Perlin-like noise
+	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ);
+} ;
+
 
 
 

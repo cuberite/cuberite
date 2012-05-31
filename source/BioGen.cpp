@@ -26,23 +26,6 @@ void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cBioGenDistortedVoronoi:
-
-void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
-{
-	// TODO: Replace this placeholder
-	ASSERT(!"Not implemented yet");
-	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		a_BiomeMap[i] = (EMCSBiome)(a_ChunkX + a_ChunkZ);
-	}
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBiomeGenList:
 
 void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
@@ -173,6 +156,47 @@ EMCSBiome cBioGenVoronoi::VoronoiBiome(int a_BlockX, int a_BlockZ)
 
 	return res;
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBioGenDistortedVoronoi:
+
+void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	int BaseZ = cChunkDef::Width * a_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkX;
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		int AbsoluteZ = BaseZ + z;
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int DistX, DistZ;
+			Distort(BaseX + x, AbsoluteZ, DistX, DistZ);
+			cChunkDef::SetBiome(a_BiomeMap, x, z, VoronoiBiome(DistX, DistZ));
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ)
+{
+	double NoiseX = m_Noise.CubicNoise3D((float)a_BlockX / m_CellSize, (float)a_BlockZ / m_CellSize, 1000);
+	NoiseX += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / m_CellSize, 2 *  (float)a_BlockZ / m_CellSize, 2000);
+	NoiseX += 0.08 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / m_CellSize, 16 * (float)a_BlockZ / m_CellSize, 3000);
+	double NoiseZ = m_Noise.CubicNoise3D((float)a_BlockX / m_CellSize, (float)a_BlockZ / m_CellSize, 4000);
+	NoiseZ += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / m_CellSize, 2 *  (float)a_BlockZ / m_CellSize, 5000);
+	NoiseZ += 0.08 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / m_CellSize, 16 * (float)a_BlockZ / m_CellSize, 6000);
+	
+	a_DistortedX = a_BlockX + (int)(m_CellSize * 0.5 * NoiseX);
+	a_DistortedZ = a_BlockZ + (int)(m_CellSize * 0.5 * NoiseZ);
+}
+
 
 
 

@@ -139,7 +139,9 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		{
 			LOGWARNING("Unknown BiomeGen \"%s\", using \"distortedvoronoi\" instead.", BiomeGenName.c_str());
 		}
-		m_BiomeGen = new cBioGenDistortedVoronoi(m_Seed);
+		int CellSize = a_IniFile.GetValueI("Generator", "DistortedVoronoiCellSize", 96);
+		AString Biomes = a_IniFile.GetValue("Generator", "DistortedVoronoiBiomes", "");
+		m_BiomeGen = new cBioGenDistortedVoronoi(m_Seed, CellSize, Biomes);
 	}
 }
 
