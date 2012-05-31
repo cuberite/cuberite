@@ -108,7 +108,9 @@ public:
 	
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
-	void UnloadUnusedChunks(void);
+	
+	void UnloadUnusedChunks(void);    // tolua_export
+	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
 	// MOTD
