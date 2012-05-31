@@ -656,7 +656,7 @@ void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx
 	
 	// Pick a direction in which to place the produce:
 	int x = 0, z = 0;
-	int CheckType = a_TickRandom.randInt(4);  // The index to the neighbors array which should be checked for emptiness
+	int CheckType = a_TickRandom.randInt(3);  // The index to the neighbors array which should be checked for emptiness
 	switch (CheckType)
 	{
 		case 0: x =  1; break;
