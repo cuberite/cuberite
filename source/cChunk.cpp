@@ -519,9 +519,10 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 void cChunk::TickBlocks(MTRand & a_TickRandom)
 {
 	// Tick dem blocks
-	int RandomX = a_TickRandom.randInt();
-	int RandomY = a_TickRandom.randInt();
-	int RandomZ = a_TickRandom.randInt();
+	// _X: We must limit the random number or else we get a nasty int overflow bug ( http://forum.mc-server.org/showthread.php?tid=457 )
+	int RandomX = a_TickRandom.randInt(0x00ffffff);
+	int RandomY = a_TickRandom.randInt(0x00ffffff);
+	int RandomZ = a_TickRandom.randInt(0x00ffffff);
 	int TickX = m_BlockTickX;
 	int TickY = m_BlockTickY;
 	int TickZ = m_BlockTickZ;
