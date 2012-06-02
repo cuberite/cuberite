@@ -282,10 +282,11 @@ void cCompoGenBiomal::ComposeTerrain(
 						FillColumnWaterMix(a_ChunkX, a_ChunkZ, x, z, Height, a_BlockTypes);
 						break;
 					}
-				}
-			}
-		}
-	}
+				}  // switch (biome)
+			}  // else (under water)
+			cChunkDef::SetBlock(a_BlockTypes, x, 0, z, E_BLOCK_BEDROCK);
+		}  // for x
+	}  // for z
 }
 
 
