@@ -82,6 +82,9 @@ void cStructGenTrees::GenStructures(
 			cChunkDef::BlockNibbles * BlM;
 			cChunkDef::HeightMap *    Hei;
 			
+			cChunkDef::BiomeMap Biomes;
+			m_BiomeGen->GenBiomes(BaseX, BaseZ, Biomes);
+
 			if ((x != 1) || (z != 1))
 			{
 				BlT = &WorkerBlockTypes;
@@ -89,7 +92,7 @@ void cStructGenTrees::GenStructures(
 				Hei = &WorkerHeight;
 				
 				m_HeightGen->GenHeightMap       (BaseX, BaseZ, *Hei);
-				m_CompositionGen->ComposeTerrain(BaseX, BaseZ, *BlT, *BlM, *Hei, Entities, BlockEntities);
+				m_CompositionGen->ComposeTerrain(BaseX, BaseZ, *BlT, *BlM, *Hei, Biomes, Entities, BlockEntities);
 				// TODO: Free the entity lists
 			}
 			else
@@ -99,8 +102,6 @@ void cStructGenTrees::GenStructures(
 				Hei = &a_HeightMap;
 			}
 
-			cChunkDef::BiomeMap Biomes;
-			m_BiomeGen->GenBiomes(BaseX, BaseZ, Biomes);
 			int NumTrees = GetNumTrees(BaseX, BaseZ, Biomes);
 
 			for (int i = 0; i < NumTrees; i++)

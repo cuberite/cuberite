@@ -93,6 +93,7 @@ public:
 		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated (the whole array gets initialized, even air)
 		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated (the whole array gets initialized)
 		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 	) = 0;

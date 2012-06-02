@@ -5,6 +5,7 @@
 	- cCompoGenSameBlock
 	- cCompoGenDebugBiomes
 	- cCompoGenClassic
+	- cCompoGenBiomal
 */
 
 
@@ -14,6 +15,7 @@
 #pragma once
 
 #include "cChunkGenerator.h"
+#include "cNoise.h"
 
 
 
@@ -39,6 +41,7 @@ protected:
 		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
 		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
 		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 	) override;
@@ -52,11 +55,9 @@ class cCompoGenDebugBiomes :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenDebugBiomes(cBiomeGen * a_BiomeGen) : m_BiomeGen(a_BiomeGen) {}
+	cCompoGenDebugBiomes(void) {}
 	
 protected:
-
-	cBiomeGen * m_BiomeGen;
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(
@@ -64,6 +65,7 @@ protected:
 		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
 		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
 		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 	) override;
@@ -91,9 +93,50 @@ protected:
 		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
 		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
 		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 	) override;
+} ;
+
+
+
+
+
+class cCompoGenBiomal :
+	public cTerrainCompositionGen
+{
+public:
+	cCompoGenBiomal(int a_Seed, int a_SeaLevel) :
+		m_Noise(a_Seed + 1000),
+		m_SeaLevel(a_SeaLevel - 1)  // we do an adjustment later in filling the terrain with water
+	{
+	}
+	
+protected:
+
+	cNoise m_Noise;
+	int    m_SeaLevel;
+	
+	// cTerrainCompositionGen overrides:
+	virtual void ComposeTerrain(
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
+		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
+		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
+		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
+		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
+	) override;
+	
+	void FillColumnGrass    (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
+	void FillColumnSand     (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
+	void FillColumnMycelium (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
+	void FillColumnWaterSand(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
+	
+	void FillColumnWaterMix (int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
+	
+	void FillColumnPattern  (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes, const BLOCKTYPE * a_Pattern, int a_PatternSize);
 } ;
 
 

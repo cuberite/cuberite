@@ -23,6 +23,7 @@ void cCompoGenSameBlock::ComposeTerrain(
 	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
 	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
 	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 )
@@ -63,6 +64,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
 	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
 	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 )
@@ -97,14 +99,11 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 	memset(a_BlockTypes, E_BLOCK_AIR, sizeof(a_BlockTypes));
 	memset(a_BlockMeta, 0, sizeof(a_BlockMeta));
 
-	cChunkDef::BiomeMap BiomeMap;
-	m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
-	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			BLOCKTYPE BlockType = Blocks[cChunkDef::GetBiome(BiomeMap, x, z) % ARRAYCOUNT(Blocks)];
+			BLOCKTYPE BlockType = Blocks[cChunkDef::GetBiome(a_BiomeMap, x, z) % ARRAYCOUNT(Blocks)];
 			for (int y = a_HeightMap[x + cChunkDef::Width * z]; y >= 0; y--)
 			{
 				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockType);
@@ -136,6 +135,7 @@ void cCompoGenClassic::ComposeTerrain(
 	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
 	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
 	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
 	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
 	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
 )
@@ -163,7 +163,7 @@ void cCompoGenClassic::ComposeTerrain(
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Height = a_HeightMap[x + cChunkDef::Width * z];
+			int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
 			const BLOCKTYPE * Pattern;
 			if (Height > m_SeaLevel + m_BeachHeight)
 			{
@@ -194,6 +194,221 @@ void cCompoGenClassic::ComposeTerrain(
 			cChunkDef::SetBlock(a_BlockTypes, x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCompoGenBiomal:
+
+void cCompoGenBiomal::ComposeTerrain(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
+	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
+	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
+	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
+	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
+)
+{
+	memset(a_BlockTypes, 0, sizeof(a_BlockTypes));
+	memset(a_BlockMeta,  0, sizeof(a_BlockMeta));
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+			if (Height > m_SeaLevel)
+			{
+				switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+				{
+					case biOcean:
+					case biPlains:
+					case biExtremeHills:
+					case biForest:
+					case biTaiga:
+					case biSwampland:
+					case biRiver:
+					case biFrozenOcean:
+					case biFrozenRiver:
+					case biIcePlains:
+					case biIceMountains:
+					case biDesertHills:
+					case biForestHills:
+					case biTaigaHills:
+					case biExtremeHillsEdge:
+					case biJungle:
+					case biJungleHills:
+					{
+						FillColumnGrass(x, z, Height, a_BlockTypes);
+						break;
+					}
+					case biDesert:
+					case biBeach:
+					{
+						FillColumnSand(x, z, Height, a_BlockTypes);
+						break;
+					}
+					case biMushroomIsland:
+					case biMushroomShore:
+					{
+						FillColumnMycelium(x, z, Height, a_BlockTypes);
+						break;
+					}
+					default:
+					{
+						// TODO
+						ASSERT(!"CompoGenBiomal: Biome not implemented yet!");
+						break;
+					}
+				}
+			}
+			else
+			{
+				switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+				{
+					case biDesert:
+					case biBeach:
+					{
+						// Fill with water, sand, sandstone and stone
+						FillColumnWaterSand(x, z, Height, a_BlockTypes);
+						break;
+					}
+					default:
+					{
+						// Fill with water, sand/dirt/clay mix and stone
+						FillColumnWaterMix(a_ChunkX, a_ChunkZ, x, z, Height, a_BlockTypes);
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+void cCompoGenBiomal::FillColumnGrass(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	BLOCKTYPE Pattern[] =
+	{
+		E_BLOCK_GRASS,
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+	} ;
+	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
+	
+	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
+	}
+}
+
+
+
+
+
+void cCompoGenBiomal::FillColumnSand(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	BLOCKTYPE Pattern[] =
+	{
+		E_BLOCK_SAND,
+		E_BLOCK_SAND,
+		E_BLOCK_SAND,
+		E_BLOCK_SANDSTONE,
+	} ;
+	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
+	
+	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
+	}
+}
+
+
+
+
+
+
+void cCompoGenBiomal::FillColumnMycelium (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	BLOCKTYPE Pattern[] =
+	{
+		E_BLOCK_MYCELIUM,
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+	} ;
+	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
+	
+	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
+	}
+}
+
+
+
+
+
+void cCompoGenBiomal::FillColumnWaterSand(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	FillColumnSand(a_RelX, a_RelZ, a_Height, a_BlockTypes);
+	for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_WATER);
+	}
+}
+
+
+
+
+
+void cCompoGenBiomal::FillColumnWaterMix(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+{
+	if (m_Noise.CubicNoise2D(0.5f * (cChunkDef::Width * a_ChunkX + a_RelX), 0.5f * (cChunkDef::Width * a_ChunkZ + a_RelZ)) < 0)
+	{
+		FillColumnWaterSand(a_RelX, a_RelZ, a_Height, a_BlockTypes);
+	}
+	else
+	{
+		// Dirt
+		BLOCKTYPE Pattern[] =
+		{
+			E_BLOCK_DIRT,
+			E_BLOCK_DIRT,
+			E_BLOCK_DIRT,
+			E_BLOCK_DIRT,
+		} ;
+		FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
+	
+		for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+		{
+			cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
+		}
+		for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
+		{
+			cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_WATER);
+		}
+	}
+}
+
+
+
+
+
+
+void cCompoGenBiomal::FillColumnPattern(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes, const BLOCKTYPE * a_Pattern, int a_PatternSize)
+{
+	for (int y = a_Height, idx = 0; (y >= 0) && (idx < a_PatternSize); y--, idx++)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, a_Pattern[idx]);
+	}
 }
 
 

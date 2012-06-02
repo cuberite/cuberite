@@ -251,18 +251,23 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(CompoGenName, "debugbiomes") == 0)
 	{
-		m_CompositionGen = new cCompoGenDebugBiomes(m_BiomeGen);
+		m_CompositionGen = new cCompoGenDebugBiomes;
 	}
-	else
+	else if (NoCaseCompare(CompoGenName, "classic") == 0)
 	{
-		if (NoCaseCompare(CompoGenName, "classic") != 0)
-		{
-			LOGWARN("Unknown CompositionGen \"%s\", using \"classic\" instead.", CompoGenName.c_str());
-		}
 		int SeaLevel    = a_IniFile.GetValueI("Generator", "ClassicSeaLevel", 60);
 		int BeachHeight = a_IniFile.GetValueI("Generator", "ClassicBeachHeight", 2);
 		int BeachDepth  = a_IniFile.GetValueI("Generator", "ClassicBeachDepth", 4);
 		m_CompositionGen = new cCompoGenClassic(SeaLevel, BeachHeight, BeachDepth);
+	}
+	else
+	{
+		if (NoCaseCompare(CompoGenName, "biomal") != 0)
+		{
+			LOGWARN("Unknown CompositionGen \"%s\", using \"biomal\" instead.", CompoGenName.c_str());
+		}
+		int SeaLevel    = a_IniFile.GetValueI("Generator", "BiomalSeaLevel", 62);
+		m_CompositionGen = new cCompoGenBiomal(m_Seed, SeaLevel);
 	}
 }
 
@@ -461,7 +466,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	// Use the composed generator:
 	m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
 	m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
-	m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, Entities, BlockEntities);
+	m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
 	for (cStructureGenList::iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
 	{
 		(*itr)->GenStructures(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, Entities, BlockEntities);
