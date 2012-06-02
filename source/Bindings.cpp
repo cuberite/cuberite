@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/31/12 22:03:38.
+** Generated automatically by tolua++-1.0.92 on 06/02/12 11:29:17.
 */
 
 #ifndef __cplusplus
@@ -12888,38 +12888,6 @@ static int tolua_AllToLua_cRoot_GetServer00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetWorld of class  cRoot */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetWorld00
-static int tolua_AllToLua_cRoot_GetWorld00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWorld'", NULL);
-#endif
-  {
-   OBSOLETE cWorld* tolua_ret = (OBSOLETE cWorld*)  self->GetWorld();
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetWorld'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetDefaultWorld of class  cRoot */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetDefaultWorld00
 static int tolua_AllToLua_cRoot_GetDefaultWorld00(lua_State* tolua_S)
@@ -12953,9 +12921,10 @@ static int tolua_AllToLua_cRoot_GetDefaultWorld00(lua_State* tolua_S)
 #endif //#ifndef TOLUA_DISABLE
 
 /* method: GetWorld of class  cRoot */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetWorld01
-static int tolua_AllToLua_cRoot_GetWorld01(lua_State* tolua_S)
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_GetWorld00
+static int tolua_AllToLua_cRoot_GetWorld00(lua_State* tolua_S)
 {
+#ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
@@ -12964,6 +12933,7 @@ static int tolua_AllToLua_cRoot_GetWorld01(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
+#endif
  {
   cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
   const AString a_WorldName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
@@ -12977,8 +12947,11 @@ static int tolua_AllToLua_cRoot_GetWorld01(lua_State* tolua_S)
   }
  }
  return 2;
-tolua_lerror:
- return tolua_AllToLua_cRoot_GetWorld00(tolua_S);
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWorld'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -18563,9 +18536,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cRoot");
    tolua_function(tolua_S,"Get",tolua_AllToLua_cRoot_Get00);
    tolua_function(tolua_S,"GetServer",tolua_AllToLua_cRoot_GetServer00);
-   tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cRoot_GetWorld00);
    tolua_function(tolua_S,"GetDefaultWorld",tolua_AllToLua_cRoot_GetDefaultWorld00);
-   tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cRoot_GetWorld01);
+   tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cRoot_GetWorld00);
    tolua_function(tolua_S,"GetGroupManager",tolua_AllToLua_cRoot_GetGroupManager00);
    tolua_function(tolua_S,"GetRecipeChecker",tolua_AllToLua_cRoot_GetRecipeChecker00);
    tolua_function(tolua_S,"GetFurnaceRecipe",tolua_AllToLua_cRoot_GetFurnaceRecipe00);

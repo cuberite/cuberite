@@ -102,6 +102,94 @@ static int tolua_LOGERROR(lua_State* tolua_S)
 
 
 
+static int tolua_cRoot_ForEachWorld(lua_State * tolua_S)
+{
+	int NumArgs = lua_gettop( tolua_S ) - 1; // This includes 'self'
+	if ((NumArgs != 1) && (NumArgs != 2))
+	{
+		LOGWARN("Error in function call 'ForEachWorld': Requires 1 or 2 arguments, got %i", NumArgs);
+		return 0;
+	}
+
+	cRoot * self = (cRoot *)tolua_tousertype(tolua_S, 1, 0);
+
+	if (!lua_isfunction(tolua_S, 2))
+	{
+		LOGWARN("Error in function call 'ForEachWorld': Expected a function for parameter #1");
+		return 0;
+	}
+
+	// luaL_ref gets reference to value on top of the stack, the table is the last argument and therefore on the top
+	int TableRef = LUA_REFNIL;
+	if( NumArgs == 2 )
+	{
+		TableRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+		if( TableRef == LUA_REFNIL )
+		{
+			LOGWARN("Error in function call 'ForEachWorld': Could not get value reference of parameter #2");
+			return 0;
+		}
+	}
+
+	// table value is popped, and now function is on top of the stack
+	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+	if( FuncRef == LUA_REFNIL )
+	{
+		LOGWARN("Error in function call 'ForEachWorld': Could not get function reference of parameter #1");
+		return 0;
+	}
+
+	class cLuaWorldCallback : public cWorldListCallback
+	{
+	public:
+		cLuaWorldCallback( lua_State* a_LuaState, int a_FuncRef, int a_TableRef )
+			: LuaState( a_LuaState )
+			, FuncRef( a_FuncRef )
+			, TableRef( a_TableRef )
+		{}
+
+	private:
+		virtual bool Item(cWorld * a_World) override
+		{
+			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef); // Push function reference
+			tolua_pushusertype( LuaState, a_World, "cWorld" );
+			if (TableRef != LUA_REFNIL)
+			{
+				lua_rawgeti(LuaState, LUA_REGISTRYINDEX, TableRef); // Push table reference
+			}
+
+			int s = lua_pcall( LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
+			if (report_errors(LuaState, s))
+			{
+				return true;  // break enumeration
+			}
+
+			if (lua_isboolean( LuaState, -1))
+			{
+				return (tolua_toboolean( LuaState, -1, 0) > 0);
+			}
+			return false;  // continue enumeration
+		}
+		lua_State* LuaState;
+		int FuncRef;
+		int TableRef;
+	} Callback( tolua_S, FuncRef, TableRef );
+
+	bool bRetVal = self->ForEachWorld(Callback);
+
+	// Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references
+	luaL_unref( tolua_S, LUA_REGISTRYINDEX, TableRef );
+	luaL_unref( tolua_S, LUA_REGISTRYINDEX, FuncRef );
+
+	// Push return value on stack
+	tolua_pushboolean( tolua_S, bRetVal );
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWorld_ForEachPlayer(lua_State* tolua_S)
 {
 	int NumArgs = lua_gettop( tolua_S )-1; // This includes 'self'
@@ -161,16 +249,16 @@ static int tolua_cWorld_ForEachPlayer(lua_State* tolua_S)
 			int s = lua_pcall( LuaState, (TableRef==LUA_REFNIL?1:2), 1, 0);
 			if( report_errors( LuaState, s ) )
 			{
-				return false;	// Maybe we should return true?
+				return true;  // Abort enumeration
 			}
 
 			if( lua_isboolean( LuaState, -1 ) )
 			{
 				return (tolua_toboolean( LuaState, -1, 0) > 0);
 			}
-			return false;
+			return false;  // Continue enumeration
 		}
-		lua_State* LuaState;
+		lua_State * LuaState;
 		int FuncRef;
 		int TableRef;
 	} Callback( tolua_S, FuncRef, TableRef );
@@ -481,6 +569,9 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_function(tolua_S,"LOGERROR",tolua_LOGERROR);
 		tolua_function(tolua_S,"Log",tolua_LOG); // Deprecated
 
+		tolua_beginmodule(tolua_S,"cRoot");
+			tolua_function(tolua_S,"ForEachWorld",tolua_cRoot_ForEachWorld);
+		tolua_endmodule(tolua_S);
 		tolua_beginmodule(tolua_S,"cWorld");
 			tolua_function(tolua_S,"ForEachPlayer",tolua_cWorld_ForEachPlayer);
 		tolua_endmodule(tolua_S);

@@ -21,6 +21,7 @@ class cServer;
 class cWorld;
 class cPlayer;
 typedef cItemCallback<cPlayer> cPlayerListCallback;
+typedef cItemCallback<cWorld>  cWorldListCallback;
 
 
 
@@ -36,18 +37,21 @@ public:
 
 	void Start();
 
-	cServer* GetServer() { return m_Server; }						//tolua_export
-	OBSOLETE cWorld* GetWorld();												//tolua_export
-	cWorld* GetDefaultWorld();										//tolua_export
+	cServer* GetServer(void) { return m_Server; }						//tolua_export
+	cWorld* GetDefaultWorld(void);										//tolua_export
 	cWorld* GetWorld( const AString & a_WorldName );				//tolua_export
+	
+	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
+	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
+	
 	cMonsterConfig *GetMonsterConfig() { return m_MonsterConfig;}
 
-	cGroupManager* GetGroupManager() { return m_GroupManager; }		//tolua_export
-	cRecipeChecker* GetRecipeChecker() { return m_RecipeChecker; }	//tolua_export
-	cFurnaceRecipe* GetFurnaceRecipe() { return m_FurnaceRecipe; }	//tolua_export
-	cWebAdmin*		GetWebAdmin() { return m_WebAdmin; }			//tolua_export
-	cPluginManager* GetPluginManager() { return m_PluginManager; }	//tolua_export
-	cAuthenticator & GetAuthenticator() {return m_Authenticator; }
+	cGroupManager *  GetGroupManager (void) { return m_GroupManager; }   // tolua_export
+	cRecipeChecker * GetRecipeChecker(void) { return m_RecipeChecker; }  // tolua_export
+	cFurnaceRecipe * GetFurnaceRecipe(void) { return m_FurnaceRecipe; }  // tolua_export
+	cWebAdmin *      GetWebAdmin     (void) { return m_WebAdmin; }       // tolua_export
+	cPluginManager * GetPluginManager(void) { return m_PluginManager; }  // tolua_export
+	cAuthenticator & GetAuthenticator(void) { return m_Authenticator; }
 
 	void ServerCommand(const char* a_Cmd );						//tolua_export
 	

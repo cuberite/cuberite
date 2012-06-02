@@ -247,15 +247,6 @@ void cRoot::UnloadWorlds()
 
 
 
-cWorld* cRoot::GetWorld()
-{
-	return GetDefaultWorld();
-}
-
-
-
-
-
 cWorld* cRoot::GetDefaultWorld()
 {
 	return m_pState->pDefaultWorld;
@@ -271,6 +262,22 @@ cWorld* cRoot::GetWorld( const AString & a_WorldName )
 	if( itr != m_pState->WorldsByName.end() )
 		return itr->second;
 	return 0;
+}
+
+
+
+
+
+bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
+{
+	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	{
+		if (a_Callback.Item(itr->second))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 
