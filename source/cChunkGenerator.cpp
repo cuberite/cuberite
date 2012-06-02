@@ -111,6 +111,7 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		BiomeGenName = "constant";
 	}
 	
+	bool CacheOffByDefault = false;
 	if (NoCaseCompare(BiomeGenName, "constant") == 0)
 	{
 		AString Biome = a_IniFile.GetValue("Generator", "ConstantBiome", "Plains");
@@ -121,12 +122,14 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 			b = biPlains;
 		}
 		m_BiomeGen = new cBioGenConstant(b);
+		CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
 	}
 	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
 	{
 		int BiomeSize = a_IniFile.GetValueI("Generator", "CheckerboardBiomeSize", 64);
 		AString Biomes = a_IniFile.GetValue("Generator", "CheckerBoardBiomes", "");
 		m_BiomeGen = new cBioGenCheckerboard(BiomeSize, Biomes);
+		CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
 	{
@@ -143,6 +146,21 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		int CellSize = a_IniFile.GetValueI("Generator", "DistortedVoronoiCellSize", 96);
 		AString Biomes = a_IniFile.GetValue("Generator", "DistortedVoronoiBiomes", "");
 		m_BiomeGen = new cBioGenDistortedVoronoi(m_Seed, CellSize, Biomes);
+	}
+	
+	// Add a cache, if requested:
+	int CacheSize = a_IniFile.GetValueI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 64);
+	if (CacheSize > 0)
+	{
+		if (CacheSize < 4)
+		{
+			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d", 
+				CacheSize, 4
+			);
+			CacheSize = 4;
+		}
+		LOGINFO("Using a cache for biomegen of size %d.", CacheSize);
+		m_BiomeGen = new cBioGenCache(m_BiomeGen, CacheSize);
 	}
 }
 

@@ -26,6 +26,96 @@ void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBioGenCache:
+
+cBioGenCache::cBioGenCache(cBiomeGen * a_BioGenToCache, int a_CacheSize) :
+	m_BioGenToCache(a_BioGenToCache),
+	m_CacheSize(a_CacheSize),
+	m_CacheOrder(new int[a_CacheSize]),
+	m_CacheData(new sCacheData[a_CacheSize]),
+	m_NumHits(0),
+	m_NumMisses(0),
+	m_TotalChain(0)
+{
+	for (int i = 0; i < m_CacheSize; i++)
+	{
+		m_CacheOrder[i] = i;
+		m_CacheData[i].m_ChunkX = 0x7fffffff;
+		m_CacheData[i].m_ChunkZ = 0x7fffffff;
+	}
+}
+
+
+
+
+
+cBioGenCache::~cBioGenCache()
+{
+	delete m_CacheData;
+	delete m_CacheOrder;
+	delete m_BioGenToCache;
+}
+
+
+
+
+
+void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	if (((m_NumHits + m_NumMisses) % 1024) == 10)
+	{
+		LOGD("BioGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
+		LOGD("BioGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
+	}
+	
+	for (int i = 0; i < m_CacheSize; i++)
+	{
+		if (
+			(m_CacheData[m_CacheOrder[i]].m_ChunkX != a_ChunkX) ||
+			(m_CacheData[m_CacheOrder[i]].m_ChunkZ != a_ChunkZ)
+		)
+		{
+			continue;
+		}
+		// Found it in the cache
+		int Idx = m_CacheOrder[i];
+		
+		// Move to front:
+		for (int j = i; j > 0; j--)
+		{
+			m_CacheOrder[j] = m_CacheOrder[j - 1];
+		}
+		m_CacheOrder[0] = Idx;
+		
+		// Use the cached data:
+		memcpy(a_BiomeMap, m_CacheData[Idx].m_BiomeMap, sizeof(a_BiomeMap));
+		
+		m_NumHits++;
+		m_TotalChain += i;
+		return;
+	}  // for i - cache
+	
+	// Not in the cache:
+	m_NumMisses++;
+	m_BioGenToCache->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	
+	// Insert it as the first item in the MRU order:
+	int Idx = m_CacheOrder[m_CacheSize - 1];
+	for (int i = m_CacheSize - 1; i > 0; i--)
+	{
+		m_CacheOrder[i] = m_CacheOrder[i - 1];
+	}  // for i - m_CacheOrder[]
+	m_CacheOrder[0] = Idx;
+	memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
+	m_CacheData[Idx].m_ChunkX = a_ChunkX;
+	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBiomeGenList:
 
 void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)

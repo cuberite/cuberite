@@ -39,6 +39,42 @@ protected:
 
 
 
+/// A simple cache that stores N most recently generated chunks' biomes; N being settable upon creation
+class cBioGenCache :
+	public cBiomeGen
+{
+public:
+	cBioGenCache(cBiomeGen * a_BioGenToCache, int a_CacheSize);  // Takes ownership of a_BioGenToCache
+	~cBioGenCache();
+	
+protected:
+
+	cBiomeGen * m_BioGenToCache;
+	
+	struct sCacheData
+	{
+		int m_ChunkX;
+		int m_ChunkZ;
+		cChunkDef::BiomeMap m_BiomeMap;
+	} ;
+	
+	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
+	int          m_CacheSize;
+	int *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	
+	// Cache statistics
+	int m_NumHits;
+	int m_NumMisses;
+	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
+	
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+} ;
+
+
+
+
+
 /// Base class for generators that use a list of available biomes. This class takes care of the list.
 class cBiomeGenList :
 	public cBiomeGen
