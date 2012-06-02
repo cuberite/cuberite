@@ -102,7 +102,7 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 		{biDesertHills,      "DesertHills"},
 		{biForestHills,      "ForestHills"},
 		{biTaigaHills,       "TaigaHills"},
-		{biExtremeHillsEdge, "ExtremeHillsEdge "},
+		{biExtremeHillsEdge, "ExtremeHillsEdge"},
 		{biJungle,           "Jungle"},
 		{biJungleHills,      "JungleHills"},
 	} ;

@@ -85,6 +85,10 @@ enum EMCSBiome
 	biExtremeHillsEdge = 20,
 	biJungle           = 21,
 	biJungleHills      = 22,
+	
+	// Automatically capture the maximum biome value into biMaxBiome:
+	biNumBiomes,  // True number of biomes, since they are zero-based
+	biMaxBiome = biNumBiomes - 1,  // The maximum biome value
 } ;
 
 

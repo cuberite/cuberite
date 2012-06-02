@@ -16,6 +16,7 @@ float cNoise::IntNoise( int a_X ) const
 {
 	int x = ((a_X*m_Seed)<<13) ^ a_X;
 	return ( 1.0f - ( (x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f); 
+	// returns a float number in the range of [-1, 1]
 }
 
 
@@ -27,6 +28,7 @@ float cNoise::IntNoise2D( int a_X, int a_Y ) const
 	int n = a_X + a_Y * 57 + m_Seed*57*57;
 	n = (n<<13) ^ n;
 	return ( 1.0f - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);  
+	// returns a float number in the range of [-1, 1]
 }
 
 
@@ -38,6 +40,7 @@ float cNoise::IntNoise3D( int a_X, int a_Y, int a_Z ) const
 	int n = a_X + a_Y * 57 + a_Z * 57*57 + m_Seed*57*57*57;
 	n = (n<<13) ^ n;
 	return ( 1.0f - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);  
+	// returns a float number in the range of [-1, 1]
 }
 
 

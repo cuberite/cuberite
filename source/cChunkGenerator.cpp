@@ -117,6 +117,7 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		EMCSBiome b = StringToBiome(Biome);
 		if (b == -1)
 		{
+			LOGWARN("[Generator]::ConstantBiome value \"%s\" not recognized, using \"Plains\".", Biome.c_str());
 			b = biPlains;
 		}
 		m_BiomeGen = new cBioGenConstant(b);
@@ -163,12 +164,8 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 		int Height = a_IniFile.GetValueI("Generator", "FlatHeight", 5);
 		m_HeightGen = new cHeiGenFlat(Height);
 	}
-	else  // "classic" or <not found>
+	else if (NoCaseCompare(HeightGenName, "classic") == 0)
 	{
-		if (NoCaseCompare(HeightGenName, "classic") != 0)
-		{
-			LOGWARN("Unknown HeightGen \"%s\", using \"classic\" instead.", HeightGenName.c_str());
-		}
 		// These used to be in terrain.ini, but now they are in world.ini (so that multiple worlds can have different values):
 		float HeightFreq1 = (float)a_IniFile.GetValueF("Generator", "ClassicHeightFreq1", 0.1);
 		float HeightFreq2 = (float)a_IniFile.GetValueF("Generator", "ClassicHeightFreq2", 1.0);
@@ -177,6 +174,14 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 		float HeightAmp2  = (float)a_IniFile.GetValueF("Generator", "ClassicHeightAmp2",  0.5);
 		float HeightAmp3  = (float)a_IniFile.GetValueF("Generator", "ClassicHeightAmp3",  0.5);
 		m_HeightGen = new cHeiGenClassic(m_Seed, HeightFreq1, HeightAmp1, HeightFreq2, HeightAmp2, HeightFreq3, HeightAmp3);
+	}
+	else  // "biomal" or <not found>
+	{
+		if (NoCaseCompare(HeightGenName, "biomal") != 0)
+		{
+			LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
+		}
+		m_HeightGen = new cHeiGenBiomal(m_Seed, *m_BiomeGen);
 	}
 }
 

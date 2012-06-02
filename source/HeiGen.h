@@ -62,3 +62,40 @@ protected:
 
 
 
+
+class cHeiGenBiomal :
+	public cTerrainHeightGen
+{
+public:
+	cHeiGenBiomal(int a_Seed, cBiomeGen & a_BiomeGen) :
+		m_Noise(a_Seed),
+		m_BiomeGen(a_BiomeGen)
+	{
+	}
+	
+protected:
+
+	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
+
+	cNoise      m_Noise;
+	cBiomeGen & m_BiomeGen;
+	
+	// Per-biome terrain generator parameters:
+	struct sGenParam
+	{
+		float m_HeightFreq1, m_HeightAmp1;
+		float m_HeightFreq2, m_HeightAmp2;
+		float m_HeightFreq3, m_HeightAmp3;
+		float m_BaseHeight;
+	} ;
+	static const sGenParam m_GenParam[biNumBiomes];
+	
+	// cTerrainHeightGen override:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	
+	HEIGHTTYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
+} ;
+
+
+
+
