@@ -288,7 +288,7 @@ HEIGHTTYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int 
 			Height += BiomeCounts[i] * (int)(m_GenParam[i].m_BaseHeight + oct1 + oct2 + oct3);
 		}
 		int res = (HEIGHTTYPE)(Height / Sum);
-		return min(250, max(res, 5));
+		return std::min(250, std::max(res, 5));
 	}
 	
 	// No known biome around? Weird. Return a bogus value:

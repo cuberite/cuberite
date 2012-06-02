@@ -11,14 +11,6 @@
 
 
 
-#ifndef min
-	#define min(a,b) (((a) < (b)) ? (a) : (b))
-#endif
-
-
-
-
-
 typedef struct
 {
 	int x, z;
@@ -454,7 +446,7 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 	// LOGD("Generating %d layers of pine leaves, SameSizeMax = %d", NumLeavesLayers, SameSizeMax);
 	for (int i = 0; i < NumLeavesLayers; ++i)
 	{
-		int LayerSize = min(i, NumLeavesLayers - i + SameSizeMax - 1);
+		int LayerSize = std::min(i, NumLeavesLayers - i + SameSizeMax - 1);
 		// LOGD("LayerSize %d: %d", i, LayerSize);
 		if (LayerSize < 0)
 		{

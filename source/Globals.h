@@ -89,6 +89,10 @@ typedef short     Int16;
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 	#include <winsock2.h>
+	
+	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
+	#undef min
+	#undef max
 #else
 	#include <sys/types.h>
 	#include <sys/stat.h>   // for mkdir
@@ -172,6 +176,7 @@ typedef short     Int16;
 
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
+
 
 
 
