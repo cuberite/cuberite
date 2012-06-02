@@ -39,6 +39,42 @@ protected:
 
 
 
+/// A simple cache that stores N most recently generated chunks' heightmaps; N being settable upon creation
+class cHeiGenCache :
+	public cTerrainHeightGen
+{
+public:
+	cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize);  // Takes ownership of a_HeiGenToCache
+	~cHeiGenCache();
+	
+protected:
+
+	cTerrainHeightGen * m_HeiGenToCache;
+	
+	struct sCacheData
+	{
+		int m_ChunkX;
+		int m_ChunkZ;
+		cChunkDef::HeightMap m_HeightMap;
+	} ;
+	
+	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
+	int          m_CacheSize;
+	int *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	
+	// Cache statistics
+	int m_NumHits;
+	int m_NumMisses;
+	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
+	
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+} ;
+
+
+
+
+
 class cHeiGenClassic :
 	public cTerrainHeightGen
 {

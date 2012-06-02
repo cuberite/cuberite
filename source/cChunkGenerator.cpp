@@ -177,10 +177,12 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 		HeightGenName = "classic";
 	}
 	
+	bool CacheOffByDefault = false;
 	if (NoCaseCompare(HeightGenName, "flat") == 0)
 	{
 		int Height = a_IniFile.GetValueI("Generator", "FlatHeight", 5);
 		m_HeightGen = new cHeiGenFlat(Height);
+		CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(HeightGenName, "classic") == 0)
 	{
@@ -200,6 +202,21 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 			LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
 		}
 		m_HeightGen = new cHeiGenBiomal(m_Seed, *m_BiomeGen);
+	}
+	
+	// Add a cache, if requested:
+	int CacheSize = a_IniFile.GetValueI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
+	if (CacheSize > 0)
+	{
+		if (CacheSize < 4)
+		{
+			LOGWARNING("Heightgen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d", 
+				CacheSize, 4
+			);
+			CacheSize = 4;
+		}
+		LOGINFO("Using a cache for Heightgen of size %d.", CacheSize);
+		m_HeightGen = new cHeiGenCache(m_HeightGen, CacheSize);
 	}
 }
 
