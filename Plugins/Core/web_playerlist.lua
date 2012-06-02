@@ -1,5 +1,5 @@
 function HandleRequest_PlayerList( Request )
-	local World = cRoot:Get():GetWorld()
+	local World = cRoot:Get():GetDefaultWorld()
 	local Content = ""
 	
 	if( Request.Params["playerlist-kick"] ~= nil ) then
