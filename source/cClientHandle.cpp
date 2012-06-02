@@ -65,6 +65,9 @@
 #include "packets/cPacket_MapChunk.h"
 #include "packets/cPacket_PreChunk.h"
 
+// DEBUG:
+#include "packets/cPacket_BlockChange.h"
+
 
 
 
@@ -1872,6 +1875,66 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 		LOGERROR("ERROR: Too many packets in queue for player %s !!", m_Username.c_str());
 		cPacket_Disconnect DC("Too many packets in queue.");
 		m_Socket.Send(DC);
+		
+		// DEBUG: Dump all outstanding packets' types to the log:
+		int Idx = 0;
+		int ChunkX = m_Player->GetChunkX();
+		int ChunkZ = m_Player->GetChunkZ();
+		for (PacketList::const_iterator itr = m_PendingNrmSendPackets.begin(); itr != m_PendingNrmSendPackets.end(); ++itr)
+		{
+			switch ((*itr)->m_PacketID)
+			{
+				case E_MAP_CHUNK:
+				{
+					int x = ((cPacket_MapChunk *)(*itr))->m_PosX;
+					int z = ((cPacket_MapChunk *)(*itr))->m_PosZ;
+					bool IsWanted = (abs(x - ChunkX) <= m_ViewDistance) && (abs(z - ChunkZ) <= m_ViewDistance);
+					LOG("Packet %4d: type %2x (MapChunk: %d, %d, %s)", 
+						Idx++, (*itr)->m_PacketID,
+						x, z,
+						IsWanted ? "wanted" : "unwanted"
+					);
+					break;
+				}
+				
+				case E_PRE_CHUNK:
+				{
+					int x = ((cPacket_PreChunk *)(*itr))->m_PosX;
+					int z = ((cPacket_PreChunk *)(*itr))->m_PosZ;
+					bool IsWanted = (abs(x - ChunkX) <= m_ViewDistance) && (abs(z - ChunkZ) <= m_ViewDistance);
+					bool Loading = ((cPacket_PreChunk *)(*itr))->m_bLoad;
+					LOG("Packet %4d: type %2x (PreChunk: %d, %d, %s, %s)", 
+						Idx++, (*itr)->m_PacketID,
+						x, z,
+						Loading ? "loading" : "unloading",
+						IsWanted ? "wanted" : "unwanted"
+					);
+					break;
+				}
+				
+				case E_BLOCK_CHANGE:
+				{
+					int x = ((cPacket_BlockChange *)(*itr))->m_PosX;
+					int z = ((cPacket_BlockChange *)(*itr))->m_PosZ;
+					int y, cx, cz;
+					cChunkDef::AbsoluteToRelative(x, y, z, cx, cz);
+					bool IsWanted = (abs(cx - ChunkX) <= m_ViewDistance) && (abs(cz - ChunkZ) <= m_ViewDistance);
+					LOG("Packet %4d: type %2x (BlockChange: [%d, %d], %s chunk)", 
+						Idx++, (*itr)->m_PacketID,
+						cx, cz,
+						IsWanted ? "wanted" : "unwanted"
+					);
+					break;
+				}
+				
+				default:
+				{
+					LOG("Packet %4d: type %2x", Idx++, (*itr)->m_PacketID); 
+					break;
+				}
+			}
+		}
+		
 		Lock.Unlock();
 		Destroy();
 		return;
