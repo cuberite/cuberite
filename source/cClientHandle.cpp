@@ -15,6 +15,7 @@
 #include "cItem.h"
 #include "cTorch.h"
 #include "cStairs.h"
+#include "cStep.h"
 #include "cDoors.h"
 #include "cLadder.h"
 #include "cSign.h"
@@ -1017,10 +1018,20 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 
 		if (ClickedBlock == E_BLOCK_STEP)
 		{
-			if (MetaData == m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) && a_Packet->m_Direction == 1)	//only make double slab if meta values are the same and if player clicked on top of the block (Dir = 1)
+      // Only make double slab if meta values are the same and if player clicked either on top or on bottom of the block (direction either 0 or 1)
+      // TODO check if it works from beneath
+			if (MetaData == ( m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) & 0x7) && a_Packet->m_Direction <= 1)
+			//if (MetaData == m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) && a_Packet->m_Direction == 1)
 			{
-				a_Packet->m_ItemType = E_BLOCK_DOUBLE_STEP;
-				a_Packet->m_PosY--;
+        a_Packet->m_ItemType = E_BLOCK_DOUBLE_STEP;
+				if(a_Packet->m_Direction == 1)
+        {
+          a_Packet->m_PosY--;
+        }
+        else
+        {
+          a_Packet->m_PosY++;
+        }
 				bIgnoreCollision = true;
 			}
 		}
@@ -1167,6 +1178,12 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				MetaData = cPiston::RotationPitchToMetaData(m_Player->GetRotation(), 0); // Same orientation as pistons, just ignore pitch
 				break;
 			}
+
+      case E_BLOCK_STEP:
+      {
+        MetaData += cStep::DirectionToMetaData( a_Packet->m_Direction );
+        break;
+      }
 			
 			case E_BLOCK_COBBLESTONE_STAIRS:
 			case E_BLOCK_BRICK_STAIRS:
@@ -1174,7 +1191,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			case E_BLOCK_NETHER_BRICK_STAIRS:
 			case E_BLOCK_WOODEN_STAIRS:
 			{
-				MetaData = cStairs::RotationToMetaData(m_Player->GetRotation());
+				MetaData = cStairs::RotationToMetaData(m_Player->GetRotation(), a_Packet->m_Direction);
 				break;
 			}
 			case E_BLOCK_LADDER:

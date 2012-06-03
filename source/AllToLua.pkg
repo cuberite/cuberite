@@ -5,6 +5,7 @@ $#include "tolua_base.h"
 
 $cfile "cTorch.h"
 $cfile "cStairs.h"
+$cfile "cStep.h"
 $cfile "cLadder.h"
 
 $cfile "../iniFile/iniFile.h"

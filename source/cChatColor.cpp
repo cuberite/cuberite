@@ -21,7 +21,13 @@ const std::string cChatColor::Rose        = cChatColor::Color + "c";
 const std::string cChatColor::LightPurple = cChatColor::Color + "d";
 const std::string cChatColor::Yellow      = cChatColor::Color + "e";
 const std::string cChatColor::White       = cChatColor::Color + "f";
-const std::string cChatColor::Funky       = cChatColor::Color + "k";
+
+const std::string cChatColor::Random      = cChatColor::Color + "k";
+const std::string cChatColor::Bold        = cChatColor::Color + "l";
+const std::string cChatColor::Strikethrough = cChatColor::Color + "m";
+const std::string cChatColor::Underlined  = cChatColor::Color + "n";
+const std::string cChatColor::Italic      = cChatColor::Color + "o";
+const std::string cChatColor::Plain       = cChatColor::Color + "r";
 
 const std::string cChatColor::MakeColor( char a_Color )
 {

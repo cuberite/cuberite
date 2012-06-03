@@ -21,7 +21,7 @@ INCLUDE = -I.\
 		-Isource/packets\
 		-Itolua++-1.0.93/src/lib\
 		-Ilua-5.1.4/src\
-		-Izlib-1.2.5\
+		-Izlib-1.2.7\
 		-IiniFile\
 		-Itolua++-1.0.93/include\
 		-Ijsoncpp-src-0.5.0/include\
@@ -37,7 +37,6 @@ MCServer : \
 		build/json_value.o\
 		build/json_writer.o\
 		build/cMakeDir.o\
-		build/cGenSettings.o\
 		build/cCuboid.o\
 		build/cNoise.o\
 		build/cTimer.o\
@@ -66,12 +65,20 @@ MCServer : \
 		build/md5.o\
 		build/cReferenceManager.o\
 		build/Bindings.o\
+		build/BlockID.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
 		build/cChunk.o\
 		build/cChunkMap.o\
+		build/HeiGen.o\
+		build/BioGen.o\
+		build/CompoGen.o\
+		build/Trees.o\
+		build/StructGen.o\
+		build/FinishGen.o\
 		build/cChunkGenerator.o\
+		build/cPacket_Player.o\
 		build/cClientHandle.o\
 		build/cCraftingWindow.o\
 		build/cCriticalSection.o\
@@ -109,9 +116,10 @@ MCServer : \
 		build/cWebAdmin.o\
 		build/cWebPlugin.o\
 		build/cWindow.o\
-		build/cWorld.o\
-		build/cWorldGenerator.o\
-		build/cWorldGenerator_Test.o\
+    build/LightingThread.o\
+		build/cRedstoneSimulator.o\
+		build/ChunkSender.o\
+    build/cWorld.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -154,10 +162,6 @@ MCServer : \
 		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
 		build/cPacket_PickupSpawn.o\
-		build/cPacket_PlayerListItem.o\
-		build/cPacket_PlayerLook.o\
-		build/cPacket_PlayerMoveLook.o\
-		build/cPacket_PlayerPosition.o\
 		build/cPacket_PreChunk.o\
 		build/cPacket_RelativeEntityMove.o\
 		build/cPacket_RelativeEntityMoveLook.o\
@@ -247,13 +251,14 @@ MCServer : \
 		build/cSocketThreads.o\
 		build/WorldStorage.o\
 		build/WSSCompact.o\
+		build/WSSAnvil.o\
+		build/FastNBT.o\
 		build/StringCompression.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
 		build/json_writer.o\
 		build/cMakeDir.o\
-		build/cGenSettings.o\
 		build/cCuboid.o\
 		build/cNoise.o\
 		build/cTimer.o\
@@ -282,12 +287,20 @@ MCServer : \
 		build/md5.o\
 		build/cReferenceManager.o\
 		build/Bindings.o\
+		build/BlockID.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
 		build/cChunk.o\
 		build/cChunkMap.o\
+		build/HeiGen.o\
+		build/BioGen.o\
+		build/CompoGen.o\
+		build/Trees.o\
+		build/StructGen.o\
+		build/FinishGen.o\
 		build/cChunkGenerator.o\
+		build/cPacket_Player.o\
 		build/cClientHandle.o\
 		build/cCraftingWindow.o\
 		build/cCriticalSection.o\
@@ -325,9 +338,10 @@ MCServer : \
 		build/cWebAdmin.o\
 		build/cWebPlugin.o\
 		build/cWindow.o\
-		build/cWorld.o\
-		build/cWorldGenerator.o\
-		build/cWorldGenerator_Test.o\
+    build/LightingThread.o\
+		build/cRedstoneSimulator.o\
+		build/ChunkSender.o\
+    build/cWorld.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -370,10 +384,6 @@ MCServer : \
 		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
 		build/cPacket_PickupSpawn.o\
-		build/cPacket_PlayerListItem.o\
-		build/cPacket_PlayerLook.o\
-		build/cPacket_PlayerMoveLook.o\
-		build/cPacket_PlayerPosition.o\
 		build/cPacket_PreChunk.o\
 		build/cPacket_RelativeEntityMove.o\
 		build/cPacket_RelativeEntityMoveLook.o\
@@ -463,6 +473,8 @@ MCServer : \
 		build/cSocketThreads.o\
 		build/WorldStorage.o\
 		build/WSSCompact.o\
+		build/WSSAnvil.o\
+		build/FastNBT.o\
 		build/StringCompression.o\
 		-o MCServer
 
@@ -472,7 +484,6 @@ clean :
 		build/json_value.o\
 		build/json_writer.o\
 		build/cMakeDir.o\
-		build/cGenSettings.o\
 		build/cCuboid.o\
 		build/cNoise.o\
 		build/cTimer.o\
@@ -501,12 +512,20 @@ clean :
 		build/md5.o\
 		build/cReferenceManager.o\
 		build/Bindings.o\
+		build/BlockID.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
 		build/cChunk.o\
 		build/cChunkMap.o\
+		build/HeiGen.o\
+		build/BioGen.o\
+		build/CompoGen.o\
+		build/Trees.o\
+		build/StructGen.o\
+		build/FinishGen.o\
 		build/cChunkGenerator.o\
+		build/cPacket_Player.o\
 		build/cClientHandle.o\
 		build/cCraftingWindow.o\
 		build/cCriticalSection.o\
@@ -544,9 +563,10 @@ clean :
 		build/cWebAdmin.o\
 		build/cWebPlugin.o\
 		build/cWindow.o\
+		build/LightingThread.o\
+		build/cRedstoneSimulator.o\
+		build/ChunkSender.o\
 		build/cWorld.o\
-		build/cWorldGenerator.o\
-		build/cWorldGenerator_Test.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -589,10 +609,6 @@ clean :
 		build/cPacket_MultiBlock.o\
 		build/cPacket_NamedEntitySpawn.o\
 		build/cPacket_PickupSpawn.o\
-		build/cPacket_PlayerListItem.o\
-		build/cPacket_PlayerLook.o\
-		build/cPacket_PlayerMoveLook.o\
-		build/cPacket_PlayerPosition.o\
 		build/cPacket_PreChunk.o\
 		build/cPacket_RelativeEntityMove.o\
 		build/cPacket_RelativeEntityMoveLook.o\
@@ -714,6 +730,10 @@ build/cReferenceManager.o : source/cReferenceManager.cpp
 build/Bindings.o : source/Bindings.cpp
 	$(CC) $(CC_OPTIONS) source/Bindings.cpp -c $(INCLUDE) -o build/Bindings.o
 
+# Item # 6 -- BlockID --
+build/BlockID.o : source/BlockID.cpp
+	$(CC) $(CC_OPTIONS) source/BlockID.cpp -c $(INCLUDE) -o build/BlockID.o
+
 
 # Item # 6 -- cBlockToPickup --
 build/cBlockToPickup.o : source/cBlockToPickup.cpp
@@ -739,9 +759,44 @@ build/cChunk.o : source/cChunk.cpp
 build/cChunkMap.o : source/cChunkMap.cpp
 	$(CC) $(CC_OPTIONS) source/cChunkMap.cpp -c $(INCLUDE) -o build/cChunkMap.o
 
+
+# Item # 11 -- HeiGen --
+build/HeiGen.o : source/HeiGen.cpp
+	$(CC) $(CC_OPTIONS) source/HeiGen.cpp -c $(INCLUDE) -o build/HeiGen.o
+
+
+# Item # 12 -- BioGen --
+build/BioGen.o : source/BioGen.cpp
+	$(CC) $(CC_OPTIONS) source/BioGen.cpp -c $(INCLUDE) -o build/BioGen.o
+
+
+# Item # 13 -- CompoGen --
+build/CompoGen.o : source/CompoGen.cpp
+	$(CC) $(CC_OPTIONS) source/CompoGen.cpp -c $(INCLUDE) -o build/CompoGen.o
+
+
+# Item # 14 -- Trees --
+build/Trees.o : source/Trees.cpp
+	$(CC) $(CC_OPTIONS) source/Trees.cpp -c $(INCLUDE) -o build/Trees.o
+
+
+# Item # 15 -- StructGen --
+build/StructGen.o : source/StructGen.cpp
+	$(CC) $(CC_OPTIONS) source/StructGen.cpp -c $(INCLUDE) -o build/StructGen.o
+
+
+# Item # 16 -- FinishGen --
+build/FinishGen.o : source/FinishGen.cpp
+	$(CC) $(CC_OPTIONS) source/FinishGen.cpp -c $(INCLUDE) -o build/FinishGen.o
+
 # Item # 10 -- cChunkGenerator --
 build/cChunkGenerator.o : source/cChunkGenerator.cpp
 	$(CC) $(CC_OPTIONS) source/cChunkGenerator.cpp -c $(INCLUDE) -o build/cChunkGenerator.o
+
+
+# Item # 11 -- cPacket_Player --
+build/cPacket_Player.o : source/packets/cPacket_Player.cpp
+	$(CC) $(CC_OPTIONS) source/packets/cPacket_Player.cpp -c $(INCLUDE) -o build/cPacket_Player.o
 
 
 # Item # 11 -- cClientHandle --
@@ -916,18 +971,18 @@ build/cWebPlugin.o : source/cWebPlugin.cpp
 build/cWindow.o : source/cWindow.cpp
 	$(CC) $(CC_OPTIONS) source/cWindow.cpp -c $(INCLUDE) -o build/cWindow.o
 
+# Item # 40 -- LightingThread --
+build/LightingThread.o : source/LightingThread.cpp
+	$(CC) $(CC_OPTIONS) source/LightingThread.cpp -c $(INCLUDE) -o build/LightingThread.o
+
+
+# Item # 42 -- ChunkSender --
+build/ChunkSender.o : source/ChunkSender.cpp
+	$(CC) $(CC_OPTIONS) source/ChunkSender.cpp -c $(INCLUDE) -o build/ChunkSender.o
 
 # Item # 40 -- cWorld --
 build/cWorld.o : source/cWorld.cpp
 	$(CC) $(CC_OPTIONS) source/cWorld.cpp -c $(INCLUDE) -o build/cWorld.o
-
-# Item # 40 -- cWorldGenerator --
-build/cWorldGenerator.o : source/cWorldGenerator.cpp
-	$(CC) $(CC_OPTIONS) source/cWorldGenerator.cpp -c $(INCLUDE) -o build/cWorldGenerator.o
-
-# Item # 40 -- cWorldGenerator_Test --
-build/cWorldGenerator_Test.o : source/cWorldGenerator_Test.cpp
-	$(CC) $(CC_OPTIONS) source/cWorldGenerator_Test.cpp -c $(INCLUDE) -o build/cWorldGenerator_Test.o
 
 # Item # 41 -- main --
 build/main.o : source/main.cpp
@@ -1072,18 +1127,6 @@ build/cPacket_NamedEntitySpawn.o : source/packets/cPacket_NamedEntitySpawn.cpp
 
 build/cPacket_PickupSpawn.o : source/packets/cPacket_PickupSpawn.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_PickupSpawn.cpp -c $(INCLUDE) -o build/cPacket_PickupSpawn.o
-
-build/cPacket_PlayerListItem.o : source/packets/cPacket_PlayerListItem.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerListItem.cpp -c $(INCLUDE) -o build/cPacket_PlayerListItem.o
-
-build/cPacket_PlayerLook.o : source/packets/cPacket_PlayerLook.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerLook.cpp -c $(INCLUDE) -o build/cPacket_PlayerLook.o
-
-build/cPacket_PlayerMoveLook.o : source/packets/cPacket_PlayerMoveLook.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerMoveLook.cpp -c $(INCLUDE) -o build/cPacket_PlayerMoveLook.o
-
-build/cPacket_PlayerPosition.o : source/packets/cPacket_PlayerPosition.cpp
-	$(CC) $(CC_OPTIONS) source/packets/cPacket_PlayerPosition.cpp -c $(INCLUDE) -o build/cPacket_PlayerPosition.o
 
 build/cPacket_PreChunk.o : source/packets/cPacket_PreChunk.cpp
 	$(CC) $(CC_OPTIONS) source/packets/cPacket_PreChunk.cpp -c $(INCLUDE) -o build/cPacket_PreChunk.o
@@ -1338,78 +1381,78 @@ build/print.o : lua-5.1.4/src/print.c
 
 
 # Item # 104 -- adler32 --
-build/adler32.o : zlib-1.2.5/adler32.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/adler32.c -c $(INCLUDE) -o build/adler32.o
+build/adler32.o : zlib-1.2.7/adler32.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/adler32.c -c $(INCLUDE) -o build/adler32.o
 
 
 # Item # 105 -- compress --
-build/compress.o : zlib-1.2.5/compress.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/compress.c -c $(INCLUDE) -o build/compress.o
+build/compress.o : zlib-1.2.7/compress.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/compress.c -c $(INCLUDE) -o build/compress.o
 
 
 # Item # 106 -- crc32 --
-build/crc32.o : zlib-1.2.5/crc32.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/crc32.c -c $(INCLUDE) -o build/crc32.o
+build/crc32.o : zlib-1.2.7/crc32.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/crc32.c -c $(INCLUDE) -o build/crc32.o
 
 
 # Item # 107 -- deflate --
-build/deflate.o : zlib-1.2.5/deflate.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/deflate.c -c $(INCLUDE) -o build/deflate.o
+build/deflate.o : zlib-1.2.7/deflate.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/deflate.c -c $(INCLUDE) -o build/deflate.o
 
 
 # Item # 108 -- gzclose --
-build/gzclose.o : zlib-1.2.5/gzclose.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/gzclose.c -c $(INCLUDE) -o build/gzclose.o
+build/gzclose.o : zlib-1.2.7/gzclose.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/gzclose.c -c $(INCLUDE) -o build/gzclose.o
 
 
 # Item # 109 -- gzlib --
-build/gzlib.o : zlib-1.2.5/gzlib.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/gzlib.c -c $(INCLUDE) -o build/gzlib.o
+build/gzlib.o : zlib-1.2.7/gzlib.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/gzlib.c -c $(INCLUDE) -o build/gzlib.o
 
 
 # Item # 110 -- gzread --
-build/gzread.o : zlib-1.2.5/gzread.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/gzread.c -c $(INCLUDE) -o build/gzread.o
+build/gzread.o : zlib-1.2.7/gzread.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/gzread.c -c $(INCLUDE) -o build/gzread.o
 
 
 # Item # 111 -- gzwrite --
-build/gzwrite.o : zlib-1.2.5/gzwrite.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/gzwrite.c -c $(INCLUDE) -o build/gzwrite.o
+build/gzwrite.o : zlib-1.2.7/gzwrite.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/gzwrite.c -c $(INCLUDE) -o build/gzwrite.o
 
 
 # Item # 112 -- infback --
-build/infback.o : zlib-1.2.5/infback.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/infback.c -c $(INCLUDE) -o build/infback.o
+build/infback.o : zlib-1.2.7/infback.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/infback.c -c $(INCLUDE) -o build/infback.o
 
 
 # Item # 113 -- inffast --
-build/inffast.o : zlib-1.2.5/inffast.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/inffast.c -c $(INCLUDE) -o build/inffast.o
+build/inffast.o : zlib-1.2.7/inffast.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/inffast.c -c $(INCLUDE) -o build/inffast.o
 
 
 # Item # 114 -- inflate --
-build/inflate.o : zlib-1.2.5/inflate.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/inflate.c -c $(INCLUDE) -o build/inflate.o
+build/inflate.o : zlib-1.2.7/inflate.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/inflate.c -c $(INCLUDE) -o build/inflate.o
 
 
 # Item # 115 -- inftrees --
-build/inftrees.o : zlib-1.2.5/inftrees.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/inftrees.c -c $(INCLUDE) -o build/inftrees.o
+build/inftrees.o : zlib-1.2.7/inftrees.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/inftrees.c -c $(INCLUDE) -o build/inftrees.o
 
 
 # Item # 116 -- trees --
-build/trees.o : zlib-1.2.5/trees.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/trees.c -c $(INCLUDE) -o build/trees.o
+build/trees.o : zlib-1.2.7/trees.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/trees.c -c $(INCLUDE) -o build/trees.o
 
 
 # Item # 117 -- uncompr --
-build/uncompr.o : zlib-1.2.5/uncompr.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/uncompr.c -c $(INCLUDE) -o build/uncompr.o
+build/uncompr.o : zlib-1.2.7/uncompr.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/uncompr.c -c $(INCLUDE) -o build/uncompr.o
 
 
 # Item # 118 -- zutil --
-build/zutil.o : zlib-1.2.5/zutil.c
-	$(CC) $(CCE_OPTIONS) zlib-1.2.5/zutil.c -c $(INCLUDE) -o build/zutil.o
+build/zutil.o : zlib-1.2.7/zutil.c
+	$(CC) $(CCE_OPTIONS) zlib-1.2.7/zutil.c -c $(INCLUDE) -o build/zutil.o
 
 
 # Item # 119 -- iniFile --
@@ -1486,9 +1529,6 @@ build/cNoise.o : source/cNoise.cpp
 build/cCuboid.o : source/cCuboid.cpp
 	$(CC) $(CC_OPTIONS) source/cCuboid.cpp -c $(INCLUDE) -o build/cCuboid.o
 
-build/cGenSettings.o : source/cGenSettings.cpp
-	$(CC) $(CC_OPTIONS) source/cGenSettings.cpp -c $(INCLUDE) -o build/cGenSettings.o
-
 build/json_reader.o : jsoncpp-src-0.5.0/src/lib_json/json_reader.cpp
 	$(CC) $(CC_OPTIONS) jsoncpp-src-0.5.0/src/lib_json/json_reader.cpp -c $(INCLUDE) -o build/json_reader.o
 
@@ -1550,13 +1590,19 @@ build/WorldStorage.o : source/WorldStorage.cpp
 	$(CC) $(CC_OPTIONS) source/WorldStorage.cpp -c $(INCLUDE) -o build/WorldStorage.o	
 
 build/WSSCompact.o : source/WSSCompact.cpp
-	$(CC) $(CC_OPTIONS) source/WSSCompact.cpp -c $(INCLUDE) -o build/WSSCompact.o	
+	$(CC) $(CC_OPTIONS) source/WSSCompact.cpp -c $(INCLUDE) -o build/WSSCompact.o
+
+build/WSSAnvil.o : source/WSSAnvil.cpp
+	$(CC) $(CC_OPTIONS) source/WSSAnvil.cpp -c $(INCLUDE) -o build/WSSAnvil.o
+
+build/FastNBT.o : source/FastNBT.cpp
+	$(CC) $(CC_OPTIONS) source/FastNBT.cpp -c $(INCLUDE) -o build/FastNBT.o
 
 build/StringCompression.o : source/StringCompression.cpp
 	$(CC) $(CC_OPTIONS) source/StringCompression.cpp -c $(INCLUDE) -o build/StringCompression.o	
 
 build/cRedstoneSimulator.o : source/cRedstoneSimulator.cpp
- 	$(CC) $(CC_OPTIONS) source/cRedstoneSimulator.cpp -c $(INCLUDE) -o build/cRedstoneSimulator.o	
+	$(CC) $(CC_OPTIONS) source/cRedstoneSimulator.cpp -c $(INCLUDE) -o build/cRedstoneSimulator.o
 
 # Template: copy and delete the "# "; insert filenames
 # build/.o : source/.cpp

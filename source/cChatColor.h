@@ -28,7 +28,14 @@ public:
 	static const std::string LightPurple;
 	static const std::string Yellow;
  	static const std::string White;
- 	static const std::string Funky;
+
+  // Styles ( source: http://wiki.vg/Chat )
+  static const std::string Random;
+  static const std::string Bold;
+  static const std::string Strikethrough;
+  static const std::string Underlined;
+  static const std::string Italic;
+  static const std::string Plain;
 
 	static const std::string MakeColor( char a_Color );
 };
