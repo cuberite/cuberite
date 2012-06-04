@@ -36,7 +36,7 @@ public:
 		return m_Ini.GetValueI("Items", a_ItemName, -1);
 	}
 	
-	AString ResolveString(AString & a_ItemName)
+	AString ResolveString(const AString & a_ItemName)
 	{
 		return m_Ini.GetValue("Items", a_ItemName, "");
 	}

@@ -253,7 +253,8 @@ MCServer : \
 		build/WSSCompact.o\
 		build/WSSAnvil.o\
 		build/FastNBT.o\
-		build/StringCompression.o
+		build/StringCompression.o\
+		build/CraftingRecipes.o
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -476,6 +477,7 @@ MCServer : \
 		build/WSSAnvil.o\
 		build/FastNBT.o\
 		build/StringCompression.o\
+		build/CraftingRecipes.o\
 		-o MCServer
 
 clean : 
@@ -696,6 +698,7 @@ clean :
 		build/StringUtils.o\
 		build/cIsThread.o\
 		build/cSocketThreads.o\
+		build/CraftingRecipes.o\
 		MCServer
 
 install : MCServer
@@ -1603,6 +1606,9 @@ build/StringCompression.o : source/StringCompression.cpp
 
 build/cRedstoneSimulator.o : source/cRedstoneSimulator.cpp
 	$(CC) $(CC_OPTIONS) source/cRedstoneSimulator.cpp -c $(INCLUDE) -o build/cRedstoneSimulator.o
+
+build/CraftingRecipes.o : source/CraftingRecipes.cpp
+	$(CC) $(CC_OPTIONS) source/CraftingRecipes.cpp -c $(INCLUDE) -o build/CraftingRecipes.o
 
 # Template: copy and delete the "# "; insert filenames
 # build/.o : source/.cpp
