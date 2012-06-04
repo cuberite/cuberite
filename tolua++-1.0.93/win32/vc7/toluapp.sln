@@ -1,6 +1,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "toluapp", "toluapp.vcproj", "{71891C1A-E328-4258-AC3F-6F9698C6D8B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9DDCB327-0D20-460F-A7F8-DE038163CD63} = {9DDCB327-0D20-460F-A7F8-DE038163CD63}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tolualib", "..\tolualib\tolualib.vcproj", "{9DDCB327-0D20-460F-A7F8-DE038163CD63}"
 EndProject
@@ -20,8 +23,8 @@ Global
 		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.Release|Win32.Build.0 = withLua51_Release|Win32
 		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua50_Debug|Win32.ActiveCfg = withLua51_Release|Win32
 		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua50_Debug|Win32.Build.0 = withLua51_Release|Win32
-		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua50_Release|Win32.ActiveCfg = withLua50_Release|Win32
-		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua50_Release|Win32.Build.0 = withLua50_Release|Win32
+		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua50_Release|Win32.ActiveCfg = withLua51_Release|Win32
+		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua50_Release|Win32.Build.0 = withLua51_Release|Win32
 		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua51_Debug|Win32.ActiveCfg = withLua51_Debug|Win32
 		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua51_Debug|Win32.Build.0 = withLua51_Debug|Win32
 		{71891C1A-E328-4258-AC3F-6F9698C6D8B4}.withLua51_Release|Win32.ActiveCfg = withLua51_Release|Win32

@@ -40,6 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;../../../lua-5.1.4/src&quot;;../../include"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -109,7 +110,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../../include;&quot;C:\Program Files (x86)\Lua\5.1\include&quot;"
+				AdditionalIncludeDirectories="&quot;../../../lua-5.1.4/src&quot;;../../include"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -126,7 +127,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="lua51.lib"
 				AdditionalLibraryDirectories="C:\Program Files (x86)\Lua\5.1\lib"
 			/>
 			<Tool
