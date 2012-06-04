@@ -4,6 +4,7 @@
 #include "cCraftingWindow.h"
 #include "cItem.h"
 #include "cRecipeChecker.h"
+#include "CraftingRecipes.h"
 #include "cPlayer.h"
 #include "cClientHandle.h"
 #include "cInventory.h"
@@ -12,6 +13,10 @@
 
 #include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_InventorySlot.h"
+
+
+
+
 
 cCraftingWindow::cCraftingWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 	 : cWindow( a_Owner, a_bInventoryVisible )
@@ -22,6 +27,10 @@ cCraftingWindow::cCraftingWindow( cWindowOwner* a_Owner, bool a_bInventoryVisibl
 	cItem* Slots = new cItem[10];
 	SetSlots( Slots, 10 );
 }
+
+
+
+
 
 void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 {
@@ -59,25 +68,41 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 		cWindow::Clicked( a_ClickPacket, a_Player );
 	}
 
-	if( a_ClickPacket->m_SlotNum >= 0 && a_ClickPacket->m_SlotNum < 10 )
+	if ((a_ClickPacket->m_SlotNum >= 0) && (a_ClickPacket->m_SlotNum < 10))
 	{
 		cItem CookedItem;
-		if( a_ClickPacket->m_SlotNum == 0 && !bDontCook )
+		if ((a_ClickPacket->m_SlotNum == 0) && !bDontCook)
 		{
-			CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( GetSlots()+1, 3, 3, true );
+			// Consume the ingredients from the crafting grid:
+			CookedItem = cRoot::Get()->GetCraftingRecipes()->Craft(GetSlots() + 1, 3, 3);
+			LOGD("New recipes crafted: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount);
+			// Upgrade the crafting result from the new crafting grid contents:
+			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(GetSlots() + 1, 3, 3);
+			if (CookedItem.IsEmpty())
+			{
+				// Fallback to the old recipes:
+				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( GetSlots()+1, 3, 3, true );
+				LOGD("Old recipes crafted: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount );
+			}
 		}
 		else
 		{
-			CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( GetSlots()+1, 3, 3 );
+			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(GetSlots() + 1, 3, 3);
+			LOGD("New recipes offer: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount );
+			if (CookedItem.IsEmpty())
+			{
+				// Fallback to the old recipes
+				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( GetSlots()+1, 3, 3 );
+				LOGD("Old recipes offer: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount );
+			}
 		}
 		*GetSlot(0) = CookedItem;
 		LOG("You cooked: %i x %i !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
 	}
 	SendWholeWindow( a_Player.GetClientHandle() );
 	a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );
-	//Separate packet for result =/ Don't know why
-	
-	
+
+	// Separate packet for result =/ Don't know why
 	cPacket_InventorySlot Packet;
 	Packet.m_WindowID = (char)GetWindowID();
 	Packet.m_SlotNum = 0;
@@ -85,8 +110,11 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 	Packet.m_ItemCount = GetSlot(0)->m_ItemCount;
 	Packet.m_ItemUses = (char)GetSlot(0)->m_ItemHealth;
 	a_Player.GetClientHandle()->Send( Packet );
-	
 }
+
+
+
+
 
 void cCraftingWindow::Close( cPlayer & a_Player )
 {
@@ -106,3 +134,7 @@ void cCraftingWindow::Close( cPlayer & a_Player )
 	}
 	cWindow::Close( a_Player );
 }
+
+
+
+

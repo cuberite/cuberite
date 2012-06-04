@@ -33,6 +33,9 @@ extern AString & AppendPrintf (AString & str, const char * format, ...);
 /// Split the string at delimiters, return as a stringvector
 extern AStringVector StringSplit(const AString & str, const AString & delim);
 
+/// Trime whitespace at both ends of the string
+extern AString TrimString(const AString & str);
+
 /// In-place string conversion to uppercase; returns the same string
 extern AString & StrToUpper(AString & s);
 

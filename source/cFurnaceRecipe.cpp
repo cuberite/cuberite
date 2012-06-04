@@ -7,13 +7,26 @@
 #include <fstream>
 #include <sstream>
 
+
+
+
+
 typedef std::list< cFurnaceRecipe::Recipe > RecipeList;
 typedef std::list< cFurnaceRecipe::Fuel > FuelList;
+
+
+
+
+
 struct cFurnaceRecipe::sFurnaceRecipeState
 {
 	RecipeList Recipes;
 	FuelList Fuel;
 };
+
+
+
+
 
 cFurnaceRecipe::cFurnaceRecipe()
 	: m_pState( new sFurnaceRecipeState )
@@ -21,16 +34,24 @@ cFurnaceRecipe::cFurnaceRecipe()
 	ReloadRecipes();
 }
 
+
+
+
+
 cFurnaceRecipe::~cFurnaceRecipe()
 {
 	ClearRecipes();
 	delete m_pState;
 }
 
+
+
+
+
 void cFurnaceRecipe::ReloadRecipes()
 {
 	ClearRecipes();
-	LOG("--Loading furnace recipes--");
+	LOG("-- Loading furnace recipes --");
 
 	std::ifstream f;
 	char a_File[] = "furnace.txt";
@@ -152,8 +173,12 @@ void cFurnaceRecipe::ReloadRecipes()
 	}
 	LOG("Got %i furnace recipes, and %i fuels.", m_pState->Recipes.size(), m_pState->Fuel.size() );
 
-	LOG("--Done loading furnace recipes--");
+	LOG("-- Done loading furnace recipes --");
 }
+
+
+
+
 
 void cFurnaceRecipe::ClearRecipes()
 {

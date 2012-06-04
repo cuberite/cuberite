@@ -7,6 +7,7 @@
 #include "cWindow.h"
 #include "cItem.h"
 #include "cRecipeChecker.h"
+#include "CraftingRecipes.h"
 #include "cRoot.h"
 #include "packets/cPacket_WindowClick.h"
 
@@ -69,16 +70,29 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 		LOG("No Inventory window! WTF");
 	}
 
-	if( Packet->m_SlotNum >= (short)c_CraftOffset && Packet->m_SlotNum < (short)(c_CraftOffset+c_CraftSlots+1) )
+	if ((Packet->m_SlotNum >= (short)c_CraftOffset) && (Packet->m_SlotNum < (short)(c_CraftOffset + c_CraftSlots + 1)))
 	{
 		cItem CookedItem;
-		if( Packet->m_SlotNum == 0 && !bDontCook )
+		if ((Packet->m_SlotNum == 0) && !bDontCook)
 		{
-			CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( m_Slots+c_CraftOffset+1, 2, 2, true );
+			// Consume the items from the crafting grid:
+			CookedItem = cRoot::Get()->GetCraftingRecipes()->Craft(m_Slots + c_CraftOffset + 1, 2, 2);
+			// Upgrade the crafting result from the new crafting grid contents:
+			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(m_Slots + c_CraftOffset + 1, 2, 2);
+			if (CookedItem.IsEmpty())
+			{
+				// Fallback to the old recipes:
+				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( m_Slots+c_CraftOffset+1, 2, 2, true );
+			}
 		}
 		else
 		{
-			CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( m_Slots+c_CraftOffset+1, 2, 2 );
+			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(m_Slots + c_CraftOffset + 1, 2, 2);
+			if (CookedItem.IsEmpty())
+			{
+				// Fallback to the old recipes:
+				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( m_Slots+c_CraftOffset+1, 2, 2 );
+			}
 		}
 		m_Slots[c_CraftOffset] = CookedItem;
 		LOG("You cooked: %i x %i !!", m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );

@@ -88,10 +88,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	size_t Prev = 0;
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
-		if (cutAt > 0)
-		{
-			results.push_back(str.substr(Prev, cutAt - Prev));
-		}
+		results.push_back(str.substr(Prev, cutAt - Prev));
 		Prev = cutAt + delim.length();
 	}
 	if (Prev < str.length())
@@ -100,6 +97,40 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
+
+
+
+AString TrimString(const AString & str)
+{
+	size_t len = str.length();
+	size_t start = 0;
+	while (start < len)
+	{
+		if (str[start] > 32)
+		{
+			break;
+		}
+		++start;
+	}
+	if (start == len)
+	{
+		return "";
+	}
+	
+	size_t end = len;
+	while (end >= start)
+	{
+		if (str[end] > 32)
+		{
+			break;
+		}
+		--end;
+	}
+	
+	return str.substr(start, end - start + 1);
+}
+
 
 
 

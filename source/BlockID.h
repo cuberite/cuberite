@@ -145,7 +145,8 @@ enum ENUM_ITEM_ID
 	E_ITEM_GRASS = 2,
 	E_ITEM_DIRT	= 3,
 	E_ITEM_COBBLESTONE = 4,
-	E_ITEM_WOOD = 5,
+	E_ITEM_PLANKS = 5,
+	E_ITEM_WOOD = 5,  // obsolete, use E_ITEM_PLANKS instead
 	E_ITEM_SAPLING = 6,
 	E_ITEM_BEDROCK = 7,
 	E_ITEM_WATER = 8,
@@ -443,8 +444,18 @@ enum
 
 
 
+// fwd: cItem.h:
+class cItem;
+
+
+
+
+
 /// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
-extern int BlockStringToType(const AString & a_BlockTypeString);
+extern int BlockStringToType(const AString & a_BlockTypeString);  // tolua_export
+
+/// Translates an itemtype string into an item. Takes either a number, number^number, number:number or an items.ini alias as input. Returns true if successful.
+extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);  // tolua_export
 
 /// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);

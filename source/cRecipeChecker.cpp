@@ -125,7 +125,7 @@ void PrintNear( std::ifstream & f, int a_History = 64 )
 
 void cRecipeChecker::ReloadRecipes()
 {
-	LOG("--Loading recipes--");
+	LOG("-- Loading recipes from recipes.txt --");
 	ClearRecipes();
 
 	std::ifstream f;
@@ -369,7 +369,7 @@ void cRecipeChecker::ReloadRecipes()
 	}
 	f.close();
 
- 	LOG("--Done loading recipes, found %i recipes", m_pState->Recipes.size() );
+ 	LOG("-- Done loading recipes, found %i recipes --", m_pState->Recipes.size() );
 }
 
 

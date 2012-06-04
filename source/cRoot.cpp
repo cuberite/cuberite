@@ -8,6 +8,7 @@
 #include "cFurnaceRecipe.h"
 #include "cGroupManager.h"
 #include "cRecipeChecker.h"
+#include "CraftingRecipes.h"
 #include "cPluginManager.h"
 #include "cMonsterConfig.h"
 #include "cSleep.h"
@@ -40,7 +41,8 @@ cRoot::cRoot()
 	: m_Server( 0 )
 	, m_MonsterConfig( 0 )
 	, m_GroupManager( 0 )
-	, m_RecipeChecker( 0 )
+	, m_RecipeChecker(NULL)
+	, m_CraftingRecipes(NULL)
 	, m_FurnaceRecipe( 0 )
 	, m_WebAdmin( 0 )
 	, m_PluginManager( 0 )
@@ -85,11 +87,11 @@ void cRoot::InputThread(void* a_Params)
 
 void cRoot::Start()
 {
-	if( m_Log ) delete m_Log, m_Log = 0;
+	delete m_Log;
 	m_Log = new cMCLogger();
 
 	m_bStop = false;
-	while(!m_bStop)
+	while (!m_bStop)
 	{
 		m_bRestart = false;
 
@@ -122,6 +124,7 @@ void cRoot::Start()
 		LOG("Loading settings...");
 		m_GroupManager	= new cGroupManager();
 		m_RecipeChecker = new cRecipeChecker();
+		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe = new cFurnaceRecipe();
 		
 		LOG("Loading worlds...");
@@ -166,8 +169,9 @@ void cRoot::Start()
 		LOG("Stopping WebAdmin...");
 		delete m_WebAdmin; m_WebAdmin = 0;
 		LOG("Unloading recipes...");
-		delete m_FurnaceRecipe; m_FurnaceRecipe = 0;
-		delete m_RecipeChecker; m_RecipeChecker = 0;
+		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
+		delete m_RecipeChecker;   m_RecipeChecker = NULL;
+		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
 		LOG("Forgetting groups...");
 		delete m_GroupManager; m_GroupManager = 0;
 		LOG("Unloading worlds...");

@@ -909,6 +909,7 @@
     <ClCompile Include="..\source\FastNBT.cpp">
       <Filter>Storage</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\CraftingRecipes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1417,6 +1418,8 @@
     <ClInclude Include="..\source\FastNBT.h">
       <Filter>Storage</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\cStep.h" />
+    <ClInclude Include="..\source\CraftingRecipes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

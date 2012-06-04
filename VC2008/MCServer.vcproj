@@ -459,6 +459,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\CraftingRecipes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\CraftingRecipes.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\cRecipeChecker.cpp"
 				>
 			</File>
@@ -1383,10 +1391,10 @@
 					RelativePath="..\source\cStairs.h"
 					>
 				</File>
-        <File
-          RelativePath="..\source\cStep.h"
-          >
-        </File>
+				<File
+					RelativePath="..\source\cStep.h"
+					>
+				</File>
 				<File
 					RelativePath="..\source\cTorch.h"
 					>

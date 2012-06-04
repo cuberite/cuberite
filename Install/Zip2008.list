@@ -2,6 +2,7 @@ MCServer.exe
 MCServer*debug.cmd
 Plugins
 webadmin
+crafting.ini
 banned.example.ini
 furnace.txt
 groups.example.ini

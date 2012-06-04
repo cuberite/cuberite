@@ -14,6 +14,7 @@ class cThread;
 class cMonsterConfig;
 class cGroupManager;
 class cRecipeChecker;
+class cCraftingRecipes;
 class cFurnaceRecipe;
 class cWebAdmin;
 class cPluginManager;
@@ -32,26 +33,27 @@ class cRoot	//tolua_export
 public:
 	static cRoot* Get() { return s_Root; }							//tolua_export
 
-	cRoot();
+	cRoot(void);
 	~cRoot();
 
-	void Start();
+	void Start(void);
 
-	cServer* GetServer(void) { return m_Server; }						//tolua_export
-	cWorld* GetDefaultWorld(void);										//tolua_export
-	cWorld* GetWorld( const AString & a_WorldName );				//tolua_export
+	cServer * GetServer(void) { return m_Server; }						//tolua_export
+	cWorld *  GetDefaultWorld(void);										//tolua_export
+	cWorld *  GetWorld(const AString & a_WorldName);				//tolua_export
 	
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
 	
-	cMonsterConfig *GetMonsterConfig() { return m_MonsterConfig;}
+	cMonsterConfig * GetMonsterConfig() { return m_MonsterConfig; }
 
-	cGroupManager *  GetGroupManager (void) { return m_GroupManager; }   // tolua_export
-	cRecipeChecker * GetRecipeChecker(void) { return m_RecipeChecker; }  // tolua_export
-	cFurnaceRecipe * GetFurnaceRecipe(void) { return m_FurnaceRecipe; }  // tolua_export
-	cWebAdmin *      GetWebAdmin     (void) { return m_WebAdmin; }       // tolua_export
-	cPluginManager * GetPluginManager(void) { return m_PluginManager; }  // tolua_export
-	cAuthenticator & GetAuthenticator(void) { return m_Authenticator; }
+	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export
+	cRecipeChecker *   GetRecipeChecker  (void) { return m_RecipeChecker; }    // tolua_export
+	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
+	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // tolua_export
+	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
+	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
+	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 
 	void ServerCommand(const char* a_Cmd );						//tolua_export
 	
@@ -78,12 +80,13 @@ private:
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
 
-	cGroupManager *  m_GroupManager;
-	cRecipeChecker * m_RecipeChecker;
-	cFurnaceRecipe * m_FurnaceRecipe;
-	cWebAdmin *      m_WebAdmin;
-	cPluginManager * m_PluginManager;
-	cAuthenticator   m_Authenticator;
+	cGroupManager *    m_GroupManager;
+	cRecipeChecker *   m_RecipeChecker;
+	cCraftingRecipes * m_CraftingRecipes;
+	cFurnaceRecipe *   m_FurnaceRecipe;
+	cWebAdmin *        m_WebAdmin;
+	cPluginManager *   m_PluginManager;
+	cAuthenticator     m_Authenticator;
 
 	cMCLogger *      m_Log;
 

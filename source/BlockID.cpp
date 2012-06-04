@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "BlockID.h"
 #include "../iniFile/iniFile.h"
+#include "cItem.h"
 
 
 
@@ -35,6 +36,11 @@ public:
 		return m_Ini.GetValueI("Items", a_ItemName, -1);
 	}
 	
+	AString ResolveString(AString & a_ItemName)
+	{
+		return m_Ini.GetValue("Items", a_ItemName, "");
+	}
+	
 protected:
 	cIniFile m_Ini;
 } ;
@@ -58,8 +64,43 @@ int BlockStringToType(const AString & a_BlockTypeString)
 		return res;
 	}
 	
-	return gsBlockIDMap.Resolve(a_BlockTypeString);
+	return gsBlockIDMap.Resolve(TrimString(a_BlockTypeString));
 }
+
+
+
+
+bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
+{
+	AString Resolved = TrimString(gsBlockIDMap.ResolveString(TrimString(a_ItemTypeString)));
+	AString txt = (!Resolved.empty()) ? Resolved : a_ItemTypeString;
+	AStringVector Split = StringSplit(txt, ":");
+	if (Split.size() == 1)
+	{
+		Split = StringSplit(txt, "^");
+	}
+	if (Split.empty())
+	{
+		return false;
+	}
+	a_Item.m_ItemID = (ENUM_ITEM_ID)atoi(Split[0].c_str());
+	if ((a_Item.m_ItemID == 0) && (Split[0] != "0"))
+	{
+		// Parsing the number failed
+		return false;
+	}
+	if (Split.size() > 1)
+	{
+		a_Item.m_ItemHealth = atoi(Split[1].c_str());
+		if ((a_Item.m_ItemHealth == 0) && (Split[1] != "0"))
+		{
+			// Parsing the number failed
+			return false;
+		}
+	}
+	return true;
+}
+
 
 
 
