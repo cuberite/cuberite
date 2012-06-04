@@ -99,7 +99,7 @@
     <ClCompile>
       <AdditionalOptions>/ZI /D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.7;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -130,7 +130,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.7;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -162,7 +162,7 @@
     <ClCompile>
       <AdditionalOptions>/ZI /D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.7;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -194,7 +194,7 @@
     <ClCompile>
       <AdditionalOptions>/ZI /D_DEBUG %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.7;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -228,7 +228,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.7;..\mysql-connector\include;..\source\;..\pdcurs34\;..\jsoncpp-src-0.5.0\include;..\squirrel_3_0_1_stable\include;..\squirrel_3_0_1_stable;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -268,7 +268,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.5;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\tolua++-1.0.93\include;..\lua-5.1.4\src;..\zlib-1.2.7;..\mysql-connector\include;..\source\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
