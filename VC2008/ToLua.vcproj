@@ -241,22 +241,6 @@
 				RelativePath="..\tolua++-1.0.93\src\lib\tolua_to.c"
 				>
 			</File>
-			<File
-				RelativePath="..\tolua++-1.0.93\src\bin\toluabind.c"
-				>
-			</File>
-			<File
-				RelativePath="..\tolua++-1.0.93\src\bin\toluabind.h"
-				>
-			</File>
-			<File
-				RelativePath="..\tolua++-1.0.93\src\bin\toluabind_default.c"
-				>
-			</File>
-			<File
-				RelativePath="..\tolua++-1.0.93\src\bin\toluabind_default.h"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
