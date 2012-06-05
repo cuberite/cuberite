@@ -25,19 +25,19 @@ public:														//tolua_export
 
 	virtual void Tick(float a_Dt);	//tolua_export
 
-	//tolua_begin
-	virtual bool OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player );
-	virtual bool OnDisconnect( std::string a_Reason, cPlayer* a_Player );
-	virtual bool OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player );
-	virtual bool OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem );
-	virtual bool OnChat( const char* a_Chat, cPlayer* a_Player );
-	virtual bool OnLogin( cPacket_Login* a_PacketData );
-	virtual void OnPlayerSpawn( cPlayer* a_Player );
-	virtual bool OnPlayerJoin( cPlayer* a_Player );
-	virtual void OnPlayerMove( cPlayer* a_Player );
-	virtual void OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo );
-	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer );
-	//tolua_end
+	virtual bool OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player ) override;
+	virtual bool OnDisconnect( std::string a_Reason, cPlayer* a_Player ) override;
+	virtual bool OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player ) override;
+	virtual bool OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) override;
+	virtual bool OnChat( const char* a_Chat, cPlayer* a_Player ) override;
+	virtual bool OnLogin( cPacket_Login* a_PacketData ) override;
+	virtual void OnPlayerSpawn( cPlayer* a_Player ) override;
+	virtual bool OnPlayerJoin( cPlayer* a_Player ) override;
+	virtual void OnPlayerMove( cPlayer* a_Player ) override;
+	virtual void OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) override;
+	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) override;
+	
+	virtual void OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
 
 	lua_State* GetLuaState() { return m_LuaState; }
 

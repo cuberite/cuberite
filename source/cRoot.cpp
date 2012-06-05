@@ -141,6 +141,9 @@ void cRoot::Start()
 		LOG("Starting Authenticator...");
 		m_Authenticator.Start();
 		
+		LOG("Starting worlds...");
+		StartWorlds();
+		
 		LOG("Starting server...");
 		m_Server->StartListenThread();
 		//cHeartBeat* HeartBeat = new cHeartBeat();
@@ -202,35 +205,49 @@ void cRoot::LoadGlobalSettings()
 
 
 
-void cRoot::LoadWorlds()
+void cRoot::LoadWorlds(void)
 {
 	cIniFile IniFile("settings.ini"); IniFile.ReadFile();
 
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValue("Worlds", "DefaultWorld", "world");
 	m_pState->pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
-	m_pState->pDefaultWorld->InitializeSpawn();
 	m_pState->WorldsByName[ DefaultWorldName ] = m_pState->pDefaultWorld;
 
 	// Then load the other worlds
 	unsigned int KeyNum = IniFile.FindKey("Worlds");
 	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum );
-	if ( NumWorlds > 0 )
+	if (NumWorlds <= 0)
 	{
-		for (unsigned int i = 0; i < NumWorlds; i++)
+		return;
+	}
+	
+	for (unsigned int i = 0; i < NumWorlds; i++)
+	{
+		std::string ValueName = IniFile.GetValueName(KeyNum, i );
+		if (ValueName.compare("World") != 0)
 		{
-			std::string ValueName = IniFile.GetValueName(KeyNum, i );
-			if( ValueName.compare("World") == 0 )
-			{
-				std::string WorldName = IniFile.GetValue(KeyNum, i );
-				if (!WorldName.empty())
-				{
-					cWorld* NewWorld = new cWorld( WorldName.c_str() );
-					NewWorld->InitializeSpawn();
-					m_pState->WorldsByName[ WorldName ] = NewWorld;
-				}
-			}
+			continue;
 		}
+		std::string WorldName = IniFile.GetValue(KeyNum, i );
+		if (WorldName.empty())
+		{
+			continue;
+		}
+		cWorld* NewWorld = new cWorld( WorldName.c_str() );
+		m_pState->WorldsByName[ WorldName ] = NewWorld;
+	}  // for i - Worlds
+}
+
+
+
+
+
+void cRoot::StartWorlds(void)
+{
+	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	{
+		itr->second->InitializeSpawn();
 	}
 }
 
@@ -238,7 +255,7 @@ void cRoot::LoadWorlds()
 
 
 
-void cRoot::UnloadWorlds()
+void cRoot::UnloadWorlds(void)
 {
 	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
 	{

@@ -363,6 +363,25 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 		
+		case E_PLUGIN_CHUNK_GENERATED:
+		{
+			if (a_NumArgs != 3)
+			{
+				break;
+			}
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cWorld * World = va_arg(argptr, cWorld *);
+			int ChunkX = va_arg(argptr, int);
+			int ChunkZ = va_arg(argptr, int);
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				(*itr)->OnChunkGenerated(World, ChunkX, ChunkZ);
+			}
+			break;
+		}
+		
 		default:
 		{
 			LOGWARNING("cPluginManager: Calling Unknown hook: %i", a_Hook );

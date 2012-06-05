@@ -135,6 +135,10 @@ void cPlugin_NewLua::Tick(float a_Dt)
 	CallFunction(1, 0, "Tick");
 }
 
+
+
+
+
 bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
@@ -150,6 +154,10 @@ bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bRetVal;
 }
+
+
+
+
 
 bool cPlugin_NewLua::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
 {
@@ -167,6 +175,10 @@ bool cPlugin_NewLua::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
 	return bRetVal;
 }
 
+
+
+
+
 bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
@@ -182,6 +194,10 @@ bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bRetVal;
 }
+
+
+
+
 
 bool cPlugin_NewLua::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem )
 {
@@ -200,6 +216,10 @@ bool cPlugin_NewLua::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Play
 	return bRetVal;
 }
 
+
+
+
+
 bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
@@ -216,6 +236,10 @@ bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
 	return bRetVal;
 }
 
+
+
+
+
 bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
 {
 	cCSLock Lock( m_CriticalSection );
@@ -231,6 +255,10 @@ bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
 	return bRetVal;
 }
 
+
+
+
+
 void cPlugin_NewLua::OnPlayerSpawn( cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
@@ -241,6 +269,10 @@ void cPlugin_NewLua::OnPlayerSpawn( cPlayer* a_Player )
 
 	CallFunction(1, 0, "OnPlayerSpawn");
 }
+
+
+
+
 
 bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
 {
@@ -257,6 +289,10 @@ bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
 	return bRetVal;
 }
 
+
+
+
+
 void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
@@ -267,6 +303,10 @@ void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
 
 	CallFunction(1, 0, "OnPlayerMove");
 }
+
+
+
+
 
 void cPlugin_NewLua::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo )
 {
@@ -279,6 +319,10 @@ void cPlugin_NewLua::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageIn
 
 	CallFunction(2, 0, "OnTakeDamage");
 }
+
+
+
+
 
 bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 {
@@ -295,6 +339,28 @@ bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bRetVal;
 }
+
+
+
+
+
+void cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnChunkGenerated"))
+	{
+		return;
+	}
+	
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	
+	CallFunction(3, 0, "OnChunkGenerated");
+}
+
+
+
 
 
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)

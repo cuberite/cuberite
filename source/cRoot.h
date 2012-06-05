@@ -74,8 +74,13 @@ public:
 private:
 	void LoadGlobalSettings();
 
-	void LoadWorlds();
-	void UnloadWorlds();
+	/// Loads the worlds from settings.ini, creates the worldmap
+	void LoadWorlds(void);
+	
+	/// Starts each world's life
+	void StartWorlds(void);
+	
+	void UnloadWorlds(void);
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;

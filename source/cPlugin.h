@@ -13,7 +13,12 @@ class cPickup;
 class cItem;
 class cEntity;
 class cPawn;
+class cWorld;
 struct TakeDamageInfo;
+
+
+
+
 
 // tolua_begin
 class cPlugin
@@ -43,6 +48,7 @@ public:
 	virtual void OnPlayerMove( cPlayer* a_Player ) { (void)a_Player; }
 	virtual void OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) { (void)a_Pawn; (void)a_TakeDamageInfo; }
 	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) { (void)a_Killed; (void)a_Killer; return false; }
+	virtual void OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ) {}
 
 	// Accessors
 	const char* GetName() const { return m_Name.c_str(); }
@@ -85,3 +91,7 @@ private:
 	std::string m_Name;
 	int m_Version;
 };	//tolua_export
+
+
+
+
