@@ -100,180 +100,190 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 	if( WebAdmin == 0 ) return;
 	LOG("Path: %s", r->path_.c_str() );
 
-	AStringVector Split = StringSplit( r->path_, "/" );
-
-	if(r->path_ == "/")
+	if (r->path_ == "/")
 	{
+		r->answer_ += "<h1>MCServer WebAdmin</h1>";
 		r->answer_ += "<center>";
-		r->answer_ += "MCServer WebAdmin";
-		r->answer_ += "<br>";
 		r->answer_ += "<form method='get' action='webadmin/'>";
 		r->answer_ += "<input type='submit' value='Log in'>";
 		r->answer_ += "</form>";
 		r->answer_ += "</center>";
 		return;
 	}
-	else if( Split.size() > 0 && Split[0] == "webadmin" )
+
+	if (r->path_.empty() || r->path_[0] != '/')
 	{
-		if( r->authentication_given_ )
+		r->answer_ += "<h1>Bad request</h1>";
+		r->answer_ += "<p>";
+		r->answer_ = r->path_;  // TODO: Shouldn't we sanitize this? Possible security issue.
+		r->answer_ += "</p>";
+		return;
+	}
+	
+	AStringVector Split = StringSplit(r->path_.substr(1), "/");
+
+	if (Split.empty() || (Split[0] != "webadmin"))
+	{
+		r->answer_ += "<h1>Bad request</h1>";
+		return;
+	}
+	
+	if (!r->authentication_given_)
+	{
+		r->answer_ += "no auth";
+		r->auth_realm_ = "MCServer WebAdmin";
+	}
+	
+	std::string UserPassword = WebAdmin->m_IniFile->GetValue( "User:"+r->username_, "Password", "");
+	if ((UserPassword != "") && (r->password_ == UserPassword))
+	{
+		std::string BaseURL = "./";
+		if (Split.size() > 1)
 		{
-			std::string UserPassword = WebAdmin->m_IniFile->GetValue( "User:"+r->username_, "Password", "");
-			if (UserPassword != "" && r->password_ == UserPassword)
+			for (unsigned int i = 0; i < Split.size(); i++)
 			{
-				std::string BaseURL = "./";
-				if( Split.size() > 1 )
+				BaseURL += "../";
+			}
+			BaseURL += "webadmin/";
+		}
+
+		std::string Menu;
+		std::string Content;
+		std::string Template = WebAdmin->GetTemplate();
+		std::string FoundPlugin;
+
+		for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
+		{
+			cWebPlugin* WebPlugin = *itr;
+			cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
+			if( LuaPlugin )
+			{
+				std::list< std::pair<std::string, std::string> > NameList = LuaPlugin->GetTabNames();
+				for( std::list< std::pair<std::string, std::string> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
 				{
-					for( unsigned int i = 0; i < Split.size(); i++)
-					{
-						BaseURL += "../";
-					}
-					BaseURL += "webadmin/";
+					Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
 				}
-
-				std::string Menu;
-				std::string Content;
-				std::string Template = WebAdmin->GetTemplate();
-				std::string FoundPlugin;
-
-				for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
-				{
-					cWebPlugin* WebPlugin = *itr;
-					cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
-					if( LuaPlugin )
-					{
-						std::list< std::pair<std::string, std::string> > NameList = LuaPlugin->GetTabNames();
-						for( std::list< std::pair<std::string, std::string> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
-						{
-							Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
-						}
-					}
-					else
-					{
-						Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "'>" + WebPlugin->GetName() + "</a></li>";
-					}
-				}
-
-				HTTPRequest Request;
-				Request.Username = r->username_;
-				Request.Method = r->method_;
-				Request.Params = r->params_;
-				Request.PostParams = r->params_post_;
-				Request.Path = r->path_;
-
-				for( unsigned int i = 0; i < r->multipart_formdata_.size(); ++i )
-				{
-					webserver::formdata& fd = r->multipart_formdata_[i];
-
-					HTTPFormData HTTPfd;//( fd.value_ );
-					HTTPfd.Value = fd.value_;
-					HTTPfd.Type = fd.content_type_;
-					HTTPfd.Name = fd.name_;
-					LOGINFO("Form data name: %s", fd.name_.c_str() );
-					Request.FormData[ fd.name_ ] = HTTPfd;
-				}
-
-				if( Split.size() > 1 )
-				{
-					for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
-					{
-						if( (*itr)->GetName() == Split[1] )
-						{
-							Content = (*itr)->HandleRequest( &Request );
-							cWebPlugin* WebPlugin = *itr;
-							FoundPlugin = WebPlugin->GetName();
-							cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
-							if( LuaPlugin )
-							{
-								FoundPlugin += " - " + LuaPlugin->GetTabNameForRequest( &Request ).first;
-							}
-							break;
-						}
-					}
-				}
-
-				if( FoundPlugin.empty() )	// Default page
-				{
-					Content.clear();
-					FoundPlugin = "Current Game";
-					Content += "<h4>Server Name:</h4>";
-					Content += "<p>" + std::string( cRoot::Get()->GetServer()->GetServerID() ) + "</p>";
-
-					Content += "<h4>Plugins:</h4><ul>";
-					cPluginManager* PM = cRoot::Get()->GetPluginManager();
-					if( PM )
-					{
-						const cPluginManager::PluginList & List = PM->GetAllPlugins();
-						for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
-						{
-							AString VersionNum;
-							AppendPrintf(Content, "<li>%s V.%i</li>", (*itr)->GetName(), (*itr)->GetVersion());
-						}
-					}
-					Content += "</ul>";
-					Content += "<h4>Players:</h4><ul>";
-
-					cPlayerAccum PlayerAccum;
-					cWorld * World = cRoot::Get()->GetDefaultWorld(); // TODO - Create a list of worlds and players
-					World->ForEachPlayer(PlayerAccum);
-					Content.append(PlayerAccum.m_Contents);
-					Content += "</ul><br>";
-				}
-
-				
-
-				if( Split.size() > 1 )
-				{
-					Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
-				}
-
-				// mem usage
-#ifndef _WIN32
-				rusage resource_usage;
-				if (getrusage(RUSAGE_SELF, &resource_usage) != 0)
-				{
-					ReplaceString( Template, std::string("{MEM}"), "Error :(" );
-				}
-				else
-				{
-					AString MemUsage;
-					Printf(MemUsage, "%0.2f", ((double)resource_usage.ru_maxrss / 1024 / 1024) );
-					ReplaceString(Template, std::string("{MEM}"), MemUsage);
-				}
-#else
-				HANDLE hProcess = GetCurrentProcess();
-				PROCESS_MEMORY_COUNTERS pmc;
-				if( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc) ) )
-				{
-					AString MemUsage;
-					Printf(MemUsage, "%0.2f", (pmc.WorkingSetSize / 1024.f / 1024.f) );
-					ReplaceString( Template, "{MEM}", MemUsage );
-				}
-#endif
-				// end mem usage
-
-				ReplaceString( Template, "{USERNAME}",    r->username_ );
-				ReplaceString( Template, "{MENU}",        Menu );
-				ReplaceString( Template, "{PLUGIN_NAME}", FoundPlugin );
-				ReplaceString( Template, "{CONTENT}",     Content );
-				ReplaceString( Template, "{TITLE}",       "MCServer" );
-
-				AString NumChunks;
-				Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
-				ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
-
-				r->answer_ = Template;
 			}
 			else
 			{
-				r->answer_ += "Wrong username/password";
-				r->auth_realm_ = "MCServer WebAdmin";
+				Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "'>" + WebPlugin->GetName() + "</a></li>";
 			}
+		}
+
+		HTTPRequest Request;
+		Request.Username = r->username_;
+		Request.Method = r->method_;
+		Request.Params = r->params_;
+		Request.PostParams = r->params_post_;
+		Request.Path = r->path_.substr(1);
+
+		for( unsigned int i = 0; i < r->multipart_formdata_.size(); ++i )
+		{
+			webserver::formdata& fd = r->multipart_formdata_[i];
+
+			HTTPFormData HTTPfd;//( fd.value_ );
+			HTTPfd.Value = fd.value_;
+			HTTPfd.Type = fd.content_type_;
+			HTTPfd.Name = fd.name_;
+			LOGINFO("Form data name: %s", fd.name_.c_str() );
+			Request.FormData[ fd.name_ ] = HTTPfd;
+		}
+
+		if( Split.size() > 1 )
+		{
+			for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
+			{
+				if( (*itr)->GetName() == Split[1] )
+				{
+					Content = (*itr)->HandleRequest( &Request );
+					cWebPlugin* WebPlugin = *itr;
+					FoundPlugin = WebPlugin->GetName();
+					cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
+					if( LuaPlugin )
+					{
+						FoundPlugin += " - " + LuaPlugin->GetTabNameForRequest( &Request ).first;
+					}
+					break;
+				}
+			}
+		}
+
+		if( FoundPlugin.empty() )	// Default page
+		{
+			Content.clear();
+			FoundPlugin = "Current Game";
+			Content += "<h4>Server Name:</h4>";
+			Content += "<p>" + std::string( cRoot::Get()->GetServer()->GetServerID() ) + "</p>";
+
+			Content += "<h4>Plugins:</h4><ul>";
+			cPluginManager* PM = cRoot::Get()->GetPluginManager();
+			if( PM )
+			{
+				const cPluginManager::PluginList & List = PM->GetAllPlugins();
+				for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
+				{
+					AString VersionNum;
+					AppendPrintf(Content, "<li>%s V.%i</li>", (*itr)->GetName(), (*itr)->GetVersion());
+				}
+			}
+			Content += "</ul>";
+			Content += "<h4>Players:</h4><ul>";
+
+			cPlayerAccum PlayerAccum;
+			cWorld * World = cRoot::Get()->GetDefaultWorld(); // TODO - Create a list of worlds and players
+			World->ForEachPlayer(PlayerAccum);
+			Content.append(PlayerAccum.m_Contents);
+			Content += "</ul><br>";
+		}
+
+		
+
+		if( Split.size() > 1 )
+		{
+			Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
+		}
+
+		// mem usage
+#ifndef _WIN32
+		rusage resource_usage;
+		if (getrusage(RUSAGE_SELF, &resource_usage) != 0)
+		{
+			ReplaceString( Template, std::string("{MEM}"), "Error :(" );
 		}
 		else
 		{
-			r->answer_ += "no auth";
-			r->auth_realm_ = "MCServer WebAdmin";
+			AString MemUsage;
+			Printf(MemUsage, "%0.2f", ((double)resource_usage.ru_maxrss / 1024 / 1024) );
+			ReplaceString(Template, std::string("{MEM}"), MemUsage);
 		}
+#else
+		HANDLE hProcess = GetCurrentProcess();
+		PROCESS_MEMORY_COUNTERS pmc;
+		if( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc) ) )
+		{
+			AString MemUsage;
+			Printf(MemUsage, "%0.2f", (pmc.WorkingSetSize / 1024.f / 1024.f) );
+			ReplaceString( Template, "{MEM}", MemUsage );
+		}
+#endif
+		// end mem usage
+
+		ReplaceString( Template, "{USERNAME}",    r->username_ );
+		ReplaceString( Template, "{MENU}",        Menu );
+		ReplaceString( Template, "{PLUGIN_NAME}", FoundPlugin );
+		ReplaceString( Template, "{CONTENT}",     Content );
+		ReplaceString( Template, "{TITLE}",       "MCServer" );
+
+		AString NumChunks;
+		Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
+		ReplaceString(Template, "{NUMCHUNKS}", NumChunks);
+
+		r->answer_ = Template;
+	}
+	else
+	{
+		r->answer_ += "Wrong username/password";
+		r->auth_realm_ = "MCServer WebAdmin";
 	}
 }
 
