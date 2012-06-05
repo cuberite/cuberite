@@ -150,11 +150,11 @@ FireCharge     = BlazePowder, *   | Coal, *    | Gunpowder, *
 #******************************************************#
 # Weapons
 #
-WoodenSword    = Stick, 2:3, | Planks,      2:1, 2:2
-StoneSword     = Stick, 2:3, | Cobblestone, 2:1, 2:2
-GoldenSword    = Stick, 2:3, | GoldIngot,   2:1, 2:2
-IronSword      = Stick, 2:3, | IronIngot,   2:1, 2:2
-DiamondSword   = Stick, 2:3, | Diamond,     2:1, 2:2
+WoodenSword    = Stick, 2:3 | Planks,      2:1, 2:2
+StoneSword     = Stick, 2:3 | Cobblestone, 2:1, 2:2
+GoldenSword    = Stick, 2:3 | GoldIngot,   2:1, 2:2
+IronSword      = Stick, 2:3 | IronIngot,   2:1, 2:2
+DiamondSword   = Stick, 2:3 | Diamond,     2:1, 2:2
 Bow            = Stick, 2:1, 1:2, 2:3   | String, 3:1, 3:2, 3:3
 Bow            = Stick, 2:1, 3:2, 2:3   | String, 1:1, 1:2, 1:3
 Arrow, 4       = Flint, 1:1             | Stick, 1:2       | Feather, 1:3
@@ -232,7 +232,7 @@ Dispenser        = Cobblestone, 1:1, 1:2, 1:3, 2:1, 3:1, 3:2, 3:3      | Redston
 Repeater         = Stone,  1:2, 2:2, 3:2            | RedstoneTorchOn, 1:1, 3:1 | RedstoneDust, 2:1
 Piston           = Planks, 1:1, 2:1, 3:1            | RedstoneDust, 2:2         | Cobblestone, 1:2, 3:2, 1:3, 2:3, 3:3
 StickyPiston     = Piston, *         | SlimeBall, *
-Lamp             = RedstoneDust, 2:1, 1:2, 3:2, 2:3 | Glowstone, 2:2
+RedstoneLamp     = RedstoneDust, 2:1, 1:2, 3:2, 2:3 | Glowstone, 2:2
 
 
 
