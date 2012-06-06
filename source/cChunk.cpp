@@ -556,20 +556,6 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 		BLOCKTYPE ID = m_BlockTypes[Index];
 		switch( ID )
 		{
-			case E_BLOCK_GRASS:
-			{
-				// Grass turns into dirt if there's another block on top of it:
-				BLOCKTYPE AboveBlock = GetBlock(Index + (Width * Width) );
-				if (!( (AboveBlock == E_BLOCK_AIR) || (g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock]) ) )
-				{
-					FastSetBlock( m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_DIRT, GetNibble( m_BlockMeta, Index ) );
-				}
-				
-				// TODO: Grass spreads to nearby blocks if there's enough light and free space above that block
-				// Ref.: http://www.minecraftwiki.net/wiki/Grass_Block#Growth
-				break;
-			}
-			
 			case E_BLOCK_CROPS:
 			{
 				NIBBLETYPE Meta = GetMeta(Index);
@@ -580,10 +566,10 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 				break;
 			}
 			
+			case E_BLOCK_GRASS:        TickGrass(m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_TickRandom); break;
 			case E_BLOCK_PUMPKIN_STEM:
-			case E_BLOCK_MELON_STEM: TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
-			
-			case E_BLOCK_FARMLAND: TickFarmland(m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
+			case E_BLOCK_MELON_STEM:   TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
+			case E_BLOCK_FARMLAND:     TickFarmland(m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
 			
 			case E_BLOCK_SAPLING:
 			{
@@ -609,6 +595,50 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			{
 				break;
 			}
+		}
+	}
+}
+
+
+
+
+
+void cChunk::TickGrass(int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom)
+{
+	// Grass turns into dirt if there's another block on top of it:
+	BLOCKTYPE AboveBlock = cChunkDef::GetBlock(m_BlockTypes, a_RelX, a_RelY + 1, a_RelZ);
+	if (!((g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock])))
+	{
+		FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+	}
+	
+	// Grass spreads to nearby blocks if there's enough light (TODO) and free space above that block
+	// Ref.: http://www.minecraftwiki.net/wiki/Grass_Block#Growth
+	for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
+	{
+		int OfsX = a_TickRandom.randInt(2) - 1;  // [-1 .. 1]
+		int OfsY = a_TickRandom.randInt(4) - 3;  // [-3 .. 1]
+		int OfsZ = a_TickRandom.randInt(2) - 1;  // [-1 .. 1]
+		
+		BLOCKTYPE  DestBlock;
+		NIBBLETYPE DestMeta;
+		if (
+			!UnboundedRelGetBlock(a_RelX + OfsX, a_RelY + OfsY,     a_RelZ + OfsZ, DestBlock, DestMeta) ||
+			(DestBlock != E_BLOCK_DIRT)
+		)
+		{
+			continue;
+		}
+
+		BLOCKTYPE AboveDest;
+		NIBBLETYPE AboveMeta;
+		if (
+			UnboundedRelGetBlock(a_RelX + OfsX, a_RelY + OfsY + 1, a_RelZ + OfsZ, AboveDest, AboveMeta) &&
+			((g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock]))
+			// TODO: Query dest light, if it's enough
+		)
+		{
+			UnboundedRelFastSetBlock(a_RelX + OfsX, a_RelY + OfsY, a_RelZ + OfsZ, E_BLOCK_GRASS, 0);
 		}
 	}
 }
@@ -775,6 +805,11 @@ void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
 
 bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
+	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	{
+		return false;
+	}
+	
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
