@@ -419,7 +419,8 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			unsigned int index = (*itr);
 			Vector3i BlockPos = IndexToCoordinate( index );
 
-			char BlockID = GetBlock( index );
+			BLOCKTYPE BlockID = GetBlock( index );
+			NIBBLETYPE BlockMeta = GetMeta(index);
 			switch ( BlockID )
 			{
 				case E_BLOCK_REDSTONE_REPEATER_OFF:
@@ -443,16 +444,17 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 				case E_BLOCK_RED_MUSHROOM:
 				case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
 				{
-					if( GetBlock( BlockPos.x, BlockPos.y-1, BlockPos.z ) == E_BLOCK_AIR )
+					if (GetBlock(BlockPos.x, BlockPos.y - 1, BlockPos.z) == E_BLOCK_AIR)
 					{
 						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
 
 						Vector3i WorldPos = PositionToWorldPosition( BlockPos );
 
 						m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
-
-						cPickup* Pickup = new cPickup( WorldPos.x * 32 + 16, WorldPos.y * 32 + 16, WorldPos.z * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
-						Pickup->Initialize( m_World );
+						
+						cItems Pickups;
+						cBlockToPickup::ToPickup(BlockID, BlockMeta, E_ITEM_EMPTY, Pickups);
+						m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
 					}
 					break;
 				}
@@ -477,8 +479,9 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 
 						m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
 
-						cPickup* Pickup = new cPickup( WorldPos.x * 32 + 16, WorldPos.y * 32 + 16, WorldPos.z * 32 + 16, cItem( cBlockToPickup::ToPickup( (ENUM_ITEM_ID)BlockID, E_ITEM_EMPTY) , 1 ) );
-						Pickup->Initialize( m_World );
+						cItems Pickups;
+						cBlockToPickup::ToPickup(BlockID, BlockMeta, E_ITEM_EMPTY, Pickups);
+						m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
 					}
 					break;
 				}
@@ -492,8 +495,9 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 					if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
 					{
 						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-						cPickup* Pickup = new cPickup( WorldPos.x * 32 + 16, WorldPos.y * 32 + 16, WorldPos.z * 32 + 16,  cItem( (ENUM_ITEM_ID)BlockID, 1 ) );
-						Pickup->Initialize( m_World );
+						cItems Pickups;
+						cBlockToPickup::ToPickup(BlockID, BlockMeta, E_ITEM_EMPTY, Pickups);
+						m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
 					}
 					break;
 				}

@@ -13,9 +13,17 @@ cPig::cPig()
 	GetMonsterConfig("Pig");
 }
 
+
+
+
+
 cPig::~cPig()
 {
 }
+
+
+
+
 
 bool cPig::IsA( const char* a_EntityType )
 {
@@ -23,12 +31,21 @@ bool cPig::IsA( const char* a_EntityType )
 	return cMonster::IsA( a_EntityType );
 }
 
+
+
+
+
 void cPig::KilledBy( cEntity* a_Killer )
 {
-	//Drops 0-2 meat
-	cMonster::RandomDropItem(E_ITEM_RAW_MEAT, 0, 2);
+	cItems Drops;
+	AddRandomDropItem(Drops, 0, 2, E_ITEM_RAW_MEAT);
+	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
 
-	//TODO: Check for burning state
+	// TODO: Check for burning state
 
 	cMonster::KilledBy( a_Killer );
 }
+
+
+
+

@@ -7,10 +7,7 @@
 #include "cClientHandle.h"
 #include "cWorld.h"
 #include "cPlayer.h"
-#include "BlockID.h"
 #include "Defines.h"
-#include "cPickup.h"
-#include "cItem.h"
 #include "cMonsterConfig.h"
 #include "MersenneTwister.h"
 
@@ -548,21 +545,16 @@ void cMonster::SetSightDistance(float sd)
 
 
 
-void cMonster::DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count)
+void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, ENUM_ITEM_ID a_Item, short a_ItemHealth)
 {
-	if (a_Count > 0)
+	MTRand r1;
+	int Count = r1.randInt() % (a_Max + 1 - a_Min) + a_Min;
+	if (Count > 0)
 	{
-		cPickup * Pickup = new cPickup( (int)(m_Pos.x * 32), (int)(m_Pos.y * 32), (int)(m_Pos.z * 32), cItem( a_Item, (char) a_Count ) );
-		Pickup->Initialize( GetWorld() );
+		a_Drops.push_back(cItem(a_Item, Count, a_ItemHealth));
 	}
 }
 
 
 
 
-
-void cMonster::RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max)
-{
-	MTRand r1;
-	return cMonster::DropItem(a_Item, r1.randInt() % (a_Max + 1 - a_Min) + a_Min);
-}

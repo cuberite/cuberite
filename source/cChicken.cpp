@@ -3,7 +3,14 @@
 
 #include "cChicken.h"
 
-//TODO Drop egg every 5-10 minutes
+
+
+
+
+// TODO Drop egg every 5-10 minutes
+
+
+
 
 
 cChicken::cChicken()
@@ -12,9 +19,17 @@ cChicken::cChicken()
 	GetMonsterConfig("Chicken");
 }
 
+
+
+
+
 cChicken::~cChicken()
 {
 }
+
+
+
+
 
 bool cChicken::IsA( const char* a_EntityType )
 {
@@ -22,18 +37,20 @@ bool cChicken::IsA( const char* a_EntityType )
 	return cMonster::IsA( a_EntityType );
 }
 
+
+
+
+
 void cChicken::KilledBy( cEntity* a_Killer )
 {
-	//Drops 0-2 Feathers
-	cMonster::RandomDropItem(E_ITEM_FEATHER, 0, 2);
-
-	// Raw Chicken 
-	if(GetMetaData() == BURNING)
-	{
-		cMonster::DropItem(E_ITEM_COOKED_CHICKEN, 1);
-	}else{
-		cMonster::DropItem(E_ITEM_RAW_CHICKEN, 1);
-	}
+	cItems Drops;
+	AddRandomDropItem(Drops, 0, 2, E_ITEM_FEATHER);
+	Drops.push_back(cItem((GetMetaData() == BURNING) ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN, 1));
+	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
 
 	cMonster::KilledBy( a_Killer );
 }
+
+
+
+

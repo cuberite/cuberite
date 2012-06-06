@@ -84,6 +84,16 @@
 
 
 
+#define RECI_RAND_MAX (1.f/RAND_MAX)
+inline int fRadRand(MTRand & r1, int a_BlockCoord)
+{
+	return a_BlockCoord * 32 + (int)(16 * ((float)r1.rand() * RECI_RAND_MAX) * 16 - 8);
+}
+
+
+
+
+
 int cClientHandle::s_ClientCount = 0;
 
 
@@ -769,22 +779,29 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, 
 		a_Packet->m_Direction, a_Packet->m_Status
 	);
-	if (a_Packet->m_Status == 0x04)	// Drop block
+
+	// Do we want plugins to disable tossing items? Probably no, so toss item before asking plugins for permission
+	if (a_Packet->m_Status == 0x04)  // Drop held item
 	{
 		m_Player->TossItem(false);
 		return;
 	}
 	
 	cWorld* World = m_Player->GetWorld();
+	BLOCKTYPE  OldBlock = World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	NIBBLETYPE OldMeta  = World->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 
-	char OldBlock = World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	char MetaData = World->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_BLOCK_DIG, 4, a_Packet, m_Player, OldBlock, OldMeta))
+	{
+		// The plugin doesn't agree with the digging, replace the block on the client and quit:
+		World->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
+		return;
+	}
+	
 	bool bBroken = (
 		(a_Packet->m_Status == 0x02) || 
 		(g_BlockOneHitDig[(int)OldBlock]) || 
-		((a_Packet->m_Status == 0x00) && (m_Player->GetGameMode() == 1)) ||
-		((m_Player->GetInventory().GetEquippedItem().m_ItemID == E_ITEM_SHEARS) && (OldBlock == E_BLOCK_LEAVES))
+		((a_Packet->m_Status == 0x00) && (m_Player->GetGameMode() == 1))
 	);
 
 	if ((OldBlock == E_BLOCK_WOODEN_DOOR) && !bBroken)
@@ -792,27 +809,11 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 	}
 
-	cItem PickupItem;
+	cItems PickupItems;
 	if (bBroken && !(m_Player->GetGameMode() == 1)) // broken
 	{
-		ENUM_ITEM_ID PickupID = cBlockToPickup::ToPickup((ENUM_BLOCK_ID)OldBlock, m_Player->GetInventory().GetEquippedItem().m_ItemID);
-		PickupItem.m_ItemID = PickupID;
-		PickupItem.m_ItemHealth = MetaData;
-		PickupItem.m_ItemCount = cBlockToPickup::PickupCount(OldBlock);
-		if (OldBlock == E_BLOCK_LAPIS_ORE)
-		{
-			PickupItem.m_ItemHealth = 4;
-		}
-		if (cDoors::IsDoor(OldBlock))
-		{
-			PickupItem.m_ItemHealth = 1;	//For a complete door this works :D
-		}
-	}
-	
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_BLOCK_DIG, 2, a_Packet, m_Player, &PickupItem))
-	{
-		World->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
-		return;
+		// TODO: Allow plugins to change the dropped objects
+		cBlockToPickup::ToPickup(OldBlock, OldMeta, m_Player->GetInventory().GetEquippedItem().m_ItemID, PickupItems);
 	}
 	
 	int pX = a_Packet->m_PosX;
@@ -836,32 +837,31 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		return;
 	}
 	
-	if (!World->DigBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, PickupItem))
+	if (!World->DigBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ))
 	{
 		return;
 	}
 	
-	if (OldBlock == E_BLOCK_REDSTONE_TORCH_ON)
+	World->SpawnItemPickups(PickupItems, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	
+	switch (OldBlock)
 	{
-		cRedstone Redstone(World);
-		Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
+		case E_BLOCK_REDSTONE_TORCH_ON:
+		case E_BLOCK_REDSTONE_TORCH_OFF:
+		case E_BLOCK_REDSTONE_WIRE:
+		{
+			cRedstone Redstone(World);
+			Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
+			break;
+		}
 	}
-	if (OldBlock == E_BLOCK_REDSTONE_TORCH_OFF)
-	{
-		cRedstone Redstone(World);
-		Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
-	}
-	if (OldBlock == E_BLOCK_REDSTONE_WIRE)
-	{
-		cRedstone Redstone(World);
-		Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
-	}
+	
 	if ((OldBlock == E_BLOCK_PISTON) || (OldBlock == E_BLOCK_STICKY_PISTON))
 	{
 		int newX = a_Packet->m_PosX;
 		int newY = a_Packet->m_PosY;
 		int newZ = a_Packet->m_PosZ;
-		AddPistonDir(newX, newY, newZ, MetaData & ~(8), 1);
+		AddPistonDir(newX, newY, newZ, OldMeta & ~(8), 1);
 		if (World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
 		{
 			World->SetBlock(newX, newY, newZ, E_BLOCK_AIR, 0);
@@ -871,7 +871,7 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 	if (cDoors::IsDoor(OldBlock))
 	{
 		// Special actions for destroyed door (Destroy second part)
-		if (MetaData & 8)
+		if (OldMeta & 8)
 		{
 			// Was upper part of door
 			if (cDoors::IsDoor(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY - 1, a_Packet->m_PosZ)))

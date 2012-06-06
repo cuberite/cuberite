@@ -345,31 +345,39 @@ void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 	}
 }
 
-void cPlayer::KilledBy( cEntity* a_Killer )
-{
-	cPawn::KilledBy( a_Killer );
 
-	if( m_Health > 0 ) return; //  not dead yet =]
+
+
+
+void cPlayer::KilledBy(cEntity * a_Killer)
+{
+	cPawn::KilledBy(a_Killer);
+
+	if (m_Health > 0)
+	{
+		return; //  not dead yet =]
+	}
 
 	m_bVisible = false; // So new clients don't see the player
 
-	MTRand r1;
 	// Puke out all the items
 	cItem* Items = m_Inventory->GetSlots();
-	for( unsigned int i = 1; i < m_Inventory->c_NumSlots; ++i )
+	cItems Pickups;
+	for (unsigned int i = 1; i < m_Inventory->c_NumSlots; ++i)
 	{
 		if( !Items[i].IsEmpty() )
 		{
-			float SpeedX = ((r1.randInt()%1000)-500)	/100.f;
-			float SpeedY = ((r1.randInt()%1000))		/100.f;
-			float SpeedZ = ((r1.randInt()%1000)-500)	/100.f;
-			cPickup* Pickup = new cPickup( (int)(m_Pos.x*32), (int)(m_Pos.y*32), (int)(m_Pos.z*32), Items[i], SpeedX, SpeedY, SpeedZ );
-			Pickup->Initialize( GetWorld() );
+			Pickups.push_back(Items[i]);
 		}
 		Items[i].Empty();
 	}
+	m_World->SpawnItemPickups(Pickups, m_Pos.x, m_Pos.y, m_Pos.z, 10);
 	SaveToDisk(); // Save it, yeah the world is a tough place !
 }
+
+
+
+
 
 void cPlayer::Respawn()
 {
@@ -409,30 +417,41 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 	m_CurrentWindow = a_Window;
 }
 
+
+
+
+
 void cPlayer::CloseWindow(char a_WindowType)
 {
-	if (a_WindowType == 0) { // Inventory
-		if(m_Inventory->GetWindow()->GetDraggingItem() && m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount > 0)
+	if (a_WindowType == 0)
+	{
+		// Inventory
+		if (
+			(m_Inventory->GetWindow()->GetDraggingItem() != NULL) && 
+			(m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount > 0)
+		)
 		{
 			LOG("Player holds item! Dropping it...");
 			TossItem( true, m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount );
 		}
 
 		//Drop whats in the crafting slots (1, 2, 3, 4)
-		for( int i = 1; i <= 4; i++ )
+		cItems Drops;
+		for (int i = 1; i <= 4; i++)
 		{
 			cItem* Item = m_Inventory->GetSlot( i );
-			if( Item->m_ItemID > 0 && Item->m_ItemCount > 0 )
+			if (!Item->IsEmpty())
 			{
-				float vX = 0, vY = 0, vZ = 0;
-				EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
-				vY = -vY*2 + 1.f;
-				cPickup* Pickup = new cPickup( (int)(GetPosX()*32), (int)(GetPosY()*32) + (int)(1.6f*32), (int)(GetPosZ()*32), *Item, vX*2, vY*2, vZ*2 );
-				Pickup->Initialize( GetWorld() );
+				Drops.push_back(*Item);
 			}
 			Item->Empty();
 		}
+		float vX = 0, vY = 0, vZ = 0;
+		EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
+		vY = -vY*2 + 1.f;
+		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 2, vY * 2, vZ * 2);
 	}
+	
 	if (m_CurrentWindow)
 	{
 		// FIXME: If the player entity is destroyed while having a chest window open, the chest will not close
@@ -652,6 +671,10 @@ bool cPlayer::IsInGroup( const char* a_Group )
 	return false;
 }
 
+
+
+
+
 void cPlayer::ResolvePermissions()
 {
 	m_ResolvedPermissions.clear();	// Start with an empty map yo~
@@ -741,39 +764,37 @@ AString cPlayer::GetColor(void) const
 
 void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
 {
-	if( a_bDraggingItem )
+	cItems Drops;
+	if (a_bDraggingItem)
 	{
-		cItem* Item = GetInventory().GetWindow()->GetDraggingItem();
-		if( Item->m_ItemID > 0 && Item->m_ItemCount >= a_Amount )
+		cItem * Item = GetInventory().GetWindow()->GetDraggingItem();
+		if (!Item->IsEmpty())
 		{
-			float vX = 0, vY = 0, vZ = 0;
-			EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
-			vY = -vY*2 + 1.f;
-			cPickup* Pickup = new cPickup( (int)(GetPosX()*32), (int)(GetPosY()*32) + (int)(1.6f*32), (int)(GetPosZ()*32), cItem( Item->m_ItemID, (char)a_Amount, Item->m_ItemHealth), vX*2, vY*2, vZ*2 );
-			Pickup->Initialize( GetWorld() );
+			Drops.push_back(*Item);
 			if( Item->m_ItemCount > a_Amount )
 				Item->m_ItemCount -= (char)a_Amount;
 			else
 				Item->Empty();
 		}
-		return;
 	}
-
-	// Else drop equipped item
-	cItem DroppedItem = GetInventory().GetEquippedItem();
-	if( DroppedItem.m_ItemID > 0 && DroppedItem.m_ItemCount > 0 )
+	else
 	{
-		DroppedItem.m_ItemCount = 1;
-		if( GetInventory().RemoveItem( DroppedItem ) )
+		// Else drop equipped item
+		cItem DroppedItem = GetInventory().GetEquippedItem();
+		if (!DroppedItem.IsEmpty())
 		{
-			DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
-			float vX = 0, vY = 0, vZ = 0;
-			EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
-			vY = -vY*2 + 1.f;
-			cPickup* Pickup = new cPickup( (int)(GetPosX()*32), (int)(GetPosY()*32) + (int)(1.6f*32), (int)(GetPosZ()*32), DroppedItem, vX*2, vY*2, vZ*2 );
-			Pickup->Initialize( GetWorld() );
+			DroppedItem.m_ItemCount = 1;
+			if (GetInventory().RemoveItem(DroppedItem))
+			{
+				DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
+				Drops.push_back(DroppedItem);
+			}
 		}
 	}
+	float vX = 0, vY = 0, vZ = 0;
+	EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
+	vY = -vY*2 + 1.f;
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 2, vY * 2, vZ * 2);
 }
 
 

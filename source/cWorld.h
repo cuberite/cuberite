@@ -19,6 +19,7 @@
 #include "ChunkSender.h"
 #include "Defines.h"
 #include "LightingThread.h"
+#include "cItem.h"
 
 
 
@@ -206,14 +207,20 @@ public:
 	char GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
 	// TODO: char GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
+	/// Spawns item pickups for each item in the list. May compress pickups if too many entities:
+	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0);
+	
+	/// Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified:
+	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	
 	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
 	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
 	
 	/// Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read.
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 	
-	bool DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem );									//tolua_export
-	void SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer* a_Player );									//tolua_export
+	bool DigBlock   (int a_X, int a_Y, int a_Z);									//tolua_export
+	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player );									//tolua_export
 
 	const double & GetSpawnX() { return m_SpawnX; }														//tolua_export
 	const double & GetSpawnY();																			//tolua_export

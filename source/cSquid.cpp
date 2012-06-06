@@ -26,13 +26,23 @@ bool cSquid::IsA( const char* a_EntityType )
 	return cMonster::IsA( a_EntityType );
 }
 
+
+
+
+
 void cSquid::KilledBy( cEntity* a_Killer )
 {
-	//Drops 0-3 Ink Sacs
-	cMonster::RandomDropItem(E_ITEM_DYE, 0, 3);
+	// Drops 0-3 Ink Sacs
+	cItems Drops;
+	AddRandomDropItem(Drops, 0, 3, E_ITEM_DYE, E_META_DYE_BLACK);
+	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
 
 	cMonster::KilledBy( a_Killer );
 }
+
+
+
+
 
 void cSquid::Tick(float a_Dt)
 {

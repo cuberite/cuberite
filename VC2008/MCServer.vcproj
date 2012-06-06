@@ -4,6 +4,7 @@
 	Version="9,00"
 	Name="MCServer"
 	ProjectGUID="{32012054-0C96-4C43-AB27-174FF8E72D66}"
+	RootNamespace="MCServer"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="0"
 	>
@@ -1846,6 +1847,10 @@
 			>
 			<File
 				RelativePath="..\banned.ini"
+				>
+			</File>
+			<File
+				RelativePath="..\crafting.txt"
 				>
 			</File>
 			<File

@@ -1,13 +1,19 @@
 #include "Globals.h"
+
+#include <set>
+#include <queue>
+
 #include "cFluidSimulator.h"
 #include "cWorld.h"
 #include "Vector3i.h"
 #include "BlockID.h"
 #include "Defines.h"
-#include <set>
-#include "cPickup.h"
 #include "cItem.h"
-#include <queue>
+#include "cBlockToPickup.h"
+
+
+
+
 
 //#define DEBUG_FLUID
 #ifdef DEBUG_FLUID
@@ -15,6 +21,9 @@
 #else
 #define LOG_FLUID(...)
 #endif
+
+
+
 
 
 class cFluidSimulator::FluidData
@@ -343,14 +352,15 @@ void cFluidSimulator::Simulate( float a_Dt )
 			{
 				char DownID = m_World->GetBlock( pos.x, pos.y-1, pos.z );
 				bool bWashedAwayItem = CanWashAway( DownID );
-				if( (IsPassableForFluid(DownID) || bWashedAwayItem)&&!IsStationaryBlock(DownID) ) // free for fluid 
+				if( (IsPassableForFluid(DownID) || bWashedAwayItem) && !IsStationaryBlock(DownID) ) // free for fluid 
 				{
 					if( bWashedAwayItem )
 					{
-						cPickup* Pickup = new cPickup( pos.x * 32 + 16, (pos.y-1) * 32 + 16, pos.z * 32 + 16, cItem( (ENUM_ITEM_ID)DownID, 1, m_World->GetBlockMeta( pos.x, pos.y-1, pos.z ) ) );
-						Pickup->Initialize( m_World );
+						cItems Drops;
+						cBlockToPickup::ToPickup(DownID, m_World->GetBlockMeta(pos.x, pos.y - 1, pos.z), E_ITEM_EMPTY, Drops);
+						m_World->SpawnItemPickups(Drops, pos.x, pos.y - 1, pos.z);
 					}
-					if( pos.y > 0 )
+					if (pos.y > 0)
 					{
 						m_World->FastSetBlock( pos.x, pos.y-1, pos.z, m_FluidBlock, 8 ); // falling
 						AddBlock( pos.x, pos.y-1, pos.z );
@@ -374,14 +384,15 @@ void cFluidSimulator::Simulate( float a_Dt )
 							char BlockID = m_World->GetBlock( p.x, p.y, p.z );
 							bool bWashedAwayItem = CanWashAway( BlockID );
 
-							if(!IsPassableForFluid(BlockID)) continue;
+							if (!IsPassableForFluid(BlockID)) continue;
 
-							if( !IsAllowedBlock( BlockID ) )
+							if (!IsAllowedBlock(BlockID))
 							{
-								if( bWashedAwayItem )
+								if (bWashedAwayItem)
 								{
-									cPickup* Pickup = new cPickup( p.x * 32 + 16, p.y * 32 + 16, p.z * 32 + 16, cItem( (ENUM_ITEM_ID)BlockID, 1, m_World->GetBlockMeta( p.x, p.y, p.z ) ) );
-									Pickup->Initialize( m_World );
+									cItems Drops;
+									cBlockToPickup::ToPickup(DownID, m_World->GetBlockMeta(p.x, p.y, p.z), E_ITEM_EMPTY, Drops);
+									m_World->SpawnItemPickups(Drops, p.x, p.y, p.z);
 								}
 
 								if( p.y == pos.y )

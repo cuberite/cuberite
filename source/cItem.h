@@ -8,6 +8,10 @@ namespace Json
 	class Value;
 };
 
+
+
+
+
 class cItem																								//tolua_export
 {																										//tolua_export
 public:
@@ -95,3 +99,9 @@ public:
 	short			m_ItemHealth;																		//tolua_export
 
 }; //tolua_export
+
+typedef std::vector<cItem> cItems;
+
+
+
+

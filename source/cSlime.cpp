@@ -15,9 +15,17 @@ cSlime::cSlime()
 	GetMonsterConfig("Slime");
 }
 
+
+
+
+
 cSlime::~cSlime()
 {
 }
+
+
+
+
 
 bool cSlime::IsA( const char* a_EntityType )
 {
@@ -25,10 +33,20 @@ bool cSlime::IsA( const char* a_EntityType )
 	return cMonster::IsA( a_EntityType );
 }
 
+
+
+
+
 void cSlime::KilledBy( cEntity* a_Killer )
 {
 	//TODO: only when tiny
-	cMonster::RandomDropItem(E_ITEM_SLIMEBALL, 0, 2);
+	cItems Drops;
+	AddRandomDropItem(Drops, 0, 2, E_ITEM_SLIMEBALL);
+	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
 
 	cMonster::KilledBy( a_Killer );
 }
+
+
+
+

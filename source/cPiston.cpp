@@ -51,7 +51,8 @@ unsigned short cPiston::FirstPassthroughBlock( int pistonX, int pistonY, int pis
 
 
 
-void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
+void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
+{
 	char pistonBlock = m_World->GetBlock( pistx, pisty, pistz );
 	char pistonMeta = m_World->GetBlockMeta( pistx, pisty, pistz );
 	char isSticky = (char)(pistonBlock == E_BLOCK_STICKY_PISTON) * 8;
@@ -59,21 +60,22 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz ) {
 	if ( (pistonMeta & 0x8) == 0x0 ) // only extend if piston is not already extended 
 	{
 		unsigned short dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
-		if(dist>9000) return; // too many blocks
+		if (dist > 9000) return; // too many blocks
 	
 		AddDir( pistx, pisty, pistz, pistonMeta & 7, dist+1 )
-		char currBlock = m_World->GetBlock( pistx, pisty, pistz );
-		if( currBlock != E_BLOCK_AIR ) {
-			cItem PickupItem;
-			PickupItem.m_ItemID = cBlockToPickup::ToPickup( (ENUM_BLOCK_ID) currBlock, E_ITEM_EMPTY );
-			PickupItem.m_ItemCount = 1;
-			cPickup* Pickup = new cPickup( pistx*32 + 16, pisty*32 + 16, pistz*32 + 16, PickupItem );
-			Pickup->Initialize( m_World );
+		BLOCKTYPE currBlock = m_World->GetBlock    (pistx, pisty, pistz);
+		NIBBLETYPE currMeta = m_World->GetBlockMeta(pistx, pisty, pistz);
+		if (currBlock != E_BLOCK_AIR)
+		{
+			cItems PickupItems;
+			cBlockToPickup::ToPickup(currBlock, currMeta, E_ITEM_EMPTY, PickupItems);
+			m_World->SpawnItemPickups(PickupItems, pistx, pisty, pistz);
 			recalc = true;
 		}
 		int oldx = pistx, oldy = pisty, oldz = pistz;
 		char currBlockMeta;
-		for( int i = dist+1; i>0; i-- ) {
+		for (int i = dist+1; i>0; i--)
+		{
 			AddDir( pistx, pisty, pistz, pistonMeta & 7, -1 )
 			currBlock = m_World->GetBlock( pistx, pisty, pistz );
 			currBlockMeta = m_World->GetBlockMeta( pistx, pisty, pistz );

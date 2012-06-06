@@ -29,6 +29,7 @@ public:																	//tolua_export
 		E_PLUGIN_KILLED,            // tolua_export
 		E_PLUGIN_CHUNK_GENERATED,   // tolua_export
 		E_PLUGIN_CHUNK_GENERATING,  // tolua_export
+		E_PLUGIN_BLOCK_TO_DROPS,    // tolua_export
 	};                            // tolua_export
 
 	static cPluginManager * GetPluginManager();							//tolua_export

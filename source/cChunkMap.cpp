@@ -23,17 +23,6 @@
 
 
 
-#define RECI_RAND_MAX (1.f/RAND_MAX)
-inline float fRadRand( float a_Radius )
-{
-	MTRand r1;
-	return ((float)r1.rand() * RECI_RAND_MAX)*a_Radius - a_Radius*0.5f;
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap:
 
@@ -747,7 +736,7 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z, cItem & a_PickupItem)
+bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z)
 {
 	int PosX = a_X, PosY = a_Y, PosZ = a_Z, ChunkX, ChunkZ;
 
@@ -766,11 +755,6 @@ bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z, cItem & a_PickupItem)
 
 	m_World->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
 
-	if ( !a_PickupItem.IsEmpty() )
-	{
-		cPickup * Pickup = new cPickup( a_X * 32 + 16 + (int)fRadRand(16.f), a_Y * 32 + 16 + (int)fRadRand(16.f), a_Z * 32 + 16 + (int)fRadRand(16.f), a_PickupItem );
-		Pickup->Initialize(m_World);
-	}
 	return true;
 }
 

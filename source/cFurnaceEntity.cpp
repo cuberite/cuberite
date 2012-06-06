@@ -58,15 +58,16 @@ cFurnaceEntity::~cFurnaceEntity()
 void cFurnaceEntity::Destroy()
 {
 	// Drop items
+	cItems Pickups;
 	for( int i = 0; i < 3; i++)
 	{
 		if( !m_Items[i].IsEmpty() )
 		{
-			cPickup* Pickup = new cPickup( m_PosX * 32 + 16, m_PosY * 32 + 16, m_PosZ * 32 + 16, m_Items[i], 0, 1.f, 0 );
-			Pickup->Initialize(m_World);
+			Pickups.push_back(m_Items[i]);
 			m_Items[i].Empty();
 		}
 	}
+	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
 }
 
 

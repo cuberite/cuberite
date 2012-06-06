@@ -13,15 +13,27 @@ cSkeleton::cSkeleton()
 	GetMonsterConfig("Skeleton");
 }
 
+
+
+
+
 cSkeleton::~cSkeleton()
 {
 }
+
+
+
+
 
 bool cSkeleton::IsA( const char* a_EntityType )
 {
 	if( strcmp( a_EntityType, "cSkeleton" ) == 0 ) return true;
 	return cMonster::IsA( a_EntityType );
 }
+
+
+
+
 
 void cSkeleton::Tick(float a_Dt)
 {
@@ -34,11 +46,20 @@ void cSkeleton::Tick(float a_Dt)
 	}
 }
 
+
+
+
+
 void cSkeleton::KilledBy( cEntity* a_Killer )
 {
-	cMonster::RandomDropItem(E_ITEM_ARROW, 0, 2);
-
-	cMonster::RandomDropItem(E_ITEM_BONE, 0, 2);
+	cItems Drops;
+	AddRandomDropItem(Drops, 0, 2, E_ITEM_ARROW);
+	AddRandomDropItem(Drops, 0, 2, E_ITEM_BONE);
+	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
 
 	cMonster::KilledBy( a_Killer );
 }
+
+
+
+

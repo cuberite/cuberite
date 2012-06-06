@@ -938,6 +938,48 @@ char cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
 
 
 
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed)
+{
+	MTRand r1;
+	a_FlyAwaySpeed /= 1000;  // Pre-divide, so that we can don't have to divide each time inside the loop
+	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
+	{
+		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
+		float SpeedY = (float)(a_FlyAwaySpeed *  r1.randInt(1000));
+		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
+		cPickup * Pickup = new cPickup(
+			(int)(a_BlockX * 32) + r1.randInt(16) + r1.randInt(16), 
+			(int)(a_BlockY * 32) + r1.randInt(16) + r1.randInt(16), 
+			(int)(a_BlockZ * 32) + r1.randInt(16) + r1.randInt(16),
+			*itr, SpeedX, SpeedY, SpeedZ
+		);
+		Pickup->Initialize(this);
+	}
+}
+
+
+
+
+
+void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	MTRand r1;
+	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
+	{
+		cPickup * Pickup = new cPickup(
+			(int)(a_BlockX * 32) + r1.randInt(16) + r1.randInt(16), 
+			(int)(a_BlockY * 32) + r1.randInt(16) + r1.randInt(16), 
+			(int)(a_BlockZ * 32) + r1.randInt(16) + r1.randInt(16),
+			*itr, (float)a_SpeedX, (float)a_SpeedY, (float)a_SpeedZ
+		);
+		Pickup->Initialize(this);
+	}
+}
+
+
+
+
+
 void cWorld::ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType)
 {
 	m_ChunkMap->ReplaceBlocks(a_Blocks, a_FilterBlockType);
@@ -956,14 +998,9 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock( int a_X, int a_Y, int a_Z, cItem & a_PickupItem )
+bool cWorld::DigBlock( int a_X, int a_Y, int a_Z)
 {
-	bool res = m_ChunkMap->DigBlock(a_X, a_Y, a_Z, a_PickupItem);
-	if (res)
-	{
-		GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
-	}
-	return res;
+	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
 }
 
 

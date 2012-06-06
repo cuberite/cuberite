@@ -10,6 +10,7 @@
 #include "cInventory.h"
 #include "cPickup.h"
 #include "cRoot.h"
+#include "cWorld.h"
 
 #include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_InventorySlot.h"
@@ -116,23 +117,24 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 
 
 
-void cCraftingWindow::Close( cPlayer & a_Player )
+void cCraftingWindow::Close(cPlayer & a_Player)
 {
 	// Start from slot 1, don't drop what's in the result slot
+	cItems Drops;
 	for( int i = 1; i < GetNumSlots(); i++ )
 	{
-		cItem* Item = GetSlot( i );
-		if( Item->m_ItemID > 0 && Item->m_ItemCount > 0 )
+		cItem * Item = GetSlot(i);
+		if (!Item->IsEmpty())
 		{
-			float vX = 0, vY = 0, vZ = 0;
-			EulerToVector( -a_Player.GetRotation(), a_Player.GetPitch(), vZ, vX, vY );
-			vY = -vY*2 + 1.f;
-			cPickup* Pickup = new cPickup( (int)(a_Player.GetPosX()*32), (int)(a_Player.GetPosY()*32) + (int)(1.6f*32), (int)(a_Player.GetPosZ()*32), *Item, vX*2, vY*2, vZ*2 );
-			Pickup->Initialize( a_Player.GetWorld() );
+			Drops.push_back(*Item);
 		}
 		Item->Empty();
 	}
-	cWindow::Close( a_Player );
+	float vX = 0, vY = 0, vZ = 0;
+	EulerToVector( -a_Player.GetRotation(), a_Player.GetPitch(), vZ, vX, vY);
+	vY = -vY*2 + 1.f;
+	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 2, vY * 2, vZ * 2);
+	cWindow::Close(a_Player);
 }
 
 

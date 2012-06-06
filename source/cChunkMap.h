@@ -104,8 +104,8 @@ public:
 	/// Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read.
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
-	bool      DigBlock           (int a_X, int a_Y, int a_Z, cItem & a_PickupItem);
-	void      SendBlockTo        (int a_X, int a_Y, int a_Z, cPlayer * a_Player);
+	bool DigBlock   (int a_X, int a_Y, int a_Z);
+	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player);
 	
 	/// Compares clients of two chunks, calls the callback accordingly
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);

@@ -13,15 +13,27 @@ cZombiepigman::cZombiepigman()
 	GetMonsterConfig("Zombiepigman");
 }
 
+
+
+
+
 cZombiepigman::~cZombiepigman()
 {
 }
+
+
+
+
 
 bool cZombiepigman::IsA( const char* a_EntityType )
 {
 	if( strcmp( a_EntityType, "cZombiepigman" ) == 0 ) return true;
 	return cMonster::IsA( a_EntityType );
 }
+
+
+
+
 
 void cZombiepigman::Tick(float a_Dt)
 {
@@ -33,10 +45,23 @@ void cZombiepigman::Tick(float a_Dt)
 	}
 }
 
-void cZombiepigman::KilledBy( cEntity* a_Killer )
+
+
+
+
+void cZombiepigman::KilledBy(cEntity * a_Killer)
 {
-	cMonster::RandomDropItem(E_ITEM_ROTTEN_FLESH, 0, 1);
-	cMonster::RandomDropItem(E_ITEM_GOLD_NUGGET, 0, 1);
+	cItems Drops;
+	AddRandomDropItem(Drops, 0, 1, E_ITEM_ROTTEN_FLESH);
+	AddRandomDropItem(Drops, 0, 1, E_ITEM_GOLD_NUGGET);
+	
+	// TODO: Rare drops
+	
+	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
 
 	cMonster::KilledBy( a_Killer );
 }
+
+
+
+

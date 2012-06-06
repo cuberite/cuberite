@@ -5,6 +5,8 @@
 #include "Defines.h"
 #include "cWorld.h"
 #include "BlockID.h"
+#include "cItem.h"
+#include "BlockID.h"
 
 
 
@@ -91,7 +93,9 @@ protected:
 	float m_AttackRange;
 	float m_AttackInterval;
 
-	void DropItem(ENUM_ITEM_ID a_Item, unsigned int a_Count);
-	void RandomDropItem(ENUM_ITEM_ID a_Item, unsigned int a_Min, unsigned int a_Max);
-
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, ENUM_ITEM_ID a_Item, short a_ItemHealth = 0);
 }; //tolua_export
+
+
+
+

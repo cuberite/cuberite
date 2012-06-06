@@ -1,14 +1,28 @@
 #pragma once
 
 #ifndef _WIN32
-#include "BlockID.h"
+	#include "BlockID.h"
 #else
-enum ENUM_ITEM_ID;
+	enum ENUM_ITEM_ID;
 #endif
 
-class cBlockToPickup
-{
+#include "cItem.h"
+
+
+
+
+
+class cBlockToPickup      // tolua_export
+{                         // tolua_export
 public:
-	static ENUM_ITEM_ID ToPickup( unsigned char a_BlockID, ENUM_ITEM_ID a_UsedItemID );
-	static char PickupCount(unsigned char a_BlockID);
-};
+	/// For a given block and tool, returns the list of drops generated
+	static void ToPickup(BLOCKTYPE a_BlockID, NIBBLETYPE a_BlockMeta, ENUM_ITEM_ID a_UsedItemID, cItems & a_Drops);  // tolua_export
+	
+	/// Returns true if the tool used for the block is the right one for the job. cClientHandle uses this to determine whether to decrease tool durability twice as much
+	static bool IsRightTool(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENUM_ITEM_ID a_UsedTool);  // tolua_export
+	
+};      // tolua_export
+
+
+
+

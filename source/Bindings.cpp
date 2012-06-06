@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/05/12 17:10:07.
+** Generated automatically by tolua++-1.0.92 on 06/06/12 21:50:56.
 */
 
 #ifndef __cplusplus
@@ -9895,8 +9895,7 @@ static int tolua_AllToLua_cWorld_DigBlock00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"cItem",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9906,12 +9905,11 @@ static int tolua_AllToLua_cWorld_DigBlock00(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
-  cItem* a_PickupItem = ((cItem*)  tolua_tousertype(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DigBlock'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->DigBlock(a_X,a_Y,a_Z,*a_PickupItem);
+   bool tolua_ret = (bool)  self->DigBlock(a_X,a_Y,a_Z);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -17174,7 +17172,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_RED_MUSHROOM",E_BLOCK_RED_MUSHROOM);
   tolua_constant(tolua_S,"E_BLOCK_GOLD_BLOCK",E_BLOCK_GOLD_BLOCK);
   tolua_constant(tolua_S,"E_BLOCK_IRON_BLOCK",E_BLOCK_IRON_BLOCK);
+  tolua_constant(tolua_S,"E_BLOCK_DOUBLE_STONE_SLAB",E_BLOCK_DOUBLE_STONE_SLAB);
   tolua_constant(tolua_S,"E_BLOCK_DOUBLE_STEP",E_BLOCK_DOUBLE_STEP);
+  tolua_constant(tolua_S,"E_BLOCK_STONE_SLAB",E_BLOCK_STONE_SLAB);
   tolua_constant(tolua_S,"E_BLOCK_STEP",E_BLOCK_STEP);
   tolua_constant(tolua_S,"E_BLOCK_BRICK",E_BLOCK_BRICK);
   tolua_constant(tolua_S,"E_BLOCK_TNT",E_BLOCK_TNT);
@@ -17189,15 +17189,18 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_REDSTONE_WIRE",E_BLOCK_REDSTONE_WIRE);
   tolua_constant(tolua_S,"E_BLOCK_DIAMOND_ORE",E_BLOCK_DIAMOND_ORE);
   tolua_constant(tolua_S,"E_BLOCK_DIAMOND_BLOCK",E_BLOCK_DIAMOND_BLOCK);
+  tolua_constant(tolua_S,"E_BLOCK_CRAFTING_TABLE",E_BLOCK_CRAFTING_TABLE);
   tolua_constant(tolua_S,"E_BLOCK_WORKBENCH",E_BLOCK_WORKBENCH);
   tolua_constant(tolua_S,"E_BLOCK_CROPS",E_BLOCK_CROPS);
   tolua_constant(tolua_S,"E_BLOCK_SOIL",E_BLOCK_SOIL);
   tolua_constant(tolua_S,"E_BLOCK_FARMLAND",E_BLOCK_FARMLAND);
   tolua_constant(tolua_S,"E_BLOCK_FURNACE",E_BLOCK_FURNACE);
+  tolua_constant(tolua_S,"E_BLOCK_LIT_FURNACE",E_BLOCK_LIT_FURNACE);
   tolua_constant(tolua_S,"E_BLOCK_BURNING_FURNACE",E_BLOCK_BURNING_FURNACE);
   tolua_constant(tolua_S,"E_BLOCK_SIGN_POST",E_BLOCK_SIGN_POST);
   tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOOR",E_BLOCK_WOODEN_DOOR);
   tolua_constant(tolua_S,"E_BLOCK_LADDER",E_BLOCK_LADDER);
+  tolua_constant(tolua_S,"E_BLOCK_RAIL",E_BLOCK_RAIL);
   tolua_constant(tolua_S,"E_BLOCK_MINECART_TRACKS",E_BLOCK_MINECART_TRACKS);
   tolua_constant(tolua_S,"E_BLOCK_COBBLESTONE_STAIRS",E_BLOCK_COBBLESTONE_STAIRS);
   tolua_constant(tolua_S,"E_BLOCK_WALLSIGN",E_BLOCK_WALLSIGN);
@@ -17215,6 +17218,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_SNOW_BLOCK",E_BLOCK_SNOW_BLOCK);
   tolua_constant(tolua_S,"E_BLOCK_CACTUS",E_BLOCK_CACTUS);
   tolua_constant(tolua_S,"E_BLOCK_CLAY",E_BLOCK_CLAY);
+  tolua_constant(tolua_S,"E_BLOCK_SUGARCANE",E_BLOCK_SUGARCANE);
   tolua_constant(tolua_S,"E_BLOCK_REEDS",E_BLOCK_REEDS);
   tolua_constant(tolua_S,"E_BLOCK_JUKEBOX",E_BLOCK_JUKEBOX);
   tolua_constant(tolua_S,"E_BLOCK_FENCE",E_BLOCK_FENCE);
@@ -17259,6 +17263,15 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_DRAGON_EGG",E_BLOCK_DRAGON_EGG);
   tolua_constant(tolua_S,"E_BLOCK_REDSTONE_LAMP_OFF",E_BLOCK_REDSTONE_LAMP_OFF);
   tolua_constant(tolua_S,"E_BLOCK_REDSTONE_LAMP_ON",E_BLOCK_REDSTONE_LAMP_ON);
+  tolua_constant(tolua_S,"E_BLOCK_DOUBLE_WOODEN_SLAB",E_BLOCK_DOUBLE_WOODEN_SLAB);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_SLAB",E_BLOCK_WOODEN_SLAB);
+  tolua_constant(tolua_S,"E_BLOCK_COCA_PLANT",E_BLOCK_COCA_PLANT);
+  tolua_constant(tolua_S,"E_BLOCK_SANDSTONE_STAIRS",E_BLOCK_SANDSTONE_STAIRS);
+  tolua_constant(tolua_S,"E_BLOCK_EMERALD_ORE",E_BLOCK_EMERALD_ORE);
+  tolua_constant(tolua_S,"E_BLOCK_ENDER_CHEST",E_BLOCK_ENDER_CHEST);
+  tolua_constant(tolua_S,"E_BLOCK_TRIPWIRE_HOOK",E_BLOCK_TRIPWIRE_HOOK);
+  tolua_constant(tolua_S,"E_BLOCK_TRIPWIRE",E_BLOCK_TRIPWIRE);
+  tolua_constant(tolua_S,"E_BLOCK_EMERALD_BLOCK",E_BLOCK_EMERALD_BLOCK);
   tolua_constant(tolua_S,"E_BLOCK_",E_BLOCK_);
   tolua_constant(tolua_S,"E_ITEM_EMPTY",E_ITEM_EMPTY);
   tolua_constant(tolua_S,"E_ITEM_STONE",E_ITEM_STONE);
@@ -17303,7 +17316,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_RED_MUSHROOM",E_ITEM_RED_MUSHROOM);
   tolua_constant(tolua_S,"E_ITEM_GOLD_BLOCK",E_ITEM_GOLD_BLOCK);
   tolua_constant(tolua_S,"E_ITEM_IRON_BLOCK",E_ITEM_IRON_BLOCK);
+  tolua_constant(tolua_S,"E_ITEM_DOUBLE_STONE_SLAB",E_ITEM_DOUBLE_STONE_SLAB);
   tolua_constant(tolua_S,"E_ITEM_DOUBLE_STEP",E_ITEM_DOUBLE_STEP);
+  tolua_constant(tolua_S,"E_ITEM_STONE_SLAB",E_ITEM_STONE_SLAB);
   tolua_constant(tolua_S,"E_ITEM_STEP",E_ITEM_STEP);
   tolua_constant(tolua_S,"E_ITEM_BRICK",E_ITEM_BRICK);
   tolua_constant(tolua_S,"E_ITEM_TNT",E_ITEM_TNT);
@@ -17375,10 +17390,20 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_END_PORTAL",E_ITEM_END_PORTAL);
   tolua_constant(tolua_S,"E_ITEM_END_PORTAL_FRAME",E_ITEM_END_PORTAL_FRAME);
   tolua_constant(tolua_S,"E_ITEM_END_STONE",E_ITEM_END_STONE);
+  tolua_constant(tolua_S,"E_ITEM_DOUBLE_WOODEN_SLAB",E_ITEM_DOUBLE_WOODEN_SLAB);
+  tolua_constant(tolua_S,"E_ITEM_WOODEN_SLAB",E_ITEM_WOODEN_SLAB);
+  tolua_constant(tolua_S,"E_ITEM_COCA_PLANT",E_ITEM_COCA_PLANT);
+  tolua_constant(tolua_S,"E_ITEM_SANDSTONE_STAIRS",E_ITEM_SANDSTONE_STAIRS);
+  tolua_constant(tolua_S,"E_ITEM_EMERALD_ORE",E_ITEM_EMERALD_ORE);
+  tolua_constant(tolua_S,"E_ITEM_ENDER_CHEST",E_ITEM_ENDER_CHEST);
+  tolua_constant(tolua_S,"E_ITEM_TRIPWIRE_HOOK",E_ITEM_TRIPWIRE_HOOK);
+  tolua_constant(tolua_S,"E_ITEM_TRIPWIRE",E_ITEM_TRIPWIRE);
+  tolua_constant(tolua_S,"E_ITEM_EMERALD_BLOCK",E_ITEM_EMERALD_BLOCK);
   tolua_constant(tolua_S,"E_ITEM_IRON_SHOVEL",E_ITEM_IRON_SHOVEL);
   tolua_constant(tolua_S,"E_ITEM_IRON_PICKAXE",E_ITEM_IRON_PICKAXE);
   tolua_constant(tolua_S,"E_ITEM_IRON_AXE",E_ITEM_IRON_AXE);
   tolua_constant(tolua_S,"E_ITEM_FLINT_AND_STEEL",E_ITEM_FLINT_AND_STEEL);
+  tolua_constant(tolua_S,"E_ITEM_RED_APPLE",E_ITEM_RED_APPLE);
   tolua_constant(tolua_S,"E_ITEM_APPLE",E_ITEM_APPLE);
   tolua_constant(tolua_S,"E_ITEM_BOW",E_ITEM_BOW);
   tolua_constant(tolua_S,"E_ITEM_ARROW",E_ITEM_ARROW);
@@ -17457,6 +17482,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_MILK",E_ITEM_MILK);
   tolua_constant(tolua_S,"E_ITEM_CLAY_BRICK",E_ITEM_CLAY_BRICK);
   tolua_constant(tolua_S,"E_ITEM_CLAY",E_ITEM_CLAY);
+  tolua_constant(tolua_S,"E_ITEM_SUGARCANE",E_ITEM_SUGARCANE);
   tolua_constant(tolua_S,"E_ITEM_SUGAR_CANE",E_ITEM_SUGAR_CANE);
   tolua_constant(tolua_S,"E_ITEM_PAPER",E_ITEM_PAPER);
   tolua_constant(tolua_S,"E_ITEM_BOOK",E_ITEM_BOOK);
@@ -17502,6 +17528,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_CAULDRON",E_ITEM_CAULDRON);
   tolua_constant(tolua_S,"E_ITEM_EYE_OF_ENDER",E_ITEM_EYE_OF_ENDER);
   tolua_constant(tolua_S,"E_ITEM_GLISTERING_MELON",E_ITEM_GLISTERING_MELON);
+  tolua_constant(tolua_S,"E_ITEM_SPAWN_EGG",E_ITEM_SPAWN_EGG);
+  tolua_constant(tolua_S,"E_ITEM_BOTTLE_O_ENCHANTING",E_ITEM_BOTTLE_O_ENCHANTING);
+  tolua_constant(tolua_S,"E_ITEM_FIRE_CHARGE",E_ITEM_FIRE_CHARGE);
+  tolua_constant(tolua_S,"E_ITEM_BOOK_AND_QUILL",E_ITEM_BOOK_AND_QUILL);
+  tolua_constant(tolua_S,"E_ITEM_WRITTEN_BOOK",E_ITEM_WRITTEN_BOOK);
+  tolua_constant(tolua_S,"E_ITEM_EMERALD",E_ITEM_EMERALD);
   tolua_constant(tolua_S,"E_ITEM_13_DISC",E_ITEM_13_DISC);
   tolua_constant(tolua_S,"E_ITEM_CAT_DISC",E_ITEM_CAT_DISC);
   tolua_constant(tolua_S,"E_ITEM_BLOCKS_DISC",E_ITEM_BLOCKS_DISC);
@@ -17532,6 +17564,99 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_TALL_GRASS_DEAD_SHRUB",E_META_TALL_GRASS_DEAD_SHRUB);
   tolua_constant(tolua_S,"E_META_TALL_GRASS_GRASS",E_META_TALL_GRASS_GRASS);
   tolua_constant(tolua_S,"E_META_TALL_GRASS_FERN",E_META_TALL_GRASS_FERN);
+  tolua_constant(tolua_S,"E_META_SANDSTONE_NORMAL",E_META_SANDSTONE_NORMAL);
+  tolua_constant(tolua_S,"E_META_SANDSTONE_ORNAMENT",E_META_SANDSTONE_ORNAMENT);
+  tolua_constant(tolua_S,"E_META_SANDSTONE_SMOOTH",E_META_SANDSTONE_SMOOTH);
+  tolua_constant(tolua_S,"E_META_WOOL_WHITE",E_META_WOOL_WHITE);
+  tolua_constant(tolua_S,"E_META_WOOL_ORANGE",E_META_WOOL_ORANGE);
+  tolua_constant(tolua_S,"E_META_WOOL_MAGENTA",E_META_WOOL_MAGENTA);
+  tolua_constant(tolua_S,"E_META_WOOL_LIGHTBLUE",E_META_WOOL_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_WOOL_YELLOW",E_META_WOOL_YELLOW);
+  tolua_constant(tolua_S,"E_META_WOOL_LIGHTGREEN",E_META_WOOL_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_WOOL_PINK",E_META_WOOL_PINK);
+  tolua_constant(tolua_S,"E_META_WOOL_GRAY",E_META_WOOL_GRAY);
+  tolua_constant(tolua_S,"E_META_WOOL_LIGHTGRAY",E_META_WOOL_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_WOOL_CYAN",E_META_WOOL_CYAN);
+  tolua_constant(tolua_S,"E_META_WOOL_PURPLE",E_META_WOOL_PURPLE);
+  tolua_constant(tolua_S,"E_META_WOOL_BLUE",E_META_WOOL_BLUE);
+  tolua_constant(tolua_S,"E_META_WOOL_BROWN",E_META_WOOL_BROWN);
+  tolua_constant(tolua_S,"E_META_WOOL_GREEN",E_META_WOOL_GREEN);
+  tolua_constant(tolua_S,"E_META_WOOL_RED",E_META_WOOL_RED);
+  tolua_constant(tolua_S,"E_META_WOOL_BLACK",E_META_WOOL_BLACK);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE",E_META_DOUBLE_STEP_STONE);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_SANDSTONE",E_META_DOUBLE_STEP_SANDSTONE);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_WOODEN",E_META_DOUBLE_STEP_WOODEN);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_COBBLESTONE",E_META_DOUBLE_STEP_COBBLESTONE);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_BRICK",E_META_DOUBLE_STEP_BRICK);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE_BRICK",E_META_DOUBLE_STEP_STONE_BRICK);
+  tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE_SECRET",E_META_DOUBLE_STEP_STONE_SECRET);
+  tolua_constant(tolua_S,"E_META_STEP_STONE",E_META_STEP_STONE);
+  tolua_constant(tolua_S,"E_META_STEP_SANDSTONE",E_META_STEP_SANDSTONE);
+  tolua_constant(tolua_S,"E_META_STEP_PLANKS",E_META_STEP_PLANKS);
+  tolua_constant(tolua_S,"E_META_STEP_COBBLESTONE",E_META_STEP_COBBLESTONE);
+  tolua_constant(tolua_S,"E_META_STEP_BRICK",E_META_STEP_BRICK);
+  tolua_constant(tolua_S,"E_META_STEP_STONE_BRICK",E_META_STEP_STONE_BRICK);
+  tolua_constant(tolua_S,"E_META_STEP_STONE_SECRET",E_META_STEP_STONE_SECRET);
+  tolua_constant(tolua_S,"E_META_SILVERFISH_EGG_STONE",E_META_SILVERFISH_EGG_STONE);
+  tolua_constant(tolua_S,"E_META_SILVERFISH_EGG_COBBLESTONE",E_META_SILVERFISH_EGG_COBBLESTONE);
+  tolua_constant(tolua_S,"E_META_SILVERFISH_EGG_STONE_BRICK",E_META_SILVERFISH_EGG_STONE_BRICK);
+  tolua_constant(tolua_S,"E_META_STONE_BRICK_NORMAL",E_META_STONE_BRICK_NORMAL);
+  tolua_constant(tolua_S,"E_META_STONE_BRICK_MOSSY",E_META_STONE_BRICK_MOSSY);
+  tolua_constant(tolua_S,"E_META_STONE_BRICK_CRACKED",E_META_STONE_BRICK_CRACKED);
+  tolua_constant(tolua_S,"E_META_STONE_BRICK_ORNAMENT",E_META_STONE_BRICK_ORNAMENT);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_APPLE",E_BLOCK_WOODEN_DOUBLE_STEP_APPLE);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_CONIFER",E_BLOCK_WOODEN_DOUBLE_STEP_CONIFER);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_BIRCH",E_BLOCK_WOODEN_DOUBLE_STEP_BIRCH);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_DOUBLE_STEP_JUNGLE",E_BLOCK_WOODEN_DOUBLE_STEP_JUNGLE);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_APPLE",E_BLOCK_WOODEN_STEP_APPLE);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_CONIFER",E_BLOCK_WOODEN_STEP_CONIFER);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_BIRCH",E_BLOCK_WOODEN_STEP_BIRCH);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_STEP_JUNGLE",E_BLOCK_WOODEN_STEP_JUNGLE);
+  tolua_constant(tolua_S,"E_META_COAL_NORMAL",E_META_COAL_NORMAL);
+  tolua_constant(tolua_S,"E_META_COAL_CHARCOAL",E_META_COAL_CHARCOAL);
+  tolua_constant(tolua_S,"E_META_GOLDEN_APPLE_NORMAL",E_META_GOLDEN_APPLE_NORMAL);
+  tolua_constant(tolua_S,"E_META_GOLDEN_APPLE_ENCHANTED",E_META_GOLDEN_APPLE_ENCHANTED);
+  tolua_constant(tolua_S,"E_META_DYE_BLACK",E_META_DYE_BLACK);
+  tolua_constant(tolua_S,"E_META_DYE_RED",E_META_DYE_RED);
+  tolua_constant(tolua_S,"E_META_DYE_GREEN",E_META_DYE_GREEN);
+  tolua_constant(tolua_S,"E_META_DYE_BROWN",E_META_DYE_BROWN);
+  tolua_constant(tolua_S,"E_META_DYE_BLUE",E_META_DYE_BLUE);
+  tolua_constant(tolua_S,"E_META_DYE_PURPLE",E_META_DYE_PURPLE);
+  tolua_constant(tolua_S,"E_META_DYE_CYAN",E_META_DYE_CYAN);
+  tolua_constant(tolua_S,"E_META_DYE_LIGHTGRAY",E_META_DYE_LIGHTGRAY);
+  tolua_constant(tolua_S,"E_META_DYE_GRAY",E_META_DYE_GRAY);
+  tolua_constant(tolua_S,"E_META_DYE_PINK",E_META_DYE_PINK);
+  tolua_constant(tolua_S,"E_META_DYE_LIGHTGREEN",E_META_DYE_LIGHTGREEN);
+  tolua_constant(tolua_S,"E_META_DYE_YELLOW",E_META_DYE_YELLOW);
+  tolua_constant(tolua_S,"E_META_DYE_LIGHTBLUE",E_META_DYE_LIGHTBLUE);
+  tolua_constant(tolua_S,"E_META_DYE_MAGENTA",E_META_DYE_MAGENTA);
+  tolua_constant(tolua_S,"E_META_DYE_ORANGE",E_META_DYE_ORANGE);
+  tolua_constant(tolua_S,"E_META_DYE_WHITE",E_META_DYE_WHITE);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_CREEPER",E_META_SPAWN_EGG_CREEPER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SKELETON",E_META_SPAWN_EGG_SKELETON);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SPIDER",E_META_SPAWN_EGG_SPIDER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ZOMBIE",E_META_SPAWN_EGG_ZOMBIE);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SLIME",E_META_SPAWN_EGG_SLIME);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_GHAST",E_META_SPAWN_EGG_GHAST);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ZOMBIE_PIGMAN",E_META_SPAWN_EGG_ZOMBIE_PIGMAN);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ENDERMAN",E_META_SPAWN_EGG_ENDERMAN);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_CAVE_SPIDER",E_META_SPAWN_EGG_CAVE_SPIDER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SILVERFISH",E_META_SPAWN_EGG_SILVERFISH);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_BLAZE",E_META_SPAWN_EGG_BLAZE);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MAGMA_CUBE",E_META_SPAWN_EGG_MAGMA_CUBE);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_GIANT",E_META_SPAWN_EGG_GIANT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_ENDER_DRAGON",E_META_SPAWN_EGG_ENDER_DRAGON);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_PIG",E_META_SPAWN_EGG_PIG);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SHEEP",E_META_SPAWN_EGG_SHEEP);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_COW",E_META_SPAWN_EGG_COW);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_CHICKEN",E_META_SPAWN_EGG_CHICKEN);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SQUID",E_META_SPAWN_EGG_SQUID);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_WOLF",E_META_SPAWN_EGG_WOLF);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_MOOSHROOM",E_META_SPAWN_EGG_MOOSHROOM);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_OCELOT",E_META_SPAWN_EGG_OCELOT);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_VILLAGER",E_META_SPAWN_EGG_VILLAGER);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_SNOW_GOLEM",E_META_SPAWN_EGG_SNOW_GOLEM);
+  tolua_constant(tolua_S,"E_META_SPAWN_EGG_IRON_GOLEM",E_META_SPAWN_EGG_IRON_GOLEM);
   tolua_function(tolua_S,"BlockStringToType",tolua_AllToLua_BlockStringToType00);
   tolua_function(tolua_S,"StringToItem",tolua_AllToLua_StringToItem00);
   tolua_constant(tolua_S,"E_KEEP_ALIVE",E_KEEP_ALIVE);
@@ -17786,6 +17911,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"E_PLUGIN_KILLED",cPluginManager::E_PLUGIN_KILLED);
    tolua_constant(tolua_S,"E_PLUGIN_CHUNK_GENERATED",cPluginManager::E_PLUGIN_CHUNK_GENERATED);
    tolua_constant(tolua_S,"E_PLUGIN_CHUNK_GENERATING",cPluginManager::E_PLUGIN_CHUNK_GENERATING);
+   tolua_constant(tolua_S,"E_PLUGIN_BLOCK_TO_DROPS",cPluginManager::E_PLUGIN_BLOCK_TO_DROPS);
    tolua_function(tolua_S,"GetPluginManager",tolua_AllToLua_cPluginManager_GetPluginManager00);
    tolua_function(tolua_S,"GetPlugin",tolua_AllToLua_cPluginManager_GetPlugin00);
    tolua_function(tolua_S,"ReloadPlugins",tolua_AllToLua_cPluginManager_ReloadPlugins00);
