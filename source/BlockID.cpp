@@ -195,12 +195,15 @@ public:
 
 		// Spread blocks
 		g_BlockSpreadLightFalloff[E_BLOCK_AIR]              = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_CHEST]            = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_CROPS]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_FIRE]             = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_GLASS]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_GLOWSTONE]        = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_LEAVES]           = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_SIGN_POST]        = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_TORCH]            = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_VINES]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_WALLSIGN]         = 1;
 		// Light in water and lava dissapears faster:
 		g_BlockSpreadLightFalloff[E_BLOCK_LAVA]             = 2;
@@ -211,6 +214,8 @@ public:
 		// Transparent blocks
 		g_BlockTransparent[E_BLOCK_AIR]            = true;
 		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM] = true;
+		g_BlockTransparent[E_BLOCK_CHEST]          = true;
+		g_BlockTransparent[E_BLOCK_CROPS]          = true;
 		g_BlockTransparent[E_BLOCK_FIRE]           = true;
 		g_BlockTransparent[E_BLOCK_GLASS]          = true;
 		g_BlockTransparent[E_BLOCK_ICE]            = true;
