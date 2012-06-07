@@ -225,6 +225,7 @@ public:
 		g_BlockTransparent[E_BLOCK_SNOW]           = true;
 		g_BlockTransparent[E_BLOCK_TALL_GRASS]     = true;
 		g_BlockTransparent[E_BLOCK_TORCH]          = true;
+		g_BlockTransparent[E_BLOCK_VINES]          = true;
 		g_BlockTransparent[E_BLOCK_WALLSIGN]       = true;
 		g_BlockTransparent[E_BLOCK_YELLOW_FLOWER]  = true;
 
