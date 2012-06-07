@@ -290,6 +290,17 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		}
 		
 		
+		// Snow drops only when using a shovel
+		case E_BLOCK_SNOW_BLOCK:
+		{
+			if (ItemCategory::IsShovel(a_UsedItemID))
+			{
+				a_Drops.push_back(cItem(E_ITEM_SNOWBALL,   4, 0)); return;
+			}
+			return;
+		}
+
+
 		// Random multi-drop blocks:
 		case E_BLOCK_TALL_GRASS: a_Drops.push_back(cItem(E_ITEM_SEEDS,           (short)r1.randInt(3) / 2, 1)); return;
 		case E_BLOCK_MELON:      a_Drops.push_back(cItem(E_ITEM_MELON_SLICE, 3 + (short)r1.randInt(2),     1)); return;
@@ -298,7 +309,6 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Fixed multi-drop blocks:
 		case E_BLOCK_DOUBLE_STONE_SLAB:  a_Drops.push_back(cItem(E_ITEM_STONE_SLAB, 2, 0)); return;
 		case E_BLOCK_DOUBLE_WOODEN_SLAB: a_Drops.push_back(cItem(E_ITEM_STEP,       2, 0)); return;
-		case E_BLOCK_SNOW_BLOCK:         a_Drops.push_back(cItem(E_ITEM_SNOWBALL,   4, 0)); return;
 		
 		default:
 		{
