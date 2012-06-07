@@ -606,10 +606,13 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 void cChunk::TickGrass(int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom)
 {
 	// Grass turns into dirt if there's another block on top of it:
-	BLOCKTYPE AboveBlock = cChunkDef::GetBlock(m_BlockTypes, a_RelX, a_RelY + 1, a_RelZ);
-	if (!((g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock])))
 	{
-		FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+		BLOCKTYPE AboveBlock = cChunkDef::GetBlock(m_BlockTypes, a_RelX, a_RelY + 1, a_RelZ);
+		if (!((g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock])))
+		{
+			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+			return;
+		}
 	}
 	
 	// Grass spreads to nearby blocks if there's enough light (TODO) and free space above that block
@@ -634,13 +637,13 @@ void cChunk::TickGrass(int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom
 		NIBBLETYPE AboveMeta;
 		if (
 			UnboundedRelGetBlock(a_RelX + OfsX, a_RelY + OfsY + 1, a_RelZ + OfsZ, AboveDest, AboveMeta) &&
-			((g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock]))
+			((g_BlockOneHitDig[AboveDest]) || (g_BlockTransparent[AboveDest]))
 			// TODO: Query dest light, if it's enough
 		)
 		{
 			UnboundedRelFastSetBlock(a_RelX + OfsX, a_RelY + OfsY, a_RelZ + OfsZ, E_BLOCK_GRASS, 0);
 		}
-	}
+	}  // for i - repeat twice
 }
 
 
