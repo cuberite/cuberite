@@ -68,6 +68,7 @@
 
 // DEBUG:
 #include "packets/cPacket_BlockChange.h"
+#include "packets/cPacket_MultiBlock.h"
 
 
 
@@ -1939,13 +1940,30 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 				{
 					int x = ((cPacket_BlockChange *)(*itr))->m_PosX;
 					int z = ((cPacket_BlockChange *)(*itr))->m_PosZ;
+					char ToBlock = ((cPacket_BlockChange *)(*itr))->m_BlockType;
 					int y, cx, cz;
 					cChunkDef::AbsoluteToRelative(x, y, z, cx, cz);
 					bool IsWanted = (abs(cx - ChunkX) <= m_ViewDistance) && (abs(cz - ChunkZ) <= m_ViewDistance);
-					LOG("Packet %4d: type %2x (BlockChange: [%d, %d], %s chunk)", 
+					LOG("Packet %4d: type %2x (BlockChange: [%d, %d], %s chunk; to block %d)", 
 						Idx++, (*itr)->m_PacketID,
 						cx, cz,
-						IsWanted ? "wanted" : "unwanted"
+						IsWanted ? "wanted" : "unwanted",
+						ToBlock
+					);
+					break;
+				}
+				
+				case E_MULTI_BLOCK:
+				{
+					int cx = ((cPacket_MultiBlock *)(*itr))->m_ChunkX;
+					int cz = ((cPacket_MultiBlock *)(*itr))->m_ChunkZ;
+					int NumBlocks = ((cPacket_MultiBlock *)(*itr))->m_NumBlocks;
+					bool IsWanted = (abs(cx - ChunkX) <= m_ViewDistance) && (abs(cz - ChunkZ) <= m_ViewDistance);
+					LOG("Packet %4d: type %2x (MultiBlock: [%d, %d], %s chunk, %d blocks)", 
+						Idx++, (*itr)->m_PacketID,
+						cx, cz,
+						IsWanted ? "wanted" : "unwanted",
+						NumBlocks
 					);
 					break;
 				}
