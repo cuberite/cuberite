@@ -402,109 +402,8 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		m_UnloadQuery.remove( *m_UnloadQuery.begin() );
 	}
 
-	cCSLock Lock2(m_CSBlockLists);
-	unsigned int NumTickBlocks = m_ToTickBlocks.size();
-	Lock2.Unlock();
-
-	if ( NumTickBlocks > 0 )
-	{
-		Lock2.Lock();
-		std::deque< unsigned int > ToTickBlocks = m_ToTickBlocks;
-		m_ToTickBlocks.clear();
-		Lock2.Unlock();
+	CheckBlocks();
 	
-		bool isRedstone = false;
-		for ( std::deque< unsigned int >::iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr )
-		{
-			unsigned int index = (*itr);
-			Vector3i BlockPos = IndexToCoordinate( index );
-
-			BLOCKTYPE BlockID = GetBlock( index );
-			NIBBLETYPE BlockMeta = GetMeta(index);
-			switch ( BlockID )
-			{
-				case E_BLOCK_REDSTONE_REPEATER_OFF:
-				case E_BLOCK_REDSTONE_REPEATER_ON:
-				case E_BLOCK_REDSTONE_WIRE:
-				{
-					isRedstone = true;
-					// fallthrough
-				}
-				
-				case E_BLOCK_CACTUS:
-				case E_BLOCK_REEDS:
-				case E_BLOCK_WOODEN_PRESSURE_PLATE:
-				case E_BLOCK_STONE_PRESSURE_PLATE:
-				case E_BLOCK_MINECART_TRACKS:
-				case E_BLOCK_SIGN_POST:
-				case E_BLOCK_CROPS:
-				case E_BLOCK_SAPLING:
-				case E_BLOCK_YELLOW_FLOWER:
-				case E_BLOCK_RED_ROSE:
-				case E_BLOCK_RED_MUSHROOM:
-				case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
-				{
-					if (GetBlock(BlockPos.x, BlockPos.y - 1, BlockPos.z) == E_BLOCK_AIR)
-					{
-						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-
-						Vector3i WorldPos = PositionToWorldPosition( BlockPos );
-
-						m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
-						
-						cItems Pickups;
-						cBlockToPickup::ToPickup(BlockID, BlockMeta, E_ITEM_EMPTY, Pickups);
-						m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
-					}
-					break;
-				}
-
-				case E_BLOCK_REDSTONE_TORCH_OFF:
-				case E_BLOCK_REDSTONE_TORCH_ON:
-				{
-					isRedstone = true;
-					// fallthrough
-				}
-				
-				case E_BLOCK_TORCH:
-				{
-					char Dir = cTorch::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
-					Vector3i WorldPos = PositionToWorldPosition( BlockPos );
-
-					Vector3i AttachedTo = WorldPos;
-					AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
-					if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
-					{
-						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-
-						m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
-
-						cItems Pickups;
-						cBlockToPickup::ToPickup(BlockID, BlockMeta, E_ITEM_EMPTY, Pickups);
-						m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
-					}
-					break;
-				}
-
-				case E_BLOCK_LADDER:
-				{
-					char Dir = cLadder::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
-					Vector3i WorldPos = PositionToWorldPosition( BlockPos );
-					Vector3i AttachedTo = WorldPos;
-					AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
-					if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
-					{
-						SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-						cItems Pickups;
-						cBlockToPickup::ToPickup(BlockID, BlockMeta, E_ITEM_EMPTY, Pickups);
-						m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
-					}
-					break;
-				}
-			}  // switch (BlockType)
-		}  // for itr - ToTickBlocks[]
-	}
-
 	TickBlocks(a_TickRandom);
 
 	// Tick block entities (furnaces)
@@ -516,6 +415,108 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		}
 	}
 }
+
+
+
+
+
+void cChunk::CheckBlocks(void)
+{
+	cCSLock Lock2(m_CSBlockLists);
+	unsigned int NumTickBlocks = m_ToTickBlocks.size();
+	Lock2.Unlock();
+
+	if (NumTickBlocks == 0)
+	{
+		return;
+	}
+	
+	Lock2.Lock();
+	std::deque< unsigned int > ToTickBlocks = m_ToTickBlocks;
+	m_ToTickBlocks.clear();
+	Lock2.Unlock();
+	
+	for (std::deque< unsigned int >::const_iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr)
+	{
+		unsigned int index = (*itr);
+		Vector3i BlockPos = IndexToCoordinate(index);
+
+		BLOCKTYPE  BlockType = GetBlock(index);
+		NIBBLETYPE BlockMeta = GetMeta (index);
+		switch (BlockType)
+		{
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_CACTUS:
+			case E_BLOCK_REEDS:
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_MINECART_TRACKS:
+			case E_BLOCK_SIGN_POST:
+			case E_BLOCK_CROPS:
+			case E_BLOCK_SAPLING:
+			case E_BLOCK_YELLOW_FLOWER:
+			case E_BLOCK_RED_ROSE:
+			case E_BLOCK_RED_MUSHROOM:
+			case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
+			{
+				if (GetBlock(BlockPos.x, BlockPos.y - 1, BlockPos.z) == E_BLOCK_AIR)
+				{
+					SetBlock( BlockPos, E_BLOCK_AIR, 0 );
+
+					Vector3i WorldPos = PositionToWorldPosition( BlockPos );
+
+					m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
+					
+					cItems Pickups;
+					cBlockToPickup::ToPickup(BlockType, BlockMeta, E_ITEM_EMPTY, Pickups);
+					m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
+				}
+				break;
+			}
+
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_TORCH:
+			{
+				char Dir = cTorch::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
+				Vector3i WorldPos = PositionToWorldPosition( BlockPos );
+
+				Vector3i AttachedTo = WorldPos;
+				AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
+				if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
+				{
+					SetBlock( BlockPos, E_BLOCK_AIR, 0 );
+
+					m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
+
+					cItems Pickups;
+					cBlockToPickup::ToPickup(BlockType, BlockMeta, E_ITEM_EMPTY, Pickups);
+					m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
+				}
+				break;
+			}
+
+			case E_BLOCK_LADDER:
+			{
+				char Dir = cLadder::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
+				Vector3i WorldPos = PositionToWorldPosition( BlockPos );
+				Vector3i AttachedTo = WorldPos;
+				AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
+				if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
+				{
+					SetBlock( BlockPos, E_BLOCK_AIR, 0 );
+					cItems Pickups;
+					cBlockToPickup::ToPickup(BlockType, BlockMeta, E_ITEM_EMPTY, Pickups);
+					m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
+				}
+				break;
+			}
+		}  // switch (BlockType)
+	}  // for itr - ToTickBlocks[]
+}
+
 
 
 

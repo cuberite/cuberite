@@ -227,7 +227,10 @@ private:
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 
-	void TickBlocks(MTRand & a_TickRandom);
+	/// Checks the block scheduled for checking in m_ToTickBlocks[]
+	void CheckBlocks(void);
+	
+	void TickBlocks      (MTRand & a_TickRandom);
 	void TickGrass       (int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom);
 	void TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom);
 	void TickFarmland    (int a_RelX, int a_RelY, int a_RelZ);
