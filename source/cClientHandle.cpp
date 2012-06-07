@@ -77,8 +77,14 @@
 													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
 													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
 
+
+
+
+
+// TODO: Temporarily set to higher value, the advances in blockticking made this a needed change until a better solution is implemented.
+// Ref.: http://forum.mc-server.org/showthread.php?tid=471 )
 /// If the number of queued outgoing packets reaches this, the client will be kicked
-#define MAX_OUTGOING_PACKETS 2000
+#define MAX_OUTGOING_PACKETS 10000
 
 
 
