@@ -82,10 +82,8 @@
 
 
 
-// TODO: Temporarily set to higher value, the advances in blockticking made this a needed change until a better solution is implemented.
-// Ref.: http://forum.mc-server.org/showthread.php?tid=471 )
 /// If the number of queued outgoing packets reaches this, the client will be kicked
-#define MAX_OUTGOING_PACKETS 10000
+#define MAX_OUTGOING_PACKETS 2000
 
 
 
@@ -1992,13 +1990,16 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 	}
 
 	AString Data;
-	if (!m_PendingNrmSendPackets.empty())
+	Data.reserve(1100);
+	// Serialize normal-priority packets up to 1000 bytes
+	while (!m_PendingNrmSendPackets.empty() && (Data.size() < 1000))
 	{
 		m_PendingNrmSendPackets.front()->Serialize(Data);
 		delete m_PendingNrmSendPackets.front();
 		m_PendingNrmSendPackets.erase(m_PendingNrmSendPackets.begin());
 	}
-	else if (!m_PendingLowSendPackets.empty())
+	// Serialize one low-priority packet:
+	if (!m_PendingLowSendPackets.empty() && Data.empty())
 	{
 		m_PendingLowSendPackets.front()->Serialize(Data);
 		delete m_PendingLowSendPackets.front();
