@@ -938,6 +938,15 @@ char cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
 
 
 
+void cWorld::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, char & a_BlockType, unsigned char & a_BlockMeta)
+{
+	m_ChunkMap->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, (BLOCKTYPE &)a_BlockType, (NIBBLETYPE &)a_BlockMeta);
+}
+
+
+
+
+
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed)
 {
 	MTRand r1;

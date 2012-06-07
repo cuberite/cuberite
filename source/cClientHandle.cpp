@@ -939,14 +939,19 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 
 	if (a_Packet->m_Direction >= 0)
 	{
-		ENUM_BLOCK_ID BlockID = (ENUM_BLOCK_ID)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-		switch (BlockID)
+		cWorld * World = m_Player->GetWorld();
+		BLOCKTYPE  BlockType = 0;
+		NIBBLETYPE BlockMeta;
+		World->GetBlockTypeMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, BlockType, BlockMeta);
+		switch (BlockType)
 		{
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			{
 				// no need to update redstone current with a repeater
-				// TODO: Find meta value of repeater and change it to one step more.
+				// Find meta value of repeater and change it to one step more:
+				World->FastSetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, BlockType, ((BlockMeta + 0x04) & 0x0f));
+				bPlaceBlock = false;
 				break;
 			}
 			

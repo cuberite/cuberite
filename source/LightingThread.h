@@ -157,7 +157,7 @@ protected:
 	{
 		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + g_BlockSpreadLightFalloff[m_BlockTypes[a_DstIdx]])
 		{
-			// The dest block already has enough light than we're offerring
+			// We're not offering more light than the dest block already has
 			return;
 		}
 

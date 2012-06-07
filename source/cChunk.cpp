@@ -1398,6 +1398,17 @@ BLOCKTYPE cChunk::GetBlock( int a_BlockIdx )
 
 
 
+void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+{
+	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
+	a_BlockType = cChunkDef::GetBlock (m_BlockTypes, a_RelX, a_RelY, a_RelZ);
+	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ);
+}
+
+
+
+
+
 /*
 // _X 2012_02_23: Loading in old format not supported anymore
 /// Loads the chunk from the old-format disk file, erases the file afterwards. Returns true if successful

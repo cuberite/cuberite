@@ -206,6 +206,7 @@ public:
 	void SetBlockMeta( const Vector3i & a_Pos, char a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
 	char GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
 	// TODO: char GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
+	void GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, char & a_BlockType, unsigned char & a_BlockMeta);  // tolua_export
 	
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities:
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0);

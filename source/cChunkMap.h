@@ -92,6 +92,7 @@ public:
 	BLOCKTYPE GetBlockSkyLight   (int a_X, int a_Y, int a_Z);
 	void      SetBlockMeta       (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockMeta);
 	void      SetBlock           (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
+	void      GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 
 	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
 	void      ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
