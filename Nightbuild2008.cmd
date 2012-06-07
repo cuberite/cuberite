@@ -31,6 +31,8 @@ echo Performing nightbuild of MC-Server
 set DONOTPAUSE=y
 
 :: Update the sources to the latest revision:
+del source\Bindings.cpp
+del source\Bindings.h
 start "tsvn src" /b /min /wait %tsvn% /command:update /path:. /closeonend:1
 if errorlevel 1 goto haderror
 
