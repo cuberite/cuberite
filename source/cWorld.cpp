@@ -844,6 +844,94 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
+void cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	switch (BlockType)
+	{
+		case E_BLOCK_CROPS:
+		{
+			if (BlockMeta < 7)
+			{
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+			}
+			break;
+		}
+		
+		case E_BLOCK_MELON_STEM:
+		case E_BLOCK_PUMPKIN_STEM:
+		{
+			if (BlockMeta < 7)
+			{
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+			}
+			else
+			{
+				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
+			}
+			break;
+		}
+		
+		case E_BLOCK_SAPLING:
+		{
+			GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
+			break;
+		}
+		
+		case E_BLOCK_GRASS:
+		{
+			MTRand r1;
+			for (int i = 0; i < 60; i++)
+			{
+				int OfsX = (r1.randInt(3) + r1.randInt(3) + r1.randInt(3) + r1.randInt(3)) / 2 - 3;
+				int OfsY = r1.randInt(3) + r1.randInt(3) - 3;
+				int OfsZ = (r1.randInt(3) + r1.randInt(3) + r1.randInt(3) + r1.randInt(3)) / 2 - 3;
+				BLOCKTYPE Ground = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ);
+				if (Ground != E_BLOCK_GRASS)
+				{
+					continue;
+				}
+				BLOCKTYPE Above  = GetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ);
+				if (Above != E_BLOCK_AIR)
+				{
+					continue;
+				}
+				BLOCKTYPE  SpawnType;
+				NIBBLETYPE SpawnMeta = 0;
+				switch (r1.randInt(10))
+				{
+					case 0:  SpawnType = E_BLOCK_YELLOW_FLOWER; break;
+					case 1:  SpawnType = E_BLOCK_RED_ROSE;      break;
+					default:
+					{
+						SpawnType = E_BLOCK_TALL_GRASS;
+						SpawnMeta = E_META_TALL_GRASS_GRASS;
+						break;
+					}
+				}  // switch (random spawn block)
+				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
+			}  // for i - 50 times
+			break;
+		}
+	}  // switch (BlockType)
+}
+
+
+
+
+
+void cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType)
+{
+	MTRand Rand;
+	m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, Rand);
+}
+
+
+
+
+
 int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 {
 	return m_ChunkMap->GetBiomeAt(a_BlockX, a_BlockZ);

@@ -659,7 +659,15 @@ void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx
 		FastSetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_BlockType, ++Meta);
 		return;
 	}
-	
+	GrowMelonPumpkin(a_RelX, a_RelY, a_RelZ, a_BlockType, a_TickRandom);
+}
+
+
+
+
+
+void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
+{
 	// Convert the stem BlockType into produce BlockType
 	BLOCKTYPE ProduceType;
 	switch (a_BlockType)

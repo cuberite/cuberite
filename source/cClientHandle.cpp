@@ -977,6 +977,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 				break;
 			}
+			
 			default:
 			{
 				break;
@@ -1211,12 +1212,12 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			}
 			case E_ITEM_SIGN:
 			{
-				LOG("Sign Dir: %i", a_Packet->m_Direction);
+				LOGD("Sign Dir: %i", a_Packet->m_Direction);
 				if (a_Packet->m_Direction == 1)
 				{
-					LOG("Player Rotation: %f", m_Player->GetRotation());
+					LOGD("Player Rotation: %f", m_Player->GetRotation());
 					MetaData = cSign::RotationToMetaData(m_Player->GetRotation());
-					LOG("Sign rotation %i", MetaData);
+					LOGD("Sign rotation %i", MetaData);
 					a_Packet->m_ItemType = E_BLOCK_SIGN_POST;
 				}
 				else
@@ -1259,6 +1260,15 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 					return;
 				}
 				a_Packet->m_ItemType = E_BLOCK_PUMPKIN_STEM;
+				break;
+			}
+			case E_ITEM_DYE:
+			{
+				// Handle bonemeal and dyes on sheep
+				if (HandleDyes(a_Packet))
+				{
+					return;
+				}
 				break;
 			}
 			default:
@@ -1551,6 +1561,26 @@ void cClientHandle::HandleKeepAlive(cPacket_KeepAlive * a_Packet)
 		cTimer t1;
 		m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
 	}
+}
+
+
+
+
+
+bool cClientHandle::HandleDyes(cPacket_BlockPlace * a_Packet)
+{
+	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
+	
+	// TODO: Handle coloring the sheep, too
+	
+	// Handle growing the plants:
+	if (Equipped.m_ItemHealth == E_META_DYE_WHITE)
+	{
+		cWorld * World = m_Player->GetWorld();
+		World->GrowPlant(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	}
+	
+	return false;
 }
 
 

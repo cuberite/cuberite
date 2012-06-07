@@ -243,6 +243,12 @@ public:
 	void GrowTreeByBiome    (int a_BlockX, int a_BlockY, int a_BlockZ);                           // tolua_export
 	
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
+	
+	/// Grows the plant at the specified block to its ripe stage (bonemeal used)
+	void GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ);    // tolua_export
+	
+	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
+	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType);    // tolua_export
 
 	int  GetBiomeAt (int a_BlockX, int a_BlockZ);   // tolua_export
 

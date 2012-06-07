@@ -151,6 +151,9 @@ public:
 	/// Returns the number of valid chunks and the number of dirty chunks
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 	
+	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
+	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, MTRand & a_Rand);
+	
 		/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
