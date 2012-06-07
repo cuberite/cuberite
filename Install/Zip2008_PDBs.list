@@ -4,4 +4,5 @@ VC2008\Release\Lua\*.pdb
 VC2008\Release\ToLua\*.pdb
 VC2008\Release\webserver\*.pdb
 VC2008\Release\zlib*.pdb
+source\Bindings.*
 

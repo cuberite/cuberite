@@ -55,6 +55,15 @@ if exist MCServer_Win_%WCREV%.7z (
 
 
 
+:: Update Bindings.cpp
+echo Updating Lua bindings
+set ALLTOLUA_WAIT=N
+cd source
+call AllToLua.bat
+cd ..
+
+
+
 
 :: Compile using VC2008 Express. Do a full rebuild.
 echo Setting up VS environment...
