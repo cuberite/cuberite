@@ -235,6 +235,9 @@ private:
 	void TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom);
 	void TickFarmland    (int a_RelX, int a_RelY, int a_RelZ);
 	
+	/// Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking)
+	void GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
+	
 	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
 	void GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
 	

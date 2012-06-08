@@ -915,6 +915,12 @@ void cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 			}  // for i - 50 times
 			break;
 		}
+		
+		case E_BLOCK_SUGARCANE:
+		{
+			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 3);
+			break;
+		}
 	}  // switch (BlockType)
 }
 

@@ -1271,6 +1271,11 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				}
 				break;
 			}
+			case E_ITEM_SUGARCANE:
+			{
+				a_Packet->m_ItemType = E_BLOCK_SUGARCANE;
+				break;
+			}
 			default:
 			{
 				break;

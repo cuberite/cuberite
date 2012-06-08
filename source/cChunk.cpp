@@ -567,10 +567,11 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 				break;
 			}
 			
-			case E_BLOCK_GRASS:        TickGrass(m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_TickRandom); break;
+			case E_BLOCK_GRASS:        TickGrass       (m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_TickRandom); break;
 			case E_BLOCK_PUMPKIN_STEM:
 			case E_BLOCK_MELON_STEM:   TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
-			case E_BLOCK_FARMLAND:     TickFarmland(m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
+			case E_BLOCK_FARMLAND:     TickFarmland    (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
+			case E_BLOCK_SUGARCANE:    GrowSugarcane   (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
 			
 			case E_BLOCK_SAPLING:
 			{
@@ -666,6 +667,76 @@ void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx
 
 
 
+void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
+{
+	// TODO: Rain hydrates blocks, too. Check world weather, don't search for water if raining.
+	
+	// Search for water in a close proximity:
+	// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+	bool Found = false;
+	for (int y = a_RelY; y <= a_RelY + 1; y++)
+	{
+		for (int z = a_RelZ - 4; z <= a_RelZ + 4; z++)
+		{
+			for (int x = a_RelX - 4; x <= a_RelX + 4; x++)
+			{
+				BLOCKTYPE BlockType;
+				NIBBLETYPE Meta;  // unused
+				
+				if (!UnboundedRelGetBlock(x, y, z, BlockType, Meta))
+				{
+					// Too close to an unloaded chunk, we might miss a water block there, so don't tick at all
+					return;
+				}
+				if (
+					(BlockType == E_BLOCK_WATER) ||
+					(BlockType == E_BLOCK_STATIONARY_WATER)
+				)
+				{
+					Found = true;
+					break;
+				}
+			}  // for x
+			if (Found)
+			{
+				break;
+			}
+		}  // for z
+		if (Found)
+		{
+			break;
+		}
+	}  // for y
+	
+	NIBBLETYPE BlockMeta = GetMeta(a_RelX, a_RelY, a_RelZ);
+	
+	if (Found)
+	{
+		// Water was found, hydrate the block until hydration reaches 7:
+		if (BlockMeta < 7)
+		{
+			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, ++BlockMeta);
+		}
+		return;
+	}
+
+	// Water wasn't found, de-hydrate block:
+	if (BlockMeta > 0)
+	{
+		FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, --BlockMeta);
+		return;
+	}
+	
+	// Farmland too dry. Turn back to dirt:
+	FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+	
+	// TODO: Uproot whatever was growing on top:
+}
+
+
+
+
+
 void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
 {
 	// Convert the stem BlockType into produce BlockType
@@ -745,70 +816,37 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 
 
-void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
+void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 {
-	// TODO: Rain hydrates blocks, too. Check world weather, don't search for water if raining.
-	
-	// Search for water in a close proximity:
-	// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
-	bool Found = false;
-	for (int y = a_RelY; y <= a_RelY + 1; y++)
+	// Check the total height of the sugarcane blocks here:
+	int Top = a_RelY + 1;
+	while (
+		(Top < cChunkDef::Height) &&
+		(GetBlock(a_RelX, Top, a_RelZ) == E_BLOCK_SUGARCANE)
+	)
 	{
-		for (int z = a_RelZ - 4; z <= a_RelZ + 4; z++)
-		{
-			for (int x = a_RelX - 4; x <= a_RelX + 4; x++)
-			{
-				BLOCKTYPE BlockType;
-				NIBBLETYPE Meta;  // unused
-				
-				if (!UnboundedRelGetBlock(x, y, z, BlockType, Meta))
-				{
-					// Too close to an unloaded chunk, we might miss a water block there, so don't tick at all
-					return;
-				}
-				if (
-					(BlockType == E_BLOCK_WATER) ||
-					(BlockType == E_BLOCK_STATIONARY_WATER)
-				)
-				{
-					Found = true;
-					break;
-				}
-			}  // for x
-			if (Found)
-			{
-				break;
-			}
-		}  // for z
-		if (Found)
-		{
-			break;
-		}
-	}  // for y
-	
-	NIBBLETYPE BlockMeta = GetMeta(a_RelX, a_RelY, a_RelZ);
-	
-	if (Found)
-	{
-		// Water was found, hydrate the block until hydration reaches 7:
-		if (BlockMeta < 7)
-		{
-			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, ++BlockMeta);
-		}
-		return;
+		++Top;
 	}
-
-	// Water wasn't found, de-hydrate block:
-	if (BlockMeta > 0)
+	int Bottom = a_RelY - 1;
+	while (
+		(Bottom > 0) &&
+		(GetBlock(a_RelX, Bottom, a_RelZ) == E_BLOCK_SUGARCANE)
+	)
 	{
-		FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, --BlockMeta);
-		return;
+		--Bottom;
 	}
 	
-	// Farmland too dry. Turn back to dirt:
-	FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
-	
-	// TODO: Uproot whatever was growing on top:
+	// Grow by at most a_NumBlocks, but no more than height 3:
+	int ToGrow = std::min(a_NumBlocks, 4 - (Top - Bottom));
+	for (int i = 0; i < ToGrow; i++)
+	{
+		BLOCKTYPE  BlockType;
+		NIBBLETYPE BlockMeta;
+		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
+		{
+			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_SUGARCANE, 0);
+		}
+	}  // for i
 }
 
 
