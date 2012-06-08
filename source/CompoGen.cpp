@@ -245,7 +245,6 @@ void cCompoGenBiomal::ComposeTerrain(
 					case biFrozenRiver:
 					case biIcePlains:
 					case biIceMountains:
-					case biDesertHills:
 					case biForestHills:
 					case biTaigaHills:
 					case biExtremeHillsEdge:
@@ -255,6 +254,7 @@ void cCompoGenBiomal::ComposeTerrain(
 						FillColumnGrass(x, z, Height, a_BlockTypes);
 						break;
 					}
+					case biDesertHills:
 					case biDesert:
 					case biBeach:
 					{
