@@ -119,18 +119,20 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenClassic:
 
-cCompoGenClassic::cCompoGenClassic(int a_SeaLevel, int a_BeachHeight, int a_BeachDepth,
-                                   BLOCKTYPE a_BlockTop, BLOCKTYPE a_BlockMiddle, BLOCKTYPE a_BlockBottom,
-                                   BLOCKTYPE a_BlockBeach, BLOCKTYPE a_BlockBeachBottom, BLOCKTYPE a_BlockSea) :
+cCompoGenClassic::cCompoGenClassic(
+	int a_SeaLevel, int a_BeachHeight, int a_BeachDepth,
+	BLOCKTYPE a_BlockTop, BLOCKTYPE a_BlockMiddle, BLOCKTYPE a_BlockBottom,
+	BLOCKTYPE a_BlockBeach, BLOCKTYPE a_BlockBeachBottom, BLOCKTYPE a_BlockSea
+) :
 	m_SeaLevel(a_SeaLevel),
 	m_BeachHeight(a_BeachHeight),
 	m_BeachDepth(a_BeachDepth),
-  m_BlockTop(a_BlockTop),
-  m_BlockMiddle(a_BlockMiddle),
-  m_BlockBottom(a_BlockBottom),
-  m_BlockBeach(a_BlockBeach),
-  m_BlockBeachBottom(a_BlockBeachBottom),
-  m_BlockSea(a_BlockSea)
+	m_BlockTop(a_BlockTop),
+	m_BlockMiddle(a_BlockMiddle),
+	m_BlockBottom(a_BlockBottom),
+	m_BlockBeach(a_BlockBeach),
+	m_BlockBeachBottom(a_BlockBeachBottom),
+	m_BlockSea(a_BlockSea)
 {
 }
 

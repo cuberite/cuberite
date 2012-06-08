@@ -64,7 +64,15 @@ public:
 	
 protected:
 	int m_Seed;
-
+	
+	/// Tries to place sugarcane at the coords specified, returns true if successful
+	bool TryAddSugarcane(
+		int a_ChunkX, int a_ChunkZ,
+		int a_RelX, int a_RelY, int a_RelZ,      // relative block coords of the sugarcane's base
+		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+		cChunkDef::BlockNibbles & a_BlockMeta    // Block meta to read and change
+	);
+	
 	// cFinishGen override:
 	virtual void GenFinish(
 		int a_ChunkX, int a_ChunkZ,

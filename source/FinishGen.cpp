@@ -17,8 +17,69 @@
 
 
 
+static inline bool IsWater(BLOCKTYPE a_BlockType)
+{
+	return (a_BlockType == E_BLOCK_STATIONARY_WATER) || (a_BlockType == E_BLOCK_WATER);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
+
+bool cFinishGenSprinkleFoliage::TryAddSugarcane(
+	int a_ChunkX, int a_ChunkZ,
+	int a_RelX, int a_RelY, int a_RelZ,
+	cChunkDef::BlockTypes & a_BlockTypes,
+	cChunkDef::BlockNibbles & a_BlockMeta
+)
+{
+	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
+	if (
+		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
+		(a_RelY < 1) || (a_RelY >= cChunkDef::Height - 2) ||
+		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
+	)
+	{
+		return false;
+	}
+
+	// Only allow dirt, grass or sand below sugarcane:
+	switch (cChunkDef::GetBlock(a_BlockTypes, a_RelX, a_RelY, a_RelZ))
+	{
+		case E_BLOCK_DIRT:
+		case E_BLOCK_GRASS:
+		case E_BLOCK_SAND:
+		{
+			break;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+
+	// Water is required next to the block below the sugarcane:
+	if (
+		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX - 1, a_RelY, a_RelZ)) &&
+		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX + 1, a_RelY, a_RelZ)) &&
+		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX    , a_RelY, a_RelZ - 1)) &&
+		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX    , a_RelY, a_RelZ + 1))
+	)
+	{
+		return false;
+	}
+	
+	// All conditions met, place a sugarcane here:
+	cChunkDef::SetBlock(a_BlockTypes, a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
+	return true;
+}
+
+
+
+
 
 void cFinishGenSprinkleFoliage::GenFinish(
 	int a_ChunkX, int a_ChunkZ,
@@ -88,18 +149,36 @@ void cFinishGenSprinkleFoliage::GenFinish(
 						cChunkDef::SetBlock (a_BlockTypes, x, ++Top, z, E_BLOCK_TALL_GRASS);
 						cChunkDef::SetNibble(a_BlockMeta,  x,   Top, z, E_META_TALL_GRASS_GRASS);
 					}
+					else if (TryAddSugarcane(a_ChunkX, a_ChunkZ, x, Top, z, a_BlockTypes, a_BlockMeta))
+					{
+						++Top;
+					}
+					else if ((val1 > 0.5) && (val2 < -0.5))
+					{
+						cChunkDef::SetBlock (a_BlockTypes, x, ++Top, z, E_BLOCK_PUMPKIN);
+						cChunkDef::SetNibble(a_BlockMeta,  x,   Top, z, (int)(val3 * 8) % 4);
+					}
 					break;
 				}  // case E_BLOCK_GRASS
 				
 				case E_BLOCK_SAND:
 				{
-					if (val1 + val2 > 0.f)
+					int y = Top + 1;
+					if (
+						(x > 0) && (x < cChunkDef::Width - 1) &&
+						(z > 0) && (z < cChunkDef::Width - 1) &&
+						(val1 + val2 > 0.5f) &&
+						(cChunkDef::GetBlock(a_BlockTypes, x + 1, y, z)     == E_BLOCK_AIR) &&
+						(cChunkDef::GetBlock(a_BlockTypes, x - 1, y, z)     == E_BLOCK_AIR) &&
+						(cChunkDef::GetBlock(a_BlockTypes, x,     y, z + 1) == E_BLOCK_AIR) &&
+						(cChunkDef::GetBlock(a_BlockTypes, x,     y, z - 1) == E_BLOCK_AIR)
+					)
 					{
 						cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_CACTUS);
-						if (val1 > val2)
-						{
-							cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_CACTUS);
-						}
+					}
+					else if (TryAddSugarcane(a_ChunkX, a_ChunkZ, x, Top, z, a_BlockTypes, a_BlockMeta))
+					{
+						++Top;
 					}
 					break;
 				}
