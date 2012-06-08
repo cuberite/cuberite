@@ -12,11 +12,11 @@
 
 static void AddRandomDrop(cItems & a_Drops, MTRand & r1, int a_OneInNChance, ENUM_ITEM_ID a_ItemID)
 {
-	if (r1.randInt(a_OneInNChance - 1) != 0)
+	if ((r1.randInt(16 * a_OneInNChance - 1) / 16) != 0)
 	{
 		return;
 	}
-	a_Drops.push_back(cItem(a_ItemID));
+	a_Drops.push_back(cItem(a_ItemID, 1));
 }
 
 
