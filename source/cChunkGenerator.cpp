@@ -224,6 +224,17 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 
 
 
+BLOCKTYPE ResolveBlock(AString BlockType, BLOCKTYPE DefaultBlock)
+{
+  int Block = BlockStringToType(BlockType);
+  if(Block < 0)
+  {
+    LOGWARN("[Generator] Could not parse block value \"%s\". Using default.", BlockType.c_str());
+    return DefaultBlock;
+  }
+  return (BLOCKTYPE) Block;
+}
+
 
 
 void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
@@ -260,7 +271,14 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		int SeaLevel    = a_IniFile.GetValueI("Generator", "ClassicSeaLevel", 60);
 		int BeachHeight = a_IniFile.GetValueI("Generator", "ClassicBeachHeight", 2);
 		int BeachDepth  = a_IniFile.GetValueI("Generator", "ClassicBeachDepth", 4);
-		m_CompositionGen = new cCompoGenClassic(SeaLevel, BeachHeight, BeachDepth);
+    BLOCKTYPE BlockTop    = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockTop", "grass"), E_BLOCK_GRASS);
+    BLOCKTYPE BlockMiddle = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockMiddle", "dirt"), E_BLOCK_DIRT);
+    BLOCKTYPE BlockBottom = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockBottom", "stone"), E_BLOCK_STONE);
+    BLOCKTYPE BlockBeach  = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockBeach", "sand"), E_BLOCK_SAND);
+    BLOCKTYPE BlockBeachBottom = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockBeachBottom", "sandstone"), E_BLOCK_SANDSTONE);
+    BLOCKTYPE BlockSea    = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockSea", "9"), E_BLOCK_STATIONARY_WATER);
+		m_CompositionGen = new cCompoGenClassic(SeaLevel, BeachHeight, BeachDepth, BlockTop, BlockMiddle, BlockBottom, BlockBeach,
+                                            BlockBeachBottom, BlockSea);
 	}
 	else
 	{

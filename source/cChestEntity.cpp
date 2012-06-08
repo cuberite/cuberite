@@ -106,24 +106,6 @@ void cChestEntity::SetSlot( int a_Slot, cItem & a_Item )
 		return false; \
 	}
 
-bool cChestEntity::LoadFromFile(cFile & f)
-{
-	READ(f, m_PosX);
-	READ(f, m_PosY);
-	READ(f, m_PosZ);
-
-	unsigned int NumSlots = 0;
-	READ(f, NumSlots);
-	for(unsigned int i = 0; i < NumSlots; i++)
-	{
-		cItem Item;
-		READ(f, Item.m_ItemID);
-		READ(f, Item.m_ItemCount);
-		READ(f, Item.m_ItemHealth);
-		SetSlot( i, Item );
-	}
-	return true;
-}
 
 
 

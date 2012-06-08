@@ -119,10 +119,18 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenClassic:
 
-cCompoGenClassic::cCompoGenClassic(int a_SeaLevel, int a_BeachHeight, int a_BeachDepth) :
+cCompoGenClassic::cCompoGenClassic(int a_SeaLevel, int a_BeachHeight, int a_BeachDepth,
+                                   BLOCKTYPE a_BlockTop, BLOCKTYPE a_BlockMiddle, BLOCKTYPE a_BlockBottom,
+                                   BLOCKTYPE a_BlockBeach, BLOCKTYPE a_BlockBeachBottom, BLOCKTYPE a_BlockSea) :
 	m_SeaLevel(a_SeaLevel),
 	m_BeachHeight(a_BeachHeight),
-	m_BeachDepth(a_BeachDepth)
+	m_BeachDepth(a_BeachDepth),
+  m_BlockTop(a_BlockTop),
+  m_BlockMiddle(a_BlockMiddle),
+  m_BlockBottom(a_BlockBottom),
+  m_BlockBeach(a_BlockBeach),
+  m_BlockBeachBottom(a_BlockBeachBottom),
+  m_BlockSea(a_BlockSea)
 {
 }
 
@@ -152,9 +160,9 @@ void cCompoGenClassic::ComposeTerrain(
 	memset(a_BlockMeta, 0, sizeof(a_BlockMeta));
 
 	// The patterns to use for different situations, must be same length!
-	static const BLOCKTYPE PatternGround[] = {E_BLOCK_GRASS, E_BLOCK_DIRT, E_BLOCK_DIRT, E_BLOCK_DIRT} ;
-	static const BLOCKTYPE PatternBeach[]  = {E_BLOCK_SAND,  E_BLOCK_SAND, E_BLOCK_SAND, E_BLOCK_SANDSTONE} ;
-	static const BLOCKTYPE PatternOcean[]  = {E_BLOCK_DIRT,  E_BLOCK_DIRT, E_BLOCK_DIRT, E_BLOCK_STONE} ;
+	static const BLOCKTYPE PatternGround[] = {m_BlockTop, m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
+	static const BLOCKTYPE PatternBeach[]  = {m_BlockBeach,  m_BlockBeach, m_BlockBeach, m_BlockBeachBottom} ;
+	static const BLOCKTYPE PatternOcean[]  = {m_BlockMiddle,  m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
 	static int PatternLength = ARRAYCOUNT(PatternGround);
 	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternBeach));
 	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternOcean));
@@ -181,13 +189,13 @@ void cCompoGenClassic::ComposeTerrain(
 			// Fill water from sealevel down to height (if any):
 			for (int y = m_SeaLevel; y >= Height; --y)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_STATIONARY_WATER);
+				cChunkDef::SetBlock(a_BlockTypes, x, y, z, m_BlockSea);
 			}
 			
 			// Fill from height till the bottom:
 			for (int y = Height; y >= 1; y--)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : E_BLOCK_STONE);
+				cChunkDef::SetBlock(a_BlockTypes, x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : m_BlockBottom);
 			}
 			
 			// The last layer is always bedrock:

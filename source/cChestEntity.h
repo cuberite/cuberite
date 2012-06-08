@@ -37,8 +37,6 @@ public:
 	const cItem * GetSlot( int a_Slot ) const;
 	void	SetSlot( int a_Slot, cItem & a_Item );
 
-	OBSOLETE bool LoadFromFile(cFile & a_File);  // deprecated format
-
 	bool LoadFromJson( const Json::Value& a_Value );
 	virtual void SaveToJson(Json::Value& a_Value ) override;
 

@@ -104,32 +104,6 @@ cPacket * cSignEntity::GetPacket(void)
 		return false; \
 	}
 
-bool cSignEntity::LoadFromFile(cFile & f)
-{
-	READ(f, m_PosX);
-	READ(f, m_PosY);
-	READ(f, m_PosZ);
-
-	for( int i = 0; i < 4; i++ )
-	{
-		short Size = 0;
-		READ(f, Size);
-		if (Size > 0)
-		{
-			char * c_Str = new char[Size];
-			if (f.Read(c_Str, Size) != Size )
-			{
-				LOGERROR("ERROR READING SIGN FROM FILE");
-				delete [] c_Str;
-				return false;
-			}
-			m_Line[i].assign( c_Str, Size );
-			delete [] c_Str;
-		}
-	}
-
-	return true;
-}
 
 
 

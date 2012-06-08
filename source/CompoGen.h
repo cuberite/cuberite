@@ -79,13 +79,21 @@ class cCompoGenClassic :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenClassic(int a_SeaLevel, int a_BeachHeight, int a_BeachDepth);
+  cCompoGenClassic(int a_SeaLevel, int a_BeachHeight, int a_BeachDepth,
+                      BLOCKTYPE a_BlockTop, BLOCKTYPE a_BlockMiddle, BLOCKTYPE a_BlockBottom,
+                      BLOCKTYPE a_BlockBeach, BLOCKTYPE a_BlockBeachBottom, BLOCKTYPE a_BlockSea);
 	
 protected:
 
 	int m_SeaLevel;
 	int m_BeachHeight;
 	int m_BeachDepth;
+  BLOCKTYPE m_BlockTop;
+  BLOCKTYPE m_BlockMiddle;
+  BLOCKTYPE m_BlockBottom;
+  BLOCKTYPE m_BlockBeach;
+  BLOCKTYPE m_BlockBeachBottom;
+  BLOCKTYPE m_BlockSea;
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(

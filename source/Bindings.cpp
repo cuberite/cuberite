@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/07/12 23:02:08.
+** Generated automatically by tolua++-1.0.92 on Fri Jun  8 03:43:28 2012.
 */
 
 #ifndef __cplusplus
@@ -13,8 +13,8 @@
 /* Exported function */
 TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "tolua_base.h"
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "tolua_base.h"
 #include "cTorch.h"
 #include "cStairs.h"
 #include "cStep.h"
