@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/09/12 14:03:09.
+** Generated automatically by tolua++-1.0.92 on 06/09/12 14:43:12.
 */
 
 #ifndef __cplusplus
@@ -10262,7 +10262,8 @@ static int tolua_AllToLua_cWorld_GrowPlant00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10272,11 +10273,12 @@ static int tolua_AllToLua_cWorld_GrowPlant00(lua_State* tolua_S)
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  bool a_IsByBonemeal = ((bool)  tolua_toboolean(tolua_S,5,false));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GrowPlant'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->GrowPlant(a_BlockX,a_BlockY,a_BlockZ);
+   bool tolua_ret = (bool)  self->GrowPlant(a_BlockX,a_BlockY,a_BlockZ,a_IsByBonemeal);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }

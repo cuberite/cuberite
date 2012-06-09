@@ -235,21 +235,32 @@ cWorld::cWorld( const AString & a_WorldName )
 	cMakeDir::MakeDir(m_WorldName.c_str());
 
 	MTRand r1;
-	m_SpawnX = (double)((r1.randInt()%1000)-500);
+	m_SpawnX = (double)((r1.randInt() % 1000) - 500);
 	m_SpawnY = cChunkDef::Height;
-	m_SpawnZ = (double)((r1.randInt()%1000)-500);
+	m_SpawnZ = (double)((r1.randInt() % 1000) - 500);
 	m_GameMode = eGameMode_Creative;
 
 	AString StorageSchema("Default");
 
 	cIniFile IniFile(m_IniFileName);
-	if( IniFile.ReadFile() )
+	if (IniFile.ReadFile())
 	{
-		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX );
-		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY );
-		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ );
+		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
+		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
+		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
 		m_GameMode = (eGameMode)IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
 		StorageSchema = IniFile.GetValue("Storage", "Schema", StorageSchema);
+		m_MaxCactusHeight           = IniFile.GetValueI("Plants", "MaxCactusHeight",           3);
+		m_MaxSugarcaneHeight        = IniFile.GetValueI("Plants", "MaxSugarcaneHeight",        3);
+		m_IsCropsBonemealable       = IniFile.GetValueB("Plants", "IsCropsBonemealable",       true);
+		m_IsGrassBonemealable       = IniFile.GetValueB("Plants", "IsGrassBonemealable",       true);
+		m_IsSaplingBonemealable     = IniFile.GetValueB("Plants", "IsSaplingBonemealable",     true);
+		m_IsMelonStemBonemealable   = IniFile.GetValueB("Plants", "IsMelonStemBonemealable",   true);
+		m_IsMelonBonemealable       = IniFile.GetValueB("Plants", "IsMelonBonemealable",       false);
+		m_IsPumpkinStemBonemealable = IniFile.GetValueB("Plants", "IsPumpkinStemBonemealable", true);
+		m_IsPumpkinBonemealable     = IniFile.GetValueB("Plants", "IsPumpkinBonemealable",     false);
+		m_IsSugarcaneBonemealable   = IniFile.GetValueB("Plants", "IsSugarcaneBonemealable",   false);
+		m_IsCactusBonemealable      = IniFile.GetValueB("Plants", "IsCactusBonemealable",      false);
 	}
 	else
 	{
@@ -274,7 +285,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	if( IniFile2.ReadFile() )
 	{
 		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true );
-		m_SpawnMonsterRate = (float)IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10 );
+		m_SpawnMonsterRate = (float)IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10);
 		SetMaxPlayers(IniFile2.GetValueI("Server", "MaxPlayers", 9001));
 		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - It's OVER 9000!").c_str();
 	}
@@ -844,7 +855,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -853,6 +864,10 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		case E_BLOCK_CROPS:
 		{
+			if (a_IsByBonemeal && !m_IsGrassBonemealable)
+			{
+				return false;
+			}
 			if (BlockMeta < 7)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
@@ -861,14 +876,42 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 		}
 		
 		case E_BLOCK_MELON_STEM:
-		case E_BLOCK_PUMPKIN_STEM:
 		{
 			if (BlockMeta < 7)
 			{
+				if (a_IsByBonemeal && !m_IsMelonStemBonemealable)
+				{
+					return false;
+				}
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
 			}
 			else
 			{
+				if (a_IsByBonemeal && !m_IsMelonBonemealable)
+				{
+					return false;
+				}
+				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
+			}
+			return true;
+		}
+		
+		case E_BLOCK_PUMPKIN_STEM:
+		{
+			if (BlockMeta < 7)
+			{
+				if (a_IsByBonemeal && !m_IsPumpkinStemBonemealable)
+				{
+					return false;
+				}
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+			}
+			else
+			{
+				if (a_IsByBonemeal && !m_IsPumpkinBonemealable)
+				{
+					return false;
+				}
 				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
 			}
 			return true;
@@ -876,12 +919,20 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 		
 		case E_BLOCK_SAPLING:
 		{
+			if (a_IsByBonemeal && !m_IsSaplingBonemealable)
+			{
+				return false;
+			}
 			GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
 			return true;
 		}
 		
 		case E_BLOCK_GRASS:
 		{
+			if (a_IsByBonemeal && !m_IsGrassBonemealable)
+			{
+				return false;
+			}
 			MTRand r1;
 			for (int i = 0; i < 60; i++)
 			{
@@ -918,12 +969,20 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 		
 		case E_BLOCK_SUGARCANE:
 		{
+			if (a_IsByBonemeal && !m_IsSugarcaneBonemealable)
+			{
+				return false;
+			}
 			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 3);
 			return true;
 		}
 		
 		case E_BLOCK_CACTUS:
 		{
+			if (a_IsByBonemeal && !m_IsCactusBonemealable)
+			{
+				return false;
+			}
 			m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, 3);
 			return true;
 		}

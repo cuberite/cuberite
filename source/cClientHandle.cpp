@@ -1586,7 +1586,7 @@ bool cClientHandle::HandleDyes(cPacket_BlockPlace * a_Packet)
 	if (Equipped.m_ItemHealth == E_META_DYE_WHITE)
 	{
 		cWorld * World = m_Player->GetWorld();
-		return World->GrowPlant(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		return World->GrowPlant(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, true);
 	}
 	
 	return false;

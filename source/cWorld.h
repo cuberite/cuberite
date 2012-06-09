@@ -244,8 +244,8 @@ public:
 	
 	void GrowTreeImage(const sSetBlockVector & a_Blocks);
 	
-	/// Grows the plant at the specified block to its ripe stage (bonemeal used); returns false if the block is not growable.
-	bool GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ);    // tolua_export
+	/// Grows the plant at the specified block to its ripe stage (bonemeal used); returns false if the block is not growable. If a_IsBonemeal is true, block is not grown if not allowed in world.ini
+	bool GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false);    // tolua_export
 	
 	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
 	void GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType);    // tolua_export
@@ -360,6 +360,18 @@ private:
 	float m_SpawnMonsterRate;
 
 	eWeather m_Weather;
+	
+	int  m_MaxCactusHeight;
+	int  m_MaxSugarcaneHeight;
+	bool m_IsCropsBonemealable;
+	bool m_IsGrassBonemealable;
+	bool m_IsSaplingBonemealable;
+	bool m_IsMelonStemBonemealable;
+	bool m_IsMelonBonemealable;
+	bool m_IsPumpkinStemBonemealable;
+	bool m_IsPumpkinBonemealable;
+	bool m_IsSugarcaneBonemealable;
+	bool m_IsCactusBonemealable;
 	
 	cEntityList       m_RemoveEntityQueue;
 	cEntityList       m_AllEntities;
