@@ -445,6 +445,7 @@ void cChunk::CheckBlocks(void)
 		NIBBLETYPE BlockMeta = GetMeta (index);
 		switch (BlockType)
 		{
+			// Stuff that drops when block below is destroyed:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_REDSTONE_WIRE:
@@ -459,7 +460,8 @@ void cChunk::CheckBlocks(void)
 			case E_BLOCK_YELLOW_FLOWER:
 			case E_BLOCK_RED_ROSE:
 			case E_BLOCK_RED_MUSHROOM:
-			case E_BLOCK_BROWN_MUSHROOM:		// Stuff that drops when block below is destroyed
+			case E_BLOCK_BROWN_MUSHROOM:
+			case E_BLOCK_SNOW:
 			{
 				if (GetBlock(BlockPos.x, BlockPos.y - 1, BlockPos.z) == E_BLOCK_AIR)
 				{
