@@ -247,6 +247,7 @@ public:
 		g_BlockOneHitDig[E_BLOCK_REEDS]                 = true;
 		g_BlockOneHitDig[E_BLOCK_SAPLING]               = true;
 		g_BlockOneHitDig[E_BLOCK_TNT]                   = true;
+		g_BlockOneHitDig[E_BLOCK_TALL_GRASS]            = true;
 		g_BlockOneHitDig[E_BLOCK_TORCH]                 = true;
 		g_BlockOneHitDig[E_BLOCK_YELLOW_FLOWER]         = true;
 
