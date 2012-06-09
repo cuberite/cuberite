@@ -1332,6 +1332,8 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			// Check whether selected item is allowed to be placed on specific surface
 			if (!m_Player->GetWorld()->IsPlacingItemLegal(a_Packet->m_ItemType, X, Y, Z))
 			{
+				// If we don't send the block, MC is happy placing cacti underwater:
+				m_Player->GetWorld()->SendBlockTo(X, Y, Z, m_Player);
 				return;
 			}
 
