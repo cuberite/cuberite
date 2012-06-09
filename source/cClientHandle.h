@@ -205,7 +205,7 @@ private:
 	void HandleDisconnect       (cPacket_Disconnect *              a_Packet);
 	void HandleKeepAlive        (cPacket_KeepAlive *               a_Packet);
 	
-	/// Handles rclk with a dye; returns true if normal rclk processing should continue
+	/// Handles rclk with a dye; returns true if the dye is to be be consumed
 	bool HandleDyes(cPacket_BlockPlace * a_Packet);
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)

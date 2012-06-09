@@ -1267,6 +1267,10 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				// Handle bonemeal and dyes on sheep
 				if (HandleDyes(a_Packet))
 				{
+					if (m_Player->GetGameMode() == eGameMode_Survival)
+					{
+						m_Player->GetInventory().RemoveItem(Item);
+					}
 					return;
 				}
 				break;
@@ -1582,7 +1586,7 @@ bool cClientHandle::HandleDyes(cPacket_BlockPlace * a_Packet)
 	if (Equipped.m_ItemHealth == E_META_DYE_WHITE)
 	{
 		cWorld * World = m_Player->GetWorld();
-		World->GrowPlant(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		return World->GrowPlant(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 	}
 	
 	return false;

@@ -844,7 +844,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-void cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -857,7 +857,7 @@ void cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 			{
 				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
 			}
-			break;
+			return true;
 		}
 		
 		case E_BLOCK_MELON_STEM:
@@ -871,13 +871,13 @@ void cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 			{
 				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
 			}
-			break;
+			return true;
 		}
 		
 		case E_BLOCK_SAPLING:
 		{
 			GrowTreeFromSapling(a_BlockX, a_BlockY, a_BlockZ, BlockMeta);
-			break;
+			return true;
 		}
 		
 		case E_BLOCK_GRASS:
@@ -913,15 +913,16 @@ void cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 				}  // switch (random spawn block)
 				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
 			}  // for i - 50 times
-			break;
+			return true;
 		}
 		
 		case E_BLOCK_SUGARCANE:
 		{
 			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 3);
-			break;
+			return true;
 		}
 	}  // switch (BlockType)
+	return false;
 }
 
 
