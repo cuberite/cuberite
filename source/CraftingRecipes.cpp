@@ -457,30 +457,37 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			EndY = itrS->y;
 		}
 		bool Found = false;
-		for (int x = StartX; x <= EndX; x++) for (int y = StartY; y <= EndY; y++)
+		for (int x = StartX; x <= EndX; x++)
 		{
-			if (HasMatched[x][y])
+			for (int y = StartY; y <= EndY; y++)
 			{
-				// Already matched some other item
-				continue;
-			}
-			int GridIdx = x + a_GridStride * y;
-			if (
-				(a_CraftingGrid[GridIdx].m_ItemID == itrS->m_Item.m_ItemID) &&
-				(
-					(itrS->m_Item.m_ItemHealth < 0) ||  // doesn't want damage comparison
-					(itrS->m_Item.m_ItemHealth == a_CraftingGrid[GridIdx].m_ItemHealth)  // the damage matches
+				if (HasMatched[x][y])
+				{
+					// Already matched some other item
+					continue;
+				}
+				int GridIdx = x + a_GridStride * y;
+				if (
+					(a_CraftingGrid[GridIdx].m_ItemID == itrS->m_Item.m_ItemID) &&
+					(
+						(itrS->m_Item.m_ItemHealth < 0) ||  // doesn't want damage comparison
+						(itrS->m_Item.m_ItemHealth == a_CraftingGrid[GridIdx].m_ItemHealth)  // the damage matches
+					)
 				)
-			)
+				{
+					HasMatched[x][y] = true;
+					Found = true;
+					MatchedSlots.push_back(*itrS);
+					MatchedSlots.back().x = x;
+					MatchedSlots.back().y = y;
+					break;
+				}
+			}  // for y
+			if (Found)
 			{
-				HasMatched[x][y] = true;
-				Found = true;
-				MatchedSlots.push_back(*itrS);
-				MatchedSlots.back().x = x;
-				MatchedSlots.back().y = y;
 				break;
 			}
-		}  // for y, for x - "anywhere"
+		}  // for x
 		if (!Found)
 		{
 			return NULL;
