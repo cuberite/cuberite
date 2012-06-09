@@ -25,7 +25,6 @@
 using namespace std;
 
 // C Includes
-#include <stdarg.h>
 #include <ctype.h>
 
 // Local Includes
