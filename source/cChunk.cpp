@@ -837,8 +837,8 @@ void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		--Bottom;
 	}
 	
-	// Grow by at most a_NumBlocks, but no more than height 3:
-	int ToGrow = std::min(a_NumBlocks, 4 - (Top - Bottom));
+	// Grow by at most a_NumBlocks, but no more than max height:
+	int ToGrow = std::min(a_NumBlocks, m_World->GetMaxSugarcaneHeight() + 1 - (Top - Bottom));
 	for (int i = 0; i < ToGrow; i++)
 	{
 		BLOCKTYPE  BlockType;
@@ -878,8 +878,8 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		--Bottom;
 	}
 	
-	// Grow by at most a_NumBlocks, but no more than height 3:
-	int ToGrow = std::min(a_NumBlocks, 4 - (Top - Bottom));
+	// Grow by at most a_NumBlocks, but no more than max height:
+	int ToGrow = std::min(a_NumBlocks, m_World->GetMaxCactusHeight() + 1 - (Top - Bottom));
 	for (int i = 0; i < ToGrow; i++)
 	{
 		BLOCKTYPE  BlockType;

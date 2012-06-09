@@ -973,7 +973,7 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBone
 			{
 				return false;
 			}
-			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 3);
+			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, m_MaxSugarcaneHeight);
 			return true;
 		}
 		
@@ -983,7 +983,7 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBone
 			{
 				return false;
 			}
-			m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, 3);
+			m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, m_MaxCactusHeight);
 			return true;
 		}
 	}  // switch (BlockType)

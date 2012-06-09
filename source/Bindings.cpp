@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/09/12 14:43:12.
+** Generated automatically by tolua++-1.0.92 on 06/09/12 14:48:28.
 */
 
 #ifndef __cplusplus
@@ -10728,6 +10728,70 @@ static int tolua_AllToLua_cWorld_SetNextBlockTick00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetMaxSugarcaneHeight of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00
+static int tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxSugarcaneHeight'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetMaxSugarcaneHeight();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxSugarcaneHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetMaxCactusHeight of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetMaxCactusHeight00
+static int tolua_AllToLua_cWorld_GetMaxCactusHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxCactusHeight'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetMaxCactusHeight();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxCactusHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Clear of class  cInventory */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_Clear00
 static int tolua_AllToLua_cInventory_Clear00(lua_State* tolua_S)
@@ -18175,6 +18239,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
    tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);
    tolua_function(tolua_S,"SetNextBlockTick",tolua_AllToLua_cWorld_SetNextBlockTick00);
+   tolua_function(tolua_S,"GetMaxSugarcaneHeight",tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00);
+   tolua_function(tolua_S,"GetMaxCactusHeight",tolua_AllToLua_cWorld_GetMaxCactusHeight00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cInventory","cInventory","",NULL);
   tolua_beginmodule(tolua_S,"cInventory");

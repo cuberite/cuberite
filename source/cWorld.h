@@ -313,6 +313,9 @@ public:
 	/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
+	int GetMaxSugarcaneHeight(void) const { return m_MaxSugarcaneHeight; }  // tolua_export
+	int GetMaxCactusHeight   (void) const { return m_MaxCactusHeight; }     // tolua_export
+	
 private:
 
 	friend class cRoot;
