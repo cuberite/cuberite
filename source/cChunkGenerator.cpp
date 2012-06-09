@@ -26,6 +26,25 @@ const int QUEUE_SKIP_LIMIT = 500;
 
 
 
+static BLOCKTYPE GetIniBlock(cIniFile & a_IniFile, const AString & a_SectionName, const AString & a_ValueName, const AString & a_Default)
+{
+	AString BlockType = a_IniFile.GetValueSet(a_SectionName, a_ValueName, a_Default);
+	BLOCKTYPE Block = BlockStringToType(BlockType);
+	if (Block < 0)
+	{
+		LOGWARN("[&s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(),a_Default.c_str());
+		return BlockStringToType(a_Default);
+	}
+	return Block;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cChunkGenerator:
+
 cChunkGenerator::cChunkGenerator(void)
 	: super("cChunkGenerator")
 	, m_World(NULL)
@@ -52,12 +71,7 @@ bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
 {
 	MTRand rnd;
 	m_World = a_World;
-	m_Seed = a_IniFile.GetValueI("Seed", "Seed", rnd.randInt());
-	
-	// TODO: Remove this after INI file interface changes ( http://forum.mc-server.org/showthread.php?tid=427 )
-	a_IniFile.DeleteValue("Seed", "Seed");
-	
-	a_IniFile.SetValueI("Seed", "Seed", m_Seed);
+	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", rnd.randInt());
 
 	InitBiomeGen(a_IniFile);
 	InitHeightGen(a_IniFile);
@@ -106,17 +120,17 @@ void cChunkGenerator::Stop(void)
 
 void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 {
-	AString BiomeGenName = a_IniFile.GetValue("Generator", "BiomeGen", "");
+	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
 	if (BiomeGenName.empty())
 	{
-		LOGWARN("[Generator]::BiomeGen value not found in world.ini, using \"constant\".");
-		BiomeGenName = "constant";
+		LOGWARN("[Generator]::BiomeGen value not found in world.ini, using \"DistortedVoronoi\".");
+		BiomeGenName = "DistortedVoronoi";
 	}
 	
 	bool CacheOffByDefault = false;
 	if (NoCaseCompare(BiomeGenName, "constant") == 0)
 	{
-		AString Biome = a_IniFile.GetValue("Generator", "ConstantBiome", "Plains");
+		AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
 		EMCSBiome b = StringToBiome(Biome);
 		if (b == -1)
 		{
@@ -128,30 +142,30 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
 	{
-		int BiomeSize = a_IniFile.GetValueI("Generator", "CheckerboardBiomeSize", 64);
-		AString Biomes = a_IniFile.GetValue("Generator", "CheckerBoardBiomes", "");
+		int BiomeSize  = a_IniFile.GetValueSetI("Generator", "CheckerboardBiomeSize", 64);
+		AString Biomes = a_IniFile.GetValueSet ("Generator", "CheckerBoardBiomes",    "");
 		m_BiomeGen = new cBioGenCheckerboard(BiomeSize, Biomes);
 		CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
 	{
-		int CellSize = a_IniFile.GetValueI("Generator", "VoronoiCellSize", 64);
-		AString Biomes = a_IniFile.GetValue("Generator", "VoronoiBiomes", "");
+		int CellSize   = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 64);
+		AString Biomes = a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   "");
 		m_BiomeGen = new cBioGenVoronoi(m_Seed, CellSize, Biomes);
 	}
 	else
 	{
 		if (NoCaseCompare(BiomeGenName, "distortedvoronoi") != 0)
 		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"distortedvoronoi\" instead.", BiomeGenName.c_str());
+			LOGWARNING("Unknown BiomeGen \"%s\", using \"DistortedVoronoi\" instead.", BiomeGenName.c_str());
 		}
-		int CellSize = a_IniFile.GetValueI("Generator", "DistortedVoronoiCellSize", 96);
-		AString Biomes = a_IniFile.GetValue("Generator", "DistortedVoronoiBiomes", "");
+		int CellSize   = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
+		AString Biomes = a_IniFile.GetValueSet ("Generator", "DistortedVoronoiBiomes",   "");
 		m_BiomeGen = new cBioGenDistortedVoronoi(m_Seed, CellSize, Biomes);
 	}
 	
 	// Add a cache, if requested:
-	int CacheSize = a_IniFile.GetValueI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 64);
+	int CacheSize = a_IniFile.GetValueSetI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 64);
 	if (CacheSize > 0)
 	{
 		if (CacheSize < 4)
@@ -172,29 +186,29 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 {
-	AString HeightGenName = a_IniFile.GetValue("Generator", "HeightGen", "");
+	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
 	if (HeightGenName.empty())
 	{
-		LOGWARN("[Generator]::HeightGen value not found in world.ini, using \"classic\".");
-		HeightGenName = "classic";
+		LOGWARN("[Generator]::HeightGen value not found in world.ini, using \"Biomal\".");
+		HeightGenName = "Biomal";
 	}
 	
 	bool CacheOffByDefault = false;
 	if (NoCaseCompare(HeightGenName, "flat") == 0)
 	{
-		int Height = a_IniFile.GetValueI("Generator", "FlatHeight", 5);
+		int Height = a_IniFile.GetValueSetI("Generator", "FlatHeight", 5);
 		m_HeightGen = new cHeiGenFlat(Height);
 		CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(HeightGenName, "classic") == 0)
 	{
 		// These used to be in terrain.ini, but now they are in world.ini (so that multiple worlds can have different values):
-		float HeightFreq1 = (float)a_IniFile.GetValueF("Generator", "ClassicHeightFreq1", 0.1);
-		float HeightFreq2 = (float)a_IniFile.GetValueF("Generator", "ClassicHeightFreq2", 1.0);
-		float HeightFreq3 = (float)a_IniFile.GetValueF("Generator", "ClassicHeightFreq3", 2.0);
-		float HeightAmp1  = (float)a_IniFile.GetValueF("Generator", "ClassicHeightAmp1",  1.0);
-		float HeightAmp2  = (float)a_IniFile.GetValueF("Generator", "ClassicHeightAmp2",  0.5);
-		float HeightAmp3  = (float)a_IniFile.GetValueF("Generator", "ClassicHeightAmp3",  0.5);
+		float HeightFreq1 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq1", 0.1);
+		float HeightFreq2 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq2", 1.0);
+		float HeightFreq3 = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq3", 2.0);
+		float HeightAmp1  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp1",  1.0);
+		float HeightAmp2  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp2",  0.5);
+		float HeightAmp3  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3",  0.5);
 		m_HeightGen = new cHeiGenClassic(m_Seed, HeightFreq1, HeightAmp1, HeightFreq2, HeightAmp2, HeightFreq3, HeightAmp3);
 	}
 	else  // "biomal" or <not found>
@@ -207,7 +221,7 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 	}
 	
 	// Add a cache, if requested:
-	int CacheSize = a_IniFile.GetValueI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
+	int CacheSize = a_IniFile.GetValueSetI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
 	if (CacheSize > 0)
 	{
 		if (CacheSize < 4)
@@ -226,43 +240,23 @@ void cChunkGenerator::InitHeightGen(cIniFile & a_IniFile)
 
 
 
-BLOCKTYPE ResolveBlock(AString BlockType, BLOCKTYPE DefaultBlock)
-{
-	int Block = BlockStringToType(BlockType);
-	if(Block < 0)
-	{
-		LOGWARN("[Generator] Could not parse block value \"%s\". Using default.", BlockType.c_str());
-		return DefaultBlock;
-	}
-	return (BLOCKTYPE) Block;
-}
-
-
-
-
-
 void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
-	AString CompoGenName = a_IniFile.GetValue("Generator", "CompositionGen", "");
+	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
 	if (CompoGenName.empty())
 	{
-		LOGWARN("[Generator]::CompositionGen value not found in world.ini, using \"classic\".");
-		CompoGenName = "classic";
+		LOGWARN("[Generator]::CompositionGen value not found in world.ini, using \"Biomal\".");
+		CompoGenName = "Biomal";
 	}
 	if (NoCaseCompare(CompoGenName, "sameblock") == 0)
 	{
-		AString BlockType = a_IniFile.GetValue("Generator", "SameBlockType", "");
+		AString BlockType = a_IniFile.GetValueSet("Generator", "SameBlockType", "");
 		if (BlockType.empty())
 		{
 			LOGWARN("[Generator]::SameBlockType value not found in world.ini, using \"stone\".");
 			BlockType = "stone";
 		}
-		int Block = BlockStringToType(BlockType);
-		if (Block < 0)
-		{
-			LOGWARN("World.ini: [Generator]::SameBlockType value \"%s\" not parseable (use a number or alias from items.ini), using \"stone\" (1).", BlockType.c_str());
-			Block = E_BLOCK_STONE;
-		}
+		int Block = GetIniBlock(a_IniFile, "[Generator]", "SameBlockType", "stone");
 		bool Bedrocked = (a_IniFile.GetValueI("Generator", "SameBlockBedrocked", 1) != 0);
 		m_CompositionGen = new cCompoGenSameBlock((BLOCKTYPE)Block, Bedrocked);
 	}
@@ -275,12 +269,12 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		int SeaLevel    = a_IniFile.GetValueI("Generator", "ClassicSeaLevel", 60);
 		int BeachHeight = a_IniFile.GetValueI("Generator", "ClassicBeachHeight", 2);
 		int BeachDepth  = a_IniFile.GetValueI("Generator", "ClassicBeachDepth", 4);
-		BLOCKTYPE BlockTop         = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockTop",         "grass"),     E_BLOCK_GRASS);
-		BLOCKTYPE BlockMiddle      = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockMiddle",      "dirt"),      E_BLOCK_DIRT);
-		BLOCKTYPE BlockBottom      = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockBottom",      "stone"),     E_BLOCK_STONE);
-		BLOCKTYPE BlockBeach       = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockBeach",       "sand"),      E_BLOCK_SAND);
-		BLOCKTYPE BlockBeachBottom = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockBeachBottom", "sandstone"), E_BLOCK_SANDSTONE);
-		BLOCKTYPE BlockSea         = ResolveBlock(a_IniFile.GetValue("Generator", "ClassicBlockSea",         "9"),         E_BLOCK_STATIONARY_WATER);
+		BLOCKTYPE BlockTop         = GetIniBlock(a_IniFile, "Generator", "ClassicBlockTop",         "grass");
+		BLOCKTYPE BlockMiddle      = GetIniBlock(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt");
+		BLOCKTYPE BlockBottom      = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBottom",      "stone");
+		BLOCKTYPE BlockBeach       = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBeach",       "sand");
+		BLOCKTYPE BlockBeachBottom = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone");
+		BLOCKTYPE BlockSea         = GetIniBlock(a_IniFile, "Generator", "ClassicBlockSea",         "9");
 		m_CompositionGen = new cCompoGenClassic(
 			SeaLevel, BeachHeight, BeachDepth, BlockTop, BlockMiddle, BlockBottom, BlockBeach,
 			BlockBeachBottom, BlockSea
@@ -292,7 +286,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		{
 			LOGWARN("Unknown CompositionGen \"%s\", using \"biomal\" instead.", CompoGenName.c_str());
 		}
-		int SeaLevel    = a_IniFile.GetValueI("Generator", "BiomalSeaLevel", 62);
+		int SeaLevel = a_IniFile.GetValueSetI("Generator", "BiomalSeaLevel", 62);
 		m_CompositionGen = new cCompoGenBiomal(m_Seed, SeaLevel);
 	}
 }
@@ -303,7 +297,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValue("Generator", "Structures", "Trees,MarbleCaves,OreNests");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Trees,MarbleCaves,OreNests");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
@@ -333,7 +327,7 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValue("Generator", "Finishers", "SprinkleFoliage");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
