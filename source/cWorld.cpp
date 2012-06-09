@@ -921,6 +921,12 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ)
 			m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 3);
 			return true;
 		}
+		
+		case E_BLOCK_CACTUS:
+		{
+			m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, 3);
+			return true;
+		}
 	}  // switch (BlockType)
 	return false;
 }

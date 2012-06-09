@@ -157,6 +157,9 @@ public:
 	/// Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height of 3
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
+	/// Grows a cactus present at the block specified by the amount of blocks specified, up to the max height of 3
+	void GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
+	
 		/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 

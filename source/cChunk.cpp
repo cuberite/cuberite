@@ -572,6 +572,7 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			case E_BLOCK_MELON_STEM:   TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
 			case E_BLOCK_FARMLAND:     TickFarmland    (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
 			case E_BLOCK_SUGARCANE:    GrowSugarcane   (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
+			case E_BLOCK_CACTUS:       GrowCactus      (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
 			
 			case E_BLOCK_SAPLING:
 			{
@@ -845,6 +846,52 @@ void cChunk::GrowSugarcane(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
 		{
 			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_SUGARCANE, 0);
+		}
+		else
+		{
+			break;
+		}
+	}  // for i
+}
+
+
+
+
+
+void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
+{
+	// Check the total height of the sugarcane blocks here:
+	int Top = a_RelY + 1;
+	while (
+		(Top < cChunkDef::Height) &&
+		(GetBlock(a_RelX, Top, a_RelZ) == E_BLOCK_CACTUS)
+	)
+	{
+		++Top;
+	}
+	int Bottom = a_RelY - 1;
+	while (
+		(Bottom > 0) &&
+		(GetBlock(a_RelX, Bottom, a_RelZ) == E_BLOCK_CACTUS)
+	)
+	{
+		--Bottom;
+	}
+	
+	// Grow by at most a_NumBlocks, but no more than height 3:
+	int ToGrow = std::min(a_NumBlocks, 4 - (Top - Bottom));
+	for (int i = 0; i < ToGrow; i++)
+	{
+		BLOCKTYPE  BlockType;
+		NIBBLETYPE BlockMeta;
+		if (UnboundedRelGetBlock(a_RelX, Top + i, a_RelZ, BlockType, BlockMeta) && (BlockType == E_BLOCK_AIR))
+		{
+			// TODO: Check the surrounding blocks, if they aren't air, break the cactus block into pickups (and continue breaking blocks above in the next loop iterations)
+			UnboundedRelFastSetBlock(a_RelX, Top + i, a_RelZ, E_BLOCK_CACTUS, 0);
+		}
+		else
+		{
+			break;
 		}
 	}  // for i
 }

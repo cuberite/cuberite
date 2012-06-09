@@ -1118,6 +1118,23 @@ void cChunkMap::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Nu
 
 
 
+void cChunkMap::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk != NULL)
+	{
+		Chunk->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+	}
+}
+
+
+
+
+
 void cChunkMap::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int ChunkX, ChunkZ;
