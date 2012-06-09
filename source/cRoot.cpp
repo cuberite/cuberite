@@ -103,13 +103,15 @@ void cRoot::Start()
 		m_Server = new cServer();
 
 		LOG("Starting server...");
-		cIniFile IniFile("settings.ini"); IniFile.ReadFile();
-		int Port = IniFile.GetValueI("Server", "Port", 25565 );
+		cIniFile IniFile("settings.ini");
+		IniFile.ReadFile();
+		int Port = IniFile.GetValueSetI("Server", "Port", 25565 );
 		if(!m_Server->InitServer( Port ))
 		{
 			LOG("Failed to start server, shutting down.");
 			return;
 		}
+		IniFile.WriteFile();
 
 		cIniFile WebIniFile("webadmin.ini");
 		if( WebIniFile.ReadFile() )
@@ -210,7 +212,7 @@ void cRoot::LoadWorlds(void)
 	cIniFile IniFile("settings.ini"); IniFile.ReadFile();
 
 	// First get the default world
-	AString DefaultWorldName = IniFile.GetValue("Worlds", "DefaultWorld", "world");
+	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
 	m_pState->pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
 	m_pState->WorldsByName[ DefaultWorldName ] = m_pState->pDefaultWorld;
 
@@ -224,12 +226,12 @@ void cRoot::LoadWorlds(void)
 	
 	for (unsigned int i = 0; i < NumWorlds; i++)
 	{
-		std::string ValueName = IniFile.GetValueName(KeyNum, i );
+		AString ValueName = IniFile.GetValueName(KeyNum, i );
 		if (ValueName.compare("World") != 0)
 		{
 			continue;
 		}
-		std::string WorldName = IniFile.GetValue(KeyNum, i );
+		AString WorldName = IniFile.GetValue(KeyNum, i );
 		if (WorldName.empty())
 		{
 			continue;

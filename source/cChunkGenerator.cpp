@@ -257,7 +257,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 			BlockType = "stone";
 		}
 		int Block = GetIniBlock(a_IniFile, "[Generator]", "SameBlockType", "stone");
-		bool Bedrocked = (a_IniFile.GetValueI("Generator", "SameBlockBedrocked", 1) != 0);
+		bool Bedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
 		m_CompositionGen = new cCompoGenSameBlock((BLOCKTYPE)Block, Bedrocked);
 	}
 	else if (NoCaseCompare(CompoGenName, "debugbiomes") == 0)
@@ -266,9 +266,9 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(CompoGenName, "classic") == 0)
 	{
-		int SeaLevel    = a_IniFile.GetValueI("Generator", "ClassicSeaLevel", 60);
-		int BeachHeight = a_IniFile.GetValueI("Generator", "ClassicBeachHeight", 2);
-		int BeachDepth  = a_IniFile.GetValueI("Generator", "ClassicBeachDepth", 4);
+		int SeaLevel    = a_IniFile.GetValueSetI("Generator", "ClassicSeaLevel", 60);
+		int BeachHeight = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", 2);
+		int BeachDepth  = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth", 4);
 		BLOCKTYPE BlockTop         = GetIniBlock(a_IniFile, "Generator", "ClassicBlockTop",         "grass");
 		BLOCKTYPE BlockMiddle      = GetIniBlock(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt");
 		BLOCKTYPE BlockBottom      = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBottom",      "stone");

@@ -229,12 +229,7 @@ bool cServer::InitServer( int a_Port )
 			m_pState->ServerID = ServerID;
 		}
 		
-		m_ClientViewDistance = IniFile.GetValueI("Server", "DefaultViewDistance", -1);
-		if (m_ClientViewDistance == -1)
-		{
-			m_ClientViewDistance = cClientHandle::DEFAULT_VIEW_DISTANCE;
-			LOG("[Server].DefaultViewDistance not set, using a default of %d", m_ClientViewDistance);
-		}
+		m_ClientViewDistance = IniFile.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
 		if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 		{
 			m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
@@ -245,6 +240,7 @@ bool cServer::InitServer( int a_Port )
 			m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
 			LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 		}
+		IniFile.WriteFile();
 	}
 	
 	m_NotifyWriteThread.Start(this);
