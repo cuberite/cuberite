@@ -243,6 +243,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	AString StorageSchema("Default");
 
 	cIniFile IniFile(m_IniFileName);
+	IniFile.ReadFile();
 	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
 	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
 	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
