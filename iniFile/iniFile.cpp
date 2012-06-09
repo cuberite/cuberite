@@ -388,33 +388,45 @@ double cIniFile::GetValueF(const string & keyname, const string & valuename, dou
 
 
 
-// 16 variables may be a bit of over kill, but hey, it's only code.
-unsigned cIniFile::GetValueV( const string & keyname, const string & valuename, char *format,
-			      void *v1, void *v2, void *v3, void *v4,
-  			      void *v5, void *v6, void *v7, void *v8,
-  			      void *v9, void *v10, void *v11, void *v12,
-  			      void *v13, void *v14, void *v15, void *v16)
+AString cIniFile::GetValueSet(const AString & keyname, const AString & valuename, const AString & defValue)
 {
-  string   value;
-  // va_list  args;
-  unsigned nVals;
+	long keyID = FindKey( keyname);
+	if ( keyID == noID)
+	{
+		SetValue(keyname, valuename, defValue);
+		return defValue;
+	}
+
+	long valueID = FindValue( unsigned(keyID), valuename);
+	if ( valueID == noID)
+	{
+		SetValue(keyname, valuename, defValue);
+		return defValue;
+	}
+
+	return keys[keyID].values[valueID];
+}
 
 
-  value = GetValue( keyname, valuename);
-  if ( !value.length())
-    return false;
-  // Why is there not vsscanf() function. Linux man pages say that there is
-  // but no compiler I've seen has it defined. Bummer!
-  //
-  // va_start( args, format);
-  // nVals = vsscanf( value.c_str(), format, args);
-  // va_end( args);
 
-  nVals = sscanf_s( value.c_str(), format,
-		  v1, v2, v3, v4, v5, v6, v7, v8,
-		  v9, v10, v11, v12, v13, v14, v15, v16);
 
-  return nVals;
+
+double cIniFile::GetValueSetF(const AString & keyname, const AString & valuename, const double defValue)
+{
+  AString Data;
+  Printf(Data, "%f", defValue);
+  return atof(GetValueSet(keyname, valuename, Data).c_str());
+}
+
+
+
+
+
+int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const int defValue)
+{
+	AString Data;
+	Printf(Data, "%d", defValue);
+  return atoi(GetValueSet(keyname, valuename, Data).c_str());
 }
 
 

@@ -243,36 +243,27 @@ cWorld::cWorld( const AString & a_WorldName )
 	AString StorageSchema("Default");
 
 	cIniFile IniFile(m_IniFileName);
-	if (IniFile.ReadFile())
+	m_SpawnX                    = IniFile.GetValueF   ("SpawnPosition", "X",                         m_SpawnX);
+	m_SpawnY                    = IniFile.GetValueF   ("SpawnPosition", "Y",                         m_SpawnY);
+	m_SpawnZ                    = IniFile.GetValueF   ("SpawnPosition", "Z",                         m_SpawnZ);
+	StorageSchema               = IniFile.GetValue    ("Storage",       "Schema",                    StorageSchema);
+	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
+	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
+	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
+	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
+	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
+	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
+	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
+	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
+	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
+	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
+	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
+	
+	m_GameMode = (eGameMode)IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
+
+	if (!IniFile.WriteFile())
 	{
-		m_SpawnX = IniFile.GetValueF("SpawnPosition", "X", m_SpawnX);
-		m_SpawnY = IniFile.GetValueF("SpawnPosition", "Y", m_SpawnY);
-		m_SpawnZ = IniFile.GetValueF("SpawnPosition", "Z", m_SpawnZ);
-		m_GameMode = (eGameMode)IniFile.GetValueI("GameMode", "GameMode", m_GameMode );
-		StorageSchema = IniFile.GetValue("Storage", "Schema", StorageSchema);
-		m_MaxCactusHeight           = IniFile.GetValueI("Plants", "MaxCactusHeight",           3);
-		m_MaxSugarcaneHeight        = IniFile.GetValueI("Plants", "MaxSugarcaneHeight",        3);
-		m_IsCropsBonemealable       = IniFile.GetValueB("Plants", "IsCropsBonemealable",       true);
-		m_IsGrassBonemealable       = IniFile.GetValueB("Plants", "IsGrassBonemealable",       true);
-		m_IsSaplingBonemealable     = IniFile.GetValueB("Plants", "IsSaplingBonemealable",     true);
-		m_IsMelonStemBonemealable   = IniFile.GetValueB("Plants", "IsMelonStemBonemealable",   true);
-		m_IsMelonBonemealable       = IniFile.GetValueB("Plants", "IsMelonBonemealable",       false);
-		m_IsPumpkinStemBonemealable = IniFile.GetValueB("Plants", "IsPumpkinStemBonemealable", true);
-		m_IsPumpkinBonemealable     = IniFile.GetValueB("Plants", "IsPumpkinBonemealable",     false);
-		m_IsSugarcaneBonemealable   = IniFile.GetValueB("Plants", "IsSugarcaneBonemealable",   false);
-		m_IsCactusBonemealable      = IniFile.GetValueB("Plants", "IsCactusBonemealable",      false);
-	}
-	else
-	{
-		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX );
-		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY );
-		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ );
-		IniFile.SetValueI("GameMode", "GameMode", m_GameMode );
-		IniFile.SetValue("Storage", "Schema", StorageSchema);
-		if( !IniFile.WriteFile() )
-		{
-			LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
-		}
+		LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
 	}
 	
 	m_Lighting.Start(this);

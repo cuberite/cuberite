@@ -108,23 +108,21 @@ public:
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
 	// Returns defValue if key/value not found.
-	std::string GetValue( const std::string & keyname, const std::string & valuename, const std::string & defValue = "") const;	//tolua_export
-	std::string GetValue( const unsigned keyID, const unsigned valueID, const std::string & defValue = "") const;			//tolua_export
-	int    GetValueI( const std::string & keyname, const std::string & valuename, const int defValue = 0) const;				//tolua_export
-	bool   GetValueB( const std::string & keyname, const std::string & valuename, const bool defValue = false) const {			//tolua_export
+	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const;   // tolua_export
+	AString GetValue (const unsigned keyID,    const unsigned valueID,    const AString & defValue = "")    const;   // tolua_export
+	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;   // tolua_export
+	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;   // tolua_export
+	bool    GetValueB(const AString & keyname, const AString & valuename, const bool      defValue = false) const {  // tolua_export
 		return ( GetValueI( keyname, valuename, int( defValue)) > 0);
-	}																														//tolua_export
-	double   GetValueF( const std::string & keyname, const std::string & valuename, const double defValue = 0.0) const;		//tolua_export
-
-	// This is a variable length formatted GetValue routine. All these voids
-	// are required because there is no vsscanf() like there is a vsprintf().
-	// Only a maximum of 8 variable can be read.
-	// NOTE: do not use this function, instead get the string value and parse it yourself
-	OBSOLETE unsigned GetValueV( const std::string & keyname, const std::string & valuename, char *format,
-		void *v1 = 0, void *v2 = 0, void *v3 = 0, void *v4 = 0,
-		void *v5 = 0, void *v6 = 0, void *v7 = 0, void *v8 = 0,
-		void *v9 = 0, void *v10 = 0, void *v11 = 0, void *v12 = 0,
-		void *v13 = 0, void *v14 = 0, void *v15 = 0, void *v16 = 0);
+	}  // tolua_export
+	
+	// Gets the value; if not found, write the default to the INI file
+	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "");      // tolua_export
+	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);     // tolua_export
+	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0);       // tolua_export
+	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false) {  // tolua_export
+		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) > 0);
+	}  // tolua_export
 
 	// Sets value of [keyname] valuename =.
 	// Specify the optional paramter as false (0) if you do not want it to create

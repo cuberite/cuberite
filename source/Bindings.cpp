@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/09/12 14:48:28.
+** Generated automatically by tolua++-1.0.92 on 06/09/12 17:10:20.
 */
 
 #ifndef __cplusplus
@@ -1297,13 +1297,13 @@ static int tolua_AllToLua_cIniFile_GetValue00(lua_State* tolua_S)
 #endif
  {
   const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string keyname = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  const std::string valuename = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValue'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->GetValue(keyname,valuename);
+   AString tolua_ret = (AString)  self->GetValue(keyname,valuename);
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)keyname);
    tolua_pushcppstring(tolua_S,(const char*)valuename);
@@ -1334,14 +1334,14 @@ static int tolua_AllToLua_cIniFile_GetValue01(lua_State* tolua_S)
  else
  {
   const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string keyname = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  const std::string valuename = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
-  const std::string defValue = ((const std::string)  tolua_tocppstring(tolua_S,4,0));
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const AString defValue = ((const AString)  tolua_tocppstring(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValue'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->GetValue(keyname,valuename,defValue);
+   AString tolua_ret = (AString)  self->GetValue(keyname,valuename,defValue);
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)keyname);
    tolua_pushcppstring(tolua_S,(const char*)valuename);
@@ -1375,7 +1375,7 @@ static int tolua_AllToLua_cIniFile_GetValue02(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValue'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->GetValue(keyID,valueID);
+   AString tolua_ret = (AString)  self->GetValue(keyID,valueID);
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }
@@ -1403,12 +1403,12 @@ static int tolua_AllToLua_cIniFile_GetValue03(lua_State* tolua_S)
   const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
   const unsigned keyID = ((const unsigned)  tolua_tonumber(tolua_S,2,0));
   const unsigned valueID = ((const unsigned)  tolua_tonumber(tolua_S,3,0));
-  const std::string defValue = ((const std::string)  tolua_tocppstring(tolua_S,4,0));
+  const AString defValue = ((const AString)  tolua_tocppstring(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValue'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->GetValue(keyID,valueID,defValue);
+   AString tolua_ret = (AString)  self->GetValue(keyID,valueID,defValue);
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)defValue);
   }
@@ -1416,6 +1416,46 @@ static int tolua_AllToLua_cIniFile_GetValue03(lua_State* tolua_S)
  return 2;
 tolua_lerror:
  return tolua_AllToLua_cIniFile_GetValue02(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetValueF of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueF00
+static int tolua_AllToLua_cIniFile_GetValueF00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const double defValue = ((const double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueF'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetValueF(keyname,valuename,defValue);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)keyname);
+   tolua_pushcppstring(tolua_S,(const char*)valuename);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetValueF'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -1437,8 +1477,8 @@ static int tolua_AllToLua_cIniFile_GetValueI00(lua_State* tolua_S)
 #endif
  {
   const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string keyname = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  const std::string valuename = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
   const int defValue = ((const int)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueI'", NULL);
@@ -1477,8 +1517,8 @@ static int tolua_AllToLua_cIniFile_GetValueB00(lua_State* tolua_S)
 #endif
  {
   const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string keyname = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  const std::string valuename = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
   const bool defValue = ((const bool)  tolua_toboolean(tolua_S,4,false));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueB'", NULL);
@@ -1499,14 +1539,88 @@ static int tolua_AllToLua_cIniFile_GetValueB00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetValueF of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueF00
-static int tolua_AllToLua_cIniFile_GetValueF00(lua_State* tolua_S)
+/* method: GetValueSet of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueSet00
+static int tolua_AllToLua_cIniFile_GetValueSet00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueSet'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->GetValueSet(keyname,valuename);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)keyname);
+   tolua_pushcppstring(tolua_S,(const char*)valuename);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetValueSet'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetValueSet of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueSet01
+static int tolua_AllToLua_cIniFile_GetValueSet01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const AString defValue = ((const AString)  tolua_tocppstring(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueSet'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->GetValueSet(keyname,valuename,defValue);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)keyname);
+   tolua_pushcppstring(tolua_S,(const char*)valuename);
+   tolua_pushcppstring(tolua_S,(const char*)defValue);
+  }
+ }
+ return 4;
+tolua_lerror:
+ return tolua_AllToLua_cIniFile_GetValueSet00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetValueSetF of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueSetF00
+static int tolua_AllToLua_cIniFile_GetValueSetF00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
@@ -1516,15 +1630,15 @@ static int tolua_AllToLua_cIniFile_GetValueF00(lua_State* tolua_S)
  else
 #endif
  {
-  const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
-  const std::string keyname = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
-  const std::string valuename = ((const std::string)  tolua_tocppstring(tolua_S,3,0));
+  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
   const double defValue = ((const double)  tolua_tonumber(tolua_S,4,0.0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueF'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueSetF'", NULL);
 #endif
   {
-   double tolua_ret = (double)  self->GetValueF(keyname,valuename,defValue);
+   double tolua_ret = (double)  self->GetValueSetF(keyname,valuename,defValue);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)keyname);
    tolua_pushcppstring(tolua_S,(const char*)valuename);
@@ -1533,7 +1647,87 @@ static int tolua_AllToLua_cIniFile_GetValueF00(lua_State* tolua_S)
  return 3;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetValueF'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetValueSetF'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetValueSetI of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueSetI00
+static int tolua_AllToLua_cIniFile_GetValueSetI00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const int defValue = ((const int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueSetI'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetValueSetI(keyname,valuename,defValue);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)keyname);
+   tolua_pushcppstring(tolua_S,(const char*)valuename);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetValueSetI'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetValueSetB of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_GetValueSetB00
+static int tolua_AllToLua_cIniFile_GetValueSetB00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const AString keyname = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString valuename = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const bool defValue = ((const bool)  tolua_toboolean(tolua_S,4,false));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetValueSetB'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->GetValueSetB(keyname,valuename,defValue);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)keyname);
+   tolua_pushcppstring(tolua_S,(const char*)valuename);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetValueSetB'.",&tolua_err);
  return 0;
 #endif
 }
@@ -17286,9 +17480,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetValue",tolua_AllToLua_cIniFile_GetValue01);
    tolua_function(tolua_S,"GetValue",tolua_AllToLua_cIniFile_GetValue02);
    tolua_function(tolua_S,"GetValue",tolua_AllToLua_cIniFile_GetValue03);
+   tolua_function(tolua_S,"GetValueF",tolua_AllToLua_cIniFile_GetValueF00);
    tolua_function(tolua_S,"GetValueI",tolua_AllToLua_cIniFile_GetValueI00);
    tolua_function(tolua_S,"GetValueB",tolua_AllToLua_cIniFile_GetValueB00);
-   tolua_function(tolua_S,"GetValueF",tolua_AllToLua_cIniFile_GetValueF00);
+   tolua_function(tolua_S,"GetValueSet",tolua_AllToLua_cIniFile_GetValueSet00);
+   tolua_function(tolua_S,"GetValueSet",tolua_AllToLua_cIniFile_GetValueSet01);
+   tolua_function(tolua_S,"GetValueSetF",tolua_AllToLua_cIniFile_GetValueSetF00);
+   tolua_function(tolua_S,"GetValueSetI",tolua_AllToLua_cIniFile_GetValueSetI00);
+   tolua_function(tolua_S,"GetValueSetB",tolua_AllToLua_cIniFile_GetValueSetB00);
    tolua_function(tolua_S,"SetValue",tolua_AllToLua_cIniFile_SetValue00);
    tolua_function(tolua_S,"SetValue",tolua_AllToLua_cIniFile_SetValue01);
    tolua_function(tolua_S,"SetValueI",tolua_AllToLua_cIniFile_SetValueI00);
