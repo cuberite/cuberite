@@ -363,6 +363,27 @@ void cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
+bool cPlugin_NewLua::OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk )
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnChunkGenerating"))
+		return false;
+
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cLuaChunk");
+
+	if( !CallFunction(3, 1, "OnChunkGenerating") )
+		return false;
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 {
 	cCSLock Lock( m_CriticalSection );

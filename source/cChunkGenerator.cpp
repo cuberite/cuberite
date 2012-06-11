@@ -11,6 +11,7 @@
 #include "FinishGen.h"
 #include "cRoot.h"
 #include "cPluginManager.h"
+#include "cLuaChunk.h"
 
 
 
@@ -483,18 +484,28 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cEntityList Entities;
 	cBlockEntityList BlockEntities;
 	
-	// Use the composed generator:
-	m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
-	m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
-	m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
-	for (cStructureGenList::iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
+	
+	cLuaChunk LuaChunk( BlockTypes, BlockMeta, HeightMap, BiomeMap );
+	if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_CHUNK_GENERATING, 3, a_ChunkX, a_ChunkZ, &LuaChunk ) )
 	{
-		(*itr)->GenStructures(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, Entities, BlockEntities);
-	}   // for itr - m_StructureGens[]
-	for (cFinishGenList::iterator itr = m_FinishGens.begin(); itr != m_FinishGens.end(); ++itr)
+		// A plugin interrupted generation, handle something plugin specific?
+		//LOG("returned true");
+	}
+	else
 	{
-		(*itr)->GenFinish(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
-	}  // for itr - m_FinishGens[]
+		// Use the composed generator:
+		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
+		m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
+		m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
+		for (cStructureGenList::iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
+		{
+			(*itr)->GenStructures(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, Entities, BlockEntities);
+		}   // for itr - m_StructureGens[]
+		for (cFinishGenList::iterator itr = m_FinishGens.begin(); itr != m_FinishGens.end(); ++itr)
+		{
+			(*itr)->GenFinish(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
+		}  // for itr - m_FinishGens[]
+	}
 	
 	m_World->SetChunkData(
 		a_ChunkX, a_ChunkY, a_ChunkZ, 

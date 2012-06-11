@@ -38,6 +38,7 @@ public:														//tolua_export
 	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) override;
 	
 	virtual void OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) override;
 
 	lua_State* GetLuaState() { return m_LuaState; }
 

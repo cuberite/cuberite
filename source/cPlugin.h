@@ -14,6 +14,7 @@ class cItem;
 class cEntity;
 class cPawn;
 class cWorld;
+class cLuaChunk;
 struct TakeDamageInfo;
 
 
@@ -49,6 +50,7 @@ public:
 	virtual void OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) { (void)a_Pawn; (void)a_TakeDamageInfo; }
 	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) { (void)a_Killed; (void)a_Killer; return false; }
 	virtual void OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ) {}
+	virtual bool OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) { return false; }
 
 	// Accessors
 	const char* GetName() const { return m_Name.c_str(); }

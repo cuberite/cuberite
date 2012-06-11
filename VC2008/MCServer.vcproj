@@ -1645,6 +1645,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cLuaChunk.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cLuaChunk.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cLuaCommandBinder.cpp"
 					>
 				</File>

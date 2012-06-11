@@ -381,6 +381,26 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			}
 			break;
 		}
+
+		case E_PLUGIN_CHUNK_GENERATING:
+		{
+			if (a_NumArgs != 3)
+			{
+				break;
+			}
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			int ChunkX = va_arg(argptr, int);
+			int ChunkZ = va_arg(argptr, int);
+			cLuaChunk * LuaChunk = va_arg(argptr, cLuaChunk *);
+			va_end (argptr);
+			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			{
+				if( (*itr)->OnChunkGenerating(ChunkX, ChunkZ, LuaChunk) )
+					return true;
+			}
+			break;
+		}
 		
 		default:
 		{
@@ -450,19 +470,22 @@ void cPluginManager::UnloadPluginsNow()
 
 void cPluginManager::RemoveHooks( cPlugin* a_Plugin )
 {
-	m_Hooks[ E_PLUGIN_TICK].remove        ( a_Plugin );
-	m_Hooks[ E_PLUGIN_CHAT].remove        ( a_Plugin );
-	m_Hooks[ E_PLUGIN_COLLECT_ITEM].remove( a_Plugin );
-	m_Hooks[ E_PLUGIN_BLOCK_DIG].remove   ( a_Plugin );
-	m_Hooks[ E_PLUGIN_BLOCK_PLACE].remove ( a_Plugin );
-	m_Hooks[ E_PLUGIN_DISCONNECT].remove  ( a_Plugin );
-	m_Hooks[ E_PLUGIN_HANDSHAKE].remove   ( a_Plugin );
-	m_Hooks[ E_PLUGIN_LOGIN].remove       ( a_Plugin );
-	m_Hooks[ E_PLUGIN_PLAYER_SPAWN].remove( a_Plugin );
-	m_Hooks[ E_PLUGIN_PLAYER_JOIN].remove ( a_Plugin );
-	m_Hooks[ E_PLUGIN_PLAYER_MOVE].remove ( a_Plugin );
-	m_Hooks[ E_PLUGIN_TAKE_DAMAGE].remove ( a_Plugin );
-	m_Hooks[ E_PLUGIN_KILLED].remove      ( a_Plugin );
+	m_Hooks[ E_PLUGIN_TICK].remove             ( a_Plugin );
+	m_Hooks[ E_PLUGIN_CHAT].remove             ( a_Plugin );
+	m_Hooks[ E_PLUGIN_COLLECT_ITEM].remove     ( a_Plugin );
+	m_Hooks[ E_PLUGIN_BLOCK_DIG].remove        ( a_Plugin );
+	m_Hooks[ E_PLUGIN_BLOCK_PLACE].remove      ( a_Plugin );
+	m_Hooks[ E_PLUGIN_DISCONNECT].remove       ( a_Plugin );
+	m_Hooks[ E_PLUGIN_HANDSHAKE].remove        ( a_Plugin );
+	m_Hooks[ E_PLUGIN_LOGIN].remove            ( a_Plugin );
+	m_Hooks[ E_PLUGIN_PLAYER_SPAWN].remove     ( a_Plugin );
+	m_Hooks[ E_PLUGIN_PLAYER_JOIN].remove      ( a_Plugin );
+	m_Hooks[ E_PLUGIN_PLAYER_MOVE].remove      ( a_Plugin );
+	m_Hooks[ E_PLUGIN_TAKE_DAMAGE].remove      ( a_Plugin );
+	m_Hooks[ E_PLUGIN_KILLED].remove           ( a_Plugin );
+	m_Hooks[ E_PLUGIN_CHUNK_GENERATED ].remove ( a_Plugin );
+	m_Hooks[ E_PLUGIN_CHUNK_GENERATING ].remove( a_Plugin );
+	m_Hooks[ E_PLUGIN_BLOCK_TO_DROPS ].remove  ( a_Plugin );
 }
 
 
