@@ -18,7 +18,6 @@
 #include "cPlayer.h"
 #include "cInventory.h"
 #include "cItem.h"
-#include "cRecipeChecker.h"
 #include "cFurnaceRecipe.h"
 #include "cTracer.h"
 #include "cWebAdmin.h"

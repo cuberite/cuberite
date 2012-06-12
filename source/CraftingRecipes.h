@@ -14,6 +14,90 @@
 
 
 
+class cCraftingGrid  // tolua_export
+{  // tolua_export
+public:
+	cCraftingGrid(const cCraftingGrid & a_Original);
+	cCraftingGrid(int a_Width, int a_Height);  // tolua_export
+	cCraftingGrid(cItem * a_Items, int a_Width, int a_Height);
+	~cCraftingGrid();
+	
+	// tolua_begin
+	int     GetWidth (void) const {return m_Width; }
+	int     GetHeight(void) const {return m_Height; }
+	cItem & GetItem  (int x, int y) const;
+	void    SetItem  (int x, int y, ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount);
+	void    SetItem  (int x, int y, const cItem & a_Item);
+	void    Clear    (void);
+	
+	/// Removes items in a_Grid from m_Items[] (used by cCraftingRecipe::ConsumeIngredients())
+	void ConsumeGrid(const cCraftingGrid & a_Grid);
+
+	/// Dumps the entire crafting grid using LOGD()
+	void Dump(void);
+	
+	// tolua_end
+	
+	cItem * GetItems(void) const {return m_Items; }
+	
+	/// Copies internal contents into the item array specified. Assumes that the array has the same dimensions as self
+	void  CopyToItems(cItem * a_Items) const;
+	
+protected:
+
+	int     m_Width;
+	int     m_Height;
+	cItem * m_Items;
+} ;  // tolua_export
+
+
+
+
+
+class cCraftingRecipe  // tolua_export
+{  // tolua_export
+public:
+	cCraftingRecipe(const cCraftingGrid & a_CraftingGrid);
+	
+	// tolua_begin
+	void          Clear               (void);
+	int           GetIngredientsWidth (void) const {return m_Ingredients.GetWidth(); }
+	int           GetIngredientsHeight(void) const {return m_Ingredients.GetHeight(); }
+	cItem &       GetIngredient       (int x, int y) const {return m_Ingredients.GetItem(x, y); }
+	const cItem & GetResult           (void) const {return m_Result; }
+	void          SetResult           (ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount);
+	void          SetResult           (const cItem & a_Item)
+	{
+		m_Result = a_Item;
+	}
+	
+	void          SetIngredient       (int x, int y, ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount)
+	{
+		m_Ingredients.SetItem(x, y, a_ItemType, a_ItemHealth, a_ItemCount);
+	}
+	
+	void          SetIngredient       (int x, int y, const cItem & a_Item)
+	{
+		m_Ingredients.SetItem(x, y, a_Item);
+	}
+	
+	/// Consumes ingredients from the crafting grid specified
+	void ConsumeIngredients(cCraftingGrid & a_CraftingGrid);
+
+	/// Dumps the entire recipe using LOGD()
+	void Dump(void);
+	// tolua_end
+	
+protected:
+
+	cCraftingGrid m_Ingredients;  // Adjusted to correspond to the input crafting grid!
+	cItem         m_Result;
+} ;  // tolua_export
+
+
+
+
+
 class cCraftingRecipes
 {
 public:
@@ -23,11 +107,8 @@ public:
 	cCraftingRecipes(void);
 	~cCraftingRecipes();
 	
-	/// Offers an item resulting from the crafting grid setup. Doesn't modify the grid
-	cItem Offer(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight);
-	
-	/// Crafts the item resulting from the crafting grid setup. Modifies the grid, returns the crafted item
-	cItem Craft(cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight);
+	/// Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found.
+	void GetRecipe(const cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 	
 protected:
 
@@ -38,7 +119,9 @@ protected:
 	} ;
 	typedef std::vector<cRecipeSlot> cRecipeSlots;
 	
-	// A single recipe, stored. Each recipe is normalized right after parsing (NormalizeIngredients())
+	/** A single recipe, stored. Each recipe is normalized right after parsing (NormalizeIngredients())
+	A normalized recipe starts at (0,0)
+	*/
 	struct cRecipe
 	{
 		cRecipeSlots m_Ingredients;

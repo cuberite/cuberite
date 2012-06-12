@@ -10,6 +10,253 @@
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCraftingGrid:
+
+cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
+	m_Width(a_Width),
+	m_Height(a_Height),
+	m_Items(new cItem[a_Width * a_Height])
+{
+}
+
+
+
+
+
+cCraftingGrid::cCraftingGrid(cItem * a_Items, int a_Width, int a_Height) :
+	m_Width(a_Width),
+	m_Height(a_Height),
+	m_Items(new cItem[a_Width * a_Height])
+{
+	for (int i = a_Width * a_Height - 1; i >= 0; i--)
+	{
+		m_Items[i] = a_Items[i];
+	}
+}
+
+
+
+
+
+cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
+	m_Width(a_Original.m_Width),
+	m_Height(a_Original.m_Height),
+	m_Items(new cItem[a_Original.m_Width * a_Original.m_Height])
+{
+	for (int i = m_Width * m_Height - 1; i >= 0; i--)
+	{
+		m_Items[i] = a_Original.m_Items[i];
+	}
+}
+
+
+
+
+
+cCraftingGrid::~cCraftingGrid()
+{
+	delete[] m_Items;
+}
+
+
+
+
+
+cItem & cCraftingGrid::GetItem(int x, int y) const
+{
+	// Accessible through scripting, must verify parameters:
+	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	{
+		LOGERROR("Attempted to get an invalid item from a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
+			x, y, m_Width, m_Height
+		);
+		return m_Items[0];
+	}
+	return m_Items[x + m_Width * y];
+}
+
+
+
+
+
+void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount)
+{
+	// Accessible through scripting, must verify parameters:
+	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	{
+		LOGERROR("Attempted to set an invalid item in a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
+			x, y, m_Width, m_Height
+		);
+		return;
+	}
+	
+	m_Items[x + m_Width * y] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+}
+
+
+
+
+
+void cCraftingGrid::SetItem(int x, int y, const cItem & a_Item)
+{
+	// Accessible through scripting, must verify parameters:
+	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	{
+		LOGERROR("Attempted to set an invalid item in a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
+			x, y, m_Width, m_Height
+		);
+		return;
+	}
+	
+	m_Items[x + m_Width * y] = a_Item;
+}
+
+
+
+
+
+void cCraftingGrid::Clear(void)
+{
+	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
+	{
+		m_Items[x + m_Width * y].Empty();
+	}
+}
+
+
+
+
+
+void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
+{
+	if ((a_Grid.m_Width != m_Width) || (a_Grid.m_Height != m_Height))
+	{
+		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)", 
+			a_Grid.m_Width, a_Grid.m_Height, m_Width, m_Height
+		);
+	}
+	int MinX = std::min(a_Grid.m_Width,  m_Width);
+	int MinY = std::min(a_Grid.m_Height, m_Height);
+	for (int y = 0; y <  MinY; y++) for (int x = 0; x < MinX; x++)
+	{
+		int ThatIdx = x + a_Grid.m_Width * y;
+		if (a_Grid.m_Items[ThatIdx].IsEmpty())
+		{
+			continue;
+		}
+		int ThisIdx = x + m_Width * y;
+		if (a_Grid.m_Items[ThatIdx].m_ItemID != m_Items[ThisIdx].m_ItemID)
+		{
+			LOGWARNING("Consuming incompatible grids: item at (%d, %d) is %d in grid and %d in ingredients. Item not consumed.",
+				x, y, m_Items[ThisIdx].m_ItemID, a_Grid.m_Items[ThatIdx].m_ItemID
+			);
+			continue;
+		}
+		char NumWantedItems = a_Grid.m_Items[ThatIdx].m_ItemCount;
+		if (NumWantedItems > m_Items[ThisIdx].m_ItemCount)
+		{
+			LOGWARNING("Consuming more items than there actually are in slot (%d, %d), item %d (want %d, have %d). Item zeroed out.",
+				x, y, m_Items[ThisIdx].m_ItemID,
+				NumWantedItems, m_Items[ThisIdx].m_ItemCount
+			);
+			NumWantedItems = m_Items[ThisIdx].m_ItemCount;
+		}
+		m_Items[ThisIdx].m_ItemCount -= NumWantedItems;
+		if (m_Items[ThisIdx].m_ItemCount == 0)
+		{
+			m_Items[ThisIdx].Clear();
+		}
+	}  // for x, for y
+}
+
+
+
+
+
+void cCraftingGrid::CopyToItems(cItem * a_Items) const
+{
+	for (int i = m_Height * m_Width - 1; i >= 0; i--)
+	{
+		a_Items[i] = m_Items[i];
+	}  // for x, for y
+}
+
+
+
+
+
+void cCraftingGrid::Dump(void)
+{
+	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
+	{
+		int idx = x + m_Width * y;
+		LOGD("Slot (%d, %d): Type %d, health %d, count %d", 
+			x, y, m_Items[idx].m_ItemID, m_Items[idx].m_ItemHealth, m_Items[idx].m_ItemCount
+		);
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCraftingRecipe:
+
+cCraftingRecipe::cCraftingRecipe(const cCraftingGrid & a_CraftingGrid) :
+	m_Ingredients(a_CraftingGrid)
+{
+}
+
+
+
+
+
+void cCraftingRecipe::Clear(void)
+{
+	m_Ingredients.Clear();
+	m_Result.Clear();
+}
+
+
+
+
+
+void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount)
+{
+	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+}
+
+
+
+
+
+void cCraftingRecipe::ConsumeIngredients(cCraftingGrid & a_CraftingGrid)
+{
+	a_CraftingGrid.ConsumeGrid(m_Ingredients);
+}
+
+
+
+
+
+void cCraftingRecipe::Dump(void)
+{
+	LOGD("Recipe ingredients:");
+	m_Ingredients.Dump();
+	LOGD("Result: Type %d, health %d, count %d", 
+		m_Result.m_ItemID, m_Result.m_ItemHealth, m_Result.m_ItemCount
+	);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCraftingRecipes:
+
 cCraftingRecipes::cCraftingRecipes(void)
 {
 	LoadRecipes();
@@ -28,42 +275,22 @@ cCraftingRecipes::~cCraftingRecipes()
 
 
 
-/// Offers an item resulting from the crafting grid setup. Doesn't modify the grid
-cItem cCraftingRecipes::Offer(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight)
+void cCraftingRecipes::GetRecipe(const cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe)
 {
-	std::auto_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid, a_GridWidth, a_GridHeight));
+	// TODO: Allow plugins to intercept recipes, add a pre-craft hook here
+	std::auto_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid.GetItems(), a_CraftingGrid.GetWidth(), a_CraftingGrid.GetHeight()));
+	a_Recipe.Clear();
 	if (Recipe.get() == NULL)
 	{
-		return cItem();
+		// TODO: Allow plugins to intercept recipes, add a post-craft hook here
+		return;
 	}
-	
-	return Recipe->m_Result;
-}
-
-
-
-
-
-/// Crafts the item resulting from the crafting grid setup. Modifies the grid, returns the crafted item
-cItem cCraftingRecipes::Craft(cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight)
-{
-	std::auto_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid, a_GridWidth, a_GridHeight));
-	if (Recipe.get() == NULL)
-	{
-		return cItem();
-	}
-	
-	// Consume the ingredients from the grid:
 	for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
 	{
-		int GridIdx = itr->x + a_GridWidth * itr->y;
-		a_CraftingGrid[GridIdx].m_ItemCount -= itr->m_Item.m_ItemCount;
-		if (a_CraftingGrid[GridIdx].m_ItemCount <= 0)
-		{
-			a_CraftingGrid[GridIdx].Empty();
-		}
-	}
-	return Recipe->m_Result;
+		a_Recipe.SetIngredient(itr->x, itr->y, itr->m_Item);
+	}  // for itr
+	a_Recipe.SetResult(Recipe->m_Result);
+	// TODO: Allow plugins to intercept recipes, add a post-craft hook here
 }
 
 

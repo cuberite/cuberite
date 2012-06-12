@@ -55,9 +55,6 @@
     <Filter Include="cWindow\cWindowOwner">
       <UniqueIdentifier>{014bf50c-1589-4fda-8b62-1a8100e451f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cRecipeChecker">
-      <UniqueIdentifier>{f7875f7a-f596-4690-8f0d-678989b9d7c3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="cWindow\cCraftingWindow">
       <UniqueIdentifier>{0047a86b-b12e-4b61-987f-1e558719226f}</UniqueIdentifier>
     </Filter>
@@ -489,9 +486,6 @@
     <ClCompile Include="..\source\main.cpp" />
     <ClCompile Include="..\source\cWindow.cpp">
       <Filter>cWindow</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Source\cRecipeChecker.cpp">
-      <Filter>cRecipeChecker</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cCraftingWindow.cpp">
       <Filter>cWindow\cCraftingWindow</Filter>
@@ -975,9 +969,6 @@
       <Filter>cWindow\cWindowOwner</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\MemoryLeak.h" />
-    <ClInclude Include="..\Source\cRecipeChecker.h">
-      <Filter>cRecipeChecker</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\cCraftingWindow.h">
       <Filter>cWindow\cCraftingWindow</Filter>
     </ClInclude>

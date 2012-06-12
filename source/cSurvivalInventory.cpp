@@ -6,7 +6,6 @@
 #include "cClientHandle.h"
 #include "cWindow.h"
 #include "cItem.h"
-#include "cRecipeChecker.h"
 #include "CraftingRecipes.h"
 #include "cRoot.h"
 #include "packets/cPacket_WindowClick.h"
@@ -72,30 +71,24 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 
 	if ((Packet->m_SlotNum >= (short)c_CraftOffset) && (Packet->m_SlotNum < (short)(c_CraftOffset + c_CraftSlots + 1)))
 	{
-		cItem CookedItem;
+		cCraftingGrid   Grid(m_Slots + c_CraftOffset + 1, 2, 2);
+		cCraftingRecipe Recipe(Grid);
+		
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
+		
 		if ((Packet->m_SlotNum == 0) && !bDontCook)
 		{
 			// Consume the items from the crafting grid:
-			CookedItem = cRoot::Get()->GetCraftingRecipes()->Craft(m_Slots + c_CraftOffset + 1, 2, 2);
-			// Upgrade the crafting result from the new crafting grid contents:
-			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(m_Slots + c_CraftOffset + 1, 2, 2);
-			if (CookedItem.IsEmpty())
-			{
-				// Fallback to the old recipes:
-				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( m_Slots+c_CraftOffset+1, 2, 2, true );
-			}
+			Recipe.ConsumeIngredients(Grid);
+			
+			// Propagate grid back to m_Slots:
+			Grid.CopyToItems(m_Slots + c_CraftOffset + 1);
+			
+			// Get the recipe for the new grid contents:
+			cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
 		}
-		else
-		{
-			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(m_Slots + c_CraftOffset + 1, 2, 2);
-			if (CookedItem.IsEmpty())
-			{
-				// Fallback to the old recipes:
-				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( m_Slots+c_CraftOffset+1, 2, 2 );
-			}
-		}
-		m_Slots[c_CraftOffset] = CookedItem;
-		LOG("You cooked: %i x %i !!", m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );
+		m_Slots[c_CraftOffset] = Recipe.GetResult();
+		LOGD("You cooked: %i x %i !!", m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );
 		SendWholeInventory( m_Owner->GetClientHandle() );
 	}
 	SendSlot( 0 );

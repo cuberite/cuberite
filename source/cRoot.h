@@ -13,7 +13,6 @@
 class cThread;
 class cMonsterConfig;
 class cGroupManager;
-class cRecipeChecker;
 class cCraftingRecipes;
 class cFurnaceRecipe;
 class cWebAdmin;
@@ -48,7 +47,6 @@ public:
 	cMonsterConfig * GetMonsterConfig() { return m_MonsterConfig; }
 
 	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export
-	cRecipeChecker *   GetRecipeChecker  (void) { return m_RecipeChecker; }    // tolua_export
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
 	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // tolua_export
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
@@ -86,7 +84,6 @@ private:
 	cMonsterConfig * m_MonsterConfig;
 
 	cGroupManager *    m_GroupManager;
-	cRecipeChecker *   m_RecipeChecker;
 	cCraftingRecipes * m_CraftingRecipes;
 	cFurnaceRecipe *   m_FurnaceRecipe;
 	cWebAdmin *        m_WebAdmin;

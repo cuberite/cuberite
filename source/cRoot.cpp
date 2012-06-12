@@ -7,7 +7,6 @@
 #include "cWebAdmin.h"
 #include "cFurnaceRecipe.h"
 #include "cGroupManager.h"
-#include "cRecipeChecker.h"
 #include "CraftingRecipes.h"
 #include "cPluginManager.h"
 #include "cMonsterConfig.h"
@@ -41,7 +40,6 @@ cRoot::cRoot()
 	: m_Server( 0 )
 	, m_MonsterConfig( 0 )
 	, m_GroupManager( 0 )
-	, m_RecipeChecker(NULL)
 	, m_CraftingRecipes(NULL)
 	, m_FurnaceRecipe( 0 )
 	, m_WebAdmin( 0 )
@@ -125,7 +123,6 @@ void cRoot::Start()
 
 		LOG("Loading settings...");
 		m_GroupManager	= new cGroupManager();
-		m_RecipeChecker = new cRecipeChecker();
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe = new cFurnaceRecipe();
 		
@@ -175,7 +172,6 @@ void cRoot::Start()
 		delete m_WebAdmin; m_WebAdmin = 0;
 		LOG("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
-		delete m_RecipeChecker;   m_RecipeChecker = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
 		LOG("Forgetting groups...");
 		delete m_GroupManager; m_GroupManager = 0;

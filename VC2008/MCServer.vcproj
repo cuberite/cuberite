@@ -468,14 +468,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cRecipeChecker.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cRecipeChecker.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\cRedstone.cpp"
 				>
 			</File>

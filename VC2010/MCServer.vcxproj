@@ -357,7 +357,6 @@
     <ClCompile Include="..\Source\cPluginManager.cpp" />
     <ClCompile Include="..\source\cPlugin_NewLua.cpp" />
     <ClCompile Include="..\source\CraftingRecipes.cpp" />
-    <ClCompile Include="..\Source\cRecipeChecker.cpp" />
     <ClCompile Include="..\source\cRedstone.cpp" />
     <ClCompile Include="..\source\cRedstoneSimulator.cpp" />
     <ClCompile Include="..\Source\cReferenceManager.cpp" />
@@ -539,7 +538,6 @@
     <ClInclude Include="..\Source\cPluginManager.h" />
     <ClInclude Include="..\source\cPlugin_NewLua.h" />
     <ClInclude Include="..\source\CraftingRecipes.h" />
-    <ClInclude Include="..\Source\cRecipeChecker.h" />
     <ClInclude Include="..\source\cRedstone.h" />
     <ClInclude Include="..\source\cRedstoneSimulator.h" />
     <ClInclude Include="..\Source\cReferenceManager.h" />

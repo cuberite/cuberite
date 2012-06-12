@@ -6,7 +6,6 @@
 #include "cClientHandle.h"
 #include "cWindow.h"
 #include "cItem.h"
-#include "cRecipeChecker.h"
 #include "cRoot.h"
 
 #include <json/json.h>

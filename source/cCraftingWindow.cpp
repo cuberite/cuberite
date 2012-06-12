@@ -3,7 +3,6 @@
 
 #include "cCraftingWindow.h"
 #include "cItem.h"
-#include "cRecipeChecker.h"
 #include "CraftingRecipes.h"
 #include "cPlayer.h"
 #include "cClientHandle.h"
@@ -71,34 +70,24 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 
 	if ((a_ClickPacket->m_SlotNum >= 0) && (a_ClickPacket->m_SlotNum < 10))
 	{
-		cItem CookedItem;
+		cCraftingGrid   Grid(GetSlots() + 1, 3, 3);
+		cCraftingRecipe Recipe(Grid);
+		
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
+
 		if ((a_ClickPacket->m_SlotNum == 0) && !bDontCook)
 		{
-			// Consume the ingredients from the crafting grid:
-			CookedItem = cRoot::Get()->GetCraftingRecipes()->Craft(GetSlots() + 1, 3, 3);
-			LOGD("New recipes crafted: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount);
-			// Upgrade the crafting result from the new crafting grid contents:
-			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(GetSlots() + 1, 3, 3);
-			if (CookedItem.IsEmpty())
-			{
-				// Fallback to the old recipes:
-				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( GetSlots()+1, 3, 3, true );
-				LOGD("Old recipes crafted: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount );
-			}
+			// Consume the items from the crafting grid:
+			Recipe.ConsumeIngredients(Grid);
+			
+			// Propagate grid back to m_Slots:
+			Grid.CopyToItems(GetSlots() + 1);
+			
+			// Get the recipe for the new grid contents:
+			cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
 		}
-		else
-		{
-			CookedItem = cRoot::Get()->GetCraftingRecipes()->Offer(GetSlots() + 1, 3, 3);
-			LOGD("New recipes offer: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount );
-			if (CookedItem.IsEmpty())
-			{
-				// Fallback to the old recipes
-				CookedItem = cRoot::Get()->GetRecipeChecker()->CookIngredients( GetSlots()+1, 3, 3 );
-				LOGD("Old recipes offer: %i x %i", CookedItem.m_ItemID, CookedItem.m_ItemCount );
-			}
-		}
-		*GetSlot(0) = CookedItem;
-		LOG("You cooked: %i x %i !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
+		*GetSlot(0) = Recipe.GetResult();
+		LOGD("You cooked: %i x %i !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
 	}
 	SendWholeWindow( a_Player.GetClientHandle() );
 	a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );

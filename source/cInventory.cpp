@@ -6,7 +6,6 @@
 #include "cClientHandle.h"
 #include "cWindow.h"
 #include "cItem.h"
-#include "cRecipeChecker.h"
 #include "cRoot.h"
 
 #include <json/json.h>
@@ -26,6 +25,10 @@ cInventory::~cInventory()
 	if( GetWindow() ) GetWindow()->Close( *m_Owner );
 	CloseWindow();
 }
+
+
+
+
 
 cInventory::cInventory(cPlayer* a_Owner)
 {
@@ -51,6 +54,10 @@ cInventory::cInventory(cPlayer* a_Owner)
 		OpenWindow( Window );
 	}
 }
+
+
+
+
 
 bool cInventory::AddItem( cItem & a_Item )
 {
@@ -83,6 +90,10 @@ bool cInventory::AddItem( cItem & a_Item )
 
 	return (a_Item.m_ItemCount == 0);
 }
+
+
+
+
 
 // TODO: Right now if you dont have enough items, the items you did have are removed, and the function returns false anyway
 bool cInventory::RemoveItem( cItem & a_Item )
@@ -138,13 +149,21 @@ bool cInventory::RemoveItem( cItem & a_Item )
 		return false;
 }
 
+
+
+
+
 void cInventory::Clear()
 {
 	for(unsigned int i = 0; i < c_NumSlots; i++)
 		m_Slots[i].Empty();
 }
 
-cItem* cInventory::GetSlotsForType( int a_Type )
+
+
+
+
+cItem * cInventory::GetSlotsForType( int a_Type )
 {
 	switch( a_Type )
 	{
@@ -158,19 +177,26 @@ cItem* cInventory::GetSlotsForType( int a_Type )
 	return 0;
 }
 
+
+
+
+
 int cInventory::GetSlotCountForType( int a_Type )
 {
-	switch( a_Type )
+	switch (a_Type)
 	{
-	case -1:
-		return 36;
-	case -2:
-	case -3:
-		return 4;
+		case -1:
+			return 36;
+		case -2:
+		case -3:
+			return 4;
 	}
 	return 0;
 }
-	
+
+
+
+
 
 cItem* cInventory::GetSlot( int a_SlotNum )
 {
@@ -178,17 +204,32 @@ cItem* cInventory::GetSlot( int a_SlotNum )
 	return &m_Slots[a_SlotNum];
 }
 
+
+
+
+
 cItem* cInventory::GetFromHotBar( int a_SlotNum )
 {
-	if( a_SlotNum < 0 || a_SlotNum >= 9 ) return 0;
+	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
+	{
+		return NULL;
+	}
 	return &m_HotSlots[a_SlotNum];
 }
+
+
+
+
 
 void cInventory::SetEquippedSlot( int a_SlotNum )
 {
 	if( a_SlotNum < 0 || a_SlotNum >= 9 ) m_EquippedSlot = 0;
 	else m_EquippedSlot = (short)a_SlotNum;
 }
+
+
+
+
 
 cItem & cInventory::GetEquippedItem()
 {
@@ -205,11 +246,19 @@ cItem & cInventory::GetEquippedItem()
 	return *m_EquippedItem;
 }
 
+
+
+
+
 void cInventory::SendWholeInventory( cClientHandle* a_Client )
 {
 	cPacket_WholeInventory Inventory( this );
 	a_Client->Send( Inventory );
 }
+
+
+
+
 
 void cInventory::SendSlot( int a_SlotNum )
 {
@@ -225,6 +274,10 @@ void cInventory::SendSlot( int a_SlotNum )
 		m_Owner->GetClientHandle()->Send( InventorySlot );
 	}
 }
+
+
+
+
 
 bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */ )
 {
@@ -273,6 +326,10 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 	return true;
 }
 
+
+
+
+
 void cInventory::SaveToJson(Json::Value & a_Value)
 {
 	for(unsigned int i = 0; i < c_NumSlots; i++)
@@ -282,6 +339,10 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 		a_Value.append( JSON_Item );
 	}
 }
+
+
+
+
 
 bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
@@ -293,3 +354,7 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 	}
 	return true;
 }
+
+
+
+
