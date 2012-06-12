@@ -1,3 +1,4 @@
+
 #pragma once
 
 class cPacket_BlockPlace;
@@ -16,6 +17,13 @@ class cPawn;
 class cWorld;
 class cLuaChunk;
 struct TakeDamageInfo;
+
+// fwd: cPlayer.h
+class cPlayer;
+
+// fwd: CraftingRecipes.h
+class cCraftingGrid;
+class cCraftingRecipe;
 
 
 
@@ -51,6 +59,9 @@ public:
 	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) { (void)a_Killed; (void)a_Killer; return false; }
 	virtual void OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ) {}
 	virtual bool OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) { return false; }
+	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
+	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
+	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
 
 	// Accessors
 	const char* GetName() const { return m_Name.c_str(); }

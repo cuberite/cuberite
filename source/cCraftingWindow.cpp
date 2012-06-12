@@ -73,7 +73,7 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 		cCraftingGrid   Grid(GetSlots() + 1, 3, 3);
 		cCraftingRecipe Recipe(Grid);
 		
-		cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 
 		if ((a_ClickPacket->m_SlotNum == 0) && !bDontCook)
 		{
@@ -84,10 +84,10 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 			Grid.CopyToItems(GetSlots() + 1);
 			
 			// Get the recipe for the new grid contents:
-			cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
+			cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 		}
 		*GetSlot(0) = Recipe.GetResult();
-		LOGD("You cooked: %i x %i !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
+		LOGD("%s cooked: %i x %i !!", a_Player.GetName().c_str(), GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
 	}
 	SendWholeWindow( a_Player.GetClientHandle() );
 	a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );

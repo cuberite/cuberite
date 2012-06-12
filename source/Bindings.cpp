@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/12/12 21:57:04.
+** Generated automatically by tolua++-1.0.92 on 06/12/12 23:23:39.
 */
 
 #ifndef __cplusplus
@@ -7713,6 +7713,120 @@ static int tolua_AllToLua_cPlugin_OnChunkGenerating00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: OnPreCrafting of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnPreCrafting00
+static int tolua_AllToLua_cPlugin_OnPreCrafting00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,4,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const cCraftingGrid* a_Grid = ((const cCraftingGrid*)  tolua_tousertype(tolua_S,3,0));
+  cCraftingRecipe* a_Recipe = ((cCraftingRecipe*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnPreCrafting'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnPreCrafting(a_Player,a_Grid,a_Recipe);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnPreCrafting'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnCraftingNoRecipe of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnCraftingNoRecipe00
+static int tolua_AllToLua_cPlugin_OnCraftingNoRecipe00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,4,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const cCraftingGrid* a_Grid = ((const cCraftingGrid*)  tolua_tousertype(tolua_S,3,0));
+  cCraftingRecipe* a_Recipe = ((cCraftingRecipe*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnCraftingNoRecipe'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnCraftingNoRecipe'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnPostCrafting of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnPostCrafting00
+static int tolua_AllToLua_cPlugin_OnPostCrafting00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,4,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const cCraftingGrid* a_Grid = ((const cCraftingGrid*)  tolua_tousertype(tolua_S,3,0));
+  cCraftingRecipe* a_Recipe = ((cCraftingRecipe*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnPostCrafting'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnPostCrafting(a_Player,a_Grid,a_Recipe);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnPostCrafting'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetName of class  cPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_GetName00
 static int tolua_AllToLua_cPlugin_GetName00(lua_State* tolua_S)
@@ -8149,6 +8263,45 @@ public:
 			return ( bool ) cPlugin:: OnChunkGenerating(a_ChunkX,a_ChunkZ,a_pLuaChunk);
 		};
 	};
+	 bool  OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		if (push_method("OnPreCrafting",  tolua_AllToLua_cPlugin_OnPreCrafting00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "const cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Grid, "const cCraftingGrid");
+			tolua_pushusertype(lua_state, (void*)a_Recipe, "cCraftingRecipe");
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin:: OnPreCrafting(a_Player,a_Grid,a_Recipe);
+		};
+	};
+	 bool  OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		if (push_method("OnCraftingNoRecipe",  tolua_AllToLua_cPlugin_OnCraftingNoRecipe00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "const cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Grid, "const cCraftingGrid");
+			tolua_pushusertype(lua_state, (void*)a_Recipe, "cCraftingRecipe");
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin:: OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
+		};
+	};
+	 bool  OnPostCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		if (push_method("OnPostCrafting",  tolua_AllToLua_cPlugin_OnPostCrafting00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "const cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Grid, "const cCraftingGrid");
+			tolua_pushusertype(lua_state, (void*)a_Recipe, "cCraftingRecipe");
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin:: OnPostCrafting(a_Player,a_Grid,a_Recipe);
+		};
+	};
 
 	 void cPlugin__OnDisable( void ) {
 		return ( void )cPlugin::OnDisable();
@@ -8194,6 +8347,15 @@ public:
 	};
 	 bool cPlugin__OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
 		return ( bool )cPlugin::OnChunkGenerating(a_ChunkX,a_ChunkZ,a_pLuaChunk);
+	};
+	 bool cPlugin__OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		return ( bool )cPlugin::OnPreCrafting(a_Player,a_Grid,a_Recipe);
+	};
+	 bool cPlugin__OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		return ( bool )cPlugin::OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
+	};
+	 bool cPlugin__OnPostCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		return ( bool )cPlugin::OnPostCrafting(a_Player,a_Grid,a_Recipe);
 	};
 	 Lua__cPlugin( void ): cPlugin(){};
 };
@@ -8757,6 +8919,120 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerating00(lua_State* t
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: cPlugin__OnPreCrafting of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnPreCrafting00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnPreCrafting00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,4,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const cCraftingGrid* a_Grid = ((const cCraftingGrid*)  tolua_tousertype(tolua_S,3,0));
+  cCraftingRecipe* a_Recipe = ((cCraftingRecipe*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnPreCrafting'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin__OnPreCrafting(a_Player,a_Grid,a_Recipe);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnPreCrafting'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin__OnCraftingNoRecipe of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnCraftingNoRecipe00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnCraftingNoRecipe00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,4,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const cCraftingGrid* a_Grid = ((const cCraftingGrid*)  tolua_tousertype(tolua_S,3,0));
+  cCraftingRecipe* a_Recipe = ((cCraftingRecipe*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnCraftingNoRecipe'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin__OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnCraftingNoRecipe'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin__OnPostCrafting of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnPostCrafting00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnPostCrafting00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,4,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const cCraftingGrid* a_Grid = ((const cCraftingGrid*)  tolua_tousertype(tolua_S,3,0));
+  cCraftingRecipe* a_Recipe = ((cCraftingRecipe*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnPostCrafting'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin__OnPostCrafting(a_Player,a_Grid,a_Recipe);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnPostCrafting'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  Lua__cPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_new00
 static int tolua_AllToLua_Lua__cPlugin_new00(lua_State* tolua_S)
@@ -9154,6 +9430,45 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnChunkGenerating(a_ChunkX,a_ChunkZ,a_pLuaChunk);
 		};
 	};
+	 bool  OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		if (push_method("OnPreCrafting",  tolua_AllToLua_cPlugin_OnPreCrafting00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "const cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Grid, "const cCraftingGrid");
+			tolua_pushusertype(lua_state, (void*)a_Recipe, "cCraftingRecipe");
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnPreCrafting(a_Player,a_Grid,a_Recipe);
+		};
+	};
+	 bool  OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		if (push_method("OnCraftingNoRecipe",  tolua_AllToLua_cPlugin_OnCraftingNoRecipe00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "const cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Grid, "const cCraftingGrid");
+			tolua_pushusertype(lua_state, (void*)a_Recipe, "cCraftingRecipe");
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
+		};
+	};
+	 bool  OnPostCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		if (push_method("OnPostCrafting",  tolua_AllToLua_cPlugin_OnPostCrafting00)) {
+			tolua_pushusertype(lua_state, (void*)a_Player, "const cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Grid, "const cCraftingGrid");
+			tolua_pushusertype(lua_state, (void*)a_Recipe, "cCraftingRecipe");
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnPostCrafting(a_Player,a_Grid,a_Recipe);
+		};
+	};
 
 	 void cPlugin_NewLua__OnDisable( void ) {
 		return ( void )cPlugin_NewLua::OnDisable();
@@ -9202,6 +9517,15 @@ public:
 	};
 	 bool cPlugin_NewLua__OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
 		return ( bool )cPlugin_NewLua::OnChunkGenerating(a_ChunkX,a_ChunkZ,a_pLuaChunk);
+	};
+	 bool cPlugin_NewLua__OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		return ( bool )cPlugin_NewLua::OnPreCrafting(a_Player,a_Grid,a_Recipe);
+	};
+	 bool cPlugin_NewLua__OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		return ( bool )cPlugin_NewLua::OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
+	};
+	 bool cPlugin_NewLua__OnPostCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
+		return ( bool )cPlugin_NewLua::OnPostCrafting(a_Player,a_Grid,a_Recipe);
 	};
 };
 
@@ -17920,13 +18244,13 @@ static int tolua_AllToLua_cCraftingGrid_SetItem00(lua_State* tolua_S)
   int x = ((int)  tolua_tonumber(tolua_S,2,0));
   int y = ((int)  tolua_tonumber(tolua_S,3,0));
   ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,4,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,5,0));
-  int a_ItemCount = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_ItemCount = ((int)  tolua_tonumber(tolua_S,5,0));
+  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetItem'", NULL);
 #endif
   {
-   self->SetItem(x,y,a_ItemType,a_ItemHealth,a_ItemCount);
+   self->SetItem(x,y,a_ItemType,a_ItemCount,a_ItemHealth);
   }
  }
  return 0;
@@ -18247,13 +18571,13 @@ static int tolua_AllToLua_cCraftingRecipe_SetResult00(lua_State* tolua_S)
  {
   cCraftingRecipe* self = (cCraftingRecipe*)  tolua_tousertype(tolua_S,1,0);
   ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,3,0));
-  int a_ItemCount = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_ItemCount = ((int)  tolua_tonumber(tolua_S,3,0));
+  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetResult'", NULL);
 #endif
   {
-   self->SetResult(a_ItemType,a_ItemHealth,a_ItemCount);
+   self->SetResult(a_ItemType,a_ItemCount,a_ItemHealth);
   }
  }
  return 0;
@@ -18316,13 +18640,13 @@ static int tolua_AllToLua_cCraftingRecipe_SetIngredient00(lua_State* tolua_S)
   int x = ((int)  tolua_tonumber(tolua_S,2,0));
   int y = ((int)  tolua_tonumber(tolua_S,3,0));
   ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,4,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,5,0));
-  int a_ItemCount = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_ItemCount = ((int)  tolua_tonumber(tolua_S,5,0));
+  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetIngredient'", NULL);
 #endif
   {
-   self->SetIngredient(x,y,a_ItemType,a_ItemHealth,a_ItemCount);
+   self->SetIngredient(x,y,a_ItemType,a_ItemCount,a_ItemHealth);
   }
  }
  return 0;
@@ -19295,6 +19619,25 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginManager","cPluginManager","",NULL);
   tolua_beginmodule(tolua_S,"cPluginManager");
+   tolua_constant(tolua_S,"HOOK_TICK",cPluginManager::HOOK_TICK);
+   tolua_constant(tolua_S,"HOOK_CHAT",cPluginManager::HOOK_CHAT);
+   tolua_constant(tolua_S,"HOOK_COLLECT_ITEM",cPluginManager::HOOK_COLLECT_ITEM);
+   tolua_constant(tolua_S,"HOOK_BLOCK_DIG",cPluginManager::HOOK_BLOCK_DIG);
+   tolua_constant(tolua_S,"HOOK_BLOCK_PLACE",cPluginManager::HOOK_BLOCK_PLACE);
+   tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
+   tolua_constant(tolua_S,"HOOK_HANDSHAKE",cPluginManager::HOOK_HANDSHAKE);
+   tolua_constant(tolua_S,"HOOK_LOGIN",cPluginManager::HOOK_LOGIN);
+   tolua_constant(tolua_S,"HOOK_PLAYER_SPAWN",cPluginManager::HOOK_PLAYER_SPAWN);
+   tolua_constant(tolua_S,"HOOK_PLAYER_JOIN",cPluginManager::HOOK_PLAYER_JOIN);
+   tolua_constant(tolua_S,"HOOK_PLAYER_MOVE",cPluginManager::HOOK_PLAYER_MOVE);
+   tolua_constant(tolua_S,"HOOK_TAKE_DAMAGE",cPluginManager::HOOK_TAKE_DAMAGE);
+   tolua_constant(tolua_S,"HOOK_KILLED",cPluginManager::HOOK_KILLED);
+   tolua_constant(tolua_S,"HOOK_CHUNK_GENERATED",cPluginManager::HOOK_CHUNK_GENERATED);
+   tolua_constant(tolua_S,"HOOK_CHUNK_GENERATING",cPluginManager::HOOK_CHUNK_GENERATING);
+   tolua_constant(tolua_S,"HOOK_BLOCK_TO_DROPS",cPluginManager::HOOK_BLOCK_TO_DROPS);
+   tolua_constant(tolua_S,"HOOK_PRE_CRAFTING",cPluginManager::HOOK_PRE_CRAFTING);
+   tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
+   tolua_constant(tolua_S,"HOOK_POST_CRAFTING",cPluginManager::HOOK_POST_CRAFTING);
    tolua_constant(tolua_S,"E_PLUGIN_TICK",cPluginManager::E_PLUGIN_TICK);
    tolua_constant(tolua_S,"E_PLUGIN_CHAT",cPluginManager::E_PLUGIN_CHAT);
    tolua_constant(tolua_S,"E_PLUGIN_COLLECT_ITEM",cPluginManager::E_PLUGIN_COLLECT_ITEM);
@@ -19344,6 +19687,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"OnKilled",tolua_AllToLua_cPlugin_OnKilled00);
    tolua_function(tolua_S,"OnChunkGenerated",tolua_AllToLua_cPlugin_OnChunkGenerated00);
    tolua_function(tolua_S,"OnChunkGenerating",tolua_AllToLua_cPlugin_OnChunkGenerating00);
+   tolua_function(tolua_S,"OnPreCrafting",tolua_AllToLua_cPlugin_OnPreCrafting00);
+   tolua_function(tolua_S,"OnCraftingNoRecipe",tolua_AllToLua_cPlugin_OnCraftingNoRecipe00);
+   tolua_function(tolua_S,"OnPostCrafting",tolua_AllToLua_cPlugin_OnPostCrafting00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cPlugin_GetName00);
    tolua_function(tolua_S,"SetName",tolua_AllToLua_cPlugin_SetName00);
    tolua_function(tolua_S,"GetVersion",tolua_AllToLua_cPlugin_GetVersion00);
@@ -19378,6 +19724,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cPlugin__OnKilled",tolua_AllToLua_Lua__cPlugin_cPlugin__OnKilled00);
    tolua_function(tolua_S,"cPlugin__OnChunkGenerated",tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerated00);
    tolua_function(tolua_S,"cPlugin__OnChunkGenerating",tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerating00);
+   tolua_function(tolua_S,"cPlugin__OnPreCrafting",tolua_AllToLua_Lua__cPlugin_cPlugin__OnPreCrafting00);
+   tolua_function(tolua_S,"cPlugin__OnCraftingNoRecipe",tolua_AllToLua_Lua__cPlugin_cPlugin__OnCraftingNoRecipe00);
+   tolua_function(tolua_S,"cPlugin__OnPostCrafting",tolua_AllToLua_Lua__cPlugin_cPlugin__OnPostCrafting00);
    tolua_function(tolua_S,"new",tolua_AllToLua_Lua__cPlugin_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cPlugin_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_Lua__cPlugin_new00_local);

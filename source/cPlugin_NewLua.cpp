@@ -384,6 +384,75 @@ bool cPlugin_NewLua::OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * 
 
 
 
+bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnPreCrafting"))
+		return false;
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+
+	if (!CallFunction(3, 1, "OnPreCrafting"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnCraftingNoRecipe"))
+		return false;
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+
+	if (!CallFunction(3, 1, "OnCraftingNoRecipe"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnPostCrafting"))
+		return false;
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+
+	if (!CallFunction(3, 1, "OnPostCrafting"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 {
 	cCSLock Lock( m_CriticalSection );

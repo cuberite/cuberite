@@ -74,7 +74,7 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 		cCraftingGrid   Grid(m_Slots + c_CraftOffset + 1, 2, 2);
 		cCraftingRecipe Recipe(Grid);
 		
-		cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(m_Owner, Grid, Recipe);
 		
 		if ((Packet->m_SlotNum == 0) && !bDontCook)
 		{
@@ -85,10 +85,10 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 			Grid.CopyToItems(m_Slots + c_CraftOffset + 1);
 			
 			// Get the recipe for the new grid contents:
-			cRoot::Get()->GetCraftingRecipes()->GetRecipe(Grid, Recipe);
+			cRoot::Get()->GetCraftingRecipes()->GetRecipe(m_Owner, Grid, Recipe);
 		}
 		m_Slots[c_CraftOffset] = Recipe.GetResult();
-		LOGD("You cooked: %i x %i !!", m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );
+		LOGD("%s cooked: %i x %i !!", m_Owner->GetName().c_str(), m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );
 		SendWholeInventory( m_Owner->GetClientHandle() );
 	}
 	SendSlot( 0 );

@@ -14,6 +14,13 @@
 
 
 
+// fwd: cPlayer.h
+class cPlayer;
+
+
+
+
+
 class cCraftingGrid  // tolua_export
 {  // tolua_export
 public:
@@ -26,7 +33,7 @@ public:
 	int     GetWidth (void) const {return m_Width; }
 	int     GetHeight(void) const {return m_Height; }
 	cItem & GetItem  (int x, int y) const;
-	void    SetItem  (int x, int y, ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount);
+	void    SetItem  (int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth);
 	void    SetItem  (int x, int y, const cItem & a_Item);
 	void    Clear    (void);
 	
@@ -65,15 +72,15 @@ public:
 	int           GetIngredientsHeight(void) const {return m_Ingredients.GetHeight(); }
 	cItem &       GetIngredient       (int x, int y) const {return m_Ingredients.GetItem(x, y); }
 	const cItem & GetResult           (void) const {return m_Result; }
-	void          SetResult           (ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount);
+	void          SetResult           (ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth);
 	void          SetResult           (const cItem & a_Item)
 	{
 		m_Result = a_Item;
 	}
 	
-	void          SetIngredient       (int x, int y, ENUM_ITEM_ID a_ItemType, short a_ItemHealth, int a_ItemCount)
+	void          SetIngredient       (int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
 	{
-		m_Ingredients.SetItem(x, y, a_ItemType, a_ItemHealth, a_ItemCount);
+		m_Ingredients.SetItem(x, y, a_ItemType, a_ItemCount, a_ItemHealth);
 	}
 	
 	void          SetIngredient       (int x, int y, const cItem & a_Item)
@@ -108,7 +115,7 @@ public:
 	~cCraftingRecipes();
 	
 	/// Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found.
-	void GetRecipe(const cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
+	void GetRecipe(const cPlayer * a_Player, const cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 	
 protected:
 

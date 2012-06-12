@@ -187,43 +187,51 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
-bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
+bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 {
 	HookMap::iterator Plugins = m_Hooks.find( a_Hook );
 
 	// Special case for chat hook, since you can also bind commands (bound commands don't use chat hook)
-	if( a_Hook == E_PLUGIN_CHAT )
+	if (a_Hook == HOOK_CHAT)
 	{
-		if( a_NumArgs != 2 ) return false;
+		if (a_NumArgs != 2)
+		{
+			return false;
+		}
 		va_list argptr;
 		va_start( argptr, a_NumArgs);
-		const char* Message = va_arg(argptr, const char* );
-		cPlayer* Player = va_arg(argptr, cPlayer* );
+		const char * Message = va_arg(argptr, const char* );
+		cPlayer * Player = va_arg(argptr, cPlayer * );
 		va_end (argptr);
 
-		if( m_LuaCommandBinder->HandleCommand( std::string( Message ), Player ) )
-			return true;
-
-		if( Plugins != m_Hooks.end() )
+		if (m_LuaCommandBinder->HandleCommand( std::string( Message ), Player))
 		{
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnChat( Message, Player ) )
-					return true;
-			}
+			return true;
 		}
 
+		if (Plugins == m_Hooks.end())
+		{
+			return false;
+		}
+		
+		for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+		{
+			if ((*itr)->OnChat(Message, Player))
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 
-	if( Plugins == m_Hooks.end() )
+	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	
 	switch( a_Hook )
 	{
-		case E_PLUGIN_COLLECT_ITEM:
+		case HOOK_COLLECT_ITEM:
 		{
 			if( a_NumArgs != 2 ) break;
 			va_list argptr;
@@ -239,7 +247,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 		
-		case E_PLUGIN_BLOCK_DIG:
+		case HOOK_BLOCK_DIG:
 		{
 			if( a_NumArgs != 2 ) break;
 			va_list argptr;
@@ -256,7 +264,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 		
-		case E_PLUGIN_BLOCK_PLACE:
+		case HOOK_BLOCK_PLACE:
 		{
 			if( a_NumArgs != 2 ) break;
 			va_list argptr;
@@ -272,7 +280,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 		
-		case E_PLUGIN_DISCONNECT:
+		case HOOK_DISCONNECT:
 		{
 			if( a_NumArgs != 2 ) break;
 			va_list argptr;
@@ -288,7 +296,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 
-		case E_PLUGIN_LOGIN:
+		case HOOK_LOGIN:
 		{
 			if( a_NumArgs != 1 ) break;
 			va_list argptr;
@@ -303,7 +311,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 
-		case E_PLUGIN_PLAYER_JOIN:
+		case HOOK_PLAYER_JOIN:
 		{
 			if( a_NumArgs != 1 ) break;
 			va_list argptr;
@@ -318,7 +326,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 
-		case E_PLUGIN_PLAYER_MOVE:
+		case HOOK_PLAYER_MOVE:
 		{
 			if( a_NumArgs != 1 ) break;
 			va_list argptr;
@@ -332,7 +340,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 
-		case E_PLUGIN_TAKE_DAMAGE:
+		case HOOK_TAKE_DAMAGE:
 		{
 			if( a_NumArgs != 2 ) break;
 			va_list argptr;
@@ -347,7 +355,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 
-		case E_PLUGIN_KILLED:
+		case HOOK_KILLED:
 		{
 			if( a_NumArgs != 2 ) break;
 			va_list argptr;
@@ -363,7 +371,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 		
-		case E_PLUGIN_CHUNK_GENERATED:
+		case HOOK_CHUNK_GENERATED:
 		{
 			if (a_NumArgs != 3)
 			{
@@ -382,7 +390,7 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			break;
 		}
 
-		case E_PLUGIN_CHUNK_GENERATING:
+		case HOOK_CHUNK_GENERATING:
 		{
 			if (a_NumArgs != 3)
 			{
@@ -394,10 +402,12 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 			int ChunkZ = va_arg(argptr, int);
 			cLuaChunk * LuaChunk = va_arg(argptr, cLuaChunk *);
 			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+			for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 			{
-				if( (*itr)->OnChunkGenerating(ChunkX, ChunkZ, LuaChunk) )
+				if ((*itr)->OnChunkGenerating(ChunkX, ChunkZ, LuaChunk))
+				{
 					return true;
+				}
 			}
 			break;
 		}
@@ -405,9 +415,73 @@ bool cPluginManager::CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... )
 		default:
 		{
 			LOGWARNING("cPluginManager: Calling Unknown hook: %i", a_Hook );
+			ASSERT(!"Calling an unknown hook");
 			break;
 		}
 	}  // switch (a_Hook)
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_CRAFTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPreCrafting(a_Player, a_Grid, a_Recipe))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CRAFTING_NO_RECIPE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnCraftingNoRecipe(a_Player, a_Grid, a_Recipe))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPostCrafting(a_Player, a_Grid, a_Recipe))
+		{
+			return true;
+		}
+	}
 	return false;
 }
 
