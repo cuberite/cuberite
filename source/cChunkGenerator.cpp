@@ -484,12 +484,32 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cEntityList Entities;
 	cBlockEntityList BlockEntities;
 	
-	
 	cLuaChunk LuaChunk( BlockTypes, BlockMeta, HeightMap, BiomeMap );
 	if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_CHUNK_GENERATING, 3, a_ChunkX, a_ChunkZ, &LuaChunk ) )
 	{
-		// A plugin interrupted generation, handle something plugin specific?
-		//LOG("returned true");
+		// A plugin interrupted generation, handle something plugin specific
+		if( LuaChunk.IsUsingDefaultBiomes() )
+		{
+			m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
+		}
+		if( LuaChunk.IsUsingDefaultComposition() )
+		{
+			m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
+		}
+		if( LuaChunk.IsUsingDefaultStructures() )
+		{
+			for (cStructureGenList::iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
+			{
+				(*itr)->GenStructures(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, Entities, BlockEntities);
+			}   // for itr - m_StructureGens[]
+		}
+		if( LuaChunk.IsUsingDefaultFinish() )
+		{
+			for (cFinishGenList::iterator itr = m_FinishGens.begin(); itr != m_FinishGens.end(); ++itr)
+			{
+				(*itr)->GenFinish(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
+			}  // for itr - m_FinishGens[]
+		}
 	}
 	else
 	{

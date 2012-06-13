@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on Wed Jun 13 02:33:14 2012.
+** Generated automatically by tolua++-1.0.92 on 06/13/12 17:39:42.
 */
 
 #ifndef __cplusplus
@@ -13,8 +13,8 @@
 /* Exported function */
 TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "tolua_base.h"
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "tolua_base.h"
 #include "cTorch.h"
 #include "cStairs.h"
 #include "cStep.h"
@@ -18015,43 +18015,6 @@ static int tolua_set_cPacket_BlockPlace_m_Uses(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetBlock of class  cLuaChunk */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetBlock00
-static int tolua_AllToLua_cLuaChunk_SetBlock00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
-  const Vector3i* a_Pos = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
-  char a_BlockID = ((char)  tolua_tonumber(tolua_S,3,0));
-  unsigned char a_BlockMeta = ((unsigned char)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlock'", NULL);
-#endif
-  {
-   self->SetBlock(*a_Pos,a_BlockID,a_BlockMeta);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetBlock'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: FillBlocks of class  cLuaChunk */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_FillBlocks00
 static int tolua_AllToLua_cLuaChunk_FillBlocks00(lua_State* tolua_S)
@@ -18082,6 +18045,529 @@ static int tolua_AllToLua_cLuaChunk_FillBlocks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'FillBlocks'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetBlock of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetBlock00
+static int tolua_AllToLua_cLuaChunk_SetBlock00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
+  char a_BlockID = ((char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = ((unsigned char)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlock'", NULL);
+#endif
+  {
+   self->SetBlock(a_X,a_Y,a_Z,a_BlockID,a_BlockMeta);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetBlock'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetBlock of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_GetBlock00
+static int tolua_AllToLua_cLuaChunk_GetBlock00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlock'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetBlock(a_X,a_Y,a_Z);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetBlock'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetBlockMeta of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_GetBlockMeta00
+static int tolua_AllToLua_cLuaChunk_GetBlockMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockMeta'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetBlockMeta(a_X,a_Y,a_Z);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetBlockMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetBiome of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetBiome00
+static int tolua_AllToLua_cLuaChunk_SetBiome00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BiomeID = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBiome'", NULL);
+#endif
+  {
+   self->SetBiome(a_X,a_Z,a_BiomeID);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetBiome'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetBiome of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_GetBiome00
+static int tolua_AllToLua_cLuaChunk_GetBiome00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBiome'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetBiome(a_X,a_Z);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetBiome'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetHeight of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetHeight00
+static int tolua_AllToLua_cLuaChunk_SetHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_Height = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetHeight'", NULL);
+#endif
+  {
+   self->SetHeight(a_X,a_Z,a_Height);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetHeight of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_GetHeight00
+static int tolua_AllToLua_cLuaChunk_GetHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Z = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHeight'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetHeight(a_X,a_Z);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetUseDefaultBiomes of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetUseDefaultBiomes00
+static int tolua_AllToLua_cLuaChunk_SetUseDefaultBiomes00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  bool a_bUseDefaultBiomes = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetUseDefaultBiomes'", NULL);
+#endif
+  {
+   self->SetUseDefaultBiomes(a_bUseDefaultBiomes);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetUseDefaultBiomes'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsUsingDefaultBiomes of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_IsUsingDefaultBiomes00
+static int tolua_AllToLua_cLuaChunk_IsUsingDefaultBiomes00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsUsingDefaultBiomes'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsUsingDefaultBiomes();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsUsingDefaultBiomes'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetUseDefaultComposition of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetUseDefaultComposition00
+static int tolua_AllToLua_cLuaChunk_SetUseDefaultComposition00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  bool a_bUseDefaultComposition = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetUseDefaultComposition'", NULL);
+#endif
+  {
+   self->SetUseDefaultComposition(a_bUseDefaultComposition);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetUseDefaultComposition'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsUsingDefaultComposition of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_IsUsingDefaultComposition00
+static int tolua_AllToLua_cLuaChunk_IsUsingDefaultComposition00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsUsingDefaultComposition'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsUsingDefaultComposition();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsUsingDefaultComposition'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetUseDefaultStructures of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetUseDefaultStructures00
+static int tolua_AllToLua_cLuaChunk_SetUseDefaultStructures00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  bool a_bUseDefaultStructures = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetUseDefaultStructures'", NULL);
+#endif
+  {
+   self->SetUseDefaultStructures(a_bUseDefaultStructures);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetUseDefaultStructures'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsUsingDefaultStructures of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_IsUsingDefaultStructures00
+static int tolua_AllToLua_cLuaChunk_IsUsingDefaultStructures00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsUsingDefaultStructures'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsUsingDefaultStructures();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsUsingDefaultStructures'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetUseDefaultFinish of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_SetUseDefaultFinish00
+static int tolua_AllToLua_cLuaChunk_SetUseDefaultFinish00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+  bool a_bUseDefaultFinish = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetUseDefaultFinish'", NULL);
+#endif
+  {
+   self->SetUseDefaultFinish(a_bUseDefaultFinish);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetUseDefaultFinish'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsUsingDefaultFinish of class  cLuaChunk */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaChunk_IsUsingDefaultFinish00
+static int tolua_AllToLua_cLuaChunk_IsUsingDefaultFinish00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaChunk",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsUsingDefaultFinish'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsUsingDefaultFinish();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsUsingDefaultFinish'.",&tolua_err);
  return 0;
 #endif
 }
@@ -20196,8 +20682,22 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLuaChunk","cLuaChunk","",NULL);
   tolua_beginmodule(tolua_S,"cLuaChunk");
-   tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cLuaChunk_SetBlock00);
    tolua_function(tolua_S,"FillBlocks",tolua_AllToLua_cLuaChunk_FillBlocks00);
+   tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cLuaChunk_SetBlock00);
+   tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cLuaChunk_GetBlock00);
+   tolua_function(tolua_S,"GetBlockMeta",tolua_AllToLua_cLuaChunk_GetBlockMeta00);
+   tolua_function(tolua_S,"SetBiome",tolua_AllToLua_cLuaChunk_SetBiome00);
+   tolua_function(tolua_S,"GetBiome",tolua_AllToLua_cLuaChunk_GetBiome00);
+   tolua_function(tolua_S,"SetHeight",tolua_AllToLua_cLuaChunk_SetHeight00);
+   tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cLuaChunk_GetHeight00);
+   tolua_function(tolua_S,"SetUseDefaultBiomes",tolua_AllToLua_cLuaChunk_SetUseDefaultBiomes00);
+   tolua_function(tolua_S,"IsUsingDefaultBiomes",tolua_AllToLua_cLuaChunk_IsUsingDefaultBiomes00);
+   tolua_function(tolua_S,"SetUseDefaultComposition",tolua_AllToLua_cLuaChunk_SetUseDefaultComposition00);
+   tolua_function(tolua_S,"IsUsingDefaultComposition",tolua_AllToLua_cLuaChunk_IsUsingDefaultComposition00);
+   tolua_function(tolua_S,"SetUseDefaultStructures",tolua_AllToLua_cLuaChunk_SetUseDefaultStructures00);
+   tolua_function(tolua_S,"IsUsingDefaultStructures",tolua_AllToLua_cLuaChunk_IsUsingDefaultStructures00);
+   tolua_function(tolua_S,"SetUseDefaultFinish",tolua_AllToLua_cLuaChunk_SetUseDefaultFinish00);
+   tolua_function(tolua_S,"IsUsingDefaultFinish",tolua_AllToLua_cLuaChunk_IsUsingDefaultFinish00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cCraftingGrid","cCraftingGrid","",tolua_collect_cCraftingGrid);
