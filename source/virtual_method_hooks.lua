@@ -413,8 +413,8 @@ function classVirtualClass:output_method(f, btype)
 					if m == "*" then m = "" end
 					output("\t\t\ttolua_pushusertype(lua_state, (void*)"..m..arg.name..", \""..arg.type.."\");")
 				else
-					output("\t\t\tvoid* tolua_obj = (void*)new "..arg.type.."("..arg.name..");\n")
-					output('\t\t\ttolua_pushusertype_and_takeownership(lua_state, tolua_obj, "'..arg.type..'");\n')
+					output("\t\t\tvoid* tolua_obj" .. argn .." = (void*)new "..arg.type.."("..arg.name..");\n")
+					output('\t\t\ttolua_pushusertype_and_takeownership(lua_state, tolua_obj' .. argn .. ', "'..arg.type..'");\n')
 				end
 			end
 			argn = argn+1
