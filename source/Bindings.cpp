@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/13/12 19:36:04.
+** Generated automatically by tolua++-1.0.92 on 06/13/12 20:13:25.
 */
 
 #ifndef __cplusplus
@@ -2880,6 +2880,180 @@ static int tolua_AllToLua_AddDirection00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'AddDirection'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsPickaxe */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsPickaxe00
+static int tolua_AllToLua_ItemCategory_IsPickaxe00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsPickaxe(a_ItemID);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsPickaxe'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsAxe */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsAxe00
+static int tolua_AllToLua_ItemCategory_IsAxe00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsAxe(a_ItemID);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsAxe'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsSword */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsSword00
+static int tolua_AllToLua_ItemCategory_IsSword00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsSword(a_ItemID);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSword'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsHoe */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsHoe00
+static int tolua_AllToLua_ItemCategory_IsHoe00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsHoe(a_ItemID);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsHoe'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsShovel */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsShovel00
+static int tolua_AllToLua_ItemCategory_IsShovel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsShovel(a_ItemID);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsShovel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsTool */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsTool00
+static int tolua_AllToLua_ItemCategory_IsTool00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsTool(a_ItemID);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsTool'.",&tolua_err);
  return 0;
 #endif
 }
@@ -20355,6 +20529,15 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"IsValidBlock",tolua_AllToLua_IsValidBlock00);
   tolua_function(tolua_S,"IsValidItem",tolua_AllToLua_IsValidItem00);
   tolua_function(tolua_S,"AddDirection",tolua_AllToLua_AddDirection00);
+  tolua_module(tolua_S,"ItemCategory",0);
+  tolua_beginmodule(tolua_S,"ItemCategory");
+   tolua_function(tolua_S,"IsPickaxe",tolua_AllToLua_ItemCategory_IsPickaxe00);
+   tolua_function(tolua_S,"IsAxe",tolua_AllToLua_ItemCategory_IsAxe00);
+   tolua_function(tolua_S,"IsSword",tolua_AllToLua_ItemCategory_IsSword00);
+   tolua_function(tolua_S,"IsHoe",tolua_AllToLua_ItemCategory_IsHoe00);
+   tolua_function(tolua_S,"IsShovel",tolua_AllToLua_ItemCategory_IsShovel00);
+   tolua_function(tolua_S,"IsTool",tolua_AllToLua_ItemCategory_IsTool00);
+  tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"eGameMode_Survival",eGameMode_Survival);
   tolua_constant(tolua_S,"eGameMode_Creative",eGameMode_Creative);
   tolua_constant(tolua_S,"eWeather_Sunny",eWeather_Sunny);

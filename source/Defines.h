@@ -192,7 +192,7 @@ inline float GetSpecialSignf( float a_Val )
 
 
 
-
+//tolua_begin
 namespace ItemCategory
 {
 	inline bool IsPickaxe(ENUM_ITEM_ID a_ItemID)
@@ -247,8 +247,19 @@ namespace ItemCategory
 			|| (a_ItemID == E_ITEM_GOLD_SHOVEL)
 			|| (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
 	}
-}
 
+
+
+	inline bool IsTool(ENUM_ITEM_ID a_ItemID)
+	{
+		return IsPickaxe( a_ItemID )
+			|| IsAxe    ( a_ItemID )
+			|| IsSword  ( a_ItemID )
+			|| IsHoe    ( a_ItemID )
+			|| IsShovel ( a_ItemID );
+	}
+}
+//tolua_end
 
 
 
