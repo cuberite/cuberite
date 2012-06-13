@@ -631,10 +631,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\LuaFunctions.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\main.cpp"
 				>
 			</File>
@@ -1698,6 +1694,10 @@
 				</File>
 				<File
 					RelativePath="..\source\cWebPlugin_Lua.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\LuaFunctions.h"
 					>
 				</File>
 				<File
