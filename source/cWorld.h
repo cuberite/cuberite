@@ -302,6 +302,7 @@ public:
 
 	void CastThunderbolt (int a_X, int a_Y, int a_Z);						//tolua_export
 	void SetWeather ( eWeather a_Weather );									//tolua_export
+	void ChangeWeather();												//tolua_export
 	eWeather GetWeather() { return m_Weather; };							//tolua_export
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
@@ -363,6 +364,7 @@ private:
 	float m_SpawnMonsterRate;
 
 	eWeather m_Weather;
+	int m_WeatherInterval;
 	
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;

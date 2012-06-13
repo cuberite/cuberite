@@ -356,7 +356,7 @@ void cWorld::CastThunderbolt ( int a_X, int a_Y, int a_Z )
 	ThunderboltPacket.m_xLBPos = a_X;
 	ThunderboltPacket.m_yLBPos = a_Y;
 	ThunderboltPacket.m_zLBPos = a_Z;
-	Broadcast( ThunderboltPacket ); // FIXME: Broadcast to chunk instead of entire world
+	BroadcastToChunkOfBlock(a_X, a_Y, a_Z, &ThunderboltPacket);
 }
 
 
@@ -619,42 +619,83 @@ void cWorld::Tick(float a_Dt)
 
 
 
-void cWorld::TickWeather(float a_Dt)
+void cWorld::ChangeWeather()
 {
-	if ( GetWeather() == 0 )  // if sunny
+	unsigned randWeather = (m_TickRand.randInt() % 99);
+	
+	if (GetWeather() == eWeather_Sunny)
 	{
-		if( CurrentTick % 19 == 0 )  //every 20 ticks random weather
+		if (randWeather < 20)
 		{
-			unsigned randWeather = (m_TickRand.randInt() % 10000);
-			if (randWeather == 0)
-			{
-				LOG("Starting Rainstorm!");
-				SetWeather ( eWeather_Rain );
-			}
-			else if  (randWeather == 1)
-			{
-				LOG("Starting Thunderstorm!");
-				SetWeather ( eWeather_ThunderStorm );
-			}
+			LOG("Starting rainstorm!");
+			SetWeather( eWeather_Rain );
 		}
 	}
-
-	if ( GetWeather() != 0 )  // if raining or thunderstorm
+	
+	else if (GetWeather() == eWeather_Rain)
 	{
-		if ( CurrentTick % 19 == 0 ) // every 20 ticks random weather
+		if (randWeather < 5)
 		{
-			unsigned randWeather = (m_TickRand.randInt() % 4999);
-			if (randWeather == 0)  //2% chance per second
-			{
-				LOG("Back to sunny!");
-				SetWeather ( eWeather_Sunny );
-			}
-			else if ( (randWeather > 4000) && (GetWeather() != 2) )  // random chance for rainstorm to turn into thunderstorm.
-			{
-				LOG("Starting Thunderstorm!");
-				SetWeather ( eWeather_ThunderStorm );
-			}
+			LOG("Thunderstorm!");
+			SetWeather( eWeather_ThunderStorm );
 		}
+		
+		else if (randWeather < 60)
+		{
+			LOG("Back to sunshine");
+			SetWeather( eWeather_Sunny );
+		}
+	}
+	
+	else if (GetWeather() == eWeather_ThunderStorm)
+	{
+		if (randWeather < 70)
+		{
+			SetWeather(eWeather_Sunny);
+			LOG("Thunder ended abruptly, returning to lovely sunshine");
+		}
+		else if (randWeather < 85)
+		{
+			SetWeather(eWeather_Rain);
+			LOG("Thunder ended, but rain persists.");
+		}
+		else
+		{
+			return;
+		}
+	}
+}
+
+
+
+
+
+void cWorld::TickWeather(float a_Dt)
+{
+	if(m_WeatherInterval == 0)
+	{
+		ChangeWeather();
+		
+		switch(GetWeather())
+		{
+			case eWeather_Sunny:
+				m_WeatherInterval = 14400 + (m_TickRand.randInt() % 4800); // 12 - 16 minutes
+				break;
+			case eWeather_Rain:
+				m_WeatherInterval = 9600 + (m_TickRand.randInt() % 7200); // 8 - 14 minutes
+				break;
+			case eWeather_ThunderStorm:
+				m_WeatherInterval = 2400 + (m_TickRand.randInt() % 4800); // 2 - 6 minutes
+				break;
+			default:
+				LOG("Unknown weather occurred");
+				break;
+		}
+	}
+	
+	else
+	{
+		m_WeatherInterval--;
 	}
 
 	if ( GetWeather() == 2 )  // if thunderstorm

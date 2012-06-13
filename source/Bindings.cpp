@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/12/12 23:23:39.
+** Generated automatically by tolua++-1.0.92 on Wed Jun 13 02:33:14 2012.
 */
 
 #ifndef __cplusplus
@@ -13,8 +13,8 @@
 /* Exported function */
 TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "tolua_base.h"
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "tolua_base.h"
 #include "cTorch.h"
 #include "cStairs.h"
 #include "cStep.h"
@@ -11296,6 +11296,37 @@ static int tolua_AllToLua_cWorld_SetWeather00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: ChangeWeather of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_ChangeWeather00
+static int tolua_AllToLua_cWorld_ChangeWeather00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ChangeWeather'", NULL);
+#endif
+  {
+   self->ChangeWeather();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ChangeWeather'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetWeather of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetWeather00
 static int tolua_AllToLua_cWorld_GetWeather00(lua_State* tolua_S)
@@ -19801,6 +19832,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetStorageSaveQueueLength",tolua_AllToLua_cWorld_GetStorageSaveQueueLength00);
    tolua_function(tolua_S,"CastThunderbolt",tolua_AllToLua_cWorld_CastThunderbolt00);
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
+   tolua_function(tolua_S,"ChangeWeather",tolua_AllToLua_cWorld_ChangeWeather00);
    tolua_function(tolua_S,"GetWeather",tolua_AllToLua_cWorld_GetWeather00);
    tolua_function(tolua_S,"SetNextBlockTick",tolua_AllToLua_cWorld_SetNextBlockTick00);
    tolua_function(tolua_S,"GetMaxSugarcaneHeight",tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00);
