@@ -489,6 +489,30 @@ bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraft
 
 
 
+bool cPluginManager::CallHookBlockToPickup(
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
+	const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups
+)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBlockToPickup(a_BlockType, a_BlockMeta, a_Player, a_EquippedItem, a_Pickups))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 cPlugin* cPluginManager::GetPlugin( const char* a_Plugin ) const
 {
 	for( PluginList::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )

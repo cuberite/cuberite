@@ -5,6 +5,7 @@
 #include "cPlugin_NewLua.h"
 #include "cMCLogger.h"
 #include "cWebPlugin_Lua.h"
+#include "LuaItems.h"
 
 extern "C"
 {
@@ -21,13 +22,25 @@ extern "C"
 #include <dirent.h>
 #endif
 
+
+
+
+
 extern bool report_errors(lua_State* lua, int status);
+
+
+
+
 
 cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
 	: m_LuaState( 0 )
 {
 	m_Directory = a_PluginName;
 }
+
+
+
+
 
 cPlugin_NewLua::~cPlugin_NewLua()
 {
@@ -44,6 +57,10 @@ cPlugin_NewLua::~cPlugin_NewLua()
 		m_LuaState = 0;
 	}
 }
+
+
+
+
 
 bool cPlugin_NewLua::Initialize()
 {
@@ -115,6 +132,10 @@ bool cPlugin_NewLua::Initialize()
 	return bSuccess;
 }
 
+
+
+
+
 void cPlugin_NewLua::OnDisable()
 {
 	cCSLock Lock( m_CriticalSection );
@@ -123,6 +144,10 @@ void cPlugin_NewLua::OnDisable()
 
 	CallFunction(0, 0, "OnDisable");
 }
+
+
+
+
 
 void cPlugin_NewLua::Tick(float a_Dt)
 {
@@ -159,7 +184,7 @@ bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 
 
 
-bool cPlugin_NewLua::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
+bool cPlugin_NewLua::OnDisconnect(const AString & a_Reason, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnDisconnect") )
@@ -441,6 +466,35 @@ bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGri
 	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
 
 	if (!CallFunction(3, 1, "OnPostCrafting"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnBlockToPickup(
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
+	const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups
+)
+{
+	cLuaItems Pickups(a_Pickups);
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnBlockToPickup"))
+		return false;
+
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	tolua_pushusertype(m_LuaState, (void *)a_Player,        "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)&a_EquippedItem, "cItem");
+	tolua_pushusertype(m_LuaState, (void *)&Pickups,        "cLuaItems");
+
+	if (!CallFunction(5, 1, "OnBlockToPickup"))
 	{
 		return false;
 	}

@@ -817,8 +817,10 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 	cItems PickupItems;
 	if (bBroken && !(m_Player->GetGameMode() == 1)) // broken
 	{
-		// TODO: Allow plugins to change the dropped objects
-		cBlockToPickup::ToPickup(OldBlock, OldMeta, m_Player->GetInventory().GetEquippedItem().m_ItemID, PickupItems);
+		cBlockToPickup::ToPickup(OldBlock, OldMeta, m_Player->GetInventory().GetEquippedItem(), PickupItems);
+		
+		// Allow plugins to change the dropped objects:
+		cRoot::Get()->GetPluginManager()->CallHookBlockToPickup(OldBlock, OldMeta, m_Player, m_Player->GetInventory().GetEquippedItem(), PickupItems);
 	}
 	
 	int pX = a_Packet->m_PosX;

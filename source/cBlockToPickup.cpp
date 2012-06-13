@@ -23,7 +23,7 @@ static void AddRandomDrop(cItems & a_Drops, MTRand & r1, int a_OneInNChance, ENU
 
 
 
-void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENUM_ITEM_ID a_UsedItemID, cItems & a_Drops)
+void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cItem & a_UsedItem, cItems & a_Drops)
 {
 	MTRand r1;
 
@@ -101,7 +101,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Coal ore requires a pickaxe:
 		case E_BLOCK_COAL_ORE:
 		{
-			if (ItemCategory::IsPickaxe(a_UsedItemID))
+			if (ItemCategory::IsPickaxe(a_UsedItem.m_ItemID))
 			{
 				a_Drops.push_back(cItem(E_ITEM_COAL, 1));
 			}
@@ -112,9 +112,9 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_IRON_ORE:
 		{
 			if (
-				(a_UsedItemID == E_ITEM_STONE_PICKAXE) ||
-				(a_UsedItemID == E_ITEM_IRON_PICKAXE)  ||
-				(a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+				(a_UsedItem.m_ItemID == E_ITEM_STONE_PICKAXE) ||
+				(a_UsedItem.m_ItemID == E_ITEM_IRON_PICKAXE)  ||
+				(a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			)
 			{
 				a_Drops.push_back(cItem(E_ITEM_IRON_ORE, 1));
@@ -127,8 +127,8 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_DIAMOND_ORE:
 		{
 			if (
-				(a_UsedItemID == E_ITEM_IRON_PICKAXE) ||
-				(a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+				(a_UsedItem.m_ItemID == E_ITEM_IRON_PICKAXE) ||
+				(a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			)
 			{
 				a_Drops.push_back(cItem((ENUM_ITEM_ID)a_BlockType, 1));
@@ -139,7 +139,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Obsidian require a diamond pickaxe:
 		case E_BLOCK_OBSIDIAN:
 		{
-			if (a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+			if (a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			{
 				a_Drops.push_back(cItem((ENUM_ITEM_ID)a_BlockType, 1));
 			}
@@ -151,8 +151,8 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_REDSTONE_ORE:
 		{
 			if (
-				(a_UsedItemID == E_ITEM_IRON_PICKAXE) ||
-				(a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+				(a_UsedItem.m_ItemID == E_ITEM_IRON_PICKAXE) ||
+				(a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			)
 			{
 				a_Drops.push_back(cItem(E_ITEM_REDSTONE_DUST, 4 + (short)r1.randInt(1)));
@@ -164,10 +164,10 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_LAPIS_ORE:
 		{
 			if (
-				(a_UsedItemID == E_ITEM_STONE_PICKAXE) ||
-				(a_UsedItemID == E_ITEM_IRON_PICKAXE)  ||
-				(a_UsedItemID == E_ITEM_GOLD_PICKAXE)  ||
-				(a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+				(a_UsedItem.m_ItemID == E_ITEM_STONE_PICKAXE) ||
+				(a_UsedItem.m_ItemID == E_ITEM_IRON_PICKAXE)  ||
+				(a_UsedItem.m_ItemID == E_ITEM_GOLD_PICKAXE)  ||
+				(a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			)
 			{
 				a_Drops.push_back(cItem(E_ITEM_DYE, 4 + (short)r1.randInt(4), E_META_DYE_BLUE));
@@ -184,9 +184,9 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_LAPIS_BLOCK:
 		{
 			if (
-				(a_UsedItemID == E_ITEM_STONE_PICKAXE) ||
-				(a_UsedItemID == E_ITEM_IRON_PICKAXE)  ||
-				(a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+				(a_UsedItem.m_ItemID == E_ITEM_STONE_PICKAXE) ||
+				(a_UsedItem.m_ItemID == E_ITEM_IRON_PICKAXE)  ||
+				(a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			)
 			{
 				a_Drops.push_back(cItem((ENUM_ITEM_ID)a_BlockType, 1));
@@ -198,8 +198,8 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_DIAMOND_BLOCK:
 		{
 			if (
-				(a_UsedItemID == E_ITEM_IRON_PICKAXE) ||
-				(a_UsedItemID == E_ITEM_DIAMOND_PICKAXE)
+				(a_UsedItem.m_ItemID == E_ITEM_IRON_PICKAXE) ||
+				(a_UsedItem.m_ItemID == E_ITEM_DIAMOND_PICKAXE)
 			)
 			{
 				a_Drops.push_back(cItem((ENUM_ITEM_ID)a_BlockType, 1));
@@ -220,7 +220,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		case E_BLOCK_SANDSTONE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		{
-			if (ItemCategory::IsPickaxe(a_UsedItemID))
+			if (ItemCategory::IsPickaxe(a_UsedItem.m_ItemID))
 			{
 				a_Drops.push_back(cItem((ENUM_ITEM_ID)a_BlockType, 1));
 			}
@@ -231,7 +231,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Stone requires a pickaxe to drop cobblestone:
 		case E_BLOCK_STONE:
 		{
-			if (ItemCategory::IsPickaxe(a_UsedItemID))
+			if (ItemCategory::IsPickaxe(a_UsedItem.m_ItemID))
 			{
 				a_Drops.push_back(cItem(E_ITEM_COBBLESTONE, 1));
 			}
@@ -242,7 +242,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Snow requires a shovel to harvest:
 		case E_BLOCK_SNOW:
 		{
-			if (ItemCategory::IsShovel(a_UsedItemID))
+			if (ItemCategory::IsShovel(a_UsedItem.m_ItemID))
 			{
 				a_Drops.push_back(cItem(E_ITEM_SNOWBALL, 1));
 			}
@@ -253,7 +253,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Leaves require shears for harvesting and have a chance of dropping a sapling and a red apple:
 		case E_BLOCK_LEAVES:
 		{
-			if (a_UsedItemID == E_ITEM_SHEARS)
+			if (a_UsedItem.m_ItemID == E_ITEM_SHEARS)
 			{
 				a_Drops.push_back(cItem(E_ITEM_LEAVES, 1));
 			}
@@ -282,7 +282,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Vines drop only with shears, otherwise they are destroyed
 		case E_BLOCK_VINES:
 		{
-			if (a_UsedItemID == E_ITEM_SHEARS)
+			if (a_UsedItem.m_ItemID == E_ITEM_SHEARS)
 			{
 				a_Drops.push_back(cItem(E_ITEM_VINES, 1));
 			}
@@ -293,7 +293,7 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, ENU
 		// Snow drops only when using a shovel
 		case E_BLOCK_SNOW_BLOCK:
 		{
-			if (ItemCategory::IsShovel(a_UsedItemID))
+			if (ItemCategory::IsShovel(a_UsedItem.m_ItemID))
 			{
 				a_Drops.push_back(cItem(E_ITEM_SNOWBALL,   4, 0)); return;
 			}

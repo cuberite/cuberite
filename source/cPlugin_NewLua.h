@@ -25,24 +25,23 @@ public:														//tolua_export
 
 	virtual void Tick(float a_Dt);	//tolua_export
 
-	virtual bool OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player ) override;
-	virtual bool OnDisconnect( std::string a_Reason, cPlayer* a_Player ) override;
-	virtual bool OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player ) override;
-	virtual bool OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) override;
-	virtual bool OnChat( const char* a_Chat, cPlayer* a_Player ) override;
-	virtual bool OnLogin( cPacket_Login* a_PacketData ) override;
-	virtual void OnPlayerSpawn( cPlayer* a_Player ) override;
-	virtual bool OnPlayerJoin( cPlayer* a_Player ) override;
-	virtual void OnPlayerMove( cPlayer* a_Player ) override;
-	virtual void OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) override;
-	virtual bool OnKilled( cPawn* a_Killed, cEntity* a_Killer ) override;
-	
-	virtual void OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
-	virtual bool OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) override;
-
+	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player ) override;
+	virtual bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player ) override;
+	virtual bool OnBlockPlace      (cPacket_BlockPlace* a_PacketData, cPlayer* a_Player ) override;
+	virtual bool OnBlockDig        (cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) override;
+	virtual bool OnChat            (const char* a_Chat, cPlayer* a_Player ) override;
+	virtual bool OnLogin           (cPacket_Login* a_PacketData ) override;
+	virtual void OnPlayerSpawn     (cPlayer* a_Player ) override;
+	virtual bool OnPlayerJoin      (cPlayer* a_Player ) override;
+	virtual void OnPlayerMove      (cPlayer* a_Player ) override;
+	virtual void OnTakeDamage      (cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) override;
+	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer ) override;
+	virtual void OnChunkGenerated  (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnChunkGenerating (int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) override;
 	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
+	virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
 
 	lua_State* GetLuaState() { return m_LuaState; }
 

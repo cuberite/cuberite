@@ -1701,6 +1701,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\LuaItems.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\ManualBindings.cpp"
 					>
 				</File>

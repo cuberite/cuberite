@@ -43,7 +43,7 @@ bool cPlugin::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 	return false;
 }
 
-bool cPlugin::OnDisconnect( std::string a_Reason, cPlayer* a_Player )
+bool cPlugin::OnDisconnect(const AString & a_Reason, cPlayer* a_Player )
 {
 	(void)a_Reason;
 	(void)a_Player;
