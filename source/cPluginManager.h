@@ -49,6 +49,7 @@ public:																	//tolua_export
 		HOOK_CRAFTING_NO_RECIPE,  /// cPlayer, cCraftingGrid, cCraftingRecipe
 		HOOK_POST_CRAFTING,       /// cPlayer, cCraftingGrid, cCraftingRecipe
 		HOOK_BLOCK_TO_PICKUP,     /// BlockType, BlockMeta, cPlayer, cItem, cItems
+		HOOK_WEATHER_CHANGE,
 		
 		// E_PLUGIN_ names are obsolete, but are kept for compatibility reasons
 		E_PLUGIN_TICK             = HOOK_TICK,

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/13/12 20:13:25.
+** Generated automatically by tolua++-1.0.92 on Thu Jun 14 14:20:17 2012.
 */
 
 #ifndef __cplusplus
@@ -20734,6 +20734,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_POST_CRAFTING",cPluginManager::HOOK_POST_CRAFTING);
    tolua_constant(tolua_S,"HOOK_BLOCK_TO_PICKUP",cPluginManager::HOOK_BLOCK_TO_PICKUP);
+   tolua_constant(tolua_S,"HOOK_WEATHER_CHANGE",cPluginManager::HOOK_WEATHER_CHANGE);
    tolua_constant(tolua_S,"E_PLUGIN_TICK",cPluginManager::E_PLUGIN_TICK);
    tolua_constant(tolua_S,"E_PLUGIN_CHAT",cPluginManager::E_PLUGIN_CHAT);
    tolua_constant(tolua_S,"E_PLUGIN_COLLECT_ITEM",cPluginManager::E_PLUGIN_COLLECT_ITEM);

@@ -41,6 +41,7 @@
 #include "MersenneTwister.h"
 #include "cTracer.h"
 #include "Trees.h"
+#include "cPluginManager.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -675,6 +676,8 @@ void cWorld::TickWeather(float a_Dt)
 	if(m_WeatherInterval == 0)
 	{
 		ChangeWeather();
+		
+		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::HOOK_WEATHER_CHANGE, 0 );
 		
 		switch(GetWeather())
 		{
