@@ -1051,9 +1051,24 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		
 		if (ClickedBlock == E_BLOCK_SNOW)
 		{
-			if (a_Packet->m_Direction == 1)
+			switch (a_Packet->m_Direction)
 			{
-				a_Packet->m_PosY--;
+				case 1:
+					a_Packet->m_PosY--;
+					break;
+				case 2:
+					a_Packet->m_PosZ++;
+					break;
+				case 3:
+					a_Packet->m_PosZ--;
+					break;
+				case 4:
+					a_Packet->m_PosX++;
+					break;
+				case 5:
+					a_Packet->m_PosX--;
+					break;
+				default: break;
 			}
 			bIgnoreCollision = true;
 		}
