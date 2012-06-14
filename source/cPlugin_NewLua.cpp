@@ -388,12 +388,13 @@ void cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
-bool cPlugin_NewLua::OnChunkGenerating( int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk )
+bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!PushFunction("OnChunkGenerating"))
 		return false;
 
+	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
 	tolua_pushnumber  (m_LuaState, a_ChunkX);
 	tolua_pushnumber  (m_LuaState, a_ChunkZ);
 	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cLuaChunk");

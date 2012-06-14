@@ -8,6 +8,12 @@ class cLuaCommandBinder;
 class cPlugin;
 class cPlugin_Lua;
 
+// fwd: cWorld.h
+class cWorld;
+
+// fwd: cLuaChunk.h
+class cLuaChunk;
+
 // fwd: cPlayer.h
 class cPlayer;
 
@@ -87,6 +93,7 @@ public:																	//tolua_export
 
 	bool CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... );
 	
+	bool CallHookChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_Chunk);
 	bool CallHookPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);

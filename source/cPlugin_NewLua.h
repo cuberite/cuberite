@@ -37,7 +37,7 @@ public:														//tolua_export
 	virtual void OnTakeDamage      (cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) override;
 	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer ) override;
 	virtual void OnChunkGenerated  (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
-	virtual bool OnChunkGenerating (int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) override;
+	virtual bool OnChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) override;
 	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;

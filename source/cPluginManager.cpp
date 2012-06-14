@@ -390,28 +390,6 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			break;
 		}
 
-		case HOOK_CHUNK_GENERATING:
-		{
-			if (a_NumArgs != 3)
-			{
-				break;
-			}
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			int ChunkX = va_arg(argptr, int);
-			int ChunkZ = va_arg(argptr, int);
-			cLuaChunk * LuaChunk = va_arg(argptr, cLuaChunk *);
-			va_end (argptr);
-			for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-			{
-				if ((*itr)->OnChunkGenerating(ChunkX, ChunkZ, LuaChunk))
-				{
-					return true;
-				}
-			}
-			break;
-		}
-		
 		default:
 		{
 			LOGWARNING("cPluginManager: Calling Unknown hook: %i", a_Hook );
@@ -419,6 +397,27 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			break;
 		}
 	}  // switch (a_Hook)
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_LuaChunk)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_LuaChunk))
+		{
+			return true;
+		}
+	}
 	return false;
 }
 

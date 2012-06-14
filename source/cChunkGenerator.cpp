@@ -485,7 +485,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cBlockEntityList BlockEntities;
 	
 	cLuaChunk LuaChunk( BlockTypes, BlockMeta, HeightMap, BiomeMap );
-	if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_CHUNK_GENERATING, 3, a_ChunkX, a_ChunkZ, &LuaChunk ) )
+	if( cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &LuaChunk ) )
 	{
 		// A plugin interrupted generation, handle something plugin specific
 		if( LuaChunk.IsUsingDefaultBiomes() )
