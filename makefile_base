@@ -107,7 +107,6 @@ MCServer : \
 		build/cPlugin_Lua.o\
 		build/cPlugin.o\
 		build/cPluginManager.o\
-		build/cRecipeChecker.o\
 		build/cRoot.o\
 		build/cSemaphore.o\
 		build/cServer.o\
@@ -330,7 +329,6 @@ MCServer : \
 		build/cPlugin_Lua.o\
 		build/cPlugin.o\
 		build/cPluginManager.o\
-		build/cRecipeChecker.o\
 		build/cRoot.o\
 		build/cSemaphore.o\
 		build/cServer.o\
@@ -556,7 +554,6 @@ clean :
 		build/cPlugin_Lua.o\
 		build/cPlugin.o\
 		build/cPluginManager.o\
-		build/cRecipeChecker.o\
 		build/cRoot.o\
 		build/cSemaphore.o\
 		build/cServer.o\
@@ -928,11 +925,6 @@ build/cPlugin.o : source/cPlugin.cpp
 # Item # 30 -- cPluginManager --
 build/cPluginManager.o : source/cPluginManager.cpp
 	$(CC) $(CC_OPTIONS) source/cPluginManager.cpp -c $(INCLUDE) -o build/cPluginManager.o
-
-
-# Item # 31 -- cRecipeChecker --
-build/cRecipeChecker.o : source/cRecipeChecker.cpp
-	$(CC) $(CC_OPTIONS) source/cRecipeChecker.cpp -c $(INCLUDE) -o build/cRecipeChecker.o
 
 
 # Item # 32 -- cRoot --
