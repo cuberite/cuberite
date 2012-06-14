@@ -1031,22 +1031,31 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 
 		if (ClickedBlock == E_BLOCK_STEP)
 		{
-      // Only make double slab if meta values are the same and if player clicked either on top or on bottom of the block (direction either 0 or 1)
-      // TODO check if it works from beneath
+		// Only make double slab if meta values are the same and if player clicked either on top or on bottom of the block (direction either 0 or 1)
+		// TODO check if it works from beneath
 			if (MetaData == ( m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) & 0x7) && a_Packet->m_Direction <= 1)
 			//if (MetaData == m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) && a_Packet->m_Direction == 1)
 			{
-        a_Packet->m_ItemType = E_BLOCK_DOUBLE_STEP;
+				a_Packet->m_ItemType = E_BLOCK_DOUBLE_STEP;
 				if(a_Packet->m_Direction == 1)
-        {
-          a_Packet->m_PosY--;
-        }
-        else
-        {
-          a_Packet->m_PosY++;
-        }
+				{
+					a_Packet->m_PosY--;
+				}
+				else
+				{
+					a_Packet->m_PosY++;
+				}
 				bIgnoreCollision = true;
 			}
+		}
+		
+		if (ClickedBlock == E_BLOCK_SNOW)
+		{
+			if (a_Packet->m_Direction == 1)
+			{
+				a_Packet->m_PosY--;
+			}
+			bIgnoreCollision = true;
 		}
 
 		// Special handling for special items:
@@ -2078,6 +2087,8 @@ void cClientHandle::SocketClosed(void)
 	LOG("Client \"%s\" disconnected", GetLogName().c_str());
 	*/
 }
+
+
 
 
 
