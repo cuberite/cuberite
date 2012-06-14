@@ -508,6 +508,29 @@ bool cPlugin_NewLua::OnBlockToPickup(
 
 
 
+bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnWeatherChanged"))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
+
+	if (!CallFunction(1, 1, "OnWeatherChanged"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 {
 	cCSLock Lock( m_CriticalSection );

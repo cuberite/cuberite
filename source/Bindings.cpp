@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/14/12 19:28:15.
+** Generated automatically by tolua++-1.0.92 on 06/14/12 21:17:55.
 */
 
 #ifndef __cplusplus
@@ -8051,6 +8051,40 @@ static int tolua_AllToLua_cPlugin_OnBlockToPickup00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: OnWeatherChanged of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnWeatherChanged00
+static int tolua_AllToLua_cPlugin_OnWeatherChanged00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnWeatherChanged'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnWeatherChanged(a_World);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnWeatherChanged'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetName of class  cPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_GetName00
 static int tolua_AllToLua_cPlugin_GetName00(lua_State* tolua_S)
@@ -8544,6 +8578,17 @@ public:
 			return ( bool ) cPlugin:: OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 		};
 	};
+	 bool  OnWeatherChanged( cWorld* a_World) {
+		if (push_method("OnWeatherChanged",  tolua_AllToLua_cPlugin_OnWeatherChanged00)) {
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin:: OnWeatherChanged(a_World);
+		};
+	};
 
 	 void cPlugin__OnDisable( void ) {
 		return ( void )cPlugin::OnDisable();
@@ -8601,6 +8646,9 @@ public:
 	};
 	 bool cPlugin__OnBlockToPickup( BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		return ( bool )cPlugin::OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
+	};
+	 bool cPlugin__OnWeatherChanged( cWorld* a_World) {
+		return ( bool )cPlugin::OnWeatherChanged(a_World);
 	};
 	 Lua__cPlugin( void ): cPlugin(){};
 };
@@ -9323,6 +9371,40 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnBlockToPickup00(lua_State* tol
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: cPlugin__OnWeatherChanged of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnWeatherChanged00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnWeatherChanged00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnWeatherChanged'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin__OnWeatherChanged(a_World);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnWeatherChanged'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  Lua__cPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_new00
 static int tolua_AllToLua_Lua__cPlugin_new00(lua_State* tolua_S)
@@ -9777,6 +9859,17 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 		};
 	};
+	 bool  OnWeatherChanged( cWorld* a_World) {
+		if (push_method("OnWeatherChanged",  tolua_AllToLua_cPlugin_OnWeatherChanged00)) {
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnWeatherChanged(a_World);
+		};
+	};
 
 	 void cPlugin_NewLua__OnDisable( void ) {
 		return ( void )cPlugin_NewLua::OnDisable();
@@ -9837,6 +9930,9 @@ public:
 	};
 	 bool cPlugin_NewLua__OnBlockToPickup( BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		return ( bool )cPlugin_NewLua::OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
+	};
+	 bool cPlugin_NewLua__OnWeatherChanged( cWorld* a_World) {
+		return ( bool )cPlugin_NewLua::OnWeatherChanged(a_World);
 	};
 };
 
@@ -20740,7 +20836,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_POST_CRAFTING",cPluginManager::HOOK_POST_CRAFTING);
    tolua_constant(tolua_S,"HOOK_BLOCK_TO_PICKUP",cPluginManager::HOOK_BLOCK_TO_PICKUP);
-   tolua_constant(tolua_S,"HOOK_WEATHER_CHANGE",cPluginManager::HOOK_WEATHER_CHANGE);
+   tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
    tolua_constant(tolua_S,"E_PLUGIN_TICK",cPluginManager::E_PLUGIN_TICK);
    tolua_constant(tolua_S,"E_PLUGIN_CHAT",cPluginManager::E_PLUGIN_CHAT);
    tolua_constant(tolua_S,"E_PLUGIN_COLLECT_ITEM",cPluginManager::E_PLUGIN_COLLECT_ITEM);
@@ -20794,6 +20890,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"OnCraftingNoRecipe",tolua_AllToLua_cPlugin_OnCraftingNoRecipe00);
    tolua_function(tolua_S,"OnPostCrafting",tolua_AllToLua_cPlugin_OnPostCrafting00);
    tolua_function(tolua_S,"OnBlockToPickup",tolua_AllToLua_cPlugin_OnBlockToPickup00);
+   tolua_function(tolua_S,"OnWeatherChanged",tolua_AllToLua_cPlugin_OnWeatherChanged00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cPlugin_GetName00);
    tolua_function(tolua_S,"SetName",tolua_AllToLua_cPlugin_SetName00);
    tolua_function(tolua_S,"GetVersion",tolua_AllToLua_cPlugin_GetVersion00);
@@ -20832,6 +20929,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cPlugin__OnCraftingNoRecipe",tolua_AllToLua_Lua__cPlugin_cPlugin__OnCraftingNoRecipe00);
    tolua_function(tolua_S,"cPlugin__OnPostCrafting",tolua_AllToLua_Lua__cPlugin_cPlugin__OnPostCrafting00);
    tolua_function(tolua_S,"cPlugin__OnBlockToPickup",tolua_AllToLua_Lua__cPlugin_cPlugin__OnBlockToPickup00);
+   tolua_function(tolua_S,"cPlugin__OnWeatherChanged",tolua_AllToLua_Lua__cPlugin_cPlugin__OnWeatherChanged00);
    tolua_function(tolua_S,"new",tolua_AllToLua_Lua__cPlugin_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cPlugin_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_Lua__cPlugin_new00_local);

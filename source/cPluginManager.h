@@ -55,7 +55,7 @@ public:																	//tolua_export
 		HOOK_CRAFTING_NO_RECIPE,  /// cPlayer, cCraftingGrid, cCraftingRecipe
 		HOOK_POST_CRAFTING,       /// cPlayer, cCraftingGrid, cCraftingRecipe
 		HOOK_BLOCK_TO_PICKUP,     /// BlockType, BlockMeta, cPlayer, cItem, cItems
-		HOOK_WEATHER_CHANGE,
+		HOOK_WEATHER_CHANGED,
 		
 		// E_PLUGIN_ names are obsolete, but are kept for compatibility reasons
 		E_PLUGIN_TICK             = HOOK_TICK,
@@ -98,6 +98,7 @@ public:																	//tolua_export
 	bool CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
+	bool CallHookWeatherChanged  (cWorld * a_World);
 
 	void RemoveHooks( cPlugin* a_Plugin );
 	void RemovePlugin( cPlugin* a_Plugin, bool a_bDelete = false );		//tolua_export

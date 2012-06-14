@@ -65,6 +65,7 @@ public:
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
 	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
 	virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups) {return false; }
+	virtual bool OnWeatherChanged  (cWorld * a_World) {return false; }
 	
 	// Accessors
 	const char* GetName() const { return m_Name.c_str(); }

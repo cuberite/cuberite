@@ -673,13 +673,13 @@ void cWorld::ChangeWeather()
 
 void cWorld::TickWeather(float a_Dt)
 {
-	if(m_WeatherInterval == 0)
+	if (m_WeatherInterval == 0)
 	{
 		ChangeWeather();
 		
-		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::HOOK_WEATHER_CHANGE, 0 );
+		cRoot::Get()->GetPluginManager()->CallHookWeatherChanged(this);
 		
-		switch(GetWeather())
+		switch (GetWeather())
 		{
 			case eWeather_Sunny:
 				m_WeatherInterval = 14400 + (m_TickRand.randInt() % 4800); // 12 - 16 minutes
