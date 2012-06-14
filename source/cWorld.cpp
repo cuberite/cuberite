@@ -747,26 +747,32 @@ void cWorld::TickSpawnMobs(float a_Dt)
 
 	if (m_WorldTime >= 12000 + 1000)
 	{
-		if (nightRand == 0) //random percent to spawn for night
-			Monster = new cSpider();
-		else if (nightRand == 1)
-			Monster = new cZombie();
-		else if (nightRand == 2)
-			Monster = new cEnderman();
-		else if (nightRand == 3)
-			Monster = new cCreeper();
-		else if (nightRand == 4)
-			Monster = new cCavespider();
-		else if (nightRand == 5)
-			Monster = new cGhast();
-		else if (nightRand == 6)
-			Monster = new cZombiepigman();
-		else if (nightRand == 7)
-			Monster = new cSlime();
-		else if (nightRand == 8)
-			Monster = new cSilverfish();
-		else if (nightRand == 9)
-			Monster = new cSkeleton();
+		if (GetBiomeAt(SpawnPos.x, SpawnPos.z) == biHell) // Spawn nether mobs
+		{
+			if (nightRand == 1 && GetBiomeAt(SpawnPos.x, SpawnPos.z) == biHell)
+				Monster = new cZombie();
+			else if (nightRand == 5)
+				Monster = new cGhast();
+			else if (nightRand == 6)
+				Monster = new cZombiepigman();
+		}
+		else
+		{
+			if (nightRand == 0) //random percent to spawn for night
+				Monster = new cSpider();
+			else if (nightRand == 2)
+				Monster = new cEnderman();
+			else if (nightRand == 3)
+				Monster = new cCreeper();
+			else if (nightRand == 4)
+				Monster = new cCavespider();
+			else if (nightRand == 7)
+				Monster = new cSlime();
+			else if (nightRand == 8)
+				Monster = new cSilverfish();
+			else if (nightRand == 9)
+				Monster = new cSkeleton();
+		}
 		//end random percent to spawn for night
 	}
 	else
