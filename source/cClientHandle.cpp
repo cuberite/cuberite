@@ -967,6 +967,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			}
 
 			case E_BLOCK_FURNACE:
+			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_CHEST:
 			{
 				bPlaceBlock = false;
