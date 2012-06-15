@@ -1,11 +1,11 @@
 #pragma once
 
-class cVine			//tolua_export
-{					//tolua_export
+class cVine												//tolua_export
+{														//tolua_export
 public:
 	
-	static char DirectionToMetaData( char a_Direction )
-	{
+	static char DirectionToMetaData( char a_Direction )	//tolua_export
+	{													//tolua_export
 		switch (a_Direction)
 		{
 			case 0x2:
@@ -20,5 +20,5 @@ public:
 				return 0xf;
 		};
 		return 0xf;
-	}				//tolua_export
-};					//tolua_export
+	}													//tolua_export
+};														//tolua_export
