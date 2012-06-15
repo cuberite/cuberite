@@ -182,6 +182,14 @@ public:
 		return NetworkToHostDouble8(m_Data + m_Tags[a_Tag].m_DataStart);
 	}
 	
+	inline AString GetString(int a_Tag) const
+	{
+		ASSERT(m_Tags[a_Tag].m_Type == TAG_String);
+		AString res;
+		res.assign(m_Data + m_Tags[a_Tag].m_DataStart, m_Tags[a_Tag].m_DataLength);
+		return res;
+	}
+	
 protected:
 	const char *             m_Data;
 	int                      m_Length;

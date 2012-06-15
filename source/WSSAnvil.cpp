@@ -10,10 +10,10 @@
 #include "BlockID.h"
 #include "cChestEntity.h"
 #include "cFurnaceEntity.h"
+#include "cSignEntity.h"
 #include "cItem.h"
 #include "StringCompression.h"
 #include "cEntity.h"
-#include "cBlockEntity.h"
 #include "cMakeDir.h"
 #include "FastNBT.h"
 
@@ -136,6 +136,18 @@ protected:
 	}
 
 
+	void AddSignEntity(cSignEntity * a_Sign)
+	{
+		m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Sign, "Sign");
+		m_Writer.AddString("Text1",   a_Sign->GetLine(0));
+		m_Writer.AddString("Text2",   a_Sign->GetLine(1));
+		m_Writer.AddString("Text3",   a_Sign->GetLine(2));
+		m_Writer.AddString("Text4",   a_Sign->GetLine(3));
+		m_Writer.EndCompound();
+	}
+
+
 	virtual bool LightIsValid(bool a_IsLightValid) override
 	{
 		m_IsLightValid = a_IsLightValid;
@@ -168,8 +180,10 @@ protected:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
-			case E_BLOCK_CHEST:   AddChestEntity  ((cChestEntity *)  a_Entity); break;
-			case E_BLOCK_FURNACE: AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
+			case E_BLOCK_CHEST:     AddChestEntity  ((cChestEntity *)  a_Entity); break;
+			case E_BLOCK_FURNACE:   AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
+			case E_BLOCK_SIGN_POST:
+			case E_BLOCK_WALLSIGN:  AddSignEntity   ((cSignEntity *)   a_Entity); break;
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -619,6 +633,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Sign", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadSignFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		// TODO: Other block entities
 	}  // for Child - tag children
 }
@@ -734,6 +752,27 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 	}
 	Furnace->ContinueCooking();
 	a_BlockEntities.push_back(Furnace.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cSignEntity> Sign(new cSignEntity(E_BLOCK_SIGN_POST, x, y, z, m_World));
+	int Text1 = a_NBT.FindChildByName(a_TagIdx, "Text1");
+	if (Text1 >= 0)
+	{
+		Sign->SetLine(0, a_NBT.GetString(Text1));
+	}
+	a_BlockEntities.push_back(Sign.release());
 }
 
 
