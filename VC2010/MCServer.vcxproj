@@ -522,6 +522,7 @@
     <ClInclude Include="..\source\ChunkSender.h" />
     <ClInclude Include="..\source\cIsThread.h" />
     <ClInclude Include="..\Source\cLadder.h" />
+    <ClInclude Include="..\Source\cVine.h" />
     <ClInclude Include="..\source\cLavaSimulator.h" />
     <ClInclude Include="..\Source\cLuaCommandBinder.h" />
     <ClInclude Include="..\source\cMakeDir.h" />

@@ -1388,6 +1388,10 @@
 					RelativePath="..\source\cTorch.h"
 					>
 				</File>
+				<File
+					RelativePath="..\source\cVine.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="UI"

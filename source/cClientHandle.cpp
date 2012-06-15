@@ -18,6 +18,7 @@
 #include "cStep.h"
 #include "cDoors.h"
 #include "cLadder.h"
+#include "cVine.h"
 #include "cSign.h"
 #include "cRedstone.h"
 #include "cPiston.h"
@@ -307,7 +308,7 @@ void cClientHandle::Authenticate(void)
 
 	m_Player->SetIP (m_Socket.GetIPString());
 
-	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_PLAYER_SPAWN, 1, m_Player);
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
 
 	// Return a server login packet
 	cPacket_Login LoginResponse;
@@ -686,7 +687,7 @@ void cClientHandle::HandleLogin(cPacket_Login * a_Packet)
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_LOGIN, 1, a_Packet))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_LOGIN, 1, a_Packet))
 	{
 		Destroy();
 		return;
@@ -796,7 +797,7 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 	BLOCKTYPE  OldBlock = World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 	NIBBLETYPE OldMeta  = World->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_BLOCK_DIG, 4, a_Packet, m_Player, OldBlock, OldMeta))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_BLOCK_DIG, 4, a_Packet, m_Player, OldBlock, OldMeta))
 	{
 		// The plugin doesn't agree with the digging, replace the block on the client and quit:
 		World->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
@@ -921,7 +922,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_BLOCK_PLACE, 2, a_Packet, m_Player))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_BLOCK_PLACE, 2, a_Packet, m_Player))
 	{
 		if (a_Packet->m_Direction > -1)
 		{
@@ -1032,7 +1033,6 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		if (ClickedBlock == E_BLOCK_STEP)
 		{
 		// Only make double slab if meta values are the same and if player clicked either on top or on bottom of the block (direction either 0 or 1)
-		// TODO check if it works from beneath
 			if (MetaData == ( m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) & 0x7) && a_Packet->m_Direction <= 1)
 			//if (MetaData == m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) && a_Packet->m_Direction == 1)
 			{
@@ -1049,7 +1049,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			}
 		}
 		
-		if ((ClickedBlock == E_BLOCK_SNOW) || (ClickedBlock == E_BLOCK_TALL_GRASS))
+		if ((ClickedBlock == E_BLOCK_SNOW) || (ClickedBlock == E_BLOCK_TALL_GRASS) || (ClickedBlock == E_BLOCK_VINES))
 		{
 			switch (a_Packet->m_Direction)
 			{
@@ -1216,11 +1216,11 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				break;
 			}
 
-      case E_BLOCK_STEP:
-      {
-        MetaData += cStep::DirectionToMetaData( a_Packet->m_Direction );
-        break;
-      }
+			case E_BLOCK_STEP:
+			{
+				MetaData += cStep::DirectionToMetaData( a_Packet->m_Direction );
+				break;
+			}
 			
 			case E_BLOCK_COBBLESTONE_STAIRS:
 			case E_BLOCK_BRICK_STAIRS:
@@ -1229,6 +1229,11 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			case E_BLOCK_WOODEN_STAIRS:
 			{
 				MetaData = cStairs::RotationToMetaData(m_Player->GetRotation(), a_Packet->m_Direction);
+				break;
+			}
+			case E_BLOCK_VINES:
+			{
+				MetaData = cVine::DirectionToMetaData(a_Packet->m_Direction);
 				break;
 			}
 			case E_BLOCK_LADDER:
@@ -1579,7 +1584,7 @@ void cClientHandle::HandleRespawn(void)
 void cClientHandle::HandleDisconnect(cPacket_Disconnect * a_Packet)
 {
 	LOG("Received d/c packet from \"%s\"", m_Username.c_str());
-	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_DISCONNECT, 2, a_Packet->m_Reason.c_str(), m_Player))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_DISCONNECT, 2, a_Packet->m_Reason.c_str(), m_Player))
 	{
 		cPacket_Chat DisconnectMessage(m_Username + " disconnected: " + a_Packet->m_Reason);
 		cRoot::Get()->GetServer()->Broadcast(DisconnectMessage);
@@ -1838,7 +1843,7 @@ void cClientHandle::SendConfirmPosition(void)
 	
 	m_State = csConfirmingPos;
 
-	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_PLAYER_JOIN, 1, m_Player))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_JOIN, 1, m_Player))
 	{
 		// Broadcast that this player has joined the game! Yay~
 		cPacket_Chat Joined(m_Username + " joined the game!");

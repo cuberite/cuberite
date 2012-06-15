@@ -996,6 +996,9 @@
     <ClInclude Include="..\Source\cLadder.h">
       <Filter>HandyStuff</Filter>
     </ClInclude>
+    <ClInclude Include="..\Source\cVine.h">
+      <Filter>HandyStuff</Filter>
+    </ClInclude>
     <ClInclude Include="..\Source\cGroupManager.h">
       <Filter>cGroupManager</Filter>
     </ClInclude>
