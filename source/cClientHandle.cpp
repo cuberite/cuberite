@@ -1049,7 +1049,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			}
 		}
 		
-		if (ClickedBlock == E_BLOCK_SNOW)
+		if ((ClickedBlock == E_BLOCK_SNOW) || (ClickedBlock == E_BLOCK_TALL_GRASS))
 		{
 			switch (a_Packet->m_Direction)
 			{
