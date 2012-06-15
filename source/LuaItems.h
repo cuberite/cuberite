@@ -43,10 +43,12 @@ public:
 	{
 		m_Items[a_Idx] = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 	}
+	
 protected:
 	cItems & m_Items;
 } ;
 // tolua_end
+
 
 
 
