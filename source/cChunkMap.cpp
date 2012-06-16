@@ -932,6 +932,21 @@ void cChunkMap::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_Ch
 
 
 
+bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return false;
+	}
+	return Chunk->ForEachEntity(a_Callback);
+}
+
+
+
+
+
 void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);

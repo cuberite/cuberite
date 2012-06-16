@@ -40,7 +40,7 @@ class cPlayer;
 class cChunkMap;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
-
+typedef cItemCallback<cEntity> cEntityCallback;
 
 
 
@@ -143,6 +143,9 @@ public:
 	void AddEntity( cEntity * a_Entity);
 	void RemoveEntity( cEntity * a_Entity);
 	
+	/// Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true
+	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
 	void CalculateLighting(); // Recalculate right now

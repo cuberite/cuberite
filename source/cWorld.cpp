@@ -1602,23 +1602,6 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 
 
 
-bool cWorld::DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback )
-{
-	cCSLock Lock(m_CSEntities);
-	for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end(); ++itr )
-	{
-		if( (*itr)->GetUniqueID() == a_UniqueID )
-		{
-			return a_Callback.Item(*itr);
-		}
-	} // for itr - m_AllEntities[]
-	return false;
-}
-
-
-
-
-
 void cWorld::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	m_ChunkMap->RemoveEntityFromChunk(a_Entity, a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -1631,6 +1614,49 @@ void cWorld::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_Chunk
 void cWorld::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	m_ChunkMap->MoveEntityToChunk(a_Entity, a_ChunkX, a_ChunkY, a_ChunkZ);
+}
+
+
+
+
+
+bool cWorld::ForEachEntity(cEntityCallback & a_Callback)
+{
+	cCSLock Lock(m_CSEntities);
+	for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end(); ++itr )
+	{
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	} // for itr - m_AllEntities[]
+	return false;
+}
+
+
+
+
+
+bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachEntityInChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithEntityByID( int a_UniqueID, cEntityCallback & a_Callback )
+{
+	cCSLock Lock(m_CSEntities);
+	for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end(); ++itr )
+	{
+		if( (*itr)->GetUniqueID() == a_UniqueID )
+		{
+			return a_Callback.Item(*itr);
+		}
+	} // for itr - m_AllEntities[]
+	return false;
 }
 
 

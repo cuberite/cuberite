@@ -124,6 +124,7 @@ public:
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
 
+	/// Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true
  	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 	
 	unsigned int GetNumPlayers();													//tolua_export
@@ -146,6 +147,15 @@ public:
 	
 	/// Moves the entity from its current chunk to the new chunk specified
 	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	
+	/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
+	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	
+	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
+	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+
+	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param
+	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // TODO: Exported in ManualBindings.cpp
 
 	/// Compares clients of two chunks, calls the callback accordingly
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -192,9 +202,6 @@ public:
 	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = NULL);
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
-
-	// TODO: Export to Lua
-	bool DoWithEntity( int a_UniqueID, cEntityCallback & a_Callback );
 
 	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );						//tolua_export
 	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );					//tolua_export

@@ -21,6 +21,7 @@ class cPlayer;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
+typedef cItemCallback<cEntity> cEntityCallback;
 
 
 
@@ -126,6 +127,9 @@ public:
 	/// Removes the entity from the chunk specified
 	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
+	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
+	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
+
 	/// Touches the chunk, causing it to be loaded or generated
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	

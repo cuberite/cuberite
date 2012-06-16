@@ -1566,7 +1566,7 @@ void cClientHandle::HandleUseEntity(cPacket_UseEntity * a_Packet)
 	Callback.Instigator = m_Player;
 
 	cWorld * World = m_Player->GetWorld();
-	World->DoWithEntity( a_Packet->m_TargetID, Callback );
+	World->DoWithEntityByID(a_Packet->m_TargetID, Callback);
 }
 
 

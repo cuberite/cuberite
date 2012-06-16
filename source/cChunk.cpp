@@ -1473,6 +1473,23 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 
 
+bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
+{
+	// The entity list is locked by the parent chunkmap's CS
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	{
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_Entitites[]
+	return true;
+}
+
+
+
+
+
 BLOCKTYPE cChunk::GetBlock( int a_X, int a_Y, int a_Z )
 {
 	if ((a_X < 0) || (a_X >= Width) || (a_Y < 0) || (a_Y >= Height) || (a_Z < 0) || (a_Z >= Width)) return 0; // Clip

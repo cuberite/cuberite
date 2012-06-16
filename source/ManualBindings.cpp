@@ -102,6 +102,102 @@ static int tolua_LOGERROR(lua_State* tolua_S)
 
 
 
+static int tolua_cWorld_ForEachEntityInChunk(lua_State * tolua_S)
+{
+	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
+	if ((NumArgs != 3) && (NumArgs != 4))
+	{
+		LOGWARN("Error in function call 'ForEachEntityInChunk': Requires 3 or 4 arguments, got %i", NumArgs);
+		return 0;
+	}
+	
+	cWorld * self = (cWorld *)  tolua_tousertype(tolua_S, 1, 0);
+	if (!lua_isnumber(tolua_S, 2) || !lua_isnumber(tolua_S, 3))
+	{
+		LOGWARN("Errorin function call 'ForEachEntityInChunk': Expected a number for parameters #1 and #2");
+		return 0;
+	}
+	
+	int ChunkX = ((int)tolua_tonumber(tolua_S, 2, 0));
+	int ChunkZ = ((int)tolua_tonumber(tolua_S, 3, 0));
+
+	if (!lua_isfunction( tolua_S, 4))
+	{
+		LOGWARN("Error in function call 'ForEachEntityInChunk': Expected a function for parameter #3");
+		return 0;
+	}
+	
+	/* luaL_ref gets reference to value on top of the stack, the table is the last argument and therefore on the top */
+	int TableRef = LUA_REFNIL;
+	if (NumArgs == 4)
+	{
+		TableRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+		if (TableRef == LUA_REFNIL)
+		{
+			LOGWARN("Error in function call 'ForEachEntityInChunk': Could not get value reference of parameter #4");
+			return 0;
+		}
+	}
+	
+	/* table value is popped, and now function is on top of the stack */
+	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+	if (FuncRef == LUA_REFNIL)
+	{
+		LOGWARN("Error in function call 'ForEachEntityInChunk': Could not get function reference of parameter #3");
+		return 0;
+	}
+	
+	class cLuaPlayerCallback : public cItemCallback<cEntity>
+	{
+	public:
+		cLuaPlayerCallback(lua_State* a_LuaState, int a_FuncRef, int a_TableRef)
+			: LuaState( a_LuaState )
+			, FuncRef( a_FuncRef )
+			, TableRef( a_TableRef )
+		{}
+		
+	private:
+		virtual bool Item(cEntity * a_Item) override
+		{
+			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
+			tolua_pushusertype(LuaState, a_Item, "cEntity");
+			if (TableRef != LUA_REFNIL)
+			{
+				lua_rawgeti( LuaState, LUA_REGISTRYINDEX, TableRef);  /* Push table reference */
+			}
+			
+			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
+			if (report_errors(LuaState, s))
+			{
+				return true;  /* Abort enumeration */
+			}
+			
+			if (lua_isboolean(LuaState, -1))
+			{
+				return (tolua_toboolean( LuaState, -1, 0) > 0);
+			}
+			return false;  /* Continue enumeration */
+		}
+		lua_State * LuaState;
+		int FuncRef;
+		int TableRef;
+	} Callback(tolua_S, FuncRef, TableRef);
+	
+	bool bRetVal = self->ForEachEntityInChunk(ChunkX, ChunkZ, Callback);
+	
+	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
+	luaL_unref(tolua_S, LUA_REGISTRYINDEX, TableRef);
+	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
+	
+	/* Push return value on stack */
+	tolua_pushboolean(tolua_S, bRetVal );
+	return 1;
+}
+
+
+
+
+
 #define DEFINE_LUA_FOREACH(CONTAINER,ITEM,FOREACH,FNNAME) \
 static int FNNAME(lua_State * tolua_S) \
 { \
@@ -191,14 +287,15 @@ static int FNNAME(lua_State * tolua_S) \
 
 
 // Define the ForEach enumerators:
-DEFINE_LUA_FOREACH(cWorld,cPlayer,ForEachPlayer, tolua_cWorld_ForEachPlayer);
-DEFINE_LUA_FOREACH(cRoot, cWorld, ForEachWorld,  tolua_cRoot_ForEachWorld);
+DEFINE_LUA_FOREACH(cWorld, cPlayer, ForEachPlayer, tolua_cWorld_ForEachPlayer);
+DEFINE_LUA_FOREACH(cRoot,  cWorld,  ForEachWorld,  tolua_cRoot_ForEachWorld);
+DEFINE_LUA_FOREACH(cWorld, cEntity, ForEachEntity, tolua_cWorld_ForEachEntity);
 
 
 
 
 
-static int tolua_cPlugin_GetCommands(lua_State* tolua_S)
+static int tolua_cPlugin_GetCommands(lua_State * tolua_S)
 {
 	cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
 
@@ -482,32 +579,39 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 void ManualBindings::Bind( lua_State* tolua_S )
 {
 	tolua_beginmodule(tolua_S,NULL);
-		tolua_function(tolua_S,"StringSplit",tolua_StringSplit);
-		tolua_function(tolua_S,"LOG",tolua_LOG);
-		tolua_function(tolua_S,"LOGINFO",tolua_LOGINFO);
-		tolua_function(tolua_S,"LOGWARN",tolua_LOGWARN);
-		tolua_function(tolua_S,"LOGERROR",tolua_LOGERROR);
-		tolua_function(tolua_S,"Log",tolua_LOG); // Deprecated
+		tolua_function(tolua_S, "StringSplit", tolua_StringSplit);
+		tolua_function(tolua_S, "LOG",         tolua_LOG);
+		tolua_function(tolua_S, "LOGINFO",     tolua_LOGINFO);
+		tolua_function(tolua_S, "LOGWARN",     tolua_LOGWARN);
+		tolua_function(tolua_S, "LOGERROR",    tolua_LOGERROR);
+		tolua_function(tolua_S, "Log",         tolua_LOG); // Deprecated
 
-		tolua_beginmodule(tolua_S,"cRoot");
-			tolua_function(tolua_S,"ForEachWorld",tolua_cRoot_ForEachWorld);
+		tolua_beginmodule(tolua_S, "cRoot");
+			tolua_function(tolua_S, "ForEachWorld", tolua_cRoot_ForEachWorld);
 		tolua_endmodule(tolua_S);
-		tolua_beginmodule(tolua_S,"cWorld");
-			tolua_function(tolua_S,"ForEachPlayer",tolua_cWorld_ForEachPlayer);
+		
+		tolua_beginmodule(tolua_S, "cWorld");
+			tolua_function(tolua_S, "ForEachPlayer",        tolua_cWorld_ForEachPlayer);
+			tolua_function(tolua_S, "ForEachEntity",        tolua_cWorld_ForEachEntity);
+			tolua_function(tolua_S, "ForEachEntityInChunk", tolua_cWorld_ForEachEntityInChunk);
 		tolua_endmodule(tolua_S);
-		tolua_beginmodule(tolua_S,"cPlugin");
-			tolua_function(tolua_S,"GetCommands",tolua_cPlugin_GetCommands);
-			tolua_function(tolua_S,"BindCommand",tolua_cPlugin_BindCommand);
+		
+		tolua_beginmodule(tolua_S, "cPlugin");
+			tolua_function(tolua_S, "GetCommands", tolua_cPlugin_GetCommands);
+			tolua_function(tolua_S, "BindCommand", tolua_cPlugin_BindCommand);
 		tolua_endmodule(tolua_S);
-		tolua_beginmodule(tolua_S,"cPluginManager");
-			tolua_function(tolua_S,"GetAllPlugins",tolua_cPluginManager_GetAllPlugins);
+		
+		tolua_beginmodule(tolua_S, "cPluginManager");
+			tolua_function(tolua_S, "GetAllPlugins", tolua_cPluginManager_GetAllPlugins);
 		tolua_endmodule(tolua_S);
-		tolua_beginmodule(tolua_S,"cPlayer");
-			tolua_function(tolua_S,"GetGroups",tolua_cPlayer_GetGroups);
-			tolua_function(tolua_S,"GetResolvedPermissions",tolua_cPlayer_GetResolvedPermissions);
+		
+		tolua_beginmodule(tolua_S, "cPlayer");
+			tolua_function(tolua_S, "GetGroups",              tolua_cPlayer_GetGroups);
+			tolua_function(tolua_S, "GetResolvedPermissions", tolua_cPlayer_GetResolvedPermissions);
 		tolua_endmodule(tolua_S);
-		tolua_beginmodule(tolua_S,"cWebPlugin_Lua");
-			tolua_function(tolua_S,"AddTab",tolua_cWebPlugin_Lua_AddTab);
+		
+		tolua_beginmodule(tolua_S, "cWebPlugin_Lua");
+			tolua_function(tolua_S, "AddTab", tolua_cWebPlugin_Lua_AddTab);
 		tolua_endmodule(tolua_S);
 
 		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);
@@ -519,12 +623,12 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
 		tolua_endmodule(tolua_S);
 			
-		tolua_beginmodule(tolua_S,"cClientHandle");
-			tolua_constant(tolua_S,"MIN_VIEW_DISTANCE",cClientHandle::MIN_VIEW_DISTANCE);
-			tolua_constant(tolua_S,"MAX_VIEW_DISTANCE",cClientHandle::MAX_VIEW_DISTANCE);
+		tolua_beginmodule(tolua_S, "cClientHandle");
+			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
+			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
 		tolua_endmodule(tolua_S);
 
-		tolua_function(tolua_S,"md5",tolua_md5);
+		tolua_function(tolua_S, "md5", tolua_md5);
 
 	tolua_endmodule(tolua_S);
 }
