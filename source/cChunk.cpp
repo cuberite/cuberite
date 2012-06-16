@@ -591,8 +591,27 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 				break;
 			}
 			
-			case E_BLOCK_LEAVES: //todo, http://www.minecraftwiki.net/wiki/Data_values#Leaves
+			case E_BLOCK_LEAVES:
 			{
+				NIBBLETYPE Meta = GetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
+				if (((Meta & 0x04) == 0) && ((Meta & 0x08) == 1)){
+					int x,y,z,f = 0;
+					for( y = 4; y > - 5; y-- ) {
+						for( x = - 4; x < 5; x++ ){
+							for( z = - 4; z < 5; z++ ){
+								if((x<0 ? -x : x) + (y<0 ? -y : y) + (z<0 ? -z : z) > 4) continue;
+								if(GetBlock(m_BlockTickX + x, m_BlockTickY + y, m_BlockTickZ + z) == E_BLOCK_LOG){
+									f = 1;
+								}
+							}
+						}
+					}
+					if(f==0){
+						SetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, 0, 0);
+					}else{
+						SetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Meta -= 8);
+					}
+				}
 				break;
 			}
 			

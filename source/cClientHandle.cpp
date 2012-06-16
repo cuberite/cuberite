@@ -1270,6 +1270,11 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 				bRemoveItem = false;
 				break;
 			}
+			case E_BLOCK_LEAVES: 
+			{
+				MetaData += 0x4;
+				break;
+			}
 			case E_ITEM_SEEDS:
 			{
 				if (ClickedBlock != E_BLOCK_FARMLAND)
