@@ -514,7 +514,7 @@ bool cPluginManager::CallHookBlockToPickup(
 
 bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGED);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
@@ -528,6 +528,49 @@ bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
 	}
 	return false;
 }
+
+
+
+
+
+bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATING_SIGN);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATED_SIGN);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 
 
 

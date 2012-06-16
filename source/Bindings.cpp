@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on Sat Jun 16 00:40:32 2012.
+** Generated automatically by tolua++-1.0.92 on 06/16/12 17:04:45.
 */
 
 #ifndef __cplusplus
@@ -8117,6 +8117,110 @@ static int tolua_AllToLua_cPlugin_OnWeatherChanged00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: OnUpdatingSign of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnUpdatingSign00
+static int tolua_AllToLua_cPlugin_OnUpdatingSign00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  AString a_Line1 = ((AString)  tolua_tocppstring(tolua_S,6,0));
+  AString a_Line2 = ((AString)  tolua_tocppstring(tolua_S,7,0));
+  AString a_Line3 = ((AString)  tolua_tocppstring(tolua_S,8,0));
+  AString a_Line4 = ((AString)  tolua_tocppstring(tolua_S,9,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnUpdatingSign'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
+  }
+ }
+ return 5;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnUpdatingSign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: OnUpdatedSign of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnUpdatedSign00
+static int tolua_AllToLua_cPlugin_OnUpdatedSign00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  const AString a_Line1 = ((const AString)  tolua_tocppstring(tolua_S,6,0));
+  const AString a_Line2 = ((const AString)  tolua_tocppstring(tolua_S,7,0));
+  const AString a_Line3 = ((const AString)  tolua_tocppstring(tolua_S,8,0));
+  const AString a_Line4 = ((const AString)  tolua_tocppstring(tolua_S,9,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnUpdatedSign'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
+  }
+ }
+ return 5;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'OnUpdatedSign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetName of class  cPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_GetName00
 static int tolua_AllToLua_cPlugin_GetName00(lua_State* tolua_S)
@@ -8621,6 +8725,42 @@ public:
 			return ( bool ) cPlugin:: OnWeatherChanged(a_World);
 		};
 	};
+	 bool  OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
+		if (push_method("OnUpdatingSign",  tolua_AllToLua_cPlugin_OnUpdatingSign00)) {
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockY);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockZ);
+			tolua_pushcppstring(lua_state, (const char*)a_Line1);
+			tolua_pushcppstring(lua_state, (const char*)a_Line2);
+			tolua_pushcppstring(lua_state, (const char*)a_Line3);
+			tolua_pushcppstring(lua_state, (const char*)a_Line4);
+			ToluaBase::dbcall(lua_state, 9, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin:: OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+		};
+	};
+	 bool  OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
+		if (push_method("OnUpdatedSign",  tolua_AllToLua_cPlugin_OnUpdatedSign00)) {
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockY);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockZ);
+			tolua_pushcppstring(lua_state, (const char*)a_Line1);
+			tolua_pushcppstring(lua_state, (const char*)a_Line2);
+			tolua_pushcppstring(lua_state, (const char*)a_Line3);
+			tolua_pushcppstring(lua_state, (const char*)a_Line4);
+			ToluaBase::dbcall(lua_state, 9, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin:: OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+		};
+	};
 
 	 void cPlugin__OnDisable( void ) {
 		return ( void )cPlugin::OnDisable();
@@ -8681,6 +8821,12 @@ public:
 	};
 	 bool cPlugin__OnWeatherChanged( cWorld* a_World) {
 		return ( bool )cPlugin::OnWeatherChanged(a_World);
+	};
+	 bool cPlugin__OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
+		return ( bool )cPlugin::OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+	};
+	 bool cPlugin__OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
+		return ( bool )cPlugin::OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
 	};
 	 Lua__cPlugin( void ): cPlugin(){};
 };
@@ -9437,6 +9583,110 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnWeatherChanged00(lua_State* to
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: cPlugin__OnUpdatingSign of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatingSign00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatingSign00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  AString a_Line1 = ((AString)  tolua_tocppstring(tolua_S,6,0));
+  AString a_Line2 = ((AString)  tolua_tocppstring(tolua_S,7,0));
+  AString a_Line3 = ((AString)  tolua_tocppstring(tolua_S,8,0));
+  AString a_Line4 = ((AString)  tolua_tocppstring(tolua_S,9,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnUpdatingSign'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin__OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
+  }
+ }
+ return 5;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnUpdatingSign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cPlugin__OnUpdatedSign of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatedSign00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatedSign00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  const AString a_Line1 = ((const AString)  tolua_tocppstring(tolua_S,6,0));
+  const AString a_Line2 = ((const AString)  tolua_tocppstring(tolua_S,7,0));
+  const AString a_Line3 = ((const AString)  tolua_tocppstring(tolua_S,8,0));
+  const AString a_Line4 = ((const AString)  tolua_tocppstring(tolua_S,9,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnUpdatedSign'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cPlugin__OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
+  }
+ }
+ return 5;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnUpdatedSign'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  Lua__cPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_new00
 static int tolua_AllToLua_Lua__cPlugin_new00(lua_State* tolua_S)
@@ -9902,6 +10152,42 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnWeatherChanged(a_World);
 		};
 	};
+	 bool  OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
+		if (push_method("OnUpdatingSign",  tolua_AllToLua_cPlugin_OnUpdatingSign00)) {
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockY);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockZ);
+			tolua_pushcppstring(lua_state, (const char*)a_Line1);
+			tolua_pushcppstring(lua_state, (const char*)a_Line2);
+			tolua_pushcppstring(lua_state, (const char*)a_Line3);
+			tolua_pushcppstring(lua_state, (const char*)a_Line4);
+			ToluaBase::dbcall(lua_state, 9, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+		};
+	};
+	 bool  OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
+		if (push_method("OnUpdatedSign",  tolua_AllToLua_cPlugin_OnUpdatedSign00)) {
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockY);
+			tolua_pushnumber(lua_state, (lua_Number)a_BlockZ);
+			tolua_pushcppstring(lua_state, (const char*)a_Line1);
+			tolua_pushcppstring(lua_state, (const char*)a_Line2);
+			tolua_pushcppstring(lua_state, (const char*)a_Line3);
+			tolua_pushcppstring(lua_state, (const char*)a_Line4);
+			ToluaBase::dbcall(lua_state, 9, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlugin_NewLua:: OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+		};
+	};
 
 	 void cPlugin_NewLua__OnDisable( void ) {
 		return ( void )cPlugin_NewLua::OnDisable();
@@ -9965,6 +10251,12 @@ public:
 	};
 	 bool cPlugin_NewLua__OnWeatherChanged( cWorld* a_World) {
 		return ( bool )cPlugin_NewLua::OnWeatherChanged(a_World);
+	};
+	 bool cPlugin_NewLua__OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
+		return ( bool )cPlugin_NewLua::OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+	};
+	 bool cPlugin_NewLua__OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
+		return ( bool )cPlugin_NewLua::OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
 	};
 };
 
@@ -20873,6 +21165,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_POST_CRAFTING",cPluginManager::HOOK_POST_CRAFTING);
    tolua_constant(tolua_S,"HOOK_BLOCK_TO_PICKUP",cPluginManager::HOOK_BLOCK_TO_PICKUP);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
+   tolua_constant(tolua_S,"HOOK_UPDATING_SIGN",cPluginManager::HOOK_UPDATING_SIGN);
+   tolua_constant(tolua_S,"HOOK_UPDATED_SIGN",cPluginManager::HOOK_UPDATED_SIGN);
    tolua_constant(tolua_S,"E_PLUGIN_TICK",cPluginManager::E_PLUGIN_TICK);
    tolua_constant(tolua_S,"E_PLUGIN_CHAT",cPluginManager::E_PLUGIN_CHAT);
    tolua_constant(tolua_S,"E_PLUGIN_COLLECT_ITEM",cPluginManager::E_PLUGIN_COLLECT_ITEM);
@@ -20927,6 +21221,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"OnPostCrafting",tolua_AllToLua_cPlugin_OnPostCrafting00);
    tolua_function(tolua_S,"OnBlockToPickup",tolua_AllToLua_cPlugin_OnBlockToPickup00);
    tolua_function(tolua_S,"OnWeatherChanged",tolua_AllToLua_cPlugin_OnWeatherChanged00);
+   tolua_function(tolua_S,"OnUpdatingSign",tolua_AllToLua_cPlugin_OnUpdatingSign00);
+   tolua_function(tolua_S,"OnUpdatedSign",tolua_AllToLua_cPlugin_OnUpdatedSign00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cPlugin_GetName00);
    tolua_function(tolua_S,"SetName",tolua_AllToLua_cPlugin_SetName00);
    tolua_function(tolua_S,"GetVersion",tolua_AllToLua_cPlugin_GetVersion00);
@@ -20966,6 +21262,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cPlugin__OnPostCrafting",tolua_AllToLua_Lua__cPlugin_cPlugin__OnPostCrafting00);
    tolua_function(tolua_S,"cPlugin__OnBlockToPickup",tolua_AllToLua_Lua__cPlugin_cPlugin__OnBlockToPickup00);
    tolua_function(tolua_S,"cPlugin__OnWeatherChanged",tolua_AllToLua_Lua__cPlugin_cPlugin__OnWeatherChanged00);
+   tolua_function(tolua_S,"cPlugin__OnUpdatingSign",tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatingSign00);
+   tolua_function(tolua_S,"cPlugin__OnUpdatedSign",tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatedSign00);
    tolua_function(tolua_S,"new",tolua_AllToLua_Lua__cPlugin_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cPlugin_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_Lua__cPlugin_new00_local);

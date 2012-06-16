@@ -55,7 +55,9 @@ public:																	//tolua_export
 		HOOK_CRAFTING_NO_RECIPE,  /// cPlayer, cCraftingGrid, cCraftingRecipe
 		HOOK_POST_CRAFTING,       /// cPlayer, cCraftingGrid, cCraftingRecipe
 		HOOK_BLOCK_TO_PICKUP,     /// BlockType, BlockMeta, cPlayer, cItem, cItems
-		HOOK_WEATHER_CHANGED,
+		HOOK_WEATHER_CHANGED,     /// cWorld
+		HOOK_UPDATING_SIGN,       /// cWorld, int, int, int, string, string, string, string
+		HOOK_UPDATED_SIGN,        /// cWorld, int, int, int, string, string, string, string
 		
 		// E_PLUGIN_ names are obsolete, but are kept for compatibility reasons
 		E_PLUGIN_TICK             = HOOK_TICK,
@@ -91,6 +93,7 @@ public:																	//tolua_export
 
 	unsigned int GetNumPlugins() const;									//tolua_export
 
+	// If the hook returns true, no further hook is called and the functions return false
 	bool CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... );
 	
 	bool CallHookChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_Chunk);
@@ -99,6 +102,8 @@ public:																	//tolua_export
 	bool CallHookPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
 	bool CallHookWeatherChanged  (cWorld * a_World);
+	bool CallHookUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4);
+	bool CallHookUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	void RemoveHooks( cPlugin* a_Plugin );
 	void RemovePlugin( cPlugin* a_Plugin, bool a_bDelete = false );		//tolua_export

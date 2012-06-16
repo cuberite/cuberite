@@ -531,6 +531,90 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 
 
 
+bool cPlugin_NewLua::OnUpdatingSign(
+	cWorld * a_World, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4
+)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnUpdatingSign"))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushstring  (m_LuaState, a_Line1.c_str());
+	tolua_pushstring  (m_LuaState, a_Line2.c_str());
+	tolua_pushstring  (m_LuaState, a_Line3.c_str());
+	tolua_pushstring  (m_LuaState, a_Line4.c_str());
+
+	if (!CallFunction(8, 5, "OnUpdatingSign"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -5, 0) > 0);
+	if (lua_isstring(m_LuaState, -4))
+	{
+		a_Line1 = tolua_tostring(m_LuaState, -4, "");
+	}
+	if (lua_isstring(m_LuaState, -3))
+	{
+		a_Line2 = tolua_tostring(m_LuaState, -3, "");
+	}
+	if (lua_isstring(m_LuaState, -2))
+	{
+		a_Line3 = tolua_tostring(m_LuaState, -2, "");
+	}
+	if (lua_isstring(m_LuaState, -1))
+	{
+		a_Line4 = tolua_tostring(m_LuaState, -1, "");
+	}
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnUpdatedSign(
+	cWorld * a_World, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
+)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnUpdatedSign"))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushstring  (m_LuaState, a_Line1.c_str());
+	tolua_pushstring  (m_LuaState, a_Line2.c_str());
+	tolua_pushstring  (m_LuaState, a_Line3.c_str());
+	tolua_pushstring  (m_LuaState, a_Line4.c_str());
+
+	if (!CallFunction(8, 1, "OnUpdatedSign"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
 cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
 {
 	cCSLock Lock( m_CriticalSection );
