@@ -203,9 +203,12 @@ cClientHandle::~cClientHandle()
 
 	if (m_Socket.IsValid())
 	{
-		cPacket_Disconnect Disconnect;
-		Disconnect.m_Reason = "Server shut down? Kthnxbai";
-		m_Socket.Send(&Disconnect);
+		if(!m_bKicking)
+		{
+			cPacket_Disconnect Disconnect;
+			Disconnect.m_Reason = "Server shut down? Kthnxbai";
+			m_Socket.Send(&Disconnect);
+		}
 	}
 	
 	if (m_Player != NULL)
