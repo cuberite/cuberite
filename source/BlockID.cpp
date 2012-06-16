@@ -195,16 +195,23 @@ public:
 
 		// Spread blocks
 		g_BlockSpreadLightFalloff[E_BLOCK_AIR]              = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_CAKE]             = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_CHEST]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_CROPS]            = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_FENCE]            = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_FENCE_GATE]       = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_FIRE]             = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_GLASS]            = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_GLASS_PLANE]      = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_GLOWSTONE]        = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_IRON_BARS]        = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_IRON_DOOR]        = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_LEAVES]           = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_SIGN_POST]        = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_TORCH]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_VINES]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_WALLSIGN]         = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_WOODEN_DOOR]      = 1;
 		// Light in water and lava dissapears faster:
 		g_BlockSpreadLightFalloff[E_BLOCK_LAVA]             = 2;
 		g_BlockSpreadLightFalloff[E_BLOCK_STATIONARY_LAVA]  = 2;

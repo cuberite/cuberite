@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/16/12 17:04:45.
+** Generated automatically by tolua++-1.0.92 on 06/16/12 20:12:04.
 */
 
 #ifndef __cplusplus
@@ -20478,7 +20478,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_STONE_BRICKS",E_BLOCK_STONE_BRICKS);
   tolua_constant(tolua_S,"E_BLOCK_HUGE_BROWN_MUSHROOM",E_BLOCK_HUGE_BROWN_MUSHROOM);
   tolua_constant(tolua_S,"E_BLOCK_HUGE_RED_MUSHROOM",E_BLOCK_HUGE_RED_MUSHROOM);
+  tolua_constant(tolua_S,"E_BLOCK_IRON_BARS",E_BLOCK_IRON_BARS);
   tolua_constant(tolua_S,"E_BLOCK_IRON_BAR",E_BLOCK_IRON_BAR);
+  tolua_constant(tolua_S,"E_BLOCK_GLASS_PANE",E_BLOCK_GLASS_PANE);
   tolua_constant(tolua_S,"E_BLOCK_GLASS_PLANE",E_BLOCK_GLASS_PLANE);
   tolua_constant(tolua_S,"E_BLOCK_MELON",E_BLOCK_MELON);
   tolua_constant(tolua_S,"E_BLOCK_PUMPKIN_STEM",E_BLOCK_PUMPKIN_STEM);
