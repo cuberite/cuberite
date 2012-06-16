@@ -161,7 +161,13 @@ bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a
 		return false;
 	}
 	
-	Link.SendMessage( AString( "GET " + a_Address + " HTTP/1.0\r\n\r\n" ).c_str());
+	Link.SendMessage( AString( "GET " + a_Address + " HTTP/1.1\r\n" ).c_str());
+	Link.SendMessage( AString( "User-Agent: MCServer\r\n" ).c_str());
+	// FIXME: AString( "Host: %s\r\n", a_Server.c_str() ).c_str() doesn't work. Causes segfault.
+	Link.SendMessage( AString( "Host: session.minecraft.net\r\n" ).c_str());
+	Link.SendMessage( AString( "Accept: */*\r\n" ).c_str());
+	Link.SendMessage( AString( "Connection: keep-alive\r\n" ).c_str());
+	Link.SendMessage( AString( "\r\n" ).c_str());
 	AString DataRecvd;
 	Link.ReceiveData(DataRecvd);
 	Link.CloseSocket();
@@ -260,7 +266,10 @@ bool cAuthenticator::AuthFromAddress(const AString & a_Server, const AString & a
 	std::string Result;
 	ss >> Result;
 	LOGINFO("Got result: %s", Result.c_str());
-	if (Result.compare("YES") == 0)
+	// if (Result.compare("YES") == 0)
+	// TODO: I'm assuming the only response containing 3 letters is "YES", but proper reading of the return code
+	//       would be preferred.
+	if (Result.compare("3") == 0) // FIXME: Quick and dirty hack to support auth
 	{
 		LOGINFO("Result was \"YES\", so player is authenticated!");
 		return true;
