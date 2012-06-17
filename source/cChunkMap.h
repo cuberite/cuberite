@@ -18,10 +18,14 @@ class cChunkStay;
 class cChunk;
 class cPacket;
 class cPlayer;
+class cChestEntity;
+class cFurnaceEntity;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
-typedef cItemCallback<cEntity> cEntityCallback;
+typedef cItemCallback<cEntity>        cEntityCallback;
+typedef cItemCallback<cChestEntity>   cChestCallback;
+typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
 
 
 
@@ -129,6 +133,21 @@ public:
 	
 	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
+
+	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
+	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Lua-accessible
+
+	/// Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true
+	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Lua-accessible
+	
+	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
+	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Lua-acessible
+
+	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords, true if found
+	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
+
+	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
+	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/// Touches the chunk, causing it to be loaded or generated
 	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);

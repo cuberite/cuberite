@@ -1540,6 +1540,160 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 
 
 
+bool cChunk::ForEachChest(cChestCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
+		{
+			continue;
+		}
+		if (a_Callback.Item((cChestEntity *)*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_BlockEntitites[]
+	return true;
+}
+
+
+
+
+
+bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		switch ((*itr)->GetBlockType())
+		{
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_LIT_FURNACE:
+			{
+				break;
+			}
+			default:
+			{
+				continue;
+			}
+		}
+		if (a_Callback.Item((cFurnaceEntity *)*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_BlockEntitites[]
+	return true;
+}
+
+
+
+
+
+bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here
+		if (a_Callback.Item((cChestEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		switch ((*itr)->GetBlockType())
+		{
+			case E_BLOCK_FURNACE:
+			case E_BLOCK_LIT_FURNACE:
+			{
+				break;
+			}
+			default:
+			{
+				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+				return false;
+			}
+		}  // switch (BlockType)
+		
+		// The correct block entity is here, 
+		if (a_Callback.Item((cFurnaceEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		switch ((*itr)->GetBlockType())
+		{
+			case E_BLOCK_WALLSIGN:
+			case E_BLOCK_SIGN_POST:
+			{
+				a_Line1 = ((cSignEntity *)*itr)->GetLine(0);
+				a_Line2 = ((cSignEntity *)*itr)->GetLine(1);
+				a_Line3 = ((cSignEntity *)*itr)->GetLine(2);
+				a_Line4 = ((cSignEntity *)*itr)->GetLine(3);
+				return true;
+			}
+		}  // switch (BlockType)
+		
+		// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+		return false;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
 BLOCKTYPE cChunk::GetBlock( int a_X, int a_Y, int a_Z )
 {
 	if ((a_X < 0) || (a_X >= Width) || (a_Y < 0) || (a_Y >= Height) || (a_Z < 0) || (a_Z >= Width)) return 0; // Clip

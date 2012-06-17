@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/16/12 20:12:04.
+** Generated automatically by tolua++-1.0.92 on 06/17/12 20:43:06.
 */
 
 #ifndef __cplusplus
@@ -174,24 +174,23 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"BLOCKTYPE");
- tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"TakeDamageInfo");
- tolua_usertype(tolua_S,"HTTPFormData");
- tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"cLuaChunk");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"NIBBLETYPE");
- tolua_usertype(tolua_S,"cCraftingRecipes");
+ tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
  tolua_usertype(tolua_S,"cTCPLink");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"Lua__cTCPLink");
  tolua_usertype(tolua_S,"Json::Value");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cRoot");
+ tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
@@ -199,13 +198,13 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cStep");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cStairs");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cPacket_PickupSpawn");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"Lua__cTCPLink");
+ tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cPlugin_Lua");
@@ -214,15 +213,15 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPacket");
  tolua_usertype(tolua_S,"cPacket_BlockDig");
  tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"cGroupManager");
- tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPlugin");
- tolua_usertype(tolua_S,"cInventory");
+ tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cPacket_BlockPlace");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"Lua__cPlayer");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cEntity");
@@ -230,7 +229,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
- tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"cVine");
@@ -11468,9 +11467,9 @@ static int tolua_AllToLua_cWorld_GetSpawnZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetBlockEntity of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlockEntity00
-static int tolua_AllToLua_cWorld_GetBlockEntity00(lua_State* tolua_S)
+/* method: GetSignLines of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetSignLines00
+static int tolua_AllToLua_cWorld_GetSignLines00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -11479,28 +11478,40 @@ static int tolua_AllToLua_cWorld_GetBlockEntity00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  AString a_Line1 = ((AString)  tolua_tocppstring(tolua_S,5,0));
+  AString a_Line2 = ((AString)  tolua_tocppstring(tolua_S,6,0));
+  AString a_Line3 = ((AString)  tolua_tocppstring(tolua_S,7,0));
+  AString a_Line4 = ((AString)  tolua_tocppstring(tolua_S,8,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockEntity'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSignLines'", NULL);
 #endif
   {
-   OBSOLETE cBlockEntity* tolua_ret = (OBSOLETE cBlockEntity*)  self->GetBlockEntity(a_X,a_Y,a_Z);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockEntity");
+   bool tolua_ret = (bool)  self->GetSignLines(a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
+   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
   }
  }
- return 1;
+ return 5;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetBlockEntity'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetSignLines'.",&tolua_err);
  return 0;
 #endif
 }
@@ -21324,7 +21335,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnX",tolua_AllToLua_cWorld_GetSpawnX00);
    tolua_function(tolua_S,"GetSpawnY",tolua_AllToLua_cWorld_GetSpawnY00);
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
-   tolua_function(tolua_S,"GetBlockEntity",tolua_AllToLua_cWorld_GetBlockEntity00);
+   tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
    tolua_function(tolua_S,"GrowTreeByBiome",tolua_AllToLua_cWorld_GrowTreeByBiome00);

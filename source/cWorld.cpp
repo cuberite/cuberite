@@ -804,6 +804,51 @@ void cWorld::TickSpawnMobs(float a_Dt)
 
 
 
+bool cWorld::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachChestInChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachFurnaceInChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithChestAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithFurnaceAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
+{
+	return m_ChunkMap->GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
+}
+
+
+
+
+
 void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 {
 	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
@@ -1221,16 +1266,6 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z)
 void cWorld::SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer * a_Player )
 {
 	m_ChunkMap->SendBlockTo(a_X, a_Y, a_Z, a_Player);
-}
-
-
-
-
-
-// TODO: This interface is dangerous!
-cBlockEntity * cWorld::GetBlockEntity( int a_X, int a_Y, int a_Z )
-{
-	return NULL;
 }
 
 

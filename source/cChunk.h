@@ -38,9 +38,13 @@ class cServer;
 class MTRand;
 class cPlayer;
 class cChunkMap;
+class cChestEntity;
+class cFurnaceEntity;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
-typedef cItemCallback<cEntity> cEntityCallback;
+typedef cItemCallback<cEntity>        cEntityCallback;
+typedef cItemCallback<cChestEntity>   cChestCallback;
+typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
 
 
 
@@ -145,6 +149,21 @@ public:
 	
 	/// Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
+	/// Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true
+	bool ForEachChest(cChestCallback & a_Callback);  // Lua-accessible
+
+	/// Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true
+	bool ForEachFurnace(cFurnaceCallback & a_Callback);  // Lua-accessible
+	
+	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
+	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
+
+	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords, true if found
+	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
+
+	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
+	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 

@@ -39,9 +39,16 @@ class cEntity;
 class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
+class cChestEntity;
+class cFurnaceEntity;
+
 typedef std::list< cPlayer * > cPlayerList;
-typedef cItemCallback<cPlayer> cPlayerListCallback;
-typedef cItemCallback<cEntity> cEntityCallback;
+
+typedef cItemCallback<cPlayer>        cPlayerListCallback;
+typedef cItemCallback<cEntity>        cEntityCallback;
+typedef cItemCallback<cChestEntity>   cChestCallback;
+typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
+
 
 
 
@@ -238,9 +245,20 @@ public:
 	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
 	inline cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
 
-	// TODO: This interface is dangerous! Export as a set of specific action functions for Lua: GetChestItem, GetFurnaceItem, SetFurnaceItem, SetSignLines etc.
-	// _X 2012_02_21: This function always returns NULL
-	OBSOLETE cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );						//tolua_export
+	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
+	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
+
+	/// Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true
+	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
+	
+	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
+	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
+
+	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords, true if found
+	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
+	
+	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
+	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // tolua_export
 	
 	/// a_Player is using block entity at [x, y, z], handle that:
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z) {m_ChunkMap->UseBlockEntity(a_Player, a_X, a_Y, a_Z); }

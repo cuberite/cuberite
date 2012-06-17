@@ -158,10 +158,10 @@ static int FNNAME(lua_State * tolua_S) \
 		{} \
 	\
 	private: \
-		virtual bool Item(cEntity * a_Item) override \
+		virtual bool Item(ITEM * a_Item) override \
 		{ \
 			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */ \
-			tolua_pushusertype(LuaState, a_Item, "cEntity"); \
+			tolua_pushusertype(LuaState, a_Item, #ITEM); \
 			if (TableRef != LUA_REFNIL) \
 			{ \
 				lua_rawgeti( LuaState, LUA_REGISTRYINDEX, TableRef);  /* Push table reference */ \
@@ -292,7 +292,9 @@ DEFINE_LUA_FOREACH(cWorld, cPlayer, ForEachPlayer, tolua_cWorld_ForEachPlayer);
 DEFINE_LUA_FOREACH(cRoot,  cWorld,  ForEachWorld,  tolua_cRoot_ForEachWorld);
 DEFINE_LUA_FOREACH(cWorld, cEntity, ForEachEntity, tolua_cWorld_ForEachEntity);
 
-DEFINE_LUA_FOREACHINCHUNK(cWorld, cEntity, ForEachEntityInChunk, tolua_cWorld_ForEachEntityInChunk);
+DEFINE_LUA_FOREACHINCHUNK(cWorld, cEntity,        ForEachEntityInChunk,  tolua_cWorld_ForEachEntityInChunk);
+DEFINE_LUA_FOREACHINCHUNK(cWorld, cChestEntity,   ForEachChestInChunk,   tolua_cWorld_ForEachChestInChunk);
+DEFINE_LUA_FOREACHINCHUNK(cWorld, cFurnaceEntity, ForEachFurnaceInChunk, tolua_cWorld_ForEachFurnaceInChunk);
 
 
 
@@ -594,9 +596,11 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
-			tolua_function(tolua_S, "ForEachPlayer",        tolua_cWorld_ForEachPlayer);
-			tolua_function(tolua_S, "ForEachEntity",        tolua_cWorld_ForEachEntity);
-			tolua_function(tolua_S, "ForEachEntityInChunk", tolua_cWorld_ForEachEntityInChunk);
+			tolua_function(tolua_S, "ForEachPlayer",         tolua_cWorld_ForEachPlayer);
+			tolua_function(tolua_S, "ForEachEntity",         tolua_cWorld_ForEachEntity);
+			tolua_function(tolua_S, "ForEachEntityInChunk",  tolua_cWorld_ForEachEntityInChunk);
+			tolua_function(tolua_S, "ForEachChestInChunk",   tolua_cWorld_ForEachChestInChunk);
+			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_cWorld_ForEachFurnaceInChunk);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");
