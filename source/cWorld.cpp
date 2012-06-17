@@ -1824,6 +1824,7 @@ void cWorld::SaveAllChunks(void)
 	LOG("Saving all chunks...");
 	m_LastSave = m_Time;
 	m_ChunkMap->SaveAllChunks();
+	LOG("All chunks saved.");
 }
 
 
