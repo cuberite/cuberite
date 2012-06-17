@@ -591,29 +591,7 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 				break;
 			}
 			
-			case E_BLOCK_LEAVES:
-			{
-				NIBBLETYPE Meta = GetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-				if (((Meta & 0x04) == 0) && ((Meta & 0x08) == 1)){
-					int x,y,z,f = 0;
-					for( y = 4; y > - 5; y-- ) {
-						for( x = - 4; x < 5; x++ ){
-							for( z = - 4; z < 5; z++ ){
-								if((x<0 ? -x : x) + (y<0 ? -y : y) + (z<0 ? -z : z) > 4) continue;
-								if(GetBlock(m_BlockTickX + x, m_BlockTickY + y, m_BlockTickZ + z) == E_BLOCK_LOG){
-									f = 1;
-								}
-							}
-						}
-					}
-					if(f==0){
-						SetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, 0, 0);
-					}else{
-						SetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Meta -= 8);
-					}
-				}
-				break;
-			}
+			case E_BLOCK_LEAVES: TickLeaves(m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
 			
 			default:
 			{
@@ -753,6 +731,59 @@ void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
 	FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
 	
 	// TODO: Uproot whatever was growing on top:
+}
+
+
+
+
+
+void cChunk::TickLeaves(int a_RelX, int a_RelY, int a_RelZ)
+{
+	// Since leaves-checking is a costly operation, it is done only if leaves are marked for checking (Meta has its 0x08 bit cleared)
+	// TODO: The meta is cleared (check flag set) each time a block next to the leaves changes
+	
+	NIBBLETYPE Meta = GetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
+	if ((Meta & 0x04) != 0)
+	{
+		// Player-placed leaves, don't decay
+		return;
+	}
+	if ((Meta & 0x08) == 0)
+	{
+		// These leaves have been checked for decay lately and nothing around them changed
+		return;
+	}
+	
+	// TODO: We need a proper BFS check - is the leaves block connected to a log via other leaves blocks?
+	for (int y = 4; y > - 5; y--)
+	{
+		for (int z = - 4; z < 5; z++ )
+		{
+			for (int x = - 4; x < 5; x++ )
+			{
+				if (abs(x) + abs(y) + abs(z) > 4)
+				{
+					// Too far away
+					continue;
+				}
+				BLOCKTYPE  BlockType;
+				NIBBLETYPE BlockMeta;
+				if (!UnboundedRelGetBlock(a_RelX + x, a_RelY + y, a_RelZ + z, BlockType, BlockMeta))
+				{
+					// Too close to unloaded chunks, don't check at all
+					return;
+				} 
+				if (BlockType == E_BLOCK_LOG)
+				{
+					// Wood found, the leaves stay; mark them as checked:
+					SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, Meta & 0x07);
+					return;
+				}
+			}
+		}
+	}
+	// Decay the leaves. Let them drop something if the random is right
+	m_World->DigBlock(m_PosX * cChunkDef::Width + a_RelX, a_RelY, m_PosZ * cChunkDef::Width + a_RelZ);
 }
 
 
