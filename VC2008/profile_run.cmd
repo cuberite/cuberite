@@ -1,8 +1,9 @@
-@
-@ Profiling using a MSVC standalone profiler
-@
-@ See http://www.codeproject.com/Articles/144643/Profiling-of-C-Applications-in-Visual-Studio-for-F for details
-@
+@echo off
+::
+:: Profiling using a MSVC standalone profiler
+::
+:: See http://www.codeproject.com/Articles/144643/Profiling-of-C-Applications-in-Visual-Studio-for-F for details
+::
 
 
 
