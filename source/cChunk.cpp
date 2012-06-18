@@ -670,6 +670,7 @@ void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx
 void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
 {
 	// TODO: Rain hydrates blocks, too. Check world weather, don't search for water if raining.
+	// NOTE: The desert biomes do not get precipitation, so another check needs to be made.
 	
 	// Search for water in a close proximity:
 	// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
@@ -727,10 +728,18 @@ void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
 		return;
 	}
 	
-	// Farmland too dry. Turn back to dirt:
-	FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+	// Farmland too dry. If nothing is growing on top, turn back to dirt:
 	
-	// TODO: Uproot whatever was growing on top:
+	switch (GetBlock(a_RelX, a_RelY + 1, a_RelZ))
+	{
+		case E_BLOCK_CROPS:
+		case E_BLOCK_MELON_STEM:
+		case E_BLOCK_PUMPKIN_STEM:
+			break;
+		default:
+			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+			break;
+	}
 }
 
 
