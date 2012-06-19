@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/17/12 20:43:06.
+** Generated automatically by tolua++-1.0.92 on 06/19/12 23:28:50.
 */
 
 #ifndef __cplusplus
@@ -176,16 +176,15 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"BLOCKTYPE");
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cLuaItems");
- tolua_usertype(tolua_S,"cLuaChunk");
  tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"cLuaChunk");
  tolua_usertype(tolua_S,"NIBBLETYPE");
+ tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
  tolua_usertype(tolua_S,"cTCPLink");
  tolua_usertype(tolua_S,"Lua__cTCPLink");
- tolua_usertype(tolua_S,"Json::Value");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cMCLogger");
@@ -218,11 +217,11 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPlugin");
- tolua_usertype(tolua_S,"cStringMap");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cPacket_BlockPlace");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"Lua__cPlayer");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"HTTPRequest");
@@ -12792,72 +12791,6 @@ static int tolua_AllToLua_cItem_HasDuration00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetJson of class  cItem */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_GetJson00
-static int tolua_AllToLua_cItem_GetJson00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Json::Value",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cItem* self = (const cItem*)  tolua_tousertype(tolua_S,1,0);
-  Json::Value* a_OutValue = ((Json::Value*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetJson'", NULL);
-#endif
-  {
-   self->GetJson(*a_OutValue);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetJson'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: FromJson of class  cItem */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_FromJson00
-static int tolua_AllToLua_cItem_FromJson00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Json::Value",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
-  const Json::Value* a_Value = ((const Json::Value*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FromJson'", NULL);
-#endif
-  {
-   self->FromJson(*a_Value);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'FromJson'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: IsEnchantable of class  cItem */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_IsEnchantable00
 static int tolua_AllToLua_cItem_IsEnchantable00(lua_State* tolua_S)
@@ -21385,8 +21318,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetMaxDuration",tolua_AllToLua_cItem_GetMaxDuration00);
    tolua_function(tolua_S,"DamageItem",tolua_AllToLua_cItem_DamageItem00);
    tolua_function(tolua_S,"HasDuration",tolua_AllToLua_cItem_HasDuration00);
-   tolua_function(tolua_S,"GetJson",tolua_AllToLua_cItem_GetJson00);
-   tolua_function(tolua_S,"FromJson",tolua_AllToLua_cItem_FromJson00);
    tolua_function(tolua_S,"IsEnchantable",tolua_AllToLua_cItem_IsEnchantable00);
    tolua_variable(tolua_S,"m_ItemID",tolua_get_cItem_m_ItemID,tolua_set_cItem_m_ItemID);
    tolua_variable(tolua_S,"m_ItemCount",tolua_get_cItem_m_ItemCount,tolua_set_cItem_m_ItemCount);
