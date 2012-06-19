@@ -1535,8 +1535,9 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
+		++itr2;
 		if (a_Callback.Item(*itr))
 		{
 			return false;
@@ -1552,8 +1553,9 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 bool cChunk::ForEachChest(cChestCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
 	{
+		++itr2;
 		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
 		{
 			continue;
@@ -1573,8 +1575,9 @@ bool cChunk::ForEachChest(cChestCallback & a_Callback)
 bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
 	{
+		++itr2;
 		switch ((*itr)->GetBlockType())
 		{
 			case E_BLOCK_FURNACE:
@@ -1602,8 +1605,9 @@ bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
 	{
+		++itr2;
 		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
 		{
 			continue;
@@ -1633,8 +1637,9 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
 	{
+		++itr2;
 		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
 		{
 			continue;

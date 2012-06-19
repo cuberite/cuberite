@@ -289,8 +289,9 @@ cWorld* cRoot::GetWorld( const AString & a_WorldName )
 
 bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 {
-	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(), itr2 = itr; itr != m_pState->WorldsByName.end(); itr = itr2)
 	{
+		++itr2;
 		if (a_Callback.Item(itr->second))
 		{
 			return false;
@@ -379,8 +380,9 @@ void cRoot::SaveAllChunks(void)
 
 bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr)
+	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(), itr2 = itr; itr != m_pState->WorldsByName.end(); itr = itr2)
 	{
+		++itr2;
 		if (!itr->second->ForEachPlayer(a_Callback))
 		{
 			return false;

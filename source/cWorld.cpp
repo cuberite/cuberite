@@ -1515,8 +1515,9 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
 	// Calls the callback for each player in the list
 	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (cPlayerList::iterator itr = m_Players.begin(), itr2 = itr; itr != m_Players.end(); itr = itr2)
 	{
+		++itr2;
 		if (a_Callback.Item(*itr))
 		{
 			return false;
@@ -1658,8 +1659,9 @@ void cWorld::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, i
 bool cWorld::ForEachEntity(cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSEntities);
-	for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end(); ++itr )
+	for (cEntityList::iterator itr = m_AllEntities.begin(), itr2 = itr; itr != m_AllEntities.end(); itr = itr2)
 	{
+		++itr2;
 		if (a_Callback.Item(*itr))
 		{
 			return false;
