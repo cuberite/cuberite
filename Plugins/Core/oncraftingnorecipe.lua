@@ -3,7 +3,7 @@
 -- Based on Fixies plugin v2 by Taugeshtu
 
 
--- how much "extra" points are healed per a repair operation (fraction)
+-- how much "extra" points are healed per a repair operation (fraction of full health)
 BONUS = 0.1
 
 
@@ -28,7 +28,16 @@ function OnCraftingNoRecipe(Player, Grid, Recipe)
 	end
 	
 	if (Items[1].m_ItemID ~= Items[2].m_ItemID) then
-		-- Only same items may be fixed
+		-- Only items of the same type may be fixed
+		return false
+	end
+	
+	if (
+		(Items[1].m_ItemHealth == 0)	or
+		(Items[2].m_ItemHealth == 0)
+	)
+	then
+		-- Only damaged items may be fixed
 		return false
 	end
 	
