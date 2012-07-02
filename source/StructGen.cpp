@@ -14,15 +14,15 @@
 // cStructGenOreNests configuration:
 
 const int MAX_HEIGHT_COAL = 127;
-const int NUM_NESTS_COAL = 60;
+const int NUM_NESTS_COAL = 50;
 const int NEST_SIZE_COAL = 10;
 
 const int MAX_HEIGHT_IRON = 70;
-const int NUM_NESTS_IRON = 30;
+const int NUM_NESTS_IRON = 20;
 const int NEST_SIZE_IRON = 6;
 
 const int MAX_HEIGHT_REDSTONE = 40;
-const int NUM_NESTS_REDSTONE = 10;
+const int NUM_NESTS_REDSTONE = 7;
 const int NEST_SIZE_REDSTONE = 6;
 
 const int MAX_HEIGHT_GOLD = 35;
@@ -30,11 +30,11 @@ const int NUM_NESTS_GOLD = 6;
 const int NEST_SIZE_GOLD = 6;
 
 const int MAX_HEIGHT_DIAMOND = 16;
-const int NUM_NESTS_DIAMOND = 6;
+const int NUM_NESTS_DIAMOND = 3;
 const int NEST_SIZE_DIAMOND = 5;
 
 const int MAX_HEIGHT_LAPIS = 30;
-const int NUM_NESTS_LAPIS = 6;
+const int NUM_NESTS_LAPIS = 3;
 const int NEST_SIZE_LAPIS = 5;
 
 
