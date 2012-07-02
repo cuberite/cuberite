@@ -266,6 +266,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\source\BlockArea.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\BlockArea.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\BlockID.cpp"
 				>
 			</File>
@@ -1604,6 +1612,43 @@
 			<Filter
 				Name="Bindings"
 				>
+				<File
+					RelativePath="..\source\AllToLua.pkg"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="GenerateBindings.cmd"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							Outputs="Bindings.cpp"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="GenerateBindings.cmd"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							Outputs="Bindings.cpp"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release profiled|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="GenerateBindings.cmd"
+							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
+							Outputs="Bindings.cpp"
+						/>
+					</FileConfiguration>
+				</File>
 				<File
 					RelativePath="..\source\Bindings.cpp"
 					>

@@ -171,6 +171,9 @@ public:
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 	
+	/// Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully
+	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
+	
 	/// Returns the number of valid chunks and the number of dirty chunks
 	void GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty);
 	

@@ -41,6 +41,10 @@ typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// NOTE: when changing the BLOCKTYPE or NIBBLETYPE types, you need to change them both in this file and in AllToLua.pkg
+// (for some reason, just including the ChunkDef.h file in AllToLua.pkg doesn't work in ToLua)
+
 /// The datatype used by blockdata
 typedef char BLOCKTYPE;
 
@@ -49,6 +53,8 @@ typedef unsigned char NIBBLETYPE;
 
 /// The type used by the heightmap
 typedef unsigned char HEIGHTTYPE;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 

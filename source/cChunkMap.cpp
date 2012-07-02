@@ -1165,6 +1165,35 @@ bool cChunkMap::IsChunkLighted(int a_ChunkX, int a_ChunkZ)
 
 
 
+bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback)
+{
+	bool Result = true;
+	cCSLock Lock(m_CSLayers);
+	for (int z = a_MinChunkZ; z <= a_MaxChunkZ; z++)
+	{
+		for (int x = a_MinChunkX; x <= a_MaxChunkX; x++)
+		{
+			cChunkPtr Chunk = GetChunkNoLoad(x, ZERO_CHUNK_Y, z);
+			if ((Chunk == NULL) || (!Chunk->IsValid()))
+			{
+				// Not present / not valid
+				Result = false;
+				continue;
+			}
+			if (!a_Callback.Coords(x, z))
+			{
+				continue;
+			}
+			Chunk->GetAllData(a_Callback);
+		}
+	}
+	return Result;
+}
+
+
+
+
+
 void cChunkMap::GetChunkStats(int & a_NumChunksValid, int & a_NumChunksDirty)
 {
 	a_NumChunksValid = 0;

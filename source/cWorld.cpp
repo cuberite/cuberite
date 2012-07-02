@@ -50,8 +50,6 @@
 
 #include "Vector3d.h"
 
-#include <time.h>
-
 #include "tolua++.h"
 
 #ifndef _WIN32
@@ -1813,6 +1811,15 @@ void cWorld::QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a
 bool cWorld::IsChunkLighted(int a_ChunkX, int a_ChunkZ)
 {
 	return m_ChunkMap->IsChunkLighted(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachChunkInRect(a_MinChunkX, a_MaxChunkX, a_MinChunkZ, a_MaxChunkZ, a_Callback);
 }
 
 
