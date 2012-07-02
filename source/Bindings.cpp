@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/02/12 18:28:58.
+** Generated automatically by tolua++-1.0.92 on 07/02/12 18:39:13.
 */
 
 #ifndef __cplusplus
@@ -15,6 +15,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "tolua_base.h"
+#include "ChunkDef.h"
 #include "cTorch.h"
 #include "cStairs.h"
 #include "cStep.h"
@@ -21117,6 +21118,33 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
  tolua_reg_types(tolua_S);
  tolua_module(tolua_S,NULL,1);
  tolua_beginmodule(tolua_S,NULL);
+  tolua_constant(tolua_S,"biOcean",biOcean);
+  tolua_constant(tolua_S,"biPlains",biPlains);
+  tolua_constant(tolua_S,"biDesert",biDesert);
+  tolua_constant(tolua_S,"biExtremeHills",biExtremeHills);
+  tolua_constant(tolua_S,"biForest",biForest);
+  tolua_constant(tolua_S,"biTaiga",biTaiga);
+  tolua_constant(tolua_S,"biSwampland",biSwampland);
+  tolua_constant(tolua_S,"biRiver",biRiver);
+  tolua_constant(tolua_S,"biHell",biHell);
+  tolua_constant(tolua_S,"biNether",biNether);
+  tolua_constant(tolua_S,"biSky",biSky);
+  tolua_constant(tolua_S,"biFrozenOcean",biFrozenOcean);
+  tolua_constant(tolua_S,"biFrozenRiver",biFrozenRiver);
+  tolua_constant(tolua_S,"biIcePlains",biIcePlains);
+  tolua_constant(tolua_S,"biTundra",biTundra);
+  tolua_constant(tolua_S,"biIceMountains",biIceMountains);
+  tolua_constant(tolua_S,"biMushroomIsland",biMushroomIsland);
+  tolua_constant(tolua_S,"biMushroomShore",biMushroomShore);
+  tolua_constant(tolua_S,"biBeach",biBeach);
+  tolua_constant(tolua_S,"biDesertHills",biDesertHills);
+  tolua_constant(tolua_S,"biForestHills",biForestHills);
+  tolua_constant(tolua_S,"biTaigaHills",biTaigaHills);
+  tolua_constant(tolua_S,"biExtremeHillsEdge",biExtremeHillsEdge);
+  tolua_constant(tolua_S,"biJungle",biJungle);
+  tolua_constant(tolua_S,"biJungleHills",biJungleHills);
+  tolua_constant(tolua_S,"biNumBiomes",biNumBiomes);
+  tolua_constant(tolua_S,"biMaxBiome",biMaxBiome);
   tolua_cclass(tolua_S,"cTorch","cTorch","",NULL);
   tolua_beginmodule(tolua_S,"cTorch");
    tolua_function(tolua_S,"DirectionToMetaData",tolua_AllToLua_cTorch_DirectionToMetaData00);

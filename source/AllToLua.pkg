@@ -3,22 +3,7 @@ $#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same acr
 
 $#include "tolua_base.h"
 
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NOTE: when changing the BLOCKTYPE or NIBBLETYPE types, you need to change them both in this file and in ChunkDef.h
-// (for some reason, just including the ChunkDef.h file doesn't work in ToLua)
-
-typedef char BLOCKTYPE;
-typedef unsigned char NIBBLETYPE;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
+$cfile "ChunkDef.h"
 
 $cfile "cTorch.h"
 $cfile "cStairs.h"

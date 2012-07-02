@@ -41,9 +41,7 @@ typedef std::list<cBlockEntity *>   cBlockEntityList;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// NOTE: when changing the BLOCKTYPE or NIBBLETYPE types, you need to change them both in this file and in AllToLua.pkg
-// (for some reason, just including the ChunkDef.h file in AllToLua.pkg doesn't work in ToLua)
+// tolua_begin
 
 /// The datatype used by blockdata
 typedef char BLOCKTYPE;
@@ -54,12 +52,14 @@ typedef unsigned char NIBBLETYPE;
 /// The type used by the heightmap
 typedef unsigned char HEIGHTTYPE;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// tolua_end
 
 
 
 
 
+
+// tolua_begin
 /** Biome IDs
 The first batch corresponds to the clientside biomes, used by MineCraft.
 BiomeIDs over 255 are used by MCServer internally and are translated to MC biomes before sending them to client
@@ -97,6 +97,7 @@ enum EMCSBiome
 	biMaxBiome = biNumBiomes - 1,  // The maximum biome value
 } ;
 
+// tolua_end
 
 
 
