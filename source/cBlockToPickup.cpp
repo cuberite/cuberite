@@ -260,7 +260,10 @@ void cBlockToPickup::ToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, con
 			else
 			{
 				AddRandomDrop(a_Drops, r1, 5,   E_ITEM_SAPLING);
-				AddRandomDrop(a_Drops, r1, 200, E_ITEM_APPLE);
+				if (a_BlockMeta == E_META_LEAVES_APPLE)
+				{
+					AddRandomDrop(a_Drops, r1, 200, E_ITEM_APPLE);
+				}
 			}
 			return;
 		}
