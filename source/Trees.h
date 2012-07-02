@@ -35,7 +35,7 @@ To generate a random image for the (x, y, z) coords, pass an arbitrary value as 
 // Blocks that a tree may overwrite when growing:
 #define CASE_TREE_OVERWRITTEN_BLOCKS \
 	case E_BLOCK_AIR: \
-	case E_BLOCK_LEAVES: \
+	/* case E_BLOCK_LEAVES: LEAVES are a special case, they can be overwritten only by log. Handled in cChunkMap::ReplaceTreeBlocks(). */ \
 	case E_BLOCK_SNOW: \
 	case E_BLOCK_TALL_GRASS: \
 	case E_BLOCK_DEAD_BUSH: \

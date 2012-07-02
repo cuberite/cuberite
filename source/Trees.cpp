@@ -530,8 +530,49 @@ void GetAppleBushImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 
 void GetJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_Blocks)
 {
-	// TODO
+	// TODO: generate proper jungle trees
+	// Temporary: generate just some high swamp-like trees with jungle materials:
+
+	// Vines are around the BigO3, but not in the corners; need proper meta for direction
+	static const sMetaCoords Vines[] =
+	{
+		{-2, -4, 1}, {-1, -4, 1}, {0, -4, 1}, {1, -4, 1}, {2, -4, 1},  // North face
+		{-2,  4, 4}, {-1,  4, 4}, {0,  4, 4}, {1,  4, 4}, {2,  4, 4},  // South face
+		{4,  -2, 2}, {4,  -1, 2}, {4,  0, 2}, {4,  1, 2}, {4,  2, 2},  // East face
+		{-4, -2, 8}, {-4, -1, 8}, {-4, 0, 8}, {-4, 1, 8}, {-4, 2, 8},  // West face
+	} ;
+
+	int Height = 6 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 8) % 16;
+	
+	a_Blocks.reserve(2 * ARRAYCOUNT(BigO3) + 2 * ARRAYCOUNT(BigO2) + Height * ARRAYCOUNT(Vines) + 20);
+	
+	for (int i = 0; i < Height; i++)
+	{
+		a_Blocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_LOG, E_META_LOG_JUNGLE));
+	}
+	int hei = a_BlockY + Height - 2;
+	
+	// Put vines around the lowermost leaves layer:
+	PushSomeColumns(a_BlockX, hei, a_BlockZ, Height, a_Seq, a_Noise, 0x3fffffff, a_Blocks, Vines, ARRAYCOUNT(Vines), E_BLOCK_VINES);
+	
+	// The lower two leaves layers are BigO3 with log in the middle and possibly corners:
+	for (int i = 0; i < 2; i++)
+	{
+		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_Blocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_Blocks, 3, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		hei++;
+	}  // for i - 2*
+
+	// The upper two leaves layers are BigO2 with leaves in the middle and possibly corners:
+	for (int i = 0; i < 2; i++)
+	{
+		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_Blocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_Blocks, 3, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE);
+		a_Blocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_JUNGLE));
+		hei++;
+	}  // for i - 2*
 }
+
 
 
 
