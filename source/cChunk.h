@@ -40,6 +40,7 @@ class cPlayer;
 class cChunkMap;
 class cChestEntity;
 class cFurnaceEntity;
+class cBlockArea;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cItemCallback<cEntity>        cEntityCallback;
@@ -256,7 +257,7 @@ private:
 	void TickGrass       (int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom);
 	void TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom);
 	void TickFarmland    (int a_RelX, int a_RelY, int a_RelZ);
-	void TickLeaves      (int a_RelX, int a_RelY, int a_RelZ);
+	void TickLeaves      (int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom);
 	
 	/// Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking)
 	void GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);
@@ -266,6 +267,9 @@ private:
 
 	/// Grows a melon or a pumpkin next to the block specified (assumed to be the stem)
 	void GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, MTRand & a_Random);
+	
+	/// Checks if a leaves block at the specified coords has a log up to 4 blocks away connected by other leaves blocks (false if no log)
+	bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);

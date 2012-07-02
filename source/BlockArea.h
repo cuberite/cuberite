@@ -76,6 +76,15 @@ public:
 	
 	/// Returns the datatypes that are stored in the object (bitmask of baXXX values)
 	int GetDataTypes(void) const;
+	
+	// tolua_end
+	
+	// Clients can use these for faster access to all blocktypes. Be careful though!
+	/// Returns the internal pointer to the block types
+	BLOCKTYPE * GetBlockTypes(void) { return m_BlockTypes; }
+	int         GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	
+	// tolua_begin
 
 protected:
 
