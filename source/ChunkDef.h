@@ -202,7 +202,7 @@ public:
 	}
 	
 	
-	inline static BLOCKTYPE GetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
+	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Y >= 0) && (a_Y < Height));
@@ -235,7 +235,7 @@ public:
 	}
 	
 	
-	static NIBBLETYPE GetNibble(NIBBLETYPE * a_Buffer, int a_BlockIdx)
+	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int a_BlockIdx)
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < cChunkDef::NumBlocks))
 		{
@@ -245,7 +245,7 @@ public:
 	}
 	
 	
-	static NIBBLETYPE GetNibble(NIBBLETYPE * a_Buffer, int x, int y, int z)
+	static NIBBLETYPE GetNibble(const NIBBLETYPE * a_Buffer, int x, int y, int z)
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
@@ -281,7 +281,7 @@ public:
 	}
 
 
-	inline static char GetNibble(NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
+	inline static char GetNibble(const NIBBLETYPE * a_Buffer, const Vector3i & a_BlockPos )
 	{
 		return GetNibble( a_Buffer, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 	}
@@ -305,6 +305,12 @@ The virtual methods are called in the same order as they're declared here.
 class cChunkDataCallback abstract
 {
 public:
+	/** Called before any other callbacks to inform of the current coords 
+	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
+	If false is returned, the chunk is skipped.
+	*/
+	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { return true; };
+	
 	/// Called once to provide heightmap data
 	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {};
 	
@@ -317,7 +323,7 @@ public:
 	/// Called once to export block meta
 	virtual void BlockMeta    (const NIBBLETYPE * a_Meta) {};
 	
-	/// Called once to let know if the chunk lighting is valid. Return value is used to control if BlockLight() and BlockSkyLight() are called next
+	/// Called once to let know if the chunk lighting is valid. Return value is used to control if BlockLight() and BlockSkyLight() are called next (if true)
 	virtual bool LightIsValid(bool a_IsLightValid) {return true; };
 
 	/// Called once to export block light
