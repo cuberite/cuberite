@@ -1529,64 +1529,27 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 
 
 
-// TODO: This interface is dangerous!
-cPlayer* cWorld::GetPlayer( const char* a_PlayerName )
+
+bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	cPlayer* BestMatch = 0;
-	unsigned int MatchedLetters = 0;
-	unsigned int NumMatches = 0;
-	bool bPerfectMatch = false;
-
-	unsigned int NameLength = strlen( a_PlayerName );
+	// Calls the callback for each player in the list
 	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); itr++ )
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		std::string Name = (*itr)->GetName();
-		if( NameLength > Name.length() ) continue; // Definitely not a match
-
-		for (unsigned int i = 0; i < NameLength; i++)
+		if ((*itr)->GetName() == a_PlayerName)
 		{
-			char c1 = (char)toupper( a_PlayerName[i] );
-			char c2 = (char)toupper( Name[i] );
-			if( c1 == c2 )
-			{
-				if( i+1 > MatchedLetters )
-				{
-					MatchedLetters = i+1;
-					BestMatch = *itr;
-				}
-				if( i+1 == NameLength )
-				{
-					NumMatches++;
-					if( NameLength == Name.length() )
-					{
-						bPerfectMatch = true;
-						break;
-					}
-				}
-			}
-			else
-			{
-				if( BestMatch == *itr ) BestMatch = 0;
-				break;
-			}
-			if( bPerfectMatch )
-				break;
+			a_Callback.Item(*itr);
+			return true;
 		}
-	}
-	if ( NumMatches == 1 )
-	{
-		return BestMatch;
-	}
-
-	// More than one matches, so it's undefined. Return NULL instead
-	return NULL;
+	}  // for itr - m_Players[]
+	return false;
 }
 
 
 
 
 
+// TODO: This interface is dangerous!
 cPlayer * cWorld::FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit)
 {
 	cTracer LineOfSight(this);

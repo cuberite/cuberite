@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/19/12 23:28:50.
+** Generated automatically by tolua++-1.0.92 on 07/02/12 10:32:19.
 */
 
 #ifndef __cplusplus
@@ -10774,40 +10774,6 @@ static int tolua_AllToLua_cWorld_GetNumPlayers00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetPlayer of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetPlayer00
-static int tolua_AllToLua_cWorld_GetPlayer00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_PlayerName = ((const char*)  tolua_tostring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPlayer'", NULL);
-#endif
-  {
-   cPlayer* tolua_ret = (cPlayer*)  self->GetPlayer(a_PlayerName);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPlayer");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetPlayer'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: UpdateSign of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_UpdateSign00
 static int tolua_AllToLua_cWorld_UpdateSign00(lua_State* tolua_S)
@@ -21249,7 +21215,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetMaxPlayers",tolua_AllToLua_cWorld_GetMaxPlayers00);
    tolua_function(tolua_S,"SetMaxPlayers",tolua_AllToLua_cWorld_SetMaxPlayers00);
    tolua_function(tolua_S,"GetNumPlayers",tolua_AllToLua_cWorld_GetNumPlayers00);
-   tolua_function(tolua_S,"GetPlayer",tolua_AllToLua_cWorld_GetPlayer00);
    tolua_function(tolua_S,"UpdateSign",tolua_AllToLua_cWorld_UpdateSign00);
    tolua_function(tolua_S,"RegenerateChunk",tolua_AllToLua_cWorld_RegenerateChunk00);
    tolua_function(tolua_S,"GenerateChunk",tolua_AllToLua_cWorld_GenerateChunk00);

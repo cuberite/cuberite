@@ -133,11 +133,11 @@ public:
 
 	/// Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true
  	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+ 	
+ 	/// Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found. Callback return ignored
+ 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 	
 	unsigned int GetNumPlayers();													//tolua_export
-	
-	// TODO: This interface is dangerous - rewrite to DoWithPlayer(playername, action)
-	cPlayer * GetPlayer( const char * a_PlayerName );								//tolua_export
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
