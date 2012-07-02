@@ -41,8 +41,8 @@
 
 
 
-// Leaves can be this many blocks that away from the log not to decay
-#define LEAVES_CHECK_DISTANCE 4
+// Leaves can be this many blocks that away (inclusive) from the log not to decay
+#define LEAVES_CHECK_DISTANCE 5
 
 
 
