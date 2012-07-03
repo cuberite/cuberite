@@ -328,7 +328,7 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
@@ -344,6 +344,10 @@ void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenIce);
+		}
+		else if (NoCaseCompare(*itr, "Lilypads") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenLilypads(m_Seed));
 		}
 	}  // for itr - Str[]
 }

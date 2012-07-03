@@ -283,3 +283,76 @@ void cFinishGenIce::GenFinish(
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenLilypads:
+
+int cFinishGenLilypads::GetNumLilypads(const cChunkDef::BiomeMap & a_BiomeMap)
+{
+	int res = 0;
+	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	{
+		if (a_BiomeMap[i] == biSwampland)
+		{
+			res++;
+		}
+	}  // for i - a_BiomeMap[]
+	return res / 64;
+}
+
+
+
+
+
+void cFinishGenLilypads::GenFinish(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes, // Block types to read and change
+	cChunkDef::BlockNibbles & a_BlockMeta, // Block meta to read and change
+	cChunkDef::HeightMap & a_HeightMap, // Height map to read and change by the current data
+	const cChunkDef::BiomeMap & a_BiomeMap, // Biomes to adhere to
+	cEntityList & a_Entities, // Entities may be added or deleted
+	cBlockEntityList & a_BlockEntities // Block entities may be added or deleted
+)
+{
+	// Add Lilypads on top of water surface in Swampland
+
+	int NumLilypads = GetNumLilypads(a_BiomeMap);
+	for (int i = 0; i < NumLilypads; i++)
+	{
+		int x = m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, i) % cChunkDef::Width;
+		int z = m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, i, a_ChunkZ) % cChunkDef::Width;
+
+		// Place a lily pad at {x, z} if possible (swampland, empty block, water below):
+		if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biSwampland)
+		{
+			// not swampland
+			continue;
+		}
+		int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+		if (Height >= cChunkDef::Height)
+		{
+			// Too high up
+			continue;
+		}
+		if (cChunkDef::GetBlock(a_BlockTypes, x, Height + 1, z) != E_BLOCK_AIR)
+		{
+			// not empty block
+			continue;
+		}
+		switch (cChunkDef::GetBlock(a_BlockTypes, x, Height, z))
+		{
+			case E_BLOCK_WATER:
+			case E_BLOCK_STATIONARY_WATER:
+			{
+				cChunkDef::SetBlock(a_BlockTypes, x, Height + 1, z, E_BLOCK_LILY_PAD);
+				cChunkDef::SetHeight(a_HeightMap, x, z, Height + 1);
+				break;
+			}
+		}  // switch (GetBlock)
+	}  // for i
+}
+
+
+
+
+
