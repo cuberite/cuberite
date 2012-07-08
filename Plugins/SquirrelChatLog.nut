@@ -1,26 +1,20 @@
-class SquirrelChatLog extends cPlugin__Squirrel
+class SquirrelChatLog extends Plugin
 {
-	constructor()
-	{
-		base.constructor();
-	}
-	
+	name = "SquirrelChatLogger";
+		
 	function Initialize()
 	{
 		::print("SquirrelChatLog initialize()");
-		this.SetName("SquirrelChatLog");
 		
-		local PluginManager = cRoot.Get().GetPluginManager();
-		PluginManager.AddHook( this, PluginManager.E_PLUGIN_CHAT );
+		this.AddHook(Hook.Chat);
+		
 		return true;
 	}
 
 	function OnChat( Message, Player )
 	{
+		::print("CHAT");
 		::print(Player.GetName() + ": " + Message);
+		
 	}
 }
-
-
-Plugin <- SquirrelChatLog();
-cRoot.Get().GetPluginManager().AddPlugin( Plugin );

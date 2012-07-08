@@ -25,7 +25,10 @@ INCLUDE = -I.\
 		-IiniFile\
 		-Itolua++-1.0.93/include\
 		-Ijsoncpp-src-0.5.0/include\
-		-Ijsoncpp-src-0.5.0/src/lib_json
+		-Ijsoncpp-src-0.5.0/src/lib_json\
+		-Isquirrel_3_0_1_stable/include\
+		-Isquirrel_3_0_1_stable\
+		-Isquirrel_3_0_1_stable/sqrat
 
 
 #
@@ -66,6 +69,7 @@ MCServer : \
 		build/cReferenceManager.o\
 		build/Bindings.o\
 		build/BlockID.o\
+		build/cBlockArea.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
@@ -115,10 +119,10 @@ MCServer : \
 		build/cWebAdmin.o\
 		build/cWebPlugin.o\
 		build/cWindow.o\
-    build/LightingThread.o\
+    		build/LightingThread.o\
 		build/cRedstoneSimulator.o\
 		build/ChunkSender.o\
-    build/cWorld.o\
+    		build/cWorld.o\
 		build/main.o\
 		build/ManualBindings.o\
 		build/Matrix4f.o\
@@ -253,7 +257,32 @@ MCServer : \
 		build/WSSAnvil.o\
 		build/FastNBT.o\
 		build/StringCompression.o\
+		build/StringCompression.o\
+		build/sqstdaux.o\
+		build/sqstdblob.o\
+		build/sqstdio.o\
+		build/sqstdmath.o\
+		build/sqstdrex.o\
+		build/sqstdstream.o\
+		build/sqstdstring.o\
+		build/sqstdsystem.o\
+		build/sqapi.o\
+		build/sqbaselib.o\
+		build/sqclass.o\
+		build/sqcompiler.o\
+		build/sqdebug.o\
+		build/sqfuncstate.o\
+		build/sqlexer.o\
+		build/sqmem.o\
+		build/sqobject.o\
+		build/sqstate.o\
+		build/sqtable.o\
+		build/sqvm.o\
+		build/squirrelbindings/SquirrelBindings.o\
+		build/squirrelbindings/SquirrelFunctions.o\
+		build/cPlugin_Squirrel.o\
 		build/CraftingRecipes.o
+
 	$(CC) $(LNK_OPTIONS) \
 		build/json_reader.o\
 		build/json_value.o\
@@ -288,6 +317,7 @@ MCServer : \
 		build/cReferenceManager.o\
 		build/Bindings.o\
 		build/BlockID.o\
+		build/cBlockArea.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
@@ -476,6 +506,29 @@ MCServer : \
 		build/FastNBT.o\
 		build/StringCompression.o\
 		build/CraftingRecipes.o\
+		build/sqstdaux.o\
+		build/sqstdblob.o\
+		build/sqstdio.o\
+		build/sqstdmath.o\
+		build/sqstdrex.o\
+		build/sqstdstream.o\
+		build/sqstdstring.o\
+		build/sqstdsystem.o\
+		build/sqapi.o\
+		build/sqbaselib.o\
+		build/sqclass.o\
+		build/sqcompiler.o\
+		build/sqdebug.o\
+		build/sqfuncstate.o\
+		build/sqlexer.o\
+		build/sqmem.o\
+		build/sqobject.o\
+		build/sqstate.o\
+		build/sqtable.o\
+		build/sqvm.o\
+		build/squirrelbindings/SquirrelBindings.o\
+		build/squirrelbindings/SquirrelFunctions.o\
+		build/cPlugin_Squirrel.o\
 		-o MCServer
 
 clean : 
@@ -696,6 +749,29 @@ clean :
 		build/cIsThread.o\
 		build/cSocketThreads.o\
 		build/CraftingRecipes.o\
+		build/sqstdaux.o\
+		build/sqstdblob.o\
+		build/sqstdio.o\
+		build/sqstdmath.o\
+		build/sqstdrex.o\
+		build/sqstdstream.o\
+		build/sqstdstring.o\
+		build/sqstdsystem.o\
+		build/sqapi.o\
+		build/sqbaselib.o\
+		build/sqclass.o\
+		build/sqcompiler.o\
+		build/sqdebug.o\
+		build/sqfuncstate.o\
+		build/sqlexer.o\
+		build/sqmem.o\
+		build/sqobject.o\
+		build/sqstate.o\
+		build/sqtable.o\
+		build/sqvm.o\
+		build/squirrelbindings/SquirrelBindings.o\
+		build/squirrelbindings/SquirrelFunctions.o\
+		build/cPlugin_Squirrel.o\
 		MCServer
 
 install : MCServer
@@ -733,6 +809,9 @@ build/Bindings.o : source/Bindings.cpp
 # Item # 6 -- BlockID --
 build/BlockID.o : source/BlockID.cpp
 	$(CC) $(CC_OPTIONS) source/BlockID.cpp -c $(INCLUDE) -o build/BlockID.o
+
+build/cBlockArea.o : source/cBlockArea.cpp
+	$(CC) $(CC_OPTIONS) source/cBlockArea.cpp -c $(INCLUDE) -o build/cBlockArea.o
 
 
 # Item # 6 -- cBlockToPickup --
@@ -1602,7 +1681,58 @@ build/cRedstoneSimulator.o : source/cRedstoneSimulator.cpp
 build/CraftingRecipes.o : source/CraftingRecipes.cpp
 	$(CC) $(CC_OPTIONS) source/CraftingRecipes.cpp -c $(INCLUDE) -o build/CraftingRecipes.o
 
+
+
+build/squirrelbindings/SquirrelBindings.o : source/squirrelbindings/SquirrelBindings.cpp
+	$(CC) $(CC_OPTIONS) source/squirrelbindings/SquirrelBindings.cpp -c $(INCLUDE) -o build/squirrelbindings/SquirrelBindings.o
+
+build/squirrelbindings/SquirrelFunctions.o : source/squirrelbindings/SquirrelFunctions.cpp
+	$(CC) $(CC_OPTIONS) source/squirrelbindings/SquirrelFunctions.cpp -c $(INCLUDE) -o build/squirrelbindings/SquirrelFunctions.o
+
+build/cPlugin_Squirrel.o : source/cPlugin_Squirrel.cpp
+	$(CC) $(CC_OPTIONS) source/cPlugin_Squirrel.cpp -c $(INCLUDE) -o build/cPlugin_Squirrel.o
+
+build/sqstdaux.o : squirrel_3_0_1_stable/sqstdlib/sqstdaux.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdaux.cpp -c $(INCLUDE) -o build/sqstdaux.o
+build/sqstdblob.o : squirrel_3_0_1_stable/sqstdlib/sqstdblob.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdblob.cpp -c $(INCLUDE) -o build/sqstdblob.o
+build/sqstdio.o : squirrel_3_0_1_stable/sqstdlib/sqstdio.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdio.cpp -c $(INCLUDE) -o build/sqstdio.o
+build/sqstdmath.o : squirrel_3_0_1_stable/sqstdlib/sqstdmath.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdmath.cpp -c $(INCLUDE) -o build/sqstdmath.o
+build/sqstdrex.o : squirrel_3_0_1_stable/sqstdlib/sqstdrex.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdrex.cpp -c $(INCLUDE) -o build/sqstdrex.o
+build/sqstdstream.o : squirrel_3_0_1_stable/sqstdlib/sqstdstream.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdstream.cpp -c $(INCLUDE) -o build/sqstdstream.o
+build/sqstdstring.o : squirrel_3_0_1_stable/sqstdlib/sqstdstring.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdstring.cpp -c $(INCLUDE) -o build/sqstdstring.o
+build/sqstdsystem.o : squirrel_3_0_1_stable/sqstdlib/sqstdsystem.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/sqstdlib/sqstdsystem.cpp -c $(INCLUDE) -o build/sqstdsystem.o
+build/sqapi.o : squirrel_3_0_1_stable/squirrel/sqapi.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqapi.cpp -c $(INCLUDE) -o build/sqapi.o
+build/sqbaselib.o : squirrel_3_0_1_stable/squirrel/sqbaselib.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqbaselib.cpp -c $(INCLUDE) -o build/sqbaselib.o
+build/sqclass.o : squirrel_3_0_1_stable/squirrel/sqclass.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqclass.cpp -c $(INCLUDE) -o build/sqclass.o
+build/sqcompiler.o : squirrel_3_0_1_stable/squirrel/sqcompiler.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqcompiler.cpp -c $(INCLUDE) -o build/sqcompiler.o
+build/sqdebug.o : squirrel_3_0_1_stable/squirrel/sqdebug.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqdebug.cpp -c $(INCLUDE) -o build/sqdebug.o
+build/sqfuncstate.o : squirrel_3_0_1_stable/squirrel/sqfuncstate.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqfuncstate.cpp -c $(INCLUDE) -o build/sqfuncstate.o
+build/sqlexer.o : squirrel_3_0_1_stable/squirrel/sqlexer.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqlexer.cpp -c $(INCLUDE) -o build/sqlexer.o
+build/sqmem.o : squirrel_3_0_1_stable/squirrel/sqmem.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqmem.cpp -c $(INCLUDE) -o build/sqmem.o
+build/sqobject.o : squirrel_3_0_1_stable/squirrel/sqobject.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqobject.cpp -c $(INCLUDE) -o build/sqobject.o
+build/sqstate.o : squirrel_3_0_1_stable/squirrel/sqstate.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqstate.cpp -c $(INCLUDE) -o build/sqstate.o
+build/sqtable.o : squirrel_3_0_1_stable/squirrel/sqtable.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqtable.cpp -c $(INCLUDE) -o build/sqtable.o
+build/sqvm.o : squirrel_3_0_1_stable/squirrel/sqvm.cpp
+	$(CC) $(CC_OPTIONS) squirrel_3_0_1_stable/squirrel/sqvm.cpp -c $(INCLUDE) -o build/sqvm.o
+
 # Template: copy and delete the "# "; insert filenames
 # build/.o : source/.cpp
 # 	$(CC) $(CC_OPTIONS) source/.cpp -c $(INCLUDE) -o build/.o	
-

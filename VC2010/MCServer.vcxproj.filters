@@ -427,11 +427,14 @@
     <Filter Include="Simulator\cSimulator\cRedstoneSimulator">
       <UniqueIdentifier>{4b3b7b43-8e8b-4823-b112-2259fdfff7d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Generating">
-      <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Storage">
       <UniqueIdentifier>{038cf4bd-108e-44e2-bdcb-9d48fb26676e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cPlugin\cPlugin_Squirrel">
+      <UniqueIdentifier>{43f91962-ebda-4195-aadc-921eca3c8356}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HandyStuff\Generating">
+      <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -799,9 +802,6 @@
     <ClCompile Include="..\source\cLavaSimulator.cpp">
       <Filter>Simulator\cSimulator\cFluidSimulator\cLavaSimulator</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\SquirrelBindings.cpp">
-      <Filter>LuaBindings\SquirrelBindings</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\packets\cPacket_Explosion.cpp">
       <Filter>Packets\cPacket_Explosion</Filter>
     </ClCompile>
@@ -870,26 +870,26 @@
       <Filter>Packets</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cChunkGenerator.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Trees.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\CompoGen.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\HeiGen.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\StructGen.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\BioGen.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\BlockID.cpp" />
     <ClCompile Include="..\source\FinishGen.cpp">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\WorldStorage.cpp">
       <Filter>Storage</Filter>
@@ -904,6 +904,16 @@
       <Filter>Storage</Filter>
     </ClCompile>
     <ClCompile Include="..\source\CraftingRecipes.cpp" />
+    <ClCompile Include="..\source\cBlockArea.cpp" />
+    <ClCompile Include="..\source\squirrelbindings\SquirrelBindings.cpp">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\cPlugin_Squirrel.cpp">
+      <Filter>cPlugin\cPlugin_Squirrel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\squirrelbindings\SquirrelFunctions.cpp">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1308,9 +1318,6 @@
     <ClInclude Include="..\source\cLavaSimulator.h">
       <Filter>Simulator\cSimulator\cFluidSimulator\cLavaSimulator</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\SquirrelBindings.h">
-      <Filter>LuaBindings\SquirrelBindings</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\packets\cPacket_Explosion.h">
       <Filter>Packets\cPacket_Explosion</Filter>
     </ClInclude>
@@ -1380,25 +1387,25 @@
       <Filter>Packets</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cChunkGenerator.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\StructGen.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\Trees.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\CompoGen.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\HeiGen.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\BioGen.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\FinishGen.h">
-      <Filter>Generating</Filter>
+      <Filter>HandyStuff\Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\WorldStorage.h">
       <Filter>Storage</Filter>
@@ -1414,6 +1421,22 @@
     </ClInclude>
     <ClInclude Include="..\source\cStep.h" />
     <ClInclude Include="..\source\CraftingRecipes.h" />
+    <ClInclude Include="..\source\cBlockArea.h" />
+    <ClInclude Include="..\source\squirrelbindings\SquirrelBindings.h">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cPlugin_Squirrel.h">
+      <Filter>cPlugin\cPlugin_Squirrel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\squirrelbindings\SquirrelFunctions.h">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\squirrelbindings\SquirrelObject.h">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\squirrelbindings\cSquirrelBaseClass.h">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

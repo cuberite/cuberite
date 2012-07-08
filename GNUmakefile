@@ -52,7 +52,10 @@ INCLUDE = -I.\
 		-IiniFile\
 		-Itolua++-1.0.93/include\
 		-Ijsoncpp-src-0.5.0/include\
-		-Ijsoncpp-src-0.5.0/src/lib_json
+		-Ijsoncpp-src-0.5.0/src/lib_json\
+		-Isquirrel_3_0_1_stable/include\
+		-Isquirrel_3_0_1_stable\
+		-Isquirrel_3_0_1_stable/sqrat
 
 #
 # Build MCServer

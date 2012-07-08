@@ -27,7 +27,7 @@
 #include "cBlockToPickup.h"
 #include "MersenneTwister.h"
 #include "cPlayer.h"
-#include "BlockArea.h"
+#include "cBlockArea.h"
 #include "cPluginManager.h"
 
 #include "packets/cPacket_DestroyEntity.h"

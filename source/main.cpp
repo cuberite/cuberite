@@ -6,16 +6,17 @@
 #include <exception> //std::exception
 #include <csignal>   //std::signal
 #include <stdlib.h>  //exit()
+#include "squirrelbindings/SquirrelFunctions.h"
 
 #ifdef _WIN32
 	#include <dbghelp.h>
 #endif  // _WIN32
 
-#include "SquirrelBindings.h"
+#include "squirrelbindings/SquirrelBindings.h"
 #if USE_SQUIRREL
 	#pragma warning(push)
 	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
-	#include <sqplus/sqplus.h>
+	
 	#pragma warning(pop)
 #endif
 
@@ -189,7 +190,7 @@ int main( int argc, char **argv )
 	}
 
 	#if USE_SQUIRREL
-	SquirrelVM::Shutdown();
+	CloseSquirrelVM();
 	#endif
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)

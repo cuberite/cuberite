@@ -5,6 +5,7 @@
 #include "cPlugin.h"
 #include "cPlugin_Lua.h"
 #include "cPlugin_NewLua.h"
+#include "cPlugin_Squirrel.h"
 #include "cWebAdmin.h"
 #include "cItem.h"
 #include "cRoot.h"
@@ -12,10 +13,12 @@
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
 
-#include "SquirrelBindings.h"
+#include "squirrelbindings/SquirrelBindings.h"
+#include "squirrelbindings/SquirrelFunctions.h"
+
 #if USE_SQUIRREL
 	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
-	#include <sqplus/sqplus.h>
+	
 	#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
 #endif
 
@@ -70,11 +73,8 @@ void cPluginManager::ReloadPluginsNow()
 	UnloadPluginsNow();
 
 	#if USE_SQUIRREL
-	if( !SquirrelBindings::IsBound )	// Can only do this once apparently, or we're making ambiguous calls in the script
-	{
-		SquirrelVM::Init();
-		SquirrelBindings::Bind( SquirrelVM::GetVMPtr() );
-	}
+	CloseSquirrelVM();
+	OpenSquirrelVM();
 	#endif  // USE_SQUIRREL
 
 	cIniFile IniFile("settings.ini");
@@ -129,26 +129,11 @@ void cPluginManager::ReloadPluginsNow()
 				if( !PluginFile.empty() )
 				{
 					LOGINFO("Loading Squirrel plugin: %s", PluginFile.c_str() );
-					try 
-					{
-						SquirrelObject SquirrelScript = SquirrelVM::CompileScript( (AString("Plugins/") + PluginFile + ".nut").c_str() );
-						try 
-						{
-							SquirrelVM::RunScript( SquirrelScript );
-						} 
-						catch (SquirrelError & e)
-						{
-							LOGERROR("SquirrelScript error: %s, %s\n", e.desc, "SquirrelVM::RunScript");
-						}
-					}
-					catch (SquirrelError & e) 
-					{
-						LOGERROR("SquirrelScript error: %s, %s\n", e.desc, "SquirrelVM::CompileScript");
-					}
+					
+					this->AddPlugin(new cPlugin_Squirrel(PluginFile.c_str()));
 				}
 			}
 			#endif  // USE_SQUIRREL
-			
 		}
 	}
 
@@ -195,7 +180,7 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 	if (a_Hook == HOOK_CHAT)
 	{
 		if (a_NumArgs != 2)
-		{
+		{ 	
 			return false;
 		}
 		va_list argptr;
@@ -221,6 +206,7 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 				return true;
 			}
 		}
+		
 		return false;
 	}
 

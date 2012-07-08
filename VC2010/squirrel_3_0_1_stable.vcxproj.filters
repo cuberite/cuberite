@@ -7,9 +7,6 @@
     <Filter Include="sqstdlib">
       <UniqueIdentifier>{819d39f8-4859-48ad-b096-04f8d6811524}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sqplus">
-      <UniqueIdentifier>{d9a1c0d8-bd70-4686-9a3d-c35c9d3365e3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\squirrel_3_0_1_stable\squirrel\sqapi.cpp">
@@ -72,27 +69,6 @@
     <ClCompile Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdsystem.cpp">
       <Filter>sqstdlib</Filter>
     </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SqPlus.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SqPlusOCharBuf.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SqPlusUtf8.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtils.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtilsWin32.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelObject.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelVM.cpp">
-      <Filter>sqplus</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\squirrel_3_0_1_stable\squirrel\sqarray.h">
@@ -148,51 +124,6 @@
     </ClInclude>
     <ClInclude Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdstream.h">
       <Filter>sqstdlib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\sqplus.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusCallTemplates.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusConst.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusFunctionCallImpl.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusOCharBuf.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusOverload.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusSetup.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusSmartPointer.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusTypeMask.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusUtf8.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\sqplusWin32.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtils.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtilsWin32.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelObject.h">
-      <Filter>sqplus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelVM.h">
-      <Filter>sqplus</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

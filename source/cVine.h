@@ -19,6 +19,5 @@ public:
 			default:
 				return 0xf;
 		};
-		return 0xf;
 	}													//tolua_export
 };														//tolua_export

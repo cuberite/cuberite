@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/02/12 18:39:13.
+** Generated automatically by tolua++-1.0.92 on 07/08/12 16:56:12.
 */
 
 #ifndef __cplusplus
@@ -54,7 +54,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "cMCLogger.h"
 #include "cTracer.h"
 #include "cGroup.h"
-#include "BlockArea.h"
+#include "cBlockArea.h"
 #include "packets/cPacket_Login.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_BlockPlace.h"

@@ -72,13 +72,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SqPlus.cpp" />
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SqPlusOCharBuf.cpp" />
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SqPlusUtf8.cpp" />
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtils.cpp" />
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtilsWin32.cpp" />
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelObject.cpp" />
-    <ClCompile Include="..\squirrel_3_0_1_stable\sqplus\SquirrelVM.cpp" />
     <ClCompile Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdaux.cpp" />
     <ClCompile Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdblob.cpp" />
     <ClCompile Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdio.cpp" />
@@ -101,21 +94,6 @@
     <ClCompile Include="..\squirrel_3_0_1_stable\squirrel\sqvm.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\sqplus.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusCallTemplates.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusConst.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusFunctionCallImpl.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusOCharBuf.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusOverload.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusSetup.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusSmartPointer.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusTypeMask.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SqPlusUtf8.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\sqplusWin32.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtils.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelBindingsUtilsWin32.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelObject.h" />
-    <ClInclude Include="..\squirrel_3_0_1_stable\sqplus\SquirrelVM.h" />
     <ClInclude Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdblobimpl.h" />
     <ClInclude Include="..\squirrel_3_0_1_stable\sqstdlib\sqstdstream.h" />
     <ClInclude Include="..\squirrel_3_0_1_stable\squirrel\sqarray.h" />
