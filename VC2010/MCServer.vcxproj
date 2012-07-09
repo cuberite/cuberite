@@ -378,6 +378,7 @@
     <ClCompile Include="..\source\cSocketThreads.cpp" />
     <ClCompile Include="..\source\cSpider.cpp" />
     <ClCompile Include="..\source\cSquid.cpp" />
+    <ClCompile Include="..\source\cSquirrelCommandBinder.cpp" />
     <ClCompile Include="..\source\cStringMap.cpp" />
     <ClCompile Include="..\source\cSurvivalInventory.cpp" />
     <ClCompile Include="..\Source\cTCPLink.cpp" />
@@ -527,6 +528,7 @@
     <ClInclude Include="..\source\cIsThread.h" />
     <ClInclude Include="..\Source\cLadder.h" />
     <ClInclude Include="..\source\cPlugin_Squirrel.h" />
+    <ClInclude Include="..\source\cSquirrelCommandBinder.h" />
     <ClInclude Include="..\Source\cVine.h" />
     <ClInclude Include="..\source\cLavaSimulator.h" />
     <ClInclude Include="..\Source\cLuaCommandBinder.h" />
@@ -666,6 +668,7 @@
     <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
     <ClInclude Include="..\source\squirrelbindings\cSquirrelBaseClass.h" />
+    <ClInclude Include="..\source\squirrelbindings\SquirrelArray.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelBindings.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelFunctions.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelObject.h" />

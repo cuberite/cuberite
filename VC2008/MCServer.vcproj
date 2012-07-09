@@ -1738,6 +1738,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cSquirrelCommandBinder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cSquirrelCommandBinder.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cStringMap.cpp"
 					>
 				</File>
@@ -1782,6 +1790,10 @@
 					>
 					<File
 						RelativePath="..\source\squirrelbindings\cSquirrelBaseClass.h"
+						>
+					</File>
+					<File
+						RelativePath="..\source\squirrelbindings\SquirrelArray.h"
 						>
 					</File>
 					<File

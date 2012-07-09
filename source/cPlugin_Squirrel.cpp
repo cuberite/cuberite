@@ -13,7 +13,6 @@ cPlugin_Squirrel::cPlugin_Squirrel( const char* a_PluginName )
 
 cPlugin_Squirrel::~cPlugin_Squirrel()
 {
-	delete m_PluginName;
 	delete m_Plugin;
 }
 

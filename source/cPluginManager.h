@@ -5,6 +5,7 @@
 
 struct lua_State;
 class cLuaCommandBinder;
+class cSquirrelCommandBinder;
 class cPlugin;
 class cPlugin_Lua;
 
@@ -109,8 +110,10 @@ public:																	//tolua_export
 	void RemovePlugin( cPlugin* a_Plugin, bool a_bDelete = false );		//tolua_export
 	void RemoveLuaPlugin( std::string a_FileName );						//tolua_export
 	cPlugin_Lua* GetLuaPlugin( lua_State* a_State );					//tolua_export
-
+	
 	cLuaCommandBinder* GetLuaCommandBinder() const { return m_LuaCommandBinder; }
+	
+	cSquirrelCommandBinder* GetSquirrelCommandBinder() { return m_SquirrelCommandBinder; }
 
 	bool HasPlugin( cPlugin* a_Plugin ) const;
 private:
@@ -127,8 +130,9 @@ private:
 
 	void ReloadPluginsNow();
 	void UnloadPluginsNow();
-
+	
 	cLuaCommandBinder* m_LuaCommandBinder;
+	cSquirrelCommandBinder* m_SquirrelCommandBinder;
 
 	bool m_bReloadPlugins;
 }; //tolua_export

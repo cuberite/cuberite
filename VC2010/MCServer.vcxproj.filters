@@ -436,6 +436,9 @@
     <Filter Include="HandyStuff\Generating">
       <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cPluginManager\cSquirrelCommandBinder">
+      <UniqueIdentifier>{0a0b9b8e-ac72-4755-98e5-87cbc835016a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -914,6 +917,9 @@
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClCompile>
     <ClCompile Include="..\source\BlockArea.cpp" />
+    <ClCompile Include="..\source\cSquirrelCommandBinder.cpp">
+      <Filter>cPluginManager\cSquirrelCommandBinder</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1437,6 +1443,12 @@
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClInclude>
     <ClInclude Include="..\source\BlockArea.h" />
+    <ClInclude Include="..\source\cSquirrelCommandBinder.h">
+      <Filter>cPluginManager\cSquirrelCommandBinder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\squirrelbindings\SquirrelArray.h">
+      <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

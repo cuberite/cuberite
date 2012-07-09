@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cPluginManager.h"
@@ -10,6 +9,7 @@
 #include "cItem.h"
 #include "cRoot.h"
 #include "cLuaCommandBinder.h"
+#include "cSquirrelCommandBinder.h"
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
 
@@ -38,6 +38,7 @@ cPluginManager* cPluginManager::GetPluginManager()
 
 cPluginManager::cPluginManager()
 	: m_LuaCommandBinder( new cLuaCommandBinder() )
+	, m_SquirrelCommandBinder( new cSquirrelCommandBinder() )
 	, m_bReloadPlugins(false)
 {
 }
@@ -51,6 +52,7 @@ cPluginManager::~cPluginManager()
 	UnloadPluginsNow();
 	
 	delete m_LuaCommandBinder;
+	delete m_SquirrelCommandBinder;
 }
 
 
@@ -130,7 +132,12 @@ void cPluginManager::ReloadPluginsNow()
 				{
 					LOGINFO("Loading Squirrel plugin: %s", PluginFile.c_str() );
 					
-					this->AddPlugin(new cPlugin_Squirrel(PluginFile.c_str()));
+					cPlugin_Squirrel *Plugin = new cPlugin_Squirrel(PluginFile.c_str());
+
+					if( !AddPlugin( Plugin ) )
+					{
+						delete Plugin;
+					}
 				}
 			}
 			#endif  // USE_SQUIRREL
@@ -188,6 +195,11 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 		const char * Message = va_arg(argptr, const char* );
 		cPlayer * Player = va_arg(argptr, cPlayer * );
 		va_end (argptr);
+
+		if (m_SquirrelCommandBinder->HandleCommand( std::string( Message ), Player))
+		{
+			return true;
+		}
 
 		if (m_LuaCommandBinder->HandleCommand( std::string( Message ), Player))
 		{
@@ -644,13 +656,12 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 	if( a_bDelete )
 	{
 		m_LuaCommandBinder->RemoveBindingsForPlugin( a_Plugin );
+		m_SquirrelCommandBinder->RemoveBindingsForPlugin( a_Plugin );
 		m_Plugins.remove( a_Plugin );
 		RemoveHooks( a_Plugin );
 		a_Plugin->OnDisable();
-		if( a_Plugin->GetLanguage() != cPlugin::E_SQUIRREL ) // Squirrel needs to clean it up himself!
-		{
-			delete a_Plugin;
-		}
+
+		delete a_Plugin;
 	}
 	else
 	{
