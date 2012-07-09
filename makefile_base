@@ -69,7 +69,7 @@ MCServer : \
 		build/cReferenceManager.o\
 		build/Bindings.o\
 		build/BlockID.o\
-		build/cBlockArea.o\
+		build/BlockArea.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
@@ -317,7 +317,7 @@ MCServer : \
 		build/cReferenceManager.o\
 		build/Bindings.o\
 		build/BlockID.o\
-		build/cBlockArea.o\
+		build/BlockArea.o\
 		build/cBlockToPickup.o\
 		build/cChatColor.o\
 		build/cChestEntity.o\
@@ -810,8 +810,8 @@ build/Bindings.o : source/Bindings.cpp
 build/BlockID.o : source/BlockID.cpp
 	$(CC) $(CC_OPTIONS) source/BlockID.cpp -c $(INCLUDE) -o build/BlockID.o
 
-build/cBlockArea.o : source/cBlockArea.cpp
-	$(CC) $(CC_OPTIONS) source/cBlockArea.cpp -c $(INCLUDE) -o build/cBlockArea.o
+build/BlockArea.o : source/BlockArea.cpp
+	$(CC) $(CC_OPTIONS) source/BlockArea.cpp -c $(INCLUDE) -o build/BlockArea.o
 
 
 # Item # 6 -- cBlockToPickup --

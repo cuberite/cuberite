@@ -54,7 +54,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "cMCLogger.h"
 #include "cTracer.h"
 #include "cGroup.h"
-#include "cBlockArea.h"
+#include "BlockArea.h"
 #include "packets/cPacket_Login.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_BlockPlace.h"

@@ -5,7 +5,7 @@
 // The object also supports writing the blockdata back into cWorld, even into other coords
 
 #include "Globals.h"
-#include "cBlockArea.h"
+#include "BlockArea.h"
 #include "cWorld.h"
 
 

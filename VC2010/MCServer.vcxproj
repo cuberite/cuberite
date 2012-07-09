@@ -303,10 +303,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\source\BioGen.cpp" />
+    <ClCompile Include="..\source\BlockArea.cpp" />
     <ClCompile Include="..\source\BlockID.cpp" />
     <ClCompile Include="..\source\cAggressiveMonster.cpp" />
     <ClCompile Include="..\Source\cAuthenticator.cpp" />
-    <ClCompile Include="..\source\cBlockArea.cpp" />
     <ClCompile Include="..\source\cBlockingTCPLink.cpp" />
     <ClCompile Include="..\source\cCavespider.cpp" />
     <ClCompile Include="..\Source\cChicken.cpp" />
@@ -495,10 +495,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\BioGen.h" />
+    <ClInclude Include="..\source\BlockArea.h" />
     <ClInclude Include="..\Source\BlockID.h" />
     <ClInclude Include="..\source\cAggressiveMonster.h" />
     <ClInclude Include="..\Source\cAuthenticator.h" />
-    <ClInclude Include="..\source\cBlockArea.h" />
     <ClInclude Include="..\source\cBlockingTCPLink.h" />
     <ClInclude Include="..\source\cCavespider.h" />
     <ClInclude Include="..\Source\cChicken.h" />

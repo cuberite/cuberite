@@ -2,7 +2,7 @@
 #include "SquirrelBindings.h"
 #include "../cPlugin_Squirrel.h"
 #include "../cPluginManager.h"
-#include "cRoot.h"
+#include "../cRoot.h"
 
 //The baseclass for squirrel plugins
 class cSquirrelBaseClass

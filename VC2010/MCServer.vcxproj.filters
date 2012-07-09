@@ -904,7 +904,6 @@
       <Filter>Storage</Filter>
     </ClCompile>
     <ClCompile Include="..\source\CraftingRecipes.cpp" />
-    <ClCompile Include="..\source\cBlockArea.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelBindings.cpp">
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClCompile>
@@ -914,6 +913,7 @@
     <ClCompile Include="..\source\squirrelbindings\SquirrelFunctions.cpp">
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\BlockArea.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1421,7 +1421,6 @@
     </ClInclude>
     <ClInclude Include="..\source\cStep.h" />
     <ClInclude Include="..\source\CraftingRecipes.h" />
-    <ClInclude Include="..\source\cBlockArea.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelBindings.h">
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClInclude>
@@ -1437,6 +1436,7 @@
     <ClInclude Include="..\source\squirrelbindings\cSquirrelBaseClass.h">
       <Filter>LuaBindings\SquirrelBindings</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\BlockArea.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

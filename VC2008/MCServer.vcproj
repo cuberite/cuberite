@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -117,7 +117,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -192,7 +192,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="../zlib-1.2.7;../jsoncpp-src-0.5.0/include;../lua-5.1.4/src;../tolua++-1.0.93/include"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -1621,7 +1621,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="GenerateBindings.cmd"
+							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
@@ -1632,7 +1632,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="GenerateBindings.cmd"
+							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
@@ -1643,7 +1643,7 @@
 						>
 						<Tool
 							Name="VCCustomBuildTool"
-							CommandLine="GenerateBindings.cmd"
+							CommandLine="GenerateBindings.cmd&#x0D;&#x0A;"
 							AdditionalDependencies="&quot;cTorch.h&quot;;&quot;cStairs.h&quot;;&quot;cLadder.h&quot;;&quot;../iniFile/iniFile.h&quot;;&quot;BlockID.h&quot;;&quot;PacketID.h&quot;;&quot;Defines.h&quot;;&quot;LuaFunctions.h&quot;;&quot;cStringMap.h&quot;;&quot;cChatColor.h&quot;;&quot;cClientHandle.h&quot;;&quot;cEntity.h&quot;;&quot;cPawn.h&quot;;&quot;cPlayer.h&quot;;&quot;cPluginManager.h&quot;;&quot;cPlugin.h&quot;;&quot;cPlugin_NewLua.h&quot;;&quot;cPlugin_Lua.h&quot;;&quot;cServer.h&quot;;&quot;cWorld.h&quot;;&quot;cInventory.h&quot;;&quot;cItem.h&quot;;&quot;cWebAdmin.h&quot;;&quot;cWebPlugin.h&quot;;&quot;cWebPlugin_Lua.h&quot;;&quot;cPickup.h&quot;;&quot;cRoot.h&quot;;&quot;cTCPLink.h&quot;;&quot;Vector3f.h&quot;;&quot;Vector3d.h&quot;;&quot;Vector3i.h&quot;;&quot;Matrix4f.h&quot;;&quot;cCuboid.h&quot;;&quot;cMCLogger.h&quot;;&quot;cTracer.h&quot;;&quot;cGroup.h&quot;;&quot;BlockArea.h&quot;;&quot;packets/cPacket_Login.h&quot;;&quot;packets/cPacket_BlockDig.h&quot;;&quot;packets/cPacket_BlockPlace.h&quot;"
 							Outputs="Bindings.cpp"
 						/>
@@ -1722,6 +1722,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cPlugin_Squirrel.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cPlugin_Squirrel.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cPluginManager.cpp"
 					>
 				</File>
@@ -1762,14 +1770,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\SquirrelBindings.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SquirrelBindings.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\tolua++.h"
 					>
 				</File>
@@ -1777,6 +1777,34 @@
 					RelativePath="..\source\tolua_base.h"
 					>
 				</File>
+				<Filter
+					Name="Squirrel"
+					>
+					<File
+						RelativePath="..\source\squirrelbindings\cSquirrelBaseClass.h"
+						>
+					</File>
+					<File
+						RelativePath="..\source\squirrelbindings\SquirrelBindings.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\source\squirrelbindings\SquirrelBindings.h"
+						>
+					</File>
+					<File
+						RelativePath="..\source\squirrelbindings\SquirrelFunctions.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\source\squirrelbindings\SquirrelFunctions.h"
+						>
+					</File>
+					<File
+						RelativePath="..\source\squirrelbindings\SquirrelObject.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="External"
