@@ -9,13 +9,18 @@ public:
 		m_SquirrelObject = a_Obj;
 	}
 
-	Sqrat::Function GetFunction(const char *methodName)
+	Sqrat::Function GetFunction(const char *a_MethodName)
 	{
 		if(m_SquirrelObject.IsNull())
 			return Sqrat::Function();
 
-		Sqrat::Function method(m_SquirrelObject, methodName);
+		Sqrat::Function method(m_SquirrelObject, a_MethodName);
 		return method;
+	}
+
+	bool HasFunction(const char *a_MethodName)
+	{
+		return !this->GetFunction(a_MethodName).IsNull();
 	}
 
 protected:

@@ -278,8 +278,8 @@ MCServer : \
 		build/sqstate.o\
 		build/sqtable.o\
 		build/sqvm.o\
-		build/squirrelbindings/SquirrelBindings.o\
-		build/squirrelbindings/SquirrelFunctions.o\
+		build/SquirrelBindings.o\
+		build/SquirrelFunctions.o\
 		build/cSquirrelCommandBinder.o\
 		build/cPlugin_Squirrel.o\
 		build/CraftingRecipes.o
@@ -527,8 +527,8 @@ MCServer : \
 		build/sqstate.o\
 		build/sqtable.o\
 		build/sqvm.o\
-		build/squirrelbindings/SquirrelBindings.o\
-		build/squirrelbindings/SquirrelFunctions.o\
+		build/SquirrelBindings.o\
+		build/SquirrelFunctions.o\
 		build/cSquirrelCommandBinder.o\
 		build/cPlugin_Squirrel.o\
 		-o MCServer
@@ -771,8 +771,8 @@ clean :
 		build/sqstate.o\
 		build/sqtable.o\
 		build/sqvm.o\
-		build/squirrelbindings/SquirrelBindings.o\
-		build/squirrelbindings/SquirrelFunctions.o\
+		build/SquirrelBindings.o\
+		build/SquirrelFunctions.o\
 		build/cSquirrelCommandBinder.o\
 		build/cPlugin_Squirrel.o\
 		MCServer
@@ -1686,14 +1686,14 @@ build/CraftingRecipes.o : source/CraftingRecipes.cpp
 
 
 
-build/squirrelbindings/SquirrelBindings.o : source/squirrelbindings/SquirrelBindings.cpp
-	$(CC) $(CC_OPTIONS) source/squirrelbindings/SquirrelBindings.cpp -c $(INCLUDE) -o build/squirrelbindings/SquirrelBindings.o
+build/SquirrelBindings.o : source/squirrelbindings/SquirrelBindings.cpp
+	$(CC) $(CC_OPTIONS) source/squirrelbindings/SquirrelBindings.cpp -c $(INCLUDE) -o build/SquirrelBindings.o
 
 build/cSquirrelCommandBinder.o : source/cSquirrelCommandBinder.cpp
 	$(CC) $(CC_OPTIONS) source/cSquirrelCommandBinder.cpp -c $(INCLUDE) -o build/cSquirrelCommandBinder.o
 
-build/squirrelbindings/SquirrelFunctions.o : source/squirrelbindings/SquirrelFunctions.cpp
-	$(CC) $(CC_OPTIONS) source/squirrelbindings/SquirrelFunctions.cpp -c $(INCLUDE) -o build/squirrelbindings/SquirrelFunctions.o
+build/SquirrelFunctions.o : source/squirrelbindings/SquirrelFunctions.cpp
+	$(CC) $(CC_OPTIONS) source/squirrelbindings/SquirrelFunctions.cpp -c $(INCLUDE) -o build/SquirrelFunctions.o
 
 build/cPlugin_Squirrel.o : source/cPlugin_Squirrel.cpp
 	$(CC) $(CC_OPTIONS) source/cPlugin_Squirrel.cpp -c $(INCLUDE) -o build/cPlugin_Squirrel.o

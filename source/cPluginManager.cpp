@@ -12,6 +12,7 @@
 #include "cSquirrelCommandBinder.h"
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
+#include "cPlayer.h"
 
 #include "squirrelbindings/SquirrelBindings.h"
 #include "squirrelbindings/SquirrelFunctions.h"
@@ -204,6 +205,14 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 		if (m_LuaCommandBinder->HandleCommand( std::string( Message ), Player))
 		{
 			return true;
+		}
+
+		//Check if it was a standard command (starts with a slash)
+		if(Message[0] == '/')
+		{
+			Player->SendMessage("Unknown Command");
+			LOGINFO("Player \"%s\" issued command: %s", Player->GetName().c_str(), Message);
+			return true;	//Cancel sending
 		}
 
 		if (Plugins == m_Hooks.end())

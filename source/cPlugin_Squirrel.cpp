@@ -77,6 +77,8 @@ void cPlugin_Squirrel::OnDisable()
 {
 	cCSLock Lock(m_CriticalSection);
 	
+	if(!m_Plugin->HasFunction("OnDisable")) return;
+	
 	m_Plugin->GetFunction("OnDisable").Execute();
 }
 
@@ -87,6 +89,8 @@ void cPlugin_Squirrel::OnDisable()
 void cPlugin_Squirrel::Tick(float a_Dt)
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnTick")) return;
 	
 	m_Plugin->GetFunction("OnTick").Execute(a_Dt);
 }
@@ -98,6 +102,8 @@ void cPlugin_Squirrel::Tick(float a_Dt)
 bool cPlugin_Squirrel::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnCollectItem")) return false;
 	
 	return m_Plugin->GetFunction("OnCollectItem").Evaluate<bool>(a_Pickup, a_Player);
 }
@@ -110,6 +116,7 @@ bool cPlugin_Squirrel::OnDisconnect(const AString & a_Reason, cPlayer* a_Player 
 {
 	cCSLock Lock( m_CriticalSection );
 	
+	if(!m_Plugin->HasFunction("OnDisconnect")) return false;
 	
 	return m_Plugin->GetFunction("OnDisconnect").Evaluate<bool>(a_Reason, a_Player);
 }
@@ -121,6 +128,8 @@ bool cPlugin_Squirrel::OnDisconnect(const AString & a_Reason, cPlayer* a_Player 
 bool cPlugin_Squirrel::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnBlockPlace")) return false;
 	
 	return m_Plugin->GetFunction("OnBlockPlace").Evaluate<bool>(a_PacketData, a_Player);
 }
@@ -133,6 +142,8 @@ bool cPlugin_Squirrel::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Pl
 {
 	cCSLock Lock( m_CriticalSection );
 
+	if(!m_Plugin->HasFunction("OnBlockDig")) return false;
+
 	return m_Plugin->GetFunction("OnBlockDig").Evaluate<bool>(a_PacketData, a_Player, a_PickupItem);
 }
 
@@ -143,6 +154,8 @@ bool cPlugin_Squirrel::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Pl
 bool cPlugin_Squirrel::OnChat( const char* a_Chat, cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnChat")) return false;
 	
 	return m_Plugin->GetFunction("OnChat").Evaluate<bool>(a_Chat, a_Player);
 
@@ -155,6 +168,8 @@ bool cPlugin_Squirrel::OnChat( const char* a_Chat, cPlayer* a_Player )
 bool cPlugin_Squirrel::OnLogin( cPacket_Login* a_PacketData )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnLogin")) return false;
 	
 	return m_Plugin->GetFunction("OnLogin").Evaluate<bool>(a_PacketData);
 }
@@ -166,6 +181,8 @@ bool cPlugin_Squirrel::OnLogin( cPacket_Login* a_PacketData )
 void cPlugin_Squirrel::OnPlayerSpawn( cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnPlayerSpawn")) return;
 	
 	return m_Plugin->GetFunction("OnPlayerSpawn").Execute(a_Player);
 
@@ -178,6 +195,8 @@ void cPlugin_Squirrel::OnPlayerSpawn( cPlayer* a_Player )
 bool cPlugin_Squirrel::OnPlayerJoin( cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnPlayerJoin")) return false;
 	
 	return m_Plugin->GetFunction("OnPlayerJoin").Evaluate<bool>(a_Player);
 }
@@ -189,6 +208,8 @@ bool cPlugin_Squirrel::OnPlayerJoin( cPlayer* a_Player )
 void cPlugin_Squirrel::OnPlayerMove( cPlayer* a_Player )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnPlayerMove")) return;
 	
 	return m_Plugin->GetFunction("OnPlayerMove").Execute(a_Player);
 
@@ -201,6 +222,8 @@ void cPlugin_Squirrel::OnPlayerMove( cPlayer* a_Player )
 void cPlugin_Squirrel::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo )
 {
 	cCSLock Lock( m_CriticalSection );
+
+	if(!m_Plugin->HasFunction("OnTakeDamage")) return;
 	
 	return m_Plugin->GetFunction("OnTakeDamage")(a_Pawn, a_TakeDamageInfo);
 }
@@ -212,7 +235,7 @@ void cPlugin_Squirrel::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamage
 bool cPlugin_Squirrel::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 {
 	cCSLock Lock( m_CriticalSection );
-	
+	if(!m_Plugin->HasFunction("OnKilled")) return false;
 	return m_Plugin->GetFunction("OnKilled").Evaluate<bool>(a_Killed, a_Killer);
 }
 
@@ -223,7 +246,7 @@ bool cPlugin_Squirrel::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 void cPlugin_Squirrel::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
-	
+	if(!m_Plugin->HasFunction("OnChunkGenerated")) return;
 	return m_Plugin->GetFunction("OnChunkGenerated")(a_World, a_ChunkX, a_ChunkZ);
 }
 
@@ -234,7 +257,7 @@ void cPlugin_Squirrel::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Ch
 bool cPlugin_Squirrel::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
 {
 	cCSLock Lock(m_CriticalSection);
-	
+	if(!m_Plugin->HasFunction("OnChunkGenerating")) return false;
 	return m_Plugin->GetFunction("OnChunkGenerating").Evaluate<bool>(a_World, a_ChunkX, a_ChunkZ, a_pLuaChunk);
 }
 
@@ -245,7 +268,7 @@ bool cPlugin_Squirrel::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_C
 bool cPlugin_Squirrel::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
-	
+	if(!m_Plugin->HasFunction("OnPreCrafting")) return false;
 	return m_Plugin->GetFunction("OnPreCrafting").Evaluate<bool>((cPlayer *) a_Player, (cCraftingGrid *) a_Grid, a_Recipe);
 
 }
@@ -257,7 +280,7 @@ bool cPlugin_Squirrel::OnPreCrafting(const cPlayer * a_Player, const cCraftingGr
 bool cPlugin_Squirrel::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
-	
+	if(!m_Plugin->HasFunction("OnCraftingNoRecipe")) return false;
 	return m_Plugin->GetFunction("OnCraftingNoRecipe").Evaluate<bool>((cPlayer *) a_Player, (cCraftingGrid *) a_Grid, a_Recipe);
 }
 
@@ -269,7 +292,7 @@ bool cPlugin_Squirrel::OnPostCrafting(const cPlayer * a_Player, const cCraftingG
 {
 	cCSLock Lock(m_CriticalSection);
 	
-	
+	if(!m_Plugin->HasFunction("OnPostCrafting")) return false;
 	return m_Plugin->GetFunction("OnPostCrafting").Evaluate<bool>((cPlayer *) a_Player, (cCraftingGrid *) a_Grid, a_Recipe);
 }
 
@@ -284,7 +307,7 @@ bool cPlugin_Squirrel::OnBlockToPickup(
 {
 	cCSLock Lock(m_CriticalSection);
 
-	
+	if(!m_Plugin->HasFunction("OnBlockToPickup")) return false;
 	return m_Plugin->GetFunction("OnBlockToPickup").Evaluate<bool>(a_BlockType, a_BlockMeta, (cPlayer *) a_Player, a_EquippedItem, a_Pickups);
 
 }
@@ -297,7 +320,7 @@ bool cPlugin_Squirrel::OnWeatherChanged(cWorld * a_World)
 {
 	cCSLock Lock(m_CriticalSection);
 	
-	
+	if(!m_Plugin->HasFunction("OnWeatherChanged")) return false;
 	return m_Plugin->GetFunction("OnWeatherChanged").Evaluate<bool>(a_World);
 }
 
@@ -313,7 +336,7 @@ bool cPlugin_Squirrel::OnUpdatingSign(
 {
 	cCSLock Lock(m_CriticalSection);
 	
-	
+	if(!m_Plugin->HasFunction("OnUpdatingSign")) return false;
 	return m_Plugin->GetFunction("OnUpdatingSign")
 		.Evaluate<bool>(
 			a_World,
@@ -337,6 +360,9 @@ bool cPlugin_Squirrel::OnUpdatedSign(
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
 )
 {
+	cCSLock Lock(m_CriticalSection);
+
+	if(!m_Plugin->HasFunction("OnUpdatedSign")) return false;
 	return m_Plugin->GetFunction("OnUpdatedSign")
 		.Evaluate<bool>(
 			a_World,
