@@ -6,7 +6,7 @@ public:
 	static char RotationToMetaData( float a_Rotation, int a_Direction )		//tolua_export
 	{														//tolua_export
     a_Rotation += 90 + 45; // So its not aligned with axis
-    int result = 0x0;
+    char result = 0x0;
     if( a_Direction == 0)
     {
       

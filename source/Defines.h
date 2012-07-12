@@ -72,6 +72,12 @@ inline bool IsBlockLava(char a_BlockID)
 }
 
 
+inline bool IsBlockLiquid(char a_BlockID)
+{
+	return IsBlockWater(a_BlockID) || IsBlockLava(a_BlockID);
+}
+
+
 
 
 

@@ -88,10 +88,11 @@ bool cFireSimulator::IsBurnable( char a_BlockID )
 	return a_BlockID == E_BLOCK_PLANKS
 		|| a_BlockID == E_BLOCK_LEAVES
 		|| a_BlockID == E_BLOCK_LOG
-		|| a_BlockID == E_BLOCK_WHITE_CLOTH
+		|| a_BlockID == E_BLOCK_WOOL
 		|| a_BlockID == E_BLOCK_BOOKCASE
 		|| a_BlockID == E_BLOCK_FENCE
-		|| a_BlockID == E_BLOCK_TNT;
+		|| a_BlockID == E_BLOCK_TNT
+		|| a_BlockID == E_BLOCK_VINES;
 }
 
 bool cFireSimulator::FiresForever( char a_BlockID )
