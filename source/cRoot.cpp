@@ -149,7 +149,7 @@ void cRoot::Start()
 
 		LOG("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( true );
+		m_InputThread->Start( false );	//we should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
 
 		LOG("Initialization done, server running now.");
 		while( !m_bStop && !m_bRestart ) // These are modified by external threads
