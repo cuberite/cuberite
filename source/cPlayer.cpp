@@ -515,7 +515,7 @@ void cPlayer::SetGameMode( eGameMode a_GameMode )
 			m_ClientHandle->Send ( GameModePacket );
 			GetInventory().SendWholeInventory(m_ClientHandle);
 			
-			OldInventory->SetEquippedSlot(GetInventory().GetEquippedSlot());
+			GetInventory().SetEquippedSlot(OldInventory->GetEquippedSlot());
 		}
 	}
 }
