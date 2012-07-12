@@ -307,7 +307,7 @@ void cClientHandle::Authenticate(void)
 		World = cRoot::Get()->GetDefaultWorld();
 	}
 	
-	m_Player->LoginSetGameMode (World->GetGameMode()); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
+	// We don´t need this, do we? m_Player->LoginSetGameMode (World->GetGameMode()); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
 
 	m_Player->SetIP (m_Socket.GetIPString());
 
@@ -909,6 +909,14 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 
 void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 {
+	if(a_Packet->m_PosX == -1
+		&& a_Packet->m_PosY == 255
+		&& a_Packet->m_PosZ == -1)
+	{
+		//I don´t know whats the idea behind these packets O.o
+		return;
+	}
+
 	if (!CheckBlockInteractionsRate())
 	{
 		return;

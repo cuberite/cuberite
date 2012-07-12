@@ -915,6 +915,7 @@ bool cPlayer::LoadFromDisk()
 
 	m_Health = (short)root.get("health", 0 ).asInt();
 	m_FoodLevel = (short)root.get("food", 0 ).asInt();
+	m_GameMode = (eGameMode) root.get("gamemode", cRoot::Get()->GetDefaultWorld()->GetGameMode()).asInt();
 	m_Inventory->LoadFromJson(root["inventory"]);
 	m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
 
@@ -960,6 +961,7 @@ bool cPlayer::SaveToDisk()
 	root["health"] = m_Health;
 	root["food"] = m_FoodLevel;
 	root["world"] = GetWorld()->GetName();
+	root["gamemode"] = (int) m_GameMode;
 
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write( root );
