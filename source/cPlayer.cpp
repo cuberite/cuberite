@@ -53,7 +53,7 @@ CLASS_DEFINITION( cPlayer, cPawn );
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: m_GameMode( eGameMode_Survival )
+	: m_GameMode(eGameMode_NotSet)
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
 	, m_LastBlockActionCnt( 0 )
@@ -915,7 +915,10 @@ bool cPlayer::LoadFromDisk()
 
 	m_Health = (short)root.get("health", 0 ).asInt();
 	m_FoodLevel = (short)root.get("food", 0 ).asInt();
-	m_GameMode = (eGameMode) root.get("gamemode", cRoot::Get()->GetDefaultWorld()->GetGameMode()).asInt();
+
+	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
+	
+
 	m_Inventory->LoadFromJson(root["inventory"]);
 	m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
 
@@ -961,7 +964,13 @@ bool cPlayer::SaveToDisk()
 	root["health"] = m_Health;
 	root["food"] = m_FoodLevel;
 	root["world"] = GetWorld()->GetName();
-	root["gamemode"] = (int) m_GameMode;
+
+	if(m_GameMode == GetWorld()->GetGameMode())
+	{
+		root["gamemode"] = (int) eGameMode_NotSet;
+	}else{
+		root["gamemode"] = (int) m_GameMode;
+	}
 
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write( root );

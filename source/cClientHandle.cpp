@@ -307,7 +307,8 @@ void cClientHandle::Authenticate(void)
 		World = cRoot::Get()->GetDefaultWorld();
 	}
 	
-	// We don´t need this, do we? m_Player->LoginSetGameMode (World->GetGameMode()); //set player's gamemode to server's gamemode at login. TODO: set to last player's gamemode at logout
+	if(m_Player->GetGameMode() == eGameMode_NotSet)
+		m_Player->LoginSetGameMode(World->GetGameMode());
 
 	m_Player->SetIP (m_Socket.GetIPString());
 

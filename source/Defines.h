@@ -273,6 +273,7 @@ namespace ItemCategory
 //tolua_begin
 enum eGameMode
 {
+	eGameMode_NotSet	  = -1,
 	eGameMode_Survival    = 0,
 	eGameMode_Creative    = 1,
 };
