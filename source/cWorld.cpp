@@ -1534,7 +1534,7 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		if ((*itr)->GetName() == a_PlayerName)
+		if (iequals((*itr)->GetName(), a_PlayerName))
 		{
 			a_Callback.Item(*itr);
 			return true;
