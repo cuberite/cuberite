@@ -7,7 +7,6 @@ $cfile "ChunkDef.h"
 
 $cfile "cTorch.h"
 $cfile "cStairs.h"
-$cfile "cStep.h"
 $cfile "cLadder.h"
 $cfile "cVine.h"
 

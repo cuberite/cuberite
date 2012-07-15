@@ -77,6 +77,17 @@ inline bool IsBlockLiquid(char a_BlockID)
 	return IsBlockWater(a_BlockID) || IsBlockLava(a_BlockID);
 }
 
+inline bool IsBlockTypeOfDirt(char a_BlockID)
+{
+	switch (a_BlockID)
+	{
+		case E_BLOCK_DIRT:
+		case E_BLOCK_GRASS:
+		case E_BLOCK_FARMLAND:
+			return true;
+	}
+	return false;
+}
 
 
 
@@ -268,6 +279,11 @@ namespace ItemCategory
 //tolua_end
 
 
+inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockID)
+{
+	if(!IsValidBlock(a_BlockID)) return false;
+	return g_BlockRequiresSpecialTool[a_BlockID];
+}
 
 
 //tolua_begin

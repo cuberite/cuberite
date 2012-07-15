@@ -54,6 +54,7 @@ typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
 
 
 
+
 class cWorld													//tolua_export
 {																//tolua_export
 public:
@@ -330,6 +331,17 @@ public:
 	
 	/// Stops threads that belong to this world (part of deinit)
 	void StopThreads(void);
+	void TickQueuedBlocks(float a_Dt);
+
+	struct BlockTickQueueItem
+	{
+		int X;
+		int Y;
+		int Z;
+		float ToWait;
+	};
+
+	void QueueBlockForTick(int a_X, int a_Y, int a_Z, float a_Time);
 
 	void CastThunderbolt (int a_X, int a_Y, int a_Z);						//tolua_export
 	void SetWeather ( eWeather a_Weather );									//tolua_export
@@ -339,14 +351,14 @@ public:
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
 	cChunkMap *       GetChunkMap (void) { return m_ChunkMap; }
-	
-	bool IsPlacingItemLegal(Int16 a_ItemType, int a_BlockX, int a_BlockY, int a_BlockZ);
-	
+		
 	/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 	int GetMaxSugarcaneHeight(void) const { return m_MaxSugarcaneHeight; }  // tolua_export
 	int GetMaxCactusHeight   (void) const { return m_MaxCactusHeight; }     // tolua_export
+
+	bool IsBlockDirectlyWatered(int a_X, int a_Y, int a_Z);
 	
 private:
 
@@ -370,6 +382,9 @@ private:
 	// The cRedstone class simulates redstone and needs access to m_RSList
 	friend class cRedstone;
 	std::vector<int> m_RSList;
+	
+	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
+	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	//Second is for safely removing the objects from the queue
 
 	cSimulatorManager *  m_SimulatorManager;
 	cSandSimulator *     m_SandSimulator;

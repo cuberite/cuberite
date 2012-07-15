@@ -29,20 +29,20 @@
 #include "cPlayer.h"
 #include "BlockArea.h"
 #include "cPluginManager.h"
+#include "blocks/Block.h"
 
 #include "packets/cPacket_DestroyEntity.h"
 #include "packets/cPacket_PreChunk.h"
 #include "packets/cPacket_BlockChange.h"
 #include "packets/cPacket_MultiBlock.h"
 
+#include "blocks/Block.h"
+
 #include <json/json.h>
 
 
 
 
-
-// Leaves can be this many blocks that away (inclusive) from the log not to decay
-#define LEAVES_CHECK_DISTANCE 6
 
 
 
@@ -449,7 +449,20 @@ void cChunk::CheckBlocks(void)
 	{
 		unsigned int index = (*itr);
 		Vector3i BlockPos = IndexToCoordinate(index);
+		Vector3i WorldPos = PositionToWorldPosition( BlockPos );
 
+		cBlockHandler * Handler = BlockHandler(GetBlock(index));
+		if(!Handler->CanBeAt(m_World, WorldPos.x, WorldPos.y, WorldPos.z))
+		{
+			if(Handler->DropOnUnsuitable())
+			{
+				Handler->DropBlock(m_World, WorldPos.x, WorldPos.y, WorldPos.z);
+			}
+			
+			m_World->SetBlock(WorldPos.x, WorldPos.y, WorldPos.z, E_BLOCK_AIR, 0);
+		}
+
+		/*
 		BLOCKTYPE  BlockType = GetBlock(index);
 		NIBBLETYPE BlockMeta = GetMeta (index);
 		switch (BlockType)
@@ -524,14 +537,8 @@ void cChunk::CheckBlocks(void)
 				}
 				break;
 			}
-			
-			// If anything next to a leaves block changes, set the leaves' "check for decay" bit (clear bit 0x08):
-			case E_BLOCK_LEAVES:
-			{
-				cChunkDef::SetNibble(m_BlockMeta, index, BlockMeta & 0x07);
-				break;
-			}
 		}  // switch (BlockType)
+		*/
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -585,88 +592,23 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 				break;
 			}
 			
-			case E_BLOCK_GRASS:        TickGrass       (m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_TickRandom); break;
 			case E_BLOCK_PUMPKIN_STEM:
 			case E_BLOCK_MELON_STEM:   TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
 			case E_BLOCK_FARMLAND:     TickFarmland    (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
 			case E_BLOCK_SUGARCANE:    GrowSugarcane   (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
 			case E_BLOCK_CACTUS:       GrowCactus      (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
-			
-			case E_BLOCK_SAPLING:
-			{
-				// Check the highest bit, if set, grow the tree, if not, set it (1-bit delay):
-				NIBBLETYPE Meta = GetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
-				if ((Meta & 0x08) != 0)
-				{
-					m_World->GrowTree( m_BlockTickX + m_PosX*Width, m_BlockTickY, m_BlockTickZ + m_PosZ*Width );
-				}
-				else
-				{
-					SetMeta(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Meta | 0x08);
-				}
-				break;
-			}
-			
-			case E_BLOCK_LEAVES: TickLeaves(m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_TickRandom); break;
+						
 			
 			default:
 			{
+				cBlockHandler *Handler = BlockHandler(ID);
+				if(Handler->NeedsRandomTicks())
+					Handler->OnUpdate(m_World, m_BlockTickX + m_PosX*Width, m_BlockTickY, m_BlockTickZ + m_PosZ*Width);
 				break;
 			}
 		}
 	}
 }
-
-
-
-
-
-void cChunk::TickGrass(int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom)
-{
-	// Grass turns into dirt if there's another block on top of it:
-	{
-		BLOCKTYPE AboveBlock = cChunkDef::GetBlock(m_BlockTypes, a_RelX, a_RelY + 1, a_RelZ);
-		if (!((g_BlockOneHitDig[AboveBlock]) || (g_BlockTransparent[AboveBlock])))
-		{
-			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
-			return;
-		}
-	}
-	
-	// Grass spreads to nearby blocks if there's enough light (TODO) and free space above that block
-	// Ref.: http://www.minecraftwiki.net/wiki/Grass_Block#Growth
-	for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
-	{
-		int OfsX = a_TickRandom.randInt(2) - 1;  // [-1 .. 1]
-		int OfsY = a_TickRandom.randInt(4) - 3;  // [-3 .. 1]
-		int OfsZ = a_TickRandom.randInt(2) - 1;  // [-1 .. 1]
-		
-		BLOCKTYPE  DestBlock;
-		NIBBLETYPE DestMeta;
-		if (
-			!UnboundedRelGetBlock(a_RelX + OfsX, a_RelY + OfsY,     a_RelZ + OfsZ, DestBlock, DestMeta) ||
-			(DestBlock != E_BLOCK_DIRT)
-		)
-		{
-			continue;
-		}
-
-		BLOCKTYPE AboveDest;
-		NIBBLETYPE AboveMeta;
-		if (
-			UnboundedRelGetBlock(a_RelX + OfsX, a_RelY + OfsY + 1, a_RelZ + OfsZ, AboveDest, AboveMeta) &&
-			((g_BlockOneHitDig[AboveDest]) || (g_BlockTransparent[AboveDest]))
-			// TODO: Query dest light, if it's enough
-		)
-		{
-			UnboundedRelFastSetBlock(a_RelX + OfsX, a_RelY + OfsY, a_RelZ + OfsZ, E_BLOCK_GRASS, 0);
-		}
-	}  // for i - repeat twice
-}
-
-
-
-
 
 void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
 {
@@ -758,120 +700,6 @@ void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
 	}
 }
 
-
-
-
-
-void cChunk::TickLeaves(int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom)
-{
-	// Since leaves-checking is a costly operation, it is done only if leaves are marked for checking (Meta has its 0x08 bit cleared)
-	// The meta bit 0x08 bit is cleared (check flag set) each time a block next to the leaves changes
-	
-	NIBBLETYPE Meta = GetMeta(a_RelX, a_RelY, a_RelZ);
-	if ((Meta & 0x04) != 0)
-	{
-		// Player-placed leaves, don't decay
-		return;
-	}
-	if ((Meta & 0x08) != 0)
-	{
-		// These leaves have been checked for decay lately and nothing around them changed
-		return;
-	}
-
-	// Get the data around the leaves:
-	cBlockArea Area;
-	int BaseX = cChunkDef::Width * m_PosX + a_RelX;
-	int BaseZ = cChunkDef::Width * m_PosZ + a_RelZ;
-	if (!Area.Read(
-		m_World, 
-		BaseX - LEAVES_CHECK_DISTANCE, BaseX + LEAVES_CHECK_DISTANCE, 
-		a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE, 
-		BaseZ - LEAVES_CHECK_DISTANCE, BaseZ + LEAVES_CHECK_DISTANCE, 
-		cBlockArea::baTypes)
-	)
-	{
-		// Cannot check leaves, a chunk is missing too close
-		return;
-	}
-
-	if (HasNearLog(Area, BaseX, a_RelY, BaseZ))
-	{
-		// Log found, the leaves stay; mark them as checked:
-		SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, Meta & 0x07);
-		return;
-	}
-	// Decay the leaves:
-	m_World->DigBlock(m_PosX * cChunkDef::Width + a_RelX, a_RelY, m_PosZ * cChunkDef::Width + a_RelZ);
-
-	// Let them drop something if the random is right:
-	cItems PickupItems;
-	cBlockToPickup::ToPickup(E_BLOCK_LEAVES, Meta, cItem(), PickupItems);
-		
-	// Allow plugins to change the dropped objects:
-	cRoot::Get()->GetPluginManager()->CallHookBlockToPickup(E_BLOCK_LEAVES, Meta, NULL, cItem(), PickupItems);
-	m_World->SpawnItemPickups(PickupItems, BaseX, a_RelY, BaseZ);
-}
-
-
-
-
-
-#define PROCESS_NEIGHBOR(x,y,z) \
-	switch (a_Area.GetBlockType(x, y, z)) \
-	{ \
-		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, E_BLOCK_SPONGE + i + 1); break; \
-		case E_BLOCK_LOG: return true; \
-	}
-
-bool cChunk::HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	// Filter the blocks into a {leaves, log, other (air)} set:
-	BLOCKTYPE * Types = a_Area.GetBlockTypes();
-	for (int i = a_Area.GetBlockCount() - 1; i > 0; i--)
-	{
-		switch (Types[i])
-		{
-			case E_BLOCK_LEAVES:
-			case E_BLOCK_LOG:
-			{
-				break;
-			}
-			default:
-			{
-				Types[i] = E_BLOCK_AIR;
-				break;
-			}
-		}
-	}  // for i - Types[]
-	
-	// Perform a breadth-first search to see if there's a log connected within 4 blocks of the leaves block:
-	// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can reach a log in 4 iterations
-	a_Area.SetBlockType(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_SPONGE);
-	for (int i = 0; i < LEAVES_CHECK_DISTANCE; i++)
-	{
-		for (int y = a_BlockY - i; y <= a_BlockY + i; y++)
-		{
-			for (int z = a_BlockZ - i; z <= a_BlockZ + i; z++)
-			{
-				for (int x = a_BlockX - i; x <= a_BlockX + i; x++)
-				{
-					if (a_Area.GetBlockType(x, y, z) != E_BLOCK_SPONGE + i)
-					{
-						continue;
-					}
-					PROCESS_NEIGHBOR(x - 1, y,     z);
-					PROCESS_NEIGHBOR(x + 1, y,     z);
-					PROCESS_NEIGHBOR(x,     y,     z - 1);
-					PROCESS_NEIGHBOR(x,     y,     z + 1);
-					PROCESS_NEIGHBOR(x,     y + 1, z);
-					PROCESS_NEIGHBOR(x,     y - 1, z);
-				}  // for x
-			}  // for z
-		}  // for y
-	}  // for i - BFS iterations
-	return false;
-}
 
 
 

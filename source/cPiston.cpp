@@ -13,6 +13,7 @@
 #include "BlockID.h"
 #include "packets/cPacket_BlockAction.h"
 #include "cServer.h"
+#include "blocks/Block.h"
 
 extern bool g_BlockPistonBreakable[];
 
@@ -67,9 +68,11 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		NIBBLETYPE currMeta = m_World->GetBlockMeta(pistx, pisty, pistz);
 		if (currBlock != E_BLOCK_AIR)
 		{
-			cItems PickupItems;
-			cBlockToPickup::ToPickup(currBlock, currMeta, E_ITEM_EMPTY, PickupItems);
-			m_World->SpawnItemPickups(PickupItems, pistx, pisty, pistz);
+			cBlockHandler * Handler = BlockHandler(currBlock);
+			if(Handler->DropOnUnsuitable())
+			{
+				Handler->DropBlock(m_World, pistx, pisty, pistz);
+			}
 			recalc = true;
 		}
 		int oldx = pistx, oldy = pisty, oldz = pistz;

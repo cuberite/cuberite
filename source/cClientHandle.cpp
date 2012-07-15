@@ -14,8 +14,6 @@
 #include "cCraftingWindow.h"
 #include "cItem.h"
 #include "cTorch.h"
-#include "cStairs.h"
-#include "cStep.h"
 #include "cDoors.h"
 #include "cLadder.h"
 #include "cVine.h"
@@ -27,6 +25,8 @@
 #include "cChatColor.h"
 #include "cSocket.h"
 #include "cTimer.h"
+#include "items/Item.h"
+#include "blocks/Block.h"
 
 #include "cTracer.h"
 #include "Vector3f.h"
@@ -796,6 +796,11 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		m_Player->TossItem(false);
 		return;
 	}
+
+	if (a_Packet->m_Status == 0x05)
+	{
+		LOGINFO("BlockDig: Status 5 not implemented");
+	}
 	
 	cWorld* World = m_Player->GetWorld();
 	BLOCKTYPE  OldBlock = World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
@@ -814,94 +819,35 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 		((a_Packet->m_Status == 0x00) && (m_Player->GetGameMode() == 1))
 	);
 
-	if ((OldBlock == E_BLOCK_WOODEN_DOOR) && !bBroken)
-	{
-		cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	}
+	cItem &Equipped = m_Player->GetInventory().GetEquippedItem();
+	
+	cItemHandler *ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
 
-	cItems PickupItems;
-	if (bBroken && !(m_Player->GetGameMode() == 1)) // broken
+	if(bBroken)
 	{
-		cBlockToPickup::ToPickup(OldBlock, OldMeta, m_Player->GetInventory().GetEquippedItem(), PickupItems);
+		ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 		
-		// Allow plugins to change the dropped objects:
-		cRoot::Get()->GetPluginManager()->CallHookBlockToPickup(OldBlock, OldMeta, m_Player, m_Player->GetInventory().GetEquippedItem(), PickupItems);
-	}
-	
-	int pX = a_Packet->m_PosX;
-	unsigned char pY = a_Packet->m_PosY;
-	int pZ = a_Packet->m_PosZ;
+		BlockHandler(OldBlock)->OnDestroyedByPlayer(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		World->DigBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	}else{
+		cBlockHandler *Handler = cBlockHandler::GetBlockHandler(OldBlock);
+		Handler->OnClick(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
 
-	AddDirection(pX, pY, pZ, a_Packet->m_Direction);
+		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction);
+		
 
-	char PossibleBlock = World->GetBlock(pX, pY, pZ);
+		//Check for clickthrough-blocks:
+		int pX = a_Packet->m_PosX;
+		unsigned char pY = a_Packet->m_PosY;
+		int pZ = a_Packet->m_PosZ;
+		AddDirection(pX, pY, pZ, a_Packet->m_Direction);
 
-	if (PossibleBlock == E_BLOCK_FIRE)
-	{
-		a_Packet->m_PosX = pX;
-		a_Packet->m_PosY = pY;
-		a_Packet->m_PosZ = pZ;
-		bBroken = true;
-	}
-
-	if (!bBroken)
-	{
-		return;
-	}
-	
-	if (!World->DigBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ))
-	{
-		return;
-	}
-	
-	World->SpawnItemPickups(PickupItems, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	
-	switch (OldBlock)
-	{
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_WIRE:
+		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+		if(Handler->IsClickedThrough())
 		{
-			cRedstone Redstone(World);
-			Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, false);
-			break;
+			Handler->OnClick(World, m_Player, pX, pY, pZ);
 		}
 	}
-	
-	if ((OldBlock == E_BLOCK_PISTON) || (OldBlock == E_BLOCK_STICKY_PISTON))
-	{
-		int newX = a_Packet->m_PosX;
-		int newY = a_Packet->m_PosY;
-		int newZ = a_Packet->m_PosZ;
-		AddPistonDir(newX, newY, newZ, OldMeta & ~(8), 1);
-		if (World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
-		{
-			World->SetBlock(newX, newY, newZ, E_BLOCK_AIR, 0);
-		}
-	}
-
-	if (cDoors::IsDoor(OldBlock))
-	{
-		// Special actions for destroyed door (Destroy second part)
-		if (OldMeta & 8)
-		{
-			// Was upper part of door
-			if (cDoors::IsDoor(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY - 1, a_Packet->m_PosZ)))
-			{
-				World->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY - 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
-			}
-		}
-		else
-		{
-			// Was lower part
-			if (cDoors::IsDoor(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ)))
-			{
-				World->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
-			}
-		}
-	}
-	
-	m_Player->UseEquippedItem();
 }
 
 
@@ -943,490 +889,85 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 		}
 		return;
 	}
+	
+	cWorld * World = m_Player->GetWorld();
 
-	//LOG("%i %i %i %i %i %i", a_Packet->m_Count, a_Packet->m_Direction, a_Packet->m_ItemType, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-
-	//printf("Place Dir:%i %i %i %i : %i\n", a_Packet->m_Direction, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_ItemType);
-	// 'use' useable items instead of placing blocks
-	bool bPlaceBlock = true;
-	bool UpdateRedstone = false;
-	bool AddedCurrent = false;
-
-	if (a_Packet->m_Direction >= 0)
+	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
+	if(Handler->IsUseable())
 	{
-		cWorld * World = m_Player->GetWorld();
-		BLOCKTYPE  BlockType = 0;
-		NIBBLETYPE BlockMeta;
-		World->GetBlockTypeMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, BlockType, BlockMeta);
-		switch (BlockType)
-		{
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			{
-				// no need to update redstone current with a repeater
-				// Find meta value of repeater and change it to one step more:
-				World->FastSetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, BlockType, ((BlockMeta + 0x04) & 0x0f));
-				bPlaceBlock = false;
-				break;
-			}
-			
-			case E_BLOCK_WORKBENCH:
-			{
-				bPlaceBlock = false;
-				cWindow* Window = new cCraftingWindow(0, true);
-				m_Player->OpenWindow(Window);
-				break;
-			}
-
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_LIT_FURNACE:
-			case E_BLOCK_CHEST:
-			{
-				bPlaceBlock = false;
-				m_Player->GetWorld()->UseBlockEntity(m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-				break;
-			}
-			
-			case E_BLOCK_WOODEN_DOOR:
-			{
-				bPlaceBlock = false;
-				cDoors::ChangeDoor(m_Player->GetWorld(), a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-				break;
-			}
-			
-			default:
-			{
-				break;
-			}
-		}  // switch (BlockID)
-	}  // if (Direction >= 0)
-
-	// Some checks to see if it's a placeable item :P
-	if (bPlaceBlock)
-	{
-		cItem Item;
-		Item.m_ItemID = Equipped.m_ItemID;
-		Item.m_ItemCount = 1;
-		LOGD("Placing item of type %i at {%d, %d, %d}", 
-			(int)a_Packet->m_ItemType,
-			a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ
-		);
-
-		if (m_Player->EatItem(Item.m_ItemID))
-		{
-			m_Player->GetInventory().RemoveItem(Item);
-			return;
-		}
+		Handler->OnClick(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	}else{
+		cItemHandler *ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
 		
-		if (a_Packet->m_Direction < 0)
+		if(ItemHandler->OnItemUse(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction))
 		{
-			// clicked in air
-			return;
-		}
-		bool isDoor = false;
-
-		//TODO: Wrong Blocks!
-		BLOCKTYPE ClickedBlock = m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-
-		if (ItemCategory::IsHoe(Item.m_ItemID))
+			//Nothing here :P
+		}else if(ItemHandler->IsPlaceable())
 		{
-			if ((ClickedBlock == E_BLOCK_DIRT) || (ClickedBlock == E_BLOCK_GRASS))
+			if (a_Packet->m_Direction < 0)
 			{
-				m_Player->GetWorld()->FastSetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, E_BLOCK_FARMLAND, 0);
-			}
-			return;
-		}
-
-		NIBBLETYPE MetaData = (NIBBLETYPE)Equipped.m_ItemHealth;  // This generally works for logs & planks, others will override
-		bool LavaBucket = false;
-		bool WaterBucket = false;
-		bool bRemoveItem = true;
-		bool bIgnoreCollision = false;
-
-		if (ClickedBlock == E_BLOCK_STEP)
-		{
-		// Only make double slab if meta values are the same and if player clicked either on top or on bottom of the block (direction either 0 or 1)
-			if (MetaData == ( m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) & 0x7) && a_Packet->m_Direction <= 1)
-			//if (MetaData == m_Player->GetWorld()->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ) && a_Packet->m_Direction == 1)
-			{
-				a_Packet->m_ItemType = E_BLOCK_DOUBLE_STEP;
-				if(a_Packet->m_Direction == 1)
-				{
-					a_Packet->m_PosY--;
-				}
-				else
-				{
-					a_Packet->m_PosY++;
-				}
-				bIgnoreCollision = true;
-			}
-		}
-		
-		if ((ClickedBlock == E_BLOCK_SNOW) || (ClickedBlock == E_BLOCK_TALL_GRASS) || (ClickedBlock == E_BLOCK_VINES))
-		{
-			switch (a_Packet->m_Direction)
-			{
-				case 1:
-					a_Packet->m_PosY--;
-					break;
-				case 2:
-					a_Packet->m_PosZ++;
-					break;
-				case 3:
-					a_Packet->m_PosZ--;
-					break;
-				case 4:
-					a_Packet->m_PosX++;
-					break;
-				case 5:
-					a_Packet->m_PosX--;
-					break;
-				default: break;
-			}
-			bIgnoreCollision = true;
-		}
-
-		// Special handling for special items:
-		switch (a_Packet->m_ItemType)  
-		{
-			case E_ITEM_BUCKET:
-			{
-				// TODO: Change this, it is just a small hack to get it working a little bit. seems like the Client sends the position from the first hitable block :s
-				ClickedBlock = (int)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ);
-				LOG("Bucket Clicked BlockID: %d", ClickedBlock);
-				switch (ClickedBlock)
-				{
-					case E_BLOCK_WATER:
-					case E_BLOCK_STATIONARY_WATER:
-					{
-						WaterBucket = true;
-						break;
-					}
-					case E_BLOCK_LAVA:
-					case E_BLOCK_STATIONARY_LAVA:
-					{
-						LavaBucket = true;
-						break;
-					}
-				}
-				break;
-			}  // case E_ITEM_BUCKET			
-			
-			case E_ITEM_LAVA_BUCKET:
-			{
-				if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item)))
-				{
-					a_Packet->m_ItemType = E_BLOCK_LAVA;
-					if (m_Player->GetGameMode() == 1)
-					{
-						break;						//No new Bucket for creative players
-					}
-
-					cItem NewItem;
-					NewItem.m_ItemID = E_ITEM_BUCKET;
-					NewItem.m_ItemCount = 1;
-					m_Player->GetInventory().AddItem(NewItem);
-				}
-				break;
-			}  // case E_ITEM_LAVA_BUCKET
-			
-			case E_ITEM_WATER_BUCKET:
-			{
-				if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item)))
-				{
-					a_Packet->m_ItemType = E_BLOCK_WATER;
-					if (m_Player->GetGameMode() == 1)
-					{
-						break;						//No new Bucket for creative players
-					}
-					cItem NewItem;
-					NewItem.m_ItemID = E_ITEM_BUCKET;
-					NewItem.m_ItemCount = 1;
-					m_Player->GetInventory().AddItem(NewItem);
-				}
-				break;
-			}
-			
-			case E_BLOCK_TORCH:
-			{
-				MetaData = cTorch::DirectionToMetaData(a_Packet->m_Direction);
-				break;
-			}
-			
-			case E_BLOCK_REDSTONE_TORCH_OFF:
-			{
-				MetaData = cTorch::DirectionToMetaData(a_Packet->m_Direction);
-				if (g_BlockTransparent[ (int)m_Player->GetWorld()->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY+2, a_Packet->m_PosZ) ] == true) 
-				{
-					//if block above is transparent
-					//printf("transparent above me\n");
-				}
-				else
-				{
-					//printf("transparent not above me\n");
-				}
-				UpdateRedstone = true;
-				AddedCurrent = false;
-				break;
-			}
-			
-			case E_BLOCK_REDSTONE_TORCH_ON:
-			{
-				MetaData = cTorch::DirectionToMetaData(a_Packet->m_Direction);
-				UpdateRedstone = true;
-				AddedCurrent = true;
-				break;
-			}
-			
-			case E_ITEM_REDSTONE_DUST:
-			{
-				MetaData = 0;
-				a_Packet->m_ItemType = E_BLOCK_REDSTONE_WIRE;
-				UpdateRedstone = true;
-				AddedCurrent = false;
-				break;
-			}
-			
-			case E_ITEM_REDSTONE_REPEATER:
-			{
-				MetaData = cRedstone::RepeaterRotationToMetaData(m_Player->GetRotation());
-				a_Packet->m_ItemType = E_BLOCK_REDSTONE_REPEATER_OFF;
-				UpdateRedstone = true;
-				AddedCurrent = false;
-				break;
-			}
-
-			case E_BLOCK_PISTON:
-			case E_BLOCK_STICKY_PISTON:
-			{
-				MetaData = cPiston::RotationPitchToMetaData(m_Player->GetRotation(), m_Player->GetPitch());
-				UpdateRedstone = true;
-				AddedCurrent = false;
-				break;
-			}
-			
-			case E_ITEM_IRON_DOOR:
-			{
-				a_Packet->m_ItemType = E_BLOCK_IRON_DOOR;
-				MetaData = cDoors::RotationToMetaData(m_Player->GetRotation());
-				isDoor = true;
-				break;
-			}
-			
-			case E_ITEM_WOODEN_DOOR:
-			{
-				a_Packet->m_ItemType = E_BLOCK_WOODEN_DOOR;
-				MetaData = cDoors::RotationToMetaData(m_Player->GetRotation());
-				isDoor = true;
-				break;
-			}
-			
-			case E_BLOCK_CHEST:
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_DISPENSER:
-			{
-				MetaData = cPiston::RotationPitchToMetaData(m_Player->GetRotation(), 0); // Same orientation as pistons, just ignore pitch
-				break;
-			}
-
-			case E_BLOCK_STEP:
-			{
-				MetaData += cStep::DirectionToMetaData( a_Packet->m_Direction );
-				break;
-			}
-			
-			case E_BLOCK_COBBLESTONE_STAIRS:
-			case E_BLOCK_BRICK_STAIRS:
-			case E_BLOCK_STONE_BRICK_STAIRS:
-			case E_BLOCK_NETHER_BRICK_STAIRS:
-			case E_BLOCK_WOODEN_STAIRS:
-			{
-				MetaData = cStairs::RotationToMetaData(m_Player->GetRotation(), a_Packet->m_Direction);
-				break;
-			}
-			case E_BLOCK_VINES:
-			{
-				MetaData = cVine::DirectionToMetaData(a_Packet->m_Direction);
-				break;
-			}
-			case E_BLOCK_LADDER:
-			{
-				MetaData = cLadder::DirectionToMetaData(a_Packet->m_Direction);
-				break;
-			}
-			case E_ITEM_SIGN:
-			{
-				LOGD("Sign Dir: %i", a_Packet->m_Direction);
-				if (a_Packet->m_Direction == 1)
-				{
-					LOGD("Player Rotation: %f", m_Player->GetRotation());
-					MetaData = cSign::RotationToMetaData(m_Player->GetRotation());
-					LOGD("Sign rotation %i", MetaData);
-					a_Packet->m_ItemType = E_BLOCK_SIGN_POST;
-				}
-				else
-				{
-					MetaData = cSign::DirectionToMetaData(a_Packet->m_Direction);
-					a_Packet->m_ItemType = E_BLOCK_WALLSIGN;
-				}
-				break;
-			}
-		
-			case E_ITEM_FLINT_AND_STEEL:
-			{
-				a_Packet->m_ItemType = E_ITEM_FIRE;
-				m_Player->UseEquippedItem();
-				bRemoveItem = false;
-				break;
-			}
-			case E_BLOCK_LEAVES: 
-			{
-				MetaData += 0x4;
-				break;
-			}
-			case E_ITEM_SEEDS:
-			{
-				if (ClickedBlock != E_BLOCK_FARMLAND)
-				{
-					return;
-				}
-				a_Packet->m_ItemType = E_BLOCK_CROPS;
-				break;
-			}
-			case E_ITEM_MELON_SEEDS:
-			{
-				if (ClickedBlock != E_BLOCK_FARMLAND)
-				{
-					return;
-				}
-				a_Packet->m_ItemType = E_BLOCK_MELON_STEM;
-				break;
-			}
-			case E_ITEM_PUMPKIN_SEEDS: 
-			{
-				if (ClickedBlock != E_BLOCK_FARMLAND)
-				{
-					return;
-				}
-				a_Packet->m_ItemType = E_BLOCK_PUMPKIN_STEM;
-				break;
-			}
-			case E_ITEM_DYE:
-			{
-				// Handle bonemeal and dyes on sheep
-				if (HandleDyes(a_Packet))
-				{
-					if (m_Player->GetGameMode() == eGameMode_Survival)
-					{
-						m_Player->GetInventory().RemoveItem(Item);
-					}
-					return;
-				}
-				break;
-			}
-			case E_ITEM_SUGARCANE:
-			{
-				a_Packet->m_ItemType = E_BLOCK_SUGARCANE;
-				break;
-			}
-			default:
-			{
-				break;
-			}
-		}  // switch (a_Packet->m_ItemType)
-
-
-		if (LavaBucket)
-		{
-			if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item))) {
-				cItem NewItem;
-				NewItem.m_ItemID = E_ITEM_LAVA_BUCKET;
-				NewItem.m_ItemCount = 1;
-				m_Player->GetInventory().AddItem(NewItem);
-				m_Player->GetWorld()->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
-			}
-		}
-		else if (WaterBucket)
-		{
-			if ((m_Player->GetGameMode() == 1) || (m_Player->GetInventory().RemoveItem(Item)))
-			{
-				cItem NewItem;
-				NewItem.m_ItemID = E_ITEM_WATER_BUCKET;
-				NewItem.m_ItemCount = 1;
-				m_Player->GetInventory().AddItem(NewItem);
-				m_Player->GetWorld()->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, E_BLOCK_AIR, 0);
-			}
-		}
-		else if (IsValidBlock(a_Packet->m_ItemType))
-		{
-			int X = a_Packet->m_PosX;
-			int Y = a_Packet->m_PosY;
-			int Z = a_Packet->m_PosZ;
-			AddDirection(X, Y, Z, a_Packet->m_Direction);
-
-			int PlaceBlock = m_Player->GetWorld()->GetBlock(X, Y, Z);
-			if (
-				(PlaceBlock != E_BLOCK_AIR)
-				&& (PlaceBlock != E_BLOCK_WATER)
-				&& (PlaceBlock != E_BLOCK_STATIONARY_WATER)
-				&& (PlaceBlock != E_BLOCK_LAVA)
-				&& (PlaceBlock != E_BLOCK_STATIONARY_LAVA)
-				&& !bIgnoreCollision
-			)
-			{
-				//tried to place a block *into* another?
-				return;  // happens when you place a block aiming at side of block like torch or stem
-			}
-
-			// Check whether selected item is allowed to be placed on specific surface
-			if (!m_Player->GetWorld()->IsPlacingItemLegal(a_Packet->m_ItemType, X, Y, Z))
-			{
-				// If we don't send the block, MC is happy placing cacti underwater:
-				m_Player->GetWorld()->SendBlockTo(X, Y, Z, m_Player);
+				// clicked in air
 				return;
 			}
 
-			if (bRemoveItem)
+			int X = a_Packet->m_PosX;
+			int Y = a_Packet->m_PosY;
+			int Z = a_Packet->m_PosZ;
+			char Dir = a_Packet->m_Direction;
+			BLOCKTYPE ClickedBlock = World->GetBlock(X, Y, Z);
+			cBlockHandler *Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
+
+			if(Handler->IgnoreBuildCollision())
 			{
-				if ((m_Player->GetGameMode() != 1) && !m_Player->GetInventory().RemoveItem(Item))
+				Handler->OnDestroyedByPlayer(World, m_Player, X, Y, Z);
+				World->FastSetBlock(X, Y, Z, E_BLOCK_AIR, 0);
+			}else{
+				AddDirection(X, Y, Z, a_Packet->m_Direction);
+				//Check for Blocks not allowing placement on top
+				if(Dir == 1 && !Handler->AllowBlockOnTop())
 				{
+					//Resend the old block
+					//Some times the client still places the block O.o
+
+					World->SendBlockTo(X, Y, Z, m_Player);
 					return;
 				}
-			}
 
 
-			if (isDoor)
-			{
-				if ((m_Player->GetWorld()->GetBlock(X, Y + 1, Z) == E_BLOCK_AIR) || (m_Player->GetWorld()->GetBlock(X, Y + 1, Z) == E_BLOCK_AIR))
+				int PlaceBlock = m_Player->GetWorld()->GetBlock(X, Y, Z);
+				if (!BlockHandler(PlaceBlock)->IgnoreBuildCollision())
 				{
-					m_Player->GetWorld()->SetBlock(X, Y + 1, Z, (char)a_Packet->m_ItemType, MetaData + 8);
-					m_Player->GetWorld()->SetBlock(X, Y,     Z, (char)a_Packet->m_ItemType, MetaData);
+					//tried to place a block *into* another?
+					return;  // happens when you place a block aiming at side of block like torch or stem
 				}
 			}
-			else
-			{
-				m_Player->GetWorld()->SetBlock(X, Y, Z, (char)a_Packet->m_ItemType, MetaData);
-			}
+			
+			cBlockHandler *NewBlock = BlockHandler(ItemHandler->GetBlockType());
 
-			if (UpdateRedstone)
+			//cannot be placed on the side of an other block
+			if(Dir != 1 && !NewBlock->CanBePlacedOnSide())
+				return;
+
+			if(NewBlock->CanBeAt(World, X, Y, Z))
 			{
-				cRedstone Redstone(m_Player->GetWorld());
-				Redstone.ChangeRedstone(a_Packet->m_PosX, a_Packet->m_PosY + 1, a_Packet->m_PosZ, AddedCurrent);
+				ItemHandler->PlaceBlock(World, m_Player, &m_Player->GetInventory().GetEquippedItem(), X, Y, Z, a_Packet->m_Direction);
+			}else{
+				World->SendBlockTo(X, Y, Z, m_Player);	//Send the old block back to the player
+				return;
+			}
+			
+		} else if(ItemHandler->IsFood()) {
+			cItem Item;
+			Item.m_ItemID = Equipped.m_ItemID;
+			Item.m_ItemCount = 1;
+			if (m_Player->EatItem(Item.m_ItemID))
+			{
+				ItemHandler->OnFoodEaten(World, m_Player, &Item);
+				m_Player->GetInventory().RemoveItem(Item);
+				return;
 			}
 		}
 	}
-
-	/*
-	// FakeTruth's "magic stick of removal" :D
-	// TODO: Turn this into a plugin
-	if (m_Username.compare("FakeTruth") == 0)
-	{
-		if (a_Packet->m_ItemType == 280)
-		{
-			cRoot::Get()->GetWorld()->SetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, 0, 0);
-		}
-	}
-	*/
 }
 
 
@@ -1622,29 +1163,6 @@ void cClientHandle::HandleKeepAlive(cPacket_KeepAlive * a_Packet)
 		m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
 	}
 }
-
-
-
-
-
-bool cClientHandle::HandleDyes(cPacket_BlockPlace * a_Packet)
-{
-	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-	
-	// TODO: Handle coloring the sheep, too
-	
-	// Handle growing the plants:
-	if (Equipped.m_ItemHealth == E_META_DYE_WHITE)
-	{
-		cWorld * World = m_Player->GetWorld();
-		return World->GrowPlant(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, true);
-	}
-	
-	return false;
-}
-
-
-
 
 
 bool cClientHandle::CheckBlockInteractionsRate(void)

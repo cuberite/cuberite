@@ -439,6 +439,12 @@
     <Filter Include="cPluginManager\cSquirrelCommandBinder">
       <UniqueIdentifier>{0a0b9b8e-ac72-4755-98e5-87cbc835016a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Blocks">
+      <UniqueIdentifier>{9013ce6d-8f75-4f87-90c6-99aa07b3c8f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Items">
+      <UniqueIdentifier>{2bd505e5-cfc9-44f4-8295-4a36185c7c54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -919,6 +925,51 @@
     <ClCompile Include="..\source\BlockArea.cpp" />
     <ClCompile Include="..\source\cSquirrelCommandBinder.cpp">
       <Filter>cPluginManager\cSquirrelCommandBinder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockEntity.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockFire.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockPiston.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockRedstone.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockRedstoneRepeater.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockSlab.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockTorch.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockVine.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockWorkbench.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockCloth.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockDirt.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockDoor.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\Block.cpp">
+      <Filter>Blocks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\items\Item.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\blocks\BlockStairs.cpp">
+      <Filter>Blocks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1425,7 +1476,6 @@
     <ClInclude Include="..\source\FastNBT.h">
       <Filter>Storage</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\cStep.h" />
     <ClInclude Include="..\source\CraftingRecipes.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelBindings.h">
       <Filter>LuaBindings\SquirrelBindings</Filter>
@@ -1448,6 +1498,171 @@
     </ClInclude>
     <ClInclude Include="..\source\squirrelbindings\SquirrelArray.h">
       <Filter>LuaBindings\SquirrelBindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockDoor.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockEntity.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFire.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockPiston.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstone.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstoneRepeater.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSlab.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSnow.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockTallGrass.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockTorch.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockVine.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockWorkbench.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockCloth.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockDirt.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\Block.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockWood.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemCloth.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemHoe.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSlab.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemWood.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\Item.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemShears.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockLeaves.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSapling.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSapling.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemLeaves.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemBucket.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFluid.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemRedstoneDust.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockChest.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockDispenser.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFurnace.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockStairs.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockLadder.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSign.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemLighter.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSeeds.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemDye.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockCrops.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockSugarcane.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSugarcane.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockFlower.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockMushroom.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockCactus.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockStems.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstoneTorch.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockGlowstone.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemPickaxe.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemShovel.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemSword.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockRedstoneOre.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockStone.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockMelon.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemDoor.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockIce.h">
+      <Filter>Blocks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -42,6 +42,7 @@
 #include "cTracer.h"
 #include "Trees.h"
 #include "cPluginManager.h"
+#include "blocks/Block.h"
 
 
 #include "packets/cPacket_TimeUpdate.h"
@@ -288,6 +289,10 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_LastSave = 0;
 	m_LastUnload = 0;
 
+	//preallocate some memory for ticking blocks so we don´t need to allocate that often
+	m_BlockTickQueue.reserve(1000);
+	m_BlockTickQueueCopy.reserve(1000);
+
 	//Simulators:
 	m_WaterSimulator = new cWaterSimulator( this );
 	m_LavaSimulator = new cLavaSimulator( this );
@@ -355,93 +360,10 @@ void cWorld::CastThunderbolt ( int a_X, int a_Y, int a_Z )
 	BroadcastToChunkOfBlock(a_X, a_Y, a_Z, &ThunderboltPacket);
 }
 
-
-
-
-
-bool cWorld::IsPlacingItemLegal(Int16 a_ItemType, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	BLOCKTYPE SurfaceBlock = GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
-	switch (a_ItemType)
-	{
-		case E_BLOCK_YELLOW_FLOWER:	// Can ONLY be placed on dirt/grass
-		case E_BLOCK_RED_ROSE:
-		case E_BLOCK_SAPLING:
-		{
-			switch (SurfaceBlock)
-			{
-				case E_BLOCK_DIRT:
-				case E_BLOCK_GRASS:
-				case E_BLOCK_FARMLAND:
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		
-		case E_BLOCK_BROWN_MUSHROOM:	// Can be placed on pretty much anything, with exceptions
-		case E_BLOCK_RED_MUSHROOM:
-		{
-			switch (SurfaceBlock)
-			{
-				case E_BLOCK_GLASS:
-				case E_BLOCK_YELLOW_FLOWER:
-				case E_BLOCK_RED_ROSE:
-				case E_BLOCK_BROWN_MUSHROOM:
-				case E_BLOCK_RED_MUSHROOM:
-				case E_BLOCK_CACTUS:
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		case E_BLOCK_CACTUS:
-		{
-			if ((SurfaceBlock != E_BLOCK_SAND) && (SurfaceBlock != E_BLOCK_CACTUS))
-			{
-				// Cactus can only be placed on sand and itself
-				return false;
-			}
-
-			// Check surroundings. Cacti may ONLY be surrounded by air
-			if (
-				(GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ)     != E_BLOCK_AIR) ||
-				(GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ)     != E_BLOCK_AIR) ||
-				(GetBlock(a_BlockX,     a_BlockY, a_BlockZ - 1) != E_BLOCK_AIR) ||
-				(GetBlock(a_BlockX,     a_BlockY, a_BlockZ + 1) != E_BLOCK_AIR)
-			)
-			{
-				return false;
-			}
-			return true;
-		}
-		
-		case E_ITEM_SEEDS:
-		case E_ITEM_MELON_SEEDS:
-		case E_ITEM_PUMPKIN_SEEDS:
-		{
-			// Seeds can go only on the farmland block:
-			return (SurfaceBlock == E_BLOCK_FARMLAND);
-		}
-	}  // switch (a_Packet->m_ItemType)
-	return true;
-}
-
-
-
-
-
 void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
 }
-
-
-
-
 
 void cWorld::InitializeSpawn(void)
 {
@@ -555,6 +477,8 @@ void cWorld::Tick(float a_Dt)
 	}
 
 	m_ChunkMap->Tick(a_Dt, m_TickRand);
+
+	TickQueuedBlocks(a_Dt);
 	
 	GetSimulatorManager()->Simulate(a_Dt);
 
@@ -1110,9 +1034,14 @@ int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
 {
+	if(a_BlockType == E_BLOCK_AIR)
+	{
+		BlockHandler(GetBlock(a_X, a_Y, a_Z))->OnDestroyed(this, a_X, a_Y, a_Z);
+	}
 	m_ChunkMap->SetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
 
 	GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
+	BlockHandler(a_BlockType)->OnPlaced(this, a_X, a_Y, a_Z, a_BlockMeta);
 }
 
 
@@ -1264,6 +1193,8 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock( int a_X, int a_Y, int a_Z)
 {
+	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(GetBlock(a_X, a_Y, a_Z));
+	Handler->OnDestroyed(this, a_X, a_Y, a_Z);
 	return m_ChunkMap->DigBlock(a_X, a_Y, a_Z);
 }
 
@@ -1902,3 +1833,45 @@ void cWorld::GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLigh
 
 
 
+void cWorld::TickQueuedBlocks(float a_Dt)
+{
+	if(m_BlockTickQueue.empty())
+		return;
+	m_BlockTickQueueCopy.clear();
+	m_BlockTickQueue.swap(m_BlockTickQueueCopy);
+
+	for(std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
+	{
+		BlockTickQueueItem *Block = (*itr);
+		Block->ToWait -= a_Dt;
+		if(Block->ToWait <= 0)
+		{
+			BlockHandler(GetBlock(Block->X, Block->Y, Block->Z))->OnUpdate(this, Block->X, Block->Y, Block->Z);
+			delete Block;	//We don´t have to remove it from the vector, this will happen automatically on the next tick
+		}else{
+			m_BlockTickQueue.push_back(Block);	//Keep the block in the queue
+		}
+	}
+	
+}
+
+
+void cWorld::QueueBlockForTick(int a_X, int a_Y, int a_Z, float a_Time)
+{
+	BlockTickQueueItem *Block = new BlockTickQueueItem;
+	Block->X = a_X;
+	Block->Y = a_Y;
+	Block->Z = a_Z;
+	Block->ToWait = a_Time;
+	
+	m_BlockTickQueue.push_back(Block);
+}
+
+
+bool cWorld::IsBlockDirectlyWatered(int a_X, int a_Y, int a_Z)
+{
+	return IsBlockWater(GetBlock(a_X - 1, a_Y, a_Z))
+		|| IsBlockWater(GetBlock(a_X + 1, a_Y, a_Z))
+		|| IsBlockWater(GetBlock(a_X, a_Y, a_Z - 1))
+		|| IsBlockWater(GetBlock(a_X, a_Y, a_Z + 1));
+}

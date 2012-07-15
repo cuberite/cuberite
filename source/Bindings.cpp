@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/15/12 14:45:49.
+** Generated automatically by tolua++-1.0.92 on 07/15/12 22:27:57.
 */
 
 #ifndef __cplusplus
@@ -18,7 +18,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "ChunkDef.h"
 #include "cTorch.h"
 #include "cStairs.h"
-#include "cStep.h"
 #include "cLadder.h"
 #include "cVine.h"
 #include "../iniFile/iniFile.h"
@@ -184,26 +183,25 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cLuaItems");
- tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"cLuaChunk");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cStringMap");
- tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"cLuaChunk");
  tolua_usertype(tolua_S,"cBlockArea");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"Lua__cPacket_BlockDig");
- tolua_usertype(tolua_S,"Lua__cTCPLink");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cVine");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"Lua__cTCPLink");
+ tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cPacket_Login");
  tolua_usertype(tolua_S,"cClientHandle");
- tolua_usertype(tolua_S,"cStep");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
  tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"cChatColor");
@@ -228,12 +226,12 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"cPacket_BlockPlace");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPlayer");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"HTTPRequest");
- tolua_usertype(tolua_S,"cPawn");
+ tolua_usertype(tolua_S,"cVine");
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
  tolua_usertype(tolua_S,"HTTPFormData");
@@ -331,36 +329,6 @@ static int tolua_AllToLua_cStairs_RotationToMetaData00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'RotationToMetaData'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: DirectionToMetaData of class  cStep */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cStep_DirectionToMetaData00
-static int tolua_AllToLua_cStep_DirectionToMetaData00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cStep",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  int a_Direction = ((int)  tolua_tonumber(tolua_S,2,0));
-  {
-   char tolua_ret = (char)  cStep::DirectionToMetaData(a_Direction);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'DirectionToMetaData'.",&tolua_err);
  return 0;
 #endif
 }
@@ -21153,10 +21121,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cStairs","cStairs","",NULL);
   tolua_beginmodule(tolua_S,"cStairs");
    tolua_function(tolua_S,"RotationToMetaData",tolua_AllToLua_cStairs_RotationToMetaData00);
-  tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"cStep","cStep","",NULL);
-  tolua_beginmodule(tolua_S,"cStep");
-   tolua_function(tolua_S,"DirectionToMetaData",tolua_AllToLua_cStep_DirectionToMetaData00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLadder","cLadder","",NULL);
   tolua_beginmodule(tolua_S,"cLadder");

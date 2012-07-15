@@ -14,6 +14,10 @@
 #include "cThread.h"
 #include "cFileFormatUpdater.h"
 #include "cRedstone.h"
+#include "blocks/Block.h"
+#include "items/Item.h"
+#include "squirrelbindings/SquirrelFunctions.h"
+#include "squirrelbindings/SquirrelBindings.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -168,6 +172,11 @@ void cRoot::Start()
 		m_Authenticator.Stop();
 		LOG("Stopping plugin manager...");
 		delete m_PluginManager; m_PluginManager = 0;  // This should be first
+		
+
+		#if USE_SQUIRREL
+		CloseSquirrelVM();
+		#endif
 		LOG("Freeing MonsterConfig...");
 		delete m_MonsterConfig; m_MonsterConfig = 0;
 		LOG("Stopping WebAdmin...");
@@ -179,6 +188,10 @@ void cRoot::Start()
 		delete m_GroupManager; m_GroupManager = 0;
 		LOG("Unloading worlds...");
 		UnloadWorlds();
+		
+		cItemHandler::Deinit();
+		cBlockHandler::Deinit();
+
 		LOG("Destroying server...");
 		//delete HeartBeat; HeartBeat = 0;
 		delete m_Server; m_Server = 0;

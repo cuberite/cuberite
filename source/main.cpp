@@ -13,13 +13,6 @@
 #endif  // _WIN32
 
 #include "squirrelbindings/SquirrelBindings.h"
-#if USE_SQUIRREL
-	#pragma warning(push)
-	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
-	
-	#pragma warning(pop)
-#endif
-
 
 
 
@@ -189,9 +182,6 @@ int main( int argc, char **argv )
 		LOGERROR("Unknown exception!");
 	}
 
-	#if USE_SQUIRREL
-	CloseSquirrelVM();
-	#endif
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	DeinitLeakFinder();

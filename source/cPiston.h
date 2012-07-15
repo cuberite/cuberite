@@ -20,8 +20,8 @@ public:
 
 	static char RotationPitchToMetaData( float a_Rotation, float a_Pitch )
 	{
-		LOG("pre:a_Rotation %f \n",a_Rotation);
-		LOG("a_Pitch %f \n",a_Pitch);
+		LOGD("pre:a_Rotation %f \n",a_Rotation);
+		LOGD("a_Pitch %f \n",a_Pitch);
 
 		if (a_Pitch >= 50.f ){
 			return 0x1;

@@ -636,6 +636,7 @@ extern bool       g_BlockTransparent[256];
 extern bool       g_BlockOneHitDig[256];
 extern bool       g_BlockPistonBreakable[256];
 extern bool       g_BlockIsSnowable[256];
+extern bool		  g_BlockRequiresSpecialTool[256];
 
 
 

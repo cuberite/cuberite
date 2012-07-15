@@ -18,6 +18,7 @@ bool       g_BlockTransparent[256];
 bool       g_BlockOneHitDig[256];
 bool       g_BlockPistonBreakable[256];
 bool       g_BlockIsSnowable[256];
+bool	   g_BlockRequiresSpecialTool[256];
 
 
 
@@ -174,6 +175,7 @@ public:
 		memset( g_BlockOneHitDig,          0x00, sizeof( g_BlockOneHitDig ) );
 		memset( g_BlockPistonBreakable,    0x00, sizeof( g_BlockPistonBreakable ) );
 		memset( g_BlockIsSnowable,         0xff, sizeof( g_BlockIsSnowable));  // Set all blocks' snowable to true
+		memset( g_BlockRequiresSpecialTool,     false, sizeof( g_BlockRequiresSpecialTool));
 
 		// Emissive blocks
 		g_BlockLightValue[E_BLOCK_FIRE]                 = 15;
@@ -324,6 +326,42 @@ public:
 		g_BlockIsSnowable[E_BLOCK_WALLSIGN]              = false;
 		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
 		g_BlockIsSnowable[E_BLOCK_YELLOW_FLOWER]         = false;
+
+		//Blocks that don´t drop without a special tool
+		g_BlockRequiresSpecialTool[E_BLOCK_DIAMOND_BLOCK]	= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_DIAMOND_ORE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_BLOCK]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_ORE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_IRON_BLOCK]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_IRON_ORE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_REDSTONE_ORE]	= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_REDSTONE_ORE_GLOWING]= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_ORE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_BLOCK]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_EMERALD_ORE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COAL_ORE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_OBSIDIAN]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE]			= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_END_STONE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_MOSSY_COBBLESTONE]	= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_SANDSTONE]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_BRICKS]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COBWEB]			= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_SNOW]			= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK]	= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_NETHERRACK]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_SLAB]		= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_DOUBLE_STONE_SLAB]	= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_PRESSURE_PLATE]= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_BRICK]			= true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE_STAIRS] = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_BRICK_STAIRS] = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_SANDSTONE_STAIRS] = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK_STAIRS] = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_VINES]			= true;
+
+
 	}	
 } BlockPropertiesInitializer;
 		

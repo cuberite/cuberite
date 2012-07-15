@@ -9,7 +9,7 @@
 #include "BlockID.h"
 #include "Defines.h"
 #include "cItem.h"
-#include "cBlockToPickup.h"
+#include "blocks/Block.h"
 
 
 
@@ -356,9 +356,11 @@ void cFluidSimulator::Simulate( float a_Dt )
 				{
 					if( bWashedAwayItem )
 					{
-						cItems Drops;
-						cBlockToPickup::ToPickup(DownID, m_World->GetBlockMeta(pos.x, pos.y - 1, pos.z), E_ITEM_EMPTY, Drops);
-						m_World->SpawnItemPickups(Drops, pos.x, pos.y - 1, pos.z);
+						cBlockHandler * Handler = BlockHandler(DownID);
+						if(Handler->DropOnUnsuitable())
+						{
+							Handler->DropBlock(m_World, pos.x, pos.y - 1, pos.z);
+						}
 					}
 					if (pos.y > 0)
 					{
@@ -390,9 +392,11 @@ void cFluidSimulator::Simulate( float a_Dt )
 							{
 								if (bWashedAwayItem)
 								{
-									cItems Drops;
-									cBlockToPickup::ToPickup(DownID, m_World->GetBlockMeta(p.x, p.y, p.z), E_ITEM_EMPTY, Drops);
-									m_World->SpawnItemPickups(Drops, p.x, p.y, p.z);
+									cBlockHandler * Handler = BlockHandler(DownID);
+									if(Handler->DropOnUnsuitable())
+									{
+										Handler->DropBlock(m_World, p.x, p.y, p.z);
+									}
 								}
 
 								if( p.y == pos.y )
