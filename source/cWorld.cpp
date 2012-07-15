@@ -868,16 +868,17 @@ void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
 void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, char a_SaplingMeta)
 {
 	cNoise Noise(m_Generator.GetSeed());
-	sSetBlockVector Blocks;
+	sSetBlockVector Logs, Other;
 	switch (a_SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
-		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
-		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
-		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Blocks); break;
+		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
 	}
-	
-	GrowTreeImage(Blocks);
+	Other.insert(Other.begin(), Logs.begin(), Logs.end());
+	Logs.clear();
+	GrowTreeImage(Logs);
 }
 
 
@@ -887,9 +888,11 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, char a_SaplingMeta)
 void cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
 {
 	cNoise Noise(m_Generator.GetSeed());
-	sSetBlockVector Blocks;
-	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), (EMCSBiome)GetBiomeAt(a_X, a_Z), Blocks);
-	GrowTreeImage(Blocks);
+	sSetBlockVector Logs, Other;
+	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), (EMCSBiome)GetBiomeAt(a_X, a_Z), Logs, Other);
+	Other.insert(Other.begin(), Logs.begin(), Logs.end());
+	Logs.clear();
+	GrowTreeImage(Other);
 }
 
 

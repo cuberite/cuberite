@@ -40,15 +40,29 @@ protected:
 	cTerrainHeightGen *      m_HeightGen;
 	cTerrainCompositionGen * m_CompositionGen;
 	
+	/** Generates and applies an image of a single tree.
+	Parts of the tree inside the chunk are applied to a_BlockX.
+	Parts of the tree outside the chunk are stored in a_OutsideX
+	*/
 	void GenerateSingleTree(
 		int a_ChunkX, int a_ChunkZ, int a_Seq,
 		cChunkDef::BlockTypes & a_BlockTypes,
 		cChunkDef::BlockNibbles & a_BlockMetas,
 		const cChunkDef::HeightMap & a_Height,
 		const cChunkDef::BiomeMap & a_Biomes,
-		sSetBlockVector & a_Blocks
+		sSetBlockVector & a_OutsideLogs,
+		sSetBlockVector & a_OutsideOther
 	) ;
 	
+	/// Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow
+	void cStructGenTrees::ApplyTreeImage(
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,
+		cChunkDef::BlockNibbles & a_BlockMetas,
+		const sSetBlockVector & a_Image,
+		sSetBlockVector & a_Overflow
+	);
+
 	int GetNumTrees(
 		int a_ChunkX, int a_ChunkZ,
 		const cChunkDef::BiomeMap & a_Biomes

@@ -50,6 +50,15 @@ template <typename T> T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
+static bool SortTreeBlocks(const sSetBlock & a_First, const sSetBlock & a_Second)
+{
+	return (a_First.BlockType == E_BLOCK_LOG) && (a_Second.BlockType != E_BLOCK_LOG);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 
@@ -76,7 +85,6 @@ void cStructGenTrees::GenStructures(
 		for (int z = 0; z <= 2; z++)
 		{
 			int BaseZ = a_ChunkZ + z - 1;
-			sSetBlockVector Outside;
 			
 			cChunkDef::BlockTypes *   BlT;
 			cChunkDef::BlockNibbles * BlM;
@@ -104,28 +112,18 @@ void cStructGenTrees::GenStructures(
 
 			int NumTrees = GetNumTrees(BaseX, BaseZ, Biomes);
 
+			sSetBlockVector OutsideLogs, OutsideOther;
 			for (int i = 0; i < NumTrees; i++)
 			{
-				GenerateSingleTree(BaseX, BaseZ, i, *BlT, *BlM, *Hei, Biomes, Outside);
+				GenerateSingleTree(BaseX, BaseZ, i, *BlT, *BlM, *Hei, Biomes, OutsideLogs, OutsideOther);
 			}
 
-			// Integrate blocks in Outside into chunk:
-			for (sSetBlockVector::const_iterator itr = Outside.begin(); itr != Outside.end(); ++itr)
-			{
-				if ((itr->ChunkX != a_ChunkX) || (itr->ChunkZ != a_ChunkZ))
-				{
-					continue;
-				}
-				switch (cChunkDef::GetBlock(a_BlockTypes, itr->x, itr->y, itr->z))
-				{
-					CASE_TREE_OVERWRITTEN_BLOCKS:
-					{
-						cChunkDef::SetBlock (a_BlockTypes, itr->x, itr->y, itr->z, itr->BlockType);
-						cChunkDef::SetNibble(a_BlockMetas, itr->x, itr->y, itr->z, itr->BlockMeta);
-						break;
-					}
-				}  // switch (GetBlock())
-			}  // for itr - Outside[]
+			sSetBlockVector IgnoredOverflow;
+			IgnoredOverflow.reserve(OutsideOther.size());
+			ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, OutsideOther, IgnoredOverflow);
+			IgnoredOverflow.clear();
+			IgnoredOverflow.reserve(OutsideLogs.size());
+			ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, OutsideLogs, IgnoredOverflow);
 		}  // for z
 	}  // for x
 	
@@ -156,13 +154,14 @@ void cStructGenTrees::GenerateSingleTree(
 	cChunkDef::BlockNibbles & a_BlockMetas,
 	const cChunkDef::HeightMap & a_Height,
 	const cChunkDef::BiomeMap & a_Biomes,
-	sSetBlockVector & a_Blocks
+	sSetBlockVector & a_OutsideLogs,
+	sSetBlockVector & a_OutsideOther
 )
 {
-	int x = m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, a_Seq) % cChunkDef::Width;
-	int z = m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, a_Seq, a_ChunkZ) % cChunkDef::Width;
+	int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, a_Seq) / 19) % cChunkDef::Width;
+	int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, a_Seq, a_ChunkZ) / 19) % cChunkDef::Width;
 	
-	int Height = a_Height[x + cChunkDef::Width * z];
+	int Height = cChunkDef::GetHeight(a_Height, x, z);
 	
 	if ((Height <= 0) || (Height > 240))
 	{
@@ -176,15 +175,20 @@ void cStructGenTrees::GenerateSingleTree(
 		return;
 	}
 	
-	sSetBlockVector TreeBlocks;
-	GetTreeImageByBiome(a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z, m_Noise, a_Seq, a_Biomes[x + cChunkDef::Width * z], TreeBlocks);
+	sSetBlockVector TreeLogs, TreeOther;
+	GetTreeImageByBiome(
+		a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z,
+		m_Noise, a_Seq, 
+		cChunkDef::GetBiome(a_Biomes, x, z),
+		TreeLogs, TreeOther
+	);
 
-	// Check if the generated image fits the terrain:
-	for (sSetBlockVector::const_iterator itr = TreeBlocks.begin(); itr != TreeBlocks.end(); ++itr)
+	// Check if the generated image fits the terrain. Only the logs are checked:
+	for (sSetBlockVector::const_iterator itr = TreeLogs.begin(); itr != TreeLogs.end(); ++itr)
 	{
-		if ((itr->ChunkX != a_ChunkX) || (itr->ChunkZ != a_ChunkZ) || (itr->BlockType != E_BLOCK_LOG))
+		if ((itr->ChunkX != a_ChunkX) || (itr->ChunkZ != a_ChunkZ))
 		{
-			// Outside the chunk, or not a log (we don't check non-logs)
+			// Outside the chunk
 			continue;
 		}
 
@@ -203,50 +207,52 @@ void cStructGenTrees::GenerateSingleTree(
 		}
 	}
 	
+	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, TreeOther, a_OutsideOther);
+	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, TreeLogs,  a_OutsideLogs);	
+}
+
+
+
+
+
+void cStructGenTrees::ApplyTreeImage(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,
+	cChunkDef::BlockNibbles & a_BlockMetas,
+	const sSetBlockVector & a_Image,
+	sSetBlockVector & a_Overflow
+)
+{
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
-	for (sSetBlockVector::const_iterator itr = TreeBlocks.begin(); itr != TreeBlocks.end(); ++itr)
+	for (sSetBlockVector::const_iterator itr = a_Image.begin(); itr != a_Image.end(); ++itr)
 	{
 		if ((itr->ChunkX == a_ChunkX) && (itr->ChunkZ == a_ChunkZ))
 		{
 			// Inside this chunk, integrate into a_BlockTypes:
 			switch (cChunkDef::GetBlock(a_BlockTypes, itr->x, itr->y, itr->z))
 			{
+				case E_BLOCK_LEAVES:
+				{
+					if (itr->BlockType != E_BLOCK_LOG)
+					{
+						break;
+					}
+					// fallthrough:
+				}
 				CASE_TREE_OVERWRITTEN_BLOCKS:
 				{
 					cChunkDef::SetBlock (a_BlockTypes, itr->x, itr->y, itr->z, itr->BlockType);
 					cChunkDef::SetNibble(a_BlockMetas, itr->x, itr->y, itr->z, itr->BlockMeta);
 					break;
 				}
+				
 			}  // switch (GetBlock())
 			continue;
 		}
 		
-		// Outside the chunk, push into a_Blocks; check if already present there:
-		bool Found = false;
-		for (sSetBlockVector::iterator itrB = a_Blocks.begin(); itrB != a_Blocks.end(); ++itrB)
-		{
-			if (
-				(itr->ChunkX == itrB->ChunkX) &&
-				(itr->ChunkZ == itrB->ChunkZ) &&
-				(itr->x == itrB->x) &&
-				(itr->y == itrB->y) &&
-				(itr->z == itrB->z)
-			)
-			{
-				// Same coords already found in a_Blocks, overwrite with wood, if requested:
-				if (itr->BlockType == E_BLOCK_LOG)
-				{
-					itrB->BlockType = itr->BlockType;
-					itrB->BlockMeta = itr->BlockMeta;
-				}
-				Found = true;
-				break;
-			}
-		}  // for itrB - a_Blocks[]
-		if (!Found)
-		{
-			a_Blocks.push_back(*itr);
-		}
+		// Outside the chunk, push into a_Overflow.
+		// Don't check if already present there, by separating logs and others we don't need the checks anymore:
+		a_Overflow.push_back(*itr);
 	}
 }
 
