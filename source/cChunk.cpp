@@ -42,7 +42,7 @@
 
 
 // Leaves can be this many blocks that away (inclusive) from the log not to decay
-#define LEAVES_CHECK_DISTANCE 5
+#define LEAVES_CHECK_DISTANCE 6
 
 
 
@@ -797,7 +797,7 @@ void cChunk::TickLeaves(int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRando
 
 	if (HasNearLog(Area, BaseX, a_RelY, BaseZ))
 	{
-		// Wood found, the leaves stay; mark them as checked:
+		// Log found, the leaves stay; mark them as checked:
 		SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, Meta & 0x07);
 		return;
 	}
