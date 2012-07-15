@@ -162,6 +162,8 @@ void cRoot::Start()
 		// Deallocate stuffs
 		LOG("Shutting down server...");
 		m_Server->Shutdown(); // This waits for threads to stop and d/c clients
+		LOG("Stopping world threads...");
+		StopWorlds();
 		LOG("Stopping authenticator...");
 		m_Authenticator.Stop();
 		LOG("Stopping plugin manager...");
@@ -246,6 +248,18 @@ void cRoot::StartWorlds(void)
 	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
 	{
 		itr->second->InitializeSpawn();
+	}
+}
+
+
+
+
+
+void cRoot::StopWorlds(void)
+{
+	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	{
+		itr->second->StopThreads();
 	}
 }
 

@@ -326,7 +326,10 @@ public:
 
 	void Tick(float a_Dt);
 
-	void InitializeSpawn();
+	void InitializeSpawn(void);
+	
+	/// Stops threads that belong to this world (part of deinit)
+	void StopThreads(void);
 
 	void CastThunderbolt (int a_X, int a_Y, int a_Z);						//tolua_export
 	void SetWeather ( eWeather a_Weather );									//tolua_export

@@ -208,9 +208,6 @@ cWorld::~cWorld()
 	delete m_FireSimulator;
 	delete m_RedstoneSimulator;
 
-	m_Generator.Stop();
-	m_ChunkSender.Stop();
-
 	UnloadUnusedChunks();
 	
 	m_Storage.WaitForFinish();
@@ -504,6 +501,16 @@ void cWorld::InitializeSpawn(void)
 	
 	// TODO: Better spawn detection - move spawn out of the water if it isn't set in the INI already
 	m_SpawnY = (double)GetHeight( (int)m_SpawnX, (int)m_SpawnZ ) + 1.6f; // +1.6f eye height
+}
+
+
+
+
+
+void cWorld::StopThreads(void)
+{
+	m_Generator.Stop();
+	m_ChunkSender.Stop();
 }
 
 

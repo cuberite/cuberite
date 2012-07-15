@@ -78,6 +78,10 @@ private:
 	/// Starts each world's life
 	void StartWorlds(void);
 	
+	/// Stops each world's threads, so that it's safe to unload them
+	void StopWorlds(void);
+	
+	/// Unloads all worlds from memory
 	void UnloadWorlds(void);
 
 	cServer *        m_Server;
