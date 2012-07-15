@@ -22,5 +22,5 @@ private:
 	cEvent* m_Event;
 	cEvent* m_StopEvent;
 
-	char* m_ThreadName;
+	AString m_ThreadName;
 };

@@ -45,14 +45,16 @@ cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_Thre
 	, m_Param( a_Param )
 	, m_Event( new cEvent() )
 	, m_StopEvent( 0 )
-	, m_ThreadName( 0 )
 {
 	if( a_ThreadName )
 	{
-		m_ThreadName = new char[ strlen(a_ThreadName)+1 ];
-		strcpy(m_ThreadName, a_ThreadName);
+		m_ThreadName.assign(a_ThreadName);
 	}
 }
+
+
+
+
 
 cThread::~cThread()
 {
@@ -63,9 +65,11 @@ cThread::~cThread()
 		m_StopEvent->Wait();
 		delete m_StopEvent;
 	}
-
-	delete [] m_ThreadName;
 }
+
+
+
+
 
 void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 {
@@ -86,15 +90,21 @@ void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 		,&ThreadID ); // thread id
 	CloseHandle( hThread );
 
-	if( m_ThreadName )
+	#ifdef _MSC_VER
+	if (!m_ThreadName.empty())
 	{
-		SetThreadName(ThreadID, m_ThreadName );
+		SetThreadName(ThreadID, m_ThreadName.c_str());
 	}
+	#endif  // _MSC_VER
 #endif
 
 	// Wait until thread has actually been created
 	m_Event->Wait();
 }
+
+
+
+
 
 #ifdef _WIN32
 unsigned long cThread::MyThread(void* a_Param )
