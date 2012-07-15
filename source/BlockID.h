@@ -9,7 +9,7 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_DIRT	= 3,
 	E_BLOCK_COBBLESTONE = 4,
 	E_BLOCK_PLANKS = 5,
-	E_BLOCK_WOOD = E_BLOCK_PLANKS,
+	// E_BLOCK_WOOD = E_BLOCK_PLANKS,  // Obsolete - was confused too often: wood = logs or planks?
 	E_BLOCK_SAPLING = 6,
 	E_BLOCK_BEDROCK = 7,
 	E_BLOCK_WATER = 8,

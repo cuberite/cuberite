@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/09/12 09:01:54.
+** Generated automatically by tolua++-1.0.92 on 07/15/12 14:45:49.
 */
 
 #ifndef __cplusplus
@@ -21244,7 +21244,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_DIRT",E_BLOCK_DIRT);
   tolua_constant(tolua_S,"E_BLOCK_COBBLESTONE",E_BLOCK_COBBLESTONE);
   tolua_constant(tolua_S,"E_BLOCK_PLANKS",E_BLOCK_PLANKS);
-  tolua_constant(tolua_S,"E_BLOCK_WOOD",E_BLOCK_WOOD);
   tolua_constant(tolua_S,"E_BLOCK_SAPLING",E_BLOCK_SAPLING);
   tolua_constant(tolua_S,"E_BLOCK_BEDROCK",E_BLOCK_BEDROCK);
   tolua_constant(tolua_S,"E_BLOCK_WATER",E_BLOCK_WATER);
@@ -21842,6 +21841,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsShovel",tolua_AllToLua_ItemCategory_IsShovel00);
    tolua_function(tolua_S,"IsTool",tolua_AllToLua_ItemCategory_IsTool00);
   tolua_endmodule(tolua_S);
+  tolua_constant(tolua_S,"eGameMode_NotSet",eGameMode_NotSet);
   tolua_constant(tolua_S,"eGameMode_Survival",eGameMode_Survival);
   tolua_constant(tolua_S,"eGameMode_Creative",eGameMode_Creative);
   tolua_constant(tolua_S,"eWeather_Sunny",eWeather_Sunny);
