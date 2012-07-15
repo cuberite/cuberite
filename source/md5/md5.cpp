@@ -35,6 +35,8 @@ documentation and/or software.
 /* interface header */
 #include "md5.h"
 
+// _X 2012_07_15: disable MSVC warnings on "insecure" functions, such as sprintf() - we know they're being used securely here
+#define _CRT_SECURE_NO_WARNINGS
 
 
 
