@@ -42,7 +42,7 @@
 bool cBlockHandler::m_HandlerInitialized = false;
 cBlockHandler *cBlockHandler::m_BlockHandler[256];
 
-cBlockHandler *cBlockHandler::GetBlockHandler(char a_BlockID)
+cBlockHandler *cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockID)
 {
 	if(!m_HandlerInitialized)
 	{	//We have to initialize
@@ -227,7 +227,7 @@ void cBlockHandler::OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y
 
 }
 
-void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, char a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
+void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
 {
 	a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, a_BlockMeta);
 	OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
@@ -249,7 +249,7 @@ int cBlockHandler::GetDropID()
 	return m_BlockID;
 }
 
-char cBlockHandler::GetDropMeta(char a_BlockMeta)
+NIBBLETYPE cBlockHandler::GetDropMeta(NIBBLETYPE a_BlockMeta)
 {
 	return a_BlockMeta;		//This keeps most textures. The few other blocks have to override this
 }
@@ -257,7 +257,7 @@ char cBlockHandler::GetDropMeta(char a_BlockMeta)
 void cBlockHandler::DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z)
 {
 	cItems Drops;
-	char Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+	NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 	char DropCount = GetDropCount();
 	int DropItem = GetDropID();
 	if(DropCount > 0 && DropItem != E_ITEM_EMPTY)

@@ -16,12 +16,17 @@ public:
 		return true;
 	}
 
-	virtual int GetDropID()
+	virtual bool AllowBlockOnTop() override
+	{
+		return false;
+	}
+
+	virtual int GetDropID() override
 	{
 		return E_ITEM_EMPTY;
 	}
 	
-	virtual void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		MTRand rand;
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
@@ -42,13 +47,13 @@ public:
 		a_World->SpawnItemPickups(Drops, a_X, a_Y, a_Z);
 	}	
 	
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 
 		//TODO: Handle Growing here
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		return a_World->GetBlock(a_X, a_Y - 1, a_Z) == E_BLOCK_FARMLAND;
 	}

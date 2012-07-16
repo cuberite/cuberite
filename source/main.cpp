@@ -137,12 +137,12 @@ int main( int argc, char **argv )
 		// Parse arguments for minidump flags:
 		for (int i = 0; i < argc; i++)
 		{
-			if (stricmp(argv[i], "/cdg") == 0)
+			if (_stricmp(argv[i], "/cdg") == 0)
 			{
 				// Add globals to the dump
 				g_DumpFlags = (MINIDUMP_TYPE)(g_DumpFlags | MiniDumpWithDataSegs);
 			}
-			else if (stricmp(argv[i], "/cdf") == 0)
+			else if (_stricmp(argv[i], "/cdf") == 0)
 			{
 				// Add full memory to the dump (HUUUGE file)
 				g_DumpFlags = (MINIDUMP_TYPE)(g_DumpFlags | MiniDumpWithFullMemory);

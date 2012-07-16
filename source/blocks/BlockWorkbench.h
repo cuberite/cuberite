@@ -1,16 +1,23 @@
 #pragma once
 #include "Block.h"
-
+#include "../cCraftingWindow.h"
+#include "../cPlayer.h"
 
 class cBlockWorkbenchHandler : public cBlockHandler
 {
 public:
-	cBlockWorkbenchHandler(BLOCKTYPE a_BlockID);
-	virtual void OnPlaced(cWorld *a_World, int a_X, int a_Y, int a_Z, int a_Dir);
-	virtual void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z);
+	cBlockWorkbenchHandler(BLOCKTYPE a_BlockID)
+		: cBlockHandler(a_BlockID)
+	{
+	}
 	
-	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z);
-	virtual bool IsUseable()
+	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override
+	{
+		cWindow* Window = new cCraftingWindow(0, true);
+		a_Player->OpenWindow(Window);
+	}
+
+	virtual bool IsUseable() override
 	{
 		return true;
 	}

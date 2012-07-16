@@ -7,12 +7,12 @@ class cItemDyeHandler : public cItemHandler
 {
 public:
 	cItemDyeHandler(int a_ItemID)
-	: cItemHandler(a_ItemID)
+		: cItemHandler(a_ItemID)
 	{
 
 	}
 
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
+	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		// TODO: Handle coloring the sheep, too (OnItemUseOnEntity maybe)
 		// Handle growing the plants:

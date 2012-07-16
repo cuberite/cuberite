@@ -12,7 +12,7 @@ public:
 	{
 
 	}
-	virtual bool IsTool()
+	virtual bool IsTool() override
 	{
 		return true;
 	}
@@ -33,7 +33,7 @@ public:
 	}
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID)
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID) override
 	{
 		return a_BlockID == E_BLOCK_COBWEB
 			|| a_BlockID == E_BLOCK_VINES;

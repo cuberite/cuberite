@@ -11,7 +11,7 @@ public:
 	{
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		return E_ITEM_COBBLESTONE;
 	}	

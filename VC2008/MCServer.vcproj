@@ -1954,19 +1954,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockCloth.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockCloth.h"
 					>
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockCrops.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\blocks\BlockDirt.cpp"
 					>
 				</File>
 				<File
@@ -1986,15 +1978,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockEntity.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockEntity.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\blocks\BlockFire.cpp"
 					>
 				</File>
 				<File
@@ -2078,19 +2062,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockSlab.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockSlab.h"
 					>
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockSnow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\blocks\BlockStairs.cpp"
 					>
 				</File>
 				<File
@@ -2114,15 +2090,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockTorch.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockTorch.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\blocks\BlockVine.cpp"
 					>
 				</File>
 				<File
@@ -2131,10 +2099,6 @@
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockWood.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\blocks\BlockWorkbench.cpp"
 					>
 				</File>
 				<File

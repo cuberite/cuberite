@@ -10,17 +10,17 @@ public:
 	{
 	}
 
-	virtual bool IsPlaceable()
+	virtual bool IsPlaceable() override
 	{
 		return true;
 	}
 
-	virtual BLOCKTYPE GetBlockType()
+	virtual BLOCKTYPE GetBlockType() override
 	{
 		return E_BLOCK_REDSTONE_WIRE;
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
 	{
 		return 0;
 	}

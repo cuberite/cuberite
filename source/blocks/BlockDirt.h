@@ -6,21 +6,24 @@
 class cBlockDirtHandler : public cBlockHandler
 {
 public:
-	cBlockDirtHandler(BLOCKTYPE a_BlockID);
+	cBlockDirtHandler(BLOCKTYPE a_BlockID)
+		: cBlockHandler(a_BlockID)
+	{
+	}
 
 	
-	virtual bool NeedsRandomTicks()
+	virtual bool NeedsRandomTicks() override
 	{
 		return m_BlockID == E_BLOCK_GRASS;
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		return E_BLOCK_DIRT;
 	}
 	
 	
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		if(m_BlockID == E_BLOCK_GRASS)
 		{

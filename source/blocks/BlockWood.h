@@ -9,7 +9,7 @@ public:
 		: cBlockHandler(a_BlockID)
 	{
 	}
-	char GetDropMeta(char a_BlockMeta)
+	NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{
 		return a_BlockMeta;
 	}

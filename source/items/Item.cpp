@@ -209,10 +209,16 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockID)
 
 BLOCKTYPE cItemHandler::GetBlockType()
 {
-	return m_ItemID;
+#ifdef _DEBUG
+	if(m_ItemID > 256)
+	{
+		LOGERROR("Item %d has no valid block!", m_ItemID);
+	}
+#endif
+	return (BLOCKTYPE) m_ItemID;
 }
 
-NIBBLETYPE cItemHandler::GetBlockMeta(char a_ItemMeta)
+NIBBLETYPE cItemHandler::GetBlockMeta(NIBBLETYPE a_ItemMeta)
 {
 	return a_ItemMeta; //This keeps most textures. The few other items have to override this
 }

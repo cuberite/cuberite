@@ -12,17 +12,12 @@ public:
 
 	}
 
-	virtual bool IsPlaceable()
+	virtual bool IsPlaceable() override
 	{
 		return true;
 	}
-
-	virtual bool AllowBlockOnTop()
-	{
-		return false;
-	}
 	
-	virtual BLOCKTYPE GetBlockType()
+	virtual BLOCKTYPE GetBlockType() override
 	{
 		switch(m_ItemID)
 		{
@@ -37,12 +32,12 @@ public:
 		}
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
 	{
 		return 0;	//Not grown yet
 	}
 	
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
+	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		int X = a_X, 
 			Y = a_Y, 

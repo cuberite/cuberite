@@ -7,12 +7,12 @@ class cItemHoeHandler : public cItemHandler
 {
 public:
 	cItemHoeHandler(int a_ItemID)
-	: cItemHandler(a_ItemID)
+		: cItemHandler(a_ItemID)
 	{
 
 	}
 
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
+	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_X, a_Y, a_Z);
 

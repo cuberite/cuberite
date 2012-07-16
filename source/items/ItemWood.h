@@ -10,7 +10,7 @@ public:
 		: cItemHandler(a_ItemID)
 	{
 	}
-	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
 	{
 		return a_ItemMeta;
 	}

@@ -11,29 +11,29 @@ public:
 	{
 	}
 
-	virtual bool NeedsRandomTicks()
+	virtual bool NeedsRandomTicks() override
 	{
 		return true;
 	}
 
-	virtual char GetDropMeta(char a_BlockMeta)
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{
 		return 0;
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		if(m_BlockID == E_BLOCK_MELON_STEM)
 			return E_ITEM_MELON_SEEDS;
 		return E_ITEM_PUMPKIN_SEEDS;
 	}
 	
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		//TODO: Handle Growing here
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		return a_World->GetBlock(a_X, a_Y - 1, a_Z) == E_BLOCK_FARMLAND;
 	}

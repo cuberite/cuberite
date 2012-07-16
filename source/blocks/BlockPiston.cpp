@@ -40,7 +40,7 @@ void cBlockPistonHandler::OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z
 	}
 }
 
-void cBlockPistonHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, char a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
+void cBlockPistonHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
 {
 	
 	a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch()));

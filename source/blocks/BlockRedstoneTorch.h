@@ -24,12 +24,12 @@ public:
 		return CanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		return E_ITEM_REDSTONE_TORCH_ON;
 	}
 	
-	virtual bool CanBePlacedOnSide()
+	virtual bool CanBePlacedOnSide() override
 	{
 		return true;
 	}

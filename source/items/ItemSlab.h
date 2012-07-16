@@ -12,7 +12,7 @@ public:
 
 	}
 
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
+	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
@@ -32,7 +32,7 @@ public:
 		return false;
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
 	{
 		return a_ItemMeta;
 	}

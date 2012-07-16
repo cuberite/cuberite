@@ -926,12 +926,6 @@
     <ClCompile Include="..\source\cSquirrelCommandBinder.cpp">
       <Filter>cPluginManager\cSquirrelCommandBinder</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockEntity.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockFire.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\blocks\BlockPiston.cpp">
       <Filter>Blocks</Filter>
     </ClCompile>
@@ -939,24 +933,6 @@
       <Filter>Blocks</Filter>
     </ClCompile>
     <ClCompile Include="..\source\blocks\BlockRedstoneRepeater.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockSlab.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockTorch.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockVine.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockWorkbench.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockCloth.cpp">
-      <Filter>Blocks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockDirt.cpp">
       <Filter>Blocks</Filter>
     </ClCompile>
     <ClCompile Include="..\source\blocks\BlockDoor.cpp">
@@ -967,9 +943,6 @@
     </ClCompile>
     <ClCompile Include="..\source\items\Item.cpp">
       <Filter>Items</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\blocks\BlockStairs.cpp">
-      <Filter>Blocks</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

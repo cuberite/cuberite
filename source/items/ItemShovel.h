@@ -9,7 +9,7 @@ class cItemShovelHandler : public cItemHandler
 {
 public:
 	cItemShovelHandler(int a_ItemID)
-	: cItemHandler(a_ItemID)
+		: cItemHandler(a_ItemID)
 	{
 
 	}
@@ -28,7 +28,7 @@ public:
 		return false;
 	}
 	
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID)
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID) override
 	{
 		return a_BlockID == E_BLOCK_SNOW;
 	}

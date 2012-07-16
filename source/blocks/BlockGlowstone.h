@@ -10,12 +10,12 @@ public:
 	{
 	}
 	
-	virtual char GetDropMeta(char a_BlockMeta)
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{
 		return 0;
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		return E_ITEM_GLOWSTONE_DUST;
 	}

@@ -30,7 +30,7 @@ public:
 		}
 	}
 	
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID)
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID) override
 	{
 		switch(a_BlockID)
 		{

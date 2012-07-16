@@ -13,7 +13,7 @@ public:
 
 	}
 
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, char a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
+	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
@@ -30,12 +30,12 @@ public:
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		return E_ITEM_SIGN;
 	}
 	
-	virtual bool AllowBlockOnTop()
+	virtual bool AllowBlockOnTop() override
 	{
 		return false;
 	}

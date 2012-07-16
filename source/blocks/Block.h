@@ -19,18 +19,17 @@ public:
 	virtual void OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z);
 	static void NeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z);
 	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z);
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, char a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir);
+	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir);
 
 	virtual int GetTickRate();
 	virtual char GetDropCount();
 	virtual int GetDropID();
-	virtual char GetDropMeta(char a_BlockMeta);
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta);
 	virtual bool NeedsRandomTicks();
-	//Item is -2 if it wasn´t a player
 	virtual void DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z);
 	//Checks if the block can stay at
 	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z);
-	//Checks if the block can be placed at Default:CanBeAt(...) NOTE: In the block is not placed
+	//Checks if the block can be placed at this point. Default: CanBeAt(...) NOTE: In the block is not placed in this callback
 	virtual bool CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir);
 	//This gets called if the player tries to place a block ontop of this block (Only if he aims directly on this block)
 	virtual bool AllowBlockOnTop();
@@ -42,7 +41,7 @@ public:
 	//Does this block drops if it gets destroyed by an unsuitable situation? Default: true
 	virtual bool DropOnUnsuitable();
 	
-	static cBlockHandler *GetBlockHandler(char a_BlockID);
+	static cBlockHandler *GetBlockHandler(BLOCKTYPE a_BlockID);
 
 	static void Deinit();
 	
@@ -54,4 +53,4 @@ protected:
 };
 
 
-inline cBlockHandler *BlockHandler(char a_BlockID) { return cBlockHandler::GetBlockHandler(a_BlockID); }
+inline cBlockHandler *BlockHandler(BLOCKTYPE a_BlockID) { return cBlockHandler::GetBlockHandler(a_BlockID); }

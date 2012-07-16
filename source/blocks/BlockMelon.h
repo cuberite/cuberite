@@ -11,12 +11,12 @@ public:
 	}
 	
 	
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		return E_ITEM_MELON_SLICE;
 	}
 
-	virtual char GetDropCount()
+	virtual char GetDropCount() override
 	{
 		MTRand r1;
 		return (char)(3 + r1.randInt(4));

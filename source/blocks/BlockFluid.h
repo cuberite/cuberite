@@ -11,7 +11,7 @@ public:
 
 	}
 	
-	virtual bool IgnoreBuildCollision()
+	virtual bool IgnoreBuildCollision() override
 	{
 		return true;
 	}

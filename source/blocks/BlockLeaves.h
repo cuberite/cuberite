@@ -28,7 +28,7 @@ public:
 	{
 	}
 
-	virtual int GetDropID()
+	virtual int GetDropID() override
 	{
 		MTRand rand;
 
@@ -40,7 +40,7 @@ public:
 		return E_ITEM_EMPTY;
 	}
 
-	void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		cBlockHandler::OnDestroyed(a_World, a_X, a_Y, a_Z);
 		
@@ -56,18 +56,18 @@ public:
 		}
 	}
 	
-	virtual void OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual void OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 		a_World->SetBlockMeta(a_X, a_Y, a_Z, Meta & 0x7);	//Unset 0x8 bit so it gets checked for decay
 	}
 	
-	virtual bool NeedsRandomTicks()
+	virtual bool NeedsRandomTicks() override
 	{
 		return true;
 	}
 	
-	virtual void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 		if ((Meta & 0x04) != 0)

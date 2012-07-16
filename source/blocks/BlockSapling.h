@@ -15,22 +15,22 @@ public:
 		return true;
 	}
 
-	virtual char GetDropMeta(char a_BlockMeta)
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{
 		return a_BlockMeta & 3;	//Only the first 2 bits contain the display information the others are for growing
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		return IsBlockTypeOfDirt(a_World->GetBlock(a_X, a_Y - 1, a_Z));
 	}
 
-	virtual bool AllowBlockOnTop()
+	virtual bool AllowBlockOnTop() override
 	{
 		return false;
 	}
 
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 		
@@ -44,7 +44,7 @@ public:
 		}
 	}
 	
-	virtual bool CanBePlacedOnSide()
+	virtual bool CanBePlacedOnSide() override
 	{
 		return false;
 	}

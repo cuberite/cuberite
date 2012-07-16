@@ -26,7 +26,7 @@ void cBlockRedstoneHandler::OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a
 	Redstone.ChangeRedstone(a_X, a_Y, a_Z, false);
 }
 
-void cBlockRedstoneHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, char a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
+void cBlockRedstoneHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
 {
 	switch(m_BlockID)
 	{

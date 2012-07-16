@@ -10,12 +10,12 @@ public:
 	{
 	}
 
-	virtual char GetDropMeta(char a_BlockMeta)
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{
 		return 0;
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		BLOCKTYPE Surface = a_World->GetBlock(a_X, a_Y - 1, a_Z);
 		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS))
@@ -38,13 +38,13 @@ public:
 		return true;
 	}
 
-	virtual bool AllowBlockOnTop()
+	virtual bool AllowBlockOnTop() override
 	{
 		return false;
 	}
 
 	
-	virtual bool CanBePlacedOnSide()
+	virtual bool CanBePlacedOnSide() override
 	{
 		return false;
 	}

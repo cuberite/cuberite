@@ -26,7 +26,7 @@ public:
 		}
 	}
 
-	virtual char GetDropMeta(char a_Meta) override
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_Meta) override
 	{
 		switch(m_BlockID)
 		{
