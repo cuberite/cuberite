@@ -1649,9 +1649,6 @@
     <ClInclude Include="..\source\items\ItemSword.h">
       <Filter>Items</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\blocks\BlockRedstoneOre.h">
-      <Filter>Blocks</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\blocks\BlockStone.h">
       <Filter>Blocks</Filter>
     </ClInclude>
@@ -1663,6 +1660,12 @@
     </ClInclude>
     <ClInclude Include="..\source\blocks\BlockIce.h">
       <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockOre.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\items\ItemRedstoneRepeater.h">
+      <Filter>Items</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,7 @@
 #include "ItemBucket.h"
 #include "ItemLighter.h"
 #include "ItemRedstoneDust.h"
+#include "ItemRedstoneRepeater.h"
 #include "ItemSeeds.h"
 #include "ItemDye.h"
 #include "ItemSugarcane.h"
@@ -69,6 +70,8 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemID)
 		return new cItemSaplingHandler(a_ItemID);
 	case E_ITEM_REDSTONE_DUST:
 		return new cItemRedstoneDustHandler(a_ItemID);
+	case E_ITEM_REDSTONE_REPEATER:
+		return new cItemRedstoneRepeaterHandler(a_ItemID);
 	case E_ITEM_BUCKET:
 	case E_ITEM_WATER_BUCKET:
 	case E_ITEM_LAVA_BUCKET:

@@ -531,9 +531,9 @@
     <ClInclude Include="..\source\blocks\BlockLeaves.h" />
     <ClInclude Include="..\source\blocks\BlockMelon.h" />
     <ClInclude Include="..\source\blocks\BlockMushroom.h" />
+    <ClInclude Include="..\source\blocks\BlockOre.h" />
     <ClInclude Include="..\source\blocks\BlockPiston.h" />
     <ClInclude Include="..\source\blocks\BlockRedstone.h" />
-    <ClInclude Include="..\source\blocks\BlockRedstoneOre.h" />
     <ClInclude Include="..\source\blocks\BlockRedstoneRepeater.h" />
     <ClInclude Include="..\source\blocks\BlockRedstoneTorch.h" />
     <ClInclude Include="..\source\blocks\BlockSapling.h" />
@@ -652,6 +652,7 @@
     <ClInclude Include="..\source\items\ItemLighter.h" />
     <ClInclude Include="..\source\items\ItemPickaxe.h" />
     <ClInclude Include="..\source\items\ItemRedstoneDust.h" />
+    <ClInclude Include="..\source\items\ItemRedstoneRepeater.h" />
     <ClInclude Include="..\source\items\ItemSapling.h" />
     <ClInclude Include="..\source\items\ItemSeeds.h" />
     <ClInclude Include="..\source\items\ItemShears.h" />
