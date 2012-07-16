@@ -28,7 +28,10 @@ public:
 	virtual bool NeedsRandomTicks();
 	//Item is -2 if it wasn´t a player
 	virtual void DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z);
+	//Checks if the block can stay at
 	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z);
+	//Checks if the block can be placed at Default:CanBeAt(...) NOTE: In the block is not placed
+	virtual bool CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir);
 	//This gets called if the player tries to place a block ontop of this block (Only if he aims directly on this block)
 	virtual bool AllowBlockOnTop();
 	virtual bool IsUseable();

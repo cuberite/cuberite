@@ -68,5 +68,6 @@ public:
 		case E_BLOCK_NETHER_BRICK_STAIRS:
 			return PickaxeLevel() >= 1;
 		}
+		return false;
 	}
 };

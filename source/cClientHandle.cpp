@@ -948,7 +948,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			if(Dir != 1 && !NewBlock->CanBePlacedOnSide())
 				return;
 
-			if(NewBlock->CanBeAt(World, X, Y, Z))
+			if(NewBlock->CanBePlacedAt(World, X, Y, Z, Dir))
 			{
 				ItemHandler->PlaceBlock(World, m_Player, &m_Player->GetInventory().GetEquippedItem(), X, Y, Z, a_Packet->m_Direction);
 			}else{

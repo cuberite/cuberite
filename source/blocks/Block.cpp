@@ -34,10 +34,10 @@
 #include "BlockCactus.h"
 #include "BlockStems.h"
 #include "BlockGlowstone.h"
-#include "BlockRedstoneOre.h"
 #include "BlockStone.h"
 #include "BlockMelon.h"
 #include "BlockIce.h"
+#include "BlockOre.h"
 
 bool cBlockHandler::m_HandlerInitialized = false;
 cBlockHandler *cBlockHandler::m_BlockHandler[256];
@@ -144,9 +144,15 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 		return new cBlockStemsHandler(a_BlockID);
 	case E_BLOCK_GLOWSTONE:
 		return new cBlockGlowstoneHandler(a_BlockID);
+	case E_BLOCK_DIAMOND_ORE:
+	case E_BLOCK_GOLD_ORE:
 	case E_BLOCK_REDSTONE_ORE:
 	case E_BLOCK_REDSTONE_ORE_GLOWING:
-		return new cBlockRedstoneOreHandler(a_BlockID);
+	case E_BLOCK_EMERALD_ORE:
+	case E_BLOCK_IRON_ORE:
+	case E_BLOCK_LAPIS_ORE:
+	case E_BLOCK_COAL_ORE:
+		return new cBlockOreHandler(a_BlockID);
 	case E_BLOCK_STONE:
 	case E_BLOCK_COBBLESTONE:
 		return new cBlockStoneHandler(a_BlockID);
@@ -259,6 +265,11 @@ void cBlockHandler::DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z)
 		Drops.push_back(cItem((ENUM_ITEM_ID)DropItem, DropCount, GetDropMeta(Meta)));
 		a_World->SpawnItemPickups(Drops, a_X, a_Y, a_Z);
 	}
+}
+
+bool cBlockHandler::CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir)
+{
+	return CanBeAt(a_World, a_X, a_Y, a_Z);
 }
 
 bool cBlockHandler::CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)

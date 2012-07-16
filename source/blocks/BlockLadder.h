@@ -18,11 +18,17 @@ public:
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)
+	virtual bool CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir) override
+	{
+		AddDirection( a_X, a_Y, a_Z, a_Dir, true );
+		return a_World->GetBlock( a_X, a_Y, a_Z ) != E_BLOCK_AIR;
+	}
+
+
+	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
 	{
 		char Dir = cLadder::MetaDataToDirection(a_World->GetBlockMeta( a_X, a_Y, a_Z));
-		AddDirection( a_X, a_Y, a_Z, Dir, true );
-		return a_World->GetBlock( a_X, a_Y, a_Z ) != E_BLOCK_AIR;
+		return CanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
 	
 };
