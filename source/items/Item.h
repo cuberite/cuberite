@@ -24,7 +24,7 @@ public:
 	virtual bool IsPlaceable();
 
 	virtual BLOCKTYPE GetBlockType();
-	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override;
+	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta);
 
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID);
 
