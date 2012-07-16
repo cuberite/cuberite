@@ -19,6 +19,6 @@ public:
 	virtual char GetDropCount()
 	{
 		MTRand r1;
-		return 3 + r1.randInt(4);
+		return (char)(3 + r1.randInt(4));
 	}
 };
