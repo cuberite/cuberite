@@ -212,7 +212,7 @@ BLOCKTYPE cItemHandler::GetBlockType()
 	return m_ItemID;
 }
 
-char cItemHandler::GetBlockMeta(char a_ItemMeta)
+NIBBLETYPE cItemHandler::GetBlockMeta(char a_ItemMeta)
 {
 	return a_ItemMeta; //This keeps most textures. The few other items have to override this
 }

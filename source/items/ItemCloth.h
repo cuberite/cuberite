@@ -11,7 +11,7 @@ public:
 	{
 
 	}
-	virtual char GetBlockMeta(char a_ItemMeta)
+	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
 	{
 		return a_ItemMeta;
 	}

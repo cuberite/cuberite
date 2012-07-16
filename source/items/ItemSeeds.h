@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	virtual char GetBlockMeta(char a_ItemMeta)
+	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
 	{
 		return 0;	//Not grown yet
 	}

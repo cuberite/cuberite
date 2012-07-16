@@ -12,7 +12,7 @@ public:
 
 	}
 
-	virtual char GetBlockMeta(char a_ItemMeta)
+	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
 	{
 		//Only the first 2 bits are important
 		return a_ItemMeta & 3;

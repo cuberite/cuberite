@@ -20,7 +20,7 @@ public:
 		return ::E_BLOCK_REDSTONE_REPEATER_OFF;
 	}
 
-	virtual char GetBlockMeta(char a_ItemMeta)
+	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
 	{
 		return 0;
 	}

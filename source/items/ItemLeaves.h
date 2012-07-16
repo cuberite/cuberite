@@ -10,8 +10,8 @@ public:
 		: cItemHandler(a_ItemID)
 	{
 	}
-	virtual char GetBlockMeta(char a_ItemMeta)
+	virtual NIBBLETYPE GetBlockMeta(char a_ItemMeta) override
 	{
-		return a_ItemMeta | 0x4;	//0x4 bit set means this is a player places leave
+		return a_ItemMeta | 0x4;	//0x4 bit set means this is a player-placed leaves block, not to be decayed
 	}
 };
