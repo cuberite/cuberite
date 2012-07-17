@@ -237,7 +237,10 @@ void cItemHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item,
 	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(Block);
 	Handler->PlaceBlock(a_World, a_Player, GetBlockMeta(a_Item->m_ItemHealth), a_X, a_Y, a_Z, a_Dir);
 	if(a_Player->GetGameMode() == eGameMode_Survival)
-		a_Player->GetInventory().RemoveItem(cItem(a_Item->m_ItemID, 1));
+	{
+		cItem Item(a_Item->m_ItemID, 1);
+		a_Player->GetInventory().RemoveItem(Item);
+	}
 }
 
 bool cItemHandler::EatItem(cPlayer *a_Player, cItem *a_Item)

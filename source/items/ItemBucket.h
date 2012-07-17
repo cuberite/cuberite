@@ -33,11 +33,13 @@ public:
 					NewItem = E_ITEM_LAVA_BUCKET;
 					break;
 				}
+				cItem Item(a_Item->m_ItemID, 1);
 				if (NewItem != E_ITEM_EMPTY
-					&& (a_Player->GetGameMode() == 1 || (a_Player->GetInventory().RemoveItem(cItem(a_Item->m_ItemID, 1)))))
+					&& (a_Player->GetGameMode() == 1 || (a_Player->GetInventory().RemoveItem(Item))))
 				{
 					//Give New Bucket
-					a_Player->GetInventory().AddItem(cItem(NewItem, 1));
+					cItem Item(NewItem, 1);
+					a_Player->GetInventory().AddItem(Item);
 					//remove water block
 					a_Player->GetWorld()->SetBlock(a_X, a_Y, a_Z, E_BLOCK_AIR, 0);
 					return true;
@@ -52,7 +54,8 @@ public:
 				AddDirection(a_X, a_Y, a_Z, a_Dir);
 				if(a_World->GetBlock(a_X, a_Y, a_Z) == E_BLOCK_AIR)
 				{
-					if ((a_Player->GetGameMode() == 1) || (a_Player->GetInventory().RemoveItem(cItem(a_Item->m_ItemID, 1))))
+					cItem Item(a_Item->m_ItemID, 1);
+					if ((a_Player->GetGameMode() == 1) || (a_Player->GetInventory().RemoveItem(Item)))
 					{
 						a_World->SetBlock(a_X, a_Y, a_Z, NewBlock, 0);
 
@@ -60,8 +63,8 @@ public:
 						{
 							break;		//No new Bucket for creative players
 						}
-
-						a_Player->GetInventory().AddItem(cItem(E_ITEM_BUCKET, 1));
+						cItem Item(E_ITEM_BUCKET, 1);
+						a_Player->GetInventory().AddItem(Item);
 						return true;
 					}
 				}

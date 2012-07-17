@@ -23,7 +23,8 @@ public:
 			&& (Block == a_Item->m_ItemID)										//Same slab
 			&& ((Meta & 0x7) == (a_Item->m_ItemHealth & 0x7)))						//Same Texture
 		{
-			if(a_Player->GetInventory().RemoveItem(cItem(a_Item->m_ItemID, 1)))
+			cItem Item(a_Item->m_ItemID, 1);
+			if(a_Player->GetInventory().RemoveItem(Item))
 			{
 				a_World->SetBlock(a_X, a_Y, a_Z, Block - 1, Meta);				//Block - 1 simple hack to save one if statement
 				return true;

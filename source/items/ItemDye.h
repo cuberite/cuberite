@@ -22,7 +22,8 @@ public:
 			{
 				if (a_Player->GetGameMode() == eGameMode_Survival)
 				{
-					a_Player->GetInventory().RemoveItem(cItem(a_Item->m_ItemID, 1, a_Item->m_ItemHealth));
+					cItem Item(a_Item->m_ItemID, 1, a_Item->m_ItemHealth);
+					a_Player->GetInventory().RemoveItem(Item);
 					return true;
 				}
 			}
