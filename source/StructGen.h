@@ -55,7 +55,7 @@ protected:
 	) ;
 	
 	/// Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow
-	void cStructGenTrees::ApplyTreeImage(
+	void ApplyTreeImage(
 		int a_ChunkX, int a_ChunkZ,
 		cChunkDef::BlockTypes & a_BlockTypes,
 		cChunkDef::BlockNibbles & a_BlockMetas,
@@ -130,6 +130,7 @@ protected:
 	
 	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq);
 } ;
+
 
 
 
