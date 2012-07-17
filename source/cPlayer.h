@@ -83,7 +83,15 @@ public:
 	void Heal( int a_Health );												//tolua_export
 	
 	/// Returns true if any food has been consumed, false if player "full"
-	bool Feed(short a_Food);
+	bool Feed(short a_Food, float a_Saturation);
+
+	short GetMaxFoodLevel() { return m_MaxFoodLevel; }
+	short GetFoodLevel() { return m_FoodLevel; }
+
+	float GetMaxFoodSaturationLevel() { return m_MaxFoodSaturationLevel; }
+	float GetFoodSaturationLevel() { return m_FoodSaturationLevel; }
+
+	void AddFoodExhaustion(float a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }
 	
 	void TakeDamage( int a_Damage, cEntity* a_Instigator );					//tolua_export
 	void KilledBy( cEntity* a_Killer );										//tolua_export
@@ -102,8 +110,7 @@ public:
 
 	void UseEquippedItem(void);
 	
-	/// Returns true if the item type is edible && it has been consumed, false otherwise
-	bool EatItem(int a_ItemType);
+	void SendHealth();
 
 protected:
 	virtual void Destroyed();
@@ -119,6 +126,13 @@ protected:
 	std::string m_LoadedWorldName;
 
 	bool m_bVisible;
+
+	short m_FoodLevel;
+	short m_MaxFoodLevel;
+	float m_FoodSaturationLevel;
+	float m_MaxFoodSaturationLevel;
+	float m_FoodExhaustionLevel;
+	char m_FoodTickTimer;
 
 	float m_LastGroundHeight;
 	bool m_bTouchGround;

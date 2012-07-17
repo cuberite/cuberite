@@ -1640,6 +1640,9 @@
     <ClInclude Include="..\source\items\ItemRedstoneRepeater.h">
       <Filter>Items</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\items\ItemFood.h">
+      <Filter>Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

@@ -13,8 +13,23 @@ public:
 	virtual bool OnDiggingBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);
 	virtual void OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z);
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
-	virtual int GetMaxStackSize();
-	virtual int GetMaxDamage();
+
+	struct FoodInfo
+	{
+		FoodInfo(short a_FoodLevel, float a_Saturation, char a_PoisionChance = 0)
+		{
+			FoodLevel = a_FoodLevel;
+			Saturation = a_Saturation;
+			PoisionChance = a_PoisionChance;
+		}
+		short FoodLevel;
+		float Saturation;
+		char PoisionChance;	//0 - 100
+	};
+
+	virtual FoodInfo GetFoodInfo();
+	
+	virtual bool EatItem(cPlayer *a_Player, cItem *a_Item);
 
 	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);
 	

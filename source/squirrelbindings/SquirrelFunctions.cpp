@@ -3,6 +3,9 @@
 #include "SquirrelFunctions.h"
 #include "SquirrelBindings.h"
 
+
+#if USE_SQUIRREL
+
 static HSQUIRRELVM squirrelvm = NULL;
 
 SQInteger runtimeErrorHandler(HSQUIRRELVM a_VM)
@@ -63,3 +66,5 @@ void sqPrint(SQChar * text)
 {
 	LOGINFO("%s", text);
 }
+
+#endif

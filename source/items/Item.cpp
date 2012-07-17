@@ -23,6 +23,7 @@
 #include "ItemShovel.h"
 #include "ItemSword.h"
 #include "ItemDoor.h"
+#include "ItemFood.h"
 
 #include "../blocks/Block.h"
 
@@ -109,6 +110,23 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemID)
 	case E_ITEM_WOODEN_DOOR:
 		return new cItemDoorHandler(a_ItemID);
 
+	//FOOD:
+	case E_ITEM_BREAD:
+	case E_ITEM_COOKIE:
+	case E_ITEM_MELON_SLICE:
+	case E_ITEM_RAW_CHICKEN:
+	case E_ITEM_COOKED_CHICKEN:
+	case E_ITEM_RAW_BEEF:
+	case E_ITEM_RAW_MEAT:
+	case E_ITEM_STEAK:
+	case E_ITEM_COOKED_MEAT:
+	case E_ITEM_RAW_FISH:
+	case E_ITEM_COOKED_FISH:
+	case E_ITEM_RED_APPLE:
+	case E_ITEM_GOLDEN_APPLE:
+	case E_ITEM_ROTTEN_FLESH:
+	case E_ITEM_SPIDER_EYE:
+		return new cItemFoodHandler(a_ItemID);
 	default:		
 		return new cItemHandler(a_ItemID);
 		break;
@@ -157,16 +175,6 @@ void cItemHandler::OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a
 void cItemHandler::OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item)
 {
 
-}
-
-int cItemHandler::GetMaxStackSize()
-{
-	return 64;
-}
-
-int cItemHandler::GetMaxDamage()
-{
-	return 0;
 }
 
 bool cItemHandler::IsTool()
@@ -230,4 +238,31 @@ void cItemHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item,
 	Handler->PlaceBlock(a_World, a_Player, GetBlockMeta(a_Item->m_ItemHealth), a_X, a_Y, a_Z, a_Dir);
 	if(a_Player->GetGameMode() == eGameMode_Survival)
 		a_Player->GetInventory().RemoveItem(cItem(a_Item->m_ItemID, 1));
+}
+
+bool cItemHandler::EatItem(cPlayer *a_Player, cItem *a_Item)
+{
+	FoodInfo Info = GetFoodInfo();
+
+	if(Info.FoodLevel > 0 || Info.Saturation > 0.f)
+	{
+		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
+		if(Success && Info.PoisionChance > 0)
+		{
+			MTRand r1;
+			if((r1.randInt(100) - Info.PoisionChance) <= 0)
+			{	//Unlucky guy :D
+				//TODO: Make player ill
+			}
+		}
+
+		return Success;
+	}
+
+	return false;
+}
+
+cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
+{
+	return FoodInfo(0, 0.f);
 }

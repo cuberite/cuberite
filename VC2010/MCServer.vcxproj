@@ -638,6 +638,7 @@
     <ClInclude Include="..\source\items\Item.h" />
     <ClInclude Include="..\source\items\ItemDoor.h" />
     <ClInclude Include="..\source\items\ItemDye.h" />
+    <ClInclude Include="..\source\items\ItemFood.h" />
     <ClInclude Include="..\source\items\ItemHoe.h" />
     <ClInclude Include="..\source\items\ItemLeaves.h" />
     <ClInclude Include="..\source\items\ItemLighter.h" />

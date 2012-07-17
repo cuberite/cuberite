@@ -66,14 +66,22 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_TimeLastPickupCheck( 0.f )
 	, m_Color('-')
 	, m_ClientHandle( a_Client )
+	, m_FoodExhaustionLevel(0.f)
+	, m_FoodTickTimer(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetSocket().GetIPString().c_str(),
 		this, GetUniqueID()
 	);
 	m_EntityType = eEntityType_Player;
+
 	SetMaxHealth(20);
-	SetMaxFoodLevel(125);
+	m_MaxFoodLevel = 20;
+	m_MaxFoodSaturationLevel = 20.f;
+	
+	m_FoodLevel = m_MaxFoodLevel;
+	m_FoodSaturationLevel = 5.f;
+
 	m_Inventory = new cSurvivalInventory( this );
 	m_CreativeInventory = new cCreativeInventory(this);
 	cTimer t1;
@@ -242,6 +250,34 @@ void cPlayer::Tick(float a_Dt)
 	if (m_Health > 0) // make sure player is alive
 	{
 		m_World->CollectPickupsByPlayer(this);
+
+		//Handle Health:
+		m_FoodTickTimer++;
+		if(m_FoodTickTimer >= 80)
+		{
+			m_FoodTickTimer = 0;
+
+			if(m_FoodLevel >= 17)
+			{
+				Heal(1);
+			}else if(m_FoodLevel == 0)
+			{
+				TakeDamage(1, NULL);
+			}
+		}
+
+		//TODO: Increase Exhaustion level http://www.minecraftwiki.net/wiki/Hunger#Exhaustion_level_increase
+		if(m_FoodExhaustionLevel >= 4.f)
+		{
+			m_FoodExhaustionLevel -= 4.f;
+
+			if(m_FoodSaturationLevel >= 1.f)
+				m_FoodSaturationLevel--;
+			else
+				m_FoodLevel = MAX(m_FoodLevel -1, 0);
+
+			SendHealth();
+		}
 	}
 	
 	cTimer t1;
@@ -297,19 +333,12 @@ void cPlayer::Heal( int a_Health )
 	{
 		m_Health = (short) MIN(a_Health + m_Health, GetMaxHealth());
 
-		cPacket_UpdateHealth Health;
-		Health.m_Health = m_Health;
-		Health.m_Food = GetFood();
-		Health.m_Saturation = GetFoodSaturation();
-		m_ClientHandle->Send( Health );
+		
+		SendHealth();
 	}
 }
 
-
-
-
-
-bool cPlayer::Feed(short a_Food)
+bool cPlayer::Feed(short a_Food, float a_Saturation)
 {
 	if (m_FoodLevel >= GetMaxFoodLevel())
 	{
@@ -317,31 +346,31 @@ bool cPlayer::Feed(short a_Food)
 	}
 	
 	m_FoodLevel = MIN(a_Food + m_FoodLevel, GetMaxFoodLevel());
-
-	cPacket_UpdateHealth Health;
-	Health.m_Health = m_Health;
-	Health.m_Food = GetFood();
-	Health.m_Saturation = GetFoodSaturation();
-	m_ClientHandle->Send( Health );
+	m_FoodSaturationLevel = MIN(m_FoodSaturationLevel + a_Saturation, GetMaxFoodSaturationLevel());
+	
+	SendHealth();
 	return true;
 }
 
-
-
-
+void cPlayer::SendHealth()
+{
+	cPacket_UpdateHealth Health;
+	Health.m_Health = GetHealth();
+	Health.m_Food = GetFoodLevel();
+	Health.m_Saturation = GetFoodSaturationLevel();
+	if(m_ClientHandle != 0)
+		m_ClientHandle->Send( Health );
+}
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
-	if ( !(m_GameMode == 1) ) {
+	if(m_GameMode != eGameMode_Creative)
+	{
 		cPawn::TakeDamage( a_Damage, a_Instigator );
 
-		cPacket_UpdateHealth Health;
-		Health.m_Health = m_Health;
-		Health.m_Food = GetFood();
-		Health.m_Saturation = GetFoodSaturation();
-		//TODO: Causes problems sometimes O.o (E.G. Disconnecting when attacked)
-		if(m_ClientHandle != 0)
-			m_ClientHandle->Send( Health );
+		AddFoodExhaustion(0.3f);
+
+		SendHealth();
 	}
 }
 
@@ -914,7 +943,8 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	m_Health = (short)root.get("health", 0 ).asInt();
-	m_FoodLevel = (short)root.get("food", 0 ).asInt();
+	m_FoodLevel = (short)root.get("food", m_MaxFoodLevel ).asInt();
+	m_FoodSaturationLevel = (float)root.get("foodSaturation", m_MaxFoodSaturationLevel ).asDouble();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	
@@ -963,6 +993,7 @@ bool cPlayer::SaveToDisk()
 	root["creativeinventory"] = JSON_CreativeInventory;
 	root["health"] = m_Health;
 	root["food"] = m_FoodLevel;
+	root["foodSaturation"] = m_FoodSaturationLevel;
 	root["world"] = GetWorld()->GetName();
 
 	if(m_GameMode == GetWorld()->GetGameMode())
@@ -1023,49 +1054,6 @@ void cPlayer::UseEquippedItem()
 			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
 		}
 	}
-}
-
-
-
-
-
-bool cPlayer::EatItem(int a_ItemType)
-{
-	// TODO: Handle hunger
-	switch (a_ItemType)
-	{
-		case E_ITEM_APPLE:          return Feed(24); // 2 food bars
-		case E_ITEM_GOLDEN_APPLE:   return Feed(60); // 5 food
-		case E_ITEM_MUSHROOM_SOUP:  return Feed(48); // 4 food
-		case E_ITEM_BREAD:          return Feed(30); // 2.5 food
-		case E_ITEM_RAW_MEAT:       return Feed(18); // 1.5 food
-		case E_ITEM_COOKED_MEAT:    return Feed(48); // 4 food
-		case E_ITEM_RAW_FISH:       return Feed(12); // 1 food
-		case E_ITEM_COOKED_FISH:    return Feed(30); // 2.5 food
-		case E_ITEM_COOKED_CHICKEN: return Feed(36); // 3 food
-		case E_ITEM_RAW_BEEF:       return Feed(18); // 1.5 food
-		case E_ITEM_STEAK:          return Feed(48); // 4 food
-		case E_ITEM_RAW_CHICKEN:
-		{
-			if (!Feed(12)) // 1 food
-			{
-				return false;
-			}
-			// TODO: A random chance to get food-poisoned
-			return true;
-		}
-		
-		case E_ITEM_ROTTEN_FLESH:
-		{
-			if (!Feed(24))
-			{
-				return false;
-			}
-			// TODO: Food-poisoning
-			return true;
-		}
-	}
-	return false;
 }
 
 

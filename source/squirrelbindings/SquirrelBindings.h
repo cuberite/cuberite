@@ -1,7 +1,7 @@
 #pragma once
 
 
-#define USE_SQUIRREL 1
+#define USE_SQUIRREL 0
 
 #if USE_SQUIRREL
 

@@ -339,11 +339,7 @@ void cClientHandle::Authenticate(void)
 	m_Player->GetInventory().SendWholeInventory(this);
 
 	// Send health
-	cPacket_UpdateHealth Health;
-	Health.m_Health = (short)m_Player->GetHealth();
-	Health.m_Food = m_Player->GetFood();
-	Health.m_Saturation = m_Player->GetFoodSaturation();
-	Send(Health);
+	m_Player->SendHealth();
 	
 	m_Player->Initialize(World);
 	StreamChunks();
@@ -856,14 +852,7 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 
 void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 {
-	if(a_Packet->m_PosX == -1
-		&& a_Packet->m_PosY == 255
-		&& a_Packet->m_PosZ == -1)
-	{
-		//I don´t know whats the idea behind these packets O.o
-		return;
-	}
-
+	
 	if (!CheckBlockInteractionsRate())
 	{
 		return;
@@ -960,7 +949,7 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 			cItem Item;
 			Item.m_ItemID = Equipped.m_ItemID;
 			Item.m_ItemCount = 1;
-			if (m_Player->EatItem(Item.m_ItemID))
+			if (ItemHandler->EatItem(m_Player, &Item))
 			{
 				ItemHandler->OnFoodEaten(World, m_Player, &Item);
 				m_Player->GetInventory().RemoveItem(Item);

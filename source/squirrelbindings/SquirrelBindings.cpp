@@ -9,8 +9,7 @@
 
 using namespace Sqrat;
 
-
-
+#if USE_SQUIRREL
 void BindSquirrel(HSQUIRRELVM vm)
 {
 	RootTable()
@@ -91,12 +90,6 @@ void BindSquirrel(HSQUIRRELVM vm)
 		.Func("GetMetaData", &cPawn::GetMetaData)
 		.Func("SetMaxHealth", &cPawn::SetMaxHealth)
 		.Func("GetMaxHealth", &cPawn::GetMaxHealth)
-		.Func("GetMaxFood", &cPawn::GetMaxFood)
-		.Func("GetFood", &cPawn::GetFood)
-		.Func("GetMaxFoodSaturation", &cPawn::GetMaxFoodSaturation)
-		.Func("GetFoodSaturation", &cPawn::GetFoodSaturation)
-		.Func("SetMaxFoodLevel", &cPawn::SetMaxFoodLevel)
-		.Func("GetMaxFoodLevel", &cPawn::SetMaxFoodLevel)
 	);
 	
 	RootTable().Bind("cPlayer", DerivedClass<cPlayer, cPawn, NoConstructor>()
@@ -137,8 +130,6 @@ void BindSquirrel(HSQUIRRELVM vm)
 		.Func("MoveToWorld", &cPlayer::MoveToWorld)
 		.Func("GetLoadedWorldName", &cPlayer::GetLoadedWorldName)
 		.Func("UseEquippedItem", &cPlayer::UseEquippedItem)
-		.Func("EatItem", &cPlayer::EatItem)
-		
 	);
 	
 	RootTable().Bind("StringArray", Class<SquirrelStringArray>()
@@ -175,5 +166,6 @@ void BindSquirrel(HSQUIRRELVM vm)
 		.Const("WeatherChanged", cPluginManager::HOOK_WEATHER_CHANGED)
 		.Const("UpdatingSign", cPluginManager::HOOK_UPDATING_SIGN)
 		.Const("UpdatedSign", cPluginManager::HOOK_UPDATED_SIGN));
-
 }
+
+#endif
