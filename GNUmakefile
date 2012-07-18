@@ -63,7 +63,7 @@ INCLUDE = -I.\
 # Build MCServer
 #
 
-SOURCES := $(shell find lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source tolua++-1.0.93 iniFile WebServer '(' -name '*.cpp' -o -name '*.c' ')')
+SOURCES := $(shell find lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source squirrel_3_0_1_stable tolua++-1.0.93 iniFile WebServer '(' -name '*.cpp' -o -name '*.c' ')')
 SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(SOURCES))
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))
