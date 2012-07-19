@@ -399,11 +399,13 @@ void cStructGenRavines::cRavine::ProcessChunk(
 		int DifZ = BlockStartZ - itr->m_BlockZ;  // substitution for faster calc
 		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 		{
+			#ifdef _DEBUG
 			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 			if ((DifX + x == 0) && (DifZ + z == 0))
 			{
 				cChunkDef::SetBlock(a_BlockTypes, x, 4, z, E_BLOCK_LAPIS_ORE);
 			}
+			#endif  // _DEBUG
 			
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
