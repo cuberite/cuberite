@@ -1918,6 +1918,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Ravines.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Ravines.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\StructGen.cpp"
 					>
 				</File>

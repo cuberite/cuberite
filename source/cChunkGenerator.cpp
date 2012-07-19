@@ -12,6 +12,7 @@
 #include "cRoot.h"
 #include "cPluginManager.h"
 #include "cLuaChunk.h"
+#include "Ravines.h"
 
 
 
@@ -314,6 +315,10 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "orenests") == 0)
 		{
 			m_StructureGens.push_back(new cStructGenOreNests(m_Seed));
+		}
+		else if (NoCaseCompare(*itr, "ravines") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenRavines(m_Seed, 128));
 		}
 		else
 		{

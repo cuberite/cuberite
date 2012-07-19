@@ -433,9 +433,6 @@
     <Filter Include="cPlugin\cPlugin_Squirrel">
       <UniqueIdentifier>{43f91962-ebda-4195-aadc-921eca3c8356}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HandyStuff\Generating">
-      <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="cPluginManager\cSquirrelCommandBinder">
       <UniqueIdentifier>{0a0b9b8e-ac72-4755-98e5-87cbc835016a}</UniqueIdentifier>
     </Filter>
@@ -444,6 +441,9 @@
     </Filter>
     <Filter Include="Items">
       <UniqueIdentifier>{2bd505e5-cfc9-44f4-8295-4a36185c7c54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generating">
+      <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -879,26 +879,26 @@
       <Filter>Packets</Filter>
     </ClCompile>
     <ClCompile Include="..\source\cChunkGenerator.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Trees.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\CompoGen.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\HeiGen.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\StructGen.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\BioGen.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\BlockID.cpp" />
     <ClCompile Include="..\source\FinishGen.cpp">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\WorldStorage.cpp">
       <Filter>Storage</Filter>
@@ -943,6 +943,9 @@
     </ClCompile>
     <ClCompile Include="..\source\items\Item.cpp">
       <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Ravines.cpp">
+      <Filter>Generating</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1417,25 +1420,25 @@
       <Filter>Packets</Filter>
     </ClInclude>
     <ClInclude Include="..\source\cChunkGenerator.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\StructGen.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\Trees.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\CompoGen.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\HeiGen.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\BioGen.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\FinishGen.h">
-      <Filter>HandyStuff\Generating</Filter>
+      <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\WorldStorage.h">
       <Filter>Storage</Filter>
@@ -1642,6 +1645,9 @@
     </ClInclude>
     <ClInclude Include="..\source\items\ItemFood.h">
       <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Ravines.h">
+      <Filter>Generating</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

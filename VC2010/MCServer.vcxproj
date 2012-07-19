@@ -481,6 +481,7 @@
     <ClCompile Include="..\source\packets\cPacket_WindowClick.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp" />
+    <ClCompile Include="..\source\Ravines.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelBindings.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelFunctions.cpp" />
     <ClCompile Include="..\source\StackWalker.cpp">
@@ -729,6 +730,7 @@
     <ClInclude Include="..\source\packets\cPacket_WindowClick.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
+    <ClInclude Include="..\source\Ravines.h" />
     <ClInclude Include="..\source\squirrelbindings\cSquirrelBaseClass.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelArray.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelBindings.h" />
