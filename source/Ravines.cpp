@@ -316,7 +316,48 @@ void cStructGenRavines::cRavine::Smooth(void)
 
 void cStructGenRavines::cRavine::FinishLinear(void)
 {
-	// TODO
+	// For each segment, use Bresenham's algorithm to draw a "line" of defpoints
+	// _X 2012_07_20: I tried modifying this algorithm to produce "thick" lines (only one coord change per point)
+	//   But the results were about the same as the original, so I disposed of it again - no need to use twice the count of points
+	
+	cDefPoints Pts;
+	std::swap(Pts, m_Points);
+	
+	m_Points.reserve(Pts.size() * 3);
+	int PrevX = Pts.front().m_BlockX;
+	int PrevZ = Pts.front().m_BlockZ;
+	for (cDefPoints::const_iterator itr = Pts.begin() + 1, end = Pts.end(); itr != end; ++itr)
+	{
+		int x1 = itr->m_BlockX;
+		int z1 = itr->m_BlockZ;
+		int dx = abs(x1 - PrevX);
+		int dz = abs(z1 - PrevZ);
+		int sx = (PrevX < x1) ? 1 : -1;
+		int sz = (PrevZ < z1) ? 1 : -1;
+		int err = dx - dz;
+		int R = itr->m_Radius;
+		int T = itr->m_Top;
+		int B = itr->m_Bottom;
+		while (true)
+		{
+			m_Points.push_back(cDefPoint(PrevX, PrevZ, R, T, B));
+			if ((PrevX == x1) && (PrevZ == z1))
+			{
+				break;
+			}
+			int e2 = 2 * err;
+			if (e2 > -dz)
+			{
+				err -= dz;
+				PrevX += sx;
+			}
+			if (e2 < dx)
+			{
+				err += dx;
+				PrevZ += sz;
+			}
+		}  // while (true)
+	}  // for itr
 }
 
 
