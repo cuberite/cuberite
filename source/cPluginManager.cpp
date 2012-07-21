@@ -396,6 +396,23 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			}
 			break;
 		}
+		
+		case HOOK_PLAYER_SPAWN:
+		{
+			if (a_NumArgs != 1)
+			{
+				break;
+			}
+			va_list argptr;
+			va_start( argptr, a_NumArgs);
+			cPlayer * Player = va_arg(argptr, cPlayer *);
+			va_end (argptr);
+			for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+			{
+				(*itr)->OnPlayerSpawn(Player);
+			}
+			break;
+		}
 
 		default:
 		{
