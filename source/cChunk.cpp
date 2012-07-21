@@ -954,7 +954,7 @@ void cChunk::CreateBlockEntities(void)
 		{
 			for (int y = 0; y < Height; y++)
 			{
-				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)m_BlockTypes[ MakeIndex( x, y, z ) ];
+				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)cChunkDef::GetBlock(m_BlockTypes, x, y, z);
 				switch ( BlockType )
 				{
 					case E_BLOCK_CHEST:
