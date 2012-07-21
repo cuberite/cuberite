@@ -480,16 +480,27 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
 			if (ShouldInvert[x + cChunkDef::Width * z])
 			{
-				ChunkData[Index] = (ChunkData[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
+				BlockTypes[Index] = (BlockTypes[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
 			}
 			else
 			{
-				ShouldInvert[x + cChunkDef::Width * z] = (ChunkData[Index] != E_BLOCK_AIR);
+				switch (BlockTypes[Index])
+				{
+					case E_BLOCK_AIR:
+					case E_BLOCK_LEAVES:
+					{
+						// nothing needed
+						break;
+					}
+					default:
+					{
+						ShouldInvert[x + cChunkDef::Width * z] = true;
+					}
+				}
+				BlockTypes[Index] = E_BLOCK_AIR;
 			}
 		}
 	}  // for y
-	// Set everything alight, so that we can see:
-	memset(ChunkData + cChunkDef::SkyLightOffset, 0xff, cChunkDef::NumBlocks / 2);
 	//*/
 	
 	m_World->SetChunkData(
