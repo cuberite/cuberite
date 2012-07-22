@@ -947,6 +947,9 @@
     <ClCompile Include="..\source\Ravines.cpp">
       <Filter>Generating</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Caves.cpp">
+      <Filter>Generating</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1647,6 +1650,9 @@
       <Filter>Items</Filter>
     </ClInclude>
     <ClInclude Include="..\source\Ravines.h">
+      <Filter>Generating</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Caves.h">
       <Filter>Generating</Filter>
     </ClInclude>
   </ItemGroup>

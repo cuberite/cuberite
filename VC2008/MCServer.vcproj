@@ -1886,6 +1886,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Caves.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Caves.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cChunkGenerator.cpp"
 					>
 				</File>

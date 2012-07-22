@@ -13,6 +13,7 @@
 #include "cPluginManager.h"
 #include "cLuaChunk.h"
 #include "Ravines.h"
+#include "Caves.h"
 
 
 
@@ -312,6 +313,11 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 		{
 			m_StructureGens.push_back(new cStructGenMarbleCaves(m_Seed));
 		}
+		else if (NoCaseCompare(*itr, "dualridgecaves") == 0)
+		{
+			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
+			m_StructureGens.push_back(new cStructGenDualRidgeCaves(m_Seed, Threshold));
+		}
 		else if (NoCaseCompare(*itr, "orenests") == 0)
 		{
 			m_StructureGens.push_back(new cStructGenOreNests(m_Seed));
@@ -320,6 +326,13 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 		{
 			m_StructureGens.push_back(new cStructGenRavines(m_Seed, 128));
 		}
+		/*
+		// TODO: Not implemented yet; need a name
+		else if (NoCaseCompare(*itr, "caves") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenWormNestCaves(m_Seed));
+		}
+		*/
 		else
 		{
 			LOGWARNING("Unknown structure generator: \"%s\". Ignoring.", itr->c_str());

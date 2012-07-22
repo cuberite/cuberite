@@ -312,6 +312,7 @@
     <ClCompile Include="..\source\blocks\Block.cpp" />
     <ClCompile Include="..\source\cAggressiveMonster.cpp" />
     <ClCompile Include="..\Source\cAuthenticator.cpp" />
+    <ClCompile Include="..\source\Caves.cpp" />
     <ClCompile Include="..\source\cBlockingTCPLink.cpp" />
     <ClCompile Include="..\source\cCavespider.cpp" />
     <ClCompile Include="..\Source\cChicken.cpp" />
@@ -544,6 +545,7 @@
     <ClInclude Include="..\source\blocks\Block.h" />
     <ClInclude Include="..\source\cAggressiveMonster.h" />
     <ClInclude Include="..\Source\cAuthenticator.h" />
+    <ClInclude Include="..\source\Caves.h" />
     <ClInclude Include="..\source\cBlockingTCPLink.h" />
     <ClInclude Include="..\source\cCavespider.h" />
     <ClInclude Include="..\Source\cChicken.h" />
