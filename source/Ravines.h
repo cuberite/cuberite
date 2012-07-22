@@ -28,7 +28,6 @@ protected:
 	typedef std::list<cRavine *> cRavines;
 	
 	cNoise   m_Noise;
-	int      m_Seed;
 	int      m_Size;  // Max size, in blocks, of the ravines generated
 	cRavines m_Cache;
 	

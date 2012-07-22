@@ -85,7 +85,6 @@ public:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
 	m_Noise(a_Seed),
-	m_Seed(a_Seed),
 	m_Size(a_Size)
 {
 }
