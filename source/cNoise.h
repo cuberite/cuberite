@@ -56,10 +56,12 @@ public:
 	float CubicNoise3D( float a_X, float a_Y, float a_Z ) const;
 
 	void SetSeed( unsigned int a_Seed ) { m_Seed = a_Seed; }
+
+	__NOISE_INLINE__ static float CubicInterpolate( float a_A, float a_B, float a_C, float a_D, float a_Pct );
+	__NOISE_INLINE__ static float CosineInterpolate( float a_A, float a_B, float a_Pct );
+	__NOISE_INLINE__ static float LinearInterpolate( float a_A, float a_B, float a_Pct );
+
 private:
-	__NOISE_INLINE__ float CubicInterpolate( float a_A, float a_B, float a_C, float a_D, float a_Pct ) const;
-	__NOISE_INLINE__ float CosineInterpolate( float a_A, float a_B, float a_Pct ) const;
-	__NOISE_INLINE__ float LinearInterpolate( float a_A, float a_B, float a_Pct ) const;
 
 #if NOISE_USE_SSE
 	__m128 CubicInterpolate4( const __m128 & a_A, const __m128 & a_B, const __m128 & a_C, const __m128 & a_D, float a_Pct ) const;

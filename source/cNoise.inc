@@ -83,7 +83,7 @@ int cNoise::IntNoise3DInt( int a_X, int a_Y, int a_Z ) const
  * Interpolation functions
  **/
  
-float cNoise::CubicInterpolate( float a_A, float a_B, float a_C, float a_D, float a_Pct ) const
+float cNoise::CubicInterpolate( float a_A, float a_B, float a_C, float a_D, float a_Pct )
 {
 	float P = (a_D - a_C) - (a_A - a_B);
 	float Q = (a_A - a_B) - P;
@@ -97,7 +97,7 @@ float cNoise::CubicInterpolate( float a_A, float a_B, float a_C, float a_D, floa
 
 
 
-float cNoise::CosineInterpolate( float a_A, float a_B, float a_Pct ) const
+float cNoise::CosineInterpolate( float a_A, float a_B, float a_Pct )
 {
 	const float ft = a_Pct * 3.1415927f;
 	const float f = (1.f - cosf(ft)) * 0.5f;
@@ -108,7 +108,7 @@ float cNoise::CosineInterpolate( float a_A, float a_B, float a_Pct ) const
 
 
 
-float cNoise::LinearInterpolate( float a_A, float a_B, float a_Pct ) const
+float cNoise::LinearInterpolate( float a_A, float a_B, float a_Pct )
 {
 	return  a_A*(1.f-a_Pct) + a_B*a_Pct;
 }
