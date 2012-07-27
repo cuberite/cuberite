@@ -78,9 +78,11 @@ class cStructGenWormNestCaves :
 	public cStructureGen
 {
 public:
-	cStructGenWormNestCaves(int a_Seed, int a_Size = 128) :
+	cStructGenWormNestCaves(int a_Seed, int a_Size = 64, int a_Grid = 96, int a_MaxOffset = 128) :
 		m_Noise(a_Seed),
-		m_Size(128)
+		m_Size(a_Size),
+		m_Grid(a_Grid),
+		m_MaxOffset(a_MaxOffset)
 	{
 	}
 	
@@ -88,17 +90,19 @@ public:
 	
 protected:
 	class cCaveSystem;  // fwd: Caves.cpp
-	typedef std::list<cCaveSystem *> cCaves;
+	typedef std::list<cCaveSystem *> cCaveSystems;
 
-	cNoise m_Noise;
-	int    m_Size;  // relative size, in blocks, of the nests produced. Also used for spacing.
-	cCaves m_Cache;
+	cNoise       m_Noise;
+	int          m_Size;  // relative size of the cave systems' caves. Average number of blocks of each initial tunnel
+	int          m_MaxOffset;  // maximum offset of the cave nest origin from the grid cell the nest belongs to
+	int          m_Grid;  // average spacing of the nests
+	cCaveSystems m_Cache;
 	
 	/// Clears everything from the cache
 	void ClearCache(void);
 	
 	/// Returns all caves that *may* intersect the given chunk. All the caves are valid until the next call to this function.
-	void GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cCaves & a_Caves);
+	void GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cCaveSystems & a_Caves);
 	
 	// cStructGen override:
 	virtual void GenStructures(
