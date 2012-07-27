@@ -91,8 +91,8 @@ public:
 	cDefPoints m_Points;
 
 	cCaveTunnel(
-		int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ,
-		int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,
+		int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ, int a_StartRadius,
+		int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,   int a_EndRadius,
 		cNoise & a_Noise
 	);
 	
@@ -157,13 +157,13 @@ protected:
 // cCaveTunnel:
 
 cCaveTunnel::cCaveTunnel(
-	int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ,
-	int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,
+	int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ, int a_StartRadius,
+	int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,   int a_EndRadius,
 	cNoise & a_Noise
 )
 {
-	m_Points.push_back(cDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, 5));
-	m_Points.push_back(cDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   5));
+	m_Points.push_back(cDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius));
+	m_Points.push_back(cDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius));
 	
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
@@ -193,23 +193,30 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 		int PrevX = m_Points.front().m_BlockX;
 		int PrevY = m_Points.front().m_BlockY;
 		int PrevZ = m_Points.front().m_BlockZ;
+		int PrevR = m_Points.front().m_Radius;
 		cDefPoints Pts;
-		Pts.reserve(m_Points.size() * 2);
+		Pts.reserve(m_Points.size() * 2 + 1);
 		Pts.push_back(m_Points.front());
 		for (cDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
 		{
+			int Random = a_Noise.IntNoise3DInt(PrevX, PrevY, PrevZ + i) / 11;
 			int len = (PrevX - itr->m_BlockX) * (PrevX - itr->m_BlockX);
 			len += (PrevY - itr->m_BlockY) * (PrevY - itr->m_BlockY);
 			len += (PrevZ - itr->m_BlockZ) * (PrevZ - itr->m_BlockZ);
 			len = 3 * (int)sqrt((double)len) / 4;
-			int x = (itr->m_BlockX + PrevX) / 2 + ((a_Noise.IntNoise3DInt(PrevX, PrevY, PrevZ + i) / 17) % (len + 1) - len / 2);
-			int y = (itr->m_BlockY + PrevY) / 2 + ((a_Noise.IntNoise3DInt(PrevY, PrevZ, PrevX + i) / 17) % (len / 2 + 1) - len / 4);
-			int z = (itr->m_BlockZ + PrevZ) / 2 + ((a_Noise.IntNoise3DInt(PrevZ, PrevX, PrevY + i) / 17) % (len + 1) - len / 2);
-			Pts.push_back(cDefPoint(x, y, z, 5));
+			int Rad = (PrevR + itr->m_Radius) / 2 + (Random % 3) - 1;
+			Random /= 4;
+			int x = (itr->m_BlockX + PrevX) / 2 + (Random % (len + 1) - len / 2);
+			Random /= 256;
+			int y = (itr->m_BlockY + PrevY) / 2 + (Random % (len / 2 + 1) - len / 4);
+			Random /= 256;
+			int z = (itr->m_BlockZ + PrevZ) / 2 + (Random % (len + 1) - len / 2);
+			Pts.push_back(cDefPoint(x, y, z, Rad));
 			Pts.push_back(*itr);
 			PrevX = itr->m_BlockX;
 			PrevY = itr->m_BlockY;
 			PrevZ = itr->m_BlockZ;
+			PrevR = itr->m_Radius;
 		}
 		std::swap(Pts, m_Points);
 	}
@@ -471,14 +478,31 @@ void cCaveTunnel::ProcessChunk(
 		
 		// Carve out a sphere around the xyz point, m_Radius in diameter:
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
+		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
+		int Bottom = std::max(itr->m_BlockY - itr->m_Radius, 0);
+		int Top    = std::min(itr->m_BlockY + itr->m_Radius, cChunkDef::Height);
+		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++) 
 		{
-			// TODO
+			for (int y = Bottom; y <= Top; y++)
+			{
+				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
+				if (6 * SqDist <= SqRad)
+				{
+					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+				}
+			}  // for y
 		}  // for x, z
-		
-		#ifdef _DEBUG
-		// For debugging purposes, outline the shape of the cave:
+	}  // for itr - m_Points[]
+	
+	/*
+	#ifdef _DEBUG		
+	// For debugging purposes, outline the shape of the cave using glowstone, *after* carving the entire cave:
+	for (cDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
+	{
+		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
+		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		if (
 			(DifX >= 0) && (DifX < cChunkDef::Width) &&
 			(itr->m_BlockY > 0) && (itr->m_BlockY < cChunkDef::Height) &&
@@ -487,8 +511,9 @@ void cCaveTunnel::ProcessChunk(
 		{
 			cChunkDef::SetBlock(a_BlockTypes, DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
 		}
-		#endif  // _DEBUG
 	}  // for itr - m_Points[]
+	#endif  // _DEBUG
+	//*/
 }
 
 
@@ -637,16 +662,19 @@ void cStructGenWormNestCaves::cCaveSystem::GenerateTunnelsFromPoint(
 )
 {
 	int DoubleSize = m_Size * 2;
+	int Radius = 2 + (a_Noise.IntNoise3DInt(a_OriginX + a_OriginY, a_OriginY + a_OriginZ, a_OriginZ + a_OriginX) / 11) % 10;
 	for (int i = a_NumSegments - 1; i >= 0; --i)
 	{
 		int EndX = a_OriginX + (((a_Noise.IntNoise3DInt(a_OriginX, a_OriginY, a_OriginZ + 11 * a_NumSegments) / 7) % DoubleSize) - m_Size) / 2;
 		int EndY = a_OriginY + (((a_Noise.IntNoise3DInt(a_OriginY, 13 * a_NumSegments, a_OriginZ + a_OriginX) / 7) % DoubleSize) - m_Size) / 4;
 		int EndZ = a_OriginZ + (((a_Noise.IntNoise3DInt(a_OriginZ + 17 * a_NumSegments, a_OriginX, a_OriginY) / 7) % DoubleSize) - m_Size) / 2;
-		m_Tunnels.push_back(new cCaveTunnel(a_OriginX, a_OriginY, a_OriginZ, EndX, EndY, EndZ, a_Noise));
+		int EndR = 2 + (a_Noise.IntNoise3DInt(a_OriginX + 7 * i, a_OriginY + 11 * i, a_OriginZ + a_OriginX) / 11) % 10;
+		m_Tunnels.push_back(new cCaveTunnel(a_OriginX, a_OriginY, a_OriginZ, Radius, EndX, EndY, EndZ, EndR, a_Noise));
 		GenerateTunnelsFromPoint(EndX, EndY, EndZ, a_Noise, i);
 		a_OriginX = EndX;
 		a_OriginY = EndY;
 		a_OriginZ = EndZ;
+		Radius = EndR;
 	}  // for i - a_NumSegments
 }
 
