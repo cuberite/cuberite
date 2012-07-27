@@ -315,7 +315,7 @@ void cStructGenRavines::cRavine::Smooth(void)
 
 void cStructGenRavines::cRavine::FinishLinear(void)
 {
-	// For each segment, use Bresenham's algorithm to draw a "line" of defpoints
+	// For each segment, use Bresenham's line algorithm to draw a "line" of defpoints
 	// _X 2012_07_20: I tried modifying this algorithm to produce "thick" lines (only one coord change per point)
 	//   But the results were about the same as the original, so I disposed of it again - no need to use twice the count of points
 	
@@ -450,8 +450,8 @@ void cStructGenRavines::cRavine::ProcessChunk(
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
 			{
-				int Top = itr->m_Top;
-				for (int y = itr->m_Bottom; y <= Top; y++)
+				int Top = std::min(itr->m_Top, cChunkDef::Height);
+				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 				{
 					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 				}
