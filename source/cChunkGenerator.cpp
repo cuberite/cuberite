@@ -253,13 +253,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	if (NoCaseCompare(CompoGenName, "sameblock") == 0)
 	{
-		AString BlockType = a_IniFile.GetValueSet("Generator", "SameBlockType", "");
-		if (BlockType.empty())
-		{
-			LOGWARN("[Generator]::SameBlockType value not found in world.ini, using \"stone\".");
-			BlockType = "stone";
-		}
-		int Block = GetIniBlock(a_IniFile, "[Generator]", "SameBlockType", "stone");
+		int Block = GetIniBlock(a_IniFile, "Generator", "SameBlockType", "stone");
 		bool Bedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
 		m_CompositionGen = new cCompoGenSameBlock((BLOCKTYPE)Block, Bedrocked);
 	}
@@ -346,7 +340,7 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
@@ -366,6 +360,11 @@ void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenLilypads(m_Seed));
+		}
+		else if (NoCaseCompare(*itr, "BottomLava") == 0)
+		{
+			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", 10);
+			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
 		}
 	}  // for itr - Str[]
 }

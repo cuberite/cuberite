@@ -356,3 +356,32 @@ void cFinishGenLilypads::GenFinish(
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenBottomLava:
+
+void cFinishGenBottomLava::GenFinish(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+	cEntityList & a_Entities,                // Entities may be added or deleted
+	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
+)
+{
+	for (int y = m_Level; y > 0; y--)
+	{
+		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+			if (a_BlockTypes[Index] == E_BLOCK_AIR)
+			{
+				a_BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
+			}
+		}  // for x, for z
+	}  // for y
+}
+
+
+
+

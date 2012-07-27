@@ -480,7 +480,7 @@ void cCaveTunnel::ProcessChunk(
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
-		int Bottom = std::max(itr->m_BlockY - itr->m_Radius, 0);
+		int Bottom = std::max(itr->m_BlockY - itr->m_Radius, 1);
 		int Top    = std::min(itr->m_BlockY + itr->m_Radius, cChunkDef::Height);
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++) 
@@ -881,14 +881,7 @@ void cStructGenMarbleCaves::GenStructures(
 				const float WaveNoise = 1;
 				if (cosf(GetMarbleNoise(xx, yy * 0.5f, zz, Noise)) * fabs(cosf(yy * 0.2f + WaveNoise * 2) * 0.75f + WaveNoise) > 0.0005f)
 				{
-					if (y > 4)
-					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
-					}
-					else
-					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_STATIONARY_LAVA);
-					}
+					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 				}
 			}  // for y
 		}  // for x
@@ -938,14 +931,7 @@ void cStructGenDualRidgeCaves::GenStructures(
 				float n4 = Noise2.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
 				if ((abs(n1 + n3) * abs(n2 + n4)) > m_Threshold)
 				{
-					if (y > 10)
-					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
-					}
-					else
-					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_STATIONARY_LAVA);
-					}
+					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 				}
 			}  // for y
 		}  // for x
