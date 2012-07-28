@@ -42,7 +42,7 @@ public:
 		case E_BLOCK_GOLD_ORE:
 		case E_BLOCK_REDSTONE_ORE:
 		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_EMERALD_ORE:
+		case (char)E_BLOCK_EMERALD_ORE:
 			return PickaxeLevel() >= 3;
 		case E_BLOCK_IRON_BLOCK:
 		case E_BLOCK_IRON_ORE:
@@ -54,7 +54,7 @@ public:
 		case E_BLOCK_COBBLESTONE:
 		case E_BLOCK_END_STONE:
 		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_SANDSTONE_STAIRS:
+		case (char)E_BLOCK_SANDSTONE_STAIRS:
 		case E_BLOCK_SANDSTONE:
 		case E_BLOCK_STONE_BRICKS:
 		case E_BLOCK_NETHER_BRICK:

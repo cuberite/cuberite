@@ -46,7 +46,7 @@ public:
 		case E_BLOCK_REDSTONE_ORE:
 		case E_BLOCK_REDSTONE_ORE_GLOWING:
 			return E_ITEM_REDSTONE_DUST;
-		case E_BLOCK_EMERALD_ORE:
+		case (char)E_BLOCK_EMERALD_ORE:
 			return E_ITEM_EMERALD;
 		case E_BLOCK_LAPIS_ORE:
 			return E_ITEM_DYE;
