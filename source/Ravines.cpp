@@ -450,7 +450,7 @@ void cStructGenRavines::cRavine::ProcessChunk(
 			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
 			if (DistSq <= RadiusSq)
 			{
-				int Top = std::min(itr->m_Top, cChunkDef::Height);
+				int Top = std::min(itr->m_Top, (int)(cChunkDef::Height));  // Stupid gcc needs int cast
 				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 				{
 					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);

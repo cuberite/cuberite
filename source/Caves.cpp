@@ -481,7 +481,7 @@ void cCaveTunnel::ProcessChunk(
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		int Bottom = std::max(itr->m_BlockY - itr->m_Radius, 1);
-		int Top    = std::min(itr->m_BlockY + itr->m_Radius, cChunkDef::Height);
+		int Top    = std::min(itr->m_BlockY + itr->m_Radius, (int)(cChunkDef::Height));  // Stupid gcc needs int cast
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++) 
 		{
@@ -748,7 +748,7 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_Grid;
 	int StartZ = BaseZ * m_Grid;
 	int EndZ = (BaseZ + NEIGHBORHOOD_SIZE + 1) * m_Grid;
-	for (cCaveSystems::const_iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
+	for (cCaveSystems::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
 	{
 		if (
 			((*itr)->m_BlockX >= StartX) && ((*itr)->m_BlockX < EndX) &&
@@ -795,7 +795,7 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 	// Trim the cache if it's too long:
 	if (m_Cache.size() > 100)
 	{
-		cCaveSystems::const_iterator itr = m_Cache.begin();
+		cCaveSystems::iterator itr = m_Cache.begin();
 		std::advance(itr, 100);
 		for (cCaveSystems::const_iterator end = m_Cache.end(); itr != end; ++itr)
 		{
