@@ -9,8 +9,10 @@
 
 
 
+/// How many ravines in each direction are generated for a given chunk. Must be an even number
+static const int NEIGHBORHOOD_SIZE = 8;
 
-static const int NUM_RAVINE_POINTS = 4;  // Should be an odd number
+static const int NUM_RAVINE_POINTS = 4;
 
 
 
@@ -138,12 +140,6 @@ void cStructGenRavines::GenStructures(
 
 void cStructGenRavines::GetRavinesForChunk(int a_ChunkX, int a_ChunkZ, cStructGenRavines::cRavines & a_Ravines)
 {
-	// TODO: Implement proper caching
-	//  - don't destroy ravines that are reusable
-	//  - don't create ravines that are already in the cache
-	
-	ClearCache();
-	
 	int BaseX = a_ChunkX * cChunkDef::Width / m_Size;
 	int BaseZ = a_ChunkZ * cChunkDef::Width / m_Size;
 	if (BaseX < 0)
@@ -156,16 +152,69 @@ void cStructGenRavines::GetRavinesForChunk(int a_ChunkX, int a_ChunkZ, cStructGe
 	}
 	BaseX -= 4;
 	BaseZ -= 4;
-	for (int x = 0; x < 8; x++)
+	
+	// Walk the cache, move each ravine that we want into a_Ravines:
+	int StartX = BaseX * m_Size;
+	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_Size;
+	int StartZ = BaseZ * m_Size;
+	int EndZ = (BaseZ + NEIGHBORHOOD_SIZE + 1) * m_Size;
+	for (cRavines::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
+	{
+		if (
+			((*itr)->m_BlockX >= StartX) && ((*itr)->m_BlockX < EndX) &&
+			((*itr)->m_BlockZ >= StartZ) && ((*itr)->m_BlockZ < EndZ)
+		)
+		{
+			// want
+			a_Ravines.push_back(*itr);
+			itr = m_Cache.erase(itr);
+		}
+		else
+		{
+			// don't want
+			++itr;
+		}
+	}  // for itr - m_Cache[]
+	
+	for (int x = 0; x < NEIGHBORHOOD_SIZE; x++)
 	{
 		int RealX = (BaseX + x) * m_Size;
-		for (int z = 0; z < 8; z++)
+		for (int z = 0; z < NEIGHBORHOOD_SIZE; z++)
 		{
 			int RealZ = (BaseZ + z) * m_Size;
-			m_Cache.push_back(new cRavine(RealX, RealZ, m_Size, m_Noise));
+			bool Found = false;
+			for (cRavines::const_iterator itr = a_Ravines.begin(), end = a_Ravines.end(); itr != end; ++itr)
+			{
+				if (((*itr)->m_BlockX == RealX) && ((*itr)->m_BlockZ == RealZ))
+				{
+					Found = true;
+					break;
+				}
+			}
+			if (!Found)
+			{
+				a_Ravines.push_back(new cRavine(RealX, RealZ, m_Size, m_Noise));
+			}
 		}
 	}
-	a_Ravines = m_Cache;
+	
+	// Copy a_Ravines into m_Cache to the beginning:
+	cRavines RavinesCopy(a_Ravines);
+	m_Cache.splice(m_Cache.begin(), RavinesCopy, RavinesCopy.begin(), RavinesCopy.end());
+	
+	// Trim the cache if it's too long:
+	if (m_Cache.size() > 100)
+	{
+		cRavines::iterator itr = m_Cache.begin();
+		std::advance(itr, 100);
+		for (cRavines::iterator end = m_Cache.end(); itr != end; ++itr)
+		{
+			delete *itr;
+		}
+		itr = m_Cache.begin();
+		std::advance(itr, 100);
+		m_Cache.erase(itr, m_Cache.end());
+	}
 	
 	/*
 	#ifdef _DEBUG

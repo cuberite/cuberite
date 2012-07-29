@@ -797,7 +797,7 @@ void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStru
 	{
 		cCaveSystems::iterator itr = m_Cache.begin();
 		std::advance(itr, 100);
-		for (cCaveSystems::const_iterator end = m_Cache.end(); itr != end; ++itr)
+		for (cCaveSystems::iterator end = m_Cache.end(); itr != end; ++itr)
 		{
 			delete *itr;
 		}
