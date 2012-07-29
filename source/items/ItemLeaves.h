@@ -1,17 +1,27 @@
+
 #pragma once
 
 #include "Item.h"
 
 
-class cItemLeavesHandler : public cItemHandler
+
+
+
+class cItemLeavesHandler :
+	public cItemHandler
 {
 public:
 	cItemLeavesHandler(int a_ItemID)
 		: cItemHandler(a_ItemID)
 	{
 	}
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
+	
+	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
 	{
-		return a_ItemMeta | 0x4;	//0x4 bit set means this is a player places leave
+		return (NIBBLETYPE)(a_ItemDamage & 0x0f) | 0x4;	//0x4 bit set means this is a player-placed leaves block, not to be decayed
 	}
-};
+} ;
+
+
+
+

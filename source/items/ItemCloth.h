@@ -1,9 +1,14 @@
+
 #pragma once
 
 #include "Item.h"
 
 
-class cItemClothHandler : public cItemHandler
+
+
+
+class cItemClothHandler :
+	public cItemHandler
 {
 public:
 	cItemClothHandler(int a_ItemID)
@@ -11,8 +16,8 @@ public:
 	{
 
 	}
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
-	{
-		return a_ItemMeta;
-	}
-};
+} ;
+
+
+
+

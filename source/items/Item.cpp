@@ -1,3 +1,4 @@
+
 #include "Globals.h"
 #include "Item.h"
 #include "../cItem.h"
@@ -27,8 +28,16 @@
 
 #include "../blocks/Block.h"
 
+
+
+
+
 bool cItemHandler::m_HandlerInitialized = false;
-cItemHandler *cItemHandler::m_ItemHandler[2266];
+cItemHandler * cItemHandler::m_ItemHandler[2266];
+
+
+
+
 
 cItemHandler *cItemHandler::GetItemHandler(int a_ItemID)
 {
@@ -45,93 +54,120 @@ cItemHandler *cItemHandler::GetItemHandler(int a_ItemID)
 	return m_ItemHandler[a_ItemID];
 }
 
+
+
+
+
 cItemHandler *cItemHandler::CreateItemHandler(int a_ItemID)
 {
 	switch(a_ItemID)
 	{
-	case E_ITEM_WOODEN_HOE:
-	case E_ITEM_STONE_HOE:
-	case E_ITEM_IRON_HOE:
-	case E_ITEM_GOLD_HOE:
-	case E_ITEM_DIAMOND_HOE:
-		return new cItemHoeHandler(a_ItemID);
-	case E_ITEM_WHITE_CLOTH:
-		return new cItemClothHandler(a_ItemID);
-	case E_ITEM_STONE_SLAB:
-	case E_ITEM_WOODEN_SLAB:
-		return new cItemSlabHandler(a_ItemID);
-	case E_ITEM_LOG:
-	case E_ITEM_WOOD:
-		return new cItemWoodHandler(a_ItemID);
-	case E_ITEM_SHEARS:
-		return new cItemShearsHandler(a_ItemID);
-	case E_ITEM_LEAVES:
-		return new cItemLeavesHandler(a_ItemID);
-	case E_ITEM_SAPLING:
-		return new cItemSaplingHandler(a_ItemID);
-	case E_ITEM_REDSTONE_DUST:
-		return new cItemRedstoneDustHandler(a_ItemID);
-	case E_ITEM_REDSTONE_REPEATER:
-		return new cItemRedstoneRepeaterHandler(a_ItemID);
-	case E_ITEM_BUCKET:
-	case E_ITEM_WATER_BUCKET:
-	case E_ITEM_LAVA_BUCKET:
-		return new cItemBucketHandler(a_ItemID);
-	case E_ITEM_FLINT_AND_STEEL:
-		return new cItemLighterHandler(a_ItemID);
-	case E_ITEM_PUMPKIN_SEEDS:
-	case E_ITEM_MELON_SEEDS:
-	case E_ITEM_SEEDS:
-		return new cItemSeedsHandler(a_ItemID);
-	case E_ITEM_DYE:
-		return new cItemDyeHandler(a_ItemID);
-	case E_ITEM_SUGARCANE:
-		return new cItemSugarcaneHandler(a_ItemID);
-	case E_ITEM_WOODEN_PICKAXE:
-	case E_ITEM_STONE_PICKAXE:
-	case E_ITEM_IRON_PICKAXE:
-	case E_ITEM_GOLD_PICKAXE:
-	case E_ITEM_DIAMOND_PICKAXE:
-		return new cItemPickaxeHandler(a_ItemID);
-	case E_ITEM_WOODEN_SHOVEL:
-	case E_ITEM_STONE_SHOVEL:
-	case E_ITEM_IRON_SHOVEL:
-	case E_ITEM_GOLD_SHOVEL:
-	case E_ITEM_DIAMOND_SHOVEL:
-		return new cItemShovelHandler(a_ItemID);
-	case E_ITEM_WOODEN_SWORD:
-	case E_ITEM_STONE_SWORD:
-	case E_ITEM_IRON_SWORD:
-	case E_ITEM_GOLD_SWORD:
-	case E_ITEM_DIAMOND_SWORD:
-		return new cItemSwordHandler(a_ItemID);
-
-	case E_ITEM_IRON_DOOR:
-	case E_ITEM_WOODEN_DOOR:
-		return new cItemDoorHandler(a_ItemID);
-
-	//FOOD:
-	case E_ITEM_BREAD:
-	case E_ITEM_COOKIE:
-	case E_ITEM_MELON_SLICE:
-	case E_ITEM_RAW_CHICKEN:
-	case E_ITEM_COOKED_CHICKEN:
-	case E_ITEM_RAW_BEEF:
-	case E_ITEM_RAW_MEAT:
-	case E_ITEM_STEAK:
-	case E_ITEM_COOKED_MEAT:
-	case E_ITEM_RAW_FISH:
-	case E_ITEM_COOKED_FISH:
-	case E_ITEM_RED_APPLE:
-	case E_ITEM_GOLDEN_APPLE:
-	case E_ITEM_ROTTEN_FLESH:
-	case E_ITEM_SPIDER_EYE:
-		return new cItemFoodHandler(a_ItemID);
-	default:		
-		return new cItemHandler(a_ItemID);
-		break;
+		default:                       return new cItemHandler(a_ItemID);
+		
+		// Single item per handler:
+		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemID);
+		case E_ITEM_LEAVES:            return new cItemLeavesHandler(a_ItemID);
+		case E_ITEM_SAPLING:           return new cItemSaplingHandler(a_ItemID);
+		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemID);
+		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemID);
+		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemID);
+		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemID);
+		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemID);
+		case E_ITEM_WOOL:              return new cItemClothHandler(a_ItemID);
+		
+		case E_ITEM_WOODEN_HOE:
+		case E_ITEM_STONE_HOE:
+		case E_ITEM_IRON_HOE:
+		case E_ITEM_GOLD_HOE:
+		case E_ITEM_DIAMOND_HOE:
+		{
+			return new cItemHoeHandler(a_ItemID);
+		}
+		
+		case E_ITEM_WOODEN_PICKAXE:
+		case E_ITEM_STONE_PICKAXE:
+		case E_ITEM_IRON_PICKAXE:
+		case E_ITEM_GOLD_PICKAXE:
+		case E_ITEM_DIAMOND_PICKAXE:
+		{
+			return new cItemPickaxeHandler(a_ItemID);
+		}
+		
+		case E_ITEM_WOODEN_SHOVEL:
+		case E_ITEM_STONE_SHOVEL:
+		case E_ITEM_IRON_SHOVEL:
+		case E_ITEM_GOLD_SHOVEL:
+		case E_ITEM_DIAMOND_SHOVEL:
+		{
+			return new cItemShovelHandler(a_ItemID);
+		}
+		
+		case E_ITEM_WOODEN_SWORD:
+		case E_ITEM_STONE_SWORD:
+		case E_ITEM_IRON_SWORD:
+		case E_ITEM_GOLD_SWORD:
+		case E_ITEM_DIAMOND_SWORD:
+		{
+			return new cItemSwordHandler(a_ItemID);
+		}
+		
+		case E_ITEM_STONE_SLAB:
+		case E_ITEM_WOODEN_SLAB:
+		{
+			return new cItemSlabHandler(a_ItemID);
+		}
+		
+		case E_ITEM_LOG:
+		case E_ITEM_PLANKS:
+		{
+			return new cItemWoodHandler(a_ItemID);
+		}
+		
+		case E_ITEM_BUCKET:
+		case E_ITEM_WATER_BUCKET:
+		case E_ITEM_LAVA_BUCKET:
+		{
+			return new cItemBucketHandler(a_ItemID);
+		}
+		
+		case E_ITEM_PUMPKIN_SEEDS:
+		case E_ITEM_MELON_SEEDS:
+		case E_ITEM_SEEDS:
+		{
+			return new cItemSeedsHandler(a_ItemID);
+		}
+		
+		case E_ITEM_IRON_DOOR:
+		case E_ITEM_WOODEN_DOOR:
+		{
+			return new cItemDoorHandler(a_ItemID);
+		}
+		
+		// Food:
+		case E_ITEM_BREAD:
+		case E_ITEM_COOKIE:
+		case E_ITEM_MELON_SLICE:
+		case E_ITEM_RAW_CHICKEN:
+		case E_ITEM_COOKED_CHICKEN:
+		case E_ITEM_RAW_BEEF:
+		case E_ITEM_RAW_MEAT:
+		case E_ITEM_STEAK:
+		case E_ITEM_COOKED_MEAT:
+		case E_ITEM_RAW_FISH:
+		case E_ITEM_COOKED_FISH:
+		case E_ITEM_RED_APPLE:
+		case E_ITEM_GOLDEN_APPLE:
+		case E_ITEM_ROTTEN_FLESH:
+		case E_ITEM_SPIDER_EYE:
+		{
+			return new cItemFoodHandler(a_ItemID);
+		}
 	}
 }
+
+
+
+
 
 void cItemHandler::Deinit()
 {
@@ -141,20 +177,36 @@ void cItemHandler::Deinit()
 	}
 }
 
+
+
+
+
 cItemHandler::cItemHandler(int a_ItemID)
 {
 	m_ItemID = a_ItemID;
 }
+
+
+
+
 
 bool cItemHandler::OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
 {
 	return false;
 }
 
+
+
+
+
 bool cItemHandler::OnDiggingBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
 {
 	return false;
 }
+
+
+
+
 
 void cItemHandler::OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z)
 {
@@ -172,10 +224,18 @@ void cItemHandler::OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a
 	a_Player->UseEquippedItem();
 }
 
+
+
+
+
 void cItemHandler::OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item)
 {
 
 }
+
+
+
+
 
 bool cItemHandler::IsTool()
 {
@@ -189,6 +249,10 @@ bool cItemHandler::IsTool()
 		|| (m_ItemID == 325)
 		|| (m_ItemID == 346);
 }
+
+
+
+
 
 bool cItemHandler::IsFood()
 {
@@ -204,10 +268,17 @@ bool cItemHandler::IsFood()
 		|| (m_ItemID >= 363 && m_ItemID <= 366);
 }
 
+
+
+
+
 bool cItemHandler::IsPlaceable()
 {
 	return m_ItemID >= 1 && m_ItemID <= 136;
 }
+
+
+
 
 
 bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockID)
@@ -215,21 +286,36 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockID)
 	return false;
 }
 
+
+
+
+
 BLOCKTYPE cItemHandler::GetBlockType()
 {
-#ifdef _DEBUG
-	if(m_ItemID > 256)
+	ASSERT(m_ItemID < 256);  // Items with IDs above 255 should all be handled by specific handlers
+	
+	#ifdef _DEBUG
+	if (m_ItemID > 256)
 	{
 		LOGERROR("Item %d has no valid block!", m_ItemID);
 	}
-#endif
+	#endif  // _DEBUG
+	
 	return (BLOCKTYPE) m_ItemID;
 }
 
-NIBBLETYPE cItemHandler::GetBlockMeta(NIBBLETYPE a_ItemMeta)
+
+
+
+
+NIBBLETYPE cItemHandler::GetBlockMeta(short a_ItemDamage)
 {
-	return a_ItemMeta; //This keeps most textures. The few other items have to override this
+	return (NIBBLETYPE)a_ItemDamage & 0x0f;  // This keeps most textures. The few other items have to override this
 }
+
+
+
+
 
 void cItemHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir)
 {
@@ -242,6 +328,10 @@ void cItemHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item,
 		a_Player->GetInventory().RemoveItem(Item);
 	}
 }
+
+
+
+
 
 bool cItemHandler::EatItem(cPlayer *a_Player, cItem *a_Item)
 {
@@ -265,7 +355,15 @@ bool cItemHandler::EatItem(cPlayer *a_Player, cItem *a_Item)
 	return false;
 }
 
+
+
+
+
 cItemHandler::FoodInfo cItemHandler::GetFoodInfo()
 {
 	return FoodInfo(0, 0.f);
 }
+
+
+
+

@@ -1,9 +1,15 @@
+
 #pragma once
 
 #include "Item.h"
 #include "../cWorld.h"
 
-class cItemSeedsHandler : public cItemHandler
+
+
+
+
+class cItemSeedsHandler :
+	public cItemHandler
 {
 public:
 	cItemSeedsHandler(int a_ItemID)
@@ -21,18 +27,14 @@ public:
 	{
 		switch(m_ItemID)
 		{
-		case E_ITEM_SEEDS:
-			return E_BLOCK_CROPS;
-		case E_ITEM_MELON_SEEDS:
-			E_BLOCK_MELON_STEM;
-		case E_ITEM_PUMPKIN_SEEDS:
-			E_BLOCK_PUMPKIN_STEM;
-		default:
-			return E_BLOCK_AIR;
+			case E_ITEM_SEEDS:         return E_BLOCK_CROPS;
+			case E_ITEM_MELON_SEEDS:   return E_BLOCK_MELON_STEM;
+			case E_ITEM_PUMPKIN_SEEDS: return E_BLOCK_PUMPKIN_STEM;
+			default:                   return E_BLOCK_AIR;
 		}
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
 	{
 		return 0;	//Not grown yet
 	}
@@ -50,4 +52,8 @@ public:
 		
 		return cItemHandler::PlaceBlock(a_World, a_Player, a_Item, a_X, a_Y, a_Z, a_Dir);
 	}
-};
+} ;
+
+
+
+

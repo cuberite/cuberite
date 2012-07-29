@@ -39,7 +39,7 @@ public:
 	virtual bool IsPlaceable();
 
 	virtual BLOCKTYPE GetBlockType();
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta);
+	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage);
 
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID);
 

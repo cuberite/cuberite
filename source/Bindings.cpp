@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/15/12 22:27:57.
+** Generated automatically by tolua++-1.0.92 on 07/29/12 13:49:55.
 */
 
 #ifndef __cplusplus
@@ -2572,7 +2572,7 @@ static int tolua_AllToLua_BlockStringToType00(lua_State* tolua_S)
  {
   const AString a_BlockTypeString = ((const AString)  tolua_tocppstring(tolua_S,1,0));
   {
-   int tolua_ret = (int)  BlockStringToType(a_BlockTypeString);
+    char tolua_ret = (  char)  BlockStringToType(a_BlockTypeString);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_BlockTypeString);
   }
@@ -21384,6 +21384,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_DEAD_BRUSH",E_ITEM_DEAD_BRUSH);
   tolua_constant(tolua_S,"E_ITEM_PISTON",E_ITEM_PISTON);
   tolua_constant(tolua_S,"E_ITEM_PISTON_EXTENSION",E_ITEM_PISTON_EXTENSION);
+  tolua_constant(tolua_S,"E_ITEM_WOOL",E_ITEM_WOOL);
   tolua_constant(tolua_S,"E_ITEM_WHITE_CLOTH",E_ITEM_WHITE_CLOTH);
   tolua_constant(tolua_S,"E_ITEM_PISTON_MOVED_BLOCK",E_ITEM_PISTON_MOVED_BLOCK);
   tolua_constant(tolua_S,"E_ITEM_YELLOW_FLOWER",E_ITEM_YELLOW_FLOWER);

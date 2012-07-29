@@ -1,6 +1,10 @@
+
 #pragma once
 
 #include "Item.h"
+
+
+
 
 
 class cItemSaplingHandler : public cItemHandler
@@ -12,9 +16,13 @@ public:
 
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
 	{
-		//Only the first 2 bits are important
-		return a_ItemMeta & 3;
+		// Only the lowest 3 bits are important
+		return (NIBBLETYPE)(a_ItemDamage & 0x07);
 	}
-};
+} ;
+
+
+
+

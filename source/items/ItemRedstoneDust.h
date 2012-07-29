@@ -1,5 +1,9 @@
+
 #pragma once
 #include "Item.h"
+
+
+
 
 
 class cItemRedstoneDustHandler : public cItemHandler
@@ -20,8 +24,12 @@ public:
 		return E_BLOCK_REDSTONE_WIRE;
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
 	{
 		return 0;
 	}
-};
+} ;
+
+
+
+

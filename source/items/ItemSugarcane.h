@@ -1,9 +1,15 @@
+
 #pragma once
 
 #include "Item.h"
 #include "../cWorld.h"
 
-class cItemSugarcaneHandler : public cItemHandler
+
+
+
+
+class cItemSugarcaneHandler :
+	public cItemHandler
 {
 public:
 	cItemSugarcaneHandler(int a_ItemID)
@@ -22,8 +28,12 @@ public:
 		return E_BLOCK_SUGARCANE;
 	}
 
-	virtual NIBBLETYPE GetBlockMeta(NIBBLETYPE a_ItemMeta) override
+	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
 	{
 		return 0;	//Not grown yet
 	}
-};
+} ;
+
+
+
+
