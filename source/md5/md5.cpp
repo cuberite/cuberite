@@ -30,13 +30,9 @@ documentation and/or software.
 
 */
 
-#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-
 /* interface header */
 #include "md5.h"
 
-// _X 2012_07_15: disable MSVC warnings on "insecure" functions, such as sprintf() - we know they're being used securely here
-#define _CRT_SECURE_NO_WARNINGS
 
 
 
