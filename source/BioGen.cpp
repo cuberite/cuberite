@@ -223,7 +223,7 @@ EMCSBiome cBioGenVoronoi::VoronoiBiome(int a_BlockX, int a_BlockZ)
 	// Note that Noise values need to be divided by 8 to gain a uniform modulo-2^n distribution
 	
 	// Get 5x5 neighboring cell seeds, compare distance to each. Return the biome in the minumim-distance cell
-	double MinDist = m_CellSize * m_CellSize;  // There has to be a cell closer than this
+	int MinDist = m_CellSize * m_CellSize * 16;  // There has to be a cell closer than this
 	EMCSBiome res = biPlains;  // Will be overriden
 	for (int x = CellX - 2; x <= CellX + 2; x++)
 	{
@@ -235,7 +235,7 @@ EMCSBiome cBioGenVoronoi::VoronoiBiome(int a_BlockX, int a_BlockZ)
 			int SeedX = BaseX + OffsetX;
 			int SeedZ = z * m_CellSize + OffsetZ;
 			
-			double Dist = sqrt((double)((SeedX - a_BlockX) * (SeedX - a_BlockX) + (SeedZ - a_BlockZ) * (SeedZ - a_BlockZ)));
+			int Dist = (SeedX - a_BlockX) * (SeedX - a_BlockX) + (SeedZ - a_BlockZ) * (SeedZ - a_BlockZ);
 			if (Dist < MinDist)
 			{
 				MinDist = Dist;
