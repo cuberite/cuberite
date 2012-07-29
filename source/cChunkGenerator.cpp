@@ -452,17 +452,33 @@ EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 
 void cChunkGenerator::Execute(void)
 {
+	// To be able to display performance information, the generator counts the chunks generated.
+	// When the queue gets empty, the count is reset, so that waiting for the queue is not counted into the total time.
+	int NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
+	clock_t GenerationStart = clock();  // Clock tick when the queue started to fill
+	clock_t LastReportTick = clock();  // Clock tick of the last report made (so that performance isn't reported too often)
+	
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
 		while (m_Queue.size() == 0)
 		{
+			if ((NumChunksGenerated > 16) && (clock() - LastReportTick > CLOCKS_PER_SEC))
+			{
+				LOG("Chunk generator performance: %.2f ch/s (%d ch total)",
+					(double)NumChunksGenerated * CLOCKS_PER_SEC/ (clock() - GenerationStart),
+					NumChunksGenerated
+				);
+			}
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
 			if (m_ShouldTerminate)
 			{
 				return;
 			}
+			NumChunksGenerated = 0;
+			GenerationStart = clock();
+			LastReportTick = clock();
 		}
 		
 		cChunkCoords coords = m_Queue.front();		// Get next coord from queue
@@ -470,6 +486,16 @@ void cChunkGenerator::Execute(void)
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
 		Lock.Unlock();			// Unlock ASAP
 		m_evtRemoved.Set();
+
+		// Display perf info once in a while:
+		if ((NumChunksGenerated > 16) && (clock() - LastReportTick > 2 * CLOCKS_PER_SEC))
+		{
+			LOG("Chunk generator performance: %.2f ch/s (%d ch total)",
+				(double)NumChunksGenerated * CLOCKS_PER_SEC / (clock() - GenerationStart),
+				NumChunksGenerated
+			);
+			LastReportTick = clock();
+		}
 
 		// Hack for regenerating chunks: if Y != 0, the chunk is considered invalid, even if it has its data set
 		if ((coords.m_ChunkY == 0) && m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
@@ -490,6 +516,8 @@ void cChunkGenerator::Execute(void)
 		
 		// Save the chunk right after generating, so that we don't have to generate it again on next run
 		m_World->GetStorage().QueueSaveChunk(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
+		
+		NumChunksGenerated++;
 	}  // while (!bStop)
 }
 
