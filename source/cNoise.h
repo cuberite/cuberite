@@ -74,6 +74,17 @@ private:
 
 
 
+/// Linearly interpolates values in the array between the anchor points
+extern void IntArrayLinearInterpolate2D(
+	int * a_Array, 
+	int a_SizeX, int a_SizeY,  // Dimensions of the array
+	int a_AnchorStepX, int a_AnchorStepY  // Distances between the anchor points in each direction
+);
+
+
+
+
+
 #if NOISE_USE_INLINE
 # include "cNoise.inc"
 #endif

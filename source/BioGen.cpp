@@ -258,14 +258,25 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 {
 	int BaseZ = cChunkDef::Width * a_ChunkZ;
 	int BaseX = cChunkDef::Width * a_ChunkX;
+	
+	// Distortions for linear interpolation:
+	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
+	{
+		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z]);
+	}
+	
+	IntArrayLinearInterpolate2D(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	IntArrayLinearInterpolate2D(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int AbsoluteZ = BaseZ + z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int DistX, DistZ;
-			Distort(BaseX + x, AbsoluteZ, DistX, DistZ);
-			cChunkDef::SetBiome(a_BiomeMap, x, z, VoronoiBiome(DistX, DistZ));
+			// Distort(BaseX + x, AbsoluteZ, DistX, DistZ);
+			cChunkDef::SetBiome(a_BiomeMap, x, z, VoronoiBiome(DistortX[x][z], DistortZ[x][z]));
 		}  // for x
 	}  // for z
 }

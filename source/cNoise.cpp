@@ -183,6 +183,10 @@ float cNoise::SSE_CubicNoise2D( float a_X, float a_Y ) const
 }
 #endif
 
+
+
+
+
 /******************
  * Interpolated (and 1 smoothed) noise in 3-dimensions
  **/
@@ -215,6 +219,10 @@ float cNoise::CosineNoise3D( float a_X, float a_Y, float a_Z ) const
 	const float	FracZ = (a_Z) - BaseZ;
 	return CosineInterpolate( interp1, interp2, FracZ );
 }
+
+
+
+
 
 float cNoise::CubicNoise3D( float a_X, float a_Y, float a_Z ) const
 {
@@ -281,6 +289,10 @@ float cNoise::CubicNoise3D( float a_X, float a_Y, float a_Z ) const
 	return CubicInterpolate( yinterp1, yinterp2, yinterp3, yinterp4, FracZ );
 }
 
+
+
+
+
 /******************
  * Private
  **/
@@ -300,6 +312,66 @@ __m128 cNoise::CubicInterpolate4( const __m128 & a_A, const __m128 & a_B, const 
 }
 #endif
 
+
+
+
+
+void IntArrayLinearInterpolate2D(
+	int * a_Array, 
+	int a_SizeX, int a_SizeY,  // Dimensions of the array
+	int a_AnchorStepX, int a_AnchorStepY  // Distances between the anchor points in each direction
+)
+{
+	// First interpolate columns where the anchor points are:
+	int LastYCell = a_SizeY - a_AnchorStepY;
+	for (int y = 0; y < LastYCell; y += a_AnchorStepY)
+	{
+		int Idx = a_SizeX * y;
+		for (int x = 0; x < a_SizeX; x += a_AnchorStepX)
+		{
+			int StartValue = a_Array[Idx];
+			int EndValue   = a_Array[Idx + a_SizeX * a_AnchorStepY];
+			int Diff = EndValue - StartValue;
+			for (int CellY = 1; CellY < a_AnchorStepY; CellY++)
+			{
+				a_Array[Idx + a_SizeX * CellY] = StartValue + CellY * Diff / a_AnchorStepY;
+			}  // for CellY
+			Idx += a_AnchorStepX;
+		}  // for x
+	}  // for y
+	
+	// Now interpolate in rows, each row has values in the anchor columns
+	int LastXCell = a_SizeX - a_AnchorStepX;
+	for (int y = 0; y < a_SizeY; y++)
+	{
+		int Idx = a_SizeX * y;
+		for (int x = 0; x < LastXCell; x += a_AnchorStepX)
+		{
+			int StartValue = a_Array[Idx];
+			int EndValue   = a_Array[Idx + a_AnchorStepX];
+			int Diff = EndValue - StartValue;
+			for (int CellX = 1; CellX < a_AnchorStepX; CellX++)
+			{
+				a_Array[Idx + CellX] = StartValue + CellX * Diff / a_AnchorStepX;
+			}  // for CellY
+			Idx += a_AnchorStepX;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
 #if NOISE_USE_INLINE
 # include "cNoise.inc"
 #endif
+
+
+
+
