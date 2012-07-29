@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\Squirrel3"
+			IntermediateDirectory="$(ConfigurationName)\Squirrel3"
 			ConfigurationType="4"
 			CharacterSet="0"
 			ManagedExtensions="0"
@@ -79,8 +79,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\Squirrel3"
+			IntermediateDirectory="$(ConfigurationName)\Squirrel3"
 			ConfigurationType="4"
 			CharacterSet="0"
 			ManagedExtensions="0"
@@ -140,8 +140,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release profiled|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\Squirrel3"
+			IntermediateDirectory="$(ConfigurationName)\Squirrel3"
 			ConfigurationType="4"
 			CharacterSet="0"
 			ManagedExtensions="0"
