@@ -44,7 +44,7 @@ typedef std::list<cBlockEntity *>   cBlockEntityList;
 // tolua_begin
 
 /// The datatype used by blockdata
-typedef char BLOCKTYPE;
+typedef unsigned char BLOCKTYPE;
 
 /// The datatype used by nibbledata (meta, light, skylight)
 typedef unsigned char NIBBLETYPE;
@@ -94,7 +94,7 @@ enum EMCSBiome
 	
 	// Automatically capture the maximum biome value into biMaxBiome:
 	biNumBiomes,  // True number of biomes, since they are zero-based
-	biMaxBiome = biNumBiomes - 1,  // The maximum biome value
+	biMaxBiome = biNumBiomes - 1  // The maximum biome value
 } ;
 
 // tolua_end
@@ -316,34 +316,34 @@ public:
 	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
 	If false is returned, the chunk is skipped.
 	*/
-	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { return true; };
+	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; };
 	
 	/// Called once to provide heightmap data
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {};
+	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {UNUSED(a_HeightMap); };
 	
 	/// Called once to provide biome data
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) {};
+	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) {UNUSED(a_BiomeMap); };
 	
 	/// Called once to export block types
-	virtual void BlockTypes   (const BLOCKTYPE * a_Type) {};
+	virtual void BlockTypes   (const BLOCKTYPE * a_Type) {UNUSED(a_Type); };
 	
 	/// Called once to export block meta
-	virtual void BlockMeta    (const NIBBLETYPE * a_Meta) {};
+	virtual void BlockMeta    (const NIBBLETYPE * a_Meta) {UNUSED(a_Meta); };
 	
 	/// Called once to let know if the chunk lighting is valid. Return value is used to control if BlockLight() and BlockSkyLight() are called next (if true)
-	virtual bool LightIsValid(bool a_IsLightValid) {return true; };
+	virtual bool LightIsValid(bool a_IsLightValid) {UNUSED(a_IsLightValid); return true; };
 
 	/// Called once to export block light
-	virtual void BlockLight   (const NIBBLETYPE * a_Meta) {};
+	virtual void BlockLight   (const NIBBLETYPE * a_BlockLight) {UNUSED(a_BlockLight); };
 	
 	/// Called once to export sky light
-	virtual void BlockSkyLight(const NIBBLETYPE * a_Meta) {};
+	virtual void BlockSkyLight(const NIBBLETYPE * a_SkyLight) {UNUSED(a_SkyLight); };
 	
 	/// Called for each entity in the chunk
-	virtual void Entity(cEntity * a_Entity) {};
+	virtual void Entity(cEntity * a_Entity) {UNUSED(a_Entity); };
 	
 	/// Called for each blockentity in the chunk
-	virtual void BlockEntity(cBlockEntity * a_Entity) {};
+	virtual void BlockEntity(cBlockEntity * a_Entity) {UNUSED(a_Entity); };
 } ;
 
 
@@ -357,8 +357,8 @@ class cChunkDataCollector :
 {
 public:
 
-	// Must be char instead of BLOCKTYPE or NIBBLETYPE, because it houses both.
-	char m_BlockData[cChunkDef::BlockDataSize];
+	// Must be unsigned char instead of BLOCKTYPE or NIBBLETYPE, because it houses both.
+	unsigned char m_BlockData[cChunkDef::BlockDataSize];
 
 protected:
 
@@ -458,8 +458,8 @@ struct sSetBlock
 
 	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );  // absolute block position
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),
 		x(a_X), y(a_Y), z(a_Z),
+		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),
 		BlockType(a_BlockType),
 		BlockMeta(a_BlockMeta)
 	{}

@@ -6,7 +6,7 @@
 namespace Json
 {
 	class Value;
-};
+}
 
 
 

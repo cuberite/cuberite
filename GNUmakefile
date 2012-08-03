@@ -30,8 +30,8 @@ CCE_OPTIONS = -s -x c -O3
 LNK_OPTIONS = -lstdc++ -pthread -O3
 BUILDDIR = build/release/
 else
-CC_OPTIONS = -s -ggdb -D_DEBUG
-CCE_OPTIONS = -s -x c -ggdb -D_DEBUG
+CC_OPTIONS = -s -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+CCE_OPTIONS = -s -x c -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 LNK_OPTIONS = -lstdc++ -pthread -ggdb
 BUILDDIR = build/debug/
 endif

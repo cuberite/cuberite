@@ -27,7 +27,7 @@ public:
 	cJsonChunkSerializer(void);
 	
 	Json::Value & GetRoot     (void) {return m_Root; }
-	BLOCKTYPE *   GetBlockData(void) {return m_BlockData; }
+	BLOCKTYPE *   GetBlockData(void) {return (BLOCKTYPE *)m_BlockData; }
 	bool          HasJsonData (void) const {return m_HasJsonData; }
 	
 protected:

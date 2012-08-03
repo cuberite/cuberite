@@ -80,6 +80,8 @@ typedef short     Int16;
 	TypeName(const TypeName &); \
 	void operator=(const TypeName &)
 
+// A macro that is used to mark unused function parameters, to avoid pedantic warnings in gcc
+#define UNUSED(X) (void)(X)
 
 
 

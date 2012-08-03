@@ -223,7 +223,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		return;
 	}
 	cPacket_PreChunk PreChunk(a_ChunkX, a_ChunkZ, true);
-	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, m_BlockData, m_BiomeMap);
+	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, (BLOCKTYPE *)m_BlockData, m_BiomeMap);
 	
 	// Send:
 	if (a_Client == NULL)

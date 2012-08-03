@@ -41,6 +41,8 @@ public:
 	/// Called to parse the packet. Packet type has already been read and the correct packet type created. Return the number of characters processed, PACKET_INCOMPLETE for incomplete data, PACKET_ERROR for error
 	virtual int Parse(const char * a_Data, int a_Size)
 	{
+		UNUSED(a_Data);
+		UNUSED(a_Size);
 		LOGERROR("Undefined Parse function for packet type 0x%x\n", m_PacketID );
 		ASSERT(!"Undefined Parse function");
 		return -1;
@@ -49,6 +51,7 @@ public:
 	/// Called to serialize the packet into a string. Append all packet data to a_Data, including the packet type!
 	virtual void Serialize(AString & a_Data) const
 	{
+		UNUSED(a_Data);
 		LOGERROR("Undefined Serialize function for packet type 0x%x\n",  m_PacketID );
 		ASSERT(!"Undefined Serialize function");
 	}

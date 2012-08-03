@@ -289,9 +289,9 @@ inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockID)
 //tolua_begin
 enum eGameMode
 {
-	eGameMode_NotSet	  = -1,
-	eGameMode_Survival    = 0,
-	eGameMode_Creative    = 1,
+	eGameMode_NotSet   = -1,
+	eGameMode_Survival = 0,
+	eGameMode_Creative = 1
 };
 
 
@@ -300,10 +300,9 @@ enum eGameMode
 
 enum eWeather
 {
-	eWeather_Sunny		  = 0,
-	eWeather_Rain		  = 1,
-	eWeather_ThunderStorm = 2,
-
+	eWeather_Sunny        = 0,
+	eWeather_Rain         = 1,
+	eWeather_ThunderStorm = 2
 };
 
 

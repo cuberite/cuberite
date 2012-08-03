@@ -48,8 +48,8 @@ public:
 
 		http_request()
 			: s_( 0 )
-			, authentication_given_(false)
 			, content_length_( 0 )
+			, authentication_given_(false)
 		{}
 
 		Socket*                            s_;

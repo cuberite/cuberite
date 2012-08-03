@@ -28,7 +28,7 @@ public:
 	bool IsValid(void) const;
 	void CloseSocket();
 
-	operator const xSocket() const;
+	operator xSocket() const;
 	xSocket GetSocket() const;
 	
 	bool operator == (const cSocket & a_Other) {return m_Socket == a_Other.m_Socket; }

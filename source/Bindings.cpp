@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/29/12 13:49:55.
+** Generated automatically by tolua++-1.0.92 on 08/03/12 10:35:41.
 */
 
 #ifndef __cplusplus
@@ -2572,7 +2572,7 @@ static int tolua_AllToLua_BlockStringToType00(lua_State* tolua_S)
  {
   const AString a_BlockTypeString = ((const AString)  tolua_tocppstring(tolua_S,1,0));
   {
-    char tolua_ret = (  char)  BlockStringToType(a_BlockTypeString);
+   unsigned char tolua_ret = ( unsigned char)  BlockStringToType(a_BlockTypeString);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_BlockTypeString);
   }
@@ -8035,7 +8035,7 @@ static int tolua_AllToLua_cPlugin_OnBlockToPickup00(lua_State* tolua_S)
 #endif
  {
   cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-   char a_BlockType = ((  char)  tolua_tonumber(tolua_S,2,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,2,0));
   unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,3,0));
   const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,4,0));
   const cItem* a_EquippedItem = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
@@ -8671,7 +8671,7 @@ public:
 			return ( bool ) cPlugin:: OnPostCrafting(a_Player,a_Grid,a_Recipe);
 		};
 	};
-	 bool  OnBlockToPickup(  char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
+	 bool  OnBlockToPickup( unsigned char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		if (push_method("OnBlockToPickup",  tolua_AllToLua_cPlugin_OnBlockToPickup00)) {
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockType);
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockMeta);
@@ -8788,7 +8788,7 @@ public:
 	 bool cPlugin__OnPostCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin::OnPostCrafting(a_Player,a_Grid,a_Recipe);
 	};
-	 bool cPlugin__OnBlockToPickup(  char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
+	 bool cPlugin__OnBlockToPickup( unsigned char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		return ( bool )cPlugin::OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 	};
 	 bool cPlugin__OnWeatherChanged( cWorld* a_World) {
@@ -9499,7 +9499,7 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnBlockToPickup00(lua_State* tol
 #endif
  {
   Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  char a_BlockType = ((char)  tolua_tonumber(tolua_S,2,0));
+  unsigned char a_BlockType = ((unsigned char)  tolua_tonumber(tolua_S,2,0));
   unsigned char a_BlockMeta = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
   const cPlayer* a_Player = ((const cPlayer*)  tolua_tousertype(tolua_S,4,0));
   const cItem* a_EquippedItem = ((const cItem*)  tolua_tousertype(tolua_S,5,0));
@@ -10096,7 +10096,7 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnPostCrafting(a_Player,a_Grid,a_Recipe);
 		};
 	};
-	 bool  OnBlockToPickup(  char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
+	 bool  OnBlockToPickup( unsigned char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		if (push_method("OnBlockToPickup",  tolua_AllToLua_cPlugin_OnBlockToPickup00)) {
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockType);
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockMeta);
@@ -10216,7 +10216,7 @@ public:
 	 bool cPlugin_NewLua__OnPostCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin_NewLua::OnPostCrafting(a_Player,a_Grid,a_Recipe);
 	};
-	 bool cPlugin_NewLua__OnBlockToPickup(  char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
+	 bool cPlugin_NewLua__OnBlockToPickup( unsigned char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		return ( bool )cPlugin_NewLua::OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 	};
 	 bool cPlugin_NewLua__OnWeatherChanged( cWorld* a_World) {
@@ -10888,8 +10888,8 @@ static int tolua_AllToLua_cWorld_SetBlock00(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
-  char a_BlockType = ((char)  tolua_tonumber(tolua_S,5,0));
-  char a_BlockMeta = ((char)  tolua_tonumber(tolua_S,6,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlock'", NULL);
 #endif
@@ -10929,8 +10929,8 @@ static int tolua_AllToLua_cWorld_FastSetBlock00(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
-  char a_BlockType = ((char)  tolua_tonumber(tolua_S,5,0));
-  char a_BlockMeta = ((char)  tolua_tonumber(tolua_S,6,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FastSetBlock'", NULL);
 #endif
@@ -10972,7 +10972,7 @@ static int tolua_AllToLua_cWorld_GetBlock00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlock'", NULL);
 #endif
   {
-   char tolua_ret = (char)  self->GetBlock(a_X,a_Y,a_Z);
+   unsigned char tolua_ret = ( unsigned char)  self->GetBlock(a_X,a_Y,a_Z);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -11004,7 +11004,7 @@ static int tolua_AllToLua_cWorld_GetBlock01(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlock'", NULL);
 #endif
   {
-   char tolua_ret = (char)  self->GetBlock(*a_Pos);
+   unsigned char tolua_ret = ( unsigned char)  self->GetBlock(*a_Pos);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -11039,7 +11039,7 @@ static int tolua_AllToLua_cWorld_GetBlockMeta00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockMeta'", NULL);
 #endif
   {
-   char tolua_ret = (char)  self->GetBlockMeta(a_X,a_Y,a_Z);
+   unsigned char tolua_ret = ( unsigned char)  self->GetBlockMeta(a_X,a_Y,a_Z);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -11071,7 +11071,7 @@ static int tolua_AllToLua_cWorld_GetBlockMeta01(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockMeta'", NULL);
 #endif
   {
-   char tolua_ret = (char)  self->GetBlockMeta(*a_Pos);
+   unsigned char tolua_ret = ( unsigned char)  self->GetBlockMeta(*a_Pos);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -11103,7 +11103,7 @@ static int tolua_AllToLua_cWorld_SetBlockMeta00(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
-  char a_MetaData = ((char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_MetaData = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlockMeta'", NULL);
 #endif
@@ -11136,7 +11136,7 @@ static int tolua_AllToLua_cWorld_SetBlockMeta01(lua_State* tolua_S)
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
   const Vector3i* a_Pos = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
-  char a_MetaData = ((char)  tolua_tonumber(tolua_S,3,0));
+  unsigned char a_MetaData = (( unsigned char)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlockMeta'", NULL);
 #endif
@@ -11175,7 +11175,7 @@ static int tolua_AllToLua_cWorld_GetBlockSkyLight00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockSkyLight'", NULL);
 #endif
   {
-   char tolua_ret = (char)  self->GetBlockSkyLight(a_X,a_Y,a_Z);
+   unsigned char tolua_ret = ( unsigned char)  self->GetBlockSkyLight(a_X,a_Y,a_Z);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -11211,8 +11211,8 @@ static int tolua_AllToLua_cWorld_GetBlockTypeMeta00(lua_State* tolua_S)
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
-  char a_BlockType = ((char)  tolua_tonumber(tolua_S,5,0));
-  unsigned char a_BlockMeta = ((unsigned char)  tolua_tonumber(tolua_S,6,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockTypeMeta'", NULL);
 #endif
@@ -18121,7 +18121,7 @@ static int tolua_AllToLua_cBlockArea_SetRelBlockType00(lua_State* tolua_S)
   int a_RelX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_RelY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_RelZ = ((int)  tolua_tonumber(tolua_S,4,0));
-   char a_BlockType = ((  char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRelBlockType'", NULL);
 #endif
@@ -18160,7 +18160,7 @@ static int tolua_AllToLua_cBlockArea_SetBlockType00(lua_State* tolua_S)
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
-   char a_BlockType = ((  char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlockType'", NULL);
 #endif
@@ -18436,7 +18436,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockType00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRelBlockType'", NULL);
 #endif
   {
-    char tolua_ret = (  char)  self->GetRelBlockType(a_RelX,a_RelY,a_RelZ);
+   unsigned char tolua_ret = ( unsigned char)  self->GetRelBlockType(a_RelX,a_RelY,a_RelZ);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -18474,7 +18474,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockType00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockType'", NULL);
 #endif
   {
-    char tolua_ret = (  char)  self->GetBlockType(a_BlockX,a_BlockY,a_BlockZ);
+   unsigned char tolua_ret = ( unsigned char)  self->GetBlockType(a_BlockX,a_BlockY,a_BlockZ);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -21348,7 +21348,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_TRIPWIRE_HOOK",E_BLOCK_TRIPWIRE_HOOK);
   tolua_constant(tolua_S,"E_BLOCK_TRIPWIRE",E_BLOCK_TRIPWIRE);
   tolua_constant(tolua_S,"E_BLOCK_EMERALD_BLOCK",E_BLOCK_EMERALD_BLOCK);
-  tolua_constant(tolua_S,"E_BLOCK_",E_BLOCK_);
   tolua_constant(tolua_S,"E_ITEM_EMPTY",E_ITEM_EMPTY);
   tolua_constant(tolua_S,"E_ITEM_STONE",E_ITEM_STONE);
   tolua_constant(tolua_S,"E_ITEM_GRASS",E_ITEM_GRASS);

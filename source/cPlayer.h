@@ -23,7 +23,8 @@ class cPlayer : public cPawn												//tolua_export
 {																			//tolua_export
 public:
 	typedef cPawn super;
-	CLASS_PROTOTYPE();
+	
+	CLASS_PROTOTYPE()
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();

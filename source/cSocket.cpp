@@ -34,7 +34,7 @@ cSocket::~cSocket()
 
 
 
-cSocket::operator const cSocket::xSocket() const
+cSocket::operator cSocket::xSocket() const
 {
 	return m_Socket;
 }

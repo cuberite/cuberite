@@ -606,7 +606,7 @@ BLOCKTYPE cChunkMap::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
 
 
 
-void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, char a_BlockMeta)
+void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_BlockMeta)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );

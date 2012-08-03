@@ -51,23 +51,23 @@ public:
 	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player );
 	virtual bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player );
 	virtual bool OnBlockPlace      (cPacket_BlockPlace* a_PacketData, cPlayer* a_Player );
-	virtual bool OnBlockDig        (cPacket_BlockDig * a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) { (void)a_PacketData; (void)a_Player; (void)a_PickupItem; return false; }
+	virtual bool OnBlockDig        (cPacket_BlockDig * a_PacketData, cPlayer * a_Player, cItem * a_PickupItem);
 	virtual bool OnChat            (const char * a_Chat, cPlayer* a_Player );
 	virtual bool OnLogin           (cPacket_Login* a_PacketData );
 	virtual void OnPlayerSpawn     (cPlayer* a_Player );
 	virtual bool OnPlayerJoin      (cPlayer* a_Player );
-	virtual void OnPlayerMove      (cPlayer* a_Player ) { (void)a_Player; }
-	virtual void OnTakeDamage      (cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) { (void)a_Pawn; (void)a_TakeDamageInfo; }
-	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer ) { (void)a_Killed; (void)a_Killer; return false; }
-	virtual void OnChunkGenerated  (cWorld * a_World, int a_ChunkX, int a_ChunkZ) {}
-	virtual bool OnChunkGenerating (cWorld * a_Wordl, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) { return false; }
-	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
-	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
-	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) {return false; }
-	virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups) {return false; }
-	virtual bool OnWeatherChanged  (cWorld * a_World) {return false; }
-	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4) {return false; }
-	virtual bool OnUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) {return false; }
+	virtual void OnPlayerMove      (cPlayer* a_Player );
+	virtual void OnTakeDamage      (cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo );
+	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer );
+	virtual void OnChunkGenerated  (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
+	virtual bool OnChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk);
+	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
+	virtual bool OnWeatherChanged  (cWorld * a_World);
+	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4);
+	virtual bool OnUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
 	// Accessors
 	const char* GetName() const { return m_Name.c_str(); }
@@ -83,8 +83,9 @@ public:
 		std::string Permission;
 	};
 
-	void AddCommand( std::string & a_Command, std::string & a_Description, std::string & a_Permission );
+	void AddCommand(const AString & a_Command, const AString & a_Description, const AString & a_Permission);
 	// tolua_end
+	
 	typedef bool (FuncCommandHandler)( std::string & a_Command, std::vector< std::string > & a_Split );
 	void BindCommand( FuncCommandHandler* a_Function, std::string & a_Command );		// >> EXPORTED IN MANUALBINDINGS <<
 	const std::vector< CommandStruct > & GetCommands() const { return m_Commands; }		// >> EXPORTED IN MANUALBINDINGS <<

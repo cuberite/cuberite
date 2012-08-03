@@ -20,7 +20,7 @@ struct TakeDamageInfo		//tolua_export
 class cPawn :	public cEntity													//tolua_export
 {																				//tolua_export
 public:
-	CLASS_PROTOTYPE();
+	CLASS_PROTOTYPE()
 
 	cPawn();
 	virtual ~cPawn();

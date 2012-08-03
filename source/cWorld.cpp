@@ -465,7 +465,7 @@ void cWorld::Tick(float a_Dt)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				LOG("Destroying entity #%i", (*itr)->GetUniqueID());
+				LOGD("Destroying entity #%i", (*itr)->GetUniqueID());
 				cEntity * RemoveMe = *itr;
 				itr = m_AllEntities.erase( itr );
 				m_RemoveEntityQueue.push_back( RemoveMe ); 
@@ -1032,7 +1032,7 @@ int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 
 
-void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
+void cWorld::SetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )
 {
 	if(a_BlockType == E_BLOCK_AIR)
 	{
@@ -1048,7 +1048,7 @@ void cWorld::SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_Block
 
 
 
-void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta )
+void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )
 {
 	cCSLock Lock(m_CSFastSetBlock);
 	m_FastSetBlockQueue.push_back(sSetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta)); 
@@ -1058,7 +1058,7 @@ void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_B
 
 
 
-char cWorld::GetBlock(int a_X, int a_Y, int a_Z)
+BLOCKTYPE cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 {
 	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
@@ -1083,7 +1083,7 @@ char cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 
 
 
-char cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
+NIBBLETYPE cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
 {
 	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
@@ -1104,7 +1104,7 @@ char cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
 
 
 
-void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
+void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData )
 {
 	m_ChunkMap->SetBlockMeta(a_X, a_Y, a_Z, a_MetaData);
 }
@@ -1113,7 +1113,7 @@ void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData )
 
 
 
-char cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
+NIBBLETYPE cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
 {
 	return m_ChunkMap->GetBlockSkyLight(a_X, a_Y, a_Z);
 }
@@ -1122,7 +1122,7 @@ char cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
 
 
 
-void cWorld::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, char & a_BlockType, unsigned char & a_BlockMeta)
+void cWorld::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	m_ChunkMap->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, (BLOCKTYPE &)a_BlockType, (NIBBLETYPE &)a_BlockMeta);
 }

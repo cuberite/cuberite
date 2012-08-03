@@ -214,17 +214,17 @@ public:
 	/// Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
-	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );						//tolua_export
-	void FastSetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, char a_BlockMeta );					//tolua_export
-	char GetBlock( int a_X, int a_Y, int a_Z );															//tolua_export
-	char GetBlock( const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }			//tolua_export
-	char GetBlockMeta( int a_X, int a_Y, int a_Z );														//tolua_export
-	char GetBlockMeta( const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }	//tolua_export
-	void SetBlockMeta( int a_X, int a_Y, int a_Z, char a_MetaData );									//tolua_export
-	void SetBlockMeta( const Vector3i & a_Pos, char a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
-	char GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
-	// TODO: char GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
-	void GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, char & a_BlockType, unsigned char & a_BlockMeta);  // tolua_export
+	void SetBlock     (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );						//tolua_export
+	void FastSetBlock (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );					//tolua_export
+	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z );															//tolua_export
+	BLOCKTYPE GetBlock(const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }			//tolua_export
+	NIBBLETYPE GetBlockMeta(int a_X, int a_Y, int a_Z );														//tolua_export
+	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }	//tolua_export
+	void SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData );									//tolua_export
+	void SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
+	NIBBLETYPE GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
+	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
+	void GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);  // tolua_export
 	
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities:
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0);
