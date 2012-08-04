@@ -24,20 +24,54 @@ CC = /usr/bin/g++
 
 all: MCServer
 
+
+
+
+
+###################################################
+# Set the variables used for compiling, based on the build mode requested:
+# CC_OPTIONS  ... options for the C code compiler
+# CXX_OPTIONS ... options for the C++ code compiler
+# LNK_OPTIONS ... options for the linker
+# BUILDDIR    ... folder where the intermediate object files are built
+
 ifeq ($(release),1)
+################
+# release build - fastest run-time, no gdb support
+################
 CC_OPTIONS = -s -O3
-CCE_OPTIONS = -s -x c -O3
+CXX_OPTIONS = -s -O3
 LNK_OPTIONS = -lstdc++ -pthread -O3
 BUILDDIR = build/release/
 else
+
+ifeq ($(pedantic),1)
+################
+# pedantic build - basically a debug build with lots of warnings
+################
 CC_OPTIONS = -s -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-CCE_OPTIONS = -s -x c -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+CXX_OPTIONS = -s -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+LNK_OPTIONS = -lstdc++ -pthread -ggdb
+BUILDDIR = build/pedantic/
+
+else
+################
+# debug build - fully traceable by gdb in C++ code, slowest
+# Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
+################
+CC_OPTIONS = -s -ggdb -D_DEBUG -O3
+CXX_OPTIONS = -s -ggdb -D_DEBUG
 LNK_OPTIONS = -lstdc++ -pthread -ggdb
 BUILDDIR = build/debug/
 endif
 
+endif
 
-#
+
+
+
+
+###################################################
 # INCLUDE directories for MCServer
 #
 
@@ -59,7 +93,11 @@ INCLUDE = -I.\
 		-Isquirrel_3_0_1_stable\
 		-Isquirrel_3_0_1_stable/sqrat
 
-#
+
+
+
+
+###################################################
 # Build MCServer
 #
 
@@ -79,14 +117,22 @@ clean :
 install : MCServer
 		cp MCServer MCServer
 
-#
+
+
+
+
+###################################################
 # Build the parts of MCServer
 #
+# options used:
+#  -x c  ... compile as C code
+#  -c    ... compile but do not link
+#  -MM   ... generate a list of includes
 
 $(BUILDDIR)%.o: %.c
 	@mkdir -p $(dir $@) 
-	$(CC) $(CCE_OPTIONS) -c $(INCLUDE) $< -o $@
-	@$(CC) $(CC_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
+	$(CC) $(CC_OPTIONS) -x c -c $(INCLUDE) $< -o $@
+	@$(CC) $(CC_OPTIONS) -x c -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %.o,%.d,$@).tmp
 	@sed -e "s|.*:|$(BUILDDIR)$*.o:|" < $(patsubst %.o,%.d,$@).tmp > $(patsubst %.o,%.d,$@)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
@@ -94,8 +140,8 @@ $(BUILDDIR)%.o: %.c
 
 $(BUILDDIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
-	$(CC) $(CC_OPTIONS) -c $(INCLUDE) $< -o $@
-	@$(CC) $(CC_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
+	$(CC) $(CXX_OPTIONS) -c $(INCLUDE) $< -o $@
+	@$(CC) $(CXX_OPTIONS) -MM $(INCLUDE) $< > $(patsubst %.o,%.d,$@)
 	@mv -f $(patsubst %.o,%.d,$@) $(patsubst %.o,%.d,$@).tmp
 	@sed -e "s|.*:|$(BUILDDIR)$*.o:|" < $(patsubst %.o,%.d,$@).tmp > $(patsubst %.o,%.d,$@)
 	@sed -e 's/.*://' -e 's/\\$$//' < $(patsubst %.o,%.d,$@).tmp | fmt -1 | sed -e 's/^ *//' -e 's/$$/:/' >> $(patsubst %.o,%.d,$@)
