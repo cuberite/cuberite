@@ -157,8 +157,8 @@ void cChestEntity::SaveToJson( Json::Value& a_Value )
 
 void cChestEntity::SendTo( cClientHandle* a_Client, cServer* a_Server )
 {
-	(void)a_Client;
-	(void)a_Server;
+	UNUSED(a_Client);
+	UNUSED(a_Server);
 	return;
 }
 
@@ -166,14 +166,12 @@ void cChestEntity::SendTo( cClientHandle* a_Client, cServer* a_Server )
 
 
 
-void cChestEntity::UsedBy( cPlayer * a_Player )
+void cChestEntity::UsedBy(cPlayer * a_Player)
 {
-	if( !GetWindow() )
+	if (!GetWindow())
 	{
-		cWindow* Window = new cWindow( this, true );
-		Window->SetSlots( GetContents(), GetChestHeight()*c_ChestWidth );
-		Window->SetWindowID( 1 );
-		Window->SetWindowType( cWindow::Chest );
+		cWindow * Window = new cWindow(this, true, cWindow::Chest, 1);
+		Window->SetSlots(GetContents(), GetChestHeight() * c_ChestWidth);
 		Window->SetWindowTitle("UberChest");
 		Window->GetOwner()->SetEntity(this);
 		OpenWindow( Window );

@@ -48,10 +48,9 @@ cInventory::cInventory(cPlayer* a_Owner)
 
 	if( !GetWindow() )
 	{
-		cWindow* Window = new cWindow( this, false );
-		Window->SetSlots( m_Slots, c_NumSlots );
-		Window->SetWindowID( 0 );
-		OpenWindow( Window );
+		cWindow* Window = new cWindow( this, false, cWindow::Inventory, 0);
+		Window->SetSlots(m_Slots, c_NumSlots);
+		OpenWindow(Window);
 	}
 }
 

@@ -1,3 +1,12 @@
+
+// cWindow.h
+
+// Interfaces to the cWindow class representing a UI window for a specific block
+
+
+
+
+
 #pragma once
 
 
@@ -14,26 +23,32 @@ typedef std::list<cPlayer *> cPlayerList;
 
 
 
+/** 
+Represents a UI window (base class) for a specific block entity.
+
+There is up to one instance of the class for each block entity
+Each window has a list of players that are currently using it
+When there's no player using a window, it is destroyed
+*/
 class cWindow
 {
 public:
-	cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible );
+	enum WindowType
+	{
+		Inventory   = -1,  // This value is never actually sent to a client
+		Chest       = 0,
+		Workbench   = 1,
+		Furnace     = 2,
+		Dispenser   = 3,
+		Enchantment = 4,
+		Brewery     = 5
+	};
+
+	cWindow(cWindowOwner * a_Owner, bool a_bInventoryVisible, WindowType a_WindowType, int a_WindowID);
 	~cWindow();
 
 	int GetWindowID() { return m_WindowID; }
-	void SetWindowID( int a_WindowID ) { m_WindowID = a_WindowID; }
-	
-	enum WindowType {
-		Chest,
-		Workbench,
-		Furnace,
-		Dispenser,
-		Enchantment,
-		Brewery
-	};
-
-	int GetWindowType() { return m_WindowType; }
-	void SetWindowType( int a_WindowType ) { m_WindowType = a_WindowType; }
+	int GetWindowType(void) const { return m_WindowType; }
 
 	cItem* GetSlots() { return m_Slots; }
 	int GetNumSlots() { return m_NumSlots; }

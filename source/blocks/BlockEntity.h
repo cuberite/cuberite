@@ -1,5 +1,10 @@
+
 #pragma once
+
 #include "Block.h"
+
+
+
 
 
 class cBlockEntityHandler : public cBlockHandler
@@ -9,14 +14,18 @@ public:
 		: cBlockHandler(a_BlockID)
 	{
 	}
-	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override
+	
+	virtual void OnClick(cWorld * a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		a_World->UseBlockEntity(a_Player, a_X, a_Y, a_Z);
+		a_World->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
+	
 	virtual bool IsUseable() override
 	{
 		return true;
 	}
-	
-	
 };
+
+
+
+

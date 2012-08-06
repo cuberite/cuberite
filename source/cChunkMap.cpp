@@ -262,18 +262,18 @@ void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket
 
 
 
-void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
+void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// a_Player rclked block entity at the coords specified, handle it
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
 		return;
 	}
-	Chunk->UseBlockEntity(a_Player, a_X, a_Y, a_Z);
+	Chunk->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 

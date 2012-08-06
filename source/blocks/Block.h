@@ -27,21 +27,30 @@ public:
 	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta);
 	virtual bool NeedsRandomTicks();
 	virtual void DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z);
-	//Checks if the block can stay at
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z);
-	//Checks if the block can be placed at this point. Default: CanBeAt(...) NOTE: In the block is not placed in this callback
-	virtual bool CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir);
-	//This gets called if the player tries to place a block ontop of this block (Only if he aims directly on this block)
-	virtual bool AllowBlockOnTop();
-	virtual bool IsUseable();
-	virtual bool IsClickedThrough();
-	virtual bool IgnoreBuildCollision();
-	//Indicates this block can be placed on the side of other blocks. Default: true
+	
+	/// Checks if the block can stay at the specified coords in the
+	virtual bool CanBeAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	/// Checks if the block can be placed at this point. Default: CanBeAt(...) NOTE: This call doesn't actually place the block
+	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
+	
+	/// Called when the player tries to place a block on top of this block (Only if he aims directly on this block); return false to disallow
+	virtual bool AllowBlockOnTop(void);
+	
+	/// Called to check whether this block supports a rclk action. If it returns true, OnClicked() is called
+	virtual bool IsUseable(void);
+	
+	virtual bool IsClickedThrough(void);
+	
+	virtual bool IgnoreBuildCollision(void);
+	
+	/// Indicates this block can be placed on the side of other blocks. Default: true
 	virtual bool CanBePlacedOnSide();
-	//Does this block drops if it gets destroyed by an unsuitable situation? Default: true
+	
+	/// Does this block drop if it gets destroyed by an unsuitable situation? Default: true
 	virtual bool DropOnUnsuitable();
 	
-	static cBlockHandler *GetBlockHandler(BLOCKTYPE a_BlockID);
+	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockID);
 
 	static void Deinit();
 	

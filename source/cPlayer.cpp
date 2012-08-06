@@ -460,7 +460,7 @@ void cPlayer::CloseWindow(char a_WindowType)
 			(m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount > 0)
 		)
 		{
-			LOG("Player holds item! Dropping it...");
+			LOGD("Player holds item! Dropping it...");
 			TossItem( true, m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount );
 		}
 
@@ -481,17 +481,18 @@ void cPlayer::CloseWindow(char a_WindowType)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 2, vY * 2, vZ * 2);
 	}
 	
-	if (m_CurrentWindow)
+	if (m_CurrentWindow != NULL)
 	{
 		// FIXME: If the player entity is destroyed while having a chest window open, the chest will not close
-		if (a_WindowType == 1 && strcmp(m_CurrentWindow->GetWindowTitle().c_str(), "UberChest") == 0) { // Chest
-			cBlockEntity *block = m_CurrentWindow->GetOwner()->GetEntity();
+		if ((a_WindowType == 1) && (m_CurrentWindow->GetWindowType() == cWindow::Chest))
+		{
+			// Chest
 			cPacket_BlockAction ChestClose;
-			ChestClose.m_PosX = block->GetPosX();
-			ChestClose.m_PosY = (short)block->GetPosY();
-			ChestClose.m_PosZ = block->GetPosZ();
-			ChestClose.m_Byte1 = 1;
-			ChestClose.m_Byte2 = 0;
+			int y = 0;
+			m_CurrentWindow->GetOwner()->GetBlockPos(ChestClose.m_PosX, y, ChestClose.m_PosZ);
+			ChestClose.m_PosY = (short)y;
+			ChestClose.m_Byte1 = 1;  // Unused, always 1
+			ChestClose.m_Byte2 = 0;  // 0 = closed
 			m_World->Broadcast(ChestClose);
 		}
 		

@@ -18,9 +18,9 @@
 
 
 
-cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
-	: m_WindowID( 0 )
-	, m_WindowType( 0 )
+cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible, cWindow::WindowType a_WindowType, int a_WindowID)
+	: m_WindowID( a_WindowID )
+	, m_WindowType( a_WindowType )
 	, m_Owner( a_Owner )
 	, m_bInventoryVisible( a_bInventoryVisible )
 	, m_NumSlots( 0 )
@@ -28,8 +28,11 @@ cWindow::cWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 	, m_DraggingItem( 0 )
 	, m_IsDestroyed(false)
 {
-	LOGD("Created a window at %p", this);
-	if( !m_bInventoryVisible ) m_DraggingItem = new cItem();
+	LOGD("Created a window at %p, type = %d, ID = %i", this, a_WindowType, a_WindowID);
+	if (!m_bInventoryVisible)
+	{
+		m_DraggingItem = new cItem();
+	}
 }
 
 
@@ -234,18 +237,18 @@ void cWindow::Open( cPlayer & a_Player )
 void cWindow::Close( cPlayer & a_Player )
 {
 	//Checks wheather the player is still holding an item
-	if(m_DraggingItem && m_DraggingItem->m_ItemCount > 0)
+	if (m_DraggingItem && m_DraggingItem->m_ItemCount > 0)
 	{
-		LOG("Player holds item! Dropping it...");
-		a_Player.TossItem( true, m_DraggingItem->m_ItemCount );
+		LOGD("Player holds item! Dropping it...");
+		a_Player.TossItem(true, m_DraggingItem->m_ItemCount);
 	}
 
 	cPacket_WindowClose WindowClose;
 	WindowClose.m_Close = (char)m_WindowID;
 	cClientHandle * ClientHandle = a_Player.GetClientHandle();
-	if ( ClientHandle != NULL)
+	if (ClientHandle != NULL)
 	{
-		ClientHandle->Send( WindowClose );
+		ClientHandle->Send(WindowClose);
 	}
 
 	{

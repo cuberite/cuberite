@@ -882,10 +882,12 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 	cWorld * World = m_Player->GetWorld();
 
 	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
-	if(Handler->IsUseable())
+	if (Handler->IsUseable())
 	{
 		Handler->OnClick(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	}else{
+	}
+	else
+	{
 		cItemHandler *ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
 		
 		if(ItemHandler->OnItemUse(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction))
