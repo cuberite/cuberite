@@ -148,7 +148,7 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 	case E_BLOCK_GOLD_ORE:
 	case E_BLOCK_REDSTONE_ORE:
 	case E_BLOCK_REDSTONE_ORE_GLOWING:
-	case (char)E_BLOCK_EMERALD_ORE:
+	case E_BLOCK_EMERALD_ORE:
 	case E_BLOCK_IRON_ORE:
 	case E_BLOCK_LAPIS_ORE:
 	case E_BLOCK_COAL_ORE:

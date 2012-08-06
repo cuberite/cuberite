@@ -46,7 +46,7 @@ public:
 	static void Deinit();
 	
 protected:
-	char m_BlockID;
+	BLOCKTYPE m_BlockID;
 	static cBlockHandler *CreateBlockHandler(BLOCKTYPE a_BlockID);
 	static cBlockHandler *m_BlockHandler[256];
 	static bool m_HandlerInitialized;	//used to detect if the blockhandlers are initialized
