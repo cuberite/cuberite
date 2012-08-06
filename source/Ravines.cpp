@@ -18,7 +18,7 @@ static const int NUM_RAVINE_POINTS = 4;
 
 
 
-struct cDefPoint
+struct cRavDefPoint
 {
 	int m_BlockX;
 	int m_BlockZ;
@@ -26,7 +26,7 @@ struct cDefPoint
 	int m_Top;
 	int m_Bottom;
 	
-	cDefPoint(int a_BlockX, int a_BlockZ, int a_Radius, int a_Top, int a_Bottom) :
+	cRavDefPoint(int a_BlockX, int a_BlockZ, int a_Radius, int a_Top, int a_Bottom) :
 		m_BlockX(a_BlockX),
 		m_BlockZ(a_BlockZ),
 		m_Radius(a_Radius),
@@ -36,7 +36,7 @@ struct cDefPoint
 	}
 } ;
 
-typedef std::vector<cDefPoint> cDefPoints;
+typedef std::vector<cRavDefPoint> cRavDefPoints;
 
 
 
@@ -44,13 +44,13 @@ typedef std::vector<cDefPoint> cDefPoints;
 
 class cStructGenRavines::cRavine
 {
-	cDefPoints m_Points;
+	cRavDefPoints m_Points;
 	
 	/// Generates the shaping defpoints for the ravine, based on the ravine block coords and noise
 	void GenerateBaseDefPoints(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise);
 	
 	/// Refines (adds and smooths) defpoints from a_Src into a_Dst
-	void RefineDefPoints(const cDefPoints & a_Src, cDefPoints & a_Dst);
+	void RefineDefPoints(const cRavDefPoints & a_Src, cRavDefPoints & a_Dst);
 	
 	/// Does one round of smoothing, two passes of RefineDefPoints()
 	void Smooth(void);
@@ -285,7 +285,7 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	int Mid = (Top + Bottom) / 2;
 	int PointX = CenterX - (int)(xc * a_Size / 2);
 	int PointZ = CenterZ - (int)(zc * a_Size / 2);
-	m_Points.push_back(cDefPoint(PointX, PointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
+	m_Points.push_back(cRavDefPoint(PointX, PointZ, 0, (Mid + Top) / 2, (Mid + Bottom) / 2));
 	for (int i = 1; i < NUM_RAVINE_POINTS - 1; i++)
 	{
 		int LineX = CenterX + (int)(xc * a_Size * (i - NUM_RAVINE_POINTS / 2) / NUM_RAVINE_POINTS);
@@ -298,24 +298,24 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 		int Radius = MaxRadius - abs(i - NUM_RAVINE_POINTS / 2);  // TODO: better radius function
 		int ThisTop    = Top    + ((a_Noise.IntNoise3DInt(7 *  a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
 		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
-		m_Points.push_back(cDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
+		m_Points.push_back(cRavDefPoint(PointX, PointZ, Radius, ThisTop, ThisBottom));
 	}  // for i - m_Points[]
 	PointX = CenterX + (int)(xc * a_Size / 2);
 	PointZ = CenterZ + (int)(zc * a_Size / 2);
-	m_Points.push_back(cDefPoint(PointX, PointZ, 0, Mid, Mid));
+	m_Points.push_back(cRavDefPoint(PointX, PointZ, 0, Mid, Mid));
 }
 
 
 
 
 
-void cStructGenRavines::cRavine::RefineDefPoints(const cDefPoints & a_Src, cDefPoints & a_Dst)
+void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cRavDefPoints & a_Dst)
 {
 	// Smoothing: for each line segment, add points on its 1/4 lengths
 	int Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
-	cDefPoints::const_iterator itr = a_Src.begin() + 1;
+	cRavDefPoints::const_iterator itr = a_Src.begin() + 1;
 	a_Dst.push_back(a_Src.front());
 	int PrevX = a_Src.front().m_BlockX;
 	int PrevZ = a_Src.front().m_BlockZ;
@@ -336,8 +336,8 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cDefPoints & a_Src, cDefP
 		int db = itr->m_Bottom - PrevB;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
-		a_Dst.push_back(cDefPoint(PrevX + 1 * dx / 4, PrevZ + 1 * dz / 4, Rad1, PrevT + 1 * dt / 4, PrevB + 1 * db / 4));
-		a_Dst.push_back(cDefPoint(PrevX + 3 * dx / 4, PrevZ + 3 * dz / 4, Rad2, PrevT + 3 * dt / 4, PrevB + 3 * db / 4));
+		a_Dst.push_back(cRavDefPoint(PrevX + 1 * dx / 4, PrevZ + 1 * dz / 4, Rad1, PrevT + 1 * dt / 4, PrevB + 1 * db / 4));
+		a_Dst.push_back(cRavDefPoint(PrevX + 3 * dx / 4, PrevZ + 3 * dz / 4, Rad2, PrevT + 3 * dt / 4, PrevB + 3 * db / 4));
 		PrevX = itr->m_BlockX;
 		PrevZ = itr->m_BlockZ;
 		PrevR = itr->m_Radius;
@@ -353,7 +353,7 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cDefPoints & a_Src, cDefP
 
 void cStructGenRavines::cRavine::Smooth(void)
 {
-	cDefPoints Pts;
+	cRavDefPoints Pts;
 	RefineDefPoints(m_Points, Pts);  // Refine m_Points -> Pts
 	RefineDefPoints(Pts, m_Points);  // Refine Pts -> m_Points
 }
@@ -368,13 +368,13 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 	// _X 2012_07_20: I tried modifying this algorithm to produce "thick" lines (only one coord change per point)
 	//   But the results were about the same as the original, so I disposed of it again - no need to use twice the count of points
 	
-	cDefPoints Pts;
+	cRavDefPoints Pts;
 	std::swap(Pts, m_Points);
 	
 	m_Points.reserve(Pts.size() * 3);
 	int PrevX = Pts.front().m_BlockX;
 	int PrevZ = Pts.front().m_BlockZ;
-	for (cDefPoints::const_iterator itr = Pts.begin() + 1, end = Pts.end(); itr != end; ++itr)
+	for (cRavDefPoints::const_iterator itr = Pts.begin() + 1, end = Pts.end(); itr != end; ++itr)
 	{
 		int x1 = itr->m_BlockX;
 		int z1 = itr->m_BlockZ;
@@ -388,7 +388,7 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 		int B = itr->m_Bottom;
 		while (true)
 		{
-			m_Points.push_back(cDefPoint(PrevX, PrevZ, R, T, B));
+			m_Points.push_back(cRavDefPoint(PrevX, PrevZ, R, T, B));
 			if ((PrevX == x1) && (PrevZ == z1))
 			{
 				break;
@@ -418,7 +418,7 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 	AString SVG;
   AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
   char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
-  for (cDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
+  for (cRavDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
   {
 		AppendPrintf(SVG, "%c %d,%d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
 		Prefix = 'L';
@@ -469,7 +469,7 @@ void cStructGenRavines::cRavine::ProcessChunk(
 	int BlockStartZ = a_ChunkZ * cChunkDef::Width;
 	int BlockEndX = BlockStartX + cChunkDef::Width;
 	int BlockEndZ = BlockStartZ + cChunkDef::Width;
-	for (cDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
+	for (cRavDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
 		if (
 			(itr->m_BlockX + itr->m_Radius < BlockStartX) ||

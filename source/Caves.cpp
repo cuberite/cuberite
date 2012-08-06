@@ -42,14 +42,14 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 
 
-struct cDefPoint
+struct cCaveDefPoint
 {
 	int m_BlockX;
 	int m_BlockY;
 	int m_BlockZ;
 	int m_Radius;
 	
-	cDefPoint(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Radius) :
+	cCaveDefPoint(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Radius) :
 		m_BlockX(a_BlockX),
 		m_BlockY(a_BlockY),
 		m_BlockZ(a_BlockZ),
@@ -58,7 +58,7 @@ struct cDefPoint
 	}
 } ;
 
-typedef std::vector<cDefPoint> cDefPoints;
+typedef std::vector<cCaveDefPoint> cCaveDefPoints;
 
 
 
@@ -76,7 +76,7 @@ class cCaveTunnel
 	void Randomize(cNoise & a_Noise);
 	
 	/// Refines (adds and smooths) defpoints from a_Src into a_Dst; returns false if no refinement possible (segments too short)
-	bool RefineDefPoints(const cDefPoints & a_Src, cDefPoints & a_Dst);
+	bool RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst);
 	
 	/// Does rounds of smoothing, two passes of RefineDefPoints(), as long as they return true
 	void Smooth(void);
@@ -88,7 +88,7 @@ class cCaveTunnel
 	void CalcBoundingBox(void);
 	
 public:
-	cDefPoints m_Points;
+	cCaveDefPoints m_Points;
 
 	cCaveTunnel(
 		int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ, int a_StartRadius,
@@ -162,8 +162,8 @@ cCaveTunnel::cCaveTunnel(
 	cNoise & a_Noise
 )
 {
-	m_Points.push_back(cDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius));
-	m_Points.push_back(cDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius));
+	m_Points.push_back(cCaveDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius));
+	m_Points.push_back(cCaveDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius));
 	
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
@@ -194,10 +194,10 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 		int PrevY = m_Points.front().m_BlockY;
 		int PrevZ = m_Points.front().m_BlockZ;
 		int PrevR = m_Points.front().m_Radius;
-		cDefPoints Pts;
+		cCaveDefPoints Pts;
 		Pts.reserve(m_Points.size() * 2 + 1);
 		Pts.push_back(m_Points.front());
-		for (cDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
+		for (cCaveDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
 		{
 			int Random = a_Noise.IntNoise3DInt(PrevX, PrevY, PrevZ + i) / 11;
 			int len = (PrevX - itr->m_BlockX) * (PrevX - itr->m_BlockX);
@@ -211,7 +211,7 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 			int y = (itr->m_BlockY + PrevY) / 2 + (Random % (len / 2 + 1) - len / 4);
 			Random /= 256;
 			int z = (itr->m_BlockZ + PrevZ) / 2 + (Random % (len + 1) - len / 2);
-			Pts.push_back(cDefPoint(x, y, z, Rad));
+			Pts.push_back(cCaveDefPoint(x, y, z, Rad));
 			Pts.push_back(*itr);
 			PrevX = itr->m_BlockX;
 			PrevY = itr->m_BlockY;
@@ -226,14 +226,14 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 
 
 
-bool cCaveTunnel::RefineDefPoints(const cDefPoints & a_Src, cDefPoints & a_Dst)
+bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst)
 {
 	// Smoothing: for each line segment, add points on its 1/4 lengths
 	bool res = false;
 	int Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
-	cDefPoints::const_iterator itr = a_Src.begin() + 1;
+	cCaveDefPoints::const_iterator itr = a_Src.begin() + 1;
 	a_Dst.push_back(a_Src.front());
 	int PrevX = a_Src.front().m_BlockX;
 	int PrevY = a_Src.front().m_BlockY;
@@ -256,8 +256,8 @@ bool cCaveTunnel::RefineDefPoints(const cDefPoints & a_Src, cDefPoints & a_Dst)
 		int dr = itr->m_Radius - PrevR;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
-		a_Dst.push_back(cDefPoint(PrevX + 1 * dx / 4, PrevY + 1 * dy / 4, PrevZ + 1 * dz / 4, Rad1));
-		a_Dst.push_back(cDefPoint(PrevX + 3 * dx / 4, PrevY + 3 * dy / 4, PrevZ + 3 * dz / 4, Rad2));
+		a_Dst.push_back(cCaveDefPoint(PrevX + 1 * dx / 4, PrevY + 1 * dy / 4, PrevZ + 1 * dz / 4, Rad1));
+		a_Dst.push_back(cCaveDefPoint(PrevX + 3 * dx / 4, PrevY + 3 * dy / 4, PrevZ + 3 * dz / 4, Rad2));
 		PrevX = itr->m_BlockX;
 		PrevY = itr->m_BlockY;
 		PrevZ = itr->m_BlockZ;
@@ -274,7 +274,7 @@ bool cCaveTunnel::RefineDefPoints(const cDefPoints & a_Src, cDefPoints & a_Dst)
 
 void cCaveTunnel::Smooth(void)
 {
-	cDefPoints Pts;
+	cCaveDefPoints Pts;
 	while (true)
 	{
 		if (!RefineDefPoints(m_Points, Pts))
@@ -296,14 +296,14 @@ void cCaveTunnel::Smooth(void)
 void cCaveTunnel::FinishLinear(void)
 {
 	// For each segment, use Bresenham's 3D line algorithm to draw a "line" of defpoints
-	cDefPoints Pts;
+	cCaveDefPoints Pts;
 	std::swap(Pts, m_Points);
 	
 	m_Points.reserve(Pts.size() * 3);
 	int PrevX = Pts.front().m_BlockX;
 	int PrevY = Pts.front().m_BlockY;
 	int PrevZ = Pts.front().m_BlockZ;
-	for (cDefPoints::const_iterator itr = Pts.begin() + 1, end = Pts.end(); itr != end; ++itr)
+	for (cCaveDefPoints::const_iterator itr = Pts.begin() + 1, end = Pts.end(); itr != end; ++itr)
 	{
 		int x1 = itr->m_BlockX;
 		int y1 = itr->m_BlockY;
@@ -324,7 +324,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			while (true)
 			{
-				m_Points.push_back(cDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
 
 				if (PrevX == x1)
 				{
@@ -356,7 +356,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			while (true)
 			{
-				m_Points.push_back(cDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
 
 				if (PrevY == y1)
 				{
@@ -390,7 +390,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			while (true)
 			{
-				m_Points.push_back(cDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
 
 				if (PrevZ == z1)
 				{
@@ -427,7 +427,7 @@ void cCaveTunnel::CalcBoundingBox(void)
 	m_MinBlockX = m_MaxBlockX = m_Points.front().m_BlockX;
 	m_MinBlockY = m_MaxBlockY = m_Points.front().m_BlockY;
 	m_MinBlockZ = m_MaxBlockZ = m_Points.front().m_BlockZ;
-	for (cDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
+	for (cCaveDefPoints::const_iterator itr = m_Points.begin() + 1, end = m_Points.end(); itr != end; ++itr)
 	{
 		m_MinBlockX = std::min(m_MinBlockX, itr->m_BlockX - itr->m_Radius);
 		m_MaxBlockX = std::max(m_MaxBlockX, itr->m_BlockX + itr->m_Radius);
@@ -463,7 +463,7 @@ void cCaveTunnel::ProcessChunk(
 	int BlockStartZ = a_ChunkZ * cChunkDef::Width;
 	int BlockEndX = BlockStartX + cChunkDef::Width;
 	int BlockEndZ = BlockStartZ + cChunkDef::Width;
-	for (cDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
+	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
 		if (
 			(itr->m_BlockX + itr->m_Radius < BlockStartX) ||
@@ -499,7 +499,7 @@ void cCaveTunnel::ProcessChunk(
 	/*
 	#ifdef _DEBUG		
 	// For debugging purposes, outline the shape of the cave using glowstone, *after* carving the entire cave:
-	for (cDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
+	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
@@ -527,7 +527,7 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 	SVG.reserve(m_Points.size() * 20 + 200);
   AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
   char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
-  for (cDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
+  for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
   {
 		AppendPrintf(SVG, "%c %d,%d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
 		Prefix = 'L';
