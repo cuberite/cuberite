@@ -43,8 +43,18 @@ CC_OPTIONS = -s -O3
 CXX_OPTIONS = -s -O3
 LNK_OPTIONS = -lstdc++ -pthread -O3
 BUILDDIR = build/release/
-else
 
+else
+ifeq ($(profile),1)
+################
+# profile build - a release build with symbols and profiling engine built in
+################
+CC_OPTIONS = -s -ggdb -O3 -pg
+CXX_OPTIONS = -s -ggdb -O3 -pg
+LNK_OPTIONS = -lstdc++ -pthread -ggdb -O3 -pg
+BUILDDIR = build/profile/
+
+else
 ifeq ($(pedantic),1)
 ################
 # pedantic build - basically a debug build with lots of warnings
@@ -64,7 +74,7 @@ CXX_OPTIONS = -s -ggdb -D_DEBUG
 LNK_OPTIONS = -lstdc++ -pthread -ggdb
 BUILDDIR = build/debug/
 endif
-
+endif
 endif
 
 
