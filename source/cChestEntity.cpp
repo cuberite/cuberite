@@ -28,6 +28,7 @@ cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	, m_JoinedChest( NULL )
 {
 	m_Content = new cItem[ c_ChestHeight * c_ChestWidth ];
+	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
 
 
@@ -173,7 +174,6 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 		cWindow * Window = new cWindow(this, true, cWindow::Chest, 1);
 		Window->SetSlots(GetContents(), GetChestHeight() * c_ChestWidth);
 		Window->SetWindowTitle("UberChest");
-		Window->GetOwner()->SetEntity(this);
 		OpenWindow( Window );
 	}
 	if ( GetWindow() )

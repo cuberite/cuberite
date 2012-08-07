@@ -75,6 +75,9 @@ protected:
 	short m_EquippedSlot;
 
 	cPlayer* m_Owner;
+	
+	// cWindowOwner override:
+	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override {}  // UNUSED for an inventory
 };	//tolua_export
 
 

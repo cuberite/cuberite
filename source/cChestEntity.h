@@ -25,7 +25,7 @@ class cNBTData;
 
 class cChestEntity :
 	public cBlockEntity,
-	public cWindowOwner
+	public cBlockEntityWindowOwner
 {
 public:
 	cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);

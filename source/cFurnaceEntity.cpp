@@ -22,7 +22,7 @@
 
 
 cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
-	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z, a_World ) 
+	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z, a_World )
 	, m_Items( new cItem[3] )
 	, m_CookingItem( 0 )
 	, m_CookTime( 0 )
@@ -30,6 +30,7 @@ cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	, m_BurnTime( 0 )
 	, m_TimeBurned( 0 )
 {
+	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
 
 
@@ -83,7 +84,6 @@ void cFurnaceEntity::UsedBy( cPlayer * a_Player )
 		cWindow* Window = new cFurnaceWindow( this );
 		Window->SetSlots( m_Items, 3 );
 		Window->SetWindowTitle("UberFurnace");
-		Window->GetOwner()->SetEntity(this);
 		OpenWindow( Window );
 	}
 	if( GetWindow() )
