@@ -1,6 +1,11 @@
+
 #pragma once
 #include "BlockRedstone.h"
+#include "BlockTorch.h"
 #include "../cTorch.h"
+
+
+
 
 
 class cBlockRedstoneTorchHandler : public cBlockRedstoneHandler
@@ -11,10 +16,10 @@ public:
 	{
 	}
 
+
 	virtual bool CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
-		AddDirection( a_X, a_Y, a_Z, a_Dir, true );
-		return a_World->GetBlock( a_X, a_Y, a_Z ) != E_BLOCK_AIR;
+		return cBlockTorchHandler::TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir);
 	}
 
 
@@ -24,10 +29,12 @@ public:
 		return CanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
 
-	virtual int GetDropID() override
+
+	virtual int GetDropID(void) override
 	{
 		return E_ITEM_REDSTONE_TORCH_ON;
 	}
+
 	
 	virtual bool CanBePlacedOnSide() override
 	{

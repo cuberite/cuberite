@@ -1,7 +1,11 @@
+
 #pragma once
 #include "Block.h"
 #include "../cTorch.h"
 #include "../cWorld.h"
+
+
+
 
 
 class cBlockTorchHandler : public cBlockHandler
@@ -12,27 +16,115 @@ public:
 	{
 	}
 	
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
+	
+	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, cTorch::DirectionToMetaData(a_Dir));
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
 	
-	virtual bool AllowBlockOnTop() override
+	
+	virtual bool AllowBlockOnTop(void) override
 	{
 		return false;
 	}
 
-	virtual bool CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir) override
+
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, char a_Direction)
 	{
+		switch (a_BlockType)
+		{
+			case E_BLOCK_STONE:
+			case E_BLOCK_GRASS:
+			case E_BLOCK_DIRT:
+			case E_BLOCK_COBBLESTONE:
+			case E_BLOCK_PLANKS:
+			case E_BLOCK_BEDROCK:
+			case E_BLOCK_SAND:
+			case E_BLOCK_GRAVEL:
+			case E_BLOCK_GOLD_ORE:
+			case E_BLOCK_IRON_ORE:
+			case E_BLOCK_COAL_ORE:
+			case E_BLOCK_LOG:
+			case E_BLOCK_SPONGE:
+			case E_BLOCK_LAPIS_ORE:
+			case E_BLOCK_LAPIS_BLOCK:
+			case E_BLOCK_SANDSTONE:
+			case E_BLOCK_WOOL:
+			case E_BLOCK_GOLD_BLOCK:
+			case E_BLOCK_IRON_BLOCK:
+			case E_BLOCK_DOUBLE_STONE_SLAB:
+			case E_BLOCK_BRICK:
+			case E_BLOCK_BOOKCASE:
+			case E_BLOCK_MOSSY_COBBLESTONE:
+			case E_BLOCK_OBSIDIAN:
+			case E_BLOCK_MOB_SPAWNER:
+			case E_BLOCK_DIAMOND_ORE:
+			case E_BLOCK_DIAMOND_BLOCK:
+			case E_BLOCK_CRAFTING_TABLE:
+			case E_BLOCK_REDSTONE_ORE:
+			case E_BLOCK_REDSTONE_ORE_GLOWING:
+			case E_BLOCK_SNOW_BLOCK:
+			case E_BLOCK_CLAY:
+			case E_BLOCK_JUKEBOX:
+			case E_BLOCK_PUMPKIN:
+			case E_BLOCK_NETHERRACK:
+			case E_BLOCK_SOULSAND:
+			case E_BLOCK_JACK_O_LANTERN:
+			case E_BLOCK_LOCKED_CHEST:
+			case E_BLOCK_STONE_BRICKS:
+			case E_BLOCK_MELON:
+			case E_BLOCK_MYCELIUM:
+			case E_BLOCK_NETHER_BRICK:
+			case E_BLOCK_END_STONE:
+			case E_BLOCK_REDSTONE_LAMP_OFF:
+			case E_BLOCK_REDSTONE_LAMP_ON:
+			case E_BLOCK_DOUBLE_WOODEN_SLAB:
+			case E_BLOCK_EMERALD_ORE:
+			case E_BLOCK_ENDER_CHEST:
+			case E_BLOCK_EMERALD_BLOCK:
+			{
+				return true;
+			}
+			
+			case E_BLOCK_GLASS:
+			case E_BLOCK_FENCE:
+			case E_BLOCK_NETHER_BRICK_FENCE:
+			{
+				return (a_Direction == 0x1);  // allow only direction "standing on floor"
+			}
+			
+			default:
+			{
+				return false;
+			}
+		}
+	}
+	
+	
+	static bool TorchCanBePlacedAt(cWorld * a_World, int a_X, int a_Y, int a_Z, char a_Dir)
+	{
+		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
+		// How to propagate that change up?
+		
 		AddDirection( a_X, a_Y, a_Z, a_Dir, true );
-		return a_World->GetBlock( a_X, a_Y, a_Z ) != E_BLOCK_AIR;
+		return CanBePlacedOn(a_World->GetBlock( a_X, a_Y, a_Z ), a_Dir);
 	}
 
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	virtual bool CanBePlacedAt(cWorld * a_World, int a_X, int a_Y, int a_Z, char a_Dir) override
+	{
+		return TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir);
+	}
+
+
+	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		char Dir = cTorch::MetaDataToDirection(a_World->GetBlockMeta( a_X, a_Y, a_Z));
 		return CanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
 };
+
+
+
+
