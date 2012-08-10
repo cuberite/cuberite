@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/03/12 10:35:41.
+** Generated automatically by tolua++-1.0.92 on 08/10/12 20:57:53.
 */
 
 #ifndef __cplusplus
@@ -6461,7 +6461,9 @@ static int tolua_AllToLua_cPlayer_TossItem00(lua_State* tolua_S)
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
      !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6470,11 +6472,13 @@ static int tolua_AllToLua_cPlayer_TossItem00(lua_State* tolua_S)
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
   bool a_bDraggingItem = ((bool)  tolua_toboolean(tolua_S,2,0));
   int a_Amount = ((int)  tolua_tonumber(tolua_S,3,1));
+  int a_CreateType = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_CreateHealth = ((int)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TossItem'", NULL);
 #endif
   {
-   self->TossItem(a_bDraggingItem,a_Amount);
+   self->TossItem(a_bDraggingItem,a_Amount,a_CreateType,a_CreateHealth);
   }
  }
  return 0;
@@ -7880,7 +7884,7 @@ static int tolua_AllToLua_cPlugin_OnChunkGenerating00(lua_State* tolua_S)
 #endif
  {
   cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  cWorld* a_Wordl = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
   int a_ChunkX = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_ChunkZ = ((int)  tolua_tonumber(tolua_S,4,0));
   cLuaChunk* a_pLuaChunk = ((cLuaChunk*)  tolua_tousertype(tolua_S,5,0));
@@ -7888,7 +7892,7 @@ static int tolua_AllToLua_cPlugin_OnChunkGenerating00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnChunkGenerating'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->OnChunkGenerating(a_Wordl,a_ChunkX,a_ChunkZ,a_pLuaChunk);
+   bool tolua_ret = (bool)  self->OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -8433,9 +8437,9 @@ static int tolua_AllToLua_cPlugin_AddCommand00(lua_State* tolua_S)
 #endif
  {
   cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  std::string a_Command = ((std::string)  tolua_tocppstring(tolua_S,2,0));
-  std::string a_Description = ((std::string)  tolua_tocppstring(tolua_S,3,0));
-  std::string a_Permission = ((std::string)  tolua_tocppstring(tolua_S,4,0));
+  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString a_Description = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  const AString a_Permission = ((const AString)  tolua_tocppstring(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddCommand'", NULL);
 #endif
@@ -8618,9 +8622,9 @@ public:
 			return ( void ) cPlugin:: OnChunkGenerated(a_World,a_ChunkX,a_ChunkZ);
 		};
 	};
-	 bool  OnChunkGenerating( cWorld* a_Wordl, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
+	 bool  OnChunkGenerating( cWorld* a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
 		if (push_method("OnChunkGenerating",  tolua_AllToLua_cPlugin_OnChunkGenerating00)) {
-			tolua_pushusertype(lua_state, (void*)a_Wordl, "cWorld");
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
 			tolua_pushnumber(lua_state, (lua_Number)a_ChunkX);
 			tolua_pushnumber(lua_state, (lua_Number)a_ChunkZ);
 			tolua_pushusertype(lua_state, (void*)a_pLuaChunk, "cLuaChunk");
@@ -8629,7 +8633,7 @@ public:
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin:: OnChunkGenerating(a_Wordl,a_ChunkX,a_ChunkZ,a_pLuaChunk);
+			return ( bool ) cPlugin:: OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 		};
 	};
 	 bool  OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
@@ -8776,8 +8780,8 @@ public:
 	 void cPlugin__OnChunkGenerated( cWorld* a_World, int a_ChunkX, int a_ChunkZ) {
 		return ( void )cPlugin::OnChunkGenerated(a_World,a_ChunkX,a_ChunkZ);
 	};
-	 bool cPlugin__OnChunkGenerating( cWorld* a_Wordl, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
-		return ( bool )cPlugin::OnChunkGenerating(a_Wordl,a_ChunkX,a_ChunkZ,a_pLuaChunk);
+	 bool cPlugin__OnChunkGenerating( cWorld* a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
+		return ( bool )cPlugin::OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 	};
 	 bool cPlugin__OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin::OnPreCrafting(a_Player,a_Grid,a_Recipe);
@@ -9344,7 +9348,7 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerating00(lua_State* t
 #endif
  {
   Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  cWorld* a_Wordl = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
+  cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
   int a_ChunkX = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_ChunkZ = ((int)  tolua_tonumber(tolua_S,4,0));
   cLuaChunk* a_pLuaChunk = ((cLuaChunk*)  tolua_tousertype(tolua_S,5,0));
@@ -9352,7 +9356,7 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerating00(lua_State* t
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnChunkGenerating'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cPlugin__OnChunkGenerating(a_Wordl,a_ChunkX,a_ChunkZ,a_pLuaChunk);
+   bool tolua_ret = (bool)  self->cPlugin__OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -10043,9 +10047,9 @@ public:
 			return ( void ) cPlugin_NewLua:: OnChunkGenerated(a_World,a_ChunkX,a_ChunkZ);
 		};
 	};
-	 bool  OnChunkGenerating( cWorld* a_Wordl, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
+	 bool  OnChunkGenerating( cWorld* a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
 		if (push_method("OnChunkGenerating",  tolua_AllToLua_cPlugin_OnChunkGenerating00)) {
-			tolua_pushusertype(lua_state, (void*)a_Wordl, "cWorld");
+			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
 			tolua_pushnumber(lua_state, (lua_Number)a_ChunkX);
 			tolua_pushnumber(lua_state, (lua_Number)a_ChunkZ);
 			tolua_pushusertype(lua_state, (void*)a_pLuaChunk, "cLuaChunk");
@@ -10054,7 +10058,7 @@ public:
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin_NewLua:: OnChunkGenerating(a_Wordl,a_ChunkX,a_ChunkZ,a_pLuaChunk);
+			return ( bool ) cPlugin_NewLua:: OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 		};
 	};
 	 bool  OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
@@ -10204,8 +10208,8 @@ public:
 	 void cPlugin_NewLua__OnChunkGenerated( cWorld* a_World, int a_ChunkX, int a_ChunkZ) {
 		return ( void )cPlugin_NewLua::OnChunkGenerated(a_World,a_ChunkX,a_ChunkZ);
 	};
-	 bool cPlugin_NewLua__OnChunkGenerating( cWorld* a_Wordl, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
-		return ( bool )cPlugin_NewLua::OnChunkGenerating(a_Wordl,a_ChunkX,a_ChunkZ,a_pLuaChunk);
+	 bool cPlugin_NewLua__OnChunkGenerating( cWorld* a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
+		return ( bool )cPlugin_NewLua::OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 	};
 	 bool cPlugin_NewLua__OnPreCrafting( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin_NewLua::OnPreCrafting(a_Player,a_Grid,a_Recipe);

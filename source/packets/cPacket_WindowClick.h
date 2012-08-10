@@ -33,9 +33,9 @@ public:
 	// 9-35		= inventory
 	// 36-44	= Hot bar
 
-	char  m_RightMouse;	// 0		= left 1 = Right mb
-	short m_NumClicks;	// Num clicks
-	bool  m_Bool; // unkown???????????? SHIFT clicked 
+	char  m_RightMouse;  // 0 = Left 1 = Right mb
+	short m_NumClicks;   // Num clicks
+	bool  m_Bool;        // Shift pressed when clicked?
 
 	// Below = item
 	short m_ItemID; // if this is -1 the next stuff dont exist
@@ -43,8 +43,6 @@ public:
 	short m_ItemUses;
 
 	short m_EnchantNums;
-
-	static const unsigned int c_Size = 1 + 1 + 2 + 1 + 2 + 2; // Minimal size ( +1+1  = max)
 };
 
 

@@ -792,38 +792,52 @@ AString cPlayer::GetColor(void) const
 
 
 
-void cPlayer::TossItem( bool a_bDraggingItem, int a_Amount /* = 1 */ )
+void cPlayer::TossItem(
+	bool a_bDraggingItem,
+	int a_Amount /* = 1 */,
+	int a_CreateType /* = 0 */,
+	int a_CreateHealth /* = 0 */ 
+)
 {
 	cItems Drops;
-	if (a_bDraggingItem)
+	if (a_CreateType)
 	{
-		cItem * Item = GetInventory().GetWindow()->GetDraggingItem();
-		if (!Item->IsEmpty())
-		{
-			Drops.push_back(*Item);
-			if( Item->m_ItemCount > a_Amount )
-				Item->m_ItemCount -= (char)a_Amount;
-			else
-				Item->Empty();
-		}
+		// Just create item without touching the inventory (used in creative mode)
+		Drops.push_back(cItem((ENUM_ITEM_ID)a_CreateType, (char)a_Amount, a_CreateHealth));
 	}
 	else
 	{
-		// Else drop equipped item
-		cItem DroppedItem = GetInventory().GetEquippedItem();
-		if (!DroppedItem.IsEmpty())
+		// Drop an item from the inventory:
+		if (a_bDraggingItem)
 		{
-			DroppedItem.m_ItemCount = 1;
-			if (GetInventory().RemoveItem(DroppedItem))
+			cItem * Item = GetInventory().GetWindow()->GetDraggingItem();
+			if (!Item->IsEmpty())
 			{
-				DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
-				Drops.push_back(DroppedItem);
+				Drops.push_back(*Item);
+				if( Item->m_ItemCount > a_Amount )
+					Item->m_ItemCount -= (char)a_Amount;
+				else
+					Item->Empty();
+			}
+		}
+		else
+		{
+			// Else drop equipped item
+			cItem DroppedItem = GetInventory().GetEquippedItem();
+			if (!DroppedItem.IsEmpty())
+			{
+				DroppedItem.m_ItemCount = 1;
+				if (GetInventory().RemoveItem(DroppedItem))
+				{
+					DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
+					Drops.push_back(DroppedItem);
+				}
 			}
 		}
 	}
 	float vX = 0, vY = 0, vZ = 0;
-	EulerToVector( -GetRotation(), GetPitch(), vZ, vX, vY );
-	vY = -vY*2 + 1.f;
+	EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
+	vY = -vY * 2 + 1.f;
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 2, vY * 2, vZ * 2);
 }
 

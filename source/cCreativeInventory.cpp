@@ -28,8 +28,20 @@ void cCreativeInventory::Clicked( cPacket* a_ClickPacket )
 {
 	cPacket_CreativeInventoryAction* Packet = reinterpret_cast<cPacket_CreativeInventoryAction *>(a_ClickPacket);
 	short Slot = Packet->m_Slot;
+	if (Slot == -1)
+	{
+		// object thrown out
+		m_Owner->TossItem(false, Packet->m_Quantity, Packet->m_ItemID, Packet->m_Damage);
+		return;
+	}
+	
+	if ((Slot < c_HotOffset) || (Slot >= c_NumSlots))
+	{
+		LOG("%s: Invalid slot (%d) in CreativeInventoryAction packet. Ignoring...", m_Owner->GetName().c_str(), Slot);
+		return;
+	}
 
-	cItem* SlotItem = &(this->m_Slots[Slot]);
+	cItem * SlotItem = &(this->m_Slots[Slot]);
 
 	SlotItem->m_ItemID = (ENUM_ITEM_ID) Packet->m_ItemID;
 	SlotItem->m_ItemHealth = Packet->m_Damage;
