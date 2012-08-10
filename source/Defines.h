@@ -19,6 +19,20 @@ extern bool g_BlockOneHitDig[];
 
 
 
+enum
+{
+	BLOCK_FACE_BOTTOM = 0,  // Interacting with the bottom   face of the block
+	BLOCK_FACE_TOP    = 1,  // Interacting with the top      face of the block
+	BLOCK_FACE_EAST   = 2,  // Interacting with the eastern  face of the block
+	BLOCK_FACE_WEST   = 3,  // Interacting with the western  face of the block
+	BLOCK_FACE_NORTH  = 4,  // Interacting with the northern face of the block
+	BLOCK_FACE_SOUTH  = 5,  // Interacting with the southern face of the block
+} ;
+
+
+
+
+
 inline bool IsValidBlock( int a_BlockID )	//tolua_export
 {											//tolua_export
 	if( a_BlockID > -1 &&
@@ -94,53 +108,39 @@ inline bool IsBlockTypeOfDirt(char a_BlockID)
 
 inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false )
 {
-	if( !a_bInverse )
+	if (!a_bInverse)
 	{
-		switch( a_Direction )
+		switch (a_Direction)
 		{
-		case 0:
-			a_Y--;
-			break;
-		case 1:
-			a_Y++;
-			break;
-		case 2:
-			a_Z--;
-			break;
-		case 3:
-			a_Z++;
-			break;
-		case 4:
-			a_X--;
-			break;
-		case 5:
-			a_X++;
-			break;
-		};
+			case BLOCK_FACE_BOTTOM: a_Y--; break;
+			case BLOCK_FACE_TOP:    a_Y++; break;
+			case BLOCK_FACE_EAST:   a_Z--; break;
+			case BLOCK_FACE_WEST:   a_Z++; break;
+			case BLOCK_FACE_NORTH:  a_X--; break;
+			case BLOCK_FACE_SOUTH:  a_X++; break;
+			default:
+			{
+				ASSERT(!"Unknown direction");
+				break;
+			}
+		}
 	}
 	else
 	{
 		switch( a_Direction )	// other way around
 		{
-		case 0:
-			a_Y++;
-			break;
-		case 1:
-			a_Y--;
-			break;
-		case 2:
-			a_Z++;
-			break;
-		case 3:
-			a_Z--;
-			break;
-		case 4:
-			a_X++;
-			break;
-		case 5:
-			a_X--;
-			break;
-		};
+			case BLOCK_FACE_BOTTOM: a_Y++; break;
+			case BLOCK_FACE_TOP:    a_Y--; break;
+			case BLOCK_FACE_EAST:   a_Z++; break;
+			case BLOCK_FACE_WEST:   a_Z--; break;
+			case BLOCK_FACE_NORTH:  a_X++; break;
+			case BLOCK_FACE_SOUTH:  a_X--; break;
+			default:
+			{
+				ASSERT(!"Unknown direction");
+				break;
+			}
+		}
 	}
 }
 
