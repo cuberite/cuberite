@@ -1,8 +1,13 @@
+
 #pragma once
 #include "Block.h"
 
 
-class cBlockCactusHandler : public cBlockHandler
+
+
+
+class cBlockCactusHandler :
+	public cBlockHandler
 {
 public:
 	cBlockCactusHandler(BLOCKTYPE a_BlockID)
@@ -10,12 +15,14 @@ public:
 	{
 	}
 
+
 	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{
 		return 0;
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+
+	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		BLOCKTYPE Surface = a_World->GetBlock(a_X, a_Y - 1, a_Z);
 		if ((Surface != E_BLOCK_SAND) && (Surface != E_BLOCK_CACTUS))
@@ -34,13 +41,8 @@ public:
 		{
 			return false;
 		}
-		
-		return true;
-	}
 
-	virtual bool AllowBlockOnTop() override
-	{
-		return false;
+		return true;
 	}
 
 	
@@ -49,3 +51,7 @@ public:
 		return false;
 	}
 };
+
+
+
+

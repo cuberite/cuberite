@@ -1,9 +1,13 @@
+
 #pragma once
 #include "Block.h"
-#include "../MersenneTwister.h"
-#include "../cWorld.h"
 
-class cBlockSugarcaneHandler : public cBlockHandler
+
+
+
+
+class cBlockSugarcaneHandler :
+	public cBlockHandler
 {
 public:
 	cBlockSugarcaneHandler(BLOCKTYPE a_BlockID)
@@ -11,33 +15,52 @@ public:
 	{
 	}
 
+
 	virtual bool NeedsRandomTicks() override
 	{
 		return true;
 	}
+
 
 	virtual int GetDropID() override
 	{
 		return E_ITEM_SUGARCANE;
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+
+	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
-		 BLOCKTYPE Block = a_World->GetBlock(a_X, a_Y-1, a_Z);
-		 if(!IsBlockTypeOfDirt(Block) && Block != E_BLOCK_SAND && Block != E_BLOCK_SUGARCANE)
-			 return false;
-		 
-		return a_World->IsBlockDirectlyWatered(a_X, a_Y - 1, a_Z);
+		switch (a_World->GetBlock(a_X, a_Y - 1, a_Z))
+		{
+			case E_BLOCK_DIRT:
+			case E_BLOCK_GRASS:
+			case E_BLOCK_FARMLAND:
+			case E_BLOCK_SAND:
+			{
+				return a_World->IsBlockDirectlyWatered(a_X, a_Y - 1, a_Z);
+			}
+			case E_BLOCK_SUGARCANE:
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	
+	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
-
 		//TODO: Handle Growing here
 	}
+	
 
 	virtual bool CanBePlacedOnSide() override
 	{
 		return false;
 	}
+	
 };
+
+
+
+
