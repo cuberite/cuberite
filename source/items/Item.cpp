@@ -245,6 +245,21 @@ char cItemHandler::GetMaxStackSize(void)
 		return 64;
 	}
 	
+	switch (m_ItemID)
+	{
+		case E_ITEM_APPLE:          return 64;
+		case E_ITEM_ARROW:          return 64;
+		case E_ITEM_BLAZE_POWDER:   return 64;
+		case E_ITEM_BLAZE_ROD:      return 64;
+		case E_ITEM_BONE:           return 64;
+		case E_ITEM_BOOK:           return 64;
+		case E_ITEM_BOWL:           return 64;
+		case E_ITEM_BREAD:          return 64;
+		case E_ITEM_BROWN_MUSHROOM: return 64;
+		case E_ITEM_BUCKET:         return 1;  // TODO: change this to 16 when turning compatibility to 1.3
+		case E_ITEM_COAL:           return 64;
+		case E_ITEM_DIAMOND:        return 64;
+	}
 	// By default items don't stack:
 	return 1;
 }
