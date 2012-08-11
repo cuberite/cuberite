@@ -14,6 +14,8 @@
 #include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_InventorySlot.h"
 
+#include "items/Item.h"
+
 
 
 
@@ -46,10 +48,11 @@ cInventory::cInventory(cPlayer* a_Owner)
 	m_EquippedItem = new cItem();
 	m_EquippedSlot = 0;
 
-	if( !GetWindow() )
+	if (GetWindow() == NULL)
 	{
-		cWindow* Window = new cWindow( this, false, cWindow::Inventory, 0);
+		cWindow * Window = new cWindow( this, false, cWindow::Inventory, 0);
 		Window->SetSlots(m_Slots, c_NumSlots);
+		Window->Open(*a_Owner);
 		OpenWindow(Window);
 	}
 }
@@ -180,6 +183,7 @@ cItem * cInventory::GetSlotsForType( int a_Type )
 
 
 
+/*
 int cInventory::GetSlotCountForType( int a_Type )
 {
 	switch (a_Type)
@@ -192,6 +196,7 @@ int cInventory::GetSlotCountForType( int a_Type )
 	}
 	return 0;
 }
+*/
 
 
 
@@ -249,10 +254,37 @@ cItem & cInventory::GetEquippedItem()
 
 
 
-void cInventory::SendWholeInventory( cClientHandle* a_Client )
+void cInventory::SendWholeInventory(cClientHandle * a_Client)
 {
-	cPacket_WholeInventory Inventory( this );
-	a_Client->Send( Inventory );
+	cPacket_WholeInventory Inventory(this);
+	a_Client->Send(Inventory);
+}
+
+
+
+
+
+void cInventory::SendWholeInventoryToAll(void)
+{
+	cWindow * Window = GetWindow();
+	if (Window == NULL)
+	{
+		return;
+	}
+	
+	class cSender :
+		public cItemCallback<cClientHandle>
+	{
+		cInventory * m_Inventory;
+	public:
+		cSender(cInventory * a_Inventory) : m_Inventory(a_Inventory) {}
+		virtual bool Item(cClientHandle * a_Client) override
+		{
+			m_Inventory->SendWholeInventory(a_Client);
+			return false;
+		}
+	} Sender(this);
+	Window->ForEachClient(Sender);
 }
 
 
@@ -262,8 +294,12 @@ void cInventory::SendWholeInventory( cClientHandle* a_Client )
 void cInventory::SendSlot( int a_SlotNum )
 {
 	cItem* Item = GetSlot( a_SlotNum );
-	if( Item )
+	if (Item != NULL)
 	{
+		if (Item->IsEmpty())
+		{
+			Item->Empty();
+		}
 		cPacket_InventorySlot InventorySlot;
 		InventorySlot.m_ItemCount = Item->m_ItemCount;
 		InventorySlot.m_ItemID = (short) Item->m_ItemID;
@@ -272,6 +308,62 @@ void cInventory::SendSlot( int a_SlotNum )
 		InventorySlot.m_WindowID = 0; // Inventory window ID
 		m_Owner->GetClientHandle()->Send( InventorySlot );
 	}
+}
+
+
+
+
+
+int cInventory::HowManyCanFit(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot)
+{
+	int res = 0;
+	for (int i = a_BeginSlot; i <= a_EndSlot; i++)
+	{
+		if (
+			m_Slots[i].IsEmpty() ||
+			((m_Slots[i].m_ItemID == a_ItemType) && (m_Slots[i].m_ItemHealth == a_ItemDamage))
+		)
+		{
+			int MaxCount = ItemHandler(a_ItemType)->GetMaxStackSize();
+			ASSERT(m_Slots[i].m_ItemCount <= MaxCount);
+			res += MaxCount - m_Slots[i].m_ItemCount;
+		}
+	}  // for i - m_Slots[]
+	return res;
+}
+
+
+
+
+
+int cInventory::MoveItem(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_Count, int a_BeginSlot, int a_EndSlot)
+{
+	int res = 0;
+	for (int i = a_BeginSlot; i <= a_EndSlot; i++)
+	{
+		if (
+			m_Slots[i].IsEmpty() ||
+			((m_Slots[i].m_ItemID == a_ItemType) && (m_Slots[i].m_ItemHealth == a_ItemDamage))
+		)
+		{
+			int MaxCount = ItemHandler(a_ItemType)->GetMaxStackSize();
+			ASSERT(m_Slots[i].m_ItemCount <= MaxCount);
+			int NumToMove = std::min(a_Count, MaxCount);
+			m_Slots[i].m_ItemCount += NumToMove;
+			m_Slots[i].m_ItemHealth = a_ItemDamage;
+			m_Slots[i].m_ItemID = a_ItemType;
+			SendSlot(i);
+			res += NumToMove;
+			a_Count -= NumToMove;
+			if (a_Count <= 0)
+			{
+				// No more items to distribute
+				return res;
+			}
+		}
+	}  // for i - m_Slots[]
+	// No more space to distribute to
+	return res;
 }
 
 

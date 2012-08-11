@@ -86,36 +86,42 @@ cItem* cWindow::GetDraggingItem( cPlayer * a_Player /* = 0 */ )
 
 void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 {
-	if( a_ClickPacket->m_WindowID != m_WindowID )
+	if (a_ClickPacket->m_WindowID != m_WindowID)
 	{
 		LOG("WRONG WINDOW ID! (exp %d, got %d)", m_WindowID, a_ClickPacket->m_WindowID);
 		return;
 	}
 
-	if( m_bInventoryVisible )
+	if (m_bInventoryVisible)
 	{
-		cWindow* Window = a_Player.GetInventory().GetWindow();
-		if( Window )
+		cWindow * Window = a_Player.GetInventory().GetWindow();
+		if (Window != NULL)
 		{
 			m_DraggingItem = Window->GetDraggingItem();
 		}
 	}
 	bool bAsync = false;
-	if( a_ClickPacket->m_SlotNum == -999 ) // Outside window click
+	if (a_ClickPacket->m_SlotNum == -999) // Outside window click
 	{
-		if( a_ClickPacket->m_RightMouse )
-			a_Player.TossItem( true );
-		else
-			a_Player.TossItem( true, m_DraggingItem->m_ItemCount );
-	}
-	else if( GetSlot( a_ClickPacket->m_SlotNum ) != 0 )
-	{
-		cItem* Item = GetSlot( a_ClickPacket->m_SlotNum );
-		if( a_ClickPacket->m_ItemID != Item->m_ItemID
-			|| a_ClickPacket->m_ItemCount != Item->m_ItemCount
-			|| a_ClickPacket->m_ItemUses != Item->m_ItemHealth )
+		if (a_ClickPacket->m_RightMouse)
 		{
-			if( !((a_ClickPacket->m_ItemID == -1 || a_ClickPacket->m_ItemID == 0) && (Item->m_ItemID == -1 || Item->m_ItemID == 0 )) )
+			a_Player.TossItem( true );
+		}
+		else
+		{
+			a_Player.TossItem( true, m_DraggingItem->m_ItemCount );
+		}
+	}
+	else if (GetSlot(a_ClickPacket->m_SlotNum) != NULL)
+	{
+		cItem * Item = GetSlot(a_ClickPacket->m_SlotNum);
+		if (
+			(a_ClickPacket->m_ItemID    != Item->m_ItemID) ||
+			(a_ClickPacket->m_ItemCount != Item->m_ItemCount) ||
+			(a_ClickPacket->m_ItemUses  != Item->m_ItemHealth)
+		)
+		{
+			if (!((a_ClickPacket->m_ItemID == -1 || a_ClickPacket->m_ItemID == 0) && (Item->m_ItemID == -1 || Item->m_ItemID == 0 )) )
 			{
 				LOGD("My ID: %i Their ID: %i", Item->m_ItemID, a_ClickPacket->m_ItemID );
 				LOGD("My Count: %i Their Count: %i", Item->m_ItemCount, a_ClickPacket->m_ItemCount );
@@ -124,13 +130,13 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 			}
 		}
 	}
-	if( m_DraggingItem && a_ClickPacket->m_SlotNum > -1 && a_ClickPacket->m_SlotNum < m_NumSlots )
+	if (m_DraggingItem && (a_ClickPacket->m_SlotNum > -1) && (a_ClickPacket->m_SlotNum < m_NumSlots))
 	{
-		if( a_ClickPacket->m_RightMouse == 0 )
+		if (a_ClickPacket->m_RightMouse == 0)
 		{
-			if( !m_DraggingItem->Equals( m_Slots[a_ClickPacket->m_SlotNum] ) )
+			if (!m_DraggingItem->Equals(m_Slots[a_ClickPacket->m_SlotNum]))
 			{
-				cItem tmp( *m_DraggingItem );
+				cItem tmp(*m_DraggingItem);
 				*m_DraggingItem = m_Slots[a_ClickPacket->m_SlotNum];
 				m_Slots[a_ClickPacket->m_SlotNum] = tmp; // Switch contents
 			}
@@ -277,6 +283,40 @@ void cWindow::OwnerDestroyed()
 		(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
 	}
 	(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
+}
+
+
+
+
+
+bool cWindow::ForEachPlayer(cItemCallback<cPlayer> & a_Callback)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	{
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_OpenedBy[]
+	return true;
+}
+
+
+
+
+
+bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	{
+		if (a_Callback.Item((*itr)->GetClientHandle()))
+		{
+			return false;
+		}
+	}  // for itr - m_OpenedBy[]
+	return true;
 }
 
 

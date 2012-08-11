@@ -78,7 +78,13 @@ public:
 	const AString & GetWindowTitle() const { return m_WindowTitle; }
 	void SetWindowTitle( const std::string & a_WindowTitle ) { m_WindowTitle = a_WindowTitle; }
 
-	void OwnerDestroyed();
+	void OwnerDestroyed(void);
+	
+	/// Calls the callback safely for each player that has this window open; returns true if all players have been enumerated
+	bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback);
+
+	/// Calls the callback safely for each client that has this window open; returns true if all clients have been enumerated
+	bool ForEachClient(cItemCallback<cClientHandle> & a_Callback);
 	
 private:
 

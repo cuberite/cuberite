@@ -12,13 +12,11 @@
 int cPacket_WindowClick::Parse(const char * a_Data, int a_Size)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadByte,  m_WindowID, TotalBytes);
-	HANDLE_PACKET_READ(ReadShort, m_SlotNum, TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,  m_RightMouse, TotalBytes);
-	HANDLE_PACKET_READ(ReadShort, m_NumClicks, TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,  m_Bool, TotalBytes);
-
-	// LOG("WindowClick: WindowID: %i; FromSlot: %i; Right/Le: %i; NumClick: %i", m_Type, m_SlotNum, m_RightMouse, m_NumClicks );
+	HANDLE_PACKET_READ(ReadByte,  m_WindowID,       TotalBytes);
+	HANDLE_PACKET_READ(ReadShort, m_SlotNum,        TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,  m_RightMouse,     TotalBytes);
+	HANDLE_PACKET_READ(ReadShort, m_NumClicks,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,  m_IsShiftPressed, TotalBytes);
 
 	cPacket_ItemData Item;
 

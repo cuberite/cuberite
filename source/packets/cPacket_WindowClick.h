@@ -15,7 +15,7 @@ public:
 		, m_SlotNum( 0 )
 		, m_RightMouse( 0 )
 		, m_NumClicks( 0 )
-		, m_Bool( false )
+		, m_IsShiftPressed( false )
 		, m_ItemID( 0 )
 		, m_ItemCount( 0 )
 		, m_ItemUses( 0 )
@@ -33,9 +33,9 @@ public:
 	// 9-35		= inventory
 	// 36-44	= Hot bar
 
-	char  m_RightMouse;  // 0 = Left 1 = Right mb
-	short m_NumClicks;   // Num clicks
-	bool  m_Bool;        // Shift pressed when clicked?
+	char  m_RightMouse;      // 0 = Left 1 = Right mb
+	short m_NumClicks;       // Num clicks
+	bool  m_IsShiftPressed;  // Shift pressed when clicked?
 
 	// Below = item
 	short m_ItemID; // if this is -1 the next stuff dont exist
