@@ -3,7 +3,6 @@
 
 #include "cBlockEntity.h"
 #include "cWindowOwner.h"
-#include "FileDefine.h"
 #include "cItem.h"
 
 
@@ -17,6 +16,7 @@ namespace Json
 
 class cClientHandle;
 class cServer;
+
 
 
 
