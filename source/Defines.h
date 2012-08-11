@@ -275,6 +275,58 @@ namespace ItemCategory
 			|| IsHoe    ( a_ItemID )
 			|| IsShovel ( a_ItemID );
 	}
+	
+	
+	
+	inline bool IsHelmet(ENUM_ITEM_ID a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_LEATHER_CAP) ||
+			(a_ItemType == E_ITEM_GOLD_HELMET) ||
+			(a_ItemType == E_ITEM_CHAIN_HELMET) ||
+			(a_ItemType == E_ITEM_IRON_HELMET) ||
+			(a_ItemType == E_ITEM_DIAMOND_HELMET)
+		);
+	}
+
+
+
+	inline bool IsChestPlate(ENUM_ITEM_ID a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
+			(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
+			(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
+			(a_ItemType == E_ITEM_IRON_CHESTPLATE) ||
+			(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
+		);
+	}
+
+
+
+	inline bool IsLeggings(ENUM_ITEM_ID a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_LEATHER_PANTS) ||
+			(a_ItemType == E_ITEM_GOLD_LEGGINGS) ||
+			(a_ItemType == E_ITEM_CHAIN_LEGGINGS) ||
+			(a_ItemType == E_ITEM_IRON_LEGGINGS) ||
+			(a_ItemType == E_ITEM_DIAMOND_LEGGINGS)
+		);
+	}
+
+
+
+	inline bool IsBoots(ENUM_ITEM_ID a_ItemType)
+	{
+		return (
+			(a_ItemType == E_ITEM_LEATHER_BOOTS) ||
+			(a_ItemType == E_ITEM_GOLD_BOOTS) ||
+			(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
+			(a_ItemType == E_ITEM_IRON_BOOTS) ||
+			(a_ItemType == E_ITEM_DIAMOND_BOOTS)
+		);
+	}
 }
 //tolua_end
 
