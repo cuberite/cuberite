@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/10/12 20:57:53.
+** Generated automatically by tolua++-1.0.92 on 08/11/12 21:48:17.
 */
 
 #ifndef __cplusplus
@@ -3060,6 +3060,122 @@ static int tolua_AllToLua_ItemCategory_IsTool00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsTool'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsHelmet */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsHelmet00
+static int tolua_AllToLua_ItemCategory_IsHelmet00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsHelmet(a_ItemType);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsHelmet'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsChestPlate */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsChestPlate00
+static int tolua_AllToLua_ItemCategory_IsChestPlate00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsChestPlate(a_ItemType);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsChestPlate'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsLeggings */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsLeggings00
+static int tolua_AllToLua_ItemCategory_IsLeggings00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsLeggings(a_ItemType);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsLeggings'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemCategory::IsBoots */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemCategory_IsBoots00
+static int tolua_AllToLua_ItemCategory_IsBoots00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   bool tolua_ret = (bool)  ItemCategory::IsBoots(a_ItemType);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsBoots'.",&tolua_err);
  return 0;
 #endif
 }
@@ -21663,6 +21779,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_WOOL_GREEN",E_META_WOOL_GREEN);
   tolua_constant(tolua_S,"E_META_WOOL_RED",E_META_WOOL_RED);
   tolua_constant(tolua_S,"E_META_WOOL_BLACK",E_META_WOOL_BLACK);
+  tolua_constant(tolua_S,"E_META_TORCH_EAST",E_META_TORCH_EAST);
+  tolua_constant(tolua_S,"E_META_TORCH_WEST",E_META_TORCH_WEST);
+  tolua_constant(tolua_S,"E_META_TORCH_SOUTH",E_META_TORCH_SOUTH);
+  tolua_constant(tolua_S,"E_META_TORCH_NORTH",E_META_TORCH_NORTH);
+  tolua_constant(tolua_S,"E_META_TORCH_FLOOR",E_META_TORCH_FLOOR);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE",E_META_DOUBLE_STEP_STONE);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_SANDSTONE",E_META_DOUBLE_STEP_SANDSTONE);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_WOODEN",E_META_DOUBLE_STEP_WOODEN);
@@ -21808,6 +21929,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsHoe",tolua_AllToLua_ItemCategory_IsHoe00);
    tolua_function(tolua_S,"IsShovel",tolua_AllToLua_ItemCategory_IsShovel00);
    tolua_function(tolua_S,"IsTool",tolua_AllToLua_ItemCategory_IsTool00);
+   tolua_function(tolua_S,"IsHelmet",tolua_AllToLua_ItemCategory_IsHelmet00);
+   tolua_function(tolua_S,"IsChestPlate",tolua_AllToLua_ItemCategory_IsChestPlate00);
+   tolua_function(tolua_S,"IsLeggings",tolua_AllToLua_ItemCategory_IsLeggings00);
+   tolua_function(tolua_S,"IsBoots",tolua_AllToLua_ItemCategory_IsBoots00);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"eGameMode_NotSet",eGameMode_NotSet);
   tolua_constant(tolua_S,"eGameMode_Survival",eGameMode_Survival);
