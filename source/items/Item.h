@@ -1,8 +1,17 @@
+
 #pragma once
 #include "../Defines.h"
 
+
+
+
+
+// fwd:
 class cWorld;
 class cPlayer;
+
+
+
 
 
 class cItemHandler
@@ -13,6 +22,9 @@ public:
 	virtual bool OnDiggingBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);
 	virtual void OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z);
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
+	
+	/// Returns the maximum stack size for a given item
+	virtual char GetMaxStackSize(void);
 
 	struct FoodInfo
 	{

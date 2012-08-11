@@ -237,6 +237,22 @@ void cItemHandler::OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item
 
 
 
+char cItemHandler::GetMaxStackSize(void)
+{
+	if (m_ItemID < 256)
+	{
+		// All blocks can stack up to 64
+		return 64;
+	}
+	
+	// By default items don't stack:
+	return 1;
+}
+
+
+
+
+
 bool cItemHandler::IsTool()
 {
 	return 
