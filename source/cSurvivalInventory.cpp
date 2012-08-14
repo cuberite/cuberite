@@ -151,7 +151,42 @@ void cSurvivalInventory::ShiftClicked(cPacket_WindowClick * a_ClickPacket)
 
 void cSurvivalInventory::ShiftClickedCraftingResult(short a_Slot)
 {
-	// TODO
+	// Craft until either the recipe changes (due to ingredients) or there's not enough storage for the result
+	cItem * CraftingResult = GetSlot(SLOT_CRAFTING_RESULT);
+	if ((CraftingResult == NULL) || CraftingResult->IsEmpty())
+	{
+		return;
+	}
+	cItem ResultCopy = *CraftingResult;
+	int HowManyItemsWillFit = HowManyCanFit(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, SLOT_INVENTORY_MIN, SLOT_INVENTORY_MAX);
+	HowManyItemsWillFit += HowManyCanFit(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, SLOT_HOTBAR_MIN, SLOT_HOTBAR_MAX);
+	int HowManyPassesWillFit = HowManyItemsWillFit / CraftingResult->m_ItemCount;
+	for (int i = 0; i < HowManyPassesWillFit; i++)
+	{
+		// First try moving into the hotbar:
+		int NumMoved = MoveItem(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, CraftingResult->m_ItemCount, SLOT_HOTBAR_MIN, SLOT_HOTBAR_MAX);
+		
+		// If something didn't fit, move into main inventory:
+		if (NumMoved < CraftingResult->m_ItemCount)
+		{
+			MoveItem(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, CraftingResult->m_ItemCount - NumMoved, SLOT_INVENTORY_MIN, SLOT_INVENTORY_MAX);
+		}
+		
+		// "Use" the crafting recipe once:
+		cCraftingGrid   Grid(m_Slots + SLOT_CRAFTING_MIN, 2, 2);
+		cCraftingRecipe Recipe(Grid);
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(m_Owner, Grid, Recipe);
+		Recipe.ConsumeIngredients(Grid);
+		Grid.CopyToItems(m_Slots + c_CraftOffset + 1);
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(m_Owner, Grid, Recipe);
+		m_Slots[SLOT_CRAFTING_RESULT] = Recipe.GetResult();
+		
+		// If the recipe changed, abort:
+		if (!Recipe.GetResult().Equals(ResultCopy))
+		{
+			break;
+		}
+	}
 }
 
 

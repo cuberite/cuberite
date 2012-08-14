@@ -348,7 +348,7 @@ int cInventory::MoveItem(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_Coun
 		{
 			int MaxCount = ItemHandler(a_ItemType)->GetMaxStackSize();
 			ASSERT(m_Slots[i].m_ItemCount <= MaxCount);
-			int NumToMove = std::min(a_Count, MaxCount);
+			int NumToMove = std::min(a_Count, MaxCount - m_Slots[i].m_ItemCount);
 			m_Slots[i].m_ItemCount += NumToMove;
 			m_Slots[i].m_ItemHealth = a_ItemDamage;
 			m_Slots[i].m_ItemID = a_ItemType;
