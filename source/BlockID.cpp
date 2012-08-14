@@ -18,7 +18,7 @@ bool       g_BlockTransparent[256];
 bool       g_BlockOneHitDig[256];
 bool       g_BlockPistonBreakable[256];
 bool       g_BlockIsSnowable[256];
-bool	   g_BlockRequiresSpecialTool[256];
+bool       g_BlockRequiresSpecialTool[256];
 
 
 
@@ -169,13 +169,13 @@ class cBlockPropertiesInitializer
 public:
 	cBlockPropertiesInitializer(void)
 	{
-		memset( g_BlockLightValue,         0x00, sizeof( g_BlockLightValue ) );
-		memset( g_BlockSpreadLightFalloff, 0x0f, sizeof( g_BlockSpreadLightFalloff ) ); // 0x0f means total falloff
-		memset( g_BlockTransparent,        0x00, sizeof( g_BlockTransparent ) );
-		memset( g_BlockOneHitDig,          0x00, sizeof( g_BlockOneHitDig ) );
-		memset( g_BlockPistonBreakable,    0x00, sizeof( g_BlockPistonBreakable ) );
-		memset( g_BlockIsSnowable,         0xff, sizeof( g_BlockIsSnowable));  // Set all blocks' snowable to true
-		memset( g_BlockRequiresSpecialTool,     false, sizeof( g_BlockRequiresSpecialTool));
+		memset(g_BlockLightValue,          0x00, sizeof(g_BlockLightValue));
+		memset(g_BlockSpreadLightFalloff,  0x0f, sizeof(g_BlockSpreadLightFalloff)); // 0x0f means total falloff
+		memset(g_BlockTransparent,         0x00, sizeof(g_BlockTransparent));
+		memset(g_BlockOneHitDig,           0x00, sizeof(g_BlockOneHitDig));
+		memset(g_BlockPistonBreakable,     0x00, sizeof(g_BlockPistonBreakable));
+		memset(g_BlockIsSnowable,          0xff, sizeof(g_BlockIsSnowable));  // Set all blocks' snowable to true
+		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
 
 		// Emissive blocks
 		g_BlockLightValue[E_BLOCK_FIRE]                 = 15;
@@ -224,6 +224,7 @@ public:
 		g_BlockTransparent[E_BLOCK_AIR]            = true;
 		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM] = true;
 		g_BlockTransparent[E_BLOCK_CHEST]          = true;
+		g_BlockTransparent[E_BLOCK_COBWEB]         = true;
 		g_BlockTransparent[E_BLOCK_CROPS]          = true;
 		g_BlockTransparent[E_BLOCK_FIRE]           = true;
 		g_BlockTransparent[E_BLOCK_GLASS]          = true;
