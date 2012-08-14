@@ -23,10 +23,10 @@ enum
 {
 	BLOCK_FACE_BOTTOM = 0,  // Interacting with the bottom   face of the block
 	BLOCK_FACE_TOP    = 1,  // Interacting with the top      face of the block
-	BLOCK_FACE_EAST   = 2,  // Interacting with the eastern  face of the block
-	BLOCK_FACE_WEST   = 3,  // Interacting with the western  face of the block
-	BLOCK_FACE_NORTH  = 4,  // Interacting with the northern face of the block
-	BLOCK_FACE_SOUTH  = 5,  // Interacting with the southern face of the block
+	BLOCK_FACE_NORTH  = 2,  // Interacting with the northern face of the block
+	BLOCK_FACE_SOUTH  = 3,  // Interacting with the southern face of the block
+	BLOCK_FACE_EAST   = 5,  // Interacting with the eastern  face of the block
+	BLOCK_FACE_WEST   = 4,  // Interacting with the western  face of the block
 } ;
 
 
@@ -114,10 +114,10 @@ inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, boo
 		{
 			case BLOCK_FACE_BOTTOM: a_Y--; break;
 			case BLOCK_FACE_TOP:    a_Y++; break;
-			case BLOCK_FACE_EAST:   a_Z--; break;
-			case BLOCK_FACE_WEST:   a_Z++; break;
-			case BLOCK_FACE_NORTH:  a_X--; break;
-			case BLOCK_FACE_SOUTH:  a_X++; break;
+			case BLOCK_FACE_EAST:   a_X++; break;
+			case BLOCK_FACE_WEST:   a_X--; break;
+			case BLOCK_FACE_NORTH:  a_Z--; break;
+			case BLOCK_FACE_SOUTH:  a_Z++; break;
 			default:
 			{
 				ASSERT(!"Unknown direction");
@@ -131,10 +131,10 @@ inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, boo
 		{
 			case BLOCK_FACE_BOTTOM: a_Y++; break;
 			case BLOCK_FACE_TOP:    a_Y--; break;
-			case BLOCK_FACE_EAST:   a_Z++; break;
-			case BLOCK_FACE_WEST:   a_Z--; break;
-			case BLOCK_FACE_NORTH:  a_X++; break;
-			case BLOCK_FACE_SOUTH:  a_X--; break;
+			case BLOCK_FACE_EAST:   a_X--; break;
+			case BLOCK_FACE_WEST:   a_X++; break;
+			case BLOCK_FACE_NORTH:  a_Z++; break;
+			case BLOCK_FACE_SOUTH:  a_Z--; break;
 			default:
 			{
 				ASSERT(!"Unknown direction");

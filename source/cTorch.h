@@ -35,6 +35,7 @@ public:
 	{														//tolua_export
 		switch (a_MetaData)
 		{
+			case 0:                  return BLOCK_FACE_TOP;  // by default, the torches stand on the ground
 			case E_META_TORCH_FLOOR: return BLOCK_FACE_TOP;
 			case E_META_TORCH_EAST:  return BLOCK_FACE_EAST;
 			case E_META_TORCH_WEST:  return BLOCK_FACE_WEST;
