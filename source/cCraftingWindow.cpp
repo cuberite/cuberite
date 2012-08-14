@@ -32,8 +32,19 @@ cCraftingWindow::cCraftingWindow( cWindowOwner* a_Owner, bool a_bInventoryVisibl
 void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 {
 	bool bDontCook = false;
+	
+	cItem * DraggingItem = GetDraggingItem(&a_Player);
+	if (
+		a_ClickPacket->m_IsShiftPressed && 
+		((DraggingItem == NULL) || DraggingItem->IsEmpty())
+	)
+	{
+		ShiftClicked(a_ClickPacket, a_Player);
+		return;
+	}
+	
 	// Override for craft result slot
-	if( a_ClickPacket->m_SlotNum == 0 )
+	if (a_ClickPacket->m_SlotNum == 0)
 	{
 		LOG("In craft slot: %i x %i !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
 		cItem* DraggingItem = GetDraggingItem( &a_Player );
@@ -121,6 +132,72 @@ void cCraftingWindow::Close(cPlayer & a_Player)
 	vY = -vY*2 + 1.f;
 	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 2, vY * 2, vZ * 2);
 	cWindow::Close(a_Player);
+}
+
+
+
+
+
+void cCraftingWindow::ShiftClicked(cPacket_WindowClick * a_ClickPacket, cPlayer & a_Player)
+{
+	short Slot = a_ClickPacket->m_SlotNum;
+	if (Slot == SLOT_CRAFTING_RESULT)
+	{
+		ShiftClickedCraftingResult(Slot, a_Player);
+	}
+	else if ((Slot >= SLOT_CRAFTING_MIN) && (Slot <= SLOT_CRAFTING_MAX))
+	{
+		ShiftClickedCraftingGrid(Slot, a_Player);
+	}
+	else
+	{
+		// No need to handle inventory shift-click, it is handled by the underlying cSurvivalInventory, surprise surprise ;)
+	}
+	SendWholeWindow(a_Player.GetClientHandle());
+}
+
+
+
+
+
+void cCraftingWindow::ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Player)
+{
+	// TODO
+}
+
+
+
+
+
+void cCraftingWindow::ShiftClickedCraftingGrid(short a_Slot, cPlayer & a_Player)
+{
+	enum
+	{
+		SLOT_INVENTORY_MIN = 9,
+		SLOT_INVENTORY_MAX = 35,
+		SLOT_HOTBAR_MIN    = 36,
+		SLOT_HOTBAR_MAX    = 44
+	} ;
+	
+	cInventory & Inventory = a_Player.GetInventory();
+	cItem * Item = GetSlot(a_Slot);
+	if ((Item == NULL) || Item->IsEmpty())
+	{
+		return;
+	}
+	
+	// First try the main inventory:
+	Item->m_ItemCount -= Inventory.MoveItem(Item->m_ItemID, Item->m_ItemHealth, Item->m_ItemCount, SLOT_INVENTORY_MIN, SLOT_INVENTORY_MAX);
+	
+	// If anything left, try the hotbar:
+	if (Item->m_ItemCount > 0)
+	{
+		Item->m_ItemCount -= Inventory.MoveItem(Item->m_ItemID, Item->m_ItemHealth, Item->m_ItemCount, SLOT_HOTBAR_MIN, SLOT_HOTBAR_MAX);
+	}
+	if (Item->m_ItemCount == 0)
+	{
+		Item->Empty();
+	}
 }
 
 
