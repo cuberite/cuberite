@@ -18,6 +18,21 @@
 
 
 
+/* These numbers are valid for the underlying cInventory object, because that's where we're sending the 
+MoveItem() and HowManyCanFit() function calls
+*/
+enum
+{
+	SLOT_INVENTORY_MIN = 9,
+	SLOT_INVENTORY_MAX = 35,
+	SLOT_HOTBAR_MIN    = 36,
+	SLOT_HOTBAR_MAX    = 44
+} ;
+
+
+
+
+
 cCraftingWindow::cCraftingWindow( cWindowOwner* a_Owner, bool a_bInventoryVisible )
 	 : cWindow(a_Owner, a_bInventoryVisible, cWindow::Workbench, 1)
 {
@@ -162,7 +177,44 @@ void cCraftingWindow::ShiftClicked(cPacket_WindowClick * a_ClickPacket, cPlayer 
 
 void cCraftingWindow::ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Player)
 {
-	// TODO
+	// Craft until either the recipe changes (due to ingredients) or there's not enough storage for the result
+	cInventory & Inventory = a_Player.GetInventory();
+	cItem * CraftingResult = GetSlot(SLOT_CRAFTING_RESULT);
+	if ((CraftingResult == NULL) || CraftingResult->IsEmpty())
+	{
+		return;
+	}
+	cItem ResultCopy = *CraftingResult;
+	int HowManyItemsWillFit = Inventory.HowManyCanFit(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, SLOT_INVENTORY_MIN, SLOT_INVENTORY_MAX);
+	HowManyItemsWillFit += Inventory.HowManyCanFit(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, SLOT_HOTBAR_MIN, SLOT_HOTBAR_MAX);
+	int HowManyPassesWillFit = HowManyItemsWillFit / CraftingResult->m_ItemCount;
+	for (int i = 0; i < HowManyPassesWillFit; i++)
+	{
+		// First try moving into the hotbar:
+		int NumMoved = Inventory.MoveItem(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, CraftingResult->m_ItemCount, SLOT_HOTBAR_MIN, SLOT_HOTBAR_MAX);
+		
+		// If something didn't fit, move into main inventory:
+		if (NumMoved < CraftingResult->m_ItemCount)
+		{
+			NumMoved += Inventory.MoveItem(CraftingResult->m_ItemID, CraftingResult->m_ItemHealth, CraftingResult->m_ItemCount - NumMoved, SLOT_INVENTORY_MIN, SLOT_INVENTORY_MAX);
+			ASSERT(NumMoved == CraftingResult->m_ItemCount);  // We checked earlier that we can fit this many items
+		}
+		
+		// "Use" the crafting recipe once:
+		cCraftingGrid   Grid(GetSlots() + 1, 3, 3);
+		cCraftingRecipe Recipe(Grid);
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+		Recipe.ConsumeIngredients(Grid);
+		Grid.CopyToItems(GetSlots() + 1);
+		cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+		GetSlots()[SLOT_CRAFTING_RESULT] = Recipe.GetResult();
+		
+		// If the recipe changed, abort:
+		if (!Recipe.GetResult().Equals(ResultCopy))
+		{
+			break;
+		}
+	}
 }
 
 
@@ -171,14 +223,6 @@ void cCraftingWindow::ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Playe
 
 void cCraftingWindow::ShiftClickedCraftingGrid(short a_Slot, cPlayer & a_Player)
 {
-	enum
-	{
-		SLOT_INVENTORY_MIN = 9,
-		SLOT_INVENTORY_MAX = 35,
-		SLOT_HOTBAR_MIN    = 36,
-		SLOT_HOTBAR_MAX    = 44
-	} ;
-	
 	cInventory & Inventory = a_Player.GetInventory();
 	cItem * Item = GetSlot(a_Slot);
 	if ((Item == NULL) || Item->IsEmpty())
