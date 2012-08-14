@@ -247,18 +247,31 @@ char cItemHandler::GetMaxStackSize(void)
 	
 	switch (m_ItemID)
 	{
-		case E_ITEM_APPLE:          return 64;
-		case E_ITEM_ARROW:          return 64;
-		case E_ITEM_BLAZE_POWDER:   return 64;
-		case E_ITEM_BLAZE_ROD:      return 64;
-		case E_ITEM_BONE:           return 64;
-		case E_ITEM_BOOK:           return 64;
-		case E_ITEM_BOWL:           return 64;
-		case E_ITEM_BREAD:          return 64;
-		case E_ITEM_BROWN_MUSHROOM: return 64;
-		case E_ITEM_BUCKET:         return 1;  // TODO: change this to 16 when turning compatibility to 1.3
-		case E_ITEM_COAL:           return 64;
-		case E_ITEM_DIAMOND:        return 64;
+		case E_ITEM_APPLE:           return 64;
+		case E_ITEM_ARROW:           return 64;
+		case E_ITEM_BLAZE_POWDER:    return 64;
+		case E_ITEM_BLAZE_ROD:       return 64;
+		case E_ITEM_BONE:            return 64;
+		case E_ITEM_BOOK:            return 64;
+		case E_ITEM_BOWL:            return 64;
+		case E_ITEM_BREAD:           return 64;
+		case E_ITEM_BROWN_MUSHROOM:  return 64;
+		case E_ITEM_BUCKET:          return 1;  // TODO: change this to 16 when turning compatibility to 1.3
+		case E_ITEM_COAL:            return 64;
+		case E_ITEM_COOKED_CHICKEN:  return 64;
+		case E_ITEM_COOKED_FISH:     return 64;
+		case E_ITEM_COOKED_PORKCHOP: return 64;
+		case E_ITEM_DIAMOND:         return 64;
+		case E_ITEM_FEATHER:         return 64;
+		case E_ITEM_FLINT:           return 64;
+		case E_ITEM_GOLD:            return 64;
+		case E_ITEM_GUNPOWDER:       return 64;
+		case E_ITEM_IRON:            return 64;
+		case E_ITEM_RAW_PORKCHOP:    return 64;
+		case E_ITEM_SEEDS:           return 64;
+		case E_ITEM_STICK:           return 64;
+		case E_ITEM_STRING:          return 64;
+		case E_ITEM_WHEAT:           return 64;
 	}
 	// By default items don't stack:
 	return 1;
