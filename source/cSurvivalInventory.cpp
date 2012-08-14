@@ -201,7 +201,14 @@ void cSurvivalInventory::ShiftClickedCraftingGrid(short a_Slot)
 	{
 		return;
 	}
+	// First try the main inventory:
 	Item->m_ItemCount -= MoveItem(Item->m_ItemID, Item->m_ItemHealth, Item->m_ItemCount, SLOT_INVENTORY_MIN, SLOT_INVENTORY_MAX);
+	
+	// If anything left, try the hotbar:
+	if (Item->m_ItemCount > 0)
+	{
+		Item->m_ItemCount -= MoveItem(Item->m_ItemID, Item->m_ItemHealth, Item->m_ItemCount, SLOT_HOTBAR_MIN, SLOT_HOTBAR_MAX);
+	}
 	SendSlot(a_Slot);
 }
 
