@@ -44,6 +44,9 @@ public:
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
 	
+	/// Logs chunkstats for each world and totals
+	void LogChunkStats(void);
+	
 	cMonsterConfig * GetMonsterConfig() { return m_MonsterConfig; }
 
 	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export

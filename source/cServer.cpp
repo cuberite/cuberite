@@ -21,7 +21,6 @@
 #include "cFurnaceRecipe.h"
 #include "cTracer.h"
 #include "cWebAdmin.h"
-#include "cChunk.h"
 
 #include "MersenneTwister.h"
 
@@ -528,31 +527,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 	}
 	if (split[0].compare("chunkstats") == 0)
 	{
-		// TODO: For each world
-		int NumValid = 0;
-		int NumDirty = 0;
-		int NumInLighting = 0;
-		cWorld * World = cRoot::Get()->GetDefaultWorld();
-		int NumInGenerator = World->GetGeneratorQueueLength();
-		int NumInSaveQueue = World->GetStorageSaveQueueLength();
-		int NumInLoadQueue = World->GetStorageLoadQueueLength();
-		World->GetChunkStats(NumValid, NumDirty, NumInLighting);
-		LOG("Num loaded chunks: %d", NumValid);
-		LOG("Num dirty chunks: %d", NumDirty);
-		LOG("Num chunks in lighting queue: %d", NumInLighting);
-		LOG("Num chunks in generator queue: %d", NumInGenerator);
-		LOG("Num chunks in storage load queue: %d", NumInLoadQueue);
-		LOG("Num chunks in storage save queue: %d", NumInSaveQueue);
-		int Mem = NumValid * sizeof(cChunk);
-		LOG("Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
-		LOG("Per-chunk memory size breakdown:");
-		LOG("  block types:    %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
-		LOG("  block metadata: %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		LOG("  block lighting: %6d bytes (%3d KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		LOG("  heightmap:      %6d bytes (%3d KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
-		LOG("  biomemap:       %6d bytes (%3d KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
-		int Rest = sizeof(cChunk) - sizeof(cChunkDef::BlockTypes) - 3 * sizeof(cChunkDef::BlockNibbles) - sizeof(cChunkDef::HeightMap) - sizeof(cChunkDef::BiomeMap);
-		LOG("  other:          %6d bytes (%3d KiB)", Rest, (Rest + 1023) / 1024);
+		cRoot::Get()->LogChunkStats();
 		return;
 	}
 	

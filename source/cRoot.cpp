@@ -18,6 +18,7 @@
 #include "items/Item.h"
 #include "squirrelbindings/SquirrelFunctions.h"
 #include "squirrelbindings/SquirrelBindings.h"
+#include "cChunk.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -416,6 +417,58 @@ bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 		}
 	}
 	return true;
+}
+
+
+
+
+
+void cRoot::LogChunkStats(void)
+{
+	int SumNumValid = 0;
+	int SumNumDirty = 0;
+	int SumNumInLighting = 0;
+	int SumNumInGenerator = 0;
+	int SumMem = 0;
+	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(), end = m_pState->WorldsByName.end(); itr != end; ++itr)
+	{
+		cWorld * World = itr->second;
+		int NumInGenerator = World->GetGeneratorQueueLength();
+		int NumInSaveQueue = World->GetStorageSaveQueueLength();
+		int NumInLoadQueue = World->GetStorageLoadQueueLength();
+		int NumValid = 0;
+		int NumDirty = 0;
+		int NumInLighting = 0;
+		World->GetChunkStats(NumValid, NumDirty, NumInLighting);
+		LOG("World %s:", World->GetName().c_str());
+		LOG("  Num loaded chunks: %d", NumValid);
+		LOG("  Num dirty chunks: %d", NumDirty);
+		LOG("  Num chunks in lighting queue: %d", NumInLighting);
+		LOG("  Num chunks in generator queue: %d", NumInGenerator);
+		LOG("  Num chunks in storage load queue: %d", NumInLoadQueue);
+		LOG("  Num chunks in storage save queue: %d", NumInSaveQueue);
+		int Mem = NumValid * sizeof(cChunk);
+		LOG("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+		LOG("  Per-chunk memory size breakdown:");
+		LOG("    block types:    %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
+		LOG("    block metadata: %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		LOG("    block lighting: %6d bytes (%3d KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		LOG("    heightmap:      %6d bytes (%3d KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		LOG("    biomemap:       %6d bytes (%3d KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
+		int Rest = sizeof(cChunk) - sizeof(cChunkDef::BlockTypes) - 3 * sizeof(cChunkDef::BlockNibbles) - sizeof(cChunkDef::HeightMap) - sizeof(cChunkDef::BiomeMap);
+		LOG("    other:          %6d bytes (%3d KiB)", Rest, (Rest + 1023) / 1024);
+		SumNumValid += NumValid;
+		SumNumDirty += NumDirty;
+		SumNumInLighting += NumInLighting;
+		SumNumInGenerator += NumInGenerator;
+		SumMem += Mem;
+	}
+	LOG("Totals:");
+	LOG("  Num loaded chunks: %d", SumNumValid);
+	LOG("  Num dirty chunks: %d", SumNumDirty);
+	LOG("  Num chunks in lighting queue: %d", SumNumInLighting);
+	LOG("  Num chunks in generator queue: %d", SumNumInGenerator);
+	LOG("  Memory used by chunks: %d KiB (%d MiB)", (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024));
 }
 
 
