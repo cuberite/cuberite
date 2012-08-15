@@ -498,7 +498,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 	}
 	if( split[0].compare( "save-all" ) == 0 )
 	{
-		cRoot::Get()->SaveAllChunks();	// TODO - Force ALL worlds to save their chunks
+		cRoot::Get()->SaveAllChunks();
 		return;
 	}
 	if (split[0].compare("unload") == 0)

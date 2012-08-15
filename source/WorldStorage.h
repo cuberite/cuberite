@@ -65,6 +65,9 @@ public:
 	void QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate);  // Queues the chunk for loading; if not loaded, the chunk will be generated if a_Generate is true
 	void QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
+	/// Signals that a message should be output to the console when all the chunks have been saved
+	void QueueSavedMessage(void);
+	
 	/// Loads the chunk specified; returns true on success, false on failure
 	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 

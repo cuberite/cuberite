@@ -19,6 +19,13 @@
 
 
 
+/// If a chunk with this Y coord is de-queued, it is a signal to emit the saved-all message (cWorldStorage::QueueSavedMessage())
+#define CHUNK_Y_MESSAGE 2
+
+
+
+
+
 /// Example storage schema - forgets all chunks ;)
 class cWSSForgetful :
 	public cWSSchema
@@ -175,6 +182,20 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
+void cWorldStorage::QueueSavedMessage(void)
+{
+	// Pushes a special coord pair into the queue, signalizing a message instead:
+	{
+		cCSLock Lock(m_CSQueues);
+		m_SaveQueue.push_back(cChunkCoords(0, CHUNK_Y_MESSAGE, 0));
+	}
+	m_Event.Set();
+}
+
+
+
+
+
 void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSQueues);
@@ -322,6 +343,11 @@ bool cWorldStorage::SaveOneChunk(void)
 			ShouldSave = true;
 		}
 		HasMore = !m_SaveQueue.empty();
+	}
+	if (Save.m_ChunkY == CHUNK_Y_MESSAGE)
+	{
+		LOGINFO("Saved all chunks in world %s", m_World->GetName().c_str());
+		return HasMore;
 	}
 	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ))
 	{

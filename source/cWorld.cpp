@@ -1769,10 +1769,10 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 void cWorld::SaveAllChunks(void)
 {
-	LOG("Saving all chunks...");
+	LOGINFO("Saving all chunks...");
 	m_LastSave = m_Time;
 	m_ChunkMap->SaveAllChunks();
-	LOG("All chunks saved.");
+	m_Storage.QueueSavedMessage();
 }
 
 
