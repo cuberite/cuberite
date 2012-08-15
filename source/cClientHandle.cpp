@@ -1298,11 +1298,14 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 	}
 	
 	// Optimize away multiple queued RelativeEntityMoveLook packets:
+	static int NumRelEntMoveLookTotal   = 0;
+	static int NumRelEntMoveLookRemoved = 0;
 	cCSLock Lock(m_CSPackets);
 	if (a_Priority == E_PRIORITY_NORMAL)
 	{
 		if (a_Packet.m_PacketID == E_REL_ENT_MOVE_LOOK)
 		{
+			NumRelEntMoveLookTotal++;
 			PacketList & Packets = m_PendingNrmSendPackets;
 			const cPacket_RelativeEntityMoveLook & ThisPacketData = reinterpret_cast< const cPacket_RelativeEntityMoveLook &>(a_Packet);
 			for (PacketList::iterator itr = Packets.begin(); itr != Packets.end(); ++itr)
@@ -1318,6 +1321,7 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 							Packets.erase(itr);
 							bBreak = true;
 							delete PacketData;
+							NumRelEntMoveLookRemoved++;
 							break;
 						}
 						break;
@@ -1328,6 +1332,14 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 					break;
 				}
 			}  // for itr - Packets[]
+			if ((NumRelEntMoveLookTotal % 1000) == 10)  // print out a debug statistics every 1000 packets sent
+			{
+				LOGD("RelEntMoveLook optimization: removed %d out of %d packets, saved %d bytes (%d KiB) of bandwidth",
+					NumRelEntMoveLookRemoved, NumRelEntMoveLookTotal,
+					NumRelEntMoveLookRemoved * sizeof(cPacket_RelativeEntityMoveLook),
+					NumRelEntMoveLookRemoved * sizeof(cPacket_RelativeEntityMoveLook) / 1024
+				);
+			}
 		}  // if (E_REL_ENT_MOVE_LOOK
 		m_PendingNrmSendPackets.push_back(a_Packet.Clone());
 	}
