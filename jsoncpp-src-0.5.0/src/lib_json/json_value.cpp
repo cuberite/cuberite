@@ -153,7 +153,8 @@ Value::CommentInfo::setComment( const char *text )
    if ( comment_ )
       valueAllocator()->releaseStringValue( comment_ );
    JSON_ASSERT( text );
-   JSON_ASSERT_MESSAGE( text[0]=='\0' || text[0]=='/', "Comments must start with /");
+   //JSON_ASSERT_MESSAGE( text[0]=='\0' || text[0]=='/', "Comments must start with /");
+   JSON_ASSERT( text[0]=='\0' || text[0]=='/' );
    // It seems that /**/ style comments are acceptable as well.
    comment_ = valueAllocator()->duplicateStringValue( text );
 }
@@ -697,7 +698,8 @@ Value::asString() const
    case realValue:
    case arrayValue:
    case objectValue:
-      JSON_ASSERT_MESSAGE( false, "Type is not convertible to string" );
+      //JSON_ASSERT_MESSAGE( false, "Type is not convertible to string" );
+	  JSON_ASSERT( false );
    default:
       JSON_ASSERT_UNREACHABLE;
    }
@@ -722,17 +724,20 @@ Value::asInt() const
    case intValue:
       return value_.int_;
    case uintValue:
-      JSON_ASSERT_MESSAGE( value_.uint_ < (unsigned)maxInt, "integer out of signed integer range" );
+      //JSON_ASSERT_MESSAGE( value_.uint_ < (unsigned)maxInt, "integer out of signed integer range" );
+	  JSON_ASSERT( value_.uint_ < (unsigned)maxInt );
       return value_.uint_;
    case realValue:
-      JSON_ASSERT_MESSAGE( value_.real_ >= minInt  &&  value_.real_ <= maxInt, "Real out of signed integer range" );
+      //JSON_ASSERT_MESSAGE( value_.real_ >= minInt  &&  value_.real_ <= maxInt, "Real out of signed integer range" );
+	  JSON_ASSERT( value_.real_ >= minInt  &&  value_.real_ <= maxInt );
       return Int( value_.real_ );
    case booleanValue:
       return value_.bool_ ? 1 : 0;
    case stringValue:
    case arrayValue:
    case objectValue:
-      JSON_ASSERT_MESSAGE( false, "Type is not convertible to int" );
+      //JSON_ASSERT_MESSAGE( false, "Type is not convertible to int" );
+	  JSON_ASSERT( false );
    default:
       JSON_ASSERT_UNREACHABLE;
    }
@@ -747,19 +752,22 @@ Value::asUInt() const
    case nullValue:
       return 0;
    case intValue:
-      JSON_ASSERT_MESSAGE( value_.int_ >= 0, "Negative integer can not be converted to unsigned integer" );
+      //JSON_ASSERT_MESSAGE( value_.int_ >= 0, "Negative integer can not be converted to unsigned integer" );
+	  JSON_ASSERT( value_.int_ >= 0 );
       return value_.int_;
    case uintValue:
       return value_.uint_;
    case realValue:
-      JSON_ASSERT_MESSAGE( value_.real_ >= 0  &&  value_.real_ <= maxUInt,  "Real out of unsigned integer range" );
+      //JSON_ASSERT_MESSAGE( value_.real_ >= 0  &&  value_.real_ <= maxUInt,  "Real out of unsigned integer range" );
+	  JSON_ASSERT( value_.real_ >= 0  &&  value_.real_ <= maxUInt );
       return UInt( value_.real_ );
    case booleanValue:
       return value_.bool_ ? 1 : 0;
    case stringValue:
    case arrayValue:
    case objectValue:
-      JSON_ASSERT_MESSAGE( false, "Type is not convertible to uint" );
+      //JSON_ASSERT_MESSAGE( false, "Type is not convertible to uint" );
+	  JSON_ASSERT( false );
    default:
       JSON_ASSERT_UNREACHABLE;
    }
@@ -784,7 +792,8 @@ Value::asDouble() const
    case stringValue:
    case arrayValue:
    case objectValue:
-      JSON_ASSERT_MESSAGE( false, "Type is not convertible to double" );
+      //JSON_ASSERT_MESSAGE( false, "Type is not convertible to double" );
+	  JSON_ASSERT( false );
    default:
       JSON_ASSERT_UNREACHABLE;
    }

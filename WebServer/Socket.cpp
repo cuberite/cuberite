@@ -98,7 +98,9 @@ Socket::Socket() :
 
 	if (!IsValid())
 	{
+#if !defined(ANDROID_NDK)
 		throw "INVALID_SOCKET";
+#endif
 	}
 
 	refCounter_ = new int(1);
@@ -354,7 +356,9 @@ SocketSelect::SocketSelect(Socket const * const s1, Socket const * const s2, Typ
 	}
 	if (select(Highest + 1, &fds_, NULL, NULL, NULL) == SOCKET_ERROR)
 	{
+#if !defined(ANDROID_NDK)
 		throw "Error in select";
+#endif
 	}
 }
 

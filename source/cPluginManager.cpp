@@ -4,20 +4,21 @@
 #include "cPlugin.h"
 #include "cPlugin_Lua.h"
 #include "cPlugin_NewLua.h"
-#include "cPlugin_Squirrel.h"
 #include "cWebAdmin.h"
 #include "cItem.h"
 #include "cRoot.h"
 #include "cLuaCommandBinder.h"
-#include "cSquirrelCommandBinder.h"
+#if USE_SQUIRREL
+# include "cPlugin_Squirrel.h"
+# include "cSquirrelCommandBinder.h"
+#endif
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
 #include "cPlayer.h"
 
-#include "squirrelbindings/SquirrelBindings.h"
-#include "squirrelbindings/SquirrelFunctions.h"
-
 #if USE_SQUIRREL
+	#include "squirrelbindings/SquirrelBindings.h"
+	#include "squirrelbindings/SquirrelFunctions.h"
 	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
 	
 	#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
@@ -39,7 +40,9 @@ cPluginManager* cPluginManager::GetPluginManager()
 
 cPluginManager::cPluginManager()
 	: m_LuaCommandBinder( new cLuaCommandBinder() )
+#if USE_SQUIRREL
 	, m_SquirrelCommandBinder( new cSquirrelCommandBinder() )
+#endif
 	, m_bReloadPlugins(false)
 {
 }
@@ -53,7 +56,9 @@ cPluginManager::~cPluginManager()
 	UnloadPluginsNow();
 	
 	delete m_LuaCommandBinder;
+#if USE_SQUIRREL
 	delete m_SquirrelCommandBinder;
+#endif
 }
 
 
@@ -197,10 +202,12 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 		cPlayer * Player = va_arg(argptr, cPlayer * );
 		va_end (argptr);
 
+#if USE_SQUIRREL
 		if (m_SquirrelCommandBinder->HandleCommand( std::string( Message ), Player))
 		{
 			return true;
 		}
+#endif
 
 		if (m_LuaCommandBinder->HandleCommand( std::string( Message ), Player))
 		{
@@ -682,7 +689,9 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 	if( a_bDelete )
 	{
 		m_LuaCommandBinder->RemoveBindingsForPlugin( a_Plugin );
+#if USE_SQUIRREL
 		m_SquirrelCommandBinder->RemoveBindingsForPlugin( a_Plugin );
+#endif
 		m_Plugins.remove( a_Plugin );
 		RemoveHooks( a_Plugin );
 		a_Plugin->OnDisable();

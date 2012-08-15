@@ -6,13 +6,16 @@
 #include <exception> //std::exception
 #include <csignal>   //std::signal
 #include <stdlib.h>  //exit()
+#ifdef USE_SQUIRREL
 #include "squirrelbindings/SquirrelFunctions.h"
+#include "squirrelbindings/SquirrelBindings.h"
+#endif
 
 #ifdef _WIN32
 	#include <dbghelp.h>
 #endif  // _WIN32
 
-#include "squirrelbindings/SquirrelBindings.h"
+
 
 
 
@@ -168,11 +171,14 @@ int main( int argc, char **argv )
 	// DEBUG: test the dumpfile creation:
 	// *((int *)0) = 0;
 	
+	#if !defined(ANDROID_NDK)
 	try
+	#endif
 	{
 		cRoot Root;	
 		Root.Start();
 	}
+	#if !defined(ANDROID_NDK)
 	catch( std::exception& e )
 	{
 		LOGERROR("Standard exception: %s", e.what() );
@@ -181,6 +187,7 @@ int main( int argc, char **argv )
 	{
 		LOGERROR("Unknown exception!");
 	}
+	#endif
 
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)

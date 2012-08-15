@@ -111,7 +111,7 @@ AString cSocket::GetErrorString( int a_ErrNo )
 	
 	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
 	
-	#if ( _GNU_SOURCE )  // GNU version of strerror_r()
+	#if ( _GNU_SOURCE ) && !defined(ANDROID_NDK)  // GNU version of strerror_r()
 	
 	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
 	if( res != NULL )
@@ -158,7 +158,7 @@ int cSocket::GetLastError()
 
 int cSocket::SetReuseAddress()
 {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(ANDROID_NDK)
 	char yes = 1;
 #else
 	int yes = 1;

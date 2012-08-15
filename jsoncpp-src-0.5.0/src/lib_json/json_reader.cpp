@@ -871,13 +871,13 @@ Reader::getFormatedErrorMessages() const
    return formattedMessage;
 }
 
-
+#define JSON_ASSERT( condition ) assert( condition );
 std::istream& operator>>( std::istream &sin, Value &root )
 {
     Json::Reader reader;
     bool ok = reader.parse(sin, root, true);
-    //JSON_ASSERT( ok );
-    if (!ok) throw std::runtime_error(reader.getFormatedErrorMessages());
+    JSON_ASSERT( ok );
+    //if (!ok) throw std::runtime_error(reader.getFormatedErrorMessages());
     return sin;
 }
 

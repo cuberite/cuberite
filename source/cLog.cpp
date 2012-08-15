@@ -9,6 +9,9 @@
 
 #include "cIsThread.h"
 
+#if defined(ANDROID_NDK)
+#include <android/log.h>
+#endif
 
 
 
@@ -97,6 +100,10 @@ void cLog::ClearLog()
 
 void cLog::Log(const char * a_Format, va_list argList)
 {
+#if defined(ANDROID_NDK)
+	__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
+	return; // This is as far as android goes
+#endif
 	AString Message;
 	AppendVPrintf(Message, a_Format, argList);
 

@@ -16,8 +16,10 @@
 #include "cRedstone.h"
 #include "blocks/Block.h"
 #include "items/Item.h"
+#if USE_SQUIRREL
 #include "squirrelbindings/SquirrelFunctions.h"
 #include "squirrelbindings/SquirrelBindings.h"
+#endif
 #include "cChunk.h"
 
 #include "../iniFile/iniFile.h"
