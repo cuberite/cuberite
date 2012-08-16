@@ -8,15 +8,17 @@
 #include "cItem.h"
 #include "cRoot.h"
 #include "cLuaCommandBinder.h"
-#if USE_SQUIRREL
-# include "cPlugin_Squirrel.h"
-# include "cSquirrelCommandBinder.h"
+
+#ifdef USE_SQUIRREL
+	#include "cPlugin_Squirrel.h"
+	#include "cSquirrelCommandBinder.h"
 #endif
+
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
 #include "cPlayer.h"
 
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 	#include "squirrelbindings/SquirrelBindings.h"
 	#include "squirrelbindings/SquirrelFunctions.h"
 	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
@@ -40,7 +42,7 @@ cPluginManager* cPluginManager::GetPluginManager()
 
 cPluginManager::cPluginManager()
 	: m_LuaCommandBinder( new cLuaCommandBinder() )
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 	, m_SquirrelCommandBinder( new cSquirrelCommandBinder() )
 #endif
 	, m_bReloadPlugins(false)
@@ -56,7 +58,7 @@ cPluginManager::~cPluginManager()
 	UnloadPluginsNow();
 	
 	delete m_LuaCommandBinder;
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 	delete m_SquirrelCommandBinder;
 #endif
 }
@@ -80,7 +82,7 @@ void cPluginManager::ReloadPluginsNow()
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
-	#if USE_SQUIRREL
+	#ifdef USE_SQUIRREL
 	CloseSquirrelVM();
 	OpenSquirrelVM();
 	#endif  // USE_SQUIRREL
@@ -130,7 +132,7 @@ void cPluginManager::ReloadPluginsNow()
 				}
 			}
 			
-			#if USE_SQUIRREL
+			#ifdef USE_SQUIRREL
 			else if( ValueName.compare("Squirrel") == 0 ) // Squirrel plugin
 			{
 				AString PluginFile = IniFile.GetValue(KeyNum, i );
@@ -202,7 +204,7 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 		cPlayer * Player = va_arg(argptr, cPlayer * );
 		va_end (argptr);
 
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 		if (m_SquirrelCommandBinder->HandleCommand( std::string( Message ), Player))
 		{
 			return true;
@@ -689,7 +691,7 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 	if( a_bDelete )
 	{
 		m_LuaCommandBinder->RemoveBindingsForPlugin( a_Plugin );
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 		m_SquirrelCommandBinder->RemoveBindingsForPlugin( a_Plugin );
 #endif
 		m_Plugins.remove( a_Plugin );

@@ -16,11 +16,12 @@
 #include "cRedstone.h"
 #include "blocks/Block.h"
 #include "items/Item.h"
-#if USE_SQUIRREL
-#include "squirrelbindings/SquirrelFunctions.h"
-#include "squirrelbindings/SquirrelBindings.h"
-#endif
 #include "cChunk.h"
+
+#ifdef USE_SQUIRREL
+	#include "squirrelbindings/SquirrelFunctions.h"
+	#include "squirrelbindings/SquirrelBindings.h"
+#endif
 
 #include "../iniFile/iniFile.h"
 
@@ -177,7 +178,7 @@ void cRoot::Start()
 		delete m_PluginManager; m_PluginManager = 0;  // This should be first
 		
 
-		#if USE_SQUIRREL
+		#ifdef USE_SQUIRREL
 		CloseSquirrelVM();
 		#endif
 		LOG("Freeing MonsterConfig...");

@@ -9,7 +9,7 @@
 
 using namespace Sqrat;
 
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 void BindSquirrel(HSQUIRRELVM vm)
 {
 	RootTable()

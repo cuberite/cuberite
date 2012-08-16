@@ -4,7 +4,7 @@
 #include "SquirrelBindings.h"
 
 
-#if USE_SQUIRREL
+#ifdef USE_SQUIRREL
 
 static HSQUIRRELVM squirrelvm = NULL;
 
