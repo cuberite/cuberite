@@ -26,7 +26,7 @@ cLog::cLog(const AString & a_FileName )
 	// create logs directory
 	cMakeDir::MakeDir("logs");
 
-	OpenLog( (std::string("logs/") + a_FileName).c_str() );
+	OpenLog( (FILE_IO_PREFIX + std::string("logs/") + a_FileName).c_str() );
 }
 
 
@@ -100,10 +100,6 @@ void cLog::ClearLog()
 
 void cLog::Log(const char * a_Format, va_list argList)
 {
-#if defined(ANDROID_NDK)
-	__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
-	return; // This is as far as android goes
-#endif
 	AString Message;
 	AppendVPrintf(Message, a_Format, argList);
 
@@ -132,8 +128,12 @@ void cLog::Log(const char * a_Format, va_list argList)
 	}
 
 	// Print to console:
+#if defined(ANDROID_NDK)
+	__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
+#else
 	printf("%s", Line.c_str());
-	
+#endif
+
 	#if defined (_WIN32) && defined(_DEBUG)
 	// In a Windows Debug build, output the log to debug console as well:
 	OutputDebugString(Line.c_str());

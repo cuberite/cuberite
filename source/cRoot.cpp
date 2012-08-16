@@ -77,6 +77,9 @@ cRoot::~cRoot()
 
 void cRoot::InputThread(void* a_Params)
 {
+#if defined(ANDROID_NDK)
+	return;
+#else
 	cRoot& self = *(cRoot*)a_Params;
 
 	while( !(self.m_bStop || self.m_bRestart) )
@@ -85,6 +88,7 @@ void cRoot::InputThread(void* a_Params)
 		std::getline(std::cin, Command);
 		self.ServerCommand( Command.c_str() );
 	}
+#endif
 }
 
 

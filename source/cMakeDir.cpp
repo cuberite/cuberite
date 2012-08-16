@@ -14,9 +14,9 @@ void cMakeDir::MakeDir(const AString & a_Directory)
 	Attrib.nLength = sizeof(SECURITY_ATTRIBUTES);
 	Attrib.lpSecurityDescriptor = NULL;
 	Attrib.bInheritHandle = false;
-	::CreateDirectory(a_Directory.c_str(), &Attrib);
+	::CreateDirectory( (FILE_IO_PREFIX + a_Directory).c_str(), &Attrib);
 #else
-	mkdir(a_Directory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+	mkdir( (FILE_IO_PREFIX + a_Directory).c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
 #endif
 }
 

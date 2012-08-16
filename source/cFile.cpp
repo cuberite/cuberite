@@ -76,14 +76,14 @@ bool cFile::Open(const AString & iFileName, EMode iMode)
 			return false;
 		}
 	}
-	m_File = fopen(iFileName.c_str(), Mode);
+	m_File = fopen( (FILE_IO_PREFIX + iFileName).c_str(), Mode);
 	if ((m_File == NULL) && (iMode == fmReadWrite))
 	{
 		// Fix for MS not following C spec, opening "a" mode files for writing at the end only
 		// The file open operation has been tried with "read update", fails if file not found
 		// So now we know either the file doesn't exist or we don't have rights, no need to worry about file contents.
 		// Simply re-open for read-writing, erasing existing contents:
-		m_File = fopen(iFileName.c_str(), "wb+");
+		m_File = fopen( (FILE_IO_PREFIX + iFileName).c_str(), "wb+");
 	}
 	return (m_File != NULL);
 }

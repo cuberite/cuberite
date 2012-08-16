@@ -59,7 +59,7 @@ bool cIniFile::ReadFile()
   string   keyname, valuename, value;
   string::size_type pLeft, pRight;
 
-  f.open( path.c_str(), ios::in);
+  f.open( (FILE_IO_PREFIX + path).c_str(), ios::in);
   if ( f.fail())
     return false;
 
@@ -127,7 +127,7 @@ bool cIniFile::WriteFile()
   // a few bugs with ofstream. So ... fstream used.
   fstream f;
 
-  f.open( path.c_str(), ios::out);
+  f.open( (FILE_IO_PREFIX + path).c_str(), ios::out);
   if ( f.fail())
     return false;
 

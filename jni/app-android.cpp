@@ -12,6 +12,7 @@
 
 #include "cCriticalSection.h"
 #include "cRoot.h"
+#include "cMakeDir.h"
 
 #include <android/log.h>
 
@@ -20,17 +21,22 @@ cCriticalSection g_CriticalSection;
 JNIEnv* g_CurrentJNIEnv = 0;
 jobject g_JavaRenderer = 0;
 
+cRoot * pRoot = NULL;
+
 /* Called when program/activity is created */
 extern "C" void Java_com_mcserver_MainThread_NativeOnCreate( JNIEnv*  env )
 {
 	g_CriticalSection.Lock();
 	g_CurrentJNIEnv = env;
 	//if( !cLogger::GetSingletonPtr() ) new cLogger();
-	__android_log_print(ANDROID_LOG_ERROR,"Arashi", "%s", "Logging from C++!");
+	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Logging from C++!");
 	g_CriticalSection.Unlock();
 	
-	cRoot Root;
-	Root.Start();
+	mkdir("/sdcard/mcserver", S_IRWXU | S_IRWXG | S_IRWXO);
+
+	pRoot = new cRoot();
+	pRoot->Start();
+	delete pRoot;
 }
 
 extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env )
@@ -39,6 +45,8 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env )
 	g_CurrentJNIEnv = env;
 
 	g_CriticalSection.Unlock();
+
+	pRoot->ServerCommand("stop");
 }
 
 /* Call to initialize the graphics state */
