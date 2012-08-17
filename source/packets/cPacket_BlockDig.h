@@ -15,7 +15,7 @@ public:
 	{ m_PacketID = E_BLOCK_DIG;  }		//tolua_export
 	virtual cPacket* Clone() const { return new cPacket_BlockDig(*this); }	//tolua_export
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	char m_Status;     // tolua_export

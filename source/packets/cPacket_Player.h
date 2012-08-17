@@ -33,7 +33,7 @@ class cPacket_PlayerAbilities : public cPacket
 public:
 	cPacket_PlayerAbilities(void) { m_PacketID = E_PLAYER_LIST_ITEM; }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	virtual cPacket * Clone() const { return new cPacket_PlayerAbilities(*this); }
@@ -54,7 +54,7 @@ public:
 	cPacket_PlayerListItem() { m_PacketID = E_PLAYER_LIST_ITEM; }
 	cPacket_PlayerListItem(const AString & a_PlayerName, bool a_Online, short a_Ping);
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	virtual cPacket* Clone() const { return new cPacket_PlayerListItem(*this); }
@@ -79,7 +79,7 @@ public:
 	cPacket_PlayerLook( cPlayer* a_Player );
 	virtual cPacket* Clone() const { return new cPacket_PlayerLook(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	float m_Rotation;
@@ -106,7 +106,7 @@ public:
 	cPacket_PlayerMoveLook( cPlayer* a_Player );
 	virtual cPacket* Clone() const { return new cPacket_PlayerMoveLook(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	double m_PosX;
@@ -135,7 +135,7 @@ public:
 	{ m_PacketID = E_PLAYERPOS;  }
 	virtual cPacket* Clone() const { return new cPacket_PlayerPosition(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	double m_PosX;

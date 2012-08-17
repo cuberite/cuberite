@@ -48,6 +48,9 @@ extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AS
 /// Returns the list of all items in the specified directory (files, folders, nix pipes, whatever's there)
 extern AStringList GetDirectoryContents(const char * a_Directory);
 
+/// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
+extern AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8);
+
 
 
 // If you have any other string helper functions, declare them here

@@ -95,6 +95,11 @@ typedef short     Int16;
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#undef min
 	#undef max
+	
+	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
+	#ifdef GetFreeSpace
+		#undef GetFreeSpace
+	#endif  // GetFreeSpace
 #else
 	#include <sys/types.h>
 	#include <sys/stat.h>   // for mkdir

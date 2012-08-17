@@ -286,6 +286,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\ByteBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ByteBuffer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\cAuthenticator.cpp"
 				>
 			</File>

@@ -7,10 +7,10 @@
 
 
 
-int cPacket_ItemSwitch::Parse(const char * a_Data, int a_Size)
+int cPacket_ItemSwitch::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadShort, m_SlotNum, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_SlotNum, TotalBytes);
 	return TotalBytes;
 }
 

@@ -23,7 +23,7 @@ public:
 	{ m_PacketID = E_WINDOW_CLICK; }
 	virtual cPacket* Clone() const { return new cPacket_WindowClick(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 
 	char  m_WindowID;
 	short m_SlotNum;	// Slot

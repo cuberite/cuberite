@@ -233,3 +233,49 @@ AStringList GetDirectoryContents(const char * a_Directory)
 
 
 
+
+// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
+AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8)
+{
+	a_UTF8.clear();
+	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
+	for (int i = 0; i < a_NumShorts; i++)
+	{
+		int c = ntohs(*(a_RawData + i));
+		if (c < 0x80)
+		{
+			a_UTF8.push_back((char)c);
+		}
+		else if (c < 0x800)
+		{
+			a_UTF8.push_back((char)(192 + c / 64));
+			a_UTF8.push_back((char)(128 + c % 64));
+		}
+		else if (c - 0xd800u < 0x800)
+		{
+			// Error, silently drop
+		}
+		else if (c < 0x10000)
+		{
+			a_UTF8.push_back((char)(224 + c / 4096));
+			a_UTF8.push_back((char)(128 + c / 64 % 64));
+			a_UTF8.push_back((char)(128 + c % 64));
+		}
+		else if (c < 0x110000)
+		{
+			a_UTF8.push_back((char)(240 + c / 262144));
+			a_UTF8.push_back((char)(128 + c / 4096 % 64));
+			a_UTF8.push_back((char)(128 + c / 64 % 64));
+			a_UTF8.push_back((char)(128 + c % 64));
+		}
+		else
+		{
+			// Error, silently drop
+		}
+	}
+	return a_UTF8;
+}
+
+
+
+

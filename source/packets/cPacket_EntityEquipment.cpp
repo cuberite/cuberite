@@ -20,13 +20,13 @@ cPacket_EntityEquipment::cPacket_EntityEquipment( const cPacket_EntityEquipment 
 
 
 
-int cPacket_EntityEquipment::Parse(const char * a_Data, int a_Size)
+int cPacket_EntityEquipment::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadInteger, m_UniqueID, TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,   m_Slot,     TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,   m_ItemID,   TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,   m_Short,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_UniqueID, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort,   m_Slot,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort,   m_ItemID,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort,   m_Short,    TotalBytes);
 	return TotalBytes;
 }
 

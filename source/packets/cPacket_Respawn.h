@@ -22,7 +22,7 @@ public:
 	
 	virtual cPacket* Clone() const { return new cPacket_Respawn( *this ); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	int m_Dimension;

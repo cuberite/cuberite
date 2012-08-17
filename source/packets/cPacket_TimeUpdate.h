@@ -16,7 +16,7 @@ public:
 	cPacket_TimeUpdate( long long a_Time ) { m_PacketID = E_UPDATE_TIME;  m_Time = a_Time; }
 	virtual cPacket* Clone() const { return new cPacket_TimeUpdate(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	long long m_Time;

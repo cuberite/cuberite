@@ -7,10 +7,10 @@
 
 
 
-int cPacket_Chat::Parse(const char * a_Data, int a_Size)
+int cPacket_Chat::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadString16, m_Message, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_Message, TotalBytes);
 	return TotalBytes;
 }
 

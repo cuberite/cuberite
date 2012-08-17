@@ -7,12 +7,12 @@
 
 
 
-int cPacket_UseEntity::Parse(const char * a_Data, int a_Size)
+int cPacket_UseEntity::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadInteger, m_UniqueID,   TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_TargetID,   TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,    m_bLeftClick, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_UniqueID,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_TargetID,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,  m_bLeftClick, TotalBytes);
 	return TotalBytes;
 }
 

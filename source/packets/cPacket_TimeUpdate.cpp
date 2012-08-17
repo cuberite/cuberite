@@ -7,10 +7,10 @@
 
 
 
-int cPacket_TimeUpdate::Parse(const char * a_Data, int a_Size)
+int cPacket_TimeUpdate::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadLong, m_Time, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt64, m_Time, TotalBytes);
 	return TotalBytes;
 }
 

@@ -9,18 +9,17 @@
 
 
 
-int cPacket_WindowClick::Parse(const char * a_Data, int a_Size)
+int cPacket_WindowClick::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadByte,  m_WindowID,       TotalBytes);
-	HANDLE_PACKET_READ(ReadShort, m_SlotNum,        TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,  m_RightMouse,     TotalBytes);
-	HANDLE_PACKET_READ(ReadShort, m_NumClicks,      TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,  m_IsShiftPressed, TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_WindowID,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_SlotNum,        TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_RightMouse,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_NumClicks,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,    m_IsShiftPressed, TotalBytes);
 
 	cPacket_ItemData Item;
-
-	int res = Item.Parse(a_Data + TotalBytes, a_Size - TotalBytes);
+	int res = Item.Parse(a_Buffer);
 	if (res < 0)
 	{
 		return res;

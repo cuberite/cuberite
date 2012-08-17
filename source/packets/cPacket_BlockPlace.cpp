@@ -8,16 +8,16 @@
 
 
 
-int cPacket_BlockPlace::Parse(const char * a_Data, int a_Size)
+int cPacket_BlockPlace::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadInteger, m_PosX,      TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,    m_PosY,      TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_PosZ,      TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,    m_Direction, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_PosX,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,  m_PosY,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_PosZ,      TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,  m_Direction, TotalBytes);
 
 	cPacket_ItemData Item;
-	int res = Item.Parse(a_Data + TotalBytes, a_Size - TotalBytes);
+	int res = Item.Parse(a_Buffer);
 	if (res < 0)
 	{
 		return res;

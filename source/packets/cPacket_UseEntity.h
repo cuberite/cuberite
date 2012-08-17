@@ -17,7 +17,7 @@ public:
 	{ m_PacketID = E_USE_ENTITY;  }
 	virtual cPacket* Clone() const { return new cPacket_UseEntity(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 
 	int  m_UniqueID;
 	int  m_TargetID;

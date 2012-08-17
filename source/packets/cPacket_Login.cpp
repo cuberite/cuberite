@@ -14,19 +14,19 @@ const std::string cPacket_Login::LEVEL_TYPE_SUPERFLAT = "SUPERFLAT";
 
 
 
-int cPacket_Login::Parse(const char * a_Data, int a_Size)
+int cPacket_Login::Parse(cByteBuffer & a_Buffer)
 {
 	//printf("Parse: NEW Login\n");
 	int TotalBytes = 0;
 	m_Username.clear();
-	HANDLE_PACKET_READ(ReadInteger,  m_ProtocolVersion, TotalBytes);
-	HANDLE_PACKET_READ(ReadString16, m_Username,        TotalBytes);
-	HANDLE_PACKET_READ(ReadString16, m_LevelType,       TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger,  m_ServerMode,      TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger,  m_Dimension,       TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,     m_Difficulty,      TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,     m_WorldHeight,     TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,     m_MaxPlayers,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,           m_ProtocolVersion, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_Username,        TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_LevelType,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,           m_ServerMode,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,           m_Dimension,       TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,            m_Difficulty,      TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,            m_WorldHeight,     TotalBytes);
+	HANDLE_PACKET_READ(ReadByte,            m_MaxPlayers,      TotalBytes);
 	return TotalBytes;
 }
 

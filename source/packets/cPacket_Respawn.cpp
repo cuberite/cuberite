@@ -22,15 +22,15 @@ void cPacket_Respawn::Serialize(AString & a_Data) const
 
 
 
-int cPacket_Respawn::Parse(const char * a_Data, int a_Size)
+int cPacket_Respawn::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
 
-	HANDLE_PACKET_READ(ReadInteger,  m_Dimension, TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,     m_Difficulty, TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,     m_CreativeMode, TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,    m_WorldHeight, TotalBytes);
-	HANDLE_PACKET_READ(ReadString16, m_LevelType, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,           m_Dimension,    TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,            m_Difficulty,   TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,            m_CreativeMode, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort,         m_WorldHeight,  TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_LevelType,    TotalBytes);
 	return TotalBytes;
 }
 

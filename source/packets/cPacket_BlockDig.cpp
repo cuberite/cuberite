@@ -20,14 +20,14 @@ void cPacket_BlockDig::Serialize(AString & a_Data) const
 
 
 
-int cPacket_BlockDig::Parse(const char * a_Data, int a_Size)
+int cPacket_BlockDig::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadByte,	  m_Status,    TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_PosX,      TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,	  m_PosY,      TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_PosZ,      TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,	  m_Direction, TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,	m_Status,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_PosX,      TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,	m_PosY,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_PosZ,      TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,	m_Direction, TotalBytes);
 	return TotalBytes;
 }
 

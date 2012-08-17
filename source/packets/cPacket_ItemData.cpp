@@ -7,10 +7,10 @@
 
 
 
-int cPacket_ItemData::Parse(const char * a_Data, int a_Size)
+int cPacket_ItemData::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadShort, m_ItemID, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_ItemID, TotalBytes);
 
 	if (m_ItemID <= -1)
 	{
@@ -19,12 +19,12 @@ int cPacket_ItemData::Parse(const char * a_Data, int a_Size)
 		return TotalBytes;
 	}
 
-	HANDLE_PACKET_READ(ReadByte , m_ItemCount, TotalBytes);
-	HANDLE_PACKET_READ(ReadShort, m_ItemUses,  TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_ItemCount, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_ItemUses,  TotalBytes);
 
 	if (cItem::IsEnchantable((ENUM_ITEM_ID) m_ItemID))
 	{
-		HANDLE_PACKET_READ(ReadShort, m_EnchantNums, TotalBytes);
+		HANDLE_PACKET_READ(ReadBEShort, m_EnchantNums, TotalBytes);
 		
 		if ( m_EnchantNums > -1 )
 		{

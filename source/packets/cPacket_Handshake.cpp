@@ -7,10 +7,10 @@
 
 
 
-int cPacket_Handshake::Parse(const char * a_Data, int a_Size)
+int cPacket_Handshake::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadString16, m_Username, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_Username, TotalBytes);
 	return TotalBytes;
 }
 

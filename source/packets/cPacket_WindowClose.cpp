@@ -7,10 +7,10 @@
 
 
 
-int cPacket_WindowClose::Parse(const char * a_Data, int a_Size)
+int cPacket_WindowClose::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadByte, m_Close, TotalBytes);
+	HANDLE_PACKET_READ(ReadChar, m_Close, TotalBytes);
 	return TotalBytes;
 }
 

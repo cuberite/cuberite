@@ -7,19 +7,19 @@
 
 
 
-int cPacket_PickupSpawn::Parse(const char * a_Data, int a_Size)
+int cPacket_PickupSpawn::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadInteger, m_UniqueID, TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,   m_Item,     TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,    m_Count,    TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,   m_Health,   TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_PosX,     TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_PosY,     TotalBytes);
-	HANDLE_PACKET_READ(ReadInteger, m_PosZ,     TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,    m_Rotation, TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,    m_Pitch,    TotalBytes);
-	HANDLE_PACKET_READ(ReadByte,    m_Roll,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,   m_UniqueID, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_Item,     TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_Count,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_Health,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,   m_PosX,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,   m_PosY,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt,   m_PosZ,     TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_Rotation, TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_Pitch,    TotalBytes);
+	HANDLE_PACKET_READ(ReadChar,    m_Roll,     TotalBytes);
 	return TotalBytes;
 }
 

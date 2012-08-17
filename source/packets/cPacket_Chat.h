@@ -10,7 +10,7 @@ public:
 	cPacket_Chat( const std::string & a_Message ) : m_Message( a_Message) { m_PacketID = E_CHAT; }
 	virtual cPacket* Clone() const { return new cPacket_Chat(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	AString m_Message;

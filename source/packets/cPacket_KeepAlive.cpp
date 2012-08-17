@@ -17,10 +17,10 @@ void cPacket_KeepAlive::Serialize(AString & a_Data) const
 
 
 
-int cPacket_KeepAlive::Parse(const char * a_Data, int a_Size)
+int cPacket_KeepAlive::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadInteger, m_KeepAliveID, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_KeepAliveID, TotalBytes);
 	return TotalBytes;
 }
 

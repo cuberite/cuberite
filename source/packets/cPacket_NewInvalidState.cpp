@@ -18,11 +18,11 @@ cPacket_NewInvalidState::cPacket_NewInvalidState( const cPacket_NewInvalidState 
 
 
 
-int cPacket_NewInvalidState::Parse(const char * a_Data, int a_Size)
+int cPacket_NewInvalidState::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadByte, m_Reason, TotalBytes);
-	HANDLE_PACKET_READ(ReadByte, m_GameMode, TotalBytes);
+	HANDLE_PACKET_READ(ReadChar, m_Reason,   TotalBytes);
+	HANDLE_PACKET_READ(ReadChar, m_GameMode, TotalBytes);
 	return TotalBytes;
 }
 

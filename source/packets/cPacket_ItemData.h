@@ -17,7 +17,7 @@ public:
 
 	virtual cPacket* Clone() const { return new cPacket_ItemData(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 
 	static void AppendItem(AString & a_Data, short a_ItemID, char a_Quantity, short a_Damage);
 	static void AppendItem(AString & a_Data, const cItem * a_Item);

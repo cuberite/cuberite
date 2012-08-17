@@ -39,6 +39,7 @@
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_Ping.h"
+#include "ByteBuffer.h"
 
 
 
@@ -100,6 +101,8 @@ public:
 	bool IsPlaying(void) const {return (m_State == csPlaying); }
 
 	void Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL);
+	
+	void SendDisconnect(const AString & a_Reason);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	
@@ -122,11 +125,11 @@ private:
 	
 	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight. 2 is the minimum, since foliage is generated 1 step behind chunk terrain generation
 
-	int m_ProtocolVersion;
+	int     m_ProtocolVersion;
 	AString m_Username;
 	AString m_Password;
 	
-	AString m_ReceivedData;  // Accumulator for the data received from the socket, waiting to be parsed; accessed from the cSocketThreads' thread only!
+	cByteBuffer m_ReceivedData;  // Accumulator for the data received from the socket, waiting to be parsed; accessed from the cSocketThreads' thread only!
 
 	cCriticalSection m_CSPackets;
 	PacketList       m_PendingNrmSendPackets;

@@ -112,6 +112,7 @@ int cClientHandle::s_ClientCount = 0;
 cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
 	, m_ProtocolVersion(MCS_PROTOCOL_VERSION)
+	, m_ReceivedData(64 KiB)
 	, m_Socket(a_Socket)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
@@ -1357,6 +1358,16 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 
 
 
+void cClientHandle::SendDisconnect(const AString & a_Reason)
+{
+	cPacket_Disconnect DC(a_Reason);
+	m_Socket.Send(&DC);
+}
+
+
+
+
+
 void cClientHandle::CheckIfWorldDownloaded(void)
 {
 	if (m_State != csDownloadingWorld)
@@ -1453,32 +1464,43 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
 	// Data is received from the client
-
-	m_ReceivedData.append(a_Data, a_Size);
+	
+	if (!m_ReceivedData.Write(a_Data, a_Size))
+	{
+		// Too much data in the incoming queue, the server is probably too busy, kick the client:
+		LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_Socket.GetIPString().c_str());
+		SendDisconnect("Server busy");
+		// TODO: QueueDestroy();
+		cSleep::MilliSleep(1000); // Give packet some time to be received
+		Destroy();
+		return;
+	}
 
 	// Parse and handle all complete packets in m_ReceivedData:
-	while (!m_ReceivedData.empty())
+	while (m_ReceivedData.CanReadBytes(1))
 	{
-		cPacket* pPacket = m_PacketMap[(unsigned char)m_ReceivedData[0]];
+		unsigned char PacketType;
+		m_ReceivedData.ReadByte(PacketType);
+		cPacket* pPacket = m_PacketMap[PacketType];
 		if (pPacket == NULL)
 		{
-			LOGERROR("Unknown packet type 0x%02x from client \"%s\"", (unsigned char)m_ReceivedData[0], m_Username.c_str());
+			LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", PacketType, m_Username.c_str(), m_Socket.GetIPString().c_str());
 
 			AString Reason;
-			Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", (unsigned char)m_ReceivedData[0]);
-			cPacket_Disconnect DC(Reason);
-			m_Socket.Send(&DC);
+			Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", PacketType);
+			SendDisconnect(Reason);
+			// TODO: QueueDestroy();
 			cSleep::MilliSleep(1000); // Give packet some time to be received
 			Destroy();
 			return;
 		}
 		
-		int NumBytes = pPacket->Parse(m_ReceivedData.data() + 1, m_ReceivedData.size() - 1);
+		int NumBytes = pPacket->Parse(m_ReceivedData);
 		if (NumBytes == PACKET_ERROR)
 		{
-			LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", (unsigned char)m_ReceivedData[0], m_Username.c_str());
-			cPacket_Disconnect DC("Protocol error");
-			m_Socket.Send(&DC);
+			LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", PacketType, m_Username.c_str());
+			SendDisconnect("Protocol error");
+			// TODO: QueueDestroy();
 			cSleep::MilliSleep(1000); // Give packet some time to be received
 			Destroy();
 			return;
@@ -1486,6 +1508,7 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 		else if (NumBytes == PACKET_INCOMPLETE)
 		{
 			// Not a complete packet
+			m_ReceivedData.ResetRead();
 			break;
 		}
 		else
@@ -1493,10 +1516,9 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 			// Packet parsed successfully, add it to internal queue:
 			HandlePacket(pPacket);
 			// Erase the packet from the buffer:
-			ASSERT(m_ReceivedData.size() > (size_t)NumBytes);
-			m_ReceivedData.erase(0, NumBytes + 1);
+			m_ReceivedData.CommitRead();
 		}
-	}  // while (!Received.empty())
+	}  // while (!Received.CanReadBytes(1))
 }
 
 

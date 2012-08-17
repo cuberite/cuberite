@@ -7,7 +7,7 @@
 
 
 
-int cPacket_Flying::Parse(const char * a_Data, int a_Size)
+int cPacket_Flying::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes= 0;
 	HANDLE_PACKET_READ(ReadBool, m_bFlying, TotalBytes);

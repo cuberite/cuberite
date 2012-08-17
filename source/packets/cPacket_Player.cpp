@@ -22,17 +22,14 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPacket_PlayerAbilities:
 
-int cPacket_PlayerAbilities::Parse(const char * a_Data, int a_Size)
+int cPacket_PlayerAbilities::Parse(cByteBuffer & a_Buffer)
 {
-	if (a_Size < 4)
-	{
-		return PACKET_INCOMPLETE;
-	}
-	m_Invulnerable = (a_Data[0] != 0);
-	m_IsFlying     = (a_Data[1] != 0);
-	m_CanFly       = (a_Data[2] != 0);
-	m_InstaMine    = (a_Data[3] != 0);
-	return 4;
+	int TotalBytes = 0;
+	HANDLE_PACKET_READ(ReadBool, m_Invulnerable, TotalBytes);
+	HANDLE_PACKET_READ(ReadBool, m_IsFlying,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBool, m_CanFly,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBool, m_InstaMine,    TotalBytes);
+	return TotalBytes;
 }
 
 
@@ -69,12 +66,12 @@ cPacket_PlayerListItem::cPacket_PlayerListItem(const AString & a_PlayerName, boo
 
 
 
-int cPacket_PlayerListItem::Parse(const char * a_Data, int a_Size)
+int cPacket_PlayerListItem::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadString16, m_PlayerName, TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,     m_Online,     TotalBytes);
-	HANDLE_PACKET_READ(ReadShort,    m_Ping,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_PlayerName, TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,            m_Online,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort,         m_Ping,       TotalBytes);
 	return TotalBytes;
 }
 
@@ -119,12 +116,12 @@ cPacket_PlayerLook::cPacket_PlayerLook( cPlayer* a_Player )
 
 
 
-int cPacket_PlayerLook::Parse(const char * a_Data, int a_Size)
+int cPacket_PlayerLook::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadFloat, m_Rotation, TotalBytes);
-	HANDLE_PACKET_READ(ReadFloat, m_Pitch,    TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,  m_bFlying,  TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat, m_Rotation, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat, m_Pitch,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,    m_bFlying,  TotalBytes);
 	return TotalBytes;
 }
 
@@ -162,16 +159,16 @@ cPacket_PlayerMoveLook::cPacket_PlayerMoveLook( cPlayer* a_Player )
 
 
 
-int cPacket_PlayerMoveLook::Parse(const char * a_Data, int a_Size)
+int cPacket_PlayerMoveLook::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadDouble, m_PosX,     TotalBytes);
-	HANDLE_PACKET_READ(ReadDouble, m_PosY,     TotalBytes);
-	HANDLE_PACKET_READ(ReadDouble, m_Stance,   TotalBytes);
-	HANDLE_PACKET_READ(ReadDouble, m_PosZ,     TotalBytes);
-	HANDLE_PACKET_READ(ReadFloat,  m_Rotation, TotalBytes);
-	HANDLE_PACKET_READ(ReadFloat,  m_Pitch,    TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,   m_bFlying,  TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosX,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosY,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_Stance,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosZ,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat,  m_Rotation, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat,  m_Pitch,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,     m_bFlying,  TotalBytes);
 	return TotalBytes;
 }
 
@@ -213,14 +210,14 @@ cPacket_PlayerPosition::cPacket_PlayerPosition( cPlayer* a_Player )
 
 
 
-int cPacket_PlayerPosition::Parse(const char * a_Data, int a_Size)
+int cPacket_PlayerPosition::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadDouble, m_PosX,    TotalBytes);
-	HANDLE_PACKET_READ(ReadDouble, m_PosY,    TotalBytes);
-	HANDLE_PACKET_READ(ReadDouble, m_Stance,  TotalBytes);
-	HANDLE_PACKET_READ(ReadDouble, m_PosZ,    TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,   m_bFlying, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosX,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosY,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_Stance,  TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosZ,    TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,     m_bFlying, TotalBytes);
 	return TotalBytes;
 }
 

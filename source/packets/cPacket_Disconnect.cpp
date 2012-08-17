@@ -7,10 +7,10 @@
 
 
 
-int cPacket_Disconnect::Parse(const char * a_Data, int a_Size)
+int cPacket_Disconnect::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadString16, m_Reason, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, m_Reason, TotalBytes);
 	return TotalBytes;
 }
 

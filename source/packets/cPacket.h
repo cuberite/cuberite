@@ -3,6 +3,7 @@
 
 #include "../cSocket.h"
 #include "../PacketID.h"
+#include "../ByteBuffer.h"
 
 
 
@@ -10,6 +11,7 @@
 
 #define PACKET_INCOMPLETE -2
 #define PACKET_ERROR      -1
+#define PACKET_OK         1
 
 
 
@@ -18,12 +20,11 @@
 // Use this macro to simplify handling several ReadXXX in a row. It assumes that you want [a_Data, a_Size] parsed (which is true for all Parse() functions)
 #define HANDLE_PACKET_READ(Proc, Var, TotalBytes) \
 	{ \
-		int res = Proc(a_Data + TotalBytes, a_Size - TotalBytes, Var); \
-		if (res < 0) \
+		if (!a_Buffer.Proc(Var)) \
 		{ \
-			return res; \
+			return PACKET_INCOMPLETE; \
 		} \
-		TotalBytes += res; \
+		TotalBytes = PACKET_OK; \
 	}
 
 
@@ -38,22 +39,23 @@ public:
 	{}
 	virtual ~cPacket() {}
 
-	/// Called to parse the packet. Packet type has already been read and the correct packet type created. Return the number of characters processed, PACKET_INCOMPLETE for incomplete data, PACKET_ERROR for error
-	virtual int Parse(const char * a_Data, int a_Size)
+	/// Called to parse the packet. Packet type has already been read and the correct packet type created. Return PACKET_INCOMPLETE for incomplete data, PACKET_ERROR for error, any positive number for success
+	virtual int Parse(cByteBuffer & a_Buffer)
 	{
-		UNUSED(a_Data);
-		UNUSED(a_Size);
-		LOGERROR("Undefined Parse function for packet type 0x%x\n", m_PacketID );
-		ASSERT(!"Undefined Parse function");
-		return -1;
+		// There are packets that are sent S->C only, those don't have a parsing function
+		UNUSED(a_Buffer);
+		LOGERROR("Packet type 0x%02x has no parser defined!", m_PacketID);
+		ASSERT(!"Unparsed packet type!");
+		return PACKET_ERROR;
 	}
 	
 	/// Called to serialize the packet into a string. Append all packet data to a_Data, including the packet type!
 	virtual void Serialize(AString & a_Data) const
 	{
+		// There are packets that are sent C->S only, those don't have a serializing function
 		UNUSED(a_Data);
-		LOGERROR("Undefined Serialize function for packet type 0x%x\n",  m_PacketID );
-		ASSERT(!"Undefined Serialize function");
+		LOGERROR("Packet type 0x%02x has no serializer defined!", m_PacketID);
+		ASSERT(!"Unserialized packet");
 	}
 	
 	virtual cPacket * Clone() const = 0;
@@ -61,19 +63,6 @@ public:
 	unsigned char m_PacketID;
 
 protected:
-
-	// These return the number of characters processed, PACKET_INCOMPLETE for incomplete data, PACKET_ERROR for error:
-	static int ReadString16(const char * a_Data, int a_Size, AString & a_OutString );
-	static int ReadShort   (const char * a_Data, int a_Size, short & a_Short );
-	static int ReadInteger (const char * a_Data, int a_Size, int & a_OutInteger );
-	static int ReadInteger (const char * a_Data, int a_Size, unsigned int & a_OutInteger );
-	static int ReadFloat   (const char * a_Data, int a_Size, float & a_OutFloat );
-	static int ReadDouble  (const char * a_Data, int a_Size, double & a_OutDouble );
-	static int ReadByte    (const char * a_Data, int a_Size, char & a_OutByte );
-	static int ReadByte    (const char * a_Data, int a_Size, unsigned char & a_OutByte );
-	static int ReadLong    (const char * a_Data, int a_Size, long long & a_OutLong );
-	static int ReadBool    (const char * a_Data, int a_Size, bool & a_OutBool );
-
 	// These append the data into the a_Dst string:
 	static void AppendString  ( AString & a_Dst, const AString & a_String);
 	static void AppendString16( AString & a_Dst, const AString & a_String);

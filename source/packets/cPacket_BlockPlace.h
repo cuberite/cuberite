@@ -21,7 +21,7 @@ public:
 	{ m_PacketID = E_BLOCK_PLACE;  }
 	virtual cPacket* Clone() const { return new cPacket_BlockPlace(*this); }
 
-	virtual int Parse(const char * a_Data, int a_Size) override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 
 	int  m_PosX;			//tolua_export
 	unsigned char m_PosY;	//tolua_export
