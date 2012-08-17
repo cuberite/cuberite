@@ -13,24 +13,34 @@
 #include "cCriticalSection.h"
 #include "cRoot.h"
 #include "cMakeDir.h"
+#include "ToJava.h"
 
 #include <android/log.h>
 
 cCriticalSection g_CriticalSection;
 
 JNIEnv* g_CurrentJNIEnv = 0;
-jobject g_JavaRenderer = 0;
+jobject g_JavaThread = 0;
+//jobject g_JavaActivity = 0;
 
 cRoot * pRoot = NULL;
 
+
+
+
+
 /* Called when program/activity is created */
-extern "C" void Java_com_mcserver_MainThread_NativeOnCreate( JNIEnv*  env )
+extern "C" void Java_com_mcserver_MainThread_NativeOnCreate( JNIEnv*  env, jobject  thiz )
 {
 	g_CriticalSection.Lock();
 	g_CurrentJNIEnv = env;
+	g_JavaThread = thiz;
 	//if( !cLogger::GetSingletonPtr() ) new cLogger();
 	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Logging from C++!");
 	g_CriticalSection.Unlock();
+
+	//CallJavaFunction_Void_Void(g_JavaActivity, "TestTest" );
+	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", "herpderpderp!!" );
 	
 	mkdir("/sdcard/mcserver", S_IRWXU | S_IRWXG | S_IRWXO);
 
@@ -39,57 +49,20 @@ extern "C" void Java_com_mcserver_MainThread_NativeOnCreate( JNIEnv*  env )
 	delete pRoot;
 }
 
-extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env )
+
+
+
+
+extern "C" void Java_com_mcserver_MainThread_NativeCleanUp( JNIEnv*  env, jobject  thiz )
 {
 	g_CriticalSection.Lock();
 	g_CurrentJNIEnv = env;
-
+	g_JavaThread = thiz;
 	g_CriticalSection.Unlock();
 
 	pRoot->ServerCommand("stop");
 }
 
-/* Call to initialize the graphics state */
-extern "C" void Java_com_ballz_CppWrapperRenderer_NativeInitGL( JNIEnv*  env, jobject  thiz )
-{
-	g_CriticalSection.Lock();
-	g_CurrentJNIEnv = env;
-	g_JavaRenderer = thiz;
-
-	g_CriticalSection.Unlock();
-}
-
-extern "C" void Java_com_ballz_CppWrapperRenderer_NativeResize( JNIEnv*  env, jobject  thiz, jint w, jint h )
-{
-	g_CriticalSection.Lock();
-	g_CurrentJNIEnv = env;
-	g_JavaRenderer = thiz;
-
-	g_CriticalSection.Unlock();
-}
-
-extern "C" void Java_com_ballz_CppWrapperRenderer_NativeRender( JNIEnv*  env, jobject  thiz )
-{
-	g_CriticalSection.Lock();
-	g_CurrentJNIEnv = env;
-	g_JavaRenderer = thiz;
 
 
-	g_CriticalSection.Unlock();
-}
 
-extern "C" void Java_com_ballz_CppWrapperGLSurfaceView_NativeTouchScreen( JNIEnv*  env, jobject  thiz, jint mouseid, jint touched )
-{
-	g_CriticalSection.Lock();
-	g_CurrentJNIEnv = env;
-
-	g_CriticalSection.Unlock();
-}
-
-extern "C" void Java_com_ballz_CppWrapperGLSurfaceView_NativeTouchEvent( JNIEnv*  env, jobject  thiz, jint mouseid, jfloat x, jfloat y )
-{
-	g_CriticalSection.Lock();
-	g_CurrentJNIEnv = env;
-
-	g_CriticalSection.Unlock();
-}

@@ -11,6 +11,7 @@
 
 #if defined(ANDROID_NDK)
 #include <android/log.h>
+#include "ToJava.h"
 #endif
 
 
@@ -130,6 +131,7 @@ void cLog::Log(const char * a_Format, va_list argList)
 	// Print to console:
 #if defined(ANDROID_NDK)
 	__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
+	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
 #else
 	printf("%s", Line.c_str());
 #endif

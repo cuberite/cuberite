@@ -73,7 +73,7 @@ bool cPlugin_NewLua::Initialize()
 		ManualBindings::Bind( m_LuaState );
 	}
 
-	std::string PluginPath = std::string("Plugins/") + m_Directory + "/";
+	std::string PluginPath = FILE_IO_PREFIX + std::string("Plugins/") + m_Directory + "/";
 
 	// Load all files for this plugin, and execute them
 	AStringList Files = GetDirectoryContents(PluginPath.c_str());

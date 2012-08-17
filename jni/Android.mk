@@ -9,7 +9,7 @@ LOCAL_SRC_FILES := $(shell find lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source sq
 LOCAL_SRC_FILES := $(filter-out %SquirrelFunctions.cpp %SquirrelBindings.cpp %cPlugin_Squirrel.cpp %cSquirrelCommandBinder.cpp %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES := $(patsubst %.cpp,../%.cpp,$(LOCAL_SRC_FILES))
 LOCAL_SRC_FILES := $(patsubst %.c,../%.c,$(LOCAL_SRC_FILES))
-LOCAL_SRC_FILES += app-android.cpp
+LOCAL_SRC_FILES += app-android.cpp ToJava.cpp
 
 LOCAL_CFLAGS := -DANDROID_NDK \
 				-ffast-math \

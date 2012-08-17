@@ -1620,6 +1620,70 @@
 					RelativePath="..\source\cTimer.h"
 					>
 				</File>
+				<Filter
+					Name="Android Specific"
+					>
+					<File
+						RelativePath="..\jni\Android.mk"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\jni\app-android.cpp"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\jni\Application.mk"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\jni\ToJava.cpp"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath="..\jni\ToJava.h"
+						>
+						<FileConfiguration
+							Name="Release|Win32"
+							ExcludedFromBuild="true"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+							/>
+						</FileConfiguration>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Bindings"
