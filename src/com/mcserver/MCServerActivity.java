@@ -1,9 +1,14 @@
 package com.mcserver;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -17,12 +22,16 @@ import android.widget.TextView;
 public class MCServerActivity extends Activity {
 	MainThread mThread = null;
 	Thread ServerStatusThread = null;
+	boolean mbExiting = false;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        Log.e("MCServer", "p id: " + android.os.Process.myPid() );
+        
         
         ((Button)findViewById(R.id.start_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
@@ -58,6 +67,51 @@ public class MCServerActivity extends Activity {
 			}
         });
         ServerStatusThread.start();
+        
+        
+        
+
+        
+        
+
+        Thread loggerThread = new Thread( new Runnable() {
+			public void run() {
+				Process process = null;
+				
+				SetText( "herpaderpa" );
+
+				try {
+					process = Runtime.getRuntime().exec("logcat -v raw *:s MCServer ");// Verbose filter
+				} catch (IOException e) {
+				}
+
+				BufferedReader reader = null;
+
+				try {
+					reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+					String line;
+
+					while( mbExiting == false ) {
+						line = reader.readLine();
+						if( line != null )
+						{
+							SetText( line );
+						}
+					}
+
+					Log.i("MCServer", "Prepping thread for termination");
+					reader.close();
+					process.destroy();
+					process = null;
+					reader = null;
+				} catch (IOException e) {
+				}
+			}
+        });
+        loggerThread.start();
+
+        
         
         
         
@@ -118,6 +172,14 @@ public class MCServerActivity extends Activity {
     
     
     
+    public void onDestroy() {
+    	mbExiting = true;
+    	super.onDestroy();
+    }
+    
+    
+    
+    
     
     public void AddToLog( String logMessage ) {
     	
@@ -128,7 +190,7 @@ public class MCServerActivity extends Activity {
     
     
     public void SetText( final String aText ) {
-    	Log.d("MCServer", "in SetText " + aText);
+    	//Log.d("MCServer", "in SetText " + aText);
     	/*
     	final MCServerActivity context = this;
 		this.runOnUiThread(new Runnable() 
@@ -178,18 +240,6 @@ class MainThread extends Thread {
 	
     MainThread( MCServerActivity aContext ) {
     	mContext = aContext;
-    }
-
-    public void AddToLog( String logMessage ) {
-    	mContext.SetText( logMessage );
-    	//Log.d("MCServer", "Add to log: " + logMessage);
-    }
-    
-    public void TestTest(){
-    	numlogs++;
-    	//Log.d("MCServer", "in testtest" + numlogs);
-    	mContext.Testtt();
-    	mContext.SetText("log no. " + numlogs);
     }
     
     public void run() {
