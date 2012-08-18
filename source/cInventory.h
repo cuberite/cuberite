@@ -51,7 +51,7 @@ public:
 	void SetEquippedSlot( int a_SlotNum );				//tolua_export
 	short GetEquippedSlot() { return m_EquippedSlot; }	//tolua_export
 
-	virtual void Clicked( cPacket* a_ClickPacket ) = 0;
+	virtual void Clicked(short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem) = 0;
 
 	void SendSlot( int a_SlotNum );						//tolua_export
 	

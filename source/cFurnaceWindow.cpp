@@ -22,21 +22,27 @@ cFurnaceWindow::cFurnaceWindow( cFurnaceEntity* a_Owner )
 
 
 
-void cFurnaceWindow::Clicked(cPacket_WindowClick * a_ClickPacket, cPlayer & a_Player)
+void cFurnaceWindow::Clicked(
+	cPlayer & a_Player, 
+	int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+	const cItem & a_HeldItem
+)
 {
 	cItem Fuel = *GetSlot( 0 );
 
-	cWindow::Clicked( a_ClickPacket, a_Player );
+	cWindow::Clicked(a_Player, a_WindowID, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
 	if (m_Furnace != NULL)
 	{
-		if ((a_ClickPacket->m_SlotNum >= 0) && (a_ClickPacket->m_SlotNum <= 2)) // them important slots
+		if ((a_SlotNum >= 0) && (a_SlotNum <= 2)) // them important slots
 		{
-			if( Fuel.m_ItemID != GetSlot( 0 )->m_ItemID )
-				m_Furnace->ResetCookTimer();
-
-			if( m_Furnace->StartCooking() )
+			if (Fuel.m_ItemID != GetSlot( 0 )->m_ItemID)
 			{
-				SendWholeWindow( a_Player.GetClientHandle() );
+				m_Furnace->ResetCookTimer();
+			}
+
+			if (m_Furnace->StartCooking())
+			{
+				SendWholeWindow(a_Player.GetClientHandle());
 			}
 		}
 	}

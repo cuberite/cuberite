@@ -97,6 +97,9 @@ public:																	//tolua_export
 	// If the hook returns true, no further hook is called and the functions return false
 	bool CallHook( PluginHook a_Hook, unsigned int a_NumArgs, ... );
 	
+	bool CallHookLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
+	bool CallHookBlockDig        (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE OldBlock, NIBBLETYPE OldMeta);
+	bool CallHookBlockPlace      (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
 	bool CallHookChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_Chunk);
 	bool CallHookPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);

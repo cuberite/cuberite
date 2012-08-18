@@ -10,12 +10,11 @@
 #pragma once
 
 
-class cPacket_WindowClick;
 class cPlayer;
 class cItem;
 class cWindowOwner;
 class cClientHandle;
-class cPacket;
+class cPacket;  // TODO: remove this
 
 typedef std::list<cPlayer *> cPlayerList;
 
@@ -63,7 +62,11 @@ public:
 	bool IsInventoryVisible() { return m_bInventoryVisible; }
 	void SetInventoryVisible( bool a_bVisible ) { m_bInventoryVisible = a_bVisible; }
 
-	virtual void Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player );
+	virtual void Clicked(
+		cPlayer & a_Player, int a_WindowID, 
+		short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed,
+		const cItem & a_HeldItem
+	);
 
 	virtual void Open( cPlayer & a_Player );
 	virtual void Close( cPlayer & a_Player );
@@ -71,7 +74,7 @@ public:
 	cWindowOwner* GetOwner() { return m_Owner; }
 	void SetOwner( cWindowOwner* a_Owner ) { m_Owner = a_Owner; }
 
-	void SendWholeWindow( cClientHandle* a_Client );
+	void SendWholeWindow(cClientHandle * a_Client);
 	void BroadcastWholeWindow(void);
 	void Broadcast(const cPacket & a_Packet);
 

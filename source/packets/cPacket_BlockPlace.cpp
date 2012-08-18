@@ -16,18 +16,13 @@ int cPacket_BlockPlace::Parse(cByteBuffer & a_Buffer)
 	HANDLE_PACKET_READ(ReadBEInt, m_PosZ,      TotalBytes);
 	HANDLE_PACKET_READ(ReadChar,  m_Direction, TotalBytes);
 
-	cPacket_ItemData Item;
+	cPacket_ItemData Item(m_HeldItem);
 	int res = Item.Parse(a_Buffer);
 	if (res < 0)
 	{
 		return res;
 	}
 	TotalBytes += res;
-
-	m_ItemType = Item.m_ItemID;
-	m_Count    = Item.m_ItemCount;
-	m_Uses     = Item.m_ItemUses;
-
 	return TotalBytes;
 }
 

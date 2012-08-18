@@ -28,8 +28,8 @@ class cSurvivalInventory										//tolua_export
 		SLOT_HOTBAR_MAX       = 44,
 	} ;
 	
-	void ShiftClickedCraftingResult(short a_Slot);
-	void ShiftClickedCraftingGrid  (short a_Slot);
+	void ShiftClickedCraftingResult(short a_SlotNum);
+	void ShiftClickedCraftingGrid  (short a_SlotNum);
 	void ShiftClickedArmor         (short a_Slot);
 	void ShiftClickedHotbar        (short a_Slot);
 	void ShiftClickedInventory     (short a_Slot);
@@ -38,9 +38,9 @@ public:
 	cSurvivalInventory(cPlayer* a_Owner);
 	~cSurvivalInventory();
 
-	virtual void Clicked(cPacket * a_ClickPacket) override;
+	virtual void Clicked(short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem) override;
 	
-	void ShiftClicked(cPacket_WindowClick * a_ClickPacket);
+	void ShiftClicked(short a_SlotNum);
 };	//tolua_export
 
 

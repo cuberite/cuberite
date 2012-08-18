@@ -292,6 +292,20 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, int a_NumChars)
 
 
 
+bool cByteBuffer::SkipRead(int a_Count)
+{
+	if (!CanReadBytes(a_Count))
+	{
+		return false;
+	}
+	AdvanceReadPos(a_Count);
+	return true;
+}
+
+
+
+
+
 void cByteBuffer::CommitRead(void)
 {
 	m_DataStart = m_ReadPos;

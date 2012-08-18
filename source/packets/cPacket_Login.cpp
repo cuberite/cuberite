@@ -7,8 +7,8 @@
 
 
 
-const std::string cPacket_Login::LEVEL_TYPE_DEFAULT = "DEFAULT";
-const std::string cPacket_Login::LEVEL_TYPE_SUPERFLAT = "SUPERFLAT";
+const char * cPacket_Login::LEVEL_TYPE_DEFAULT   = "DEFAULT";
+const char * cPacket_Login::LEVEL_TYPE_SUPERFLAT = "SUPERFLAT";
 
 
 
@@ -16,7 +16,6 @@ const std::string cPacket_Login::LEVEL_TYPE_SUPERFLAT = "SUPERFLAT";
 
 int cPacket_Login::Parse(cByteBuffer & a_Buffer)
 {
-	//printf("Parse: NEW Login\n");
 	int TotalBytes = 0;
 	m_Username.clear();
 	HANDLE_PACKET_READ(ReadBEInt,           m_ProtocolVersion, TotalBytes);

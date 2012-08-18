@@ -19,7 +19,7 @@ class cItemHandler
 public:
 	cItemHandler(int a_ItemID);
 	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);	//eg for fishing or hoes
-	virtual bool OnDiggingBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);
+	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
 	virtual void OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z);
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
 	

@@ -293,7 +293,7 @@ void cInventory::SendWholeInventoryToAll(void)
 
 void cInventory::SendSlot( int a_SlotNum )
 {
-	cItem* Item = GetSlot( a_SlotNum );
+	cItem * Item = GetSlot(a_SlotNum);
 	if (Item != NULL)
 	{
 		if (Item->IsEmpty())

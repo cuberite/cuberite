@@ -120,7 +120,7 @@ bool cFurnaceEntity::Tick( float a_Dt )
 	
 	if ((m_CookingItem != NULL) && ((m_TimeBurned < m_BurnTime) || (m_TimeCooked + a_Dt >= m_CookTime)))
 	{
-		if (m_CookingItem->Equals(m_Items[2]) || m_Items[2].IsEmpty())
+		if (m_CookingItem->IsEqual(m_Items[2]) || m_Items[2].IsEmpty())
 		{
 			m_TimeCooked += a_Dt;
 			if ( m_TimeCooked >= m_CookTime )
@@ -201,9 +201,9 @@ bool cFurnaceEntity::StartCooking(void)
 	if( (m_TimeBurned < m_BurnTime) || BurnTime > 0.f ) // burnable material
 	{
 		const cFurnaceRecipe::Recipe* R = FR->GetRecipeFrom( m_Items[0] );
-		if( R ) // cook able ingredient
+		if (R != NULL) // cook able ingredient
 		{
-			if( m_Items[2].Equals( *R->Out ) || m_Items[2].IsEmpty() )
+			if (m_Items[2].IsEqual(*R->Out) || m_Items[2].IsEmpty())
 			{
 				// good to go
 
@@ -241,7 +241,7 @@ bool cFurnaceEntity::ContinueCooking(void)
 		const cFurnaceRecipe::Recipe * R = FR->GetRecipeFrom( m_Items[0] );
 		if (R != NULL) // cook able ingredient
 		{
-			if (m_Items[2].Equals(*R->Out) || m_Items[2].IsEmpty())
+			if (m_Items[2].IsEqual(*R->Out) || m_Items[2].IsEmpty())
 			{
 				// good to go
 				if (m_CookingItem == NULL) // Only cook new item if not already cooking

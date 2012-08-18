@@ -39,6 +39,7 @@ public:
 	double GetEyeHeight();													//tolua_export
 	Vector3d GetEyePosition();												//tolua_export
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
+	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline const double & GetStance() { return m_Stance; }					//tolua_export
 	inline cInventory & GetInventory() { if(GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }	//tolua_export
 

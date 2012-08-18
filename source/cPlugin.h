@@ -46,28 +46,28 @@ public:
 
 	/**
 	 * On all these functions, return true if you want to override default behavior
-	 * You can also return false, so default behavior is used, but with changed PacketData
+	 * You can also return false, so default behavior is used.
 	 **/
-	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player );
-	virtual bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player );
-	virtual bool OnBlockPlace      (cPacket_BlockPlace* a_PacketData, cPlayer* a_Player );
-	virtual bool OnBlockDig        (cPacket_BlockDig * a_PacketData, cPlayer * a_Player, cItem * a_PickupItem);
-	virtual bool OnChat            (const char * a_Chat, cPlayer* a_Player );
-	virtual bool OnLogin           (cPacket_Login* a_PacketData );
-	virtual void OnPlayerSpawn     (cPlayer* a_Player );
-	virtual bool OnPlayerJoin      (cPlayer* a_Player );
-	virtual void OnPlayerMove      (cPlayer* a_Player );
-	virtual void OnTakeDamage      (cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo );
-	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer );
+	virtual bool OnBlockDig        (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	virtual bool OnBlockPlace      (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
+	virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
+	virtual bool OnChat            (const char * a_Chat, cPlayer * a_Player );
 	virtual void OnChunkGenerated  (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	virtual bool OnChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk);
-	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player );
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player );
+	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer );
+	virtual bool OnLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
+	virtual bool OnPlayerJoin      (cPlayer* a_Player );
+	virtual void OnPlayerMove      (cPlayer* a_Player );
+	virtual void OnPlayerSpawn     (cPlayer* a_Player );
 	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
-	virtual bool OnWeatherChanged  (cWorld * a_World);
-	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4);
+	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual void OnTakeDamage      (cPawn * a_Pawn, TakeDamageInfo * a_TakeDamageInfo );
 	virtual bool OnUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4);
+	virtual bool OnWeatherChanged  (cWorld * a_World);
 	
 	// Accessors
 	const char* GetName() const { return m_Name.c_str(); }

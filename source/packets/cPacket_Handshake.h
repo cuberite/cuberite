@@ -17,7 +17,6 @@ public:
 	virtual void Serialize(AString & a_Data) const override;
 
 	std::string m_Username;
-	static const unsigned int c_Size = 3; // Minimal size
 };
 
 

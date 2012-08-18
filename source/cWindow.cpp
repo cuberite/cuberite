@@ -8,8 +8,8 @@
 #include "cPickup.h"
 #include "cInventory.h"
 #include "cWindowOwner.h"
+#include "items/Item.h"
 
-#include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_WindowOpen.h"
 #include "packets/cPacket_WindowClose.h"
@@ -84,11 +84,15 @@ cItem* cWindow::GetDraggingItem( cPlayer * a_Player /* = 0 */ )
 
 
 
-void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
+void cWindow::Clicked(
+	cPlayer & a_Player, 
+	int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+	const cItem & a_HeldItem
+)
 {
-	if (a_ClickPacket->m_WindowID != m_WindowID)
+	if (a_WindowID != m_WindowID)
 	{
-		LOG("WRONG WINDOW ID! (exp %d, got %d)", m_WindowID, a_ClickPacket->m_WindowID);
+		LOG("WRONG WINDOW ID! (exp %d, got %d) received from \"%s\"", m_WindowID, a_WindowID, a_Player.GetName().c_str());
 		return;
 	}
 
@@ -101,111 +105,118 @@ void cWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
 		}
 	}
 	bool bAsync = false;
-	if (a_ClickPacket->m_SlotNum == -999) // Outside window click
+	if (a_SlotNum == -999) // Outside window click
 	{
-		if (a_ClickPacket->m_RightMouse)
+		if (a_IsRightClick)
 		{
-			a_Player.TossItem( true );
+			a_Player.TossItem(true);
 		}
 		else
 		{
-			a_Player.TossItem( true, m_DraggingItem->m_ItemCount );
+			a_Player.TossItem(true, m_DraggingItem->m_ItemCount);
 		}
 	}
-	else if (GetSlot(a_ClickPacket->m_SlotNum) != NULL)
+	else if (GetSlot(a_SlotNum) != NULL)
 	{
-		cItem * Item = GetSlot(a_ClickPacket->m_SlotNum);
-		if (
-			(a_ClickPacket->m_ItemID    != Item->m_ItemID) ||
-			(a_ClickPacket->m_ItemCount != Item->m_ItemCount) ||
-			(a_ClickPacket->m_ItemUses  != Item->m_ItemHealth)
-		)
+		cItem * Item = GetSlot(a_SlotNum);
+		if (!Item->IsEqual(a_HeldItem))
 		{
-			if (!((a_ClickPacket->m_ItemID == -1 || a_ClickPacket->m_ItemID == 0) && (Item->m_ItemID == -1 || Item->m_ItemID == 0 )) )
-			{
-				LOGD("My ID: %i Their ID: %i", Item->m_ItemID, a_ClickPacket->m_ItemID );
-				LOGD("My Count: %i Their Count: %i", Item->m_ItemCount, a_ClickPacket->m_ItemCount );
-				LOGD("My Uses: %i Their Uses: %i", Item->m_ItemHealth, a_ClickPacket->m_ItemUses );
-				bAsync = true;
-			}
+			LOGD("*** Window lost sync ***");
+			LOGD("My Type:  %i Their Type:  %i", Item->m_ItemID,     a_HeldItem.m_ItemID);
+			LOGD("My Count: %i Their Count: %i", Item->m_ItemCount,  a_HeldItem.m_ItemCount);
+			LOGD("My Dmg:   %i Their Dmg:   %i", Item->m_ItemHealth, a_HeldItem.m_ItemHealth);
+			bAsync = true;
 		}
 	}
-	if (m_DraggingItem && (a_ClickPacket->m_SlotNum > -1) && (a_ClickPacket->m_SlotNum < m_NumSlots))
+	if (m_DraggingItem && (a_SlotNum > -1) && (a_SlotNum < m_NumSlots))
 	{
-		if (a_ClickPacket->m_RightMouse == 0)
+		if (!a_IsRightClick)
 		{
-			if (!m_DraggingItem->Equals(m_Slots[a_ClickPacket->m_SlotNum]))
+			// Left-clicked
+			if (!m_DraggingItem->IsEqual(m_Slots[a_SlotNum]))
 			{
+				// Switch contents
 				cItem tmp(*m_DraggingItem);
-				*m_DraggingItem = m_Slots[a_ClickPacket->m_SlotNum];
-				m_Slots[a_ClickPacket->m_SlotNum] = tmp; // Switch contents
+				*m_DraggingItem = m_Slots[a_SlotNum];
+				m_Slots[a_SlotNum] = tmp;
 			}
 			else
 			{
-				int FreeSlots = 64 - m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount;
-				int Filling = (FreeSlots > m_DraggingItem->m_ItemCount) ? m_DraggingItem->m_ItemCount : FreeSlots;
-				m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount += (char)Filling;
-				m_DraggingItem->m_ItemCount -= (char)Filling;
-				if( m_DraggingItem->m_ItemCount <= 0 )
-					m_DraggingItem->Empty();
-			}
-		}
-		else // Right clicked
-		{
-			if( m_DraggingItem->m_ItemID <= 0 ) // Empty?
-			{
-				m_DraggingItem->m_ItemCount = (char)(((float)m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount)/2.f + 0.5f);
-				m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount -= m_DraggingItem->m_ItemCount;
-				m_DraggingItem->m_ItemID = m_Slots[a_ClickPacket->m_SlotNum].m_ItemID;
-				m_DraggingItem->m_ItemHealth = m_Slots[a_ClickPacket->m_SlotNum].m_ItemHealth;
-
-				if( m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount <= 0 )
+				// Same type, add items:
+				cItemHandler * Handler = ItemHandler(m_DraggingItem->m_ItemID);
+				int FreeSlots = Handler->GetMaxStackSize() - m_Slots[a_SlotNum].m_ItemCount;
+				if (FreeSlots < 0)
 				{
-					m_Slots[a_ClickPacket->m_SlotNum].Empty();
+					ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
+					FreeSlots = 0;
+				}
+				int Filling = (FreeSlots > m_DraggingItem->m_ItemCount) ? m_DraggingItem->m_ItemCount : FreeSlots;
+				m_Slots[a_SlotNum].m_ItemCount += (char)Filling;
+				m_DraggingItem->m_ItemCount -= (char)Filling;
+				if (m_DraggingItem->m_ItemCount <= 0)
+				{
+					m_DraggingItem->Empty();
 				}
 			}
-			else if( m_Slots[a_ClickPacket->m_SlotNum].m_ItemID <= 0 || m_DraggingItem->Equals( m_Slots[a_ClickPacket->m_SlotNum] ) )
-			{	// Drop one item in slot
-				if( m_DraggingItem->m_ItemCount > 0 && m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount < 64 )
+		}
+		else
+		{
+			// Right clicked
+			if (m_DraggingItem->m_ItemID <= 0) // Empty-handed?
+			{
+				m_DraggingItem->m_ItemCount = (char)(((float)m_Slots[a_SlotNum].m_ItemCount) / 2.f + 0.5f);
+				m_Slots[a_SlotNum].m_ItemCount -= m_DraggingItem->m_ItemCount;
+				m_DraggingItem->m_ItemID = m_Slots[a_SlotNum].m_ItemID;
+				m_DraggingItem->m_ItemHealth = m_Slots[a_SlotNum].m_ItemHealth;
+
+				if (m_Slots[a_SlotNum].m_ItemCount <= 0)
 				{
-					m_Slots[a_ClickPacket->m_SlotNum].m_ItemID = m_DraggingItem->m_ItemID;
-					m_Slots[a_ClickPacket->m_SlotNum].m_ItemCount++;
-					m_Slots[a_ClickPacket->m_SlotNum].m_ItemHealth = m_DraggingItem->m_ItemHealth;
+					m_Slots[a_SlotNum].Empty();
+				}
+			}
+			else if ((m_Slots[a_SlotNum].m_ItemID <= 0) || m_DraggingItem->IsEqual(m_Slots[a_SlotNum]))
+			{
+				// Drop one item in slot
+				cItemHandler * Handler = ItemHandler(m_Slots[a_SlotNum].m_ItemID);
+				if ((m_DraggingItem->m_ItemCount > 0) && (m_Slots[a_SlotNum].m_ItemCount < Handler->GetMaxStackSize()))
+				{
+					m_Slots[a_SlotNum].m_ItemID = m_DraggingItem->m_ItemID;
+					m_Slots[a_SlotNum].m_ItemCount++;
+					m_Slots[a_SlotNum].m_ItemHealth = m_DraggingItem->m_ItemHealth;
 					m_DraggingItem->m_ItemCount--;
 				}
-				if( m_DraggingItem->m_ItemCount <= 0 )
+				if (m_DraggingItem->m_ItemCount <= 0)
 				{
 					m_DraggingItem->Empty();
 				}
 			}
-			else if( !m_DraggingItem->Equals( m_Slots[a_ClickPacket->m_SlotNum]) ) // Swap contents
+			else if (!m_DraggingItem->IsEqual(m_Slots[a_SlotNum]))
 			{
+				// Swap contents
 				cItem tmp( *m_DraggingItem );
-				*m_DraggingItem = m_Slots[a_ClickPacket->m_SlotNum];
-				m_Slots[a_ClickPacket->m_SlotNum] = tmp; // Switch contents
+				*m_DraggingItem = m_Slots[a_SlotNum];
+				m_Slots[a_SlotNum] = tmp;
 			}
 		}
-		if( bAsync )
+		if (bAsync)
 		{
-			LOG("Window is not synchonous with client. Sending whole window. ID: %i", m_WindowID);
-			for( std::list< cPlayer* >::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr )
+			// TODO: Handle this thread-safely (m_OpenedBy may change by another cSocketThread
+			for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 			{
-				SendWholeWindow( (*itr)->GetClientHandle() );
+				SendWholeWindow((*itr)->GetClientHandle());
 			}
-			if( m_bInventoryVisible || m_OpenedBy.size() == 0 )
+			if (m_bInventoryVisible || m_OpenedBy.empty())
 			{
 				a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );
 			}
 		}
 	}
-	else if( m_bInventoryVisible ) // Click in player inventory
+	else if (m_bInventoryVisible) // Click in player inventory
 	{
-		a_ClickPacket->m_WindowID = 0;
-		a_ClickPacket->m_SlotNum -= (short)(m_NumSlots - 9);
-		cWindow* Window = a_Player.GetInventory().GetWindow();
-		if( Window )
+		cWindow * Window = a_Player.GetInventory().GetWindow();
+		if (Window)
 		{
-			Window->Clicked( a_ClickPacket, a_Player );
+			Window->Clicked(a_Player, a_WindowID, a_SlotNum - 9, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
 		}
 	}
 	if (m_DraggingItem != NULL)

@@ -25,12 +25,17 @@ public:
 	
 	cCraftingWindow(cWindowOwner * a_Owner, bool a_bInventoryVisible);
 
-	virtual void Clicked(cPacket_WindowClick * a_ClickPacket, cPlayer & a_Player);
-	virtual void Close(cPlayer & a_Player);
+	virtual void Clicked(
+		cPlayer & a_Player, 
+		int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+		const cItem & a_HeldItem
+	) override;
 	
-	void ShiftClicked(cPacket_WindowClick * a_ClickPacket, cPlayer & a_Player);
-	void ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Player);
-	void ShiftClickedCraftingGrid  (short a_Slot, cPlayer & a_Player);
+	virtual void Close(cPlayer & a_Player) override;
+	
+	void ShiftClicked(cPlayer & a_Player, short a_SlotNum);
+	void ShiftClickedCraftingResult(cPlayer & a_Player, short a_SlotNum);
+	void ShiftClickedCraftingGrid  (cPlayer & a_Player, short a_SlotNum);
 };
 
 

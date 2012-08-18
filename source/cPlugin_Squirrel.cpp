@@ -125,37 +125,37 @@ bool cPlugin_Squirrel::OnDisconnect(const AString & a_Reason, cPlayer* a_Player 
 
 
 
-bool cPlugin_Squirrel::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player )
+bool cPlugin_Squirrel::OnBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 
-	if(!m_Plugin->HasFunction("OnBlockPlace")) return false;
+	if (!m_Plugin->HasFunction("OnBlockPlace")) return false;
 	
-	return m_Plugin->GetFunction("OnBlockPlace").Evaluate<bool>(a_PacketData, a_Player);
+	return m_Plugin->GetFunction("OnBlockPlace").Evaluate<bool>(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem);
 }
 
 
 
 
 
-bool cPlugin_Squirrel::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem )
+bool cPlugin_Squirrel::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 
-	if(!m_Plugin->HasFunction("OnBlockDig")) return false;
+	if (!m_Plugin->HasFunction("OnBlockDig")) return false;
 
-	return m_Plugin->GetFunction("OnBlockDig").Evaluate<bool>(a_PacketData, a_Player, a_PickupItem);
+	return m_Plugin->GetFunction("OnBlockDig").Evaluate<bool>(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, a_OldBlock, a_OldMeta);
 }
 
 
 
 
 
-bool cPlugin_Squirrel::OnChat( const char* a_Chat, cPlayer* a_Player )
+bool cPlugin_Squirrel::OnChat(const char * a_Chat, cPlayer * a_Player)
 {
 	cCSLock Lock( m_CriticalSection );
 
-	if(!m_Plugin->HasFunction("OnChat")) return false;
+	if (!m_Plugin->HasFunction("OnChat")) return false;
 	
 	return m_Plugin->GetFunction("OnChat").Evaluate<bool>(a_Chat, a_Player);
 
@@ -165,13 +165,16 @@ bool cPlugin_Squirrel::OnChat( const char* a_Chat, cPlayer* a_Player )
 
 
 
-bool cPlugin_Squirrel::OnLogin( cPacket_Login* a_PacketData )
+bool cPlugin_Squirrel::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
 	cCSLock Lock( m_CriticalSection );
 
-	if(!m_Plugin->HasFunction("OnLogin")) return false;
+	if (!m_Plugin->HasFunction("OnLogin"))
+	{
+		return false;
+	}
 	
-	return m_Plugin->GetFunction("OnLogin").Evaluate<bool>(a_PacketData);
+	return m_Plugin->GetFunction("OnLogin").Evaluate<bool>(a_Client, a_ProtocolVersion, a_Username);
 }
 
 

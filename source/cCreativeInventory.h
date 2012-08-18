@@ -1,13 +1,22 @@
+
 #pragma once
 
 #include "cInventory.h"
 
-class cCreativeInventory								//tolua_export
+
+
+
+
+class cCreativeInventory
 	: public cInventory
-{														//tolua_export
+{
 public:
-	cCreativeInventory(cPlayer* a_Owner);
+	cCreativeInventory(cPlayer * a_Owner);
 	~cCreativeInventory();
 
-	virtual void Clicked( cPacket* a_ClickPacket );
-};	//tolua_export
+	virtual void Clicked(short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem) override;
+} ;
+
+
+
+

@@ -16,10 +16,10 @@ public:
 
 	bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player ) override;
 	bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player ) override;
-	bool OnBlockPlace      (cPacket_BlockPlace* a_PacketData, cPlayer* a_Player ) override;
-	bool OnBlockDig        (cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) override;
-	bool OnChat            (const char* a_Chat, cPlayer* a_Player ) override;
-	bool OnLogin           (cPacket_Login* a_PacketData ) override;
+	bool OnBlockPlace      (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem) override;
+	bool OnBlockDig        (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta) override;
+	bool OnChat            (const char * a_Chat, cPlayer * a_Player ) override;
+	bool OnLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;
 	void OnPlayerSpawn     (cPlayer* a_Player ) override;
 	bool OnPlayerJoin      (cPlayer* a_Player ) override;
 	void OnPlayerMove      (cPlayer* a_Player ) override;

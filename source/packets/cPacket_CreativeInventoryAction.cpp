@@ -10,11 +10,9 @@
 
 cPacket_CreativeInventoryAction::cPacket_CreativeInventoryAction( const cPacket_CreativeInventoryAction & a_Copy )
 {
-	m_PacketID = E_CREATIVE_INVENTORY_ACTION;
-	m_Slot	 = a_Copy.m_Slot;
-	m_ItemID = a_Copy.m_ItemID;
-	m_Quantity = a_Copy.m_Quantity;
-	m_Damage = a_Copy.m_Damage;
+	m_PacketID    = E_CREATIVE_INVENTORY_ACTION;
+	m_SlotNum     = a_Copy.m_SlotNum;
+	m_ClickedItem = a_Copy.m_ClickedItem;
 }
 
 
@@ -24,20 +22,15 @@ cPacket_CreativeInventoryAction::cPacket_CreativeInventoryAction( const cPacket_
 int cPacket_CreativeInventoryAction::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadBEShort, m_Slot, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEShort, m_SlotNum, TotalBytes);
 
-	cPacket_ItemData Item;
+	cPacket_ItemData Item(m_ClickedItem);
 	int res = Item.Parse(a_Buffer);
 	if (res < 0)
 	{
 		return res;
 	}
 	TotalBytes += res;
-
-	m_ItemID = Item.m_ItemID;
-	m_Quantity = Item.m_ItemCount;
-	m_Damage = Item.m_ItemUses;
-
 	return TotalBytes;
 }
 
@@ -47,19 +40,10 @@ int cPacket_CreativeInventoryAction::Parse(cByteBuffer & a_Buffer)
 
 void cPacket_CreativeInventoryAction::Serialize(AString & a_Data) const
 {
-	short ItemID = m_ItemID;
-	ASSERT(ItemID >= -1);  // Check validity of packets in debug runtime
-	if (ItemID <= 0)
-	{
-		ItemID = -1;
-		// Fix, to make sure no invalid values are sent.
-		// WARNING: HERE ITS -1, BUT IN NAMED ENTITY SPAWN PACKET ITS 0 !!
-	}
+	AppendByte (a_Data, m_PacketID);
+	AppendShort(a_Data, m_SlotNum);
 
-	AppendByte	 (a_Data, m_PacketID);
-	AppendShort  (a_Data, m_Slot);
-
-	cPacket_ItemData::AppendItem(a_Data, ItemID, m_Quantity, m_Damage);
+	cPacket_ItemData::AppendItem(a_Data, m_ClickedItem);
 }
 
 

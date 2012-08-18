@@ -129,9 +129,9 @@ public:
 	cPacket_PlayerPosition()
 		: m_PosX( 0.0 )
 		, m_PosY( 0.0 )
-		, m_Stance( 0.0 )
 		, m_PosZ( 0.0 )
-		, m_bFlying( false )
+		, m_Stance( 0.0 )
+		, m_IsOnGround(true)
 	{ m_PacketID = E_PLAYERPOS;  }
 	virtual cPacket* Clone() const { return new cPacket_PlayerPosition(*this); }
 
@@ -140,9 +140,9 @@ public:
 
 	double m_PosX;
 	double m_PosY;
-	double m_Stance;
 	double m_PosZ;
-	bool   m_bFlying; // Yeah.. wtf
+	double m_Stance;
+	bool   m_IsOnGround;
 } ;
 
 

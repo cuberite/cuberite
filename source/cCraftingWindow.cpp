@@ -10,9 +10,7 @@
 #include "cPickup.h"
 #include "cRoot.h"
 #include "cWorld.h"
-
-#include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_InventorySlot.h"
+#include "items/Item.h"
 
 
 
@@ -44,33 +42,38 @@ cCraftingWindow::cCraftingWindow( cWindowOwner* a_Owner, bool a_bInventoryVisibl
 
 
 
-void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_Player )
+void cCraftingWindow::Clicked(
+	cPlayer & a_Player, 
+	int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+	const cItem & a_HeldItem
+)
 {
 	bool bDontCook = false;
 	
 	cItem * DraggingItem = GetDraggingItem(&a_Player);
 	if (
-		a_ClickPacket->m_IsShiftPressed && 
+		a_IsShiftPressed && 
 		((DraggingItem == NULL) || DraggingItem->IsEmpty())
 	)
 	{
-		ShiftClicked(a_ClickPacket, a_Player);
+		ShiftClicked(a_Player, a_SlotNum);
 		return;
 	}
 	
 	// Override for craft result slot
-	if (a_ClickPacket->m_SlotNum == 0)
+	if (a_SlotNum == 0)
 	{
-		LOG("In craft slot: %i x %i !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
-		cItem* DraggingItem = GetDraggingItem( &a_Player );
-		if( DraggingItem->m_ItemID <= 0 )
+		LOGD("Clicked in craft result slot, item there: %d:%d (%d times) !!", GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemHealth, GetSlot(0)->m_ItemCount);
+		cItem * DraggingItem = GetDraggingItem(&a_Player);
+		if (DraggingItem->IsEmpty())
 		{
 			*DraggingItem = *GetSlot(0);
 			GetSlot(0)->Empty();
 		}
-		else if( DraggingItem->Equals( *GetSlot(0) ) )
+		else if (DraggingItem->IsEqual(*GetSlot(0)))
 		{
-			if( DraggingItem->m_ItemCount + GetSlot(0)->m_ItemCount <= 64 )
+			cItemHandler * Handler = ItemHandler(GetSlot(0)->m_ItemID);
+			if (DraggingItem->m_ItemCount + GetSlot(0)->m_ItemCount <= Handler->GetMaxStackSize())
 			{
 				DraggingItem->m_ItemCount += GetSlot(0)->m_ItemCount;
 				GetSlot(0)->Empty();
@@ -84,21 +87,20 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 		{
 			bDontCook = true;
 		}
-		LOG("Dragging Dish %i", DraggingItem->m_ItemCount );
 	}
 	else
 	{
-		cWindow::Clicked( a_ClickPacket, a_Player );
+		cWindow::Clicked(a_Player, GetWindowID(), a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
 	}
 
-	if ((a_ClickPacket->m_SlotNum >= 0) && (a_ClickPacket->m_SlotNum < 10))
+	if ((a_SlotNum >= 0) && (a_SlotNum < 10))
 	{
 		cCraftingGrid   Grid(GetSlots() + 1, 3, 3);
 		cCraftingRecipe Recipe(Grid);
 		
 		cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 
-		if ((a_ClickPacket->m_SlotNum == 0) && !bDontCook)
+		if ((a_SlotNum == 0) && !bDontCook)
 		{
 			// Consume the items from the crafting grid:
 			Recipe.ConsumeIngredients(Grid);
@@ -110,19 +112,13 @@ void cCraftingWindow::Clicked( cPacket_WindowClick* a_ClickPacket, cPlayer & a_P
 			cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 		}
 		*GetSlot(0) = Recipe.GetResult();
-		LOGD("%s cooked: %i x %i !!", a_Player.GetName().c_str(), GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemCount );
+		LOGD("%s cooked: %d:%d (%d times) !!", a_Player.GetName().c_str(), GetSlot(0)->m_ItemID, GetSlot(0)->m_ItemHealth, GetSlot(0)->m_ItemCount);
 	}
 	SendWholeWindow( a_Player.GetClientHandle() );
 	a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );
 
 	// Separate packet for result =/ Don't know why
-	cPacket_InventorySlot Packet;
-	Packet.m_WindowID = (char)GetWindowID();
-	Packet.m_SlotNum = 0;
-	Packet.m_ItemID = (short)GetSlot(0)->m_ItemID;
-	Packet.m_ItemCount = GetSlot(0)->m_ItemCount;
-	Packet.m_ItemUses = (char)GetSlot(0)->m_ItemHealth;
-	a_Player.GetClientHandle()->Send( Packet );
+	a_Player.GetClientHandle()->SendInventorySlot(GetWindowID(), 0, *GetSlot(0));
 }
 
 
@@ -153,16 +149,15 @@ void cCraftingWindow::Close(cPlayer & a_Player)
 
 
 
-void cCraftingWindow::ShiftClicked(cPacket_WindowClick * a_ClickPacket, cPlayer & a_Player)
+void cCraftingWindow::ShiftClicked(cPlayer & a_Player, short a_SlotNum)
 {
-	short Slot = a_ClickPacket->m_SlotNum;
-	if (Slot == SLOT_CRAFTING_RESULT)
+	if (a_SlotNum == SLOT_CRAFTING_RESULT)
 	{
-		ShiftClickedCraftingResult(Slot, a_Player);
+		ShiftClickedCraftingResult(a_Player, a_SlotNum);
 	}
-	else if ((Slot >= SLOT_CRAFTING_MIN) && (Slot <= SLOT_CRAFTING_MAX))
+	else if ((a_SlotNum >= SLOT_CRAFTING_MIN) && (a_SlotNum <= SLOT_CRAFTING_MAX))
 	{
-		ShiftClickedCraftingGrid(Slot, a_Player);
+		ShiftClickedCraftingGrid(a_Player, a_SlotNum);
 	}
 	else
 	{
@@ -175,7 +170,7 @@ void cCraftingWindow::ShiftClicked(cPacket_WindowClick * a_ClickPacket, cPlayer 
 
 
 
-void cCraftingWindow::ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Player)
+void cCraftingWindow::ShiftClickedCraftingResult(cPlayer & a_Player, short a_Slot)
 {
 	// Craft until either the recipe changes (due to ingredients) or there's not enough storage for the result
 	cInventory & Inventory = a_Player.GetInventory();
@@ -210,7 +205,7 @@ void cCraftingWindow::ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Playe
 		GetSlots()[SLOT_CRAFTING_RESULT] = Recipe.GetResult();
 		
 		// If the recipe changed, abort:
-		if (!Recipe.GetResult().Equals(ResultCopy))
+		if (!Recipe.GetResult().IsEqual(ResultCopy))
 		{
 			break;
 		}
@@ -221,7 +216,7 @@ void cCraftingWindow::ShiftClickedCraftingResult(short a_Slot, cPlayer & a_Playe
 
 
 
-void cCraftingWindow::ShiftClickedCraftingGrid(short a_Slot, cPlayer & a_Player)
+void cCraftingWindow::ShiftClickedCraftingGrid(cPlayer & a_Player, short a_Slot)
 {
 	cInventory & Inventory = a_Player.GetInventory();
 	cItem * Item = GetSlot(a_Slot);

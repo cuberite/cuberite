@@ -7,8 +7,8 @@
 
 
 
-class cPacket_Login : public cPacket											//tolua_export
-{																				//tolua_export
+class cPacket_Login : public cPacket
+{
 public:
 	cPacket_Login()
 		: m_ProtocolVersion( 0 )
@@ -24,18 +24,18 @@ public:
 	virtual int Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
-	int m_ProtocolVersion;														//tolua_export
-	AString m_Username;														//tolua_export
-	AString m_LevelType;													//tolua_export
-	int m_ServerMode;															//tolua_export
-	int m_Dimension;
-	char m_Difficulty;															//tolua_export
-	unsigned char m_WorldHeight;												//tolua_export
-	unsigned char m_MaxPlayers;													//tolua_export
+	int           m_ProtocolVersion;
+	AString       m_Username;
+	AString       m_LevelType;
+	int           m_ServerMode;
+	int           m_Dimension;
+	char          m_Difficulty;
+	unsigned char m_WorldHeight;
+	unsigned char m_MaxPlayers;
 
-	static const AString LEVEL_TYPE_DEFAULT;
-	static const AString LEVEL_TYPE_SUPERFLAT;
-};	//tolua_export
+	static const char * LEVEL_TYPE_DEFAULT;
+	static const char * LEVEL_TYPE_SUPERFLAT;
+};
 
 
 

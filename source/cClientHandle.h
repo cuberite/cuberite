@@ -103,6 +103,8 @@ public:
 	void Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL);
 	
 	void SendDisconnect(const AString & a_Reason);
+	void SendHandshake (const AString & a_ServerName);
+	void SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	
@@ -182,18 +184,18 @@ private:
 	
 	// Packets handled in csConnected:
 	void HandlePing            (void);
-	void HandleHandshake       (cPacket_Handshake *      a_Packet);
-	void HandleLogin           (cPacket_Login *          a_Packet);
-	void HandleUnexpectedPacket(cPacket *                a_Packet);  // the default case -> kick
+	void HandleHandshake       (const AString & a_Username);
+	void HandleLogin           (int a_ProtocolVersion, const AString & a_Username);
+	void HandleUnexpectedPacket(int a_PacketType);  // the default case -> kick
 	
 	// Packets handled while in csConfirmingPos:
-	void HandleMoveLookConfirm(cPacket_PlayerMoveLook * a_Packet);  // While !m_bPositionConfirmed
+	void HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ);  // While !m_bPositionConfirmed
 	
 	// Packets handled while in csPlaying:
-	void HandleCreativeInventory(cPacket_CreativeInventoryAction * a_Packet);
-	void HandlePlayerPos        (cPacket_PlayerPosition *          a_Packet);
-	void HandleBlockDig         (cPacket_BlockDig *                a_Packet);
-	void HandleBlockPlace       (cPacket_BlockPlace *              a_Packet);
+	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
+	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
+	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
+	void HandleBlockPlace       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
 	void HandlePickupSpawn      (cPacket_PickupSpawn *             a_Packet);
 	void HandleChat             (cPacket_Chat *                    a_Packet);
 	void HandlePlayerLook       (cPacket_PlayerLook *              a_Packet);
@@ -201,7 +203,7 @@ private:
 	void HandleAnimation        (cPacket_ArmAnim *                 a_Packet);
 	void HandleItemSwitch       (cPacket_ItemSwitch *              a_Packet);
 	void HandleWindowClose      (cPacket_WindowClose *             a_Packet);
-	void HandleWindowClick      (cPacket_WindowClick *             a_Packet);
+	void HandleWindowClick      (int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
 	void HandleUpdateSign       (cPacket_UpdateSign *              a_Packet);
 	void HandleUseEntity        (cPacket_UseEntity *               a_Packet);
 	void HandleRespawn          (void);

@@ -27,10 +27,10 @@ public:														//tolua_export
 
 	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player ) override;
 	virtual bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player ) override;
-	virtual bool OnBlockPlace      (cPacket_BlockPlace* a_PacketData, cPlayer* a_Player ) override;
-	virtual bool OnBlockDig        (cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem ) override;
+	virtual bool OnBlockPlace      (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem) override;
+	virtual bool OnBlockDig        (cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta) override;
 	virtual bool OnChat            (const char* a_Chat, cPlayer* a_Player ) override;
-	virtual bool OnLogin           (cPacket_Login* a_PacketData ) override;
+	virtual bool OnLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;
 	virtual void OnPlayerSpawn     (cPlayer* a_Player ) override;
 	virtual bool OnPlayerJoin      (cPlayer* a_Player ) override;
 	virtual void OnPlayerMove      (cPlayer* a_Player ) override;

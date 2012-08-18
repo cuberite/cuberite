@@ -204,41 +204,56 @@ bool cPlugin_NewLua::OnDisconnect(const AString & a_Reason, cPlayer* a_Player )
 
 
 
-bool cPlugin_NewLua::OnBlockPlace( cPacket_BlockPlace* a_PacketData, cPlayer* a_Player )
+bool cPlugin_NewLua::OnBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnBlockPlace") )
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnBlockPlace"))
+	{
 		return false;
+	}
 
-	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_BlockPlace");
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushusertype(m_LuaState, (void *)&a_HeldItem, "cItem");
 
-	if( !CallFunction(2, 1, "OnBlockPlace") )
+	if (!CallFunction(6, 1, "OnBlockPlace"))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	return bRetVal;
+	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
 }
 
 
 
 
 
-bool cPlugin_NewLua::OnBlockDig( cPacket_BlockDig* a_PacketData, cPlayer* a_Player, cItem* a_PickupItem )
+bool cPlugin_NewLua::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnBlockDig") )
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnBlockDig"))
+	{
 		return false;
+	}
 
-	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_BlockDig");
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, a_PickupItem, "cItem");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_Status);
+	tolua_pushnumber  (m_LuaState, a_OldBlock);
+	tolua_pushnumber  (m_LuaState, a_OldMeta);
 
-	if( !CallFunction(3, 1, "OnBlockDig") )
+	if (!CallFunction(8, 1, "OnBlockDig"))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	return bRetVal;
+	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
 }
 
 
@@ -265,15 +280,17 @@ bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
 
 
 
-bool cPlugin_NewLua::OnLogin( cPacket_Login* a_PacketData )
+bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
 	cCSLock Lock( m_CriticalSection );
 	if( !PushFunction("OnLogin") )
 		return false;
 
-	tolua_pushusertype(m_LuaState, a_PacketData, "cPacket_Login");
+	tolua_pushusertype (m_LuaState, a_Client, "cClientHandle");
+	tolua_pushnumber   (m_LuaState, a_ProtocolVersion);
+	tolua_pushcppstring(m_LuaState, a_Username);
 
-	if( !CallFunction(1, 1, "OnLogin") )
+	if (!CallFunction(3, 1, "OnLogin"))
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);

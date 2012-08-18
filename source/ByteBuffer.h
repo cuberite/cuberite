@@ -65,8 +65,8 @@ public:
 	/// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
 	bool ReadUTF16String(AString & a_String, int a_NumChars);
 	
-	/// Skips reading by a_Count bytes
-	void SkipRead(int a_Count);
+	/// Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer
+	bool SkipRead(int a_Count);
 	
 	/// Removes the bytes that have been read from the ringbuffer
 	void CommitRead(void);

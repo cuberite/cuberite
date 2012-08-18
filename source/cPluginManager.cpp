@@ -262,40 +262,7 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			}
 			break;
 		}
-		
-		case HOOK_BLOCK_DIG:
-		{
-			if( a_NumArgs != 2 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPacket_BlockDig* Packet = va_arg(argptr, cPacket_BlockDig* );
-			cPlayer* Player = va_arg(argptr, cPlayer* );
-			cItem* Item = va_arg( argptr, cItem* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnBlockDig( Packet, Player, Item ) )
-					return true;
-			}
-			break;
-		}
-		
-		case HOOK_BLOCK_PLACE:
-		{
-			if( a_NumArgs != 2 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPacket_BlockPlace* Packet = va_arg(argptr, cPacket_BlockPlace* );
-			cPlayer* Player = va_arg(argptr, cPlayer* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnBlockPlace( Packet, Player ) )
-					return true;
-			}
-			break;
-		}
-		
+
 		case HOOK_DISCONNECT:
 		{
 			if( a_NumArgs != 2 ) break;
@@ -307,21 +274,6 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
 			{
 				if( (*itr)->OnDisconnect( Reason, Player ) )
-					return true;
-			}
-			break;
-		}
-
-		case HOOK_LOGIN:
-		{
-			if( a_NumArgs != 1 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPacket_Login* Packet = va_arg(argptr, cPacket_Login* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnLogin( Packet ) )
 					return true;
 			}
 			break;
@@ -430,6 +382,69 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			break;
 		}
 	}  // switch (a_Hook)
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_LOGIN);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnLogin(a_Client, a_ProtocolVersion, a_Username))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_DIG);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBlockDig(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, a_OldBlock, a_OldMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_PLACE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnBlockPlace(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem))
+		{
+			return true;
+		}
+	}
 	return false;
 }
 

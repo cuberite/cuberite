@@ -39,9 +39,23 @@ public:
 	{
 		return (m_ItemID <= 0 || m_ItemCount <= 0);
 	}
-	bool Equals( cItem & a_Item ) const
+	
+	// tolua_end
+	OBSOLETE
+	// tolua_begin
+	bool Equals(const cItem & a_Item) const  // obsolete, use IsEqual() instead
 	{
-		return ( (m_ItemID == a_Item.m_ItemID) && (m_ItemHealth == a_Item.m_ItemHealth) );
+		return IsEqual(a_Item);
+	}
+	
+	bool IsEqual(const cItem & a_Item) const
+	{
+		return (IsSameType(a_Item) && (m_ItemHealth == a_Item.m_ItemHealth));
+	}
+	
+	bool IsSameType(const cItem & a_Item) const
+	{
+		return (m_ItemID == a_Item.m_ItemID) || (IsEmpty() && a_Item.IsEmpty());
 	}
 
 	// TODO Sorry for writing the functions in the header. But somehow it doesn´t worked when I put them into the cpp File :s
@@ -100,12 +114,25 @@ public:
 	void FromJson( const Json::Value & a_Value );
 	// tolua_begin
 	
-	static bool IsEnchantable(ENUM_ITEM_ID item);
+	static bool IsEnchantable(short a_ItemType);
 
-	ENUM_ITEM_ID m_ItemID;
-	char         m_ItemCount;
-	short        m_ItemHealth;
-
+	// tolua_end
+	union
+	{
+		// tolua_begin
+		ENUM_ITEM_ID m_ItemID;  // OBSOLETE, use m_ItemType instead
+		short        m_ItemType;
+		// tolua_end
+	} ;
+	char         m_ItemCount;  // tolua_export
+	union
+	{
+		// tolua_begin
+		short      m_ItemHealth;  // OBSOLETE, use m_ItemDamage instead
+		short      m_ItemDamage;
+		// tolua_end
+	} ;
+	// tolua_begin
 };
 // tolua_end
 

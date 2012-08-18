@@ -8,7 +8,7 @@
 #include "cItem.h"
 #include "CraftingRecipes.h"
 #include "cRoot.h"
-#include "packets/cPacket_WindowClick.h"
+#include "items/Item.h"
 
 
 
@@ -31,39 +31,42 @@ cSurvivalInventory::~cSurvivalInventory()
 
 
 
-void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
+void cSurvivalInventory::Clicked(
+	short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+	const cItem & a_HeldItem
+)
 {
-	cPacket_WindowClick * Packet = reinterpret_cast<cPacket_WindowClick *>(a_ClickPacket);
-	
+	cWindow * Window = GetWindow();
 	if (
-		Packet->m_IsShiftPressed &&   // Shift pressed
-		(GetWindow() != NULL) &&      // Window is valid
-		(GetWindow()->GetDraggingItem()->IsEmpty())  // Not dragging anything
+		a_IsShiftPressed &&      // Shift pressed
+		(Window != NULL) &&      // Window is valid
+		(Window->GetDraggingItem()->IsEmpty())  // Not dragging anything
 	)
 	{
-		ShiftClicked(Packet);
+		ShiftClicked(a_SlotNum);
 		return;
 	}
 	
 	bool bDontCook = false;
-	if (GetWindow())
+	if (Window != NULL)
 	{
 		// Override for craft result slot
-		if (Packet->m_SlotNum == (short)c_CraftOffset)
+		if (a_SlotNum == (short)c_CraftOffset)
 		{
-			LOGD("In craft slot: %i x %i !!", m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );
-			cItem * DraggingItem = GetWindow()->GetDraggingItem();
+			LOGD("Clicked in craft result slot, item there: %d:%d (%d times) !!", m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemHealth, m_Slots[c_CraftOffset].m_ItemCount);
+			cItem * DraggingItem = Window->GetDraggingItem();
 			if (DraggingItem->IsEmpty())
 			{
 				*DraggingItem = m_Slots[c_CraftOffset];
 				m_Slots[c_CraftOffset].Empty();
 			}
-			else if (DraggingItem->Equals(m_Slots[c_CraftOffset]))
+			else if (DraggingItem->IsEqual(m_Slots[c_CraftOffset]))
 			{
-				if (DraggingItem->m_ItemCount + m_Slots[c_CraftOffset].m_ItemCount <= 64)
+				cItemHandler * Handler = ItemHandler(m_Slots[c_CraftOffset].m_ItemID);
+				if (DraggingItem->m_ItemCount + m_Slots[c_CraftOffset].m_ItemCount <= Handler->GetMaxStackSize())
 				{
 					DraggingItem->m_ItemCount += m_Slots[c_CraftOffset].m_ItemCount;
-					m_Slots[0].Empty();
+					m_Slots[c_CraftOffset].Empty();
 				}
 				else
 				{
@@ -74,11 +77,10 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 			{
 				bDontCook = true;
 			}
-			LOGD("Dragging Dish %i", DraggingItem->m_ItemCount );
 		}
 		else
 		{
-			GetWindow()->Clicked( Packet, *m_Owner );
+			Window->Clicked(*m_Owner, 0, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
 		}
 	}
 	else
@@ -87,14 +89,14 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 		LOG("No Inventory window! WTF");
 	}
 
-	if ((Packet->m_SlotNum >= (short)c_CraftOffset) && (Packet->m_SlotNum < (short)(c_CraftOffset + c_CraftSlots + 1)))
+	if ((a_SlotNum >= (short)c_CraftOffset) && (a_SlotNum < (short)(c_CraftOffset + c_CraftSlots + 1)))
 	{
 		cCraftingGrid   Grid(m_Slots + c_CraftOffset + 1, 2, 2);
 		cCraftingRecipe Recipe(Grid);
 		
 		cRoot::Get()->GetCraftingRecipes()->GetRecipe(m_Owner, Grid, Recipe);
 		
-		if ((Packet->m_SlotNum == 0) && !bDontCook)
+		if ((a_SlotNum == 0) && !bDontCook)
 		{
 			// Consume the items from the crafting grid:
 			Recipe.ConsumeIngredients(Grid);
@@ -106,8 +108,8 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 			cRoot::Get()->GetCraftingRecipes()->GetRecipe(m_Owner, Grid, Recipe);
 		}
 		m_Slots[c_CraftOffset] = Recipe.GetResult();
-		LOGD("%s cooked: %i x %i !!", m_Owner->GetName().c_str(), m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemCount );
-		SendWholeInventory( m_Owner->GetClientHandle() );
+		LOGD("%s cooked: %d:%d (%d times) !!", m_Owner->GetName().c_str(), m_Slots[c_CraftOffset].m_ItemID, m_Slots[c_CraftOffset].m_ItemHealth, m_Slots[c_CraftOffset].m_ItemCount );
+		SendWholeInventory(m_Owner->GetClientHandle());
 	}
 	SendSlot(0);
 }
@@ -116,32 +118,31 @@ void cSurvivalInventory::Clicked( cPacket* a_ClickPacket )
 
 
 
-void cSurvivalInventory::ShiftClicked(cPacket_WindowClick * a_ClickPacket)
+void cSurvivalInventory::ShiftClicked(short a_SlotNum)
 {
 	ASSERT((GetWindow() == NULL) || (GetWindow()->GetDraggingItem()->IsEmpty()));  // Cannot handle shift-click if dragging something
 	
-	short Slot = a_ClickPacket->m_SlotNum;
-	if (Slot == SLOT_CRAFTING_RESULT)
+	if (a_SlotNum == SLOT_CRAFTING_RESULT)
 	{
-		ShiftClickedCraftingResult(Slot);
+		ShiftClickedCraftingResult(a_SlotNum);
 	}
-	else if ((Slot >= SLOT_CRAFTING_MIN) && (Slot <= SLOT_CRAFTING_MAX))
+	else if ((a_SlotNum >= SLOT_CRAFTING_MIN) && (a_SlotNum <= SLOT_CRAFTING_MAX))
 	{
-		ShiftClickedCraftingGrid(Slot);
+		ShiftClickedCraftingGrid(a_SlotNum);
 	}
-	else if ((Slot >= SLOT_ARMOR_MIN) && (Slot <= SLOT_ARMOR_MAX))
+	else if ((a_SlotNum >= SLOT_ARMOR_MIN) && (a_SlotNum <= SLOT_ARMOR_MAX))
 	{
-		ShiftClickedArmor(Slot);
+		ShiftClickedArmor(a_SlotNum);
 	}
-	else if ((Slot >= SLOT_HOTBAR_MIN) && (Slot <= SLOT_HOTBAR_MAX))
+	else if ((a_SlotNum >= SLOT_HOTBAR_MIN) && (a_SlotNum <= SLOT_HOTBAR_MAX))
 	{
-		ShiftClickedHotbar(Slot);
+		ShiftClickedHotbar(a_SlotNum);
 	}
 	else
 	{
-		ShiftClickedInventory(Slot);
+		ShiftClickedInventory(a_SlotNum);
 	}
-	// Because the client tries to guess our actions, not always right, send the whole inventory:
+	// Because the client tries to guess our actions and is not always right, send the whole inventory:
 	SendWholeInventoryToAll();
 }
 
@@ -182,7 +183,7 @@ void cSurvivalInventory::ShiftClickedCraftingResult(short a_Slot)
 		m_Slots[SLOT_CRAFTING_RESULT] = Recipe.GetResult();
 		
 		// If the recipe changed, abort:
-		if (!Recipe.GetResult().Equals(ResultCopy))
+		if (!Recipe.GetResult().IsEqual(ResultCopy))
 		{
 			break;
 		}

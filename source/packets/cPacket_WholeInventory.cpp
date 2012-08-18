@@ -17,19 +17,21 @@ cPacket_WholeInventory::cPacket_WholeInventory( const cPacket_WholeInventory & a
 	m_WindowID = a_Clone.m_WindowID;
 	m_Count = a_Clone.m_Count;
 	m_Items = new cItem[m_Count];
-	memcpy( m_Items, a_Clone.m_Items, sizeof(cItem)*m_Count );
+	// TODO: copy items one by one, they may have some values that needn't be shallow-copiable
+	memcpy(m_Items, a_Clone.m_Items, sizeof(cItem) * m_Count);
 }
 
 
 
 
 
-cPacket_WholeInventory::cPacket_WholeInventory( cInventory* a_Inventory )
+cPacket_WholeInventory::cPacket_WholeInventory(cInventory * a_Inventory)
 {
 	m_PacketID = E_INVENTORY_WHOLE;
 	m_WindowID = 0;
 	m_Count = a_Inventory->c_NumSlots;
 	m_Items = new cItem[m_Count];
+	// TODO: copy items one by one, they may have some values that needn't be shallow-copiable
 	memcpy( m_Items, a_Inventory->GetSlots(), sizeof(cItem)*m_Count );
 }
 
@@ -37,13 +39,14 @@ cPacket_WholeInventory::cPacket_WholeInventory( cInventory* a_Inventory )
 
 
 
-cPacket_WholeInventory::cPacket_WholeInventory( cWindow* a_Window )
+cPacket_WholeInventory::cPacket_WholeInventory(cWindow * a_Window)
 {
 	m_PacketID = E_INVENTORY_WHOLE;
 	m_WindowID = (char)a_Window->GetWindowID();
 	m_Count = (short)a_Window->GetNumSlots();
 	m_Items = new cItem[m_Count];
-	memcpy( m_Items, a_Window->GetSlots(), sizeof(cItem)*m_Count );
+	// TODO: copy items one by one, they may have some values that needn't be shallow-copiable
+	memcpy( m_Items, a_Window->GetSlots(), sizeof(cItem) * m_Count);
 }
 
 
@@ -67,7 +70,7 @@ void cPacket_WholeInventory::Serialize(AString & a_Data) const
 
 	for (int j = 0; j < m_Count; j++)
 	{
-		cPacket_ItemData::AppendItem(a_Data, &(m_Items[j]));
+		cPacket_ItemData::AppendItem(a_Data, m_Items[j]);
 	}
 }
 

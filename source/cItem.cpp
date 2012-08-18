@@ -28,24 +28,31 @@ void cItem::FromJson( const Json::Value & a_Value )
 	}
 }
 
-bool cItem::IsEnchantable(ENUM_ITEM_ID item)
+
+
+
+
+bool cItem::IsEnchantable(short item)
 {
-	if(item >= 256 && item <= 259)
+	if ((item >= 256) && (item <= 259))
 		return true;
-	if(item >= 267 && item <= 279)
+	if ((item >= 267) && (item <= 279))
 		return true;
-	if(item >= 283 && item <= 286)	
+	if ((item >= 283) && (item <= 286))	
 		return true;
-	if(item >= 290 && item <= 294)
+	if ((item >= 290) && (item <= 294))
 		return true;
-	if(item >= 298 && item <= 317)
+	if ((item >= 298) && (item <= 317))
 		return true;
-	if(item >= 290 && item <= 294)
-		return true;
-
-	if(item == 346 || item == 359 || item == 261)
+	if ((item >= 290) && (item <= 294))
 		return true;
 
+	if ((item == 346) || (item == 359) || (item == 261))
+		return true;
 
 	return false;
 }
+
+
+
+

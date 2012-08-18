@@ -66,6 +66,7 @@
 #include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_MapChunk.h"
 #include "packets/cPacket_PreChunk.h"
+#include "packets/cPacket_InventorySlot.h"
 
 // DEBUG:
 #include "packets/cPacket_BlockChange.h"
@@ -492,6 +493,11 @@ void cClientHandle::RemoveFromAllChunks()
 
 void cClientHandle::HandlePacket(cPacket * a_Packet)
 {
+	// TODO: _X: This function will get out-sourced into a separate cProtocol class
+	// and the switch statements will be split into virtual functions of that class
+	// Therefore I keep this function huge and untidy for the time being
+	// ( http://forum.mc-server.org/showthread.php?tid=524 )
+	
 	m_TimeLastPacket = cWorld::GetTime();
 
 	// LOG("Recv packet 0x%02x from client \"%s\" (\"%s\")", a_Packet->m_PacketID, m_Socket.GetIPString().c_str(), m_Username.c_str());
@@ -513,8 +519,18 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 					break;
 				}
 				case E_PING:           HandlePing     (); break;
-				case E_HANDSHAKE:      HandleHandshake(reinterpret_cast<cPacket_Handshake *>(a_Packet)); break;
-				case E_LOGIN:          HandleLogin    (reinterpret_cast<cPacket_Login *>    (a_Packet)); break;
+				case E_HANDSHAKE:
+				{
+					cPacket_Handshake * Handshake = reinterpret_cast<cPacket_Handshake *>(a_Packet);
+					HandleHandshake(Handshake->m_Username);
+					break;
+				}
+				case E_LOGIN:
+				{
+					cPacket_Login * Login = reinterpret_cast<cPacket_Login *>(a_Packet);
+					HandleLogin(Login->m_ProtocolVersion, Login->m_Username);
+					break;
+				}
 				
 				// Ignored packets:
 				case E_PLAYERLOOK:
@@ -522,7 +538,7 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 				case E_PLAYERMOVELOOK:
 				case E_PLAYERPOS:
 				case E_KEEP_ALIVE:     break;
-				default:               HandleUnexpectedPacket(a_Packet); break;
+				default:               HandleUnexpectedPacket(a_Packet->m_PacketID); break;
 			}  // switch (PacketType)
 			break;
 		}  // case csConnected
@@ -540,7 +556,7 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 				case E_PLAYERMOVELOOK:
 				case E_PLAYERPOS: break;
 				
-				default: HandleUnexpectedPacket(a_Packet); break;
+				default: HandleUnexpectedPacket(a_Packet->m_PacketID); break;
 			}
 			break;
 		}
@@ -558,7 +574,7 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 				case E_PLAYERMOVELOOK:
 				case E_PLAYERPOS: break;
 				
-				default: HandleUnexpectedPacket(a_Packet); break;
+				default: HandleUnexpectedPacket(a_Packet->m_PacketID); break;
 			}
 			break;
 		}
@@ -574,11 +590,16 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 				case E_PLAYERLOOK:
 				case E_PLAYERPOS: break;
 
-				case E_PLAYERMOVELOOK: HandleMoveLookConfirm(reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet)); break;
+				case E_PLAYERMOVELOOK:
+				{
+					cPacket_PlayerMoveLook * MoveLook = reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet);
+					HandleMoveLookConfirm(MoveLook->m_PosX, MoveLook->m_PosY, MoveLook->m_PosZ);
+					break;
+				}
 
 				default:
 				{
-					HandleUnexpectedPacket(a_Packet);
+					HandleUnexpectedPacket(a_Packet->m_PacketID);
 					break;
 				}
 			}  // switch (PacketType)
@@ -589,10 +610,30 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 		{
 			switch (a_Packet->m_PacketID)
 			{
-				case E_CREATIVE_INVENTORY_ACTION: HandleCreativeInventory(reinterpret_cast<cPacket_CreativeInventoryAction *>(a_Packet)); break;
-				case E_PLAYERPOS:                 HandlePlayerPos        (reinterpret_cast<cPacket_PlayerPosition *>         (a_Packet)); break;
-				case E_BLOCK_DIG:                 HandleBlockDig         (reinterpret_cast<cPacket_BlockDig *>               (a_Packet)); break;
-				case E_BLOCK_PLACE:               HandleBlockPlace       (reinterpret_cast<cPacket_BlockPlace *>             (a_Packet)); break;
+				case E_CREATIVE_INVENTORY_ACTION:
+				{
+					cPacket_CreativeInventoryAction * cia = reinterpret_cast<cPacket_CreativeInventoryAction *>(a_Packet);
+					HandleCreativeInventory(cia->m_SlotNum, cia->m_ClickedItem);
+					break;
+				}
+				case E_PLAYERPOS:
+				{
+					cPacket_PlayerPosition * pp = reinterpret_cast<cPacket_PlayerPosition *>(a_Packet);
+					HandlePlayerPos(pp->m_PosX, pp->m_PosY, pp->m_PosZ, pp->m_Stance, pp->m_IsOnGround);
+					break;
+				}
+				case E_BLOCK_DIG:
+				{
+					cPacket_BlockDig * bd = reinterpret_cast<cPacket_BlockDig *>(a_Packet);
+					HandleBlockDig(bd->m_PosX, bd->m_PosY, bd->m_PosZ, bd->m_Direction, bd->m_Status);
+					break;
+				}
+				case E_BLOCK_PLACE:
+				{
+					cPacket_BlockPlace * bp = reinterpret_cast<cPacket_BlockPlace *>(a_Packet);
+					HandleBlockPlace(bp->m_PosX, bp->m_PosY, bp->m_PosZ, bp->m_Direction, bp->m_HeldItem);
+					break;
+				}
 				case E_PICKUP_SPAWN:              HandlePickupSpawn      (reinterpret_cast<cPacket_PickupSpawn *>            (a_Packet)); break;
 				case E_CHAT:                      HandleChat             (reinterpret_cast<cPacket_Chat *>                   (a_Packet)); break;
 				case E_PLAYERLOOK:                HandlePlayerLook       (reinterpret_cast<cPacket_PlayerLook *>             (a_Packet)); break;
@@ -600,7 +641,12 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 				case E_ANIMATION:                 HandleAnimation        (reinterpret_cast<cPacket_ArmAnim *>                (a_Packet)); break;
 				case E_ITEM_SWITCH:               HandleItemSwitch       (reinterpret_cast<cPacket_ItemSwitch *>             (a_Packet)); break;
 				case E_WINDOW_CLOSE:              HandleWindowClose      (reinterpret_cast<cPacket_WindowClose *>            (a_Packet)); break;
-				case E_WINDOW_CLICK:              HandleWindowClick      (reinterpret_cast<cPacket_WindowClick *>            (a_Packet)); break;
+				case E_WINDOW_CLICK:
+				{
+					cPacket_WindowClick * wc = reinterpret_cast<cPacket_WindowClick *>(a_Packet);
+					HandleWindowClick(wc->m_WindowID, wc->m_SlotNum, wc->m_IsRightClick, wc->m_IsShiftPressed, wc->m_HeldItem);
+					break;
+				}
 				case E_UPDATE_SIGN:               HandleUpdateSign       (reinterpret_cast<cPacket_UpdateSign *>             (a_Packet)); break;
 				case E_USE_ENTITY:                HandleUseEntity        (reinterpret_cast<cPacket_UseEntity *>              (a_Packet)); break;
 				case E_RESPAWN:                   HandleRespawn(); break;
@@ -634,17 +680,17 @@ void cClientHandle::HandlePing(void)
 
 
 
-void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
+void cClientHandle::HandleHandshake(const AString & a_Username)
 {
-	AStringVector UserData = StringSplit( a_Packet->m_Username, ";" ); // "FakeTruth;localhost:25565"
-	if( UserData.size() == 0 )
+	AStringVector UserData = StringSplit(a_Username, ";"); // "FakeTruth;localhost:25565"
+	if (UserData.empty())
 	{
-		Kick("Could not receive username");
+		Kick("Did not receive username");
 		return;
 	}
 	m_Username = UserData[0];
 
-	LOG("HANDSHAKE %s", m_Username.c_str());
+	LOGD("HANDSHAKE %s", m_Username.c_str());
 
 	if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
 	{
@@ -654,9 +700,7 @@ void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 	cPacket_Chat Connecting(m_Username + " is connecting.");
 	cRoot::Get()->GetServer()->Broadcast(Connecting, this);
 
-	cPacket_Handshake Handshake;
-	Handshake.m_Username = cRoot::Get()->GetServer()->GetServerID();
-	Send(Handshake);
+	SendHandshake(cRoot::Get()->GetServer()->GetServerID());
 	LOG("User \"%s\" was sent a handshake", m_Username.c_str());
 }
 
@@ -664,23 +708,23 @@ void cClientHandle::HandleHandshake(cPacket_Handshake * a_Packet)
 
 
 
-void cClientHandle::HandleLogin(cPacket_Login * a_Packet)
+void cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
 {
-	LOG("LOGIN %s", m_Username.c_str());
-	if (a_Packet->m_ProtocolVersion < m_ProtocolVersion)
+	LOGD("LOGIN %s", a_Username.c_str());
+	if (a_ProtocolVersion < m_ProtocolVersion)
 	{
 		Kick("Your client is outdated!");
 		return;
 	}
-	else if (a_Packet->m_ProtocolVersion > m_ProtocolVersion)
+	else if (a_ProtocolVersion > m_ProtocolVersion)
 	{
 		Kick("Your client version is higher than the server!");
 		return;
 	}
-	if (m_Username.compare(a_Packet->m_Username) != 0)
+	if (m_Username.compare(a_Username) != 0)
 	{
-		LOGWARNING("Login Username (\"%s\") does not match Handshake username (\"%s\") for client \"%s\")",
-			a_Packet->m_Username.c_str(),
+		LOGWARNING("Login Username (\"%s\") does not match Handshake username (\"%s\") for client @ \"%s\")",
+			a_Username.c_str(),
 			m_Username.c_str(),
 			m_Socket.GetIPString().c_str()
 		);
@@ -688,7 +732,7 @@ void cClientHandle::HandleLogin(cPacket_Login * a_Packet)
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_LOGIN, 1, a_Packet))
+	if (cRoot::Get()->GetPluginManager()->CallHookLogin(this, a_ProtocolVersion, a_Username))
 	{
 		Destroy();
 		return;
@@ -703,12 +747,12 @@ void cClientHandle::HandleLogin(cPacket_Login * a_Packet)
 
 
 
-void cClientHandle::HandleUnexpectedPacket(cPacket * a_Packet)
+void cClientHandle::HandleUnexpectedPacket(int a_PacketType)
 {
 	LOGWARNING(
 		"Invalid packet in state %d: 0x%02x from client \"%s\", username \"%s\"", 
 		m_State,
-		a_Packet->m_PacketID,
+		a_PacketType,
 		m_Socket.GetIPString().c_str(),
 		m_Username.c_str()
 	);
@@ -719,9 +763,9 @@ void cClientHandle::HandleUnexpectedPacket(cPacket * a_Packet)
 
 
 
-void cClientHandle::HandleMoveLookConfirm(cPacket_PlayerMoveLook * a_Packet)
+void cClientHandle::HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ)
 {
-	Vector3d ReceivedPosition = Vector3d(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	Vector3d ReceivedPosition = Vector3d(a_PosX, a_PosY, a_PosZ);
 
 	// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
 	double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
@@ -746,12 +790,12 @@ void cClientHandle::HandleMoveLookConfirm(cPacket_PlayerMoveLook * a_Packet)
 
 
 
-void cClientHandle::HandleCreativeInventory(cPacket_CreativeInventoryAction * a_Packet)
+void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
 {
 	// This is for creative Inventory changes
 	if (m_Player->GetGameMode() == 1)
 	{
-		m_Player->GetInventory().Clicked(a_Packet);
+		m_Player->GetInventory().Clicked(a_SlotNum, false, false, a_HeldItem);
 	}
 	else
 	{
@@ -763,84 +807,86 @@ void cClientHandle::HandleCreativeInventory(cPacket_CreativeInventoryAction * a_
 
 
 
-void cClientHandle::HandlePlayerPos(cPacket_PlayerPosition * a_Packet)
+void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
 	// LOG("recv player pos: %0.2f %0.2f %0.2f", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-	m_Player->MoveTo(Vector3d(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
-	m_Player->SetStance(a_Packet->m_Stance);
-	m_Player->SetTouchGround(a_Packet->m_bFlying);
+	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
+	m_Player->SetStance(a_Stance);
+	m_Player->SetTouchGround(a_IsOnGround);
 }
 
 
 
 
 
-void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
+void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	if (!CheckBlockInteractionsRate())
 	{
 		return;
 	}
 
-	LOGD("OnBlockDig: {%i, %i, %i} Dir: %i Stat: %i",
-		a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, 
-		a_Packet->m_Direction, a_Packet->m_Status
+	LOGD("OnBlockDig: {%i, %i, %i}; Face: %i; Stat: %i",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
 	);
 
 	// Do we want plugins to disable tossing items? Probably no, so toss item before asking plugins for permission
-	if (a_Packet->m_Status == 0x04)  // Drop held item
+	if (a_Status == DIG_STATUS_DROP_HELD)  // Drop held item
 	{
 		m_Player->TossItem(false);
 		return;
 	}
 
-	if (a_Packet->m_Status == 0x05)
+	if (a_Status == DIG_STATUS_SHOOT_EAT)
 	{
-		LOGINFO("BlockDig: Status 5 not implemented");
+		LOGINFO("BlockDig: Status SHOOT/EAT not implemented");
+		return;
 	}
 	
-	cWorld* World = m_Player->GetWorld();
-	BLOCKTYPE  OldBlock = World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	NIBBLETYPE OldMeta  = World->GetBlockMeta(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+	cWorld * World = m_Player->GetWorld();
+	BLOCKTYPE  OldBlock;
+	NIBBLETYPE OldMeta;
+	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
 
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_BLOCK_DIG, 4, a_Packet, m_Player, OldBlock, OldMeta))
+	if (cRoot::Get()->GetPluginManager()->CallHookBlockDig(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, OldBlock, OldMeta))
 	{
 		// The plugin doesn't agree with the digging, replace the block on the client and quit:
-		World->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
 	
 	bool bBroken = (
-		(a_Packet->m_Status == 0x02) || 
+		(a_Status == DIG_STATUS_FINISHED) || 
 		(g_BlockOneHitDig[(int)OldBlock]) || 
-		((a_Packet->m_Status == 0x00) && (m_Player->GetGameMode() == 1))
+		((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() == 1))
 	);
 
-	cItem &Equipped = m_Player->GetInventory().GetEquippedItem();
-	
-	cItemHandler *ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
+	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
 
-	if(bBroken)
+	if (bBroken)
 	{
-		ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ);
 		
-		BlockHandler(OldBlock)->OnDestroyedByPlayer(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-		World->DigBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
-	}else{
-		cBlockHandler *Handler = cBlockHandler::GetBlockHandler(OldBlock);
-		Handler->OnClick(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		BlockHandler(OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+		World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+	}
+	else
+	{
+		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(OldBlock);
+		Handler->OnClick(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
-		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction);
+		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		
 
-		//Check for clickthrough-blocks:
-		int pX = a_Packet->m_PosX;
-		unsigned char pY = a_Packet->m_PosY;
-		int pZ = a_Packet->m_PosZ;
-		AddDirection(pX, pY, pZ, a_Packet->m_Direction);
+		// Check for clickthrough-blocks:
+		int pX = a_BlockX;
+		unsigned char pY = a_BlockY;
+		int pZ = a_BlockZ;
+		AddDirection(pX, pY, pZ, a_BlockFace);
 
 		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
-		if(Handler->IsClickedThrough())
+		if (Handler->IsClickedThrough())
 		{
 			Handler->OnClick(World, m_Player, pX, pY, pZ);
 		}
@@ -851,9 +897,8 @@ void cClientHandle::HandleBlockDig(cPacket_BlockDig * a_Packet)
 
 
 
-void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
+void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
 {
-	
 	if (!CheckBlockInteractionsRate())
 	{
 		return;
@@ -861,94 +906,105 @@ void cClientHandle::HandleBlockPlace(cPacket_BlockPlace * a_Packet)
 	
 	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 
-	if ((Equipped.m_ItemID != a_Packet->m_ItemType))	// Not valid
+	if ((Equipped.m_ItemID != a_HeldItem.m_ItemType))	// Not valid
 	{
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
-			m_Username.c_str(), Equipped.m_ItemID, a_Packet->m_ItemType
+			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
 		);
-		// TODO: We should probably send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
+		
+		// Let's send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
+		if (a_BlockFace > -1)
+		{
+			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		}
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_BLOCK_PLACE, 2, a_Packet, m_Player))
+	if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem))
 	{
-		if (a_Packet->m_Direction > -1)
+		if (a_BlockFace > -1)
 		{
-			AddDirection(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction);
-			m_Player->GetWorld()->SendBlockTo(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, m_Player);
+			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		}
 		return;
 	}
 	
 	cWorld * World = m_Player->GetWorld();
 
-	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
+	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_BlockX, a_BlockY, a_BlockZ));
 	if (Handler->IsUseable())
 	{
-		Handler->OnClick(World, m_Player, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ);
+		Handler->OnClick(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	else
 	{
-		cItemHandler *ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
+		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
 		
-		if(ItemHandler->OnItemUse(World, m_Player, &Equipped, a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Direction))
+		if (ItemHandler->OnItemUse(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
-			//Nothing here :P
-		}else if(ItemHandler->IsPlaceable())
+			// Nothing here :P
+		}
+		else if (ItemHandler->IsPlaceable())
 		{
-			if (a_Packet->m_Direction < 0)
+			if (a_BlockFace < 0)
 			{
 				// clicked in air
 				return;
 			}
 
-			int X = a_Packet->m_PosX;
-			int Y = a_Packet->m_PosY;
-			int Z = a_Packet->m_PosZ;
-			char Dir = a_Packet->m_Direction;
-			BLOCKTYPE ClickedBlock = World->GetBlock(X, Y, Z);
+			BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 			cBlockHandler *Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
 
 			if(Handler->IgnoreBuildCollision())
 			{
-				Handler->OnDestroyedByPlayer(World, m_Player, X, Y, Z);
-				World->FastSetBlock(X, Y, Z, E_BLOCK_AIR, 0);
-			}else{
-				AddDirection(X, Y, Z, a_Packet->m_Direction);
-				//Check for Blocks not allowing placement on top
-				if(Dir == 1 && !Handler->AllowBlockOnTop())
+				Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+				World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			}
+			else
+			{
+				AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				// Check for Blocks not allowing placement on top
+				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->AllowBlockOnTop())
 				{
-					//Resend the old block
-					//Some times the client still places the block O.o
+					// Resend the old block
+					// Some times the client still places the block O.o
 
-					World->SendBlockTo(X, Y, Z, m_Player);
+					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 					return;
 				}
 
 
-				int PlaceBlock = m_Player->GetWorld()->GetBlock(X, Y, Z);
+				int PlaceBlock = m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 				if (!BlockHandler(PlaceBlock)->IgnoreBuildCollision())
 				{
-					//tried to place a block *into* another?
-					return;  // happens when you place a block aiming at side of block like torch or stem
+					// Tried to place a block *into* another?
+					return;  // Happens when you place a block aiming at side of block like torch or stem
 				}
 			}
 			
-			cBlockHandler *NewBlock = BlockHandler(ItemHandler->GetBlockType());
+			cBlockHandler * NewBlock = BlockHandler(ItemHandler->GetBlockType());
 
-			//cannot be placed on the side of an other block
-			if(Dir != 1 && !NewBlock->CanBePlacedOnSide())
-				return;
-
-			if(NewBlock->CanBePlacedAt(World, X, Y, Z, Dir))
+			// Cannot be placed on the side of an other block
+			if ((a_BlockFace != BLOCK_FACE_TOP) && !NewBlock->CanBePlacedOnSide())
 			{
-				ItemHandler->PlaceBlock(World, m_Player, &m_Player->GetInventory().GetEquippedItem(), X, Y, Z, a_Packet->m_Direction);
-			}else{
-				World->SendBlockTo(X, Y, Z, m_Player);	//Send the old block back to the player
+				return;
+			}
+
+			if (NewBlock->CanBePlacedAt(World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+			{
+				ItemHandler->PlaceBlock(World, m_Player, &m_Player->GetInventory().GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			}
+			else
+			{
+				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);  // Send the old block back to the player
 				return;
 			}
 			
-		} else if(ItemHandler->IsFood()) {
+		}
+		else if (ItemHandler->IsFood())
+		{
 			cItem Item;
 			Item.m_ItemID = Equipped.m_ItemID;
 			Item.m_ItemCount = 1;
@@ -1058,11 +1114,11 @@ void cClientHandle::HandleWindowClose(cPacket_WindowClose * a_Packet)
 
 
 
-void cClientHandle::HandleWindowClick(cPacket_WindowClick * a_Packet)
+void cClientHandle::HandleWindowClick(int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem)
 {
-	if (a_Packet->m_WindowID == 0)
+	if (a_WindowID == 0)
 	{
-		m_Player->GetInventory().Clicked(a_Packet);
+		m_Player->GetInventory().Clicked(a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
 		return;
 	}
 	
@@ -1073,7 +1129,7 @@ void cClientHandle::HandleWindowClick(cPacket_WindowClick * a_Packet)
 		return;
 	}
 	
-	Window->Clicked(a_Packet, *m_Player);
+	Window->Clicked(*m_Player, a_WindowID, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
 }
 
 
@@ -1361,7 +1417,32 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
 	cPacket_Disconnect DC(a_Reason);
-	m_Socket.Send(&DC);
+	m_Socket.Send(&DC);  // Send it immediately to the socket, bypassing any packet buffers
+}
+
+
+
+
+
+void cClientHandle::SendHandshake(const AString & a_ServerName)
+{
+	cPacket_Handshake Handshake;
+	Handshake.m_Username = a_ServerName;
+	Send(Handshake);
+}
+
+
+
+
+
+void cClientHandle::SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item)
+{
+	cPacket_InventorySlot Packet;
+	Packet.m_WindowID  = (char)a_WindowID;
+	Packet.m_SlotNum   = a_SlotNum;
+	Packet.m_ItemID    = (short)(a_Item.m_ItemID);
+	Packet.m_ItemCount = a_Item.m_ItemCount;
+	Packet.m_ItemUses  = a_Item.m_ItemHealth;
 }
 
 
