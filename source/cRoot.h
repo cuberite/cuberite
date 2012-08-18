@@ -56,7 +56,7 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 
-	void ServerCommand(const char* a_Cmd );						//tolua_export
+	void ServerCommand(const AString & a_Cmd);						//tolua_export
 	
 	void KickUser(int a_ClientID, const AString & a_Reason);  // Kicks the user, no matter in what world they are. Used from cAuthenticator
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user

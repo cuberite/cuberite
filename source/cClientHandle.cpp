@@ -634,8 +634,12 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 					HandleBlockPlace(bp->m_PosX, bp->m_PosY, bp->m_PosZ, bp->m_Direction, bp->m_HeldItem);
 					break;
 				}
-				case E_PICKUP_SPAWN:              HandlePickupSpawn      (reinterpret_cast<cPacket_PickupSpawn *>            (a_Packet)); break;
-				case E_CHAT:                      HandleChat             (reinterpret_cast<cPacket_Chat *>                   (a_Packet)); break;
+				case E_CHAT:
+				{
+					cPacket_Chat * ch = reinterpret_cast<cPacket_Chat *>(a_Packet);
+					HandleChat(ch->m_Message);
+					break;
+				}
 				case E_PLAYERLOOK:                HandlePlayerLook       (reinterpret_cast<cPacket_PlayerLook *>             (a_Packet)); break;
 				case E_PLAYERMOVELOOK:            HandlePlayerMoveLook   (reinterpret_cast<cPacket_PlayerMoveLook *>         (a_Packet)); break;
 				case E_ANIMATION:                 HandleAnimation        (reinterpret_cast<cPacket_ArmAnim *>                (a_Packet)); break;
@@ -1022,31 +1026,18 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cClientHandle::HandlePickupSpawn(cPacket_PickupSpawn * a_Packet)
+void cClientHandle::HandleChat(const AString & a_Message)
 {
-	LOG("Received packet E_PICKUP_SPAWN");
-
-	cItem DroppedItem;
-	DroppedItem.m_ItemID = (ENUM_ITEM_ID)a_Packet->m_Item;
-	DroppedItem.m_ItemCount = a_Packet->m_Count;
-	DroppedItem.m_ItemHealth = 0x0; // TODO: Somehow figure out what item was dropped, and apply correct health
-	if (m_Player->GetInventory().RemoveItem(DroppedItem))
+	if (!cRoot::Get()->GetServer()->Command(*this, a_Message))
 	{
-		cPickup * Pickup = new cPickup(a_Packet);
-		Pickup->Initialize(m_Player->GetWorld());
-	}
-}
-
-
-
-
-
-void cClientHandle::HandleChat(cPacket_Chat * a_Packet)
-{
-	if (!cRoot::Get()->GetServer()->Command(*this, a_Packet->m_Message.c_str()))
-	{
-		a_Packet->m_Message.insert(0, "<" + m_Player->GetColor() + m_Username + cChatColor::White + "> ");
-		cRoot::Get()->GetServer()->Broadcast(*a_Packet);
+		AString Msg;
+		Printf(Msg, "<%s%s%s> %s",
+			m_Player->GetColor().c_str(),
+			m_Player->GetName().c_str(),
+			cChatColor::White.c_str(),
+			a_Message.c_str()
+		);
+		m_Player->GetWorld()->BroadcastChat(Msg);
 	}
 }
 
@@ -1443,6 +1434,17 @@ void cClientHandle::SendInventorySlot(int a_WindowID, short a_SlotNum, const cIt
 	Packet.m_ItemID    = (short)(a_Item.m_ItemID);
 	Packet.m_ItemCount = a_Item.m_ItemCount;
 	Packet.m_ItemUses  = a_Item.m_ItemHealth;
+	Send(Packet);
+}
+
+
+
+
+
+void cClientHandle::SendChat(const AString & a_Message)
+{
+	cPacket_Chat Chat(a_Message);
+	Send(Chat);
 }
 
 

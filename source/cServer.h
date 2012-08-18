@@ -44,8 +44,8 @@ public:												//tolua_export
 
 	void StartListenThread();
 
-	bool Command( cClientHandle & a_Client, const char* a_Cmd );
-	void ServerCommand( const char* a_Cmd );								//tolua_export
+	bool Command(cClientHandle & a_Client, const AString & a_Cmd);
+	void ServerCommand(const AString & a_Cmd);								//tolua_export
 	void Shutdown();
 
 	void SendMessage( const char* a_Message, cPlayer* a_Player = 0, bool a_bExclude = false ); //tolua_export

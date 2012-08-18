@@ -83,10 +83,10 @@ bool cPlugin::OnBlockToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, con
 
 
 
-bool cPlugin::OnChat(const char * a_Chat, cPlayer * a_Player)
+bool cPlugin::OnChat(cPlayer * a_Player, const AString & a_Message)
 {
-	UNUSED(a_Chat);
 	UNUSED(a_Player);
+	UNUSED(a_Message);
 	return false;
 }
 

@@ -191,55 +191,6 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 {
 	HookMap::iterator Plugins = m_Hooks.find( a_Hook );
 
-	// Special case for chat hook, since you can also bind commands (bound commands don't use chat hook)
-	if (a_Hook == HOOK_CHAT)
-	{
-		if (a_NumArgs != 2)
-		{ 	
-			return false;
-		}
-		va_list argptr;
-		va_start( argptr, a_NumArgs);
-		const char * Message = va_arg(argptr, const char* );
-		cPlayer * Player = va_arg(argptr, cPlayer * );
-		va_end (argptr);
-
-#ifdef USE_SQUIRREL
-		if (m_SquirrelCommandBinder->HandleCommand( std::string( Message ), Player))
-		{
-			return true;
-		}
-#endif
-
-		if (m_LuaCommandBinder->HandleCommand( std::string( Message ), Player))
-		{
-			return true;
-		}
-
-		//Check if it was a standard command (starts with a slash)
-		if(Message[0] == '/')
-		{
-			Player->SendMessage("Unknown Command");
-			LOGINFO("Player \"%s\" issued command: %s", Player->GetName().c_str(), Message);
-			return true;	//Cancel sending
-		}
-
-		if (Plugins == m_Hooks.end())
-		{
-			return false;
-		}
-		
-		for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-		{
-			if ((*itr)->OnChat(Message, Player))
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
@@ -445,6 +396,49 @@ bool cPluginManager::CallHookBlockPlace(cPlayer * a_Player, int a_BlockX, int a_
 			return true;
 		}
 	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookChat(cPlayer * a_Player, const AString & a_Message)
+{
+	#ifdef USE_SQUIRREL
+	if (m_SquirrelCommandBinder->HandleCommand(a_Message, a_Player))
+	{
+		return true;
+	}
+	#endif  // USE_SQUIRREL
+
+	if (m_LuaCommandBinder->HandleCommand(a_Message, a_Player))
+	{
+		return true;
+	}
+
+	//Check if it was a standard command (starts with a slash)
+	if (a_Message[0] == '/')
+	{
+		a_Player->SendMessage("Unknown Command");
+		LOGINFO("Player \"%s\" issued an unknown command: \"%s\"", a_Player->GetName().c_str(), a_Message.c_str());
+		return true;	// Cancel sending
+	}
+
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHAT);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnChat(a_Player, a_Message))
+		{
+			return true;
+		}
+	}
+	
 	return false;
 }
 

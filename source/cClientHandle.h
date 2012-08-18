@@ -105,6 +105,7 @@ public:
 	void SendDisconnect(const AString & a_Reason);
 	void SendHandshake (const AString & a_ServerName);
 	void SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendChat(const AString & a_Message);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	
@@ -196,8 +197,7 @@ private:
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	void HandleBlockPlace       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
-	void HandlePickupSpawn      (cPacket_PickupSpawn *             a_Packet);
-	void HandleChat             (cPacket_Chat *                    a_Packet);
+	void HandleChat             (const AString & a_Message);
 	void HandlePlayerLook       (cPacket_PlayerLook *              a_Packet);
 	void HandlePlayerMoveLook   (cPacket_PlayerMoveLook *          a_Packet);  // While m_bPositionConfirmed (normal gameplay)
 	void HandleAnimation        (cPacket_ArmAnim *                 a_Packet);

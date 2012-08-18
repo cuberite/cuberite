@@ -75,18 +75,18 @@ cRoot::~cRoot()
 
 
 
-void cRoot::InputThread(void* a_Params)
+void cRoot::InputThread(void * a_Params)
 {
 #if defined(ANDROID_NDK)
 	return;
 #else
-	cRoot& self = *(cRoot*)a_Params;
+	cRoot & self = *(cRoot*)a_Params;
 
-	while( !(self.m_bStop || self.m_bRestart) )
+	while (!(self.m_bStop || self.m_bRestart))
 	{
 		std::string Command;
 		std::getline(std::cin, Command);
-		self.ServerCommand( Command.c_str() );
+		self.ServerCommand(Command);
 	}
 #endif
 }
@@ -351,15 +351,15 @@ void cRoot::TickWorlds( float a_Dt )
 
 
 
-void cRoot::ServerCommand( const char * a_Cmd )
+void cRoot::ServerCommand(const AString & a_Cmd)
 {
-	LOG("Server console command: \"%s\"", a_Cmd );
-	m_Server->ServerCommand( a_Cmd );
-	if( strcmp(a_Cmd, "stop") == 0 )
+	LOG("Server console command: \"%s\"", a_Cmd.c_str());
+	m_Server->ServerCommand(a_Cmd);
+	if (a_Cmd == "stop")
 	{
 		m_bStop = true;
 	}
-	else if( strcmp( a_Cmd, "restart") == 0 )
+	else if (a_Cmd == "restart")
 	{
 		m_bRestart = true;
 	}

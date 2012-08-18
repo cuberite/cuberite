@@ -74,9 +74,11 @@ public:
 
 	int GetHeight( int a_X, int a_Z );												//tolua_export
 
-	void Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude = 0 );
+	void Broadcast(const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
 	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
+	
+	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
 	
 	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);

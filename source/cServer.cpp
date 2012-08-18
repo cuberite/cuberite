@@ -437,45 +437,24 @@ void cServer::StartListenThread()
 
 
 
-template <class T>
-bool from_string(
-	T& t,
-	const std::string& s,
-	std::ios_base& (*f)(std::ios_base&)
-)
+bool cServer::Command(cClientHandle & a_Client, const AString & a_Cmd)
 {
-	std::istringstream iss(s);
-	return !(iss >> f >> t).fail();
+	return cRoot::Get()->GetPluginManager()->CallHookChat(a_Client.GetPlayer(), a_Cmd);
 }
 
 
 
 
 
-bool cServer::Command( cClientHandle & a_Client, const char* a_Cmd )
+void cServer::ServerCommand(const AString & a_Cmd)
 {
-	cPluginManager* PM = cRoot::Get()->GetPluginManager();
-	if( PM->CallHook( cPluginManager::E_PLUGIN_CHAT, 2, a_Cmd, a_Client.GetPlayer() ) )
-	{
-		return true;
-	}
-	return false;
-}
-
-
-
-
-
-void cServer::ServerCommand( const char * a_Cmd )
-{
-	AString Command( a_Cmd );
-	AStringVector split = StringSplit( Command, " " );
-	if( split.empty())
+	AStringVector split = StringSplit(a_Cmd, " ");
+	if (split.empty())
 	{
 		return;
 	}
 	
-	if( split[0].compare( "help" ) == 0 )
+	if (split[0].compare( "help" ) == 0)
 	{
 		printf("================== ALL COMMANDS ===================\n");
 		printf("help       - Shows this message\n");
@@ -491,11 +470,11 @@ void cServer::ServerCommand( const char * a_Cmd )
 		printf("===================================================\n");
 		return;
 	}
-	if( split[0].compare( "stop" ) == 0 || split[0].compare( "restart" ) == 0 )
+	if ((split[0].compare("stop") == 0) || (split[0].compare("restart") == 0))
 	{
 		return;
 	}
-	if( split[0].compare( "save-all" ) == 0 )
+	if (split[0].compare("save-all") == 0)
 	{
 		cRoot::Get()->SaveAllChunks();
 		return;
@@ -507,7 +486,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 		LOG("Num loaded chunks after: %i", cRoot::Get()->GetTotalChunkCount() );
 		return;
 	}
-	if( split[0].compare( "list" ) == 0 )
+	if (split[0].compare("list") == 0)
 	{
 		class cPlayerLogger : public cPlayerListCallback
 		{
@@ -520,7 +499,7 @@ void cServer::ServerCommand( const char * a_Cmd )
 		cRoot::Get()->ForEachPlayer(Logger);
 		return;
 	}
-	if( split[0].compare( "numchunks" ) == 0 )
+	if (split[0].compare("numchunks") == 0)
 	{
 		LOG("Num loaded chunks: %i", cRoot::Get()->GetTotalChunkCount() );
 		return;
@@ -531,19 +510,19 @@ void cServer::ServerCommand( const char * a_Cmd )
 		return;
 	}
 	
-	if(split[0].compare("monsters") == 0 )
+	if (split[0].compare("monsters") == 0)
 	{
 		// TODO: cWorld::ListMonsters();
 		return;
 	}
 	
-	if(split.size() > 1)
+	if (split.size() > 1)
 	{
-		if( split[0].compare( "say" ) == 0 )
+		if (split[0].compare("say") == 0)
 		{
-			std::string Message = cChatColor::Purple + "[SERVER] " + Command.substr( Command.find_first_of("say") + 4 );
+			AString Message = cChatColor::Purple + "[SERVER] " + a_Cmd.substr(a_Cmd.find_first_of("say") + 4);
 			LOG("%s", Message.c_str() );
-			Broadcast( cPacket_Chat(Message) );
+			Broadcast(cPacket_Chat(Message));
 			return;
 		}
 	}

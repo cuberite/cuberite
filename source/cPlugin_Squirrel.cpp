@@ -151,13 +151,13 @@ bool cPlugin_Squirrel::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY
 
 
 
-bool cPlugin_Squirrel::OnChat(const char * a_Chat, cPlayer * a_Player)
+bool cPlugin_Squirrel::OnChat(cPlayer * a_Player, const AString & a_Message)
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 
 	if (!m_Plugin->HasFunction("OnChat")) return false;
 	
-	return m_Plugin->GetFunction("OnChat").Evaluate<bool>(a_Chat, a_Player);
+	return m_Plugin->GetFunction("OnChat").Evaluate<bool>(a_Player, a_Message);
 
 }
 

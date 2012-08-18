@@ -260,20 +260,23 @@ bool cPlugin_NewLua::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, 
 
 
 
-bool cPlugin_NewLua::OnChat( const char* a_Chat, cPlayer* a_Player )
+bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnChat") )
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnChat"))
+	{
 		return false;
+	}
 
-	tolua_pushstring( m_LuaState, a_Chat );
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushstring  (m_LuaState, a_Message.c_str());
 
-	if( !CallFunction(2, 1, "OnChat") )
+	if (!CallFunction(2, 1, "OnChat"))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	return bRetVal;
+	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
 }
 
 

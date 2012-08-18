@@ -1238,7 +1238,7 @@ void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->GetClientHandle()->Send( a_Packet );
+		ch->Send( a_Packet );
 	}
 }
 
@@ -1258,6 +1258,24 @@ void cWorld::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cP
 void cWorld::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastToChunkOfBlock(a_X, a_Y, a_Z, a_Packet, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendChat(a_Message);
+	}
 }
 
 

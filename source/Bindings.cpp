@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/18/12 11:57:21.
+** Generated automatically by tolua++-1.0.92 on 08/18/12 12:40:25.
 */
 
 #ifndef __cplusplus
@@ -7715,8 +7715,8 @@ static int tolua_AllToLua_cPlugin_OnChat00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -7724,17 +7724,18 @@ static int tolua_AllToLua_cPlugin_OnChat00(lua_State* tolua_S)
 #endif
  {
   cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Chat = ((const char*)  tolua_tostring(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnChat'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->OnChat(a_Chat,a_Player);
+   bool tolua_ret = (bool)  self->OnChat(a_Player,a_Message);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Message);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'OnChat'.",&tolua_err);
@@ -8697,16 +8698,16 @@ public:
 			return ( bool ) cPlugin:: OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 		};
 	};
-	 bool  OnChat( const char* a_Chat, cPlayer* a_Player) {
+	 bool  OnChat( cPlayer* a_Player, const AString& a_Message) {
 		if (push_method("OnChat",  tolua_AllToLua_cPlugin_OnChat00)) {
-			tolua_pushstring(lua_state, (const char*)a_Chat);
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			tolua_pushcppstring(lua_state, (const char*)a_Message);
 			ToluaBase::dbcall(lua_state, 3, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin:: OnChat(a_Chat,a_Player);
+			return ( bool ) cPlugin:: OnChat(a_Player,a_Message);
 		};
 	};
 	 void  OnChunkGenerated( cWorld* a_World, int a_ChunkX, int a_ChunkZ) {
@@ -8920,8 +8921,8 @@ public:
 	 bool cPlugin__OnBlockToPickup( unsigned char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		return ( bool )cPlugin::OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 	};
-	 bool cPlugin__OnChat( const char* a_Chat, cPlayer* a_Player) {
-		return ( bool )cPlugin::OnChat(a_Chat,a_Player);
+	 bool cPlugin__OnChat( cPlayer* a_Player, const AString& a_Message) {
+		return ( bool )cPlugin::OnChat(a_Player,a_Message);
 	};
 	 void cPlugin__OnChunkGenerated( cWorld* a_World, int a_ChunkX, int a_ChunkZ) {
 		return ( void )cPlugin::OnChunkGenerated(a_World,a_ChunkX,a_ChunkZ);
@@ -9213,8 +9214,8 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnChat00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -9222,17 +9223,18 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnChat00(lua_State* tolua_S)
 #endif
  {
   Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Chat = ((const char*)  tolua_tostring(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnChat'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cPlugin__OnChat(a_Chat,a_Player);
+   bool tolua_ret = (bool)  self->cPlugin__OnChat(a_Player,a_Message);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Message);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'cPlugin__OnChat'.",&tolua_err);
@@ -10156,16 +10158,16 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 		};
 	};
-	 bool  OnChat( const char* a_Chat, cPlayer* a_Player) {
+	 bool  OnChat( cPlayer* a_Player, const AString& a_Message) {
 		if (push_method("OnChat",  tolua_AllToLua_cPlugin_OnChat00)) {
-			tolua_pushstring(lua_state, (const char*)a_Chat);
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			tolua_pushcppstring(lua_state, (const char*)a_Message);
 			ToluaBase::dbcall(lua_state, 3, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin_NewLua:: OnChat(a_Chat,a_Player);
+			return ( bool ) cPlugin_NewLua:: OnChat(a_Player,a_Message);
 		};
 	};
 	 void  OnChunkGenerated( cWorld* a_World, int a_ChunkX, int a_ChunkZ) {
@@ -10382,8 +10384,8 @@ public:
 	 bool cPlugin_NewLua__OnBlockToPickup( unsigned char a_BlockType, unsigned char a_BlockMeta, const cPlayer* a_Player, const cItem& a_EquippedItem, cItems& a_Pickups) {
 		return ( bool )cPlugin_NewLua::OnBlockToPickup(a_BlockType,a_BlockMeta,a_Player,a_EquippedItem,a_Pickups);
 	};
-	 bool cPlugin_NewLua__OnChat( const char* a_Chat, cPlayer* a_Player) {
-		return ( bool )cPlugin_NewLua::OnChat(a_Chat,a_Player);
+	 bool cPlugin_NewLua__OnChat( cPlayer* a_Player, const AString& a_Message) {
+		return ( bool )cPlugin_NewLua::OnChat(a_Player,a_Message);
 	};
 	 void cPlugin_NewLua__OnChunkGenerated( cWorld* a_World, int a_ChunkX, int a_ChunkZ) {
 		return ( void )cPlugin_NewLua::OnChunkGenerated(a_World,a_ChunkX,a_ChunkZ);
@@ -10632,7 +10634,7 @@ static int tolua_AllToLua_cServer_ServerCommand00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -10640,15 +10642,16 @@ static int tolua_AllToLua_cServer_ServerCommand00(lua_State* tolua_S)
 #endif
  {
   cServer* self = (cServer*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Cmd = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Cmd = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ServerCommand'", NULL);
 #endif
   {
    self->ServerCommand(a_Cmd);
+   tolua_pushcppstring(tolua_S,(const char*)a_Cmd);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ServerCommand'.",&tolua_err);
@@ -14546,7 +14549,7 @@ static int tolua_AllToLua_cRoot_ServerCommand00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -14554,15 +14557,16 @@ static int tolua_AllToLua_cRoot_ServerCommand00(lua_State* tolua_S)
 #endif
  {
   cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Cmd = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Cmd = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ServerCommand'", NULL);
 #endif
   {
    self->ServerCommand(a_Cmd);
+   tolua_pushcppstring(tolua_S,(const char*)a_Cmd);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ServerCommand'.",&tolua_err);
