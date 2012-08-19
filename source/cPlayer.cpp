@@ -22,17 +22,6 @@
 #include "MersenneTwister.h"
 
 #include "packets/cPacket_NamedEntitySpawn.h"
-#include "packets/cPacket_EntityLook.h"
-#include "packets/cPacket_TeleportEntity.h"
-#include "packets/cPacket_RelativeEntityMove.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
-#include "packets/cPacket_UpdateHealth.h"
-#include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_DestroyEntity.h"
-#include "packets/cPacket_Metadata.h"
-#include "packets/cPacket_Chat.h"
-#include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_BlockAction.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -105,6 +94,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 			a_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
 		);
 	}
+	m_LastGroundHeight = (float)(m_Pos.y);
+	m_Stance = m_Pos.y + 1.62;
 }
 
 
@@ -193,13 +184,11 @@ void cPlayer::Tick(float a_Dt)
 
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
-		cPacket_EntityLook EntityLook(*this);
-		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityLook, m_ClientHandle );
-		cPacket_EntityHeadLook EntityHeadLook(*this);
-		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityHeadLook, m_ClientHandle);
+		m_World->BroadcastEntLook(*this, m_ClientHandle);
+		m_World->BroadcastEntHeadLook(*this, m_ClientHandle);
 		m_bDirtyOrientation = false;
 	}
-	else if (m_bDirtyPosition )
+	else if (m_bDirtyPosition)
 	{
 		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_MOVE, 1, this );
 
@@ -212,32 +201,21 @@ void cPlayer::Tick(float a_Dt)
 			(cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
 		)
 		{
-			//LOG("Teleported %f", sqrtf(SqrDist) );
-			cPacket_TeleportEntity TeleportEntity( this );
-			m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, TeleportEntity, m_ClientHandle);
+			// LOG("Teleported %f", sqrtf(SqrDist) );
+			m_World->BroadcastTeleportEntity(*this, m_ClientHandle);
 			m_TimeLastTeleportPacket = cWorld::GetTime();
 		}
 		else
-		{	// Relative move sucks balls! It's always wrong wtf!
-			if( m_bDirtyOrientation )
+		{
+			// Relative move sucks balls! It's always wrong wtf!
+			if (m_bDirtyOrientation)
 			{
-				cPacket_RelativeEntityMoveLook RelativeEntityMoveLook;
-				RelativeEntityMoveLook.m_UniqueID = GetUniqueID();
-				RelativeEntityMoveLook.m_MoveX = (char)(DiffX*32);
-				RelativeEntityMoveLook.m_MoveY = (char)(DiffY*32);
-				RelativeEntityMoveLook.m_MoveZ = (char)(DiffZ*32);
-				RelativeEntityMoveLook.m_Yaw = (char)((GetRotation()/360.f)*256);
-				RelativeEntityMoveLook.m_Pitch    = (char)((GetPitch()/360.f)*256);
-				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMoveLook, m_ClientHandle );
+				m_World->BroadcastRelEntMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
+				m_bDirtyOrientation = false;
 			}
 			else
 			{
-				cPacket_RelativeEntityMove RelativeEntityMove;
-				RelativeEntityMove.m_UniqueID = GetUniqueID();
-				RelativeEntityMove.m_MoveX = (char)(DiffX*32);
-				RelativeEntityMove.m_MoveY = (char)(DiffY*32);
-				RelativeEntityMove.m_MoveZ = (char)(DiffZ*32);
-				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMove, m_ClientHandle );
+				m_World->BroadcastRelEntMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
 			}
 		}
 		m_LastPosX = GetPosX();
@@ -266,15 +244,19 @@ void cPlayer::Tick(float a_Dt)
 			}
 		}
 
-		//TODO: Increase Exhaustion level http://www.minecraftwiki.net/wiki/Hunger#Exhaustion_level_increase
-		if(m_FoodExhaustionLevel >= 4.f)
+		// TODO: Increase Exhaustion level http://www.minecraftwiki.net/wiki/Hunger#Exhaustion_level_increase
+		if (m_FoodExhaustionLevel >= 4.f)
 		{
 			m_FoodExhaustionLevel -= 4.f;
 
-			if(m_FoodSaturationLevel >= 1.f)
+			if (m_FoodSaturationLevel >= 1.f)
+			{
 				m_FoodSaturationLevel--;
+			}
 			else
+			{
 				m_FoodLevel = MAX(m_FoodLevel -1, 0);
+			}
 
 			SendHealth();
 		}
@@ -293,39 +275,42 @@ void cPlayer::Tick(float a_Dt)
 
 
 
-void cPlayer::SetTouchGround( bool a_bTouchGround )
+void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
 	m_bTouchGround = a_bTouchGround;
 
-	if( !m_bTouchGround )
+	if (!m_bTouchGround)
 	{
 		cWorld* World = GetWorld();
 		char BlockID = World->GetBlock( float2int(m_Pos.x), float2int(m_Pos.y), float2int(m_Pos.z) );
 		if( BlockID != E_BLOCK_AIR )
 		{
+			// LOGD("TouchGround set to true by server");
 			m_bTouchGround = true;
 		}
 		if( BlockID == E_BLOCK_WATER || BlockID == E_BLOCK_STATIONARY_WATER || BlockID == E_BLOCK_LADDER || BlockID == E_BLOCK_TORCH )
 		{
+			// LOGD("Water / Ladder / Torch");
 			m_LastGroundHeight = (float)m_Pos.y;
 		}
 	}
 
-	if( m_bTouchGround )
+	if (m_bTouchGround)
 	{
 		float Dist = (float)(m_LastGroundHeight - m_Pos.y);
-		if( Dist > 4.f ) // Player dropped
+		int Damage = (int)(Dist - 4.f);
+		if (Damage > 0)
 		{
-			int Damage = (int)(Dist - 4.f);
-			if( Damage > 0 )
-			{
-				TakeDamage( Damage, 0 );
-			}
+			TakeDamage(Damage, 0);
 		}
 
 		m_LastGroundHeight = (float)m_Pos.y;
 	}
 }
+
+
+
+
 
 void cPlayer::Heal( int a_Health )
 {
@@ -337,6 +322,10 @@ void cPlayer::Heal( int a_Health )
 		SendHealth();
 	}
 }
+
+
+
+
 
 bool cPlayer::Feed(short a_Food, float a_Saturation)
 {
@@ -352,19 +341,25 @@ bool cPlayer::Feed(short a_Food, float a_Saturation)
 	return true;
 }
 
+
+
+
+
 void cPlayer::SendHealth()
 {
-	cPacket_UpdateHealth Health;
-	Health.m_Health = GetHealth();
-	Health.m_Food = GetFoodLevel();
-	Health.m_Saturation = GetFoodSaturationLevel();
-	if(m_ClientHandle != 0)
-		m_ClientHandle->Send( Health );
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendHealth();
+	}
 }
+
+
+
+
 
 void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
 {
-	if(m_GameMode != eGameMode_Creative)
+	if (m_GameMode != eGameMode_Creative)
 	{
 		cPawn::TakeDamage( a_Damage, a_Instigator );
 
@@ -412,22 +407,19 @@ void cPlayer::Respawn()
 {
 	m_Health = GetMaxHealth();
 
-	// Create Respawn player packet
-	cPacket_Respawn Packet;
-	//Set Gamemode for packet by looking at world's gamemode (Need to check players gamemode.)
-	//Packet.m_CreativeMode = (char)GetWorld()->GetGameMode();
-	Packet.m_CreativeMode = (char)m_GameMode; //Set GameMode packet based on Player's GameMode;
-
-	//Send Packet
-	m_ClientHandle->Send( Packet );
+	m_ClientHandle->SendRespawn();
 	
-	//Set non Burning
+	// Set non Burning
 	SetMetaData(NORMAL);
 
-	TeleportTo( GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ() );
+	TeleportTo(GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ());
 
-	SetVisible( true );
+	SetVisible(true);
 }
+
+
+
+
 
 double cPlayer::GetEyeHeight()
 {
@@ -486,14 +478,9 @@ void cPlayer::CloseWindow(char a_WindowType)
 		// FIXME: If the player entity is destroyed while having a chest window open, the chest will not close
 		if ((a_WindowType == 1) && (m_CurrentWindow->GetWindowType() == cWindow::Chest))
 		{
-			// Chest
-			cPacket_BlockAction ChestClose;
-			int y = 0;
-			m_CurrentWindow->GetOwner()->GetBlockPos(ChestClose.m_PosX, y, ChestClose.m_PosZ);
-			ChestClose.m_PosY = (short)y;
-			ChestClose.m_Byte1 = 1;  // Unused, always 1
-			ChestClose.m_Byte2 = 0;  // 0 = closed
-			m_World->Broadcast(ChestClose);
+			int x, y, z;
+			m_CurrentWindow->GetOwner()->GetBlockPos(x, y, z);
+			m_World->BroadcastBlockAction(x, y, z, 1, 0);
 		}
 		
 		m_CurrentWindow->Close( *this );
@@ -526,28 +513,33 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 
 
-void cPlayer::SetGameMode( eGameMode a_GameMode )
+void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
-	if ( (a_GameMode < 2) && (a_GameMode >= 0) )
+	if ((a_GameMode >= 2) || (a_GameMode < 0))
 	{
-		if (m_GameMode != a_GameMode)
-		{
-			cInventory *OldInventory = 0;
-			if(m_GameMode == eGameMode_Survival)
-				OldInventory = m_Inventory;
-			else
-				OldInventory = m_CreativeInventory;
-
-			m_GameMode = a_GameMode;
-			cPacket_NewInvalidState GameModePacket;
-			GameModePacket.m_Reason = 3; //GameModeChange
-			GameModePacket.m_GameMode = (char)a_GameMode; //GameModeChange
-			m_ClientHandle->Send ( GameModePacket );
-			GetInventory().SendWholeInventory(m_ClientHandle);
-			
-			GetInventory().SetEquippedSlot(OldInventory->GetEquippedSlot());
-		}
+		LOGWARNING("%s: Setting invalid gamemode: %d", GetName().c_str(), a_GameMode);
+		return;
 	}
+	
+	if (m_GameMode == a_GameMode)
+	{
+		// Gamemode already set
+		return;
+	}
+	
+	short OldSlotNum = 0;
+	if (m_GameMode == eGameMode_Survival)
+	{
+		OldSlotNum = m_Inventory->GetEquippedSlot();
+	}
+	else
+	{
+		OldSlotNum = m_CreativeInventory->GetEquippedSlot();
+	}
+	m_GameMode = a_GameMode;
+	m_ClientHandle->SendGameMode(a_GameMode);
+	GetInventory().SendWholeInventory(m_ClientHandle);
+	GetInventory().SetEquippedSlot(OldSlotNum);
 }
 
 
@@ -563,7 +555,7 @@ void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
 
 
 
-void cPlayer::SetIP( std::string a_IP )
+void cPlayer::SetIP(const AString & a_IP)
 {
 	m_IP = a_IP;
 }
@@ -572,26 +564,21 @@ void cPlayer::SetIP( std::string a_IP )
 
 
 
-void cPlayer::SendMessage( const char* a_Message )
+void cPlayer::SendMessage(const AString & a_Message)
 {
-	m_ClientHandle->Send( cPacket_Chat( a_Message ) );
+	m_ClientHandle->SendChat(a_Message);
 }
 
 
 
 
 
-void cPlayer::TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ )
+void cPlayer::TeleportTo(const double & a_PosX, const double & a_PosY, const double & a_PosZ)
 {
 	SetPosition( a_PosX, a_PosY, a_PosZ );
 
-	cPacket_TeleportEntity TeleportEntity( this );
-	cRoot::Get()->GetServer()->Broadcast( TeleportEntity, GetClientHandle() );
-	
-
-	cPacket_PlayerPosition PlayerPosition( this );
-
-	m_ClientHandle->Send( PlayerPosition );
+	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
+	m_ClientHandle->SendPlayerMoveLook();
 }
 
 
@@ -604,24 +591,24 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 	
 	SetPosition( a_NewPos );
+	SetStance(a_NewPos.y + 1.62);
 }
 
 
 
 
 
-void cPlayer::SetVisible( bool a_bVisible )
+void cPlayer::SetVisible(bool a_bVisible)
 {
 	if (a_bVisible && !m_bVisible) // Make visible
 	{
 		m_bVisible = true;
-		SpawnOn( NULL ); // Spawn on everybody
+		SpawnOn(NULL); // Spawn on all clients
 	}
 	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
-		cPacket_DestroyEntity DestroyEntity( this );
-		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, DestroyEntity );	// Destroy on all clients
+		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);	// Destroy on all clients
 	}
 }
 

@@ -148,18 +148,17 @@ void cPickup::Tick(float a_Dt)
 		return;
 	}
 
-	if(!m_bCollected)
+	if (!m_bCollected)
 	{
-		HandlePhysics( a_Dt );
+		HandlePhysics(a_Dt);
 	}
 
-	if( !m_bReplicated || m_bDirtyPosition )
+	if (!m_bReplicated || m_bDirtyPosition)
 	{
 		MoveToCorrectChunk();
 		m_bReplicated = true;
 		m_bDirtyPosition = false;
-		cPacket_TeleportEntity TeleportEntity( this );
-		GetWorld()->BroadcastToChunk( m_ChunkX, m_ChunkY, m_ChunkZ, TeleportEntity );
+		GetWorld()->BroadcastTeleportEntity(*this);
 	}
 }
 

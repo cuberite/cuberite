@@ -103,6 +103,7 @@ public:																	//tolua_export
 	bool CallHookChat            (cPlayer * a_Player, const AString & a_Message);
 	bool CallHookChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_Chunk);
 	bool CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	bool CallHookDisconnect      (cPlayer * a_Player, const AString & a_Reason);
 	bool CallHookLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);

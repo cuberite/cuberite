@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/19/12 13:48:32.
+** Generated automatically by tolua++-1.0.92 on 08/19/12 21:46:45.
 */
 
 #ifndef __cplusplus
@@ -5931,14 +5931,14 @@ static int tolua_AllToLua_cPlayer_GetStance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetStance'", NULL);
 #endif
@@ -6293,14 +6293,14 @@ static int tolua_AllToLua_cPlayer_GetClientHandle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetClientHandle'", NULL);
 #endif
@@ -6326,7 +6326,7 @@ static int tolua_AllToLua_cPlayer_SendMessage00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -6334,15 +6334,16 @@ static int tolua_AllToLua_cPlayer_SendMessage00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Message = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SendMessage'", NULL);
 #endif
   {
    self->SendMessage(a_Message);
+   tolua_pushcppstring(tolua_S,(const char*)a_Message);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SendMessage'.",&tolua_err);
@@ -7903,8 +7904,8 @@ static int tolua_AllToLua_cPlugin_OnDisconnect00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -7912,13 +7913,13 @@ static int tolua_AllToLua_cPlugin_OnDisconnect00(lua_State* tolua_S)
 #endif
  {
   cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  const AString a_Reason = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const AString a_Reason = ((const AString)  tolua_tocppstring(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnDisconnect'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->OnDisconnect(a_Reason,a_Player);
+   bool tolua_ret = (bool)  self->OnDisconnect(a_Player,a_Reason);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Reason);
   }
@@ -8759,16 +8760,16 @@ public:
 			return ( bool ) cPlugin:: OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
 		};
 	};
-	 bool  OnDisconnect( const AString& a_Reason, cPlayer* a_Player) {
+	 bool  OnDisconnect( cPlayer* a_Player, const AString& a_Reason) {
 		if (push_method("OnDisconnect",  tolua_AllToLua_cPlugin_OnDisconnect00)) {
-			tolua_pushcppstring(lua_state, (const char*)a_Reason);
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			tolua_pushcppstring(lua_state, (const char*)a_Reason);
 			ToluaBase::dbcall(lua_state, 3, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin:: OnDisconnect(a_Reason,a_Player);
+			return ( bool ) cPlugin:: OnDisconnect(a_Player,a_Reason);
 		};
 	};
 	 bool  OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
@@ -8936,8 +8937,8 @@ public:
 	 bool cPlugin__OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin::OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
 	};
-	 bool cPlugin__OnDisconnect( const AString& a_Reason, cPlayer* a_Player) {
-		return ( bool )cPlugin::OnDisconnect(a_Reason,a_Player);
+	 bool cPlugin__OnDisconnect( cPlayer* a_Player, const AString& a_Reason) {
+		return ( bool )cPlugin::OnDisconnect(a_Player,a_Reason);
 	};
 	 bool cPlugin__OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
 		return ( bool )cPlugin::OnKilled(a_Killed,a_Killer);
@@ -9402,8 +9403,8 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnDisconnect00(lua_State* tolua_
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -9411,13 +9412,13 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnDisconnect00(lua_State* tolua_
 #endif
  {
   Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  const AString a_Reason = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const AString a_Reason = ((const AString)  tolua_tocppstring(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnDisconnect'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cPlugin__OnDisconnect(a_Reason,a_Player);
+   bool tolua_ret = (bool)  self->cPlugin__OnDisconnect(a_Player,a_Reason);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Reason);
   }
@@ -10219,16 +10220,16 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
 		};
 	};
-	 bool  OnDisconnect( const AString& a_Reason, cPlayer* a_Player) {
+	 bool  OnDisconnect( cPlayer* a_Player, const AString& a_Reason) {
 		if (push_method("OnDisconnect",  tolua_AllToLua_cPlugin_OnDisconnect00)) {
-			tolua_pushcppstring(lua_state, (const char*)a_Reason);
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			tolua_pushcppstring(lua_state, (const char*)a_Reason);
 			ToluaBase::dbcall(lua_state, 3, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin_NewLua:: OnDisconnect(a_Reason,a_Player);
+			return ( bool ) cPlugin_NewLua:: OnDisconnect(a_Player,a_Reason);
 		};
 	};
 	 bool  OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
@@ -10399,8 +10400,8 @@ public:
 	 bool cPlugin_NewLua__OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin_NewLua::OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
 	};
-	 bool cPlugin_NewLua__OnDisconnect( const AString& a_Reason, cPlayer* a_Player) {
-		return ( bool )cPlugin_NewLua::OnDisconnect(a_Reason,a_Player);
+	 bool cPlugin_NewLua__OnDisconnect( cPlayer* a_Player, const AString& a_Reason) {
+		return ( bool )cPlugin_NewLua::OnDisconnect(a_Player,a_Reason);
 	};
 	 bool cPlugin_NewLua__OnKilled( cPawn* a_Killed, cEntity* a_Killer) {
 		return ( bool )cPlugin_NewLua::OnKilled(a_Killed,a_Killer);

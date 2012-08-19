@@ -184,20 +184,23 @@ bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 
 
 
-bool cPlugin_NewLua::OnDisconnect(const AString & a_Reason, cPlayer* a_Player )
+bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnDisconnect") )
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnDisconnect"))
+	{
 		return false;
+	}
 
-	tolua_pushstring( m_LuaState, a_Reason.c_str() );
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushstring  (m_LuaState, a_Reason.c_str());
 
-	if( !CallFunction(2, 1, "OnDisconnect") )
+	if (!CallFunction(2, 1, "OnDisconnect"))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	return bRetVal;
+	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
 }
 
 

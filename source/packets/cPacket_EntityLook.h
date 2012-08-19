@@ -43,14 +43,17 @@ public:
 	cPacket_EntityHeadLook(void) 
 		: m_UniqueID( 0 )
 		, m_HeadYaw( 0 )
-	{ m_PacketID = E_ENT_LOOK;  }
+	{
+		m_PacketID = E_ENT_LOOK;
+	}
+	
 	cPacket_EntityHeadLook(const cEntity & a_Entity);
 	
 	virtual cPacket * Clone(void) const { return new cPacket_EntityHeadLook(*this); }
 
 	virtual void Serialize(AString & a_Data) const override;
 
-	int m_UniqueID;
+	int  m_UniqueID;
 	char m_HeadYaw;
 };
 

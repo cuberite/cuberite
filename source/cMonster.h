@@ -41,7 +41,7 @@ public:
 	virtual bool ReachedDestination();
 
 	const char *GetState();
-	void SetState(const char* str);
+	void SetState(const AString & str);
 	static void ListMonsters();
 	
 	virtual void CheckEventSeePlayer();
@@ -93,7 +93,7 @@ protected:
 	float m_AttackRange;
 	float m_AttackInterval;
 
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, ENUM_ITEM_ID a_Item, short a_ItemHealth = 0);
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
 }; //tolua_export
 
 

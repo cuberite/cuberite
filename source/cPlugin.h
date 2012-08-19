@@ -56,8 +56,8 @@ public:
 	virtual bool OnChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk);
 	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player );
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	virtual bool OnDisconnect      (const AString & a_Reason, cPlayer * a_Player );
-	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer );
+	virtual bool OnDisconnect      (cPlayer * a_Player, const AString & a_Reason);
+	virtual bool OnKilled          (cPawn * a_Killed, cEntity* a_Killer );
 	virtual bool OnLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	virtual bool OnPlayerJoin      (cPlayer* a_Player );
 	virtual void OnPlayerMove      (cPlayer* a_Player );

@@ -77,38 +77,32 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		}
 		int oldx = pistx, oldy = pisty, oldz = pistz;
 		char currBlockMeta;
-		for (int i = dist+1; i>0; i--)
+		for (int i = dist + 1; i>0; i--)
 		{
-			AddDir( pistx, pisty, pistz, pistonMeta & 7, -1 )
-			currBlock = m_World->GetBlock( pistx, pisty, pistz );
-			currBlockMeta = m_World->GetBlockMeta( pistx, pisty, pistz );
-			m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta );
+			AddDir(pistx, pisty, pistz, pistonMeta & 7, -1)
+			currBlock = m_World->GetBlock(pistx, pisty, pistz);
+			currBlockMeta = m_World->GetBlockMeta(pistx, pisty, pistz);
+			m_World->SetBlock( oldx, oldy, oldz, currBlock, currBlockMeta);
 			oldx = pistx;
 			oldy = pisty;
 			oldz = pistz;
 		}
-		cPacket_BlockAction Action;
-		Action.m_PosX		= (int)pistx;
-		Action.m_PosY		= (short)pisty;
-		Action.m_PosZ		= (int)pistz;
-		Action.m_Byte1	=	0;
-		Action.m_Byte2	=	pistonMeta;
-
-		m_World->BroadcastToChunkOfBlock(pistx, pisty, pistz, &Action);
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta);
 		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
 
 		int extx = pistx;
 		int exty = pisty;
 		int extz = pistz;
 	
-		AddDir( extx, exty, extz, pistonMeta&7, 1 )
+		AddDir(extx, exty, extz, pistonMeta & 7, 1)
 
-		m_World->SetBlock( extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky+pistonMeta&7 );
+		m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
 		
-		if (recalc) {
+		if (recalc)
+		{
 			cRedstone Redstone(m_World);
-			Redstone.ChangeRedstone( extx, exty, extz, false ); //recalculate redstone around current device.			
-			Redstone.ChangeRedstone( pistx, pisty, pistz, false ); //recalculate redstone around current device.			
+			Redstone.ChangeRedstone(extx,  exty,  extz,  false);  // recalculate redstone around current device
+			Redstone.ChangeRedstone(pistx, pisty, pistz, false);  // recalculate redstone around current device
 		}
 	}
 }
@@ -125,21 +119,13 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	{
 		return;
 	}
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8));
+	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
 	
-	//send blockaction packet
-	cPacket_BlockAction Action;
-	Action.m_PosX   = (int)pistx;
-	Action.m_PosY   = (short)pisty;
-	Action.m_PosZ   = (int)pistz;
-	Action.m_Byte1  = 1;
-	Action.m_Byte2  = pistonMeta & ~(8);
-	m_World->BroadcastToChunkOfBlock(pistx, pisty, pistz, &Action );
-	m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8) );
-	
-	AddDir( pistx, pisty, pistz, pistonMeta & 7, 1 )
-	if ( m_World->GetBlock( pistx, pisty, pistz ) == E_BLOCK_PISTON_EXTENSION )
+	AddDir(pistx, pisty, pistz, pistonMeta & 7, 1)
+	if (m_World->GetBlock(pistx, pisty, pistz) == E_BLOCK_PISTON_EXTENSION)
 	{
-		if ( pistonBlock == E_BLOCK_STICKY_PISTON )
+		if (pistonBlock == E_BLOCK_STICKY_PISTON)
 		{
 			int tempx = pistx, tempy = pisty, tempz = pistz;
 			AddDir( tempx, tempy, tempz, pistonMeta & 7, 1 )

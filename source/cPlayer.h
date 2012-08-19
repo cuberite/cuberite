@@ -35,12 +35,13 @@ public:
 	virtual void Tick(float a_Dt) override;
 
 	void SetTouchGround( bool a_bTouchGround );
-	inline void SetStance( const double & a_Stance ) { m_Stance = a_Stance; }
+	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
 	double GetEyeHeight();													//tolua_export
 	Vector3d GetEyePosition();												//tolua_export
+	OBSOLETE
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
-	inline const double & GetStance() { return m_Stance; }					//tolua_export
+	inline const double GetStance(void) const { return m_Pos.y + 1.62; }					//tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory & GetInventory() { if(GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }	//tolua_export
 
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
@@ -53,7 +54,7 @@ public:
 	void SetLastBlockActionTime();																		//tolua_export
 	void SetGameMode( eGameMode a_GameMode );															//tolua_export
 	void LoginSetGameMode( eGameMode a_GameMode );
-	void SetIP( std::string a_IP );
+	void SetIP(const AString & a_IP);
 
 	// Tries to move to a new position, with collision checks and stuff
 	virtual void MoveTo( const Vector3d & a_NewPos );													//tolua_export
@@ -62,9 +63,9 @@ public:
 	void OpenWindow( cWindow* a_Window );
 	void CloseWindow(char a_WindowType);
 
-	cClientHandle * GetClientHandle() { return m_ClientHandle; }			//tolua_export
+	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }			//tolua_export
 
-	void SendMessage( const char* a_Message );								//tolua_export
+	void SendMessage(const AString & a_Message);								//tolua_export
 
 	const AString & GetName(void) const { return m_PlayerName; }			//tolua_export
 	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }			//tolua_export

@@ -15,30 +15,6 @@
 #include "Vector3d.h"
 #include "cSocketThreads.h"
 #include "ChunkDef.h"
-
-#include "packets/cPacket_KeepAlive.h"
-#include "packets/cPacket_Player.h"
-#include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
-#include "packets/cPacket_Chat.h"
-#include "packets/cPacket_Login.h"
-#include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_TimeUpdate.h"
-#include "packets/cPacket_BlockDig.h"
-#include "packets/cPacket_Handshake.h"
-#include "packets/cPacket_ArmAnim.h"
-#include "packets/cPacket_BlockPlace.h"
-#include "packets/cPacket_Flying.h"
-#include "packets/cPacket_Disconnect.h"
-#include "packets/cPacket_PickupSpawn.h"
-#include "packets/cPacket_ItemSwitch.h"
-#include "packets/cPacket_EntityEquipment.h"
-#include "packets/cPacket_CreativeInventoryAction.h"
-#include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_UseEntity.h"
-#include "packets/cPacket_WindowClose.h"
-#include "packets/cPacket_UpdateSign.h"
-#include "packets/cPacket_Ping.h"
 #include "ByteBuffer.h"
 
 
@@ -114,6 +90,19 @@ public:
 	void SendWindowClose(char a_WindowID);
 	void SendWholeInventory(const cInventory & a_Inventory);
 	void SendWholeInventory(const cWindow    & a_Window);
+	void SendTeleportEntity(const cEntity & a_Entity);
+	void SendPlayerListItem(const cPlayer & a_Player);
+	void SendPlayerPosition(void);
+	void SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendRelEntMove    (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntLook       (const cEntity & a_Entity);
+	void SendEntHeadLook   (const cEntity & a_Entity);
+	void SendBlockAction   (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2);
+	void SendHealth (void);
+	void SendRespawn(void);
+	void SendGameMode(char a_GameMode);
+	void SendDestroyEntity(const cEntity & a_Entity);
+	void SendPlayerMoveLook(void);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	
@@ -212,14 +201,20 @@ private:
 	void HandleSlotSelected     (short a_SlotNum);
 	void HandleWindowClose      (char a_WindowID);
 	void HandleWindowClick      (char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
-	void HandleUpdateSign       (cPacket_UpdateSign *              a_Packet);
-	void HandleUseEntity        (cPacket_UseEntity *               a_Packet);
+	void HandleUpdateSign       (
+		int a_BlockX, int a_BlockY, int a_BlockZ, 
+		const AString & a_Line1, const AString & a_Line2, 
+		const AString & a_Line3, const AString & a_Line4
+	);
+	void HandleUseEntity        (int a_TargetEntityID, bool a_IsLeftClick);
 	void HandleRespawn          (void);
-	void HandleDisconnect       (cPacket_Disconnect *              a_Packet);
-	void HandleKeepAlive        (cPacket_KeepAlive *               a_Packet);
+	void HandleDisconnect       (const AString & a_Reason);
+	void HandleKeepAlive        (int a_KeepAliveID);
 	
+	/*
 	/// Handles rclk with a dye; returns true if the dye is to be be consumed
 	bool HandleDyes(cPacket_BlockPlace * a_Packet);
+	*/
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
 	bool CheckBlockInteractionsRate(void);

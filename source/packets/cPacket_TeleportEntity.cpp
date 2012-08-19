@@ -9,16 +9,16 @@
 
 
 
-cPacket_TeleportEntity::cPacket_TeleportEntity(cEntity* a_Client)
+cPacket_TeleportEntity::cPacket_TeleportEntity(const cEntity & a_Entity)
 {
 	m_PacketID = E_ENT_TELEPORT;
 
-	m_UniqueID = a_Client->GetUniqueID();
-	m_PosX = (int)(a_Client->GetPosX() * 32);
-	m_PosY = (int)(a_Client->GetPosY() * 32);
-	m_PosZ = (int)(a_Client->GetPosZ() * 32);
-	m_Rotation = (char)((a_Client->GetRotation() / 360.f) * 256);
-	m_Pitch    = (char)((a_Client->GetPitch() / 360.f) * 256);
+	m_UniqueID = a_Entity.GetUniqueID();
+	m_PosX = (int)(a_Entity.GetPosX() * 32);
+	m_PosY = (int)(a_Entity.GetPosY() * 32);
+	m_PosZ = (int)(a_Entity.GetPosZ() * 32);
+	m_Rotation = (char)((a_Entity.GetRotation() / 360.f) * 256);
+	m_Pitch    = (char)((a_Entity.GetPitch() / 360.f) * 256);
 }
 
 

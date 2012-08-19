@@ -141,7 +141,7 @@ bool cPlugin::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid *
 
 
 
-bool cPlugin::OnDisconnect(const AString & a_Reason, cPlayer * a_Player)
+bool cPlugin::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
 	UNUSED(a_Reason);
 	UNUSED(a_Player);

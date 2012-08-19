@@ -1787,6 +1787,102 @@ void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 
 
+void cChunk::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastEntLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendEntLook(a_Entity);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastEntHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendEntHeadLook(a_Entity);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendDestroyEntity(a_Entity);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z)
 {
 	a_Y = a_ChunkY;

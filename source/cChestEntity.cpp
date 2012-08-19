@@ -184,13 +184,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 			GetWindow()->SendWholeWindow( a_Player->GetClientHandle() );
 		}
 	}
-	cPacket_BlockAction ChestOpen;
-	ChestOpen.m_PosX = GetPosX();
-	ChestOpen.m_PosY = (short)GetPosY();
-	ChestOpen.m_PosZ = GetPosZ();
-	ChestOpen.m_Byte1 = (char)1;
-	ChestOpen.m_Byte2 = (char)1;
-	m_World->BroadcastToChunkOfBlock(m_PosX, m_PosY, m_PosZ, &ChestOpen);
+	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, 1, 1);
 
 	// This is rather a hack
 	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
@@ -205,18 +199,18 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
-cItem *cChestEntity::GetContents(bool a_OnlyThis)
+cItem * cChestEntity::GetContents(bool a_OnlyThis)
 {
 	if (m_JoinedChest && !a_OnlyThis)
 	{
-		cItem *Combined = new cItem[GetChestHeight()*c_ChestWidth];
-		int i;
-		cItem *first = (m_TopChest) ? GetContents(true) : m_JoinedChest->GetContents(true);
-		cItem *second = (!m_TopChest) ? GetContents(true) :  m_JoinedChest->GetContents(true);
-		for (i=0; i < GetChestHeight()*c_ChestWidth; i++)
+		// TODO: "Combined" memory leaks here
+		cItem * Combined = new cItem[GetChestHeight() * c_ChestWidth];
+		cItem * first =  (m_TopChest)  ? GetContents(true) : m_JoinedChest->GetContents(true);
+		cItem * second = (!m_TopChest) ? GetContents(true) : m_JoinedChest->GetContents(true);
+		for (int i = 0; i < GetChestHeight() * c_ChestWidth; i++)
 		{
-			int index = i % c_ChestHeight*c_ChestWidth;
-			if (i < c_ChestHeight*c_ChestWidth)
+			int index = i % (c_ChestHeight * c_ChestWidth);
+			if (i < c_ChestHeight * c_ChestWidth)
 				Combined[index] = first[index];
 			else
 				Combined[index] = second[index];
@@ -224,7 +218,9 @@ cItem *cChestEntity::GetContents(bool a_OnlyThis)
 		return Combined;
 	}
 	else
+	{
 		return m_Content;
+	}
 }
 
 

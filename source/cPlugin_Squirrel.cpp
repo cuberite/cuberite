@@ -112,13 +112,13 @@ bool cPlugin_Squirrel::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
 
 
 
-bool cPlugin_Squirrel::OnDisconnect(const AString & a_Reason, cPlayer* a_Player )
+bool cPlugin_Squirrel::OnDisconnect(cPlayer* a_Player, const AString & a_Reason)
 {
 	cCSLock Lock( m_CriticalSection );
 	
-	if(!m_Plugin->HasFunction("OnDisconnect")) return false;
+	if (!m_Plugin->HasFunction("OnDisconnect")) return false;
 	
-	return m_Plugin->GetFunction("OnDisconnect").Evaluate<bool>(a_Reason, a_Player);
+	return m_Plugin->GetFunction("OnDisconnect").Evaluate<bool>(a_Player, a_Reason);
 }
 
 

@@ -214,22 +214,6 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			break;
 		}
 
-		case HOOK_DISCONNECT:
-		{
-			if( a_NumArgs != 2 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			const char* Reason = va_arg(argptr, const char* );
-			cPlayer* Player = va_arg(argptr, cPlayer* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnDisconnect( Reason, Player ) )
-					return true;
-			}
-			break;
-		}
-
 		case HOOK_PLAYER_JOIN:
 		{
 			if( a_NumArgs != 1 ) break;
@@ -498,6 +482,27 @@ bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cC
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnCraftingNoRecipe(a_Player, a_Grid, a_Recipe))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Reason)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_DISCONNECT);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnDisconnect(a_Player, a_Reason))
 		{
 			return true;
 		}

@@ -294,6 +294,114 @@ void cChunkMap::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotN
 
 
 
+
+void cChunkMap::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+}
+
+
+
+
+
+
+void cChunkMap::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+}
+
+
+
+
+
+
+void cChunkMap::BroadcastEntLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastEntLook(a_Entity, a_Exclude);
+}
+
+
+
+
+
+
+void cChunkMap::BroadcastEntHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastEntHeadLook(a_Entity, a_Exclude);
+}
+
+
+
+
+
+
+void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	int x, y, z, ChunkX, ChunkZ;
+	x = a_BlockX;
+	y = a_BlockY;
+	z = a_BlockZ;
+	cChunkDef::BlockToChunk(x, y, z, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_Exclude);
+}
+
+
+
+
+
+
+void cChunkMap::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastDestroyEntity(a_Entity, a_Exclude);
+}
+
+
+
+
+
+
 void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// a_Player rclked block entity at the coords specified, handle it

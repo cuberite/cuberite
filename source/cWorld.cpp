@@ -1300,6 +1300,78 @@ void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 
 
+void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendTeleportEntity(a_Entity);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntLook(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntHeadLook(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
+}
+
+
+
+
+
 void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkY, a_ChunkZ);
@@ -1561,13 +1633,12 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 {
 	// Sends the playerlist to a_DestPlayer
 	cCSLock Lock(m_CSPlayers);
-	for ( cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
 		if ((ch != NULL) && !ch->IsDestroyed())
 		{
-			cPacket_PlayerListItem PlayerListItem((*itr)->GetColor() + (*itr)->GetName(), true, (*itr)->GetClientHandle()->GetPing());
-			a_DestPlayer->GetClientHandle()->Send( PlayerListItem );
+			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr));
 		}
 	}
 }

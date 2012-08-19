@@ -143,16 +143,16 @@ void cPacket_PlayerLook::Serialize(AString & a_Data) const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPacket_PlayerMoveLook:
 
-cPacket_PlayerMoveLook::cPacket_PlayerMoveLook( cPlayer* a_Player )
+cPacket_PlayerMoveLook::cPacket_PlayerMoveLook(const cPlayer & a_Player)
 {
 	m_PacketID   = E_PLAYERMOVELOOK;
-	m_PosX       = a_Player->GetPosX();
-	m_PosY       = a_Player->GetPosY() + 1.65;
-	m_PosZ       = a_Player->GetPosZ();
-	m_Stance     = a_Player->GetStance();
-	m_Rotation   = a_Player->GetRotation();
-	m_Pitch      = a_Player->GetPitch();
-	m_IsOnGround = a_Player->IsOnGround();
+	m_PosX       = a_Player.GetPosX();
+	m_PosY       = a_Player.GetPosY() + 0.03;  // Add a small amount so that the player doesn't start inside a block
+	m_PosZ       = a_Player.GetPosZ();
+	m_Stance     = a_Player.GetStance() + 0.03;  // Add a small amount so that the player doesn't start inside a block
+	m_Rotation   = a_Player.GetRotation();
+	m_Pitch      = a_Player.GetPitch();
+	m_IsOnGround = a_Player.IsOnGround();
 }
 
 
@@ -161,6 +161,8 @@ cPacket_PlayerMoveLook::cPacket_PlayerMoveLook( cPlayer* a_Player )
 
 int cPacket_PlayerMoveLook::Parse(cByteBuffer & a_Buffer)
 {
+	// NOTE that Stance and Y are swapped when sent C->S vs S->C
+	// This is the C->S case:
 	int TotalBytes = 0;
 	HANDLE_PACKET_READ(ReadBEDouble, m_PosX,       TotalBytes);
 	HANDLE_PACKET_READ(ReadBEDouble, m_PosY,       TotalBytes);
@@ -169,6 +171,7 @@ int cPacket_PlayerMoveLook::Parse(cByteBuffer & a_Buffer)
 	HANDLE_PACKET_READ(ReadBEFloat,  m_Rotation,   TotalBytes);
 	HANDLE_PACKET_READ(ReadBEFloat,  m_Pitch,      TotalBytes);
 	HANDLE_PACKET_READ(ReadBool,     m_IsOnGround, TotalBytes);
+	// LOGD("Recv PML: {%0.2f, %0.2f, %0.2f}, Stance %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
 	return TotalBytes;
 }
 
@@ -178,10 +181,14 @@ int cPacket_PlayerMoveLook::Parse(cByteBuffer & a_Buffer)
 
 void cPacket_PlayerMoveLook::Serialize(AString & a_Data) const
 {
+	// NOTE that Stance and Y are swapped when sent C->S vs S->C
+	// This is the S->C case:
+	// LOGD("Send PML: {%0.2f, %0.2f, %0.2f}, Stance: %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
+	
 	AppendByte	(a_Data, m_PacketID);
 	AppendDouble(a_Data, m_PosX);
-	AppendDouble(a_Data, m_PosY);
 	AppendDouble(a_Data, m_Stance);
+	AppendDouble(a_Data, m_PosY);
 	AppendDouble(a_Data, m_PosZ);
 	AppendFloat	(a_Data, m_Rotation);
 	AppendFloat	(a_Data, m_Pitch);
@@ -200,7 +207,7 @@ cPacket_PlayerPosition::cPacket_PlayerPosition(cPlayer * a_Player)
 	m_PacketID = E_PLAYERPOS;
 
 	m_PosX       = a_Player->GetPosX();
-	m_PosY       = a_Player->GetPosY() + 1.65;
+	m_PosY       = a_Player->GetPosY();
 	m_PosZ       = a_Player->GetPosZ();
 	m_Stance     = a_Player->GetStance();
 	m_IsOnGround = a_Player->IsOnGround();
@@ -218,6 +225,7 @@ int cPacket_PlayerPosition::Parse(cByteBuffer & a_Buffer)
 	HANDLE_PACKET_READ(ReadBEDouble, m_Stance,     TotalBytes);
 	HANDLE_PACKET_READ(ReadBEDouble, m_PosZ,       TotalBytes);
 	HANDLE_PACKET_READ(ReadBool,     m_IsOnGround, TotalBytes);
+	// LOGD("Recv PlayerPos: {%0.2f %0.2f %0.2f}, Stance %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
 	return TotalBytes;
 }
 
@@ -227,12 +235,17 @@ int cPacket_PlayerPosition::Parse(cByteBuffer & a_Buffer)
 
 void cPacket_PlayerPosition::Serialize(AString & a_Data) const
 {
+	LOGD("Ignore send PlayerPos");
+	/*
+	LOGD("Send PlayerPos: {%0.2f %0.2f %0.2f}, Stance %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
+	// _X: This should not get sent to the client at all - http://wiki.vg/wiki/index.php?title=Protocol&oldid=2513#Player_Position_.280x0B.29
 	AppendByte	 (a_Data, m_PacketID);
 	AppendDouble (a_Data, m_PosX);
 	AppendDouble (a_Data, m_PosY);
 	AppendDouble (a_Data, m_Stance);
 	AppendDouble (a_Data, m_PosZ);
 	AppendBool	 (a_Data, m_IsOnGround);
+	*/
 }
 
 

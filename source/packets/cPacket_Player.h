@@ -109,8 +109,8 @@ public:
 		m_PacketID = E_PLAYERMOVELOOK;
 	}
 	
-	cPacket_PlayerMoveLook( cPlayer* a_Player );
-	virtual cPacket* Clone() const { return new cPacket_PlayerMoveLook(*this); }
+	cPacket_PlayerMoveLook(const cPlayer & a_Player);
+	virtual cPacket * Clone() const { return new cPacket_PlayerMoveLook(*this); }
 
 	virtual int  Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;

@@ -18,9 +18,12 @@ public:
 		, m_PosZ( 0 )
 		, m_Rotation( 0 )
 		, m_Pitch( 0 )
-	{ m_PacketID = E_ENT_TELEPORT;  }
-	virtual cPacket* Clone() const { return new cPacket_TeleportEntity(*this); }
-	cPacket_TeleportEntity(cEntity* a_Client);
+	{
+		m_PacketID = E_ENT_TELEPORT;
+	}
+	
+	virtual cPacket * Clone() const { return new cPacket_TeleportEntity(*this); }
+	cPacket_TeleportEntity(const cEntity & a_Entity);
 
 	virtual void Serialize(AString & a_Data) const override;
 

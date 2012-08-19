@@ -122,9 +122,7 @@ void cPawn::TeleportTo( const double & a_PosX, const double & a_PosY, const doub
 {
 	SetPosition( a_PosX, a_PosY, a_PosZ );
 
-	cPacket_TeleportEntity TeleportEntity( this );
-
-	cRoot::Get()->GetServer()->Broadcast( TeleportEntity );
+	GetWorld()->BroadcastTeleportEntity(*this);
 }
 
 
@@ -133,7 +131,7 @@ void cPawn::TeleportTo( const double & a_PosX, const double & a_PosY, const doub
 
 void cPawn::Tick(float a_Dt)
 {
-	CheckMetaDataBurn(); //Check to see if pawn should burn based on block they are on
+	CheckMetaDataBurn();  // Check to see if pawn should burn based on block they are on
 	
 	if (GetMetaData() == BURNING)
 	{

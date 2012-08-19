@@ -39,40 +39,45 @@
 #include "cAuthenticator.h"
 #include "MersenneTwister.h"
 
-#include "packets/cPacket_KeepAlive.h"
-#include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_UpdateHealth.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
-#include "packets/cPacket_Chat.h"
-#include "packets/cPacket_Login.h"
-#include "packets/cPacket_TimeUpdate.h"
-#include "packets/cPacket_BlockDig.h"
-#include "packets/cPacket_Handshake.h"
+#include "packets/cPacket_13.h"
 #include "packets/cPacket_ArmAnim.h"
+#include "packets/cPacket_BlockChange.h"
+#include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_BlockPlace.h"
-#include "packets/cPacket_Flying.h"
-#include "packets/cPacket_Disconnect.h"
-#include "packets/cPacket_PickupSpawn.h"
-#include "packets/cPacket_ItemSwitch.h"
-#include "packets/cPacket_EntityEquipment.h"
+#include "packets/cPacket_Chat.h"
 #include "packets/cPacket_CreativeInventoryAction.h"
+#include "packets/cPacket_DestroyEntity.h"
+#include "packets/cPacket_Disconnect.h"
+#include "packets/cPacket_EntityEquipment.h"
+#include "packets/cPacket_EntityLook.h"
+#include "packets/cPacket_Flying.h"
+#include "packets/cPacket_Handshake.h"
+#include "packets/cPacket_InventorySlot.h"
+#include "packets/cPacket_ItemSwitch.h"
+#include "packets/cPacket_KeepAlive.h"
+#include "packets/cPacket_Login.h"
+#include "packets/cPacket_MapChunk.h"
+#include "packets/cPacket_Metadata.h"
+#include "packets/cPacket_MultiBlock.h"
+#include "packets/cPacket_NamedEntitySpawn.h"
 #include "packets/cPacket_NewInvalidState.h"
+#include "packets/cPacket_PickupSpawn.h"
+#include "packets/cPacket_Ping.h"
+#include "packets/cPacket_Player.h"
+#include "packets/cPacket_PreChunk.h"
+#include "packets/cPacket_RelativeEntityMove.h"
+#include "packets/cPacket_RelativeEntityMoveLook.h"
+#include "packets/cPacket_Respawn.h"
+#include "packets/cPacket_SpawnMob.h"
+#include "packets/cPacket_TeleportEntity.h"
+#include "packets/cPacket_TimeUpdate.h"
+#include "packets/cPacket_UpdateHealth.h"
+#include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_UseEntity.h"
+#include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_WindowClose.h"
 #include "packets/cPacket_WindowOpen.h"
-#include "packets/cPacket_WholeInventory.h"
-#include "packets/cPacket_13.h"
-#include "packets/cPacket_UpdateSign.h"
-#include "packets/cPacket_Ping.h"
-#include "packets/cPacket_NamedEntitySpawn.h"
-#include "packets/cPacket_MapChunk.h"
-#include "packets/cPacket_PreChunk.h"
-#include "packets/cPacket_InventorySlot.h"
-
-// DEBUG:
-#include "packets/cPacket_BlockChange.h"
-#include "packets/cPacket_MultiBlock.h"
 
 
 
@@ -500,6 +505,8 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 	// Therefore I keep this function huge and untidy for the time being
 	// ( http://forum.mc-server.org/showthread.php?tid=524 )
 	
+	// LOGD("Recv packet %02x", a_Packet->m_PacketID);
+	
 	m_TimeLastPacket = cWorld::GetTime();
 
 	// LOG("Recv packet 0x%02x from client \"%s\" (\"%s\")", a_Packet->m_PacketID, m_Socket.GetIPString().c_str(), m_Username.c_str());
@@ -678,11 +685,35 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 					HandleWindowClick(wc->m_WindowID, wc->m_SlotNum, wc->m_IsRightClick, wc->m_IsShiftPressed, wc->m_HeldItem);
 					break;
 				}
-				case E_UPDATE_SIGN:               HandleUpdateSign       (reinterpret_cast<cPacket_UpdateSign *>             (a_Packet)); break;
-				case E_USE_ENTITY:                HandleUseEntity        (reinterpret_cast<cPacket_UseEntity *>              (a_Packet)); break;
-				case E_RESPAWN:                   HandleRespawn(); break;
-				case E_DISCONNECT:                HandleDisconnect       (reinterpret_cast<cPacket_Disconnect *>             (a_Packet)); break;
-				case E_KEEP_ALIVE:                HandleKeepAlive        (reinterpret_cast<cPacket_KeepAlive *>              (a_Packet)); break;
+				case E_UPDATE_SIGN:
+				{
+					cPacket_UpdateSign * us = reinterpret_cast<cPacket_UpdateSign *>(a_Packet);
+					HandleUpdateSign(us->m_BlockX, us->m_BlockY, us->m_BlockZ, us->m_Line1, us->m_Line2, us->m_Line3, us->m_Line4);
+					break;
+				}
+				case E_USE_ENTITY:
+				{
+					cPacket_UseEntity * ue = reinterpret_cast<cPacket_UseEntity *>(a_Packet);
+					HandleUseEntity(ue->m_TargetEntityID, ue->m_IsLeftClick);
+					break;
+				}
+				case E_RESPAWN:
+				{
+					HandleRespawn();
+					break;
+				}
+				case E_DISCONNECT:
+				{
+					cPacket_Disconnect * dc = reinterpret_cast<cPacket_Disconnect *>(a_Packet);
+					HandleDisconnect(dc->m_Reason);
+					break;
+				}
+				case E_KEEP_ALIVE:
+				{
+					cPacket_KeepAlive * ka = reinterpret_cast<cPacket_KeepAlive *>(a_Packet);
+					HandleKeepAlive(ka->m_KeepAliveID);
+					break;
+				}
 			}  // switch (Packet type)
 			break;
 		}  // case csPlaying
@@ -797,7 +828,8 @@ void cClientHandle::HandleUnexpectedPacket(int a_PacketType)
 void cClientHandle::HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ)
 {
 	Vector3d ReceivedPosition = Vector3d(a_PosX, a_PosY, a_PosZ);
-
+	// LOGD("Received MoveLook confirmation: {%0.2f %0.2f %0.2f}", a_PosX, a_PosY, a_PosZ);
+	
 	// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
 	double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
 	if (Dist < 1.0)
@@ -813,7 +845,7 @@ void cClientHandle::HandleMoveLookConfirm(double a_PosX, double a_PosY, double a
 	{
 		LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), Dist);
 		m_ConfirmPosition = m_Player->GetPosition();
-		Send(cPacket_PlayerMoveLook(m_Player));
+		SendPlayerMoveLook();
 	}
 }
 
@@ -840,8 +872,25 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 
 void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
-	// LOG("recv player pos: %0.2f %0.2f %0.2f", PacketData->m_PosX, PacketData->m_PosY, PacketData->m_PosZ);
-	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
+	/*
+		// TODO: Invalid stance check
+	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
+	{
+		LOGD("Invalid stance");
+		SendPlayerMoveLook();
+		return;
+	}
+	*/
+	
+	// LOGD("recv player pos: {%0.2f %0.2f %0.2f}, ground: %d", a_PosX, a_PosY, a_PosZ, a_IsOnGround ? 1 : 0);
+	Vector3d Pos(a_PosX, a_PosY, a_PosZ);
+	if ((m_Player->GetPosition() - Pos).SqrLength() > 100 * 100)
+	{
+		LOGD("Too far away (%0.2f), \"repairing\" the client", (m_Player->GetPosition() - Pos).Length());
+		SendPlayerMoveLook();
+		return;
+	}
+	m_Player->MoveTo(Pos);
 	m_Player->SetStance(a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
 }
@@ -1086,6 +1135,16 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
+	/*
+	// TODO: Invalid stance check
+	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
+	{
+		LOGD("Invalid stance");
+		SendPlayerMoveLook();
+		return;
+	}
+	*/
+	
 	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
 	m_Player->SetStance     (a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
@@ -1148,20 +1207,25 @@ void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, bool a_I
 
 
 
-void cClientHandle::HandleUpdateSign(cPacket_UpdateSign * a_Packet)
+void cClientHandle::HandleUpdateSign(
+	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	const AString & a_Line1, const AString & a_Line2, 
+	const AString & a_Line3, const AString & a_Line4
+)
 {
 	cWorld * World = m_Player->GetWorld();
-	World->UpdateSign(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ, a_Packet->m_Line1, a_Packet->m_Line2, a_Packet->m_Line3, a_Packet->m_Line4);
+	World->UpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
 
 
 
 
-void cClientHandle::HandleUseEntity(cPacket_UseEntity * a_Packet)
+void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 {
-	if (!a_Packet->m_bLeftClick)
+	if (!a_IsLeftClick)
 	{
+		// TODO: we don't handle right-clicking yet
 		return;
 	}
 
@@ -1169,9 +1233,9 @@ void cClientHandle::HandleUseEntity(cPacket_UseEntity * a_Packet)
 	{
 		virtual bool Item(cEntity * a_Entity) override
 		{
-			if( a_Entity->IsA("cPawn") )
+			if (a_Entity->IsA("cPawn"))
 			{
-				reinterpret_cast< cPawn* >( a_Entity )->TakeDamage(Damage, Instigator );
+				reinterpret_cast<cPawn *>(a_Entity)->TakeDamage(Damage, Instigator);
 			}
 			return true;
 		}
@@ -1184,7 +1248,7 @@ void cClientHandle::HandleUseEntity(cPacket_UseEntity * a_Packet)
 	Callback.Instigator = m_Player;
 
 	cWorld * World = m_Player->GetWorld();
-	World->DoWithEntityByID(a_Packet->m_TargetID, Callback);
+	World->DoWithEntityByID(a_TargetEntityID, Callback);
 }
 
 
@@ -1200,13 +1264,14 @@ void cClientHandle::HandleRespawn(void)
 
 
 
-void cClientHandle::HandleDisconnect(cPacket_Disconnect * a_Packet)
+void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
-	LOG("Received d/c packet from \"%s\"", m_Username.c_str());
-	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_DISCONNECT, 2, a_Packet->m_Reason.c_str(), m_Player))
+	LOGD("Received d/c packet from \"%s\" with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
+	if (!cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason))
 	{
-		cPacket_Chat DisconnectMessage(m_Username + " disconnected: " + a_Packet->m_Reason);
-		cRoot::Get()->GetServer()->Broadcast(DisconnectMessage);
+		AString DisconnectMessage;
+		Printf(DisconnectMessage, "%s disconnected: %s", m_Username.c_str(), a_Reason.c_str());
+		m_Player->GetWorld()->BroadcastChat(DisconnectMessage, this);
 	}
 	Destroy();
 }
@@ -1215,14 +1280,17 @@ void cClientHandle::HandleDisconnect(cPacket_Disconnect * a_Packet)
 
 
 
-void cClientHandle::HandleKeepAlive(cPacket_KeepAlive * a_Packet)
+void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 {
-	if (a_Packet->m_KeepAliveID == m_PingID)
+	if (a_KeepAliveID == m_PingID)
 	{
 		cTimer t1;
 		m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
 	}
 }
+
+
+
 
 
 bool cClientHandle::CheckBlockInteractionsRate(void)
@@ -1543,6 +1611,174 @@ void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 
 
 
+void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
+{
+	cPacket_TeleportEntity te(a_Entity);
+	Send(te);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListItem(const cPlayer & a_Player)
+{
+	cPacket_PlayerListItem pli(a_Player.GetColor() + a_Player.GetName(), true, a_Player.GetClientHandle()->GetPing());
+	Send(pli);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerPosition(void)
+{
+	cPacket_PlayerPosition pp(m_Player);
+	Send(pp);
+}
+
+
+
+
+
+void cClientHandle::SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	cPacket_RelativeEntityMoveLook reml;
+	reml.m_UniqueID = a_Entity.GetUniqueID();
+	reml.m_MoveX    = a_RelX;
+	reml.m_MoveY    = a_RelY;
+	reml.m_MoveZ    = a_RelZ;
+	reml.m_Yaw      = (char)((a_Entity.GetRotation() / 360.f) * 256);
+	reml.m_Pitch    = (char)((a_Entity.GetPitch()    / 360.f) * 256);
+	Send(reml);
+}
+
+
+
+
+
+void cClientHandle::SendRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	cPacket_RelativeEntityMove rem;
+	rem.m_UniqueID = a_Entity.GetUniqueID();
+	rem.m_MoveX    = a_RelX;
+	rem.m_MoveY    = a_RelY;
+	rem.m_MoveZ    = a_RelZ;
+	Send(rem);
+}
+
+
+
+
+
+void cClientHandle::SendEntLook(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	cPacket_EntityLook el;
+	el.m_UniqueID = a_Entity.GetUniqueID();
+	el.m_Rotation = (char)((a_Entity.GetRotation() / 360.f) * 256);
+	el.m_Pitch    = (char)((a_Entity.GetPitch()    / 360.f) * 256);
+	Send(el);
+}
+
+
+
+
+
+void cClientHandle::SendEntHeadLook(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	cPacket_EntityHeadLook ehl(a_Entity);
+	Send(ehl);
+}
+
+
+
+
+
+void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2)
+{
+	cPacket_BlockAction ba;
+	ba.m_BlockX = a_BlockX;
+	ba.m_BlockY = (short)a_BlockY;
+	ba.m_BlockZ = a_BlockZ;
+	ba.m_Byte1 = a_Byte1;
+	ba.m_Byte2 = a_Byte2;
+	Send(ba);
+}
+
+
+
+
+
+void cClientHandle::SendHealth(void)
+{
+	cPacket_UpdateHealth Health;
+	Health.m_Health     = m_Player->GetHealth();
+	Health.m_Food       = m_Player->GetFoodLevel();
+	Health.m_Saturation = m_Player->GetFoodSaturationLevel();
+	Send(Health);
+}
+
+
+
+
+
+void cClientHandle::SendRespawn(void)
+{
+	cPacket_Respawn Packet;
+	Packet.m_CreativeMode = (char)m_Player->GetGameMode();  // Set GameMode packet based on Player's GameMode;
+	Send(Packet);
+}
+
+
+
+
+
+void cClientHandle::SendGameMode(char a_GameMode)
+{
+	cPacket_NewInvalidState nis;
+	nis.m_Reason = 3;
+	nis.m_GameMode = a_GameMode;
+	Send(nis);
+}
+
+
+
+
+
+void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
+{
+	cPacket_DestroyEntity de;
+	de.m_UniqueID = a_Entity.GetUniqueID();
+	Send(de);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerMoveLook(void)
+{
+	cPacket_PlayerMoveLook pml(*m_Player);
+	/*
+	LOGD("Sending PlayerMoveLook: {%0.2f, %0.2f, %0.2f}, stance %0.2f, OnGround: %d",
+		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
+	);
+	*/
+	Send(pml);
+}
+
+
+
+
+
 void cClientHandle::CheckIfWorldDownloaded(void)
 {
 	if (m_State != csDownloadingWorld)
@@ -1576,7 +1812,7 @@ void cClientHandle::SendConfirmPosition(void)
 	}
 
 	m_ConfirmPosition = m_Player->GetPosition();
-	Send(cPacket_PlayerMoveLook(m_Player));
+	SendPlayerMoveLook();
 }
 
 
@@ -1808,6 +2044,7 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 	while (!m_PendingNrmSendPackets.empty() && (Data.size() < 1000))
 	{
 		m_PendingNrmSendPackets.front()->Serialize(Data);
+		// LOGD("Sending packet 0x%02x", m_PendingNrmSendPackets.front()->m_PacketID);
 		delete m_PendingNrmSendPackets.front();
 		m_PendingNrmSendPackets.erase(m_PendingNrmSendPackets.begin());
 	}

@@ -12,11 +12,6 @@
 #include "MersenneTwister.h"
 
 #include "packets/cPacket_SpawnMob.h"
-#include "packets/cPacket_EntityLook.h"
-#include "packets/cPacket_TeleportEntity.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
-#include "packets/cPacket_RelativeEntityMove.h"
-#include "packets/cPacket_Metadata.h"
 
 #include "Vector3f.h"
 #include "Vector3i.h"
@@ -60,10 +55,18 @@ cMonster::cMonster()
 	m_MetaData = NORMAL;
 }
 
+
+
+
+
 cMonster::~cMonster()
 {
 	LOG("cMonster::~cMonster()");
 }
+
+
+
+
 
 bool cMonster::IsA( const char* a_EntityType )
 {
@@ -99,6 +102,10 @@ void cMonster::MoveToPosition( const Vector3f & a_Position )
 
 	m_Destination = a_Position;
 }
+
+
+
+
 
 bool cMonster::ReachedDestination()
 {
@@ -173,7 +180,7 @@ void cMonster::Tick(float a_Dt)
 	ReplicateMovement();
 	
 	Vector3f Distance = m_Destination - Vector3f( m_Pos );
-	if( Distance.SqrLength() > 0.1f )
+	if (Distance.SqrLength() > 0.1f)
 	{
 		float Rotation, Pitch;
 		Distance.Normalize();
@@ -182,18 +189,22 @@ void cMonster::Tick(float a_Dt)
 		SetPitch( Pitch );
 	}
 	
-	if(m_EMState == IDLE) { //If enemy passive we ignore checks for player visibility
+	if (m_EMState == IDLE)
+	{
+		// If enemy passive we ignore checks for player visibility
 		InStateIdle(a_Dt);
 	}
 	
-	if(m_EMState == CHASING) { //If we do not see a player anymore skip chasing action
+	if (m_EMState == CHASING)
+	{
+		// If we do not see a player anymore skip chasing action
 		InStateChasing(a_Dt);
 	}
 	
-	if(m_EMState == ESCAPING) {
+	if (m_EMState == ESCAPING)
+	{
 		InStateEscaping(a_Dt);
 	}
-
 }
 
 
@@ -202,50 +213,38 @@ void cMonster::Tick(float a_Dt)
 
 void cMonster::ReplicateMovement()
 {
-	if(m_bDirtyOrientation && !m_bDirtyPosition)
+	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
-		cPacket_EntityLook EntityLook(*this);
-		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, EntityLook );
+		m_World->BroadcastEntLook(*this);
 		m_bDirtyOrientation = false;
 	}
 	
-	if( m_bDirtyPosition )
+	if (m_bDirtyPosition)
 	{
-		float DiffX = (float)(GetPosX() - m_LastPosX );
-		float DiffY = (float)(GetPosY() - m_LastPosY );
-		float DiffZ = (float)(GetPosZ() - m_LastPosZ );
-		float SqrDist = DiffX*DiffX + DiffY*DiffY + DiffZ*DiffZ;
+		float DiffX = (float)(GetPosX() - m_LastPosX);
+		float DiffY = (float)(GetPosY() - m_LastPosY);
+		float DiffZ = (float)(GetPosZ() - m_LastPosZ);
+		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (
-			(SqrDist > 4 * 4) // 4 blocks is max Relative Move
-			|| (cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
+			(SqrDist > 4 * 4)  // 4 blocks is max Relative Move
+			|| (cWorld::GetTime() - m_TimeLastTeleportPacket > 2)  // Send an absolute position every 2 seconds
 		)
 		{
-			//LOG("Teleported %f", sqrtf(SqrDist) );
-			cPacket_TeleportEntity TeleportEntity( this );
-			m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, TeleportEntity);
+			// LOGD("Teleported %f", sqrtf(SqrDist) );
+			m_World->BroadcastTeleportEntity(*this);
 			m_TimeLastTeleportPacket = cWorld::GetTime();
 		}
 		else
-		{	// Relative move sucks balls! It's always wrong wtf!
-			if( m_bDirtyOrientation )
+		{
+			// Relative move sucks balls! It's always wrong wtf!
+			if (m_bDirtyOrientation)
 			{
-				cPacket_RelativeEntityMoveLook RelativeEntityMoveLook;
-				RelativeEntityMoveLook.m_UniqueID = GetUniqueID();
-				RelativeEntityMoveLook.m_MoveX    = (char)(DiffX*32);
-				RelativeEntityMoveLook.m_MoveY    = (char)(DiffY*32);
-				RelativeEntityMoveLook.m_MoveZ    = (char)(DiffZ*32);
-				RelativeEntityMoveLook.m_Yaw      = (char)((GetRotation()/360.f)*256);
-				RelativeEntityMoveLook.m_Pitch    = (char)((GetPitch()/360.f)*256);
-				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMoveLook );
+				m_World->BroadcastRelEntMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32));
+				m_bDirtyOrientation = false;
 			}
 			else
 			{
-				cPacket_RelativeEntityMove RelativeEntityMove;
-				RelativeEntityMove.m_UniqueID = GetUniqueID();
-				RelativeEntityMove.m_MoveX    = (char)(DiffX*32);
-				RelativeEntityMove.m_MoveY    = (char)(DiffY*32);
-				RelativeEntityMove.m_MoveZ    = (char)(DiffZ*32);
-				m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, RelativeEntityMove );
+				m_World->BroadcastRelEntMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32));
 			}
 		}
 		m_LastPosX = GetPosX();
@@ -325,6 +324,10 @@ void cMonster::HandlePhysics(float a_Dt)
 	}
 }
 
+
+
+
+
 void cMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
 {
 	cPawn::TakeDamage( a_Damage, a_Instigator );
@@ -332,45 +335,61 @@ void cMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
 	AddReference( m_Target );
 }
 
+
+
+
+
 void cMonster::KilledBy( cEntity* a_Killer )
 {
 	cPawn::KilledBy( a_Killer );
 	m_DestroyTimer = 0;
 }
 
+
+
+
+
 //----State Logic
 
-const char *cMonster::GetState() {
-	switch(m_EMState) {
-	case IDLE:
-		return "Idle";
-		break;
-	case ATTACKING:
-		return "Attacking";
-		break;
-	case CHASING:
-		return "Chasing";
-		break;
-	default:
-		return "Unknown";
-		break;
+const char *cMonster::GetState()
+{
+	switch(m_EMState)
+	{
+		case IDLE:      return "Idle";
+		case ATTACKING: return "Attacking";
+		case CHASING:   return "Chasing";
+		default:        return "Unknown";
 	}
 }
 
-//for debugging
-void cMonster::SetState(const char* a_str)
+
+
+
+
+// for debugging
+void cMonster::SetState(const AString & a_State)
 {
-	std::string str = a_str;
-	if(str.compare("Idle") == 0 ) {
+	if (a_State.compare("Idle") == 0)
+	{
 		m_EMState = IDLE;
-	} else if(str.compare("Attacking") == 0 ) {
+	}
+	else if (a_State.compare("Attacking") == 0)
+	{
 		m_EMState = ATTACKING;
-	} else if(str.compare("Chasing") == 0 ) {
+	}
+	else if (a_State.compare("Chasing") == 0)
+	{
 		m_EMState = CHASING;
-	} else {
+	}
+	else
+	{
 		printf("Invalid State");
 	}
 }
+
+
+
+
 
 //Checks to see if EventSeePlayer should be fired
 //monster sez: Do I see the player
@@ -378,50 +397,73 @@ void cMonster::CheckEventSeePlayer()
 {
 	cPlayer *Closest = FindClosestPlayer();
 
-	if(Closest)
+	if (Closest)
 	{
 		EventSeePlayer(Closest);
 	}
 }
 
+
+
+
+
 void cMonster::CheckEventLostPlayer()
 {
 	Vector3f pos;
-	cTracer LineOfSight(GetWorld() );
+	cTracer LineOfSight(GetWorld());
 	
-	if(m_Target != 0) {
+	if (m_Target != NULL)
+	{
 		pos = m_Target->GetPosition();
-		if((pos - m_Pos).Length() > m_SightDistance || LineOfSight.Trace(m_Pos,(pos - m_Pos), (int)(pos - m_Pos).Length()))
+		if ((pos - m_Pos).Length() > m_SightDistance || LineOfSight.Trace(m_Pos,(pos - m_Pos), (int)(pos - m_Pos).Length()))
 		{
 			EventLosePlayer();
 		}
-	} else {
+	}
+	else
+	{
 		EventLosePlayer();
 	}
 }
 
-//What to do if player is seen
-//default to change state to chasing
+
+
+
+
+// What to do if player is seen
+// default to change state to chasing
 void cMonster::EventSeePlayer(cEntity *a_SeenPlayer)
 {
 	m_Target = a_SeenPlayer;
 	AddReference( m_Target );
 }
 
-void cMonster::EventLosePlayer(){
+
+
+
+
+void cMonster::EventLosePlayer()
+{
 	Dereference(m_Target);
 	m_Target = 0;
 	m_EMState = IDLE;
 }
 
+
+
+
+
 //What to do if in Idle State
-void cMonster::InStateIdle(float a_Dt) {
+void cMonster::InStateIdle(float a_Dt)
+{
 	idle_interval += a_Dt;
-	if(idle_interval > 1) { //at this interval the results are predictable
+	if (idle_interval > 1)
+	{
+		// at this interval the results are predictable
 		MTRand r1;
 		int rem = r1.randInt()%6 + 1;
-		//LOG("Moving: int: %3.3f rem: %i",idle_interval,rem);
-		idle_interval -= 1;		//So nothing gets dropped when the server hangs for a few seconds
+		// LOGD("Moving: int: %3.3f rem: %i",idle_interval,rem);
+		idle_interval -= 1;		// So nothing gets dropped when the server hangs for a few seconds
 		Vector3f Dist;
 		Dist.x = (float)((r1.randInt()%11)-5);
 		Dist.z = (float)((r1.randInt()%11)-5);
@@ -435,62 +477,60 @@ void cMonster::InStateIdle(float a_Dt) {
 	}
 }
 
-//What to do if in Chasing State
-//This state should always be defined in each child class
-void cMonster::InStateChasing(float a_Dt) {
-	(void)a_Dt;
+
+
+
+
+// What to do if in Chasing State
+// This state should always be defined in each child class
+void cMonster::InStateChasing(float a_Dt)
+{
+	UNUSED(a_Dt);
 }
 
-//What to do if in Escaping State
-void cMonster::InStateEscaping(float a_Dt) {
+
+
+
+
+// What to do if in Escaping State
+void cMonster::InStateEscaping(float a_Dt)
+{
 	(void)a_Dt;
-	if(m_Target) {
+	if(m_Target)
+	{
 		Vector3d newloc = m_Pos;
 		newloc.x = (m_Target->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
 		newloc.z = (m_Target->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
 		MoveToPosition(newloc);
-	} else {
+	}
+	else
+	{
 		m_EMState = IDLE; //this shouldnt be required but just to be safe
 	}
 }
 
 
-//Do attack here
-//a_Dt is passed so we can set attack rate
-void cMonster::Attack(float a_Dt) {
-	m_AttackInterval += a_Dt * m_AttackRate;
-	if(m_Target != 0 && m_AttackInterval > 3.0) { //Setting this higher gives us more wiggle room for attackrate
-		m_AttackInterval = 0.0;
-		((cPawn *)m_Target)->TakeDamage((int)m_AttackDamage,this);
-	}
-}
 
 
 
-
-
-#if 0
-// TODO: Implement this debug function inside cWorld instead - the world owns the entities
-void cMonster::ListMonsters()
+// Do attack here
+// a_Dt is passed so we can set attack rate
+void cMonster::Attack(float a_Dt)
 {
-
-	cWorld::EntityList Entities = cRoot::Get()->GetWorld()->GetEntities();
-	cRoot::Get()->GetWorld()->LockEntities();
-	for( cWorld::EntityList::iterator itr = Entities.begin(); itr != Entities.end(); ++itr) {
-		if((*itr)->GetEntityType() == cEntity::E_ENTITY){
-			LOG("In state: %s type: %i attack rate: %i",((cMonster *)(*itr))->GetState(), ((cMonster *)(*itr))->GetMobType(),((cMonster *)(*itr))->GetAttackRate());
-			
-		}
+	m_AttackInterval += a_Dt * m_AttackRate;
+	if ((m_Target != NULL) && (m_AttackInterval > 3.0))
+	{
+		// Setting this higher gives us more wiggle room for attackrate
+		m_AttackInterval = 0.0;
+		((cPawn *)m_Target)->TakeDamage((int)m_AttackDamage, this);
 	}
-	cRoot::Get()->GetWorld()->UnlockEntities();
 }
-#endif
 
 
 
 
 
-//Checks for Players close by and if they are visible return the closest
+// Checks for Players close by and if they are visible return the closest
 cPlayer * cMonster::FindClosestPlayer(void)
 {
 	return m_World->FindClosestPlayer(m_Pos, m_SightDistance);
@@ -545,7 +585,7 @@ void cMonster::SetSightDistance(float sd)
 
 
 
-void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, ENUM_ITEM_ID a_Item, short a_ItemHealth)
+void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
 	MTRand r1;
 	int Count = r1.randInt() % (a_Max + 1 - a_Min) + a_Min;

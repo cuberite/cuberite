@@ -10,9 +10,9 @@
 int cPacket_UseEntity::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadBEInt, m_UniqueID,   TotalBytes);
-	HANDLE_PACKET_READ(ReadBEInt, m_TargetID,   TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,  m_bLeftClick, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_SourceEntityID, TotalBytes);
+	HANDLE_PACKET_READ(ReadBEInt, m_TargetEntityID, TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,  m_IsLeftClick,    TotalBytes);
 	return TotalBytes;
 }
 
