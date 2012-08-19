@@ -14,7 +14,6 @@ class cPlayer;
 class cItem;
 class cWindowOwner;
 class cClientHandle;
-class cPacket;  // TODO: remove this
 
 typedef std::list<cPlayer *> cPlayerList;
 
@@ -76,7 +75,7 @@ public:
 
 	void SendWholeWindow(cClientHandle * a_Client);
 	void BroadcastWholeWindow(void);
-	void Broadcast(const cPacket & a_Packet);
+	void BroadcastInventoryProgress(short a_Progressbar, short a_Value);
 
 	const AString & GetWindowTitle() const { return m_WindowTitle; }
 	void SetWindowTitle( const std::string & a_WindowTitle ) { m_WindowTitle = a_WindowTitle; }

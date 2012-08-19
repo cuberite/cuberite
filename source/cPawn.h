@@ -38,7 +38,7 @@ public:
 	enum MetaData {NORMAL, BURNING, CROUCHED, RIDING, SPRINTING, EATING, BLOCKING};
 
 	virtual void SetMetaData(MetaData a_MetaData);
-	virtual MetaData GetMetaData() { return m_MetaData; }
+	virtual MetaData GetMetaData(void) const { return m_MetaData; }
 
 	virtual void InStateBurning(float a_Dt);
 

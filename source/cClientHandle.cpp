@@ -41,6 +41,7 @@
 
 #include "packets/cPacket_13.h"
 #include "packets/cPacket_ArmAnim.h"
+#include "packets/cPacket_BlockAction.h"
 #include "packets/cPacket_BlockChange.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_BlockPlace.h"
@@ -50,8 +51,10 @@
 #include "packets/cPacket_Disconnect.h"
 #include "packets/cPacket_EntityEquipment.h"
 #include "packets/cPacket_EntityLook.h"
+#include "packets/cPacket_EntityStatus.h"
 #include "packets/cPacket_Flying.h"
 #include "packets/cPacket_Handshake.h"
+#include "packets/cPacket_InventoryProgressBar.h"
 #include "packets/cPacket_InventorySlot.h"
 #include "packets/cPacket_ItemSwitch.h"
 #include "packets/cPacket_KeepAlive.h"
@@ -1773,6 +1776,42 @@ void cClientHandle::SendPlayerMoveLook(void)
 	);
 	*/
 	Send(pml);
+}
+
+
+
+
+
+void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
+{
+	cPacket_EntityStatus es;
+	es.m_Status   = a_Status;
+	es.m_UniqueID = a_Entity.GetUniqueID();
+	Send(es);
+}
+
+
+
+
+
+void cClientHandle::SendMetadata(const cPawn & a_Pawn)
+{
+	cPacket_Metadata md(a_Pawn.GetMetaData(), a_Pawn.GetUniqueID());
+	Send(md);
+}
+
+
+
+
+
+void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
+{
+	cPacket_InventoryProgressBar Progress;
+	Progress.m_WindowID    = a_WindowID;
+	Progress.m_ProgressBar = a_ProgressBar;
+	Progress.m_Value       = a_Value;
+	Progress.m_WindowID    = a_WindowID;
+	Send(Progress);
 }
 
 

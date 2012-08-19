@@ -41,6 +41,7 @@ class cChunkMap;
 class cChestEntity;
 class cFurnaceEntity;
 class cBlockArea;
+class cPawn;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cItemCallback<cEntity>        cEntityCallback;
@@ -182,7 +183,9 @@ public:
 	void BroadcastEntLook        (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntHeadLook    (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockAction    (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude = NULL);
-	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastDestroyEntity  (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityStatus   (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
+	void BroadcastMetadata       (const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 
 	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
 	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos ) { return PositionToWorldPosition( a_InChunkPos.x, a_InChunkPos.y, a_InChunkPos.z ); }

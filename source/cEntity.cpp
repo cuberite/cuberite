@@ -11,8 +11,6 @@
 #include "cReferenceManager.h"
 #include "cClientHandle.h"
 
-#include "packets/cPacket_DestroyEntity.h"
-
 
 
 
@@ -115,11 +113,7 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 			{
 				return;
 			}
-			if (m_Destroy == NULL)
-			{
-				m_Destroy = new cPacket_DestroyEntity(m_Entity);
-			}
-			a_Client->Send(*m_Destroy);
+			a_Client->SendDestroyEntity(*m_Entity);
 		}
 		
 		virtual void Added(cClientHandle * a_Client) override
@@ -134,14 +128,12 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 			}
 		}
 
-		cPacket * m_Destroy;
 		cPacket * m_Spawn;
 		bool      m_IgnoreOldChunk;
 		cEntity * m_Entity;
 		
 	public:
 		cMover(cEntity * a_Entity, bool a_IgnoreOldChunk) :
-			m_Destroy(NULL),
 			m_Spawn(NULL),
 			m_IgnoreOldChunk(a_IgnoreOldChunk),
 			m_Entity(a_Entity)
@@ -150,7 +142,6 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 		~cMover()
 		{
 			delete m_Spawn;
-			delete m_Destroy;
 		}
 	} Mover(this, a_bIgnoreOldChunk);
 	
@@ -177,7 +168,7 @@ void cEntity::Destroy()
 		RemoveFromChunk();
 	}
 	
-	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, cPacket_DestroyEntity(this));
+	m_World->BroadcastDestroyEntity(*this);
 	
 	m_bDestroyed = true;
 

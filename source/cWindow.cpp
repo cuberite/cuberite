@@ -360,12 +360,12 @@ void cWindow::BroadcastWholeWindow(void)
 
 
 
-void cWindow::Broadcast(const cPacket & a_Packet)
+void cWindow::BroadcastInventoryProgress(short a_Progressbar, short a_Value)
 {
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 	{
-		(*itr)->GetClientHandle()->Send(a_Packet);
+		(*itr)->GetClientHandle()->SendInventoryProgress(m_WindowID, a_Progressbar, a_Value);
 	}  // for itr - m_OpenedBy[]
 }
 

@@ -402,6 +402,39 @@ void cChunkMap::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHa
 
 
 
+void cChunkMap::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastEntityStatus(a_Entity, a_Status, a_Exclude);
+}
+
+
+
+
+
+
+void cChunkMap::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Pawn.GetChunkX(), a_Pawn.GetChunkY(), a_Pawn.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastMetadata(a_Pawn, a_Exclude);
+}
+
+
+
+
+
 void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// a_Player rclked block entity at the coords specified, handle it

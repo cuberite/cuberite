@@ -48,25 +48,37 @@ class cPacket;
 
 
 
+// tolua_begin
+class cEntity
+{
+public:			
+	enum
+	{
+		ENTITY_STATUS_HURT            = 2,
+		ENTITY_STATUS_DEAD            = 3,
+		ENTITY_STATUS_WOLF_TAMING     = 6,
+		ENTITY_STATUS_WOLF_TAMED      = 7,
+		ENTITY_STATUS_WOLF_SHAKING    = 8,
+		ENTITY_STATUS_EATING_ACCEPTED = 9,
+		ENTITY_STATUS_SHEEP_EATING    = 10,
+	} ;
+	
+	cEntity(const double & a_X, const double & a_Y, const double & a_Z);
+	virtual ~cEntity();
 
-class cEntity																				//tolua_export
-{																							//tolua_export
-public:																						//tolua_export
-	cEntity(const double & a_X, const double & a_Y, const double & a_Z);					//tolua_export
-	virtual ~cEntity();																		//tolua_export
+	virtual void Initialize( cWorld* a_World );
 
-	virtual void Initialize( cWorld* a_World );												//tolua_export
+	enum eEntityType
+	{
+		eEntityType_Entity,
+		eEntityType_Player,
+		eEntityType_Pickup
+	};
 
-	enum eEntityType																		//tolua_export
-	{																						//tolua_export
-		eEntityType_Entity,																	//tolua_export
-		eEntityType_Player,																	//tolua_export
-		eEntityType_Pickup																	//tolua_export
-	};																						//tolua_export
-
-	virtual unsigned int GetEntityType() { return m_EntityType; }							//tolua_export
-	virtual bool IsA( const char* a_EntityType );											//tolua_export
-	virtual const char* GetClass();															//tolua_export
+	virtual unsigned int GetEntityType() { return m_EntityType; }
+	virtual bool IsA( const char* a_EntityType );
+	virtual const char* GetClass();
+	// tolua_end
 
 	cWorld * GetWorld(void) const { return m_World; }										//tolua_export
 

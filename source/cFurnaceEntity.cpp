@@ -12,9 +12,6 @@
 #include "cServer.h"
 #include "cPickup.h"
 #include "cRoot.h"
-
-#include "packets/cPacket_InventoryProgressBar.h"
-
 #include <json/json.h>
 
 
@@ -146,13 +143,10 @@ bool cFurnaceEntity::Tick( float a_Dt )
 			cWindow * Window = GetWindow();
 			if (Window != NULL)
 			{
-				cPacket_InventoryProgressBar Progress;
-				Progress.m_ProgressBar = 0;
-				Progress.m_WindowID = (char)Window->GetWindowID();
-				Progress.m_Value = (short)( m_TimeCooked * (180.f / m_CookTime) );
-				if (Progress.m_Value > 180) Progress.m_Value = 180;
-				if (Progress.m_Value < 0)   Progress.m_Value = 0;
-				Window->Broadcast(Progress);
+				short Value = (short)( m_TimeCooked * (180.f / m_CookTime));
+				if (Value > 180) Value = 180;
+				if (Value < 0)   Value = 0;
+				Window->BroadcastInventoryProgress(0, Value);
 			}
 		}
 	}
@@ -171,21 +165,14 @@ bool cFurnaceEntity::Tick( float a_Dt )
 	}
 	if (Window != NULL)
 	{
-		cPacket_InventoryProgressBar Progress;
-		Progress.m_WindowID = (char)Window->GetWindowID();
-		Progress.m_ProgressBar = 1;
-
+		short Value = 0;
 		if (m_BurnTime > 0.f)
 		{
-			Progress.m_Value = 250 - (short)( m_TimeBurned * (250.f / m_BurnTime) );
-			if (Progress.m_Value > 250) Progress.m_Value = 250;
-			if (Progress.m_Value < 0)   Progress.m_Value = 0;
+			Value = 250 - (short)( m_TimeBurned * (250.f / m_BurnTime));
+			if (Value > 250) Value = 250;
+			if (Value < 0)   Value = 0;
 		}
-		else
-		{
-			Progress.m_Value = 0;
-		}
-		Window->Broadcast(Progress);
+		Window->BroadcastInventoryProgress(1, Value);
 	}
 	return ((m_CookingItem != NULL) || (m_TimeBurned < m_BurnTime)) && (m_BurnTime > 0.0); // Keep on ticking, if there's more to cook, or if it's cooking
 }

@@ -1372,6 +1372,24 @@ void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 
 
 
+void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityStatus(a_Entity, a_Status, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastMetadata(a_Pawn, a_Exclude);
+}
+
+
+
+
+
 void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkY, a_ChunkZ);

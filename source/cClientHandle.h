@@ -32,6 +32,7 @@ class cPlayer;
 class cRedstone;
 class cInventory;
 class cWindow;
+class cPawn;
 
 
 
@@ -103,6 +104,9 @@ public:
 	void SendGameMode(char a_GameMode);
 	void SendDestroyEntity(const cEntity & a_Entity);
 	void SendPlayerMoveLook(void);
+	void SendEntityStatus(const cEntity & a_Entity, char a_Status);
+	void SendMetadata(const cPawn & a_Entity);
+	void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	

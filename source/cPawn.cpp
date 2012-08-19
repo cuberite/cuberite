@@ -9,12 +9,7 @@
 #include "cPluginManager.h"
 #include "Vector3d.h"
 #include "BlockID.h"
-
 #include "Defines.h"
-
-#include "packets/cPacket_TeleportEntity.h"
-#include "packets/cPacket_EntityStatus.h"
-#include "packets/cPacket_Metadata.h"
 
 
 
@@ -62,27 +57,34 @@ void cPawn::Heal( int a_Health )
 
 
 
-void cPawn::TakeDamage( int a_Damage, cEntity* a_Instigator )
+void cPawn::TakeDamage(int a_Damage, cEntity * a_Instigator)
 {
 	TakeDamageInfo TDI;
 	TDI.Damage = a_Damage;
 	TDI.Instigator = a_Instigator;
-	cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_TAKE_DAMAGE, 2, this, &TDI );
+	cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_TAKE_DAMAGE, 2, this, &TDI);
 
-	if( TDI.Damage == 0 ) return;
-	if( m_Health <= 0 ) return; // Can't take damage if already dead
+	if (TDI.Damage == 0)
+	{
+		return;
+	}
+	if (m_Health <= 0)
+	{
+		// Can't take damage if already dead
+		return;
+	}
 
 	m_Health -= (short)TDI.Damage;
-	if( m_Health < 0 ) m_Health = 0;
+	if (m_Health < 0)
+	{
+		m_Health = 0;
+	}
 
-	cPacket_EntityStatus Status;
-	Status.m_UniqueID = GetUniqueID();
-	Status.m_Status =  cPacket_EntityStatus::STATUS_TAKEDAMAGE;
-	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, Status);
+	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
 
 	if (m_Health <= 0)
 	{
-		KilledBy( TDI.Instigator );
+		KilledBy(TDI.Instigator);
 	}
 }
 
@@ -90,7 +92,7 @@ void cPawn::TakeDamage( int a_Damage, cEntity* a_Instigator )
 
 
 
-void cPawn::KilledBy( cEntity* a_Killer )
+void cPawn::KilledBy(cEntity * a_Killer)
 {
 	m_Health = 0;
 
@@ -99,19 +101,16 @@ void cPawn::KilledBy( cEntity* a_Killer )
 		return; // Give plugins a chance to 'unkill' the pawn.
 	}
 
-	cPacket_EntityStatus Status;
-	Status.m_UniqueID = GetUniqueID();
-	Status.m_Status = cPacket_EntityStatus::STATUS_DIE;
-	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, Status);
+	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_DEAD);
 }
 
 
 
 
 
-void cPawn::TeleportToEntity( cEntity* a_Entity )
+void cPawn::TeleportToEntity(cEntity * a_Entity)
 {
-	TeleportTo( a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ() );
+	TeleportTo(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ());
 }
 
 
@@ -148,8 +147,7 @@ void cPawn::SetMetaData(MetaData a_MetaData)
 {
 	//Broadcast new status to clients in the chunk
 	m_MetaData = a_MetaData;
-	cPacket_Metadata md(a_MetaData, GetUniqueID());
-	m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, md);
+	m_World->BroadcastMetadata(*this);
 }
 
 

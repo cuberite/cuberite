@@ -20,6 +20,7 @@ class cPacket;
 class cPlayer;
 class cChestEntity;
 class cFurnaceEntity;
+class cPawn;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
@@ -69,6 +70,10 @@ public:
 	void BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude = NULL);
 	
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	
+	void BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
+	
+	void BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 	
 	/// a_Player rclked block entity at the coords specified, handle it
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);

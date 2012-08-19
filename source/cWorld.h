@@ -88,6 +88,8 @@ public:
 	void BroadcastEntHeadLook    (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockAction    (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity  (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityStatus   (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
+	void BroadcastMetadata       (const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 	
 	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
