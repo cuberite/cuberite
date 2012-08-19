@@ -77,9 +77,6 @@ cRoot::~cRoot()
 
 void cRoot::InputThread(void * a_Params)
 {
-#if defined(ANDROID_NDK)
-	return;
-#else
 	cRoot & self = *(cRoot*)a_Params;
 
 	while (!(self.m_bStop || self.m_bRestart))
@@ -88,7 +85,6 @@ void cRoot::InputThread(void * a_Params)
 		std::getline(std::cin, Command);
 		self.ServerCommand(Command);
 	}
-#endif
 }
 
 
@@ -159,9 +155,11 @@ void cRoot::Start()
 		m_Server->StartListenThread();
 		//cHeartBeat* HeartBeat = new cHeartBeat();
 
+#if !defined(ANDROID_NDK)
 		LOG("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
 		m_InputThread->Start( false );	//we should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
+#endif
 
 		LOG("Initialization done, server running now.");
 		while( !m_bStop && !m_bRestart ) // These are modified by external threads
@@ -169,7 +167,9 @@ void cRoot::Start()
 			cSleep::MilliSleep( 1000 );
 		}
 
+#if !defined(ANDROID_NDK)
 		delete m_InputThread; m_InputThread = 0;
+#endif
 
 		// Deallocate stuffs
 		LOG("Shutting down server...");
