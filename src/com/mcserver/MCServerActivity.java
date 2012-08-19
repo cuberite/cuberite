@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,13 +17,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class MCServerActivity extends Activity {
 	MainThread mThread = null;
 	Thread ServerStatusThread = null;
 	boolean mbExiting = false;
+	boolean mbEnabledLogging = false;
+	
+	ArrayList<String> mLogList = new ArrayList<String>();
+	ArrayAdapter<String> mAdapter;
 	
     /** Called when the activity is first created. */
     @Override
@@ -35,6 +42,7 @@ public class MCServerActivity extends Activity {
         
         ((Button)findViewById(R.id.start_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
+				mbEnabledLogging = true;
 				if( mThread == null || mThread.isAlive() == false ) {
 					mThread = new MainThread( (MCServerActivity)v.getContext() );
 					mThread.start();
@@ -44,11 +52,21 @@ public class MCServerActivity extends Activity {
         
         ((Button)findViewById(R.id.stop_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
+				mbEnabledLogging = true;
 				NativeCleanUp();
 			}
 		});
         
-
+        
+        
+        ListView lv = (ListView)this.findViewById(R.id.listView1);
+        mAdapter = new ArrayAdapter<String>(this,
+        	    R.layout.list_item,
+        	    mLogList);
+        lv.setAdapter(mAdapter);
+        
+        
+        mLogList.add("---- LOG ----");
         
         ServerStatusThread = new Thread( new Runnable() {
 			public void run() {
@@ -77,8 +95,6 @@ public class MCServerActivity extends Activity {
         Thread loggerThread = new Thread( new Runnable() {
 			public void run() {
 				Process process = null;
-				
-				SetText( "herpaderpa" );
 
 				try {
 					process = Runtime.getRuntime().exec("logcat -v raw *:s MCServer ");// Verbose filter
@@ -88,15 +104,16 @@ public class MCServerActivity extends Activity {
 				BufferedReader reader = null;
 
 				try {
-					reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+					InputStreamReader isr = new InputStreamReader(process.getInputStream());
+					reader = new BufferedReader( isr );
 
 					String line;
 
 					while( mbExiting == false ) {
 						line = reader.readLine();
-						if( line != null )
+						if( mbEnabledLogging == true && line != null )
 						{
-							SetText( line );
+							AddToLog( line );
 						}
 					}
 
@@ -181,32 +198,27 @@ public class MCServerActivity extends Activity {
     
     
     
-    public void AddToLog( String logMessage ) {
-    	
-    }
-    
-    
-    
-    
-    
-    public void SetText( final String aText ) {
-    	//Log.d("MCServer", "in SetText " + aText);
-    	/*
-    	final MCServerActivity context = this;
-		this.runOnUiThread(new Runnable() 
-		{
-		    public void run() 
-		    {
-		    	((TextView)context.findViewById(R.id.textView1)).setText(aText);
-		    }
-		} );
-		*/
-    	final TextView tv = (TextView)this.findViewById(R.id.textView1);
-    	tv.post(new Runnable() {
-    		public void run() {
-    			tv.setText(aText);
-    		}
-    	});
+    public void AddToLog( final String logMessage ) {
+    	final ListView lv = ((ListView)findViewById(R.id.listView1));
+    	lv.post(new Runnable() {
+            public void run() {
+				//final boolean bAutoscroll = lv.getLastVisiblePosition() >= mAdapter.getCount() - 1 ? true : false;
+            	
+				mLogList.add(logMessage);
+				while( mLogList.size() > 100 ) // only allow 100 messages in the list, otherwise it might slow the GUI down
+				{
+					mLogList.remove(0);
+				}
+				mAdapter.notifyDataSetChanged();
+				
+
+				// Autoscroll detection is dodgy
+				//if( bAutoscroll )
+				{
+					lv.setSelection(mAdapter.getCount() - 1);
+				}
+            }
+        });
     }
     
     

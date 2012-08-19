@@ -37,12 +37,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/your_ip" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.73"
-        android:text="@string/hello" />
-
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </ListView>
+    
 </LinearLayout>
