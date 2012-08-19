@@ -79,6 +79,8 @@ public:
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
 	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
 	
 	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);

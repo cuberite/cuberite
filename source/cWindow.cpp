@@ -10,10 +10,6 @@
 #include "cWindowOwner.h"
 #include "items/Item.h"
 
-#include "packets/cPacket_WholeInventory.h"
-#include "packets/cPacket_WindowOpen.h"
-#include "packets/cPacket_WindowClose.h"
-
 
 
 
@@ -239,12 +235,7 @@ void cWindow::Open( cPlayer & a_Player )
 		m_OpenedBy.push_back( &a_Player );
 	}
 
-	cPacket_WindowOpen WindowOpen;
-	WindowOpen.m_WindowID = (char)m_WindowID;
-	WindowOpen.m_InventoryType = (char)m_WindowType;
-	WindowOpen.m_WindowTitle = m_WindowTitle;
-	WindowOpen.m_NumSlots = (char)m_NumSlots;
-	a_Player.GetClientHandle()->Send( WindowOpen );
+	a_Player.GetClientHandle()->SendWindowOpen(m_WindowID, m_WindowType, m_WindowTitle, m_NumSlots);
 }
 
 
@@ -260,12 +251,10 @@ void cWindow::Close( cPlayer & a_Player )
 		a_Player.TossItem(true, m_DraggingItem->m_ItemCount);
 	}
 
-	cPacket_WindowClose WindowClose;
-	WindowClose.m_Close = (char)m_WindowID;
 	cClientHandle * ClientHandle = a_Player.GetClientHandle();
 	if (ClientHandle != NULL)
 	{
-		ClientHandle->Send(WindowClose);
+		ClientHandle->SendWindowClose(m_WindowID);
 	}
 
 	{
@@ -349,10 +338,9 @@ void cWindow::Destroy()
 
 
 
-void cWindow::SendWholeWindow( cClientHandle* a_Client )
+void cWindow::SendWholeWindow(cClientHandle * a_Client )
 {
-	cPacket_WholeInventory Inventory( this );
-	a_Client->Send( Inventory );
+	a_Client->SendWholeInventory(*this);
 }
 
 

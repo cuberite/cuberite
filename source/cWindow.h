@@ -46,11 +46,11 @@ public:
 	cWindow(cWindowOwner * a_Owner, bool a_bInventoryVisible, WindowType a_WindowType, int a_WindowID);
 	~cWindow();
 
-	int GetWindowID() { return m_WindowID; }
+	int GetWindowID(void) const { return m_WindowID; }
 	int GetWindowType(void) const { return m_WindowType; }
 
-	cItem* GetSlots() { return m_Slots; }
-	int GetNumSlots() { return m_NumSlots; }
+	cItem* GetSlots(void) const { return m_Slots; }
+	int GetNumSlots(void) const { return m_NumSlots; }
 
 	cItem* GetSlot( int a_Slot );
 

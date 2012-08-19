@@ -16,25 +16,28 @@ namespace Json
 class cItem
 {
 public:
-	cItem( ENUM_ITEM_ID a_ItemID = E_ITEM_EMPTY, char a_ItemCount = 0, short a_ItemHealth = 0 )
-		: m_ItemID		( a_ItemID )
-		, m_ItemCount	( a_ItemCount )
-		, m_ItemHealth	( a_ItemHealth )
+	cItem(short a_ItemType = E_ITEM_EMPTY, char a_ItemCount = 0, short a_ItemHealth = 0)
+		: m_ItemType  (a_ItemType)
+		, m_ItemCount (a_ItemCount)
+		, m_ItemHealth(a_ItemHealth)
 	{
-		if(!IsValidItem( m_ItemID ) ) m_ItemID = E_ITEM_EMPTY;
+		if (!IsValidItem( m_ItemID ) ) m_ItemID = E_ITEM_EMPTY;
 	}
+	
 	void Empty()
 	{
 		m_ItemID = E_ITEM_EMPTY;
 		m_ItemCount = 0;
 		m_ItemHealth = 0;
 	}
+	
 	void Clear(void)
 	{
 		m_ItemID = E_ITEM_EMPTY;
 		m_ItemCount = 0;
 		m_ItemHealth = 0;
 	}
+	
 	bool IsEmpty(void) const
 	{
 		return (m_ItemID <= 0 || m_ItemCount <= 0);
@@ -120,8 +123,8 @@ public:
 	union
 	{
 		// tolua_begin
-		ENUM_ITEM_ID m_ItemID;  // OBSOLETE, use m_ItemType instead
-		short        m_ItemType;
+		short m_ItemID;  // OBSOLETE, use m_ItemType instead
+		short m_ItemType;
 		// tolua_end
 	} ;
 	char         m_ItemCount;  // tolua_export

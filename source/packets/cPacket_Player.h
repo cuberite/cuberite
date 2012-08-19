@@ -74,8 +74,11 @@ public:
 	cPacket_PlayerLook()
 		: m_Rotation( 0 )
 		, m_Pitch( 0 )
-		, m_bFlying( false )
-	{ m_PacketID = E_PLAYERLOOK;  }
+		, m_IsOnGround( false )
+	{
+		m_PacketID = E_PLAYERLOOK;
+	}
+	
 	cPacket_PlayerLook( cPlayer* a_Player );
 	virtual cPacket* Clone() const { return new cPacket_PlayerLook(*this); }
 
@@ -84,7 +87,7 @@ public:
 
 	float m_Rotation;
 	float m_Pitch;
-	bool  m_bFlying; // Yeah.. wtf
+	bool  m_IsOnGround;
 } ;
 
 
@@ -101,12 +104,15 @@ public:
 		, m_PosZ( 0.0 )
 		, m_Rotation( 0.f )
 		, m_Pitch( 0.f )
-		, m_bFlying( false )
-	{ m_PacketID = E_PLAYERMOVELOOK;  }
+		, m_IsOnGround( false )
+	{
+		m_PacketID = E_PLAYERMOVELOOK;
+	}
+	
 	cPacket_PlayerMoveLook( cPlayer* a_Player );
 	virtual cPacket* Clone() const { return new cPacket_PlayerMoveLook(*this); }
 
-	virtual int Parse(cByteBuffer & a_Buffer) override;
+	virtual int  Parse(cByteBuffer & a_Buffer) override;
 	virtual void Serialize(AString & a_Data) const override;
 
 	double m_PosX;
@@ -115,7 +121,7 @@ public:
 	double m_PosZ;
 	float  m_Rotation;
 	float  m_Pitch;
-	bool   m_bFlying; // Yeah.. wtf
+	bool   m_IsOnGround;
 } ;
 
 

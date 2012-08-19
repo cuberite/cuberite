@@ -222,7 +222,7 @@ inline float GetSpecialSignf( float a_Val )
 //tolua_begin
 namespace ItemCategory
 {
-	inline bool IsPickaxe(ENUM_ITEM_ID a_ItemID)
+	inline bool IsPickaxe(short a_ItemID)
 	{
 		return (a_ItemID == E_ITEM_WOODEN_PICKAXE)
 			|| (a_ItemID == E_ITEM_STONE_PICKAXE)
@@ -233,7 +233,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsAxe(ENUM_ITEM_ID a_ItemID)
+	inline bool IsAxe(short a_ItemID)
 	{
 		return (a_ItemID == E_ITEM_WOODEN_AXE)
 			|| (a_ItemID == E_ITEM_STONE_AXE)
@@ -244,7 +244,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsSword(ENUM_ITEM_ID a_ItemID)
+	inline bool IsSword(short a_ItemID)
 	{
 		return (a_ItemID == E_ITEM_WOODEN_SWORD)
 			|| (a_ItemID == E_ITEM_STONE_SWORD)
@@ -255,7 +255,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsHoe(ENUM_ITEM_ID a_ItemID)
+	inline bool IsHoe(short a_ItemID)
 	{
 		return (a_ItemID == E_ITEM_WOODEN_HOE)
 			|| (a_ItemID == E_ITEM_STONE_HOE)
@@ -266,7 +266,7 @@ namespace ItemCategory
 	
 	
 	
-	inline bool IsShovel(ENUM_ITEM_ID a_ItemID)
+	inline bool IsShovel(short a_ItemID)
 	{
 		return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
 			|| (a_ItemID == E_ITEM_STONE_SHOVEL)
@@ -277,7 +277,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsTool(ENUM_ITEM_ID a_ItemID)
+	inline bool IsTool(short a_ItemID)
 	{
 		return IsPickaxe( a_ItemID )
 			|| IsAxe    ( a_ItemID )
@@ -288,7 +288,7 @@ namespace ItemCategory
 	
 	
 	
-	inline bool IsHelmet(ENUM_ITEM_ID a_ItemType)
+	inline bool IsHelmet(short a_ItemType)
 	{
 		return (
 			(a_ItemType == E_ITEM_LEATHER_CAP) ||
@@ -301,7 +301,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsChestPlate(ENUM_ITEM_ID a_ItemType)
+	inline bool IsChestPlate(short a_ItemType)
 	{
 		return (
 			(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
@@ -314,7 +314,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsLeggings(ENUM_ITEM_ID a_ItemType)
+	inline bool IsLeggings(short a_ItemType)
 	{
 		return (
 			(a_ItemType == E_ITEM_LEATHER_PANTS) ||
@@ -327,7 +327,7 @@ namespace ItemCategory
 
 
 
-	inline bool IsBoots(ENUM_ITEM_ID a_ItemType)
+	inline bool IsBoots(short a_ItemType)
 	{
 		return (
 			(a_ItemType == E_ITEM_LEATHER_BOOTS) ||

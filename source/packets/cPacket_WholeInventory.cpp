@@ -25,28 +25,28 @@ cPacket_WholeInventory::cPacket_WholeInventory( const cPacket_WholeInventory & a
 
 
 
-cPacket_WholeInventory::cPacket_WholeInventory(cInventory * a_Inventory)
+cPacket_WholeInventory::cPacket_WholeInventory(const cInventory & a_Inventory)
 {
 	m_PacketID = E_INVENTORY_WHOLE;
-	m_WindowID = 0;
-	m_Count = a_Inventory->c_NumSlots;
-	m_Items = new cItem[m_Count];
+	m_WindowID = 0;  // Inventory window has a constant ID of 0
+	m_Count    = a_Inventory.c_NumSlots;
+	m_Items    = new cItem[m_Count];
 	// TODO: copy items one by one, they may have some values that needn't be shallow-copiable
-	memcpy( m_Items, a_Inventory->GetSlots(), sizeof(cItem)*m_Count );
+	memcpy( m_Items, a_Inventory.GetSlots(), sizeof(cItem) * m_Count);
 }
 
 
 
 
 
-cPacket_WholeInventory::cPacket_WholeInventory(cWindow * a_Window)
+cPacket_WholeInventory::cPacket_WholeInventory(const cWindow & a_Window)
 {
 	m_PacketID = E_INVENTORY_WHOLE;
-	m_WindowID = (char)a_Window->GetWindowID();
-	m_Count = (short)a_Window->GetNumSlots();
-	m_Items = new cItem[m_Count];
+	m_WindowID = (char)a_Window.GetWindowID();
+	m_Count    = (short)a_Window.GetNumSlots();
+	m_Items    = new cItem[m_Count];
 	// TODO: copy items one by one, they may have some values that needn't be shallow-copiable
-	memcpy( m_Items, a_Window->GetSlots(), sizeof(cItem) * m_Count);
+	memcpy( m_Items, a_Window.GetSlots(), sizeof(cItem) * m_Count);
 }
 
 

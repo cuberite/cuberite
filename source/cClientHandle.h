@@ -54,6 +54,8 @@
 
 class cPlayer;
 class cRedstone;
+class cInventory;
+class cWindow;
 
 
 
@@ -106,6 +108,12 @@ public:
 	void SendHandshake (const AString & a_ServerName);
 	void SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendChat(const AString & a_Message);
+	void SendPlayerAnimation(const cPlayer & a_Player, char a_Animation);
+	void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
+	void SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
+	void SendWindowClose(char a_WindowID);
+	void SendWholeInventory(const cInventory & a_Inventory);
+	void SendWholeInventory(const cWindow    & a_Window);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	
@@ -198,12 +206,12 @@ private:
 	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	void HandleBlockPlace       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
 	void HandleChat             (const AString & a_Message);
-	void HandlePlayerLook       (cPacket_PlayerLook *              a_Packet);
-	void HandlePlayerMoveLook   (cPacket_PlayerMoveLook *          a_Packet);  // While m_bPositionConfirmed (normal gameplay)
-	void HandleAnimation        (cPacket_ArmAnim *                 a_Packet);
-	void HandleItemSwitch       (cPacket_ItemSwitch *              a_Packet);
-	void HandleWindowClose      (cPacket_WindowClose *             a_Packet);
-	void HandleWindowClick      (int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
+	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
+	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
+	void HandleAnimation        (char a_Animation);
+	void HandleSlotSelected     (short a_SlotNum);
+	void HandleWindowClose      (char a_WindowID);
+	void HandleWindowClick      (char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
 	void HandleUpdateSign       (cPacket_UpdateSign *              a_Packet);
 	void HandleUseEntity        (cPacket_UseEntity *               a_Packet);
 	void HandleRespawn          (void);

@@ -44,7 +44,7 @@ public:
 	void SendWholeInventoryToAll(void);
 
 	cItem* GetSlot( int a_SlotNum );					//tolua_export
-	cItem* GetSlots() { return m_Slots; }
+	cItem* GetSlots() const { return m_Slots; }
 	cItem* GetFromHotBar( int a_SlotNum );				//tolua_export
 
 	cItem & GetEquippedItem();							//tolua_export
@@ -56,10 +56,10 @@ public:
 	void SendSlot( int a_SlotNum );						//tolua_export
 	
 	/// Returns how many items of the specified type would fit into the slot range specified
-	int HowManyCanFit(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot);
+	int HowManyCanFit(short a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot);
 	
 	/// Moves items, fitting them into the slot range specified, up to a_Count items. Returns the number of items moved
-	int MoveItem(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_Count, int a_BeginSlot, int a_EndSlot);
+	int MoveItem(short a_ItemType, short a_ItemDamage, int a_Count, int a_BeginSlot, int a_EndSlot);
 
 	static const unsigned int c_NumSlots = 45;
 	static const unsigned int c_MainSlots = 27;

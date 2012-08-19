@@ -1282,6 +1282,24 @@ void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Ex
 
 
 
+void cWorld::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastPlayerAnimation(a_Player, a_Animation, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityEquipment(a_Entity, a_SlotNum, a_Item, a_Exclude);
+}
+
+
+
+
+
 void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkY, a_ChunkZ);

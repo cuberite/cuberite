@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/18/12 12:40:25.
+** Generated automatically by tolua++-1.0.92 on 08/19/12 13:48:32.
 */
 
 #ifndef __cplusplus
@@ -2890,7 +2890,7 @@ static int tolua_AllToLua_ItemCategory_IsPickaxe00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemID = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsPickaxe(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -2919,7 +2919,7 @@ static int tolua_AllToLua_ItemCategory_IsAxe00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemID = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsAxe(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -2948,7 +2948,7 @@ static int tolua_AllToLua_ItemCategory_IsSword00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemID = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsSword(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -2977,7 +2977,7 @@ static int tolua_AllToLua_ItemCategory_IsHoe00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemID = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsHoe(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -3006,7 +3006,7 @@ static int tolua_AllToLua_ItemCategory_IsShovel00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemID = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsShovel(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -3035,7 +3035,7 @@ static int tolua_AllToLua_ItemCategory_IsTool00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemID = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsTool(a_ItemID);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -3064,7 +3064,7 @@ static int tolua_AllToLua_ItemCategory_IsHelmet00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsHelmet(a_ItemType);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -3093,7 +3093,7 @@ static int tolua_AllToLua_ItemCategory_IsChestPlate00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsChestPlate(a_ItemType);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -3122,7 +3122,7 @@ static int tolua_AllToLua_ItemCategory_IsLeggings00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsLeggings(a_ItemType);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -3151,7 +3151,7 @@ static int tolua_AllToLua_ItemCategory_IsBoots00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,1,0));
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,1,0));
   {
    bool tolua_ret = (bool)  ItemCategory::IsBoots(a_ItemType);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
@@ -12661,11 +12661,11 @@ static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,E_ITEM_EMPTY));
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,E_ITEM_EMPTY));
   char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
   short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,4,0));
   {
-   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemID,a_ItemCount,a_ItemHealth));
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemHealth));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
@@ -12695,11 +12695,11 @@ static int tolua_AllToLua_cItem_new00_local(lua_State* tolua_S)
  else
 #endif
  {
-  ENUM_ITEM_ID a_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,E_ITEM_EMPTY));
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,E_ITEM_EMPTY));
   char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
   short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,4,0));
   {
-   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemID,a_ItemCount,a_ItemHealth));
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemHealth));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
@@ -13059,7 +13059,7 @@ static int tolua_set_cItem_m_ItemID(lua_State* tolua_S)
   if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
-  self->m_ItemID = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0))
+  self->m_ItemID = ((short)  tolua_tonumber(tolua_S,2,0))
 ;
  return 0;
 }
@@ -21282,6 +21282,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_PLAYERMOVELOOK",E_PLAYERMOVELOOK);
   tolua_constant(tolua_S,"E_BLOCK_DIG",E_BLOCK_DIG);
   tolua_constant(tolua_S,"E_BLOCK_PLACE",E_BLOCK_PLACE);
+  tolua_constant(tolua_S,"E_SLOT_SELECTED",E_SLOT_SELECTED);
   tolua_constant(tolua_S,"E_ITEM_SWITCH",E_ITEM_SWITCH);
   tolua_constant(tolua_S,"E_ADD_TO_INV",E_ADD_TO_INV);
   tolua_constant(tolua_S,"E_ANIMATION",E_ANIMATION);

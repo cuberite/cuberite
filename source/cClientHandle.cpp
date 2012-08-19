@@ -45,7 +45,6 @@
 #include "packets/cPacket_RelativeEntityMoveLook.h"
 #include "packets/cPacket_Chat.h"
 #include "packets/cPacket_Login.h"
-#include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_TimeUpdate.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_Handshake.h"
@@ -59,7 +58,10 @@
 #include "packets/cPacket_CreativeInventoryAction.h"
 #include "packets/cPacket_NewInvalidState.h"
 #include "packets/cPacket_UseEntity.h"
+#include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_WindowClose.h"
+#include "packets/cPacket_WindowOpen.h"
+#include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_13.h"
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_Ping.h"
@@ -640,11 +642,36 @@ void cClientHandle::HandlePacket(cPacket * a_Packet)
 					HandleChat(ch->m_Message);
 					break;
 				}
-				case E_PLAYERLOOK:                HandlePlayerLook       (reinterpret_cast<cPacket_PlayerLook *>             (a_Packet)); break;
-				case E_PLAYERMOVELOOK:            HandlePlayerMoveLook   (reinterpret_cast<cPacket_PlayerMoveLook *>         (a_Packet)); break;
-				case E_ANIMATION:                 HandleAnimation        (reinterpret_cast<cPacket_ArmAnim *>                (a_Packet)); break;
-				case E_ITEM_SWITCH:               HandleItemSwitch       (reinterpret_cast<cPacket_ItemSwitch *>             (a_Packet)); break;
-				case E_WINDOW_CLOSE:              HandleWindowClose      (reinterpret_cast<cPacket_WindowClose *>            (a_Packet)); break;
+				case E_PLAYERLOOK:
+				{
+					cPacket_PlayerLook * pl = reinterpret_cast<cPacket_PlayerLook *>(a_Packet);
+					HandlePlayerLook(pl->m_Rotation, pl->m_Pitch, pl->m_IsOnGround);
+					break;
+				}
+				case E_PLAYERMOVELOOK:
+				{
+					cPacket_PlayerMoveLook * pml = reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet);
+					HandlePlayerMoveLook(pml->m_PosX, pml->m_PosY, pml->m_PosZ, pml->m_Stance, pml->m_Rotation, pml->m_Pitch, pml->m_IsOnGround);
+					break;
+				}
+				case E_ANIMATION:
+				{
+					cPacket_ArmAnim * aa = reinterpret_cast<cPacket_ArmAnim *>(a_Packet);
+					HandleAnimation(aa->m_Animation);
+					break;
+				}
+				case E_SLOT_SELECTED:
+				{
+					cPacket_ItemSwitch * isw = reinterpret_cast<cPacket_ItemSwitch *>(a_Packet);
+					HandleSlotSelected(isw->m_SlotNum);
+					break;
+				}
+				case E_WINDOW_CLOSE:
+				{
+					cPacket_WindowClose * wc = reinterpret_cast<cPacket_WindowClose *>(a_Packet);
+					HandleWindowClose(wc->m_WindowID);
+					break;
+				}
 				case E_WINDOW_CLICK:
 				{
 					cPacket_WindowClick * wc = reinterpret_cast<cPacket_WindowClick *>(a_Packet);
@@ -910,7 +937,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 
-	if ((Equipped.m_ItemID != a_HeldItem.m_ItemType))	// Not valid
+	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType))	// Not valid
 	{
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
@@ -1045,11 +1072,11 @@ void cClientHandle::HandleChat(const AString & a_Message)
 
 
 
-void cClientHandle::HandlePlayerLook(cPacket_PlayerLook * a_Packet)
+void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	m_Player->SetRotation   (a_Packet->m_Rotation);
-	m_Player->SetPitch      (a_Packet->m_Pitch);
-	m_Player->SetTouchGround(a_Packet->m_bFlying);
+	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetPitch      (a_Pitch);
+	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->WrapRotation();
 }
 
@@ -1057,13 +1084,13 @@ void cClientHandle::HandlePlayerLook(cPacket_PlayerLook * a_Packet)
 
 
 
-void cClientHandle::HandlePlayerMoveLook(cPacket_PlayerMoveLook * a_Packet)
+void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	m_Player->MoveTo(Vector3d(a_Packet->m_PosX, a_Packet->m_PosY, a_Packet->m_PosZ));
-	m_Player->SetStance     (a_Packet->m_Stance);
-	m_Player->SetTouchGround(a_Packet->m_bFlying);
-	m_Player->SetRotation   (a_Packet->m_Rotation);
-	m_Player->SetPitch      (a_Packet->m_Pitch);
+	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
+	m_Player->SetStance     (a_Stance);
+	m_Player->SetTouchGround(a_IsOnGround);
+	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetPitch      (a_Pitch);
 	m_Player->WrapRotation();
 }
 
@@ -1071,41 +1098,35 @@ void cClientHandle::HandlePlayerMoveLook(cPacket_PlayerMoveLook * a_Packet)
 
 
 
-void cClientHandle::HandleAnimation(cPacket_ArmAnim * a_Packet)
+void cClientHandle::HandleAnimation(char a_Animation)
 {
-	a_Packet->m_EntityID = m_Player->GetUniqueID();
-	cRoot::Get()->GetServer()->Broadcast(*a_Packet, this);
+	m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, a_Animation, this);
 }
 
 
 
 
 
-void cClientHandle::HandleItemSwitch(cPacket_ItemSwitch * a_Packet)
+void cClientHandle::HandleSlotSelected(short a_SlotNum)
 {
-	m_Player->GetInventory().SetEquippedSlot(a_Packet->m_SlotNum);
-
-	cPacket_EntityEquipment Equipment;
-	Equipment.m_ItemID = (short)m_Player->GetInventory().GetEquippedItem().m_ItemID;
-	Equipment.m_Slot = 0;
-	Equipment.m_UniqueID = m_Player->GetUniqueID();
-	cRoot::Get()->GetServer()->Broadcast(Equipment, this);
+	m_Player->GetInventory().SetEquippedSlot(a_SlotNum);
+	m_Player->GetWorld()->BroadcastEntityEquipment(*m_Player, 0, m_Player->GetInventory().GetEquippedItem(), this);
 }
 
 
 
 
 
-void cClientHandle::HandleWindowClose(cPacket_WindowClose * a_Packet)
+void cClientHandle::HandleWindowClose(char a_WindowID)
 {
-	m_Player->CloseWindow(a_Packet->m_Close);
+	m_Player->CloseWindow(a_WindowID);
 }
 
 
 
 
 
-void cClientHandle::HandleWindowClick(int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem)
+void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem)
 {
 	if (a_WindowID == 0)
 	{
@@ -1445,6 +1466,77 @@ void cClientHandle::SendChat(const AString & a_Message)
 {
 	cPacket_Chat Chat(a_Message);
 	Send(Chat);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+{
+	cPacket_ArmAnim Anim;
+	Anim.m_EntityID  = a_Player.GetUniqueID();
+	Anim.m_Animation = a_Animation;
+	Send(Anim);
+}
+
+
+
+
+
+void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
+{
+	cPacket_EntityEquipment ee;
+	ee.m_UniqueID   = a_Entity.GetUniqueID();
+	ee.m_SlotNum    = a_SlotNum;
+	ee.m_ItemType   = a_Item.m_ItemType;
+	ee.m_ItemDamage = a_Item.m_ItemDamage;
+	Send(ee);
+}
+
+
+
+
+
+void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+{
+	cPacket_WindowOpen WindowOpen;
+	WindowOpen.m_WindowID      = a_WindowID;
+	WindowOpen.m_InventoryType = a_WindowType;
+	WindowOpen.m_WindowTitle   = a_WindowTitle;
+	WindowOpen.m_NumSlots      = a_NumSlots;
+	Send(WindowOpen);
+}
+
+
+
+
+
+void cClientHandle::SendWindowClose(char a_WindowID)
+{
+	cPacket_WindowClose wc;
+	wc.m_WindowID = a_WindowID;
+	Send(wc);
+}
+
+
+
+
+
+void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
+{
+	cPacket_WholeInventory wi(a_Inventory);
+	Send(wi);
+}
+
+
+
+
+
+void cClientHandle::SendWholeInventory(const cWindow & a_Window)
+{
+	cPacket_WholeInventory wi(a_Window);
+	Send(wi);
 }
 
 

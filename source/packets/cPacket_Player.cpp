@@ -106,10 +106,10 @@ void cPacket_PlayerListItem::Serialize(AString & a_Data) const
 
 cPacket_PlayerLook::cPacket_PlayerLook( cPlayer* a_Player )
 {
-	m_PacketID = E_PLAYERLOOK;
-	m_Rotation = a_Player->GetRotation();
-	m_Pitch    = a_Player->GetPitch();
-	m_bFlying  = a_Player->GetFlying();
+	m_PacketID   = E_PLAYERLOOK;
+	m_Rotation   = a_Player->GetRotation();
+	m_Pitch      = a_Player->GetPitch();
+	m_IsOnGround = a_Player->IsOnGround();
 }
 
 
@@ -119,9 +119,9 @@ cPacket_PlayerLook::cPacket_PlayerLook( cPlayer* a_Player )
 int cPacket_PlayerLook::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadBEFloat, m_Rotation, TotalBytes);
-	HANDLE_PACKET_READ(ReadBEFloat, m_Pitch,    TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,    m_bFlying,  TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat, m_Rotation,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat, m_Pitch,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,    m_IsOnGround, TotalBytes);
 	return TotalBytes;
 }
 
@@ -134,7 +134,7 @@ void cPacket_PlayerLook::Serialize(AString & a_Data) const
 	AppendByte	(a_Data, m_PacketID);
 	AppendFloat	(a_Data, m_Rotation);
 	AppendFloat	(a_Data, m_Pitch);
-	AppendBool	(a_Data, m_bFlying);
+	AppendBool	(a_Data, m_IsOnGround);
 }
 
 
@@ -145,14 +145,14 @@ void cPacket_PlayerLook::Serialize(AString & a_Data) const
 
 cPacket_PlayerMoveLook::cPacket_PlayerMoveLook( cPlayer* a_Player )
 {
-	m_PacketID = E_PLAYERMOVELOOK;
-	m_PosX     = a_Player->GetPosX();
-	m_PosY     = a_Player->GetPosY() + 1.65;
-	m_PosZ     = a_Player->GetPosZ();
-	m_Stance   = a_Player->GetStance();
-	m_Rotation = a_Player->GetRotation();
-	m_Pitch    = a_Player->GetPitch();
-	m_bFlying  = a_Player->GetFlying();
+	m_PacketID   = E_PLAYERMOVELOOK;
+	m_PosX       = a_Player->GetPosX();
+	m_PosY       = a_Player->GetPosY() + 1.65;
+	m_PosZ       = a_Player->GetPosZ();
+	m_Stance     = a_Player->GetStance();
+	m_Rotation   = a_Player->GetRotation();
+	m_Pitch      = a_Player->GetPitch();
+	m_IsOnGround = a_Player->IsOnGround();
 }
 
 
@@ -162,13 +162,13 @@ cPacket_PlayerMoveLook::cPacket_PlayerMoveLook( cPlayer* a_Player )
 int cPacket_PlayerMoveLook::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;
-	HANDLE_PACKET_READ(ReadBEDouble, m_PosX,     TotalBytes);
-	HANDLE_PACKET_READ(ReadBEDouble, m_PosY,     TotalBytes);
-	HANDLE_PACKET_READ(ReadBEDouble, m_Stance,   TotalBytes);
-	HANDLE_PACKET_READ(ReadBEDouble, m_PosZ,     TotalBytes);
-	HANDLE_PACKET_READ(ReadBEFloat,  m_Rotation, TotalBytes);
-	HANDLE_PACKET_READ(ReadBEFloat,  m_Pitch,    TotalBytes);
-	HANDLE_PACKET_READ(ReadBool,     m_bFlying,  TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosX,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosY,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_Stance,     TotalBytes);
+	HANDLE_PACKET_READ(ReadBEDouble, m_PosZ,       TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat,  m_Rotation,   TotalBytes);
+	HANDLE_PACKET_READ(ReadBEFloat,  m_Pitch,      TotalBytes);
+	HANDLE_PACKET_READ(ReadBool,     m_IsOnGround, TotalBytes);
 	return TotalBytes;
 }
 
@@ -185,7 +185,7 @@ void cPacket_PlayerMoveLook::Serialize(AString & a_Data) const
 	AppendDouble(a_Data, m_PosZ);
 	AppendFloat	(a_Data, m_Rotation);
 	AppendFloat	(a_Data, m_Pitch);
-	AppendBool	(a_Data, m_bFlying);
+	AppendBool	(a_Data, m_IsOnGround);
 }
 
 

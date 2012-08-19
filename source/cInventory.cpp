@@ -256,8 +256,7 @@ cItem & cInventory::GetEquippedItem()
 
 void cInventory::SendWholeInventory(cClientHandle * a_Client)
 {
-	cPacket_WholeInventory Inventory(this);
-	a_Client->Send(Inventory);
+	a_Client->SendWholeInventory(*this);
 }
 
 
@@ -314,7 +313,7 @@ void cInventory::SendSlot( int a_SlotNum )
 
 
 
-int cInventory::HowManyCanFit(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot)
+int cInventory::HowManyCanFit(short a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot)
 {
 	int res = 0;
 	for (int i = a_BeginSlot; i <= a_EndSlot; i++)
@@ -336,7 +335,7 @@ int cInventory::HowManyCanFit(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a
 
 
 
-int cInventory::MoveItem(ENUM_ITEM_ID a_ItemType, short a_ItemDamage, int a_Count, int a_BeginSlot, int a_EndSlot)
+int cInventory::MoveItem(short a_ItemType, short a_ItemDamage, int a_Count, int a_BeginSlot, int a_EndSlot)
 {
 	int res = 0;
 	for (int i = a_BeginSlot; i <= a_EndSlot; i++)

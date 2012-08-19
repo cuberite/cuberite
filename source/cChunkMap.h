@@ -47,6 +47,12 @@ public:
 	/// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
 	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
 	
+	/// Broadcasts an a_Player's animation to all clients in the chunk where a_Player is
+	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
+	
+	/// Broadcasts an entity equipment change to all clients in the chunk where a_Entity is
+	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
+	
 	/// a_Player rclked block entity at the coords specified, handle it
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
 
