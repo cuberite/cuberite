@@ -11,7 +11,7 @@ public:
 	{
 	}
 	
-	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override
+	virtual void OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override
 	{
 		cWindow* Window = new cCraftingWindow(0, true);
 		a_Player->OpenWindow(Window);

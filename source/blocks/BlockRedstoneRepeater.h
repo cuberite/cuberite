@@ -9,7 +9,8 @@ public:
 	virtual void OnPlaced(cWorld *a_World, int a_X, int a_Y, int a_Z, int a_Dir) override;
 	virtual void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z) override;
 	
-	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override;
+	virtual void OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override;
+	virtual void OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override;
 
 	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
 	{

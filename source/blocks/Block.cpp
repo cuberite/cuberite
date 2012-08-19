@@ -222,7 +222,12 @@ void cBlockHandler::OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z
 
 }
 
-void cBlockHandler::OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
+void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
+{
+
+}
+
+void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
 {
 
 }

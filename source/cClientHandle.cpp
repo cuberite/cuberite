@@ -878,7 +878,7 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 	else
 	{
 		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(OldBlock);
-		Handler->OnClick(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+		Handler->OnDigging(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		
@@ -892,7 +892,7 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
 		if (Handler->IsClickedThrough())
 		{
-			Handler->OnClick(World, m_Player, pX, pY, pZ);
+			Handler->OnDigging(World, m_Player, pX, pY, pZ);
 		}
 	}
 }
@@ -940,7 +940,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_BlockX, a_BlockY, a_BlockZ));
 	if (Handler->IsUseable())
 	{
-		Handler->OnClick(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+		Handler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	else
 	{

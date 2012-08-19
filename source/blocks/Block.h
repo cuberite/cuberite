@@ -18,7 +18,8 @@ public:
 	virtual void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z);
 	virtual void OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z);
 	static void NeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z);
-	virtual void OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z);
+	virtual void OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z);
+	virtual void OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z);
 	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir);
 
 	virtual int GetTickRate();

@@ -38,7 +38,12 @@ void cBlockDoorHandler::OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z)
 	}
 }
 
-void cBlockDoorHandler::OnClick(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
+void cBlockDoorHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
+{
+	cDoors::ChangeDoor(a_World, a_X, a_Y, a_Z);
+}
+
+void cBlockDoorHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
 {
 	cDoors::ChangeDoor(a_World, a_X, a_Y, a_Z);
 }
