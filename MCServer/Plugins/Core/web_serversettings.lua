@@ -1,5 +1,3 @@
-local CurrentlyEditingIni = nil
-
 -- Some HTML helper functions
 local function HTML_Option( value, text, selected )
 	if( selected == true ) then
@@ -68,9 +66,9 @@ local function ShowGeneralSettings( Request )
 	Content = Content .. "<th colspan=\"2\">Authentication</th>"
 	Content = Content .. "<tr><td style=\"width: 50%;\">Authenticate:</td>"
 	Content = Content .. "<td>" .. HTML_Select_On_Off("Authentication_Authenticate", SettingsIni:GetValueI("Authentication", "Authenticate") ) .. "</td></tr>"
-	Content = Content .. "</table>"
+	Content = Content .. "</table><br>"
 	
-	Content = Content .. "<input type=\"submit\" value=\"Save Settings\" name=\"general_submit\"> WARNING: Any changes made here might require a server restart to be applied!"
+	Content = Content .. "<input type=\"submit\" value=\"Save Settings\" name=\"general_submit\"> WARNING: Any changes made here might require a server restart in order to be applied!"
 	Content = Content .. "</form>"
 	
 	return Content
@@ -78,7 +76,52 @@ end
 
 
 local function ShowMonstersSettings( Request )
-	return "<p><b>Monsters Settings</b></p>"
+	local Content = ""
+	local InfoMsg = nil
+	
+	local SettingsIni = cIniFile("settings.ini")
+	if( SettingsIni:ReadFile() == false ) then
+		InfoMsg = "<b style=\"color: red;\">ERROR: Could not read settings.ini!</b>"
+	end
+	
+	if( Request.PostParams["monsters_submit"] ~= nil ) then
+		
+		if( tonumber( Request.PostParams["Monsters_AnimalsOn"] ) ~= nil ) then
+			SettingsIni:SetValue("Monsters", "AnimalsOn", Request.PostParams["Monsters_AnimalsOn"], false )
+		end
+		if( tonumber( Request.PostParams["Monsters_AnimalSpawnInterval"] ) ~= nil ) then
+			SettingsIni:SetValue("Monsters", "AnimalSpawnInterval", Request.PostParams["Monsters_AnimalSpawnInterval"], false )
+		end
+		SettingsIni:SetValue("Monsters", "Types", Request.PostParams["Monsters_Types"], false )
+		if( SettingsIni:WriteFile() == false ) then
+			InfoMsg =  "<b style=\"color: red;\">ERROR: Could not write to settings.ini!</b>"
+		else
+			InfoMsg = "<b style=\"color: green;\">INFO: Successfully saved changes to settings.ini</b>"
+		end
+	end
+	
+	
+	Content = Content .. "<form method=\"POST\">"
+	
+	Content = Content .. "<p><b>Monsters Settings</b></p>"
+	if( InfoMsg ~= nil ) then
+		Content = Content .. "<p>" .. InfoMsg .. "</p>"
+	end
+	
+	Content = Content .. "<table>"
+	Content = Content .. "<th colspan=\"2\">Monsters</th>"
+	Content = Content .. "<tr><td style=\"width: 50%;\">Animals On:</td>"
+	Content = Content .. "<td>" .. HTML_Select_On_Off("Monsters_AnimalsOn", SettingsIni:GetValueI("Monsters", "AnimalsOn") ) .. "</td></tr>"
+	Content = Content .. "<tr><td>Animal Spawn Interval:</td>"
+	Content = Content .. "<td><input type=\"text\" name=\"Monsters_AnimalSpawnInterval\" value=\"" .. SettingsIni:GetValue("Monsters", "AnimalSpawnInterval") .. "\"></td></tr>"
+	Content = Content .. "<tr><td>Monster Types:</td>"
+	Content = Content .. "<td><input type=\"text\" name=\"Monsters_Types\" value=\"" .. SettingsIni:GetValue("Monsters", "Types") .. "\"></td></tr>"
+	Content = Content .. "</table><br>"
+	
+	Content = Content .. "<input type=\"submit\" value=\"Save Settings\" name=\"monsters_submit\"> WARNING: Any changes made here might require a server restart in order to be applied!"
+	Content = Content .. "</form>"
+	
+	return Content
 end
 
 local function ShowWorldsSettings( Request )
