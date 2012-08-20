@@ -119,10 +119,10 @@ OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))
 -include $(patsubst %.o,%.d,$(OBJECTS))
 
 MCServer : $(OBJECTS)
-	$(CC) $(LNK_OPTIONS) $(OBJECTS) -o MCServer
+	$(CC) $(LNK_OPTIONS) $(OBJECTS) -o MCServer/MCServer
 
 clean : 
-		rm -rf $(BUILDDIR) MCServer
+		rm -rf $(BUILDDIR) MCServer/MCServer
 
 install : MCServer
 		cp MCServer MCServer
