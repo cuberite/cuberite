@@ -140,7 +140,6 @@ function Initialize( Plugin )
 	WebPlugin:AddTab( "Whitelist", HandleRequest_WhiteList )
 	WebPlugin:AddTab( "Permissions", HandleRequest_Permissions )
 	WebPlugin:AddTab( "Manage Plugins", HandleRequest_ManagePlugins )
-	WebPlugin:AddTab( "Ini Editor", HandleRequest_IniEditor )
 	
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
