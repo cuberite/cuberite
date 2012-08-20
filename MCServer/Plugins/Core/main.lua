@@ -136,6 +136,7 @@ function Initialize( Plugin )
 	
 	local WebPlugin = Plugin:CreateWebPlugin()
 	WebPlugin:SetName( Plugin:GetName() )
+	WebPlugin:AddTab( "Server Settings", HandleRequest_ServerSettings )
 	WebPlugin:AddTab( "Playerlist", HandleRequest_PlayerList )
 	WebPlugin:AddTab( "Whitelist", HandleRequest_WhiteList )
 	WebPlugin:AddTab( "Permissions", HandleRequest_Permissions )
