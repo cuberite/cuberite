@@ -28,6 +28,9 @@ if %subwcrev%a == a set subwcrev=subwcrev
 echo Performing nightbuild of MC-Server
 
 
+
+
+
 set DONOTPAUSE=y
 
 :: Update the sources to the latest revision:
@@ -50,7 +53,7 @@ echo WCREV = %WCREV%
  
 
 :: Test if the version is already present
-if exist MCServer_Win_%WCREV%.7z (
+if exist Install\MCServer_Win_%WCREV%.7z (
 	echo Latest version already present, bailing out
 	goto end
 )
@@ -58,6 +61,8 @@ if exist MCServer_Win_%WCREV%.7z (
 
 
 :: Update Bindings.cpp
+del source\Bindings.cpp
+del source\Bindings.h
 echo Updating Lua bindings
 set ALLTOLUA_WAIT=N
 cd source
@@ -78,15 +83,18 @@ if errorlevel 1 goto haderror
 
 
 
+
 :: Use 7-zip to compress the resulting files into a single file:
 :: Note: the output filename here must be the same as in the upload_win.ftp.template script
-copy VC2008\Release\MCServer.exe MCServer.exe
-%zip% a -mx9 -y MCServer_Win_%WCREV%.7z -scsWIN @Install\Zip2008.list
+copy MCServer\MCServer.exe Install\MCServer.exe
+cd Install
+%zip% a -mx9 -y MCServer_Win_%WCREV%.7z -scsWIN @Zip2008.list
 if errorlevel 1 goto haderror
+cd ..
 
 :: Also pack PDBs into a separate archive:
 :: Note: the output filename here must be the same as in the upload_win.ftp.template script
-%zip% a -mx9 -y MCServer_Win_%WCREV%_PDBs.7z -scsWIN @Install\Zip2008_PDBs.list
+%zip% a -mx9 -y Install\MCServer_Win_%WCREV%_PDBs.7z -scsWIN @Install\Zip2008_PDBs.list
 if errorlevel 1 goto haderror
 
 
