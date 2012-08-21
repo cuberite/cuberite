@@ -1,19 +1,17 @@
 -- Some HTML helper functions
 local function HTML_Option( value, text, selected )
 	if( selected == true ) then
-		return "<option value=\"" .. value .. "\" selected>" .. text .. "</option>"
+		return [[<option value="]] .. value .. [[" selected>]] .. text .. [[</option>]]
 	else
-		return "<option value=\"" .. value .. "\">" .. text .. "</option>"
+		return [[<option value="]] .. value .. [[">]] .. text .. [[</option>"]]
 	end
 end
 
 local function HTML_Select_On_Off( name, defaultValue )
-	local Content = ""
-	Content = Content .. "<select name=\"" .. name .. "\">"
-	Content = Content .. HTML_Option("1", "On",  defaultValue == 1 )
-	Content = Content .. HTML_Option("0", "Off", defaultValue == 0 )
-	Content = Content .. "</select>"
-	return Content
+	return [[<select name="]] .. name .. [[">]]
+	.. HTML_Option("1", "On",  defaultValue == 1 )
+	.. HTML_Option("0", "Off", defaultValue == 0 )
+	.. [[</select>]]
 end
 
 
@@ -39,37 +37,39 @@ local function ShowGeneralSettings( Request )
 			SettingsIni:SetValue("Authentication", "Authenticate", Request.PostParams["Authentication_Authenticate"], false )
 		end
 		if( SettingsIni:WriteFile() == false ) then
-			InfoMsg =  "<b style=\"color: red;\">ERROR: Could not write to settings.ini!</b>"
+			InfoMsg =  [[<b style="color: red;">ERROR: Could not write to settings.ini!</b>]]
 		else
-			InfoMsg = "<b style=\"color: green;\">INFO: Successfully saved changes to settings.ini</b>"
+			InfoMsg = [[<b style="color: green;">INFO: Successfully saved changes to settings.ini</b>]]
 		end
 	end
 	
 	
-	Content = Content .. "<form method=\"POST\">"
+	Content = Content .. [[
+	<form method="POST">
+	<h4>General Settings</h4>]]
 	
-	Content = Content .. "<h4>General Settings</h4>"
 	if( InfoMsg ~= nil ) then
 		Content = Content .. "<p>" .. InfoMsg .. "</p>"
 	end
-	Content = Content .. "<table>"
-	Content = Content .. "<th colspan=\"2\">Server</th>"
-	Content = Content .. "<tr><td style=\"width: 50%;\">Description:</td>"
-	Content = Content .. "<td><input type=\"text\" name=\"Server_Description\" value=\"" .. SettingsIni:GetValue("Server", "Description") .. "\"></td></tr>"
-	Content = Content .. "<tr><td>Max Players:</td>"
-	Content = Content .. "<td><input type=\"text\" name=\"Server_MaxPlayers\" value=\"" .. SettingsIni:GetValue("Server", "MaxPlayers") .. "\"></td></tr>"
-	Content = Content .. "<tr><td>Port:</td>"
-	Content = Content .. "<td><input type=\"text\" name=\"Server_Port\" value=\"" .. SettingsIni:GetValue("Server", "Port") .. "\"></td></tr>"
-	Content = Content .. "</table><br>"
+	Content = Content .. [[
+	<table>
+	<th colspan="2">Server</th>
+	<tr><td style="width: 50%;">Description:</td>
+	<td><input type="text" name="Server_Description" value="]] .. SettingsIni:GetValue("Server", "Description") .. [["></td></tr>
+	<tr><td>Max Players:</td>
+	<td><input type="text" name="Server_MaxPlayers" value="]] .. SettingsIni:GetValue("Server", "MaxPlayers") .. [["></td></tr>
+	<tr><td>Port:</td>
+	<td><input type="text" name="Server_Port" value="]] .. SettingsIni:GetValue("Server", "Port") .. [["></td></tr>
+	</table><br>
 	
-	Content = Content .. "<table>"
-	Content = Content .. "<th colspan=\"2\">Authentication</th>"
-	Content = Content .. "<tr><td style=\"width: 50%;\">Authenticate:</td>"
-	Content = Content .. "<td>" .. HTML_Select_On_Off("Authentication_Authenticate", SettingsIni:GetValueI("Authentication", "Authenticate") ) .. "</td></tr>"
-	Content = Content .. "</table><br>"
+	<table>
+	<th colspan="2">Authentication</th>
+	<tr><td style="width: 50%;">Authenticate:</td>
+	<td>]] .. HTML_Select_On_Off("Authentication_Authenticate", SettingsIni:GetValueI("Authentication", "Authenticate") ) .. [[</td></tr>
+	</table><br>
 	
-	Content = Content .. "<input type=\"submit\" value=\"Save Settings\" name=\"general_submit\"> WARNING: Any changes made here might require a server restart in order to be applied!"
-	Content = Content .. "</form>"
+	<input type="submit" value="Save Settings" name="general_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
+	</form>]]
 	
 	return Content
 end
@@ -108,18 +108,18 @@ local function ShowMonstersSettings( Request )
 		Content = Content .. "<p>" .. InfoMsg .. "</p>"
 	end
 	
-	Content = Content .. "<table>"
-	Content = Content .. "<th colspan=\"2\">Monsters</th>"
-	Content = Content .. "<tr><td style=\"width: 50%;\">Animals On:</td>"
-	Content = Content .. "<td>" .. HTML_Select_On_Off("Monsters_AnimalsOn", SettingsIni:GetValueI("Monsters", "AnimalsOn") ) .. "</td></tr>"
-	Content = Content .. "<tr><td>Animal Spawn Interval:</td>"
-	Content = Content .. "<td><input type=\"text\" name=\"Monsters_AnimalSpawnInterval\" value=\"" .. SettingsIni:GetValue("Monsters", "AnimalSpawnInterval") .. "\"></td></tr>"
-	Content = Content .. "<tr><td>Monster Types:</td>"
-	Content = Content .. "<td><input type=\"text\" name=\"Monsters_Types\" value=\"" .. SettingsIni:GetValue("Monsters", "Types") .. "\"></td></tr>"
-	Content = Content .. "</table><br>"
-	
-	Content = Content .. "<input type=\"submit\" value=\"Save Settings\" name=\"monsters_submit\"> WARNING: Any changes made here might require a server restart in order to be applied!"
-	Content = Content .. "</form>"
+	Content = Content .. [[
+	<table>
+	<th colspan="2">Monsters</th>
+	<tr><td style="width: 50%;">Animals On:</td>
+	<td>]] .. HTML_Select_On_Off("Monsters_AnimalsOn", SettingsIni:GetValueI("Monsters", "AnimalsOn") ) .. [[</td></tr>
+	<tr><td>Animal Spawn Interval:</td>
+	<td><input type="text" name="Monsters_AnimalSpawnInterval" value="]] .. SettingsIni:GetValue("Monsters", "AnimalSpawnInterval") .. [["></td></tr>
+	<tr><td>Monster Types:</td>
+	<td><input type="text" name="Monsters_Types" value="]] .. SettingsIni:GetValue("Monsters", "Types") .. [[\"></td></tr>
+	</table><br>
+	<input type="submit" value="Save Settings" name="monsters_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
+	</form>]]
 	
 	return Content
 end
@@ -131,15 +131,16 @@ end
 function HandleRequest_ServerSettings( Request )
 	local Content = ""
 
-	Content = Content .. "<p><b>Server Settings</b></p>"
-	Content = Content .. "<table>"
-	Content = Content .. "<tr>"
-	Content = Content .. "<td><a href=\"?tab=General\">General</a></td>"
-	Content = Content .. "<td><a href=\"?tab=Monsters\">Monsters</a></td>"
-	Content = Content .. "<td><a href=\"?tab=Worlds\">Worlds</a></td>"
-	Content = Content .. "</tr>"
-	Content = Content .. "</table>"
-	Content = Content .. "<br>"
+	Content = Content .. [[
+	<p><b>Server Settings</b></p>
+	<table>
+	<tr>
+	<td><a href="?tab=General">General</a></td>
+	<td><a href="?tab=Monsters">Monsters</a></td>
+	<td><a href="?tab=Worlds">Worlds</a></td>
+	</tr>
+	</table>
+	<br>]]
 	
 	if( Request.Params["tab"] == "Monsters" ) then
 		Content = Content .. ShowMonstersSettings( Request )
