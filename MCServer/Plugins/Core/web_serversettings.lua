@@ -48,7 +48,7 @@ local function ShowGeneralSettings( Request )
 	
 	Content = Content .. "<form method=\"POST\">"
 	
-	Content = Content .. "<p><b>General Settings</b></p>"
+	Content = Content .. "<h4>General Settings</h4>"
 	if( InfoMsg ~= nil ) then
 		Content = Content .. "<p>" .. InfoMsg .. "</p>"
 	end
@@ -103,7 +103,7 @@ local function ShowMonstersSettings( Request )
 	
 	Content = Content .. "<form method=\"POST\">"
 	
-	Content = Content .. "<p><b>Monsters Settings</b></p>"
+	Content = Content .. "<h4>Monsters Settings</h4>"
 	if( InfoMsg ~= nil ) then
 		Content = Content .. "<p>" .. InfoMsg .. "</p>"
 	end
