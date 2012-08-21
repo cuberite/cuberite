@@ -116,7 +116,7 @@ local function ShowMonstersSettings( Request )
 	<tr><td>Animal Spawn Interval:</td>
 	<td><input type="text" name="Monsters_AnimalSpawnInterval" value="]] .. SettingsIni:GetValue("Monsters", "AnimalSpawnInterval") .. [["></td></tr>
 	<tr><td>Monster Types:</td>
-	<td><input type="text" name="Monsters_Types" value="]] .. SettingsIni:GetValue("Monsters", "Types") .. [[\"></td></tr>
+	<td><input type="text" name="Monsters_Types" value="]] .. SettingsIni:GetValue("Monsters", "Types") .. [["></td></tr>
 	</table><br>
 	<input type="submit" value="Save Settings" name="monsters_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
 	</form>]]
@@ -125,7 +125,82 @@ local function ShowMonstersSettings( Request )
 end
 
 local function ShowWorldsSettings( Request )
-	return "<p><b>Worlds Settings</b></p>"
+	local Content = ""
+	local InfoMsg = nil
+	local bSaveIni = false
+	
+	local SettingsIni = cIniFile("settings.ini")
+	if( SettingsIni:ReadFile() == false ) then
+		InfoMsg = [[<b style="color: red;">ERROR: Could not read settings.ini!</b>]]
+	end
+	
+	if( Request.PostParams["RemoveWorld"] ~= nil ) then
+		Content = Content .. Request.PostParams["RemoveWorld"]
+		local WorldIdx = string.sub( Request.PostParams["RemoveWorld"], string.len("Remove ") )
+		local KeyIdx = SettingsIni:FindKey("Worlds")
+		local WorldName = SettingsIni:GetValue( KeyIdx, WorldIdx )
+		if( SettingsIni:DeleteValueByID( KeyIdx, WorldIdx ) == true ) then
+			InfoMsg = "<b style=\"color: green;\">INFO: Successfully removed world " .. WorldName .. "!</b><br>"
+			bSaveIni = true
+		end
+	end
+	
+	if( Request.PostParams["AddWorld"] ~= nil ) then
+		if( Request.PostParams["WorldName"] ~= nil and Request.PostParams["WorldName"] ~= "" ) then
+			SettingsIni:SetValue("Worlds", "World", Request.PostParams["WorldName"], true )
+			InfoMsg = "<b style=\"color: green;\">INFO: Successfully added world " .. Request.PostParams["WorldName"] .. "!</b><br>"
+			bSaveIni = true
+		end
+	end
+	
+	if( Request.PostParams["worlds_submit"] ~= nil ) then
+		SettingsIni:SetValue("Worlds", "DefaultWorld", Request.PostParams["Worlds_DefaultWorld"], false )
+		if( Request.PostParams["Worlds_World"] ~= nil ) then
+			SettingsIni:SetValue("Worlds", "World", Request.PostParams["Worlds_World"], true )
+		end
+		bSaveIni = true
+	end
+	
+	if( bSaveIni == true ) then
+		if( InfoMsg == nil ) then InfoMsg = "" end
+		if( SettingsIni:WriteFile() == false ) then
+			InfoMsg = InfoMsg .. "<b style=\"color: red;\">ERROR: Could not write to settings.ini!</b>"
+		else
+			InfoMsg = InfoMsg .. "<b style=\"color: green;\">INFO: Successfully saved changes to settings.ini</b>"
+		end
+	end
+	
+	Content = Content .. "<h4>Worlds Settings</h4>"
+	if( InfoMsg ~= nil ) then
+		Content = Content .. "<p>" .. InfoMsg .. "</p>"
+	end
+	
+	Content = Content .. [[
+	<form method="POST">
+	<table>
+	<th colspan="2">Worlds</th>
+	<tr><td style="width: 50%;">Default World:</td>
+	<td><input type="text" name="Worlds_DefaultWorld" value="]] .. SettingsIni:GetValue("Worlds", "DefaultWorld") .. [["></td></tr>]]
+	
+	local KeyIdx = SettingsIni:FindKey("Worlds")
+	local NumValues = SettingsIni:GetNumValues( KeyIdx )
+	for i = 0, NumValues-1 do
+		local ValueName = SettingsIni:GetValueName(KeyIdx, i )
+		if( ValueName == "World" ) then
+			local WorldName = SettingsIni:GetValue(KeyIdx, i)
+			Content = Content .. [[
+			<tr><td>]] .. ValueName .. [[:</td><td><div style="width: 100px; display: inline-block;">]] .. WorldName .. [[</div><input type="submit" value="Remove ]] .. i .. [[" name="RemoveWorld"></td></tr>]]
+		end
+	end
+	
+	Content = Content .. [[
+	<tr><td>Add World:</td>
+	<td><input type='text' name='WorldName'><input type='submit' name='AddWorld' value='Add World'></td></tr>
+	</table><br>
+	
+	<input type="submit" value="Save Settings" name="worlds_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
+	</form>]]
+	return Content
 end
 
 function HandleRequest_ServerSettings( Request )
