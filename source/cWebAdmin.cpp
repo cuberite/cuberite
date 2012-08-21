@@ -122,7 +122,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 	
 	AStringVector Split = StringSplit(r->path_.substr(1), "/");
 
-	if (Split.empty() || (Split[0] != "webadmin"))
+	if (Split.empty() || (Split[0] != "webadmin" && Split[0] != "~webadmin"))
 	{
 		r->answer_ += "<h1>Bad request</h1>";
 		return;
@@ -132,6 +132,12 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 	{
 		r->answer_ += "no auth";
 		r->auth_realm_ = "MCServer WebAdmin";
+	}
+
+	bool bDontShowTemplate = false;
+	if (Split[0] == "~webadmin")
+	{
+		bDontShowTemplate = true;
 	}
 	
 	std::string UserPassword = WebAdmin->m_IniFile->GetValue( "User:"+r->username_, "Password", "");
@@ -149,7 +155,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 		std::string Menu;
 		std::string Content;
-		std::string Template = WebAdmin->GetTemplate();
+		std::string Template = bDontShowTemplate ? "{CONTENT}" : WebAdmin->GetTemplate();
 		std::string FoundPlugin;
 
 		for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
@@ -238,7 +244,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 		
 
-		if( Split.size() > 1 )
+		if (bDontShowTemplate == false && Split.size() > 1)
 		{
 			Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
 		}
