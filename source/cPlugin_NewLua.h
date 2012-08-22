@@ -49,6 +49,8 @@ public:														//tolua_export
 	lua_State* GetLuaState() { return m_LuaState; }
 
 	cWebPlugin_Lua* CreateWebPlugin(lua_State* a_LuaState);	//tolua_export
+
+	cCriticalSection & GetCriticalSection() { return m_CriticalSection; }
 private:
 	bool PushFunction( const char* a_FunctionName, bool a_bLogError = true );
 	bool CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName ); // a_FunctionName is only used for error messages, nothing else

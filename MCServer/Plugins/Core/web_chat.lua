@@ -1,4 +1,5 @@
 local CHAT_HISTORY = 50
+local LastMessageID = 0
 
 local JavaScript = [[
 	<script type="text/javascript">
@@ -24,7 +25,7 @@ local JavaScript = [[
 			return request;
 		}
 		
-		function OpenPage( url, callback ) 
+		function OpenPage( url, postParams, callback ) 
 		{
 			var xhr = createXHR();
 			xhr.onreadystatechange=function()
@@ -34,24 +35,36 @@ local JavaScript = [[
 					callback( xhr )
 				} 
 			}; 
-			xhr.open("GET", url , true);
-			xhr.send(null); 
+			xhr.open( (postParams!=null)?"POST":"GET", url , true);
+			if( postParams != null )
+			{
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			}
+			xhr.send(postParams); 
 		}
 
-		function LoadPageInto( url, storage ) 
+		function LoadPageInto( url, postParams, storage ) 
 		{
-			OpenPage( url, function( xhr ) 
+			OpenPage( url, postParams, function( xhr ) 
 			{
 				var ScrollBottom = storage.scrollTop + storage.offsetHeight;
 				var bAutoScroll = (ScrollBottom >= storage.scrollHeight); // Detect whether we scrolled to the bottom of the div
 				
-				storage.innerHTML = xhr.responseText;
+				results = xhr.responseText.split("<<divider>>");
+				if( results[2] != LastMessageID ) return; // Check if this message was meant for us
 				
-				if( bAutoScroll == true )
+				LastMessageID = results[1];
+				if( results[0] != "" )
 				{
-					storage.scrollTop = storage.scrollHeight;
+					storage.innerHTML += results[0];
+					
+					if( bAutoScroll == true )
+					{
+						storage.scrollTop = storage.scrollHeight;
+					}
 				}
 			} );
+			
 			
 			return false;
 		}
@@ -61,7 +74,8 @@ local JavaScript = [[
 			var MessageContainer = document.getElementById('ChatMessage');
 			if( MessageContainer.value == "" ) return;
 			
-			OpenPage( "/~webadmin/Core/Chat/?ChatMessage=" + MessageContainer.value, function( xhr ) 
+			var postParams = "ChatMessage=" + MessageContainer.value;
+			OpenPage( "/~webadmin/Core/Chat/", postParams, function( xhr ) 
 			{
 				RefreshChat();
 			} );
@@ -70,11 +84,14 @@ local JavaScript = [[
 		
 		function RefreshChat() 
 		{
-			LoadPageInto('/~webadmin/Core/Chat/?JustChat=true', document.getElementById('ChatDiv'));
+			var postParams = "JustChat=true&LastMessageID=" + LastMessageID;
+			LoadPageInto("/~webadmin/Core/Chat/", postParams, document.getElementById('ChatDiv'));
 		}
 		
 		setInterval(RefreshChat, 1000);
 		window.onload = RefreshChat;
+		
+		var LastMessageID = 0;
 		
 	</script>
 ]]
@@ -82,7 +99,8 @@ local JavaScript = [[
 local ChatLogMessages = {}
 
 function AddMessage( PlayerName, Message )
-	table.insert( ChatLogMessages, { name = PlayerName, message = Message } )
+	LastMessageID = LastMessageID + 1
+	table.insert( ChatLogMessages, { name = PlayerName, message = Message, id = LastMessageID } )
 	while( #ChatLogMessages > CHAT_HISTORY ) do
 		table.remove( ChatLogMessages, 1 )
 	end
@@ -93,25 +111,29 @@ function OnChat( Player, Message )
 end
 		
 function HandleRequest_Chat( Request )
-	if( Request.Params["JustChat"] ~= nil ) then
+	if( Request.PostParams["JustChat"] ~= nil ) then
+		local LastIdx = 0
+		if( Request.PostParams["LastMessageID"] ~= nil ) then LastIdx = tonumber( Request.PostParams["LastMessageID"] ) end
 		local Content = ""
 		for key, value in pairs(ChatLogMessages) do 
-			Content = Content .. "[" .. value.name .. "]: " .. value.message .. "<br>"
+			if( value.id > LastIdx ) then
+				Content = Content .. "[" .. value.name .. "]: " .. value.message .. "<br>"
+			end
 		end
+		Content = Content .. "<<divider>>" .. LastMessageID .. "<<divider>>" .. LastIdx
 		return Content
 	end
 	
-	if( Request.Params["ChatMessage"] ~= nil ) then
-		LOG("Chat msg: " .. Request.Params["ChatMessage"] )
-		local Message = "[WebAdmin]: " .. Request.Params["ChatMessage"]
+	if( Request.PostParams["ChatMessage"] ~= nil ) then
+		local Message = "[WebAdmin]: " .. Request.PostParams["ChatMessage"]
 		cRoot:Get():GetServer():SendMessage( Message )
-		AddMessage("WebAdmin", Request.Params["ChatMessage"] )
+		AddMessage("WebAdmin", Request.PostParams["ChatMessage"] )
 		return ""
 	end
 
 	local Content = JavaScript
 	Content = Content .. [[
-	<div style="font-family: Courier; border: 1px solid #DDD; padding: 10px; width: 97%; height: 200px; overflow: scroll;" id="ChatDiv">Chat messageessss</div>
+	<div style="font-family: Courier; border: 1px solid #DDD; padding: 10px; width: 97%; height: 200px; overflow: scroll;" id="ChatDiv"></div>
 	<input type="text" id="ChatMessage" onKeyPress="if (event.keyCode == 13) { SendChatMessage(); }"><input type="submit" value="Submit" onClick="SendChatMessage();">
 	]]
 	return Content

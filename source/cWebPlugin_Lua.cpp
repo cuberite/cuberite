@@ -79,6 +79,7 @@ bool cWebPlugin_Lua::AddTab( const char* a_Title, lua_State * a_LuaState, int a_
 
 std::string cWebPlugin_Lua::HandleRequest( HTTPRequest* a_Request )
 {
+	cCSLock( m_Plugin->GetCriticalSection() );
 	lua_State* LuaState = m_Plugin->GetLuaState();
 	std::string RetVal = "";
 
