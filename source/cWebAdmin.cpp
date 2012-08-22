@@ -237,8 +237,11 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 			cPlayerAccum PlayerAccum;
 			cWorld * World = cRoot::Get()->GetDefaultWorld(); // TODO - Create a list of worlds and players
-			World->ForEachPlayer(PlayerAccum);
-			Content.append(PlayerAccum.m_Contents);
+			if( World != NULL )
+			{
+				World->ForEachPlayer(PlayerAccum);
+				Content.append(PlayerAccum.m_Contents);
+			}
 			Content += "</ul><br>";
 		}
 

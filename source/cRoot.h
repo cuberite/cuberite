@@ -102,8 +102,9 @@ private:
 	bool m_bStop;
 	bool m_bRestart;
 
-	struct sRootState;
-	sRootState* m_pState;
+	typedef std::map< AString, cWorld* > WorldMap;
+	cWorld*  m_pDefaultWorld;
+	WorldMap m_WorldsByName;
 
 	cThread* m_InputThread;
 	static void InputThread(void* a_Params);

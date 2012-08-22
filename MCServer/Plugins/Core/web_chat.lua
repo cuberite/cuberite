@@ -1,84 +1,91 @@
+local CHAT_HISTORY = 50
+
 local JavaScript = [[
-<script type="text/javascript">
-			function createXHR() 
-			{
-				var request = false;
-					try {
-						request = new ActiveXObject('Msxml2.XMLHTTP');
-					}
-					catch (err2) {
-						try {
-							request = new ActiveXObject('Microsoft.XMLHTTP');
-						}
-						catch (err3) {
+	<script type="text/javascript">
+		function createXHR() 
+		{
+			var request = false;
+			try {
+				request = new ActiveXObject('Msxml2.XMLHTTP');
+			}
+			catch (err2) {
+				try {
+					request = new ActiveXObject('Microsoft.XMLHTTP');
+				}
+				catch (err3) {
 					try {
 						request = new XMLHttpRequest();
 					}
-					catch (err1) 
-					{
+					catch (err1) {
 						request = false;
 					}
-						}
-					}
-				return request;
+				}
 			}
+			return request;
+		}
 		
-			function loadWholePage( url )
+		function OpenPage( url, callback ) 
+		{
+			var xhr = createXHR();
+			xhr.onreadystatechange=function()
+			{ 
+				if (xhr.readyState == 4)
+				{
+					callback( xhr )
+				} 
+			}; 
+			xhr.open("GET", url , true);
+			xhr.send(null); 
+		}
+
+		function LoadPageInto( url, storage ) 
+		{
+			OpenPage( url, function( xhr ) 
 			{
-				var storage = document.getElementById('ChatDiv');
-				var xhr = createXHR();
-				xhr.onreadystatechange=function()
-				{ 
-					if(xhr.readyState == 4)
-					{
-						//alert( xhr.status + " " + xhr.statusText );
-						//if(xhr.status == 200)
-						{
-							storage.innerHTML = xhr.responseText;//getBody(xhr.responseText);
-							storage.scrollTop = storage.scrollHeight;
-						}
-					} 
-				}; 
-				xhr.open("GET", url , true);
-				xhr.send(null); 
+				var ScrollBottom = storage.scrollTop + storage.offsetHeight;
+				var bAutoScroll = (ScrollBottom >= storage.scrollHeight); // Detect whether we scrolled to the bottom of the div
 				
-				return false;
-			}
-			
-			function SendChatMessage()
-			{
-				var MessageContainer = document.getElementById('ChatMessage');
-				if( MessageContainer.value == "" ) return;
+				storage.innerHTML = xhr.responseText;
 				
-				var xhr = createXHR();
-				xhr.onreadystatechange=function()
-				{ 
-					if(xhr.readyState == 4)
-					{
-						//alert( xhr.status + " " + xhr.statusText );
-						RefreshChat();
-					} 
-				}; 
-				xhr.open("GET", "/~webadmin/Core/Chat/?ChatMessage=" + MessageContainer.value, true);
-				xhr.send(null); 
-				MessageContainer.value = "";
-			}
+				if( bAutoScroll == true )
+				{
+					storage.scrollTop = storage.scrollHeight;
+				}
+			} );
 			
-			function RefreshChat()
+			return false;
+		}
+		
+		function SendChatMessage() 
+		{
+			var MessageContainer = document.getElementById('ChatMessage');
+			if( MessageContainer.value == "" ) return;
+			
+			OpenPage( "/~webadmin/Core/Chat/?ChatMessage=" + MessageContainer.value, function( xhr ) 
 			{
-				loadWholePage('/~webadmin/Core/Chat/?JustChat=true');
-			}
-			
-			setInterval(RefreshChat, 1000);
-			window.onload = RefreshChat;
-			
-		</script>
+				RefreshChat();
+			} );
+			MessageContainer.value = "";
+		}
+		
+		function RefreshChat() 
+		{
+			LoadPageInto('/~webadmin/Core/Chat/?JustChat=true', document.getElementById('ChatDiv'));
+		}
+		
+		setInterval(RefreshChat, 1000);
+		window.onload = RefreshChat;
+		
+	</script>
 ]]
 
 local ChatLogMessages = {}
 
 function AddMessage( PlayerName, Message )
 	table.insert( ChatLogMessages, { name = PlayerName, message = Message } )
+	while( #ChatLogMessages > CHAT_HISTORY ) do
+		table.remove( ChatLogMessages, 1 )
+	end
 end
 
 function OnChat( Player, Message )
@@ -95,6 +102,7 @@ function HandleRequest_Chat( Request )
 	end
 	
 	if( Request.Params["ChatMessage"] ~= nil ) then
+		LOG("Chat msg: " .. Request.Params["ChatMessage"] )
 		local Message = "[WebAdmin]: " .. Request.Params["ChatMessage"]
 		cRoot:Get():GetServer():SendMessage( Message )
 		AddMessage("WebAdmin", Request.Params["ChatMessage"] )

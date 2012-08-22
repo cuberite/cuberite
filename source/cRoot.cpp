@@ -33,30 +33,23 @@
 
 cRoot* cRoot::s_Root = 0;
 
-typedef std::map< AString, cWorld* > WorldMap;
-struct cRoot::sRootState
-{
-	cWorld* pDefaultWorld;
-	WorldMap WorldsByName;
-};
-
 
 
 
 
 cRoot::cRoot()
-	: m_Server( 0 )
-	, m_MonsterConfig( 0 )
-	, m_GroupManager( 0 )
+	: m_Server( NULL )
+	, m_MonsterConfig( NULL )
+	, m_GroupManager( NULL )
 	, m_CraftingRecipes(NULL)
-	, m_FurnaceRecipe( 0 )
-	, m_WebAdmin( 0 )
-	, m_PluginManager( 0 )
-	, m_Log( 0 )
+	, m_FurnaceRecipe( NULL )
+	, m_WebAdmin( NULL )
+	, m_PluginManager( NULL )
+	, m_Log( NULL )
 	, m_bStop( false )
 	, m_bRestart( false )
-	, m_InputThread( 0 )
-	, m_pState( new sRootState )
+	, m_InputThread( NULL )
+	, m_pDefaultWorld( NULL )
 {
 	s_Root = this;
 }
@@ -68,7 +61,6 @@ cRoot::cRoot()
 cRoot::~cRoot()
 {
 	s_Root = 0;
-	delete m_pState;
 }
 
 
@@ -232,8 +224,8 @@ void cRoot::LoadWorlds(void)
 
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pState->pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
-	m_pState->WorldsByName[ DefaultWorldName ] = m_pState->pDefaultWorld;
+	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
+	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
 	unsigned int KeyNum = IniFile.FindKey("Worlds");
@@ -256,7 +248,7 @@ void cRoot::LoadWorlds(void)
 			continue;
 		}
 		cWorld* NewWorld = new cWorld( WorldName.c_str() );
-		m_pState->WorldsByName[ WorldName ] = NewWorld;
+		m_WorldsByName[ WorldName ] = NewWorld;
 	}  // for i - Worlds
 }
 
@@ -266,7 +258,7 @@ void cRoot::LoadWorlds(void)
 
 void cRoot::StartWorlds(void)
 {
-	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		itr->second->InitializeSpawn();
 	}
@@ -278,7 +270,7 @@ void cRoot::StartWorlds(void)
 
 void cRoot::StopWorlds(void)
 {
-	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		itr->second->StopThreads();
 	}
@@ -290,11 +282,12 @@ void cRoot::StopWorlds(void)
 
 void cRoot::UnloadWorlds(void)
 {
-	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	m_pDefaultWorld = NULL;
+	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		delete itr->second;
 	}
-	m_pState->WorldsByName.clear();
+	m_WorldsByName.clear();
 }
 
 
@@ -303,7 +296,7 @@ void cRoot::UnloadWorlds(void)
 
 cWorld* cRoot::GetDefaultWorld()
 {
-	return m_pState->pDefaultWorld;
+	return m_pDefaultWorld;
 }
 
 
@@ -312,8 +305,8 @@ cWorld* cRoot::GetDefaultWorld()
 
 cWorld* cRoot::GetWorld( const AString & a_WorldName )
 {
-	WorldMap::iterator itr = m_pState->WorldsByName.find( a_WorldName );
-	if( itr != m_pState->WorldsByName.end() )
+	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName );
+	if( itr != m_WorldsByName.end() )
 		return itr->second;
 	return 0;
 }
@@ -324,7 +317,7 @@ cWorld* cRoot::GetWorld( const AString & a_WorldName )
 
 bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(), itr2 = itr; itr != m_pState->WorldsByName.end(); itr = itr2)
+	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
 		if (a_Callback.Item(itr->second))
@@ -341,7 +334,7 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 
 void cRoot::TickWorlds( float a_Dt )
 {
-	for( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		itr->second->Tick( a_Dt );
 	}
@@ -390,7 +383,7 @@ void cRoot::AuthenticateUser(int a_ClientID)
 int cRoot::GetTotalChunkCount(void)
 {
 	int res = 0;
-	for ( WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr )
+	for ( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		res += itr->second->GetNumChunks();
 	}
@@ -403,7 +396,7 @@ int cRoot::GetTotalChunkCount(void)
 
 void cRoot::SaveAllChunks(void)
 {
-	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(); itr != m_pState->WorldsByName.end(); ++itr)
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		itr->second->SaveAllChunks();
 	}
@@ -415,7 +408,7 @@ void cRoot::SaveAllChunks(void)
 
 bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(), itr2 = itr; itr != m_pState->WorldsByName.end(); itr = itr2)
+	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
 		if (!itr->second->ForEachPlayer(a_Callback))
@@ -437,7 +430,7 @@ void cRoot::LogChunkStats(void)
 	int SumNumInLighting = 0;
 	int SumNumInGenerator = 0;
 	int SumMem = 0;
-	for (WorldMap::iterator itr = m_pState->WorldsByName.begin(), end = m_pState->WorldsByName.end(); itr != end; ++itr)
+	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
 	{
 		cWorld * World = itr->second;
 		int NumInGenerator = World->GetGeneratorQueueLength();
