@@ -421,9 +421,6 @@
     <Filter Include="cPlugin\cPlugin_NewLua">
       <UniqueIdentifier>{fb282bd3-cf18-44b3-8ccc-9a5a89701a6d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="cWebAdmin\cWebPlugin\cWebPlugin">
-      <UniqueIdentifier>{31f2d7f9-9684-456b-9d70-011a10e894fd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Simulator\cSimulator\cRedstoneSimulator">
       <UniqueIdentifier>{4b3b7b43-8e8b-4823-b112-2259fdfff7d3}</UniqueIdentifier>
     </Filter>
@@ -858,9 +855,6 @@
     </ClCompile>
     <ClCompile Include="..\source\cPlugin_NewLua.cpp">
       <Filter>cPlugin\cPlugin_NewLua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\cWebPlugin_Lua.cpp">
-      <Filter>cWebAdmin\cWebPlugin\cWebPlugin</Filter>
     </ClCompile>
     <ClCompile Include="..\source\Globals.cpp" />
     <ClCompile Include="..\source\cFile.cpp" />
@@ -1402,9 +1396,6 @@
     </ClInclude>
     <ClInclude Include="..\source\cPlugin_NewLua.h">
       <Filter>cPlugin\cPlugin_NewLua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\cWebPlugin_Lua.h">
-      <Filter>cWebAdmin\cWebPlugin\cWebPlugin</Filter>
     </ClInclude>
     <ClInclude Include="..\source\Globals.h" />
     <ClInclude Include="..\source\cFile.h" />

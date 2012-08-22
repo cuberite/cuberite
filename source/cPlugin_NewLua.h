@@ -9,7 +9,6 @@
 
 
 typedef struct lua_State lua_State;
-class cWebPlugin_Lua;
 
 
 

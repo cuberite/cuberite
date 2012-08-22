@@ -238,12 +238,6 @@ void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_
 	OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 }
 
-
-int cBlockHandler::GetTickRate()
-{
-	return 10;
-}
-
 char cBlockHandler::GetDropCount()
 {
 	return 1;
