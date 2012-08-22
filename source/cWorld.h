@@ -150,6 +150,9 @@ public:
  	
  	/// Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found. Callback return ignored
  	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+
+	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
+	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
 	unsigned int GetNumPlayers();													//tolua_export
 	

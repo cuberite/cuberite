@@ -22,7 +22,7 @@ function Initialize( Plugin )
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_BLOCK_DIG)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLED)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE)
-	PluginManager:AddHook(Plugin, cPluginManager.E_PLUGIN_CHAT) -- used in web_chat.lua
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
 	
 	Plugin:AddCommand("/help",         " - [Page] Show this message",                 "core.help")
 	Plugin:AddCommand("/pluginlist",   " - Show list of plugins",                     "core.pluginlist")

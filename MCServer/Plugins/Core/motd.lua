@@ -5,6 +5,6 @@ end
 
 function ShowMOTDTo( Player )
 	Player:SendMessage( cChatColor.Gold .. "Welcome to the MCServer test server!" );
-	Player:SendMessage( cChatColor.Gold .. "http://mcserver.ae-c.net/" );
+	Player:SendMessage( cChatColor.Gold .. "http://www.mcserver.org/" );
 	Player:SendMessage( cChatColor.Gold .. "Type /help for all commands" );
 end

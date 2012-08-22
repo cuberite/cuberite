@@ -42,6 +42,9 @@ extern AString & StrToUpper(AString & s);
 /// Case-insensitive string comparison; returns 0 if the strings are the same
 extern int NoCaseCompare(const AString & s1, const AString & s2);
 
+/// Case-insensitive string comparison that returns a rating of equal-ness between [0 - s1.length()]
+extern unsigned int RateCompareString(const AString & s1, const AString & s2 );
+
 /// Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);
 

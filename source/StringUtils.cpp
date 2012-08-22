@@ -172,6 +172,33 @@ int NoCaseCompare(const AString & s1, const AString & s2)
 
 
 
+unsigned int RateCompareString(const AString & s1, const AString & s2 )
+{
+	unsigned int MatchedLetters = 0;
+	unsigned int s1Length = s1.length();
+
+	if( s1Length > s2.length() ) return 0; // Definitely not a match
+
+	for (unsigned int i = 0; i < s1Length; i++)
+	{
+		char c1 = (char)toupper( s1[i] );
+		char c2 = (char)toupper( s2[i] );
+		if( c1 == c2 )
+		{
+			++MatchedLetters;
+		}
+		else
+		{
+			break;
+		}
+	}
+	return MatchedLetters;
+}
+
+
+
+
+
 void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith)
 {
 	size_t pos1 = iHayStack.find(iNeedle);

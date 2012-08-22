@@ -4,12 +4,14 @@ function HandleRequest_PlayerList( Request )
 	
 	if( Request.Params["playerlist-kick"] ~= nil ) then
 		local KickPlayerName = Request.Params["playerlist-kick"]
-		local Player = World:GetPlayer( KickPlayerName )
-		if( Player == nil ) then
+		local FoundPlayerCallback = function( Player )
+			if( Player:GetName() == KickPlayerName ) then
+				Player:GetClientHandle():Kick("You were kicked from the game!")
+				Content = Content .. "<p>" .. KickPlayerName .. " has been kicked from the game!</p>"
+			end
+		end
+		if( World:DoWithPlayer( KickPlayerName, FoundPlayerCallback ) == false ) then
 			Content = Content .. "<p>Could not find player " .. KickPlayerName .. " !</p>"
-		elseif( Player:GetName() == KickPlayerName ) then
-			Player:GetClientHandle():Kick("You were kicked from the game!")
-			Content = Content .. "<p>" .. KickPlayerName .. " has been kicked from the game!</p>"
 		end
 	end
 	
@@ -25,7 +27,7 @@ function HandleRequest_PlayerList( Request )
 		Content = Content .. "<td><a href='?playerlist-kick=" .. Player:GetName() .. "'>Kick</a></td>"
 		Content = Content .. "</tr>"
 	end
-	World:ForEachPlayer( AddPlayerToTable )
+	cRoot:Get():ForEachPlayer( AddPlayerToTable )
 
 	if( PlayerNum == 0 ) then
 		Content = Content .. "<tr><td>None</td></tr>"

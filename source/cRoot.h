@@ -70,7 +70,10 @@ public:
 	void SaveAllChunks(void);
 	
 	/// Calls the callback for each player in all worlds
-	bool ForEachPlayer(cPlayerListCallback & a_Callback);
+	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+
+	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
+	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
 private:
 	void LoadGlobalSettings();

@@ -14,6 +14,7 @@
 #include "cThread.h"
 #include "cFileFormatUpdater.h"
 #include "cRedstone.h"
+#include "cPlayer.h"
 #include "blocks/Block.h"
 #include "items/Item.h"
 #include "cChunk.h"
@@ -417,6 +418,58 @@ bool cRoot::ForEachPlayer(cPlayerListCallback & a_Callback)
 		}
 	}
 	return true;
+}
+
+
+
+
+
+bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
+{
+	class cCallback : public cPlayerListCallback
+	{
+		unsigned int BestRating;
+		unsigned int NameLength;
+		const AString PlayerName;
+
+		cPlayerListCallback & m_Callback;
+		virtual bool Item (cPlayer * a_pPlayer)
+		{
+			unsigned int Rating = RateCompareString (PlayerName, a_pPlayer->GetName());
+			if (Rating > 0 && Rating >= BestRating)
+			{
+				BestMatch = a_pPlayer;
+				if( Rating > BestRating ) NumMatches = 0;
+				BestRating = Rating;
+				++NumMatches;
+			}
+			if (Rating == NameLength) // Perfect match
+			{
+				return false;
+			}
+			return true;
+		}
+
+	public:
+		cCallback (const AString & a_PlayerName, cPlayerListCallback & a_Callback) 
+			: m_Callback( a_Callback )
+			, BestMatch( NULL )
+			, BestRating( 0 )
+			, NumMatches( 0 )
+			, NameLength( a_PlayerName.length() )
+			, PlayerName( a_PlayerName )
+		{}
+
+		cPlayer * BestMatch;
+		unsigned int NumMatches;
+	} Callback (a_PlayerName, a_Callback);
+	ForEachPlayer( Callback );
+
+	if (Callback.NumMatches == 1)
+	{
+		return a_Callback.Item (Callback.BestMatch);
+	}
+	return false;
 }
 
 

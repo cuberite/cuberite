@@ -108,87 +108,89 @@ static int tolua_LOGERROR(lua_State* tolua_S)
 
 
 
-static int tolua_cWorld_DoWithPlayer(lua_State * tolua_S)
-{
-	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if ((NumArgs != 2) && (NumArgs != 3))
-	{
-		LOGWARN("Error in function call 'cWorld:DoWithPlayer()': Requires 2 or 3 arguments, got %i", NumArgs );
-		return 0;
-	}
-	
-	cWorld * self = (cWorld *)  tolua_tousertype(tolua_S, 1, 0);
-
-	const char * PlayerName = tolua_tocppstring(tolua_S, 2, "");
-	if ((PlayerName == NULL) || (PlayerName[0] == 0))
-	{
-		LOGWARN("Error in function call 'cWorld:DoWithPlayer()': Expected a non-empty string for parameter #1");
-		return 0;
-	}
-	if (!lua_isfunction( tolua_S, 3))
-	{
-		LOGWARN("Error in function call 'cWorld:DoWithPlayer()': Expected a function for parameter #2");
-		return 0;
-	}
-	
-	/* luaL_ref gets reference to value on top of the stack, the table is the last argument and therefore on the top */
-	int TableRef = LUA_REFNIL;
-	if (NumArgs == 3)
-	{
-		TableRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		if (TableRef == LUA_REFNIL)
-		{
-			LOGWARN("Error in function call 'cWorld:DoWithPlayer()': Could not get value reference of parameter #3");
-			return 0;
-		}
-	}
-	
-	/* table value is popped, and now function is on top of the stack */
-	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FuncRef == LUA_REFNIL)
-	{
-		LOGWARN("Error in function call 'cWorld:DoWithPlayer()': Could not get function reference of parameter #2");
-		return 0;
-	}
-	
-	class cLuaCallback : public cItemCallback<cPlayer>
-	{
-	public:
-		cLuaCallback(lua_State* a_LuaState, int a_FuncRef, int a_TableRef)
-			: LuaState( a_LuaState )
-			, FuncRef( a_FuncRef )
-			, TableRef( a_TableRef )
-		{}
-		
-	private:
-		virtual bool Item(cPlayer * a_Item) override
-		{
-			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
-			tolua_pushusertype(LuaState, a_Item, "cPlayer");
-			if (TableRef != LUA_REFNIL)
-			{
-				lua_rawgeti( LuaState, LUA_REGISTRYINDEX, TableRef);  /* Push table reference */
-			}
-			
-			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			report_errors(LuaState, s);
-			return true;
-		}
-		lua_State * LuaState;
-		int FuncRef;
-		int TableRef;
-	} Callback(tolua_S, FuncRef, TableRef);
-	
-	bool bRetVal = self->DoWithPlayer(PlayerName, Callback);
-	
-	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, TableRef);
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
-	
-	/* Push return value on stack */
-	tolua_pushboolean(tolua_S, bRetVal );
-	return 1;
+#define DEFINE_LUA_DOWITH(CONTAINER,ITEM,FOREACH,FNNAME) \
+static int FNNAME(lua_State * tolua_S) \
+{ \
+	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */ \
+	if ((NumArgs != 2) && (NumArgs != 3)) \
+	{ \
+		LOGWARN("Error in function call '" #FOREACH "': Requires 2 or 3 arguments, got %i", NumArgs ); \
+		return 0; \
+	} \
+	\
+	CONTAINER * self = (CONTAINER *)  tolua_tousertype(tolua_S, 1, 0); \
+	\
+	const char * ItemName = tolua_tocppstring(tolua_S, 2, ""); \
+	if ((ItemName == NULL) || (ItemName[0] == 0)) \
+	{ \
+		LOGWARN("Error in function call '" #FOREACH "': Expected a non-empty string for parameter #1"); \
+		return 0; \
+	} \
+	if (!lua_isfunction( tolua_S, 3)) \
+	{ \
+		LOGWARN("Error in function call '" #FOREACH "': Expected a function for parameter #2"); \
+		return 0; \
+	} \
+	\
+	/* luaL_ref gets reference to value on top of the stack, the table is the last argument and therefore on the top */ \
+	int TableRef = LUA_REFNIL; \
+	if (NumArgs == 3) \
+	{ \
+		TableRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX); \
+		if (TableRef == LUA_REFNIL) \
+		{ \
+			LOGWARN("Error in function call '" #FOREACH "': Could not get value reference of parameter #3"); \
+			return 0; \
+		} \
+	} \
+	\
+	/* table value is popped, and now function is on top of the stack */ \
+	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX); \
+	if (FuncRef == LUA_REFNIL) \
+	{ \
+		LOGWARN("Error in function call '" #FOREACH "': Could not get function reference of parameter #2"); \
+		return 0; \
+	} \
+	\
+	class cLuaCallback : public cItemCallback<ITEM> \
+	{ \
+	public: \
+		cLuaCallback(lua_State* a_LuaState, int a_FuncRef, int a_TableRef) \
+			: LuaState( a_LuaState ) \
+			, FuncRef( a_FuncRef ) \
+			, TableRef( a_TableRef ) \
+		{} \
+	\
+	private: \
+		virtual bool Item(ITEM * a_Item) override \
+		{ \
+			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */ \
+			tolua_pushusertype(LuaState, a_Item, #ITEM); \
+			if (TableRef != LUA_REFNIL) \
+			{ \
+				lua_rawgeti( LuaState, LUA_REGISTRYINDEX, TableRef);  /* Push table reference */ \
+			} \
+			\
+			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0); \
+			report_errors(LuaState, s); \
+			return true; \
+		} \
+		lua_State * LuaState; \
+		int FuncRef; \
+		int TableRef; \
+	} Callback(tolua_S, FuncRef, TableRef); \
+	\
+	bool bRetVal = self->FOREACH(ItemName, Callback); \
+	\
+	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */ \
+	luaL_unref(tolua_S, LUA_REGISTRYINDEX, TableRef); \
+	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef); \
+	\
+	/* Push return value on stack */ \
+	tolua_pushboolean(tolua_S, bRetVal ); \
+	return 1; \
 }
+
 
 
 
@@ -378,10 +380,17 @@ static int FNNAME(lua_State * tolua_S) \
 
 
 
+
+// Define the DoWith enumerators: (they take a string and a callback class)
+DEFINE_LUA_DOWITH(cWorld, cPlayer, DoWithPlayer,        tolua_cWorld_DoWithPlayer);
+DEFINE_LUA_DOWITH(cWorld, cPlayer, FindAndDoWithPlayer, tolua_cWorld_FindAndDoWithPlayer);
+DEFINE_LUA_DOWITH(cRoot,  cPlayer, FindAndDoWithPlayer, tolua_cRoot_FindAndDoWithPlayer);
+
 // Define the ForEach enumerators:
 DEFINE_LUA_FOREACH(cWorld, cPlayer, ForEachPlayer, tolua_cWorld_ForEachPlayer);
-DEFINE_LUA_FOREACH(cRoot,  cWorld,  ForEachWorld,  tolua_cRoot_ForEachWorld);
 DEFINE_LUA_FOREACH(cWorld, cEntity, ForEachEntity, tolua_cWorld_ForEachEntity);
+DEFINE_LUA_FOREACH(cRoot,  cWorld,  ForEachWorld,  tolua_cRoot_ForEachWorld);
+DEFINE_LUA_FOREACH(cRoot,  cPlayer, ForEachPlayer, tolua_cRoot_ForEachPlayer);
 
 DEFINE_LUA_FOREACHINCHUNK(cWorld, cEntity,        ForEachEntityInChunk,  tolua_cWorld_ForEachEntityInChunk);
 DEFINE_LUA_FOREACHINCHUNK(cWorld, cChestEntity,   ForEachChestInChunk,   tolua_cWorld_ForEachChestInChunk);
@@ -694,6 +703,8 @@ void ManualBindings::Bind( lua_State* tolua_S )
 
 		tolua_beginmodule(tolua_S, "cRoot");
 			tolua_function(tolua_S, "ForEachWorld", tolua_cRoot_ForEachWorld);
+			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_cRoot_FindAndDoWithPlayer);
+			tolua_function(tolua_S, "ForEachPlayer", tolua_cRoot_ForEachPlayer);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
@@ -702,7 +713,8 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_function(tolua_S, "ForEachEntityInChunk",  tolua_cWorld_ForEachEntityInChunk);
 			tolua_function(tolua_S, "ForEachChestInChunk",   tolua_cWorld_ForEachChestInChunk);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_cWorld_ForEachFurnaceInChunk);
-			tolua_function(tolua_S, "DoWithPlayer", tolua_cWorld_DoWithPlayer);
+			tolua_function(tolua_S, "DoWithPlayer",          tolua_cWorld_DoWithPlayer);
+			tolua_function(tolua_S, "FindAndDoWithPlayer",   tolua_cWorld_FindAndDoWithPlayer);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");
