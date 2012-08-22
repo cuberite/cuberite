@@ -7,8 +7,8 @@
 #include "cRoot.h"
 #include "cWorld.h"
 #include "cPlugin.h"
+#include "cPlugin_NewLua.h"
 #include "cPluginManager.h"
-#include "cWebPlugin_Lua.h"
 #include "cLuaCommandBinder.h"
 #include "cPlayer.h"
 #include "cWebAdmin.h"
@@ -549,9 +549,9 @@ static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
 
 
 
-static int tolua_cWebPlugin_Lua_AddTab(lua_State* tolua_S)
+static int tolua_cPlugin_NewLua_AddWebTab(lua_State* tolua_S)
 {
-	cWebPlugin_Lua* self = (cWebPlugin_Lua*)  tolua_tousertype(tolua_S,1,0);
+	cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
 
 	tolua_Error tolua_err;
 	tolua_err.array = 0;
@@ -573,23 +573,33 @@ static int tolua_cWebPlugin_Lua_AddTab(lua_State* tolua_S)
 		{
 			tolua_err.type = "function";
 		}
-		tolua_error(tolua_S,"#ferror in function 'AddTab'.",&tolua_err);
+		tolua_error(tolua_S,"#ferror in function 'AddWebTab'.",&tolua_err);
 		return 0;
 	}
 
 	if( Reference != LUA_REFNIL )
 	{
-		if( !self->AddTab( Title.c_str(), tolua_S, Reference ) )
+		if( !self->AddWebTab( Title.c_str(), tolua_S, Reference ) )
 		{
 			luaL_unref( tolua_S, LUA_REGISTRYINDEX, Reference );
 		}
 	}
 	else
 	{
-		LOGERROR("ERROR: cWebPlugin_Lua:AddTab invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str() );
+		LOGERROR("ERROR: cPlugin_NewLua:AddWebTab invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str() );
 	}
 
 	return 0;
+}
+
+
+
+
+
+static int tolua_cPlugin_NewLua_AddTab(lua_State* tolua_S)
+{
+	LOGWARN("WARNING: Using deprecated function AddTab()! Use AddWebTab() instead.");
+	return tolua_cPlugin_NewLua_AddWebTab( tolua_S );
 }
 
 
@@ -709,8 +719,9 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_function(tolua_S, "GetResolvedPermissions", tolua_cPlayer_GetResolvedPermissions);
 		tolua_endmodule(tolua_S);
 		
-		tolua_beginmodule(tolua_S, "cWebPlugin_Lua");
-			tolua_function(tolua_S, "AddTab", tolua_cWebPlugin_Lua_AddTab);
+		tolua_beginmodule(tolua_S, "cPlugin_NewLua");
+			tolua_function(tolua_S, "AddWebTab", tolua_cPlugin_NewLua_AddWebTab);
+			tolua_function(tolua_S, "AddTab", tolua_cPlugin_NewLua_AddTab);
 		tolua_endmodule(tolua_S);
 
 		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);

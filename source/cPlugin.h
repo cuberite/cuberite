@@ -70,8 +70,8 @@ public:
 	virtual bool OnWeatherChanged  (cWorld * a_World);
 	
 	// Accessors
-	const char* GetName() const { return m_Name.c_str(); }
-	void SetName( const char* a_Name ) { m_Name = a_Name; }
+	const AString & GetName() const { return m_Name; }
+	virtual void SetName( const AString & a_Name ) { m_Name = a_Name; }
 
 	int GetVersion() const { return m_Version; }
 	void SetVersion( int a_Version ) { m_Version = a_Version; }

@@ -80,13 +80,13 @@ cWebAdmin::~cWebAdmin()
 	delete m_Event;
 }
 
-void cWebAdmin::AddPlugin( cWebPlugin* a_Plugin )
+void cWebAdmin::AddPlugin( cWebPlugin * a_Plugin )
 {
 	m_Plugins.remove( a_Plugin );
 	m_Plugins.push_back( a_Plugin );
 }
 
-void cWebAdmin::RemovePlugin( cWebPlugin* a_Plugin )
+void cWebAdmin::RemovePlugin( cWebPlugin * a_Plugin )
 {
 	m_Plugins.remove( a_Plugin );
 }
@@ -161,18 +161,10 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 		for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
 		{
 			cWebPlugin* WebPlugin = *itr;
-			cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
-			if( LuaPlugin )
+			std::list< std::pair<std::string, std::string> > NameList = WebPlugin->GetTabNames();
+			for( std::list< std::pair<std::string, std::string> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
 			{
-				std::list< std::pair<std::string, std::string> > NameList = LuaPlugin->GetTabNames();
-				for( std::list< std::pair<std::string, std::string> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
-				{
-					Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
-				}
-			}
-			else
-			{
-				Menu += "<li><a href='" + BaseURL + WebPlugin->GetName() + "'>" + WebPlugin->GetName() + "</a></li>";
+				Menu += "<li><a href='" + BaseURL + WebPlugin->GetName().c_str() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
 			}
 		}
 
@@ -201,7 +193,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 			{
 				if( (*itr)->GetName() == Split[1] )
 				{
-					Content = (*itr)->HandleRequest( &Request );
+					Content = (*itr)->HandleWebRequest( &Request );
 					cWebPlugin* WebPlugin = *itr;
 					FoundPlugin = WebPlugin->GetName();
 					cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
@@ -229,7 +221,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
 				{
 					AString VersionNum;
-					AppendPrintf(Content, "<li>%s V.%i</li>", (*itr)->GetName(), (*itr)->GetVersion());
+					AppendPrintf(Content, "<li>%s V.%i</li>", (*itr)->GetName().c_str(), (*itr)->GetVersion());
 				}
 			}
 			Content += "</ul>";
@@ -371,22 +363,4 @@ std::string cWebAdmin::GetTemplate()
 	f.ReadRestOfFile(retVal);
 
 	return retVal;
-}
-
-
-
-
-
-void cWebAdmin::RemovePlugin( lua_State* L )
-{
-	for( PluginList::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); )
-	{
-		if( (*itr)->GetLuaState() == L )
-		{
-			PluginList::iterator prev = itr++;
-			delete *prev; // deleting a dereferenced iterator also takes it out of the list, so no need for erase()
-		}
-		else
-			++itr;
-	}
 }

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "cPlugin.h"
+#include "cWebPlugin.h"
 
 
 
@@ -14,7 +15,7 @@ class cWebPlugin_Lua;
 
 
 
-class cPlugin_NewLua : public cPlugin						//tolua_export
+class cPlugin_NewLua : public cPlugin, public cWebPlugin	//tolua_export
 {															//tolua_export
 public:														//tolua_export
 	cPlugin_NewLua( const char* a_PluginName );
@@ -46,17 +47,21 @@ public:														//tolua_export
 	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4) override;
 	virtual bool OnWeatherChanged  (cWorld * a_World) override;
 
+	virtual void SetName( const AString & a_Name ) override { cPlugin::SetName(a_Name); cWebPlugin::SetName(a_Name); }
+
+	// cWebPlugin and WebAdmin stuff
+	virtual AString HandleWebRequest( HTTPRequest * a_Request ) override;
+	bool AddWebTab( const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference );	// >> EXPORTED IN MANUALBINDINGS <<
+	OBSOLETE bool AddTab( const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference ); // >> EXPORTED IN MANUALBINDINGS <<
+
 	lua_State* GetLuaState() { return m_LuaState; }
 
-	cWebPlugin_Lua* CreateWebPlugin(lua_State* a_LuaState);	//tolua_export
+	OBSOLETE cPlugin_NewLua * CreateWebPlugin(lua_State* a_LuaState);	//tolua_export
 
 	cCriticalSection & GetCriticalSection() { return m_CriticalSection; }
 private:
 	bool PushFunction( const char* a_FunctionName, bool a_bLogError = true );
 	bool CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName ); // a_FunctionName is only used for error messages, nothing else
-
-	typedef std::list< cWebPlugin_Lua* > WebPluginList;
-	WebPluginList m_WebPlugins;
 
 	cCriticalSection m_CriticalSection;
 

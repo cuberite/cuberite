@@ -1913,14 +1913,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWebPlugin_Lua.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cWebPlugin_Lua.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\LuaFunctions.h"
 					>
 				</File>

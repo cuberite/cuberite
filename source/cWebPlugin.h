@@ -7,18 +7,32 @@ struct HTTPRequest;
 class cWebPlugin
 {
 public:
-	cWebPlugin( lua_State* L );
+	cWebPlugin();
 	virtual ~cWebPlugin();
 	
 	void SetName( std::string a_Name ) { m_Name = a_Name; }
 	std::string GetName() { return m_Name; }
 
-	virtual std::string HandleRequest( HTTPRequest* a_Request ) = 0;
-	virtual void Initialize() = 0;
+	virtual std::string HandleWebRequest( HTTPRequest* a_Request ) = 0;
+
+	static AString SafeString( const AString & a_String );
 	//tolua_end
 
-	lua_State* GetLuaState() { return m_LuaState; }
+	struct sWebPluginTab
+	{
+		std::string Title;
+		std::string SafeTitle;
+
+		int UserData;
+	};
+
+	typedef std::list< sWebPluginTab* > TabList;
+	TabList & GetTabs() { return m_Tabs; }
+
+	std::list< std::pair<std::string, std::string> > GetTabNames();
+	std::pair< std::string, std::string > GetTabNameForRequest( HTTPRequest* a_Request );
+
 private:
-	lua_State* m_LuaState;
+	TabList m_Tabs;
 	std::string m_Name;
 }; //tolua_export

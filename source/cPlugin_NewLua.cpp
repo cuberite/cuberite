@@ -4,7 +4,6 @@
 #define LUA_USE_POSIX
 #include "cPlugin_NewLua.h"
 #include "cMCLogger.h"
-#include "cWebPlugin_Lua.h"
 #include "LuaItems.h"
 
 extern "C"
@@ -34,6 +33,7 @@ extern bool report_errors(lua_State* lua, int status);
 
 cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
 	: m_LuaState( 0 )
+	, cWebPlugin()
 {
 	m_Directory = a_PluginName;
 }
@@ -45,11 +45,6 @@ cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
 cPlugin_NewLua::~cPlugin_NewLua()
 {
 	cCSLock Lock( m_CriticalSection );
-	for( WebPluginList::iterator itr = m_WebPlugins.begin(); itr != m_WebPlugins.end(); ++itr )
-	{
-		delete *itr;
-	}
-	m_WebPlugins.clear();
 
 	if( m_LuaState )
 	{
@@ -638,20 +633,95 @@ bool cPlugin_NewLua::OnUpdatedSign(
 
 
 
-cWebPlugin_Lua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
+cPlugin_NewLua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
+{
+	LOGWARN("WARNING: Using deprecated function CreateWebPlugin()! A Lua plugin is a WebPlugin by itself now.");
+	return this;
+}
+
+
+
+
+
+AString cPlugin_NewLua::HandleWebRequest( HTTPRequest * a_Request )
+{
+	cCSLock Lock( m_CriticalSection );
+	std::string RetVal = "";
+
+	std::pair< std::string, std::string > TabName = GetTabNameForRequest(a_Request);
+	std::string SafeTabName = TabName.second;
+	if( SafeTabName.empty() )
+		return "";
+
+	sWebPluginTab* Tab = 0;
+	for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
+	{
+		if( (*itr)->SafeTitle.compare( SafeTabName ) == 0 ) // This is the one! Rawr
+		{
+			Tab = *itr;
+			break;
+		}
+	}
+
+	if( Tab )
+	{
+		//LOGINFO("1. Stack size: %i", lua_gettop(m_LuaState) );
+		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, Tab->UserData); // same as lua_getref()
+
+		//LOGINFO("2. Stack size: %i", lua_gettop(m_LuaState) );
+		// Push HTTPRequest
+		tolua_pushusertype( m_LuaState, a_Request, "HTTPRequest" );
+		//LOGINFO("Calling bound function! :D");
+		int s = lua_pcall( m_LuaState, 1, 1, 0);
+
+		if ( s != 0 )
+		{
+			std::string err = lua_tostring(m_LuaState, -1);
+			LOGERROR("-- %s", err.c_str() );
+			lua_pop(m_LuaState, 1);
+			LOGINFO("error. Stack size: %i", lua_gettop(m_LuaState) );
+			return err;	// Show the error message in the web page, looks cool
+		}
+
+		if( !lua_isstring( m_LuaState, -1 ) )
+		{
+			LOGWARN("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str() );
+			lua_pop(m_LuaState, 1); // Pop return value
+			return std::string("WARNING: WebPlugin tab '") + Tab->Title + std::string("' did not return a string!");
+		}
+
+		RetVal += tolua_tostring(m_LuaState, -1, 0);
+		lua_pop(m_LuaState, 1); // Pop return value
+		//LOGINFO("ok. Stack size: %i", lua_gettop(m_LuaState) );
+	}
+
+	return RetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::AddWebTab( const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference )
 {
 	cCSLock Lock( m_CriticalSection );
 	if( a_LuaState != m_LuaState )
 	{
-		LOGERROR("Not allowed to create a WebPlugin from another plugin but your own!");
-		return 0;
+		LOGERROR("Only allowed to add a tab to a WebPlugin of your own Plugin!");
+		return false;
 	}
-	cWebPlugin_Lua* WebPlugin = new cWebPlugin_Lua( this );
+	sWebPluginTab* Tab = new sWebPluginTab();
+	Tab->Title = a_Title;
+	Tab->SafeTitle = SafeString( a_Title );
 
-	m_WebPlugins.push_back( WebPlugin );
+	Tab->UserData = a_FunctionReference;
 
-	return WebPlugin;
+	GetTabs().push_back( Tab );
+	return true;
 }
+
+
+
 
 
 // Helper functions

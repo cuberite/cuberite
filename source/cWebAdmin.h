@@ -43,8 +43,6 @@ public:
 	PluginList GetPlugins() { return m_Plugins; }
 
 	static void Request_Handler(webserver::http_request* r);
-
-	void RemovePlugin( lua_State* L );
 private:
 
 #ifdef _WIN32

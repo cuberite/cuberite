@@ -83,7 +83,7 @@ public:																	//tolua_export
 	static cPluginManager * GetPluginManager();							//tolua_export
 
 	typedef std::list< cPlugin * > PluginList;
-	cPlugin* GetPlugin( const char* a_Plugin ) const;					//tolua_export
+	cPlugin * GetPlugin( const AString & a_Plugin ) const;					//tolua_export
 	const PluginList & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
 
 	void ReloadPlugins();												//tolua_export

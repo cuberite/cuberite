@@ -623,11 +623,11 @@ bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_B
 
 
 
-cPlugin* cPluginManager::GetPlugin( const char* a_Plugin ) const
+cPlugin* cPluginManager::GetPlugin( const AString & a_Plugin ) const
 {
 	for( PluginList::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
 	{
-		if (strcmp((*itr)->GetName(), a_Plugin) == 0 )
+		if ((*itr)->GetName().compare(a_Plugin) == 0)
 		{
 			return *itr;
 		}
@@ -657,8 +657,6 @@ void cPluginManager::UnloadPluginsNow()
 		cPlugin_Lua* LuaPlugin = *m_LuaPlugins.begin();
 		if( LuaPlugin )
 		{
-			cWebAdmin* WebAdmin = cRoot::Get()->GetWebAdmin();
-			if( WebAdmin ) WebAdmin->RemovePlugin( LuaPlugin->GetLuaState() );
 			delete LuaPlugin;
 		}
 		m_LuaPlugins.remove( LuaPlugin );

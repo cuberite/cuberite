@@ -135,14 +135,12 @@ function Initialize( Plugin )
 		end
 	end
 	
-	local WebPlugin = Plugin:CreateWebPlugin()
-	WebPlugin:SetName( Plugin:GetName() )
-	WebPlugin:AddTab( "Server Settings", HandleRequest_ServerSettings )
-	WebPlugin:AddTab( "Chat", HandleRequest_Chat )
-	WebPlugin:AddTab( "Playerlist", HandleRequest_PlayerList )
-	WebPlugin:AddTab( "Whitelist", HandleRequest_WhiteList )
-	WebPlugin:AddTab( "Permissions", HandleRequest_Permissions )
-	WebPlugin:AddTab( "Manage Plugins", HandleRequest_ManagePlugins )
+	Plugin:AddWebTab( "Server Settings", HandleRequest_ServerSettings )
+	Plugin:AddWebTab( "Chat", HandleRequest_Chat )
+	Plugin:AddWebTab( "Playerlist", HandleRequest_PlayerList )
+	Plugin:AddWebTab( "Whitelist", HandleRequest_WhiteList )
+	Plugin:AddWebTab( "Permissions", HandleRequest_Permissions )
+	Plugin:AddWebTab( "Manage Plugins", HandleRequest_ManagePlugins )
 	
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
