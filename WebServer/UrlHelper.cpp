@@ -111,6 +111,10 @@ void SplitGetReq(std::string get_req, std::string& path, std::map<std::string, s
         val.replace(pos_plus, 1, " ");
       }
 
+	  while ( (pos_plus = val.find("%20")) != std::string::npos ) {
+		  val.replace(pos_plus, 3, " ");
+	  }
+
       // Replacing %xy notation
       std::string::size_type pos_hex = 0;
       while ( (pos_hex = val.find("%", pos_hex)) != std::string::npos ) {
