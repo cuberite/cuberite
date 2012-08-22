@@ -38,12 +38,12 @@ cWebPlugin::~cWebPlugin()
 
 
 
-std::list< std::pair<std::string, std::string> > cWebPlugin::GetTabNames()
+std::list< std::pair<AString, AString> > cWebPlugin::GetTabNames()
 {
-	std::list< std::pair< std::string, std::string > > NameList;
+	std::list< std::pair< AString, AString > > NameList;
 	for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
 	{
-		std::pair< std::string, std::string > StringPair;
+		std::pair< AString, AString > StringPair;
 		StringPair.first = (*itr)->Title;
 		StringPair.second = (*itr)->SafeTitle;
 		NameList.push_back( StringPair );
@@ -55,9 +55,9 @@ std::list< std::pair<std::string, std::string> > cWebPlugin::GetTabNames()
 
 
 
-std::pair< std::string, std::string > cWebPlugin::GetTabNameForRequest( HTTPRequest* a_Request )
+std::pair< AString, AString > cWebPlugin::GetTabNameForRequest( HTTPRequest* a_Request )
 {
-	std::pair< std::string, std::string > Names;
+	std::pair< AString, AString > Names;
 	AStringVector Split = StringSplit(a_Request->Path, "/");
 
 	if( Split.size() > 1 )
@@ -95,7 +95,7 @@ std::pair< std::string, std::string > cWebPlugin::GetTabNameForRequest( HTTPRequ
 
 AString cWebPlugin::SafeString( const AString & a_String )
 {
-	std::string RetVal;
+	AString RetVal;
 	for( unsigned int i = 0; i < a_String.size(); ++i )
 	{
 		char c = a_String[i];

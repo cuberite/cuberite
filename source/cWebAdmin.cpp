@@ -195,14 +195,11 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 					Content = (*itr)->HandleWebRequest( &Request );
 					cWebPlugin* WebPlugin = *itr;
 					FoundPlugin = WebPlugin->GetName();
-					/*
-					TODO: Is this needed anymore?
-					cWebPlugin_Lua* LuaPlugin = dynamic_cast< cWebPlugin_Lua* >( WebPlugin );
-					if( LuaPlugin )
+					AString TabName = WebPlugin->GetTabNameForRequest( &Request ).first;
+					if( TabName.empty() == false )
 					{
-						FoundPlugin += " - " + LuaPlugin->GetTabNameForRequest( &Request ).first;
+						FoundPlugin += " - " + TabName;
 					}
-					*/
 					break;
 				}
 			}
