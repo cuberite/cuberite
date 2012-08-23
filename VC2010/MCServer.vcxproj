@@ -656,6 +656,7 @@
     <ClInclude Include="..\source\items\ItemSeeds.h" />
     <ClInclude Include="..\source\items\ItemShears.h" />
     <ClInclude Include="..\source\items\ItemShovel.h" />
+    <ClInclude Include="..\source\items\ItemSign.h" />
     <ClInclude Include="..\source\items\ItemSlab.h" />
     <ClInclude Include="..\source\items\ItemSugarcane.h" />
     <ClInclude Include="..\source\items\ItemSword.h" />

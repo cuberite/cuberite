@@ -1648,6 +1648,9 @@
       <Filter>Generating</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ByteBuffer.h" />
+    <ClInclude Include="..\source\items\ItemSign.h">
+      <Filter>Items</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">
