@@ -46,18 +46,23 @@ public:														//tolua_export
 	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4) override;
 	virtual bool OnWeatherChanged  (cWorld * a_World) override;
 
-	virtual void SetName( const AString & a_Name ) override { cPlugin::SetName(a_Name); cWebPlugin::SetName(a_Name); }
+	const AString & GetDirectory(void) const {return m_Directory; }
+	
+	virtual void SetName( const AString & a_Name ) override { cPlugin::SetName(a_Name); }
+	
+	// cWebPlugin override
+	virtual const AString & GetName(void) const {return cPlugin::GetName(); }
 
 	// cWebPlugin and WebAdmin stuff
 	virtual AString HandleWebRequest( HTTPRequest * a_Request ) override;
 	bool AddWebTab( const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference );	// >> EXPORTED IN MANUALBINDINGS <<
-	OBSOLETE bool AddTab( const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference ); // >> EXPORTED IN MANUALBINDINGS <<
 
 	lua_State* GetLuaState() { return m_LuaState; }
 
-	OBSOLETE cPlugin_NewLua * CreateWebPlugin(lua_State* a_LuaState);	//tolua_export
+	OBSOLETE cPlugin_NewLua * CreateWebPlugin(lua_State * a_LuaState);	//tolua_export
 
 	cCriticalSection & GetCriticalSection() { return m_CriticalSection; }
+	
 private:
 	bool PushFunction( const char* a_FunctionName, bool a_bLogError = true );
 	bool CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName ); // a_FunctionName is only used for error messages, nothing else
@@ -65,5 +70,5 @@ private:
 	cCriticalSection m_CriticalSection;
 
 	std::string m_Directory;
-	lua_State* m_LuaState;
+	lua_State * m_LuaState;
 };//tolua_export

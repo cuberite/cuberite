@@ -3,17 +3,23 @@
 
 struct lua_State;
 struct HTTPRequest;
-//tolua_begin
+
+
+
+
+
+// tolua_begin
 class cWebPlugin
 {
 public:
+	// tolua_end
 	cWebPlugin();
 	virtual ~cWebPlugin();
-	
-	void SetName( std::string a_Name ) { m_Name = a_Name; }
-	AString GetName() { return m_Name; }
 
-	virtual AString HandleWebRequest( HTTPRequest* a_Request ) = 0;
+	virtual const AString & GetName(void) const = 0;
+	// tolua_begin
+	
+	virtual AString HandleWebRequest( HTTPRequest * a_Request ) = 0;
 
 	static AString SafeString( const AString & a_String );
 	//tolua_end
@@ -34,5 +40,8 @@ public:
 
 private:
 	TabList m_Tabs;
-	AString m_Name;
-}; //tolua_export
+};  // tolua_export
+
+
+
+

@@ -607,7 +607,10 @@ static int tolua_cPlugin_NewLua_AddWebTab(lua_State* tolua_S)
 
 static int tolua_cPlugin_NewLua_AddTab(lua_State* tolua_S)
 {
-	LOGWARN("WARNING: Using deprecated function AddTab()! Use AddWebTab() instead.");
+	cPlugin_NewLua * self = (cPlugin_NewLua *) tolua_tousertype(tolua_S, 1, 0);
+	LOGWARN("WARNING: Using deprecated function AddTab()! Use AddWebTab() instead. (plugin \"%s\" in folder \"%s\")",
+		self->GetName().c_str(), self->GetDirectory().c_str()
+	);
 	return tolua_cPlugin_NewLua_AddWebTab( tolua_S );
 }
 

@@ -633,9 +633,11 @@ bool cPlugin_NewLua::OnUpdatedSign(
 
 
 
-cPlugin_NewLua* cPlugin_NewLua::CreateWebPlugin(lua_State* a_LuaState)
+cPlugin_NewLua * cPlugin_NewLua::CreateWebPlugin(lua_State * a_LuaState)
 {
-	LOGWARN("WARNING: Using deprecated function CreateWebPlugin()! A Lua plugin is a WebPlugin by itself now.");
+	LOGWARN("WARNING: Using deprecated function CreateWebPlugin()! A Lua plugin is a WebPlugin by itself now. (plugin \"%s\" in folder \"%s\")",
+		cPlugin::GetName().c_str(), m_Directory.c_str()
+	);
 	return this;
 }
 

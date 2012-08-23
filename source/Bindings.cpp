@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/22/12 16:11:06.
+** Generated automatically by tolua++-1.0.92 on 08/23/12 22:41:28.
 */
 
 #ifndef __cplusplus
@@ -60,13 +60,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 /* function to release collected object via destructor */
 #ifdef __cplusplus
 
-static int tolua_collect_cMCLogger (lua_State* tolua_S)
-{
- cMCLogger* self = (cMCLogger*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
 static int tolua_collect_cItem (lua_State* tolua_S)
 {
  cItem* self = (cItem*) tolua_tousertype(tolua_S,1,0);
@@ -95,16 +88,16 @@ static int tolua_collect_cPickup (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cBlockArea (lua_State* tolua_S)
+static int tolua_collect_cTracer (lua_State* tolua_S)
 {
- cBlockArea* self = (cBlockArea*) tolua_tousertype(tolua_S,1,0);
+ cTracer* self = (cTracer*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
 
-static int tolua_collect_cTracer (lua_State* tolua_S)
+static int tolua_collect_cBlockArea (lua_State* tolua_S)
 {
- cTracer* self = (cTracer*) tolua_tousertype(tolua_S,1,0);
+ cBlockArea* self = (cBlockArea*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -130,9 +123,9 @@ static int tolua_collect_cCuboid (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cWebPlugin (lua_State* tolua_S)
+static int tolua_collect_cMCLogger (lua_State* tolua_S)
 {
- cWebPlugin* self = (cWebPlugin*) tolua_tousertype(tolua_S,1,0);
+ cMCLogger* self = (cMCLogger*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -13439,100 +13432,6 @@ static int tolua_set_HTTPRequest_Username(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: delete of class  cWebPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebPlugin_delete00
-static int tolua_AllToLua_cWebPlugin_delete00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWebPlugin* self = (cWebPlugin*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'", NULL);
-#endif
-  Mtolua_delete(self);
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SetName of class  cWebPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebPlugin_SetName00
-static int tolua_AllToLua_cWebPlugin_SetName00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWebPlugin* self = (cWebPlugin*)  tolua_tousertype(tolua_S,1,0);
-  std::string a_Name = ((std::string)  tolua_tocppstring(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetName'", NULL);
-#endif
-  {
-   self->SetName(a_Name);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetName'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetName of class  cWebPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWebPlugin_GetName00
-static int tolua_AllToLua_cWebPlugin_GetName00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWebPlugin* self = (cWebPlugin*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetName'", NULL);
-#endif
-  {
-   std::string tolua_ret = (std::string)  self->GetName();
-   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetName'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: HandleWebRequest of class  cWebPlugin */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWebPlugin_HandleWebRequest00
 static int tolua_AllToLua_cWebPlugin_HandleWebRequest00(lua_State* tolua_S)
@@ -13554,7 +13453,7 @@ static int tolua_AllToLua_cWebPlugin_HandleWebRequest00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'HandleWebRequest'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->HandleWebRequest(a_Request);
+   AString tolua_ret = (AString)  self->HandleWebRequest(a_Request);
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }
@@ -13600,11 +13499,11 @@ static int tolua_AllToLua_cWebPlugin_SafeString00(lua_State* tolua_S)
 
  class Lua__cWebPlugin : public cWebPlugin, public ToluaBase {
 public:
-	 std::string  HandleWebRequest( HTTPRequest* a_Request) {
+	 AString  HandleWebRequest( HTTPRequest* a_Request) {
 		if (push_method("HandleWebRequest",  tolua_AllToLua_cWebPlugin_HandleWebRequest00)) {
 			tolua_pushusertype(lua_state, (void*)a_Request, "HTTPRequest");
 			ToluaBase::dbcall(lua_state, 2, 1);
-			 std::string  tolua_ret = ( std::string )tolua_tocppstring(lua_state, -1, 0);
+			 AString  tolua_ret = ( AString )tolua_tocppstring(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
@@ -13614,11 +13513,10 @@ public:
 				LOG("pure-virtual method cWebPlugin::HandleWebRequest called with no lua_state. Aborting");
 				::abort();
 			};
-			return "";
+			return ( AString )0;
 		};
 	};
 
-	 Lua__cWebPlugin( void ): cWebPlugin(){};
 };
 
 /* method: tolua__set_instance of class  Lua__cWebPlugin */
@@ -13653,104 +13551,6 @@ static int tolua_AllToLua_Lua__cWebPlugin_tolua__set_instance00(lua_State* tolua
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  Lua__cWebPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cWebPlugin_new00
-static int tolua_AllToLua_Lua__cWebPlugin_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"Lua__cWebPlugin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   Lua__cWebPlugin* tolua_ret = (Lua__cWebPlugin*)  Mtolua_new((Lua__cWebPlugin)());
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cWebPlugin");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  Lua__cWebPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cWebPlugin_new00_local
-static int tolua_AllToLua_Lua__cWebPlugin_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"Lua__cWebPlugin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   Lua__cWebPlugin* tolua_ret = (Lua__cWebPlugin*)  Mtolua_new((Lua__cWebPlugin)());
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cWebPlugin");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: delete of class  Lua__cWebPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cWebPlugin_delete00
-static int tolua_AllToLua_Lua__cWebPlugin_delete00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cWebPlugin",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cWebPlugin* self = (Lua__cWebPlugin*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'", NULL);
-#endif
-  Mtolua_delete(self);
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-
-/* function to release collected object via destructor */
-#ifdef __cplusplus
-
-static int tolua_collect_Lua__cWebPlugin (lua_State* tolua_S)
-{
- Lua__cWebPlugin* self = (Lua__cWebPlugin*) tolua_tousertype(tolua_S,1,0);
-	delete self;
-	return 0;
-}
-#endif
 
 /* method: new of class  cPickup */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPickup_new00
@@ -21846,29 +21646,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
    tolua_variable(tolua_S,"Username",tolua_get_HTTPRequest_Username,tolua_set_HTTPRequest_Username);
   tolua_endmodule(tolua_S);
-  #ifdef __cplusplus
-  tolua_cclass(tolua_S,"cWebPlugin","cWebPlugin","",tolua_collect_cWebPlugin);
-  #else
   tolua_cclass(tolua_S,"cWebPlugin","cWebPlugin","",NULL);
-  #endif
   tolua_beginmodule(tolua_S,"cWebPlugin");
-   tolua_function(tolua_S,"delete",tolua_AllToLua_cWebPlugin_delete00);
-   tolua_function(tolua_S,"SetName",tolua_AllToLua_cWebPlugin_SetName00);
-   tolua_function(tolua_S,"GetName",tolua_AllToLua_cWebPlugin_GetName00);
    tolua_function(tolua_S,"HandleWebRequest",tolua_AllToLua_cWebPlugin_HandleWebRequest00);
    tolua_function(tolua_S,"SafeString",tolua_AllToLua_cWebPlugin_SafeString00);
   tolua_endmodule(tolua_S);
-  #ifdef __cplusplus
-  tolua_cclass(tolua_S,"Lua__cWebPlugin","Lua__cWebPlugin","cWebPlugin",tolua_collect_Lua__cWebPlugin);
-  #else
   tolua_cclass(tolua_S,"Lua__cWebPlugin","Lua__cWebPlugin","cWebPlugin",NULL);
-  #endif
   tolua_beginmodule(tolua_S,"Lua__cWebPlugin");
    tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cWebPlugin_tolua__set_instance00);
-   tolua_function(tolua_S,"new",tolua_AllToLua_Lua__cWebPlugin_new00);
-   tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cWebPlugin_new00_local);
-   tolua_function(tolua_S,".call",tolua_AllToLua_Lua__cWebPlugin_new00_local);
-   tolua_function(tolua_S,"delete",tolua_AllToLua_Lua__cWebPlugin_delete00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cPickup","cPickup","cEntity",tolua_collect_cPickup);
