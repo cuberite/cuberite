@@ -27,7 +27,6 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #include "cIsThread.h"
 #include "ChunkDef.h"
-#include "packets/cPacket.h"
 
 
 
@@ -116,9 +115,25 @@ protected:
 				(a_Other.m_Client == m_Client)
 			);
 		}
-	};
+	} ;
 	typedef std::list<sSendChunk> sSendChunkList;
 
+	struct sBlockCoord
+	{
+		int m_BlockX;
+		int m_BlockY;
+		int m_BlockZ;
+		
+		sBlockCoord(int a_BlockX, int a_BlockY, int a_BlockZ) :
+			m_BlockX(a_BlockX),
+			m_BlockY(a_BlockY),
+			m_BlockZ(a_BlockZ)
+		{
+		}
+	} ;
+
+	typedef std::vector<sBlockCoord> sBlockCoords;
+	
 	cWorld * m_World;
 	
 	cCriticalSection  m_CS;
@@ -133,7 +148,8 @@ protected:
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
-	PacketList m_Packets;  // Accumulator for the entity-packets to send
+	sBlockCoords  m_BlockEntities;  // Coords of the block entities to send
+	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
 	
 	// cIsThread override:
 	virtual void Execute(void) override;

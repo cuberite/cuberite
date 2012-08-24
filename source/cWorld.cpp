@@ -723,9 +723,9 @@ void cWorld::TickSpawnMobs(float a_Dt)
 
 	if( Monster )
 	{
-		Monster->Initialize( this );
-		Monster->TeleportTo( SpawnPos.x, (double)(Height) + 2, SpawnPos.z );
-		Monster->SpawnOn(0);
+		Monster->Initialize(this);
+		Monster->TeleportTo(SpawnPos.x, (double)(Height) + 2, SpawnPos.z);
+		BroadcastSpawn(*Monster);
 	}
 }
 
@@ -1134,7 +1134,7 @@ void cWorld::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYP
 void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed)
 {
 	MTRand r1;
-	a_FlyAwaySpeed /= 1000;  // Pre-divide, so that we can don't have to divide each time inside the loop
+	a_FlyAwaySpeed /= 1000;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
 		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
@@ -1384,6 +1384,33 @@ void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, cons
 void cWorld::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastMetadata(a_Pawn, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastSpawn(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
+{
+	m_ChunkMap->SendBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Client);
 }
 
 

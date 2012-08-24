@@ -58,25 +58,10 @@ public:
 	
 	virtual void UsedBy( cPlayer * a_Player ) = 0;
 	
-	void SendTo( cClientHandle* a_Client )
-	{
-		std::auto_ptr<cPacket> Packet(GetPacket());
-		if (Packet.get() == NULL)
-		{
-			return;
-		}
-		if ( a_Client != NULL )
-		{
-			a_Client->Send(*(Packet.get()));
-		}
-		else // broadcast to all chunk clients
-		{
-			m_World->BroadcastToChunkOfBlock(m_PosX, m_PosY, m_PosZ, Packet.get());
-		}
-	}
-	
-	/// Returns the packet to send to clients to represent this entity; NULL if no packet needed; caller is supposed to delete the packet
-	virtual cPacket * GetPacket(void) {return NULL; }
+	/** Sends the packet defining the block entity to the client specified.
+	To send to all eligible clients, use cWorld::BroadcastBlockEntity()
+	*/
+	virtual void SendTo(cClientHandle & a_Client) = 0;
 
 protected:
 	int m_PosX; // Position in absolute block coordinates

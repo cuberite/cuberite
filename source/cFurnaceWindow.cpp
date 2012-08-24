@@ -6,8 +6,6 @@
 #include "cFurnaceEntity.h"
 #include "cPlayer.h"
 
-#include "packets/cPacket_WindowClick.h"
-
 
 
 

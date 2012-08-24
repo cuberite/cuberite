@@ -47,7 +47,8 @@ public:
 	cItem* GetSlots() const { return m_Slots; }
 	cItem* GetFromHotBar( int a_SlotNum );				//tolua_export
 
-	cItem & GetEquippedItem();							//tolua_export
+	cItem &       GetEquippedItem(void);							//tolua_export
+	const cItem & GetEquippedItem(void) const;
 	void SetEquippedSlot( int a_SlotNum );				//tolua_export
 	short GetEquippedSlot() { return m_EquippedSlot; }	//tolua_export
 

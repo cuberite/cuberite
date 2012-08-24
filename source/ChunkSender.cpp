@@ -237,20 +237,21 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		a_Client->Send(MapChunk);
 	}
 	
-	// Send entity creation packets:
-	for (PacketList::iterator itr = m_Packets.begin(); itr != m_Packets.end(); ++itr)
+	// Send block-entity packets:
+	for (sBlockCoords::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		if (a_Client == NULL)
 		{
-			m_World->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, **itr);
+			m_World->BroadcastBlockEntity(itr->m_BlockX, itr->m_BlockY, itr->m_BlockZ);
 		}
 		else
 		{
-			a_Client->Send(**itr);
+			m_World->SendBlockEntity(itr->m_BlockX, itr->m_BlockY, itr->m_BlockZ, *a_Client);
 		}
-		delete *itr;
 	}  // for itr - m_Packets[]
-	m_Packets.clear();
+	m_BlockEntities.clear();
+	
+	// TODO: Send entity spawn packets
 }
 
 
@@ -259,11 +260,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 
 void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
-	cPacket * Packet = a_Entity->GetPacket();
-	if (Packet != NULL)
-	{
-		m_Packets.push_back(Packet);
-	}
+	m_BlockEntities.push_back(sBlockCoord(a_Entity->GetPosX(), a_Entity->GetPosY(), a_Entity->GetPosZ()));
 }
 
 

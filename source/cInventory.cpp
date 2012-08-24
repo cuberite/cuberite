@@ -235,7 +235,7 @@ void cInventory::SetEquippedSlot( int a_SlotNum )
 
 
 
-cItem & cInventory::GetEquippedItem()
+cItem & cInventory::GetEquippedItem(void)
 {
 	cItem* Item = GetFromHotBar( m_EquippedSlot );
 	if( Item )
@@ -247,6 +247,15 @@ cItem & cInventory::GetEquippedItem()
 	{
 		m_EquippedItem->Empty();
 	}
+	return *m_EquippedItem;
+}
+
+
+
+
+
+const cItem & cInventory::GetEquippedItem(void) const
+{
 	return *m_EquippedItem;
 }
 

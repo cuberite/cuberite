@@ -17,8 +17,6 @@
 #include "cRoot.h"
 #include "cTracer.h"
 
-#include "packets/cPacket_TeleportEntity.h"
-#include "packets/cPacket_PickupSpawn.h"
 #include "packets/cPacket_CollectItem.h"
 
 #include "Vector3d.h"
@@ -30,10 +28,9 @@
 
 CLASS_DEFINITION( cPickup, cEntity )
 
-cPickup::~cPickup()
-{
-	delete m_Item;
-}
+
+
+
 
 cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity( ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
@@ -44,18 +41,7 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 	, m_Item( new cItem( a_Item ) )
 	, m_bCollected( false )
 {
-
-	//LOG("New pickup: ID(%i) Amount(%i) Health(%i)", m_Item.m_ItemID, m_Item.m_ItemCount, m_Item.m_ItemHealth );
-
-	// Spawn it on clients
-	if (!a_Item.IsEmpty())
-	{
-		std::auto_ptr<cPacket> PickupSpawn(GetSpawnPacket());
-		if (PickupSpawn.get() != NULL)
-		{
-			cRoot::Get()->GetServer()->Broadcast(*(PickupSpawn.get()));
-		}
-	}
+	// LOGD("New pickup: ID(%i) Amount(%i) Health(%i)", m_Item.m_ItemID, m_Item.m_ItemCount, m_Item.m_ItemHealth );
 
 	m_EntityType = eEntityType_Pickup;
 }
@@ -64,59 +50,28 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 
 
 
-cPickup::cPickup(cPacket_PickupSpawn* a_PickupSpawnPacket)
-	:	cEntity( ((double)a_PickupSpawnPacket->m_PosX)/32, ((double)a_PickupSpawnPacket->m_PosY)/32, ((double)a_PickupSpawnPacket->m_PosZ)/32 )
-	, m_Speed( new Vector3f() )
-	, m_ResultingSpeed(new Vector3f())
-	, m_WaterSpeed(new Vector3f())
-	, m_bOnGround( false )
-	, m_bReplicated( false )
-	, m_Timer( 0.f )
-	, m_bCollected( false )
+cPickup::~cPickup()
 {
-	a_PickupSpawnPacket->m_UniqueID = m_UniqueID;
-
-	m_Item = new cItem();
-	m_Item->m_ItemID = (ENUM_ITEM_ID)a_PickupSpawnPacket->m_Item;
-	m_Item->m_ItemCount = a_PickupSpawnPacket->m_Count;
-	m_Item->m_ItemHealth = 0x0;
-
-	m_Speed.x = (float)(a_PickupSpawnPacket->m_Rotation)	/ 8;
-	m_Speed.y = (float)(a_PickupSpawnPacket->m_Pitch)		/ 8;
-	m_Speed.z = (float)(a_PickupSpawnPacket->m_Roll)		/ 8;
-
-	// Spawn it on clients
-	if (a_PickupSpawnPacket->m_Item != E_ITEM_EMPTY)
-	{
-		cRoot::Get()->GetServer()->Broadcast( *a_PickupSpawnPacket );
-	}
-
-	m_EntityType = eEntityType_Pickup;
+	delete m_Item;
 }
 
 
 
 
 
-cPacket * cPickup::GetSpawnPacket(void) const
+void cPickup::Initialize(cWorld * a_World)
 {
-	if (m_Item->IsEmpty())
-	{
-		return NULL;
-	}
-	
-	cPacket_PickupSpawn * PickupSpawn = new cPacket_PickupSpawn;
-	PickupSpawn->m_UniqueID = m_UniqueID;
-	PickupSpawn->m_Item     = (short)m_Item->m_ItemID;
-	PickupSpawn->m_Count    = m_Item->m_ItemCount;
-	PickupSpawn->m_Health   = m_Item->m_ItemHealth;
-	PickupSpawn->m_PosX     = (int) (m_Pos.x * 32);
-	PickupSpawn->m_PosY     = (int) (m_Pos.y * 32);
-	PickupSpawn->m_PosZ     = (int) (m_Pos.z * 32);
-	PickupSpawn->m_Rotation = (char)(m_Speed.x * 8);
-	PickupSpawn->m_Pitch    = (char)(m_Speed.y * 8);
-	PickupSpawn->m_Roll     = (char)(m_Speed.z * 8);
-	return PickupSpawn;
+	super::Initialize(a_World);
+	a_World->BroadcastSpawn(*this);
+}
+
+
+
+
+
+void cPickup::SpawnOn(cClientHandle & a_Client)
+{
+	a_Client.SendPickupSpawn(*this);	
 }
 
 

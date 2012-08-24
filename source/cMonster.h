@@ -27,22 +27,23 @@ public:
 
 	virtual bool IsA( const char* a_EntityType );
 
-	virtual cPacket * GetSpawnPacket(void) const override;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	virtual void Tick(float a_Dt) override;
 	
 	virtual void HandlePhysics(float a_Dt);
-	virtual void ReplicateMovement();
+	virtual void ReplicateMovement(void);
 
-	virtual void TakeDamage( int a_Damage, cEntity* a_Instigator );
-	virtual void KilledBy( cEntity* a_Killer );
+	virtual void TakeDamage(int a_Damage, cEntity *  a_Instigator) override;
+	virtual void KilledBy(cEntity * a_Killer) override;
 
-	virtual void MoveToPosition( const Vector3f & a_Position );
-	virtual bool ReachedDestination();
+	virtual void MoveToPosition(const Vector3f & a_Position);
+	virtual bool ReachedDestination(void);
+	
+	char GetMobType(void) const {return m_MobType; }
 
-	const char *GetState();
+	const char * GetState();
 	void SetState(const AString & str);
-	static void ListMonsters();
 	
 	virtual void CheckEventSeePlayer();
 	virtual void EventSeePlayer(cEntity *);

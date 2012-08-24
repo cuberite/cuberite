@@ -27,8 +27,6 @@
 #include "../iniFile/iniFile.h"
 #include "Vector3f.h"
 
-#include "packets/cPacket_Chat.h"
-
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -286,16 +284,33 @@ cServer::~cServer()
 
 
 // TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
-void cServer::Broadcast( const cPacket & a_Packet, cClientHandle* a_Exclude /* = 0 */ )
+void cServer::Broadcast(const cPacket & a_Packet, cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSClients);
-	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr == a_Exclude) || !(*itr)->IsLoggedIn())
 		{
 			continue;
 		}
-		(*itr)->Send( a_Packet );
+		(*itr)->Send(a_Packet);
+	}
+}
+
+
+
+
+
+void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSClients);
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	{
+		if ((*itr == a_Exclude) || !(*itr)->IsLoggedIn())
+		{
+			continue;
+		}
+		(*itr)->SendChat(a_Message);
 	}
 }
 
@@ -520,9 +535,10 @@ void cServer::ServerCommand(const AString & a_Cmd)
 	{
 		if (split[0].compare("say") == 0)
 		{
-			AString Message = cChatColor::Purple + "[SERVER] " + a_Cmd.substr(a_Cmd.find_first_of("say") + 4);
-			LOG("%s", Message.c_str() );
-			Broadcast(cPacket_Chat(Message));
+			AString ToSay = a_Cmd.substr(a_Cmd.find_first_of("say") + 4);
+			AString Message = cChatColor::Purple + "[SERVER] " + ToSay;
+			LOG("[SERVER]: %s", ToSay.c_str());
+			BroadcastChat(Message);
 			return;
 		}
 	}
@@ -534,17 +550,19 @@ void cServer::ServerCommand(const AString & a_Cmd)
 
 
 
-void cServer::SendMessage( const char* a_Message, cPlayer* a_Player /* = 0 */, bool a_bExclude /* = false */ )
+void cServer::SendMessage(const AString & a_Message, cPlayer * a_Player /* = NULL */, bool a_bExclude /* = false */ )
 {
-	cPacket_Chat Chat( a_Message );
-	if( a_Player && !a_bExclude )
+	if ((a_Player != NULL) && !a_bExclude)
 	{
-		cClientHandle* Client = a_Player->GetClientHandle();
-		if( Client ) Client->Send( Chat );
+		cClientHandle * Client = a_Player->GetClientHandle();
+		if (Client != NULL)
+		{
+			Client->SendChat(a_Message);
+		}
 		return;
 	}
 
-	Broadcast( Chat, (a_Player)?a_Player->GetClientHandle():0 );
+	BroadcastChat(a_Message, (a_Player != NULL) ? a_Player->GetClientHandle() : NULL);
 }
 
 

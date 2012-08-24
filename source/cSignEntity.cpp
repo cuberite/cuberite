@@ -8,8 +8,6 @@
 #include "cWorld.h"
 #include "cRoot.h"
 
-#include "packets/cPacket_UpdateSign.h"
-
 #include <json/json.h>
 
 
@@ -80,17 +78,9 @@ AString cSignEntity::GetLine( int a_Index ) const
 
 
 
-cPacket * cSignEntity::GetPacket(void)
+void cSignEntity::SendTo(cClientHandle & a_Client)
 {
-	cPacket_UpdateSign * Sign = new cPacket_UpdateSign;
-	Sign->m_BlockX = m_PosX;
-	Sign->m_BlockY = (short)m_PosY;
-	Sign->m_BlockZ = m_PosZ;
-	Sign->m_Line1 = m_Line[0];
-	Sign->m_Line2 = m_Line[1];
-	Sign->m_Line3 = m_Line[2];
-	Sign->m_Line4 = m_Line[3];
-	return Sign;
+	a_Client.SendUpdateSign(m_PosX, m_PosY, m_PosZ, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
 }
 
 

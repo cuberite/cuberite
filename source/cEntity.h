@@ -66,7 +66,7 @@ public:
 	cEntity(const double & a_X, const double & a_Y, const double & a_Z);
 	virtual ~cEntity();
 
-	virtual void Initialize( cWorld* a_World );
+	virtual void Initialize(cWorld * a_World);
 
 	enum eEntityType
 	{
@@ -114,8 +114,11 @@ public:
 
 	virtual void Tick(float a_Dt) = 0;														//tolua_export
 
-	virtual cPacket * GetSpawnPacket(void) const {ASSERT(!"GetSpawnedPacket unimplemented!"); return NULL; };  // _X: Needs to be implemented due to Lua bindings
-	void SpawnOn (cClientHandle * a_Client);  // tolua_export
+	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
+	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
+	Needs to have a default implementation due to Lua bindings.
+	*/
+	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }  // tolua_export
 	
 	void WrapRotation();
 

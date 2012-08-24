@@ -11,7 +11,6 @@
 #include "cClientHandle.h"
 #include "cWorld.h"
 #include "BlockID.h"
-#include "packets/cPacket_BlockAction.h"
 #include "cServer.h"
 #include "blocks/Block.h"
 

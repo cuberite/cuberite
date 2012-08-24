@@ -33,6 +33,8 @@ class cRedstone;
 class cInventory;
 class cWindow;
 class cPawn;
+class cPickup;
+class cMonster;
 
 
 
@@ -107,6 +109,10 @@ public:
 	void SendEntityStatus(const cEntity & a_Entity, char a_Status);
 	void SendMetadata(const cPawn & a_Entity);
 	void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value);
+	void SendPlayerSpawn(const cPlayer & a_Player);
+	void SendPickupSpawn(const cPickup & a_Pickup);
+	void SendSpawnMob   (const cMonster & a_Mob);
+	void SendUpdateSign (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	

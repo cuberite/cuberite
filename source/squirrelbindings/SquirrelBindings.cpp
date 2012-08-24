@@ -65,8 +65,6 @@ void BindSquirrel(HSQUIRRELVM vm)
 		.Func("GetUniqueID", &cEntity::GetUniqueID)
 		.Func("IsDestroyed", &cEntity::IsDestroyed)
 		.Func("Destroy", &cEntity::Destroy)
-		.Func("SpawnOn", &cEntity::SpawnOn)
-
 	);
 	
 	ConstTable().Enum("MetaData", Enumeration()

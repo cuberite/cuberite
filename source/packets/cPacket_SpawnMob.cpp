@@ -11,7 +11,6 @@
 cPacket_SpawnMob::~cPacket_SpawnMob()
 {
 	if( m_MetaData ) delete [] m_MetaData;
-	delete m_Pos;
 }
 
 
@@ -21,7 +20,6 @@ cPacket_SpawnMob::~cPacket_SpawnMob()
 cPacket_SpawnMob::cPacket_SpawnMob()
 	: m_UniqueID( 0 )
 	, m_Type( 0 )
-	, m_Pos( new Vector3i() )
 	, m_Yaw( 0 )
 	, m_Pitch( 0 )
 	, m_MetaDataSize( 0 )
@@ -37,12 +35,10 @@ cPacket_SpawnMob::cPacket_SpawnMob()
 
 cPacket_SpawnMob::cPacket_SpawnMob( const cPacket_SpawnMob & a_Clone )
 {
-	m_Pos = new Vector3i();
-
 	m_PacketID = E_SPAWN_MOB;
 	m_UniqueID = a_Clone.m_UniqueID;
 	m_Type     = a_Clone.m_Type;
-	*m_Pos     = *a_Clone.m_Pos;
+	m_Pos      = a_Clone.m_Pos;
 	m_Yaw      = a_Clone.m_Yaw;
 	m_Pitch    = a_Clone.m_Pitch;
 	m_HeadYaw  = a_Clone.m_HeadYaw;
@@ -61,9 +57,9 @@ void cPacket_SpawnMob::Serialize(AString & a_Data) const
 	AppendByte		(a_Data, m_PacketID);
 	AppendInteger	(a_Data, m_UniqueID);
 	AppendByte		(a_Data, m_Type);
-	AppendInteger	(a_Data, m_Pos->x);
-	AppendInteger	(a_Data, m_Pos->y);
-	AppendInteger	(a_Data, m_Pos->z);
+	AppendInteger	(a_Data, m_Pos.x);
+	AppendInteger	(a_Data, m_Pos.y);
+	AppendInteger	(a_Data, m_Pos.z);
 	AppendByte		(a_Data, m_Yaw);
 	AppendByte		(a_Data, m_Pitch);
 	AppendByte    (a_Data, m_HeadYaw);

@@ -1230,7 +1230,6 @@ void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
 
 cBlockEntity * cChunk::GetBlockEntity(int a_X, int a_Y, int a_Z)
 {
-	// Assumes that the m_CSBlockList is already locked, we're being called from SetBlock()
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		if (
@@ -1308,7 +1307,7 @@ void cChunk::UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Li
 		{
 			MarkDirty();
 			(reinterpret_cast<cSignEntity *>(*itr))->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
-			(*itr)->SendTo(NULL);
+			m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
 		}
 	}  // for itr - m_BlockEntities[]
 }
@@ -1342,8 +1341,8 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 	{
-		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str() );
-		(*itr)->SpawnOn( a_Client );
+		LOGD("cChunk: Entity #%d (%s) at [%i, %i, %i] spawning for player \"%s\"", (*itr)->GetUniqueID(), (*itr)->GetClass(), m_PosX, m_PosY, m_PosZ, a_Client->GetUsername().c_str());
+		(*itr)->SpawnOn(*a_Client);
 	}
 	return true;
 }
@@ -1909,6 +1908,58 @@ void cChunk::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exc
 		}
 		(*itr)->SendMetadata(a_Pawn);
 	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		a_Entity.SpawnOn(*(*itr));
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	// We can operate on entity pointers, we're inside the ChunkMap's CS lock which guards the list
+	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Entity == NULL)
+	{
+		return;
+	}
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		Entity->SendTo(*(*itr));
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
+{
+	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Entity == NULL)
+	{
+		return;
+	}
+	Entity->SendTo(a_Client);
 }
 
 

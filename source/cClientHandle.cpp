@@ -1818,6 +1818,83 @@ void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, 
 
 
 
+void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	cPacket_NamedEntitySpawn SpawnPacket;
+	SpawnPacket.m_UniqueID    = a_Player.GetUniqueID();
+	SpawnPacket.m_PlayerName  = a_Player.GetName();
+	SpawnPacket.m_PosX        = (int)(a_Player.GetPosX() * 32);
+	SpawnPacket.m_PosY        = (int)(a_Player.GetPosY() * 32);
+	SpawnPacket.m_PosZ        = (int)(a_Player.GetPosZ() * 32);
+	SpawnPacket.m_Rotation    = (char)((a_Player.GetRot().x / 360.f) * 256);
+	SpawnPacket.m_Pitch       = (char)((a_Player.GetRot().y / 360.f) * 256);
+	const cItem & HeldItem    = a_Player.GetEquippedItem();
+	SpawnPacket.m_CurrentItem = HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType;  // Unlike -1 in inventory, the named entity packet uses 0 for "empty"
+	Send(SpawnPacket);
+}
+
+
+
+
+
+void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
+{
+	cPacket_PickupSpawn PickupSpawn;
+	PickupSpawn.m_UniqueID   = a_Pickup.GetUniqueID();
+	PickupSpawn.m_ItemType   = a_Pickup.GetItem()->m_ItemType;
+	PickupSpawn.m_ItemCount  = a_Pickup.GetItem()->m_ItemCount;
+	PickupSpawn.m_ItemDamage = a_Pickup.GetItem()->m_ItemHealth;
+	PickupSpawn.m_PosX       = (int) (a_Pickup.GetPosX() * 32);
+	PickupSpawn.m_PosY       = (int) (a_Pickup.GetPosY() * 32);
+	PickupSpawn.m_PosZ       = (int) (a_Pickup.GetPosZ() * 32);
+	PickupSpawn.m_Rotation   = (char)(a_Pickup.GetSpeed().x * 8);
+	PickupSpawn.m_Pitch      = (char)(a_Pickup.GetSpeed().y * 8);
+	PickupSpawn.m_Roll       = (char)(a_Pickup.GetSpeed().z * 8);
+	Send(PickupSpawn);
+}
+
+
+
+
+
+void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
+{
+	cPacket_SpawnMob Spawn;
+	Spawn.m_UniqueID = a_Mob.GetUniqueID();
+	Spawn.m_Type     = a_Mob.GetMobType();
+	Spawn.m_Pos      = ((Vector3i)(a_Mob.GetPosition())) * 32;
+	Spawn.m_Yaw      = 0;
+	Spawn.m_Pitch    = 0;
+	Spawn.m_MetaDataSize = 1;
+	Spawn.m_MetaData     = new char[Spawn.m_MetaDataSize];
+	Spawn.m_MetaData[0]  = 0x7f;  // not on fire/crouching/riding
+	Send(Spawn);
+}
+
+
+
+
+
+void cClientHandle::SendUpdateSign(
+	int a_BlockX, int a_BlockY, int a_BlockZ,
+	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
+)
+{
+	cPacket_UpdateSign us;
+	us.m_BlockX = a_BlockX;
+	us.m_BlockY = a_BlockY;
+	us.m_BlockZ = a_BlockZ;
+	us.m_Line1  = a_Line1;
+	us.m_Line2  = a_Line2;
+	us.m_Line3  = a_Line3;
+	us.m_Line4  = a_Line4;
+	Send(us);
+}
+
+
+
+
+
 void cClientHandle::CheckIfWorldDownloaded(void)
 {
 	if (m_State != csDownloadingWorld)

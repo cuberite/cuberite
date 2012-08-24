@@ -75,6 +75,14 @@ public:
 	
 	void BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 	
+	void BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	
+	/// Broadcasts the block entity, if it is at the coords specified, to all clients except a_Exclude
+	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
+	
+	/// Sends the block entity, if it is at the coords specified, to a_Client
+	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
+	
 	/// a_Player rclked block entity at the coords specified, handle it
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
 

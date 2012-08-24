@@ -386,3 +386,13 @@ void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 
 
 
+
+void cFurnaceEntity::SendTo(cClientHandle & a_Client)
+{
+	// Nothing needs to be sent
+	UNUSED(a_Client);
+}
+
+
+
+

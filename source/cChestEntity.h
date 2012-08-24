@@ -39,7 +39,7 @@ public:
 	bool LoadFromJson( const Json::Value& a_Value );
 	virtual void SaveToJson(Json::Value& a_Value ) override;
 
-	void SendTo( cClientHandle* a_Client, cServer* a_Server );
+	virtual void SendTo(cClientHandle & a_Client) override;
 
 	virtual void UsedBy( cPlayer * a_Player ) override;
 

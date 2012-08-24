@@ -21,8 +21,6 @@
 #include "cTimer.h"
 #include "MersenneTwister.h"
 
-#include "packets/cPacket_NamedEntitySpawn.h"
-
 #include "Vector3d.h"
 #include "Vector3f.h"
 
@@ -102,16 +100,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 
 
-void cPlayer::Initialize( cWorld* a_World )
-{
-	cPawn::Initialize( a_World );
-	GetWorld()->AddPlayer( this );
-}
-
-
-
-
-
 cPlayer::~cPlayer(void)
 {
 	LOG("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
@@ -134,6 +122,16 @@ cPlayer::~cPlayer(void)
 
 
 
+void cPlayer::Initialize( cWorld* a_World )
+{
+	cPawn::Initialize( a_World );
+	GetWorld()->AddPlayer( this );
+}
+
+
+
+
+
 void cPlayer::Destroyed()
 {
 	CloseWindow(-1);
@@ -144,28 +142,18 @@ void cPlayer::Destroyed()
 
 
 
-cPacket * cPlayer::GetSpawnPacket(void) const
+void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	LOGD("cPlayer::GetSpawnPacket for \"%s\" at pos {%.2f, %.2f, %.2f}",
-		m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
+	/*
+	LOGD("cPlayer::SpawnOn(%s) for \"%s\" at pos {%.2f, %.2f, %.2f}",
+		a_Client.GetUsername().c_str(), m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
 	);
-	
-	if (!m_bVisible )
+	*/
+
+	if (m_bVisible)
 	{
-		return NULL;
+		a_Client.SendPlayerSpawn(*this);
 	}
-	
-	cPacket_NamedEntitySpawn * SpawnPacket = new cPacket_NamedEntitySpawn;
-	SpawnPacket->m_UniqueID    = m_UniqueID;
-	SpawnPacket->m_PlayerName  = m_PlayerName;
-	SpawnPacket->m_PosX        = (int)(m_Pos.x * 32);
-	SpawnPacket->m_PosY        = (int)(m_Pos.y * 32);
-	SpawnPacket->m_PosZ        = (int)(m_Pos.z * 32);
-	SpawnPacket->m_Rotation    = (char)((m_Rot.x / 360.f) * 256);
-	SpawnPacket->m_Pitch       = (char)((m_Rot.y / 360.f) * 256);
-	short ItemID = (short)m_Inventory->GetEquippedItem().m_ItemID;
-	SpawnPacket->m_CurrentItem = (ItemID > 0) ? ItemID : 0;  // Unlike -1 in inventory, the named entity packet uses 0 for "none"
-	return SpawnPacket;
 }
 
 
@@ -603,7 +591,7 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (a_bVisible && !m_bVisible) // Make visible
 	{
 		m_bVisible = true;
-		SpawnOn(NULL); // Spawn on all clients
+		m_World->BroadcastSpawn(*this);
 	}
 	if (!a_bVisible && m_bVisible)
 	{
@@ -620,7 +608,7 @@ void cPlayer::AddToGroup( const char* a_GroupName )
 {
 	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
 	m_Groups.push_back( Group );
-	LOG("Added %s to group %s", m_PlayerName.c_str(), a_GroupName );
+	LOGD("Added %s to group %s", m_PlayerName.c_str(), a_GroupName );
 	ResolveGroups();
 	ResolvePermissions();
 }

@@ -35,6 +35,8 @@ public:
 	bool LoadFromJson(const Json::Value& a_Value );
 	virtual void SaveToJson(Json::Value& a_Value ) override;
 
+	virtual void SendTo(cClientHandle & a_Client) override;
+	
 	// Returns true if there's any change, forcing the chunk to go dirty.
 	bool Tick( float a_Dt );
 	

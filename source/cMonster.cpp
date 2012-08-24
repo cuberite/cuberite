@@ -11,8 +11,6 @@
 #include "cMonsterConfig.h"
 #include "MersenneTwister.h"
 
-#include "packets/cPacket_SpawnMob.h"
-
 #include "Vector3f.h"
 #include "Vector3i.h"
 #include "Vector3d.h"
@@ -78,18 +76,9 @@ bool cMonster::IsA( const char* a_EntityType )
 
 
 
-cPacket * cMonster::GetSpawnPacket(void) const
+void cMonster::SpawnOn(cClientHandle & a_Client)
 {
-	cPacket_SpawnMob * Spawn = new cPacket_SpawnMob;
-	Spawn->m_UniqueID = GetUniqueID();
-	Spawn->m_Type = m_MobType;
-	*Spawn->m_Pos = ((Vector3i)(m_Pos)) * 32;
-	Spawn->m_Yaw = 0;
-	Spawn->m_Pitch = 0;
-	Spawn->m_MetaDataSize = 1;
-	Spawn->m_MetaData = new char[Spawn->m_MetaDataSize];
-	Spawn->m_MetaData[0] = 0x7f; // not on fire/crouching/riding
-	return Spawn;
+	a_Client.SendSpawnMob(*this);
 }
 
 

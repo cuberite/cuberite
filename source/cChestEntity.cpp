@@ -156,11 +156,12 @@ void cChestEntity::SaveToJson( Json::Value& a_Value )
 
 
 
-void cChestEntity::SendTo( cClientHandle* a_Client, cServer* a_Server )
+void cChestEntity::SendTo(cClientHandle & a_Client)
 {
+	// The chest entity doesn't need anything sent to the client when it's created / gets in the viewdistance
+	// All the actual handling is in the cWindow UI code that gets called when the chest is rclked
+	
 	UNUSED(a_Client);
-	UNUSED(a_Server);
-	return;
 }
 
 

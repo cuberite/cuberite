@@ -68,7 +68,13 @@ cEntity::~cEntity()
 
 
 
-void cEntity::Initialize( cWorld* a_World )
+CLASS_DEF_GETCLASS(cEntity);
+
+
+
+
+
+void cEntity::Initialize(cWorld * a_World)
 {
 	m_World = a_World;
 	m_World->AddEntity( this );
@@ -118,31 +124,17 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 		
 		virtual void Added(cClientHandle * a_Client) override
 		{
-			if (m_Spawn == NULL)
-			{
-				m_Spawn = m_Entity->GetSpawnPacket();  // Only create the packet when needed
-			}
-			if (m_Spawn != NULL)
-			{
-				a_Client->Send(*m_Spawn);
-			}
+			m_Entity->SpawnOn(*a_Client);
 		}
 
-		cPacket * m_Spawn;
 		bool      m_IgnoreOldChunk;
 		cEntity * m_Entity;
 		
 	public:
 		cMover(cEntity * a_Entity, bool a_IgnoreOldChunk) :
-			m_Spawn(NULL),
 			m_IgnoreOldChunk(a_IgnoreOldChunk),
 			m_Entity(a_Entity)
 		{}
-		
-		~cMover()
-		{
-			delete m_Spawn;
-		}
 	} Mover(this, a_bIgnoreOldChunk);
 	
 	m_World->CompareChunkClients(m_ChunkX, m_ChunkY, m_ChunkZ, ChunkX, ChunkY, ChunkZ, Mover);
@@ -194,29 +186,6 @@ void cEntity::RemoveFromChunk(void)
 
 
 
-void cEntity::SpawnOn(cClientHandle * a_Client)
-{
-	std::auto_ptr<cPacket> SpawnPacket(GetSpawnPacket());
-	if (SpawnPacket.get() == NULL)
-	{
-		return;
-	}
-	
-	if (a_Client == NULL)
-	{
-		m_World->BroadcastToChunk(m_ChunkX, m_ChunkY, m_ChunkZ, *SpawnPacket.get(), NULL);
-	}
-	else
-	{
-		a_Client->Send(*(SpawnPacket.get()));
-	}
-}
-
-
-
-
-
-CLASS_DEF_GETCLASS( cEntity );
 bool cEntity::IsA( const char* a_EntityType )
 {
     //LOG("IsA( cEntity ) : %s", a_EntityType);

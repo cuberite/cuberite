@@ -31,7 +31,8 @@ public:
 
 	virtual void Initialize( cWorld* a_World );								//tolua_export
 
-	virtual cPacket * GetSpawnPacket(void) const override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+	
 	virtual void Tick(float a_Dt) override;
 
 	void SetTouchGround( bool a_bTouchGround );
@@ -42,11 +43,14 @@ public:
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline const double GetStance(void) const { return m_Pos.y + 1.62; }					//tolua_export  // TODO: Proper stance when crouching etc.
-	inline cInventory & GetInventory() { if(GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }	//tolua_export
+	inline cInventory &       GetInventory(void)       { if (GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }	//tolua_export
+	inline const cInventory & GetInventory(void) const { if (GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }
+	
+	inline const cItem & GetEquippedItem(void) const {return GetInventory().GetEquippedItem(); }
 
 	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
 
-	eGameMode GetGameMode() { return m_GameMode; }														//tolua_export
+	eGameMode GetGameMode(void) const { return m_GameMode; }														//tolua_export
 	std::string GetIP() { return m_IP; }																//tolua_export
 	float GetLastBlockActionTime() { return m_LastBlockActionTime; }									//tolua_export
 	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }										//tolua_export

@@ -39,6 +39,7 @@ public:												//tolua_export
 	void StartListenClient(); // Listen to client
 
 	void Broadcast(const cPacket & a_Packet, cClientHandle* a_Exclude = NULL);
+	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
 
 	bool Tick(float a_Dt);
 
@@ -48,7 +49,7 @@ public:												//tolua_export
 	void ServerCommand(const AString & a_Cmd);								//tolua_export
 	void Shutdown();
 
-	void SendMessage( const char* a_Message, cPlayer* a_Player = 0, bool a_bExclude = false ); //tolua_export
+	void SendMessage(const AString & a_Message, cPlayer * a_Player = NULL, bool a_bExclude = false );  // tolua_export
 	
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
