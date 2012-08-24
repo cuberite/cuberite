@@ -99,13 +99,16 @@ void cPlugin_Squirrel::Tick(float a_Dt)
 
 
 
-bool cPlugin_Squirrel::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
+bool cPlugin_Squirrel::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 
-	if(!m_Plugin->HasFunction("OnCollectItem")) return false;
+	if (!m_Plugin->HasFunction("OnCollectPickup"))
+	{
+		return false;
+	}
 	
-	return m_Plugin->GetFunction("OnCollectItem").Evaluate<bool>(a_Pickup, a_Player);
+	return m_Plugin->GetFunction("OnCollectPickup").Evaluate<bool>(a_Player, a_Pickup);
 }
 
 

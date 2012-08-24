@@ -22,6 +22,9 @@ class cPlayer;
 class cCraftingGrid;
 class cCraftingRecipe;
 
+// fwd: cPickup.h
+class cPickup;
+
 
 
 
@@ -38,7 +41,8 @@ public:																	//tolua_export
 	{
 		HOOK_TICK,
 		HOOK_CHAT,
-		HOOK_COLLECT_ITEM,
+		HOOK_COLLECT_PICKUP,
+		HOOK_COLLECT_ITEM = HOOK_COLLECT_PICKUP,  // OBSOLETE, use HOOK_COLLECT_PICKUP instead
 		HOOK_BLOCK_DIG,
 		HOOK_BLOCK_PLACE,
 		HOOK_DISCONNECT,
@@ -102,6 +106,7 @@ public:																	//tolua_export
 	bool CallHookBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
 	bool CallHookChat            (cPlayer * a_Player, const AString & a_Message);
 	bool CallHookChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_Chunk);
+	bool CallHookCollectPickup   (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect      (cPlayer * a_Player, const AString & a_Reason);
 	bool CallHookLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);

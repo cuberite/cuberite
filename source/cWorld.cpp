@@ -1399,6 +1399,15 @@ void cWorld::BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude)
 
 
 
+void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastCollectPickup(a_Pickup, a_Player, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);

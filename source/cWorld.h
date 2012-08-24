@@ -91,6 +91,7 @@ public:
 	void BroadcastEntityStatus   (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastMetadata       (const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawn          (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectPickup  (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	
 	/// If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);

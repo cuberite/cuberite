@@ -198,22 +198,6 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 	
 	switch( a_Hook )
 	{
-		case HOOK_COLLECT_ITEM:
-		{
-			if( a_NumArgs != 2 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPickup* Pickup = va_arg(argptr, cPickup* );
-			cPlayer* Player = va_arg(argptr, cPlayer* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnCollectItem( Pickup, Player ) )
-					return true;
-			}
-			break;
-		}
-
 		case HOOK_PLAYER_JOIN:
 		{
 			if( a_NumArgs != 1 ) break;
@@ -440,6 +424,27 @@ bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_LuaChunk))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookCollectPickup(cPlayer * a_Player, cPickup & a_Pickup)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_COLLECT_PICKUP);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnCollectPickup(a_Player, &a_Pickup))
 		{
 			return true;
 		}

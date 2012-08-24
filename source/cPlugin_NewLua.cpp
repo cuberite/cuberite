@@ -159,20 +159,23 @@ void cPlugin_NewLua::Tick(float a_Dt)
 
 
 
-bool cPlugin_NewLua::OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player )
+bool cPlugin_NewLua::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnCollectItem") )
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnCollectPickup"))
+	{
 		return false;
+	}
 
-	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
 
-	if( !CallFunction(2, 1, "OnCollectItem") )
+	if (!CallFunction(2, 1, "OnCollectPickup"))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	return bRetVal;
+	return (tolua_toboolean(m_LuaState, -1, 0) > 0);
 }
 
 

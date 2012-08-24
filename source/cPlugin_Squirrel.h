@@ -1,9 +1,16 @@
+
 #pragma once
+
 #include "cPlugin.h"
 #include <sqrat.h>
 #include "squirrelbindings/SquirrelObject.h"
 
-class cPlugin_Squirrel : public cPlugin
+
+
+
+
+class cPlugin_Squirrel :
+	public cPlugin
 {
 public:
 	cPlugin_Squirrel(const char* a_PluginName);
@@ -20,7 +27,7 @@ public:
 	virtual bool OnChat            (cPlayer * a_Player, const AString & a_Message) override;
 	virtual void OnChunkGenerated  (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnChunkGenerating (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk ) override;
-	virtual bool OnCollectItem     (cPickup* a_Pickup, cPlayer* a_Player ) override;
+	virtual bool OnCollectPickup   (cPlayer * a_Player, cPickup * a_Pickup) override;
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnDisconnect      (cPlayer * a_Player, const AString & a_Reason) override;
 	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer ) override;
@@ -40,3 +47,7 @@ protected:
 	cCriticalSection m_CriticalSection;
 	SquirrelObject *m_Plugin;
 };
+
+
+
+

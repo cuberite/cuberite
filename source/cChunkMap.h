@@ -21,6 +21,7 @@ class cPlayer;
 class cChestEntity;
 class cFurnaceEntity;
 class cPawn;
+class cPickup;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
@@ -76,6 +77,8 @@ public:
 	void BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 	
 	void BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	
+	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	
 	/// Broadcasts the block entity, if it is at the coords specified, to all clients except a_Exclude
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);

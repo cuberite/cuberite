@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/24/12 09:56:22.
+** Generated automatically by tolua++-1.0.92 on 08/24/12 10:55:13.
 */
 
 #ifndef __cplusplus
@@ -7879,16 +7879,16 @@ static int tolua_AllToLua_cPlugin_OnChunkGenerating00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: OnCollectItem of class  cPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnCollectItem00
-static int tolua_AllToLua_cPlugin_OnCollectItem00(lua_State* tolua_S)
+/* method: OnCollectPickup of class  cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_OnCollectPickup00
+static int tolua_AllToLua_cPlugin_OnCollectPickup00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cPickup",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cPickup",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -7896,20 +7896,20 @@ static int tolua_AllToLua_cPlugin_OnCollectItem00(lua_State* tolua_S)
 #endif
  {
   cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  cPickup* a_Pickup = ((cPickup*)  tolua_tousertype(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  cPickup* a_Pickup = ((cPickup*)  tolua_tousertype(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnCollectItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnCollectPickup'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->OnCollectItem(a_Pickup,a_Player);
+   bool tolua_ret = (bool)  self->OnCollectPickup(a_Player,a_Pickup);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'OnCollectItem'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'OnCollectPickup'.",&tolua_err);
  return 0;
 #endif
 }
@@ -8793,16 +8793,16 @@ public:
 			return ( bool ) cPlugin:: OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 		};
 	};
-	 bool  OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player) {
-		if (push_method("OnCollectItem",  tolua_AllToLua_cPlugin_OnCollectItem00)) {
-			tolua_pushusertype(lua_state, (void*)a_Pickup, "cPickup");
+	 bool  OnCollectPickup( cPlayer* a_Player, cPickup* a_Pickup) {
+		if (push_method("OnCollectPickup",  tolua_AllToLua_cPlugin_OnCollectPickup00)) {
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Pickup, "cPickup");
 			ToluaBase::dbcall(lua_state, 3, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin:: OnCollectItem(a_Pickup,a_Player);
+			return ( bool ) cPlugin:: OnCollectPickup(a_Player,a_Pickup);
 		};
 	};
 	 bool  OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
@@ -8997,8 +8997,8 @@ public:
 	 bool cPlugin__OnChunkGenerating( cWorld* a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
 		return ( bool )cPlugin::OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 	};
-	 bool cPlugin__OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player) {
-		return ( bool )cPlugin::OnCollectItem(a_Pickup,a_Player);
+	 bool cPlugin__OnCollectPickup( cPlayer* a_Player, cPickup* a_Pickup) {
+		return ( bool )cPlugin::OnCollectPickup(a_Player,a_Pickup);
 	};
 	 bool cPlugin__OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin::OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
@@ -9390,16 +9390,16 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerating00(lua_State* t
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: cPlugin__OnCollectItem of class  Lua__cPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectItem00
-static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectItem00(lua_State* tolua_S)
+/* method: cPlugin__OnCollectPickup of class  Lua__cPlugin */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectPickup00
+static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectPickup00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cPlugin",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cPickup",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cPickup",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -9407,20 +9407,20 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectItem00(lua_State* tolua
 #endif
  {
   Lua__cPlugin* self = (Lua__cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  cPickup* a_Pickup = ((cPickup*)  tolua_tousertype(tolua_S,2,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,3,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  cPickup* a_Pickup = ((cPickup*)  tolua_tousertype(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnCollectItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnCollectPickup'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cPlugin__OnCollectItem(a_Pickup,a_Player);
+   bool tolua_ret = (bool)  self->cPlugin__OnCollectPickup(a_Player,a_Pickup);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPlugin__OnCollectItem'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'cPlugin__OnCollectPickup'.",&tolua_err);
  return 0;
 #endif
 }
@@ -10315,16 +10315,16 @@ public:
 			return ( bool ) cPlugin_NewLua:: OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 		};
 	};
-	 bool  OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player) {
-		if (push_method("OnCollectItem",  tolua_AllToLua_cPlugin_OnCollectItem00)) {
-			tolua_pushusertype(lua_state, (void*)a_Pickup, "cPickup");
+	 bool  OnCollectPickup( cPlayer* a_Player, cPickup* a_Pickup) {
+		if (push_method("OnCollectPickup",  tolua_AllToLua_cPlugin_OnCollectPickup00)) {
 			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			tolua_pushusertype(lua_state, (void*)a_Pickup, "cPickup");
 			ToluaBase::dbcall(lua_state, 3, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin_NewLua:: OnCollectItem(a_Pickup,a_Player);
+			return ( bool ) cPlugin_NewLua:: OnCollectPickup(a_Player,a_Pickup);
 		};
 	};
 	 bool  OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
@@ -10522,8 +10522,8 @@ public:
 	 bool cPlugin_NewLua__OnChunkGenerating( cWorld* a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk* a_pLuaChunk) {
 		return ( bool )cPlugin_NewLua::OnChunkGenerating(a_World,a_ChunkX,a_ChunkZ,a_pLuaChunk);
 	};
-	 bool cPlugin_NewLua__OnCollectItem( cPickup* a_Pickup, cPlayer* a_Player) {
-		return ( bool )cPlugin_NewLua::OnCollectItem(a_Pickup,a_Player);
+	 bool cPlugin_NewLua__OnCollectPickup( cPlayer* a_Player, cPickup* a_Pickup) {
+		return ( bool )cPlugin_NewLua::OnCollectPickup(a_Player,a_Pickup);
 	};
 	 bool cPlugin_NewLua__OnCraftingNoRecipe( const cPlayer* a_Player, const cCraftingGrid* a_Grid, cCraftingRecipe* a_Recipe) {
 		return ( bool )cPlugin_NewLua::OnCraftingNoRecipe(a_Player,a_Grid,a_Recipe);
@@ -21373,6 +21373,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cPluginManager");
    tolua_constant(tolua_S,"HOOK_TICK",cPluginManager::HOOK_TICK);
    tolua_constant(tolua_S,"HOOK_CHAT",cPluginManager::HOOK_CHAT);
+   tolua_constant(tolua_S,"HOOK_COLLECT_PICKUP",cPluginManager::HOOK_COLLECT_PICKUP);
    tolua_constant(tolua_S,"HOOK_COLLECT_ITEM",cPluginManager::HOOK_COLLECT_ITEM);
    tolua_constant(tolua_S,"HOOK_BLOCK_DIG",cPluginManager::HOOK_BLOCK_DIG);
    tolua_constant(tolua_S,"HOOK_BLOCK_PLACE",cPluginManager::HOOK_BLOCK_PLACE);
@@ -21436,7 +21437,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"OnChat",tolua_AllToLua_cPlugin_OnChat00);
    tolua_function(tolua_S,"OnChunkGenerated",tolua_AllToLua_cPlugin_OnChunkGenerated00);
    tolua_function(tolua_S,"OnChunkGenerating",tolua_AllToLua_cPlugin_OnChunkGenerating00);
-   tolua_function(tolua_S,"OnCollectItem",tolua_AllToLua_cPlugin_OnCollectItem00);
+   tolua_function(tolua_S,"OnCollectPickup",tolua_AllToLua_cPlugin_OnCollectPickup00);
    tolua_function(tolua_S,"OnCraftingNoRecipe",tolua_AllToLua_cPlugin_OnCraftingNoRecipe00);
    tolua_function(tolua_S,"OnDisconnect",tolua_AllToLua_cPlugin_OnDisconnect00);
    tolua_function(tolua_S,"OnKilled",tolua_AllToLua_cPlugin_OnKilled00);
@@ -21477,7 +21478,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cPlugin__OnChat",tolua_AllToLua_Lua__cPlugin_cPlugin__OnChat00);
    tolua_function(tolua_S,"cPlugin__OnChunkGenerated",tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerated00);
    tolua_function(tolua_S,"cPlugin__OnChunkGenerating",tolua_AllToLua_Lua__cPlugin_cPlugin__OnChunkGenerating00);
-   tolua_function(tolua_S,"cPlugin__OnCollectItem",tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectItem00);
+   tolua_function(tolua_S,"cPlugin__OnCollectPickup",tolua_AllToLua_Lua__cPlugin_cPlugin__OnCollectPickup00);
    tolua_function(tolua_S,"cPlugin__OnCraftingNoRecipe",tolua_AllToLua_Lua__cPlugin_cPlugin__OnCraftingNoRecipe00);
    tolua_function(tolua_S,"cPlugin__OnDisconnect",tolua_AllToLua_Lua__cPlugin_cPlugin__OnDisconnect00);
    tolua_function(tolua_S,"cPlugin__OnKilled",tolua_AllToLua_Lua__cPlugin_cPlugin__OnKilled00);

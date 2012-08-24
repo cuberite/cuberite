@@ -118,10 +118,10 @@ bool cPlugin::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cL
 
 
 
-bool cPlugin::OnCollectItem(cPickup * a_Pickup, cPlayer * a_Player)
+bool cPlugin::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
-	UNUSED(a_Pickup);
 	UNUSED(a_Player);
+	UNUSED(a_Pickup);
 	return false;
 }
 

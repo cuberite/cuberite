@@ -113,6 +113,7 @@ public:
 	void SendPickupSpawn(const cPickup & a_Pickup);
 	void SendSpawnMob   (const cMonster & a_Mob);
 	void SendUpdateSign (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	void SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	

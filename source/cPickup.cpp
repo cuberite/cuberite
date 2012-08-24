@@ -17,8 +17,6 @@
 #include "cRoot.h"
 #include "cTracer.h"
 
-#include "packets/cPacket_CollectItem.h"
-
 #include "Vector3d.h"
 #include "Vector3f.h"
 
@@ -244,18 +242,25 @@ void cPickup::HandlePhysics(float a_Dt)
 
 bool cPickup::CollectedBy( cPlayer* a_Dest )
 {
-	if(m_bCollected) return false; // It's already collected!
-	// 800 is to long
-	if(m_Timer < 500.f) return false; // Not old enough
-
-	if( cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_COLLECT_ITEM, 2, this, a_Dest ) ) return false;
-
-	if( a_Dest->GetInventory().AddItem( *m_Item ) )
+	if (m_bCollected)
 	{
-		cPacket_CollectItem CollectItem;
-		CollectItem.m_CollectedID = m_UniqueID;
-		CollectItem.m_CollectorID = a_Dest->GetUniqueID();
-		cRoot::Get()->GetServer()->Broadcast( CollectItem );
+		return false; // It's already collected!
+	}
+	
+	// 800 is to long
+	if (m_Timer < 500.f)
+	{
+		return false; // Not old enough
+	}
+
+	if (cRoot::Get()->GetPluginManager()->CallHookCollectPickup(a_Dest, *this))
+	{
+		return false;
+	}
+
+	if (a_Dest->GetInventory().AddItem(*m_Item))
+	{
+		m_World->BroadcastCollectPickup(*this, *a_Dest);
 
 		m_bCollected = true;
 		m_Timer = 0;

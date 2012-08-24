@@ -46,6 +46,7 @@
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_BlockPlace.h"
 #include "packets/cPacket_Chat.h"
+#include "packets/cPacket_CollectItem.h"
 #include "packets/cPacket_CreativeInventoryAction.h"
 #include "packets/cPacket_DestroyEntity.h"
 #include "packets/cPacket_Disconnect.h"
@@ -1889,6 +1890,18 @@ void cClientHandle::SendUpdateSign(
 	us.m_Line3  = a_Line3;
 	us.m_Line4  = a_Line4;
 	Send(us);
+}
+
+
+
+
+
+void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+{
+	cPacket_CollectItem ci;
+	ci.m_CollectedID = a_Pickup.GetUniqueID();
+	ci.m_CollectorID = a_Player.GetUniqueID();
+	Send(ci);
 }
 
 
