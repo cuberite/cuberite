@@ -8,7 +8,6 @@
 #include "Globals.h"
 #include "cSocketThreads.h"
 #include "cClientHandle.h"
-// #include "packets/cPacket_RelativeEntityMoveLook.h"
 
 
 

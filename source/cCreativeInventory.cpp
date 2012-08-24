@@ -10,10 +10,6 @@
 
 #include <json/json.h>
 
-#include "packets/cPacket_CreativeInventoryAction.h"
-#include "packets/cPacket_WholeInventory.h"
-#include "packets/cPacket_InventorySlot.h"
-
 
 
 

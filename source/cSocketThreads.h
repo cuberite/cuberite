@@ -30,7 +30,7 @@ This means that the socket can be written to several times before finally closin
 #ifndef CSOCKETTHREADS_H_INCLUDED
 #define CSOCKETTHREADS_H_INCLUDED
 
-#include "packets/cPacket.h"
+#include "cSocket.h"
 #include "cIsThread.h"
 
 
