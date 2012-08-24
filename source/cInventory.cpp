@@ -10,10 +10,6 @@
 
 #include <json/json.h>
 
-#include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_WholeInventory.h"
-#include "packets/cPacket_InventorySlot.h"
-
 #include "items/Item.h"
 
 
@@ -299,22 +295,17 @@ void cInventory::SendWholeInventoryToAll(void)
 
 
 
-void cInventory::SendSlot( int a_SlotNum )
+void cInventory::SendSlot(int a_SlotNum)
 {
 	cItem * Item = GetSlot(a_SlotNum);
 	if (Item != NULL)
 	{
 		if (Item->IsEmpty())
 		{
+			// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
 			Item->Empty();
 		}
-		cPacket_InventorySlot InventorySlot;
-		InventorySlot.m_ItemCount = Item->m_ItemCount;
-		InventorySlot.m_ItemID = (short) Item->m_ItemID;
-		InventorySlot.m_ItemUses = (char) Item->m_ItemHealth;
-		InventorySlot.m_SlotNum = (short) a_SlotNum;
-		InventorySlot.m_WindowID = 0; // Inventory window ID
-		m_Owner->GetClientHandle()->Send( InventorySlot );
+		m_Owner->GetClientHandle()->SendInventorySlot(0, a_SlotNum, *Item);
 	}
 }
 
