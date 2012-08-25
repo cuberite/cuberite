@@ -92,6 +92,9 @@ public:
 	void BroadcastMetadata       (const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawn          (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup  (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastWeather        (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
+	void BroadcastThunderbolt    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastTimeUpdate     (const cClientHandle * a_Exclude = NULL);
 	
 	/// If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
@@ -365,9 +368,9 @@ public:
 		float ToWait;
 	};
 
-	void QueueBlockForTick(int a_X, int a_Y, int a_Z, float a_Time);
+	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_Time);
 
-	void CastThunderbolt (int a_X, int a_Y, int a_Z);						//tolua_export
+	void CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ);						//tolua_export
 	void SetWeather ( eWeather a_Weather );									//tolua_export
 	void ChangeWeather();												//tolua_export
 	eWeather GetWeather() { return m_Weather; };							//tolua_export

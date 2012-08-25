@@ -11,6 +11,7 @@
 #ifndef CCLIENTHANDLE_H_INCLUDED
 #define CCLIENTHANDLE_H_INCLUDED
 
+#include "defines.h"
 #include "packets/cPacket.h"
 #include "Vector3d.h"
 #include "cSocketThreads.h"
@@ -117,6 +118,9 @@ public:
 	void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendUnloadChunk(int a_ChunkX, int a_ChunkZ);
+	void SendWeather(eWeather a_Weather);
+	void SendTimeUpdate(Int64 a_WorldTime);
+	void SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	

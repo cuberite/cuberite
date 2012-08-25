@@ -43,12 +43,6 @@
 #include "Trees.h"
 #include "cPluginManager.h"
 #include "blocks/Block.h"
-
-
-#include "packets/cPacket_TimeUpdate.h"
-#include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_Thunderbolt.h"
-
 #include "Vector3d.h"
 
 #include "tolua++.h"
@@ -312,38 +306,24 @@ cWorld::cWorld( const AString & a_WorldName )
 
 
 
-void cWorld::SetWeather( eWeather a_Weather )
+void cWorld::SetWeather(eWeather a_Weather)
 {
-	switch( a_Weather )
+	switch (a_Weather)
 	{
-	case eWeather_Sunny:
+		case eWeather_Sunny:        
+		case eWeather_Rain:         
+		case eWeather_ThunderStorm:
 		{
 			m_Weather = a_Weather;
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 2; //stop rain
-			Broadcast ( WeatherPacket );
+			BroadcastWeather(a_Weather);
+			break;
 		}
-		break;
-	case eWeather_Rain:
+		
+		default:
 		{
-			m_Weather = a_Weather;
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 1; //begin rain
-			Broadcast ( WeatherPacket );
+			LOGWARN("Trying to set unknown weather %d", a_Weather);
+			break;
 		}
-		break;
-	case eWeather_ThunderStorm:
-		{
-			m_Weather = a_Weather;
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 1; //begin rain
-			Broadcast ( WeatherPacket );
-			CastThunderbolt ( 0, 0, 0 ); //start thunderstorm with a lightning strike at 0, 0, 0. >:D
-		}
-		break;
-	default:
-		LOGWARN("Trying to set unknown weather %d", a_Weather );
-		break;
 	}
 }
 
@@ -351,19 +331,23 @@ void cWorld::SetWeather( eWeather a_Weather )
 
 
 
-void cWorld::CastThunderbolt ( int a_X, int a_Y, int a_Z )
+void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	cPacket_Thunderbolt ThunderboltPacket;
-	ThunderboltPacket.m_xLBPos = a_X;
-	ThunderboltPacket.m_yLBPos = a_Y;
-	ThunderboltPacket.m_zLBPos = a_Z;
-	BroadcastToChunkOfBlock(a_X, a_Y, a_Z, &ThunderboltPacket);
+	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
 }
+
+
+
+
 
 void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return m_ChunkMap->SetNextBlockTick(a_BlockX, a_BlockY, a_BlockZ);
 }
+
+
+
+
 
 void cWorld::InitializeSpawn(void)
 {
@@ -447,16 +431,17 @@ void cWorld::Tick(float a_Dt)
 
 	bool bSendTime = false;
 	m_WorldTimeFraction += a_Dt / 1000.f;
-	while ( m_WorldTimeFraction > 1.f )
+	while (m_WorldTimeFraction > 1.f)
 	{
 		m_WorldTimeFraction -= 1.f;
 		m_WorldTime += 20;
 		bSendTime = true;
 	}
 	m_WorldTime %= 24000; // 24000 units in a day
-	if ( bSendTime )
+	
+	if (bSendTime)
 	{
-		Broadcast( cPacket_TimeUpdate( (m_WorldTime) ) );
+		BroadcastTimeUpdate();
 	}
 
 	{
@@ -1402,6 +1387,51 @@ void cWorld::BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude)
 void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastCollectPickup(a_Pickup, a_Player, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendWeather(a_Weather);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendTimeUpdate(m_WorldTime);
+	}
 }
 
 

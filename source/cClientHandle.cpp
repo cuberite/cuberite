@@ -74,6 +74,7 @@
 #include "packets/cPacket_Respawn.h"
 #include "packets/cPacket_SpawnMob.h"
 #include "packets/cPacket_TeleportEntity.h"
+#include "packets/cPacket_Thunderbolt.h"
 #include "packets/cPacket_TimeUpdate.h"
 #include "packets/cPacket_UpdateHealth.h"
 #include "packets/cPacket_UpdateSign.h"
@@ -1963,6 +1964,63 @@ void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 	UnloadPacket.m_PosZ = a_ChunkZ;
 	UnloadPacket.m_bLoad = false;  // Unload
 	Send(UnloadPacket);
+}
+
+
+
+
+
+void cClientHandle::SendWeather(eWeather a_Weather)
+{
+	switch( a_Weather )
+	{
+		case eWeather_Sunny:
+		{
+			cPacket_NewInvalidState WeatherPacket;
+			WeatherPacket.m_Reason = 2;  // stop rain
+			Send(WeatherPacket);
+			break;
+		}
+		
+		case eWeather_Rain:
+		{
+			cPacket_NewInvalidState WeatherPacket;
+			WeatherPacket.m_Reason = 1;  // begin rain
+			Send(WeatherPacket);
+			break;
+		}
+		
+		case eWeather_ThunderStorm:
+		{
+			cPacket_NewInvalidState WeatherPacket;
+			WeatherPacket.m_Reason = 1;  // begin rain
+			Send(WeatherPacket);
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cClientHandle::SendTimeUpdate(Int64 a_WorldTime)
+{
+	cPacket_TimeUpdate tu;
+	tu.m_Time = a_WorldTime;
+	Send(tu);
+}
+
+
+
+
+
+void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cPacket_Thunderbolt ThunderboltPacket;
+	ThunderboltPacket.m_xLBPos = a_BlockX;
+	ThunderboltPacket.m_yLBPos = a_BlockY;
+	ThunderboltPacket.m_zLBPos = a_BlockZ;
 }
 
 

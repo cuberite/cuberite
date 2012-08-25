@@ -1905,6 +1905,22 @@ void cChunk::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_
 
 
 
+void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
 	// We can operate on entity pointers, we're inside the ChunkMap's CS lock which guards the list

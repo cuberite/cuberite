@@ -467,6 +467,24 @@ void cChunkMap::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer &
 
 
 
+void cChunkMap::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+}
+
+
+
+
+
 void cChunkMap::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
