@@ -217,11 +217,9 @@ cClientHandle::~cClientHandle()
 
 	if (m_Socket.IsValid())
 	{
-		if(!m_bKicking)
+		if (!m_bKicking)
 		{
-			cPacket_Disconnect Disconnect;
-			Disconnect.m_Reason = "Server shut down? Kthnxbai";
-			m_Socket.Send(&Disconnect);
+			SendDisconnect("Server shut down? Kthnxbai");
 		}
 	}
 	
@@ -295,7 +293,7 @@ void cClientHandle::Kick(const AString & a_Reason)
 	{
 		LOG("Kicking user \"%s\" for \"%s\"", m_Username.c_str(), a_Reason.c_str());
 	}
-	Send(cPacket_Disconnect(a_Reason));
+	SendDisconnect(a_Reason);
 	m_bKicking = true;
 }
 
@@ -1333,8 +1331,7 @@ void cClientHandle::Tick(float a_Dt)
 	(void)a_Dt;
 	if (cWorld::GetTime() - m_TimeLastPacket > 30.f)  // 30 seconds time-out
 	{
-		cPacket_Disconnect DC("Nooooo!! You timed out! D: Come back!");
-		m_Socket.Send(&DC);
+		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 
 		// TODO: Cannot sleep in the tick thread!
 		cSleep::MilliSleep(1000);  // Give packet some time to be received
@@ -1506,7 +1503,7 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
 	cPacket_Disconnect DC(a_Reason);
-	m_Socket.Send(&DC);  // Send it immediately to the socket, bypassing any packet buffers
+	Send(DC);  // TODO: Send it immediately to the socket, bypassing any packet buffers (? is it safe? packet boundaries...)
 }
 
 
@@ -2021,6 +2018,7 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ThunderboltPacket.m_xLBPos = a_BlockX;
 	ThunderboltPacket.m_yLBPos = a_BlockY;
 	ThunderboltPacket.m_zLBPos = a_BlockZ;
+	Send(ThunderboltPacket);
 }
 
 
@@ -2198,8 +2196,7 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 	if (m_PendingNrmSendPackets.size() + m_PendingLowSendPackets.size() > MAX_OUTGOING_PACKETS)
 	{
 		LOGERROR("ERROR: Too many packets in queue for player %s !!", m_Username.c_str());
-		cPacket_Disconnect DC("Too many packets in queue.");
-		m_Socket.Send(DC);
+		SendDisconnect("Too many packets in queue.");
 		
 		// DEBUG: Dump all outstanding packets' types to the log:
 		int Idx = 0;

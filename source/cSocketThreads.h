@@ -148,8 +148,6 @@ private:
 		
 		virtual void Execute(void) override;
 		
-		void AddOrUpdatePacket(int a_Slot, cPacket * a_Packet);  // Adds the packet to the specified slot, or updates an existing packet in that queue (EntityMoveLook filtering)
-		
 		void PrepareSet     (fd_set * a_Set, cSocket::xSocket & a_Highest);  // Puts all sockets into the set, along with m_ControlSocket1
 		void ReadFromSockets(fd_set * a_Read);  // Reads from sockets indicated in a_Read
 		void WriteToSockets (fd_set * a_Write);  // Writes to sockets indicated in a_Write

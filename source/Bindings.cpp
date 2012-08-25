@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/24/12 10:55:13.
+** Generated automatically by tolua++-1.0.92 on 08/25/12 23:57:06.
 */
 
 #ifndef __cplusplus
@@ -12264,14 +12264,14 @@ static int tolua_AllToLua_cWorld_CastThunderbolt00(lua_State* tolua_S)
 #endif
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CastThunderbolt'", NULL);
 #endif
   {
-   self->CastThunderbolt(a_X,a_Y,a_Z);
+   self->CastThunderbolt(a_BlockX,a_BlockY,a_BlockZ);
   }
  }
  return 0;

@@ -5,12 +5,6 @@
 
 
 
-class cPacket;
-
-
-
-
-
 class cSocket
 {
 public:
@@ -74,8 +68,6 @@ public:
 	int Connect(const AString & a_HostNameOrAddr, unsigned short a_Port);  // Returns 0 on success, !0 on failure
 	int Receive( char* a_Buffer, unsigned int a_Length, unsigned int a_Flags );
 	int Send   (const char * a_Buffer, unsigned int a_Length);
-	int Send   (const cPacket * a_Packet);  // Sends the packet, doesn't handle partial sends
-	int Send   (const cPacket & a_Packet);  // Sends the packet, doesn't handle partial sends
 	
 	unsigned short GetPort(void) const;  // Returns 0 on failure
 
