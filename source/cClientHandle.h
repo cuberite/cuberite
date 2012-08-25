@@ -114,6 +114,9 @@ public:
 	void SendSpawnMob   (const cMonster & a_Mob);
 	void SendUpdateSign (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player);
+	void SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
+	void SendUnloadChunk(int a_ChunkX, int a_ChunkZ);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	

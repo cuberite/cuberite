@@ -31,13 +31,6 @@
 #include "cPluginManager.h"
 #include "blocks/Block.h"
 
-#include "packets/cPacket_DestroyEntity.h"
-#include "packets/cPacket_PreChunk.h"
-#include "packets/cPacket_BlockChange.h"
-#include "packets/cPacket_MultiBlock.h"
-
-#include "blocks/Block.h"
-
 #include <json/json.h>
 
 
@@ -358,58 +351,14 @@ void cChunk::Stay(bool a_Stay)
 
 void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 {
-	cCSLock Lock(m_CSBlockLists);
-	unsigned int PendingSendBlocks = m_PendingSendBlocks.size();
-	if( PendingSendBlocks > 1 )
-	{
-		cPacket_MultiBlock MultiBlock;
-		MultiBlock.m_ChunkX = m_PosX;
-		MultiBlock.m_ChunkZ = m_PosZ;
-		MultiBlock.m_NumBlocks = (short)PendingSendBlocks;
-		MultiBlock.m_Data = new cPacket_MultiBlock::sBlockChange[ PendingSendBlocks ];
-		MultiBlock.m_DataSize = PendingSendBlocks * sizeof( cPacket_MultiBlock::sBlockChange );
-		//LOG("Sending multiblock packet for %i blocks", PendingSendBlocks );
-		for( unsigned int i = 0; i < PendingSendBlocks; i++)
-		{
-			unsigned int index = m_PendingSendBlocks[i];
-			Vector3i BlockPos = IndexToCoordinate( index );
+	BroadcastPendingBlockChanges();
 
-			unsigned int Coords = BlockPos.y | (BlockPos.z << 8) | (BlockPos.x << 12);
-			unsigned int Blocks = GetNibble( m_BlockMeta, index ) | (m_BlockTypes[index] << 4);
-			MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
-		}
-		m_PendingSendBlocks.clear();
-		PendingSendBlocks = m_PendingSendBlocks.size();
-		Broadcast( MultiBlock );
-	}
-	if( PendingSendBlocks > 0 )
+	// Unload the chunk from all clients that have queued unloading:
+	for (cClientHandleList::iterator itr = m_UnloadQuery.begin(), end = m_UnloadQuery.end(); itr != end; ++itr)
 	{
-		for( unsigned int i = 0; i < PendingSendBlocks; i++)
-		{
-			unsigned int index = m_PendingSendBlocks[i];
-			Vector3i WorldPos = PositionToWorldPosition( IndexToCoordinate( index ) );
-
-			cPacket_BlockChange BlockChange;
-			BlockChange.m_PosX = WorldPos.x;
-			BlockChange.m_PosY = (unsigned char)WorldPos.y;
-			BlockChange.m_PosZ = WorldPos.z;
-			BlockChange.m_BlockType = m_BlockTypes[index];
-			BlockChange.m_BlockMeta = GetNibble( m_BlockMeta, index );
-			Broadcast( BlockChange );
-		}
-		m_PendingSendBlocks.clear();
+		(*itr)->SendUnloadChunk(m_PosX, m_PosZ);
 	}
-	Lock.Unlock();
-
-	while ( !m_UnloadQuery.empty() )
-	{
-		cPacket_PreChunk UnloadPacket;
-		UnloadPacket.m_PosX = GetPosX();
-		UnloadPacket.m_PosZ = GetPosZ();
-		UnloadPacket.m_bLoad = false; // Unload
-		(*m_UnloadQuery.begin())->Send( UnloadPacket );
-		m_UnloadQuery.remove( *m_UnloadQuery.begin() );
-	}
+	m_UnloadQuery.clear();
 
 	CheckBlocks();
 	
@@ -422,6 +371,35 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		{
 			m_IsDirty = ((cFurnaceEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
 		}
+	}
+}
+
+
+
+
+
+void cChunk::BroadcastPendingBlockChanges(void)
+{
+	sSetBlockVector Changes;
+	{
+		cCSLock Lock(m_CSBlockLists);
+		if (m_PendingSendBlocks.empty())
+		{
+			return;
+		}
+		Changes.reserve(m_PendingSendBlocks.size());
+		for (std::vector<unsigned int>::iterator itr = m_PendingSendBlocks.begin(), end = m_PendingSendBlocks.end(); itr != end; ++itr)
+		{
+			unsigned int index = *itr;
+			Vector3i RelPos = IndexToCoordinate(index);
+			Changes.push_back(sSetBlock(m_PosX, m_PosZ, RelPos.x, RelPos.y, RelPos.z, GetBlock(index), GetMeta(index)));
+		}  // for itr - m_PendingSendBlocks[]
+		m_PendingSendBlocks.clear();
+	}
+	
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+	{
+		(*itr)->SendBlockChanges(m_PosX, m_PosZ, Changes);
 	}
 }
 
@@ -1176,42 +1154,24 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLO
 
 
 
-void cChunk::SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client )
+void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
-	if( a_Client == 0 )
+	unsigned int index = MakeIndex(a_RelX, a_RelY, a_RelZ);
+	if (index == INDEX_OUT_OF_RANGE)
 	{
-		cCSLock Lock(m_CSBlockLists);
-		unsigned int index = MakeIndex( a_X, a_Y, a_Z );
-		if( index != INDEX_OUT_OF_RANGE )
-		{
-			m_PendingSendBlocks.push_back( index );
-		}
-		else
-		{
-			LOGWARN("cChunk::SendBlockTo Index out of range!");
-		}
+		LOGWARN("cChunk::SendBlockTo Index out of range!");
 		return;
 	}
 
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	if (a_Client == NULL)
 	{
-		if ( *itr == a_Client )
-		{
-			unsigned int index = MakeIndex( a_X, a_Y, a_Z );
-			Vector3i WorldPos = PositionToWorldPosition( a_X, a_Y, a_Z );
-			cPacket_BlockChange BlockChange;
-			BlockChange.m_PosX = WorldPos.x;
-			BlockChange.m_PosY = (unsigned char)WorldPos.y;
-			BlockChange.m_PosZ = WorldPos.z;
-			if( index != INDEX_OUT_OF_RANGE )
-			{
-				BlockChange.m_BlockType = m_BlockTypes[ index ];
-				BlockChange.m_BlockMeta = GetNibble( m_BlockMeta, index );
-			} // else it's both 0
-			a_Client->Send( BlockChange );
-			break;
-		}
+		// Queue the block for all clients in the chunk (will be sent in Tick())
+		m_PendingSendBlocks.push_back(index);
+		return;
 	}
+
+	Vector3i wp = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
+	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(index), GetMeta(index));
 }
 
 
@@ -1362,13 +1322,12 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 		
 		m_LoadedByClient.erase(itr);
 
-		if ( !a_Client->IsDestroyed() )
+		if (!a_Client->IsDestroyed())
 		{
 			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
 			{
 				LOGD("chunk [%i, %i] destroying entity #%i for player \"%s\"", m_PosX, m_PosZ, (*itr)->GetUniqueID(), a_Client->GetUsername().c_str() );
-				cPacket_DestroyEntity DestroyEntity( *itr );
-				a_Client->Send( DestroyEntity );
+				a_Client->SendDestroyEntity(*(*itr));
 			}
 		}
 		return;
@@ -1982,20 +1941,20 @@ void cChunk::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 
 
 
-void cChunk::PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z)
+void cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
-	a_Y = a_ChunkY;
-	a_X = m_PosX * Width + a_ChunkX;
-	a_Z = m_PosZ * Width + a_ChunkZ;
+	a_BlockY = a_RelY;
+	a_BlockX = m_PosX * Width + a_RelX;
+	a_BlockZ = m_PosZ * Width + a_RelZ;
 }
 
 
 
 
 
-Vector3i cChunk::PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
+Vector3i cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ)
 {
-	return Vector3i( m_PosX * Width + a_ChunkX, m_PosY * Height + a_ChunkY, m_PosZ * Width + a_ChunkZ );
+	return Vector3i(m_PosX * Width + a_RelX, m_PosY * Height + a_RelY, m_PosZ * Width + a_RelZ);
 }
 
 

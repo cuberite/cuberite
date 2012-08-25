@@ -138,7 +138,7 @@ public:
 
 	int  GetHeight( int a_X, int a_Z );
 
-	void SendBlockTo( int a_X, int a_Y, int a_Z, cClientHandle* a_Client );
+	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
 	/// Adds a client to the chunk; returns true if added, false if already there
 	bool AddClient    (cClientHandle* a_Client );
@@ -193,9 +193,13 @@ public:
 	
 	void SendBlockEntity         (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
-	void PositionToWorldPosition(int a_ChunkX, int a_ChunkY, int a_ChunkZ, int & a_X, int & a_Y, int & a_Z);
-	Vector3i PositionToWorldPosition( const Vector3i & a_InChunkPos ) { return PositionToWorldPosition( a_InChunkPos.x, a_InChunkPos.y, a_InChunkPos.z ); }
-	Vector3i PositionToWorldPosition( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
+	Vector3i PositionToWorldPosition(const Vector3i & a_RelPos)
+	{
+		return PositionToWorldPosition(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+	}
+	
+	void     PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	Vector3i PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ );
 
 	inline void MarkDirty(void)
 	{
@@ -268,6 +272,9 @@ private:
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 
+	/// Sends m_PendingSendBlocks to all clients
+	void BroadcastPendingBlockChanges(void);
+	
 	/// Checks the block scheduled for checking in m_ToTickBlocks[]
 	void CheckBlocks(void);
 	

@@ -1400,7 +1400,11 @@ void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* =
 			if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
 			{
 				m_ChunksToSend.erase(itr);
+				
+				// TODO: _X: Decouple this from packet sending, it creates a deadlock possibility
+				//  -- postpone till Tick() instead, using a bool flag
 				CheckIfWorldDownloaded();
+				
 				Found = true;
 				break;
 			}
@@ -1908,14 +1912,77 @@ void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & 
 
 
 
+void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	cPacket_BlockChange BlockChange;
+	BlockChange.m_PosX = a_BlockX;
+	BlockChange.m_PosY = (unsigned char)a_BlockY;
+	BlockChange.m_PosZ = a_BlockZ;
+	BlockChange.m_BlockType = a_BlockType;
+	BlockChange.m_BlockMeta = a_BlockMeta;
+	Send(BlockChange);
+}
+
+
+
+
+
+void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	if (a_Changes.size() == 1)
+	{
+		// Special packet for single-block changes
+		const sSetBlock & blk = a_Changes.front();
+		SendBlockChange(a_ChunkX * cChunkDef::Width + blk.x, blk.y, a_ChunkZ * cChunkDef::Height + blk.z, blk.BlockType, blk.BlockMeta);
+		return;
+	}
+	
+	cPacket_MultiBlock MultiBlock;
+	MultiBlock.m_ChunkX = a_ChunkX;
+	MultiBlock.m_ChunkZ = a_ChunkZ;
+	MultiBlock.m_NumBlocks = (short)a_Changes.size();
+	MultiBlock.m_Data = new cPacket_MultiBlock::sBlockChange[a_Changes.size()];
+	int i = 0;
+	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr, i++)
+	{
+		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
+		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
+		MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
+	}
+	Send(MultiBlock);
+}
+
+
+
+
+
+void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
+{
+	cPacket_PreChunk UnloadPacket;
+	UnloadPacket.m_PosX = a_ChunkX;
+	UnloadPacket.m_PosZ = a_ChunkZ;
+	UnloadPacket.m_bLoad = false;  // Unload
+	Send(UnloadPacket);
+}
+
+
+
+
+
 void cClientHandle::CheckIfWorldDownloaded(void)
 {
 	if (m_State != csDownloadingWorld)
 	{
 		return;
 	}
-	cCSLock Lock(m_CSChunkLists);
-	if (m_ChunksToSend.empty())
+	
+	bool ShouldSendConfirm = false;
+	{
+		cCSLock Lock(m_CSChunkLists);
+		ShouldSendConfirm = m_ChunksToSend.empty();
+	}
+	
+	if (ShouldSendConfirm)
 	{
 		SendConfirmPosition();
 	}
