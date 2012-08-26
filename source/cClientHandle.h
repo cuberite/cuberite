@@ -11,7 +11,7 @@
 #ifndef CCLIENTHANDLE_H_INCLUDED
 #define CCLIENTHANDLE_H_INCLUDED
 
-#include "defines.h"
+#include "Defines.h"
 #include "packets/cPacket.h"
 #include "Vector3d.h"
 #include "cSocketThreads.h"
