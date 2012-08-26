@@ -1,7 +1,6 @@
 COMPILING
 =========
 
-To compile MCServer on *nix, either:
-1, Use GNU-compatible make (with GNUmakefile) directly, as described in the GNUmakefile header
-2, Copy makefile.debug or makefile.release as makefile and use any make-system
-3, Use "make -f makefile.debug" or "make -f makefile.release", if your make system accepts "-f <filename>" parameter
+To compile MCServer on *nix, you need a GNUmake-compatible make that reads GNUmakefile.
+Run "make" to build a debug version (slow, but gives more info on crash)
+Run "make release=1" to build a release version (fast, less info on crash)
