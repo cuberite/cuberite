@@ -1364,6 +1364,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\cNoteEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\cNoteEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\cPawn.cpp"
 					>
 				</File>
@@ -2213,6 +2221,10 @@
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockMushroom.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\blocks\BlockNote.h"
 					>
 				</File>
 				<File

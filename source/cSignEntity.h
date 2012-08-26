@@ -13,9 +13,6 @@ namespace Json
 }
 
 
-
-
-
 class cSignEntity : 
 	public cBlockEntity
 {

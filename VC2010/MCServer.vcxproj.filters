@@ -442,6 +442,9 @@
     <Filter Include="Generating">
       <UniqueIdentifier>{833e49bd-848d-42de-ac60-6cd7656474e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cBlockEntity\cNoteEntity">
+      <UniqueIdentifier>{7bfe7ca2-4966-4eca-a501-94e1bfaa009f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -945,6 +948,9 @@
       <Filter>Generating</Filter>
     </ClCompile>
     <ClCompile Include="..\source\ByteBuffer.cpp" />
+    <ClCompile Include="..\source\cNoteEntity.cpp">
+      <Filter>cBlockEntity\cNoteEntity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1650,6 +1656,12 @@
     <ClInclude Include="..\source\ByteBuffer.h" />
     <ClInclude Include="..\source\items\ItemSign.h">
       <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\blocks\BlockNote.h">
+      <Filter>Blocks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\cNoteEntity.h">
+      <Filter>cBlockEntity\cNoteEntity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

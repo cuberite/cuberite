@@ -111,6 +111,7 @@ protected:
 	void LoadChestFromNBT  (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSignFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadNoteFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z);

@@ -17,6 +17,7 @@
 #include "cChestEntity.h"
 #include "cFurnaceEntity.h"
 #include "cSignEntity.h"
+#include "cNoteEntity.h"
 #include "cTorch.h"
 #include "cLadder.h"
 #include "cPickup.h"
@@ -962,6 +963,15 @@ void cChunk::CreateBlockEntities(void)
 						}
 						break;
 					}
+
+					case E_BLOCK_NOTE_BLOCK:
+					{
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						{
+							m_BlockEntities.push_back(new cNoteEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+						}
+						break;
+					}
 				}  // switch (BlockType)
 			}  // for y
 		}  // for z
@@ -1085,6 +1095,11 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		case E_BLOCK_WALLSIGN:
 		{
 			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			break;
+		}
+		case E_BLOCK_NOTE_BLOCK:
+		{
+			AddBlockEntity(new cNoteEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 	}  // switch (a_BlockType)

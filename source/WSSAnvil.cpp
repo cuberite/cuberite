@@ -11,6 +11,7 @@
 #include "cChestEntity.h"
 #include "cFurnaceEntity.h"
 #include "cSignEntity.h"
+#include "cNoteEntity.h"
 #include "cItem.h"
 #include "StringCompression.h"
 #include "cEntity.h"
@@ -147,6 +148,14 @@ protected:
 		m_Writer.EndCompound();
 	}
 
+	void AddNoteEntity(cNoteEntity * a_Note)
+	{
+		m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Note, "Music");
+		m_Writer.AddByte("note", a_Note->GetPitch());
+		m_Writer.EndCompound();
+	}
+
 
 	virtual bool LightIsValid(bool a_IsLightValid) override
 	{
@@ -184,6 +193,7 @@ protected:
 			case E_BLOCK_FURNACE:   AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
 			case E_BLOCK_SIGN_POST:
 			case E_BLOCK_WALLSIGN:  AddSignEntity   ((cSignEntity *)   a_Entity); break;
+			case E_BLOCK_NOTE_BLOCK:  AddNoteEntity   ((cNoteEntity *)   a_Entity); break;
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -648,6 +658,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadSignFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Music", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadNoteFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		// TODO: Other block entities
 	}  // for Child - tag children
 }
@@ -778,12 +792,52 @@ void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParse
 		return;
 	}
 	std::auto_ptr<cSignEntity> Sign(new cSignEntity(E_BLOCK_SIGN_POST, x, y, z, m_World));
-	int Text1 = a_NBT.FindChildByName(a_TagIdx, "Text1");
-	if (Text1 >= 0)
+
+	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Text1");
+	if (currentLine >= 0)
 	{
-		Sign->SetLine(0, a_NBT.GetString(Text1));
+		Sign->SetLine(0, a_NBT.GetString(currentLine));
 	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text2");
+	if (currentLine >= 0)
+	{
+		Sign->SetLine(1, a_NBT.GetString(currentLine));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text3");
+	if (currentLine >= 0)
+	{
+		Sign->SetLine(2, a_NBT.GetString(currentLine));
+	}
+
+	currentLine = a_NBT.FindChildByName(a_TagIdx, "Text4");
+	if (currentLine >= 0)
+	{
+		Sign->SetLine(3, a_NBT.GetString(currentLine));
+	}
+
 	a_BlockEntities.push_back(Sign.release());
+}
+
+
+
+
+void cWSSAnvil::LoadNoteFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cNoteEntity> Note(new cNoteEntity(x, y, z, m_World));
+	int note = a_NBT.FindChildByName(a_TagIdx, "note");
+	if (note >= 0)
+	{
+		Note->SetPitch(a_NBT.GetByte(note));
+	}
+	a_BlockEntities.push_back(Note.release());
 }
 
 
@@ -1003,3 +1057,7 @@ unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const
 	}  // for i - m_Header[]
 	return MaxLocation >> 8;
 }
+
+
+
+

@@ -356,6 +356,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">Default</BasicRuntimeChecks>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug with optimized Noise|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\source\cNoteEntity.cpp" />
     <ClCompile Include="..\source\CompoGen.cpp" />
     <ClCompile Include="..\source\cPassiveAggressiveMonster.cpp" />
     <ClCompile Include="..\source\cPassiveMonster.cpp" />
@@ -528,6 +529,7 @@
     <ClInclude Include="..\source\blocks\BlockLeaves.h" />
     <ClInclude Include="..\source\blocks\BlockMelon.h" />
     <ClInclude Include="..\source\blocks\BlockMushroom.h" />
+    <ClInclude Include="..\source\blocks\BlockNote.h" />
     <ClInclude Include="..\source\blocks\BlockOre.h" />
     <ClInclude Include="..\source\blocks\BlockPiston.h" />
     <ClInclude Include="..\source\blocks\BlockRedstone.h" />
@@ -578,6 +580,7 @@
     <ClInclude Include="..\source\ChunkSender.h" />
     <ClInclude Include="..\source\cIsThread.h" />
     <ClInclude Include="..\Source\cLadder.h" />
+    <ClInclude Include="..\source\cNoteEntity.h" />
     <ClInclude Include="..\source\cPlugin_Squirrel.h" />
     <ClInclude Include="..\source\cSquirrelCommandBinder.h" />
     <ClInclude Include="..\Source\cVine.h" />

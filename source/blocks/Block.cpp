@@ -38,6 +38,7 @@
 #include "BlockMelon.h"
 #include "BlockIce.h"
 #include "BlockOre.h"
+#include "BlockNote.h"
 
 bool cBlockHandler::m_HandlerInitialized = false;
 cBlockHandler *cBlockHandler::m_BlockHandler[256];
@@ -158,6 +159,8 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 		return new cBlockStoneHandler(a_BlockID);
 	case E_BLOCK_MELON:
 		return new cBlockMelonHandler(a_BlockID);
+	case E_BLOCK_NOTE_BLOCK:
+		return new cBlockNoteHandler(a_BlockID);
 	default:		
 		return new cBlockHandler(a_BlockID);
 		break;

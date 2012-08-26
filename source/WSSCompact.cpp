@@ -12,6 +12,7 @@
 #include "cChestEntity.h"
 #include "cSignEntity.h"
 #include "cFurnaceEntity.h"
+#include "cNoteEntity.h"
 #include "BlockID.h"
 
 
@@ -73,7 +74,8 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 		case E_BLOCK_FURNACE:   SaveInto = "Furnaces"; break;
 		case E_BLOCK_SIGN_POST: SaveInto = "Signs";    break;
 		case E_BLOCK_WALLSIGN:  SaveInto = "Signs";    break;
-		
+		case E_BLOCK_NOTE_BLOCK:  SaveInto = "Notes";    break;
+
 		default:
 		{
 			ASSERT(!"Unhandled blocktype in BlockEntities list while saving to JSON");
@@ -315,6 +317,26 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 				a_BlockEntities.push_back( SignEntity );
 			}
 		}  // for itr - AllSigns[]
+	}
+
+	// Load note blocks
+	Json::Value AllNotes = a_Value.get("Notes", Json::nullValue);
+	if( !AllNotes.empty() )
+	{
+		for( Json::Value::iterator itr = AllNotes.begin(); itr != AllNotes.end(); ++itr )
+		{
+			Json::Value & Note = *itr;
+			cNoteEntity * NoteEntity = new cNoteEntity(0, 0, 0, a_World);
+			if ( !NoteEntity->LoadFromJson( Note ) )
+			{
+				LOGERROR("ERROR READING NOTE BLOCK FROM JSON!" );
+				delete NoteEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( NoteEntity );
+			}
+		}  // for itr - AllNotes[]
 	}
 }
 
