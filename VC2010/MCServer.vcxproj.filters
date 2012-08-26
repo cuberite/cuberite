@@ -951,6 +951,7 @@
     <ClCompile Include="..\source\cNoteEntity.cpp">
       <Filter>cBlockEntity\cNoteEntity</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\ChunkDataSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1663,6 +1664,7 @@
     <ClInclude Include="..\source\cNoteEntity.h">
       <Filter>cBlockEntity\cNoteEntity</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\ChunkDataSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

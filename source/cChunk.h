@@ -43,6 +43,7 @@ class cFurnaceEntity;
 class cBlockArea;
 class cPawn;
 class cPickup;
+class cChunkDataSerializer;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cItemCallback<cEntity>        cEntityCallback;
@@ -191,6 +192,7 @@ public:
 	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup  (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastChunkData      (cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	
 	void SendBlockEntity         (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 

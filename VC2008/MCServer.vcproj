@@ -389,6 +389,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\ChunkDataSerializer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ChunkDataSerializer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\ChunkDef.h"
 				>
 			</File>

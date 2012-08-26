@@ -95,6 +95,7 @@ public:
 	void BroadcastWeather        (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTimeUpdate     (const cClientHandle * a_Exclude = NULL);
+	void BroadcastChunkData      (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	
 	/// If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);

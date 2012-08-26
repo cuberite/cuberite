@@ -10,9 +10,8 @@
 #include "Globals.h"
 #include "ChunkSender.h"
 #include "cWorld.h"
-#include "packets/cPacket_MapChunk.h"
-#include "packets/cPacket_PreChunk.h"
 #include "cBlockEntity.h"
+#include "ChunkDataSerializer.h"
 
 
 
@@ -217,24 +216,21 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 		return;
 	}
 	
-	// Prepare MapChunk packets:
+	// Query and prepare chunk data:
 	if( !m_World->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, *this) )
 	{
 		return;
 	}
-	cPacket_PreChunk PreChunk(a_ChunkX, a_ChunkZ, true);
-	cPacket_MapChunk MapChunk(a_ChunkX, a_ChunkY, a_ChunkZ, (BLOCKTYPE *)m_BlockData, m_BiomeMap);
+	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap);
 	
 	// Send:
 	if (a_Client == NULL)
 	{
-		m_World->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, PreChunk);
-		m_World->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, MapChunk);
+		m_World->BroadcastChunkData(a_ChunkX, a_ChunkZ, Data);
 	}
 	else
 	{
-		a_Client->Send(PreChunk);
-		a_Client->Send(MapChunk);
+		a_Client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
 	}
 	
 	// Send block-entity packets:

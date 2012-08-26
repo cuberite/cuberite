@@ -36,6 +36,7 @@ class cWindow;
 class cPawn;
 class cPickup;
 class cMonster;
+class cChunkDataSerializer;
 
 
 
@@ -121,6 +122,7 @@ public:
 	void SendWeather(eWeather a_Weather);
 	void SendTimeUpdate(Int64 a_WorldTime);
 	void SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	

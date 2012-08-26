@@ -27,6 +27,7 @@
 #include "cTimer.h"
 #include "items/Item.h"
 #include "blocks/Block.h"
+#include "ChunkDataSerializer.h"
 
 #include "cTracer.h"
 #include "Vector3f.h"
@@ -2019,6 +2020,21 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ThunderboltPacket.m_yLBPos = a_BlockY;
 	ThunderboltPacket.m_zLBPos = a_BlockZ;
 	Send(ThunderboltPacket);
+}
+
+
+
+
+
+void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+{
+	// Send the pre-chunk:
+	cPacket_PreChunk pre(a_ChunkX, a_ChunkZ, true);
+	Send(pre);
+	
+	// Send the data:
+	cPacket_MapChunk mc(a_ChunkX, a_ChunkZ, a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5));
+	Send(mc);
 }
 
 
