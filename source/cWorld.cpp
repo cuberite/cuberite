@@ -1213,41 +1213,6 @@ const double & cWorld::GetSpawnY(void)
 
 
 
-void cWorld::Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->Send( a_Packet );
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastToChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Packet, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastToChunkOfBlock(a_X, a_Y, a_Z, a_Packet, a_Exclude);
-}
-
-
-
-
 
 void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
 {
@@ -1441,6 +1406,24 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastChunkData(a_ChunkX, a_ChunkZ, a_Serializer, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListItem(a_Player, a_IsOnline);
+	}
 }
 
 
@@ -1767,7 +1750,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 		cClientHandle * ch = (*itr)->GetClientHandle();
 		if ((ch != NULL) && !ch->IsDestroyed())
 		{
-			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr));
+			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), true);
 		}
 	}
 }

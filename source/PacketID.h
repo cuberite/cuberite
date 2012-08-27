@@ -27,7 +27,7 @@ enum ENUM_PACKET_ID
 	E_ITEM_SWITCH               = 0x10,  // OBSOLETE, use E_SLOT_SELECTED instead
 	E_ADD_TO_INV                = 0x11,  // TODO: Sure this is not Use Bed??
 	E_ANIMATION                 = 0x12,
-	E_PACKET_13                 = 0x13,
+	E_PACKET_ENTITY_ACTION      = 0x13,
 	E_NAMED_ENTITY_SPAWN        = 0x14,
 	E_PICKUP_SPAWN              = 0x15,
 	E_COLLECT_ITEM              = 0x16,

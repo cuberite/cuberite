@@ -25,7 +25,6 @@
 
 
 
-class cPacket;
 class cRedstone;
 class cFireSimulator;
 class cWaterSimulator;
@@ -59,7 +58,7 @@ class cWorld													//tolua_export
 {																//tolua_export
 public:
 
-	OBSOLETE static cWorld* GetWorld();
+	OBSOLETE static cWorld * GetWorld();
 
 	// Return time in seconds
 	inline static float GetTime()													//tolua_export
@@ -74,10 +73,6 @@ public:
 
 	int GetHeight( int a_X, int a_Z );												//tolua_export
 
-	void Broadcast(const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
-	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
-	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
-	
 	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
@@ -96,6 +91,7 @@ public:
 	void BroadcastThunderbolt    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTimeUpdate     (const cClientHandle * a_Exclude = NULL);
 	void BroadcastChunkData      (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	
 	/// If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
@@ -174,9 +170,6 @@ public:
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	void AddEntity( cEntity* a_Entity );
-	
-	/// Add an entity to the chunk specified; broadcasts the a_SpawnPacket to all clients of that chunk
-	void AddEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ, cPacket * a_SpawnPacket);
 	
 	/// Removes the entity from the chunk specified
 	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);

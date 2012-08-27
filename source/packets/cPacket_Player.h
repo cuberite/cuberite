@@ -131,7 +131,7 @@ public:
 class cPacket_PlayerPosition : public cPacket
 {
 public:
-	cPacket_PlayerPosition( cPlayer* a_Player );
+	cPacket_PlayerPosition(const cPlayer & a_Player);
 	cPacket_PlayerPosition()
 		: m_PosX( 0.0 )
 		, m_PosY( 0.0 )

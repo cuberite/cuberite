@@ -92,8 +92,8 @@ private:
 
 	void Destroy();
 
-	int m_WindowID;
-	int m_WindowType;
+	char    m_WindowID;
+	int     m_WindowType;
 	AString m_WindowTitle;
 
 	cWindowOwner * m_Owner;

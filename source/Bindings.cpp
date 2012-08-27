@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/25/12 23:57:06.
+** Generated automatically by tolua++-1.0.92 on 08/27/12 16:12:30.
 */
 
 #ifndef __cplusplus
@@ -21119,7 +21119,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_SWITCH",E_ITEM_SWITCH);
   tolua_constant(tolua_S,"E_ADD_TO_INV",E_ADD_TO_INV);
   tolua_constant(tolua_S,"E_ANIMATION",E_ANIMATION);
-  tolua_constant(tolua_S,"E_PACKET_13",E_PACKET_13);
+  tolua_constant(tolua_S,"E_PACKET_ENTITY_ACTION",E_PACKET_ENTITY_ACTION);
   tolua_constant(tolua_S,"E_NAMED_ENTITY_SPAWN",E_NAMED_ENTITY_SPAWN);
   tolua_constant(tolua_S,"E_PICKUP_SPAWN",E_PICKUP_SPAWN);
   tolua_constant(tolua_S,"E_COLLECT_ITEM",E_COLLECT_ITEM);

@@ -18,7 +18,7 @@ public:
 	cPacket_13()
 		: m_EntityID( 0 )
 		, m_ActionID( 0 )
-	{ m_PacketID = E_PACKET_13; }
+	{ m_PacketID = E_PACKET_ENTITY_ACTION; }
 	virtual cPacket* Clone() const { return new cPacket_13( *this ); }
 
 	virtual int Parse(cByteBuffer & a_Buffer) override;

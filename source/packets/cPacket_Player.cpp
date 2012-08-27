@@ -202,15 +202,15 @@ void cPacket_PlayerMoveLook::Serialize(AString & a_Data) const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPacket_PlayerPosition:
 
-cPacket_PlayerPosition::cPacket_PlayerPosition(cPlayer * a_Player)
+cPacket_PlayerPosition::cPacket_PlayerPosition(const cPlayer & a_Player)
 {
 	m_PacketID = E_PLAYERPOS;
 
-	m_PosX       = a_Player->GetPosX();
-	m_PosY       = a_Player->GetPosY();
-	m_PosZ       = a_Player->GetPosZ();
-	m_Stance     = a_Player->GetStance();
-	m_IsOnGround = a_Player->IsOnGround();
+	m_PosX       = a_Player.GetPosX();
+	m_PosY       = a_Player.GetPosY();
+	m_PosZ       = a_Player.GetPosZ();
+	m_Stance     = a_Player.GetStance();
+	m_IsOnGround = a_Player.IsOnGround();
 }
 
 

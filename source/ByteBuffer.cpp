@@ -306,6 +306,15 @@ bool cByteBuffer::SkipRead(int a_Count)
 
 
 
+void cByteBuffer::ReadAll(AString & a_Data)
+{
+	ReadString(a_Data, GetReadableSpace());
+}
+
+
+
+
+
 void cByteBuffer::CommitRead(void)
 {
 	m_DataStart = m_ReadPos;

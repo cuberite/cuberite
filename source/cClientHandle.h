@@ -12,7 +12,6 @@
 #define CCLIENTHANDLE_H_INCLUDED
 
 #include "Defines.h"
-#include "packets/cPacket.h"
 #include "Vector3d.h"
 #include "cSocketThreads.h"
 #include "ChunkDef.h"
@@ -29,15 +28,15 @@
 
 
 
-class cPlayer;
-class cRedstone;
+class cChunkDataSerializer;
 class cInventory;
-class cWindow;
+class cMonster;
 class cPawn;
 class cPickup;
-class cMonster;
-class cChunkDataSerializer;
-
+class cPlayer;
+class cProtocol;
+class cRedstone;
+class cWindow;
 
 
 
@@ -83,8 +82,6 @@ public:
 	
 	bool IsPlaying(void) const {return (m_State == csPlaying); }
 
-	void Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority = E_PRIORITY_NORMAL);
-	
 	void SendDisconnect(const AString & a_Reason);
 	void SendHandshake (const AString & a_ServerName);
 	void SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item);
@@ -96,7 +93,7 @@ public:
 	void SendWholeInventory(const cInventory & a_Inventory);
 	void SendWholeInventory(const cWindow    & a_Window);
 	void SendTeleportEntity(const cEntity & a_Entity);
-	void SendPlayerListItem(const cPlayer & a_Player);
+	void SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline);
 	void SendPlayerPosition(void);
 	void SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendRelEntMove    (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
@@ -105,7 +102,7 @@ public:
 	void SendBlockAction   (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2);
 	void SendHealth (void);
 	void SendRespawn(void);
-	void SendGameMode(char a_GameMode);
+	void SendGameMode(eGameMode a_GameMode);
 	void SendDestroyEntity(const cEntity & a_Entity);
 	void SendPlayerMoveLook(void);
 	void SendEntityStatus(const cEntity & a_Entity, char a_Status);
@@ -138,7 +135,45 @@ public:
 	
 	/// Adds the chunk specified to the list of chunks wanted for sending (m_ChunksToSend)
 	void AddWantedChunk(int a_ChunkX, int a_ChunkZ);
+	
+	// Calls that cProtocol descendants use to report state:
+	void PacketBufferFull(void);
+	void PacketUnknown(unsigned char a_PacketType);
+	void PacketError(unsigned char a_PacketType);
 
+	// Calls that cProtocol descendants use for handling packets:
+	// Packets handled in csConnected:
+	void HandlePing            (void);
+	void HandleHandshake       (const AString & a_Username);
+	void HandleLogin           (int a_ProtocolVersion, const AString & a_Username);
+	void HandleUnexpectedPacket(int a_PacketType);  // the default case -> kick
+	
+	// Packets handled while in csConfirmingPos:
+	void HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ);  // While !m_bPositionConfirmed
+	
+	// Packets handled while in csPlaying:
+	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
+	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
+	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
+	void HandleBlockPlace       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
+	void HandleChat             (const AString & a_Message);
+	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
+	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
+	void HandleAnimation        (char a_Animation);
+	void HandleSlotSelected     (short a_SlotNum);
+	void HandleWindowClose      (char a_WindowID);
+	void HandleWindowClick      (char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
+	void HandleUpdateSign       (
+		int a_BlockX, int a_BlockY, int a_BlockZ, 
+		const AString & a_Line1, const AString & a_Line2, 
+		const AString & a_Line3, const AString & a_Line4
+	);
+	void HandleUseEntity        (int a_TargetEntityID, bool a_IsLeftClick);
+	void HandleRespawn          (void);
+	void HandleDisconnect       (const AString & a_Reason);
+	void HandleKeepAlive        (int a_KeepAliveID);
+	
+	void SendData(const char * a_Data, int a_Size);
 private:
 
 	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
@@ -148,24 +183,20 @@ private:
 	int     m_ProtocolVersion;
 	AString m_Username;
 	AString m_Password;
-	
-	cByteBuffer m_ReceivedData;  // Accumulator for the data received from the socket, waiting to be parsed; accessed from the cSocketThreads' thread only!
-
-	cCriticalSection m_CSPackets;
-	PacketList       m_PendingNrmSendPackets;
-	PacketList       m_PendingLowSendPackets;
 
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
 	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 
-	cSocket m_Socket;
+	cSocket     m_Socket;
+	cProtocol * m_Protocol;
+	
+	cCriticalSection m_CSOutgoingData;
+	cByteBuffer      m_OutgoingData;
 
 	cCriticalSection m_CriticalSection;
 
 	Vector3d m_ConfirmPosition;
-
-	cPacket * m_PacketMap[256];
 
 	bool      m_bDestroyed;
 	cPlayer * m_Player;
@@ -198,39 +229,6 @@ private:
 
 	bool m_bKeepThreadGoing;
 
-	void HandlePacket(cPacket * a_Packet);
-	
-	// Packets handled in csConnected:
-	void HandlePing            (void);
-	void HandleHandshake       (const AString & a_Username);
-	void HandleLogin           (int a_ProtocolVersion, const AString & a_Username);
-	void HandleUnexpectedPacket(int a_PacketType);  // the default case -> kick
-	
-	// Packets handled while in csConfirmingPos:
-	void HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ);  // While !m_bPositionConfirmed
-	
-	// Packets handled while in csPlaying:
-	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
-	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
-	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	void HandleBlockPlace       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
-	void HandleChat             (const AString & a_Message);
-	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
-	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
-	void HandleAnimation        (char a_Animation);
-	void HandleSlotSelected     (short a_SlotNum);
-	void HandleWindowClose      (char a_WindowID);
-	void HandleWindowClick      (char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
-	void HandleUpdateSign       (
-		int a_BlockX, int a_BlockY, int a_BlockZ, 
-		const AString & a_Line1, const AString & a_Line2, 
-		const AString & a_Line3, const AString & a_Line4
-	);
-	void HandleUseEntity        (int a_TargetEntityID, bool a_IsLeftClick);
-	void HandleRespawn          (void);
-	void HandleDisconnect       (const AString & a_Reason);
-	void HandleKeepAlive        (int a_KeepAliveID);
-	
 	/*
 	/// Handles rclk with a dye; returns true if the dye is to be be consumed
 	bool HandleDyes(cPacket_BlockPlace * a_Packet);

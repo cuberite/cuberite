@@ -488,6 +488,7 @@
     <ClCompile Include="..\source\packets\cPacket_WindowClick.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowClose.cpp" />
     <ClCompile Include="..\source\packets\cPacket_WindowOpen.cpp" />
+    <ClCompile Include="..\source\Protocol125.cpp" />
     <ClCompile Include="..\source\Ravines.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelBindings.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelFunctions.cpp" />
@@ -742,6 +743,9 @@
     <ClInclude Include="..\source\packets\cPacket_WindowClick.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowClose.h" />
     <ClInclude Include="..\source\packets\cPacket_WindowOpen.h" />
+    <ClInclude Include="..\source\Protocol.h" />
+    <ClInclude Include="..\source\Protocol125.h" />
+    <ClInclude Include="..\source\ProtocolRecognizer.h" />
     <ClInclude Include="..\source\Ravines.h" />
     <ClInclude Include="..\source\squirrelbindings\cSquirrelBaseClass.h" />
     <ClInclude Include="..\source\squirrelbindings\SquirrelArray.h" />

@@ -18,7 +18,6 @@
 
 cSocketThreads::cSocketThreads(void)
 {
-	LOG("cSocketThreads startup");
 }
 
 
@@ -55,7 +54,7 @@ bool cSocketThreads::AddClient(cSocket * a_Socket, cCallback * a_Client)
 	}
 	
 	// No thread has free space, create a new one:
-	LOG("Creating a new cSocketThread (currently have %d)", m_Threads.size());
+	LOGD("Creating a new cSocketThread (currently have %d)", m_Threads.size());
 	cSocketThread * Thread = new cSocketThread(this);
 	if (!Thread->Start())
 	{

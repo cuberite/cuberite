@@ -2404,6 +2404,26 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Protocol"
+				>
+				<File
+					RelativePath="..\source\Protocol.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol125.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol125.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\ProtocolRecognizer.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Config files"

@@ -19,7 +19,7 @@ This means that the socket can be written to several times before finally closin
 
 
 
-/// How many clients should one thread handle? (must be less than FD_SETSIZE - 1 for your platform)
+/// How many clients should one thread handle? (must be less than FD_SETSIZE for your platform)
 #define MAX_SLOTS 63
 
 
@@ -38,7 +38,7 @@ This means that the socket can be written to several times before finally closin
 
 // Check MAX_SLOTS:
 #if MAX_SLOTS >= FD_SETSIZE
-	#error "MAX_SLOTS must be less than FD_SETSIZE - 1 for your platform! (otherwise select() won't work)"
+	#error "MAX_SLOTS must be less than FD_SETSIZE for your platform! (otherwise select() won't work)"
 #endif
 
 

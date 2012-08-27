@@ -224,44 +224,6 @@ bool cChunkMap::LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 
 
-void cChunkMap::BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude)
-{
-	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
-	
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
-	if (Chunk == NULL)
-	{
-		return;
-	}
-	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->Broadcast(a_Packet, a_Exclude);
-}
-
-
-
-
-
-void cChunkMap::BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket * a_Packet, cClientHandle * a_Exclude)
-{
-	// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
-	
-	cCSLock Lock(m_CSLayers);
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
-	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if (Chunk == NULL)
-	{
-		return;
-	}
-	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->Broadcast(a_Packet, a_Exclude);
-}
-
-
-
-
-
 void cChunkMap::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);

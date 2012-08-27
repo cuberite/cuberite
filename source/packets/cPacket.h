@@ -9,9 +9,12 @@
 
 
 
-#define PACKET_INCOMPLETE -2
-#define PACKET_ERROR      -1
-#define PACKET_OK         1
+enum
+{
+	PACKET_INCOMPLETE = -2,
+	PACKET_ERROR      = -1,
+	PACKET_OK         =  1,
+} ;
 
 
 

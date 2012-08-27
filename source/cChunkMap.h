@@ -16,7 +16,6 @@ class cItem;
 class MTRand;
 class cChunkStay;
 class cChunk;
-class cPacket;
 class cPlayer;
 class cChestEntity;
 class cFurnaceEntity;
@@ -43,13 +42,6 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
-	// Direct action methods:
-	/// Broadcast a_Packet to all clients in the chunk specified
-	void BroadcastToChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, const cPacket & a_Packet, cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts a_Packet to all clients in the chunk where block [x, y, z] is, except to client a_Exclude
-	void BroadcastToChunkOfBlock(int a_X, int a_Y, int a_Z, const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
-	
 	/// Broadcasts an a_Player's animation to all clients in the chunk where a_Player is
 	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	

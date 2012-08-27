@@ -40,50 +40,7 @@
 #include "cAuthenticator.h"
 #include "MersenneTwister.h"
 
-#include "packets/cPacket_13.h"
-#include "packets/cPacket_ArmAnim.h"
-#include "packets/cPacket_BlockAction.h"
-#include "packets/cPacket_BlockChange.h"
-#include "packets/cPacket_BlockDig.h"
-#include "packets/cPacket_BlockPlace.h"
-#include "packets/cPacket_Chat.h"
-#include "packets/cPacket_CollectItem.h"
-#include "packets/cPacket_CreativeInventoryAction.h"
-#include "packets/cPacket_DestroyEntity.h"
-#include "packets/cPacket_Disconnect.h"
-#include "packets/cPacket_EntityEquipment.h"
-#include "packets/cPacket_EntityLook.h"
-#include "packets/cPacket_EntityStatus.h"
-#include "packets/cPacket_Flying.h"
-#include "packets/cPacket_Handshake.h"
-#include "packets/cPacket_InventoryProgressBar.h"
-#include "packets/cPacket_InventorySlot.h"
-#include "packets/cPacket_ItemSwitch.h"
-#include "packets/cPacket_KeepAlive.h"
-#include "packets/cPacket_Login.h"
-#include "packets/cPacket_MapChunk.h"
-#include "packets/cPacket_Metadata.h"
-#include "packets/cPacket_MultiBlock.h"
-#include "packets/cPacket_NamedEntitySpawn.h"
-#include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_PickupSpawn.h"
-#include "packets/cPacket_Ping.h"
-#include "packets/cPacket_Player.h"
-#include "packets/cPacket_PreChunk.h"
-#include "packets/cPacket_RelativeEntityMove.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
-#include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_SpawnMob.h"
-#include "packets/cPacket_TeleportEntity.h"
-#include "packets/cPacket_Thunderbolt.h"
-#include "packets/cPacket_TimeUpdate.h"
-#include "packets/cPacket_UpdateHealth.h"
-#include "packets/cPacket_UpdateSign.h"
-#include "packets/cPacket_UseEntity.h"
-#include "packets/cPacket_WholeInventory.h"
-#include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_WindowClose.h"
-#include "packets/cPacket_WindowOpen.h"
+#include "Protocol125.h"
 
 
 
@@ -126,8 +83,8 @@ int cClientHandle::s_ClientCount = 0;
 cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
 	, m_ProtocolVersion(MCS_PROTOCOL_VERSION)
-	, m_ReceivedData(64 KiB)
 	, m_Socket(a_Socket)
+	, m_OutgoingData(64 KiB)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
 	, m_bKicking(false)
@@ -139,44 +96,15 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	, m_LastStreamedChunkZ(0x7fffffff)
 	, m_UniqueID(0)
 {
+	m_Protocol = new cProtocol125(this);
+	
 	s_ClientCount++;	// Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
 
 	cTimer t1;
 	m_LastPingTime = t1.GetNowTime();
 
-	// All the packets that can be received from the client
-	for (int i = 0; i < ARRAYCOUNT(m_PacketMap); ++i)
-	{
-		m_PacketMap[i] = NULL;
-	}
-	m_PacketMap[E_KEEP_ALIVE]                = new cPacket_KeepAlive;
-	m_PacketMap[E_HANDSHAKE]                 = new cPacket_Handshake;
-	m_PacketMap[E_LOGIN]                     = new cPacket_Login;
-	m_PacketMap[E_PLAYERPOS]                 = new cPacket_PlayerPosition;
-	m_PacketMap[E_PLAYERLOOK]                = new cPacket_PlayerLook;
-	m_PacketMap[E_PLAYERMOVELOOK]            = new cPacket_PlayerMoveLook;
-	m_PacketMap[E_PLAYER_ABILITIES]          = new cPacket_PlayerAbilities;
-	m_PacketMap[E_CHAT]                      = new cPacket_Chat;
-	m_PacketMap[E_ANIMATION]                 = new cPacket_ArmAnim;
-	m_PacketMap[E_FLYING]                    = new cPacket_Flying;
-	m_PacketMap[E_BLOCK_DIG]                 = new cPacket_BlockDig;
-	m_PacketMap[E_BLOCK_PLACE]               = new cPacket_BlockPlace;
-	m_PacketMap[E_DISCONNECT]                = new cPacket_Disconnect;
-	m_PacketMap[E_ITEM_SWITCH]               = new cPacket_ItemSwitch;
-	m_PacketMap[E_ENTITY_EQUIPMENT]          = new cPacket_EntityEquipment;
-	m_PacketMap[E_CREATIVE_INVENTORY_ACTION] = new cPacket_CreativeInventoryAction;
-	m_PacketMap[E_NEW_INVALID_STATE]         = new cPacket_NewInvalidState;
-	m_PacketMap[E_PICKUP_SPAWN]              = new cPacket_PickupSpawn;
-	m_PacketMap[E_USE_ENTITY]                = new cPacket_UseEntity;
-	m_PacketMap[E_WINDOW_CLOSE]              = new cPacket_WindowClose;
-	m_PacketMap[E_WINDOW_CLICK]              = new cPacket_WindowClick;
-	m_PacketMap[E_PACKET_13]                 = new cPacket_13;
-	m_PacketMap[E_UPDATE_SIGN]               = new cPacket_UpdateSign;
-	m_PacketMap[E_RESPAWN]                   = new cPacket_Respawn;
-	m_PacketMap[E_PING]                      = new cPacket_Ping;
-
-	LOG("New ClientHandle created at %p", this);
+	LOGD("New ClientHandle created at %p", this);
 }
 
 
@@ -185,7 +113,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 
 cClientHandle::~cClientHandle()
 {
-	LOG("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
+	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
 	// Remove from cSocketThreads, we're not to be called anymore:
 	cRoot::Get()->GetServer()->ClientDestroying(this);
@@ -202,13 +130,11 @@ cClientHandle::~cClientHandle()
 		if (!m_Username.empty() && (World != NULL))
 		{
 			// Send the Offline PlayerList packet:
-			AString NameColor = (m_Player ? m_Player->GetColor() : "");
-			cPacket_PlayerListItem PlayerList(NameColor + GetUsername(), false, (short)9999);
-			World->Broadcast(PlayerList, this);
+			World->BroadcastPlayerListItem(*m_Player, false, this);
 
 			// Send the Chat packet:
-			cPacket_Chat Left(m_Username + " left the game!");
-			World->Broadcast(Left, this);
+			AString Left(m_Username + " left the game!");
+			World->BroadcastChat(Left, this);
 		}
 		if (World != NULL)
 		{
@@ -229,30 +155,14 @@ cClientHandle::~cClientHandle()
 		m_Player->Destroy();
 		m_Player = NULL;
 	}
-	for (int i = 0; i < ARRAYCOUNT(m_PacketMap); i++)
-	{
-		delete m_PacketMap[i];
-	}
 
 	// Queue all remaining outgoing packets to cSocketThreads:
 	{
-		cCSLock Lock(m_CSPackets);
-		for (PacketList::iterator itr = m_PendingNrmSendPackets.begin(); itr != m_PendingNrmSendPackets.end(); ++itr)
-		{
-			AString Data;
-			(*itr)->Serialize(Data);
-			cRoot::Get()->GetServer()->WriteToClient(&m_Socket, Data);
-			delete *itr;
-		}
-		m_PendingNrmSendPackets.clear();
-		for (PacketList::iterator itr = m_PendingLowSendPackets.begin(); itr != m_PendingLowSendPackets.end(); ++itr)
-		{
-			AString Data;
-			(*itr)->Serialize(Data);
-			cRoot::Get()->GetServer()->WriteToClient(&m_Socket, Data);
-			delete *itr;
-		}
-		m_PendingLowSendPackets.clear();
+		cCSLock Lock(m_CSOutgoingData);
+		AString Data;
+		m_OutgoingData.ReadAll(Data);
+		m_OutgoingData.CommitRead();
+		cRoot::Get()->GetServer()->WriteToClient(&m_Socket, Data);
 	}
 	
 	// Queue the socket to close as soon as it sends all outgoing data:
@@ -262,7 +172,10 @@ cClientHandle::~cClientHandle()
 	// TODO: The socket needs to stay alive, someone else has to own it
 	cRoot::Get()->GetServer()->RemoveClient(&m_Socket);
 	
-	LOG("ClientHandle at %p deleted", this);
+	delete m_Protocol;
+	m_Protocol = NULL;
+	
+	LOGD("ClientHandle at %p deleted", this);
 }
 
 
@@ -320,33 +233,26 @@ void cClientHandle::Authenticate(void)
 		World = cRoot::Get()->GetDefaultWorld();
 	}
 	
-	if(m_Player->GetGameMode() == eGameMode_NotSet)
+	if (m_Player->GetGameMode() == eGameMode_NotSet)
+	{
 		m_Player->LoginSetGameMode(World->GetGameMode());
+	}
 
 	m_Player->SetIP (m_Socket.GetIPString());
 
 	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
 
 	// Return a server login packet
-	cPacket_Login LoginResponse;
-	LoginResponse.m_ProtocolVersion = m_Player->GetUniqueID();
-	//LoginResponse.m_Username = "";
-	LoginResponse.m_ServerMode = m_Player->GetGameMode();  // set gamemode from player.
-	LoginResponse.m_Dimension = 0;
-	LoginResponse.m_MaxPlayers = (unsigned char)cRoot::Get()->GetDefaultWorld()->GetMaxPlayers();
-	LoginResponse.m_Difficulty = 2;
-	Send(LoginResponse);
+	m_Protocol->SendLogin(*m_Player);
 
 	// Send Weather if raining:
 	if ((World->GetWeather() == 1) || (World->GetWeather() == 2))
 	{
-		cPacket_NewInvalidState RainPacket;
-		RainPacket.m_Reason = 1; //begin rain
-		Send(RainPacket);
+		m_Protocol->SendWeather(World->GetWeather());
 	}
 
 	// Send time
-	Send(cPacket_TimeUpdate(World->GetWorldTime()));
+	m_Protocol->SendTimeUpdate(World->GetWorldTime());
 
 	// Send inventory
 	m_Player->GetInventory().SendWholeInventory(this);
@@ -422,7 +328,7 @@ void cClientHandle::StreamChunks(void)
 	for (cChunkCoordsList::iterator itr = RemoveChunks.begin(); itr != RemoveChunks.end(); ++itr)
 	{
 		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
-		Send(cPacket_PreChunk(itr->m_ChunkX, itr->m_ChunkZ, false));
+		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - RemoveChunks[]
 	
 	// Add all chunks that are in range and not yet in m_LoadedChunks:
@@ -502,232 +408,6 @@ void cClientHandle::RemoveFromAllChunks()
 
 
 
-void cClientHandle::HandlePacket(cPacket * a_Packet)
-{
-	// TODO: _X: This function will get out-sourced into a separate cProtocol class
-	// and the switch statements will be split into virtual functions of that class
-	// Therefore I keep this function huge and untidy for the time being
-	// ( http://forum.mc-server.org/showthread.php?tid=524 )
-	
-	// LOGD("Recv packet %02x", a_Packet->m_PacketID);
-	
-	m_TimeLastPacket = cWorld::GetTime();
-
-	// LOG("Recv packet 0x%02x from client \"%s\" (\"%s\")", a_Packet->m_PacketID, m_Socket.GetIPString().c_str(), m_Username.c_str());
-
-	if (m_bKicking)
-	{
-		return;
-	}
-
-	switch (m_State)
-	{
-		case csConnected:
-		{
-			switch (a_Packet->m_PacketID)
-			{
-				case E_NEW_INVALID_STATE: // New/Invalid State packet received. I'm guessing the client only sends it when there's a problem with the bed?
-				{
-					LOGINFO("Got New Invalid State packet");
-					break;
-				}
-				case E_PING:           HandlePing     (); break;
-				case E_HANDSHAKE:
-				{
-					cPacket_Handshake * Handshake = reinterpret_cast<cPacket_Handshake *>(a_Packet);
-					HandleHandshake(Handshake->m_Username);
-					break;
-				}
-				case E_LOGIN:
-				{
-					cPacket_Login * Login = reinterpret_cast<cPacket_Login *>(a_Packet);
-					HandleLogin(Login->m_ProtocolVersion, Login->m_Username);
-					break;
-				}
-				
-				// Ignored packets:
-				case E_PLAYERLOOK:
-				case E_CHAT:
-				case E_PLAYERMOVELOOK:
-				case E_PLAYERPOS:
-				case E_KEEP_ALIVE:     break;
-				default:               HandleUnexpectedPacket(a_Packet->m_PacketID); break;
-			}  // switch (PacketType)
-			break;
-		}  // case csConnected
-		
-		case csAuthenticating:
-		{
-			// Waiting for external authentication, no packets are handled
-			switch (a_Packet->m_PacketID)
-			{
-				// Ignored packets:
-				case E_KEEP_ALIVE:
-				case E_CHAT:
-				case E_FLYING:
-				case E_PLAYERLOOK:
-				case E_PLAYERMOVELOOK:
-				case E_PLAYERPOS: break;
-				
-				default: HandleUnexpectedPacket(a_Packet->m_PacketID); break;
-			}
-			break;
-		}
-		
-		case csDownloadingWorld:
-		{
-			// Waiting for chunks to stream to client, no packets are handled
-			switch (a_Packet->m_PacketID)
-			{
-				// Ignored packets:
-				case E_KEEP_ALIVE:
-				case E_CHAT:
-				case E_FLYING:
-				case E_PLAYERLOOK:
-				case E_PLAYERMOVELOOK:
-				case E_PLAYERPOS: break;
-				
-				default: HandleUnexpectedPacket(a_Packet->m_PacketID); break;
-			}
-			break;
-		}
-		
-		case csConfirmingPos:
-		{
-			switch (a_Packet->m_PacketID)
-			{
-				// Ignored packets:
-				case E_KEEP_ALIVE:
-				case E_CHAT:
-				case E_FLYING:
-				case E_PLAYERLOOK:
-				case E_PLAYERPOS: break;
-
-				case E_PLAYERMOVELOOK:
-				{
-					cPacket_PlayerMoveLook * MoveLook = reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet);
-					HandleMoveLookConfirm(MoveLook->m_PosX, MoveLook->m_PosY, MoveLook->m_PosZ);
-					break;
-				}
-
-				default:
-				{
-					HandleUnexpectedPacket(a_Packet->m_PacketID);
-					break;
-				}
-			}  // switch (PacketType)
-			break;
-		}  // case csConfirmingPos
-		
-		case csPlaying:
-		{
-			switch (a_Packet->m_PacketID)
-			{
-				case E_CREATIVE_INVENTORY_ACTION:
-				{
-					cPacket_CreativeInventoryAction * cia = reinterpret_cast<cPacket_CreativeInventoryAction *>(a_Packet);
-					HandleCreativeInventory(cia->m_SlotNum, cia->m_ClickedItem);
-					break;
-				}
-				case E_PLAYERPOS:
-				{
-					cPacket_PlayerPosition * pp = reinterpret_cast<cPacket_PlayerPosition *>(a_Packet);
-					HandlePlayerPos(pp->m_PosX, pp->m_PosY, pp->m_PosZ, pp->m_Stance, pp->m_IsOnGround);
-					break;
-				}
-				case E_BLOCK_DIG:
-				{
-					cPacket_BlockDig * bd = reinterpret_cast<cPacket_BlockDig *>(a_Packet);
-					HandleBlockDig(bd->m_PosX, bd->m_PosY, bd->m_PosZ, bd->m_Direction, bd->m_Status);
-					break;
-				}
-				case E_BLOCK_PLACE:
-				{
-					cPacket_BlockPlace * bp = reinterpret_cast<cPacket_BlockPlace *>(a_Packet);
-					HandleBlockPlace(bp->m_PosX, bp->m_PosY, bp->m_PosZ, bp->m_Direction, bp->m_HeldItem);
-					break;
-				}
-				case E_CHAT:
-				{
-					cPacket_Chat * ch = reinterpret_cast<cPacket_Chat *>(a_Packet);
-					HandleChat(ch->m_Message);
-					break;
-				}
-				case E_PLAYERLOOK:
-				{
-					cPacket_PlayerLook * pl = reinterpret_cast<cPacket_PlayerLook *>(a_Packet);
-					HandlePlayerLook(pl->m_Rotation, pl->m_Pitch, pl->m_IsOnGround);
-					break;
-				}
-				case E_PLAYERMOVELOOK:
-				{
-					cPacket_PlayerMoveLook * pml = reinterpret_cast<cPacket_PlayerMoveLook *>(a_Packet);
-					HandlePlayerMoveLook(pml->m_PosX, pml->m_PosY, pml->m_PosZ, pml->m_Stance, pml->m_Rotation, pml->m_Pitch, pml->m_IsOnGround);
-					break;
-				}
-				case E_ANIMATION:
-				{
-					cPacket_ArmAnim * aa = reinterpret_cast<cPacket_ArmAnim *>(a_Packet);
-					HandleAnimation(aa->m_Animation);
-					break;
-				}
-				case E_SLOT_SELECTED:
-				{
-					cPacket_ItemSwitch * isw = reinterpret_cast<cPacket_ItemSwitch *>(a_Packet);
-					HandleSlotSelected(isw->m_SlotNum);
-					break;
-				}
-				case E_WINDOW_CLOSE:
-				{
-					cPacket_WindowClose * wc = reinterpret_cast<cPacket_WindowClose *>(a_Packet);
-					HandleWindowClose(wc->m_WindowID);
-					break;
-				}
-				case E_WINDOW_CLICK:
-				{
-					cPacket_WindowClick * wc = reinterpret_cast<cPacket_WindowClick *>(a_Packet);
-					HandleWindowClick(wc->m_WindowID, wc->m_SlotNum, wc->m_IsRightClick, wc->m_IsShiftPressed, wc->m_HeldItem);
-					break;
-				}
-				case E_UPDATE_SIGN:
-				{
-					cPacket_UpdateSign * us = reinterpret_cast<cPacket_UpdateSign *>(a_Packet);
-					HandleUpdateSign(us->m_BlockX, us->m_BlockY, us->m_BlockZ, us->m_Line1, us->m_Line2, us->m_Line3, us->m_Line4);
-					break;
-				}
-				case E_USE_ENTITY:
-				{
-					cPacket_UseEntity * ue = reinterpret_cast<cPacket_UseEntity *>(a_Packet);
-					HandleUseEntity(ue->m_TargetEntityID, ue->m_IsLeftClick);
-					break;
-				}
-				case E_RESPAWN:
-				{
-					HandleRespawn();
-					break;
-				}
-				case E_DISCONNECT:
-				{
-					cPacket_Disconnect * dc = reinterpret_cast<cPacket_Disconnect *>(a_Packet);
-					HandleDisconnect(dc->m_Reason);
-					break;
-				}
-				case E_KEEP_ALIVE:
-				{
-					cPacket_KeepAlive * ka = reinterpret_cast<cPacket_KeepAlive *>(a_Packet);
-					HandleKeepAlive(ka->m_KeepAliveID);
-					break;
-				}
-			}  // switch (Packet type)
-			break;
-		}  // case csPlaying
-	}  // switch (m_State)
-}
-
-
-
-
-
 void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
@@ -763,11 +443,10 @@ void cClientHandle::HandleHandshake(const AString & a_Username)
 		Kick("The server is currently full :(-- Try again later");
 		return;
 	}
-	cPacket_Chat Connecting(m_Username + " is connecting.");
-	cRoot::Get()->GetServer()->Broadcast(Connecting, this);
+	cRoot::Get()->GetServer()->BroadcastChat(m_Username + " is connecting.", this);
 
 	SendHandshake(cRoot::Get()->GetServer()->GetServerID());
-	LOG("User \"%s\" was sent a handshake", m_Username.c_str());
+	LOGD("User \"%s\" was sent a handshake", m_Username.c_str());
 }
 
 
@@ -1148,6 +827,11 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 		return;
 	}
 	*/
+	if (m_State != csPlaying)
+	{
+		// Ignore this packet unles the player is fully in:
+		return;
+	}
 	
 	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
 	m_Player->SetStance     (a_Stance);
@@ -1297,6 +981,25 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 
 
+void cClientHandle::SendData(const char * a_Data, int a_Size)
+{
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		if (!m_OutgoingData.Write(a_Data, a_Size))
+		{
+			// Client has too much outgoing data queued, drop them silently:
+			Destroy();
+		}
+	}
+	
+	// Notify SocketThreads that we have something to write:
+	cRoot::Get()->GetServer()->NotifyClientWrite(this);
+}
+
+
+
+
+
 bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != NULL);
@@ -1345,9 +1048,8 @@ void cClientHandle::Tick(float a_Dt)
 	if (m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
 	{
 		m_PingID++;
-		cPacket_KeepAlive Ping(m_PingID);
 		m_PingStartTime = t1.GetNowTime();
-		Send(Ping);
+		m_Protocol->SendKeepAlive(m_PingID);
 		m_LastPingTime = m_PingStartTime;
 	}
 }
@@ -1356,155 +1058,10 @@ void cClientHandle::Tick(float a_Dt)
 
 
 
-void cClientHandle::Send(const cPacket & a_Packet, ENUM_PRIORITY a_Priority /* = E_PRIORITY_NORMAL */)
-{
-	if (m_bKicking) return; // Don't add more packets if player is getting kicked anyway
-
-	// If it is the packet spawning myself for myself, drop it silently:
-	if (a_Packet.m_PacketID == E_NAMED_ENTITY_SPAWN)
-	{
-		if (((cPacket_NamedEntitySpawn &)a_Packet).m_UniqueID == m_Player->GetUniqueID())
-		{
-			return;
-		}
-	}
-	
-	// Filter out packets that don't belong to a csDownloadingWorld state:
-	if (m_State == csDownloadingWorld)
-	{
-		switch (a_Packet.m_PacketID)
-		{
-			case E_PLAYERMOVELOOK:
-			case E_KEEP_ALIVE:
-			case E_PRE_CHUNK:
-			case E_MAP_CHUNK:
-			{
-				// Allow
-				break;
-			}
-			default: return;
-		}
-	}
-	
-	// Filter out map chunks that the client doesn't want anymore:
-	if (a_Packet.m_PacketID == E_MAP_CHUNK)
-	{
-		// Check chunks being sent, erase them from m_ChunksToSend:
-		int ChunkX = ((cPacket_MapChunk &)a_Packet).m_PosX;
-		int ChunkZ = ((cPacket_MapChunk &)a_Packet).m_PosZ;
-		bool Found = false;
-		cCSLock Lock(m_CSChunkLists);
-		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
-		{
-			if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
-			{
-				m_ChunksToSend.erase(itr);
-				
-				// TODO: _X: Decouple this from packet sending, it creates a deadlock possibility
-				//  -- postpone till Tick() instead, using a bool flag
-				CheckIfWorldDownloaded();
-				
-				Found = true;
-				break;
-			}
-		}  // for itr - m_ChunksToSend[]
-		if (!Found)
-		{
-			// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
-			// It's not a big issue anyway, just means that some chunks may be compressed several times
-			// LOGD("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
-			return;
-		}
-	}
-	
-	// Filter out pre chunks that the client doesn't want anymore:
-	if ((a_Packet.m_PacketID == E_PRE_CHUNK) && ((cPacket_PreChunk &)a_Packet).m_bLoad)
-	{
-		int ChunkX = ((cPacket_PreChunk &)a_Packet).m_PosX;
-		int ChunkZ = ((cPacket_PreChunk &)a_Packet).m_PosZ;
-		bool Found = false;
-		cCSLock Lock(m_CSChunkLists);
-		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
-		{
-			if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
-			{
-				Found = true;
-				break;
-			}
-		}  // for itr - m_ChunksToSend[]
-		if (!Found)
-		{
-			// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
-			// It's not a big issue anyway, just means that some chunks may be compressed several times
-			// LOGD("Refusing to send PREchunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
-			return;
-		}
-	}
-	
-	// Optimize away multiple queued RelativeEntityMoveLook packets:
-	static int NumRelEntMoveLookTotal   = 0;
-	static int NumRelEntMoveLookRemoved = 0;
-	cCSLock Lock(m_CSPackets);
-	if (a_Priority == E_PRIORITY_NORMAL)
-	{
-		if (a_Packet.m_PacketID == E_REL_ENT_MOVE_LOOK)
-		{
-			NumRelEntMoveLookTotal++;
-			PacketList & Packets = m_PendingNrmSendPackets;
-			const cPacket_RelativeEntityMoveLook & ThisPacketData = reinterpret_cast< const cPacket_RelativeEntityMoveLook &>(a_Packet);
-			for (PacketList::iterator itr = Packets.begin(); itr != Packets.end(); ++itr)
-			{
-				bool bBreak = false;
-				switch ((*itr)->m_PacketID)
-				{
-					case E_REL_ENT_MOVE_LOOK:
-					{
-						cPacket_RelativeEntityMoveLook * PacketData = reinterpret_cast< cPacket_RelativeEntityMoveLook *>(*itr);
-						if (ThisPacketData.m_UniqueID == PacketData->m_UniqueID)
-						{
-							Packets.erase(itr);
-							bBreak = true;
-							delete PacketData;
-							NumRelEntMoveLookRemoved++;
-							break;
-						}
-						break;
-					}  // case E_REL_END_MOVE_LOOK
-				}  // switch (*itr -> Packet type)
-				if (bBreak)
-				{
-					break;
-				}
-			}  // for itr - Packets[]
-			if ((NumRelEntMoveLookTotal % 1000) == 10)  // print out a debug statistics every 1000 packets sent
-			{
-				LOGD("RelEntMoveLook optimization: removed %d out of %d packets, saved %d bytes (%d KiB) of bandwidth",
-					NumRelEntMoveLookRemoved, NumRelEntMoveLookTotal,
-					NumRelEntMoveLookRemoved * sizeof(cPacket_RelativeEntityMoveLook),
-					NumRelEntMoveLookRemoved * sizeof(cPacket_RelativeEntityMoveLook) / 1024
-				);
-			}
-		}  // if (E_REL_ENT_MOVE_LOOK
-		m_PendingNrmSendPackets.push_back(a_Packet.Clone());
-	}
-	else if (a_Priority == E_PRIORITY_LOW)
-	{
-		m_PendingLowSendPackets.push_back(a_Packet.Clone());
-	}
-	Lock.Unlock();
-	
-	// Notify SocketThreads that we have something to write:
-	cRoot::Get()->GetServer()->NotifyClientWrite(this);
-}
-
-
-
-
-
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
-	cPacket_Disconnect DC(a_Reason);
-	Send(DC);  // TODO: Send it immediately to the socket, bypassing any packet buffers (? is it safe? packet boundaries...)
+	LOGD("Sending a DC");
+	m_Protocol->SendDisconnect(a_Reason);
 }
 
 
@@ -1513,9 +1070,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 
 void cClientHandle::SendHandshake(const AString & a_ServerName)
 {
-	cPacket_Handshake Handshake;
-	Handshake.m_Username = a_ServerName;
-	Send(Handshake);
+	m_Protocol->SendHandshake(a_ServerName);
 }
 
 
@@ -1524,13 +1079,7 @@ void cClientHandle::SendHandshake(const AString & a_ServerName)
 
 void cClientHandle::SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
-	cPacket_InventorySlot Packet;
-	Packet.m_WindowID  = (char)a_WindowID;
-	Packet.m_SlotNum   = a_SlotNum;
-	Packet.m_ItemID    = (short)(a_Item.m_ItemID);
-	Packet.m_ItemCount = a_Item.m_ItemCount;
-	Packet.m_ItemUses  = a_Item.m_ItemHealth;
-	Send(Packet);
+	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
 }
 
 
@@ -1539,8 +1088,7 @@ void cClientHandle::SendInventorySlot(int a_WindowID, short a_SlotNum, const cIt
 
 void cClientHandle::SendChat(const AString & a_Message)
 {
-	cPacket_Chat Chat(a_Message);
-	Send(Chat);
+	m_Protocol->SendChat(a_Message);
 }
 
 
@@ -1549,10 +1097,7 @@ void cClientHandle::SendChat(const AString & a_Message)
 
 void cClientHandle::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
 {
-	cPacket_ArmAnim Anim;
-	Anim.m_EntityID  = a_Player.GetUniqueID();
-	Anim.m_Animation = a_Animation;
-	Send(Anim);
+	m_Protocol->SendPlayerAnimation(a_Player, a_Animation);
 }
 
 
@@ -1561,12 +1106,7 @@ void cClientHandle::SendPlayerAnimation(const cPlayer & a_Player, char a_Animati
 
 void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
-	cPacket_EntityEquipment ee;
-	ee.m_UniqueID   = a_Entity.GetUniqueID();
-	ee.m_SlotNum    = a_SlotNum;
-	ee.m_ItemType   = a_Item.m_ItemType;
-	ee.m_ItemDamage = a_Item.m_ItemDamage;
-	Send(ee);
+	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
 }
 
 
@@ -1575,12 +1115,7 @@ void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNu
 
 void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
-	cPacket_WindowOpen WindowOpen;
-	WindowOpen.m_WindowID      = a_WindowID;
-	WindowOpen.m_InventoryType = a_WindowType;
-	WindowOpen.m_WindowTitle   = a_WindowTitle;
-	WindowOpen.m_NumSlots      = a_NumSlots;
-	Send(WindowOpen);
+	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
 }
 
 
@@ -1589,9 +1124,7 @@ void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const ASt
 
 void cClientHandle::SendWindowClose(char a_WindowID)
 {
-	cPacket_WindowClose wc;
-	wc.m_WindowID = a_WindowID;
-	Send(wc);
+	m_Protocol->SendWindowClose(a_WindowID);
 }
 
 
@@ -1600,8 +1133,7 @@ void cClientHandle::SendWindowClose(char a_WindowID)
 
 void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
 {
-	cPacket_WholeInventory wi(a_Inventory);
-	Send(wi);
+	m_Protocol->SendWholeInventory(a_Inventory);
 }
 
 
@@ -1610,8 +1142,7 @@ void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
 
 void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 {
-	cPacket_WholeInventory wi(a_Window);
-	Send(wi);
+	m_Protocol->SendWholeInventory(a_Window);
 }
 
 
@@ -1620,18 +1151,16 @@ void cClientHandle::SendWholeInventory(const cWindow & a_Window)
 
 void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
 {
-	cPacket_TeleportEntity te(a_Entity);
-	Send(te);
+	m_Protocol->SendTeleportEntity(a_Entity);
 }
 
 
 
 
 
-void cClientHandle::SendPlayerListItem(const cPlayer & a_Player)
+void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 {
-	cPacket_PlayerListItem pli(a_Player.GetColor() + a_Player.GetName(), true, a_Player.GetClientHandle()->GetPing());
-	Send(pli);
+	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
 }
 
 
@@ -1640,8 +1169,7 @@ void cClientHandle::SendPlayerListItem(const cPlayer & a_Player)
 
 void cClientHandle::SendPlayerPosition(void)
 {
-	cPacket_PlayerPosition pp(m_Player);
-	Send(pp);
+	m_Protocol->SendPlayerPosition();
 }
 
 
@@ -1652,14 +1180,7 @@ void cClientHandle::SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, ch
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
-	cPacket_RelativeEntityMoveLook reml;
-	reml.m_UniqueID = a_Entity.GetUniqueID();
-	reml.m_MoveX    = a_RelX;
-	reml.m_MoveY    = a_RelY;
-	reml.m_MoveZ    = a_RelZ;
-	reml.m_Yaw      = (char)((a_Entity.GetRotation() / 360.f) * 256);
-	reml.m_Pitch    = (char)((a_Entity.GetPitch()    / 360.f) * 256);
-	Send(reml);
+	m_Protocol->SendRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -1670,12 +1191,7 @@ void cClientHandle::SendRelEntMove(const cEntity & a_Entity, char a_RelX, char a
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
-	cPacket_RelativeEntityMove rem;
-	rem.m_UniqueID = a_Entity.GetUniqueID();
-	rem.m_MoveX    = a_RelX;
-	rem.m_MoveY    = a_RelY;
-	rem.m_MoveZ    = a_RelZ;
-	Send(rem);
+	m_Protocol->SendRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -1686,11 +1202,7 @@ void cClientHandle::SendEntLook(const cEntity & a_Entity)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
-	cPacket_EntityLook el;
-	el.m_UniqueID = a_Entity.GetUniqueID();
-	el.m_Rotation = (char)((a_Entity.GetRotation() / 360.f) * 256);
-	el.m_Pitch    = (char)((a_Entity.GetPitch()    / 360.f) * 256);
-	Send(el);
+	m_Protocol->SendEntLook(a_Entity);
 }
 
 
@@ -1701,8 +1213,7 @@ void cClientHandle::SendEntHeadLook(const cEntity & a_Entity)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
-	cPacket_EntityHeadLook ehl(a_Entity);
-	Send(ehl);
+	m_Protocol->SendEntHeadLook(a_Entity);
 }
 
 
@@ -1711,13 +1222,7 @@ void cClientHandle::SendEntHeadLook(const cEntity & a_Entity)
 
 void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2)
 {
-	cPacket_BlockAction ba;
-	ba.m_BlockX = a_BlockX;
-	ba.m_BlockY = (short)a_BlockY;
-	ba.m_BlockZ = a_BlockZ;
-	ba.m_Byte1 = a_Byte1;
-	ba.m_Byte2 = a_Byte2;
-	Send(ba);
+	m_Protocol->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2);
 }
 
 
@@ -1726,11 +1231,7 @@ void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 
 void cClientHandle::SendHealth(void)
 {
-	cPacket_UpdateHealth Health;
-	Health.m_Health     = m_Player->GetHealth();
-	Health.m_Food       = m_Player->GetFoodLevel();
-	Health.m_Saturation = m_Player->GetFoodSaturationLevel();
-	Send(Health);
+	m_Protocol->SendHealth();
 }
 
 
@@ -1739,21 +1240,16 @@ void cClientHandle::SendHealth(void)
 
 void cClientHandle::SendRespawn(void)
 {
-	cPacket_Respawn Packet;
-	Packet.m_CreativeMode = (char)m_Player->GetGameMode();  // Set GameMode packet based on Player's GameMode;
-	Send(Packet);
+	m_Protocol->SendRespawn();
 }
 
 
 
 
 
-void cClientHandle::SendGameMode(char a_GameMode)
+void cClientHandle::SendGameMode(eGameMode a_GameMode)
 {
-	cPacket_NewInvalidState nis;
-	nis.m_Reason = 3;
-	nis.m_GameMode = a_GameMode;
-	Send(nis);
+	m_Protocol->SendGameMode(a_GameMode);
 }
 
 
@@ -1762,9 +1258,7 @@ void cClientHandle::SendGameMode(char a_GameMode)
 
 void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 {
-	cPacket_DestroyEntity de;
-	de.m_UniqueID = a_Entity.GetUniqueID();
-	Send(de);
+	m_Protocol->SendDestroyEntity(a_Entity);
 }
 
 
@@ -1773,13 +1267,12 @@ void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
 
 void cClientHandle::SendPlayerMoveLook(void)
 {
-	cPacket_PlayerMoveLook pml(*m_Player);
 	/*
 	LOGD("Sending PlayerMoveLook: {%0.2f, %0.2f, %0.2f}, stance %0.2f, OnGround: %d",
 		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
 	);
 	*/
-	Send(pml);
+	m_Protocol->SendPlayerMoveLook();
 }
 
 
@@ -1788,10 +1281,7 @@ void cClientHandle::SendPlayerMoveLook(void)
 
 void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
-	cPacket_EntityStatus es;
-	es.m_Status   = a_Status;
-	es.m_UniqueID = a_Entity.GetUniqueID();
-	Send(es);
+	m_Protocol->SendEntityStatus(a_Entity, a_Status);
 }
 
 
@@ -1800,8 +1290,7 @@ void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 void cClientHandle::SendMetadata(const cPawn & a_Pawn)
 {
-	cPacket_Metadata md(a_Pawn.GetMetaData(), a_Pawn.GetUniqueID());
-	Send(md);
+	m_Protocol->SendMetadata(a_Pawn);
 }
 
 
@@ -1810,12 +1299,7 @@ void cClientHandle::SendMetadata(const cPawn & a_Pawn)
 
 void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
 {
-	cPacket_InventoryProgressBar Progress;
-	Progress.m_WindowID    = a_WindowID;
-	Progress.m_ProgressBar = a_ProgressBar;
-	Progress.m_Value       = a_Value;
-	Progress.m_WindowID    = a_WindowID;
-	Send(Progress);
+	m_Protocol->SendInventoryProgress(a_WindowID, a_ProgressBar, a_Value);
 }
 
 
@@ -1824,17 +1308,13 @@ void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, 
 
 void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 {
-	cPacket_NamedEntitySpawn SpawnPacket;
-	SpawnPacket.m_UniqueID    = a_Player.GetUniqueID();
-	SpawnPacket.m_PlayerName  = a_Player.GetName();
-	SpawnPacket.m_PosX        = (int)(a_Player.GetPosX() * 32);
-	SpawnPacket.m_PosY        = (int)(a_Player.GetPosY() * 32);
-	SpawnPacket.m_PosZ        = (int)(a_Player.GetPosZ() * 32);
-	SpawnPacket.m_Rotation    = (char)((a_Player.GetRot().x / 360.f) * 256);
-	SpawnPacket.m_Pitch       = (char)((a_Player.GetRot().y / 360.f) * 256);
-	const cItem & HeldItem    = a_Player.GetEquippedItem();
-	SpawnPacket.m_CurrentItem = HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType;  // Unlike -1 in inventory, the named entity packet uses 0 for "empty"
-	Send(SpawnPacket);
+	if (a_Player.GetUniqueID() == m_Player->GetUniqueID())
+	{
+		// Do NOT send this packet to myself
+		return;
+	}
+	
+	m_Protocol->SendPlayerSpawn(a_Player);
 }
 
 
@@ -1843,18 +1323,7 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
-	cPacket_PickupSpawn PickupSpawn;
-	PickupSpawn.m_UniqueID   = a_Pickup.GetUniqueID();
-	PickupSpawn.m_ItemType   = a_Pickup.GetItem()->m_ItemType;
-	PickupSpawn.m_ItemCount  = a_Pickup.GetItem()->m_ItemCount;
-	PickupSpawn.m_ItemDamage = a_Pickup.GetItem()->m_ItemHealth;
-	PickupSpawn.m_PosX       = (int) (a_Pickup.GetPosX() * 32);
-	PickupSpawn.m_PosY       = (int) (a_Pickup.GetPosY() * 32);
-	PickupSpawn.m_PosZ       = (int) (a_Pickup.GetPosZ() * 32);
-	PickupSpawn.m_Rotation   = (char)(a_Pickup.GetSpeed().x * 8);
-	PickupSpawn.m_Pitch      = (char)(a_Pickup.GetSpeed().y * 8);
-	PickupSpawn.m_Roll       = (char)(a_Pickup.GetSpeed().z * 8);
-	Send(PickupSpawn);
+	m_Protocol->SendPickupSpawn(a_Pickup);
 }
 
 
@@ -1863,16 +1332,7 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 
 void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 {
-	cPacket_SpawnMob Spawn;
-	Spawn.m_UniqueID = a_Mob.GetUniqueID();
-	Spawn.m_Type     = a_Mob.GetMobType();
-	Spawn.m_Pos      = ((Vector3i)(a_Mob.GetPosition())) * 32;
-	Spawn.m_Yaw      = 0;
-	Spawn.m_Pitch    = 0;
-	Spawn.m_MetaDataSize = 1;
-	Spawn.m_MetaData     = new char[Spawn.m_MetaDataSize];
-	Spawn.m_MetaData[0]  = 0x7f;  // not on fire/crouching/riding
-	Send(Spawn);
+	m_Protocol->SendSpawnMob(a_Mob);
 }
 
 
@@ -1884,15 +1344,10 @@ void cClientHandle::SendUpdateSign(
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
 )
 {
-	cPacket_UpdateSign us;
-	us.m_BlockX = a_BlockX;
-	us.m_BlockY = a_BlockY;
-	us.m_BlockZ = a_BlockZ;
-	us.m_Line1  = a_Line1;
-	us.m_Line2  = a_Line2;
-	us.m_Line3  = a_Line3;
-	us.m_Line4  = a_Line4;
-	Send(us);
+	m_Protocol->SendUpdateSign(
+		a_BlockX, a_BlockY, a_BlockZ,
+		a_Line1, a_Line2, a_Line3, a_Line4
+	);
 }
 
 
@@ -1901,10 +1356,7 @@ void cClientHandle::SendUpdateSign(
 
 void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
 {
-	cPacket_CollectItem ci;
-	ci.m_CollectedID = a_Pickup.GetUniqueID();
-	ci.m_CollectorID = a_Player.GetUniqueID();
-	Send(ci);
+	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
 }
 
 
@@ -1913,13 +1365,7 @@ void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & 
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cPacket_BlockChange BlockChange;
-	BlockChange.m_PosX = a_BlockX;
-	BlockChange.m_PosY = (unsigned char)a_BlockY;
-	BlockChange.m_PosZ = a_BlockZ;
-	BlockChange.m_BlockType = a_BlockType;
-	BlockChange.m_BlockMeta = a_BlockMeta;
-	Send(BlockChange);
+	m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 
@@ -1928,27 +1374,7 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
-	if (a_Changes.size() == 1)
-	{
-		// Special packet for single-block changes
-		const sSetBlock & blk = a_Changes.front();
-		SendBlockChange(a_ChunkX * cChunkDef::Width + blk.x, blk.y, a_ChunkZ * cChunkDef::Height + blk.z, blk.BlockType, blk.BlockMeta);
-		return;
-	}
-	
-	cPacket_MultiBlock MultiBlock;
-	MultiBlock.m_ChunkX = a_ChunkX;
-	MultiBlock.m_ChunkZ = a_ChunkZ;
-	MultiBlock.m_NumBlocks = (short)a_Changes.size();
-	MultiBlock.m_Data = new cPacket_MultiBlock::sBlockChange[a_Changes.size()];
-	int i = 0;
-	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr, i++)
-	{
-		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
-		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
-		MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
-	}
-	Send(MultiBlock);
+	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
 
@@ -1957,11 +1383,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	cPacket_PreChunk UnloadPacket;
-	UnloadPacket.m_PosX = a_ChunkX;
-	UnloadPacket.m_PosZ = a_ChunkZ;
-	UnloadPacket.m_bLoad = false;  // Unload
-	Send(UnloadPacket);
+	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -1970,32 +1392,7 @@ void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cClientHandle::SendWeather(eWeather a_Weather)
 {
-	switch( a_Weather )
-	{
-		case eWeather_Sunny:
-		{
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 2;  // stop rain
-			Send(WeatherPacket);
-			break;
-		}
-		
-		case eWeather_Rain:
-		{
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 1;  // begin rain
-			Send(WeatherPacket);
-			break;
-		}
-		
-		case eWeather_ThunderStorm:
-		{
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 1;  // begin rain
-			Send(WeatherPacket);
-			break;
-		}
-	}
+	m_Protocol->SendWeather(a_Weather);
 }
 
 
@@ -2004,9 +1401,7 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 void cClientHandle::SendTimeUpdate(Int64 a_WorldTime)
 {
-	cPacket_TimeUpdate tu;
-	tu.m_Time = a_WorldTime;
-	Send(tu);
+	m_Protocol->SendTimeUpdate(a_WorldTime);
 }
 
 
@@ -2015,11 +1410,7 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldTime)
 
 void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	cPacket_Thunderbolt ThunderboltPacket;
-	ThunderboltPacket.m_xLBPos = a_BlockX;
-	ThunderboltPacket.m_yLBPos = a_BlockY;
-	ThunderboltPacket.m_zLBPos = a_BlockZ;
-	Send(ThunderboltPacket);
+	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -2028,13 +1419,32 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	// Send the pre-chunk:
-	cPacket_PreChunk pre(a_ChunkX, a_ChunkZ, true);
-	Send(pre);
+	// Check chunks being sent, erase them from m_ChunksToSend:
+	bool Found = false;
+	cCSLock Lock(m_CSChunkLists);
+	for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
+	{
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
+		{
+			m_ChunksToSend.erase(itr);
+			
+			// TODO: _X: Decouple this from packet sending, it creates a deadlock possibility
+			//  -- postpone till Tick() instead, using a bool flag
+			CheckIfWorldDownloaded();
+			
+			Found = true;
+			break;
+		}
+	}  // for itr - m_ChunksToSend[]
+	if (!Found)
+	{
+		// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
+		// It's not a big issue anyway, just means that some chunks may be compressed several times
+		// LOGD("Refusing to send    chunk [%d, %d] to client \"%s\" at [%d, %d].", ChunkX, ChunkZ, m_Username.c_str(), m_Player->GetChunkX(), m_Player->GetChunkZ());
+		return;
+	}
 	
-	// Send the data:
-	cPacket_MapChunk mc(a_ChunkX, a_ChunkZ, a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5));
-	Send(mc);
+	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
 }
 
 
@@ -2075,8 +1485,7 @@ void cClientHandle::SendConfirmPosition(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_JOIN, 1, m_Player))
 	{
 		// Broadcast that this player has joined the game! Yay~
-		cPacket_Chat Joined(m_Username + " joined the game!");
-		cRoot::Get()->GetServer()->Broadcast(Joined, this);
+		cRoot::Get()->GetServer()->BroadcastChat(m_Username + " joined the game!", this);
 	}
 
 	m_ConfirmPosition = m_Player->GetPosition();
@@ -2140,64 +1549,54 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cClientHandle::PacketBufferFull(void)
+{
+	// Too much data in the incoming queue, the server is probably too busy, kick the client:
+	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_Socket.GetIPString().c_str());
+	SendDisconnect("Server busy");
+	// TODO: QueueDestroy();
+	cSleep::MilliSleep(1000); // Give packet some time to be received
+	Destroy();
+}
+
+
+
+
+
+void cClientHandle::PacketUnknown(unsigned char a_PacketType)
+{
+	LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_Socket.GetIPString().c_str());
+
+	AString Reason;
+	Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", a_PacketType);
+	SendDisconnect(Reason);
+	// TODO: QueueDestroy();
+	cSleep::MilliSleep(1000); // Give packet some time to be received
+	Destroy();
+}
+
+
+
+
+
+void cClientHandle::PacketError(unsigned char a_PacketType)
+{
+	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
+	SendDisconnect("Protocol error");
+	// TODO: QueueDestroy();
+	cSleep::MilliSleep(1000); // Give packet some time to be received
+	Destroy();
+}
+
+
+
+
+
 void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
-	// Data is received from the client
-	
-	if (!m_ReceivedData.Write(a_Data, a_Size))
-	{
-		// Too much data in the incoming queue, the server is probably too busy, kick the client:
-		LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_Socket.GetIPString().c_str());
-		SendDisconnect("Server busy");
-		// TODO: QueueDestroy();
-		cSleep::MilliSleep(1000); // Give packet some time to be received
-		Destroy();
-		return;
-	}
-
-	// Parse and handle all complete packets in m_ReceivedData:
-	while (m_ReceivedData.CanReadBytes(1))
-	{
-		unsigned char PacketType;
-		m_ReceivedData.ReadByte(PacketType);
-		cPacket* pPacket = m_PacketMap[PacketType];
-		if (pPacket == NULL)
-		{
-			LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", PacketType, m_Username.c_str(), m_Socket.GetIPString().c_str());
-
-			AString Reason;
-			Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", PacketType);
-			SendDisconnect(Reason);
-			// TODO: QueueDestroy();
-			cSleep::MilliSleep(1000); // Give packet some time to be received
-			Destroy();
-			return;
-		}
-		
-		int NumBytes = pPacket->Parse(m_ReceivedData);
-		if (NumBytes == PACKET_ERROR)
-		{
-			LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", PacketType, m_Username.c_str());
-			SendDisconnect("Protocol error");
-			// TODO: QueueDestroy();
-			cSleep::MilliSleep(1000); // Give packet some time to be received
-			Destroy();
-			return;
-		}
-		else if (NumBytes == PACKET_INCOMPLETE)
-		{
-			// Not a complete packet
-			m_ReceivedData.ResetRead();
-			break;
-		}
-		else
-		{
-			// Packet parsed successfully, add it to internal queue:
-			HandlePacket(pPacket);
-			// Erase the packet from the buffer:
-			m_ReceivedData.CommitRead();
-		}
-	}  // while (!Received.CanReadBytes(1))
+	// Data is received from the client, hand it off to the protocol:
+	m_Protocol->DataReceived(a_Data, a_Size);
+	m_TimeLastPacket = cWorld::GetTime();
 }
 
 
@@ -2207,127 +1606,11 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 void cClientHandle::GetOutgoingData(AString & a_Data)
 {
 	// Data can be sent to client
-	
-	cCSLock Lock(m_CSPackets);
-	if (m_PendingNrmSendPackets.size() + m_PendingLowSendPackets.size() > MAX_OUTGOING_PACKETS)
-	{
-		LOGERROR("ERROR: Too many packets in queue for player %s !!", m_Username.c_str());
-		SendDisconnect("Too many packets in queue.");
-		
-		// DEBUG: Dump all outstanding packets' types to the log:
-		int Idx = 0;
-		int ChunkX = m_Player->GetChunkX();
-		int ChunkZ = m_Player->GetChunkZ();
-		for (PacketList::const_iterator itr = m_PendingNrmSendPackets.begin(); itr != m_PendingNrmSendPackets.end(); ++itr)
-		{
-			switch ((*itr)->m_PacketID)
-			{
-				case E_MAP_CHUNK:
-				{
-					int x = ((cPacket_MapChunk *)(*itr))->m_PosX;
-					int z = ((cPacket_MapChunk *)(*itr))->m_PosZ;
-					bool IsWanted = (abs(x - ChunkX) <= m_ViewDistance) && (abs(z - ChunkZ) <= m_ViewDistance);
-					LOG("Packet %4d: type %2x (MapChunk: %d, %d, %s)", 
-						Idx++, (*itr)->m_PacketID,
-						x, z,
-						IsWanted ? "wanted" : "unwanted"
-					);
-					break;
-				}
-				
-				case E_PRE_CHUNK:
-				{
-					int x = ((cPacket_PreChunk *)(*itr))->m_PosX;
-					int z = ((cPacket_PreChunk *)(*itr))->m_PosZ;
-					bool IsWanted = (abs(x - ChunkX) <= m_ViewDistance) && (abs(z - ChunkZ) <= m_ViewDistance);
-					bool Loading = ((cPacket_PreChunk *)(*itr))->m_bLoad;
-					LOG("Packet %4d: type %2x (PreChunk: %d, %d, %s, %s)", 
-						Idx++, (*itr)->m_PacketID,
-						x, z,
-						Loading ? "loading" : "unloading",
-						IsWanted ? "wanted" : "unwanted"
-					);
-					break;
-				}
-				
-				case E_BLOCK_CHANGE:
-				{
-					int x = ((cPacket_BlockChange *)(*itr))->m_PosX;
-					int z = ((cPacket_BlockChange *)(*itr))->m_PosZ;
-					char ToBlock = ((cPacket_BlockChange *)(*itr))->m_BlockType;
-					int y, cx, cz;
-					cChunkDef::AbsoluteToRelative(x, y, z, cx, cz);
-					bool IsWanted = (abs(cx - ChunkX) <= m_ViewDistance) && (abs(cz - ChunkZ) <= m_ViewDistance);
-					LOG("Packet %4d: type %2x (BlockChange: [%d, %d], %s chunk; to block %d)", 
-						Idx++, (*itr)->m_PacketID,
-						cx, cz,
-						IsWanted ? "wanted" : "unwanted",
-						ToBlock
-					);
-					break;
-				}
-				
-				case E_MULTI_BLOCK:
-				{
-					int cx = ((cPacket_MultiBlock *)(*itr))->m_ChunkX;
-					int cz = ((cPacket_MultiBlock *)(*itr))->m_ChunkZ;
-					int NumBlocks = ((cPacket_MultiBlock *)(*itr))->m_NumBlocks;
-					bool IsWanted = (abs(cx - ChunkX) <= m_ViewDistance) && (abs(cz - ChunkZ) <= m_ViewDistance);
-					LOG("Packet %4d: type %2x (MultiBlock: [%d, %d], %s chunk, %d blocks)", 
-						Idx++, (*itr)->m_PacketID,
-						cx, cz,
-						IsWanted ? "wanted" : "unwanted",
-						NumBlocks
-					);
-					break;
-				}
-				
-				default:
-				{
-					LOG("Packet %4d: type %2x", Idx++, (*itr)->m_PacketID); 
-					break;
-				}
-			}
-		}
-		
-		Lock.Unlock();
-		Destroy();
-		return;
-	}
-	
-	if ((m_PendingNrmSendPackets.size() == 0) && (m_PendingLowSendPackets.size() == 0))
-	{
-		return;
-	}
-
-	if (m_PendingNrmSendPackets.size() > MAX_OUTGOING_PACKETS / 2)
-	{
-		LOGINFO("Suspiciously many pending packets: %i; client \"%s\", LastType: 0x%02x", m_PendingNrmSendPackets.size(), m_Username.c_str(), (*m_PendingNrmSendPackets.rbegin())->m_PacketID);
-	}
-
-	AString Data;
-	Data.reserve(1100);
-	// Serialize normal-priority packets up to 1000 bytes
-	while (!m_PendingNrmSendPackets.empty() && (Data.size() < 1000))
-	{
-		m_PendingNrmSendPackets.front()->Serialize(Data);
-		// LOGD("Sending packet 0x%02x", m_PendingNrmSendPackets.front()->m_PacketID);
-		delete m_PendingNrmSendPackets.front();
-		m_PendingNrmSendPackets.erase(m_PendingNrmSendPackets.begin());
-	}
-	// Serialize one low-priority packet:
-	if (!m_PendingLowSendPackets.empty() && Data.empty())
-	{
-		m_PendingLowSendPackets.front()->Serialize(Data);
-		delete m_PendingLowSendPackets.front();
-		m_PendingLowSendPackets.erase(m_PendingLowSendPackets.begin());
-	}
-	Lock.Unlock();
-	
-	a_Data.append(Data);
+	m_OutgoingData.ReadAll(a_Data);
+	m_OutgoingData.CommitRead();
 
 	// Disconnect player after all packets have been sent
-	if (m_bKicking && (m_PendingNrmSendPackets.size() + m_PendingLowSendPackets.size() == 0))
+	if (m_bKicking && a_Data.empty())
 	{
 		Destroy();
 	}

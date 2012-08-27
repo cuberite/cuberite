@@ -445,6 +445,9 @@
     <Filter Include="cBlockEntity\cNoteEntity">
       <UniqueIdentifier>{7bfe7ca2-4966-4eca-a501-94e1bfaa009f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocol">
+      <UniqueIdentifier>{dcde29da-b011-40c1-b4b0-c39b653ef73c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\cServer.cpp">
@@ -952,6 +955,9 @@
       <Filter>cBlockEntity\cNoteEntity</Filter>
     </ClCompile>
     <ClCompile Include="..\source\ChunkDataSerializer.cpp" />
+    <ClCompile Include="..\source\Protocol125.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1665,6 +1671,15 @@
       <Filter>cBlockEntity\cNoteEntity</Filter>
     </ClInclude>
     <ClInclude Include="..\source\ChunkDataSerializer.h" />
+    <ClInclude Include="..\source\ProtocolRecognizer.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol125.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\source\AllToLua.pkg">

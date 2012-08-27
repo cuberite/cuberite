@@ -283,24 +283,6 @@ cServer::~cServer()
 
 
 
-// TODO - Need to modify this or something, so it broadcasts to all worlds? And move this to cWorld?
-void cServer::Broadcast(const cPacket & a_Packet, cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
-	{
-		if ((*itr == a_Exclude) || !(*itr)->IsLoggedIn())
-		{
-			continue;
-		}
-		(*itr)->Send(a_Packet);
-	}
-}
-
-
-
-
-
 void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSClients);
