@@ -288,13 +288,13 @@ void* webserver::Request(void* ptr_s)
 	req.path_   = path;
 	req.params_ = params;
 
-	static const std::string authorization   = "Authorization: Basic ";
-	static const std::string accept          = "Accept: "             ;
-	static const std::string accept_language = "Accept-Language: "    ;
-	static const std::string accept_encoding = "Accept-Encoding: "    ;
-	static const std::string user_agent      = "User-Agent: "         ;
-	static const std::string content_length  = "Content-Length: "	  ;
-	static const std::string content_type    = "Content-Type: "		  ;
+	static const char authorization[]   = "Authorization: Basic ";
+	static const char accept[]          = "Accept: ";
+	static const char accept_language[] = "Accept-Language: ";
+	static const char accept_encoding[] = "Accept-Encoding: ";
+	static const char user_agent[]      = "User-Agent: ";
+	static const char content_length[]  = "Content-Length: ";
+	static const char content_type[]    = "Content-Type: ";
 
 	while(1)
 	{
@@ -309,40 +309,40 @@ void* webserver::Request(void* ptr_s)
 
 		line = line.substr(0,pos_cr_lf);
 
-		if (line.substr(0, authorization.size()) == authorization) 
+		if (line.compare(0, sizeof(authorization) - 1, authorization) == 0) 
 		{
 			req.authentication_given_ = true;
-			std::string encoded = line.substr(authorization.size());
+			std::string encoded = line.substr(sizeof(authorization) - 1);
 			std::string decoded = base64_decode(encoded);
 
 			unsigned int pos_colon = decoded.find(":");
 
 			req.username_ = decoded.substr(0, pos_colon);
-			req.password_ = decoded.substr(pos_colon+1 );
+			req.password_ = decoded.substr(pos_colon + 1);
 		}
-		else if (line.substr(0, accept.size()) == accept) 
+		else if (line.compare(0, sizeof(accept) - 1, accept) == 0)
 		{
-			req.accept_ = line.substr(accept.size());
+			req.accept_ = line.substr(sizeof(accept) - 1);
 		}
-		else if (line.substr(0, accept_language.size()) == accept_language) 
+		else if (line.compare(0, sizeof(accept_language) - 1, accept_language) == 0)
 		{
-			req.accept_language_ = line.substr(accept_language.size());
+			req.accept_language_ = line.substr(sizeof(accept_language) - 1);
 		}
-		else if (line.substr(0, accept_encoding.size()) == accept_encoding) 
+		else if (line.compare(0, sizeof(accept_encoding) - 1, accept_encoding) == 0)
 		{
-			req.accept_encoding_ = line.substr(accept_encoding.size());
+			req.accept_encoding_ = line.substr(sizeof(accept_encoding) - 1);
 		}
-		else if (line.substr(0, user_agent.size()) == user_agent) 
+		else if (line.compare(0, sizeof(user_agent) - 1, user_agent) == 0)
 		{
-			req.user_agent_ = line.substr(user_agent.size());
+			req.user_agent_ = line.substr(sizeof(user_agent) - 1);
 		}
-		else if (line.substr(0, content_length.size()) == content_length) 
+		else if (line.compare(0, sizeof(content_length) - 1, content_length) == 0)
 		{
-			req.content_length_ = atoi( line.substr(content_length.size()).c_str() );
+			req.content_length_ = atoi(line.substr(sizeof(content_length) - 1).c_str() );
 		}
-		else if (line.substr(0, content_type.size()) == content_type) 
+		else if (line.compare(0, sizeof(content_type) - 1, content_type) == 0)
 		{
-			req.content_type_ = line.substr(content_type.size());
+			req.content_type_ = line.substr(sizeof(content_type) - 1);
 		}
 	}
 
@@ -376,11 +376,11 @@ void* webserver::Request(void* ptr_s)
 	tm* gmt= gmtime(&ltime);
 
 #ifdef _WIN32
-	static std::string const serverName = "MCServerWebAdmin (Windows)";
+	static const char serverName[] = "MCServerWebAdmin (Windows)";
 #elif __APPLE__
-	static std::string const serverName = "MCServerWebAdmin (MacOSX)";
+	static const char serverName[] = "MCServerWebAdmin (MacOSX)";
 #else
-	static std::string const serverName = "MCServerWebAdmin (Linux)";
+	static const char serverName[] = "MCServerWebAdmin (Linux)";
 #endif
 
 
@@ -401,7 +401,7 @@ void* webserver::Request(void* ptr_s)
 		s->SendLine(req.status_);
 	}
 	s->SendLine(std::string("Date: ") + asctime_remove_nl + " GMT");
-	s->SendLine(std::string("Server: ") +serverName);
+	s->SendLine(std::string("Server: ") + serverName);
 	s->SendLine("Connection: close");
 	s->SendLine("Content-Type: text/html; charset=ISO-8859-1");
 	s->SendLine("Content-Length: " + str_str.str());
