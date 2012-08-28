@@ -17,13 +17,3 @@ int cPacket_ItemSwitch::Parse(cByteBuffer & a_Buffer)
 
 
 
-
-void cPacket_ItemSwitch::Serialize(AString & a_Data) const
-{
-	AppendByte (a_Data, m_PacketID);
-	AppendShort(a_Data, m_SlotNum);
-}
-
-
-
-

@@ -148,9 +148,6 @@ public:
 	void HandleLogin           (int a_ProtocolVersion, const AString & a_Username);
 	void HandleUnexpectedPacket(int a_PacketType);  // the default case -> kick
 	
-	// Packets handled while in csConfirmingPos:
-	void HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ);  // While !m_bPositionConfirmed
-	
 	// Packets handled while in csPlaying:
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);

@@ -85,7 +85,7 @@ public:
 
 	AString GetColor(void) const;											//tolua_export
 
-	void TossItem(bool a_bDraggingItem, int a_Amount = 1, int a_CreateType = 0, int a_CreateHealth = 0);				//tolua_export
+	void TossItem(bool a_bDraggingItem, char a_Amount = 1, short a_CreateType = 0, short a_CreateHealth = 0);				//tolua_export
 
 	void Heal( int a_Health );												//tolua_export
 	

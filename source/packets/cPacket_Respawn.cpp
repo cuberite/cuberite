@@ -7,21 +7,6 @@
 
 
 
-void cPacket_Respawn::Serialize(AString & a_Data) const
-{
-	AppendByte    (a_Data, m_PacketID);
-
-	AppendInteger (a_Data, m_Dimension);
-	AppendByte    (a_Data, m_Difficulty);
-	AppendByte    (a_Data, m_CreativeMode);
-	AppendShort   (a_Data, m_WorldHeight);
-	AppendString16(a_Data, m_LevelType);
-}
-
-
-
-
-
 int cPacket_Respawn::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;

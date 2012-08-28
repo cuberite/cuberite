@@ -18,8 +18,7 @@ public:
 	
 	virtual cPacket* Clone() const { return new cPacket_WindowClose(*this); }
 
-	virtual int  Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 
 	char m_WindowID;
 };

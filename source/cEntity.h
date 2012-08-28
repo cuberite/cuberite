@@ -121,6 +121,13 @@ public:
 	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }  // tolua_export
 	
 	void WrapRotation();
+	
+	// Metadata flags; descendants may override the defaults:
+	virtual bool IsOnFire   (void) const {return (m_BurnPeriod > 0); }
+	virtual bool IsCrouched (void) const {return false; }
+	virtual bool IsRiding   (void) const {return false; }
+	virtual bool IsSprinting(void) const {return false; }
+	virtual bool IsRclking  (void) const {return false; }
 
 protected:
 	virtual void Destroyed() {} // Called after the entity has been destroyed
@@ -154,6 +161,9 @@ protected:
 	eEntityType m_EntityType;
 	
 	cWorld* m_World;
+	
+	float m_FireDamageInterval;
+	float m_BurnPeriod;
 }; //tolua_export
 
 typedef std::list<cEntity *> cEntityList;

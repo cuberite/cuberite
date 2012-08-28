@@ -508,34 +508,6 @@ void cClientHandle::HandleUnexpectedPacket(int a_PacketType)
 
 
 
-void cClientHandle::HandleMoveLookConfirm(double a_PosX, double a_PosY, double a_PosZ)
-{
-	Vector3d ReceivedPosition = Vector3d(a_PosX, a_PosY, a_PosZ);
-	// LOGD("Received MoveLook confirmation: {%0.2f %0.2f %0.2f}", a_PosX, a_PosY, a_PosZ);
-	
-	// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
-	double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
-	if (Dist < 1.0)
-	{
-		// Test
-		if (ReceivedPosition.Equals(m_ConfirmPosition))
-		{
-			LOGINFO("Exact position confirmed by client!");
-		}
-		m_State = csPlaying;
-	}
-	else
-	{
-		LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), Dist);
-		m_ConfirmPosition = m_Player->GetPosition();
-		SendPlayerMoveLook();
-	}
-}
-
-
-
-
-
 void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
 {
 	// This is for creative Inventory changes
@@ -827,18 +799,44 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 		return;
 	}
 	*/
-	if (m_State != csPlaying)
+	switch (m_State)
 	{
-		// Ignore this packet unles the player is fully in:
-		return;
+		case csPlaying:
+		{
+			m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
+			m_Player->SetStance     (a_Stance);
+			m_Player->SetTouchGround(a_IsOnGround);
+			m_Player->SetRotation   (a_Rotation);
+			m_Player->SetPitch      (a_Pitch);
+			m_Player->WrapRotation();
+			break;
+		}
+		
+		case csDownloadingWorld:
+		{
+			Vector3d ReceivedPosition = Vector3d(a_PosX, a_PosY, a_PosZ);
+			// LOGD("Received MoveLook confirmation: {%0.2f %0.2f %0.2f}", a_PosX, a_PosY, a_PosZ);
+			
+			// Test the distance between points with a small/large enough value instead of comparing directly. Floating point inaccuracies might screw stuff up
+			double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
+			if (Dist < 1.0)
+			{
+				// Test
+				if (ReceivedPosition.Equals(m_ConfirmPosition))
+				{
+					LOGINFO("Exact position confirmed by client!");
+				}
+				m_State = csPlaying;
+			}
+			else
+			{
+				LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), Dist);
+				m_ConfirmPosition = m_Player->GetPosition();
+				SendPlayerMoveLook();
+			}
+			break;
+		}
 	}
-	
-	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
-	m_Player->SetStance     (a_Stance);
-	m_Player->SetTouchGround(a_IsOnGround);
-	m_Player->SetRotation   (a_Rotation);
-	m_Player->SetPitch      (a_Pitch);
-	m_Player->WrapRotation();
 }
 
 

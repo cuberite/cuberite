@@ -32,20 +32,3 @@ int cPacket_Login::Parse(cByteBuffer & a_Buffer)
 
 
 
-
-void cPacket_Login::Serialize(AString & a_Data) const
-{
-	AppendByte    (a_Data, m_PacketID);
-	AppendInteger (a_Data, m_ProtocolVersion);
-	AppendString16(a_Data, m_Username);
-	AppendString16(a_Data, m_LevelType);
-	AppendInteger (a_Data, m_ServerMode);
-	AppendInteger (a_Data, m_Dimension);
-	AppendByte    (a_Data, m_Difficulty);
-	AppendByte    (a_Data, m_WorldHeight);
-	AppendByte    (a_Data, m_MaxPlayers);
-}
-
-
-
-

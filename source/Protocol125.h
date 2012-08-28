@@ -47,13 +47,13 @@ public:
 	virtual void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityStatus     (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendGameMode         (eGameMode a_GameMode) override;
-	virtual void SendHandshake        (const AString & a_ServerName) override;
+	virtual void SendHandshake        (const AString & a_ConnectionHash) override;
 	virtual void SendHealth           (void) override;
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) override;
 	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive        (int a_PingID) override;
 	virtual void SendLogin            (const cPlayer & a_Player) override;
-	virtual void SendMetadata         (const cPawn & a_Entity) override;
+	virtual void SendMetadata         (const cEntity & a_Entity) override;
 	virtual void SendPickupSpawn      (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation) override;
 	virtual void SendPlayerListItem   (const cPlayer & a_Player, bool a_IsOnline) override;
@@ -86,39 +86,50 @@ protected:
 	
 	cByteBuffer m_ReceivedData;  //< Buffer for the received data
 	
-	void Send(const cPacket & a_Packet);
-	
 	virtual void SendData(const char * a_Data, int a_Size) override;
 	
 	/// Parse the packet of the specified type from m_ReceivedData (switch into ParseXYZ() )
 	virtual int ParsePacket(unsigned char a_PacketType);
 
 	// Specific packet parsers:
-	virtual int ParseKeepAlive              (void);
-	virtual int ParseHandshake              (void);
-	virtual int ParseLogin                  (void);
-	virtual int ParsePlayerPosition         (void);
-	virtual int ParsePlayerLook             (void);
-	virtual int ParsePlayerMoveLook         (void);
-	virtual int ParsePlayerAbilities        (void);
-	virtual int ParseChat                   (void);
 	virtual int ParseArmAnim                (void);
-	virtual int ParseFlying                 (void);
 	virtual int ParseBlockDig               (void);
 	virtual int ParseBlockPlace             (void);
-	virtual int ParseDisconnect             (void);
-	virtual int ParseItemSwitch             (void);
-	virtual int ParseEntityEquipment        (void);
+	virtual int ParseChat                   (void);
 	virtual int ParseCreativeInventoryAction(void);
-	virtual int ParseNewInvalidState        (void);
-	virtual int ParsePickupSpawn            (void);
-	virtual int ParseUseEntity              (void);
-	virtual int ParseWindowClose            (void);
-	virtual int ParseWindowClick            (void);
+	virtual int ParseDisconnect             (void);
 	virtual int ParseEntityAction           (void);
-	virtual int ParseUpdateSign             (void);
-	virtual int ParseRespawn                (void);
+	virtual int ParseFlying                 (void);
+	virtual int ParseHandshake              (void);
+	virtual int ParseSlotSelected           (void);
+	virtual int ParseKeepAlive              (void);
+	virtual int ParseLogin                  (void);
 	virtual int ParsePing                   (void);
+	virtual int ParsePlayerAbilities        (void);
+	virtual int ParsePlayerLook             (void);
+	virtual int ParsePlayerMoveLook         (void);
+	virtual int ParsePlayerPosition         (void);
+	virtual int ParseRespawn                (void);
+	virtual int ParseUpdateSign             (void);
+	virtual int ParseUseEntity              (void);
+	virtual int ParseWindowClick            (void);
+	virtual int ParseWindowClose            (void);
+	
+	// Utility functions:
+	/// Writes a "pre-chunk" packet
+	void SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad);
+	
+	/// Writes a "whole inventory" packet with the specified params
+	void SendWholeInventory(char a_WindowID, int a_NumItems, const cItem * a_Items);
+	
+	/// Writes one item, "slot" as the protocol wiki calls it
+	virtual void WriteItem(const cItem & a_Item);
+	
+	/// Returns the entity metadata representation
+	AString GetEntityMetaData(const cEntity & a_Entity);
+	
+	/// Returns the entity common metadata, index 0 (generic flags)
+	char GetEntityMetadataFlags(const cEntity & a_Entity);
 } ;
 
 

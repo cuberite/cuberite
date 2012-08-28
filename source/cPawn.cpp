@@ -29,8 +29,6 @@ cPawn::cPawn()
 	, m_TimeLastTeleportPacket( 0.f )
 	, m_bBurnable(true)
 	, m_MetaData(NORMAL)
-	, m_FireDamageInterval(0.f)
-	, m_BurnPeriod(0.f)
 {
 	SetMaxHealth(20);
 }

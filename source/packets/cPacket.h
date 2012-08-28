@@ -52,15 +52,6 @@ public:
 		return PACKET_ERROR;
 	}
 	
-	/// Called to serialize the packet into a string. Append all packet data to a_Data, including the packet type!
-	virtual void Serialize(AString & a_Data) const
-	{
-		// There are packets that are sent C->S only, those don't have a serializing function
-		UNUSED(a_Data);
-		LOGERROR("Packet type 0x%02x has no serializer defined!", m_PacketID);
-		ASSERT(!"Unserialized packet");
-	}
-	
 	virtual cPacket * Clone() const = 0;
 
 	unsigned char m_PacketID;

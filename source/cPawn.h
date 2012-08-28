@@ -59,10 +59,6 @@ protected:
 
 	double m_LastPosX, m_LastPosY, m_LastPosZ;
 	float m_TimeLastTeleportPacket;
-
-	float m_FireDamageInterval;
-	float m_BurnPeriod;
-
 }; //tolua_export
 
 

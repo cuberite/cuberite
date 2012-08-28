@@ -306,3 +306,162 @@ AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF8)
 
 
 
+// UTF-8 conversion code adapted from:
+//  http://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
+
+#define UNI_MAX_BMP         0x0000FFFF
+#define UNI_MAX_UTF16       0x0010FFFF
+#define UNI_MAX_UTF32       0x7FFFFFFF
+#define UNI_MAX_LEGAL_UTF32 0x0010FFFF
+#define UNI_SUR_HIGH_START  0xD800
+#define UNI_SUR_HIGH_END    0xDBFF
+#define UNI_SUR_LOW_START   0xDC00
+#define UNI_SUR_LOW_END     0xDFFF
+
+
+
+
+
+static const char trailingBytesForUTF8[256] =
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
+};
+
+
+
+
+
+static const unsigned int offsetsFromUTF8[6] =
+{
+	0x00000000UL, 0x00003080UL, 0x000E2080UL, 
+	0x03C82080UL, 0xFA082080UL, 0x82082080UL
+};
+
+
+
+
+
+static bool isLegalUTF8(const unsigned char * source, int length)
+{
+	unsigned char a;
+	const unsigned char * srcptr = source + length;
+	switch (length)
+	{
+		default: return false;
+		// Everything else falls through when "true"...
+		case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+		case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+		case 2:
+		{
+			if ((a = (*--srcptr)) > 0xBF) return false;
+			switch (*source)
+			{
+				// no fall-through in this inner switch
+				case 0xE0: if (a < 0xA0) return false; break;
+				case 0xED: if (a > 0x9F) return false; break;
+				case 0xF0: if (a < 0x90) return false; break;
+				case 0xF4: if (a > 0x8F) return false; break;
+				default:   if (a < 0x80) return false;
+			}
+		}
+		case 1: if (*source >= 0x80 && *source < 0xC2) return false;
+	}
+	if (*source > 0xF4) return false;
+	return true;
+}
+
+
+
+
+
+AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16)
+{
+	a_UTF16.clear();
+	a_UTF16.reserve(a_UTF8Length * 3);
+
+	const unsigned char * source    = (const unsigned char*)a_UTF8;
+	const unsigned char * sourceEnd = source + a_UTF8Length;
+	const int halfShift  = 10;  // used for shifting by 10 bits
+	const unsigned int halfBase = 0x0010000UL;
+	const unsigned int halfMask = 0x3FFUL;
+
+	while (source < sourceEnd)
+	{
+		unsigned int ch = 0;
+		unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
+		if (source + extraBytesToRead >= sourceEnd)
+		{
+			return a_UTF16;
+		}
+		// Do this check whether lenient or strict
+		if (!isLegalUTF8(source, extraBytesToRead + 1))
+		{
+			return a_UTF16;
+			break;
+		}
+		
+		// The cases all fall through. See "Note A" below.
+		switch (extraBytesToRead)
+		{
+			case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+			case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
+			case 3: ch += *source++; ch <<= 6;
+			case 2: ch += *source++; ch <<= 6;
+			case 1: ch += *source++; ch <<= 6;
+			case 0: ch += *source++;
+		}
+		ch -= offsetsFromUTF8[extraBytesToRead];
+
+		if (ch <= UNI_MAX_BMP)
+		{
+			// Target is a character <= 0xFFFF
+			if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END)
+			{
+				// UTF-16 surrogate values are illegal in UTF-32
+				ch = ' ';
+			}
+			unsigned short v = htons((unsigned short)ch);
+			a_UTF16.append((const char *)&v, 2);
+		}
+		else if (ch > UNI_MAX_UTF16)
+		{
+			// Invalid value, replace with a space
+			unsigned short v = htons(' ');
+			a_UTF16.append((const char *)&v, 2);
+		}
+		else
+		{
+			// target is a character in range 0xFFFF - 0x10FFFF.
+			ch -= halfBase;
+			unsigned short v1 = htons((ch >> halfShift) + UNI_SUR_HIGH_START);
+			unsigned short v2 = htons((ch & halfMask) + UNI_SUR_LOW_START);
+			a_UTF16.append((const char *)&v1, 2);
+			a_UTF16.append((const char *)&v2, 2);
+		}
+	}
+	return a_UTF16;
+}
+
+/* ---------------------------------------------------------------------
+
+    Note A.
+    The fall-through switches in UTF-8 reading code save a
+    temp variable, some decrements & conditionals.  The switches
+    are equivalent to the following loop:
+    {
+        int tmpBytesToRead = extraBytesToRead+1;
+        do {
+        ch += *source++;
+        --tmpBytesToRead;
+        if (tmpBytesToRead) ch <<= 6;
+        } while (tmpBytesToRead > 0);
+    }
+
+   --------------------------------------------------------------------- */

@@ -18,14 +18,3 @@ int cPacket_ArmAnim::Parse(cByteBuffer & a_Buffer)
 
 
 
-
-void cPacket_ArmAnim::Serialize(AString & a_Data) const
-{
-	AppendByte   (a_Data, m_PacketID);
-	AppendInteger(a_Data, m_EntityID);
-	AppendByte   (a_Data, m_Animation);
-}
-
-
-
-

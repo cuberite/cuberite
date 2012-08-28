@@ -14,7 +14,6 @@ public:
 	virtual cPacket* Clone() const { return new cPacket_Handshake(*this); }
 
 	virtual int Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
 
 	std::string m_Username;
 };

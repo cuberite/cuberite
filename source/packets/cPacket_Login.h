@@ -22,7 +22,6 @@ public:
 	virtual cPacket* Clone() const { return new cPacket_Login(*this); }
 
 	virtual int Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
 
 	int           m_ProtocolVersion;
 	AString       m_Username;

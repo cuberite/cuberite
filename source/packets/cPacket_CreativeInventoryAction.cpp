@@ -38,14 +38,3 @@ int cPacket_CreativeInventoryAction::Parse(cByteBuffer & a_Buffer)
 
 
 
-void cPacket_CreativeInventoryAction::Serialize(AString & a_Data) const
-{
-	AppendByte (a_Data, m_PacketID);
-	AppendShort(a_Data, m_SlotNum);
-
-	cPacket_ItemData::AppendItem(a_Data, m_ClickedItem);
-}
-
-
-
-

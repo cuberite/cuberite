@@ -16,11 +16,8 @@ public:
 	virtual cPacket* Clone() const { return new cPacket_ItemSwitch(*this); }
 
 	virtual int Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
 
 	short m_SlotNum;
-	
-	static const unsigned int c_Size = 1 + 2;
 };
 
 

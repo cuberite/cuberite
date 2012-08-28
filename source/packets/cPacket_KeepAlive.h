@@ -14,8 +14,7 @@ public:
 	cPacket_KeepAlive(int a_PingID) { m_KeepAliveID = a_PingID; }
 	virtual cPacket * Clone() const { return new cPacket_KeepAlive(*this); }
 
-	virtual int  Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
+	virtual int Parse(cByteBuffer & a_Buffer) override;
 
 	int m_KeepAliveID;
 };

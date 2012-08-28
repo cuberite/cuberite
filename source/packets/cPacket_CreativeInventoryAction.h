@@ -22,7 +22,6 @@ public:
 	virtual cPacket* Clone() const { return new cPacket_CreativeInventoryAction(*this); }
 
 	virtual int Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
 
 	short m_SlotNum;
 	cItem m_ClickedItem;

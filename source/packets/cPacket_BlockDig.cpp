@@ -7,19 +7,6 @@
 
 
 
-void cPacket_BlockDig::Serialize(AString & a_Data) const
-{
-	AppendByte	 (a_Data, m_PacketID);
-	AppendInteger(a_Data, m_PosX);
-	AppendByte	 (a_Data, m_PosY);
-	AppendInteger(a_Data, m_PosZ);
-	AppendByte   (a_Data, m_Direction);
-}
-
-
-
-
-
 int cPacket_BlockDig::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;

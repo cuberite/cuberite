@@ -17,13 +17,3 @@ int cPacket_WindowClose::Parse(cByteBuffer & a_Buffer)
 
 
 
-
-void cPacket_WindowClose::Serialize(AString & a_Data) const
-{
-	AppendByte(a_Data, m_PacketID);
-	AppendByte(a_Data, m_WindowID);
-}
-
-
-
-

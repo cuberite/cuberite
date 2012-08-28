@@ -776,35 +776,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_AddToInventory.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_AddToInventory.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\packets\cPacket_ArmAnim.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\packets\cPacket_ArmAnim.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_BlockAction.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_BlockAction.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_BlockChange.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_BlockChange.h"
 					>
 				</File>
 				<File
@@ -832,14 +808,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_CollectItem.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_CollectItem.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\packets\cPacket_CreativeInventoryAction.cpp"
 					>
 				</File>
@@ -848,43 +816,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_DestroyEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_DestroyEntity.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\packets\cPacket_Disconnect.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\packets\cPacket_Disconnect.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_EntityEquipment.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_EntityEquipment.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_EntityLook.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_EntityLook.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_EntityStatus.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_EntityStatus.h"
 					>
 				</File>
 				<File
@@ -909,22 +845,6 @@
 				</File>
 				<File
 					RelativePath="..\source\packets\cPacket_Handshake.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_InventoryProgressBar.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_InventoryProgressBar.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_InventorySlot.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_InventorySlot.h"
 					>
 				</File>
 				<File
@@ -960,54 +880,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_MapChunk.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_MapChunk.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_Metadata.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_Metadata.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_MultiBlock.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_MultiBlock.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_NamedEntitySpawn.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_NamedEntitySpawn.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_NewInvalidState.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_NewInvalidState.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PickupSpawn.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PickupSpawn.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\packets\cPacket_Ping.h"
 					>
 				</File>
@@ -1020,83 +892,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_PreChunk.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_PreChunk.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_RelativeEntityMove.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_RelativeEntityMove.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_RelativeEntityMoveLook.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_RelativeEntityMoveLook.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\packets\cPacket_Respawn.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\packets\cPacket_Respawn.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_SoundEffect.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_SoundEffect.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_SpawnMob.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_SpawnMob.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_TeleportEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_TeleportEntity.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_Thunderbolt.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_Thunderbolt.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_TimeUpdate.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_TimeUpdate.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_UpdateHealth.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_UpdateHealth.h"
 					>
 				</File>
 				<File
@@ -1116,14 +916,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\packets\cPacket_WholeInventory.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_WholeInventory.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\packets\cPacket_WindowClick.cpp"
 					>
 				</File>
@@ -1137,18 +929,6 @@
 				</File>
 				<File
 					RelativePath="..\source\packets\cPacket_WindowClose.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_WindowOpen.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\packets\cPacket_WindowOpen.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\PacketID.h"
 					>
 				</File>
 			</Filter>

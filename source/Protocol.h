@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Defines.h"
+#include "Endianness.h"
 
 
 
@@ -40,46 +41,46 @@ public:
 	virtual void DataReceived(const char * a_Data, int a_Size) = 0;
 	
 	// Sending stuff to clients:
-	virtual void SendDisconnect       (const AString & a_Reason) = 0;
-	virtual void SendLogin            (const cPlayer & a_Player) = 0;
-	virtual void SendHandshake        (const AString & a_ServerName) = 0;
-	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
-	virtual void SendChat             (const AString & a_Message) = 0;
-	virtual void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation) = 0;
-	virtual void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
-	virtual void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) = 0;
-	virtual void SendWindowClose      (char a_WindowID) = 0;
-	virtual void SendWholeInventory   (const cInventory & a_Inventory) = 0;
-	virtual void SendWholeInventory   (const cWindow    & a_Window) = 0;
-	virtual void SendTeleportEntity   (const cEntity & a_Entity) = 0;
-	virtual void SendPlayerListItem   (const cPlayer & a_Player, bool a_IsOnline) = 0;
-	virtual void SendPlayerPosition   (void) = 0;
-	virtual void SendRelEntMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
-	virtual void SendRelEntMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
-	virtual void SendEntLook          (const cEntity & a_Entity) = 0;
-	virtual void SendEntHeadLook      (const cEntity & a_Entity) = 0;
 	virtual void SendBlockAction      (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2) = 0;
-	virtual void SendHealth           (void) = 0;
-	virtual void SendRespawn          (void) = 0;
-	virtual void SendGameMode         (eGameMode a_GameMode) = 0;
-	virtual void SendDestroyEntity    (const cEntity & a_Entity) = 0;
-	virtual void SendPlayerMoveLook   (void) = 0;
-	virtual void SendEntityStatus     (const cEntity & a_Entity, char a_Status) = 0;
-	virtual void SendMetadata         (const cPawn & a_Entity) = 0;
-	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) = 0;
-	virtual void SendPlayerSpawn      (const cPlayer & a_Player) = 0;
-	virtual void SendPickupSpawn      (const cPickup & a_Pickup) = 0;
-	virtual void SendSpawnMob         (const cMonster & a_Mob) = 0;
-	virtual void SendUpdateSign       (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
-	virtual void SendCollectPickup    (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
 	virtual void SendBlockChange      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges     (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
-	virtual void SendUnloadChunk      (int a_ChunkX, int a_ChunkZ) = 0;
-	virtual void SendWeather          (eWeather a_Weather) = 0;
-	virtual void SendTimeUpdate       (Int64 a_WorldTime) = 0;
-	virtual void SendThunderbolt      (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void SendChat             (const AString & a_Message) = 0;
 	virtual void SendChunkData        (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
+	virtual void SendCollectPickup    (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
+	virtual void SendDestroyEntity    (const cEntity & a_Entity) = 0;
+	virtual void SendDisconnect       (const AString & a_Reason) = 0;
+	virtual void SendEntHeadLook      (const cEntity & a_Entity) = 0;
+	virtual void SendEntLook          (const cEntity & a_Entity) = 0;
+	virtual void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
+	virtual void SendEntityStatus     (const cEntity & a_Entity, char a_Status) = 0;
+	virtual void SendGameMode         (eGameMode a_GameMode) = 0;
+	virtual void SendHandshake        (const AString & a_ServerName) = 0;
+	virtual void SendHealth           (void) = 0;
+	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) = 0;
+	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive        (int a_PingID) = 0;
+	virtual void SendLogin            (const cPlayer & a_Player) = 0;
+	virtual void SendMetadata         (const cEntity & a_Entity) = 0;
+	virtual void SendPickupSpawn      (const cPickup & a_Pickup) = 0;
+	virtual void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation) = 0;
+	virtual void SendPlayerListItem   (const cPlayer & a_Player, bool a_IsOnline) = 0;
+	virtual void SendPlayerMoveLook   (void) = 0;
+	virtual void SendPlayerPosition   (void) = 0;
+	virtual void SendPlayerSpawn      (const cPlayer & a_Player) = 0;
+	virtual void SendRelEntMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
+	virtual void SendRelEntMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
+	virtual void SendRespawn          (void) = 0;
+	virtual void SendSpawnMob         (const cMonster & a_Mob) = 0;
+	virtual void SendTeleportEntity   (const cEntity & a_Entity) = 0;
+	virtual void SendThunderbolt      (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	virtual void SendTimeUpdate       (Int64 a_WorldTime) = 0;
+	virtual void SendUnloadChunk      (int a_ChunkX, int a_ChunkZ) = 0;
+	virtual void SendUpdateSign       (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
+	virtual void SendWeather          (eWeather a_Weather) = 0;
+	virtual void SendWholeInventory   (const cInventory & a_Inventory) = 0;
+	virtual void SendWholeInventory   (const cWindow    & a_Window) = 0;
+	virtual void SendWindowClose      (char a_WindowID) = 0;
+	virtual void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) = 0;
 
 protected:
 	cClientHandle * m_Client;
@@ -87,6 +88,79 @@ protected:
 	
 	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it
 	virtual void SendData(const char * a_Data, int a_Size) = 0;
+	
+	/// Called after writing each packet, enables descendants to flush their buffers
+	virtual void Flush(void) {};
+	
+	// Helpers for writing partial packet data, write using SendData()
+	void WriteByte(char a_Value)
+	{
+		SendData((const char *)&a_Value, 1);
+	}
+	
+	void WriteShort(short a_Value)
+	{
+		a_Value = htons(a_Value);
+		SendData((const char *)&a_Value, 2);
+	}
+	
+	/*
+	void WriteShort(unsigned short a_Value)
+	{
+		a_Value = htons(a_Value);
+		SendData((const char *)&a_Value, 2);
+	}
+	*/
+	
+	void WriteInt(int a_Value)
+	{
+		a_Value = htonl(a_Value);
+		SendData((const char *)&a_Value, 4);
+	}
+	
+	void WriteInt(unsigned int a_Value)
+	{
+		a_Value = htonl(a_Value);
+		SendData((const char *)&a_Value, 4);
+	}
+	
+	void WriteInt64 (Int64 a_Value)
+	{
+		a_Value = HostToNetwork8(&a_Value);
+		SendData((const char *)&a_Value, 8);
+	}
+	
+	void WriteFloat (float a_Value)
+	{
+		unsigned int val = HostToNetwork4(&a_Value);
+		SendData((const char *)&val, 4);
+	}
+	
+	void WriteDouble(double a_Value)
+	{
+		unsigned long long val = HostToNetwork8(&a_Value);
+		SendData((const char *)&val, 8);
+	}
+	
+	void WriteString(const AString & a_Value)
+	{
+		AString UTF16;
+		UTF8ToRawBEUTF16(a_Value.c_str(), a_Value.length(), UTF16);
+		WriteShort((unsigned short)(UTF16.size() / 2));
+		SendData(UTF16.data(), UTF16.size());
+	}
+	
+	void WriteBool(bool a_Value)
+	{
+		WriteByte(a_Value ? 1 : 0);
+	}
+	
+	void WriteVectorI(const Vector3i & a_Vector)
+	{
+		WriteInt(a_Vector.x);
+		WriteInt(a_Vector.y);
+		WriteInt(a_Vector.z);
+	}
 } ;
 
 

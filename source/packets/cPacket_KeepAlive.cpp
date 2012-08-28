@@ -7,16 +7,6 @@
 
 
 
-void cPacket_KeepAlive::Serialize(AString & a_Data) const
-{
-	AppendByte   (a_Data, m_PacketID);
-	AppendInteger(a_Data, m_KeepAliveID);
-}
-
-
-
-
-
 int cPacket_KeepAlive::Parse(cByteBuffer & a_Buffer)
 {
 	int TotalBytes = 0;

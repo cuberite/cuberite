@@ -15,7 +15,6 @@ public:
 	virtual cPacket* Clone() const { return new cPacket_Disconnect(*this); }
 
 	virtual int Parse(cByteBuffer & a_Buffer) override;
-	virtual void Serialize(AString & a_Data) const override;
 
 	AString m_Reason;
 	static const unsigned int c_Size = 3; // Minimum size

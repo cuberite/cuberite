@@ -769,16 +769,16 @@ AString cPlayer::GetColor(void) const
 
 void cPlayer::TossItem(
 	bool a_bDraggingItem,
-	int a_Amount /* = 1 */,
-	int a_CreateType /* = 0 */,
-	int a_CreateHealth /* = 0 */ 
+	char a_Amount /* = 1 */,
+	short a_CreateType /* = 0 */,
+	short a_CreateHealth /* = 0 */ 
 )
 {
 	cItems Drops;
 	if (a_CreateType)
 	{
 		// Just create item without touching the inventory (used in creative mode)
-		Drops.push_back(cItem((ENUM_ITEM_ID)a_CreateType, (char)a_Amount, a_CreateHealth));
+		Drops.push_back(cItem(a_CreateType, a_Amount, a_CreateHealth));
 	}
 	else
 	{

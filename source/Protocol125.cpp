@@ -10,48 +10,23 @@
 #include "packets/cPacket.h"
 #include "packets/cPacket_13.h"
 #include "packets/cPacket_ArmAnim.h"
-#include "packets/cPacket_BlockAction.h"
-#include "packets/cPacket_BlockChange.h"
 #include "packets/cPacket_BlockDig.h"
 #include "packets/cPacket_BlockPlace.h"
 #include "packets/cPacket_Chat.h"
-#include "packets/cPacket_CollectItem.h"
 #include "packets/cPacket_CreativeInventoryAction.h"
-#include "packets/cPacket_DestroyEntity.h"
 #include "packets/cPacket_Disconnect.h"
-#include "packets/cPacket_EntityEquipment.h"
-#include "packets/cPacket_EntityLook.h"
-#include "packets/cPacket_EntityStatus.h"
 #include "packets/cPacket_Flying.h"
 #include "packets/cPacket_Handshake.h"
-#include "packets/cPacket_InventoryProgressBar.h"
-#include "packets/cPacket_InventorySlot.h"
 #include "packets/cPacket_ItemSwitch.h"
 #include "packets/cPacket_KeepAlive.h"
 #include "packets/cPacket_Login.h"
-#include "packets/cPacket_MapChunk.h"
-#include "packets/cPacket_Metadata.h"
-#include "packets/cPacket_MultiBlock.h"
-#include "packets/cPacket_NamedEntitySpawn.h"
-#include "packets/cPacket_NewInvalidState.h"
-#include "packets/cPacket_PickupSpawn.h"
 #include "packets/cPacket_Ping.h"
 #include "packets/cPacket_Player.h"
-#include "packets/cPacket_PreChunk.h"
-#include "packets/cPacket_RelativeEntityMove.h"
-#include "packets/cPacket_RelativeEntityMoveLook.h"
 #include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_SpawnMob.h"
-#include "packets/cPacket_TeleportEntity.h"
-#include "packets/cPacket_Thunderbolt.h"
-#include "packets/cPacket_TimeUpdate.h"
-#include "packets/cPacket_UpdateHealth.h"
 #include "packets/cPacket_UpdateSign.h"
 #include "packets/cPacket_UseEntity.h"
-#include "packets/cPacket_WholeInventory.h"
 #include "packets/cPacket_WindowClick.h"
 #include "packets/cPacket_WindowClose.h"
-#include "packets/cPacket_WindowOpen.h"
 
 #include "cClientHandle.h"
 #include "ChunkDataSerializer.h"
@@ -59,6 +34,70 @@
 #include "cMonster.h"
 #include "cPickup.h"
 #include "cPlayer.h"
+#include "cChatColor.h"
+#include "cWindow.h"
+
+
+
+
+
+enum
+{
+	PACKET_KEEP_ALIVE                = 0x00,
+	PACKET_LOGIN                     = 0x01,
+	PACKET_HANDSHAKE                 = 0x02,
+	PACKET_CHAT                      = 0x03,
+	PACKET_UPDATE_TIME               = 0x04,
+	PACKET_ENTITY_EQUIPMENT          = 0x05,
+	PACKET_USE_ENTITY                = 0x07,
+	PACKET_UPDATE_HEALTH             = 0x08,
+	PACKET_RESPAWN                   = 0x09,
+	PACKET_FLYING                    = 0x0a,
+	PACKET_PLAYERPOS                 = 0x0b,
+	PACKET_PLAYERLOOK                = 0x0c,
+	PACKET_PLAYERMOVELOOK            = 0x0d,
+	PACKET_BLOCK_DIG                 = 0x0e,
+	PACKET_BLOCK_PLACE               = 0x0f,
+	PACKET_SLOT_SELECTED             = 0x10,
+	PACKET_ADD_TO_INV                = 0x11,  // TODO: Sure this is not Use Bed??
+	PACKET_ANIMATION                 = 0x12,
+	PACKET_PACKET_ENTITY_ACTION      = 0x13,
+	PACKET_PLAYER_SPAWN              = 0x14,
+	PACKET_PICKUP_SPAWN              = 0x15,
+	PACKET_COLLECT_PICKUP            = 0x16,
+	PACKET_ADD_VEHICLE               = 0x17,
+	PACKET_SPAWN_MOB                 = 0x18,
+	PACKET_DESTROY_ENTITY            = 0x1d,
+	PACKET_ENTITY                    = 0x1e,
+	PACKET_REL_ENT_MOVE              = 0x1f,
+	PACKET_ENT_LOOK                  = 0x20,
+	PACKET_REL_ENT_MOVE_LOOK         = 0x21,
+	PACKET_ENT_TELEPORT              = 0x22,
+	PACKET_ENT_HEAD_LOOK             = 0x23,
+	PACKET_ENT_STATUS                = 0x26,
+	PACKET_METADATA                  = 0x28,
+	PACKET_PRE_CHUNK                 = 0x32,
+	PACKET_MAP_CHUNK                 = 0x33,
+	PACKET_MULTI_BLOCK               = 0x34,
+	PACKET_BLOCK_CHANGE              = 0x35,
+	PACKET_BLOCK_ACTION              = 0x36,
+	PACKET_EXPLOSION                 = 0x3C,
+	PACKET_SOUND_EFFECT              = 0x3D,
+	PACKET_CHANGE_GAME_STATE         = 0x46,
+	PACKET_THUNDERBOLT               = 0x47,
+	PACKET_WINDOW_OPEN               = 0x64,
+	PACKET_WINDOW_CLOSE              = 0x65,
+	PACKET_WINDOW_CLICK              = 0x66,
+	PACKET_INVENTORY_SLOT            = 0x67,
+	PACKET_INVENTORY_WHOLE           = 0x68,
+	PACKET_INVENTORY_PROGRESS        = 0x69,
+	PACKET_CREATIVE_INVENTORY_ACTION = 0x6B,
+	PACKET_UPDATE_SIGN               = 0x82,
+	PACKET_PLAYER_LIST_ITEM          = 0xC9,
+	PACKET_PLAYER_ABILITIES          = 0xca,
+	PACKET_PING                      = 0xfe,
+	PACKET_DISCONNECT                = 0xff
+} ;
 
 
 
@@ -77,13 +116,13 @@ cProtocol125::cProtocol125(cClientHandle * a_Client) :
 void cProtocol125::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_BlockAction ba;
-	ba.m_BlockX = a_BlockX;
-	ba.m_BlockY = (short)a_BlockY;
-	ba.m_BlockZ = a_BlockZ;
-	ba.m_Byte1 = a_Byte1;
-	ba.m_Byte2 = a_Byte2;
-	Send(ba);
+	WriteByte (PACKET_BLOCK_ACTION);
+	WriteInt  (a_BlockX);
+	WriteShort((short)a_BlockY);
+	WriteInt  (a_BlockZ);
+	WriteByte (a_Byte1);
+	WriteByte (a_Byte2);
+	Flush();
 }
 
 
@@ -93,13 +132,13 @@ void cProtocol125::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 void cProtocol125::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_BlockChange BlockChange;
-	BlockChange.m_PosX = a_BlockX;
-	BlockChange.m_PosY = (unsigned char)a_BlockY;
-	BlockChange.m_PosZ = a_BlockZ;
-	BlockChange.m_BlockType = a_BlockType;
-	BlockChange.m_BlockMeta = a_BlockMeta;
-	Send(BlockChange);
+	WriteByte(PACKET_BLOCK_CHANGE);
+	WriteInt (a_BlockX);
+	WriteByte(a_BlockY);
+	WriteInt (a_BlockZ);
+	WriteByte(a_BlockType);
+	WriteByte(a_BlockMeta);
+	Flush();
 }
 
 
@@ -117,19 +156,18 @@ void cProtocol125::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 		return;
 	}
 	
-	cPacket_MultiBlock MultiBlock;
-	MultiBlock.m_ChunkX = a_ChunkX;
-	MultiBlock.m_ChunkZ = a_ChunkZ;
-	MultiBlock.m_NumBlocks = (short)a_Changes.size();
-	MultiBlock.m_Data = new cPacket_MultiBlock::sBlockChange[a_Changes.size()];
-	int i = 0;
-	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr, i++)
+	WriteByte (PACKET_MULTI_BLOCK);
+	WriteInt  (a_ChunkX);
+	WriteInt  (a_ChunkZ);
+	WriteShort((unsigned short)a_Changes.size());
+	WriteInt  (sizeof(int) * a_Changes.size());
+	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
 		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
 		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
-		MultiBlock.m_Data[i].Data = Coords << 16 | Blocks;
+		WriteInt(Coords << 16 | Blocks);
 	}
-	Send(MultiBlock);
+	Flush();
 }
 
 
@@ -139,8 +177,9 @@ void cProtocol125::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 void cProtocol125::SendChat(const AString & a_Message)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Chat Chat(a_Message);
-	Send(Chat);
+	WriteByte  (PACKET_CHAT);
+	WriteString(a_Message);
+	Flush();
 }
 
 
@@ -152,12 +191,15 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	cCSLock Lock(m_CSPacket);
 
 	// Send the pre-chunk:
-	cPacket_PreChunk pre(a_ChunkX, a_ChunkZ, true);
-	Send(pre);
+	SendPreChunk(a_ChunkX, a_ChunkZ, true);
 	
-	// Send the data:
-	cPacket_MapChunk mc(a_ChunkX, a_ChunkZ, a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5));
-	Send(mc);
+	// Send the chunk data:
+	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5);
+	WriteByte(PACKET_MAP_CHUNK);
+	WriteInt (a_ChunkX);
+	WriteInt (a_ChunkZ);
+	SendData(Serialized.data(), Serialized.size());
+	Flush();
 }
 
 
@@ -167,10 +209,10 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 void cProtocol125::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_CollectItem ci;
-	ci.m_CollectedID = a_Pickup.GetUniqueID();
-	ci.m_CollectorID = a_Player.GetUniqueID();
-	Send(ci);
+	WriteByte(PACKET_COLLECT_PICKUP);
+	WriteInt (a_Pickup.GetUniqueID());
+	WriteInt (a_Player.GetUniqueID());
+	Flush();
 }
 
 
@@ -180,9 +222,9 @@ void cProtocol125::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a
 void cProtocol125::SendDestroyEntity(const cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_DestroyEntity de;
-	de.m_UniqueID = a_Entity.GetUniqueID();
-	Send(de);
+	WriteByte(PACKET_DESTROY_ENTITY);
+	WriteInt (a_Entity.GetUniqueID());
+	Flush();
 }
 
 
@@ -192,8 +234,9 @@ void cProtocol125::SendDestroyEntity(const cEntity & a_Entity)
 void cProtocol125::SendDisconnect(const AString & a_Reason)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Disconnect DC(a_Reason);
-	Send(DC);  // TODO: Send it immediately to the socket, bypassing any packet buffers (? is it safe? packet boundaries...)
+	WriteByte  ((unsigned char)PACKET_DISCONNECT);
+	WriteString(a_Reason);
+	Flush();
 }
 
 
@@ -205,8 +248,10 @@ void cProtocol125::SendEntHeadLook(const cEntity & a_Entity)
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
 	
 	cCSLock Lock(m_CSPacket);
-	cPacket_EntityHeadLook ehl(a_Entity);
-	Send(ehl);
+	WriteByte(PACKET_ENT_HEAD_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	Flush();
 }
 
 
@@ -218,11 +263,11 @@ void cProtocol125::SendEntLook(const cEntity & a_Entity)
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
 	
 	cCSLock Lock(m_CSPacket);
-	cPacket_EntityLook el;
-	el.m_UniqueID = a_Entity.GetUniqueID();
-	el.m_Rotation = (char)((a_Entity.GetRotation() / 360.f) * 256);
-	el.m_Pitch    = (char)((a_Entity.GetPitch()    / 360.f) * 256);
-	Send(el);
+	WriteByte(PACKET_ENT_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
+	Flush();
 }
 
 
@@ -232,12 +277,12 @@ void cProtocol125::SendEntLook(const cEntity & a_Entity)
 void cProtocol125::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_EntityEquipment ee;
-	ee.m_UniqueID   = a_Entity.GetUniqueID();
-	ee.m_SlotNum    = a_SlotNum;
-	ee.m_ItemType   = a_Item.m_ItemType;
-	ee.m_ItemDamage = a_Item.m_ItemDamage;
-	Send(ee);
+	WriteByte (PACKET_ENTITY_EQUIPMENT);
+	WriteInt  (a_Entity.GetUniqueID());
+	WriteShort(a_SlotNum);
+	WriteShort(a_Item.m_ItemType);
+	WriteShort(a_Item.m_ItemDamage);
+	Flush();
 }
 
 
@@ -247,10 +292,10 @@ void cProtocol125::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_EntityStatus es;
-	es.m_Status   = a_Status;
-	es.m_UniqueID = a_Entity.GetUniqueID();
-	Send(es);
+	WriteByte(PACKET_ENT_STATUS);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_Status);
+	Flush();
 }
 
 
@@ -260,22 +305,22 @@ void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 void cProtocol125::SendGameMode(eGameMode a_GameMode)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_NewInvalidState nis;
-	nis.m_Reason = 3;
-	nis.m_GameMode = (char)a_GameMode;
-	Send(nis);
+	WriteByte(PACKET_CHANGE_GAME_STATE);
+	WriteByte(3);
+	WriteByte((char)a_GameMode);
+	Flush();
 }
 
 
 
 
 
-void cProtocol125::SendHandshake(const AString & a_ServerName)
+void cProtocol125::SendHandshake(const AString & a_ConnectionHash)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Handshake Handshake;
-	Handshake.m_Username = a_ServerName;
-	Send(Handshake);
+	WriteByte  (PACKET_HANDSHAKE);
+	WriteString(a_ConnectionHash);
+	Flush();
 }
 
 
@@ -285,11 +330,11 @@ void cProtocol125::SendHandshake(const AString & a_ServerName)
 void cProtocol125::SendHealth(void)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_UpdateHealth Health;
-	Health.m_Health     = (short)m_Client->GetPlayer()->GetHealth();
-	Health.m_Food       = m_Client->GetPlayer()->GetFoodLevel();
-	Health.m_Saturation = m_Client->GetPlayer()->GetFoodSaturationLevel();
-	Send(Health);
+	WriteByte (PACKET_UPDATE_HEALTH);
+	WriteShort((short)m_Client->GetPlayer()->GetHealth());
+	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
+	WriteFloat(m_Client->GetPlayer()->GetFoodSaturationLevel());
+	Flush();
 }
 
 
@@ -299,12 +344,11 @@ void cProtocol125::SendHealth(void)
 void cProtocol125::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_InventoryProgressBar Progress;
-	Progress.m_WindowID    = a_WindowID;
-	Progress.m_ProgressBar = a_ProgressBar;
-	Progress.m_Value       = a_Value;
-	Progress.m_WindowID    = a_WindowID;
-	Send(Progress);
+	WriteByte (PACKET_INVENTORY_PROGRESS);
+	WriteByte (a_WindowID);
+	WriteShort(a_ProgressBar);
+	WriteShort(a_Value);
+	Flush();
 }
 
 
@@ -314,13 +358,11 @@ void cProtocol125::SendInventoryProgress(char a_WindowID, short a_ProgressBar, s
 void cProtocol125::SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_InventorySlot Packet;
-	Packet.m_WindowID  = (char)a_WindowID;
-	Packet.m_SlotNum   = a_SlotNum;
-	Packet.m_ItemID    = (short)(a_Item.m_ItemID);
-	Packet.m_ItemCount = a_Item.m_ItemCount;
-	Packet.m_ItemUses  = a_Item.m_ItemHealth;
-	Send(Packet);
+	WriteByte (PACKET_INVENTORY_SLOT);
+	WriteByte (a_WindowID);
+	WriteShort(a_SlotNum);
+	WriteItem (a_Item);
+	Flush();
 }
 
 
@@ -330,8 +372,8 @@ void cProtocol125::SendInventorySlot(int a_WindowID, short a_SlotNum, const cIte
 void cProtocol125::SendKeepAlive(int a_PingID)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_KeepAlive ka(a_PingID);
-	Send(ka);
+	WriteByte(PACKET_KEEP_ALIVE);
+	WriteInt (a_PingID);
 }
 
 
@@ -341,25 +383,31 @@ void cProtocol125::SendKeepAlive(int a_PingID)
 void cProtocol125::SendLogin(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Login LoginResponse;
-	LoginResponse.m_ProtocolVersion = a_Player.GetUniqueID();
-	LoginResponse.m_Username = "";  // Not used
-	LoginResponse.m_ServerMode = a_Player.GetGameMode();  // set gamemode from player.
-	LoginResponse.m_Dimension = 0;  // TODO: Dimension (Nether / Overworld / End)
-	LoginResponse.m_MaxPlayers = 60;  // Client list width or something
-	LoginResponse.m_Difficulty = 2;  // TODO: Difficulty
-	Send(LoginResponse);
+
+	WriteByte  (E_LOGIN);
+	WriteInt   (a_Player.GetUniqueID());  // EntityID of the player
+	WriteString("");  // Username, not used
+	WriteString("DEFAULT");  // Level type
+	WriteInt   ((int)a_Player.GetGameMode());
+	WriteInt   (0);  // TODO: Dimension (Nether / Overworld / End)
+	WriteByte  (2);  // TODO: Difficulty
+	WriteByte  (0);  // Unused
+	WriteByte  (60);  // Client list width or something
+	Flush();
 }
 
 
 
 
 
-void cProtocol125::SendMetadata(const cPawn & a_Pawn)
+void cProtocol125::SendMetadata(const cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Metadata md(a_Pawn.GetMetaData(), a_Pawn.GetUniqueID());
-	Send(md);
+	WriteByte(PACKET_METADATA);
+	WriteInt (a_Entity.GetUniqueID());
+	AString MetaData = GetEntityMetaData(a_Entity);
+	SendData(MetaData.data(), MetaData.size());
+	Flush();
 }
 
 
@@ -369,18 +417,18 @@ void cProtocol125::SendMetadata(const cPawn & a_Pawn)
 void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_PickupSpawn PickupSpawn;
-	PickupSpawn.m_UniqueID   = a_Pickup.GetUniqueID();
-	PickupSpawn.m_ItemType   = a_Pickup.GetItem()->m_ItemType;
-	PickupSpawn.m_ItemCount  = a_Pickup.GetItem()->m_ItemCount;
-	PickupSpawn.m_ItemDamage = a_Pickup.GetItem()->m_ItemHealth;
-	PickupSpawn.m_PosX       = (int) (a_Pickup.GetPosX() * 32);
-	PickupSpawn.m_PosY       = (int) (a_Pickup.GetPosY() * 32);
-	PickupSpawn.m_PosZ       = (int) (a_Pickup.GetPosZ() * 32);
-	PickupSpawn.m_Rotation   = (char)(a_Pickup.GetSpeed().x * 8);
-	PickupSpawn.m_Pitch      = (char)(a_Pickup.GetSpeed().y * 8);
-	PickupSpawn.m_Roll       = (char)(a_Pickup.GetSpeed().z * 8);
-	Send(PickupSpawn);
+	WriteByte (PACKET_PICKUP_SPAWN);
+	WriteInt  (a_Pickup.GetUniqueID());
+	WriteShort(a_Pickup.GetItem()->m_ItemType);
+	WriteByte (a_Pickup.GetItem()->m_ItemCount);
+	WriteShort(a_Pickup.GetItem()->m_ItemDamage);
+	WriteInt  ((int)(a_Pickup.GetPosX() * 32));
+	WriteInt  ((int)(a_Pickup.GetPosY() * 32));
+	WriteInt  ((int)(a_Pickup.GetPosZ() * 32));
+	WriteByte ((char)(a_Pickup.GetSpeed().x * 8));
+	WriteByte ((char)(a_Pickup.GetSpeed().y * 8));
+	WriteByte ((char)(a_Pickup.GetSpeed().z * 8));
+	Flush();
 }
 
 
@@ -390,10 +438,10 @@ void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 void cProtocol125::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_ArmAnim Anim;
-	Anim.m_EntityID  = a_Player.GetUniqueID();
-	Anim.m_Animation = a_Animation;
-	Send(Anim);
+	WriteByte(PACKET_ANIMATION);
+	WriteInt (a_Player.GetUniqueID());
+	WriteByte(a_Animation);
+	Flush();
 }
 
 
@@ -403,8 +451,19 @@ void cProtocol125::SendPlayerAnimation(const cPlayer & a_Player, char a_Animatio
 void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_PlayerListItem pli(a_Player.GetColor() + a_Player.GetName(), a_IsOnline, a_Player.GetClientHandle()->GetPing());
-	Send(pli);
+	AString PlayerName(a_Player.GetColor());
+	PlayerName.append(a_Player.GetName());
+	if (PlayerName.length() > 14)
+	{
+		PlayerName.erase(14);
+	}
+	PlayerName += cChatColor::White;
+
+	WriteByte  ((unsigned char)PACKET_PLAYER_LIST_ITEM);
+	WriteString(PlayerName);
+	WriteBool  (a_IsOnline);
+	WriteShort (a_Player.GetClientHandle()->GetPing());
+	Flush();
 }
 
 
@@ -414,13 +473,23 @@ void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 void cProtocol125::SendPlayerMoveLook(void)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_PlayerMoveLook pml(*m_Client->GetPlayer());
+
 	/*
 	LOGD("Sending PlayerMoveLook: {%0.2f, %0.2f, %0.2f}, stance %0.2f, OnGround: %d",
 		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
 	);
 	*/
-	Send(pml);
+
+	WriteByte	(PACKET_PLAYERMOVELOOK);
+	cPlayer * Player = m_Client->GetPlayer();
+	WriteDouble(Player->GetPosX());
+	WriteDouble(Player->GetStance() + 0.03);  // Add a small amount so that the player doesn't start inside a block
+	WriteDouble(Player->GetPosY()   + 0.03);  // Add a small amount so that the player doesn't start inside a block
+	WriteDouble(Player->GetPosZ());
+	WriteFloat (Player->GetRotation());
+	WriteFloat (Player->GetPitch());
+	WriteBool  (Player->IsOnGround());
+	Flush();
 }
 
 
@@ -430,8 +499,7 @@ void cProtocol125::SendPlayerMoveLook(void)
 void cProtocol125::SendPlayerPosition(void)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_PlayerPosition pp(*(m_Client->GetPlayer()));
-	Send(pp);
+	LOGD("Ignore send PlayerPos");  // PlayerPos is a C->S packet only now
 }
 
 
@@ -440,18 +508,18 @@ void cProtocol125::SendPlayerPosition(void)
 
 void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 {
+	const cItem & HeldItem = a_Player.GetEquippedItem();
 	cCSLock Lock(m_CSPacket);
-	cPacket_NamedEntitySpawn SpawnPacket;
-	SpawnPacket.m_UniqueID    = a_Player.GetUniqueID();
-	SpawnPacket.m_PlayerName  = a_Player.GetName();
-	SpawnPacket.m_PosX        = (int)(a_Player.GetPosX() * 32);
-	SpawnPacket.m_PosY        = (int)(a_Player.GetPosY() * 32);
-	SpawnPacket.m_PosZ        = (int)(a_Player.GetPosZ() * 32);
-	SpawnPacket.m_Rotation    = (char)((a_Player.GetRot().x / 360.f) * 256);
-	SpawnPacket.m_Pitch       = (char)((a_Player.GetRot().y / 360.f) * 256);
-	const cItem & HeldItem    = a_Player.GetEquippedItem();
-	SpawnPacket.m_CurrentItem = HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType;  // Unlike -1 in inventory, the named entity packet uses 0 for "empty"
-	Send(SpawnPacket);
+	WriteByte	(PACKET_PLAYER_SPAWN);
+	WriteInt   (a_Player.GetUniqueID());
+	WriteString(a_Player.GetName());
+	WriteInt   ((int)(a_Player.GetPosX() * 32));
+	WriteInt   ((int)(a_Player.GetPosY() * 32));
+	WriteInt   ((int)(a_Player.GetPosZ() * 32));
+	WriteByte  ((char)((a_Player.GetRot().x / 360.f) * 256));
+	WriteByte  ((char)((a_Player.GetRot().y / 360.f) * 256));
+	WriteShort (HeldItem.IsEmpty() ? 0 : HeldItem.m_ItemType);
+	Flush();
 }
 
 
@@ -463,12 +531,12 @@ void cProtocol125::SendRelEntMove(const cEntity & a_Entity, char a_RelX, char a_
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
 	
 	cCSLock Lock(m_CSPacket);
-	cPacket_RelativeEntityMove rem;
-	rem.m_UniqueID = a_Entity.GetUniqueID();
-	rem.m_MoveX    = a_RelX;
-	rem.m_MoveY    = a_RelY;
-	rem.m_MoveZ    = a_RelZ;
-	Send(rem);
+	WriteByte(PACKET_REL_ENT_MOVE);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_RelX);
+	WriteByte(a_RelY);
+	WriteByte(a_RelZ);
+	Flush();
 }
 
 
@@ -480,14 +548,14 @@ void cProtocol125::SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, cha
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
 	
 	cCSLock Lock(m_CSPacket);
-	cPacket_RelativeEntityMoveLook reml;
-	reml.m_UniqueID = a_Entity.GetUniqueID();
-	reml.m_MoveX    = a_RelX;
-	reml.m_MoveY    = a_RelY;
-	reml.m_MoveZ    = a_RelZ;
-	reml.m_Yaw      = (char)((a_Entity.GetRotation() / 360.f) * 256);
-	reml.m_Pitch    = (char)((a_Entity.GetPitch()    / 360.f) * 256);
-	Send(reml);
+	WriteByte(PACKET_REL_ENT_MOVE_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_RelX);
+	WriteByte(a_RelY);
+	WriteByte(a_RelZ);
+	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
+	Flush();
 }
 
 
@@ -497,9 +565,12 @@ void cProtocol125::SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, cha
 void cProtocol125::SendRespawn(void)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Respawn Packet;
-	Packet.m_CreativeMode = (char)m_Client->GetPlayer()->GetGameMode();  // Set GameMode packet based on Player's GameMode;
-	Send(Packet);
+	WriteByte  (PACKET_RESPAWN);
+	WriteInt   (0);  // TODO: Dimension;  0 = Overworld
+	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
+	WriteByte  ((char)m_Client->GetPlayer()->GetGameMode());
+	WriteShort (256);  // Current world height
+	WriteString("DEFAULT");
 }
 
 
@@ -509,16 +580,19 @@ void cProtocol125::SendRespawn(void)
 void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_SpawnMob Spawn;
-	Spawn.m_UniqueID = a_Mob.GetUniqueID();
-	Spawn.m_Type     = a_Mob.GetMobType();
-	Spawn.m_Pos      = ((Vector3i)(a_Mob.GetPosition())) * 32;
-	Spawn.m_Yaw      = 0;
-	Spawn.m_Pitch    = 0;
-	Spawn.m_MetaDataSize = 1;
-	Spawn.m_MetaData     = new char[Spawn.m_MetaDataSize];
-	Spawn.m_MetaData[0]  = 0x7f;  // not on fire/crouching/riding
-	Send(Spawn);
+	Vector3i Pos = (Vector3i)(a_Mob.GetPosition() * 32);
+	WriteByte(PACKET_SPAWN_MOB);
+	WriteInt (a_Mob.GetUniqueID());
+	WriteByte(a_Mob.GetMobType());
+	WriteInt (Pos.x);
+	WriteInt (Pos.y);
+	WriteInt (Pos.z);
+	WriteByte(0);
+	WriteByte(0);
+	WriteByte(0);
+	AString MetaData = GetEntityMetaData(a_Mob);
+	SendData (MetaData.data(), MetaData.size());
+	Flush();
 }
 
 
@@ -528,8 +602,12 @@ void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_TeleportEntity te(a_Entity);
-	Send(te);
+	WriteByte   (PACKET_ENT_TELEPORT);
+	WriteInt    (a_Entity.GetUniqueID());
+	WriteVectorI((Vector3i)(a_Entity.GetPosition() * 32));
+	WriteByte   ((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte   ((char)((a_Entity.GetPitch() / 360.f) * 256));
+	Flush();
 }
 
 
@@ -539,11 +617,13 @@ void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 void cProtocol125::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_Thunderbolt ThunderboltPacket;
-	ThunderboltPacket.m_xLBPos = a_BlockX;
-	ThunderboltPacket.m_yLBPos = a_BlockY;
-	ThunderboltPacket.m_zLBPos = a_BlockZ;
-	Send(ThunderboltPacket);
+	WriteByte(PACKET_THUNDERBOLT);
+	WriteInt (0x7fffffff);  // Entity ID of the thunderbolt; we use a constant one
+	WriteBool(true);  // Unknown bool
+	WriteInt (a_BlockX * 32);
+	WriteInt (a_BlockY * 32);
+	WriteInt (a_BlockZ * 32);
+	Flush();
 }
 
 
@@ -553,9 +633,9 @@ void cProtocol125::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cProtocol125::SendTimeUpdate(Int64 a_WorldTime)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_TimeUpdate tu;
-	tu.m_Time = a_WorldTime;
-	Send(tu);
+	WriteByte (PACKET_UPDATE_TIME);
+	WriteInt64(a_WorldTime);
+	Flush();
 }
 
 
@@ -565,11 +645,7 @@ void cProtocol125::SendTimeUpdate(Int64 a_WorldTime)
 void cProtocol125::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_PreChunk UnloadPacket;
-	UnloadPacket.m_PosX = a_ChunkX;
-	UnloadPacket.m_PosZ = a_ChunkZ;
-	UnloadPacket.m_bLoad = false;  // Unload
-	Send(UnloadPacket);
+	SendPreChunk(a_ChunkX, a_ChunkZ, false);
 }
 
 
@@ -582,15 +658,15 @@ void cProtocol125::SendUpdateSign(
 )
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_UpdateSign us;
-	us.m_BlockX = a_BlockX;
-	us.m_BlockY = (short)a_BlockY;
-	us.m_BlockZ = a_BlockZ;
-	us.m_Line1  = a_Line1;
-	us.m_Line2  = a_Line2;
-	us.m_Line3  = a_Line3;
-	us.m_Line4  = a_Line4;
-	Send(us);
+	WriteByte  ((unsigned char)PACKET_UPDATE_SIGN);
+	WriteInt   (a_BlockX);
+	WriteShort ((short)a_BlockY);
+	WriteInt   (a_BlockZ);
+	WriteString(a_Line1);
+	WriteString(a_Line2);
+	WriteString(a_Line3);
+	WriteString(a_Line4);
+	Flush();
 }
 
 
@@ -604,25 +680,20 @@ void cProtocol125::SendWeather(eWeather a_Weather)
 	{
 		case eWeather_Sunny:
 		{
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 2;  // stop rain
-			Send(WeatherPacket);
+			WriteByte(PACKET_CHANGE_GAME_STATE);
+			WriteByte(2);  // Stop rain
+			WriteByte(0);  // Unused
+			Flush();
 			break;
 		}
 		
 		case eWeather_Rain:
-		{
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 1;  // begin rain
-			Send(WeatherPacket);
-			break;
-		}
-		
 		case eWeather_ThunderStorm:
 		{
-			cPacket_NewInvalidState WeatherPacket;
-			WeatherPacket.m_Reason = 1;  // begin rain
-			Send(WeatherPacket);
+			WriteByte(PACKET_CHANGE_GAME_STATE);
+			WriteByte(1);  // Begin rain
+			WriteByte(0);  // Unused
+			Flush();
 			break;
 		}
 	}
@@ -635,8 +706,7 @@ void cProtocol125::SendWeather(eWeather a_Weather)
 void cProtocol125::SendWholeInventory(const cInventory & a_Inventory)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_WholeInventory wi(a_Inventory);
-	Send(wi);
+	SendWholeInventory(0, a_Inventory.c_NumSlots, a_Inventory.GetSlots());
 }
 
 
@@ -646,8 +716,11 @@ void cProtocol125::SendWholeInventory(const cInventory & a_Inventory)
 void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_WholeInventory wi(a_Window);
-	Send(wi);
+	SendWholeInventory(
+		a_Window.GetWindowID(), 
+		a_Window.GetNumSlots(),
+		a_Window.GetSlots()
+	);
 }
 
 
@@ -657,9 +730,9 @@ void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 void cProtocol125::SendWindowClose(char a_WindowID)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_WindowClose wc;
-	wc.m_WindowID = a_WindowID;
-	Send(wc);
+	WriteByte(PACKET_WINDOW_CLOSE);
+	WriteByte(a_WindowID);
+	Flush();
 }
 
 
@@ -669,23 +742,12 @@ void cProtocol125::SendWindowClose(char a_WindowID)
 void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
 	cCSLock Lock(m_CSPacket);
-	cPacket_WindowOpen WindowOpen;
-	WindowOpen.m_WindowID      = a_WindowID;
-	WindowOpen.m_InventoryType = a_WindowType;
-	WindowOpen.m_WindowTitle   = a_WindowTitle;
-	WindowOpen.m_NumSlots      = a_NumSlots;
-	Send(WindowOpen);
-}
-
-
-
-
-
-void cProtocol125::Send(const cPacket & a_Packet)
-{
-	AString str;
-	a_Packet.Serialize(str);
-	SendData(str.data(), str.size());
+	WriteByte  (PACKET_WINDOW_OPEN);
+	WriteByte  (a_WindowID);
+	WriteByte  (a_WindowType);
+	WriteString(a_WindowTitle);
+	WriteByte  (a_NumSlots);
+	Flush();
 }
 
 
@@ -754,31 +816,28 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 	switch (a_PacketType)
 	{
 		default: return PACKET_UNKNOWN;
-		case E_KEEP_ALIVE:                return ParseKeepAlive();
-		case E_HANDSHAKE:                 return ParseHandshake();
-		case E_LOGIN:                     return ParseLogin();
-		case E_PLAYERPOS:                 return ParsePlayerPosition();
-		case E_PLAYERLOOK:                return ParsePlayerLook();
-		case E_PLAYERMOVELOOK:            return ParsePlayerMoveLook();
-		case E_PLAYER_ABILITIES:          return ParsePlayerAbilities();
-		case E_CHAT:                      return ParseChat();
-		case E_ANIMATION:                 return ParseArmAnim();
-		case E_FLYING:                    return ParseFlying();
-		case E_BLOCK_DIG:                 return ParseBlockDig();
-		case E_BLOCK_PLACE:               return ParseBlockPlace();
-		case E_DISCONNECT:                return ParseDisconnect();
-		case E_ITEM_SWITCH:               return ParseItemSwitch();
-		case E_ENTITY_EQUIPMENT:          return ParseEntityEquipment();
-		case E_CREATIVE_INVENTORY_ACTION: return ParseCreativeInventoryAction();
-		case E_NEW_INVALID_STATE:         return ParseNewInvalidState();
-		case E_PICKUP_SPAWN:              return ParsePickupSpawn();
-		case E_USE_ENTITY:                return ParseUseEntity();
-		case E_WINDOW_CLOSE:              return ParseWindowClose();
-		case E_WINDOW_CLICK:              return ParseWindowClick();
-		case E_PACKET_ENTITY_ACTION:      return ParseEntityAction();
-		case E_UPDATE_SIGN:               return ParseUpdateSign();
-		case E_RESPAWN:                   return ParseRespawn();
-		case E_PING:                      return ParsePing();
+		case PACKET_ANIMATION:                 return ParseArmAnim();
+		case PACKET_BLOCK_DIG:                 return ParseBlockDig();
+		case PACKET_BLOCK_PLACE:               return ParseBlockPlace();
+		case PACKET_CHAT:                      return ParseChat();
+		case PACKET_CREATIVE_INVENTORY_ACTION: return ParseCreativeInventoryAction();
+		case PACKET_DISCONNECT:                return ParseDisconnect();
+		case PACKET_FLYING:                    return ParseFlying();
+		case PACKET_HANDSHAKE:                 return ParseHandshake();
+		case PACKET_KEEP_ALIVE:                return ParseKeepAlive();
+		case PACKET_LOGIN:                     return ParseLogin();
+		case PACKET_PACKET_ENTITY_ACTION:      return ParseEntityAction();
+		case PACKET_PING:                      return ParsePing();
+		case PACKET_PLAYERLOOK:                return ParsePlayerLook();
+		case PACKET_PLAYERMOVELOOK:            return ParsePlayerMoveLook();
+		case PACKET_PLAYERPOS:                 return ParsePlayerPosition();
+		case PACKET_PLAYER_ABILITIES:          return ParsePlayerAbilities();
+		case PACKET_RESPAWN:                   return ParseRespawn();
+		case PACKET_SLOT_SELECTED:             return ParseSlotSelected();
+		case PACKET_UPDATE_SIGN:               return ParseUpdateSign();
+		case PACKET_USE_ENTITY:                return ParseUseEntity();
+		case PACKET_WINDOW_CLICK:              return ParseWindowClick();
+		case PACKET_WINDOW_CLOSE:              return ParseWindowClose();
 	}
 }
 
@@ -955,23 +1014,11 @@ int cProtocol125::ParseDisconnect(void)
 
 
 
-int cProtocol125::ParseItemSwitch(void)
+int cProtocol125::ParseSlotSelected(void)
 {
 	cPacket_ItemSwitch its;
 	HANDLE_PACKET_PARSE(its);
 	m_Client->HandleSlotSelected(its.m_SlotNum);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseEntityEquipment(void)
-{
-	cPacket_EntityEquipment ee;
-	HANDLE_PACKET_PARSE(ee);
-	// TODO: m_Client->HandleEntityEquipment(...);
 	return PACKET_OK;
 }
 
@@ -984,30 +1031,6 @@ int cProtocol125::ParseCreativeInventoryAction(void)
 	cPacket_CreativeInventoryAction cia;
 	HANDLE_PACKET_PARSE(cia);
 	m_Client->HandleCreativeInventory(cia.m_SlotNum, cia.m_ClickedItem);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseNewInvalidState(void)
-{
-	cPacket_NewInvalidState nis;
-	HANDLE_PACKET_PARSE(nis);
-	// TODO: m_Client->Handle(...);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParsePickupSpawn(void)
-{
-	cPacket_PickupSpawn ps;
-	HANDLE_PACKET_PARSE(ps);
-	// TODO: m_Client->HandlePickupSpawn(...);
 	return PACKET_OK;
 }
 
@@ -1098,6 +1121,114 @@ int cProtocol125::ParsePing(void)
 	return PACKET_OK;
 }
 
+
+
+
+
+
+void cProtocol125::SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad)
+{
+	WriteByte(E_PRE_CHUNK);
+	WriteInt (a_ChunkX);
+	WriteInt (a_ChunkZ);
+	WriteBool(a_ShouldLoad);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendWholeInventory(char a_WindowID, int a_NumItems, const cItem * a_Items)
+{
+	WriteByte (PACKET_INVENTORY_WHOLE);
+	WriteByte (a_WindowID);
+	WriteShort((short)a_NumItems);
+
+	for (int j = 0; j < a_NumItems; j++)
+	{
+		WriteItem(a_Items[j]);
+	}
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::WriteItem(const cItem & a_Item)
+{
+	short ItemType = a_Item.m_ItemType;
+	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
+	if (ItemType <= 0)
+	{
+		// Fix, to make sure no invalid values are sent.
+		ItemType = -1;
+	}
+	
+	WriteShort(ItemType);
+	if (a_Item.IsEmpty())
+	{
+		return;
+	}
+	
+	WriteByte (a_Item.m_ItemCount);
+	WriteShort(a_Item.m_ItemDamage);
+	
+	if (cItem::IsEnchantable(a_Item.m_ItemType))
+	{
+		// TODO: Implement enchantments
+		WriteShort(-1);
+	}
+}
+
+
+
+
+
+AString cProtocol125::GetEntityMetaData(const cEntity & a_Entity)
+{
+	// We should send all the metadata here
+	AString MetaData;
+	// Common metadata (index 0, byte):
+	MetaData.push_back(0);
+	MetaData.push_back(GetEntityMetadataFlags(a_Entity));
+	
+	// TODO: Add more entity-specific metadata
+	
+	MetaData.push_back(0x7f);  // End metadata
+	return MetaData;
+}
+
+
+
+
+
+char cProtocol125::GetEntityMetadataFlags(const cEntity & a_Entity)
+{
+	char Flags = 0;
+	if (a_Entity.IsOnFire())
+	{
+		Flags |= 1;
+	}
+	if (a_Entity.IsCrouched())
+	{
+		Flags |= 2;
+	}
+	if (a_Entity.IsRiding())
+	{
+		Flags |= 4;
+	}
+	if (a_Entity.IsSprinting())
+	{
+		Flags |= 8;
+	}
+	if (a_Entity.IsRclking())
+	{
+		Flags |= 16;
+	}
+	return Flags;
+}
 
 
 

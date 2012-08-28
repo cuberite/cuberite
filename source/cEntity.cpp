@@ -36,6 +36,8 @@ cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
 	, m_EntityType( eEntityType_Entity )
 	, m_World( 0 )
 	, m_bRemovedFromChunk( false )
+	, m_FireDamageInterval(0.f)
+	, m_BurnPeriod(0.f)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;

@@ -23,19 +23,3 @@ int cPacket_UpdateSign::Parse(cByteBuffer & a_Buffer)
 
 
 
-
-void cPacket_UpdateSign::Serialize(AString & a_Data) const
-{
-	AppendByte    (a_Data, m_PacketID);
-	AppendInteger (a_Data, m_BlockX);
-	AppendShort   (a_Data, m_BlockY);
-	AppendInteger (a_Data, m_BlockZ);
-	AppendString16(a_Data, m_Line1);
-	AppendString16(a_Data, m_Line2);
-	AppendString16(a_Data, m_Line3);
-	AppendString16(a_Data, m_Line4);
-}
-
-
-
-

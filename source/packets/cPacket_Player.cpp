@@ -36,21 +36,6 @@ int cPacket_PlayerAbilities::Parse(cByteBuffer & a_Buffer)
 
 
 
-void cPacket_PlayerAbilities::Serialize(AString & a_Data) const
-{
-	char Data[5];
-	Data[0] = m_PacketID;
-	Data[1] = (char)m_Invulnerable;
-	Data[2] = (char)m_IsFlying;
-	Data[3] = (char)m_CanFly;
-	Data[4] = (char)m_InstaMine;
-	a_Data.append(Data, 5);
-}
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPacket_PlayerListItem:
 
@@ -73,28 +58,6 @@ int cPacket_PlayerListItem::Parse(cByteBuffer & a_Buffer)
 	HANDLE_PACKET_READ(ReadBool,            m_Online,     TotalBytes);
 	HANDLE_PACKET_READ(ReadBEShort,         m_Ping,       TotalBytes);
 	return TotalBytes;
-}
-
-
-
-
-
-void cPacket_PlayerListItem::Serialize(AString & a_Data) const
-{
-	AString PlayerName(m_PlayerName);
-	if (PlayerName.length() > 16)
-	{
-		PlayerName.erase(16);
-	}
-	else if (PlayerName.length() <= 14)
-	{
-		PlayerName += cChatColor::White;
-	}
-
-	AppendByte    (a_Data, m_PacketID);
-	AppendString16(a_Data, PlayerName);
-	AppendBool    (a_Data, m_Online);
-	AppendShort   (a_Data, m_Ping);
 }
 
 
@@ -125,17 +88,6 @@ int cPacket_PlayerLook::Parse(cByteBuffer & a_Buffer)
 	return TotalBytes;
 }
 
-
-
-
-
-void cPacket_PlayerLook::Serialize(AString & a_Data) const
-{
-	AppendByte	(a_Data, m_PacketID);
-	AppendFloat	(a_Data, m_Rotation);
-	AppendFloat	(a_Data, m_Pitch);
-	AppendBool	(a_Data, m_IsOnGround);
-}
 
 
 
@@ -179,26 +131,6 @@ int cPacket_PlayerMoveLook::Parse(cByteBuffer & a_Buffer)
 
 
 
-void cPacket_PlayerMoveLook::Serialize(AString & a_Data) const
-{
-	// NOTE that Stance and Y are swapped when sent C->S vs S->C
-	// This is the S->C case:
-	// LOGD("Send PML: {%0.2f, %0.2f, %0.2f}, Stance: %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
-	
-	AppendByte	(a_Data, m_PacketID);
-	AppendDouble(a_Data, m_PosX);
-	AppendDouble(a_Data, m_Stance);
-	AppendDouble(a_Data, m_PosY);
-	AppendDouble(a_Data, m_PosZ);
-	AppendFloat	(a_Data, m_Rotation);
-	AppendFloat	(a_Data, m_Pitch);
-	AppendBool	(a_Data, m_IsOnGround);
-}
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPacket_PlayerPosition:
 
@@ -227,25 +159,6 @@ int cPacket_PlayerPosition::Parse(cByteBuffer & a_Buffer)
 	HANDLE_PACKET_READ(ReadBool,     m_IsOnGround, TotalBytes);
 	// LOGD("Recv PlayerPos: {%0.2f %0.2f %0.2f}, Stance %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
 	return TotalBytes;
-}
-
-
-
-
-
-void cPacket_PlayerPosition::Serialize(AString & a_Data) const
-{
-	LOGD("Ignore send PlayerPos");
-	/*
-	LOGD("Send PlayerPos: {%0.2f %0.2f %0.2f}, Stance %0.2f, Gnd: %d", m_PosX, m_PosY, m_PosZ, m_Stance, m_IsOnGround ? 1 : 0);
-	// _X: This should not get sent to the client at all - http://wiki.vg/wiki/index.php?title=Protocol&oldid=2513#Player_Position_.280x0B.29
-	AppendByte	 (a_Data, m_PacketID);
-	AppendDouble (a_Data, m_PosX);
-	AppendDouble (a_Data, m_PosY);
-	AppendDouble (a_Data, m_Stance);
-	AppendDouble (a_Data, m_PosZ);
-	AppendBool	 (a_Data, m_IsOnGround);
-	*/
 }
 
 

@@ -17,13 +17,3 @@ int cPacket_Handshake::Parse(cByteBuffer & a_Buffer)
 
 
 
-
-void cPacket_Handshake::Serialize(AString & a_Data) const
-{
-	AppendByte    (a_Data, m_PacketID);
-	AppendString16(a_Data, m_Username);
-}
-
-
-
-
