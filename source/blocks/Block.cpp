@@ -261,10 +261,10 @@ void cBlockHandler::DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z)
 	cItems Drops;
 	NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 	char DropCount = GetDropCount();
-	int DropItem = GetDropID();
-	if(DropCount > 0 && DropItem != E_ITEM_EMPTY)
+	short DropItem = (short)GetDropID();
+	if (DropCount > 0 && (DropItem != E_ITEM_EMPTY))
 	{
-		Drops.push_back(cItem((ENUM_ITEM_ID)DropItem, DropCount, GetDropMeta(Meta)));
+		Drops.push_back(cItem(DropItem, DropCount, GetDropMeta(Meta)));
 		a_World->SpawnItemPickups(Drops, a_X, a_Y, a_Z);
 	}
 }

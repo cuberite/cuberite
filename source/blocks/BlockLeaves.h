@@ -12,7 +12,7 @@
 #define PROCESS_NEIGHBOR(x,y,z) \
 	switch (a_Area.GetBlockType(x, y, z)) \
 	{ \
-		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, E_BLOCK_SPONGE + i + 1); break; \
+		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
 		case E_BLOCK_LOG: return true; \
 	}
 

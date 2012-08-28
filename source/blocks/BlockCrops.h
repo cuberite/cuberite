@@ -31,8 +31,6 @@ public:
 		MTRand rand;
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 
-		ENUM_ITEM_ID Drop = E_ITEM_EMPTY;
-		
 		cItems Drops;
 
 		if(Meta & 0x7)	//Is Wheat
