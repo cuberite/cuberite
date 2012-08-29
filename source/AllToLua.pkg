@@ -13,7 +13,6 @@ $cfile "cVine.h"
 $cfile "../iniFile/iniFile.h"
 
 $cfile "BlockID.h"
-$cfile "PacketID.h"
 $cfile "Defines.h"
 $cfile "LuaFunctions.h"
 $cfile "cStringMap.h"

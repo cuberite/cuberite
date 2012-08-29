@@ -1174,22 +1174,22 @@ void cClientHandle::SendPlayerPosition(void)
 
 
 
-void cClientHandle::SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cClientHandle::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
-	m_Protocol->SendRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+	m_Protocol->SendEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
 
 
 
-void cClientHandle::SendRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cClientHandle::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
-	m_Protocol->SendRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+	m_Protocol->SendEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 

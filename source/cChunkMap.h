@@ -49,10 +49,10 @@ public:
 	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
 	
 	/// Broadcasts a RelEntMoveLook packet to all clients in the chunk where a_Entity is
-	void BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	
 	/// Broadcasts a RelEntMove packet to all clients in the chunk where a_Entity is
-	void BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	
 	/// Broadcasts a EntLook packet to all clients in the chunk where a_Entity is
 	void BroadcastEntLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);

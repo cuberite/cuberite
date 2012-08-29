@@ -43,7 +43,6 @@
 class cWorld;
 class cReferenceManager;
 class cClientHandle;
-class cPacket;
 
 
 

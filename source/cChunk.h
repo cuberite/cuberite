@@ -32,7 +32,6 @@ namespace Json
 
 class cWorld;
 class cFurnaceEntity;
-class cPacket;
 class cClientHandle;
 class cServer;
 class MTRand;
@@ -174,14 +173,10 @@ public:
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
 
-	// Broadcasts to all clients that have loaded this chunk
-	void Broadcast( const cPacket & a_Packet, cClientHandle * a_Exclude = NULL) {Broadcast(&a_Packet, a_Exclude); }
-	void Broadcast( const cPacket * a_Packet, cClientHandle * a_Exclude = NULL);
-	
 	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
-	void BroadcastRelEntMoveLook (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastRelEntMove     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntRelMoveLook (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntRelMove     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntLook        (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntHeadLook    (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockAction    (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude = NULL);

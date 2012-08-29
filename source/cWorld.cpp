@@ -1268,18 +1268,18 @@ void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+	m_ChunkMap->BroadcastEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
 }
 
 
 
 
 
-void cWorld::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+	m_ChunkMap->BroadcastEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
 }
 
 

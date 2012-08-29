@@ -3,13 +3,6 @@
 
 #include "cItem.h"
 
-class cPacket_BlockPlace;
-class cPacket_PickupSpawn;
-class cPacket_EntityEquipment;
-class cPacket_Disconnect;
-class cPacket_Chat;
-class cPacket_BlockDig;
-class cPacket_Login;
 class cClientHandle;
 class cPlayer;
 class cPickup;

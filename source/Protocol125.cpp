@@ -7,27 +7,6 @@
 
 #include "Protocol125.h"
 
-#include "packets/cPacket.h"
-#include "packets/cPacket_13.h"
-#include "packets/cPacket_ArmAnim.h"
-#include "packets/cPacket_BlockDig.h"
-#include "packets/cPacket_BlockPlace.h"
-#include "packets/cPacket_Chat.h"
-#include "packets/cPacket_CreativeInventoryAction.h"
-#include "packets/cPacket_Disconnect.h"
-#include "packets/cPacket_Flying.h"
-#include "packets/cPacket_Handshake.h"
-#include "packets/cPacket_ItemSwitch.h"
-#include "packets/cPacket_KeepAlive.h"
-#include "packets/cPacket_Login.h"
-#include "packets/cPacket_Ping.h"
-#include "packets/cPacket_Player.h"
-#include "packets/cPacket_Respawn.h"
-#include "packets/cPacket_UpdateSign.h"
-#include "packets/cPacket_UseEntity.h"
-#include "packets/cPacket_WindowClick.h"
-#include "packets/cPacket_WindowClose.h"
-
 #include "cClientHandle.h"
 #include "ChunkDataSerializer.h"
 #include "cEntity.h"
@@ -52,10 +31,10 @@ enum
 	PACKET_USE_ENTITY                = 0x07,
 	PACKET_UPDATE_HEALTH             = 0x08,
 	PACKET_RESPAWN                   = 0x09,
-	PACKET_FLYING                    = 0x0a,
-	PACKET_PLAYERPOS                 = 0x0b,
-	PACKET_PLAYERLOOK                = 0x0c,
-	PACKET_PLAYERMOVELOOK            = 0x0d,
+	PACKET_PLAYER_ON_GROUND          = 0x0a,
+	PACKET_PLAYER_POS                = 0x0b,
+	PACKET_PLAYER_LOOK               = 0x0c,
+	PACKET_PLAYER_MOVE_LOOK          = 0x0d,
 	PACKET_BLOCK_DIG                 = 0x0e,
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECTED             = 0x10,
@@ -69,9 +48,9 @@ enum
 	PACKET_SPAWN_MOB                 = 0x18,
 	PACKET_DESTROY_ENTITY            = 0x1d,
 	PACKET_ENTITY                    = 0x1e,
-	PACKET_REL_ENT_MOVE              = 0x1f,
+	PACKET_ENT_REL_MOVE              = 0x1f,
 	PACKET_ENT_LOOK                  = 0x20,
-	PACKET_REL_ENT_MOVE_LOOK         = 0x21,
+	PACKET_ENT_REL_MOVE_LOOK         = 0x21,
 	PACKET_ENT_TELEPORT              = 0x22,
 	PACKET_ENT_HEAD_LOOK             = 0x23,
 	PACKET_ENT_STATUS                = 0x26,
@@ -98,6 +77,24 @@ enum
 	PACKET_PING                      = 0xfe,
 	PACKET_DISCONNECT                = 0xff
 } ;
+
+
+
+
+
+#define HANDLE_PACKET_READ(Proc, Type, Var) \
+	Type Var; \
+	{ \
+		if (!m_ReceivedData.Proc(Var)) \
+		{ \
+			return PARSE_INCOMPLETE; \
+		} \
+	}
+
+
+
+
+typedef unsigned char Byte;
 
 
 
@@ -384,7 +381,7 @@ void cProtocol125::SendLogin(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 
-	WriteByte  (E_LOGIN);
+	WriteByte  (PACKET_LOGIN);
 	WriteInt   (a_Player.GetUniqueID());  // EntityID of the player
 	WriteString("");  // Username, not used
 	WriteString("DEFAULT");  // Level type
@@ -480,7 +477,7 @@ void cProtocol125::SendPlayerMoveLook(void)
 	);
 	*/
 
-	WriteByte	(PACKET_PLAYERMOVELOOK);
+	WriteByte	(PACKET_PLAYER_MOVE_LOOK);
 	cPlayer * Player = m_Client->GetPlayer();
 	WriteDouble(Player->GetPosX());
 	WriteDouble(Player->GetStance() + 0.03);  // Add a small amount so that the player doesn't start inside a block
@@ -526,12 +523,12 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol125::SendRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cProtocol125::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
 	
 	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_REL_ENT_MOVE);
+	WriteByte(PACKET_ENT_REL_MOVE);
 	WriteInt (a_Entity.GetUniqueID());
 	WriteByte(a_RelX);
 	WriteByte(a_RelY);
@@ -543,12 +540,12 @@ void cProtocol125::SendRelEntMove(const cEntity & a_Entity, char a_RelX, char a_
 
 
 
-void cProtocol125::SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+void cProtocol125::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
 	
 	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_REL_ENT_MOVE_LOOK);
+	WriteByte(PACKET_ENT_REL_MOVE_LOOK);
 	WriteInt (a_Entity.GetUniqueID());
 	WriteByte(a_RelX);
 	WriteByte(a_RelY);
@@ -779,19 +776,19 @@ void cProtocol125::DataReceived(const char * a_Data, int a_Size)
 		m_ReceivedData.ReadByte(PacketType);
 		switch (ParsePacket(PacketType))
 		{
-			case PACKET_UNKNOWN:
+			case PARSE_UNKNOWN:
 			{
 				// An unknown packet has been received, notify the client and abort:
 				m_Client->PacketUnknown(PacketType);
 				return;
 			}
-			case PACKET_ERROR:
+			case PARSE_ERROR:
 			{
 				// An error occurred while parsing a known packet, notify the client and abort:
 				m_Client->PacketError(PacketType);
 				return;
 			}
-			case PACKET_INCOMPLETE:
+			case PARSE_INCOMPLETE:
 			{
 				// Incomplete packet, bail out and process with the next batch of data
 				m_ReceivedData.ResetRead();
@@ -815,23 +812,23 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 {
 	switch (a_PacketType)
 	{
-		default: return PACKET_UNKNOWN;
+		default: return PARSE_UNKNOWN;
 		case PACKET_ANIMATION:                 return ParseArmAnim();
 		case PACKET_BLOCK_DIG:                 return ParseBlockDig();
 		case PACKET_BLOCK_PLACE:               return ParseBlockPlace();
 		case PACKET_CHAT:                      return ParseChat();
 		case PACKET_CREATIVE_INVENTORY_ACTION: return ParseCreativeInventoryAction();
 		case PACKET_DISCONNECT:                return ParseDisconnect();
-		case PACKET_FLYING:                    return ParseFlying();
 		case PACKET_HANDSHAKE:                 return ParseHandshake();
 		case PACKET_KEEP_ALIVE:                return ParseKeepAlive();
 		case PACKET_LOGIN:                     return ParseLogin();
 		case PACKET_PACKET_ENTITY_ACTION:      return ParseEntityAction();
 		case PACKET_PING:                      return ParsePing();
-		case PACKET_PLAYERLOOK:                return ParsePlayerLook();
-		case PACKET_PLAYERMOVELOOK:            return ParsePlayerMoveLook();
-		case PACKET_PLAYERPOS:                 return ParsePlayerPosition();
 		case PACKET_PLAYER_ABILITIES:          return ParsePlayerAbilities();
+		case PACKET_PLAYER_LOOK:               return ParsePlayerLook();
+		case PACKET_PLAYER_MOVE_LOOK:          return ParsePlayerMoveLook();
+		case PACKET_PLAYER_ON_GROUND:          return ParsePlayerOnGround();
+		case PACKET_PLAYER_POS:                return ParsePlayerPosition();
 		case PACKET_RESPAWN:                   return ParseRespawn();
 		case PACKET_SLOT_SELECTED:             return ParseSlotSelected();
 		case PACKET_UPDATE_SIGN:               return ParseUpdateSign();
@@ -858,120 +855,12 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 
 
 
-int cProtocol125::ParseKeepAlive(void)
-{
-	cPacket_KeepAlive KeepAlive;
-	HANDLE_PACKET_PARSE(KeepAlive);
-	m_Client->HandleKeepAlive(KeepAlive.m_KeepAliveID);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseHandshake(void)
-{
-	cPacket_Handshake Handshake;
-	HANDLE_PACKET_PARSE(Handshake);
-	m_Client->HandleHandshake(Handshake.m_Username);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseLogin(void)
-{
-	cPacket_Login Login;
-	HANDLE_PACKET_PARSE(Login);
-	m_Client->HandleLogin(Login.m_ProtocolVersion, Login.m_Username);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParsePlayerPosition(void)
-{
-	cPacket_PlayerPosition pp;
-	HANDLE_PACKET_PARSE(pp);
-	m_Client->HandlePlayerPos(pp.m_PosX, pp.m_PosY, pp.m_PosZ, pp.m_Stance, pp.m_IsOnGround);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParsePlayerLook(void)
-{
-	cPacket_PlayerLook pl;
-	HANDLE_PACKET_PARSE(pl);
-	m_Client->HandlePlayerLook(pl.m_Rotation, pl.m_Pitch, pl.m_IsOnGround);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParsePlayerMoveLook(void)
-{
-	cPacket_PlayerMoveLook pml;
-	HANDLE_PACKET_PARSE(pml);
-	m_Client->HandlePlayerMoveLook(pml.m_PosX, pml.m_PosY, pml.m_PosZ, pml.m_Stance, pml.m_Rotation, pml.m_Pitch, pml.m_IsOnGround);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParsePlayerAbilities(void)
-{
-	cPacket_PlayerAbilities pa;
-	HANDLE_PACKET_PARSE(pa);
-	// TODO: m_Client->HandlePlayerAbilities(...);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseChat(void)
-{
-	cPacket_Chat ch;
-	HANDLE_PACKET_PARSE(ch);
-	m_Client->HandleChat(ch.m_Message);
-	return PACKET_OK;
-}
-
-
-
-
-
 int cProtocol125::ParseArmAnim(void)
 {
-	cPacket_ArmAnim aa;
-	HANDLE_PACKET_PARSE(aa);
-	m_Client->HandleAnimation(aa.m_Animation);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseFlying(void)
-{
-	cPacket_Flying fl;
-	HANDLE_PACKET_PARSE(fl);
-	// TODO: m_Client->HandleFlying(fl.m_bFlying);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_PACKET_READ(ReadChar,  char, Animation);
+	m_Client->HandleAnimation(Animation);
+	return PARSE_OK;
 }
 
 
@@ -980,10 +869,13 @@ int cProtocol125::ParseFlying(void)
 
 int cProtocol125::ParseBlockDig(void)
 {
-	cPacket_BlockDig bd;
-	HANDLE_PACKET_PARSE(bd);
-	m_Client->HandleBlockDig(bd.m_PosX, bd.m_PosY, bd.m_PosZ, bd.m_Direction, bd.m_Status);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadChar,	char, Status);
+	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
+	HANDLE_PACKET_READ(ReadByte,	Byte, PosY);
+	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
+	HANDLE_PACKET_READ(ReadChar,	char, Direction);
+	m_Client->HandleBlockDig(PosX, PosY, PosZ, Direction, Status);
+	return PARSE_OK;
 }
 
 
@@ -992,34 +884,31 @@ int cProtocol125::ParseBlockDig(void)
 
 int cProtocol125::ParseBlockPlace(void)
 {
-	cPacket_BlockPlace bp;
-	HANDLE_PACKET_PARSE(bp);
-	m_Client->HandleBlockPlace(bp.m_PosX, bp.m_PosY, bp.m_PosZ, bp.m_Direction, bp.m_HeldItem);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
+	HANDLE_PACKET_READ(ReadByte,  Byte, PosY);
+	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
+	HANDLE_PACKET_READ(ReadChar,  char, Direction);
+
+	cItem HeldItem;
+	int res = ParseItem(HeldItem);
+	if (res < 0)
+	{
+		return res;
+	}
+
+	m_Client->HandleBlockPlace(PosX, PosY, PosZ, Direction, HeldItem);
+	return PARSE_OK;
 }
 
 
 
 
 
-int cProtocol125::ParseDisconnect(void)
+int cProtocol125::ParseChat(void)
 {
-	cPacket_Disconnect dc;
-	HANDLE_PACKET_PARSE(dc);
-	m_Client->HandleDisconnect(dc.m_Reason);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseSlotSelected(void)
-{
-	cPacket_ItemSwitch its;
-	HANDLE_PACKET_PARSE(its);
-	m_Client->HandleSlotSelected(its.m_SlotNum);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Message);
+	m_Client->HandleChat(Message);
+	return PARSE_OK;
 }
 
 
@@ -1028,46 +917,26 @@ int cProtocol125::ParseSlotSelected(void)
 
 int cProtocol125::ParseCreativeInventoryAction(void)
 {
-	cPacket_CreativeInventoryAction cia;
-	HANDLE_PACKET_PARSE(cia);
-	m_Client->HandleCreativeInventory(cia.m_SlotNum, cia.m_ClickedItem);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEShort, short, SlotNum);
+	cItem HeldItem;
+	int res = ParseItem(HeldItem);
+	if (res < 0)
+	{
+		return res;
+	}
+	m_Client->HandleCreativeInventory(SlotNum, HeldItem);
+	return PARSE_OK;
 }
 
 
 
 
 
-int cProtocol125::ParseUseEntity(void)
+int cProtocol125::ParseDisconnect(void)
 {
-	cPacket_UseEntity ue;
-	HANDLE_PACKET_PARSE(ue);
-	m_Client->HandleUseEntity(ue.m_TargetEntityID, ue.m_IsLeftClick);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseWindowClose(void)
-{
-	cPacket_WindowClose wc;
-	HANDLE_PACKET_PARSE(wc);
-	m_Client->HandleWindowClose(wc.m_WindowID);
-	return PACKET_OK;
-}
-
-
-
-
-
-int cProtocol125::ParseWindowClick(void)
-{
-	cPacket_WindowClick wc;
-	HANDLE_PACKET_PARSE(wc);
-	m_Client->HandleWindowClick(wc.m_WindowID, wc.m_SlotNum, wc.m_IsRightClick, wc.m_IsShiftPressed, wc.m_HeldItem);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Reason);
+	m_Client->HandleDisconnect(Reason);
+	return PARSE_OK;
 }
 
 
@@ -1076,37 +945,50 @@ int cProtocol125::ParseWindowClick(void)
 
 int cProtocol125::ParseEntityAction(void)
 {
-	cPacket_13 ea;
-	HANDLE_PACKET_PARSE(ea);
+	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
 	// TODO: m_Client->HandleEntityAction(...);
-	return PACKET_OK;
+	return PARSE_OK;
 }
 
 
 
 
 
-int cProtocol125::ParseUpdateSign(void)
+int cProtocol125::ParseHandshake(void)
 {
-	cPacket_UpdateSign us;
-	HANDLE_PACKET_PARSE(us);
-	m_Client->HandleUpdateSign(
-		us.m_BlockX, us.m_BlockY, us.m_BlockZ,
-		us.m_Line1, us.m_Line2, us.m_Line3, us.m_Line4
-	);
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Username);
+	m_Client->HandleHandshake(Username);
+	return PARSE_OK;
 }
 
 
 
 
 
-int cProtocol125::ParseRespawn(void)
+int cProtocol125::ParseKeepAlive(void)
 {
-	cPacket_Respawn rsp;
-	HANDLE_PACKET_PARSE(rsp);
-	m_Client->HandleRespawn();
-	return PACKET_OK;
+	HANDLE_PACKET_READ(ReadBEInt, int, KeepAliveID);
+	m_Client->HandleKeepAlive(KeepAliveID);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseLogin(void)
+{
+	HANDLE_PACKET_READ(ReadBEInt,           int,     ProtocolVersion);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Username);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, LevelType);
+	HANDLE_PACKET_READ(ReadBEInt,           int,     ServerMode);
+	HANDLE_PACKET_READ(ReadBEInt,           int,     Dimension);
+	HANDLE_PACKET_READ(ReadChar,            char,    Difficulty);
+	HANDLE_PACKET_READ(ReadByte,            Byte,    WorldHeight);
+	HANDLE_PACKET_READ(ReadByte,            Byte,    MaxPlayers);
+	m_Client->HandleLogin(ProtocolVersion, Username);
+	return PARSE_OK;
 }
 
 
@@ -1115,10 +997,9 @@ int cProtocol125::ParseRespawn(void)
 
 int cProtocol125::ParsePing(void)
 {
-	cPacket_Ping ping;
-	HANDLE_PACKET_PARSE(ping);
+	// Packet has no more data
 	m_Client->HandlePing();
-	return PACKET_OK;
+	return PARSE_OK;
 }
 
 
@@ -1126,9 +1007,168 @@ int cProtocol125::ParsePing(void)
 
 
 
+int cProtocol125::ParsePlayerAbilities(void)
+{
+	HANDLE_PACKET_READ(ReadBool, bool, Invulnerable);
+	HANDLE_PACKET_READ(ReadBool, bool, IsFlying);
+	HANDLE_PACKET_READ(ReadBool, bool, CanFly);
+	HANDLE_PACKET_READ(ReadBool, bool, InstaMine);
+	// TODO: m_Client->HandlePlayerAbilities(...);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParsePlayerLook(void)
+{
+	HANDLE_PACKET_READ(ReadBEFloat, float, Rotation);
+	HANDLE_PACKET_READ(ReadBEFloat, float, Pitch);
+	HANDLE_PACKET_READ(ReadBool,    bool,  IsOnGround);
+	m_Client->HandlePlayerLook(Rotation, Pitch, IsOnGround);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParsePlayerMoveLook(void)
+{
+	HANDLE_PACKET_READ(ReadBEDouble, double, PosX);
+	HANDLE_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_PACKET_READ(ReadBEDouble, double, Stance);
+	HANDLE_PACKET_READ(ReadBEDouble, double, PosZ);
+	HANDLE_PACKET_READ(ReadBEFloat,  float,  Rotation);
+	HANDLE_PACKET_READ(ReadBEFloat,  float,  Pitch);
+	HANDLE_PACKET_READ(ReadBool,     bool,   IsOnGround);
+	// LOGD("Recv PML: {%0.2f, %0.2f, %0.2f}, Stance %0.2f, Gnd: %d", PosX, PosY, PosZ, Stance, IsOnGround ? 1 : 0);
+	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Stance, Rotation, Pitch, IsOnGround);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParsePlayerOnGround(void)
+{
+	HANDLE_PACKET_READ(ReadBool, bool, IsOnGround);
+	// TODO: m_Client->HandleFlying(IsOnGround);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParsePlayerPosition(void)
+{
+	HANDLE_PACKET_READ(ReadBEDouble, double, PosX);
+	HANDLE_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_PACKET_READ(ReadBEDouble, double, Stance);
+	HANDLE_PACKET_READ(ReadBEDouble, double, PosZ);
+	HANDLE_PACKET_READ(ReadBool,     bool,   IsOnGround);
+	m_Client->HandlePlayerPos(PosX, PosY, PosZ, Stance, IsOnGround);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseRespawn(void)
+{
+	HANDLE_PACKET_READ(ReadBEInt,           int,     Dimension);
+	HANDLE_PACKET_READ(ReadChar,            char,    Difficulty);
+	HANDLE_PACKET_READ(ReadChar,            char,    CreativeMode);
+	HANDLE_PACKET_READ(ReadBEShort,         short,   WorldHeight);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, LevelType);
+	m_Client->HandleRespawn();
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseSlotSelected(void)
+{
+	HANDLE_PACKET_READ(ReadBEShort, short, SlotNum);
+	m_Client->HandleSlotSelected(SlotNum);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseUpdateSign(void)
+{
+	HANDLE_PACKET_READ(ReadBEInt,           int,     BlockX);
+	HANDLE_PACKET_READ(ReadBEShort,         short,   BlockY);
+	HANDLE_PACKET_READ(ReadBEInt,           int,     BlockZ);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Line1);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Line2);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Line3);
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Line4);
+	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseUseEntity(void)
+{
+	HANDLE_PACKET_READ(ReadBEInt, int,  SourceEntityID);
+	HANDLE_PACKET_READ(ReadBEInt, int,  TargetEntityID);
+	HANDLE_PACKET_READ(ReadBool,  bool, IsLeftClick);
+	m_Client->HandleUseEntity(TargetEntityID, IsLeftClick);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseWindowClick(void)
+{
+	HANDLE_PACKET_READ(ReadChar,    char,  WindowID);
+	HANDLE_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_PACKET_READ(ReadBool,    bool,  IsRightClick);
+	HANDLE_PACKET_READ(ReadBEShort, short, TransactionID);
+	HANDLE_PACKET_READ(ReadBool,    bool,  IsShiftPressed);
+	cItem HeldItem;
+	int res = ParseItem(HeldItem);
+	if (res < 0)
+	{
+		return res;
+	}
+	m_Client->HandleWindowClick(WindowID, SlotNum, IsRightClick, IsShiftPressed, HeldItem);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParseWindowClose(void)
+{
+	HANDLE_PACKET_READ(ReadChar, char, WindowID);
+	m_Client->HandleWindowClose(WindowID);
+	return PARSE_OK;
+}
+
+
+
+
+
 void cProtocol125::SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad)
 {
-	WriteByte(E_PRE_CHUNK);
+	WriteByte(PACKET_PRE_CHUNK);
 	WriteInt (a_ChunkX);
 	WriteInt (a_ChunkZ);
 	WriteBool(a_ShouldLoad);
@@ -1180,6 +1220,51 @@ void cProtocol125::WriteItem(const cItem & a_Item)
 		// TODO: Implement enchantments
 		WriteShort(-1);
 	}
+}
+
+
+
+
+
+int cProtocol125::ParseItem(cItem & a_Item)
+{
+	HANDLE_PACKET_READ(ReadBEShort, short, ItemType);
+
+	if (ItemType <= -1)
+	{
+		a_Item.Empty();
+		return PARSE_OK;
+	}
+	a_Item.m_ItemType = ItemType;
+
+	HANDLE_PACKET_READ(ReadChar,    char,  ItemCount);
+	HANDLE_PACKET_READ(ReadBEShort, short, ItemDamage);
+	a_Item.m_ItemCount  = ItemCount;
+	a_Item.m_ItemDamage = ItemDamage;
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+	}
+
+	if (!cItem::IsEnchantable(ItemType))
+	{
+		return PARSE_OK;
+	}
+	
+	HANDLE_PACKET_READ(ReadBEShort, short, EnchantNumBytes);
+	
+	if (EnchantNumBytes == 0)
+	{
+		return PARSE_OK;
+	}
+		
+	// TODO: Enchantment not implemented yet!
+	if (!m_ReceivedData.SkipRead(EnchantNumBytes))
+	{
+		return PARSE_INCOMPLETE;
+	}
+	
+	return PARSE_OK;
 }
 
 

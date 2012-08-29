@@ -6,7 +6,6 @@
 
 
 
-class cPacket_PickupSpawn;
 class cPlayer;
 class cItem;
 

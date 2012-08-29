@@ -19,7 +19,6 @@
 
 class cPlayer;
 class cClientHandle;
-class cPacket;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 

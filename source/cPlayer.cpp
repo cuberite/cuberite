@@ -198,12 +198,12 @@ void cPlayer::Tick(float a_Dt)
 			// Relative move sucks balls! It's always wrong wtf!
 			if (m_bDirtyOrientation)
 			{
-				m_World->BroadcastRelEntMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
+				m_World->BroadcastEntRelMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
 				m_bDirtyOrientation = false;
 			}
 			else
 			{
-				m_World->BroadcastRelEntMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
+				m_World->BroadcastEntRelMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
 			}
 		}
 		m_LastPosX = GetPosX();

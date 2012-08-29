@@ -95,8 +95,8 @@ public:
 	void SendTeleportEntity(const cEntity & a_Entity);
 	void SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline);
 	void SendPlayerPosition(void);
-	void SendRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendRelEntMove    (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntRelMove    (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntLook       (const cEntity & a_Entity);
 	void SendEntHeadLook   (const cEntity & a_Entity);
 	void SendBlockAction   (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2);
@@ -225,11 +225,6 @@ private:
 	eState m_State;
 
 	bool m_bKeepThreadGoing;
-
-	/*
-	/// Handles rclk with a dye; returns true if the dye is to be be consumed
-	bool HandleDyes(cPacket_BlockPlace * a_Packet);
-	*/
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
 	bool CheckBlockInteractionsRate(void);

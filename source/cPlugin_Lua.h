@@ -3,10 +3,12 @@
 
 class cPickup;
 class cPlayer;
-class cPacket_BlockPlace;
-class cPacket_BlockDig;
-class cPacket_Login;
 class cPlugin;
+
+
+
+
+
 class cPlugin_Lua							//tolua_export
 {											//tolua_export
 public:
@@ -30,3 +32,7 @@ private:
 	typedef std::list< cPlugin* > PluginList;
 	PluginList m_Plugins;
 };											//tolua_export
+
+
+
+

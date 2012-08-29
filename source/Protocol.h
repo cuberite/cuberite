@@ -53,6 +53,8 @@ public:
 	virtual void SendEntLook          (const cEntity & a_Entity) = 0;
 	virtual void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendEntityStatus     (const cEntity & a_Entity, char a_Status) = 0;
+	virtual void SendEntRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
+	virtual void SendEntRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
 	virtual void SendGameMode         (eGameMode a_GameMode) = 0;
 	virtual void SendHandshake        (const AString & a_ServerName) = 0;
 	virtual void SendHealth           (void) = 0;
@@ -67,8 +69,6 @@ public:
 	virtual void SendPlayerMoveLook   (void) = 0;
 	virtual void SendPlayerPosition   (void) = 0;
 	virtual void SendPlayerSpawn      (const cPlayer & a_Player) = 0;
-	virtual void SendRelEntMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
-	virtual void SendRelEntMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
 	virtual void SendRespawn          (void) = 0;
 	virtual void SendSpawnMob         (const cMonster & a_Mob) = 0;
 	virtual void SendTeleportEntity   (const cEntity & a_Entity) = 0;

@@ -1651,7 +1651,7 @@ void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 
 
-void cChunk::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+void cChunk::BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
@@ -1659,7 +1659,7 @@ void cChunk::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char
 		{
 			continue;
 		}
-		(*itr)->SendRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+		(*itr)->SendEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 	}  // for itr - LoadedByClient[]
 }
 
@@ -1667,7 +1667,7 @@ void cChunk::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char
 
 
 
-void cChunk::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+void cChunk::BroadcastEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
@@ -1675,7 +1675,7 @@ void cChunk::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_R
 		{
 			continue;
 		}
-		(*itr)->SendRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+		(*itr)->SendEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
 	}  // for itr - LoadedByClient[]
 }
 

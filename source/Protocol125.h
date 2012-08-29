@@ -16,13 +16,6 @@
 
 
 
-// fwd:
-class cPacket;
-
-
-
-
-
 class cProtocol125 :
 	public cProtocol
 {
@@ -46,6 +39,8 @@ public:
 	virtual void SendEntLook          (const cEntity & a_Entity) override;
 	virtual void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityStatus     (const cEntity & a_Entity, char a_Status) override;
+	virtual void SendEntRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
+	virtual void SendEntRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendGameMode         (eGameMode a_GameMode) override;
 	virtual void SendHandshake        (const AString & a_ConnectionHash) override;
 	virtual void SendHealth           (void) override;
@@ -60,8 +55,6 @@ public:
 	virtual void SendPlayerMoveLook   (void) override;
 	virtual void SendPlayerPosition   (void) override;
 	virtual void SendPlayerSpawn      (const cPlayer & a_Player) override;
-	virtual void SendRelEntMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
-	virtual void SendRelEntMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendRespawn          (void) override;
 	virtual void SendSpawnMob         (const cMonster & a_Mob) override;
 	virtual void SendTeleportEntity   (const cEntity & a_Entity) override;
@@ -78,10 +71,10 @@ public:
 protected:
 	/// Results of packet-parsing:
 	enum {
-		PACKET_OK         =  1,
-		PACKET_ERROR      = -1,
-		PACKET_UNKNOWN    = -2,
-		PACKET_INCOMPLETE = -3,
+		PARSE_OK         =  1,
+		PARSE_ERROR      = -1,
+		PARSE_UNKNOWN    = -2,
+		PARSE_INCOMPLETE = -3,
 	} ;
 	
 	cByteBuffer m_ReceivedData;  //< Buffer for the received data
@@ -99,17 +92,17 @@ protected:
 	virtual int ParseCreativeInventoryAction(void);
 	virtual int ParseDisconnect             (void);
 	virtual int ParseEntityAction           (void);
-	virtual int ParseFlying                 (void);
 	virtual int ParseHandshake              (void);
-	virtual int ParseSlotSelected           (void);
 	virtual int ParseKeepAlive              (void);
 	virtual int ParseLogin                  (void);
 	virtual int ParsePing                   (void);
 	virtual int ParsePlayerAbilities        (void);
 	virtual int ParsePlayerLook             (void);
 	virtual int ParsePlayerMoveLook         (void);
+	virtual int ParsePlayerOnGround         (void);
 	virtual int ParsePlayerPosition         (void);
 	virtual int ParseRespawn                (void);
+	virtual int ParseSlotSelected           (void);
 	virtual int ParseUpdateSign             (void);
 	virtual int ParseUseEntity              (void);
 	virtual int ParseWindowClick            (void);
@@ -124,6 +117,9 @@ protected:
 	
 	/// Writes one item, "slot" as the protocol wiki calls it
 	virtual void WriteItem(const cItem & a_Item);
+	
+	/// Parses one item, "slot" as the protocol wiki calls it, from m_ReceivedData; returns the usual ParsePacket() codes
+	virtual int  ParseItem(cItem & a_Item);
 	
 	/// Returns the entity metadata representation
 	AString GetEntityMetaData(const cEntity & a_Entity);

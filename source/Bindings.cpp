@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/27/12 16:12:30.
+** Generated automatically by tolua++-1.0.92 on 08/29/12 22:33:21.
 */
 
 #ifndef __cplusplus
@@ -22,7 +22,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "cVine.h"
 #include "../iniFile/iniFile.h"
 #include "BlockID.h"
-#include "PacketID.h"
 #include "Defines.h"
 #include "LuaFunctions.h"
 #include "cStringMap.h"
@@ -6650,9 +6649,9 @@ static int tolua_AllToLua_cPlayer_TossItem00(lua_State* tolua_S)
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
   bool a_bDraggingItem = ((bool)  tolua_toboolean(tolua_S,2,0));
-  int a_Amount = ((int)  tolua_tonumber(tolua_S,3,1));
-  int a_CreateType = ((int)  tolua_tonumber(tolua_S,4,0));
-  int a_CreateHealth = ((int)  tolua_tonumber(tolua_S,5,0));
+  char a_Amount = ((char)  tolua_tonumber(tolua_S,3,1));
+  short a_CreateType = ((short)  tolua_tonumber(tolua_S,4,0));
+  short a_CreateHealth = ((short)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TossItem'", NULL);
 #endif
@@ -21100,61 +21099,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_SPAWN_EGG_IRON_GOLEM",E_META_SPAWN_EGG_IRON_GOLEM);
   tolua_function(tolua_S,"BlockStringToType",tolua_AllToLua_BlockStringToType00);
   tolua_function(tolua_S,"StringToItem",tolua_AllToLua_StringToItem00);
-  tolua_constant(tolua_S,"E_KEEP_ALIVE",E_KEEP_ALIVE);
-  tolua_constant(tolua_S,"E_LOGIN",E_LOGIN);
-  tolua_constant(tolua_S,"E_HANDSHAKE",E_HANDSHAKE);
-  tolua_constant(tolua_S,"E_CHAT",E_CHAT);
-  tolua_constant(tolua_S,"E_UPDATE_TIME",E_UPDATE_TIME);
-  tolua_constant(tolua_S,"E_ENTITY_EQUIPMENT",E_ENTITY_EQUIPMENT);
-  tolua_constant(tolua_S,"E_USE_ENTITY",E_USE_ENTITY);
-  tolua_constant(tolua_S,"E_UPDATE_HEALTH",E_UPDATE_HEALTH);
-  tolua_constant(tolua_S,"E_RESPAWN",E_RESPAWN);
-  tolua_constant(tolua_S,"E_FLYING",E_FLYING);
-  tolua_constant(tolua_S,"E_PLAYERPOS",E_PLAYERPOS);
-  tolua_constant(tolua_S,"E_PLAYERLOOK",E_PLAYERLOOK);
-  tolua_constant(tolua_S,"E_PLAYERMOVELOOK",E_PLAYERMOVELOOK);
-  tolua_constant(tolua_S,"E_BLOCK_DIG",E_BLOCK_DIG);
-  tolua_constant(tolua_S,"E_BLOCK_PLACE",E_BLOCK_PLACE);
-  tolua_constant(tolua_S,"E_SLOT_SELECTED",E_SLOT_SELECTED);
-  tolua_constant(tolua_S,"E_ITEM_SWITCH",E_ITEM_SWITCH);
-  tolua_constant(tolua_S,"E_ADD_TO_INV",E_ADD_TO_INV);
-  tolua_constant(tolua_S,"E_ANIMATION",E_ANIMATION);
-  tolua_constant(tolua_S,"E_PACKET_ENTITY_ACTION",E_PACKET_ENTITY_ACTION);
-  tolua_constant(tolua_S,"E_NAMED_ENTITY_SPAWN",E_NAMED_ENTITY_SPAWN);
-  tolua_constant(tolua_S,"E_PICKUP_SPAWN",E_PICKUP_SPAWN);
-  tolua_constant(tolua_S,"E_COLLECT_ITEM",E_COLLECT_ITEM);
-  tolua_constant(tolua_S,"E_ADD_VEHICLE",E_ADD_VEHICLE);
-  tolua_constant(tolua_S,"E_SPAWN_MOB",E_SPAWN_MOB);
-  tolua_constant(tolua_S,"E_DESTROY_ENT",E_DESTROY_ENT);
-  tolua_constant(tolua_S,"E_ENTITY",E_ENTITY);
-  tolua_constant(tolua_S,"E_REL_ENT_MOVE",E_REL_ENT_MOVE);
-  tolua_constant(tolua_S,"E_ENT_LOOK",E_ENT_LOOK);
-  tolua_constant(tolua_S,"E_REL_ENT_MOVE_LOOK",E_REL_ENT_MOVE_LOOK);
-  tolua_constant(tolua_S,"E_ENT_TELEPORT",E_ENT_TELEPORT);
-  tolua_constant(tolua_S,"E_ENT_HEAD_LOOK",E_ENT_HEAD_LOOK);
-  tolua_constant(tolua_S,"E_ENT_STATUS",E_ENT_STATUS);
-  tolua_constant(tolua_S,"E_METADATA",E_METADATA);
-  tolua_constant(tolua_S,"E_PRE_CHUNK",E_PRE_CHUNK);
-  tolua_constant(tolua_S,"E_MAP_CHUNK",E_MAP_CHUNK);
-  tolua_constant(tolua_S,"E_MULTI_BLOCK",E_MULTI_BLOCK);
-  tolua_constant(tolua_S,"E_BLOCK_CHANGE",E_BLOCK_CHANGE);
-  tolua_constant(tolua_S,"E_BLOCK_ACTION",E_BLOCK_ACTION);
-  tolua_constant(tolua_S,"E_EXPLOSION",E_EXPLOSION);
-  tolua_constant(tolua_S,"E_SOUND_EFFECT",E_SOUND_EFFECT);
-  tolua_constant(tolua_S,"E_NEW_INVALID_STATE",E_NEW_INVALID_STATE);
-  tolua_constant(tolua_S,"E_THUNDERBOLT",E_THUNDERBOLT);
-  tolua_constant(tolua_S,"E_WINDOW_OPEN",E_WINDOW_OPEN);
-  tolua_constant(tolua_S,"E_WINDOW_CLOSE",E_WINDOW_CLOSE);
-  tolua_constant(tolua_S,"E_WINDOW_CLICK",E_WINDOW_CLICK);
-  tolua_constant(tolua_S,"E_INVENTORY_SLOT",E_INVENTORY_SLOT);
-  tolua_constant(tolua_S,"E_INVENTORY_WHOLE",E_INVENTORY_WHOLE);
-  tolua_constant(tolua_S,"E_INVENTORY_PROGRESS",E_INVENTORY_PROGRESS);
-  tolua_constant(tolua_S,"E_CREATIVE_INVENTORY_ACTION",E_CREATIVE_INVENTORY_ACTION);
-  tolua_constant(tolua_S,"E_UPDATE_SIGN",E_UPDATE_SIGN);
-  tolua_constant(tolua_S,"E_PLAYER_LIST_ITEM",E_PLAYER_LIST_ITEM);
-  tolua_constant(tolua_S,"E_PLAYER_ABILITIES",E_PLAYER_ABILITIES);
-  tolua_constant(tolua_S,"E_PING",E_PING);
-  tolua_constant(tolua_S,"E_DISCONNECT",E_DISCONNECT);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);

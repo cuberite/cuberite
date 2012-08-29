@@ -15,8 +15,6 @@ namespace Json
 class cItem;
 class cClientHandle;
 class cPlayer;
-class cPacket;
-class cPacket_EntityEquipment;
 
 
 

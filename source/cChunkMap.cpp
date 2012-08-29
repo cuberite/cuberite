@@ -257,7 +257,7 @@ void cChunkMap::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotN
 
 
 
-void cChunkMap::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
@@ -266,7 +266,7 @@ void cChunkMap::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, c
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastRelEntMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+	Chunk->BroadcastEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
 }
 
 
@@ -274,7 +274,7 @@ void cChunkMap::BroadcastRelEntMoveLook(const cEntity & a_Entity, char a_RelX, c
 
 
 
-void cChunkMap::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
@@ -283,7 +283,7 @@ void cChunkMap::BroadcastRelEntMove(const cEntity & a_Entity, char a_RelX, char 
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastRelEntMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+	Chunk->BroadcastEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
 }
 
 

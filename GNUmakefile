@@ -89,7 +89,6 @@ INCLUDE = -I.\
 		-Isource\
 		-Isource/md5\
 		-IWebServer\
-		-Isource/packets\
 		-Isource/items\
 		-Isource/blocks\
 		-Itolua++-1.0.93/src/lib\
