@@ -19,6 +19,10 @@ public:
 	
 	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
+		if (a_Dir == BLOCK_FACE_BOTTOM)
+		{
+			return;
+		}
 		a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, cTorch::DirectionToMetaData(a_Dir));
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
