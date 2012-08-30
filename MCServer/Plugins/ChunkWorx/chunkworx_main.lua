@@ -5,6 +5,7 @@ OPERATION_CODE = 0	-- 0 = generation
 CX = 0
 CZ = 0
 CURRENT = 0
+TOTAL = 0
 -- AREA Variables
 AreaStartX = -10
 AreaStartZ = -10
@@ -23,7 +24,7 @@ function Initialize(Plugin)
 	PLUGIN = Plugin
 	
 	PLUGIN:SetName("ChunkWorx")
-	PLUGIN:SetVersion(5)
+	PLUGIN:SetVersion(6)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(PLUGIN, cPluginManager.E_PLUGIN_TICK)
@@ -95,8 +96,8 @@ function Tick( DeltaTime )
 		CURRENT = 0
 		
 		if (WW_instance == nil) then
-			LOG("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": works ABORTED")
-			LOG("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": NO WORLD found :(")
+			LOGERROR("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": works ABORTED")
+			LOGERROR("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": NO WORLD found :(")
 			GENERATION_STATE = 0
 		end
 	end
@@ -108,6 +109,7 @@ function Tick( DeltaTime )
 		and WW_instance:GetLightingQueueLength() < 200
 		and (WW_instance:GetStorageSaveQueueLength() + WW_instance:GetStorageLoadQueueLength()) < 80) then
 			local chunk_sum = (1+ AreaEndX - AreaStartX) * (1+ AreaEndZ - AreaStartZ)
+			TOTAL = chunk_sum
 			LOG("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": PROCESSING 100 chunks, (" .. CURRENT .. "/" .. chunk_sum .. ")")
 			for C = 1, 100	do
 				if (GENERATION_STATE == 2) then WW_instance:GenerateChunk(CX, CZ) end
