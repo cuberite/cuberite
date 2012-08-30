@@ -426,66 +426,21 @@ void cClientHandle::HandlePing(void)
 
 
 
-void cClientHandle::HandleHandshake(const AString & a_Username)
-{
-	AStringVector UserData = StringSplit(a_Username, ";"); // "FakeTruth;localhost:25565"
-	if (UserData.empty())
-	{
-		Kick("Did not receive username");
-		return;
-	}
-	m_Username = UserData[0];
-
-	LOGD("HANDSHAKE %s", m_Username.c_str());
-
-	if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
-	{
-		Kick("The server is currently full :(-- Try again later");
-		return;
-	}
-	cRoot::Get()->GetServer()->BroadcastChat(m_Username + " is connecting.", this);
-
-	SendHandshake(cRoot::Get()->GetServer()->GetServerID());
-	LOGD("User \"%s\" was sent a handshake", m_Username.c_str());
-}
-
-
-
-
-
-void cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
+bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
 {
 	LOGD("LOGIN %s", a_Username.c_str());
-	if (a_ProtocolVersion < m_ProtocolVersion)
-	{
-		Kick("Your client is outdated!");
-		return;
-	}
-	else if (a_ProtocolVersion > m_ProtocolVersion)
-	{
-		Kick("Your client version is higher than the server!");
-		return;
-	}
-	if (m_Username.compare(a_Username) != 0)
-	{
-		LOGWARNING("Login Username (\"%s\") does not match Handshake username (\"%s\") for client @ \"%s\")",
-			a_Username.c_str(),
-			m_Username.c_str(),
-			m_Socket.GetIPString().c_str()
-		);
-		Kick("Hacked client");  // Don't tell them why we don't want them
-		return;
-	}
+	m_Username = a_Username;
 
 	if (cRoot::Get()->GetPluginManager()->CallHookLogin(this, a_ProtocolVersion, a_Username))
 	{
 		Destroy();
-		return;
+		return false;
 	}
 
 	// Schedule for authentication; until then, let them wait (but do not block)
 	m_State = csAuthenticating;
 	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), cRoot::Get()->GetServer()->GetServerID());
+	return true;
 }
 
 
@@ -1060,15 +1015,6 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
 	LOGD("Sending a DC");
 	m_Protocol->SendDisconnect(a_Reason);
-}
-
-
-
-
-
-void cClientHandle::SendHandshake(const AString & a_ServerName)
-{
-	m_Protocol->SendHandshake(a_ServerName);
 }
 
 

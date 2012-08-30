@@ -56,7 +56,6 @@ public:
 	virtual void SendEntRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
 	virtual void SendEntRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
 	virtual void SendGameMode         (eGameMode a_GameMode) = 0;
-	virtual void SendHandshake        (const AString & a_ServerName) = 0;
 	virtual void SendHealth           (void) = 0;
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) = 0;
 	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;

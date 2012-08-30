@@ -83,7 +83,6 @@ public:
 	bool IsPlaying(void) const {return (m_State == csPlaying); }
 
 	void SendDisconnect(const AString & a_Reason);
-	void SendHandshake (const AString & a_ServerName);
 	void SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendChat(const AString & a_Message);
 	void SendPlayerAnimation(const cPlayer & a_Player, char a_Animation);
@@ -142,13 +141,9 @@ public:
 	void PacketError(unsigned char a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
-	// Packets handled in csConnected:
-	void HandlePing            (void);
-	void HandleHandshake       (const AString & a_Username);
-	void HandleLogin           (int a_ProtocolVersion, const AString & a_Username);
-	void HandleUnexpectedPacket(int a_PacketType);  // the default case -> kick
+	void HandlePing             (void);
 	
-	// Packets handled while in csPlaying:
+	void HandleUnexpectedPacket (int a_PacketType);  // the default case -> kick
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
@@ -169,6 +164,11 @@ public:
 	void HandleRespawn          (void);
 	void HandleDisconnect       (const AString & a_Reason);
 	void HandleKeepAlive        (int a_KeepAliveID);
+	
+	/** Called when the protocol has finished logging the user in.
+	Return true to allow the user in; false to kick them.
+	*/
+	bool HandleLogin(int a_ProtocolVersion, const AString & a_Username);
 	
 	void SendData(const char * a_Data, int a_Size);
 private:

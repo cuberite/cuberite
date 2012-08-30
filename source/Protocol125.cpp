@@ -15,6 +15,8 @@
 #include "cPlayer.h"
 #include "cChatColor.h"
 #include "cWindow.h"
+#include "cRoot.h"
+#include "cServer.h"
 
 
 
@@ -958,7 +960,26 @@ int cProtocol125::ParseEntityAction(void)
 int cProtocol125::ParseHandshake(void)
 {
 	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Username);
-	m_Client->HandleHandshake(Username);
+
+	AStringVector UserData = StringSplit(Username, ";"); // "FakeTruth;localhost:25565"
+	if (UserData.empty())
+	{
+		m_Client->Kick("Did not receive username");
+		return PARSE_OK;
+	}
+	m_Username = UserData[0];
+
+	LOGD("HANDSHAKE %s", Username.c_str());
+
+	if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
+	{
+		m_Client->Kick("The server is currently full :(-- Try again later");
+		return PARSE_OK;
+	}
+
+	SendHandshake(cRoot::Get()->GetServer()->GetServerID());
+	LOGD("User \"%s\" was sent a handshake response", m_Username.c_str());
+
 	return PARSE_OK;
 }
 
@@ -987,6 +1008,29 @@ int cProtocol125::ParseLogin(void)
 	HANDLE_PACKET_READ(ReadChar,            char,    Difficulty);
 	HANDLE_PACKET_READ(ReadByte,            Byte,    WorldHeight);
 	HANDLE_PACKET_READ(ReadByte,            Byte,    MaxPlayers);
+
+	if (ProtocolVersion < 29)
+	{
+		m_Client->Kick("Your client is outdated!");
+		return PARSE_OK;
+	}
+	else if (ProtocolVersion > 29)
+	{
+		m_Client->Kick("Your client version is higher than the server!");
+		return PARSE_OK;
+	}
+
+	if (m_Username.compare(Username) != 0)
+	{
+		LOGWARNING("Login Username (\"%s\") does not match Handshake username (\"%s\") for client @ \"%s\", kicking",
+			Username.c_str(),
+			m_Username.c_str(),
+			m_Client->GetSocket().GetIPString().c_str()
+		);
+		m_Client->Kick("Hacked client");  // Don't tell them why we don't want them
+		return PARSE_OK;
+	}
+
 	m_Client->HandleLogin(ProtocolVersion, Username);
 	return PARSE_OK;
 }

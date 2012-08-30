@@ -42,7 +42,6 @@ public:
 	virtual void SendEntRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendGameMode         (eGameMode a_GameMode) override;
-	virtual void SendHandshake        (const AString & a_ConnectionHash) override;
 	virtual void SendHealth           (void) override;
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) override;
 	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) override;
@@ -79,8 +78,13 @@ protected:
 	
 	cByteBuffer m_ReceivedData;  //< Buffer for the received data
 	
+	AString m_Username;  //< Stored in ParseHandshake(), compared to Login username
+	
 	virtual void SendData(const char * a_Data, int a_Size) override;
 	
+	/// Sends the Handshake packet
+	void SendHandshake(const AString & a_ConnectionHash);
+
 	/// Parse the packet of the specified type from m_ReceivedData (switch into ParseXYZ() )
 	virtual int ParsePacket(unsigned char a_PacketType);
 
