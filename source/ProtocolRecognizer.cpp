@@ -43,7 +43,6 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, int a_Size)
 		{
 			return;
 		}
-		LOGD("ProtocolRecognizer at %p recognized protocol %p", this, m_Protocol);
 
 		// The protocol has just been recognized, dump the whole m_Buffer contents into it for parsing:
 		AString Dump;
@@ -491,7 +490,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	{
 		return false;
 	}
-	if (ch == 0x39)
+	if (ch == 39)
 	{
 		m_Protocol = new cProtocol132(m_Client);
 		return true;

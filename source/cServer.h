@@ -12,6 +12,8 @@
 #define CSERVER_H_INCLUDED
 
 #include "cSocketThreads.h"
+#include "CryptoPP/rsa.h"
+#include "CryptoPP/osrng.h"
 
 
 
@@ -66,6 +68,9 @@ public:												//tolua_export
 	
 	void RemoveClient(const cSocket * a_Socket);  // Removes the socket from m_SocketThreads
 	
+	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
+	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }
+	
 private:
 
 	friend class cRoot; // so cRoot can create and destroy cServer
@@ -114,10 +119,15 @@ private:
 	int m_iServerPort;
 
 	bool m_bRestarting;
+	
+	CryptoPP::RSA::PrivateKey      m_PrivateKey;
+	CryptoPP::RSA::PublicKey       m_PublicKey;
 
 	cServer();
 	~cServer();
 
+	/// Loads, or generates, if missing, RSA keys for protocol encryption
+	void PrepareKeys(void);
 }; //tolua_export
 
 

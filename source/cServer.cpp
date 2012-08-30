@@ -241,6 +241,8 @@ bool cServer::InitServer( int a_Port )
 	
 	m_NotifyWriteThread.Start(this);
 	
+	PrepareKeys();
+	
 	return true;
 }
 
@@ -277,6 +279,22 @@ cServer::~cServer()
 	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
 
 	delete m_pState;
+}
+
+
+
+
+
+void cServer::PrepareKeys(void)
+{
+	// TODO: Save and load key for persistence across sessions
+	// But generating the key takes only a moment, do we even need that?
+	
+	LOG("Generating protocol encryption keypair...");
+	CryptoPP::AutoSeededRandomPool rng;
+	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
+	CryptoPP::RSA::PublicKey pk(m_PrivateKey);
+	m_PublicKey = pk;
 }
 
 
