@@ -40,7 +40,7 @@
 #include "cAuthenticator.h"
 #include "MersenneTwister.h"
 
-#include "Protocol125.h"
+#include "ProtocolRecognizer.h"
 
 
 
@@ -82,7 +82,6 @@ int cClientHandle::s_ClientCount = 0;
 
 cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
-	, m_ProtocolVersion(MCS_PROTOCOL_VERSION)
 	, m_Socket(a_Socket)
 	, m_OutgoingData(64 KiB)
 	, m_bDestroyed(false)
@@ -96,7 +95,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	, m_LastStreamedChunkZ(0x7fffffff)
 	, m_UniqueID(0)
 {
-	m_Protocol = new cProtocol125(this);
+	m_Protocol = new cProtocolRecognizer(this);
 	
 	s_ClientCount++;	// Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
@@ -447,22 +446,6 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 
 
 
-void cClientHandle::HandleUnexpectedPacket(int a_PacketType)
-{
-	LOGWARNING(
-		"Invalid packet in state %d: 0x%02x from client \"%s\", username \"%s\"", 
-		m_State,
-		a_PacketType,
-		m_Socket.GetIPString().c_str(),
-		m_Username.c_str()
-	);
-	Kick("Hacked client");  // Don't tell them why we don't like them
-}
-
-
-
-
-
 void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
 {
 	// This is for creative Inventory changes
@@ -571,7 +554,7 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 		// Check for clickthrough-blocks:
 		int pX = a_BlockX;
-		unsigned char pY = a_BlockY;
+		int pY = a_BlockY;
 		int pZ = a_BlockZ;
 		AddDirection(pX, pY, pZ, a_BlockFace);
 
@@ -666,7 +649,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 				}
 
 
-				int PlaceBlock = m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+				BLOCKTYPE PlaceBlock = m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 				if (!BlockHandler(PlaceBlock)->IgnoreBuildCollision())
 				{
 					// Tried to place a block *into* another?
@@ -776,7 +759,6 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 			double Dist = (ReceivedPosition - m_ConfirmPosition).SqrLength();
 			if (Dist < 1.0)
 			{
-				// Test
 				if (ReceivedPosition.Equals(m_ConfirmPosition))
 				{
 					LOGINFO("Exact position confirmed by client!");
@@ -785,7 +767,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 			}
 			else
 			{
-				LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), Dist);
+				LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), sqrt(Dist));
 				m_ConfirmPosition = m_Player->GetPosition();
 				SendPlayerMoveLook();
 			}
@@ -998,7 +980,10 @@ void cClientHandle::Tick(float a_Dt)
 	
 	cTimer t1;
 	// Send ping packet
-	if (m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
+	if (
+		(m_Player != NULL) &&  // Is logged in?
+		(m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
+	)
 	{
 		m_PingID++;
 		m_PingStartTime = t1.GetNowTime();
@@ -1021,7 +1006,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 
 
 
-void cClientHandle::SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item)
+void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
 }

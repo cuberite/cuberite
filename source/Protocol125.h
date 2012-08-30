@@ -44,7 +44,7 @@ public:
 	virtual void SendGameMode         (eGameMode a_GameMode) override;
 	virtual void SendHealth           (void) override;
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) override;
-	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) override;
+	virtual void SendInventorySlot    (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive        (int a_PingID) override;
 	virtual void SendLogin            (const cPlayer & a_Player) override;
 	virtual void SendMetadata         (const cEntity & a_Entity) override;

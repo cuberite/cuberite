@@ -118,7 +118,7 @@ void cCraftingWindow::Clicked(
 	a_Player.GetInventory().SendWholeInventory( a_Player.GetClientHandle() );
 
 	// Separate packet for result =/ Don't know why
-	a_Player.GetClientHandle()->SendInventorySlot(GetWindowID(), 0, *GetSlot(0));
+	a_Player.GetClientHandle()->SendInventorySlot((char)GetWindowID(), 0, *GetSlot(0));
 }
 
 

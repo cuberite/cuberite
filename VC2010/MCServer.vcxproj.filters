@@ -667,6 +667,12 @@
     <ClCompile Include="..\source\Protocol125.cpp">
       <Filter>Protocol</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\Protocol132.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\ProtocolRecognizer.cpp">
+      <Filter>Protocol</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\cServer.h">
@@ -1234,6 +1240,9 @@
       <Filter>Protocol</Filter>
     </ClInclude>
     <ClInclude Include="..\source\Protocol.h">
+      <Filter>Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Protocol132.h">
       <Filter>Protocol</Filter>
     </ClInclude>
   </ItemGroup>

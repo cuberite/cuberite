@@ -3,8 +3,8 @@
 
 #include "cChatColor.h"
 
-const std::string cChatColor::Color     = "\xc2\xa7";  // or in other words: "§"
-const std::string cChatColor::Delimiter = "\xa7";
+const std::string cChatColor::Color     = "\xc2\xa7";  // or in other words: "§" in UTF-8
+const std::string cChatColor::Delimiter = "\xc2\xa7";  // or in other words: "§" in UTF-8
 const std::string cChatColor::Black       = cChatColor::Color + "0";
 const std::string cChatColor::Navy        = cChatColor::Color + "1";
 const std::string cChatColor::Green       = cChatColor::Color + "2";

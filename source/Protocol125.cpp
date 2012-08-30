@@ -133,7 +133,7 @@ void cProtocol125::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_BLOCK_CHANGE);
 	WriteInt (a_BlockX);
-	WriteByte(a_BlockY);
+	WriteByte((unsigned char)a_BlockY);
 	WriteInt (a_BlockZ);
 	WriteByte(a_BlockType);
 	WriteByte(a_BlockMeta);
@@ -354,7 +354,7 @@ void cProtocol125::SendInventoryProgress(char a_WindowID, short a_ProgressBar, s
 
 
 
-void cProtocol125::SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item)
+void cProtocol125::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_INVENTORY_SLOT);
@@ -716,7 +716,7 @@ void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 {
 	cCSLock Lock(m_CSPacket);
 	SendWholeInventory(
-		a_Window.GetWindowID(), 
+		(char)a_Window.GetWindowID(), 
 		a_Window.GetNumSlots(),
 		a_Window.GetSlots()
 	);

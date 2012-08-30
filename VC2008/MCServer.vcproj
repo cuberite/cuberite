@@ -2024,6 +2024,18 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Protocol132.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol132.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\ProtocolRecognizer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\ProtocolRecognizer.h"
 					>
 				</File>

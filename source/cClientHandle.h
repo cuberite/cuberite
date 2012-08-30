@@ -83,7 +83,7 @@ public:
 	bool IsPlaying(void) const {return (m_State == csPlaying); }
 
 	void SendDisconnect(const AString & a_Reason);
-	void SendInventorySlot(int a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item);
 	void SendChat(const AString & a_Message);
 	void SendPlayerAnimation(const cPlayer & a_Player, char a_Animation);
 	void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
@@ -142,8 +142,6 @@ public:
 
 	// Calls that cProtocol descendants use for handling packets:
 	void HandlePing             (void);
-	
-	void HandleUnexpectedPacket (int a_PacketType);  // the default case -> kick
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
 	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);

@@ -441,6 +441,8 @@
     <ClCompile Include="..\source\Bindings.cpp" />
     <ClCompile Include="..\source\main.cpp" />
     <ClCompile Include="..\source\Protocol125.cpp" />
+    <ClCompile Include="..\source\Protocol132.cpp" />
+    <ClCompile Include="..\source\ProtocolRecognizer.cpp" />
     <ClCompile Include="..\source\Ravines.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelBindings.cpp" />
     <ClCompile Include="..\source\squirrelbindings\SquirrelFunctions.cpp" />
@@ -646,6 +648,7 @@
     <ClInclude Include="..\source\MCSocket.h" />
     <ClInclude Include="..\source\Protocol.h" />
     <ClInclude Include="..\source\Protocol125.h" />
+    <ClInclude Include="..\source\Protocol132.h" />
     <ClInclude Include="..\source\ProtocolRecognizer.h" />
     <ClInclude Include="..\source\Ravines.h" />
     <ClInclude Include="..\source\squirrelbindings\cSquirrelBaseClass.h" />

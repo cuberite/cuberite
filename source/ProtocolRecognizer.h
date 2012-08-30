@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Protocol.h"
+#include "ByteBuffer.h"
 
 
 
@@ -19,6 +20,8 @@
 class cProtocolRecognizer :
 	public cProtocol
 {
+	typedef cProtocol super;
+	
 public:
 	cProtocolRecognizer(cClientHandle * a_Client);
 	
@@ -38,21 +41,21 @@ public:
 	virtual void SendEntLook          (const cEntity & a_Entity) override;
 	virtual void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityStatus     (const cEntity & a_Entity, char a_Status) override;
+	virtual void SendEntRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
+	virtual void SendEntRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendGameMode         (eGameMode a_GameMode) override;
 	virtual void SendHealth           (void) override;
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) override;
-	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) override;
+	virtual void SendInventorySlot    (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive        (int a_PingID) override;
 	virtual void SendLogin            (const cPlayer & a_Player) override;
-	virtual void SendMetadata         (const cPawn & a_Entity) override;
+	virtual void SendMetadata         (const cEntity & a_Entity) override;
 	virtual void SendPickupSpawn      (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation) override;
 	virtual void SendPlayerListItem   (const cPlayer & a_Player, bool a_IsOnline) override;
 	virtual void SendPlayerMoveLook   (void) override;
 	virtual void SendPlayerPosition   (void) override;
 	virtual void SendPlayerSpawn      (const cPlayer & a_Player) override;
-	virtual void SendRelEntMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
-	virtual void SendRelEntMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendRespawn          (void) override;
 	virtual void SendSpawnMob         (const cMonster & a_Mob) override;
 	virtual void SendTeleportEntity   (const cEntity & a_Entity) override;
@@ -65,10 +68,18 @@ public:
 	virtual void SendWholeInventory   (const cWindow    & a_Window) override;
 	virtual void SendWindowClose      (char a_WindowID) override;
 	virtual void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) override;
-	
+
+	virtual void SendData(const char * a_Data, int a_Size) override;
+
 protected:
 	cProtocol * m_Protocol;  //< The recognized protocol
-	cByteBuffer m_Buffer;    //< Buffer used until the protocol is recognized
+	cByteBuffer m_Buffer;    //< Buffer for the incoming data until we recognize the protocol
+	
+	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
+	bool TryRecognizeProtocol(void);
+	
+	/// Called when the recognizer gets a server ping packet; responds with server stats and destroys the client
+	void HandleServerPing(void);
 } ;
 
 

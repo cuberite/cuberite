@@ -58,7 +58,7 @@ public:
 	virtual void SendGameMode         (eGameMode a_GameMode) = 0;
 	virtual void SendHealth           (void) = 0;
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) = 0;
-	virtual void SendInventorySlot    (int a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
+	virtual void SendInventorySlot    (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive        (int a_PingID) = 0;
 	virtual void SendLogin            (const cPlayer & a_Player) = 0;
 	virtual void SendMetadata         (const cEntity & a_Entity) = 0;
