@@ -102,19 +102,25 @@ function HandleRequest_Generation( Request )
 				GENERATION_STATE = 3
 			end
 		end
+		
+		local GetAreaByPlayer = function(Player)
+			-- Player is valid only within this function, it cannot be stord and used later!
+			AreaStartX = Player:GetChunkX()
+			AreaStartZ = Player:GetChunkZ()
+		end
 		-- PLAYERS REGEN!
 		if( Request.PostParams["PlayerExact"] ~= nil
 		and Request.PostParams["PlayerName"] ~= nil ) then		-- Making BOOM! I meant, regenereate...
-			AreaStartX = cRoot:Get():GetWorld(WORK_WORLD):GetPlayer(Request.PostParams["PlayerName"]):GetChunkX()
-			AreaStartZ = cRoot:Get():GetWorld(WORK_WORLD):GetPlayer(Request.PostParams["PlayerName"]):GetChunkZ()
+			cRoot:Get():GetWorld(WORK_WORLD):DoWithPlayer(Request.PostParams["PlayerName"],GetAreaByPlayer)
 			AreaEndX = AreaStartX
 			AreaEndZ = AreaStartZ
 			GENERATION_STATE = 3
 		end
 		if( Request.PostParams["Player3x3"] ~= nil
 		and Request.PostParams["PlayerName"] ~= nil ) then		-- Making BOOM! I meant, regenereate...
-			AreaStartX = cRoot:Get():GetWorld(WORK_WORLD):GetPlayer(Request.PostParams["PlayerName"]):GetChunkX() - 1
-			AreaStartZ = cRoot:Get():GetWorld(WORK_WORLD):GetPlayer(Request.PostParams["PlayerName"]):GetChunkZ() - 1
+			cRoot:Get():GetWorld(WORK_WORLD):DoWithPlayer(Request.PostParams["PlayerName"],GetAreaByPlayer)
+			AreaStartX = AreaStartX - 1
+			AreaStartZ = AreaStartZ - 1
 			AreaEndX = AreaStartX + 2
 			AreaEndZ = AreaStartZ + 2
 			GENERATION_STATE = 3

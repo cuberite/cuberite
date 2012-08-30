@@ -23,7 +23,7 @@ function Initialize(Plugin)
 	PLUGIN = Plugin
 	
 	PLUGIN:SetName("ChunkWorx")
-	PLUGIN:SetVersion(4)
+	PLUGIN:SetVersion(5)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(PLUGIN, cPluginManager.E_PLUGIN_TICK)
