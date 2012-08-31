@@ -1,3 +1,4 @@
+MCServer\*.pdb
 VC2008\Release\*.pdb
 VC2008\Release\JsonCpp\*.pdb
 VC2008\Release\Lua\*.pdb
