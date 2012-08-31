@@ -23,11 +23,13 @@ protected:
 	Serializations m_Serializations;
 	
 	void Serialize29(AString & a_Data);  // Release 1.2.4 and 1.2.5
+	void Serialize39(AString & a_Data);  // Release 1.3.1 and 1.3.2
 	
 public:
 	enum
 	{
 		RELEASE_1_2_5 = 29,
+		RELEASE_1_3_2 = 39,
 	} ;
 	
 	cChunkDataSerializer(

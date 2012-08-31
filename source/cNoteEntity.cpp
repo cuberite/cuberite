@@ -84,7 +84,7 @@ void cNoteEntity::MakeSound( void )
 		}
 	}
 
-	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, instrument, m_Pitch);
+	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, instrument, m_Pitch, E_BLOCK_NOTE_BLOCK);
 }
 
 

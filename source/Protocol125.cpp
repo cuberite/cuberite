@@ -112,8 +112,10 @@ cProtocol125::cProtocol125(cClientHandle * a_Client) :
 
 
 
-void cProtocol125::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2)
+void cProtocol125::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
+	UNUSED(a_BlockType);
+	
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_BLOCK_ACTION);
 	WriteInt  (a_BlockX);
@@ -301,6 +303,42 @@ void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 
 
+void cProtocol125::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENT_REL_MOVE);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_RelX);
+	WriteByte(a_RelY);
+	WriteByte(a_RelZ);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENT_REL_MOVE_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_RelX);
+	WriteByte(a_RelY);
+	WriteByte(a_RelZ);
+	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
+	Flush();
+}
+
+
+
+
+
 void cProtocol125::SendGameMode(eGameMode a_GameMode)
 {
 	cCSLock Lock(m_CSPacket);
@@ -386,7 +424,7 @@ void cProtocol125::SendLogin(const cPlayer & a_Player)
 	WriteByte  (PACKET_LOGIN);
 	WriteInt   (a_Player.GetUniqueID());  // EntityID of the player
 	WriteString("");  // Username, not used
-	WriteString("DEFAULT");  // Level type
+	WriteString("default");  // Level type
 	WriteInt   ((int)a_Player.GetGameMode());
 	WriteInt   (0);  // TODO: Dimension (Nether / Overworld / End)
 	WriteByte  (2);  // TODO: Difficulty
@@ -416,17 +454,15 @@ void cProtocol125::SendMetadata(const cEntity & a_Entity)
 void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte (PACKET_PICKUP_SPAWN);
-	WriteInt  (a_Pickup.GetUniqueID());
-	WriteShort(a_Pickup.GetItem()->m_ItemType);
-	WriteByte (a_Pickup.GetItem()->m_ItemCount);
-	WriteShort(a_Pickup.GetItem()->m_ItemDamage);
-	WriteInt  ((int)(a_Pickup.GetPosX() * 32));
-	WriteInt  ((int)(a_Pickup.GetPosY() * 32));
-	WriteInt  ((int)(a_Pickup.GetPosZ() * 32));
-	WriteByte ((char)(a_Pickup.GetSpeed().x * 8));
-	WriteByte ((char)(a_Pickup.GetSpeed().y * 8));
-	WriteByte ((char)(a_Pickup.GetSpeed().z * 8));
+	WriteByte   (PACKET_PICKUP_SPAWN);
+	WriteInt    (a_Pickup.GetUniqueID());
+	WriteShort  (a_Pickup.GetItem()->m_ItemType);
+	WriteByte   (a_Pickup.GetItem()->m_ItemCount);
+	WriteShort  (a_Pickup.GetItem()->m_ItemDamage);
+	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
+	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeed().z * 8));
 	Flush();
 }
 
@@ -509,7 +545,7 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	const cItem & HeldItem = a_Player.GetEquippedItem();
 	cCSLock Lock(m_CSPacket);
-	WriteByte	(PACKET_PLAYER_SPAWN);
+	WriteByte	 (PACKET_PLAYER_SPAWN);
 	WriteInt   (a_Player.GetUniqueID());
 	WriteString(a_Player.GetName());
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
@@ -525,42 +561,6 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol125::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENT_REL_MOVE);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_RelX);
-	WriteByte(a_RelY);
-	WriteByte(a_RelZ);
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENT_REL_MOVE_LOOK);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_RelX);
-	WriteByte(a_RelY);
-	WriteByte(a_RelZ);
-	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
-	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
-	Flush();
-}
-
-
-
-
-
 void cProtocol125::SendRespawn(void)
 {
 	cCSLock Lock(m_CSPacket);
@@ -569,7 +569,7 @@ void cProtocol125::SendRespawn(void)
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
 	WriteByte  ((char)m_Client->GetPlayer()->GetGameMode());
 	WriteShort (256);  // Current world height
-	WriteString("DEFAULT");
+	WriteString("default");
 }
 
 
@@ -579,16 +579,13 @@ void cProtocol125::SendRespawn(void)
 void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 {
 	cCSLock Lock(m_CSPacket);
-	Vector3i Pos = (Vector3i)(a_Mob.GetPosition() * 32);
-	WriteByte(PACKET_SPAWN_MOB);
-	WriteInt (a_Mob.GetUniqueID());
-	WriteByte(a_Mob.GetMobType());
-	WriteInt (Pos.x);
-	WriteInt (Pos.y);
-	WriteInt (Pos.z);
-	WriteByte(0);
-	WriteByte(0);
-	WriteByte(0);
+	WriteByte   (PACKET_SPAWN_MOB);
+	WriteInt    (a_Mob.GetUniqueID());
+	WriteByte   (a_Mob.GetMobType());
+	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
+	WriteByte   (0);
+	WriteByte   (0);
+	WriteByte   (0);
 	AString MetaData = GetEntityMetaData(a_Mob);
 	SendData (MetaData.data(), MetaData.size());
 	Flush();
@@ -740,6 +737,11 @@ void cProtocol125::SendWindowClose(char a_WindowID)
 
 void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
+	if (a_WindowType < 0)
+	{
+		// Do not send for inventory windows
+		return;
+	}
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_WINDOW_OPEN);
 	WriteByte  (a_WindowID);

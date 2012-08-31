@@ -98,7 +98,7 @@ public:
 	void SendEntRelMove    (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntLook       (const cEntity & a_Entity);
 	void SendEntHeadLook   (const cEntity & a_Entity);
-	void SendBlockAction   (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2);
+	void SendBlockAction   (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendHealth (void);
 	void SendRespawn(void);
 	void SendGameMode(eGameMode a_GameMode);

@@ -61,7 +61,7 @@ public:
 	void BroadcastEntHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	
 	/// Broadcasts a BlockAction packet to all clients who are in the specified chunk
-	void BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
 	
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	

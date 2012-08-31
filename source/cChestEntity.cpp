@@ -185,7 +185,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 			GetWindow()->SendWholeWindow( a_Player->GetClientHandle() );
 		}
 	}
-	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, 1, 1);
+	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, 1, 1, E_BLOCK_CHEST);
 
 	// This is rather a hack
 	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now

@@ -468,7 +468,7 @@ void cPlayer::CloseWindow(char a_WindowType)
 		{
 			int x, y, z;
 			m_CurrentWindow->GetOwner()->GetBlockPos(x, y, z);
-			m_World->BroadcastBlockAction(x, y, z, 1, 0);
+			m_World->BroadcastBlockAction(x, y, z, 1, 0, E_BLOCK_CHEST);
 		}
 		
 		m_CurrentWindow->Close( *this );

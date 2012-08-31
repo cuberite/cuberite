@@ -86,7 +86,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 			oldy = pisty;
 			oldz = pistz;
 		}
-		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta);
+		m_World->BroadcastBlockAction(pistx, pisty, pistz, 0, pistonMeta, E_BLOCK_PISTON);
 		m_World->FastSetBlock( pistx, pisty, pistz, pistonBlock, pistonMeta | 0x8 );
 
 		int extx = pistx;
@@ -118,7 +118,7 @@ void cPiston::RetractPiston( int pistx, int pisty, int pistz )
 	{
 		return;
 	}
-	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8));
+	m_World->BroadcastBlockAction(pistx, pisty, pistz, 1, pistonMeta & ~(8), E_BLOCK_PISTON);
 	m_World->FastSetBlock(pistx, pisty, pistz, pistonBlock, pistonMeta & ~(8));
 	
 	AddDir(pistx, pisty, pistz, pistonMeta & 7, 1)
