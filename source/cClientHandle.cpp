@@ -90,6 +90,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	, m_TimeLastPacket(cWorld::GetTime())
 	, m_bKeepThreadGoing(true)
 	, m_Ping(1000)
+	, m_PingID(1)
 	, m_State(csConnected)
 	, m_LastStreamedChunkX(0x7fffffff)  // bogus chunk coords to force streaming upon login
 	, m_LastStreamedChunkZ(0x7fffffff)
@@ -1350,21 +1351,23 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 {
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
-	cCSLock Lock(m_CSChunkLists);
-	for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
+		cCSLock Lock(m_CSChunkLists);
+		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end(); ++itr)
 		{
-			m_ChunksToSend.erase(itr);
-			
-			// TODO: _X: Decouple this from packet sending, it creates a deadlock possibility
-			//  -- postpone till Tick() instead, using a bool flag
-			CheckIfWorldDownloaded();
-			
-			Found = true;
-			break;
-		}
-	}  // for itr - m_ChunksToSend[]
+			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
+			{
+				m_ChunksToSend.erase(itr);
+				
+				// TODO: _X: Decouple this from packet sending, it creates a deadlock possibility
+				//  -- postpone till Tick() instead, using a bool flag
+				CheckIfWorldDownloaded();
+				
+				Found = true;
+				break;
+			}
+		}  // for itr - m_ChunksToSend[]
+	}
 	if (!Found)
 	{
 		// This just sometimes happens. If you have a reliably replicatable situation for this, go ahead and fix it
