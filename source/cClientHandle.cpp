@@ -94,6 +94,7 @@ cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
 	, m_State(csConnected)
 	, m_LastStreamedChunkX(0x7fffffff)  // bogus chunk coords to force streaming upon login
 	, m_LastStreamedChunkZ(0x7fffffff)
+	, m_ShouldCheckDownloaded(false)
 	, m_UniqueID(0)
 {
 	m_Protocol = new cProtocolRecognizer(this);
@@ -923,8 +924,9 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 		cCSLock Lock(m_CSOutgoingData);
 		if (!m_OutgoingData.Write(a_Data, a_Size))
 		{
-			// Client has too much outgoing data queued, drop them silently:
-			Destroy();
+			// Client has too much outgoing data queued, drop them silently by timing them out:
+			// (So that they're dropped in the tick thread and not the sender thread)
+			m_LastPingTime = 0;
 		}
 	}
 	
@@ -977,6 +979,12 @@ void cClientHandle::Tick(float a_Dt)
 		cSleep::MilliSleep(1000);  // Give packet some time to be received
 
 		Destroy();
+	}
+	
+	if ((m_State == csDownloadingWorld) && m_ShouldCheckDownloaded)
+	{
+		CheckIfWorldDownloaded();
+		m_ShouldCheckDownloaded = false;
 	}
 	
 	cTimer t1;
@@ -1359,9 +1367,9 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 			{
 				m_ChunksToSend.erase(itr);
 				
-				// TODO: _X: Decouple this from packet sending, it creates a deadlock possibility
-				//  -- postpone till Tick() instead, using a bool flag
-				CheckIfWorldDownloaded();
+				// Make the tick thread check if all the needed chunks have been downloaded
+				//   -- needed to offload this from here due to a deadlock possibility
+				m_ShouldCheckDownloaded = true;
 				
 				Found = true;
 				break;

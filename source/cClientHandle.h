@@ -223,6 +223,9 @@ private:
 	eState m_State;
 
 	bool m_bKeepThreadGoing;
+	
+	/// If set to true during csDownloadingWorld, the tick thread calls CheckIfWorldDownloaded()
+	bool m_ShouldCheckDownloaded;
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
 	bool CheckBlockInteractionsRate(void);
