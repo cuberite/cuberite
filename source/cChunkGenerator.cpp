@@ -405,7 +405,10 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 
 void cChunkGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	if (m_BiomeGen != NULL)  // Quick fix for generator deinitializing before the world storage finishes loading
+	{
+		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	}
 }
 
 
