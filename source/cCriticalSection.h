@@ -14,8 +14,17 @@ public:
 	void Lock(void);
 	void Unlock(void);
 	
+	#ifdef _DEBUG
+	bool IsLocked(void);
+	bool IsLockedByCurrentThread(void);
+	#endif  // _DEBUG
+	
 private:
-
+	#ifdef _DEBUG
+	bool m_IsLocked;
+	unsigned long m_OwningThreadID;
+	#endif  // _DEBUG
+	
 	#ifdef _WIN32
 		CRITICAL_SECTION m_CriticalSection;
 	#else  // _WIN32

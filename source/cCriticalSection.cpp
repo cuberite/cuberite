@@ -1,5 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "cIsThread.h"
 
 
 
@@ -50,11 +51,16 @@ cCriticalSection::~cCriticalSection()
 
 void cCriticalSection::Lock()
 {
-#ifdef _WIN32
-	EnterCriticalSection( &m_CriticalSection );
-#else
-    pthread_mutex_lock( (pthread_mutex_t*)m_CriticalSectionPtr );
-#endif
+	#ifdef _WIN32
+		EnterCriticalSection( &m_CriticalSection );
+	#else
+		pthread_mutex_lock( (pthread_mutex_t*)m_CriticalSectionPtr );
+	#endif
+	
+	#ifdef _DEBUG
+		m_IsLocked = true;
+		m_OwningThreadID = cIsThread::GetCurrentID();
+	#endif  // _DEBUG
 }
 
 
@@ -63,11 +69,33 @@ void cCriticalSection::Lock()
 
 void cCriticalSection::Unlock()
 {
-#ifdef _WIN32
-	LeaveCriticalSection( &m_CriticalSection );
-#else
-    pthread_mutex_unlock( (pthread_mutex_t*)m_CriticalSectionPtr );
-#endif
+	#ifdef _DEBUG
+		m_IsLocked = false;
+	#endif  // _DEBUG
+	
+	#ifdef _WIN32
+		LeaveCriticalSection( &m_CriticalSection );
+	#else
+		pthread_mutex_unlock( (pthread_mutex_t*)m_CriticalSectionPtr );
+	#endif
+}
+
+
+
+
+
+bool cCriticalSection::IsLocked(void)
+{
+	return m_IsLocked;
+}
+
+
+
+
+
+bool cCriticalSection::IsLockedByCurrentThread(void)
+{
+	return m_IsLocked && (m_OwningThreadID == cIsThread::GetCurrentID());
 }
 
 
