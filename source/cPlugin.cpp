@@ -237,7 +237,7 @@ void cPlugin::OnTakeDamage(cPawn * a_Pawn, TakeDamageInfo * a_TakeDamageInfo)
 
 
 
-bool cPlugin::OnUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+bool cPlugin::OnUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	UNUSED(a_World);
 	UNUSED(a_BlockX);
@@ -247,6 +247,7 @@ bool cPlugin::OnUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_
 	UNUSED(a_Line2);
 	UNUSED(a_Line3);
 	UNUSED(a_Line4);
+	UNUSED(a_Player);
 	return false;
 }
 
@@ -254,7 +255,7 @@ bool cPlugin::OnUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_
 
 
 
-bool cPlugin::OnUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
+bool cPlugin::OnUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	UNUSED(a_World);
 	UNUSED(a_BlockX);
@@ -264,6 +265,7 @@ bool cPlugin::OnUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a
 	UNUSED(a_Line2);
 	UNUSED(a_Line3);
 	UNUSED(a_Line4);
+	UNUSED(a_Player);
 	return false;
 }
 

@@ -216,7 +216,8 @@ public:
 	/// Marks the chunk as failed-to-load:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);	//tolua_export
+	/// Updates the sign, askin gplugins for permission forst. a_Player is the player who changed the sign, may be NULL
+	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);	//tolua_export
 
 	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable. To be used only by cChunkStay!
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);

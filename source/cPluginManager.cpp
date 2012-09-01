@@ -585,7 +585,7 @@ bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
 
 
 
-bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
+bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATING_SIGN);
 	if (Plugins == m_Hooks.end())
@@ -594,7 +594,7 @@ bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4))
+		if ((*itr)->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player))
 		{
 			return true;
 		}
@@ -606,7 +606,7 @@ bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_
 
 
 
-bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATED_SIGN);
 	if (Plugins == m_Hooks.end())
@@ -615,7 +615,7 @@ bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_B
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4))
+		if ((*itr)->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player))
 		{
 			return true;
 		}

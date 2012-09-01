@@ -555,7 +555,8 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 bool cPlugin_NewLua::OnUpdatingSign(
 	cWorld * a_World, 
 	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4
+	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
+	cPlayer * a_Player
 )
 {
 	cCSLock Lock(m_CriticalSection);
@@ -572,8 +573,9 @@ bool cPlugin_NewLua::OnUpdatingSign(
 	tolua_pushstring  (m_LuaState, a_Line2.c_str());
 	tolua_pushstring  (m_LuaState, a_Line3.c_str());
 	tolua_pushstring  (m_LuaState, a_Line4.c_str());
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
 
-	if (!CallFunction(8, 5, "OnUpdatingSign"))
+	if (!CallFunction(9, 5, "OnUpdatingSign"))
 	{
 		return false;
 	}
@@ -605,7 +607,8 @@ bool cPlugin_NewLua::OnUpdatingSign(
 bool cPlugin_NewLua::OnUpdatedSign(
 	cWorld * a_World, 
 	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
+	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
+	cPlayer * a_Player
 )
 {
 	cCSLock Lock(m_CriticalSection);
@@ -622,8 +625,9 @@ bool cPlugin_NewLua::OnUpdatedSign(
 	tolua_pushstring  (m_LuaState, a_Line2.c_str());
 	tolua_pushstring  (m_LuaState, a_Line3.c_str());
 	tolua_pushstring  (m_LuaState, a_Line4.c_str());
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
 
-	if (!CallFunction(8, 1, "OnUpdatedSign"))
+	if (!CallFunction(9, 1, "OnUpdatedSign"))
 	{
 		return false;
 	}

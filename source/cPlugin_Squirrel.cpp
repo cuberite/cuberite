@@ -337,7 +337,8 @@ bool cPlugin_Squirrel::OnWeatherChanged(cWorld * a_World)
 bool cPlugin_Squirrel::OnUpdatingSign(
 	cWorld * a_World, 
 	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4
+	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
+	cPlayer * a_Player
 )
 {
 	cCSLock Lock(m_CriticalSection);
@@ -352,7 +353,8 @@ bool cPlugin_Squirrel::OnUpdatingSign(
 			a_Line1,
 			a_Line2,
 			a_Line3,
-			a_Line4
+			a_Line4,
+			a_Player
 		);
 }
 
@@ -363,7 +365,8 @@ bool cPlugin_Squirrel::OnUpdatingSign(
 bool cPlugin_Squirrel::OnUpdatedSign(
 	cWorld * a_World, 
 	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
+	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
+	cPlayer * a_Player
 )
 {
 	cCSLock Lock(m_CriticalSection);
@@ -378,6 +381,7 @@ bool cPlugin_Squirrel::OnUpdatedSign(
 			a_Line1,
 			a_Line2,
 			a_Line3,
-			a_Line4
+			a_Line4,
+			a_Player
 		);
 }

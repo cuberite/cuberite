@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/29/12 22:33:21.
+** Generated automatically by tolua++-1.0.92 on 09/01/12 23:31:58.
 */
 
 #ifndef __cplusplus
@@ -8291,7 +8291,8 @@ static int tolua_AllToLua_cPlugin_OnUpdatedSign00(lua_State* tolua_S)
      !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,10,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,11,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8306,11 +8307,12 @@ static int tolua_AllToLua_cPlugin_OnUpdatedSign00(lua_State* tolua_S)
   const AString a_Line2 = ((const AString)  tolua_tocppstring(tolua_S,7,0));
   const AString a_Line3 = ((const AString)  tolua_tocppstring(tolua_S,8,0));
   const AString a_Line4 = ((const AString)  tolua_tocppstring(tolua_S,9,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,10,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnUpdatedSign'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   bool tolua_ret = (bool)  self->OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Line1);
    tolua_pushcppstring(tolua_S,(const char*)a_Line2);
@@ -8343,7 +8345,8 @@ static int tolua_AllToLua_cPlugin_OnUpdatingSign00(lua_State* tolua_S)
      !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,10,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,11,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8358,11 +8361,12 @@ static int tolua_AllToLua_cPlugin_OnUpdatingSign00(lua_State* tolua_S)
   AString a_Line2 = ((AString)  tolua_tocppstring(tolua_S,7,0));
   AString a_Line3 = ((AString)  tolua_tocppstring(tolua_S,8,0));
   AString a_Line4 = ((AString)  tolua_tocppstring(tolua_S,9,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,10,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'OnUpdatingSign'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   bool tolua_ret = (bool)  self->OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Line1);
    tolua_pushcppstring(tolua_S,(const char*)a_Line2);
@@ -8916,7 +8920,7 @@ public:
 			return ( void ) cPlugin:: OnTakeDamage(a_Pawn,a_TakeDamageInfo);
 		};
 	};
-	 bool  OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
+	 bool  OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4, cPlayer* a_Player) {
 		if (push_method("OnUpdatedSign",  tolua_AllToLua_cPlugin_OnUpdatedSign00)) {
 			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
@@ -8926,15 +8930,16 @@ public:
 			tolua_pushcppstring(lua_state, (const char*)a_Line2);
 			tolua_pushcppstring(lua_state, (const char*)a_Line3);
 			tolua_pushcppstring(lua_state, (const char*)a_Line4);
-			ToluaBase::dbcall(lua_state, 9, 1);
+			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			ToluaBase::dbcall(lua_state, 10, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin:: OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+			return ( bool ) cPlugin:: OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 		};
 	};
-	 bool  OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
+	 bool  OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4, cPlayer* a_Player) {
 		if (push_method("OnUpdatingSign",  tolua_AllToLua_cPlugin_OnUpdatingSign00)) {
 			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
@@ -8944,12 +8949,13 @@ public:
 			tolua_pushcppstring(lua_state, (const char*)a_Line2);
 			tolua_pushcppstring(lua_state, (const char*)a_Line3);
 			tolua_pushcppstring(lua_state, (const char*)a_Line4);
-			ToluaBase::dbcall(lua_state, 9, 1);
+			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			ToluaBase::dbcall(lua_state, 10, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin:: OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+			return ( bool ) cPlugin:: OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 		};
 	};
 	 bool  OnWeatherChanged( cWorld* a_World) {
@@ -9029,11 +9035,11 @@ public:
 	 void cPlugin__OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo) {
 		return ( void )cPlugin::OnTakeDamage(a_Pawn,a_TakeDamageInfo);
 	};
-	 bool cPlugin__OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
-		return ( bool )cPlugin::OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+	 bool cPlugin__OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4, cPlayer* a_Player) {
+		return ( bool )cPlugin::OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 	};
-	 bool cPlugin__OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
-		return ( bool )cPlugin::OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+	 bool cPlugin__OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4, cPlayer* a_Player) {
+		return ( bool )cPlugin::OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 	};
 	 bool cPlugin__OnWeatherChanged( cWorld* a_World) {
 		return ( bool )cPlugin::OnWeatherChanged(a_World);
@@ -9802,7 +9808,8 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatedSign00(lua_State* tolua
      !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,10,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,11,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9817,11 +9824,12 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatedSign00(lua_State* tolua
   const AString a_Line2 = ((const AString)  tolua_tocppstring(tolua_S,7,0));
   const AString a_Line3 = ((const AString)  tolua_tocppstring(tolua_S,8,0));
   const AString a_Line4 = ((const AString)  tolua_tocppstring(tolua_S,9,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,10,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnUpdatedSign'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cPlugin__OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   bool tolua_ret = (bool)  self->cPlugin__OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Line1);
    tolua_pushcppstring(tolua_S,(const char*)a_Line2);
@@ -9854,7 +9862,8 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatingSign00(lua_State* tolu
      !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,9,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,10,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,11,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9869,11 +9878,12 @@ static int tolua_AllToLua_Lua__cPlugin_cPlugin__OnUpdatingSign00(lua_State* tolu
   AString a_Line2 = ((AString)  tolua_tocppstring(tolua_S,7,0));
   AString a_Line3 = ((AString)  tolua_tocppstring(tolua_S,8,0));
   AString a_Line4 = ((AString)  tolua_tocppstring(tolua_S,9,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,10,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlugin__OnUpdatingSign'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cPlugin__OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+   bool tolua_ret = (bool)  self->cPlugin__OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
    tolua_pushcppstring(tolua_S,(const char*)a_Line1);
    tolua_pushcppstring(tolua_S,(const char*)a_Line2);
@@ -10438,7 +10448,7 @@ public:
 			return ( void ) cPlugin_NewLua:: OnTakeDamage(a_Pawn,a_TakeDamageInfo);
 		};
 	};
-	 bool  OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
+	 bool  OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4, cPlayer* a_Player) {
 		if (push_method("OnUpdatedSign",  tolua_AllToLua_cPlugin_OnUpdatedSign00)) {
 			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
@@ -10448,15 +10458,16 @@ public:
 			tolua_pushcppstring(lua_state, (const char*)a_Line2);
 			tolua_pushcppstring(lua_state, (const char*)a_Line3);
 			tolua_pushcppstring(lua_state, (const char*)a_Line4);
-			ToluaBase::dbcall(lua_state, 9, 1);
+			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			ToluaBase::dbcall(lua_state, 10, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin_NewLua:: OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+			return ( bool ) cPlugin_NewLua:: OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 		};
 	};
-	 bool  OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
+	 bool  OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4, cPlayer* a_Player) {
 		if (push_method("OnUpdatingSign",  tolua_AllToLua_cPlugin_OnUpdatingSign00)) {
 			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
 			tolua_pushnumber(lua_state, (lua_Number)a_BlockX);
@@ -10466,12 +10477,13 @@ public:
 			tolua_pushcppstring(lua_state, (const char*)a_Line2);
 			tolua_pushcppstring(lua_state, (const char*)a_Line3);
 			tolua_pushcppstring(lua_state, (const char*)a_Line4);
-			ToluaBase::dbcall(lua_state, 9, 1);
+			tolua_pushusertype(lua_state, (void*)a_Player, "cPlayer");
+			ToluaBase::dbcall(lua_state, 10, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlugin_NewLua:: OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+			return ( bool ) cPlugin_NewLua:: OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 		};
 	};
 	 bool  OnWeatherChanged( cWorld* a_World) {
@@ -10554,11 +10566,11 @@ public:
 	 void cPlugin_NewLua__OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo) {
 		return ( void )cPlugin_NewLua::OnTakeDamage(a_Pawn,a_TakeDamageInfo);
 	};
-	 bool cPlugin_NewLua__OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4) {
-		return ( bool )cPlugin_NewLua::OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+	 bool cPlugin_NewLua__OnUpdatedSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString& a_Line1, const AString& a_Line2, const AString& a_Line3, const AString& a_Line4, cPlayer* a_Player) {
+		return ( bool )cPlugin_NewLua::OnUpdatedSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 	};
-	 bool cPlugin_NewLua__OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4) {
-		return ( bool )cPlugin_NewLua::OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4);
+	 bool cPlugin_NewLua__OnUpdatingSign( cWorld* a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString& a_Line1, AString& a_Line2, AString& a_Line3, AString& a_Line4, cPlayer* a_Player) {
+		return ( bool )cPlugin_NewLua::OnUpdatingSign(a_World,a_BlockX,a_BlockY,a_BlockZ,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
 	};
 	 bool cPlugin_NewLua__OnWeatherChanged( cWorld* a_World) {
 		return ( bool )cPlugin_NewLua::OnWeatherChanged(a_World);
@@ -11101,7 +11113,8 @@ static int tolua_AllToLua_cWorld_UpdateSign00(lua_State* tolua_S)
      !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
      !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertype(tolua_S,9,"cPlayer",1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11115,11 +11128,12 @@ static int tolua_AllToLua_cWorld_UpdateSign00(lua_State* tolua_S)
   const AString a_Line2 = ((const AString)  tolua_tocppstring(tolua_S,6,0));
   const AString a_Line3 = ((const AString)  tolua_tocppstring(tolua_S,7,0));
   const AString a_Line4 = ((const AString)  tolua_tocppstring(tolua_S,8,0));
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,9,NULL));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'UpdateSign'", NULL);
 #endif
   {
-   self->UpdateSign(a_X,a_Y,a_Z,a_Line1,a_Line2,a_Line3,a_Line4);
+   self->UpdateSign(a_X,a_Y,a_Z,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
    tolua_pushcppstring(tolua_S,(const char*)a_Line1);
    tolua_pushcppstring(tolua_S,(const char*)a_Line2);
    tolua_pushcppstring(tolua_S,(const char*)a_Line3);
