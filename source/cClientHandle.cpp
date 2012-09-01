@@ -839,7 +839,7 @@ void cClientHandle::HandleUpdateSign(
 )
 {
 	cWorld * World = m_Player->GetWorld();
-	World->UpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
+	World->UpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
 }
 
 
