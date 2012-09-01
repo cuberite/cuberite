@@ -19,10 +19,14 @@ public:
 	
 	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
-		if (a_Dir == BLOCK_FACE_BOTTOM)
+		if(!TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir))
 		{
-			return;
+			a_Dir = FindSuitableDirection(a_World, a_X, a_Y, a_Z);
+			
+			if(a_Dir == BLOCK_FACE_BOTTOM)
+				return;
 		}
+
 		a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, cTorch::DirectionToMetaData(a_Dir));
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
@@ -110,22 +114,40 @@ public:
 	{
 		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
 		// How to propagate that change up?
-		
+		// Simon: The easiest way is to calculate the position two times, shouldn´t cost much cpu power :)
+
+		if(a_Dir == BLOCK_FACE_BOTTOM)
+			return false;
+
 		AddDirection( a_X, a_Y, a_Z, a_Dir, true );
+
 		return CanBePlacedOn(a_World->GetBlock( a_X, a_Y, a_Z ), a_Dir);
 	}
-
+	
+	// Finds a suitable Direction for the Torch. Returns BLOCK_FACE_BOTTOM on failure
+	static char FindSuitableDirection(cWorld * a_World, int a_X, int a_Y, int a_Z)
+	{
+		for(int i = 1; i <= 5; i++)
+		{
+			if(TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, i))
+				return i;
+		}
+		return BLOCK_FACE_BOTTOM;
+	}
 
 	virtual bool CanBePlacedAt(cWorld * a_World, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
-		return TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir);
+		if(TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir))
+			return true;
+
+		return FindSuitableDirection(a_World, a_X, a_Y, a_Z) != BLOCK_FACE_BOTTOM;
 	}
 
 
 	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		char Dir = cTorch::MetaDataToDirection(a_World->GetBlockMeta( a_X, a_Y, a_Z));
-		return CanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
+		return TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
 };
 

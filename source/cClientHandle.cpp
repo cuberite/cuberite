@@ -635,7 +635,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			if(Handler->IgnoreBuildCollision())
 			{
 				Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-				World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+				// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 			}
 			else
 			{
