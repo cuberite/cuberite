@@ -36,7 +36,7 @@ public:
 	virtual void SendBlockChange  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendChunkData    (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendDestroyEntity(const cEntity & a_Entity) override;
-	virtual void SendLogin        (const cPlayer & a_Player) override;
+	virtual void SendLogin        (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendPlayerSpawn  (const cPlayer & a_Player) override;
 	virtual void SendSpawnMob     (const cMonster & a_Mob) override;
 	virtual void SendUnloadChunk  (int a_ChunkX, int a_ChunkZ) override;
@@ -64,6 +64,7 @@ protected:
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
 	
 	// DEBUG:
+	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor2;
 	AString m_DataToSend;
 	int m_CurrentIn, m_CurrentOut;
 	int m_EncIn, m_EncOut;
@@ -75,6 +76,10 @@ protected:
 	
 	// Items in slots are sent differently
 	virtual void WriteItem(const cItem & a_Item) override;
+	virtual int  ParseItem(cItem & a_Item) override;
+	
+	virtual void SendCompass(const cWorld & a_World);
+	virtual void SendEncryptionKeyRequest(const AString & a_Key);
 	
 	/// Decrypts the key and nonce, checks nonce, starts the symmetric encryption
 	void HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce);

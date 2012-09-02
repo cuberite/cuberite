@@ -263,9 +263,9 @@ public:
 	bool DigBlock   (int a_X, int a_Y, int a_Z);									//tolua_export
 	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player );									//tolua_export
 
-	const double & GetSpawnX() { return m_SpawnX; }														//tolua_export
-	const double & GetSpawnY();																			//tolua_export
-	const double & GetSpawnZ() { return m_SpawnZ; }														//tolua_export
+	const double & GetSpawnX(void) const { return m_SpawnX; }														// tolua_export
+	const double & GetSpawnY(void) const { return m_SpawnY; }														// tolua_export
+	const double & GetSpawnZ(void) const { return m_SpawnZ; }														// tolua_export
 
 	inline cSimulatorManager *GetSimulatorManager() { return m_SimulatorManager; }
 	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }

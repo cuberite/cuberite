@@ -1205,15 +1205,6 @@ int cWorld::GetHeight( int a_X, int a_Z )
 
 
 
-const double & cWorld::GetSpawnY(void)
-{
-	return m_SpawnY;
-}
-
-
-
-
-
 void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);

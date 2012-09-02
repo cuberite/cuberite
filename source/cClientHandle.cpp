@@ -244,7 +244,7 @@ void cClientHandle::Authenticate(void)
 	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
 
 	// Return a server login packet
-	m_Protocol->SendLogin(*m_Player);
+	m_Protocol->SendLogin(*m_Player, *World);
 
 	// Send Weather if raining:
 	if ((World->GetWeather() == 1) || (World->GetWeather() == 2))

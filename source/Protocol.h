@@ -24,6 +24,7 @@ class cPawn;
 class cPickup;
 class cMonster;
 class cChunkDataSerializer;
+class cWorld;
 
 
 
@@ -60,7 +61,7 @@ public:
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) = 0;
 	virtual void SendInventorySlot    (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive        (int a_PingID) = 0;
-	virtual void SendLogin            (const cPlayer & a_Player) = 0;
+	virtual void SendLogin            (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendMetadata         (const cEntity & a_Entity) = 0;
 	virtual void SendPickupSpawn      (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation) = 0;

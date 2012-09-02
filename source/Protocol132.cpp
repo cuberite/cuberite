@@ -52,11 +52,12 @@ enum
 {
 	PACKET_KEEP_ALIVE       = 0x00,
 	PACKET_LOGIN            = 0x01,
+	PACKET_COMPASS          = 0x06,
 	PACKET_PLAYER_SPAWN     = 0x14,
 	PACKET_SPAWN_MOB        = 0x18,
 	PACKET_DESTROY_ENTITIES = 0x1d,
 	PACKET_CHUNK_DATA       = 0x33,
-	PACKET_BLOCK_CHANGE     = 0x34,
+	PACKET_BLOCK_CHANGE     = 0x35,
 	PACKET_BLOCK_ACTION     = 0x36,
 } ;
 
@@ -156,11 +157,11 @@ void cProtocol132::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
+	{
 	cCSLock Lock(m_CSPacket);
 	
 	// Pre-chunk not used in 1.3.2. Finally.
 
-	//*
 	// Send the chunk data:
 	// Chunk data seems to break the connection for some reason; without it, the connection lives indefinitely
 	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
@@ -169,7 +170,9 @@ void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	WriteInt (a_ChunkZ);
 	SendData(Serialized.data(), Serialized.size());
 	Flush();
-	//*/
+	}
+	// Enabling the sleep here sometimes makes the client accept us and spawn us in the world. But it makes the connection lag behind, ultimately timing out
+	// cSleep::MilliSleep(500);
 }
 
 
@@ -201,7 +204,7 @@ void cProtocol132::SendKeepAlive(int a_PingID)
 
 
 
-void cProtocol132::SendLogin(const cPlayer & a_Player)
+void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_LOGIN);
@@ -213,6 +216,8 @@ void cProtocol132::SendLogin(const cPlayer & a_Player)
 	WriteByte  (0);  // Unused, used to be world height
 	WriteByte  (8);  // Client list width or something
 	Flush();
+	
+	SendCompass(a_World);
 }
 
 
@@ -278,7 +283,7 @@ void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 int cProtocol132::ParsePacket(unsigned char a_PacketType)
 {
 	// DEBUG:
-	LOGD("Received packet 0x%02x, current bytecount %d, enc %d", a_PacketType, m_CurrentIn, m_EncIn);
+	LOGD("Received packet 0x%02x, %d B avail; BM %d, enc %d", a_PacketType, m_ReceivedData.GetReadableSpace(), m_CurrentIn, m_EncIn);
 	
 	switch (a_PacketType)
 	{
@@ -327,18 +332,12 @@ int cProtocol132::ParseHandshake(void)
 	HANDLE_PACKET_READ(ReadBEInt,           int,     ServerPort);
 	m_Username = Username;
 
+	// Send a 0xFD Encryption Key Request http://wiki.vg/Protocol#0xFD
 	AString key;
 	CryptoPP::StringSink sink(key);  // GCC won't allow inline instantiation in the following line, damned temporary refs
 	cRoot::Get()->GetServer()->GetPublicKey().Save(sink);
-	
-	// Send a 0xFD Encryption Key Request http://wiki.vg/Protocol#0xFD
-	WriteByte((char)0xfd);
-	WriteString("MCServer");
-	WriteShort((short)key.size());
-	SendData(key.data(), key.size());
-	WriteShort(4);
-	WriteInt((int)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
-	Flush();
+	SendEncryptionKeyRequest(key);
+
 	return PARSE_OK;
 }
 
@@ -440,22 +439,30 @@ void cProtocol132::SendData(const char * a_Data, int a_Size)
 void cProtocol132::Flush(void)
 {
 	// DEBUG
+	ASSERT(m_CSPacket.IsLockedByCurrentThread());  // Did all packets lock the CS properly?
+	
 	if (m_DataToSend.empty())
 	{
 		LOGD("Flushing empty");
 		return;
 	}
-	LOGD("Flushing packet 0x%02x, %d bytes; %d bytes out, %d enc out", (unsigned char)m_DataToSend[0], m_DataToSend.size(), m_CurrentOut, m_EncOut);
+	LOGD("Flushing packet 0x%02x, %d B; %d B out, %d enc out", (unsigned char)m_DataToSend[0], m_DataToSend.size(), m_CurrentOut, m_EncOut);
 	const char * a_Data = m_DataToSend.data();
 	int a_Size = m_DataToSend.size();
 	if (m_IsEncrypted)
 	{
 		m_EncOut += a_Size;
-		byte Encrypted[4096];  // Larger buffer, we may be sending lots of data (chunks)
+		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
 			int NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, (byte *)a_Data, NumBytes);
+			
+			// DEBUG: decrypt the data to check if encryption works:
+			byte Decrypted[sizeof(Encrypted)];
+			m_Decryptor2.ProcessData(Decrypted, Encrypted, NumBytes);
+			ASSERT(memcmp(Decrypted, a_Data, NumBytes) == 0);
+			
 			super::SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -466,7 +473,7 @@ void cProtocol132::Flush(void)
 		super::SendData(a_Data, a_Size);
 	}
 	m_DataToSend.clear();
-	// cSleep::MilliSleep(300);
+	// cSleep::MilliSleep(400);
 }
 
 
@@ -494,6 +501,75 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	
 	// TODO: Implement enchantments
 	WriteShort(-1);
+}
+
+
+
+
+
+int cProtocol132::ParseItem(cItem & a_Item)
+{
+	HANDLE_PACKET_READ(ReadBEShort, short, ItemType);
+
+	if (ItemType <= -1)
+	{
+		a_Item.Empty();
+		return PARSE_OK;
+	}
+	a_Item.m_ItemType = ItemType;
+
+	HANDLE_PACKET_READ(ReadChar,    char,  ItemCount);
+	HANDLE_PACKET_READ(ReadBEShort, short, ItemDamage);
+	a_Item.m_ItemCount  = ItemCount;
+	// a_Item.m_ItemDamage = ItemDamage;
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+	}
+
+	HANDLE_PACKET_READ(ReadBEShort, short, EnchantNumBytes);
+	if (EnchantNumBytes <= 0)
+	{
+		return PARSE_OK;
+	}
+		
+	// TODO: Enchantment not implemented yet!
+	if (!m_ReceivedData.SkipRead(EnchantNumBytes))
+	{
+		return PARSE_INCOMPLETE;
+	}
+	
+	return PARSE_OK;
+}
+
+
+
+
+
+void cProtocol132::SendCompass(const cWorld & a_World)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_COMPASS);
+	WriteInt((int)(a_World.GetSpawnX()));
+	WriteInt((int)(a_World.GetSpawnY()));
+	WriteInt((int)(a_World.GetSpawnZ()));
+	Flush();
+}
+
+
+
+
+
+void cProtocol132::SendEncryptionKeyRequest(const AString & a_Key)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte((char)0xfd);
+	WriteString("MCServer");
+	WriteShort((short)a_Key.size());
+	SendData(a_Key.data(), a_Key.size());
+	WriteShort(4);
+	WriteInt((int)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+	Flush();
 }
 
 
@@ -530,11 +606,14 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 		return;
 	}
 	
-	// Send encryption key response:
-	WriteByte((char)0xfc);
-	WriteShort(0);
-	WriteShort(0);
-	Flush();
+	{
+		// Send encryption key response:
+		cCSLock Lock(m_CSPacket);
+		WriteByte((char)0xfc);
+		WriteShort(0);
+		WriteShort(0);
+		Flush();
+	}
 	
 	StartEncryption(DecryptedKey);
 	return;
@@ -548,6 +627,7 @@ void cProtocol132::StartEncryption(const byte * a_Key)
 {
 	m_Encryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
 	m_Decryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
+	m_Decryptor2.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
 	m_IsEncrypted = true;
 }
 

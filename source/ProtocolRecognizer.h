@@ -48,7 +48,7 @@ public:
 	virtual void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value) override;
 	virtual void SendInventorySlot    (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive        (int a_PingID) override;
-	virtual void SendLogin            (const cPlayer & a_Player) override;
+	virtual void SendLogin            (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendMetadata         (const cEntity & a_Entity) override;
 	virtual void SendPickupSpawn      (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation) override;

@@ -238,10 +238,10 @@ void cProtocolRecognizer::SendKeepAlive(int a_PingID)
 
 
 
-void cProtocolRecognizer::SendLogin(const cPlayer & a_Player)
+void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendLogin(a_Player);
+	m_Protocol->SendLogin(a_Player, a_World);
 }
 
 

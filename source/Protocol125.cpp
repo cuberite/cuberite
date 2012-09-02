@@ -417,8 +417,9 @@ void cProtocol125::SendKeepAlive(int a_PingID)
 
 
 
-void cProtocol125::SendLogin(const cPlayer & a_Player)
+void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
+	UNUSED(a_World);
 	cCSLock Lock(m_CSPacket);
 
 	WriteByte  (PACKET_LOGIN);
