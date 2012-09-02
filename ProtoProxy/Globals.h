@@ -208,6 +208,7 @@ public:
 
 #include "CryptoPP/osrng.h"
 #include "CryptoPP/rsa.h"
+#include "CryptoPP/modes.h"
 
 using namespace CryptoPP;
 
