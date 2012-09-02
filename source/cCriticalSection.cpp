@@ -84,6 +84,7 @@ void cCriticalSection::Unlock()
 
 
 
+#ifdef _DEBUG
 bool cCriticalSection::IsLocked(void)
 {
 	return m_IsLocked;
@@ -97,6 +98,7 @@ bool cCriticalSection::IsLockedByCurrentThread(void)
 {
 	return m_IsLocked && (m_OwningThreadID == cIsThread::GetCurrentID());
 }
+#endif  // _DEBUG
 
 
 
