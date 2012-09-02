@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/02/12 15:32:35.
+** Generated automatically by tolua++-1.0.92 on 09/02/12 15:53:59.
 */
 
 #ifndef __cplusplus
@@ -167,29 +167,28 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"cStringMap");
- tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"cBlockArea");
+ tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"Lua__cTCPLink");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cRoot");
+ tolua_usertype(tolua_S,"cTCPLink");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cMCLogger");
  tolua_usertype(tolua_S,"cClientHandle");
- tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cStairs");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"Lua__cPickup");
+ tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"cLuaChunk");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cTCPLink");
+ tolua_usertype(tolua_S,"Lua__cTCPLink");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"cPlugin_Lua");
@@ -198,15 +197,15 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cBlockEntity");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"cEntity");
- tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"Lua__cPlugin");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"override");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"Lua__cPlayer");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cPlugin");
@@ -13439,36 +13438,6 @@ static int tolua_AllToLua_cChestEntity_UsedBy00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: tolua_var_2 of class  cChestEntity */
-#ifndef TOLUA_DISABLE_tolua_get_cChestEntity_override
-static int tolua_get_cChestEntity_override(lua_State* tolua_S)
-{
-  cChestEntity* self = (cChestEntity*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'tolua_var_2'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)&self->tolua_var_2,"override");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: tolua_var_2 of class  cChestEntity */
-#ifndef TOLUA_DISABLE_tolua_set_cChestEntity_override
-static int tolua_set_cChestEntity_override(lua_State* tolua_S)
-{
-  cChestEntity* self = (cChestEntity*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'tolua_var_2'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"override",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->tolua_var_2 = *((override*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetChestHeight of class  cChestEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cChestEntity_GetChestHeight00
 static int tolua_AllToLua_cChestEntity_GetChestHeight00(lua_State* tolua_S)
@@ -21842,7 +21811,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cChestEntity_GetSlot00);
    tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cChestEntity_SetSlot00);
    tolua_function(tolua_S,"UsedBy",tolua_AllToLua_cChestEntity_UsedBy00);
-   tolua_variable(tolua_S,"override",tolua_get_cChestEntity_override,tolua_set_cChestEntity_override);
    tolua_function(tolua_S,"GetChestHeight",tolua_AllToLua_cChestEntity_GetChestHeight00);
    tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cChestEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);

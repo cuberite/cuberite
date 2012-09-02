@@ -41,7 +41,7 @@ public:
 
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	virtual void UsedBy( cPlayer * a_Player ) override;	//tolua_export
+	virtual void UsedBy( cPlayer * a_Player );	//tolua_export
 
 	cChestEntity * GetJoinedChest() { return m_JoinedChest; } // NOTE: Is this a safe function? Should it be exported to Lua?
 	void SetJoinedChest(cChestEntity *a_Chest) { m_JoinedChest = a_Chest; }
