@@ -149,6 +149,11 @@ public:
 		char Dir = cTorch::MetaDataToDirection(a_World->GetBlockMeta( a_X, a_Y, a_Z));
 		return TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
+
+	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
+	{
+		return 0;
+	}
 };
 
 
