@@ -12,7 +12,8 @@
 
 
 
-#define NEEDBYTES(Num) if (!CanReadBytes(Num)) return false;
+#define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false;
+#define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false;
 
 
 
@@ -121,10 +122,19 @@ bool cByteBuffer::CanReadBytes(int a_Count) const
 
 
 
+bool cByteBuffer::CanWriteBytes(int a_Count) const
+{
+	return (a_Count <= GetFreeSpace());
+}
+
+
+
+
+
 bool cByteBuffer::ReadChar(char & a_Value)
 {
 	NEEDBYTES(1);
-	a_Value = m_Buffer[m_ReadPos++];
+	ReadBuf(&a_Value, 1);
 	return true;
 }
 
@@ -135,7 +145,7 @@ bool cByteBuffer::ReadChar(char & a_Value)
 bool cByteBuffer::ReadByte(unsigned char & a_Value)
 {
 	NEEDBYTES(1);
-	a_Value = (unsigned char)(m_Buffer[m_ReadPos++]);
+	ReadBuf(&a_Value, 1);
 	return true;
 }
 
@@ -228,6 +238,106 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 
 
 
+bool cByteBuffer::WriteChar(char a_Value)
+{
+	PUTBYTES(1);
+	return WriteBuf(&a_Value, 1);
+}
+
+
+
+
+
+bool cByteBuffer::WriteByte(unsigned char a_Value)
+{
+	PUTBYTES(1);
+	return WriteBuf(&a_Value, 1);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEShort(short a_Value)
+{
+	PUTBYTES(2);
+	short Converted = htons(a_Value);
+	return WriteBuf(&Converted, 2);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEInt(int a_Value)
+{
+	PUTBYTES(4);
+	int Converted = HostToNetwork4(&a_Value);
+	return WriteBuf(&Converted, 4);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEInt64(Int64 a_Value)
+{
+	PUTBYTES(8);
+	Int64 Converted = HostToNetwork8(&a_Value);
+	return WriteBuf(&Converted, 8);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEFloat(float a_Value)
+{
+	PUTBYTES(4);
+	int Converted = HostToNetwork4(&a_Value);
+	return WriteBuf(&Converted, 4);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEDouble(double a_Value)
+{
+	PUTBYTES(8);
+	Int64 Converted = HostToNetwork8(&a_Value);
+	return WriteBuf(&Converted, 8);
+}
+
+
+
+
+
+
+bool cByteBuffer::WriteBool(bool a_Value)
+{
+	return WriteChar(a_Value ? 1 : 0);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEUTF16String16(const AString & a_Value)
+{
+	PUTBYTES(2);
+	AString UTF16BE;
+	UTF8ToRawBEUTF16(a_Value.data(), a_Value.size(), UTF16BE);
+	WriteBEShort((short)(UTF16BE.size() / 2));
+	PUTBYTES(UTF16BE.size());
+	WriteBuf(UTF16BE.data(), UTF16BE.size());
+	return true;
+}
+
+
+
+
+
 bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
 {
 	NEEDBYTES(a_Count);
@@ -245,6 +355,30 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
 	// Read the rest of the bytes in a single read (guaranteed to fit):
 	memcpy(Dst, m_Buffer + m_ReadPos, a_Count);
 	m_ReadPos += a_Count;
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::WriteBuf(const void * a_Buffer, int a_Count)
+{
+	PUTBYTES(a_Count);
+	char * Src = (char *)a_Buffer;  // So that we can do byte math
+	int BytesToEndOfBuffer = m_BufferSize - m_WritePos;
+	if (BytesToEndOfBuffer < a_Count)
+	{
+		// Reading across the ringbuffer end, read the first part and adjust parameters:
+		memcpy(m_Buffer + m_WritePos, Src, BytesToEndOfBuffer);
+		Src += BytesToEndOfBuffer;
+		a_Count -= BytesToEndOfBuffer;
+		m_WritePos = 0;
+	}
+	
+	// Read the rest of the bytes in a single read (guaranteed to fit):
+	memcpy(m_Buffer + m_WritePos, Src, a_Count);
+	m_WritePos += a_Count;
 	return true;
 }
 

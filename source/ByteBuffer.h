@@ -45,6 +45,9 @@ public:
 	/// Returns true if the specified amount of bytes are available for reading
 	bool CanReadBytes(int a_Count) const;
 
+	/// Returns true if the specified amount of bytes are available for writing
+	bool CanWriteBytes(int a_Count) const;
+
 	// Read the specified datatype and advance the read pointer; return true if successfully read:
 	bool ReadChar           (char & a_Value);
 	bool ReadByte           (unsigned char & a_Value);
@@ -56,13 +59,27 @@ public:
 	bool ReadBool           (bool & a_Value);
 	bool ReadBEUTF16String16(AString & a_Value);
 	
-	/// Reads a_Count bytes into a_Buffer; return true if successful
+	// Write the specified datatype; return true if successfully written
+	bool WriteChar           (char a_Value);
+	bool WriteByte           (unsigned char a_Value);
+	bool WriteBEShort        (short  a_Value);
+	bool WriteBEInt          (int    a_Value);
+	bool WriteBEInt64        (Int64  a_Value);
+	bool WriteBEFloat        (float  a_Value);
+	bool WriteBEDouble       (double a_Value);
+	bool WriteBool           (bool   a_Value);
+	bool WriteBEUTF16String16(const AString & a_Value);
+	
+	/// Reads a_Count bytes into a_Buffer; returns true if successful
 	bool ReadBuf(void * a_Buffer, int a_Count);
 	
-	/// Reads a_Count bytes into a_String; return true if successful
+	/// Writes a_Count bytes into a_Buffer; returns true if successful
+	bool WriteBuf(const void * a_Buffer, int a_Count);
+	
+	/// Reads a_Count bytes into a_String; returns true if successful
 	bool ReadString(AString & a_String, int a_Count);
 	
-	/// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
+	/// Reads 2 * a_NumChars bytes and interprets it as a UTF16-BE string, converting it into UTF8 string a_String
 	bool ReadUTF16String(AString & a_String, int a_NumChars);
 	
 	/// Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer
