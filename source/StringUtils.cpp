@@ -465,3 +465,59 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
     }
 
    --------------------------------------------------------------------- */
+   
+
+
+
+
+/*
+format binary data this way:
+00001234: 31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66    1234567890abcdef
+*/
+#define HEX(x) ((x) > 9 ? (x) + 'A' - 10 : (x) + '0')
+
+AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_LineLength)
+{
+	ASSERT(a_LineLength <= 120);  // Due to using a fixed size line buffer; increase line[]'s size to lift this max
+	char line[512];
+	char * p;
+	char * q;
+	
+	a_Out.reserve(a_Size / a_LineLength * (18 + 6 * a_LineLength));
+	for (int i = 0; i < a_Size; i += a_LineLength)
+	{
+		int k = a_Size - i;
+		if (k > a_LineLength)
+		{
+			k = a_LineLength;
+		}
+		memset(line, ' ', sizeof(line));        
+		line[sprintf(line, "%08x:", i)] = 32;  // Remove the terminating NULL that sprintf puts there
+		p = line + 10;
+		q = p + 2 + a_LineLength * 3 + 1;
+		for (int j = 0; j < k; j++)
+		{
+			unsigned char c = ((unsigned char *)a_Data)[i + j];
+			p[0] = HEX(c >> 4);
+			p[1] = HEX(c & 0xf);
+			if (c >= ' ')
+			{
+				q[0] = (char)c;
+			}
+			else
+			{
+				q[0] = '.';
+			}
+			p += 3;
+			q ++;
+		}  // for j
+		q[0] = '\n';
+		q[1] = 0;
+		a_Out.append(line);
+	}  // for i
+	return a_Out;
+}
+
+
+
+

@@ -57,6 +57,8 @@ extern AString & RawBEToUTF8(short * a_RawData, int a_NumShorts, AString & a_UTF
 /// Converts a UTF-8 string into a UTF-16 BE string, packing that back into AString; return a ref to a_UTF16
 extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16);
 
+/// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
+extern AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_BytesPerLine);
 
 
 // If you have any other string helper functions, declare them here
