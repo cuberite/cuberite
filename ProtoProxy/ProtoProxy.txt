@@ -1,0 +1,25 @@
+
+// ProtoProxy.txt
+
+// A readme for the project
+
+/*
+ProtoProxy
+==========
+
+This is a project to create a proxy for the MineCraft protocol, allowing anyone to view the data sent over a network connection between a client and a server. This, in fact, performs a kind of Man-In-The-Middle (MITM) attack on the protocol by tapping in between the connection points and providing a decrypter and an encrypter for each.
+
+In order to catch the encryption parameters, the MC protocol needs to be understood at least a little bit at the beginning, when the cryptography parameters are exchanged.
+
+This project is currently Windows-only and I don't plan on making it multi-platform, although the effort needed for doing so should be minimal.
+
+The proxy only works on the localhost connection. It listens on port 25565 and expects the underlying MC server to run on port 25564.
+
+
+
+*/
+
+
+
+
+
