@@ -1028,7 +1028,7 @@ int cProtocol125::ParseLogin(void)
 		LOGWARNING("Login Username (\"%s\") does not match Handshake username (\"%s\") for client @ \"%s\", kicking",
 			Username.c_str(),
 			m_Username.c_str(),
-			m_Client->GetSocket().GetIPString().c_str()
+			m_Client->GetIPString().c_str()
 		);
 		m_Client->Kick("Hacked client");  // Don't tell them why we don't want them
 		return PARSE_OK;

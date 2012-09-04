@@ -60,8 +60,8 @@ public:
 	cClientHandle(const cSocket & a_Socket, int a_ViewDistance);
 	~cClientHandle();
 
-	const cSocket & GetSocket(void) const {return m_Socket; }
-	cSocket &       GetSocket(void)       {return m_Socket; }
+	cSocket &       GetSocket  (void)       { return m_Socket; }
+	const AString & GetIPString(void) const { return m_Socket.GetIPString(); }
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 

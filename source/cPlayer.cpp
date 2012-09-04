@@ -57,7 +57,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_FoodTickTimer(0)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
-		a_PlayerName.c_str(), a_Client->GetSocket().GetIPString().c_str(),
+		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
 		this, GetUniqueID()
 	);
 	m_EntityType = eEntityType_Player;

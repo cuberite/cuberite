@@ -1546,8 +1546,11 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 void cClientHandle::GetOutgoingData(AString & a_Data)
 {
 	// Data can be sent to client
-	m_OutgoingData.ReadAll(a_Data);
-	m_OutgoingData.CommitRead();
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		m_OutgoingData.ReadAll(a_Data);
+		m_OutgoingData.CommitRead();
+	}
 
 	// Disconnect player after all packets have been sent
 	if (m_bKicking && a_Data.empty())
