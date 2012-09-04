@@ -31,7 +31,9 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 	}
 	
 	printf("Generating protocol encryption keypair...\n");
-	AutoSeededRandomPool rng;
+	time_t CurTime = time(NULL);
+	RandomPool rng;
+	rng.Put((const byte *)&CurTime, sizeof(CurTime));
 	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
 	RSA::PublicKey pk(m_PrivateKey);
 	m_PublicKey = pk;
@@ -40,7 +42,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 	sockaddr_in local;
 	memset(&local, 0, sizeof(local));
 	local.sin_family = AF_INET;
-	local.sin_addr.s_addr = htonl(0x7f000001);  // localhost
+	local.sin_addr.s_addr = 0;  // All interfaces
 	local.sin_port = htons(a_ListenPort);
 	bind(m_ListenSocket, (sockaddr *)&local, sizeof(local));
 	listen(m_ListenSocket, 1);

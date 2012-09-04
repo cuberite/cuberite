@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Connection.h"
 #include "Server.h"
+#include <iostream>
 
 
 
@@ -16,7 +17,7 @@
 	{ \
 		if (!m_ClientBuffer.Proc(Var)) \
 		{ \
-			return; \
+			return false; \
 		} \
 	}
 
@@ -25,7 +26,7 @@
 	{ \
 		if (!m_ServerBuffer.Proc(Var)) \
 		{ \
-			return; \
+			return false; \
 		} \
 	}
 
@@ -34,7 +35,55 @@
 #define CLIENTENCRYPTSEND(...) SendEncryptedData(m_ClientSocket, m_ClientEncryptor, __VA_ARGS__, "Client")
 #define SERVERENCRYPTSEND(...) SendEncryptedData(m_ServerSocket, m_ServerEncryptor, __VA_ARGS__, "Server")
 
+#define COPY_TO_SERVER() \
+	{ \
+		AString ToServer; \
+		m_ClientBuffer.ReadAgain(ToServer); \
+		if (m_ServerState == csUnencrypted) \
+		{ \
+			SERVERSEND(ToServer.data(), ToServer.size()); \
+		} \
+		else \
+		{ \
+			SERVERENCRYPTSEND(ToServer.data(), ToServer.size()); \
+		} \
+	}
+
+#define COPY_TO_CLIENT() \
+	{ \
+		AString ToClient; \
+		m_ServerBuffer.ReadAgain(ToClient); \
+		if (m_ClientState == csUnencrypted) \
+		{ \
+			CLIENTSEND(ToClient.data(), ToClient.size()); \
+		} \
+		else \
+		{ \
+			CLIENTENCRYPTSEND(ToClient.data(), ToClient.size()); \
+		} \
+	}
+
+#define HANDLE_CLIENT_READ(Proc) \
+	{ \
+		if (!Proc()) \
+		{ \
+			m_ClientBuffer.ResetRead(); \
+			return true; \
+		} \
+	}
+	
+#define HANDLE_SERVER_READ(Proc) \
+	{ \
+		if (!Proc()) \
+		{ \
+			m_ServerBuffer.ResetRead(); \
+			return true; \
+		} \
+	}
+	
+	
 #define MAX_ENC_LEN 1024
+
 
 
 
@@ -46,7 +95,17 @@ typedef unsigned char Byte;
 
 enum
 {
+	PACKET_KEEPALIVE               = 0x00,
+	PACKET_LOGIN                   = 0x01,
 	PACKET_HANDSHAKE               = 0x02,
+	PACKET_CHAT_MESSAGE            = 0x03,
+	PACKET_TIME_UPDATE             = 0x04,
+	PACKET_ENTITY_EQUIPMENT        = 0x05,
+	PACKET_COMPASS                 = 0x06,
+	PACKET_PLAYER_POSITION_LOOK    = 0x0d,
+	PACKET_PLAYER_ABILITIES        = 0xca,
+	PACKET_LOCALE_AND_VIEW         = 0xcc,
+	PACKET_CLIENT_STATUSES         = 0xcd,
 	PACKET_ENCRYPTION_KEY_RESPONSE = 0xfc,
 	PACKET_ENCRYPTION_KEY_REQUEST  = 0xfd,
 	PACKET_PING                    = 0xfe,
@@ -150,7 +209,7 @@ void cConnection::Log(const char * a_Format, ...)
 	fputs(FullMsg.c_str(), m_LogFile);
 	
 	// Log to screen:
-	puts(FullMsg.c_str());
+	std::cout << FullMsg;
 }
 
 
@@ -166,14 +225,16 @@ void cConnection::DataLog(const void * a_Data, int a_Size, const char * a_Format
 	va_end(args);
 	AString FullMsg;
 	AString Hex;
-	Printf(FullMsg, "[%5.3f] %s\n%s", GetRelativeTime(), msg.c_str(), CreateHexDump(Hex, a_Data, a_Size, 16).c_str());
+	Printf(FullMsg, "[%5.3f] %s\n%s\n", GetRelativeTime(), msg.c_str(), CreateHexDump(Hex, a_Data, a_Size, 16).c_str());
 	
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fputs(FullMsg.c_str(), m_LogFile);
 	
+	/*
 	// Log to screen:
-	puts(FullMsg.c_str());
+	std::cout << FullMsg;
+	//*/
 }
 
 
@@ -369,13 +430,16 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 	
 	while (m_ClientBuffer.CanReadBytes(1))
 	{
+		Log("Decoding client's packets, there are now %d bytes in the queue", m_ClientBuffer.GetReadableSpace());
 		unsigned char PacketType;
 		m_ClientBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
-			case PACKET_ENCRYPTION_KEY_RESPONSE: HandleClientEncryptionKeyResponse(); break;
-			case PACKET_HANDSHAKE:               HandleClientHandshake(); break;
-			case PACKET_PING:                    HandleClientPing(); break;
+			case PACKET_CLIENT_STATUSES:         HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
+			case PACKET_ENCRYPTION_KEY_RESPONSE: HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
+			case PACKET_HANDSHAKE:               HANDLE_CLIENT_READ(HandleClientHandshake); break;
+			case PACKET_LOCALE_AND_VIEW:         HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
+			case PACKET_PING:                    HANDLE_CLIENT_READ(HandleClientPing); break;
 			default:
 			{
 				if (m_ClientState == csEncryptedUnderstood)
@@ -427,13 +491,22 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 	
 	while (m_ServerBuffer.CanReadBytes(1))
 	{
+		Log("Decoding server's packets, there are now %d bytes in the queue", m_ServerBuffer.GetReadableSpace());
 		unsigned char PacketType;
 		m_ServerBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
-			case PACKET_ENCRYPTION_KEY_REQUEST:  HandleServerEncryptionKeyRequest(); break;
-			case PACKET_ENCRYPTION_KEY_RESPONSE: HandleServerEncryptionKeyResponse(); break;
-			case PACKET_KICK:                    HandleServerKick(); break;
+			case PACKET_KEEPALIVE:               HANDLE_SERVER_READ(HandleServerKeepAlive); break;
+			case PACKET_LOGIN:                   HANDLE_SERVER_READ(HandleServerLogin); break;
+			case PACKET_CHAT_MESSAGE:            HANDLE_SERVER_READ(HandleServerChatMessage); break;
+			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
+			case PACKET_ENTITY_EQUIPMENT:        HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
+			case PACKET_COMPASS:                 HANDLE_SERVER_READ(HandleServerCompass); break;
+			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
+			case PACKET_ENCRYPTION_KEY_REQUEST:  HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
+			case PACKET_ENCRYPTION_KEY_RESPONSE: HANDLE_SERVER_READ(HandleServerEncryptionKeyResponse); break;
+			case PACKET_KICK:                    HANDLE_SERVER_READ(HandleServerKick); break;
 			default:
 			{
 				if (m_ServerState == csEncryptedUnderstood)
@@ -467,33 +540,48 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 
 
 
-void cConnection::HandleClientEncryptionKeyResponse(void)
+bool cConnection::HandleClientClientStatuses(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, EncKeyLength);
-	AString EncKey;
-	if (!m_ClientBuffer.ReadString(EncKey, EncKeyLength))
-	{
-		return;
-	}
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, EncNonceLength);
-	AString EncNonce;
-	if (!m_ClientBuffer.ReadString(EncNonce, EncNonceLength))
-	{
-		return;
-	}
-	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
-	{
-		Log("Client: Too long encryption params");
-		return;
-	}
-	StartClientEncryption(EncKey, EncNonce);
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, Statuses);
+	Log("Received a PACKET_CLIENT_STATUSES from the CLIENT:");
+	Log("  Statuses = %d", Statuses);
+	
+	COPY_TO_SERVER();
+	return true;
 }
 
 
 
 
 
-void cConnection::HandleClientHandshake(void)
+bool cConnection::HandleClientEncryptionKeyResponse(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, EncKeyLength);
+	AString EncKey;
+	if (!m_ClientBuffer.ReadString(EncKey, EncKeyLength))
+	{
+		return true;
+	}
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, EncNonceLength);
+	AString EncNonce;
+	if (!m_ClientBuffer.ReadString(EncNonce, EncNonceLength))
+	{
+		return true;
+	}
+	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	{
+		Log("Client: Too long encryption params");
+		return true;
+	}
+	StartClientEncryption(EncKey, EncNonce);
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientHandshake(void)
 {
 	// Read the packet from the client:
 	HANDLE_CLIENT_PACKET_READ(ReadByte,            Byte,    ProtocolVersion);
@@ -502,7 +590,7 @@ void cConnection::HandleClientHandshake(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,     ServerPort);
 	m_ClientBuffer.CommitRead();
 	
-	// Send the same packet to the server:
+	// Send the same packet to the server, but with our port:
 	cByteBuffer ToServer(512);
 	ToServer.WriteByte           (PACKET_HANDSHAKE);
 	ToServer.WriteByte           (ProtocolVersion);
@@ -510,24 +598,90 @@ void cConnection::HandleClientHandshake(void)
 	ToServer.WriteBEUTF16String16(ServerHost);
 	ToServer.WriteBEInt          (m_Server.GetConnectPort());
 	SERVERSEND(ToServer);
+	return true;
 }
 
 
 
 
 
-void cConnection::HandleClientPing(void)
+bool cConnection::HandleClientLocaleAndView(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Locale);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ViewDistance);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ChatFlags);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    Difficulty);
+	Log("Received a PACKET_LOCALE_AND_VIEW from the client");
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientPing(void)
 {
 	Log("Received a PACKET_PING from the CLIENT");
 	m_ClientBuffer.ResetRead();
 	SERVERSEND(m_ClientBuffer);
+	return true;
 }
 
 
 
 
 
-void cConnection::HandleServerEncryptionKeyRequest(void)
+bool cConnection::HandleClientPlayerPositionLook(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Yaw);
+	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Pitch);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,     char,   IsOnGround);
+	Log("Received a PACKET_PLAYER_POSITION_LOOK from the client");
+
+	// TODO: list packet contents
+	
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerChatMessage(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Message);
+	Log("Received a PACKET_CHAT_MESSAGE from the server:");
+	Log("  Message = \"%s\"", Message);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerCompass(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnZ);
+	Log("Received PACKET_COMPASS from the server:");
+	Log("  Spawn = {%d, %d, %d}", SpawnX, SpawnY, SpawnZ);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEncryptionKeyRequest(void)
 {
 	// Read the packet from the server:
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, ServerID);
@@ -535,13 +689,13 @@ void cConnection::HandleServerEncryptionKeyRequest(void)
 	AString PublicKey;
 	if (!m_ServerBuffer.ReadString(PublicKey, PublicKeyLength))
 	{
-		return;
+		return false;
 	}
 	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   NonceLength);
 	AString Nonce;
 	if (!m_ServerBuffer.ReadString(Nonce, NonceLength))
 	{
-		return;
+		return false;
 	}
 	Log("Got PACKET_ENCRYPTION_KEY_REQUEST from the SERVER:");
 	Log("  ServerID = %s", ServerID.c_str());
@@ -562,37 +716,256 @@ void cConnection::HandleServerEncryptionKeyRequest(void)
 	ToClient.WriteBEShort        (4);
 	ToClient.WriteBEInt          (m_Nonce);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 	CLIENTSEND(ToClient);
+	return true;
 }
 
 
 
 
 
-void cConnection::HandleServerEncryptionKeyResponse(void)
+bool cConnection::HandleServerEntityEquipment(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SlotNum);
+	AString Item;
+	if (!ParseSlot(m_ServerBuffer, Item))
+	{
+		return false;
+	}
+	Log("Received a PACKET_ENTITY_EQUIPMENT from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  SlotNum = %d", SlotNum);
+	Log("  Item = %s", Item.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerKeepAlive(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, PingID);
+	Log("Received a PACKET_KEEP_ALIVE from the server:");
+	Log("  ID = %d", PingID);
+	COPY_TO_CLIENT()
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEncryptionKeyResponse(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, Lengths);
 	if (Lengths != 0)
 	{
 		Log("Lengths are not zero!");
-		return;
+		return true;
 	}
+	Log("Server communication is now encrypted");
 	m_ServerState = csEncryptedUnderstood;
+	return true;
 }
 
 
 
 
 
-void cConnection::HandleServerKick(void)
+bool cConnection::HandleServerKick(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Reason);
 	Log("Received PACKET_KICK from the SERVER:");
 	Log("  Reason = \"%s\"", Reason.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerLogin(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, LevelType);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    Unused);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    MaxPlayers);
+	Log("Received a PACKET_LOGIN from the server:");
+	Log("  EntityID = %d",      EntityID);
+	Log("  LevelType = \"%s\"", LevelType.c_str());
+	Log("  GameMode = %d",      GameMode);
+	Log("  Dimension = %d",     Dimension);
+	Log("  Difficulty = %d",    Difficulty);
+	Log("  Unused = %d",        Unused);
+	Log("  MaxPlayers = %d",    MaxPlayers);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerMapChunk(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkZ);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  IsContiguous);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, PrimaryBitmap);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, AdditionalBitmap);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   CompressedSize);
+	AString CompressedData;
+	if (!m_ServerBuffer.ReadString(CompressedData, CompressedSize))
+	{
+		return false;
+	}
+	Log("Received a PACKET_MAP_CHUNK from the server:");
+	Log("  ChunkPos = [%d, %d]", ChunkX, ChunkZ);
+	Log("  Compressed size = %d", CompressedSize);
 	
-	cByteBuffer ToClient(Reason.size() * 2 + 4);
-	ToClient.WriteByte(PACKET_KICK);
-	ToClient.WriteBEUTF16String16(Reason);
-	CLIENTSEND(ToClient);
+	// TODO: Save the compressed data into a file for later analysis
+	
+	COPY_TO_CLIENT()
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerPlayerAbilities(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadChar, char, Flags);
+	HANDLE_SERVER_PACKET_READ(ReadChar, char, FlyingSpeed);
+	HANDLE_SERVER_PACKET_READ(ReadChar, char, WalkingSpeed);
+	Log("Received a PACKET_PLAYER_ABILITIES from the server:");
+	Log("  Flags = 0x%x", Flags);
+	Log("  FlyingSpeed = %d", FlyingSpeed);
+	Log("  WalkingSpeed = %d", WalkingSpeed);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerPlayerListItem(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, PlayerName);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    IsOnline);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   Ping);
+	Log("Received a PACKET_PLAYERLIST_ITEM from the server:");
+	Log("  PlayerName = \"%s\"", PlayerName.c_str());
+	Log("  Ping = %d", Ping);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerPlayerPositionLook(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, Stance);
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadChar,     char,   IsOnGround);
+	Log("Received a PACKET_PLAYER_POSITION_LOOK from the server");
+
+	// TODO: list packet contents
+	
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerTimeUpdate(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, Time);
+	Log("Received a PACKET_TIME_UPDATE from the server");
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerWindowContents(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadChar, char, WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, NumSlots);
+	AStringVector Items;
+	for (short i = 0; i < NumSlots; i++)
+	{
+		AString Item;
+		if (!ParseSlot(m_ServerBuffer, Item))
+		{
+			return false;
+		}
+		Items.push_back(Item);
+	}
+	Log("Received a PACKET_WINDOW_CONTENTS from the server:");
+	Log("  WindowID = %d", WindowID);
+	Log("  NumSlots = %d", NumSlots);
+
+	// TODO: list items
+	
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
+{
+	short ItemType;
+	if (!a_Buffer.ReadBEShort(ItemType))
+	{
+		return false;
+	}
+	if (ItemType <= 0)
+	{
+		a_ItemDesc = "<empty>";
+		return true;
+	}
+	if (!a_Buffer.CanReadBytes(5))
+	{
+		return false;
+	}
+	char ItemCount;
+	short ItemDamage;
+	short MetadataLength;
+	a_Buffer.ReadChar(ItemCount);
+	a_Buffer.ReadBEShort(ItemDamage);
+	a_Buffer.ReadBEShort(MetadataLength);
+	Printf(a_ItemDesc, "%d:%d * %d", ItemType, ItemDamage, ItemCount);
+	if (MetadataLength <= 0)
+	{
+		return true;
+	}
+	AppendPrintf(a_ItemDesc, " (%d bytes of meta)", MetadataLength);
+	if (!a_Buffer.SkipRead(MetadataLength))
+	{
+		return false;
+	}
+	return true;
 }
 
 
@@ -612,7 +985,9 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	bq.MessageEnd();
 	pk.Load(bq);
 	RSAES<PKCS1v15>::Encryptor rsaEncryptor(pk);
-	AutoSeededRandomPool rng;
+	RandomPool rng;
+	time_t CurTime = time(NULL);
+	rng.Put((const byte *)&CurTime, sizeof(CurTime));
 	int EncryptedLength = rsaEncryptor.FixedCiphertextLength();
 	ASSERT(EncryptedLength <= sizeof(EncryptedSecret));
 	rsaEncryptor.Encrypt(rng, SharedSecret, sizeof(SharedSecret), EncryptedSecret);
@@ -642,7 +1017,9 @@ void cConnection::StartClientEncryption(const AString & a_EncKey, const AString 
 {
 	// Decrypt EncNonce using privkey
 	RSAES<PKCS1v15>::Decryptor rsaDecryptor(m_Server.GetPrivateKey());
-	AutoSeededRandomPool rng;
+	time_t CurTime = time(NULL);
+	RandomPool rng;
+	rng.Put((const byte *)&CurTime, sizeof(CurTime));
 	byte DecryptedNonce[MAX_ENC_LEN];
 	DecodingResult res = rsaDecryptor.Decrypt(rng, (const byte *)a_EncNonce.data(), a_EncNonce.size(), DecryptedNonce);
 	if (!res.isValidCoding || (res.messageLength != 4))
@@ -675,6 +1052,7 @@ void cConnection::StartClientEncryption(const AString & a_EncKey, const AString 
 	// Start the encryption:
 	m_ClientEncryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
 	m_ClientDecryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
+	Log("Client connection is now encrypted");
 	m_ClientState = csEncryptedUnderstood;
 	
 	// Handle all postponed server data

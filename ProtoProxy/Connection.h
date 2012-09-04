@@ -97,14 +97,31 @@ protected:
 	bool DecodeServersPackets(const char * a_Data, int a_Size);
 	
 	// Packet handling, client-side:
-	void HandleClientEncryptionKeyResponse(void);
-	void HandleClientHandshake(void);
-	void HandleClientPing(void);
+	bool HandleClientClientStatuses(void);
+	bool HandleClientEncryptionKeyResponse(void);
+	bool HandleClientHandshake(void);
+	bool HandleClientLocaleAndView(void);
+	bool HandleClientPing(void);
+	bool HandleClientPlayerPositionLook(void);
 
 	// Packet handling, server-side:
-	void HandleServerEncryptionKeyRequest(void);
-	void HandleServerEncryptionKeyResponse(void);
-	void HandleServerKick(void);
+	bool HandleServerChatMessage(void);
+	bool HandleServerCompass(void);
+	bool HandleServerEncryptionKeyRequest(void);
+	bool HandleServerEncryptionKeyResponse(void);
+	bool HandleServerEntityEquipment(void);
+	bool HandleServerKeepAlive(void);
+	bool HandleServerKick(void);
+	bool HandleServerLogin(void);
+	bool HandleServerMapChunk(void);
+	bool HandleServerPlayerAbilities(void);
+	bool HandleServerPlayerListItem(void);
+	bool HandleServerPlayerPositionLook(void);
+	bool HandleServerTimeUpdate(void);
+	bool HandleServerWindowContents(void);
+	
+	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data
+	bool ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc);
 	
 	/// Send EKResp to the server:
 	void SendEncryptionKeyResponse(const AString & a_ServerPublicKey, const AString & a_Nonce);

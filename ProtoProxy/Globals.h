@@ -206,7 +206,8 @@ public:
 
 
 
-#include "CryptoPP/osrng.h"
+#include "CryptoPP/randpool.h"
+#include "CryptoPP/aes.h"
 #include "CryptoPP/rsa.h"
 #include "CryptoPP/modes.h"
 
