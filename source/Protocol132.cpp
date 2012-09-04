@@ -591,7 +591,7 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 		m_Client->Kick("Hacked client");
 		return;
 	}
-	if (ntohl(*((int *)DecryptedNonce)) != (unsigned)this)
+	if (ntohl(*((int *)DecryptedNonce)) != (unsigned)(uintptr_t)this)
 	{
 		LOGD("Bad nonce value");
 		m_Client->Kick("Hacked client");
