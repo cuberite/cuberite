@@ -94,6 +94,9 @@ public:
 	/// Restarts next reading operation at the start of the ringbuffer
 	void ResetRead(void);
 	
+	/// Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to duplicate communication
+	void ReadAgain(AString & a_Out);
+	
 protected:
 	char * m_Buffer;
 	int    m_BufferSize;  // Total size of the ringbuffer

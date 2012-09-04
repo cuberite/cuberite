@@ -48,6 +48,11 @@ cByteBuffer::~cByteBuffer()
 
 bool cByteBuffer::Write(const char * a_Bytes, int a_Count)
 {
+	// DEBUG: Store the current free space for a check after writing
+	int CurFreeSpace = GetFreeSpace();
+	int CurReadableSpace = GetReadableSpace();
+	int WrittenBytes = 0;
+	
 	if (GetFreeSpace() < a_Count)
 	{
 		return false;
@@ -60,11 +65,16 @@ bool cByteBuffer::Write(const char * a_Bytes, int a_Count)
 		m_WritePos = 0;
 		a_Bytes += TillEnd;
 		a_Count -= TillEnd;
+		WrittenBytes = TillEnd;
 	}
 	
 	// We're guaranteed that we'll fit in a single write op
 	memcpy(m_Buffer + m_WritePos, a_Bytes, a_Count);
 	m_WritePos += a_Count;
+	WrittenBytes += a_Count;
+	
+	ASSERT(GetFreeSpace() == CurFreeSpace - WrittenBytes);
+	ASSERT(GetReadableSpace() == CurReadableSpace + WrittenBytes);
 	return true;
 }
 
@@ -461,6 +471,24 @@ void cByteBuffer::CommitRead(void)
 void cByteBuffer::ResetRead(void)
 {
 	m_ReadPos = m_DataStart;
+}
+
+
+
+
+
+void cByteBuffer::ReadAgain(AString & a_Out)
+{
+	// Return the data between m_DataStart and m_ReadPos (the data that has been read but not committed)
+	// Used by ProtoProxy to repeat communication twice, once for parsing and the other time for the remote party
+	int DataStart = m_DataStart;
+	if (m_ReadPos < m_DataStart)
+	{
+		// Across the ringbuffer end, read the first part and adjust next part's start:
+		a_Out.append(m_Buffer + m_DataStart, m_BufferSize - m_DataStart);
+		DataStart = 0;
+	}
+	a_Out.append(m_Buffer + DataStart, m_ReadPos - DataStart);
 }
 
 
