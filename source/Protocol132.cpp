@@ -8,7 +8,7 @@
 #include "cRoot.h"
 #include "cServer.h"
 #include "cClientHandle.h"
-#include "CryptoPP/osrng.h"
+#include "CryptoPP/randpool.h"
 #include "cItem.h"
 #include "ChunkDataSerializer.h"
 #include "cPlayer.h"
@@ -568,7 +568,7 @@ void cProtocol132::SendEncryptionKeyRequest(const AString & a_Key)
 	WriteShort((short)a_Key.size());
 	SendData(a_Key.data(), a_Key.size());
 	WriteShort(4);
-	WriteInt((int)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+	WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 	Flush();
 }
 
@@ -580,7 +580,9 @@ void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const A
 {
 	// Decrypt EncNonce using privkey
 	RSAES<PKCS1v15>::Decryptor rsaDecryptor(cRoot::Get()->GetServer()->GetPrivateKey());
-	AutoSeededRandomPool rng;
+	time_t CurTime = time(NULL);
+	CryptoPP::RandomPool rng;
+	rng.Put((const byte *)&CurTime, sizeof(CurTime));
 	byte DecryptedNonce[MAX_ENC_LEN];
 	DecodingResult res = rsaDecryptor.Decrypt(rng, (const byte *)a_EncNonce.data(), a_EncNonce.size(), DecryptedNonce);
 	if (!res.isValidCoding || (res.messageLength != 4))

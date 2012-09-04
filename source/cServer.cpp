@@ -291,7 +291,10 @@ void cServer::PrepareKeys(void)
 	// But generating the key takes only a moment, do we even need that?
 	
 	LOG("Generating protocol encryption keypair...");
-	CryptoPP::AutoSeededRandomPool rng;
+	
+	time_t CurTime = time(NULL);
+	CryptoPP::RandomPool rng;
+	rng.Put((const byte *)&CurTime, sizeof(CurTime));
 	m_PrivateKey.GenerateRandomWithKeySize(rng, 1024);
 	CryptoPP::RSA::PublicKey pk(m_PrivateKey);
 	m_PublicKey = pk;

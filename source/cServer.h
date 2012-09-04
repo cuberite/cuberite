@@ -13,7 +13,7 @@
 
 #include "cSocketThreads.h"
 #include "CryptoPP/rsa.h"
-#include "CryptoPP/osrng.h"
+#include "CryptoPP/randpool.h"
 
 
 

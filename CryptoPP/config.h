@@ -16,12 +16,12 @@
 
 // define this if you want to disable all OS-dependent features,
 // such as sockets and OS-provided random number generators
-// #define NO_OS_DEPENDENCE
+#define NO_OS_DEPENDENCE
 
 // Define this to use features provided by Microsoft's CryptoAPI.
 // Currently the only feature used is random number generation.
 // This macro will be ignored if NO_OS_DEPENDENCE is defined.
-#define USE_MS_CRYPTOAPI
+// #define USE_MS_CRYPTOAPI
 
 // Define this to 1 to enforce the requirement in FIPS 186-2 Change Notice 1 that only 1024 bit moduli be used
 #ifndef DSA_1024_BIT_MODULUS_ONLY
