@@ -39,8 +39,8 @@ ifeq ($(release),1)
 ################
 # release build - fastest run-time, no gdb support
 ################
-CC_OPTIONS = -s -O3
-CXX_OPTIONS = -s -O3
+CC_OPTIONS = -s -O3 -DNDEBUG
+CXX_OPTIONS = -s -O3 -DNDEBUG
 LNK_OPTIONS = -lstdc++ -pthread -O3
 BUILDDIR = build/release/
 
@@ -49,8 +49,8 @@ ifeq ($(profile),1)
 ################
 # profile build - a release build with symbols and profiling engine built in
 ################
-CC_OPTIONS = -s -ggdb -O3 -pg
-CXX_OPTIONS = -s -ggdb -O3 -pg
+CC_OPTIONS = -s -ggdb -O3 -pg -DNDEBUG
+CXX_OPTIONS = -s -ggdb -O3 -pg -DNDEBUG
 LNK_OPTIONS = -lstdc++ -pthread -ggdb -O3 -pg
 BUILDDIR = build/profile/
 

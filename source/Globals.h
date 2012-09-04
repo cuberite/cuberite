@@ -187,10 +187,10 @@ typedef short     Int16;
 #define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
 
 // Own version of assert() that writes failed assertions to the log for review
-#ifdef  NDEBUG
-	#define ASSERT(x) ((void)0)
-#else
+#ifdef  _DEBUG
 	#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
+#else
+	#define ASSERT(x) ((void)0)
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
