@@ -179,6 +179,7 @@ void cItemHandler::Deinit()
 	{
 		delete m_ItemHandler[i];
 	}
+	m_HandlerInitialized = false;
 }
 
 

@@ -580,14 +580,21 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			
 			default:
 			{
-				cBlockHandler *Handler = BlockHandler(ID);
-				if(Handler->NeedsRandomTicks())
-					Handler->OnUpdate(m_World, m_BlockTickX + m_PosX*Width, m_BlockTickY, m_BlockTickZ + m_PosZ*Width);
+				cBlockHandler * Handler = BlockHandler(ID);
+				ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
+				if (Handler->NeedsRandomTicks())
+				{
+					Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
+				}
 				break;
 			}
 		}
 	}
 }
+
+
+
+
 
 void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
 {
