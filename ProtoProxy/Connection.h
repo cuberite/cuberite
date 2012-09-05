@@ -102,6 +102,9 @@ protected:
 	bool HandleClientHandshake(void);
 	bool HandleClientLocaleAndView(void);
 	bool HandleClientPing(void);
+	bool HandleClientPlayerLook(void);
+	bool HandleClientPlayerOnGround(void);
+	bool HandleClientPlayerPosition(void);
 	bool HandleClientPlayerPositionLook(void);
 
 	// Packet handling, server-side:
@@ -118,6 +121,7 @@ protected:
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerTimeUpdate(void);
+	bool HandleServerUpdateHealth(void);
 	bool HandleServerWindowContents(void);
 	
 	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data

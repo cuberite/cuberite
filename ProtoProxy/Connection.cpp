@@ -102,7 +102,14 @@ enum
 	PACKET_TIME_UPDATE             = 0x04,
 	PACKET_ENTITY_EQUIPMENT        = 0x05,
 	PACKET_COMPASS                 = 0x06,
+	PACKET_UPDATE_HEALTH           = 0x08,
+	PACKET_PLAYER_ON_GROUND        = 0x0a,
+	PACKET_PLAYER_POSITION         = 0x0b,
+	PACKET_PLAYER_LOOK             = 0x0c,
 	PACKET_PLAYER_POSITION_LOOK    = 0x0d,
+	PACKET_MAP_CHUNK               = 0x33,
+	PACKET_WINDOW_CONTENTS         = 0x68,
+	PACKET_PLAYER_LIST_ITEM        = 0xc9,
 	PACKET_PLAYER_ABILITIES        = 0xca,
 	PACKET_LOCALE_AND_VIEW         = 0xcc,
 	PACKET_CLIENT_STATUSES         = 0xcd,
@@ -127,8 +134,8 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_BeginTick(clock()),
 	m_ClientState(csUnencrypted),
 	m_ServerState(csUnencrypted),
-	m_ClientBuffer(64 KiB),
-	m_ServerBuffer(64 KiB),
+	m_ClientBuffer(1024 KiB),
+	m_ServerBuffer(1024 KiB),
 	m_Nonce(0)
 {
 	AString fnam;
@@ -267,7 +274,7 @@ bool cConnection::ConnectToServer(void)
 
 bool cConnection::RelayFromServer(void)
 {
-	char Buffer[1024];
+	char Buffer[64 KiB];
 	int res = recv(m_ServerSocket, Buffer, sizeof(Buffer), 0);
 	if (res <= 0)
 	{
@@ -307,7 +314,7 @@ bool cConnection::RelayFromServer(void)
 
 bool cConnection::RelayFromClient(void)
 {
-	char Buffer[1024];
+	char Buffer[64 KiB];
 	int res = recv(m_ClientSocket, Buffer, sizeof(Buffer), 0);
 	if (res <= 0)
 	{
@@ -386,11 +393,11 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 bool cConnection::SendEncryptedData(SOCKET a_Socket, Encryptor & a_Encryptor, const char * a_Data, int a_Size, const char * a_Peer)
 {
-	DataLog(a_Data, a_Size, "Sending encrypted %d bytes to %s", a_Size, a_Peer);
+	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
 	const byte * Data = (const byte *)a_Data;
 	while (a_Size > 0)
 	{
-		byte Buffer[512];
+		byte Buffer[64 KiB];
 		int NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
 		a_Encryptor.ProcessData(Buffer, Data, NumBytes);
 		bool res = SendData(a_Socket, (const char *)Buffer, NumBytes, a_Peer);
@@ -440,11 +447,19 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_HANDSHAKE:               HANDLE_CLIENT_READ(HandleClientHandshake); break;
 			case PACKET_LOCALE_AND_VIEW:         HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
 			case PACKET_PING:                    HANDLE_CLIENT_READ(HandleClientPing); break;
+			case PACKET_PLAYER_LOOK:             HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
+			case PACKET_PLAYER_ON_GROUND:        HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
+			case PACKET_PLAYER_POSITION:         HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
+			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
 			default:
 			{
 				if (m_ClientState == csEncryptedUnderstood)
 				{
 					Log("Unknown packet 0x%02x from the client while encrypted; continuing to relay blind only", PacketType);
+					AString Data;
+					m_ClientBuffer.ResetRead();
+					m_ClientBuffer.ReadAll(Data);
+					DataLog(Data.data(), Data.size(), "Current data in the client packet queue: %d bytes", Data.size());
 					m_ClientState = csEncryptedUnknown;
 					m_ClientBuffer.ResetRead();
 					if (m_ServerState == csUnencrypted)
@@ -496,22 +511,30 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		m_ServerBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
-			case PACKET_KEEPALIVE:               HANDLE_SERVER_READ(HandleServerKeepAlive); break;
-			case PACKET_LOGIN:                   HANDLE_SERVER_READ(HandleServerLogin); break;
 			case PACKET_CHAT_MESSAGE:            HANDLE_SERVER_READ(HandleServerChatMessage); break;
-			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
-			case PACKET_ENTITY_EQUIPMENT:        HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
 			case PACKET_COMPASS:                 HANDLE_SERVER_READ(HandleServerCompass); break;
-			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
-			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
 			case PACKET_ENCRYPTION_KEY_REQUEST:  HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
 			case PACKET_ENCRYPTION_KEY_RESPONSE: HANDLE_SERVER_READ(HandleServerEncryptionKeyResponse); break;
+			case PACKET_ENTITY_EQUIPMENT:        HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
+			case PACKET_KEEPALIVE:               HANDLE_SERVER_READ(HandleServerKeepAlive); break;
 			case PACKET_KICK:                    HANDLE_SERVER_READ(HandleServerKick); break;
+			case PACKET_LOGIN:                   HANDLE_SERVER_READ(HandleServerLogin); break;
+			case PACKET_MAP_CHUNK:               HANDLE_SERVER_READ(HandleServerMapChunk); break;
+			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
+			case PACKET_PLAYER_LIST_ITEM:        HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
+			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
+			case PACKET_UPDATE_HEALTH:           HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
+			case PACKET_WINDOW_CONTENTS:         HANDLE_SERVER_READ(HandleServerWindowContents); break;
 			default:
 			{
 				if (m_ServerState == csEncryptedUnderstood)
 				{
 					Log("Unknown packet 0x%02x from the server while encrypted; continuing to relay blind only", PacketType);
+					AString Data;
+					m_ServerBuffer.ResetRead();
+					m_ServerBuffer.ReadAll(Data);
+					DataLog(Data.data(), Data.size(), "Current data in the server packet queue: %d bytes", Data.size());
 					m_ServerState = csEncryptedUnknown;
 					m_ServerBuffer.ResetRead();
 					if (m_ClientState == csUnencrypted)
@@ -622,9 +645,54 @@ bool cConnection::HandleClientLocaleAndView(void)
 
 bool cConnection::HandleClientPing(void)
 {
-	Log("Received a PACKET_PING from the CLIENT");
+	Log("Received a PACKET_PING from the client");
 	m_ClientBuffer.ResetRead();
 	SERVERSEND(m_ClientBuffer);
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientPlayerLook(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, Yaw);
+	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, Pitch);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  OnGround);
+	Log("Received a PACKET_PLAYER_LOOK from the client");
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientPlayerOnGround(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  OnGround);
+	Log("Received a PACKET_PLAYER_ON_GROUND from the client");
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientPlayerPosition(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,     char,   IsOnGround);
+	Log("Received a PACKET_PLAYER_POSITION from the client");
+
+	// TODO: list packet contents
+	
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -827,7 +895,7 @@ bool cConnection::HandleServerMapChunk(void)
 	}
 	Log("Received a PACKET_MAP_CHUNK from the server:");
 	Log("  ChunkPos = [%d, %d]", ChunkX, ChunkZ);
-	Log("  Compressed size = %d", CompressedSize);
+	Log("  Compressed size = %d (0x%x)", CompressedSize, CompressedSize);
 	
 	// TODO: Save the compressed data into a file for later analysis
 	
@@ -897,6 +965,20 @@ bool cConnection::HandleServerTimeUpdate(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, Time);
 	Log("Received a PACKET_TIME_UPDATE from the server");
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerUpdateHealth(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, Health);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, Food);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Saturation);
+	Log("Received a PACKET_UPDATE_HEALTH from the server");
 	COPY_TO_CLIENT();
 	return true;
 }
