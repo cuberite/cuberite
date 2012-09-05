@@ -34,17 +34,18 @@ public:														//tolua_export
 	virtual bool OnCollectPickup   (cPlayer * a_Player, cPickup * a_Pickup) override;
 	virtual bool OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnDisconnect      (cPlayer * a_Player, const AString & a_Reason) override;
-	virtual bool OnKilled          (cPawn* a_Killed, cEntity* a_Killer ) override;
+	virtual bool OnKilled          (cPawn * a_Killed, cEntity* a_Killer ) override;
 	virtual bool OnLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;
-	virtual bool OnPlayerJoin      (cPlayer* a_Player ) override;
-	virtual void OnPlayerMove      (cPlayer* a_Player ) override;
-	virtual void OnPlayerSpawn     (cPlayer* a_Player ) override;
+	virtual bool OnPlayerJoin      (cPlayer * a_Player ) override;
+	virtual void OnPlayerMove      (cPlayer * a_Player ) override;
+	virtual void OnPlayerSpawn     (cPlayer * a_Player ) override;
 	virtual bool OnPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
-	virtual void OnTakeDamage      (cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo ) override;
+	virtual void OnTakeDamage      (cPawn * a_Pawn, TakeDamageInfo * a_TakeDamageInfo ) override;
 	virtual bool OnUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnWeatherChanged  (cWorld * a_World) override;
+	virtual bool OnHandshake       (cClientHandle * a_Client, const AString & a_Username) override;
 
 	const AString & GetDirectory(void) const {return m_Directory; }
 	

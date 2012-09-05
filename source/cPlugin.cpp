@@ -283,6 +283,17 @@ bool cPlugin::OnWeatherChanged(cWorld * a_World)
 
 
 
+bool cPlugin::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+{
+	UNUSED(a_Client);
+	UNUSED(a_Username);
+	return false;
+}
+
+
+
+
+
 void cPlugin::AddCommand(const AString & a_Command, const AString & a_Description, const AString & a_Permission)
 {
 	CommandStruct Command;

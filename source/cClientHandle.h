@@ -162,6 +162,7 @@ public:
 	void HandleRespawn          (void);
 	void HandleDisconnect       (const AString & a_Reason);
 	void HandleKeepAlive        (int a_KeepAliveID);
+	bool HandleHandshake        (const AString & a_Username);
 	
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.

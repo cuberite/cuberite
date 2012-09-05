@@ -332,6 +332,11 @@ int cProtocol132::ParseHandshake(void)
 	HANDLE_PACKET_READ(ReadBEInt,           int,     ServerPort);
 	m_Username = Username;
 
+	if (!m_Client->HandleHandshake( m_Username ))
+	{
+		return PARSE_OK; // Player is not allowed into the server
+	}
+
 	// Send a 0xFD Encryption Key Request http://wiki.vg/Protocol#0xFD
 	AString key;
 	CryptoPP::StringSink sink(key);  // GCC won't allow inline instantiation in the following line, damned temporary refs

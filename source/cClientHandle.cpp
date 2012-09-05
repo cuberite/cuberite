@@ -918,6 +918,23 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 
 
+bool cClientHandle::HandleHandshake(const AString & a_Username)
+{
+	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(this, a_Username))
+	{
+		if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
+		{
+			Kick("The server is currently full :(-- Try again later");
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
+
 void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
 	{

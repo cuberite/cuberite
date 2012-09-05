@@ -115,6 +115,7 @@ public:																	//tolua_export
 	bool CallHookUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	bool CallHookUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	bool CallHookWeatherChanged  (cWorld * a_World);
+	bool CallHookHandshake       (cClientHandle * a_ClientHandle, const AString & a_Username);
 
 	void RemoveHooks( cPlugin* a_Plugin );
 	void RemovePlugin( cPlugin* a_Plugin, bool a_bDelete = false );		//tolua_export

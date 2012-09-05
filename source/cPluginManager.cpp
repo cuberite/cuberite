@@ -627,6 +627,26 @@ bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_B
 
 
 
+bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const AString & a_Username)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_HANDSHAKE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnHandshake(a_ClientHandle, a_Username))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
 
 cPlugin* cPluginManager::GetPlugin( const AString & a_Plugin ) const
 {

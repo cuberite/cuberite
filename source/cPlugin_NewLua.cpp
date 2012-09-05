@@ -640,6 +640,30 @@ bool cPlugin_NewLua::OnUpdatedSign(
 
 
 
+bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+{
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnHandshake"))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
+	tolua_pushstring  (m_LuaState, a_Username.c_str());
+
+	if (!CallFunction(2, 1, "OnHandshake"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	return bRetVal;
+}
+
+
+
+
+
 cPlugin_NewLua * cPlugin_NewLua::CreateWebPlugin(lua_State * a_LuaState)
 {
 	LOGWARN("WARNING: Using deprecated function CreateWebPlugin()! A Lua plugin is a WebPlugin by itself now. (plugin \"%s\" in folder \"%s\")",

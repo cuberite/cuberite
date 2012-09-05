@@ -61,6 +61,7 @@ public:
 	virtual bool OnUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	virtual bool OnWeatherChanged  (cWorld * a_World);
+	virtual bool OnHandshake       (cClientHandle * a_Client, const AString & a_Username);
 	
 	// Accessors
 	const AString & GetName() const { return m_Name; }

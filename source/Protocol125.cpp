@@ -974,10 +974,9 @@ int cProtocol125::ParseHandshake(void)
 
 	LOGD("HANDSHAKE %s", Username.c_str());
 
-	if (cRoot::Get()->GetDefaultWorld()->GetNumPlayers() >= cRoot::Get()->GetDefaultWorld()->GetMaxPlayers())
+	if (!m_Client->HandleHandshake( m_Username ))
 	{
-		m_Client->Kick("The server is currently full :(-- Try again later");
-		return PARSE_OK;
+		return PARSE_OK; // Player is not allowed into the server
 	}
 
 	SendHandshake(cRoot::Get()->GetServer()->GetServerID());
