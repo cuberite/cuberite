@@ -1310,7 +1310,7 @@ int cProtocol125::ParseItem(cItem & a_Item)
 	
 	HANDLE_PACKET_READ(ReadBEShort, short, EnchantNumBytes);
 	
-	if (EnchantNumBytes == 0)
+	if (EnchantNumBytes <= 0)
 	{
 		return PARSE_OK;
 	}

@@ -350,6 +350,7 @@ bool cByteBuffer::WriteBEUTF16String16(const AString & a_Value)
 
 bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
 {
+	ASSERT(a_Count >= 0);
 	NEEDBYTES(a_Count);
 	char * Dst = (char *)a_Buffer;  // So that we can do byte math
 	int BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
@@ -374,6 +375,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
 
 bool cByteBuffer::WriteBuf(const void * a_Buffer, int a_Count)
 {
+	ASSERT(a_Count >= 0);
 	PUTBYTES(a_Count);
 	char * Src = (char *)a_Buffer;  // So that we can do byte math
 	int BytesToEndOfBuffer = m_BufferSize - m_WritePos;
@@ -398,6 +400,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, int a_Count)
 
 bool cByteBuffer::ReadString(AString & a_String, int a_Count)
 {
+	ASSERT(a_Count >= 0);
 	NEEDBYTES(a_Count);
 	a_String.clear();
 	a_String.reserve(a_Count);
@@ -423,6 +426,7 @@ bool cByteBuffer::ReadString(AString & a_String, int a_Count)
 bool cByteBuffer::ReadUTF16String(AString & a_String, int a_NumChars)
 {
 	// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
+	ASSERT(a_NumChars >= 0);
 	AString RawData;
 	if (!ReadString(RawData, a_NumChars * 2))
 	{
@@ -438,6 +442,7 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, int a_NumChars)
 
 bool cByteBuffer::SkipRead(int a_Count)
 {
+	ASSERT(a_Count >= 0);
 	if (!CanReadBytes(a_Count))
 	{
 		return false;
