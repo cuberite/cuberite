@@ -108,6 +108,7 @@ protected:
 	bool HandleClientPlayerPositionLook(void);
 
 	// Packet handling, server-side:
+	bool HandleServerBlockChange(void);
 	bool HandleServerChatMessage(void);
 	bool HandleServerCompass(void);
 	bool HandleServerEncryptionKeyRequest(void);
@@ -117,6 +118,7 @@ protected:
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
 	bool HandleServerMapChunk(void);
+	bool HandleServerMultiBlockChange(void);
 	bool HandleServerPlayerAbilities(void);
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);

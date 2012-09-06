@@ -108,6 +108,8 @@ enum
 	PACKET_PLAYER_LOOK             = 0x0c,
 	PACKET_PLAYER_POSITION_LOOK    = 0x0d,
 	PACKET_MAP_CHUNK               = 0x33,
+	PACKET_MULTI_BLOCK_CHANGE      = 0x34,
+	PACKET_BLOCK_CHANGE            = 0x35,
 	PACKET_WINDOW_CONTENTS         = 0x68,
 	PACKET_PLAYER_LIST_ITEM        = 0xc9,
 	PACKET_PLAYER_ABILITIES        = 0xca,
@@ -511,6 +513,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		m_ServerBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
+			case PACKET_BLOCK_CHANGE:            HANDLE_SERVER_READ(HandleServerBlockChange); break;
 			case PACKET_CHAT_MESSAGE:            HANDLE_SERVER_READ(HandleServerChatMessage); break;
 			case PACKET_COMPASS:                 HANDLE_SERVER_READ(HandleServerCompass); break;
 			case PACKET_ENCRYPTION_KEY_REQUEST:  HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
@@ -520,6 +523,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_KICK:                    HANDLE_SERVER_READ(HandleServerKick); break;
 			case PACKET_LOGIN:                   HANDLE_SERVER_READ(HandleServerLogin); break;
 			case PACKET_MAP_CHUNK:               HANDLE_SERVER_READ(HandleServerMapChunk); break;
+			case PACKET_MULTI_BLOCK_CHANGE:      HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
 			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
 			case PACKET_PLAYER_LIST_ITEM:        HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
 			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
@@ -721,6 +725,22 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 
 
 
+bool cConnection::HandleServerBlockChange(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockType);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  BlockMeta);
+	Log("Received a PACKET_BLOCK_CHANGE from the server");
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerChatMessage(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Message);
@@ -900,6 +920,28 @@ bool cConnection::HandleServerMapChunk(void)
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT()
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerMultiBlockChange(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, NumBlocks);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   DataSize);
+	AString BlockChangeData;
+	if (!m_ServerBuffer.ReadString(BlockChangeData, DataSize))
+	{
+		return false;
+	}
+	Log("Received a PACKET_MULTI_BLOCK_CHANGE packet from the server:");
+	Log("  Chunk = [%d, %d]", ChunkX, ChunkZ);
+	Log("  NumBlocks = %d", NumBlocks);
+	COPY_TO_CLIENT();
 	return true;
 }
 
