@@ -62,12 +62,7 @@ protected:
 	bool m_IsEncrypted;
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor;
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
-	
-	// DEBUG:
-	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption m_Decryptor2;
 	AString m_DataToSend;
-	int m_CurrentIn, m_CurrentOut;
-	int m_EncIn, m_EncOut;
 	
 	virtual void SendData(const char * a_Data, int a_Size) override;
 	

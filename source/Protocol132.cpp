@@ -70,12 +70,6 @@ enum
 
 cProtocol132::cProtocol132(cClientHandle * a_Client) :
 	super(a_Client),
-	// DEBUG:
-	m_CurrentIn(0),
-	m_CurrentOut(0),
-	m_EncIn(0),
-	m_EncOut(0),
-	
 	m_IsEncrypted(false)
 {
 }
@@ -98,10 +92,8 @@ cProtocol132::~cProtocol132()
 
 void cProtocol132::DataReceived(const char * a_Data, int a_Size)
 {
-	m_CurrentIn += a_Size;
 	if (m_IsEncrypted)
 	{
-		m_EncIn += a_Size;
 		byte Decrypted[512];
 		while (a_Size > 0)
 		{
@@ -157,22 +149,17 @@ void cProtocol132::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	{
 	cCSLock Lock(m_CSPacket);
 	
 	// Pre-chunk not used in 1.3.2. Finally.
 
 	// Send the chunk data:
-	// Chunk data seems to break the connection for some reason; without it, the connection lives indefinitely
 	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
 	WriteByte(PACKET_CHUNK_DATA);
 	WriteInt (a_ChunkX);
 	WriteInt (a_ChunkZ);
 	SendData(Serialized.data(), Serialized.size());
 	Flush();
-	}
-	// Enabling the sleep here sometimes makes the client accept us and spawn us in the world. But it makes the connection lag behind, ultimately timing out
-	// cSleep::MilliSleep(500);
 }
 
 
@@ -282,9 +269,6 @@ void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 int cProtocol132::ParsePacket(unsigned char a_PacketType)
 {
-	// DEBUG:
-	LOGD("Received packet 0x%02x, %d B avail; BM %d, enc %d", a_PacketType, m_ReceivedData.GetReadableSpace(), m_CurrentIn, m_EncIn);
-	
 	switch (a_PacketType)
 	{
 		default:   return super::ParsePacket(a_PacketType);  // off-load previously known packets into cProtocol125
@@ -432,9 +416,7 @@ int cProtocol132::ParsePlayerAbilities(void)
 
 void cProtocol132::SendData(const char * a_Data, int a_Size)
 {
-	// DEBUG:
 	m_DataToSend.append(a_Data, a_Size);
-	m_CurrentOut += a_Size;
 }
 
 
@@ -443,7 +425,6 @@ void cProtocol132::SendData(const char * a_Data, int a_Size)
 
 void cProtocol132::Flush(void)
 {
-	// DEBUG
 	ASSERT(m_CSPacket.IsLockedByCurrentThread());  // Did all packets lock the CS properly?
 	
 	if (m_DataToSend.empty())
@@ -451,23 +432,15 @@ void cProtocol132::Flush(void)
 		LOGD("Flushing empty");
 		return;
 	}
-	LOGD("Flushing packet 0x%02x, %d B; %d B out, %d enc out", (unsigned char)m_DataToSend[0], m_DataToSend.size(), m_CurrentOut, m_EncOut);
 	const char * a_Data = m_DataToSend.data();
 	int a_Size = m_DataToSend.size();
 	if (m_IsEncrypted)
 	{
-		m_EncOut += a_Size;
 		byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
 			int NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
 			m_Encryptor.ProcessData(Encrypted, (byte *)a_Data, NumBytes);
-			
-			// DEBUG: decrypt the data to check if encryption works:
-			byte Decrypted[sizeof(Encrypted)];
-			m_Decryptor2.ProcessData(Decrypted, Encrypted, NumBytes);
-			ASSERT(memcmp(Decrypted, a_Data, NumBytes) == 0);
-			
 			super::SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -478,7 +451,6 @@ void cProtocol132::Flush(void)
 		super::SendData(a_Data, a_Size);
 	}
 	m_DataToSend.clear();
-	// cSleep::MilliSleep(400);
 }
 
 
@@ -567,9 +539,12 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 
 void cProtocol132::SendEncryptionKeyRequest(const AString & a_Key)
 {
+	// DEBUG:
+	LOGD("ServerID: \"%s\"", cRoot::Get()->GetServer()->GetServerID().c_str());
+	
 	cCSLock Lock(m_CSPacket);
 	WriteByte((char)0xfd);
-	WriteString("MCServer");
+	WriteString(cRoot::Get()->GetServer()->GetServerID());
 	WriteShort((short)a_Key.size());
 	SendData(a_Key.data(), a_Key.size());
 	WriteShort(4);
@@ -634,7 +609,6 @@ void cProtocol132::StartEncryption(const byte * a_Key)
 {
 	m_Encryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
 	m_Decryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
-	m_Decryptor2.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
 	m_IsEncrypted = true;
 }
 
