@@ -939,13 +939,38 @@ void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
 	{
 		cCSLock Lock(m_CSOutgoingData);
-		if (!m_OutgoingData.Write(a_Data, a_Size))
+		
+		// _X 2012_09_06: We need an overflow buffer, usually when streaming the initial chunks
+		if (m_OutgoingDataOverflow.empty())
 		{
-			// Client has too much outgoing data queued, drop them silently by timing them out:
-			// (So that they're dropped in the tick thread and not the sender thread)
-			m_LastPingTime = 0;
+			// No queued overflow data; if this packet fits into the ringbuffer, put it in, otherwise put it in the overflow buffer:
+			int CanFit = m_OutgoingData.GetFreeSpace();
+			if (CanFit > a_Size)
+			{
+				CanFit = a_Size;
+			}
+			if (CanFit > 0)
+			{
+				m_OutgoingData.Write(a_Data, CanFit);
+			}
+			if (a_Size > CanFit)
+			{
+				m_OutgoingDataOverflow.append(a_Data + CanFit, a_Size - CanFit);
+			}
 		}
-	}
+		else
+		{
+			// There is a queued overflow. Append to it, then send as much from its front as possible
+			m_OutgoingDataOverflow.append(a_Data, a_Size);
+			int CanFit = m_OutgoingData.GetFreeSpace();
+			if (CanFit > 128)
+			{
+				// No point in moving the data over if it's not large enough - too much effort for too little an effect
+				m_OutgoingData.Write(m_OutgoingDataOverflow.data(), CanFit);
+				m_OutgoingDataOverflow.erase(0, CanFit);
+			}
+		}
+	}  // Lock(m_CSOutgoingData)
 	
 	// Notify SocketThreads that we have something to write:
 	cRoot::Get()->GetServer()->NotifyClientWrite(this);
@@ -1567,6 +1592,8 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 		cCSLock Lock(m_CSOutgoingData);
 		m_OutgoingData.ReadAll(a_Data);
 		m_OutgoingData.CommitRead();
+		a_Data.append(m_OutgoingDataOverflow);
+		m_OutgoingDataOverflow.clear();
 	}
 
 	// Disconnect player after all packets have been sent

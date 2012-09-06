@@ -189,6 +189,7 @@ private:
 	
 	cCriticalSection m_CSOutgoingData;
 	cByteBuffer      m_OutgoingData;
+	AString          m_OutgoingDataOverflow;  //< For data that didn't fit into the m_OutgoingData ringbuffer temporarily
 
 	cCriticalSection m_CriticalSection;
 
