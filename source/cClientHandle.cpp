@@ -440,7 +440,7 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 
 	// Schedule for authentication; until then, let them wait (but do not block)
 	m_State = csAuthenticating;
-	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), cRoot::Get()->GetServer()->GetServerID());
+	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
 	return true;
 }
 

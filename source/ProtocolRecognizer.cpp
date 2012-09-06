@@ -458,6 +458,16 @@ void cProtocolRecognizer::SendWindowOpen(char a_WindowID, char a_WindowType, con
 
 
 
+AString cProtocolRecognizer::GetAuthServerID(void)
+{
+	ASSERT(m_Protocol != NULL);
+	return m_Protocol->GetAuthServerID();
+}
+
+
+
+
+
 void cProtocolRecognizer::SendData(const char * a_Data, int a_Size)
 {
 	// This is used only when handling the server ping

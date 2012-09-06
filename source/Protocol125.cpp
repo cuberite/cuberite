@@ -756,6 +756,17 @@ void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AStr
 
 
 
+AString cProtocol125::GetAuthServerID(void)
+{
+	// http://wiki.vg/wiki/index.php?title=Session&oldid=2262
+	// The server generates a random hash and that is used for all clients, unmodified
+	return cRoot::Get()->GetServer()->GetServerID();
+}
+
+
+
+
+
 void cProtocol125::SendData(const char * a_Data, int a_Size)
 {
 	m_Client->SendData(a_Data, a_Size);

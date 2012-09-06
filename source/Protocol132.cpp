@@ -65,6 +65,81 @@ enum
 
 
 
+// Converts a raw 160-bit SHA1 digest into a Java Hex representation
+// According to http://wiki.vg/wiki/index.php?title=Protocol_Encryption&oldid=2802
+static void DigestToJava(byte a_Digest[20], AString & a_Out)
+{
+	bool IsNegative = (a_Digest[0] >= 0x80);
+	if (IsNegative)
+	{
+		// Two's complement:
+		bool carry = true;  // Add one to the whole number
+		for (int i = 19; i >= 0; i--)
+		{
+			a_Digest[i] = ~a_Digest[i];
+			if (carry)
+			{
+				carry = (a_Digest[i] == 0xff);
+				a_Digest[i]++;
+			}
+		}
+	}
+	a_Out.clear();
+	a_Out.reserve(40);
+	for (int i = 0; i < 20; i++)
+	{
+		AppendPrintf(a_Out, "%02x", a_Digest[i]);
+	}
+	while ((a_Out.length() > 0) && (a_Out[0] == '0'))
+	{
+		a_Out.erase(0, 1);
+	}
+	if (IsNegative)
+	{
+		a_Out.insert(0, "-");
+	}
+}
+
+
+
+
+
+/*
+// Self-test the hash formatting for known values:
+// sha1(Notch) : 4ed1f46bbe04bc756bcb17c0c7ce3e4632f06a48
+// sha1(jeb_)  : -7c9d5b0044c130109a5d7b5fb5c317c02b4e28c1
+// sha1(simon) : 88e16a1019277b15d58faf0541e11910eb756f6
+
+class Test
+{
+public:
+	Test(void)
+	{
+		AString DigestNotch, DigestJeb, DigestSimon;
+		byte Digest[20];
+		CryptoPP::SHA1 Checksum;
+		Checksum.Update((const byte *)"Notch", 5);
+		Checksum.Final(Digest);
+		DigestToJava(Digest, DigestNotch);
+		Checksum.Restart();
+		Checksum.Update((const byte *)"jeb_", 4);
+		Checksum.Final(Digest);
+		DigestToJava(Digest, DigestJeb);
+		Checksum.Restart();
+		Checksum.Update((const byte *)"simon", 5);
+		Checksum.Final(Digest);
+		DigestToJava(Digest, DigestSimon);
+		printf("Notch: \"%s\"", DigestNotch.c_str());
+		printf("jeb_: \"%s\"",  DigestJeb.c_str());
+		printf("simon: \"%s\"", DigestSimon.c_str());
+	}
+} test;
+*/
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cProtocol132:
 
@@ -267,6 +342,19 @@ void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+AString cProtocol132::GetAuthServerID(void)
+{
+	// http://wiki.vg/wiki/index.php?title=Session&oldid=2615
+	// Server uses SHA1 to mix ServerID, Client secret and server public key together
+	// The mixing is done in StartEncryption, the result is in m_AuthServerID
+	
+	return m_AuthServerID;
+}
+
+
+
+
+
 int cProtocol132::ParsePacket(unsigned char a_PacketType)
 {
 	switch (a_PacketType)
@@ -322,10 +410,9 @@ int cProtocol132::ParseHandshake(void)
 	}
 
 	// Send a 0xFD Encryption Key Request http://wiki.vg/Protocol#0xFD
-	AString key;
-	CryptoPP::StringSink sink(key);  // GCC won't allow inline instantiation in the following line, damned temporary refs
+	CryptoPP::StringSink sink(m_ServerPublicKey);  // GCC won't allow inline instantiation in the following line, damned temporary refs
 	cRoot::Get()->GetServer()->GetPublicKey().Save(sink);
-	SendEncryptionKeyRequest(key);
+	SendEncryptionKeyRequest();
 
 	return PARSE_OK;
 }
@@ -537,16 +624,13 @@ void cProtocol132::SendCompass(const cWorld & a_World)
 
 
 
-void cProtocol132::SendEncryptionKeyRequest(const AString & a_Key)
+void cProtocol132::SendEncryptionKeyRequest(void)
 {
-	// DEBUG:
-	LOGD("ServerID: \"%s\"", cRoot::Get()->GetServer()->GetServerID().c_str());
-	
 	cCSLock Lock(m_CSPacket);
 	WriteByte((char)0xfd);
 	WriteString(cRoot::Get()->GetServer()->GetServerID());
-	WriteShort((short)a_Key.size());
-	SendData(a_Key.data(), a_Key.size());
+	WriteShort((short)m_ServerPublicKey.size());
+	SendData(m_ServerPublicKey.data(), m_ServerPublicKey.size());
 	WriteShort(4);
 	WriteInt((int)(intptr_t)this);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 	Flush();
@@ -610,6 +694,16 @@ void cProtocol132::StartEncryption(const byte * a_Key)
 	m_Encryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
 	m_Decryptor.SetKey(a_Key, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(a_Key, 16))(Name::FeedbackSize(), 1));
 	m_IsEncrypted = true;
+	
+	// Prepare the m_AuthServerID:
+	CryptoPP::SHA1 Checksum;
+	AString ServerID = cRoot::Get()->GetServer()->GetServerID();
+	Checksum.Update((const byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update(a_Key, 16);
+	Checksum.Update((const byte *)m_ServerPublicKey.c_str(), m_ServerPublicKey.length());
+	byte Digest[20];
+	Checksum.Final(Digest);
+	DigestToJava(Digest, m_AuthServerID);
 }
 
 

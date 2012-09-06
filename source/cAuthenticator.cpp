@@ -127,11 +127,11 @@ void cAuthenticator::Execute(void)
 		}
 		ASSERT(!m_Queue.empty());
 		
-		int ClientID = m_Queue.front().mClientID;
-		AString UserName = m_Queue.front().mName;
+		int ClientID = m_Queue.front().m_ClientID;
+		AString UserName = m_Queue.front().m_Name;
 		AString ActualAddress = m_Address;
 		ReplaceString(ActualAddress, "%USERNAME%", UserName);
-		ReplaceString(ActualAddress, "%SERVERID%", cRoot::Get()->GetServer()->GetServerID());
+		ReplaceString(ActualAddress, "%SERVERID%", m_Queue.front().m_ServerID);
 		m_Queue.pop_front();
 		Lock.Unlock();
 

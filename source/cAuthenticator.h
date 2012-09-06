@@ -50,11 +50,16 @@ private:
 	class cUser
 	{
 	public:
-		int mClientID;
-		AString mName;
-		AString mServerHash;
+		int     m_ClientID;
+		AString m_Name;
+		AString m_ServerID;
 		
-		cUser(int a_ClientID, const AString & a_Name, const AString & a_ServerHash) : mClientID(a_ClientID), mName(a_Name), mServerHash(a_ServerHash) {}
+		cUser(int a_ClientID, const AString & a_Name, const AString & a_ServerID) :
+			m_ClientID(a_ClientID),
+			m_Name(a_Name),
+			m_ServerID(a_ServerID)
+		{
+		}
 	} ;
 	
 	typedef std::deque<cUser> cUserList;

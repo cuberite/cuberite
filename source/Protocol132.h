@@ -40,6 +40,8 @@ public:
 	virtual void SendPlayerSpawn  (const cPlayer & a_Player) override;
 	virtual void SendSpawnMob     (const cMonster & a_Mob) override;
 	virtual void SendUnloadChunk  (int a_ChunkX, int a_ChunkZ) override;
+	
+	virtual AString GetAuthServerID(void) override;
 
 	// DEBUG:
 	virtual void SendKeepAlive  (int a_PingID) override;
@@ -64,6 +66,12 @@ protected:
 	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption m_Encryptor;
 	AString m_DataToSend;
 	
+	/// The ServerID used for session authentication; set in StartEncryption(), used in GetAuthServerID()
+	AString m_AuthServerID;
+	
+	/// The server's public key, as used by SendEncryptionKeyRequest() and StartEncryption()
+	AString m_ServerPublicKey;
+	
 	virtual void SendData(const char * a_Data, int a_Size) override;
 	
 	// DEBUG:
@@ -74,12 +82,12 @@ protected:
 	virtual int  ParseItem(cItem & a_Item) override;
 	
 	virtual void SendCompass(const cWorld & a_World);
-	virtual void SendEncryptionKeyRequest(const AString & a_Key);
+	virtual void SendEncryptionKeyRequest(void);
 	
 	/// Decrypts the key and nonce, checks nonce, starts the symmetric encryption
 	void HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce);
 	
-	/// Starts the symmetric encryption with the specified key
+	/// Starts the symmetric encryption with the specified key; also sets m_AuthServerID
 	void StartEncryption(const byte * a_Key);
 } ;
 
