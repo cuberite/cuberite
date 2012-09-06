@@ -21,6 +21,7 @@
 #include "cFurnaceRecipe.h"
 #include "cTracer.h"
 #include "cWebAdmin.h"
+#include "ProtocolRecognizer.h"
 
 #include "MersenneTwister.h"
 
@@ -163,7 +164,7 @@ bool cServer::InitServer( int a_Port )
 	printf("email: faketruth@gmail.com\n\n");
 
 	LOG("Starting up server.");
-	LOGINFO("Compatible clients: %s, protocol version %d", MCS_CLIENT_VERSION, MCS_PROTOCOL_VERSION);
+	LOGINFO("Compatible clients: %s, protocol versions %s", MCS_CLIENT_VERSIONS, MCS_PROTOCOL_VERSIONS);
 
 	if( cSocket::WSAStartup() != 0 ) // Only does anything on Windows, but whatever
 	{

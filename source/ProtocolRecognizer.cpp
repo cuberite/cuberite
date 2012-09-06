@@ -470,6 +470,9 @@ void cProtocolRecognizer::SendData(const char * a_Data, int a_Size)
 
 bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and 
+	// MCS_PROTOCOL_VERSIONS macros in the header file
+	
 	// The first packet should be a Handshake, 0x02:
 	unsigned char PacketType;
 	if (!m_Buffer.ReadByte(PacketType))

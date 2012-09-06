@@ -21,13 +21,6 @@
 
 
 
-#define MCS_PROTOCOL_VERSION 29  // Synchronize this with MCS_CLIENT_VERSION below!
-#define MCS_CLIENT_VERSION   "1.2.4, 1.2.5"
-
-
-
-
-
 class cChunkDataSerializer;
 class cInventory;
 class cMonster;
