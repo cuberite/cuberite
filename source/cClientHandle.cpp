@@ -574,6 +574,10 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
 {
+	LOGD("HandleBlockPlace: {%d, %d, %d}, face %d, itemtype: %d",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem.m_ItemType
+	);
+	
 	if (!CheckBlockInteractionsRate())
 	{
 		return;
@@ -581,8 +585,11 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 
-	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType))	// Not valid
+	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType) && (a_HeldItem.m_ItemType != -1))
 	{
+		// Only compare ItemType, not meta (torches have different metas)
+		// The -1 check is there because sometimes the client sends -1 instead of the held item 
+		//  ( http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502 )
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
 		);
@@ -596,7 +603,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		return;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem))
+	if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, Equipped))
 	{
 		if (a_BlockFace > -1)
 		{
