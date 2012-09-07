@@ -324,6 +324,7 @@ public:
 		g_BlockIsSnowable[E_BLOCK_TALL_GRASS]            = false;
 		g_BlockIsSnowable[E_BLOCK_TNT]                   = false;
 		g_BlockIsSnowable[E_BLOCK_TORCH]                 = false;
+		g_BlockIsSnowable[E_BLOCK_VINES]                 = false;
 		g_BlockIsSnowable[E_BLOCK_WALLSIGN]              = false;
 		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
 		g_BlockIsSnowable[E_BLOCK_YELLOW_FLOWER]         = false;
