@@ -97,15 +97,20 @@ protected:
 	bool DecodeServersPackets(const char * a_Data, int a_Size);
 	
 	// Packet handling, client-side:
+	bool HandleClientAnimation(void);
+	bool HandleClientBlockPlace(void);
 	bool HandleClientClientStatuses(void);
 	bool HandleClientEncryptionKeyResponse(void);
 	bool HandleClientHandshake(void);
+	bool HandleClientKeepAlive(void);
 	bool HandleClientLocaleAndView(void);
 	bool HandleClientPing(void);
 	bool HandleClientPlayerLook(void);
 	bool HandleClientPlayerOnGround(void);
 	bool HandleClientPlayerPosition(void);
 	bool HandleClientPlayerPositionLook(void);
+	bool HandleClientSlotSelect(void);
+	bool HandleClientUpdateSign(void);
 
 	// Packet handling, server-side:
 	bool HandleServerBlockChange(void);
@@ -124,6 +129,7 @@ protected:
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);
+	bool HandleServerUpdateSign(void);
 	bool HandleServerWindowContents(void);
 	
 	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data

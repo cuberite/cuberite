@@ -67,6 +67,9 @@
 	{ \
 		if (!Proc()) \
 		{ \
+			AString Leftover; \
+			m_ClientBuffer.ReadAgain(Leftover); \
+			DataLog(Leftover.data(), Leftover.size(), "Leftover data after client packet parsing, %d bytes:", Leftover.size()); \
 			m_ClientBuffer.ResetRead(); \
 			return true; \
 		} \
@@ -107,10 +110,14 @@ enum
 	PACKET_PLAYER_POSITION         = 0x0b,
 	PACKET_PLAYER_LOOK             = 0x0c,
 	PACKET_PLAYER_POSITION_LOOK    = 0x0d,
+	PACKET_BLOCK_PLACE             = 0x0f,
+	PACKET_SLOT_SELECT             = 0x10,
+	PACKET_ANIMATION               = 0x12,
 	PACKET_MAP_CHUNK               = 0x33,
 	PACKET_MULTI_BLOCK_CHANGE      = 0x34,
 	PACKET_BLOCK_CHANGE            = 0x35,
 	PACKET_WINDOW_CONTENTS         = 0x68,
+	PACKET_UPDATE_SIGN             = 0x82,
 	PACKET_PLAYER_LIST_ITEM        = 0xc9,
 	PACKET_PLAYER_ABILITIES        = 0xca,
 	PACKET_LOCALE_AND_VIEW         = 0xcc,
@@ -444,15 +451,20 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 		m_ClientBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
+			case PACKET_ANIMATION:               HANDLE_CLIENT_READ(HandleClientAnimation); break;
+			case PACKET_BLOCK_PLACE:             HANDLE_CLIENT_READ(HandleClientBlockPlace); break;
 			case PACKET_CLIENT_STATUSES:         HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
 			case PACKET_ENCRYPTION_KEY_RESPONSE: HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
 			case PACKET_HANDSHAKE:               HANDLE_CLIENT_READ(HandleClientHandshake); break;
+			case PACKET_KEEPALIVE:               HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
 			case PACKET_LOCALE_AND_VIEW:         HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
 			case PACKET_PING:                    HANDLE_CLIENT_READ(HandleClientPing); break;
 			case PACKET_PLAYER_LOOK:             HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
 			case PACKET_PLAYER_ON_GROUND:        HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
 			case PACKET_PLAYER_POSITION:         HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
 			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
+			case PACKET_SLOT_SELECT:             HANDLE_CLIENT_READ(HandleClientSlotSelect); break;
+			case PACKET_UPDATE_SIGN:             HANDLE_CLIENT_READ(HandleClientUpdateSign); break;
 			default:
 			{
 				if (m_ClientState == csEncryptedUnderstood)
@@ -529,6 +541,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
 			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
 			case PACKET_UPDATE_HEALTH:           HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
+			case PACKET_UPDATE_SIGN:             HANDLE_SERVER_READ(HandleServerUpdateSign); break;
 			case PACKET_WINDOW_CONTENTS:         HANDLE_SERVER_READ(HandleServerWindowContents); break;
 			default:
 			{
@@ -560,6 +573,48 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		}  // switch (PacketType)
 		m_ServerBuffer.CommitRead();
 	}  // while (CanReadBytes(1))
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientAnimation(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, Animation);
+	Log("Received a PACKET_ANIMATION from the client:");
+	Log("  EntityID: %d", EntityID);
+	Log("  Animation: %d", Animation);
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientBlockPlace(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, Face);
+	AString Desc;
+	if (!ParseSlot(m_ClientBuffer, Desc))
+	{
+		return false;
+	}
+	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, CursorX);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, CursorY);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, CursorZ);
+	Log("Received a PACKET_BLOCK_PLACE from the client:");
+	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Face = %d", Face);
+	Log("  Item = %s", Desc.c_str());
+	Log("  Cursor = <%d, %d, %d>", CursorX, CursorY, CursorZ);
+	COPY_TO_SERVER();
 	return true;
 }
 
@@ -632,6 +687,18 @@ bool cConnection::HandleClientHandshake(void)
 
 
 
+bool cConnection::HandleClientKeepAlive(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int, ID);
+	Log("Received a PACKET_KEEPALIVE from the client");
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleClientLocaleAndView(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Locale);
@@ -696,7 +763,7 @@ bool cConnection::HandleClientPlayerPosition(void)
 
 	// TODO: list packet contents
 	
-	COPY_TO_CLIENT();
+	COPY_TO_SERVER();
 	return true;
 }
 
@@ -717,7 +784,40 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 
 	// TODO: list packet contents
 	
-	COPY_TO_CLIENT();
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientSlotSelect(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
+	Log("Received a PACKET_SLOT_SELECT from the client");
+	Log("  SlotNum = %d", SlotNum);
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientUpdateSign(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,   BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort,         short, BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,   BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line1);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line2);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line3);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Line4);
+	Log("Received a PACKET_UPDATE_SIGN from the client:");
+	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Lines = \"%s\", \"%s\", \"%s\", \"%s\"", Line1.c_str(), Line2.c_str(), Line3.c_str(), Line4.c_str());
+	COPY_TO_SERVER();
 	return true;
 }
 
@@ -1021,6 +1121,26 @@ bool cConnection::HandleServerUpdateHealth(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, Food);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Saturation);
 	Log("Received a PACKET_UPDATE_HEALTH from the server");
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerUpdateSign(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,   BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,   BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line1);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line2);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line3);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Line4);
+	Log("Received a PACKET_UPDATE_SIGN from the server:");
+	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Lines = \"%s\", \"%s\", \"%s\", \"%s\"", Line1.c_str(), Line2.c_str(), Line3.c_str(), Line4.c_str());
 	COPY_TO_CLIENT();
 	return true;
 }
