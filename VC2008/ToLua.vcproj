@@ -170,7 +170,7 @@
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="../tolua++-1.0.93/include;../lua-5.1.4/src"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"

@@ -200,7 +200,7 @@
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="Globals.h"
 				WarningLevel="3"
