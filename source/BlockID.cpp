@@ -82,6 +82,10 @@ public:
 		{
 			a_Item.m_ItemType = itr->second.first;
 			a_Item.m_ItemDamage = itr->second.second;
+			if (a_Item.m_ItemDamage == -1)
+			{
+				a_Item.m_ItemDamage = 0;
+			}
 			return true;
 		}
 
