@@ -353,6 +353,7 @@ public:
 		g_BlockTransparent[E_BLOCK_FIRE]           = true;
 		g_BlockTransparent[E_BLOCK_GLASS]          = true;
 		g_BlockTransparent[E_BLOCK_ICE]            = true;
+		g_BlockTransparent[E_BLOCK_LEAVES]         = true;
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]   = true;
 		g_BlockTransparent[E_BLOCK_RED_ROSE]       = true;
 		g_BlockTransparent[E_BLOCK_SIGN_POST]      = true;
