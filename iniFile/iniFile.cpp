@@ -52,68 +52,97 @@ cIniFile::cIniFile( const string iniPath)
 
 bool cIniFile::ReadFile()
 {
-  // Normally you would use ifstream, but the SGI CC compiler has
-  // a few bugs with ifstream. So ... fstream used.
-  fstream f;
-  string   line;
-  string   keyname, valuename, value;
-  string::size_type pLeft, pRight;
+	// Normally you would use ifstream, but the SGI CC compiler has
+	// a few bugs with ifstream. So ... fstream used.
+	fstream f;
+	string   line;
+	string   keyname, valuename, value;
+	string::size_type pLeft, pRight;
 
-  f.open( (FILE_IO_PREFIX + path).c_str(), ios::in);
-  if ( f.fail())
-    return false;
+	f.open( (FILE_IO_PREFIX + path).c_str(), ios::in);
+	if ( f.fail())
+		return false;
 
-  while( getline( f, line)) {
-    // To be compatible with Win32, check for existence of '\r'.
-    // Win32 files have the '\r' and Unix files don't at the end of a line.
-    // Note that the '\r' will be written to INI files from
-    // Unix so that the created INI file can be read under Win32
-    // without change.
-	unsigned int lineLength = line.length();
-	if(lineLength == 0) continue;
-    if ( line[lineLength - 1] == '\r')
-      line = line.substr( 0, lineLength - 1);
+	while (getline( f, line))
+	{
+		// To be compatible with Win32, check for existence of '\r'.
+		// Win32 files have the '\r' and Unix files don't at the end of a line.
+		// Note that the '\r' will be written to INI files from
+		// Unix so that the created INI file can be read under Win32
+		// without change.
+		unsigned int lineLength = line.length();
+		if (lineLength == 0)
+		{
+			continue;
+		}
+		if ( line[lineLength - 1] == '\r')
+		{
+			line = line.substr( 0, lineLength - 1);
+		}
 
-    if ( line.length()) {
-      // Check that the user hasn't opened a binary file by checking the first
-      // character of each line!
-      if ( !isprint( line[0])) {
-	printf( "Failing on char %d\n", line[0]);
+		if (line.length() == 0)
+		{
+			continue;
+		}
+		
+		// Check that the user hasn't opened a binary file by checking the first
+		// character of each line!
+		if ( !isprint( line[0]))
+		{
+			printf( "Failing on char %d\n", line[0]);
+			f.close();
+			return false;
+		}
+		if (( pLeft = line.find_first_of(";#[=")) == string::npos)
+		{
+			continue;
+		}
+		
+		switch ( line[pLeft])
+		{
+			case '[':
+			{
+				if (
+					((pRight = line.find_last_of("]")) != string::npos) &&
+					(pRight > pLeft)
+				)
+				{
+					keyname = line.substr( pLeft + 1, pRight - pLeft - 1);
+					AddKeyName( keyname);
+				}
+				break;
+			}
+
+			case '=':
+			{
+				valuename = line.substr( 0, pLeft);
+				value = line.substr( pLeft + 1);
+				SetValue( keyname, valuename, value);
+				break;
+			}
+
+			case ';':
+			case '#':
+			{
+				if (names.size() == 0)
+				{
+					HeaderComment( line.substr( pLeft + 1));
+				}
+				else
+				{
+					KeyComment( keyname, line.substr( pLeft + 1));
+				}
+				break;
+			}
+		}  // switch (line[pLeft])
+	}  // while (getline())
+
 	f.close();
-	return false;
-      }
-      if (( pLeft = line.find_first_of(";#[=")) != string::npos) {
-	switch ( line[pLeft]) {
-	case '[':
-	  if ((pRight = line.find_last_of("]")) != string::npos &&
-	      pRight > pLeft) {
-	    keyname = line.substr( pLeft + 1, pRight - pLeft - 1);
-	    AddKeyName( keyname);
-	  }
-	  break;
-
-	case '=':
-	  valuename = line.substr( 0, pLeft);
-	  value = line.substr( pLeft + 1);
-	  SetValue( keyname, valuename, value);
-	  break;
-
-	case ';':
-	case '#':
-	  if ( !names.size())
-	    HeaderComment( line.substr( pLeft + 1));
-	  else
-	    KeyComment( keyname, line.substr( pLeft + 1));
-	  break;
+	if (names.size() > 0)
+	{
+		return true;
 	}
-      }
-    }
-  }
-
-  f.close();
-  if ( names.size())
-    return true;
-  return false;
+	return false;
 }
 
 

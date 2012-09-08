@@ -26,24 +26,128 @@ bool       g_BlockRequiresSpecialTool[256];
 
 class cBlockIDMap
 {
+	typedef std::map<AString, std::pair<short, short> > ItemMap;
+	
 public:
-	cBlockIDMap(void) : m_Ini("items.ini")
+	cBlockIDMap(void)
 	{
-		m_Ini.ReadFile();
+		cIniFile Ini("items.ini");
+		if (!Ini.ReadFile())
+		{
+			return;
+		}
+		long KeyID = Ini.FindKey("Items");
+		if (KeyID == cIniFile::noID)
+		{
+			return;
+		}
+		unsigned NumValues = Ini.GetNumValues(KeyID);
+		for (unsigned i = 0; i < NumValues; i++)
+		{
+			AString Name = Ini.ValueName(KeyID, i);
+			if (Name.empty())
+			{
+				continue;
+			}
+			AString Value = Ini.GetValue(KeyID, i);
+			AddToMap(Name, Value);
+		}  // for i - Ini.Values[]
 	}
+	
 	
 	int Resolve(const AString & a_ItemName)
 	{
-		return m_Ini.GetValueI("Items", a_ItemName, -1);
+		ItemMap::iterator itr = m_Map.find(a_ItemName);
+		if (itr == m_Map.end())
+		{
+			return -1;
+		}
+		return itr->second.first;
 	}
 	
-	AString ResolveString(const AString & a_ItemName)
+	
+	bool ResolveItem(const AString & a_ItemName, cItem & a_Item)
 	{
-		return m_Ini.GetValue("Items", a_ItemName, "");
+		ItemMap::iterator itr = m_Map.find(a_ItemName);
+		if (itr != m_Map.end())
+		{
+			a_Item.m_ItemType = itr->second.first;
+			a_Item.m_ItemDamage = itr->second.second;
+			return true;
+		}
+
+		// Not a resolvable string, try pure numbers: "45:6", "45^6" etc.
+		AStringVector Split = StringSplit(a_ItemName, ":");
+		if (Split.size() == 1)
+		{
+			Split = StringSplit(a_ItemName, "^");
+		}
+		if (Split.empty())
+		{
+			return false;
+		}
+		a_Item.m_ItemType = (short)atoi(Split[0].c_str());
+		if ((a_Item.m_ItemType == 0) && (Split[0] != "0"))
+		{
+			// Parsing the number failed
+			return false;
+		}
+		if (Split.size() < 2)
+		{
+			return true;
+		}
+		a_Item.m_ItemDamage = atoi(Split[1].c_str());
+		if ((a_Item.m_ItemDamage == 0) && (Split[1] != "0"))
+		{
+			// Parsing the number failed
+			return false;
+		}
+
+		return true;
 	}
+	
+	
+	AString Desolve(short a_ItemType, short a_ItemDamage)
+	{
+		for (ItemMap::iterator itr = m_Map.begin(), end = m_Map.end(); itr != end; ++itr)
+		{
+			if ((itr->second.first == a_ItemType) && (itr->second.second == a_ItemDamage))
+			{
+				return itr->first;
+			}
+		}  // for itr - m_Map[]
+		AString res;
+		if (a_ItemDamage == -1)
+		{
+			Printf(res, "%d", a_ItemType);
+		}
+		else
+		{
+			Printf(res, "%d:%d", a_ItemType, a_ItemDamage);
+		}
+		return res;
+	}
+	
 	
 protected:
-	cIniFile m_Ini;
+	ItemMap m_Map;
+	
+	
+	void AddToMap(const AString & a_Name, const AString & a_Value)
+	{
+		AStringVector Split = StringSplit(a_Value, ":");
+		if (Split.size() == 1)
+		{
+			Split = StringSplit(a_Value, "^");
+		}
+		if (Split.empty())
+		{
+			return;
+		}
+		short ItemType = (short)atoi(Split[0].c_str());
+		short ItemDamage = (Split.size() > 1) ? (short)atoi(Split[1].c_str()) : -1;
+		m_Map[a_Name] = std::make_pair(ItemType, ItemDamage);
+	}
 } ;
 
 
@@ -51,6 +155,25 @@ protected:
 
 
 static cBlockIDMap gsBlockIDMap;
+
+
+
+
+
+/*
+// Quick self-test:
+class Tester
+{
+public:
+	Tester(void)
+	{
+		cItem Item;
+		gsBlockIDMap.ResolveItem("charcoal", Item);
+		AString Charcoal = gsBlockIDMap.Desolve(Item.m_ItemType, Item.m_ItemDamage);
+		ASSERT(Charcoal == "charcoal");
+	}
+} test;
+//*/
 
 
 
@@ -73,33 +196,25 @@ BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString)
 
 bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 {
-	AString Resolved = TrimString(gsBlockIDMap.ResolveString(TrimString(a_ItemTypeString)));
-	AString txt = (!Resolved.empty()) ? Resolved : a_ItemTypeString;
-	AStringVector Split = StringSplit(txt, ":");
-	if (Split.size() == 1)
-	{
-		Split = StringSplit(txt, "^");
-	}
-	if (Split.empty())
-	{
-		return false;
-	}
-	a_Item.m_ItemID = (ENUM_ITEM_ID)atoi(Split[0].c_str());
-	if ((a_Item.m_ItemID == 0) && (Split[0] != "0"))
-	{
-		// Parsing the number failed
-		return false;
-	}
-	if (Split.size() > 1)
-	{
-		a_Item.m_ItemHealth = atoi(Split[1].c_str());
-		if ((a_Item.m_ItemHealth == 0) && (Split[1] != "0"))
-		{
-			// Parsing the number failed
-			return false;
-		}
-	}
-	return true;
+	return gsBlockIDMap.ResolveItem(TrimString(a_ItemTypeString), a_Item);
+}
+
+
+
+
+
+AString ItemToString(const cItem & a_Item)
+{
+	return gsBlockIDMap.Desolve(a_Item.m_ItemType, a_Item.m_ItemDamage);
+}
+
+
+
+
+
+AString ItemTypeToString(short a_ItemType)
+{
+	return gsBlockIDMap.Desolve(a_ItemType, -1);
 }
 
 

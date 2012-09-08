@@ -631,6 +631,12 @@ extern BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString);  // tolua
 /// Translates an itemtype string into an item. Takes either a number, number^number, number:number or an items.ini alias as input. Returns true if successful.
 extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);  // tolua_export
 
+/// Translates a full item into a string. If the ItemType is not recognized, the ItemType number is output into the string.
+extern AString ItemToString(const cItem & a_Item);  // tolua_export
+
+/// Translates itemtype into a string. If the type is not recognized, the itemtype number is output into the string.
+extern AString ItemTypeToString(short a_ItemType);  // tolua_export
+
 /// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 
@@ -645,7 +651,7 @@ extern bool       g_BlockTransparent[256];
 extern bool       g_BlockOneHitDig[256];
 extern bool       g_BlockPistonBreakable[256];
 extern bool       g_BlockIsSnowable[256];
-extern bool		  g_BlockRequiresSpecialTool[256];
+extern bool       g_BlockRequiresSpecialTool[256];
 
 
 
