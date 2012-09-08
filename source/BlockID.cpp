@@ -124,6 +124,7 @@ public:
 	
 	AString Desolve(short a_ItemType, short a_ItemDamage)
 	{
+		// First try an exact match, both ItemType and ItemDamage ("birchplanks=5:2"):
 		for (ItemMap::iterator itr = m_Map.begin(), end = m_Map.end(); itr != end; ++itr)
 		{
 			if ((itr->second.first == a_ItemType) && (itr->second.second == a_ItemDamage))
@@ -131,6 +132,20 @@ public:
 				return itr->first;
 			}
 		}  // for itr - m_Map[]
+		
+		// There is no exact match, try matching ItemType only ("planks=5"):
+		if (a_ItemDamage == 0)
+		{
+			for (ItemMap::iterator itr = m_Map.begin(), end = m_Map.end(); itr != end; ++itr)
+			{
+				if ((itr->second.first == a_ItemType) && (itr->second.second == -1))
+				{
+					return itr->first;
+				}
+			}  // for itr - m_Map[]
+		}
+
+		// No match at all, synthesize a string ("5:1"):
 		AString res;
 		if (a_ItemDamage == -1)
 		{
