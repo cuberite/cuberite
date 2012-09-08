@@ -7,7 +7,6 @@ SHOW_PLUGIN_NAMES = true	-- If true, plugin name will be shown before commands
 PLUGIN = {}	-- Reference to own plugin object
 BannedPlayersIni = {}
 WhiteListIni = {}
-ItemsTable = {}
 
 function Initialize( Plugin )
 	PLUGIN = Plugin
@@ -71,33 +70,6 @@ function Initialize( Plugin )
 	local IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
 		SHOW_PLUGIN_NAMES = IniFile:GetValueB("HelpPlugin", "ShowPluginNames", true )
-	end
-
-	local itemsINI = cIniFile("items.ini")
-	if ( itemsINI:ReadFile() == true ) then
-		local KeyID = itemsINI:FindKey('Items')
-	
-		LOGINFO("Core: loaded "  .. itemsINI:GetNumValues( KeyID ) .. " item names.")
-		
-		for i = 0, itemsINI:GetNumValues('Items') do
-			local ItemName = itemsINI:GetValueName( KeyID, i )
-			local ItemSyntax = itemsINI:GetValue(KeyID, i, "0")
-			
-			local ItemData = StringSplit(ItemSyntax, ":") -- [1] = ID, [2] = perhaps meta/dmg
-			if( #ItemData > 0 ) then	
-				local ItemID = tonumber( ItemData[1] )
-				if( ItemID > 0 ) then
-					local ItemMeta = 0
-					if( #ItemData > 1 ) then
-						ItemMeta = tonumber( ItemData[2] )
-					end
-					ItemsTable[ ItemName ] = cItem( ItemID, 1, ItemMeta )
-					--LOGINFO("Got item: " .. ItemName .. "-> " .. ItemsTable[ ItemName ].m_ItemID ..":" .. ItemsTable[ ItemName ].m_ItemHealth )
-				end
-			end
-		end
-		
-		HAVE_ITEM_NAMES = true
 	end
 	
 	-- Load whitelist, and add default values and stuff

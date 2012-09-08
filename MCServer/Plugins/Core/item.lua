@@ -4,41 +4,11 @@ function HandleItemCommand( Split, Player )
 		return true
 	end
 
-	local FoundItem = false
+	local Item = cItem(E_ITEM_EMPTY, 1)
+	local FoundItem = StringToItem( Split[2], Item )
 	
-	local ItemSyntax = Split[2]	-- Contains item string with optional metadata
-	local ItemData = StringSplit( Split[2], ":" )
-
-	-- Default item values
-	local ItemID = 0
-	local ItemMeta = 0
-	local ItemAmount = 1
-	
-	if( #ItemData > 0 ) then
-		ItemID = ItemData[1]
-	end
-	
-	if( tonumber(ItemID) ~= nil ) then -- Definitely a number
-		ItemID = tonumber(ItemID)
-		if( IsValidItem( ItemID ) ) then
-			FoundItem = true
-		end
-	end
-
-	if( FoundItem == false ) then
-		if ( HAVE_ITEM_NAMES == true ) then
-			local Item = ItemsTable[ ItemID ]
-			if( Item ~= nil ) then
-				ItemID = Item.m_ItemID
-				ItemMeta = Item.m_ItemHealth
-				FoundItem = true
-			end
-		end
-	end
-	
-	-- Override metadata from item in list, if metadata was given
-	if( #ItemData > 1 and tonumber( ItemData[2] ) ~= nil ) then	-- Metadata is given, and is a number
-		ItemMeta = tonumber( ItemData[2] )
+	if( IsValidItem( Item.m_ItemType ) == false ) then -- StringToItem does not check if item is valid
+		FoundItem = false
 	end
 
 	if( FoundItem == false ) then
@@ -51,13 +21,14 @@ function HandleItemCommand( Split, Player )
 		if( ItemAmount == nil or ItemAmount < 1 or ItemAmount > 512 ) then
 			Player:SendMessage( cChatColor.Green .. "Invalid Amount !" )
 			return true
+		else
+			Item.m_ItemCount = ItemAmount
 		end
 	end
 
-	local NewItem = cItem( ItemID, ItemAmount, ItemMeta )
-	if( Player:GetInventory():AddItem( NewItem ) == true ) then
+	if( Player:GetInventory():AddItem( Item ) == true ) then
 		Player:SendMessage( cChatColor.Green .. "There you go !" )
-		LOG("Gave " .. Player:GetName() .. " " .. ItemAmount .. " times " .. ItemID .. ":" .. ItemMeta)
+		LOG("Gave " .. Player:GetName() .. " " .. Item.m_ItemCount .. " times " .. Item.m_ItemType .. ":" .. Item.m_ItemDamage)
 	else
 		Player:SendMessage( cChatColor.Green .. "Not enough space in inventory !" )
 	end
