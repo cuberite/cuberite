@@ -68,7 +68,7 @@ bool cPlugin_NewLua::Initialize()
 		ManualBindings::Bind( m_LuaState );
 	}
 
-	std::string PluginPath = FILE_IO_PREFIX + std::string("Plugins/") + m_Directory + "/";
+	std::string PluginPath = GetLocalDirectory() + "/";
 
 	// Load all files for this plugin, and execute them
 	AStringList Files = GetDirectoryContents(PluginPath.c_str());
@@ -125,6 +125,15 @@ bool cPlugin_NewLua::Initialize()
 
 	bool bSuccess = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bSuccess;
+}
+
+
+
+
+
+AString cPlugin_NewLua::GetLocalDirectory(void) const
+{
+	return FILE_IO_PREFIX + std::string("Plugins/") + m_Directory;
 }
 
 

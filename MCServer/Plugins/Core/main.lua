@@ -101,7 +101,7 @@ function Initialize( Plugin )
 	end
 	
 	-- Load whitelist, and add default values and stuff
-	WhiteListIni = cIniFile("whitelist.ini")
+	WhiteListIni = cIniFile( Plugin:GetLocalDirectory() .. "/whitelist.ini" )
 	if ( WhiteListIni:ReadFile() == true ) then
 		if( WhiteListIni:GetValueB("WhiteListSettings", "WhiteListOn", false) == true ) then
 			if( WhiteListIni:GetNumValues("WhiteList") > 0 ) then
@@ -121,7 +121,7 @@ function Initialize( Plugin )
 	end
 	
 	-- Load banned players, and add default values and stuff
-	BannedPlayersIni = cIniFile("banned.ini")
+	BannedPlayersIni = cIniFile( Plugin:GetLocalDirectory() .. "/banned.ini" )
 	if ( BannedPlayersIni:ReadFile() == true ) then
 		if( BannedPlayersIni:GetNumValues("Banned") > 0 ) then
 			LOGINFO("Core: loaded "  .. BannedPlayersIni:GetNumValues("Banned") .. " banned players.")

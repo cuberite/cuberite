@@ -48,6 +48,7 @@ public:														//tolua_export
 	virtual bool OnHandshake       (cClientHandle * a_Client, const AString & a_Username) override;
 
 	const AString & GetDirectory(void) const {return m_Directory; }
+	AString GetLocalDirectory(void) const;	//tolua_export
 	
 	virtual void SetName( const AString & a_Name ) override { cPlugin::SetName(a_Name); }
 	
