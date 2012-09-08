@@ -86,6 +86,7 @@ public:
 			{
 				a_Item.m_ItemDamage = 0;
 			}
+			a_Item.m_ItemCount = 1;
 			return true;
 		}
 
@@ -107,6 +108,7 @@ public:
 		}
 		if (Split.size() < 2)
 		{
+			a_Item.m_ItemCount = 1;
 			return true;
 		}
 		a_Item.m_ItemDamage = atoi(Split[1].c_str());
@@ -115,7 +117,7 @@ public:
 			// Parsing the number failed
 			return false;
 		}
-
+		a_Item.m_ItemCount = 1;
 		return true;
 	}
 	
