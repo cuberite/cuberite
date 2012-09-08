@@ -26,7 +26,16 @@ bool       g_BlockRequiresSpecialTool[256];
 
 class cBlockIDMap
 {
-	typedef std::map<AString, std::pair<short, short> > ItemMap;
+	// Making the map case-insensitive:
+	struct Comparator
+	{
+		bool operator()(const AString & a_Item1, const AString & a_Item2)
+		{
+			return (NoCaseCompare(a_Item1, a_Item2) > 0);
+		}
+	} ;
+	
+	typedef std::map<AString, std::pair<short, short>, Comparator> ItemMap;
 	
 public:
 	cBlockIDMap(void)
