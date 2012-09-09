@@ -348,8 +348,9 @@ void* webserver::Request(void* ptr_s)
 
 	if( (req.method_.compare("POST") == 0) && (req.content_length_ > 0) )
 	{
+		const char FormUrlEncoded[] = "application/x-www-form-urlencoded";
 		// The only content type we can parse at the moment, the default HTML post data
-		if( req.content_type_.compare( "application/x-www-form-urlencoded" ) == 0 )
+		if( req.content_type_.substr(0, strlen(FormUrlEncoded)).compare( FormUrlEncoded ) == 0 )
 		{
 			std::string Content = s->ReceiveBytes( req.content_length_ );
 			Content.insert( 0, "/ ?" ); // Little hack, inserts dummy URL so that SplitGetReq() can work with this content
