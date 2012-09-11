@@ -14,5 +14,10 @@ public:
 	{
 		return a_BlockMeta;
 	}
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.cloth";
+	}
 	
 };

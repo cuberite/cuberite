@@ -50,6 +50,13 @@ public:
 	{
 		return false;
 	}
+	
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.cloth";
+	}
+
 };
 
 

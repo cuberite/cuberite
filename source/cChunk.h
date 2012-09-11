@@ -187,6 +187,7 @@ public:
 	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup  (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSoundEffect    (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);  // a_Src coords are Block * 8
 	void BroadcastChunkData      (cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	
 	void SendBlockEntity         (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);

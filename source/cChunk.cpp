@@ -1834,6 +1834,22 @@ void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
+void cChunk::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )

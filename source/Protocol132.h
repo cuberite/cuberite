@@ -38,9 +38,10 @@ public:
 	virtual void SendDestroyEntity(const cEntity & a_Entity) override;
 	virtual void SendLogin        (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendPlayerSpawn  (const cPlayer & a_Player) override;
+	virtual void SendSoundEffect  (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendSpawnMob     (const cMonster & a_Mob) override;
 	virtual void SendUnloadChunk  (int a_ChunkX, int a_ChunkZ) override;
-	
+
 	virtual AString GetAuthServerID(void) override;
 
 	// DEBUG:

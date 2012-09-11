@@ -1816,6 +1816,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\blocks\BlockGravel.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockIce.h"
 					>
 				</File>
@@ -1873,6 +1877,10 @@
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockRedstoneTorch.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\blocks\BlockSand.h"
 					>
 				</File>
 				<File

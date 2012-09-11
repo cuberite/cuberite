@@ -39,4 +39,13 @@ public:
 		}
 		return result;
 	}
+
+	virtual AString GetStepSound(void) override
+	{		
+		if (m_BlockID == E_BLOCK_WOODEN_SLAB || m_BlockID ==E_BLOCK_DOUBLE_WOODEN_SLAB)
+			return "step.wood";
+
+		else
+			return "step.stone";
+	}
 };

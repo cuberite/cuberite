@@ -154,6 +154,11 @@ public:
 	{
 		return 0;
 	}
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.wood";
+	}
 };
 
 

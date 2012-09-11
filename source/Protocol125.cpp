@@ -577,6 +577,16 @@ void cProtocol125::SendRespawn(void)
 
 
 
+void cProtocol125::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+{
+	cCSLock Lock(m_CSPacket);
+	//TODO: Not needed in this protocol?
+}
+
+
+
+
+
 void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 {
 	cCSLock Lock(m_CSPacket);

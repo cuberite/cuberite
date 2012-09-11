@@ -20,4 +20,9 @@ public:
 	{
 		return E_ITEM_REDSTONE_TORCH_ON;
 	}
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.wood";
+	}
 };

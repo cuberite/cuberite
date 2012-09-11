@@ -30,5 +30,11 @@ public:
 		char Dir = cLadder::MetaDataToDirection(a_World->GetBlockMeta( a_X, a_Y, a_Z));
 		return CanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
+
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.wood";
+	}
 	
 };

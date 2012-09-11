@@ -65,6 +65,7 @@ public:
 	virtual void SendPlayerPosition   (void) override;
 	virtual void SendPlayerSpawn      (const cPlayer & a_Player) override;
 	virtual void SendRespawn          (void) override;
+	virtual void SendSoundEffect      (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob         (const cMonster & a_Mob) override;
 	virtual void SendTeleportEntity   (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt      (int a_BlockX, int a_BlockY, int a_BlockZ) override;

@@ -63,3 +63,12 @@ void cBlockDoorHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYP
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
 }
+
+AString cBlockDoorHandler::GetStepSound(void)
+{
+		if (m_BlockID == E_BLOCK_WOODEN_DOOR)
+			return "step.wood";
+
+		else
+			return "step.stone";
+}

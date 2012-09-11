@@ -2,6 +2,8 @@
 #include "Block.h"
 #include "../cItem.h"
 #include "../cWorld.h"
+#include "BlockSand.h"
+#include "BlockGravel.h"
 #include "BlockDoor.h"
 #include "BlockFire.h"
 #include "BlockRedstone.h"
@@ -75,6 +77,10 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 {
 	switch(a_BlockID)
 	{
+		case E_BLOCK_SAND:
+			return new cBlockSandHandler(a_BlockID);
+		case E_BLOCK_GRAVEL:
+			return new cBlockGravelHandler(a_BlockID);
 		case E_BLOCK_WOODEN_DOOR:
 		case E_BLOCK_IRON_DOOR:
 			return new cBlockDoorHandler(a_BlockID);
@@ -343,6 +349,14 @@ void cBlockHandler::DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z)
 		Drops.push_back(cItem(DropItem, DropCount, GetDropMeta(Meta)));
 		a_World->SpawnItemPickups(Drops, a_X, a_Y, a_Z);
 	}
+}
+
+
+
+
+
+AString cBlockHandler::GetStepSound() {
+	return "step.stone";
 }
 
 

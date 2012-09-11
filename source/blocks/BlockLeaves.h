@@ -108,6 +108,11 @@ public:
 		a_World->DigBlock(a_X, a_Y, a_Z);
 		
 	}
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.grass";
+	}
 };
 
 

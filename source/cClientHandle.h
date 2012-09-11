@@ -111,6 +111,7 @@ public:
 	void SendWeather(eWeather a_Weather);
 	void SendTimeUpdate(Int64 a_WorldTime);
 	void SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
 	void SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
 
 	const AString & GetUsername(void) const;		//tolua_export

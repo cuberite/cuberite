@@ -10,6 +10,7 @@ public:
 	virtual void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z) override;
 	virtual void OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override;
 	virtual void OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override;
+	virtual AString GetStepSound(void) override;
 	virtual char GetDropCount() override;
 	virtual bool IsUseable() override
 	{

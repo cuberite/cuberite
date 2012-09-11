@@ -41,7 +41,8 @@ public:
 	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta);
 	// This function handles the dropping of a block based on the Drop id, drop count and drop meta. This will not destroy the block
 	virtual void DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z);
-
+	/// Returns step sound name of block
+	virtual AString GetStepSound();
 	
 	// Indicates whether this block needs random ticks DEFAULT: False
 	virtual bool NeedsRandomTicks();

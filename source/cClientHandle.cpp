@@ -677,6 +677,8 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			if (NewBlock->CanBePlacedAt(World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 			{
 				ItemHandler->PlaceBlock(World, m_Player, &m_Player->GetInventory().GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				// Step sound with 0.8f pitch is used as block placement sound
+				World->BroadcastSoundEffect(NewBlock->GetStepSound(),a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
 			}
 			else
 			{
@@ -1398,6 +1400,15 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldTime)
 void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+{
+	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
 }
 
 

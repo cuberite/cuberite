@@ -63,5 +63,10 @@ public:
 			}
 		}  // for i - repeat twice
 	}
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.gravel";
+	}
 	
 };

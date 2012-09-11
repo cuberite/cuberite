@@ -18,5 +18,5 @@ public:
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
 	
-	
+	//TODO: step sound
 };

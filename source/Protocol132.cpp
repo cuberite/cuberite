@@ -59,6 +59,7 @@ enum
 	PACKET_CHUNK_DATA       = 0x33,
 	PACKET_BLOCK_CHANGE     = 0x35,
 	PACKET_BLOCK_ACTION     = 0x36,
+	PACKET_SOUND_EFFECT		= 0x3e
 } ;
 
 
@@ -303,6 +304,23 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 	WriteByte  (0);  // Index 0, byte (flags)
 	WriteByte  (0);  // Flags, empty
 	WriteByte  (0x7f);  // End of metadata
+	Flush();
+}
+
+
+
+
+
+void cProtocol132::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte   (PACKET_SOUND_EFFECT);
+	WriteString (a_SoundName);
+	WriteInt    (a_SrcX);
+	WriteInt    (a_SrcY);
+	WriteInt    (a_SrcZ);
+	WriteFloat  (a_Volume);
+	WriteByte   ((char)(a_Pitch * 63.0f));
 	Flush();
 }
 

@@ -21,4 +21,9 @@ public:
 		MTRand r1;
 		return (char)(3 + r1.randInt(4));
 	}
+
+	virtual AString GetStepSound(void) override
+	{
+		return "step.wood";
+	}
 };
