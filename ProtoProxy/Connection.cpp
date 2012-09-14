@@ -98,34 +98,39 @@ typedef unsigned char Byte;
 
 enum
 {
-	PACKET_KEEPALIVE               = 0x00,
-	PACKET_LOGIN                   = 0x01,
-	PACKET_HANDSHAKE               = 0x02,
-	PACKET_CHAT_MESSAGE            = 0x03,
-	PACKET_TIME_UPDATE             = 0x04,
-	PACKET_ENTITY_EQUIPMENT        = 0x05,
-	PACKET_COMPASS                 = 0x06,
-	PACKET_UPDATE_HEALTH           = 0x08,
-	PACKET_PLAYER_ON_GROUND        = 0x0a,
-	PACKET_PLAYER_POSITION         = 0x0b,
-	PACKET_PLAYER_LOOK             = 0x0c,
-	PACKET_PLAYER_POSITION_LOOK    = 0x0d,
-	PACKET_BLOCK_PLACE             = 0x0f,
-	PACKET_SLOT_SELECT             = 0x10,
-	PACKET_ANIMATION               = 0x12,
-	PACKET_MAP_CHUNK               = 0x33,
-	PACKET_MULTI_BLOCK_CHANGE      = 0x34,
-	PACKET_BLOCK_CHANGE            = 0x35,
-	PACKET_WINDOW_CONTENTS         = 0x68,
-	PACKET_UPDATE_SIGN             = 0x82,
-	PACKET_PLAYER_LIST_ITEM        = 0xc9,
-	PACKET_PLAYER_ABILITIES        = 0xca,
-	PACKET_LOCALE_AND_VIEW         = 0xcc,
-	PACKET_CLIENT_STATUSES         = 0xcd,
-	PACKET_ENCRYPTION_KEY_RESPONSE = 0xfc,
-	PACKET_ENCRYPTION_KEY_REQUEST  = 0xfd,
-	PACKET_PING                    = 0xfe,
-	PACKET_KICK                    = 0xff,
+	PACKET_KEEPALIVE                 = 0x00,
+	PACKET_LOGIN                     = 0x01,
+	PACKET_HANDSHAKE                 = 0x02,
+	PACKET_CHAT_MESSAGE              = 0x03,
+	PACKET_TIME_UPDATE               = 0x04,
+	PACKET_ENTITY_EQUIPMENT          = 0x05,
+	PACKET_COMPASS                   = 0x06,
+	PACKET_USE_ENTITY                = 0x07,
+	PACKET_UPDATE_HEALTH             = 0x08,
+	PACKET_PLAYER_ON_GROUND          = 0x0a,
+	PACKET_PLAYER_POSITION           = 0x0b,
+	PACKET_PLAYER_LOOK               = 0x0c,
+	PACKET_PLAYER_POSITION_LOOK      = 0x0d,
+	PACKET_BLOCK_PLACE               = 0x0f,
+	PACKET_SLOT_SELECT               = 0x10,
+	PACKET_ANIMATION                 = 0x12,
+	PACKET_MAP_CHUNK                 = 0x33,
+	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
+	PACKET_BLOCK_CHANGE              = 0x35,
+	PACKET_WINDOW_CLOSE              = 0x65,
+	PACKET_WINDOW_CLICK              = 0x66,
+	PACKET_SET_SLOT                  = 0x67,
+	PACKET_WINDOW_CONTENTS           = 0x68,
+	PACKET_CREATIVE_INVENTORY_ACTION = 0x6b,
+	PACKET_UPDATE_SIGN               = 0x82,
+	PACKET_PLAYER_LIST_ITEM          = 0xc9,
+	PACKET_PLAYER_ABILITIES          = 0xca,
+	PACKET_LOCALE_AND_VIEW           = 0xcc,
+	PACKET_CLIENT_STATUSES           = 0xcd,
+	PACKET_ENCRYPTION_KEY_RESPONSE   = 0xfc,
+	PACKET_ENCRYPTION_KEY_REQUEST    = 0xfd,
+	PACKET_PING                      = 0xfe,
+	PACKET_KICK                      = 0xff,
 } ;
 
 
@@ -451,20 +456,25 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 		m_ClientBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
-			case PACKET_ANIMATION:               HANDLE_CLIENT_READ(HandleClientAnimation); break;
-			case PACKET_BLOCK_PLACE:             HANDLE_CLIENT_READ(HandleClientBlockPlace); break;
-			case PACKET_CLIENT_STATUSES:         HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
-			case PACKET_ENCRYPTION_KEY_RESPONSE: HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
-			case PACKET_HANDSHAKE:               HANDLE_CLIENT_READ(HandleClientHandshake); break;
-			case PACKET_KEEPALIVE:               HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
-			case PACKET_LOCALE_AND_VIEW:         HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
-			case PACKET_PING:                    HANDLE_CLIENT_READ(HandleClientPing); break;
-			case PACKET_PLAYER_LOOK:             HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
-			case PACKET_PLAYER_ON_GROUND:        HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
-			case PACKET_PLAYER_POSITION:         HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
-			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
-			case PACKET_SLOT_SELECT:             HANDLE_CLIENT_READ(HandleClientSlotSelect); break;
-			case PACKET_UPDATE_SIGN:             HANDLE_CLIENT_READ(HandleClientUpdateSign); break;
+			case PACKET_ANIMATION:                 HANDLE_CLIENT_READ(HandleClientAnimation); break;
+			case PACKET_BLOCK_PLACE:               HANDLE_CLIENT_READ(HandleClientBlockPlace); break;
+			case PACKET_CHAT_MESSAGE:              HANDLE_CLIENT_READ(HandleClientChatMessage); break;
+			case PACKET_CLIENT_STATUSES:           HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
+			case PACKET_CREATIVE_INVENTORY_ACTION: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction); break;
+			case PACKET_ENCRYPTION_KEY_RESPONSE:   HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
+			case PACKET_HANDSHAKE:                 HANDLE_CLIENT_READ(HandleClientHandshake); break;
+			case PACKET_KEEPALIVE:                 HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
+			case PACKET_LOCALE_AND_VIEW:           HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
+			case PACKET_PING:                      HANDLE_CLIENT_READ(HandleClientPing); break;
+			case PACKET_PLAYER_LOOK:               HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
+			case PACKET_PLAYER_ON_GROUND:          HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
+			case PACKET_PLAYER_POSITION:           HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
+			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
+			case PACKET_SLOT_SELECT:               HANDLE_CLIENT_READ(HandleClientSlotSelect); break;
+			case PACKET_UPDATE_SIGN:               HANDLE_CLIENT_READ(HandleClientUpdateSign); break;
+			case PACKET_USE_ENTITY:                HANDLE_CLIENT_READ(HandleClientUseEntity); break;
+			case PACKET_WINDOW_CLICK:              HANDLE_CLIENT_READ(HandleClientWindowClick); break;
+			case PACKET_WINDOW_CLOSE:              HANDLE_CLIENT_READ(HandleClientWindowClose); break;
 			default:
 			{
 				if (m_ClientState == csEncryptedUnderstood)
@@ -539,6 +549,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
 			case PACKET_PLAYER_LIST_ITEM:        HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
 			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+			case PACKET_SET_SLOT:                HANDLE_SERVER_READ(HandleServerSetSlot); break;
 			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
 			case PACKET_UPDATE_HEALTH:           HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
 			case PACKET_UPDATE_SIGN:             HANDLE_SERVER_READ(HandleServerUpdateSign); break;
@@ -622,12 +633,44 @@ bool cConnection::HandleClientBlockPlace(void)
 
 
 
+bool cConnection::HandleClientChatMessage(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Message);
+	Log("Received a PACKET_CHAT_MESSAGE from the client:");
+	Log("  Message = \"%s\"", Message.c_str());
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleClientClientStatuses(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadChar, char, Statuses);
 	Log("Received a PACKET_CLIENT_STATUSES from the CLIENT:");
 	Log("  Statuses = %d", Statuses);
 	
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientCreativeInventoryAction(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
+	AString Item;
+	if (!ParseSlot(m_ClientBuffer, Item))
+	{
+		return false;
+	}
+	Log("Received a PACKET_CREATIVE_INVENTORY_ACTION from the client:");
+	Log("  SlotNum = %d", SlotNum);
+	Log("  Item = %s", Item.c_str());
 	COPY_TO_SERVER();
 	return true;
 }
@@ -825,6 +868,62 @@ bool cConnection::HandleClientUpdateSign(void)
 
 
 
+bool cConnection::HandleClientUseEntity(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  PlayerID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, MouseButton);
+	Log("Received a PACKET_USE_ENTITY from the client:");
+	Log("  PlayerID = %d", PlayerID);
+	Log("  EntityID = %d", EntityID);
+	Log("  MouseButton = %d", MouseButton);
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientWindowClick(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  WindowID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  IsRightClick);
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, TransactionID);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  IsShiftClick);
+	AString Item;
+	if (!ParseSlot(m_ClientBuffer, Item))
+	{
+		return false;
+	}
+	Log("Received a PACKET_WINDOW_CLICK from the client");
+	Log("  WindowID = %d", WindowID);
+	Log("  SlotNum = %d", SlotNum);
+	Log("  IsRclk = %d, IsShift = %d", IsRightClick, IsShiftClick);
+	Log("  TransactionID = 0x%x", TransactionID);
+	Log("  ClickedItem = %s", Item.c_str());
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientWindowClose(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, WindowID);
+	Log("Received a PACKET_WINDOW_CLOSE from the client:");
+	Log("  WindowID = %d", WindowID);
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerBlockChange(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
@@ -845,7 +944,7 @@ bool cConnection::HandleServerChatMessage(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Message);
 	Log("Received a PACKET_CHAT_MESSAGE from the server:");
-	Log("  Message = \"%s\"", Message);
+	Log("  Message = \"%s\"", Message.c_str());
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1103,6 +1202,27 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 
 
 
+bool cConnection::HandleServerSetSlot(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SlotNum);
+	AString Item;
+	if (!ParseSlot(m_ServerBuffer, Item))
+	{
+		return false;
+	}
+	Log("Received a PACKET_SET_SLOT from the server:");
+	Log("  WindowID = %d", WindowID);
+	Log("  SlotNum = %d", SlotNum);
+	Log("  Item = %s", Item.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerTimeUpdate(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, Time);
@@ -1141,6 +1261,19 @@ bool cConnection::HandleServerUpdateSign(void)
 	Log("Received a PACKET_UPDATE_SIGN from the server:");
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Lines = \"%s\", \"%s\", \"%s\", \"%s\"", Line1.c_str(), Line2.c_str(), Line3.c_str(), Line4.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerWindowClose(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadChar, char, WindowID);
+	Log("Received a PACKET_WINDOW_CLOSE from the server:");
+	Log("  WindowID = %d", WindowID);
 	COPY_TO_CLIENT();
 	return true;
 }
