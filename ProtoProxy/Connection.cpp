@@ -117,6 +117,7 @@ enum
 	PACKET_MAP_CHUNK                 = 0x33,
 	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
 	PACKET_BLOCK_CHANGE              = 0x35,
+	PACKET_CHANGE_GAME_STATE         = 0x46,
 	PACKET_WINDOW_CLOSE              = 0x65,
 	PACKET_WINDOW_CLICK              = 0x66,
 	PACKET_SET_SLOT                  = 0x67,
@@ -536,6 +537,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		switch (PacketType)
 		{
 			case PACKET_BLOCK_CHANGE:            HANDLE_SERVER_READ(HandleServerBlockChange); break;
+			case PACKET_CHANGE_GAME_STATE:       HANDLE_SERVER_READ(HandleServerChangeGameState); break;
 			case PACKET_CHAT_MESSAGE:            HANDLE_SERVER_READ(HandleServerChatMessage); break;
 			case PACKET_COMPASS:                 HANDLE_SERVER_READ(HandleServerCompass); break;
 			case PACKET_ENCRYPTION_KEY_REQUEST:  HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
@@ -932,6 +934,21 @@ bool cConnection::HandleServerBlockChange(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockType);
 	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  BlockMeta);
 	Log("Received a PACKET_BLOCK_CHANGE from the server");
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerChangeGameState(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadChar, char,  Reason);
+	HANDLE_SERVER_PACKET_READ(ReadChar, char,  Data);
+	Log("Received a PACKET_CHANGE_GAME_STATE from the server:");
+	Log("  Reason = %d", Reason);
+	Log("  Data = %d", Data);
 	COPY_TO_CLIENT();
 	return true;
 }

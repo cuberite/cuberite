@@ -119,6 +119,7 @@ protected:
 
 	// Packet handling, server-side:
 	bool HandleServerBlockChange(void);
+	bool HandleServerChangeGameState(void);
 	bool HandleServerChatMessage(void);
 	bool HandleServerCompass(void);
 	bool HandleServerEncryptionKeyRequest(void);
