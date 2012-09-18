@@ -118,6 +118,7 @@ enum
 	PACKET_MAP_CHUNK                 = 0x33,
 	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
 	PACKET_BLOCK_CHANGE              = 0x35,
+	PACKET_MAP_CHUNK_BULK            = 0x38,
 	PACKET_CHANGE_GAME_STATE         = 0x46,
 	PACKET_WINDOW_CLOSE              = 0x65,
 	PACKET_WINDOW_CLICK              = 0x66,
@@ -548,6 +549,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_KICK:                    HANDLE_SERVER_READ(HandleServerKick); break;
 			case PACKET_LOGIN:                   HANDLE_SERVER_READ(HandleServerLogin); break;
 			case PACKET_MAP_CHUNK:               HANDLE_SERVER_READ(HandleServerMapChunk); break;
+			case PACKET_MAP_CHUNK_BULK:          HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
 			case PACKET_MULTI_BLOCK_CHANGE:      HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
 			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
 			case PACKET_PLAYER_LIST_ITEM:        HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
@@ -1138,6 +1140,34 @@ bool cConnection::HandleServerMapChunk(void)
 	// TODO: Save the compressed data into a file for later analysis
 	
 	COPY_TO_CLIENT()
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerMapChunkBulk(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ChunkCount);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   CompressedSize);
+	AString CompressedData;
+	if (!m_ServerBuffer.ReadString(CompressedData, CompressedSize))
+	{
+		return false;
+	}
+	AString Meta;
+	if (!m_ServerBuffer.ReadString(Meta, ChunkCount * 12))
+	{
+		return false;
+	}
+	Log("Received a PACKET_MAP_CHUNK_BULK from the server:");
+	Log("  ChunkCount = %d", ChunkCount);
+	Log("  Compressed size = %d (0x%x)", CompressedSize, CompressedSize);
+	
+	// TODO: Save the compressed data into a file for later analysis
+	
+	COPY_TO_CLIENT();
 	return true;
 }
 

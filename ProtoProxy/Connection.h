@@ -129,6 +129,7 @@ protected:
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
 	bool HandleServerMapChunk(void);
+	bool HandleServerMapChunkBulk(void);
 	bool HandleServerMultiBlockChange(void);
 	bool HandleServerPlayerAbilities(void);
 	bool HandleServerPlayerListItem(void);
