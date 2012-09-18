@@ -133,6 +133,7 @@ protected:
 	bool HandleServerPlayerAbilities(void);
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
+	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);

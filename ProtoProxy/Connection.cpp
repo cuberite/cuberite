@@ -114,6 +114,7 @@ enum
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECT               = 0x10,
 	PACKET_ANIMATION                 = 0x12,
+	PACKET_SET_EXPERIENCE            = 0x2b,
 	PACKET_MAP_CHUNK                 = 0x33,
 	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
 	PACKET_BLOCK_CHANGE              = 0x35,
@@ -551,6 +552,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
 			case PACKET_PLAYER_LIST_ITEM:        HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
 			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+			case PACKET_SET_EXPERIENCE:          HANDLE_SERVER_READ(HandleServerSetExperience); break;
 			case PACKET_SET_SLOT:                HANDLE_SERVER_READ(HandleServerSetSlot); break;
 			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
 			case PACKET_UPDATE_HEALTH:           HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
@@ -1211,6 +1213,23 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 
 	// TODO: list packet contents
 	
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSetExperience(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, ExperienceBar);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, Level);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, TotalExperience);
+	Log("Received a PACKET_SET_EXPERIENCE from the server:");
+	Log("  ExperienceBar = %.05f", ExperienceBar);
+	Log("  Level = %d", Level);
+	Log("  TotalExperience = %d", TotalExperience);
 	COPY_TO_CLIENT();
 	return true;
 }
