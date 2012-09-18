@@ -114,6 +114,16 @@ enum
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECT               = 0x10,
 	PACKET_ANIMATION                 = 0x12,
+	PACKET_ENTITY                    = 0x1e,
+	PACKET_ENTITY_RELATIVE_MOVE      = 0x1f,
+	PACKET_ENTITY_LOOK               = 0x20,
+	PACKET_ENTITY_RELATIVE_MOVE_LOOK = 0x21,
+	PACKET_ENTITY_TELEPORT           = 0x22,
+	PACKET_ENTITY_HEAD_LOOK          = 0x23,
+	PACKET_ENTITY_STATUS             = 0x24,
+	PACKET_ENTITY_METADATA           = 0x28,
+	PACKET_ENTITY_EFFECT             = 0x29,
+	PACKET_ENTITY_EFFECT_REMOVE      = 0x2a,
 	PACKET_SET_EXPERIENCE            = 0x2b,
 	PACKET_MAP_CHUNK                 = 0x33,
 	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
@@ -538,28 +548,36 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		m_ServerBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
-			case PACKET_BLOCK_CHANGE:            HANDLE_SERVER_READ(HandleServerBlockChange); break;
-			case PACKET_CHANGE_GAME_STATE:       HANDLE_SERVER_READ(HandleServerChangeGameState); break;
-			case PACKET_CHAT_MESSAGE:            HANDLE_SERVER_READ(HandleServerChatMessage); break;
-			case PACKET_COMPASS:                 HANDLE_SERVER_READ(HandleServerCompass); break;
-			case PACKET_ENCRYPTION_KEY_REQUEST:  HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
-			case PACKET_ENCRYPTION_KEY_RESPONSE: HANDLE_SERVER_READ(HandleServerEncryptionKeyResponse); break;
-			case PACKET_ENTITY_EQUIPMENT:        HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
-			case PACKET_KEEPALIVE:               HANDLE_SERVER_READ(HandleServerKeepAlive); break;
-			case PACKET_KICK:                    HANDLE_SERVER_READ(HandleServerKick); break;
-			case PACKET_LOGIN:                   HANDLE_SERVER_READ(HandleServerLogin); break;
-			case PACKET_MAP_CHUNK:               HANDLE_SERVER_READ(HandleServerMapChunk); break;
-			case PACKET_MAP_CHUNK_BULK:          HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
-			case PACKET_MULTI_BLOCK_CHANGE:      HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
-			case PACKET_PLAYER_ABILITIES:        HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
-			case PACKET_PLAYER_LIST_ITEM:        HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
-			case PACKET_PLAYER_POSITION_LOOK:    HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
-			case PACKET_SET_EXPERIENCE:          HANDLE_SERVER_READ(HandleServerSetExperience); break;
-			case PACKET_SET_SLOT:                HANDLE_SERVER_READ(HandleServerSetSlot); break;
-			case PACKET_TIME_UPDATE:             HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
-			case PACKET_UPDATE_HEALTH:           HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
-			case PACKET_UPDATE_SIGN:             HANDLE_SERVER_READ(HandleServerUpdateSign); break;
-			case PACKET_WINDOW_CONTENTS:         HANDLE_SERVER_READ(HandleServerWindowContents); break;
+			case PACKET_BLOCK_CHANGE:              HANDLE_SERVER_READ(HandleServerBlockChange); break;
+			case PACKET_CHANGE_GAME_STATE:         HANDLE_SERVER_READ(HandleServerChangeGameState); break;
+			case PACKET_CHAT_MESSAGE:              HANDLE_SERVER_READ(HandleServerChatMessage); break;
+			case PACKET_COMPASS:                   HANDLE_SERVER_READ(HandleServerCompass); break;
+			case PACKET_ENCRYPTION_KEY_REQUEST:    HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
+			case PACKET_ENCRYPTION_KEY_RESPONSE:   HANDLE_SERVER_READ(HandleServerEncryptionKeyResponse); break;
+			case PACKET_ENTITY:                    HANDLE_SERVER_READ(HandleServerEntity); break;
+			case PACKET_ENTITY_EQUIPMENT:          HANDLE_SERVER_READ(HandleServerEntityEquipment); break;
+			case PACKET_ENTITY_HEAD_LOOK:          HANDLE_SERVER_READ(HandleServerEntityHeadLook); break;
+			case PACKET_ENTITY_LOOK:               HANDLE_SERVER_READ(HandleServerEntityLook); break;
+			case PACKET_ENTITY_METADATA:           HANDLE_SERVER_READ(HandleServerEntityMetadata); break;
+			case PACKET_ENTITY_RELATIVE_MOVE:      HANDLE_SERVER_READ(HandleServerEntityRelativeMove); break;
+			case PACKET_ENTITY_RELATIVE_MOVE_LOOK: HANDLE_SERVER_READ(HandleServerEntityRelativeMoveLook); break;
+			case PACKET_ENTITY_STATUS:             HANDLE_SERVER_READ(HandleServerEntityStatus); break;
+			case PACKET_ENTITY_TELEPORT:           HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
+			case PACKET_KEEPALIVE:                 HANDLE_SERVER_READ(HandleServerKeepAlive); break;
+			case PACKET_KICK:                      HANDLE_SERVER_READ(HandleServerKick); break;
+			case PACKET_LOGIN:                     HANDLE_SERVER_READ(HandleServerLogin); break;
+			case PACKET_MAP_CHUNK:                 HANDLE_SERVER_READ(HandleServerMapChunk); break;
+			case PACKET_MAP_CHUNK_BULK:            HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
+			case PACKET_MULTI_BLOCK_CHANGE:        HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
+			case PACKET_PLAYER_ABILITIES:          HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
+			case PACKET_PLAYER_LIST_ITEM:          HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
+			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+			case PACKET_SET_EXPERIENCE:            HANDLE_SERVER_READ(HandleServerSetExperience); break;
+			case PACKET_SET_SLOT:                  HANDLE_SERVER_READ(HandleServerSetSlot); break;
+			case PACKET_TIME_UPDATE:               HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
+			case PACKET_UPDATE_HEALTH:             HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
+			case PACKET_UPDATE_SIGN:               HANDLE_SERVER_READ(HandleServerUpdateSign); break;
+			case PACKET_WINDOW_CONTENTS:           HANDLE_SERVER_READ(HandleServerWindowContents); break;
 			default:
 			{
 				if (m_ServerState == csEncryptedUnderstood)
@@ -1031,6 +1049,53 @@ bool cConnection::HandleServerEncryptionKeyRequest(void)
 
 
 
+bool cConnection::HandleServerEntity(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	Log("Received a PACKET_ENTITY from the server:");
+	Log("  EntityID = %d", EntityID);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityHeadLook(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, HeadYaw);
+	Log("Received a PACKET_ENTITY_HEAD_LOOK from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  HeadYaw = %d", HeadYaw);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityMetadata(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	AString Metadata;
+	if (!ParseMetadata(m_ServerBuffer, Metadata))
+	{
+		return false;
+	}
+	Log("Received a PACKET_ENTITY_METADATA from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Metadata length = %d", Metadata.length());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerEntityEquipment(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
@@ -1044,6 +1109,97 @@ bool cConnection::HandleServerEntityEquipment(void)
 	Log("  EntityID = %d", EntityID);
 	Log("  SlotNum = %d", SlotNum);
 	Log("  Item = %s", Item.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityLook(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
+	Log("Received a PACKET_ENTITY_LOOK from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Yaw = %d", Yaw);
+	Log("  Pitch = %d", Pitch);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityRelativeMove(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dx);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dy);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dz);
+	Log("Received a PACKET_ENTITY_RELATIVE_MOVE from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  RelMove = <%d, %d, %d>", dx, dy, dz);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityRelativeMoveLook(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dx);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dy);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dz);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
+	Log("Received a PACKET_ENTITY_RELATIVE_MOVE_LOOK from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  RelMove = <%d, %d, %d>", dx, dy, dz);
+	Log("  Yaw = %d", Yaw);
+	Log("  Pitch = %d", Pitch);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityStatus(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Status);
+	Log("Received a PACKET_ENTITY_STATUS from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Status = %d", Status);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerEntityTeleport(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
+	Log("Received a PACKET_ENTITY_TELEPORT from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Yaw = %d", Yaw);
+	Log("  Pitch = %d", Pitch);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1408,6 +1564,59 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	{
 		return false;
 	}
+	return true;
+}
+
+
+
+
+
+bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
+{
+	char x;
+	if (!a_Buffer.ReadChar(x))
+	{
+		return false;
+	}
+	a_Metadata.push_back(x);
+	while (x != 0x7f)
+	{
+		int Index = x & 0x1f;  // Lower 5 bits = index
+		int Type  = x >> 5;    // Upper 3 bits = type
+		int Length = 0;
+		switch (Type)
+		{
+			case 0: Length = 1; break;  // byte
+			case 1: Length = 2; break;  // short
+			case 2: Length = 4; break;  // int
+			case 3: Length = 4; break;  // float
+			case 4:  // string16
+			{
+				short Len = 0;
+				if (!a_Buffer.ReadBEShort(Len))
+				{
+					return false;
+				}
+				short NetLen = htons(Len);
+				a_Metadata.append((char *)&NetLen, 2);
+				Length = Len;
+				break;
+			}
+			case 5: Length = 5;  break;  // short, byte, short
+			case 6: Length = 12; break;  // 3 * int
+		}  // switch (Type)
+		AString data;
+		if (!a_Buffer.ReadString(data, Length))
+		{
+			return false;
+		}
+		a_Metadata.append(data);
+		if (!a_Buffer.ReadChar(x))
+		{
+			return false;
+		}
+		a_Metadata.push_back(x);
+	}  // while (x != 0x7f)
 	return true;
 }
 

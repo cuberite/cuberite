@@ -124,7 +124,15 @@ protected:
 	bool HandleServerCompass(void);
 	bool HandleServerEncryptionKeyRequest(void);
 	bool HandleServerEncryptionKeyResponse(void);
+	bool HandleServerEntity(void);
+	bool HandleServerEntityHeadLook(void);
+	bool HandleServerEntityMetadata(void);
 	bool HandleServerEntityEquipment(void);
+	bool HandleServerEntityLook(void);
+	bool HandleServerEntityRelativeMove(void);
+	bool HandleServerEntityRelativeMoveLook(void);
+	bool HandleServerEntityStatus(void);
+	bool HandleServerEntityTeleport(void);
 	bool HandleServerKeepAlive(void);
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
@@ -144,6 +152,9 @@ protected:
 	
 	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data
 	bool ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc);
+	
+	/// Parses the metadata in a_Buffer into raw metadata in an AString; returns true if successful, false if not enough data
+	bool ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata);
 	
 	/// Send EKResp to the server:
 	void SendEncryptionKeyResponse(const AString & a_ServerPublicKey, const AString & a_Nonce);
