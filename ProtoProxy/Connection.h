@@ -133,6 +133,7 @@ protected:
 	bool HandleServerEntityRelativeMoveLook(void);
 	bool HandleServerEntityStatus(void);
 	bool HandleServerEntityTeleport(void);
+	bool HandleServerEntityVelocity(void);
 	bool HandleServerKeepAlive(void);
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
@@ -144,6 +145,10 @@ protected:
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
+	bool HandleServerSpawnMob(void);
+	bool HandleServerSpawnObjectVehicle(void);
+	bool HandleServerSpawnPainting(void);
+	bool HandleServerSpawnPickup(void);
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);
 	bool HandleServerUpdateSign(void);

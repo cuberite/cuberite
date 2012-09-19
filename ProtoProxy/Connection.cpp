@@ -114,6 +114,14 @@ enum
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECT               = 0x10,
 	PACKET_ANIMATION                 = 0x12,
+	PACKET_SPAWN_PICKUP              = 0x15,
+	PACKET_COLLECT_PICKUP            = 0x16,
+	PACKET_SPAWN_OBJECT_VEHICLE      = 0x17,
+	PACKET_SPAWN_MOB                 = 0x18,
+	PACKET_SPAWN_PAINTING            = 0x19,
+	PACKET_SPAWN_EXPERIENCE_ORB      = 0x1a,
+	PACKET_ENTITY_VELOCITY           = 0x1c,
+	PACKET_DESTROY_ENTITY            = 0x1d,
 	PACKET_ENTITY                    = 0x1e,
 	PACKET_ENTITY_RELATIVE_MOVE      = 0x1f,
 	PACKET_ENTITY_LOOK               = 0x20,
@@ -144,6 +152,26 @@ enum
 	PACKET_ENCRYPTION_KEY_REQUEST    = 0xfd,
 	PACKET_PING                      = 0xfe,
 	PACKET_KICK                      = 0xff,
+} ;
+
+
+
+
+enum
+{
+	OBJECT_BOAT             = 1,
+	OBJECT_MINECART         = 10,
+	OBJECT_MINECART_STORAGE = 11,
+	OBJECT_MINECART_POWERED = 12,
+	OBJECT_TNT              = 50,
+	OBJECT_ENDERCRYSTAL     = 51,
+	OBJECT_ARROW            = 60,
+	OBJECT_SNOWBALL         = 61,
+	OBJECT_EGG              = 62,
+	OBJECT_FALLING_BLOCK    = 70,
+	OBJECT_EYE_OF_ENDER     = 72,
+	OBJECT_DRAGON_EGG       = 74,
+	OBJECT_FISHING_FLOAT    = 90,
 } ;
 
 
@@ -563,6 +591,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_ENTITY_RELATIVE_MOVE_LOOK: HANDLE_SERVER_READ(HandleServerEntityRelativeMoveLook); break;
 			case PACKET_ENTITY_STATUS:             HANDLE_SERVER_READ(HandleServerEntityStatus); break;
 			case PACKET_ENTITY_TELEPORT:           HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
+			case PACKET_ENTITY_VELOCITY:           HANDLE_SERVER_READ(HandleServerEntityVelocity); break;
 			case PACKET_KEEPALIVE:                 HANDLE_SERVER_READ(HandleServerKeepAlive); break;
 			case PACKET_KICK:                      HANDLE_SERVER_READ(HandleServerKick); break;
 			case PACKET_LOGIN:                     HANDLE_SERVER_READ(HandleServerLogin); break;
@@ -574,6 +603,10 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
 			case PACKET_SET_EXPERIENCE:            HANDLE_SERVER_READ(HandleServerSetExperience); break;
 			case PACKET_SET_SLOT:                  HANDLE_SERVER_READ(HandleServerSetSlot); break;
+			case PACKET_SPAWN_MOB:                 HANDLE_SERVER_READ(HandleServerSpawnMob); break;
+			case PACKET_SPAWN_OBJECT_VEHICLE:      HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
+			case PACKET_SPAWN_PAINTING:            HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
+			case PACKET_SPAWN_PICKUP:              HANDLE_SERVER_READ(HandleServerSpawnPickup); break;
 			case PACKET_TIME_UPDATE:               HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
 			case PACKET_UPDATE_HEALTH:             HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
 			case PACKET_UPDATE_SIGN:               HANDLE_SERVER_READ(HandleServerUpdateSign); break;
@@ -1208,6 +1241,23 @@ bool cConnection::HandleServerEntityTeleport(void)
 
 
 
+bool cConnection::HandleServerEntityVelocity(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityZ);
+	Log("Received a PACKET_SPAWN_MOB from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerKeepAlive(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, PingID);
@@ -1437,6 +1487,137 @@ bool cConnection::HandleServerSetSlot(void)
 	Log("  WindowID = %d", WindowID);
 	Log("  SlotNum = %d", SlotNum);
 	Log("  Item = %s", Item.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSpawnMob(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  MobType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  HeadYaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityZ);
+	AString Metadata;
+	if (!ParseMetadata(m_ServerBuffer, Metadata))
+	{
+		return false;
+	}
+	Log("Received a PACKET_SPAWN_MOB from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Angles = [%d, %d, %d]", Yaw, Pitch, HeadYaw);
+	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+	Log("  Metadata size = %d", Metadata.size());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSpawnObjectVehicle(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  ObjType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   DataIndicator);
+	AString ExtraData;
+	short VelocityX, VelocityY, VelocityZ;
+	if (DataIndicator != 0)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedX);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedY);
+		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedZ);
+		VelocityX = SpeedX; VelocityY = SpeedY; VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
+		int ExtraLen = 0;
+		switch (ObjType)
+		{
+			case OBJECT_FALLING_BLOCK: ExtraLen = 4; break;  // int: BlockType | (BlockMeta << 12)
+			case OBJECT_ARROW:
+			case OBJECT_SNOWBALL:
+			case OBJECT_EGG:
+			case OBJECT_EYE_OF_ENDER:
+			case OBJECT_DRAGON_EGG:
+			case OBJECT_FISHING_FLOAT:
+			{
+				ExtraLen = 4; break;  // int: EntityID of the thrower
+			}
+			// TODO: Splash potions
+		}
+		if ((ExtraLen > 0) && !m_ServerBuffer.ReadString(ExtraData, ExtraLen))
+		{
+			return false;
+		}
+	}
+	Log("Received a PACKET_SPAWN_OBJECT_VEHICLE from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  DataIndicator = %d", DataIndicator);
+	if (DataIndicator != 0)
+	{
+		Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %d", ExtraData.size());
+	}
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSpawnPainting(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, ImageName);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     Direction);
+	Log("Received a PACKET_SPAWN_PAINTING from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  ImageName = \"%s\"", ImageName.c_str());
+	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Direction = %d", Direction);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSpawnPickup(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ItemType);
+	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  ItemCount);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ItemDamage);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Rotation);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Roll);
+	Log("Received a PACKET_SPAWN_PICKUP from the server:");
+	Log("  EntityID = %d", EntityID);
+	Log("  Item = %d:%d * %d", ItemType, ItemDamage, ItemCount);
+	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Angles = [%d, %d, %d]", Rotation, Pitch, Roll);
 	COPY_TO_CLIENT();
 	return true;
 }
