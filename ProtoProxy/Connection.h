@@ -152,6 +152,7 @@ protected:
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);
 	bool HandleServerUpdateSign(void);
+	bool HandleServerUpdateTileEntity(void);
 	bool HandleServerWindowClose(void);
 	bool HandleServerWindowContents(void);
 	

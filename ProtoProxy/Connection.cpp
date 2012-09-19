@@ -144,6 +144,7 @@ enum
 	PACKET_WINDOW_CONTENTS           = 0x68,
 	PACKET_CREATIVE_INVENTORY_ACTION = 0x6b,
 	PACKET_UPDATE_SIGN               = 0x82,
+	PACKET_UPDATE_TILE_ENTITY        = 0x84,
 	PACKET_PLAYER_LIST_ITEM          = 0xc9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
 	PACKET_LOCALE_AND_VIEW           = 0xcc,
@@ -610,6 +611,8 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_TIME_UPDATE:               HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
 			case PACKET_UPDATE_HEALTH:             HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
 			case PACKET_UPDATE_SIGN:               HANDLE_SERVER_READ(HandleServerUpdateSign); break;
+			case PACKET_UPDATE_TILE_ENTITY:        HANDLE_SERVER_READ(HandleServerUpdateTileEntity); break;
+			case PACKET_WINDOW_CLOSE:              HANDLE_SERVER_READ(HandleServerWindowClose); break;
 			case PACKET_WINDOW_CONTENTS:           HANDLE_SERVER_READ(HandleServerWindowContents); break;
 			default:
 			{
@@ -1664,6 +1667,30 @@ bool cConnection::HandleServerUpdateSign(void)
 	Log("Received a PACKET_UPDATE_SIGN from the server:");
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Lines = \"%s\", \"%s\", \"%s\", \"%s\"", Line1.c_str(), Line2.c_str(), Line3.c_str(), Line4.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerUpdateTileEntity(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Action);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, DataLength);
+	AString Data;
+	if ((DataLength > 0) && !m_ServerBuffer.ReadString(Data, DataLength))
+	{
+		return false;
+	}
+	Log("Received a PACKET_UPDATE_TILE_ENTITY from the server:");
+	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Action = %d", Action);
+	DataLog(Data.data(), Data.size(), "  Data (%d bytes)", Data.size());
 	COPY_TO_CLIENT();
 	return true;
 }
