@@ -121,14 +121,14 @@ enum
 	PACKET_SPAWN_PAINTING            = 0x19,
 	PACKET_SPAWN_EXPERIENCE_ORB      = 0x1a,
 	PACKET_ENTITY_VELOCITY           = 0x1c,
-	PACKET_DESTROY_ENTITY            = 0x1d,
+	PACKET_DESTROY_ENTITIES          = 0x1d,
 	PACKET_ENTITY                    = 0x1e,
 	PACKET_ENTITY_RELATIVE_MOVE      = 0x1f,
 	PACKET_ENTITY_LOOK               = 0x20,
 	PACKET_ENTITY_RELATIVE_MOVE_LOOK = 0x21,
 	PACKET_ENTITY_TELEPORT           = 0x22,
 	PACKET_ENTITY_HEAD_LOOK          = 0x23,
-	PACKET_ENTITY_STATUS             = 0x24,
+	PACKET_ENTITY_STATUS             = 0x26,
 	PACKET_ENTITY_METADATA           = 0x28,
 	PACKET_ENTITY_EFFECT             = 0x29,
 	PACKET_ENTITY_EFFECT_REMOVE      = 0x2a,
@@ -136,8 +136,12 @@ enum
 	PACKET_MAP_CHUNK                 = 0x33,
 	PACKET_MULTI_BLOCK_CHANGE        = 0x34,
 	PACKET_BLOCK_CHANGE              = 0x35,
+	PACKET_BLOCK_ACTION              = 0x36,
 	PACKET_MAP_CHUNK_BULK            = 0x38,
+	PACKET_SOUND_EFFECT              = 0x3d,
+	PACKET_NAMED_SOUND_EFFECT        = 0x3e,
 	PACKET_CHANGE_GAME_STATE         = 0x46,
+	PACKET_WINDOW_OPEN               = 0x64,
 	PACKET_WINDOW_CLOSE              = 0x65,
 	PACKET_WINDOW_CLICK              = 0x66,
 	PACKET_SET_SLOT                  = 0x67,
@@ -521,7 +525,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			{
 				if (m_ClientState == csEncryptedUnderstood)
 				{
-					Log("Unknown packet 0x%02x from the client while encrypted; continuing to relay blind only", PacketType);
+					Log("****************** Unknown packet 0x%02x from the client while encrypted; continuing to relay blind only", PacketType);
 					AString Data;
 					m_ClientBuffer.ResetRead();
 					m_ClientBuffer.ReadAll(Data);
@@ -572,15 +576,17 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 	
 	while (m_ServerBuffer.CanReadBytes(1))
 	{
-		Log("Decoding server's packets, there are now %d bytes in the queue", m_ServerBuffer.GetReadableSpace());
 		unsigned char PacketType;
 		m_ServerBuffer.ReadByte(PacketType);
+		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%x", m_ServerBuffer.GetReadableSpace(), PacketType);
 		switch (PacketType)
 		{
+			case PACKET_BLOCK_ACTION:              HANDLE_SERVER_READ(HandleServerBlockAction); break;
 			case PACKET_BLOCK_CHANGE:              HANDLE_SERVER_READ(HandleServerBlockChange); break;
 			case PACKET_CHANGE_GAME_STATE:         HANDLE_SERVER_READ(HandleServerChangeGameState); break;
 			case PACKET_CHAT_MESSAGE:              HANDLE_SERVER_READ(HandleServerChatMessage); break;
 			case PACKET_COMPASS:                   HANDLE_SERVER_READ(HandleServerCompass); break;
+			case PACKET_DESTROY_ENTITIES:          HANDLE_SERVER_READ(HandleServerDestroyEntities); break;
 			case PACKET_ENCRYPTION_KEY_REQUEST:    HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
 			case PACKET_ENCRYPTION_KEY_RESPONSE:   HANDLE_SERVER_READ(HandleServerEncryptionKeyResponse); break;
 			case PACKET_ENTITY:                    HANDLE_SERVER_READ(HandleServerEntity); break;
@@ -599,11 +605,13 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_MAP_CHUNK:                 HANDLE_SERVER_READ(HandleServerMapChunk); break;
 			case PACKET_MAP_CHUNK_BULK:            HANDLE_SERVER_READ(HandleServerMapChunkBulk); break;
 			case PACKET_MULTI_BLOCK_CHANGE:        HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
+			case PACKET_NAMED_SOUND_EFFECT:        HANDLE_SERVER_READ(HandleServerNamedSoundEffect); break;
 			case PACKET_PLAYER_ABILITIES:          HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
 			case PACKET_PLAYER_LIST_ITEM:          HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
 			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
 			case PACKET_SET_EXPERIENCE:            HANDLE_SERVER_READ(HandleServerSetExperience); break;
 			case PACKET_SET_SLOT:                  HANDLE_SERVER_READ(HandleServerSetSlot); break;
+			case PACKET_SOUND_EFFECT:              HANDLE_SERVER_READ(HandleServerSoundEffect); break;
 			case PACKET_SPAWN_MOB:                 HANDLE_SERVER_READ(HandleServerSpawnMob); break;
 			case PACKET_SPAWN_OBJECT_VEHICLE:      HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
 			case PACKET_SPAWN_PAINTING:            HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
@@ -614,11 +622,12 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_UPDATE_TILE_ENTITY:        HANDLE_SERVER_READ(HandleServerUpdateTileEntity); break;
 			case PACKET_WINDOW_CLOSE:              HANDLE_SERVER_READ(HandleServerWindowClose); break;
 			case PACKET_WINDOW_CONTENTS:           HANDLE_SERVER_READ(HandleServerWindowContents); break;
+			case PACKET_WINDOW_OPEN:               HANDLE_SERVER_READ(HandleServerWindowOpen); break;
 			default:
 			{
 				if (m_ServerState == csEncryptedUnderstood)
 				{
-					Log("Unknown packet 0x%02x from the server while encrypted; continuing to relay blind only", PacketType);
+					Log("********************** Unknown packet 0x%02x from the server while encrypted; continuing to relay blind only", PacketType);
 					AString Data;
 					m_ServerBuffer.ResetRead();
 					m_ServerBuffer.ReadAll(Data);
@@ -984,6 +993,26 @@ bool cConnection::HandleClientWindowClose(void)
 
 
 
+bool cConnection::HandleServerBlockAction(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Byte1);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Byte2);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, BlockID);
+	Log("Received a PACKET_BLOCK_ACTION from the server:");
+	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  Bytes = (%d, %d) == (0x%x, 0x%x)", Byte1, Byte2, Byte1, Byte2);
+	Log("  BlockID = %d", BlockID);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerBlockChange(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   BlockX);
@@ -1035,6 +1064,23 @@ bool cConnection::HandleServerCompass(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnZ);
 	Log("Received PACKET_COMPASS from the server:");
 	Log("  Spawn = {%d, %d, %d}", SpawnX, SpawnY, SpawnZ);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerDestroyEntities(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadByte, Byte, NumEntities);
+	if (!m_ServerBuffer.SkipRead((int)NumEntities * 4))
+	{
+		return false;
+	}
+	Log("Received PACKET_DESTROY_ENTITIES from the server:");
+	Log("  NumEntities = %d", NumEntities);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1406,6 +1452,27 @@ bool cConnection::HandleServerMultiBlockChange(void)
 
 
 
+bool cConnection::HandleServerNamedSoundEffect(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, SoundName);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat,         float,   Volume);
+	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    Pitch);
+	Log("Received a PACKET_NAMED_SOUND_EFFECT from the server:");
+	Log("  SoundName = \"%s\"", SoundName.c_str());
+	Log("  Pos = (%d, %d, %d) ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 8, PosY / 8, PosZ / 8);
+	Log("  Volume = %f", Volume);
+	Log("  Pitch = %d", Pitch);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerPlayerAbilities(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadChar, char, Flags);
@@ -1498,6 +1565,25 @@ bool cConnection::HandleServerSetSlot(void)
 
 
 
+bool cConnection::HandleServerSoundEffect(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EffectID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   Data);
+	Log("Received a PACKET_SOUND_EFFECT from the server:");
+	Log("  EffectID = %d", EffectID);
+	Log("  Pos = {%d, %d, %d}", PosX, PosY, PosZ);
+	Log("  Data = %d", Data);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerSpawnMob(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
@@ -1532,6 +1618,22 @@ bool cConnection::HandleServerSpawnMob(void)
 
 bool cConnection::HandleServerSpawnObjectVehicle(void)
 {
+	#ifdef _DEBUG
+	// DEBUG:
+	// This packet is still troublesome when DataIndicator != 0
+	AString Buffer;
+	m_ServerBuffer.ResetRead();
+	m_ServerBuffer.ReadAll(Buffer);
+	m_ServerBuffer.ResetRead();
+	m_ServerBuffer.SkipRead(1);
+	if (Buffer.size() > 128)
+	{
+		// Only log up to 128 bytes
+		Buffer.erase(128, AString::npos);
+	}
+	DataLog(Buffer.data(), Buffer.size(), "Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%d bytes):", Buffer.size());
+	#endif  // _DEBUG
+	
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  ObjType);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
@@ -1546,6 +1648,8 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedY);
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedZ);
 		VelocityX = SpeedX; VelocityY = SpeedY; VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
+		/*
+		// This doesn't seem to work - for a falling block I'm getting no extra data at all
 		int ExtraLen = 0;
 		switch (ObjType)
 		{
@@ -1565,9 +1669,11 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		{
 			return false;
 		}
+		*/
 	}
 	Log("Received a PACKET_SPAWN_OBJECT_VEHICLE from the server:");
 	Log("  EntityID = %d", EntityID);
+	Log("  ObjType = %d", ObjType);
 	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
 	Log("  DataIndicator = %d", DataIndicator);
 	if (DataIndicator != 0)
@@ -1732,6 +1838,25 @@ bool cConnection::HandleServerWindowContents(void)
 
 	// TODO: list items
 	
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerWindowOpen(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowType);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Title);
+	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    NumSlots);
+	Log("Received a PACKET_WINDOW_OPEN from the server:");
+	Log("  WindowID = %d", WindowID);
+	Log("  WindowType = %d", WindowType);
+	Log("  Title = \"%s\"", Title.c_str());
+	Log("  NumSlots = %d", NumSlots);
 	COPY_TO_CLIENT();
 	return true;
 }

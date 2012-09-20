@@ -118,10 +118,12 @@ protected:
 	bool HandleClientWindowClose(void);
 
 	// Packet handling, server-side:
+	bool HandleServerBlockAction(void);
 	bool HandleServerBlockChange(void);
 	bool HandleServerChangeGameState(void);
 	bool HandleServerChatMessage(void);
 	bool HandleServerCompass(void);
+	bool HandleServerDestroyEntities(void);
 	bool HandleServerEncryptionKeyRequest(void);
 	bool HandleServerEncryptionKeyResponse(void);
 	bool HandleServerEntity(void);
@@ -140,11 +142,13 @@ protected:
 	bool HandleServerMapChunk(void);
 	bool HandleServerMapChunkBulk(void);
 	bool HandleServerMultiBlockChange(void);
+	bool HandleServerNamedSoundEffect(void);
 	bool HandleServerPlayerAbilities(void);
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
+	bool HandleServerSoundEffect(void);
 	bool HandleServerSpawnMob(void);
 	bool HandleServerSpawnObjectVehicle(void);
 	bool HandleServerSpawnPainting(void);
@@ -155,6 +159,7 @@ protected:
 	bool HandleServerUpdateTileEntity(void);
 	bool HandleServerWindowClose(void);
 	bool HandleServerWindowContents(void);
+	bool HandleServerWindowOpen(void);
 	
 	/// Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data
 	bool ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc);
