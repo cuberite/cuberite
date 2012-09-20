@@ -119,8 +119,8 @@ protected:
 	/// Writes a "pre-chunk" packet
 	void SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad);
 	
-	/// Writes a "whole inventory" packet with the specified params
-	void SendWholeInventory(char a_WindowID, int a_NumItems, const cItem * a_Items);
+	/// Writes a "set window items" packet with the specified params
+	void SendWindowSlots(char a_WindowID, int a_NumItems, const cItem * a_Items);
 	
 	/// Writes one item, "slot" as the protocol wiki calls it
 	virtual void WriteItem(const cItem & a_Item);

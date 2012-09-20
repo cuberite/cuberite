@@ -2,8 +2,7 @@
 #pragma once
 
 #include "cPawn.h"
-#include "cSurvivalInventory.h"
-#include "cCreativeInventory.h"
+#include "cInventory.h"
 #include "Defines.h"
 
 
@@ -12,7 +11,6 @@
 
 class cGroup;
 class cWindow;
-class cInventory;
 class cClientHandle;
 
 
@@ -43,8 +41,8 @@ public:
 	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline const double GetStance(void) const { return m_Pos.y + 1.62; }					//tolua_export  // TODO: Proper stance when crouching etc.
-	inline cInventory &       GetInventory(void)       { if (GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }	//tolua_export
-	inline const cInventory & GetInventory(void) const { if (GetGameMode() == eGameMode_Survival) return *m_Inventory; else return *m_CreativeInventory; }
+	inline cInventory &       GetInventory(void)       { return m_Inventory; }	//tolua_export
+	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 	
 	inline const cItem & GetEquippedItem(void) const {return GetInventory().GetEquippedItem(); }
 
@@ -118,6 +116,10 @@ public:
 	void UseEquippedItem(void);
 	
 	void SendHealth();
+	
+	// In UI windows, the item that the player is dragging:
+	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }
+	cItem & GetDraggingItem(void) {return m_DraggingItem; }
 
 protected:
 	virtual void Destroyed();
@@ -144,9 +146,9 @@ protected:
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
-	cSurvivalInventory* m_Inventory;
-	cCreativeInventory* m_CreativeInventory;
-	cWindow* m_CurrentWindow;
+	cInventory m_Inventory;
+	cWindow * m_CurrentWindow;
+	cWindow * m_InventoryWindow;
 
 	float m_TimeLastPickupCheck;
 
@@ -159,6 +161,8 @@ protected:
 	int m_LastBlockActionCnt;
 	eGameMode m_GameMode;
 	std::string m_IP;
+	
+	cItem m_DraggingItem;
 
 	long long m_LastPlayerListTime;
 	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second

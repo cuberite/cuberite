@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "cWindowOwner.h"
+#include "cItem.h"
 
 
 
@@ -12,7 +12,6 @@ namespace Json
 	class Value;
 };
 
-class cItem;
 class cClientHandle;
 class cPlayer;
 
@@ -21,10 +20,9 @@ class cPlayer;
 
 
 class cInventory										//tolua_export	
-	: public cWindowOwner	
 {														//tolua_export
 public:
-	cInventory(cPlayer* a_Owner);
+	cInventory(cPlayer & a_Owner);
 	~cInventory();
 
 	void Clear();										//tolua_export
@@ -38,19 +36,17 @@ public:
 	void SaveToJson(Json::Value & a_Value);
 	bool LoadFromJson(Json::Value & a_Value);
 
-	void SendWholeInventory( cClientHandle* a_Client );
-	void SendWholeInventoryToAll(void);
+	void SendWholeInventory(cClientHandle & a_Client);
 
-	cItem* GetSlot( int a_SlotNum );					//tolua_export
-	cItem* GetSlots() const { return m_Slots; }
-	cItem* GetFromHotBar( int a_SlotNum );				//tolua_export
+	cItem *       GetSlot(int a_SlotNum );					//tolua_export
+	cItem *       GetSlots(void)       { return m_Slots; }
+	const cItem * GetSlots(void) const { return m_Slots; }
+	cItem *       GetFromHotBar(int a_HotBarSlotNum);				//tolua_export
 
 	cItem &       GetEquippedItem(void);							//tolua_export
 	const cItem & GetEquippedItem(void) const;
-	void SetEquippedSlot( int a_SlotNum );				//tolua_export
-	short GetEquippedSlot() { return m_EquippedSlot; }	//tolua_export
-
-	virtual void Clicked(short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem) = 0;
+	void          SetEquippedSlot(int a_SlotNum);				//tolua_export
+	short         GetEquippedSlot(void) { return m_EquippedSlot; }	//tolua_export
 
 	void SendSlot( int a_SlotNum );						//tolua_export
 	
@@ -74,19 +70,17 @@ public:
 protected:
 	bool AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode = 0 );
 
-	cItem* m_Slots;
-	cItem* m_MainSlots;
-	cItem* m_CraftSlots;
-	cItem* m_ArmorSlots;
-	cItem* m_HotSlots;
+	cItem m_Slots[c_NumSlots];
+	
+	cItem * m_MainSlots;
+	cItem * m_CraftSlots;
+	cItem * m_ArmorSlots;
+	cItem * m_HotSlots;
 
-	cItem* m_EquippedItem;
+	cItem * m_EquippedItem;
 	short m_EquippedSlot;
 
-	cPlayer* m_Owner;
-	
-	// cWindowOwner override:
-	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override {}  // UNUSED for an inventory
+	cPlayer & m_Owner;
 };	//tolua_export
 
 

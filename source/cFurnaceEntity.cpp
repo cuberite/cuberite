@@ -4,7 +4,7 @@
 #include "cFurnaceEntity.h"
 #include "BlockID.h"
 #include "cItem.h"
-#include "cFurnaceWindow.h"
+#include "UI/cWindow.h"
 #include "cPlayer.h"
 #include "cWorld.h"
 #include "cClientHandle.h"
@@ -13,6 +13,17 @@
 #include "cPickup.h"
 #include "cRoot.h"
 #include <json/json.h>
+
+
+
+
+
+
+enum
+{
+	PROGRESSBAR_SMELTING = 0,
+	PROGRESSBAR_FUEL = 1,
+} ;
 
 
 
@@ -72,24 +83,20 @@ void cFurnaceEntity::Destroy()
 
 
 
-void cFurnaceEntity::UsedBy( cPlayer * a_Player )
+void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
 	LOG("Used a furnace");
 
-	if( !GetWindow() )
+	if (GetWindow() == NULL)
 	{
-		cWindow* Window = new cFurnaceWindow( this );
-		Window->SetSlots( m_Items, 3 );
-		Window->SetWindowTitle("UberFurnace");
-		OpenWindow( Window );
+		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
 	}
-	if( GetWindow() )
+	if (GetWindow() != NULL)
 	{
-		if( a_Player->GetWindow() != GetWindow() )
+		if (a_Player->GetWindow() != GetWindow())
 		{
-			a_Player->OpenWindow( GetWindow() );
-
-			GetWindow()->SendWholeWindow( a_Player->GetClientHandle() );
+			a_Player->OpenWindow(GetWindow());
+			GetWindow()->SendWholeWindow(*a_Player->GetClientHandle());
 		}
 	}
 }
@@ -109,12 +116,19 @@ bool cFurnaceEntity::Tick( float a_Dt )
 
 	if (m_BurnTime <= 0)
 	{
+		if (m_TimeCooked > 0)
+		{
+			// We have just finished smelting, reset the progress bar:
+			BroadcastProgress(PROGRESSBAR_SMELTING, 0);
+			m_TimeCooked = 0;
+		}
 		// There is no fuel and no flame, no need to tick at all
 		return false;
 	}
 	
 	// DEBUG: LOGD("Furnace: Left: %0.1f Burned: %0.1f Burn time: %0.1f", m_CookTime - m_TimeCooked, m_TimeBurned, m_BurnTime );
 	
+	short SmeltingProgress = 0;
 	if ((m_CookingItem != NULL) && ((m_TimeBurned < m_BurnTime) || (m_TimeCooked + a_Dt >= m_CookTime)))
 	{
 		if (m_CookingItem->IsEqual(m_Items[2]) || m_Items[2].IsEmpty())
@@ -140,16 +154,12 @@ bool cFurnaceEntity::Tick( float a_Dt )
 				m_TimeCooked -= m_CookTime;
 				StartCooking();
 			}
-			cWindow * Window = GetWindow();
-			if (Window != NULL)
-			{
-				short Value = (short)( m_TimeCooked * (180.f / m_CookTime));
-				if (Value > 180) Value = 180;
-				if (Value < 0)   Value = 0;
-				Window->BroadcastInventoryProgress(0, Value);
-			}
+			SmeltingProgress = (short)( m_TimeCooked * (180.f / m_CookTime));
+			if (SmeltingProgress > 180) SmeltingProgress = 180;
+			if (SmeltingProgress < 0)   SmeltingProgress = 0;
 		}
 	}
+	BroadcastProgress(PROGRESSBAR_SMELTING, SmeltingProgress);
 
 	m_TimeBurned += a_Dt;
 
@@ -163,17 +173,15 @@ bool cFurnaceEntity::Tick( float a_Dt )
 			Window->BroadcastWholeWindow();
 		}
 	}
-	if (Window != NULL)
+	short Value = 0;
+	if (m_BurnTime > 0.f)
 	{
-		short Value = 0;
-		if (m_BurnTime > 0.f)
-		{
-			Value = 250 - (short)( m_TimeBurned * (250.f / m_BurnTime));
-			if (Value > 250) Value = 250;
-			if (Value < 0)   Value = 0;
-		}
-		Window->BroadcastInventoryProgress(1, Value);
+		Value = 250 - (short)( m_TimeBurned * (250.f / m_BurnTime));
+		if (Value > 250) Value = 250;
+		if (Value < 0)   Value = 0;
 	}
+	BroadcastProgress(PROGRESSBAR_FUEL, Value);
+	
 	return ((m_CookingItem != NULL) || (m_TimeBurned < m_BurnTime)) && (m_BurnTime > 0.0); // Keep on ticking, if there's more to cook, or if it's cooking
 }
 
@@ -391,6 +399,19 @@ void cFurnaceEntity::SendTo(cClientHandle & a_Client)
 {
 	// Nothing needs to be sent
 	UNUSED(a_Client);
+}
+
+
+
+
+
+void cFurnaceEntity::BroadcastProgress(int a_ProgressbarID, short a_Value)
+{
+	cWindow * Window = GetWindow();
+	if (Window != NULL)
+	{
+		Window->BroadcastInventoryProgress(a_ProgressbarID, a_Value);
+	}
 }
 
 

@@ -5,7 +5,6 @@
 
 #include "cServer.h"
 #include "cClientHandle.h"
-#include "cSleep.h"
 #include "cTimer.h"
 #include "cMonster.h"
 #include "cSocket.h"

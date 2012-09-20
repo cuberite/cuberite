@@ -637,6 +637,9 @@ extern AString ItemToString(const cItem & a_Item);  // tolua_export
 /// Translates itemtype into a string. If the type is not recognized, the itemtype number is output into the string.
 extern AString ItemTypeToString(short a_ItemType);  // tolua_export
 
+/// Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string.
+extern AString ItemToFullString(const cItem & a_Item);  // tolua_export
+
 /// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 

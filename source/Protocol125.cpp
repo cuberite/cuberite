@@ -2,6 +2,12 @@
 // Protocol125.cpp
 
 // Implements the cProtocol125 class representing the release 1.2.5 protocol (#29)
+/*
+Documentation:
+	- protocol: http://wiki.vg/wiki/index.php?title=Protocol&oldid=2513
+	- session handling: http://wiki.vg/wiki/index.php?title=Session&oldid=2262
+	- slot format: http://wiki.vg/wiki/index.php?title=Slot_Data&oldid=2152
+*/
 
 #include "Globals.h"
 
@@ -14,7 +20,7 @@
 #include "cPickup.h"
 #include "cPlayer.h"
 #include "cChatColor.h"
-#include "cWindow.h"
+#include "UI/cWindow.h"
 #include "cRoot.h"
 #include "cServer.h"
 
@@ -713,7 +719,7 @@ void cProtocol125::SendWeather(eWeather a_Weather)
 void cProtocol125::SendWholeInventory(const cInventory & a_Inventory)
 {
 	cCSLock Lock(m_CSPacket);
-	SendWholeInventory(0, a_Inventory.c_NumSlots, a_Inventory.GetSlots());
+	SendWindowSlots(0, a_Inventory.c_NumSlots, a_Inventory.GetSlots());
 }
 
 
@@ -723,11 +729,9 @@ void cProtocol125::SendWholeInventory(const cInventory & a_Inventory)
 void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 {
 	cCSLock Lock(m_CSPacket);
-	SendWholeInventory(
-		(char)a_Window.GetWindowID(), 
-		a_Window.GetNumSlots(),
-		a_Window.GetSlots()
-	);
+	cItems Slots;
+	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
+	SendWindowSlots(a_Window.GetWindowID(), Slots.size(), &(Slots[0]));
 }
 
 
@@ -748,6 +752,10 @@ void cProtocol125::SendWindowClose(char a_WindowID)
 
 void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
+	LOGD("Sending a WindowOpen packet: ID = %d, Type = %d, Title = \"%s\", NumSlots = %d",
+		a_WindowID, a_WindowType, a_WindowTitle.c_str(), a_NumSlots
+	);
+	
 	if (a_WindowType < 0)
 	{
 		// Do not send for inventory windows
@@ -1246,8 +1254,11 @@ void cProtocol125::SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad)
 
 
 
-void cProtocol125::SendWholeInventory(char a_WindowID, int a_NumItems, const cItem * a_Items)
+void cProtocol125::SendWindowSlots(char a_WindowID, int a_NumItems, const cItem * a_Items)
 {
+	LOGD("Sending a InventoryWhole packet: WindowID = %d, NumItems = %d",
+		a_WindowID, a_NumItems
+	);
 	WriteByte (PACKET_INVENTORY_WHOLE);
 	WriteByte (a_WindowID);
 	WriteShort((short)a_NumItems);

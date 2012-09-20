@@ -5,7 +5,7 @@
 #include "cItem.h"
 #include "cClientHandle.h"
 #include "cPlayer.h"
-#include "cWindow.h"
+#include "UI/cWindow.h"
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cPickup.h"
@@ -88,9 +88,9 @@ const cItem * cChestEntity::GetSlot( int a_Slot ) const
 
 
 
-void cChestEntity::SetSlot( int a_Slot, cItem & a_Item )
+void cChestEntity::SetSlot(int a_Slot, const cItem & a_Item)
 {
-	if( a_Slot > -1 && a_Slot < c_ChestHeight*c_ChestWidth )
+	if ((a_Slot > -1) && (a_Slot < c_ChestHeight * c_ChestWidth))
 	{
 		m_Content[a_Slot] = a_Item;
 	}
@@ -170,22 +170,18 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 
 void cChestEntity::UsedBy(cPlayer * a_Player)
 {
-	if (!GetWindow())
+	if (GetWindow() == NULL)
 	{
-		cWindow * Window = new cWindow(this, true, cWindow::Chest, 1);
-		Window->SetSlots(GetContents(), GetChestHeight() * c_ChestWidth);
-		Window->SetWindowTitle("UberChest");
-		OpenWindow( Window );
+		OpenWindow(new cChestWindow(m_PosX, m_PosY, m_PosZ, this));
 	}
-	if ( GetWindow() )
+	if (GetWindow())
 	{
 		if( a_Player->GetWindow() != GetWindow() )
 		{
 			a_Player->OpenWindow( GetWindow() );
-			GetWindow()->SendWholeWindow( a_Player->GetClientHandle() );
+			GetWindow()->SendWholeWindow(*a_Player->GetClientHandle());
 		}
 	}
-	m_World->BroadcastBlockAction(m_PosX, m_PosY, m_PosZ, 1, 1, E_BLOCK_CHEST);
 
 	// This is rather a hack
 	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now

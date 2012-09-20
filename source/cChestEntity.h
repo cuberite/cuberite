@@ -2,7 +2,7 @@
 #pragma once
 
 #include "cBlockEntity.h"
-#include "cWindowOwner.h"
+#include "UI/cWindowOwner.h"
 
 
 
@@ -22,10 +22,10 @@ class cNBTData;
 
 
 
-class cChestEntity :				//tolua_export
-	public cBlockEntity,			//tolua_export
-	public cBlockEntityWindowOwner	//tolua_export
-{	//tolua_export
+class cChestEntity :              // tolua_export
+	public cBlockEntity,            // tolua_export
+	public cBlockEntityWindowOwner  // tolua_export
+{  // tolua_export
 public:
 	cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cChestEntity();
@@ -34,7 +34,7 @@ public:
 	void HandleData( cNBTData* a_NBTData );
 
 	const cItem * GetSlot( int a_Slot ) const;		//tolua_export
-	void	SetSlot( int a_Slot, cItem & a_Item );	//tolua_export
+	void	SetSlot(int a_Slot, const cItem & a_Item );	//tolua_export
 
 	bool LoadFromJson( const Json::Value& a_Value );
 	virtual void SaveToJson(Json::Value& a_Value ) override;

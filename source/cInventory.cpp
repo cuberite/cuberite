@@ -4,7 +4,7 @@
 #include "cInventory.h"
 #include "cPlayer.h"
 #include "cClientHandle.h"
-#include "cWindow.h"
+#include "UI/cWindow.h"
 #include "cItem.h"
 #include "cRoot.h"
 
@@ -18,39 +18,35 @@
 
 cInventory::~cInventory()
 {
-	delete [] m_Slots;
-	delete m_EquippedItem;
-	if( GetWindow() ) GetWindow()->Close( *m_Owner );
+	/*
+	// TODO
+	cWindow wnd = GetWindow();
+	if (wnd != NULL)
+	{
+		wnd->Close(*m_Owner);
+	}
 	CloseWindow();
+	*/
 }
 
 
 
 
 
-cInventory::cInventory(cPlayer* a_Owner)
+cInventory::cInventory(cPlayer & a_Owner) :
+	m_Owner(a_Owner)
 {
-	m_Owner = a_Owner;
-
-	m_Slots = new cItem[c_NumSlots];
-	for(unsigned int i = 0; i < c_NumSlots; i++)
+	for (unsigned int i = 0; i < c_NumSlots; i++)
+	{
 		m_Slots[i].Empty();
+	}
 
 	m_CraftSlots = m_Slots + c_CraftOffset;
 	m_ArmorSlots = m_Slots + c_ArmorOffset;
 	m_MainSlots  = m_Slots + c_MainOffset;
 	m_HotSlots   = m_Slots + c_HotOffset;
 
-	m_EquippedItem = new cItem();
-	m_EquippedSlot = 0;
-
-	if (GetWindow() == NULL)
-	{
-		cWindow * Window = new cWindow( this, false, cWindow::Inventory, 0);
-		Window->SetSlots(m_Slots, c_NumSlots);
-		Window->Open(*a_Owner);
-		OpenWindow(Window);
-	}
+	SetEquippedSlot(0);
 }
 
 
@@ -97,9 +93,9 @@ bool cInventory::AddItem( cItem & a_Item )
 bool cInventory::RemoveItem( cItem & a_Item )
 {
 	// First check equipped slot
-	if( m_EquippedSlot >= 0 && m_EquippedSlot < 9 )
+	if ((m_EquippedSlot >= 0) && (m_EquippedSlot < 9))
 	{
-		if( m_HotSlots[m_EquippedSlot].m_ItemID == a_Item.m_ItemID )
+		if (m_HotSlots[m_EquippedSlot].m_ItemID == a_Item.m_ItemID)
 		{
 			cItem & Item = m_HotSlots[m_EquippedSlot];
 			if(Item.m_ItemCount > a_Item.m_ItemCount)
@@ -118,7 +114,7 @@ bool cInventory::RemoveItem( cItem & a_Item )
 	}
 
 	// Then check other slotz
-	if( a_Item.m_ItemCount > 0 )
+	if (a_Item.m_ItemCount > 0)
 	{
 		for(int i = 0; i < 36; i++)
 		{
@@ -141,10 +137,7 @@ bool cInventory::RemoveItem( cItem & a_Item )
 		}
 	}
 
-	if( a_Item.m_ItemCount == 0 )
-		return true;
-	else
-		return false;
+	return (a_Item.m_ItemCount == 0);
 }
 
 
@@ -221,10 +214,17 @@ cItem* cInventory::GetFromHotBar( int a_SlotNum )
 
 
 
-void cInventory::SetEquippedSlot( int a_SlotNum )
+void cInventory::SetEquippedSlot(int a_SlotNum)
 {
-	if( a_SlotNum < 0 || a_SlotNum >= 9 ) m_EquippedSlot = 0;
-	else m_EquippedSlot = (short)a_SlotNum;
+	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
+	{
+		m_EquippedSlot = 0;
+	}
+	else
+	{
+		m_EquippedSlot = (short)a_SlotNum;
+	}
+	m_EquippedItem = GetFromHotBar(m_EquippedSlot);
 }
 
 
@@ -259,36 +259,9 @@ const cItem & cInventory::GetEquippedItem(void) const
 
 
 
-void cInventory::SendWholeInventory(cClientHandle * a_Client)
+void cInventory::SendWholeInventory(cClientHandle & a_Client)
 {
-	a_Client->SendWholeInventory(*this);
-}
-
-
-
-
-
-void cInventory::SendWholeInventoryToAll(void)
-{
-	cWindow * Window = GetWindow();
-	if (Window == NULL)
-	{
-		return;
-	}
-	
-	class cSender :
-		public cItemCallback<cClientHandle>
-	{
-		cInventory * m_Inventory;
-	public:
-		cSender(cInventory * a_Inventory) : m_Inventory(a_Inventory) {}
-		virtual bool Item(cClientHandle * a_Client) override
-		{
-			m_Inventory->SendWholeInventory(a_Client);
-			return false;
-		}
-	} Sender(this);
-	Window->ForEachClient(Sender);
+	a_Client.SendWholeInventory(*this);
 }
 
 
@@ -305,7 +278,7 @@ void cInventory::SendSlot(int a_SlotNum)
 			// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
 			Item->Empty();
 		}
-		m_Owner->GetClientHandle()->SendInventorySlot(0, a_SlotNum, *Item);
+		m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum, *Item);
 	}
 }
 
@@ -437,6 +410,10 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
 	int SlotIdx = 0;
+	
+	// TODO: Limit the number of slots written to the actual number of slots, 
+	// otherwise an invalid json will crash the server!
+	
 	for( Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr )
 	{
 		m_Slots[SlotIdx].FromJson( *itr );

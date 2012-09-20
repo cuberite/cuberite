@@ -251,6 +251,17 @@ AString ItemTypeToString(short a_ItemType)
 
 
 
+AString ItemToFullString(const cItem & a_Item)
+{
+	AString res;
+	Printf(res, "%s:%d * %d", ItemToString(a_Item).c_str(), a_Item.m_ItemHealth, a_Item.m_ItemCount);
+	return res;
+}
+
+
+
+
+
 EMCSBiome StringToBiome(const AString & a_BiomeString)
 {
 	// If it is a number, return it:

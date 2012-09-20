@@ -1040,47 +1040,23 @@
 				Name="UI"
 				>
 				<File
-					RelativePath="..\source\cCraftingWindow.cpp"
+					RelativePath="..\source\UI\cWindow.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCraftingWindow.h"
+					RelativePath="..\source\UI\cWindow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCreativeInventory.cpp"
+					RelativePath="..\source\UI\cWindowOwner.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCreativeInventory.h"
+					RelativePath="..\source\UI\SlotArea.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFurnaceWindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cFurnaceWindow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cSurvivalInventory.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cSurvivalInventory.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cWindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cWindow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cWindowOwner.h"
+					RelativePath="..\source\UI\SlotArea.h"
 					>
 				</File>
 			</Filter>

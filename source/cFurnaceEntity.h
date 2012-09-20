@@ -2,7 +2,7 @@
 #pragma once
 
 #include "cBlockEntity.h"
-#include "cWindowOwner.h"
+#include "UI/cWindowOwner.h"
 #include "cItem.h"
 
 
@@ -49,7 +49,7 @@ public:
 
 	void ResetCookTimer();
 	
-	const cItem & GetSlot(int i) const { return m_Items[i]; }
+	const cItem * GetSlot(int i) const { return &(m_Items[i]); }
 	
 	void SetSlot(int a_Slot, const cItem & a_Item);
 	
@@ -69,6 +69,8 @@ private:
 	float   m_TimeCooked;  // Amount of time that the current item has been cooking
 	float   m_BurnTime;    // Amount of time that the current fuel can burn (in total); zero if no fuel burning
 	float   m_TimeBurned;  // Amount of time that the current fuel has been burning
+	
+	void BroadcastProgress(int a_ProgressbarID, short a_Value);
 };
 
 

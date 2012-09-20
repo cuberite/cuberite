@@ -3,13 +3,12 @@
 
 #include "cPlayer.h"
 #include "cServer.h"
-#include "cCreativeInventory.h"
-#include "cSurvivalInventory.h"
 #include "cClientHandle.h"
+#include "UI/cWindow.h"
+#include "UI/cWindowOwner.h"
 #include "cWorld.h"
 #include "cPickup.h"
 #include "cPluginManager.h"
-#include "cWindow.h"
 #include "cBlockEntity.h"
 #include "cGroupManager.h"
 #include "cGroup.h"
@@ -48,8 +47,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_LastGroundHeight( 0 )
 	, m_bTouchGround( false )
 	, m_Stance( 0.0 )
-	, m_Inventory( 0 )
-	, m_CurrentWindow( 0 )
+	, m_Inventory(*this)
+	, m_CurrentWindow(NULL)
+	, m_InventoryWindow(NULL)
 	, m_TimeLastPickupCheck( 0.f )
 	, m_Color('-')
 	, m_ClientHandle( a_Client )
@@ -61,6 +61,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 		this, GetUniqueID()
 	);
 	m_EntityType = eEntityType_Player;
+	
+	m_InventoryWindow = new cInventoryWindow(*this);
+	m_CurrentWindow = m_InventoryWindow;
 
 	SetMaxHealth(20);
 	m_MaxFoodLevel = 20;
@@ -69,8 +72,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_FoodLevel = m_MaxFoodLevel;
 	m_FoodSaturationLevel = 5.f;
 
-	m_Inventory = new cSurvivalInventory( this );
-	m_CreativeInventory = new cCreativeInventory(this);
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
 
@@ -80,10 +81,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_PlayerName = a_PlayerName;
 	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
 
-	if( !LoadFromDisk() )
+	if (!LoadFromDisk())
 	{
-		m_Inventory->Clear();
-		m_CreativeInventory->Clear();
+		m_Inventory.Clear();
 		m_Pos.x = cRoot::Get()->GetDefaultWorld()->GetSpawnX();
 		m_Pos.y = cRoot::Get()->GetDefaultWorld()->GetSpawnY();
 		m_Pos.z = cRoot::Get()->GetDefaultWorld()->GetSpawnZ();
@@ -109,11 +109,6 @@ cPlayer::~cPlayer(void)
 	m_World->RemovePlayer( this );
 
 	m_ClientHandle = NULL;
-	
-	delete m_Inventory;
-	m_Inventory = NULL;
-
-	delete m_CreativeInventory;
 	
 	LOG("Player %p deleted", this);
 }
@@ -373,9 +368,9 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	m_bVisible = false; // So new clients don't see the player
 
 	// Puke out all the items
-	cItem* Items = m_Inventory->GetSlots();
+	cItem * Items = m_Inventory.GetSlots();
 	cItems Pickups;
-	for (unsigned int i = 1; i < m_Inventory->c_NumSlots; ++i)
+	for (unsigned int i = 1; i < m_Inventory.c_NumSlots; ++i)
 	{
 		if( !Items[i].IsEmpty() )
 		{
@@ -419,10 +414,14 @@ Vector3d cPlayer::GetEyePosition()
 	return Vector3d( m_Pos.x, m_Stance, m_Pos.z );
 }
 
+
+
+
+
 void cPlayer::OpenWindow( cWindow* a_Window )
 {
 	CloseWindow(m_CurrentWindow ? (char)m_CurrentWindow->GetWindowType() : 0);
-	a_Window->Open( *this );
+	a_Window->OpenedByPlayer(*this);
 	m_CurrentWindow = a_Window;
 }
 
@@ -432,38 +431,15 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 
 void cPlayer::CloseWindow(char a_WindowType)
 {
-	if (a_WindowType == 0)
+	if (m_CurrentWindow == m_InventoryWindow)
 	{
-		// Inventory
-		if (
-			(m_Inventory->GetWindow()->GetDraggingItem() != NULL) && 
-			(m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount > 0)
-		)
-		{
-			LOGD("Player holds item! Dropping it...");
-			TossItem( true, m_Inventory->GetWindow()->GetDraggingItem()->m_ItemCount );
-		}
-
-		//Drop whats in the crafting slots (1, 2, 3, 4)
-		cItems Drops;
-		for (int i = 1; i <= 4; i++)
-		{
-			cItem* Item = m_Inventory->GetSlot( i );
-			if (!Item->IsEmpty())
-			{
-				Drops.push_back(*Item);
-			}
-			Item->Empty();
-		}
-		float vX = 0, vY = 0, vZ = 0;
-		EulerToVector(-GetRotation(), GetPitch(), vZ, vX, vY);
-		vY = -vY*2 + 1.f;
-		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY() + 1.6f, GetPosZ(), vX * 2, vY * 2, vZ * 2);
+		// The inventory window must not be closed and must not be even sent a close packet
+		return;
 	}
 	
 	if (m_CurrentWindow != NULL)
 	{
-		// FIXME: If the player entity is destroyed while having a chest window open, the chest will not close
+		// TODO: This code should be in cChestWindow instead
 		if ((a_WindowType == 1) && (m_CurrentWindow->GetWindowType() == cWindow::Chest))
 		{
 			int x, y, z;
@@ -471,9 +447,9 @@ void cPlayer::CloseWindow(char a_WindowType)
 			m_World->BroadcastBlockAction(x, y, z, 1, 0, E_BLOCK_CHEST);
 		}
 		
-		m_CurrentWindow->Close( *this );
+		m_CurrentWindow->ClosedByPlayer(*this);
 	}
-	m_CurrentWindow = NULL;
+	m_CurrentWindow = m_InventoryWindow;
 }
 
 
@@ -515,19 +491,8 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 		return;
 	}
 	
-	short OldSlotNum = 0;
-	if (m_GameMode == eGameMode_Survival)
-	{
-		OldSlotNum = m_Inventory->GetEquippedSlot();
-	}
-	else
-	{
-		OldSlotNum = m_CreativeInventory->GetEquippedSlot();
-	}
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
-	GetInventory().SendWholeInventory(m_ClientHandle);
-	GetInventory().SetEquippedSlot(OldSlotNum);
 }
 
 
@@ -785,14 +750,18 @@ void cPlayer::TossItem(
 		// Drop an item from the inventory:
 		if (a_bDraggingItem)
 		{
-			cItem * Item = GetInventory().GetWindow()->GetDraggingItem();
-			if (!Item->IsEmpty())
+			cItem & Item = GetDraggingItem();
+			if (!Item.IsEmpty())
 			{
-				Drops.push_back(*Item);
-				if( Item->m_ItemCount > a_Amount )
-					Item->m_ItemCount -= (char)a_Amount;
+				Drops.push_back(Item);
+				if (Item.m_ItemCount > a_Amount)
+				{
+					Item.m_ItemCount -= (char)a_Amount;
+				}
 				else
-					Item->Empty();
+				{
+					Item.Empty();
+				}
 			}
 		}
 		else
@@ -917,7 +886,7 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	Json::Value & JSON_PlayerPosition = root["position"];
-	if( JSON_PlayerPosition.size() == 3 )
+	if (JSON_PlayerPosition.size() == 3)
 	{
 		m_Pos.x = JSON_PlayerPosition[(unsigned int)0].asDouble();
 		m_Pos.y = JSON_PlayerPosition[(unsigned int)1].asDouble();
@@ -925,7 +894,7 @@ bool cPlayer::LoadFromDisk()
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
-	if( JSON_PlayerRotation.size() == 3 )
+	if (JSON_PlayerRotation.size() == 3)
 	{
 		m_Rot.x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
 		m_Rot.y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
@@ -938,9 +907,7 @@ bool cPlayer::LoadFromDisk()
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	
-
-	m_Inventory->LoadFromJson(root["inventory"]);
-	m_CreativeInventory->LoadFromJson(root["creativeinventory"]);
+	m_Inventory.LoadFromJson(root["inventory"]);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
 	
@@ -971,25 +938,23 @@ bool cPlayer::SaveToDisk()
 	JSON_PlayerRotation.append( Json::Value( m_Rot.z ) );
 
 	Json::Value JSON_Inventory;
-	m_Inventory->SaveToJson( JSON_Inventory );
-
-	Json::Value JSON_CreativeInventory;
-	m_CreativeInventory->SaveToJson( JSON_CreativeInventory );
+	m_Inventory.SaveToJson( JSON_Inventory );
 
 	Json::Value root;
 	root["position"] = JSON_PlayerPosition;
 	root["rotation"] = JSON_PlayerRotation;
 	root["inventory"] = JSON_Inventory;
-	root["creativeinventory"] = JSON_CreativeInventory;
 	root["health"] = m_Health;
 	root["food"] = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;
 	root["world"] = GetWorld()->GetName();
 
-	if(m_GameMode == GetWorld()->GetGameMode())
+	if (m_GameMode == GetWorld()->GetGameMode())
 	{
 		root["gamemode"] = (int) eGameMode_NotSet;
-	}else{
+	}
+	else
+	{
 		root["gamemode"] = (int) m_GameMode;
 	}
 

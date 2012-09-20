@@ -26,7 +26,7 @@ class cCraftingGrid  // tolua_export
 public:
 	cCraftingGrid(const cCraftingGrid & a_Original);
 	cCraftingGrid(int a_Width, int a_Height);  // tolua_export
-	cCraftingGrid(cItem * a_Items, int a_Width, int a_Height);
+	cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height);
 	~cCraftingGrid();
 	
 	// tolua_begin

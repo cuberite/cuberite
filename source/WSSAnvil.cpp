@@ -127,9 +127,9 @@ protected:
 		m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_Furnace, "Furnace");
 		m_Writer.BeginList("Items", TAG_Compound);
-		AddItem(&a_Furnace->GetSlot(0), 0);
-		AddItem(&a_Furnace->GetSlot(1), 1);
-		AddItem(&a_Furnace->GetSlot(2), 2);
+		AddItem(a_Furnace->GetSlot(0), 0);
+		AddItem(a_Furnace->GetSlot(1), 1);
+		AddItem(a_Furnace->GetSlot(2), 2);
 		m_Writer.EndList();
 		m_Writer.AddShort("BurnTime", (Int16)(a_Furnace->GetTimeToBurn() / 50.0));
 		m_Writer.AddShort("CookTime", (Int16)(a_Furnace->GetTimeCooked() / 50.0));

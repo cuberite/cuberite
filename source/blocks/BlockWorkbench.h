@@ -1,9 +1,14 @@
 #pragma once
 #include "Block.h"
-#include "../cCraftingWindow.h"
+#include "../UI/cWindow.h"
 #include "../cPlayer.h"
 
-class cBlockWorkbenchHandler : public cBlockHandler
+
+
+
+
+class cBlockWorkbenchHandler:
+	public cBlockHandler
 {
 public:
 	cBlockWorkbenchHandler(BLOCKTYPE a_BlockID)
@@ -11,9 +16,9 @@ public:
 	{
 	}
 	
-	virtual void OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z) override
+	virtual void OnUse(cWorld * a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		cWindow* Window = new cCraftingWindow(0, true);
+		cWindow * Window = new cCraftingWindow(a_BlockX, a_BlockY, a_BlockZ);
 		a_Player->OpenWindow(Window);
 	}
 

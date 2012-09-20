@@ -10,8 +10,6 @@
 #include "CraftingRecipes.h"
 #include "cPluginManager.h"
 #include "cMonsterConfig.h"
-#include "cSleep.h"
-#include "cThread.h"
 #include "cFileFormatUpdater.h"
 #include "cRedstone.h"
 #include "cPlayer.h"

@@ -10,8 +10,7 @@
 #include "cInventory.h"
 #include "cChestEntity.h"
 #include "cSignEntity.h"
-#include "cWindow.h"
-#include "cCraftingWindow.h"
+#include "UI/cWindow.h"
 #include "cItem.h"
 #include "cTorch.h"
 #include "cDoors.h"
@@ -256,7 +255,7 @@ void cClientHandle::Authenticate(void)
 	m_Protocol->SendTimeUpdate(World->GetWorldTime());
 
 	// Send inventory
-	m_Player->GetInventory().SendWholeInventory(this);
+	m_Player->GetInventory().SendWholeInventory(*this);
 
 	// Send health
 	m_Player->SendHealth();
@@ -451,14 +450,18 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
 {
 	// This is for creative Inventory changes
-	if (m_Player->GetGameMode() == 1)
-	{
-		m_Player->GetInventory().Clicked(a_SlotNum, false, false, a_HeldItem);
-	}
-	else
+	if (m_Player->GetGameMode() != eGameMode_Creative)
 	{
 		LOGWARNING("Got a CreativeInventoryAction packet from user \"%s\" while not in creative mode. Ignoring.", m_Username.c_str());
+		return;
 	}
+	if (m_Player->GetWindow()->GetWindowType() != cWindow::Inventory)
+	{
+		LOGWARNING("Got a CreativeInventoryAction packet from user \"%s\" while not in the inventory window. Ignoring.", m_Username.c_str());
+		return;
+	}
+	
+	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, false, false, a_HeldItem);
 }
 
 
@@ -821,11 +824,10 @@ void cClientHandle::HandleWindowClose(char a_WindowID)
 
 void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem)
 {
-	if (a_WindowID == 0)
-	{
-		m_Player->GetInventory().Clicked(a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
-		return;
-	}
+	LOGD("WindowClick: WinID %d, SlotNum %d, IsRclk %d, IsShift %d, Item %s x %d",
+		a_WindowID, a_SlotNum, a_IsRightClick, a_IsShiftPressed,
+		ItemToString(a_HeldItem).c_str(), a_HeldItem.m_ItemCount
+	);
 	
 	cWindow * Window = m_Player->GetWindow();
 	if (Window == NULL)

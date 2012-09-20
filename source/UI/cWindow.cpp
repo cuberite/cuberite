@@ -1,0 +1,385 @@
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+
+#include "cWindow.h"
+#include "../cItem.h"
+#include "../cClientHandle.h"
+#include "../cPlayer.h"
+#include "../cPickup.h"
+#include "../cInventory.h"
+#include "cWindowOwner.h"
+#include "../items/Item.h"
+#include "SlotArea.h"
+#include "../cChestEntity.h"
+
+
+
+
+
+char cWindow::m_WindowIDCounter = 1;
+
+
+
+
+
+cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle)
+	: m_WindowID(1 + (m_WindowIDCounter++ % 127))
+	, m_WindowType(a_WindowType)
+	, m_WindowTitle(a_WindowTitle)
+	, m_Owner(NULL)
+	, m_IsDestroyed(false)
+{
+	if (a_WindowType == Inventory)
+	{
+		m_WindowID = 0;
+	}
+	LOGD("Created a window at %p, type = %d, ID = %i, title = \"%s\".", 
+		this, m_WindowType, m_WindowID, m_WindowTitle.c_str()
+	);
+}
+
+
+
+
+
+cWindow::~cWindow()
+{
+	LOGD("Deleted a window at %p", this);
+}
+
+
+
+
+
+int cWindow::GetNumSlots(void) const
+{
+	int res = 0;
+	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		res += (*itr)->GetNumSlots();
+	}  // for itr - m_SlotAreas[]
+	return res;
+}
+
+
+
+
+
+void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
+{
+	a_Slots.clear();
+	a_Slots.reserve(GetNumSlots());
+	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		int NumSlots = (*itr)->GetNumSlots();
+		for (int i = 0; i < NumSlots; i++)
+		{
+			
+			const cItem * Item = (*itr)->GetSlot(i, a_Player);
+			if (Item == NULL)
+			{
+				a_Slots.push_back(cItem());
+			}
+			else
+			{
+				a_Slots.push_back(*Item);
+			}
+		}
+	}  // for itr - m_SlotAreas[]
+}
+
+
+
+
+
+void cWindow::Clicked(
+	cPlayer & a_Player, 
+	int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+	const cItem & a_ClickedItem
+)
+{
+	LOGD("cWindow::Clicked(): ID %d (exp %d), SlotNum %d", a_WindowID, m_WindowID, a_SlotNum);
+	
+	if (a_WindowID != m_WindowID)
+	{
+		LOG("WRONG WINDOW ID! (exp %d, got %d) received from \"%s\"", m_WindowID, a_WindowID, a_Player.GetName().c_str());
+		return;
+	}
+
+	if (a_SlotNum == -999)  // Outside window click
+	{
+		if (a_IsRightClick)
+		{
+			a_Player.TossItem(true);
+		}
+		else
+		{
+			a_Player.TossItem(true, a_Player.GetDraggingItem().m_ItemCount);
+		}
+		return;
+	}
+
+	int LocalSlotNum = a_SlotNum;
+	int idx = 0;
+	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		if (LocalSlotNum < (*itr)->GetNumSlots())
+		{
+			LOGD("SlotArea #%d (%d slots) handling the click", idx, (*itr)->GetNumSlots());
+			(*itr)->Clicked(a_Player, LocalSlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
+			return;
+		}
+		LocalSlotNum -= (*itr)->GetNumSlots();
+		idx++;
+	}
+	
+	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
+		a_SlotNum, GetNumSlots(), a_Player.GetName().c_str()
+	);
+}
+
+
+
+
+
+void cWindow::OpenedByPlayer(cPlayer & a_Player)
+{
+	{
+		cCSLock Lock(m_CS);
+		// If player is already in OpenedBy remove player first
+		m_OpenedBy.remove(&a_Player);
+		// Then add player
+		m_OpenedBy.push_back(&a_Player);
+		
+		for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+		{
+			(*itr)->OnPlayerAdded(a_Player);
+		}  // for itr - m_SlotAreas[]
+	}
+
+	// TODO: Notify all areas that a new player has opened the window
+
+	a_Player.GetClientHandle()->SendWindowOpen(m_WindowID, m_WindowType, m_WindowTitle, GetNumSlots() - c_NumInventorySlots);
+}
+
+
+
+
+
+void cWindow::ClosedByPlayer(cPlayer & a_Player)
+{
+	ASSERT(m_WindowType != Inventory);  // Inventory windows must not be closed (the client would repeat the close packet, looping forever)
+	
+	// Checks whether the player is still holding an item
+	if (a_Player.IsDraggingItem())
+	{
+		LOGD("Player holds item! Dropping it...");
+		a_Player.TossItem(true, a_Player.GetDraggingItem().m_ItemCount);
+	}
+
+	cClientHandle * ClientHandle = a_Player.GetClientHandle();
+	if (ClientHandle != NULL)
+	{
+		ClientHandle->SendWindowClose(m_WindowID);
+	}
+
+	{
+		cCSLock Lock(m_CS);
+
+		for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+		{
+			(*itr)->OnPlayerRemoved(a_Player);
+		}  // for itr - m_SlotAreas[]
+
+		m_OpenedBy.remove(&a_Player);
+		if (m_OpenedBy.empty())
+		{
+			Destroy();
+		}
+	}
+	if (m_IsDestroyed)
+	{
+		delete this;
+	}
+}
+
+
+
+
+
+void cWindow::OwnerDestroyed()
+{
+	m_Owner = NULL;
+	// Close window for each player. Note that the last one needs special handling
+	while (m_OpenedBy.size() > 1)
+	{
+		(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
+	}
+	(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
+}
+
+
+
+
+
+bool cWindow::ForEachPlayer(cItemCallback<cPlayer> & a_Callback)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	{
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_OpenedBy[]
+	return true;
+}
+
+
+
+
+
+bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
+	{
+		if (a_Callback.Item((*itr)->GetClientHandle()))
+		{
+			return false;
+		}
+	}  // for itr - m_OpenedBy[]
+	return true;
+}
+
+
+
+
+
+void cWindow::Destroy()
+{
+	LOGD("Destroying window %p (type %d)", this, m_WindowType);
+	if (m_Owner != NULL)
+	{
+		m_Owner->CloseWindow();
+		m_Owner = NULL;
+	}
+	m_IsDestroyed = true;
+}
+
+
+
+
+
+void cWindow::SendWholeWindow(cClientHandle & a_Client)
+{
+	a_Client.SendWholeInventory(*this);
+}
+
+
+
+
+
+void cWindow::BroadcastWholeWindow(void)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		SendWholeWindow(*(*itr)->GetClientHandle());
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cWindow::BroadcastInventoryProgress(short a_Progressbar, short a_Value)
+{
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		(*itr)->GetClientHandle()->SendInventoryProgress(m_WindowID, a_Progressbar, a_Value);
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cInventoryWindow:
+
+cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
+	cWindow(cWindow::Inventory, "MCS-Inventory"),
+	m_Player(a_Player)
+{
+	m_SlotAreas.push_back(new cSlotAreaCrafting(2, *this));  // The creative inventory doesn't display it, but it's still counted into slot numbers
+	m_SlotAreas.push_back(new cSlotAreaArmor(*this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCraftingWindow:
+
+cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	cWindow(cWindow::Workbench, "MCS-Workbench")
+{
+	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cChestWindow:
+
+cChestWindow::cChestWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cChestEntity * a_Chest) :
+	cWindow(cWindow::Chest, "MCS-Chest"),
+	m_World(a_Chest->GetWorld()),
+	m_BlockX(a_BlockX),
+	m_BlockY(a_BlockY),
+	m_BlockZ(a_BlockZ)
+{
+	m_SlotAreas.push_back(new cSlotAreaChest(a_Chest, *this));
+	
+	// TODO: Double chests
+	
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	
+	// Send out the chest-open packet:
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_CHEST);
+}
+
+
+
+
+
+cChestWindow::~cChestWindow()
+{
+	// Send out the chest-close packet:
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_CHEST);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFurnaceWindow:
+
+cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :
+	cWindow(cWindow::Furnace, "MCS-Furnace")
+{
+	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+}
+
+
+
+

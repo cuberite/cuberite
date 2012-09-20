@@ -26,7 +26,7 @@ cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 
 
 
-cCraftingGrid::cCraftingGrid(cItem * a_Items, int a_Width, int a_Height) :
+cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
 	m_Items(new cItem[a_Width * a_Height])
