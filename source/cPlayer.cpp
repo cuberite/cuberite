@@ -64,6 +64,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
+	m_InventoryWindow->OpenedByPlayer(*this);
 
 	SetMaxHealth(20);
 	m_MaxFoodLevel = 20;
@@ -109,6 +110,8 @@ cPlayer::~cPlayer(void)
 	m_World->RemovePlayer( this );
 
 	m_ClientHandle = NULL;
+	
+	delete m_InventoryWindow;
 	
 	LOG("Player %p deleted", this);
 }

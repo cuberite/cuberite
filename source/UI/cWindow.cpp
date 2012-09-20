@@ -256,7 +256,45 @@ bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
 
 
 
-void cWindow::Destroy()
+void cWindow::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply)
+{
+	// Ask each slot area to take as much of the stack as it can.
+	// First ask only slots that already have the same kind of item
+	// Then ask any remaining slots
+	for (int Pass = 0; Pass < 2; ++Pass)
+	{
+		// First distribute into the hotbar:
+		if (a_ExcludeArea != m_SlotAreas.back())
+		{
+			m_SlotAreas.back()->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0));
+			if (a_ItemStack.IsEmpty())
+			{
+				// Distributed it all
+				return;
+			}
+		}
+		// The distribute to all other areas:
+		for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end() - 1; itr != end; ++itr)
+		{
+			if (*itr == a_ExcludeArea)
+			{
+				continue;
+			}
+			(*itr)->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0));
+			if (a_ItemStack.IsEmpty())
+			{
+				// Distributed it all
+				return;
+			}
+		}  // for itr - m_SlotAreas[]
+	}  // for Pass - repeat twice
+}
+
+
+
+
+
+void cWindow::Destroy(void)
 {
 	LOGD("Destroying window %p (type %d)", this, m_WindowType);
 	if (m_Owner != NULL)
@@ -316,6 +354,7 @@ cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
 	m_SlotAreas.push_back(new cSlotAreaCrafting(2, *this));  // The creative inventory doesn't display it, but it's still counted into slot numbers
 	m_SlotAreas.push_back(new cSlotAreaArmor(*this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 
@@ -330,6 +369,7 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 
@@ -351,6 +391,7 @@ cChestWindow::cChestWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cChestEntit
 	// TODO: Double chests
 	
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 	
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_CHEST);
@@ -378,6 +419,7 @@ cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnac
 {
 	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
 
 

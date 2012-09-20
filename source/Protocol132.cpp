@@ -572,12 +572,13 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 		ItemType = -1;
 	}
 	
-	WriteShort(ItemType);
 	if (a_Item.IsEmpty())
 	{
+		WriteShort(-1);
 		return;
 	}
 	
+	WriteShort(ItemType);
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	

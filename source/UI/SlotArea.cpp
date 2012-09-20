@@ -48,6 +48,17 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 		return;
 	}
 	
+	if (a_IsShiftPressed)
+	{
+		if (!a_Player.IsDraggingItem())
+		{
+			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
+		}
+		LOGD("Shift clicked, but the player is draggint an item: %s", ItemToFullString(a_Player.GetDraggingItem()));
+		return;
+	}
+	
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
 	if (!Slot.IsEqual(a_ClickedItem))
 	{
@@ -138,31 +149,57 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cSlotAreaArmor:
-
-cSlotAreaArmor::cSlotAreaArmor(cWindow & a_ParentWindow) :
-	cSlotArea(4, a_ParentWindow)
+void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
 {
+	// Make a copy of the slot, distribute it among the other areas, then update the slot to contain the leftover:
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	m_ParentWindow.DistributeStack(Slot, a_Player, this, true);
+	if (Slot.IsEmpty())
+	{
+		// Empty the slot completely, the cilent doesn't like left-over ItemType with zero count
+		Slot.Empty();
+	}
+	SetSlot(a_SlotNum, a_Player, Slot);
+	
+	// Some clients try to guess our actions and not always right (armor slots in 1.2.5), so we fix them:
+	m_ParentWindow.BroadcastWholeWindow();
 }
 
 
 
 
 
-const cItem * cSlotAreaArmor::GetSlot(int a_SlotNum, cPlayer & a_Player)
+void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
 {
-	// a_SlotNum ranges from 0 to 3, map that to the armor slots in player's inventory, 5 to 8:
-	return a_Player.GetInventory().GetSlot(a_SlotNum + 5);
-}
-
-
-
-
-
-void cSlotAreaArmor::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
-{
-	*(a_Player.GetInventory().GetSlot(a_SlotNum + 5)) = a_Item;
+	for (int i = 0; i < m_NumSlots; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsSameType(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_Apply)
+		{
+			cItem NewSlot(a_ItemStack.m_ItemType, Slot->m_ItemCount + NumFit, a_ItemStack.m_ItemDamage);
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			return;
+		}
+	}  // for i - Slots
 }
 
 
@@ -390,10 +427,11 @@ void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cSlotAreaInventory:
+// cSlotAreaInventoryBase:
 
-cSlotAreaInventory::cSlotAreaInventory(cWindow & a_ParentWindow) :
-	cSlotArea(27 + 9, a_ParentWindow)  // 27 internal slots, 9 hotbar slots
+cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow) :
+	cSlotArea(a_NumSlots, a_ParentWindow),
+	m_SlotOffset(a_SlotOffset)
 {
 }
 
@@ -401,7 +439,7 @@ cSlotAreaInventory::cSlotAreaInventory(cWindow & a_ParentWindow) :
 
 
 
-void cSlotAreaInventory::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
+void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
 {
 	if ((a_Player.GetGameMode() == eGameMode_Creative) && (m_ParentWindow.GetWindowType() == cWindow::Inventory))
 	{
@@ -419,19 +457,62 @@ void cSlotAreaInventory::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRig
 
 
 
-const cItem * cSlotAreaInventory::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, cPlayer & a_Player)
 {
 	// a_SlotNum ranges from 0 to 35, map that to the player's inventory slots 9 to 44
-	return a_Player.GetInventory().GetSlot(a_SlotNum + 9);
+	return a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset);
 }
 
 
 
 
 
-void cSlotAreaInventory::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+void cSlotAreaInventoryBase::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	*(a_Player.GetInventory().GetSlot(a_SlotNum + 9)) = a_Item;
+	*(a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset)) = a_Item;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaArmor:
+
+void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	if (ItemCategory::IsHelmet(a_ItemStack.m_ItemType) && GetSlot(0, a_Player)->IsEmpty())
+	{
+		if (a_ShouldApply)
+		{
+			SetSlot(0, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+		}
+		a_ItemStack.m_ItemCount -= 1;
+	}
+	else if (ItemCategory::IsChestPlate(a_ItemStack.m_ItemType) && GetSlot(1, a_Player)->IsEmpty())
+	{
+		if (a_ShouldApply)
+		{
+			SetSlot(1, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+		}
+		a_ItemStack.m_ItemCount -= 1;
+	}
+	else if (ItemCategory::IsLeggings(a_ItemStack.m_ItemType) && GetSlot(2, a_Player)->IsEmpty())
+	{
+		if (a_ShouldApply)
+		{
+			SetSlot(2, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+		}
+		a_ItemStack.m_ItemCount -= 1;
+	}
+	else if (ItemCategory::IsBoots(a_ItemStack.m_ItemType) && GetSlot(3, a_Player)->IsEmpty())
+	{
+		if (a_ShouldApply)
+		{
+			SetSlot(3, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+		}
+		a_ItemStack.m_ItemCount -= 1;
+	}
 }
 
 

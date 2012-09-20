@@ -93,6 +93,12 @@ public:
 	/// Calls the callback safely for each client that has this window open; returns true if all clients have been enumerated
 	bool ForEachClient(cItemCallback<cClientHandle> & a_Callback);
 	
+	/** Called on shift-clicking to distribute the stack into other areas; Modifies a_ItemStack as it is distributed!
+	if a_ShouldApply is true, the changes are written into the slots;
+	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
+	*/
+	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply);
+	
 protected:
 	cSlotAreas m_SlotAreas;
 	
