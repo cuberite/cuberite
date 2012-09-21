@@ -55,7 +55,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
 			return;
 		}
-		LOGD("Shift clicked, but the player is draggint an item: %s", ItemToFullString(a_Player.GetDraggingItem()));
+		LOGD("Shift clicked, but the player is draggint an item: %s", ItemToFullString(a_Player.GetDraggingItem()).c_str());
 		return;
 	}
 	
