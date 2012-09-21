@@ -58,7 +58,7 @@ public:
 	cWindow(WindowType a_WindowType, const AString & a_WindowTitle);
 	virtual ~cWindow();
 
-	int GetWindowID(void) const { return m_WindowID; }
+	char GetWindowID(void) const { return m_WindowID; }
 	int GetWindowType(void) const { return m_WindowType; }
 
 	cWindowOwner * GetOwner() { return m_Owner; }
@@ -98,6 +98,9 @@ public:
 	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
 	*/
 	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply);
+	
+	/// Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea
+	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
 	
 protected:
 	cSlotAreas m_SlotAreas;

@@ -257,7 +257,14 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRigh
 	// Override for craft result slot
 	if (a_SlotNum == 0)
 	{
-		ClickedResult(a_Player, a_IsShiftPressed);
+		if (a_IsShiftPressed)
+		{
+			ShiftClickedResult(a_Player);
+		}
+		else
+		{
+			ClickedResult(a_Player);
+		}
 		return;
 	}
 	super::Clicked(a_Player, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
@@ -290,12 +297,9 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player, bool a_IsShiftPressed)
+void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 {
 	const cItem * ResultSlot = GetSlot(0, a_Player);
-	LOGD("Clicked in craft result slot, item there: %d:%d (%d times)",
-		ResultSlot->m_ItemID, ResultSlot->m_ItemHealth, ResultSlot->m_ItemCount
-	);
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 
 	// Get the current recipe:
@@ -333,11 +337,54 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player, bool a_IsShiftPressed)
 
 
 
+void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
+{
+	cItem Result(*GetSlot(0, a_Player));
+	if (Result.IsEmpty())
+	{
+		return;
+	}
+	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
+	do
+	{
+		// Try distributing the result. If it fails, bail out:
+		cItem ResultCopy(Result);
+		m_ParentWindow.DistributeStack(ResultCopy, a_Player, this, false);
+		if (!ResultCopy.IsEmpty())
+		{
+			// Couldn't distribute all of it. Bail out
+			return;
+		}
+		
+		// Distribute the result, this time for real:
+		ResultCopy = Result;
+		m_ParentWindow.DistributeStack(ResultCopy, a_Player, this, true);
+		
+		// Remove the ingredients from the crafting grid and update the recipe:
+		cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
+		cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
+		Recipe.ConsumeIngredients(Grid);
+		Grid.CopyToItems(PlayerSlots);
+		UpdateRecipe(a_Player);
+		if (!Recipe.GetResult().IsEqual(Result))
+		{
+			// The recipe has changed, bail out
+			return;
+		}
+	} while (true);
+}
+
+
+
+
+
 void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 {
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+	SetSlot(0, a_Player, Recipe.GetResult());
+	m_ParentWindow.SendSlot(a_Player, this, 0);
 }
 
 

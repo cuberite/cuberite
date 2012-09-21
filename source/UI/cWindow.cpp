@@ -294,6 +294,35 @@ void cWindow::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea
 
 
 
+void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum)
+{
+	int SlotBase = 0;
+	bool Found = false;
+	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		if (*itr == a_SlotArea)
+		{
+			Found = true;
+			break;
+		}
+		SlotBase += (*itr)->GetNumSlots();
+	}  // for itr - m_SlotAreas[]
+	if (!Found)
+	{
+		LOGERROR("cWindow::SendSlot(): unknown a_SlotArea");
+		ASSERT(!"cWindow::SendSlot(): unknown a_SlotArea");
+		return;
+	}
+	
+	a_Player.GetClientHandle()->SendInventorySlot(
+		m_WindowID, a_RelativeSlotNum + SlotBase, *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
+	);
+}
+
+
+
+
+
 void cWindow::Destroy(void)
 {
 	LOGD("Destroying window %p (type %d)", this, m_WindowType);
