@@ -259,7 +259,15 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath="..\vc2010\MCServer.rc"
+				RelativePath=".\icon.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\MCServer.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
