@@ -1,8 +1,8 @@
 #pragma once
 #include "BlockEntity.h"
-#include "../cWorld.h"
-#include "../cPiston.h"
-#include "../cPlayer.h"
+#include "../World.h"
+#include "../Piston.h"
+#include "../Player.h"
 
 class cBlockDispenserHandler : public cBlockEntityHandler
 {

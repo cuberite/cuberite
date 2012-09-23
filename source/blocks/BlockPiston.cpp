@@ -1,10 +1,10 @@
 #include "Globals.h"
 #include "BlockPiston.h"
-#include "../cItem.h"
-#include "../cWorld.h"
-#include "../cRedstone.h"
-#include "../cPlayer.h"
-#include "../cPiston.h"
+#include "../Item.h"
+#include "../World.h"
+#include "../Redstone.h"
+#include "../Player.h"
+#include "../Piston.h"
 
 
 

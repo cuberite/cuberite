@@ -1,11 +1,11 @@
 
 #pragma once
 
-#include "../cPawn.h"
+#include "../Pawn.h"
 #include "../Defines.h"
-#include "../cWorld.h"
+#include "../World.h"
 #include "../BlockID.h"
-#include "../cItem.h"
+#include "../Item.h"
 
 
 

@@ -13,16 +13,16 @@ Documentation:
 
 #include "Protocol125.h"
 
-#include "../cClientHandle.h"
+#include "../ClientHandle.h"
 #include "ChunkDataSerializer.h"
-#include "../cEntity.h"
+#include "../Entity.h"
 #include "../Mobs/Monster.h"
-#include "../cPickup.h"
-#include "../cPlayer.h"
-#include "../cChatColor.h"
+#include "../Pickup.h"
+#include "../Player.h"
+#include "../ChatColor.h"
 #include "../UI/Window.h"
-#include "../cRoot.h"
-#include "../cServer.h"
+#include "../Root.h"
+#include "../Server.h"
 
 
 

@@ -1,9 +1,9 @@
 #include "Globals.h"
 #include "BlockDoor.h"
-#include "../cItem.h"
-#include "../cWorld.h"
-#include "../cDoors.h"
-#include "../cPlayer.h"
+#include "../Item.h"
+#include "../World.h"
+#include "../Doors.h"
+#include "../Player.h"
 
 
 cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockID)

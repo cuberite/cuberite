@@ -1,7 +1,7 @@
 #pragma once
-#include "Block.h"
+#include "BlockHandler.h"
 #include "../MersenneTwister.h"
-#include "../cWorld.h"
+#include "../World.h"
 
 class cBlockStoneHandler : public cBlockHandler
 {

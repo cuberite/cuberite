@@ -5,8 +5,8 @@
 
 #include "Globals.h"
 #include "LightingThread.h"
-#include "cChunkMap.h"
-#include "cWorld.h"
+#include "ChunkMap.h"
+#include "World.h"
 
 
 

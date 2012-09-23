@@ -1,7 +1,7 @@
 #pragma once
-#include "Block.h"
-#include "../cWorld.h"
-#include "../cLadder.h"
+#include "BlockHandler.h"
+#include "../World.h"
+#include "../Ladder.h"
 
 class cBlockLadderHandler : public cBlockHandler
 {

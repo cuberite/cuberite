@@ -4,7 +4,7 @@
 #include "AggressiveMonster.h"
 
 #include "../Vector3f.h"
-#include "../cPlayer.h"
+#include "../Player.h"
 #include "../MersenneTwister.h"
 
 

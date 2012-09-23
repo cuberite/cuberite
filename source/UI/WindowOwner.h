@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "../cBlockEntity.h"
-#include "../cEntity.h"
+#include "../BlockEntity.h"
+#include "../Entity.h"
 #include "Window.h"
 
 /*

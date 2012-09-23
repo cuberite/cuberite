@@ -1,9 +1,15 @@
-#pragma once
-#include "Item.h"
-#include "../cWorld.h"
-#include "../cPlayer.h"
 
-#include "../blocks/Block.h"
+#pragma once
+
+#include "ItemHandler.h"
+#include "../World.h"
+#include "../Player.h"
+
+#include "../blocks/BlockHandler.h"
+
+
+
+
 
 class cItemShovelHandler : public cItemHandler
 {

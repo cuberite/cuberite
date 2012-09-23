@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "BlockID.h"
 #include "../iniFile/iniFile.h"
-#include "cItem.h"
+#include "Item.h"
 
 
 

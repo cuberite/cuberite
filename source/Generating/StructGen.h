@@ -14,7 +14,7 @@
 #pragma once
 
 #include "ChunkGenerator.h"
-#include "../cNoise.h"
+#include "../Noise.h"
 
 
 

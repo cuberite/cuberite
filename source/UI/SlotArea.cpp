@@ -5,13 +5,13 @@
 
 #include "Globals.h"
 #include "SlotArea.h"
-#include "../cPlayer.h"
-#include "../cChestEntity.h"
-#include "../cFurnaceEntity.h"
-#include "../Items/Item.h"
+#include "../Player.h"
+#include "../ChestEntity.h"
+#include "../FurnaceEntity.h"
+#include "../Items/ItemHandler.h"
 #include "Window.h"
 #include "../CraftingRecipes.h"
-#include "../cRoot.h"
+#include "../Root.h"
 
 
 

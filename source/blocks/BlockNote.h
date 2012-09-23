@@ -1,5 +1,5 @@
 #pragma once
-#include "Block.h"
+#include "BlockHandler.h"
 #include "BlockEntity.h"
 
 class cBlockNoteHandler :  public cBlockEntityHandler

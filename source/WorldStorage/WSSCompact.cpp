@@ -5,14 +5,14 @@
 
 #include "Globals.h"
 #include "WSSCompact.h"
-#include "../cWorld.h"
+#include "../World.h"
 #include "zlib.h"
 #include <json/json.h>
 #include "../StringCompression.h"
-#include "../cChestEntity.h"
-#include "../cSignEntity.h"
-#include "../cFurnaceEntity.h"
-#include "../cNoteEntity.h"
+#include "../ChestEntity.h"
+#include "../SignEntity.h"
+#include "../FurnaceEntity.h"
+#include "../NoteEntity.h"
 #include "../BlockID.h"
 
 

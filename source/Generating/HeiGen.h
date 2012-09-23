@@ -15,7 +15,7 @@ Interfaces to the various height generators:
 #pragma once
 
 #include "ChunkGenerator.h"
-#include "../cNoise.h"
+#include "../Noise.h"
 
 
 

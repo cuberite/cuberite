@@ -5,8 +5,8 @@
 
 #include "Globals.h"
 #include "CraftingRecipes.h"
-#include "cRoot.h"
-#include "cPluginManager.h"
+#include "Root.h"
+#include "PluginManager.h"
 
 
 

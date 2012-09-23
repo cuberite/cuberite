@@ -281,6 +281,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\source\Authenticator.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Authenticator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\BlockArea.cpp"
 				>
 			</File>
@@ -305,99 +313,35 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cAuthenticator.cpp"
+				RelativePath="..\source\ChatColor.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\cAuthenticator.h"
+				RelativePath="..\source\ChatColor.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\cChatColor.cpp"
+				RelativePath="..\source\Chunk.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\cChatColor.h"
+				RelativePath="..\source\Chunk.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\cChunk.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChunk.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChunk.inl.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChunkMap.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cChunkMap.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cClientHandle.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cClientHandle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cCuboid.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cCuboid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cFileFormatUpdater.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cFileFormatUpdater.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cFurnaceRecipe.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cFurnaceRecipe.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cGroup.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cGroup.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cGroupManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cGroupManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cHeartBeat.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cHeartBeat.h"
+				RelativePath="..\source\Chunk.inl.h"
 				>
 			</File>
 			<File
 				RelativePath="..\source\ChunkDef.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ChunkMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ChunkMap.h"
 				>
 			</File>
 			<File
@@ -409,85 +353,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cInventory.cpp"
+				RelativePath="..\source\ClientHandle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\cInventory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cLog.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cLog.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cMCLogger.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cMCLogger.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cMonsterConfig.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cMonsterConfig.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cNoise.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						Optimization="2"
-						EnableIntrinsicFunctions="true"
-						FavorSizeOrSpeed="1"
-						OmitFramePointers="true"
-						BasicRuntimeChecks="0"
-						UsePrecompiledHeader="0"
-						DebugInformationFormat="3"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release profiled|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\source\cNoise.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cNoise.inc"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPiston.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cPiston.h"
+				RelativePath="..\source\ClientHandle.h"
 				>
 			</File>
 			<File
@@ -499,83 +369,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\cRedstone.cpp"
+				RelativePath="..\source\Cuboid.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\cRedstone.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cReferenceManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cReferenceManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cRoot.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cRoot.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cServer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cServer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSimulator.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSimulator.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSimulatorManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cSimulatorManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTracer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cTracer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWebAdmin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWebAdmin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWebPlugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWebPlugin.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWorld.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cWorld.h"
+				RelativePath="..\source\Cuboid.h"
 				>
 			</File>
 			<File
@@ -584,6 +382,14 @@
 			</File>
 			<File
 				RelativePath="..\source\Endianness.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\FurnaceRecipe.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\FurnaceRecipe.h"
 				>
 			</File>
 			<File
@@ -616,6 +422,46 @@
 			</File>
 			<File
 				RelativePath="..\source\Globals.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Group.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Group.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\GroupManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\GroupManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\HeartBeat.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\HeartBeat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Inventory.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Inventory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Item.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Item.h"
 				>
 			</File>
 			<File
@@ -662,6 +508,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\Log.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Log.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\main.cpp"
 				>
 			</File>
@@ -674,11 +528,71 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\MCLogger.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MCLogger.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\MemoryLeak.h"
 				>
 			</File>
 			<File
 				RelativePath="..\source\MersenneTwister.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MonsterConfig.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\MonsterConfig.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Noise.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Noise.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Noise.inc"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Piston.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Piston.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ReferenceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ReferenceManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Root.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Root.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Server.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Server.h"
 				>
 			</File>
 			<File
@@ -733,6 +647,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\Tracer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Tracer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Vector3d.cpp"
 				>
 			</File>
@@ -754,6 +676,30 @@
 			</File>
 			<File
 				RelativePath="..\source\Vector3i.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\WebAdmin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\WebAdmin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\WebPlugin.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\WebPlugin.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\World.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\World.h"
 				>
 			</File>
 			<Filter
@@ -924,107 +870,95 @@
 				Name="Entities"
 				>
 				<File
-					RelativePath="..\source\cBlockEntity.h"
+					RelativePath="..\source\BlockEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cChestEntity.cpp"
+					RelativePath="..\source\ChestEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cChestEntity.h"
+					RelativePath="..\source\ChestEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cDoors.h"
+					RelativePath="..\source\Doors.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cEntity.cpp"
+					RelativePath="..\source\Entity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cEntity.h"
+					RelativePath="..\source\Entity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFurnaceEntity.cpp"
+					RelativePath="..\source\FurnaceEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFurnaceEntity.h"
+					RelativePath="..\source\FurnaceEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cItem.cpp"
+					RelativePath="..\source\Ladder.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cItem.h"
+					RelativePath="..\source\NoteEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLadder.h"
+					RelativePath="..\source\NoteEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cNoteEntity.cpp"
+					RelativePath="..\source\Pawn.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cNoteEntity.h"
+					RelativePath="..\source\Pawn.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPawn.cpp"
+					RelativePath="..\source\Pickup.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPawn.h"
+					RelativePath="..\source\Pickup.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPickup.cpp"
+					RelativePath="..\source\Player.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPickup.h"
+					RelativePath="..\source\Player.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPlayer.cpp"
+					RelativePath="..\source\Sign.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPlayer.h"
+					RelativePath="..\source\SignEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSign.h"
+					RelativePath="..\source\SignEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSignEntity.cpp"
+					RelativePath="..\source\Stairs.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSignEntity.h"
+					RelativePath="..\source\Torch.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cStairs.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cStep.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cTorch.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cVine.h"
+					RelativePath="..\source\Vine.h"
 					>
 				</File>
 			</Filter>
@@ -1056,51 +990,75 @@
 				Name="Physics"
 				>
 				<File
-					RelativePath="..\source\cFireSimulator.cpp"
+					RelativePath="..\source\FireSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFireSimulator.h"
+					RelativePath="..\source\FireSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFluidSimulator.cpp"
+					RelativePath="..\source\FluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFluidSimulator.h"
+					RelativePath="..\source\FluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLavaSimulator.cpp"
+					RelativePath="..\source\LavaSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLavaSimulator.h"
+					RelativePath="..\source\LavaSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cRedstoneSimulator.cpp"
+					RelativePath="..\source\Redstone.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cRedstoneSimulator.h"
+					RelativePath="..\source\Redstone.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSandSimulator.cpp"
+					RelativePath="..\source\RedstoneSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSandSimulator.h"
+					RelativePath="..\source\RedstoneSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWaterSimulator.cpp"
+					RelativePath="..\source\SandSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWaterSimulator.h"
+					RelativePath="..\source\SandSimulator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Simulator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Simulator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\SimulatorManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\SimulatorManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WaterSimulator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WaterSimulator.h"
 					>
 				</File>
 			</Filter>
@@ -1429,75 +1387,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLuaChunk.cpp"
+					RelativePath="..\source\LuaChunk.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLuaChunk.h"
+					RelativePath="..\source\LuaChunk.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLuaCommandBinder.cpp"
+					RelativePath="..\source\LuaCommandBinder.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cLuaCommandBinder.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin_Lua.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin_Lua.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin_NewLua.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin_NewLua.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin_Squirrel.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPlugin_Squirrel.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPluginManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cPluginManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cSquirrelCommandBinder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cSquirrelCommandBinder.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cStringMap.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cStringMap.h"
+					RelativePath="..\source\LuaCommandBinder.h"
 					>
 				</File>
 				<File
@@ -1517,6 +1419,62 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Plugin.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin_Lua.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin_Lua.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin_NewLua.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin_NewLua.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin_Squirrel.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Plugin_Squirrel.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\PluginManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\PluginManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\SquirrelCommandBinder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\SquirrelCommandBinder.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\StringMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\StringMap.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\tolua++.h"
 					>
 				</File>
@@ -1528,11 +1486,11 @@
 					Name="Squirrel"
 					>
 					<File
-						RelativePath="..\source\squirrelbindings\cSquirrelBaseClass.h"
+						RelativePath="..\source\squirrelbindings\SquirrelArray.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\squirrelbindings\SquirrelArray.h"
+						RelativePath="..\source\squirrelbindings\SquirrelBaseClass.h"
 						>
 					</File>
 					<File
@@ -1720,14 +1678,6 @@
 				Name="Blocks"
 				>
 				<File
-					RelativePath="..\source\blocks\Block.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\blocks\Block.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockCactus.h"
 					>
 				</File>
@@ -1785,6 +1735,14 @@
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockGravel.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\blocks\BlockHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\blocks\BlockHandler.h"
 					>
 				</File>
 				<File
@@ -1908,14 +1866,6 @@
 				Name="Items"
 				>
 				<File
-					RelativePath="..\source\items\Item.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\items\Item.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\items\ItemBucket.h"
 					>
 				</File>
@@ -1929,6 +1879,18 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemDye.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\items\ItemFood.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\items\ItemHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\items\ItemHandler.h"
 					>
 				</File>
 				<File
@@ -1952,6 +1914,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\items\ItemRedstoneRepeater.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\items\ItemSapling.h"
 					>
 				</File>
@@ -1965,6 +1931,10 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemShovel.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\items\ItemSign.h"
 					>
 				</File>
 				<File

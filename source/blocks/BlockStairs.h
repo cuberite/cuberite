@@ -1,6 +1,6 @@
 #pragma once
-#include "Block.h"
-#include "../cStairs.h"
+#include "BlockHandler.h"
+#include "../Stairs.h"
 
 class cBlockStairsHandler : public cBlockHandler
 {

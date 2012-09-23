@@ -1,6 +1,6 @@
 #pragma once
-#include "Block.h"
-#include "../cWorld.h"
+#include "BlockHandler.h"
+#include "../World.h"
 
 class cBlockRedstoneRepeaterHandler : public cBlockHandler
 {

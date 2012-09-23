@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cMCLogger.h"
+#include "MCLogger.h"
 #include <time.h>
 // tolua_begin
 

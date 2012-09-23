@@ -1,9 +1,9 @@
 #include "Globals.h"
 #include "BlockRedstone.h"
-#include "../cItem.h"
-#include "../cWorld.h"
-#include "../cRedstone.h"
-#include "../cTorch.h"
+#include "../Item.h"
+#include "../World.h"
+#include "../Redstone.h"
+#include "../Torch.h"
 
 cBlockRedstoneHandler::cBlockRedstoneHandler(BLOCKTYPE a_BlockID)
 	: cBlockHandler(a_BlockID)

@@ -9,10 +9,10 @@
 #include "WorldStorage.h"
 #include "WSSCompact.h"
 #include "WSSAnvil.h"
-#include "../cWorld.h"
+#include "../World.h"
 #include "../Generating/ChunkGenerator.h"
-#include "../cEntity.h"
-#include "../cBlockEntity.h"
+#include "../Entity.h"
+#include "../BlockEntity.h"
 #include "../BlockID.h"
 
 

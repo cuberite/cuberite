@@ -2,20 +2,20 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Monster.h"
-#include "../cRoot.h"
-#include "../cServer.h"
-#include "../cClientHandle.h"
-#include "../cWorld.h"
-#include "../cPlayer.h"
+#include "../Root.h"
+#include "../Server.h"
+#include "../ClientHandle.h"
+#include "../World.h"
+#include "../Player.h"
 #include "../Defines.h"
-#include "../cMonsterConfig.h"
+#include "../MonsterConfig.h"
 #include "../MersenneTwister.h"
 
 #include "../Vector3f.h"
 #include "../Vector3i.h"
 #include "../Vector3d.h"
 
-#include "../cTracer.h"
+#include "../Tracer.h"
 #include "../../iniFile/iniFile.h"
 
 /*

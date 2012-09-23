@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Item.h"
-#include "../cWorld.h"
-#include "../cPlayer.h"
+#include "ItemHandler.h"
+#include "../World.h"
+#include "../Player.h"
 
 class cItemLighterHandler : public cItemHandler
 {

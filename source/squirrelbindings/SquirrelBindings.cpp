@@ -2,10 +2,10 @@
 #include "SquirrelBindings.h"
 #include "SquirrelFunctions.h"
 
-#include "cSquirrelBaseClass.h"
+#include "SquirrelBaseClass.h"
 #include "SquirrelArray.h"
 
-#include "../cPlayer.h"
+#include "../Player.h"
 
 using namespace Sqrat;
 

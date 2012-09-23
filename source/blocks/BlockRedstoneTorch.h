@@ -2,7 +2,7 @@
 #pragma once
 #include "BlockRedstone.h"
 #include "BlockTorch.h"
-#include "../cTorch.h"
+#include "../Torch.h"
 
 
 

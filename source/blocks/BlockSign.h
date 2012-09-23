@@ -1,8 +1,8 @@
 #pragma once
-#include "Block.h"
-#include "../cWorld.h"
-#include "../cSign.h"
-#include "../cPlayer.h"
+#include "BlockHandler.h"
+#include "../World.h"
+#include "../Sign.h"
+#include "../Player.h"
 
 class cBlockSignHandler : public cBlockHandler
 {

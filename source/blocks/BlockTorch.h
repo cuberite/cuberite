@@ -1,8 +1,8 @@
 
 #pragma once
-#include "Block.h"
-#include "../cTorch.h"
-#include "../cWorld.h"
+#include "BlockHandler.h"
+#include "../Torch.h"
+#include "../World.h"
 
 
 

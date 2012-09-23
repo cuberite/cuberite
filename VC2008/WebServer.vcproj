@@ -222,11 +222,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\WebServer\cEvents.cpp"
+				RelativePath="..\WebServer\Events.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\WebServer\cEvents.h"
+				RelativePath="..\WebServer\Events.h"
 				>
 			</File>
 			<File

@@ -1,7 +1,7 @@
 #pragma once
-#include "Block.h"
+#include "BlockHandler.h"
 #include "../UI/Window.h"
-#include "../cPlayer.h"
+#include "../Player.h"
 
 
 

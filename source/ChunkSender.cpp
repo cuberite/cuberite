@@ -9,8 +9,8 @@
 
 #include "Globals.h"
 #include "ChunkSender.h"
-#include "cWorld.h"
-#include "cBlockEntity.h"
+#include "World.h"
+#include "BlockEntity.h"
 #include "Protocol/ChunkDataSerializer.h"
 
 
