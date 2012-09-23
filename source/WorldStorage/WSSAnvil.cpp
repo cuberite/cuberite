@@ -15,7 +15,7 @@
 #include "../cItem.h"
 #include "../StringCompression.h"
 #include "../cEntity.h"
-#include "../cMakeDir.h"
+#include "../OSSupport/MakeDir.h"
 #include "FastNBT.h"
 
 

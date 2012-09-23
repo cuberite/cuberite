@@ -21,8 +21,8 @@
 #include "cPiston.h"
 #include "Mobs/Monster.h"
 #include "cChatColor.h"
-#include "cSocket.h"
-#include "cTimer.h"
+#include "OSSupport/Socket.h"
+#include "OSSupport/Timer.h"
 #include "items/Item.h"
 #include "blocks/Block.h"
 #include "ChunkDataSerializer.h"
@@ -31,10 +31,8 @@
 #include "Vector3f.h"
 #include "Vector3d.h"
 
-#include "cSleep.h"
 #include "cRoot.h"
 
-#include "cBlockingTCPLink.h"
 #include "cAuthenticator.h"
 #include "MersenneTwister.h"
 

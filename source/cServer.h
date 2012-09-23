@@ -11,7 +11,7 @@
 #ifndef CSERVER_H_INCLUDED
 #define CSERVER_H_INCLUDED
 
-#include "cSocketThreads.h"
+#include "OSSupport/SocketThreads.h"
 #include "CryptoPP/rsa.h"
 #include "CryptoPP/randpool.h"
 

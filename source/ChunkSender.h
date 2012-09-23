@@ -25,7 +25,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #pragma once
 
-#include "cIsThread.h"
+#include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
 
 

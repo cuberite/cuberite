@@ -31,7 +31,7 @@ Chunks from m_PostponedQueue are moved back into m_Queue when their neighbors ge
 
 #pragma once
 
-#include "cIsThread.h"
+#include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
 
 

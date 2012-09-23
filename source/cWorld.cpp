@@ -38,7 +38,7 @@
 #include "Mobs/Ghast.h"
 #include "Mobs/Zombiepigman.h"
 
-#include "cMakeDir.h"
+#include "OSSupport/MakeDir.h"
 #include "MersenneTwister.h"
 #include "cTracer.h"
 #include "Generating/Trees.h"

@@ -14,7 +14,7 @@
 #ifndef CAUTHENTICATOR_H_INCLUDED
 #define CAUTHENTICATOR_H_INCLUDED
 
-#include "cIsThread.h"
+#include "OSSupport/IsThread.h"
 
 
 

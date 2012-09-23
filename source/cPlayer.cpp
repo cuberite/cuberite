@@ -16,8 +16,8 @@
 #include "cItem.h"
 #include "cTracer.h"
 #include "cRoot.h"
-#include "cMakeDir.h"
-#include "cTimer.h"
+#include "OSSupport/MakeDir.h"
+#include "OSSupport/Timer.h"
 #include "MersenneTwister.h"
 
 #include "Vector3d.h"

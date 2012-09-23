@@ -1,5 +1,5 @@
 
-// cSocketThreads.h
+// SocketThreads.h
 
 // Interfaces to the cSocketThreads class representing the heart of MCS's client networking.
 // This object takes care of network communication, groups sockets into threads and uses as little threads as possible for full read / write support
@@ -30,8 +30,8 @@ This means that the socket can be written to several times before finally closin
 #ifndef CSOCKETTHREADS_H_INCLUDED
 #define CSOCKETTHREADS_H_INCLUDED
 
-#include "cSocket.h"
-#include "cIsThread.h"
+#include "Socket.h"
+#include "IsThread.h"
 
 
 

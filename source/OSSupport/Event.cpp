@@ -1,12 +1,12 @@
 
-// cEvent.cpp
+// Event.cpp
 
 // Implements the cEvent object representing an OS-specific synchronization primitive that can be waited-for
 // Implemented as an Event on Win and as a 1-semaphore on *nix
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "cEvent.h"
+#include "Event.h"
 
 
 

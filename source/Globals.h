@@ -163,12 +163,12 @@ typedef short     Int16;
 
 // Common headers (part 1, without macros):
 #include "StringUtils.h"
-#include "cSleep.h"
-#include "cCriticalSection.h"
-#include "cSemaphore.h"
-#include "cEvent.h"
-#include "cThread.h"
-#include "cFile.h"
+#include "OSSupport/Sleep.h"
+#include "OSSupport/CriticalSection.h"
+#include "OSSupport/Semaphore.h"
+#include "OSSupport/Event.h"
+#include "OSSupport/Thread.h"
+#include "OSSupport/File.h"
 #include "cMCLogger.h"
 
 

@@ -15,7 +15,7 @@
 #define WORLDSTORAGE_H_INCLUDED
 
 #include "../ChunkDef.h"
-#include "../cIsThread.h"
+#include "../OSSupport/IsThread.h"
 #include <json/json.h>
 
 

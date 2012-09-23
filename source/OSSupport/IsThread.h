@@ -1,5 +1,5 @@
 
-// cIsThread.h
+// IsThread.h
 
 // Interfaces to the cIsThread class representing an OS-independent wrapper for a class that implements a thread.
 // This class will eventually suupersede the old cThread class

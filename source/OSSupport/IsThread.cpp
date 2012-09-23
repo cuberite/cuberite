@@ -1,12 +1,12 @@
 
-// cIsThread.cpp
+// IsThread.cpp
 
 // Implements the cIsThread class representing an OS-independent wrapper for a class that implements a thread.
 // This class will eventually suupersede the old cThread class
 
 #include "Globals.h"
 
-#include "cIsThread.h"
+#include "IsThread.h"
 
 
 

@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cAuthenticator.h"
-#include "cBlockingTCPLink.h"
+#include "OSSupport/BlockingTCPLink.h"
 #include "cRoot.h"
 #include "cServer.h"
 

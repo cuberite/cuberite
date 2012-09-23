@@ -5,13 +5,12 @@
 
 #include <fstream>
 #include <ctime>
-#include "cMakeDir.h"
-
-#include "cIsThread.h"
+#include "OSSupport/MakeDir.h"
+#include "OSSupport/IsThread.h"
 
 #if defined(ANDROID_NDK)
-#include <android/log.h>
-#include "ToJava.h"
+	#include <android/log.h>
+	#include "ToJava.h"
 #endif
 
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/23/12 23:08:35.
+** Generated automatically by tolua++-1.0.92 on 09/23/12 23:22:26.
 */
 
 #ifndef __cplusplus
@@ -43,7 +43,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "cWebPlugin.h"
 #include "cPickup.h"
 #include "cRoot.h"
-#include "cTCPLink.h"
+#include "OSSupport/TCPLink.h"
 #include "Vector3f.h"
 #include "Vector3d.h"
 #include "Vector3i.h"

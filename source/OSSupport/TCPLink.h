@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cSocket.h"
+#include "Socket.h"
 
 class cTCPLink																	//tolua_export
 {																				//tolua_export

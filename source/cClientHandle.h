@@ -13,7 +13,7 @@
 
 #include "Defines.h"
 #include "Vector3d.h"
-#include "cSocketThreads.h"
+#include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
 

@@ -6,8 +6,7 @@
 // For more detail, see http://forum.mc-server.org/showthread.php?tid=327
 
 #include "Globals.h"
-#include "cSocketThreads.h"
-#include "cClientHandle.h"
+#include "SocketThreads.h"
 
 
 

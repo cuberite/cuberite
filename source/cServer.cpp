@@ -5,9 +5,9 @@
 
 #include "cServer.h"
 #include "cClientHandle.h"
-#include "cTimer.h"
+#include "OSSupport/Timer.h"
 #include "Mobs/Monster.h"
-#include "cSocket.h"
+#include "OSSupport/Socket.h"
 #include "cRoot.h"
 #include "cWorld.h"
 #include "ChunkDef.h"

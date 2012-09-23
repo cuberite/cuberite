@@ -1,5 +1,5 @@
 
-// cEvent.h
+// Event.h
 
 // Interfaces to the cEvent object representing an OS-specific synchronization primitive that can be waited-for
 // Implemented as an Event on Win and as a 1-semaphore on *nix

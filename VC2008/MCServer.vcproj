@@ -1113,110 +1113,110 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="OS Support"
+				Name="OSSupport"
 				>
 				<File
-					RelativePath="..\source\cBlockingTCPLink.cpp"
+					RelativePath="..\source\OSSupport\BlockingTCPLink.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cBlockingTCPLink.h"
+					RelativePath="..\source\OSSupport\BlockingTCPLink.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCriticalSection.cpp"
+					RelativePath="..\source\OSSupport\CriticalSection.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCriticalSection.h"
+					RelativePath="..\source\OSSupport\CriticalSection.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cEvent.cpp"
+					RelativePath="..\source\OSSupport\Event.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cEvent.h"
+					RelativePath="..\source\OSSupport\Event.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFile.cpp"
+					RelativePath="..\source\OSSupport\File.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cFile.h"
+					RelativePath="..\source\OSSupport\File.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cIsThread.cpp"
+					RelativePath="..\source\OSSupport\IsThread.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cIsThread.h"
+					RelativePath="..\source\OSSupport\IsThread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cMakeDir.cpp"
+					RelativePath="..\source\OSSupport\MakeDir.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cMakeDir.h"
+					RelativePath="..\source\OSSupport\MakeDir.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSemaphore.cpp"
+					RelativePath="..\source\OSSupport\Semaphore.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSemaphore.h"
+					RelativePath="..\source\OSSupport\Semaphore.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSleep.cpp"
+					RelativePath="..\source\OSSupport\Sleep.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSleep.h"
+					RelativePath="..\source\OSSupport\Sleep.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSocket.cpp"
+					RelativePath="..\source\OSSupport\Socket.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSocket.h"
+					RelativePath="..\source\OSSupport\Socket.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSocketThreads.cpp"
+					RelativePath="..\source\OSSupport\SocketThreads.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSocketThreads.h"
+					RelativePath="..\source\OSSupport\SocketThreads.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cTCPLink.cpp"
+					RelativePath="..\source\OSSupport\TCPLink.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cTCPLink.h"
+					RelativePath="..\source\OSSupport\TCPLink.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cThread.cpp"
+					RelativePath="..\source\OSSupport\Thread.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cThread.h"
+					RelativePath="..\source\OSSupport\Thread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cTimer.cpp"
+					RelativePath="..\source\OSSupport\Timer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cTimer.h"
+					RelativePath="..\source\OSSupport\Timer.h"
 					>
 				</File>
 				<Filter

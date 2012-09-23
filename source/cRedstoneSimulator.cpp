@@ -4,7 +4,6 @@
 #include "cPiston.h"
 #include "cWorld.h"
 #include "BlockID.h"
-#include "cCriticalSection.h"
 #include "cTorch.h"
 
 #include "cRedstone.h"
