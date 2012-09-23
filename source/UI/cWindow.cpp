@@ -33,9 +33,6 @@ cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle
 	{
 		m_WindowID = 0;
 	}
-	LOGD("Created a window at %p, type = %d, ID = %i, title = \"%s\".", 
-		this, m_WindowType, m_WindowID, m_WindowTitle.c_str()
-	);
 }
 
 
@@ -44,7 +41,6 @@ cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle
 
 cWindow::~cWindow()
 {
-	LOGD("Deleted a window at %p", this);
 }
 
 
@@ -325,7 +321,6 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 
 void cWindow::Destroy(void)
 {
-	LOGD("Destroying window %p (type %d)", this, m_WindowType);
 	if (m_Owner != NULL)
 	{
 		m_Owner->CloseWindow();

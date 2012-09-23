@@ -85,8 +85,6 @@ void cFurnaceEntity::Destroy()
 
 void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
-	LOG("Used a furnace");
-
 	if (GetWindow() == NULL)
 	{
 		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));

@@ -24,7 +24,6 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 	m_NumSlots(a_NumSlots),
 	m_ParentWindow(a_ParentWindow)
 {
-	LOGD("Created a new cSlotArea with %d slots", a_NumSlots);
 }
 
 
@@ -33,11 +32,13 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 
 void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
 {
+	/*
 	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s", 
 		GetNumSlots(), a_SlotNum, 
 		ItemToFullString(a_ClickedItem).c_str(),
 		ItemToFullString(*GetSlot(a_SlotNum, a_Player)).c_str()
 	);
+	*/
 	
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
@@ -62,10 +63,9 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
 	if (!Slot.IsEqual(a_ClickedItem))
 	{
-		LOGD("*** Window lost sync ***");
-		LOGD("My Type:  %i Their Type:  %i", Slot.m_ItemID,     a_ClickedItem.m_ItemID);
-		LOGD("My Count: %i Their Count: %i", Slot.m_ItemCount,  a_ClickedItem.m_ItemCount);
-		LOGD("My Dmg:   %i Their Dmg:   %i", Slot.m_ItemHealth, a_ClickedItem.m_ItemHealth);
+		LOGD("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGD("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGD("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 		bAsync = true;
 	}
 	cItem & DraggingItem = a_Player.GetDraggingItem();

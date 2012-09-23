@@ -782,6 +782,8 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 			else
 			{
 				LOGWARNING("Player \"%s\" sent a weird position confirmation %.2f blocks away, retrying", m_Username.c_str(), sqrt(Dist));
+				LOGD("  Expected pos: {%0.2f, %0.2f, %0.2f}", m_ConfirmPosition.x, m_ConfirmPosition.y, m_ConfirmPosition.z);
+				LOGD("  Received pos: {%0.2f, %0.2f, %0.2f}", a_PosX, a_PosY, a_PosZ);
 				m_ConfirmPosition = m_Player->GetPosition();
 				SendPlayerMoveLook();
 			}
@@ -1304,6 +1306,10 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 		// Do NOT send this packet to myself
 		return;
 	}
+	
+	LOG("Spawning player \"%s\" on client \"%s\" @ %s", 
+		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
+	);
 	
 	m_Protocol->SendPlayerSpawn(a_Player);
 }

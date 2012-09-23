@@ -752,10 +752,6 @@ void cProtocol125::SendWindowClose(char a_WindowID)
 
 void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
-	LOGD("Sending a WindowOpen packet: ID = %d, Type = %d, Title = \"%s\", NumSlots = %d",
-		a_WindowID, a_WindowType, a_WindowTitle.c_str(), a_NumSlots
-	);
-	
 	if (a_WindowType < 0)
 	{
 		// Do not send for inventory windows
@@ -1256,9 +1252,6 @@ void cProtocol125::SendPreChunk(int a_ChunkX, int a_ChunkZ, bool a_ShouldLoad)
 
 void cProtocol125::SendWindowSlots(char a_WindowID, int a_NumItems, const cItem * a_Items)
 {
-	LOGD("Sending a InventoryWhole packet: WindowID = %d, NumItems = %d",
-		a_WindowID, a_NumItems
-	);
 	WriteByte (PACKET_INVENTORY_WHOLE);
 	WriteByte (a_WindowID);
 	WriteShort((short)a_NumItems);
