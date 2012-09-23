@@ -1621,38 +1621,38 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="World storage"
+				Name="WorldStorage"
 				>
 				<File
-					RelativePath="..\source\FastNBT.cpp"
+					RelativePath="..\source\WorldStorage\FastNBT.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FastNBT.h"
+					RelativePath="..\source\WorldStorage\FastNBT.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage.cpp"
+					RelativePath="..\source\WorldStorage\WorldStorage.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WorldStorage.h"
+					RelativePath="..\source\WorldStorage\WorldStorage.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WSSAnvil.cpp"
+					RelativePath="..\source\WorldStorage\WSSAnvil.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WSSAnvil.h"
+					RelativePath="..\source\WorldStorage\WSSAnvil.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WSSCompact.cpp"
+					RelativePath="..\source\WorldStorage\WSSCompact.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\WSSCompact.h"
+					RelativePath="..\source\WorldStorage\WSSCompact.h"
 					>
 				</File>
 			</Filter>

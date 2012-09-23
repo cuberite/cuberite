@@ -12,7 +12,7 @@
 #include "cSimulatorManager.h"
 #include "MersenneTwister.h"
 #include "cChunkMap.h"
-#include "WorldStorage.h"
+#include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
 #include "Vector3i.h"
 #include "Vector3f.h"

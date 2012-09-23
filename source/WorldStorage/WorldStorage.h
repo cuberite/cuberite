@@ -14,8 +14,8 @@
 #ifndef WORLDSTORAGE_H_INCLUDED
 #define WORLDSTORAGE_H_INCLUDED
 
-#include "ChunkDef.h"
-#include "cIsThread.h"
+#include "../ChunkDef.h"
+#include "../cIsThread.h"
 #include <json/json.h>
 
 
