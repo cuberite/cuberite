@@ -263,6 +263,9 @@ void cClientHandle::Authenticate(void)
 	m_Player->Initialize(World);
 	StreamChunks();
 	m_State = csDownloadingWorld;
+	
+	// Broadcast this player's spawning to all other players in the same chunk
+	m_Player->GetWorld()->BroadcastSpawn(*m_Player, this);
 }
 
 
