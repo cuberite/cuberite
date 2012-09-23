@@ -107,6 +107,7 @@ protected:
 	bool HandleClientKeepAlive(void);
 	bool HandleClientLocaleAndView(void);
 	bool HandleClientPing(void);
+	bool HandleClientPlayerAbilities(void);
 	bool HandleClientPlayerLook(void);
 	bool HandleClientPlayerOnGround(void);
 	bool HandleClientPlayerPosition(void);

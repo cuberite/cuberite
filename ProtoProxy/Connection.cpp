@@ -512,6 +512,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_KEEPALIVE:                 HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
 			case PACKET_LOCALE_AND_VIEW:           HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
 			case PACKET_PING:                      HANDLE_CLIENT_READ(HandleClientPing); break;
+			case PACKET_PLAYER_ABILITIES:          HANDLE_CLIENT_READ(HandleClientPlayerAbilities); break;
 			case PACKET_PLAYER_LOOK:               HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
 			case PACKET_PLAYER_ON_GROUND:          HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
 			case PACKET_PLAYER_POSITION:           HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
@@ -831,6 +832,22 @@ bool cConnection::HandleClientPing(void)
 	Log("Received a PACKET_PING from the client");
 	m_ClientBuffer.ResetRead();
 	SERVERSEND(m_ClientBuffer);
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientPlayerAbilities(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, IsInvulnerable);
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, IsFlying);
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, CanFly);
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, IsInstaMine);
+	Log("Receives a PACKET_PLAYER_ABILITIES from the client:");
+	Log("  Flags = %d, %d, %d, %d", IsInvulnerable, IsFlying, CanFly, IsInstaMine);
+	COPY_TO_SERVER();
 	return true;
 }
 
