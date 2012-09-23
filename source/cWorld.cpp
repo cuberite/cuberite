@@ -7,7 +7,6 @@
 #include "ChunkDef.h"
 #include "cClientHandle.h"
 #include "cPickup.h"
-#include "cBlockToPickup.h"
 #include "cPlayer.h"
 #include "cServer.h"
 #include "cItem.h"

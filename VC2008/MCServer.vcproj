@@ -936,14 +936,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\cBlockToPickup.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\cBlockToPickup.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\cChestEntity.cpp"
 					>
 				</File>

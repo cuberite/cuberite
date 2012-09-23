@@ -5,7 +5,6 @@
 #include "cRedstone.h"
 #include "ChunkDef.h"
 #include "cPickup.h"
-#include "cBlockToPickup.h"
 #include "cItem.h"
 #include "cRoot.h"
 #include "cClientHandle.h"

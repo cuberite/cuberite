@@ -19,7 +19,6 @@
 #include "cSign.h"
 #include "cRedstone.h"
 #include "cPiston.h"
-#include "cBlockToPickup.h"
 #include "Mobs/Monster.h"
 #include "cChatColor.h"
 #include "cSocket.h"

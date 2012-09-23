@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/08/12 22:43:41.
+** Generated automatically by tolua++-1.0.92 on 09/23/12 23:08:35.
 */
 
 #ifndef __cplusplus
@@ -2650,6 +2650,35 @@ static int tolua_AllToLua_ItemTypeToString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ItemTypeToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ItemToFullString */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ItemToFullString00
+static int tolua_AllToLua_ItemToFullString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     (tolua_isvaluenil(tolua_S,1,&tolua_err) || !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,1,0));
+  {
+   AString tolua_ret = (AString)  ItemToFullString(*a_Item);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ItemToFullString'.",&tolua_err);
  return 0;
 #endif
 }
@@ -12841,12 +12870,12 @@ static int tolua_AllToLua_cInventory_GetFromHotBar00(lua_State* tolua_S)
 #endif
  {
   cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
-  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_HotBarSlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFromHotBar'", NULL);
 #endif
   {
-   cItem* tolua_ret = (cItem*)  self->GetFromHotBar(a_SlotNum);
+   cItem* tolua_ret = (cItem*)  self->GetFromHotBar(a_HotBarSlotNum);
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
@@ -13573,7 +13602,7 @@ static int tolua_AllToLua_cChestEntity_SetSlot00(lua_State* tolua_S)
  if (
      !tolua_isusertype(tolua_S,1,"cChestEntity",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"cItem",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -13582,7 +13611,7 @@ static int tolua_AllToLua_cChestEntity_SetSlot00(lua_State* tolua_S)
  {
   cChestEntity* self = (cChestEntity*)  tolua_tousertype(tolua_S,1,0);
   int a_Slot = ((int)  tolua_tonumber(tolua_S,2,0));
-  cItem* a_Item = ((cItem*)  tolua_tousertype(tolua_S,3,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
 #endif
@@ -21547,6 +21576,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"StringToItem",tolua_AllToLua_StringToItem00);
   tolua_function(tolua_S,"ItemToString",tolua_AllToLua_ItemToString00);
   tolua_function(tolua_S,"ItemTypeToString",tolua_AllToLua_ItemTypeToString00);
+  tolua_function(tolua_S,"ItemToFullString",tolua_AllToLua_ItemToFullString00);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);

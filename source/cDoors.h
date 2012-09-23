@@ -1,5 +1,4 @@
 #pragma once
-#include "cBlockToPickup.h"
 
 
 class cDoors												//tolua_export

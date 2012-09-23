@@ -25,7 +25,6 @@
 #include "cItem.h"
 #include "cNoise.h"
 #include "cRoot.h"
-#include "cBlockToPickup.h"
 #include "MersenneTwister.h"
 #include "cPlayer.h"
 #include "BlockArea.h"
@@ -440,84 +439,6 @@ void cChunk::CheckBlocks(void)
 			
 			m_World->SetBlock(WorldPos.x, WorldPos.y, WorldPos.z, E_BLOCK_AIR, 0);
 		}
-
-		/*
-		BLOCKTYPE  BlockType = GetBlock(index);
-		NIBBLETYPE BlockMeta = GetMeta (index);
-		switch (BlockType)
-		{
-			// Stuff that drops when block below is destroyed:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_REDSTONE_WIRE:
-			case E_BLOCK_CACTUS:
-			case E_BLOCK_REEDS:
-			case E_BLOCK_WOODEN_PRESSURE_PLATE:
-			case E_BLOCK_STONE_PRESSURE_PLATE:
-			case E_BLOCK_MINECART_TRACKS:
-			case E_BLOCK_SIGN_POST:
-			case E_BLOCK_CROPS:
-			case E_BLOCK_SAPLING:
-			case E_BLOCK_YELLOW_FLOWER:
-			case E_BLOCK_RED_ROSE:
-			case E_BLOCK_RED_MUSHROOM:
-			case E_BLOCK_BROWN_MUSHROOM:
-			case E_BLOCK_SNOW:
-			{
-				if (GetBlock(BlockPos.x, BlockPos.y - 1, BlockPos.z) == E_BLOCK_AIR)
-				{
-					SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-
-					Vector3i WorldPos = PositionToWorldPosition( BlockPos );
-
-					m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
-					
-					cItems Pickups;
-					cBlockToPickup::ToPickup(BlockType, BlockMeta, E_ITEM_EMPTY, Pickups);
-					m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
-				}
-				break;
-			}
-
-			case E_BLOCK_REDSTONE_TORCH_OFF:
-			case E_BLOCK_REDSTONE_TORCH_ON:
-			case E_BLOCK_TORCH:
-			{
-				char Dir = cTorch::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
-				Vector3i WorldPos = PositionToWorldPosition( BlockPos );
-
-				Vector3i AttachedTo = WorldPos;
-				AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
-				if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
-				{
-					SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-
-					m_World->GetSimulatorManager()->WakeUp(WorldPos.x, WorldPos.y, WorldPos.z);
-
-					cItems Pickups;
-					cBlockToPickup::ToPickup(BlockType, BlockMeta, E_ITEM_EMPTY, Pickups);
-					m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
-				}
-				break;
-			}
-
-			case E_BLOCK_LADDER:
-			{
-				char Dir = cLadder::MetaDataToDirection( GetNibble( m_BlockMeta, BlockPos ) );
-				Vector3i WorldPos = PositionToWorldPosition( BlockPos );
-				Vector3i AttachedTo = WorldPos;
-				AddDirection( AttachedTo.x, AttachedTo.y, AttachedTo.z, Dir, true );
-				if( m_World->GetBlock( AttachedTo ) == E_BLOCK_AIR )
-				{
-					SetBlock( BlockPos, E_BLOCK_AIR, 0 );
-					cItems Pickups;
-					cBlockToPickup::ToPickup(BlockType, BlockMeta, E_ITEM_EMPTY, Pickups);
-					m_World->SpawnItemPickups(Pickups, WorldPos.x, WorldPos.y, WorldPos.z);
-				}
-				break;
-			}
-		}  // switch (BlockType)
-		*/
 	}  // for itr - ToTickBlocks[]
 }
 
