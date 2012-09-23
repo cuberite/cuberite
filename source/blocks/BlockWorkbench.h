@@ -1,6 +1,6 @@
 #pragma once
 #include "Block.h"
-#include "../UI/cWindow.h"
+#include "../UI/Window.h"
 #include "../cPlayer.h"
 
 

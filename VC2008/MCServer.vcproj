@@ -1048,23 +1048,23 @@
 				Name="UI"
 				>
 				<File
-					RelativePath="..\source\UI\cWindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\UI\cWindow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\UI\cWindowOwner.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\UI\SlotArea.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\UI\SlotArea.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\UI\Window.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\UI\Window.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\UI\WindowOwner.h"
 					>
 				</File>
 			</Filter>

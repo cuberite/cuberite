@@ -20,7 +20,7 @@ Documentation:
 #include "cPickup.h"
 #include "cPlayer.h"
 #include "cChatColor.h"
-#include "UI/cWindow.h"
+#include "UI/Window.h"
 #include "cRoot.h"
 #include "cServer.h"
 

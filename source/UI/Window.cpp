@@ -1,13 +1,13 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "cWindow.h"
+#include "Window.h"
 #include "../cItem.h"
 #include "../cClientHandle.h"
 #include "../cPlayer.h"
 #include "../cPickup.h"
 #include "../cInventory.h"
-#include "cWindowOwner.h"
+#include "WindowOwner.h"
 #include "../items/Item.h"
 #include "SlotArea.h"
 #include "../cChestEntity.h"
@@ -94,8 +94,6 @@ void cWindow::Clicked(
 	const cItem & a_ClickedItem
 )
 {
-	LOGD("cWindow::Clicked(): ID %d (exp %d), SlotNum %d", a_WindowID, m_WindowID, a_SlotNum);
-	
 	if (a_WindowID != m_WindowID)
 	{
 		LOG("WRONG WINDOW ID! (exp %d, got %d) received from \"%s\"", m_WindowID, a_WindowID, a_Player.GetName().c_str());
@@ -121,7 +119,6 @@ void cWindow::Clicked(
 	{
 		if (LocalSlotNum < (*itr)->GetNumSlots())
 		{
-			LOGD("SlotArea #%d (%d slots) handling the click", idx, (*itr)->GetNumSlots());
 			(*itr)->Clicked(a_Player, LocalSlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
 			return;
 		}

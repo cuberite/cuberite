@@ -3,7 +3,7 @@
 
 #include "../cBlockEntity.h"
 #include "../cEntity.h"
-#include "cWindow.h"
+#include "Window.h"
 
 /*
 Being a descendant of cWindowOwner means that the class can own one window. That window can be 

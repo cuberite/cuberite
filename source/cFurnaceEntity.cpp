@@ -4,7 +4,7 @@
 #include "cFurnaceEntity.h"
 #include "BlockID.h"
 #include "cItem.h"
-#include "UI/cWindow.h"
+#include "UI/Window.h"
 #include "cPlayer.h"
 #include "cWorld.h"
 #include "cClientHandle.h"

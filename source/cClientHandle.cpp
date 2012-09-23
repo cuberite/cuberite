@@ -10,7 +10,7 @@
 #include "cInventory.h"
 #include "cChestEntity.h"
 #include "cSignEntity.h"
-#include "UI/cWindow.h"
+#include "UI/Window.h"
 #include "cItem.h"
 #include "cTorch.h"
 #include "cDoors.h"
@@ -1067,7 +1067,7 @@ void cClientHandle::Tick(float a_Dt)
 
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
-	LOGD("Sending a DC");
+	LOGD("Sending a DC: \"%s\"", a_Reason.c_str());
 	m_Protocol->SendDisconnect(a_Reason);
 }
 

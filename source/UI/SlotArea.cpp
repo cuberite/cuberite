@@ -9,7 +9,7 @@
 #include "../cChestEntity.h"
 #include "../cFurnaceEntity.h"
 #include "../Items/Item.h"
-#include "cWindow.h"
+#include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../cRoot.h"
 

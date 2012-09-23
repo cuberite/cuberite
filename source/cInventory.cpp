@@ -4,7 +4,7 @@
 #include "cInventory.h"
 #include "cPlayer.h"
 #include "cClientHandle.h"
-#include "UI/cWindow.h"
+#include "UI/Window.h"
 #include "cItem.h"
 #include "cRoot.h"
 

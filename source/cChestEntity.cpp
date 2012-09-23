@@ -5,7 +5,7 @@
 #include "cItem.h"
 #include "cClientHandle.h"
 #include "cPlayer.h"
-#include "UI/cWindow.h"
+#include "UI/Window.h"
 #include "cWorld.h"
 #include "cRoot.h"
 #include "cPickup.h"

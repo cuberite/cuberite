@@ -1,5 +1,5 @@
 
-// cWindow.h
+// Window.h
 
 // Interfaces to the cWindow class representing a UI window for a specific block
 

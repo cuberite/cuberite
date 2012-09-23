@@ -13,7 +13,7 @@
 #include "ChunkDataSerializer.h"
 #include "cPlayer.h"
 #include "cMonster.h"
-#include "UI/cWindow.h"
+#include "UI/Window.h"
 
 
 
