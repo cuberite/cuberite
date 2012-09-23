@@ -53,6 +53,7 @@ enum
 {
 	PACKET_KEEP_ALIVE       = 0x00,
 	PACKET_LOGIN            = 0x01,
+	PACKET_ENTITY_EQUIPMENT = 0x05,
 	PACKET_COMPASS          = 0x06,
 	PACKET_PLAYER_SPAWN     = 0x14,
 	PACKET_SPAWN_MOB        = 0x18,
@@ -249,6 +250,20 @@ void cProtocol132::SendDestroyEntity(const cEntity & a_Entity)
 	WriteByte(PACKET_DESTROY_ENTITIES);
 	WriteByte(1);  // entity count
 	WriteInt (a_Entity.GetUniqueID());
+	Flush();
+}
+
+
+
+
+
+void cProtocol132::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte (PACKET_ENTITY_EQUIPMENT);
+	WriteInt  (a_Entity.GetUniqueID());
+	WriteShort(a_SlotNum);
+	WriteItem (a_Item);
 	Flush();
 }
 
