@@ -10,8 +10,8 @@
 
 #pragma once
 
-#include "Defines.h"
-#include "Endianness.h"
+#include "../Defines.h"
+#include "../Endianness.h"
 
 
 

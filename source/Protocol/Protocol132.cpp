@@ -5,15 +5,15 @@
 
 #include "Globals.h"
 #include "Protocol132.h"
-#include "cRoot.h"
-#include "cServer.h"
-#include "cClientHandle.h"
-#include "CryptoPP/randpool.h"
-#include "cItem.h"
-#include "ChunkDataSerializer.h"
-#include "cPlayer.h"
-#include "cMonster.h"
-#include "UI/Window.h"
+#include "../cRoot.h"
+#include "../cServer.h"
+#include "../cClientHandle.h"
+#include "../../CryptoPP/randpool.h"
+#include "../cItem.h"
+#include "../ChunkDataSerializer.h"
+#include "../cPlayer.h"
+#include "../cMonster.h"
+#include "../UI/Window.h"
 
 
 

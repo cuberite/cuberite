@@ -39,7 +39,7 @@
 #include "cAuthenticator.h"
 #include "MersenneTwister.h"
 
-#include "ProtocolRecognizer.h"
+#include "Protocol/ProtocolRecognizer.h"
 
 
 

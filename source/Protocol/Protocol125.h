@@ -10,7 +10,7 @@
 #pragma once
 
 #include "Protocol.h"
-#include "ByteBuffer.h"
+#include "../ByteBuffer.h"
 
 
 

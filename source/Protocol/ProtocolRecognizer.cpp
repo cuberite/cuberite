@@ -9,10 +9,10 @@
 #include "ProtocolRecognizer.h"
 #include "Protocol125.h"
 #include "Protocol132.h"
-#include "cClientHandle.h"
-#include "cRoot.h"
-#include "cWorld.h"
-#include "cChatColor.h"
+#include "../cClientHandle.h"
+#include "../cRoot.h"
+#include "../cWorld.h"
+#include "../cChatColor.h"
 
 
 

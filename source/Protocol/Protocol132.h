@@ -10,8 +10,8 @@
 #pragma once
 
 #include "Protocol125.h"
-#include "CryptoPP/modes.h"
-#include "CryptoPP/aes.h"
+#include "../../CryptoPP/modes.h"
+#include "../../CryptoPP/aes.h"
 
 
 

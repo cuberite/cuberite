@@ -20,7 +20,7 @@
 #include "cFurnaceRecipe.h"
 #include "cTracer.h"
 #include "cWebAdmin.h"
-#include "ProtocolRecognizer.h"
+#include "Protocol/ProtocolRecognizer.h"
 
 #include "MersenneTwister.h"
 

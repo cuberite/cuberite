@@ -2004,31 +2004,31 @@
 				Name="Protocol"
 				>
 				<File
-					RelativePath="..\source\Protocol.h"
+					RelativePath="..\source\Protocol\Protocol.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol125.cpp"
+					RelativePath="..\source\Protocol\Protocol125.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol125.h"
+					RelativePath="..\source\Protocol\Protocol125.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol132.cpp"
+					RelativePath="..\source\Protocol\Protocol132.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Protocol132.h"
+					RelativePath="..\source\Protocol\Protocol132.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ProtocolRecognizer.cpp"
+					RelativePath="..\source\Protocol\ProtocolRecognizer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ProtocolRecognizer.h"
+					RelativePath="..\source\Protocol\ProtocolRecognizer.h"
 					>
 				</File>
 			</Filter>
