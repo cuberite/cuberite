@@ -12,7 +12,7 @@
 #include "../cItem.h"
 #include "../ChunkDataSerializer.h"
 #include "../cPlayer.h"
-#include "../cMonster.h"
+#include "../Mobs/Monster.h"
 #include "../UI/Window.h"
 
 

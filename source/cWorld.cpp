@@ -20,22 +20,25 @@
 #include "cFireSimulator.h"
 #include "cSandSimulator.h"
 #include "cRedstoneSimulator.h"
-#include "cChicken.h"
-#include "cSpider.h"
-#include "cCow.h" //cow
-#include "cSquid.h" //Squid
-#include "cWolf.h" //wolf
-#include "cSlime.h" //slime
-#include "cSkeleton.h" //Skeleton
-#include "cSilverfish.h" //Silverfish
-#include "cPig.h" //pig
-#include "cSheep.h" //sheep
-#include "cZombie.h" //zombie
-#include "cEnderman.h" //enderman
-#include "cCreeper.h" //creeper
-#include "cCavespider.h" //cavespider
-#include "cGhast.h" //Ghast
-#include "cZombiepigman.h" //Zombiepigman
+
+// Mobs:
+#include "Mobs/Chicken.h"
+#include "Mobs/Spider.h"
+#include "Mobs/Cow.h"
+#include "Mobs/Squid.h"
+#include "Mobs/Wolf.h"
+#include "Mobs/Slime.h"
+#include "Mobs/Skeleton.h"
+#include "Mobs/Silverfish.h"
+#include "Mobs/Pig.h"
+#include "Mobs/Sheep.h"
+#include "Mobs/Zombie.h"
+#include "Mobs/Enderman.h"
+#include "Mobs/Creeper.h"
+#include "Mobs/Cavespider.h"
+#include "Mobs/Ghast.h"
+#include "Mobs/Zombiepigman.h"
+
 #include "cMakeDir.h"
 #include "MersenneTwister.h"
 #include "cTracer.h"

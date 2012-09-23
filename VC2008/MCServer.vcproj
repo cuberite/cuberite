@@ -768,163 +768,163 @@
 				Name="Mobs"
 				>
 				<File
-					RelativePath="..\source\cAggressiveMonster.cpp"
+					RelativePath="..\source\Mobs\AggressiveMonster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cAggressiveMonster.h"
+					RelativePath="..\source\Mobs\AggressiveMonster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCavespider.cpp"
+					RelativePath="..\source\Mobs\Cavespider.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCavespider.h"
+					RelativePath="..\source\Mobs\Cavespider.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cChicken.cpp"
+					RelativePath="..\source\Mobs\Chicken.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cChicken.h"
+					RelativePath="..\source\Mobs\Chicken.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCow.cpp"
+					RelativePath="..\source\Mobs\Cow.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCow.h"
+					RelativePath="..\source\Mobs\Cow.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCreeper.cpp"
+					RelativePath="..\source\Mobs\Creeper.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cCreeper.h"
+					RelativePath="..\source\Mobs\Creeper.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cEnderman.cpp"
+					RelativePath="..\source\Mobs\Enderman.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cEnderman.h"
+					RelativePath="..\source\Mobs\Enderman.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cGhast.cpp"
+					RelativePath="..\source\Mobs\Ghast.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cGhast.h"
+					RelativePath="..\source\Mobs\Ghast.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cMonster.cpp"
+					RelativePath="..\source\Mobs\Monster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cMonster.h"
+					RelativePath="..\source\Mobs\Monster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPassiveAggressiveMonster.cpp"
+					RelativePath="..\source\Mobs\PassiveAggressiveMonster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPassiveAggressiveMonster.h"
+					RelativePath="..\source\Mobs\PassiveAggressiveMonster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPassiveMonster.cpp"
+					RelativePath="..\source\Mobs\PassiveMonster.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPassiveMonster.h"
+					RelativePath="..\source\Mobs\PassiveMonster.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPig.cpp"
+					RelativePath="..\source\Mobs\Pig.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cPig.h"
+					RelativePath="..\source\Mobs\Pig.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSheep.cpp"
+					RelativePath="..\source\Mobs\Sheep.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSheep.h"
+					RelativePath="..\source\Mobs\Sheep.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSilverfish.cpp"
+					RelativePath="..\source\Mobs\Silverfish.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSilverfish.h"
+					RelativePath="..\source\Mobs\Silverfish.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSkeleton.cpp"
+					RelativePath="..\source\Mobs\Skeleton.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSkeleton.h"
+					RelativePath="..\source\Mobs\Skeleton.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSlime.cpp"
+					RelativePath="..\source\Mobs\Slime.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSlime.h"
+					RelativePath="..\source\Mobs\Slime.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSpider.cpp"
+					RelativePath="..\source\Mobs\Spider.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSpider.h"
+					RelativePath="..\source\Mobs\Spider.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSquid.cpp"
+					RelativePath="..\source\Mobs\Squid.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cSquid.h"
+					RelativePath="..\source\Mobs\Squid.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWolf.cpp"
+					RelativePath="..\source\Mobs\Wolf.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cWolf.h"
+					RelativePath="..\source\Mobs\Wolf.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cZombie.cpp"
+					RelativePath="..\source\Mobs\Zombie.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cZombie.h"
+					RelativePath="..\source\Mobs\Zombie.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cZombiepigman.cpp"
+					RelativePath="..\source\Mobs\Zombiepigman.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cZombiepigman.h"
+					RelativePath="..\source\Mobs\Zombiepigman.h"
 					>
 				</File>
 			</Filter>

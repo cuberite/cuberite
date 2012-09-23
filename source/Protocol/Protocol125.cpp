@@ -16,7 +16,7 @@ Documentation:
 #include "../cClientHandle.h"
 #include "../ChunkDataSerializer.h"
 #include "../cEntity.h"
-#include "../cMonster.h"
+#include "../Mobs/Monster.h"
 #include "../cPickup.h"
 #include "../cPlayer.h"
 #include "../cChatColor.h"

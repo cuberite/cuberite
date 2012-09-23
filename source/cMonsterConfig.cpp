@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "cMonsterConfig.h"
-#include "cMonster.h"
+#include "Mobs/Monster.h"
 #include "../iniFile/iniFile.h"
 //#include <cstdio>
 

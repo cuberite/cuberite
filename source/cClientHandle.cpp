@@ -20,7 +20,7 @@
 #include "cRedstone.h"
 #include "cPiston.h"
 #include "cBlockToPickup.h"
-#include "cMonster.h"
+#include "Mobs/Monster.h"
 #include "cChatColor.h"
 #include "cSocket.h"
 #include "cTimer.h"

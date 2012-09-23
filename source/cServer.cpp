@@ -6,7 +6,7 @@
 #include "cServer.h"
 #include "cClientHandle.h"
 #include "cTimer.h"
-#include "cMonster.h"
+#include "Mobs/Monster.h"
 #include "cSocket.h"
 #include "cRoot.h"
 #include "cWorld.h"
