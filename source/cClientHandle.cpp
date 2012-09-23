@@ -241,6 +241,8 @@ void cClientHandle::Authenticate(void)
 	m_Player->SetIP (m_Socket.GetIPString());
 
 	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
+	
+	m_ConfirmPosition = m_Player->GetPosition();
 
 	// Return a server login packet
 	m_Protocol->SendLogin(*m_Player, *World);
@@ -1499,7 +1501,6 @@ void cClientHandle::SendConfirmPosition(void)
 		cRoot::Get()->GetServer()->BroadcastChat(m_Username + " joined the game!", this);
 	}
 
-	m_ConfirmPosition = m_Player->GetPosition();
 	SendPlayerMoveLook();
 }
 

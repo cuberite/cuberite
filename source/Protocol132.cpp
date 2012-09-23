@@ -297,6 +297,9 @@ void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	Flush();
 	
 	SendCompass(a_World);
+	
+	// Send the initial position (so that confirmation works, FS #245):
+	SendPlayerMoveLook();
 }
 
 
