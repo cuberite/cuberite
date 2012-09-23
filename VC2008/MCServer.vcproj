@@ -397,14 +397,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\ChunkDataSerializer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\ChunkDataSerializer.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\ChunkDef.h"
 				>
 			</File>
@@ -1995,6 +1987,14 @@
 			<Filter
 				Name="Protocol"
 				>
+				<File
+					RelativePath="..\source\Protocol\ChunkDataSerializer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol\ChunkDataSerializer.h"
+					>
+				</File>
 				<File
 					RelativePath="..\source\Protocol\Protocol.h"
 					>

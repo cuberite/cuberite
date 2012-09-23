@@ -14,7 +14,7 @@ Documentation:
 #include "Protocol125.h"
 
 #include "../cClientHandle.h"
-#include "../ChunkDataSerializer.h"
+#include "ChunkDataSerializer.h"
 #include "../cEntity.h"
 #include "../Mobs/Monster.h"
 #include "../cPickup.h"

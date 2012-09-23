@@ -10,7 +10,7 @@
 #include "../cClientHandle.h"
 #include "../../CryptoPP/randpool.h"
 #include "../cItem.h"
-#include "../ChunkDataSerializer.h"
+#include "ChunkDataSerializer.h"
 #include "../cPlayer.h"
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"

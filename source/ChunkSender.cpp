@@ -11,7 +11,7 @@
 #include "ChunkSender.h"
 #include "cWorld.h"
 #include "cBlockEntity.h"
-#include "ChunkDataSerializer.h"
+#include "Protocol/ChunkDataSerializer.h"
 
 
 

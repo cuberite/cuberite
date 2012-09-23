@@ -25,7 +25,6 @@
 #include "OSSupport/Timer.h"
 #include "items/Item.h"
 #include "blocks/Block.h"
-#include "ChunkDataSerializer.h"
 
 #include "cTracer.h"
 #include "Vector3f.h"
