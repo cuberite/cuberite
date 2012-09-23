@@ -10,7 +10,7 @@
 #include "WSSCompact.h"
 #include "WSSAnvil.h"
 #include "cWorld.h"
-#include "cChunkGenerator.h"
+#include "Generating/ChunkGenerator.h"
 #include "cEntity.h"
 #include "cBlockEntity.h"
 #include "BlockID.h"

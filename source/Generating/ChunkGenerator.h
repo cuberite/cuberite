@@ -24,8 +24,8 @@ See http://forum.mc-server.org/showthread.php?tid=409 for details.
 
 #pragma once
 
-#include "cIsThread.h"
-#include "ChunkDef.h"
+#include "../cIsThread.h"
+#include "../ChunkDef.h"
 
 
 

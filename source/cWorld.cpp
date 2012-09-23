@@ -37,10 +37,9 @@
 #include "cGhast.h" //Ghast
 #include "cZombiepigman.h" //Zombiepigman
 #include "cMakeDir.h"
-#include "cChunkGenerator.h"
 #include "MersenneTwister.h"
 #include "cTracer.h"
-#include "Trees.h"
+#include "Generating/Trees.h"
 #include "cPluginManager.h"
 #include "blocks/Block.h"
 #include "Vector3d.h"

@@ -1,17 +1,17 @@
 
 #include "Globals.h"
 
-#include "cChunkGenerator.h"
-#include "cWorld.h"
-#include "../iniFile/iniFile.h"
+#include "ChunkGenerator.h"
+#include "../cWorld.h"
+#include "../../iniFile/iniFile.h"
 #include "BioGen.h"
 #include "HeiGen.h"
 #include "CompoGen.h"
 #include "StructGen.h"
 #include "FinishGen.h"
-#include "cRoot.h"
-#include "cPluginManager.h"
-#include "cLuaChunk.h"
+#include "../cRoot.h"
+#include "../cPluginManager.h"
+#include "../cLuaChunk.h"
 #include "Ravines.h"
 #include "Caves.h"
 

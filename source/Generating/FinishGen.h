@@ -13,8 +13,8 @@
 
 
 
-#include "cChunkGenerator.h"
-#include "cNoise.h"
+#include "ChunkGenerator.h"
+#include "../cNoise.h"
 
 
 

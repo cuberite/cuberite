@@ -13,7 +13,7 @@
 #include "MersenneTwister.h"
 #include "cChunkMap.h"
 #include "WorldStorage.h"
-#include "cChunkGenerator.h"
+#include "Generating/ChunkGenerator.h"
 #include "Vector3i.h"
 #include "Vector3f.h"
 #include "ChunkSender.h"

@@ -10,8 +10,8 @@
 #include "Globals.h"
 
 #include "FinishGen.h"
-#include "cNoise.h"
-#include "BlockID.h"
+#include "../cNoise.h"
+#include "../BlockID.h"
 
 
 

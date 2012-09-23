@@ -3,7 +3,7 @@
 
 #include "Globals.h"
 #include "StructGen.h"
-#include "BlockID.h"
+#include "../BlockID.h"
 #include "Trees.h"
 
 
@@ -36,6 +36,14 @@ const int NEST_SIZE_DIAMOND = 5;
 const int MAX_HEIGHT_LAPIS = 30;
 const int NUM_NESTS_LAPIS = 3;
 const int NEST_SIZE_LAPIS = 5;
+
+const int MAX_HEIGHT_DIRT = 127;
+const int NUM_NESTS_DIRT = 20;
+const int NEST_SIZE_DIRT = 32;
+
+const int MAX_HEIGHT_GRAVEL = 70;
+const int NUM_NESTS_GRAVEL = 15;
+const int NEST_SIZE_GRAVEL = 32;
 
 
 
@@ -313,6 +321,8 @@ void cStructGenOreNests::GenStructures(
 	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     a_BlockTypes, 4);
 	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  a_BlockTypes, 5);
 	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_LAPIS_ORE,    MAX_HEIGHT_LAPIS,    NUM_NESTS_LAPIS,    NEST_SIZE_LAPIS,    a_BlockTypes, 6);
+	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_DIRT,         MAX_HEIGHT_DIRT,     NUM_NESTS_DIRT,     NEST_SIZE_DIRT,     a_BlockTypes, 10);
+	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_GRAVEL,       MAX_HEIGHT_GRAVEL,   NUM_NESTS_GRAVEL,   NEST_SIZE_GRAVEL,   a_BlockTypes, 11);
 }
 
 

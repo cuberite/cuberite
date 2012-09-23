@@ -10,7 +10,7 @@
 #include "cItem.h"
 #include "cPickup.h"
 #include "cChunk.h"
-#include "Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
+#include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 
 #ifndef _WIN32
 	#include <cstdlib> // abs

@@ -1660,75 +1660,75 @@
 				Name="Generating"
 				>
 				<File
-					RelativePath="..\source\BioGen.cpp"
+					RelativePath="..\source\Generating\BioGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BioGen.h"
+					RelativePath="..\source\Generating\BioGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Caves.cpp"
+					RelativePath="..\source\Generating\Caves.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Caves.h"
+					RelativePath="..\source\Generating\Caves.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cChunkGenerator.cpp"
+					RelativePath="..\source\Generating\ChunkGenerator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\cChunkGenerator.h"
+					RelativePath="..\source\Generating\ChunkGenerator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\CompoGen.cpp"
+					RelativePath="..\source\Generating\CompoGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\CompoGen.h"
+					RelativePath="..\source\Generating\CompoGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FinishGen.cpp"
+					RelativePath="..\source\Generating\FinishGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FinishGen.h"
+					RelativePath="..\source\Generating\FinishGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HeiGen.cpp"
+					RelativePath="..\source\Generating\HeiGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\HeiGen.h"
+					RelativePath="..\source\Generating\HeiGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Ravines.cpp"
+					RelativePath="..\source\Generating\Ravines.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Ravines.h"
+					RelativePath="..\source\Generating\Ravines.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\StructGen.cpp"
+					RelativePath="..\source\Generating\StructGen.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\StructGen.h"
+					RelativePath="..\source\Generating\StructGen.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Trees.cpp"
+					RelativePath="..\source\Generating\Trees.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Trees.h"
+					RelativePath="..\source\Generating\Trees.h"
 					>
 				</File>
 			</Filter>

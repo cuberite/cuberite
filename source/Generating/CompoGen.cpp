@@ -9,7 +9,7 @@
 
 #include "Globals.h"
 #include "CompoGen.h"
-#include "BlockID.h"
+#include "../BlockID.h"
 
 
 
