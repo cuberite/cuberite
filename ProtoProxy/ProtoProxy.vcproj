@@ -177,30 +177,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\source\ByteBuffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\ByteBuffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cCriticalSection.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cCriticalSection.h"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cIsThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\cIsThread.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Connection.cpp"
 				>
 			</File>
@@ -242,6 +218,34 @@
 			</File>
 			<File
 				RelativePath=".\Server.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="shared"
+			>
+			<File
+				RelativePath="..\source\ByteBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ByteBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\CriticalSection.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\CriticalSection.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\IsThread.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\IsThread.h"
 				>
 			</File>
 			<File

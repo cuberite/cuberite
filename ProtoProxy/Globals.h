@@ -163,7 +163,7 @@ typedef short     Int16;
 
 // Common headers (part 1, without macros):
 #include "StringUtils.h"
-#include "cCriticalSection.h"
+#include "OSSupport/CriticalSection.h"
 
 
 
