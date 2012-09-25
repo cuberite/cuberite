@@ -76,25 +76,22 @@ public:
 	~cSocketThreads();
 	
 	/// Add a (socket, client) pair for processing, data from a_Socket is to be sent to a_Client; returns true if successful
-	bool AddClient(cSocket * a_Socket, cCallback * a_Client);
+	bool AddClient(const cSocket & a_Socket, cCallback * a_Client);
 	
-	/// Remove the socket (and associated client) from processing
-	void RemoveClient(const cSocket * a_Socket);
-	
-	/// Remove the associated socket and the client from processing
+	/// Remove the associated socket and the client from processing. The socket is left to send its data and is removed only after all its m_OutgoingData is sent
 	void RemoveClient(const cCallback * a_Client);
 	
 	/// Notify the thread responsible for a_Client that the client has something to write
 	void NotifyWrite(const cCallback * a_Client);
 	
-	/// Puts a_Data into outgoing data queue for a_Socket
-	void Write(const cSocket * a_Socket, const AString & a_Data);
+	/// Puts a_Data into outgoing data queue for a_Client
+	void Write(const cCallback * a_Client, const AString & a_Data);
 	
-	/// Stops reading from the socket - when this call returns, no more calls to the callbacks are made
+	/// Stops reading from the client - when this call returns, no more calls to the callbacks are made
 	void StopReading(const cCallback * a_Client);
 	
-	/// Queues the socket for closing, as soon as its outgoing data is sent
-	void QueueClose(const cSocket * a_Socket);
+	/// Queues the client for closing, as soon as its outgoing data is sent
+	void QueueClose(const cCallback * a_Client);
 
 private:
 
@@ -112,15 +109,15 @@ private:
 		bool HasEmptySlot(void) const {return m_NumSlots < MAX_SLOTS; }
 		bool IsEmpty     (void) const {return m_NumSlots == 0; }
 
-		void AddClient   (cSocket *         a_Socket, cCallback * a_Client);
+		void AddClient   (const cSocket &   a_Socket, cCallback * a_Client);  // Takes ownership of the socket
 		bool RemoveClient(const cCallback * a_Client);  // Returns true if removed, false if not found
 		bool RemoveSocket(const cSocket *   a_Socket);  // Returns true if removed, false if not found
 		bool HasClient   (const cCallback * a_Client) const;
 		bool HasSocket   (const cSocket *   a_Socket) const;
 		bool NotifyWrite (const cCallback * a_Client);  // Returns true if client handled by this thread
-		bool Write       (const cSocket *   a_Socket, const AString & a_Data);  // Returns true if socket handled by this thread
+		bool Write       (const cCallback * a_Client, const AString & a_Data);  // Returns true if client handled by this thread
 		bool StopReading (const cCallback * a_Client);  // Returns true if client handled by this thread
-		bool QueueClose  (const cSocket *   a_Socket);  // Returns true if socket handled by this thread
+		bool QueueClose  (const cCallback * a_Client);  // Returns true if client handled by this thread
 		
 		bool Start(void);  // Hide the cIsThread's Start method, we need to provide our own startup to create the control socket
 		
@@ -138,10 +135,11 @@ private:
 		// Manipulation with these assumes that the parent's m_CS is locked
 		struct sSlot
 		{
-			cSocket *   m_Socket;
+			cSocket     m_Socket;  // The socket is primarily owned by this
 			cCallback * m_Client;
 			AString     m_Outgoing;  // If sending writes only partial data, the rest is stored here for another send
 			bool        m_ShouldClose;  // If true, the socket is to be closed after sending all outgoing data
+			bool        m_ShouldCallClient;  // If true, the client callbacks are called. Set to false in StopReading()
 		} ;
 		sSlot m_Slots[MAX_SLOTS];
 		int   m_NumSlots;  // Number of slots actually used

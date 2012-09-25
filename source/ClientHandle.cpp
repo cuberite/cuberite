@@ -75,9 +75,9 @@ int cClientHandle::s_ClientCount = 0;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
-cClientHandle::cClientHandle(const cSocket & a_Socket, int a_ViewDistance)
+cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
-	, m_Socket(a_Socket)
+	, m_IPString(a_Socket->GetIPString())
 	, m_OutgoingData(64 KiB)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
@@ -138,12 +138,9 @@ cClientHandle::~cClientHandle()
 		}
 	}
 
-	if (m_Socket.IsValid())
+	if (!m_bKicking)
 	{
-		if (!m_bKicking)
-		{
-			SendDisconnect("Server shut down? Kthnxbai");
-		}
+		SendDisconnect("Server shut down? Kthnxbai");
 	}
 	
 	if (m_Player != NULL)
@@ -158,15 +155,12 @@ cClientHandle::~cClientHandle()
 		AString Data;
 		m_OutgoingData.ReadAll(Data);
 		m_OutgoingData.CommitRead();
-		cRoot::Get()->GetServer()->WriteToClient(&m_Socket, Data);
+		cRoot::Get()->GetServer()->WriteToClient(this, Data);
 	}
 	
 	// Queue the socket to close as soon as it sends all outgoing data:
-	cRoot::Get()->GetServer()->QueueClientClose(&m_Socket);
-	
-	// We need to remove the socket from SocketThreads because we own it and it gets destroyed after this destructor finishes
-	// TODO: The socket needs to stay alive, someone else has to own it
-	cRoot::Get()->GetServer()->RemoveClient(&m_Socket);
+	cRoot::Get()->GetServer()->QueueClientClose(this);
+	cRoot::Get()->GetServer()->RemoveClient(this);
 	
 	delete m_Protocol;
 	m_Protocol = NULL;
@@ -234,7 +228,7 @@ void cClientHandle::Authenticate(void)
 		m_Player->LoginSetGameMode(World->GetGameMode());
 	}
 
-	m_Player->SetIP (m_Socket.GetIPString());
+	m_Player->SetIP (m_IPString);
 
 	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
 	
@@ -1560,10 +1554,8 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 void cClientHandle::PacketBufferFull(void)
 {
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
-	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_Socket.GetIPString().c_str());
+	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
 	SendDisconnect("Server busy");
-	// TODO: QueueDestroy();
-	cSleep::MilliSleep(1000); // Give packet some time to be received
 	Destroy();
 }
 
@@ -1573,13 +1565,11 @@ void cClientHandle::PacketBufferFull(void)
 
 void cClientHandle::PacketUnknown(unsigned char a_PacketType)
 {
-	LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_Socket.GetIPString().c_str());
+	LOGERROR("Unknown packet type 0x%02x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
 
 	AString Reason;
 	Printf(Reason, "[C->S] Unknown PacketID: 0x%02x", a_PacketType);
 	SendDisconnect(Reason);
-	// TODO: QueueDestroy();
-	cSleep::MilliSleep(1000); // Give packet some time to be received
 	Destroy();
 }
 
@@ -1591,8 +1581,6 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 {
 	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
 	SendDisconnect("Protocol error");
-	// TODO: QueueDestroy();
-	cSleep::MilliSleep(1000); // Give packet some time to be received
 	Destroy();
 }
 
@@ -1637,11 +1625,8 @@ void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
 	
-	// TODO
-	/*
-	self->Destroy();
-	LOG("Client \"%s\" disconnected", GetLogName().c_str());
-	*/
+	LOG("Client \"%s\" @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
+	Destroy();
 }
 
 

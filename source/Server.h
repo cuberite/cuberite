@@ -62,11 +62,11 @@ public:												//tolua_export
 	
 	void NotifyClientWrite(const cClientHandle * a_Client);  // Notifies m_SocketThreads that client has something to be written
 	
-	void WriteToClient(const cSocket * a_Socket, const AString & a_Data);  // Queues outgoing data for the socket through m_SocketThreads
+	void WriteToClient(const cClientHandle * a_Client, const AString & a_Data);  // Queues outgoing data for the client through m_SocketThreads
 	
-	void QueueClientClose(const cSocket * a_Socket);  // Queues the socket to close when all its outgoing data is sent
+	void QueueClientClose(const cClientHandle * a_Client);  // Queues the clienthandle to close when all its outgoing data is sent
 	
-	void RemoveClient(const cSocket * a_Socket);  // Removes the socket from m_SocketThreads
+	void RemoveClient(const cClientHandle * a_Client);  // Removes the clienthandle from m_SocketThreads
 	
 	CryptoPP::RSA::PrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	CryptoPP::RSA::PublicKey  & GetPublicKey (void) { return m_PublicKey; }

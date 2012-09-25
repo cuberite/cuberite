@@ -24,8 +24,6 @@ class cProtocol132 :
 public:
 
 	cProtocol132(cClientHandle * a_Client);
-	
-	// DEBUG:
 	virtual ~cProtocol132();
 
 	/// Called when client sends some data:

@@ -32,6 +32,7 @@ class cProtocolRecognizer :
 	
 public:
 	cProtocolRecognizer(cClientHandle * a_Client);
+	virtual ~cProtocolRecognizer();
 	
 	/// Called when client sends some data:
 	virtual void DataReceived(const char * a_Data, int a_Size) override;

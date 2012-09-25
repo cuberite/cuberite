@@ -113,27 +113,27 @@ void cServer::NotifyClientWrite(const cClientHandle * a_Client)
 
 
 
-void cServer::WriteToClient(const cSocket * a_Socket, const AString & a_Data)
+void cServer::WriteToClient(const cClientHandle * a_Client, const AString & a_Data)
 {
-	m_SocketThreads.Write(a_Socket, a_Data);
+	m_SocketThreads.Write(a_Client, a_Data);
 }
 
 
 
 
 
-void cServer::QueueClientClose(const cSocket * a_Socket)
+void cServer::QueueClientClose(const cClientHandle * a_Client)
 {
-	m_SocketThreads.QueueClose(a_Socket);
+	m_SocketThreads.QueueClose(a_Client);
 }
 
 
 
 
 
-void cServer::RemoveClient(const cSocket * a_Socket)
+void cServer::RemoveClient(const cClientHandle * a_Client)
 {
-	m_SocketThreads.RemoveClient(a_Socket);
+	m_SocketThreads.RemoveClient(a_Client);
 }
 
 
@@ -340,8 +340,8 @@ void cServer::StartListenClient()
 
 	LOG("Client \"%s\" connected!", ClientIP.c_str());
 
-	cClientHandle *NewHandle = new cClientHandle(SClient, m_ClientViewDistance);
-	if (!m_SocketThreads.AddClient(&(NewHandle->GetSocket()), NewHandle))
+	cClientHandle * NewHandle = new cClientHandle(&SClient, m_ClientViewDistance);
+	if (!m_SocketThreads.AddClient(SClient, NewHandle))
 	{
 		// For some reason SocketThreads have rejected the handle, clean it up
 		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", SClient.GetIPString().c_str());

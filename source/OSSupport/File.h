@@ -46,6 +46,12 @@ Usage:
 class cFile
 {
 public:
+	#ifdef _WIN32
+	static const char PathSeparator = '\\';
+	#else
+	static const char PathSeparator = '/';
+	#endif
+	
 	/// The mode in which to open the file
 	enum EMode
 	{

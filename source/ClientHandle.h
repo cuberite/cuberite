@@ -50,11 +50,10 @@ public:
 	static const int MAX_VIEW_DISTANCE = 10;
 	static const int MIN_VIEW_DISTANCE = 4;
 
-	cClientHandle(const cSocket & a_Socket, int a_ViewDistance);
-	~cClientHandle();
+	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
+	virtual ~cClientHandle();
 
-	cSocket &       GetSocket  (void)       { return m_Socket; }
-	const AString & GetIPString(void) const { return m_Socket.GetIPString(); }
+	const AString & GetIPString(void) const { return m_IPString; }
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
@@ -169,6 +168,8 @@ private:
 	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
 	
 	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight. 2 is the minimum, since foliage is generated 1 step behind chunk terrain generation
+	
+	AString m_IPString;
 
 	int     m_ProtocolVersion;
 	AString m_Username;
@@ -178,7 +179,6 @@ private:
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
 	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
 
-	cSocket     m_Socket;
 	cProtocol * m_Protocol;
 	
 	cCriticalSection m_CSOutgoingData;

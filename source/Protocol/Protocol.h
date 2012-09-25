@@ -37,6 +37,7 @@ public:
 		m_Client(a_Client)
 	{
 	}
+	virtual ~cProtocol() {}
 	
 	/// Called when client sends some data
 	virtual void DataReceived(const char * a_Data, int a_Size) = 0;

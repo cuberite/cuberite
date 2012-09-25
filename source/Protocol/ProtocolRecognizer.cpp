@@ -29,6 +29,14 @@ cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 
 
 
+cProtocolRecognizer::~cProtocolRecognizer()
+{
+}
+
+
+
+
+
 void cProtocolRecognizer::DataReceived(const char * a_Data, int a_Size)
 {
 	if (m_Protocol == NULL)

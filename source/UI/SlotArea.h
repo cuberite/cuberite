@@ -26,6 +26,7 @@ class cSlotArea
 {
 public:
 	cSlotArea(int a_NumSlots, cWindow & a_ParentWindow);
+	virtual ~cSlotArea() {}  // force a virtual destructor in all subclasses
 	
 	int GetNumSlots(void) const { return m_NumSlots; }
 	
