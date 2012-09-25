@@ -1771,6 +1771,22 @@ void cChunk::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a
 
 
 
+void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )

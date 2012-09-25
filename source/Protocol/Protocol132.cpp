@@ -61,7 +61,8 @@ enum
 	PACKET_CHUNK_DATA       = 0x33,
 	PACKET_BLOCK_CHANGE     = 0x35,
 	PACKET_BLOCK_ACTION     = 0x36,
-	PACKET_SOUND_EFFECT		= 0x3e
+	PACKET_BLOCK_BREAK_ANIM = 0x37,
+	PACKET_SOUND_EFFECT     = 0x3e
 } ;
 
 
@@ -342,6 +343,22 @@ void cProtocol132::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int 
 	WriteInt    (a_SrcZ);
 	WriteFloat  (a_Volume);
 	WriteByte   ((char)(a_Pitch * 63.0f));
+	Flush();
+}
+
+
+
+
+
+void cProtocol132::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte   (PACKET_BLOCK_BREAK_ANIM);
+	WriteInt    (a_entityID);
+	WriteInt    (a_BlockX);
+	WriteInt    (a_BlockY);
+	WriteInt    (a_BlockZ);
+	WriteByte   (stage);
 	Flush();
 }
 

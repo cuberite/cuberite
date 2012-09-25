@@ -91,6 +91,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_LastStreamedChunkZ(0x7fffffff)
 	, m_ShouldCheckDownloaded(false)
 	, m_UniqueID(0)
+	, m_BlockDigAnim(-1)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -534,9 +535,28 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 		((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() == 1))
 	);
 
+	if ((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() != eGameMode_Creative))
+	{
+		// Start dig animation
+		// TODO: calculate real animation speed
+		m_BlockDigAnimSpeed = 10;
+		m_BlockDigX = a_BlockX;
+		m_BlockDigY = a_BlockY;
+		m_BlockDigZ = a_BlockZ;
+		m_BlockDigAnim = 0;
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigX, m_BlockDigY, m_BlockDigZ, 0, this);
+	}
+	else if (m_BlockDigAnim != -1)
+	{
+		// End dig animation
+		m_BlockDigAnim = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigX, m_BlockDigY, m_BlockDigZ, 10, this);
+	}
+
 	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
-
+	
 	if (bBroken)
 	{
 		ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ);
@@ -550,7 +570,6 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 		Handler->OnDigging(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		
 
 		// Check for clickthrough-blocks:
 		int pX = a_BlockX;
@@ -1049,6 +1068,21 @@ void cClientHandle::Tick(float a_Dt)
 		m_Protocol->SendKeepAlive(m_PingID);
 		m_LastPingTime = m_PingStartTime;
 	}
+
+	// Handle block break animation:
+	if ((m_Player != NULL) && (m_BlockDigAnim > -1))
+	{
+		int lastAnimVal = m_BlockDigAnim;
+		m_BlockDigAnim += (int)(m_BlockDigAnimSpeed * a_Dt);
+		if (m_BlockDigAnim > 9000)
+		{
+			m_BlockDigAnim = 9000;
+		}
+		if (m_BlockDigAnim / 1000 != lastAnimVal / 1000)
+		{
+			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigX, m_BlockDigY, m_BlockDigZ, (char)(m_BlockDigAnim / 1000), this);
+		}
+	}
 }
 
 
@@ -1412,6 +1446,15 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
 {
 	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+}
+
+
+
+
+
+void cClientHandle::SendBlockBreakAnim(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage)
+{
+	m_Protocol->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);
 }
 
 

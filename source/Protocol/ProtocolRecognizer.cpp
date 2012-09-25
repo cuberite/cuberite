@@ -364,6 +364,16 @@ void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, int a_Src
 
 
 
+void cProtocolRecognizer::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendBlockBreakAnim(a_entityID, a_BlockX, a_BlockY, a_BlockZ, stage);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_Protocol != NULL);

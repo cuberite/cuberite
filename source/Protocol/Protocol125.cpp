@@ -585,8 +585,16 @@ void cProtocol125::SendRespawn(void)
 
 void cProtocol125::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
 {
-	cCSLock Lock(m_CSPacket);
-	//TODO: Not needed in this protocol?
+	// Not needed in this protocol version
+}
+
+
+
+
+
+void cProtocol125::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+{
+	// Not supported in this protocol version
 }
 
 

@@ -1431,6 +1431,15 @@ void cWorld::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a
 
 
 
+void cWorld::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude )
+{
+	m_ChunkMap->BroadcastBlockBreakAnimation(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);

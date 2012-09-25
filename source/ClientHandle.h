@@ -101,6 +101,7 @@ public:
 	void SendPlayerSpawn      (const cPlayer & a_Player);
 	void SendRespawn          (void);
 	void SendSoundEffect      (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
+	void SendBlockBreakAnim   (int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage);
 	void SendSpawnMob         (const cMonster & a_Mob);
 	void SendTeleportEntity   (const cEntity & a_Entity);
 	void SendThunderbolt      (int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -204,6 +205,13 @@ private:
 	long long m_PingStartTime;
 	long long m_LastPingTime;
 	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
+	
+	// Values required for block dig animation
+	int m_BlockDigAnim;  // Current stage of the animation; -1 if not digging
+	int m_BlockDigAnimSpeed;  // Current speed of the animation (units ???)
+	int m_BlockDigX;
+	int m_BlockDigY;
+	int m_BlockDigZ;
 
 	enum eState
 	{

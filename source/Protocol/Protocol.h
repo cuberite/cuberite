@@ -72,6 +72,7 @@ public:
 	virtual void SendPlayerSpawn      (const cPlayer & a_Player) = 0;
 	virtual void SendRespawn          (void) = 0;
 	virtual void SendSoundEffect      (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) = 0;  // a_Src coords are Block * 8
+	virtual void SendBlockBreakAnim   (int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage) = 0;
 	virtual void SendSpawnMob         (const cMonster & a_Mob) = 0;
 	virtual void SendTeleportEntity   (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt      (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
