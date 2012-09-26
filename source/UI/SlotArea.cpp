@@ -61,7 +61,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 	}
 	
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
-	if (!Slot.IsEqual(a_ClickedItem))
+	if (!Slot.IsSameType(a_ClickedItem))
 	{
 		LOGD("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
 		LOGD("My item:    %s", ItemToFullString(Slot).c_str());

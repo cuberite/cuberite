@@ -10,10 +10,11 @@
 #include <float.h>
 #include <assert.h>
 
-#include "cCriticalSection.h"
-#include "cRoot.h"
-#include "cMakeDir.h"
+#include "OSSupport/CriticalSection.h"
+#include "OSSupport/MakeDir.h"
 #include "ToJava.h"
+
+#include "Root.h"
 
 #include <android/log.h>
 

@@ -1186,7 +1186,7 @@
 					Name="Android Specific"
 					>
 					<File
-						RelativePath="..\jni\Android.mk"
+						RelativePath="..\Android\jni\Android.mk"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1214,7 +1214,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\jni\app-android.cpp"
+						RelativePath="..\Android\jni\app-android.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1242,7 +1242,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\jni\Application.mk"
+						RelativePath="..\Android\jni\Application.mk"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1270,7 +1270,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\jni\ToJava.cpp"
+						RelativePath="..\Android\jni\ToJava.cpp"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -1298,7 +1298,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath="..\jni\ToJava.h"
+						RelativePath="..\Android\jni\ToJava.h"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"

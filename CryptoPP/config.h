@@ -243,7 +243,7 @@ NAMESPACE_END
 #	pragma warn -8037
 #endif
 
-#if (defined(_MSC_VER) && _MSC_VER <= 1300) || defined(__MWERKS__) || defined(_STLPORT_VERSION)
+#if (defined(_MSC_VER) && _MSC_VER <= 1300) || defined(__MWERKS__) || defined(_STLPORT_VERSION) || defined(ANDROID_NDK)
 #define CRYPTOPP_DISABLE_UNCAUGHT_EXCEPTION
 #endif
 
