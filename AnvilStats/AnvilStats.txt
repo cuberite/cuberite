@@ -1,0 +1,27 @@
+
+// AnvilStats.txt
+
+// A Readme for the project
+
+/*
+AnvilStats
+==========
+
+This is a project for measuring various metrics throughout an Anvil world, presumably created by a vanilla MC.
+It works by parsing the MCA files in the path specified as its param (or current directory, if no params) and
+feeding each decompressed chunk into the statistics-gathering callback function.
+
+Possible usage:
+  - count the per-chunk density of specific blocks
+  - count the per-chunk density of dungeons, by measuring the number of zombie/skeleton/regularspider spawners
+  - count the per-chunk-per-biome density of trees, by measuring the number of dirt-log vertical transitions, correlating to biome data
+
+This project is Windows-only, although it shouldn't be too difficult to make it portable.
+
+
+
+
+*/
+
+
+
