@@ -226,6 +226,14 @@
 				RelativePath=".\Statistics.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Utils.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="shared"
@@ -240,6 +248,14 @@
 			</File>
 			<File
 				RelativePath="..\source\Endianness.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\Event.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\Event.h"
 				>
 			</File>
 			<File

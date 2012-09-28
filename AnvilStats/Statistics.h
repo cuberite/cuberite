@@ -51,6 +51,7 @@ protected:
 		const NIBBLETYPE * a_BlockLight,
 		const NIBBLETYPE * a_BlockSkyLight
 	) override;
+	virtual bool OnEmptySection(unsigned char a_Y) override;
 } ;
 
 

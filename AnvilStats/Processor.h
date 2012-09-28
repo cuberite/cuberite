@@ -60,6 +60,7 @@ protected:
 	AStringList      m_FileQueue;
 	
 	cThreads m_Threads;
+	cEvent   m_ThreadsHaveStarted;  // This is signalled by each thread to notify the parent thread that it can start waiting for those threads
 	
 	void PopulateFileQueue(const AString & a_WorldFolder);
 	

@@ -8,6 +8,7 @@
 #include "Callback.h"
 #include "../source/WorldStorage/FastNBT.h"
 #include "zlib.h"
+#include "Utils.h"
 
 
 
@@ -36,16 +37,22 @@ cProcessor::cThread::cThread(cCallback & a_Callback, cProcessor & a_ParentProces
 
 void cProcessor::cThread::Execute(void)
 {
+	LOG("Started a new thread: %d", cIsThread::GetCurrentID());
+	
+	m_ParentProcessor.m_ThreadsHaveStarted.Set();
+	
 	for (;;)
 	{
 		AString FileName = m_ParentProcessor.GetOneFileName();
 		if (FileName.empty())
 		{
 			// All done, terminate the thread
-			return;
+			break;
 		}
 		ProcessFile(FileName);
 	}  // for-ever
+	
+	LOG("Thread %d terminated", cIsThread::GetCurrentID());
 }
 
 
@@ -264,6 +271,8 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 		return false;
 	}
 	
+	bool SectionProcessed[16];
+	memset(SectionProcessed, 0, sizeof(SectionProcessed));
 	for (int Tag = a_NBT.GetFirstChild(Sections); Tag > 0; Tag = a_NBT.GetNextSibling(Tag))
 	{
 		int YTag          = a_NBT.FindChildByName(Tag, "Y");
@@ -278,8 +287,14 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 			continue;
 		}
 		
+		unsigned char SectionY = a_NBT.GetByte(YTag);
+		if (SectionY >= 16)
+		{
+			LOG("WARNING: Section Y >= 16 (%d), high world, wtf? Skipping section!", SectionY);
+			continue;
+		}
 		if (m_Callback.OnSection(
-			a_NBT.GetByte(YTag),
+			SectionY,
 			(const BLOCKTYPE *) (a_NBT.GetData(BlocksTag)),
 			(AddTag > 0) ? (const NIBBLETYPE *)(a_NBT.GetData(AddTag)) : NULL,
 			(const NIBBLETYPE *)(a_NBT.GetData(DataTag)),
@@ -289,7 +304,17 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 		{
 			return true;
 		}
+		SectionProcessed[SectionY] = true;
 	}  // for Tag - Sections[]
+	
+	// Call the callback for empty sections:
+	for (unsigned char y = 0; y < 16; y++)
+	{
+		if (!SectionProcessed[y])
+		{
+			m_Callback.OnEmptySection(y);
+		}
+	}
 	
 	return false;
 }
@@ -322,26 +347,18 @@ void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & 
 {
 	PopulateFileQueue(a_WorldFolder);
 	
-	// Start as many threads as there are cores:
-	// Get number of cores by querying the system process affinity mask
-	DWORD Affinity, ProcAffinity;
-	GetProcessAffinityMask(GetCurrentProcess(), &ProcAffinity, &Affinity);
-	while (Affinity > 0)
+	// Start as many threads as there are cores, plus one:
+	// (One more thread can be in the file-read IO block while all other threads crunch the numbers)
+	int NumThreads = GetNumCores() + 1;
+	for (int i = 0; i < NumThreads; i++)
 	{
-		if ((Affinity & 1) == 1)
-		{
-			cCallback * Callback = a_CallbackFactory.GetNewCallback();
-			m_Threads.push_back(new cThread(*Callback, *this));
-		}
-		Affinity >>= 1;
-	}  // while (Affinity > 0)
-	if (m_Threads.size() == 0)
-	{
-		LOG("Zero cores detected - how am I running? Running in a single thread.");
 		cCallback * Callback = a_CallbackFactory.GetNewCallback();
 		m_Threads.push_back(new cThread(*Callback, *this));
 	}
 
+	// Wait for the first thread to start processing:
+	m_ThreadsHaveStarted.Wait();
+	
 	// Wait for all threads to finish
 	// simply by calling each thread's destructor sequentially
 	for (cThreads::iterator itr = m_Threads.begin(), end = m_Threads.end(); itr != end; ++itr)
@@ -359,7 +376,10 @@ void cProcessor::PopulateFileQueue(const AString & a_WorldFolder)
 	LOG("Processing world in \"%s\"...", a_WorldFolder.c_str());
 
 	AString Path = a_WorldFolder;
-	Path.push_back(cFile::PathSeparator);
+	if (!Path.empty() && (Path[Path.length() - 1] != cFile::PathSeparator))
+	{
+		Path.push_back(cFile::PathSeparator);
+	}
 	AStringList AllFiles = GetDirectoryContents(Path.c_str());
 	for (AStringList::iterator itr = AllFiles.begin(), end = AllFiles.end(); itr != end; ++itr)
 	{

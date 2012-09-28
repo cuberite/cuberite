@@ -172,6 +172,7 @@ typedef short     Int16;
 #define LOGERROR LOG
 #define LOGWARNING LOG
 #define LOGINFO LOG
+#define LOGWARN LOG
 
 /// Evaluates to the number of elements in an array (compile-time!)
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))

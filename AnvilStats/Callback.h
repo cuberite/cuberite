@@ -51,6 +51,9 @@ public:
 	
 	virtual bool OnHeightMap(const int * a_HeightMap) { return true; }
 	
+	/** If there is data for the section, this callback is called; otherwise OnEmptySection() is called instead.
+	All OnSection() callbacks are called first, and only then all the remaining sections are reported in OnEmptySection().
+	*/
 	virtual bool OnSection(
 		unsigned char a_Y,
 		const BLOCKTYPE * a_BlockTypes,
@@ -59,6 +62,11 @@ public:
 		const NIBBLETYPE * a_BlockLight,
 		const NIBBLETYPE * a_BlockSkyLight
 	) { return true; }
+	
+	/** If there is no data for a section, this callback is called; otherwise OnSection() is called instead. 
+	OnEmptySection() callbacks are called after all OnSection() callbacks.
+	*/
+	virtual bool OnEmptySection(unsigned char a_Y) { return false; }
 	
 	// TODO: entities, tile-entities, tile-ticks
 } ;
