@@ -206,7 +206,7 @@ void cStatisticsFactory::SaveBiomes(void)
 	for (int i = 0; i <= 255; i++)
 	{
 		AString Line;
-		Printf(Line, "%s\t%d\t%.05f\n", GetBiomeString(i), i, m_BiomeCounts[i], ((double)m_BiomeCounts[i]) / TotalColumns);
+		Printf(Line, "%s\t%d\t%d\t%.05f\n", GetBiomeString(i), i, m_BiomeCounts[i], ((double)m_BiomeCounts[i]) / TotalColumns);
 		f.Write(Line.c_str(), Line.length());
 	}
 }
