@@ -142,6 +142,7 @@
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				StackReserveSize="16777216"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"

@@ -18,7 +18,7 @@ Possible usage:
 
 This project is Windows-only, although it shouldn't be too difficult to make it portable.
 
-
+Because this project uses NBT extensively, it runs much faster in Release mode.
 
 
 */

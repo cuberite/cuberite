@@ -14,7 +14,6 @@
 
 
 const int CHUNK_INFLATE_MAX = 1 MiB;
-const int MAX_COMPRESSED_CHUNK_SIZE = 1 MiB;
 
 
 
@@ -77,20 +76,30 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 		return;
 	}
 	
-	int Header[2048];
-	if (f.Read(Header, sizeof(Header)) != sizeof(Header))
+	AString FileContents;
+	f.ReadRestOfFile(FileContents);
+	if (FileContents.size() < sizeof(8 KiB))
 	{
 		LOG("Cannot read header in file \"%s\", skipping file.", a_FileName.c_str());
 		return;
 	}
 	
+	ProcessFileData(FileContents.data(), FileContents.size(), RegionX * 32, RegionZ * 32);
+}
+
+
+
+
+
+void cProcessor::cThread::ProcessFileData(const char * a_FileData, size_t a_Size, int a_ChunkBaseX, int a_ChunkBaseZ)
+{
+	int Header[2048];
+	int * HeaderPtr = (int *)a_FileData;
 	for (int i = 0; i < ARRAYCOUNT(Header); i++)
 	{
-		Header[i] = ntohl(Header[i]);
+		Header[i] = ntohl(HeaderPtr[i]);
 	}
 	
-	int ChunkBaseX = RegionX * 32;
-	int ChunkBaseZ = RegionZ * 32;
 	for (int i = 0; i < 1024; i++)
 	{
 		unsigned Location = Header[i];
@@ -98,19 +107,20 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 		if (
 			((Location == 0) && (Timestamp == 0)) || // Official docs' "not present"
 			(Location >> 8 < 2)                   || // Logical - no chunk can start inside the header
-			((Location & 0xff) == 0)                 // Logical - no chunk can be zero bytes
+			((Location & 0xff) == 0)              || // Logical - no chunk can be zero bytes
+			((Location >> 8) * 4096 > a_Size)        // Logical - no chunk can start at beyond the file end
 		)
 		{
 			// Chunk not present in the file
 			continue;
 		}
-		int ChunkX = ChunkBaseX + (i % 32);
-		int ChunkZ = ChunkBaseZ + (i / 32);
+		int ChunkX = a_ChunkBaseX + (i % 32);
+		int ChunkZ = a_ChunkBaseZ + (i / 32);
 		if (m_Callback.OnNewChunk(ChunkX, ChunkZ))
 		{
 			continue;
 		}
-		ProcessChunk(f, ChunkX, ChunkZ, Location >> 8, Location & 0xff, Timestamp);
+		ProcessChunk(a_FileData, ChunkX, ChunkZ, Location >> 8, Location & 0xff, Timestamp);
 	}  // for i - chunk index
 }
 
@@ -118,47 +128,23 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 
 
 
-void cProcessor::cThread::ProcessChunk(cFile & a_File, int a_ChunkX, int a_ChunkZ, unsigned a_SectorStart, unsigned a_SectorSize, unsigned a_TimeStamp)
+void cProcessor::cThread::ProcessChunk(const char * a_FileData, int a_ChunkX, int a_ChunkZ, unsigned a_SectorStart, unsigned a_SectorSize, unsigned a_TimeStamp)
 {
 	if (m_Callback.OnHeader(a_SectorStart * 4096, a_SectorSize, a_TimeStamp))
 	{
 		return;
 	}
 	
-	if (a_File.Seek(a_SectorStart * 4096) < 0)
-	{
-		LOG("Seeking to sector %d failed, skipping chunk [%d, %d]", a_SectorStart, a_ChunkX, a_ChunkZ);
-		return;
-	}
-	
-	int ByteSize;
-	if (a_File.Read(&ByteSize, sizeof(ByteSize)) != sizeof(ByteSize))
-	{
-		LOG("Cannot read bytesize at offset %d, skipping chunk [%d, %d].", a_SectorStart * 4096, a_ChunkX, a_ChunkZ);
-		return;
-	}
-	ByteSize = ntohl(ByteSize);
-	
-	char CompressionMethod;
-	if (a_File.Read(&CompressionMethod, sizeof(CompressionMethod)) != sizeof(CompressionMethod))
-	{
-		LOG("Cannot read CompressionMethod at offset %d, skipping chunk [%d, %d].", a_SectorStart * 4096 + 4, a_ChunkX, a_ChunkZ);
-		return;
-	}
+	const char * ChunkStart = a_FileData + a_SectorStart * 4096;
+	int ByteSize = ntohl(*(int *)ChunkStart);
+	char CompressionMethod = ChunkStart[4];
 	
 	if (m_Callback.OnCompressedDataSizePos(ByteSize, a_SectorStart * 4096 + 5, CompressionMethod))
 	{
 		return;
 	}
 
-	char CompressedData[MAX_COMPRESSED_CHUNK_SIZE];
-	if (a_File.Read(CompressedData, ByteSize - 1) != ByteSize - 1)
-	{
-		LOG("Cannot read %d bytes of compressed data at offset %d, skipping chunk [%d, %d]", ByteSize - 1, a_SectorStart * 4096 + 5, a_ChunkX, a_ChunkZ);
-		return;
-	}
-	
-	ProcessCompressedChunkData(a_ChunkX, a_ChunkZ, CompressedData, ByteSize);
+	ProcessCompressedChunkData(a_ChunkX, a_ChunkZ, ChunkStart + 5, ByteSize);
 }
 
 

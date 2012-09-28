@@ -35,7 +35,8 @@ class cProcessor
 		virtual void Execute(void) override;
 		
 		void ProcessFile(const AString & a_FileName);
-		void ProcessChunk(cFile & a_File, int a_ChunkX, int a_ChunkZ, unsigned a_SectorStart, unsigned a_SectorSize, unsigned a_TimeStamp);
+		void ProcessFileData(const char * a_FileData, size_t a_Size, int a_ChunkBaseX, int a_ChunkBaseZ);
+		void ProcessChunk(const char * a_FileData, int a_ChunkX, int a_ChunkZ, unsigned a_SectorStart, unsigned a_SectorSize, unsigned a_TimeStamp);
 		void ProcessCompressedChunkData(int a_ChunkX, int a_ChunkZ, const char * a_CompressedData, int a_CompressedSize);
 		void ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT);
 		bool ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag);
