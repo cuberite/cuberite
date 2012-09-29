@@ -48,6 +48,7 @@ Stick, 4         = Planks, 2:2, 2:3
 Torch, 4         = Stick, 1:2 | Coal, 1:1
 Workbench        = Planks, 1:1, 1:2, 2:1, 2:2
 Chest            = Planks,      1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+EnderChest       = EyeOfEnder,  2:2 | Obsidian, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 Furnace          = Cobblestone, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 
 
@@ -61,6 +62,7 @@ IronBlock        = IronIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 GoldBlock        = GoldIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 DiamondBlock     = Diamond,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 LapisBlock       = LapisLazuli, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+EmeraldBlock     = Emerald,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 Glowstone        = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
 Wool             = String,    1:1, 1:2, 2:1, 2:2
 TNT              = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3:2, 2:3
@@ -85,15 +87,15 @@ SandstoneStairs, 4   = Sandstone,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 NetherBrickStairs, 4 = NetherBrick, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 NetherBrickStairs, 4 = NetherBrick, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 
-SnowBlock        = SnowBall,  1:1, 1:2, 2:1, 2:2
-ClayBlock        = Clay,      1:1, 1:2, 2:1, 2:2
-BrickBlock       = Brick,     1:1, 1:2, 2:1, 2:2
-StoneBrick, 4    = Stone,     1:1, 1:2, 2:1, 2:2
-BookShelf        = Planks,    1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
-Sandstone, 4     = Sand,      1:1, 1:2, 2:1, 2:2
-SmoothSandstone,4= Sandstone, 1:1, 1:2, 2:1, 2:2
-OrnamentSandstone= SandstoneSlab, 1:1, 1:2
-JackOLantern     = Pumpkin, 1:1 | Torch, 1:2
+SnowBlock          = SnowBall,  1:1, 1:2, 2:1, 2:2
+ClayBlock          = Clay,      1:1, 1:2, 2:1, 2:2
+BrickBlock         = Brick,     1:1, 1:2, 2:1, 2:2
+StoneBrick, 4      = Stone,     1:1, 1:2, 2:1, 2:2
+BookShelf          = Planks,    1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
+Sandstone, 4       = Sand,      1:1, 1:2, 2:1, 2:2
+SmoothSandstone, 4 = Sandstone, 1:1, 1:2, 2:1, 2:2
+OrnamentSandstone  = SandstoneSlab, 1:1, 1:2
+JackOLantern       = Pumpkin, 1:1 | Torch, 1:2
 
 
 
@@ -233,6 +235,7 @@ Repeater         = Stone,  1:2, 2:2, 3:2            | RedstoneTorchOn, 1:1, 3:1 
 Piston           = Planks, 1:1, 2:1, 3:1            | RedstoneDust, 2:2         | Cobblestone, 1:2, 3:2, 1:3, 2:3, 3:3
 StickyPiston     = Piston, *         | SlimeBall, *
 RedstoneLamp     = RedstoneDust, 2:1, 1:2, 3:2, 2:3 | Glowstone, 2:2
+tripwirehook, 2  = planks, 2:3 | stick, 2:2 | ironbar, 2:1
 
 
 
@@ -241,16 +244,17 @@ RedstoneLamp     = RedstoneDust, 2:1, 1:2, 3:2, 2:3 | Glowstone, 2:2
 #******************************************************#
 # Food
 #
-Bowl            = Planks, 1:1, 2:2, 3:1
-MushroomStew    = Bowl, * | BrownMushroom, * | RedMushroom, *
-Bread           = Wheat, 1:1, 2:1, 3:1
-Sugar           = Sugarcane, *
-Cake            = MilkBucket, 1:1, 2:1, 3:1 | Sugar, 1:2, 3:2 | Egg, 2:2 | Wheat, 1:3, 2:3, 3:3
-Cookie          = Wheat, *, * | CocoaBeans, *
-GoldenApple     = RedApple, 2:2 | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
-Melon           = MelonSlice, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-MelonSeeds      = MelonSlice, *
-PumpkinSeeds, 4 = Pumpkin, *
+Bowl                 = Planks, 1:1, 2:2, 3:1
+MushroomStew         = Bowl, * | BrownMushroom, * | RedMushroom, *
+Bread                = Wheat, 1:1, 2:1, 3:1
+Sugar                = Sugarcane, *
+Cake                 = MilkBucket, 1:1, 2:1, 3:1 | Sugar, 1:2, 3:2 | Egg, 2:2 | Wheat, 1:3, 2:3, 3:3
+Cookie               = Wheat, *, * | CocoaBeans, *
+GoldenApple          = RedApple, 2:2 | GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+EnchantedGoldenApple = RedApple, 2:2 | GoldBlock, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+Melon                = MelonSlice, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+MelonSeeds           = MelonSlice, *
+PumpkinSeeds, 4      = Pumpkin, *
 
 
 
@@ -272,7 +276,8 @@ Ladder, 3           = Stick, 1:1, 3:1, 1:2, 2:2, 3:2, 1:3, 3:3
 GlassPane, 16       = Glass,     1:1, 2:1, 3:1, 1:2, 2:2, 3:2
 IronBars, 16        = IronIngot, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
 Paper, 3            = Sugarcane, 1:1, 2:1, 3:1
-Book                = Paper,     1:1, 1:2, 1:3
+Book                = Paper, * | leather, *
+Bookandquill        = Book, * | feather, * | inksac, *
 Fence, 2            = Stick,       1:1, 2:1, 3:1, 1:2, 2:2, 3:2
 NetherBrickFence, 6 = NetherBrick, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
 FenceGate           = Stick,       1:1, 1:2, 3:1, 3:2  | Planks, 2:1, 2:2
