@@ -530,8 +530,6 @@ void cSocketThreads::cSocketThread::Execute(void)
 		}
 		
 		WriteToSockets(&fdWrite);
-		
-		RemoveClosedSockets();
 	}  // while (!mShouldTerminate)
 }
 
@@ -676,25 +674,6 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 		}
 		*/
 	}  // for i - m_Slots[i]
-}
-
-
-
-
-
-void cSocketThreads::cSocketThread::RemoveClosedSockets(void)
-{
-	// Removes sockets that have been queued for closing from m_Slots[]
-	
-	cCSLock Lock(m_Parent->m_CS);
-	for (int i = m_NumSlots - 1; i >= 0; --i)
-	{
-		if (!m_Slots[i].m_ShouldClose || !m_Slots[i].m_Outgoing.empty())
-		{
-			continue;
-		}
-		m_Slots[i] = m_Slots[--m_NumSlots];
-	}  // for i - m_Slots[]
 }
 
 

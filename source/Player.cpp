@@ -66,6 +66,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
 
+	// DEBUG:
+	LOGD("Inventory window for player %p is at %p", this, m_InventoryWindow);
+
 	SetMaxHealth(20);
 	m_MaxFoodLevel = 20;
 	m_MaxFoodSaturationLevel = 20.f;
@@ -103,7 +106,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 cPlayer::~cPlayer(void)
 {
-	LOG("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
+	LOG("Deleting cPlayer \"%s\" at %p, ID %d; inv win %p", m_PlayerName.c_str(), this, GetUniqueID(), m_InventoryWindow);
 	
 	SaveToDisk();
 

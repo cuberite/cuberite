@@ -149,7 +149,6 @@ private:
 		void PrepareSet     (fd_set * a_Set, cSocket::xSocket & a_Highest);  // Puts all sockets into the set, along with m_ControlSocket1
 		void ReadFromSockets(fd_set * a_Read);  // Reads from sockets indicated in a_Read
 		void WriteToSockets (fd_set * a_Write);  // Writes to sockets indicated in a_Write
-		void RemoveClosedSockets(void);  // Removes sockets that have closed from m_Slots[]
 	} ;
 	
 	typedef std::list<cSocketThread *> cSocketThreadList;
