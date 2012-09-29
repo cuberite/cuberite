@@ -46,7 +46,11 @@ public:
 
 	static const int MAXBLOCKCHANGEINTERACTIONS = 20; // 5 didn't help, 10 still doesn't work in Creative, 20 seems to have done the trick
 	
-	static const int DEFAULT_VIEW_DISTANCE = 9;  // The default ViewDistance (used when no value is set in Settings.ini)
+#if defined(ANDROID_NDK)
+	static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
+#else
+	static const int DEFAULT_VIEW_DISTANCE = 9;
+#endif
 	static const int MAX_VIEW_DISTANCE = 10;
 	static const int MIN_VIEW_DISTANCE = 4;
 

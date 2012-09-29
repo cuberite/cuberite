@@ -238,8 +238,9 @@ public:
 	/// Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
-	void SetBlock     (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );						//tolua_export
+	void SetBlock     (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );					//tolua_export
 	void FastSetBlock (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );					//tolua_export
+	void FastSetBlock (const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta ); } // tolua_export
 	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z );															//tolua_export
 	BLOCKTYPE GetBlock(const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }			//tolua_export
 	NIBBLETYPE GetBlockMeta(int a_X, int a_Y, int a_Z );														//tolua_export

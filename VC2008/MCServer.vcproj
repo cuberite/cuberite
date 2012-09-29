@@ -1691,6 +1691,10 @@
 				Name="Blocks"
 				>
 				<File
+					RelativePath="..\source\blocks\BlockBed.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockCactus.h"
 					>
 				</File>
@@ -1878,6 +1882,10 @@
 			<Filter
 				Name="Items"
 				>
+				<File
+					RelativePath="..\source\items\ItemBed.h"
+					>
+				</File>
 				<File
 					RelativePath="..\source\items\ItemBucket.h"
 					>

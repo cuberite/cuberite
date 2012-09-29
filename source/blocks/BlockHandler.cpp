@@ -41,6 +41,7 @@
 #include "BlockIce.h"
 #include "BlockOre.h"
 #include "BlockNote.h"
+#include "BlockBed.h"
 
 
 
@@ -91,7 +92,7 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 			return new cBlockRedstoneTorchHandler(a_BlockID);
 		case E_BLOCK_REDSTONE_WIRE:	
 			return new cBlockRedstoneHandler(a_BlockID);
-		case  E_BLOCK_PISTON:
+		case E_BLOCK_PISTON:
 		case E_BLOCK_STICKY_PISTON:
 			return new cBlockPistonHandler(a_BlockID);
 		case E_BLOCK_REDSTONE_REPEATER_ON:
@@ -182,6 +183,8 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 			return new cBlockMelonHandler(a_BlockID);
 		case E_BLOCK_NOTE_BLOCK:
 			return new cBlockNoteHandler(a_BlockID);
+		case E_BLOCK_BED:
+			return new cBlockBedHandler(a_BlockID);
 		default:		
 			return new cBlockHandler(a_BlockID);
 			break;

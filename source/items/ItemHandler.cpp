@@ -26,6 +26,7 @@
 #include "ItemDoor.h"
 #include "ItemFood.h"
 #include "ItemSign.h"
+#include "ItemBed.h"
 
 #include "../blocks/BlockHandler.h"
 
@@ -166,6 +167,9 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemID)
 		
 		case E_ITEM_SIGN:
 			return new cItemSignHandler(a_ItemID);
+
+		case E_ITEM_BED:
+			return new cItemBedHandler(a_ItemID);
 	}
 }
 

@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -52,6 +54,13 @@ public class MCServerActivity extends Activity {
 			public void onClick(View v) {
 				mbEnabledLogging = true;
 				NativeCleanUp();
+			}
+		});
+        
+        ((Button)findViewById(R.id.configure_server)).setOnClickListener( new View.OnClickListener() {
+			public void onClick(View v) {
+				Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://localhost:8081/webadmin/"));
+				startActivity( myIntent );
 			}
 		});
         
@@ -162,11 +171,13 @@ public class MCServerActivity extends Activity {
 			((TextView)findViewById(R.id.server_status_text)).setTextColor(Color.GREEN);
 			((Button)findViewById(R.id.stop_server)).setEnabled(true);
 			((Button)findViewById(R.id.start_server)).setEnabled(false);
+			((Button)findViewById(R.id.configure_server)).setEnabled(true);
 		} else {
 			((TextView)findViewById(R.id.server_status_text)).setText(R.string.mcserver_is_not_running);
 			((TextView)findViewById(R.id.server_status_text)).setTextColor(Color.RED);
 			((Button)findViewById(R.id.stop_server)).setEnabled(false);
 			((Button)findViewById(R.id.start_server)).setEnabled(true);
+			((Button)findViewById(R.id.configure_server)).setEnabled(false);
 		}
     }
     

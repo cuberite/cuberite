@@ -17,7 +17,6 @@ LOCAL_CFLAGS := -DANDROID_NDK \
 				-funroll-loops \
 				-mfloat-abi=softfp -mfpu=neon \
 				-fexceptions \
-				-D_DEBUG \
 
 
 LOCAL_STATIC_LIBRARIES := cpufeatures
