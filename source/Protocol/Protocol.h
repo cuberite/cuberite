@@ -84,6 +84,7 @@ public:
 	virtual void SendWholeInventory   (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose      (char a_WindowID) = 0;
 	virtual void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) = 0;
+	virtual void SendUseBed           (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) = 0;
 
 	/// Returns the ServerID used for authentication through session.minecraft.net
 	virtual AString GetAuthServerID(void) = 0;

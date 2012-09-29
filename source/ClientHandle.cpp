@@ -962,6 +962,24 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
+void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
+{
+	if( a_EntityID != m_Player->GetUniqueID() )
+	{
+		// We should only receive entity actions from the entity that is performing the action
+		return;
+	}
+
+	if( a_ActionID == 3 ) // Leave bed
+	{
+		m_Player->GetWorld()->BroadcastPlayerAnimation( *m_Player, 3 );
+	}
+}
+
+
+
+
+
 void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
 	{
@@ -1455,6 +1473,15 @@ void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int
 void cClientHandle::SendBlockBreakAnim(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage)
 {
 	m_Protocol->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);
+}
+
+
+
+
+
+void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 

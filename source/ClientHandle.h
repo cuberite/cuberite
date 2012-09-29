@@ -117,6 +117,7 @@ public:
 	void SendWholeInventory   (const cWindow    & a_Window);
 	void SendWindowClose      (char a_WindowID);
 	void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
+	void SendUseBed           (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 
 	const AString & GetUsername(void) const;		//tolua_export
 	
@@ -161,6 +162,7 @@ public:
 	void HandleDisconnect       (const AString & a_Reason);
 	void HandleKeepAlive        (int a_KeepAliveID);
 	bool HandleHandshake        (const AString & a_Username);
+	void HandleEntityAction     (int a_EntityID, char a_ActionID);
 	
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.

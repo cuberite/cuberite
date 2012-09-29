@@ -1440,6 +1440,15 @@ void cWorld::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_bl
 
 
 
+void cWorld::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	m_ChunkMap->BroadcastUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);

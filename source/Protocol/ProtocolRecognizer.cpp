@@ -485,6 +485,16 @@ void cProtocolRecognizer::SendWindowOpen(char a_WindowID, char a_WindowType, con
 
 
 
+void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 AString cProtocolRecognizer::GetAuthServerID(void)
 {
 	ASSERT(m_Protocol != NULL);

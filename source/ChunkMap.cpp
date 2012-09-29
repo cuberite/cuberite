@@ -484,6 +484,25 @@ void cChunkMap::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a
 
 
 
+void cChunkMap::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 void cChunkMap::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);

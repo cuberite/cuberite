@@ -1691,6 +1691,10 @@
 				Name="Blocks"
 				>
 				<File
+					RelativePath="..\source\Blocks\BlockBed.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockBed.h"
 					>
 				</File>

@@ -46,7 +46,7 @@ enum
 	PACKET_BLOCK_DIG                 = 0x0e,
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECTED             = 0x10,
-	PACKET_ADD_TO_INV                = 0x11,  // TODO: Sure this is not Use Bed??
+	PACKET_USE_BED                   = 0x11,  // TODO: Sure this is not Use Bed??
 	PACKET_ANIMATION                 = 0x12,
 	PACKET_PACKET_ENTITY_ACTION      = 0x13,
 	PACKET_PLAYER_SPAWN              = 0x14,
@@ -778,6 +778,22 @@ void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AStr
 
 
 
+void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_USE_BED);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(0);	// Unknown byte only 0 has been observed
+	WriteInt (a_BlockX);
+	WriteByte(a_BlockY);
+	WriteInt (a_BlockZ);
+	Flush();
+}
+
+
+
+
+
 AString cProtocol125::GetAuthServerID(void)
 {
 	// http://wiki.vg/wiki/index.php?title=Session&oldid=2262
@@ -985,7 +1001,7 @@ int cProtocol125::ParseEntityAction(void)
 {
 	HANDLE_PACKET_READ(ReadBEInt, int,  EntityID);
 	HANDLE_PACKET_READ(ReadChar,  char, ActionID);
-	// TODO: m_Client->HandleEntityAction(...);
+	m_Client->HandleEntityAction(EntityID, ActionID);
 	return PARSE_OK;
 }
 

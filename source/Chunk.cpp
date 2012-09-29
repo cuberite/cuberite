@@ -1787,6 +1787,18 @@ void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_bl
 
 
 
+void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		(*itr)->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
 void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
