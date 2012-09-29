@@ -23,8 +23,8 @@
 #include "ChatColor.h"
 #include "OSSupport/Socket.h"
 #include "OSSupport/Timer.h"
-#include "items/ItemHandler.h"
-#include "blocks/BlockHandler.h"
+#include "Items/ItemHandler.h"
+#include "Blocks/BlockHandler.h"
 
 #include "Tracer.h"
 #include "Vector3f.h"

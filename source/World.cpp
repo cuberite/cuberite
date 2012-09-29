@@ -43,7 +43,7 @@
 #include "Tracer.h"
 #include "Generating/Trees.h"
 #include "PluginManager.h"
-#include "blocks/BlockHandler.h"
+#include "Blocks/BlockHandler.h"
 #include "Vector3d.h"
 
 #include "tolua++.h"

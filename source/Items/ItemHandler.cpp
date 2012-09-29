@@ -28,7 +28,7 @@
 #include "ItemSign.h"
 #include "ItemBed.h"
 
-#include "../blocks/BlockHandler.h"
+#include "../Blocks/BlockHandler.h"
 
 
 

@@ -12,8 +12,8 @@
 #include "MonsterConfig.h"
 #include "Redstone.h"
 #include "Player.h"
-#include "blocks/BlockHandler.h"
-#include "items/ItemHandler.h"
+#include "Blocks/BlockHandler.h"
+#include "Items/ItemHandler.h"
 #include "Chunk.h"
 
 #ifdef USE_SQUIRREL

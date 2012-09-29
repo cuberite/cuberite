@@ -29,7 +29,7 @@
 #include "Player.h"
 #include "BlockArea.h"
 #include "PluginManager.h"
-#include "blocks/BlockHandler.h"
+#include "Blocks/BlockHandler.h"
 
 #include <json/json.h>
 

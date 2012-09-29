@@ -9,7 +9,7 @@
 #include "BlockID.h"
 #include "Defines.h"
 #include "Item.h"
-#include "blocks/BlockHandler.h"
+#include "Blocks/BlockHandler.h"
 
 
 

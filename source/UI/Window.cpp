@@ -8,7 +8,7 @@
 #include "../Pickup.h"
 #include "../Inventory.h"
 #include "WindowOwner.h"
-#include "../items/ItemHandler.h"
+#include "../Items/ItemHandler.h"
 #include "SlotArea.h"
 #include "../ChestEntity.h"
 

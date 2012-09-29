@@ -11,7 +11,7 @@
 #include "World.h"
 #include "BlockID.h"
 #include "Server.h"
-#include "blocks/BlockHandler.h"
+#include "Blocks/BlockHandler.h"
 
 extern bool g_BlockPistonBreakable[];
 
