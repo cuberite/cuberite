@@ -1061,10 +1061,6 @@ void cClientHandle::Tick(float a_Dt)
 	if (cWorld::GetTime() - m_TimeLastPacket > 30.f)  // 30 seconds time-out
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
-
-		// TODO: Cannot sleep in the tick thread!
-		cSleep::MilliSleep(1000);  // Give packet some time to be received
-
 		Destroy();
 	}
 	
