@@ -100,7 +100,7 @@ void cWindow::Clicked(
 		return;
 	}
 
-	if (a_SlotNum == -999)  // Outside window click
+	if (a_SlotNum < 0)  // Outside window click
 	{
 		if (a_IsRightClick)
 		{
