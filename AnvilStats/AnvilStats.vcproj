@@ -183,6 +183,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BiomeMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BiomeMap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Callback.h"
 				>
 			</File>

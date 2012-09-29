@@ -4,8 +4,9 @@
 // Implements the main app entrypoint
 
 #include "Globals.h"
-#include "Statistics.h"
 #include "Processor.h"
+#include "Statistics.h"
+#include "BiomeMap.h"
 
 
 
@@ -16,6 +17,9 @@ int main(int argc, char * argv[])
 	if (argc < 2)
 	{
 		LOG("Usage: %s <method number> [<world folder>]", argv[0]);
+		LOG("Available methods:");
+		LOG("  0 - statistics");
+		LOG("  1 - biome map");
 		LOG("\nNo method number present, aborting.");
 		return -1;
 	}
@@ -34,6 +38,7 @@ int main(int argc, char * argv[])
 	switch (atol(argv[1]))
 	{
 		case 0: Factory = new cStatisticsFactory; break;
+		case 1: Factory = new cBiomeMapFactory; break;
 		default:
 		{
 			LOG("Unknown method \"%s\", aborting.", argv[1]);
