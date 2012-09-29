@@ -597,8 +597,6 @@ const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player)
 		return NULL;
 	}
 	
-	LOGD("cSlotAreaTemporary: getting slot %d as %s", a_SlotNum, ItemToFullString(itr->second[a_SlotNum]).c_str());
-	
 	return &(itr->second[a_SlotNum]);
 }
 
@@ -608,8 +606,6 @@ const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player)
 
 void cSlotAreaTemporary::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	LOGD("cSlotAreaTemporary: setting slot %d to %s", a_SlotNum, ItemToFullString(a_Item).c_str());
-	
 	cItemMap::iterator itr = m_Items.find(a_Player.GetUniqueID());
 	if (itr == m_Items.end())
 	{
