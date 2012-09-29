@@ -95,6 +95,8 @@ public:
 	/// Returns true if the file specified exists
 	static bool Exists(const AString & a_FileName);
 	
+	int Printf(const char * a_Fmt, ...);
+	
 private:
 	#ifdef USE_STDIO_FILE
 	FILE * m_File;
