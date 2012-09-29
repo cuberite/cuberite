@@ -256,7 +256,21 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 	{
 		return;
 	}
-	// TODO: entities, tile-entities etc.
+	
+	if (ProcessChunkEntities(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
+	{
+		return;
+	}
+	
+	if (ProcessChunkTileEntities(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
+	{
+		return;
+	}
+	
+	if (ProcessChunkTileTicks(a_ChunkX, a_ChunkZ, a_NBT, LevelTag))
+	{
+		return;
+	}
 }
 
 
@@ -316,6 +330,134 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 		}
 	}
 	
+	return false;
+}
+
+
+
+
+
+bool cProcessor::cThread::ProcessChunkEntities(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag)
+{
+	int EntitiesTag = a_NBT.FindChildByName(a_LevelTag, "Entities");
+	if (EntitiesTag < 0)
+	{
+		return false;
+	}
+	
+	for (int EntityTag = a_NBT.GetFirstChild(EntitiesTag); EntityTag > 0; EntityTag = a_NBT.GetNextSibling(EntityTag))
+	{
+		int PosTag = a_NBT.FindChildByName(EntityTag, "Pos");
+		if (PosTag < 0)
+		{
+			continue;
+		}
+		int SpeedTag = a_NBT.FindChildByName(EntityTag, "Motion");
+		if (SpeedTag < 0)
+		{
+			continue;
+		}
+		int RotTag = a_NBT.FindChildByName(EntityTag, "Rotation");
+		if (RotTag < 0)
+		{
+			continue;
+		}
+		double Pos[3];
+		for (int i = 0, tag = a_NBT.GetFirstChild(PosTag); (i < 3) && (tag > 0); i++)
+		{
+			Pos[i] = a_NBT.GetDouble(tag);
+		}
+		double Speed[3];
+		for (int i = 0, tag = a_NBT.GetFirstChild(SpeedTag); (i < 3) && (tag > 0); i++)
+		{
+			Speed[i] = a_NBT.GetDouble(tag);
+		}
+		float Rot[2];
+		for (int i = 0, tag = a_NBT.GetFirstChild(RotTag); (i < 2) && (tag > 0); i++)
+		{
+			Rot[i] = a_NBT.GetFloat(tag);
+		}
+
+		if (m_Callback.OnEntity(
+			a_NBT.GetString(a_NBT.FindChildByName(EntityTag, "id")),
+			Pos[0], Pos[1], Pos[2],
+			Speed[0], Speed[1], Speed[2],
+			Rot[0], Rot[1],
+			a_NBT.GetFloat(a_NBT.FindChildByName(EntityTag, "FallDistance")),
+			a_NBT.GetShort(a_NBT.FindChildByName(EntityTag, "Fire")),
+			a_NBT.GetShort(a_NBT.FindChildByName(EntityTag, "Air")),
+			a_NBT.GetByte(a_NBT.FindChildByName(EntityTag, "OnGround")),
+			a_NBT, EntityTag
+		))
+		{
+			return true;
+		}
+	}  // for EntityTag - Entities[]
+	return false;
+}
+
+
+
+
+
+bool cProcessor::cThread::ProcessChunkTileEntities(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag)
+{
+	int TileEntitiesTag = a_NBT.FindChildByName(a_LevelTag, "TileEntities");
+	if (TileEntitiesTag < 0)
+	{
+		return false;
+	}
+	
+	for (int TileEntityTag = a_NBT.GetFirstChild(TileEntitiesTag); TileEntityTag > 0; TileEntityTag = a_NBT.GetNextSibling(TileEntityTag))
+	{
+		if (m_Callback.OnTileEntity(
+			a_NBT.GetString(a_NBT.FindChildByName(TileEntityTag, "id")),
+			a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "x")),
+			a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "y")),
+			a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "z")),
+			a_NBT, TileEntityTag
+		))
+		{
+			return true;
+		}
+	}  // for EntityTag - Entities[]
+	return false;
+}
+
+
+
+
+
+bool cProcessor::cThread::ProcessChunkTileTicks(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag)
+{
+	int TileTicksTag = a_NBT.FindChildByName(a_LevelTag, "TileTicks");
+	if (TileTicksTag < 0)
+	{
+		return false;
+	}
+	
+	for (int TileTickTag = a_NBT.GetFirstChild(TileTicksTag); TileTickTag > 0; TileTickTag = a_NBT.GetNextSibling(TileTickTag))
+	{
+		int iTag = a_NBT.FindChildByName(TileTicksTag, "i");
+		int tTag = a_NBT.FindChildByName(TileTicksTag, "t");
+		int xTag = a_NBT.FindChildByName(TileTicksTag, "x");
+		int yTag = a_NBT.FindChildByName(TileTicksTag, "y");
+		int zTag = a_NBT.FindChildByName(TileTicksTag, "z");
+		if ((iTag < 0) || (tTag < 0) || (xTag < 0) || (yTag < 0) || (zTag < 0))
+		{
+			continue;
+		}
+		if (m_Callback.OnTileTick(
+			a_NBT.GetInt(iTag),
+			a_NBT.GetInt(iTag),
+			a_NBT.GetInt(iTag),
+			a_NBT.GetInt(iTag),
+			a_NBT.GetInt(iTag)
+		))
+		{
+			return true;
+		}
+	}  // for EntityTag - Entities[]
 	return false;
 }
 

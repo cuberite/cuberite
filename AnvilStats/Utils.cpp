@@ -10,6 +10,47 @@
 
 
 
+struct
+{
+	eEntityType  Type;
+	const char * String;
+} g_EntityTypes[] =
+{
+	{entBat,           "Bat"},
+	{entBlaze,         "Blaze"},
+	{entCaveSpider,    "CaveSpider"},
+	{entChicken,       "Chicken"},
+	{entCow,           "Cow"},
+	{entCreeper,       "Creeper"},
+	{entEnderDragon,   "EnderDragon"},
+	{entEnderman,      "Enderman"},
+	{entGhast,         "Ghast"},
+	{entGiant,         "Giant"},
+	{entLavaSlime,     "LavaSlime"},
+	{entMushroomCow,   "MushroomCow"},
+	{entOzelot,        "Ozelot"},
+	{entPig,           "Pig"},
+	{entPigZombie,     "PigZombie"},
+	{entSheep,         "Sheep"},
+	{entSilverfish,    "Slverfish"},
+	{entSkeleton,      "Skeleton"},
+	{entSlime,         "Slime"},
+	{entSnowMan,       "SnowMan"},
+	{entSpider,        "Spider"},
+	{entSquid,         "Squid"},
+	{entVillager,      "Villager"},
+	{entVillagerGolem, "VillagerGolem"},
+	{entWitch,         "Witch"},
+	{entWitherBoss,    "WitherBoss"},
+	{entWolf,          "Wolf"},
+	{entZombie,        "Zombie"},
+	{entUnknown,       "Unknown"},
+} ;
+
+
+
+
+
 const char * GetBiomeString(unsigned char a_Biome)
 {
 	static const char * BiomeNames[] =  // Biome names, as equivalent to their index
@@ -197,6 +238,31 @@ const char * GetBlockTypeString(unsigned char a_BlockType)
 	} ;
 	
 	return (a_BlockType < ARRAYCOUNT(BlockTypeNames)) ? BlockTypeNames[a_BlockType] : "";
+}
+
+
+
+
+
+eEntityType GetEntityType(const AString & a_EntityTypeString)
+{
+	for (int i = 0; i < ARRAYCOUNT(g_EntityTypes); i++)
+	{
+		if (a_EntityTypeString == g_EntityTypes[i].String)
+		{
+			return g_EntityTypes[i].Type;
+		}
+	}
+	return entUnknown;
+}
+
+
+
+
+
+extern const char * GetEntityTypeString(eEntityType a_EntityType)
+{
+	return g_EntityTypes[a_EntityType].String;
 }
 
 

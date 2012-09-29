@@ -39,7 +39,12 @@ class cProcessor
 		void ProcessChunk(const char * a_FileData, int a_ChunkX, int a_ChunkZ, unsigned a_SectorStart, unsigned a_SectorSize, unsigned a_TimeStamp);
 		void ProcessCompressedChunkData(int a_ChunkX, int a_ChunkZ, const char * a_CompressedData, int a_CompressedSize);
 		void ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT);
+		
+		// The following processing parts return true if they were interrupted by the callback, causing the processing of current chunk to abort
 		bool ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag);
+		bool ProcessChunkEntities(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag);
+		bool ProcessChunkTileEntities(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag);
+		bool ProcessChunkTileTicks(int a_ChunkX, int a_ChunkZ, cParsedNBT & a_NBT, int a_LevelTag);
 
 	public:
 		cThread(cCallback & a_Callback, cProcessor & a_ParentProcessor);

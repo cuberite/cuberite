@@ -15,6 +15,8 @@
 	
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100)
+	
+	#define _CRT_SECURE_NO_WARNINGS
 
 	#define OBSOLETE __declspec(deprecated)
 	
@@ -149,6 +151,7 @@ typedef short     Int16;
 #include <map>
 #include <algorithm>
 #include <memory>
+#include <ctime>
 
 
 

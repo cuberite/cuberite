@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Callback.h"
+#include "Utils.h"
 
 
 
@@ -18,20 +19,35 @@
 class cStatistics :
 	public cCallback
 {
-	friend class cStatisticsFactory;
-	
 public:
+	class cStats
+	{
+	public:
+		int m_TotalChunks;  // Total number of chunks that go through this callback (OnNewChunk())
+		int m_BiomeCounts[256];
+		int m_BlockCounts[256][256];  // First dimension is the biome, second dimension is BlockType
+		int m_BiomeNumChunks;  // Num chunks that have been processed for biome stats
+		int m_BlockNumChunks;  // Num chunks that have been processed for block stats
+		int m_NumEntities;
+		int m_NumTileEntities;
+		int m_NumTileTicks;
+		
+		int m_SpawnerEntity[entMax + 1];
+		
+		cStats(void);
+		void Add(const cStats & a_Stats);
+	} ;
+	
 	cStatistics(void);
 	
+	const cStats & GetStats(void) const { return m_Stats; }
+	
 protected:
-	int m_TotalChunks;  // Total number of chunks that go through this callback (OnNewChunk())
-	int m_BiomeCounts[256];
-	int m_BlockCounts[256][256];  // First dimension is the biome, second dimension is BlockType
-	int m_BiomeNumChunks;  // Num chunks that have been processed for biome stats
-	int m_BlockNumChunks;  // Num chunks that have been processed for block stats
-	bool m_IsBiomesValid;  // Set to true in OnBiomes(), reset to false in OnNewChunk(); if true, the m_BiomeData is valid for the current chunk
-	unsigned char m_BiomeData[16 * 16];
-	bool m_IsFirstSectionInChunk;  // True if there was no section in the chunk yet. Set by OnNewChunk(), reset by OnSection()
+	cStats m_Stats;
+
+		bool m_IsBiomesValid;  // Set to true in OnBiomes(), reset to false in OnNewChunk(); if true, the m_BiomeData is valid for the current chunk
+		unsigned char m_BiomeData[16 * 16];
+		bool m_IsFirstSectionInChunk;  // True if there was no section in the chunk yet. Set by OnNewChunk(), reset by OnSection()
 
 	// cCallback overrides:
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) override;
@@ -51,7 +67,36 @@ protected:
 		const NIBBLETYPE * a_BlockLight,
 		const NIBBLETYPE * a_BlockSkyLight
 	) override;
+	
 	virtual bool OnEmptySection(unsigned char a_Y) override;
+	
+	virtual bool OnEntity(
+		const AString & a_EntityType,
+		double a_PosX, double a_PosY, double a_PosZ,
+		double a_SpeedX, double a_SpeedY, double a_SpeedZ,
+		float a_Yaw, float a_Pitch,
+		float a_FallDistance,
+		short a_FireTicksLeft,
+		short a_AirTicks,
+		char a_IsOnGround,
+		cParsedNBT & a_NBT,
+		int a_NBTTag
+	) override;
+	
+	virtual bool OnTileEntity(
+		const AString & a_EntityType,
+		int a_PosX, int a_PosY, int a_PosZ,
+		cParsedNBT & a_NBT,
+		int a_NBTTag
+	) override;
+	
+	virtual bool OnTileTick(
+		int a_BlockType,
+		int a_TicksLeft,
+		int a_PosX, int a_PosY, int a_PosZ
+	) override;
+	
+	void OnSpawner(cParsedNBT & a_NBT, int a_TileEntityTag);
 } ;
 
 
@@ -62,6 +107,7 @@ class cStatisticsFactory :
 	public cCallbackFactory
 {
 public:
+	cStatisticsFactory(void);
 	virtual ~cStatisticsFactory();
 	
 	virtual cCallback * CreateNewCallback(void)
@@ -71,17 +117,16 @@ public:
 	
 protected:
 	// The results, combined, are stored here:
-	int m_TotalChunks;
-	int m_BiomeCounts[256];
-	int m_BlockCounts[256][256];  // First dimension is the biome, second dimension is BlockType
-	int m_BiomeNumChunks;  // Num chunks that have been processed for biome stats
-	int m_BlockNumChunks;  // Num chunks that have been processed for block stats
+	cStatistics::cStats m_CombinedStats;
+	
+	clock_t m_BeginTick;
 
 	void JoinResults(void);
 	void SaveBiomes(void);
 	void SaveBlockTypes(void);
 	void SaveBiomeBlockTypes(void);
-
+	void SaveStatistics(void);
+	void SaveSpawners(void);
 } ;
 
 

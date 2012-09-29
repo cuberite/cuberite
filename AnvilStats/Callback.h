@@ -13,6 +13,13 @@
 
 
 
+// fwd:
+class cParsedNBT;
+
+
+
+
+
 /** The base class for all chunk-processor callbacks, declares the interface.
 The processor calls each virtual function in the order they are declared here with the specified args.
 If the function returns true, the processor moves on to next chunk and starts calling the callbacks again from start with
@@ -68,7 +75,42 @@ public:
 	*/
 	virtual bool OnEmptySection(unsigned char a_Y) { return false; }
 	
-	// TODO: entities, tile-entities, tile-ticks
+	/** Called for each entity in the chunk.
+	Common parameters are parsed from the NBT.
+	The callback may parse any other param from the a_NBT and a_NBTTag parameters.
+	The a_NBTTag parameter points to the entity compound tag inside the Entities tag.
+	*/
+	virtual bool OnEntity(
+		const AString & a_EntityType,
+		double a_PosX, double a_PosY, double a_PosZ,
+		double a_SpeedX, double a_SpeedY, double a_SpeedZ,
+		float a_Yaw, float a_Pitch,
+		float a_FallDistance,
+		short a_FireTicksLeft,
+		short a_AirTicks,
+		char a_IsOnGround,
+		cParsedNBT & a_NBT,
+		int a_NBTTag
+	) { return true; }
+	
+	/** Called for each tile entity in the chunk.
+	Common parameters are parsed from the NBT.
+	The callback may parse any other param from the a_NBT and a_NBTTag parameters.
+	The a_NBTTag parameter points to the tile entity compound tag inside the TileEntities tag.
+	*/
+	virtual bool OnTileEntity(
+		const AString & a_EntityType,
+		int a_PosX, int a_PosY, int a_PosZ,
+		cParsedNBT & a_NBT,
+		int a_NBTTag
+	) { return true; }
+
+	/// Called for each tile tick in the chunk
+	virtual bool OnTileTick(
+		int a_BlockType,
+		int a_TicksLeft,
+		int a_PosX, int a_PosY, int a_PosZ
+	) { return true; }
 } ;
 
 typedef std::vector<cCallback *> cCallbacks;
