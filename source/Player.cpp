@@ -151,9 +151,11 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	);
 	*/
 
-	if (m_bVisible)
+	if (m_bVisible && (m_ClientHandle != (&a_Client)))
 	{
 		a_Client.SendPlayerSpawn(*this);
+		a_Client.SendEntHeadLook(*this);
+		a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
 	}
 }
 
@@ -200,6 +202,7 @@ void cPlayer::Tick(float a_Dt)
 			if (m_bDirtyOrientation)
 			{
 				m_World->BroadcastEntRelMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
+				m_World->BroadcastEntHeadLook(*this, m_ClientHandle);
 				m_bDirtyOrientation = false;
 			}
 			else
