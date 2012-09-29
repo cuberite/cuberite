@@ -31,6 +31,7 @@ cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 
 cProtocolRecognizer::~cProtocolRecognizer()
 {
+	delete m_Protocol;
 }
 
 

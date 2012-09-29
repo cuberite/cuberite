@@ -41,6 +41,11 @@ cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle
 
 cWindow::~cWindow()
 {
+	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_SlotAreas.clear();
 }
 
 
