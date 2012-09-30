@@ -146,6 +146,9 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 		case E_BLOCK_STONE_BRICK_STAIRS:
 		case E_BLOCK_NETHER_BRICK_STAIRS:
 		case E_BLOCK_WOODEN_STAIRS:
+		case E_BLOCK_SPRUCE_WOOD_STAIRS:
+		case E_BLOCK_BIRCH_WOOD_STAIRS:
+		case E_BLOCK_JUNGLE_WOOD_STAIRS:
 			return new cBlockStairsHandler(a_BlockID);
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
