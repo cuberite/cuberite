@@ -21,14 +21,13 @@ public:
 	cSandSimulator( cWorld* a_World );
 	~cSandSimulator();
 
-	virtual void Simulate( float a_Dt );
-	virtual void WakeUp( int a_X, int a_Y, int a_Z );
+	virtual void Simulate( float a_Dt ) override;
 
-	virtual bool IsAllowedBlock( char a_BlockID );
-	virtual bool IsPassable( char a_BlockID );
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override;
+	virtual bool IsPassable( BLOCKTYPE a_BlockID );
 
 protected:
-	virtual void AddBlock(int a_X, int a_Y, int a_Z);
+	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;
 
 	typedef std::list <Vector3i> BlockList;
 	BlockList * m_Blocks;

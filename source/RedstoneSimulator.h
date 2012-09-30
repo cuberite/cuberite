@@ -10,10 +10,10 @@ public:
 	cRedstoneSimulator( cWorld* a_World );
 	~cRedstoneSimulator();
 
-	virtual void Simulate( float a_Dt );
-	virtual bool IsAllowedBlock( char a_BlockID ) { return true; }
+	virtual void Simulate( float a_Dt ) override;
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override { return true; }
 
-	virtual void WakeUp( int a_X, int a_Y, int a_Z );
+	virtual void WakeUp( int a_X, int a_Y, int a_Z ) override;
 
 	enum eRedstoneDirection
 	{

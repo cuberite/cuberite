@@ -80,6 +80,7 @@ public:
 	virtual void SendWindowClose      (char a_WindowID) override;
 	virtual void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) override;
 	virtual void SendUseBed           (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
+	virtual void SendSpawnObject      (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ) override;
 	
 	virtual AString GetAuthServerID(void) override;
 

@@ -52,7 +52,7 @@ enum
 	PACKET_PLAYER_SPAWN              = 0x14,
 	PACKET_PICKUP_SPAWN              = 0x15,
 	PACKET_COLLECT_PICKUP            = 0x16,
-	PACKET_ADD_VEHICLE               = 0x17,
+	PACKET_SPAWN_OBJECT              = 0x17,
 	PACKET_SPAWN_MOB                 = 0x18,
 	PACKET_DESTROY_ENTITY            = 0x1d,
 	PACKET_ENTITY                    = 0x1e,
@@ -787,6 +787,29 @@ void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 	WriteInt (a_BlockX);
 	WriteByte(a_BlockY);
 	WriteInt (a_BlockZ);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_ObjectType);
+	WriteInt ((int)(a_Entity.GetPosX() * 32));
+	WriteInt ((int)(a_Entity.GetPosY() * 32));
+	WriteInt ((int)(a_Entity.GetPosZ() * 32));
+	WriteInt (a_ObjectData);
+	if( a_ObjectData != 0 )
+	{
+		WriteShort( a_SpeedX );
+		WriteShort( a_SpeedY );
+		WriteShort( a_SpeedZ );
+	}
 	Flush();
 }
 

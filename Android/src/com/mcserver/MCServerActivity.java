@@ -59,7 +59,7 @@ public class MCServerActivity extends Activity {
         
         ((Button)findViewById(R.id.configure_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
-				Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://localhost:8081/webadmin/"));
+				Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://localhost:" + NativeGetWebAdminPort() + "/webadmin/"));
 				startActivity( myIntent );
 			}
 		});
@@ -251,6 +251,7 @@ public class MCServerActivity extends Activity {
     public native void    NativeOnCreate();
     public native void    NativeCleanUp();
     public native boolean NativeIsServerRunning();
+    public native int     NativeGetWebAdminPort();
     
 }
 

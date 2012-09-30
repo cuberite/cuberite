@@ -48,7 +48,7 @@ void cFireSimulator::Simulate( float a_Dt )
 }
 
 
-bool cFireSimulator::IsAllowedBlock( char a_BlockID )
+bool cFireSimulator::IsAllowedBlock( BLOCKTYPE a_BlockID )
 {
 	return a_BlockID == E_BLOCK_FIRE
 		|| IsBlockLava(a_BlockID);
@@ -78,12 +78,12 @@ void cFireSimulator::_AddBlock(int a_X, int a_Y, int a_Z)
 
 }
 
-bool cFireSimulator::IsForeverBurnable( char a_BlockID )
+bool cFireSimulator::IsForeverBurnable( BLOCKTYPE a_BlockID )
 {
 	return a_BlockID == E_BLOCK_BLOODSTONE;
 }
 
-bool cFireSimulator::IsBurnable( char a_BlockID )
+bool cFireSimulator::IsBurnable( BLOCKTYPE a_BlockID )
 {
 	return a_BlockID == E_BLOCK_PLANKS
 		|| a_BlockID == E_BLOCK_LEAVES
@@ -95,7 +95,7 @@ bool cFireSimulator::IsBurnable( char a_BlockID )
 		|| a_BlockID == E_BLOCK_VINES;
 }
 
-bool cFireSimulator::FiresForever( char a_BlockID )
+bool cFireSimulator::FiresForever( BLOCKTYPE a_BlockID )
 {
 	return a_BlockID != E_BLOCK_FIRE;
 }

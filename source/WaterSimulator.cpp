@@ -15,7 +15,7 @@ cWaterSimulator::cWaterSimulator(cWorld *a_World)
 }
 
 
-bool cWaterSimulator::IsAllowedBlock(char a_BlockID)
+bool cWaterSimulator::IsAllowedBlock(BLOCKTYPE a_BlockID)
 {
 	return IsBlockWater(a_BlockID);
 }

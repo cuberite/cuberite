@@ -436,7 +436,7 @@ void cFluidSimulator::Simulate( float a_Dt )
 
 
 
-bool cFluidSimulator::IsPassableForFluid(char a_BlockID)
+bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockID)
 {
 	return a_BlockID == E_BLOCK_AIR
 		|| a_BlockID == E_BLOCK_FIRE
@@ -448,7 +448,7 @@ bool cFluidSimulator::IsPassableForFluid(char a_BlockID)
 
 
 
-bool cFluidSimulator::IsStationaryBlock (char a_BlockID)
+bool cFluidSimulator::IsStationaryBlock (BLOCKTYPE a_BlockID)
 {
 	return a_BlockID == m_StationaryFluidBlock;
 }
@@ -457,7 +457,7 @@ bool cFluidSimulator::IsStationaryBlock (char a_BlockID)
 
 
 
-bool cFluidSimulator::CanWashAway( char a_BlockID )
+bool cFluidSimulator::CanWashAway( BLOCKTYPE a_BlockID )
 {
 	switch( a_BlockID )
 	{
@@ -476,7 +476,7 @@ bool cFluidSimulator::CanWashAway( char a_BlockID )
 
 
 
-bool cFluidSimulator::IsSolidBlock( char a_BlockID )
+bool cFluidSimulator::IsSolidBlock( BLOCKTYPE a_BlockID )
 {
 	return !(a_BlockID == E_BLOCK_AIR
 		|| a_BlockID == E_BLOCK_FIRE

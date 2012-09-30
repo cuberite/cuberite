@@ -81,7 +81,7 @@ inline bool IsValidItem( int a_ItemID )		//tolua_export
 
 
 
-inline bool IsBlockWater(char a_BlockID)
+inline bool IsBlockWater(BLOCKTYPE a_BlockID)
 {
 	return (a_BlockID == E_BLOCK_WATER || a_BlockID == E_BLOCK_STATIONARY_WATER);
 }
@@ -90,18 +90,18 @@ inline bool IsBlockWater(char a_BlockID)
 
 
 
-inline bool IsBlockLava(char a_BlockID)
+inline bool IsBlockLava(BLOCKTYPE a_BlockID)
 {
 	return (a_BlockID == E_BLOCK_LAVA || a_BlockID == E_BLOCK_STATIONARY_LAVA);
 }
 
 
-inline bool IsBlockLiquid(char a_BlockID)
+inline bool IsBlockLiquid(BLOCKTYPE a_BlockID)
 {
 	return IsBlockWater(a_BlockID) || IsBlockLava(a_BlockID);
 }
 
-inline bool IsBlockTypeOfDirt(char a_BlockID)
+inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockID)
 {
 	switch (a_BlockID)
 	{

@@ -495,6 +495,16 @@ void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int
 
 
 
+void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_SpeedX, a_SpeedY, a_SpeedZ);
+}
+
+
+
+
+
 AString cProtocolRecognizer::GetAuthServerID(void)
 {
 	ASSERT(m_Protocol != NULL);

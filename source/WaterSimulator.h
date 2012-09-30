@@ -6,6 +6,6 @@ class cWaterSimulator : public cFluidSimulator
 public:
 	cWaterSimulator( cWorld* a_World );
 
-	virtual bool IsAllowedBlock( char a_BlockID );
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override;
 
 };

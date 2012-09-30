@@ -907,6 +907,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\FallingBlock.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\FallingBlock.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\FurnaceEntity.cpp"
 					>
 				</File>

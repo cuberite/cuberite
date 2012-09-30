@@ -43,6 +43,8 @@ public:
 	PluginList GetPlugins() { return m_Plugins; }
 
 	static void Request_Handler(webserver::http_request* r);
+
+	int GetPort() { return m_Port; }
 private:
 
 #ifdef _WIN32

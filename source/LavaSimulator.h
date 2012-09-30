@@ -6,7 +6,7 @@ class cLavaSimulator : public cFluidSimulator
 public:
 	cLavaSimulator( cWorld* a_World );
 
-	virtual bool IsAllowedBlock( char a_BlockID );
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override;
 	
 
 };

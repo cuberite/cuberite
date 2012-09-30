@@ -21,16 +21,16 @@ public:
 	cFireSimulator( cWorld* a_World );
 	~cFireSimulator();
 
-	virtual void Simulate( float a_Dt );
+	virtual void Simulate( float a_Dt ) override;
 
-	virtual bool IsAllowedBlock( char a_BlockID );
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override;
 
-	virtual bool IsBurnable( char a_BlockID );
-	virtual bool IsForeverBurnable( char a_BlockID );
-	virtual bool FiresForever( char a_BlockID );
+	virtual bool IsBurnable( BLOCKTYPE a_BlockID );
+	virtual bool IsForeverBurnable( BLOCKTYPE a_BlockID );
+	virtual bool FiresForever( BLOCKTYPE a_BlockID );
 
 protected:
-	virtual void AddBlock(int a_X, int a_Y, int a_Z);
+	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;
 	virtual void _AddBlock(int a_X, int a_Y, int a_Z);
 	virtual bool BurnBlockAround(int a_X, int a_Y, int a_Z);
 	virtual bool BurnBlock(int a_X, int a_Y, int a_Z);

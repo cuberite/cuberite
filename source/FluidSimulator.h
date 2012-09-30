@@ -29,11 +29,11 @@ public:
 	//Gets the flowing direction. if a_Over is true also the block over the current block affects the direction (standard)
 	Direction GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over = true);
 
-	virtual bool IsAllowedBlock( char a_BlockID ) = 0;
-	virtual bool IsStationaryBlock( char a_BlockID);
-	virtual bool IsPassableForFluid( char a_BlockID );
-	bool CanWashAway( char a_BlockID );
-	bool IsSolidBlock(char a_BlockID);
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) = 0;
+	virtual bool IsStationaryBlock( BLOCKTYPE a_BlockID);
+	virtual bool IsPassableForFluid( BLOCKTYPE a_BlockID );
+	bool CanWashAway( BLOCKTYPE a_BlockID );
+	bool IsSolidBlock(BLOCKTYPE a_BlockID);
 protected:
 	virtual void AddBlock( int a_X, int a_Y, int a_Z);
 	char GetHighestLevelAround( int a_X, int a_Y, int a_Z );
@@ -47,8 +47,8 @@ protected:
 	FluidData* m_Data;
 
 	//Customize
-	char m_FluidBlock;
-	char m_StationaryFluidBlock;
+	BLOCKTYPE m_FluidBlock;
+	BLOCKTYPE m_StationaryFluidBlock;
 	char m_MaxHeight;
 	char m_FlowReduction;
 

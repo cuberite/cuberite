@@ -15,8 +15,17 @@
 #include "ToJava.h"
 
 #include "Root.h"
+#include "WebAdmin.h"
 
 #include <android/log.h>
+
+#ifdef _WIN32 // For IntelliSense parsing
+typedef void jobject;
+typedef int jint;
+typedef bool jboolean;
+typedef void JavaVM;
+typedef void JNIEnv;
+#endif
 
 cCriticalSection g_CriticalSection;
 
@@ -61,7 +70,7 @@ cMainThread * pMainThread = NULL;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
-	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "JNI_OnLoad JNI_OnLoad JNI_OnLoad JNI_OnLoad");
+	//__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "JNI_OnLoad JNI_OnLoad JNI_OnLoad JNI_OnLoad");
 	g_JavaVM = vm;
 	return JNI_VERSION_1_4;
 }
@@ -72,19 +81,10 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeOnCreate( JNIEnv*  env,
 	g_CriticalSection.Lock();
 	g_CurrentJNIEnv = env;
 	g_JavaThread = thiz;
-	//if( !cLogger::GetSingletonPtr() ) new cLogger();
-	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Logging from C++!");
+	//__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Logging from C++!");
 	g_CriticalSection.Unlock();
-
-	//CallJavaFunction_Void_Void(g_JavaActivity, "TestTest" );
-	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", "herpderpderp!!" );
 	
 	mkdir("/sdcard/mcserver", S_IRWXU | S_IRWXG | S_IRWXO);
-
-// 	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "Before mainthread");
-// 	pMainThread = new cMainThread();
-// 	pMainThread->Start();
-// 	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "%s", "AFter mainthread");
 
 	pRoot = new cRoot();
 	pRoot->Start();
@@ -107,8 +107,6 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env, 
 	{
 		pRoot->ServerCommand("stop");
 	}
-// 	pMainThread->Stop();
-// 	delete pMainThread; pMainThread = NULL;
 }
 
 
@@ -117,4 +115,16 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env, 
 extern "C" jboolean Java_com_mcserver_MCServerActivity_NativeIsServerRunning( JNIEnv* env, jobject thiz )
 {
 	return pRoot != NULL;
+}
+
+
+
+
+extern "C" jint Java_com_mcserver_MCServerActivity_NativeGetWebAdminPort( JNIEnv* env, jobject thiz )
+{
+	if( pRoot != NULL && pRoot->GetWebAdmin() != NULL )
+	{
+		return pRoot->GetWebAdmin()->GetPort();
+	}
+	return 0;
 }

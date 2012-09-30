@@ -6,7 +6,7 @@
 #include "Vector3i.h"
 #include "BlockID.h"
 #include "Defines.h"
-
+#include "FallingBlock.h"
 
 
 
@@ -19,11 +19,19 @@ cSandSimulator::cSandSimulator( cWorld* a_World )
 
 }
 
+
+
+
+
 cSandSimulator::~cSandSimulator()
 {
 	delete m_Buffer;
 	delete m_Blocks;
 }
+
+
+
+
 
 void cSandSimulator::Simulate( float a_Dt )
 {
@@ -33,31 +41,39 @@ void cSandSimulator::Simulate( float a_Dt )
 	for( BlockList::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
 	{
 		Vector3i Pos = *itr;
-		char BlockID = m_World->GetBlock(Pos.x, Pos.y, Pos.z);
+		BLOCKTYPE BlockID = m_World->GetBlock(Pos.x, Pos.y, Pos.z);
 		if(!IsAllowedBlock(BlockID))
 			continue;
 
-		char BottomBlock = m_World->GetBlock( Pos.x, Pos.y - 1, Pos.z );
+		BLOCKTYPE BottomBlock = m_World->GetBlock( Pos.x, Pos.y - 1, Pos.z );
 		
 		if( IsPassable(BottomBlock) )
 		{
-			m_World->SetBlock( Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0 );
-			m_World->SetBlock( Pos.x, Pos.y - 1, Pos.z, BlockID, 0 );
+			cFallingBlock * FallingBlock = new cFallingBlock( Pos, BlockID );
+			FallingBlock->Initialize( m_World );
+ 			m_World->SetBlock( Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0 );
 		}
 	}
 		
 }
 
 
-bool cSandSimulator::IsAllowedBlock( char a_BlockID )
+
+
+
+bool cSandSimulator::IsAllowedBlock( BLOCKTYPE a_BlockID )
 {
 	return a_BlockID == E_BLOCK_SAND
 		|| a_BlockID == E_BLOCK_GRAVEL;
 }
 
+
+
+
+
 void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 {
-	if(!IsAllowedBlock(m_World->GetBlock(a_X, a_Y, a_Z)))		//This should save very much time because it doesn´t have to iterate through all blocks
+	if(!IsAllowedBlock(m_World->GetBlock(a_X, a_Y, a_Z)))
 		return;
 
 	Vector3i Block(a_X, a_Y, a_Z);
@@ -71,21 +87,16 @@ void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 	}
 
 	m_Blocks->push_back(Block);
-
 }
 
-bool cSandSimulator::IsPassable( char a_BlockID )
+
+
+
+
+bool cSandSimulator::IsPassable( BLOCKTYPE a_BlockID )
 {
 	return a_BlockID == E_BLOCK_AIR
 		|| IsBlockWater(a_BlockID)
 		|| IsBlockLava(a_BlockID)
 		|| a_BlockID == E_BLOCK_FIRE;
-
-}
-
-void cSandSimulator::WakeUp( int a_X, int a_Y, int a_Z )
-{
-	//Nothing else needs to be simulated :D (Bugs not included :s)
-	AddBlock( a_X, a_Y+1, a_Z );
-	AddBlock( a_X, a_Y, a_Z );
 }
