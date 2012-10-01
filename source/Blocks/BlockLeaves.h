@@ -6,6 +6,8 @@
 
 
 
+
+
 // Leaves can be this many blocks that away (inclusive) from the log not to decay
 #define LEAVES_CHECK_DISTANCE 6
 
@@ -20,7 +22,10 @@ bool HasNearLog(cBlockArea &a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 
 
-class cBlockLeavesHandler : public cBlockHandler
+
+
+class cBlockLeavesHandler :
+	public cBlockHandler
 {
 public:
 	cBlockLeavesHandler(BLOCKTYPE a_BlockID)
@@ -28,19 +33,27 @@ public:
 	{
 	}
 
-	virtual int GetDropID() override
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		MTRand rand;
 
-		if(rand.randInt(5) == 0)
+		// Only the first 2 bits contain the display information, the others are for growing
+		if (rand.randInt(5) == 0)
 		{
-			return E_ITEM_SAPLING;
+			a_Pickups.push_back(cItem(E_ITEM_SAPLING, 1, a_BlockMeta & 3));
 		}
-		
-		return E_ITEM_EMPTY;
+		if ((a_BlockMeta & 3) == E_META_SAPLING_APPLE)
+		{
+			if (rand.rand(100) == 0)
+			{
+				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
+			}
+		}
 	}
 
-	void OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+
+	void OnDestroyed(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		cBlockHandler::OnDestroyed(a_World, a_X, a_Y, a_Z);
 		
@@ -56,18 +69,15 @@ public:
 		}
 	}
 	
-	virtual void OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	
+	virtual void OnNeighborChanged(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
-		a_World->SetBlockMeta(a_X, a_Y, a_Z, Meta & 0x7);	//Unset 0x8 bit so it gets checked for decay
+		a_World->SetBlockMeta(a_X, a_Y, a_Z, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
 	}
 	
-	virtual bool NeedsRandomTicks() override
-	{
-		return true;
-	}
 	
-	virtual void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	virtual void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 		if ((Meta & 0x04) != 0)
@@ -76,7 +86,7 @@ public:
 			return;
 		}
 
-		if (Meta & 0x8)
+		if ((Meta & 0x8) != 0)
 		{
 			// These leaves have been checked for decay lately and nothing around them changed
 			return;
@@ -109,14 +119,18 @@ public:
 		
 	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";
 	}
-};
+} ;
 
 
-bool HasNearLog(cBlockArea &a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
+
+
+
+bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Filter the blocks into a {leaves, log, other (air)} set:
 	BLOCKTYPE * Types = a_Area.GetBlockTypes();
@@ -164,4 +178,7 @@ bool HasNearLog(cBlockArea &a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 	}  // for i - BFS iterations
 	return false;
 }
+
+
+
 

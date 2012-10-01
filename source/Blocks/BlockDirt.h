@@ -1,9 +1,17 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 #include "../MersenneTwister.h"
 #include "../World.h"
 
-class cBlockDirtHandler : public cBlockHandler
+
+
+
+
+/// Handler used for both dirt and grass
+class cBlockDirtHandler :
+	public cBlockHandler
 {
 public:
 	cBlockDirtHandler(BLOCKTYPE a_BlockID)
@@ -12,18 +20,13 @@ public:
 	}
 
 	
-	virtual bool NeedsRandomTicks() override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return m_BlockID == E_BLOCK_GRASS;
-	}
-
-	virtual int GetDropID() override
-	{
-		return E_BLOCK_DIRT;
+		a_Pickups.push_back(cItem(E_ITEM_DIRT, 1, 0));
 	}
 	
 	
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		if (m_BlockID != E_BLOCK_GRASS)
 		{
@@ -64,9 +67,13 @@ public:
 		}  // for i - repeat twice
 	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.gravel";
 	}
-	
-};
+} ;
+
+
+
+

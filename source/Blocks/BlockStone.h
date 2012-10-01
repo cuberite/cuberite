@@ -1,9 +1,16 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 #include "../MersenneTwister.h"
 #include "../World.h"
 
-class cBlockStoneHandler : public cBlockHandler
+
+
+
+
+class cBlockStoneHandler :
+	public cBlockHandler
 {
 public:
 	cBlockStoneHandler(BLOCKTYPE a_BlockID)
@@ -11,8 +18,12 @@ public:
 	{
 	}
 
-	virtual int GetDropID() override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return E_ITEM_COBBLESTONE;
-	}	
-};
+		a_Pickups.push_back(cItem(E_BLOCK_STONE, 1, 0));
+	}
+} ;
+
+
+
+

@@ -1,27 +1,36 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 #include "../World.h"
 #include "../Sign.h"
 #include "../Player.h"
 
-class cBlockSignHandler : public cBlockHandler
+
+
+
+
+class cBlockSignHandler :
+	public cBlockHandler
 {
 public:
 	cBlockSignHandler(BLOCKTYPE a_BlockID)
 		: cBlockHandler(a_BlockID)
 	{
-
 	}
+	
 
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
+	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
-		if(a_Dir == 1)
+		if (a_Dir == BLOCK_FACE_TOP)
 		{
 			Meta = cSign::RotationToMetaData(a_Player->GetRotation());
 			Block = E_BLOCK_SIGN_POST;
-		}else{
+		}
+		else
+		{
 			Meta = cSign::DirectionToMetaData(a_Dir);
 			Block = E_BLOCK_WALLSIGN;
 		}
@@ -30,18 +39,25 @@ public:
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
 
-	virtual int GetDropID() override
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return E_ITEM_SIGN;
+		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
+
 	
-	virtual bool AllowBlockOnTop() override
+	virtual bool DoesAllowBlockOnTop(void) override
 	{
 		return false;
 	}
+	
 
-	virtual AString GetStepSound(void) override
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
 	}
-};
+} ;
+
+
+
+

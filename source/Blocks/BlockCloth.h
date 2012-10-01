@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockClothHandler : public cBlockHandler
+
+
+
+class cBlockClothHandler :
+	public cBlockHandler
 {
 public:
 	cBlockClothHandler(BLOCKTYPE a_BlockID)
@@ -10,14 +16,19 @@ public:
 	{
 	}
 
-	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return a_BlockMeta;
+		a_Pickups.push_back(cItem(E_ITEM_WOOL, 1, a_BlockMeta));
 	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.cloth";
 	}
-	
-};
+} ;
+
+
+
+

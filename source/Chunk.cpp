@@ -430,9 +430,9 @@ void cChunk::CheckBlocks(void)
 		Vector3i WorldPos = PositionToWorldPosition( BlockPos );
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		if(!Handler->CanBeAt(m_World, WorldPos.x, WorldPos.y, WorldPos.z))
+		if (!Handler->CanBeAt(m_World, WorldPos.x, WorldPos.y, WorldPos.z))
 		{
-			if(Handler->DropOnUnsuitable())
+			if (Handler->DoesDropOnUnsuitable())
 			{
 				Handler->DropBlock(m_World, WorldPos.x, WorldPos.y, WorldPos.z);
 			}
@@ -503,10 +503,7 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			{
 				cBlockHandler * Handler = BlockHandler(ID);
 				ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-				if (Handler->NeedsRandomTicks())
-				{
-					Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
-				}
+				Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
 				break;
 			}
 		}

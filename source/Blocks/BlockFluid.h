@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockFluidHandler : public cBlockHandler
+
+
+
+class cBlockFluidHandler :
+	public cBlockHandler
 {
 public:
 	cBlockFluidHandler(BLOCKTYPE a_BlockID)
@@ -11,10 +17,15 @@ public:
 
 	}
 	
-	virtual bool IgnoreBuildCollision() override
+	
+	virtual bool DoesIgnoreBuildCollision(void) override
 	{
 		return true;
 	}
 	
-	
-};
+	// TODO: Implement proper fluid physics here
+} ;
+
+
+
+

@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockSlabHandler : public cBlockHandler
+
+
+
+class cBlockSlabHandler :
+	public cBlockHandler
 {
 public:
 	cBlockSlabHandler(BLOCKTYPE a_BlockID)
@@ -10,17 +16,11 @@ public:
 	{
 	}
 
-	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return a_BlockMeta;
-	}
-	
-	virtual char GetDropCount() override
-	{
-		if(m_BlockID == E_BLOCK_DOUBLE_STONE_SLAB
-			|| m_BlockID == E_BLOCK_DOUBLE_WOODEN_SLAB)
-			return 2;
-		return 1;
+		char Count = ((m_BlockID == E_BLOCK_DOUBLE_STONE_SLAB) || (m_BlockID == E_BLOCK_DOUBLE_WOODEN_SLAB)) ? 2 : 1;
+		a_Pickups.push_back(cItem(m_BlockID, Count, a_BlockMeta));
 	}
 
 
@@ -29,6 +29,7 @@ public:
 		a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, DirectionToMetaData( a_Dir, a_BlockMeta ));
 		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
 	}
+	
 	
 	static char DirectionToMetaData( char a_Direction, NIBBLETYPE Meta )
 	{
@@ -40,12 +41,13 @@ public:
 		return result;
 	}
 
-	virtual AString GetStepSound(void) override
-	{		
-		if (m_BlockID == E_BLOCK_WOODEN_SLAB || m_BlockID ==E_BLOCK_DOUBLE_WOODEN_SLAB)
-			return "step.wood";
 
-		else
-			return "step.stone";
+	virtual const char * GetStepSound(void) override
+	{		
+		return ((m_BlockID == E_BLOCK_WOODEN_SLAB) || (m_BlockID == E_BLOCK_DOUBLE_WOODEN_SLAB)) ?  "step.wood" : "step.stone";
 	}
-};
+} ;
+
+
+
+

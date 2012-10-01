@@ -350,14 +350,14 @@ void cFluidSimulator::Simulate( float a_Dt )
 
 			if( bIsFed )
 			{
-				char DownID = m_World->GetBlock( pos.x, pos.y-1, pos.z );
-				bool bWashedAwayItem = CanWashAway( DownID );
-				if( (IsPassableForFluid(DownID) || bWashedAwayItem) && !IsStationaryBlock(DownID) ) // free for fluid 
+				char DownID = m_World->GetBlock(pos.x, pos.y - 1, pos.z);
+				bool bWashedAwayItem = CanWashAway(DownID);
+				if ((IsPassableForFluid(DownID) || bWashedAwayItem) && !IsStationaryBlock(DownID) ) // free for fluid 
 				{
-					if( bWashedAwayItem )
+					if (bWashedAwayItem)
 					{
 						cBlockHandler * Handler = BlockHandler(DownID);
-						if(Handler->DropOnUnsuitable())
+						if (Handler->DoesDropOnUnsuitable())
 						{
 							Handler->DropBlock(m_World, pos.x, pos.y - 1, pos.z);
 						}
@@ -393,13 +393,13 @@ void cFluidSimulator::Simulate( float a_Dt )
 								if (bWashedAwayItem)
 								{
 									cBlockHandler * Handler = BlockHandler(DownID);
-									if(Handler->DropOnUnsuitable())
+									if (Handler->DoesDropOnUnsuitable())
 									{
 										Handler->DropBlock(m_World, p.x, p.y, p.z);
 									}
 								}
 
-								if( p.y == pos.y )
+								if (p.y == pos.y)
 								{
 									m_World->FastSetBlock(p.x, p.y, p.z, m_FluidBlock, Meta + m_FlowReduction);
 								}

@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockMushroomHandler : public cBlockHandler
+
+
+
+class cBlockMushroomHandler :
+	public cBlockHandler
 {
 public:
 	cBlockMushroomHandler(BLOCKTYPE a_BlockID)
@@ -10,12 +16,15 @@ public:
 	{
 	}
 
-	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return 0;
+		// Reset meta to 0
+		a_Pickups.push_back(cItem(m_BlockID, 1, 0));
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+
+	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		switch (a_World->GetBlock(a_X, a_Y - 1, a_Z))
 		{
@@ -24,24 +33,32 @@ public:
 			case E_BLOCK_ICE:
 			case E_BLOCK_LEAVES:
 			case E_BLOCK_AIR:
+			{
 				return false;
+			}
 		}
 		return true;
 	}
 
-	virtual bool AllowBlockOnTop() override
+
+	virtual bool DoesAllowBlockOnTop(void) override
 	{
 		return false;
 	}
 
 	
-	virtual bool CanBePlacedOnSide() override
+	virtual bool CanBePlacedOnSide(void) override
 	{
 		return false;
 	}
+	
 
-	virtual AString GetStepSound(void) override
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";
 	}
-};
+} ;
+
+
+
+

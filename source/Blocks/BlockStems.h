@@ -1,9 +1,16 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 #include "../MersenneTwister.h"
 #include "../World.h"
 
-class cBlockStemsHandler : public cBlockHandler
+
+
+
+
+class cBlockStemsHandler :
+	public cBlockHandler
 {
 public:
 	cBlockStemsHandler(BLOCKTYPE a_BlockID)
@@ -11,36 +18,31 @@ public:
 	{
 	}
 
-	virtual bool NeedsRandomTicks() override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return true;
+		int ItemType = (m_BlockID == E_BLOCK_MELON_STEM) ? E_ITEM_MELON_SEEDS : E_ITEM_PUMPKIN_SEEDS;
+		a_Pickups.push_back(cItem(ItemType, 1, 0));
 	}
 
-	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
-	{
-		return 0;
-	}
-
-	virtual int GetDropID() override
-	{
-		if(m_BlockID == E_BLOCK_MELON_STEM)
-			return E_ITEM_MELON_SEEDS;
-		return E_ITEM_PUMPKIN_SEEDS;
-	}
 	
-	void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
-		//TODO: Handle Growing here
+		// TODO: Handle Growing here
 	}
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+
+	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
 		return a_World->GetBlock(a_X, a_Y - 1, a_Z) == E_BLOCK_FARMLAND;
 	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
 	}
-	
-};
+} ;
+
+
+
+

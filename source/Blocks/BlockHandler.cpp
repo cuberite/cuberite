@@ -317,43 +317,24 @@ void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_
 
 
 
-char cBlockHandler::GetDropCount()
+void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 {
-	return 1;
+	// Setting the meta to a_BlockMeta keeps most textures. The few other blocks have to override this.
+	a_Pickups.push_back(cItem(m_BlockID, 1, a_BlockMeta));
 }
 
 
 
 
 
-int cBlockHandler::GetDropID()
+void cBlockHandler::DropBlock(cWorld * a_World, int a_X, int a_Y, int a_Z)
 {
-	return m_BlockID;
-}
-
-
-
-
-
-NIBBLETYPE cBlockHandler::GetDropMeta(NIBBLETYPE a_BlockMeta)
-{
-	return a_BlockMeta;		//This keeps most textures. The few other blocks have to override this
-}
-
-
-
-
-
-void cBlockHandler::DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z)
-{
-	cItems Drops;
+	cItems Pickups;
 	NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
-	char DropCount = GetDropCount();
-	short DropItem = (short)GetDropID();
-	if (DropCount > 0 && (DropItem != E_ITEM_EMPTY))
+	ConvertToPickups(Pickups, Meta);
+	if (!Pickups.empty())
 	{
-		Drops.push_back(cItem(DropItem, DropCount, GetDropMeta(Meta)));
-		a_World->SpawnItemPickups(Drops, a_X, a_Y, a_Z);
+		a_World->SpawnItemPickups(Pickups, a_X, a_Y, a_Z);
 	}
 }
 
@@ -361,7 +342,8 @@ void cBlockHandler::DropBlock(cWorld *a_World, int a_X, int a_Y, int a_Z)
 
 
 
-AString cBlockHandler::GetStepSound() {
+const char * cBlockHandler::GetStepSound()
+{
 	return "step.stone";
 }
 
@@ -396,7 +378,7 @@ bool cBlockHandler::IsUseable()
 
 
 
-bool cBlockHandler::IsClickedThrough()
+bool cBlockHandler::IsClickedThrough(void)
 {
 	return false;
 }
@@ -405,25 +387,16 @@ bool cBlockHandler::IsClickedThrough()
 
 
 
-bool cBlockHandler::IgnoreBuildCollision()
+bool cBlockHandler::DoesIgnoreBuildCollision(void)
 {
-	return m_BlockID == E_BLOCK_AIR;
+	return (m_BlockID == E_BLOCK_AIR);
 }
 
 
 
 
 
-bool cBlockHandler::NeedsRandomTicks()
-{
-	return false;
-}
-
-
-
-
-
-bool cBlockHandler::AllowBlockOnTop()
+bool cBlockHandler::DoesAllowBlockOnTop(void)
 {
 	return true;
 }
@@ -432,7 +405,7 @@ bool cBlockHandler::AllowBlockOnTop()
 
 
 
-bool cBlockHandler::CanBePlacedOnSide()
+bool cBlockHandler::CanBePlacedOnSide(void)
 {
 	return true;
 }
@@ -441,7 +414,7 @@ bool cBlockHandler::CanBePlacedOnSide()
 
 
 
-bool cBlockHandler::DropOnUnsuitable()
+bool cBlockHandler::DoesDropOnUnsuitable(void)
 {
 	return true;
 }

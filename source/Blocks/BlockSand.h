@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockSandHandler : public cBlockHandler
+
+
+
+class cBlockSandHandler :
+	public cBlockHandler
 {
 public:
 	cBlockSandHandler(BLOCKTYPE a_BlockID)
@@ -10,9 +16,13 @@ public:
 	{
 	}
 
-	virtual AString GetStepSound(void) override
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.sand";
 	}
 	
 };
+
+
+
+

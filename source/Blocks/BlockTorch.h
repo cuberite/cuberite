@@ -1,5 +1,6 @@
 
 #pragma once
+
 #include "BlockHandler.h"
 #include "../Torch.h"
 #include "../World.h"
@@ -8,7 +9,8 @@
 
 
 
-class cBlockTorchHandler : public cBlockHandler
+class cBlockTorchHandler :
+	public cBlockHandler
 {
 public:
 	cBlockTorchHandler(BLOCKTYPE a_BlockID)
@@ -19,12 +21,14 @@ public:
 	
 	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
-		if(!TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir))
+		if (!TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, a_Dir))
 		{
 			a_Dir = FindSuitableDirection(a_World, a_X, a_Y, a_Z);
 			
-			if(a_Dir == BLOCK_FACE_BOTTOM)
+			if (a_Dir == BLOCK_FACE_BOTTOM)
+			{
 				return;
+			}
 		}
 
 		a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, cTorch::DirectionToMetaData(a_Dir));
@@ -32,7 +36,7 @@ public:
 	}
 	
 	
-	virtual bool AllowBlockOnTop(void) override
+	virtual bool DoesAllowBlockOnTop(void) override
 	{
 		return false;
 	}
@@ -116,24 +120,30 @@ public:
 		// How to propagate that change up?
 		// Simon: The easiest way is to calculate the position two times, shouldn´t cost much cpu power :)
 
-		if(a_Dir == BLOCK_FACE_BOTTOM)
+		if (a_Dir == BLOCK_FACE_BOTTOM)
+		{
 			return false;
+		}
 
 		AddDirection( a_X, a_Y, a_Z, a_Dir, true );
 
 		return CanBePlacedOn(a_World->GetBlock( a_X, a_Y, a_Z ), a_Dir);
 	}
 	
-	// Finds a suitable Direction for the Torch. Returns BLOCK_FACE_BOTTOM on failure
+	
+	/// Finds a suitable Direction for the Torch. Returns BLOCK_FACE_BOTTOM on failure
 	static char FindSuitableDirection(cWorld * a_World, int a_X, int a_Y, int a_Z)
 	{
-		for(int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 5; i++)
 		{
-			if(TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, i))
+			if (TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, i))
+			{
 				return i;
+			}
 		}
 		return BLOCK_FACE_BOTTOM;
 	}
+
 
 	virtual bool CanBePlacedAt(cWorld * a_World, int a_X, int a_Y, int a_Z, char a_Dir) override
 	{
@@ -150,16 +160,19 @@ public:
 		return TorchCanBePlacedAt(a_World, a_X, a_Y, a_Z, Dir);
 	}
 
-	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return 0;
+		// Always drop meta = 0
+		a_Pickups.push_back(cItem(m_BlockID, 1, 0));
 	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
 	}
-};
+} ;
 
 
 

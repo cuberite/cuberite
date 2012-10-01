@@ -656,7 +656,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 			cBlockHandler *Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
 
-			if(Handler->IgnoreBuildCollision())
+			if (Handler->DoesIgnoreBuildCollision())
 			{
 				Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 				// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
@@ -665,7 +665,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			{
 				AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 				// Check for Blocks not allowing placement on top
-				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->AllowBlockOnTop())
+				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
 				{
 					// Resend the old block
 					// Some times the client still places the block O.o
@@ -676,7 +676,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 				BLOCKTYPE PlaceBlock = m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-				if (!BlockHandler(PlaceBlock)->IgnoreBuildCollision())
+				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 				{
 					// Tried to place a block *into* another?
 					return;  // Happens when you place a block aiming at side of block like torch or stem

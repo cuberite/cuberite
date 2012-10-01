@@ -67,7 +67,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		if (currBlock != E_BLOCK_AIR)
 		{
 			cBlockHandler * Handler = BlockHandler(currBlock);
-			if(Handler->DropOnUnsuitable())
+			if (Handler->DoesDropOnUnsuitable())
 			{
 				Handler->DropBlock(m_World, pistx, pisty, pistz);
 			}

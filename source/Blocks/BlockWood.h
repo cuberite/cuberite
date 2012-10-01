@@ -1,5 +1,10 @@
+
 #pragma once
+
 #include "BlockHandler.h"
+
+
+
 
 
 class cBlockWoodHandler : public cBlockHandler
@@ -9,14 +14,14 @@ public:
 		: cBlockHandler(a_BlockID)
 	{
 	}
-	NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
-	{
-		return a_BlockMeta;
-	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
 	}
-	
-};
+} ;
+
+
+
+

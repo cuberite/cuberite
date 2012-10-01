@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockMelonHandler : public cBlockHandler
+
+
+
+class cBlockMelonHandler :
+	public cBlockHandler
 {
 public:
 	cBlockMelonHandler(BLOCKTYPE a_BlockID)
@@ -11,19 +17,19 @@ public:
 	}
 	
 	
-	virtual int GetDropID() override
-	{
-		return E_ITEM_MELON_SLICE;
-	}
-
-	virtual char GetDropCount() override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		MTRand r1;
-		return (char)(3 + r1.randInt(4));
+		a_Pickups.push_back(cItem(E_ITEM_MELON_SLICE, (char)(3 + r1.randInt(4)), 0));
 	}
 
-	virtual AString GetStepSound(void) override
+
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
 	}
-};
+} ;
+
+
+
+

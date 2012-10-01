@@ -1,5 +1,6 @@
 
 #pragma once
+
 #include "BlockHandler.h"
 
 
@@ -16,15 +17,9 @@ public:
 	}
 
 
-	virtual bool NeedsRandomTicks() override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return true;
-	}
-
-
-	virtual int GetDropID() override
-	{
-		return E_ITEM_SUGARCANE;
+		a_Pickups.push_back(cItem(E_ITEM_SUGARCANE, 1, 0));
 	}
 
 
@@ -50,7 +45,7 @@ public:
 	
 	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
 	{
-		//TODO: Handle Growing here
+		// TODO: Handle Growing here
 	}
 	
 
@@ -59,12 +54,11 @@ public:
 		return false;
 	}
 	
-	virtual AString GetStepSound(void) override
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";
 	}
-
-};
+} ;
 
 
 

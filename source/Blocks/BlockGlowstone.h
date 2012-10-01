@@ -1,8 +1,14 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 
 
-class cBlockGlowstoneHandler : public cBlockHandler
+
+
+
+class cBlockGlowstoneHandler :
+	public cBlockHandler
 {
 public:
 	cBlockGlowstoneHandler(BLOCKTYPE a_BlockID)
@@ -10,13 +16,15 @@ public:
 	{
 	}
 	
-	virtual NIBBLETYPE GetDropMeta(NIBBLETYPE a_BlockMeta) override
-	{
-		return 0;
-	}
 
-	virtual int GetDropID() override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return E_ITEM_GLOWSTONE_DUST;
+		// Reset meta to 0
+		// TODO: More drops?
+		a_Pickups.push_back(cItem(E_ITEM_GLOWSTONE_DUST, 1, 0));
 	}
-};
+} ;
+
+
+
+
