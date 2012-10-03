@@ -25,7 +25,7 @@ public:
 
 		cItems Drops;
 
-		if (Meta & 0x7)  // Is Wheat
+		if (Meta == 0x7)  // Is fully grown
 		{
 			Drops.push_back(cItem(E_ITEM_WHEAT, 1, 0));
 		}
