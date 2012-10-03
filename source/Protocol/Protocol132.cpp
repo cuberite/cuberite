@@ -14,6 +14,7 @@
 #include "../Player.h"
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"
+#include "../Pickup.h"
 
 
 
@@ -56,6 +57,7 @@ enum
 	PACKET_ENTITY_EQUIPMENT = 0x05,
 	PACKET_COMPASS          = 0x06,
 	PACKET_PLAYER_SPAWN     = 0x14,
+	PACKET_COLLECT_PICKUP   = 0x16,
 	PACKET_SPAWN_MOB        = 0x18,
 	PACKET_DESTROY_ENTITIES = 0x1d,
 	PACKET_CHUNK_DATA       = 0x33,
@@ -241,6 +243,26 @@ void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	WriteInt (a_ChunkZ);
 	SendData(Serialized.data(), Serialized.size());
 	Flush();
+}
+
+
+
+
+
+void cProtocol132::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_COLLECT_PICKUP);
+	WriteInt (a_Pickup.GetUniqueID());
+	WriteInt (a_Player.GetUniqueID());
+	Flush();
+	
+	// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
+	SendSoundEffect(
+		"random.pop",
+		(int)(a_Pickup.GetPosX() * 8), (int)(a_Pickup.GetPosY() * 8), (int)(a_Pickup.GetPosZ() * 8),
+		0.5, (float)(0.75 + ((float)((a_Pickup.GetUniqueID() * 23) % 32)) / 64)
+	);
 }
 
 

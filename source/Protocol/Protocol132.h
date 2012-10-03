@@ -33,6 +33,7 @@ public:
 	virtual void SendBlockAction    (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockChange    (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendChunkData      (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
+	virtual void SendCollectPickup  (const cPickup & a_Pickup, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity  (const cEntity & a_Entity) override;
 	virtual void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendLogin          (const cPlayer & a_Player, const cWorld & a_World) override;
