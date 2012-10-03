@@ -479,14 +479,14 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 		}
 
 		unsigned int Index = MakeIndexNoCheck( m_BlockTickX, m_BlockTickY, m_BlockTickZ );
-		BLOCKTYPE ID = m_BlockTypes[Index];
-		switch( ID )
+		BLOCKTYPE BlockType = m_BlockTypes[Index];
+		switch (BlockType)
 		{
 			case E_BLOCK_FARMLAND: TickFarmland (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
 			
 			default:
 			{
-				cBlockHandler * Handler = BlockHandler(ID);
+				cBlockHandler * Handler = BlockHandler(BlockType);
 				ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 				Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
 				break;

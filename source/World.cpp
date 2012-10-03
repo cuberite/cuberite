@@ -795,7 +795,7 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, char a_SaplingMeta)
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
-	GrowTreeImage(Logs);
+	GrowTreeImage(Other);
 }
 
 
