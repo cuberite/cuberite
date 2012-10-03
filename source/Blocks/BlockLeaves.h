@@ -28,8 +28,8 @@ class cBlockLeavesHandler :
 	public cBlockHandler
 {
 public:
-	cBlockLeavesHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockLeavesHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -53,33 +53,33 @@ public:
 	}
 
 
-	void OnDestroyed(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		cBlockHandler::OnDestroyed(a_World, a_X, a_Y, a_Z);
+		cBlockHandler::OnDestroyed(a_World, a_BlockX, a_BlockY, a_BlockZ);
 		
 		//0.5% chance of dropping an apple
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		//check if Oak (0x1 and 0x2 bit not set)
 		MTRand rand;
 		if(!(Meta & 3) && rand.randInt(200) == 100)
 		{
 			cItems Drops;
 			Drops.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
-			a_World->SpawnItemPickups(Drops, a_X, a_Y, a_Z);
+			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	
 	
-	virtual void OnNeighborChanged(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual void OnNeighborChanged(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
-		a_World->SetBlockMeta(a_X, a_Y, a_Z, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
+		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
 	}
 	
 	
-	virtual void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if ((Meta & 0x04) != 0)
 		{
 			// Player-placed leaves, don't decay
@@ -96,9 +96,9 @@ public:
 		cBlockArea Area;
 		if (!Area.Read(
 			a_World, 
-			a_X - LEAVES_CHECK_DISTANCE, a_X + LEAVES_CHECK_DISTANCE, 
-			a_Y - LEAVES_CHECK_DISTANCE, a_Y + LEAVES_CHECK_DISTANCE, 
-			a_Z - LEAVES_CHECK_DISTANCE, a_Z + LEAVES_CHECK_DISTANCE, 
+			a_BlockX - LEAVES_CHECK_DISTANCE, a_BlockX + LEAVES_CHECK_DISTANCE, 
+			a_BlockY - LEAVES_CHECK_DISTANCE, a_BlockY + LEAVES_CHECK_DISTANCE, 
+			a_BlockZ - LEAVES_CHECK_DISTANCE, a_BlockZ + LEAVES_CHECK_DISTANCE, 
 			cBlockArea::baTypes)
 		)
 		{
@@ -106,16 +106,16 @@ public:
 			return;
 		}
 
-		if (HasNearLog(Area, a_X, a_Y, a_Z))
+		if (HasNearLog(Area, a_BlockX, a_BlockY, a_BlockZ))
 		{
 			// Wood found, the leaves stay; mark them as checked:
-			a_World->SetBlockMeta(a_X, a_Y, a_Z, Meta | 0x8);
+			a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x8);
 			return;
 		}
 		// Decay the leaves:
-		DropBlock(a_World, a_X, a_Y, a_Z);
+		DropBlock(a_World, a_BlockX, a_BlockY, a_BlockZ);
 
-		a_World->DigBlock(a_X, a_Y, a_Z);
+		a_World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 		
 	}
 

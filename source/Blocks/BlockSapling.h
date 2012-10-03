@@ -12,8 +12,8 @@ class cBlockSaplingHandler :
 	public cBlockHandler
 {
 public:
-	cBlockSaplingHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockSaplingHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -25,9 +25,9 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z) override
+	virtual bool CanBeAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		return IsBlockTypeOfDirt(a_World->GetBlock(a_X, a_Y - 1, a_Z));
+		return IsBlockTypeOfDirt(a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ));
 	}
 
 
@@ -37,17 +37,17 @@ public:
 	}
 	
 
-	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		
 		if ((Meta & 0x08) != 0)
 		{
-			a_World->GrowTree(a_X, a_Y, a_Z);
+			a_World->GrowTree(a_BlockX, a_BlockY, a_BlockZ);
 		}
 		else
 		{
-			a_World->SetBlockMeta(a_X, a_Y, a_Z, Meta | 0x08);
+			a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x08);
 		}
 	}
 	

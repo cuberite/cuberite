@@ -11,23 +11,23 @@ class cBlockSlabHandler :
 	public cBlockHandler
 {
 public:
-	cBlockSlabHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockSlabHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		char Count = ((m_BlockID == E_BLOCK_DOUBLE_STONE_SLAB) || (m_BlockID == E_BLOCK_DOUBLE_WOODEN_SLAB)) ? 2 : 1;
-		a_Pickups.push_back(cItem(m_BlockID, Count, a_BlockMeta));
+		char Count = ((m_BlockType == E_BLOCK_DOUBLE_STONE_SLAB) || (m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB)) ? 2 : 1;
+		a_Pickups.push_back(cItem(m_BlockType, Count, a_BlockMeta));
 	}
 
 
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
+	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
-		a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, DirectionToMetaData( a_Dir, a_BlockMeta ));
-		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
+		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, DirectionToMetaData( a_Dir, a_BlockMeta ));
+		OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 	}
 	
 	
@@ -44,7 +44,7 @@ public:
 
 	virtual const char * GetStepSound(void) override
 	{		
-		return ((m_BlockID == E_BLOCK_WOODEN_SLAB) || (m_BlockID == E_BLOCK_DOUBLE_WOODEN_SLAB)) ?  "step.wood" : "step.stone";
+		return ((m_BlockType == E_BLOCK_WOODEN_SLAB) || (m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB)) ?  "step.wood" : "step.stone";
 	}
 } ;
 

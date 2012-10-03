@@ -11,8 +11,8 @@ class cBlockClothHandler :
 	public cBlockHandler
 {
 public:
-	cBlockClothHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockClothHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 

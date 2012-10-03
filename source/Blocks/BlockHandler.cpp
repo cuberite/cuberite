@@ -54,7 +54,7 @@ cBlockHandler *cBlockHandler::m_BlockHandler[256];
 
 
 
-cBlockHandler *cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockID)
+cBlockHandler *cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 {
 	if (!m_HandlerInitialized)
 	{
@@ -62,85 +62,85 @@ cBlockHandler *cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockID)
 		memset(m_BlockHandler, 0, sizeof(m_BlockHandler));
 		m_HandlerInitialized = true;
 	}
-	if (m_BlockHandler[a_BlockID] != NULL)
+	if (m_BlockHandler[a_BlockType] != NULL)
 	{
-		return m_BlockHandler[a_BlockID];
+		return m_BlockHandler[a_BlockType];
 	}
 
-	return m_BlockHandler[a_BlockID] = CreateBlockHandler(a_BlockID);
+	return m_BlockHandler[a_BlockType] = CreateBlockHandler(a_BlockType);
 }
 
 
 
 
 
-cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
+cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
-	switch(a_BlockID)
+	switch(a_BlockType)
 	{
 		case E_BLOCK_SAND:
-			return new cBlockSandHandler(a_BlockID);
+			return new cBlockSandHandler(a_BlockType);
 		case E_BLOCK_GRAVEL:
-			return new cBlockGravelHandler(a_BlockID);
+			return new cBlockGravelHandler(a_BlockType);
 		case E_BLOCK_WOODEN_DOOR:
 		case E_BLOCK_IRON_DOOR:
-			return new cBlockDoorHandler(a_BlockID);
+			return new cBlockDoorHandler(a_BlockType);
 		case E_BLOCK_FIRE:
-			return new cBlockFireHandler(a_BlockID);
+			return new cBlockFireHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_TORCH_ON:
 		case E_BLOCK_REDSTONE_TORCH_OFF:
-			return new cBlockRedstoneTorchHandler(a_BlockID);
+			return new cBlockRedstoneTorchHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_WIRE:	
-			return new cBlockRedstoneHandler(a_BlockID);
+			return new cBlockRedstoneHandler(a_BlockType);
 		case E_BLOCK_PISTON:
 		case E_BLOCK_STICKY_PISTON:
-			return new cBlockPistonHandler(a_BlockID);
+			return new cBlockPistonHandler(a_BlockType);
 		case E_BLOCK_REDSTONE_REPEATER_ON:
 		case E_BLOCK_REDSTONE_REPEATER_OFF:
-			return new cBlockRedstoneRepeaterHandler(a_BlockID);
+			return new cBlockRedstoneRepeaterHandler(a_BlockType);
 		case E_BLOCK_WORKBENCH:
-			return new cBlockWorkbenchHandler(a_BlockID);
+			return new cBlockWorkbenchHandler(a_BlockType);
 		case E_BLOCK_SNOW:
-			return new cBlockSnowHandler(a_BlockID);
+			return new cBlockSnowHandler(a_BlockType);
 		case E_BLOCK_TALL_GRASS:
-			return new cBlockTallGrassHandler(a_BlockID);
+			return new cBlockTallGrassHandler(a_BlockType);
 		case E_BLOCK_VINES:
-			return new cBlockVineHandler(a_BlockID);
+			return new cBlockVineHandler(a_BlockType);
 		case ::E_BLOCK_WOOL:
-			return new cBlockClothHandler(a_BlockID);
+			return new cBlockClothHandler(a_BlockType);
 		case E_BLOCK_WOODEN_SLAB:
 		case E_BLOCK_STONE_SLAB:
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:
 		case E_BLOCK_DOUBLE_STONE_SLAB:
-			return new cBlockSlabHandler(a_BlockID);
+			return new cBlockSlabHandler(a_BlockType);
 		case E_BLOCK_LOG:
 		case E_BLOCK_PLANKS:
-			return new cBlockWoodHandler(a_BlockID);
+			return new cBlockWoodHandler(a_BlockType);
 		case E_BLOCK_TORCH:
-			return new cBlockTorchHandler(a_BlockID);
+			return new cBlockTorchHandler(a_BlockType);
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
-			return new cBlockDirtHandler(a_BlockID);
+			return new cBlockDirtHandler(a_BlockType);
 		case E_BLOCK_LEAVES:
-			return new cBlockLeavesHandler(a_BlockID);
+			return new cBlockLeavesHandler(a_BlockType);
 		case E_BLOCK_SAPLING:
-			return new cBlockSaplingHandler(a_BlockID);
+			return new cBlockSaplingHandler(a_BlockType);
 		case E_BLOCK_WATER:
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_LAVA:
-			return new cBlockFluidHandler(a_BlockID);
+			return new cBlockFluidHandler(a_BlockType);
 		case E_BLOCK_DISPENSER:
-			return new cBlockDispenserHandler(a_BlockID);
+			return new cBlockDispenserHandler(a_BlockType);
 		case E_BLOCK_FURNACE:
 		case E_BLOCK_LIT_FURNACE:
-			return new cBlockFurnaceHandler(a_BlockID);
+			return new cBlockFurnaceHandler(a_BlockType);
 		case E_BLOCK_CHEST:
-			return new cBlockChestHandler(a_BlockID);
+			return new cBlockChestHandler(a_BlockType);
 		case E_BLOCK_ICE:
-			return new cBlockIceHandler(a_BlockID);
+			return new cBlockIceHandler(a_BlockType);
 		case E_BLOCK_LADDER:
-			return new cBlockLadderHandler(a_BlockID);
+			return new cBlockLadderHandler(a_BlockType);
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_BRICK_STAIRS:
 		case E_BLOCK_STONE_BRICK_STAIRS:
@@ -149,27 +149,27 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:
 		case E_BLOCK_BIRCH_WOOD_STAIRS:
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-			return new cBlockStairsHandler(a_BlockID);
+			return new cBlockStairsHandler(a_BlockType);
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
-			return new cBlockSignHandler(a_BlockID);
+			return new cBlockSignHandler(a_BlockType);
 		case E_BLOCK_CROPS:
-			return new cBlockCropsHandler(a_BlockID);
+			return new cBlockCropsHandler(a_BlockType);
 		case E_BLOCK_SUGARCANE:
-			return new cBlockSugarcaneHandler(a_BlockID);
+			return new cBlockSugarcaneHandler(a_BlockType);
 		case E_BLOCK_YELLOW_FLOWER:
 		case E_BLOCK_RED_ROSE:
-			return new cBlockFlowerHandler(a_BlockID);
+			return new cBlockFlowerHandler(a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:
 		case E_BLOCK_RED_MUSHROOM:
-			return new cBlockMushroomHandler(a_BlockID);
+			return new cBlockMushroomHandler(a_BlockType);
 		case E_BLOCK_CACTUS:
-			return new cBlockCactusHandler(a_BlockID);
+			return new cBlockCactusHandler(a_BlockType);
 		case E_BLOCK_MELON_STEM:
 		case E_BLOCK_PUMPKIN_STEM:
-			return new cBlockStemsHandler(a_BlockID);
+			return new cBlockStemsHandler(a_BlockType);
 		case E_BLOCK_GLOWSTONE:
-			return new cBlockGlowstoneHandler(a_BlockID);
+			return new cBlockGlowstoneHandler(a_BlockType);
 		case E_BLOCK_DIAMOND_ORE:
 		case E_BLOCK_GOLD_ORE:
 		case E_BLOCK_REDSTONE_ORE:
@@ -178,18 +178,18 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockID)
 		case E_BLOCK_IRON_ORE:
 		case E_BLOCK_LAPIS_ORE:
 		case E_BLOCK_COAL_ORE:
-			return new cBlockOreHandler(a_BlockID);
+			return new cBlockOreHandler(a_BlockType);
 		case E_BLOCK_STONE:
 		case E_BLOCK_COBBLESTONE:
-			return new cBlockStoneHandler(a_BlockID);
+			return new cBlockStoneHandler(a_BlockType);
 		case E_BLOCK_MELON:
-			return new cBlockMelonHandler(a_BlockID);
+			return new cBlockMelonHandler(a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:
-			return new cBlockNoteHandler(a_BlockID);
+			return new cBlockNoteHandler(a_BlockType);
 		case E_BLOCK_BED:
-			return new cBlockBedHandler(a_BlockID);
+			return new cBlockBedHandler(a_BlockType);
 		default:		
-			return new cBlockHandler(a_BlockID);
+			return new cBlockHandler(a_BlockType);
 			break;
 	}
 }
@@ -211,24 +211,16 @@ void cBlockHandler::Deinit()
 
 
 
-cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockID)
+cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 {
-	m_BlockID = a_BlockID;
+	m_BlockType = a_BlockType;
 }
 
 
 
 
 
-void cBlockHandler::OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnPlacedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z, int a_Dir)
+void cBlockHandler::OnUpdate(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -236,7 +228,7 @@ void cBlockHandler::OnPlacedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_
 
 
 
-void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z)
+void cBlockHandler::OnPlacedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
 {
 }
 
@@ -244,54 +236,54 @@ void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int
 
 
 
-void cBlockHandler::OnPlaced(cWorld *a_World, int a_X, int a_Y, int a_Z, int a_Dir)
+void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+}
+
+
+
+
+
+void cBlockHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
 {
 	//Notify the neighbors
-	NeighborChanged(a_World, a_X - 1, a_Y, a_Z);
-	NeighborChanged(a_World, a_X + 1, a_Y, a_Z);
-	NeighborChanged(a_World, a_X, a_Y - 1, a_Z);
-	NeighborChanged(a_World, a_X, a_Y + 1, a_Z);
-	NeighborChanged(a_World, a_X, a_Y, a_Z - 1);
-	NeighborChanged(a_World, a_X, a_Y, a_Z + 1);
+	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
+	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
 }
 
 
 
 
 
-void cBlockHandler::OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z)
+void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	//Notify the neighbors
-	NeighborChanged(a_World, a_X - 1, a_Y, a_Z);
-	NeighborChanged(a_World, a_X + 1, a_Y, a_Z);
-	NeighborChanged(a_World, a_X, a_Y - 1, a_Z);
-	NeighborChanged(a_World, a_X, a_Y + 1, a_Z);
-	NeighborChanged(a_World, a_X, a_Y, a_Z - 1);
-	NeighborChanged(a_World, a_X, a_Y, a_Z + 1);
+	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX, a_BlockY + 1, a_BlockZ);
+	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ - 1);
+	NeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ + 1);
 }
 
 
 
 
 
-void cBlockHandler::NeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z)
+void cBlockHandler::NeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	GetBlockHandler(a_World->GetBlock(a_X, a_Y, a_Z))->OnNeighborChanged(a_World, a_X, a_Y, a_Z);
+	GetBlockHandler(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
 
 
 
-void cBlockHandler::OnNeighborChanged(cWorld *a_World, int a_X, int a_Y, int a_Z)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
+void cBlockHandler::OnNeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -299,7 +291,7 @@ void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_X, int a
 
 
 
-void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, int a_Z)
+void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 
@@ -307,10 +299,18 @@ void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_X, int a_Y, 
 
 
 
-void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
+void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, a_BlockMeta);
-	OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
+}
+
+
+
+
+
+void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+{
+	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, a_BlockMeta);
+	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 }
 
 
@@ -320,21 +320,21 @@ void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_
 void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 {
 	// Setting the meta to a_BlockMeta keeps most textures. The few other blocks have to override this.
-	a_Pickups.push_back(cItem(m_BlockID, 1, a_BlockMeta));
+	a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta));
 }
 
 
 
 
 
-void cBlockHandler::DropBlock(cWorld * a_World, int a_X, int a_Y, int a_Z)
+void cBlockHandler::DropBlock(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cItems Pickups;
-	NIBBLETYPE Meta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
+	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	ConvertToPickups(Pickups, Meta);
 	if (!Pickups.empty())
 	{
-		a_World->SpawnItemPickups(Pickups, a_X, a_Y, a_Z);
+		a_World->SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 
@@ -351,16 +351,16 @@ const char * cBlockHandler::GetStepSound()
 
 
 
-bool cBlockHandler::CanBePlacedAt(cWorld *a_World, int a_X, int a_Y, int a_Z, char a_Dir)
+bool cBlockHandler::CanBePlacedAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
 {
-	return CanBeAt(a_World, a_X, a_Y, a_Z);
+	return CanBeAt(a_World, a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
 
 
 
-bool cBlockHandler::CanBeAt(cWorld *a_World, int a_X, int a_Y, int a_Z)
+bool cBlockHandler::CanBeAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	return true;
 }
@@ -389,7 +389,7 @@ bool cBlockHandler::IsClickedThrough(void)
 
 bool cBlockHandler::DoesIgnoreBuildCollision(void)
 {
-	return (m_BlockID == E_BLOCK_AIR);
+	return (m_BlockType == E_BLOCK_AIR);
 }
 
 

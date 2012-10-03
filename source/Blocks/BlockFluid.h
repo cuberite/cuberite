@@ -11,8 +11,8 @@ class cBlockFluidHandler :
 	public cBlockHandler
 {
 public:
-	cBlockFluidHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockFluidHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 
 	}

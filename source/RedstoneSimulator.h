@@ -11,7 +11,7 @@ public:
 	~cRedstoneSimulator();
 
 	virtual void Simulate( float a_Dt ) override;
-	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override { return true; }
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return true; }
 
 	virtual void WakeUp( int a_X, int a_Y, int a_Z ) override;
 

@@ -10,8 +10,8 @@
 class cBlockWoodHandler : public cBlockHandler
 {
 public:
-	cBlockWoodHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockWoodHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 

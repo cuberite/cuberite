@@ -14,13 +14,13 @@ class cBlockSignHandler :
 	public cBlockHandler
 {
 public:
-	cBlockSignHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockSignHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	
 
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override
+	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
@@ -35,8 +35,8 @@ public:
 			Block = E_BLOCK_WALLSIGN;
 		}
 
-		a_World->SetBlock(a_X, a_Y, a_Z, Block, Meta);
-		OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
+		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+		OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 	}
 
 

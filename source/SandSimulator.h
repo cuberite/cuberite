@@ -23,8 +23,8 @@ public:
 
 	virtual void Simulate( float a_Dt ) override;
 
-	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override;
-	virtual bool IsPassable( BLOCKTYPE a_BlockID );
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override;
+	virtual bool IsPassable( BLOCKTYPE a_BlockType );
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;

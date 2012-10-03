@@ -5,7 +5,12 @@
 #include "../World.h"
 #include "../Player.h"
 
-class cItemDyeHandler : public cItemHandler
+
+
+
+
+class cItemDyeHandler :
+	public cItemHandler
 {
 public:
 	cItemDyeHandler(int a_ItemID)
@@ -20,7 +25,7 @@ public:
 		// Handle growing the plants:
 		if (a_Item->m_ItemHealth == E_META_DYE_WHITE)
 		{
-			if(a_World->GrowPlant(a_X, a_Y, a_Z, true))
+			if (a_World->GrowRipePlant(a_X, a_Y, a_Z, true))
 			{
 				if (a_Player->GetGameMode() == eGameMode_Survival)
 				{
@@ -32,4 +37,8 @@ public:
 		}
 		return false;
 	}
-};
+} ;
+
+
+
+

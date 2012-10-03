@@ -13,8 +13,8 @@ class cBlockOreHandler :
 	public cBlockHandler
 {
 public:
-	cBlockOreHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockOreHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -25,7 +25,7 @@ public:
 		short Meta = 0;
 		
 		MTRand r1;
-		switch (m_BlockID)
+		switch (m_BlockType)
 		{
 			case E_BLOCK_LAPIS_ORE:
 			{
@@ -47,7 +47,7 @@ public:
 			}
 		}
 
-		switch (m_BlockID)
+		switch (m_BlockType)
 		{
 			case E_BLOCK_DIAMOND_ORE:
 			{

@@ -860,7 +860,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 
 
 
-bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
+bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -966,7 +966,7 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBone
 						SpawnMeta = E_META_TALL_GRASS_GRASS;
 						break;
 					}
-				}  // switch (random spawn block)
+				}  // switch (random spawn block type)
 				FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, SpawnType, SpawnMeta);
 			}  // for i - 50 times
 			return true;
@@ -999,10 +999,28 @@ bool cWorld::GrowPlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBone
 
 
 
+void cWorld::GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+{
+	m_ChunkMap->GrowCactus(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
+}
+
+
+
+
+
 void cWorld::GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockType)
 {
 	MTRand Rand;
 	m_ChunkMap->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, Rand);
+}
+
+
+
+
+
+void cWorld::GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow)
+{
+	m_ChunkMap->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, a_NumBlocksToGrow);
 }
 
 

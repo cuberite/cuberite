@@ -11,8 +11,8 @@ class cBlockMelonHandler :
 	public cBlockHandler
 {
 public:
-	cBlockMelonHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockMelonHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	

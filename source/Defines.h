@@ -44,14 +44,14 @@ enum
 
 
 
-inline bool IsValidBlock( int a_BlockID )	//tolua_export
+inline bool IsValidBlock( int a_BlockType )	//tolua_export
 {											//tolua_export
-	if( a_BlockID > -1 &&
-		a_BlockID <= 126 && //items to 109 are valid for Beta1.8.1.. 1.2.5 is up to 126
-		//a_BlockID != 29 && allow pistons
-		//a_BlockID != 33 && allow pistons
-		a_BlockID != 34 &&
-		a_BlockID != 36 )
+	if( a_BlockType > -1 &&
+		a_BlockType <= 126 && //items to 109 are valid for Beta1.8.1.. 1.2.5 is up to 126
+		//a_BlockType != 29 && allow pistons
+		//a_BlockType != 33 && allow pistons
+		a_BlockType != 34 &&
+		a_BlockType != 36 )
 	{
 		return true;
 	}
@@ -82,29 +82,29 @@ inline bool IsValidItem( int a_ItemID )		//tolua_export
 
 
 
-inline bool IsBlockWater(BLOCKTYPE a_BlockID)
+inline bool IsBlockWater(BLOCKTYPE a_BlockType)
 {
-	return (a_BlockID == E_BLOCK_WATER || a_BlockID == E_BLOCK_STATIONARY_WATER);
+	return (a_BlockType == E_BLOCK_WATER || a_BlockType == E_BLOCK_STATIONARY_WATER);
 }
 
 
 
 
 
-inline bool IsBlockLava(BLOCKTYPE a_BlockID)
+inline bool IsBlockLava(BLOCKTYPE a_BlockType)
 {
-	return (a_BlockID == E_BLOCK_LAVA || a_BlockID == E_BLOCK_STATIONARY_LAVA);
+	return (a_BlockType == E_BLOCK_LAVA || a_BlockType == E_BLOCK_STATIONARY_LAVA);
 }
 
 
-inline bool IsBlockLiquid(BLOCKTYPE a_BlockID)
+inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 {
-	return IsBlockWater(a_BlockID) || IsBlockLava(a_BlockID);
+	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
 }
 
-inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockID)
+inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 {
-	switch (a_BlockID)
+	switch (a_BlockType)
 	{
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
@@ -342,10 +342,10 @@ namespace ItemCategory
 //tolua_end
 
 
-inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockID)
+inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 {
-	if(!IsValidBlock(a_BlockID)) return false;
-	return g_BlockRequiresSpecialTool[a_BlockID];
+	if(!IsValidBlock(a_BlockType)) return false;
+	return g_BlockRequiresSpecialTool[a_BlockType];
 }
 
 

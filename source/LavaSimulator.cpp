@@ -14,7 +14,7 @@ cLavaSimulator::cLavaSimulator(cWorld *a_World)
 }
 
 
-bool cLavaSimulator::IsAllowedBlock(BLOCKTYPE a_BlockID)
+bool cLavaSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 {
-	return IsBlockLava(a_BlockID);
+	return IsBlockLava(a_BlockType);
 }

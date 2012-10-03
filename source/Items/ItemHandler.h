@@ -64,7 +64,7 @@ public:
 	//Returns the block meta on placement
 	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage);
 	// Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can´t) DEFAULT: False
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID);
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
 	static cItemHandler *GetItemHandler(int a_ItemID);
 

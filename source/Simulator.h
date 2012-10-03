@@ -11,7 +11,7 @@ public:
 	virtual void Simulate( float a_Dt ) = 0;
 	virtual void WakeUp( int a_X, int a_Y, int a_Z );
 
-	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) = 0;
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) = 0;
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z) = 0;

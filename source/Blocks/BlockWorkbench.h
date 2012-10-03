@@ -13,8 +13,8 @@ class cBlockWorkbenchHandler:
 	public cBlockHandler
 {
 public:
-	cBlockWorkbenchHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockWorkbenchHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	

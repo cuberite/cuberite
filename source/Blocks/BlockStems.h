@@ -13,27 +13,37 @@ class cBlockStemsHandler :
 	public cBlockHandler
 {
 public:
-	cBlockStemsHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockStemsHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		int ItemType = (m_BlockID == E_BLOCK_MELON_STEM) ? E_ITEM_MELON_SEEDS : E_ITEM_PUMPKIN_SEEDS;
+		int ItemType = (m_BlockType == E_BLOCK_MELON_STEM) ? E_ITEM_MELON_SEEDS : E_ITEM_PUMPKIN_SEEDS;
 		a_Pickups.push_back(cItem(ItemType, 1, 0));
 	}
 
 	
-	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		// TODO: Handle Growing here
+		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		if (Meta >= 7)
+		{
+			// Grow the produce:
+			a_World->GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, m_BlockType);
+		}
+		else
+		{
+			// Grow the stem:
+			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta + 1);
+		}
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		return a_World->GetBlock(a_X, a_Y - 1, a_Z) == E_BLOCK_FARMLAND;
+		return a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) == E_BLOCK_FARMLAND;
 	}
 
 

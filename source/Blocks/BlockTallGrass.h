@@ -11,8 +11,8 @@ class cBlockTallGrassHandler :
 	public cBlockHandler
 {
 public:
-	cBlockTallGrassHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockTallGrassHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	
@@ -34,9 +34,9 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		return a_World->GetBlock(a_X, a_Y - 1, a_Z) != E_BLOCK_AIR;
+		return a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) != E_BLOCK_AIR;
 	}
 	
 

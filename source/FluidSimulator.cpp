@@ -436,30 +436,30 @@ void cFluidSimulator::Simulate( float a_Dt )
 
 
 
-bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockID)
+bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
 {
-	return a_BlockID == E_BLOCK_AIR
-		|| a_BlockID == E_BLOCK_FIRE
-		|| IsAllowedBlock(a_BlockID)
-		|| CanWashAway(a_BlockID);
+	return a_BlockType == E_BLOCK_AIR
+		|| a_BlockType == E_BLOCK_FIRE
+		|| IsAllowedBlock(a_BlockType)
+		|| CanWashAway(a_BlockType);
 }
 
 
 
 
 
-bool cFluidSimulator::IsStationaryBlock (BLOCKTYPE a_BlockID)
+bool cFluidSimulator::IsStationaryBlock (BLOCKTYPE a_BlockType)
 {
-	return a_BlockID == m_StationaryFluidBlock;
+	return a_BlockType == m_StationaryFluidBlock;
 }
 
 
 
 
 
-bool cFluidSimulator::CanWashAway( BLOCKTYPE a_BlockID )
+bool cFluidSimulator::CanWashAway( BLOCKTYPE a_BlockType )
 {
-	switch( a_BlockID )
+	switch( a_BlockType )
 	{
 	case E_BLOCK_YELLOW_FLOWER:
 	case E_BLOCK_RED_ROSE:
@@ -476,13 +476,13 @@ bool cFluidSimulator::CanWashAway( BLOCKTYPE a_BlockID )
 
 
 
-bool cFluidSimulator::IsSolidBlock( BLOCKTYPE a_BlockID )
+bool cFluidSimulator::IsSolidBlock( BLOCKTYPE a_BlockType )
 {
-	return !(a_BlockID == E_BLOCK_AIR
-		|| a_BlockID == E_BLOCK_FIRE
-		|| IsBlockLava(a_BlockID)
-		|| IsBlockWater(a_BlockID)
-		|| CanWashAway(a_BlockID));
+	return !(a_BlockType == E_BLOCK_AIR
+		|| a_BlockType == E_BLOCK_FIRE
+		|| IsBlockLava(a_BlockType)
+		|| IsBlockWater(a_BlockType)
+		|| CanWashAway(a_BlockType));
 }
 
 

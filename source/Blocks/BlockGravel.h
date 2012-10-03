@@ -11,8 +11,8 @@ class cBlockGravelHandler :
 	public cBlockHandler
 {
 public:
-	cBlockGravelHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockGravelHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 

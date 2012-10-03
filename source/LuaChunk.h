@@ -30,16 +30,16 @@ public:
 	//tolua_begin
 
 	// Block functions
-	void FillBlocks( char a_BlockID, unsigned char a_BlockMeta )
+	void FillBlocks( char a_BlockType, unsigned char a_BlockMeta )
 	{
 		const NIBBLETYPE CompressedMeta = a_BlockMeta | a_BlockMeta << 4;
-		memset( m_BlockTypes, a_BlockID, sizeof( cChunkDef::BlockTypes ) );
+		memset( m_BlockTypes, a_BlockType, sizeof( cChunkDef::BlockTypes ) );
 		memset( m_BlockMeta, CompressedMeta, sizeof( cChunkDef::BlockNibbles ) );
 	}
 
-	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockID, unsigned char a_BlockMeta )
+	void SetBlock( int a_X, int a_Y, int a_Z, char a_BlockType, unsigned char a_BlockMeta )
 	{
-		cChunkDef::SetBlock( m_BlockTypes, a_X, a_Y, a_Z, a_BlockID );
+		cChunkDef::SetBlock( m_BlockTypes, a_X, a_Y, a_Z, a_BlockType );
 		cChunkDef::SetNibble( m_BlockMeta, a_X, a_Y, a_Z, a_BlockMeta );
 	}
 

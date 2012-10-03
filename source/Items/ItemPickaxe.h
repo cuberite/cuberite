@@ -32,9 +32,9 @@ public:
 		}
 	}
 	
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockID)
+		switch(a_BlockType)
 		{
 		case E_BLOCK_OBSIDIAN:
 			return PickaxeLevel() >= 4;

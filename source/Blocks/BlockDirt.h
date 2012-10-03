@@ -14,8 +14,8 @@ class cBlockDirtHandler :
 	public cBlockHandler
 {
 public:
-	cBlockDirtHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockDirtHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -26,18 +26,18 @@ public:
 	}
 	
 	
-	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		if (m_BlockID != E_BLOCK_GRASS)
+		if (m_BlockType != E_BLOCK_GRASS)
 		{
 			return;
 		}
 		
 		// Grass becomes dirt if there is something on top of it:
-		BLOCKTYPE Above = a_World->GetBlock(a_X, a_Y + 1, a_Z);
+		BLOCKTYPE Above = a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
 		if (!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above])
 		{
-			a_World->FastSetBlock(a_X, a_Y, a_Z, E_BLOCK_DIRT, 0);
+			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
 			return;
 		}
 		
@@ -51,7 +51,7 @@ public:
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
-			a_World->GetBlockTypeMeta(a_X + OfsX, a_Y + OfsY, a_Z + OfsZ, DestBlock, DestMeta);
+			a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, DestBlock, DestMeta);
 			if(DestBlock != E_BLOCK_DIRT)
 			{
 				continue;
@@ -59,10 +59,10 @@ public:
 
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
-			a_World->GetBlockTypeMeta(a_X + OfsX, a_Y + OfsY + 1, a_Z + OfsZ, AboveDest, AboveMeta);
+			a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, AboveDest, AboveMeta);
 			if (g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest])
 			{
-				a_World->FastSetBlock(a_X + OfsX, a_Y + OfsY, a_Z + OfsZ, E_BLOCK_GRASS, 0);
+				a_World->FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, E_BLOCK_GRASS, 0);
 			}
 		}  // for i - repeat twice
 	}

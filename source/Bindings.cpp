@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/03/12 09:15:14.
+** Generated automatically by tolua++-1.0.92 on 10/03/12 10:03:23.
 */
 
 #ifndef __cplusplus
@@ -2874,9 +2874,9 @@ static int tolua_AllToLua_IsValidBlock00(lua_State* tolua_S)
  else
 #endif
  {
-  int a_BlockID = ((int)  tolua_tonumber(tolua_S,1,0));
+  int a_BlockType = ((int)  tolua_tonumber(tolua_S,1,0));
   {
-   bool tolua_ret = (bool)  IsValidBlock(a_BlockID);
+   bool tolua_ret = (bool)  IsValidBlock(a_BlockType);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -12181,9 +12181,9 @@ static int tolua_AllToLua_cWorld_GrowTreeByBiome00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GrowPlant of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GrowPlant00
-static int tolua_AllToLua_cWorld_GrowPlant00(lua_State* tolua_S)
+/* method: GrowRipePlant of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GrowRipePlant00
+static int tolua_AllToLua_cWorld_GrowRipePlant00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12205,17 +12205,56 @@ static int tolua_AllToLua_cWorld_GrowPlant00(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   bool a_IsByBonemeal = ((bool)  tolua_toboolean(tolua_S,5,false));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GrowPlant'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GrowRipePlant'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->GrowPlant(a_BlockX,a_BlockY,a_BlockZ,a_IsByBonemeal);
+   bool tolua_ret = (bool)  self->GrowRipePlant(a_BlockX,a_BlockY,a_BlockZ,a_IsByBonemeal);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GrowPlant'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GrowRipePlant'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GrowCactus of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GrowCactus00
+static int tolua_AllToLua_cWorld_GrowCactus00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_NumBlocksToGrow = ((int)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GrowCactus'", NULL);
+#endif
+  {
+   self->GrowCactus(a_BlockX,a_BlockY,a_BlockZ,a_NumBlocksToGrow);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GrowCactus'.",&tolua_err);
  return 0;
 #endif
 }
@@ -12255,6 +12294,45 @@ static int tolua_AllToLua_cWorld_GrowMelonPumpkin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GrowMelonPumpkin'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GrowSugarcane of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GrowSugarcane00
+static int tolua_AllToLua_cWorld_GrowSugarcane00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_NumBlocksToGrow = ((int)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GrowSugarcane'", NULL);
+#endif
+  {
+   self->GrowSugarcane(a_BlockX,a_BlockY,a_BlockZ,a_NumBlocksToGrow);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GrowSugarcane'.",&tolua_err);
  return 0;
 #endif
 }
@@ -19440,13 +19518,13 @@ static int tolua_AllToLua_cLuaChunk_FillBlocks00(lua_State* tolua_S)
 #endif
  {
   cLuaChunk* self = (cLuaChunk*)  tolua_tousertype(tolua_S,1,0);
-  char a_BlockID = ((char)  tolua_tonumber(tolua_S,2,0));
+  char a_BlockType = ((char)  tolua_tonumber(tolua_S,2,0));
   unsigned char a_BlockMeta = ((unsigned char)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FillBlocks'", NULL);
 #endif
   {
-   self->FillBlocks(a_BlockID,a_BlockMeta);
+   self->FillBlocks(a_BlockType,a_BlockMeta);
   }
  }
  return 0;
@@ -19481,13 +19559,13 @@ static int tolua_AllToLua_cLuaChunk_SetBlock00(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
-  char a_BlockID = ((char)  tolua_tonumber(tolua_S,5,0));
+  char a_BlockType = ((char)  tolua_tonumber(tolua_S,5,0));
   unsigned char a_BlockMeta = ((unsigned char)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBlock'", NULL);
 #endif
   {
-   self->SetBlock(a_X,a_Y,a_Z,a_BlockID,a_BlockMeta);
+   self->SetBlock(a_X,a_Y,a_Z,a_BlockType,a_BlockMeta);
   }
  }
  return 0;
@@ -22025,8 +22103,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
    tolua_function(tolua_S,"GrowTreeByBiome",tolua_AllToLua_cWorld_GrowTreeByBiome00);
-   tolua_function(tolua_S,"GrowPlant",tolua_AllToLua_cWorld_GrowPlant00);
+   tolua_function(tolua_S,"GrowRipePlant",tolua_AllToLua_cWorld_GrowRipePlant00);
+   tolua_function(tolua_S,"GrowCactus",tolua_AllToLua_cWorld_GrowCactus00);
    tolua_function(tolua_S,"GrowMelonPumpkin",tolua_AllToLua_cWorld_GrowMelonPumpkin00);
+   tolua_function(tolua_S,"GrowSugarcane",tolua_AllToLua_cWorld_GrowSugarcane00);
    tolua_function(tolua_S,"GetBiomeAt",tolua_AllToLua_cWorld_GetBiomeAt00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cWorld_GetName00);
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cWorld_SaveAllChunks00);

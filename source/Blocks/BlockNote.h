@@ -5,8 +5,8 @@
 class cBlockNoteHandler :  public cBlockEntityHandler
 {
 public:
-	cBlockNoteHandler(BLOCKTYPE a_BlockID)
-		: cBlockEntityHandler(a_BlockID)
+	cBlockNoteHandler(BLOCKTYPE a_BlockType)
+		: cBlockEntityHandler(a_BlockType)
 	{
 	}
 

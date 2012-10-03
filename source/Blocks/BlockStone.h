@@ -13,8 +13,8 @@ class cBlockStoneHandler :
 	public cBlockHandler
 {
 public:
-	cBlockStoneHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockStoneHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 

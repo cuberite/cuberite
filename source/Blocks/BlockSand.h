@@ -11,8 +11,8 @@ class cBlockSandHandler :
 	public cBlockHandler
 {
 public:
-	cBlockSandHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockSandHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 

@@ -334,7 +334,7 @@ bool cItemHandler::IsPlaceable()
 
 
 
-bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockID)
+bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 {
 	return false;
 }

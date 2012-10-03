@@ -279,10 +279,9 @@ private:
 	/// Checks the block scheduled for checking in m_ToTickBlocks[]
 	void CheckBlocks(void);
 	
-	void TickBlocks      (MTRand & a_TickRandom);
-	void TickGrass       (int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom);
-	void TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom);
-	void TickFarmland    (int a_RelX, int a_RelY, int a_RelZ);
+	void TickBlocks  (MTRand & a_TickRandom);
+	void TickGrass   (int a_RelX, int a_RelY, int a_RelZ, MTRand & a_TickRandom);
+	void TickFarmland(int a_RelX, int a_RelY, int a_RelZ);
 	
 	/// Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking)
 	void GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);

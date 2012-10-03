@@ -61,10 +61,10 @@ void cSandSimulator::Simulate( float a_Dt )
 
 
 
-bool cSandSimulator::IsAllowedBlock( BLOCKTYPE a_BlockID )
+bool cSandSimulator::IsAllowedBlock( BLOCKTYPE a_BlockType )
 {
-	return a_BlockID == E_BLOCK_SAND
-		|| a_BlockID == E_BLOCK_GRAVEL;
+	return a_BlockType == E_BLOCK_SAND
+		|| a_BlockType == E_BLOCK_GRAVEL;
 }
 
 
@@ -93,10 +93,10 @@ void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 
 
 
-bool cSandSimulator::IsPassable( BLOCKTYPE a_BlockID )
+bool cSandSimulator::IsPassable( BLOCKTYPE a_BlockType )
 {
-	return a_BlockID == E_BLOCK_AIR
-		|| IsBlockWater(a_BlockID)
-		|| IsBlockLava(a_BlockID)
-		|| a_BlockID == E_BLOCK_FIRE;
+	return a_BlockType == E_BLOCK_AIR
+		|| IsBlockWater(a_BlockType)
+		|| IsBlockLava(a_BlockType)
+		|| a_BlockType == E_BLOCK_FIRE;
 }

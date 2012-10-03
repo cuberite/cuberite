@@ -11,8 +11,8 @@ class cBlockMushroomHandler :
 	public cBlockHandler
 {
 public:
-	cBlockMushroomHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockMushroomHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -20,13 +20,13 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to 0
-		a_Pickups.push_back(cItem(m_BlockID, 1, 0));
+		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		switch (a_World->GetBlock(a_X, a_Y - 1, a_Z))
+		switch (a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ))
 		{
 			case E_BLOCK_GLASS:
 			case E_BLOCK_CACTUS:

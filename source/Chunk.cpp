@@ -482,22 +482,7 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 		BLOCKTYPE ID = m_BlockTypes[Index];
 		switch( ID )
 		{
-			case E_BLOCK_CROPS:
-			{
-				NIBBLETYPE Meta = GetMeta(Index);
-				if (Meta < 7)
-				{
-					FastSetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, E_BLOCK_CROPS, ++Meta);
-				}
-				break;
-			}
-			
-			case E_BLOCK_PUMPKIN_STEM:
-			case E_BLOCK_MELON_STEM:   TickMelonPumpkin(m_BlockTickX, m_BlockTickY, m_BlockTickZ, Index, ID, a_TickRandom); break;
-			case E_BLOCK_FARMLAND:     TickFarmland    (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
-			case E_BLOCK_SUGARCANE:    GrowSugarcane   (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
-			case E_BLOCK_CACTUS:       GrowCactus      (m_BlockTickX, m_BlockTickY, m_BlockTickZ, 1); break;
-						
+			case E_BLOCK_FARMLAND: TickFarmland (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
 			
 			default:
 			{
@@ -508,21 +493,6 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			}
 		}
 	}
-}
-
-
-
-
-
-void cChunk::TickMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, int a_BlockIdx, BLOCKTYPE a_BlockType, MTRand & a_TickRandom)
-{
-	NIBBLETYPE Meta = GetMeta(a_BlockIdx);
-	if (Meta < 7)
-	{
-		FastSetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ, a_BlockType, ++Meta);
-		return;
-	}
-	GrowMelonPumpkin(a_RelX, a_RelY, a_RelZ, a_BlockType, a_TickRandom);
 }
 
 

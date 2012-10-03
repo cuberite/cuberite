@@ -34,9 +34,9 @@ public:
 	}
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		return a_BlockID == E_BLOCK_COBWEB
-			|| a_BlockID == E_BLOCK_VINES;
+		return a_BlockType == E_BLOCK_COBWEB
+			|| a_BlockType == E_BLOCK_VINES;
 	}
 };

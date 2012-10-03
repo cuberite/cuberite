@@ -23,11 +23,11 @@ public:
 
 	virtual void Simulate( float a_Dt ) override;
 
-	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockID ) override;
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override;
 
-	virtual bool IsBurnable( BLOCKTYPE a_BlockID );
-	virtual bool IsForeverBurnable( BLOCKTYPE a_BlockID );
-	virtual bool FiresForever( BLOCKTYPE a_BlockID );
+	virtual bool IsBurnable( BLOCKTYPE a_BlockType );
+	virtual bool IsForeverBurnable( BLOCKTYPE a_BlockType );
+	virtual bool FiresForever( BLOCKTYPE a_BlockType );
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;

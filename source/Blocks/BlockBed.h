@@ -14,15 +14,15 @@ class cBlockBedHandler :
 	public cBlockHandler
 {
 public:
-	cBlockBedHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockBedHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
 
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir) override;
-	virtual void OnDestroyed(cWorld * a_World, int a_X, int a_Y, int a_Z) override;
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z) override;
+	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override;
+	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 
 	virtual bool IsUseable(void) override

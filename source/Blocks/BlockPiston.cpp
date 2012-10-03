@@ -15,23 +15,30 @@
 
 
 
-cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockID)
-	: cBlockHandler(a_BlockID)
+cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
+	: cBlockHandler(a_BlockType)
 {
 }
 
-void cBlockPistonHandler::OnPlaced(cWorld *a_World, int a_X, int a_Y, int a_Z, int a_Dir)
-{
 
+
+
+
+void cBlockPistonHandler::OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
+{
 }
 
-void cBlockPistonHandler::OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z)
-{
-	char OldMeta = a_World->GetBlockMeta(a_X, a_Y, a_Z);
 
-	int newX = a_X;
-	int newY = a_Y;
-	int newZ = a_Z;
+
+
+
+void cBlockPistonHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	char OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+
+	int newX = a_BlockX;
+	int newY = a_BlockY;
+	int newZ = a_BlockZ;
 	AddPistonDir(newX, newY, newZ, OldMeta & ~(8), 1);
 
 	if (a_World->GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
@@ -40,12 +47,20 @@ void cBlockPistonHandler::OnDestroyed(cWorld *a_World, int a_X, int a_Y, int a_Z
 	}
 }
 
-void cBlockPistonHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir)
+
+
+
+
+void cBlockPistonHandler::PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
 {
 	
-	a_World->SetBlock(a_X, a_Y, a_Z, m_BlockID, cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch()));
-	OnPlacedByPlayer(a_World, a_Player, a_X, a_Y, a_Z, a_Dir);
+	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch()));
+	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 
 	cRedstone Redstone(a_World);
-	Redstone.ChangeRedstone(a_X, a_Y, a_Z, false);
+	Redstone.ChangeRedstone(a_BlockX, a_BlockY, a_BlockZ, false);
 }
+
+
+
+

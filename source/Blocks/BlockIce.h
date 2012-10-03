@@ -12,8 +12,8 @@ class cBlockIceHandler :
 	public cBlockHandler
 {
 public:
-	cBlockIceHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockIceHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -24,10 +24,10 @@ public:
 	}
 	
 	
-	virtual void OnDestroyed(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		// TODO: Ice destroyed with air below it should turn into air instead of water
-		a_World->FastSetBlock(a_X, a_Y, a_Z, E_BLOCK_STATIONARY_WATER, 8);
+		a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_STATIONARY_WATER, 8);
 		// This is called later than the real destroying of this ice block
 	}	
 } ;

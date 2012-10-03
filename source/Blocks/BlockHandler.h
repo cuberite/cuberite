@@ -19,43 +19,43 @@ class cPlayer;
 class cBlockHandler
 {
 public:
-	cBlockHandler(BLOCKTYPE a_BlockID);
+	cBlockHandler(BLOCKTYPE a_BlockType);
 
 	// Called when the block gets ticked either by a random tick or by a queued tick
-	virtual void OnUpdate(cWorld *a_World, int a_X, int a_Y, int a_Z);
+	virtual void OnUpdate(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/// Called by cBlockHandler::PlaceBlock after the player has placed a new block
-	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z, int a_Dir);
+	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir);
 	
 	/// Called before the player has destroyed a block
-	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z);
+	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called when a new block was placed. Called before OnPlacedByPlayer
-	virtual void OnPlaced(cWorld * a_World, int a_X, int a_Y, int a_Z, int a_Dir);
+	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir);
 	
 	/// Called before a block gets destroyed / replaced with air
-	virtual void OnDestroyed(cWorld * a_World, int a_X, int a_Y, int a_Z);
+	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called when a direct neighbor of this block has been changed (The position is the own position, not the neighbor position)
-	virtual void OnNeighborChanged(cWorld * a_World, int a_X, int a_Y, int a_Z);
+	virtual void OnNeighborChanged(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Notifies all neighbors of the given block about a change
-	static void NeighborChanged(cWorld * a_World, int a_X, int a_Y, int a_Z);
+	static void NeighborChanged(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called while the player diggs the block.
-	virtual void OnDigging(cWorld * a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z);
+	virtual void OnDigging(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called if the user right clicks the block and the block is useable
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_X, int a_Y, int a_Z);
+	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// This function handles the real block placement for the give block by a player and also calls OnPlacedByPlayer()
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_X, int a_Y, int a_Z, char a_Dir);
+	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
 
 	/// Called when the item is mined to convert it into pickups. Pickups may specify multiple items.
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 	
 	/// Handles the dropping of a block based on what ConvertToDrops() returns. This will not destroy the block
-	virtual void DropBlock(cWorld * a_World, int a_X, int a_Y, int a_Z);
+	virtual void DropBlock(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Returns step sound name of block
 	virtual const char * GetStepSound(void);
@@ -93,15 +93,16 @@ public:
 	
 
 	/// Get the blockhandler for a specific block id
-	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockID);
+	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockType);
 
 	/// Deletes all initialised block handlers
 	static void Deinit();
 	
 protected:
-	BLOCKTYPE m_BlockID;
-	// Creates a new blockhandler for the given block id. For internal use only, use GetBlockHandler instead.
-	static cBlockHandler *CreateBlockHandler(BLOCKTYPE a_BlockID);
+	BLOCKTYPE m_BlockType;
+	
+	// Creates a new blockhandler for the given block type. For internal use only, use ::GetBlockHandler() instead.
+	static cBlockHandler *CreateBlockHandler(BLOCKTYPE a_BlockType);
 	static cBlockHandler *m_BlockHandler[256];
 	static bool m_HandlerInitialized;	//used to detect if the blockhandlers are initialized
 };
@@ -111,9 +112,9 @@ protected:
 
 
 // Shortcut to get the blockhandler for a specific block
-inline cBlockHandler *BlockHandler(BLOCKTYPE a_BlockID)
+inline cBlockHandler * BlockHandler(BLOCKTYPE a_BlockType)
 {
-	return cBlockHandler::GetBlockHandler(a_BlockID);
+	return cBlockHandler::GetBlockHandler(a_BlockType);
 }
 
 

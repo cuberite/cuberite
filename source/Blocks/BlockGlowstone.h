@@ -11,8 +11,8 @@ class cBlockGlowstoneHandler :
 	public cBlockHandler
 {
 public:
-	cBlockGlowstoneHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockGlowstoneHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	

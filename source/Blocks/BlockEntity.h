@@ -10,8 +10,8 @@
 class cBlockEntityHandler : public cBlockHandler
 {
 public:
-	cBlockEntityHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockEntityHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 	

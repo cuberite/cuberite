@@ -11,8 +11,8 @@ class cBlockSugarcaneHandler :
 	public cBlockHandler
 {
 public:
-	cBlockSugarcaneHandler(BLOCKTYPE a_BlockID)
-		: cBlockHandler(a_BlockID)
+	cBlockSugarcaneHandler(BLOCKTYPE a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
@@ -23,16 +23,16 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		switch (a_World->GetBlock(a_X, a_Y - 1, a_Z))
+		switch (a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ))
 		{
 			case E_BLOCK_DIRT:
 			case E_BLOCK_GRASS:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_SAND:
 			{
-				return a_World->IsBlockDirectlyWatered(a_X, a_Y - 1, a_Z);
+				return a_World->IsBlockDirectlyWatered(a_BlockX, a_BlockY - 1, a_BlockZ);
 			}
 			case E_BLOCK_SUGARCANE:
 			{
@@ -43,16 +43,17 @@ public:
 	}
 	
 	
-	void OnUpdate(cWorld * a_World, int a_X, int a_Y, int a_Z) override
+	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		// TODO: Handle Growing here
+		a_World->GrowSugarcane(a_BlockX, a_BlockY, a_BlockZ, 1);
 	}
-	
+
 
 	virtual bool CanBePlacedOnSide() override
 	{
 		return false;
 	}
+	
 	
 	virtual const char * GetStepSound(void) override
 	{

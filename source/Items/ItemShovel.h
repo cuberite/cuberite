@@ -34,8 +34,8 @@ public:
 		return false;
 	}
 	
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockID) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		return a_BlockID == E_BLOCK_SNOW;
+		return a_BlockType == E_BLOCK_SNOW;
 	}
 };

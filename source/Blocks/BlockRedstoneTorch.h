@@ -13,8 +13,8 @@ class cBlockRedstoneTorchHandler :
 	public cBlockTorchHandler
 {
 public:
-	cBlockRedstoneTorchHandler(BLOCKTYPE a_BlockID)
-		: cBlockTorchHandler(a_BlockID)
+	cBlockRedstoneTorchHandler(BLOCKTYPE a_BlockType)
+		: cBlockTorchHandler(a_BlockType)
 	{
 	}
 
