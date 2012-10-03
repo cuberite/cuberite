@@ -1,17 +1,18 @@
-function OnBlockPlace( Block, Player )
+function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
 
 	-- dont check if the direction is in the air
-	if Block.m_Direction == -1 then
+	if BlockFace == BLOCK_FACE_NONE then
 		return false
 	end
 
-	if (Block.m_ItemType ~= 280) then -- not a Stick of Ticking
+	if (HeldItem.m_ItemType ~= 280) then
+		-- not a Stick of Ticking
 		return false
 	end
 
-	LOG("Setting next block tick to {" .. Block.m_PosX .. ", " .. Block.m_PosY .. ", " .. Block.m_PosZ .. "}")
+	LOG("Setting next block tick to {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "}")
 
-	Player:GetWorld():SetNextBlockTick(Block.m_PosX, Block.m_PosY, Block.m_PosZ);
+	Player:GetWorld():SetNextBlockTick(BlockX, BlockY, BlockZ);
 
 	return true
 
