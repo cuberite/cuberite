@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 09/24/12 00:25:03.
+** Generated automatically by tolua++-1.0.92 on 10/03/12 09:15:14.
 */
 
 #ifndef __cplusplus
@@ -11529,6 +11529,38 @@ static int tolua_AllToLua_cWorld_FastSetBlock00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: FastSetBlock of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_FastSetBlock01
+static int tolua_AllToLua_cWorld_FastSetBlock01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3i* a_Pos = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,3,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FastSetBlock'", NULL);
+#endif
+  {
+   self->FastSetBlock(*a_Pos,a_BlockType,a_BlockMeta);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cWorld_FastSetBlock00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetBlock of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetBlock00
 static int tolua_AllToLua_cWorld_GetBlock00(lua_State* tolua_S)
@@ -21180,6 +21212,17 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_TRIPWIRE_HOOK",E_BLOCK_TRIPWIRE_HOOK);
   tolua_constant(tolua_S,"E_BLOCK_TRIPWIRE",E_BLOCK_TRIPWIRE);
   tolua_constant(tolua_S,"E_BLOCK_EMERALD_BLOCK",E_BLOCK_EMERALD_BLOCK);
+  tolua_constant(tolua_S,"E_BLOCK_SPRUCE_WOOD_STAIRS",E_BLOCK_SPRUCE_WOOD_STAIRS);
+  tolua_constant(tolua_S,"E_BLOCK_BIRCH_WOOD_STAIRS",E_BLOCK_BIRCH_WOOD_STAIRS);
+  tolua_constant(tolua_S,"E_BLOCK_JUNGLE_WOOD_STAIRS",E_BLOCK_JUNGLE_WOOD_STAIRS);
+  tolua_constant(tolua_S,"E_BLOCK_COMMAND_BLOCK",E_BLOCK_COMMAND_BLOCK);
+  tolua_constant(tolua_S,"E_BLOCK_BEACON",E_BLOCK_BEACON);
+  tolua_constant(tolua_S,"E_BLOCK_COBBLESTONE_WALL",E_BLOCK_COBBLESTONE_WALL);
+  tolua_constant(tolua_S,"E_BLOCK_FLOWER_POT",E_BLOCK_FLOWER_POT);
+  tolua_constant(tolua_S,"E_BLOCK_CARROTS",E_BLOCK_CARROTS);
+  tolua_constant(tolua_S,"E_BLOCK_POTATOES",E_BLOCK_POTATOES);
+  tolua_constant(tolua_S,"E_BLOCK_WOODEN_BUTTON",E_BLOCK_WOODEN_BUTTON);
+  tolua_constant(tolua_S,"E_BLOCK_HEAD",E_BLOCK_HEAD);
   tolua_constant(tolua_S,"E_ITEM_EMPTY",E_ITEM_EMPTY);
   tolua_constant(tolua_S,"E_ITEM_STONE",E_ITEM_STONE);
   tolua_constant(tolua_S,"E_ITEM_GRASS",E_ITEM_GRASS);
@@ -21581,6 +21624,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);
   tolua_array(tolua_S,"g_BlockOneHitDig",tolua_get_AllToLua_g_BlockOneHitDig,tolua_set_AllToLua_g_BlockOneHitDig);
+  tolua_constant(tolua_S,"BLOCK_FACE_NONE",BLOCK_FACE_NONE);
   tolua_constant(tolua_S,"BLOCK_FACE_BOTTOM",BLOCK_FACE_BOTTOM);
   tolua_constant(tolua_S,"BLOCK_FACE_TOP",BLOCK_FACE_TOP);
   tolua_constant(tolua_S,"BLOCK_FACE_NORTH",BLOCK_FACE_NORTH);
@@ -21963,6 +22007,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GenerateChunk",tolua_AllToLua_cWorld_GenerateChunk00);
    tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cWorld_SetBlock00);
    tolua_function(tolua_S,"FastSetBlock",tolua_AllToLua_cWorld_FastSetBlock00);
+   tolua_function(tolua_S,"FastSetBlock",tolua_AllToLua_cWorld_FastSetBlock01);
    tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock00);
    tolua_function(tolua_S,"GetBlock",tolua_AllToLua_cWorld_GetBlock01);
    tolua_function(tolua_S,"GetBlockMeta",tolua_AllToLua_cWorld_GetBlockMeta00);

@@ -21,12 +21,13 @@ extern bool g_BlockOneHitDig[];
 // Block face constants, used in PlayerDigging and PlayerBlockPlacement packets
 enum
 {
-	BLOCK_FACE_BOTTOM = 0,  // Interacting with the bottom   face of the block
-	BLOCK_FACE_TOP    = 1,  // Interacting with the top      face of the block
-	BLOCK_FACE_NORTH  = 2,  // Interacting with the northern face of the block
-	BLOCK_FACE_SOUTH  = 3,  // Interacting with the southern face of the block
-	BLOCK_FACE_WEST   = 4,  // Interacting with the western  face of the block
-	BLOCK_FACE_EAST   = 5,  // Interacting with the eastern  face of the block
+	BLOCK_FACE_NONE   = -1,  // Interacting with no block face - swinging the item in the air
+	BLOCK_FACE_BOTTOM = 0,   // Interacting with the bottom   face of the block
+	BLOCK_FACE_TOP    = 1,   // Interacting with the top      face of the block
+	BLOCK_FACE_NORTH  = 2,   // Interacting with the northern face of the block
+	BLOCK_FACE_SOUTH  = 3,   // Interacting with the southern face of the block
+	BLOCK_FACE_WEST   = 4,   // Interacting with the western  face of the block
+	BLOCK_FACE_EAST   = 5,   // Interacting with the eastern  face of the block
 } ;
 
 // PlayerDigging status constants:
