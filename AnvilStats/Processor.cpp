@@ -489,6 +489,12 @@ void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & 
 {
 	PopulateFileQueue(a_WorldFolder);
 	
+	if (m_FileQueue.empty())
+	{
+		LOG("No files to process, exitting.");
+		return;
+	}
+	
 	// Start as many threads as there are cores, plus one:
 	// (One more thread can be in the file-read IO block while all other threads crunch the numbers)
 	int NumThreads = GetNumCores() + 1;
@@ -503,10 +509,12 @@ void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & 
 	
 	// Wait for all threads to finish
 	// simply by calling each thread's destructor sequentially
+	LOG("Waiting for threads to finish");
 	for (cThreads::iterator itr = m_Threads.begin(), end = m_Threads.end(); itr != end; ++itr)
 	{
 		delete *itr;
 	}  // for itr - m_Threads[]
+	LOG("Processor finished");
 }
 
 
