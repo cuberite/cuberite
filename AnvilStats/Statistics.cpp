@@ -293,11 +293,11 @@ cStatisticsFactory::~cStatisticsFactory()
 	LOG("cStatistics:");
 	LOG("  Joining results...");
 	JoinResults();
-	LOG("  Total %d chunks went through", m_CombinedStats.m_TotalChunks);
-	LOG("  Biomes processed for %d chunks", m_CombinedStats.m_BiomeNumChunks);
+	LOG("  Total %llu chunks went through", m_CombinedStats.m_TotalChunks);
+	LOG("  Biomes processed for %llu chunks", m_CombinedStats.m_BiomeNumChunks);
 	
 	// Check the number of blocks processed
-	Int64 TotalBlocks = 0;
+	UInt64 TotalBlocks = 0;
 	for (int i = 0; i <= 255; i++)
 	{
 		for (int j = 0; j < 255; j++)
@@ -305,8 +305,8 @@ cStatisticsFactory::~cStatisticsFactory()
 			TotalBlocks += m_CombinedStats.m_BlockCounts[i][j];
 		}
 	}
-	Int64 ExpTotalBlocks = (Int64)(m_CombinedStats.m_BlockNumChunks) * 16LL * 16LL * 256LL;
-	LOG("  BlockIDs processed for %d chunks, %lld blocks (exp %lld; %s)", m_CombinedStats.m_BlockNumChunks, TotalBlocks, ExpTotalBlocks, (TotalBlocks == ExpTotalBlocks) ? "match" : "failed");
+	UInt64 ExpTotalBlocks = m_CombinedStats.m_BlockNumChunks * 16LL * 16LL * 256LL;
+	LOG("  BlockIDs processed for %llu chunks, %llu blocks (exp %llu; %s)", m_CombinedStats.m_BlockNumChunks, TotalBlocks, ExpTotalBlocks, (TotalBlocks == ExpTotalBlocks) ? "match" : "failed");
 	
 	// Save statistics:
 	LOG("  Saving statistics into files:");
