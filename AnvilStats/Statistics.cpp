@@ -355,7 +355,7 @@ void cStatisticsFactory::SaveBiomes(void)
 	for (int i = 0; i <= 255; i++)
 	{
 		AString Line;
-		Printf(Line, "%s\t%d\t%d\t%.05f\n", GetBiomeString(i), i, m_CombinedStats.m_BiomeCounts[i], ((double)(m_CombinedStats.m_BiomeCounts[i])) / TotalColumns);
+		Printf(Line, "%s\t%d\t%llu\t%.05f\n", GetBiomeString(i), i, m_CombinedStats.m_BiomeCounts[i], ((double)(m_CombinedStats.m_BiomeCounts[i])) / TotalColumns);
 		f.Write(Line.c_str(), Line.length());
 	}
 }
@@ -380,13 +380,13 @@ void cStatisticsFactory::SaveBlockTypes(void)
 	}
 	for (int i = 0; i <= 255; i++)
 	{
-		int Count = 0;
+		UInt64 Count = 0;
 		for (int Biome = 0; Biome <= 255; ++Biome)
 		{
 			Count += m_CombinedStats.m_BlockCounts[Biome][i];
 		}
 		AString Line;
-		Printf(Line, "%s\t%d\t%d\t%.08f\n", GetBlockTypeString(i), i, Count, ((double)Count) / TotalBlocks);
+		Printf(Line, "%s\t%d\t%llu\t%.08f\n", GetBlockTypeString(i), i, Count, ((double)Count) / TotalBlocks);
 		f.Write(Line.c_str(), Line.length());
 	}
 }
@@ -430,7 +430,7 @@ void cStatisticsFactory::SaveBiomeBlockTypes(void)
 		Printf(Line, "%s\t%d", GetBlockTypeString(BlockType), BlockType);
 		for (int Biome = 0; Biome <= 127; Biome++)
 		{
-			AppendPrintf(Line, "\t%d", m_CombinedStats.m_BlockCounts[Biome][BlockType]);
+			AppendPrintf(Line, "\t%llu", m_CombinedStats.m_BlockCounts[Biome][BlockType]);
 		}
 		Line.append("\n");
 		f.Write(Line.c_str(), Line.length());
@@ -458,7 +458,7 @@ void cStatisticsFactory::SaveBiomeBlockTypes(void)
 		Printf(Line, "%s\t%d", GetBlockTypeString(BlockType), BlockType);
 		for (int Biome = 128; Biome <= 255; Biome++)
 		{
-			AppendPrintf(Line, "\t%d", m_CombinedStats.m_BlockCounts[Biome][BlockType]);
+			AppendPrintf(Line, "\t%llu", m_CombinedStats.m_BlockCounts[Biome][BlockType]);
 		}
 		Line.append("\n");
 		f.Write(Line.c_str(), Line.length());
@@ -481,15 +481,18 @@ void cStatisticsFactory::SaveStatistics(void)
 	
 	int Elapsed = (clock() - m_BeginTick) / CLOCKS_PER_SEC;
 	f.Printf("Time elapsed: %d seconds (%d hours, %d minutes and %d seconds)\n", Elapsed, Elapsed / 3600, (Elapsed / 60) % 60, Elapsed % 60);
-	f.Printf("Total chunks processed: %d\n", m_CombinedStats.m_TotalChunks);
-	f.Printf("Chunk processing speed: %.02f chunks per second\n", (double)(m_CombinedStats.m_TotalChunks) / Elapsed);
-	f.Printf("Biomes counted for %d chunks.\n", m_CombinedStats.m_BiomeNumChunks);
-	f.Printf("Blocktypes counted for %d chunks.\n", m_CombinedStats.m_BlockNumChunks);
-	f.Printf("Total blocks counted: %lld\n", (Int64)(m_CombinedStats.m_BlockNumChunks) * 16 * 16 * 256);
-	f.Printf("Total biomes counted: %lld\n", (Int64)(m_CombinedStats.m_BiomeNumChunks) * 16 * 16);
-	f.Printf("Total entities counted: %d\n", m_CombinedStats.m_NumEntities);
-	f.Printf("Total tile entities counted: %d\n", m_CombinedStats.m_NumTileEntities);
-	f.Printf("Total tile ticks counted: %d\n", m_CombinedStats.m_NumTileTicks);
+	f.Printf("Total chunks processed: %llu\n", m_CombinedStats.m_TotalChunks);
+	if (Elapsed > 0)
+	{
+		f.Printf("Chunk processing speed: %.02f chunks per second\n", (double)(m_CombinedStats.m_TotalChunks) / Elapsed);
+	}
+	f.Printf("Biomes counted for %llu chunks.\n", m_CombinedStats.m_BiomeNumChunks);
+	f.Printf("Blocktypes counted for %llu chunks.\n", m_CombinedStats.m_BlockNumChunks);
+	f.Printf("Total blocks counted: %llu\n", m_CombinedStats.m_BlockNumChunks * 16 * 16 * 256);
+	f.Printf("Total biomes counted: %llu\n", m_CombinedStats.m_BiomeNumChunks * 16 * 16);
+	f.Printf("Total entities counted: %llu\n", m_CombinedStats.m_NumEntities);
+	f.Printf("Total tile entities counted: %llu\n", m_CombinedStats.m_NumTileEntities);
+	f.Printf("Total tile ticks counted: %llu\n", m_CombinedStats.m_NumTileTicks);
 	f.Printf("Chunk coord ranges:\n");
 	f.Printf("\tX: %d .. %d\n", m_CombinedStats.m_MinChunkX, m_CombinedStats.m_MaxChunkX);
 	f.Printf("\tZ: %d .. %d\n", m_CombinedStats.m_MinChunkZ, m_CombinedStats.m_MaxChunkZ);
@@ -511,7 +514,7 @@ void cStatisticsFactory::SaveSpawners(void)
 	f.Printf("Entity type\tTotal count\tCount per chunk\n");
 	for (int i = 0; i < entMax; i++)
 	{
-		f.Printf("%s\t%d\t%0.4f\n", GetEntityTypeString((eEntityType)i), m_CombinedStats.m_SpawnerEntity[i], (double)(m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks);
+		f.Printf("%s\t%llu\t%0.4f\n", GetEntityTypeString((eEntityType)i), m_CombinedStats.m_SpawnerEntity[i], (double)(m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks);
 	}
 }
 

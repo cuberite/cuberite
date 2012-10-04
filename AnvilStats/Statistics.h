@@ -23,18 +23,19 @@ public:
 	class cStats
 	{
 	public:
-		int m_TotalChunks;  // Total number of chunks that go through this callback (OnNewChunk())
-		int m_BiomeCounts[256];
-		int m_BlockCounts[256][256];  // First dimension is the biome, second dimension is BlockType
-		int m_BiomeNumChunks;  // Num chunks that have been processed for biome stats
-		int m_BlockNumChunks;  // Num chunks that have been processed for block stats
-		int m_NumEntities;
-		int m_NumTileEntities;
-		int m_NumTileTicks;
+		UInt64 m_TotalChunks;  // Total number of chunks that go through this callback (OnNewChunk())
+		UInt64 m_BiomeCounts[256];
+		UInt64 m_BlockCounts[256][256];  // First dimension is the biome, second dimension is BlockType
+		UInt64 m_BiomeNumChunks;  // Num chunks that have been processed for biome stats
+		UInt64 m_BlockNumChunks;  // Num chunks that have been processed for block stats
+		UInt64 m_NumEntities;
+		UInt64 m_NumTileEntities;
+		UInt64 m_NumTileTicks;
 		int m_MinChunkX, m_MaxChunkX;  // X coords range
 		int m_MinChunkZ, m_MaxChunkZ;  // Z coords range
 		
-		int m_SpawnerEntity[entMax + 1];
+		Int64 m;
+		UInt64 m_SpawnerEntity[entMax + 1];
 		
 		cStats(void);
 		void Add(const cStats & a_Stats);
