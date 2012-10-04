@@ -31,11 +31,14 @@ public:
 		int m_NumEntities;
 		int m_NumTileEntities;
 		int m_NumTileTicks;
+		int m_MinChunkX, m_MaxChunkX;  // X coords range
+		int m_MinChunkZ, m_MaxChunkZ;  // Z coords range
 		
 		int m_SpawnerEntity[entMax + 1];
 		
 		cStats(void);
 		void Add(const cStats & a_Stats);
+		void UpdateCoordsRange(int a_ChunkX, int a_ChunkZ);
 	} ;
 	
 	cStatistics(void);

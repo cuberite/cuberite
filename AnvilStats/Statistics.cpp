@@ -20,7 +20,11 @@ cStatistics::cStats::cStats(void) :
 	m_BlockNumChunks(0),
 	m_NumEntities(0),
 	m_NumTileEntities(0),
-	m_NumTileTicks(0)
+	m_NumTileTicks(0),
+	m_MinChunkX(0x7fffffff),
+	m_MaxChunkX(0x80000000),
+	m_MinChunkZ(0x7fffffff),
+	m_MaxChunkZ(0x80000000)
 {
 	memset(m_BiomeCounts, 0, sizeof(m_BiomeCounts));
 	memset(m_BlockCounts, 0, sizeof(m_BlockCounts));
@@ -54,6 +58,32 @@ void cStatistics::cStats::Add(const cStatistics::cStats & a_Stats)
 	m_NumEntities += a_Stats.m_NumEntities;
 	m_NumTileEntities += a_Stats.m_NumTileEntities;
 	m_NumTileTicks += a_Stats.m_NumTileTicks;
+	UpdateCoordsRange(a_Stats.m_MinChunkX, a_Stats.m_MinChunkZ);
+	UpdateCoordsRange(a_Stats.m_MinChunkX, a_Stats.m_MinChunkZ);
+}
+
+
+
+
+
+void cStatistics::cStats::UpdateCoordsRange(int a_ChunkX, int a_ChunkZ)
+{
+	if (a_ChunkX < m_MinChunkX)
+	{
+		m_MinChunkX = a_ChunkX;
+	}
+	if (a_ChunkX > m_MaxChunkX)
+	{
+		m_MaxChunkX = a_ChunkX;
+	}
+	if (a_ChunkZ < m_MinChunkZ)
+	{
+		m_MinChunkZ = a_ChunkZ;
+	}
+	if (a_ChunkZ > m_MaxChunkZ)
+	{
+		m_MaxChunkZ = a_ChunkZ;
+	}
 }
 
 
@@ -74,6 +104,7 @@ cStatistics::cStatistics(void)
 bool cStatistics::OnNewChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_Stats.m_TotalChunks++;
+	m_Stats.UpdateCoordsRange(a_ChunkX, a_ChunkZ);
 	m_IsBiomesValid = false;
 	m_IsFirstSectionInChunk = true;
 	return false;
@@ -459,6 +490,9 @@ void cStatisticsFactory::SaveStatistics(void)
 	f.Printf("Total entities counted: %d\n", m_CombinedStats.m_NumEntities);
 	f.Printf("Total tile entities counted: %d\n", m_CombinedStats.m_NumTileEntities);
 	f.Printf("Total tile ticks counted: %d\n", m_CombinedStats.m_NumTileTicks);
+	f.Printf("Chunk coord ranges:\n");
+	f.Printf("\tX: %d .. %d\n", m_CombinedStats.m_MinChunkX, m_CombinedStats.m_MaxChunkX);
+	f.Printf("\tZ: %d .. %d\n", m_CombinedStats.m_MinChunkZ, m_CombinedStats.m_MaxChunkZ);
 }
 
 
@@ -480,3 +514,7 @@ void cStatisticsFactory::SaveSpawners(void)
 		f.Printf("%s\t%d\t%0.4f\n", GetEntityTypeString((eEntityType)i), m_CombinedStats.m_SpawnerEntity[i], (double)(m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks);
 	}
 }
+
+
+
+

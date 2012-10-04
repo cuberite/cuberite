@@ -48,6 +48,8 @@ int main(int argc, char * argv[])
 	cProcessor Processor;
 	Processor.ProcessWorld(WorldFolder, *Factory);
 	
+	LOG("Processing finished");
+	
 	delete Factory;
 	
 	LOG("Done");
