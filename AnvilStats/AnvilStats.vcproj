@@ -356,6 +356,30 @@
 			<File
 				RelativePath="..\source\WorldStorage\FastNBT.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="NBT_RESERVE_SIZE=10000"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="NBT_RESERVE_SIZE=10000"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release profiled|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						PreprocessorDefinitions="NBT_RESERVE_SIZE=10000"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\source\WorldStorage\FastNBT.h"

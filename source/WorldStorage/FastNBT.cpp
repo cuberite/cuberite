@@ -10,6 +10,12 @@
 
 
 
+// The number of NBT tags that are reserved when an NBT parsing is started. 
+// You can override this by using a cmdline define
+#ifndef NBT_RESERVE_SIZE
+	#define NBT_RESERVE_SIZE 200
+#endif  // NBT_RESERVE_SIZE
+
 #define RETURN_FALSE_IF_FALSE(X) do { if (!X) return false; } while (0)
 
 
@@ -54,7 +60,7 @@ bool cParsedNBT::Parse(void)
 		return false;
 	}
 	
-	m_Tags.reserve(200);
+	m_Tags.reserve(NBT_RESERVE_SIZE);
 	
 	m_Tags.push_back(cFastNBTTag(TAG_Compound, -1));
 	
