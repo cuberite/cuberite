@@ -522,7 +522,14 @@ int cProtocol132::ParseHandshake(void)
 int cProtocol132::ParseClientStatuses(void)
 {
 	HANDLE_PACKET_READ(ReadByte, byte, Status);
-	m_Client->HandleLogin(39, m_Username);
+	if ((Status & 1) == 0)
+	{
+		m_Client->HandleLogin(39, m_Username);
+	}
+	else
+	{
+		m_Client->HandleRespawn();
+	}
 	return PARSE_OK;
 }
 
