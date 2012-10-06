@@ -21,7 +21,6 @@
 #include "Torch.h"
 #include "Ladder.h"
 #include "Pickup.h"
-#include "Redstone.h"
 #include "Item.h"
 #include "Noise.h"
 #include "Root.h"

@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Piston.h"
-#include "Redstone.h"
 #include "ChunkDef.h"
 #include "Pickup.h"
 #include "Item.h"
@@ -52,10 +51,9 @@ unsigned short cPiston::FirstPassthroughBlock( int pistonX, int pistonY, int pis
 
 void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 {
-	char pistonBlock = m_World->GetBlock( pistx, pisty, pistz );
-	char pistonMeta = m_World->GetBlockMeta( pistx, pisty, pistz );
+	BLOCKTYPE pistonBlock = m_World->GetBlock( pistx, pisty, pistz );
+	NIBBLETYPE pistonMeta = m_World->GetBlockMeta( pistx, pisty, pistz );
 	char isSticky = (char)(pistonBlock == E_BLOCK_STICKY_PISTON) * 8;
-	bool recalc = false;
 	if ( (pistonMeta & 0x8) == 0x0 ) // only extend if piston is not already extended 
 	{
 		unsigned short dist = FirstPassthroughBlock(pistx, pisty, pistz, pistonMeta);
@@ -71,7 +69,6 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 			{
 				Handler->DropBlock(m_World, pistx, pisty, pistz);
 			}
-			recalc = true;
 		}
 		int oldx = pistx, oldy = pisty, oldz = pistz;
 		char currBlockMeta;
@@ -95,13 +92,6 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		AddDir(extx, exty, extz, pistonMeta & 7, 1)
 
 		m_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, isSticky + pistonMeta & 7);
-		
-		if (recalc)
-		{
-			cRedstone Redstone(m_World);
-			Redstone.ChangeRedstone(extx,  exty,  extz,  false);  // recalculate redstone around current device
-			Redstone.ChangeRedstone(pistx, pisty, pistz, false);  // recalculate redstone around current device
-		}
 	}
 }
 

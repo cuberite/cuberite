@@ -10,7 +10,6 @@
 #include "CraftingRecipes.h"
 #include "PluginManager.h"
 #include "MonsterConfig.h"
-#include "Redstone.h"
 #include "Player.h"
 #include "Blocks/BlockHandler.h"
 #include "Items/ItemHandler.h"
@@ -203,11 +202,7 @@ void cRoot::Start()
 
 void cRoot::LoadGlobalSettings()
 {
-	cIniFile IniFile("settings.ini"); 
-	if( IniFile.ReadFile() )
-	{
-		cRedstone::s_UseRedstone = IniFile.GetValueB("Redstone", "SimulateRedstone", true );
-	}
+	// Nothing needed yet
 }
 
 

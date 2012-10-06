@@ -1,16 +1,25 @@
+
 #include "Globals.h"
 #include "BlockPiston.h"
 #include "../Item.h"
 #include "../World.h"
-#include "../Redstone.h"
 #include "../Player.h"
 #include "../Piston.h"
 
 
 
-#define AddPistonDir(x, y, z, dir, amount) switch (dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
-													 case 2: (z)-=(amount); break; case 3: (z)+=(amount); break;\
-													 case 4: (x)-=(amount); break; case 5: (x)+=(amount); break; }
+
+
+#define AddPistonDir(x, y, z, dir, amount) \
+	switch (dir) \
+	{ \
+		case 0: (y) -= (amount); break; \
+		case 1: (y) += (amount); break; \
+		case 2: (z) -= (amount); break; \
+		case 3: (z) += (amount); break; \
+		case 4: (x) -= (amount); break; \
+		case 5: (x) += (amount); break; \
+	}
 
 
 
@@ -56,9 +65,6 @@ void cBlockPistonHandler::PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBL
 	
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch()));
 	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
-
-	cRedstone Redstone(a_World);
-	Redstone.ChangeRedstone(a_BlockX, a_BlockY, a_BlockZ, false);
 }
 
 

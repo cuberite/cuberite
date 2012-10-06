@@ -1035,14 +1035,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Redstone.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Redstone.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\RedstoneSimulator.cpp"
 					>
 				</File>

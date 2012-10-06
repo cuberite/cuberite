@@ -17,7 +17,6 @@
 #include "Ladder.h"
 #include "Vine.h"
 #include "Sign.h"
-#include "Redstone.h"
 #include "Piston.h"
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
