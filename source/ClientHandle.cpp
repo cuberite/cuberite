@@ -571,15 +571,18 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
 		// Check for clickthrough-blocks:
-		int pX = a_BlockX;
-		int pY = a_BlockY;
-		int pZ = a_BlockZ;
-		AddDirection(pX, pY, pZ, a_BlockFace);
-
-		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
-		if (Handler->IsClickedThrough())
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
-			Handler->OnDigging(World, m_Player, pX, pY, pZ);
+			int pX = a_BlockX;
+			int pY = a_BlockY;
+			int pZ = a_BlockZ;
+			AddDirection(pX, pY, pZ, a_BlockFace);
+
+			Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+			if (Handler->IsClickedThrough())
+			{
+				Handler->OnDigging(World, m_Player, pX, pY, pZ);
+			}
 		}
 	}
 }
