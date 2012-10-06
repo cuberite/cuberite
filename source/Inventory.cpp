@@ -73,11 +73,11 @@ bool cInventory::AddItem( cItem & a_Item )
 		return false;
 	}
 
-	for(unsigned int i = 0; i < c_NumSlots; i++)
+	for (unsigned int i = 0; i < c_NumSlots; i++)
 	{
-		if( ChangedSlots[i] )
+		if (ChangedSlots[i])
 		{
-			LOG("Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemID, m_Slots[i].m_ItemCount );
+			LOGD("cInventory::AddItem(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemID, m_Slots[i].m_ItemCount);
 			SendSlot(i);
 		}
 	}

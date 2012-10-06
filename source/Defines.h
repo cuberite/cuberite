@@ -132,6 +132,7 @@ inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, boo
 			default:
 			{
 				LOGWARNING("AddDirection(): Unknown direction: %d", a_Direction);
+				ASSERT(!"AddDirection(): Unknown direction");
 				break;
 			}
 		}
@@ -149,6 +150,7 @@ inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, boo
 			default:
 			{
 				LOGWARNING("AddDirection(): Unknown inv direction: %d", a_Direction);
+				ASSERT(!"AddDirection(): Unknown direction");
 				break;
 			}
 		}

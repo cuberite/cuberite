@@ -47,8 +47,8 @@ cMonster::cMonster()
 	, m_AttackRate(3)
 	, idle_interval(0)
 {
-	LOG("cMonster::cMonster()");
-	LOG("In state: %s", GetState());
+	LOGD("cMonster::cMonster()");
+	LOGD("In state: %s", GetState());
 
 	m_bBurnable = true;
 	m_MetaData = NORMAL;
@@ -60,7 +60,7 @@ cMonster::cMonster()
 
 cMonster::~cMonster()
 {
-	LOG("cMonster::~cMonster()");
+	LOGD("cMonster::~cMonster()");
 }
 
 
@@ -373,7 +373,8 @@ void cMonster::SetState(const AString & a_State)
 	}
 	else
 	{
-		printf("Invalid State");
+		LOGD("cMonster::SetState(): Invalid state");
+		ASSERT(!"Invalid state");
 	}
 }
 
