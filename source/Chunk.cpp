@@ -317,6 +317,59 @@ void cChunk::GetBlockData(BLOCKTYPE * a_BlockData)
 
 
 
+void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+{
+	if ((a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)) != (cBlockArea::baTypes | cBlockArea::baMetas))
+	{
+		LOGWARNING("cChunk::WriteBlockArea(): unsupported datatype request, can write only types + metas (0x%x), requested 0x%x. Ignoring.",
+			(cBlockArea::baTypes | cBlockArea::baMetas), a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)
+		);
+		return;
+	}
+	
+	// SizeX, SizeZ are the dimensions of the block data to copy to the chunk (size of the geometric union)
+
+	int BlockStartX = std::max(a_MinBlockX, m_PosX * cChunkDef::Width);
+	int BlockEndX   = std::min(a_MinBlockX + a_Area.GetSizeX(), (m_PosX + 1) * cChunkDef::Width);
+	int BlockStartZ = std::max(a_MinBlockZ, m_PosZ * cChunkDef::Width);
+	int BlockEndZ   = std::min(a_MinBlockZ + a_Area.GetSizeZ(), (m_PosZ + 1) * cChunkDef::Width);
+	int SizeX = BlockEndX - BlockStartX;
+	int SizeZ = BlockEndZ - BlockStartZ;
+	int OffX = BlockStartX - m_PosX * cChunkDef::Width;
+	int OffZ = BlockStartZ - m_PosZ * cChunkDef::Width;
+	int BaseX = BlockStartX - a_MinBlockX;
+	int BaseZ = BlockStartZ - a_MinBlockZ;
+	int SizeY = a_Area.GetSizeY();
+
+	// TODO: Improve this by not calling FastSetBlock() and doing the processing here
+	// so that the heightmap is touched only once for each column.
+	BLOCKTYPE *  AreaBlockTypes = a_Area.GetBlockTypes();
+	NIBBLETYPE * AreaBlockMetas = a_Area.GetBlockMetas();
+	for (int y = 0; y < SizeY; y++)
+	{
+		int ChunkY = a_MinBlockY + y;
+		int AreaY = y;
+		for (int z = 0; z < SizeZ; z++)
+		{
+			int ChunkZ = OffZ + z;
+			int AreaZ = BaseZ + z;
+			for (int x = 0; x < SizeX; x++)
+			{
+				int ChunkX = OffX + x;
+				int AreaX = BaseX + x;
+				int idx = a_Area.MakeIndex(AreaX, AreaY, AreaZ);
+				BLOCKTYPE BlockType = AreaBlockTypes[idx];
+				NIBBLETYPE BlockMeta = AreaBlockMetas[idx];
+				FastSetBlock(ChunkX, ChunkY, ChunkZ, BlockType, BlockMeta);
+			}  // for x
+		}  // for z
+	}  // for y
+}
+
+
+
+
+
 /// Returns true if there is a block entity at the coords specified
 bool cChunk::HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {

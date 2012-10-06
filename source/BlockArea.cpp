@@ -50,6 +50,7 @@ void cBlockArea::Clear(void)
 
 
 
+
 bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
@@ -65,6 +66,11 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 	{
 		std::swap(a_MinBlockZ, a_MaxBlockZ);
 	}
+	
+	// Include the Max coords:
+	a_MaxBlockX += 1;
+	a_MaxBlockY += 1;
+	a_MaxBlockZ += 1;
 	
 	// Check coords validity:
 	if (a_MinBlockY < 0)
@@ -111,6 +117,7 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 		Clear();
 		return false;
 	}
+	
 	return true;
 }
 
@@ -120,11 +127,62 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 
 bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
-	// TODO
-	ASSERT(!"Not implemented yet");
-	return false;
+	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
+	a_DataTypes = a_DataTypes & GetDataTypes();  // For release builds, silently cut off the datatypes that I don't have
+
+	// Check coords validity:
+	if (a_MinBlockY < 0)
+	{
+		LOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero");
+		a_MinBlockY = 0;
+	}
+	else if (a_MinBlockY >= cChunkDef::Height - m_SizeY)
+	{
+		LOGWARNING("cBlockArea::Read(): MinBlockY + m_SizeY more than chunk height, adjusting to chunk height");
+		a_MinBlockY = cChunkDef::Height - m_SizeY - 1;
+	}
+
+	return a_World->WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }
 
+
+
+
+
+void cBlockArea::DumpToRawFile(const AString & a_FileName)
+{
+	cFile f;
+	if (!f.Open(a_FileName, cFile::fmWrite))
+	{
+		LOGWARNING("cBlockArea: Cannot open file \"%s\" for raw dump", a_FileName.c_str());
+		return;
+	}
+	UInt32 SizeX = ntohl(m_SizeX);
+	UInt32 SizeY = ntohl(m_SizeY);
+	UInt32 SizeZ = ntohl(m_SizeZ);
+	f.Write(&SizeX, 4);
+	f.Write(&SizeY, 4);
+	f.Write(&SizeZ, 4);
+	unsigned char DataTypes = GetDataTypes();
+	f.Write(&DataTypes, 1);
+	int NumBlocks = GetBlockCount();
+	if (HasBlockTypes())
+	{
+		f.Write(m_BlockTypes, NumBlocks * sizeof(BLOCKTYPE));
+	}
+	if (HasBlockMetas())
+	{
+		f.Write(m_BlockMetas, NumBlocks);
+	}
+	if (HasBlockLights())
+	{
+		f.Write(m_BlockLight, NumBlocks);
+	}
+	if (HasBlockSkyLights())
+	{
+		f.Write(m_BlockSkyLight, NumBlocks);
+	}
+}
 
 
 
@@ -619,7 +677,6 @@ void cBlockArea::cChunkReader::BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight)
 	}
 	CopyNibbles(m_Area.m_BlockSkyLight, a_BlockSkyLight);
 }
-
 
 
 

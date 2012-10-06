@@ -4,6 +4,8 @@
 // Interfaces to the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed again without further queries
 // The object also supports writing the blockdata back into cWorld, even into other coords
 
+// NOTE: All Nibble values (meta, blocklight, skylight) are stored one-nibble-per-byte for faster access / editting!
+
 
 
 
@@ -48,8 +50,11 @@ public:
 	/// Reads an area of blocks specified. Returns true if successful. All coords are inclusive.
 	bool Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
 	
-	/// Writes the area back into cWorld at the coords specified. Returns true if successful.
+	/// Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all
 	bool Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
+	
+	/// For testing purposes only, dumps the area into a file.
+	void DumpToRawFile(const AString & a_FileName);
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
@@ -74,21 +79,30 @@ public:
 	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ);
 	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ);
 	
+	int GetSizeX(void) const { return m_SizeX; }
+	int GetSizeY(void) const { return m_SizeY; }
+	int GetSizeZ(void) const { return m_SizeZ; }
+	
 	/// Returns the datatypes that are stored in the object (bitmask of baXXX values)
 	int GetDataTypes(void) const;
+	
+	bool HasBlockTypes    (void) const { return (m_BlockTypes    != NULL); }
+	bool HasBlockMetas    (void) const { return (m_BlockMetas    != NULL); }
+	bool HasBlockLights   (void) const { return (m_BlockLight    != NULL); }
+	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != NULL); }
 	
 	// tolua_end
 	
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/// Returns the internal pointer to the block types
-	BLOCKTYPE * GetBlockTypes(void) { return m_BlockTypes; }
-	int         GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
-	
-	// tolua_begin
+	BLOCKTYPE *  GetBlockTypes   (void) { return m_BlockTypes; }
+	NIBBLETYPE * GetBlockMetas   (void) { return m_BlockMetas; }     // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockLight   (void) { return m_BlockLight; }     // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockSkyLight(void) { return m_BlockSkyLight; }  // NOTE: one byte per block!
+	int          GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
+	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ);
 
 protected:
-
-	// tolua_end
 	
 	class cChunkReader :
 		public cChunkDataCallback
@@ -114,7 +128,6 @@ protected:
 		virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override;
 	} ;
 	
-	// tolua_begin
 	
 	int m_OriginX;
 	int m_OriginY;
@@ -130,8 +143,6 @@ protected:
 	
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);
 	
-	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ);
-	
 	// Basic Setters:
 	void SetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
 	void SetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
@@ -139,6 +150,8 @@ protected:
 	// Basic Getters:
 	NIBBLETYPE GetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE * a_Array);
 	NIBBLETYPE GetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array);
+
+	// tolua_begin
 } ;
 // tolua_end
 

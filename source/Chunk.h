@@ -43,6 +43,7 @@ class cBlockArea;
 class cPawn;
 class cPickup;
 class cChunkDataSerializer;
+class cBlockArea;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cItemCallback<cEntity>        cEntityCallback;
@@ -108,6 +109,9 @@ public:
 	/// Copies entire block data into a_BlockData, the entire 4 arrays (Type, Meta, Light, SkyLight)
 	void GetBlockData(BLOCKTYPE  * a_BlockData);
 	
+	/// Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk!
+	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
+
 	/// Returns true if there is a block entity at the coords specified
 	bool HasBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ);
 	

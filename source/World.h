@@ -252,6 +252,13 @@ public:
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	void GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);  // tolua_export
 	
+	/** Writes the block area into the specified coords. 
+	Returns true if all chunks have been processed. 
+	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
+	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
+	*/
+	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
+	
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities:
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0);
 	

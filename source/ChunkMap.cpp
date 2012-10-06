@@ -10,6 +10,7 @@
 #include "Pickup.h"
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
+#include "BlockArea.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -1486,6 +1487,44 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 			Chunk->GetAllData(a_Callback);
 		}
 	}
+	return Result;
+}
+
+
+
+
+
+bool cChunkMap::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+{
+	// Convert block coords to chunks coords:
+	int MinChunkX, MaxChunkX;
+	int MinChunkZ, MaxChunkZ;
+	int MinBlockX = a_MinBlockX;
+	int MinBlockY = a_MinBlockY;
+	int MinBlockZ = a_MinBlockZ;
+	int MaxBlockX = a_MinBlockX + a_Area.GetSizeX();
+	int MaxBlockY = a_MinBlockY + a_Area.GetSizeY();
+	int MaxBlockZ = a_MinBlockZ + a_Area.GetSizeZ();
+	cChunkDef::AbsoluteToRelative(MinBlockX, MinBlockY, MinBlockZ, MinChunkX, MinChunkZ);
+	cChunkDef::AbsoluteToRelative(MaxBlockX, MaxBlockY, MaxBlockZ, MaxChunkX, MaxChunkZ);
+	
+	// Iterate over chunks, write data into each:
+	bool Result = true;
+	cCSLock Lock(m_CSLayers);
+	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
+	{
+		for (int x = MinChunkX; x <= MaxChunkX; x++)
+		{
+			cChunkPtr Chunk = GetChunkNoLoad(x, ZERO_CHUNK_Y, z);
+			if ((Chunk == NULL) || (!Chunk->IsValid()))
+			{
+				// Not present / not valid
+				Result = false;
+				continue;
+			}
+			Chunk->WriteBlockArea(a_Area, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
+		}  // for x
+	}  // for z
 	return Result;
 }
 
