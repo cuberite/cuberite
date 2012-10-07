@@ -1735,6 +1735,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockFarmland.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockFire.h"
 					>
 				</File>

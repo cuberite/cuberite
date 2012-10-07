@@ -26,7 +26,7 @@ public:
 	}
 	
 	
-	void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		if (m_BlockType != E_BLOCK_GRASS)
 		{

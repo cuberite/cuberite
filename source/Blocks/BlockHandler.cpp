@@ -1,3 +1,4 @@
+
 #include "Globals.h"
 #include "BlockHandler.h"
 #include "../Item.h"
@@ -42,23 +43,24 @@
 #include "BlockOre.h"
 #include "BlockNote.h"
 #include "BlockBed.h"
+#include "BlockFarmland.h"
 
 
 
 
 
-bool cBlockHandler::m_HandlerInitialized = false;
-cBlockHandler *cBlockHandler::m_BlockHandler[256];
+bool            cBlockHandler::m_HandlerInitialized = false;
+cBlockHandler * cBlockHandler::m_BlockHandler[256];
 
 
 
 
 
-cBlockHandler *cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
+cBlockHandler * cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 {
 	if (!m_HandlerInitialized)
 	{
-		//We have to initialize
+		// We have to initialize
 		memset(m_BlockHandler, 0, sizeof(m_BlockHandler));
 		m_HandlerInitialized = true;
 	}
@@ -74,123 +76,85 @@ cBlockHandler *cBlockHandler::GetBlockHandler(BLOCKTYPE a_BlockType)
 
 
 
-cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
+cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
 	switch(a_BlockType)
 	{
-		case E_BLOCK_SAND:
-			return new cBlockSandHandler(a_BlockType);
-		case E_BLOCK_GRAVEL:
-			return new cBlockGravelHandler(a_BlockType);
-		case E_BLOCK_WOODEN_DOOR:
-		case E_BLOCK_IRON_DOOR:
-			return new cBlockDoorHandler(a_BlockType);
-		case E_BLOCK_FIRE:
-			return new cBlockFireHandler(a_BlockType);
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-			return new cBlockRedstoneTorchHandler(a_BlockType);
-		case E_BLOCK_REDSTONE_WIRE:	
-			return new cBlockRedstoneHandler(a_BlockType);
-		case E_BLOCK_PISTON:
-		case E_BLOCK_STICKY_PISTON:
-			return new cBlockPistonHandler(a_BlockType);
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-			return new cBlockRedstoneRepeaterHandler(a_BlockType);
-		case E_BLOCK_WORKBENCH:
-			return new cBlockWorkbenchHandler(a_BlockType);
-		case E_BLOCK_SNOW:
-			return new cBlockSnowHandler(a_BlockType);
-		case E_BLOCK_TALL_GRASS:
-			return new cBlockTallGrassHandler(a_BlockType);
-		case E_BLOCK_VINES:
-			return new cBlockVineHandler(a_BlockType);
-		case ::E_BLOCK_WOOL:
-			return new cBlockClothHandler(a_BlockType);
-		case E_BLOCK_WOODEN_SLAB:
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_DOUBLE_WOODEN_SLAB:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-			return new cBlockSlabHandler(a_BlockType);
-		case E_BLOCK_LOG:
-		case E_BLOCK_PLANKS:
-			return new cBlockWoodHandler(a_BlockType);
-		case E_BLOCK_TORCH:
-			return new cBlockTorchHandler(a_BlockType);
-		case E_BLOCK_DIRT:
-		case E_BLOCK_GRASS:
-			return new cBlockDirtHandler(a_BlockType);
-		case E_BLOCK_LEAVES:
-			return new cBlockLeavesHandler(a_BlockType);
-		case E_BLOCK_SAPLING:
-			return new cBlockSaplingHandler(a_BlockType);
-		case E_BLOCK_WATER:
-		case E_BLOCK_STATIONARY_WATER:
-		case E_BLOCK_STATIONARY_LAVA:
-		case E_BLOCK_LAVA:
-			return new cBlockFluidHandler(a_BlockType);
-		case E_BLOCK_DISPENSER:
-			return new cBlockDispenserHandler(a_BlockType);
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_LIT_FURNACE:
-			return new cBlockFurnaceHandler(a_BlockType);
-		case E_BLOCK_CHEST:
-			return new cBlockChestHandler(a_BlockType);
-		case E_BLOCK_ICE:
-			return new cBlockIceHandler(a_BlockType);
-		case E_BLOCK_LADDER:
-			return new cBlockLadderHandler(a_BlockType);
-		case E_BLOCK_COBBLESTONE_STAIRS:
-		case E_BLOCK_BRICK_STAIRS:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_WOODEN_STAIRS:
-		case E_BLOCK_SPRUCE_WOOD_STAIRS:
-		case E_BLOCK_BIRCH_WOOD_STAIRS:
-		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-			return new cBlockStairsHandler(a_BlockType);
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:
-			return new cBlockSignHandler(a_BlockType);
-		case E_BLOCK_CROPS:
-			return new cBlockCropsHandler(a_BlockType);
-		case E_BLOCK_SUGARCANE:
-			return new cBlockSugarcaneHandler(a_BlockType);
-		case E_BLOCK_YELLOW_FLOWER:
-		case E_BLOCK_RED_ROSE:
-			return new cBlockFlowerHandler(a_BlockType);
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_RED_MUSHROOM:
-			return new cBlockMushroomHandler(a_BlockType);
-		case E_BLOCK_CACTUS:
-			return new cBlockCactusHandler(a_BlockType);
-		case E_BLOCK_MELON_STEM:
-		case E_BLOCK_PUMPKIN_STEM:
-			return new cBlockStemsHandler(a_BlockType);
-		case E_BLOCK_GLOWSTONE:
-			return new cBlockGlowstoneHandler(a_BlockType);
-		case E_BLOCK_DIAMOND_ORE:
-		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_EMERALD_ORE:
-		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_LAPIS_ORE:
-		case E_BLOCK_COAL_ORE:
-			return new cBlockOreHandler(a_BlockType);
-		case E_BLOCK_STONE:
-		case E_BLOCK_COBBLESTONE:
-			return new cBlockStoneHandler(a_BlockType);
-		case E_BLOCK_MELON:
-			return new cBlockMelonHandler(a_BlockType);
-		case E_BLOCK_NOTE_BLOCK:
-			return new cBlockNoteHandler(a_BlockType);
-		case E_BLOCK_BED:
-			return new cBlockBedHandler(a_BlockType);
-		default:		
-			return new cBlockHandler(a_BlockType);
-			break;
+		// Block handlers, alphabetically sorted:
+		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
+		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BROWN_MUSHROOM:        return new cBlockMushroomHandler        (a_BlockType);
+		case E_BLOCK_CACTUS:                return new cBlockCactusHandler          (a_BlockType);
+		case E_BLOCK_CHEST:                 return new cBlockChestHandler           (a_BlockType);
+		case E_BLOCK_COAL_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_COBBLESTONE:           return new cBlockStoneHandler           (a_BlockType);
+		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
+		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
+		case E_BLOCK_DISPENSER:             return new cBlockDispenserHandler       (a_BlockType);
+		case E_BLOCK_DOUBLE_STONE_SLAB:     return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler;
+		case E_BLOCK_FIRE:                  return new cBlockFireHandler            (a_BlockType);
+		case E_BLOCK_FURNACE:               return new cBlockFurnaceHandler         (a_BlockType);
+		case E_BLOCK_GLOWSTONE:             return new cBlockGlowstoneHandler       (a_BlockType);
+		case E_BLOCK_GOLD_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
+		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
+		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
+		case E_BLOCK_IRON_DOOR:             return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_IRON_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_JUNGLE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
+		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_LAVA:                  return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
+		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
+		case E_BLOCK_LOG:                   return new cBlockWoodHandler            (a_BlockType);
+		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
+		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
+		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
+		case E_BLOCK_PLANKS:                return new cBlockWoodHandler            (a_BlockType);
+		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_REDSTONE_REPEATER_OFF: return new cBlockRedstoneRepeaterHandler(a_BlockType);
+		case E_BLOCK_REDSTONE_REPEATER_ON:  return new cBlockRedstoneRepeaterHandler(a_BlockType);
+		case E_BLOCK_REDSTONE_TORCH_OFF:    return new cBlockRedstoneTorchHandler   (a_BlockType);
+		case E_BLOCK_REDSTONE_TORCH_ON:     return new cBlockRedstoneTorchHandler   (a_BlockType);
+		case E_BLOCK_REDSTONE_WIRE:	        return new cBlockRedstoneHandler        (a_BlockType);
+		case E_BLOCK_RED_MUSHROOM:          return new cBlockMushroomHandler        (a_BlockType);
+		case E_BLOCK_RED_ROSE:              return new cBlockFlowerHandler          (a_BlockType);
+		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
+		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
+		case E_BLOCK_SIGN_POST:             return new cBlockSignHandler            (a_BlockType);
+		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
+		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_STATIONARY_LAVA:       return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_STATIONARY_WATER:      return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_STICKY_PISTON:         return new cBlockPistonHandler          (a_BlockType);
+		case E_BLOCK_STONE:                 return new cBlockStoneHandler           (a_BlockType);
+		case E_BLOCK_STONE_BRICK_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_STONE_SLAB:            return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_SUGARCANE:             return new cBlockSugarcaneHandler       (a_BlockType);
+		case E_BLOCK_TALL_GRASS:            return new cBlockTallGrassHandler       (a_BlockType);
+		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
+		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
+		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);
+		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
+		case E_BLOCK_WOODEN_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_WOODEN_SLAB:           return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_WOODEN_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_WOOL:                  return new cBlockClothHandler           (a_BlockType);
+		case E_BLOCK_WORKBENCH:             return new cBlockWorkbenchHandler       (a_BlockType);
+		case E_BLOCK_YELLOW_FLOWER:         return new cBlockFlowerHandler          (a_BlockType);
+			
+		default: return new cBlockHandler(a_BlockType);
 	}
 }
 
@@ -200,10 +164,11 @@ cBlockHandler *cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 
 void cBlockHandler::Deinit()
 {
-	for(int i = 0; i < 256; i++)
+	for (int i = 0; i < 256; i++)
 	{
 		delete m_BlockHandler[i];
 	}
+	memset(m_BlockHandler, 0, sizeof(m_BlockHandler));  // Don't leave any dangling pointers around, just in case
 	m_HandlerInitialized = false;
 }
 
@@ -220,7 +185,7 @@ cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockHandler::OnUpdate(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
 

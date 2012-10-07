@@ -530,102 +530,12 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 			continue; // It's all air up here
 		}
 
-		unsigned int Index = MakeIndexNoCheck( m_BlockTickX, m_BlockTickY, m_BlockTickZ );
-		BLOCKTYPE BlockType = m_BlockTypes[Index];
-		switch (BlockType)
-		{
-			case E_BLOCK_FARMLAND: TickFarmland (m_BlockTickX, m_BlockTickY, m_BlockTickZ); break;
-			
-			default:
-			{
-				cBlockHandler * Handler = BlockHandler(BlockType);
-				ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
-				Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
-				break;
-			}
-		}
-	}
+		unsigned int Index = MakeIndexNoCheck(m_BlockTickX, m_BlockTickY, m_BlockTickZ);
+		cBlockHandler * Handler = BlockHandler(m_BlockTypes[Index]);
+		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
+		Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
+	}  // for i - tickblocks
 }
-
-
-
-
-
-void cChunk::TickFarmland(int a_RelX, int a_RelY, int a_RelZ)
-{
-	// TODO: Rain hydrates blocks, too. Check world weather, don't search for water if raining.
-	// NOTE: The desert biomes do not get precipitation, so another check needs to be made.
-	
-	// Search for water in a close proximity:
-	// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
-	bool Found = false;
-	for (int y = a_RelY; y <= a_RelY + 1; y++)
-	{
-		for (int z = a_RelZ - 4; z <= a_RelZ + 4; z++)
-		{
-			for (int x = a_RelX - 4; x <= a_RelX + 4; x++)
-			{
-				BLOCKTYPE BlockType;
-				NIBBLETYPE Meta;  // unused
-				
-				if (!UnboundedRelGetBlock(x, y, z, BlockType, Meta))
-				{
-					// Too close to an unloaded chunk, we might miss a water block there, so don't tick at all
-					return;
-				}
-				if (
-					(BlockType == E_BLOCK_WATER) ||
-					(BlockType == E_BLOCK_STATIONARY_WATER)
-				)
-				{
-					Found = true;
-					break;
-				}
-			}  // for x
-			if (Found)
-			{
-				break;
-			}
-		}  // for z
-		if (Found)
-		{
-			break;
-		}
-	}  // for y
-	
-	NIBBLETYPE BlockMeta = GetMeta(a_RelX, a_RelY, a_RelZ);
-	
-	if (Found)
-	{
-		// Water was found, hydrate the block until hydration reaches 7:
-		if (BlockMeta < 7)
-		{
-			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, ++BlockMeta);
-		}
-		return;
-	}
-
-	// Water wasn't found, de-hydrate block:
-	if (BlockMeta > 0)
-	{
-		FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, --BlockMeta);
-		return;
-	}
-	
-	// Farmland too dry. If nothing is growing on top, turn back to dirt:
-	
-	switch (GetBlock(a_RelX, a_RelY + 1, a_RelZ))
-	{
-		case E_BLOCK_CROPS:
-		case E_BLOCK_MELON_STEM:
-		case E_BLOCK_PUMPKIN_STEM:
-			break;
-		default:
-			FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
-			break;
-	}
-}
-
 
 
 
