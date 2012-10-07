@@ -167,12 +167,12 @@ void cProtocol125::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	WriteInt  (a_ChunkX);
 	WriteInt  (a_ChunkZ);
 	WriteShort((unsigned short)a_Changes.size());
-	WriteInt  (sizeof(int) * a_Changes.size());
+	WriteUInt (sizeof(int) * a_Changes.size());
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
 		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
 		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
-		WriteInt(Coords << 16 | Blocks);
+		WriteUInt(Coords << 16 | Blocks);
 	}
 	Flush();
 }

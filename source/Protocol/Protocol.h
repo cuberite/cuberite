@@ -126,7 +126,7 @@ protected:
 		SendData((const char *)&a_Value, 4);
 	}
 	
-	void WriteInt(unsigned int a_Value)
+	void WriteUInt(unsigned int a_Value)
 	{
 		a_Value = htonl(a_Value);
 		SendData((const char *)&a_Value, 4);
