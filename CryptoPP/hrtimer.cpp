@@ -70,7 +70,6 @@ TimerWord Timer::GetCurrentTimerValue()
 	gettimeofday(&now, NULL);
 	return (TimerWord)now.tv_sec * 1000000 + now.tv_usec;
 #else
-	clock_t now;
 	return clock();
 #endif
 }
