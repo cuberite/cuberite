@@ -887,6 +887,15 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 	{
 		virtual bool Item(cEntity * a_Entity) override
 		{
+			if (a_Entity->GetWorld()->IsPVPEnabled() == false)
+			{
+				// PVP is disabled
+				if (a_Entity->IsA("cPlayer") && Instigator->IsA("cPlayer"))
+				{
+					// Player is hurting another player which is not allowed when PVP is disabled so ignore it
+					return true;
+				}
+			}
 			if (a_Entity->IsA("cPawn"))
 			{
 				reinterpret_cast<cPawn *>(a_Entity)->TakeDamage(Damage, Instigator);

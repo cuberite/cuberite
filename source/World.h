@@ -68,6 +68,7 @@ public:
 	long long GetWorldTime(void) const { return m_WorldTime; }						//tolua_export
 
 	eGameMode GetGameMode(void) const { return m_GameMode; }						//tolua_export
+	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }							//tolua_export
 
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
@@ -416,6 +417,7 @@ private:
 	long long m_WorldTime; // Time in seconds*20, this is sent to clients (is wrapped)
 	unsigned long long CurrentTick;
 	eGameMode m_GameMode;
+	bool m_bEnabledPVP;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
 	// The cRedstone class simulates redstone and needs access to m_RSList

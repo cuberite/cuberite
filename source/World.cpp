@@ -250,7 +250,8 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
 	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
-	
+	m_bEnabledPVP				= IniFile.GetValueSetB("PVP",           "Enabled",                   true);
+
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode );
 
 	if (!IniFile.WriteFile())
