@@ -88,11 +88,11 @@ bool cLuaCommandBinder::HandleCommand( const std::string & a_Command, cPlayer* a
 			lua_rawset(func.LuaState, -3);
 		lua_pop(func.LuaState, 1);
 		
-		LOGINFO("1. Stack size: %i", lua_gettop(func.LuaState) );
+		LOGD("1. Stack size: %i", lua_gettop(func.LuaState) );
 		lua_rawgeti( func.LuaState, LUA_REGISTRYINDEX, func.Reference); // same as lua_getref()
 
 		// Push the split
-		LOGINFO("2. Stack size: %i", lua_gettop(func.LuaState) );
+		LOGD("2. Stack size: %i", lua_gettop(func.LuaState) );
 		lua_createtable(func.LuaState, Split.size(), 0);
 		int newTable = lua_gettop(func.LuaState);
 		int index = 1;
@@ -103,19 +103,19 @@ bool cLuaCommandBinder::HandleCommand( const std::string & a_Command, cPlayer* a
 			++iter;
 			++index;
 		}
-		LOGINFO("3. Stack size: %i", lua_gettop(func.LuaState) );
+		LOGD("3. Stack size: %i", lua_gettop(func.LuaState) );
 		// Push player
 		tolua_pushusertype( func.LuaState, a_Player, "cPlayer" );
-		LOGINFO("Calling bound function! :D");
+		LOGD("Calling bound function! :D");
 		int s = lua_pcall(func.LuaState, 2, 1, 0);
 		if( report_errors( func.LuaState, s ) )
 		{
-			LOGINFO("error. Stack size: %i", lua_gettop(func.LuaState) );
+			LOGERROR("error. Stack size: %i", lua_gettop(func.LuaState) );
 			return false;
 		}
 		bool RetVal = (tolua_toboolean(func.LuaState, -1, 0) > 0);
 		lua_pop(func.LuaState, 1); // Pop return value
-		LOGINFO("ok. Stack size: %i", lua_gettop(func.LuaState) );
+		LOGD("ok. Stack size: %i", lua_gettop(func.LuaState) );
 		return RetVal;
 	}
 	return false;
