@@ -2075,123 +2075,131 @@
 				Name="Core"
 				>
 				<File
-					RelativePath="..\Plugins\Core\ban.lua"
+					RelativePath="..\MCServer\Plugins\Core\ban.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\coords.lua"
+					RelativePath="..\MCServer\Plugins\Core\coords.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\gamemode.lua"
+					RelativePath="..\MCServer\Plugins\Core\gamemode.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\gotoworld.lua"
+					RelativePath="..\MCServer\Plugins\Core\gotoworld.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\help.lua"
+					RelativePath="..\MCServer\Plugins\Core\help.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\item.lua"
+					RelativePath="..\MCServer\Plugins\Core\item.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\kick.lua"
+					RelativePath="..\MCServer\Plugins\Core\kick.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\main.lua"
+					RelativePath="..\MCServer\Plugins\Core\main.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\motd.lua"
+					RelativePath="..\MCServer\Plugins\Core\motd.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\onblockdig.lua"
+					RelativePath="..\MCServer\Plugins\Core\onblockdig.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\onblockplace.lua"
+					RelativePath="..\MCServer\Plugins\Core\onblockplace.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\oncraftingnorecipe.lua"
+					RelativePath="..\MCServer\Plugins\Core\oncraftingnorecipe.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\onkilled.lua"
+					RelativePath="..\MCServer\Plugins\Core\onkilled.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\onlogin.lua"
+					RelativePath="..\MCServer\Plugins\Core\onlogin.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\onplayerjoin.lua"
+					RelativePath="..\MCServer\Plugins\Core\onplayerjoin.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\playerlist.lua"
+					RelativePath="..\MCServer\Plugins\Core\playerlist.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\pluginlist.lua"
+					RelativePath="..\MCServer\Plugins\Core\pluginlist.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\regeneratechunk.lua"
+					RelativePath="..\MCServer\Plugins\Core\regeneratechunk.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\reload.lua"
+					RelativePath="..\MCServer\Plugins\Core\reload.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\spawn.lua"
+					RelativePath="..\MCServer\Plugins\Core\spawn.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\stop.lua"
+					RelativePath="..\MCServer\Plugins\Core\stop.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\teleport.lua"
+					RelativePath="..\MCServer\Plugins\Core\teleport.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\time.lua"
+					RelativePath="..\MCServer\Plugins\Core\time.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\top.lua"
+					RelativePath="..\MCServer\Plugins\Core\top.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\unban.lua"
+					RelativePath="..\MCServer\Plugins\Core\unban.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\viewdistance.lua"
+					RelativePath="..\MCServer\Plugins\Core\viewdistance.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\web_manageplugins.lua"
+					RelativePath="..\MCServer\Plugins\Core\web_chat.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\web_permissions.lua"
+					RelativePath="..\MCServer\Plugins\Core\web_manageplugins.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\web_playerlist.lua"
+					RelativePath="..\MCServer\Plugins\Core\web_permissions.lua"
 					>
 				</File>
 				<File
-					RelativePath="..\Plugins\Core\web_whitelist.lua"
+					RelativePath="..\MCServer\Plugins\Core\web_playerlist.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\web_serversettings.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\MCServer\Plugins\Core\web_whitelist.lua"
 					>
 				</File>
 			</Filter>

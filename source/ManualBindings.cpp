@@ -709,6 +709,90 @@ static int tolua_cPlugin_NewLua_AddTab(lua_State* tolua_S)
 
 
 
+// Perhaps use this as well for copying tables https://github.com/keplerproject/rings/pull/1
+static int copy_lua_values(lua_State * a_Source, lua_State * a_Destination, int i, int top)
+{
+	for(; i <= top; ++i )
+	{
+		int t = lua_type(a_Source, i);
+		switch (t) {
+			case LUA_TSTRING:  /* strings */
+				{
+					const char * s = lua_tostring(a_Source, i);
+					LOGD("%i push string: %s", i, s);
+					tolua_pushstring(a_Destination, s);
+				}
+				break;
+			case LUA_TBOOLEAN:  /* booleans */
+				{
+					int b = tolua_toboolean(a_Source, i, false);
+					LOGD("%i push bool: %i", i, b);
+					tolua_pushboolean(a_Destination, b );
+				}
+				break;
+			case LUA_TNUMBER:  /* numbers */
+				{
+					lua_Number d = tolua_tonumber(a_Source, i, 0);
+					LOGD("%i push number: %0.2f", i, d);
+					tolua_pushnumber(a_Destination, d );
+				}
+				break;
+			default:  /* other values */
+				LOGERROR("Unsupported value: '%s'. Can only use numbers and strings!", lua_typename(a_Source, t));
+				return 0;
+		}
+	}
+	return 1;
+}
+
+static int tolua_cPlugin_Call(lua_State* tolua_S)
+{
+	cPlugin_NewLua * self = (cPlugin_NewLua *) tolua_tousertype(tolua_S, 1, 0);
+	lua_State* targetState = self->GetLuaState();
+	int targetTop = lua_gettop(targetState);
+
+	int top = lua_gettop(tolua_S);
+	LOGD("total in stack: %i", top );
+
+	std::string funcName = tolua_tostring(tolua_S, 2, "");
+	LOGD("Func name: %s", funcName.c_str() );
+
+	lua_getglobal(targetState, funcName.c_str());
+	if(!lua_isfunction(targetState,-1))
+	{
+		LOGWARN("Error could not find function '%s' in plugin '%s'", funcName.c_str(), self->GetName().c_str() );
+		lua_pop(targetState,1);
+		return 0;
+	}
+
+	if( copy_lua_values(tolua_S, targetState, 3, top) == 0 ) // Start at 3 because 1 and 2 are the plugin and function name respectively
+	{
+		// something went wrong, exit
+		return 0;
+	}
+	
+	int s = lua_pcall(targetState, top-2, LUA_MULTRET, 0);
+	if( report_errors( targetState, s ) )
+	{
+		LOGWARN("Error while calling function '%s' in plugin '%s'", funcName.c_str(), self->GetName().c_str() );
+		return 0;
+	}
+
+	int nresults = lua_gettop(targetState) - targetTop;
+	LOGD("num results: %i", nresults);
+	int ttop = lua_gettop(targetState);
+	if( copy_lua_values(targetState, tolua_S, 2, ttop) == 0 ) // Start at 2 and I have no idea why xD
+	{
+		// something went wrong, exit
+		return 0;
+	}
+
+	return nresults;
+}
+
+
+
+
 
 static int tolua_md5(lua_State* tolua_S)
 {
@@ -816,6 +900,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_beginmodule(tolua_S, "cPlugin");
 			tolua_function(tolua_S, "GetCommands", tolua_cPlugin_GetCommands);
 			tolua_function(tolua_S, "BindCommand", tolua_cPlugin_BindCommand);
+			tolua_function(tolua_S, "Call", tolua_cPlugin_Call);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPluginManager");
