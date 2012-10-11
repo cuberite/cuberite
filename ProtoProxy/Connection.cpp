@@ -586,6 +586,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_BLOCK_CHANGE:              HANDLE_SERVER_READ(HandleServerBlockChange); break;
 			case PACKET_CHANGE_GAME_STATE:         HANDLE_SERVER_READ(HandleServerChangeGameState); break;
 			case PACKET_CHAT_MESSAGE:              HANDLE_SERVER_READ(HandleServerChatMessage); break;
+			case PACKET_COLLECT_PICKUP:            HANDLE_SERVER_READ(HandleServerCollectPickup); break;
 			case PACKET_COMPASS:                   HANDLE_SERVER_READ(HandleServerCompass); break;
 			case PACKET_DESTROY_ENTITIES:          HANDLE_SERVER_READ(HandleServerDestroyEntities); break;
 			case PACKET_ENCRYPTION_KEY_REQUEST:    HANDLE_SERVER_READ(HandleServerEncryptionKeyRequest); break;
@@ -1066,6 +1067,21 @@ bool cConnection::HandleServerChatMessage(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Message);
 	Log("Received a PACKET_CHAT_MESSAGE from the server:");
 	Log("  Message = \"%s\"", Message.c_str());
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerCollectPickup(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, CollectedID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, CollectorID);
+	Log("Received a PACKET_COLLECT_PICKUP from the server:");
+	Log("  CollectedID = %d", CollectedID);
+	Log("  CollectorID = %d", CollectorID);
 	COPY_TO_CLIENT();
 	return true;
 }

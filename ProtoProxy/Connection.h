@@ -123,6 +123,7 @@ protected:
 	bool HandleServerBlockChange(void);
 	bool HandleServerChangeGameState(void);
 	bool HandleServerChatMessage(void);
+	bool HandleServerCollectPickup(void);
 	bool HandleServerCompass(void);
 	bool HandleServerDestroyEntities(void);
 	bool HandleServerEncryptionKeyRequest(void);
