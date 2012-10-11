@@ -81,12 +81,6 @@ bool cLuaCommandBinder::HandleCommand( const std::string & a_Command, cPlayer* a
 			}
 		}
 
-		// For enabling 'self' in the function, it's kind of a hack I'm not sure this is the way to go
-		lua_pushvalue(func.LuaState, LUA_GLOBALSINDEX);
-			lua_pushstring(func.LuaState, "self");
-			tolua_pushusertype( func.LuaState, func.Plugin, "cPlugin" );
-			lua_rawset(func.LuaState, -3);
-		lua_pop(func.LuaState, 1);
 		
 		LOGD("1. Stack size: %i", lua_gettop(func.LuaState) );
 		lua_rawgeti( func.LuaState, LUA_REGISTRYINDEX, func.Reference); // same as lua_getref()

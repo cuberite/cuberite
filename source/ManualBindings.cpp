@@ -808,7 +808,7 @@ static int tolua_cPlugin_Call(lua_State* tolua_S)
 		return 0;
 	}
 
-	lua_pop(targetState, nresults+1); // I have no idea what I'm doing, but it works
+	lua_pop(targetState, nresults); // I have no idea what I'm doing, but it works
 
 	return nresults;
 }

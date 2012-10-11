@@ -184,7 +184,9 @@ bool cPlugin_NewLua::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 		return false;
 	}
 
-	return (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -207,7 +209,9 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 		return false;
 	}
 
-	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -234,7 +238,9 @@ bool cPlugin_NewLua::OnBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY
 		return false;
 	}
 
-	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -263,7 +269,9 @@ bool cPlugin_NewLua::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, 
 		return false;
 	}
 
-	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -286,7 +294,9 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
 		return false;
 	}
 
-	return (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -307,6 +317,7 @@ bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, co
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -341,6 +352,7 @@ bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -392,6 +404,7 @@ bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -433,6 +446,7 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 		return false;
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -456,6 +470,7 @@ bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -479,6 +494,7 @@ bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftin
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -502,6 +518,7 @@ bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGri
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -531,6 +548,7 @@ bool cPlugin_NewLua::OnBlockToPickup(
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -554,6 +572,7 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -589,6 +608,7 @@ bool cPlugin_NewLua::OnUpdatingSign(
 		return false;
 	}
 
+	
 	bool bRetVal = (tolua_toboolean( m_LuaState, -5, 0) > 0);
 	if (lua_isstring(m_LuaState, -4))
 	{
@@ -606,6 +626,7 @@ bool cPlugin_NewLua::OnUpdatingSign(
 	{
 		a_Line4 = tolua_tostring(m_LuaState, -1, "");
 	}
+	// TODO - FIXME: This probably needs to pop 5 things from the stack before returning
 	return bRetVal;
 }
 
@@ -642,6 +663,7 @@ bool cPlugin_NewLua::OnUpdatedSign(
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
@@ -666,6 +688,7 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 	}
 
 	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
 
