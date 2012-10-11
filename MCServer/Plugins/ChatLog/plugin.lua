@@ -9,7 +9,7 @@ function Initialize( Plugin )
 	return true
 end
 
-function OnChat( Message, Player )
+function OnChat( Player, Message )
 	-- Lets get loggin'
 	LOGINFO("[" .. Player:GetName() .. "]: " .. Message);
 

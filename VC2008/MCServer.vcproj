@@ -2028,43 +2028,39 @@
 			Name="Config files"
 			>
 			<File
-				RelativePath="..\banned.ini"
+				RelativePath="..\MCServer\crafting.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\crafting.txt"
+				RelativePath="..\MCServer\furnace.txt"
 				>
 			</File>
 			<File
-				RelativePath="..\furnace.txt"
+				RelativePath="..\MCServer\groups.ini"
 				>
 			</File>
 			<File
-				RelativePath="..\groups.ini"
+				RelativePath="..\MCServer\items.ini"
 				>
 			</File>
 			<File
-				RelativePath="..\items.ini"
+				RelativePath="..\MCServer\monsters.ini"
 				>
 			</File>
 			<File
-				RelativePath="..\monsters.ini"
+				RelativePath="..\MCServer\settings.ini"
 				>
 			</File>
 			<File
-				RelativePath="..\settings.ini"
+				RelativePath="..\MCServer\terrain.ini"
 				>
 			</File>
 			<File
-				RelativePath="..\users.ini"
+				RelativePath="..\MCServer\users.ini"
 				>
 			</File>
 			<File
-				RelativePath="..\webadmin.ini"
-				>
-			</File>
-			<File
-				RelativePath="..\world\world.ini"
+				RelativePath="..\MCServer\webadmin.ini"
 				>
 			</File>
 		</Filter>
@@ -2200,6 +2196,14 @@
 				</File>
 				<File
 					RelativePath="..\MCServer\Plugins\Core\web_whitelist.lua"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ChatLog"
+				>
+				<File
+					RelativePath="..\MCServer\Plugins\ChatLog\plugin.lua"
 					>
 				</File>
 			</Filter>
