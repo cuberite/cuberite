@@ -737,8 +737,29 @@ static int copy_lua_values(lua_State * a_Source, lua_State * a_Destination, int 
 					tolua_pushnumber(a_Destination, d );
 				}
 				break;
+			case LUA_TUSERDATA:
+				{
+					const char * type = 0;
+					if (lua_getmetatable(a_Source,i))
+					{
+						lua_rawget(a_Source, LUA_REGISTRYINDEX);
+						type = lua_tostring(a_Source, -1);
+						lua_pop(a_Source, 1); // Pop.. something?! I don't knooow~~ T_T
+					}
+					
+					// don't need tolua_tousertype we already have the type
+					void * ud = tolua_touserdata(a_Source, i, 0);
+					LOGD("%i push usertype: %p of type '%s'", i, ud, type);
+					if( type == 0 )
+					{
+						LOGERROR("Call(): Something went wrong when trying to get usertype name!");
+						return 0;
+					}
+					tolua_pushusertype(a_Destination, ud, type);
+				}
+				break;
 			default:  /* other values */
-				LOGERROR("Unsupported value: '%s'. Can only use numbers and strings!", lua_typename(a_Source, t));
+				LOGERROR("Call(): Unsupported value: '%s'. Can only use numbers and strings!", lua_typename(a_Source, t));
 				return 0;
 		}
 	}
@@ -781,11 +802,13 @@ static int tolua_cPlugin_Call(lua_State* tolua_S)
 	int nresults = lua_gettop(targetState) - targetTop;
 	LOGD("num results: %i", nresults);
 	int ttop = lua_gettop(targetState);
-	if( copy_lua_values(targetState, tolua_S, 2, ttop) == 0 ) // Start at 2 and I have no idea why xD
+	if( copy_lua_values(targetState, tolua_S, targetTop+1, ttop) == 0 ) // Start at targetTop+1 and I have no idea why xD
 	{
 		// something went wrong, exit
 		return 0;
 	}
+
+	lua_pop(targetState, nresults+1); // I have no idea what I'm doing, but it works
 
 	return nresults;
 }
