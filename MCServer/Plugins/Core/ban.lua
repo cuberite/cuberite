@@ -4,27 +4,37 @@ function HandleBanCommand( Split, Player )
 		return true
 	end
 
-	local World = Player:GetWorld()
-	local OtherPlayer = World:GetPlayer( Split[2] )
-	if( OtherPlayer == nil ) then
-		Player:SendMessage( cChatColor.Green .. "Could not find player " .. Split[2] )
-		return true
-	end
-
 	local Reason = "You have been banned"
 	if( #Split > 2 ) then
 		Reason = table.concat(Split, " ", 3)
 	end
-
-	local Server = cRoot:Get():GetServer()
-	LOGINFO( Player:GetName() .. " is banning " .. OtherPlayer:GetName() .. " ( "..Reason..") " )
-	Server:SendMessage( "Banning " .. OtherPlayer:GetName() )
-
-	local ClientHandle = OtherPlayer:GetClientHandle()
-	ClientHandle:Kick( Reason )
 	
-	BannedPlayersIni:SetValueB("Banned", OtherPlayer:GetName(), true)
-	BannedPlayersIni:WriteFile()
+	
+	if( BanPlayer(Split[2], Reason) == false ) then
+		Player:SendMessage( cChatColor.Green .. "Could not find player " .. Split[2] )
+		return true
+	end
 
+	return true
+end
+
+function BanPlayer( PlayerName, Reason )
+	if( Reason == nil ) then
+		Reason = "You have been banned"
+	end
+		
+	local Success, RealName = KickPlayer( PlayerName, Reason )
+	if( Success == false ) then
+		return false
+	end
+	
+	LOGINFO( "'" .. RealName .. "' is being banned for ( "..Reason..") " )
+	
+	local Server = cRoot:Get():GetServer()
+	Server:SendMessage( "Banning " .. RealName )
+	
+	BannedPlayersIni:SetValueB("Banned", RealName, true)
+	BannedPlayersIni:WriteFile()
+	
 	return true
 end
