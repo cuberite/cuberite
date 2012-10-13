@@ -1008,70 +1008,62 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Physics"
+				Name="Simulator"
 				>
 				<File
-					RelativePath="..\source\FireSimulator.cpp"
+					RelativePath="..\source\Simulator\ClassicFluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FireSimulator.h"
+					RelativePath="..\source\Simulator\ClassicFluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FluidSimulator.cpp"
+					RelativePath="..\source\Simulator\FireSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FluidSimulator.h"
+					RelativePath="..\source\Simulator\FireSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LavaSimulator.cpp"
+					RelativePath="..\source\Simulator\FluidSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\LavaSimulator.h"
+					RelativePath="..\source\Simulator\FluidSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\RedstoneSimulator.cpp"
+					RelativePath="..\source\Simulator\RedstoneSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\RedstoneSimulator.h"
+					RelativePath="..\source\Simulator\RedstoneSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\SandSimulator.cpp"
+					RelativePath="..\source\Simulator\SandSimulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\SandSimulator.h"
+					RelativePath="..\source\Simulator\SandSimulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator.cpp"
+					RelativePath="..\source\Simulator\Simulator.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Simulator.h"
+					RelativePath="..\source\Simulator\Simulator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\SimulatorManager.cpp"
+					RelativePath="..\source\Simulator\SimulatorManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\SimulatorManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\WaterSimulator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\WaterSimulator.h"
+					RelativePath="..\source\Simulator\SimulatorManager.h"
 					>
 				</File>
 			</Filter>

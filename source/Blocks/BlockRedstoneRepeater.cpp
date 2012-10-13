@@ -4,7 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Player.h"
-#include "../RedstoneSimulator.h"
+#include "../Simulator/RedstoneSimulator.h"
 
 
 

@@ -2,11 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "SandSimulator.h"
-#include "World.h"
-#include "Vector3i.h"
-#include "BlockID.h"
-#include "Defines.h"
-#include "FallingBlock.h"
+#include "../World.h"
+#include "../BlockID.h"
+#include "../Defines.h"
+#include "../FallingBlock.h"
 
 
 

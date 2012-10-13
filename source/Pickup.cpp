@@ -9,7 +9,7 @@
 #include "ClientHandle.h"
 #include "Inventory.h"
 #include "World.h"
-#include "WaterSimulator.h"
+#include "Simulator/FluidSimulator.h"
 #include "Server.h"
 #include "Player.h"
 #include "PluginManager.h"
@@ -157,10 +157,8 @@ void cPickup::HandlePhysics(float a_Dt)
 		if( fabs(m_Speed.z) < 0.05 ) m_Speed.z = 0;
 	}
 
-
-	//get flowing direction
+	// get flowing direction
 	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) m_Pos.x - 1, (int) m_Pos.y, (int) m_Pos.z - 1);
-
 
 	m_WaterSpeed *= 0.9f;		//Keep old speed but lower it
 

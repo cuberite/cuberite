@@ -12,12 +12,14 @@
 #include "Root.h"
 #include "../iniFile/iniFile.h"
 #include "ChunkMap.h"
-#include "SimulatorManager.h"
-#include "WaterSimulator.h"
-#include "LavaSimulator.h"
-#include "FireSimulator.h"
-#include "SandSimulator.h"
-#include "RedstoneSimulator.h"
+
+// Simulators:
+#include "Simulator/SimulatorManager.h"
+#include "Simulator/ClassicFluidSimulator.h"
+#include "Simulator/FluidSimulator.h"
+#include "Simulator/FireSimulator.h"
+#include "Simulator/SandSimulator.h"
+#include "Simulator/RedstoneSimulator.h"
 
 // Mobs:
 #include "Mobs/Chicken.h"
@@ -288,11 +290,11 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
-	//Simulators:
-	m_WaterSimulator = new cWaterSimulator( this );
-	m_LavaSimulator = new cLavaSimulator( this );
-	m_SandSimulator = new cSandSimulator(this);
-	m_FireSimulator = new cFireSimulator(this);
+	// Simulators:
+	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	m_SandSimulator     = new cSandSimulator(this);
+	m_FireSimulator     = new cFireSimulator(this);
 	m_RedstoneSimulator = new cRedstoneSimulator(this);
 
 	m_SimulatorManager = new cSimulatorManager();
@@ -2150,6 +2152,47 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 }
 
 
+
+
+
+cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock)
+{
+	AString SimulatorNameKey;
+	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
+	AString SimulatorSectionName;
+	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
+	AString SimulatorName = a_IniFile.GetValue("Physics", SimulatorNameKey, "");
+	if (SimulatorName.empty())
+	{
+		LOGWARNING("%s [Physics]:%s not present or empty, using the default of \"Classic\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+		SimulatorName = "Classic";
+	}
+	
+	cFluidSimulator * res = NULL;
+	/*
+	// TODO: other fluid simulators
+	if (NoCaseCompare(SimulatorName, "floody") == 0)
+	{
+		// TODO: Floody simulator params
+		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock);
+	}
+	else
+	*/
+	{
+		if (NoCaseCompare(SimulatorName, "classic") != 0)
+		{
+			// The simulator name doesn't match anything we have, issue a warning:
+			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Classic\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+		}
+		int DefaultFalloff   = (strcmp(a_FluidName, "Water") == 0) ? 1 : 2;
+		int DefaultMaxHeight = (strcmp(a_FluidName, "Water") == 0) ? 7 : 6;
+		int Falloff   = a_IniFile.GetValueI(SimulatorSectionName, "Falloff",   DefaultFalloff);
+		int MaxHeight = a_IniFile.GetValueI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
+		res = new cClassicFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);
+	}
+	
+	return res;
+}
 
 
 

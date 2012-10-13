@@ -2,14 +2,8 @@
 #pragma once
 
 #include "Simulator.h"
-#include "BlockEntity.h"
-#include "Vector3i.h"
-
-
-
-
-
-class cWorld;
+#include "../BlockEntity.h"
+#include "../Vector3i.h"
 
 
 

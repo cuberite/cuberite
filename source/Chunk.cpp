@@ -8,8 +8,6 @@
 
 #include "Chunk.h"
 #include "World.h"
-#include "WaterSimulator.h"
-#include "LavaSimulator.h"
 #include "ClientHandle.h"
 #include "Server.h"
 #include "zlib.h"

@@ -2,10 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "RedstoneSimulator.h"
-#include "Piston.h"
-#include "World.h"
-#include "BlockID.h"
-#include "Torch.h"
+#include "../Piston.h"
+#include "../World.h"
+#include "../BlockID.h"
+#include "../Torch.h"
 
 
 

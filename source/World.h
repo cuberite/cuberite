@@ -9,7 +9,7 @@
 
 #define MAX_PLAYERS 65535
 
-#include "SimulatorManager.h"
+#include "Simulator/SimulatorManager.h"
 #include "MersenneTwister.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
@@ -27,8 +27,7 @@
 
 class cRedstone;
 class cFireSimulator;
-class cWaterSimulator;
-class cLavaSimulator;
+class cFluidSimulator;
 class cSandSimulator;
 class cRedstoneSimulator;
 class cItem;
@@ -279,9 +278,10 @@ public:
 	const double & GetSpawnY(void) const { return m_SpawnY; }														// tolua_export
 	const double & GetSpawnZ(void) const { return m_SpawnZ; }														// tolua_export
 
-	inline cSimulatorManager *GetSimulatorManager() { return m_SimulatorManager; }
-	inline cWaterSimulator *GetWaterSimulator() { return m_WaterSimulator; }
-	inline cLavaSimulator *GetLavaSimulator() { return m_LavaSimulator; }
+	inline cSimulatorManager * GetSimulatorManager(void) { return m_SimulatorManager; }
+	
+	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
+	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
 
 	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
@@ -429,8 +429,8 @@ private:
 
 	cSimulatorManager *  m_SimulatorManager;
 	cSandSimulator *     m_SandSimulator;
-	cWaterSimulator *    m_WaterSimulator;
-	cLavaSimulator *     m_LavaSimulator;
+	cFluidSimulator *    m_WaterSimulator;
+	cFluidSimulator *    m_LavaSimulator;
 	cFireSimulator *     m_FireSimulator;
 	cRedstoneSimulator * m_RedstoneSimulator;
 	
@@ -488,6 +488,9 @@ private:
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
 	
 	void RemoveEntity( cEntity * a_Entity );
+	
+	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
+	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
 }; //tolua_export
 
 

@@ -2,10 +2,13 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "FireSimulator.h"
-#include "World.h"
-#include "Vector3i.h"
-#include "BlockID.h"
-#include "Defines.h"
+#include "../World.h"
+#include "../BlockID.h"
+#include "../Defines.h"
+
+
+
+
 
 cFireSimulator::cFireSimulator( cWorld* a_World )
 	: cSimulator(a_World)
@@ -13,8 +16,11 @@ cFireSimulator::cFireSimulator( cWorld* a_World )
 	, m_Buffer(new BlockList)
 	, m_BurningBlocks(new BlockList)
 {
-
 }
+
+
+
+
 
 cFireSimulator::~cFireSimulator()
 {
@@ -22,6 +28,10 @@ cFireSimulator::~cFireSimulator()
 	delete m_Blocks;
 	delete m_BurningBlocks;
 }
+
+
+
+
 
 void cFireSimulator::Simulate( float a_Dt )
 {
@@ -48,11 +58,18 @@ void cFireSimulator::Simulate( float a_Dt )
 }
 
 
+
+
+
 bool cFireSimulator::IsAllowedBlock( BLOCKTYPE a_BlockType )
 {
 	return a_BlockType == E_BLOCK_FIRE
 		|| IsBlockLava(a_BlockType);
 }
+
+
+
+
 
 void cFireSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 {
@@ -72,16 +89,28 @@ void cFireSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 
 }
 
+
+
+
+
 void cFireSimulator::_AddBlock(int a_X, int a_Y, int a_Z)
 {
 	m_Blocks->push_back( Vector3i(a_X, a_Y, a_Z) );
 
 }
 
+
+
+
+
 bool cFireSimulator::IsForeverBurnable( BLOCKTYPE a_BlockType )
 {
 	return a_BlockType == E_BLOCK_BLOODSTONE;
 }
+
+
+
+
 
 bool cFireSimulator::IsBurnable( BLOCKTYPE a_BlockType )
 {
@@ -95,10 +124,18 @@ bool cFireSimulator::IsBurnable( BLOCKTYPE a_BlockType )
 		|| a_BlockType == E_BLOCK_VINES;
 }
 
+
+
+
+
 bool cFireSimulator::FiresForever( BLOCKTYPE a_BlockType )
 {
 	return a_BlockType != E_BLOCK_FIRE;
 }
+
+
+
+
 
 bool cFireSimulator::BurnBlockAround(int a_X, int a_Y, int a_Z)
 {
@@ -109,6 +146,10 @@ bool cFireSimulator::BurnBlockAround(int a_X, int a_Y, int a_Z)
 		|| BurnBlock(a_X, a_Y, a_Z + 1)
 		|| BurnBlock(a_X, a_Y, a_Z - 1);
 }
+
+
+
+
 
 bool cFireSimulator::BurnBlock(int a_X, int a_Y, int a_Z)
 {
@@ -131,3 +172,7 @@ bool cFireSimulator::BurnBlock(int a_X, int a_Y, int a_Z)
 
 	return false;
 }
+
+
+
+

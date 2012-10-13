@@ -42,11 +42,11 @@ void cSimulatorManager::Simulate( float a_Dt )
 
 
 
-void cSimulatorManager::WakeUp(int a_X, int a_Y, int a_Z)
+void cSimulatorManager::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr )
 	{
-		(*itr)->first->WakeUp(a_X, a_Y, a_Z);
+		(*itr)->first->WakeUp(a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 
