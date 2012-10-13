@@ -103,6 +103,7 @@ protected:
 	bool HandleClientClientStatuses(void);
 	bool HandleClientCreativeInventoryAction(void);
 	bool HandleClientEncryptionKeyResponse(void);
+	bool HandleClientEntityAction(void);
 	bool HandleClientHandshake(void);
 	bool HandleClientKeepAlive(void);
 	bool HandleClientLocaleAndView(void);

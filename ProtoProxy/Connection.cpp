@@ -114,6 +114,7 @@ enum
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECT               = 0x10,
 	PACKET_ANIMATION                 = 0x12,
+	PACKET_ENTITY_ACTION             = 0x13,
 	PACKET_SPAWN_PICKUP              = 0x15,
 	PACKET_COLLECT_PICKUP            = 0x16,
 	PACKET_SPAWN_OBJECT_VEHICLE      = 0x17,
@@ -508,6 +509,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_CLIENT_STATUSES:           HANDLE_CLIENT_READ(HandleClientClientStatuses); break;
 			case PACKET_CREATIVE_INVENTORY_ACTION: HANDLE_CLIENT_READ(HandleClientCreativeInventoryAction); break;
 			case PACKET_ENCRYPTION_KEY_RESPONSE:   HANDLE_CLIENT_READ(HandleClientEncryptionKeyResponse); break;
+			case PACKET_ENTITY_ACTION:             HANDLE_CLIENT_READ(HandleClientEntityAction); break;
 			case PACKET_HANDSHAKE:                 HANDLE_CLIENT_READ(HandleClientHandshake); break;
 			case PACKET_KEEPALIVE:                 HANDLE_CLIENT_READ(HandleClientKeepAlive); break;
 			case PACKET_LOCALE_AND_VIEW:           HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
@@ -770,6 +772,21 @@ bool cConnection::HandleClientEncryptionKeyResponse(void)
 		return true;
 	}
 	StartClientEncryption(EncKey, EncNonce);
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientEntityAction(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  PlayerID);
+	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, ActionType);
+	Log("Received a PACKET_ENTITY_ACTION from the client:");
+	Log("  PlayerID = %d", PlayerID);
+	Log("  ActionType = %d", ActionType);
+	COPY_TO_SERVER();
 	return true;
 }
 
