@@ -1032,16 +1032,16 @@ int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 
 
-void cWorld::SetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )
+void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	if(a_BlockType == E_BLOCK_AIR)
 	{
-		BlockHandler(GetBlock(a_X, a_Y, a_Z))->OnDestroyed(this, a_X, a_Y, a_Z);
+		BlockHandler(GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnDestroyed(this, a_BlockX, a_BlockY, a_BlockZ);
 	}
-	m_ChunkMap->SetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta);
+	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
-	GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
-	BlockHandler(a_BlockType)->OnPlaced(this, a_X, a_Y, a_Z, a_BlockMeta);
+	GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ);
+	BlockHandler(a_BlockType)->OnPlaced(this, a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 }
 
 
@@ -2094,45 +2094,62 @@ void cWorld::GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLigh
 
 
 
+
 void cWorld::TickQueuedBlocks(float a_Dt)
 {
-	if(m_BlockTickQueue.empty())
+	if (m_BlockTickQueue.empty())
+	{
 		return;
+	}
 	m_BlockTickQueueCopy.clear();
 	m_BlockTickQueue.swap(m_BlockTickQueueCopy);
 
-	for(std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
+	for (std::vector<BlockTickQueueItem *>::iterator itr = m_BlockTickQueueCopy.begin(); itr != m_BlockTickQueueCopy.end(); itr++)
 	{
 		BlockTickQueueItem *Block = (*itr);
 		Block->ToWait -= a_Dt;
-		if(Block->ToWait <= 0)
+		if (Block->ToWait <= 0)
 		{
 			BlockHandler(GetBlock(Block->X, Block->Y, Block->Z))->OnUpdate(this, Block->X, Block->Y, Block->Z);
-			delete Block;	//We don´t have to remove it from the vector, this will happen automatically on the next tick
-		}else{
+			delete Block;	//We don't have to remove it from the vector, this will happen automatically on the next tick
+		}
+		else
+		{
 			m_BlockTickQueue.push_back(Block);	//Keep the block in the queue
 		}
-	}
-	
+	}  // for itr - m_BlockTickQueueCopy[]
 }
 
 
-void cWorld::QueueBlockForTick(int a_X, int a_Y, int a_Z, float a_Time)
+
+
+
+void cWorld::QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_TimeToWait)
 {
-	BlockTickQueueItem *Block = new BlockTickQueueItem;
-	Block->X = a_X;
-	Block->Y = a_Y;
-	Block->Z = a_Z;
-	Block->ToWait = a_Time;
+	BlockTickQueueItem * Block = new BlockTickQueueItem;
+	Block->X = a_BlockX;
+	Block->Y = a_BlockY;
+	Block->Z = a_BlockZ;
+	Block->ToWait = a_TimeToWait;
 	
 	m_BlockTickQueue.push_back(Block);
 }
 
 
-bool cWorld::IsBlockDirectlyWatered(int a_X, int a_Y, int a_Z)
+
+
+
+bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	return IsBlockWater(GetBlock(a_X - 1, a_Y, a_Z))
-		|| IsBlockWater(GetBlock(a_X + 1, a_Y, a_Z))
-		|| IsBlockWater(GetBlock(a_X, a_Y, a_Z - 1))
-		|| IsBlockWater(GetBlock(a_X, a_Y, a_Z + 1));
+	return (
+		IsBlockWater(GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ)) ||
+		IsBlockWater(GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ)) ||
+		IsBlockWater(GetBlock(a_BlockX,     a_BlockY, a_BlockZ - 1)) ||
+		IsBlockWater(GetBlock(a_BlockX,     a_BlockY, a_BlockZ + 1))
+	);
 }
+
+
+
+
+

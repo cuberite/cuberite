@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/06/12 17:42:13.
+** Generated automatically by tolua++-1.0.92 on 10/13/12 10:55:10.
 */
 
 #ifndef __cplusplus
@@ -11161,6 +11161,38 @@ static int tolua_AllToLua_cWorld_GetGameMode00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsPVPEnabled of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsPVPEnabled00
+static int tolua_AllToLua_cWorld_IsPVPEnabled00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsPVPEnabled'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsPVPEnabled();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsPVPEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetWorldTime of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetWorldTime00
 static int tolua_AllToLua_cWorld_SetWorldTime00(lua_State* tolua_S)
@@ -12629,6 +12661,45 @@ static int tolua_AllToLua_cWorld_GetStorageSaveQueueLength00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: QueueBlockForTick of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_QueueBlockForTick00
+static int tolua_AllToLua_cWorld_QueueBlockForTick00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  float a_TimeToWait = ((float)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'QueueBlockForTick'", NULL);
+#endif
+  {
+   self->QueueBlockForTick(a_BlockX,a_BlockY,a_BlockZ,a_TimeToWait);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'QueueBlockForTick'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: CastThunderbolt of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_CastThunderbolt00
 static int tolua_AllToLua_cWorld_CastThunderbolt00(lua_State* tolua_S)
@@ -12858,6 +12929,44 @@ static int tolua_AllToLua_cWorld_GetMaxCactusHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetMaxCactusHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsBlockDirectlyWatered of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsBlockDirectlyWatered00
+static int tolua_AllToLua_cWorld_IsBlockDirectlyWatered00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsBlockDirectlyWatered'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsBlockDirectlyWatered(a_BlockX,a_BlockY,a_BlockZ);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsBlockDirectlyWatered'.",&tolua_err);
  return 0;
 #endif
 }
@@ -22365,6 +22474,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cWorld");
    tolua_function(tolua_S,"GetTime",tolua_AllToLua_cWorld_GetTime00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cWorld_GetGameMode00);
+   tolua_function(tolua_S,"IsPVPEnabled",tolua_AllToLua_cWorld_IsPVPEnabled00);
    tolua_function(tolua_S,"SetWorldTime",tolua_AllToLua_cWorld_SetWorldTime00);
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"UnloadUnusedChunks",tolua_AllToLua_cWorld_UnloadUnusedChunks00);
@@ -22406,6 +22516,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetLightingQueueLength",tolua_AllToLua_cWorld_GetLightingQueueLength00);
    tolua_function(tolua_S,"GetStorageLoadQueueLength",tolua_AllToLua_cWorld_GetStorageLoadQueueLength00);
    tolua_function(tolua_S,"GetStorageSaveQueueLength",tolua_AllToLua_cWorld_GetStorageSaveQueueLength00);
+   tolua_function(tolua_S,"QueueBlockForTick",tolua_AllToLua_cWorld_QueueBlockForTick00);
    tolua_function(tolua_S,"CastThunderbolt",tolua_AllToLua_cWorld_CastThunderbolt00);
    tolua_function(tolua_S,"SetWeather",tolua_AllToLua_cWorld_SetWeather00);
    tolua_function(tolua_S,"ChangeWeather",tolua_AllToLua_cWorld_ChangeWeather00);
@@ -22413,6 +22524,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetNextBlockTick",tolua_AllToLua_cWorld_SetNextBlockTick00);
    tolua_function(tolua_S,"GetMaxSugarcaneHeight",tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00);
    tolua_function(tolua_S,"GetMaxCactusHeight",tolua_AllToLua_cWorld_GetMaxCactusHeight00);
+   tolua_function(tolua_S,"IsBlockDirectlyWatered",tolua_AllToLua_cWorld_IsBlockDirectlyWatered00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cInventory","cInventory","",NULL);
   tolua_beginmodule(tolua_S,"cInventory");

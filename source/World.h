@@ -381,7 +381,7 @@ public:
 		float ToWait;
 	};
 
-	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_Time);
+	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_TimeToWait);  // tolua_export
 
 	void CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ);						//tolua_export
 	void SetWeather ( eWeather a_Weather );									//tolua_export
@@ -398,7 +398,7 @@ public:
 	int GetMaxSugarcaneHeight(void) const { return m_MaxSugarcaneHeight; }  // tolua_export
 	int GetMaxCactusHeight   (void) const { return m_MaxCactusHeight; }     // tolua_export
 
-	bool IsBlockDirectlyWatered(int a_X, int a_Y, int a_Z);
+	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 private:
 
