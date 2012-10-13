@@ -859,12 +859,13 @@ bool cConnection::HandleClientPing(void)
 
 bool cConnection::HandleClientPlayerAbilities(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, IsInvulnerable);
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, IsFlying);
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, CanFly);
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, IsInstaMine);
+	HANDLE_CLIENT_PACKET_READ(ReadChar, char, Flags);
+	HANDLE_CLIENT_PACKET_READ(ReadByte, Byte, FlyingSpeed);
+	HANDLE_CLIENT_PACKET_READ(ReadByte, Byte, WalkingSpeed);
 	Log("Receives a PACKET_PLAYER_ABILITIES from the client:");
-	Log("  Flags = %d, %d, %d, %d", IsInvulnerable, IsFlying, CanFly, IsInstaMine);
+	Log("  Flags = %d (0x%x)", Flags, Flags);
+	Log("  FlyingSpeed = %d", FlyingSpeed);
+	Log("  WalkingSpeed = %d", WalkingSpeed);
 	COPY_TO_SERVER();
 	return true;
 }
