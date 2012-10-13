@@ -7,7 +7,6 @@ struct lua_State;
 class cLuaCommandBinder;
 class cSquirrelCommandBinder;
 class cPlugin;
-class cPlugin_Lua;
 
 // fwd: cWorld.h
 class cWorld;
@@ -86,14 +85,14 @@ public:																	//tolua_export
 
 	static cPluginManager * GetPluginManager();							//tolua_export
 
+	typedef std::map< AString, cPlugin * > PluginMap;
 	typedef std::list< cPlugin * > PluginList;
-	cPlugin * GetPlugin( const AString & a_Plugin ) const;					//tolua_export
-	const PluginList & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
+	cPlugin * GetPlugin( const AString & a_Plugin ) const;				//tolua_export
+	const PluginMap & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
 
+	void FindPlugins();													//tolua_export
 	void ReloadPlugins();												//tolua_export
 	bool AddPlugin( cPlugin* a_Plugin );
-	bool AddPlugin( lua_State* a_LuaState, cPlugin* a_Plugin );			//tolua_export
-	bool AddLuaPlugin( cPlugin_Lua* a_Plugin );
 	void AddHook( cPlugin* a_Plugin, PluginHook a_Hook );				//tolua_export
 
 	unsigned int GetNumPlugins() const;									//tolua_export
@@ -117,10 +116,11 @@ public:																	//tolua_export
 	bool CallHookWeatherChanged  (cWorld * a_World);
 	bool CallHookHandshake       (cClientHandle * a_ClientHandle, const AString & a_Username);
 
-	void RemoveHooks( cPlugin* a_Plugin );
-	void RemovePlugin( cPlugin* a_Plugin, bool a_bDelete = false );		//tolua_export
-	void RemoveLuaPlugin( std::string a_FileName );						//tolua_export
-	cPlugin_Lua* GetLuaPlugin( lua_State* a_State );					//tolua_export
+	bool DisablePlugin( AString & a_PluginName );						//tolua_export
+	bool LoadPlugin( AString & a_PluginName );							//tolua_export
+
+	void RemoveHooks( cPlugin * a_Plugin );
+	void RemovePlugin( cPlugin * a_Plugin, bool a_bDelete = false );
 	
 	cLuaCommandBinder* GetLuaCommandBinder() const { return m_LuaCommandBinder; }
 	
@@ -132,11 +132,11 @@ private:
 	cPluginManager();
 	~cPluginManager();
 
-	typedef std::list< cPlugin_Lua* > LuaPluginList;
 	typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
 
-	LuaPluginList m_LuaPlugins;
-	PluginList m_Plugins;
+	PluginList m_DisablePluginList;
+
+	PluginMap m_Plugins;
 	HookMap m_Hooks;
 
 	void ReloadPluginsNow();

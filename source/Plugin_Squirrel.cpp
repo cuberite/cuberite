@@ -6,6 +6,7 @@
 
 
 cPlugin_Squirrel::cPlugin_Squirrel( const char* a_PluginName )
+	: cPlugin( a_PluginName )
 {
 	SetLanguage( cPlugin::E_SQUIRREL );
 	m_PluginName = a_PluginName;

@@ -7,10 +7,11 @@
 
 
 
-cPlugin::cPlugin()
+cPlugin::cPlugin( const AString & a_PluginDirectory )
 	: m_Version( 0 )
 	, m_Language( E_CPP )
 	, m_bCanBindCommands( false )
+	, m_Directory( a_PluginDirectory )
 {
 }
 
@@ -306,3 +307,8 @@ void cPlugin::AddCommand(const AString & a_Command, const AString & a_Descriptio
 
 
 
+
+AString cPlugin::GetLocalDirectory(void) const
+{
+	return std::string("Plugins/") + m_Directory;
+}

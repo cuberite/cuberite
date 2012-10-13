@@ -521,17 +521,27 @@ static int tolua_cPluginManager_GetAllPlugins(lua_State* tolua_S)
 {
 	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
 
-	const cPluginManager::PluginList & AllPlugins = self->GetAllPlugins();
+	const cPluginManager::PluginMap & AllPlugins = self->GetAllPlugins();
 
-	lua_createtable(tolua_S, AllPlugins.size(), 0);
+	lua_newtable(tolua_S);
+	//lua_createtable(tolua_S, AllPlugins.size(), 0);
 	int newTable = lua_gettop(tolua_S);
 	int index = 1;
-	cPluginManager::PluginList::const_iterator iter = AllPlugins.begin();
+	cPluginManager::PluginMap::const_iterator iter = AllPlugins.begin();
 	while(iter != AllPlugins.end())
 	{
-		const cPlugin* Plugin = *iter;
-		tolua_pushusertype( tolua_S, (void*)Plugin, "const cPlugin" );
-		lua_rawseti(tolua_S, newTable, index);
+		const cPlugin* Plugin = iter->second;
+		tolua_pushstring( tolua_S, iter->first.c_str() );
+		if( Plugin != NULL )
+		{
+			tolua_pushusertype( tolua_S, (void*)Plugin, "const cPlugin" );
+		}
+		else
+		{
+			tolua_pushboolean(tolua_S, 0);
+		}
+		//lua_rawseti(tolua_S, newTable, index);
+		lua_rawset(tolua_S, -3);
 		++iter;
 		++index;
 	}

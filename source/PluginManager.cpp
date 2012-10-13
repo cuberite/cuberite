@@ -2,7 +2,6 @@
 
 #include "PluginManager.h"
 #include "Plugin.h"
-#include "Plugin_Lua.h"
 #include "Plugin_NewLua.h"
 #include "WebAdmin.h"
 #include "Item.h"
@@ -76,6 +75,45 @@ void cPluginManager::ReloadPlugins()
 
 
 
+void cPluginManager::FindPlugins()
+{
+	AString PluginsPath = FILE_IO_PREFIX + AString( "Plugins/" );
+
+	// First get a clean list of only the currently running plugins, we don't want to mess those up
+	for( PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); )
+	{
+		if( itr->second == NULL )
+		{
+			PluginMap::iterator thiz = itr;
+			++thiz;
+			m_Plugins.erase( itr );
+			itr = thiz;
+			continue;
+		}
+		++itr;
+	}
+
+	AStringList Files = GetDirectoryContents(PluginsPath.c_str());
+	for (AStringList::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
+	{
+		if (itr->rfind(".") != AString::npos)
+		{
+			// Ignore files, we only want directories
+			continue;
+		}
+
+		// Add plugin name/directory to the list
+		if( m_Plugins.find( *itr ) == m_Plugins.end() )
+		{
+			m_Plugins[ *itr ] = NULL;
+		}
+	}
+}
+
+
+
+
+
 void cPluginManager::ReloadPluginsNow()
 {
 	LOG("Loading plugins");
@@ -86,6 +124,8 @@ void cPluginManager::ReloadPluginsNow()
 	CloseSquirrelVM();
 	OpenSquirrelVM();
 	#endif  // USE_SQUIRREL
+
+	FindPlugins();
 
 	cIniFile IniFile("settings.ini");
 	if (!IniFile.ReadFile() )
@@ -100,34 +140,14 @@ void cPluginManager::ReloadPluginsNow()
 		for(unsigned int i = 0; i < NumPlugins; i++)
 		{
 			AString ValueName = IniFile.GetValueName(KeyNum, i );
-			if( ValueName.compare("Plugin") == 0 ) // It's a Lua plugin
-			{	
-				AString PluginFile = IniFile.GetValue(KeyNum, i );
-				if( !PluginFile.empty() )
-				{
-					// allow for comma separated plugin list
-					// degrades and works fine for the plugin
-					// per line
-					AStringVector split = StringSplit( PluginFile, "," );
-					for (unsigned int j = 0; j < split.size(); j++)
-					{
-						cPlugin_Lua* Plugin = new cPlugin_Lua( (split[j] + AString(".lua") ).c_str() );
-						if( !AddLuaPlugin( Plugin ) )
-						{
-							delete Plugin;
-						}
-					}
-				}
-			}
-			else if( ValueName.compare("NewPlugin") == 0 ) // New plugin style
+			if( (ValueName.compare("NewPlugin") == 0) || (ValueName.compare("Plugin") == 0) ) // New plugin style
 			{
 				AString PluginFile = IniFile.GetValue(KeyNum, i );
 				if( !PluginFile.empty() )
 				{
-					cPlugin_NewLua* Plugin = new cPlugin_NewLua( PluginFile.c_str() );
-					if( !AddPlugin( Plugin ) )
+					if( m_Plugins.find( PluginFile ) != m_Plugins.end() )
 					{
-						delete Plugin;
+						LoadPlugin( PluginFile );
 					}
 				}
 			}
@@ -168,6 +188,12 @@ void cPluginManager::ReloadPluginsNow()
 
 void cPluginManager::Tick(float a_Dt)
 {
+	while( m_DisablePluginList.size() > 0 )
+	{
+		RemovePlugin( m_DisablePluginList.front(), true );
+		m_DisablePluginList.pop_front();
+	}
+
 	if( m_bReloadPlugins )
 	{
 		ReloadPluginsNow();
@@ -650,11 +676,12 @@ bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const ASt
 
 cPlugin* cPluginManager::GetPlugin( const AString & a_Plugin ) const
 {
-	for( PluginList::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
+	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
 	{
-		if ((*itr)->GetName().compare(a_Plugin) == 0)
+		if (itr->second == NULL ) continue;
+		if (itr->second->GetName().compare(a_Plugin) == 0)
 		{
-			return *itr;
+			return itr->second;
 		}
 	}
 	return 0;
@@ -664,7 +691,7 @@ cPlugin* cPluginManager::GetPlugin( const AString & a_Plugin ) const
 
 
 
-const cPluginManager::PluginList & cPluginManager::GetAllPlugins() const
+const cPluginManager::PluginMap & cPluginManager::GetAllPlugins() const
 {
 	return m_Plugins;
 }
@@ -677,22 +704,46 @@ void cPluginManager::UnloadPluginsNow()
 {
 	m_Hooks.clear();
 
-	while( m_LuaPlugins.size() > 0 )
-	{
-		cPlugin_Lua* LuaPlugin = *m_LuaPlugins.begin();
-		if( LuaPlugin )
-		{
-			delete LuaPlugin;
-		}
-		m_LuaPlugins.remove( LuaPlugin );
-	}
-
 	while( m_Plugins.size() > 0 )
 	{
-		RemovePlugin( *m_Plugins.begin(), true );
+		RemovePlugin( m_Plugins.begin()->second, true );
 	}
 
 	//SquirrelVM::Shutdown(); // This breaks shit
+}
+
+
+
+
+
+bool cPluginManager::DisablePlugin( AString & a_PluginName )
+{
+	PluginMap::iterator itr = m_Plugins.find( a_PluginName );
+	if (itr != m_Plugins.end())
+	{
+		if (itr->first.compare( a_PluginName ) == 0)
+		{
+			m_DisablePluginList.push_back( itr->second );
+			itr->second = NULL;	// Get rid of this thing right away
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::LoadPlugin( AString & a_PluginName )
+{
+	cPlugin_NewLua* Plugin = new cPlugin_NewLua( a_PluginName.c_str() );
+	if( !AddPlugin( Plugin ) )
+	{
+		delete Plugin;
+		return false;
+	}
+	return true;
 }
 
 
@@ -723,7 +774,7 @@ void cPluginManager::RemoveHooks( cPlugin* a_Plugin )
 
 
 
-void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false */ )
+void cPluginManager::RemovePlugin( cPlugin * a_Plugin, bool a_bDelete /* = false */ )
 {
 	if( a_bDelete )
 	{
@@ -731,17 +782,20 @@ void cPluginManager::RemovePlugin( cPlugin* a_Plugin, bool a_bDelete /* = false 
 #ifdef USE_SQUIRREL
 		m_SquirrelCommandBinder->RemoveBindingsForPlugin( a_Plugin );
 #endif
-		m_Plugins.remove( a_Plugin );
-		RemoveHooks( a_Plugin );
-		a_Plugin->OnDisable();
 
-		delete a_Plugin;
-	}
-	else
-	{
-		for( LuaPluginList::iterator itr = m_LuaPlugins.begin(); itr != m_LuaPlugins.end(); ++itr )
+		for( PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
 		{
-			(*itr)->RemovePlugin( a_Plugin );
+			if( itr->second == a_Plugin )
+			{
+				m_Plugins.erase( itr );
+				break;
+			}
+		}
+		if( a_Plugin != NULL )
+		{
+			RemoveHooks( a_Plugin );
+			a_Plugin->OnDisable();
+			delete a_Plugin;
 		}
 	}
 }
@@ -755,92 +809,13 @@ bool cPluginManager::AddPlugin( cPlugin* a_Plugin )
 	a_Plugin->m_bCanBindCommands = true;
 	if( a_Plugin->Initialize() )
 	{
-		m_Plugins.remove( a_Plugin );
-		m_Plugins.push_back( a_Plugin );
+		m_Plugins[ a_Plugin->GetDirectory() ] = a_Plugin;
 		return true;
 	}
 
 	a_Plugin->m_bCanBindCommands = false;
 	RemoveHooks( a_Plugin ); // Undo any damage the Initialize() might have done
 	return false;
-}
-
-
-
-
-
-bool cPluginManager::AddPlugin( lua_State* a_LuaState, cPlugin* a_Plugin )
-{
-	a_Plugin->SetLanguage( cPlugin::E_LUA );
-	cPlugin_Lua* LuaPlugin = GetLuaPlugin( a_LuaState );
-	if( LuaPlugin == NULL )
-	{
-		lua_Debug ar;
-		lua_getstack(a_LuaState, 1, &ar);
-		lua_getinfo(a_LuaState, "nSl", &ar);
-		LOGERROR("ERROR: Trying to add an 'old style' plugin from within a 'new style' plugin.\nIn file: %s at line: %i", ar.source, ar.currentline);
-	}
-	a_Plugin->m_bCanBindCommands = true;
-	if( LuaPlugin && a_Plugin->Initialize() )
-	{
-		m_Plugins.remove( a_Plugin );
-		m_Plugins.push_back( a_Plugin );
-		LuaPlugin->AddPlugin( a_Plugin );
-		return true;
-	}
-
-	a_Plugin->m_bCanBindCommands = false;
-	return false;
-}
-
-
-
-
-
-bool cPluginManager::AddLuaPlugin( cPlugin_Lua* a_Plugin )
-{
-	m_LuaPlugins.push_back( a_Plugin ); // It HAS to be in here before calling Initialize, so it can be found by AddPlugin()
-	if(a_Plugin->Initialize() )
-	{
-		return true;
-	}
-	LOG(">>>>>>> Could not initialize a plugin! ");
-	m_LuaPlugins.remove( a_Plugin );
-	return false;
-}
-
-
-
-
-
-void cPluginManager::RemoveLuaPlugin( std::string a_FileName )
-{
-	for( LuaPluginList::iterator itr = m_LuaPlugins.begin(); itr != m_LuaPlugins.end(); ++itr )
-	{
-		if( (*itr)->GetFileName() == a_FileName )
-		{
-			cPlugin_Lua* Plugin = *itr;
-			m_LuaPlugins.remove( Plugin );
-			delete Plugin;
-			return;
-		}
-	}
-}
-
-
-
-
-
-cPlugin_Lua* cPluginManager::GetLuaPlugin( lua_State* a_State )
-{
-	for( LuaPluginList::iterator itr = m_LuaPlugins.begin(); itr != m_LuaPlugins.end(); ++itr )
-	{
-		if( (*itr)->GetLuaState() == a_State )
-		{
-			return *itr;
-		}
-	}
-	return NULL;
 }
 
 
@@ -874,9 +849,9 @@ unsigned int cPluginManager::GetNumPlugins() const
 
 bool cPluginManager::HasPlugin( cPlugin* a_Plugin ) const
 {
-	for( PluginList::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
+	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
 	{
-		if( *itr == a_Plugin )
+		if( itr->second == a_Plugin )
 			return true;
 	}
 	return false;

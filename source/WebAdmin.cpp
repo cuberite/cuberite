@@ -216,11 +216,12 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 			cPluginManager* PM = cRoot::Get()->GetPluginManager();
 			if( PM )
 			{
-				const cPluginManager::PluginList & List = PM->GetAllPlugins();
-				for( cPluginManager::PluginList::const_iterator itr = List.begin(); itr != List.end(); ++itr )
+				const cPluginManager::PluginMap & List = PM->GetAllPlugins();
+				for( cPluginManager::PluginMap::const_iterator itr = List.begin(); itr != List.end(); ++itr )
 				{
+					if( itr->second == NULL ) continue;
 					AString VersionNum;
-					AppendPrintf(Content, "<li>%s V.%i</li>", (*itr)->GetName().c_str(), (*itr)->GetVersion());
+					AppendPrintf(Content, "<li>%s V.%i</li>", itr->second->GetName().c_str(), itr->second->GetVersion());
 				}
 			}
 			Content += "</ul>";

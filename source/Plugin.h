@@ -28,7 +28,7 @@ class cCraftingRecipe;
 class cPlugin
 {
 public:
-	cPlugin();
+	cPlugin( const AString & a_PluginDirectory );
 	virtual ~cPlugin();
 	
 	virtual void OnDisable() {}
@@ -70,18 +70,21 @@ public:
 	int GetVersion() const { return m_Version; }
 	void SetVersion( int a_Version ) { m_Version = a_Version; }
 
+	const AString & GetDirectory(void) const {return m_Directory; }
+	AString GetLocalDirectory(void) const;	//tolua_export
+
 	struct CommandStruct
 	{
-		std::string Command;
-		std::string Description;
-		std::string Permission;
+		AString Command;
+		AString Description;
+		AString Permission;
 	};
 
 	void AddCommand(const AString & a_Command, const AString & a_Description, const AString & a_Permission);
 	// tolua_end
 	
-	typedef bool (FuncCommandHandler)( std::string & a_Command, std::vector< std::string > & a_Split );
-	void BindCommand( FuncCommandHandler* a_Function, std::string & a_Command );		// >> EXPORTED IN MANUALBINDINGS <<
+	typedef bool (FuncCommandHandler)( AString & a_Command, std::vector< std::string > & a_Split );
+	void BindCommand( FuncCommandHandler* a_Function, AString & a_Command );		// >> EXPORTED IN MANUALBINDINGS <<
 	const std::vector< CommandStruct > & GetCommands() const { return m_Commands; }		// >> EXPORTED IN MANUALBINDINGS <<
 
 
@@ -102,8 +105,10 @@ private:
 
 	PluginLanguage m_Language;
 	std::vector< CommandStruct > m_Commands;
-	std::string m_Name;
+	AString m_Name;
 	int m_Version;
+
+	AString m_Directory;
 };	//tolua_export
 
 

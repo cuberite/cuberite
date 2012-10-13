@@ -4,7 +4,6 @@
 #include "LuaCommandBinder.h"
 #include "Player.h"
 #include "Plugin.h"
-#include "Plugin_Lua.h"
 
 #include "tolua++.h"
 
@@ -12,7 +11,18 @@
 
 
 
-extern bool report_errors(lua_State* lua, int status);
+bool report_errors(lua_State* lua, int status)
+{
+	if ( status!=0 )
+	{
+		std::string s = lua_tostring(lua, -1);
+		LOGERROR("-- %s", s.c_str() );
+		lua_pop(lua, 1);
+		return true;
+	}
+	return false;
+}
+
 
 cLuaCommandBinder::cLuaCommandBinder()
 {

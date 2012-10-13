@@ -88,15 +88,15 @@ public:
 	void Heal( int a_Health );												//tolua_export
 	
 	/// Returns true if any food has been consumed, false if player "full"
-	bool Feed(short a_Food, float a_Saturation);
+	bool Feed(short a_Food, float a_Saturation);							//tolua_export
 
-	short GetMaxFoodLevel() { return m_MaxFoodLevel; }
-	short GetFoodLevel() { return m_FoodLevel; }
+	short GetMaxFoodLevel() { return m_MaxFoodLevel; }						//tolua_export
+	short GetFoodLevel() { return m_FoodLevel; }							//tolua_export
 
-	float GetMaxFoodSaturationLevel() { return m_MaxFoodSaturationLevel; }
-	float GetFoodSaturationLevel() { return m_FoodSaturationLevel; }
+	float GetMaxFoodSaturationLevel() { return m_MaxFoodSaturationLevel; }	//tolua_export
+	float GetFoodSaturationLevel() { return m_FoodSaturationLevel; }		//tolua_export
 
-	void AddFoodExhaustion(float a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }
+	void AddFoodExhaustion(float a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }	//tolua_export
 	
 	void TakeDamage( int a_Damage, cEntity* a_Instigator );					//tolua_export
 	void KilledBy( cEntity* a_Killer );										//tolua_export

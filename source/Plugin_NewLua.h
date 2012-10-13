@@ -17,7 +17,7 @@ typedef struct lua_State lua_State;
 class cPlugin_NewLua : public cPlugin, public cWebPlugin	//tolua_export
 {															//tolua_export
 public:														//tolua_export
-	cPlugin_NewLua( const char* a_PluginName );
+	cPlugin_NewLua( const AString & a_PluginDirectory );
 	~cPlugin_NewLua();
 
 	virtual void OnDisable();	//tolua_export
@@ -46,9 +46,6 @@ public:														//tolua_export
 	virtual bool OnUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnWeatherChanged  (cWorld * a_World) override;
 	virtual bool OnHandshake       (cClientHandle * a_Client, const AString & a_Username) override;
-
-	const AString & GetDirectory(void) const {return m_Directory; }
-	AString GetLocalDirectory(void) const;	//tolua_export
 	
 	virtual void SetName( const AString & a_Name ) override { cPlugin::SetName(a_Name); }
 	
@@ -71,6 +68,5 @@ private:
 
 	cCriticalSection m_CriticalSection;
 
-	std::string m_Directory;
 	lua_State * m_LuaState;
 };//tolua_export

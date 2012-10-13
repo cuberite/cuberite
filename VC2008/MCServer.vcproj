@@ -1432,14 +1432,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin_Lua.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Plugin_Lua.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Plugin_NewLua.cpp"
 					>
 				</File>

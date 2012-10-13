@@ -31,11 +31,11 @@ extern bool report_errors(lua_State* lua, int status);
 
 
 
-cPlugin_NewLua::cPlugin_NewLua( const char* a_PluginName )
+cPlugin_NewLua::cPlugin_NewLua( const AString & a_PluginDirectory )
 	: m_LuaState( 0 )
 	, cWebPlugin()
+	, cPlugin( a_PluginDirectory )
 {
-	m_Directory = a_PluginName;
 }
 
 
@@ -82,7 +82,7 @@ bool cPlugin_NewLua::Initialize()
 		int s = luaL_loadfile(m_LuaState, Path.c_str() );
 		if( report_errors( m_LuaState, s ) )
 		{
-			LOGERROR("Can't load plugin %s because of an error in file %s", m_Directory.c_str(), Path.c_str() );
+			LOGERROR("Can't load plugin %s because of an error in file %s", GetLocalDirectory().c_str(), Path.c_str() );
 			lua_close( m_LuaState );
 			m_LuaState = 0;
 			return false;
@@ -91,7 +91,7 @@ bool cPlugin_NewLua::Initialize()
 		s = lua_pcall(m_LuaState, 0, LUA_MULTRET, 0);
 		if( report_errors( m_LuaState, s ) )
 		{
-			LOGERROR("Error in plugin %s in file %s", m_Directory.c_str(), Path.c_str() );
+			LOGERROR("Error in plugin %s in file %s", GetLocalDirectory().c_str(), Path.c_str() );
 			lua_close( m_LuaState );
 			m_LuaState = 0;
 			return false;
@@ -117,7 +117,7 @@ bool cPlugin_NewLua::Initialize()
 
 	if( !lua_isboolean( m_LuaState, -1 ) )
 	{
-		LOGWARN("Error in plugin %s Initialize() must return a boolean value!", m_Directory.c_str() );
+		LOGWARN("Error in plugin %s Initialize() must return a boolean value!", GetLocalDirectory().c_str() );
 		lua_close( m_LuaState );
 		m_LuaState = 0;
 		return false;
@@ -125,15 +125,6 @@ bool cPlugin_NewLua::Initialize()
 
 	bool bSuccess = (tolua_toboolean( m_LuaState, -1, 0) > 0);
 	return bSuccess;
-}
-
-
-
-
-
-AString cPlugin_NewLua::GetLocalDirectory(void) const
-{
-	return std::string("Plugins/") + m_Directory;
 }
 
 
@@ -699,7 +690,7 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 cPlugin_NewLua * cPlugin_NewLua::CreateWebPlugin(lua_State * a_LuaState)
 {
 	LOGWARN("WARNING: Using deprecated function CreateWebPlugin()! A Lua plugin is a WebPlugin by itself now. (plugin \"%s\" in folder \"%s\")",
-		cPlugin::GetName().c_str(), m_Directory.c_str()
+		cPlugin::GetName().c_str(), GetLocalDirectory().c_str()
 	);
 	return this;
 }
@@ -797,7 +788,7 @@ bool cPlugin_NewLua::PushFunction( const char* a_FunctionName, bool a_bLogError 
 	{
 		if( a_bLogError )
 		{
-			LOGWARN("Error in plugin %s: Could not find function %s()", m_Directory.c_str(), a_FunctionName );
+			LOGWARN("Error in plugin %s: Could not find function %s()", GetLocalDirectory().c_str(), a_FunctionName );
 		}
 		lua_pop(m_LuaState,1);
 		return false;
@@ -810,7 +801,7 @@ bool cPlugin_NewLua::CallFunction( int a_NumArgs, int a_NumResults, const char* 
 	int s = lua_pcall(m_LuaState, a_NumArgs, a_NumResults, 0);
 	if( report_errors( m_LuaState, s ) )
 	{
-		LOGWARN("Error in plugin %s calling function %s()", m_Directory.c_str(), a_FunctionName );
+		LOGWARN("Error in plugin %s calling function %s()", GetLocalDirectory().c_str(), a_FunctionName );
 		return false;
 	}
 	return true;
