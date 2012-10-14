@@ -67,21 +67,21 @@ public:
 				if (a_Dir >= 0)
 				{
 					AddDirection(a_X, a_Y, a_Z, a_Dir);
-				}
-				if(a_World->GetBlock(a_X, a_Y, a_Z) == E_BLOCK_AIR)
-				{
-					cItem Item(a_Item->m_ItemID, 1);
-					if ((a_Player->GetGameMode() == 1) || (a_Player->GetInventory().RemoveItem(Item)))
+					if (a_World->GetBlock(a_X, a_Y, a_Z) == E_BLOCK_AIR)
 					{
-						a_World->SetBlock(a_X, a_Y, a_Z, NewBlock, 0);
-
-						if (a_Player->GetGameMode() == 1)
+						cItem Item(a_Item->m_ItemID, 1);
+						if ((a_Player->GetGameMode() == 1) || (a_Player->GetInventory().RemoveItem(Item)))
 						{
-							break;		//No new Bucket for creative players
+							a_World->SetBlock(a_X, a_Y, a_Z, NewBlock, 0);
+
+							if (a_Player->GetGameMode() == 1)
+							{
+								break;		//No new Bucket for creative players
+							}
+							cItem Item(E_ITEM_BUCKET, 1);
+							a_Player->GetInventory().AddItem(Item);
+							return true;
 						}
-						cItem Item(E_ITEM_BUCKET, 1);
-						a_Player->GetInventory().AddItem(Item);
-						return true;
 					}
 				}
 			}
