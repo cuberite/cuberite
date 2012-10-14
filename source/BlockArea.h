@@ -70,14 +70,14 @@ public:
 	void SetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockSkyLight);
 
 	// Getters:
-	BLOCKTYPE  GetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ);
-	BLOCKTYPE  GetBlockType       (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetRelBlockMeta    (int a_RelX,   int a_RelY,   int a_RelZ);
-	NIBBLETYPE GetBlockMeta       (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetRelBlockLight   (int a_RelX,   int a_RelY,   int a_RelZ);
-	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ);
-	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ);
-	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ);
+	BLOCKTYPE  GetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
+	BLOCKTYPE  GetBlockType       (int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	NIBBLETYPE GetRelBlockMeta    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
+	NIBBLETYPE GetBlockMeta       (int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	NIBBLETYPE GetRelBlockLight   (int a_RelX,   int a_RelY,   int a_RelZ)   const;
+	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
+	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	
 	int GetSizeX(void) const { return m_SizeX; }
 	int GetSizeY(void) const { return m_SizeY; }
@@ -100,7 +100,7 @@ public:
 	NIBBLETYPE * GetBlockLight   (void) { return m_BlockLight; }     // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockSkyLight(void) { return m_BlockSkyLight; }  // NOTE: one byte per block!
 	int          GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
-	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ);
+	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
 protected:
 	
@@ -148,8 +148,8 @@ protected:
 	void SetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
 
 	// Basic Getters:
-	NIBBLETYPE GetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE * a_Array);
-	NIBBLETYPE GetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array);
+	NIBBLETYPE GetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE * a_Array) const;
+	NIBBLETYPE GetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array) const;
 
 	// tolua_begin
 } ;

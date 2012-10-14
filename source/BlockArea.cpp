@@ -265,7 +265,7 @@ void cBlockArea::SetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBB
 
 
 
-BLOCKTYPE cBlockArea::GetRelBlockType(int a_RelX,   int a_RelY,   int a_RelZ)
+BLOCKTYPE cBlockArea::GetRelBlockType(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	if (m_BlockTypes == NULL)
 	{
@@ -279,7 +279,7 @@ BLOCKTYPE cBlockArea::GetRelBlockType(int a_RelX,   int a_RelY,   int a_RelZ)
 
 
 
-BLOCKTYPE cBlockArea::GetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ)
+BLOCKTYPE cBlockArea::GetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ) const
 {
 	return GetRelBlockType(a_BlockX - m_OriginX, a_BlockY - m_OriginY, a_BlockZ - m_OriginZ);
 }
@@ -288,7 +288,7 @@ BLOCKTYPE cBlockArea::GetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-NIBBLETYPE cBlockArea::GetRelBlockMeta(int a_RelX, int a_RelY, int a_RelZ)
+NIBBLETYPE cBlockArea::GetRelBlockMeta(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return GetRelNibble(a_RelX, a_RelY, a_RelZ, m_BlockMetas);
 }
@@ -297,7 +297,7 @@ NIBBLETYPE cBlockArea::GetRelBlockMeta(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-NIBBLETYPE cBlockArea::GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
+NIBBLETYPE cBlockArea::GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ) const
 {
 	return GetNibble(a_BlockX, a_BlockY, a_BlockZ, m_BlockMetas);
 }
@@ -306,7 +306,7 @@ NIBBLETYPE cBlockArea::GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-NIBBLETYPE cBlockArea::GetRelBlockLight(int a_RelX, int a_RelY, int a_RelZ)
+NIBBLETYPE cBlockArea::GetRelBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return GetRelNibble(a_RelX, a_RelY, a_RelZ, m_BlockLight);
 }
@@ -315,7 +315,7 @@ NIBBLETYPE cBlockArea::GetRelBlockLight(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-NIBBLETYPE cBlockArea::GetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+NIBBLETYPE cBlockArea::GetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ) const
 {
 	return GetNibble(a_BlockX, a_BlockY, a_BlockZ, m_BlockLight);
 }
@@ -324,7 +324,7 @@ NIBBLETYPE cBlockArea::GetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-NIBBLETYPE cBlockArea::GetRelBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ)
+NIBBLETYPE cBlockArea::GetRelBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return GetRelNibble(a_RelX, a_RelY, a_RelZ, m_BlockSkyLight);
 }
@@ -333,7 +333,7 @@ NIBBLETYPE cBlockArea::GetRelBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-NIBBLETYPE cBlockArea::GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+NIBBLETYPE cBlockArea::GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ) const
 {
 	return GetNibble(a_BlockX, a_BlockY, a_BlockZ, m_BlockSkyLight);
 }
@@ -420,7 +420,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 
 
 
-int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ)
+int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return a_RelX + a_RelZ * m_SizeZ + a_RelY * m_SizeX * m_SizeZ;
 }
@@ -452,7 +452,7 @@ void cBlockArea::SetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE 
 
 
 
-NIBBLETYPE cBlockArea::GetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE * a_Array)
+NIBBLETYPE cBlockArea::GetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE * a_Array) const
 {
 	if (a_Array == NULL)
 	{
@@ -466,7 +466,7 @@ NIBBLETYPE cBlockArea::GetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NI
 
 
 
-NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array)
+NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array) const
 {
 	return GetRelNibble(a_BlockX - m_OriginX, a_BlockY - m_OriginY, a_BlockZ - m_OriginZ, a_Array);
 }
