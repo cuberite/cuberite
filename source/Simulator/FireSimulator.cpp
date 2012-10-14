@@ -47,8 +47,10 @@ void cFireSimulator::Simulate( float a_Dt )
 		if(!IsAllowedBlock(BlockID))	//Check wheather the block is still burning
 			continue;
 
-		if(BurnBlockAround(Pos.x, Pos.y, Pos.z))	//Burn single block and if there was one -> next time again
-			_AddBlock(Pos.x, Pos.y, Pos.z);
+		if (BurnBlockAround(Pos.x, Pos.y, Pos.z))	//Burn single block and if there was one -> next time again
+		{
+			m_Blocks->push_back(Pos);
+		}
 		else
 			if(!IsForeverBurnable(m_World->GetBlock(Pos.x, Pos.y - 1, Pos.z)) && !FiresForever(BlockID))
 				m_World->SetBlock(Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0);
@@ -61,42 +63,34 @@ void cFireSimulator::Simulate( float a_Dt )
 
 
 
-bool cFireSimulator::IsAllowedBlock( BLOCKTYPE a_BlockType )
+bool cFireSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 {
-	return a_BlockType == E_BLOCK_FIRE
-		|| IsBlockLava(a_BlockType);
+	return (a_BlockType == E_BLOCK_FIRE) || IsBlockLava(a_BlockType);
 }
 
 
 
 
 
-void cFireSimulator::AddBlock(int a_X, int a_Y, int a_Z)
+void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	char BlockID = m_World->GetBlock(a_X, a_Y, a_Z);
-	if(!IsAllowedBlock(BlockID))		//This should save very much time because it doesn´t have to iterate through all blocks
+	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	if (!IsAllowedBlock(BlockType))
+	{
 		return;
+	}
 	
-	//check for duplicates
-	for( BlockList::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
+	// Check for duplicates:
+	for (BlockList::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
 	{
 		Vector3i Pos = *itr;
-		if( Pos.x == a_X && Pos.y == a_Y && Pos.z == a_Z )
+		if ((Pos.x == a_BlockX) && (Pos.y == a_BlockY) && (Pos.z == a_BlockZ))
+		{
 			return;
+		}
 	}
 
-	_AddBlock(a_X, a_Y, a_Z);
-
-}
-
-
-
-
-
-void cFireSimulator::_AddBlock(int a_X, int a_Y, int a_Z)
-{
-	m_Blocks->push_back( Vector3i(a_X, a_Y, a_Z) );
-
+	m_Blocks->push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
 }
 
 

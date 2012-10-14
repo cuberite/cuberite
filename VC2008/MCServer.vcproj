@@ -1019,11 +1019,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Simulator\DelayedFluidSimulator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Simulator\DelayedFluidSimulator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Simulator\FireSimulator.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\Simulator\FireSimulator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Simulator\FloodyFluidSimulator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Simulator\FloodyFluidSimulator.h"
 					>
 				</File>
 				<File

@@ -19,14 +19,9 @@ cFluidSimulator::cFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE 
 
 
 
-bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 {
-	return (
-		(a_BlockType == E_BLOCK_AIR) ||
-		(a_BlockType == E_BLOCK_FIRE) ||
-		IsAllowedBlock(a_BlockType) ||
-		CanWashAway(a_BlockType)
-	);
+	return ((a_BlockType == m_FluidBlock) || (a_BlockType == m_StationaryFluidBlock));
 }
 
 
@@ -59,6 +54,52 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType)
 {
 	return !IsPassableForFluid(a_BlockType);
+}
+
+
+
+
+
+bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
+{
+	return (
+		(a_BlockType == E_BLOCK_AIR) ||
+		(a_BlockType == E_BLOCK_FIRE) ||
+		IsAllowedBlock(a_BlockType) ||
+		CanWashAway(a_BlockType)
+	);
+}
+
+
+
+
+
+bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
+{
+	if (a_Meta1 == 0)
+	{
+		// Source block is higher than anything, even itself.
+		return true;
+	}
+	if ((a_Meta1 & 0x08) != 0)
+	{
+		// Falling fluid is higher than anything, including self
+		return true;
+	}
+	
+	if (a_Meta2 == 0)
+	{
+		// Second block is a source and first block isn't
+		return false;
+	}
+	if ((a_Meta2 & 0x08) != 0)
+	{
+		// Second block is falling and the first one is neither a source nor falling
+		return false;
+	}
+	
+	// All special cases have been handled, now it's just a raw comparison:
+	return (a_Meta1 < a_Meta2);
 }
 
 

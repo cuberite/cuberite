@@ -16,6 +16,7 @@
 // Simulators:
 #include "Simulator/SimulatorManager.h"
 #include "Simulator/ClassicFluidSimulator.h"
+#include "Simulator/FloodyFluidSimulator.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
@@ -252,15 +253,10 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
 	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
-	m_bEnabledPVP				= IniFile.GetValueSetB("PVP",           "Enabled",                   true);
+	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode );
 
-	if (!IniFile.WriteFile())
-	{
-		LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
-	}
-	
 	m_Lighting.Start(this);
 	m_Storage.Start(this, StorageSchema);
 	m_Generator.Start(this, IniFile);
@@ -286,7 +282,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_LastSave = 0;
 	m_LastUnload = 0;
 
-	//preallocate some memory for ticking blocks so we don´t need to allocate that often
+	// preallocate some memory for ticking blocks so we don´t need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
@@ -303,6 +299,12 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
+
+	// Save any changes that the defaults may have done to the ini file:
+	if (!IniFile.WriteFile())
+	{
+		LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
+	}
 }
 
 
@@ -2161,7 +2163,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
 	AString SimulatorSectionName;
 	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
-	AString SimulatorName = a_IniFile.GetValue("Physics", SimulatorNameKey, "");
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
 	if (SimulatorName.empty())
 	{
 		LOGWARNING("%s [Physics]:%s not present or empty, using the default of \"Classic\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
@@ -2169,15 +2171,13 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	
 	cFluidSimulator * res = NULL;
-	/*
 	// TODO: other fluid simulators
 	if (NoCaseCompare(SimulatorName, "floody") == 0)
 	{
 		// TODO: Floody simulator params
-		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock);
+		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, 1, 5);
 	}
 	else
-	*/
 	{
 		if (NoCaseCompare(SimulatorName, "classic") != 0)
 		{
@@ -2186,8 +2186,8 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		}
 		int DefaultFalloff   = (strcmp(a_FluidName, "Water") == 0) ? 1 : 2;
 		int DefaultMaxHeight = (strcmp(a_FluidName, "Water") == 0) ? 7 : 6;
-		int Falloff   = a_IniFile.GetValueI(SimulatorSectionName, "Falloff",   DefaultFalloff);
-		int MaxHeight = a_IniFile.GetValueI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
+		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
+		int MaxHeight = a_IniFile.GetValueSetI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
 		res = new cClassicFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);
 	}
 	

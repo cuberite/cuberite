@@ -25,7 +25,6 @@ public:
 	// cSimulator overrides:
 	virtual void Simulate(float a_Dt) override;
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
 
 protected:
 	NIBBLETYPE GetHighestLevelAround(int a_BlockX, int a_BlockY, int a_BlockZ);

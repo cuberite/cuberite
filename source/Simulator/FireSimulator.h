@@ -24,7 +24,6 @@ public:
 
 protected:
 	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;
-	virtual void _AddBlock(int a_X, int a_Y, int a_Z);  // _X 2012_10_13: WTF? what kind of naming is this? Use proper names!
 	virtual bool BurnBlockAround(int a_X, int a_Y, int a_Z);
 	virtual bool BurnBlock(int a_X, int a_Y, int a_Z);
 

@@ -28,6 +28,7 @@ public:
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) = 0;
 
 protected:
+	/// Called to simulate a new block
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 
 	cWorld * m_World;

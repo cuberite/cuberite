@@ -300,15 +300,6 @@ void cClassicFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-bool cClassicFluidSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
-{
-	return ((a_BlockType == m_FluidBlock) || (a_BlockType == m_StationaryFluidBlock));
-}
-
-
-
-
-
 NIBBLETYPE cClassicFluidSimulator::GetHighestLevelAround(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	NIBBLETYPE Max = m_MaxHeight + m_Falloff;
