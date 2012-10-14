@@ -15,6 +15,17 @@
 
 
 
+// Enable or disable detailed logging
+#if 1
+	#define FLOG LOG
+#else
+	#define FLOG(...)
+#endif
+
+
+
+
+
 cFloodyFluidSimulator::cFloodyFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay) :
 	super(a_World, a_Fluid, a_StationaryFluid, a_TickDelay),
 	m_Falloff(a_Falloff)
@@ -27,6 +38,8 @@ cFloodyFluidSimulator::cFloodyFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid
 
 void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	FLOG("Simulating block {%d, %d, %d}", a_BlockX, a_BlockY, a_BlockZ);
+	
 	cBlockArea Area;
 	int MinBlockY = std::max(0, a_BlockY - 1);
 	int MaxBlockY = std::min(cChunkDef::Height, a_BlockY + 1);
@@ -34,6 +47,7 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	{
 		// Cannot read the immediate neighborhood, probably too close to an unloaded chunk. Bail out.
 		// TODO: Shouldn't we re-schedule?
+		FLOG("  Cannot read area, bailing out.");
 		return;
 	}
 	int y = (a_BlockY > 0) ? 1 : 0;  // Relative y-coord of this block in Area
@@ -42,6 +56,7 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	if (!IsAnyFluidBlock(Area.GetRelBlockType(1, y, 1)))
 	{
 		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
+		FLOG("  Not my type: exp %d, got %d", m_FluidBlock, Area.GetRelBlockType(1, y, 1));
 		return;
 	}
 
@@ -59,9 +74,9 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	NIBBLETYPE NewMeta = ((MyMeta == 0) || ((MyMeta & 0x08) != 0)) ? m_Falloff : (MyMeta + m_Falloff);
 	
 	BLOCKTYPE Below = Area.GetRelBlockType(1, 0, 1);
-	if ((a_BlockY > 0) && IsPassableForFluid(Below))
+	if ((a_BlockY > 0) && (IsPassableForFluid(Below) || IsBlockLava(Below) || IsBlockWater(Below)))
 	{
-		// Spread only down, possibly washing away what's there:
+		// Spread only down, possibly washing away what's there or turning lava to stone / cobble / obsidian:
 		SpreadToNeighbor(a_BlockX, a_BlockY - 1, a_BlockZ, Area, 8);
 	}
 	else if (NewMeta < 8)   // Can reach there
@@ -96,16 +111,18 @@ bool cFloodyFluidSimulator::CheckTributaries(int a_BlockX, int a_BlockY, int a_B
 	if (!IsFed)
 	{
 		IsFed = (
-			(IsAnyFluidBlock(a_Area.GetRelBlockType(0, y, 1)) && IsHigherMeta(a_Area.GetRelBlockMeta(0, y, 1), a_MyMeta)) ||
-			(IsAnyFluidBlock(a_Area.GetRelBlockType(2, y, 1)) && IsHigherMeta(a_Area.GetRelBlockMeta(2, y, 1), a_MyMeta)) ||
-			(IsAnyFluidBlock(a_Area.GetRelBlockType(1, y, 0)) && IsHigherMeta(a_Area.GetRelBlockMeta(1, y, 0), a_MyMeta)) ||
-			(IsAnyFluidBlock(a_Area.GetRelBlockType(1, y, 2)) && IsHigherMeta(a_Area.GetRelBlockMeta(1, y, 2), a_MyMeta))
+			(IsAllowedBlock(a_Area.GetRelBlockType(0, y, 1)) && IsHigherMeta(a_Area.GetRelBlockMeta(0, y, 1), a_MyMeta)) ||
+			(IsAllowedBlock(a_Area.GetRelBlockType(2, y, 1)) && IsHigherMeta(a_Area.GetRelBlockMeta(2, y, 1), a_MyMeta)) ||
+			(IsAllowedBlock(a_Area.GetRelBlockType(1, y, 0)) && IsHigherMeta(a_Area.GetRelBlockMeta(1, y, 0), a_MyMeta)) ||
+			(IsAllowedBlock(a_Area.GetRelBlockType(1, y, 2)) && IsHigherMeta(a_Area.GetRelBlockMeta(1, y, 2), a_MyMeta))
 		);
 	}
 	
 	// If not fed, decrease by m_Falloff levels:
 	if (!IsFed)
 	{
+		FLOG("  Not fed, decreasing from %d to %d", a_MyMeta, a_MyMeta + m_Falloff);
+		
 		a_MyMeta += m_Falloff;
 		if (a_MyMeta < 8)
 		{
@@ -131,15 +148,55 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 	
 	BLOCKTYPE Block = a_Area.GetBlockType(a_BlockX, a_BlockY, a_BlockZ);
 	
-	if (IsAnyFluidBlock(Block))
+	if (IsAllowedBlock(Block))
 	{
 		NIBBLETYPE Meta = a_Area.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		if (!IsHigherMeta(a_NewMeta, Meta))
+		if ((Meta == a_NewMeta) || IsHigherMeta(Meta, a_NewMeta))
 		{
-			// Don't spread there, there's already a higher level there
+			// Don't spread there, there's already a higher or same level there
 			return;
 		}
 	}
+
+	// Check water - lava interaction:
+	if (m_FluidBlock == E_BLOCK_LAVA)
+	{
+		if (IsBlockWater(Block))
+		{
+			// Lava flowing into water, change to stone / cobblestone based on direction:
+			BLOCKTYPE NewBlock = (a_NewMeta == 8) ? E_BLOCK_STONE : E_BLOCK_COBBLESTONE;
+			FLOG("  Lava flowing into water, turning water at {%d, %d, %d} into stone", 
+				a_BlockX, a_BlockY, a_BlockZ,
+				ItemTypeToString(NewBlock).c_str()
+			);
+			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
+			
+			// TODO: Sound effect
+			
+			return;
+		}
+	}
+	else if (m_FluidBlock == E_BLOCK_WATER)
+	{
+		if (IsBlockLava(Block))
+		{
+			// Water flowing into lava, change to cobblestone / obsidian based on dest block:
+			BLOCKTYPE NewBlock = (a_Area.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) == 0) ? E_BLOCK_OBSIDIAN : E_BLOCK_COBBLESTONE;
+			FLOG("  Water flowing into lava, turning lava at {%d, %d, %d} into %s", 
+				a_BlockX, a_BlockY, a_BlockZ, ItemTypeToString(NewBlock).c_str()
+			);
+			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
+			
+			// TODO: Sound effect
+			
+			return;
+		}
+	}
+	else
+	{
+		ASSERT(!"Unknown fluid!");
+	}
+	
 	if (!IsPassableForFluid(Block))
 	{
 		// Can't spread there
@@ -157,6 +214,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 	}
 	
 	// Spread:
+	FLOG("  Spreading to {%d, %d, %d} with meta %d", a_BlockX, a_BlockY, a_BlockZ, a_NewMeta);
 	m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, a_NewMeta);
 }
 

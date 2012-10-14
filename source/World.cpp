@@ -2171,11 +2171,14 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	
 	cFluidSimulator * res = NULL;
-	// TODO: other fluid simulators
+	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	if (NoCaseCompare(SimulatorName, "floody") == 0)
 	{
-		// TODO: Floody simulator params
-		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, 1, 5);
+		int DefaultFalloff   = IsWater ? 1 : 2;
+		int DefaultTickDelay = IsWater ? 5 : 30;
+		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
+		int TickDelay = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay", DefaultTickDelay);
+		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay);
 	}
 	else
 	{
@@ -2184,8 +2187,8 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 			// The simulator name doesn't match anything we have, issue a warning:
 			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Classic\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
 		}
-		int DefaultFalloff   = (strcmp(a_FluidName, "Water") == 0) ? 1 : 2;
-		int DefaultMaxHeight = (strcmp(a_FluidName, "Water") == 0) ? 7 : 6;
+		int DefaultFalloff   = IsWater ? 1 : 2;
+		int DefaultMaxHeight = IsWater ? 7 : 6;
 		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
 		int MaxHeight = a_IniFile.GetValueSetI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
 		res = new cClassicFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);

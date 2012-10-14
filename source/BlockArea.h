@@ -83,6 +83,10 @@ public:
 	int GetSizeY(void) const { return m_SizeY; }
 	int GetSizeZ(void) const { return m_SizeZ; }
 	
+	int GetOriginX(void) const { return m_OriginX; }
+	int GetOriginY(void) const { return m_OriginY; }
+	int GetOriginZ(void) const { return m_OriginZ; }
+	
 	/// Returns the datatypes that are stored in the object (bitmask of baXXX values)
 	int GetDataTypes(void) const;
 	
