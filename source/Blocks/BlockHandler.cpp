@@ -387,3 +387,25 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
+
+void cBlockHandler::Check(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	if (!CanBeAt(a_World, a_BlockX, a_BlockY, a_BlockZ))
+	{
+		if (DoesDropOnUnsuitable())
+		{
+			DropBlock(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		}
+		
+		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+	}
+	else
+	{
+		// Wake up the simulators:
+		a_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ);
+	}
+}
+
+
+
+

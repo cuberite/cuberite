@@ -480,15 +480,7 @@ void cChunk::CheckBlocks(void)
 		Vector3i WorldPos = PositionToWorldPosition( BlockPos );
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		if (!Handler->CanBeAt(m_World, WorldPos.x, WorldPos.y, WorldPos.z))
-		{
-			if (Handler->DoesDropOnUnsuitable())
-			{
-				Handler->DropBlock(m_World, WorldPos.x, WorldPos.y, WorldPos.z);
-			}
-			
-			m_World->SetBlock(WorldPos.x, WorldPos.y, WorldPos.z, E_BLOCK_AIR, 0);
-		}
+		Handler->Check(m_World, WorldPos.x, WorldPos.y, WorldPos.z);
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -918,13 +910,8 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		}
 	}
 
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX,     a_RelY,     a_RelZ ) );
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX + 1, a_RelY,     a_RelZ ) );
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX - 1, a_RelY,     a_RelZ ) );
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX,     a_RelY + 1, a_RelZ ) );
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX,     a_RelY - 1, a_RelZ ) );
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX,     a_RelY,     a_RelZ + 1 ) );
-	m_ToTickBlocks.push_back( MakeIndex( a_RelX,     a_RelY,     a_RelZ - 1 ) );
+	m_ToTickBlocks.push_back(index);
+	CheckNeighbors(a_RelX, a_RelY, a_RelZ);
 
 	Vector3i WorldPos = PositionToWorldPosition( a_RelX, a_RelY, a_RelZ );
 	cBlockEntity* BlockEntity = GetBlockEntity( WorldPos );
@@ -958,6 +945,75 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 			break;
 		}
 	}  // switch (a_BlockType)
+}
+
+
+
+
+
+void cChunk::CheckNeighbors(int a_RelX, int a_RelY, int a_RelZ)
+{
+	int BlockX = m_PosX * cChunkDef::Width + a_RelX;
+	int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
+	if (a_RelX < cChunkDef::Width)
+	{
+		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX + 1, a_RelY, a_RelZ));
+	}
+	else
+	{
+		m_ChunkMap->CheckBlock(BlockX + 1, a_RelY, BlockZ);
+	}
+	
+	if (a_RelX > 0)
+	{
+		m_ToTickBlocks.push_back( MakeIndexNoCheck(a_RelX - 1, a_RelY,     a_RelZ));
+	}
+	else
+	{
+		m_ChunkMap->CheckBlock(BlockX - 1, a_RelY, BlockZ);
+	}
+	
+	if (a_RelY < cChunkDef::Height - 1)
+	{
+		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY + 1, a_RelZ));
+	}
+	
+	if (a_RelY > 0)
+	{
+		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY - 1, a_RelZ));
+	}
+	
+	if (a_RelZ < cChunkDef::Width - 1)
+	{
+		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ + 1));
+	}
+	else
+	{
+		m_ChunkMap->CheckBlock(BlockX, a_RelY, BlockZ + 1);
+	}
+	
+	if (a_RelZ > 0)
+	{
+		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ - 1));
+	}
+	else
+	{
+		m_ChunkMap->CheckBlock(BlockX, a_RelY, BlockZ - 1);
+	}
+}
+
+
+
+
+
+void cChunk::CheckBlock(int a_RelX, int a_RelY, int a_RelZ)
+{
+	if (!IsValid())
+	{
+		return;
+	}
+	
+	m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ));
 }
 
 

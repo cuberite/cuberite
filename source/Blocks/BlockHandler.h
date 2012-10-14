@@ -91,6 +91,12 @@ public:
 	/// Does this block drop if it gets destroyed by an unsuitable situation? Default: true
 	virtual bool DoesDropOnUnsuitable(void);
 	
+	/** Called when one of the neighbors gets set; equivalent to MC block update. 
+	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
+	and wakes up all simulators on the block.
+	*/
+	virtual void Check(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	
 
 	/// Get the blockhandler for a specific block id
 	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockType);

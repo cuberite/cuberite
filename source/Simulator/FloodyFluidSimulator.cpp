@@ -39,6 +39,11 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	int y = (a_BlockY > 0) ? 1 : 0;  // Relative y-coord of this block in Area
 	
 	NIBBLETYPE MyMeta = Area.GetRelBlockMeta(1, y, 1);
+	if (!IsAnyFluidBlock(Area.GetRelBlockType(1, y, 1)))
+	{
+		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
+		return;
+	}
 
 	if (MyMeta != 0)
 	{
@@ -121,6 +126,9 @@ bool cFloodyFluidSimulator::CheckTributaries(int a_BlockX, int a_BlockY, int a_B
 
 void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockArea & a_Area, NIBBLETYPE a_NewMeta)
 {
+	ASSERT(a_NewMeta <= 8);  // Invalid meta values
+	ASSERT(a_NewMeta > 0);  // Source blocks aren't spread
+	
 	BLOCKTYPE Block = a_Area.GetBlockType(a_BlockX, a_BlockY, a_BlockZ);
 	
 	if (IsAnyFluidBlock(Block))
@@ -149,8 +157,6 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 	}
 	
 	// Spread:
-	LOGD("Fluid:     spreading to block {%d, %d, %d}, meta %d", a_BlockX, a_BlockY, a_BlockZ, a_NewMeta);
-	
 	m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, a_NewMeta);
 }
 

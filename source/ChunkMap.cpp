@@ -898,18 +898,19 @@ BLOCKTYPE cChunkMap::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
 
 
 
-void cChunkMap::SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_BlockMeta)
+void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta)
 {
 	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	// a_BlockXYZ now contains relative coords!
 
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
-	if ((Chunk != NULL) && Chunk->IsValid() )	
+	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if ((Chunk != NULL) && Chunk->IsValid())
 	{
-		Chunk->SetMeta(a_X, a_Y, a_Z, a_BlockMeta);
+		Chunk->SetMeta(a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
 		Chunk->MarkDirty();
-		Chunk->SendBlockTo( a_X, a_Y, a_Z, NULL );
+		Chunk->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, NULL);
 	}
 }
 
@@ -1657,6 +1658,48 @@ void cChunkMap::SaveAllChunks(void)
 
 
 
+int cChunkMap::GetNumChunks(void)
+{
+	cCSLock Lock(m_CSLayers);
+	int NumChunks = 0;
+	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		NumChunks += (*itr)->GetNumChunksLoaded();
+	}
+	return NumChunks;
+}
+
+
+
+
+
+void cChunkMap::ChunkValidated(void)
+{
+	m_evtChunkValid.Set();
+}
+
+
+
+
+
+void cChunkMap::CheckBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	// a_BlockXYZ now contains relative coords!
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk != NULL)
+	{
+		Chunk->CheckBlock(a_BlockX, a_BlockY, a_BlockZ);
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap::cChunkLayer:
 
@@ -1811,30 +1854,6 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 			m_Chunks[i] = NULL;
 		}
 	}  // for i - m_Chunks[]
-}
-
-
-
-
-
-int cChunkMap::GetNumChunks(void)
-{
-	cCSLock Lock(m_CSLayers);
-	int NumChunks = 0;
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
-	{
-		NumChunks += (*itr)->GetNumChunksLoaded();
-	}
-	return NumChunks;
-}
-
-
-
-
-
-void cChunkMap::ChunkValidated(void)
-{
-	m_evtChunkValid.Set();
 }
 
 

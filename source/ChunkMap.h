@@ -245,6 +245,9 @@ public:
 	int GetNumChunks(void);
 	
 	void ChunkValidated(void);  // Called by chunks that have become valid
+	
+	/// Schedules the specified block for checking (block update)
+	void CheckBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 private:
 
