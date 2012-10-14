@@ -271,7 +271,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		BLOCKTYPE BlockBottom      = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBottom",      "stone");
 		BLOCKTYPE BlockBeach       = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBeach",       "sand");
 		BLOCKTYPE BlockBeachBottom = GetIniBlock(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone");
-		BLOCKTYPE BlockSea         = GetIniBlock(a_IniFile, "Generator", "ClassicBlockSea",         "9");
+		BLOCKTYPE BlockSea         = GetIniBlock(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater");
 		m_CompositionGen = new cCompoGenClassic(
 			SeaLevel, BeachHeight, BeachDepth, BlockTop, BlockMiddle, BlockBottom, BlockBeach,
 			BlockBeachBottom, BlockSea

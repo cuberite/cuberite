@@ -372,7 +372,7 @@ void cCompoGenBiomal::FillColumnWaterSand(int a_RelX, int a_RelZ, int a_Height, 
 	FillColumnSand(a_RelX, a_RelZ, a_Height, a_BlockTypes);
 	for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
 	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_WATER);
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
 	}
 }
 
@@ -404,7 +404,7 @@ void cCompoGenBiomal::FillColumnWaterMix(int a_ChunkX, int a_ChunkZ, int a_RelX,
 		}
 		for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
 		{
-			cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_WATER);
+			cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
 		}
 	}
 }
