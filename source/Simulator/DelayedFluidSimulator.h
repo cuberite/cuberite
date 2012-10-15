@@ -34,7 +34,13 @@ protected:
 	int           m_TickDelay;       // Count of the m_Slots array
 	CoordsArray * m_Slots;           // Slots, one for each delay tick
 	int           m_CurrentSlotNum;  // Index into m_Slots[] where to insert new blocks
-	
+
+	/*
+	Slots:
+	| 0 | 1 | ... |     m_CurrentSlotNum | m_CurrentSlotNum + 1 | ... | m_TickDelay - 1 |
+	                adding blocks here ^ | ^ simulating here
+	*/
+
 	/// Called from Simulate() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation.
 	virtual void SimulateBlock(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 } ;

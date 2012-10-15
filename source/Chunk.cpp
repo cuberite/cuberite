@@ -955,7 +955,7 @@ void cChunk::CheckNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 {
 	int BlockX = m_PosX * cChunkDef::Width + a_RelX;
 	int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
-	if (a_RelX < cChunkDef::Width)
+	if (a_RelX < cChunkDef::Width - 1)
 	{
 		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX + 1, a_RelY, a_RelZ));
 	}

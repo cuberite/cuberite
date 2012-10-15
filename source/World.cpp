@@ -287,15 +287,14 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
+	m_SimulatorManager = new cSimulatorManager();
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
 	m_SandSimulator     = new cSandSimulator(this);
 	m_FireSimulator     = new cFireSimulator(this);
 	m_RedstoneSimulator = new cRedstoneSimulator(this);
 
-	m_SimulatorManager = new cSimulatorManager();
-	m_SimulatorManager->RegisterSimulator(m_WaterSimulator, 6);
-	m_SimulatorManager->RegisterSimulator(m_LavaSimulator, 12);
+	// Water and Lava simulators get registered in InitializeFluidSimulator()
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
@@ -2172,6 +2171,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	
 	cFluidSimulator * res = NULL;
 	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
+	int Rate = 1;
 	if (NoCaseCompare(SimulatorName, "floody") == 0)
 	{
 		int DefaultFalloff   = IsWater ? 1 : 2;
@@ -2192,8 +2192,11 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
 		int MaxHeight = a_IniFile.GetValueSetI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
 		res = new cClassicFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);
+		Rate = IsWater ? 6 : 12;
 	}
 	
+	m_SimulatorManager->RegisterSimulator(res, Rate);
+
 	return res;
 }
 

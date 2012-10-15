@@ -17,7 +17,7 @@ cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld * a_World, BLOCKTYPE a_Flu
 	super(a_World, a_Fluid, a_StationaryFluid),
 	m_TickDelay(a_TickDelay),
 	m_Slots(NULL),
-	m_CurrentSlotNum(a_TickDelay - 1)
+	m_CurrentSlotNum(0)
 {
 	m_Slots = new CoordsArray[a_TickDelay];
 }
@@ -70,14 +70,13 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cDelayedFluidSimulator::Simulate(float a_Dt)
 {
-	CoordsArray & Blocks = m_Slots[m_CurrentSlotNum];
-	
-	// First move to the next slot, so that simulated blocks can write another batch of scheduled blocks:
-	m_CurrentSlotNum += 1;
-	if (m_CurrentSlotNum >= m_TickDelay)
+	int SlotNum = m_CurrentSlotNum + 1;
+	if (SlotNum >= m_TickDelay)
 	{
-		m_CurrentSlotNum = 0;
+		SlotNum = 0;
 	}
+	
+	CoordsArray & Blocks = m_Slots[SlotNum];
 	
 	// Simulate the blocks in the scheduled slot:
 	for (CoordsArray::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
@@ -85,6 +84,8 @@ void cDelayedFluidSimulator::Simulate(float a_Dt)
 		SimulateBlock(itr->x, itr->y, itr->z);
 	}
 	Blocks.clear();
+	
+	m_CurrentSlotNum = SlotNum;
 }
 
 
