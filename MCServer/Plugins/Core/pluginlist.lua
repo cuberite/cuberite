@@ -3,8 +3,10 @@ function HandlePluginListCommand( Split, Player )
 	local PluginList = PluginManager:GetAllPlugins()
 
 	local PluginTable = {}
-	for i, Plugin in ipairs( PluginList ) do
-		table.insert(PluginTable, Plugin:GetName() )
+	for k, Plugin in pairs( PluginList ) do
+		if ( Plugin ) then
+			table.insert(PluginTable, Plugin:GetName() )
+		end
 	end
 
 	Player:SendMessage( cChatColor.Green .. "Loaded plugins: (" .. #PluginTable .. ")" )
