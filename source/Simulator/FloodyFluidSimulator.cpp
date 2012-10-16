@@ -107,8 +107,8 @@ bool cFloodyFluidSimulator::CheckTributaries(int a_BlockX, int a_BlockY, int a_B
 		IsFed = IsAnyFluidBlock(a_Area.GetRelBlockType(1, 2, 1));
 	}
 
-	// If not fed from above, check if there's a feed from the side:
-	if (!IsFed)
+	// If not fed from above, check if there's a feed from the side (but not if it's a downward-flowing block):
+	if (!IsFed && (a_MyMeta != 8))
 	{
 		IsFed = (
 			(IsAllowedBlock(a_Area.GetRelBlockType(0, y, 1)) && IsHigherMeta(a_Area.GetRelBlockMeta(0, y, 1), a_MyMeta)) ||
@@ -121,16 +121,24 @@ bool cFloodyFluidSimulator::CheckTributaries(int a_BlockX, int a_BlockY, int a_B
 	// If not fed, decrease by m_Falloff levels:
 	if (!IsFed)
 	{
-		FLOG("  Not fed, decreasing from %d to %d", a_MyMeta, a_MyMeta + m_Falloff);
-		
-		a_MyMeta += m_Falloff;
-		if (a_MyMeta < 8)
+		if (a_MyMeta >= 8)
 		{
-			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, a_MyMeta);
+			FLOG("  Not fed and downwards, turning into non-downwards meta %d", m_Falloff);
+			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, m_Falloff);
 		}
 		else
 		{
-			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			a_MyMeta += m_Falloff;
+			if (a_MyMeta < 8)
+			{
+				FLOG("  Not fed, decreasing from %d to %d", a_MyMeta, a_MyMeta + m_Falloff);
+				m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, a_MyMeta);
+			}
+			else
+			{
+				FLOG("  Not fed, meta %d, erasing altogether", a_MyMeta);
+				m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			}
 		}
 		return true;
 	}
