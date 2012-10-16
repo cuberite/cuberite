@@ -17,7 +17,7 @@
 
 // Enable or disable detailed logging
 #if 1
-	#define FLOG LOG
+	#define FLOG LOGD
 #else
 	#define FLOG(...)
 #endif
