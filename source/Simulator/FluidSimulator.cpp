@@ -37,6 +37,10 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RED_MUSHROOM:
 		case E_BLOCK_BROWN_MUSHROOM:
 		case E_BLOCK_CACTUS:
+		case E_BLOCK_TORCH:
+		case E_BLOCK_REDSTONE_TORCH_OFF:
+		case E_BLOCK_REDSTONE_TORCH_ON:
+		case E_BLOCK_RAIL:
 		{
 			return true;
 		}
