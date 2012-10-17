@@ -230,7 +230,7 @@ void cClientHandle::Authenticate(void)
 
 	m_Player->SetIP (m_IPString);
 
-	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_JOIN, 1, m_Player);
 	
 	m_ConfirmPosition = m_Player->GetPosition();
 
@@ -258,6 +258,8 @@ void cClientHandle::Authenticate(void)
 	
 	// Broadcast this player's spawning to all other players in the same chunk
 	m_Player->GetWorld()->BroadcastSpawn(*m_Player, this);
+
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
 }
 
 
@@ -920,7 +922,13 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 
 void cClientHandle::HandleRespawn(void)
 {
+	if( m_Player == NULL )
+	{
+		Destroy();
+		return;
+	}
 	m_Player->Respawn();
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
 }
 
 
