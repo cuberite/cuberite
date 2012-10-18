@@ -691,7 +691,7 @@ int cProtocol132::ParseItem(cItem & a_Item)
 	HANDLE_PACKET_READ(ReadChar,    char,  ItemCount);
 	HANDLE_PACKET_READ(ReadBEShort, short, ItemDamage);
 	a_Item.m_ItemCount  = ItemCount;
-	// a_Item.m_ItemDamage = ItemDamage;
+	a_Item.m_ItemDamage = ItemDamage;
 	if (ItemCount <= 0)
 	{
 		a_Item.Empty();
