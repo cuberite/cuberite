@@ -42,7 +42,8 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	
 	cBlockArea Area;
 	int MinBlockY = std::max(0, a_BlockY - 1);
-	int MaxBlockY = std::min(cChunkDef::Height, a_BlockY + 1);
+	int ChunkHeight = cChunkDef::Height;  // Stupid compilers wouldn't let me use std::min(cChunkDef::Height, ...)
+	int MaxBlockY = std::min(ChunkHeight, a_BlockY + 1);
 	if (!Area.Read(m_World, a_BlockX - 1, a_BlockX + 1, MinBlockY, MaxBlockY, a_BlockZ - 1, a_BlockZ + 1))
 	{
 		// Cannot read the immediate neighborhood, probably too close to an unloaded chunk. Bail out.

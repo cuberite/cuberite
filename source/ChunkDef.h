@@ -106,17 +106,20 @@ enum EMCSBiome
 class cChunkDef
 {
 public:
-	static const int Width = 16;
-	static const int Height = 256;
-	static const int NumBlocks = Width * Height * Width;
-	static const int BlockDataSize = NumBlocks * 2 + (NumBlocks / 2); // 2.5 * numblocks
+	enum
+	{
+		Width = 16,
+		Height = 256,
+		NumBlocks = Width * Height * Width,
+		BlockDataSize = NumBlocks * 2 + (NumBlocks / 2), // 2.5 * numblocks
 	
-	// Offsets to individual components in the joined blockdata array
-	static const int MetaOffset     = NumBlocks;
-	static const int LightOffset    = MetaOffset + NumBlocks / 2;
-	static const int SkyLightOffset = LightOffset + NumBlocks / 2;
+		// Offsets to individual components in the joined blockdata array
+		MetaOffset     = NumBlocks,
+		LightOffset    = MetaOffset + NumBlocks / 2,
+		SkyLightOffset = LightOffset + NumBlocks / 2,
 
-	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
+		INDEX_OUT_OF_RANGE = 0xffffffff,
+	} ;
 
 	/// The type used for any heightmap operations and storage; idx = x + Width * z
 	typedef HEIGHTTYPE HeightMap[Width * Width];
