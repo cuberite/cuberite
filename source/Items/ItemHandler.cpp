@@ -27,6 +27,7 @@
 #include "ItemFood.h"
 #include "ItemSign.h"
 #include "ItemBed.h"
+#include "ItemSpawnEgg.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -66,15 +67,18 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemID)
 	{
 		default:                       return new cItemHandler(a_ItemID);
 		
-		// Single item per handler:
-		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemID);
-		case E_ITEM_LEAVES:            return new cItemLeavesHandler(a_ItemID);
-		case E_ITEM_SAPLING:           return new cItemSaplingHandler(a_ItemID);
+		// Single item per handler, alphabetically sorted:
+		case E_ITEM_BED:               return new cItemBedHandler(a_ItemID);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemID);
-		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemID);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemID);
+		case E_ITEM_LEAVES:            return new cItemLeavesHandler(a_ItemID);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemID);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemID);
+		case E_ITEM_SAPLING:           return new cItemSaplingHandler(a_ItemID);
+		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemID);
+		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemID);
+		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemID);
+		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemID);
 		case E_ITEM_WOOL:              return new cItemClothHandler(a_ItemID);
 		
 		case E_ITEM_WOODEN_HOE:
@@ -164,12 +168,6 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemID)
 		{
 			return new cItemFoodHandler(a_ItemID);
 		}
-		
-		case E_ITEM_SIGN:
-			return new cItemSignHandler(a_ItemID);
-
-		case E_ITEM_BED:
-			return new cItemBedHandler(a_ItemID);
 	}
 }
 

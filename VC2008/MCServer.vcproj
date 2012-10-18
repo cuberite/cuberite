@@ -1971,6 +1971,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Items\ItemSpawnEgg.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\items\ItemSugarcane.h"
 					>
 				</File>
