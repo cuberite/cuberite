@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/14/12 01:26:59.
+** Generated automatically by tolua++-1.0.92 on 10/18/12 23:53:20.
 */
 
 #ifndef __cplusplus
@@ -3746,6 +3746,40 @@ static int tolua_AllToLua_cClientHandle_GetUsername00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetUsername of class  cClientHandle */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cClientHandle_SetUsername00
+static int tolua_AllToLua_cClientHandle_SetUsername00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cClientHandle* self = (cClientHandle*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_Username = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetUsername'", NULL);
+#endif
+  {
+   self->SetUsername(a_Username);
+   tolua_pushcppstring(tolua_S,(const char*)a_Username);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetUsername'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetPing of class  cClientHandle */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cClientHandle_GetPing00
 static int tolua_AllToLua_cClientHandle_GetPing00(lua_State* tolua_S)
@@ -6592,7 +6626,7 @@ static int tolua_AllToLua_cPlayer_AddToGroup00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -6600,18 +6634,53 @@ static int tolua_AllToLua_cPlayer_AddToGroup00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_GroupName = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_GroupName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddToGroup'", NULL);
 #endif
   {
    self->AddToGroup(a_GroupName);
+   tolua_pushcppstring(tolua_S,(const char*)a_GroupName);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'AddToGroup'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RemoveFromGroup of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_RemoveFromGroup00
+static int tolua_AllToLua_cPlayer_RemoveFromGroup00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_GroupName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RemoveFromGroup'", NULL);
+#endif
+  {
+   self->RemoveFromGroup(a_GroupName);
+   tolua_pushcppstring(tolua_S,(const char*)a_GroupName);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RemoveFromGroup'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6625,7 +6694,7 @@ static int tolua_AllToLua_cPlayer_CanUseCommand00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -6633,16 +6702,17 @@ static int tolua_AllToLua_cPlayer_CanUseCommand00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Command = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CanUseCommand'", NULL);
 #endif
   {
    bool tolua_ret = (bool)  self->CanUseCommand(a_Command);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Command);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'CanUseCommand'.",&tolua_err);
@@ -6659,7 +6729,7 @@ static int tolua_AllToLua_cPlayer_HasPermission00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -6667,16 +6737,17 @@ static int tolua_AllToLua_cPlayer_HasPermission00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Permission = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Permission = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'HasPermission'", NULL);
 #endif
   {
    bool tolua_ret = (bool)  self->HasPermission(a_Permission);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Permission);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'HasPermission'.",&tolua_err);
@@ -6693,7 +6764,7 @@ static int tolua_AllToLua_cPlayer_IsInGroup00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
@@ -6701,16 +6772,17 @@ static int tolua_AllToLua_cPlayer_IsInGroup00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Group = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const AString a_Group = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsInGroup'", NULL);
 #endif
   {
    bool tolua_ret = (bool)  self->IsInGroup(a_Group);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Group);
   }
  }
- return 1;
+ return 2;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsInGroup'.",&tolua_err);
@@ -19513,7 +19585,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19523,7 +19595,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockType00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_RelX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_RelY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_RelZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19551,7 +19623,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19561,7 +19633,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockType00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19589,7 +19661,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19599,7 +19671,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockMeta00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_RelX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_RelY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_RelZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19627,7 +19699,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19637,7 +19709,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockMeta00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19665,7 +19737,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19675,7 +19747,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockLight00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_RelX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_RelY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_RelZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19703,7 +19775,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19713,7 +19785,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockLight00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19741,7 +19813,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19751,7 +19823,7 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockSkyLight00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_RelX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_RelY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_RelZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19779,7 +19851,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -19789,7 +19861,7 @@ static int tolua_AllToLua_cBlockArea_GetBlockSkyLight00(lua_State* tolua_S)
  else
 #endif
  {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
@@ -19901,6 +19973,102 @@ static int tolua_AllToLua_cBlockArea_GetSizeZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetSizeZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetOriginX of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_GetOriginX00
+static int tolua_AllToLua_cBlockArea_GetOriginX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetOriginX'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetOriginX();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetOriginX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetOriginY of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_GetOriginY00
+static int tolua_AllToLua_cBlockArea_GetOriginY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetOriginY'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetOriginY();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetOriginY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetOriginZ of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_GetOriginZ00
+static int tolua_AllToLua_cBlockArea_GetOriginZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetOriginZ'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetOriginZ();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetOriginZ'.",&tolua_err);
  return 0;
 #endif
 }
@@ -22341,6 +22509,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetPlayer",tolua_AllToLua_cClientHandle_GetPlayer00);
    tolua_function(tolua_S,"Kick",tolua_AllToLua_cClientHandle_Kick00);
    tolua_function(tolua_S,"GetUsername",tolua_AllToLua_cClientHandle_GetUsername00);
+   tolua_function(tolua_S,"SetUsername",tolua_AllToLua_cClientHandle_SetUsername00);
    tolua_function(tolua_S,"GetPing",tolua_AllToLua_cClientHandle_GetPing00);
    tolua_function(tolua_S,"SetViewDistance",tolua_AllToLua_cClientHandle_SetViewDistance00);
    tolua_function(tolua_S,"GetViewDistance",tolua_AllToLua_cClientHandle_GetViewDistance00);
@@ -22458,6 +22627,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cPlayer_GetName00);
    tolua_function(tolua_S,"SetName",tolua_AllToLua_cPlayer_SetName00);
    tolua_function(tolua_S,"AddToGroup",tolua_AllToLua_cPlayer_AddToGroup00);
+   tolua_function(tolua_S,"RemoveFromGroup",tolua_AllToLua_cPlayer_RemoveFromGroup00);
    tolua_function(tolua_S,"CanUseCommand",tolua_AllToLua_cPlayer_CanUseCommand00);
    tolua_function(tolua_S,"HasPermission",tolua_AllToLua_cPlayer_HasPermission00);
    tolua_function(tolua_S,"IsInGroup",tolua_AllToLua_cPlayer_IsInGroup00);
@@ -23032,6 +23202,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSizeX",tolua_AllToLua_cBlockArea_GetSizeX00);
    tolua_function(tolua_S,"GetSizeY",tolua_AllToLua_cBlockArea_GetSizeY00);
    tolua_function(tolua_S,"GetSizeZ",tolua_AllToLua_cBlockArea_GetSizeZ00);
+   tolua_function(tolua_S,"GetOriginX",tolua_AllToLua_cBlockArea_GetOriginX00);
+   tolua_function(tolua_S,"GetOriginY",tolua_AllToLua_cBlockArea_GetOriginY00);
+   tolua_function(tolua_S,"GetOriginZ",tolua_AllToLua_cBlockArea_GetOriginZ00);
    tolua_function(tolua_S,"GetDataTypes",tolua_AllToLua_cBlockArea_GetDataTypes00);
    tolua_function(tolua_S,"HasBlockTypes",tolua_AllToLua_cBlockArea_HasBlockTypes00);
    tolua_function(tolua_S,"HasBlockMetas",tolua_AllToLua_cBlockArea_HasBlockMetas00);

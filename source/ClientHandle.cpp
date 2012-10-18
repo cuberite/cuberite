@@ -1600,6 +1600,15 @@ const AString & cClientHandle::GetUsername(void) const
 
 
 
+void cClientHandle::SetUsername( const AString & a_Username )
+{
+	m_Username = a_Username;
+}
+
+
+
+
+
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
 	if (a_ViewDistance < MIN_VIEW_DISTANCE)

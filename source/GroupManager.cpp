@@ -11,7 +11,7 @@
 
 
 
-typedef std::map< std::string, cGroup* > GroupMap;
+typedef std::map< AString, cGroup* > GroupMap;
 struct cGroupManager::sGroupManagerState
 {
 	GroupMap Groups;
@@ -92,7 +92,7 @@ cGroupManager::cGroupManager()
 	LOG("-- Done Loading Groups --");
 }
 
-cGroup* cGroupManager::GetGroup( const char* a_Name )
+cGroup* cGroupManager::GetGroup( const AString & a_Name )
 {
 	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
 	if( itr != m_pState->Groups.end() )

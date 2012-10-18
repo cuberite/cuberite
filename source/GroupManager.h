@@ -6,7 +6,7 @@ class cGroupManager
 public:
 	static cGroupManager * GetGroupManager();	//tolua_export
 
-	cGroup* GetGroup( const char* a_Name );
+	cGroup * GetGroup( const AString & a_Name );
 private:
 	friend class cRoot;
 	cGroupManager();

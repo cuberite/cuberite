@@ -578,11 +578,11 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
-void cPlayer::AddToGroup( const char* a_GroupName )
+void cPlayer::AddToGroup( const AString & a_GroupName )
 {
 	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
 	m_Groups.push_back( Group );
-	LOGD("Added %s to group %s", m_PlayerName.c_str(), a_GroupName );
+	LOGD("Added %s to group %s", m_PlayerName.c_str(), a_GroupName.c_str() );
 	ResolveGroups();
 	ResolvePermissions();
 }
@@ -591,7 +591,36 @@ void cPlayer::AddToGroup( const char* a_GroupName )
 
 
 
-bool cPlayer::CanUseCommand( const char* a_Command )
+void cPlayer::RemoveFromGroup( const AString & a_GroupName )
+{
+	bool bRemoved = false;
+	for( GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr )
+	{
+		if( (*itr)->GetName().compare(a_GroupName ) == 0 )
+		{
+			m_Groups.erase( itr );
+			bRemoved = true;
+			break;
+		}
+	}
+
+	if( bRemoved )
+	{
+		LOGD("Removed %s from group %s", m_PlayerName.c_str(), a_GroupName.c_str() );
+		ResolveGroups();
+		ResolvePermissions();
+	}
+	else
+	{
+		LOGWARN("Tried to remove %s from group %s but was not in that group", m_PlayerName.c_str(), a_GroupName.c_str() );
+	}
+}
+
+
+
+
+
+bool cPlayer::CanUseCommand( const AString & a_Command )
 {
 	for( GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr )
 	{
@@ -604,7 +633,7 @@ bool cPlayer::CanUseCommand( const char* a_Command )
 
 
 
-bool cPlayer::HasPermission( const char* a_Permission )
+bool cPlayer::HasPermission( const AString & a_Permission )
 {
 	AStringVector Split = StringSplit( a_Permission, "." );
 	PermissionMap Possibilities = m_ResolvedPermissions;
@@ -640,11 +669,11 @@ bool cPlayer::HasPermission( const char* a_Permission )
 
 
 
-bool cPlayer::IsInGroup( const char* a_Group )
+bool cPlayer::IsInGroup( const AString & a_Group )
 {
 	for( GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr )
 	{
-		if( strcmp( a_Group, (*itr)->GetName().c_str() ) == 0 )
+		if( a_Group.compare( (*itr)->GetName().c_str() ) == 0 )
 			return true;
 	}
 	return false;

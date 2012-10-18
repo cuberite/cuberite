@@ -121,6 +121,7 @@ public:
 	void SendSpawnObject      (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ);
 
 	const AString & GetUsername(void) const;		//tolua_export
+	void SetUsername( const AString & a_Username );	//tolua_export
 	
 	inline short GetPing() const { return m_Ping; }	//tolua_export
 	

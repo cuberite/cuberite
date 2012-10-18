@@ -74,12 +74,16 @@ public:
 
 	typedef std::list< cGroup* > GroupList;
 	typedef std::list< std::string > StringList;
-	void AddToGroup( const char* a_GroupName );								//tolua_export
-	bool CanUseCommand( const char* a_Command );							//tolua_export
-	bool HasPermission( const char* a_Permission );							//tolua_export
+
+	/// Adds a player to existing group or creates a new group when it doesn't exist
+	void AddToGroup( const AString & a_GroupName );							//tolua_export
+	/// Removes a player from the group, resolves permissions and group inheritance (case sensitive)
+	void RemoveFromGroup( const AString & a_GroupName );					//tolua_export
+	bool CanUseCommand( const AString & a_Command );						//tolua_export
+	bool HasPermission( const AString & a_Permission );						//tolua_export
 	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
 	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
-	bool IsInGroup( const char* a_Group );									//tolua_export
+	bool IsInGroup( const AString & a_Group );								//tolua_export
 
 	AString GetColor(void) const;											//tolua_export
 
