@@ -12,8 +12,8 @@ class cItemSugarcaneHandler :
 	public cItemHandler
 {
 public:
-	cItemSugarcaneHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemSugarcaneHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}

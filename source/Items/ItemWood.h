@@ -11,8 +11,8 @@ class cItemWoodHandler :
 	public cItemHandler
 {
 public:
-	cItemWoodHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemWoodHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 	}
 } ;

@@ -30,25 +30,25 @@
 class cItemSpawnEggHandler : public cItemHandler
 {
 public:
-	cItemSpawnEggHandler(int a_ItemID) :
-		cItemHandler(a_ItemID)
+	cItemSpawnEggHandler(int a_ItemType) :
+		cItemHandler(a_ItemType)
 	{
 
 	}
 
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_X, int a_Y, int a_Z, char a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
 		if (a_Dir < 0)
 		{
 			return false;
 		}
 		
-		AddDirection(a_X, a_Y, a_Z, a_Dir);
+		AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 
 		if (a_Dir == BLOCK_FACE_BOTTOM)
 		{
-			a_Y--;
+			a_BlockY--;
 		}
 
 		cMonster * Monster = NULL;
@@ -56,7 +56,7 @@ public:
 		Monster = new cZombie();
 
 		Monster->Initialize(a_World);
-		Monster->TeleportTo(a_X + 0.5, a_Y, a_Z + 0.5);
+		Monster->TeleportTo(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5);
 		a_World->BroadcastSpawn(*Monster);
 
 		a_Player->UseEquippedItem();

@@ -11,8 +11,8 @@ class cItemClothHandler :
 	public cItemHandler
 {
 public:
-	cItemClothHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemClothHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}

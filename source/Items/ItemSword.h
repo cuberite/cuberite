@@ -8,8 +8,8 @@
 class cItemSwordHandler : public cItemHandler
 {
 public:
-	cItemSwordHandler(int a_ItemID)
-	: cItemHandler(a_ItemID)
+	cItemSwordHandler(int a_ItemType)
+	: cItemHandler(a_ItemType)
 	{
 
 	}

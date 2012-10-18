@@ -8,19 +8,19 @@
 class cItemHoeHandler : public cItemHandler
 {
 public:
-	cItemHoeHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemHoeHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}
 
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir) override
+	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
-		BLOCKTYPE Block = a_World->GetBlock(a_X, a_Y, a_Z);
+		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 
-		if(Block == E_BLOCK_DIRT || Block == E_BLOCK_GRASS)
+		if ((Block == E_BLOCK_DIRT) || (Block == E_BLOCK_GRASS))
 		{
-			a_World->FastSetBlock(a_X, a_Y, a_Z, E_BLOCK_FARMLAND, 0);
+			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FARMLAND, 0);
 
 			a_Player->UseEquippedItem();
 			return true;

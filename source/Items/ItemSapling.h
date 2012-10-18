@@ -10,8 +10,8 @@
 class cItemSaplingHandler : public cItemHandler
 {
 public:
-	cItemSaplingHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemSaplingHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}

@@ -7,8 +7,8 @@
 class cItemSignHandler : public cItemHandler
 {
 public:
-	cItemSignHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemSignHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}

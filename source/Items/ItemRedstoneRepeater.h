@@ -10,8 +10,8 @@
 class cItemRedstoneRepeaterHandler : public cItemHandler
 {
 public:
-	cItemRedstoneRepeaterHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemRedstoneRepeaterHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 	}
 

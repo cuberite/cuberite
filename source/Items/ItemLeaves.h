@@ -11,8 +11,8 @@ class cItemLeavesHandler :
 	public cItemHandler
 {
 public:
-	cItemLeavesHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemLeavesHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 	}
 	

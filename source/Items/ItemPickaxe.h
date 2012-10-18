@@ -8,15 +8,15 @@
 class cItemPickaxeHandler : public cItemHandler
 {
 public:
-	cItemPickaxeHandler(int a_ItemID)
-	: cItemHandler(a_ItemID)
+	cItemPickaxeHandler(int a_ItemType)
+	: cItemHandler(a_ItemType)
 	{
 
 	}
 
 	char PickaxeLevel()
 	{
-		switch(m_ItemID)
+		switch(m_ItemType)
 		{
 		case E_ITEM_WOODEN_PICKAXE:
 		case E_ITEM_GOLD_PICKAXE:

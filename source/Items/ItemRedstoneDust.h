@@ -10,8 +10,8 @@
 class cItemRedstoneDustHandler : public cItemHandler
 {
 public:
-	cItemRedstoneDustHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemRedstoneDustHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 	}
 

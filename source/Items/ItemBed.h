@@ -7,8 +7,8 @@
 class cItemBedHandler : public cItemHandler
 {
 public:
-	cItemBedHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemBedHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}

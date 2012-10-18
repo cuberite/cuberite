@@ -7,8 +7,8 @@
 class cItemDoorHandler : public cItemHandler
 {
 public:
-	cItemDoorHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemDoorHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 
 	}
@@ -20,7 +20,7 @@ public:
 
 	virtual BLOCKTYPE GetBlockType() override
 	{
-		return (m_ItemID == E_ITEM_WOODEN_DOOR) ? E_BLOCK_WOODEN_DOOR : E_BLOCK_IRON_DOOR;
+		return (m_ItemType == E_ITEM_WOODEN_DOOR) ? E_BLOCK_WOODEN_DOOR : E_BLOCK_IRON_DOOR;
 	}
 
 };

@@ -7,8 +7,8 @@
 class cItemFoodHandler : public cItemHandler
 {
 public:
-	cItemFoodHandler(int a_ItemID)
-		: cItemHandler(a_ItemID)
+	cItemFoodHandler(int a_ItemType)
+		: cItemHandler(a_ItemType)
 	{
 	}
 
@@ -19,7 +19,7 @@ public:
 
 	virtual FoodInfo GetFoodInfo() override
 	{
-		switch(m_ItemID)
+		switch(m_ItemType)
 		{
 		case E_ITEM_BREAD:
 			return FoodInfo(5, 6.f);

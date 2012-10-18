@@ -17,9 +17,9 @@ class cPlayer;
 class cItemHandler
 {
 public:
-	cItemHandler(int a_ItemID);
+	cItemHandler(int a_ItemType);
 	// Called when the player tries to use the item. Return false to make the item unusable. DEFAULT: False
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);	//eg for fishing or hoes
+	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);	//eg for fishing or hoes
 	// Called while the player diggs a block using this item
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
 	// Called when the player destroys a block using this item. This also calls the drop function for the destroyed block
@@ -50,7 +50,7 @@ public:
 	virtual bool EatItem(cPlayer *a_Player, cItem *a_Item);
 
 	// Places the current block and removes the item from the player inventory
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z, char a_Dir);
+	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
 	
 	// Indicates if this item is a tool
 	virtual bool IsTool();
@@ -66,18 +66,18 @@ public:
 	// Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can´t) DEFAULT: False
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
-	static cItemHandler *GetItemHandler(int a_ItemID);
+	static cItemHandler *GetItemHandler(int a_ItemType);
 
 	static void Deinit();
 
 	
 protected:
-	int m_ItemID;
-	static cItemHandler *CreateItemHandler(int m_ItemID);
+	int m_ItemType;
+	static cItemHandler *CreateItemHandler(int m_ItemType);
 
 	static cItemHandler *m_ItemHandler[2266];
 	static bool m_HandlerInitialized;	//used to detect if the itemhandlers are initialized
 };
 
 //Short function
-inline cItemHandler *ItemHandler(int a_ItemID) { return cItemHandler::GetItemHandler(a_ItemID); }
+inline cItemHandler *ItemHandler(int a_ItemType) { return cItemHandler::GetItemHandler(a_ItemType); }
