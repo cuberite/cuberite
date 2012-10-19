@@ -727,6 +727,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\Blaze.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Blaze.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Cavespider.cpp"
 					>
 				</File>
@@ -775,11 +783,35 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\Magmacube.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Magmacube.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Monster.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\Mobs\Monster.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Mooshroom.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Mooshroom.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Ocelot.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Ocelot.h"
 					>
 				</File>
 				<File
@@ -852,6 +884,14 @@
 				</File>
 				<File
 					RelativePath="..\source\Mobs\Squid.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Villager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Villager.h"
 					>
 				</File>
 				<File
