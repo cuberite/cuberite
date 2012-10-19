@@ -143,3 +143,13 @@ ZZZ_LeakFinder zzz_LeakFinder;
 #endif
 
 #endif  // __cplusplus
+
+
+
+
+extern void DumpUsedMemory(LeakFinderOutput * output = NULL);
+
+
+
+
+

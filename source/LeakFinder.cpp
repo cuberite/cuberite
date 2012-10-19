@@ -129,6 +129,10 @@
 #define _tcscat_s _tcscat
 #endif
 
+
+
+
+
 static std::string SimpleXMLEncode(LPCSTR szText)
 {
   std::string szRet;
@@ -159,22 +163,40 @@ static std::string SimpleXMLEncode(LPCSTR szText)
 }
 
 
+
+
+
 LeakFinderOutput::LeakFinderOutput(int options, LPCSTR szSymPath)
   : StackWalker(options, szSymPath)
 {
 }
+
+
+
+
+
 void LeakFinderOutput::OnLeakSearchStart(LPCSTR szLeakFinderName)
 {
   CHAR buffer[1024];
   _snprintf_s(buffer, 1024, "######## %s ########\n", szLeakFinderName);
   this->OnOutput(buffer);
 }
+
+
+
+
+
 void LeakFinderOutput::OnLeakStartEntry(LPCSTR szKeyName, SIZE_T nDataSize)
 {
   CHAR buffer[1024];
   _snprintf_s(buffer, 1024, "--------------- Key: %s, %d bytes ---------\n", szKeyName, nDataSize);
   this->OnOutput(buffer);
 }
+
+
+
+
+
 void LeakFinderOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &entry)
 {
   if ( (eType != lastEntry) && (entry.offset != 0) )
@@ -193,6 +215,9 @@ void LeakFinderOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEntry
   }
   StackWalker::OnCallstackEntry(eType, entry);
 }
+
+
+
 
 
 // ####################################################################
@@ -222,6 +247,11 @@ LeakFinderXmlOutput::LeakFinderXmlOutput()
     MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
   }
 }
+
+
+
+
+
 LeakFinderXmlOutput::LeakFinderXmlOutput(LPCTSTR szFileName)
 {
 #if _MSC_VER < 1400
@@ -235,6 +265,11 @@ LeakFinderXmlOutput::LeakFinderXmlOutput(LPCTSTR szFileName)
     MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
   }
 }
+
+
+
+
+
 LeakFinderXmlOutput::~LeakFinderXmlOutput()
 {
   if (m_fXmlFile != NULL) 
@@ -245,9 +280,19 @@ LeakFinderXmlOutput::~LeakFinderXmlOutput()
   }
   m_fXmlFile = NULL;
 }
+
+
+
+
+
 void LeakFinderXmlOutput::OnLeakSearchStart(LPCSTR sszLeakFinderName)
 {
 }
+
+
+
+
+
 void LeakFinderXmlOutput::OnLeakStartEntry(LPCSTR szKeyName, SIZE_T nDataSize)
 {
   if (m_fXmlFile != NULL)
@@ -255,6 +300,11 @@ void LeakFinderXmlOutput::OnLeakStartEntry(LPCSTR szKeyName, SIZE_T nDataSize)
     fprintf(m_fXmlFile, "  <LEAK requestID=\"%s\" size=\"%d\">\n", SimpleXMLEncode(szKeyName).c_str(), nDataSize);
   }
 }
+
+
+
+
+
 void LeakFinderXmlOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEntry &entry)
 {
   if (m_fXmlFile != NULL)
@@ -272,6 +322,10 @@ void LeakFinderXmlOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEn
     }
   }
 }
+
+
+
+
 
 // ##########################################################################
 // ##########################################################################
@@ -567,6 +621,9 @@ public:
 };  // template <typename HASHTABLE_KEY> class ContextHashtableBase
 
 
+
+
+
 // ##########################################################################
 // ##########################################################################
 // ##########################################################################
@@ -802,186 +859,6 @@ static int MyAllocHook(int nAllocType, void *pvData,
 #endif  // _DEBUG
 
 
-// ##########################################################################
-// ##########################################################################
-// ##########################################################################
-// Specialization for COM-Leaks:
-
-// forwards:
-class COMTable;
-class CMallocSpy : public IMallocSpy
-{
-public: 
-  CMallocSpy() { m_cbRequest = 0; m_cRef = 0; m_disableCount = 0; }
-  virtual ~CMallocSpy() {}
-  // IUnknown methods
-  STDMETHOD(QueryInterface) (REFIID riid, LPVOID *ppUnk);
-  STDMETHOD_(ULONG, AddRef) ();
-  STDMETHOD_(ULONG, Release) ();
-  // IMallocSpy methods
-  STDMETHOD_(SIZE_T, PreAlloc) (SIZE_T cbRequest);
-  STDMETHOD_(void *, PostAlloc) (void *pActual);
-  STDMETHOD_(void *, PreFree) (void *pRequest, BOOL fSpyed);
-  STDMETHOD_(void, PostFree) (BOOL fSpyed) { return; };
-  STDMETHOD_(SIZE_T, PreRealloc) (void *pRequest, SIZE_T cbRequest, void **ppNewRequest, BOOL fSpyed);
-  STDMETHOD_(void *, PostRealloc) (void *pActual, BOOL fSpyed);
-  STDMETHOD_(void *, PreGetSize) (void *pRequest, BOOL fSpyed) { return pRequest; }
-  STDMETHOD_(SIZE_T, PostGetSize) (SIZE_T cbActual, BOOL fSpyed) { return cbActual; }
-  STDMETHOD_(void *, PreDidAlloc) (void *pRequest, BOOL fSpyed) { return pRequest; }
-  STDMETHOD_(BOOL, PostDidAlloc) (void *pRequest, BOOL fSpyed, BOOL fActual) { return fActual; }
-  STDMETHOD_(void, PreHeapMinimize) (void) { return; }
-  STDMETHOD_(void, PostHeapMinimize) (void) { return; }
-private:
-  LONG m_cRef;
-  SIZE_T m_cbRequest;
-protected:
-  COMTable *m_pComTable;
-  LONG m_disableCount;
-  friend COMTable;
-};
-
-class COMTable : public ContextHashtableBase<LPVOID>
-{
-public:
-  COMTable() : ContextHashtableBase<LPVOID>(1021, "COM-Leaks")
-  {
-    m_pMallocSpy = new CMallocSpy(); // wird später durch Release freigegeben
-    if (m_pMallocSpy != NULL)
-    {
-      m_pMallocSpy->m_pComTable = this;
-      // CoInitilize(); // ??? Is this necessary ?
-      HRESULT hr = CoRegisterMallocSpy(m_pMallocSpy);
-      if FAILED(hr)
-      {
-        _tprintf(_T("\nCoRegisterMallocSpay failed with %.8x"), hr);
-      }
-    }
-  }
-
-  virtual ~COMTable()
-  {
-    if (m_pMallocSpy != NULL)
-      m_pMallocSpy->m_pComTable = NULL;
-    CoRevokeMallocSpy();
-  }
-
-  virtual LONG Disable()
-  {
-    return InterlockedIncrement(&(m_pMallocSpy->m_disableCount));
-  }
-  virtual LONG Enable()
-  {
-    return InterlockedDecrement(&(m_pMallocSpy->m_disableCount));
-  }
-
-  virtual SIZE_T HashFunction(LPVOID &key)
-  {
-    // I couldn´t find any better and faster
-#ifdef _M_IX86
-#if _MSC_VER > 1100
-#pragma warning (push)
-#endif
-#pragma warning (disable: 4311)
-    DWORD llP = (DWORD) key;
-#if _MSC_VER > 1100
-#pragma warning (pop)
-#endif
-#else
-    ULONGLONG llP = (ULONGLONG) key;
-#endif
-    return (SIZE_T) llP % sAllocEntries;
-  }
-  virtual BOOL IsKeyEmpty(LPVOID &key)
-  {
-    if (key == 0)
-      return TRUE;
-    return FALSE;
-  }
-  virtual VOID SetEmptyKey(LPVOID &key)
-  {
-    key = 0;
-  }
-  virtual VOID GetKeyAsString(LPVOID &key, CHAR *szName, SIZE_T nBufferLen)
-  {
-#if _MSC_VER < 1400
-    _snprintf_s(szName, nBufferLen, "%p", key);
-#else
-    _snprintf_s(szName, nBufferLen, nBufferLen, "%p", key);
-#endif
-  }
-
-  CMallocSpy *m_pMallocSpy;
-  friend CMallocSpy;
-};  // class COMTable
-
-
-STDMETHODIMP CMallocSpy::QueryInterface(REFIID riid, LPVOID *ppUnk) {
-  HRESULT hr = S_OK;
-  if (IsEqualIID(riid, IID_IUnknown)) {
-      *ppUnk = (IUnknown *) this;
-  }
-  else if (IsEqualIID(riid, IID_IMallocSpy)) {
-      *ppUnk =  (IMalloc *) this;
-  }
-  else {
-      *ppUnk = NULL;
-      hr =  E_NOINTERFACE;
-  }
-  AddRef();
-  return hr;
-}
-STDMETHODIMP_(ULONG) CMallocSpy::AddRef(void) {
-  return (ULONG) InterlockedIncrement(&m_cRef);
-}
-STDMETHODIMP_(ULONG) CMallocSpy::Release(void) {
-  LONG cRef;
-  cRef = InterlockedDecrement(&m_cRef);
-  if (cRef == 0)
-  {
-    delete this;
-  }
-  return (ULONG) cRef;
-} 
-// IMallocSpy methods
-STDMETHODIMP_(SIZE_T) CMallocSpy::PreAlloc(SIZE_T cbRequest) {
-  m_cbRequest = cbRequest;
-  return cbRequest;
-}
-STDMETHODIMP_(void *) CMallocSpy::PostAlloc(void *pActual) {
-  if (m_pComTable != NULL)
-  {
-    CONTEXT c;
-    GET_CURRENT_CONTEXT(c, CONTEXT_FULL);
-    m_pComTable->Insert(pActual, c, m_cbRequest);
-  }
-  return pActual;
-}
-STDMETHODIMP_(void *) CMallocSpy::PreFree(void *pRequest, BOOL fSpyed) {
-  if (m_pComTable != NULL)
-  {
-    m_pComTable->Remove(pRequest);
-  }
-  return pRequest;
-}
-STDMETHODIMP_(SIZE_T) CMallocSpy::PreRealloc(void *pRequest, SIZE_T cbRequest,
-  void **ppNewRequest, BOOL fSpyed) {
-  if (m_pComTable != NULL)
-  {
-    m_pComTable->Remove(pRequest);
-  }
-  *ppNewRequest = pRequest;  // Bug fixed. Thanx to Christoph Weber
-  return cbRequest;
-}
-STDMETHODIMP_(void *) CMallocSpy::PostRealloc(void *pActual, BOOL fSpyed) {
-  if (m_pComTable != NULL)
-  {
-    CONTEXT c;
-    GET_CURRENT_CONTEXT(c, CONTEXT_FULL);
-    m_pComTable->Insert(pActual, c, m_cbRequest);
-  }
-  return pActual;
-}
-
 
 
 
@@ -990,51 +867,67 @@ STDMETHODIMP_(void *) CMallocSpy::PostRealloc(void *pActual, BOOL fSpyed) {
 // ##########################################################################
 // Init/Deinit functions
 
-
-static COMTable *g_pCOMTable;
 HRESULT InitLeakFinder()
 {
-  // _X: Disabled COM monitoring: g_pCOMTable = new COMTable();
-#ifdef _DEBUG
-  g_pCRTTable = new CRTTable();
-#endif
-  return S_OK;
+	#ifdef _DEBUG
+	g_pCRTTable = new CRTTable();
+	#endif
+	return S_OK;
 }
+
+
+
+
+
+void DumpUsedMemory(LeakFinderOutput * output)
+{
+	LeakFinderOutput *pLeakFinderOutput = output;
+
+	#ifdef _DEBUG
+	g_pCRTTable->Disable();
+	#endif
+
+	if (pLeakFinderOutput == NULL)
+	{
+		pLeakFinderOutput = new LeakFinderOutput();
+	}
+
+	// explicitly load the modules:
+	pLeakFinderOutput->LoadModules();
+
+	#ifdef _DEBUG
+	g_pCRTTable->ShowLeaks(*pLeakFinderOutput);
+	#endif
+
+	if (output == NULL)
+	{
+		delete pLeakFinderOutput;
+	}
+}
+
+
+
+
 
 void DeinitLeakFinder(LeakFinderOutput *output)
 {
-  LeakFinderOutput *pLeakFinderOutput = output;
+	DumpUsedMemory(output);
 
-#ifdef _DEBUG
-  g_pCRTTable->Disable();
-#endif
-  // _X: Disabled COM monitoring: g_pCOMTable->Disable();
-
-  if (pLeakFinderOutput == NULL)
-    pLeakFinderOutput = new LeakFinderOutput();
-
-  // explicite load the modules:
-  pLeakFinderOutput->LoadModules();
-
-#ifdef _DEBUG
-  g_pCRTTable->ShowLeaks(*pLeakFinderOutput);
-  if (g_pCRTTable != NULL)
-    delete g_pCRTTable;
-  g_pCRTTable = NULL;
-#endif
-
-  /*
-  // _X: Disabled COM monitoring:
-  g_pCOMTable->ShowLeaks(*pLeakFinderOutput);
-  if (g_pCOMTable != NULL)
-    delete g_pCOMTable;
-  g_pCOMTable = NULL;
-  */
-
-  if (output == NULL)
-    delete pLeakFinderOutput;
+	#ifdef _DEBUG
+	delete g_pCRTTable;
+	g_pCRTTable = NULL;
+	#endif
 }
+
+
+
+
+
 void DeinitLeakFinder()
 {
-  DeinitLeakFinder(NULL);
+	DeinitLeakFinder(NULL);
 }
+
+
+
+

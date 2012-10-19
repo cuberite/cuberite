@@ -27,7 +27,6 @@
 
 
 #if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	#define XML_LEAK_FINDER
 	#pragma warning(push)
 	#pragma warning(disable:4100)
 	#include "LeakFinder.h"

@@ -38,6 +38,20 @@ extern "C" {
 
 
 
+// For the "dumpmem" server command:
+/// Synchronize this with main.cpp - the leak finder needs initialization before it can be used to dump memory
+#define ENABLE_LEAK_FINDER
+
+#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
+	#pragma warning(push)
+	#pragma warning(disable:4100)
+	#include "LeakFinder.h"
+	#pragma warning(pop)
+#endif
+
+
+
+
 
 typedef std::list< cClientHandle* > ClientList;
 
@@ -527,6 +541,15 @@ void cServer::ServerCommand(const AString & a_Cmd)
 		// TODO: cWorld::ListMonsters();
 		return;
 	}
+	
+	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
+	if (split[0].compare("dumpmem") == 0)
+	{
+		LeakFinderXmlOutput Output("memdump.xml");
+		DumpUsedMemory(&Output);
+		return;
+	}
+	#endif
 	
 	if (split.size() > 1)
 	{
