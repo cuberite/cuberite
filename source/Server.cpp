@@ -31,17 +31,13 @@
 #include <sstream>
 #include <iostream>
 
-
-
-
-
 extern "C" {
 	#include "zlib.h"
 }
 
 
 
-bool g_bWaterPhysics = false;
+
 
 typedef std::list< cClientHandle* > ClientList;
 
@@ -209,10 +205,8 @@ bool cServer::InitServer( int a_Port )
 	cIniFile IniFile("settings.ini");
 	if (IniFile.ReadFile())
 	{
-		g_bWaterPhysics = IniFile.GetValueB("Physics", "Water", false );
-		
 		m_pState->ServerID = "-";
-		if (IniFile.GetValueB("Authentication", "Authenticate"))
+		if (IniFile.GetValueSetB("Authentication", "Authenticate", true))
 		{
 			MTRand mtrand1;
 			unsigned int r1 = (mtrand1.randInt()%1147483647) + 1000000000;
