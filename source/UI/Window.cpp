@@ -155,8 +155,6 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 		}  // for itr - m_SlotAreas[]
 	}
 
-	// TODO: Notify all areas that a new player has opened the window
-
 	a_Player.GetClientHandle()->SendWindowOpen(m_WindowID, m_WindowType, m_WindowTitle, GetNumSlots() - c_NumInventorySlots);
 }
 
@@ -405,20 +403,43 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cChestWindow:
 
-cChestWindow::cChestWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cChestEntity * a_Chest) :
-	cWindow(cWindow::Chest, "MCS-Chest"),
+cChestWindow::cChestWindow(cChestEntity * a_Chest) :
+	cWindow(cWindow::Chest, "MCS-SingleChest"),
 	m_World(a_Chest->GetWorld()),
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+	m_BlockX(a_Chest->GetPosX()),
+	m_BlockY(a_Chest->GetPosY()),
+	m_BlockZ(a_Chest->GetPosZ())
 {
 	m_SlotAreas.push_back(new cSlotAreaChest(a_Chest, *this));
-	
-	// TODO: Double chests
-	
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 	
+	// Play the opening sound:
+	m_World->BroadcastSoundEffect("random.chestopen", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+
+	// Send out the chest-open packet:
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_CHEST);
+}
+
+
+
+
+
+cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest) :
+	cWindow(cWindow::Chest, "MCS-DoubleChest"),
+	m_World(a_PrimaryChest->GetWorld()),
+	m_BlockX(a_PrimaryChest->GetPosX()),
+	m_BlockY(a_PrimaryChest->GetPosY()),
+	m_BlockZ(a_PrimaryChest->GetPosZ())
+{
+	m_SlotAreas.push_back(new cSlotAreaChest(a_PrimaryChest,   *this));
+	m_SlotAreas.push_back(new cSlotAreaChest(a_SecondaryChest, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	
+	// Play the opening sound:
+	m_World->BroadcastSoundEffect("random.chestopen", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_CHEST);
 }
@@ -431,6 +452,8 @@ cChestWindow::~cChestWindow()
 {
 	// Send out the chest-close packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_CHEST);
+
+	m_World->BroadcastSoundEffect("random.chestclosed", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
 }
 
 

@@ -22,10 +22,8 @@ class cRoot;
 
 
 
-cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
-	: cBlockEntity( E_BLOCK_CHEST, a_X, a_Y, a_Z, a_World)
-	, m_TopChest( false )
-	, m_JoinedChest( NULL )
+cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	cBlockEntity(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World)
 {
 	m_Content = new cItem[ c_ChestHeight * c_ChestWidth ];
 	SetBlockEntity(this);  // cBlockEntityWindowOwner
@@ -37,51 +35,45 @@ cChestEntity::cChestEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 
 cChestEntity::~cChestEntity()
 {
-	if( GetWindow() )
+	cWindow * Window = GetWindow();
+	if (Window != NULL)
 	{
-		GetWindow()->OwnerDestroyed();
+		Window->OwnerDestroyed();
 	}
 
-	if( m_Content )
-	{
-		delete [] m_Content;
-	}
+	delete [] m_Content;
 }
 
 
 
 
 
-void cChestEntity::Destroy()
+void cChestEntity::Destroy(void)
 {
 	// Drop items
 	cItems Pickups;
-	for( int i = 0; i < c_ChestHeight * c_ChestWidth; ++i )
+	for (int i = 0; i < c_ChestHeight * c_ChestWidth; ++i)
 	{
-		if( !m_Content[i].IsEmpty() )
+		if (!m_Content[i].IsEmpty())
 		{
 			Pickups.push_back(m_Content[i]);
 			m_Content[i].Empty();
 		}
 	}
 	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
-	if (m_JoinedChest)
-	{
-		m_JoinedChest->RemoveJoinedChest(this);
-	}
 }
 
 
 
 
 
-const cItem * cChestEntity::GetSlot( int a_Slot ) const
+const cItem * cChestEntity::GetSlot(int a_Slot) const
 {
-	if( a_Slot > -1 && a_Slot < c_ChestHeight*c_ChestWidth )
+	if ((a_Slot > -1) && (a_Slot < c_ChestHeight * c_ChestWidth))
 	{
-		return &m_Content[ a_Slot ];
+		return &m_Content[a_Slot];
 	}
-	return 0;
+	return NULL;
 }
 
 
@@ -112,7 +104,7 @@ void cChestEntity::SetSlot(int a_Slot, const cItem & a_Item)
 
 
 
-bool cChestEntity::LoadFromJson( const Json::Value& a_Value )
+bool cChestEntity::LoadFromJson(const Json::Value & a_Value)
 {
 	m_PosX = a_Value.get("x", 0).asInt();
 	m_PosY = a_Value.get("y", 0).asInt();
@@ -120,7 +112,7 @@ bool cChestEntity::LoadFromJson( const Json::Value& a_Value )
 
 	Json::Value AllSlots = a_Value.get("Slots", 0);
 	int SlotIdx = 0;
-	for( Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr )
+	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
 	{
 		cItem Item;
 		Item.FromJson( *itr );
@@ -134,7 +126,7 @@ bool cChestEntity::LoadFromJson( const Json::Value& a_Value )
 
 
 
-void cChestEntity::SaveToJson( Json::Value& a_Value )
+void cChestEntity::SaveToJson(Json::Value & a_Value)
 {
 	a_Value["x"] = m_PosX;
 	a_Value["y"] = m_PosY;
@@ -142,12 +134,15 @@ void cChestEntity::SaveToJson( Json::Value& a_Value )
 
 	unsigned int NumSlots = c_ChestHeight*c_ChestWidth;
 	Json::Value AllSlots;
-	for(unsigned int i = 0; i < NumSlots; i++)
+	for (unsigned int i = 0; i < NumSlots; i++)
 	{
 		Json::Value Slot;
-		const cItem * Item = GetSlot( i );
-		if( Item ) Item->GetJson( Slot );
-		AllSlots.append( Slot );
+		const cItem * Item = GetSlot(i);
+		if (Item != NULL)
+		{
+			Item->GetJson(Slot);
+		}
+		AllSlots.append(Slot);
 	}
 	a_Value["Slots"] = AllSlots;
 }
@@ -172,7 +167,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 {
 	if (GetWindow() == NULL)
 	{
-		OpenWindow(new cChestWindow(m_PosX, m_PosY, m_PosZ, this));
+		OpenNewWindow();
 	}
 	if (GetWindow())
 	{
@@ -196,28 +191,51 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 
 
 
-cItem * cChestEntity::GetContents(bool a_OnlyThis)
+void cChestEntity::OpenNewWindow(void)
 {
-	if (m_JoinedChest && !a_OnlyThis)
+	// Callback for opening together with neighbor chest:
+	class cOpenDouble :
+		public cChestCallback
 	{
-		// TODO: "Combined" memory leaks here
-		cItem * Combined = new cItem[GetChestHeight() * c_ChestWidth];
-		cItem * first =  (m_TopChest)  ? GetContents(true) : m_JoinedChest->GetContents(true);
-		cItem * second = (!m_TopChest) ? GetContents(true) : m_JoinedChest->GetContents(true);
-		for (int i = 0; i < GetChestHeight() * c_ChestWidth; i++)
+		cChestEntity * m_ThisChest;
+	public:
+		cOpenDouble(cChestEntity * a_ThisChest) :
+			m_ThisChest(a_ThisChest)
 		{
-			int index = i % (c_ChestHeight * c_ChestWidth);
-			if (i < c_ChestHeight * c_ChestWidth)
-				Combined[index] = first[index];
-			else
-				Combined[index] = second[index];
 		}
-		return Combined;
-	}
-	else
+		
+		virtual bool Item(cChestEntity * a_Chest) override
+		{
+			// The primary chest should eb the one with lesser X or Z coord:
+			cChestEntity * Primary = a_Chest;
+			cChestEntity * Secondary = m_ThisChest;
+			if (
+				(Primary->GetPosX() > Secondary->GetPosX()) ||
+				(Primary->GetPosZ() > Secondary->GetPosZ())
+			)
+			{
+				std::swap(Primary, Secondary);
+			}
+			m_ThisChest->OpenWindow(new cChestWindow(Primary, Secondary));
+			return false;
+		}
+	} ;
+	
+	// Scan neighbors for adjacent chests:
+	cOpenDouble OpenDbl(this);
+	if (
+		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     OpenDbl) ||
+		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     OpenDbl) ||
+		m_World->DoWithChestAt(m_PosX    , m_PosY, m_PosZ - 1, OpenDbl) ||
+		m_World->DoWithChestAt(m_PosX    , m_PosY, m_PosZ + 1, OpenDbl)
+	)
 	{
-		return m_Content;
+		// The double-chest window has been opened in the callback
+		return;
 	}
+
+	// There is no chest neighbor, open a single-chest window:	
+	OpenWindow(new cChestWindow(this));
 }
 
 

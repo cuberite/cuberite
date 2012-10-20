@@ -152,7 +152,8 @@ class cChestWindow :
 	public cWindow
 {
 public:
-	cChestWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cChestEntity * a_Chest);
+	cChestWindow(cChestEntity * a_Chest);
+	cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest);
 	~cChestWindow();
 	
 protected:

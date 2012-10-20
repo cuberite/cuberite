@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/20/12 13:37:50.
+** Generated automatically by tolua++-1.0.92 on 10/20/12 23:51:02.
 */
 
 #ifndef __cplusplus
@@ -296,9 +296,9 @@ static int tolua_AllToLua_cStairs_RotationToMetaData00(lua_State* tolua_S)
 #endif
  {
   float a_Rotation = ((float)  tolua_tonumber(tolua_S,2,0));
-  int a_Direction = ((int)  tolua_tonumber(tolua_S,3,0));
+  char a_BlockFace = ((char)  tolua_tonumber(tolua_S,3,0));
   {
-   char tolua_ret = (char)  cStairs::RotationToMetaData(a_Rotation,a_Direction);
+   unsigned char tolua_ret = (unsigned char)  cStairs::RotationToMetaData(a_Rotation,a_BlockFace);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -14237,38 +14237,6 @@ static int tolua_AllToLua_cChestEntity_UsedBy00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetChestHeight of class  cChestEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cChestEntity_GetChestHeight00
-static int tolua_AllToLua_cChestEntity_GetChestHeight00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cChestEntity",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cChestEntity* self = (cChestEntity*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetChestHeight'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetChestHeight();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetChestHeight'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* get function: __cBlockEntityWindowOwner__ of class  cChestEntity */
 #ifndef TOLUA_DISABLE_tolua_get_cChestEntity___cBlockEntityWindowOwner__
 static int tolua_get_cChestEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
@@ -22995,7 +22963,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cChestEntity_GetSlot00);
    tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cChestEntity_SetSlot00);
    tolua_function(tolua_S,"UsedBy",tolua_AllToLua_cChestEntity_UsedBy00);
-   tolua_function(tolua_S,"GetChestHeight",tolua_AllToLua_cChestEntity_GetChestHeight00);
    tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cChestEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Lua__cChestEntity","Lua__cChestEntity","cChestEntity",NULL);
