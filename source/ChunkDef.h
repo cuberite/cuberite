@@ -218,6 +218,13 @@ public:
 	}
 	
 	
+	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_Idx)
+	{
+		ASSERT((a_Idx >= 0) && (a_Idx < Width * Width * Height));
+		return a_BlockTypes[a_Idx];
+	}
+	
+	
 	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
 	{
 		return a_HeightMap[a_X + Width * a_Z];

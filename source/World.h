@@ -239,18 +239,24 @@ public:
 	/// Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
 
-	void SetBlock     (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );					//tolua_export
-	void FastSetBlock (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );					//tolua_export
-	void FastSetBlock (const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta ); } // tolua_export
-	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z );															//tolua_export
-	BLOCKTYPE GetBlock(const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }			//tolua_export
-	NIBBLETYPE GetBlockMeta(int a_X, int a_Y, int a_Z );														//tolua_export
-	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }	//tolua_export
-	void SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData );									//tolua_export
-	void SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); } //tolua_export
-	NIBBLETYPE GetBlockSkyLight( int a_X, int a_Y, int a_Z );													//tolua_export
-	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
-	void GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);  // tolua_export
+	// tolua_begin
+	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void       FastSetBlock      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
+	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData);
+	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
+	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	void       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
+	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	// Vector3i variants:
+	void       FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta ); }
+	BLOCKTYPE  GetBlock    (const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }
+	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }
+	void       SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); }
+	// tolua_end
 	
 	/** Writes the block area into the specified coords. 
 	Returns true if all chunks have been processed. 

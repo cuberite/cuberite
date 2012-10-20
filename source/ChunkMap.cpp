@@ -844,16 +844,16 @@ void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
 
 
 
-BLOCKTYPE cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
+BLOCKTYPE cChunkMap::GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ );
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
-		return Chunk->GetBlock(a_X, a_Y, a_Z);
+		return Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	return 0;
 }
@@ -862,16 +862,16 @@ BLOCKTYPE cChunkMap::GetBlock(int a_X, int a_Y, int a_Z)
 
 
 
-BLOCKTYPE cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
+NIBBLETYPE cChunkMap::GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ );
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid() )
 	{
-		return Chunk->GetMeta(a_X, a_Y, a_Z);
+		return Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	return 0;
 }
@@ -880,16 +880,34 @@ BLOCKTYPE cChunkMap::GetBlockMeta(int a_X, int a_Y, int a_Z)
 
 
 
-BLOCKTYPE cChunkMap::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
+NIBBLETYPE cChunkMap::GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int ChunkX, ChunkZ;
-	cChunkDef::AbsoluteToRelative( a_X, a_Y, a_Z, ChunkX, ChunkZ );
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ );
 
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid() )
 	{
-		return Chunk->GetSkyLight( a_X, a_Y, a_Z );
+		return Chunk->GetSkyLight(a_BlockX, a_BlockY, a_BlockZ);
+	}
+	return 0;
+}
+
+
+
+
+
+NIBBLETYPE cChunkMap::GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid() )
+	{
+		return Chunk->GetBlockLight(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	return 0;
 }
@@ -945,6 +963,23 @@ void cChunkMap::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCK
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		Chunk->GetBlockTypeMeta(X, Y, Z, a_BlockType, a_BlockMeta);
+	}
+}
+
+
+
+
+
+void cChunkMap::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+{
+	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
+	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
+
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
+	if ((Chunk != NULL) && Chunk->IsValid())
+	{
+		Chunk->GetBlockInfo(X, Y, Z, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
 	}
 }
 

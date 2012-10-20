@@ -135,12 +135,15 @@ public:
 	int       GetHeight          (int a_BlockX, int a_BlockZ);
 	void      FastSetBlocks      (sSetBlockList & a_BlockList);
 	void      CollectPickupsByPlayer(cPlayer * a_Player);
-	BLOCKTYPE GetBlock           (int a_X, int a_Y, int a_Z);
-	BLOCKTYPE GetBlockMeta       (int a_X, int a_Y, int a_Z);
-	BLOCKTYPE GetBlockSkyLight   (int a_X, int a_Y, int a_Z);
-	void      SetBlockMeta       (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockMeta);
-	void      SetBlock           (int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
-	void      GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	
+	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
+	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
+	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
+	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockMeta);
+	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
+	void       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	void       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 
 	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
 	void      ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);

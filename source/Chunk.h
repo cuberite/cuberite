@@ -134,7 +134,8 @@ public:
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	BLOCKTYPE GetBlock( int a_X, int a_Y, int a_Z );
 	BLOCKTYPE GetBlock( int a_BlockIdx );
-	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	void      GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	void      GetBlockInfo    (int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 	
 	/// Queues all 6 neighbors of the specified block for checking. If outside the chunk, relays the checking to the neighboring chunk
 	void CheckNeighbors(int a_RelX, int a_RelY, int a_RelZ);
@@ -228,8 +229,8 @@ public:
 	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                        {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
 
-	inline NIBBLETYPE GetLight(int a_RelX, int a_RelY, int a_RelZ)    {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
 
 private:
 

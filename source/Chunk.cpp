@@ -1520,6 +1520,19 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 
 
 
+void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+{
+	int Idx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
+	a_BlockType  = cChunkDef::GetBlock (m_BlockTypes,    Idx);
+	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
+	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
+	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
+}
+
+
+
+
+
 void cChunk::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
