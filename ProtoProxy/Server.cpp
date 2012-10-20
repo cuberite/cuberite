@@ -46,6 +46,9 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 	local.sin_port = htons(a_ListenPort);
 	bind(m_ListenSocket, (sockaddr *)&local, sizeof(local));
 	listen(m_ListenSocket, 1);
+	
+	printf("Listening on port %d, connecting to localhost:%d\n", a_ListenPort, a_ConnectPort);
+	
 	return 0;
 }
 
