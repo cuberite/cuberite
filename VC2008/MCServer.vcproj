@@ -218,7 +218,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib Psapi.lib"
-				OutputFile="$(ProjectDir)\..\MCServer\$(ProjectName).exe"
+				OutputFile="$(ProjectDir)\..\MCServer\$(ProjectName)_profiled.exe"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"

@@ -10,7 +10,7 @@
 
 set pt="C:\Program Files\Microsoft Visual Studio 9.0\Team Tools\Performance Tools"
 set appdir=..\MCServer
-set app=MCServer.exe
+set app=MCServer_profiled.exe
 
 :: outputdir is relative to appdir!
 set outputdir=..\Profiling
