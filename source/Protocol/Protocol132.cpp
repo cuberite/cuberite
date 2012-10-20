@@ -271,6 +271,12 @@ void cProtocol132::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a
 
 void cProtocol132::SendDestroyEntity(const cEntity & a_Entity)
 {
+	if (a_Entity.GetUniqueID() == m_Client->GetPlayer()->GetUniqueID())
+	{
+		// Do not send "destroy self" to the client, the client would crash (FS #254)
+		return;
+	}
+	
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_DESTROY_ENTITIES);
 	WriteByte(1);  // entity count
