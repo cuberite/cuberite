@@ -392,6 +392,11 @@ static int FNNAME(lua_State * tolua_S) \
 	} \
 	\
 	CONTAINER * self = (CONTAINER *)  tolua_tousertype(tolua_S, 1, 0); \
+	if (self == NULL) \
+	{ \
+		LOGWARN("Error in function call '" #FOREACH "': Not called on an object instance"); \
+		return 0; \
+	} \
 	\
 	if (!lua_isfunction( tolua_S, 2)) \
 	{ \
