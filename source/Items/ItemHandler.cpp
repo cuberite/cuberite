@@ -252,33 +252,72 @@ char cItemHandler::GetMaxStackSize(void)
 		return 64;
 	}
 	
-	switch (m_ItemType)
+	switch (m_ItemType) //sorted by id
 	{
-		case E_ITEM_APPLE:           return 64;
-		case E_ITEM_ARROW:           return 64;
-		case E_ITEM_BLAZE_POWDER:    return 64;
-		case E_ITEM_BLAZE_ROD:       return 64;
-		case E_ITEM_BONE:            return 64;
-		case E_ITEM_BOOK:            return 64;
-		case E_ITEM_BOWL:            return 64;
-		case E_ITEM_BREAD:           return 64;
-		case E_ITEM_BROWN_MUSHROOM:  return 64;
-		case E_ITEM_BUCKET:          return 1;  // TODO: change this to 16 when turning compatibility to 1.3
-		case E_ITEM_COAL:            return 64;
-		case E_ITEM_COOKED_CHICKEN:  return 64;
-		case E_ITEM_COOKED_FISH:     return 64;
-		case E_ITEM_COOKED_PORKCHOP: return 64;
-		case E_ITEM_DIAMOND:         return 64;
-		case E_ITEM_FEATHER:         return 64;
-		case E_ITEM_FLINT:           return 64;
-		case E_ITEM_GOLD:            return 64;
-		case E_ITEM_GUNPOWDER:       return 64;
-		case E_ITEM_IRON:            return 64;
-		case E_ITEM_RAW_PORKCHOP:    return 64;
-		case E_ITEM_SEEDS:           return 64;
-		case E_ITEM_STICK:           return 64;
-		case E_ITEM_STRING:          return 64;
-		case E_ITEM_WHEAT:           return 64;
+		case E_ITEM_APPLE:                return 64;
+		case E_ITEM_ARROW:                return 64;
+		case E_ITEM_BLAZE_POWDER:         return 64;
+		case E_ITEM_BLAZE_ROD:            return 64;
+		case E_ITEM_BONE:                 return 64;
+		case E_ITEM_BOOK:                 return 64;
+		case E_ITEM_BOTTLE_O_ENCHANTING:  return 64;
+		case E_ITEM_BOWL:                 return 64;
+		case E_ITEM_BREAD:                return 64;
+		case E_ITEM_BREWING_STAND:        return 64;
+		case E_ITEM_BUCKET:               return 1;  // TODO: change this to 16 when turning compatibility to 1.3
+		case E_ITEM_CLAY:                 return 64;
+		case E_ITEM_CLAY_BRICK:           return 64;
+		case E_ITEM_CLOCK:                return 64;
+		case E_ITEM_COAL:                 return 64;
+		case E_ITEM_COMPASS:              return 64;
+		case E_ITEM_COOKED_CHICKEN:       return 64;
+		case E_ITEM_COOKED_FISH:          return 64;
+		case E_ITEM_COOKED_PORKCHOP:      return 64;
+		case E_ITEM_COOKIE:               return 64;
+		case E_ITEM_DIAMOND:              return 64;
+		case E_ITEM_DYE:                  return 64;
+		case E_ITEM_EGG:                  return 16;
+		case E_ITEM_EMERALD:              return 64;
+		case E_ITEM_ENDER_PEARL:          return 16;
+		case E_ITEM_EYE_OF_ENDER:         return 64;
+		case E_ITEM_FEATHER:              return 64;
+		case E_ITEM_FERMENTED_SPIDER_EYE: return 64;
+		case E_ITEM_FIRE_CHARGE:          return 64;
+		case E_ITEM_FLINT:                return 64;
+		case E_ITEM_GHAST_TEAR:           return 64;
+		case E_ITEM_GLASS_BOTTLE:         return 64;
+		case E_ITEM_GLISTERING_MELON:     return 64;
+		case E_ITEM_GLOWSTONE_DUST:       return 64;
+		case E_ITEM_GOLD:                 return 64;
+		case E_ITEM_GOLDEN_APPLE:         return 64;
+		case E_ITEM_GOLD_NUGGET:          return 64;
+		case E_ITEM_GUNPOWDER:            return 64;
+		case E_ITEM_IRON:                 return 64;
+		case E_ITEM_LEATHER:              return 64;
+		case E_ITEM_MAGMA_CREAM:          return 64;
+		case E_ITEM_MELON_SEEDS:          return 64;
+		case E_ITEM_MELON_SLICE:          return 64;
+		case E_ITEM_PAINTINGS:            return 64;
+		case E_ITEM_PAPER:                return 64;
+		case E_ITEM_PUMPKIN_SEEDS:        return 64;
+		case E_ITEM_RAW_BEEF:             return 64;
+		case E_ITEM_RAW_CHICKEN:          return 64;
+		case E_ITEM_RAW_FISH:             return 64;
+		case E_ITEM_RAW_PORKCHOP:         return 64;
+		case E_ITEM_REDSTONE_DUST:        return 64;
+		case E_ITEM_REDSTONE_REPEATER:    return 64;
+		case E_ITEM_ROTTEN_FLESH:         return 64;
+		case E_ITEM_SEEDS:                return 64;
+		case E_ITEM_SIGN:                 return 16;
+		case E_ITEM_SLIMEBALL:            return 64;
+		case E_ITEM_SNOWBALL:             return 16;
+		case E_ITEM_SPIDER_EYE:           return 64;
+		case E_ITEM_STEAK:                return 64;
+		case E_ITEM_STICK:                return 64;
+		case E_ITEM_STRING:               return 64;
+		case E_ITEM_SUGAR:                return 64;
+		case E_ITEM_SUGAR_CANE:           return 64;
+		case E_ITEM_WHEAT:                return 64;
 	}
 	// By default items don't stack:
 	return 1;
