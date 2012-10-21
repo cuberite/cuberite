@@ -12,6 +12,7 @@
 #include "FinishGen.h"
 #include "../Noise.h"
 #include "../BlockID.h"
+#include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 
 
 
@@ -409,6 +410,8 @@ void cFinishGenPreSimulator::GenFinish(
 )
 {
 	CollapseSandGravel(a_BlockTypes, a_HeightMap);
+	StationarizeFluid(a_BlockTypes, a_HeightMap, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	StationarizeFluid(a_BlockTypes, a_HeightMap, E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
 	// TODO: other operations
 }
 
@@ -421,7 +424,6 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 	cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
 )
 {
-	// Collapse gravel and sand:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -459,6 +461,85 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 			cChunkDef::SetHeight(a_HeightMap, x, z, LastY);
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cFinishGenPreSimulator::StationarizeFluid(
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::HeightMap & a_HeightMap,      // Height map to read
+	BLOCKTYPE a_Fluid,
+	BLOCKTYPE a_StationaryFluid
+)
+{
+	// Turn fluid in the middle to stationary, unless it has air or washable block next to it:
+	for (int z = 1; z < cChunkDef::Width - 1; z++)
+	{
+		for (int x = 1; x < cChunkDef::Width - 1; x++)
+		{
+			for (int y = cChunkDef::GetHeight(a_HeightMap, x, z); y >= 0; y--)
+			{
+				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
+				if ((Block != a_Fluid) && (Block != a_StationaryFluid))
+				{
+					continue;
+				}
+				static const struct
+				{
+					int x, y, z;
+				} Coords[] =
+				{
+					{1, 0, 0},
+					{-1, 0, 0},
+					{0, 0, 1},
+					{0, 0, -1},
+					{0, -1, 0}
+				} ;
+				BLOCKTYPE BlockToSet = a_StationaryFluid;  // By default, don't simulate this block
+				for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+				{
+					if ((y == 0) && (Coords[i].y < 0))
+					{
+						continue;
+					}
+					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z);
+					if ((Neighbor == E_BLOCK_AIR) || cFluidSimulator::CanWashAway(Neighbor))
+					{
+						// There is an air / washable neighbor, simulate this block
+						BlockToSet = a_Fluid;
+						break;
+					}
+				}  // for i - Coords[]
+				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockToSet);
+			}  // for y
+		}  // for x
+	}  // for z
+	
+	// Turn fluid at the chunk edges into non-stationary fluid:
+	for (int y = 0; y < cChunkDef::Height; y++)
+	{
+		for (int i = 1; i < cChunkDef::Width; i++)  // i stands for both x and z here
+		{
+			if (cChunkDef::GetBlock(a_BlockTypes, 0, y, i) == a_StationaryFluid)
+			{
+				cChunkDef::SetBlock(a_BlockTypes, 0, y, i, a_Fluid);
+			}
+			if (cChunkDef::GetBlock(a_BlockTypes, i, y, 0) == a_StationaryFluid)
+			{
+				cChunkDef::SetBlock(a_BlockTypes, i, y, 0, a_Fluid);
+			}
+			if (cChunkDef::GetBlock(a_BlockTypes, cChunkDef::Width - 1, y, i) == a_StationaryFluid)
+			{
+				cChunkDef::SetBlock(a_BlockTypes, cChunkDef::Width - 1, y, i, a_Fluid);
+			}
+			if (cChunkDef::GetBlock(a_BlockTypes, i, y, cChunkDef::Width - 1) == a_StationaryFluid)
+			{
+				cChunkDef::SetBlock(a_BlockTypes, i, y, cChunkDef::Width - 1, a_Fluid);
+			}
+		}
+	}
 }
 
 

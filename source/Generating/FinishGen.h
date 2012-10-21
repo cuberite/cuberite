@@ -161,9 +161,20 @@ protected:
 	// Drops hanging sand and gravel down to the ground, recalculates heightmap
 	void CollapseSandGravel(
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::HeightMap & a_HeightMap      // Height map to read and change by the current data
+		cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
 	);
 	
+	/** For each fluid block:
+	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
+	- all fluid on the chunk's edge is made flowing
+	*/
+	void StationarizeFluid(
+		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+		cChunkDef::HeightMap & a_HeightMap,      // Height map to read
+		BLOCKTYPE a_Fluid,
+		BLOCKTYPE a_StationaryFluid
+	);
+
 	// cFinishGen override:
 	virtual void GenFinish(
 		int a_ChunkX, int a_ChunkZ,
