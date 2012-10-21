@@ -150,3 +150,32 @@ protected:
 
 
 
+
+class cFinishGenPreSimulator :
+	public cFinishGen
+{
+public:
+	cFinishGenPreSimulator(void);
+	
+protected:
+	// Drops hanging sand and gravel down to the ground, recalculates heightmap
+	void CollapseSandGravel(
+		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+		cChunkDef::HeightMap & a_HeightMap      // Height map to read and change by the current data
+	);
+	
+	// cFinishGen override:
+	virtual void GenFinish(
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+		cEntityList & a_Entities,                // Entities may be added or deleted
+		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
+	) override;
+} ;
+
+
+
+

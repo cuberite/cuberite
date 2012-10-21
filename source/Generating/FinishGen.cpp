@@ -385,3 +385,82 @@ void cFinishGenBottomLava::GenFinish(
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenPreSimulator:
+
+cFinishGenPreSimulator::cFinishGenPreSimulator(void)
+{
+	// Nothing needed yet
+}
+
+
+
+
+
+void cFinishGenPreSimulator::GenFinish(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+	cEntityList & a_Entities,                // Entities may be added or deleted
+	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
+)
+{
+	CollapseSandGravel(a_BlockTypes, a_HeightMap);
+	// TODO: other operations
+}
+
+
+
+
+
+void cFinishGenPreSimulator::CollapseSandGravel(
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
+)
+{
+	// Collapse gravel and sand:
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int LastY = -1;
+			for (int y = 0; y < cChunkDef::Height; y++)
+			{
+				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
+				switch (Block)
+				{
+					default:
+					{
+						// Set the last block onto which stuff can fall to this height:
+						LastY = y;
+						break;
+					}
+					case E_BLOCK_AIR:
+					{
+						// Do nothing
+						break;
+					}
+					case E_BLOCK_SAND:
+					case E_BLOCK_GRAVEL:
+					{
+						if (LastY < y - 1)
+						{
+							cChunkDef::SetBlock(a_BlockTypes, x, LastY + 1, z, Block);
+							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+						}
+						LastY++;
+						break;
+					}
+				}  // switch (GetBlock)
+			}  // for y
+			cChunkDef::SetHeight(a_HeightMap, x, z, LastY);
+		}  // for x
+	}  // for z
+}
+
+
+
+

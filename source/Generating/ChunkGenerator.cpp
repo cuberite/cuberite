@@ -366,6 +366,10 @@ void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", 10);
 			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
 		}
+		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenPreSimulator);
+		}
 	}  // for itr - Str[]
 }
 
