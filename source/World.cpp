@@ -254,6 +254,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
 	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
 	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
+	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
 
 	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode );
 

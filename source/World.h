@@ -68,6 +68,7 @@ public:
 
 	eGameMode GetGameMode(void) const { return m_GameMode; }						//tolua_export
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }							//tolua_export
+	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
 
@@ -425,6 +426,7 @@ private:
 	unsigned long long CurrentTick;
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
+	bool m_IsDeepSnowEnabled;
 	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
 	// The cRedstone class simulates redstone and needs access to m_RSList

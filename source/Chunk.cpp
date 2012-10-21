@@ -413,6 +413,8 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			m_IsDirty = ((cFurnaceEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
 		}
 	}
+	
+	ApplyWeatherToTop(a_TickRandom);
 }
 
 
@@ -516,6 +518,88 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 		Handler->OnUpdate(m_World, m_BlockTickX + m_PosX * Width, m_BlockTickY, m_BlockTickZ + m_PosZ * Width);
 	}  // for i - tickblocks
+}
+
+
+
+
+
+void cChunk::ApplyWeatherToTop(MTRand & a_TickRandom)
+{
+	if (
+		(a_TickRandom.randInt(100) != 0) ||
+		(
+			(m_World->GetWeather() != eWeather_Rain) &&
+			(m_World->GetWeather() != eWeather_ThunderStorm)
+		)
+	)
+	{
+		// Not the right weather, or not at this tick; bail out
+		return;
+	}
+	
+	int X = a_TickRandom.randInt(15);
+	int Z = a_TickRandom.randInt(15);
+	switch (GetBiomeAt(X, Z))
+	{
+		case biTaiga:
+		case biFrozenOcean:
+		case biFrozenRiver:
+		case biIcePlains:
+		case biIceMountains:
+		case biTaigaHills:
+		{
+			// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
+			int Height = GetHeight(X, Z);
+			BLOCKTYPE TopBlock = GetBlock(X, Height, Z);
+			NIBBLETYPE TopMeta = GetMeta (X, Height, Z);
+			if (m_World->IsDeepSnowEnabled() && (TopBlock == E_BLOCK_SNOW))
+			{
+				int MaxSize = 7;
+				BLOCKTYPE  BlockType[4];
+				NIBBLETYPE BlockMeta[4];
+				UnboundedRelGetBlock(X - 1, Height, Z,     BlockType[0], BlockMeta[0]);
+				UnboundedRelGetBlock(X + 1, Height, Z,     BlockType[1], BlockMeta[1]);
+				UnboundedRelGetBlock(X,     Height, Z - 1, BlockType[2], BlockMeta[2]);
+				UnboundedRelGetBlock(X,     Height, Z + 1, BlockType[3], BlockMeta[3]);
+				for (int i = 0; i < 4; i++)
+				{
+					switch (BlockType[i])
+					{
+						case E_BLOCK_AIR:
+						{
+							MaxSize = 0;
+							break;
+						}
+						case E_BLOCK_SNOW:
+						{
+							MaxSize = std::min(BlockMeta[i] + 1, MaxSize);
+							break;
+						}
+					}
+				}
+				if (TopMeta < MaxSize)
+				{
+					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta + 1);
+				}
+				else if (TopMeta > MaxSize)
+				{
+					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
+				}
+			}
+			else if (g_BlockIsSnowable[TopBlock])
+			{
+				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
+			}
+			else if ((TopBlock == E_BLOCK_WATER) || (TopBlock == E_BLOCK_STATIONARY_WATER))
+			{
+				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
+			}
+			break;
+		}  // case (snowy biomes)
+		
+		// TODO: Rainy biomes should check for farmland and cauldrons
+	}  // switch (biome)
 }
 
 

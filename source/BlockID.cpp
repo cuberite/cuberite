@@ -455,6 +455,7 @@ public:
 		g_BlockPistonBreakable[E_BLOCK_YELLOW_FLOWER]         = true;
 
 		// Blocks that can be snowed over:
+		g_BlockIsSnowable[E_BLOCK_AIR]                   = false;
 		g_BlockIsSnowable[E_BLOCK_BROWN_MUSHROOM]        = false;
 		g_BlockIsSnowable[E_BLOCK_CACTUS]                = false;
 		g_BlockIsSnowable[E_BLOCK_CHEST]                 = false;
