@@ -29,8 +29,9 @@ public:
 	/// Called when client sends some data:
 	virtual void DataReceived(const char * a_Data, int a_Size) override;
 	
-	// Sending commands:
+	// Sending commands (alphabetically sorted):
 	virtual void SendBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
+	virtual void SendBlockBreakAnim     (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange        (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player) override;
@@ -40,15 +41,11 @@ public:
 	virtual void SendPlayerSpawn        (const cPlayer & a_Player) override;
 	virtual void SendSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
-	virtual void SendBlockBreakAnim     (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendSpawnMob           (const cMonster & a_Mob) override;
 	virtual void SendUnloadChunk        (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendWholeInventory     (const cWindow & a_Window) override;
 
 	virtual AString GetAuthServerID(void) override;
-
-	// DEBUG:
-	virtual void SendKeepAlive  (int a_PingID) override;
 
 	/// Handling of the additional packets:
 	virtual int ParsePacket(unsigned char a_PacketType) override;

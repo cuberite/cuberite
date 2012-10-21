@@ -215,6 +215,22 @@ void cProtocol132::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 
 
+void cProtocol132::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte   (PACKET_BLOCK_BREAK_ANIM);
+	WriteInt    (a_entityID);
+	WriteInt    (a_BlockX);
+	WriteInt    (a_BlockY);
+	WriteInt    (a_BlockZ);
+	WriteByte   (stage);
+	Flush();
+}
+
+
+
+
+
 void cProtocol132::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CSPacket);
@@ -303,18 +319,6 @@ void cProtocol132::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 
 
 
-void cProtocol132::SendKeepAlive(int a_PingID)
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_KEEP_ALIVE);
-	WriteInt (a_PingID);
-	Flush();
-}
-
-
-
-
-
 void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	cCSLock Lock(m_CSPacket);
@@ -388,22 +392,6 @@ void cProtocol132::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 	WriteByte(a_SrcY / 8);
 	WriteInt (a_SrcZ / 8);
 	WriteInt (a_Data);
-	Flush();
-}
-
-
-
-
-
-void cProtocol132::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte   (PACKET_BLOCK_BREAK_ANIM);
-	WriteInt    (a_entityID);
-	WriteInt    (a_BlockX);
-	WriteInt    (a_BlockY);
-	WriteInt    (a_BlockZ);
-	WriteByte   (stage);
 	Flush();
 }
 

@@ -46,7 +46,7 @@ enum
 	PACKET_BLOCK_DIG                 = 0x0e,
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECTED             = 0x10,
-	PACKET_USE_BED                   = 0x11,  // TODO: Sure this is not Use Bed??
+	PACKET_USE_BED                   = 0x11,
 	PACKET_ANIMATION                 = 0x12,
 	PACKET_PACKET_ENTITY_ACTION      = 0x13,
 	PACKET_PLAYER_SPAWN              = 0x14,
@@ -131,6 +131,15 @@ void cProtocol125::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 	WriteByte (a_Byte1);
 	WriteByte (a_Byte2);
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+{
+	// Not supported in this protocol version
 }
 
 
@@ -418,6 +427,7 @@ void cProtocol125::SendKeepAlive(int a_PingID)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_KEEP_ALIVE);
 	WriteInt (a_PingID);
+	Flush();
 }
 
 
@@ -602,15 +612,6 @@ void cProtocol125::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 
 
 
-void cProtocol125::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
-{
-	// Not supported in this protocol version
-}
-
-
-
-
-
 void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 {
 	cCSLock Lock(m_CSPacket);
@@ -623,6 +624,29 @@ void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 	WriteByte   (0);
 	AString MetaData = GetEntityMetaData(a_Mob);
 	SendData (MetaData.data(), MetaData.size());
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_ObjectType);
+	WriteInt ((int)(a_Entity.GetPosX() * 32));
+	WriteInt ((int)(a_Entity.GetPosY() * 32));
+	WriteInt ((int)(a_Entity.GetPosZ() * 32));
+	WriteInt (a_ObjectData);
+	if( a_ObjectData != 0 )
+	{
+		WriteShort( a_SpeedX );
+		WriteShort( a_SpeedY );
+		WriteShort( a_SpeedZ );
+	}
 	Flush();
 }
 
@@ -697,6 +721,22 @@ void cProtocol125::SendUpdateSign(
 	WriteString(a_Line2);
 	WriteString(a_Line3);
 	WriteString(a_Line4);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_USE_BED);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(0);	// Unknown byte only 0 has been observed
+	WriteInt (a_BlockX);
+	WriteByte(a_BlockY);
+	WriteInt (a_BlockZ);
 	Flush();
 }
 
@@ -781,45 +821,6 @@ void cProtocol125::SendWindowOpen(char a_WindowID, char a_WindowType, const AStr
 	WriteByte  (a_WindowType);
 	WriteString(a_WindowTitle);
 	WriteByte  (a_NumSlots);
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_USE_BED);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(0);	// Unknown byte only 0 has been observed
-	WriteInt (a_BlockX);
-	WriteByte(a_BlockY);
-	WriteInt (a_BlockZ);
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_SPAWN_OBJECT);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_ObjectType);
-	WriteInt ((int)(a_Entity.GetPosX() * 32));
-	WriteInt ((int)(a_Entity.GetPosY() * 32));
-	WriteInt ((int)(a_Entity.GetPosZ() * 32));
-	WriteInt (a_ObjectData);
-	if( a_ObjectData != 0 )
-	{
-		WriteShort( a_SpeedX );
-		WriteShort( a_SpeedY );
-		WriteShort( a_SpeedZ );
-	}
 	Flush();
 }
 

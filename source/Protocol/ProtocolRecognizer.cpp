@@ -79,6 +79,16 @@ void cProtocolRecognizer::SendBlockAction(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
+void cProtocolRecognizer::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendBlockBreakAnim(a_entityID, a_BlockX, a_BlockY, a_BlockZ, stage);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	ASSERT(m_Protocol != NULL);
@@ -171,6 +181,26 @@ void cProtocolRecognizer::SendEntLook(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendEntLook(a_Entity);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -327,26 +357,6 @@ void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocolRecognizer::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
 void cProtocolRecognizer::SendRespawn(void)
 {
 	ASSERT(m_Protocol != NULL);
@@ -377,20 +387,20 @@ void cProtocolRecognizer::SendSoundParticleEffect(int a_EffectID, int a_SrcX, in
 
 
 
-void cProtocolRecognizer::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendBlockBreakAnim(a_entityID, a_BlockX, a_BlockY, a_BlockZ, stage);
+	m_Protocol->SendSpawnMob(a_Mob);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
+void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSpawnMob(a_Mob);
+	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -447,6 +457,16 @@ void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_Block
 
 
 
+void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 {
 	ASSERT(m_Protocol != NULL);
@@ -491,26 +511,6 @@ void cProtocolRecognizer::SendWindowOpen(char a_WindowID, char a_WindowType, con
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
