@@ -963,6 +963,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\JukeboxEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\JukeboxEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Ladder.h"
 					>
 				</File>

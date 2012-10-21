@@ -182,26 +182,27 @@ public:
 	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap();
 
-	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntRelMoveLook (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntRelMove     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntLook        (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntHeadLook    (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastBlockAction    (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
-	void BroadcastDestroyEntity  (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityStatus   (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
-	void BroadcastMetadata       (const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
-	void BroadcastSpawn          (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastBlockEntity    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastCollectPickup  (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
-	void BroadcastThunderbolt    (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastSoundEffect    (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);  // a_Src coords are Block * 8
-	void BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed         (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
-	void BroadcastChunkData      (cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerAnimation    (const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntRelMove         (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntLook            (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntHeadLook        (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
+	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityStatus       (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
+	void BroadcastMetadata           (const cPawn & a_Pawn, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSpawn              (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);  // a_Src coords are Block * 8
+	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
+	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
+	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void BroadcastChunkData          (cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	
-	void SendBlockEntity         (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
+	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
 	Vector3i PositionToWorldPosition(const Vector3i & a_RelPos)
 	{

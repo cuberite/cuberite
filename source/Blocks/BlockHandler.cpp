@@ -107,6 +107,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_IRON_DOOR:             return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_IRON_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_JUKEBOX:               return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);

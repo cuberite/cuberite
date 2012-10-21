@@ -78,47 +78,48 @@ public:
 	
 	bool IsPlaying(void) const {return (m_State == csPlaying); }
 
-	void SendBlockAction      (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
-	void SendBlockChange      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	void SendBlockChanges     (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
-	void SendChat             (const AString & a_Message);
-	void SendChunkData        (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectPickup    (const cPickup & a_Pickup, const cPlayer & a_Player);
-	void SendDestroyEntity    (const cEntity & a_Entity);
-	void SendDisconnect       (const AString & a_Reason);
-	void SendEntHeadLook      (const cEntity & a_Entity);
-	void SendEntLook          (const cEntity & a_Entity);
-	void SendEntRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntityEquipment  (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
-	void SendEntityStatus     (const cEntity & a_Entity, char a_Status);
-	void SendGameMode         (eGameMode a_GameMode);
-	void SendHealth           (void);
-	void SendInventoryProgress(char a_WindowID, short a_Progressbar, short a_Value);
-	void SendInventorySlot    (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendMetadata         (const cPawn & a_Entity);
-	void SendPickupSpawn      (const cPickup & a_Pickup);
-	void SendPlayerAnimation  (const cPlayer & a_Player, char a_Animation);
-	void SendPlayerListItem   (const cPlayer & a_Player, bool a_IsOnline);
-	void SendPlayerMoveLook   (void);
-	void SendPlayerPosition   (void);
-	void SendPlayerSpawn      (const cPlayer & a_Player);
-	void SendRespawn          (void);
-	void SendSoundEffect      (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
-	void SendBlockBreakAnim   (int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage);
-	void SendSpawnMob         (const cMonster & a_Mob);
-	void SendTeleportEntity   (const cEntity & a_Entity);
-	void SendThunderbolt      (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendTimeUpdate       (Int64 a_WorldTime);
-	void SendUnloadChunk      (int a_ChunkX, int a_ChunkZ);
-	void SendUpdateSign       (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-	void SendWeather          (eWeather a_Weather);
-	void SendWholeInventory   (const cInventory & a_Inventory);
-	void SendWholeInventory   (const cWindow    & a_Window);
-	void SendWindowClose      (char a_WindowID);
-	void SendWindowOpen       (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
-	void SendUseBed           (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
-	void SendSpawnObject      (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ);
+	void SendBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
+	void SendBlockChange        (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SendBlockChanges       (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
+	void SendChat               (const AString & a_Message);
+	void SendChunkData          (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
+	void SendCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player);
+	void SendDestroyEntity      (const cEntity & a_Entity);
+	void SendDisconnect         (const AString & a_Reason);
+	void SendEntHeadLook        (const cEntity & a_Entity);
+	void SendEntLook            (const cEntity & a_Entity);
+	void SendEntRelMove         (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
+	void SendEntityStatus       (const cEntity & a_Entity, char a_Status);
+	void SendGameMode           (eGameMode a_GameMode);
+	void SendHealth             (void);
+	void SendInventoryProgress  (char a_WindowID, short a_Progressbar, short a_Value);
+	void SendInventorySlot      (char a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendMetadata           (const cPawn & a_Entity);
+	void SendPickupSpawn        (const cPickup & a_Pickup);
+	void SendPlayerAnimation    (const cPlayer & a_Player, char a_Animation);
+	void SendPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline);
+	void SendPlayerMoveLook     (void);
+	void SendPlayerPosition     (void);
+	void SendPlayerSpawn        (const cPlayer & a_Player);
+	void SendRespawn            (void);
+	void SendSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
+	void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
+	void SendBlockBreakAnim     (int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage);
+	void SendSpawnMob           (const cMonster & a_Mob);
+	void SendTeleportEntity     (const cEntity & a_Entity);
+	void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendTimeUpdate         (Int64 a_WorldTime);
+	void SendUnloadChunk        (int a_ChunkX, int a_ChunkZ);
+	void SendUpdateSign         (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	void SendWeather            (eWeather a_Weather);
+	void SendWholeInventory     (const cInventory & a_Inventory);
+	void SendWholeInventory     (const cWindow    & a_Window);
+	void SendWindowClose        (char a_WindowID);
+	void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
+	void SendUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	void SetUsername( const AString & a_Username );	//tolua_export

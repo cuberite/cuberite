@@ -52,19 +52,20 @@ const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should b
 
 enum
 {
-	PACKET_KEEP_ALIVE         = 0x00,
-	PACKET_LOGIN              = 0x01,
-	PACKET_ENTITY_EQUIPMENT   = 0x05,
-	PACKET_COMPASS            = 0x06,
-	PACKET_PLAYER_SPAWN       = 0x14,
-	PACKET_COLLECT_PICKUP     = 0x16,
-	PACKET_SPAWN_MOB          = 0x18,
-	PACKET_DESTROY_ENTITIES   = 0x1d,
-	PACKET_CHUNK_DATA         = 0x33,
-	PACKET_BLOCK_CHANGE       = 0x35,
-	PACKET_BLOCK_ACTION       = 0x36,
-	PACKET_BLOCK_BREAK_ANIM   = 0x37,
-	PACKET_SOUND_EFFECT       = 0x3e
+	PACKET_KEEP_ALIVE            = 0x00,
+	PACKET_LOGIN                 = 0x01,
+	PACKET_ENTITY_EQUIPMENT      = 0x05,
+	PACKET_COMPASS               = 0x06,
+	PACKET_PLAYER_SPAWN          = 0x14,
+	PACKET_COLLECT_PICKUP        = 0x16,
+	PACKET_SPAWN_MOB             = 0x18,
+	PACKET_DESTROY_ENTITIES      = 0x1d,
+	PACKET_CHUNK_DATA            = 0x33,
+	PACKET_BLOCK_CHANGE          = 0x35,
+	PACKET_BLOCK_ACTION          = 0x36,
+	PACKET_BLOCK_BREAK_ANIM      = 0x37,
+	PACKET_SOUND_EFFECT          = 0x3e,
+	PACKET_SOUND_PARTICLE_EFFECT = 0x3d
 } ;
 
 
@@ -371,6 +372,22 @@ void cProtocol132::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int 
 	WriteInt    (a_SrcZ);
 	WriteFloat  (a_Volume);
 	WriteByte   ((char)(a_Pitch * 63.0f));
+	Flush();
+}
+
+
+
+
+
+void cProtocol132::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SOUND_PARTICLE_EFFECT);
+	WriteInt (a_EffectID);
+	WriteInt (a_SrcX / 8);
+	WriteByte(a_SrcY / 8);
+	WriteInt (a_SrcZ / 8);
+	WriteInt (a_Data);
 	Flush();
 }
 

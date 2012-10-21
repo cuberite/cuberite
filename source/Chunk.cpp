@@ -16,6 +16,7 @@
 #include "FurnaceEntity.h"
 #include "SignEntity.h"
 #include "NoteEntity.h"
+#include "JukeboxEntity.h"
 #include "Torch.h"
 #include "Ladder.h"
 #include "Pickup.h"
@@ -809,6 +810,15 @@ void cChunk::CreateBlockEntities(void)
 						}
 						break;
 					}
+
+					case E_BLOCK_JUKEBOX:
+					{
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						{
+							m_BlockEntities.push_back(new cJukeboxEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+						}
+						break;
+					}
 				}  // switch (BlockType)
 			}  // for y
 		}  // for z
@@ -932,6 +942,11 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		case E_BLOCK_NOTE_BLOCK:
 		{
 			AddBlockEntity(new cNoteEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			break;
+		}
+		case E_BLOCK_JUKEBOX:
+		{
+			AddBlockEntity(new cJukeboxEntity(WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 	}  // switch (a_BlockType)
@@ -1750,6 +1765,22 @@ void cChunk::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a
 			continue;
 		}
 		(*itr)->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+	}  // for itr - LoadedByClient[]
+}
+
+
+
+
+
+void cChunk::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
+{
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		if (*itr == a_Exclude)
+		{
+			continue;
+		}
+		(*itr)->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
 	}  // for itr - LoadedByClient[]
 }
 

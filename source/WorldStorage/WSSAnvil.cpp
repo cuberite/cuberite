@@ -12,6 +12,7 @@
 #include "../FurnaceEntity.h"
 #include "../SignEntity.h"
 #include "../NoteEntity.h"
+#include "../JukeboxEntity.h"
 #include "../Item.h"
 #include "../StringCompression.h"
 #include "../Entity.h"
@@ -156,6 +157,13 @@ protected:
 		m_Writer.EndCompound();
 	}
 
+	void AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
+	{
+		m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Jukebox, "RecordPlayer");
+		m_Writer.AddInt("Record", a_Jukebox->GetRecord());
+		m_Writer.EndCompound();
+	}
 
 	virtual bool LightIsValid(bool a_IsLightValid) override
 	{
@@ -189,11 +197,12 @@ protected:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
-			case E_BLOCK_CHEST:     AddChestEntity  ((cChestEntity *)  a_Entity); break;
-			case E_BLOCK_FURNACE:   AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
+			case E_BLOCK_CHEST:      AddChestEntity  ((cChestEntity *)  a_Entity); break;
+			case E_BLOCK_FURNACE:    AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
 			case E_BLOCK_SIGN_POST:
-			case E_BLOCK_WALLSIGN:  AddSignEntity   ((cSignEntity *)   a_Entity); break;
-			case E_BLOCK_NOTE_BLOCK:  AddNoteEntity   ((cNoteEntity *)   a_Entity); break;
+			case E_BLOCK_WALLSIGN:   AddSignEntity   ((cSignEntity *)   a_Entity); break;
+			case E_BLOCK_NOTE_BLOCK: AddNoteEntity   ((cNoteEntity *)   a_Entity); break;
+			case E_BLOCK_JUKEBOX:    AddJukeboxEntity((cJukeboxEntity *)a_Entity); break;
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -662,6 +671,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadNoteFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "RecordPlayer", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadJukeboxFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		// TODO: Other block entities
 	}  // for Child - tag children
 }
@@ -838,6 +851,27 @@ void cWSSAnvil::LoadNoteFromNBT(cBlockEntityList & a_BlockEntities, const cParse
 		Note->SetPitch(a_NBT.GetByte(note));
 	}
 	a_BlockEntities.push_back(Note.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadJukeboxFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cJukeboxEntity> Jukebox(new cJukeboxEntity(x, y, z, m_World));
+	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
+	if (Record >= 0)
+	{
+		Jukebox->SetRecord(a_NBT.GetInt(Record));
+	}
+	a_BlockEntities.push_back(Jukebox.release());
 }
 
 

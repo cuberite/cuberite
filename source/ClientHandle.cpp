@@ -1485,6 +1485,15 @@ void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int
 
 
 
+void cClientHandle::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+{
+	m_Protocol->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
+}
+
+
+
+
+
 void cClientHandle::SendBlockBreakAnim(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage)
 {
 	m_Protocol->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);

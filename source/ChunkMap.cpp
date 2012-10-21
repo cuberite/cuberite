@@ -466,6 +466,25 @@ void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, in
 
 
 
+void cChunkMap::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+
+	cChunkDef::BlockToChunk(a_SrcX / 8, a_SrcY / 8, a_SrcZ / 8, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data, a_Exclude);
+}
+
+
+
+
+
 void cChunkMap::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);

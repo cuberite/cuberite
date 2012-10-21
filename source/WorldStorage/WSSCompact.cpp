@@ -13,6 +13,7 @@
 #include "../SignEntity.h"
 #include "../FurnaceEntity.h"
 #include "../NoteEntity.h"
+#include "../JukeboxEntity.h"
 #include "../BlockID.h"
 
 
@@ -70,11 +71,12 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 	const char * SaveInto = NULL;
 	switch (a_BlockEntity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:     SaveInto = "Chests";   break;
-		case E_BLOCK_FURNACE:   SaveInto = "Furnaces"; break;
-		case E_BLOCK_SIGN_POST: SaveInto = "Signs";    break;
-		case E_BLOCK_WALLSIGN:  SaveInto = "Signs";    break;
-		case E_BLOCK_NOTE_BLOCK:  SaveInto = "Notes";    break;
+		case E_BLOCK_CHEST:      SaveInto = "Chests";    break;
+		case E_BLOCK_FURNACE:    SaveInto = "Furnaces";  break;
+		case E_BLOCK_SIGN_POST:  SaveInto = "Signs";     break;
+		case E_BLOCK_WALLSIGN:   SaveInto = "Signs";     break;
+		case E_BLOCK_NOTE_BLOCK: SaveInto = "Notes";     break;
+		case E_BLOCK_JUKEBOX:    SaveInto = "Jukeboxes"; break;
 
 		default:
 		{
@@ -337,6 +339,26 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 				a_BlockEntities.push_back( NoteEntity );
 			}
 		}  // for itr - AllNotes[]
+	}
+
+	// Load jukeboxes
+	Json::Value AllJukeboxes = a_Value.get("Jukeboxes", Json::nullValue);
+	if( !AllJukeboxes.empty() )
+	{
+		for( Json::Value::iterator itr = AllJukeboxes.begin(); itr != AllJukeboxes.end(); ++itr )
+		{
+			Json::Value & Jukebox = *itr;
+			cJukeboxEntity * JukeboxEntity = new cJukeboxEntity(0, 0, 0, a_World);
+			if ( !JukeboxEntity->LoadFromJson( Jukebox ) )
+			{
+				LOGERROR("ERROR READING JUKEBOX FROM JSON!" );
+				delete JukeboxEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( JukeboxEntity );
+			}
+		}  // for itr - AllJukeboxes[]
 	}
 }
 

@@ -69,7 +69,8 @@ enum
 	PACKET_BLOCK_CHANGE              = 0x35,
 	PACKET_BLOCK_ACTION              = 0x36,
 	PACKET_EXPLOSION                 = 0x3C,
-	PACKET_SOUND_EFFECT              = 0x3D,
+	PACKET_SOUND_EFFECT              = 0x3e,
+	PACKET_SOUND_PARTICLE_EFFECT     = 0x3d,
 	PACKET_CHANGE_GAME_STATE         = 0x46,
 	PACKET_THUNDERBOLT               = 0x47,
 	PACKET_WINDOW_OPEN               = 0x64,
@@ -586,6 +587,15 @@ void cProtocol125::SendRespawn(void)
 void cProtocol125::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
 {
 	// Not needed in this protocol version
+}
+
+
+
+
+
+void cProtocol125::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+{
+	// Not implemented in this protocol version
 }
 
 
