@@ -595,6 +595,18 @@ void cChunk::ApplyWeatherToTop(MTRand & a_TickRandom)
 			{
 				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
 			}
+			else if (
+					(m_World->IsDeepSnowEnabled()) && 
+					(
+						(TopBlock == E_BLOCK_RED_ROSE) ||
+						(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
+						(TopBlock == E_BLOCK_RED_MUSHROOM) ||
+						(TopBlock == E_BLOCK_BROWN_MUSHROOM)
+					)
+				)
+			{
+				SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
+			}
 			break;
 		}  // case (snowy biomes)
 		
