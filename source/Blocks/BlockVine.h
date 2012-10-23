@@ -35,20 +35,20 @@ public:
 			return true;
 		}
 		
-		if ((a_World->GetBlock( a_BlockX, a_BlockY + 1, a_BlockZ ) != E_BLOCK_AIR))
+		if (g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY + 1, a_BlockZ )])
 		{
 			AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, true );
-			if (a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ ) == E_BLOCK_AIR)
+			if (g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ )]==false)
 			{
 				AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, false );
-				a_World->FastSetBlock( a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_VINES, 0);
+				a_World->SetBlock( a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_VINES, 0);
 			}
 			return true;
 		}
 
 		AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, true );
 
-		return a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ ) != E_BLOCK_AIR;
+		return g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ)];
 	}
 
 

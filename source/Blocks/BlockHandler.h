@@ -87,7 +87,7 @@ public:
 	
 	/// Indicates this block can be placed on the side of other blocks. Default: true
 	virtual bool CanBePlacedOnSide(void);
-	
+
 	/// Does this block drop if it gets destroyed by an unsuitable situation? Default: true
 	virtual bool DoesDropOnUnsuitable(void);
 	

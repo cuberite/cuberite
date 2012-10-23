@@ -27,7 +27,7 @@ public:
 
 	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		return a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ) != E_BLOCK_AIR;
+		return g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)];
 	}
 	
 	
