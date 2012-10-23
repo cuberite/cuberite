@@ -333,7 +333,7 @@ public:
 		memset(g_BlockPistonBreakable,     0x00, sizeof(g_BlockPistonBreakable));
 		memset(g_BlockIsSnowable,          0xff, sizeof(g_BlockIsSnowable));  // Set all blocks' snowable to true
 		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
-		memset(g_BlockIsSolid,			   0xff, sizeof(g_BlockIsSolid));
+		memset(g_BlockIsSolid,             0xff, sizeof(g_BlockIsSolid));  // Set all blocks to true
 
 		// Emissive blocks
 		g_BlockLightValue[E_BLOCK_FIRE]                 = 15;
@@ -372,6 +372,7 @@ public:
 		g_BlockSpreadLightFalloff[E_BLOCK_VINES]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_WALLSIGN]         = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_WOODEN_DOOR]      = 1;
+
 		// Light in water and lava dissapears faster:
 		g_BlockSpreadLightFalloff[E_BLOCK_LAVA]             = 2;
 		g_BlockSpreadLightFalloff[E_BLOCK_STATIONARY_LAVA]  = 2;
@@ -488,51 +489,71 @@ public:
 		g_BlockIsSnowable[E_BLOCK_WATER]                 = false;
 		g_BlockIsSnowable[E_BLOCK_YELLOW_FLOWER]         = false;
 
-		//Blocks that don´t drop without a special tool
-		g_BlockRequiresSpecialTool[E_BLOCK_DIAMOND_BLOCK]	= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_DIAMOND_ORE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_BLOCK]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_ORE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_IRON_BLOCK]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_IRON_ORE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_REDSTONE_ORE]	= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_REDSTONE_ORE_GLOWING]= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_ORE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_BLOCK]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_EMERALD_ORE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_COAL_ORE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_OBSIDIAN]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_STONE]			= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_END_STONE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_MOSSY_COBBLESTONE]	= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_SANDSTONE]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_STONE_BRICKS]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_COBWEB]			= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_SNOW]			= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK]	= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_NETHERRACK]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_STONE_SLAB]		= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_DOUBLE_STONE_SLAB]	= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_STONE_PRESSURE_PLATE]= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_BRICK]			= true;
-		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE_STAIRS] = true;
-		g_BlockRequiresSpecialTool[E_BLOCK_STONE_BRICK_STAIRS] = true;
-		g_BlockRequiresSpecialTool[E_BLOCK_SANDSTONE_STAIRS] = true;
-		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK_STAIRS] = true;
-		g_BlockRequiresSpecialTool[E_BLOCK_VINES]			= true;
+		// Blocks that don´t drop without a special tool
+		g_BlockRequiresSpecialTool[E_BLOCK_BRICK]                = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COAL_ORE]             = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE]          = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE_STAIRS]   = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_COBWEB]               = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_DIAMOND_BLOCK]        = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_DIAMOND_ORE]          = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_DOUBLE_STONE_SLAB]    = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_EMERALD_ORE]          = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_END_STONE]            = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_BLOCK]           = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_GOLD_ORE]             = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_IRON_BLOCK]           = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_IRON_ORE]             = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_BLOCK]          = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_LAPIS_ORE]            = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_MOSSY_COBBLESTONE]    = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_NETHERRACK]           = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK]         = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_NETHER_BRICK_STAIRS]  = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_OBSIDIAN]             = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_REDSTONE_ORE]         = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_REDSTONE_ORE_GLOWING] = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_SANDSTONE]            = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_SANDSTONE_STAIRS]     = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_SNOW]                 = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE]                = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_BRICKS]         = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_BRICK_STAIRS]   = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_PRESSURE_PLATE] = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_STONE_SLAB]           = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_VINES]                = true;
 
 		// Nonsolid Blocks:
 		g_BlockIsSolid[E_BLOCK_AIR]                   = false;
+		g_BlockIsSolid[E_BLOCK_BED]                   = false;
+		g_BlockIsSolid[E_BLOCK_BIRCH_WOOD_STAIRS]     = false;
+		g_BlockIsSolid[E_BLOCK_BRICK_STAIRS]          = false;
 		g_BlockIsSolid[E_BLOCK_BROWN_MUSHROOM]        = false;
 		g_BlockIsSolid[E_BLOCK_CACTUS]                = false;
+		g_BlockIsSolid[E_BLOCK_CAKE]                  = false;
 		g_BlockIsSolid[E_BLOCK_CHEST]                 = false;
+		g_BlockIsSolid[E_BLOCK_COBBLESTONE_STAIRS]    = false;
 		g_BlockIsSolid[E_BLOCK_CROPS]                 = false;
+		g_BlockIsSolid[E_BLOCK_ENCHANTMENT_TABLE]     = false;
+		g_BlockIsSolid[E_BLOCK_END_PORTAL]            = false;
+		g_BlockIsSolid[E_BLOCK_END_PORTAL_FRAME]      = false;
+		g_BlockIsSolid[E_BLOCK_FARMLAND]              = false;
+		g_BlockIsSolid[E_BLOCK_FENCE]                 = false;
 		g_BlockIsSolid[E_BLOCK_FIRE]                  = false;
 		g_BlockIsSolid[E_BLOCK_GLASS]                 = false;
 		g_BlockIsSolid[E_BLOCK_ICE]                   = false;
+		g_BlockIsSolid[E_BLOCK_IRON_DOOR]             = false;
+		g_BlockIsSolid[E_BLOCK_JUNGLE_WOOD_STAIRS]    = false;
+		g_BlockIsSolid[E_BLOCK_LADDER]                = false;
 		g_BlockIsSolid[E_BLOCK_LAVA]                  = false;
+		g_BlockIsSolid[E_BLOCK_LEAVES]                = false;
+		g_BlockIsSolid[E_BLOCK_LEVER]                 = false;
 		g_BlockIsSolid[E_BLOCK_LOCKED_CHEST]          = false;
+		g_BlockIsSolid[E_BLOCK_NETHER_BRICK_STAIRS]   = false;
+		g_BlockIsSolid[E_BLOCK_NETHER_PORTAL]         = false;
+		g_BlockIsSolid[E_BLOCK_PISTON]                = false;
+		g_BlockIsSolid[E_BLOCK_PISTON_EXTENSION]      = false;
+		g_BlockIsSolid[E_BLOCK_RAIL]                  = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_OFF] = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_REPEATER_ON]  = false;
 		g_BlockIsSolid[E_BLOCK_REDSTONE_TORCH_OFF]    = false;
@@ -541,52 +562,32 @@ public:
 		g_BlockIsSolid[E_BLOCK_RED_MUSHROOM]          = false;
 		g_BlockIsSolid[E_BLOCK_RED_ROSE]              = false;
 		g_BlockIsSolid[E_BLOCK_REEDS]                 = false;
+		g_BlockIsSolid[E_BLOCK_SANDSTONE_STAIRS]      = false;
 		g_BlockIsSolid[E_BLOCK_SAPLING]               = false;
 		g_BlockIsSolid[E_BLOCK_SIGN_POST]             = false;
 		g_BlockIsSolid[E_BLOCK_SNOW]                  = false;
+		g_BlockIsSolid[E_BLOCK_SPRUCE_WOOD_STAIRS]    = false;
 		g_BlockIsSolid[E_BLOCK_STATIONARY_LAVA]       = false;
 		g_BlockIsSolid[E_BLOCK_STATIONARY_WATER]      = false;
+		g_BlockIsSolid[E_BLOCK_STONE_BRICK_STAIRS]    = false;
+		g_BlockIsSolid[E_BLOCK_STONE_BUTTON]          = false;
+		g_BlockIsSolid[E_BLOCK_STONE_PRESSURE_PLATE]  = false;
+		g_BlockIsSolid[E_BLOCK_STONE_SLAB]            = false;
 		g_BlockIsSolid[E_BLOCK_TALL_GRASS]            = false;
 		g_BlockIsSolid[E_BLOCK_TNT]                   = false;
 		g_BlockIsSolid[E_BLOCK_TORCH]                 = false;
+		g_BlockIsSolid[E_BLOCK_TRAPDOOR]              = false;
 		g_BlockIsSolid[E_BLOCK_VINES]                 = false;
 		g_BlockIsSolid[E_BLOCK_WALLSIGN]              = false;
 		g_BlockIsSolid[E_BLOCK_WATER]                 = false;
-		g_BlockIsSolid[E_BLOCK_YELLOW_FLOWER]         = false;
-		g_BlockIsSolid[E_BLOCK_LEAVES]				  = false;
-		g_BlockIsSolid[E_BLOCK_PISTON]				  = false;
-		g_BlockIsSolid[E_BLOCK_PISTON_EXTENSION]	  = false;
-		g_BlockIsSolid[E_BLOCK_FARMLAND]			  = false;
-		g_BlockIsSolid[E_BLOCK_STONE_SLAB]			  = false;
-		g_BlockIsSolid[E_BLOCK_WOODEN_SLAB]			  = false;
-		g_BlockIsSolid[E_BLOCK_COBBLESTONE_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_BRICK_STAIRS]	      = false;
-		g_BlockIsSolid[E_BLOCK_STONE_BRICK_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_NETHER_BRICK_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_SANDSTONE_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_SPRUCE_WOOD_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_BIRCH_WOOD_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_JUNGLE_WOOD_STAIRS]	  = false;
-		g_BlockIsSolid[E_BLOCK_LADDER]				  = false;
-		g_BlockIsSolid[E_BLOCK_FENCE]				  = false;
-		g_BlockIsSolid[E_BLOCK_CAKE]				  = false;
-		g_BlockIsSolid[E_BLOCK_BED]					  = false;
-		g_BlockIsSolid[E_BLOCK_WOODEN_DOOR]			  = false;
-		g_BlockIsSolid[E_BLOCK_IRON_DOOR]			  = false;
-		g_BlockIsSolid[E_BLOCK_TRAPDOOR]			  = false;
-		g_BlockIsSolid[E_BLOCK_RAIL]				  = false;
-		g_BlockIsSolid[E_BLOCK_LEVER]				  = false;
-		g_BlockIsSolid[E_BLOCK_STONE_PRESSURE_PLATE]  = false;
+		g_BlockIsSolid[E_BLOCK_WOODEN_BUTTON]         = false;
+		g_BlockIsSolid[E_BLOCK_WOODEN_DOOR]           = false;
 		g_BlockIsSolid[E_BLOCK_WOODEN_PRESSURE_PLATE] = false;
-		g_BlockIsSolid[E_BLOCK_STONE_BUTTON]		  = false;
-		g_BlockIsSolid[E_BLOCK_WOODEN_BUTTON]		  = false;
-		g_BlockIsSolid[E_BLOCK_ENCHANTMENT_TABLE]	  = false;
-		g_BlockIsSolid[E_BLOCK_NETHER_PORTAL]		  = false;
-		g_BlockIsSolid[E_BLOCK_END_PORTAL]			  = false;
-		g_BlockIsSolid[E_BLOCK_END_PORTAL_FRAME]	  = false;
-	}	
+		g_BlockIsSolid[E_BLOCK_WOODEN_SLAB]           = false;
+		g_BlockIsSolid[E_BLOCK_YELLOW_FLOWER]         = false;
+	}
 } BlockPropertiesInitializer;
-		
+
 
 
 
