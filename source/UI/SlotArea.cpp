@@ -138,11 +138,12 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 		}
 	}
 	
+	SetSlot(a_SlotNum, a_Player, Slot);
 	if (bAsync)
 	{
 		m_ParentWindow.BroadcastWholeWindow();
 	}
-	SetSlot(a_SlotNum, a_Player, Slot);
+	
 }
 
 

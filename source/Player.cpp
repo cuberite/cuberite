@@ -443,6 +443,11 @@ void cPlayer::CloseWindow(char a_WindowType)
 	if (m_CurrentWindow == m_InventoryWindow)
 	{
 		// The inventory window must not be closed and must not be even sent a close packet
+		if (IsDraggingItem()) // But we need to check if player is holding anything
+		{
+			LOGD("Player holds item in inventory window! Dropping it...");
+			TossItem(true, GetDraggingItem().m_ItemCount);
+		}
 		return;
 	}
 	
@@ -791,10 +796,12 @@ void cPlayer::TossItem(
 			cItem & Item = GetDraggingItem();
 			if (!Item.IsEmpty())
 			{
+				char OriginalItemAmount = Item.m_ItemCount;
+				Item.m_ItemCount = MIN(OriginalItemAmount, a_Amount);
 				Drops.push_back(Item);
-				if (Item.m_ItemCount > a_Amount)
+				if (OriginalItemAmount > a_Amount)
 				{
-					Item.m_ItemCount -= (char)a_Amount;
+					Item.m_ItemCount = OriginalItemAmount - (char)a_Amount;
 				}
 				else
 				{

@@ -256,12 +256,16 @@ bool cPickup::CollectedBy( cPlayer* a_Dest )
 		return false;
 	}
 
-	if (a_Dest->GetInventory().AddItem(*m_Item))
+	if (a_Dest->GetInventory().AddItemAnyAmount(*m_Item))
 	{
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
-
 		m_bCollected = true;
 		m_Timer = 0;
+		if( m_Item->m_ItemCount != 0 ) {
+			cItems Pickup;
+			Pickup.push_back(cItem(*m_Item));
+			m_World->SpawnItemPickups(Pickup, m_Pos.x, m_Pos.y, m_Pos.z);
+		}
 		return true;
 	}
 

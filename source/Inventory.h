@@ -31,6 +31,7 @@ public:
 	int GetSlotCountForType( int a_Type );
 
 	bool AddItem( cItem & a_Item );						//tolua_export
+	bool AddItemAnyAmount( cItem & a_Item );			//tolua_export
 	bool RemoveItem( cItem & a_Item );					//tolua_export
 
 	void SaveToJson(Json::Value & a_Value);

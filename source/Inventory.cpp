@@ -89,6 +89,36 @@ bool cInventory::AddItem( cItem & a_Item )
 
 
 
+bool cInventory::AddItemAnyAmount( cItem & a_Item )
+{
+	bool ChangedSlots[c_NumSlots];
+	memset( ChangedSlots, false, c_NumSlots * sizeof( bool ) );
+
+	char StartCount = a_Item.m_ItemCount;
+	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_HotOffset,  c_HotSlots,  ChangedSlots, 0 );
+	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_MainOffset, c_MainSlots, ChangedSlots, 0 );
+	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_HotOffset,  c_HotSlots,  ChangedSlots, 2 );
+	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_MainOffset, c_MainSlots, ChangedSlots, 2 );
+	
+	if (a_Item.m_ItemCount == StartCount)
+		return false;
+
+	for (unsigned int i = 0; i < c_NumSlots; i++)
+	{
+		if (ChangedSlots[i])
+		{
+			LOGD("cInventory::AddItemAnyAmount(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemID, m_Slots[i].m_ItemCount);
+			SendSlot(i);
+		}
+	}
+
+	return true;
+}
+
+
+
+
+
 // TODO: Right now if you dont have enough items, the items you did have are removed, and the function returns false anyway
 bool cInventory::RemoveItem( cItem & a_Item )
 {
@@ -347,11 +377,12 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 	// Fill already present stacks
 	if( a_Mode < 2 )
 	{
+		int MaxStackSize = cItemHandler::GetItemHandler(a_Item.m_ItemType)->GetMaxStackSize();
 		for(int i = 0; i < a_Size; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemID == a_Item.m_ItemID && m_Slots[i + a_Offset].m_ItemCount < 64 && m_Slots[i + a_Offset].m_ItemHealth == a_Item.m_ItemHealth )
+			if( m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemHealth == a_Item.m_ItemHealth )
 			{
-				int NumFree = 64 - m_Slots[i + a_Offset].m_ItemCount;
+				int NumFree = MaxStackSize - m_Slots[i + a_Offset].m_ItemCount;
 				if( NumFree >= a_Item.m_ItemCount )
 				{
 
@@ -377,7 +408,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 		// If we got more left, find first empty slot
 		for(int i = 0; i < a_Size && a_Item.m_ItemCount > 0; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemID == -1 )
+			if( m_Slots[i + a_Offset].m_ItemType == -1 )
 			{
 				m_Slots[i + a_Offset] = a_Item;
 				a_Item.m_ItemCount = 0;
