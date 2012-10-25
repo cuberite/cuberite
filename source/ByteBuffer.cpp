@@ -39,7 +39,7 @@ cByteBuffer::cByteBuffer(int a_BufferSize) :
 
 cByteBuffer::~cByteBuffer()
 {
-	delete m_Buffer;
+	delete[] m_Buffer;
 }
 
 

@@ -217,12 +217,13 @@ cWorld::~cWorld()
 
 
 
-cWorld::cWorld( const AString & a_WorldName )
-	: m_SpawnMonsterTime( 0.f )
-	, m_RSList ( 0 )
-	, m_Weather ( eWeather_Sunny )
+cWorld::cWorld(const AString & a_WorldName) :
+	m_SpawnMonsterTime(0.f),
+	m_RSList(0),
+	m_Weather(eWeather_Sunny),
+	m_WeatherInterval(24000)  // Guaranteed 1 day of sunshine at server start :)
 {
-	LOG("cWorld::cWorld(%s)", a_WorldName.c_str());
+	LOGD("cWorld::cWorld(%s)", a_WorldName.c_str());
 	m_WorldName = a_WorldName;
 	m_IniFileName = m_WorldName + "/world.ini";
 
@@ -265,7 +266,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	m_bAnimals = true;
 	m_SpawnMonsterRate = 10;
 	cIniFile IniFile2("settings.ini");
-	if( IniFile2.ReadFile() )
+	if (IniFile2.ReadFile())
 	{
 		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true );
 		m_SpawnMonsterRate = (float)IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10);
@@ -303,7 +304,7 @@ cWorld::cWorld( const AString & a_WorldName )
 	// Save any changes that the defaults may have done to the ini file:
 	if (!IniFile.WriteFile())
 	{
-		LOG("WARNING: Could not write to %s", m_IniFileName.c_str());
+		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
 }
 

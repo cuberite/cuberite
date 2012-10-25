@@ -55,6 +55,7 @@ cChunkSender::~cChunkSender()
 
 bool cChunkSender::Start(cWorld * a_World)
 {
+	m_ShouldTerminate = false;
 	m_World = a_World;
 	return super::Start();
 }
