@@ -64,7 +64,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib Psapi.lib"
-				OutputFile="$(ProjectDir)\..\MCServer\$(ProjectName).exe"
+				OutputFile="$(ProjectDir)\..\MCServer\$(ProjectName)_debug.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
