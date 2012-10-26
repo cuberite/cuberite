@@ -972,7 +972,7 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 
 
 
-void cChunkMap::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cChunkMap::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
@@ -982,14 +982,16 @@ void cChunkMap::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCK
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		Chunk->GetBlockTypeMeta(X, Y, Z, a_BlockType, a_BlockMeta);
+		return true;
 	}
+	return false;
 }
 
 
 
 
 
-void cChunkMap::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
+bool cChunkMap::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative( X, Y, Z, ChunkX, ChunkZ );
@@ -999,7 +1001,9 @@ void cChunkMap::GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		Chunk->GetBlockInfo(X, Y, Z, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
+		return true;
 	}
+	return false;
 }
 
 

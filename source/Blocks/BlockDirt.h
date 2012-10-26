@@ -51,15 +51,16 @@ public:
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
-			a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, DestBlock, DestMeta);
-			if(DestBlock != E_BLOCK_DIRT)
+			bool IsValid = a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, DestBlock, DestMeta);
+			if (!IsValid || (DestBlock != E_BLOCK_DIRT))
 			{
 				continue;
 			}
 
 			BLOCKTYPE AboveDest;
 			NIBBLETYPE AboveMeta;
-			a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, AboveDest, AboveMeta);
+			IsValid = a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY + 1, a_BlockZ + OfsZ, AboveDest, AboveMeta);
+			ASSERT(IsValid);  // WTF - how did we get the DestBlock if AboveBlock is not valid?
 			if (g_BlockOneHitDig[AboveDest] || g_BlockTransparent[AboveDest])
 			{
 				a_World->FastSetBlock(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, E_BLOCK_GRASS, 0);
