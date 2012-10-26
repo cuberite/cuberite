@@ -28,8 +28,8 @@ private:
 	#ifdef _WIN32
 		CRITICAL_SECTION m_CriticalSection;
 	#else  // _WIN32
-		void* m_CriticalSectionPtr ALIGN_8; // Pointer to a CRITICAL_SECTION object
-		void* m_Attributes ALIGN_8;
+		pthread_mutex_t     m_CriticalSection;
+		pthread_mutexattr_t m_Attributes;
 	#endif  // else _WIN32
 } ALIGN_8;
 

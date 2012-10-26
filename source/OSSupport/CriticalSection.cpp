@@ -11,19 +11,17 @@
 
 cCriticalSection::cCriticalSection()
 {
-#ifdef _WIN32
-	InitializeCriticalSection( &m_CriticalSection );
-#else
-	m_Attributes = new pthread_mutexattr_t;
-	pthread_mutexattr_init((pthread_mutexattr_t*)m_Attributes);
-	pthread_mutexattr_settype((pthread_mutexattr_t*)m_Attributes, PTHREAD_MUTEX_RECURSIVE);
+	#ifdef _WIN32
+		InitializeCriticalSection(&m_CriticalSection);
+	#else
+		pthread_mutexattr_init(&m_Attributes);
+		pthread_mutexattr_settype(&m_Attributes, PTHREAD_MUTEX_RECURSIVE);
 
-    m_CriticalSectionPtr = new pthread_mutex_t;
-    if( pthread_mutex_init( (pthread_mutex_t*)m_CriticalSectionPtr, (pthread_mutexattr_t*)m_Attributes ) != 0 )
-    {
-        LOG("ERROR: Could not initialize Critical Section!");
-    }
-#endif
+		if (pthread_mutex_init(&m_CriticalSection, &m_Attributes) != 0)
+		{
+			LOGERROR("Could not initialize Critical Section!");
+		}
+	#endif
 }
 
 
@@ -32,17 +30,15 @@ cCriticalSection::cCriticalSection()
 
 cCriticalSection::~cCriticalSection()
 {
-#ifdef _WIN32
-	DeleteCriticalSection( &m_CriticalSection );
-#else
-    if( pthread_mutex_destroy( (pthread_mutex_t*)m_CriticalSectionPtr ) != 0 )
-    {
-        LOG("ERROR: Could not destroy Critical Section!");
-    }
-    delete (pthread_mutex_t*)m_CriticalSectionPtr;
-	pthread_mutexattr_destroy( (pthread_mutexattr_t*)m_Attributes );
-	delete (pthread_mutexattr_t*)m_Attributes;
-#endif
+	#ifdef _WIN32
+		DeleteCriticalSection(&m_CriticalSection);
+	#else
+		if (pthread_mutex_destroy(&m_CriticalSection) != 0)
+		{
+			LOGWARNING("Could not destroy Critical Section!");
+		}
+		pthread_mutexattr_destroy(&m_Attributes);
+	#endif
 }
 
 
@@ -52,9 +48,9 @@ cCriticalSection::~cCriticalSection()
 void cCriticalSection::Lock()
 {
 	#ifdef _WIN32
-		EnterCriticalSection( &m_CriticalSection );
+		EnterCriticalSection(&m_CriticalSection);
 	#else
-		pthread_mutex_lock( (pthread_mutex_t*)m_CriticalSectionPtr );
+		pthread_mutex_lock(&m_CriticalSection);
 	#endif
 	
 	#ifdef _DEBUG
@@ -74,9 +70,9 @@ void cCriticalSection::Unlock()
 	#endif  // _DEBUG
 	
 	#ifdef _WIN32
-		LeaveCriticalSection( &m_CriticalSection );
+		LeaveCriticalSection(&m_CriticalSection);
 	#else
-		pthread_mutex_unlock( (pthread_mutex_t*)m_CriticalSectionPtr );
+		pthread_mutex_unlock(&m_CriticalSection);
 	#endif
 }
 
@@ -96,7 +92,7 @@ bool cCriticalSection::IsLocked(void)
 
 bool cCriticalSection::IsLockedByCurrentThread(void)
 {
-	return m_IsLocked && (m_OwningThreadID == cIsThread::GetCurrentID());
+	return (m_IsLocked && (m_OwningThreadID == cIsThread::GetCurrentID()));
 }
 #endif  // _DEBUG
 
