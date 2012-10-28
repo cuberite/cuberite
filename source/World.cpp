@@ -23,21 +23,26 @@
 #include "Simulator/RedstoneSimulator.h"
 
 // Mobs:
+#include "Mobs/Blaze.h"
+#include "Mobs/Cavespider.h"
 #include "Mobs/Chicken.h"
-#include "Mobs/Spider.h"
 #include "Mobs/Cow.h"
-#include "Mobs/Squid.h"
-#include "Mobs/Wolf.h"
-#include "Mobs/Slime.h"
-#include "Mobs/Skeleton.h"
-#include "Mobs/Silverfish.h"
+#include "Mobs/Creeper.h"
+#include "Mobs/Enderman.h"
+#include "Mobs/Ghast.h"
+#include "Mobs/Magmacube.h"
+#include "Mobs/Mooshroom.h"
+#include "Mobs/Ocelot.h"
 #include "Mobs/Pig.h"
 #include "Mobs/Sheep.h"
+#include "Mobs/Silverfish.h"
+#include "Mobs/Skeleton.h"
+#include "Mobs/Slime.h"
+#include "Mobs/Spider.h"
+#include "Mobs/Squid.h"
+#include "Mobs/Villager.h"
+#include "Mobs/Wolf.h"
 #include "Mobs/Zombie.h"
-#include "Mobs/Enderman.h"
-#include "Mobs/Creeper.h"
-#include "Mobs/Cavespider.h"
-#include "Mobs/Ghast.h"
 #include "Mobs/Zombiepigman.h"
 
 #include "OSSupport/MakeDir.h"
@@ -2179,6 +2184,50 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 		IsBlockWater(GetBlock(a_BlockX,     a_BlockY, a_BlockZ - 1)) ||
 		IsBlockWater(GetBlock(a_BlockX,     a_BlockY, a_BlockZ + 1))
 	);
+}
+
+
+
+
+
+int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType)
+{
+	cMonster * Monster = NULL;
+
+	switch (a_EntityType)
+	{
+		case E_ENTITY_TYPE_BLAZE:         Monster = new cBlaze();        break;
+		case E_ENTITY_TYPE_CAVE_SPIDER:   Monster = new cCavespider();   break;
+		case E_ENTITY_TYPE_CHICKEN:       Monster = new cChicken();      break;
+		case E_ENTITY_TYPE_COW:           Monster = new cCow();          break;
+		case E_ENTITY_TYPE_CREEPER:       Monster = new cCreeper();      break;
+		case E_ENTITY_TYPE_ENDERMAN:      Monster = new cEnderman();     break;
+		case E_ENTITY_TYPE_GHAST:         Monster = new cGhast();        break;
+		case E_ENTITY_TYPE_MAGMA_CUBE:    Monster = new cMagmacube();    break;
+		case E_ENTITY_TYPE_MOOSHROOM:     Monster = new cMooshroom();    break;
+		case E_ENTITY_TYPE_OCELOT:        Monster = new cOcelot();       break;
+		case E_ENTITY_TYPE_PIG:           Monster = new cPig();          break;
+		case E_ENTITY_TYPE_SHEEP:         Monster = new cSheep();        break;
+		case E_ENTITY_TYPE_SILVERFISH:    Monster = new cSilverfish();   break;
+		case E_ENTITY_TYPE_SKELETON:      Monster = new cSkeleton();     break;
+		case E_ENTITY_TYPE_SLIME:         Monster = new cSlime();        break;
+		case E_ENTITY_TYPE_SPIDER:        Monster = new cSpider();       break;
+		case E_ENTITY_TYPE_SQUID:         Monster = new cSquid();        break;
+		case E_ENTITY_TYPE_VILLAGER:      Monster = new cVillager();     break;
+		case E_ENTITY_TYPE_WOLF:          Monster = new cWolf();         break;
+		case E_ENTITY_TYPE_ZOMBIE:        Monster = new cZombie();       break;
+		case E_ENTITY_TYPE_ZOMBIE_PIGMAN: Monster = new cZombiepigman(); break;
+		
+		default:
+		{
+			LOGWARNING(__FUNCTION__ ": Unhandled entity type: %d. Not spawning.", a_EntityType);
+			return -1;
+		}
+	}
+	Monster->Initialize(this);
+	Monster->TeleportTo(a_PosX, a_PosY, a_PosZ);
+	BroadcastSpawn(*Monster);
+	return Monster->GetUniqueID();
 }
 
 

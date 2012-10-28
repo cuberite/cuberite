@@ -408,6 +408,9 @@ public:
 
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
+	/// Spawns a mob of the specified entity type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
+	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType);  // tolua_export
+	
 private:
 
 	friend class cRoot;
