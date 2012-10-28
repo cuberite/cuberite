@@ -69,9 +69,9 @@ else
 # debug build - fully traceable by gdb in C++ code, slowest
 # Since C code is used only for supporting libraries (zlib, lua), it is still O3-optimized
 ################
-CC_OPTIONS = -s -ggdb -D_DEBUG -O3
-CXX_OPTIONS = -s -ggdb -D_DEBUG
-LNK_OPTIONS = -lstdc++ -pthread -ggdb
+CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
+CXX_OPTIONS = -s -ggdb -g -D_DEBUG
+LNK_OPTIONS = -lstdc++ -pthread -g -ggdb
 BUILDDIR = build/debug/
 endif
 endif
