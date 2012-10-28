@@ -99,7 +99,10 @@ protected:
 	/// Saves the chunk into NBT data using a_Writer; returns true on success
 	bool SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer);
 	
-	/// Loads the chunk's biome map; returns a_BiomeMap if biomes present and valid, NULL otherwise
+	/// Loads the chunk's biome map from vanilla-format; returns a_BiomeMap if biomes present and valid, NULL otherwise
+	cChunkDef::BiomeMap * LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
+	
+	/// Loads the chunk's biome map from MCS format; returns a_BiomeMap if biomes present and valid, NULL otherwise
 	cChunkDef::BiomeMap * LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1)

@@ -43,7 +43,13 @@ class cNBTChunkSerializer :
 	public cChunkDataSeparateCollector
 {
 public:
+	cChunkDef::BiomeMap m_Biomes;
+	unsigned char m_VanillaBiomes[cChunkDef::Width * cChunkDef::Width];
+	bool m_BiomesAreValid;
+
+
 	cNBTChunkSerializer(cFastNBTWriter & a_Writer) :
+		m_BiomesAreValid(false),
 		m_Writer(a_Writer),
 		m_IsTagOpen(false),
 		m_HasHadEntity(false),
@@ -64,7 +70,7 @@ public:
 	
 	
 	bool IsLightValid(void) const {return m_IsLightValid; }
-	
+
 protected:
 	
 	/* From cChunkDataSeparateCollector we inherit:
@@ -74,16 +80,14 @@ protected:
 	- m_BlockSkyLight[]
 	*/
 	
-	// TODO: Biomes
-	
 	cFastNBTWriter & m_Writer;
 	
 	bool m_IsTagOpen;  // True if a tag has been opened in the callbacks and not yet closed.
 	bool m_HasHadEntity;  // True if any Entity has already been received and processed
 	bool m_HasHadBlockEntity;  // True if any BlockEntity has already been received and processed
 	bool m_IsLightValid;  // True if the chunk lighting is valid
-	
-	
+
+
 	void AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID)
 	{
 		m_Writer.AddInt   ("x",  a_Entity->GetPosX());
@@ -169,6 +173,27 @@ protected:
 	{
 		m_IsLightValid = a_IsLightValid;
 		return a_IsLightValid;  // We want lighting only if it's valid, otherwise don't bother
+	}
+	
+	
+	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override
+	{
+		memcpy(m_Biomes, a_BiomeMap, sizeof(m_Biomes));
+		for (int i = 0; i < ARRAYCOUNT(m_Biomes); i++)
+		{
+			if ((*a_BiomeMap)[i] < 255)
+			{
+				// Normal MC biome, copy as-is:
+				m_VanillaBiomes[i] = (unsigned char)((*a_BiomeMap)[i]);
+			}
+			else
+			{
+				// TODO: MCS-specific biome, need to map to some basic MC biome:
+				ASSERT(!"Unimplemented MCS-specific biome");
+				return;
+			}
+		}  // for i - m_BiomeMap[]
+		m_BiomesAreValid = true;
 	}
 	
 	
@@ -475,9 +500,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		CopyNBTData(a_NBT, Child, "BlockLight", (char *)&(BlockLight[y * 2048]), 2048);
 	}  // for itr - LevelSections[]
 	
-	// Load the biomes from NBT, if present and valid:
+	// Load the biomes from NBT, if present and valid. First try MCS-style, then Vanilla-style:
 	cChunkDef::BiomeMap BiomeMap;
-	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
+	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "MCSBiomes"));
+	if (Biomes == NULL)
+	{
+		// MCS-style biomes not available, load vanilla-style:
+		Biomes = LoadVanillaBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
+	}
 	
 	// Load the entities from NBT:
 	cEntityList      Entities;
@@ -562,9 +592,9 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	}
 	Serializer.Finish();  // Close NBT tags
 	
-	// TODO: Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
-	// Level->Add(new cNBTByteArray(Level, "Biomes", AString(Serializer.m_Biomes, sizeof(Serializer.m_Biomes));
-	// Level->Add(new cNBTByteArray(Level, "MCSBiomes", AString(Serializer.m_Biomes, sizeof(Serializer.m_Biomes));
+	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
+	a_Writer.AddByteArray("Biomes",    (const char *)(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
+	a_Writer.AddIntArray ("MCSBiomes", (const int *)(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
 	
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
@@ -601,7 +631,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 
 
 
-cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
 	{
@@ -612,9 +642,38 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		// The biomes stored don't match in size
 		return NULL;
 	}
-	memcpy(a_BiomeMap, a_NBT.GetData(a_TagIdx), sizeof(*a_BiomeMap));
+	const unsigned char * VanillaBiomeData = (const unsigned char *)(a_NBT.GetData(a_TagIdx));
 	for (int i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
 	{
+		if ((VanillaBiomeData)[i] == 0xff)
+		{
+			// Unassigned biomes
+			return NULL;
+		}
+		(*a_BiomeMap)[i] = (EMCSBiome)(VanillaBiomeData[i]);
+	}
+	return a_BiomeMap;
+}
+
+
+
+
+
+cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_IntArray))
+	{
+		return NULL;
+	}
+	if (a_NBT.GetDataLength(a_TagIdx) != sizeof(*a_BiomeMap))
+	{
+		// The biomes stored don't match in size
+		return NULL;
+	}
+	const int * BiomeData = (const int *)(a_NBT.GetData(a_TagIdx));
+	for (int i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
+	{
+		(*a_BiomeMap)[i] = (EMCSBiome)(ntohl(BiomeData[i]));
 		if ((*a_BiomeMap)[i] == 0xff)
 		{
 			// Unassigned biomes

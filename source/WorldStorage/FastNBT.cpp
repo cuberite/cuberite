@@ -502,7 +502,7 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, si
 {
 	TagCommon(a_Name, TAG_IntArray);
 	Int32 len = htonl(a_NumElements);
-	m_Result.append((const char *)&len, 2);
+	m_Result.append((const char *)&len, 4);
 	int * Elements = (int *)(m_Result.data() + m_Result.size());
 	m_Result.append(a_NumElements * 4, (char)0);
 	for (size_t i = 0; i < a_NumElements; i++)
