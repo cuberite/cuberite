@@ -2220,7 +2220,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 		
 		default:
 		{
-			LOGWARNING(__FUNCTION__ ": Unhandled entity type: %d. Not spawning.", a_EntityType);
+			LOGWARNING("cWorld::SpawnMob(): Unhandled entity type: %d. Not spawning.", a_EntityType);
 			return -1;
 		}
 	}
