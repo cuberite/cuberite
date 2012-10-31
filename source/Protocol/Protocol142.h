@@ -10,8 +10,6 @@
 #pragma once
 
 #include "Protocol132.h"
-#include "../../CryptoPP/modes.h"
-#include "../../CryptoPP/aes.h"
 
 
 
@@ -27,6 +25,7 @@ public:
 	virtual ~cProtocol142();
 
 	// Sending commands (alphabetically sorted):
+	virtual void SendPickupSpawn        (const cPickup & a_Pickup) override;
 	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendTimeUpdate         (Int64 a_WorldTime) override;
 

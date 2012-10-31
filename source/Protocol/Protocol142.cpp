@@ -42,6 +42,7 @@ typedef unsigned char Byte;
 enum
 {
 	PACKET_UPDATE_TIME           = 0x04,
+	PACKET_PICKUP_SPAWN          = 0x15,
 	PACKET_SOUND_PARTICLE_EFFECT = 0x3d
 } ;
 
@@ -79,6 +80,26 @@ int cProtocol142::ParseLogin(void)
 {
 	// This packet seems to be back in 1.4.2, no documentation yet.
 	return PARSE_OK;
+}
+
+
+
+
+
+void cProtocol142::SendPickupSpawn(const cPickup & a_Pickup)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte   (PACKET_PICKUP_SPAWN);
+	WriteInt    (a_Pickup.GetUniqueID());
+	WriteShort  (a_Pickup.GetItem()->m_ItemType);
+	WriteByte   (a_Pickup.GetItem()->m_ItemCount);
+	WriteShort  (a_Pickup.GetItem()->m_ItemDamage);
+	WriteShort  (-1); //TODO: Implement item metadata
+	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
+	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
+	WriteByte   ((char)(a_Pickup.GetSpeed().z * 8));
+	Flush();
 }
 
 
