@@ -30,6 +30,9 @@ typedef cItemCallback<cWorld>  cWorldListCallback;
 class cRoot	//tolua_export
 {			//tolua_export
 public:
+	/// The version of the protocol that is primary for the server (reported in the server list). All versions are still supported.
+	int m_PrimaryServerVersion;  // tolua_export
+	
 	static cRoot* Get() { return s_Root; }							//tolua_export
 
 	cRoot(void);

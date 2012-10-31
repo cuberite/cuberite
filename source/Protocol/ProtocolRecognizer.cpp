@@ -562,7 +562,7 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	{
 		return false;
 	}
-	if (ch == 39)
+	if (ch == PROTO_VERSION_1_3_2)
 	{
 		m_Protocol = new cProtocol132(m_Client);
 		return true;
@@ -578,14 +578,58 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 void cProtocolRecognizer::HandleServerPing(void)
 {
 	AString Reply;
-	Printf(Reply, "%s%s%i%s%i", 
-		cRoot::Get()->GetDefaultWorld()->GetDescription().c_str(), 
-		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetDefaultWorld()->GetNumPlayers(),
-		cChatColor::Delimiter.c_str(), 
-		cRoot::Get()->GetDefaultWorld()->GetMaxPlayers()
-	);
-	m_Client->Kick(Reply.c_str());
+	switch (cRoot::Get()->m_PrimaryServerVersion)
+	{
+		case PROTO_VERSION_1_2_5:
+		case PROTO_VERSION_1_3_2:
+		{
+			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
+			Printf(Reply, "%s%s%i%s%i", 
+				cRoot::Get()->GetDefaultWorld()->GetDescription().c_str(), 
+				cChatColor::Delimiter.c_str(), 
+				cRoot::Get()->GetDefaultWorld()->GetNumPlayers(),
+				cChatColor::Delimiter.c_str(), 
+				cRoot::Get()->GetDefaultWorld()->GetMaxPlayers()
+			);
+			break;
+		}
+		
+		case PROTO_VERSION_1_4_2:
+		{
+			// The server list ping now has 1 more byte of "magic". Mojang just loves to complicate stuff.
+			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3101#Server_List_Ping_.280xFE.29
+			// _X 2012_10_31: I know that this needn't eat the byte, since it still may be in transit.
+			//    Who cares? We're disconnecting anyway.
+			if (m_Buffer.CanReadBytes(1))
+			{
+				byte val;
+				m_Buffer.ReadByte(val);
+				ASSERT(val == 0x01);
+			}
+			
+			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
+			AString NumPlayers;
+			Printf(NumPlayers, "%d", cRoot::Get()->GetDefaultWorld()->GetNumPlayers());
+			AString MaxPlayers;
+			Printf(MaxPlayers, "%d", cRoot::Get()->GetDefaultWorld()->GetMaxPlayers());
+
+			// Cannot use Printf() because of in-string NUL bytes.
+			Reply = cChatColor::Delimiter;
+			Reply.append("1");
+			Reply.push_back(0);
+			Reply.append("47");
+			Reply.push_back(0);
+			Reply.append("1.4.2");
+			Reply.push_back(0);
+			Reply.append(cRoot::Get()->GetDefaultWorld()->GetDescription());
+			Reply.push_back(0);
+			Reply.append(NumPlayers);
+			Reply.push_back(0);
+			Reply.append(MaxPlayers);
+			break;
+		}
+	}  // switch (m_PrimaryServerVersion)
+	m_Client->Kick(Reply);
 }
 
 

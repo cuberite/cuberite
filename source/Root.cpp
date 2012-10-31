@@ -14,6 +14,7 @@
 #include "Blocks/BlockHandler.h"
 #include "Items/ItemHandler.h"
 #include "Chunk.h"
+#include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 
 #ifdef USE_SQUIRREL
 	#include "squirrelbindings/SquirrelFunctions.h"
@@ -98,8 +99,10 @@ void cRoot::Start()
 		LOG("Starting server...");
 		cIniFile IniFile("settings.ini");
 		IniFile.ReadFile();
+		m_PrimaryServerVersion = IniFile.GetValueSetI("Server", "PrimaryServerVersion", cProtocolRecognizer::PROTO_VERSION_1_4_2);
+
 		int Port = IniFile.GetValueSetI("Server", "Port", 25565 );
-		if(!m_Server->InitServer( Port ))
+		if (!m_Server->InitServer(Port))
 		{
 			LOG("Failed to start server, shutting down.");
 			return;

@@ -31,6 +31,13 @@ class cProtocolRecognizer :
 	typedef cProtocol super;
 	
 public:
+	enum
+	{
+		PROTO_VERSION_1_2_5 = 29,
+		PROTO_VERSION_1_3_2 = 39,
+		PROTO_VERSION_1_4_2 = 47,
+	} ;
+
 	cProtocolRecognizer(cClientHandle * a_Client);
 	virtual ~cProtocolRecognizer();
 	
