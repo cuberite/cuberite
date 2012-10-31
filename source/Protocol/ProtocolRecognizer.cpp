@@ -9,6 +9,7 @@
 #include "ProtocolRecognizer.h"
 #include "Protocol125.h"
 #include "Protocol132.h"
+#include "Protocol142.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../World.h"
@@ -565,6 +566,11 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	if (ch == PROTO_VERSION_1_3_2)
 	{
 		m_Protocol = new cProtocol132(m_Client);
+		return true;
+	}
+	if (ch == PROTO_VERSION_1_4_2)
+	{
+		m_Protocol = new cProtocol142(m_Client);
 		return true;
 	}
 	m_Protocol = new cProtocol125(m_Client);

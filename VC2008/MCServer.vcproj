@@ -2067,6 +2067,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Protocol\Protocol142.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol\Protocol142.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Protocol\ProtocolRecognizer.cpp"
 					>
 				</File>
