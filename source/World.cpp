@@ -23,6 +23,7 @@
 #include "Simulator/RedstoneSimulator.h"
 
 // Mobs:
+#include "Mobs/Bat.h"
 #include "Mobs/Blaze.h"
 #include "Mobs/Cavespider.h"
 #include "Mobs/Chicken.h"
@@ -41,6 +42,7 @@
 #include "Mobs/Spider.h"
 #include "Mobs/Squid.h"
 #include "Mobs/Villager.h"
+#include "Mobs/Witch.h"
 #include "Mobs/Wolf.h"
 #include "Mobs/Zombie.h"
 #include "Mobs/Zombiepigman.h"
@@ -2196,6 +2198,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 
 	switch (a_EntityType)
 	{
+		case E_ENTITY_TYPE_BAT:           Monster = new cBat();          break;
 		case E_ENTITY_TYPE_BLAZE:         Monster = new cBlaze();        break;
 		case E_ENTITY_TYPE_CAVE_SPIDER:   Monster = new cCavespider();   break;
 		case E_ENTITY_TYPE_CHICKEN:       Monster = new cChicken();      break;
@@ -2214,6 +2217,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 		case E_ENTITY_TYPE_SPIDER:        Monster = new cSpider();       break;
 		case E_ENTITY_TYPE_SQUID:         Monster = new cSquid();        break;
 		case E_ENTITY_TYPE_VILLAGER:      Monster = new cVillager();     break;
+		case E_ENTITY_TYPE_WITCH:         Monster = new cWitch();        break;
 		case E_ENTITY_TYPE_WOLF:          Monster = new cWolf();         break;
 		case E_ENTITY_TYPE_ZOMBIE:        Monster = new cZombie();       break;
 		case E_ENTITY_TYPE_ZOMBIE_PIGMAN: Monster = new cZombiepigman(); break;

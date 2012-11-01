@@ -727,6 +727,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Mobs\Bat.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Bat.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Mobs\Blaze.cpp"
 					>
 				</File>
@@ -892,6 +900,14 @@
 				</File>
 				<File
 					RelativePath="..\source\Mobs\Villager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Witch.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Mobs\Witch.h"
 					>
 				</File>
 				<File
