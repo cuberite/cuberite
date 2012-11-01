@@ -217,12 +217,12 @@ void cMonster::ReplicateMovement()
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (
 			(SqrDist > 4 * 4)  // 4 blocks is max Relative Move
-			|| (cWorld::GetTime() - m_TimeLastTeleportPacket > 2)  // Send an absolute position every 2 seconds
+			|| (m_World->GetWorldAge() - m_TimeLastTeleportPacket > 40)  // Send an absolute position every 2 seconds
 		)
 		{
 			// LOGD("Teleported %f", sqrtf(SqrDist) );
 			m_World->BroadcastTeleportEntity(*this);
-			m_TimeLastTeleportPacket = cWorld::GetTime();
+			m_TimeLastTeleportPacket = m_World->GetWorldAge();
 		}
 		else
 		{

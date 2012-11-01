@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 10/31/12 20:34:13.
+** Generated automatically by tolua++-1.0.92 on 11/01/12 22:24:07.
 */
 
 #ifndef __cplusplus
@@ -11397,6 +11397,168 @@ static int tolua_AllToLua_cWorld_GetTime00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetWorldTime of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetWorldTime00
+static int tolua_AllToLua_cWorld_GetWorldTime00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWorldTime'", NULL);
+#endif
+  {
+   long long tolua_ret = (long long)  self->GetWorldTime();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWorldTime'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetWorldAge of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetWorldAge00
+static int tolua_AllToLua_cWorld_GetWorldAge00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWorldAge'", NULL);
+#endif
+  {
+   long long tolua_ret = ( long long)  self->GetWorldAge();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWorldAge'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetTimeOfDay of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetTimeOfDay00
+static int tolua_AllToLua_cWorld_GetTimeOfDay00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetTimeOfDay'", NULL);
+#endif
+  {
+   long long tolua_ret = ( long long)  self->GetTimeOfDay();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetTimeOfDay'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetTimeOfDay of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetTimeOfDay00
+static int tolua_AllToLua_cWorld_SetTimeOfDay00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  long long a_TimeOfDay = (( long long)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetTimeOfDay'", NULL);
+#endif
+  {
+   self->SetTimeOfDay(a_TimeOfDay);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetTimeOfDay'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetWorldTime of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetWorldTime00
+static int tolua_AllToLua_cWorld_SetWorldTime00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  long long a_TimeOfDay = ((long long)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWorldTime'", NULL);
+#endif
+  {
+   self->SetWorldTime(a_TimeOfDay);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetWorldTime'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetGameMode of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetGameMode00
 static int tolua_AllToLua_cWorld_GetGameMode00(lua_State* tolua_S)
@@ -11461,34 +11623,33 @@ static int tolua_AllToLua_cWorld_IsPVPEnabled00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetWorldTime of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SetWorldTime00
-static int tolua_AllToLua_cWorld_SetWorldTime00(lua_State* tolua_S)
+/* method: IsDeepSnowEnabled of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsDeepSnowEnabled00
+static int tolua_AllToLua_cWorld_IsDeepSnowEnabled00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  long long a_WorldTime = ((long long)  tolua_tonumber(tolua_S,2,0));
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWorldTime'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsDeepSnowEnabled'", NULL);
 #endif
   {
-   self->SetWorldTime(a_WorldTime);
+   bool tolua_ret = (bool)  self->IsDeepSnowEnabled();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetWorldTime'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'IsDeepSnowEnabled'.",&tolua_err);
  return 0;
 #endif
 }
@@ -11511,13 +11672,13 @@ static int tolua_AllToLua_cWorld_GetHeight00(lua_State* tolua_S)
 #endif
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_Z = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHeight'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->GetHeight(a_X,a_Z);
+   int tolua_ret = (int)  self->GetHeight(a_BlockX,a_BlockZ);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -23031,9 +23192,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);
   tolua_beginmodule(tolua_S,"cWorld");
    tolua_function(tolua_S,"GetTime",tolua_AllToLua_cWorld_GetTime00);
+   tolua_function(tolua_S,"GetWorldTime",tolua_AllToLua_cWorld_GetWorldTime00);
+   tolua_function(tolua_S,"GetWorldAge",tolua_AllToLua_cWorld_GetWorldAge00);
+   tolua_function(tolua_S,"GetTimeOfDay",tolua_AllToLua_cWorld_GetTimeOfDay00);
+   tolua_function(tolua_S,"SetTimeOfDay",tolua_AllToLua_cWorld_SetTimeOfDay00);
+   tolua_function(tolua_S,"SetWorldTime",tolua_AllToLua_cWorld_SetWorldTime00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cWorld_GetGameMode00);
    tolua_function(tolua_S,"IsPVPEnabled",tolua_AllToLua_cWorld_IsPVPEnabled00);
-   tolua_function(tolua_S,"SetWorldTime",tolua_AllToLua_cWorld_SetWorldTime00);
+   tolua_function(tolua_S,"IsDeepSnowEnabled",tolua_AllToLua_cWorld_IsDeepSnowEnabled00);
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"UnloadUnusedChunks",tolua_AllToLua_cWorld_UnloadUnusedChunks00);
    tolua_function(tolua_S,"GetMaxPlayers",tolua_AllToLua_cWorld_GetMaxPlayers00);

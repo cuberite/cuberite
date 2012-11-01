@@ -39,8 +39,9 @@ void cZombie::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);
 
-	//TODO Same as in cSkeleton :D
-	if (GetWorld()->GetWorldTime() < (12000 + 1000) && GetMetaData() != BURNING) { //if daylight
+	// TODO Same as in cSkeleton :D
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))
+	{
 		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
 	}
 }

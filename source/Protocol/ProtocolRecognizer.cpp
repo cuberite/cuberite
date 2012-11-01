@@ -428,10 +428,10 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldTime)
+void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendTimeUpdate(a_WorldTime);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
 }
 
 

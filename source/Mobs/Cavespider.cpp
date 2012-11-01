@@ -38,7 +38,7 @@ bool cCavespider::IsA( const char* a_EntityType )
 void cCavespider::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);
-	m_EMPersonality = (GetWorld()->GetWorldTime() < (12000 + 1000) ) ? PASSIVE : AGGRESSIVE;
+	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
 }
 
 

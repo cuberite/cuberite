@@ -59,20 +59,43 @@ public:
 
 	OBSOLETE static cWorld * GetWorld();
 
-	// Return time in seconds
-	inline static float GetTime()													//tolua_export
+	// tolua_begin
+	
+	/// Return time in seconds
+	inline static float GetTime(void)
 	{
-		return m_Time;
+		LOGWARNING("cWorld:GetTime() is obsolete, use GetWorldAge() or GetTimeOfDay() for a specific world instead.");
+		return 0;
 	}
-	long long GetWorldTime(void) const { return m_WorldTime; }						//tolua_export
-
-	eGameMode GetGameMode(void) const { return m_GameMode; }						//tolua_export
-	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }							//tolua_export
+	
+	long long GetWorldTime(void) const  // OBSOLETE, use GetWorldAge() instead!
+	{
+		LOGWARNING("cWorld:GetWorldTime() is obsolete, use GetWorldAge() or GetTimeOfDay() instead");
+		return m_WorldAge;
+	}
+	Int64 GetWorldAge(void)  const { return m_WorldAge; }
+	Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
+	
+	void SetTimeOfDay(Int64 a_TimeOfDay)
+	{
+		m_TimeOfDay = a_TimeOfDay;
+		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
+		BroadcastTimeUpdate();
+	}
+	
+	void SetWorldTime(Int64 a_TimeOfDay)
+	{
+		LOGWARNING("cWorld:SetWorldTime() is obsolete, use SetTimeOfDay() instead");
+		SetTimeOfDay(a_TimeOfDay);
+	}
+	
+	eGameMode GetGameMode(void) const { return m_GameMode; }
+	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
-	void SetWorldTime(long long a_WorldTime) { m_WorldTime = a_WorldTime; }			//tolua_export
-
-	int GetHeight( int a_X, int a_Z );												//tolua_export
+	int GetHeight(int a_BlockX, int a_BlockZ);
+	
+	// tolua_end
 
 	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);
 	void BroadcastPlayerAnimation    (const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
@@ -422,15 +445,18 @@ private:
 	double m_SpawnY;
 	double m_SpawnZ;
 
-	float m_LastUnload;
-	float m_LastSave;
-	static float m_Time;	// Time in seconds
-	long long m_WorldTime; // Time in seconds*20, this is sent to clients (is wrapped)
-	unsigned long long CurrentTick;
+	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
+	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
+	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
+	Int64  m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
+	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
+	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
+	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	Int64  m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned
+
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
 	bool m_IsDeepSnowEnabled;
-	float m_WorldTimeFraction; // When this > 1.f m_WorldTime is incremented by 20
 
 	// The cRedstone class simulates redstone and needs access to m_RSList
 	friend class cRedstone;
@@ -459,8 +485,7 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	bool m_bAnimals;
-	float m_SpawnMonsterTime;
-	float m_SpawnMonsterRate;
+	Int64 m_SpawnMonsterRate;
 
 	eWeather m_Weather;
 	int m_WeatherInterval;

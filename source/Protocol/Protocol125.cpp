@@ -685,11 +685,12 @@ void cProtocol125::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocol125::SendTimeUpdate(Int64 a_WorldTime)
+void cProtocol125::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_TIME);
-	WriteInt64(a_WorldTime);
+	// Use a_WorldAge for daycount, and a_TimeOfDay for the proper time of day:
+	WriteInt64((24000 * (a_WorldAge / 24000)) + (a_TimeOfDay % 24000));
 	Flush();
 }
 

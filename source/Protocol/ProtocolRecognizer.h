@@ -80,7 +80,7 @@ public:
 	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ) override;
 	virtual void SendTeleportEntity     (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendTimeUpdate         (Int64 a_WorldTime) override;
+	virtual void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
 	virtual void SendUnloadChunk        (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateSign         (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
 	virtual void SendUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;

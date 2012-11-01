@@ -26,7 +26,7 @@ cPawn::cPawn()
 	, m_LastPosX( 0.0 )
 	, m_LastPosY( 0.0 )
 	, m_LastPosZ( 0.0 )
-	, m_TimeLastTeleportPacket( 0.f )
+	, m_TimeLastTeleportPacket(0)
 	, m_bBurnable(true)
 	, m_MetaData(NORMAL)
 {

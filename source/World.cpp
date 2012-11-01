@@ -72,12 +72,6 @@ const int MAX_LIGHTING_SPREAD_PER_TICK = 10;
 
 
 
-float cWorld::m_Time = 0.f;
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorldLoadProgress:
 
@@ -225,7 +219,12 @@ cWorld::~cWorld()
 
 
 cWorld::cWorld(const AString & a_WorldName) :
-	m_SpawnMonsterTime(0.f),
+	m_WorldAgeSecs(0),
+	m_TimeOfDaySecs(0),
+	m_WorldAge(0),
+	m_TimeOfDay(0),
+	m_LastTimeUpdate(0),
+	m_LastSpawnMonster(0),
 	m_RSList(0),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000)  // Guaranteed 1 day of sunshine at server start :)
@@ -271,23 +270,22 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_Generator.Start(this, IniFile);
 
 	m_bAnimals = true;
-	m_SpawnMonsterRate = 10;
+	m_SpawnMonsterRate = 200;  // 1 mob each 10 seconds
 	cIniFile IniFile2("settings.ini");
 	if (IniFile2.ReadFile())
 	{
 		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true );
-		m_SpawnMonsterRate = (float)IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10);
-		SetMaxPlayers(IniFile2.GetValueI("Server", "MaxPlayers", 9001));
-		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - It's OVER 9000!").c_str();
+		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
+		
+		// TODO: Move this into cServer instead:
+		SetMaxPlayers(IniFile2.GetValueI("Server", "MaxPlayers", 100));
+		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - In C++!").c_str();
 	}
 
 	m_ChunkMap = new cChunkMap(this );
 	
 	m_ChunkSender.Start(this);
 
-	m_Time = 0;
-	m_WorldTimeFraction = 0.f;
-	m_WorldTime = 0;
 	m_LastSave = 0;
 	m_LastUnload = 0;
 
@@ -438,23 +436,24 @@ void cWorld::StopThreads(void)
 
 void cWorld::Tick(float a_Dt)
 {
-	m_Time += a_Dt / 1000.f;
+	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
+	m_TimeOfDaySecs += (double)a_Dt / 1000.0;
 
-	CurrentTick++;
-
-	bool bSendTime = false;
-	m_WorldTimeFraction += a_Dt / 1000.f;
-	while (m_WorldTimeFraction > 1.f)
+	// Wrap time of day each 20 minutes (1200 seconds)
+	if (m_TimeOfDaySecs > 1200.0)
 	{
-		m_WorldTimeFraction -= 1.f;
-		m_WorldTime += 20;
-		bSendTime = true;
+		m_TimeOfDaySecs -= 1200.0;
 	}
-	m_WorldTime %= 24000; // 24000 units in a day
-	
-	if (bSendTime)
+
+	m_WorldAge  = (Int64)(m_WorldAgeSecs  / 20.0);
+	m_TimeOfDay = (Int64)(m_TimeOfDaySecs / 20.0);
+
+	// Broadcase time update every 40 ticks (2 seconds)
+	if (m_LastTimeUpdate < m_WorldAge - 40)
 	{
 		BroadcastTimeUpdate();
+		m_LastTimeUpdate = m_WorldAge;
 	}
 
 	{
@@ -496,12 +495,12 @@ void cWorld::Tick(float a_Dt)
 		m_FastSetBlockQueue.splice(m_FastSetBlockQueue.end(), FastSetBlockQueueCopy);
 	}
 
-	if( m_Time - m_LastSave > 60 * 5 ) // Save each 5 minutes
+	if (m_WorldAge - m_LastSave > 60 * 5 * 20) // Save each 5 minutes
 	{
 		SaveAllChunks();
 	}
 
-	if( m_Time - m_LastUnload > 10 ) // Unload every 10 seconds
+	if (m_WorldAge - m_LastUnload > 10 * 20 ) // Unload every 10 seconds
 	{
 		UnloadUnusedChunks();
 	}
@@ -639,12 +638,12 @@ void cWorld::TickWeather(float a_Dt)
 
 void cWorld::TickSpawnMobs(float a_Dt)
 {
-	if (!m_bAnimals || (m_Time - m_SpawnMonsterTime <= m_SpawnMonsterRate))
+	if (!m_bAnimals || (m_WorldAge - m_LastSpawnMonster <= m_SpawnMonsterRate))
 	{
 		return;
 	}
 	
-	m_SpawnMonsterTime = m_Time;
+	m_LastSpawnMonster = m_WorldAge;
 	Vector3d SpawnPos;
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -668,7 +667,7 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	SpawnPos += Vector3d( (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32 );
 	int Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
 
-	if (m_WorldTime >= 12000 + 1000)
+	if (m_TimeOfDay >= 12000 + 1000)
 	{
 		if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biHell) // Spawn nether mobs
 		{
@@ -796,10 +795,10 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, char a_SaplingMeta)
 	sSetBlockVector Logs, Other;
 	switch (a_SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_APPLE:   GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_BIRCH:   GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_CONIFER: GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_JUNGLE:  GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
@@ -814,7 +813,7 @@ void cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
-	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(m_WorldTime & 0xffffffff), (EMCSBiome)GetBiomeAt(a_X, a_Z), Logs, Other);
+	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), (EMCSBiome)GetBiomeAt(a_X, a_Z), Logs, Other);
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
 	GrowTreeImage(Other);
@@ -1440,7 +1439,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		ch->SendTimeUpdate(m_WorldTime);
+		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay);
 	}
 }
 
@@ -1661,7 +1660,7 @@ bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
 
 void cWorld::UnloadUnusedChunks(void )
 {
-	m_LastUnload = m_Time;
+	m_LastUnload = m_WorldAge;
 	m_ChunkMap->UnloadUnusedChunks();
 }
 
@@ -2070,7 +2069,7 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 void cWorld::SaveAllChunks(void)
 {
 	LOGINFO("Saving all chunks...");
-	m_LastSave = m_Time;
+	m_LastSave = m_WorldAge;
 	m_ChunkMap->SaveAllChunks();
 	m_Storage.QueueSavedMessage();
 }
@@ -2079,23 +2078,7 @@ void cWorld::SaveAllChunks(void)
 
 
 
-/************************************************************************/
-/* Get and set                                                          */
-/************************************************************************/
-// void cWorld::AddClient( cClientHandle* a_Client )
-// {
-// 	m_m_Clients.push_back( a_Client );
-// }
-// cWorld::ClientList & cWorld::GetClients()
-// {
-// 	return m_m_Clients;
-// }
-
-
-
-
-
-void cWorld::AddEntity( cEntity* a_Entity )
+void cWorld::AddEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSEntities);
 	m_AllEntities.push_back( a_Entity ); 
@@ -2105,7 +2088,7 @@ void cWorld::AddEntity( cEntity* a_Entity )
 
 
 
-unsigned int cWorld::GetNumPlayers()
+unsigned int cWorld::GetNumPlayers(void)
 {
 	cCSLock Lock(m_CSPlayers);
 	return m_Players.size(); 

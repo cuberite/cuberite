@@ -79,8 +79,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
 
-	m_TimeLastTeleportPacket = cWorld::GetTime();
-	m_TimeLastPickupCheck = cWorld::GetTime();
+	m_TimeLastTeleportPacket = 0;
+	m_TimeLastPickupCheck = 0;
 	
 	m_PlayerName = a_PlayerName;
 	m_bDirtyPosition = true; // So chunks are streamed to player at spawn
@@ -189,12 +189,12 @@ void cPlayer::Tick(float a_Dt)
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (
 			(SqrDist > 4 * 4) ||  // 4 blocks is max Relative Move
-			(cWorld::GetTime() - m_TimeLastTeleportPacket > 2 )  // Send an absolute position every 2 seconds
+			(m_World->GetWorldAge() - m_TimeLastTeleportPacket > 40)  // Send an absolute position every 2 seconds
 		)
 		{
 			// LOG("Teleported %f", sqrtf(SqrDist) );
 			m_World->BroadcastTeleportEntity(*this, m_ClientHandle);
-			m_TimeLastTeleportPacket = cWorld::GetTime();
+			m_TimeLastTeleportPacket = m_World->GetWorldAge();
 		}
 		else
 		{
@@ -474,7 +474,7 @@ void cPlayer::SetLastBlockActionTime()
 {
 	if (m_World != NULL)
 	{
-		m_LastBlockActionTime = m_World->GetTime();
+		m_LastBlockActionTime = m_World->GetWorldAge() / 20.0f;
 	}
 }
 

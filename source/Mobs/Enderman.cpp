@@ -39,8 +39,9 @@ void cEnderman::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);
 
-	//TODO Same as stated in cSkeleton
-	if (GetWorld()->GetWorldTime() < (12000 + 1000) && GetMetaData() != BURNING) { //if daylight
+	// TODO Same as stated in cSkeleton
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))
+	{
 		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
 	}
 }

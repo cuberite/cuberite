@@ -81,7 +81,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_bDestroyed(false)
 	, m_Player(NULL)
 	, m_bKicking(false)
-	, m_TimeLastPacket(cWorld::GetTime())
+	, m_TimeSinceLastPacket(0)
 	, m_bKeepThreadGoing(true)
 	, m_Ping(1000)
 	, m_PingID(1)
@@ -244,7 +244,7 @@ void cClientHandle::Authenticate(void)
 	}
 
 	// Send time
-	m_Protocol->SendTimeUpdate(World->GetWorldTime());
+	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay());
 
 	// Send inventory
 	m_Player->GetInventory().SendWholeInventory(*this);
@@ -1049,6 +1049,8 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 {
 	ASSERT(m_Player != NULL);
 	ASSERT(m_Player->GetWorld() != NULL);
+	/*
+	// TODO: _X 2012_11_01: This needs a total re-thinking and rewriting
 	int LastActionCnt = m_Player->GetLastBlockActionCnt();
 	if ((m_Player->GetWorld()->GetTime() - m_Player->GetLastBlockActionTime()) < 0.1)
 	{
@@ -1068,6 +1070,7 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 		m_Player->SetLastBlockActionCnt(0);  // Reset count 
 		m_Player->SetLastBlockActionTime();  // Player tried to interact with a block. Reset last block interation time.
 	}
+	*/
 	return true;
 }
 
@@ -1077,8 +1080,8 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 void cClientHandle::Tick(float a_Dt)
 {
-	(void)a_Dt;
-	if (cWorld::GetTime() - m_TimeLastPacket > 30.f)  // 30 seconds time-out
+	m_TimeSinceLastPacket += a_Dt;
+	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		Destroy();
@@ -1459,9 +1462,9 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 
 
 
-void cClientHandle::SendTimeUpdate(Int64 a_WorldTime)
+void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 {
-	m_Protocol->SendTimeUpdate(a_WorldTime);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
 }
 
 
@@ -1704,7 +1707,7 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
 	// Data is received from the client, hand it off to the protocol:
 	m_Protocol->DataReceived(a_Data, a_Size);
-	m_TimeLastPacket = cWorld::GetTime();
+	m_TimeSinceLastPacket = 0;
 }
 
 

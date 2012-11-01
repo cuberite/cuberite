@@ -91,10 +91,7 @@ void cProtocol142::SendPickupSpawn(const cPickup & a_Pickup)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_PICKUP_SPAWN);
 	WriteInt    (a_Pickup.GetUniqueID());
-	WriteShort  (a_Pickup.GetItem()->m_ItemType);
-	WriteByte   (a_Pickup.GetItem()->m_ItemCount);
-	WriteShort  (a_Pickup.GetItem()->m_ItemDamage);
-	WriteShort  (-1); //TODO: Implement item metadata
+	WriteItem   (*(a_Pickup.GetItem()));
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
 	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
 	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
@@ -123,11 +120,11 @@ void cProtocol142::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 
 
 
-void cProtocol142::SendTimeUpdate(Int64 a_WorldTime)
+void cProtocol142::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_TIME);
-	WriteInt64(1);
-	WriteInt64(a_WorldTime);
+	WriteInt64(a_WorldAge);
+	WriteInt64(a_TimeOfDay);
 	Flush();
 }

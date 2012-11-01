@@ -110,7 +110,7 @@ public:
 	void SendSpawnMob           (const cMonster & a_Mob);
 	void SendTeleportEntity     (const cEntity & a_Entity);
 	void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendTimeUpdate         (Int64 a_WorldTime);
+	void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay);
 	void SendUnloadChunk        (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateSign         (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void SendWeather            (eWeather a_Weather);
@@ -207,7 +207,8 @@ private:
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
 
-	float m_TimeLastPacket;
+	/// Seconds since the last packet data was received (updated in Tick(), reset in DataReceived())
+	float m_TimeSinceLastPacket;
 	
 	short m_Ping;
 	int   m_PingID;

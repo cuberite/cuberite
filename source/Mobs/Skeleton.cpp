@@ -39,9 +39,10 @@ void cSkeleton::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);
 
-	//TODO Outsource
-	//TODO should do lightcheck, not daylight -> mobs in the dark don´t burn 
-	if (GetWorld()->GetWorldTime() < (12000 + 1000) && GetMetaData() != BURNING ) { //if daylight
+	// TODO Outsource
+	// TODO should do SkyLight check, mobs in the dark don´t burn 
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))
+	{
 		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
 	}
 }
