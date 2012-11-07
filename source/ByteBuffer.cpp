@@ -354,7 +354,8 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, int a_Count)
 	NEEDBYTES(a_Count);
 	char * Dst = (char *)a_Buffer;  // So that we can do byte math
 	int BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
-	if (BytesToEndOfBuffer < a_Count)
+	ASSERT(BytesToEndOfBuffer >= 0);  // Sanity check
+	if ((BytesToEndOfBuffer > 0) && (BytesToEndOfBuffer < a_Count))
 	{
 		// Reading across the ringbuffer end, read the first part and adjust parameters:
 		memcpy(Dst, m_Buffer + m_ReadPos, BytesToEndOfBuffer);
