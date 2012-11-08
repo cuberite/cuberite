@@ -97,10 +97,13 @@ INCLUDE = -I.\
 		-IiniFile\
 		-Itolua++-1.0.93/include\
 		-Ijsoncpp-src-0.5.0/include\
-		-Ijsoncpp-src-0.5.0/src/lib_json\
-		-Isquirrel_3_0_1_stable/include\
-		-Isquirrel_3_0_1_stable\
-		-Isquirrel_3_0_1_stable/sqrat
+		-Ijsoncpp-src-0.5.0/src/lib_json
+
+
+# 2012_11_08 _X: Removed, see Globals.h
+#		-Isquirrel_3_0_1_stable/include\
+#		-Isquirrel_3_0_1_stable\
+#		-Isquirrel_3_0_1_stable/sqrat
 
 
 
@@ -110,7 +113,9 @@ INCLUDE = -I.\
 # Build MCServer
 #
 
-SOURCES := $(shell find CryptoPP lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source squirrel_3_0_1_stable tolua++-1.0.93 iniFile WebServer '(' -name '*.cpp' -o -name '*.c' ')')
+# 2012_11_08 _X: Removed: squirrel_3_0_1_stable 
+
+SOURCES := $(shell find CryptoPP lua-5.1.4 jsoncpp-src-0.5.0 zlib-1.2.7 source tolua++-1.0.93 iniFile WebServer '(' -name '*.cpp' -o -name '*.c' ')')
 SOURCES := $(filter-out %minigzip.c %lua.c %tolua.c %toluabind.c %LeakFinder.cpp %StackWalker.cpp %example.c,$(SOURCES))
 OBJECTS := $(patsubst %.c,$(BUILDDIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))

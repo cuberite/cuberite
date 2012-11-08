@@ -1,6 +1,16 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
+
 #include "SquirrelCommandBinder.h"
 #include "Player.h"
 #include "Plugin.h"
@@ -96,3 +106,13 @@ bool cSquirrelCommandBinder::HandleCommand( const std::string & a_Command, cPlay
 	}
 	return false;
 }
+
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+

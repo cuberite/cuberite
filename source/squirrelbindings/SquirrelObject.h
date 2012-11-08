@@ -1,5 +1,21 @@
+
 #pragma once
+
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
+
 #include <sqrat.h>
+
+
+
+
 
 class SquirrelObject
 {
@@ -27,3 +43,13 @@ protected:
 	Sqrat::Object m_SquirrelObject;
 
 };
+
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+

@@ -1,5 +1,15 @@
+
 #pragma once
-#include <string>
+
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
 
 template <typename T>
 class SquirrelArray
@@ -34,3 +44,13 @@ protected:
 };
 
 class SquirrelStringArray : public SquirrelArray<std::string> { };
+
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+

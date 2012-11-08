@@ -1,12 +1,28 @@
 
 #include "Globals.h"
-#include "SquirrelFunctions.h"
-#include "SquirrelBindings.h"
+
+
+
 
 
 #ifdef USE_SQUIRREL
 
+
+
+
+
+#include "SquirrelFunctions.h"
+#include "SquirrelBindings.h"
+
+
+
+
+
 static HSQUIRRELVM squirrelvm = NULL;
+
+
+
+
 
 SQInteger runtimeErrorHandler(HSQUIRRELVM a_VM)
 {
@@ -67,4 +83,12 @@ void sqPrint(SQChar * text)
 	LOGINFO("%s", text);
 }
 
-#endif
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+

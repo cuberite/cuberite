@@ -1,11 +1,26 @@
+
 #pragma once
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
+
 #include "SquirrelBindings.h"
 #include "../Plugin_Squirrel.h"
 #include "../PluginManager.h"
 #include "../Root.h"
 #include "../SquirrelCommandBinder.h"
 
-//The baseclass for squirrel plugins
+
+
+
+
+// The baseclass for squirrel plugins
 class cSquirrelBaseClass
 {
 public:
@@ -39,3 +54,13 @@ public:
 protected:
 	cPlugin_Squirrel *m_Instance;
 };
+
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+

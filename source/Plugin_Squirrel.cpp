@@ -1,4 +1,15 @@
+
 #include "Globals.h"
+
+
+
+
+#ifdef USE_SUIRREL
+
+
+
+
+
 #include "Plugin_Squirrel.h"
 #include "squirrelbindings/SquirrelFunctions.h"
 #include "squirrelbindings/SquirrelBindings.h"
@@ -386,3 +397,13 @@ bool cPlugin_Squirrel::OnUpdatedSign(
 			a_Player
 		);
 }
+
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+

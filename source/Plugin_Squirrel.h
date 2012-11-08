@@ -1,6 +1,16 @@
 
 #pragma once
 
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
+
 #include "Plugin.h"
 #include <sqrat.h>
 #include "squirrelbindings/SquirrelObject.h"
@@ -47,6 +57,12 @@ protected:
 	cCriticalSection m_CriticalSection;
 	SquirrelObject *m_Plugin;
 };
+
+
+
+
+
+#endif  // USE_SQUIRREL
 
 
 

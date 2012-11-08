@@ -1,5 +1,16 @@
+
 #pragma once
-#include <string>
+
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
+
 #include <sqrat.h>
 
 class cPlugin;
@@ -29,6 +40,11 @@ private:
 	CommandMap m_BoundCommands;
 };
 
+
+
+
+
+#endif  // USE_SQUIRREL
 
 
 

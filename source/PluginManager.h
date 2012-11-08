@@ -5,7 +5,11 @@
 
 struct lua_State;
 class cLuaCommandBinder;
-class cSquirrelCommandBinder;
+
+#ifdef USE_SQUIRREL
+	class cSquirrelCommandBinder;
+#endif  // USE_SQUIRREL
+
 class cPlugin;
 
 // fwd: cWorld.h
@@ -124,11 +128,16 @@ public:																	//tolua_export
 	
 	cLuaCommandBinder* GetLuaCommandBinder() const { return m_LuaCommandBinder; }
 	
-	cSquirrelCommandBinder* GetSquirrelCommandBinder() { return m_SquirrelCommandBinder; }
+	#ifdef USE_SQUIRREL
+		cSquirrelCommandBinder * GetSquirrelCommandBinder() { return m_SquirrelCommandBinder; }
+	#endif  // USE_SQUIRREL
 
 	bool HasPlugin( cPlugin* a_Plugin ) const;
+	
 private:
+
 	friend class cRoot;
+	
 	cPluginManager();
 	~cPluginManager();
 
@@ -142,8 +151,15 @@ private:
 	void ReloadPluginsNow();
 	void UnloadPluginsNow();
 	
-	cLuaCommandBinder* m_LuaCommandBinder;
-	cSquirrelCommandBinder* m_SquirrelCommandBinder;
+	cLuaCommandBinder * m_LuaCommandBinder;
+	
+	#ifdef USE_SQUIRREL
+		cSquirrelCommandBinder * m_SquirrelCommandBinder;
+	#endif  // USE_SQUIRREL
 
 	bool m_bReloadPlugins;
 }; //tolua_export
+
+
+
+

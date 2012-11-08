@@ -1,4 +1,15 @@
+
 #include "Globals.h"
+
+
+
+
+
+#ifdef USE_SQUIRREL
+
+
+
+
 #include "SquirrelBindings.h"
 #include "SquirrelFunctions.h"
 
@@ -7,9 +18,16 @@
 
 #include "../Player.h"
 
+
+
+
+
 using namespace Sqrat;
 
-#ifdef USE_SQUIRREL
+
+
+
+
 void BindSquirrel(HSQUIRRELVM vm)
 {
 	RootTable()
@@ -166,4 +184,12 @@ void BindSquirrel(HSQUIRRELVM vm)
 		.Const("UpdatedSign", cPluginManager::HOOK_UPDATED_SIGN));
 }
 
-#endif
+
+
+
+
+#endif  // USE_SQUIRREL
+
+
+
+
