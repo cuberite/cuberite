@@ -76,9 +76,17 @@ cProtocol142::~cProtocol142()
 
 
 
-int cProtocol142::ParseLogin(void)
+int cProtocol142::ParseLocaleViewDistance(void)
 {
-	// This packet seems to be back in 1.4.2, no documentation yet.
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Locale);
+	HANDLE_PACKET_READ(ReadChar,            char,    ViewDistance);
+	HANDLE_PACKET_READ(ReadChar,            char,    ChatFlags);
+	HANDLE_PACKET_READ(ReadChar,            char,    ClientDifficulty);
+	HANDLE_PACKET_READ(ReadChar,            char,    ShouldShowCape);  // <-- new in 1.4.2
+	// TODO: m_Client->HandleLocale(Locale);
+	// TODO: m_Client->HandleViewDistance(ViewDistance);
+	// TODO: m_Client->HandleChatFlags(ChatFlags);
+	// Ignoring client difficulty
 	return PARSE_OK;
 }
 

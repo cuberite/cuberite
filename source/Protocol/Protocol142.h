@@ -30,7 +30,7 @@ public:
 	virtual void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
 
 	// Specific packet parsers:
-	virtual int ParseLogin              (void) override;
+	virtual int ParseLocaleViewDistance(void) override;
 } ;
 
 
