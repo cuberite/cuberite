@@ -836,6 +836,7 @@ bool cConnection::HandleClientLocaleAndView(void)
 	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ViewDistance);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ChatFlags);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    Difficulty);
+	HANDLE_CLIENT_PACKET_READ(ReadChar,            char,    ShowCape);
 	Log("Received a PACKET_LOCALE_AND_VIEW from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1623,10 +1624,12 @@ bool cConnection::HandleServerSoundEffect(void)
 	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   Data);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  NoVolumeDecrease);
 	Log("Received a PACKET_SOUND_EFFECT from the server:");
 	Log("  EffectID = %d", EffectID);
 	Log("  Pos = {%d, %d, %d}", PosX, PosY, PosZ);
 	Log("  Data = %d", Data);
+	Log("  NoVolumeDecrease = %d", NoVolumeDecrease);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1764,9 +1767,11 @@ bool cConnection::HandleServerSpawnPainting(void)
 bool cConnection::HandleServerSpawnPickup(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ItemType);
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  ItemCount);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ItemDamage);
+	AString ItemDesc;
+	if (!ParseSlot(m_ServerBuffer, ItemDesc))
+	{
+		return false;
+	}
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
@@ -1775,7 +1780,7 @@ bool cConnection::HandleServerSpawnPickup(void)
 	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Roll);
 	Log("Received a PACKET_SPAWN_PICKUP from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  Item = %d:%d * %d", ItemType, ItemDamage, ItemCount);
+	Log("  Item = %s", ItemDesc.c_str());
 	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
 	Log("  Angles = [%d, %d, %d]", Rotation, Pitch, Roll);
 	COPY_TO_CLIENT();
@@ -1788,7 +1793,8 @@ bool cConnection::HandleServerSpawnPickup(void)
 
 bool cConnection::HandleServerTimeUpdate(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, Time);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, WorldAge);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, TimeOfDay);
 	Log("Received a PACKET_TIME_UPDATE from the server");
 	COPY_TO_CLIENT();
 	return true;

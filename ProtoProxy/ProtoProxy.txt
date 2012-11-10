@@ -13,7 +13,10 @@ In order to catch the encryption parameters, the MC protocol needs to be underst
 
 This project is currently Windows-only and I don't plan on making it multi-platform, although the effort needed for doing so should be minimal.
 
-The proxy only works on the localhost connection. It listens on port 25565 and expects the underlying MC server to run on port 25564.
+The proxy only works on the localhost connection. It listens on port 25564 and expects the underlying MC server to run on port 25565. Ports can be changed by cmdline args: ProtoProxy <listen-port> <server-port>.
+
+
+Currently the protocol version 47 (client 1.4.2) is the only one supported.
 
 
 
