@@ -98,7 +98,12 @@ void cRoot::Start()
 
 		LOG("Starting server...");
 		cIniFile IniFile("settings.ini");
-		IniFile.ReadFile();
+		if ( IniFile.ReadFile() == false )
+		{
+			IniFile.Path("settings.example.ini");
+			IniFile.ReadFile();
+			IniFile.Path("settings.ini");
+		}
 		m_PrimaryServerVersion = IniFile.GetValueSetI("Server", "PrimaryServerVersion", cProtocolRecognizer::PROTO_VERSION_1_4_2);
 
 		int Port = IniFile.GetValueSetI("Server", "Port", 25565 );
