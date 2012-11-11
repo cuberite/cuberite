@@ -1183,12 +1183,9 @@ void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLO
 
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
-	unsigned int index = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	if (index == INDEX_OUT_OF_RANGE)
-	{
-		LOGWARN("cChunk::SendBlockTo Index out of range!");
-		return;
-	}
+	// The coords must be valid, because the upper level already does chunk lookup. No need to check them again.
+	// There's an debug-time assert in MakeIndexNoCheck anyway
+	unsigned int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 
 	if (a_Client == NULL)
 	{
@@ -1199,6 +1196,15 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 	Vector3i wp = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
 	a_Client->SendBlockChange(wp.x, wp.y, wp.z, GetBlock(index), GetMeta(index));
+	
+	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), end = m_BlockEntities.end(); itr != end; ++itr)
+	{
+		if (((*itr)->GetPosX() == wp.x) && ((*itr)->GetPosY() == wp.y) && ((*itr)->GetPosZ() == wp.z))
+		{
+			(*itr)->SendTo(*a_Client);
+		}
+	}  // for itr - m_BlockEntities
 }
 
 
