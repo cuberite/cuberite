@@ -126,11 +126,8 @@ public:
 	
 	bool GetChunkData       (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
 	
-	/// Gets the chunk's blocks, only the block types
+	/// Copies the chunk's blocktypes into a_Blocks; returns true if successful
 	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_Blocks);
-	
-	/// Gets the chunk's block data, the entire 4 arrays (Types, Meta, Light, SkyLight)
-	bool GetChunkBlockData  (int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData);
 	
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkY, int a_ChunkZ);

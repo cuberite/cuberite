@@ -106,9 +106,6 @@ public:
 	/// Copies m_BlockData into a_BlockTypes, only the block types
 	void GetBlockTypes(BLOCKTYPE  * a_BlockTypes);
 	
-	/// Copies entire block data into a_BlockData, the entire 4 arrays (Type, Meta, Light, SkyLight)
-	void GetBlockData(BLOCKTYPE  * a_BlockData);
-	
 	/// Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk!
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 

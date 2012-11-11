@@ -293,18 +293,6 @@ void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 
 
 
-void cChunk::GetBlockData(BLOCKTYPE * a_BlockData)
-{
-	memcpy(a_BlockData, m_BlockTypes, NumBlocks);
-	memcpy(a_BlockData + MetaOffset,     m_BlockMeta,     NumBlocks / 2);
-	memcpy(a_BlockData + LightOffset,    m_BlockLight,    NumBlocks / 2);
-	memcpy(a_BlockData + SkyLightOffset, m_BlockSkyLight, NumBlocks / 2);
-}
-
-
-
-
-
 void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	if ((a_DataTypes & (cBlockArea::baTypes | cBlockArea::baMetas)) != (cBlockArea::baTypes | cBlockArea::baMetas))

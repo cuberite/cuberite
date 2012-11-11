@@ -1631,15 +1631,6 @@ bool cWorld::GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKT
 
 
 
-bool cWorld::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData)
-{
-	return m_ChunkMap->GetChunkBlockData(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockData);
-}
-
-
-
-
-
 bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
 {
 	return m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ);

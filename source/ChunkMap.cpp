@@ -720,22 +720,6 @@ bool cChunkMap::GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLO
 
 
 
-bool cChunkMap::GetChunkBlockData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkY, a_ChunkZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
-	{
-		return false;
-	}
-	Chunk->GetBlockData(a_BlockData);
-	return true;
-}
-
-
-
-
-
 bool cChunkMap::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);

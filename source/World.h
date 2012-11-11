@@ -161,9 +161,6 @@ public:
 	/// Gets the chunk's blocks, only the block types
 	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 	
-	/// Gets the chunk's blockdata, the entire 4 arrays (Types, Meta, Light, SkyLight)
-	bool GetChunkBlockData (int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockData);
-	
 	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
 	
