@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 11/01/12 22:24:07.
+** Generated automatically by tolua++-1.0.92 on 11/11/12 14:50:43.
 */
 
 #ifndef __cplusplus
@@ -3882,14 +3882,14 @@ static int tolua_AllToLua_cClientHandle_GetViewDistance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cClientHandle* self = (cClientHandle*)  tolua_tousertype(tolua_S,1,0);
+  const cClientHandle* self = (const cClientHandle*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetViewDistance'", NULL);
 #endif
@@ -11542,7 +11542,7 @@ static int tolua_AllToLua_cWorld_SetWorldTime00(lua_State* tolua_S)
 #endif
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  long long a_TimeOfDay = ((long long)  tolua_tonumber(tolua_S,2,0));
+  long long a_TimeOfDay = (( long long)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWorldTime'", NULL);
 #endif

@@ -78,7 +78,6 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	: m_ViewDistance(a_ViewDistance)
 	, m_IPString(a_Socket->GetIPString())
 	, m_OutgoingData(64 KiB)
-	, m_bDestroyed(false)
 	, m_Player(NULL)
 	, m_bKicking(false)
 	, m_TimeSinceLastPacket(0)
@@ -109,6 +108,8 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 
 cClientHandle::~cClientHandle()
 {
+	ASSERT(m_State == csDestroyed);  // Has Destroy() been called?
+	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
 	// Remove from cSocketThreads, we're not to be called anymore:
@@ -178,13 +179,13 @@ void cClientHandle::Destroy()
 	// otherwise the destructor may be called within another thread before the client is removed from chunks
 	// http://forum.mc-server.org/showthread.php?tid=366
 	
+	m_State = csDestroying;
 	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
 	{
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 	}
-
-	m_bDestroyed = true;
+	m_State = csDestroyed;
 }
 
 
@@ -268,7 +269,7 @@ void cClientHandle::Authenticate(void)
 
 void cClientHandle::StreamChunks(void)
 {
-	if (m_State < csAuthenticating)
+	if ((m_State < csAuthenticating) || (m_State >= csDestroying))
 	{
 		return;
 	}
@@ -367,6 +368,12 @@ void cClientHandle::StreamChunks(void)
 
 void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
+	if (m_State >= csDestroying)
+	{
+		// Don't stream chunks to clients that are being destroyed
+		return;
+	}
+	
 	cWorld * World = m_Player->GetWorld();
 	ASSERT(World != NULL);
 
@@ -1644,6 +1651,11 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 
 bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
+	if (m_State >= csDestroying)
+	{
+		return false;
+	}
+	
 	cCSLock Lock(m_CSChunkLists);
 	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)) != m_ChunksToSend.end());
 }
@@ -1654,6 +1666,11 @@ bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 {
+	if (m_State >= csDestroying)
+	{
+		return;
+	}
+	
 	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, this);
 	cCSLock Lock(m_CSChunkLists);
 	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ)) == m_ChunksToSend.end())

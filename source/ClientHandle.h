@@ -69,14 +69,15 @@ public:
 	// Removes the client from all chunks. Used when switching worlds or destroying the player
 	void RemoveFromAllChunks(void);
 	
-	inline bool IsLoggedIn(void) const { return m_State >= csAuthenticating; }
+	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
 	void Tick(float a_Dt);
 
-	bool IsDestroyed() { return m_bDestroyed; }
-	void Destroy();
+	void Destroy(void);
 	
-	bool IsPlaying(void) const {return (m_State == csPlaying); }
+	bool IsPlaying   (void) const { return (m_State == csPlaying); }
+	bool IsDestroyed (void) const { return (m_State == csDestroyed); }
+	bool IsDestroying(void) const { return (m_State == csDestroying); }
 
 	void SendBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendBlockChange        (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -124,10 +125,10 @@ public:
 	const AString & GetUsername(void) const;		//tolua_export
 	void SetUsername( const AString & a_Username );	//tolua_export
 	
-	inline short GetPing() const { return m_Ping; }	//tolua_export
+	inline short GetPing(void) const { return m_Ping; }	//tolua_export
 	
-	void SetViewDistance(int a_ViewDistance);		//tolua_export
-	int GetViewDistance() { return m_ViewDistance; }//tolua_export
+	void SetViewDistance(int a_ViewDistance);		// tolua_export
+	int  GetViewDistance(void) const { return m_ViewDistance; }  // tolua_export
 
 	int GetUniqueID() const { return m_UniqueID; }	//tolua_export
 	
@@ -199,7 +200,6 @@ private:
 
 	Vector3d m_ConfirmPosition;
 
-	bool      m_bDestroyed;
 	cPlayer * m_Player;
 	bool      m_bKicking;
 	
@@ -230,8 +230,10 @@ private:
 		csDownloadingWorld,  // The client is waiting for chunks, we're waiting for the loader to provide and send them
  		csConfirmingPos,     // The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           // Normal gameplay
+		csDestroying,        // The client is being destroyed, don't queue any more packets / don't add to chunks
+		csDestroyed,         // The client has been destroyed, the destructor is to be called from the owner thread
 		
-		// TODO: Add Kicking and Destroyed here as well
+		// TODO: Add Kicking here as well
 	} ;
 	
 	eState m_State;
