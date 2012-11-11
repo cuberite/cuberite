@@ -58,8 +58,6 @@ public:														//tolua_export
 
 	lua_State* GetLuaState() { return m_LuaState; }
 
-	OBSOLETE cPlugin_NewLua * CreateWebPlugin(lua_State * a_LuaState);	//tolua_export
-
 	cCriticalSection & GetCriticalSection() { return m_CriticalSection; }
 	
 private:

@@ -43,14 +43,6 @@ public:
 		return (m_ItemID <= 0 || m_ItemCount <= 0);
 	}
 	
-	// tolua_end
-	OBSOLETE
-	// tolua_begin
-	bool Equals(const cItem & a_Item) const  // obsolete, use IsEqual() instead
-	{
-		return IsEqual(a_Item);
-	}
-	
 	bool IsEqual(const cItem & a_Item) const
 	{
 		return (IsSameType(a_Item) && (m_ItemHealth == a_Item.m_ItemHealth));

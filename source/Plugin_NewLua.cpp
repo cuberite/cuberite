@@ -687,18 +687,6 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 
 
 
-cPlugin_NewLua * cPlugin_NewLua::CreateWebPlugin(lua_State * a_LuaState)
-{
-	LOGWARN("WARNING: Using deprecated function CreateWebPlugin()! A Lua plugin is a WebPlugin by itself now. (plugin \"%s\" in folder \"%s\")",
-		cPlugin::GetName().c_str(), GetLocalDirectory().c_str()
-	);
-	return this;
-}
-
-
-
-
-
 AString cPlugin_NewLua::HandleWebRequest( HTTPRequest * a_Request )
 {
 	cCSLock Lock( m_CriticalSection );

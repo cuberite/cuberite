@@ -37,8 +37,6 @@ public:
 	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
 	double GetEyeHeight();													//tolua_export
 	Vector3d GetEyePosition();												//tolua_export
-	OBSOLETE
-	inline bool GetFlying() { return m_bTouchGround; }						//tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline const double GetStance(void) const { return m_Pos.y + 1.62; }					//tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	//tolua_export
