@@ -96,10 +96,11 @@ void cRoot::Start(void)
 		LOG("Creating new server instance...");
 		m_Server = new cServer();
 
-		LOG("Starting server...");
+		LOG("Reading server config...");
 		cIniFile IniFile("settings.ini");
-		if ( IniFile.ReadFile() == false )
+		if (!IniFile.ReadFile())
 		{
+			LOGINFO("settings.ini inaccessible, using settings.example.ini for defaults!");
 			IniFile.Path("settings.example.ini");
 			IniFile.ReadFile();
 			IniFile.Path("settings.ini");
@@ -115,8 +116,8 @@ void cRoot::Start(void)
 			LOGINFO("settings.ini: [Server].PrimaryServerVersion set to %d.", m_PrimaryServerVersion);
 		}
 
-		int Port = IniFile.GetValueSetI("Server", "Port", 25565 );
-		if (!m_Server->InitServer(Port))
+		LOG("Starting server...");
+		if (!m_Server->InitServer(IniFile))
 		{
 			LOGERROR("Failed to start server, shutting down.");
 			return;

@@ -21,6 +21,7 @@
 
 class cPlayer;
 class cClientHandle;
+class cIniFile;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 
@@ -33,7 +34,7 @@ class cServer										//tolua_export
 public:												//tolua_export
 	static cServer * GetServer();					//tolua_export
 
-	bool InitServer( int a_Port = 25565 );
+	bool InitServer(cIniFile & a_SettingsIni);
 
 	int GetPort() { return m_iServerPort; }
 	bool IsConnected(){return m_bIsConnected;} // returns connection status

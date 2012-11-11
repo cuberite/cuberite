@@ -150,9 +150,9 @@ void cServer::RemoveClient(const cClientHandle * a_Client)
 
 
 
-bool cServer::InitServer( int a_Port )
+bool cServer::InitServer(cIniFile & a_SettingsIni)
 {
-	if( m_bIsConnected )
+	if (m_bIsConnected)
 	{
 		LOGERROR("ERROR: Trying to initialize server while server is already running!");
 		return false;
@@ -175,7 +175,7 @@ bool cServer::InitServer( int a_Port )
 	LOG("Starting up server.");
 	LOGINFO("Compatible clients: %s, protocol versions %s", MCS_CLIENT_VERSIONS, MCS_PROTOCOL_VERSIONS);
 
-	if( cSocket::WSAStartup() != 0 ) // Only does anything on Windows, but whatever
+	if (cSocket::WSAStartup() != 0) // Only does anything on Windows, but whatever
 	{
 		LOGERROR("WSAStartup() != 0");
 		return false;
@@ -195,10 +195,12 @@ bool cServer::InitServer( int a_Port )
 		return false;
 	}
 
+	int Port = a_SettingsIni.GetValueSetI("Server", "Port", 25565);
+
 	cSocket::SockAddr_In local;
 	local.Family = cSocket::ADDRESS_FAMILY_INTERNET;
 	local.Address = cSocket::INTERNET_ADDRESS_ANY;
-	local.Port = (unsigned short)a_Port; // 25565
+	local.Port = (unsigned short)Port;
 
 	if( m_pState->SListenClient.Bind( local ) != 0 )
 	{
@@ -212,39 +214,34 @@ bool cServer::InitServer( int a_Port )
 		return false;
 	}
 
-	m_iServerPort = a_Port;
-	LOG("Port %i has been bound, server is open for connections", m_iServerPort);
+	m_iServerPort = Port;
+	LOG("Port %i has been bound", m_iServerPort);
 	m_bIsConnected = true;
 
-	cIniFile IniFile("settings.ini");
-	if (IniFile.ReadFile())
+	m_pState->ServerID = "-";
+	if (a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true))
 	{
-		m_pState->ServerID = "-";
-		if (IniFile.GetValueSetB("Authentication", "Authenticate", true))
-		{
-			MTRand mtrand1;
-			unsigned int r1 = (mtrand1.randInt()%1147483647) + 1000000000;
-			unsigned int r2 = (mtrand1.randInt()%1147483647) + 1000000000;
-			std::ostringstream sid;
-			sid << std::hex << r1;
-			sid << std::hex << r2;
-			std::string ServerID = sid.str();
-			ServerID.resize(16, '0');
-			m_pState->ServerID = ServerID;
-		}
-		
-		m_ClientViewDistance = IniFile.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
-		if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
-		{
-			m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
-			LOGINFO("Setting default viewdistance to the minimum of %d", m_ClientViewDistance);
-		}
-		if (m_ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
-		{
-			m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
-			LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
-		}
-		IniFile.WriteFile();
+		MTRand mtrand1;
+		unsigned int r1 = (mtrand1.randInt()%1147483647) + 1000000000;
+		unsigned int r2 = (mtrand1.randInt()%1147483647) + 1000000000;
+		std::ostringstream sid;
+		sid << std::hex << r1;
+		sid << std::hex << r2;
+		std::string ServerID = sid.str();
+		ServerID.resize(16, '0');
+		m_pState->ServerID = ServerID;
+	}
+	
+	m_ClientViewDistance = a_SettingsIni.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
+	{
+		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
+		LOGINFO("Setting default viewdistance to the minimum of %d", m_ClientViewDistance);
+	}
+	if (m_ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
+	{
+		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
+		LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 	}
 	
 	m_NotifyWriteThread.Start(this);
