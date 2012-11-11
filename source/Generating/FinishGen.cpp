@@ -307,12 +307,12 @@ int cFinishGenLilypads::GetNumLilypads(const cChunkDef::BiomeMap & a_BiomeMap)
 
 void cFinishGenLilypads::GenFinish(
 	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes, // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta, // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap, // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap, // Biomes to adhere to
-	cEntityList & a_Entities, // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities // Block entities may be added or deleted
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+	cEntityList & a_Entities,                // Entities may be added or deleted
+	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
 )
 {
 	// Add Lilypads on top of water surface in Swampland
@@ -320,8 +320,8 @@ void cFinishGenLilypads::GenFinish(
 	int NumLilypads = GetNumLilypads(a_BiomeMap);
 	for (int i = 0; i < NumLilypads; i++)
 	{
-		int x = m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, i) % cChunkDef::Width;
-		int z = m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, i, a_ChunkZ) % cChunkDef::Width;
+		int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, i) / 13) % cChunkDef::Width;
+		int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, i, a_ChunkZ) / 11) % cChunkDef::Width;
 
 		// Place a lily pad at {x, z} if possible (swampland, empty block, water below):
 		if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biSwampland)
@@ -544,4 +544,72 @@ void cFinishGenPreSimulator::StationarizeFluid(
 
 
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenDeadBushes:
+
+int cFinishGenDeadBushes::GetNumDeadBushes(const cChunkDef::BiomeMap & a_BiomeMap)
+{
+	int res = 0;
+	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	{
+		if (a_BiomeMap[i] == biDesert)
+		{
+			res++;
+		}
+	}  // for i - a_BiomeMap[]
+	return res / 128;
+}
+
+
+
+
+
+void cFinishGenDeadBushes::GenFinish(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+	cEntityList & a_Entities,                // Entities may be added or deleted
+	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
+)
+{
+	// Add DeadBushes on top of sand surface in Desert
+
+	int NumDeadBushes = GetNumDeadBushes(a_BiomeMap);
+	for (int i = 0; i < NumDeadBushes; i++)
+	{
+		int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, i) / 13) % cChunkDef::Width;
+		int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, i, a_ChunkZ) / 11) % cChunkDef::Width;
+
+		// Place a dead bush at {x, z} if possible (desert, empty block, sand below):
+		if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biDesert)
+		{
+			// not swampland
+			continue;
+		}
+		int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+		if (Height >= cChunkDef::Height)
+		{
+			// Too high up
+			continue;
+		}
+		if (cChunkDef::GetBlock(a_BlockTypes, x, Height + 1, z) != E_BLOCK_AIR)
+		{
+			// not empty block
+			continue;
+		}
+		switch (cChunkDef::GetBlock(a_BlockTypes, x, Height, z))
+		{
+			case E_BLOCK_SAND:
+			{
+				cChunkDef::SetBlock(a_BlockTypes, x, Height + 1, z, E_BLOCK_DEAD_BUSH);
+				cChunkDef::SetHeight(a_HeightMap, x, z, Height + 1);
+				break;
+			}
+		}  // switch (GetBlock)
+	}  // for i
+}
 

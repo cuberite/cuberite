@@ -340,18 +340,20 @@ void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
-		if (NoCaseCompare(*itr, "SprinkleFoliage") == 0)
+		// Finishers, alpha-sorted:
+		if (NoCaseCompare(*itr, "BottomLava") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(m_Seed));
+			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", 10);
+			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
 		}
-		else if (NoCaseCompare(*itr, "Snow") == 0)
+		else if (NoCaseCompare(*itr, "DeadBushes") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenSnow);
+			m_FinishGens.push_back(new cFinishGenDeadBushes(m_Seed));
 		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
@@ -361,14 +363,17 @@ void cChunkGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenLilypads(m_Seed));
 		}
-		else if (NoCaseCompare(*itr, "BottomLava") == 0)
-		{
-			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", 10);
-			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
-		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenPreSimulator);
+		}
+		else if (NoCaseCompare(*itr, "Snow") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenSnow);
+		}
+		else if (NoCaseCompare(*itr, "SprinkleFoliage") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(m_Seed));
 		}
 	}  // for itr - Str[]
 }
