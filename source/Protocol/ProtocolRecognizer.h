@@ -36,6 +36,8 @@ public:
 		PROTO_VERSION_1_2_5 = 29,
 		PROTO_VERSION_1_3_2 = 39,
 		PROTO_VERSION_1_4_2 = 47,
+		
+		PROTO_VERSION_LATEST = PROTO_VERSION_1_4_2,  // Keep this up to date, this serves as the default for PrimaryServerVersion
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);

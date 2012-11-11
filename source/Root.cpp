@@ -81,7 +81,7 @@ void cRoot::InputThread(void * a_Params)
 
 
 
-void cRoot::Start()
+void cRoot::Start(void)
 {
 	delete m_Log;
 	m_Log = new cMCLogger();
@@ -104,12 +104,21 @@ void cRoot::Start()
 			IniFile.ReadFile();
 			IniFile.Path("settings.ini");
 		}
-		m_PrimaryServerVersion = IniFile.GetValueSetI("Server", "PrimaryServerVersion", cProtocolRecognizer::PROTO_VERSION_1_4_2);
+		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
+		if (m_PrimaryServerVersion == 0)
+		{
+			m_PrimaryServerVersion = cProtocolRecognizer::PROTO_VERSION_LATEST;
+		}
+		else
+		{
+			// Make a note in the log that the primary server version is explicitly set in the ini file
+			LOGINFO("settings.ini: [Server].PrimaryServerVersion set to %d.", m_PrimaryServerVersion);
+		}
 
 		int Port = IniFile.GetValueSetI("Server", "Port", 25565 );
 		if (!m_Server->InitServer(Port))
 		{
-			LOG("Failed to start server, shutting down.");
+			LOGERROR("Failed to start server, shutting down.");
 			return;
 		}
 		IniFile.WriteFile();
