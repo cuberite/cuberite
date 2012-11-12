@@ -90,6 +90,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_ShouldCheckDownloaded(false)
 	, m_UniqueID(0)
 	, m_BlockDigAnim(-1)
+	, m_LastDigStatus(-1)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -508,8 +509,8 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 		return;
 	}
 
-	LOGD("OnBlockDig: {%i, %i, %i}; Face: %i; Stat: %i",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
+	LOGD("OnBlockDig: {%i, %i, %i}; Face: %i; Stat: %i LastStat: %i",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, m_LastDigStatus
 	);
 
 	// Do we want plugins to disable tossing items? Probably no, so toss item before asking plugins for permission
@@ -536,12 +537,22 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
-	
+
 	bool bBroken = (
-		(a_Status == DIG_STATUS_FINISHED) || 
+		((a_Status == DIG_STATUS_FINISHED) &&
+		//Don't allow to finish digging if not started yet:
+		(m_LastDigStatus == 0) &&
+		(m_LastDigX == a_BlockX) &&
+		(m_LastDigY == a_BlockY) &&
+		(m_LastDigZ == a_BlockZ)) || 
 		(g_BlockOneHitDig[(int)OldBlock]) || 
 		((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() == 1))
 	);
+
+	m_LastDigStatus = a_Status;
+	m_LastDigX = a_BlockX;
+	m_LastDigY = a_BlockY;
+	m_LastDigZ = a_BlockZ;
 
 	if ((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() != eGameMode_Creative))
 	{

@@ -223,6 +223,11 @@ private:
 	int m_BlockDigY;
 	int m_BlockDigZ;
 
+	char m_LastDigStatus;
+	int m_LastDigX;
+	int m_LastDigY;
+	int m_LastDigZ;
+
 	enum eState
 	{
 		csConnected,         // The client has just connected, waiting for their handshake / login
