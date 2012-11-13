@@ -402,6 +402,7 @@ void cLightingThread::PrepareBlockLight(void)
 {
 	// Clear seeds:
 	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
+	memset(m_IsSeed2, 0, sizeof(m_IsSeed2));
 	m_NumSeeds = 0;
 
 	// Walk every column that has all XZ neighbors, make a seed for each light-emitting block:
