@@ -66,6 +66,13 @@ public:
 		{
 			m_Writer.EndList();
 		}
+		
+		// If light not valid, reset it to all zeroes:
+		if (!m_IsLightValid)
+		{
+			memset(m_BlockLight,    0, sizeof(m_BlockLight));
+			memset(m_BlockSkyLight, 0, sizeof(m_BlockSkyLight));
+		}
 	}
 	
 	
@@ -593,8 +600,11 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	Serializer.Finish();  // Close NBT tags
 	
 	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
-	a_Writer.AddByteArray("Biomes",    (const char *)(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
-	a_Writer.AddIntArray ("MCSBiomes", (const int *)(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
+	if (Serializer.m_BiomesAreValid)
+	{
+		a_Writer.AddByteArray("Biomes",    (const char *)(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
+		a_Writer.AddIntArray ("MCSBiomes", (const int *)(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
+	}
 	
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
