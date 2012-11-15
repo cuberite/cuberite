@@ -239,10 +239,9 @@ cSocket cSocket::Accept()
 
 	cSocket SClient = accept(m_Socket, (sockaddr*)&from, &fromlen);
 
-	if (from.sin_addr.s_addr && SClient.IsValid())	// Get IP in string form
+	if (SClient.IsValid() && (from.sin_addr.s_addr != 0))  // Get IP in string form
 	{
 		SClient.m_IPString = inet_ntoa(from.sin_addr);
-		//LOG("cSocket::Accept() %s", SClient.m_IPString);
 	}
 
 	return SClient;

@@ -51,8 +51,8 @@ cHeiGenCache::cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize)
 
 cHeiGenCache::~cHeiGenCache()
 {
-	delete m_CacheData;
-	delete m_CacheOrder;
+	delete[] m_CacheData;
+	delete[] m_CacheOrder;
 	delete m_HeiGenToCache;
 }
 
