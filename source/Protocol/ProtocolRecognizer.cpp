@@ -48,6 +48,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_4_2: return "1.4.2";
 		case PROTO_VERSION_1_4_4: return "1.4.4";
 	}
+	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
 }
 
