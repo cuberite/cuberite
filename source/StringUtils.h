@@ -27,6 +27,9 @@ extern AString & AppendVPrintf(AString & str, const char * format, va_list args)
 /// Output the formatted text into the string
 extern AString & Printf       (AString & str, const char * format, ...);
 
+/// Output the formatted text into string, return string by value
+extern AString Printf(const char * format, ...);
+
 /// Add the formatted string to the existing data in the string
 extern AString & AppendPrintf (AString & str, const char * format, ...);
 

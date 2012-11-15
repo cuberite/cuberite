@@ -57,7 +57,7 @@ AString & AppendVPrintf(AString & str, const char *format, va_list args)
 
 
 
-AString & Printf(AString & str, const char *format, ...)
+AString & Printf(AString & str, const char * format, ...)
 {
 	str.clear();
 	va_list args;
@@ -65,6 +65,20 @@ AString & Printf(AString & str, const char *format, ...)
 	std::string &retval = AppendVPrintf(str, format, args);
 	va_end(args);
 	return retval;
+}
+
+
+
+
+
+AString Printf(const char * format, ...)
+{
+	AString res;
+	va_list args;
+	va_start(args, format);
+	AppendVPrintf(res, format, args);
+	va_end(args);
+	return res;
 }
 
 
