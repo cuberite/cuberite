@@ -21,7 +21,7 @@ cJukeboxEntity::cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld 
 
 cJukeboxEntity::~cJukeboxEntity()
 {
-	if (m_Record >= 2256 && m_Record <= 2266)
+	if (m_Record >= 2256 && m_Record <= 2267)
 	{
 		EjectRecord();
 		m_Record = 0;
@@ -37,14 +37,14 @@ void cJukeboxEntity::UsedBy( cPlayer * a_Player )
 	if (m_Record == 0)
 	{
 		const cItem & HeldItem = a_Player->GetEquippedItem();
-		if (HeldItem.m_ItemType >= 2256 && HeldItem.m_ItemType <= 2266)
+		if (HeldItem.m_ItemType >= 2256 && HeldItem.m_ItemType <= 2267)
 		{
 			m_Record = HeldItem.m_ItemType;
 			a_Player->UseEquippedItem();
 			PlayRecord();
 		}
 	}
-	else if (m_Record >= 2256 && m_Record <= 2266)
+	else if (m_Record >= 2256 && m_Record <= 2267)
 	{
 		EjectRecord();
 		m_Record = 0;

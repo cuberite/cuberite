@@ -36,7 +36,7 @@
 
 
 bool cItemHandler::m_HandlerInitialized = false;
-cItemHandler * cItemHandler::m_ItemHandler[2266];
+cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 
 
@@ -177,7 +177,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 
 void cItemHandler::Deinit()
 {
-	for(int i = 0; i < 2266; i++)
+	for(int i = 0; i < 2267; i++)
 	{
 		delete m_ItemHandler[i];
 	}

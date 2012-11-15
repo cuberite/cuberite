@@ -35,10 +35,12 @@ public:
 			return true;
 		}
 		
-		if (g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY + 1, a_BlockZ )])
+		BLOCKTYPE TopBlock = a_World->GetBlock( a_BlockX, a_BlockY + 1, a_BlockZ);
+		if (g_BlockIsSolid[TopBlock] || TopBlock==E_BLOCK_LEAVES)
 		{
 			AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, true );
-			if (g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ )]==false)
+			BLOCKTYPE BaseBlock = a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ);
+			if (g_BlockIsSolid[BaseBlock] == false && BaseBlock!=E_BLOCK_LEAVES)
 			{
 				AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, false );
 				a_World->SetBlock( a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_VINES, 0);
@@ -47,8 +49,8 @@ public:
 		}
 
 		AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, true );
-
-		return g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ)];
+		BLOCKTYPE BaseBlock = a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ);
+		return g_BlockIsSolid[BaseBlock] || BaseBlock==E_BLOCK_LEAVES;
 	}
 
 
