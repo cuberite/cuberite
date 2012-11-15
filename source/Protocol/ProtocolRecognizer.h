@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2"
-#define MCS_PROTOCOL_VERSIONS "29, 39, 47"
+#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4"
+#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49"
 
 
 
@@ -36,12 +36,16 @@ public:
 		PROTO_VERSION_1_2_5 = 29,
 		PROTO_VERSION_1_3_2 = 39,
 		PROTO_VERSION_1_4_2 = 47,
+		PROTO_VERSION_1_4_4 = 49,
 		
-		PROTO_VERSION_LATEST = PROTO_VERSION_1_4_2,  // Keep this up to date, this serves as the default for PrimaryServerVersion
+		PROTO_VERSION_LATEST = PROTO_VERSION_1_4_4,  // Keep this up to date, this serves as the default for PrimaryServerVersion
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
 	virtual ~cProtocolRecognizer();
+	
+	/// Translates protocol version number into protocol version text: 49 -> "1.4.4"
+	static AString GetVersionTextFromInt(int a_ProtocolVersion);
 	
 	/// Called when client sends some data:
 	virtual void DataReceived(const char * a_Data, int a_Size) override;

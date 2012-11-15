@@ -2,6 +2,7 @@
 // Protocol142.h
 
 // Interfaces to the cProtocol142 class representing the release 1.4.2 protocol (#47)
+// The same protocol class is used for 1.4.4 too, because the only difference is in a packet that MCServer doesn't implement yet (ITEM_DATA)
 
 
 

@@ -39,6 +39,22 @@ cProtocolRecognizer::~cProtocolRecognizer()
 
 
 
+AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
+{
+	switch (a_ProtocolVersion)
+	{
+		case PROTO_VERSION_1_2_5: return "1.2.5";
+		case PROTO_VERSION_1_3_2: return "1.3.2";
+		case PROTO_VERSION_1_4_2: return "1.4.2";
+		case PROTO_VERSION_1_4_4: return "1.4.4";
+	}
+	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
+}
+
+
+
+
+
 void cProtocolRecognizer::DataReceived(const char * a_Data, int a_Size)
 {
 	if (m_Protocol == NULL)
@@ -541,7 +557,7 @@ void cProtocolRecognizer::SendData(const char * a_Data, int a_Size)
 bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and 
-	// MCS_PROTOCOL_VERSIONS macros in the header file
+	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
 	
 	// The first packet should be a Handshake, 0x02:
 	unsigned char PacketType;
@@ -563,15 +579,19 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	{
 		return false;
 	}
-	if (ch == PROTO_VERSION_1_3_2)
+	switch (ch)
 	{
-		m_Protocol = new cProtocol132(m_Client);
-		return true;
-	}
-	if (ch == PROTO_VERSION_1_4_2)
-	{
-		m_Protocol = new cProtocol142(m_Client);
-		return true;
+	 case PROTO_VERSION_1_3_2:
+		{
+			m_Protocol = new cProtocol132(m_Client);
+			return true;
+		}
+		case PROTO_VERSION_1_4_2:
+		case PROTO_VERSION_1_4_4:
+		{
+			m_Protocol = new cProtocol142(m_Client);
+			return true;
+		}
 	}
 	m_Protocol = new cProtocol125(m_Client);
 	return true;
@@ -601,6 +621,7 @@ void cProtocolRecognizer::HandleServerPing(void)
 		}
 		
 		case PROTO_VERSION_1_4_2:
+		case PROTO_VERSION_1_4_4:
 		{
 			// The server list ping now has 1 more byte of "magic". Mojang just loves to complicate stuff.
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3101#Server_List_Ping_.280xFE.29
@@ -618,14 +639,18 @@ void cProtocolRecognizer::HandleServerPing(void)
 			Printf(NumPlayers, "%d", cRoot::Get()->GetDefaultWorld()->GetNumPlayers());
 			AString MaxPlayers;
 			Printf(MaxPlayers, "%d", cRoot::Get()->GetDefaultWorld()->GetMaxPlayers());
+			
+			AString ProtocolVersionNum;
+			Printf(ProtocolVersionNum, "%d", cRoot::Get()->m_PrimaryServerVersion);
+			AString ProtocolVersionTxt(GetVersionTextFromInt(cRoot::Get()->m_PrimaryServerVersion));
 
 			// Cannot use Printf() because of in-string NUL bytes.
 			Reply = cChatColor::Delimiter;
 			Reply.append("1");
 			Reply.push_back(0);
-			Reply.append("47");
+			Reply.append(ProtocolVersionNum);
 			Reply.push_back(0);
-			Reply.append("1.4.2");
+			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
 			Reply.append(cRoot::Get()->GetDefaultWorld()->GetDescription());
 			Reply.push_back(0);
