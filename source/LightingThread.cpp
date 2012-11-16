@@ -474,7 +474,7 @@ void cLightingThread::CalcLightStep(
 		int SeedY = SeedIdx / BlocksPerYLayer;
 		
 		// Propagate seed:
-		if (SeedX < cChunkDef::Width * 3)
+		if (SeedX < cChunkDef::Width * 3 - 1)
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + 1, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
@@ -482,7 +482,7 @@ void cLightingThread::CalcLightStep(
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - 1, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedZ < cChunkDef::Width * 3)
+		if (SeedZ < cChunkDef::Width * 3 - 1)
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + cChunkDef::Width * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
@@ -490,7 +490,7 @@ void cLightingThread::CalcLightStep(
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - cChunkDef::Width * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedY < cChunkDef::Height)
+		if (SeedY < cChunkDef::Height - 1)
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + cChunkDef::Width * cChunkDef::Width * 3 * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}

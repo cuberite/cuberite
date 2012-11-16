@@ -146,7 +146,7 @@ protected:
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
 	
-	/// Compresses from 1-byte-per-block into 2-bytes-per-block:
+	/// Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage):
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
 	
 	inline void PropagateLight(
@@ -155,6 +155,11 @@ protected:
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	)
 	{
+		ASSERT(a_SrcIdx >= 0);
+		ASSERT(a_SrcIdx < ARRAYCOUNT(m_SkyLight));
+		ASSERT(a_DstIdx >= 0);
+		ASSERT(a_DstIdx < ARRAYCOUNT(m_BlockTypes));
+		
 		if (a_Light[a_SrcIdx] <= a_Light[a_DstIdx] + g_BlockSpreadLightFalloff[m_BlockTypes[a_DstIdx]])
 		{
 			// We're not offering more light than the dest block already has
