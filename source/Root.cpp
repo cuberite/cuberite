@@ -125,13 +125,19 @@ void cRoot::Start(void)
 		IniFile.WriteFile();
 
 		cIniFile WebIniFile("webadmin.ini");
-		if( WebIniFile.ReadFile() )
+		if (!WebIniFile.ReadFile())
 		{
-			if (WebIniFile.GetValueB("WebAdmin", "Enabled", false ))
-			{
-				LOG("Creating WebAdmin...");
-				m_WebAdmin = new cWebAdmin(8080);
-			}
+			LOGINFO("webadmin.ini inaccessible, using webadmin.example.ini for defaults!");
+			WebIniFile.Path("webadmin.example.ini");
+			WebIniFile.ReadFile();
+			WebIniFile.Path("webadmin.ini");
+			WebIniFile.WriteFile();
+		}
+
+		if (WebIniFile.GetValueB("WebAdmin", "Enabled", false ))
+		{
+			LOG("Creating WebAdmin...");
+			m_WebAdmin = new cWebAdmin(8080);
 		}
 
 		LOG("Loading settings...");

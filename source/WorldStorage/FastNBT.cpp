@@ -503,13 +503,22 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, si
 	TagCommon(a_Name, TAG_IntArray);
 	Int32 len = htonl(a_NumElements);
 	m_Result.append((const char *)&len, 4);
+#if defined(ANDROID_NDK)
+	for (size_t i = 0; i < a_NumElements; i++)
+	{
+		int Element = htonl(a_Value[i]);
+		m_Result.append((const char *)&Element, 4);
+	}
+#else
 	int * Elements = (int *)(m_Result.data() + m_Result.size());
 	m_Result.append(a_NumElements * 4, (char)0);
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
 		Elements[i] = htonl(a_Value[i]);
 	}
+#endif
 }
+
 
 
 

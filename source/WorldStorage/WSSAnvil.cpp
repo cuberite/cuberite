@@ -272,7 +272,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World) :
 		ASSERT(TestParse.IsValid());
 		#endif  // _DEBUG
 		
-		gzFile gz = gzopen(fnam.c_str(), "wb");
+		gzFile gz = gzopen((FILE_IO_PREFIX + fnam).c_str(), "wb");
 		if (gz != NULL)
 		{
 			gzwrite(gz, Writer.GetResult().data(), Writer.GetResult().size());
