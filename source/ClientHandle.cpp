@@ -908,7 +908,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 	{
 		virtual bool Item(cEntity * a_Entity) override
 		{
-			if (a_Entity->GetWorld()->IsPVPEnabled() == false)
+			if (!a_Entity->GetWorld()->IsPVPEnabled())
 			{
 				// PVP is disabled
 				if (a_Entity->IsA("cPlayer") && Instigator->IsA("cPlayer"))

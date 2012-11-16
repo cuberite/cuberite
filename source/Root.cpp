@@ -127,7 +127,7 @@ void cRoot::Start(void)
 		cIniFile WebIniFile("webadmin.ini");
 		if( WebIniFile.ReadFile() )
 		{
-			if( WebIniFile.GetValueB("WebAdmin", "Enabled", false ) == true )
+			if (WebIniFile.GetValueB("WebAdmin", "Enabled", false ))
 			{
 				LOG("Creating WebAdmin...");
 				m_WebAdmin = new cWebAdmin(8080);

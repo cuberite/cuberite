@@ -56,12 +56,12 @@ void cRedstoneSimulator::Simulate( float a_Dt )
 		if( (*itr).Ticks <= 0 )
 		{
 			char Block = m_World->GetBlock( (*itr).Position );
-			if( (*itr).bPowerOn == true && Block == E_BLOCK_REDSTONE_REPEATER_OFF )
+			if ((*itr).bPowerOn && (Block == E_BLOCK_REDSTONE_REPEATER_OFF))
 			{
 				m_World->FastSetBlock( (*itr).Position.x, (*itr).Position.y, (*itr).Position.z, E_BLOCK_REDSTONE_REPEATER_ON, m_World->GetBlockMeta( (*itr).Position ) );
 				m_Blocks.push_back( (*itr).Position );
 			}
-			else if( (*itr).bPowerOn == false && Block == E_BLOCK_REDSTONE_REPEATER_ON )
+			else if (!(*itr).bPowerOn && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
 				m_World->FastSetBlock( (*itr).Position.x, (*itr).Position.y, (*itr).Position.z, E_BLOCK_REDSTONE_REPEATER_OFF, m_World->GetBlockMeta( (*itr).Position ) );
 				m_Blocks.push_back( (*itr).Position );
@@ -860,11 +860,11 @@ void cRedstoneSimulator::SetRepeater( const Vector3i & a_Position, int a_Ticks, 
 		sRepeaterChange & Change = *itr;
 		if( Change.Position.Equals( a_Position ) )
 		{
-			if( Change.bPowerOn && a_bPowerOn == false )
+			if (Change.bPowerOn && !a_bPowerOn)
 			{
 				Change.bPowerOffNextTime = true;
 			}
-			if( a_bPowerOn == true )
+			if (a_bPowerOn)
 			{
 				Change.bPowerOffNextTime = false;
 			}

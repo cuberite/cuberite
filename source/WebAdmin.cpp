@@ -196,7 +196,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 					cWebPlugin* WebPlugin = *itr;
 					FoundPlugin = WebPlugin->GetName();
 					AString TabName = WebPlugin->GetTabNameForRequest( &Request ).first;
-					if( TabName.empty() == false )
+					if (!TabName.empty())
 					{
 						FoundPlugin += " - " + TabName;
 					}
@@ -239,7 +239,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 		
 
-		if (bDontShowTemplate == false && Split.size() > 1)
+		if (!bDontShowTemplate && (Split.size() > 1))
 		{
 			Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
 		}
