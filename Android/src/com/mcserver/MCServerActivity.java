@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -31,13 +33,17 @@ public class MCServerActivity extends Activity {
 	ArrayList<String> mLogList = new ArrayList<String>();
 	ArrayAdapter<String> mAdapter;
 	
+	MCServerInstaller mInstaller = null;
+	
+	final private int MENU_REINSTALL = 0;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        Log.e("MCServer", "p id: " + android.os.Process.myPid() );
+        //Log.e("MCServer", "p id: " + android.os.Process.myPid() );
         
         
         ((Button)findViewById(R.id.start_server)).setOnClickListener( new View.OnClickListener() {
@@ -135,12 +141,14 @@ public class MCServerActivity extends Activity {
         });
         loggerThread.start();
 
-        
-        
-        
-        
-        
         ((TextView)findViewById(R.id.ip_address)).setText("Connect to: " + getLocalIpAddress());
+        
+        
+        mInstaller = new MCServerInstaller(this);
+        if( mInstaller.NeedsUpdate() )
+        {
+        	mInstaller.ShowFirstRunDialog();
+        }
     }
     
     
@@ -234,11 +242,28 @@ public class MCServerActivity extends Activity {
     
     
     
-    public void Testtt()
-    {
-    	//Log.d("MCServer", "in Testtt");
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, MENU_REINSTALL, 0, "Reinstall MCServer" );
+        return super.onCreateOptionsMenu(menu);
     }
     
+    
+    
+    
+    
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	
+    	switch( item.getItemId() )
+    	{
+    	case MENU_REINSTALL:
+    		mInstaller.ShowPluginInstallDialog(true);
+    		return true;
+    	}
+        return false;
+    }
+
     
     
     
