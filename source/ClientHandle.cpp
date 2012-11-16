@@ -1391,7 +1391,7 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 		return;
 	}
 	
-	LOG("Spawning player \"%s\" on client \"%s\" @ %s", 
+	LOGD("Spawning player \"%s\" on client \"%s\" @ %s", 
 		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
 	);
 	
