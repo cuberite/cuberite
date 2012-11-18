@@ -614,12 +614,13 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
 {
-	LOGD("HandleBlockPlace: {%d, %d, %d}, face %d, itemtype: %d",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem.m_ItemType
+	LOGD("HandleBlockPlace: {%d, %d, %d}, face %d, HeldItem: %s",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
 	
 	if (!CheckBlockInteractionsRate())
 	{
+		LOGD("Too many block interactions, aborting placement");
 		return;
 	}
 	
@@ -722,6 +723,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			}
 			else
 			{
+				LOGD("Block refused placement here, aborting");
 				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);  // Send the old block back to the player
 				return;
 			}

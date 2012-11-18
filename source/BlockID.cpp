@@ -331,9 +331,19 @@ public:
 		memset(g_BlockTransparent,         0x00, sizeof(g_BlockTransparent));
 		memset(g_BlockOneHitDig,           0x00, sizeof(g_BlockOneHitDig));
 		memset(g_BlockPistonBreakable,     0x00, sizeof(g_BlockPistonBreakable));
-		memset(g_BlockIsSnowable,          0xff, sizeof(g_BlockIsSnowable));  // Set all blocks' snowable to true
+		
+		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
+		for (int i = 0; i < ARRAYCOUNT(g_BlockIsSnowable); i++)
+		{
+			g_BlockIsSnowable[i] = true;
+		}
 		memset(g_BlockRequiresSpecialTool, 0x00, sizeof(g_BlockRequiresSpecialTool));  // Set all blocks to false
-		memset(g_BlockIsSolid,             0xff, sizeof(g_BlockIsSolid));  // Set all blocks to true
+		
+		// Setting bools to true must be done manually, see http://forum.mc-server.org/showthread.php?tid=629&pid=5415#pid5415
+		for (int i = 0; i < ARRAYCOUNT(g_BlockIsSolid); i++)
+		{
+			g_BlockIsSolid[i] = true;
+		}
 
 		// Emissive blocks
 		g_BlockLightValue[E_BLOCK_FIRE]                 = 15;
