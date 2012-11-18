@@ -363,6 +363,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	if (Sides.size() != 2)
 	{
 		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);
+		LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 		return;
 	}
 	
@@ -373,11 +374,13 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	if (ResultSplit.empty())
 	{
 		LOGWARNING("crafting.txt: line %d: Result is empty, ignoring the recipe.", a_LineNum);
+		LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 		return;
 	}
 	if (!ParseItem(ResultSplit[0], Recipe->m_Result))
 	{
 		LOGWARNING("crafting.txt: line %d: Cannot parse result item, ignoring the recipe.", a_LineNum);
+		LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 		return;
 	}
 	if (ResultSplit.size() > 1)
@@ -386,6 +389,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		if (Recipe->m_Result.m_ItemCount == 0)
 		{
 			LOGWARNING("crafting.txt: line %d: Cannot parse result count, ignoring the recipe.", a_LineNum);
+			LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 			return;
 		}
 	}
@@ -402,6 +406,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		if (!ParseIngredient(*itr, Recipe.get()))
 		{
 			LOGWARNING("crafting.txt: line %d: Cannot parse ingredient #%d, ignoring the recipe.", a_LineNum, Num);
+			LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
 			return;
 		}
 	}  // for itr - Ingredients[]
