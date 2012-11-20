@@ -96,8 +96,10 @@ enum
 	{ \
 		if (!m_ReceivedData.Proc(Var)) \
 		{ \
+			m_ReceivedData.CheckValid(); \
 			return PARSE_INCOMPLETE; \
 		} \
+		m_ReceivedData.CheckValid(); \
 	}
 
 
@@ -111,7 +113,7 @@ typedef unsigned char Byte;
 
 cProtocol125::cProtocol125(cClientHandle * a_Client) :
 	super(a_Client),
-	m_ReceivedData(64 KiB)
+	m_ReceivedData(32 KiB)
 {
 }
 

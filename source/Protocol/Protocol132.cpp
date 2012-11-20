@@ -25,8 +25,10 @@
 	{ \
 		if (!m_ReceivedData.Proc(Var)) \
 		{ \
+			m_ReceivedData.CheckValid(); \
 			return PARSE_INCOMPLETE; \
 		} \
+		m_ReceivedData.CheckValid(); \
 	}
 
 

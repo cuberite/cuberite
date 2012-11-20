@@ -97,6 +97,9 @@ public:
 	/// Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to duplicate communication
 	void ReadAgain(AString & a_Out);
 	
+	/// Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs
+	void CheckValid(void) const;
+
 protected:
 	char * m_Buffer;
 	int    m_BufferSize;  // Total size of the ringbuffer
