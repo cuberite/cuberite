@@ -294,7 +294,7 @@ void cChunkGenerator::InitCompositionGen(cIniFile & a_IniFile)
 
 void cChunkGenerator::InitStructureGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Trees,MarbleCaves,OreNests");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Ravines,WormNestCaves,OreNests,Trees");
 
 	AStringVector Str = StringSplit(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
