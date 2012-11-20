@@ -50,6 +50,9 @@ public:
 	/// Logs chunkstats for each world and totals
 	void LogChunkStats(void);
 	
+	int GetPrimaryServerVersion(void) const { return m_PrimaryServerVersion; }  // tolua_export
+	void SetPrimaryServerVersion(int a_Version) { m_PrimaryServerVersion = a_Version; }  // tolua_export
+	
 	cMonsterConfig * GetMonsterConfig() { return m_MonsterConfig; }
 
 	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export

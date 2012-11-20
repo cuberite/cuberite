@@ -548,6 +548,25 @@ void cServer::ServerCommand(const AString & a_Cmd)
 	}
 	#endif
 	
+	if (split[0].compare("primaryserverversion") == 0)
+	{
+		if (split.size() > 1)
+		{
+			int Version = atol(split[1].c_str());
+			if (Version == 0)
+			{
+				LOGWARNING("Cannot parse version \"%s\". Not setting anything.");
+				return;
+			}
+			cRoot::Get()->SetPrimaryServerVersion(Version);
+		}
+		LOGINFO("Primary server version: %d (%s)", 
+			cRoot::Get()->m_PrimaryServerVersion, 
+			cProtocolRecognizer::GetVersionTextFromInt(cRoot::Get()->m_PrimaryServerVersion).c_str()
+		);
+		return;
+	}
+	
 	if (split.size() > 1)
 	{
 		if (split[0].compare("say") == 0)
