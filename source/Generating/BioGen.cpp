@@ -125,10 +125,32 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 	// Convert each string in the list into biome:
 	for (AStringVector::const_iterator itr = Split.begin(); itr != Split.end(); ++itr)
 	{
-		EMCSBiome Biome = StringToBiome(*itr);
+		AStringVector Split2 = StringSplit(*itr, ":");
+		if (Split2.size() < 1)
+		{
+			continue;
+		}
+		int Count = 1;
+		if (Split2.size() >= 2)
+		{
+			Count = atol(Split2[1].c_str());
+			if (Count <= 0)
+			{
+				LOGWARNING("Cannot decode biome count: \"%s\"; using 1.", Split2[1].c_str());
+				Count = 1;
+			}
+		}
+		EMCSBiome Biome = StringToBiome(Split2[0]);
 		if (Biome != -1)
 		{
-			m_Biomes.push_back(Biome);
+			for (int i = 0; i < Count; i++)
+			{
+				m_Biomes.push_back(Biome);
+			}
+		}
+		else
+		{
+			LOGWARNING("Cannot decode biome name: \"%s\"; skipping", Split2[0].c_str());
 		}
 	}  // for itr - Split[]
 	if (!m_Biomes.empty())

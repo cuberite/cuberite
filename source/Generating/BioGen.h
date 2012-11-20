@@ -90,6 +90,7 @@ protected:
 	EMCSBiomes m_Biomes;
 	int        m_BiomesCount;  // Pulled out of m_Biomes for faster access
 	
+	/// Parses the INI file setting string into m_Biomes.
 	void InitializeBiomes(const AString & a_Biomes);
 	
 } ;
