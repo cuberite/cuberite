@@ -39,8 +39,8 @@ ifeq ($(release),1)
 ################
 # release build - fastest run-time, no gdb support
 ################
-CC_OPTIONS = -s -O3 -DNDEBUG
-CXX_OPTIONS = -s -O3 -DNDEBUG
+CC_OPTIONS = -s -g -O3 -DNDEBUG
+CXX_OPTIONS = -s -g -O3 -DNDEBUG
 LNK_OPTIONS = -lstdc++ -pthread -O3
 BUILDDIR = build/release/
 
@@ -49,8 +49,8 @@ ifeq ($(profile),1)
 ################
 # profile build - a release build with symbols and profiling engine built in
 ################
-CC_OPTIONS = -s -ggdb -O3 -pg -DNDEBUG
-CXX_OPTIONS = -s -ggdb -O3 -pg -DNDEBUG
+CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
+CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 LNK_OPTIONS = -lstdc++ -pthread -ggdb -O3 -pg
 BUILDDIR = build/profile/
 
@@ -59,8 +59,8 @@ ifeq ($(pedantic),1)
 ################
 # pedantic build - basically a debug build with lots of warnings
 ################
-CC_OPTIONS = -s -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-CXX_OPTIONS = -s -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
+CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 LNK_OPTIONS = -lstdc++ -pthread -ggdb
 BUILDDIR = build/pedantic/
 
