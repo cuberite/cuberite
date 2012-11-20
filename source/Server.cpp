@@ -490,6 +490,7 @@ void cServer::ServerCommand(const AString & a_Cmd)
 		printf("restart    - Kicks all clients, and saves everything\n");
 		printf("            and clears memory\n");
 		printf("stop       - Saves everything and closes server\n");
+		printf("primaryserverversion - Gets or sets server version reported to 1.4+ clients\n");
 		printf("===================================================\n");
 		return;
 	}
