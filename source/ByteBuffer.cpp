@@ -297,7 +297,9 @@ bool cByteBuffer::ReadBool(bool & a_Value)
 	CHECK_THREAD;
 	CheckValid();
 	NEEDBYTES(1);
-	a_Value = (m_Buffer[m_ReadPos++] != 0);
+	char Value = 0;
+	ReadBuf(&Value, 1);
+	a_Value = (Value != 0);
 	return true;
 }
 
