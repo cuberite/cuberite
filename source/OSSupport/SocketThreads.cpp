@@ -577,7 +577,8 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 	cCSLock Lock(m_Parent->m_CS);
 	for (int i = m_NumSlots - 1; i >= 0; --i)
 	{
-		if (!FD_ISSET(m_Slots[i].m_Socket.GetSocket(), a_Read))
+		cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
+		if (!cSocket::IsValidSocket(Socket) || !FD_ISSET(Socket, a_Read))
 		{
 			continue;
 		}
@@ -621,7 +622,8 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 	cCSLock Lock(m_Parent->m_CS);
 	for (int i = m_NumSlots - 1; i >= 0; --i)
 	{
-		if (!m_Slots[i].m_Socket.IsValid() || !FD_ISSET(m_Slots[i].m_Socket.GetSocket(), a_Write))
+		cSocket::xSocket Socket = m_Slots[i].m_Socket.GetSocket();
+		if (!cSocket::IsValidSocket(Socket) || !FD_ISSET(Socket, a_Write))
 		{
 			continue;
 		}

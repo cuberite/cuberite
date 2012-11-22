@@ -19,7 +19,7 @@ public:
 	cSocket(xSocket a_Socket);
 	~cSocket();
 
-	bool IsValid(void) const;
+	bool IsValid(void) const { return IsValidSocket(m_Socket); }
 	void CloseSocket();
 
 	operator xSocket() const;
@@ -43,12 +43,14 @@ public:
 
 	inline static bool IsSocketError( int a_ReturnedValue )
 	{
-#ifdef _WIN32
-		return (a_ReturnedValue == SOCKET_ERROR || a_ReturnedValue == 0);
-#else
-		return (a_ReturnedValue <= 0);
-#endif
+		#ifdef _WIN32
+			return (a_ReturnedValue == SOCKET_ERROR || a_ReturnedValue == 0);
+		#else
+			return (a_ReturnedValue <= 0);
+		#endif
 	}
+	
+	static bool IsValidSocket(xSocket a_Socket);
 
 	struct SockAddr_In
 	{

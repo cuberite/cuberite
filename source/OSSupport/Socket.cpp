@@ -51,12 +51,12 @@ cSocket::xSocket cSocket::GetSocket() const
 
 
 
-bool cSocket::IsValid(void) const
+bool cSocket::IsValidSocket(cSocket::xSocket a_Socket)
 {
 	#ifdef _WIN32
-	return (m_Socket != INVALID_SOCKET);
+	return (a_Socket != INVALID_SOCKET);
 	#else  // _WIN32
-	return (m_Socket >= 0);
+	return (a_Socket >= 0);
 	#endif  // else _WIN32
 }
 
