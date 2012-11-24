@@ -35,8 +35,11 @@ public:
 
 		if (a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, a_Item->m_ItemDamage) >= 0)
 		{
-			// The mob was spawned, "use" the item:
-			a_Player->UseEquippedItem();
+			if(a_Player->GetGameMode() != 1)
+			{
+				// The mob was spawned, "use" the item:
+				a_Player->GetInventory().RemoveItem(a_Player->GetInventory().GetEquippedItem());
+			}
 			return true;
 		}
 		

@@ -9,18 +9,18 @@
 
 
 
-class cBlockStoneHandler :
+class cBlockMyceliumHandler :
 	public cBlockHandler
 {
 public:
-	cBlockStoneHandler(BLOCKTYPE a_BlockType)
+	cBlockMyceliumHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_COBBLESTONE, 1, 0));
+		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
 	}
 } ;
 

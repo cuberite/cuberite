@@ -1855,6 +1855,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockMycelium.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockNote.h"
 					>
 				</File>

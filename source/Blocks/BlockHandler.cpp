@@ -44,6 +44,7 @@
 #include "BlockNote.h"
 #include "BlockBed.h"
 #include "BlockFarmland.h"
+#include "BlockMycelium.h"
 
 
 
@@ -117,6 +118,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LOG:                   return new cBlockWoodHandler            (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_MYCELIUM:              return new cBlockMyceliumHandler        (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
@@ -132,6 +134,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RED_MUSHROOM:          return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_RED_ROSE:              return new cBlockFlowerHandler          (a_BlockType);
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
+		case E_ITEM_SANDSTONE_STAIRS:       return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignHandler            (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
