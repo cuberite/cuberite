@@ -45,6 +45,7 @@
 #include "BlockBed.h"
 #include "BlockFarmland.h"
 #include "BlockMycelium.h"
+#include "BlockRail.h"
 
 
 
@@ -124,6 +125,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PLANKS:                return new cBlockWoodHandler            (a_BlockType);
 		case E_BLOCK_PUMPKIN_STEM:          return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_REPEATER_OFF: return new cBlockRedstoneRepeaterHandler(a_BlockType);

@@ -1875,6 +1875,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockRail.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockRedstone.cpp"
 					>
 				</File>
