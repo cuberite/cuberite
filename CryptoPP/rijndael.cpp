@@ -349,7 +349,11 @@ void Rijndael::Base::UncheckedSetKey(const byte *userKey, unsigned int keylen, c
 void Rijndael::Enc::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
 #if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE) || CRYPTOPP_BOOL_AESNI_INTRINSICS_AVAILABLE
+#if CRYPTOPP_BOOL_SSE2_ASM_AVAILABLE || defined(CRYPTOPP_X64_MASM_AVAILABLE)
 	if (HasSSE2())
+#else
+	if (HasAESNI())
+#endif
 	{
 		Rijndael::Enc::AdvancedProcessBlocks(inBlock, xorBlock, outBlock, 16, 0);
 		return;
@@ -522,7 +526,7 @@ CRYPTOPP_NAKED void CRYPTOPP_FASTCALL Rijndael_Enc_AdvancedProcessBlocks(void *l
 #if CRYPTOPP_BOOL_X86
 
 #define L_REG			esp
-#define L_INDEX(i)		(L_REG+512+i)
+#define L_INDEX(i)		(L_REG+768+i)
 #define L_INXORBLOCKS	L_INBLOCKS+4
 #define L_OUTXORBLOCKS	L_INBLOCKS+8
 #define L_OUTBLOCKS		L_INBLOCKS+12
@@ -621,7 +625,7 @@ CRYPTOPP_NAKED void CRYPTOPP_FASTCALL Rijndael_Enc_AdvancedProcessBlocks(void *l
 
 #if CRYPTOPP_BOOL_X86
 	AS2(	mov		[ecx+16*12+16*4], esp)	// save esp to L_SP
-	AS2(	lea		esp, [ecx-512])
+	AS2(	lea		esp, [ecx-768])
 #endif
 
 	// copy subkeys to stack
