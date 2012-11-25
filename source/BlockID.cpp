@@ -408,6 +408,9 @@ public:
 		g_BlockTransparent[E_BLOCK_VINES]          = true;
 		g_BlockTransparent[E_BLOCK_WALLSIGN]       = true;
 		g_BlockTransparent[E_BLOCK_YELLOW_FLOWER]  = true;
+		g_BlockTransparent[E_BLOCK_RAIL]           = true;
+		g_BlockTransparent[E_BLOCK_DETECTOR_RAIL]  = true;
+		g_BlockTransparent[E_BLOCK_POWERED_RAIL]   = true;
 
 		// TODO: Any other transparent blocks?
 
