@@ -119,6 +119,7 @@ bool cFurnaceEntity::Tick( float a_Dt )
 			// We have just finished smelting, reset the progress bar:
 			BroadcastProgress(PROGRESSBAR_SMELTING, 0);
 			m_TimeCooked = 0;
+			m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_FURNACE, m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ));
 		}
 		// There is no fuel and no flame, no need to tick at all
 		return false;
@@ -199,6 +200,7 @@ bool cFurnaceEntity::StartCooking(void)
 			if (m_Items[2].IsEqual(*R->Out) || m_Items[2].IsEmpty())
 			{
 				// good to go
+				m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_LIT_FURNACE, m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ));
 
 				if( m_TimeBurned >= m_BurnTime ) // burn new material
 				{
