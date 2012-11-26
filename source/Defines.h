@@ -47,7 +47,7 @@ enum
 inline bool IsValidBlock( int a_BlockType )	//tolua_export
 {											//tolua_export
 	if( a_BlockType > -1 &&
-		a_BlockType <= 126 && //items to 109 are valid for Beta1.8.1.. 1.2.5 is up to 126
+		a_BlockType <= 145 && //items to 109 are valid for Beta1.8.1.. 1.2.5 is up to 126
 		//a_BlockType != 29 && allow pistons
 		//a_BlockType != 33 && allow pistons
 		a_BlockType != 34 &&
@@ -66,7 +66,7 @@ inline bool IsValidBlock( int a_BlockType )	//tolua_export
 // Changed to fit the style ;)
 inline bool IsValidItem( int a_ItemID )		//tolua_export
 {											//tolua_export
-	if( (a_ItemID >= 256 && a_ItemID <= 388)
+	if( (a_ItemID >= 256 && a_ItemID <= 400)
 		|| (a_ItemID >= 2256 && a_ItemID <= 2267) )
 	{
 		return true;

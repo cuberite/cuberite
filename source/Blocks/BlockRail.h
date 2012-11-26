@@ -58,7 +58,8 @@ public:
 
 	virtual void OnNeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		if(IsUnstable(a_World, a_BlockX, a_BlockY, a_BlockZ))
+		char Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		if(IsUnstable(a_World, a_BlockX, a_BlockY, a_BlockZ) && Meta != FindMeta(a_World, a_BlockX, a_BlockY, a_BlockZ))
 			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, FindMeta(a_World, a_BlockX, a_BlockY, a_BlockZ));
 	}
 

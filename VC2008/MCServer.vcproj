@@ -1819,6 +1819,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockGlass.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockGlowstone.h"
 					>
 				</File>

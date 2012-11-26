@@ -290,7 +290,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	if (m_bTouchGround)
 	{
 		float Dist = (float)(m_LastGroundHeight - m_Pos.y);
-		int Damage = (int)(Dist - 4.f);
+		int Damage = (int)(Dist - 3.f);
 		if (Damage > 0)
 		{
 			TakeDamage(Damage, 0);
