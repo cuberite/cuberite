@@ -274,7 +274,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 	if (!m_bTouchGround)
 	{
-		if(m_Pos.y > m_LastJumpHeight) m_LastJumpHeight = m_Pos.y;
+		if(m_Pos.y > m_LastJumpHeight) m_LastJumpHeight = (float)m_Pos.y;
 		cWorld* World = GetWorld();
 		char BlockID = World->GetBlock( float2int(m_Pos.x), float2int(m_Pos.y), float2int(m_Pos.z) );
 		if( BlockID != E_BLOCK_AIR )
@@ -294,7 +294,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		float Dist = (float)(m_LastGroundHeight - m_Pos.y);
 		int Damage = (int)(Dist - 3.f);
 		if(m_LastJumpHeight > m_LastGroundHeight) Damage++;
-		m_LastJumpHeight = m_Pos.y;
+		m_LastJumpHeight = (float)m_Pos.y;
 		if (Damage > 0)
 		{
 			TakeDamage(Damage, 0);
