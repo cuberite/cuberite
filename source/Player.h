@@ -145,6 +145,7 @@ protected:
 	float m_FoodExhaustionLevel;
 	char m_FoodTickTimer;
 
+	float m_LastJumpHeight;
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;

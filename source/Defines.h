@@ -354,9 +354,10 @@ inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 //tolua_begin
 enum eGameMode
 {
-	eGameMode_NotSet   = -1,
-	eGameMode_Survival = 0,
-	eGameMode_Creative = 1
+	eGameMode_NotSet    = -1,
+	eGameMode_Survival  = 0,
+	eGameMode_Creative  = 1,
+	eGameMode_Adventure = 2
 };
 
 

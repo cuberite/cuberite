@@ -277,6 +277,7 @@ IronIngot, 9    = IronBlock, *
 GoldIngot, 9    = GoldBlock, *
 Diamond, 9      = DiamondBlock, *
 LapisLazuli, 9  = LapisBlock, *
+Emerald, 9      = EmeraldBlock, *
 
 Painting            = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Wool, 2:2
 ItemFrame           = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Leather, 2:2

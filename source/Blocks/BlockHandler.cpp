@@ -47,6 +47,7 @@
 #include "BlockMycelium.h"
 #include "BlockRail.h"
 #include "BlockGlass.h"
+#include "BlockEnderchest.h"
 
 
 
@@ -100,6 +101,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DOUBLE_STONE_SLAB:     return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
 		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler;
 		case E_BLOCK_FIRE:                  return new cBlockFireHandler            (a_BlockType);
 		case E_BLOCK_FURNACE:               return new cBlockFurnaceHandler         (a_BlockType);

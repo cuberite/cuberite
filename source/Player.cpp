@@ -96,6 +96,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 			a_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
 		);
 	}
+	m_LastJumpHeight = (float)(m_Pos.y);
 	m_LastGroundHeight = (float)(m_Pos.y);
 	m_Stance = m_Pos.y + 1.62;
 }
@@ -273,6 +274,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 	if (!m_bTouchGround)
 	{
+		if(m_Pos.y > m_LastJumpHeight) m_LastJumpHeight = m_Pos.y;
 		cWorld* World = GetWorld();
 		char BlockID = World->GetBlock( float2int(m_Pos.x), float2int(m_Pos.y), float2int(m_Pos.z) );
 		if( BlockID != E_BLOCK_AIR )
@@ -280,7 +282,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			// LOGD("TouchGround set to true by server");
 			m_bTouchGround = true;
 		}
-		if( BlockID == E_BLOCK_WATER || BlockID == E_BLOCK_STATIONARY_WATER || BlockID == E_BLOCK_LADDER || BlockID == E_BLOCK_TORCH )
+		if( BlockID == E_BLOCK_WATER || BlockID == E_BLOCK_STATIONARY_WATER || BlockID == E_BLOCK_LADDER || BlockID == E_BLOCK_VINES )
 		{
 			// LOGD("Water / Ladder / Torch");
 			m_LastGroundHeight = (float)m_Pos.y;
@@ -291,6 +293,8 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	{
 		float Dist = (float)(m_LastGroundHeight - m_Pos.y);
 		int Damage = (int)(Dist - 3.f);
+		if(m_LastJumpHeight > m_LastGroundHeight) Damage++;
+		m_LastJumpHeight = m_Pos.y;
 		if (Damage > 0)
 		{
 			TakeDamage(Damage, 0);
@@ -493,7 +497,7 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
-	if ((a_GameMode >= 2) || (a_GameMode < 0))
+	if ((a_GameMode >= 3) || (a_GameMode < 0))
 	{
 		LOGWARNING("%s: Setting invalid gamemode: %d", GetName().c_str(), a_GameMode);
 		return;

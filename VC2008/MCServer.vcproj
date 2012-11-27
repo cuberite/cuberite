@@ -1795,6 +1795,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockEnderchest.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockEntity.h"
 					>
 				</File>
