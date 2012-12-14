@@ -84,7 +84,38 @@ cChunkMap::cChunkLayer * cChunkMap::GetLayer(int a_LayerX, int a_LayerZ)
 
 
 
-cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk( int a_ChunkX, int a_ChunkZ )
+cChunkMap::cChunkLayer * cChunkMap::FindLayerForChunk(int a_ChunkX, int a_ChunkZ)
+{
+	const int LayerX = (int)(floorf((float)a_ChunkX / (float)(LAYER_SIZE)));
+	const int LayerZ = (int)(floorf((float)a_ChunkZ / (float)(LAYER_SIZE)));
+	return FindLayer(LayerX, LayerZ);
+}
+
+
+
+
+
+cChunkMap::cChunkLayer * cChunkMap::FindLayer(int a_LayerX, int a_LayerZ)
+{
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		if (((*itr)->GetX() == a_LayerX) && ((*itr)->GetZ() == a_LayerZ))
+		{
+			return *itr;
+		}
+	}  // for itr - m_Layers[]
+	
+	// Not found
+	return NULL;
+}
+
+
+
+
+
+cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk(int a_ChunkX, int a_ChunkZ)
 {
 	const int LayerX = (int)(floorf((float)a_ChunkX / (float)(LAYER_SIZE)));
 	const int LayerZ = (int)(floorf((float)a_ChunkZ / (float)(LAYER_SIZE)));
@@ -98,6 +129,8 @@ cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk( int a_ChunkX, int a_ChunkZ
 cChunkPtr cChunkMap::GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 {
 	// No need to lock m_CSLayers, since it's already locked by the operation that called us
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+
 	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ );
 	if (Layer == NULL)
 	{
@@ -218,6 +251,22 @@ bool cChunkMap::LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 	
 	Chunk->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	return true;
+}
+
+
+
+
+
+cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
+{
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+	
+	cChunkLayer * Layer = FindLayerForChunk(a_ChunkX, a_ChunkZ);
+	if (Layer == NULL)
+	{
+		return NULL;
+	}
+	return Layer->FindChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -1786,8 +1835,31 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 	int Index = LocalX + LocalZ * LAYER_SIZE;
 	if (m_Chunks[Index] == NULL)
 	{
-		m_Chunks[Index] = new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld());
+		cChunk * neixm = (LocalX > 0)              ? m_Chunks[Index - 1]          : m_Parent->FindChunk(a_ChunkX - 1, a_ChunkZ);
+		cChunk * neixp = (LocalX < LAYER_SIZE - 1) ? m_Chunks[Index + 1]          : m_Parent->FindChunk(a_ChunkX + 1, a_ChunkZ);
+		cChunk * neizm = (LocalZ > 0)              ? m_Chunks[Index - LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX    , a_ChunkZ - 1);
+		cChunk * neizp = (LocalZ < LAYER_SIZE - 1) ? m_Chunks[Index + LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX    , a_ChunkZ + 1);
+		m_Chunks[Index] = new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld(), neixm, neixp, neizm, neizp);
 	}
+	return m_Chunks[Index];
+}
+
+
+
+
+
+cChunk * cChunkMap::cChunkLayer::FindChunk(int a_ChunkX, int a_ChunkZ)
+{
+	const int LocalX = a_ChunkX - m_LayerX * LAYER_SIZE;
+	const int LocalZ = a_ChunkZ - m_LayerZ * LAYER_SIZE;
+	
+	if (!((LocalX < LAYER_SIZE) && (LocalZ < LAYER_SIZE) && (LocalX > -1) && (LocalZ > -1)))
+	{
+		ASSERT(!"Asking a cChunkLayer for a chunk that doesn't belong to it!");
+		return NULL;
+	}
+	
+	int Index = LocalX + LocalZ * LAYER_SIZE;
 	return m_Chunks[Index];
 }
 

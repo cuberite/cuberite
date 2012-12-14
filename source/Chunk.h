@@ -59,7 +59,11 @@ class cChunk :
 	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
 {
 public:
-	cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap, cWorld * a_World);
+	cChunk(
+		int a_ChunkX, int a_ChunkY, int a_ChunkZ,   // Chunk coords
+		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
+		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP  // Neighbor chunks
+	);
 	~cChunk();
 
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk block data is valid (loaded / generated)
@@ -267,6 +271,11 @@ private:
 	cChunkDef::BiomeMap  m_BiomeMap;
 
 	int m_BlockTickX, m_BlockTickY, m_BlockTickZ;
+	
+	cChunk * m_NeighborXM;  // Neighbor at [X - 1, Z]
+	cChunk * m_NeighborXP;  // Neighbor at [X + 1, Z]
+	cChunk * m_NeighborZM;  // Neighbor at [X,     Z - 1]
+	cChunk * m_NeighborZP;  // Neighbor at [X,     Z + 1]
 
 	void RemoveBlockEntity( cBlockEntity* a_BlockEntity );
 	void AddBlockEntity( cBlockEntity* a_BlockEntity );
@@ -303,13 +312,13 @@ private:
 	/// Checks if a leaves block at the specified coords has a log up to 4 blocks away connected by other leaves blocks (false if no log)
 	bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
-	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	
-	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 };
 

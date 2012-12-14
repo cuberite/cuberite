@@ -55,7 +55,11 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cChunk:
 
-cChunk::cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap, cWorld * a_World)
+cChunk::cChunk(
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+	cChunkMap * a_ChunkMap, cWorld * a_World,
+	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP
+)
 	: m_PosX( a_ChunkX )
 	, m_PosY( a_ChunkY )
 	, m_PosZ( a_ChunkZ )
@@ -69,8 +73,27 @@ cChunk::cChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkMap * a_ChunkMap,
 	, m_IsDirty(false)
 	, m_IsSaving(false)
 	, m_StayCount(0)
+	, m_NeighborXM(a_NeighborXM)
+	, m_NeighborXP(a_NeighborXP)
+	, m_NeighborZM(a_NeighborZM)
+	, m_NeighborZP(a_NeighborZP)
 {
-	// LOGINFO("### new cChunk (%i, %i) at %p, thread 0x%x ###", a_X, a_Z, this, GetCurrentThreadId());
+	if (a_NeighborXM != NULL)
+	{
+		a_NeighborXM->m_NeighborXP = this;
+	}
+	if (a_NeighborXP != NULL)
+	{
+		a_NeighborXP->m_NeighborXM = this;
+	}
+	if (a_NeighborZM != NULL)
+	{
+		a_NeighborZM->m_NeighborZP = this;
+	}
+	if (a_NeighborZP != NULL)
+	{
+		a_NeighborZP->m_NeighborZM = this;
+	}
 }
 
 
@@ -102,6 +125,23 @@ cChunk::~cChunk()
 		(*itr)->Destroy();
 	}
 	m_Entities.clear();
+	
+	if (m_NeighborXM != NULL)
+	{
+		m_NeighborXM->m_NeighborXP = NULL;
+	}
+	if (m_NeighborXP != NULL)
+	{
+		m_NeighborXP->m_NeighborXM = NULL;
+	}
+	if (m_NeighborZM != NULL)
+	{
+		m_NeighborZM->m_NeighborZP = NULL;
+	}
+	if (m_NeighborZP != NULL)
+	{
+		m_NeighborZP->m_NeighborZM = NULL;
+	}
 }
 
 
@@ -772,9 +812,11 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 {
 	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
 	{
+		LOGWARNING("UnboundedRelGetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
 	}
 	
+	// Is it in this chunk?
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
@@ -782,6 +824,26 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 		a_BlockMeta = GetMeta(BlockIdx);
 		return true;
 	}
+
+	// Not in this chunk, try walking the neighbors first:
+	if ((a_RelX < 0) && (m_NeighborXM != NULL))
+	{
+		return m_NeighborXM->UnboundedRelGetBlock(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
+	{
+		return m_NeighborXP->UnboundedRelGetBlock(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
+	{
+		return m_NeighborZM->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
+	{
+		return m_NeighborZP->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_BlockType, a_BlockMeta);
+	}
+
+	// Neighbors not available, use the chunkmap to locate the chunk:
 	return m_ChunkMap->LockedGetBlock(
 		m_PosX * cChunkDef::Width + a_RelX,
 		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
@@ -796,11 +858,38 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	{
+		LOGWARNING("UnboundedRelSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
+		return false;
+	}
+	
+	// Is it in this chunk?
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 		return true;
 	}
+	
+	// Not in this chunk, try walking the neighbors first:
+	if ((a_RelX < 0) && (m_NeighborXM != NULL))
+	{
+		return m_NeighborXM->UnboundedRelSetBlock(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
+	{
+		return m_NeighborXP->UnboundedRelSetBlock(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
+	{
+		return m_NeighborZM->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
+	{
+		return m_NeighborZP->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_BlockType, a_BlockMeta);
+	}
+
+	// Neighbors not available, use the chunkmap to locate the chunk:
 	return m_ChunkMap->LockedSetBlock(
 		m_PosX * cChunkDef::Width + a_RelX,
 		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,
@@ -815,11 +904,38 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	{
+		LOGWARNING("UnboundedRelFastSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
+		return false;
+	}
+
+	// Is it in this chunk?	
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
 		FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 		return true;
 	}
+
+	// Not in this chunk, try walking the neighbors first:
+	if ((a_RelX < 0) && (m_NeighborXM != NULL))
+	{
+		return m_NeighborXM->UnboundedRelFastSetBlock(a_RelX + cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
+	{
+		return m_NeighborXP->UnboundedRelFastSetBlock(a_RelX - cChunkDef::Width, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
+	{
+		return m_NeighborZM->UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ + cChunkDef::Width, a_BlockType, a_BlockMeta);
+	}
+	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
+	{
+		return m_NeighborZP->UnboundedRelFastSetBlock(a_RelX, a_RelY, a_RelZ - cChunkDef::Width, a_BlockType, a_BlockMeta);
+	}
+
+	// Neighbors not available, use the chunkmap to locate the chunk:
 	return m_ChunkMap->LockedFastSetBlock(
 		m_PosX * cChunkDef::Width + a_RelX,
 		ZERO_CHUNK_Y * cChunkDef::Height + a_RelY,

@@ -264,6 +264,9 @@ private:
 		/// Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check
 		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
 		
+		/// Returns the specified chunk, or NULL if not created yet
+		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
+		
 		int GetX(void) const {return m_LayerX; }
 		int GetZ(void) const {return m_LayerZ; }
 		
@@ -288,12 +291,20 @@ private:
 	};
 	
 	typedef std::list<cChunkLayer *> cChunkLayerList;
-	// TODO: Use smart pointers for cChunkLayerList as well, so that ticking and saving needn't lock the entire layerlist
-	// This however means that cChunkLayer needs to interlock its m_Chunks[]
 
-	cChunkLayer * GetLayerForChunk( int a_ChunkX, int a_ChunkZ );  // Creates the layer if it doesn't already exist
-	cChunkLayer * GetLayer( int a_LayerX, int a_LayerZ );  // Creates the layer if it doesn't already exist
-	void RemoveLayer( cChunkLayer* a_Layer );
+	/// Finds the cChunkLayer object responsible for the specified chunk; returns NULL if not found. Assumes m_CSLayers is locked.
+	cChunkLayer * FindLayerForChunk(int a_ChunkX, int a_ChunkZ);
+	
+	/// Returns the specified cChunkLayer object; returns NULL if not found. Assumes m_CSLayers is locked.
+	cChunkLayer * FindLayer(int a_LayerX, int a_LayerZ);
+	
+	/// Returns the cChunkLayer object responsible for the specified chunk; creates it if not found.
+	cChunkLayer * GetLayerForChunk (int a_ChunkX, int a_ChunkZ);
+	
+	/// Returns the specified cChunkLayer object; creates it if not found.
+	cChunkLayer * GetLayer(int a_LayerX, int a_LayerZ);
+	
+	void RemoveLayer(cChunkLayer * a_Layer);
 
 	cCriticalSection m_CSLayers;
 	cChunkLayerList  m_Layers;
@@ -313,6 +324,9 @@ private:
 
 	/// Fast-sets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load)
 	bool LockedFastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE   a_BlockType, NIBBLETYPE   a_BlockMeta);
+	
+	/// Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSLayers is locked. To be called only from cChunkMap.
+	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
 };
 
 
