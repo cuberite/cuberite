@@ -21,7 +21,7 @@ public:
 	
 private:
 	#ifdef _DEBUG
-	bool m_IsLocked;
+	int           m_IsLocked;  // Number of times this CS is locked
 	unsigned long m_OwningThreadID;
 	#endif  // _DEBUG
 	

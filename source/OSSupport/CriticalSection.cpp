@@ -22,6 +22,10 @@ cCriticalSection::cCriticalSection()
 			LOGERROR("Could not initialize Critical Section!");
 		}
 	#endif
+	
+	#ifdef _DEBUG
+		m_IsLocked = 0;
+	#endif  // _DEBUG
 }
 
 
@@ -54,7 +58,7 @@ void cCriticalSection::Lock()
 	#endif
 	
 	#ifdef _DEBUG
-		m_IsLocked = true;
+		m_IsLocked += 1;
 		m_OwningThreadID = cIsThread::GetCurrentID();
 	#endif  // _DEBUG
 }
@@ -66,7 +70,8 @@ void cCriticalSection::Lock()
 void cCriticalSection::Unlock()
 {
 	#ifdef _DEBUG
-		m_IsLocked = false;
+		ASSERT(m_IsLocked > 0);
+		m_IsLocked -= 1;
 	#endif  // _DEBUG
 	
 	#ifdef _WIN32
@@ -83,7 +88,7 @@ void cCriticalSection::Unlock()
 #ifdef _DEBUG
 bool cCriticalSection::IsLocked(void)
 {
-	return m_IsLocked;
+	return (m_IsLocked > 0);
 }
 
 
@@ -92,7 +97,7 @@ bool cCriticalSection::IsLocked(void)
 
 bool cCriticalSection::IsLockedByCurrentThread(void)
 {
-	return (m_IsLocked && (m_OwningThreadID == cIsThread::GetCurrentID()));
+	return ((m_IsLocked > 0) && (m_OwningThreadID == cIsThread::GetCurrentID()));
 }
 #endif  // _DEBUG
 
