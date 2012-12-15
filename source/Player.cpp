@@ -291,7 +291,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 	if (m_bTouchGround)
 	{
-		float Dist = (float)(m_LastGroundHeight - m_Pos.y);
+		float Dist = (float)(m_LastGroundHeight - floor(m_Pos.y));
 		int Damage = (int)(Dist - 3.f);
 		if(m_LastJumpHeight > m_LastGroundHeight) Damage++;
 		m_LastJumpHeight = (float)m_Pos.y;
