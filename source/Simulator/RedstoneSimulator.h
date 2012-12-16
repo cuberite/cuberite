@@ -18,7 +18,7 @@ public:
 	virtual void Simulate( float a_Dt ) override;
 	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return true; }
 
-	virtual void WakeUp( int a_X, int a_Y, int a_Z ) override;
+	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ) override;
 
 	enum eRedstoneDirection
 	{
@@ -28,15 +28,16 @@ public:
 		REDSTONE_Z_POS = 0x4,
 		REDSTONE_Z_NEG = 0x8,
 	};
-	eRedstoneDirection GetDirection( int a_X, int a_Y, int a_Z );
-	eRedstoneDirection GetDirection( const Vector3i & a_Pos ) { return GetDirection( a_Pos.x, a_Pos.y, a_Pos.z ); }
+	eRedstoneDirection GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ);
+	eRedstoneDirection GetWireDirection(const Vector3i & a_Pos) { return GetWireDirection(a_Pos.x, a_Pos.y, a_Pos.z); }
 
 	static bool IsRepeaterPointingTo  (const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
 	static bool IsRepeaterPointingAway(const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
 	static NIBBLETYPE RepeaterRotationToMetaData(float a_Rotation);
 	static Vector3i GetRepeaterDirection(NIBBLETYPE a_MetaData);
-	static NIBBLETYPE LeverDirectionToMetaData(NIBBLETYPE a_dir);
-	static bool cRedstoneSimulator::IsLeverOn(cWorld *a_World, const Vector3i & a_BlockPos);
+	static NIBBLETYPE LeverDirectionToMetaData(char a_Dir);
+	static bool IsLeverOn(cWorld * a_World, const Vector3i & a_BlockPos);
+	static bool IsLeverOn(NIBBLETYPE a_BlockMeta);
 
 
 private:
