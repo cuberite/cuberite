@@ -24,7 +24,7 @@ Also the overall shape of the generated holes is unsatisfactory - there are whol
 
 DualRidgeCaves generator:
 Instead of evaluating a single noise function, two different noise functions are multiplied. This produces
-regular tunnels instead of sheets. However due to the sheer amount of CPU work needed, the nosie functions need to be
+regular tunnels instead of sheets. However due to the sheer amount of CPU work needed, the noise functions need to be
 reduced in complexity in order for this generator to be useful, so the caves' shapes are "bubbly" at best.
 */
 
@@ -147,6 +147,9 @@ protected:
 		int a_OriginX, int a_OriginY, int a_OriginZ, 
 		cNoise & a_Noise, int a_Segments
 	);
+	
+	/// Returns a radius based on the location provided.
+	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
 } ;
 
 
@@ -684,13 +687,13 @@ void cStructGenWormNestCaves::cCaveSystem::GenerateTunnelsFromPoint(
 )
 {
 	int DoubleSize = m_Size * 2;
-	int Radius = 2 + (a_Noise.IntNoise3DInt(a_OriginX + a_OriginY, a_OriginY + a_OriginZ, a_OriginZ + a_OriginX) / 11) % 10;
+	int Radius = GetRadius(a_Noise, a_OriginX + a_OriginY, a_OriginY + a_OriginZ, a_OriginZ + a_OriginX);
 	for (int i = a_NumSegments - 1; i >= 0; --i)
 	{
 		int EndX = a_OriginX + (((a_Noise.IntNoise3DInt(a_OriginX, a_OriginY, a_OriginZ + 11 * a_NumSegments) / 7) % DoubleSize) - m_Size) / 2;
 		int EndY = a_OriginY + (((a_Noise.IntNoise3DInt(a_OriginY, 13 * a_NumSegments, a_OriginZ + a_OriginX) / 7) % DoubleSize) - m_Size) / 4;
 		int EndZ = a_OriginZ + (((a_Noise.IntNoise3DInt(a_OriginZ + 17 * a_NumSegments, a_OriginX, a_OriginY) / 7) % DoubleSize) - m_Size) / 2;
-		int EndR = 2 + (a_Noise.IntNoise3DInt(a_OriginX + 7 * i, a_OriginY + 11 * i, a_OriginZ + a_OriginX) / 11) % 10;
+		int EndR = GetRadius(a_Noise, a_OriginX + 7 * i, a_OriginY + 11 * i, a_OriginZ + a_OriginX);
 		m_Tunnels.push_back(new cCaveTunnel(a_OriginX, a_OriginY, a_OriginZ, Radius, EndX, EndY, EndZ, EndR, a_Noise));
 		GenerateTunnelsFromPoint(EndX, EndY, EndZ, a_Noise, i);
 		a_OriginX = EndX;
@@ -698,6 +701,29 @@ void cStructGenWormNestCaves::cCaveSystem::GenerateTunnelsFromPoint(
 		a_OriginZ = EndZ;
 		Radius = EndR;
 	}  // for i - a_NumSegments
+}
+
+
+
+
+
+int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ)
+{
+	// Instead of a flat distribution noise function, we need to shape it, so that most caves are smallish and only a few select are large
+	int rnd = a_Noise.IntNoise3DInt(a_OriginX, a_OriginY, a_OriginZ) / 11;
+	/*
+	// Not good enough:
+	// The algorithm of choice: emulate gauss-distribution noise by adding 3 flat noises, then fold it in half using absolute value.
+	// To save on processing, use one random value and extract 3 bytes to be separately added as the gaussian noise
+	int sum = (rnd & 0xff) + ((rnd >> 8) & 0xff) + ((rnd >> 16) & 0xff);
+	// sum is now a gaussian-distribution noise within [0 .. 767], with center at 384.
+	// We want mapping 384 -> 3, 0 -> 19, 768 -> 19, so divide by 24 to get [0 .. 31] with center at 16, then use abs() to fold around the center
+	int res = 3 + abs((sum / 24) - 16);
+	*/
+	
+	// The algorithm of choice: Divide a constant by the random number returned, thus producing a hyperbole-shaped noise distribution
+	int res = 4 + (32 / ((rnd & 0xff) + 2));
+	return res;
 }
 
 
