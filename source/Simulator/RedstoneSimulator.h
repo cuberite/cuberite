@@ -35,6 +35,8 @@ public:
 	static bool IsRepeaterPointingAway(const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
 	static NIBBLETYPE RepeaterRotationToMetaData(float a_Rotation);
 	static Vector3i GetRepeaterDirection(NIBBLETYPE a_MetaData);
+	static NIBBLETYPE LeverDirectionToMetaData(NIBBLETYPE a_dir);
+	static bool cRedstoneSimulator::IsLeverOn(cWorld *a_World, const Vector3i & a_BlockPos);
 
 
 private:

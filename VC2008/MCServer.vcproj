@@ -1855,6 +1855,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockLever.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Blocks\BlockLever.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockMelon.h"
 					>
 				</File>

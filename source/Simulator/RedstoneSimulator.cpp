@@ -225,7 +225,7 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 
 	BlockList Sources;
 	// If torch is still on, use it as a source
-	if( Block == E_BLOCK_REDSTONE_TORCH_ON )
+	if( Block == E_BLOCK_REDSTONE_TORCH_ON)
 	{
 		Sources.push_back( a_BlockPos );
 	}
@@ -245,6 +245,12 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 			}
 		}
 	}
+	else if ( Block == E_BLOCK_LEVER )
+	{ 
+		//Adding lever to the source queue
+		if (cRedstoneSimulator::IsLeverOn(m_World,a_BlockPos))
+			Sources.push_back( a_BlockPos );
+	}
 
 	// Power all blocks legally connected to the sources
 	if( Block != E_BLOCK_REDSTONE_REPEATER_ON )
@@ -259,6 +265,7 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 			char Block = m_World->GetBlock( SourcePos );
 			switch( Block )
 			{
+			case E_BLOCK_LEVER: //Treating lever as a torch
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
 				{
@@ -384,7 +391,12 @@ bool cRedstoneSimulator::PowerBlock( const Vector3i & a_BlockPos, const Vector3i
 		break;
 	default:
 		{
-			if( Block != E_BLOCK_AIR && Block != E_BLOCK_REDSTONE_TORCH_ON && Block != E_BLOCK_REDSTONE_TORCH_OFF )
+			if (
+				(Block != E_BLOCK_AIR) &&
+				(Block != E_BLOCK_REDSTONE_TORCH_ON) &&
+				(Block != E_BLOCK_REDSTONE_TORCH_OFF) &&
+				(Block != E_BLOCK_LEVER)  //Treating lever as a torch, for refreshing
+			)
 			{
 				if( IsPowered( a_BlockPos, true ) )
 				{
@@ -423,10 +435,19 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 			m_RefreshPistons.push_back( a_BlockPos );
 			break;
 		}
-		
+
 		case E_BLOCK_REDSTONE_TORCH_ON:
 		{
 			return 2;
+			break;
+		}
+		case E_BLOCK_LEVER:
+		{
+			//Check if lever is ON. If it is, report it back as a source
+			if (cRedstoneSimulator::IsLeverOn(m_World,a_BlockPos))
+			{
+				return 2;
+			}
 			break;
 		}
 		
@@ -457,7 +478,7 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 		
 		default:
 		{
-			if ((BlockType != E_BLOCK_AIR) && (BlockType != E_BLOCK_REDSTONE_TORCH_ON) && (BlockType != E_BLOCK_REDSTONE_TORCH_OFF))
+			if ((BlockType != E_BLOCK_AIR) && (BlockType != E_BLOCK_REDSTONE_TORCH_ON) && (BlockType != E_BLOCK_REDSTONE_TORCH_OFF) && (BlockType != E_BLOCK_LEVER)) //Treating lever as a torch
 			{
 				if (!IsPowered(a_BlockPos, true))
 				{
@@ -501,7 +522,10 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 	};
 
 	char Block = m_World->GetBlock( a_BlockPos );
-	if( Block == E_BLOCK_REDSTONE_REPEATER_ON || Block == E_BLOCK_REDSTONE_REPEATER_OFF )
+	if (
+		(Block == E_BLOCK_REDSTONE_REPEATER_ON) ||
+		(Block == E_BLOCK_REDSTONE_REPEATER_OFF)
+	)
 	{
 		static Vector3i Surroundings [] = { // Repeaters only spread right in front and 1 block up
 			Vector3i( 0, 0, 0),
@@ -522,7 +546,11 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 			}
 		}
 	}
-	else if( Block == E_BLOCK_REDSTONE_TORCH_OFF || Block == E_BLOCK_REDSTONE_TORCH_ON )
+	else if (
+		(Block == E_BLOCK_REDSTONE_TORCH_OFF) ||
+		(Block == E_BLOCK_REDSTONE_TORCH_ON) ||
+		(Block == E_BLOCK_LEVER)  // Treating lever as a torch
+	)
 	{
 		static Vector3i Surroundings [] = {	// Torches only spread on the same level
 			Vector3i(-1, 0, 0),
@@ -581,7 +609,15 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 bool cRedstoneSimulator::IsPowering( const Vector3i & a_PowerPos, const Vector3i & a_BlockPos, eRedstoneDirection a_WireDirection, bool a_bOnlyByWire )
 {
 	BLOCKTYPE PowerBlock = m_World->GetBlock( a_PowerPos );
-	if (!a_bOnlyByWire && (PowerBlock == E_BLOCK_REDSTONE_TORCH_ON))	return true;
+	if (
+		!a_bOnlyByWire && (
+			(PowerBlock == E_BLOCK_REDSTONE_TORCH_ON) ||
+			(PowerBlock == E_BLOCK_LEVER)
+		)
+	)
+	{
+		return true;
+	}
 	if (PowerBlock == E_BLOCK_REDSTONE_REPEATER_ON ) // A repeater pointing towards block is regarded as wire
 	{
 		if (IsRepeaterPointingTo( a_PowerPos, m_World->GetBlockMeta( a_PowerPos ), a_BlockPos ) )
@@ -614,7 +650,7 @@ bool cRedstoneSimulator::IsPowered( const Vector3i & a_BlockPos, bool a_bOnlyByW
 	{
 		Vector3i Behind = a_BlockPos - GetRepeaterDirection( m_World->GetBlockMeta( a_BlockPos ) );
 		BLOCKTYPE BehindBlock = m_World->GetBlock( Behind );
-		if (BehindBlock == E_BLOCK_REDSTONE_TORCH_ON)
+		if ((BehindBlock == E_BLOCK_REDSTONE_TORCH_ON) || (BehindBlock == E_BLOCK_LEVER))
 		{
 			return true;
 		}
@@ -666,17 +702,29 @@ cRedstoneSimulator::eRedstoneDirection cRedstoneSimulator::GetDirection( int a_X
 	int Dir = REDSTONE_NONE;
 
 	char NegX = m_World->GetBlock( a_X-1, a_Y, a_Z );
-	if( NegX == E_BLOCK_REDSTONE_WIRE || NegX == E_BLOCK_REDSTONE_TORCH_ON )
+	if (
+		(NegX == E_BLOCK_REDSTONE_WIRE) ||
+		(NegX == E_BLOCK_REDSTONE_TORCH_ON) ||
+		(NegX == E_BLOCK_LEVER)
+	)
 	{
 		Dir |= (REDSTONE_X_POS);
 	}
 	char PosX = m_World->GetBlock( a_X+1, a_Y, a_Z );
-	if( PosX == E_BLOCK_REDSTONE_WIRE || PosX == E_BLOCK_REDSTONE_TORCH_ON )
+	if (
+		(PosX == E_BLOCK_REDSTONE_WIRE) ||
+		(PosX == E_BLOCK_REDSTONE_TORCH_ON) ||
+		(PosX == E_BLOCK_LEVER)
+	)
 	{
 		Dir |= (REDSTONE_X_NEG);
 	}
 	char NegZ = m_World->GetBlock( a_X, a_Y, a_Z-1 );
-	if( NegZ == E_BLOCK_REDSTONE_WIRE || NegZ == E_BLOCK_REDSTONE_TORCH_ON )
+	if (
+		(NegZ == E_BLOCK_REDSTONE_WIRE) ||
+		(NegZ == E_BLOCK_REDSTONE_TORCH_ON) ||
+		(NegZ == E_BLOCK_LEVER)
+	)
 	{
 		if( (Dir & REDSTONE_X_POS) && !(Dir & REDSTONE_X_NEG ) ) //corner
 		{
@@ -691,7 +739,11 @@ cRedstoneSimulator::eRedstoneDirection cRedstoneSimulator::GetDirection( int a_X
 		Dir |= REDSTONE_Z_POS;
 	}
 	char PosZ = m_World->GetBlock( a_X, a_Y, a_Z+1 );
-	if( PosZ == E_BLOCK_REDSTONE_WIRE || PosZ == E_BLOCK_REDSTONE_TORCH_ON )
+	if (
+		(PosZ == E_BLOCK_REDSTONE_WIRE) ||
+		(PosZ == E_BLOCK_REDSTONE_TORCH_ON) ||
+		(PosZ == E_BLOCK_LEVER)
+	)
 	{
 		if( (Dir & REDSTONE_X_POS) && !(Dir & REDSTONE_X_NEG ) ) //corner
 		{
@@ -847,6 +899,35 @@ Vector3i cRedstoneSimulator::GetRepeaterDirection(NIBBLETYPE a_MetaData)
 		case 0x3: return Vector3i(-1, 0, 0);
 	}
 	return Vector3i();
+}
+
+
+
+
+
+NIBBLETYPE cRedstoneSimulator::LeverDirectionToMetaData(NIBBLETYPE a_Dir)
+{
+	// Determine lever direction.
+	switch (a_Dir)
+	{
+		case BLOCK_FACE_TOP:    return 0x6;
+		case BLOCK_FACE_EAST:   return 0x1;
+		case BLOCK_FACE_WEST:   return 0x2;
+		case BLOCK_FACE_SOUTH:  return 0x3;
+		case BLOCK_FACE_NORTH:  return 0x4;
+		case BLOCK_FACE_BOTTOM: return 0x0;
+		default:                return 0x6;
+	}
+}
+
+
+
+
+
+bool cRedstoneSimulator::IsLeverOn (cWorld *a_World, const Vector3i & a_BlockPos)
+{
+	// Extract the ON bit from metadata and return if true if it is set
+	return ((a_World->GetBlockMeta(a_BlockPos) & 0x8) == 0x8);
 }
 
 

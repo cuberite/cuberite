@@ -29,6 +29,7 @@
 #include "BlockDispenser.h"
 #include "BlockStairs.h"
 #include "BlockLadder.h"
+#include "BlockLever.h"
 #include "BlockSign.h"
 #include "BlockCrops.h"
 #include "BlockSugarcane.h"
@@ -116,6 +117,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_JUKEBOX:               return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
+		case E_BLOCK_LEVER:                 return new cBlockLeverHandler           (a_BlockType);
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_LAVA:                  return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
