@@ -9,6 +9,7 @@
 #include "zlib.h"
 #include "../BlockID.h"
 #include "../ChestEntity.h"
+#include "../DispenserEntity.h"
 #include "../FurnaceEntity.h"
 #include "../SignEntity.h"
 #include "../NoteEntity.h"
@@ -132,8 +133,27 @@ protected:
 		m_Writer.EndList();
 		m_Writer.EndCompound();
 	}
+
+
+	void AddDispenserEntity(cDispenserEntity * a_Entity)
+	{
+		m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Entity, "Trap");
+		m_Writer.BeginList("Items", TAG_Compound);
+		for (int i = 0; i < 9; i++)
+		{
+			const cItem * Item = a_Entity->GetSlot(i);
+			if ((Item == NULL) || Item->IsEmpty())
+			{
+				continue;
+			}
+			AddItem(Item, i);
+		}
+		m_Writer.EndList();
+		m_Writer.EndCompound();
+	}
 	
-	
+
 	void AddFurnaceEntity(cFurnaceEntity * a_Furnace)
 	{
 		m_Writer.BeginCompound("");
@@ -229,12 +249,13 @@ protected:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
-			case E_BLOCK_CHEST:      AddChestEntity  ((cChestEntity *)  a_Entity); break;
-			case E_BLOCK_FURNACE:    AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
+			case E_BLOCK_CHEST:      AddChestEntity     ((cChestEntity *)     a_Entity); break;
+			case E_BLOCK_DISPENSER:  AddDispenserEntity ((cDispenserEntity *) a_Entity); break;
+			case E_BLOCK_FURNACE:    AddFurnaceEntity   ((cFurnaceEntity *)   a_Entity); break;
 			case E_BLOCK_SIGN_POST:
-			case E_BLOCK_WALLSIGN:   AddSignEntity   ((cSignEntity *)   a_Entity); break;
-			case E_BLOCK_NOTE_BLOCK: AddNoteEntity   ((cNoteEntity *)   a_Entity); break;
-			case E_BLOCK_JUKEBOX:    AddJukeboxEntity((cJukeboxEntity *)a_Entity); break;
+			case E_BLOCK_WALLSIGN:   AddSignEntity      ((cSignEntity *)      a_Entity); break;
+			case E_BLOCK_NOTE_BLOCK: AddNoteEntity      ((cNoteEntity *)      a_Entity); break;
+			case E_BLOCK_JUKEBOX:    AddJukeboxEntity   ((cJukeboxEntity *)   a_Entity); break;
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -728,6 +749,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Trap", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadDispenserFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		else if (strncmp(a_NBT.GetData(sID), "Furnace", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child);
@@ -795,6 +820,55 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 		Chest->SetSlot(a_NBT.GetByte(Slot), Item);
 	}  // for itr - ItemDefs[]
 	a_BlockEntities.push_back(Chest.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadDispenserFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
+	}
+	std::auto_ptr<cDispenserEntity> Dispenser(new cDispenserEntity(x, y, z, m_World));
+	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
+	{
+		int Slot = a_NBT.FindChildByName(Child, "Slot");
+		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
+		{
+			continue;
+		}
+		cItem Item;
+		int ID = a_NBT.FindChildByName(Child, "id");
+		if ((ID < 0) || (a_NBT.GetType(ID) != TAG_Short))
+		{
+			continue;
+		}
+		Item.m_ItemID = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+		int Damage = a_NBT.FindChildByName(Child, "Damage");
+		if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
+		{
+			continue;
+		}
+		Item.m_ItemHealth = a_NBT.GetShort(Damage);
+		int Count = a_NBT.FindChildByName(Child, "Count");
+		if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
+		{
+			continue;
+		}
+		Item.m_ItemCount = a_NBT.GetByte(Count);
+		Dispenser->SetSlot(a_NBT.GetByte(Slot), Item);
+	}  // for itr - ItemDefs[]
+	a_BlockEntities.push_back(Dispenser.release());
 }
 
 

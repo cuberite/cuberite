@@ -951,6 +951,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\DispenserEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DispenserEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Doors.h"
 					>
 				</File>

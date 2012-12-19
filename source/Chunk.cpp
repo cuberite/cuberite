@@ -13,6 +13,7 @@
 #include "zlib.h"
 #include "Defines.h"
 #include "ChestEntity.h"
+#include "DispenserEntity.h"
 #include "FurnaceEntity.h"
 #include "SignEntity.h"
 #include "NoteEntity.h"
@@ -982,6 +983,15 @@ void cChunk::CreateBlockEntities(void)
 						}
 						break;
 					}
+
+					case E_BLOCK_DISPENSER:
+					{
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						{
+							m_BlockEntities.push_back( new cDispenserEntity( x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+						}
+						break;
+					}
 					
 					case E_BLOCK_FURNACE:
 					{
@@ -1126,6 +1136,11 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		case E_BLOCK_CHEST:
 		{
 			AddBlockEntity( new cChestEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			break;
+		}
+		case E_BLOCK_DISPENSER:
+		{
+			AddBlockEntity( new cDispenserEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
 			break;
 		}
 		case E_BLOCK_FURNACE:

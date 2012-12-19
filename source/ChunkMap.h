@@ -18,6 +18,7 @@ class cChunkStay;
 class cChunk;
 class cPlayer;
 class cChestEntity;
+class cDispenserEntity;
 class cFurnaceEntity;
 class cPawn;
 class cPickup;
@@ -26,9 +27,10 @@ class cBlockArea;
 
 typedef std::list<cClientHandle *>  cClientHandleList;
 typedef cChunk * cChunkPtr;
-typedef cItemCallback<cEntity>        cEntityCallback;
-typedef cItemCallback<cChestEntity>   cChestCallback;
-typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
+typedef cItemCallback<cEntity>          cEntityCallback;
+typedef cItemCallback<cChestEntity>     cChestCallback;
+typedef cItemCallback<cDispenserEntity> cDispenserCallback;
+typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
 
 
 

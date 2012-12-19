@@ -34,7 +34,8 @@ public:
 		char OldMetaData = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		char NewMetaData = cDoors::RotationToMetaData(a_Player->GetRotation() + 270);
 		OldMetaData ^= 4; //Toggle the gate
-		if((OldMetaData & 1) == (NewMetaData & 1)){
+		if((OldMetaData & 1) == (NewMetaData & 1))
+		{
 			//Standing in front of the gate - apply new direction
 			a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, (OldMetaData & 4) | (NewMetaData & 3));
 		}

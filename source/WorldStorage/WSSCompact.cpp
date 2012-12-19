@@ -11,6 +11,7 @@
 #include "../StringCompression.h"
 #include "../ChestEntity.h"
 #include "../SignEntity.h"
+#include "../DispenserEntity.h"
 #include "../FurnaceEntity.h"
 #include "../NoteEntity.h"
 #include "../JukeboxEntity.h"
@@ -71,12 +72,13 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 	const char * SaveInto = NULL;
 	switch (a_BlockEntity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:      SaveInto = "Chests";    break;
-		case E_BLOCK_FURNACE:    SaveInto = "Furnaces";  break;
-		case E_BLOCK_SIGN_POST:  SaveInto = "Signs";     break;
-		case E_BLOCK_WALLSIGN:   SaveInto = "Signs";     break;
-		case E_BLOCK_NOTE_BLOCK: SaveInto = "Notes";     break;
-		case E_BLOCK_JUKEBOX:    SaveInto = "Jukeboxes"; break;
+		case E_BLOCK_CHEST:      SaveInto = "Chests";      break;
+		case E_BLOCK_DISPENSER:  SaveInto = "Dispensers";  break;
+		case E_BLOCK_FURNACE:    SaveInto = "Furnaces";    break;
+		case E_BLOCK_SIGN_POST:  SaveInto = "Signs";       break;
+		case E_BLOCK_WALLSIGN:   SaveInto = "Signs";       break;
+		case E_BLOCK_NOTE_BLOCK: SaveInto = "Notes";       break;
+		case E_BLOCK_JUKEBOX:    SaveInto = "Jukeboxes";   break;
 
 		default:
 		{
@@ -279,6 +281,26 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 				a_BlockEntities.push_back( ChestEntity );
 			}
 		}  // for itr - AllChests[]
+	}
+
+	// Load dispensers
+	Json::Value AllDispensers = a_Value.get("Dispensers", Json::nullValue);
+	if( !AllDispensers.empty() )
+	{
+		for( Json::Value::iterator itr = AllDispensers.begin(); itr != AllDispensers.end(); ++itr )
+		{
+			Json::Value & Dispenser = *itr;
+			cDispenserEntity * DispenserEntity = new cDispenserEntity(0,0,0, a_World);
+			if( !DispenserEntity->LoadFromJson( Dispenser ) )
+			{
+				LOGERROR("ERROR READING DISPENSER FROM JSON!" );
+				delete DispenserEntity;
+			}
+			else
+			{
+				a_BlockEntities.push_back( DispenserEntity );
+			}
+		}  // for itr - AllDispensers[]
 	}
 
 	// Load furnaces

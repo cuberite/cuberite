@@ -1,10 +1,17 @@
+
 #pragma once
+
 #include "BlockEntity.h"
 #include "../World.h"
 #include "../Piston.h"
 #include "../Player.h"
 
-class cBlockDispenserHandler : public cBlockEntityHandler
+
+
+
+
+class cBlockDispenserHandler :
+	public cBlockEntityHandler
 {
 public:
 	cBlockDispenserHandler(BLOCKTYPE a_BlockType)

@@ -25,7 +25,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_ITEM_SNOWBALL, 4, 0));
+		a_Pickups.push_back(cItem(E_ITEM_SNOWBALL, 1, 0));
 	}
 
 

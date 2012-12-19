@@ -461,6 +461,21 @@ cChestWindow::~cChestWindow()
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cDispenserWindow:
+
+cDispenserWindow::cDispenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserEntity * a_Dispenser) :
+	cWindow(cWindow::Dispenser, "MCS-Dispenser")
+{
+	m_SlotAreas.push_back(new cSlotAreaDispenser(a_Dispenser, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFurnaceWindow:
 
 cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :

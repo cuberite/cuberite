@@ -38,6 +38,7 @@ class MTRand;
 class cPlayer;
 class cChunkMap;
 class cChestEntity;
+class cDispenserEntity;
 class cFurnaceEntity;
 class cBlockArea;
 class cPawn;
@@ -45,10 +46,11 @@ class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
 
-typedef std::list<cClientHandle *>  cClientHandleList;
-typedef cItemCallback<cEntity>        cEntityCallback;
-typedef cItemCallback<cChestEntity>   cChestCallback;
-typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
+typedef std::list<cClientHandle *>      cClientHandleList;
+typedef cItemCallback<cEntity>          cEntityCallback;
+typedef cItemCallback<cChestEntity>     cChestCallback;
+typedef cItemCallback<cDispenserEntity> cDispenserCallback;
+typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
 
 
 

@@ -578,11 +578,14 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 	
 	if (bBroken)
 	{
-		ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ);
-		
-		BlockHandler(OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-		World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, OldBlock, this);
-		World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if(World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_AIR)
+		{
+			ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ);
+			
+			BlockHandler(OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+			World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, OldBlock, this);
+			World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+		}
 	}
 	else
 	{
@@ -643,20 +646,12 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		}
 		return;
 	}
-
-	if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, Equipped))
-	{
-		if (a_BlockFace > -1)
-		{
-			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		}
-		return;
-	}
 	
 	cWorld * World = m_Player->GetWorld();
 
 	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_BlockX, a_BlockY, a_BlockZ));
+	
+	// TODO: Wrap following if into another if which will call hook 'OnBlockUse' (or some nicer name)
 	if (Handler->IsUseable())
 	{
 		Handler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
@@ -742,6 +737,16 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			}
 		}
 	}
+
+	if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, Equipped))
+	{
+		if (a_BlockFace > -1)
+		{
+			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		}
+		return;
+	}
 }
 
 
@@ -760,6 +765,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 			a_Message.c_str()
 		);
 		m_Player->GetWorld()->BroadcastChat(Msg);
+		LOG("<%s> %s", m_Player->GetName().c_str(), a_Message.c_str());
 	}
 }
 

@@ -15,6 +15,7 @@
 class cWindow;
 class cPlayer;
 class cChestEntity;
+class cDispenserEntity;
 class cFurnaceEntity;
 class cCraftingRecipe;
 
@@ -225,6 +226,26 @@ public:
 	
 protected:
 	cChestEntity * m_Chest;
+} ;
+
+
+
+
+
+class cSlotAreaDispenser :
+	public cSlotArea
+{
+	typedef cSlotArea super;
+	
+public:
+	cSlotAreaDispenser(cDispenserEntity * a_Dispenser, cWindow & a_ParentWindow);
+	
+	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	
+protected:
+	cDispenserEntity * m_Dispenser;
 } ;
 
 

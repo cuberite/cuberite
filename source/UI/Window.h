@@ -19,6 +19,7 @@ class cPlayer;
 class cWindowOwner;
 class cClientHandle;
 class cChestEntity;
+class cDispenserEntity;
 class cFurnaceEntity;
 class cSlotArea;
 class cWorld;
@@ -142,6 +143,17 @@ class cFurnaceWindow :
 {
 public:
 	cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace);
+} ;
+
+
+
+
+
+class cDispenserWindow :
+	public cWindow
+{
+public:
+	cDispenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserEntity * a_Dispenser);
 } ;
 
 

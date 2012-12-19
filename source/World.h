@@ -38,14 +38,16 @@ class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
 class cChestEntity;
+class cDispenserEntity;
 class cFurnaceEntity;
 
 typedef std::list< cPlayer * > cPlayerList;
 
-typedef cItemCallback<cPlayer>        cPlayerListCallback;
-typedef cItemCallback<cEntity>        cEntityCallback;
-typedef cItemCallback<cChestEntity>   cChestCallback;
-typedef cItemCallback<cFurnaceEntity> cFurnaceCallback;
+typedef cItemCallback<cPlayer>          cPlayerListCallback;
+typedef cItemCallback<cEntity>          cEntityCallback;
+typedef cItemCallback<cChestEntity>     cChestCallback;
+typedef cItemCallback<cDispenserEntity> cDispenserCallback;
+typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
 
 
 
