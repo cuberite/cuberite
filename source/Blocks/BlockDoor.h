@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../World.h"
 
 
 
@@ -14,7 +15,6 @@ public:
 	cBlockDoorHandler(BLOCKTYPE a_BlockType);
 	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir) override;
 	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void OnDigging(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual const char * GetStepSound(void) override;
 	
@@ -33,6 +33,11 @@ public:
 	virtual bool CanBePlacedOnSide(void) override
 	{
 		return false;
+	}
+
+	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		return a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
 	}
 } ;
 

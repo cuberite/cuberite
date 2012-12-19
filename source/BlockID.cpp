@@ -395,9 +395,12 @@ public:
 		g_BlockTransparent[E_BLOCK_CHEST]          = true;
 		g_BlockTransparent[E_BLOCK_COBWEB]         = true;
 		g_BlockTransparent[E_BLOCK_CROPS]          = true;
+		g_BlockTransparent[E_BLOCK_FENCE]          = true;
+		g_BlockTransparent[E_BLOCK_FENCE_GATE]     = true;
 		g_BlockTransparent[E_BLOCK_FIRE]           = true;
 		g_BlockTransparent[E_BLOCK_GLASS]          = true;
 		g_BlockTransparent[E_BLOCK_ICE]            = true;
+		g_BlockTransparent[E_BLOCK_IRON_DOOR]      = true;
 		g_BlockTransparent[E_BLOCK_LEAVES]         = true;
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]   = true;
 		g_BlockTransparent[E_BLOCK_RED_ROSE]       = true;
@@ -407,6 +410,7 @@ public:
 		g_BlockTransparent[E_BLOCK_TORCH]          = true;
 		g_BlockTransparent[E_BLOCK_VINES]          = true;
 		g_BlockTransparent[E_BLOCK_WALLSIGN]       = true;
+		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]    = true;
 		g_BlockTransparent[E_BLOCK_YELLOW_FLOWER]  = true;
 		g_BlockTransparent[E_BLOCK_RAIL]           = true;
 		g_BlockTransparent[E_BLOCK_DETECTOR_RAIL]  = true;

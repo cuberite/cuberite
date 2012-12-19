@@ -1807,6 +1807,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockFenceGate.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockFire.h"
 					>
 				</File>
