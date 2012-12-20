@@ -456,6 +456,10 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
+	if ((a_BlockPos.y < 0) || (a_BlockPos.y >= cChunkDef::Height))
+	{
+		return 0;
+	}
 	m_World->GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, BlockType, BlockMeta);
 	switch (BlockType)
 	{
