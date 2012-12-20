@@ -765,7 +765,6 @@ void cClientHandle::HandleChat(const AString & a_Message)
 			a_Message.c_str()
 		);
 		m_Player->GetWorld()->BroadcastChat(Msg);
-		LOG("<%s> %s", m_Player->GetName().c_str(), a_Message.c_str());
 	}
 }
 
