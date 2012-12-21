@@ -14,6 +14,7 @@ function Initialize(Plugin)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.E_PLUGIN_BLOCK_PLACE)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE)
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 	return true
@@ -64,6 +65,16 @@ function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
 	end
 end
 
+
+
+
+
+function OnTakeDamage(Receiver, TDI)
+	-- Receiver is cPawn
+	-- TDI is TakeDamageInfo
+
+	LOG(Receiver:GetClass() .. " was dealt RawDamage " .. TDI.RawDamage .. ", FinalDamage " .. TDI.FinalDamage .. " (that is, " .. (TDI.RawDamage - TDI.FinalDamage) .. " HPs covered by armor)");
+end
 
 
 
