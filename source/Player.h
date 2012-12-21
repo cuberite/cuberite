@@ -30,8 +30,6 @@ public:
 	} ;
 	// tolua_end
 	
-	typedef cPawn super;
-	
 	CLASS_PROTODEF(cPlayer)
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
