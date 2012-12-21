@@ -20,15 +20,6 @@ cSheep::cSheep(void) :
 
 
 
-bool cSheep::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cSheep") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cSheep::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	if (!m_IsSheared)

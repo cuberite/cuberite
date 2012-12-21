@@ -17,15 +17,6 @@ cSkeleton::cSkeleton(void)
 
 
 
-bool cSkeleton::IsA( const char* a_EntityType )
-{
-	return ((strcmp(a_EntityType, "cSkeleton") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cSkeleton::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);

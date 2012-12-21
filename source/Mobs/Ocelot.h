@@ -15,7 +15,7 @@ class cOcelot :
 public:
 	cOcelot();
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cOcelot);
 } ;
 
 

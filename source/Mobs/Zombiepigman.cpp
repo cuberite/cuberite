@@ -17,15 +17,6 @@ cZombiepigman::cZombiepigman()
 
 
 
-bool cZombiepigman::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cZombiepigman") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cZombiepigman::Tick(float a_Dt)
 {
 	super::Tick(a_Dt);

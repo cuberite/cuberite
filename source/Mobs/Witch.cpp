@@ -17,15 +17,6 @@ cWitch::cWitch()
 
 
 
-bool cWitch::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cWitch") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cWitch::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_GLASS_BOTTLE);

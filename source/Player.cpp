@@ -32,12 +32,6 @@
 
 
 
-CLASS_DEFINITION( cPlayer, cPawn );
-
-
-
-
-
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: m_GameMode(eGameMode_NotSet)
 	, m_IP("")

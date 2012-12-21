@@ -15,7 +15,7 @@ class cBat :
 public:
 	cBat(void);
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cBat);
 } ;
 
 

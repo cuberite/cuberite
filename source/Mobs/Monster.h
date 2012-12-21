@@ -26,10 +26,9 @@ public:
 	// tolua_end
 	
 	cMonster(void);
-	virtual ~cMonster();
 
-	virtual bool IsA(const char * a_EntityType);
-
+	CLASS_PROTODEF(cMonster);
+	
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	virtual void Tick(float a_Dt) override;

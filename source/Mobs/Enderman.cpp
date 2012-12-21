@@ -17,15 +17,6 @@ cEnderman::cEnderman(void)
 
 
 
-bool cEnderman::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cEnderman") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cEnderman::Tick(float a_Dt)
 {
 	cMonster::Tick(a_Dt);

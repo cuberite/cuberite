@@ -18,15 +18,6 @@ cSquid::cSquid()
 
 
 
-bool cSquid::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cSquid") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cSquid::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	// Drops 0-3 Ink Sacs

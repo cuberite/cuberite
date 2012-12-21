@@ -21,6 +21,8 @@ class cClientHandle;
 class cPlayer :
 	public cPawn
 {
+	typedef cPawn super;
+	
 public:
 	enum
 	{
@@ -30,7 +32,7 @@ public:
 	
 	typedef cPawn super;
 	
-	CLASS_PROTOTYPE()
+	CLASS_PROTODEF(cPlayer)
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();

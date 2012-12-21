@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/21/12 19:26:06.
+** Generated automatically by tolua++-1.0.92 on 12/21/12 21:19:57.
 */
 
 #ifndef __cplusplus
@@ -4008,14 +4008,14 @@ static int tolua_AllToLua_cEntity_GetEntityType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEntityType'", NULL);
 #endif
@@ -4040,7 +4040,7 @@ static int tolua_AllToLua_cEntity_IsA00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isstring(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -4048,13 +4048,13 @@ static int tolua_AllToLua_cEntity_IsA00(lua_State* tolua_S)
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_EntityType = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const char* a_ClassName = ((const char*)  tolua_tostring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsA'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->IsA(a_EntityType);
+   bool tolua_ret = (bool)  self->IsA(a_ClassName);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -4074,14 +4074,14 @@ static int tolua_AllToLua_cEntity_GetClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetClass'", NULL);
 #endif
@@ -4094,6 +4094,38 @@ static int tolua_AllToLua_cEntity_GetClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetClass'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetParentClass of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetParentClass00
+static int tolua_AllToLua_cEntity_GetParentClass00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetParentClass'", NULL);
+#endif
+  {
+   const char* tolua_ret = (const char*)  self->GetParentClass();
+   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetParentClass'.",&tolua_err);
  return 0;
 #endif
 }
@@ -4992,7 +5024,7 @@ public:
 			return ( void ) cEntity:: Initialize(a_World);
 		};
 	};
-	unsigned int  GetEntityType( void ) {
+	unsigned int  GetEntityType( void )const {
 		if (push_method("GetEntityType",  tolua_AllToLua_cEntity_GetEntityType00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 unsigned int  tolua_ret = (unsigned int )tolua_tonumber(lua_state, -1, 0);
@@ -5002,18 +5034,18 @@ public:
 			return (unsigned int ) cEntity:: GetEntityType();
 		};
 	};
-	 bool  IsA( const char* a_EntityType) {
+	 bool  IsA( const char* a_ClassName)const {
 		if (push_method("IsA",  tolua_AllToLua_cEntity_IsA00)) {
-			tolua_pushstring(lua_state, (const char*)a_EntityType);
+			tolua_pushstring(lua_state, (const char*)a_ClassName);
 			ToluaBase::dbcall(lua_state, 2, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cEntity:: IsA(a_EntityType);
+			return ( bool ) cEntity:: IsA(a_ClassName);
 		};
 	};
-	 const char*  GetClass( void ) {
+	 const char*  GetClass( void )const {
 		if (push_method("GetClass",  tolua_AllToLua_cEntity_GetClass00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
@@ -5021,6 +5053,16 @@ public:
 			return tolua_ret;
 		} else {
 			return ( const char* ) cEntity:: GetClass();
+		};
+	};
+	 const char*  GetParentClass( void )const {
+		if (push_method("GetParentClass",  tolua_AllToLua_cEntity_GetParentClass00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( const char* ) cEntity:: GetParentClass();
 		};
 	};
 	 void  Tick( float a_Dt) {
@@ -5052,11 +5094,14 @@ public:
 	unsigned int cEntity__GetEntityType( void ) {
 		return (unsigned int )cEntity::GetEntityType();
 	};
-	 bool cEntity__IsA( const char* a_EntityType) {
-		return ( bool )cEntity::IsA(a_EntityType);
+	 bool cEntity__IsA( const char* a_ClassName) {
+		return ( bool )cEntity::IsA(a_ClassName);
 	};
 	 const char* cEntity__GetClass( void ) {
 		return ( const char* )cEntity::GetClass();
+	};
+	 const char* cEntity__GetParentClass( void ) {
+		return ( const char* )cEntity::GetParentClass();
 	};
 	 void cEntity__SpawnOn( cClientHandle& a_Client) {
 		return ( void )cEntity::SpawnOn(a_Client);
@@ -5178,12 +5223,12 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsA00(lua_State* tolua_S)
 #endif
  {
   Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_EntityType = ((const char*)  tolua_tostring(tolua_S,2,0));
+  const char* a_ClassName = ((const char*)  tolua_tostring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__IsA'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cEntity__IsA(a_EntityType);
+   bool tolua_ret = (bool)  self->cEntity__IsA(a_ClassName);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -5223,6 +5268,38 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'cEntity__GetClass'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetParentClass of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetParentClass'", NULL);
+#endif
+  {
+   const char* tolua_ret = (const char*)  self->cEntity__GetParentClass();
+   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetParentClass'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6270,7 +6347,7 @@ public:
 			return ( void ) cPawn:: Initialize(a_World);
 		};
 	};
-	unsigned int  GetEntityType( void ) {
+	unsigned int  GetEntityType( void )const {
 		if (push_method("GetEntityType",  tolua_AllToLua_cEntity_GetEntityType00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 unsigned int  tolua_ret = (unsigned int )tolua_tonumber(lua_state, -1, 0);
@@ -6280,18 +6357,18 @@ public:
 			return (unsigned int ) cPawn:: GetEntityType();
 		};
 	};
-	 bool  IsA( const char* a_EntityType) {
+	 bool  IsA( const char* a_ClassName)const {
 		if (push_method("IsA",  tolua_AllToLua_cEntity_IsA00)) {
-			tolua_pushstring(lua_state, (const char*)a_EntityType);
+			tolua_pushstring(lua_state, (const char*)a_ClassName);
 			ToluaBase::dbcall(lua_state, 2, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPawn:: IsA(a_EntityType);
+			return ( bool ) cPawn:: IsA(a_ClassName);
 		};
 	};
-	 const char*  GetClass( void ) {
+	 const char*  GetClass( void )const {
 		if (push_method("GetClass",  tolua_AllToLua_cEntity_GetClass00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
@@ -6299,6 +6376,16 @@ public:
 			return tolua_ret;
 		} else {
 			return ( const char* ) cPawn:: GetClass();
+		};
+	};
+	 const char*  GetParentClass( void )const {
+		if (push_method("GetParentClass",  tolua_AllToLua_cEntity_GetParentClass00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( const char* ) cPawn:: GetParentClass();
 		};
 	};
 	 void  Tick( float a_Dt) {
@@ -6366,11 +6453,14 @@ public:
 	unsigned int cPawn__GetEntityType( void ) {
 		return (unsigned int )cPawn::GetEntityType();
 	};
-	 bool cPawn__IsA( const char* a_EntityType) {
-		return ( bool )cPawn::IsA(a_EntityType);
+	 bool cPawn__IsA( const char* a_ClassName) {
+		return ( bool )cPawn::IsA(a_ClassName);
 	};
 	 const char* cPawn__GetClass( void ) {
 		return ( const char* )cPawn::GetClass();
+	};
+	 const char* cPawn__GetParentClass( void ) {
+		return ( const char* )cPawn::GetParentClass();
 	};
 	 void cPawn__SpawnOn( cClientHandle& a_Client) {
 		return ( void )cPawn::SpawnOn(a_Client);
@@ -8259,7 +8349,7 @@ public:
 			return ( cItem ) cPlayer:: GetEquippedBoots();
 		};
 	};
-	unsigned int  GetEntityType( void ) {
+	unsigned int  GetEntityType( void )const {
 		if (push_method("GetEntityType",  tolua_AllToLua_cEntity_GetEntityType00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 unsigned int  tolua_ret = (unsigned int )tolua_tonumber(lua_state, -1, 0);
@@ -8269,18 +8359,18 @@ public:
 			return (unsigned int ) cPlayer:: GetEntityType();
 		};
 	};
-	 bool  IsA( const char* a_EntityType) {
+	 bool  IsA( const char* a_ClassName)const {
 		if (push_method("IsA",  tolua_AllToLua_cEntity_IsA00)) {
-			tolua_pushstring(lua_state, (const char*)a_EntityType);
+			tolua_pushstring(lua_state, (const char*)a_ClassName);
 			ToluaBase::dbcall(lua_state, 2, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPlayer:: IsA(a_EntityType);
+			return ( bool ) cPlayer:: IsA(a_ClassName);
 		};
 	};
-	 const char*  GetClass( void ) {
+	 const char*  GetClass( void )const {
 		if (push_method("GetClass",  tolua_AllToLua_cEntity_GetClass00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
@@ -8288,6 +8378,16 @@ public:
 			return tolua_ret;
 		} else {
 			return ( const char* ) cPlayer:: GetClass();
+		};
+	};
+	 const char*  GetParentClass( void )const {
+		if (push_method("GetParentClass",  tolua_AllToLua_cEntity_GetParentClass00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( const char* ) cPlayer:: GetParentClass();
 		};
 	};
 	 void  Tick( float a_Dt) {
@@ -8358,11 +8458,14 @@ public:
 	unsigned int cPlayer__GetEntityType( void ) {
 		return (unsigned int )cPlayer::GetEntityType();
 	};
-	 bool cPlayer__IsA( const char* a_EntityType) {
-		return ( bool )cPlayer::IsA(a_EntityType);
+	 bool cPlayer__IsA( const char* a_ClassName) {
+		return ( bool )cPlayer::IsA(a_ClassName);
 	};
 	 const char* cPlayer__GetClass( void ) {
 		return ( const char* )cPlayer::GetClass();
+	};
+	 const char* cPlayer__GetParentClass( void ) {
+		return ( const char* )cPlayer::GetParentClass();
 	};
 	 void cPlayer__SpawnOn( cClientHandle& a_Client) {
 		return ( void )cPlayer::SpawnOn(a_Client);
@@ -16012,7 +16115,7 @@ public:
 			return ( void ) cPickup:: Initialize(a_World);
 		};
 	};
-	unsigned int  GetEntityType( void ) {
+	unsigned int  GetEntityType( void )const {
 		if (push_method("GetEntityType",  tolua_AllToLua_cEntity_GetEntityType00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 unsigned int  tolua_ret = (unsigned int )tolua_tonumber(lua_state, -1, 0);
@@ -16022,18 +16125,18 @@ public:
 			return (unsigned int ) cPickup:: GetEntityType();
 		};
 	};
-	 bool  IsA( const char* a_EntityType) {
+	 bool  IsA( const char* a_ClassName)const {
 		if (push_method("IsA",  tolua_AllToLua_cEntity_IsA00)) {
-			tolua_pushstring(lua_state, (const char*)a_EntityType);
+			tolua_pushstring(lua_state, (const char*)a_ClassName);
 			ToluaBase::dbcall(lua_state, 2, 1);
 			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
 			lua_pop(lua_state, 1);
 			return tolua_ret;
 		} else {
-			return ( bool ) cPickup:: IsA(a_EntityType);
+			return ( bool ) cPickup:: IsA(a_ClassName);
 		};
 	};
-	 const char*  GetClass( void ) {
+	 const char*  GetClass( void )const {
 		if (push_method("GetClass",  tolua_AllToLua_cEntity_GetClass00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
 			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
@@ -16041,6 +16144,16 @@ public:
 			return tolua_ret;
 		} else {
 			return ( const char* ) cPickup:: GetClass();
+		};
+	};
+	 const char*  GetParentClass( void )const {
+		if (push_method("GetParentClass",  tolua_AllToLua_cEntity_GetParentClass00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( const char* ) cPickup:: GetParentClass();
 		};
 	};
 	 void  Tick( float a_Dt) {
@@ -16075,11 +16188,14 @@ public:
 	unsigned int cPickup__GetEntityType( void ) {
 		return (unsigned int )cPickup::GetEntityType();
 	};
-	 bool cPickup__IsA( const char* a_EntityType) {
-		return ( bool )cPickup::IsA(a_EntityType);
+	 bool cPickup__IsA( const char* a_ClassName) {
+		return ( bool )cPickup::IsA(a_ClassName);
 	};
 	 const char* cPickup__GetClass( void ) {
 		return ( const char* )cPickup::GetClass();
+	};
+	 const char* cPickup__GetParentClass( void ) {
+		return ( const char* )cPickup::GetParentClass();
 	};
 	 void cPickup__SpawnOn( cClientHandle& a_Client) {
 		return ( void )cPickup::SpawnOn(a_Client);
@@ -23892,6 +24008,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetEntityType",tolua_AllToLua_cEntity_GetEntityType00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);
+   tolua_function(tolua_S,"GetParentClass",tolua_AllToLua_cEntity_GetParentClass00);
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cEntity_GetWorld00);
    tolua_function(tolua_S,"GetPosition",tolua_AllToLua_cEntity_GetPosition00);
    tolua_function(tolua_S,"GetPosX",tolua_AllToLua_cEntity_GetPosX00);
@@ -23931,6 +24048,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cEntity__GetEntityType",tolua_AllToLua_Lua__cEntity_cEntity__GetEntityType00);
    tolua_function(tolua_S,"cEntity__IsA",tolua_AllToLua_Lua__cEntity_cEntity__IsA00);
    tolua_function(tolua_S,"cEntity__GetClass",tolua_AllToLua_Lua__cEntity_cEntity__GetClass00);
+   tolua_function(tolua_S,"cEntity__GetParentClass",tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00);
    tolua_function(tolua_S,"cEntity__SpawnOn",tolua_AllToLua_Lua__cEntity_cEntity__SpawnOn00);
    tolua_function(tolua_S,"new",tolua_AllToLua_Lua__cEntity_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cEntity_new00_local);

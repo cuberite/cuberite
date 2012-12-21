@@ -74,13 +74,14 @@ struct TakeDamageInfo
 // tolua_begin
 class cPawn :
 	public cEntity
-{							
+{
 	// tolua_end
+	typedef cEntity super;
+	
 public:
-	CLASS_PROTOTYPE()
+	CLASS_PROTODEF(cPawn);
 
 	cPawn(void);
-	virtual ~cPawn();
 
 	virtual void Tick(float a_Dt) override;
 

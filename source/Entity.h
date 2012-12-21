@@ -11,30 +11,45 @@
 
 
 
-#define CLASS_PROT_ISA() virtual bool IsA( const char* a_EntityType );
-#define CLASS_PROT_GETCLASS() virtual const char* GetClass();
+#define CLASS_PROT_ISA()       virtual bool IsA(const char * a_EntityType) const override;
+#define CLASS_PROT_GETCLASS()  virtual const char * GetClass      (void) const override;
+#define CLASS_PROT_GETPARENT() virtual const char * GetParentClass(void) const override;
 
-/* Can't use this (yet) because of tolua */
 #define CLASS_PROTOTYPE() \
 	CLASS_PROT_ISA(); \
-	CLASS_PROT_GETCLASS(); 
+	CLASS_PROT_GETCLASS(); \
+	CLASS_PROT_GETPARENT();
 
-#define CLASS_DEF_ISA( classname, superclass ) \
-	bool classname::IsA( const char* a_EntityType ) \
+#define CLASS_DEF_ISA(classname) \
+	bool classname::IsA(const char * a_ClassName) const \
 	{ \
-		if( strcmp( a_EntityType, #classname ) == 0 ) return true; \
-		return superclass::IsA( a_EntityType ); \
+		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
 	}
 
-#define CLASS_DEF_GETCLASS( classname ) \
-	const char* classname::GetClass() \
+#define CLASS_DEF_GETCLASS(classname) \
+	const char * classname::GetClass(void) const \
 	{ \
-	return #classname; \
+		return #classname; \
 	}
 
-#define CLASS_DEFINITION( classname, superclass ) \
-	CLASS_DEF_ISA( classname, superclass ) \
-	CLASS_DEF_GETCLASS( classname )
+#define CLASS_DEFINITION(classname) \
+	CLASS_DEF_ISA(classname) \
+	CLASS_DEF_GETCLASS(classname)
+
+// Place this macro in the header of each cEntity descendant class and you're done :)
+#define CLASS_PROTODEF(classname) \
+	virtual bool IsA(const char * a_ClassName) const override\
+	{ \
+		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
+	} \
+	virtual const char * GetClass(void) const override \
+	{ \
+		return #classname; \
+	} \
+	virtual const char * GetParentClass(void) const override \
+	{ \
+		return super::GetClass(); \
+	}
 
 
 
@@ -74,9 +89,16 @@ public:
 		eEntityType_Pickup
 	};
 
-	virtual unsigned int GetEntityType() { return m_EntityType; }
-	virtual bool IsA( const char* a_EntityType );
-	virtual const char* GetClass();
+	virtual unsigned int GetEntityType(void) const { return m_EntityType; }
+	
+	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
+	virtual bool IsA(const char * a_ClassName) const;
+	
+	/// Returns the topmost class name for the object
+	virtual const char * GetClass(void) const;
+	
+	/// Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent).
+	virtual const char * GetParentClass(void) const;
 
 	cWorld * GetWorld(void) const { return m_World; }
 

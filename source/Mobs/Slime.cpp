@@ -19,15 +19,6 @@ cSlime::cSlime(void)
 
 
 
-bool cSlime::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cSlime") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cSlime::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	// TODO: only when tiny

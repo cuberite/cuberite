@@ -58,25 +58,6 @@ cMonster::cMonster(void)
 
 
 
-cMonster::~cMonster()
-{
-	LOGD("cMonster::~cMonster()");
-}
-
-
-
-
-
-bool cMonster::IsA( const char* a_EntityType )
-{
-	if( strcmp( a_EntityType, "cMonster" ) == 0 ) return true;
-	return cPawn::IsA( a_EntityType );
-}
-
-
-
-
-
 void cMonster::SpawnOn(cClientHandle & a_Client)
 {
 	a_Client.SendSpawnMob(*this);

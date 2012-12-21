@@ -17,7 +17,8 @@ public:
 
 	virtual void Tick(float a_Dt) override;
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cSquid);
+	
 	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
 } ;
 

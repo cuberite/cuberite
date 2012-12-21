@@ -17,15 +17,6 @@ cZombie::cZombie()
 
 
 
-bool cZombie::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cZombie") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cZombie::Tick(float a_Dt)
 {
 	super::Tick(a_Dt);

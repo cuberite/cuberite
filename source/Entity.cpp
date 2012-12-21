@@ -76,6 +76,15 @@ CLASS_DEF_GETCLASS(cEntity);
 
 
 
+const char * cEntity::GetParentClass(void) const
+{
+	return "";
+}
+
+
+
+
+
 void cEntity::Initialize(cWorld * a_World)
 {
 	m_World = a_World;
@@ -188,11 +197,9 @@ void cEntity::RemoveFromChunk(void)
 
 
 
-bool cEntity::IsA( const char* a_EntityType )
+bool cEntity::IsA(const char * a_ClassName) const
 {
-    //LOG("IsA( cEntity ) : %s", a_EntityType);
-	if( strcmp( a_EntityType, "cEntity" ) == 0 ) return true;
-	return false;
+	return (strcmp(a_ClassName, "cEntity") == 0);
 }
 
 

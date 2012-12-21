@@ -16,13 +16,3 @@ cOcelot::cOcelot()
 
 
 
-
-bool cOcelot::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cOcelot") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-

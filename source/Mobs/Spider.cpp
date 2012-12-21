@@ -17,15 +17,6 @@ cSpider::cSpider()
 
 
 
-bool cSpider::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cSpider") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cSpider::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_STRING);

@@ -15,7 +15,7 @@ class cPig :
 public:
 	cPig(void);
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cPig);
 
 	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
 } ;

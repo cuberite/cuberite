@@ -16,12 +16,3 @@ cVillager::cVillager()
 
 
 
-
-bool cVillager::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cVillager") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-

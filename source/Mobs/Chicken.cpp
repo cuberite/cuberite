@@ -23,15 +23,6 @@ cChicken::cChicken(void)
 
 
 
-bool cChicken::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cChicken") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cChicken::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_FEATHER);

@@ -23,15 +23,6 @@ cMooshroom::cMooshroom(void)
 
 
 
-bool cMooshroom::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cMooshroom") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cMooshroom::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_LEATHER);

@@ -19,11 +19,9 @@ class cPickup :
 {
 	// tolua_end
 	typedef cEntity super;
-	// tolua_begin
 	
 public:
-	// tolua_end
-	CLASS_PROTOTYPE();
+	CLASS_PROTODEF(cPickup);
 
 	cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);	//tolua_export
 	~cPickup();														//tolua_export

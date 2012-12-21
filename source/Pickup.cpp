@@ -24,12 +24,6 @@
 
 
 
-CLASS_DEFINITION( cPickup, cEntity )
-
-
-
-
-
 cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity( ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
 	, m_Speed( a_SpeedX, a_SpeedY, a_SpeedZ )

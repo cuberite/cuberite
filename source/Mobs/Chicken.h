@@ -15,7 +15,7 @@ class cChicken :
 public:
 	cChicken(void);
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cChicken);
 
 	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
 } ;

@@ -3,15 +3,19 @@
 
 #include "AggressiveMonster.h"
 
+
+
+
+
 class cSlime :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
 	
 public:
-	cSlime();
+	cSlime(void);
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cSlime);
 
 	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
 } ;

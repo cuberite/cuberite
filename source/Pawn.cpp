@@ -15,12 +15,6 @@
 
 
 
-CLASS_DEFINITION( cPawn, cEntity )
-
-
-
-
-
 cPawn::cPawn(void)
 	: cEntity( 0, 0, 0 )
 	, m_Health(1)
@@ -32,15 +26,6 @@ cPawn::cPawn(void)
 	, m_bBurnable(true)
 	, m_MetaData(NORMAL)
 {
-}
-
-
-
-
-
-cPawn::~cPawn()
-{
-	// Nothing needed yet
 }
 
 

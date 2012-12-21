@@ -15,7 +15,7 @@ class cMooshroom :
 public:
 	cMooshroom(void);
 
-	virtual bool IsA(const char * a_EntityType);
+	CLASS_PROTODEF(cMooshroom);
 
 	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
 } ;

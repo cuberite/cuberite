@@ -17,18 +17,10 @@ cCavespider::cCavespider(void)
 
 
 
-bool cCavespider::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cCaveSpider") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-
 void cCavespider::Tick(float a_Dt)
 {
 	super::Tick(a_Dt);
+
 	// TODO: Check vanilla if cavespiders really get passive during the day
 	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
 }

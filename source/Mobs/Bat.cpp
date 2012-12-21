@@ -16,13 +16,3 @@ cBat::cBat(void)
 
 
 
-
-bool cBat::IsA(const char * a_EntityType)
-{
-	return ((strcmp(a_EntityType, "cBat") == 0) || super::IsA(a_EntityType));
-}
-
-
-
-
-

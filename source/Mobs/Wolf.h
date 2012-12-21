@@ -1,12 +1,23 @@
+
 #pragma once
 
 #include "PassiveAggressiveMonster.h"
 
-class cWolf : public cPassiveAggressiveMonster
-{
-public:
-	cWolf();
-	~cWolf();
 
-	virtual bool IsA( const char* a_EntityType );
-};
+
+
+
+class cWolf :
+	public cPassiveAggressiveMonster
+{
+	typedef cPassiveAggressiveMonster super;
+	
+public:
+	cWolf(void);
+
+	CLASS_PROTODEF(cWolf);
+} ;
+
+
+
+

@@ -15,7 +15,7 @@ class cCow :
 public:
 	cCow();
 
-	virtual bool IsA(const char * a_EntityType) override;
+	CLASS_PROTODEF(cCow);
 
 	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
 } ;
