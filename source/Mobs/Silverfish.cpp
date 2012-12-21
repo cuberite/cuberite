@@ -10,6 +10,8 @@
 cSilverfish::cSilverfish(void)
 {
 	m_MobType = 60;
+	m_SoundHurt = "mob.silverfish.hit";
+	m_SoundDeath = "mob.silverfish.kill";
 	GetMonsterConfig("Silverfish");
 }
 

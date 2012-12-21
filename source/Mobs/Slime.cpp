@@ -12,6 +12,8 @@
 cSlime::cSlime(void)
 {
 	m_MobType = 55;
+	m_SoundHurt = "mob.slime.attack";
+	m_SoundDeath = "mob.slime.attack";
 	GetMonsterConfig("Slime");
 }
 

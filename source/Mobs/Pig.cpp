@@ -10,6 +10,8 @@
 cPig::cPig(void)
 {
 	m_MobType = 90;
+	m_SoundHurt = "mob.pig.say";
+	m_SoundDeath = "mob.pig.death";
 	GetMonsterConfig("Pig");
 }
 

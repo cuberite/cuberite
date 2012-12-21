@@ -10,6 +10,8 @@
 cZombiepigman::cZombiepigman()
 {
 	m_MobType = 57;
+	m_SoundHurt = "mob.zombiepig.zpighurt";
+	m_SoundDeath = "mob.zombiepig.zpigdeath";
 	GetMonsterConfig("Zombiepigman");
 }
 

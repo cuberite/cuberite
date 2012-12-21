@@ -10,6 +10,8 @@
 cSkeleton::cSkeleton(void)
 {
 	m_MobType = 51;
+	m_SoundHurt = "mob.skeleton.hurt";
+	m_SoundDeath = "mob.skeleton.death";
 	GetMonsterConfig("Skeleton");
 }
 

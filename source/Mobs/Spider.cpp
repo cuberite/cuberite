@@ -10,6 +10,8 @@
 cSpider::cSpider()
 {
 	m_MobType = 52;
+	m_SoundHurt = "mob.spider.say";
+	m_SoundDeath = "mob.spider.death";
 	GetMonsterConfig("Spider");
 }
 

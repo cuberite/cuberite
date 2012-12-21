@@ -10,6 +10,8 @@
 cMagmacube::cMagmacube()
 {
 	m_MobType = 62;
+	m_SoundHurt = "mob.magmacube.big";
+	m_SoundDeath = "mob.magmacube.big";
 	GetMonsterConfig("Magmacube");
 }
 

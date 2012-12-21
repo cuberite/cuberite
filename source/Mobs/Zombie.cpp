@@ -10,6 +10,8 @@
 cZombie::cZombie()
 {
 	m_MobType = 54;
+	m_SoundHurt = "mob.zombie.hurt";
+	m_SoundDeath = "mob.zombie.death";
 	GetMonsterConfig("Zombie");
 }
 

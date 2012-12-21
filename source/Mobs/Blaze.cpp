@@ -10,6 +10,8 @@
 cBlaze::cBlaze(void)
 {
 	m_MobType = 61;
+	m_SoundHurt = "mob.blaze.hit";
+	m_SoundDeath = "mob.blaze.death";
 	GetMonsterConfig("Blaze");
 }
 

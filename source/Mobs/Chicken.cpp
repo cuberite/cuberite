@@ -16,6 +16,8 @@
 cChicken::cChicken(void)
 {
 	m_MobType = 93;
+	m_SoundHurt = "mob.chicken.hurt";
+	m_SoundDeath = "mob.chicken.hurt";
 	GetMonsterConfig("Chicken");
 }
 

@@ -40,7 +40,16 @@ void cBlockLeverHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY
 void cBlockLeverHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	//Flip the ON bit on/off. Using XOR bitwise operation to turn it on/off.
-	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, ((a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x08) & 0x0f));
+	NIBBLETYPE Meta = ((a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x08) & 0x0f);
+	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta);
+	if(Meta & 0x08)
+	{
+		a_World->BroadcastSoundEffect("random.click", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
+	}
+	else
+	{
+		a_World->BroadcastSoundEffect("random.click", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.5f);
+	}
 }
 
 

@@ -16,6 +16,8 @@
 cCow::cCow(void)
 {
 	m_MobType = 92;
+	m_SoundHurt = "mob.cow.hurt";
+	m_SoundDeath = "mob.cow.hurt";
 	GetMonsterConfig("Cow");
 }
 

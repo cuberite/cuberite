@@ -10,6 +10,8 @@
 cOcelot::cOcelot()
 {
 	m_MobType = 98;
+	m_SoundHurt = "mob.cat.hitt";
+	m_SoundDeath = "mob.cat.hitt";
 	GetMonsterConfig("Ocelot");
 }
 

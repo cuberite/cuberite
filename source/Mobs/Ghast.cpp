@@ -10,6 +10,8 @@
 cGhast::cGhast(void)
 {
 	m_MobType = 56;
+	m_SoundHurt = "mob.ghast.scream";
+	m_SoundDeath = "mob.ghast.death";
 	GetMonsterConfig("Ghast");
 }
 

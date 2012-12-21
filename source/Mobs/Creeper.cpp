@@ -10,6 +10,8 @@
 cCreeper::cCreeper(void)
 {
 	m_MobType = 50;
+	m_SoundHurt = "mob.creeper.say";
+	m_SoundDeath = "mob.creeper.say";
 	GetMonsterConfig("Creeper");
 }
 

@@ -10,6 +10,8 @@
 cEnderman::cEnderman(void)
 {
 	m_MobType = 58;
+	m_SoundHurt = "mob.endermen.hit";
+	m_SoundDeath = "mob.endermen.death";
 	GetMonsterConfig("Enderman");
 }
 

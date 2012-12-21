@@ -10,6 +10,8 @@
 cBat::cBat(void)
 {
 	m_MobType = 65;
+	m_SoundHurt = "mob.bat.hurt";
+	m_SoundDeath = "mob.bat.death";
 	GetMonsterConfig("Bat");
 }
 

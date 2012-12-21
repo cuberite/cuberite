@@ -10,6 +10,8 @@
 cWolf::cWolf(void)
 {
 	m_MobType = 95;
+	m_SoundHurt = "mob.wolf.hurt";
+	m_SoundDeath = "mob.wolf.death";
 	GetMonsterConfig("Wolf");
 }
 

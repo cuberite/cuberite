@@ -92,6 +92,9 @@ protected:
 
 	char m_MobType;
 
+	AString m_SoundHurt;
+	AString m_SoundDeath;
+
 	float m_SeePlayerInterval;
 	float m_AttackDamage;
 	float m_AttackRange;

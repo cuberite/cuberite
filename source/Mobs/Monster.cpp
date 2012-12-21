@@ -38,6 +38,8 @@ cMonster::cMonster(void)
 	, m_DestroyTimer( 0 )
 	, m_Jump(0)
 	, m_MobType( 0 )
+	, m_SoundHurt( "" )
+	, m_SoundDeath( "" )
 	, m_EMState(IDLE)
 	, m_SightDistance(25)
 	, m_SeePlayerInterval (0)
@@ -303,6 +305,7 @@ void cMonster::HandlePhysics(float a_Dt)
 void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	super::DoTakeDamage(a_TDI);
+	if((m_SoundHurt != "") && (m_Health > 0)) m_World->BroadcastSoundEffect(m_SoundHurt, (int)(m_Pos.x * 8), (int)(m_Pos.y * 8), (int)(m_Pos.z * 8), 1.0f, 0.8f);
 	if (a_TDI.Attacker != NULL)
 	{
 		m_Target = a_TDI.Attacker;
@@ -317,6 +320,7 @@ void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cMonster::KilledBy(cPawn * a_Killer)
 {
 	super::KilledBy(a_Killer);
+	if(m_SoundHurt != "") m_World->BroadcastSoundEffect(m_SoundDeath, (int)(m_Pos.x * 8), (int)(m_Pos.y * 8), (int)(m_Pos.z * 8), 1.0f, 0.8f);
 	m_DestroyTimer = 0;
 }
 
