@@ -28,8 +28,8 @@
 
 
 
-cMonster::cMonster()
-	: m_Target(0)
+cMonster::cMonster(void)
+	: m_Target(NULL)
 	, m_bMovingToDestination(false)
 	, m_DestinationTime( 0 )
 	, m_Gravity( -9.81f)
@@ -318,20 +318,23 @@ void cMonster::HandlePhysics(float a_Dt)
 
 
 
-void cMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
+void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	cPawn::TakeDamage( a_Damage, a_Instigator );
-	m_Target = a_Instigator;
-	AddReference( m_Target );
+	super::DoTakeDamage(a_TDI);
+	if (a_TDI.Attacker != NULL)
+	{
+		m_Target = a_TDI.Attacker;
+		AddReference(m_Target);
+	}
 }
 
 
 
 
 
-void cMonster::KilledBy( cEntity* a_Killer )
+void cMonster::KilledBy(cPawn * a_Killer)
 {
-	cPawn::KilledBy( a_Killer );
+	super::KilledBy(a_Killer);
 	m_DestroyTimer = 0;
 }
 
@@ -513,7 +516,7 @@ void cMonster::Attack(float a_Dt)
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		m_AttackInterval = 0.0;
-		((cPawn *)m_Target)->TakeDamage((int)m_AttackDamage, this);
+		((cPawn *)m_Target)->TakeDamage(*this);
 	}
 }
 

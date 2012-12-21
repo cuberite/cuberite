@@ -2,12 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Sheep.h"
-
-
-
-
-
-//Todo: Implement color
+#include "../BlockID.h"
 
 
 
@@ -15,7 +10,7 @@
 
 cSheep::cSheep(void) :
 	m_IsSheared(false),
-	m_WoolColor(0)  // TODO: E_META_WOOL_WHITE
+	m_WoolColor(E_META_WOOL_WHITE)
 {
 	m_MobType = 91;
 	GetMonsterConfig("Sheep");
@@ -25,41 +20,23 @@ cSheep::cSheep(void) :
 
 
 
-cSheep::~cSheep()
+bool cSheep::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cSheep") == 0) || super::IsA(a_EntityType));
 }
 
 
 
 
 
-bool cSheep::IsA( const char* a_EntityType )
+void cSheep::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
-	if (strcmp( a_EntityType, "cSheep" ) == 0)
-	{
-		return true;
-	}
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cSheep::KilledBy( cEntity* a_Killer )
-{
-	// TODO: Check whether it is sheared
-	// TODO: Check color
-
 	if (!m_IsSheared)
 	{
-		cItems Drops;
-		Drops.push_back(cItem(E_ITEM_WHITE_CLOTH, 1, m_WoolColor));
-		m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
+		a_Drops.push_back(cItem(E_ITEM_WHITE_CLOTH, 1, m_WoolColor));
 	}
-
-	cMonster::KilledBy( a_Killer );
 }
+
 
 
 

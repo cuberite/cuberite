@@ -17,28 +17,11 @@ cOcelot::cOcelot()
 
 
 
-cOcelot::~cOcelot()
+bool cOcelot::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cOcelot") == 0) || super::IsA(a_EntityType));
 }
 
-
-
-
-
-bool cOcelot::IsA( const char* a_EntityType )
-{
-	if( strcmp( a_EntityType, "cOcelot" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cOcelot::KilledBy( cEntity* a_Killer )
-{
-	cMonster::KilledBy( a_Killer );
-}
 
 
 

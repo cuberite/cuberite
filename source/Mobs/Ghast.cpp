@@ -7,7 +7,7 @@
 
 
 
-cGhast::cGhast()
+cGhast::cGhast(void)
 {
 	m_MobType = 56;
 	GetMonsterConfig("Ghast");
@@ -17,31 +17,19 @@ cGhast::cGhast()
 
 
 
-cGhast::~cGhast()
+bool cGhast::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cGhast") == 0) || super::IsA(a_EntityType));
 }
 
 
 
 
 
-bool cGhast::IsA( const char* a_EntityType )
+void cGhast::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
-	if( strcmp( a_EntityType, "cGhast" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cGhast::KilledBy( cEntity* a_Killer )
-{
-	cItems Drops;
-	AddRandomDropItem(Drops, 0, 2, E_ITEM_GUNPOWDER);
-	AddRandomDropItem(Drops, 0, 1, E_ITEM_GHAST_TEAR);
-
-	cMonster::KilledBy( a_Killer );
+	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_GUNPOWDER);
+	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_GHAST_TEAR);
 }
 
 

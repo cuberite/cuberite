@@ -9,30 +9,27 @@
 
 
 
-cPassiveAggressiveMonster::cPassiveAggressiveMonster()
+cPassiveAggressiveMonster::cPassiveAggressiveMonster(void)
 {
 	m_EMPersonality = PASSIVE;
 }
 
-cPassiveAggressiveMonster::~cPassiveAggressiveMonster()
-{
-}
 
-void cPassiveAggressiveMonster::TakeDamage(int a_Damage, cEntity* a_Instigator)
+
+
+
+void cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	cMonster::TakeDamage(a_Damage, a_Instigator);
-	if(m_Target->GetEntityType() == cEntity::eEntityType_Player)
+	if ((m_Target != NULL) && (m_Target->GetEntityType() == cEntity::eEntityType_Player))
 	{
 		cPlayer * Player = (cPlayer *) m_Target;
-		if(Player->GetGameMode() != 1)
+		if (Player->GetGameMode() != 1)
 		{
 			m_EMState = CHASING;
 		}
 	}
-	
 }
 
-void cPassiveAggressiveMonster::EventSeePlayer(cEntity *a_Entity)
-{
-	return cMonster::EventSeePlayer(a_Entity);
-}
+
+
+

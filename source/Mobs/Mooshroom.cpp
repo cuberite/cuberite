@@ -13,7 +13,7 @@
 
 
 
-cMooshroom::cMooshroom()
+cMooshroom::cMooshroom(void)
 {
 	m_MobType = 96;
 	GetMonsterConfig("Mooshroom");
@@ -23,32 +23,19 @@ cMooshroom::cMooshroom()
 
 
 
-cMooshroom::~cMooshroom()
+bool cMooshroom::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cMooshroom") == 0) || super::IsA(a_EntityType));
 }
 
 
 
 
 
-bool cMooshroom::IsA( const char* a_EntityType )
+void cMooshroom::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
-	if( strcmp( a_EntityType, "cMooshroom" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cMooshroom::KilledBy( cEntity* a_Killer )
-{
-	cItems Drops;
-	AddRandomDropItem(Drops, 0, 2, E_ITEM_LEATHER);
-	AddRandomDropItem(Drops, 1, 3, (GetMetaData() == BURNING) ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
-	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
-
-	cMonster::KilledBy( a_Killer );
+	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_LEATHER);
+	AddRandomDropItem(a_Drops, 1, 3, (GetMetaData() == BURNING) ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
 
 

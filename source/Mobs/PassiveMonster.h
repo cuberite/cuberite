@@ -1,14 +1,26 @@
+
 #pragma once
 
 #include "Monster.h"
 
-class cPassiveMonster : public cMonster
+
+
+
+
+class cPassiveMonster :
+	public cMonster
 {
+	typedef cMonster super;
+	
 public:
-	cPassiveMonster();
-	~cPassiveMonster();
+	cPassiveMonster(void);
 
-	virtual void Tick(float a_Dt);
+	virtual void Tick(float a_Dt) override;
 
-	virtual void TakeDamage(int a_Damage, cEntity* a_Instigator);
-};
+	/// When hit by someone, run away
+	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+} ;
+
+
+
+

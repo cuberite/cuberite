@@ -1,18 +1,26 @@
+
 #pragma once
 
 #include "PassiveMonster.h"
 
-class cSquid : public cPassiveMonster
+
+
+
+
+class cSquid :
+	public cPassiveMonster
 {
+	typedef cPassiveMonster super;
+	
 public:
 	cSquid();
-	~cSquid();
 
-	virtual void Tick(float a_Dt);
+	virtual void Tick(float a_Dt) override;
 
-	virtual bool IsA( const char* a_EntityType );
-	virtual void KilledBy( cEntity* a_Killer );
-	
-protected:
-	float m_NoWater;
-};
+	virtual bool IsA(const char * a_EntityType) override;
+	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
+} ;
+
+
+
+

@@ -1,14 +1,21 @@
+
 #pragma once
 
 #include "AggressiveMonster.h"
 
-class cSlime : public cAggressiveMonster
+class cSlime :
+	public cAggressiveMonster
 {
+	typedef cAggressiveMonster super;
+	
 public:
 	cSlime();
-	~cSlime();
 
-	virtual bool IsA( const char* a_EntityType );
+	virtual bool IsA(const char * a_EntityType) override;
 
-	virtual void KilledBy( cEntity* a_Killer );
-};
+	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
+} ;
+
+
+
+

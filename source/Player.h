@@ -17,9 +17,17 @@ class cClientHandle;
 
 
 
-class cPlayer : public cPawn												//tolua_export
-{																			//tolua_export
+// tolua_begin
+class cPlayer :
+	public cPawn
+{
 public:
+	enum
+	{
+		MAX_HEALTH = 20,
+	} ;
+	// tolua_end
+	
 	typedef cPawn super;
 	
 	CLASS_PROTOTYPE()
@@ -33,6 +41,21 @@ public:
 	
 	virtual void Tick(float a_Dt) override;
 
+	/// Returns the curently equipped weapon; empty item if none
+	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
+	
+	/// Returns the currently equipped helmet; empty item if nonte
+	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
+	
+	/// Returns the currently equipped chestplate; empty item if none
+	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
+
+	/// Returns the currently equipped leggings; empty item if none
+	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
+	
+	/// Returns the currently equipped boots; empty item if none
+	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
+
 	void SetTouchGround( bool a_bTouchGround );
 	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
 	double GetEyeHeight();													//tolua_export
@@ -44,7 +67,7 @@ public:
 	
 	inline const cItem & GetEquippedItem(void) const {return GetInventory().GetEquippedItem(); }  // tolua_export
 
-	virtual void TeleportTo( const double & a_PosX, const double & a_PosY, const double & a_PosZ );		//tolua_export
+	virtual void TeleportTo(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	eGameMode GetGameMode(void) const { return m_GameMode; }														//tolua_export
 	std::string GetIP() { return m_IP; }																//tolua_export
@@ -100,18 +123,18 @@ public:
 
 	void AddFoodExhaustion(float a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }	//tolua_export
 	
-	void TakeDamage( int a_Damage, cEntity* a_Instigator );					//tolua_export
-	void KilledBy( cEntity* a_Killer );										//tolua_export
-	void Respawn();															//tolua_export
+	virtual void KilledBy(cPawn * a_Killer) override;
+	
+	void Respawn(void);															//tolua_export
 
 	void SetVisible( bool a_bVisible );										//tolua_export
-	bool IsVisible() { return m_bVisible; }									//tolua_export
+	bool IsVisible(void) const { return m_bVisible; }									//tolua_export
 
-	bool MoveToWorld( const char* a_WorldName );							//tolua_export
+	bool MoveToWorld(const char * a_WorldName );							//tolua_export
 
-	bool SaveToDisk();
-	bool LoadFromDisk();
-	void LoadPermissionsFromDisk();											//tolua_export
+	bool SaveToDisk(void);
+	bool LoadFromDisk(void);
+	void LoadPermissionsFromDisk(void);											//tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
@@ -171,4 +194,12 @@ protected:
 	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second
 
 	cClientHandle* m_ClientHandle;
-}; //tolua_export
+
+	/// Filters out damage for creative mode
+	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+	
+} ; //tolua_export
+
+
+
+

@@ -70,6 +70,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	LOGD("Inventory window for player %p is at %p", this, m_InventoryWindow);
 
 	SetMaxHealth(20);
+	
 	m_MaxFoodLevel = 20;
 	m_MaxFoodSaturationLevel = 20.f;
 	
@@ -222,18 +223,19 @@ void cPlayer::Tick(float a_Dt)
 	{
 		m_World->CollectPickupsByPlayer(this);
 
-		//Handle Health:
+		// Handle Health:
 		m_FoodTickTimer++;
-		if(m_FoodTickTimer >= 80)
+		if (m_FoodTickTimer >= 80)
 		{
 			m_FoodTickTimer = 0;
 
-			if(m_FoodLevel >= 17)
+			if (m_FoodLevel >= 17)
 			{
 				Heal(1);
-			}else if(m_FoodLevel == 0)
+			}
+			else if (m_FoodLevel == 0)
 			{
-				TakeDamage(1, NULL);
+				super::TakeDamage(dtStarving, NULL, 1, 1, 0);
 			}
 		}
 
@@ -248,7 +250,7 @@ void cPlayer::Tick(float a_Dt)
 			}
 			else
 			{
-				m_FoodLevel = MAX(m_FoodLevel -1, 0);
+				m_FoodLevel = MAX(m_FoodLevel - 1, 0);
 			}
 
 			SendHealth();
@@ -297,7 +299,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		m_LastJumpHeight = (float)m_Pos.y;
 		if (Damage > 0)
 		{
-			TakeDamage(Damage, 0);
+			super::TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 		}
 
 		m_LastGroundHeight = (float)m_Pos.y;
@@ -353,23 +355,30 @@ void cPlayer::SendHealth()
 
 
 
-void cPlayer::TakeDamage( int a_Damage, cEntity* a_Instigator )
+void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (m_GameMode != eGameMode_Creative)
+	if (m_GameMode == eGameMode_Creative)
 	{
-		cPawn::TakeDamage( a_Damage, a_Instigator );
-
-		AddFoodExhaustion(0.3f);
-
-		SendHealth();
+		// No damage / health in creative mode
+		return;
 	}
+	
+	super::DoTakeDamage(a_TDI);
+	
+	if (a_TDI.Attacker != NULL)
+	{
+		// Only increase hunger if being attacked by a mob
+		AddFoodExhaustion(0.3f);
+	}
+	
+	SendHealth();
 }
 
 
 
 
 
-void cPlayer::KilledBy(cEntity * a_Killer)
+void cPlayer::KilledBy(cPawn * a_Killer)
 {
 	cPawn::KilledBy(a_Killer);
 
@@ -544,7 +553,7 @@ void cPlayer::SendMessage(const AString & a_Message)
 
 
 
-void cPlayer::TeleportTo(const double & a_PosX, const double & a_PosY, const double & a_PosZ)
+void cPlayer::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
 {
 	SetPosition( a_PosX, a_PosY, a_PosZ );
 

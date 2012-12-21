@@ -8,5 +8,5 @@ public:
 	cSilverfish();
 	~cSilverfish();
 
-	virtual bool IsA( const char* a_EntityType );
+	virtual bool IsA(const char * a_EntityType);
 };

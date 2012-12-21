@@ -7,13 +7,13 @@
 
 
 
-// TODO Drop egg every 5-10 minutes
+// TODO: Drop egg every 5-10 minutes
 
 
 
 
 
-cChicken::cChicken()
+cChicken::cChicken(void)
 {
 	m_MobType = 93;
 	GetMonsterConfig("Chicken");
@@ -23,32 +23,19 @@ cChicken::cChicken()
 
 
 
-cChicken::~cChicken()
+bool cChicken::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cChicken") == 0) || super::IsA(a_EntityType));
 }
 
 
 
 
 
-bool cChicken::IsA( const char* a_EntityType )
+void cChicken::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
-	if( strcmp( a_EntityType, "cChicken" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cChicken::KilledBy( cEntity* a_Killer )
-{
-	cItems Drops;
-	AddRandomDropItem(Drops, 0, 2, E_ITEM_FEATHER);
-	Drops.push_back(cItem((GetMetaData() == BURNING) ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN, 1));
-	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
-
-	cMonster::KilledBy( a_Killer );
+	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_FEATHER);
+	a_Drops.push_back(cItem((GetMetaData() == BURNING) ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN, 1));
 }
 
 

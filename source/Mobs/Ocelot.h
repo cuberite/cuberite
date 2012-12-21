@@ -1,14 +1,23 @@
+
 #pragma once
 
 #include "PassiveMonster.h"
 
-class cOcelot : public cPassiveMonster
+
+
+
+
+class cOcelot :
+	public cPassiveMonster
 {
+	typedef cPassiveMonster super;
+	
 public:
 	cOcelot();
-	~cOcelot();
 
-	virtual bool IsA( const char* a_EntityType );
+	virtual bool IsA(const char * a_EntityType) override;
+} ;
 
-	virtual void KilledBy( cEntity* a_Killer );
-};
+
+
+

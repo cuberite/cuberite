@@ -253,21 +253,6 @@ bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
 			break;
 		}
 
-		case HOOK_TAKE_DAMAGE:
-		{
-			if( a_NumArgs != 2 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPawn* Pawn = va_arg(argptr, cPawn* );
-			TakeDamageInfo* TDI = va_arg(argptr, TakeDamageInfo* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				(*itr)->OnTakeDamage( Pawn, TDI );
-			}
-			break;
-		}
-
 		case HOOK_KILLED:
 		{
 			if( a_NumArgs != 2 ) break;
@@ -482,27 +467,6 @@ bool cPluginManager::CallHookCollectPickup(cPlayer * a_Player, cPickup & a_Picku
 
 
 
-bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_CRAFTING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnPreCrafting(a_Player, a_Grid, a_Recipe))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-
 bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_CRAFTING_NO_RECIPE);
@@ -555,6 +519,48 @@ bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraft
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPostCrafting(a_Player, a_Grid, a_Recipe))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_CRAFTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPreCrafting(a_Player, a_Grid, a_Recipe))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_TAKE_DAMAGE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnTakeDamage(a_Receiver, a_TDI))
 		{
 			return true;
 		}

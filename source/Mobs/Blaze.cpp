@@ -7,7 +7,7 @@
 
 
 
-cBlaze::cBlaze()
+cBlaze::cBlaze(void)
 {
 	m_MobType = 61;
 	GetMonsterConfig("Blaze");
@@ -17,31 +17,18 @@ cBlaze::cBlaze()
 
 
 
-cBlaze::~cBlaze()
+bool cBlaze::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cBlaze") == 0) || super::IsA(a_EntityType));
 }
 
 
 
 
 
-bool cBlaze::IsA( const char* a_EntityType )
+void cBlaze::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
-	if( strcmp( a_EntityType, "cBlaze" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cBlaze::KilledBy( cEntity* a_Killer )
-{
-	cItems Drops;
-	AddRandomDropItem(Drops, 0, 1, E_ITEM_BLAZE_ROD);
-	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
-
-	cMonster::KilledBy( a_Killer );
+	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_BLAZE_ROD);
 }
 
 

@@ -17,14 +17,18 @@ class cClientHandle;
 
 
 
-class cMonster :	public cPawn											//tolua_export
-{																			//tolua_export
+// tolua_begin
+class cMonster :
+	public cPawn
+{
+	typedef cPawn super;
 public:
-
-	cMonster();
+	// tolua_end
+	
+	cMonster(void);
 	virtual ~cMonster();
 
-	virtual bool IsA( const char* a_EntityType );
+	virtual bool IsA(const char * a_EntityType);
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -33,8 +37,9 @@ public:
 	virtual void HandlePhysics(float a_Dt);
 	virtual void ReplicateMovement(void);
 
-	virtual void TakeDamage(int a_Damage, cEntity *  a_Instigator) override;
-	virtual void KilledBy(cEntity * a_Killer) override;
+	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	
+	virtual void KilledBy(cPawn * a_Killer) override;
 
 	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual bool ReachedDestination(void);
@@ -47,7 +52,7 @@ public:
 	virtual void CheckEventSeePlayer();
 	virtual void EventSeePlayer(cEntity *);
 	float m_SightDistance;
-	virtual cPlayer *FindClosestPlayer();		//non static is easier. also virtual so other mobs can implement their own searching algo 
+	virtual cPlayer * FindClosestPlayer();		// non static is easier. also virtual so other mobs can implement their own searching algo 
 	virtual void GetMonsterConfig(const char* pm_name);
 	virtual void EventLosePlayer();
 	virtual void CheckEventLostPlayer();
@@ -69,7 +74,7 @@ public:
 	
 protected:
 	
-	cEntity* m_Target;
+	cEntity * m_Target;
 	float m_AttackRate;
 	float idle_interval;
 
@@ -94,7 +99,7 @@ protected:
 	float m_AttackInterval;
 
 	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
-}; //tolua_export
+} ; // tolua_export
 
 
 

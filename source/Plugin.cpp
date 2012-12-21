@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Plugin.h"
+#include "Pawn.h"
 
 
 
@@ -228,10 +229,11 @@ bool cPlugin::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Gr
 
 
 
-void cPlugin::OnTakeDamage(cPawn * a_Pawn, TakeDamageInfo * a_TakeDamageInfo)
+bool cPlugin::OnTakeDamage(cPawn & a_Pawn, TakeDamageInfo & a_TakeDamageInfo)
 {
 	UNUSED(a_Pawn);
 	UNUSED(a_TakeDamageInfo);
+	return false;
 }
 
 

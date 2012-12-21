@@ -17,37 +17,24 @@ cWitch::cWitch()
 
 
 
-cWitch::~cWitch()
+bool cWitch::IsA(const char * a_EntityType)
 {
+	return ((strcmp(a_EntityType, "cWitch") == 0) || super::IsA(a_EntityType));
 }
 
 
 
 
 
-bool cWitch::IsA( const char* a_EntityType )
+void cWitch::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
-	if( strcmp( a_EntityType, "cWitch" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cWitch::KilledBy( cEntity* a_Killer )
-{
-	cItems Drops;
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_GLASS_BOTTLE);
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_GLOWSTONE_DUST);
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_GUNPOWDER);
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_REDSTONE_DUST);
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_SPIDER_EYE);
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_STICK);
-	AddRandomDropItem(Drops, 0, 6, E_ITEM_SUGAR);
-	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
-
-	cMonster::KilledBy( a_Killer );
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_GLASS_BOTTLE);
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_GLOWSTONE_DUST);
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_GUNPOWDER);
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_REDSTONE_DUST);
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_SPIDER_EYE);
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_STICK);
+	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_SUGAR);
 }
 
 

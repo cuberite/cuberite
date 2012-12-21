@@ -918,7 +918,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 			if (!a_Entity->GetWorld()->IsPVPEnabled())
 			{
 				// PVP is disabled
-				if (a_Entity->IsA("cPlayer") && Instigator->IsA("cPlayer"))
+				if (a_Entity->IsA("cPlayer") && m_Attacker->IsA("cPlayer"))
 				{
 					// Player is hurting another player which is not allowed when PVP is disabled so ignore it
 					return true;
@@ -926,17 +926,15 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 			}
 			if (a_Entity->IsA("cPawn"))
 			{
-				reinterpret_cast<cPawn *>(a_Entity)->TakeDamage(Damage, Instigator);
+				reinterpret_cast<cPawn *>(a_Entity)->TakeDamage(*m_Attacker);
 			}
 			return true;
 		}
 	public:
-		int Damage;
-		cEntity * Instigator;
+		cPawn * m_Attacker;
 	} Callback;
 
-	Callback.Damage = 1; // TODO: Find proper damage from current item equipped
-	Callback.Instigator = m_Player;
+	Callback.m_Attacker = m_Player;
 
 	cWorld * World = m_Player->GetWorld();
 	World->DoWithEntityByID(a_TargetEntityID, Callback);

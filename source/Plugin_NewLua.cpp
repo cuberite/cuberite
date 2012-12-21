@@ -366,16 +366,25 @@ void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
 
 
 
-void cPlugin_NewLua::OnTakeDamage( cPawn* a_Pawn, TakeDamageInfo* a_TakeDamageInfo )
+bool cPlugin_NewLua::OnTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnTakeDamage") )
-		return;
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnTakeDamage"))
+	{
+		return false;
+	}
 
-	tolua_pushusertype(m_LuaState, a_Pawn, "cPawn");
-	tolua_pushusertype(m_LuaState, a_TakeDamageInfo, "TakeDamageInfo");
+	tolua_pushusertype(m_LuaState, &a_Receiver, "cPawn");
+	tolua_pushusertype(m_LuaState, &a_TDI,      "TakeDamageInfo");
 
-	CallFunction(2, 0, "OnTakeDamage");
+	if (!CallFunction(2, 1, "OnTakeDamage"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) != 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 

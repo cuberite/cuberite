@@ -17,27 +17,9 @@ cVillager::cVillager()
 
 
 
-cVillager::~cVillager()
+bool cVillager::IsA(const char * a_EntityType)
 {
-}
-
-
-
-
-
-bool cVillager::IsA( const char* a_EntityType )
-{
-	if( strcmp( a_EntityType, "cVillager" ) == 0 ) return true;
-	return cMonster::IsA( a_EntityType );
-}
-
-
-
-
-
-void cVillager::KilledBy( cEntity* a_Killer )
-{
-	cMonster::KilledBy( a_Killer );
+	return ((strcmp(a_EntityType, "cVillager") == 0) || super::IsA(a_EntityType));
 }
 
 

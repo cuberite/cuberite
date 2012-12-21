@@ -12,21 +12,25 @@ class cLuaCommandBinder;
 
 class cPlugin;
 
-// fwd: cWorld.h
+// fwd: World.h
 class cWorld;
 
-// fwd: cLuaChunk.h
+// fwd: LuaChunk.h
 class cLuaChunk;
 
-// fwd: cPlayer.h
+// fwd: Player.h
 class cPlayer;
 
 // fwd: CraftingRecipes.h
 class cCraftingGrid;
 class cCraftingRecipe;
 
-// fwd: cPickup.h
+// fwd: Pickup.h
 class cPickup;
+
+// fwd: Pawn.h
+struct TakeDamageInfo;
+class cPawn;
 
 
 
@@ -54,7 +58,7 @@ public:																	//tolua_export
 		HOOK_PLAYER_SPAWN,
 		HOOK_PLAYER_JOIN,
 		HOOK_PLAYER_MOVE,
-		HOOK_TAKE_DAMAGE,
+		HOOK_TAKE_DAMAGE,         // cPawn, TakeDamageInfo
 		HOOK_KILLED,
 		HOOK_CHUNK_GENERATED,
 		HOOK_CHUNK_GENERATING,
@@ -115,6 +119,7 @@ public:																	//tolua_export
 	bool CallHookLogin           (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPostCrafting    (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting     (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	bool CallHookTakeDamage      (cPawn & a_Receiver, TakeDamageInfo & a_TDI);
 	bool CallHookUpdatedSign     (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	bool CallHookUpdatingSign    (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	bool CallHookWeatherChanged  (cWorld * a_World);
