@@ -22,7 +22,7 @@ cCriticalSection cEntity::m_CSCount;
 
 
 
-cEntity::cEntity(const double & a_X, const double & a_Y, const double & a_Z)
+cEntity::cEntity(double a_X, double a_Y, double a_Z)
 	: m_UniqueID( 0 )
 	, m_Referencers( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCERS ) )
 	, m_References( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCES ) )
@@ -57,9 +57,9 @@ cEntity::~cEntity()
 		this
 	);
 	
-	if( !m_bDestroyed || !m_bRemovedFromChunk )
+	if (!m_bDestroyed || !m_bRemovedFromChunk)
 	{
-		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk );
+		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk);
 		ASSERT(!"Entity deallocated without being destroyed or unlinked");
 	}
 	delete m_Referencers;
@@ -269,9 +269,9 @@ void cEntity::SetPosition( const Vector3d & a_Pos )
 
 
 
-void cEntity::SetPosition( const double & a_PosX, const double & a_PosY, const double & a_PosZ )
+void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
-	m_Pos.Set( a_PosX, a_PosY, a_PosZ );
+	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
 	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
@@ -280,7 +280,7 @@ void cEntity::SetPosition( const double & a_PosX, const double & a_PosY, const d
 
 
 
-void cEntity::SetPosX( const double & a_PosX )
+void cEntity::SetPosX(double a_PosX)
 {
 	m_Pos.x = a_PosX;
 	MoveToCorrectChunk();
@@ -291,7 +291,7 @@ void cEntity::SetPosX( const double & a_PosX )
 
 
 
-void cEntity::SetPosY( const double & a_PosY )
+void cEntity::SetPosY(double a_PosY)
 {
 	m_Pos.y = a_PosY;
 	MoveToCorrectChunk();
@@ -302,7 +302,7 @@ void cEntity::SetPosY( const double & a_PosY )
 
 
 
-void cEntity::SetPosZ( const double & a_PosZ )
+void cEntity::SetPosZ(double a_PosZ)
 {
 	m_Pos.z = a_PosZ;
 	MoveToCorrectChunk();
@@ -315,7 +315,7 @@ void cEntity::SetPosZ( const double & a_PosZ )
 
 //////////////////////////////////////////////////////////////////////////
 // Reference stuffs
-void cEntity::AddReference( cEntity*& a_EntityPtr )
+void cEntity::AddReference(cEntity * & a_EntityPtr)
 {
 	m_References->AddReference( a_EntityPtr );
 	a_EntityPtr->ReferencedBy( a_EntityPtr );
@@ -325,7 +325,7 @@ void cEntity::AddReference( cEntity*& a_EntityPtr )
 
 
 
-void cEntity::ReferencedBy( cEntity*& a_EntityPtr )
+void cEntity::ReferencedBy(cEntity * & a_EntityPtr)
 {
 	m_Referencers->AddReference( a_EntityPtr );
 }
@@ -334,7 +334,7 @@ void cEntity::ReferencedBy( cEntity*& a_EntityPtr )
 
 
 
-void cEntity::Dereference( cEntity*& a_EntityPtr )
+void cEntity::Dereference(cEntity*& a_EntityPtr)
 {
 	m_Referencers->Dereference( a_EntityPtr );
 }

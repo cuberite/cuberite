@@ -301,12 +301,14 @@ public:
 	/// Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read.
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 	
-	bool DigBlock   (int a_X, int a_Y, int a_Z);									//tolua_export
-	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player );									//tolua_export
+	// tolua_begin
+	bool DigBlock   (int a_X, int a_Y, int a_Z);
+	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player );
 
-	const double & GetSpawnX(void) const { return m_SpawnX; }														// tolua_export
-	const double & GetSpawnY(void) const { return m_SpawnY; }														// tolua_export
-	const double & GetSpawnZ(void) const { return m_SpawnZ; }														// tolua_export
+	double GetSpawnX(void) const { return m_SpawnX; }
+	double GetSpawnY(void) const { return m_SpawnY; }
+	double GetSpawnZ(void) const { return m_SpawnZ; }
+	// tolua_end
 
 	inline cSimulatorManager * GetSimulatorManager(void) { return m_SimulatorManager; }
 	

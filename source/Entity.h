@@ -62,7 +62,7 @@ public:
 		ENTITY_STATUS_SHEEP_EATING    = 10,
 	} ;
 	
-	cEntity(const double & a_X, const double & a_Y, const double & a_Z);
+	cEntity(double a_X, double a_Y, double a_Z);
 	virtual ~cEntity();
 
 	virtual void Initialize(cWorld * a_World);
@@ -77,33 +77,33 @@ public:
 	virtual unsigned int GetEntityType() { return m_EntityType; }
 	virtual bool IsA( const char* a_EntityType );
 	virtual const char* GetClass();
-	// tolua_end
 
-	cWorld * GetWorld(void) const { return m_World; }										//tolua_export
+	cWorld * GetWorld(void) const { return m_World; }
 
-	const Vector3d & GetPosition(void) const {return m_Pos; }								//tolua_export
-	const double &   GetPosX    (void) const {return m_Pos.x; }								//tolua_export
-	const double &   GetPosY    (void) const {return m_Pos.y; }								//tolua_export
-	const double &   GetPosZ    (void) const {return m_Pos.z; }								//tolua_export
-	const Vector3f & GetRot     (void) const {return m_Rot; }								//tolua_export
-	float GetRotation(void) const {return m_Rot.x; }										//tolua_export
-	float GetPitch   (void) const {return m_Rot.y; }										//tolua_export
-	float GetRoll    (void) const {return m_Rot.z; }										//tolua_export
-	Vector3f GetLookVector();																//tolua_export
+	const Vector3d & GetPosition(void) const {return m_Pos; }
+	double           GetPosX    (void) const {return m_Pos.x; }
+	double           GetPosY    (void) const {return m_Pos.y; }
+	double           GetPosZ    (void) const {return m_Pos.z; }
+	const Vector3f & GetRot     (void) const {return m_Rot; }
+	float            GetRotation(void) const {return m_Rot.x; }
+	float            GetPitch   (void) const {return m_Rot.y; }
+	float            GetRoll    (void) const {return m_Rot.z; }
+	Vector3f         GetLookVector(void);
 	
-	int GetChunkX(void) const {return m_ChunkX; }											//tolua_export
-	int GetChunkY(void) const {return m_ChunkY; }											//tolua_export
-	int GetChunkZ(void) const {return m_ChunkZ; }											//tolua_export
+	int GetChunkX(void) const {return m_ChunkX; }
+	int GetChunkY(void) const {return m_ChunkY; }
+	int GetChunkZ(void) const {return m_ChunkZ; }
 
-	void SetPosX( const double & a_PosX );													//tolua_export
-	void SetPosY( const double & a_PosY );													//tolua_export
-	void SetPosZ( const double & a_PosZ );													//tolua_export
-	void SetPosition( const double & a_PosX, const double & a_PosY, const double & a_PosZ );//tolua_export
-	void SetPosition( const Vector3d & a_Pos );												//tolua_export
-	void SetRot( const Vector3f & a_Rot );													//tolua_export
-	void SetRotation( float a_Rotation );													//tolua_export
-	void SetPitch( float a_Pitch );															//tolua_export
-	void SetRoll( float a_Roll );															//tolua_export
+	void SetPosX    (double a_PosX);
+	void SetPosY    (double a_PosY);
+	void SetPosZ    (double a_PosZ);
+	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
+	void SetPosition(const Vector3d & a_Pos);
+	void SetRot     (const Vector3f & a_Rot);
+	void SetRotation(float a_Rotation);
+	void SetPitch   (float a_Pitch);
+	void SetRoll    (float a_Roll);
+	// tolua_end
 
 	inline int  GetUniqueID(void) const { return m_UniqueID; }								//tolua_export
 	inline bool IsDestroyed(void) const { return m_bDestroyed; }							//tolua_export
