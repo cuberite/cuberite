@@ -81,7 +81,7 @@ class cPawn :
 public:
 	CLASS_PROTODEF(cPawn);
 
-	cPawn(void);
+	cPawn(eEntityType a_EntityType);
 
 	virtual void Tick(float a_Dt) override;
 

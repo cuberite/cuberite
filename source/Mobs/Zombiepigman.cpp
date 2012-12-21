@@ -48,7 +48,7 @@ void cZombiepigman::KilledBy(cPawn * a_Killer)
 {
 	super::KilledBy(a_Killer);
 
-	if ((a_Killer != NULL) && (a_Killer->GetEntityType() == eEntityType_Player))
+	if ((a_Killer != NULL) && (a_Killer->IsPlayer()))
 	{
 		// TODO: Anger all nearby zombie pigmen
 		// TODO: In vanilla, if one player angers ZPs, do they attack any nearby player, or only that one attacker?

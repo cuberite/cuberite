@@ -25,7 +25,7 @@
 
 
 cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	:	cEntity( ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
+	:	cEntity(etPickup, ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
 	, m_Speed( a_SpeedX, a_SpeedY, a_SpeedZ )
 	, m_bOnGround( false )
 	, m_bReplicated( false )
@@ -33,9 +33,6 @@ cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX
 	, m_Item( new cItem( a_Item ) )
 	, m_bCollected( false )
 {
-	// LOGD("New pickup: ID(%i) Amount(%i) Health(%i)", m_Item.m_ItemID, m_Item.m_ItemCount, m_Item.m_ItemHealth );
-
-	m_EntityType = eEntityType_Pickup;
 }
 
 

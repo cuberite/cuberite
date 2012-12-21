@@ -1,17 +1,29 @@
+
 #pragma once
 
 #include "Monster.h"
 
-class cAggressiveMonster : public cMonster
-{
-public:
-	cAggressiveMonster();
-	~cAggressiveMonster();
 
-	virtual void Tick(float a_Dt);
-	virtual void InStateChasing(float a_Dt);
+
+
+
+class cAggressiveMonster :
+	public cMonster
+{
+	typedef cMonster super;
 	
-	virtual void EventSeePlayer(cEntity *);
+public:
+	cAggressiveMonster(void);
+
+	virtual void Tick(float a_Dt) override;
+	virtual void InStateChasing(float a_Dt) override;
+	
+	virtual void EventSeePlayer(cEntity *) override;
+	
 protected:
 	float m_ChaseTime;
-};
+} ;
+
+
+
+

@@ -15,8 +15,8 @@
 
 
 
-cPawn::cPawn(void)
-	: cEntity( 0, 0, 0 )
+cPawn::cPawn(eEntityType a_EntityType)
+	: cEntity(a_EntityType, 0, 0, 0)
 	, m_Health(1)
 	, m_MaxHealth(1)
 	, m_LastPosX( 0.0 )

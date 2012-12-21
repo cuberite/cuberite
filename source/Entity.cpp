@@ -22,7 +22,7 @@ cCriticalSection cEntity::m_CSCount;
 
 
 
-cEntity::cEntity(double a_X, double a_Y, double a_Z)
+cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	: m_UniqueID( 0 )
 	, m_Referencers( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCERS ) )
 	, m_References( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCES ) )
@@ -33,8 +33,8 @@ cEntity::cEntity(double a_X, double a_Y, double a_Z)
 	, m_bDirtyPosition( true )
 	, m_bDirtyOrientation( true )
 	, m_bDestroyed( false )
-	, m_EntityType( eEntityType_Entity )
-	, m_World( 0 )
+	, m_EntityType(a_EntityType)
+	, m_World(NULL)
 	, m_bRemovedFromChunk( false )
 	, m_FireDamageInterval(0.f)
 	, m_BurnPeriod(0.f)

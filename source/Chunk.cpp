@@ -115,7 +115,7 @@ cChunk::~cChunk()
 	cEntityList Entities;
 	for (cEntityList::const_iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		if ((*itr)->GetEntityType() != cEntity::eEntityType_Player)
+		if (!(*itr)->IsPlayer())
 		{
 			Entities.push_back(*itr);
 		}
@@ -1382,7 +1382,7 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		if ( (*itr)->GetEntityType() != cEntity::eEntityType_Pickup )
+		if (!(*itr)->IsPickup())
 		{
 			continue; // Only pickups
 		}
@@ -1515,13 +1515,13 @@ bool cChunk::HasAnyClients(void)
 
 
 
-void cChunk::AddEntity( cEntity * a_Entity)
+void cChunk::AddEntity(cEntity * a_Entity)
 {
-	if (a_Entity->GetEntityType() != cEntity::eEntityType_Player)
+	if (!a_Entity->IsPlayer())
 	{
 		MarkDirty();
 	}
-	m_Entities.push_back( a_Entity );
+	m_Entities.push_back(a_Entity);
 }
 
 
@@ -1537,7 +1537,7 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 	if (SizeBefore != SizeAfter)
 	{
 		// Mark as dirty if it was a server-generated entity:
-		if (a_Entity->GetEntityType() != cEntity::eEntityType_Player)
+		if (!a_Entity->IsPlayer())
 		{
 			MarkDirty();
 		}

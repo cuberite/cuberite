@@ -29,7 +29,8 @@
 
 
 cMonster::cMonster(void)
-	: m_Target(NULL)
+	: super(etMob)
+	, m_Target(NULL)
 	, m_bMovingToDestination(false)
 	, m_DestinationTime( 0 )
 	, m_Gravity( -9.81f)

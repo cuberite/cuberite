@@ -77,19 +77,31 @@ public:
 		ENTITY_STATUS_SHEEP_EATING    = 10,
 	} ;
 	
-	cEntity(double a_X, double a_Y, double a_Z);
+	enum eEntityType
+	{
+		etEntity,  // For all other types
+		etPlayer,
+		etPickup,
+		etMob,
+		etFallingBlock,
+		
+		// Older constants, left over for compatibility reasons (plugins)
+		eEntityType_Entity = etEntity,
+		eEntityType_Player = etPlayer,
+		eEntityType_Pickup = etPickup,
+		eEntityType_Mob    = etMob,
+	} ;
+
+	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z);
 	virtual ~cEntity();
 
 	virtual void Initialize(cWorld * a_World);
 
-	enum eEntityType
-	{
-		eEntityType_Entity,
-		eEntityType_Player,
-		eEntityType_Pickup
-	};
-
-	virtual unsigned int GetEntityType(void) const { return m_EntityType; }
+	eEntityType GetEntityType(void) const { return m_EntityType; }
+	
+	bool IsPlayer(void) const { return (m_EntityType == etPlayer); }
+	bool IsPickup(void) const { return (m_EntityType == etPickup); }
+	bool IsMob   (void) const { return (m_EntityType == etMob); }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;

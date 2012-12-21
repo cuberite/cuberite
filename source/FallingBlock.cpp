@@ -9,7 +9,7 @@
 
 
 cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType)
-	: super( a_BlockPosition.x + 0.5f, a_BlockPosition.y + 0.5f, a_BlockPosition.z + 0.5f )
+	: super(etFallingBlock, a_BlockPosition.x + 0.5f, a_BlockPosition.y + 0.5f, a_BlockPosition.z + 0.5f )
 	, m_BlockType( a_BlockType )
 	, m_OriginalPosition( a_BlockPosition )
 	, m_SpeedY( 0 )

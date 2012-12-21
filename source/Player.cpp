@@ -33,7 +33,8 @@
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: m_GameMode(eGameMode_NotSet)
+	: super(etPlayer)
+	, m_GameMode(eGameMode_NotSet)
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
 	, m_LastBlockActionCnt( 0 )
@@ -54,7 +55,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
 		this, GetUniqueID()
 	);
-	m_EntityType = eEntityType_Player;
 	
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;

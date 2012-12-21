@@ -20,7 +20,9 @@ cPassiveAggressiveMonster::cPassiveAggressiveMonster(void)
 
 void cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if ((m_Target != NULL) && (m_Target->GetEntityType() == cEntity::eEntityType_Player))
+	super::DoTakeDamage(a_TDI);
+	
+	if ((m_Target != NULL) && (m_Target->IsPlayer()))
 	{
 		cPlayer * Player = (cPlayer *) m_Target;
 		if (Player->GetGameMode() != 1)
