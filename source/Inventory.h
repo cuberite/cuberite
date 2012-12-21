@@ -48,6 +48,13 @@ public:
 	const cItem & GetEquippedItem(void) const;
 	void          SetEquippedSlot(int a_SlotNum);				//tolua_export
 	short         GetEquippedSlot(void) { return m_EquippedSlot; }	//tolua_export
+	
+	// tolua_begin
+	const cItem & GetEquippedHelmet    (void) const { return m_Slots[c_ArmorOffset]; }
+	const cItem & GetEquippedChestplate(void) const { return m_Slots[c_ArmorOffset + 1]; }
+	const cItem & GetEquippedLeggings  (void) const { return m_Slots[c_ArmorOffset + 2]; }
+	const cItem & GetEquippedBoots     (void) const { return m_Slots[c_ArmorOffset + 3]; }
+	// tolua_end
 
 	void SendSlot( int a_SlotNum );						//tolua_export
 	
