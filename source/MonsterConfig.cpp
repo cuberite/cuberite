@@ -44,7 +44,8 @@ cMonsterConfig::cMonsterConfig(void)
 
 
 
-cMonsterConfig::~cMonsterConfig() {
+cMonsterConfig::~cMonsterConfig()
+{
 	delete m_pState;
 }
 
@@ -52,8 +53,8 @@ cMonsterConfig::~cMonsterConfig() {
 
 
 
-void cMonsterConfig::Initialize() {
-	
+void cMonsterConfig::Initialize()
+{
 	sAttributesStruct Attributes;
 	cIniFile SettingsIniFile("settings.ini");
 	cIniFile MonstersIniFile("monsters.ini");
@@ -64,7 +65,7 @@ void cMonsterConfig::Initialize() {
 		return;
 	}
 	
-	m_pState->MonsterTypes = SettingsIniFile.GetValue("Monsters","Types","");
+	m_pState->MonsterTypes = SettingsIniFile.GetValue("Monsters", "Types", "");
 	
 	if ( m_pState->MonsterTypes.empty() )
 	{
@@ -72,17 +73,17 @@ void cMonsterConfig::Initialize() {
 		return;
 	}
 	
-	AStringVector SplitList = StringSplit(m_pState->MonsterTypes,",");
+	AStringVector SplitList = StringSplit(m_pState->MonsterTypes, ",");
 	for (unsigned int i = 0; i < SplitList.size(); ++i)
 	{
 		if (!SplitList[i].empty())
 		{
-			Attributes.m_name = SplitList[i].c_str();
-			Attributes.m_AttackDamage  = (float)MonstersIniFile.GetValueF(SplitList[i].c_str(), "AttackDamage",  0);
-			Attributes.m_AttackRange   = (float)MonstersIniFile.GetValueF(SplitList[i].c_str(), "AttackRange",   0);
-			Attributes.m_SightDistance = (float)MonstersIniFile.GetValueF(SplitList[i].c_str(), "SightDistance", 0);
-			Attributes.m_AttackRate    = (float)MonstersIniFile.GetValueF(SplitList[i].c_str(), "AttackRate",    0);
-			Attributes.m_MaxHealth     =        MonstersIniFile.GetValueI(SplitList[i].c_str(), "MaxHealth",     0);
+			Attributes.m_name = SplitList[i];
+			Attributes.m_AttackDamage  = (float)MonstersIniFile.GetValueF(SplitList[i], "AttackDamage",  0);
+			Attributes.m_AttackRange   = (float)MonstersIniFile.GetValueF(SplitList[i], "AttackRange",   0);
+			Attributes.m_SightDistance = (float)MonstersIniFile.GetValueF(SplitList[i], "SightDistance", 0);
+			Attributes.m_AttackRate    = (float)MonstersIniFile.GetValueF(SplitList[i], "AttackRate",    0);
+			Attributes.m_MaxHealth     =        MonstersIniFile.GetValueI(SplitList[i], "MaxHealth",     0);
 			m_pState->AttributesList.push_front(Attributes);
 		}
 	}  // for i - SplitList[]
@@ -92,18 +93,19 @@ void cMonsterConfig::Initialize() {
 
 
 
-void cMonsterConfig::AssignAttributes(cMonster *m, const char* n)
+void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Name)
 {
 	std::list<sAttributesStruct>::const_iterator itr;
 	for (itr = m_pState->AttributesList.begin(); itr != m_pState->AttributesList.end(); ++itr)
 	{
-		if(itr->m_name.compare(n) == 0)
+		if (itr->m_name.compare(a_Name) == 0)
 		{
-			m->SetAttackDamage (itr->m_AttackDamage);
-			m->SetAttackRange  (itr->m_AttackRange);
-			m->SetSightDistance(itr->m_SightDistance);
-			m->SetAttackRate   ((int)itr->m_AttackRate);
-			m->SetMaxHealth    ((short)itr->m_MaxHealth);
+			a_Monster->SetAttackDamage (itr->m_AttackDamage);
+			a_Monster->SetAttackRange  (itr->m_AttackRange);
+			a_Monster->SetSightDistance(itr->m_SightDistance);
+			a_Monster->SetAttackRate   ((int)itr->m_AttackRate);
+			a_Monster->SetMaxHealth    ((short)itr->m_MaxHealth);
+			return;
 		}
 	}  // for itr - m_pState->AttributesList[]
 }

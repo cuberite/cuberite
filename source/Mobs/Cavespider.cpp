@@ -7,12 +7,9 @@
 
 
 
-cCavespider::cCavespider(void)
+cCavespider::cCavespider(void) :
+	super("Cavespider", 59, "mob.spider.say", "mob.spider.death")
 {
-	m_MobType = 59;
-	m_SoundHurt = "mob.spider.say";
-	m_SoundDeath = "mob.spider.death";
-	GetMonsterConfig("Cavespider");
 }
 
 

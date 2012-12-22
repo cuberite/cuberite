@@ -13,7 +13,10 @@ class cBat :
 	typedef cPassiveMonster super;
 	
 public:
-	cBat(void);
+	cBat(void) :
+		super("Bat", 65, "mob.bat.hurt", "mob.bat.death")
+	{
+	}
 
 	CLASS_PROTODEF(cBat);
 } ;

@@ -13,12 +13,9 @@
 
 
 
-cChicken::cChicken(void)
+cChicken::cChicken(void) :
+	super("Chicken", 93, "mob.chicken.hurt", "mob.chicken.hurt")
 {
-	m_MobType = 93;
-	m_SoundHurt = "mob.chicken.hurt";
-	m_SoundDeath = "mob.chicken.hurt";
-	GetMonsterConfig("Chicken");
 }
 
 

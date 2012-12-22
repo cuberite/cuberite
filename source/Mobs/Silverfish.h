@@ -13,7 +13,10 @@ class cSilverfish :
 	typedef cAggressiveMonster super;
 	
 public:
-	cSilverfish(void);
+	cSilverfish(void) :
+		super("Silverfish", 60, "mob.silverfish.hit", "mob.silverfish.kill")
+	{
+	}
 
 	CLASS_PROTODEF(cSilverfish);
 } ;

@@ -8,7 +8,8 @@
 
 
 
-cPassiveMonster::cPassiveMonster(void)
+cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath) :
+	super(a_ConfigName, a_ProtocolMobType, a_SoundHurt, a_SoundDeath)
 {
 	m_EMPersonality = PASSIVE;
 }
@@ -32,7 +33,7 @@ void cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cPassiveMonster::Tick(float a_Dt)
 {
-	cMonster::Tick(a_Dt);
+	super::Tick(a_Dt);
 
 	m_SeePlayerInterval += a_Dt;
 

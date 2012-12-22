@@ -727,10 +727,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Bat.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Mobs\Bat.h"
 					>
 				</File>
@@ -815,10 +811,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Mobs\Ocelot.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Mobs\Ocelot.h"
 					>
 				</File>
@@ -852,10 +844,6 @@
 				</File>
 				<File
 					RelativePath="..\source\Mobs\Sheep.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Mobs\Silverfish.cpp"
 					>
 				</File>
 				<File
@@ -908,10 +896,6 @@
 				</File>
 				<File
 					RelativePath="..\source\Mobs\Witch.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Mobs\Wolf.cpp"
 					>
 				</File>
 				<File

@@ -7,12 +7,9 @@
 
 
 
-cZombie::cZombie()
+cZombie::cZombie(void) :
+	super("Zombie", 54, "mob.zombie.hurt", "mob.zombie.death")
 {
-	m_MobType = 54;
-	m_SoundHurt = "mob.zombie.hurt";
-	m_SoundDeath = "mob.zombie.death";
-	GetMonsterConfig("Zombie");
 }
 
 

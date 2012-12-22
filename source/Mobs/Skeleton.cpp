@@ -7,12 +7,9 @@
 
 
 
-cSkeleton::cSkeleton(void)
+cSkeleton::cSkeleton(void) :
+	super("Skeleton", 51, "mob.skeleton.hurt", "mob.skeleton.death")
 {
-	m_MobType = 51;
-	m_SoundHurt = "mob.skeleton.hurt";
-	m_SoundDeath = "mob.skeleton.death";
-	GetMonsterConfig("Skeleton");
 }
 
 

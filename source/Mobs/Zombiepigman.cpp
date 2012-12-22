@@ -7,12 +7,9 @@
 
 
 
-cZombiepigman::cZombiepigman()
+cZombiepigman::cZombiepigman(void) :
+	super("Zombiepigman", 57, "mob.zombiepig.zpighurt", "mob.zombiepig.zpigdeath")
 {
-	m_MobType = 57;
-	m_SoundHurt = "mob.zombiepig.zpighurt";
-	m_SoundDeath = "mob.zombiepig.zpigdeath";
-	GetMonsterConfig("Zombiepigman");
 }
 
 

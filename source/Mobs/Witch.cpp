@@ -7,10 +7,9 @@
 
 
 
-cWitch::cWitch()
+cWitch::cWitch(void) :
+	super("Witch", 66, "", "")
 {
-	m_MobType = 66;
-	GetMonsterConfig("Witch");
 }
 
 

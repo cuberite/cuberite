@@ -11,8 +11,9 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster()
-	: m_ChaseTime(999999)
+cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath) :
+	super(a_ConfigName, a_ProtocolMobType, a_SoundHurt, a_SoundDeath),
+	m_ChaseTime(999999)
 {
 	m_EMPersonality = AGGRESSIVE;
 }

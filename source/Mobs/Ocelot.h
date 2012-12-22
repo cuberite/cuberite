@@ -13,7 +13,10 @@ class cOcelot :
 	typedef cPassiveMonster super;
 	
 public:
-	cOcelot();
+	cOcelot(void) :
+		super("Ocelot", 98, "mob.cat.hitt", "mob.cat.hitt")
+	{
+	}
 
 	CLASS_PROTODEF(cOcelot);
 } ;

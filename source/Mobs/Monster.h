@@ -25,7 +25,12 @@ class cMonster :
 public:
 	// tolua_end
 	
-	cMonster(void);
+	/** Creates the mob object.
+	* If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
+	* a_ProtocolMobType is the ID of the mob used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22)
+	* a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
+	*/
+	cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath);
 
 	CLASS_PROTODEF(cMonster);
 	
@@ -52,7 +57,10 @@ public:
 	virtual void EventSeePlayer(cEntity *);
 	float m_SightDistance;
 	virtual cPlayer * FindClosestPlayer();		// non static is easier. also virtual so other mobs can implement their own searching algo 
-	virtual void GetMonsterConfig(const char* pm_name);
+	
+	/// Reads the monster configuration for the specified monster name and assigns it to this object.
+	void GetMonsterConfig(const AString & a_Name);
+	
 	virtual void EventLosePlayer();
 	virtual void CheckEventLostPlayer();
 	

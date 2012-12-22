@@ -7,12 +7,9 @@
 
 
 
-cPig::cPig(void)
+cPig::cPig(void) :
+	super("Pig", 90, "mob.pig.say", "mob.pig.death")
 {
-	m_MobType = 90;
-	m_SoundHurt = "mob.pig.say";
-	m_SoundDeath = "mob.pig.death";
-	GetMonsterConfig("Pig");
 }
 
 

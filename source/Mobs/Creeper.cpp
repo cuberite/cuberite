@@ -7,12 +7,9 @@
 
 
 
-cCreeper::cCreeper(void)
+cCreeper::cCreeper(void) :
+	super("Creeper", 50, "mob.creeper.say", "mob.creeper.say")
 {
-	m_MobType = 50;
-	m_SoundHurt = "mob.creeper.say";
-	m_SoundDeath = "mob.creeper.say";
-	GetMonsterConfig("Creeper");
 }
 
 

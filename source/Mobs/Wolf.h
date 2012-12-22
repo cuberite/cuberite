@@ -13,7 +13,10 @@ class cWolf :
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cWolf(void);
+	cWolf(void) :
+		super("Wolf", 95, "mob.wolf.hurt", "mob.wolf.death")
+	{
+	}
 
 	CLASS_PROTODEF(cWolf);
 } ;

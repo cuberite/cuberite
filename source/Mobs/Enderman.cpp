@@ -7,12 +7,9 @@
 
 
 
-cEnderman::cEnderman(void)
+cEnderman::cEnderman(void) :
+	super("Enderman", 58, "mob.endermen.hit", "mob.endermen.death")
 {
-	m_MobType = 58;
-	m_SoundHurt = "mob.endermen.hit";
-	m_SoundDeath = "mob.endermen.death";
-	GetMonsterConfig("Enderman");
 }
 
 

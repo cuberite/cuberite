@@ -7,12 +7,9 @@
 
 
 
-cGhast::cGhast(void)
+cGhast::cGhast(void) :
+	super("Ghast", 56, "mob.ghast.scream", "mob.ghast.death")
 {
-	m_MobType = 56;
-	m_SoundHurt = "mob.ghast.scream";
-	m_SoundDeath = "mob.ghast.death";
-	GetMonsterConfig("Ghast");
 }
 
 

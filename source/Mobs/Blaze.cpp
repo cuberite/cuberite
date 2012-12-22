@@ -7,12 +7,9 @@
 
 
 
-cBlaze::cBlaze(void)
+cBlaze::cBlaze(void) :
+	super("Blaze", 61, "mob.blaze.hit", "mob.blaze.death")
 {
-	m_MobType = 61;
-	m_SoundHurt = "mob.blaze.hit";
-	m_SoundDeath = "mob.blaze.death";
-	GetMonsterConfig("Blaze");
 }
 
 

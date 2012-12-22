@@ -7,10 +7,9 @@
 
 
 
-cVillager::cVillager()
+cVillager::cVillager(void) :
+	super("Villager", 120, "", "")
 {
-	m_MobType = 120;
-	GetMonsterConfig("Villager");
 }
 
 

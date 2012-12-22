@@ -8,10 +8,9 @@
 
 
 
-cSquid::cSquid()
+cSquid::cSquid(void) :
+	super("Squid", 94, "", "")
 {
-	m_MobType = 94;
-	GetMonsterConfig("Squid");
 }
 
 

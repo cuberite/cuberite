@@ -16,19 +16,13 @@
 #include "../Vector3d.h"
 
 #include "../Tracer.h"
-#include "../../iniFile/iniFile.h"
-
-/*
-#ifndef _WIN32
-	#include <unistd.h>
-#endif
-*/
+// #include "../../iniFile/iniFile.h"
 
 
 
 
 
-cMonster::cMonster(void)
+cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath)
 	: super(etMob)
 	, m_Target(NULL)
 	, m_bMovingToDestination(false)
@@ -37,9 +31,9 @@ cMonster::cMonster(void)
 	, m_bOnGround( false )
 	, m_DestroyTimer( 0 )
 	, m_Jump(0)
-	, m_MobType( 0 )
-	, m_SoundHurt( "" )
-	, m_SoundDeath( "" )
+	, m_MobType(a_ProtocolMobType)
+	, m_SoundHurt(a_SoundHurt)
+	, m_SoundDeath(a_SoundDeath)
 	, m_EMState(IDLE)
 	, m_SightDistance(25)
 	, m_SeePlayerInterval (0)
@@ -50,11 +44,10 @@ cMonster::cMonster(void)
 	, m_AttackRate(3)
 	, idle_interval(0)
 {
-	LOGD("cMonster::cMonster()");
-	LOGD("In state: %s", GetState());
-
-	m_bBurnable = true;
-	m_MetaData = NORMAL;
+	if (!a_ConfigName.empty())
+	{
+		GetMonsterConfig(a_ConfigName);
+	}
 }
 
 
@@ -520,9 +513,9 @@ cPlayer * cMonster::FindClosestPlayer(void)
 
 
 
-void cMonster::GetMonsterConfig(const char* pm_name)
+void cMonster::GetMonsterConfig(const AString & a_Name)
 {
-	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, pm_name);
+	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
 }
 
 

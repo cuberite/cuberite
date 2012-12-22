@@ -13,12 +13,9 @@
 
 
 
-cMooshroom::cMooshroom(void)
+cMooshroom::cMooshroom(void) :
+	super("Mooshroom", 96, "mob.cow.hurt", "mob.cow.hurt")
 {
-	m_MobType = 96;
-	m_SoundHurt = "mob.cow.hurt";
-	m_SoundDeath = "mob.cow.hurt";
-	GetMonsterConfig("Mooshroom");
 }
 
 

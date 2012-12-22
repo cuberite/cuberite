@@ -13,7 +13,7 @@ class cPassiveMonster :
 	typedef cMonster super;
 	
 public:
-	cPassiveMonster(void);
+	cPassiveMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath);
 
 	virtual void Tick(float a_Dt) override;
 

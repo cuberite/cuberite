@@ -13,7 +13,7 @@ class cAggressiveMonster :
 	typedef cMonster super;
 	
 public:
-	cAggressiveMonster(void);
+	cAggressiveMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath);
 
 	virtual void Tick(float a_Dt) override;
 	virtual void InStateChasing(float a_Dt) override;

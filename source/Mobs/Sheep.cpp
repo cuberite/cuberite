@@ -9,13 +9,10 @@
 
 
 cSheep::cSheep(void) :
+	super("Sheep", 91, "mob.sheep.say", "mob.sheep.say"),
 	m_IsSheared(false),
 	m_WoolColor(E_META_WOOL_WHITE)
 {
-	m_MobType = 91;
-	m_SoundHurt = "mob.sheep.say";
-	m_SoundDeath = "mob.sheep.say";
-	GetMonsterConfig("Sheep");
 }
 
 

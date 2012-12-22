@@ -9,12 +9,9 @@
 
 
 
-cSlime::cSlime(void)
+cSlime::cSlime(void) :
+	super("Slime", 55, "mob.slime.attack", "mob.slime.attack")
 {
-	m_MobType = 55;
-	m_SoundHurt = "mob.slime.attack";
-	m_SoundDeath = "mob.slime.attack";
-	GetMonsterConfig("Slime");
 }
 
 
