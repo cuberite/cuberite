@@ -58,6 +58,7 @@
 class cWorld;
 class cReferenceManager;
 class cClientHandle;
+class MTRand;
 
 
 
@@ -145,7 +146,8 @@ public:
 	void Destroy();																			//tolua_export
 	void RemoveFromChunk(void); // for internal use in cChunk
 
-	virtual void Tick(float a_Dt) = 0;														//tolua_export
+	virtual void Tick(float a_Dt, MTRand & a_TickRandom);														// tolua_export
+	virtual void HandlePhysics(float a_Dt) {}  // tolua_export
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()

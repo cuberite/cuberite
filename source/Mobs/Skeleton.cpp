@@ -16,9 +16,9 @@ cSkeleton::cSkeleton(void) :
 
 
 
-void cSkeleton::Tick(float a_Dt)
+void cSkeleton::Tick(float a_Dt, MTRand & a_TickRandom)
 {
-	cMonster::Tick(a_Dt);
+	cMonster::Tick(a_Dt, a_TickRandom);
 
 	// TODO Outsource
 	// TODO should do SkyLight check, mobs in the dark don´t burn 

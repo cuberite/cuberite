@@ -16,9 +16,9 @@ cZombiepigman::cZombiepigman(void) :
 
 
 
-void cZombiepigman::Tick(float a_Dt)
+void cZombiepigman::Tick(float a_Dt, MTRand & a_TickRandom)
 {
-	super::Tick(a_Dt);
+	super::Tick(a_Dt, a_TickRandom);
 
 	// TODO Same as noticed in cSkeleton AND Do they really burn by sun?? :D In the neather is no sun :D
 	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))

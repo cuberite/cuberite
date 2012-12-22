@@ -33,10 +33,10 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	
-	virtual bool CollectedBy( cPlayer* a_Dest );					//tolua_export
+	virtual bool CollectedBy(cPlayer * a_Dest);					//tolua_export
 
-	void Tick(float a_Dt);
-	void HandlePhysics(float a_Dt);
+	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
+	virtual void HandlePhysics(float a_Dt) override;
 	
 	const Vector3f & GetSpeed(void) const {return m_Speed; }
 	

@@ -36,7 +36,7 @@ public:
 	
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	virtual void Tick(float a_Dt) override;
+	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 	
 	virtual void HandlePhysics(float a_Dt);
 	virtual void ReplicateMovement(void);
@@ -53,20 +53,20 @@ public:
 	const char * GetState();
 	void SetState(const AString & str);
 	
-	virtual void CheckEventSeePlayer();
-	virtual void EventSeePlayer(cEntity *);
+	virtual void CheckEventSeePlayer(MTRand & a_TickRandom);
+	virtual void EventSeePlayer(cEntity *, MTRand & a_TickRandom);
 	float m_SightDistance;
 	virtual cPlayer * FindClosestPlayer();		// non static is easier. also virtual so other mobs can implement their own searching algo 
 	
 	/// Reads the monster configuration for the specified monster name and assigns it to this object.
 	void GetMonsterConfig(const AString & a_Name);
 	
-	virtual void EventLosePlayer();
-	virtual void CheckEventLostPlayer();
+	virtual void EventLosePlayer(void);
+	virtual void CheckEventLostPlayer(MTRand & a_TickRandom);
 	
-	virtual void InStateIdle(float a_Dt);
-	virtual void InStateChasing(float a_Dt);
-	virtual void InStateEscaping(float a_Dt);
+	virtual void InStateIdle    (float a_Dt, MTRand & a_TickRandom);
+	virtual void InStateChasing (float a_Dt, MTRand & a_TickRandom);
+	virtual void InStateEscaping(float a_Dt, MTRand & a_TickRandom);
 	
 	virtual void Attack(float a_Dt);
 	int GetMobType() {return m_MobType;}

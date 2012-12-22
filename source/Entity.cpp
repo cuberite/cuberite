@@ -197,6 +197,17 @@ void cEntity::RemoveFromChunk(void)
 
 
 
+void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
+{
+	UNUSED(a_TickRandom);
+	
+	HandlePhysics(a_Dt);
+}
+
+
+
+
+
 bool cEntity::IsA(const char * a_ClassName) const
 {
 	return (strcmp(a_ClassName, "cEntity") == 0);

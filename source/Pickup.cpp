@@ -67,34 +67,31 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPickup::Tick(float a_Dt)
+void cPickup::Tick(float a_Dt, MTRand & a_TickRandom)
 {
+	super::Tick(a_Dt, a_TickRandom);
+	
 	m_Timer += a_Dt;
 	a_Dt = a_Dt / 1000.f;
-	if(m_bCollected)
+	if (m_bCollected)
 	{
-		if(m_Timer > 500.f) // 0.5 second
+		if (m_Timer > 500.f)  // 0.5 second
 		{
 			Destroy();
 			return;
 		}
 	}
 
-	if( m_Timer > 1000*60*5 ) // 5 minutes
+	if (m_Timer > 1000 * 60 * 5)  // 5 minutes
 	{
 		Destroy();
 		return;
 	}
 
-	if( m_Pos.y < 0 ) // Out of this world!
+	if (m_Pos.y < -8) // Out of this world and no more visible!
 	{
 		Destroy();
 		return;
-	}
-
-	if (!m_bCollected)
-	{
-		HandlePhysics(a_Dt);
 	}
 
 	if (!m_bReplicated || m_bDirtyPosition)
@@ -229,7 +226,7 @@ void cPickup::HandlePhysics(float a_Dt)
 
 
 
-bool cPickup::CollectedBy( cPlayer* a_Dest )
+bool cPickup::CollectedBy(cPlayer * a_Dest)
 {
 	if (m_bCollected)
 	{
@@ -252,7 +249,8 @@ bool cPickup::CollectedBy( cPlayer* a_Dest )
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
 		m_bCollected = true;
 		m_Timer = 0;
-		if( m_Item->m_ItemCount != 0 ) {
+		if (m_Item->m_ItemCount != 0)
+		{
 			cItems Pickup;
 			Pickup.push_back(cItem(*m_Item));
 			m_World->SpawnItemPickups(Pickup, m_Pos.x, m_Pos.y, m_Pos.z);

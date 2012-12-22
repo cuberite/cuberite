@@ -60,9 +60,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
 
-	// DEBUG:
-	LOGD("Inventory window for player %p is at %p", this, m_InventoryWindow);
-
 	SetMaxHealth(20);
 	
 	m_MaxFoodLevel = 20;
@@ -159,7 +156,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPlayer::Tick(float a_Dt)
+void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	if (!m_ClientHandle->IsPlaying())
 	{
@@ -167,7 +164,7 @@ void cPlayer::Tick(float a_Dt)
 		return;
 	}
 	
-	cPawn::Tick(a_Dt);
+	super::Tick(a_Dt, a_TickRandom);
 
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{

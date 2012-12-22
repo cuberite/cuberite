@@ -39,7 +39,7 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-	virtual void Tick(float a_Dt) override;
+	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 
 	/// Returns the curently equipped weapon; empty item if none
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }

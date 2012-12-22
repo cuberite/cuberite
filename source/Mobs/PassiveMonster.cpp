@@ -31,23 +31,22 @@ void cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPassiveMonster::Tick(float a_Dt)
+void cPassiveMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 {
-	super::Tick(a_Dt);
+	super::Tick(a_Dt, a_TickRandom);
 
 	m_SeePlayerInterval += a_Dt;
 
 	if (m_SeePlayerInterval > 1)  // Check every second
 	{
-		MTRand r1;
-		int rem = r1.randInt() % 3 + 1;  // Check most of the time but miss occasionally
+		int rem = a_TickRandom.randInt() % 3 + 1;  // Check most of the time but miss occasionally
 
 		m_SeePlayerInterval = 0.0;
 		if (rem >= 2)
 		{
 			if (m_EMState == ESCAPING)
 			{
-				CheckEventLostPlayer();
+				CheckEventLostPlayer(a_TickRandom);
 			} 
 		}
 	}

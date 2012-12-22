@@ -27,9 +27,9 @@ void cSquid::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 
 
 
-void cSquid::Tick(float a_Dt)
+void cSquid::Tick(float a_Dt, MTRand & a_TickRandom)
 {
-	super::Tick(a_Dt);
+	super::Tick(a_Dt, a_TickRandom);
 	
 	Vector3d Pos = GetPosition();
 

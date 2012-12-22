@@ -16,9 +16,9 @@ cEnderman::cEnderman(void) :
 
 
 
-void cEnderman::Tick(float a_Dt)
+void cEnderman::Tick(float a_Dt, MTRand & a_TickRandom)
 {
-	cMonster::Tick(a_Dt);
+	cMonster::Tick(a_Dt, a_TickRandom);
 
 	// TODO Same as stated in cSkeleton
 	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))

@@ -456,6 +456,7 @@ void cWorld::Tick(float a_Dt)
 		m_LastTimeUpdate = m_WorldAge;
 	}
 
+	// Remove entities scheduled for removal:
 	{
 		cCSLock Lock(m_CSEntities);
 		for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end();)
@@ -468,7 +469,7 @@ void cWorld::Tick(float a_Dt)
 				m_RemoveEntityQueue.push_back( RemoveMe ); 
 				continue;
 			}
-			(*itr)->Tick(a_Dt);
+			(*itr)->Tick(a_Dt, m_TickRand);
 			itr++;
 		}
 	}

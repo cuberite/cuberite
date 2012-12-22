@@ -39,7 +39,7 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cFallingBlock::Tick(float a_Dt)
+void cFallingBlock::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	float MilliDt = a_Dt * 0.001f;
 	m_SpeedY -= MilliDt * 9.8f;

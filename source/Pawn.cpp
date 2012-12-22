@@ -292,7 +292,7 @@ void cPawn::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
 
 
 
-void cPawn::Tick(float a_Dt)
+void cPawn::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	CheckMetaDataBurn();  // Check to see if pawn should burn based on block they are on
 	

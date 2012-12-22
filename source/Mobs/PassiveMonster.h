@@ -15,7 +15,7 @@ class cPassiveMonster :
 public:
 	cPassiveMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath);
 
-	virtual void Tick(float a_Dt) override;
+	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 
 	/// When hit by someone, run away
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
