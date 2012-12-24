@@ -1696,12 +1696,16 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   DataIndicator);
 	AString ExtraData;
 	short VelocityX, VelocityY, VelocityZ;
+	Byte Yaw, Pitch;
 	if (DataIndicator != 0)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedX);
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedY);
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedZ);
+		HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  LocalYaw);
+		HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  LocalPitch);
 		VelocityX = SpeedX; VelocityY = SpeedY; VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
+		Yaw = LocalYaw; Pitch = LocalPitch;
 		/*
 		// This doesn't seem to work - for a falling block I'm getting no extra data at all
 		int ExtraLen = 0;
@@ -1733,6 +1737,7 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	if (DataIndicator != 0)
 	{
 		Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+		Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
 		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %d", ExtraData.size());
 	}
 	COPY_TO_CLIENT();
