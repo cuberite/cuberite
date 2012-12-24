@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4"
-#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49"
+#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6"
+#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51"
 
 
 
@@ -37,8 +37,9 @@ public:
 		PROTO_VERSION_1_3_2 = 39,
 		PROTO_VERSION_1_4_2 = 47,
 		PROTO_VERSION_1_4_4 = 49,
+		PROTO_VERSION_1_4_6 = 51,
 		
-		PROTO_VERSION_LATEST = PROTO_VERSION_1_4_4,  // Keep this up to date, this serves as the default for PrimaryServerVersion
+		PROTO_VERSION_LATEST = PROTO_VERSION_1_4_6,  // Keep this up to date, this serves as the default for PrimaryServerVersion
 	} ;
 
 	cProtocolRecognizer(cClientHandle * a_Client);
@@ -83,7 +84,7 @@ public:
 	virtual void SendSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnMob           (const cMonster & a_Mob) override;
-	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ) override;
+	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch) override;
 	virtual void SendTeleportEntity     (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay) override;

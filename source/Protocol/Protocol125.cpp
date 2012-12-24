@@ -633,8 +633,11 @@ void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
+void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
 {
+	UNUSED(a_Yaw);
+	UNUSED(a_Pitch);
+	
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_SPAWN_OBJECT);
 	WriteInt (a_Entity.GetUniqueID());
@@ -643,11 +646,11 @@ void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	WriteInt ((int)(a_Entity.GetPosY() * 32));
 	WriteInt ((int)(a_Entity.GetPosZ() * 32));
 	WriteInt (a_ObjectData);
-	if( a_ObjectData != 0 )
+	if (a_ObjectData != 0)
 	{
-		WriteShort( a_SpeedX );
-		WriteShort( a_SpeedY );
-		WriteShort( a_SpeedZ );
+		WriteShort(a_SpeedX);
+		WriteShort(a_SpeedY);
+		WriteShort(a_SpeedZ);
 	}
 	Flush();
 }

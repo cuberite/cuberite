@@ -1,6 +1,9 @@
+
 #pragma once
 
 #include "BlockID.h"
+
+typedef unsigned char Byte;
 
 //tolua_begin
 // emissive blocks

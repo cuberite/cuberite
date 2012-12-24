@@ -156,7 +156,6 @@ cProtocol132::cProtocol132(cClientHandle * a_Client) :
 	super(a_Client),
 	m_IsEncrypted(false)
 {
-	LOGD("Created cProtocol132 at %p", this);
 }
 
 
@@ -169,7 +168,6 @@ cProtocol132::~cProtocol132()
 	{
 		LOGD("There are %d unsent bytes while deleting cProtocol132", m_DataToSend.size());
 	}
-	LOGD("Deleted cProtocol132 at %p", this);
 }
 
 

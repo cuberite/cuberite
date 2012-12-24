@@ -34,6 +34,7 @@ class cWindow;
 
 
 
+
 class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
 {											// tolua_export
@@ -120,7 +121,7 @@ public:
 	void SendWindowClose        (char a_WindowID);
 	void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
 	void SendUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
-	void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ);
+	void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	void SetUsername( const AString & a_Username );	//tolua_export

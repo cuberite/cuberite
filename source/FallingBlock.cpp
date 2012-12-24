@@ -32,7 +32,7 @@ void cFallingBlock::Initialize(cWorld * a_World)
 
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnObject(*this, 70, m_BlockType, 0, 0, 0);
+	a_ClientHandle.SendSpawnObject(*this, 70, m_BlockType, 0, 0, 0, 0, 0);
 }
 
 

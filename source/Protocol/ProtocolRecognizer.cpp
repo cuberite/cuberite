@@ -9,7 +9,7 @@
 #include "ProtocolRecognizer.h"
 #include "Protocol125.h"
 #include "Protocol132.h"
-#include "Protocol142.h"
+#include "Protocol14x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../World.h"
@@ -47,6 +47,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_3_2: return "1.3.2";
 		case PROTO_VERSION_1_4_2: return "1.4.2";
 		case PROTO_VERSION_1_4_4: return "1.4.4";
+		case PROTO_VERSION_1_4_6: return "1.4.6";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -415,10 +416,10 @@ void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ)
+void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_SpeedX, a_SpeedY, a_SpeedZ, a_Yaw, a_Pitch);
 }
 
 
@@ -593,6 +594,11 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 			m_Protocol = new cProtocol142(m_Client);
 			return true;
 		}
+		case PROTO_VERSION_1_4_6:
+		{
+			m_Protocol = new cProtocol146(m_Client);
+			return true;
+		}
 	}
 	m_Protocol = new cProtocol125(m_Client);
 	return true;
@@ -623,6 +629,7 @@ void cProtocolRecognizer::HandleServerPing(void)
 		
 		case PROTO_VERSION_1_4_2:
 		case PROTO_VERSION_1_4_4:
+		case PROTO_VERSION_1_4_6:
 		{
 			// The server list ping now has 1 more byte of "magic". Mojang just loves to complicate stuff.
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3101#Server_List_Ping_.280xFE.29

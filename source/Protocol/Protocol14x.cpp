@@ -1,10 +1,18 @@
 
-// Protocol142.cpp
+// Protocol14x.cpp
 
-// Implements the cProtocol142 class representing the release 1.4.2 protocol (#47)
+/*
+Implements the 1.4.x protocol classes representing these protocols:
+- cProtocol142:
+	- release 1.4.2 protocol (#47)
+	- release 1.4.4 protocol (#49) - the same protocol class is used, because the only difference is in a packet that MCServer doesn't implement yet (ITEM_DATA)
+	- release 1.4.5 protocol (same as 1.4.4)
+- cProtocol146:
+	- release 1.4.6 protocol (#51)
+*/
 
 #include "Globals.h"
-#include "Protocol142.h"
+#include "Protocol14x.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
@@ -45,6 +53,8 @@ enum
 {
 	PACKET_UPDATE_TIME           = 0x04,
 	PACKET_PICKUP_SPAWN          = 0x15,
+	PACKET_SPAWN_OBJECT          = 0x17,
+	PACKET_ENTITY_METADATA       = 0x28,
 	PACKET_SOUND_PARTICLE_EFFECT = 0x3d
 } ;
 
@@ -58,20 +68,6 @@ enum
 cProtocol142::cProtocol142(cClientHandle * a_Client) :
 	super(a_Client)
 {
-	LOGD("Created cProtocol142 at %p", this);
-}
-
-
-
-
-
-cProtocol142::~cProtocol142()
-{
-	if (!m_DataToSend.empty())
-	{
-		LOGD("There are %d unsent bytes while deleting cProtocol142", m_DataToSend.size());
-	}
-	LOGD("Deleted cProtocol142 at %p", this);
 }
 
 
@@ -138,3 +134,78 @@ void cProtocol142::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
 	WriteInt64(a_TimeOfDay);
 	Flush();
 }
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol146:
+
+cProtocol146::cProtocol146(cClientHandle * a_Client) :
+	super(a_Client)
+{
+}
+
+
+
+
+
+void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_ObjectType);
+	WriteInt ((int)(a_Entity.GetPosX() * 32));
+	WriteInt ((int)(a_Entity.GetPosY() * 32));
+	WriteInt ((int)(a_Entity.GetPosZ() * 32));
+	WriteInt (a_ObjectData);
+	if (a_ObjectData != 0)
+	{
+		WriteShort(a_SpeedX);
+		WriteShort(a_SpeedY);
+		WriteShort(a_SpeedZ);
+		WriteByte(a_Yaw);
+		WriteByte(a_Pitch);
+	}
+	Flush();
+}
+
+
+
+
+
+void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
+{
+	ASSERT(!a_Pickup.GetItem()->IsEmpty());
+	
+	cCSLock Lock(m_CSPacket);
+
+	// Send a SPAWN_OBJECT packet for the base entity:
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_Pickup.GetUniqueID());
+	WriteByte(0x02);
+	WriteInt ((int)(a_Pickup.GetPosX() * 32));
+	WriteInt ((int)(a_Pickup.GetPosY() * 32));
+	WriteInt ((int)(a_Pickup.GetPosZ() * 32));
+	WriteInt (1);
+	WriteShort((short)(a_Pickup.GetSpeed().x * 32));
+	WriteShort((short)(a_Pickup.GetSpeed().y * 32));
+	WriteShort((short)(a_Pickup.GetSpeed().z * 32));
+	WriteByte(0);
+	WriteByte(0);
+	
+	// Send a ENTITY_METADATA packet with the slot info:
+	WriteByte(PACKET_ENTITY_METADATA);
+	WriteInt(a_Pickup.GetUniqueID());
+	WriteByte(0xaa);  // a slot value at index 10
+	WriteItem(*a_Pickup.GetItem());  // TODO: Still not good, needs GZIP!
+	WriteByte(0x7f);  // End of metadata
+	Flush();
+}
+
+
+
+
