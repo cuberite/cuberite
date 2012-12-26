@@ -98,6 +98,7 @@ protected:
 	
 	// Packet handling, client-side:
 	bool HandleClientAnimation(void);
+	bool HandleClientBlockDig(void);
 	bool HandleClientBlockPlace(void);
 	bool HandleClientChatMessage(void);
 	bool HandleClientClientStatuses(void);
@@ -151,6 +152,7 @@ protected:
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
+	bool HandleServerSlotSelect(void);
 	bool HandleServerSoundEffect(void);
 	bool HandleServerSpawnMob(void);
 	bool HandleServerSpawnObjectVehicle(void);
