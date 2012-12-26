@@ -101,8 +101,9 @@ void cDispenserEntity::Dispense()
 	if(SlotsCnt > 0)
 	{
 		MTRand r1;
-		cItem Drop = m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]];
-		switch( m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType )
+		char RandomSlot = r1.randInt() % SlotsCnt;
+		cItem Drop = m_Items[OccupiedSlots[RandomSlot]];
+		switch( m_Items[OccupiedSlots[RandomSlot]].m_ItemType )
 		{
 			case E_ITEM_BUCKET:
 			{
@@ -110,19 +111,19 @@ void cDispenserEntity::Dispense()
 				if( DispBlock == E_BLOCK_STATIONARY_WATER )
 				{
 					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_AIR, 0 );
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_WATER_BUCKET;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemType = E_ITEM_WATER_BUCKET;
 				}
 				else if( DispBlock == E_BLOCK_STATIONARY_LAVA )
 				{
 					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_AIR, 0 );
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_LAVA_BUCKET;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemType = E_ITEM_LAVA_BUCKET;
 				}
 				else
 				{
 					cItems Pickups;
 					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
 					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				}
 				break;
 			}
@@ -132,14 +133,14 @@ void cDispenserEntity::Dispense()
 				if( DispBlock == E_BLOCK_AIR || IsBlockLiquid(DispBlock) || cFluidSimulator::CanWashAway(DispBlock) )
 				{
 					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_STATIONARY_WATER, 0 );
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_BUCKET;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemType = E_ITEM_BUCKET;
 				}
 				else
 				{
 					cItems Pickups;
 					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
 					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				}
 				break;
 			}
@@ -149,14 +150,22 @@ void cDispenserEntity::Dispense()
 				if( DispBlock == E_BLOCK_AIR || IsBlockLiquid(DispBlock) || cFluidSimulator::CanWashAway(DispBlock) )
 				{
 					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_STATIONARY_LAVA, 0 );
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_BUCKET;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemType = E_ITEM_BUCKET;
 				}
 				else
 				{
 					cItems Pickups;
 					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
 					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
-					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
+				}
+				break;
+			}
+			case E_ITEM_SPAWN_EGG:
+			{
+				if (m_World->SpawnMob(Disp_X + 0.5, Disp_Y, Disp_Z + 0.5, m_Items[OccupiedSlots[RandomSlot]].m_ItemDamage) >= 0)
+				{
+					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				}
 				break;
 			}
@@ -165,7 +174,7 @@ void cDispenserEntity::Dispense()
 				cItems Pickups;
 				Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
 				m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
-				m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+				m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				break;
 			}
 		}
