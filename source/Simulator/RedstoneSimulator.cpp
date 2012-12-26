@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "RedstoneSimulator.h"
+#include "../DispenserEntity.h"
 #include "../Piston.h"
 #include "../World.h"
 #include "../BlockID.h"
@@ -387,6 +388,36 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 			}
 		}  // switch (BlockType)
 	}  // while (m_RefreshPistons[])
+
+	while (!m_RefreshDispensers.empty())
+	{
+		Vector3i pos = m_RefreshDispensers.back();
+		m_RefreshDispensers.pop_back();
+
+		BLOCKTYPE BlockType = m_World->GetBlock(pos);
+		if (BlockType == E_BLOCK_DISPENSER)
+		{
+			if (IsPowered(pos))
+			{
+				class cActivateDispenser :
+					public cDispenserCallback
+				{
+				public:
+					cActivateDispenser()
+					{
+					}
+					
+					virtual bool Item(cDispenserEntity * a_Dispenser) override
+					{
+						a_Dispenser->Activate();
+						return false;
+					}
+				} ;
+				cActivateDispenser DispAct;
+				m_World->DoWithDispenserAt(pos.x, pos.y, pos.z, DispAct);
+			}
+		}
+	}
 }
 
 
@@ -414,6 +445,12 @@ bool cRedstoneSimulator::PowerBlock(const Vector3i & a_BlockPos, const Vector3i 
 		case E_BLOCK_STICKY_PISTON:
 		{
 			m_RefreshPistons.push_back(a_BlockPos);
+			break;
+		}
+
+		case E_BLOCK_DISPENSER:
+		{
+			m_RefreshDispensers.push_back(a_BlockPos);
 			break;
 		}
 		

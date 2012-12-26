@@ -318,11 +318,17 @@ public:
 	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
 
+	/// Calls the callback for each dispenser in the specified chunk; returns true if all dispensers processed, false if the callback aborted by returning true
+	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback & a_Callback);  // Exported in ManualBindings.cpp
+
 	/// Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
+
+	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords, true if found
+	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords, true if found
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp

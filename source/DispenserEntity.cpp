@@ -11,7 +11,21 @@
 #include "Server.h"
 #include "Pickup.h"
 #include "Root.h"
+#include "Simulator/FluidSimulator.h"
 #include <json/json.h>
+
+
+
+
+
+#define AddDispenserDir(x, y, z, dir) \
+	switch (dir) \
+	{ \
+		case 2: (z) --; break; \
+		case 3: (z) ++; break; \
+		case 4: (x) --; break; \
+		case 5: (x) ++; break; \
+	}
 
 
 
@@ -20,6 +34,7 @@
 cDispenserEntity::cDispenserEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 	: cBlockEntity( E_BLOCK_DISPENSER, a_X, a_Y, a_Z, a_World )
 	, m_Items( new cItem[9] )
+	, m_CanDispense( 0 )
 {
 	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
@@ -51,7 +66,7 @@ void cDispenserEntity::Destroy()
 {
 	// Drop items
 	cItems Pickups;
-	for( int i = 0; i < 3; i++)
+	for( int i = 0; i < 9; i++)
 	{
 		if( !m_Items[i].IsEmpty() )
 		{
@@ -60,6 +75,120 @@ void cDispenserEntity::Destroy()
 		}
 	}
 	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
+}
+
+
+
+
+
+void cDispenserEntity::Dispense()
+{
+	int Disp_X = m_PosX;
+	int Disp_Y = m_PosY;
+	int Disp_Z = m_PosZ;
+	NIBBLETYPE Meta = m_World->GetBlockMeta( m_PosX, m_PosY, m_PosZ );
+	AddDispenserDir( Disp_X, Disp_Y, Disp_Z, Meta );
+	char OccupiedSlots[9];
+	char SlotsCnt = 0;
+	for( int i = 0; i < 9; i++)
+	{
+		if( !m_Items[i].IsEmpty() )
+		{
+			OccupiedSlots[SlotsCnt] = i;
+			SlotsCnt++;
+		}
+	}
+	if(SlotsCnt > 0)
+	{
+		MTRand r1;
+		cItem Drop = m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]];
+		switch( m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType )
+		{
+			case E_ITEM_BUCKET:
+			{
+				BLOCKTYPE DispBlock = m_World->GetBlock( Disp_X, Disp_Y, Disp_Z );
+				if( DispBlock == E_BLOCK_STATIONARY_WATER )
+				{
+					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_AIR, 0 );
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_WATER_BUCKET;
+				}
+				else if( DispBlock == E_BLOCK_STATIONARY_LAVA )
+				{
+					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_AIR, 0 );
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_LAVA_BUCKET;
+				}
+				else
+				{
+					cItems Pickups;
+					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+				}
+				break;
+			}
+			case E_ITEM_WATER_BUCKET:
+			{
+				BLOCKTYPE DispBlock = m_World->GetBlock( Disp_X, Disp_Y, Disp_Z );
+				if( DispBlock == E_BLOCK_AIR || IsBlockLiquid(DispBlock) || cFluidSimulator::CanWashAway(DispBlock) )
+				{
+					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_STATIONARY_WATER, 0 );
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_BUCKET;
+				}
+				else
+				{
+					cItems Pickups;
+					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+				}
+				break;
+			}
+			case E_ITEM_LAVA_BUCKET:
+			{
+				BLOCKTYPE DispBlock = m_World->GetBlock( Disp_X, Disp_Y, Disp_Z );
+				if( DispBlock == E_BLOCK_AIR || IsBlockLiquid(DispBlock) || cFluidSimulator::CanWashAway(DispBlock) )
+				{
+					m_World->SetBlock( Disp_X, Disp_Y, Disp_Z, E_BLOCK_STATIONARY_LAVA, 0 );
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemType = E_ITEM_BUCKET;
+				}
+				else
+				{
+					cItems Pickups;
+					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
+					m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+				}
+				break;
+			}
+			default:
+			{
+				cItems Pickups;
+				Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+				m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
+				m_Items[OccupiedSlots[r1.randInt() % SlotsCnt]].m_ItemCount--;
+				break;
+			}
+		}
+		char SmokeDir;
+		switch( Meta )
+		{
+			case 2: SmokeDir = 1; break;
+			case 3: SmokeDir = 7; break;
+			case 4: SmokeDir = 3; break;
+			case 5: SmokeDir = 5; break;
+		}
+		m_World->BroadcastSoundParticleEffect(2000, m_PosX * 8, m_PosY * 8, m_PosZ * 8, SmokeDir);
+		m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
+		cWindow * Window = GetWindow();
+		if ( Window != NULL )
+		{
+			Window->BroadcastWholeWindow();
+		}
+	}
+	else
+	{
+		m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.2f);
+	}
 }
 
 
@@ -86,9 +215,23 @@ void cDispenserEntity::UsedBy(cPlayer * a_Player)
 
 
 
+void cDispenserEntity::Activate()
+{
+	m_CanDispense = 1;
+}
+
+
+
+
+
 bool cDispenserEntity::Tick( float a_Dt )
 {
-	return true;
+	if(m_CanDispense)
+	{
+		m_CanDispense = 0;
+		Dispense();
+	}
+	return false;
 }
 
 

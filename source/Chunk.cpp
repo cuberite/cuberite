@@ -442,7 +442,15 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 			m_IsDirty = ((cFurnaceEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
 		}
 	}
-	
+
+	// Tick block entities (dispensers)
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		if ((*itr)->GetBlockType() == E_BLOCK_DISPENSER)
+		{
+			m_IsDirty = ((cDispenserEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
+		}
+	}
 	ApplyWeatherToTop(a_TickRandom);
 }
 
@@ -1588,6 +1596,28 @@ bool cChunk::ForEachChest(cChestCallback & a_Callback)
 
 
 
+bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if ((*itr)->GetBlockType() != E_BLOCK_DISPENSER)
+		{
+			continue;
+		}
+		if (a_Callback.Item((cDispenserEntity *)*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_BlockEntitites[]
+	return true;
+}
+
+
+
+
+
 bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
@@ -1636,6 +1666,38 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 		
 		// The correct block entity is here
 		if (a_Callback.Item((cChestEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_DISPENSER)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here
+		if (a_Callback.Item((cDispenserEntity *)*itr))
 		{
 			return false;
 		}

@@ -45,9 +45,14 @@ public:
 	const cItem * GetSlot(int i) const { return &(m_Items[i]); }
 	
 	void SetSlot(int a_Slot, const cItem & a_Item);
+
+	void Activate();
 	
 private:
 	cItem * m_Items;
+	bool m_CanDispense;
+
+	void Dispense();
 };
 
 
