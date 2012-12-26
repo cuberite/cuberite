@@ -23,6 +23,7 @@ Implements the 1.4.x protocol classes representing these protocols:
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"
 #include "../Pickup.h"
+#include "../FallingBlock.h"
 
 
 
@@ -152,31 +153,6 @@ cProtocol146::cProtocol146(cClientHandle * a_Client) :
 
 
 
-void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_SPAWN_OBJECT);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_ObjectType);
-	WriteInt ((int)(a_Entity.GetPosX() * 32));
-	WriteInt ((int)(a_Entity.GetPosY() * 32));
-	WriteInt ((int)(a_Entity.GetPosZ() * 32));
-	WriteInt (a_ObjectData);
-	if (a_ObjectData != 0)
-	{
-		WriteShort(a_SpeedX);
-		WriteShort(a_SpeedY);
-		WriteShort(a_SpeedZ);
-		WriteByte(a_Yaw);
-		WriteByte(a_Pitch);
-	}
-	Flush();
-}
-
-
-
-
-
 void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	ASSERT(!a_Pickup.GetItem()->IsEmpty());
@@ -201,10 +177,68 @@ void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
 	WriteByte(PACKET_ENTITY_METADATA);
 	WriteInt(a_Pickup.GetUniqueID());
 	WriteByte(0xaa);  // a slot value at index 10
-	WriteItem(*a_Pickup.GetItem());  // TODO: Still not good, needs GZIP!
+	WriteItem(*a_Pickup.GetItem());
 	WriteByte(0x7f);  // End of metadata
 	Flush();
 }
+
+
+
+
+
+void cProtocol146::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+{
+	// Send two packets - spawn object, then entity metadata
+	cCSLock Lock(m_CSPacket);
+
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_FallingBlock.GetUniqueID());
+	WriteByte(70);
+	WriteInt ((int)(a_FallingBlock.GetPosX() * 32));
+	WriteInt ((int)(a_FallingBlock.GetPosY() * 32));
+	WriteInt ((int)(a_FallingBlock.GetPosZ() * 32));
+	WriteInt (0x800000);
+	WriteShort(0);
+	WriteShort(0);
+	WriteShort(0);
+	WriteByte (0);
+	WriteByte (0);
+	
+	// TODO: This still doesn't work, although it is exactly the same that the vanilla server sends. WTF?
+	WriteByte(PACKET_ENTITY_METADATA);
+	WriteInt(a_FallingBlock.GetUniqueID());
+	WriteByte(0xaa);  // a slot value at index 10
+	cItem Item(a_FallingBlock.GetBlockType(), 1);
+	WriteItem(Item);
+	WriteByte(0x7f);  // End of metadata
+	Flush();
+}
+
+
+
+
+
+void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_ObjectType);
+	WriteInt ((int)(a_Entity.GetPosX() * 32));
+	WriteInt ((int)(a_Entity.GetPosY() * 32));
+	WriteInt ((int)(a_Entity.GetPosZ() * 32));
+	WriteInt (a_ObjectData);
+	if (a_ObjectData != 0)
+	{
+		WriteShort(a_SpeedX);
+		WriteShort(a_SpeedY);
+		WriteShort(a_SpeedZ);
+		WriteByte(a_Yaw);
+		WriteByte(a_Pitch);
+	}
+	Flush();
+}
+
 
 
 

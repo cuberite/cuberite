@@ -25,6 +25,9 @@ public:
 
 	cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType);
 
+	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
+	
+	// cEntity overrides:
 	virtual void Initialize(cWorld * a_World) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;

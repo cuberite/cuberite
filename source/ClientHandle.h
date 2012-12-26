@@ -30,6 +30,7 @@ class cPlayer;
 class cProtocol;
 class cRedstone;
 class cWindow;
+class cFallingBlock;
 
 
 
@@ -109,7 +110,9 @@ public:
 	void SendSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
 	void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendBlockBreakAnim     (int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage);
+	void SendSpawnFallingBlock  (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob           (const cMonster & a_Mob);
+	void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch);
 	void SendTeleportEntity     (const cEntity & a_Entity);
 	void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay);
@@ -121,7 +124,6 @@ public:
 	void SendWindowClose        (char a_WindowID);
 	void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
 	void SendUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
-	void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch);
 
 	const AString & GetUsername(void) const;		//tolua_export
 	void SetUsername( const AString & a_Username );	//tolua_export

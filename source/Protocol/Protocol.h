@@ -25,6 +25,7 @@ class cPickup;
 class cMonster;
 class cChunkDataSerializer;
 class cWorld;
+class cFallingBlock;
 
 
 
@@ -80,6 +81,7 @@ public:
 	virtual void SendRespawn            (void) = 0;
 	virtual void SendSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) = 0;  // a_Src coords are Block * 8
 	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
+	virtual void SendSpawnFallingBlock  (const cFallingBlock & a_FallingBlock) = 0;
 	virtual void SendSpawnMob           (const cMonster & a_Mob) = 0;
 	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch) = 0;
 	virtual void SendTeleportEntity     (const cEntity & a_Entity) = 0;

@@ -1416,6 +1416,15 @@ void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 
 
 
+void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+{
+	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
+}
+
+
+
+
+
 void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 {
 	m_Protocol->SendSpawnMob(a_Mob);

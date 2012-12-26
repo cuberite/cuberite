@@ -406,6 +406,16 @@ void cProtocolRecognizer::SendSoundParticleEffect(int a_EffectID, int a_SrcX, in
 
 
 
+void cProtocolRecognizer::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_Protocol != NULL);

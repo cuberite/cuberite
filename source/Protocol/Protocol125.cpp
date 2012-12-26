@@ -23,6 +23,7 @@ Documentation:
 #include "../UI/Window.h"
 #include "../Root.h"
 #include "../Server.h"
+#include "../FallingBlock.h"
 
 
 
@@ -608,6 +609,16 @@ void cProtocol125::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int 
 void cProtocol125::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
 	// Not implemented in this protocol version
+}
+
+
+
+
+
+void cProtocol125::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+{
+	// This protocol version implements falling blocks using the spawn object / vehicle packet:
+	SendSpawnObject(a_FallingBlock, 70, a_FallingBlock.GetBlockType(), 0, 0, 0, 0, 0);
 }
 
 
