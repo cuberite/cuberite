@@ -1811,6 +1811,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockFlowerPot.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockFluid.h"
 					>
 				</File>
@@ -1992,6 +1996,10 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemDye.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemFlowerPot.h"
 					>
 				</File>
 				<File

@@ -50,6 +50,7 @@
 #include "BlockGlass.h"
 #include "BlockEnderchest.h"
 #include "BlockFenceGate.h"
+#include "BlockFlowerPot.h"
 
 
 
@@ -107,6 +108,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler;
 		case E_BLOCK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_FIRE:                  return new cBlockFireHandler            (a_BlockType);
+		case E_BLOCK_FLOWER_POT:            return new cBlockFlowerPotHandler       (a_BlockType);
 		case E_BLOCK_FURNACE:               return new cBlockFurnaceHandler         (a_BlockType);
 		case E_BLOCK_GLOWSTONE:             return new cBlockGlowstoneHandler       (a_BlockType);
 		case E_BLOCK_GOLD_ORE:              return new cBlockOreHandler             (a_BlockType);

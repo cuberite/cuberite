@@ -28,6 +28,7 @@
 #include "ItemSign.h"
 #include "ItemBed.h"
 #include "ItemSpawnEgg.h"
+#include "ItemFlowerPot.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -71,6 +72,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
+		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
 		case E_ITEM_LEAVES:            return new cItemLeavesHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);

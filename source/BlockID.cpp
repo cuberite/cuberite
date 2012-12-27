@@ -390,31 +390,36 @@ public:
 		g_BlockSpreadLightFalloff[E_BLOCK_WATER]            = 2;
 
 		// Transparent blocks
-		g_BlockTransparent[E_BLOCK_AIR]            = true;
-		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM] = true;
-		g_BlockTransparent[E_BLOCK_CHEST]          = true;
-		g_BlockTransparent[E_BLOCK_COBWEB]         = true;
-		g_BlockTransparent[E_BLOCK_CROPS]          = true;
-		g_BlockTransparent[E_BLOCK_FENCE]          = true;
-		g_BlockTransparent[E_BLOCK_FENCE_GATE]     = true;
-		g_BlockTransparent[E_BLOCK_FIRE]           = true;
-		g_BlockTransparent[E_BLOCK_GLASS]          = true;
-		g_BlockTransparent[E_BLOCK_ICE]            = true;
-		g_BlockTransparent[E_BLOCK_IRON_DOOR]      = true;
-		g_BlockTransparent[E_BLOCK_LEAVES]         = true;
-		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]   = true;
-		g_BlockTransparent[E_BLOCK_RED_ROSE]       = true;
-		g_BlockTransparent[E_BLOCK_SIGN_POST]      = true;
-		g_BlockTransparent[E_BLOCK_SNOW]           = true;
-		g_BlockTransparent[E_BLOCK_TALL_GRASS]     = true;
-		g_BlockTransparent[E_BLOCK_TORCH]          = true;
-		g_BlockTransparent[E_BLOCK_VINES]          = true;
-		g_BlockTransparent[E_BLOCK_WALLSIGN]       = true;
-		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]    = true;
-		g_BlockTransparent[E_BLOCK_YELLOW_FLOWER]  = true;
-		g_BlockTransparent[E_BLOCK_RAIL]           = true;
-		g_BlockTransparent[E_BLOCK_DETECTOR_RAIL]  = true;
-		g_BlockTransparent[E_BLOCK_POWERED_RAIL]   = true;
+		g_BlockTransparent[E_BLOCK_AIR]                   = true;
+		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM]        = true;
+		g_BlockTransparent[E_BLOCK_CHEST]                 = true;
+		g_BlockTransparent[E_BLOCK_COBWEB]                = true;
+		g_BlockTransparent[E_BLOCK_CROPS]                 = true;
+		g_BlockTransparent[E_BLOCK_DETECTOR_RAIL]         = true;
+		g_BlockTransparent[E_BLOCK_FENCE]                 = true;
+		g_BlockTransparent[E_BLOCK_FENCE_GATE]            = true;
+		g_BlockTransparent[E_BLOCK_FIRE]                  = true;
+		g_BlockTransparent[E_BLOCK_FLOWER_POT]            = true;
+		g_BlockTransparent[E_BLOCK_GLASS]                 = true;
+		g_BlockTransparent[E_BLOCK_ICE]                   = true;
+		g_BlockTransparent[E_BLOCK_IRON_DOOR]             = true;
+		g_BlockTransparent[E_BLOCK_LEAVES]                = true;
+		g_BlockTransparent[E_BLOCK_LEVER]                 = true;
+		g_BlockTransparent[E_BLOCK_NETHER_BRICK_FENCE]    = true;
+		g_BlockTransparent[E_BLOCK_POWERED_RAIL]          = true;
+		g_BlockTransparent[E_BLOCK_RAIL]                  = true;
+		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]          = true;
+		g_BlockTransparent[E_BLOCK_RED_ROSE]              = true;
+		g_BlockTransparent[E_BLOCK_SIGN_POST]             = true;
+		g_BlockTransparent[E_BLOCK_STONE_PRESSURE_PLATE]  = true;
+		g_BlockTransparent[E_BLOCK_SNOW]                  = true;
+		g_BlockTransparent[E_BLOCK_TALL_GRASS]            = true;
+		g_BlockTransparent[E_BLOCK_TORCH]                 = true;
+		g_BlockTransparent[E_BLOCK_VINES]                 = true;
+		g_BlockTransparent[E_BLOCK_WALLSIGN]              = true;
+		g_BlockTransparent[E_BLOCK_WOODEN_DOOR]           = true;
+		g_BlockTransparent[E_BLOCK_WOODEN_PRESSURE_PLATE] = true;
+		g_BlockTransparent[E_BLOCK_YELLOW_FLOWER]         = true;
 
 		// TODO: Any other transparent blocks?
 
@@ -422,6 +427,7 @@ public:
 		g_BlockOneHitDig[E_BLOCK_BROWN_MUSHROOM]        = true;
 		g_BlockOneHitDig[E_BLOCK_CROPS]                 = true;
 		g_BlockOneHitDig[E_BLOCK_FIRE]                  = true;
+		g_BlockOneHitDig[E_BLOCK_FLOWER_POT]            = true;
 		g_BlockOneHitDig[E_BLOCK_LOCKED_CHEST]          = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_OFF] = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_ON]  = true;
