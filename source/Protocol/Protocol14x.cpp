@@ -188,7 +188,7 @@ void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
 
 void cProtocol146::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 {
-	// Send two packets - spawn object, then entity metadata
+	// Send a spawn object / vehicle packet
 	cCSLock Lock(m_CSPacket);
 
 	WriteByte(PACKET_SPAWN_OBJECT);
@@ -197,20 +197,12 @@ void cProtocol146::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	WriteInt ((int)(a_FallingBlock.GetPosX() * 32));
 	WriteInt ((int)(a_FallingBlock.GetPosY() * 32));
 	WriteInt ((int)(a_FallingBlock.GetPosZ() * 32));
-	WriteInt (0x800000);
-	WriteShort(0);
-	WriteShort(0);
-	WriteShort(0);
-	WriteByte (0);
-	WriteByte (0);
-	
-	// TODO: This still doesn't work, although it is exactly the same that the vanilla server sends. WTF?
-	WriteByte(PACKET_ENTITY_METADATA);
-	WriteInt(a_FallingBlock.GetUniqueID());
-	WriteByte(0xaa);  // a slot value at index 10
-	cItem Item(a_FallingBlock.GetBlockType(), 1);
-	WriteItem(Item);
-	WriteByte(0x7f);  // End of metadata
+	WriteByte (0);  // Yaw
+	WriteByte (0);  // Pitch
+	WriteInt (a_FallingBlock.GetBlockType());  // data indicator = blocktype
+	WriteShort(0);  // SpeedX
+	WriteShort(0);  // SpeedY
+	WriteShort(0);  // SpeedZ
 	Flush();
 }
 
