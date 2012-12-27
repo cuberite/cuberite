@@ -29,11 +29,19 @@ public:
 			&& (Block == a_Item->m_ItemType)  // Same slab
 			&& ((Meta & 0x7) == (a_Item->m_ItemHealth & 0x7)))  // Same Texture
 		{
-			cItem Item(a_Item->m_ItemType, 1);
-			if (a_Player->GetInventory().RemoveItem(Item))
+			if(a_Player->GetGameMode() == eGameMode_Creative)
 			{
-				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, Block - 1, Meta);				// Block - 1 simple hack to save one if statement
+				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, Block - 1, Meta); // Block - 1 simple hack to save one if statement
 				return true;
+			}
+			else
+			{
+				cItem Item(a_Item->m_ItemType, 1);
+				if (a_Player->GetInventory().RemoveItem(Item))
+				{
+					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, Block - 1, Meta); // Block - 1 simple hack to save one if statement
+					return true;
+				}
 			}
 		}
 		return false;

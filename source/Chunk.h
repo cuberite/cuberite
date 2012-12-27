@@ -169,7 +169,7 @@ public:
 	bool ForEachChest(cChestCallback & a_Callback);  // Lua-accessible
 
 	/// Calls the callback for each dispenser; returns true if all dispensers processed, false if the callback aborted by returning true
-	bool ForEachDispenser(cDispenserCallback & a_Callback);  // Lua-accessible
+	bool ForEachDispenser(cDispenserCallback & a_Callback);
 
 	/// Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true
 	bool ForEachFurnace(cFurnaceCallback & a_Callback);  // Lua-accessible
@@ -178,7 +178,7 @@ public:
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
 
 	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords, true if found
-	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);  // Lua-accessible
+	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);
 
 	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords, true if found
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
