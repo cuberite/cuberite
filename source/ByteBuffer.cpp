@@ -316,6 +316,11 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 	{
 		return false;
 	}
+	if (Length < 0)
+	{
+		ASSERT(!"Negative string length? Are you sure?");
+		return true;
+	}
 	return ReadUTF16String(a_Value, Length);
 }
 

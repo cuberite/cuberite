@@ -153,6 +153,7 @@ enum
 	PACKET_UPDATE_TILE_ENTITY        = 0x84,
 	PACKET_PLAYER_LIST_ITEM          = 0xc9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
+	PACKET_INCREMENT_STATISTIC       = 0xc8,
 	PACKET_LOCALE_AND_VIEW           = 0xcc,
 	PACKET_CLIENT_STATUSES           = 0xcd,
 	PACKET_ENCRYPTION_KEY_RESPONSE   = 0xfc,
@@ -278,7 +279,7 @@ void cConnection::Log(const char * a_Format, ...)
 	fputs(FullMsg.c_str(), m_LogFile);
 	
 	// Log to screen:
-	std::cout << FullMsg;
+	// std::cout << FullMsg;
 }
 
 
@@ -605,6 +606,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_ENTITY_STATUS:             HANDLE_SERVER_READ(HandleServerEntityStatus); break;
 			case PACKET_ENTITY_TELEPORT:           HANDLE_SERVER_READ(HandleServerEntityTeleport); break;
 			case PACKET_ENTITY_VELOCITY:           HANDLE_SERVER_READ(HandleServerEntityVelocity); break;
+			case PACKET_INCREMENT_STATISTIC:       HANDLE_SERVER_READ(HandleServerIncrementStatistic); break;
 			case PACKET_KEEPALIVE:                 HANDLE_SERVER_READ(HandleServerKeepAlive); break;
 			case PACKET_KICK:                      HANDLE_SERVER_READ(HandleServerKick); break;
 			case PACKET_LOGIN:                     HANDLE_SERVER_READ(HandleServerLogin); break;
@@ -1241,9 +1243,12 @@ bool cConnection::HandleServerEntityMetadata(void)
 	{
 		return false;
 	}
+	AString HexDump;
+	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_ENTITY_METADATA from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  Metadata length = %d", Metadata.length());
+	Log("  Metadata, length = %d (0x%x): %s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1370,9 +1375,25 @@ bool cConnection::HandleServerEntityVelocity(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityX);
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityY);
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityZ);
-	Log("Received a PACKET_SPAWN_MOB from the server:");
+	Log("Received a PACKET_ENTITY_VELOCITY from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerIncrementStatistic(void)
+{
+	// 0xc8
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  StatisticID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Amount);
+	Log("Received a PACKET_INCREMENT_STATISTIC from the server:");
+	Log("  StatisticID = %d (0x%x)", StatisticID, StatisticID);
+	Log("  Amount = %d", Amount);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1695,6 +1716,7 @@ bool cConnection::HandleServerSpawnMob(void)
 	}
 	Log("Received a PACKET_SPAWN_MOB from the server:");
 	Log("  EntityID = %d", EntityID);
+	Log("  MobType = %d", MobType);
 	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
 	Log("  Angles = [%d, %d, %d]", Yaw, Pitch, HeadYaw);
 	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
@@ -1730,19 +1752,17 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Pitch);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   DataIndicator);
 	AString ExtraData;
 	short VelocityX, VelocityY, VelocityZ;
-	Byte Yaw, Pitch;
 	if (DataIndicator != 0)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedX);
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedY);
 		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedZ);
-		HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  LocalYaw);
-		HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  LocalPitch);
 		VelocityX = SpeedX; VelocityY = SpeedY; VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
-		Yaw = LocalYaw; Pitch = LocalPitch;
 		/*
 		// This doesn't seem to work - for a falling block I'm getting no extra data at all
 		int ExtraLen = 0;
@@ -1767,15 +1787,15 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		*/
 	}
 	Log("Received a PACKET_SPAWN_OBJECT_VEHICLE from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  ObjType = %d", ObjType);
+	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
+	Log("  ObjType = %d (0x%x)", ObjType, ObjType);
 	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
-	Log("  DataIndicator = %d", DataIndicator);
+	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
+	Log("  DataIndicator = %d (0x%x)", DataIndicator, DataIndicator);
 	if (DataIndicator != 0)
 	{
 		Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
-		Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
-		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %d", ExtraData.size());
+		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %d:", ExtraData.size());
 	}
 	COPY_TO_CLIENT();
 	return true;
@@ -2013,8 +2033,8 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 	a_Metadata.push_back(x);
 	while (x != 0x7f)
 	{
-		int Index = x & 0x1f;  // Lower 5 bits = index
-		int Type  = x >> 5;    // Upper 3 bits = type
+		int Index = ((unsigned)((unsigned char)x)) & 0x1f;  // Lower 5 bits = index
+		int Type  = ((unsigned)((unsigned char)x)) >> 5;    // Upper 3 bits = type
 		int Length = 0;
 		switch (Type)
 		{
@@ -2034,8 +2054,26 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 				Length = Len;
 				break;
 			}
-			case 5: Length = 5;  break;  // short, byte, short
+			case 5:
+			{
+				int Before = a_Buffer.GetReadableSpace();
+				AString ItemDesc;
+				if (!ParseSlot(a_Buffer, ItemDesc))
+				{
+					return false;
+				}
+				int After = a_Buffer.GetReadableSpace();
+				a_Buffer.ResetRead();
+				a_Buffer.SkipRead(a_Buffer.GetReadableSpace() - Before);
+				Length = Before - After;
+				break;
+			}
 			case 6: Length = 12; break;  // 3 * int
+			default:
+			{
+				ASSERT(!"Unknown metadata type");
+				break;
+			}
 		}  // switch (Type)
 		AString data;
 		if (!a_Buffer.ReadString(data, Length))
@@ -2050,6 +2088,90 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 		a_Metadata.push_back(x);
 	}  // while (x != 0x7f)
 	return true;
+}
+
+
+
+
+
+void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
+{
+	AString Indent(a_IndentCount, ' ');
+	int pos = 0;
+	while (a_Metadata[pos] != 0x7f)
+	{
+		int Index = ((unsigned)((unsigned char)a_Metadata[pos])) & 0x1f;  // Lower 5 bits = index
+		int Type  = ((unsigned)((unsigned char)a_Metadata[pos])) >> 5;    // Upper 3 bits = type
+		int Length = 0;
+		switch (Type)
+		{
+			case 0:
+			{
+				Log("%sbyte[%d] = %d", Indent.c_str(), Index, a_Metadata[pos + 1]);
+				pos += 1;
+				break;
+			}
+			case 1:
+			{
+				Log("%sshort[%d] = %d", Indent.c_str(), Index, (a_Metadata[pos + 1] << 8) | a_Metadata[pos + 2]);
+				pos += 2;
+				break;
+			}
+			case 2:
+			{
+				Log("%sint[%d] = %d", Indent.c_str(), Index, (a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) | a_Metadata[pos + 4]);
+				pos += 4;
+				break;
+			}
+			case 3:
+			{
+				Log("%sfloat[%d] = 0x%x", Indent.c_str(), Index, (a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) | a_Metadata[pos + 4]);
+				pos += 4;
+				break;
+			}
+			case 4:  // string16
+			{
+				short Length = (a_Metadata[pos + 1] << 8) | a_Metadata[pos + 2];
+				Log("%sstring[%d] = \"%*s\"", Indent.c_str(), Index, Length, a_Metadata.c_str() + pos + 3);
+				pos += Length + 2;
+				break;
+			}
+			case 5:
+			{
+				int BytesLeft = a_Metadata.size() - pos - 1;
+				cByteBuffer bb(BytesLeft);
+				bb.Write(a_Metadata.data() + pos + 1, BytesLeft);
+				AString ItemDesc;
+				if (!ParseSlot(bb, ItemDesc))
+				{
+					ASSERT(!"Cannot parse item description from metadata");
+					return;
+				}
+				int After = bb.GetReadableSpace();
+				int BytesConsumed = BytesLeft - bb.GetReadableSpace();
+
+				Log("%sslot[%d] = %s (%d bytes)", Indent.c_str(), Index, ItemDesc.c_str(), BytesConsumed);
+				pos += BytesConsumed;
+				break;
+			}
+			case 6:
+			{
+				Log("%spos[%d] = <%d, %d, %d>", Indent.c_str(), Index, 
+					(a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2]  << 16) | (a_Metadata[pos + 3]  << 8) | a_Metadata[pos + 4],
+					(a_Metadata[pos + 5] << 24) | (a_Metadata[pos + 6]  << 16) | (a_Metadata[pos + 7]  << 8) | a_Metadata[pos + 8],
+					(a_Metadata[pos + 9] << 24) | (a_Metadata[pos + 10] << 16) | (a_Metadata[pos + 11] << 8) | a_Metadata[pos + 12]
+				);
+				pos += 12;
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unknown metadata type");
+				break;
+			}
+		}  // switch (Type)
+		pos += 1;
+	}  // while (x != 0x7f)
 }
 
 

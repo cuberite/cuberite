@@ -140,6 +140,7 @@ protected:
 	bool HandleServerEntityStatus(void);
 	bool HandleServerEntityTeleport(void);
 	bool HandleServerEntityVelocity(void);
+	bool HandleServerIncrementStatistic(void);
 	bool HandleServerKeepAlive(void);
 	bool HandleServerKick(void);
 	bool HandleServerLogin(void);
@@ -171,6 +172,9 @@ protected:
 	
 	/// Parses the metadata in a_Buffer into raw metadata in an AString; returns true if successful, false if not enough data
 	bool ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata);
+	
+	/// Logs the contents of the metadata in the AString, using Log(). Assumes a_Metadata is valid (parsed by ParseMetadata()). The log is indented by a_IndentCount spaces
+	void LogMetadata(const AString & a_Metadata, size_t a_IndentCount);
 	
 	/// Send EKResp to the server:
 	void SendEncryptionKeyResponse(const AString & a_ServerPublicKey, const AString & a_Nonce);
