@@ -4978,10 +4978,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\salsa.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\CryptoPP\seal.cpp"
 				>
 				<FileConfiguration
@@ -5488,10 +5484,6 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\.\sosemanuk.cpp"
-				>
 			</File>
 			<File
 				RelativePath="..\CryptoPP\square.cpp"
@@ -6715,10 +6707,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\CryptoPP\.\salsa.h"
-				>
-			</File>
-			<File
 				RelativePath="..\CryptoPP\seal.h"
 				>
 			</File>
@@ -6764,10 +6752,6 @@
 			</File>
 			<File
 				RelativePath="..\CryptoPP\socketft.h"
-				>
-			</File>
-			<File
-				RelativePath="..\CryptoPP\.\sosemanuk.h"
 				>
 			</File>
 			<File
