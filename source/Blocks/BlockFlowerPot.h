@@ -20,7 +20,7 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_ITEM_FLOWER_POT, 1, 0));
 		if( a_BlockMeta == 0 ) return;
-		cItem & Plant = cItem(E_ITEM_RED_ROSE, 1, 0);
+		cItem Plant;
 		switch( a_BlockMeta )
 		{
 			case 1: Plant = cItem(E_ITEM_RED_ROSE, 1, 0); break;
@@ -64,8 +64,11 @@ public:
 			case E_BLOCK_TALL_GRASS:
 				if( a_Player->GetEquippedItem().m_ItemDamage == E_META_TALL_GRASS_FERN ) Meta = 11; break;
 		}
-		cItem Item(a_Player->GetEquippedItem().m_ItemType, 1);
-		a_Player->GetInventory().RemoveItem(Item);
+		if(a_Player->GetGameMode() != eGameMode_Creative)
+		{
+			cItem Item(a_Player->GetEquippedItem().m_ItemType, 1);
+			a_Player->GetInventory().RemoveItem(Item);
+		}
 		a_World->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, Meta );
 	}
 
