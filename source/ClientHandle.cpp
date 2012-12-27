@@ -666,6 +666,16 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		}
 		else if (ItemHandler->IsPlaceable())
 		{
+			if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, Equipped))
+			{
+				if (a_BlockFace > -1)
+				{
+					AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+					m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+				}
+				return;
+			}
+
 			if (a_BlockFace < 0)
 			{
 				// clicked in air
@@ -736,16 +746,6 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 				return;
 			}
 		}
-	}
-
-	if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, Equipped))
-	{
-		if (a_BlockFace > -1)
-		{
-			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		}
-		return;
 	}
 }
 
