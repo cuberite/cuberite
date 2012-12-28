@@ -477,9 +477,9 @@ void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_PICKUP_SPAWN);
 	WriteInt    (a_Pickup.GetUniqueID());
-	WriteShort  (a_Pickup.GetItem()->m_ItemType);
-	WriteByte   (a_Pickup.GetItem()->m_ItemCount);
-	WriteShort  (a_Pickup.GetItem()->m_ItemDamage);
+	WriteShort  (a_Pickup.GetItem().m_ItemType);
+	WriteByte   (a_Pickup.GetItem().m_ItemCount);
+	WriteShort  (a_Pickup.GetItem().m_ItemDamage);
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
 	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
 	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));

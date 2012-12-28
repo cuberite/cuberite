@@ -98,7 +98,7 @@ void cProtocol142::SendPickupSpawn(const cPickup & a_Pickup)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_PICKUP_SPAWN);
 	WriteInt    (a_Pickup.GetUniqueID());
-	WriteItem   (*(a_Pickup.GetItem()));
+	WriteItem   (a_Pickup.GetItem());
 	WriteVectorI((Vector3i)(a_Pickup.GetPosition() * 32));
 	WriteByte   ((char)(a_Pickup.GetSpeed().x * 8));
 	WriteByte   ((char)(a_Pickup.GetSpeed().y * 8));
@@ -155,7 +155,7 @@ cProtocol146::cProtocol146(cClientHandle * a_Client) :
 
 void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
 {
-	ASSERT(!a_Pickup.GetItem()->IsEmpty());
+	ASSERT(!a_Pickup.GetItem().IsEmpty());
 	
 	cCSLock Lock(m_CSPacket);
 
@@ -177,7 +177,7 @@ void cProtocol146::SendPickupSpawn(const cPickup & a_Pickup)
 	WriteByte(PACKET_ENTITY_METADATA);
 	WriteInt(a_Pickup.GetUniqueID());
 	WriteByte(0xaa);  // a slot value at index 10
-	WriteItem(*a_Pickup.GetItem());
+	WriteItem(a_Pickup.GetItem());
 	WriteByte(0x7f);  // End of metadata
 	Flush();
 }

@@ -24,24 +24,15 @@
 
 
 
-cPickup::cPickup(int a_X, int a_Y, int a_Z, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	:	cEntity(etPickup, ((double)(a_X))/32, ((double)(a_Y))/32, ((double)(a_Z))/32 )
+cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
+	:	cEntity(etPickup, ((double)(a_MicroPosX)) / 32, ((double)(a_MicroPosY)) / 32, ((double)(a_MicroPosZ)) / 32)
 	, m_Speed( a_SpeedX, a_SpeedY, a_SpeedZ )
 	, m_bOnGround( false )
 	, m_bReplicated( false )
 	, m_Timer( 0.f )
-	, m_Item( new cItem( a_Item ) )
+	, m_Item(a_Item)
 	, m_bCollected( false )
 {
-}
-
-
-
-
-
-cPickup::~cPickup()
-{
-	delete m_Item;
 }
 
 
@@ -244,15 +235,15 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		return false;
 	}
 
-	if (a_Dest->GetInventory().AddItemAnyAmount(*m_Item))
+	if (a_Dest->GetInventory().AddItemAnyAmount(m_Item))
 	{
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
 		m_bCollected = true;
 		m_Timer = 0;
-		if (m_Item->m_ItemCount != 0)
+		if (m_Item.m_ItemCount != 0)
 		{
 			cItems Pickup;
-			Pickup.push_back(cItem(*m_Item));
+			Pickup.push_back(cItem(m_Item));
 			m_World->SpawnItemPickups(Pickup, m_Pos.x, m_Pos.y, m_Pos.z);
 		}
 		return true;
