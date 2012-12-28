@@ -121,6 +121,7 @@ protected:
 	bool HandleClientWindowClose(void);
 
 	// Packet handling, server-side:
+	bool HandleServerAttachEntity(void);
 	bool HandleServerBlockAction(void);
 	bool HandleServerBlockChange(void);
 	bool HandleServerChangeGameState(void);

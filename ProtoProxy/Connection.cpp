@@ -131,6 +131,7 @@ enum
 	PACKET_ENTITY_TELEPORT           = 0x22,
 	PACKET_ENTITY_HEAD_LOOK          = 0x23,
 	PACKET_ENTITY_STATUS             = 0x26,
+	PACKET_ATTACH_ENTITY             = 0x27,
 	PACKET_ENTITY_METADATA           = 0x28,
 	PACKET_ENTITY_EFFECT             = 0x29,
 	PACKET_ENTITY_EFFECT_REMOVE      = 0x2a,
@@ -587,6 +588,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%x", m_ServerBuffer.GetReadableSpace(), PacketType);
 		switch (PacketType)
 		{
+			case PACKET_ATTACH_ENTITY:             HANDLE_SERVER_READ(HandleServerAttachEntity); break;
 			case PACKET_BLOCK_ACTION:              HANDLE_SERVER_READ(HandleServerBlockAction); break;
 			case PACKET_BLOCK_CHANGE:              HANDLE_SERVER_READ(HandleServerBlockChange); break;
 			case PACKET_CHANGE_GAME_STATE:         HANDLE_SERVER_READ(HandleServerChangeGameState); break;
@@ -1047,6 +1049,21 @@ bool cConnection::HandleClientWindowClose(void)
 	Log("Received a PACKET_WINDOW_CLOSE from the client:");
 	Log("  WindowID = %d", WindowID);
 	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerAttachEntity(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, VehicleID);
+	Log("Received a PACKET_ATTACH_ENTITY from the server:");
+	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
+	Log("  VehicleID = %d (0x%x)", VehicleID, VehicleID);
+	COPY_TO_CLIENT();
 	return true;
 }
 
