@@ -514,6 +514,7 @@ public:
 
 		// Blocks that don´t drop without a special tool
 		g_BlockRequiresSpecialTool[E_BLOCK_BRICK]                = true;
+		g_BlockRequiresSpecialTool[E_BLOCK_CAULDRON]             = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_COAL_ORE]             = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE]          = true;
 		g_BlockRequiresSpecialTool[E_BLOCK_COBBLESTONE_STAIRS]   = true;

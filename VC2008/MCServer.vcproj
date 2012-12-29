@@ -1755,7 +1755,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockBrewingStand.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockCactus.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Blocks\BlockCauldron.h"
 					>
 				</File>
 				<File
@@ -1983,7 +1991,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Items\ItemBrewingStand.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\items\ItemBucket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemCauldron.h"
 					>
 				</File>
 				<File

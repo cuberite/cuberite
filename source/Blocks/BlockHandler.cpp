@@ -51,6 +51,8 @@
 #include "BlockEnderchest.h"
 #include "BlockFenceGate.h"
 #include "BlockFlowerPot.h"
+#include "BlockCauldron.h"
+#include "BlockBrewingStand.h"
 
 
 
@@ -90,9 +92,11 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		// Block handlers, alphabetically sorted:
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BROWN_MUSHROOM:        return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_CACTUS:                return new cBlockCactusHandler          (a_BlockType);
+		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
 		case E_BLOCK_CHEST:                 return new cBlockChestHandler           (a_BlockType);
 		case E_BLOCK_COAL_ORE:              return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_COBBLESTONE:           return new cBlockStoneHandler           (a_BlockType);

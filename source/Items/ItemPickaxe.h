@@ -68,6 +68,7 @@ public:
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_STONE_BRICK_STAIRS:
 		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_CAULDRON:
 			return PickaxeLevel() >= 1;
 		}
 		return false;
