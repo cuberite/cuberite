@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 12/28/12 15:46:17.
+** Generated automatically by tolua++-1.0.92 on 01/04/13 18:19:46.
 */
 
 #ifndef __cplusplus
@@ -21494,6 +21494,92 @@ static int tolua_AllToLua_cBlockArea_GetBlockSkyLight00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetBlockTypeMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_GetBlockTypeMeta00
+static int tolua_AllToLua_cBlockArea_GetBlockTypeMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetBlockTypeMeta'", NULL);
+#endif
+  {
+   self->GetBlockTypeMeta(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_BlockMeta);
+   tolua_pushnumber(tolua_S,(lua_Number)a_BlockType);
+   tolua_pushnumber(tolua_S,(lua_Number)a_BlockMeta);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetBlockTypeMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetRelBlockTypeMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_GetRelBlockTypeMeta00
+static int tolua_AllToLua_cBlockArea_GetRelBlockTypeMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  int a_RelX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_RelY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_RelZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRelBlockTypeMeta'", NULL);
+#endif
+  {
+   self->GetRelBlockTypeMeta(a_RelX,a_RelY,a_RelZ,a_BlockType,a_BlockMeta);
+   tolua_pushnumber(tolua_S,(lua_Number)a_BlockType);
+   tolua_pushnumber(tolua_S,(lua_Number)a_BlockMeta);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetRelBlockTypeMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetSizeX of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_GetSizeX00
 static int tolua_AllToLua_cBlockArea_GetSizeX00(lua_State* tolua_S)
@@ -24922,6 +25008,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetBlockLight",tolua_AllToLua_cBlockArea_GetBlockLight00);
    tolua_function(tolua_S,"GetRelBlockSkyLight",tolua_AllToLua_cBlockArea_GetRelBlockSkyLight00);
    tolua_function(tolua_S,"GetBlockSkyLight",tolua_AllToLua_cBlockArea_GetBlockSkyLight00);
+   tolua_function(tolua_S,"GetBlockTypeMeta",tolua_AllToLua_cBlockArea_GetBlockTypeMeta00);
+   tolua_function(tolua_S,"GetRelBlockTypeMeta",tolua_AllToLua_cBlockArea_GetRelBlockTypeMeta00);
    tolua_function(tolua_S,"GetSizeX",tolua_AllToLua_cBlockArea_GetSizeX00);
    tolua_function(tolua_S,"GetSizeY",tolua_AllToLua_cBlockArea_GetSizeY00);
    tolua_function(tolua_S,"GetSizeZ",tolua_AllToLua_cBlockArea_GetSizeZ00);

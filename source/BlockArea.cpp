@@ -342,6 +342,43 @@ NIBBLETYPE cBlockArea::GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
+void cBlockArea::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+{
+	return GetRelBlockTypeMeta(a_BlockX - m_OriginX, a_BlockY - m_OriginY, a_BlockZ - m_OriginZ, a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
+void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+{
+	int idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
+	if (m_BlockTypes == NULL)
+	{
+		LOGWARNING("cBlockArea: BlockTypes have not been read!");
+		a_BlockType = E_BLOCK_AIR;
+	}
+	else
+	{
+		a_BlockType = m_BlockTypes[idx];
+	}
+	
+	if (m_BlockMetas == NULL)
+	{
+		LOGWARNING("cBlockArea: BlockMetas have not been read!");
+		a_BlockMeta = 0;
+	}
+	else
+	{
+		a_BlockMeta = m_BlockMetas[idx];
+	}
+}
+
+
+
+
+
 int cBlockArea::GetDataTypes(void) const
 {
 	int res = 0;
