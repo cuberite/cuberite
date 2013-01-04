@@ -26,9 +26,17 @@
 
 
 
-cFloodyFluidSimulator::cFloodyFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay) :
+cFloodyFluidSimulator::cFloodyFluidSimulator(
+	cWorld * a_World,
+	BLOCKTYPE a_Fluid,
+	BLOCKTYPE a_StationaryFluid,
+	NIBBLETYPE a_Falloff,
+	int a_TickDelay,
+	int a_NumNeighborsForSource
+) :
 	super(a_World, a_Fluid, a_StationaryFluid, a_TickDelay),
-	m_Falloff(a_Falloff)
+	m_Falloff(a_Falloff),
+	m_NumNeighborsForSource(a_NumNeighborsForSource)
 {
 }
 
@@ -62,8 +70,10 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 
 	if (MyMeta != 0)
 	{
+		// Source blocks aren't checked for tributaries, others are.
 		if (CheckTributaries(a_BlockX, a_BlockY, a_BlockZ, Area, MyMeta))
 		{
+			// Has no tributary, has been decreased, no more processing needed (neighbors have been scheduled by the decrease)
 			return;
 		}
 	}
@@ -81,6 +91,19 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	}
 	else if (NewMeta < 8)   // Can reach there
 	{
+		// If source creation is on, check for it here:
+		if (
+			(m_NumNeighborsForSource > 0) &&  // Source creation is on
+			(MyMeta == m_Falloff) &&          // Only exactly one block away from a source (fast bail-out)
+			!IsPassableForFluid(Below) &&     // Only exactly 1 block deep
+			CheckNeighborsForSource(a_BlockX, a_BlockY, a_BlockZ, Area)  // Did we create a source?
+		)
+		{
+			// We created a source, no more spreading is to be done now
+			// Also has been re-scheduled for ticking in the next wave
+			return;
+		}
+		
 		// Spread to the neighbors:
 		SpreadToNeighbor(a_BlockX - 1, a_BlockY, a_BlockZ,     Area, NewMeta);
 		SpreadToNeighbor(a_BlockX + 1, a_BlockY, a_BlockZ,     Area, NewMeta);
@@ -224,6 +247,49 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 	// Spread:
 	FLOG("  Spreading to {%d, %d, %d} with meta %d", a_BlockX, a_BlockY, a_BlockZ, a_NewMeta);
 	m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, a_NewMeta);
+}
+
+
+
+
+
+bool cFloodyFluidSimulator::CheckNeighborsForSource(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockArea & a_Area)
+{
+	FLOG("  Checking neighbors for source creation");
+	
+	static const Vector3i NeighborCoords[] =
+	{
+		Vector3i(-1, 0, 0),
+		Vector3i( 1, 0, 0),
+		Vector3i( 0, 0,-1),
+		Vector3i( 0, 0, 1),
+	} ;
+	
+	int NumNeeded = m_NumNeighborsForSource;
+	for (int i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
+	{
+		int x = a_BlockX + NeighborCoords[i].x;
+		int y = a_BlockY + NeighborCoords[i].y;
+		int z = a_BlockZ + NeighborCoords[i].z;
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+		a_Area.GetBlockTypeMeta(x, y, z, BlockType, BlockMeta);
+		FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(BlockType, 1, BlockMeta)).c_str());
+		if ((BlockMeta == 0) && IsAnyFluidBlock(BlockType))
+		{
+			NumNeeded--;
+			FLOG("    Found a neighbor source at {%d, %d, %d}, NumNeeded := %d", x, y, z, NumNeeded);
+			if (NumNeeded == 0)
+			{
+				// Found enough, turn into a source and bail out
+				FLOG("    Found enough neighbor sources, turning into a source");
+				m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, 0);
+				return true;
+			}
+		}
+	}
+	FLOG("    Not enough neighbors for turning into a source, NumNeeded = %d", NumNeeded);
+	return false;
 }
 
 

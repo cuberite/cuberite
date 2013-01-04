@@ -2249,11 +2249,10 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	int Rate = 1;
 	if (NoCaseCompare(SimulatorName, "floody") == 0)
 	{
-		int DefaultFalloff   = IsWater ? 1 : 2;
-		int DefaultTickDelay = IsWater ? 5 : 30;
-		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
-		int TickDelay = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay", DefaultTickDelay);
-		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay);
+		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
+		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
+		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
+		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
 	}
 	else
 	{
