@@ -204,7 +204,8 @@ private:
 	Vector3d m_ConfirmPosition;
 
 	cPlayer * m_Player;
-	bool      m_bKicking;
+	
+	bool m_HasSentDC;
 	
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;

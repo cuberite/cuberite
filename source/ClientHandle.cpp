@@ -79,7 +79,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_IPString(a_Socket->GetIPString())
 	, m_OutgoingData(64 KiB)
 	, m_Player(NULL)
-	, m_bKicking(false)
+	, m_HasSentDC(false)
 	, m_TimeSinceLastPacket(0)
 	, m_bKeepThreadGoing(true)
 	, m_Ping(1000)
@@ -140,7 +140,7 @@ cClientHandle::~cClientHandle()
 		}
 	}
 
-	if (!m_bKicking)
+	if (!m_HasSentDC)
 	{
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
@@ -200,7 +200,6 @@ void cClientHandle::Kick(const AString & a_Reason)
 		LOG("Kicking user \"%s\" for \"%s\"", m_Username.c_str(), a_Reason.c_str());
 	}
 	SendDisconnect(a_Reason);
-	m_bKicking = true;
 }
 
 
@@ -1151,8 +1150,12 @@ void cClientHandle::Tick(float a_Dt)
 
 void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
-	LOGD("Sending a DC: \"%s\"", a_Reason.c_str());
-	m_Protocol->SendDisconnect(a_Reason);
+	if (!m_HasSentDC)
+	{
+		LOGD("Sending a DC: \"%s\"", a_Reason.c_str());
+		m_Protocol->SendDisconnect(a_Reason);
+		m_HasSentDC = true;
+	}
 }
 
 
@@ -1768,7 +1771,7 @@ void cClientHandle::GetOutgoingData(AString & a_Data)
 	}
 
 	// Disconnect player after all packets have been sent
-	if (m_bKicking && a_Data.empty())
+	if (m_HasSentDC && a_Data.empty())
 	{
 		Destroy();
 	}
