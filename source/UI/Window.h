@@ -106,7 +106,6 @@ public:
 protected:
 	cSlotAreas m_SlotAreas;
 	
-private:
 	char    m_WindowID;
 	int     m_WindowType;
 	AString m_WindowTitle;
@@ -114,7 +113,8 @@ private:
 	cCriticalSection m_CS;
 	cPlayerList      m_OpenedBy;
 	
-	bool    m_IsDestroyed;
+	bool m_IsDestroyed;
+	bool m_ShouldDistributeToHotbarFirst;  ///< If set (default), shift+click tries to distribute to hotbar first, then other areas. False for doublechests
 	
 	cWindowOwner * m_Owner;
 	

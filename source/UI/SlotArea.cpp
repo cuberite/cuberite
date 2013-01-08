@@ -211,7 +211,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaChest:
 
-cSlotAreaChest::cSlotAreaChest(cChestEntity *a_Chest, cWindow &a_ParentWindow) :
+cSlotAreaChest::cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow) :
 	cSlotArea(27, a_ParentWindow),
 	m_Chest(a_Chest)
 {
@@ -234,6 +234,53 @@ const cItem * cSlotAreaChest::GetSlot(int a_SlotNum, cPlayer & a_Player)
 void cSlotAreaChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	m_Chest->SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaDoubleChest:
+
+cSlotAreaDoubleChest::cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEntity * a_BottomChest, cWindow & a_ParentWindow) :
+	cSlotArea(54, a_ParentWindow),
+	m_TopChest(a_TopChest),
+	m_BottomChest(a_BottomChest)
+{
+}
+
+
+
+
+
+const cItem * cSlotAreaDoubleChest::GetSlot(int a_SlotNum, cPlayer & a_Player)
+{
+	// a_SlotNum ranges from 0 to 53, use that to index the correct chest's inventory:
+	if (a_SlotNum < 27)
+	{
+		return m_TopChest->GetSlot(a_SlotNum);
+	}
+	else
+	{
+		return m_BottomChest->GetSlot(a_SlotNum - 27);
+	}
+}
+
+
+
+
+
+void cSlotAreaDoubleChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	if (a_SlotNum < 27)
+	{
+		m_TopChest->SetSlot(a_SlotNum, a_Item);
+	}
+	else
+	{
+		m_BottomChest->SetSlot(a_SlotNum - 27, a_Item);
+	}
 }
 
 

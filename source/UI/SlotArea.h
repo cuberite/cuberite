@@ -232,6 +232,24 @@ protected:
 
 
 
+class cSlotAreaDoubleChest :
+	public cSlotArea
+{
+public:
+	cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEntity * a_BottomChest, cWindow & a_ParentWindow);
+	
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	
+protected:
+	cChestEntity * m_TopChest;
+	cChestEntity * m_BottomChest;
+} ;
+
+
+
+
+
 class cSlotAreaDispenser :
 	public cSlotArea
 {

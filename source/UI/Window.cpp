@@ -28,6 +28,7 @@ cWindow::cWindow(cWindow::WindowType a_WindowType, const AString & a_WindowTitle
 	, m_WindowTitle(a_WindowTitle)
 	, m_Owner(NULL)
 	, m_IsDestroyed(false)
+	, m_ShouldDistributeToHotbarFirst(true)
 {
 	if (a_WindowType == Inventory)
 	{
@@ -259,18 +260,23 @@ void cWindow::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea
 	// Then ask any remaining slots
 	for (int Pass = 0; Pass < 2; ++Pass)
 	{
-		// First distribute into the hotbar:
-		if (a_ExcludeArea != m_SlotAreas.back())
+		if (m_ShouldDistributeToHotbarFirst)
 		{
-			m_SlotAreas.back()->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0));
-			if (a_ItemStack.IsEmpty())
+			// First distribute into the hotbar:
+			if (a_ExcludeArea != m_SlotAreas.back())
 			{
-				// Distributed it all
-				return;
+				m_SlotAreas.back()->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0));
+				if (a_ItemStack.IsEmpty())
+				{
+					// Distributed it all
+					return;
+				}
 			}
 		}
+		
 		// The distribute to all other areas:
-		for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end() - 1; itr != end; ++itr)
+		cSlotAreas::iterator end = m_ShouldDistributeToHotbarFirst ? (m_SlotAreas.end() - 1) : m_SlotAreas.end();
+		for (cSlotAreas::iterator itr = m_SlotAreas.begin(); itr != end; ++itr)
 		{
 			if (*itr == a_ExcludeArea)
 			{
@@ -432,10 +438,11 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 	m_BlockY(a_PrimaryChest->GetPosY()),
 	m_BlockZ(a_PrimaryChest->GetPosZ())
 {
-	m_SlotAreas.push_back(new cSlotAreaChest(a_PrimaryChest,   *this));
-	m_SlotAreas.push_back(new cSlotAreaChest(a_SecondaryChest, *this));
+	m_SlotAreas.push_back(new cSlotAreaDoubleChest(a_PrimaryChest, a_SecondaryChest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	
+	m_ShouldDistributeToHotbarFirst = false;
 	
 	// Play the opening sound:
 	m_World->BroadcastSoundEffect("random.chestopen", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
