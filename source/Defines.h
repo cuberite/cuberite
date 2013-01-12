@@ -5,17 +5,19 @@
 
 typedef unsigned char Byte;
 
-//tolua_begin
-// emissive blocks
-extern unsigned char g_BlockLightValue[];
-// whether blocks allow spreading
-extern unsigned char g_BlockSpreadLightFalloff[];
-// whether blocks are transparent (light can shine though)
-extern bool g_BlockTransparent[];
-// one hit break blocks
-extern bool g_BlockOneHitDig[];
+// tolua_begin
 
-//--DO NOT DELETE THIS COMMENT-- //tolua_export
+/// How much light do the blocks emit on their own?
+extern unsigned char g_BlockLightValue[];
+
+/// How much light do the block consume?
+extern unsigned char g_BlockSpreadLightFalloff[];
+
+/// Is a block completely transparent? (light doesn't get decreased(?))
+extern bool g_BlockTransparent[];
+
+/// Is a block destroyed after a single hit?
+extern bool g_BlockOneHitDig[];
 
 
 
@@ -41,45 +43,47 @@ enum
 	DIG_STATUS_DROP_HELD = 4,
 	DIG_STATUS_SHOOT_EAT = 5,
 } ;
-//tolua_end
+// tolua_end
 
 
 
 
 
-inline bool IsValidBlock( int a_BlockType )	//tolua_export
-{											//tolua_export
-	if( a_BlockType > -1 &&
-		a_BlockType <= 145 && //items to 109 are valid for Beta1.8.1.. 1.2.5 is up to 126
-		//a_BlockType != 29 && allow pistons
-		//a_BlockType != 33 && allow pistons
-		a_BlockType != 34 &&
-		a_BlockType != 36 )
+inline bool IsValidBlock(int a_BlockType)	// tolua_export
+{											// tolua_export
+	if (
+		(a_BlockType > -1) &&
+		(a_BlockType <= E_BLOCK_MAX_TYPE_ID) &&
+		(a_BlockType != 34) &&  // Piston extension
+		(a_BlockType != 36)     // Piston moved block
+	)
 	{
 		return true;
 	}
 	return false;
-}											//tolua_export
+}											// tolua_export
 
 
 
 
 
-// Was old :o
-// Changed to fit the style ;)
-inline bool IsValidItem( int a_ItemID )		//tolua_export
-{											//tolua_export
-	if( (a_ItemID >= 256 && a_ItemID <= 400)
-		|| (a_ItemID >= 2256 && a_ItemID <= 2267) )
+inline bool IsValidItem(int a_ItemType)		// tolua_export
+{											// tolua_export
+	if (
+		((a_ItemType >= E_ITEM_FIRST) && (a_ItemType <= E_ITEM_MAX_CONSECUTIVE_TYPE_ID)) ||  // Basic items range
+		((a_ItemType >= E_ITEM_FIRST_DISC) && (a_ItemType <= E_ITEM_LAST_DISC))   // Music discs' special range
+	)
 	{
 		return true;
 	}
 
-	if( a_ItemID == 0 )
+	if (a_ItemType == 0)
+	{
 		return false;
+	}
 
-	return IsValidBlock( a_ItemID );
-}											//tolua_export
+	return IsValidBlock(a_ItemType);
+}											// tolua_export
 
 
 
@@ -87,7 +91,7 @@ inline bool IsValidItem( int a_ItemID )		//tolua_export
 
 inline bool IsBlockWater(BLOCKTYPE a_BlockType)
 {
-	return (a_BlockType == E_BLOCK_WATER || a_BlockType == E_BLOCK_STATIONARY_WATER);
+	return ((a_BlockType == E_BLOCK_WATER) || (a_BlockType == E_BLOCK_STATIONARY_WATER));
 }
 
 
@@ -96,14 +100,21 @@ inline bool IsBlockWater(BLOCKTYPE a_BlockType)
 
 inline bool IsBlockLava(BLOCKTYPE a_BlockType)
 {
-	return (a_BlockType == E_BLOCK_LAVA || a_BlockType == E_BLOCK_STATIONARY_LAVA);
+	return ((a_BlockType == E_BLOCK_LAVA) || (a_BlockType == E_BLOCK_STATIONARY_LAVA));
 }
+
+
+
 
 
 inline bool IsBlockLiquid(BLOCKTYPE a_BlockType)
 {
 	return IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType);
 }
+
+
+
+
 
 inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 {
@@ -112,7 +123,9 @@ inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
 		case E_BLOCK_FARMLAND:
+		{
 			return true;
+		}
 	}
 	return false;
 }
@@ -120,58 +133,67 @@ inline bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType)
 
 
 
-inline void AddDirection( int & a_X, int & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false )
-{
+inline void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, char a_BlockFace, bool a_bInverse = false)  // tolua_export
+{  // tolua_export
 	if (!a_bInverse)
 	{
-		switch (a_Direction)
+		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_BOTTOM: a_Y--; break;
-			case BLOCK_FACE_TOP:    a_Y++; break;
-			case BLOCK_FACE_EAST:   a_X++; break;
-			case BLOCK_FACE_WEST:   a_X--; break;
-			case BLOCK_FACE_NORTH:  a_Z--; break;
-			case BLOCK_FACE_SOUTH:  a_Z++; break;
+			case BLOCK_FACE_BOTTOM: a_BlockY--; break;
+			case BLOCK_FACE_TOP:    a_BlockY++; break;
+			case BLOCK_FACE_EAST:   a_BlockX++; break;
+			case BLOCK_FACE_WEST:   a_BlockX--; break;
+			case BLOCK_FACE_NORTH:  a_BlockZ--; break;
+			case BLOCK_FACE_SOUTH:  a_BlockZ++; break;
 			default:
 			{
-				LOGWARNING("AddDirection(): Unknown direction: %d", a_Direction);
-				ASSERT(!"AddDirection(): Unknown direction");
+				LOGWARNING("%s: Unknown face: %d", __FUNCTION__, a_BlockFace);
+				ASSERT(!"AddFaceDirection(): Unknown face");
 				break;
 			}
 		}
 	}
 	else
 	{
-		switch( a_Direction )	// other way around
+		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_BOTTOM: a_Y++; break;
-			case BLOCK_FACE_TOP:    a_Y--; break;
-			case BLOCK_FACE_EAST:   a_X--; break;
-			case BLOCK_FACE_WEST:   a_X++; break;
-			case BLOCK_FACE_NORTH:  a_Z++; break;
-			case BLOCK_FACE_SOUTH:  a_Z--; break;
+			case BLOCK_FACE_BOTTOM: a_BlockY++; break;
+			case BLOCK_FACE_TOP:    a_BlockY--; break;
+			case BLOCK_FACE_EAST:   a_BlockX--; break;
+			case BLOCK_FACE_WEST:   a_BlockX++; break;
+			case BLOCK_FACE_NORTH:  a_BlockZ++; break;
+			case BLOCK_FACE_SOUTH:  a_BlockZ--; break;
 			default:
 			{
-				LOGWARNING("AddDirection(): Unknown inv direction: %d", a_Direction);
-				ASSERT(!"AddDirection(): Unknown direction");
+				LOGWARNING("%s: Unknown inv face: %d", __FUNCTION__, a_BlockFace);
+				ASSERT(!"AddFaceDirection(): Unknown face");
 				break;
 			}
 		}
 	}
+}  // tolua_export
+
+
+
+
+
+inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_BlockZ, char a_BlockFace, bool a_bInverse = false)
+{
+	int Y = a_BlockY;
+	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
+	if (Y < 0)
+	{
+		a_BlockY = 0;
+	}
+	else if (Y > 255)
+	{
+		a_BlockY = 255;
+	}
+	else
+	{
+		a_BlockY = (unsigned char)Y;
+	}
 }
-
-
-
-
-
-inline void AddDirection( int & a_X, unsigned char & a_Y, int & a_Z, char a_Direction, bool a_bInverse = false ) //tolua_export
-{//tolua_export
-	int Y = a_Y;
-	AddDirection( a_X, Y, a_Z, a_Direction, a_bInverse );
-	if( Y < 0 ) a_Y = 0;
-	else if( Y > 255 ) a_Y = 255;
-	else a_Y = (unsigned char)Y;
-}//tolua_export
 
 
 
@@ -225,7 +247,7 @@ inline float GetSpecialSignf( float a_Val )
 
 
 
-//tolua_begin
+// tolua_begin
 namespace ItemCategory
 {
 	inline bool IsPickaxe(short a_ItemID)
@@ -344,7 +366,7 @@ namespace ItemCategory
 		);
 	}
 }
-//tolua_end
+// tolua_end
 
 
 inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
@@ -354,7 +376,7 @@ inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 }
 
 
-//tolua_begin
+// tolua_begin
 enum eGameMode
 {
 	eGameMode_NotSet    = -1,
@@ -377,7 +399,7 @@ enum eWeather
 
 
 
-//tolua_end
+// tolua_end
 
 
 

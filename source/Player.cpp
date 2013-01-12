@@ -174,7 +174,7 @@ void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
 	}
 	else if (m_bDirtyPosition)
 	{
-		cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_PLAYER_MOVE, 1, this );
+		cRoot::Get()->GetPluginManager()->CallHookPlayerMoved(*this);
 
 		float DiffX = (float)(GetPosX() - m_LastPosX );
 		float DiffY = (float)(GetPosY() - m_LastPosY );
@@ -1054,7 +1054,7 @@ void cPlayer::UseEquippedItem()
 	{
 		if (GetInventory().GetEquippedItem().DamageItem()) 
 		{
-			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername().c_str(), GetInventory().GetEquippedItem().m_ItemID);
+			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername().c_str(), GetInventory().GetEquippedItem().m_ItemType);
 			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
 		}
 	}

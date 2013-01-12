@@ -12,16 +12,19 @@
 
 
 typedef std::map< AString, cGroup* > GroupMap;
+
+
+
+
+
 struct cGroupManager::sGroupManagerState
 {
 	GroupMap Groups;
 };
 
-cGroupManager* cGroupManager::GetGroupManager()
-{
-	LOGWARN("WARNING: Using deprecated function cGroupManager::GetGroupManager() use cRoot::Get()->GetGroupManager() instead!");
-	return cRoot::Get()->GetGroupManager();
-}
+
+
+
 
 cGroupManager::~cGroupManager()
 {
@@ -33,6 +36,10 @@ cGroupManager::~cGroupManager()
 
 	delete m_pState;
 }
+
+
+
+
 
 cGroupManager::cGroupManager()
 	: m_pState( new sGroupManagerState )
@@ -98,6 +105,10 @@ cGroupManager::cGroupManager()
 	LOG("-- Done Loading Groups --");
 }
 
+
+
+
+
 cGroup* cGroupManager::GetGroup( const AString & a_Name )
 {
 	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
@@ -110,5 +121,8 @@ cGroup* cGroupManager::GetGroup( const AString & a_Name )
 	m_pState->Groups[a_Name] = Group;
 
 	return Group;
-
 }
+
+
+
+

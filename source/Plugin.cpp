@@ -3,6 +3,7 @@
 
 #include "Plugin.h"
 #include "Pawn.h"
+#include "Player.h"
 
 
 
@@ -16,15 +17,13 @@ cPlugin::cPlugin( const AString & a_PluginDirectory )
 {
 }
 
+
+
+
+
 cPlugin::~cPlugin()
 {
 }
-
-// bool cPlugin::Initialize()
-// {
-// 	LOG("cPlugin::Initialize()");
-// 	return false;
-// }
 
 
 
@@ -39,38 +38,8 @@ void cPlugin::Tick(float a_Dt)
 
 
 
-bool cPlugin::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
-{
-	UNUSED(a_Player);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_BlockFace);
-	UNUSED(a_Status);
-	UNUSED(a_OldBlock);
-	UNUSED(a_OldMeta);
-	return false;
-}
-
-
-
-
-
-bool cPlugin::OnBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
-{
-	UNUSED(a_Player);
-	UNUSED(a_BlockX);
-	UNUSED(a_BlockY);
-	UNUSED(a_BlockZ);
-	UNUSED(a_BlockFace);
-	UNUSED(a_HeldItem);
-	return false;
-}
-
-
-
-
-
+/*
+// TODO
 bool cPlugin::OnBlockToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups)
 {
 	UNUSED(a_BlockType);
@@ -80,6 +49,8 @@ bool cPlugin::OnBlockToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, con
 	UNUSED(a_Pickups);
 	return false;
 }
+*/
+
 
 
 
@@ -96,11 +67,12 @@ bool cPlugin::OnChat(cPlayer * a_Player, const AString & a_Message)
 
 
 
-void cPlugin::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPlugin::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	UNUSED(a_World);
 	UNUSED(a_ChunkX);
 	UNUSED(a_ChunkZ);
+	return false;
 }
 
 
@@ -154,7 +126,7 @@ bool cPlugin::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 
 
 
-bool cPlugin::OnKilled(cPawn * a_Killed, cEntity * a_Killer)
+bool cPlugin::OnKilled(cPawn & a_Killed, cEntity * a_Killer)
 {
 	UNUSED(a_Killed);
 	UNUSED(a_Killer);
@@ -177,7 +149,39 @@ bool cPlugin::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const ASt
 
 
 
-bool cPlugin::OnPlayerJoin(cPlayer * a_Player)
+bool cPlugin::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_BlockType);
+	UNUSED(a_BlockMeta);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_BlockType);
+	UNUSED(a_BlockMeta);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerEating(cPlayer & a_Player)
 {
 	UNUSED(a_Player);
 	return false;
@@ -187,18 +191,192 @@ bool cPlugin::OnPlayerJoin(cPlayer * a_Player)
 
 
 
-void cPlugin::OnPlayerMove(cPlayer * a_Player)
+bool cPlugin::OnPlayerJoined(cPlayer & a_Player)
 {
 	UNUSED(a_Player);
+	return false;
 }
 
 
 
 
 
-void cPlugin::OnPlayerSpawn(cPlayer * a_Player)
+bool cPlugin::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_Status);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerMoved(cPlayer & a_Player)
+{
+	UNUSED(a_Player);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	UNUSED(a_BlockType);
+	UNUSED(a_BlockMeta);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	UNUSED(a_BlockType);
+	UNUSED(a_BlockMeta);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerShooting(cPlayer & a_Player)
+{
+	UNUSED(a_Player);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerSpawned(cPlayer & a_Player)
+{
+	UNUSED(a_Player);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerTossingItem(cPlayer & a_Player)
+{
+	UNUSED(a_Player);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	UNUSED(a_BlockType);
+	UNUSED(a_BlockMeta);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	UNUSED(a_BlockType);
+	UNUSED(a_BlockMeta);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	UNUSED(a_Player);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+	return false;
 }
 
 

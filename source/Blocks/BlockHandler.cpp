@@ -207,6 +207,23 @@ cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 
 
 
+bool cBlockHandler::GetPlacementBlockTypeMeta(
+	cWorld * a_World, cPlayer * a_Player,
+	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+	int a_CursorX, int a_CursorY, int a_CursorZ,
+	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+)
+{
+	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
+	a_BlockType = m_BlockType;
+	a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);
+	return true;
+}
+
+
+
+
+
 void cBlockHandler::OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 }
@@ -215,7 +232,7 @@ void cBlockHandler::OnUpdate(cWorld * a_World, int a_BlockX, int a_BlockY, int a
 
 
 
-void cBlockHandler::OnPlacedByPlayer(cWorld *a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
+void cBlockHandler::OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 }
 
@@ -231,9 +248,9 @@ void cBlockHandler::OnDestroyedByPlayer(cWorld *a_World, cPlayer * a_Player, int
 
 
 
-void cBlockHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
+void cBlockHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	//Notify the neighbors
+	// Notify the neighbors
 	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
 	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
 	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
@@ -248,7 +265,7 @@ void cBlockHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_
 
 void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	//Notify the neighbors
+	// Notify the neighbors
 	NeighborChanged(a_World, a_BlockX - 1, a_BlockY, a_BlockZ);
 	NeighborChanged(a_World, a_BlockX + 1, a_BlockY, a_BlockZ);
 	NeighborChanged(a_World, a_BlockX, a_BlockY - 1, a_BlockZ);
@@ -286,18 +303,8 @@ void cBlockHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, 
 
 
 
-void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-}
-
-
-
-
-
-void cBlockHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
-{
-	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, a_BlockMeta);
-	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 }
 
 

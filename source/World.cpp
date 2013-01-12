@@ -174,50 +174,6 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld* cWorld::GetWorld()
-{
-	LOGWARN("WARNING: Using deprecated function cWorld::GetWorld() use cRoot::Get()->GetDefaultWorld() instead!");
-	return cRoot::Get()->GetDefaultWorld();
-}
-
-
-
-
-
-cWorld::~cWorld()
-{
-	{
-		cCSLock Lock(m_CSEntities);
-		while( m_AllEntities.begin() != m_AllEntities.end() )
-		{
-			cEntity* Entity = *m_AllEntities.begin();
-			m_AllEntities.remove( Entity );
-			if ( !Entity->IsDestroyed() )
-			{
-				Entity->Destroy();
-			}
-			delete Entity;
-		}
-	}
-
-	delete m_SimulatorManager;
-	delete m_SandSimulator;
-	delete m_WaterSimulator;
-	delete m_LavaSimulator;
-	delete m_FireSimulator;
-	delete m_RedstoneSimulator;
-
-	UnloadUnusedChunks();
-	
-	m_Storage.WaitForFinish();
-
-	delete m_ChunkMap;
-}
-
-
-
-
-
 cWorld::cWorld(const AString & a_WorldName) :
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
@@ -311,6 +267,40 @@ cWorld::cWorld(const AString & a_WorldName) :
 	{
 		LOGWARNING("Could not write world config to %s", m_IniFileName.c_str());
 	}
+}
+
+
+
+
+
+cWorld::~cWorld()
+{
+	{
+		cCSLock Lock(m_CSEntities);
+		while( m_AllEntities.begin() != m_AllEntities.end() )
+		{
+			cEntity* Entity = *m_AllEntities.begin();
+			m_AllEntities.remove( Entity );
+			if ( !Entity->IsDestroyed() )
+			{
+				Entity->Destroy();
+			}
+			delete Entity;
+		}
+	}
+
+	delete m_SimulatorManager;
+	delete m_SandSimulator;
+	delete m_WaterSimulator;
+	delete m_LavaSimulator;
+	delete m_FireSimulator;
+	delete m_RedstoneSimulator;
+
+	UnloadUnusedChunks();
+	
+	m_Storage.WaitForFinish();
+
+	delete m_ChunkMap;
 }
 
 
@@ -1064,14 +1054,14 @@ int cWorld::GetBiomeAt (int a_BlockX, int a_BlockZ)
 
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if(a_BlockType == E_BLOCK_AIR)
+	if (a_BlockType == E_BLOCK_AIR)
 	{
 		BlockHandler(GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnDestroyed(this, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
 	GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ);
-	BlockHandler(a_BlockType)->OnPlaced(this, a_BlockX, a_BlockY, a_BlockZ, a_BlockMeta);
+	BlockHandler(a_BlockType)->OnPlaced(this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 

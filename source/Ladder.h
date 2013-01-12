@@ -1,11 +1,11 @@
 #pragma once
 
-class cLadder												//tolua_export
-{															//tolua_export
+class cLadder												// tolua_export
+{															// tolua_export
 public:
 
-	static char DirectionToMetaData( char a_Direction )		//tolua_export
-	{														//tolua_export
+	static char DirectionToMetaData( char a_Direction )		// tolua_export
+	{														// tolua_export
 		switch( a_Direction )
 		{
 		case 0x2:
@@ -20,10 +20,10 @@ public:
 			break;
 		};
 		return 0x2;
-	}														//tolua_export
+	}														// tolua_export
 
-	static char MetaDataToDirection( char a_MetaData )		//tolua_export
-	{														//tolua_export
+	static char MetaDataToDirection( char a_MetaData )		// tolua_export
+	{														// tolua_export
 		switch( a_MetaData )
 		{
 		case 0x2:
@@ -38,6 +38,6 @@ public:
 			break;
 		};
 		return 0x2;
-	}														//tolua_export
+	}														// tolua_export
 
-};															//tolua_export
+};															// tolua_export

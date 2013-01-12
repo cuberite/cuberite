@@ -12,54 +12,49 @@ class cItemSeedsHandler :
 	public cItemHandler
 {
 public:
-	cItemSeedsHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+	cItemSeedsHandler(int a_ItemType) :
+		cItemHandler(a_ItemType)
 	{
 
 	}
 
-	virtual bool IsPlaceable() override
+	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 	
-	virtual BLOCKTYPE GetBlockType() override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		switch(m_ItemType)
-		{
-			case E_ITEM_SEEDS:         return E_BLOCK_CROPS;
-			case E_ITEM_MELON_SEEDS:   return E_BLOCK_MELON_STEM;
-			case E_ITEM_PUMPKIN_SEEDS: return E_BLOCK_PUMPKIN_STEM;
-			default:                   return E_BLOCK_AIR;
-		}
-	}
-
-	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
-	{
-		return 0;	//Not grown yet
-	}
-	
-	
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
-	{
-		if (a_Dir != BLOCK_FACE_TOP)
+		if (a_BlockFace != BLOCK_FACE_TOP)
 		{
 			// Only allow planting seeds from the top side of the block
-			return;
+			return false;
 		}
 		
+		// Only allow placement on farmland
 		int X = a_BlockX;
 		int Y = a_BlockY;
 		int Z = a_BlockZ;
-
-		AddDirection(X, Y, Z, a_Dir, true);
-
+		AddFaceDirection(X, Y, Z, a_BlockFace, true);
 		if (a_World->GetBlock(X, Y, Z) != E_BLOCK_FARMLAND)
 		{
-			return;
+			return false;
 		}
 		
-		return cItemHandler::PlaceBlock(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+		a_BlockMeta = 0;
+		switch (m_ItemType)
+		{
+			case E_ITEM_SEEDS:         a_BlockType = E_BLOCK_CROPS;        return true;
+			case E_ITEM_MELON_SEEDS:   a_BlockType = E_BLOCK_MELON_STEM;   return true;
+			case E_ITEM_PUMPKIN_SEEDS: a_BlockType = E_BLOCK_PUMPKIN_STEM; return true;
+			default:                   a_BlockType = E_BLOCK_AIR;          return true;
+		}
+		return false;
 	}
 } ;
 

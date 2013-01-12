@@ -27,9 +27,9 @@ public:
 			((a_Dir == 0) || (a_Dir == 1))  // Only when clicking on top or on bottom of the block
 			&& ((Block == E_BLOCK_WOODEN_SLAB) || (Block == E_BLOCK_STONE_SLAB))  // It is a slab
 			&& (Block == a_Item->m_ItemType)  // Same slab
-			&& ((Meta & 0x7) == (a_Item->m_ItemHealth & 0x7)))  // Same Texture
+			&& ((Meta & 0x7) == (a_Item->m_ItemDamage & 0x7)))  // Same Texture
 		{
-			if(a_Player->GetGameMode() == eGameMode_Creative)
+			if (a_Player->GetGameMode() == eGameMode_Creative)
 			{
 				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, Block - 1, Meta); // Block - 1 simple hack to save one if statement
 				return true;

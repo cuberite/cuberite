@@ -3,24 +3,49 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
+#include "../Sign.h"
 
-class cItemSignHandler : public cItemHandler
+
+
+
+
+class cItemSignHandler :
+	public cItemHandler
 {
 public:
-	cItemSignHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+	cItemSignHandler(int a_ItemType) :
+		cItemHandler(a_ItemType)
 	{
-
 	}
 
-	virtual bool IsPlaceable() override
+
+	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 
-	virtual BLOCKTYPE GetBlockType() override
+	
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		return E_BLOCK_SIGN_POST;
+		if (a_BlockFace == BLOCK_FACE_TOP)
+		{
+			a_BlockMeta = cSign::RotationToMetaData(a_Player->GetRotation());
+			a_BlockType = E_BLOCK_SIGN_POST;
+		}
+		else
+		{
+			a_BlockMeta = cSign::DirectionToMetaData(a_BlockFace);
+			a_BlockType = E_BLOCK_WALLSIGN;
+		}
+		return true;
 	}
+} ;
 
-};
+
+
+

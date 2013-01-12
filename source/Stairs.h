@@ -1,38 +1,41 @@
+
 #pragma once
 
-class cStairs												//tolua_export
-{															//tolua_export
+
+
+
+
+class cStairs												// tolua_export
+{															// tolua_export
 public:
-	static NIBBLETYPE RotationToMetaData( float a_Rotation, char a_BlockFace)		//tolua_export
-	{														//tolua_export
+	/// Converts player rotation to stair rotation metadata. To get upside-down stairs, OR with 0x4
+	static NIBBLETYPE RotationToMetaData(float a_Rotation)  // tolua_export
+	{														// tolua_export
     a_Rotation += 90 + 45; // So its not aligned with axis
     NIBBLETYPE result = 0x0;
-    if (a_BlockFace == BLOCK_FACE_BOTTOM)
-    {
-      result = 0x4;
-    }
-
 		if (a_Rotation > 360.f)
 		{
 			a_Rotation -= 360.f;
 		}
 		if ((a_Rotation >= 0.f) && (a_Rotation < 90.f))
 		{
-			return result;
+			return 0x0;
 		}
 		else if ((a_Rotation >= 180) && (a_Rotation < 270))
 		{
-			result += 0x1;
+			return 0x1;
 		}
 		else if ((a_Rotation >= 90) && (a_Rotation < 180))
 		{
-			result += 0x2;
+			return 0x2;
 		}
 		else
 		{
-			result += 0x3;
+			return 0x3;
 		}
+	}														// tolua_export
+} ;															// tolua_export
 
-    return result;
-	}														//tolua_export
-};															//tolua_export
+
+
+

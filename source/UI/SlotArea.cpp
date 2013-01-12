@@ -73,27 +73,27 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 	if (a_IsRightClick)
 	{
 		// Right clicked
-		if (DraggingItem.m_ItemID <= 0) // Empty-handed?
+		if (DraggingItem.m_ItemType <= 0) // Empty-handed?
 		{
 			DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 			Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-			DraggingItem.m_ItemID = Slot.m_ItemID;
-			DraggingItem.m_ItemHealth = Slot.m_ItemHealth;
+			DraggingItem.m_ItemType = Slot.m_ItemType;
+			DraggingItem.m_ItemDamage = Slot.m_ItemDamage;
 
 			if (Slot.m_ItemCount <= 0)
 			{
 				Slot.Empty();
 			}
 		}
-		else if ((Slot.m_ItemID <= 0) || DraggingItem.IsEqual(Slot))
+		else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
 		{
 			// Drop one item in slot
-			cItemHandler * Handler = ItemHandler(Slot.m_ItemID);
+			cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
 			if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
 			{
-				Slot.m_ItemID = DraggingItem.m_ItemID;
+				Slot.m_ItemType = DraggingItem.m_ItemType;
 				Slot.m_ItemCount++;
-				Slot.m_ItemHealth = DraggingItem.m_ItemHealth;
+				Slot.m_ItemDamage = DraggingItem.m_ItemDamage;
 				DraggingItem.m_ItemCount--;
 			}
 			if (DraggingItem.m_ItemCount <= 0)
@@ -122,7 +122,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 		else
 		{
 			// Same type, add items:
-			cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemID);
+			cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
 			int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
 			if (FreeSlots < 0)
 			{
@@ -366,7 +366,7 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 	}
 	else if (DraggingItem.IsEqual(Recipe.GetResult()))
 	{
-		cItemHandler * Handler = ItemHandler(Recipe.GetResult().m_ItemID);
+		cItemHandler * Handler = ItemHandler(Recipe.GetResult().m_ItemType);
 		if (DraggingItem.m_ItemCount + Recipe.GetResult().m_ItemCount <= Handler->GetMaxStackSize())
 		{
 			DraggingItem.m_ItemCount += Recipe.GetResult().m_ItemCount;
@@ -535,7 +535,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRight
 		return;
 	}
 	
-	if (Fuel.m_ItemID != GetSlot(0, a_Player)->m_ItemID)
+	if (Fuel.m_ItemType != GetSlot(0, a_Player)->m_ItemType)
 	{
 		m_Furnace->ResetCookTimer();
 	}

@@ -17,7 +17,7 @@ public:								// tolua_export
 
 	unsigned int size() const;		// tolua_export
 
-	std::string & get( const std::string & index );	//tolua_export
+	std::string & get( const std::string & index );	// tolua_export
 
 	std::map< std::string, std::string >& GetStringMap() { return m_StringMap; }
 private:

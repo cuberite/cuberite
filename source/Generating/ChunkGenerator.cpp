@@ -597,7 +597,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 		true
 	);
 	
-	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::E_PLUGIN_CHUNK_GENERATED, 3, m_World, a_ChunkX, a_ChunkZ);
+	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ);
 }
 
 

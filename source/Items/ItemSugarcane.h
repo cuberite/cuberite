@@ -2,7 +2,6 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "../World.h"
 
 
 
@@ -12,25 +11,26 @@ class cItemSugarcaneHandler :
 	public cItemHandler
 {
 public:
-	cItemSugarcaneHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+	cItemSugarcaneHandler(int a_ItemType) :
+		cItemHandler(a_ItemType)
 	{
-
 	}
 
-	virtual bool IsPlaceable() override
+	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
 
-	virtual BLOCKTYPE GetBlockType() override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		return E_BLOCK_SUGARCANE;
-	}
-
-	virtual NIBBLETYPE GetBlockMeta(short a_ItemDamage) override
-	{
-		return 0;	//Not grown yet
+		a_BlockType = E_BLOCK_SUGARCANE;
+		a_BlockMeta = 0;
+		return true;
 	}
 } ;
 

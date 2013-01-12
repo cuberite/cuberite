@@ -20,17 +20,8 @@
 
 
 
-static bool report_errors(lua_State* lua, int status)
-{
-	if ( status!=0 )
-	{
-		std::string s = lua_tostring(lua, -1);
-		LOGERROR("-- %s", s.c_str() );
-		lua_pop(lua, 1);
-		return true;
-	}
-	return false;
-}
+// fwd: LuaCommandBinder.cpp
+bool report_errors(lua_State* lua, int status);
 
 
 
@@ -665,9 +656,9 @@ static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
 
 
 
-static int tolua_cPlugin_NewLua_AddWebTab(lua_State* tolua_S)
+static int tolua_cPlugin_NewLua_AddWebTab(lua_State * tolua_S)
 {
-	cPlugin_NewLua* self = (cPlugin_NewLua*)  tolua_tousertype(tolua_S,1,0);
+	cPlugin_NewLua * self = (cPlugin_NewLua*)tolua_tousertype(tolua_S,1,0);
 
 	tolua_Error tolua_err;
 	tolua_err.array = 0;

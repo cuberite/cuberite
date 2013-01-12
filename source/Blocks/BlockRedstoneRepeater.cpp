@@ -19,15 +19,6 @@ cBlockRedstoneRepeaterHandler::cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockTy
 
 
 
-void cBlockRedstoneRepeaterHandler::OnPlaced(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
-{
-	// Noting needed yet
-}
-
-
-
-
-
 void cBlockRedstoneRepeaterHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Nothing needed yet
@@ -37,7 +28,7 @@ void cBlockRedstoneRepeaterHandler::OnDestroyed(cWorld *a_World, int a_BlockX, i
 
 
 
-void cBlockRedstoneRepeaterHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockRedstoneRepeaterHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, ((a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) + 0x04) & 0x0f));
 }
@@ -48,17 +39,7 @@ void cBlockRedstoneRepeaterHandler::OnUse(cWorld *a_World, cPlayer *a_Player, in
 
 void cBlockRedstoneRepeaterHandler::OnDigging(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	OnUse(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-
-void cBlockRedstoneRepeaterHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
-{
-	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, cRedstoneSimulator::RepeaterRotationToMetaData(a_Player->GetRotation()));
-	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+	OnUse(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NONE, 8, 8, 8);
 }
 
 

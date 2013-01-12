@@ -16,13 +16,13 @@ public:
 	cWebPlugin();
 	virtual ~cWebPlugin();
 
-	virtual const AString & GetName(void) const = 0;
+	virtual const AString & GetWebTitle(void) const = 0;
 	// tolua_begin
 	
 	virtual AString HandleWebRequest( HTTPRequest * a_Request ) = 0;
 
 	static AString SafeString( const AString & a_String );
-	//tolua_end
+	// tolua_end
 
 	struct sWebPluginTab
 	{

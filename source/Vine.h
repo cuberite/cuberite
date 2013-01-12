@@ -1,11 +1,11 @@
 #pragma once
 
-class cVine												//tolua_export
-{														//tolua_export
+class cVine												// tolua_export
+{														// tolua_export
 public:
 	
-	static NIBBLETYPE DirectionToMetaData( char a_Direction )	//tolua_export
-	{													//tolua_export
+	static NIBBLETYPE DirectionToMetaData( char a_Direction )	// tolua_export
+	{													// tolua_export
 		switch (a_Direction)
 		{
 			case 0x2:
@@ -19,10 +19,10 @@ public:
 			default:
 				return 0x0;
 		};
-	}													//tolua_export
+	}													// tolua_export
 
-	static char MetaDataToDirection(NIBBLETYPE a_MetaData )		//tolua_export
-	{														//tolua_export
+	static char MetaDataToDirection(NIBBLETYPE a_MetaData )		// tolua_export
+	{														// tolua_export
 		switch(a_MetaData)
 		{
 			case 0x1:
@@ -36,6 +36,6 @@ public:
 			default:
 				return 0x1;
 		};
-	}														//tolua_export
+	}														// tolua_export
 
-};														//tolua_export
+};														// tolua_export

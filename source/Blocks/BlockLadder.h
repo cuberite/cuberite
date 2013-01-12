@@ -19,61 +19,70 @@ public:
 	}	
 
 
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		if (!LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Dir))
+		if (!LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
-			a_Dir = FindSuitableDirection(a_World, a_BlockX, a_BlockY, a_BlockZ);
+			a_BlockFace = FindSuitableBlockFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
 			
-			if (a_Dir == BLOCK_FACE_BOTTOM)
+			if (a_BlockFace == BLOCK_FACE_BOTTOM)
 			{
-				return;
+				return false;
 			}
 		}
 
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, cLadder::DirectionToMetaData(a_Dir));
-		OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+		a_BlockType = m_BlockType;
+		a_BlockMeta = cLadder::DirectionToMetaData(a_BlockFace);
+		return true;
 	}
 
+
 	/// Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure
-	static char FindSuitableDirection(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+	static char FindSuitableBlockFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		for (int i = 2; i <= 5; i++)
+		for (int Face = 2; Face <= 5; Face++)
 		{
-			if (LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, i))
+			if (LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, Face))
 			{
-				return i;
+				return Face;
 			}
 		}
 		return BLOCK_FACE_BOTTOM;
 	}
 	
 
-	static bool LadderCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+	static bool LadderCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_Dir == BLOCK_FACE_BOTTOM || a_Dir == BLOCK_FACE_TOP )
+		if ((a_BlockFace == BLOCK_FACE_BOTTOM) || (a_BlockFace == BLOCK_FACE_TOP))
 		{
 			return false;
 		}
 
-		AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, true );
+		AddFaceDirection( a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return g_BlockIsSolid[a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ)];
+		return g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ)];
 	}
 
 
-	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
 	{
-		if (LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Dir))
+		if (LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+		{
 			return true;
-		return FindSuitableDirection(a_World, a_BlockX, a_BlockY, a_BlockZ) != BLOCK_FACE_BOTTOM;
+		}
+		return (FindSuitableBlockFace(a_World, a_BlockX, a_BlockY, a_BlockZ) != BLOCK_FACE_BOTTOM);
 	}
 
 
 	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		char Dir = cLadder::MetaDataToDirection(a_World->GetBlockMeta( a_BlockX, a_BlockY, a_BlockZ));
-		return CanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, Dir);
+		char BlockFace = cLadder::MetaDataToDirection(a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
+		return CanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, BlockFace);
 	}
 
 

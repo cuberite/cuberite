@@ -978,8 +978,8 @@ int cProtocol125::ParseBlockDig(void)
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
 	HANDLE_PACKET_READ(ReadByte,	Byte, PosY);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
-	HANDLE_PACKET_READ(ReadChar,	char, Direction);
-	m_Client->HandleBlockDig(PosX, PosY, PosZ, Direction, Status);
+	HANDLE_PACKET_READ(ReadChar,	char, BlockFace);
+	m_Client->HandleLeftClick(PosX, PosY, PosZ, BlockFace, Status);
 	return PARSE_OK;
 }
 
@@ -992,7 +992,7 @@ int cProtocol125::ParseBlockPlace(void)
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
 	HANDLE_PACKET_READ(ReadByte,  Byte, PosY);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
-	HANDLE_PACKET_READ(ReadChar,  char, Direction);
+	HANDLE_PACKET_READ(ReadChar,  char, BlockFace);
 
 	cItem HeldItem;
 	int res = ParseItem(HeldItem);
@@ -1001,7 +1001,8 @@ int cProtocol125::ParseBlockPlace(void)
 		return res;
 	}
 
-	m_Client->HandleBlockPlace(PosX, PosY, PosZ, Direction, HeldItem);
+	// 1.2.5 didn't have any cursor position, so use 8, 8, 8, so that halfslabs and stairs work correctly and the special value is recognizable.
+	m_Client->HandleRightClick(PosX, PosY, PosZ, BlockFace, 8, 8, 8, HeldItem);
 	return PARSE_OK;
 }
 

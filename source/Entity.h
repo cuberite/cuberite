@@ -140,10 +140,10 @@ public:
 	void SetRoll    (float a_Roll);
 	// tolua_end
 
-	inline int  GetUniqueID(void) const { return m_UniqueID; }								//tolua_export
-	inline bool IsDestroyed(void) const { return m_bDestroyed; }							//tolua_export
+	inline int  GetUniqueID(void) const { return m_UniqueID; }								// tolua_export
+	inline bool IsDestroyed(void) const { return m_bDestroyed; }							// tolua_export
 
-	void Destroy();																			//tolua_export
+	void Destroy();																			// tolua_export
 	void RemoveFromChunk(void); // for internal use in cChunk
 
 	virtual void Tick(float a_Dt, MTRand & a_TickRandom);														// tolua_export
@@ -199,7 +199,7 @@ protected:
 	
 	float m_FireDamageInterval;
 	float m_BurnPeriod;
-}; //tolua_export
+}; // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
 

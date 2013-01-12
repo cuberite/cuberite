@@ -19,41 +19,89 @@ public:
 	}
 
 	
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
+	{
+		a_BlockType = m_BlockType;
+		
+		// Is there a doublechest already next to this block?
+		if (!CanBeAt(a_World, a_BlockX, a_BlockY, a_BlockZ))
+		{
+			// Yup, cannot form a triple-chest, refuse:
+			return false;
+		}
+		
+		// Check if this forms a doublechest, if so, need to adjust the meta:
+		cBlockArea Area;
+		if (!Area.Read(a_World, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
+		{
+			return false;
+		}
+		float rot = a_Player->GetRotation();
+		if (
+			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
+			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
+		)
+		{
+			a_BlockMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
+			return true;
+		}
+		if (
+			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
+			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
+		)
+		{
+			a_BlockMeta = (rot < 0) ? 4 : 5;
+			return true;
+		}
+		
+		// Single chest, get meta from rotation only
+		a_BlockMeta = RotationToMetaData(rot);
+		return true;
+	}
+	
+
+	virtual void OnPlacedByPlayer(
+		cWorld * a_World, cPlayer * a_Player, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	) override
 	{
 		// Check if this forms a doublechest, if so, need to adjust the meta:
 		cBlockArea Area;
-		if (Area.Read(a_World, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
+		if (!Area.Read(a_World, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
 		{
-			float rot = a_Player->GetRotation();
-			// Choose meta from player rotation, choose only between 2 or 3
-			NIBBLETYPE NewMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
-			if (
-				CheckAndAdjustNeighbor(a_World, Area, 0, 1, NewMeta) ||
-				CheckAndAdjustNeighbor(a_World, Area, 2, 1, NewMeta)
-			)
-			{
-				// Forming a double chest in the X direction
-				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, NewMeta);
-				OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
-				return;
-			}
-			// Choose meta from player rotation, choose only between 4 or 5
-			NewMeta = (rot < 0) ? 4 : 5;
-			if (
-				CheckAndAdjustNeighbor(a_World, Area, 1, 0, NewMeta) ||
-				CheckAndAdjustNeighbor(a_World, Area, 2, 2, NewMeta)
-			)
-			{
-				// Forming a double chest in the Z direction
-				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, NewMeta);
-				OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
-				return;
-			}
+			return;
 		}
-		// Single chest or unable to read neighbors (don't really care, then):
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, RotationToMetaData(a_Player->GetRotation()));
-		OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+		
+		float rot = a_Player->GetRotation();
+		// Choose meta from player rotation, choose only between 2 or 3
+		NIBBLETYPE NewMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
+		if (
+			CheckAndAdjustNeighbor(a_World, Area, 0, 1, NewMeta) ||
+			CheckAndAdjustNeighbor(a_World, Area, 2, 1, NewMeta)
+		)
+		{
+			// Forming a double chest in the X direction
+			return;
+		}
+		// Choose meta from player rotation, choose only between 4 or 5
+		NewMeta = (rot < 0) ? 4 : 5;
+		if (
+			CheckAndAdjustNeighbor(a_World, Area, 1, 0, NewMeta) ||
+			CheckAndAdjustNeighbor(a_World, Area, 2, 2, NewMeta)
+		)
+		{
+			// Forming a double chest in the Z direction
+			return;
+		}
+		
+		// Single chest, no further processing needed
 	}
 	
 	

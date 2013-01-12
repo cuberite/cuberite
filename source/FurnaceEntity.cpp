@@ -138,8 +138,8 @@ bool cFurnaceEntity::Tick( float a_Dt )
 				m_Items[0].m_ItemCount--;
 				if( m_Items[0].IsEmpty() ) m_Items[0].Empty();
 
-				m_Items[2].m_ItemHealth = m_CookingItem->m_ItemHealth;
-				m_Items[2].m_ItemID = m_CookingItem->m_ItemID;
+				m_Items[2].m_ItemDamage = m_CookingItem->m_ItemDamage;
+				m_Items[2].m_ItemType = m_CookingItem->m_ItemType;
 				m_Items[2].m_ItemCount += m_CookingItem->m_ItemCount;
 				delete m_CookingItem;
 				m_CookingItem = NULL;
@@ -299,14 +299,14 @@ bool cFurnaceEntity::LoadFromFile(cFile & f)
 	for(unsigned int i = 0; i < NumSlots; i++)
 	{
 		cItem & Item = m_Items[i];
-		READ(f, Item.m_ItemID);
+		READ(f, Item.m_ItemType);
 		READ(f, Item.m_ItemCount);
-		READ(f, Item.m_ItemHealth);
+		READ(f, Item.m_ItemDamage);
 	}
 	cItem CookingItem;
-	READ(f, CookingItem.m_ItemID);
+	READ(f, CookingItem.m_ItemType);
 	READ(f, CookingItem.m_ItemCount);
-	READ(f, CookingItem.m_ItemHealth);
+	READ(f, CookingItem.m_ItemDamage);
 	if (!CookingItem.IsEmpty())
 	{
 		m_CookingItem = new cItem(CookingItem);

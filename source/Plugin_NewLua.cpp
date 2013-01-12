@@ -44,7 +44,7 @@ cPlugin_NewLua::cPlugin_NewLua( const AString & a_PluginDirectory )
 
 cPlugin_NewLua::~cPlugin_NewLua()
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 
 	if( m_LuaState )
 	{
@@ -59,7 +59,7 @@ cPlugin_NewLua::~cPlugin_NewLua()
 
 bool cPlugin_NewLua::Initialize()
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 	if( !m_LuaState ) 
 	{	
 		m_LuaState = lua_open();
@@ -99,7 +99,7 @@ bool cPlugin_NewLua::Initialize()
 	}  // for itr - Files[]
 
 	// Call intialize function
-	if( !PushFunction("Initialize") )
+	if (!PushFunction("Initialize"))
 	{
 		lua_close( m_LuaState );
 		m_LuaState = 0;
@@ -108,7 +108,7 @@ bool cPlugin_NewLua::Initialize()
 
 	tolua_pushusertype(m_LuaState, this, "cPlugin_NewLua");
 	
-	if( !CallFunction(1, 1, "Initialize") ) 
+	if (!CallFunction(1, 1, "Initialize"))
 	{
 		lua_close( m_LuaState );
 		m_LuaState = 0;
@@ -123,7 +123,7 @@ bool cPlugin_NewLua::Initialize()
 		return false;
 	}
 
-	bool bSuccess = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bSuccess = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	return bSuccess;
 }
 
@@ -133,9 +133,11 @@ bool cPlugin_NewLua::Initialize()
 
 void cPlugin_NewLua::OnDisable()
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnDisable", false) ) // false = don't log error if not found
+	cCSLock Lock(m_CriticalSection);
+	if (!PushFunction("OnDisable", false)) // false = don't log error if not found
+	{
 		return;
+	}
 
 	CallFunction(0, 0, "OnDisable");
 }
@@ -146,13 +148,100 @@ void cPlugin_NewLua::OnDisable()
 
 void cPlugin_NewLua::Tick(float a_Dt)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("Tick") )
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_TICK);
+	if (!PushFunction(FnName))
+	{
 		return;
+	}
 
 	tolua_pushnumber( m_LuaState, a_Dt );
 
-	CallFunction(1, 0, "Tick");
+	CallFunction(1, 0, FnName);
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHAT);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushstring  (m_LuaState, a_Message.c_str());
+
+	if (!CallFunction(2, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+	
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	
+	if (!CallFunction(3, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cLuaChunk");
+
+	if (!CallFunction(4, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -162,7 +251,9 @@ void cPlugin_NewLua::Tick(float a_Dt)
 bool cPlugin_NewLua::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnCollectPickup"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_COLLECT_PICKUP);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
@@ -170,12 +261,40 @@ bool cPlugin_NewLua::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
 
-	if (!CallFunction(2, 1, "OnCollectPickup"))
+	if (!CallFunction(2, 1, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CRAFTING_NO_RECIPE);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+
+	if (!CallFunction(3, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -187,7 +306,9 @@ bool cPlugin_NewLua::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
 bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnDisconnect"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_DISCONNECT);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
@@ -195,12 +316,12 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 	tolua_pushstring  (m_LuaState, a_Reason.c_str());
 
-	if (!CallFunction(2, 1, "OnDisconnect"))
+	if (!CallFunction(2, 1, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -209,27 +330,25 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 
 
 
-bool cPlugin_NewLua::OnBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
+bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnBlockPlace"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_HANDSHAKE);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushusertype(m_LuaState, (void *)&a_HeldItem, "cItem");
+	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
+	tolua_pushstring  (m_LuaState, a_Username.c_str());
 
-	if (!CallFunction(6, 1, "OnBlockPlace"))
+	if (!CallFunction(2, 1, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -238,54 +357,25 @@ bool cPlugin_NewLua::OnBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY
 
 
 
-bool cPlugin_NewLua::OnBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+bool cPlugin_NewLua::OnKilled(cPawn & a_Killed, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnBlockDig"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_KILLED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_Status);
-	tolua_pushnumber  (m_LuaState, a_OldBlock);
-	tolua_pushnumber  (m_LuaState, a_OldMeta);
+	tolua_pushusertype(m_LuaState, &a_Killed, "cPawn");
+	tolua_pushusertype(m_LuaState, a_Killer,  "cEntity");
 
-	if (!CallFunction(8, 1, "OnBlockDig"))
+	if (!CallFunction(2, 1, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnChat"))
-	{
-		return false;
-	}
-
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushstring  (m_LuaState, a_Message.c_str());
-
-	if (!CallFunction(2, 1, "OnChat"))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -296,18 +386,24 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
 
 bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnLogin") )
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_LOGIN);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
 		return false;
+	}
 
 	tolua_pushusertype (m_LuaState, a_Client, "cClientHandle");
 	tolua_pushnumber   (m_LuaState, a_ProtocolVersion);
 	tolua_pushcppstring(m_LuaState, a_Username);
 
-	if (!CallFunction(3, 1, "OnLogin"))
+	if (!CallFunction(3, 1, FnName))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -316,33 +412,30 @@ bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, co
 
 
 
-void cPlugin_NewLua::OnPlayerSpawn( cPlayer* a_Player )
+bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnPlayerSpawn") )
-		return;
-
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-
-	CallFunction(1, 0, "OnPlayerSpawn");
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
-{
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnPlayerJoin") )
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
 		return false;
+	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
 
-	if( !CallFunction(1, 1, "OnPlayerJoin") )
+	if (!CallFunction(7, 1, FnName))
+	{
 		return false;
+	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -351,15 +444,514 @@ bool cPlugin_NewLua::OnPlayerJoin( cPlayer* a_Player )
 
 
 
-void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
+bool cPlugin_NewLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnPlayerMove") )
-		return;
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
 
-	CallFunction(1, 0, "OnPlayerMove");
+	if (!CallFunction(7, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerEating(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_EATING);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	if (!CallFunction(1, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerJoined(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_JOINED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	if (!CallFunction(1, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_LEFT_CLICK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_Status);
+
+	if (!CallFunction(6, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_MOVED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	if (!CallFunction(1, 1, FnName))
+	{
+		return false;
+	}
+	
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_PLACED_BLOCK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+
+	if (!CallFunction(10, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_PLACING_BLOCK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+
+	if (!CallFunction(10, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHTCLICK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+
+	if (!CallFunction(8, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_SHOOTING);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	if (!CallFunction(1, 1, FnName))
+	{
+		return false;
+	}
+	
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerSpawned(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_SPAWNED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	if (!CallFunction(1, 1, FnName))
+	{
+		return false;
+	}
+	
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerTossingItem(cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_TOSSING_ITEM);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	if (!CallFunction(1, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USED_BLOCK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+
+	if (!CallFunction(10, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USED_ITEM);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+
+	if (!CallFunction(8, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USING_BLOCK);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+
+	if (!CallFunction(10, 1, "OnPlayerUsingBlock"))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USING_ITEM);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockFace);
+	tolua_pushnumber  (m_LuaState, a_CursorX);
+	tolua_pushnumber  (m_LuaState, a_CursorY);
+	tolua_pushnumber  (m_LuaState, a_CursorZ);
+
+	if (!CallFunction(8, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_POST_CRAFTING);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+
+	if (!CallFunction(3, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PRE_CRAFTING);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+
+	if (!CallFunction(3, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
 }
 
 
@@ -369,7 +961,9 @@ void cPlugin_NewLua::OnPlayerMove( cPlayer* a_Player )
 bool cPlugin_NewLua::OnTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnTakeDamage"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_TAKE_DAMAGE);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
@@ -377,7 +971,7 @@ bool cPlugin_NewLua::OnTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
 	tolua_pushusertype(m_LuaState, &a_Receiver, "cPawn");
 	tolua_pushusertype(m_LuaState, &a_TDI,      "TakeDamageInfo");
 
-	if (!CallFunction(2, 1, "OnTakeDamage"))
+	if (!CallFunction(2, 1, FnName))
 	{
 		return false;
 	}
@@ -391,187 +985,37 @@ bool cPlugin_NewLua::OnTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
 
 
 
-bool cPlugin_NewLua::OnKilled( cPawn* a_Killed, cEntity* a_Killer )
-{
-	cCSLock Lock( m_CriticalSection );
-	if( !PushFunction("OnKilled") )
-		return false;
-
-	tolua_pushusertype(m_LuaState, a_Killed, "cPawn");
-	tolua_pushusertype(m_LuaState, a_Killer, "cEntity");
-
-	if( !CallFunction(2, 1, "OnKilled") )
-		return false;
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-void cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnChunkGenerated"))
-	{
-		return;
-	}
-	
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
-	
-	CallFunction(3, 0, "OnChunkGenerated");
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnChunkGenerating"))
-		return false;
-
-	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
-	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cLuaChunk");
-
-	if( !CallFunction(3, 1, "OnChunkGenerating") )
-		return false;
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnPreCrafting"))
-		return false;
-
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
-
-	if (!CallFunction(3, 1, "OnPreCrafting"))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnCraftingNoRecipe"))
-		return false;
-
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
-
-	if (!CallFunction(3, 1, "OnCraftingNoRecipe"))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnPostCrafting"))
-		return false;
-
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
-
-	if (!CallFunction(3, 1, "OnPostCrafting"))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnBlockToPickup(
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
-	const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups
+bool cPlugin_NewLua::OnUpdatedSign(
+	cWorld * a_World, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
+	cPlayer * a_Player
 )
 {
-	cLuaItems Pickups(a_Pickups);
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnBlockToPickup"))
-		return false;
-
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
-	tolua_pushusertype(m_LuaState, (void *)a_Player,        "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)&a_EquippedItem, "cItem");
-	tolua_pushusertype(m_LuaState, (void *)&Pickups,        "cLuaItems");
-
-	if (!CallFunction(5, 1, "OnBlockToPickup"))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-
-
-
-
-
-bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
-{
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnWeatherChanged"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_UPDATED_SIGN);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
 
 	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushstring  (m_LuaState, a_Line1.c_str());
+	tolua_pushstring  (m_LuaState, a_Line2.c_str());
+	tolua_pushstring  (m_LuaState, a_Line3.c_str());
+	tolua_pushstring  (m_LuaState, a_Line4.c_str());
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
 
-	if (!CallFunction(1, 1, "OnWeatherChanged"))
+	if (!CallFunction(9, 1, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -588,7 +1032,9 @@ bool cPlugin_NewLua::OnUpdatingSign(
 )
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnUpdatingSign"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_UPDATING_SIGN);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
@@ -609,7 +1055,7 @@ bool cPlugin_NewLua::OnUpdatingSign(
 	}
 
 	
-	bool bRetVal = (tolua_toboolean( m_LuaState, -5, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -5, 0) > 0);
 	if (lua_isstring(m_LuaState, -4))
 	{
 		a_Line1 = tolua_tostring(m_LuaState, -4, "");
@@ -626,7 +1072,6 @@ bool cPlugin_NewLua::OnUpdatingSign(
 	{
 		a_Line4 = tolua_tostring(m_LuaState, -1, "");
 	}
-	// TODO - FIXME: This probably needs to pop 5 things from the stack before returning
 	return bRetVal;
 }
 
@@ -634,35 +1079,24 @@ bool cPlugin_NewLua::OnUpdatingSign(
 
 
 
-bool cPlugin_NewLua::OnUpdatedSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
-	cPlayer * a_Player
-)
+bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnUpdatedSign"))
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
 	{
 		return false;
 	}
 
 	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushstring  (m_LuaState, a_Line1.c_str());
-	tolua_pushstring  (m_LuaState, a_Line2.c_str());
-	tolua_pushstring  (m_LuaState, a_Line3.c_str());
-	tolua_pushstring  (m_LuaState, a_Line4.c_str());
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
 
-	if (!CallFunction(9, 1, "OnUpdatedSign"))
+	if (!CallFunction(1, 1, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -671,25 +1105,89 @@ bool cPlugin_NewLua::OnUpdatedSign(
 
 
 
-bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+bool cPlugin_NewLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 {
-	cCSLock Lock(m_CriticalSection);
-	if (!PushFunction("OnHandshake"))
+	const char * FnName = GetHookFnName(a_Hook);
+	if (FnName == NULL)
 	{
+		// Unknown hook ID
+		LOGWARNING("Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.", GetName().c_str(), a_Hook);
 		return false;
 	}
-
-	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
-	tolua_pushstring  (m_LuaState, a_Username.c_str());
-
-	if (!CallFunction(2, 1, "OnHandshake"))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean( m_LuaState, -1, 0) > 0);
+	
+	// Check if the function is available
+	lua_getglobal(m_LuaState, FnName);
+	bool res = lua_isfunction(m_LuaState, -1);
 	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	
+	if (res)
+	{
+		return true;
+	}
+	
+	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.", 
+		GetName().c_str(), a_Hook, FnName
+	);
+	
+	// Lua stacktrace:
+	LOGWARNING("Stack trace:");
+	lua_Debug entry;
+	int depth = 0; 
+	while (lua_getstack(m_LuaState, depth, &entry))
+	{
+		int status = lua_getinfo(m_LuaState, "Sln", &entry);
+		assert(status);
+
+		LOGWARNING("  %s(%d): %s", entry.short_src, entry.currentline, entry.name ? entry.name : "?");
+		depth++;
+	}
+	LOGWARNING("Stack trace end");
+
+	return false;
+}
+
+
+
+
+
+const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
+{
+	switch (a_Hook)
+	{
+		case cPluginManager::HOOK_CHAT:                  return "OnChat";
+		case cPluginManager::HOOK_CHUNK_GENERATED:       return "OnChunkGenerated";
+		case cPluginManager::HOOK_CHUNK_GENERATING:      return "OnChunkGenerating";
+		case cPluginManager::HOOK_COLLECT_PICKUP:        return "OnCollectPickup";
+		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:    return "OnCraftingNoRecipe";
+		case cPluginManager::HOOK_DISCONNECT:            return "OnDisconnect";
+		case cPluginManager::HOOK_HANDSHAKE:             return "OnHandshake";
+		case cPluginManager::HOOK_KILLED:                return "OnKilled";
+		case cPluginManager::HOOK_LOGIN:                 return "OnLogin";
+		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK: return "OnPlayerBreakingBlock";
+		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:   return "OnPlayerBrokenBlock";
+		case cPluginManager::HOOK_PLAYER_EATING:         return "OnPlayerEating";
+		case cPluginManager::HOOK_PLAYER_JOINED:         return "OnPlayerJoined";
+		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:     return "OnPlayerLeftClick";
+		case cPluginManager::HOOK_PLAYER_MOVED:          return "OnPlayerMoved";
+		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:   return "OnPlayerPlacedBlock";
+		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:  return "OnPlayerPlacingBlock";
+		case cPluginManager::HOOK_PLAYER_RIGHTCLICK:     return "OnPlayerRightClick";
+		case cPluginManager::HOOK_PLAYER_SHOOTING:       return "OnPlayerShooting";
+		case cPluginManager::HOOK_PLAYER_SPAWNED:        return "OnPlayerSpawned";
+		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:   return "OnPlayerTossingItem";
+		case cPluginManager::HOOK_PLAYER_USED_BLOCK:     return "OnPlayerUsedBlock";
+		case cPluginManager::HOOK_PLAYER_USED_ITEM:      return "OnPlayerUsedItem";
+		case cPluginManager::HOOK_PLAYER_USING_BLOCK:    return "OnPlayerUsingBlock";
+		case cPluginManager::HOOK_PLAYER_USING_ITEM:     return "OnPlayerUsingItem";
+		case cPluginManager::HOOK_POST_CRAFTING:         return "OnPostCrafting";
+		case cPluginManager::HOOK_PRE_CRAFTING:          return "OnPreCrafting";
+		case cPluginManager::HOOK_TAKE_DAMAGE:           return "OnTakeDamage";
+		case cPluginManager::HOOK_TICK:                  return "OnTick";
+		case cPluginManager::HOOK_UPDATED_SIGN:          return "OnUpdatedSign";
+		case cPluginManager::HOOK_UPDATING_SIGN:         return "OnUpdatingSign";
+		case cPluginManager::HOOK_WEATHER_CHANGED:       return "OnWeatherChanged";
+		default: return NULL;
+	}  // switch (a_Hook)
 }
 
 
@@ -698,7 +1196,7 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 
 AString cPlugin_NewLua::HandleWebRequest( HTTPRequest * a_Request )
 {
-	cCSLock Lock( m_CriticalSection );
+	cCSLock Lock(m_CriticalSection);
 	std::string RetVal = "";
 
 	std::pair< std::string, std::string > TabName = GetTabNameForRequest(a_Request);
@@ -757,15 +1255,15 @@ AString cPlugin_NewLua::HandleWebRequest( HTTPRequest * a_Request )
 
 bool cPlugin_NewLua::AddWebTab( const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference )
 {
-	cCSLock Lock( m_CriticalSection );
-	if( a_LuaState != m_LuaState )
+	cCSLock Lock(m_CriticalSection);
+	if (a_LuaState != m_LuaState)
 	{
 		LOGERROR("Only allowed to add a tab to a WebPlugin of your own Plugin!");
 		return false;
 	}
-	sWebPluginTab* Tab = new sWebPluginTab();
+	sWebPluginTab * Tab = new sWebPluginTab();
 	Tab->Title = a_Title;
-	Tab->SafeTitle = SafeString( a_Title );
+	Tab->SafeTitle = SafeString(a_Title);
 
 	Tab->UserData = a_FunctionReference;
 
@@ -778,28 +1276,36 @@ bool cPlugin_NewLua::AddWebTab( const AString & a_Title, lua_State * a_LuaState,
 
 
 // Helper functions
-bool cPlugin_NewLua::PushFunction( const char* a_FunctionName, bool a_bLogError /* = true */ )
+bool cPlugin_NewLua::PushFunction(const char * a_FunctionName, bool a_bLogError /* = true */)
 {
 	lua_getglobal(m_LuaState, a_FunctionName);
-	if(!lua_isfunction(m_LuaState,-1))
+	if (!lua_isfunction(m_LuaState, -1))
 	{
-		if( a_bLogError )
+		if (a_bLogError)
 		{
-			LOGWARN("Error in plugin %s: Could not find function %s()", GetLocalDirectory().c_str(), a_FunctionName );
+			LOGWARN("Error in plugin %s: Could not find function %s()", GetName().c_str(), a_FunctionName);
 		}
-		lua_pop(m_LuaState,1);
+		lua_pop(m_LuaState, 1);
 		return false;
 	}
 	return true;
 }
 
+
+
+
+
 bool cPlugin_NewLua::CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName )
 {
 	int s = lua_pcall(m_LuaState, a_NumArgs, a_NumResults, 0);
-	if( report_errors( m_LuaState, s ) )
+	if (report_errors(m_LuaState, s))
 	{
-		LOGWARN("Error in plugin %s calling function %s()", GetLocalDirectory().c_str(), a_FunctionName );
+		LOGWARN("Error in plugin %s calling function %s()", GetName().c_str(), a_FunctionName);
 		return false;
 	}
 	return true;
 }
+
+
+
+

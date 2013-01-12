@@ -484,7 +484,7 @@ int cProtocol132::ParseBlockPlace(void)
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
 	HANDLE_PACKET_READ(ReadByte,  Byte, PosY);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
-	HANDLE_PACKET_READ(ReadChar,  char, Direction);
+	HANDLE_PACKET_READ(ReadChar,  char, BlockFace);
 
 	cItem HeldItem;
 	int res = ParseItem(HeldItem);
@@ -497,7 +497,7 @@ int cProtocol132::ParseBlockPlace(void)
 	HANDLE_PACKET_READ(ReadChar, char, CursorY);
 	HANDLE_PACKET_READ(ReadChar, char, CursorZ);
 
-	m_Client->HandleBlockPlace(PosX, PosY, PosZ, Direction, HeldItem);
+	m_Client->HandleRightClick(PosX, PosY, PosZ, BlockFace, CursorX, CursorY, CursorZ, HeldItem);
 	return PARSE_OK;
 }
 

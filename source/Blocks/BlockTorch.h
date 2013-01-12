@@ -19,23 +19,29 @@ public:
 	}
 	
 	
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		if (!TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Dir))
+		// Find proper placement. Use the player-supplied one as the default, but fix if not okay:
+		if (!TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
-			a_Dir = FindSuitableDirection(a_World, a_BlockX, a_BlockY, a_BlockZ);
+			a_BlockFace = FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ);
 			
-			if (a_Dir == BLOCK_FACE_BOTTOM)
+			if (a_BlockFace == BLOCK_FACE_BOTTOM)
 			{
-				return;
+				return false;
 			}
 		}
-
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, cTorch::DirectionToMetaData(a_Dir));
-		OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+		a_BlockType = m_BlockType;
+		a_BlockMeta = cTorch::DirectionToMetaData(a_BlockFace);
+		return true;
 	}
 	
-	
+
 	virtual bool DoesAllowBlockOnTop(void) override
 	{
 		return false;
@@ -61,25 +67,25 @@ public:
 	}
 	
 	
-	static bool TorchCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+	static bool TorchCanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
 		// TODO: If placing a torch from below, check all 4 XZ neighbors, place it on that neighbor instead
 		// How to propagate that change up?
 		// Simon: The easiest way is to calculate the position two times, shouldn´t cost much cpu power :)
 
-		if (a_Dir == BLOCK_FACE_BOTTOM)
+		if (a_BlockFace == BLOCK_FACE_BOTTOM)
 		{
 			return false;
 		}
 
-		AddDirection( a_BlockX, a_BlockY, a_BlockZ, a_Dir, true );
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 
-		return CanBePlacedOn(a_World->GetBlock( a_BlockX, a_BlockY, a_BlockZ ), a_Dir);
+		return CanBePlacedOn(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace);
 	}
 	
 	
-	/// Finds a suitable Direction for the Torch. Returns BLOCK_FACE_BOTTOM on failure
-	static char FindSuitableDirection(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+	/// Finds a suitable Face for the Torch. Returns BLOCK_FACE_BOTTOM on failure
+	static char FindSuitableFace(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int i = 1; i <= 5; i++)
 		{
@@ -92,19 +98,21 @@ public:
 	}
 
 
-	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
 	{
-		if(TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Dir))
+		if (TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+		{
 			return true;
+		}
 
-		return FindSuitableDirection(a_World, a_BlockX, a_BlockY, a_BlockZ) != BLOCK_FACE_BOTTOM;
+		return (FindSuitableFace(a_World, a_BlockX, a_BlockY, a_BlockZ) != BLOCK_FACE_BOTTOM);
 	}
 
 
 	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		char Dir = cTorch::MetaDataToDirection(a_World->GetBlockMeta( a_BlockX, a_BlockY, a_BlockZ));
-		return TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, Dir);
+		char Face = cTorch::MetaDataToDirection(a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
+		return TorchCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, Face);
 	}
 
 

@@ -31,6 +31,7 @@ class cProtocol;
 class cRedstone;
 class cWindow;
 class cFallingBlock;
+class cItemHandler;
 
 
 
@@ -63,7 +64,7 @@ public:
 	
 	cPlayer* GetPlayer() { return m_Player; }	// tolua_export
 
-	void Kick(const AString & a_Reason);		//tolua_export
+	void Kick(const AString & a_Reason);		// tolua_export
 	void Authenticate(void);  // Called by cAuthenticator when the user passes authentication
 
 	void StreamChunks(void);
@@ -125,15 +126,15 @@ public:
 	void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
 	void SendUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 
-	const AString & GetUsername(void) const;		//tolua_export
-	void SetUsername( const AString & a_Username );	//tolua_export
+	const AString & GetUsername(void) const;		// tolua_export
+	void SetUsername( const AString & a_Username );	// tolua_export
 	
-	inline short GetPing(void) const { return m_Ping; }	//tolua_export
+	inline short GetPing(void) const { return m_Ping; }	// tolua_export
 	
 	void SetViewDistance(int a_ViewDistance);		// tolua_export
 	int  GetViewDistance(void) const { return m_ViewDistance; }  // tolua_export
 
-	int GetUniqueID() const { return m_UniqueID; }	//tolua_export
+	int GetUniqueID() const { return m_UniqueID; }	// tolua_export
 	
 	/// Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend)
 	bool WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -150,8 +151,8 @@ public:
 	void HandlePing             (void);
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
 	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
-	void HandleBlockDig         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	void HandleBlockPlace       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem);
+	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleChat             (const AString & a_Message);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
@@ -221,16 +222,17 @@ private:
 	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
 	
 	// Values required for block dig animation
-	int m_BlockDigAnim;  // Current stage of the animation; -1 if not digging
+	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
 	int m_BlockDigAnimSpeed;  // Current speed of the animation (units ???)
-	int m_BlockDigX;
-	int m_BlockDigY;
-	int m_BlockDigZ;
+	int m_BlockDigAnimX;
+	int m_BlockDigAnimY;
+	int m_BlockDigAnimZ;
 
-	char m_LastDigStatus;
-	int m_LastDigX;
-	int m_LastDigY;
-	int m_LastDigZ;
+	// To avoid dig/aim bug in the client, store the last position given in a DIG_START packet and compare to that when processing the DIG_FINISH packet:
+	bool m_HasStartedDigging;
+	int m_LastDigBlockX;
+	int m_LastDigBlockY;
+	int m_LastDigBlockZ;
 
 	enum eState
 	{
@@ -264,6 +266,15 @@ private:
 	/// Adds a single chunk to be streamed to the client; used by StreamChunks()
 	void StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
+	/// Handles the DIG_STARTED dig packet:
+	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+	
+	/// Handles the DIG_FINISHED dig packet:
+	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
+
+	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
+	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
+
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client

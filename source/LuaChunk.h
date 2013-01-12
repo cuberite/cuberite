@@ -2,8 +2,8 @@
 
 #include "ChunkDef.h"
 
-class cLuaChunk			//tolua_export
-{						//tolua_export
+class cLuaChunk			// tolua_export
+{						// tolua_export
 public:
 	cLuaChunk( cChunkDef::BlockTypes   & a_BlockTypes
 	         , cChunkDef::BlockNibbles & a_BlockNibbles 
@@ -27,7 +27,7 @@ public:
 	~cLuaChunk()
 	{}
 
-	//tolua_begin
+	// tolua_begin
 
 	// Block functions
 	void FillBlocks( char a_BlockType, unsigned char a_BlockMeta )
@@ -124,7 +124,7 @@ public:
 		return m_bUseDefaultFinish;
 	}
 
-	//tolua_end
+	// tolua_end
 
 private:
 	bool m_bUseDefaultBiomes;
@@ -136,4 +136,4 @@ private:
 	cChunkDef::BlockTypes   & m_BlockTypes;
 	cChunkDef::BlockNibbles & m_BlockMeta;
 	cChunkDef::HeightMap    & m_HeightMap;
-};	//tolua_export
+};	// tolua_export

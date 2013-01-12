@@ -80,16 +80,6 @@ struct cServer::sServerState
 
 
 
-cServer * cServer::GetServer()
-{
-	LOGWARN("WARNING: Using deprecated function cServer::GetServer() use cRoot::Get()->GetServer() instead!");
-	return cRoot::Get()->GetServer();
-}
-
-
-
-
-
 void cServer::ServerListenThread( void *a_Args )
 {
 	LOG("ServerListenThread");
@@ -173,7 +163,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	printf("email: faketruth@gmail.com\n\n");
 
 	LOG("Starting up server.");
-	LOGINFO("Compatible clients: %s, protocol versions %s", MCS_CLIENT_VERSIONS, MCS_PROTOCOL_VERSIONS);
+	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
+	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
 	if (cSocket::WSAStartup() != 0) // Only does anything on Windows, but whatever
 	{

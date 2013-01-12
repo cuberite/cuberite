@@ -16,48 +16,51 @@ namespace Json
 class cItem
 {
 public:
-	cItem(short a_ItemType = E_ITEM_EMPTY, char a_ItemCount = 0, short a_ItemHealth = 0)
+	cItem(short a_ItemType = E_ITEM_EMPTY, char a_ItemCount = 0, short a_ItemDamage = 0)
 		: m_ItemType  (a_ItemType)
 		, m_ItemCount (a_ItemCount)
-		, m_ItemHealth(a_ItemHealth)
+		, m_ItemDamage(a_ItemDamage)
 	{
-		if (!IsValidItem( m_ItemID ) ) m_ItemID = E_ITEM_EMPTY;
+		if (!IsValidItem(m_ItemType))
+		{
+			m_ItemType = E_ITEM_EMPTY;
+		}
 	}
 	
 	void Empty()
 	{
-		m_ItemID = E_ITEM_EMPTY;
+		m_ItemType = E_ITEM_EMPTY;
 		m_ItemCount = 0;
-		m_ItemHealth = 0;
+		m_ItemDamage = 0;
 	}
 	
 	void Clear(void)
 	{
-		m_ItemID = E_ITEM_EMPTY;
+		m_ItemType = E_ITEM_EMPTY;
 		m_ItemCount = 0;
-		m_ItemHealth = 0;
+		m_ItemDamage = 0;
 	}
 	
 	bool IsEmpty(void) const
 	{
-		return (m_ItemID <= 0 || m_ItemCount <= 0);
+		return (m_ItemType <= 0 || m_ItemCount <= 0);
 	}
 	
 	bool IsEqual(const cItem & a_Item) const
 	{
-		return (IsSameType(a_Item) && (m_ItemHealth == a_Item.m_ItemHealth));
+		return (IsSameType(a_Item) && (m_ItemDamage == a_Item.m_ItemDamage));
 	}
 	
 	bool IsSameType(const cItem & a_Item) const
 	{
-		return (m_ItemID == a_Item.m_ItemID) || (IsEmpty() && a_Item.IsEmpty());
+		return (m_ItemType == a_Item.m_ItemType) || (IsEmpty() && a_Item.IsEmpty());
 	}
 
 	// TODO Sorry for writing the functions in the header. But somehow it doesn´t worked when I put them into the cpp File :s
 
 	inline int GetMaxDuration(void) const
 	{
-		switch(m_ItemID)
+		switch (m_ItemType)
 		{
 			case 256: return 251;
 			case 257: return 251;
@@ -90,13 +93,13 @@ public:
 		}
 	}
 
-	// Damages a weapon / tool. Returns true when destroyed
+	/// Damages a weapon / tool. Returns true when destroyed
 	inline bool DamageItem()
 	{
 		if (HasDuration())
 		{
-			m_ItemHealth++;
-			if(m_ItemHealth >= GetMaxDuration())
+			m_ItemDamage++;
+			if (m_ItemDamage >= GetMaxDuration())
 				return true;
 		}
 		return false;
@@ -111,23 +114,9 @@ public:
 	
 	static bool IsEnchantable(short a_ItemType);
 
-	// tolua_end
-	union
-	{
-		// tolua_begin
-		short m_ItemID;  // OBSOLETE, use m_ItemType instead
-		short m_ItemType;
-		// tolua_end
-	} ;
-	char         m_ItemCount;  // tolua_export
-	union
-	{
-		// tolua_begin
-		short      m_ItemHealth;  // OBSOLETE, use m_ItemDamage instead
-		short      m_ItemDamage;
-		// tolua_end
-	} ;
-	// tolua_begin
+	short m_ItemType;
+	char  m_ItemCount;
+	short m_ItemDamage;
 };
 // tolua_end
 

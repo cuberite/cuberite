@@ -21,17 +21,34 @@ class cBlockHandler
 public:
 	cBlockHandler(BLOCKTYPE a_BlockType);
 
-	// Called when the block gets ticked either by a random tick or by a queued tick
+	/// Called when the block gets ticked either by a random tick or by a queued tick
 	virtual void OnUpdate(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	/// Called by cBlockHandler::PlaceBlock after the player has placed a new block
-	virtual void OnPlacedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir);
+	/** Called before a block is placed	into a world. 
+	The handler should return true to allow placement, false to refuse.
+	Also, the handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
+	Called by cItemHandler::GetPlacementBlockTypeMeta() if the item is a block
+	*/
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	);
+
+	/// Called by cWorld::SetBlock() after the block has been set
+	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/// Called by cClientHandle::HandlePlaceBlock() after the player has placed a new block. Called after OnPlaced().
+	virtual void OnPlacedByPlayer(
+		cWorld * a_World, cPlayer * a_Player, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	);
 	
 	/// Called before the player has destroyed a block
 	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
-	
-	/// Called when a new block was placed. Called before OnPlacedByPlayer
-	virtual void OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir);
 	
 	/// Called before a block gets destroyed / replaced with air
 	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -46,11 +63,8 @@ public:
 	virtual void OnDigging(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Called if the user right clicks the block and the block is useable
-	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void OnUse(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	
-	/// This function handles the real block placement for the give block by a player and also calls OnPlacedByPlayer()
-	virtual void PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
-
 	/// Called when the item is mined to convert it into pickups. Pickups may specify multiple items.
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 	

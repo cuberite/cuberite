@@ -163,7 +163,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 			std::list< std::pair<std::string, std::string> > NameList = WebPlugin->GetTabNames();
 			for( std::list< std::pair<std::string, std::string> >::iterator Names = NameList.begin(); Names != NameList.end(); ++Names )
 			{
-				Menu += "<li><a href='" + BaseURL + WebPlugin->GetName().c_str() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
+				Menu += "<li><a href='" + BaseURL + WebPlugin->GetWebTitle().c_str() + "/" + (*Names).second + "'>" + (*Names).first + "</a></li>";
 			}
 		}
 
@@ -186,16 +186,16 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 			Request.FormData[ fd.name_ ] = HTTPfd;
 		}
 
-		if( Split.size() > 1 )
+		if (Split.size() > 1)
 		{
-			for( PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr )
+			for (PluginList::iterator itr = WebAdmin->m_Plugins.begin(); itr != WebAdmin->m_Plugins.end(); ++itr)
 			{
-				if( (*itr)->GetName() == Split[1] )
+				if ((*itr)->GetWebTitle() == Split[1])
 				{
-					Content = (*itr)->HandleWebRequest( &Request );
-					cWebPlugin* WebPlugin = *itr;
-					FoundPlugin = WebPlugin->GetName();
-					AString TabName = WebPlugin->GetTabNameForRequest( &Request ).first;
+					Content = (*itr)->HandleWebRequest(&Request);
+					cWebPlugin * WebPlugin = *itr;
+					FoundPlugin = WebPlugin->GetWebTitle();
+					AString TabName = WebPlugin->GetTabNameForRequest(&Request).first;
 					if (!TabName.empty())
 					{
 						FoundPlugin += " - " + TabName;

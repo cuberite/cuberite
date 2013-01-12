@@ -52,7 +52,7 @@ public:
 private:
 
 	cItem * m_Content;
-};	//tolua_export
+};	// tolua_export
 
 
 

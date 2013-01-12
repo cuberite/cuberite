@@ -1,6 +1,6 @@
 #pragma once
 
-//tolua_begin
+// tolua_begin
 enum ENUM_BLOCK_ID
 {
 	E_BLOCK_AIR	= 0,
@@ -161,10 +161,15 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_POTATOES = 142,
 	E_BLOCK_WOODEN_BUTTON = 143,
 	E_BLOCK_HEAD = 144,
+	
+	// Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
+	// IsValidBlock() depends on this
+	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
+	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1  ///< Maximum BlockType number used
 };
-//tolua_end
+// tolua_end
 
-//tolua_begin
+// tolua_begin
 enum ENUM_ITEM_ID
 {
 	E_ITEM_EMPTY	= -1,
@@ -303,6 +308,8 @@ enum ENUM_ITEM_ID
 	E_ITEM_TRIPWIRE = 132,
 	E_ITEM_EMERALD_BLOCK = 133,
 
+	E_ITEM_FIRST = 256,  // First true item type
+	
 	E_ITEM_IRON_SHOVEL = 256,
 	E_ITEM_IRON_PICKAXE = 257,
 	E_ITEM_IRON_AXE = 258,
@@ -445,7 +452,13 @@ enum ENUM_ITEM_ID
 	E_ITEM_FIREWORK_ROCKET = 401,
 	E_ITEM_FIREWORK_STAR = 402,
 	E_ITEM_ENCHANTED_BOOK = 403,
+	
+	// Keep these two as the last values of the consecutive list, without a number - they will get their correct number assigned automagically by C++
+	// IsValidItem() depends on this!
+	E_ITEM_NUMBER_OF_CONSECUTIVE_TYPES,  ///< Number of individual (different) consecutive itemtypes
+	E_ITEM_MAX_CONSECUTIVE_TYPE_ID = E_ITEM_NUMBER_OF_CONSECUTIVE_TYPES - 1,  ///< Maximum consecutive ItemType number used
 
+	E_ITEM_FIRST_DISC = 2256,
 	E_ITEM_13_DISC = 2256,
 	E_ITEM_CAT_DISC = 2257,
 	E_ITEM_BLOCKS_DISC = 2258,
@@ -457,7 +470,12 @@ enum ENUM_ITEM_ID
 	E_ITEM_STRAD_DISC = 2264,
 	E_ITEM_WARD_DISC = 2265,
 	E_ITEM_11_DISC = 2266,
-	E_ITEM_WAIT_DISC = 2267
+	E_ITEM_WAIT_DISC = 2267,
+	
+	// Keep these two as the last values of the disc list, without a number - they will get their correct number assigned automagically by C++
+	// IsValidItem() depends on this!
+	E_ITEM_LAST_DISC_PLUS_ONE,  ///< Useless, really, but needs to be present for the following value
+	E_ITEM_LAST_DISC = E_ITEM_LAST_DISC_PLUS_ONE - 1  ///< Maximum disc itemtype number used
 };
 
 
@@ -667,7 +685,7 @@ enum
 	E_ENTITY_TYPE_IRON_GOLEM    = 99,
 	E_ENTITY_TYPE_VILLAGER      = 120,
 } ;
-//tolua_end
+// tolua_end
 
 
 

@@ -23,13 +23,13 @@ public:
 	{
 		// TODO: Handle coloring the sheep, too (OnItemUseOnEntity maybe)
 		// Handle growing the plants:
-		if (a_Item->m_ItemHealth == E_META_DYE_WHITE)
+		if (a_Item->m_ItemDamage == E_META_DYE_WHITE)
 		{
 			if (a_World->GrowRipePlant(a_BlockX, a_BlockY, a_BlockZ, true))
 			{
 				if (a_Player->GetGameMode() != eGameMode_Creative)
 				{
-					cItem Item(a_Item->m_ItemType, 1, a_Item->m_ItemHealth);
+					cItem Item(a_Item->m_ItemType, 1, a_Item->m_ItemDamage);
 					a_Player->GetInventory().RemoveItem(Item);
 					return true;
 				}

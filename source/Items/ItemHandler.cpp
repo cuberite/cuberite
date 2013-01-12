@@ -386,50 +386,38 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 
 
 
-BLOCKTYPE cItemHandler::GetBlockType()
+bool cItemHandler::GetPlacementBlockTypeMeta(
+	cWorld * a_World, cPlayer * a_Player,
+	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+	int a_CursorX, int a_CursorY, int a_CursorZ,
+	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+)
 {
 	ASSERT(m_ItemType < 256);  // Items with IDs above 255 should all be handled by specific handlers
 	
-	#ifdef _DEBUG
 	if (m_ItemType > 256)
 	{
-		LOGERROR("Item %d has no valid block!", m_ItemType);
+		LOGERROR("%s: Item %d has no valid block!", __FUNCTION__, m_ItemType);
+		return false;
 	}
-	#endif  // _DEBUG
 	
-	return (BLOCKTYPE) m_ItemType;
+	cBlockHandler * BlockH = BlockHandler(m_ItemType);
+	return BlockH->GetPlacementBlockTypeMeta(
+		a_World, a_Player,
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
+		a_CursorX, a_CursorY, a_CursorZ,
+		a_BlockType, a_BlockMeta
+	);
+	a_BlockType = (BLOCKTYPE) m_ItemType;
+	a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);  // This keeps most textures. The few other items have to override this
+	return true;
 }
 
 
 
 
 
-NIBBLETYPE cItemHandler::GetBlockMeta(short a_ItemDamage)
-{
-	return (NIBBLETYPE)a_ItemDamage & 0x0f;  // This keeps most textures. The few other items have to override this
-}
-
-
-
-
-
-void cItemHandler::PlaceBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
-{
-	BLOCKTYPE Block = GetBlockType();
-	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(Block);
-	Handler->PlaceBlock(a_World, a_Player, GetBlockMeta(a_Item->m_ItemHealth), a_BlockX, a_BlockY, a_BlockZ, a_Dir);
-	if(a_Player->GetGameMode() == eGameMode_Survival)
-	{
-		cItem Item(a_Item->m_ItemType, 1);
-		a_Player->GetInventory().RemoveItem(Item);
-	}
-}
-
-
-
-
-
-bool cItemHandler::EatItem(cPlayer *a_Player, cItem *a_Item)
+bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	FoodInfo Info = GetFoodInfo();
 

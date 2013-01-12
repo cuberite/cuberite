@@ -33,14 +33,6 @@ cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 
 
 
-void cBlockPistonHandler::OnPlaced(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, int a_Dir)
-{
-}
-
-
-
-
-
 void cBlockPistonHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	char OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
@@ -60,11 +52,16 @@ void cBlockPistonHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_Bloc
 
 
 
-void cBlockPistonHandler::PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
+	cWorld * a_World, cPlayer * a_Player,
+	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+	int a_CursorX, int a_CursorY, int a_CursorZ,
+	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+)
 {
-	
-	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch()));
-	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+	a_BlockType = E_BLOCK_REDSTONE_REPEATER_OFF;
+	a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch());
+	return true;
 }
 
 

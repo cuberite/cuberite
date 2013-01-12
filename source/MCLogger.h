@@ -10,19 +10,19 @@ class cLog;
 
 
 
-class cMCLogger														//tolua_export
-{																	//tolua_export
-public:																//tolua_export
+class cMCLogger														// tolua_export
+{																	// tolua_export
+public:																// tolua_export
 	cMCLogger();
-	cMCLogger( char* a_File );										//tolua_export
-	~cMCLogger();													//tolua_export
+	cMCLogger( char* a_File );										// tolua_export
+	~cMCLogger();													// tolua_export
 
 	void Log(const char* a_Format, va_list a_ArgList);
 	void Info(const char* a_Format, va_list a_ArgList);
 	void Warn(const char* a_Format, va_list a_ArgList);
 	void Error(const char* a_Format, va_list a_ArgList);
 
-	void LogSimple(const char* a_Text, int a_LogType = 0 );			//tolua_export
+	void LogSimple(const char* a_Text, int a_LogType = 0 );			// tolua_export
 
 	static cMCLogger* GetInstance();
 private:
@@ -31,7 +31,7 @@ private:
 	cCriticalSection m_CriticalSection;
 	cLog* m_Log;
 	static cMCLogger* s_MCLogger;
-};																	//tolua_export
+};																	// tolua_export
 
 extern void LOG(const char* a_Format, ...);
 extern void LOGINFO(const char* a_Format, ...);

@@ -204,7 +204,7 @@ const cFurnaceRecipe::Recipe* cFurnaceRecipe::GetRecipeFrom( const cItem & a_Ing
 	for( RecipeList::const_iterator itr = m_pState->Recipes.begin(); itr != m_pState->Recipes.end(); ++itr )
 	{
 		const Recipe & R = *itr;
-		if( (R.In->m_ItemID == a_Ingredient.m_ItemID) && (R.In->m_ItemCount <= a_Ingredient.m_ItemCount ) )
+		if( (R.In->m_ItemType == a_Ingredient.m_ItemType) && (R.In->m_ItemCount <= a_Ingredient.m_ItemCount ) )
 		{
 			if( BestRecipe && (BestRecipe->In->m_ItemCount > R.In->m_ItemCount) )
 			{
@@ -225,7 +225,7 @@ float cFurnaceRecipe::GetBurnTime( const cItem & a_Fuel ) const
 	for( FuelList::const_iterator itr = m_pState->Fuel.begin(); itr != m_pState->Fuel.end(); ++itr )
 	{
 		const Fuel & F = *itr;
-		if( (F.In->m_ItemID == a_Fuel.m_ItemID) && (F.In->m_ItemCount <= a_Fuel.m_ItemCount ) )
+		if( (F.In->m_ItemType == a_Fuel.m_ItemType) && (F.In->m_ItemCount <= a_Fuel.m_ItemCount ) )
 		{
 			if( BestFuel > 0.f && (BestFuel > F.BurnTime ) )
 			{

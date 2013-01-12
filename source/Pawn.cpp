@@ -124,7 +124,7 @@ void cPawn::KilledBy(cPawn * a_Killer)
 	short OldHealth = m_Health;
 	m_Health = 0;
 
-	if (cRoot::Get()->GetPluginManager()->CallHook( cPluginManager::E_PLUGIN_KILLED, 2, this, a_Killer))
+	if (cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_Killer))
 	{
 		// Plugin wants to 'unkill' the pawn. Set health back and abort
 		m_Health = OldHealth;

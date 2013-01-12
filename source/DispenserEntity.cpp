@@ -121,7 +121,7 @@ void cDispenserEntity::Dispense()
 				else
 				{
 					cItems Pickups;
-					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemDamage));	
 					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
 					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				}
@@ -138,7 +138,7 @@ void cDispenserEntity::Dispense()
 				else
 				{
 					cItems Pickups;
-					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemDamage));	
 					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
 					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				}
@@ -155,7 +155,7 @@ void cDispenserEntity::Dispense()
 				else
 				{
 					cItems Pickups;
-					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+					Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemDamage));	
 					m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
 					m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				}
@@ -172,7 +172,7 @@ void cDispenserEntity::Dispense()
 			default:
 			{
 				cItems Pickups;
-				Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemHealth));	
+				Pickups.push_back(cItem(Drop.m_ItemType, 1, Drop.m_ItemDamage));	
 				m_World->SpawnItemPickups(Pickups, Disp_X, Disp_Y, Disp_Z);
 				m_Items[OccupiedSlots[RandomSlot]].m_ItemCount--;
 				break;
@@ -280,9 +280,9 @@ bool cDispenserEntity::LoadFromFile(cFile & f)
 	for(unsigned int i = 0; i < NumSlots; i++)
 	{
 		cItem & Item = m_Items[i];
-		READ(f, Item.m_ItemID);
+		READ(f, Item.m_ItemType);
 		READ(f, Item.m_ItemCount);
-		READ(f, Item.m_ItemHealth);
+		READ(f, Item.m_ItemDamage);
 	}
 
 	return true;

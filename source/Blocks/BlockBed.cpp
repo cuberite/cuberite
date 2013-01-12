@@ -5,25 +5,18 @@
 
 
 
-void cBlockBedHandler::PlaceBlock(cWorld * a_World, cPlayer * a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+void cBlockBedHandler::OnPlacedByPlayer(
+	cWorld * a_World, cPlayer * a_Player,
+	int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+	int a_CursorX, int a_CursorY, int a_CursorZ,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+)
 {
-	if (a_Dir != 1) // Can only be placed on the floor
+	if (a_BlockMeta < 8)
 	{
-		return;
+		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
+		a_World->SetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
 	}
-
-	NIBBLETYPE Meta = RotationToMetaData( a_Player->GetRotation() );
-	Vector3i Direction = MetaDataToDirection( Meta );
-
-	if (a_World->GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) != E_BLOCK_AIR)
-	{
-		return;
-	}
-
-	a_World->SetBlock(a_BlockX,               a_BlockY, a_BlockZ,               E_BLOCK_BED, Meta);
-	a_World->SetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, Meta | 0x8);
-
-	OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
 }
 
 
@@ -58,13 +51,13 @@ void cBlockBedHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY,
 
 
 
-void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	if (Meta & 0x8)
 	{
 		// Is pillow	
-		a_World->BroadcastUseBed( *a_Player, a_BlockX, a_BlockY, a_BlockZ );
+		a_World->BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
 	}
 	else
 	{
@@ -72,9 +65,8 @@ void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, i
 		Vector3i Direction = MetaDataToDirection( Meta & 0x7 );
 		if (a_World->GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
 		{
-			a_World->BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z );
+			a_World->BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
 		}
-
 	}
 }
 

@@ -19,35 +19,35 @@ class cPlayer;
 
 
 
-class cInventory										//tolua_export	
-{														//tolua_export
+class cInventory										// tolua_export	
+{														// tolua_export
 public:
 	cInventory(cPlayer & a_Owner);
 	~cInventory();
 
-	void Clear();										//tolua_export
+	void Clear();										// tolua_export
 
 	cItem* GetSlotsForType( int a_Type );
 	int GetSlotCountForType( int a_Type );
 
-	bool AddItem( cItem & a_Item );						//tolua_export
-	bool AddItemAnyAmount( cItem & a_Item );			//tolua_export
-	bool RemoveItem( cItem & a_Item );					//tolua_export
+	bool AddItem( cItem & a_Item );						// tolua_export
+	bool AddItemAnyAmount( cItem & a_Item );			// tolua_export
+	bool RemoveItem( cItem & a_Item );					// tolua_export
 
 	void SaveToJson(Json::Value & a_Value);
 	bool LoadFromJson(Json::Value & a_Value);
 
 	void SendWholeInventory(cClientHandle & a_Client);
 
-	cItem *       GetSlot(int a_SlotNum );					//tolua_export
+	cItem *       GetSlot(int a_SlotNum );					// tolua_export
 	cItem *       GetSlots(void)       { return m_Slots; }
 	const cItem * GetSlots(void) const { return m_Slots; }
-	cItem *       GetFromHotBar(int a_HotBarSlotNum);				//tolua_export
+	cItem *       GetFromHotBar(int a_HotBarSlotNum);				// tolua_export
 
-	cItem &       GetEquippedItem(void);							//tolua_export
+	cItem &       GetEquippedItem(void);							// tolua_export
 	const cItem & GetEquippedItem(void) const;
-	void          SetEquippedSlot(int a_SlotNum);				//tolua_export
-	short         GetEquippedSlot(void) { return m_EquippedSlot; }	//tolua_export
+	void          SetEquippedSlot(int a_SlotNum);				// tolua_export
+	short         GetEquippedSlot(void) { return m_EquippedSlot; }	// tolua_export
 	
 	// tolua_begin
 	const cItem & GetEquippedHelmet    (void) const { return m_Slots[c_ArmorOffset]; }
@@ -56,7 +56,7 @@ public:
 	const cItem & GetEquippedBoots     (void) const { return m_Slots[c_ArmorOffset + 3]; }
 	// tolua_end
 
-	void SendSlot( int a_SlotNum );						//tolua_export
+	void SendSlot( int a_SlotNum );						// tolua_export
 	
 	/// Returns how many items of the specified type would fit into the slot range specified
 	int HowManyCanFit(short a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot);
@@ -89,7 +89,7 @@ protected:
 	short m_EquippedSlot;
 
 	cPlayer & m_Owner;
-};	//tolua_export
+};	// tolua_export
 
 
 

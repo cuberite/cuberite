@@ -11,31 +11,47 @@
 
 
 
-bool report_errors(lua_State* lua, int status)
+bool report_errors(lua_State * lua, int status)
 {
-	if ( status!=0 )
+	if (status == 0)
 	{
-		std::string s = lua_tostring(lua, -1);
-		LOGERROR("-- %s", s.c_str() );
-		lua_pop(lua, 1);
-		return true;
+		// No error to report
+		return false;
 	}
-	return false;
+	
+	LOGERROR("LUA: %s", lua_tostring(lua, -1));
+	lua_pop(lua, 1);
+	return true;
 }
+
+
+
 
 
 cLuaCommandBinder::cLuaCommandBinder()
 {
 }
 
+
+
+
+
 cLuaCommandBinder::~cLuaCommandBinder()
 {
 }
+
+
+
+
 
 void cLuaCommandBinder::ClearBindings()
 {
 	m_BoundCommands.clear();
 }
+
+
+
+
 
 void cLuaCommandBinder::RemoveBindingsForPlugin( cPlugin* a_Plugin )
 {
@@ -54,6 +70,10 @@ void cLuaCommandBinder::RemoveBindingsForPlugin( cPlugin* a_Plugin )
 	}
 }
 
+
+
+
+
 bool cLuaCommandBinder::BindCommand( const std::string & a_Command, const std::string & a_Permission, cPlugin* a_Plugin, lua_State * a_LuaState, int a_FunctionReference )
 {
 	if( !a_Plugin->CanBindCommands() )
@@ -70,6 +90,10 @@ bool cLuaCommandBinder::BindCommand( const std::string & a_Command, const std::s
 	m_BoundCommands[ a_Command ] = BoundFunction( a_Plugin, a_LuaState, a_FunctionReference, a_Permission );
 	return true;
 }
+
+
+
+
 
 bool cLuaCommandBinder::HandleCommand( const std::string & a_Command, cPlayer* a_Player )
 {
@@ -124,3 +148,7 @@ bool cLuaCommandBinder::HandleCommand( const std::string & a_Command, cPlayer* a
 	}
 	return false;
 }
+
+
+
+

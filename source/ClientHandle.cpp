@@ -89,8 +89,8 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance)
 	, m_LastStreamedChunkZ(0x7fffffff)
 	, m_ShouldCheckDownloaded(false)
 	, m_UniqueID(0)
-	, m_BlockDigAnim(-1)
-	, m_LastDigStatus(-1)
+	, m_BlockDigAnimStage(-1)
+	, m_HasStartedDigging(false)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -231,7 +231,7 @@ void cClientHandle::Authenticate(void)
 
 	m_Player->SetIP (m_IPString);
 
-	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_JOIN, 1, m_Player);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player);
 	
 	m_ConfirmPosition = m_Player->GetPosition();
 
@@ -260,7 +260,7 @@ void cClientHandle::Authenticate(void)
 	// Broadcast this player's spawning to all other players in the same chunk
 	m_Player->GetWorld()->BroadcastSpawn(*m_Player, this);
 
-	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 
 
@@ -501,111 +501,158 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 
 
-void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
+	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
+	);
+
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
+	{
+		// A plugin doesn't agree with the action, replace the block on the client and quit:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+	
 	if (!CheckBlockInteractionsRate())
 	{
+		// Too many interactions per second, simply ignore. Probably a hacked client, so don't even send bak the block
 		return;
 	}
 
-	LOGD("OnBlockDig: {%i, %i, %i}; Face: %i; Stat: %i LastStat: %i",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, m_LastDigStatus
-	);
-
-	// Do we want plugins to disable tossing items? Probably no, so toss item before asking plugins for permission
-	if (a_Status == DIG_STATUS_DROP_HELD)  // Drop held item
+	switch (a_Status)
 	{
-		m_Player->TossItem(false);
-		return;
-	}
-
-	if (a_Status == DIG_STATUS_SHOOT_EAT)
-	{
-		LOGINFO("BlockDig: Status SHOOT/EAT not implemented");
-		return;
-	}
-	
-	cWorld * World = m_Player->GetWorld();
-	BLOCKTYPE  OldBlock;
-	NIBBLETYPE OldMeta;
-	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
-
-	if (cRoot::Get()->GetPluginManager()->CallHookBlockDig(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, OldBlock, OldMeta))
-	{
-		// The plugin doesn't agree with the digging, replace the block on the client and quit:
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
-
-	bool bBroken = (
-		((a_Status == DIG_STATUS_FINISHED) &&
-		//Don't allow to finish digging if not started yet:
-		(m_LastDigStatus == 0) &&
-		(m_LastDigX == a_BlockX) &&
-		(m_LastDigY == a_BlockY) &&
-		(m_LastDigZ == a_BlockZ)) || 
-		(g_BlockOneHitDig[(int)OldBlock]) || 
-		((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() == 1))
-	);
-
-	m_LastDigStatus = a_Status;
-	m_LastDigX = a_BlockX;
-	m_LastDigY = a_BlockY;
-	m_LastDigZ = a_BlockZ;
-
-	if ((a_Status == DIG_STATUS_STARTED) && (m_Player->GetGameMode() != eGameMode_Creative))
-	{
-		// Start dig animation
-		// TODO: calculate real animation speed
-		m_BlockDigAnimSpeed = 10;
-		m_BlockDigX = a_BlockX;
-		m_BlockDigY = a_BlockY;
-		m_BlockDigZ = a_BlockZ;
-		m_BlockDigAnim = 0;
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigX, m_BlockDigY, m_BlockDigZ, 0, this);
-	}
-	else if (m_BlockDigAnim != -1)
-	{
-		// End dig animation
-		m_BlockDigAnim = -1;
-		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigX, m_BlockDigY, m_BlockDigZ, 10, this);
-	}
-
-	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
-	
-	if (bBroken)
-	{
-		if(World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_AIR)
+		case DIG_STATUS_DROP_HELD:  // Drop held item
 		{
-			ItemHandler->OnBlockDestroyed(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ);
-			
-			BlockHandler(OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-			World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, OldBlock, this);
-			World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
-		}
-	}
-	else
-	{
-		cBlockHandler * Handler = cBlockHandler::GetBlockHandler(OldBlock);
-		Handler->OnDigging(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-
-		ItemHandler->OnDiggingBlock(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-		// Check for clickthrough-blocks:
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			int pX = a_BlockX;
-			int pY = a_BlockY;
-			int pZ = a_BlockZ;
-			AddDirection(pX, pY, pZ, a_BlockFace);
-
-			Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
-			if (Handler->IsClickedThrough())
+			if (PlgMgr->CallHookPlayerTossingItem(*m_Player))
 			{
-				Handler->OnDigging(World, m_Player, pX, pY, pZ);
+				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
+				return;
 			}
+			m_Player->TossItem(false);
+			return;
+		}
+
+		case DIG_STATUS_SHOOT_EAT:
+		{
+			cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+			if (ItemHandler->IsFood())
+			{
+				if (PlgMgr->CallHookPlayerEating(*m_Player))
+				{
+					// A plugin doesn't agree with the action. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
+					return;
+				}
+			}
+			else
+			{
+				if (PlgMgr->CallHookPlayerShooting(*m_Player))
+				{
+					// A plugin doesn't agree with the action. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
+					return;
+				}
+			}
+			LOGINFO("%s: Status SHOOT / EAT not implemented", __FUNCTION__);
+			return;
+		}
+		
+		case DIG_STATUS_STARTED:
+		{
+			BLOCKTYPE  OldBlock;
+			NIBBLETYPE OldMeta;
+			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
+			HandleBlockDigStarted(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, OldBlock, OldMeta);
+			return;
+		}
+		
+		case DIG_STATUS_FINISHED:
+		{
+			BLOCKTYPE  OldBlock;
+			NIBBLETYPE OldMeta;
+			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
+			HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, OldBlock, OldMeta);
+			return;
+		}
+		
+		default:
+		{
+			ASSERT(!"Unhandled DIG_STATUS");
+			return;
+		}
+	}  // switch (a_Status)
+}
+
+
+
+
+
+void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
+{
+	if (
+		m_HasStartedDigging &&
+		(a_BlockX == m_LastDigBlockX) &&
+		(a_BlockY == m_LastDigBlockY) &&
+		(a_BlockZ == m_LastDigBlockZ)
+	)
+	{
+		// It is a duplicate packet, drop it right away
+		return;
+	}
+	
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	{
+		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+	
+	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
+	m_HasStartedDigging = true;
+	m_LastDigBlockX = a_BlockX;
+	m_LastDigBlockY = a_BlockY;
+	m_LastDigBlockZ = a_BlockZ;
+
+	// In creative mode, digging is done immediately
+	if (m_Player->GetGameMode() == eGameMode_Creative)
+	{
+		HandleBlockDigFinished(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+		return;
+	}
+
+	// Start dig animation
+	// TODO: calculate real animation speed
+	// TODO: Send animation packets even without receiving any other packets
+	m_BlockDigAnimSpeed = 10;
+	m_BlockDigAnimX = a_BlockX;
+	m_BlockDigAnimY = a_BlockY;
+	m_BlockDigAnimZ = a_BlockZ;
+	m_BlockDigAnimStage = 0;
+	m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 0, this);
+
+	cWorld * World = m_Player->GetWorld();
+	
+	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(a_OldBlock);
+	Handler->OnDigging(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	ItemHandler->OnDiggingBlock(World, m_Player, &m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+
+	// Check for clickthrough-blocks:
+	if (a_BlockFace != BLOCK_FACE_NONE)
+	{
+		int pX = a_BlockX;
+		int pY = a_BlockY;
+		int pZ = a_BlockZ;
+		AddFaceDirection(pX, pY, pZ, a_BlockFace);
+
+		Handler = cBlockHandler::GetBlockHandler(World->GetBlock(pX, pY, pZ));
+		
+		// 2013_01_05 _X: This looks weird
+		// Why do we ask the block "behind" the one being clicked if it is clicked through? Shouldn't we ask the primary block instead?
+		if (Handler->IsClickedThrough())
+		{
+			Handler->OnDigging(World, m_Player, pX, pY, pZ);
 		}
 	}
 }
@@ -614,11 +661,71 @@ void cClientHandle::HandleBlockDig(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 
 
-void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
+void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
-	LOGD("HandleBlockPlace: {%d, %d, %d}, face %d, HeldItem: %s",
+	if (
+		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
+		(m_LastDigBlockX != a_BlockX) ||  // DIG_STARTED has had different pos
+		(m_LastDigBlockY != a_BlockY) ||
+		(m_LastDigBlockZ != a_BlockZ)
+	)
+	{
+		LOGD("Prevented a dig/aim bug in the client (finish {%d, %d, %d} vs start {%d, %d, %d}, HSD: %s)",
+			a_BlockX, a_BlockY, a_BlockZ,
+			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
+			m_HasStartedDigging
+		);
+		return;
+	}
+
+	m_HasStartedDigging = false;
+	if (m_BlockDigAnimStage != -1)
+	{
+		// End dig animation
+		m_BlockDigAnimStage = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+	}
+
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+	
+	if (a_OldBlock == E_BLOCK_AIR)
+	{
+		LOGD("Digged air? wtf?");
+		return;
+	}
+	
+	cWorld * World = m_Player->GetWorld();
+	ItemHandler->OnBlockDestroyed(World, m_Player, &m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
+	
+	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, a_OldBlock, this);
+	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
+
+	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+}
+
+
+
+
+
+void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
+{
+	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
+	
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+	{
+		// A plugin doesn't agree with the action, replace the block on the client and quit:
+		if (a_BlockFace > -1)
+		{
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		}
+		return;
+	}
 	
 	if (!CheckBlockInteractionsRate())
 	{
@@ -640,7 +747,7 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		// Let's send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
 		if (a_BlockFace > -1)
 		{
-			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		}
 		return;
@@ -648,104 +755,133 @@ void cClientHandle::HandleBlockPlace(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	cWorld * World = m_Player->GetWorld();
 
-	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(World->GetBlock(a_BlockX, a_BlockY, a_BlockZ));
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(BlockType);
 	
-	// TODO: Wrap following if into another if which will call hook 'OnBlockUse' (or some nicer name)
 	if (Handler->IsUseable())
 	{
-		Handler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+		if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+		{
+			// A plugin doesn't agree with using the block, abort
+			return;
+		}
+		Handler->OnUse(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+		return;
+	}
+	
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
+	
+	if (ItemHandler->IsPlaceable())
+	{
+		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
+	}
+	else if (ItemHandler->IsFood())
+	{
+		cItem Item;
+		Item.m_ItemType = Equipped.m_ItemType;
+		Item.m_ItemCount = 1;
+		if (ItemHandler->EatItem(m_Player, &Item))
+		{
+			ItemHandler->OnFoodEaten(World, m_Player, &Item);
+			m_Player->GetInventory().RemoveItem(Item);
+			return;
+		}
 	}
 	else
 	{
-		cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemID);
-		
-		if (ItemHandler->OnItemUse(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+		if (PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
-			// Nothing here :P
+			// A plugin doesn't agree with using the item, abort
+			return;
 		}
-		else if (ItemHandler->IsPlaceable())
+		ItemHandler->OnItemUse(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler)
+{
+	if (a_BlockFace < 0)
+	{
+		// Clicked in air
+		return;
+	}
+	
+	cWorld * World = m_Player->GetWorld();
+	
+	// Check if the block ignores build collision (water, grass etc.):
+	BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
+	if (Handler->DoesIgnoreBuildCollision())
+	{
+		Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+		// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+	}
+	else
+	{
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		// Check for Blocks not allowing placement on top
+		if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
 		{
-			if (cRoot::Get()->GetPluginManager()->CallHookBlockPlace(m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, Equipped))
-			{
-				if (a_BlockFace > -1)
-				{
-					AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-					m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-				}
-				return;
-			}
-
-			if (a_BlockFace < 0)
-			{
-				// clicked in air
-				return;
-			}
-
-			BLOCKTYPE ClickedBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-			cBlockHandler *Handler = cBlockHandler::GetBlockHandler(ClickedBlock);
-
-			if (Handler->DoesIgnoreBuildCollision())
-			{
-				Handler->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-				// World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-			}
-			else
-			{
-				AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				// Check for Blocks not allowing placement on top
-				if ((a_BlockFace == BLOCK_FACE_TOP) && !Handler->DoesAllowBlockOnTop())
-				{
-					// Resend the old block
-					// Some times the client still places the block O.o
-
-					World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-					return;
-				}
-
-
-				BLOCKTYPE PlaceBlock = m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-				if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
-				{
-					// Tried to place a block *into* another?
-					return;  // Happens when you place a block aiming at side of block like torch or stem
-				}
-			}
-			
-			cBlockHandler * NewBlock = BlockHandler(ItemHandler->GetBlockType());
-
-			// Cannot be placed on the side of an other block
-			if ((a_BlockFace != BLOCK_FACE_TOP) && !NewBlock->CanBePlacedOnSide())
-			{
-				return;
-			}
-
-			if (NewBlock->CanBePlacedAt(World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
-			{
-				ItemHandler->PlaceBlock(World, m_Player, &m_Player->GetInventory().GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				// Step sound with 0.8f pitch is used as block placement sound
-				World->BroadcastSoundEffect(NewBlock->GetStepSound(),a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
-			}
-			else
-			{
-				LOGD("Block refused placement here, aborting");
-				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);  // Send the old block back to the player
-				return;
-			}
-			
+			// Resend the old block
+			// Some times the client still places the block O.o
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			return;
 		}
-		else if (ItemHandler->IsFood())
+
+
+		BLOCKTYPE PlaceBlock = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if (!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision())
 		{
-			cItem Item;
-			Item.m_ItemID = Equipped.m_ItemID;
-			Item.m_ItemCount = 1;
-			if (ItemHandler->EatItem(m_Player, &Item))
-			{
-				ItemHandler->OnFoodEaten(World, m_Player, &Item);
-				m_Player->GetInventory().RemoveItem(Item);
-				return;
-			}
+			// Tried to place a block *into* another?
+			return;  // Happens when you place a block aiming at side of block like torch or stem
 		}
 	}
+
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	if (!a_ItemHandler.GetPlacementBlockTypeMeta(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+	{
+		// Handler refused the placement, send that information back to the client:
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		return;
+	}
+	
+	cBlockHandler * NewBlock = BlockHandler(BlockType);
+
+	if ((a_BlockFace != BLOCK_FACE_TOP) && !NewBlock->CanBePlacedOnSide())
+	{
+		// Cannot be placed on the side of an other block
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerPlacingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+	{
+		// A plugin doesn't agree with placing the block, revert the block on the client:
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+	
+	// The actual block placement:
+	World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+	if (m_Player->GetGameMode() == eGameMode_Survival)
+	{
+		cItem Item(m_Player->GetEquippedItem().m_ItemType, 1);
+		m_Player->GetInventory().RemoveItem(Item);
+	}
+	NewBlock->OnPlacedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+	
+	// Step sound with 0.8f pitch is used as block placement sound
+	World->BroadcastSoundEffect(NewBlock->GetStepSound(),a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.8f);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 
 
@@ -951,7 +1087,7 @@ void cClientHandle::HandleRespawn(void)
 		return;
 	}
 	m_Player->Respawn();
-	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWN, 1, m_Player);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
 
 
@@ -1129,17 +1265,17 @@ void cClientHandle::Tick(float a_Dt)
 	}
 
 	// Handle block break animation:
-	if ((m_Player != NULL) && (m_BlockDigAnim > -1))
+	if ((m_Player != NULL) && (m_BlockDigAnimStage > -1))
 	{
-		int lastAnimVal = m_BlockDigAnim;
-		m_BlockDigAnim += (int)(m_BlockDigAnimSpeed * a_Dt);
-		if (m_BlockDigAnim > 9000)
+		int lastAnimVal = m_BlockDigAnimStage;
+		m_BlockDigAnimStage += (int)(m_BlockDigAnimSpeed * a_Dt);
+		if (m_BlockDigAnimStage > 9000)
 		{
-			m_BlockDigAnim = 9000;
+			m_BlockDigAnimStage = 9000;
 		}
-		if (m_BlockDigAnim / 1000 != lastAnimVal / 1000)
+		if (m_BlockDigAnimStage / 1000 != lastAnimVal / 1000)
 		{
-			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigX, m_BlockDigY, m_BlockDigZ, (char)(m_BlockDigAnim / 1000), this);
+			m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, (char)(m_BlockDigAnimStage / 1000), this);
 		}
 	}
 }
@@ -1626,7 +1762,7 @@ void cClientHandle::SendConfirmPosition(void)
 	
 	m_State = csConfirmingPos;
 
-	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_JOIN, 1, m_Player))
+	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
 		// Broadcast that this player has joined the game! Yay~
 		cRoot::Get()->GetServer()->BroadcastChat(m_Username + " joined the game!", this);

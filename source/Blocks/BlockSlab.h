@@ -24,24 +24,41 @@ public:
 	}
 
 
-	virtual void PlaceBlock(cWorld *a_World, cPlayer *a_Player, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, 
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	) override
 	{
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_BlockType, DirectionToMetaData( a_Dir, a_BlockMeta ));
-		OnPlacedByPlayer(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
-	}
-	
-	
-	static char DirectionToMetaData( char a_Direction, NIBBLETYPE Meta )
-	{
-		char result = Meta;
-		if( a_Direction == 0)
+		a_BlockType = m_BlockType;
+		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x07);
+		switch (a_BlockFace)
 		{
-		  result |= 0x8;
-		}
-		return result;
+			case BLOCK_FACE_TOP:    a_BlockMeta = Meta & 0x7; break;  // Always bottom half of the slab when placing on top    of something
+			case BLOCK_FACE_BOTTOM: a_BlockMeta = Meta | 0x8; break;  // Always top    half of the slab when placing on bottom of something
+			case BLOCK_FACE_EAST:
+			case BLOCK_FACE_NORTH:
+			case BLOCK_FACE_SOUTH:
+			case BLOCK_FACE_WEST:
+			{
+				if (a_CursorY > 7)
+				{
+					// Cursor at the top half of the face, place a top half of slab
+					a_BlockMeta = Meta | 0x8;
+				}
+				else
+				{
+					// Cursor at the bottom half of the face, place a bottom half of slab:
+					a_BlockMeta = Meta & 0x7;
+				}
+				break;
+			}
+		}  // switch (a_BlockFace)
+		return true;
 	}
-
-
+	
+	
 	virtual const char * GetStepSound(void) override
 	{		
 		return ((m_BlockType == E_BLOCK_WOODEN_SLAB) || (m_BlockType == E_BLOCK_DOUBLE_WOODEN_SLAB)) ?  "step.wood" : "step.stone";

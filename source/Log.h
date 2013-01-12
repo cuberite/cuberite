@@ -16,14 +16,14 @@ public:
 	~cLog();
 	void Log(const char* a_Format, va_list argList );
 	void Log(const char* a_Format, ...);
-	//tolua_begin
+	// tolua_begin
 	void SimpleLog(const char* a_String);
 	void OpenLog( const char* a_FileName );
 	void CloseLog();
 	void ClearLog();
 	static cLog* GetInstance();
 };
-//tolua_end
+// tolua_end
 
 
 

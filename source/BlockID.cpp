@@ -255,7 +255,7 @@ AString ItemTypeToString(short a_ItemType)
 AString ItemToFullString(const cItem & a_Item)
 {
 	AString res;
-	Printf(res, "%s:%d * %d", ItemToString(a_Item).c_str(), a_Item.m_ItemHealth, a_Item.m_ItemCount);
+	Printf(res, "%s:%d * %d", ItemToString(a_Item).c_str(), a_Item.m_ItemDamage, a_Item.m_ItemCount);
 	return res;
 }
 

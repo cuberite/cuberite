@@ -37,13 +37,13 @@ public:
 	
 	
 	
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_Dir < 0)
+		if (a_BlockFace < 0)
 		{
 			return false;
 		}
-		AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		BLOCKTYPE ClickedBlock;
 		NIBBLETYPE ClickedMeta;
 		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedMeta);
@@ -100,9 +100,9 @@ public:
 	}
 
 
-	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir, BLOCKTYPE a_FluidBlock)
+	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_FluidBlock)
 	{			
-		if (a_Dir < 0)
+		if (a_BlockFace < 0)
 		{
 			return false;
 		}
@@ -112,7 +112,7 @@ public:
 		if (!CanWashAway)
 		{
 			// The block pointed at cannot be washed away, so put fluid on top of it / on its sides
-			AddDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir);
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			CurrentBlock = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		}
 		if (

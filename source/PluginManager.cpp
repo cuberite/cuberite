@@ -199,7 +199,7 @@ void cPluginManager::Tick(float a_Dt)
 		ReloadPluginsNow();
 	}
 
-	HookMap::iterator Plugins = m_Hooks.find( E_PLUGIN_TICK );
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_TICK);
 	if( Plugins != m_Hooks.end() )
 	{
 		for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
@@ -213,133 +213,33 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
-bool cPluginManager::CallHook(PluginHook a_Hook, unsigned int a_NumArgs, ...)
+/*
+bool cPluginManager::CallHookBlockToPickup(
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
+	const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups
+)
 {
-	HookMap::iterator Plugins = m_Hooks.find( a_Hook );
-
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	
-	switch( a_Hook )
-	{
-		case HOOK_PLAYER_JOIN:
-		{
-			if( a_NumArgs != 1 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPlayer* Player = va_arg(argptr, cPlayer* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnPlayerJoin( Player ) )
-					return true;
-			}
-			break;
-		}
-
-		case HOOK_PLAYER_MOVE:
-		{
-			if( a_NumArgs != 1 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPlayer* Player = va_arg(argptr, cPlayer* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				(*itr)->OnPlayerMove( Player );
-			}
-			break;
-		}
-
-		case HOOK_KILLED:
-		{
-			if( a_NumArgs != 2 ) break;
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPawn* Killed = va_arg(argptr, cPawn* );
-			cEntity* Killer = va_arg(argptr, cEntity* );
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				if( (*itr)->OnKilled( Killed, Killer ) )
-					return true;
-			}
-			break;
-		}
-		
-		case HOOK_CHUNK_GENERATED:
-		{
-			if (a_NumArgs != 3)
-			{
-				break;
-			}
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cWorld * World = va_arg(argptr, cWorld *);
-			int ChunkX = va_arg(argptr, int);
-			int ChunkZ = va_arg(argptr, int);
-			va_end (argptr);
-			for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
-			{
-				(*itr)->OnChunkGenerated(World, ChunkX, ChunkZ);
-			}
-			break;
-		}
-		
-		case HOOK_PLAYER_SPAWN:
-		{
-			if (a_NumArgs != 1)
-			{
-				break;
-			}
-			va_list argptr;
-			va_start( argptr, a_NumArgs);
-			cPlayer * Player = va_arg(argptr, cPlayer *);
-			va_end (argptr);
-			for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-			{
-				(*itr)->OnPlayerSpawn(Player);
-			}
-			break;
-		}
-
-		default:
-		{
-			LOGWARNING("cPluginManager: Calling Unknown hook: %i", a_Hook );
-			ASSERT(!"Calling an unknown hook");
-			break;
-		}
-	}  // switch (a_Hook)
-	return false;
-}
-
-
-
-
-
-bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_LOGIN);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnLogin(a_Client, a_ProtocolVersion, a_Username))
+		if ((*itr)->OnBlockToPickup(a_BlockType, a_BlockMeta, a_Player, a_EquippedItem, a_Pickups))
 		{
 			return true;
 		}
 	}
 	return false;
 }
+*/
 
 
 
 
 
+/*
 bool cPluginManager::CallHookBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_DIG);
@@ -356,11 +256,13 @@ bool cPluginManager::CallHookBlockDig(cPlayer * a_Player, int a_BlockX, int a_Bl
 	}
 	return false;
 }
+*/
 
 
 
 
 
+/*
 bool cPluginManager::CallHookBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_PLACE);
@@ -377,6 +279,7 @@ bool cPluginManager::CallHookBlockPlace(cPlayer * a_Player, int a_BlockX, int a_
 	}
 	return false;
 }
+*/
 
 
 
@@ -396,7 +299,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, const AString & a_Message)
 		return true;
 	}
 
-	//Check if it was a standard command (starts with a slash)
+	// Check if it was a standard command (starts with a slash)
 	if (a_Message[0] == '/')
 	{
 		a_Player->SendMessage("Unknown Command");
@@ -418,6 +321,27 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, const AString & a_Message)
 		}
 	}
 	
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ))
+		{
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -509,6 +433,405 @@ bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Re
 
 
 
+bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const AString & a_Username)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_HANDSHAKE);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnHandshake(a_ClientHandle, a_Username))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookKilled(cPawn & a_Victim, cEntity * a_Killer)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_KILLED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnKilled(a_Victim, a_Killer))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_LOGIN);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnLogin(a_Client, a_ProtocolVersion, a_Username))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_BREAKING_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_BROKEN_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_EATING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerEating(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_JOINED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerJoined(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_LEFT_CLICK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerMoved(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_MOVED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerMoved(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_PLACED_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerPlacedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_PLACING_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_RIGHTCLICK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerShooting(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_SHOOTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerShooting(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerSpawned(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_SPAWNED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerSpawned(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_TOSSING_ITEM);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerTossingItem(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USED_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerUsedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USED_ITEM);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerUsedItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USING_BLOCK);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerUsingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USING_ITEM);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerUsingItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
@@ -572,51 +895,6 @@ bool cPluginManager::CallHookTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_T
 
 
 
-bool cPluginManager::CallHookBlockToPickup(
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
-	const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups
-)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnBlockToPickup(a_BlockType, a_BlockMeta, a_Player, a_EquippedItem, a_Pickups))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-
-bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnWeatherChanged(a_World))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-
-
-
-
 bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATING_SIGN);
@@ -659,16 +937,16 @@ bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_B
 
 
 
-bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const AString & a_Username)
+bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_HANDSHAKE);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGED);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnHandshake(a_ClientHandle, a_Username))
+		if ((*itr)->OnWeatherChanged(a_World))
 		{
 			return true;
 		}
@@ -744,7 +1022,7 @@ bool cPluginManager::DisablePlugin( AString & a_PluginName )
 bool cPluginManager::LoadPlugin( AString & a_PluginName )
 {
 	cPlugin_NewLua* Plugin = new cPlugin_NewLua( a_PluginName.c_str() );
-	if( !AddPlugin( Plugin ) )
+	if (!AddPlugin(Plugin))
 	{
 		delete Plugin;
 		return false;
@@ -756,24 +1034,12 @@ bool cPluginManager::LoadPlugin( AString & a_PluginName )
 
 
 
-void cPluginManager::RemoveHooks( cPlugin* a_Plugin )
+void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
 {
-	m_Hooks[ E_PLUGIN_TICK].remove             ( a_Plugin );
-	m_Hooks[ E_PLUGIN_CHAT].remove             ( a_Plugin );
-	m_Hooks[ E_PLUGIN_COLLECT_ITEM].remove     ( a_Plugin );
-	m_Hooks[ E_PLUGIN_BLOCK_DIG].remove        ( a_Plugin );
-	m_Hooks[ E_PLUGIN_BLOCK_PLACE].remove      ( a_Plugin );
-	m_Hooks[ E_PLUGIN_DISCONNECT].remove       ( a_Plugin );
-	m_Hooks[ E_PLUGIN_HANDSHAKE].remove        ( a_Plugin );
-	m_Hooks[ E_PLUGIN_LOGIN].remove            ( a_Plugin );
-	m_Hooks[ E_PLUGIN_PLAYER_SPAWN].remove     ( a_Plugin );
-	m_Hooks[ E_PLUGIN_PLAYER_JOIN].remove      ( a_Plugin );
-	m_Hooks[ E_PLUGIN_PLAYER_MOVE].remove      ( a_Plugin );
-	m_Hooks[ E_PLUGIN_TAKE_DAMAGE].remove      ( a_Plugin );
-	m_Hooks[ E_PLUGIN_KILLED].remove           ( a_Plugin );
-	m_Hooks[ E_PLUGIN_CHUNK_GENERATED ].remove ( a_Plugin );
-	m_Hooks[ E_PLUGIN_CHUNK_GENERATING ].remove( a_Plugin );
-	m_Hooks[ E_PLUGIN_BLOCK_TO_DROPS ].remove  ( a_Plugin );
+	for (HookMap::iterator itr = m_Hooks.begin(), end = m_Hooks.end(); itr != end; ++itr)
+	{
+		itr->second.remove(a_Plugin);
+	}
 }
 
 
@@ -828,16 +1094,20 @@ bool cPluginManager::AddPlugin( cPlugin* a_Plugin )
 
 
 
-void cPluginManager::AddHook( cPlugin* a_Plugin, PluginHook a_Hook )
+void cPluginManager::AddHook(cPlugin * a_Plugin, PluginHook a_Hook)
 {
-	if( !a_Plugin )
+	if (!a_Plugin)
 	{
-		LOGWARN("Called cPluginManager::AddHook while a_Plugin is NULL");
+		LOGWARN("Called cPluginManager::AddHook() with a_Plugin == NULL");
 		return;
 	}
-	PluginList & Plugins = m_Hooks[ a_Hook ];
-	Plugins.remove( a_Plugin );
-	Plugins.push_back( a_Plugin );
+	if (!a_Plugin->CanAddHook(a_Hook))
+	{
+		return;
+	}
+	PluginList & Plugins = m_Hooks[a_Hook];
+	Plugins.remove(a_Plugin);
+	Plugins.push_back(a_Plugin);
 }
 
 
@@ -862,3 +1132,7 @@ bool cPluginManager::HasPlugin( cPlugin* a_Plugin ) const
 	}
 	return false;
 }
+
+
+
+

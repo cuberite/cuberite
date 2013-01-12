@@ -148,10 +148,10 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 			continue;
 		}
 		int ThisIdx = x + m_Width * y;
-		if (a_Grid.m_Items[ThatIdx].m_ItemID != m_Items[ThisIdx].m_ItemID)
+		if (a_Grid.m_Items[ThatIdx].m_ItemType != m_Items[ThisIdx].m_ItemType)
 		{
 			LOGWARNING("Consuming incompatible grids: item at (%d, %d) is %d in grid and %d in ingredients. Item not consumed.",
-				x, y, m_Items[ThisIdx].m_ItemID, a_Grid.m_Items[ThatIdx].m_ItemID
+				x, y, m_Items[ThisIdx].m_ItemType, a_Grid.m_Items[ThatIdx].m_ItemType
 			);
 			continue;
 		}
@@ -159,7 +159,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 		if (NumWantedItems > m_Items[ThisIdx].m_ItemCount)
 		{
 			LOGWARNING("Consuming more items than there actually are in slot (%d, %d), item %d (want %d, have %d). Item zeroed out.",
-				x, y, m_Items[ThisIdx].m_ItemID,
+				x, y, m_Items[ThisIdx].m_ItemType,
 				NumWantedItems, m_Items[ThisIdx].m_ItemCount
 			);
 			NumWantedItems = m_Items[ThisIdx].m_ItemCount;
@@ -194,7 +194,7 @@ void cCraftingGrid::Dump(void)
 	{
 		int idx = x + m_Width * y;
 		LOGD("Slot (%d, %d): Type %d, health %d, count %d", 
-			x, y, m_Items[idx].m_ItemID, m_Items[idx].m_ItemHealth, m_Items[idx].m_ItemCount
+			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
 		);
 	}
 }
@@ -248,7 +248,7 @@ void cCraftingRecipe::Dump(void)
 	LOGD("Recipe ingredients:");
 	m_Ingredients.Dump();
 	LOGD("Result: Type %d, health %d, count %d", 
-		m_Result.m_ItemID, m_Result.m_ItemHealth, m_Result.m_ItemCount
+		m_Result.m_ItemType, m_Result.m_ItemDamage, m_Result.m_ItemCount
 	);
 }
 
@@ -438,8 +438,8 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
-		a_Item.m_ItemHealth = atoi(Damage.c_str());
-		if ((a_Item.m_ItemHealth == 0) && (Damage.compare("0") != 0))
+		a_Item.m_ItemDamage = atoi(Damage.c_str());
+		if ((a_Item.m_ItemDamage == 0) && (Damage.compare("0") != 0))
 		{
 			// Parsing the number failed
 			return false;
@@ -662,11 +662,11 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		if (
 			(itrS->x >= a_GridWidth) || 
 			(itrS->y >= a_GridHeight) ||
-			(itrS->m_Item.m_ItemID != a_CraftingGrid[GridID].m_ItemID) ||       // same item type?
+			(itrS->m_Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
 			(itrS->m_Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
 			(
-				(itrS->m_Item.m_ItemHealth > 0) &&  // should compare damage values?
-				(itrS->m_Item.m_ItemHealth != a_CraftingGrid[GridID].m_ItemHealth)
+				(itrS->m_Item.m_ItemDamage > 0) &&  // should compare damage values?
+				(itrS->m_Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
 			)
 		)
 		{
@@ -711,10 +711,10 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 				}
 				int GridIdx = x + a_GridStride * y;
 				if (
-					(a_CraftingGrid[GridIdx].m_ItemID == itrS->m_Item.m_ItemID) &&
+					(a_CraftingGrid[GridIdx].m_ItemType == itrS->m_Item.m_ItemType) &&
 					(
-						(itrS->m_Item.m_ItemHealth < 0) ||  // doesn't want damage comparison
-						(itrS->m_Item.m_ItemHealth == a_CraftingGrid[GridIdx].m_ItemHealth)  // the damage matches
+						(itrS->m_Item.m_ItemDamage < 0) ||  // doesn't want damage comparison
+						(itrS->m_Item.m_ItemDamage == a_CraftingGrid[GridIdx].m_ItemDamage)  // the damage matches
 					)
 				)
 				{

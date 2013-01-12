@@ -29,11 +29,9 @@ typedef std::list<cClientHandle *> cClientHandleList;
 
 
 
-class cServer										//tolua_export
-{													//tolua_export
-public:												//tolua_export
-	static cServer * GetServer();					//tolua_export
-
+class cServer										// tolua_export
+{													// tolua_export
+public:												// tolua_export
 	bool InitServer(cIniFile & a_SettingsIni);
 
 	int GetPort() { return m_iServerPort; }
@@ -47,7 +45,7 @@ public:												//tolua_export
 	void StartListenThread();
 
 	bool Command(cClientHandle & a_Client, const AString & a_Cmd);
-	void ServerCommand(const AString & a_Cmd);								//tolua_export
+	void ServerCommand(const AString & a_Cmd);								// tolua_export
 	void Shutdown();
 
 	void SendMessage(const AString & a_Message, cPlayer * a_Player = NULL, bool a_bExclude = false );  // tolua_export
@@ -129,7 +127,7 @@ private:
 
 	/// Loads, or generates, if missing, RSA keys for protocol encryption
 	void PrepareKeys(void);
-}; //tolua_export
+}; // tolua_export
 
 
 

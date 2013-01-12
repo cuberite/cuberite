@@ -12,9 +12,11 @@
 
 cWebPlugin::cWebPlugin()
 {
-	LOG("cWebPlugin::cWebPlugin()");
-	cWebAdmin* WebAdmin = cRoot::Get()->GetWebAdmin();
-	if( WebAdmin ) WebAdmin->AddPlugin( this );
+	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
+	if (WebAdmin != NULL)
+	{
+		WebAdmin->AddPlugin(this);
+	}
 }
 
 
@@ -23,11 +25,13 @@ cWebPlugin::cWebPlugin()
 
 cWebPlugin::~cWebPlugin()
 {
-	LOG("~cWebPlugin::cWebPlugin()");
-	cWebAdmin* WebAdmin = cRoot::Get()->GetWebAdmin();
-	if( WebAdmin ) WebAdmin->RemovePlugin( this );
+	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
+	if (WebAdmin != NULL)
+	{
+		WebAdmin->RemovePlugin(this);
+	}
 
-	for( TabList::iterator itr = m_Tabs.begin(); itr != m_Tabs.end(); ++itr )
+	for (TabList::iterator itr = m_Tabs.begin(); itr != m_Tabs.end(); ++itr)
 	{
 		delete *itr;
 	}
@@ -38,7 +42,7 @@ cWebPlugin::~cWebPlugin()
 
 
 
-std::list< std::pair<AString, AString> > cWebPlugin::GetTabNames()
+std::list<std::pair<AString, AString> > cWebPlugin::GetTabNames(void)
 {
 	std::list< std::pair< AString, AString > > NameList;
 	for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
@@ -55,7 +59,7 @@ std::list< std::pair<AString, AString> > cWebPlugin::GetTabNames()
 
 
 
-std::pair< AString, AString > cWebPlugin::GetTabNameForRequest( HTTPRequest* a_Request )
+std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(HTTPRequest * a_Request)
 {
 	std::pair< AString, AString > Names;
 	AStringVector Split = StringSplit(a_Request->Path, "/");

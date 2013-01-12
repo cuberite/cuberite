@@ -27,22 +27,22 @@ typedef cItemCallback<cWorld>  cWorldListCallback;
 
 
 
-class cRoot	//tolua_export
-{			//tolua_export
+class cRoot	// tolua_export
+{			// tolua_export
 public:
 	/// The version of the protocol that is primary for the server (reported in the server list). All versions are still supported.
 	int m_PrimaryServerVersion;  // tolua_export
 	
-	static cRoot* Get() { return s_Root; }							//tolua_export
+	static cRoot* Get() { return s_Root; }							// tolua_export
 
 	cRoot(void);
 	~cRoot();
 
 	void Start(void);
 
-	cServer * GetServer(void) { return m_Server; }						//tolua_export
-	cWorld *  GetDefaultWorld(void);										//tolua_export
-	cWorld *  GetWorld(const AString & a_WorldName);				//tolua_export
+	cServer * GetServer(void) { return m_Server; }						// tolua_export
+	cWorld *  GetDefaultWorld(void);										// tolua_export
+	cWorld *  GetWorld(const AString & a_WorldName);				// tolua_export
 	
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
@@ -62,7 +62,7 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 
-	void ServerCommand(const AString & a_Cmd);						//tolua_export
+	void ServerCommand(const AString & a_Cmd);						// tolua_export
 	
 	void KickUser(int a_ClientID, const AString & a_Reason);  // Kicks the user, no matter in what world they are. Used from cAuthenticator
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
@@ -119,7 +119,7 @@ private:
 	static void InputThread(void* a_Params);
 
 	static cRoot*	s_Root;
-};	//tolua_export
+};	// tolua_export
 
 
 

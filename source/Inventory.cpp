@@ -77,7 +77,7 @@ bool cInventory::AddItem( cItem & a_Item )
 	{
 		if (ChangedSlots[i])
 		{
-			LOGD("cInventory::AddItem(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemID, m_Slots[i].m_ItemCount);
+			LOGD("cInventory::AddItem(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemType, m_Slots[i].m_ItemCount);
 			SendSlot(i);
 		}
 	}
@@ -107,7 +107,7 @@ bool cInventory::AddItemAnyAmount( cItem & a_Item )
 	{
 		if (ChangedSlots[i])
 		{
-			LOGD("cInventory::AddItemAnyAmount(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemID, m_Slots[i].m_ItemCount);
+			LOGD("cInventory::AddItemAnyAmount(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemType, m_Slots[i].m_ItemCount);
 			SendSlot(i);
 		}
 	}
@@ -125,7 +125,7 @@ bool cInventory::RemoveItem( cItem & a_Item )
 	// First check equipped slot
 	if ((m_EquippedSlot >= 0) && (m_EquippedSlot < 9))
 	{
-		if (m_HotSlots[m_EquippedSlot].m_ItemID == a_Item.m_ItemID)
+		if (m_HotSlots[m_EquippedSlot].m_ItemType == a_Item.m_ItemType)
 		{
 			cItem & Item = m_HotSlots[m_EquippedSlot];
 			if(Item.m_ItemCount > a_Item.m_ItemCount)
@@ -149,7 +149,7 @@ bool cInventory::RemoveItem( cItem & a_Item )
 		for(int i = 0; i < 36; i++)
 		{
 			cItem & Item = m_MainSlots[i];
-			if( Item.m_ItemID == a_Item.m_ItemID )
+			if( Item.m_ItemType == a_Item.m_ItemType )
 			{
 				if(Item.m_ItemCount > a_Item.m_ItemCount)
 				{
@@ -323,7 +323,7 @@ int cInventory::HowManyCanFit(short a_ItemType, short a_ItemDamage, int a_BeginS
 	{
 		if (
 			m_Slots[i].IsEmpty() ||
-			((m_Slots[i].m_ItemID == a_ItemType) && (m_Slots[i].m_ItemHealth == a_ItemDamage))
+			((m_Slots[i].m_ItemType == a_ItemType) && (m_Slots[i].m_ItemDamage == a_ItemDamage))
 		)
 		{
 			int MaxCount = ItemHandler(a_ItemType)->GetMaxStackSize();
@@ -345,15 +345,15 @@ int cInventory::MoveItem(short a_ItemType, short a_ItemDamage, int a_Count, int 
 	{
 		if (
 			m_Slots[i].IsEmpty() ||
-			((m_Slots[i].m_ItemID == a_ItemType) && (m_Slots[i].m_ItemHealth == a_ItemDamage))
+			((m_Slots[i].m_ItemType == a_ItemType) && (m_Slots[i].m_ItemDamage == a_ItemDamage))
 		)
 		{
 			int MaxCount = ItemHandler(a_ItemType)->GetMaxStackSize();
 			ASSERT(m_Slots[i].m_ItemCount <= MaxCount);
 			int NumToMove = std::min(a_Count, MaxCount - m_Slots[i].m_ItemCount);
 			m_Slots[i].m_ItemCount += NumToMove;
-			m_Slots[i].m_ItemHealth = a_ItemDamage;
-			m_Slots[i].m_ItemID = a_ItemType;
+			m_Slots[i].m_ItemDamage = a_ItemDamage;
+			m_Slots[i].m_ItemType = a_ItemType;
 			SendSlot(i);
 			res += NumToMove;
 			a_Count -= NumToMove;
@@ -380,7 +380,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 		int MaxStackSize = cItemHandler::GetItemHandler(a_Item.m_ItemType)->GetMaxStackSize();
 		for(int i = 0; i < a_Size; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemHealth == a_Item.m_ItemHealth )
+			if( m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemDamage == a_Item.m_ItemDamage )
 			{
 				int NumFree = MaxStackSize - m_Slots[i + a_Offset].m_ItemCount;
 				if( NumFree >= a_Item.m_ItemCount )

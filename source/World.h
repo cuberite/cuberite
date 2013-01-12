@@ -55,11 +55,9 @@ typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
 
 
 
-class cWorld													//tolua_export
-{																//tolua_export
+class cWorld													// tolua_export
+{																// tolua_export
 public:
-
-	OBSOLETE static cWorld * GetWorld();
 
 	// tolua_begin
 	
@@ -70,11 +68,6 @@ public:
 		return 0;
 	}
 	
-	long long GetWorldTime(void) const  // OBSOLETE, use GetWorldAge() instead!
-	{
-		LOGWARNING("cWorld:GetWorldTime() is obsolete, use GetWorldAge() or GetTimeOfDay() instead");
-		return m_WorldAge;
-	}
 	Int64 GetWorldAge(void)  const { return m_WorldAge; }
 	Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
 	
@@ -174,8 +167,8 @@ public:
 	const AString & GetDescription(void) const {return m_Description; }	// FIXME: This should not be in cWorld
 
 	// Max Players
-	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					//tolua_export
-	void SetMaxPlayers(int iMax);													//tolua_export
+	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					// tolua_export
+	void SetMaxPlayers(int iMax);													// tolua_export
 
 	void AddPlayer( cPlayer* a_Player );
 	void RemovePlayer( cPlayer* a_Player );
@@ -189,7 +182,7 @@ public:
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 	
-	unsigned int GetNumPlayers();													//tolua_export
+	unsigned int GetNumPlayers();													// tolua_export
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3f & a_Pos, float a_SightLimit);
@@ -244,16 +237,16 @@ public:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
 	/// Updates the sign, askin gplugins for permission forst. a_Player is the player who changed the sign, may be NULL
-	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);	//tolua_export
+	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);	// tolua_export
 
 	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable. To be used only by cChunkStay!
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);
 	
 	/// Regenerate the given chunk:
-	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													//tolua_export
+	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
 	
 	/// Generates the given chunk, if not already generated
-	void GenerateChunk(int a_ChunkX, int a_ChunkZ);													//tolua_export
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
 	
 	/// Queues a chunk for lighting; a_Callback is called after the chunk is lighted
 	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = NULL);
@@ -359,7 +352,7 @@ public:
 	
 	int  GetBiomeAt (int a_BlockX, int a_BlockZ);   // tolua_export
 
-	const AString & GetName(void) const { return m_WorldName; }									//tolua_export
+	const AString & GetName(void) const { return m_WorldName; }									// tolua_export
 	const AString & GetIniFileName(void) const {return m_IniFileName; }
 
 	inline static void AbsoluteToRelative( int & a_X, int & a_Y, int & a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
@@ -389,10 +382,10 @@ public:
 		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
 	}
 
-	void SaveAllChunks(void);			//tolua_export
+	void SaveAllChunks(void);			// tolua_export
 
 	/// Returns the number of chunks loaded	
-	int GetNumChunks() const;		//tolua_export
+	int GetNumChunks() const;		// tolua_export
 
 	/// Returns the number of chunks loaded and dirty, and in the lighting queue
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
@@ -421,10 +414,10 @@ public:
 
 	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_TimeToWait);  // tolua_export
 
-	void CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ);						//tolua_export
-	void SetWeather ( eWeather a_Weather );									//tolua_export
-	void ChangeWeather();												//tolua_export
-	eWeather GetWeather() { return m_Weather; };							//tolua_export
+	void CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ);						// tolua_export
+	void SetWeather ( eWeather a_Weather );									// tolua_export
+	void ChangeWeather();												// tolua_export
+	eWeather GetWeather() { return m_Weather; };							// tolua_export
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
@@ -535,7 +528,7 @@ private:
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
-}; //tolua_export
+}; // tolua_export
 
 
 

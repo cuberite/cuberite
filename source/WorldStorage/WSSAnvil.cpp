@@ -108,8 +108,8 @@ protected:
 	void AddItem(const cItem * a_Item, int a_Slot)
 	{
 		m_Writer.BeginCompound("");
-		m_Writer.AddShort("id",     (short)(a_Item->m_ItemID));
-		m_Writer.AddShort("Damage", a_Item->m_ItemHealth);
+		m_Writer.AddShort("id",     (short)(a_Item->m_ItemType));
+		m_Writer.AddShort("Damage", a_Item->m_ItemDamage);
 		m_Writer.AddByte ("Count",  a_Item->m_ItemCount);
 		m_Writer.AddByte ("Slot",   (unsigned char)a_Slot);
 		m_Writer.EndCompound();
@@ -804,13 +804,13 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 		{
 			continue;
 		}
-		Item.m_ItemID = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+		Item.m_ItemType = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
 		int Damage = a_NBT.FindChildByName(Child, "Damage");
 		if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
 		{
 			continue;
 		}
-		Item.m_ItemHealth = a_NBT.GetShort(Damage);
+		Item.m_ItemDamage = a_NBT.GetShort(Damage);
 		int Count = a_NBT.FindChildByName(Child, "Count");
 		if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
 		{
@@ -853,13 +853,13 @@ void cWSSAnvil::LoadDispenserFromNBT(cBlockEntityList & a_BlockEntities, const c
 		{
 			continue;
 		}
-		Item.m_ItemID = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+		Item.m_ItemType = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
 		int Damage = a_NBT.FindChildByName(Child, "Damage");
 		if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
 		{
 			continue;
 		}
-		Item.m_ItemHealth = a_NBT.GetShort(Damage);
+		Item.m_ItemDamage = a_NBT.GetShort(Damage);
 		int Count = a_NBT.FindChildByName(Child, "Count");
 		if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
 		{
@@ -902,13 +902,13 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 		{
 			continue;
 		}
-		Item.m_ItemID = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
+		Item.m_ItemType = (ENUM_ITEM_ID)(a_NBT.GetShort(ID));
 		int Damage = a_NBT.FindChildByName(Child, "Damage");
 		if ((Damage < 0) || (a_NBT.GetType(Damage) != TAG_Short))
 		{
 			continue;
 		}
-		Item.m_ItemHealth = a_NBT.GetShort(Damage);
+		Item.m_ItemDamage = a_NBT.GetShort(Damage);
 		int Count = a_NBT.FindChildByName(Child, "Count");
 		if ((Count < 0) || (a_NBT.GetType(Count) != TAG_Byte))
 		{

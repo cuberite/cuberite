@@ -24,16 +24,16 @@ class cPickup :
 public:
 	CLASS_PROTODEF(cPickup);
 
-	cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);	//tolua_export
+	cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);	// tolua_export
 	
 	virtual void Initialize(cWorld * a_World) override;
 
-	cItem &       GetItem(void)       {return m_Item; }								//tolua_export
+	cItem &       GetItem(void)       {return m_Item; }								// tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	
-	virtual bool CollectedBy(cPlayer * a_Dest);					//tolua_export
+	virtual bool CollectedBy(cPlayer * a_Dest);					// tolua_export
 
 	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 	virtual void HandlePhysics(float a_Dt) override;
@@ -54,7 +54,7 @@ private:
 	cItem m_Item;
 
 	bool m_bCollected;
-};  //tolua_export
+};  // tolua_export
 
 
 
