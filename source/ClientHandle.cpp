@@ -575,6 +575,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 			return;
 		}
 		
+		case DIG_STATUS_CANCELLED:
+		{
+			// Block breaking cancelled by player
+			return;
+		}
+
 		default:
 		{
 			ASSERT(!"Unhandled DIG_STATUS");
