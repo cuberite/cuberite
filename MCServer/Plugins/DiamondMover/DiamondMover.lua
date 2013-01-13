@@ -25,7 +25,7 @@ function Initialize(Plugin)
 	Plugin:SetVersion(1);
 	
 	PluginManager = cRoot:Get():GetPluginManager();
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_BLOCK_PLACE);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USED_ITEM);
 	return true;
 end
 
@@ -33,7 +33,7 @@ end
 
 
 
-function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
+function OnPlayerUsedItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ)
 
 	-- Don't check if the direction is in the air
 	if (BlockFace == -1) then

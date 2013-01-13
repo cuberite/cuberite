@@ -1,4 +1,4 @@
-function OnBlockDig(Player, BlockX, BlockY, BlockZ, BlockFace, Status, OldBlockType, OldBlockMeta)
+function OnPlayerBreakingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, Status, OldBlockType, OldBlockMeta)
 	-- dont check if the direction is in the air
 	if (BlockFace ~= -1) then
 

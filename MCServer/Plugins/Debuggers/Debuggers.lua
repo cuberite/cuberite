@@ -13,7 +13,7 @@ function Initialize(Plugin)
 	Plugin:SetVersion(1)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(Plugin, cPluginManager.E_PLUGIN_BLOCK_PLACE)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE)
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
@@ -24,12 +24,14 @@ end
 
 
 
-function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
+function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ)
 
 	-- dont check if the direction is in the air
-	if BlockFace == BLOCK_FACE_NONE then
+	if (BlockFace == BLOCK_FACE_NONE) then
 		return false
 	end
+
+	local HeldItem = Player:GetEquippedItem();
 
 	if (HeldItem.m_ItemType == E_ITEM_STICK) then
 		-- Magic sTick of ticking: set the pointed block for ticking at the next tick
@@ -42,7 +44,9 @@ function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
 		-- Magic rod of query: show block types and metas for both neighbors of the pointed face
 		local Type = 0;
 		local Meta = 0;
-		Type, Meta = Player:GetWorld():GetBlockTypeMeta(BlockX, BlockY, BlockZ, Type, Meta);
+		local Valid = false;
+		Valid, Type, Meta = Player:GetWorld():GetBlockTypeMeta(BlockX, BlockY, BlockZ, Type, Meta);
+
 		if (Type == E_BLOCK_AIR) then
 			Player:SendMessage(cChatColor.LightGray .. "Block {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "}: air:" .. Meta);
 		else
@@ -53,8 +57,8 @@ function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
 		local X = BlockX;
 		local Y = BlockY;
 		local Z = BlockZ;
-		X, Y, Z = AddDirection(BlockX, BlockY, BlockZ, BlockFace);
-		Type, Meta = Player:GetWorld():GetBlockTypeMeta(X, Y, Z, Type, Meta);
+		X, Y, Z = AddFaceDirection(BlockX, BlockY, BlockZ, BlockFace);
+		Valid, Type, Meta = Player:GetWorld():GetBlockTypeMeta(X, Y, Z, Type, Meta);
 		if (Type == E_BLOCK_AIR) then
 			Player:SendMessage(cChatColor.LightGray .. "Block {" .. X .. ", " .. Y .. ", " .. Z .. "}: air:" .. Meta);
 		else

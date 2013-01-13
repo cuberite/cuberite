@@ -27,7 +27,7 @@ function Initialize(Plugin)
 	PLUGIN:SetVersion(6)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(PLUGIN, cPluginManager.E_PLUGIN_TICK)
+	PluginManager:AddHook(PLUGIN, cPluginManager.HOOK_TICK)
 	
 	Plugin:AddWebTab("(Re)Generation", HandleRequest_Generation)
 	
@@ -71,7 +71,7 @@ function OnDisable()
   LOG(PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. " is shutting down...")
 end
 
-function Tick( DeltaTime )
+function OnTick( DeltaTime )
 	if (GENERATION_STATE == 1 or GENERATION_STATE == 3) then
 		LOGINFO("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": works STARTED!")
 		LOGINFO("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": At world: " .. WORK_WORLD)

@@ -1,6 +1,6 @@
 function HandleItemCommand( Split, Player )
 	if( #Split ~= 2 and #Split ~=3 ) then
-		Player:SendMessage( cChatColor.Green .. "Usage: /item [ItemID/Name:Dmg] <Amount>" )
+		Player:SendMessage( cChatColor.Green .. "Usage: /item [ItemType/Name:Dmg] <Amount>" )
 		return true
 	end
 
@@ -12,7 +12,7 @@ function HandleItemCommand( Split, Player )
 	end
 
 	if( FoundItem == false ) then
-		Player:SendMessage( cChatColor.Green .. "Invalid Item ID / Name !" )
+		Player:SendMessage( cChatColor.Green .. "Invalid Item type / name !" )
 		return true
 	end
 

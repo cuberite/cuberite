@@ -16,7 +16,7 @@ function OnCraftingNoRecipe(Player, Grid, Recipe)
 	for x = 0, Grid:GetWidth() - 1 do
 		for y = 0, Grid:GetHeight() - 1 do
 			local Item = Grid:GetItem(x, y)
-			if (Item.m_ItemID ~= E_ITEM_EMPTY) then
+			if (Item.m_ItemType ~= E_ITEM_EMPTY) then
 				table.insert(Items, Item)
 			end
 		end
@@ -27,23 +27,23 @@ function OnCraftingNoRecipe(Player, Grid, Recipe)
 		return false
 	end
 	
-	if (Items[1].m_ItemID ~= Items[2].m_ItemID) then
+	if (Items[1].m_ItemType ~= Items[2].m_ItemType) then
 		-- Only items of the same type may be fixed
 		return false
 	end
 	
 	if (
-		(Items[1].m_ItemHealth == 0)	or
-		(Items[2].m_ItemHealth == 0)
+		(Items[1].m_ItemDamage == 0)	or
+		(Items[2].m_ItemDamage == 0)
 	)
 	then
 		-- Only damaged items may be fixed
 		return false
 	end
 	
-	local _ID = Items[1].m_ItemID
-	local _least_hp = math.max(Items[1].m_ItemHealth, Items[2].m_ItemHealth)
-	local _most_hp = math.min(Items[1].m_ItemHealth, Items[2].m_ItemHealth)
+	local _ID = Items[1].m_ItemType
+	local _least_hp = math.max(Items[1].m_ItemDamage, Items[2].m_ItemDamage)
+	local _most_hp = math.min(Items[1].m_ItemDamage, Items[2].m_ItemDamage)
 	local _item_hp = 0
 	
 	-- TODO: This could be refactored into better code, using an _ID-indexed table for _item_hp

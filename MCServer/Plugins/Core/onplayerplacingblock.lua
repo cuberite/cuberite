@@ -1,4 +1,4 @@
-function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
+function OnPlayerPlacingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ, BlockType)
 
 	-- dont check if the direction is in the air
 	if (BlockFace == -1) then
@@ -14,7 +14,7 @@ function OnBlockPlace(Player, BlockX, BlockY, BlockZ, BlockFace, HeldItem)
 	local X = BlockX
 	local Y = BlockY
 	local Z = BlockZ
-	X, Y, Z = AddDirection(X, Y, Z, BlockFace)
+	X, Y, Z = AddFaceDirection(X, Y, Z, BlockFace)
 	if (Y >= 256 or Y < 0) then
 		return true
 	end

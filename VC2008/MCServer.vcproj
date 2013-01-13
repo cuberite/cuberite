@@ -700,14 +700,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\WebPlugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\WebPlugin.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\World.cpp"
 				>
 			</File>
@@ -1549,6 +1541,14 @@
 				</File>
 				<File
 					RelativePath="..\source\tolua_base.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WebPlugin.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WebPlugin.h"
 					>
 				</File>
 				<Filter
