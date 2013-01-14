@@ -88,6 +88,7 @@ public:
 	*/
 	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) { return false; }
 	
+	// tolua_begin
 	struct CommandStruct
 	{
 		AString Command;
@@ -95,7 +96,6 @@ public:
 		AString Permission;
 	};
 
-	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }
 	void SetName(const AString & a_Name) { m_Name = a_Name; }
 
