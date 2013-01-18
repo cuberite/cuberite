@@ -30,7 +30,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVED);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACED_BLOCK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACING_BLOCK);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHTCLICK);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_SHOOTING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_SPAWNED);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_TOSSING_ITEM);

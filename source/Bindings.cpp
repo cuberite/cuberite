@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/14/13 21:20:39.
+** Generated automatically by tolua++-1.0.92 on 01/19/13 07:27:33.
 */
 
 #ifndef __cplusplus
@@ -21043,6 +21043,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"BLOCK_FACE_WEST",BLOCK_FACE_WEST);
   tolua_constant(tolua_S,"BLOCK_FACE_EAST",BLOCK_FACE_EAST);
   tolua_constant(tolua_S,"DIG_STATUS_STARTED",DIG_STATUS_STARTED);
+  tolua_constant(tolua_S,"DIG_STATUS_CANCELLED",DIG_STATUS_CANCELLED);
   tolua_constant(tolua_S,"DIG_STATUS_FINISHED",DIG_STATUS_FINISHED);
   tolua_constant(tolua_S,"DIG_STATUS_DROP_HELD",DIG_STATUS_DROP_HELD);
   tolua_constant(tolua_S,"DIG_STATUS_SHOOT_EAT",DIG_STATUS_SHOOT_EAT);
@@ -21338,7 +21339,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_PLAYER_MOVED",cPluginManager::HOOK_PLAYER_MOVED);
    tolua_constant(tolua_S,"HOOK_PLAYER_PLACED_BLOCK",cPluginManager::HOOK_PLAYER_PLACED_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_PLACING_BLOCK",cPluginManager::HOOK_PLAYER_PLACING_BLOCK);
-   tolua_constant(tolua_S,"HOOK_PLAYER_RIGHTCLICK",cPluginManager::HOOK_PLAYER_RIGHTCLICK);
+   tolua_constant(tolua_S,"HOOK_PLAYER_RIGHT_CLICK",cPluginManager::HOOK_PLAYER_RIGHT_CLICK);
    tolua_constant(tolua_S,"HOOK_PLAYER_SHOOTING",cPluginManager::HOOK_PLAYER_SHOOTING);
    tolua_constant(tolua_S,"HOOK_PLAYER_SPAWNED",cPluginManager::HOOK_PLAYER_SPAWNED);
    tolua_constant(tolua_S,"HOOK_PLAYER_TOSSING_ITEM",cPluginManager::HOOK_PLAYER_TOSSING_ITEM);

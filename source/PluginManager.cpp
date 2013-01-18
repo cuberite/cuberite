@@ -666,7 +666,7 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX
 
 bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_RIGHTCLICK);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_RIGHT_CLICK);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;

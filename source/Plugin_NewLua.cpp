@@ -658,7 +658,7 @@ bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int 
 bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHTCLICK);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICK);
 	ASSERT(FnName != NULL);
 	if (!PushFunction(FnName))
 	{
@@ -1171,7 +1171,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_PLAYER_MOVED:          return "OnPlayerMoved";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:   return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:  return "OnPlayerPlacingBlock";
-		case cPluginManager::HOOK_PLAYER_RIGHTCLICK:     return "OnPlayerRightClick";
+		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:    return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:       return "OnPlayerShooting";
 		case cPluginManager::HOOK_PLAYER_SPAWNED:        return "OnPlayerSpawned";
 		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:   return "OnPlayerTossingItem";
