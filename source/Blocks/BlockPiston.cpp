@@ -59,7 +59,7 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
 {
-	a_BlockType = E_BLOCK_REDSTONE_REPEATER_OFF;
+	a_BlockType = m_BlockType;
 	a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch());
 	return true;
 }
