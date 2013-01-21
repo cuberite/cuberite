@@ -187,6 +187,7 @@ void cItemHandler::Deinit()
 	{
 		delete m_ItemHandler[i];
 	}
+	memset(m_ItemHandler, 0, sizeof(m_ItemHandler));  // Don't leave any dangling pointers around, just in case
 	m_HandlerInitialized = false;
 }
 
