@@ -306,6 +306,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HeightMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\HeightMap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Processor.cpp"
 				>
 			</File>

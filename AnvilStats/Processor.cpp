@@ -326,8 +326,16 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 	{
 		if (!SectionProcessed[y])
 		{
-			m_Callback.OnEmptySection(y);
+			if (m_Callback.OnEmptySection(y))
+			{
+				return true;
+			}
 		}
+	}
+	
+	if (m_Callback.OnSectionsFinished())
+	{
+		return true;
 	}
 	
 	return false;
@@ -498,6 +506,14 @@ void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & 
 	// Start as many threads as there are cores, plus one:
 	// (One more thread can be in the file-read IO block while all other threads crunch the numbers)
 	int NumThreads = GetNumCores() + 1;
+	
+	/*
+	// Limit the number of threads in DEBUG mode to 1 for easier debugging
+	#ifdef _DEBUG
+	NumThreads = 1;
+	#endif  // _DEBUG
+	*/
+	
 	for (int i = 0; i < NumThreads; i++)
 	{
 		cCallback * Callback = a_CallbackFactory.GetNewCallback();

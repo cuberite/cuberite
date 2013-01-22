@@ -56,7 +56,10 @@ public:
 	
 	virtual bool OnBiomes(const unsigned char * a_BiomeData) { return true; }
 	
-	virtual bool OnHeightMap(const int * a_HeightMap) { return true; }
+	/** Called when a heightmap for the chunk is read from the file.
+	Note that the heightmap is given in big-endian ints, so if you want it, you need to ntohl() it first!
+	*/
+	virtual bool OnHeightMap(const int * a_HeightMapBE) { return true; }
 	
 	/** If there is data for the section, this callback is called; otherwise OnEmptySection() is called instead.
 	All OnSection() callbacks are called first, and only then all the remaining sections are reported in OnEmptySection().
@@ -74,6 +77,10 @@ public:
 	OnEmptySection() callbacks are called after all OnSection() callbacks.
 	*/
 	virtual bool OnEmptySection(unsigned char a_Y) { return false; }
+	
+	/** Called after all sections have been processed via either OnSection() or OnEmptySection().
+	*/
+	virtual bool OnSectionsFinished(void) { return true; }
 	
 	/** Called for each entity in the chunk.
 	Common parameters are parsed from the NBT.
