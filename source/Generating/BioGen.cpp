@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "BioGen.h"
+#include "../../iniFile/iniFile.h"
 
 
 
@@ -320,6 +321,306 @@ void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_Distor
 	a_DistortedZ = a_BlockZ + (int)(m_CellSize * 0.5 * NoiseZ);
 }
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBioGenMultiStepMap :
+
+cBioGenMultiStepMap::cBioGenMultiStepMap(int a_Seed) :
+	m_Noise(a_Seed),
+	m_Seed(a_Seed),
+	m_OceanCellSize(384),
+	m_MushroomIslandSize(32),
+	m_RiverCellSize(128),
+	m_RiverWidthThreshold((float)0.05),
+	m_LandBiomesSize(192)
+{
+}
+
+
+
+
+
+void cBioGenMultiStepMap::Init(cIniFile & a_IniFile)
+{
+	m_OceanCellSize       =        a_IniFile.GetValueSetI("Generator", "MultiStepMapOceanCellSize",      m_OceanCellSize);
+	m_MushroomIslandSize  =        a_IniFile.GetValueSetI("Generator", "MultiStepMapMushroomIslandSize", m_MushroomIslandSize);
+	m_RiverCellSize       =        a_IniFile.GetValueSetI("Generator", "MultiStepMapRiverCellSize",      m_RiverCellSize);
+	m_RiverWidthThreshold = (float)a_IniFile.GetValueSetF("Generator", "MultiStepMapRiverWidth",         m_RiverWidthThreshold);
+	m_LandBiomesSize      = (float)a_IniFile.GetValueSetI("Generator", "MultiStepMapLandBiomeSize",      (int)m_LandBiomesSize);
+}
+
+
+
+
+
+void cBioGenMultiStepMap::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	DecideOceanLandMushroom(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	AddRivers(a_ChunkX, a_ChunkZ, a_BiomeMap);
+	ApplyTemperatureHumidity(a_ChunkX, a_ChunkZ, a_BiomeMap);
+}
+
+
+
+
+
+void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	// Distorted Voronoi over 3 biomes, with mushroom having only a special occurence.
+	
+	// Prepare a distortion lookup table, by distorting a 5x5 area and using that as 1:4 zoom (linear interpolate):
+	int BaseZ = cChunkDef::Width * a_ChunkZ;
+	int BaseX = cChunkDef::Width * a_ChunkX;
+	int DistortX[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
+	int DistortSize = m_OceanCellSize / 2;
+	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
+	{
+		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z], DistortSize);
+	}
+	IntArrayLinearInterpolate2D(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	IntArrayLinearInterpolate2D(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	
+	// Prepare a 9x9 area of neighboring cell seeds
+	// (assuming that 7x7 cell area is larger than a chunk being generated)
+	const int NEIGHBORHOOD_SIZE = 4;  // How many seeds in each direction to check
+	int CellX = BaseX / m_OceanCellSize;
+	int CellZ = BaseZ / m_OceanCellSize;
+	int SeedX[2 * NEIGHBORHOOD_SIZE + 1][2 * NEIGHBORHOOD_SIZE + 1];
+	int SeedZ[2 * NEIGHBORHOOD_SIZE + 1][2 * NEIGHBORHOOD_SIZE + 1];
+	EMCSBiome SeedV[2 * NEIGHBORHOOD_SIZE + 1][2 * NEIGHBORHOOD_SIZE + 1];
+	for (int xc = 0; xc < 2 * NEIGHBORHOOD_SIZE + 1; xc++)
+	{
+		int RealCellX = xc + CellX - NEIGHBORHOOD_SIZE;
+		int CellBlockX = RealCellX * m_OceanCellSize;
+		for (int zc = 0; zc < 2 * NEIGHBORHOOD_SIZE + 1; zc++)
+		{
+			int RealCellZ = zc + CellZ - NEIGHBORHOOD_SIZE;
+			int CellBlockZ = RealCellZ * m_OceanCellSize;
+			int OffsetX = (m_Noise.IntNoise3DInt(RealCellX, 16 * RealCellX + 32 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
+			int OffsetZ = (m_Noise.IntNoise3DInt(RealCellX, 32 * RealCellX - 16 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
+			SeedX[xc][zc] = CellBlockX + OffsetX;
+			SeedZ[xc][zc] = CellBlockZ + OffsetZ;
+			SeedV[xc][zc] = (((m_Noise.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : ((EMCSBiome)(-1));
+		}  // for z
+	}  // for x
+	
+	for (int xc = 1; xc < 2 * NEIGHBORHOOD_SIZE; xc++) for (int zc = 1; zc < 2 * NEIGHBORHOOD_SIZE; zc++)
+	{
+		if (
+			(SeedV[xc    ][zc]     == biOcean) &&
+			(SeedV[xc - 1][zc]     == biOcean) &&
+			(SeedV[xc + 1][zc]     == biOcean) &&
+			(SeedV[xc    ][zc - 1] == biOcean) &&
+			(SeedV[xc    ][zc + 1] == biOcean) &&
+			(SeedV[xc - 1][zc - 1] == biOcean) &&
+			(SeedV[xc + 1][zc - 1] == biOcean) &&
+			(SeedV[xc - 1][zc + 1] == biOcean) &&
+			(SeedV[xc + 1][zc + 1] == biOcean)
+		)
+		{
+			SeedV[xc][zc] = biMushroomIsland;
+		}
+	}
+	
+	// For each column find the nearest distorted cell and use its value as the biome:
+	int MushroomOceanThreshold = m_OceanCellSize * m_OceanCellSize * m_MushroomIslandSize / 1024;
+	int MushroomShoreThreshold = m_OceanCellSize * m_OceanCellSize * m_MushroomIslandSize / 2048;
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int AbsoluteZ = DistortZ[x][z];
+			int AbsoluteX = DistortX[x][z];
+			int MinDist = m_OceanCellSize * m_OceanCellSize * 16;  // There has to be a cell closer than this
+			EMCSBiome Biome = biPlains;
+			// Find the nearest cell seed:
+			for (int xs = 1; xs < 2 * NEIGHBORHOOD_SIZE; xs++) for (int zs = 1; zs < 2 * NEIGHBORHOOD_SIZE; zs++)
+			{
+				int Dist = (SeedX[xs][zs] - AbsoluteX) * (SeedX[xs][zs] - AbsoluteX) + (SeedZ[xs][zs] - AbsoluteZ) * (SeedZ[xs][zs] - AbsoluteZ);
+				if (Dist >= MinDist)
+				{
+					continue;
+				}
+				MinDist = Dist;
+				Biome = SeedV[xs][zs];
+				// Shrink mushroom biome and add a shore:
+				if (Biome == biMushroomIsland)
+				{
+					if (Dist > MushroomOceanThreshold)
+					{
+						Biome = biOcean;
+					}
+					else if (Dist > MushroomShoreThreshold)
+					{
+						Biome = biMushroomShore;
+					}
+				}
+			}  // for zs, xs
+
+			cChunkDef::SetBiome(a_BiomeMap, x, z, Biome);
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_RiverCellSize;
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
+			{
+				// Biome already set, skip this column
+				continue;
+			}
+			
+			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
+		
+			double Noise = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 4000);
+			Noise += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 5000);
+			Noise += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 6000);
+			
+			if ((Noise > 0) && (Noise < m_RiverWidthThreshold))
+			{
+				cChunkDef::SetBiome(a_BiomeMap, x, z, biRiver);
+			}
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBioGenMultiStepMap::ApplyTemperatureHumidity(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	IntMap TemperatureMap;
+	IntMap HumidityMap;
+	BuildTemperatureHumidityMaps(a_ChunkX, a_ChunkZ, TemperatureMap, HumidityMap);
+	
+	FreezeWaterBiomes(a_BiomeMap, TemperatureMap);
+	DecideLandBiomes(a_BiomeMap, TemperatureMap, HumidityMap);
+}
+
+
+
+
+
+void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize)
+{
+	double NoiseX = m_Noise.CubicNoise3D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize, 1000);
+	NoiseX += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize, 2000);
+	NoiseX += 0.1 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize, 3000);
+	double NoiseZ = m_Noise.CubicNoise3D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize, 4000);
+	NoiseZ += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize, 5000);
+	NoiseZ += 0.1 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize, 6000);
+	
+	a_DistortedX = a_BlockX + (int)(a_CellSize * 0.5 * NoiseX);
+	a_DistortedZ = a_BlockZ + (int)(a_CellSize * 0.5 * NoiseZ);
+}
+
+
+
+
+
+void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_ChunkZ, IntMap & a_TemperatureMap, IntMap & a_HumidityMap)
+{
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
+		
+			double NoiseT = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 7000);
+			NoiseT += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 8000);
+			NoiseT += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 9000);
+			a_TemperatureMap[x + 16 * z] = std::max(0, std::min(255, (int)(128 + NoiseT * 128)));
+
+			double NoiseH = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 9000);
+			NoiseH += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 5000);
+			NoiseH += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 1000);
+			a_HumidityMap[x + 16 * z] = std::max(0, std::min(255, (int)(128 + NoiseH * 128)));
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap, const IntMap & a_HumidityMap)
+{
+	static const EMCSBiome BiomeMap[] =
+	{
+		//       0         1         2               3               4               5               6         7         8         9         10              11              12              13              14             15
+		/*  0 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biPlains,       biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesert,       biDesert,       biDesert,      biDesert,
+		/*  1 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biPlains,       biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesert,       biDesert,       biDesert,      biDesert,
+		/*  2 */ biTundra, biTundra, biTundra,       biTundra,       biPlains,       biExtremeHills, biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesertHills,  biDesertHills,  biDesert,      biDesert,
+		/*  3 */ biTundra, biTundra, biTundra,       biTundra,       biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biDesert,       biDesert,      biDesertHills,  biDesertHills,  biDesert,      biDesert,
+		/*  4 */ biTundra, biTundra, biIceMountains, biIceMountains, biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biForestHills,  biForestHills, biExtremeHills, biExtremeHills, biDesertHills, biDesert,
+		/*  5 */ biTundra, biTundra, biIceMountains, biIceMountains, biExtremeHills, biExtremeHills, biPlains, biPlains, biPlains, biPlains, biForestHills,  biForestHills, biExtremeHills, biExtremeHills, biDesertHills, biDesert,
+		/*  6 */ biTundra, biTundra, biIceMountains, biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+		/*  7 */ biTundra, biTundra, biIceMountains, biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+		/*  8 */ biTundra, biTundra, biTaiga,        biTaiga,        biForest,       biForest,       biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+		/*  9 */ biTundra, biTundra, biTaiga,        biTaiga,        biForest,       biForest,       biForest, biForest, biForest, biForest, biForest,       biForestHills, biExtremeHills, biExtremeHills, biPlains,      biPlains,
+		/* 10 */ biTaiga,  biTaiga,  biTaiga,        biIceMountains, biForestHills,  biForestHills,  biForest, biForest, biForest, biForest, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+		/* 11 */ biTaiga,  biTaiga,  biIceMountains, biIceMountains, biExtremeHills, biForestHills,  biForest, biForest, biForest, biForest, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+		/* 12 */ biTaiga,  biTaiga,  biIceMountains, biIceMountains, biExtremeHills, biJungleHills,  biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+		/* 13 */ biTaiga,  biTaiga,  biTaiga,        biIceMountains, biJungleHills,  biJungleHills,  biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+		/* 14 */ biTaiga,  biTaiga,  biTaiga,        biTaiga,        biJungle,       biJungle,       biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+		/* 15 */ biTaiga,  biTaiga,  biTaiga,        biTaiga,        biJungle,       biJungle,       biJungle, biJungle, biJungle, biJungle, biJungle,       biJungle,      biSwampland,    biSwampland,    biSwampland,   biSwampland,
+	} ;
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
+			{
+				// Already set before
+				continue;
+			}
+			int idx = x + 16 * z;
+			int Temperature = a_TemperatureMap[idx] / 16;  // -> [0..15] range
+			int Humidity    = a_HumidityMap[idx]    / 16;  // -> [0..15] range
+			cChunkDef::SetBiome(a_BiomeMap, x, z, BiomeMap[Temperature + 16 * Humidity]);
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBioGenMultiStepMap::FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, const IntMap & a_TemperatureMap)
+{
+	int idx = 0;
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++, idx++)
+		{
+			if (a_TemperatureMap[idx] > 4 * 16)
+			{
+				// Not frozen
+				continue;
+			}
+			switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+			{
+				case biRiver: cChunkDef::SetBiome(a_BiomeMap, x, z, biFrozenRiver); break;
+				case biOcean: cChunkDef::SetBiome(a_BiomeMap, x, z, biFrozenOcean); break;
+			}
+		}  // for x
+	}  // for z
+}
 
 
 

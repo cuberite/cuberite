@@ -156,6 +156,11 @@ void cChunkGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		AString Biomes = a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   "");
 		m_BiomeGen = new cBioGenVoronoi(m_Seed, CellSize, Biomes);
 	}
+	else if (NoCaseCompare(BiomeGenName, "multistepmap") == 0)
+	{
+		m_BiomeGen = new cBioGenMultiStepMap(m_Seed);
+		((cBioGenMultiStepMap *)m_BiomeGen)->Init(a_IniFile);
+	}
 	else
 	{
 		if (NoCaseCompare(BiomeGenName, "distortedvoronoi") != 0)
