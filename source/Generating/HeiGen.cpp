@@ -187,29 +187,29 @@ const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[biNumBiomes] =
 {
 	/*                        Fast-changing | Middle-changing | Slow-changing |*/
 	/* Biome               |  Freq1  | Amp1 | Freq2   | Amp2  | Freq3  | Amp3 | BaseHeight */
-	/* biOcean            */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},    // done
-	/* biPlains           */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},    // done
-	/* biDesert           */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},    // done
-	/* biExtremeHills     */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 100},    // done
-	/* biForest           */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},    // done
-	/* biTaiga            */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},    // done
-	/* biSwampland        */ { 0.1f,   1.1f,  0.05f,     1.5f,  0.02f,    2.5f,  61.5},  // done
-	/* biRiver            */ { 0.2f,   3.0f,  0.05f,     1.0f,  0.01f,    1.0f,  56},    // done
+	/* biOcean            */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},
+	/* biPlains           */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
+	/* biDesert           */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
+	/* biExtremeHills     */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 100},
+	/* biForest           */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
+	/* biTaiga            */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
+	/* biSwampland        */ { 0.1f,   1.1f,  0.05f,     1.5f,  0.02f,    2.5f,  61.5},
+	/* biRiver            */ { 0.2f,   0.1f,  0.05f,     0.1f,  0.01f,    0.1f,  56},
 	/* biNether           */ { 0.1f,   0.0f,  0.01f,     0.0f,  0.01f,    0.0f,   0},  // Unused, but must be here due to indexing
 	/* biSky              */ { 0.1f,   0.0f,  0.01f,     0.0f,  0.01f,    0.0f,   0},  // Unused, but must be here due to indexing
-	/* biFrozenOcean      */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // done
-	/* biFrozenRiver      */ { 0.2f,   3.0f,  0.05f,     1.0f,  0.01f,    1.0f,  56},  // done
-	/* biIcePlains        */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},  // done
-	/* biIceMountains     */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},  // done
-	/* biMushroomIsland   */ { 0.1f,   2.0f,  0.05f,     8.0f,  0.01f,    6.0f,  80},  // done
-	/* biMushroomShore    */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  64},  // done
-	/* biBeach            */ { 0.1f,   0.5f,  0.05f,     1.0f,  0.01f,    1.0f,  64},  // done
-	/* biDesertHills      */ { 0.2f,   2.0f,  0.05f,     5.0f,  0.01f,    4.0f,  75},  // done
-	/* biForestHills      */ { 0.2f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},  // done
-	/* biTaigaHills       */ { 0.2f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},  // done
-	/* biExtremeHillsEdge */ { 0.2f,   3.0f,  0.05f,    16.0f,  0.01f,   12.0f,  80},  // done
-	/* biJungle           */ { 0.1f,   3.0f,  0.05f,     6.0f,  0.01f,    6.0f,  70},  // done
-	/* biJungleHills      */ { 0.2f,   3.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},  // done
+	/* biFrozenOcean      */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},
+	/* biFrozenRiver      */ { 0.2f,   0.1f,  0.05f,     0.1f,  0.01f,    0.1f,  56},
+	/* biIcePlains        */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
+	/* biIceMountains     */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},
+	/* biMushroomIsland   */ { 0.1f,   2.0f,  0.05f,     8.0f,  0.01f,    6.0f,  80},
+	/* biMushroomShore    */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  64},
+	/* biBeach            */ { 0.1f,   0.5f,  0.05f,     1.0f,  0.01f,    1.0f,  64},
+	/* biDesertHills      */ { 0.2f,   2.0f,  0.05f,     5.0f,  0.01f,    4.0f,  75},
+	/* biForestHills      */ { 0.2f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},
+	/* biTaigaHills       */ { 0.2f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},
+	/* biExtremeHillsEdge */ { 0.2f,   3.0f,  0.05f,    16.0f,  0.01f,   12.0f,  80},
+	/* biJungle           */ { 0.1f,   3.0f,  0.05f,     6.0f,  0.01f,    6.0f,  70},
+	/* biJungleHills      */ { 0.2f,   3.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},
 } ;
 
 
