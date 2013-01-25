@@ -79,7 +79,7 @@ bool cPlugin::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cPlugin::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
+bool cPlugin::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk)
 {
 	UNUSED(a_World);
 	UNUSED(a_ChunkX);

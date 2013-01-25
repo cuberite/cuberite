@@ -109,6 +109,10 @@ void cLightingThread::Stop(void)
 {
 	{
 		cCSLock Lock(m_CS);
+		for (sItems::iterator itr = m_Queue.begin(), end = m_Queue.end(); itr != end; ++itr)
+		{
+			delete itr->m_ChunkStay;
+		}
 		m_Queue.clear();
 	}
 	m_ShouldTerminate = true;

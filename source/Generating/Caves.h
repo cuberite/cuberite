@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "ChunkGenerator.h"
+#include "ComposableGenerator.h"
 #include "../Noise.h"
 
 

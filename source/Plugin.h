@@ -15,7 +15,7 @@ class cItem;
 class cEntity;
 class cPawn;
 class cWorld;
-class cLuaChunk;
+class cChunkDesc;
 struct TakeDamageInfo;
 
 // fwd: cPlayer.h
@@ -51,7 +51,7 @@ public:
 	// TODO: virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
 	virtual bool OnChat               (cPlayer * a_Player, const AString & a_Message);
 	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
-	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk);
+	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk);
 	virtual bool OnCollectPickup      (cPlayer * a_Player, cPickup * a_Pickup);
 	virtual bool OnCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason);

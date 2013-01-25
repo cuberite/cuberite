@@ -15,8 +15,8 @@ class cPlugin;
 // fwd: World.h
 class cWorld;
 
-// fwd: LuaChunk.h
-class cLuaChunk;
+// fwd: ChunkDesc.h
+class cChunkDesc;
 
 // fwd: Player.h
 class cPlayer;
@@ -100,7 +100,7 @@ public:																	// tolua_export
 	// TODO: bool CallHookBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
 	bool CallHookChat               (cPlayer * a_Player, const AString & a_Message);
 	bool CallHookChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_Chunk);
+	bool CallHookChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_Chunk);
 	bool CallHookCollectPickup      (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect         (cPlayer * a_Player, const AString & a_Reason);

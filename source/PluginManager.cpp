@@ -349,7 +349,7 @@ bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_LuaChunk)
+bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_LuaChunk)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATING);
 	if (Plugins == m_Hooks.end())

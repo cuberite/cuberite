@@ -1456,14 +1456,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaChunk.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\LuaChunk.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\LuaCommandBinder.cpp"
 					>
 				</File>
@@ -1687,6 +1679,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Generating\ChunkDesc.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Generating\ChunkGenerator.cpp"
 					>
 				</File>
@@ -1700,6 +1696,14 @@
 				</File>
 				<File
 					RelativePath="..\source\Generating\CompoGen.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Generating\ComposableGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Generating\ComposableGenerator.h"
 					>
 				</File>
 				<File

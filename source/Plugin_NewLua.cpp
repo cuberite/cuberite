@@ -219,7 +219,7 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
-bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
+bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk)
 {
 	cCSLock Lock(m_CriticalSection);
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING);
@@ -232,7 +232,7 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
 	tolua_pushnumber  (m_LuaState, a_ChunkX);
 	tolua_pushnumber  (m_LuaState, a_ChunkZ);
-	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cLuaChunk");
+	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cChunkDesc");
 
 	if (!CallFunction(4, 1, FnName))
 	{

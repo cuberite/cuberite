@@ -272,7 +272,7 @@ void cPlugin_Squirrel::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Ch
 
 
 
-bool cPlugin_Squirrel::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cLuaChunk * a_pLuaChunk)
+bool cPlugin_Squirrel::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk)
 {
 	cCSLock Lock(m_CriticalSection);
 	if(!m_Plugin->HasFunction("OnChunkGenerating")) return false;
