@@ -60,7 +60,7 @@ public:																	// tolua_export
 		HOOK_PLAYER_EATING,
 		HOOK_PLAYER_JOINED,
 		HOOK_PLAYER_LEFT_CLICK,
-		HOOK_PLAYER_MOVED,
+		HOOK_PLAYER_MOVING,
 		HOOK_PLAYER_PLACED_BLOCK,
 		HOOK_PLAYER_PLACING_BLOCK,
 		HOOK_PLAYER_RIGHT_CLICK,
@@ -111,7 +111,7 @@ public:																	// tolua_export
 	bool CallHookPlayerBrokenBlock  (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerEating       (cPlayer & a_Player);
 	bool CallHookPlayerJoined       (cPlayer & a_Player);
-	bool CallHookPlayerMoved        (cPlayer & a_Player);
+	bool CallHookPlayerMoving       (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick    (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	bool CallHookPlayerPlacedBlock  (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerPlacingBlock (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

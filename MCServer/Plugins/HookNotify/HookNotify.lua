@@ -27,7 +27,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_EATING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_LEFT_CLICK);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVED);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACED_BLOCK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACING_BLOCK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICK);
@@ -191,8 +191,8 @@ end
 
 
 
-function OnPlayerMoved(...)
-	LogHook("OnPlayerMoved", unpack(arg));
+function OnPlayerMoving(...)
+	LogHook("OnPlayerMoving", unpack(arg));
 end
 
 

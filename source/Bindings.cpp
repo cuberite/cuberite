@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/25/13 19:08:52.
+** Generated automatically by tolua++-1.0.92 on 01/26/13 16:47:03.
 */
 
 #ifndef __cplusplus
@@ -21402,7 +21402,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_PLAYER_EATING",cPluginManager::HOOK_PLAYER_EATING);
    tolua_constant(tolua_S,"HOOK_PLAYER_JOINED",cPluginManager::HOOK_PLAYER_JOINED);
    tolua_constant(tolua_S,"HOOK_PLAYER_LEFT_CLICK",cPluginManager::HOOK_PLAYER_LEFT_CLICK);
-   tolua_constant(tolua_S,"HOOK_PLAYER_MOVED",cPluginManager::HOOK_PLAYER_MOVED);
+   tolua_constant(tolua_S,"HOOK_PLAYER_MOVING",cPluginManager::HOOK_PLAYER_MOVING);
    tolua_constant(tolua_S,"HOOK_PLAYER_PLACED_BLOCK",cPluginManager::HOOK_PLAYER_PLACED_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_PLACING_BLOCK",cPluginManager::HOOK_PLAYER_PLACING_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_RIGHT_CLICK",cPluginManager::HOOK_PLAYER_RIGHT_CLICK);

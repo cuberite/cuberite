@@ -601,9 +601,9 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoved(cPlayer & a_Player)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_MOVED);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_MOVING);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;

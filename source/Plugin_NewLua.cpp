@@ -562,7 +562,7 @@ bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_B
 bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_MOVED);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_MOVING);
 	ASSERT(FnName != NULL);
 	if (!PushFunction(FnName))
 	{
@@ -1168,7 +1168,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_PLAYER_EATING:         return "OnPlayerEating";
 		case cPluginManager::HOOK_PLAYER_JOINED:         return "OnPlayerJoined";
 		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:     return "OnPlayerLeftClick";
-		case cPluginManager::HOOK_PLAYER_MOVED:          return "OnPlayerMoved";
+		case cPluginManager::HOOK_PLAYER_MOVING:         return "OnPlayerMoving";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:   return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:  return "OnPlayerPlacingBlock";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:    return "OnPlayerRightClick";

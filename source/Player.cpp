@@ -174,7 +174,7 @@ void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
 	}
 	else if (m_bDirtyPosition)
 	{
-		cRoot::Get()->GetPluginManager()->CallHookPlayerMoved(*this);
+		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
 
 		float DiffX = (float)(GetPosX() - m_LastPosX );
 		float DiffY = (float)(GetPosY() - m_LastPosY );
