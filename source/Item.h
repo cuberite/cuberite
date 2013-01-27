@@ -137,14 +137,14 @@ public:
 	void    Clear (void) {clear(); }
 	int     Size  (void) {return size(); }
 
-	void    Add   (ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+	void    Add   (ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage)
 	{
-		push_back(cItem(a_ItemType, a_ItemCount, a_ItemHealth));
+		push_back(cItem(a_ItemType, a_ItemCount, a_ItemDamage));
 	}
 	
-	void    Set   (int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+	void    Set   (int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage)
 	{
-		at(a_Idx) = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+		at(a_Idx) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);
 	}
 	// tolua_end
 } ;  // tolua_export
