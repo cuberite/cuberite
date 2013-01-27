@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/26/13 16:47:03.
+** Generated automatically by tolua++-1.0.92 on 01/27/13 05:58:09.
 */
 
 #ifndef __cplusplus
@@ -48,7 +48,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Vector3i.h"
 #include "Matrix4f.h"
 #include "Cuboid.h"
-#include "MCLogger.h"
 #include "Tracer.h"
 #include "Group.h"
 #include "BlockArea.h"
@@ -87,13 +86,6 @@ static int tolua_collect_cPickup (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cBlockArea (lua_State* tolua_S)
-{
- cBlockArea* self = (cBlockArea*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
 static int tolua_collect_cEntity (lua_State* tolua_S)
 {
  cEntity* self = (cEntity*) tolua_tousertype(tolua_S,1,0);
@@ -115,9 +107,9 @@ static int tolua_collect_cCuboid (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cTracer (lua_State* tolua_S)
+static int tolua_collect_cBlockArea (lua_State* tolua_S)
 {
- cTracer* self = (cTracer*) tolua_tousertype(tolua_S,1,0);
+ cBlockArea* self = (cBlockArea*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -129,9 +121,9 @@ static int tolua_collect_Vector3i (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cMCLogger (lua_State* tolua_S)
+static int tolua_collect_cTracer (lua_State* tolua_S)
 {
- cMCLogger* self = (cMCLogger*) tolua_tousertype(tolua_S,1,0);
+ cTracer* self = (cTracer*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -162,9 +154,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
@@ -172,7 +163,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cMCLogger");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
@@ -16778,131 +16769,6 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: new of class  cMCLogger */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cMCLogger_new00
-static int tolua_AllToLua_cMCLogger_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cMCLogger",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  char* a_File = ((char*)  tolua_tostring(tolua_S,2,0));
-  {
-   cMCLogger* tolua_ret = (cMCLogger*)  Mtolua_new((cMCLogger)(a_File));
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cMCLogger");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  cMCLogger */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cMCLogger_new00_local
-static int tolua_AllToLua_cMCLogger_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"cMCLogger",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  char* a_File = ((char*)  tolua_tostring(tolua_S,2,0));
-  {
-   cMCLogger* tolua_ret = (cMCLogger*)  Mtolua_new((cMCLogger)(a_File));
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cMCLogger");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: delete of class  cMCLogger */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cMCLogger_delete00
-static int tolua_AllToLua_cMCLogger_delete00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cMCLogger",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cMCLogger* self = (cMCLogger*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'", NULL);
-#endif
-  Mtolua_delete(self);
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: LogSimple of class  cMCLogger */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cMCLogger_LogSimple00
-static int tolua_AllToLua_cMCLogger_LogSimple00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cMCLogger",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cMCLogger* self = (cMCLogger*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Text = ((const char*)  tolua_tostring(tolua_S,2,0));
-  int a_LogType = ((int)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LogSimple'", NULL);
-#endif
-  {
-   self->LogSimple(a_Text,a_LogType);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'LogSimple'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: new of class  cTracer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cTracer_new00
 static int tolua_AllToLua_cTracer_new00(lua_State* tolua_S)
@@ -21778,18 +21644,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Sort",tolua_AllToLua_cCuboid_Sort00);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside00);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside01);
-  tolua_endmodule(tolua_S);
-  #ifdef __cplusplus
-  tolua_cclass(tolua_S,"cMCLogger","cMCLogger","",tolua_collect_cMCLogger);
-  #else
-  tolua_cclass(tolua_S,"cMCLogger","cMCLogger","",NULL);
-  #endif
-  tolua_beginmodule(tolua_S,"cMCLogger");
-   tolua_function(tolua_S,"new",tolua_AllToLua_cMCLogger_new00);
-   tolua_function(tolua_S,"new_local",tolua_AllToLua_cMCLogger_new00_local);
-   tolua_function(tolua_S,".call",tolua_AllToLua_cMCLogger_new00_local);
-   tolua_function(tolua_S,"delete",tolua_AllToLua_cMCLogger_delete00);
-   tolua_function(tolua_S,"LogSimple",tolua_AllToLua_cMCLogger_LogSimple00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cTracer","cTracer","",tolua_collect_cTracer);
