@@ -222,16 +222,16 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * 
 
 
 
-void cItemHandler::OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z)
+void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	char Block = a_World->GetBlock(a_X, a_Y, a_Z);
-	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(Block);
+	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(Block);
 
-	if(a_Player->GetGameMode() == eGameMode_Survival)
+	if (a_Player->GetGameMode() == eGameMode_Survival)
 	{
-		if(!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
+		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
 		{
-			Handler->DropBlock(a_World, a_X, a_Y, a_Z);
+			Handler->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	
@@ -242,7 +242,7 @@ void cItemHandler::OnBlockDestroyed(cWorld *a_World, cPlayer *a_Player, cItem *a
 
 
 
-void cItemHandler::OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item)
+void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_Item)
 {
 
 }

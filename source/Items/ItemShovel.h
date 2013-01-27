@@ -20,12 +20,12 @@ public:
 
 	}
 
-	virtual bool OnDiggingBlock(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if (Block == E_BLOCK_SNOW)
 		{
-			BlockHandler(Block)->DropBlock(a_World, a_BlockX, a_BlockY, a_BlockZ);
+			BlockHandler(Block)->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 			a_Player->UseEquippedItem();

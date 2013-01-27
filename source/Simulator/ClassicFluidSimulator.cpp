@@ -384,7 +384,7 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 						cBlockHandler * Handler = BlockHandler(DownID);
 						if (Handler->DoesDropOnUnsuitable())
 						{
-							Handler->DropBlock(m_World, pos.x, pos.y - 1, pos.z);
+							Handler->DropBlock(m_World, NULL, pos.x, pos.y - 1, pos.z);
 						}
 					}
 					if (pos.y > 0)
@@ -420,7 +420,7 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 									cBlockHandler * Handler = BlockHandler(DownID);
 									if (Handler->DoesDropOnUnsuitable())
 									{
-										Handler->DropBlock(m_World, p.x, p.y, p.z);
+										Handler->DropBlock(m_World, NULL, p.x, p.y, p.z);
 									}
 								}
 

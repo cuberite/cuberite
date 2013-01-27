@@ -48,7 +48,7 @@ public:
 	 * On all these functions, return true if you want to override default behavior and not call other plugins on that callback.
 	 * You can also return false, so default behavior is used.
 	 **/
-	// TODO: virtual bool OnBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
+	virtual bool OnBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	virtual bool OnChat               (cPlayer * a_Player, const AString & a_Message);
 	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk);

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/27/13 05:58:09.
+** Generated automatically by tolua++-1.0.92 on 01/27/13 05:59:07.
 */
 
 #ifndef __cplusplus
@@ -21254,6 +21254,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPluginManager","cPluginManager","",NULL);
   tolua_beginmodule(tolua_S,"cPluginManager");
+   tolua_constant(tolua_S,"HOOK_BLOCK_TO_PICKUPS",cPluginManager::HOOK_BLOCK_TO_PICKUPS);
    tolua_constant(tolua_S,"HOOK_CHAT",cPluginManager::HOOK_CHAT);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATED",cPluginManager::HOOK_CHUNK_GENERATED);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATING",cPluginManager::HOOK_CHUNK_GENERATING);

@@ -164,6 +164,39 @@ void cPlugin_NewLua::Tick(float a_Dt)
 
 
 
+bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_BLOCK_TO_PICKUPS);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	tolua_pushusertype(m_LuaState, a_Digger, "cEntity");
+	tolua_pushnumber  (m_LuaState, a_BlockX);
+	tolua_pushnumber  (m_LuaState, a_BlockY);
+	tolua_pushnumber  (m_LuaState, a_BlockZ);
+	tolua_pushnumber  (m_LuaState, a_BlockType);
+	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	tolua_pushusertype(m_LuaState, &a_Pickups, "cItems");
+
+	if (!CallFunction(8, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
 bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1154,6 +1187,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 {
 	switch (a_Hook)
 	{
+		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:      return "OnBlockToPickups";
 		case cPluginManager::HOOK_CHAT:                  return "OnChat";
 		case cPluginManager::HOOK_CHUNK_GENERATED:       return "OnChunkGenerated";
 		case cPluginManager::HOOK_CHUNK_GENERATING:      return "OnChunkGenerating";

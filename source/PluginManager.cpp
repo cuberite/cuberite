@@ -213,73 +213,26 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
-/*
-bool cPluginManager::CallHookBlockToPickup(
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
-	const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups
+bool cPluginManager::CallHookBlockToPickups(
+	cWorld * a_World, cEntity * a_Digger,
+	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, 
+	cItems & a_Pickups
 )
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_TO_PICKUPS);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnBlockToPickup(a_BlockType, a_BlockMeta, a_Player, a_EquippedItem, a_Pickups))
+		if ((*itr)->OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups))
 		{
 			return true;
 		}
 	}
 	return false;
 }
-*/
-
-
-
-
-
-/*
-bool cPluginManager::CallHookBlockDig(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_DIG);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnBlockDig(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, a_OldBlock, a_OldMeta))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-*/
-
-
-
-
-
-/*
-bool cPluginManager::CallHookBlockPlace(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, const cItem & a_HeldItem)
-{
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_PLACE);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
-	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
-	{
-		if ((*itr)->OnBlockPlace(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_HeldItem))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-*/
 
 
 

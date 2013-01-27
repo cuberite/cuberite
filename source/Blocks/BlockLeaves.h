@@ -113,7 +113,7 @@ public:
 			return;
 		}
 		// Decay the leaves:
-		DropBlock(a_World, a_BlockX, a_BlockY, a_BlockZ);
+		DropBlock(a_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
 
 		a_World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 		

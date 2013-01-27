@@ -46,6 +46,7 @@ public:																	// tolua_export
 	// tolua_begin
 	enum PluginHook
 	{
+		HOOK_BLOCK_TO_PICKUPS,
 		HOOK_CHAT,
 		HOOK_CHUNK_GENERATED,
 		HOOK_CHUNK_GENERATING,
@@ -97,7 +98,7 @@ public:																	// tolua_export
 
 	unsigned int GetNumPlugins() const;									// tolua_export
 
-	// TODO: bool CallHookBlockToPickup   (BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups);
+	bool CallHookBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	bool CallHookChat               (cPlayer * a_Player, const AString & a_Message);
 	bool CallHookChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_Chunk);

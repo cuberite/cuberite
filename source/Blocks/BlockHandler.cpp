@@ -3,6 +3,8 @@
 #include "BlockHandler.h"
 #include "../Item.h"
 #include "../World.h"
+#include "../Root.h"
+#include "../PluginManager.h"
 #include "BlockSand.h"
 #include "BlockGravel.h"
 #include "BlockDoor.h"
@@ -321,11 +323,15 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 
 
 
-void cBlockHandler::DropBlock(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cItems Pickups;
 	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 	ConvertToPickups(Pickups, Meta);
+	
+	// Allow plugins to modify the pickups:
+	cRoot::Get()->GetPluginManager()->CallHookBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
+	
 	if (!Pickups.empty())
 	{
 		a_World->SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
@@ -423,7 +429,7 @@ void cBlockHandler::Check(cWorld * a_World, int a_BlockX, int a_BlockY, int a_Bl
 	{
 		if (DoesDropOnUnsuitable())
 		{
-			DropBlock(a_World, a_BlockX, a_BlockY, a_BlockZ);
+			DropBlock(a_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
 		}
 		
 		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);

@@ -98,7 +98,7 @@ void cPiston::ExtendPiston( int pistx, int pisty, int pistz )
 		cBlockHandler * Handler = BlockHandler(currBlock);
 		if (Handler->DoesDropOnUnsuitable())
 		{
-			Handler->DropBlock(m_World, pistx, pisty, pistz);
+			Handler->DropBlock(m_World, NULL, pistx, pisty, pistz);
 		}
 	}
 	int oldx = pistx, oldy = pisty, oldz = pistz;

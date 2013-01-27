@@ -38,18 +38,18 @@ void cPlugin::Tick(float a_Dt)
 
 
 
-/*
-// TODO
-bool cPlugin::OnBlockToPickup(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cPlayer * a_Player, const cItem & a_EquippedItem, cItems & a_Pickups)
+bool cPlugin::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
 {
+	UNUSED(a_World);
+	UNUSED(a_Digger);
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
 	UNUSED(a_BlockType);
 	UNUSED(a_BlockMeta);
-	UNUSED(a_Player);
-	UNUSED(a_EquippedItem);
 	UNUSED(a_Pickups);
 	return false;
 }
-*/
 
 
 

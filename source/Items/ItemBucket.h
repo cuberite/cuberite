@@ -152,7 +152,7 @@ public:
 			cBlockHandler * Handler = BlockHandler(CurrentBlock);
 			if (Handler->DoesDropOnUnsuitable())
 			{
-				Handler->DropBlock(a_World, a_BlockX, a_BlockY, a_BlockZ);
+				Handler->DropBlock(a_World, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 			}
 		}
 

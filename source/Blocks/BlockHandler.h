@@ -68,8 +68,8 @@ public:
 	/// Called when the item is mined to convert it into pickups. Pickups may specify multiple items.
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 	
-	/// Handles the dropping of a block based on what ConvertToDrops() returns. This will not destroy the block
-	virtual void DropBlock(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// Handles the dropping of a block based on what ConvertToDrops() returns. This will not destroy the block. a_Digger is the entity causing the drop; it may be NULL
+	virtual void DropBlock(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Returns step sound name of block
 	virtual const char * GetStepSound(void);

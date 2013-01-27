@@ -13,6 +13,7 @@ function Initialize(Plugin)
 	Plugin:SetVersion(1)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_BLOCK_TO_PICKUPS);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING);
@@ -67,6 +68,16 @@ function LogHook(FnName, ...)
 	end
 	LOG(")");
 end
+
+
+
+
+
+function OnBlockToPickups(...)
+	LOG("************************");
+	LogHook("OnBlockToPickups", unpack(arg));
+	LOG("========================");
+end;
 
 
 

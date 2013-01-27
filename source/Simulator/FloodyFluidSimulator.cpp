@@ -240,7 +240,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 		cBlockHandler * Handler = BlockHandler(Block);
 		if (Handler->DoesDropOnUnsuitable())
 		{
-			Handler->DropBlock(m_World, a_BlockX, a_BlockY, a_BlockZ);
+			Handler->DropBlock(m_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	

@@ -908,7 +908,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_function(tolua_S, "LOGWARN",     tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",    tolua_LOGERROR);
 		tolua_function(tolua_S, "Log",         tolua_LOG); // Deprecated
-
+		
 		tolua_beginmodule(tolua_S, "cRoot");
 			tolua_function(tolua_S, "ForEachWorld", tolua_cRoot_ForEachWorld);
 			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_cRoot_FindAndDoWithPlayer);
