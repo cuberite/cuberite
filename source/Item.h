@@ -120,7 +120,34 @@ public:
 };
 // tolua_end
 
-typedef std::vector<cItem> cItems;
+
+
+
+// This stupid construct is here only so that Lua can access cItems in an API
+
+class cItems  // tolua_export
+	: public std::vector<cItem>
+{  // tolua_export
+public:
+	// tolua_begin
+	cItem & Get   (int a_Idx) {return at(a_Idx); }
+	void    Set   (int a_Idx, const cItem & a_Item) {at(a_Idx) = a_Item; }
+	void    Add   (const cItem & a_Item) {push_back(a_Item); }
+	void    Delete(int a_Idx) {erase(begin() + a_Idx); }
+	void    Clear (void) {clear(); }
+	int     Size  (void) {return size(); }
+
+	void    Add   (ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+	{
+		push_back(cItem(a_ItemType, a_ItemCount, a_ItemHealth));
+	}
+	
+	void    Set   (int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
+	{
+		at(a_Idx) = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
+	}
+	// tolua_end
+} ;  // tolua_export
 
 
 

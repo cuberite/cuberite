@@ -4,7 +4,6 @@
 #define LUA_USE_POSIX
 #include "Plugin_NewLua.h"
 #include "MCLogger.h"
-#include "LuaItems.h"
 
 extern "C"
 {

@@ -74,9 +74,17 @@ end
 
 
 function OnBlockToPickups(...)
-	LOG("************************");
 	LogHook("OnBlockToPickups", unpack(arg));
-	LOG("========================");
+	local World, Digger, BlockX, BlockY, BlockZ, BlockType, BlockMeta, Pickups = unpack(arg);
+	if (Pickups ~= nil) then
+		local Name = "NULL";
+		if (Digger ~= nil) then
+			Name = Digger:GetName()
+		end
+		LOG("Got cItems from " .. Name .. ", trying to manipulate them.");
+		Pickups:Add(cItem:new(E_ITEM_DIAMOND_SHOVEL, 1));
+		LOG("Current size: " .. Pickups:Size());
+	end;
 end;
 
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/27/13 05:59:07.
+** Generated automatically by tolua++-1.0.92 on 01/27/13 07:29:49.
 */
 
 #ifndef __cplusplus
@@ -53,7 +53,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "BlockArea.h"
 #include "Generating/ChunkDesc.h"
 #include "CraftingRecipes.h"
-#include "LuaItems.h"
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -155,7 +154,6 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cLuaItems");
  tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
@@ -169,7 +167,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cPawn");
+ tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"Lua__cTCPLink");
@@ -181,13 +179,13 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"Lua__cPickup");
- tolua_usertype(tolua_S,"Lua__cEntity");
- tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cLadder");
  tolua_usertype(tolua_S,"MTRand");
- tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cWorld");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"HTTPRequest");
@@ -197,8 +195,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
  tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"Lua__cChestEntity");
- tolua_usertype(tolua_S,"cWorld");
- tolua_usertype(tolua_S,"cStairs");
+ tolua_usertype(tolua_S,"cPawn");
+ tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"Vector3d");
 }
 
@@ -12495,6 +12493,270 @@ static int tolua_set_cItem_m_ItemDamage(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: Get of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Get00
+static int tolua_AllToLua_cItems_Get00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Get'", NULL);
+#endif
+  {
+   cItem& tolua_ret = (cItem&)  self->Get(a_Idx);
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Set of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Set00
+static int tolua_AllToLua_cItems_Set00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Set'", NULL);
+#endif
+  {
+   self->Set(a_Idx,*a_Item);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Set'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Add of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Add00
+static int tolua_AllToLua_cItems_Add00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
+#endif
+  {
+   self->Add(*a_Item);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Add'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Delete of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Delete00
+static int tolua_AllToLua_cItems_Delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Delete'", NULL);
+#endif
+  {
+   self->Delete(a_Idx);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Delete'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Clear of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Clear00
+static int tolua_AllToLua_cItems_Clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Clear'", NULL);
+#endif
+  {
+   self->Clear();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Clear'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Size of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Size00
+static int tolua_AllToLua_cItems_Size00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Size'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->Size();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Size'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Add of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Add01
+static int tolua_AllToLua_cItems_Add01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
+  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
+#endif
+  {
+   self->Add(a_ItemType,a_ItemCount,a_ItemHealth);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cItems_Add00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Set of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Set01
+static int tolua_AllToLua_cItems_Set01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,3,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,4,0));
+  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Set'", NULL);
+#endif
+  {
+   self->Set(a_Idx,a_ItemType,a_ItemCount,a_ItemHealth);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cItems_Set00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetSlot of class  cChestEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cChestEntity_GetSlot00
 static int tolua_AllToLua_cChestEntity_GetSlot00(lua_State* tolua_S)
@@ -19977,270 +20239,6 @@ static int tolua_AllToLua_cCraftingRecipe_Dump00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: Get of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Get00
-static int tolua_AllToLua_cLuaItems_Get00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Get'", NULL);
-#endif
-  {
-   cItem& tolua_ret = (cItem&)  self->Get(a_Idx);
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Set of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Set00
-static int tolua_AllToLua_cLuaItems_Set00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
-  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Set'", NULL);
-#endif
-  {
-   self->Set(a_Idx,*a_Item);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Set'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Add of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Add00
-static int tolua_AllToLua_cLuaItems_Add00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
-#endif
-  {
-   self->Add(*a_Item);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Add'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Delete of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Delete00
-static int tolua_AllToLua_cLuaItems_Delete00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Delete'", NULL);
-#endif
-  {
-   self->Delete(a_Idx);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Delete'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Clear of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Clear00
-static int tolua_AllToLua_cLuaItems_Clear00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Clear'", NULL);
-#endif
-  {
-   self->Clear();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Clear'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Size of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Size00
-static int tolua_AllToLua_cLuaItems_Size00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Size'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->Size();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Size'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Add of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Add01
-static int tolua_AllToLua_cLuaItems_Add01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0));
-  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
-#endif
-  {
-   self->Add(a_ItemType,a_ItemCount,a_ItemHealth);
-  }
- }
- return 0;
-tolua_lerror:
- return tolua_AllToLua_cLuaItems_Add00(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Set of class  cLuaItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaItems_Set01
-static int tolua_AllToLua_cLuaItems_Set01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cLuaItems",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  cLuaItems* self = (cLuaItems*)  tolua_tousertype(tolua_S,1,0);
-  int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,3,0));
-  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,4,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,5,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Set'", NULL);
-#endif
-  {
-   self->Set(a_Idx,a_ItemType,a_ItemCount,a_ItemHealth);
-  }
- }
- return 0;
-tolua_lerror:
- return tolua_AllToLua_cLuaItems_Set00(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* Open function */
 TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
 {
@@ -21423,6 +21421,17 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"m_ItemCount",tolua_get_cItem_m_ItemCount,tolua_set_cItem_m_ItemCount);
    tolua_variable(tolua_S,"m_ItemDamage",tolua_get_cItem_m_ItemDamage,tolua_set_cItem_m_ItemDamage);
   tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cItems","cItems","",NULL);
+  tolua_beginmodule(tolua_S,"cItems");
+   tolua_function(tolua_S,"Get",tolua_AllToLua_cItems_Get00);
+   tolua_function(tolua_S,"Set",tolua_AllToLua_cItems_Set00);
+   tolua_function(tolua_S,"Add",tolua_AllToLua_cItems_Add00);
+   tolua_function(tolua_S,"Delete",tolua_AllToLua_cItems_Delete00);
+   tolua_function(tolua_S,"Clear",tolua_AllToLua_cItems_Clear00);
+   tolua_function(tolua_S,"Size",tolua_AllToLua_cItems_Size00);
+   tolua_function(tolua_S,"Add",tolua_AllToLua_cItems_Add01);
+   tolua_function(tolua_S,"Set",tolua_AllToLua_cItems_Set01);
+  tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cChestEntity","cChestEntity","cBlockEntity",NULL);
   tolua_beginmodule(tolua_S,"cChestEntity");
    tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cChestEntity_GetSlot00);
@@ -21775,17 +21784,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetIngredient",tolua_AllToLua_cCraftingRecipe_SetIngredient01);
    tolua_function(tolua_S,"ConsumeIngredients",tolua_AllToLua_cCraftingRecipe_ConsumeIngredients00);
    tolua_function(tolua_S,"Dump",tolua_AllToLua_cCraftingRecipe_Dump00);
-  tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"cLuaItems","cLuaItems","",NULL);
-  tolua_beginmodule(tolua_S,"cLuaItems");
-   tolua_function(tolua_S,"Get",tolua_AllToLua_cLuaItems_Get00);
-   tolua_function(tolua_S,"Set",tolua_AllToLua_cLuaItems_Set00);
-   tolua_function(tolua_S,"Add",tolua_AllToLua_cLuaItems_Add00);
-   tolua_function(tolua_S,"Delete",tolua_AllToLua_cLuaItems_Delete00);
-   tolua_function(tolua_S,"Clear",tolua_AllToLua_cLuaItems_Clear00);
-   tolua_function(tolua_S,"Size",tolua_AllToLua_cLuaItems_Size00);
-   tolua_function(tolua_S,"Add",tolua_AllToLua_cLuaItems_Add01);
-   tolua_function(tolua_S,"Set",tolua_AllToLua_cLuaItems_Set01);
   tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;
