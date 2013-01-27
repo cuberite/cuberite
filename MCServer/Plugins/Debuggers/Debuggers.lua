@@ -25,16 +25,18 @@ function Initialize(Plugin)
 		function dump (prefix, a) 
 			for i, v in pairs (a) do
 				if (type(v) == "table") then
-					if (v == _G) then
-						LOG(prefix .. i .. " == _G, CYCLE, ignoring");
-					elseif (v == _G.package) then
-						LOG(prefix .. i .. " == _G.package, ignoring");
-					else
-						dump(prefix .. i .. ".", v)
+					if (GetChar(i, 1) ~= ".") then
+						if (v == _G) then
+							LOG(prefix .. i .. " == _G, CYCLE, ignoring");
+						elseif (v == _G.package) then
+							LOG(prefix .. i .. " == _G.package, ignoring");
+						else
+							dump(prefix .. i .. ".", v)
+						end
 					end
 				elseif (type(v) == "function") then
 					LOG(prefix .. i .. "()")
-				end 
+				end
 			end
 		end
 		dump("", _G);
