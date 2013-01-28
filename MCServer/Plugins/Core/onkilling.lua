@@ -1,6 +1,6 @@
-function OnKilled( Killed, Killer )
-	if( Killer == nil ) then
-		local KilledPlayer = tolua.cast( Killed, "cPlayer")
+function OnKilling(Victim, Killer)
+	if (Killer == nil) then
+		local KilledPlayer = tolua.cast(Victim, "cPlayer")
 		if( not KilledPlayer:IsA("cPlayer") or KilledPlayer == nil ) then
 			return false
 		end
@@ -8,11 +8,11 @@ function OnKilled( Killed, Killer )
 		local Server = cRoot:Get():GetServer()
 		Server:SendMessage( cChatColor.Red .. KilledPlayer:GetName() .. " died" )
 	else
-		local KilledPlayer = tolua.cast( Killed, "cPlayer")
+		local KilledPlayer = tolua.cast(Victim, "cPlayer")
 		if( not KilledPlayer:IsA("cPlayer") or KilledPlayer == nil ) then
 			return false
 		end
-		local KillerPlayer = tolua.cast( Killer, "cPlayer")
+		local KillerPlayer = tolua.cast(Killer, "cPlayer")
 		if( not KillerPlayer:IsA("cPlayer") or KillerPlayer == nil ) then
 			return false
 		end

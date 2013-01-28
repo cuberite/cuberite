@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/28/13 17:07:07.
+** Generated automatically by tolua++-1.0.92 on 01/28/13 17:46:12.
 */
 
 #ifndef __cplusplus
@@ -21260,7 +21260,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
    tolua_constant(tolua_S,"HOOK_HANDSHAKE",cPluginManager::HOOK_HANDSHAKE);
-   tolua_constant(tolua_S,"HOOK_KILLED",cPluginManager::HOOK_KILLED);
+   tolua_constant(tolua_S,"HOOK_KILLING",cPluginManager::HOOK_KILLING);
    tolua_constant(tolua_S,"HOOK_LOGIN",cPluginManager::HOOK_LOGIN);
    tolua_constant(tolua_S,"HOOK_PLAYER_BREAKING_BLOCK",cPluginManager::HOOK_PLAYER_BREAKING_BLOCK);
    tolua_constant(tolua_S,"HOOK_PLAYER_BROKEN_BLOCK",cPluginManager::HOOK_PLAYER_BROKEN_BLOCK);

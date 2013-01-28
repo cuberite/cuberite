@@ -407,16 +407,16 @@ bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const ASt
 
 
 
-bool cPluginManager::CallHookKilled(cPawn & a_Victim, cEntity * a_Killer)
+bool cPluginManager::CallHookKilling(cPawn & a_Victim, cEntity * a_Killer)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_KILLED);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_KILLING);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnKilled(a_Victim, a_Killer))
+		if ((*itr)->OnKilling(a_Victim, a_Killer))
 		{
 			return true;
 		}

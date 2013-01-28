@@ -54,7 +54,7 @@ public:																	// tolua_export
 		HOOK_CRAFTING_NO_RECIPE,
 		HOOK_DISCONNECT,
 		HOOK_HANDSHAKE,
-		HOOK_KILLED,
+		HOOK_KILLING,
 		HOOK_LOGIN,
 		HOOK_PLAYER_BREAKING_BLOCK,
 		HOOK_PLAYER_BROKEN_BLOCK,
@@ -106,7 +106,7 @@ public:																	// tolua_export
 	bool CallHookCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect         (cPlayer * a_Player, const AString & a_Reason);
 	bool CallHookHandshake          (cClientHandle * a_ClientHandle, const AString & a_Username);
-	bool CallHookKilled             (cPawn & a_Victim, cEntity * a_Killer);
+	bool CallHookKilling            (cPawn & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin              (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock  (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

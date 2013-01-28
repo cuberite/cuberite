@@ -126,9 +126,9 @@ bool cPlugin::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 
 
 
-bool cPlugin::OnKilled(cPawn & a_Killed, cEntity * a_Killer)
+bool cPlugin::OnKilling(cPawn & a_Victim, cEntity * a_Killer)
 {
-	UNUSED(a_Killed);
+	UNUSED(a_Victim);
 	UNUSED(a_Killer);
 	return false;
 }

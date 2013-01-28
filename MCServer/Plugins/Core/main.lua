@@ -19,7 +19,7 @@ function Initialize( Plugin )
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_BREAKING_BLOCK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACING_BLOCK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN)
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLED)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
 	

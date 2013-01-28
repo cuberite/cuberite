@@ -14,26 +14,23 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 
-#ifdef _WIN32
-// #include "wdirent.h"
-#else
-#include <dirent.h>
-#endif
+
+
+
+
+extern bool report_errors(lua_State * lua, int status);
 
 
 
 
 
-extern bool report_errors(lua_State* lua, int status);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cPlugin_NewLua:
 
-
-
-
-
-cPlugin_NewLua::cPlugin_NewLua( const AString & a_PluginDirectory )
+cPlugin_NewLua::cPlugin_NewLua(const AString & a_PluginDirectory)
 	: m_LuaState( 0 )
 	, cWebPlugin()
-	, cPlugin( a_PluginDirectory )
+	, cPlugin(a_PluginDirectory)
 {
 }
 
@@ -389,17 +386,17 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 
 
 
-bool cPlugin_NewLua::OnKilled(cPawn & a_Killed, cEntity * a_Killer)
+bool cPlugin_NewLua::OnKilling(cPawn & a_Victim, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_KILLED);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_KILLING);
 	ASSERT(FnName != NULL);
 	if (!PushFunction(FnName))
 	{
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Killed, "cPawn");
+	tolua_pushusertype(m_LuaState, &a_Victim, "cPawn");
 	tolua_pushusertype(m_LuaState, a_Killer,  "cEntity");
 
 	if (!CallFunction(2, 1, FnName))
@@ -1194,7 +1191,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:    return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:            return "OnDisconnect";
 		case cPluginManager::HOOK_HANDSHAKE:             return "OnHandshake";
-		case cPluginManager::HOOK_KILLED:                return "OnKilled";
+		case cPluginManager::HOOK_KILLING:               return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                 return "OnLogin";
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK: return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:   return "OnPlayerBrokenBlock";

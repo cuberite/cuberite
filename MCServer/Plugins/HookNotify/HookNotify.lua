@@ -21,7 +21,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_HANDSHAKE);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLED);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_BREAKING_BLOCK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_BROKEN_BLOCK);
@@ -154,8 +154,8 @@ end
 
 
 
-function OnKilled(...)
-	LogHook("OnKilled", unpack(arg));
+function OnKilling(...)
+	LogHook("OnKilling", unpack(arg));
 end
 
 

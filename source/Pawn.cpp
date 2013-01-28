@@ -121,13 +121,13 @@ void cPawn::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cPawn::KilledBy(cPawn * a_Killer)
 {
-	short OldHealth = m_Health;
 	m_Health = 0;
 
-	if (cRoot::Get()->GetPluginManager()->CallHookKilled(*this, a_Killer))
+	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_Killer);
+	
+	if (m_Health > 0)
 	{
-		// Plugin wants to 'unkill' the pawn. Set health back and abort
-		m_Health = OldHealth;
+		// Plugin wants to 'unkill' the pawn. Abort
 		return;
 	}
 
