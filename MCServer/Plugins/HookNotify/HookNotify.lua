@@ -17,7 +17,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_COLLECT_PICKUP);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_COLLECTING_PICKUP);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_HANDSHAKE);
@@ -123,8 +123,8 @@ end
 
 
 
-function OnCollectPickup(...)
-	LogHook("OnCollectPickup", unpack(arg));
+function OnCollectingPickup(...)
+	LogHook("OnCollectingPickup", unpack(arg));
 end
 
 
