@@ -240,7 +240,7 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		return false; // Not old enough
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookCollectPickup(a_Dest, *this))
+	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))
 	{
 		return false;
 	}

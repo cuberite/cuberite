@@ -52,7 +52,7 @@ public:
 	virtual bool OnChat               (cPlayer * a_Player, const AString & a_Message);
 	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk);
-	virtual bool OnCollectPickup      (cPlayer * a_Player, cPickup * a_Pickup);
+	virtual bool OnCollectingPickup   (cPlayer * a_Player, cPickup * a_Pickup);
 	virtual bool OnCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason);
 	virtual bool OnHandshake          (cClientHandle * a_Client, const AString & a_Username);

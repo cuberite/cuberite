@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/27/13 07:29:49.
+** Generated automatically by tolua++-1.0.92 on 01/28/13 17:07:07.
 */
 
 #ifndef __cplusplus
@@ -12709,12 +12709,12 @@ static int tolua_AllToLua_cItems_Add01(lua_State* tolua_S)
   cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
   ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0));
   char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,4,0));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
 #endif
   {
-   self->Add(a_ItemType,a_ItemCount,a_ItemHealth);
+   self->Add(a_ItemType,a_ItemCount,a_ItemDamage);
   }
  }
  return 0;
@@ -12743,12 +12743,12 @@ static int tolua_AllToLua_cItems_Set01(lua_State* tolua_S)
   int a_Idx = ((int)  tolua_tonumber(tolua_S,2,0));
   ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,3,0));
   char a_ItemCount = ((char)  tolua_tonumber(tolua_S,4,0));
-  short a_ItemHealth = ((short)  tolua_tonumber(tolua_S,5,0));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Set'", NULL);
 #endif
   {
-   self->Set(a_Idx,a_ItemType,a_ItemCount,a_ItemHealth);
+   self->Set(a_Idx,a_ItemType,a_ItemCount,a_ItemDamage);
   }
  }
  return 0;
@@ -21256,7 +21256,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_CHAT",cPluginManager::HOOK_CHAT);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATED",cPluginManager::HOOK_CHUNK_GENERATED);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATING",cPluginManager::HOOK_CHUNK_GENERATING);
-   tolua_constant(tolua_S,"HOOK_COLLECT_PICKUP",cPluginManager::HOOK_COLLECT_PICKUP);
+   tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
    tolua_constant(tolua_S,"HOOK_HANDSHAKE",cPluginManager::HOOK_HANDSHAKE);

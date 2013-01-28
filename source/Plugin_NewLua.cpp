@@ -280,10 +280,10 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 
 
 
-bool cPlugin_NewLua::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
+bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_COLLECT_PICKUP);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_COLLECTING_PICKUP);
 	ASSERT(FnName != NULL);
 	if (!PushFunction(FnName))
 	{
@@ -1190,7 +1190,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_CHAT:                  return "OnChat";
 		case cPluginManager::HOOK_CHUNK_GENERATED:       return "OnChunkGenerated";
 		case cPluginManager::HOOK_CHUNK_GENERATING:      return "OnChunkGenerating";
-		case cPluginManager::HOOK_COLLECT_PICKUP:        return "OnCollectPickup";
+		case cPluginManager::HOOK_COLLECTING_PICKUP:     return "OnCollectingPickup";
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:    return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:            return "OnDisconnect";
 		case cPluginManager::HOOK_HANDSHAKE:             return "OnHandshake";

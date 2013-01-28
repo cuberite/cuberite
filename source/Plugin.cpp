@@ -92,7 +92,7 @@ bool cPlugin::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cC
 
 
 
-bool cPlugin::OnCollectPickup(cPlayer * a_Player, cPickup * a_Pickup)
+bool cPlugin::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
 	UNUSED(a_Player);
 	UNUSED(a_Pickup);

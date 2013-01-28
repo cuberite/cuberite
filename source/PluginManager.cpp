@@ -323,16 +323,16 @@ bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int
 
 
 
-bool cPluginManager::CallHookCollectPickup(cPlayer * a_Player, cPickup & a_Pickup)
+bool cPluginManager::CallHookCollectingPickup(cPlayer * a_Player, cPickup & a_Pickup)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_COLLECT_PICKUP);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_COLLECTING_PICKUP);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnCollectPickup(a_Player, &a_Pickup))
+		if ((*itr)->OnCollectingPickup(a_Player, &a_Pickup))
 		{
 			return true;
 		}
