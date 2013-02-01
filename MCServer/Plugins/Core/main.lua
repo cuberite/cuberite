@@ -8,11 +8,15 @@ PLUGIN = {}	-- Reference to own plugin object
 BannedPlayersIni = {}
 WhiteListIni = {}
 
-function Initialize( Plugin )
+
+
+
+
+function Initialize(Plugin)
 	PLUGIN = Plugin
 	
-	Plugin:SetName( "Core" )
-	Plugin:SetVersion(9)
+	Plugin:SetName("Core")
+	Plugin:SetVersion(10)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
@@ -22,50 +26,29 @@ function Initialize( Plugin )
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
-	
-	Plugin:AddCommand("/help",         " - [Page] Show this message",                         "core.help")
-	Plugin:AddCommand("/pluginlist",   " - Show list of plugins",                             "core.pluginlist")
-	Plugin:AddCommand("/tp",           " - [Player] - Teleport yourself to a player",         "core.teleport")
-	Plugin:AddCommand("/item",         " - [ItemType/Name] <Amount> - Give yourself an item", "core.item")
-	Plugin:AddCommand("/list",         " - Shows list of connected players",                  "core.playerlist")
-	Plugin:AddCommand("/motd",         " - Show message of the day",                          "core.motd")
-	Plugin:AddCommand("/reload",       " - Reload all plugins",                               "core.reload")
-	Plugin:AddCommand("/stop",         " - Stops the server",                                 "core.stop")
-	Plugin:AddCommand("/time",         " - [Day/Night] - Sets the time of day",               "core.time")
-	Plugin:AddCommand("/spawn",        " - Return to the spawn",                              "core.spawn")
-	Plugin:AddCommand("/kick",         " - [Player] - Kick a player",                         "core.kick")
-	Plugin:AddCommand("/ban",          " - [Player] - Ban a player",                          "core.ban")
-	Plugin:AddCommand("/unban",        " - [Player] - Unban a player",                        "core.unban")
-	Plugin:AddCommand("/top",          " - Teleport yourself to the top most block",          "core.top")
-	Plugin:AddCommand("/gm",           " - [Gamemode (0|1)] - Change your gamemode",          "core.changegm")
-	Plugin:AddCommand("/gotoworld",    " - Move to a different world!",                       "core.gotoworld")
-	Plugin:AddCommand("/coords",       " - Show your current server coordinates",             "core.coords")
-	Plugin:AddCommand("/viewdistance", " - [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance", "core.viewdistance")
-	Plugin:AddCommand("/regeneratechunk", " - <X [Z]> - Regenerates a chunk", "core.regeneratechunk")
-	
-	Plugin:BindCommand( "/help",            "core.help",            HandleHelpCommand )
-	Plugin:BindCommand( "/pluginlist",      "core.pluginlist",      HandlePluginListCommand )
-	Plugin:BindCommand( "/tp",              "core.teleport",        HandleTPCommand )
-	Plugin:BindCommand( "/item",            "core.item",            HandleItemCommand )
-	Plugin:BindCommand( "/i",               "core.item",            HandleItemCommand )
-	Plugin:BindCommand( "/list",            "core.playerlist",      HandlePlayerListCommand )
-	Plugin:BindCommand( "/who",             "core.playerlist",      HandlePlayerListCommand )
-	Plugin:BindCommand( "/playerlist",      "core.playerlist",      HandlePlayerListCommand )
-	Plugin:BindCommand( "/motd",            "core.motd",            HandleMOTDCommand )
-	Plugin:BindCommand( "/reload",          "core.reload",          HandleReloadCommand )
-	Plugin:BindCommand( "/stop",          	"core.stop",          	HandleStopCommand )
-	Plugin:BindCommand( "/time",            "core.time",            HandleTimeCommand )
-	Plugin:BindCommand( "/spawn",           "core.spawn",           HandleSpawnCommand )
-	Plugin:BindCommand( "/kick",            "core.kick",            HandleKickCommand )
-	Plugin:BindCommand( "/ban",             "core.ban",             HandleBanCommand )
-	Plugin:BindCommand( "/unban",           "core.unban",           HandleUnbanCommand )
-	Plugin:BindCommand( "/top",             "core.top",             HandleTopCommand )
-	Plugin:BindCommand( "/gm",              "core.changegm",        HandleChangeGMCommand )
-	Plugin:BindCommand( "/gotoworld",       "core.gotoworld",       HandleGotoWorldCommand )
-	Plugin:BindCommand( "/coords",          "core.coords",          HandleCoordsCommand )
-	Plugin:BindCommand( "/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand )
-	Plugin:BindCommand( "/regeneratechunk", "core.regeneratechunk", HandleRegenerateChunkCommand )
 
+	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " [Page] - Show available commands");
+	PluginManager:BindCommand("/pluginlist",      "core.pluginlist",      HandlePluginListCommand,      " - Show list of plugins");
+	PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " [Player] - Teleport yourself to a player");
+	PluginManager:BindCommand("/item",            "core.item",            HandleItemCommand,            " [ItemType/Name] <Amount> - Give yourself an item");
+	PluginManager:BindCommand("/list",            "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
+	PluginManager:BindCommand("/who",             "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
+	PluginManager:BindCommand("/playerlist",      "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
+	PluginManager:BindCommand("/motd",            "core.motd",            HandleMOTDCommand,            " - Show message of the day");
+	PluginManager:BindCommand("/reload",          "core.reload",          HandleReloadCommand,          " - Reload all plugins");
+	PluginManager:BindCommand("/stop",            "core.stop",            HandleStopCommand,            " - Stops the server");
+	PluginManager:BindCommand("/time",            "core.time",            HandleTimeCommand,            " [Day/Night] - Sets the time of day");
+	PluginManager:BindCommand("/spawn",           "core.spawn",           HandleSpawnCommand,           " - Return to the spawn");
+	PluginManager:BindCommand("/kick",            "core.kick",            HandleKickCommand,            " [Player] - Kick a player");
+	PluginManager:BindCommand("/ban",             "core.ban",             HandleBanCommand,             " [Player] - Ban a player");
+	PluginManager:BindCommand("/unban",           "core.unban",           HandleUnbanCommand,           " [Player] - Unban a player");
+	PluginManager:BindCommand("/top",             "core.top",             HandleTopCommand,             " - Teleport yourself to the top most block");
+	PluginManager:BindCommand("/gm",              "core.changegm",        HandleChangeGMCommand,        " [0|1] - Change your gamemode");
+	PluginManager:BindCommand("/gotoworld",       "core.gotoworld",       HandleGotoWorldCommand,       " [WorldName] - Move to a different world!");  
+	PluginManager:BindCommand("/coords",          "core.coords",          HandleCoordsCommand,          " - Show your current server coordinates");
+	PluginManager:BindCommand("/regeneratechunk", "core.regeneratechunk", HandleRegenerateChunkCommand, " <[X] [Z]> - Regenerates a chunk, current or specified");
+	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
+	
 	local IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
 		SHOW_PLUGIN_NAMES = IniFile:GetValueB("HelpPlugin", "ShowPluginNames", true )

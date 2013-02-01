@@ -81,6 +81,12 @@ public:
 	virtual bool OnUpdatingSign       (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	virtual bool OnWeatherChanged     (cWorld * a_World);
 	
+	/// Handles the command split into a_Split, issued by player a_Player. Command permissions have already been checked.
+	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player);
+	
+	/// All bound commands are to be removed, do any language-dependent cleanup here
+	virtual void ClearCommands(void) {} ;
+	
 	/** Called from cPluginManager::AddHook() to check if the hook can be added.
 	Plugin API providers may check if the plugin is written correctly (has the hook handler function)
 	Returns true if the hook can be added (handler exists)
@@ -89,13 +95,6 @@ public:
 	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) { return false; }
 	
 	// tolua_begin
-	struct CommandStruct
-	{
-		AString Command;
-		AString Description;
-		AString Permission;
-	};
-
 	const AString & GetName(void) const  { return m_Name; }
 	void SetName(const AString & a_Name) { m_Name = a_Name; }
 
@@ -104,14 +103,8 @@ public:
 
 	const AString & GetDirectory(void) const {return m_Directory; }
 	AString GetLocalDirectory(void) const;
-
-	void AddCommand(const AString & a_Command, const AString & a_Description, const AString & a_Permission);
 	// tolua_end
 	
-	typedef bool (FuncCommandHandler)( AString & a_Command, std::vector< std::string > & a_Split );
-	void BindCommand( FuncCommandHandler* a_Function, AString & a_Command );		// >> EXPORTED IN MANUALBINDINGS <<
-	const std::vector< CommandStruct > & GetCommands() const { return m_Commands; }		// >> EXPORTED IN MANUALBINDINGS <<
-
 
 	/* This should not be exposed to scripting languages */
 	enum PluginLanguage
@@ -123,13 +116,8 @@ public:
 	PluginLanguage GetLanguage() { return m_Language; }
 	void SetLanguage( PluginLanguage a_Language ) { m_Language = a_Language; }
 
-	bool CanBindCommands() { return m_bCanBindCommands; }
 private:
-	friend class cPluginManager;
-	bool m_bCanBindCommands;	// Only changed by cPluginManager
-
 	PluginLanguage m_Language;
-	std::vector< CommandStruct > m_Commands;
 	AString m_Name;
 	int m_Version;
 

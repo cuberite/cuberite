@@ -3,13 +3,6 @@
 
 #include "Item.h"
 
-struct lua_State;
-class cLuaCommandBinder;
-
-#ifdef USE_SQUIRREL
-	class cSquirrelCommandBinder;
-#endif  // USE_SQUIRREL
-
 class cPlugin;
 
 // fwd: World.h
@@ -84,7 +77,16 @@ public:																	// tolua_export
 	} ;
 	// tolua_end
 
-	static cPluginManager * GetPluginManager();							// tolua_export
+	/// Used as a callback for enumerating bound commands
+	class cCommandEnumCallback
+	{
+	public:
+		/// Called for each command; return true to abort enumeration
+		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
+	} ;
+	
+	/// Returns the instance of the Plugin Manager (there is only ever one)
+	static cPluginManager * Get(void);							// tolua_export
 
 	typedef std::map< AString, cPlugin * > PluginMap;
 	typedef std::list< cPlugin * > PluginList;
@@ -93,7 +95,6 @@ public:																	// tolua_export
 
 	void FindPlugins();													// tolua_export
 	void ReloadPlugins();												// tolua_export
-	bool AddPlugin( cPlugin* a_Plugin );
 	void AddHook( cPlugin* a_Plugin, PluginHook a_Hook );				// tolua_export
 
 	unsigned int GetNumPlugins() const;									// tolua_export
@@ -130,46 +131,70 @@ public:																	// tolua_export
 	bool CallHookUpdatedSign        (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	bool CallHookUpdatingSign       (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	bool CallHookWeatherChanged     (cWorld * a_World);
-
-	bool DisablePlugin( AString & a_PluginName );						// tolua_export
-	bool LoadPlugin( AString & a_PluginName );							// tolua_export
-
-	void RemoveHooks( cPlugin * a_Plugin );
-	void RemovePlugin( cPlugin * a_Plugin, bool a_bDelete = false );
 	
-	cLuaCommandBinder* GetLuaCommandBinder() const { return m_LuaCommandBinder; }
-	
-	#ifdef USE_SQUIRREL
-		cSquirrelCommandBinder * GetSquirrelCommandBinder() { return m_SquirrelCommandBinder; }
-	#endif  // USE_SQUIRREL
+	bool DisablePlugin(const AString & a_PluginName);  // tolua_export
+	bool LoadPlugin   (const AString & a_PluginName);  // tolua_export
 
-	bool HasPlugin( cPlugin* a_Plugin ) const;
+	/// Removes all hooks the specified plugin has registered
+	void RemoveHooks(cPlugin * a_Plugin);
 	
+	/// Removes the plugin from the internal structures and deletes its object.
+	void RemovePlugin(cPlugin * a_Plugin);
+	
+	/// Removes all command bindings that the specified plugin has made
+	void RemovePluginCommands(cPlugin * a_Plugin);
+	
+	/// Binds a command to the specified plugin. Returns true if successful, false if command already bound.
+	bool BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
+	
+	/// Calls a_Callback for each bound command, returns true if all commands were enumerated
+	bool ForEachCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
+	
+	/// Returns true if the command is in the command map
+	bool IsCommandBound(const AString & a_Command);  // tolua_export
+	
+	/// Returns the permission needed for the specified command; empty string if command not found
+	AString GetCommandPermission(const AString & a_Command);  // tolua_export
+	
+	/// Executes the command, as if it was requested by a_Player. Checks permissions first. Returns true if executed.
+	bool ExecuteCommand(cPlayer * a_Player, const AString & a_Command);
+	
+	/// Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns true if executed (false if not found)
+	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);
+
 private:
-
 	friend class cRoot;
 	
+	class cCommandReg
+	{
+	public:
+		cPlugin * m_Plugin;
+		AString   m_Permission;
+		AString   m_HelpString;
+	} ;
+	
+	typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
+	typedef std::map<AString, cCommandReg> CommandMap;
+
+	PluginList m_DisablePluginList;
+	PluginMap  m_Plugins;
+	HookMap    m_Hooks;
+	CommandMap m_Commands;
+
+	bool m_bReloadPlugins;
+
 	cPluginManager();
 	~cPluginManager();
 
-	typedef std::map< cPluginManager::PluginHook, cPluginManager::PluginList > HookMap;
+	void ReloadPluginsNow(void);
+	void UnloadPluginsNow(void);
 
-	PluginList m_DisablePluginList;
+	/// Adds the plugin into the internal list of plugins and initializes it. If initialization fails, the plugin is removed again.
+	bool AddPlugin(cPlugin * a_Plugin);
 
-	PluginMap m_Plugins;
-	HookMap m_Hooks;
-
-	void ReloadPluginsNow();
-	void UnloadPluginsNow();
-	
-	cLuaCommandBinder * m_LuaCommandBinder;
-	
-	#ifdef USE_SQUIRREL
-		cSquirrelCommandBinder * m_SquirrelCommandBinder;
-	#endif  // USE_SQUIRREL
-
-	bool m_bReloadPlugins;
-}; // tolua_export
+	/// Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns true if the command is handled.
+	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
+} ; // tolua_export
 
 
 

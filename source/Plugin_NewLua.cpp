@@ -18,7 +18,18 @@ extern "C"
 
 
 
-extern bool report_errors(lua_State * lua, int status);
+bool report_errors(lua_State * lua, int status)
+{
+	if (status == 0)
+	{
+		// No error to report
+		return false;
+	}
+	
+	LOGERROR("LUA: %s", lua_tostring(lua, -1));
+	lua_pop(lua, 1);
+	return true;
+}
 
 
 
@@ -53,15 +64,21 @@ cPlugin_NewLua::~cPlugin_NewLua()
 
 
 
-bool cPlugin_NewLua::Initialize()
+bool cPlugin_NewLua::Initialize(void)
 {
 	cCSLock Lock(m_CriticalSection);
-	if( !m_LuaState ) 
+	if (m_LuaState == NULL)
 	{	
 		m_LuaState = lua_open();
-		luaL_openlibs( m_LuaState );
+		luaL_openlibs(m_LuaState);
 		tolua_AllToLua_open(m_LuaState);
-		ManualBindings::Bind( m_LuaState );
+		ManualBindings::Bind(m_LuaState);
+		
+		// Inject the identification global variables into the state:
+		lua_pushlightuserdata(m_LuaState, this);
+		lua_setglobal(m_LuaState, LUA_PLUGIN_INSTANCE_VAR_NAME);
+		lua_pushstring(m_LuaState, GetName().c_str());
+		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 	}
 
 	std::string PluginPath = FILE_IO_PREFIX + GetLocalDirectory() + "/";
@@ -1134,6 +1151,80 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 
 
 
+bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
+{
+	ASSERT(!a_Split.empty());
+	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
+	if (cmd == m_Commands.end())
+	{
+		LOGWARNING("Command handler registered in cPluginManager but not in cPlugin, wtf? Command \"%s\".", a_Split[0].c_str());
+		return false;
+	}
+	
+	cCSLock Lock(m_CriticalSection);
+	
+	// Push the function to be called:
+	LOGD("1. Stack size: %i", lua_gettop(m_LuaState));
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, cmd->second);  // same as lua_getref()
+	
+	// Push the split:
+	LOGD("2. Stack size: %i", lua_gettop(m_LuaState));
+	lua_createtable(m_LuaState, a_Split.size(), 0);
+	int newTable = lua_gettop(m_LuaState);
+	int index = 1;
+	std::vector<std::string>::const_iterator iter = a_Split.begin(), end = a_Split.end();
+	while(iter != end)
+	{
+		tolua_pushstring(m_LuaState, (*iter).c_str());
+		lua_rawseti(m_LuaState, newTable, index);
+		++iter;
+		++index;
+	}
+	LOGD("3. Stack size: %i", lua_gettop(m_LuaState));
+	
+	// Push player:
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	
+	// Call function:
+	LOGD("Calling bound function! :D");
+	int s = lua_pcall(m_LuaState, 2, 1, 0);
+	if (report_errors(m_LuaState, s))
+	{
+		LOGERROR("error. Stack size: %i", lua_gettop(m_LuaState));
+		return false;
+	}
+	
+	// Handle return value:
+	bool RetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);  // Pop return value
+	LOGD("ok. Stack size: %i", lua_gettop(m_LuaState));
+	
+	return RetVal;
+}
+
+
+
+
+
+void cPlugin_NewLua::ClearCommands(void)
+{
+	cCSLock Lock(m_CriticalSection);
+
+	// Unreference the bound functions so that Lua can GC them
+	if (m_LuaState != NULL)
+	{
+		for (CommandMap::iterator itr = m_Commands.begin(), end = m_Commands.end(); itr != end; ++itr)
+		{
+			luaL_unref(m_LuaState, LUA_REGISTRYINDEX, itr->second);
+		}
+	}
+	m_Commands.clear();
+}
+
+
+
+
+
 bool cPlugin_NewLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 {
 	const char * FnName = GetHookFnName(a_Hook);
@@ -1305,9 +1396,25 @@ bool cPlugin_NewLua::AddWebTab( const AString & a_Title, lua_State * a_LuaState,
 
 
 
+void cPlugin_NewLua::BindCommand(const AString & a_Command, int a_FnRef)
+{
+	ASSERT(m_Commands.find(a_Command) == m_Commands.end());
+	m_Commands[a_Command] = a_FnRef;
+}
+
+
+
+
+
 // Helper functions
 bool cPlugin_NewLua::PushFunction(const char * a_FunctionName, bool a_bLogError /* = true */)
 {
+	if (m_LuaState == NULL)
+	{
+		// This happens if Initialize() fails with an error
+		return false;
+	}
+	
 	lua_getglobal(m_LuaState, a_FunctionName);
 	if (!lua_isfunction(m_LuaState, -1))
 	{

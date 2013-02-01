@@ -1456,14 +1456,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaCommandBinder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\LuaCommandBinder.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\LuaFunctions.h"
 					>
 				</File>

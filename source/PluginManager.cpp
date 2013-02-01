@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "PluginManager.h"
@@ -6,32 +7,17 @@
 #include "WebAdmin.h"
 #include "Item.h"
 #include "Root.h"
-#include "LuaCommandBinder.h"
-
-#ifdef USE_SQUIRREL
-	#include "Plugin_Squirrel.h"
-	#include "SquirrelCommandBinder.h"
-#endif
 
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
 #include "Player.h"
 
-#ifdef USE_SQUIRREL
-	#include "squirrelbindings/SquirrelBindings.h"
-	#include "squirrelbindings/SquirrelFunctions.h"
-	#pragma warning(disable:4100;disable:4127;disable:4510;disable:4610;disable:4244;disable:4512) // Getting A LOT of these warnings from SqPlus
-	
-	#pragma warning(default:4100;default:4127;default:4510;default:4610;default:4244;default:4512)
-#endif
 
 
 
 
-
-cPluginManager* cPluginManager::GetPluginManager()
+cPluginManager * cPluginManager::Get(void)
 {
-	LOGWARN("WARNING: Using deprecated function cPluginManager::GetPluginManager() use cRoot::Get()->GetPluginManager() instead!");
 	return cRoot::Get()->GetPluginManager();
 }
 
@@ -39,12 +25,8 @@ cPluginManager* cPluginManager::GetPluginManager()
 
 
 
-cPluginManager::cPluginManager()
-	: m_LuaCommandBinder( new cLuaCommandBinder() )
-#ifdef USE_SQUIRREL
-	, m_SquirrelCommandBinder( new cSquirrelCommandBinder() )
-#endif
-	, m_bReloadPlugins(false)
+cPluginManager::cPluginManager(void) :
+	m_bReloadPlugins(false)
 {
 }
 
@@ -55,18 +37,13 @@ cPluginManager::cPluginManager()
 cPluginManager::~cPluginManager()
 {
 	UnloadPluginsNow();
-	
-	delete m_LuaCommandBinder;
-#ifdef USE_SQUIRREL
-	delete m_SquirrelCommandBinder;
-#endif
 }
 
 
 
 
 
-void cPluginManager::ReloadPlugins()
+void cPluginManager::ReloadPlugins(void)
 {
 	m_bReloadPlugins = true;
 }
@@ -75,12 +52,12 @@ void cPluginManager::ReloadPlugins()
 
 
 
-void cPluginManager::FindPlugins()
+void cPluginManager::FindPlugins(void)
 {
 	AString PluginsPath = FILE_IO_PREFIX + AString( "Plugins/" );
 
 	// First get a clean list of only the currently running plugins, we don't want to mess those up
-	for( PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); )
+	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
 	{
 		if( itr->second == NULL )
 		{
@@ -103,7 +80,7 @@ void cPluginManager::FindPlugins()
 		}
 
 		// Add plugin name/directory to the list
-		if( m_Plugins.find( *itr ) == m_Plugins.end() )
+		if (m_Plugins.find( *itr ) == m_Plugins.end())
 		{
 			m_Plugins[ *itr ] = NULL;
 		}
@@ -114,71 +91,51 @@ void cPluginManager::FindPlugins()
 
 
 
-void cPluginManager::ReloadPluginsNow()
+void cPluginManager::ReloadPluginsNow(void)
 {
 	LOG("Loading plugins");
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
-	#ifdef USE_SQUIRREL
-	CloseSquirrelVM();
-	OpenSquirrelVM();
-	#endif  // USE_SQUIRREL
-
 	FindPlugins();
 
 	cIniFile IniFile("settings.ini");
-	if (!IniFile.ReadFile() )
+	if (!IniFile.ReadFile())
 	{
 		LOGWARNING("cPluginManager: Can't find settings.ini, so can't load any plugins.");
 	}
 		
 	unsigned int KeyNum = IniFile.FindKey("Plugins");
-	unsigned int NumPlugins = IniFile.GetNumValues( KeyNum );
-	if( NumPlugins > 0 )
+	unsigned int NumPlugins = IniFile.GetNumValues(KeyNum);
+	if (NumPlugins > 0)
 	{
 		for(unsigned int i = 0; i < NumPlugins; i++)
 		{
 			AString ValueName = IniFile.GetValueName(KeyNum, i );
-			if( (ValueName.compare("NewPlugin") == 0) || (ValueName.compare("Plugin") == 0) ) // New plugin style
+			if (
+				(ValueName.compare("NewPlugin") == 0) || 
+				(ValueName.compare("Plugin") == 0)
+			)
 			{
-				AString PluginFile = IniFile.GetValue(KeyNum, i );
-				if( !PluginFile.empty() )
+				AString PluginFile = IniFile.GetValue(KeyNum, i);
+				if (!PluginFile.empty())
 				{
-					if( m_Plugins.find( PluginFile ) != m_Plugins.end() )
+					if (m_Plugins.find(PluginFile) != m_Plugins.end())
 					{
 						LoadPlugin( PluginFile );
 					}
 				}
 			}
-			
-			#ifdef USE_SQUIRREL
-			else if( ValueName.compare("Squirrel") == 0 ) // Squirrel plugin
-			{
-				AString PluginFile = IniFile.GetValue(KeyNum, i );
-				if( !PluginFile.empty() )
-				{
-					LOGINFO("Loading Squirrel plugin: %s", PluginFile.c_str() );
-					
-					cPlugin_Squirrel *Plugin = new cPlugin_Squirrel(PluginFile.c_str());
-
-					if( !AddPlugin( Plugin ) )
-					{
-						delete Plugin;
-					}
-				}
-			}
-			#endif  // USE_SQUIRREL
 		}
 	}
 
-	if( GetNumPlugins() == 0 )
+	if (GetNumPlugins() == 0)
 	{
 		LOG("No plugins loaded");
 	}
 	else
 	{
-		LOG("Loaded %i plugin(s)", GetNumPlugins() );
+		LOG("Loaded %i plugin(s)", GetNumPlugins());
 	}
 }
 
@@ -188,23 +145,23 @@ void cPluginManager::ReloadPluginsNow()
 
 void cPluginManager::Tick(float a_Dt)
 {
-	while( m_DisablePluginList.size() > 0 )
+	while (!m_DisablePluginList.empty())
 	{
-		RemovePlugin( m_DisablePluginList.front(), true );
+		RemovePlugin(m_DisablePluginList.front());
 		m_DisablePluginList.pop_front();
 	}
 
-	if( m_bReloadPlugins )
+	if (m_bReloadPlugins)
 	{
 		ReloadPluginsNow();
 	}
 
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_TICK);
-	if( Plugins != m_Hooks.end() )
+	if (Plugins != m_Hooks.end())
 	{
-		for( PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr )
+		for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 		{
-			(*itr)->Tick( a_Dt );
+			(*itr)->Tick(a_Dt);
 		}
 	}
 }
@@ -240,22 +197,17 @@ bool cPluginManager::CallHookBlockToPickups(
 
 bool cPluginManager::CallHookChat(cPlayer * a_Player, const AString & a_Message)
 {
-	#ifdef USE_SQUIRREL
-	if (m_SquirrelCommandBinder->HandleCommand(a_Message, a_Player))
-	{
-		return true;
-	}
-	#endif  // USE_SQUIRREL
-
-	if (m_LuaCommandBinder->HandleCommand(a_Message, a_Player))
+	if (ExecuteCommand(a_Player, a_Message))
 	{
 		return true;
 	}
 
 	// Check if it was a standard command (starts with a slash)
-	if (a_Message[0] == '/')
+	if (!a_Message.empty() && (a_Message[0] == '/'))
 	{
-		a_Player->SendMessage("Unknown Command");
+		AStringVector Split(StringSplit(a_Message, " "));
+		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
+		a_Player->SendMessage(Printf("Unknown Command: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player \"%s\" issued an unknown command: \"%s\"", a_Player->GetName().c_str(), a_Message.c_str());
 		return true;	// Cancel sending
 	}
@@ -911,7 +863,43 @@ bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
 
 
 
-cPlugin* cPluginManager::GetPlugin( const AString & a_Plugin ) const
+bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
+{
+	ASSERT(a_Player != NULL);
+	
+	AStringVector Split(StringSplit(a_Command, " "));
+	if (Split.empty())
+	{
+		return false;
+	}
+	
+	CommandMap::iterator cmd = m_Commands.find(Split[0]);
+	if (cmd == m_Commands.end())
+	{
+		// Command not found
+		return false;
+	}
+	
+	if (
+		a_ShouldCheckPermissions &&
+		!cmd->second.m_Permission.empty() &&
+		!a_Player->HasPermission(cmd->second.m_Permission)
+	)
+	{
+		LOGINFO("Player \"%s\" tried to execute forbidden command \"%s\".", a_Player->GetName().c_str(), Split[0].c_str());
+		return false;
+	}
+
+	ASSERT(cmd->second.m_Plugin != NULL);
+	
+	return cmd->second.m_Plugin->HandleCommand(Split, a_Player);	
+}
+
+
+
+
+
+cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin ) const
 {
 	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
 	{
@@ -941,9 +929,9 @@ void cPluginManager::UnloadPluginsNow()
 {
 	m_Hooks.clear();
 
-	while( m_Plugins.size() > 0 )
+	while (!m_Plugins.empty())
 	{
-		RemovePlugin( m_Plugins.begin()->second, true );
+		RemovePlugin(m_Plugins.begin()->second);
 	}
 
 	//SquirrelVM::Shutdown(); // This breaks shit
@@ -953,17 +941,19 @@ void cPluginManager::UnloadPluginsNow()
 
 
 
-bool cPluginManager::DisablePlugin( AString & a_PluginName )
+bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 {
-	PluginMap::iterator itr = m_Plugins.find( a_PluginName );
-	if (itr != m_Plugins.end())
+	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
+	if (itr == m_Plugins.end())
 	{
-		if (itr->first.compare( a_PluginName ) == 0)
-		{
-			m_DisablePluginList.push_back( itr->second );
-			itr->second = NULL;	// Get rid of this thing right away
-			return true;
-		}
+		return false;
+	}
+	
+	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
+	{
+		m_DisablePluginList.push_back(itr->second);
+		itr->second = NULL;	// Get rid of this thing right away
+		return true;
 	}
 	return false;
 }
@@ -972,15 +962,9 @@ bool cPluginManager::DisablePlugin( AString & a_PluginName )
 
 
 
-bool cPluginManager::LoadPlugin( AString & a_PluginName )
+bool cPluginManager::LoadPlugin(const AString & a_PluginName)
 {
-	cPlugin_NewLua* Plugin = new cPlugin_NewLua( a_PluginName.c_str() );
-	if (!AddPlugin(Plugin))
-	{
-		delete Plugin;
-		return false;
-	}
-	return true;
+	return AddPlugin(new cPlugin_NewLua(a_PluginName.c_str()));
 }
 
 
@@ -999,47 +983,137 @@ void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
 
 
 
-void cPluginManager::RemovePlugin( cPlugin * a_Plugin, bool a_bDelete /* = false */ )
+void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 {
-	if( a_bDelete )
+	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
-		m_LuaCommandBinder->RemoveBindingsForPlugin( a_Plugin );
-#ifdef USE_SQUIRREL
-		m_SquirrelCommandBinder->RemoveBindingsForPlugin( a_Plugin );
-#endif
-
-		for( PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
+		if (itr->second == a_Plugin)
 		{
-			if( itr->second == a_Plugin )
-			{
-				m_Plugins.erase( itr );
-				break;
-			}
-		}
-		if( a_Plugin != NULL )
-		{
-			RemoveHooks( a_Plugin );
-			a_Plugin->OnDisable();
-			delete a_Plugin;
+			m_Plugins.erase(itr);
+			break;
 		}
 	}
+	
+	RemovePluginCommands(a_Plugin);
+	RemoveHooks(a_Plugin);
+	if (a_Plugin != NULL)
+	{
+		a_Plugin->OnDisable();
+	}
+	delete a_Plugin;
 }
 
 
 
 
 
-bool cPluginManager::AddPlugin( cPlugin* a_Plugin )
+void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 {
-	a_Plugin->m_bCanBindCommands = true;
-	if( a_Plugin->Initialize() )
+	if (a_Plugin != NULL)
 	{
-		m_Plugins[ a_Plugin->GetDirectory() ] = a_Plugin;
+		a_Plugin->ClearCommands();
+	}
+	
+	for (CommandMap::iterator itr = m_Commands.begin(); itr != m_Commands.end();)
+	{
+		if (itr->second.m_Plugin == a_Plugin)
+		{
+			itr = m_Commands.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}  // for itr - m_Commands[]
+}
+
+
+
+
+
+bool cPluginManager::BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString)
+{
+	CommandMap::iterator cmd = m_Commands.find(a_Command);
+	if (cmd != m_Commands.end())
+	{
+		LOGWARNING("Command \"%s\" is already bound to plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str());
+		return false;
+	}
+	
+	m_Commands[a_Command].m_Plugin     = a_Plugin;
+	m_Commands[a_Command].m_Permission = a_Permission;
+	m_Commands[a_Command].m_HelpString = a_HelpString;
+	return true;
+}
+
+
+
+
+
+bool cPluginManager::ForEachCommand(cCommandEnumCallback & a_Callback)
+{
+	for (CommandMap::iterator itr = m_Commands.begin(), end = m_Commands.end(); itr != end; ++itr)
+	{
+		if (a_Callback.Command(itr->first, itr->second.m_Plugin, itr->second.m_Permission, itr->second.m_HelpString))
+		{
+			return false;
+		}
+	}  // for itr - m_Commands[]
+	return true;
+}
+
+
+
+
+
+bool cPluginManager::IsCommandBound(const AString & a_Command)
+{
+	return (m_Commands.find(a_Command) != m_Commands.end());
+}
+
+
+
+
+
+AString cPluginManager::GetCommandPermission(const AString & a_Command)
+{
+	CommandMap::iterator cmd = m_Commands.find(a_Command);
+	return (cmd == m_Commands.end()) ? "" : cmd->second.m_Permission;
+}
+
+
+
+
+
+bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+{
+	return HandleCommand(a_Player, a_Command, true);
+}
+
+
+
+
+
+bool cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+{
+	return HandleCommand(a_Player, a_Command, false);
+}
+
+
+
+
+
+bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
+{
+	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
+	if (a_Plugin->Initialize())
+	{
+		// Initialization OK
 		return true;
 	}
 
-	a_Plugin->m_bCanBindCommands = false;
-	RemoveHooks( a_Plugin ); // Undo any damage the Initialize() might have done
+	// Initialization failed
+	RemovePlugin(a_Plugin);  // Also undoes any registrations that Initialize() might have made
 	return false;
 }
 
@@ -1070,20 +1144,6 @@ void cPluginManager::AddHook(cPlugin * a_Plugin, PluginHook a_Hook)
 unsigned int cPluginManager::GetNumPlugins() const
 {
 	return m_Plugins.size(); 
-}
-
-
-
-
-
-bool cPluginManager::HasPlugin( cPlugin* a_Plugin ) const
-{
-	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
-	{
-		if( itr->second == a_Plugin )
-			return true;
-	}
-	return false;
 }
 
 

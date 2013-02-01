@@ -4,6 +4,9 @@
 #include "Plugin.h"
 #include "WebPlugin.h"
 
+// Names for the global variables through which the plugin is identified in its LuaState
+#define LUA_PLUGIN_NAME_VAR_NAME     "_MCServerInternal_PluginName"
+#define LUA_PLUGIN_INSTANCE_VAR_NAME "_MCServerInternal_PluginInstance"
 
 
 
@@ -63,6 +66,10 @@ public:
 	virtual bool OnUpdatingSign       (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnWeatherChanged     (cWorld * a_World) override;
 	
+	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player) override;
+	
+	virtual void ClearCommands(void) override;
+	
 	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) override;
 	
 	// cWebPlugin override
@@ -71,21 +78,28 @@ public:
 	// cWebPlugin and WebAdmin stuff
 	virtual AString HandleWebRequest( HTTPRequest * a_Request ) override;
 	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);	// >> EXPORTED IN MANUALBINDINGS <<
+	
+	/// Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap.
+	void BindCommand(const AString & a_Command, int a_FnRef);
 
 	lua_State* GetLuaState() { return m_LuaState; }
 
 	cCriticalSection & GetCriticalSection() { return m_CriticalSection; }
 	
 protected:
+	cCriticalSection m_CriticalSection;
+	lua_State * m_LuaState;
+	
+	/// Maps command name into Lua function reference
+	typedef std::map<AString, int> CommandMap;
+	
+	CommandMap m_Commands;
+
 	bool PushFunction(const char * a_FunctionName, bool a_bLogError = true);
 	bool CallFunction(int a_NumArgs, int a_NumResults, const char * a_FunctionName );  // a_FunctionName is only used for error messages, nothing else
 	
 	/// Returns the name of Lua function that should handle the specified hook
 	const char * GetHookFnName(cPluginManager::PluginHook a_Hook);
-
-	cCriticalSection m_CriticalSection;
-
-	lua_State * m_LuaState;
 } ;  // tolua_export
 
 

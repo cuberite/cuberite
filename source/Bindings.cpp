@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 01/28/13 17:46:12.
+** Generated automatically by tolua++-1.0.92 on 02/01/13 20:11:44.
 */
 
 #ifndef __cplusplus
@@ -154,7 +154,6 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cPlugin::CommandStruct");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cGroup");
@@ -167,7 +166,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cStairs");
+ tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"Lua__cTCPLink");
@@ -179,13 +178,13 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"Lua__cPickup");
- tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"cPluginManager");
- tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"HTTPFormData");
+ tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cLadder");
  tolua_usertype(tolua_S,"MTRand");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"HTTPRequest");
@@ -193,10 +192,10 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cServer");
+ tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"Lua__cChestEntity");
- tolua_usertype(tolua_S,"cPawn");
- tolua_usertype(tolua_S,"Lua__cEntity");
+ tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"Vector3d");
 }
 
@@ -8782,9 +8781,9 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__MoveTo00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetPluginManager of class  cPluginManager */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_GetPluginManager00
-static int tolua_AllToLua_cPluginManager_GetPluginManager00(lua_State* tolua_S)
+/* method: Get of class  cPluginManager */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_Get00
+static int tolua_AllToLua_cPluginManager_Get00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -8797,14 +8796,14 @@ static int tolua_AllToLua_cPluginManager_GetPluginManager00(lua_State* tolua_S)
 #endif
  {
   {
-   cPluginManager* tolua_ret = (cPluginManager*)  cPluginManager::GetPluginManager();
+   cPluginManager* tolua_ret = (cPluginManager*)  cPluginManager::Get();
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPluginManager");
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetPluginManager'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'Get'.",&tolua_err);
  return 0;
 #endif
 }
@@ -8990,7 +8989,7 @@ static int tolua_AllToLua_cPluginManager_DisablePlugin00(lua_State* tolua_S)
 #endif
  {
   cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
-  AString a_PluginName = ((AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString a_PluginName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DisablePlugin'", NULL);
 #endif
@@ -9025,7 +9024,7 @@ static int tolua_AllToLua_cPluginManager_LoadPlugin00(lua_State* tolua_S)
 #endif
  {
   cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
-  AString a_PluginName = ((AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString a_PluginName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LoadPlugin'", NULL);
 #endif
@@ -9044,93 +9043,73 @@ static int tolua_AllToLua_cPluginManager_LoadPlugin00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: Command of class  CommandStruct */
-#ifndef TOLUA_DISABLE_tolua_get_cPlugin__CommandStruct_Command
-static int tolua_get_cPlugin__CommandStruct_Command(lua_State* tolua_S)
+/* method: IsCommandBound of class  cPluginManager */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_IsCommandBound00
+static int tolua_AllToLua_cPluginManager_IsCommandBound00(lua_State* tolua_S)
 {
-  cPlugin::CommandStruct* self = (cPlugin::CommandStruct*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Command'",NULL);
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
 #endif
-  tolua_pushcppstring(tolua_S,(const char*)self->Command);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Command of class  CommandStruct */
-#ifndef TOLUA_DISABLE_tolua_set_cPlugin__CommandStruct_Command
-static int tolua_set_cPlugin__CommandStruct_Command(lua_State* tolua_S)
-{
-  cPlugin::CommandStruct* self = (cPlugin::CommandStruct*)  tolua_tousertype(tolua_S,1,0);
+ {
+  cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Command'",NULL);
-  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCommandBound'", NULL);
 #endif
-  self->Command = ((AString)  tolua_tocppstring(tolua_S,2,0))
-;
+  {
+   bool tolua_ret = (bool)  self->IsCommandBound(a_Command);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Command);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsCommandBound'.",&tolua_err);
  return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: Description of class  CommandStruct */
-#ifndef TOLUA_DISABLE_tolua_get_cPlugin__CommandStruct_Description
-static int tolua_get_cPlugin__CommandStruct_Description(lua_State* tolua_S)
+/* method: GetCommandPermission of class  cPluginManager */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_GetCommandPermission00
+static int tolua_AllToLua_cPluginManager_GetCommandPermission00(lua_State* tolua_S)
 {
-  cPlugin::CommandStruct* self = (cPlugin::CommandStruct*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Description'",NULL);
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
 #endif
-  tolua_pushcppstring(tolua_S,(const char*)self->Description);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Description of class  CommandStruct */
-#ifndef TOLUA_DISABLE_tolua_set_cPlugin__CommandStruct_Description
-static int tolua_set_cPlugin__CommandStruct_Description(lua_State* tolua_S)
-{
-  cPlugin::CommandStruct* self = (cPlugin::CommandStruct*)  tolua_tousertype(tolua_S,1,0);
+ {
+  cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Description'",NULL);
-  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetCommandPermission'", NULL);
 #endif
-  self->Description = ((AString)  tolua_tocppstring(tolua_S,2,0))
-;
+  {
+   AString tolua_ret = (AString)  self->GetCommandPermission(a_Command);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Command);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetCommandPermission'.",&tolua_err);
  return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: Permission of class  CommandStruct */
-#ifndef TOLUA_DISABLE_tolua_get_cPlugin__CommandStruct_Permission
-static int tolua_get_cPlugin__CommandStruct_Permission(lua_State* tolua_S)
-{
-  cPlugin::CommandStruct* self = (cPlugin::CommandStruct*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Permission'",NULL);
 #endif
-  tolua_pushcppstring(tolua_S,(const char*)self->Permission);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Permission of class  CommandStruct */
-#ifndef TOLUA_DISABLE_tolua_set_cPlugin__CommandStruct_Permission
-static int tolua_set_cPlugin__CommandStruct_Permission(lua_State* tolua_S)
-{
-  cPlugin::CommandStruct* self = (cPlugin::CommandStruct*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Permission'",NULL);
-  if (!tolua_iscppstring(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Permission = ((AString)  tolua_tocppstring(tolua_S,2,0))
-;
- return 0;
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -9324,46 +9303,6 @@ static int tolua_AllToLua_cPlugin_GetLocalDirectory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetLocalDirectory'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: AddCommand of class  cPlugin */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlugin_AddCommand00
-static int tolua_AllToLua_cPlugin_AddCommand00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  const AString a_Description = ((const AString)  tolua_tocppstring(tolua_S,3,0));
-  const AString a_Permission = ((const AString)  tolua_tocppstring(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddCommand'", NULL);
-#endif
-  {
-   self->AddCommand(a_Command,a_Description,a_Permission);
-   tolua_pushcppstring(tolua_S,(const char*)a_Command);
-   tolua_pushcppstring(tolua_S,(const char*)a_Description);
-   tolua_pushcppstring(tolua_S,(const char*)a_Permission);
-  }
- }
- return 3;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'AddCommand'.",&tolua_err);
  return 0;
 #endif
 }
@@ -21285,7 +21224,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_UPDATED_SIGN",cPluginManager::HOOK_UPDATED_SIGN);
    tolua_constant(tolua_S,"HOOK_UPDATING_SIGN",cPluginManager::HOOK_UPDATING_SIGN);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
-   tolua_function(tolua_S,"GetPluginManager",tolua_AllToLua_cPluginManager_GetPluginManager00);
+   tolua_function(tolua_S,"Get",tolua_AllToLua_cPluginManager_Get00);
    tolua_function(tolua_S,"GetPlugin",tolua_AllToLua_cPluginManager_GetPlugin00);
    tolua_function(tolua_S,"FindPlugins",tolua_AllToLua_cPluginManager_FindPlugins00);
    tolua_function(tolua_S,"ReloadPlugins",tolua_AllToLua_cPluginManager_ReloadPlugins00);
@@ -21293,22 +21232,17 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetNumPlugins",tolua_AllToLua_cPluginManager_GetNumPlugins00);
    tolua_function(tolua_S,"DisablePlugin",tolua_AllToLua_cPluginManager_DisablePlugin00);
    tolua_function(tolua_S,"LoadPlugin",tolua_AllToLua_cPluginManager_LoadPlugin00);
+   tolua_function(tolua_S,"IsCommandBound",tolua_AllToLua_cPluginManager_IsCommandBound00);
+   tolua_function(tolua_S,"GetCommandPermission",tolua_AllToLua_cPluginManager_GetCommandPermission00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPlugin","cPlugin","",NULL);
   tolua_beginmodule(tolua_S,"cPlugin");
-   tolua_cclass(tolua_S,"CommandStruct","cPlugin::CommandStruct","",NULL);
-   tolua_beginmodule(tolua_S,"CommandStruct");
-    tolua_variable(tolua_S,"Command",tolua_get_cPlugin__CommandStruct_Command,tolua_set_cPlugin__CommandStruct_Command);
-    tolua_variable(tolua_S,"Description",tolua_get_cPlugin__CommandStruct_Description,tolua_set_cPlugin__CommandStruct_Description);
-    tolua_variable(tolua_S,"Permission",tolua_get_cPlugin__CommandStruct_Permission,tolua_set_cPlugin__CommandStruct_Permission);
-   tolua_endmodule(tolua_S);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cPlugin_GetName00);
    tolua_function(tolua_S,"SetName",tolua_AllToLua_cPlugin_SetName00);
    tolua_function(tolua_S,"GetVersion",tolua_AllToLua_cPlugin_GetVersion00);
    tolua_function(tolua_S,"SetVersion",tolua_AllToLua_cPlugin_SetVersion00);
    tolua_function(tolua_S,"GetDirectory",tolua_AllToLua_cPlugin_GetDirectory00);
    tolua_function(tolua_S,"GetLocalDirectory",tolua_AllToLua_cPlugin_GetLocalDirectory00);
-   tolua_function(tolua_S,"AddCommand",tolua_AllToLua_cPlugin_AddCommand00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPlugin_NewLua","cPlugin_NewLua","cPlugin",NULL);
   tolua_beginmodule(tolua_S,"cPlugin_NewLua");

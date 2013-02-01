@@ -10,10 +10,9 @@
 
 
 cPlugin::cPlugin( const AString & a_PluginDirectory )
-	: m_Version( 0 )
-	, m_Language( E_CPP )
-	, m_bCanBindCommands( false )
-	, m_Directory( a_PluginDirectory )
+	: m_Version(0)
+	, m_Language(E_CPP)
+	, m_Directory(a_PluginDirectory)
 {
 }
 
@@ -119,6 +118,17 @@ bool cPlugin::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
 	UNUSED(a_Reason);
 	UNUSED(a_Player);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+{
+	UNUSED(a_Client);
+	UNUSED(a_Username);
 	return false;
 }
 
@@ -464,24 +474,11 @@ bool cPlugin::OnWeatherChanged(cWorld * a_World)
 
 
 
-bool cPlugin::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+bool cPlugin::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
 {
-	UNUSED(a_Client);
-	UNUSED(a_Username);
+	UNUSED(a_Split);
+	UNUSED(a_Player);
 	return false;
-}
-
-
-
-
-
-void cPlugin::AddCommand(const AString & a_Command, const AString & a_Description, const AString & a_Permission)
-{
-	CommandStruct Command;
-	Command.Command = a_Command;
-	Command.Description = a_Description;
-	Command.Permission = a_Permission;
-	m_Commands.push_back( Command );
 }
 
 
