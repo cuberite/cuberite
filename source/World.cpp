@@ -1752,33 +1752,30 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 
 
 
-bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
+bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback)
 {
-	cPlayer* BestMatch = 0;
+	cPlayer * BestMatch = NULL;
 	unsigned int BestRating = 0;
-	unsigned int NumMatches = 0;
-	unsigned int NameLength = a_PlayerName.length();
+	unsigned int NameLength = a_PlayerNameHint.length();
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		unsigned int Rating = RateCompareString (a_PlayerName, (*itr)->GetName());
-		if (Rating > 0 && Rating >= BestRating)
+		unsigned int Rating = RateCompareString (a_PlayerNameHint, (*itr)->GetName());
+		if (Rating >= BestRating)
 		{
 			BestMatch = *itr;
-			if( Rating > BestRating ) NumMatches = 0;
 			BestRating = Rating;
-			++NumMatches;
 		}
-		if (Rating == NameLength) // Perfect match
+		if (Rating == NameLength)  // Perfect match
 		{
 			break;
 		}
 	}  // for itr - m_Players[]
 
-	if (NumMatches == 1)
+	if (BestMatch != NULL)
 	{
-		LOG("Compared %s and %s with rating %i", a_PlayerName.c_str(), BestMatch->GetName().c_str(), BestRating );
+		LOG("Compared %s and %s with rating %i", a_PlayerNameHint.c_str(), BestMatch->GetName().c_str(), BestRating);
 		return a_Callback.Item (BestMatch);
 	}
 	return false;
