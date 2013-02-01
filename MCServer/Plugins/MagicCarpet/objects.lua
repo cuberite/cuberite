@@ -52,7 +52,7 @@ function cCarpet:new()
 end
 
 function cCarpet:remove()
-	local World = cRoot:Get():GetWorld()
+	local World = cRoot:Get():GetDefaultWorld()
 	for i, fib in ipairs( self.Fibers ) do
 		local x = self.Location.x + fib.x
 		local y = self.Location.y + fib.y
@@ -66,7 +66,7 @@ function cCarpet:remove()
 end
 
 function cCarpet:draw()
-	local World = cRoot:Get():GetWorld()
+	local World = cRoot:Get():GetDefaultWorld()
 	for i, fib in ipairs( self.Fibers ) do
 		local x = self.Location.x + fib.x
 		local y = self.Location.y + fib.y

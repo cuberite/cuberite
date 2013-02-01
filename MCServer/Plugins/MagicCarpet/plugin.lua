@@ -8,15 +8,18 @@ function Initialize( Plugin )
 	Plugin:SetVersion( 1 )
 
 	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_PLAYER_MOVE)
-	PluginManager:AddHook( Plugin, cPluginManager.E_PLUGIN_DISCONNECT)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
 	
-	Plugin:AddCommand("/mc", " - Spawns a magical carpet!", 	"magiccarpet")
-	Plugin:BindCommand( "/mc", 		"magiccarpet",		HandleCarpetCommand )
+	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
 
 	Log( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
 end
+
+
+
+
 
 function OnDisable()
 	Log( PLUGIN:GetName() .. " v." .. PLUGIN:GetVersion() .. " is shutting down..." )
@@ -24,6 +27,10 @@ function OnDisable()
 		Carpet:remove()
 	end
 end
+
+
+
+
 
 function HandleCarpetCommand( Split, Player )
 	Carpet = Carpets[ Player ]
@@ -39,6 +46,10 @@ function HandleCarpetCommand( Split, Player )
 	return true
 end
 
+
+
+
+
 function OnDisconnect( Reason, Player )
 	local Carpet = Carpets[ Player ]
 	if( Carpet ~= nil )	 then
@@ -47,14 +58,18 @@ function OnDisconnect( Reason, Player )
 	Carpets[ Player ] = nil
 end
 
-function OnPlayerMove( Player )
+
+
+
+
+function OnPlayerMoving(Player)
 	local Carpet = Carpets[ Player ]
 	if( Carpet == nil ) then
 		return
 	end
 
 	if( Player:GetPitch() == 90 ) then
-		Carpet:moveTo( cLocation:new( Player:GetPosX(), Player:GetPosY()-1, Player:GetPosZ() ) )
+		Carpet:moveTo( cLocation:new( Player:GetPosX(), Player:GetPosY() - 1, Player:GetPosZ() ) )
 	else
 		if( Player:GetPosY() < Carpet:getY() ) then
 			LOGINFO("Fell tru mc!")
@@ -63,3 +78,6 @@ function OnPlayerMove( Player )
 		Carpet:moveTo( cLocation:new( Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() ) )
 	end
 end
+
+
+
