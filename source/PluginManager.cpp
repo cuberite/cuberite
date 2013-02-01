@@ -1018,7 +1018,9 @@ void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 	{
 		if (itr->second.m_Plugin == a_Plugin)
 		{
-			itr = m_Commands.erase(itr);
+			CommandMap::iterator NextItr = itr + 1;  // Stupid GCC doesn't have a std::map::erase() that would return the next iterator
+			m_Commands.erase(itr);
+			itr = NextItr;
 		}
 		else
 		{
