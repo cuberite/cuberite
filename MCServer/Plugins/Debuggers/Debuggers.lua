@@ -1,7 +1,7 @@
 
 -- Global variables
-PLUGIN = {}	-- Reference to own plugin object
-ShouldDumpFunctions = false  -- If set to true, all available functions are logged upon plugin initialization
+PLUGIN = {};	-- Reference to own plugin object
+ShouldDumpFunctions = true;  -- If set to true, all available functions are logged upon plugin initialization
 
 
 
@@ -22,7 +22,7 @@ function Initialize(Plugin)
 	-- dump all available functions to console:
 	if (ShouldDumpFunctions) then
 		LOG("Dumping all available functions:");
-		function dump (prefix, a) 
+		function dump (prefix, a, Output)
 			for i, v in pairs (a) do
 				if (type(v) == "table") then
 					if (GetChar(i, 1) ~= ".") then
@@ -31,15 +31,26 @@ function Initialize(Plugin)
 						elseif (v == _G.package) then
 							LOG(prefix .. i .. " == _G.package, ignoring");
 						else
-							dump(prefix .. i .. ".", v)
+							dump(prefix .. i .. ".", v, Output)
 						end
 					end
 				elseif (type(v) == "function") then
-					LOG(prefix .. i .. "()")
+					if (string.sub(i, 1, 2) ~= "__") then
+						table.insert(Output, prefix .. i .. "()");
+					end
 				end
 			end
 		end
-		dump("", _G);
+
+		local Output = {};
+		dump("", _G, Output);
+
+		table.sort(Output);
+		local f = io.open("API.txt", "w");
+		for i, n in ipairs(Output) do
+			f:write(n, "\n");
+		end
+		f:close();
 	end
 
 	return true
