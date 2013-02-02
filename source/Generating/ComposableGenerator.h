@@ -34,6 +34,9 @@ public:
 	
 	/// Generates biomes for the given chunk
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) = 0;
+	
+	/// Reads parameters from the ini file, prepares generator for use.
+	virtual void Initialize(cIniFile & a_IniFile) {}
 } ;
 
 

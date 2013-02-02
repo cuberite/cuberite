@@ -146,33 +146,21 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	bool CacheOffByDefault = false;
 	if (NoCaseCompare(BiomeGenName, "constant") == 0)
 	{
-		AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
-		EMCSBiome b = StringToBiome(Biome);
-		if (b == -1)
-		{
-			LOGWARN("[Generator]::ConstantBiome value \"%s\" not recognized, using \"Plains\".", Biome.c_str());
-			b = biPlains;
-		}
-		m_BiomeGen = new cBioGenConstant(b);
+		m_BiomeGen = new cBioGenConstant;
 		CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
 	}
 	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
 	{
-		int BiomeSize  = a_IniFile.GetValueSetI("Generator", "CheckerboardBiomeSize", 64);
-		AString Biomes = a_IniFile.GetValueSet ("Generator", "CheckerBoardBiomes",    "");
-		m_BiomeGen = new cBioGenCheckerboard(BiomeSize, Biomes);
+		m_BiomeGen = new cBioGenCheckerboard;
 		CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
 	{
-		int CellSize   = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 64);
-		AString Biomes = a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   "");
-		m_BiomeGen = new cBioGenVoronoi(Seed, CellSize, Biomes);
+		m_BiomeGen = new cBioGenVoronoi(Seed);
 	}
 	else if (NoCaseCompare(BiomeGenName, "multistepmap") == 0)
 	{
 		m_BiomeGen = new cBioGenMultiStepMap(Seed);
-		((cBioGenMultiStepMap *)m_BiomeGen)->Init(a_IniFile);
 	}
 	else
 	{
@@ -180,9 +168,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		{
 			LOGWARNING("Unknown BiomeGen \"%s\", using \"DistortedVoronoi\" instead.", BiomeGenName.c_str());
 		}
-		int CellSize   = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
-		AString Biomes = a_IniFile.GetValueSet ("Generator", "DistortedVoronoiBiomes",   "");
-		m_BiomeGen = new cBioGenDistortedVoronoi(Seed, CellSize, Biomes);
+		m_BiomeGen = new cBioGenDistortedVoronoi(Seed);
 	}
 	
 	// Add a cache, if requested:
@@ -199,6 +185,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		LOGINFO("Using a cache for biomegen of size %d.", CacheSize);
 		m_BiomeGen = new cBioGenCache(m_BiomeGen, CacheSize);
 	}
+	m_BiomeGen->Initialize(a_IniFile);
 }
 
 

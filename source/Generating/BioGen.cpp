@@ -26,6 +26,21 @@ void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 
 
+void cBioGenConstant::Initialize(cIniFile & a_IniFile)
+{
+	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
+	m_Biome = StringToBiome(Biome);
+	if (m_Biome == -1)
+	{
+		LOGWARN("[Generator]::ConstantBiome value \"%s\" not recognized, using \"Plains\".", Biome.c_str());
+		m_Biome = biPlains;
+	}
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBioGenCache:
 
@@ -110,6 +125,16 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 	memcpy(m_CacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
 	m_CacheData[Idx].m_ChunkX = a_ChunkX;
 	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
+}
+
+
+
+
+
+void cBioGenCache::Initialize(cIniFile & a_IniFile)
+{
+	super::Initialize(a_IniFile);
+	m_BioGenToCache->Initialize(a_IniFile);
 }
 
 
@@ -217,6 +242,19 @@ void cBioGenCheckerboard::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 
 
 
+void cBioGenCheckerboard::Initialize(cIniFile & a_IniFile)
+{
+	super::Initialize(a_IniFile);
+	AString Biomes = a_IniFile.GetValueSet ("Generator", "CheckerBoardBiomes",    "");
+	m_BiomeSize    = a_IniFile.GetValueSetI("Generator", "CheckerboardBiomeSize", 64);
+	m_BiomeSize = (m_BiomeSize < 8) ? 8 : m_BiomeSize;
+	InitializeBiomes(Biomes);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBioGenVoronoi :
 
@@ -232,6 +270,18 @@ void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap &
 			cChunkDef::SetBiome(a_BiomeMap, x, z, VoronoiBiome(BaseX + x, AbsoluteZ));
 		}  // for x
 	}  // for z
+}
+
+
+
+
+
+void cBioGenVoronoi::Initialize(cIniFile & a_IniFile)
+{
+	super::Initialize(a_IniFile);
+	m_CellSize     = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 64);
+	AString Biomes = a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   "");
+	InitializeBiomes(Biomes);
 }
 
 
@@ -308,6 +358,17 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 
 
 
+void cBioGenDistortedVoronoi::Initialize(cIniFile & a_IniFile)
+{
+	// Do NOT call super::Initialize(), as it would try to read Voronoi params instead of DistortedVoronoi params
+	m_CellSize     = a_IniFile.GetValueSetI("Generator", "DistortedVoronoiCellSize", 96);
+	AString Biomes = a_IniFile.GetValueSet ("Generator", "DistortedVoronoiBiomes",   "");
+	InitializeBiomes(Biomes);
+}
+
+
+
+
 void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ)
 {
 	double NoiseX = m_Noise.CubicNoise3D((float)a_BlockX / m_CellSize, (float)a_BlockZ / m_CellSize, 1000);
@@ -343,7 +404,7 @@ cBioGenMultiStepMap::cBioGenMultiStepMap(int a_Seed) :
 
 
 
-void cBioGenMultiStepMap::Init(cIniFile & a_IniFile)
+void cBioGenMultiStepMap::Initialize(cIniFile & a_IniFile)
 {
 	m_OceanCellSize       =        a_IniFile.GetValueSetI("Generator", "MultiStepMapOceanCellSize",      m_OceanCellSize);
 	m_MushroomIslandSize  =        a_IniFile.GetValueSetI("Generator", "MultiStepMapMushroomIslandSize", m_MushroomIslandSize);
