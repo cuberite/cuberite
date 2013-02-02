@@ -11,31 +11,6 @@
 
 
 
-#define CLASS_PROT_ISA()       virtual bool IsA(const char * a_EntityType) const override;
-#define CLASS_PROT_GETCLASS()  virtual const char * GetClass      (void) const override;
-#define CLASS_PROT_GETPARENT() virtual const char * GetParentClass(void) const override;
-
-#define CLASS_PROTOTYPE() \
-	CLASS_PROT_ISA(); \
-	CLASS_PROT_GETCLASS(); \
-	CLASS_PROT_GETPARENT();
-
-#define CLASS_DEF_ISA(classname) \
-	bool classname::IsA(const char * a_ClassName) const \
-	{ \
-		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
-	}
-
-#define CLASS_DEF_GETCLASS(classname) \
-	const char * classname::GetClass(void) const \
-	{ \
-		return #classname; \
-	}
-
-#define CLASS_DEFINITION(classname) \
-	CLASS_DEF_ISA(classname) \
-	CLASS_DEF_GETCLASS(classname)
-
 // Place this macro in the header of each cEntity descendant class and you're done :)
 #define CLASS_PROTODEF(classname) \
 	virtual bool IsA(const char * a_ClassName) const override\
@@ -43,6 +18,10 @@
 		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
 	} \
 	virtual const char * GetClass(void) const override \
+	{ \
+		return #classname; \
+	} \
+	static const char * GetClassStatic(void) \
 	{ \
 		return #classname; \
 	} \
@@ -109,6 +88,9 @@ public:
 	
 	/// Returns the topmost class name for the object
 	virtual const char * GetClass(void) const;
+
+	// Returns the class name of this class
+	static const char * GetClassStatic(void);
 	
 	/// Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent).
 	virtual const char * GetParentClass(void) const;

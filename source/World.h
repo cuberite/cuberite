@@ -60,6 +60,11 @@ class cWorld													// tolua_export
 public:
 
 	// tolua_begin
+
+	static const char * GetClassStatic(void)
+	{
+		return "cWorld";
+	}
 	
 	/// Return time in seconds
 	inline static float GetTime(void)

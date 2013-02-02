@@ -30,6 +30,8 @@ public:
 	virtual ~cFurnaceEntity();
 	virtual void Destroy();
 
+	static const char * GetClassStatic() { return "cFurnaceEntity"; }
+
 	bool LoadFromFile(cFile & a_File);  // deprecated format
 
 	bool LoadFromJson(const Json::Value& a_Value );

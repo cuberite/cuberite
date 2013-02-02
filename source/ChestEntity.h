@@ -31,6 +31,8 @@ public:
 	virtual ~cChestEntity();
 	virtual void Destroy();
 
+	static const char * GetClassStatic() { return "cChestEntity"; }
+
 	const cItem * GetSlot(int a_Slot) const;                   // tolua_export
 	void          SetSlot(int a_Slot, const cItem & a_Item );  // tolua_export
 

@@ -70,7 +70,19 @@ cEntity::~cEntity()
 
 
 
-CLASS_DEF_GETCLASS(cEntity);
+const char * cEntity::GetClass(void) const
+{
+	return "cEntity";
+}
+
+
+
+
+
+const char * cEntity::GetClassStatic(void)
+{
+	return "cEntity";
+}
 
 
 
