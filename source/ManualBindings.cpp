@@ -637,7 +637,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 	int FnRef = luaL_ref(L, LUA_REGISTRYINDEX);  // Store function reference
 	if (FnRef == LUA_REFNIL)
 	{
-		LOGERROR("\"BindCommand\": Cannot create a function reference. Command \"%s\" not bound.", Command);
+		LOGERROR("\"BindCommand\": Cannot create a function reference. Command \"%s\" not bound.", Command.c_str());
 		return 0;
 	}
 	
