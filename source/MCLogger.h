@@ -13,8 +13,8 @@ class cLog;
 class cMCLogger														// tolua_export
 {																	// tolua_export
 public:																// tolua_export
-	cMCLogger();
-	cMCLogger( char* a_File );										// tolua_export
+	cMCLogger(void);
+	cMCLogger(const AString & a_FileName);  // tolua_export
 	~cMCLogger();													// tolua_export
 
 	void Log(const char* a_Format, va_list a_ArgList);

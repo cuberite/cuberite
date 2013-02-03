@@ -8,7 +8,11 @@
 
 
 
-cMCLogger* cMCLogger::s_MCLogger = 0;
+cMCLogger * cMCLogger::s_MCLogger = NULL;
+
+
+
+
 
 cMCLogger* cMCLogger::GetInstance()
 {
@@ -19,10 +23,10 @@ cMCLogger* cMCLogger::GetInstance()
 
 
 
-cMCLogger::cMCLogger()
+cMCLogger::cMCLogger(void)
 {
 	AString FileName;
-	Printf(FileName, "LOG_%d.txt", (int)time(0) );
+	Printf(FileName, "LOG_%d.txt", (int)time(NULL));
 	m_Log = new cLog(FileName);
 	m_Log->Log("--- Started Log ---");
 
@@ -33,9 +37,9 @@ cMCLogger::cMCLogger()
 
 
 
-cMCLogger::cMCLogger( char* a_File )
+cMCLogger::cMCLogger(const AString & a_FileName)
 {
-	m_Log = new cLog( a_File );
+	m_Log = new cLog(a_FileName);
 }
 
 
