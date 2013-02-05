@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/01/13 20:11:44.
+** Generated automatically by tolua++-1.0.92 on 02/05/13 19:20:01.
 */
 
 #ifndef __cplusplus
@@ -4241,6 +4241,34 @@ static int tolua_AllToLua_cEntity_GetClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetClass'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetClassStatic of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetClassStatic00
+static int tolua_AllToLua_cEntity_GetClassStatic00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   const char* tolua_ret = (const char*)  cEntity::GetClassStatic();
+   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetClassStatic'.",&tolua_err);
  return 0;
 #endif
 }
@@ -9392,6 +9420,34 @@ static int tolua_AllToLua_cServer_SendMessage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SendMessage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetClassStatic of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetClassStatic00
+static int tolua_AllToLua_cWorld_GetClassStatic00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   const char* tolua_ret = (const char*)  cWorld::GetClassStatic();
+   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetClassStatic'.",&tolua_err);
  return 0;
 #endif
 }
@@ -21019,6 +21075,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsMob",tolua_AllToLua_cEntity_IsMob00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);
+   tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cEntity_GetClassStatic00);
    tolua_function(tolua_S,"GetParentClass",tolua_AllToLua_cEntity_GetParentClass00);
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cEntity_GetWorld00);
    tolua_function(tolua_S,"GetPosition",tolua_AllToLua_cEntity_GetPosition00);
@@ -21193,8 +21250,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cPluginManager");
    tolua_constant(tolua_S,"HOOK_BLOCK_TO_PICKUPS",cPluginManager::HOOK_BLOCK_TO_PICKUPS);
    tolua_constant(tolua_S,"HOOK_CHAT",cPluginManager::HOOK_CHAT);
+   tolua_constant(tolua_S,"HOOK_CHUNK_AVAILABLE",cPluginManager::HOOK_CHUNK_AVAILABLE);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATED",cPluginManager::HOOK_CHUNK_GENERATED);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATING",cPluginManager::HOOK_CHUNK_GENERATING);
+   tolua_constant(tolua_S,"HOOK_CHUNK_UNLOADING",cPluginManager::HOOK_CHUNK_UNLOADING);
+   tolua_constant(tolua_S,"HOOK_CHUNK_UNLOADED",cPluginManager::HOOK_CHUNK_UNLOADED);
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
@@ -21255,6 +21315,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);
   tolua_beginmodule(tolua_S,"cWorld");
+   tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cWorld_GetClassStatic00);
    tolua_function(tolua_S,"GetTime",tolua_AllToLua_cWorld_GetTime00);
    tolua_function(tolua_S,"GetWorldAge",tolua_AllToLua_cWorld_GetWorldAge00);
    tolua_function(tolua_S,"GetTimeOfDay",tolua_AllToLua_cWorld_GetTimeOfDay00);

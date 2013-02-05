@@ -237,10 +237,10 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
 
 
 
-bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE);
 	ASSERT(FnName != NULL);
 	if (!PushFunction(FnName))
 	{
@@ -252,6 +252,35 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 	tolua_pushnumber  (m_LuaState, a_ChunkZ);
 	
 	if (!CallFunction(3, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+	
+	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
+	
+	if (!CallFunction(4, 1, FnName))
 	{
 		return false;
 	}
@@ -281,6 +310,62 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cChunkDesc");
 
 	if (!CallFunction(4, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+	
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	
+	if (!CallFunction(3, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+	
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_ChunkX);
+	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	
+	if (!CallFunction(3, 1, FnName))
 	{
 		return false;
 	}
@@ -1276,8 +1361,11 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 	{
 		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:      return "OnBlockToPickups";
 		case cPluginManager::HOOK_CHAT:                  return "OnChat";
+		case cPluginManager::HOOK_CHUNK_AVAILABLE:       return "OnChunkAvailable";
 		case cPluginManager::HOOK_CHUNK_GENERATED:       return "OnChunkGenerated";
 		case cPluginManager::HOOK_CHUNK_GENERATING:      return "OnChunkGenerating";
+		case cPluginManager::HOOK_CHUNK_UNLOADED:        return "OnChunkUnloaded";
+		case cPluginManager::HOOK_CHUNK_UNLOADING:       return "OnChunkUnloading";
 		case cPluginManager::HOOK_COLLECTING_PICKUP:     return "OnCollectingPickup";
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:    return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:            return "OnDisconnect";

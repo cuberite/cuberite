@@ -15,8 +15,11 @@ function Initialize(Plugin)
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_BLOCK_TO_PICKUPS);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_AVAILABLE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_UNLOADED);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_UNLOADING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_COLLECTING_PICKUP);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT);
@@ -99,6 +102,14 @@ end
 
 
 
+function OnChunkAvailable(...)
+	LogHook("OnChunkAvailable", unpack(arg));
+end
+
+
+
+
+
 function OnChunkGenerated(...)
 	LogHook("OnChunkGenerated", unpack(arg));
 end
@@ -109,6 +120,22 @@ end
 
 function OnChunkGenerating(...)
 	LogHook("OnChunkGenerating", unpack(arg));
+end
+
+
+
+
+
+function OnChunkUnloaded(...)
+	LogHook("OnChunkUnloaded", unpack(arg));
+end
+
+
+
+
+
+function OnChunkUnloading(...)
+	LogHook("OnChunkUnloading", unpack(arg));
 end
 
 

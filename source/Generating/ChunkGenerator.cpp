@@ -273,9 +273,10 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cEntityList Entities;
 	cBlockEntityList BlockEntities;
 	
-	cChunkDesc LuaChunk(BlockTypes, BlockMeta, HeightMap, BiomeMap);
-	cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &LuaChunk);
-	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, LuaChunk, Entities, BlockEntities);
+	cChunkDesc ChunkDesc(BlockTypes, BlockMeta, HeightMap, BiomeMap);
+	cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
+	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc, Entities, BlockEntities);
+	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
 	
 	m_World->SetChunkData(
 		a_ChunkX, a_ChunkY, a_ChunkZ, 
@@ -285,8 +286,6 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 		Entities, BlockEntities,
 		true
 	);
-	
-	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ);
 }
 
 

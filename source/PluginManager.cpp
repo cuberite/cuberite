@@ -233,16 +233,16 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, const AString & a_Message)
 
 
 
-bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginManager::CallHookChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATED);
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_AVAILABLE);
 	if (Plugins == m_Hooks.end())
 	{
 		return false;
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ))
+		if ((*itr)->OnChunkAvailable(a_World, a_ChunkX, a_ChunkZ))
 		{
 			return true;
 		}
@@ -254,7 +254,28 @@ bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_LuaChunk)
+bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATING);
 	if (Plugins == m_Hooks.end())
@@ -263,7 +284,49 @@ bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_LuaChunk))
+		if ((*itr)->OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_UNLOADED);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnChunkUnloaded(a_World, a_ChunkX, a_ChunkZ))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_UNLOADING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnChunkUnloading(a_World, a_ChunkX, a_ChunkZ))
 		{
 			return true;
 		}

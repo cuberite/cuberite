@@ -35,8 +35,11 @@ public:
 
 	virtual bool OnBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
 	virtual bool OnChat               (cPlayer * a_Player, const AString & a_Message) override;
-	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
-	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk ) override;
+	virtual bool OnChunkAvailable     (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
+	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
+	virtual bool OnChunkUnloaded      (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnChunkUnloading     (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnCollectingPickup   (cPlayer * a_Player, cPickup * a_Pickup) override;
 	virtual bool OnCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason) override;

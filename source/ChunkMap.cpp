@@ -11,6 +11,7 @@
 #include "Chunk.h"
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
+#include "PluginManager.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -711,6 +712,9 @@ void cChunkMap::SetChunkData(
 	{
 		Chunk->MarkDirty();
 	}
+
+	// Notify plugins of the chunk becoming available
+	cPluginManager::Get()->CallHookChunkAvailable(m_World, a_ChunkX, a_ChunkZ);
 }
 
 
@@ -1992,7 +1996,11 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 {
 	for (int i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
-		if ((m_Chunks[i] != NULL) && (m_Chunks[i]->CanUnload()))
+		if (
+			(m_Chunks[i] != NULL) &&   // Is valid
+			(m_Chunks[i]->CanUnload()) &&  // Can unload
+			!cPluginManager::Get()->CallHookChunkUnloading(m_Parent->GetWorld(), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
+		)
 		{
 			// The cChunk destructor calls our GetChunk() while removing its entities
 			// so we still need to be able to return the chunk. Therefore we first delete, then NULLify

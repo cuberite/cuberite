@@ -189,8 +189,6 @@ void cRoot::Start(void)
 		StopWorlds();
 		LOG("Stopping authenticator...");
 		m_Authenticator.Stop();
-		LOG("Stopping plugin manager...");
-		delete m_PluginManager; m_PluginManager = 0;  // This should be first
 		
 
 		#ifdef USE_SQUIRREL
@@ -208,6 +206,9 @@ void cRoot::Start(void)
 		LOG("Unloading worlds...");
 		UnloadWorlds();
 		
+		LOG("Stopping plugin manager...");
+		delete m_PluginManager; m_PluginManager = NULL;
+
 		cItemHandler::Deinit();
 		cBlockHandler::Deinit();
 

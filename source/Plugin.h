@@ -50,8 +50,11 @@ public:
 	 **/
 	virtual bool OnBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	virtual bool OnChat               (cPlayer * a_Player, const AString & a_Message);
-	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
-	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk);
+	virtual bool OnChunkAvailable     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
+	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	virtual bool OnChunkUnloaded      (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
+	virtual bool OnChunkUnloading     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	virtual bool OnCollectingPickup   (cPlayer * a_Player, cPickup * a_Pickup);
 	virtual bool OnCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason);

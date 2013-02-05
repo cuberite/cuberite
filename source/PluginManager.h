@@ -41,8 +41,11 @@ public:																	// tolua_export
 	{
 		HOOK_BLOCK_TO_PICKUPS,
 		HOOK_CHAT,
+		HOOK_CHUNK_AVAILABLE,
 		HOOK_CHUNK_GENERATED,
 		HOOK_CHUNK_GENERATING,
+		HOOK_CHUNK_UNLOADED,
+		HOOK_CHUNK_UNLOADING,
 		HOOK_COLLECTING_PICKUP,
 		HOOK_CRAFTING_NO_RECIPE,
 		HOOK_DISCONNECT,
@@ -101,8 +104,11 @@ public:																	// tolua_export
 
 	bool CallHookBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	bool CallHookChat               (cPlayer * a_Player, const AString & a_Message);
-	bool CallHookChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_Chunk);
+	bool CallHookChunkAvailable     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
+	bool CallHookChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	bool CallHookChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	bool CallHookChunkUnloaded      (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
+	bool CallHookChunkUnloading     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookCollectingPickup   (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect         (cPlayer * a_Player, const AString & a_Reason);

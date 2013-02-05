@@ -62,16 +62,15 @@ cWebAdmin::cWebAdmin( int a_Port /* = 8080 */ )
 	Init( m_Port );
 }
 
+
+
+
+
 cWebAdmin::~cWebAdmin()
 {
 	WebAdmin = 0;
 	m_WebServer->Stop();
 
-	while( m_Plugins.begin() != m_Plugins.end() )
-	{
-		delete *m_Plugins.begin();
-		//m_Plugins.remove( *m_Plugins.begin() );
-	}
 	delete m_WebServer;
 	delete m_IniFile;
 
@@ -79,11 +78,19 @@ cWebAdmin::~cWebAdmin()
 	delete m_Event;
 }
 
+
+
+
+
 void cWebAdmin::AddPlugin( cWebPlugin * a_Plugin )
 {
 	m_Plugins.remove( a_Plugin );
 	m_Plugins.push_back( a_Plugin );
 }
+
+
+
+
 
 void cWebAdmin::RemovePlugin( cWebPlugin * a_Plugin )
 {

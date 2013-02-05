@@ -22,6 +22,7 @@ cPlugin::cPlugin( const AString & a_PluginDirectory )
 
 cPlugin::~cPlugin()
 {
+	LOGD("Destroying plugin \"%s\".", m_Name.c_str());
 }
 
 
@@ -66,7 +67,7 @@ bool cPlugin::OnChat(cPlayer * a_Player, const AString & a_Message)
 
 
 
-bool cPlugin::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPlugin::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	UNUSED(a_World);
 	UNUSED(a_ChunkX);
@@ -78,12 +79,49 @@ bool cPlugin::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cPlugin::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk)
+bool cPlugin::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	UNUSED(a_World);
 	UNUSED(a_ChunkX);
 	UNUSED(a_ChunkZ);
-	UNUSED(a_pLuaChunk);
+	UNUSED(a_ChunkDesc);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+{
+	UNUSED(a_World);
+	UNUSED(a_ChunkX);
+	UNUSED(a_ChunkZ);
+	UNUSED(a_ChunkDesc);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	UNUSED(a_World);
+	UNUSED(a_ChunkX);
+	UNUSED(a_ChunkZ);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+{
+	UNUSED(a_World);
+	UNUSED(a_ChunkX);
+	UNUSED(a_ChunkZ);
 	return false;
 }
 
