@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/06/13 17:53:00.
+** Generated automatically by tolua++-1.0.92 on 02/06/13 22:02:40.
 */
 
 #ifndef __cplusplus
@@ -17859,6 +17859,41 @@ static int tolua_AllToLua_cBlockArea_DumpToRawFile00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: LoadFromSchematicFile of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_LoadFromSchematicFile00
+static int tolua_AllToLua_cBlockArea_LoadFromSchematicFile00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_FileName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'LoadFromSchematicFile'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->LoadFromSchematicFile(a_FileName);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_FileName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'LoadFromSchematicFile'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Crop of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_Crop00
 static int tolua_AllToLua_cBlockArea_Crop00(lua_State* tolua_S)
@@ -21740,6 +21775,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Write",tolua_AllToLua_cBlockArea_Write00);
    tolua_function(tolua_S,"Write",tolua_AllToLua_cBlockArea_Write01);
    tolua_function(tolua_S,"DumpToRawFile",tolua_AllToLua_cBlockArea_DumpToRawFile00);
+   tolua_function(tolua_S,"LoadFromSchematicFile",tolua_AllToLua_cBlockArea_LoadFromSchematicFile00);
    tolua_function(tolua_S,"Crop",tolua_AllToLua_cBlockArea_Crop00);
    tolua_function(tolua_S,"SetRelBlockType",tolua_AllToLua_cBlockArea_SetRelBlockType00);
    tolua_function(tolua_S,"SetBlockType",tolua_AllToLua_cBlockArea_SetBlockType00);

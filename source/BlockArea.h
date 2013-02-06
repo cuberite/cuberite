@@ -16,8 +16,11 @@
 
 
 
-// fwd: "cWorld.h"
+// fwd: World.h
 class cWorld;
+
+// fwd: FastNBT.h
+class cParsedNBT;
 
 
 
@@ -58,6 +61,9 @@ public:
 	
 	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
 	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
+	
+	/// Loads an area from a .schematic file. Returns true if successful
+	bool LoadFromSchematicFile(const AString & a_FileName);
 	
 	/// Crops the internal contents by the specified amount of blocks from each border.
 	void Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
@@ -166,6 +172,9 @@ protected:
 	// Crop helpers:
 	void CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
 	void CropNibbles   (NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
+	
+	/// Loads the area from a schematic file uncompressed and parsed into a NBT tree. Returns true if successful.
+	bool LoadFromSchematicNBT(cParsedNBT & a_NBT);
 
 	// tolua_begin
 } ;

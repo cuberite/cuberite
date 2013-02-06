@@ -69,12 +69,14 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 
 	local HeldItem = Player:GetEquippedItem();
 
+
 	if (HeldItem.m_ItemType == E_ITEM_STICK) then
 		-- Magic sTick of ticking: set the pointed block for ticking at the next tick
 		Player:SendMessage(cChatColor.LightGray .. "Setting next block tick to {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "}")
 		Player:GetWorld():SetNextBlockTick(BlockX, BlockY, BlockZ);
 		return true
 	end
+
 
 	if (HeldItem.m_ItemType == E_ITEM_BLAZE_ROD) then
 		-- Magic rod of query: show block types and metas for both neighbors of the pointed face
@@ -104,6 +106,7 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 		end
 	end
 
+
 	-- Rclk with a diamond to read a block area, dump it, crop it, dump it again, crop it again...
 	if (Player:GetEquippedItem().m_ItemType == E_ITEM_DIAMOND) then
 		local Area = cBlockArea();
@@ -132,6 +135,20 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 		return false;
 	end
 
+
+	-- Rclk with an eye of ender places a predefined schematic at the cursor
+	if (Player:GetEquippedItem().m_ItemType == E_ITEM_EYE_OF_ENDER) then
+		local Area = cBlockArea();
+		if not(Area:LoadFromSchematicFile("schematics/test.schematic")) then
+			LOG("Loading failed");
+			return false;
+		end
+		LOG("Schematic loaded, placing now.");
+		Area:Write(Player:GetWorld(), BlockX, BlockY, BlockZ);
+		LOG("Done.");
+		return false;
+	end
+	
 end
 
 
