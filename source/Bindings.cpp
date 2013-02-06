@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/05/13 19:20:01.
+** Generated automatically by tolua++-1.0.92 on 02/06/13 17:53:00.
 */
 
 #ifndef __cplusplus
@@ -17859,6 +17859,49 @@ static int tolua_AllToLua_cBlockArea_DumpToRawFile00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: Crop of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_Crop00
+static int tolua_AllToLua_cBlockArea_Crop00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  int a_AddMinX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_SubMaxX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_AddMinY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_SubMaxY = ((int)  tolua_tonumber(tolua_S,5,0));
+  int a_AddMinZ = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_SubMaxZ = ((int)  tolua_tonumber(tolua_S,7,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Crop'", NULL);
+#endif
+  {
+   self->Crop(a_AddMinX,a_SubMaxX,a_AddMinY,a_SubMaxY,a_AddMinZ,a_SubMaxZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Crop'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetRelBlockType of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_SetRelBlockType00
 static int tolua_AllToLua_cBlockArea_SetRelBlockType00(lua_State* tolua_S)
@@ -21253,8 +21296,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_CHUNK_AVAILABLE",cPluginManager::HOOK_CHUNK_AVAILABLE);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATED",cPluginManager::HOOK_CHUNK_GENERATED);
    tolua_constant(tolua_S,"HOOK_CHUNK_GENERATING",cPluginManager::HOOK_CHUNK_GENERATING);
-   tolua_constant(tolua_S,"HOOK_CHUNK_UNLOADING",cPluginManager::HOOK_CHUNK_UNLOADING);
    tolua_constant(tolua_S,"HOOK_CHUNK_UNLOADED",cPluginManager::HOOK_CHUNK_UNLOADED);
+   tolua_constant(tolua_S,"HOOK_CHUNK_UNLOADING",cPluginManager::HOOK_CHUNK_UNLOADING);
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
@@ -21697,6 +21740,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Write",tolua_AllToLua_cBlockArea_Write00);
    tolua_function(tolua_S,"Write",tolua_AllToLua_cBlockArea_Write01);
    tolua_function(tolua_S,"DumpToRawFile",tolua_AllToLua_cBlockArea_DumpToRawFile00);
+   tolua_function(tolua_S,"Crop",tolua_AllToLua_cBlockArea_Crop00);
    tolua_function(tolua_S,"SetRelBlockType",tolua_AllToLua_cBlockArea_SetRelBlockType00);
    tolua_function(tolua_S,"SetBlockType",tolua_AllToLua_cBlockArea_SetBlockType00);
    tolua_function(tolua_S,"SetRelBlockMeta",tolua_AllToLua_cBlockArea_SetRelBlockMeta00);

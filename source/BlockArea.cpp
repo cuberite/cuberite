@@ -188,6 +188,36 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 
 
 
+void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
+{
+	if (HasBlockTypes())
+	{
+		CropBlockTypes(a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
+	}
+	if (HasBlockMetas())
+	{
+		CropNibbles(m_BlockMetas, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
+	}
+	if (HasBlockLights())
+	{
+		CropNibbles(m_BlockLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
+	}
+	if (HasBlockSkyLights())
+	{
+		CropNibbles(m_BlockSkyLight, a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
+	}
+	m_OriginX += a_AddMinX;
+	m_OriginY += a_AddMinY;
+	m_OriginZ += a_AddMinZ;
+	m_SizeX -= a_AddMinX + a_SubMaxX;
+	m_SizeY -= a_AddMinY + a_SubMaxY;
+	m_SizeZ -= a_AddMinZ + a_SubMaxZ;
+}
+
+
+
+
+
 void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
 	if (m_BlockTypes == NULL)
@@ -459,7 +489,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 
 int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	return a_RelX + a_RelZ * m_SizeZ + a_RelY * m_SizeX * m_SizeZ;
+	return a_RelX + a_RelZ * m_SizeX + a_RelY * m_SizeX * m_SizeZ;
 }
 
 
@@ -713,6 +743,57 @@ void cBlockArea::cChunkReader::BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight)
 		return;
 	}
 	CopyNibbles(m_Area.m_BlockSkyLight, a_BlockSkyLight);
+}
+
+
+
+
+
+void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
+{
+	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
+	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
+	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
+	BLOCKTYPE * NewBlockTypes = new BLOCKTYPE[NewSizeX * NewSizeY * NewSizeZ];
+	int idx = 0;
+	for (int y = 0; y < NewSizeY; y++)
+	{
+		for (int z = 0; z < NewSizeZ; z++)
+		{
+			for (int x = 0; x < NewSizeX; x++)
+			{
+				int OldIndex = MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ);
+				NewBlockTypes[idx++] = m_BlockTypes[OldIndex];
+			}  // for x
+		}  // for z
+	}  // for y
+	delete m_BlockTypes;
+	m_BlockTypes = NewBlockTypes;
+}
+
+
+
+
+
+void cBlockArea::CropNibbles(NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
+{
+	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
+	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
+	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
+	NIBBLETYPE * NewNibbles = new NIBBLETYPE[NewSizeX * NewSizeY * NewSizeZ];
+	int idx = 0;
+	for (int y = 0; y < NewSizeY; y++)
+	{
+		for (int z = 0; z < NewSizeZ; z++)
+		{
+			for (int x = 0; x < NewSizeX; x++)
+			{
+				NewNibbles[idx++] = a_Array[MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ)];
+			}  // for x
+		}  // for z
+	}  // for y
+	delete a_Array;
+	a_Array = NewNibbles;
 }
 
 

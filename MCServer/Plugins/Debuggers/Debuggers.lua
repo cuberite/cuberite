@@ -1,7 +1,7 @@
 
 -- Global variables
 PLUGIN = {};	-- Reference to own plugin object
-ShouldDumpFunctions = true;  -- If set to true, all available functions are logged upon plugin initialization
+ShouldDumpFunctions = false;  -- If set to true, all available functions are logged upon plugin initialization
 
 
 
@@ -103,6 +103,35 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 			return true;
 		end
 	end
+
+	-- Rclk with a diamond to read a block area, dump it, crop it, dump it again, crop it again...
+	if (Player:GetEquippedItem().m_ItemType == E_ITEM_DIAMOND) then
+		local Area = cBlockArea();
+		Area:Read(Player:GetWorld(),
+			BlockX - 9, BlockX + 9,
+			BlockY - 7, BlockY + 7,
+			BlockZ - 9, BlockZ + 9
+		);
+
+		LOG("Size before cropping: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("crop0.dat");
+		Area:Crop(2, 3, 0, 0, 0, 0);
+		LOG("Size after cropping 1: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("crop1.dat");
+		Area:Crop(2, 3, 0, 0, 0, 0);
+		LOG("Size after cropping 2: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("crop2.dat");
+		Area:Crop(0, 0, 0, 0, 3, 2);
+		LOG("Size after cropping 3: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("crop3.dat");
+		Area:Crop(0, 0, 3, 2, 0, 0);
+		LOG("Size after cropping 4: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("crop4.dat");
+
+		LOG("Crop test done");
+		return false;
+	end
+
 end
 
 
