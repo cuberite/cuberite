@@ -56,6 +56,12 @@ public:
 	/// Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all
 	bool Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
 	
+	/// Copies this object's contents into the specified BlockArea.
+	void CopyTo(cBlockArea & a_Into) const;
+	
+	/// Copies the contents from the specified BlockArea into this object.
+	void CopyFrom(const cBlockArea & a_From);
+	
 	/// For testing purposes only, dumps the area into a file.
 	void DumpToRawFile(const AString & a_FileName);
 	

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/07/13 10:38:08.
+** Generated automatically by tolua++-1.0.92 on 02/07/13 11:39:26.
 */
 
 #ifndef __cplusplus
@@ -17825,6 +17825,72 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: CopyTo of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_CopyTo00
+static int tolua_AllToLua_cBlockArea_CopyTo00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBlockArea",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockArea* self = (const cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  cBlockArea* a_Into = ((cBlockArea*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CopyTo'", NULL);
+#endif
+  {
+   self->CopyTo(*a_Into);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CopyTo'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CopyFrom of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_CopyFrom00
+static int tolua_AllToLua_cBlockArea_CopyFrom00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* a_From = ((const cBlockArea*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CopyFrom'", NULL);
+#endif
+  {
+   self->CopyFrom(*a_From);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CopyFrom'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: DumpToRawFile of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_DumpToRawFile00
 static int tolua_AllToLua_cBlockArea_DumpToRawFile00(lua_State* tolua_S)
@@ -21809,6 +21875,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Read",tolua_AllToLua_cBlockArea_Read01);
    tolua_function(tolua_S,"Write",tolua_AllToLua_cBlockArea_Write00);
    tolua_function(tolua_S,"Write",tolua_AllToLua_cBlockArea_Write01);
+   tolua_function(tolua_S,"CopyTo",tolua_AllToLua_cBlockArea_CopyTo00);
+   tolua_function(tolua_S,"CopyFrom",tolua_AllToLua_cBlockArea_CopyFrom00);
    tolua_function(tolua_S,"DumpToRawFile",tolua_AllToLua_cBlockArea_DumpToRawFile00);
    tolua_function(tolua_S,"LoadFromSchematicFile",tolua_AllToLua_cBlockArea_LoadFromSchematicFile00);
    tolua_function(tolua_S,"SaveToSchematicFile",tolua_AllToLua_cBlockArea_SaveToSchematicFile00);

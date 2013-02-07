@@ -150,7 +150,7 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 	end
 	
 	
-	-- Rclk with an ender pearl saves a predefined area around the cursor into a .schematic file
+	-- Rclk with an ender pearl saves a predefined area around the cursor into a .schematic file. Also tests area copying
 	if (Player:GetEquippedItem().m_ItemType == E_ITEM_ENDER_PEARL) then
 		local Area = cBlockArea();
 		if not(Area:Read(Player:GetWorld(), 
@@ -159,8 +159,11 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 			LOG("LUA: Area couldn't be read");
 			return false;
 		end
-		LOG("LUA: Area read, saving now.");
-		if not(Area:SaveToSchematicFile("schematics/out.schematic")) then
+		LOG("LUA: Area read, copying now.");
+		local Area2 = cBlockArea();
+		Area2:CopyFrom(Area);
+		LOG("LUA: Copied, now saving.");
+		if not(Area2:SaveToSchematicFile("schematics/test.schematic")) then
 			LOG("LUA: Cannot save schematic file.");
 			return false;
 		end

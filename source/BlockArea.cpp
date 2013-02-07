@@ -151,6 +151,51 @@ bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a
 
 
 
+void cBlockArea::CopyTo(cBlockArea & a_Into) const
+{
+	if (&a_Into == this)
+	{
+		LOGWARNING("Trying to copy a cBlockArea into self, ignoring.");
+		return;
+	}
+	
+	a_Into.Clear();
+	a_Into.SetSize(m_SizeX, m_SizeY, m_SizeZ, GetDataTypes());
+	a_Into.m_OriginX = m_OriginX;
+	a_Into.m_OriginY = m_OriginY;
+	a_Into.m_OriginZ = m_OriginZ;
+	int BlockCount = GetBlockCount();
+	if (HasBlockTypes())
+	{
+		memcpy(a_Into.m_BlockTypes, m_BlockTypes, BlockCount * sizeof(BLOCKTYPE));
+	}
+	if (HasBlockMetas())
+	{
+		memcpy(a_Into.m_BlockMetas, m_BlockMetas, BlockCount * sizeof(NIBBLETYPE));
+	}
+	if (HasBlockLights())
+	{
+		memcpy(a_Into.m_BlockLight, m_BlockLight, BlockCount * sizeof(NIBBLETYPE));
+	}
+	if (HasBlockSkyLights())
+	{
+		memcpy(a_Into.m_BlockSkyLight, m_BlockSkyLight, BlockCount * sizeof(NIBBLETYPE));
+	}
+}
+
+
+
+
+
+void cBlockArea::CopyFrom(const cBlockArea & a_From)
+{
+	a_From.CopyTo(*this);
+}
+
+
+
+
+
 void cBlockArea::DumpToRawFile(const AString & a_FileName)
 {
 	cFile f;
