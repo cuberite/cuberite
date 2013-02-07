@@ -225,6 +225,19 @@ bool cBlockArea::LoadFromSchematicFile(const AString & a_FileName)
 
 void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
+	if (
+		(a_AddMinX + a_SubMaxX >= m_SizeX) ||
+		(a_AddMinY + a_SubMaxY >= m_SizeY) ||
+		(a_AddMinZ + a_SubMaxZ >= m_SizeZ)
+	)
+	{
+		LOGWARNING("cBlockArea:Crop called with more croping than the dimensions: %d x %d x %d with cropping %d, %d and %d",
+			m_SizeX, m_SizeY, m_SizeZ,
+			a_AddMinX + a_SubMaxX, a_AddMinY + a_SubMaxY, a_AddMinZ + a_SubMaxZ
+		);
+		return;
+	}
+	
 	if (HasBlockTypes())
 	{
 		CropBlockTypes(a_AddMinX, a_SubMaxX, a_AddMinY, a_SubMaxY, a_AddMinZ, a_SubMaxZ);
