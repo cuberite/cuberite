@@ -36,11 +36,12 @@ public:
 	/// Reads the rest of the file and decompresses it into a_Contents. Returns the number of decompressed bytes, <0 for error
 	int ReadRestOfFile(AString & a_Contents);
 	
-	/// Writes a_Contents into file, compressing it along the way. Returns the number of decompressed bytes, <0 for error. Multiple writes are supported.
-	int Write(AString & a_Contents);
+	/// Writes a_Contents into file, compressing it along the way. Returns true if successful. Multiple writes are supported.
+	bool Write(const AString & a_Contents);
 	
 protected:
 	gzFile m_File;
+	eMode  m_Mode;
 } ;
 
 

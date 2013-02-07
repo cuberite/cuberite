@@ -65,6 +65,9 @@ public:
 	/// Loads an area from a .schematic file. Returns true if successful
 	bool LoadFromSchematicFile(const AString & a_FileName);
 	
+	/// Saves the area into a .schematic file. Returns true if successful
+	bool SaveToSchematicFile(const AString & a_FileName);
+	
 	/// Crops the internal contents by the specified amount of blocks from each border.
 	void Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
 	

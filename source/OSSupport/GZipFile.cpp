@@ -36,6 +36,7 @@ bool cGZipFile::Open(const AString & a_FileName, eMode a_Mode)
 		return false;
 	}
 	m_File = gzopen(a_FileName.c_str(), (a_Mode == fmRead) ? "r" : "w");
+	m_Mode = a_Mode;
 	return (m_File != NULL);
 }
 
@@ -64,6 +65,12 @@ int cGZipFile::ReadRestOfFile(AString & a_Contents)
 		return -1;
 	}
 	
+	if (m_Mode != fmRead)
+	{
+		ASSERT(!"Bad file mode, cannot read");
+		return -1;
+	}
+	
 	// Since the gzip format doesn't really support getting the uncompressed length, we need to read incrementally. Yuck!
 	int NumBytesRead = 0;
 	char Buffer[64 KiB];
@@ -72,6 +79,27 @@ int cGZipFile::ReadRestOfFile(AString & a_Contents)
 		a_Contents.append(Buffer, NumBytesRead);
 	}
 	return NumBytesRead;
+}
+
+
+
+
+
+bool cGZipFile::Write(const AString & a_Contents)
+{
+	if (m_File == NULL)
+	{
+		ASSERT(!"No file has been opened");
+		return false;
+	}
+
+	if (m_Mode != fmWrite)
+	{
+		ASSERT(!"Bad file mode, cannot write");
+		return false;
+	}
+
+	return (gzwrite(m_File, a_Contents.data(), a_Contents.size()) != 0);
 }
 
 

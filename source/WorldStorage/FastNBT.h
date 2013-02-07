@@ -213,7 +213,7 @@ protected:
 class cFastNBTWriter
 {
 public:
-	cFastNBTWriter(void);
+	cFastNBTWriter(const AString & a_RootTagName = "");
 	
 	void BeginCompound(const AString & a_Name);
 	void EndCompound(void);

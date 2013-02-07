@@ -327,13 +327,13 @@ int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFastNBTWriter:
 
-cFastNBTWriter::cFastNBTWriter(void) :
+cFastNBTWriter::cFastNBTWriter(const AString & a_RootTagName) :
 	m_CurrentStack(0)
 {
 	m_Stack[0].m_Type = TAG_Compound;
 	m_Result.reserve(100 * 1024);
 	m_Result.push_back(TAG_Compound);
-	WriteString("", 0);
+	WriteString(a_RootTagName.data(), a_RootTagName.size());
 }
 
 

@@ -223,6 +223,52 @@ bool cBlockArea::LoadFromSchematicFile(const AString & a_FileName)
 
 
 
+bool cBlockArea::SaveToSchematicFile(const AString & a_FileName)
+{
+	cFastNBTWriter Writer("Schematic");
+	Writer.AddShort("Width", m_SizeX);
+	Writer.AddShort("Height", m_SizeY);
+	Writer.AddShort("Length", m_SizeZ);
+	Writer.AddString("Materials", "Alpha");
+	if (HasBlockTypes())
+	{
+		Writer.AddByteArray("Blocks", (const char *)m_BlockTypes, GetBlockCount());
+	}
+	else
+	{
+		AString Dummy(GetBlockCount(), 0);
+		Writer.AddByteArray("Blocks", Dummy.data(), Dummy.size());
+	}
+	if (HasBlockMetas())
+	{
+		Writer.AddByteArray("Data", (const char *)m_BlockMetas, GetBlockCount());
+	}
+	else
+	{
+		AString Dummy(GetBlockCount(), 0);
+		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
+	}
+	Writer.Finish();
+	
+	// TODO: Save to file
+	cGZipFile File;
+	if (!File.Open(a_FileName, cGZipFile::fmWrite))
+	{
+		LOG("Cannot open file \"%s\" for writing.", a_FileName.c_str());
+		return false;
+	}
+	if (!File.Write(Writer.GetResult()))
+	{
+		LOG("Cannot write data to file \"%s\".", a_FileName.c_str());
+		return false;
+	}
+	return true;
+}
+
+
+
+
+
 void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
 	if (
