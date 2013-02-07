@@ -25,8 +25,6 @@ Usage:
 
 
 #pragma once
-#ifndef CFILE_H_INCLUDED
-#define CFILE_H_INCLUDED
 
 
 
@@ -53,7 +51,7 @@ public:
 	#endif
 	
 	/// The mode in which to open the file
-	enum EMode
+	enum eMode
 	{
 		fmRead,      // Read-only. If the file doesn't exist, object will not be valid
 		fmWrite,     // Write-only. If the file already exists, it will be overwritten
@@ -64,12 +62,12 @@ public:
 	cFile(void);
 	
 	/// Constructs and opens / creates the file specified, use IsOpen() to check for success
-	cFile(const AString & iFileName, EMode iMode);
+	cFile(const AString & iFileName, eMode iMode);
 	
 	/// Auto-closes the file, if open
 	~cFile();
 	
-	bool Open(const AString & iFileName, EMode iMode);
+	bool Open(const AString & iFileName, eMode iMode);
 	void Close(void);
 	bool IsOpen(void) const;
 	bool IsEOF(void) const;
@@ -104,12 +102,6 @@ private:
 	HANDLE m_File;
 	#endif
 } ;
-
-
-
-
-
-#endif  // CFILE_H_INCLUDED
 
 
 

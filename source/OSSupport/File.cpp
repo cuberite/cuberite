@@ -28,7 +28,7 @@ cFile::cFile(void) :
 
 
 /// Constructs and opens / creates the file specified, use IsOpen() to check for success
-cFile::cFile(const AString & iFileName, EMode iMode) :
+cFile::cFile(const AString & iFileName, eMode iMode) :
 	#ifdef USE_STDIO_FILE
 	m_File(NULL)
 	#else
@@ -55,7 +55,7 @@ cFile::~cFile()
 
 
 
-bool cFile::Open(const AString & iFileName, EMode iMode)
+bool cFile::Open(const AString & iFileName, eMode iMode)
 {
 	ASSERT(!IsOpen());  // You should close the file before opening another one
 	

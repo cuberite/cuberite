@@ -1167,6 +1167,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\OSSupport\GZipFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\OSSupport\GZipFile.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\OSSupport\IsThread.cpp"
 					>
 				</File>

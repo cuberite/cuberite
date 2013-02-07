@@ -7,7 +7,7 @@
 #include "Globals.h"
 #include "BlockArea.h"
 #include "World.h"
-#include "zlib.h"
+#include "OSSupport/GZipFile.h"
 #include "WorldStorage/FastNBT.h"
 
 
@@ -194,28 +194,21 @@ bool cBlockArea::LoadFromSchematicFile(const AString & a_FileName)
 {
 	// Un-GZip the contents:
 	AString Contents;
-	gzFile File = gzopen(a_FileName.c_str(), "rb");
-	if (File == NULL)
+	cGZipFile File;
+	if (!File.Open(a_FileName, cGZipFile::fmRead))
 	{
 		LOG("Cannot open the schematic file \"%s\".", a_FileName.c_str());
 		return false;
 	}
-	// Since the gzip format doesn't really support getting the uncompressed length, we need to read incrementally. Yuck!
-	int NumBytesRead = 0;
-	char Buffer[32 KiB];
-	while ((NumBytesRead = gzread(File, Buffer, sizeof(Buffer))) > 0)
-	{
-		Contents.append(Buffer, NumBytesRead);
-	}
+	int NumBytesRead = File.ReadRestOfFile(Contents);
 	if (NumBytesRead < 0)
 	{
 		LOG("Cannot read GZipped data in the schematic file \"%s\", error %d", a_FileName.c_str(), NumBytesRead);
-		gzclose(File);
 		return false;
 	}
-	gzclose(File);
+	File.Close();
 	
-	// TODO: Parse the NBT:
+	// Parse the NBT:
 	cParsedNBT NBT(Contents.data(), Contents.size());
 	if (!NBT.IsValid())
 	{
