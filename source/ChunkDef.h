@@ -209,6 +209,12 @@ public:
 	}
 	
 	
+	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
+	{
+		a_BlockTypes[a_Index] = a_Type;
+	}
+	
+	
 	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));

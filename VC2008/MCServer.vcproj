@@ -1675,6 +1675,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Generating\ChunkDesc.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Generating\ChunkDesc.h"
 					>
 				</File>

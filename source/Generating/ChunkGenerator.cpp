@@ -266,24 +266,17 @@ void cChunkGenerator::Execute(void)
 
 void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cChunkDef::BiomeMap     BiomeMap;
-	cChunkDef::BlockTypes   BlockTypes;
-	cChunkDef::BlockNibbles BlockMeta;
-	cChunkDef::HeightMap    HeightMap;
-	cEntityList Entities;
-	cBlockEntityList BlockEntities;
-	
-	cChunkDesc ChunkDesc(BlockTypes, BlockMeta, HeightMap, BiomeMap);
+	cChunkDesc ChunkDesc;
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
-	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc, Entities, BlockEntities);
+	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
 	
 	m_World->SetChunkData(
 		a_ChunkX, a_ChunkY, a_ChunkZ, 
-		BlockTypes, BlockMeta,
+		ChunkDesc.GetBlockTypes(), ChunkDesc.GetBlockMetas(),
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
-		&HeightMap, &BiomeMap,
-		Entities, BlockEntities,
+		&ChunkDesc.GetHeightMap(), &ChunkDesc.GetBiomeMap(),
+		ChunkDesc.GetEntities(), ChunkDesc.GetBlockEntities(),
 		true
 	);
 }

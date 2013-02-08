@@ -88,14 +88,14 @@ void cComposableGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef:
 
 
 
-void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities)
+void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
 	cChunkDef::BiomeMap &     BiomeMap      = a_ChunkDesc.GetBiomeMap();
 	cChunkDef::BlockTypes &   BlockTypes    = a_ChunkDesc.GetBlockTypes();
 	cChunkDef::BlockNibbles & BlockMeta     = a_ChunkDesc.GetBlockMetas();
 	cChunkDef::HeightMap &    HeightMap     = a_ChunkDesc.GetHeightMap();
-	cEntityList &             Entities      = a_Entities;
-	cBlockEntityList &        BlockEntities = a_BlockEntities;
+	cEntityList &             Entities      = a_ChunkDesc.GetEntities();
+	cBlockEntityList &        BlockEntities = a_ChunkDesc.GetBlockEntities();
 
 	if (a_ChunkDesc.IsUsingDefaultBiomes())
 	{
@@ -109,7 +109,7 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 	
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
-		m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, a_Entities, a_BlockEntities);
+		m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultStructures())

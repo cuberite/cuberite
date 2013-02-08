@@ -56,8 +56,8 @@ public:
 		/// Returns the biome at the specified coords. Used by ChunkMap if an invalid chunk is queried for biome. Default implementation uses GenerateBiomes().
 		virtual EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 
-		/// Called in a separate thread to do the actual chunk generation. Generator should generate into a_ChunkDesc, a_Entities and a_BlockEntities.
-		virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities) = 0;
+		/// Called in a separate thread to do the actual chunk generation. Generator should generate into a_ChunkDesc.
+		virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) = 0;
 		
 	protected:
 		cChunkGenerator & m_ChunkGenerator;

@@ -150,7 +150,7 @@ public:
 	
 	virtual void Initialize(cWorld * a_World, cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities) override;
+	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
 
 protected:
 	// The generation composition:
