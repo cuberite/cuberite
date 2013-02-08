@@ -14,8 +14,9 @@ function Initialize(Plugin)
 	Plugin:SetVersion(1)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM)
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
@@ -183,6 +184,21 @@ function OnTakeDamage(Receiver, TDI)
 
 	LOG(Receiver:GetClass() .. " was dealt RawDamage " .. TDI.RawDamage .. ", FinalDamage " .. TDI.FinalDamage .. " (that is, " .. (TDI.RawDamage - TDI.FinalDamage) .. " HPs covered by armor)");
 end
+
+
+
+
+
+function OnChunkGenerated(World, ChunkX, ChunkZ, ChunkDesc)
+	-- Test ChunkDesc / BlockArea interaction
+	local BlockArea = cBlockArea();
+	ChunkDesc:ReadBlockArea(BlockArea, 0, 15, 50, 70, 0, 15);
+	BlockArea:SaveToSchematicFile("ChunkBlocks_" .. ChunkX .. "_" .. ChunkZ .. ".schematic");
+
+	ChunkDesc:WriteBlockArea(BlockArea, 5, 115, 5);
+	return false;
+end
+
 
 
 

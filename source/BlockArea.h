@@ -96,7 +96,9 @@ public:
 	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
 	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
 	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	
+
+	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
+	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
 	void GetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	
@@ -128,6 +130,7 @@ public:
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
 protected:
+	friend class cChunkDesc;
 	
 	class cChunkReader :
 		public cChunkDataCallback
@@ -168,6 +171,7 @@ protected:
 	NIBBLETYPE * m_BlockLight;     // Each light value is stored as a separate byte for faster access
 	NIBBLETYPE * m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
 	
+	/// Clears the data stored and prepares a fresh new block area with the specified dimensions
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);
 	
 	// Basic Setters:

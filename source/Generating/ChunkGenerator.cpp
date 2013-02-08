@@ -266,7 +266,7 @@ void cChunkGenerator::Execute(void)
 
 void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	cChunkDesc ChunkDesc;
+	cChunkDesc ChunkDesc(a_ChunkX, a_ChunkZ);
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerating(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
 	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);

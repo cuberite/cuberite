@@ -15,19 +15,27 @@
 
 
 
+// fwd: ../BlockArea.h
+class cBlockArea;
+
+
+
+
+
 // tolua_begin
 class cChunkDesc
 {
 public:
 	// tolua_end
 	
-	cChunkDesc(void);
+	cChunkDesc(int a_ChunkX, int a_ChunkZ);
 	~cChunkDesc();
 
 	// tolua_begin
 
 	void       FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	void       SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void       SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void       GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 
 	void       SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
 	BLOCKTYPE  GetBlockType(int a_RelX, int a_RelY, int a_RelZ);
@@ -53,6 +61,12 @@ public:
 	void SetUseDefaultFinish(bool a_bUseDefaultFinish);
 	bool IsUsingDefaultFinish(void) const;
 
+	/// Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk.
+	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ);
+
+	/// Reads an area from the chunk into a cBlockArea
+	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
+
 	// tolua_end
 	
 	
@@ -65,6 +79,9 @@ public:
 	cBlockEntityList &        GetBlockEntities(void) { return m_BlockEntities; }
 	
 private:
+	int m_ChunkX;
+	int m_ChunkZ;
+	
 	cChunkDef::BiomeMap     m_BiomeMap;
 	cChunkDef::BlockTypes   m_BlockTypes;
 	cChunkDef::BlockNibbles m_BlockMeta;

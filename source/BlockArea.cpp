@@ -511,6 +511,40 @@ NIBBLETYPE cBlockArea::GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
+void cBlockArea::SetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	SetRelBlockTypeMeta(a_BlockX - m_OriginX, a_BlockY - m_OriginY, a_BlockZ - m_OriginZ, a_BlockType, a_BlockMeta);
+}
+
+
+
+
+
+void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	int idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
+	if (m_BlockTypes == NULL)
+	{
+		LOGWARNING("%s: BlockTypes not available but requested to be written to.", __FUNCTION__);
+	}
+	else
+	{
+		m_BlockTypes[idx] = a_BlockType;
+	}
+	if (m_BlockMetas == NULL)
+	{
+		LOGWARNING("%s: BlockMetas not available but requested to be written to.", __FUNCTION__);
+	}
+	else
+	{
+		m_BlockMetas[idx] = a_BlockMeta;
+	}
+}
+
+
+
+
+
 void cBlockArea::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	return GetRelBlockTypeMeta(a_BlockX - m_OriginX, a_BlockY - m_OriginY, a_BlockZ - m_OriginZ, a_BlockType, a_BlockMeta);
