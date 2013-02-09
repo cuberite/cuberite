@@ -108,31 +108,44 @@ function OnPlayerUsingItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, C
 	end
 
 
-	-- Rclk with a diamond to read a block area, dump it, crop it, dump it again, crop it again...
+	-- Rclk with a diamond to test block area cropping and expanding
 	if (Player:GetEquippedItem().m_ItemType == E_ITEM_DIAMOND) then
 		local Area = cBlockArea();
 		Area:Read(Player:GetWorld(),
-			BlockX - 9, BlockX + 9,
+			BlockX - 19, BlockX + 19,
 			BlockY - 7, BlockY + 7,
-			BlockZ - 9, BlockZ + 9
+			BlockZ - 19, BlockZ + 19
 		);
 
 		LOG("Size before cropping: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 		Area:DumpToRawFile("crop0.dat");
+		
 		Area:Crop(2, 3, 0, 0, 0, 0);
 		LOG("Size after cropping 1: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 		Area:DumpToRawFile("crop1.dat");
+		
 		Area:Crop(2, 3, 0, 0, 0, 0);
 		LOG("Size after cropping 2: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 		Area:DumpToRawFile("crop2.dat");
+		
+		Area:Expand(2, 3, 0, 0, 0, 0);
+		LOG("Size after expanding 1: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("expand1.dat");
+		
+		Area:Expand(3, 2, 1, 1, 0, 0);
+		LOG("Size after expanding 2: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
+		Area:DumpToRawFile("expand2.dat");
+		
 		Area:Crop(0, 0, 0, 0, 3, 2);
 		LOG("Size after cropping 3: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 		Area:DumpToRawFile("crop3.dat");
+		
 		Area:Crop(0, 0, 3, 2, 0, 0);
 		LOG("Size after cropping 4: " .. Area:GetSizeX() .. " x " .. Area:GetSizeY() .. " x " .. Area:GetSizeZ());
 		Area:DumpToRawFile("crop4.dat");
 
 		LOG("Crop test done");
+		Player:SendMessage("Crop / expand test done.");
 		return false;
 	end
 
@@ -193,7 +206,8 @@ function OnChunkGenerated(World, ChunkX, ChunkZ, ChunkDesc)
 	-- Test ChunkDesc / BlockArea interaction
 	local BlockArea = cBlockArea();
 	ChunkDesc:ReadBlockArea(BlockArea, 0, 15, 50, 70, 0, 15);
-	BlockArea:SaveToSchematicFile("ChunkBlocks_" .. ChunkX .. "_" .. ChunkZ .. ".schematic");
+	
+	-- BlockArea:SaveToSchematicFile("ChunkBlocks_" .. ChunkX .. "_" .. ChunkZ .. ".schematic");
 
 	ChunkDesc:WriteBlockArea(BlockArea, 5, 115, 5);
 	return false;

@@ -357,6 +357,36 @@ void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY
 
 
 
+void cBlockArea::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
+{
+	if (HasBlockTypes())
+	{
+		ExpandBlockTypes(a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
+	}
+	if (HasBlockMetas())
+	{
+		ExpandNibbles(m_BlockMetas, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
+	}
+	if (HasBlockLights())
+	{
+		ExpandNibbles(m_BlockLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
+	}
+	if (HasBlockSkyLights())
+	{
+		ExpandNibbles(m_BlockSkyLight, a_SubMinX, a_AddMaxX, a_SubMinY, a_AddMaxY, a_SubMinZ, a_AddMaxZ);
+	}
+	m_OriginX -= a_SubMinX;
+	m_OriginY -= a_SubMinY;
+	m_OriginZ -= a_SubMinZ;
+	m_SizeX += a_SubMinX + a_AddMaxX;
+	m_SizeY += a_SubMinY + a_AddMaxY;
+	m_SizeZ += a_SubMinZ + a_AddMaxZ;
+}
+
+
+
+
+
 void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
 	if (m_BlockTypes == NULL)
@@ -962,6 +992,66 @@ void cBlockArea::CropNibbles(NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX
 			for (int x = 0; x < NewSizeX; x++)
 			{
 				NewNibbles[idx++] = a_Array[MakeIndex(x + a_AddMinX, y + a_AddMinY, z + a_AddMinZ)];
+			}  // for x
+		}  // for z
+	}  // for y
+	delete a_Array;
+	a_Array = NewNibbles;
+}
+
+
+
+
+
+void cBlockArea::ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
+{
+	int NewSizeX = m_SizeX + a_SubMinX + a_AddMaxX;
+	int NewSizeY = m_SizeY + a_SubMinY + a_AddMaxY;
+	int NewSizeZ = m_SizeZ + a_SubMinZ + a_AddMaxZ;
+	int BlockCount = NewSizeX * NewSizeY * NewSizeZ;
+	BLOCKTYPE * NewBlockTypes = new BLOCKTYPE[BlockCount];
+	memset(NewBlockTypes, 0, BlockCount * sizeof(BLOCKTYPE));
+	int OldIndex = 0;
+	for (int y = 0; y < m_SizeY; y++)
+	{
+		int IndexBaseY = (y + a_SubMinY) * m_SizeX * m_SizeZ;
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			int IndexBaseZ = IndexBaseY + (z + a_SubMinZ) * m_SizeX;
+			int idx = IndexBaseZ + a_SubMinX;
+			for (int x = 0; x < m_SizeX; x++)
+			{
+				NewBlockTypes[idx++] = m_BlockTypes[OldIndex++];
+			}  // for x
+		}  // for z
+	}  // for y
+	delete m_BlockTypes;
+	m_BlockTypes = NewBlockTypes;
+}
+
+
+
+
+
+void cBlockArea::ExpandNibbles(NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
+{
+	int NewSizeX = m_SizeX + a_SubMinX + a_AddMaxX;
+	int NewSizeY = m_SizeY + a_SubMinY + a_AddMaxY;
+	int NewSizeZ = m_SizeZ + a_SubMinZ + a_AddMaxZ;
+	int BlockCount = NewSizeX * NewSizeY * NewSizeZ;
+	NIBBLETYPE * NewNibbles = new NIBBLETYPE[BlockCount];
+	memset(NewNibbles, 0, BlockCount * sizeof(NIBBLETYPE));
+	int OldIndex = 0;
+	for (int y = 0; y < m_SizeY; y++)
+	{
+		int IndexBaseY = (y + a_SubMinY) * m_SizeX * m_SizeZ;
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			int IndexBaseZ = IndexBaseY + (z + a_SubMinZ) * m_SizeX;
+			int idx = IndexBaseZ + a_SubMinX;
+			for (int x = 0; x < m_SizeX; x++)
+			{
+				NewNibbles[idx++] = a_Array[OldIndex++];
 			}  // for x
 		}  // for z
 	}  // for y
