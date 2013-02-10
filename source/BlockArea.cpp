@@ -293,6 +293,11 @@ bool cBlockArea::SaveToSchematicFile(const AString & a_FileName)
 		AString Dummy(GetBlockCount(), 0);
 		Writer.AddByteArray("Data", Dummy.data(), Dummy.size());
 	}
+	// TODO: Save entities and block entities
+	Writer.BeginList("Entities", TAG_Compound);
+	Writer.EndList();
+	Writer.BeginList("TileEntities", TAG_Compound);
+	Writer.EndList();
 	Writer.Finish();
 	
 	// TODO: Save to file
