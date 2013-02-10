@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/09/13 10:54:12.
+** Generated automatically by tolua++-1.0.92 on 02/10/13 14:41:15.
 */
 
 #ifndef __cplusplus
@@ -4601,14 +4601,14 @@ static int tolua_AllToLua_cEntity_GetLookVector00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLookVector'", NULL);
 #endif
@@ -18081,6 +18081,47 @@ static int tolua_AllToLua_cBlockArea_Expand00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: Merge of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_Merge00
+static int tolua_AllToLua_cBlockArea_Merge00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  const cBlockArea* a_Src = ((const cBlockArea*)  tolua_tousertype(tolua_S,2,0));
+  int a_RelX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_RelY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_RelZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  cBlockArea::eMergeStrategy a_Strategy = ((cBlockArea::eMergeStrategy) (int)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Merge'", NULL);
+#endif
+  {
+   self->Merge(*a_Src,a_RelX,a_RelY,a_RelZ,a_Strategy);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Merge'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetRelBlockType of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_SetRelBlockType00
 static int tolua_AllToLua_cBlockArea_SetRelBlockType00(lua_State* tolua_S)
@@ -22196,6 +22237,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"baMetas",cBlockArea::baMetas);
    tolua_constant(tolua_S,"baLight",cBlockArea::baLight);
    tolua_constant(tolua_S,"baSkyLight",cBlockArea::baSkyLight);
+   tolua_constant(tolua_S,"msOverwrite",cBlockArea::msOverwrite);
+   tolua_constant(tolua_S,"msFillAir",cBlockArea::msFillAir);
+   tolua_constant(tolua_S,"msImprint",cBlockArea::msImprint);
    tolua_function(tolua_S,"new",tolua_AllToLua_cBlockArea_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cBlockArea_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cBlockArea_new00_local);
@@ -22212,6 +22256,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SaveToSchematicFile",tolua_AllToLua_cBlockArea_SaveToSchematicFile00);
    tolua_function(tolua_S,"Crop",tolua_AllToLua_cBlockArea_Crop00);
    tolua_function(tolua_S,"Expand",tolua_AllToLua_cBlockArea_Expand00);
+   tolua_function(tolua_S,"Merge",tolua_AllToLua_cBlockArea_Merge00);
    tolua_function(tolua_S,"SetRelBlockType",tolua_AllToLua_cBlockArea_SetRelBlockType00);
    tolua_function(tolua_S,"SetBlockType",tolua_AllToLua_cBlockArea_SetBlockType00);
    tolua_function(tolua_S,"SetRelBlockMeta",tolua_AllToLua_cBlockArea_SetRelBlockMeta00);

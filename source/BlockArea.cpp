@@ -14,6 +14,87 @@
 
 
 
+// This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
+/// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
+template<typename Combinator> void InternalMergeBlocks(
+	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
+	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas, 
+	int a_SizeX, int a_SizeY, int a_SizeZ,
+	int a_SrcOffX, int a_SrcOffY, int a_SrcOffZ,
+	int a_DstOffX, int a_DstOffY, int a_DstOffZ,
+	int a_SrcSizeX, int a_SrcSizeY, int a_SrcSizeZ,
+	int a_DstSizeX, int a_DstSizeY, int a_DstSizeZ,
+	Combinator a_Combinator
+)
+{
+	for (int y = 0; y < a_SizeY; y++)
+	{
+		int SrcBaseY = (y + a_SrcOffY) * a_SrcSizeX * a_SrcSizeZ;
+		int DstBaseY = (y + a_DstOffY) * a_DstSizeX * a_DstSizeZ;
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			int SrcBaseZ = SrcBaseY + (z + a_SrcOffZ) * a_SrcSizeX;
+			int DstBaseZ = DstBaseY + (z + a_DstOffZ) * a_DstSizeX;
+			int SrcIdx = SrcBaseZ + a_SrcOffX;
+			int DstIdx = DstBaseZ + a_DstOffX;
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				a_Combinator(a_DstTypes[DstIdx], a_SrcTypes[SrcIdx], a_DstMetas[DstIdx], a_SrcMetas[SrcIdx]);
+				++DstIdx;
+				++SrcIdx;
+			}  // for x
+		}  // for z
+	}  // for y
+}
+
+
+
+
+
+/// Combinator used for cBlockArea::msOverwrite merging
+static void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	a_DstType = a_SrcType;
+	a_DstMeta = a_SrcMeta;
+}
+
+
+
+
+
+/// Combinator used for cBlockArea::msFillAir merging
+static void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	if (a_DstType == E_BLOCK_AIR)
+	{
+		a_DstType = a_SrcType;
+		a_DstMeta = a_SrcMeta;
+	}
+	// "else" is the default, already in place
+}
+
+
+
+
+
+/// Combinator used for cBlockArea::msImprint merging
+static void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	if (a_SrcType != E_BLOCK_AIR)
+	{
+		a_DstType = a_SrcType;
+		a_DstMeta = a_SrcMeta;
+	}
+	// "else" is the default, already in place
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBlockArea:
+
 cBlockArea::cBlockArea(void) :
 	m_SizeX(0),
 	m_SizeY(0),
@@ -300,7 +381,7 @@ bool cBlockArea::SaveToSchematicFile(const AString & a_FileName)
 	Writer.EndList();
 	Writer.Finish();
 	
-	// TODO: Save to file
+	// Save to file
 	cGZipFile File;
 	if (!File.Open(a_FileName, cGZipFile::fmWrite))
 	{
@@ -386,6 +467,104 @@ void cBlockArea::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMa
 	m_SizeX += a_SubMinX + a_AddMaxX;
 	m_SizeY += a_SubMinY + a_AddMaxY;
 	m_SizeZ += a_SubMinZ + a_AddMaxZ;
+}
+
+
+
+
+
+void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy)
+{
+	// Block types are compulsory, block metas are voluntary
+	if (!HasBlockTypes() || !a_Src.HasBlockTypes())
+	{
+		LOGWARNING("%s: cannot merge because one of the areas doesn't have blocktypes.", __FUNCTION__);
+		return;
+	}
+	
+	// Dst is *this, Src is a_Src
+	int SrcOffX = std::max(0, -a_RelX);  // Offset in Src where to start reading
+	int DstOffX = std::max(0,  a_RelX);  // Offset in Dst where to start writing
+	int SizeX   = std::min(a_Src.GetSizeX() - SrcOffX, GetSizeX() - DstOffX);  // How many blocks to copy
+
+	int SrcOffY = std::max(0, -a_RelY);  // Offset in Src where to start reading
+	int DstOffY = std::max(0,  a_RelY);  // Offset in Dst where to start writing
+	int SizeY   = std::min(a_Src.GetSizeY() - SrcOffY, GetSizeY() - DstOffY);  // How many blocks to copy
+
+	int SrcOffZ = std::max(0, -a_RelZ);  // Offset in Src where to start reading
+	int DstOffZ = std::max(0,  a_RelZ);  // Offset in Dst where to start writing
+	int SizeZ   = std::min(a_Src.GetSizeZ() - SrcOffZ, GetSizeZ() - DstOffZ);  // How many blocks to copy
+
+	const NIBBLETYPE * SrcMetas = a_Src.GetBlockMetas();
+	NIBBLETYPE * DstMetas = m_BlockMetas;
+	bool IsDummyMetas = ((SrcMetas == NULL) || (DstMetas == NULL));
+	
+	if (IsDummyMetas)
+	{
+		SrcMetas = new NIBBLETYPE[a_Src.GetBlockCount()];
+		DstMetas = new NIBBLETYPE[GetBlockCount()];
+	}
+	
+	switch (a_Strategy)
+	{
+		case msOverwrite:
+		{
+			InternalMergeBlocks(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_SizeX, m_SizeY, m_SizeZ,
+				MergeCombinatorOverwrite
+			);
+			break;
+		}  // case msOverwrite
+		
+		case msFillAir:
+		{
+			InternalMergeBlocks(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_SizeX, m_SizeY, m_SizeZ,
+				MergeCombinatorFillAir
+			);
+			break;
+		}  // case msFillAir
+		
+		case msImprint:
+		{
+			InternalMergeBlocks(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_SizeX, m_SizeY, m_SizeZ,
+				MergeCombinatorImprint
+			);
+			break;
+		}  // case msImprint
+		
+		default:
+		{
+			LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
+			ASSERT(!"Unknown block area merge strategy");
+			break;
+		}
+	}  // switch (a_Strategy)
+	
+	if (IsDummyMetas)
+	{
+		delete[] SrcMetas;
+		delete[] DstMetas;
+	}
 }
 
 

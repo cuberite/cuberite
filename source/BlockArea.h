@@ -44,6 +44,13 @@ public:
 		baSkyLight = 8,
 	} ;
 	
+	enum eMergeStrategy
+	{
+		msOverwrite,
+		msFillAir,
+		msImprint,
+	} ;
+	
 	cBlockArea(void);
 	~cBlockArea();
 	
@@ -79,6 +86,25 @@ public:
 	
 	/// Expands the internal contents by the specified amount of blocks from each border
 	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+	
+	/** Merges another block area into this one, using the specified block combinating strategy
+	This function combines another BlockArea into the current object.
+	The strategy parameter specifies how individual blocks are combined together, using the table below.
+
+	| area block |                 result              |
+	| this | Src | msOverwrite | msFillAir | msImprint |
+	+------+-----+-------------+-----------+-----------+
+	| air  | air | air         | air       | air       |
+	| A    | air | air         | A         | A         |
+	| air  | B   | B           | B         | B         |
+	| A    | B   | B           | A         | B         |
+
+	So to sum up:
+	- msOverwrite completely overwrites all blocks with the Src's blocks
+	- msFillAir overwrites only those blocks that were air
+	- msImprint overwrites with only those blocks that are non-air
+	*/
+	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);
 	
 	// Setters:
 	void SetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE  a_BlockType);
@@ -125,10 +151,10 @@ public:
 	
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/// Returns the internal pointer to the block types
-	BLOCKTYPE *  GetBlockTypes   (void) { return m_BlockTypes; }
-	NIBBLETYPE * GetBlockMetas   (void) { return m_BlockMetas; }     // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockLight   (void) { return m_BlockLight; }     // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockSkyLight(void) { return m_BlockSkyLight; }  // NOTE: one byte per block!
+	BLOCKTYPE *  GetBlockTypes   (void) const { return m_BlockTypes; }
+	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one byte per block!
 	int          GetBlockCount(void) const { return m_SizeX * m_SizeY * m_SizeZ; }
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 

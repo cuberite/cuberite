@@ -53,6 +53,20 @@ function Initialize(Plugin)
 		end
 		f:close();
 	end
+	
+	
+	-- Debug block area merging:
+	local BA1 = cBlockArea();
+	local BA2 = cBlockArea();
+	if (BA1:LoadFromSchematicFile("schematics/test.schematic")) then
+		if (BA2:LoadFromSchematicFile("schematics/fountain.schematic")) then
+			BA2:SetRelBlockType(0, 0, 0, E_BLOCK_LAPIS_BLOCK);
+			BA2:SetRelBlockType(1, 0, 0, E_BLOCK_LAPIS_BLOCK);
+			BA2:SetRelBlockType(2, 0, 0, E_BLOCK_LAPIS_BLOCK);
+			BA1:Merge(BA2, 1, 10, 1, cBlockArea.msImprint);
+			BA1:SaveToSchematicFile("schematics/merge.schematic");
+		end
+	end
 
 	return true
 end
