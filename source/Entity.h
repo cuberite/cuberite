@@ -97,15 +97,15 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	const Vector3d & GetPosition(void) const {return m_Pos; }
-	double           GetPosX    (void) const {return m_Pos.x; }
-	double           GetPosY    (void) const {return m_Pos.y; }
-	double           GetPosZ    (void) const {return m_Pos.z; }
-	const Vector3f & GetRot     (void) const {return m_Rot; }
-	float            GetRotation(void) const {return m_Rot.x; }
-	float            GetPitch   (void) const {return m_Rot.y; }
-	float            GetRoll    (void) const {return m_Rot.z; }
-	Vector3f         GetLookVector(void);
+	const Vector3d & GetPosition  (void) const {return m_Pos; }
+	double           GetPosX      (void) const {return m_Pos.x; }
+	double           GetPosY      (void) const {return m_Pos.y; }
+	double           GetPosZ      (void) const {return m_Pos.z; }
+	const Vector3f & GetRot       (void) const {return m_Rot; }
+	float            GetRotation  (void) const {return m_Rot.x; }
+	float            GetPitch     (void) const {return m_Rot.y; }
+	float            GetRoll      (void) const {return m_Rot.z; }
+	Vector3f         GetLookVector(void) const;
 	
 	int GetChunkX(void) const {return m_ChunkX; }
 	int GetChunkY(void) const {return m_ChunkY; }

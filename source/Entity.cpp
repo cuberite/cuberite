@@ -273,12 +273,11 @@ void cEntity::SetRoll( float a_Roll )
 
 //////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
-Vector3f cEntity::GetLookVector()
+Vector3f cEntity::GetLookVector(void) const
 {
 	Matrix4f m;
 	m.Init( Vector3f(), 0, m_Rot.x, -m_Rot.y );
 	Vector3f Look = m.Transform( Vector3f(0, 0, 1) );
-	LOG("Look: %0.1f %0.1f %0.1f", Look.x, Look.y, Look.z );
 	return Look;
 }
 
