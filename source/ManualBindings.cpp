@@ -35,8 +35,8 @@ int tolua_do_error(lua_State* L, const char * a_pMsg, tolua_Error * a_pToLuaErro
 {
 	// Retrieve current function name
 	lua_Debug entry;
-	ASSERT( lua_getstack(L, 0, &entry) );
-	ASSERT( lua_getinfo(L, "n", &entry) );
+	VERIFY(lua_getstack(L, 0, &entry));
+	VERIFY(lua_getinfo(L, "n", &entry));
 
 	// Insert function name into error msg
 	AString msg(a_pMsg);
@@ -55,8 +55,8 @@ int lua_do_error(lua_State* L, const char * a_pFormat, ...)
 {
 	// Retrieve current function name
 	lua_Debug entry;
-	ASSERT( lua_getstack(L, 0, &entry) );
-	ASSERT( lua_getinfo(L, "n", &entry) );
+	VERIFY(lua_getstack(L, 0, &entry));
+	VERIFY(lua_getinfo(L, "n", &entry));
 
 	// Insert function name into error msg
 	AString msg(a_pFormat);
