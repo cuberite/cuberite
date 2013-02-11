@@ -695,6 +695,27 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 			m_BlockTypes[MakeIndex(x, y, z)] = a_BlockType;
 		}  // for x, z, y
 	}
+	if ((a_DataTypes & baMetas) != 0)
+	{
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			m_BlockMetas[MakeIndex(x, y, z)] = a_BlockMeta;
+		}  // for x, z, y
+	}
+	if ((a_DataTypes & baLight) != 0)
+	{
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			m_BlockLight[MakeIndex(x, y, z)] = a_BlockLight;
+		}  // for x, z, y
+	}
+	if ((a_DataTypes & baSkyLight) != 0)
+	{
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			m_BlockSkyLight[MakeIndex(x, y, z)] = a_BlockSkyLight;
+		}  // for x, z, y
+	}
 }
 
 
