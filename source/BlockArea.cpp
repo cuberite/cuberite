@@ -134,6 +134,65 @@ void cBlockArea::Clear(void)
 
 
 
+void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
+{
+	Clear();
+	int BlockCount = a_SizeX * a_SizeY * a_SizeZ;
+	if ((a_DataTypes & baTypes) != 0)
+	{
+		m_BlockTypes = new BLOCKTYPE[BlockCount];
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockTypes[i] = E_BLOCK_AIR;
+		}
+	}
+	if ((a_DataTypes & baMetas) != 0)
+	{
+		m_BlockMetas = new NIBBLETYPE[BlockCount];
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockMetas[i] = 0;
+		}
+	}
+	if ((a_DataTypes & baLight) != 0)
+	{
+		m_BlockLight = new NIBBLETYPE[BlockCount];
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockLight[i] = 0;
+		}
+	}
+	if ((a_DataTypes & baSkyLight) != 0)
+	{
+		m_BlockSkyLight = new NIBBLETYPE[BlockCount];
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockSkyLight[i] = 0x0f;
+		}
+	}
+	m_SizeX = a_SizeX;
+	m_SizeY = a_SizeY;
+	m_SizeZ = a_SizeZ;
+	m_OriginX = 0;
+	m_OriginY = 0;
+	m_OriginZ = 0;
+}
+
+
+
+
+
+void cBlockArea::SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ)
+{
+	m_OriginX = a_OriginX;
+	m_OriginY = a_OriginY;
+	m_OriginZ = a_OriginZ;
+}
+
+
+
+
+
 bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	// Normalize the coords:
@@ -564,6 +623,77 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 	{
 		delete[] SrcMetas;
 		delete[] DstMetas;
+	}
+}
+
+
+
+
+
+void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight)
+{
+	if ((a_DataTypes & GetDataTypes()) != a_DataTypes)
+	{
+		LOGWARNING("%s: requested datatypes that are not present in the BlockArea object, trimming those away (req 0x%x, stor 0x%x)",
+			__FUNCTION__, a_DataTypes, GetDataTypes()
+		);
+		a_DataTypes = a_DataTypes & GetDataTypes();
+	}
+	
+	int BlockCount = GetBlockCount();
+	if ((a_DataTypes & baTypes) != 0)
+	{
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockTypes[i] = a_BlockType;
+		}
+	}
+	if ((a_DataTypes & baMetas) != 0)
+	{
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockMetas[i] = a_BlockMeta;
+		}
+	}
+	if ((a_DataTypes & baLight) != 0)
+	{
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockLight[i] = a_BlockLight;
+		}
+	}
+	if ((a_DataTypes & baSkyLight) != 0)
+	{
+		for (int i = 0; i < BlockCount; i++)
+		{
+			m_BlockSkyLight[i] = a_BlockSkyLight;
+		}
+	}
+}
+
+
+
+
+
+void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
+	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+)
+{
+	if ((a_DataTypes & GetDataTypes()) != a_DataTypes)
+	{
+		LOGWARNING("%s: requested datatypes that are not present in the BlockArea object, trimming those away (req 0x%x, stor 0x%x)",
+			__FUNCTION__, a_DataTypes, GetDataTypes()
+		);
+		a_DataTypes = a_DataTypes & GetDataTypes();
+	}
+	
+	if ((a_DataTypes & baTypes) != 0)
+	{
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+		{
+			m_BlockTypes[MakeIndex(x, y, z)] = a_BlockType;
+		}  // for x, z, y
 	}
 }
 

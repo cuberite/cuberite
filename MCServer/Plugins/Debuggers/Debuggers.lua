@@ -67,6 +67,10 @@ function Initialize(Plugin)
 			BA1:SaveToSchematicFile("schematics/merge.schematic");
 		end
 	end
+	
+	-- Debug block area cuboid filling:
+	BA1:FillRelCuboid(2, 9, 2, 8, 2, 8, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK);
+	BA1:SaveToSchematicFile("schematics/fillrel.schematic");
 
 	return true
 end

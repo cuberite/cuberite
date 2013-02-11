@@ -57,8 +57,20 @@ public:
 	/// Clears the data stored to reclaim memory
 	void Clear(void);
 	
+	/** Creates a new area of the specified size and contents. 
+	Origin is set to all zeroes. 
+	BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.
+	*/
+	void Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes = baTypes | baMetas);
+	
+	/// Resets the origin. No other changes are made, contents are untouched.
+	void SetOrigin(int a_OriginX, int a_OriginY, int a_OriginZ);
+	
 	/// Reads an area of blocks specified. Returns true if successful. All coords are inclusive.
 	bool Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas);
+	
+	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
+	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
 	/// Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all
 	bool Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes = baTypes | baMetas);
@@ -71,9 +83,6 @@ public:
 	
 	/// For testing purposes only, dumps the area into a file.
 	void DumpToRawFile(const AString & a_FileName);
-	
-	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
-	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
 	
 	/// Loads an area from a .schematic file. Returns true if successful
 	bool LoadFromSchematicFile(const AString & a_FileName);
@@ -105,6 +114,15 @@ public:
 	- msImprint overwrites with only those blocks that are non-air
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);
+	
+	/// Fills the entire block area with the specified data
+	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
+	
+	/// Fills a cuboid inside the block area with the specified data
+	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
+		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	);
 	
 	// Setters:
 	void SetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE  a_BlockType);
