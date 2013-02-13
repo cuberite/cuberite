@@ -4,6 +4,7 @@
 #include "Plugin.h"
 #include "Pawn.h"
 #include "Player.h"
+#include "World.h"
 
 
 
@@ -502,9 +503,20 @@ bool cPlugin::OnUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a
 
 
 
-bool cPlugin::OnWeatherChanged(cWorld * a_World)
+bool cPlugin::OnWeatherChanged(cWorld & a_World)
 {
 	UNUSED(a_World);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnWeatherChanging(cWorld & a_World, eWeather & a_Weather)
+{
+	UNUSED(a_World);
+	UNUSED(a_Weather);
 	return false;
 }
 

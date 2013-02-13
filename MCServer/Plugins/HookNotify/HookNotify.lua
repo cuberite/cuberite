@@ -9,10 +9,10 @@ PLUGIN = {}	-- Reference to own plugin object
 function Initialize(Plugin)
 	PLUGIN = Plugin
 	
-	Plugin:SetName("HookNotify")
-	Plugin:SetVersion(1)
+	Plugin:SetName("HookNotify");
+	Plugin:SetVersion(1);
 	
-	PluginManager = cRoot:Get():GetPluginManager()
+	PluginManager = cPluginManager:Get();
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_BLOCK_TO_PICKUPS);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_AVAILABLE);
@@ -48,6 +48,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_UPDATED_SIGN);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_UPDATING_SIGN);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_WEATHER_CHANGED);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_WEATHER_CHANGING);
 	
 	LOGINFO("HookNotify plugin is installed, beware, the log output may be quite large!");
 	LOGINFO("You want this plugin enabled only when developing another plugin, not for regular gameplay.");
@@ -359,6 +360,14 @@ end
 
 function OnWeatherChanged(...)
 	LogHook("OnWeatherChanged", unpack(arg));
+end
+
+
+
+
+
+function OnWeatherChanging(...)
+	LogHook("OnWeatherChanging", unpack(arg));
 end
 
 

@@ -307,34 +307,49 @@ cWorld::~cWorld()
 
 
 
-void cWorld::SetWeather(eWeather a_Weather)
+void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	switch (a_Weather)
-	{
-		case eWeather_Sunny:        
-		case eWeather_Rain:         
-		case eWeather_ThunderStorm:
-		{
-			m_Weather = a_Weather;
-			BroadcastWeather(a_Weather);
-			break;
-		}
-		
-		default:
-		{
-			LOGWARN("Trying to set unknown weather %d", a_Weather);
-			break;
-		}
-	}
+	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
 
 
 
-void cWorld::CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ)
+void cWorld::SetWeather(eWeather a_NewWeather)
 {
-	BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+	// Do the plugins agree? Do they want a different weather?
+	cRoot::Get()->GetPluginManager()->CallHookWeatherChanging(*this, a_NewWeather);
+	
+	// Set new period for the selected weather:
+	switch (a_NewWeather)
+	{
+		case eWeather_Sunny:        m_WeatherInterval = 14400 + (m_TickRand.randInt() % 4800); break;  // 12 - 16 minutes
+		case eWeather_Rain:         m_WeatherInterval =  9600 + (m_TickRand.randInt() % 7200); break;  //  8 - 14 minutes
+		case eWeather_ThunderStorm: m_WeatherInterval =  2400 + (m_TickRand.randInt() % 4800); break;  //  2 - 6 minutes
+		default:
+		{
+			LOGWARNING("Requested unknown weather %d, setting sunny for a minute instead.", a_NewWeather);
+			a_NewWeather = eWeather_Sunny;
+			m_WeatherInterval = 1200;
+			break;
+		}
+	}  // switch (NewWeather)
+	m_Weather = a_NewWeather;
+	BroadcastWeather(m_Weather);
+	
+	// Let the plugins know about the change:
+	cPluginManager::Get()->CallHookWeatherChanged(*this);
+}
+
+
+
+
+
+void cWorld::ChangeWeather(void)
+{
+	// In the next tick the weather will be changed
+	m_WeatherInterval = 0;
 }
 
 
@@ -533,92 +548,47 @@ void cWorld::Tick(float a_Dt)
 
 
 
-void cWorld::ChangeWeather()
-{
-	unsigned randWeather = (m_TickRand.randInt() % 99);
-	
-	if (GetWeather() == eWeather_Sunny)
-	{
-		if (randWeather < 20)
-		{
-			LOG("Starting rainstorm!");
-			SetWeather( eWeather_Rain );
-		}
-	}
-	
-	else if (GetWeather() == eWeather_Rain)
-	{
-		if (randWeather < 5)
-		{
-			LOG("Thunderstorm!");
-			SetWeather( eWeather_ThunderStorm );
-		}
-		
-		else if (randWeather < 60)
-		{
-			LOG("Back to sunshine");
-			SetWeather( eWeather_Sunny );
-		}
-	}
-	
-	else if (GetWeather() == eWeather_ThunderStorm)
-	{
-		if (randWeather < 70)
-		{
-			SetWeather(eWeather_Sunny);
-			LOG("Thunder ended abruptly, returning to lovely sunshine");
-		}
-		else if (randWeather < 85)
-		{
-			SetWeather(eWeather_Rain);
-			LOG("Thunder ended, but rain persists.");
-		}
-		else
-		{
-			return;
-		}
-	}
-}
-
-
-
-
-
 void cWorld::TickWeather(float a_Dt)
 {
-	if (m_WeatherInterval == 0)
+	if (m_WeatherInterval > 0)
 	{
-		ChangeWeather();
-		
-		cRoot::Get()->GetPluginManager()->CallHookWeatherChanged(this);
-		
-		switch (GetWeather())
-		{
-			case eWeather_Sunny:
-				m_WeatherInterval = 14400 + (m_TickRand.randInt() % 4800); // 12 - 16 minutes
-				break;
-			case eWeather_Rain:
-				m_WeatherInterval = 9600 + (m_TickRand.randInt() % 7200); // 8 - 14 minutes
-				break;
-			case eWeather_ThunderStorm:
-				m_WeatherInterval = 2400 + (m_TickRand.randInt() % 4800); // 2 - 6 minutes
-				break;
-			default:
-				LOG("Unknown weather occurred");
-				break;
-		}
-	}
-	
-	else
-	{
+		// Not yet, wait for the weather period to end
 		m_WeatherInterval--;
 	}
-
-	if ( GetWeather() == 2 )  // if thunderstorm
+	else
 	{
-		if (m_TickRand.randInt() % 199 == 0)  // 0.5% chance per tick of thunderbolt
+		// Change weather:
+	
+		// Pick a new weather. Only reasonable transitions allowed:
+		eWeather NewWeather = m_Weather;
+		switch (m_Weather)
 		{
-			CastThunderbolt ( 0, 0, 0 );  // TODO: find random possitions near players to cast thunderbolts.
+			case eWeather_Sunny:        NewWeather = eWeather_Rain; break;
+			case eWeather_ThunderStorm: NewWeather = eWeather_Rain; break;
+			case eWeather_Rain:
+			{
+				// 1/8 chance of turning into a thunderstorm
+				NewWeather = ((m_TickRand.randInt() % 256) < 32) ? eWeather_ThunderStorm : eWeather_Sunny;
+				break;
+			}
+			
+			default:
+			{
+				LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
+				ASSERT(!"Unknown weather");
+				NewWeather = eWeather_Sunny;
+			}
+		}
+		
+		SetWeather(NewWeather);
+	}  // else (m_WeatherInterval > 0)
+
+	if (m_Weather == eWeather_ThunderStorm)
+	{
+		// 0.5% chance per tick of thunderbolt
+		if (m_TickRand.randInt() % 199 == 0)
+		{
+			CastThunderbolt(0, 0, 0);  // TODO: find random possitions near players to cast thunderbolts.
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/11/13 09:47:05.
+** Generated automatically by tolua++-1.0.92 on 02/13/13 19:08:23.
 */
 
 #ifndef __cplusplus
@@ -11323,12 +11323,12 @@ static int tolua_AllToLua_cWorld_SetWeather00(lua_State* tolua_S)
 #endif
  {
   cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  eWeather a_Weather = ((eWeather) (int)  tolua_tonumber(tolua_S,2,0));
+  eWeather a_NewWeather = ((eWeather) (int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWeather'", NULL);
 #endif
   {
-   self->SetWeather(a_Weather);
+   self->SetWeather(a_NewWeather);
   }
  }
  return 0;
@@ -11378,14 +11378,14 @@ static int tolua_AllToLua_cWorld_GetWeather00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWeather'", NULL);
 #endif
@@ -18324,6 +18324,59 @@ static int tolua_AllToLua_cBlockArea_FillRelCuboid00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: RelLine of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RelLine00
+static int tolua_AllToLua_cBlockArea_RelLine00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,10,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,11,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,12,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,13,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+  int a_RelX1 = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_RelY1 = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_RelZ1 = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_RelX2 = ((int)  tolua_tonumber(tolua_S,5,0));
+  int a_RelY2 = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_RelZ2 = ((int)  tolua_tonumber(tolua_S,7,0));
+  int a_DataTypes = ((int)  tolua_tonumber(tolua_S,8,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,9,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,10,0));
+  unsigned char a_BlockLight = (( unsigned char)  tolua_tonumber(tolua_S,11,0));
+  unsigned char a_BlockSkyLight = (( unsigned char)  tolua_tonumber(tolua_S,12,0x0f));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RelLine'", NULL);
+#endif
+  {
+   self->RelLine(a_RelX1,a_RelY1,a_RelZ1,a_RelX2,a_RelY2,a_RelZ2,a_DataTypes,a_BlockType,a_BlockMeta,a_BlockLight,a_BlockSkyLight);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RelLine'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetRelBlockType of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_SetRelBlockType00
 static int tolua_AllToLua_cBlockArea_SetRelBlockType00(lua_State* tolua_S)
@@ -22036,6 +22089,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_UPDATED_SIGN",cPluginManager::HOOK_UPDATED_SIGN);
    tolua_constant(tolua_S,"HOOK_UPDATING_SIGN",cPluginManager::HOOK_UPDATING_SIGN);
    tolua_constant(tolua_S,"HOOK_WEATHER_CHANGED",cPluginManager::HOOK_WEATHER_CHANGED);
+   tolua_constant(tolua_S,"HOOK_WEATHER_CHANGING",cPluginManager::HOOK_WEATHER_CHANGING);
    tolua_function(tolua_S,"Get",tolua_AllToLua_cPluginManager_Get00);
    tolua_function(tolua_S,"GetPlugin",tolua_AllToLua_cPluginManager_GetPlugin00);
    tolua_function(tolua_S,"FindPlugins",tolua_AllToLua_cPluginManager_FindPlugins00);
@@ -22464,6 +22518,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Merge",tolua_AllToLua_cBlockArea_Merge00);
    tolua_function(tolua_S,"Fill",tolua_AllToLua_cBlockArea_Fill00);
    tolua_function(tolua_S,"FillRelCuboid",tolua_AllToLua_cBlockArea_FillRelCuboid00);
+   tolua_function(tolua_S,"RelLine",tolua_AllToLua_cBlockArea_RelLine00);
    tolua_function(tolua_S,"SetRelBlockType",tolua_AllToLua_cBlockArea_SetRelBlockType00);
    tolua_function(tolua_S,"SetBlockType",tolua_AllToLua_cBlockArea_SetBlockType00);
    tolua_function(tolua_S,"SetRelBlockMeta",tolua_AllToLua_cBlockArea_SetRelBlockMeta00);

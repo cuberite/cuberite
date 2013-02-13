@@ -905,7 +905,7 @@ bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_B
 
 
 
-bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
+bool cPluginManager::CallHookWeatherChanged(cWorld & a_World)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGED);
 	if (Plugins == m_Hooks.end())
@@ -915,6 +915,27 @@ bool cPluginManager::CallHookWeatherChanged(cWorld * a_World)
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnWeatherChanged(a_World))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnWeatherChanging(a_World, a_NewWeather))
 		{
 			return true;
 		}

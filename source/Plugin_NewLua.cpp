@@ -1210,7 +1210,7 @@ bool cPlugin_NewLua::OnUpdatingSign(
 
 
 
-bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
+bool cPlugin_NewLua::OnWeatherChanged(cWorld & a_World)
 {
 	cCSLock Lock(m_CriticalSection);
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED);
@@ -1220,7 +1220,7 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
+	tolua_pushusertype(m_LuaState, &a_World, "cWorld");
 
 	if (!CallFunction(1, 1, FnName))
 	{
@@ -1228,6 +1228,37 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld * a_World)
 	}
 
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_World, "cWorld");
+	tolua_pushnumber  (m_LuaState, a_NewWeather);
+
+	if (!CallFunction(2, 2, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	if (lua_isnumber(m_LuaState, -2))
+	{
+		a_NewWeather = (eWeather)lua_tointeger(m_LuaState, -2);
+	}
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
@@ -1395,6 +1426,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_UPDATED_SIGN:          return "OnUpdatedSign";
 		case cPluginManager::HOOK_UPDATING_SIGN:         return "OnUpdatingSign";
 		case cPluginManager::HOOK_WEATHER_CHANGED:       return "OnWeatherChanged";
+		case cPluginManager::HOOK_WEATHER_CHANGING:      return "OnWeatherChanging";
 		default: return NULL;
 	}  // switch (a_Hook)
 }

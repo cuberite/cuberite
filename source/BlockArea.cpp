@@ -722,6 +722,18 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 
 
 
+void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
+	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+)
+{
+	// TODO
+}
+
+
+
+
+
 void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
 	if (m_BlockTypes == NULL)

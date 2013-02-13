@@ -419,10 +419,19 @@ public:
 
 	void QueueBlockForTick(int a_BlockX, int a_BlockY, int a_BlockZ, float a_TimeToWait);  // tolua_export
 
-	void CastThunderbolt (int a_BlockX, int a_BlockY, int a_BlockZ);						// tolua_export
-	void SetWeather ( eWeather a_Weather );									// tolua_export
-	void ChangeWeather();												// tolua_export
-	eWeather GetWeather() { return m_Weather; };							// tolua_export
+	// tolua_begin
+	/// Casts a thunderbolt at the specified coords
+	void CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	/// Sets the specified weather; resets weather interval; asks and notifies plugins of the change
+	void SetWeather     (eWeather a_NewWeather);
+	
+	/// Forces a weather change in the next game tick
+	void ChangeWeather  (void);
+	
+	/// Returns the current weather
+	eWeather GetWeather     (void) const { return m_Weather; };
+	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
