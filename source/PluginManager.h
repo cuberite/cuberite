@@ -166,10 +166,10 @@ public:																	// tolua_export
 	AString GetCommandPermission(const AString & a_Command);  // tolua_export
 	
 	/// Executes the command, as if it was requested by a_Player. Checks permissions first. Returns true if executed.
-	bool ExecuteCommand(cPlayer * a_Player, const AString & a_Command);
+	bool ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
 	/// Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns true if executed (false if not found)
-	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);
+	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 
 private:
 	friend class cRoot;

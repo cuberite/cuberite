@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/13/13 19:08:23.
+** Generated automatically by tolua++-1.0.92 on 02/13/13 21:05:08.
 */
 
 #ifndef __cplusplus
@@ -9136,6 +9136,80 @@ static int tolua_AllToLua_cPluginManager_GetCommandPermission00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetCommandPermission'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ExecuteCommand of class  cPluginManager */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_ExecuteCommand00
+static int tolua_AllToLua_cPluginManager_ExecuteCommand00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ExecuteCommand'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->ExecuteCommand(a_Player,a_Command);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Command);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ExecuteCommand'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ForceExecuteCommand of class  cPluginManager */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_ForceExecuteCommand00
+static int tolua_AllToLua_cPluginManager_ForceExecuteCommand00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  const AString a_Command = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ForceExecuteCommand'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->ForceExecuteCommand(a_Player,a_Command);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Command);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ForceExecuteCommand'.",&tolua_err);
  return 0;
 #endif
 }
@@ -22100,6 +22174,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"LoadPlugin",tolua_AllToLua_cPluginManager_LoadPlugin00);
    tolua_function(tolua_S,"IsCommandBound",tolua_AllToLua_cPluginManager_IsCommandBound00);
    tolua_function(tolua_S,"GetCommandPermission",tolua_AllToLua_cPluginManager_GetCommandPermission00);
+   tolua_function(tolua_S,"ExecuteCommand",tolua_AllToLua_cPluginManager_ExecuteCommand00);
+   tolua_function(tolua_S,"ForceExecuteCommand",tolua_AllToLua_cPluginManager_ForceExecuteCommand00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPlugin","cPlugin","",NULL);
   tolua_beginmodule(tolua_S,"cPlugin");
