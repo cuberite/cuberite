@@ -727,7 +727,113 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 )
 {
-	// TODO
+	// Bresenham-3D algorithm for drawing lines:
+	int dx = abs(a_RelX2 - a_RelX1);
+	int dy = abs(a_RelY2 - a_RelY1);
+	int dz = abs(a_RelZ2 - a_RelZ1);
+	int sx = (a_RelX1 < a_RelX2) ? 1 : -1;
+	int sy = (a_RelY1 < a_RelY2) ? 1 : -1;
+	int sz = (a_RelZ1 < a_RelZ2) ? 1 : -1;
+	int err = dx - dz;
+
+	if (dx >= std::max(dy, dz))  // x dominant
+	{
+		int yd = dy - dx / 2;
+		int zd = dz - dx / 2;
+
+		while (true)
+		{
+			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
+
+			if (a_RelX1 == a_RelX2)
+			{
+				break;
+			}
+
+			if (yd >= 0)  // move along y
+			{
+				a_RelY1 += sy;
+				yd -= dx;
+			}
+
+			if (zd >= 0)  // move along z
+			{
+				a_RelZ1 += sz;
+				zd -= dx;
+			}
+
+			// move along x
+			a_RelX1  += sx;
+			yd += dy;
+			zd += dz;
+		}
+	}
+	else if (dy >= std::max(dx, dz))  // y dominant
+	{
+		int xd = dx - dy / 2;
+		int zd = dz - dy / 2;
+
+		while (true)
+		{
+			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
+
+			if (a_RelY1 == a_RelY2)
+			{
+				break;
+			}
+
+			if (xd >= 0)  // move along x
+			{
+				a_RelX1 += sx;
+				xd -= dy;
+			}
+
+			if (zd >= 0)  // move along z
+			{
+				a_RelZ1 += sz;
+				zd -= dy;
+			}
+
+			// move along y
+			a_RelY1 += sy;
+			xd += dx;
+			zd += dz;
+		}
+	}
+	else
+	{
+		// z dominant
+		ASSERT(dz >= std::max(dx, dy));
+		int xd = dx - dz / 2;
+		int yd = dy - dz / 2;
+
+		while (true)
+		{
+			RelSetData(a_RelX1, a_RelY1, a_RelZ1, a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight);
+
+			if (a_RelZ1 == a_RelZ2)
+			{
+				break;
+			}
+
+			if (xd >= 0)  // move along x
+			{
+				a_RelX1 += sx;
+				xd -= dz;
+			}
+
+			if (yd >= 0)  // move along y
+			{
+				a_RelY1 += sy;
+				yd -= dz;
+			}
+			
+			// move along z
+			a_RelZ1 += sz;
+			xd += dx;
+			yd += dy;
+		}
+	}  // if (which dimension is dominant)
 }
 
 
@@ -1484,6 +1590,34 @@ bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
 	}
 	
 	return true;
+}
+
+
+
+
+void cBlockArea::RelSetData(
+	int a_RelX, int a_RelY, int a_RelZ,
+	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+)
+{
+	int Index = MakeIndex(a_RelX, a_RelY, a_RelZ);
+	if ((a_DataTypes & baTypes) != 0)
+	{
+		m_BlockTypes[Index] = a_BlockType;
+	}
+	if ((a_DataTypes & baMetas) != 0)
+	{
+		m_BlockMetas[Index] = a_BlockMeta;
+	}
+	if ((a_DataTypes & baLight) != 0)
+	{
+		m_BlockLight[Index] = a_BlockLight;
+	}
+	if ((a_DataTypes & baSkyLight) != 0)
+	{
+		m_BlockSkyLight[Index] = a_BlockSkyLight;
+	}
 }
 
 

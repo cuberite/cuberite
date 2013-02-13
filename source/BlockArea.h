@@ -246,6 +246,12 @@ protected:
 	/// Loads the area from a schematic file uncompressed and parsed into a NBT tree. Returns true if successful.
 	bool LoadFromSchematicNBT(cParsedNBT & a_NBT);
 
+	/// Sets the specified datatypes at the specified location.
+	void RelSetData(
+		int a_RelX, int a_RelY, int a_RelZ, 
+		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+		NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+	);
 	// tolua_begin
 } ;
 // tolua_end

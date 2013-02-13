@@ -70,6 +70,7 @@ function Initialize(Plugin)
 	
 	-- Debug block area cuboid filling:
 	BA1:FillRelCuboid(2, 9, 2, 8, 2, 8, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK);
+	BA1:RelLine(2, 2, 2, 9, 8, 8, cBlockArea.baTypes or cBlockArea.baMetas, E_BLOCK_SAPLING, E_META_SAPLING_BIRCH);
 	BA1:SaveToSchematicFile("schematics/fillrel.schematic");
 
 	return true
