@@ -1432,6 +1432,10 @@
 					</FileConfiguration>
 				</File>
 				<File
+					RelativePath="..\MCServer\API.txt"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Bindings.cpp"
 					>
 					<FileConfiguration
@@ -2336,10 +2340,6 @@
 				</File>
 			</Filter>
 		</Filter>
-		<File
-			RelativePath="..\makefile"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
