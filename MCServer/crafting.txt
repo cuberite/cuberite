@@ -48,6 +48,7 @@ Stick, 4         = Planks, 2:2, 2:3
 Torch, 4         = Stick, 1:2 | Coal, 1:1
 Workbench        = Planks, 1:1, 1:2, 2:1, 2:2
 Chest            = Planks,      1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
+TrappedChest     = TripWireHook, 1:1 | Chest, 2:1
 EnderChest       = EyeOfEnder,  2:2 | Obsidian, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 Furnace          = Cobblestone, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 
@@ -63,6 +64,9 @@ GoldBlock        = GoldIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 DiamondBlock     = Diamond,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 LapisBlock       = LapisLazuli, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 EmeraldBlock     = Emerald,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+RedstoneBlock    = RedstoneDust,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+QuartzBlock      = NetherQuartz, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+NetherBrick      = netherbrickitem, 1:1, 1:2, 2:1, 2:2
 Glowstone        = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
 Wool             = String,    1:1, 1:2, 2:1, 2:2
 TNT              = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3:2, 2:3
@@ -75,6 +79,7 @@ CobblestoneSlab, 6  = Cobblestone,       1:1, 2:1, 3:1
 BrickSlab,       6  = BrickBlock,        1:1, 2:1, 3:1
 StonebrickSlab,  6  = StoneBrick,        1:1, 2:1, 3:1
 NetherbrickSlab, 6  = NetherBrick,       1:1, 2:1, 3:1
+snow,			 6  = SnowBlock,         1:1, 2:1, 3:1
 
 # Stairs:
 WoodStairs, 4    = Planks, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
@@ -86,8 +91,7 @@ BrickStairs, 4       = BrickBlock,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 SandstoneStairs, 4   = Sandstone,   1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 SandstoneStairs, 4   = Sandstone,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 NetherBrickStairs, 4 = NetherBrick, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-NetherBrickStairs, 4 = NetherBrick, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-
+quartzstairs, 4      = Quartzblock, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 SnowBlock          = SnowBall,  1:1, 1:2, 2:1, 2:2
 ClayBlock          = Clay,      1:1, 1:2, 2:1, 2:2
 BrickBlock         = Brick,     1:1, 1:2, 2:1, 2:2
@@ -215,6 +219,8 @@ CarrotOnAStick   = FishingRod, 1:2 | Carrot, 2:3
 Minecart         = IronIngot, 1:1, 3:1, 1:2, 2:2, 3:2
 PoweredMinecart  = Minecart, * | Furnace, *
 StorageMinecart  = Minecart, * | Chest, *
+TNTMinecart      = Minecart, * | TNT, *
+hopperminecart   = Minecart, * | Hopper, *
 Rails, 16        = IronIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 3:3 | Stick, 2:2
 PoweredRail, 6   = GoldIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 3:3 | Stick, 2:2      | RedstoneDust, 2:3
 DetectorRail, 6  = IronIngot, 1:1, 3:1, 1:2, 3:2, 1:3, 3:3 | StonePlate, 2:2 | RedstoneDust, 2:3
@@ -239,7 +245,11 @@ Lever            = Cobblestone, 1:2  | Stick, 1:1
 NoteBlock        = Planks,      1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | RedstoneDust, 2:2
 Jukebox          = Planks,      1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | Diamond,      2:2
 Dispenser        = Cobblestone, 1:1, 1:2, 1:3, 2:1, 3:1, 3:2, 3:3      | RedstoneDust, 2:3  | Bow, 2:2
+Dropper          = Cobblestone, 1:1, 2:1, 3:1, 1:2, 1:3, 3:2, 3:3 | Hopper, 2:2 | RedstoneDust, 2:3
 Repeater         = Stone,  1:2, 2:2, 3:2            | RedstoneTorchOn, 1:1, 3:1 | RedstoneDust, 2:1
+Comparator       = RedstoneTorchOn, 2:1, 1:2, 3:2   | NetherQuartz, 2:2 | Stone, 1:3, 2:3, 3:3
+DaylightSensor   = Glass, 1:1, 2:1, 3:1             | NetherQuartz, 1:2, 2:2, 3:2 | Woodslab, 1:3, 2:3, 3:3
+Hopper           = Ironbars, 1:1, 3:1, 1:2, 3:2, 2:3 | Chest, 2:2
 Piston           = Planks, 1:1, 2:1, 3:1            | RedstoneDust, 2:2         | Cobblestone, 1:2, 3:2, 1:3, 2:3, 3:3
 StickyPiston     = Piston, *         | SlimeBall, *
 RedstoneLamp     = RedstoneDust, 2:1, 1:2, 3:2, 2:3 | Glowstone, 2:2
@@ -252,7 +262,7 @@ tripwirehook, 2  = planks, 2:3 | stick, 2:2 | ironbar, 2:1
 #******************************************************#
 # Food
 #
-Bowl                 = Planks, 1:1, 2:2, 3:1
+Bowl, 4              = Planks, 1:1, 2:2, 3:1
 MushroomStew         = Bowl, * | BrownMushroom, * | RedMushroom, *
 Bread                = Wheat, 1:1, 2:1, 3:1
 Sugar                = Sugarcane, *

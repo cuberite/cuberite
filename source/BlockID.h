@@ -162,6 +162,19 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_POTATOES = 142,
 	E_BLOCK_WOODEN_BUTTON = 143,
 	E_BLOCK_HEAD = 144,
+	E_BLOCK_TRAPPED_CHEST = 146,
+	E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE = 147,
+	E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE = 148,
+	
+	E_BLOCK_INACTIVE_COMPARATOR = 149,
+	E_BLOCK_ACTIVE_COMPARATOR = 150,
+	E_BLOCK_DAYLIGHT_SENSOR = 151,
+	E_BLOCK_BLOCK_OF_REDSTONE = 152,
+
+	E_BLOCK_NETHER_QUARTZ_ORE = 153,
+	E_BLOCK_HOPPER = 154,
+	E_BLOCK_QUARTZ_BLOCK = 155,
+	E_BLOCK_ACTIVATOR_RAIL = 157,
 	
 	// Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
 	// IsValidBlock() depends on this
@@ -453,6 +466,9 @@ enum ENUM_ITEM_ID
 	E_ITEM_FIREWORK_ROCKET = 401,
 	E_ITEM_FIREWORK_STAR = 402,
 	E_ITEM_ENCHANTED_BOOK = 403,
+	E_ITEM_COMPARATOR = 404,
+	E_ITEM_NETHER_BRICK = 405,
+	E_ITEM_NETHER_QUARTZ = 406,
 	
 	// Keep these two as the last values of the consecutive list, without a number - they will get their correct number assigned automagically by C++
 	// IsValidItem() depends on this!
@@ -686,7 +702,7 @@ enum
 	E_ENTITY_TYPE_IRON_GOLEM    = 99,
 	E_ENTITY_TYPE_VILLAGER      = 120,
 } ;
-// tolua_end
+//tolua_end
 
 
 

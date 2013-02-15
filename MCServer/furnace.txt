@@ -41,9 +41,13 @@
 4:1  @10000=1:1		#-> 1 Cobblestone	-> 1 Rock
 15:1 @10000=265:1	#-> 1 Iron Ore 		-> 1 Iron Ingot
 14:1 @10000=266:1	#-> 1 Gold Ore		-> 1 Gold Ingot
+153:1 @10000=406:1   #-> 1 Quartz Ore   -> 1 Quartz
 12:1 @10000=20:1	#-> 1 Sand		-> 1 Glass
 319:1@10000=320:1	#-> 1 Raw Pork		-> 1 Cooked Pork
+363:1@10000=364:1	#-> 1 Raw Beef		-> 1 Cooked Beef (steak)
+365:1@10000=366:1	#-> 1 Raw Chicken		-> 1 Cooked Chicken
 337:1@10000=336:1	#-> 1 Clay		-> 1 Clay Brick
+87:1@10000=405:1    #-> 1 NetherRack -> 1 NetherBrick
 349:1@10000=350:1	#-> 1 Raw Fish		-> 1 Cooked Fish
 17:1 @10000=263:1	#-> 1 Wood		-> 1 Charcoal
 81:1 @10000=351:1:2	#-> 1 Cactus		-> 1 Dye
@@ -52,6 +56,7 @@
 # Burn baby! Buuurn!
 
 !263:1 = 80000		#-> 1 Charcoal		-> 80 sec
+!42:126:1 = 7500    #-> 1 halfslab       -> 7.5 seconds
 !5:1   = 15000		#-> 1 Planks		-> 15 sec
 !280:1 = 5000		#-> 1 Stick		-> 5 sec
 !85:1  = 15000		#-> 1 Fence		-> 15 sec
@@ -62,3 +67,4 @@
 !84:1  = 15000		#-> 1 Jukebox		-> 15 sec
 !327:1 = 1000000	#-> 1 Lava Bucket	-> 1000 sec
 !17:1  = 15000		#-> 1 Wood		-> 15 sec
+!6:1   = 5000		#-> 1 Sapling   -> 5 sec
