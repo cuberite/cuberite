@@ -467,7 +467,7 @@ enum ENUM_ITEM_ID
 	E_ITEM_FIREWORK_STAR = 402,
 	E_ITEM_ENCHANTED_BOOK = 403,
 	E_ITEM_COMPARATOR = 404,
-	E_ITEM_NETHER_BRICK = 405,
+	// E_ITEM_NETHER_BRICK = 405, // TODO: E_ITEM_NETHER_BRICK is already used for the nether brick block (as an item, #112). What name to use?
 	E_ITEM_NETHER_QUARTZ = 406,
 	
 	// Keep these two as the last values of the consecutive list, without a number - they will get their correct number assigned automagically by C++
