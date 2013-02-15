@@ -38,14 +38,18 @@ public:												// tolua_export
 	bool IsConnected(){return m_bIsConnected;} // returns connection status
 	void StartListenClient(); // Listen to client
 
-	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);
+	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
 
 	bool Tick(float a_Dt);
 
 	void StartListenThread();
 
 	bool Command(cClientHandle & a_Client, const AString & a_Cmd);
-	void ServerCommand(const AString & a_Cmd);								// tolua_export
+	void ExecuteConsoleCommand(const AString & a_Cmd);
+
+	/// Binds the built-in console commands with the plugin manager
+	static void BindBuiltInConsoleCommands(void);
+	
 	void Shutdown();
 
 	void SendMessage(const AString & a_Message, cPlayer * a_Player = NULL, bool a_bExclude = false );  // tolua_export

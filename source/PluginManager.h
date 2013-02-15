@@ -86,7 +86,9 @@ public:																	// tolua_export
 	class cCommandEnumCallback
 	{
 	public:
-		/// Called for each command; return true to abort enumeration
+		/** Called for each command; return true to abort enumeration
+		For console commands, a_Permission is not used (set to empty string)
+		*/
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
 	} ;
 	
@@ -170,7 +172,22 @@ public:																	// tolua_export
 	
 	/// Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns true if executed (false if not found)
 	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
-
+	
+	/// Removes all console command bindings that the specified plugin has made
+	void RemovePluginConsoleCommands(cPlugin * a_Plugin);
+	
+	/// Binds a console command to the specified plugin. Returns true if successful, false if command already bound.
+	bool BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
+	
+	/// Calls a_Callback for each bound console command, returns true if all commands were enumerated
+	bool ForEachConsoleCommand(cCommandEnumCallback & a_Callback);  // Exported in ManualBindings.cpp
+	
+	/// Returns true if the console command is in the command map
+	bool IsConsoleCommandBound(const AString & a_Command);  // tolua_export
+	
+	/// Executes the command split into a_Split, as if it was given on the console. Returns true if executed.
+	bool ExecuteConsoleCommand(const AStringVector & a_Split);  // tolua_export
+	
 private:
 	friend class cRoot;
 	
@@ -178,7 +195,7 @@ private:
 	{
 	public:
 		cPlugin * m_Plugin;
-		AString   m_Permission;
+		AString   m_Permission;  // Not used for console commands
 		AString   m_HelpString;
 	} ;
 	
@@ -189,6 +206,7 @@ private:
 	PluginMap  m_Plugins;
 	HookMap    m_Hooks;
 	CommandMap m_Commands;
+	CommandMap m_ConsoleCommands;
 
 	bool m_bReloadPlugins;
 

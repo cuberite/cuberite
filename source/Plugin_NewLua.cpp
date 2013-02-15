@@ -1273,7 +1273,7 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
 	if (cmd == m_Commands.end())
 	{
-		LOGWARNING("Command handler registered in cPluginManager but not in cPlugin, wtf? Command \"%s\".", a_Split[0].c_str());
+		LOGWARNING("Command handler is registered in cPluginManager but not in cPlugin, wtf? Command \"%s\".", a_Split[0].c_str());
 		return false;
 	}
 	
@@ -1322,6 +1322,58 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 
 
 
+bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split)
+{
+	ASSERT(!a_Split.empty());
+	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
+	if (cmd == m_ConsoleCommands.end())
+	{
+		LOGWARNING("Console command handler is registered in cPluginManager but not in cPlugin, wtf? Console command \"%s\".", a_Split[0].c_str());
+		return false;
+	}
+	
+	cCSLock Lock(m_CriticalSection);
+	
+	// Push the function to be called:
+	LOGD("1. Stack size: %i", lua_gettop(m_LuaState));
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, cmd->second);  // same as lua_getref()
+	
+	// Push the split:
+	LOGD("2. Stack size: %i", lua_gettop(m_LuaState));
+	lua_createtable(m_LuaState, a_Split.size(), 0);
+	int newTable = lua_gettop(m_LuaState);
+	int index = 1;
+	std::vector<std::string>::const_iterator iter = a_Split.begin(), end = a_Split.end();
+	while(iter != end)
+	{
+		tolua_pushstring(m_LuaState, (*iter).c_str());
+		lua_rawseti(m_LuaState, newTable, index);
+		++iter;
+		++index;
+	}
+	LOGD("3. Stack size: %i", lua_gettop(m_LuaState));
+	
+	// Call function:
+	LOGD("Calling bound function! :D");
+	int s = lua_pcall(m_LuaState, 1, 1, 0);
+	if (report_errors(m_LuaState, s))
+	{
+		LOGERROR("Lua error. Stack size: %i", lua_gettop(m_LuaState));
+		return false;
+	}
+	
+	// Handle return value:
+	bool RetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);  // Pop return value
+	LOGD("ok. Stack size: %i", lua_gettop(m_LuaState));
+	
+	return RetVal;
+}
+
+
+
+
+
 void cPlugin_NewLua::ClearCommands(void)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1335,6 +1387,25 @@ void cPlugin_NewLua::ClearCommands(void)
 		}
 	}
 	m_Commands.clear();
+}
+
+
+
+
+
+void cPlugin_NewLua::ClearConsoleCommands(void)
+{
+	cCSLock Lock(m_CriticalSection);
+
+	// Unreference the bound functions so that Lua can GC them
+	if (m_LuaState != NULL)
+	{
+		for (CommandMap::iterator itr = m_ConsoleCommands.begin(), end = m_ConsoleCommands.end(); itr != end; ++itr)
+		{
+			luaL_unref(m_LuaState, LUA_REGISTRYINDEX, itr->second);
+		}
+	}
+	m_ConsoleCommands.clear();
 }
 
 
@@ -1520,6 +1591,16 @@ void cPlugin_NewLua::BindCommand(const AString & a_Command, int a_FnRef)
 {
 	ASSERT(m_Commands.find(a_Command) == m_Commands.end());
 	m_Commands[a_Command] = a_FnRef;
+}
+
+
+
+
+
+void cPlugin_NewLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
+{
+	ASSERT(m_ConsoleCommands.find(a_Command) == m_ConsoleCommands.end());
+	m_ConsoleCommands[a_Command] = a_FnRef;
 }
 
 

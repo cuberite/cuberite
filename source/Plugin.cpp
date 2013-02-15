@@ -535,6 +535,16 @@ bool cPlugin::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
 
 
 
+bool cPlugin::HandleConsoleCommand(const AStringVector & a_Split)
+{
+	UNUSED(a_Split);
+	return false;
+}
+
+
+
+
+
 AString cPlugin::GetLocalDirectory(void) const
 {
 	return std::string("Plugins/") + m_Directory;

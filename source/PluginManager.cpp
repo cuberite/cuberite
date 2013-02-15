@@ -7,6 +7,7 @@
 #include "WebAdmin.h"
 #include "Item.h"
 #include "Root.h"
+#include "Server.h"
 
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
@@ -137,6 +138,7 @@ void cPluginManager::ReloadPluginsNow(void)
 	{
 		LOG("Loaded %i plugin(s)", GetNumPlugins());
 	}
+	cServer::BindBuiltInConsoleCommands();
 }
 
 
@@ -1079,6 +1081,7 @@ void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 	}
 	
 	RemovePluginCommands(a_Plugin);
+	RemovePluginConsoleCommands(a_Plugin);
 	RemoveHooks(a_Plugin);
 	if (a_Plugin != NULL)
 	{
@@ -1183,6 +1186,103 @@ bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Comman
 bool cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, false);
+}
+
+
+
+
+
+void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
+{
+	if (a_Plugin != NULL)
+	{
+		a_Plugin->ClearConsoleCommands();
+	}
+	
+	for (CommandMap::iterator itr = m_ConsoleCommands.begin(); itr != m_ConsoleCommands.end();)
+	{
+		if (itr->second.m_Plugin == a_Plugin)
+		{
+			CommandMap::iterator EraseMe = itr;  // Stupid GCC doesn't have a std::map::erase() that would return the next iterator
+			++itr;
+			m_ConsoleCommands.erase(EraseMe);
+		}
+		else
+		{
+			++itr;
+		}
+	}  // for itr - m_Commands[]
+}
+
+
+
+
+
+bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_HelpString)
+{
+	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Command);
+	if (cmd != m_ConsoleCommands.end())
+	{
+		LOGWARNING("Console command \"%s\" is already bound to plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str());
+		return false;
+	}
+	
+	m_ConsoleCommands[a_Command].m_Plugin     = a_Plugin;
+	m_ConsoleCommands[a_Command].m_Permission = "";
+	m_ConsoleCommands[a_Command].m_HelpString = a_HelpString;
+	return true;
+}
+
+
+
+
+
+bool cPluginManager::ForEachConsoleCommand(cCommandEnumCallback & a_Callback)
+{
+	for (CommandMap::iterator itr = m_ConsoleCommands.begin(), end = m_ConsoleCommands.end(); itr != end; ++itr)
+	{
+		if (a_Callback.Command(itr->first, itr->second.m_Plugin, "", itr->second.m_HelpString))
+		{
+			return false;
+		}
+	}  // for itr - m_Commands[]
+	return true;
+}
+
+
+
+
+
+bool cPluginManager::IsConsoleCommandBound(const AString & a_Command)
+{
+	return (m_ConsoleCommands.find(a_Command) != m_ConsoleCommands.end());
+}
+
+
+
+
+
+bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split)
+{
+	if (a_Split.empty())
+	{
+		return false;
+	}
+	
+	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
+	if (cmd == m_ConsoleCommands.end())
+	{
+		// Command not found
+		return false;
+	}
+	
+	if (cmd->second.m_Plugin == NULL)
+	{
+		// This is a built-in command
+		return false;
+	}
+	
+	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split);	
 }
 
 

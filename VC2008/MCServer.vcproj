@@ -2199,6 +2199,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\MCServer\Plugins\Core\console.lua"
+					>
+				</File>
+				<File
 					RelativePath="..\MCServer\Plugins\Core\coords.lua"
 					>
 				</File>

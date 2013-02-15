@@ -49,6 +49,8 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/regeneratechunk", "core.regeneratechunk", HandleRegenerateChunkCommand, " <[X] [Z]> - Regenerates a chunk, current or specified");
 	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
 	
+	InitConsoleCommands();
+	
 	local IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
 		SHOW_PLUGIN_NAMES = IniFile:GetValueB("HelpPlugin", "ShowPluginNames", true )
@@ -89,12 +91,12 @@ function Initialize(Plugin)
 		end
 	end
 	
-	Plugin:AddWebTab( "Server Settings", HandleRequest_ServerSettings )
-	Plugin:AddWebTab( "Chat", HandleRequest_Chat )
-	Plugin:AddWebTab( "Playerlist", HandleRequest_PlayerList )
-	Plugin:AddWebTab( "Whitelist", HandleRequest_WhiteList )
-	Plugin:AddWebTab( "Permissions", HandleRequest_Permissions )
-	Plugin:AddWebTab( "Manage Plugins", HandleRequest_ManagePlugins )
+	Plugin:AddWebTab("Server Settings", HandleRequest_ServerSettings);
+	Plugin:AddWebTab("Chat",            HandleRequest_Chat);
+	Plugin:AddWebTab("Playerlist",      HandleRequest_PlayerList);
+	Plugin:AddWebTab("Whitelist",       HandleRequest_WhiteList);
+	Plugin:AddWebTab("Permissions",     HandleRequest_Permissions);
+	Plugin:AddWebTab("Manage Plugins",  HandleRequest_ManagePlugins);
 	
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true

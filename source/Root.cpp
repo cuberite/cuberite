@@ -73,7 +73,7 @@ void cRoot::InputThread(void * a_Params)
 	{
 		std::string Command;
 		std::getline(std::cin, Command);
-		self.ServerCommand(Command);
+		self.ExecuteConsoleCommand(Command);
 	}
 }
 
@@ -149,7 +149,7 @@ void cRoot::Start(void)
 		LoadWorlds();
 
 		LOG("Loading plugin manager...");
-		m_PluginManager = new cPluginManager(); // This should be last
+		m_PluginManager = new cPluginManager();
 		m_PluginManager->ReloadPluginsNow();
 		
 		LOG("Loading MonsterConfig...");
@@ -348,11 +348,11 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 
 
 
-void cRoot::TickWorlds( float a_Dt )
+void cRoot::TickWorlds(float a_Dt)
 {
-	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
-		itr->second->Tick( a_Dt );
+		itr->second->Tick(a_Dt);
 	}
 }
 
@@ -360,10 +360,12 @@ void cRoot::TickWorlds( float a_Dt )
 
 
 
-void cRoot::ServerCommand(const AString & a_Cmd)
+void cRoot::ExecuteConsoleCommand(const AString & a_Cmd)
 {
-	LOG("Server console command: \"%s\"", a_Cmd.c_str());
-	m_Server->ServerCommand(a_Cmd);
+	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
+	m_Server->ExecuteConsoleCommand(a_Cmd);
+	
+	// Some commands are built-in:
 	if (a_Cmd == "stop")
 	{
 		m_bStop = true;
@@ -485,6 +487,15 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 		return a_Callback.Item (Callback.BestMatch);
 	}
 	return false;
+}
+
+
+
+
+
+AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
+{
+	return cProtocolRecognizer::GetVersionTextFromInt(a_ProtocolVersion);
 }
 
 

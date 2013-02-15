@@ -62,24 +62,31 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 
-	void ServerCommand(const AString & a_Cmd);						// tolua_export
+	/// Executes a console command through the cServer class; does special handling for "stop" and "restart".
+	void ExecuteConsoleCommand(const AString & a_Cmd);						// tolua_export
 	
-	void KickUser(int a_ClientID, const AString & a_Reason);  // Kicks the user, no matter in what world they are. Used from cAuthenticator
-	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
+	/// Kicks the user, no matter in what world they are. Used from cAuthenticator
+	void KickUser(int a_ClientID, const AString & a_Reason);
+	
+	/// Called by cAuthenticator to auth the specified user
+	void AuthenticateUser(int a_ClientID);
 
-	void TickWorlds( float a_Dt );
+	void TickWorlds(float a_Dt);
 	
 	/// Returns the number of chunks loaded
 	int GetTotalChunkCount(void);  // tolua_export
 	
 	/// Saves all chunks in all worlds
-	void SaveAllChunks(void);
+	void SaveAllChunks(void);  // tolua_export
 	
 	/// Calls the callback for each player in all worlds
 	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
 
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	
+	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
+	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);  // tolua_export
 	
 private:
 	void LoadGlobalSettings();

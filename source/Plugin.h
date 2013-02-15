@@ -85,11 +85,20 @@ public:
 	virtual bool OnWeatherChanged     (cWorld & a_World);
 	virtual bool OnWeatherChanging    (cWorld & a_World, eWeather & a_NewWeather);
 	
-	/// Handles the command split into a_Split, issued by player a_Player. Command permissions have already been checked.
+	/** Handles the command split into a_Split, issued by player a_Player.
+	Command permissions have already been checked.
+	Returns true if command handled successfully
+	*/
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player);
+	
+	/// Handles the console command split into a_Split. Returns true if command handled successfully.
+	virtual bool HandleConsoleCommand(const AStringVector & a_Split);
 	
 	/// All bound commands are to be removed, do any language-dependent cleanup here
 	virtual void ClearCommands(void) {} ;
+	
+	/// All bound console commands are to be removed, do any language-dependent cleanup here
+	virtual void ClearConsoleCommands(void) {} ;
 	
 	/** Called from cPluginManager::AddHook() to check if the hook can be added.
 	Plugin API providers may check if the plugin is written correctly (has the hook handler function)

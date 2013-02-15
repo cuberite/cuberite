@@ -507,6 +507,41 @@ static int tolua_ForEach(lua_State * tolua_S)
 
 
 
+static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
+{
+	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
+
+	const cPluginManager::PluginMap & AllPlugins = self->GetAllPlugins();
+
+	lua_newtable(tolua_S);
+	//lua_createtable(tolua_S, AllPlugins.size(), 0);
+	int newTable = lua_gettop(tolua_S);
+	int index = 1;
+	cPluginManager::PluginMap::const_iterator iter = AllPlugins.begin();
+	while(iter != AllPlugins.end())
+	{
+		const cPlugin* Plugin = iter->second;
+		tolua_pushstring( tolua_S, iter->first.c_str() );
+		if( Plugin != NULL )
+		{
+			tolua_pushusertype( tolua_S, (void*)Plugin, "const cPlugin" );
+		}
+		else
+		{
+			tolua_pushboolean(tolua_S, 0);
+		}
+		//lua_rawseti(tolua_S, newTable, index);
+		lua_rawset(tolua_S, -3);
+		++iter;
+		++index;
+	}
+	return 1;
+}
+
+
+
+
+
 static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
@@ -582,36 +617,76 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 
 
 
-static int tolua_cPluginManager_GetAllPlugins(lua_State* tolua_S)
+static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 {
-	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
-
-	const cPluginManager::PluginMap & AllPlugins = self->GetAllPlugins();
-
-	lua_newtable(tolua_S);
-	//lua_createtable(tolua_S, AllPlugins.size(), 0);
-	int newTable = lua_gettop(tolua_S);
-	int index = 1;
-	cPluginManager::PluginMap::const_iterator iter = AllPlugins.begin();
-	while(iter != AllPlugins.end())
+	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
+	if( NumArgs != 1)
 	{
-		const cPlugin* Plugin = iter->second;
-		tolua_pushstring( tolua_S, iter->first.c_str() );
-		if( Plugin != NULL )
-		{
-			tolua_pushusertype( tolua_S, (void*)Plugin, "const cPlugin" );
-		}
-		else
-		{
-			tolua_pushboolean(tolua_S, 0);
-		}
-		//lua_rawseti(tolua_S, newTable, index);
-		lua_rawset(tolua_S, -3);
-		++iter;
-		++index;
+		LOGWARN("Error in function call 'ForEachConsoleCommand': Requires 1 argument, got %i", NumArgs);
+		return 0;
 	}
+
+	cPluginManager * self = (cPluginManager *)tolua_tousertype(tolua_S, 1, 0);
+	if (self == NULL)
+	{
+		LOGWARN("Error in function call 'ForEachConsoleCommand': Not called on an object instance");
+		return 0;
+	}
+
+	if (!lua_isfunction(tolua_S, 2))
+	{
+		LOGWARN("Error in function call 'ForEachConsoleCommand': Expected a function for parameter #1");
+		return 0;
+	}
+
+	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+	if (FuncRef == LUA_REFNIL)
+	{
+		LOGWARN("Error in function call 'ForEachConsoleCommand': Could not get function reference of parameter #1");
+		return 0;
+	}
+
+	class cLuaCallback : public cPluginManager::cCommandEnumCallback
+	{
+	public:
+		cLuaCallback(lua_State * a_LuaState, int a_FuncRef)
+			: LuaState( a_LuaState )
+			, FuncRef( a_FuncRef )
+		{}
+
+	private:
+		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
+		{
+			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
+			tolua_pushcppstring(LuaState, a_Command);
+			tolua_pushcppstring(LuaState, a_HelpString);
+
+			int s = lua_pcall(LuaState, 2, 1, 0);
+			if (report_errors(LuaState, s))
+			{
+				return true;  /* Abort enumeration */
+			}
+
+			if (lua_isboolean(LuaState, -1))
+			{
+				return (tolua_toboolean( LuaState, -1, 0) > 0);
+			}
+			return false;  /* Continue enumeration */
+		}
+		lua_State * LuaState;
+		int FuncRef;
+	} Callback(tolua_S, FuncRef);
+
+	bool bRetVal = self->ForEachConsoleCommand(Callback);
+
+	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
+	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
+
+	/* Push return value on stack */
+	tolua_pushboolean(tolua_S, bRetVal);
 	return 1;
 }
+
 
 
 
@@ -675,6 +750,63 @@ static int tolua_cPluginManager_BindCommand(lua_State * L)
 
 
 
+static int tolua_cPluginManager_BindConsoleCommand(lua_State * L)
+{
+	// Function signature: cPluginManager:BindConsoleCommand(Command, Function, HelpString)
+	
+	// Get the plugin identification out of LuaState:
+	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
+	if (!lua_islightuserdata(L, -1))
+	{
+		LOGERROR("cPluginManager:BindConsoleCommand() cannot get plugin instance, what have you done to my Lua state? Command-binding aborted.");
+	}
+	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
+	lua_pop(L, 1);
+	
+	// Read the arguments to this API call:
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype (L, 1, "cPluginManager", 0, &tolua_err) ||  // self
+		!tolua_iscppstring(L, 2, 0, &tolua_err) ||  // Command
+		!tolua_iscppstring(L, 4, 0, &tolua_err) ||  // HelpString
+		!tolua_isnoobj    (L, 5, &tolua_err)
+	)
+	{
+		tolua_error(L, "#ferror in function 'BindConsoleCommand'.", &tolua_err);
+		return 0;
+	}
+	if (!lua_isfunction(L, 3))
+	{
+		luaL_error(L, "\"BindConsoleCommand\" function expects a function as its 2nd parameter. Command-binding aborted.");
+		return 0;
+	}
+	cPluginManager * self = (cPluginManager *)tolua_tousertype(L, 1, 0);
+	AString Command   (tolua_tocppstring(L, 2, ""));
+	AString HelpString(tolua_tocppstring(L, 4, ""));
+	
+	// Store the function reference:
+	lua_pop(L, 1);  // Pop the help string off the stack
+	int FnRef = luaL_ref(L, LUA_REGISTRYINDEX);  // Store function reference
+	if (FnRef == LUA_REFNIL)
+	{
+		LOGERROR("\"BindConsoleCommand\": Cannot create a function reference. Console Command \"%s\" not bound.", Command.c_str());
+		return 0;
+	}
+	
+	if (!self->BindConsoleCommand(Command, Plugin, HelpString))
+	{
+		// Refused. Possibly already bound. Error message has been given, bail out silently.
+		return 0;
+	}
+	
+	Plugin->BindConsoleCommand(Command, FnRef);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPlayer_GetGroups(lua_State* tolua_S)
 {
 	cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
@@ -720,67 +852,6 @@ static int tolua_cPlayer_GetResolvedPermissions(lua_State* tolua_S)
 	}
 	return 1;
 }
-
-
-
-
-
-/*
-// TODO: rewrite this for the new API
-static int tolua_cPlugin_BindCommand(lua_State* tolua_S)
-{
-	cPlugin* self = (cPlugin*)  tolua_tousertype(tolua_S,1,0);
-	cPluginManager* PluginManager = cRoot::Get()->GetPluginManager();
-	cLuaCommandBinder* CommandBinder = PluginManager->GetLuaCommandBinder();
-
-	tolua_Error tolua_err;
-	tolua_err.array = 0;
-	tolua_err.index = 0;
-	tolua_err.type = 0;
-
-	std::string Permission = "";
-	std::string Command = "";
-	int Reference = LUA_REFNIL;
-
-	if( tolua_isstring( tolua_S, 2, 0, &tolua_err ) &&
-		lua_isfunction( tolua_S, 3 ) )
-	{
-		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		Command = ((std::string)  tolua_tocppstring(tolua_S,2,0));
-	}
-	else if( tolua_isstring( tolua_S, 2, 0, &tolua_err ) &&
-			tolua_isstring( tolua_S, 3, 0, &tolua_err ) &&
-			lua_isfunction( tolua_S, 4 ) )
-	{
-		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		Command = ((std::string)  tolua_tocppstring(tolua_S,2,0));
-		Permission = ((std::string)  tolua_tocppstring(tolua_S,3,0));
-	}
-	else
-	{
-		if( tolua_err.type == 0 )
-		{
-			tolua_err.type = "function";
-		}
-		tolua_error(tolua_S,"#ferror in function 'BindCommand'.",&tolua_err);
-		return 0;
-	}
-
-	if( Reference != LUA_REFNIL )
-	{
-		if( !CommandBinder->BindCommand( Command, Permission, self, tolua_S, Reference ) )
-		{
-			luaL_unref( tolua_S, LUA_REGISTRYINDEX, Reference );
-		}
-	}
-	else
-	{
-		LOGERROR("ERROR: cPlugin:BindCommand invalid function reference in 2nd argument (Command: \"%s\")", Command.c_str() );
-	}
-
-	return 0;
-}
-*/
 
 
 
@@ -1056,9 +1127,11 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPluginManager");
-			tolua_function(tolua_S, "GetAllPlugins", tolua_cPluginManager_GetAllPlugins);
-			tolua_function(tolua_S, "BindCommand", tolua_cPluginManager_BindCommand);
-			tolua_function(tolua_S, "ForEachCommand", tolua_cPluginManager_ForEachCommand);
+			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
+			tolua_function(tolua_S, "BindCommand",           tolua_cPluginManager_BindCommand);
+			tolua_function(tolua_S, "BindConsoleCommand",    tolua_cPluginManager_BindConsoleCommand);
+			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
+			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");

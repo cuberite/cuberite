@@ -72,8 +72,12 @@ public:
 	
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player) override;
 	
+	virtual bool HandleConsoleCommand(const AStringVector & a_Split) override;
+
 	virtual void ClearCommands(void) override;
 	
+	virtual void ClearConsoleCommands(void) override;
+
 	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) override;
 	
 	// cWebPlugin override
@@ -85,6 +89,9 @@ public:
 	
 	/// Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap.
 	void BindCommand(const AString & a_Command, int a_FnRef);
+
+	/// Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap.
+	void BindConsoleCommand(const AString & a_Command, int a_FnRef);
 
 	lua_State* GetLuaState() { return m_LuaState; }
 
@@ -98,6 +105,7 @@ protected:
 	typedef std::map<AString, int> CommandMap;
 	
 	CommandMap m_Commands;
+	CommandMap m_ConsoleCommands;
 
 	bool PushFunction(const char * a_FunctionName, bool a_bLogError = true);
 	bool CallFunction(int a_NumArgs, int a_NumResults, const char * a_FunctionName );  // a_FunctionName is only used for error messages, nothing else
