@@ -178,7 +178,7 @@ void cStructGenTrees::GenerateSingleTree(
 
 	// Check the block underneath the tree:
 	BLOCKTYPE TopBlock = cChunkDef::GetBlock(a_BlockTypes, x, Height, z);
-	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_SOIL))
+	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND))
 	{
 		return;
 	}

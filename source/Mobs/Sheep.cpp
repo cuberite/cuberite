@@ -23,7 +23,7 @@ void cSheep::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 {
 	if (!m_IsSheared)
 	{
-		a_Drops.push_back(cItem(E_ITEM_WHITE_CLOTH, 1, m_WoolColor));
+		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, m_WoolColor));
 	}
 }
 

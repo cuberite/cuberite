@@ -372,7 +372,7 @@ public:
 		g_BlockSpreadLightFalloff[E_BLOCK_FENCE_GATE]       = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_FIRE]             = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_GLASS]            = 1;
-		g_BlockSpreadLightFalloff[E_BLOCK_GLASS_PLANE]      = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_GLASS_PANE]       = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_GLOWSTONE]        = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_IRON_BARS]        = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_IRON_DOOR]        = 1;

@@ -21,7 +21,7 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Only the first 2 bits contain the display information, the others are for growing
-		a_Pickups.push_back(cItem(E_ITEM_SAPLING, 1, a_BlockMeta & 3));
+		a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 3));
 	}
 
 

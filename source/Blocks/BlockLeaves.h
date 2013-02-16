@@ -41,7 +41,7 @@ public:
 		// Only the first 2 bits contain the display information, the others are for growing
 		if (rand.randInt(5) == 0)
 		{
-			a_Pickups.push_back(cItem(E_ITEM_SAPLING, 1, a_BlockMeta & 3));
+			a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 3));
 		}
 		if ((a_BlockMeta & 3) == E_META_SAPLING_APPLE)
 		{

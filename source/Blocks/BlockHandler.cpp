@@ -154,7 +154,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RED_MUSHROOM:          return new cBlockMushroomHandler        (a_BlockType);
 		case E_BLOCK_RED_ROSE:              return new cBlockFlowerHandler          (a_BlockType);
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
-		case E_ITEM_SANDSTONE_STAIRS:       return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_SANDSTONE_STAIRS:      return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignHandler            (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);

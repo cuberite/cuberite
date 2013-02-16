@@ -71,21 +71,21 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		default:                       return new cItemHandler(a_ItemType);
 		
 		// Single item per handler, alphabetically sorted:
+		case E_BLOCK_LEAVES:           return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_SAPLING:          return new cItemSaplingHandler(a_ItemType);
+		case E_BLOCK_WOOL:             return new cItemClothHandler(a_ItemType);
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
 		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
-		case E_ITEM_LEAVES:            return new cItemLeavesHandler(a_ItemType);
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
-		case E_ITEM_SAPLING:           return new cItemSaplingHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
 		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemType);
 		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);
-		case E_ITEM_WOOL:              return new cItemClothHandler(a_ItemType);
 		
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -123,14 +123,14 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemSwordHandler(a_ItemType);
 		}
 		
-		case E_ITEM_STONE_SLAB:
-		case E_ITEM_WOODEN_SLAB:
+		case E_BLOCK_STONE_SLAB:
+		case E_BLOCK_WOODEN_SLAB:
 		{
 			return new cItemSlabHandler(a_ItemType);
 		}
 		
-		case E_ITEM_LOG:
-		case E_ITEM_PLANKS:
+		case E_BLOCK_LOG:
+		case E_BLOCK_PLANKS:
 		{
 			return new cItemWoodHandler(a_ItemType);
 		}
@@ -162,9 +162,9 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_COOKED_CHICKEN:
 		case E_ITEM_RAW_BEEF:
-		case E_ITEM_RAW_MEAT:
+		case E_ITEM_RAW_PORKCHOP:
 		case E_ITEM_STEAK:
-		case E_ITEM_COOKED_MEAT:
+		case E_ITEM_COOKED_PORKCHOP:
 		case E_ITEM_RAW_FISH:
 		case E_ITEM_COOKED_FISH:
 		case E_ITEM_RED_APPLE:
@@ -261,7 +261,6 @@ char cItemHandler::GetMaxStackSize(void)
 	
 	switch (m_ItemType) //sorted by id
 	{
-		case E_ITEM_APPLE:                return 64;
 		case E_ITEM_ARROW:                return 64;
 		case E_ITEM_BLAZE_POWDER:         return 64;
 		case E_ITEM_BLAZE_ROD:            return 64;
@@ -311,6 +310,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_RAW_CHICKEN:          return 64;
 		case E_ITEM_RAW_FISH:             return 64;
 		case E_ITEM_RAW_PORKCHOP:         return 64;
+		case E_ITEM_RED_APPLE:            return 64;
 		case E_ITEM_REDSTONE_DUST:        return 64;
 		case E_ITEM_REDSTONE_REPEATER:    return 64;
 		case E_ITEM_ROTTEN_FLESH:         return 64;

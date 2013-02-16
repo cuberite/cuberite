@@ -99,7 +99,7 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 bool cFireSimulator::IsForeverBurnable( BLOCKTYPE a_BlockType )
 {
-	return a_BlockType == E_BLOCK_BLOODSTONE;
+	return a_BlockType == E_BLOCK_NETHERRACK;
 }
 
 

@@ -31,7 +31,7 @@ public:
 		if (Block == E_BLOCK_LEAVES)
 		{
 			cItems Drops;
-			Drops.push_back(cItem(E_ITEM_LEAVES, 1, a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ)));
+			Drops.push_back(cItem(E_BLOCK_LEAVES, 1, a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ)));
 			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);

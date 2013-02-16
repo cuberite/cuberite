@@ -32,10 +32,10 @@ public:
 		case E_ITEM_COOKED_CHICKEN:
 			return FoodInfo(6, 7.2f);
 		case E_ITEM_RAW_BEEF:
-		case E_ITEM_RAW_MEAT:
+		case E_ITEM_RAW_PORKCHOP:
 			return FoodInfo(3, 1.8f);
 		case E_ITEM_STEAK:
-		case E_ITEM_COOKED_MEAT:
+		case E_ITEM_COOKED_PORKCHOP:
 			return FoodInfo(8, 12.8f);
 		case E_ITEM_RAW_FISH:
 			return FoodInfo(2, 1.2f);
