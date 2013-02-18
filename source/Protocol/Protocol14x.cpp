@@ -235,3 +235,25 @@ void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 
 
 
+void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_SPAWN_OBJECT);
+	WriteInt (a_Vehicle.GetUniqueID());
+	WriteByte(a_VehicleType);
+	WriteInt ((int)(a_Vehicle.GetPosX() * 32));
+	WriteInt ((int)(a_Vehicle.GetPosY() * 32));
+	WriteInt ((int)(a_Vehicle.GetPosZ() * 32));
+	WriteInt (1);
+	WriteShort(0);  // TODO: SpeedX
+	WriteShort(0);  // TODO: SpeedY
+	WriteShort(0);  // TODO: SpeedZ
+	WriteByte (0);  // TODO: Yaw
+	WriteByte (0);  // TODO: Pitch
+	Flush();
+}
+
+
+
+
+

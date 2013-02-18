@@ -975,6 +975,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Minecart.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Minecart.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\NoteEntity.cpp"
 					>
 				</File>
@@ -2048,6 +2056,10 @@
 				</File>
 				<File
 					RelativePath="..\source\items\ItemLighter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Items\ItemMinecart.h"
 					>
 				</File>
 				<File

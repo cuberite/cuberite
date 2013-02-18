@@ -61,6 +61,7 @@ public:
 	virtual void SendSpawnFallingBlock  (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob           (const cMonster & a_Mob) override;
 	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch) override;
+	virtual void SendSpawnVehicle       (const cEntity & a_Vehicle, char a_VehicleType) override;
 	virtual void SendTeleportEntity     (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay) override;

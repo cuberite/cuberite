@@ -1703,6 +1703,15 @@ void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType,
 
 
 
+void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
+{
+	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType);
+}
+
+
+
+
+
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
 	// Check chunks being sent, erase them from m_ChunksToSend:

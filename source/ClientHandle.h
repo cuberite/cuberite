@@ -114,6 +114,7 @@ public:
 	void SendSpawnFallingBlock  (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob           (const cMonster & a_Mob);
 	void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch);
+	void SendSpawnVehicle       (const cEntity & a_Vehicle, char a_VehicleType);
 	void SendTeleportEntity     (const cEntity & a_Entity);
 	void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay);

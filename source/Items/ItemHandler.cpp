@@ -5,32 +5,33 @@
 #include "../World.h"
 #include "../Player.h"
 
-//Handler
-#include "ItemCloth.h"
-#include "ItemHoe.h"
-#include "ItemSlab.h"
-#include "ItemWood.h"
-#include "ItemShears.h"
-#include "ItemLeaves.h"
-#include "ItemSapling.h"
+// Handlers:
+#include "ItemBed.h"
+#include "ItemBrewingStand.h"
 #include "ItemBucket.h"
+#include "ItemCauldron.h"
+#include "ItemCloth.h"
+#include "ItemDoor.h"
+#include "ItemDye.h"
+#include "ItemFlowerPot.h"
+#include "ItemFood.h"
+#include "ItemHoe.h"
+#include "ItemLeaves.h"
 #include "ItemLighter.h"
+#include "ItemMinecart.h"
+#include "ItemPickaxe.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
+#include "ItemSapling.h"
 #include "ItemSeeds.h"
-#include "ItemDye.h"
-#include "ItemSugarcane.h"
-#include "ItemPickaxe.h"
+#include "ItemShears.h"
 #include "ItemShovel.h"
-#include "ItemSword.h"
-#include "ItemDoor.h"
-#include "ItemFood.h"
 #include "ItemSign.h"
-#include "ItemBed.h"
+#include "ItemSlab.h"
 #include "ItemSpawnEgg.h"
-#include "ItemFlowerPot.h"
-#include "ItemBrewingStand.h"
-#include "ItemCauldron.h"
+#include "ItemSugarcane.h"
+#include "ItemSword.h"
+#include "ItemWood.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -153,6 +154,13 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_WOODEN_DOOR:
 		{
 			return new cItemDoorHandler(a_ItemType);
+		}
+		
+		case E_ITEM_MINECART:
+		case E_ITEM_CHEST_MINECART:
+		case E_ITEM_FURNACE_MINECART:
+		{
+			return new cItemMinecartHandler(a_ItemType);
 		}
 		
 		// Food:

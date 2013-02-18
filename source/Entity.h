@@ -64,6 +64,7 @@ public:
 		etPickup,
 		etMob,
 		etFallingBlock,
+		etMinecart,
 		
 		// Older constants, left over for compatibility reasons (plugins)
 		eEntityType_Entity = etEntity,

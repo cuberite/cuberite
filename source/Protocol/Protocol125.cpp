@@ -670,6 +670,26 @@ void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 
 
 
+void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte (PACKET_SPAWN_OBJECT);
+	WriteInt  (a_Vehicle.GetUniqueID());
+	WriteByte (a_VehicleType);
+	WriteInt  ((int)(a_Vehicle.GetPosX() * 32));
+	WriteInt  ((int)(a_Vehicle.GetPosY() * 32));
+	WriteInt  ((int)(a_Vehicle.GetPosZ() * 32));
+	WriteInt  (1);
+	WriteShort(0);  // TODO: SpeedX
+	WriteShort(0);  // TODO: SpeedY
+	WriteShort(0);  // TODO: SpeedZ
+	Flush();
+}
+
+
+
+
+
 void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSPacket);
