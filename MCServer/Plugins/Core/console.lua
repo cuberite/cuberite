@@ -82,7 +82,7 @@ function HandleConsolePlayers(Split)
 		if (PlayersInWorlds[WorldName] == nil) then
 			PlayersInWorlds[WorldName] = {};
 		end
-		table.insert(PlayersInWorlds[WorldName], Player:GetName());
+		table.insert(PlayersInWorlds[WorldName], Player:GetName() .. " @ " ..  Player:GetIP());
 	end
 	
 	cRoot:Get():ForEachPlayer(AddToTable);
