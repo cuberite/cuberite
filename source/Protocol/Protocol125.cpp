@@ -618,7 +618,7 @@ void cProtocol125::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 void cProtocol125::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 {
 	// This protocol version implements falling blocks using the spawn object / vehicle packet:
-	SendSpawnObject(a_FallingBlock, 70, a_FallingBlock.GetBlockType(), 0, 0, 0, 0, 0);
+	SendSpawnObject(a_FallingBlock, 70, a_FallingBlock.GetBlockType(), 0, 0);
 }
 
 
@@ -644,7 +644,7 @@ void cProtocol125::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
+void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
 	UNUSED(a_Yaw);
 	UNUSED(a_Pitch);
@@ -659,9 +659,9 @@ void cProtocol125::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	WriteInt (a_ObjectData);
 	if (a_ObjectData != 0)
 	{
-		WriteShort(a_SpeedX);
-		WriteShort(a_SpeedY);
-		WriteShort(a_SpeedZ);
+		WriteShort((short)a_Entity.GetSpeedX());
+		WriteShort((short)a_Entity.GetSpeedY());
+		WriteShort((short)a_Entity.GetSpeedZ());
 	}
 	Flush();
 }

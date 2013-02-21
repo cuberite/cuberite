@@ -72,12 +72,16 @@ public:
 		eEntityType_Pickup = etPickup,
 		eEntityType_Mob    = etMob,
 	} ;
+	
+	// tolua_end
 
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z);
 	virtual ~cEntity();
 
 	virtual void Initialize(cWorld * a_World);
 
+	// tolua_begin
+	
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 	
 	bool IsPlayer(void) const { return (m_EntityType == etPlayer); }
@@ -107,6 +111,10 @@ public:
 	float            GetPitch     (void) const {return m_Rot.y; }
 	float            GetRoll      (void) const {return m_Rot.z; }
 	Vector3f         GetLookVector(void) const;
+	const Vector3d & GetSpeed     (void) const { return m_Speed; }
+	double           GetSpeedX    (void) const { return m_Speed.x; }
+	double           GetSpeedY    (void) const { return m_Speed.y; }
+	double           GetSpeedZ    (void) const { return m_Speed.z; }
 	
 	int GetChunkX(void) const {return m_ChunkX; }
 	int GetChunkY(void) const {return m_ChunkY; }
@@ -168,10 +176,12 @@ protected:
 
 	int m_ChunkX, m_ChunkY, m_ChunkZ;
 	Vector3d m_Pos;
-	bool m_bDirtyPosition;
+	bool     m_bDirtyPosition;
 
 	Vector3f m_Rot;
-	bool m_bDirtyOrientation;
+	bool     m_bDirtyOrientation;
+	
+	Vector3d m_Speed;
 
 	bool m_bDestroyed;
 	bool m_bRemovedFromChunk;

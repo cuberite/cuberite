@@ -89,7 +89,6 @@ protected:
 	bool m_bMovingToDestination;
 	bool m_bPassiveAggressive;
 
-	Vector3f m_Speed;
 	float m_DestinationTime;
 
 	float m_Gravity;

@@ -36,8 +36,6 @@ private:
 	BLOCKTYPE m_BlockType;
 	Vector3i m_OriginalPosition;
 
-	float m_SpeedY;
-
 	static bool IsPassable(BLOCKTYPE a_BlockType)
 	{
 		return ((a_BlockType == E_BLOCK_AIR) || IsBlockLiquid(a_BlockType));

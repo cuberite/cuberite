@@ -83,7 +83,7 @@ public:
 	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock  (const cFallingBlock & a_FallingBlock) = 0;
 	virtual void SendSpawnMob           (const cMonster & a_Mob) = 0;
-	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch) = 0;
+	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) = 0;
 	virtual void SendSpawnVehicle       (const cEntity & a_Vehicle, char a_VehicleType) = 0;
 	virtual void SendTeleportEntity     (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;

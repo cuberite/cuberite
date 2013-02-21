@@ -26,13 +26,13 @@
 
 cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity(etPickup, ((double)(a_MicroPosX)) / 32, ((double)(a_MicroPosY)) / 32, ((double)(a_MicroPosZ)) / 32)
-	, m_Speed( a_SpeedX, a_SpeedY, a_SpeedZ )
 	, m_bOnGround( false )
 	, m_bReplicated( false )
 	, m_Timer( 0.f )
 	, m_Item(a_Item)
 	, m_bCollected( false )
 {
+	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 

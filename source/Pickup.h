@@ -38,14 +38,11 @@ public:
 	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 	virtual void HandlePhysics(float a_Dt) override;
 	
-	const Vector3f & GetSpeed(void) const {return m_Speed; }
-	
 private:
 
-	Vector3f   m_Speed;
-	Vector3f   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
+	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
 
-	Vector3f   m_WaterSpeed;
+	Vector3d   m_WaterSpeed;
 	bool       m_bOnGround;
 	bool       m_bReplicated;
 

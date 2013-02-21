@@ -60,7 +60,7 @@ public:
 	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock  (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob           (const cMonster & a_Mob) override;
-	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch) override;
+	virtual void SendSpawnObject        (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override;
 	virtual void SendSpawnVehicle       (const cEntity & a_Vehicle, char a_VehicleType) override;
 	virtual void SendTeleportEntity     (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ) override;

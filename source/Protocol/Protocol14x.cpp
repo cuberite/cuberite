@@ -210,7 +210,7 @@ void cProtocol146::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 
 
 
-void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, short a_SpeedX, short a_SpeedY, short a_SpeedZ, Byte a_Yaw, Byte a_Pitch)
+void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_SPAWN_OBJECT);
@@ -222,9 +222,10 @@ void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	WriteInt (a_ObjectData);
 	if (a_ObjectData != 0)
 	{
-		WriteShort(a_SpeedX);
-		WriteShort(a_SpeedY);
-		WriteShort(a_SpeedZ);
+		// TODO: Proper speed units
+		WriteShort((short)a_Entity.GetSpeedX());
+		WriteShort((short)a_Entity.GetSpeedY());
+		WriteShort((short)a_Entity.GetSpeedZ());
 		WriteByte(a_Yaw);
 		WriteByte(a_Pitch);
 	}
