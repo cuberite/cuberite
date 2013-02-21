@@ -23,6 +23,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_COLLECTING_PICKUP);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_EXECUTE_COMMAND);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_HANDSHAKE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN);
@@ -168,6 +169,21 @@ end
 
 function OnDisconnect(...)
 	LogHook("OnDisconnect", unpack(arg));
+end
+
+
+
+
+
+function OnExecuteCommand(...)
+	LogHook("OnExecuteCommand", unpack(arg));
+	
+	-- For some reason logging doesn't work for this callback, so list some stuff manually to verify:
+	LOG("arg1 type: " .. type(arg[1]));
+	if (arg[1] ~= nil) then
+		LOG("Player name: " .. arg[1]:GetName());
+	end
+	LOG("Command: " .. arg[2][1]);
 end
 
 

@@ -43,6 +43,7 @@ public:
 	virtual bool OnCollectingPickup   (cPlayer * a_Player, cPickup * a_Pickup) override;
 	virtual bool OnCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason) override;
+	virtual bool OnExecuteCommand     (cPlayer * a_Player, const AStringVector & a_Split) override;
 	virtual bool OnHandshake          (cClientHandle * a_Client, const AString & a_Username) override;
 	virtual bool OnKilling            (cPawn & a_Victim, cEntity * a_Killer) override;
 	virtual bool OnLogin              (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;

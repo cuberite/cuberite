@@ -58,6 +58,7 @@ public:
 	virtual bool OnCollectingPickup   (cPlayer * a_Player, cPickup * a_Pickup);
 	virtual bool OnCraftingNoRecipe   (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason);
+	virtual bool OnExecuteCommand     (cPlayer * a_Player, const AStringVector & a_Split);
 	virtual bool OnHandshake          (cClientHandle * a_Client, const AString & a_Username);
 	virtual bool OnKilling            (cPawn & a_Victim, cEntity * a_Killer);
 	virtual bool OnLogin              (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);

@@ -461,6 +461,45 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 
 
 
+bool cPlugin_NewLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_EXECUTE_COMMAND);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+
+	// Push the split:
+	lua_createtable(m_LuaState, a_Split.size(), 0);
+	int newTable = lua_gettop(m_LuaState);
+	int index = 1;
+	std::vector<std::string>::const_iterator iter = a_Split.begin(), end = a_Split.end();
+	while(iter != end)
+	{
+		tolua_pushstring(m_LuaState, (*iter).c_str());
+		lua_rawseti(m_LuaState, newTable, index);
+		++iter;
+		++index;
+	}
+
+	if (!CallFunction(2, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
 bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1280,11 +1319,9 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 	cCSLock Lock(m_CriticalSection);
 	
 	// Push the function to be called:
-	LOGD("1. Stack size: %i", lua_gettop(m_LuaState));
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, cmd->second);  // same as lua_getref()
 	
 	// Push the split:
-	LOGD("2. Stack size: %i", lua_gettop(m_LuaState));
 	lua_createtable(m_LuaState, a_Split.size(), 0);
 	int newTable = lua_gettop(m_LuaState);
 	int index = 1;
@@ -1296,24 +1333,21 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 		++iter;
 		++index;
 	}
-	LOGD("3. Stack size: %i", lua_gettop(m_LuaState));
 	
 	// Push player:
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 	
 	// Call function:
-	LOGD("Calling bound function! :D");
 	int s = lua_pcall(m_LuaState, 2, 1, 0);
 	if (report_errors(m_LuaState, s))
 	{
-		LOGERROR("error. Stack size: %i", lua_gettop(m_LuaState));
+		LOGERROR("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
 		return false;
 	}
 	
 	// Handle return value:
 	bool RetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);  // Pop return value
-	LOGD("ok. Stack size: %i", lua_gettop(m_LuaState));
 	
 	return RetVal;
 }
@@ -1335,11 +1369,9 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split)
 	cCSLock Lock(m_CriticalSection);
 	
 	// Push the function to be called:
-	LOGD("1. Stack size: %i", lua_gettop(m_LuaState));
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, cmd->second);  // same as lua_getref()
 	
 	// Push the split:
-	LOGD("2. Stack size: %i", lua_gettop(m_LuaState));
 	lua_createtable(m_LuaState, a_Split.size(), 0);
 	int newTable = lua_gettop(m_LuaState);
 	int index = 1;
@@ -1351,10 +1383,8 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split)
 		++iter;
 		++index;
 	}
-	LOGD("3. Stack size: %i", lua_gettop(m_LuaState));
 	
 	// Call function:
-	LOGD("Calling bound function! :D");
 	int s = lua_pcall(m_LuaState, 1, 1, 0);
 	if (report_errors(m_LuaState, s))
 	{
@@ -1365,7 +1395,6 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split)
 	// Handle return value:
 	bool RetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);  // Pop return value
-	LOGD("ok. Stack size: %i", lua_gettop(m_LuaState));
 	
 	return RetVal;
 }
@@ -1471,6 +1500,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_COLLECTING_PICKUP:     return "OnCollectingPickup";
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:    return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:            return "OnDisconnect";
+		case cPluginManager::HOOK_EXECUTE_COMMAND:       return "OnExecuteCommand";
 		case cPluginManager::HOOK_HANDSHAKE:             return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:               return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                 return "OnLogin";
@@ -1633,8 +1663,10 @@ bool cPlugin_NewLua::PushFunction(const char * a_FunctionName, bool a_bLogError 
 
 
 
-bool cPlugin_NewLua::CallFunction( int a_NumArgs, int a_NumResults, const char* a_FunctionName )
+bool cPlugin_NewLua::CallFunction( int a_NumArgs, int a_NumResults, const char * a_FunctionName)
 {
+	ASSERT(lua_isfunction(m_LuaState, -a_NumArgs - 1));
+	
 	int s = lua_pcall(m_LuaState, a_NumArgs, a_NumResults, 0);
 	if (report_errors(m_LuaState, s))
 	{

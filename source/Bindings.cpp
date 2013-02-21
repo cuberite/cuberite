@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/16/13 12:08:29.
+** Generated automatically by tolua++-1.0.92 on 02/21/13 14:08:40.
 */
 
 #ifndef __cplusplus
@@ -21948,6 +21948,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etPickup",cEntity::etPickup);
    tolua_constant(tolua_S,"etMob",cEntity::etMob);
    tolua_constant(tolua_S,"etFallingBlock",cEntity::etFallingBlock);
+   tolua_constant(tolua_S,"etMinecart",cEntity::etMinecart);
    tolua_constant(tolua_S,"eEntityType_Entity",cEntity::eEntityType_Entity);
    tolua_constant(tolua_S,"eEntityType_Player",cEntity::eEntityType_Player);
    tolua_constant(tolua_S,"eEntityType_Pickup",cEntity::eEntityType_Pickup);
@@ -22146,6 +22147,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_COLLECTING_PICKUP",cPluginManager::HOOK_COLLECTING_PICKUP);
    tolua_constant(tolua_S,"HOOK_CRAFTING_NO_RECIPE",cPluginManager::HOOK_CRAFTING_NO_RECIPE);
    tolua_constant(tolua_S,"HOOK_DISCONNECT",cPluginManager::HOOK_DISCONNECT);
+   tolua_constant(tolua_S,"HOOK_EXECUTE_COMMAND",cPluginManager::HOOK_EXECUTE_COMMAND);
    tolua_constant(tolua_S,"HOOK_HANDSHAKE",cPluginManager::HOOK_HANDSHAKE);
    tolua_constant(tolua_S,"HOOK_KILLING",cPluginManager::HOOK_KILLING);
    tolua_constant(tolua_S,"HOOK_LOGIN",cPluginManager::HOOK_LOGIN);

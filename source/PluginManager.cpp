@@ -403,6 +403,27 @@ bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Re
 
 
 
+bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_EXECUTE_COMMAND);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnExecuteCommand(a_Player, a_Split))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const AString & a_Username)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_HANDSHAKE);
@@ -966,6 +987,13 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 		return false;
 	}
 	
+	// Ask plugins first if a command is okay to execute the command:
+	if (CallHookExecuteCommand(a_Player, Split))
+	{
+		LOGINFO("Player \"%s\" tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player->GetName().c_str(), Split[0].c_str());
+		return false;
+	}
+	
 	if (
 		a_ShouldCheckPermissions &&
 		!cmd->second.m_Permission.empty() &&
@@ -1282,6 +1310,13 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split)
 		return false;
 	}
 	
+	// Ask plugins first if a command is okay to execute the console command:
+	if (CallHookExecuteCommand(NULL, a_Split))
+	{
+		LOGINFO("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
+		return false;
+	}
+
 	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split);	
 }
 

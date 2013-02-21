@@ -164,6 +164,17 @@ bool cPlugin::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 
 
 
+bool cPlugin::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+{
+	UNUSED(a_Player);
+	UNUSED(a_Split);
+	return false;
+}
+
+
+
+
+
 bool cPlugin::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
 {
 	UNUSED(a_Client);
