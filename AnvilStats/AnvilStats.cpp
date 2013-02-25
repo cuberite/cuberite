@@ -8,6 +8,7 @@
 #include "Statistics.h"
 #include "BiomeMap.h"
 #include "HeightMap.h"
+#include "ChunkExtract.h"
 
 
 
@@ -22,6 +23,7 @@ int main(int argc, char * argv[])
 		LOG("  0 - statistics");
 		LOG("  1 - biome map");
 		LOG("  2 - height map");
+		LOG("  3 - extract chunks");
 		LOG("\nNo method number present, aborting.");
 		return -1;
 	}
@@ -39,9 +41,10 @@ int main(int argc, char * argv[])
 	cCallbackFactory * Factory = NULL;
 	switch (atol(argv[1]))
 	{
-		case 0: Factory = new cStatisticsFactory; break;
-		case 1: Factory = new cBiomeMapFactory; break;
-		case 2: Factory = new cHeightMapFactory; break;
+		case 0: Factory = new cStatisticsFactory;                break;
+		case 1: Factory = new cBiomeMapFactory;                  break;
+		case 2: Factory = new cHeightMapFactory;                 break;
+		case 3: Factory = new cChunkExtractFactory(WorldFolder); break;
 		default:
 		{
 			LOG("Unknown method \"%s\", aborting.", argv[1]);

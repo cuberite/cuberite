@@ -94,10 +94,9 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 
 void cFile::Close(void)
 {
-	ASSERT(IsOpen());  // You should not close file objects that don't have an open file.
-	
 	if (!IsOpen())
 	{
+		// Closing an unopened file is a legal nop
 		return;
 	}
 

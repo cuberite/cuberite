@@ -14,7 +14,8 @@ set app=MCServer_profiled.exe
 
 :: outputdir is relative to appdir!
 set outputdir=..\Profiling
-set output=%outputdir%\profile.vsp
+set outputname=profile.vsp
+set output=%outputdir%\%outputname%
 
 
 
@@ -50,7 +51,7 @@ if errorlevel 1 goto haderror
 cd %outputdir%
 
 :: generate the report files (.csv)
-%pt%\vsperfreport /summary:all %output% /symbolpath:"srv*C:\Programovani\Symbols*http://msdl.microsoft.com/download/symbols" 
+%pt%\vsperfreport /summary:all %outputname% /symbolpath:"srv*C:\Programovani\Symbols*http://msdl.microsoft.com/download/symbols" 
 if errorlevel 1 goto haderror
 
 

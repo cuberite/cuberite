@@ -69,7 +69,7 @@ class cHeightMapFactory :
 public:
 	virtual ~cHeightMapFactory();
 	
-	virtual cCallback * CreateNewCallback(void)
+	virtual cCallback * CreateNewCallback(void) override
 	{
 		return new cHeightMap;
 	}

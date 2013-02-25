@@ -274,6 +274,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ChunkExtract.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ChunkExtract.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Globals.cpp"
 				>
 				<FileConfiguration
@@ -399,6 +407,14 @@
 			</File>
 			<File
 				RelativePath="..\source\OSSupport\File.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\GZipFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\OSSupport\GZipFile.h"
 				>
 			</File>
 			<File

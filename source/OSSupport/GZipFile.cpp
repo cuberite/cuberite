@@ -85,7 +85,7 @@ int cGZipFile::ReadRestOfFile(AString & a_Contents)
 
 
 
-bool cGZipFile::Write(const AString & a_Contents)
+bool cGZipFile::Write(const char * a_Contents, int a_Size)
 {
 	if (m_File == NULL)
 	{
@@ -99,7 +99,7 @@ bool cGZipFile::Write(const AString & a_Contents)
 		return false;
 	}
 
-	return (gzwrite(m_File, a_Contents.data(), a_Contents.size()) != 0);
+	return (gzwrite(m_File, a_Contents, a_Size) != 0);
 }
 
 
