@@ -119,7 +119,7 @@ cChunkMap::cChunkLayer * cChunkMap::FindLayer(int a_LayerX, int a_LayerZ)
 cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk(int a_ChunkX, int a_ChunkZ)
 {
 	const int LayerX = FAST_FLOOR_DIV(a_ChunkX, LAYER_SIZE);
-	const int LayerZ = FAST_FLOOR_DIV(a_ChunkX, LAYER_SIZE);
+	const int LayerZ = FAST_FLOOR_DIV(a_ChunkZ, LAYER_SIZE);
 	return GetLayer(LayerX, LayerZ);
 }
 
