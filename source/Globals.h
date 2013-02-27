@@ -189,9 +189,10 @@ typedef unsigned short     UInt16;
 
 /// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
 #define KiB * 1024
+#define MiB * 1024 * 1024
 
 /// Faster than (int)floorf((float)x / (float)div)
-#define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
+#define FAST_FLOOR_DIV( x, div ) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef  _DEBUG

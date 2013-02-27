@@ -171,8 +171,8 @@ cWSSCompact::cPAKFile * cWSSCompact::LoadPAKFile(const cChunkCoords & a_Chunk)
 	// ASSUMES that m_CS has been locked
 	
 	// We need to retain this weird conversion code, because some edge chunks are in the wrong PAK file
-	const int LayerX = (int)(floorf((float)a_Chunk.m_ChunkX / 32.0f));
-	const int LayerZ = (int)(floorf((float)a_Chunk.m_ChunkZ / 32.0f));
+	const int LayerX = FAST_FLOOR_DIV(a_Chunk.m_ChunkX, 32);
+	const int LayerZ = FAST_FLOOR_DIV(a_Chunk.m_ChunkZ, 32);
 	
 	// Is it already cached?
 	for (cPAKFiles::iterator itr = m_PAKFiles.begin(); itr != m_PAKFiles.end(); ++itr)

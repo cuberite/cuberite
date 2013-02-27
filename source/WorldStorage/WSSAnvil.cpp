@@ -388,9 +388,10 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Dat
 cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 {
 	// ASSUME m_CS is locked
+	ASSERT(m_CS.IsLocked());
 
-	const int RegionX = (int)(floorf((float)a_Chunk.m_ChunkX / 32.0f));
-	const int RegionZ = (int)(floorf((float)a_Chunk.m_ChunkZ / 32.0f));
+	const int RegionX = FAST_FLOOR_DIV(a_Chunk.m_ChunkX, 32);
+	const int RegionZ = FAST_FLOOR_DIV(a_Chunk.m_ChunkZ, 32);
 	
 	// Is it already cached?
 	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
