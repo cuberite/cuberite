@@ -11,7 +11,7 @@
 
 
 
-// Place this macro in the header of each cEntity descendant class and you're done :)
+// Place this macro in the public section of each cEntity descendant class and you're done :)
 #define CLASS_PROTODEF(classname) \
 	virtual bool IsA(const char * a_ClassName) const override\
 	{ \
@@ -84,9 +84,10 @@ public:
 	
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 	
-	bool IsPlayer(void) const { return (m_EntityType == etPlayer); }
-	bool IsPickup(void) const { return (m_EntityType == etPickup); }
-	bool IsMob   (void) const { return (m_EntityType == etMob); }
+	bool IsPlayer  (void) const { return (m_EntityType == etPlayer); }
+	bool IsPickup  (void) const { return (m_EntityType == etPickup); }
+	bool IsMob     (void) const { return (m_EntityType == etMob); }
+	bool IsMinecart(void) const { return (m_EntityType == etMinecart); }
 	
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;

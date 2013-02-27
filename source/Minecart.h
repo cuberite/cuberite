@@ -21,13 +21,16 @@ class cMinecart :
 	typedef cEntity super;
 	
 public:
+	CLASS_PROTODEF(cMinecart);
+	
 	enum ePayload
 	{
-		mpNone,  // Empty minecart, ridable by player or mobs
-		mpChest,  // Minecart-with-chest, can store a grid of 3*8 items
+		mpNone,     // Empty minecart, ridable by player or mobs
+		mpChest,    // Minecart-with-chest, can store a grid of 3*8 items
 		mpFurnace,  // Minecart-with-furnace, can be powered
 		// TODO: Other 1.5 features: hopper, tnt, dispenser, spawner
 	} ;
+	
 	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
 	
 	// cEntity overrides:
