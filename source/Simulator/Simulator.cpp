@@ -12,7 +12,7 @@
 
 
 
-cSimulator::cSimulator( cWorld* a_World )
+cSimulator::cSimulator(cWorld & a_World)
 	: m_World(a_World)
 {
 }

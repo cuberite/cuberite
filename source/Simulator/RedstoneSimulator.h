@@ -12,7 +12,7 @@ class cRedstoneSimulator :
 {
 	typedef cSimulator super;
 public:
-	cRedstoneSimulator( cWorld* a_World );
+	cRedstoneSimulator(cWorld & a_World);
 	~cRedstoneSimulator();
 
 	virtual void Simulate( float a_Dt ) override;

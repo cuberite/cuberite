@@ -13,7 +13,7 @@
 
 
 
-cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay) :
+cDelayedFluidSimulator::cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay) :
 	super(a_World, a_Fluid, a_StationaryFluid),
 	m_TickDelay(a_TickDelay),
 	m_Slots(NULL),
@@ -45,7 +45,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	}
 	
 	// TODO: This can be optimized:
-	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	BLOCKTYPE BlockType = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (BlockType != m_FluidBlock)
 	{
 		return;

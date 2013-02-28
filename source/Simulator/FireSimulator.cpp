@@ -10,7 +10,7 @@
 
 
 
-cFireSimulator::cFireSimulator( cWorld* a_World )
+cFireSimulator::cFireSimulator(cWorld & a_World)
 	: cSimulator(a_World)
 	, m_Blocks(new BlockList)
 	, m_Buffer(new BlockList)
@@ -33,30 +33,34 @@ cFireSimulator::~cFireSimulator()
 
 
 
-void cFireSimulator::Simulate( float a_Dt )
+void cFireSimulator::Simulate(float a_Dt)
 {
 	m_Buffer->clear();
-	std::swap( m_Blocks, m_Buffer );
+	std::swap(m_Blocks, m_Buffer);
 
-	for( BlockList::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
+	for (BlockList::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr)
 	{
 		Vector3i Pos = *itr;
 
-		char BlockID = m_World->GetBlock(Pos.x, Pos.y, Pos.z);
+		BLOCKTYPE BlockID = m_World.GetBlock(Pos.x, Pos.y, Pos.z);
 
-		if(!IsAllowedBlock(BlockID))	//Check wheather the block is still burning
+		if (!IsAllowedBlock(BlockID))	 // Check wheather the block is still burning
+		{
 			continue;
+		}
 
 		if (BurnBlockAround(Pos.x, Pos.y, Pos.z))	//Burn single block and if there was one -> next time again
 		{
 			m_Blocks->push_back(Pos);
 		}
 		else
-			if(!IsForeverBurnable(m_World->GetBlock(Pos.x, Pos.y - 1, Pos.z)) && !FiresForever(BlockID))
-				m_World->SetBlock(Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0);
-
-	}
-		
+		{
+			if (!IsForeverBurnable(m_World.GetBlock(Pos.x, Pos.y - 1, Pos.z)) && !FiresForever(BlockID))
+			{
+				m_World.SetBlock(Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0);
+			}
+		}
+	}  // for itr - m_Buffer[]
 }
 
 
@@ -75,7 +79,7 @@ bool cFireSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
 	// TODO: This can be optimized
-	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	BLOCKTYPE BlockType = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (!IsAllowedBlock(BlockType))
 	{
 		return;
@@ -148,18 +152,18 @@ bool cFireSimulator::BurnBlockAround(int a_X, int a_Y, int a_Z)
 
 bool cFireSimulator::BurnBlock(int a_X, int a_Y, int a_Z)
 {
-	char BlockID = m_World->GetBlock(a_X, a_Y, a_Z);
-	if(IsBurnable(BlockID))
+	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
+	if (IsBurnable(BlockID))
 	{
-		m_World->SetBlock(a_X, a_Y, a_Z, E_BLOCK_FIRE, 0);
+		m_World.SetBlock(a_X, a_Y, a_Z, E_BLOCK_FIRE, 0);
 		return true;
 	}
-	if(IsForeverBurnable(BlockID))
+	if (IsForeverBurnable(BlockID))
 	{
-		char BlockAbove = m_World->GetBlock(a_X, a_Y + 1, a_Z);
-		if(BlockAbove == E_BLOCK_AIR)
+		BLOCKTYPE BlockAbove = m_World.GetBlock(a_X, a_Y + 1, a_Z);
+		if (BlockAbove == E_BLOCK_AIR)
 		{
-			m_World->SetBlock(a_X, a_Y + 1, a_Z, E_BLOCK_FIRE, 0);	//Doesn´t notify the simulator so it won´t go off
+			m_World.SetBlock(a_X, a_Y + 1, a_Z, E_BLOCK_FIRE, 0);	//Doesn´t notify the simulator so it won´t go off
 			return true;
 		}
 		return false;

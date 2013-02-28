@@ -12,7 +12,7 @@
 class cSandSimulator : public cSimulator
 {
 public:
-	cSandSimulator( cWorld* a_World );
+	cSandSimulator(cWorld & a_World);
 	~cSandSimulator();
 
 	virtual void Simulate( float a_Dt ) override;

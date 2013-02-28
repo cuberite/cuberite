@@ -21,7 +21,7 @@ class cDelayedFluidSimulator :
 	typedef cFluidSimulator super;
 
 public:	
-	cDelayedFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
+	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
 	virtual ~cDelayedFluidSimulator();
 	
 	// cSimulator overrides:

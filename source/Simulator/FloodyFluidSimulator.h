@@ -29,7 +29,7 @@ class cFloodyFluidSimulator :
 	typedef cDelayedFluidSimulator super;
 	
 public:
-	cFloodyFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay, int a_NumNeighborsForSource);
+	cFloodyFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_Falloff, int a_TickDelay, int a_NumNeighborsForSource);
 	
 protected:
 	NIBBLETYPE m_Falloff;

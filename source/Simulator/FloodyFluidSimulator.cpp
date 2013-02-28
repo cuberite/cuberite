@@ -27,7 +27,7 @@
 
 
 cFloodyFluidSimulator::cFloodyFluidSimulator(
-	cWorld * a_World,
+	cWorld & a_World,
 	BLOCKTYPE a_Fluid,
 	BLOCKTYPE a_StationaryFluid,
 	NIBBLETYPE a_Falloff,
@@ -51,7 +51,7 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	cBlockArea Area;
 	int MinBlockY = std::max(0, a_BlockY - 1);
 	int MaxBlockY = std::min(+cChunkDef::Height, a_BlockY + 1);
-	if (!Area.Read(m_World, a_BlockX - 1, a_BlockX + 1, MinBlockY, MaxBlockY, a_BlockZ - 1, a_BlockZ + 1))
+	if (!Area.Read(&m_World, a_BlockX - 1, a_BlockX + 1, MinBlockY, MaxBlockY, a_BlockZ - 1, a_BlockZ + 1))
 	{
 		// Cannot read the immediate neighborhood, probably too close to an unloaded chunk. Bail out.
 		// TODO: Shouldn't we re-schedule?
@@ -112,7 +112,7 @@ void cFloodyFluidSimulator::SimulateBlock(int a_BlockX, int a_BlockY, int a_Bloc
 	}
 	
 	// Mark as processed:
-	m_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, MyMeta);
+	m_World.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, MyMeta);
 }
 
 
@@ -147,7 +147,7 @@ bool cFloodyFluidSimulator::CheckTributaries(int a_BlockX, int a_BlockY, int a_B
 		if (a_MyMeta >= 8)
 		{
 			FLOG("  Not fed and downwards, turning into non-downwards meta %d", m_Falloff);
-			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, m_Falloff);
+			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, m_Falloff);
 		}
 		else
 		{
@@ -155,12 +155,12 @@ bool cFloodyFluidSimulator::CheckTributaries(int a_BlockX, int a_BlockY, int a_B
 			if (a_MyMeta < 8)
 			{
 				FLOG("  Not fed, decreasing from %d to %d", a_MyMeta, a_MyMeta + m_Falloff);
-				m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, a_MyMeta);
+				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_StationaryFluidBlock, a_MyMeta);
 			}
 			else
 			{
 				FLOG("  Not fed, meta %d, erasing altogether", a_MyMeta);
-				m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 			}
 		}
 		return true;
@@ -200,7 +200,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 				a_BlockX, a_BlockY, a_BlockZ,
 				ItemTypeToString(NewBlock).c_str()
 			);
-			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
+			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
 			
 			// TODO: Sound effect
 			
@@ -216,7 +216,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 			FLOG("  Water flowing into lava, turning lava at {%d, %d, %d} into %s", 
 				a_BlockX, a_BlockY, a_BlockZ, ItemTypeToString(NewBlock).c_str()
 			);
-			m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
+			m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
 			
 			// TODO: Sound effect
 			
@@ -240,13 +240,13 @@ void cFloodyFluidSimulator::SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_B
 		cBlockHandler * Handler = BlockHandler(Block);
 		if (Handler->DoesDropOnUnsuitable())
 		{
-			Handler->DropBlock(m_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
+			Handler->DropBlock(&m_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 	
 	// Spread:
 	FLOG("  Spreading to {%d, %d, %d} with meta %d", a_BlockX, a_BlockY, a_BlockZ, a_NewMeta);
-	m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, a_NewMeta);
+	m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, a_NewMeta);
 }
 
 
@@ -283,7 +283,7 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(int a_BlockX, int a_BlockY, 
 			{
 				// Found enough, turn into a source and bail out
 				FLOG("    Found enough neighbor sources, turning into a source");
-				m_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, 0);
+				m_World.SetBlock(a_BlockX, a_BlockY, a_BlockZ, m_FluidBlock, 0);
 				return true;
 			}
 		}

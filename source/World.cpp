@@ -250,12 +250,12 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager = new cSimulatorManager();
+	m_SimulatorManager = new cSimulatorManager(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = new cSandSimulator(this);
-	m_FireSimulator     = new cFireSimulator(this);
-	m_RedstoneSimulator = new cRedstoneSimulator(this);
+	m_SandSimulator     = new cSandSimulator(*this);
+	m_FireSimulator     = new cFireSimulator(*this);
+	m_RedstoneSimulator = new cRedstoneSimulator(*this);
 
 	// Water and Lava simulators get registered in InitializeFluidSimulator()
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
@@ -2217,7 +2217,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
-		res = new cFloodyFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
 	}
 	else
 	{
@@ -2230,7 +2230,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		int DefaultMaxHeight = IsWater ? 7 : 6;
 		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
 		int MaxHeight = a_IniFile.GetValueSetI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
-		res = new cClassicFluidSimulator(this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);
+		res = new cClassicFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);
 		Rate = IsWater ? 6 : 12;
 	}
 	

@@ -8,7 +8,7 @@
 
 
 
-cFluidSimulator::cFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
+cFluidSimulator::cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
 	super(a_World),
 	m_FluidBlock(a_Fluid),
 	m_StationaryFluidBlock(a_StationaryFluid)
@@ -119,7 +119,7 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 // TODO Not working very well yet :s
 Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
 {
-	char BlockID = m_World->GetBlock(a_X, a_Y, a_Z);
+	char BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
 	if (!IsAllowedBlock(BlockID))	// No Fluid -> No Flowing direction :D
 	{
 		return NONE;
@@ -128,15 +128,15 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 
 	/*
 	Disabled because of causing problems and being useless atm
-	char BlockBelow = m_World->GetBlock(a_X, a_Y - 1, a_Z);		//If there is nothing or fluid below it -> dominating flow is down :D
+	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);		//If there is nothing or fluid below it -> dominating flow is down :D
 	if (BlockBelow == E_BLOCK_AIR || IsAllowedBlock(BlockBelow))
 		return Y_MINUS;
 	*/
 
-	NIBBLETYPE LowestPoint = m_World->GetBlockMeta(a_X, a_Y, a_Z);	//Current Block Meta so only lower points will be counted
+	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);	//Current Block Meta so only lower points will be counted
 	int X = 0, Y = 0, Z = 0;									//Lowest Pos will be stored here
 
-	if (IsAllowedBlock(m_World->GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)		//check for upper block to flow because this also affects the flowing direction
+	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)		//check for upper block to flow because this also affects the flowing direction
 	{
 		return GetFlowingDirection(a_X, a_Y + 1, a_Z, false);
 	}
@@ -154,10 +154,10 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	for (std::vector<Vector3i *>::iterator it = Points.begin(); it < Points.end(); it++)
 	{
 		Vector3i *Pos = (*it);
-		char BlockID = m_World->GetBlock(Pos->x, Pos->y, Pos->z);
+		char BlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
 		if(IsAllowedBlock(BlockID))
 		{
-			char Meta = m_World->GetBlockMeta(Pos->x, Pos->y, Pos->z);
+			char Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
 
 			if(Meta > LowestPoint)
 			{
@@ -177,7 +177,7 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 		delete Pos;
 	}
 
-	if (LowestPoint == m_World->GetBlockMeta(a_X, a_Y, a_Z))
+	if (LowestPoint == m_World.GetBlockMeta(a_X, a_Y, a_Z))
 		return NONE;
 
 	if (a_X - X > 0)

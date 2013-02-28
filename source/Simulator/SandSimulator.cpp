@@ -12,7 +12,7 @@
 
 
 
-cSandSimulator::cSandSimulator( cWorld* a_World )
+cSandSimulator::cSandSimulator(cWorld & a_World)
 	: cSimulator(a_World)
 	, m_Blocks(new BlockList)
 	, m_Buffer(new BlockList)
@@ -34,7 +34,7 @@ cSandSimulator::~cSandSimulator()
 
 
 
-void cSandSimulator::Simulate( float a_Dt )
+void cSandSimulator::Simulate(float a_Dt)
 {
 	m_Buffer->clear();
 	std::swap( m_Blocks, m_Buffer );
@@ -42,17 +42,17 @@ void cSandSimulator::Simulate( float a_Dt )
 	for( BlockList::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr )
 	{
 		Vector3i Pos = *itr;
-		BLOCKTYPE BlockID = m_World->GetBlock(Pos.x, Pos.y, Pos.z);
+		BLOCKTYPE BlockID = m_World.GetBlock(Pos.x, Pos.y, Pos.z);
 		if(!IsAllowedBlock(BlockID))
 			continue;
 
-		BLOCKTYPE BottomBlock = m_World->GetBlock( Pos.x, Pos.y - 1, Pos.z );
+		BLOCKTYPE BottomBlock = m_World.GetBlock( Pos.x, Pos.y - 1, Pos.z );
 		
 		if( IsPassable(BottomBlock) )
 		{
-			cFallingBlock * FallingBlock = new cFallingBlock( Pos, BlockID );
-			FallingBlock->Initialize( m_World );
- 			m_World->SetBlock( Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0 );
+			cFallingBlock * FallingBlock = new cFallingBlock(Pos, BlockID);
+			FallingBlock->Initialize(&m_World);
+ 			m_World.SetBlock( Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0 );
 		}
 	}
 		

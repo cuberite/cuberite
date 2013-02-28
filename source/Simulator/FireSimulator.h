@@ -11,7 +11,7 @@
 class cFireSimulator : public cSimulator
 {
 public:
-	cFireSimulator( cWorld* a_World );
+	cFireSimulator(cWorld & a_World);
 	~cFireSimulator();
 
 	virtual void Simulate( float a_Dt ) override;

@@ -32,7 +32,7 @@
 class cClassicFluidSimulator::FluidData
 {
 public:
-	FluidData(cWorld * a_World, cClassicFluidSimulator * a_Simulator )
+	FluidData(cWorld & a_World, cClassicFluidSimulator * a_Simulator )
 		: m_ActiveFluid( new std::set < Vector3i >() )
 		, m_Simulator (a_Simulator)
 		, m_Buffer( new std::set< Vector3i >() )
@@ -109,8 +109,8 @@ public:
 		{
 			for (int z = 0; z < AREA_WIDTH; z++)
 			{
-				char UpperBlock = m_World->GetBlock(CornerGlobal.x + x, CornerGlobal.y,     CornerGlobal.z + z);
-				char DownBlock  = m_World->GetBlock(CornerGlobal.x + x, CornerGlobal.y - 1, CornerGlobal.z + z);
+				BLOCKTYPE UpperBlock = m_World.GetBlock(CornerGlobal.x + x, CornerGlobal.y,     CornerGlobal.z + z);
+				BLOCKTYPE DownBlock  = m_World.GetBlock(CornerGlobal.x + x, CornerGlobal.y - 1, CornerGlobal.z + z);
 
 				if (m_Simulator->IsSolidBlock(UpperBlock) || (m_Simulator->IsStationaryFluidBlock(UpperBlock)))
 				{
@@ -214,7 +214,7 @@ public:
 			};
 			for (int i = 0; i < 4; ++i)
 			{
-				char Block = m_World->GetBlock(LevelPoints[i].x, a_BlockY, LevelPoints[i].z);
+				char Block = m_World.GetBlock(LevelPoints[i].x, a_BlockY, LevelPoints[i].z);
 				if (m_Simulator->IsPassableForFluid(Block))
 				{
 					Points.push_back(LevelPoints[i]);
@@ -227,7 +227,7 @@ public:
 
 	std::set< Vector3i > * m_ActiveFluid;
 	std::set< Vector3i > * m_Buffer;
-	cWorld * m_World;
+	cWorld & m_World;
 	cClassicFluidSimulator * m_Simulator;
 
 	const static int AREA_WIDTH = 11; 
@@ -262,7 +262,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cClassicFluidSimulator:
 
-cClassicFluidSimulator::cClassicFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_MaxHeight, NIBBLETYPE a_Falloff) :
+cClassicFluidSimulator::cClassicFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_MaxHeight, NIBBLETYPE a_Falloff) :
 	cFluidSimulator(a_World, a_Fluid, a_StationaryFluid),
 	m_Data(NULL),
 	m_MaxHeight(a_MaxHeight),
@@ -287,7 +287,7 @@ cClassicFluidSimulator::~cClassicFluidSimulator()
 void cClassicFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
 	// TODO: This can be optimized
-	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	BLOCKTYPE BlockType = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (!IsAllowedBlock(BlockType))		// This should save very much time because it doesn´t have to iterate through all blocks
 	{
 		return;
@@ -306,10 +306,10 @@ NIBBLETYPE cClassicFluidSimulator::GetHighestLevelAround(int a_BlockX, int a_Blo
 	NIBBLETYPE Max = m_MaxHeight + m_Falloff;
 
 #define __HIGHLEVEL_CHECK__( x, y, z ) \
-	if (IsAllowedBlock(m_World->GetBlock( x, y, z ) ) ) \
+	if (IsAllowedBlock(m_World.GetBlock( x, y, z ) ) ) \
 	{ \
 		NIBBLETYPE Meta; \
-		if ((Meta = m_World->GetBlockMeta( x, y, z ) ) < Max ) Max = Meta; \
+		if ((Meta = m_World.GetBlockMeta( x, y, z ) ) < Max ) Max = Meta; \
 		else if (Meta == m_MaxHeight + m_Falloff) Max = 0; \
 		if (Max == 0) return 0; \
 	}
@@ -348,16 +348,16 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 			continue;
 		}
 		
-		char BlockID = m_World->GetBlock( pos.x, pos.y, pos.z );
+		char BlockID = m_World.GetBlock( pos.x, pos.y, pos.z );
 		if( IsAllowedBlock( BlockID ) ) // only care about own fluid
 		{
 			bool bIsFed = false;
-			NIBBLETYPE Meta = m_World->GetBlockMeta( pos.x, pos.y, pos.z );
+			NIBBLETYPE Meta = m_World.GetBlockMeta( pos.x, pos.y, pos.z );
 			NIBBLETYPE Feed = Meta;
 			if (BlockID == m_StationaryFluidBlock) Meta = 0;
 			if (Meta == 8 ) // Falling fluid
 			{
-				if (IsAllowedBlock( m_World->GetBlock(pos.x, pos.y+1, pos.z) ) )	// Block above is fluid
+				if (IsAllowedBlock( m_World.GetBlock(pos.x, pos.y+1, pos.z) ) )	// Block above is fluid
 				{
 					bIsFed = true;
 					Meta = 0;	// Make it a full block
@@ -376,7 +376,7 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 
 			if( bIsFed )
 			{
-				char DownID = m_World->GetBlock(pos.x, pos.y - 1, pos.z);
+				char DownID = m_World.GetBlock(pos.x, pos.y - 1, pos.z);
 				bool bWashedAwayItem = CanWashAway(DownID);
 				if ((IsPassableForFluid(DownID) || bWashedAwayItem) && !IsStationaryFluidBlock(DownID) ) // free for fluid 
 				{
@@ -385,12 +385,12 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 						cBlockHandler * Handler = BlockHandler(DownID);
 						if (Handler->DoesDropOnUnsuitable())
 						{
-							Handler->DropBlock(m_World, NULL, pos.x, pos.y - 1, pos.z);
+							Handler->DropBlock(&m_World, NULL, pos.x, pos.y - 1, pos.z);
 						}
 					}
 					if (pos.y > 0)
 					{
-						m_World->SetBlock(pos.x, pos.y - 1, pos.z, m_FluidBlock, 8); // falling
+						m_World.SetBlock(pos.x, pos.y - 1, pos.z, m_FluidBlock, 8); // falling
 						ApplyUniqueToNearest(pos - Vector3i(0, 1, 0));
 					}
 				}
@@ -398,7 +398,7 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 				{
 					if (Feed + m_Falloff < Meta)
 					{
-						m_World->SetBlock(pos.x, pos.y, pos.z, m_FluidBlock, Feed + m_Falloff);
+						m_World.SetBlock(pos.x, pos.y, pos.z, m_FluidBlock, Feed + m_Falloff);
 						ApplyUniqueToNearest(pos);
 					}
 					else if ((Meta < m_MaxHeight ) || (BlockID == m_StationaryFluidBlock)) // max is the lowest, so it cannot spread					
@@ -407,7 +407,7 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 						for( std::vector< Vector3i >::iterator itr = Points.begin(); itr != Points.end(); ++itr )
 						{
 							Vector3i & p = *itr;
-							char BlockID = m_World->GetBlock( p.x, p.y, p.z );
+							char BlockID = m_World.GetBlock( p.x, p.y, p.z );
 							bool bWashedAwayItem = CanWashAway( BlockID );
 
 							if (!IsPassableForFluid(BlockID)) continue;
@@ -419,23 +419,23 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 									cBlockHandler * Handler = BlockHandler(DownID);
 									if (Handler->DoesDropOnUnsuitable())
 									{
-										Handler->DropBlock(m_World, NULL, p.x, p.y, p.z);
+										Handler->DropBlock(&m_World, NULL, p.x, p.y, p.z);
 									}
 								}
 
 								if (p.y == pos.y)
 								{
-									m_World->SetBlock(p.x, p.y, p.z, m_FluidBlock, Meta + m_Falloff);
+									m_World.SetBlock(p.x, p.y, p.z, m_FluidBlock, Meta + m_Falloff);
 								}
 								else
 								{
-									m_World->SetBlock(p.x, p.y, p.z, m_FluidBlock, 8);
+									m_World.SetBlock(p.x, p.y, p.z, m_FluidBlock, 8);
 								}
 								ApplyUniqueToNearest(p);
 							}
 							else // it's fluid
 							{
-								NIBBLETYPE PointMeta = m_World->GetBlockMeta(p.x, p.y, p.z);
+								NIBBLETYPE PointMeta = m_World.GetBlockMeta(p.x, p.y, p.z);
 								if (PointMeta > Meta + m_Falloff)
 								{
 									// TODO: AddBlock(p.x, p.y, p.z);
@@ -448,7 +448,7 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 			}
 			else  // not fed
 			{
-				m_World->SetBlock(pos.x, pos.y, pos.z, E_BLOCK_AIR, 0);
+				m_World.SetBlock(pos.x, pos.y, pos.z, E_BLOCK_AIR, 0);
 			}
 		}
 	}
@@ -462,22 +462,22 @@ bool cClassicFluidSimulator::UniqueSituation(Vector3i a_Pos)
 {
 	bool result = false;
 
-	char BlockId = m_World->GetBlock( a_Pos.x, a_Pos.y, a_Pos.z );
-	char Meta = m_World->GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z );
+	char BlockId = m_World.GetBlock( a_Pos.x, a_Pos.y, a_Pos.z );
+	char Meta = m_World.GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z );
 
 	if(IsBlockWater(BlockId))
 	{
 
-		char UpperBlock = m_World->GetBlock( a_Pos.x, a_Pos.y + 1, a_Pos.z );
+		char UpperBlock = m_World.GetBlock( a_Pos.x, a_Pos.y + 1, a_Pos.z );
 		if(IsBlockLava(UpperBlock))
 		{
-			m_World->SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_STONE, 0);
+			m_World.SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_STONE, 0);
 		}
 
 	
 		if(BlockId != E_BLOCK_STATIONARY_WATER)
 		{
-			char DownBlockId = m_World->GetBlock( a_Pos.x, a_Pos.y-1, a_Pos.z );
+			char DownBlockId = m_World.GetBlock( a_Pos.x, a_Pos.y-1, a_Pos.z );
 			if(IsSolidBlock(DownBlockId))
 			{
 				Vector3i LevelPoints [] = {
@@ -489,14 +489,14 @@ bool cClassicFluidSimulator::UniqueSituation(Vector3i a_Pos)
 				int SourceBlocksCount = 0;
 				for(int i=0; i<4; i++)
 				{
-					if (m_World->GetBlock(LevelPoints[i].x, LevelPoints[i].y, LevelPoints[i].z)==E_BLOCK_STATIONARY_WATER)
+					if (m_World.GetBlock(LevelPoints[i].x, LevelPoints[i].y, LevelPoints[i].z)==E_BLOCK_STATIONARY_WATER)
 					{
 						SourceBlocksCount++;
 					}
 				}
 				if(SourceBlocksCount>=2)
 				{
-					m_World->SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_STATIONARY_WATER, 0);
+					m_World.SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_STATIONARY_WATER, 0);
 				}
 			}
 
@@ -507,7 +507,7 @@ bool cClassicFluidSimulator::UniqueSituation(Vector3i a_Pos)
 	{
 		bool bWater = false;
 
-		char UpperBlock = m_World->GetBlock( a_Pos.x, a_Pos.y + 1, a_Pos.z );
+		char UpperBlock = m_World.GetBlock( a_Pos.x, a_Pos.y + 1, a_Pos.z );
 		if (IsBlockWater(UpperBlock))
 		{
 			bWater = true;
@@ -523,7 +523,7 @@ bool cClassicFluidSimulator::UniqueSituation(Vector3i a_Pos)
 
 			for(int i=0; i<4; i++)
 			{
-				if (IsBlockWater(m_World->GetBlock(LevelPoints[i].x, LevelPoints[i].y, LevelPoints[i].z)))
+				if (IsBlockWater(m_World.GetBlock(LevelPoints[i].x, LevelPoints[i].y, LevelPoints[i].z)))
 				{
 					bWater = true;
 				}
@@ -535,11 +535,11 @@ bool cClassicFluidSimulator::UniqueSituation(Vector3i a_Pos)
 		{
 			if (BlockId == E_BLOCK_STATIONARY_LAVA)
 			{
-				m_World->SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_OBSIDIAN, 0);
 			}
 			else if (Meta<m_MaxHeight)
 			{
-				m_World->SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_COBBLESTONE, 0);
+				m_World.SetBlock(a_Pos.x, a_Pos.y, a_Pos.z, E_BLOCK_COBBLESTONE, 0);
 			}
 		}
 	}

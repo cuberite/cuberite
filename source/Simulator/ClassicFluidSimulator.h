@@ -19,7 +19,7 @@ class cClassicFluidSimulator :
 	public cFluidSimulator
 {
 public:
-	cClassicFluidSimulator(cWorld * a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_MaxHeight, NIBBLETYPE a_Falloff);
+	cClassicFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, NIBBLETYPE a_MaxHeight, NIBBLETYPE a_Falloff);
 	~cClassicFluidSimulator();
 
 	// cSimulator overrides:
