@@ -1193,8 +1193,6 @@ void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 
 void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 {
-	int BlockX = m_PosX * cChunkDef::Width + a_RelX;
-	int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
 	struct
 	{
 		int x, y, z;
@@ -1210,7 +1208,7 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 	} ;
 	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
-		cChunk * ch = GetNeighborChunk(BlockX + Coords[i].x, a_RelY, BlockZ + Coords[i].z);
+		cChunk * ch = GetNeighborChunk(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z);
 		if (ch != NULL)
 		{
 			ch->QueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
