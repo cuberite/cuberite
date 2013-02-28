@@ -21,7 +21,7 @@ public:
 	virtual bool IsPassable( BLOCKTYPE a_BlockType );
 
 protected:
-	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
 	typedef std::list <Vector3i> BlockList;
 	BlockList * m_Blocks;

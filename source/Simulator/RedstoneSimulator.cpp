@@ -29,10 +29,9 @@ cRedstoneSimulator::~cRedstoneSimulator()
 
 
 
-void cRedstoneSimulator::WakeUp( int a_X, int a_Y, int a_Z )
+void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	cCSLock Lock( m_CS );
-	m_Blocks.push_back( Vector3i( a_X, a_Y, a_Z ) );
+	m_Blocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
 }
 
 

@@ -436,8 +436,8 @@ void cBlockHandler::Check(cWorld * a_World, int a_BlockX, int a_BlockY, int a_Bl
 	}
 	else
 	{
-		// Wake up the simulators:
-		a_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ);
+		// Wake up the simulators for this block:
+		a_World->WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 

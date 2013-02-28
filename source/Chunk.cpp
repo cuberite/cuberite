@@ -492,15 +492,10 @@ void cChunk::BroadcastPendingBlockChanges(void)
 void cChunk::CheckBlocks(void)
 {
 	cCSLock Lock2(m_CSBlockLists);
-	unsigned int NumTickBlocks = m_ToTickBlocks.size();
-	Lock2.Unlock();
-
-	if (NumTickBlocks == 0)
+	if (m_ToTickBlocks.size() == 0)
 	{
 		return;
 	}
-	
-	Lock2.Lock();
 	std::deque< unsigned int > ToTickBlocks = m_ToTickBlocks;
 	m_ToTickBlocks.clear();
 	Lock2.Unlock();
@@ -1131,17 +1126,18 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 	}
 
 	m_ToTickBlocks.push_back(index);
-	CheckNeighbors(a_RelX, a_RelY, a_RelZ);
+	QueueTickBlockNeighbors(a_RelX, a_RelY, a_RelZ);
 
-	Vector3i WorldPos = PositionToWorldPosition( a_RelX, a_RelY, a_RelZ );
-	cBlockEntity* BlockEntity = GetBlockEntity( WorldPos );
-	if( BlockEntity )
+	Vector3i WorldPos = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
+	cBlockEntity * BlockEntity = GetBlockEntity(WorldPos);
+	if (BlockEntity != NULL)
 	{
 		BlockEntity->Destroy();
-		RemoveBlockEntity( BlockEntity );
+		RemoveBlockEntity(BlockEntity);
 		delete BlockEntity;
 	}
-	switch( a_BlockType )
+	
+	switch (a_BlockType)
 	{
 		case E_BLOCK_CHEST:
 		{
@@ -1181,62 +1177,7 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 
 
 
-void cChunk::CheckNeighbors(int a_RelX, int a_RelY, int a_RelZ)
-{
-	int BlockX = m_PosX * cChunkDef::Width + a_RelX;
-	int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
-	if (a_RelX < cChunkDef::Width - 1)
-	{
-		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX + 1, a_RelY, a_RelZ));
-	}
-	else
-	{
-		m_ChunkMap->CheckBlock(BlockX + 1, a_RelY, BlockZ);
-	}
-	
-	if (a_RelX > 0)
-	{
-		m_ToTickBlocks.push_back( MakeIndexNoCheck(a_RelX - 1, a_RelY,     a_RelZ));
-	}
-	else
-	{
-		m_ChunkMap->CheckBlock(BlockX - 1, a_RelY, BlockZ);
-	}
-	
-	if (a_RelY < cChunkDef::Height - 1)
-	{
-		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY + 1, a_RelZ));
-	}
-	
-	if (a_RelY > 0)
-	{
-		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY - 1, a_RelZ));
-	}
-	
-	if (a_RelZ < cChunkDef::Width - 1)
-	{
-		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ + 1));
-	}
-	else
-	{
-		m_ChunkMap->CheckBlock(BlockX, a_RelY, BlockZ + 1);
-	}
-	
-	if (a_RelZ > 0)
-	{
-		m_ToTickBlocks.push_back(MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ - 1));
-	}
-	else
-	{
-		m_ChunkMap->CheckBlock(BlockX, a_RelY, BlockZ - 1);
-	}
-}
-
-
-
-
-
-void cChunk::CheckBlock(int a_RelX, int a_RelY, int a_RelZ)
+void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
 	if (!IsValid())
 	{
@@ -1250,7 +1191,38 @@ void cChunk::CheckBlock(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-void cChunk::FastSetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
+{
+	int BlockX = m_PosX * cChunkDef::Width + a_RelX;
+	int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
+	struct
+	{
+		int x, y, z;
+	}
+	Coords[] =
+	{
+		{ 1,  0,  0},
+		{-1,  0,  0},
+		{ 0,  1,  0},
+		{ 0, -1,  0},
+		{ 0,  0,  1},
+		{ 0,  0, -1},
+	} ;
+	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		cChunk * ch = GetNeighborChunk(BlockX + Coords[i].x, a_RelY, BlockZ + Coords[i].z);
+		if (ch != NULL)
+		{
+			ch->QueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
+		}
+	}  // for i - Coords[]
+}
+
+
+
+
+
+void cChunk::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
 	ASSERT(!((a_X < 0 || a_X >= Width || a_Y < 0 || a_Y >= Height || a_Z < 0 || a_Z >= Width)));
 
@@ -1827,6 +1799,74 @@ void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_Bloc
 	a_Meta       = cChunkDef::GetNibble(m_BlockMeta,     Idx);
 	a_SkyLight   = cChunkDef::GetNibble(m_BlockSkyLight, Idx);
 	a_BlockLight = cChunkDef::GetNibble(m_BlockLight,    Idx);
+}
+
+
+
+
+
+cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// Convert coords to relative, then call the relative version:
+	a_BlockX -= m_PosX * cChunkDef::Width;
+	a_BlockZ -= m_PosZ * cChunkDef::Width;
+	return GetRelNeighborChunk(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelY, int a_RelZ)
+{
+	bool ReturnThis = true;
+	if (a_RelX < 0)
+	{
+		if (m_NeighborXM != NULL)
+		{
+			cChunk * Candidate = m_NeighborXM->GetRelNeighborChunk(a_RelX + cChunkDef::Width, a_RelY, a_RelZ);
+			if (Candidate != NULL)
+			{
+				return Candidate;
+			}
+		}
+		// Going X first failed, but if the request is crossing Z as well, let's try the Z first later on.
+		ReturnThis = false;
+	}
+	else if (a_RelX >= cChunkDef::Width)
+	{
+		if (m_NeighborXP != NULL)
+		{
+			cChunk * Candidate = m_NeighborXP->GetRelNeighborChunk(a_RelX - cChunkDef::Width, a_RelY, a_RelZ);
+			if (Candidate != NULL)
+			{
+				return Candidate;
+			}
+		}
+		// Going X first failed, but if the request is crossing Z as well, let's try the Z first later on.
+		ReturnThis = false;
+	}
+	
+	if (a_RelZ < 0)
+	{
+		if (m_NeighborZM != NULL)
+		{
+			return m_NeighborZM->GetRelNeighborChunk(a_RelX, a_RelY, a_RelZ + cChunkDef::Width);
+			// For requests crossing both X and Z, the X-first way has been already tried
+		}
+		return NULL;
+	}																																																 
+	else if (a_RelZ >= cChunkDef::Width)																																	 
+	{																																																 
+		if (m_NeighborZP != NULL)
+		{
+			return m_NeighborZP->GetRelNeighborChunk(a_RelX, a_RelY, a_RelZ - cChunkDef::Width);
+			// For requests crossing both X and Z, the X-first way has been already tried
+		}
+		return NULL;
+	}
+	
+	return (ReturnThis ? this : NULL);
 }
 
 

@@ -23,7 +23,7 @@ public:
 	virtual bool FiresForever( BLOCKTYPE a_BlockType );
 
 protected:
-	virtual void AddBlock(int a_X, int a_Y, int a_Z) override;
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 	virtual bool BurnBlockAround(int a_X, int a_Y, int a_Z);
 	virtual bool BurnBlock(int a_X, int a_Y, int a_Z);
 

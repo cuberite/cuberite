@@ -72,8 +72,9 @@ bool cFireSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 
 
 
-void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
+	// TODO: This can be optimized
 	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (!IsAllowedBlock(BlockType))
 	{

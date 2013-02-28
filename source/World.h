@@ -312,6 +312,9 @@ public:
 	
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
+	
+	/// Wakes up the simulators for the specified block
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp

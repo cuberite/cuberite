@@ -284,8 +284,9 @@ cClassicFluidSimulator::~cClassicFluidSimulator()
 
 
 
-void cClassicFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cClassicFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
+	// TODO: This can be optimized
 	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (!IsAllowedBlock(BlockType))		// This should save very much time because it doesn´t have to iterate through all blocks
 	{
@@ -389,17 +390,15 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 					}
 					if (pos.y > 0)
 					{
-						m_World->FastSetBlock( pos.x, pos.y-1, pos.z, m_FluidBlock, 8 ); // falling
-						AddBlock( pos.x, pos.y-1, pos.z );
+						m_World->SetBlock(pos.x, pos.y - 1, pos.z, m_FluidBlock, 8); // falling
 						ApplyUniqueToNearest(pos - Vector3i(0, 1, 0));
 					}
 				}
-				if (IsSolidBlock(DownID)||( BlockID == m_StationaryFluidBlock)) // Not falling
+				if (IsSolidBlock(DownID) || (BlockID == m_StationaryFluidBlock)) // Not falling
 				{
 					if (Feed + m_Falloff < Meta)
 					{
-						m_World->FastSetBlock( pos.x, pos.y, pos.z, m_FluidBlock, Feed + m_Falloff);
-						AddBlock( pos.x, pos.y, pos.z );
+						m_World->SetBlock(pos.x, pos.y, pos.z, m_FluidBlock, Feed + m_Falloff);
 						ApplyUniqueToNearest(pos);
 					}
 					else if ((Meta < m_MaxHeight ) || (BlockID == m_StationaryFluidBlock)) // max is the lowest, so it cannot spread					
@@ -426,21 +425,20 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 
 								if (p.y == pos.y)
 								{
-									m_World->FastSetBlock(p.x, p.y, p.z, m_FluidBlock, Meta + m_Falloff);
+									m_World->SetBlock(p.x, p.y, p.z, m_FluidBlock, Meta + m_Falloff);
 								}
 								else
 								{
-									m_World->FastSetBlock(p.x, p.y, p.z, m_FluidBlock, 8);
+									m_World->SetBlock(p.x, p.y, p.z, m_FluidBlock, 8);
 								}
-								AddBlock( p.x, p.y, p.z );
 								ApplyUniqueToNearest(p);
 							}
 							else // it's fluid
 							{
-								char PointMeta = m_World->GetBlockMeta( p.x, p.y, p.z );
-								if( PointMeta > Meta + m_Falloff)
+								NIBBLETYPE PointMeta = m_World->GetBlockMeta(p.x, p.y, p.z);
+								if (PointMeta > Meta + m_Falloff)
 								{
-									AddBlock( p.x, p.y, p.z );
+									// TODO: AddBlock(p.x, p.y, p.z);
 									ApplyUniqueToNearest(p);
 								}
 							}
@@ -448,10 +446,9 @@ void cClassicFluidSimulator::Simulate(float a_Dt)
 					}
 				}
 			}
-			else// not fed
+			else  // not fed
 			{
-				m_World->FastSetBlock( pos.x, pos.y, pos.z, E_BLOCK_AIR, 0 );
-				WakeUp( pos.x, pos.y, pos.z );
+				m_World->SetBlock(pos.x, pos.y, pos.z, E_BLOCK_AIR, 0);
 			}
 		}
 	}

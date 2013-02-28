@@ -15,6 +15,13 @@
 
 
 
+// fwd: Chunk.h
+class cChunk;
+
+
+
+
+
 class cSimulatorManager
 {
 public:
@@ -22,7 +29,7 @@ public:
 	~cSimulatorManager();
 
 	void Simulate(float a_Dt);
-	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ);
+	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
 
 	void RegisterSimulator(cSimulator * a_Simulator, int a_Rate);  // Takes ownership of the simulator object!
 

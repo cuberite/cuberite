@@ -96,6 +96,9 @@ public:
 	
 	/// a_Player rclked block entity at the coords specified, handle it
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
+	
+	/// Wakes up simulators for the specified block
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	void MarkChunkDirty     (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
@@ -256,8 +259,8 @@ public:
 	
 	void ChunkValidated(void);  // Called by chunks that have become valid
 	
-	/// Schedules the specified block for checking (block update)
-	void CheckBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// Queues the specified block for ticking (block update)
+	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 private:
 

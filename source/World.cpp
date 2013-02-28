@@ -687,6 +687,15 @@ void cWorld::TickSpawnMobs(float a_Dt)
 
 
 
+void cWorld::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return m_ChunkMap->WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 bool cWorld::ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback & a_Callback)
 {
 	return m_ChunkMap->ForEachChestInChunk(a_ChunkX, a_ChunkZ, a_Callback);
@@ -1030,7 +1039,6 @@ void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 	}
 	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
-	GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ);
 	BlockHandler(a_BlockType)->OnPlaced(this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 

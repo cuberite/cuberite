@@ -641,6 +641,23 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, i
 
 
 
+void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cCSLock Lock(m_CSLayers);
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
+}
+
+
+
+
+
 void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
@@ -1002,6 +1019,7 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
 		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
 	}
 }
 
@@ -1164,9 +1182,8 @@ bool cChunkMap::DigBlock(int a_X, int a_Y, int a_Z)
 		}
 		
 		DestChunk->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, 0 );
+		m_World->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z, DestChunk);
 	}
-
-	m_World->GetSimulatorManager()->WakeUp(a_X, a_Y, a_Z);
 
 	return true;
 }
@@ -1810,7 +1827,7 @@ void cChunkMap::ChunkValidated(void)
 
 
 
-void cChunkMap::CheckBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
@@ -1820,7 +1837,7 @@ void cChunkMap::CheckBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if (Chunk != NULL)
 	{
-		Chunk->CheckBlock(a_BlockX, a_BlockY, a_BlockZ);
+		Chunk->QueueTickBlock(a_BlockX, a_BlockY, a_BlockZ);
 	}
 }
 

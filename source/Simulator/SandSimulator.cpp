@@ -6,6 +6,8 @@
 #include "../BlockID.h"
 #include "../Defines.h"
 #include "../FallingBlock.h"
+#include "../Chunk.h"
+
 
 
 
@@ -70,19 +72,29 @@ bool cSandSimulator::IsAllowedBlock( BLOCKTYPE a_BlockType )
 
 
 
-void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
+void cSandSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	if(!IsAllowedBlock(m_World->GetBlock(a_X, a_Y, a_Z)))
+	// TODO: Optimize this by passing the block type along
+	int RelX = a_BlockX;
+	int RelY = a_BlockY;
+	int RelZ = a_BlockZ;
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
+	if (!IsAllowedBlock(a_Chunk->GetBlock(RelX, RelY, RelZ)))
+	{
 		return;
+	}
 
-	Vector3i Block(a_X, a_Y, a_Z);
+	Vector3i Block(a_BlockX, a_BlockY, a_BlockZ);
 	
 	//check for duplicates
-	for( BlockList::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
+	for (BlockList::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr)
 	{
 		Vector3i Pos = *itr;
-		if( Pos.x == a_X && Pos.y == a_Y && Pos.z == a_Z )
+		if ((Pos.x == a_BlockX) && (Pos.y == a_BlockY) && (Pos.z == a_BlockZ))
+		{
 			return;
+		}
 	}
 
 	m_Blocks->push_back(Block);
@@ -92,10 +104,10 @@ void cSandSimulator::AddBlock(int a_X, int a_Y, int a_Z)
 
 
 
-bool cSandSimulator::IsPassable( BLOCKTYPE a_BlockType )
+bool cSandSimulator::IsPassable(BLOCKTYPE a_BlockType)
 {
-	return a_BlockType == E_BLOCK_AIR
+	return (a_BlockType == E_BLOCK_AIR)
 		|| IsBlockWater(a_BlockType)
 		|| IsBlockLava(a_BlockType)
-		|| a_BlockType == E_BLOCK_FIRE;
+		|| (a_BlockType == E_BLOCK_FIRE);
 }

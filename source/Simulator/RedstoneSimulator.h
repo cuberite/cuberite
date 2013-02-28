@@ -18,7 +18,7 @@ public:
 	virtual void Simulate( float a_Dt ) override;
 	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return true; }
 
-	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
 	enum eRedstoneDirection
 	{
@@ -56,7 +56,7 @@ private:
 	
 	void SetRepeater(const Vector3i & a_Position, int a_Ticks, bool a_bPowerOn);
 
-	virtual void AddBlock(int a_X, int a_Y, int a_Z) {}
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override {}
 
 	void HandleChange( const Vector3i & a_BlockPos );
 	BlockList RemoveCurrent( const Vector3i & a_BlockPos );
@@ -77,6 +77,7 @@ private:
 	
 	void RefreshTorchesAround( const Vector3i & a_BlockPos );
 
+	// TODO: The entire simulator is synchronized, no need to lock data structures; remove this
 	cCriticalSection m_CS;
 };
 

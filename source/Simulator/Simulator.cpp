@@ -6,6 +6,7 @@
 #include "../Vector3i.h"
 #include "../BlockID.h"
 #include "../Defines.h"
+#include "../Chunk.h"
 
 
 
@@ -28,15 +29,15 @@ cSimulator::~cSimulator()
 
 
 
-void cSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	AddBlock(a_BlockX,     a_BlockY,     a_BlockZ);
-	AddBlock(a_BlockX - 1, a_BlockY,     a_BlockZ);
-	AddBlock(a_BlockX + 1, a_BlockY,     a_BlockZ);
-	AddBlock(a_BlockX,     a_BlockY - 1, a_BlockZ);
-	AddBlock(a_BlockX,     a_BlockY + 1, a_BlockZ);
-	AddBlock(a_BlockX,     a_BlockY,     a_BlockZ - 1);
-	AddBlock(a_BlockX,     a_BlockY,     a_BlockZ + 1);
+	AddBlock(a_BlockX,     a_BlockY,     a_BlockZ,     a_Chunk);
+	AddBlock(a_BlockX,     a_BlockY - 1, a_BlockZ,     a_Chunk);
+	AddBlock(a_BlockX,     a_BlockY + 1, a_BlockZ,     a_Chunk);
+	AddBlock(a_BlockX - 1, a_BlockY,     a_BlockZ,     a_Chunk->GetNeighborChunk(a_BlockX - 1, a_BlockY, a_BlockZ));
+	AddBlock(a_BlockX + 1, a_BlockY,     a_BlockZ,     a_Chunk->GetNeighborChunk(a_BlockX + 1, a_BlockY, a_BlockZ));
+	AddBlock(a_BlockX,     a_BlockY,     a_BlockZ - 1, a_Chunk->GetNeighborChunk(a_BlockX,     a_BlockY, a_BlockZ - 1));
+	AddBlock(a_BlockX,     a_BlockY,     a_BlockZ + 1, a_Chunk->GetNeighborChunk(a_BlockX,     a_BlockY, a_BlockZ + 1));
 }
 
 

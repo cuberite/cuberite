@@ -36,7 +36,7 @@ cDelayedFluidSimulator::~cDelayedFluidSimulator()
 
 
 
-void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
 	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 	{
@@ -44,6 +44,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 		return;
 	}
 	
+	// TODO: This can be optimized:
 	BLOCKTYPE BlockType = m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	if (BlockType != m_FluidBlock)
 	{
