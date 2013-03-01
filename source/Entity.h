@@ -94,7 +94,7 @@ public:
 	
 	/// Returns the topmost class name for the object
 	virtual const char * GetClass(void) const;
-
+	
 	// Returns the class name of this class
 	static const char * GetClassStatic(void);
 	
@@ -138,16 +138,18 @@ public:
 	void Destroy();																			// tolua_export
 	void RemoveFromChunk(void); // for internal use in cChunk
 
-	virtual void Tick(float a_Dt, MTRand & a_TickRandom);														// tolua_export
-	virtual void HandlePhysics(float a_Dt) {}  // tolua_export
+	virtual void Tick(float a_Dt, MTRand & a_TickRandom);
+	virtual void HandlePhysics(float a_Dt) {}
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
 	Needs to have a default implementation due to Lua bindings.
 	*/
-	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }  // tolua_export
+	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }
 	
 	void WrapRotation();
+	
+	// tolua_begin
 	
 	// Metadata flags; descendants may override the defaults:
 	virtual bool IsOnFire   (void) const {return (m_BurnPeriod > 0); }
@@ -155,6 +157,8 @@ public:
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
 	virtual bool IsRclking  (void) const {return false; }
+	
+	// tolua_end
 
 protected:
 	virtual void Destroyed() {} // Called after the entity has been destroyed
