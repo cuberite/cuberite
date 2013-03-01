@@ -254,12 +254,12 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
 	m_SandSimulator     = new cSandSimulator(*this);
-	m_FireSimulator     = new cFireSimulator(*this);
+	m_FireSimulator     = new cFireSimulator(*this, IniFile);
 	m_RedstoneSimulator = new cRedstoneSimulator(*this);
 
 	// Water and Lava simulators get registered in InitializeFluidSimulator()
 	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 10);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
 	m_SimulatorManager->RegisterSimulator(m_RedstoneSimulator, 1);
 
 	// Save any changes that the defaults may have done to the ini file:

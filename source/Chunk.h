@@ -4,6 +4,8 @@
 #include "Entity.h"
 #include "ChunkDef.h"
 
+#include "Simulator/FireSimulator.h"
+
 
 
 
@@ -147,13 +149,13 @@ public:
 	/** Returns the chunk into which the specified block belongs, by walking the neighbors.
 	Will return self if appropriate. Returns NULL if not reachable through neighbors.
 	*/
-	cChunk * GetNeighborChunk(int a_BlockX, int a_BlockY, int a_BlockZ);
+	cChunk * GetNeighborChunk(int a_BlockX, int a_BlockZ);
 	
 	/**
 	Returns the chunk into which the relatively-specified block belongs, by walking the neighbors.
 	Will return self if appropriate. Returns NULL if not reachable through neighbors.
 	*/
-	cChunk * GetRelNeighborChunk(int a_RelX, int a_RelY, int a_RelZ);
+	cChunk * GetRelNeighborChunk(int a_RelX, int a_RelZ);
 	
 	EMCSBiome GetBiomeAt(int a_RelX, int a_RelZ) const {return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ); }
 	
@@ -250,9 +252,22 @@ public:
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                    {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
 	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                        {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
+	inline void       SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)                     {       cChunkDef::SetNibble(m_BlockMeta, a_BlockIdx, a_Meta); }
 
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
 	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	
+	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	
+	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
+	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	// Simulator data:
+	cFireSimulatorChunkData & GetFireSimulatorData(void) { return m_FireSimulatorData; }
 
 private:
 
@@ -296,11 +311,14 @@ private:
 	cChunk * m_NeighborXP;  // Neighbor at [X + 1, Z]
 	cChunk * m_NeighborZM;  // Neighbor at [X,     Z - 1]
 	cChunk * m_NeighborZP;  // Neighbor at [X,     Z + 1]
+	
+	cFireSimulatorChunkData m_FireSimulatorData;
 
-	void RemoveBlockEntity( cBlockEntity* a_BlockEntity );
-	void AddBlockEntity( cBlockEntity* a_BlockEntity );
-	cBlockEntity * GetBlockEntity( int a_X, int a_Y, int a_Z );
-	cBlockEntity * GetBlockEntity( const Vector3i & a_BlockPos ) { return GetBlockEntity( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z ); }
+
+	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
+	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
+	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
 
 	void SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
 
@@ -331,15 +349,6 @@ private:
 	
 	/// Checks if a leaves block at the specified coords has a log up to 4 blocks away connected by other leaves blocks (false if no log)
 	bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
-	
-	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
-	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
-	
-	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
-	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
-	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
-	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 };
 
 typedef cChunk * cChunkPtr;

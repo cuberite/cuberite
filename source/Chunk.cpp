@@ -434,6 +434,9 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 
 	CheckBlocks();
 	
+	// Tick simulators:
+	m_World->GetSimulatorManager()->SimulateChunk(a_Dt, m_PosX, m_PosZ, this);
+	
 	TickBlocks(a_TickRandom);
 
 	// Tick block entities (furnaces)
@@ -1208,7 +1211,7 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 	} ;
 	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
-		cChunk * ch = GetRelNeighborChunk(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z);
+		cChunk * ch = GetRelNeighborChunk(a_RelX + Coords[i].x, a_RelZ + Coords[i].z);
 		if (ch != NULL)
 		{
 			ch->QueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
@@ -1310,7 +1313,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 
 
 
-void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
+void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	cCSLock Lock(m_CSBlockLists);
 	m_BlockEntities.push_back( a_BlockEntity );
@@ -1320,14 +1323,14 @@ void cChunk::AddBlockEntity( cBlockEntity* a_BlockEntity )
 
 
 
-cBlockEntity * cChunk::GetBlockEntity(int a_X, int a_Y, int a_Z)
+cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		if (
-			((*itr)->GetPosX() == a_X) &&
-			((*itr)->GetPosY() == a_Y) &&
-			((*itr)->GetPosZ() == a_Z)
+			((*itr)->GetPosX() == a_BlockX) &&
+			((*itr)->GetPosY() == a_BlockY) &&
+			((*itr)->GetPosZ() == a_BlockZ)
 		)
 		{
 			return *itr;
@@ -1803,26 +1806,26 @@ void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_Bloc
 
 
 
-cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockY, int a_BlockZ)
+cChunk * cChunk::GetNeighborChunk(int a_BlockX, int a_BlockZ)
 {
 	// Convert coords to relative, then call the relative version:
 	a_BlockX -= m_PosX * cChunkDef::Width;
 	a_BlockZ -= m_PosZ * cChunkDef::Width;
-	return GetRelNeighborChunk(a_BlockX, a_BlockY, a_BlockZ);
+	return GetRelNeighborChunk(a_BlockX, a_BlockZ);
 }
 
 
 
 
 
-cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelY, int a_RelZ)
+cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 {
 	bool ReturnThis = true;
 	if (a_RelX < 0)
 	{
 		if (m_NeighborXM != NULL)
 		{
-			cChunk * Candidate = m_NeighborXM->GetRelNeighborChunk(a_RelX + cChunkDef::Width, a_RelY, a_RelZ);
+			cChunk * Candidate = m_NeighborXM->GetRelNeighborChunk(a_RelX + cChunkDef::Width, a_RelZ);
 			if (Candidate != NULL)
 			{
 				return Candidate;
@@ -1835,7 +1838,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelY, int a_RelZ)
 	{
 		if (m_NeighborXP != NULL)
 		{
-			cChunk * Candidate = m_NeighborXP->GetRelNeighborChunk(a_RelX - cChunkDef::Width, a_RelY, a_RelZ);
+			cChunk * Candidate = m_NeighborXP->GetRelNeighborChunk(a_RelX - cChunkDef::Width, a_RelZ);
 			if (Candidate != NULL)
 			{
 				return Candidate;
@@ -1849,7 +1852,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelY, int a_RelZ)
 	{
 		if (m_NeighborZM != NULL)
 		{
-			return m_NeighborZM->GetRelNeighborChunk(a_RelX, a_RelY, a_RelZ + cChunkDef::Width);
+			return m_NeighborZM->GetRelNeighborChunk(a_RelX, a_RelZ + cChunkDef::Width);
 			// For requests crossing both X and Z, the X-first way has been already tried
 		}
 		return NULL;
@@ -1858,7 +1861,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelY, int a_RelZ)
 	{																																																 
 		if (m_NeighborZP != NULL)
 		{
-			return m_NeighborZP->GetRelNeighborChunk(a_RelX, a_RelY, a_RelZ - cChunkDef::Width);
+			return m_NeighborZP->GetRelNeighborChunk(a_RelX, a_RelZ - cChunkDef::Width);
 			// For requests crossing both X and Z, the X-first way has been already tried
 		}
 		return NULL;

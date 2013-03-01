@@ -516,3 +516,31 @@ public:
 
 
 
+
+/// Generic template that can store any kind of data together with a triplet of 3 coords:
+template <typename X> class cCoordWithData
+{
+public:
+	int x;
+	int y;
+	int z;
+	X   Data;
+	
+	cCoordWithData<typename X>(int a_X, int a_Y, int a_Z) :
+		x(a_X), y(a_Y), z(a_Z)
+	{
+	}
+	
+	cCoordWithData<typename X>(int a_X, int a_Y, int a_Z, const X & a_Data) :
+		x(a_X), y(a_Y), z(a_Z), Data(a_Data)
+	{
+	}
+} ;
+
+// Illegal in C++03: typedef std::list< cCoordWithData<X> > cCoordWithDataList<X>;
+typedef cCoordWithData<int>      cCoordWithInt;
+typedef std::list<cCoordWithInt> cCoordWithIntList;
+
+
+
+

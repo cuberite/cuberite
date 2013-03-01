@@ -451,6 +451,9 @@ public:
 	/// Spawns a mob of the specified entity type. Returns the mob's EntityID if recognized and spawned, <0 otherwise
 	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType);  // tolua_export
 	
+	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
+	unsigned GetTickRandomNumber(unsigned a_Range) { return m_TickRand.randInt(a_Range); }
+	
 private:
 
 	friend class cRoot;

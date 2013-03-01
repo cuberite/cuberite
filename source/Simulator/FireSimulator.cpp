@@ -5,17 +5,73 @@
 #include "../World.h"
 #include "../BlockID.h"
 #include "../Defines.h"
+#include "../Chunk.h"
 
 
 
 
 
-cFireSimulator::cFireSimulator(cWorld & a_World)
-	: cSimulator(a_World)
-	, m_Blocks(new BlockList)
-	, m_Buffer(new BlockList)
-	, m_BurningBlocks(new BlockList)
+// Easy switch for turning on debugging logging:
+#if 0
+	#define FLOG LOGD
+#else
+	#define FLOG(...)
+#endif
+
+
+
+
+
+#define MAX_CHANCE_REPLACE_FUEL 100000
+#define MAX_CHANCE_FLAMMABILITY 100000
+
+
+
+
+
+static const struct
 {
+	int x, y, z;
+} gCrossCoords[] =
+{
+	{ 1, 0,  0},
+	{-1, 0,  0},
+	{ 0, 0,  1},
+	{ 0, 0, -1},
+} ;
+
+
+
+
+
+static const struct
+{
+	int x, y, z;
+} gNeighborCoords[] =
+{
+	{ 1,  0,  0},
+	{-1,  0,  0},
+	{ 0,  1,  0},
+	{ 0, -1,  0},
+	{ 0,  0,  1},
+	{ 0,  0, -1},
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFireSimulator:
+
+cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
+	cSimulator(a_World)
+{
+	// Read params from the ini file:
+	m_BurnStepTimeFuel    = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500);
+	m_BurnStepTimeNonfuel = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100);
+	m_Flammability        = a_IniFile.GetValueSetI("FireSimulator", "Flammability",          50);
+	m_ReplaceFuelChance   = a_IniFile.GetValueSetI("FireSimulator", "ReplaceFuelChance",  50000);
 }
 
 
@@ -24,43 +80,64 @@ cFireSimulator::cFireSimulator(cWorld & a_World)
 
 cFireSimulator::~cFireSimulator()
 {
-	delete m_Buffer;
-	delete m_Blocks;
-	delete m_BurningBlocks;
 }
 
 
 
 
 
-void cFireSimulator::Simulate(float a_Dt)
+void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
-	m_Buffer->clear();
-	std::swap(m_Blocks, m_Buffer);
+	cCoordWithIntList & Data = a_Chunk->GetFireSimulatorData();
 
-	for (BlockList::iterator itr = m_Buffer->begin(); itr != m_Buffer->end(); ++itr)
+	int NumMSecs = (int)a_Dt;
+	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
-		Vector3i Pos = *itr;
+		int idx = cChunkDef::MakeIndexNoCheck(itr->x, itr->y, itr->z);
+		BLOCKTYPE BlockType = a_Chunk->GetBlock(idx);
 
-		BLOCKTYPE BlockID = m_World.GetBlock(Pos.x, Pos.y, Pos.z);
-
-		if (!IsAllowedBlock(BlockID))	 // Check wheather the block is still burning
+		if (!IsAllowedBlock(BlockType))
 		{
+			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
+			FLOG("FS: Removing block {%d, %d, %d}",
+				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+			);
+			itr = Data.erase(itr);
 			continue;
 		}
 
-		if (BurnBlockAround(Pos.x, Pos.y, Pos.z))	//Burn single block and if there was one -> next time again
+		// Try to spread the fire:
+		TrySpreadFire(a_Chunk, itr->x, itr->y, itr->z);
+
+		itr->Data -= NumMSecs;
+		if (itr->Data >= 0)
 		{
-			m_Blocks->push_back(Pos);
+			// Not yet, wait for it longer
+			++itr;
+			continue;
 		}
-		else
+		
+		// Burn out the fire one step by increasing the meta:
+		/*
+		FLOG("FS: Fire at {%d, %d, %d} is stepping",
+			itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+		);
+		*/
+		NIBBLETYPE BlockMeta = a_Chunk->GetMeta(idx);
+		if (BlockMeta == 0x0f)
 		{
-			if (!IsForeverBurnable(m_World.GetBlock(Pos.x, Pos.y - 1, Pos.z)) && !FiresForever(BlockID))
-			{
-				m_World.SetBlock(Pos.x, Pos.y, Pos.z, E_BLOCK_AIR, 0);
-			}
+			// The fire burnt out completely
+			FLOG("FS: Fire at {%d, %d, %d} burnt out, removing the fire block",
+				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+			);
+			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
+			RemoveFuelNeighbors(a_Chunk, itr->x, itr->y, itr->z);
+			itr = Data.erase(itr);
+			continue;
 		}
-	}  // for itr - m_Buffer[]
+		a_Chunk->SetMeta(idx, BlockMeta + 1);
+		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
+	}  // for itr - Data[]
 }
 
 
@@ -69,7 +146,39 @@ void cFireSimulator::Simulate(float a_Dt)
 
 bool cFireSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 {
-	return (a_BlockType == E_BLOCK_FIRE) || IsBlockLava(a_BlockType);
+	return (a_BlockType == E_BLOCK_FIRE);
+}
+
+
+
+
+
+bool cFireSimulator::IsFuel(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_PLANKS:
+		case E_BLOCK_LEAVES:
+		case E_BLOCK_LOG:
+		case E_BLOCK_WOOL:
+		case E_BLOCK_BOOKCASE:
+		case E_BLOCK_FENCE:
+		case E_BLOCK_TNT:
+		case E_BLOCK_VINES:
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cFireSimulator::IsForever(BLOCKTYPE a_BlockType)
+{
+	return (a_BlockType == E_BLOCK_NETHERRACK);
 }
 
 
@@ -78,97 +187,173 @@ bool cFireSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 
 void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	// TODO: This can be optimized
-	BLOCKTYPE BlockType = m_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
+	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
 	if (!IsAllowedBlock(BlockType))
 	{
 		return;
 	}
 	
 	// Check for duplicates:
-	for (BlockList::iterator itr = m_Blocks->begin(); itr != m_Blocks->end(); ++itr )
+	cFireSimulatorChunkData & ChunkData = a_Chunk->GetFireSimulatorData();
+	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
 	{
-		Vector3i Pos = *itr;
-		if ((Pos.x == a_BlockX) && (Pos.y == a_BlockY) && (Pos.z == a_BlockZ))
+		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
 		{
+			// Already present, skip adding
 			return;
 		}
-	}
+	}  // for itr - ChunkData[]
 
-	m_Blocks->push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	FLOG("FS: Adding block {%d, %d, %d}", a_BlockX, a_BlockY, a_BlockZ);
+	ChunkData.push_back(cCoordWithInt(RelX, a_BlockY, RelZ, 100));
 }
 
 
 
 
 
-bool cFireSimulator::IsForeverBurnable( BLOCKTYPE a_BlockType )
+int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	return a_BlockType == E_BLOCK_NETHERRACK;
-}
-
-
-
-
-
-bool cFireSimulator::IsBurnable( BLOCKTYPE a_BlockType )
-{
-	return a_BlockType == E_BLOCK_PLANKS
-		|| a_BlockType == E_BLOCK_LEAVES
-		|| a_BlockType == E_BLOCK_LOG
-		|| a_BlockType == E_BLOCK_WOOL
-		|| a_BlockType == E_BLOCK_BOOKCASE
-		|| a_BlockType == E_BLOCK_FENCE
-		|| a_BlockType == E_BLOCK_TNT
-		|| a_BlockType == E_BLOCK_VINES;
-}
-
-
-
-
-
-bool cFireSimulator::FiresForever( BLOCKTYPE a_BlockType )
-{
-	return a_BlockType != E_BLOCK_FIRE;
-}
-
-
-
-
-
-bool cFireSimulator::BurnBlockAround(int a_X, int a_Y, int a_Z)
-{
-	return BurnBlock(a_X + 1, a_Y, a_Z)
-		|| BurnBlock(a_X - 1, a_Y, a_Z)
-		|| BurnBlock(a_X, a_Y + 1, a_Z)
-		|| BurnBlock(a_X, a_Y - 1, a_Z)
-		|| BurnBlock(a_X, a_Y, a_Z + 1)
-		|| BurnBlock(a_X, a_Y, a_Z - 1);
-}
-
-
-
-
-
-bool cFireSimulator::BurnBlock(int a_X, int a_Y, int a_Z)
-{
-	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
-	if (IsBurnable(BlockID))
+	if (a_RelY > 0)
 	{
-		m_World.SetBlock(a_X, a_Y, a_Z, E_BLOCK_FIRE, 0);
-		return true;
-	}
-	if (IsForeverBurnable(BlockID))
-	{
-		BLOCKTYPE BlockAbove = m_World.GetBlock(a_X, a_Y + 1, a_Z);
-		if (BlockAbove == E_BLOCK_AIR)
+		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		if (IsForever(BlockBelow))
 		{
-			m_World.SetBlock(a_X, a_Y + 1, a_Z, E_BLOCK_FIRE, 0);	//Doesn´t notify the simulator so it won´t go off
-			return true;
+			// Is burning atop of netherrack, burn forever (re-check in 10 sec)
+			return 10000;
 		}
+		if (IsFuel(BlockBelow))
+		{
+			return m_BurnStepTimeFuel;
+		}
+	}
+	if ((a_RelY < cChunkDef::Height - 1) && IsFuel(a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ)))
+	{
+		return m_BurnStepTimeFuel;
+	}
+	
+	for (int i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	{
+		BLOCKTYPE  BlockType;
+		NIBBLETYPE BlockMeta;
+		if (a_Chunk->UnboundedRelGetBlock(a_RelX + gCrossCoords[i].x, a_RelY, a_RelZ + gCrossCoords[i].z, BlockType, BlockMeta))
+		{
+			if (IsFuel(BlockType))
+			{
+				return m_BurnStepTimeFuel;
+			}
+		}
+	}  // for i - gCrossCoords[]
+	return m_BurnStepTimeNonfuel;
+}
+
+
+
+
+
+void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+{
+	/*
+	if (m_World.GetTickRandomNumber(10000) > 100)
+	{
+		// Make the chance to spread 100x smaller
+		return;
+	}
+	*/
+	
+	for (int x = a_RelX - 1; x <= a_RelX + 1; x++)
+	{
+		for (int z = a_RelZ - 1; z <= a_RelZ + 1; z++)
+		{
+			for (int y = a_RelY - 1; y <= a_RelY + 2; y++)  // flames spread up one more block than around
+			{
+				// No need to check the coords for equality with the parent block,
+				// it cannot catch fire anyway (because it's not an air block)
+				
+				if (m_World.GetTickRandomNumber(MAX_CHANCE_FLAMMABILITY) > m_Flammability) 
+				{
+					continue;
+				}
+				
+				// Start the fire in the neighbor {x, y, z}
+				/*
+				FLOG("FS: Trying to start fire at {%d, %d, %d}.", 
+					x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
+				);
+				*/
+				if (CanStartFireInBlock(a_Chunk, x, y, z))
+				{
+					FLOG("FS: Starting new fire at {%d, %d, %d}.", 
+						x + a_Chunk->GetPosX() * cChunkDef::Width, y, z + a_Chunk->GetPosZ() * cChunkDef::Width
+					);
+					a_Chunk->UnboundedRelSetBlock(x, y, z, E_BLOCK_FIRE, 0);
+				}
+			}  // for y
+		}  // for z
+	}  // for x
+}
+
+
+
+
+
+void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+{
+	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	{
+		BLOCKTYPE  BlockType;
+		NIBBLETYPE BlockMeta;
+		if (!a_Chunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		{
+			// Neighbor not accessible, ignore it
+			continue;
+		}
+		if (!IsFuel(BlockType))
+		{
+			continue;
+		}
+		bool ShouldReplaceFuel = (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance);
+		a_Chunk->UnboundedRelSetBlock(
+			a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z,
+			ShouldReplaceFuel ? E_BLOCK_FIRE : E_BLOCK_AIR, 0
+		);
+	}  // for i - Coords[]
+}
+
+
+
+
+
+bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ)
+{
+	BLOCKTYPE  BlockType;
+	NIBBLETYPE BlockMeta;
+	if (!a_NearChunk->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
+	{
+		// The chunk is not accessible
 		return false;
 	}
-
+	
+	if (BlockType != E_BLOCK_AIR)
+	{
+		// Only an air block can be replaced by a fire block
+		return false;
+	}
+	
+	for (int i = 0; i < ARRAYCOUNT(gNeighborCoords); i++)
+	{
+		if (!a_NearChunk->UnboundedRelGetBlock(a_RelX + gNeighborCoords[i].x, a_RelY + gNeighborCoords[i].y, a_RelZ + gNeighborCoords[i].z, BlockType, BlockMeta))
+		{
+			// Neighbor inaccessible, skip it while evaluating
+			continue;
+		}
+		if (IsFuel(BlockType))
+		{
+			return true;
+		}
+	}  // for i - Coords[]
 	return false;
 }
 
