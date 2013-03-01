@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 02/21/13 15:20:08.
+** Generated automatically by tolua++-1.0.92 on 03/01/13 16:38:13.
 */
 
 #ifndef __cplusplus
@@ -141,43 +141,42 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cCraftingRecipe");
- tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cTCPLink");
+ tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
  tolua_usertype(tolua_S,"Lua__cTCPLink");
  tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"Lua__cPlayer");
- tolua_usertype(tolua_S,"cGroupManager");
+ tolua_usertype(tolua_S,"cTCPLink");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cWebAdmin");
- tolua_usertype(tolua_S,"Lua__cPickup");
+ tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntity");
- tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"Lua__cPickup");
+ tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"cPluginManager");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"HTTPRequest");
- tolua_usertype(tolua_S,"HTTPFormData");
- tolua_usertype(tolua_S,"MTRand");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"cPlugin_NewLua");
+ tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cServer");
@@ -186,10 +185,10 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"Lua__cChestEntity");
- tolua_usertype(tolua_S,"cPawn");
- tolua_usertype(tolua_S,"Lua__cEntity");
+ tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cStairs");
  tolua_usertype(tolua_S,"Vector3d");
 }
 
@@ -4039,6 +4038,38 @@ static int tolua_AllToLua_cEntity_IsMob00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsMinecart of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsMinecart00
+static int tolua_AllToLua_cEntity_IsMinecart00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsMinecart'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsMinecart();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsMinecart'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: IsA of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsA00
 static int tolua_AllToLua_cEntity_IsA00(lua_State* tolua_S)
@@ -5110,102 +5141,161 @@ static int tolua_AllToLua_cEntity_Destroy00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: Tick of class  cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_Tick00
-static int tolua_AllToLua_cEntity_Tick00(lua_State* tolua_S)
+/* method: IsOnFire of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsOnFire00
+static int tolua_AllToLua_cEntity_IsOnFire00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"MTRand",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Dt = ((float)  tolua_tonumber(tolua_S,2,0));
-  MTRand* a_TickRandom = ((MTRand*)  tolua_tousertype(tolua_S,3,0));
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Tick'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsOnFire'", NULL);
 #endif
   {
-   self->Tick(a_Dt,*a_TickRandom);
+   bool tolua_ret = (bool)  self->IsOnFire();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Tick'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'IsOnFire'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: HandlePhysics of class  cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_HandlePhysics00
-static int tolua_AllToLua_cEntity_HandlePhysics00(lua_State* tolua_S)
+/* method: IsCrouched of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsCrouched00
+static int tolua_AllToLua_cEntity_IsCrouched00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Dt = ((float)  tolua_tonumber(tolua_S,2,0));
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'HandlePhysics'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCrouched'", NULL);
 #endif
   {
-   self->HandlePhysics(a_Dt);
+   bool tolua_ret = (bool)  self->IsCrouched();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'HandlePhysics'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'IsCrouched'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SpawnOn of class  cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SpawnOn00
-static int tolua_AllToLua_cEntity_SpawnOn00(lua_State* tolua_S)
+/* method: IsRiding of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsRiding00
+static int tolua_AllToLua_cEntity_IsRiding00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cClientHandle",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  cClientHandle* a_Client = ((cClientHandle*)  tolua_tousertype(tolua_S,2,0));
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnOn'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsRiding'", NULL);
 #endif
   {
-   self->SpawnOn(*a_Client);
+   bool tolua_ret = (bool)  self->IsRiding();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SpawnOn'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'IsRiding'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsSprinting of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsSprinting00
+static int tolua_AllToLua_cEntity_IsSprinting00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSprinting'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSprinting();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSprinting'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsRclking of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsRclking00
+static int tolua_AllToLua_cEntity_IsRclking00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsRclking'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsRclking();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsRclking'.",&tolua_err);
  return 0;
 #endif
 }
@@ -5244,29 +5334,54 @@ public:
 			return ( const char* ) cEntity:: GetParentClass();
 		};
 	};
-	 void  Tick( float a_Dt, MTRand& a_TickRandom) {
-		if (push_method("Tick",  tolua_AllToLua_cEntity_Tick00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			tolua_pushusertype(lua_state, (void*)&a_TickRandom, "MTRand");
-			ToluaBase::dbcall(lua_state, 3, 0);
+	 bool  IsOnFire( void )const {
+		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cEntity:: Tick(a_Dt,a_TickRandom);
+			return ( bool ) cEntity:: IsOnFire();
 		};
 	};
-	 void  HandlePhysics( float a_Dt) {
-		if (push_method("HandlePhysics",  tolua_AllToLua_cEntity_HandlePhysics00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsCrouched( void )const {
+		if (push_method("IsCrouched",  tolua_AllToLua_cEntity_IsCrouched00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cEntity:: HandlePhysics(a_Dt);
+			return ( bool ) cEntity:: IsCrouched();
 		};
 	};
-	 void  SpawnOn( cClientHandle& a_Client) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Client, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsRiding( void )const {
+		if (push_method("IsRiding",  tolua_AllToLua_cEntity_IsRiding00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cEntity:: SpawnOn(a_Client);
+			return ( bool ) cEntity:: IsRiding();
+		};
+	};
+	 bool  IsSprinting( void )const {
+		if (push_method("IsSprinting",  tolua_AllToLua_cEntity_IsSprinting00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cEntity:: IsSprinting();
+		};
+	};
+	 bool  IsRclking( void )const {
+		if (push_method("IsRclking",  tolua_AllToLua_cEntity_IsRclking00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cEntity:: IsRclking();
 		};
 	};
 
@@ -5279,14 +5394,20 @@ public:
 	 const char* cEntity__GetParentClass( void ) {
 		return ( const char* )cEntity::GetParentClass();
 	};
-	 void cEntity__Tick( float a_Dt, MTRand& a_TickRandom) {
-		return ( void )cEntity::Tick(a_Dt,a_TickRandom);
+	 bool cEntity__IsOnFire( void ) {
+		return ( bool )cEntity::IsOnFire();
 	};
-	 void cEntity__HandlePhysics( float a_Dt) {
-		return ( void )cEntity::HandlePhysics(a_Dt);
+	 bool cEntity__IsCrouched( void ) {
+		return ( bool )cEntity::IsCrouched();
 	};
-	 void cEntity__SpawnOn( cClientHandle& a_Client) {
-		return ( void )cEntity::SpawnOn(a_Client);
+	 bool cEntity__IsRiding( void ) {
+		return ( bool )cEntity::IsRiding();
+	};
+	 bool cEntity__IsSprinting( void ) {
+		return ( bool )cEntity::IsSprinting();
+	};
+	 bool cEntity__IsRclking( void ) {
+		return ( bool )cEntity::IsRclking();
 	};
 };
 
@@ -5421,102 +5542,161 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00(lua_State* tolu
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: cEntity__Tick of class  Lua__cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__Tick00
-static int tolua_AllToLua_Lua__cEntity_cEntity__Tick00(lua_State* tolua_S)
+/* method: cEntity__IsOnFire of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__IsOnFire00
+static int tolua_AllToLua_Lua__cEntity_cEntity__IsOnFire00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"MTRand",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Dt = ((float)  tolua_tonumber(tolua_S,2,0));
-  MTRand* a_TickRandom = ((MTRand*)  tolua_tousertype(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__Tick'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__IsOnFire'", NULL);
 #endif
   {
-   self->cEntity__Tick(a_Dt,*a_TickRandom);
+   bool tolua_ret = (bool)  self->cEntity__IsOnFire();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cEntity__Tick'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'cEntity__IsOnFire'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: cEntity__HandlePhysics of class  Lua__cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__HandlePhysics00
-static int tolua_AllToLua_Lua__cEntity_cEntity__HandlePhysics00(lua_State* tolua_S)
+/* method: cEntity__IsCrouched of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__IsCrouched00
+static int tolua_AllToLua_Lua__cEntity_cEntity__IsCrouched00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Dt = ((float)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__HandlePhysics'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__IsCrouched'", NULL);
 #endif
   {
-   self->cEntity__HandlePhysics(a_Dt);
+   bool tolua_ret = (bool)  self->cEntity__IsCrouched();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cEntity__HandlePhysics'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'cEntity__IsCrouched'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: cEntity__SpawnOn of class  Lua__cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__SpawnOn00
-static int tolua_AllToLua_Lua__cEntity_cEntity__SpawnOn00(lua_State* tolua_S)
+/* method: cEntity__IsRiding of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__IsRiding00
+static int tolua_AllToLua_Lua__cEntity_cEntity__IsRiding00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cClientHandle",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
-  cClientHandle* a_Client = ((cClientHandle*)  tolua_tousertype(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__SpawnOn'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__IsRiding'", NULL);
 #endif
   {
-   self->cEntity__SpawnOn(*a_Client);
+   bool tolua_ret = (bool)  self->cEntity__IsRiding();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cEntity__SpawnOn'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'cEntity__IsRiding'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__IsSprinting of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__IsSprinting00
+static int tolua_AllToLua_Lua__cEntity_cEntity__IsSprinting00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__IsSprinting'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cEntity__IsSprinting();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__IsSprinting'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__IsRclking of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00
+static int tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__IsRclking'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cEntity__IsRclking();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__IsRclking'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6444,29 +6624,54 @@ public:
 			return ( const char* ) cPawn:: GetParentClass();
 		};
 	};
-	 void  Tick( float a_Dt, MTRand& a_TickRandom) {
-		if (push_method("Tick",  tolua_AllToLua_cEntity_Tick00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			tolua_pushusertype(lua_state, (void*)&a_TickRandom, "MTRand");
-			ToluaBase::dbcall(lua_state, 3, 0);
+	 bool  IsOnFire( void )const {
+		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPawn:: Tick(a_Dt,a_TickRandom);
+			return ( bool ) cPawn:: IsOnFire();
 		};
 	};
-	 void  HandlePhysics( float a_Dt) {
-		if (push_method("HandlePhysics",  tolua_AllToLua_cEntity_HandlePhysics00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsCrouched( void )const {
+		if (push_method("IsCrouched",  tolua_AllToLua_cEntity_IsCrouched00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPawn:: HandlePhysics(a_Dt);
+			return ( bool ) cPawn:: IsCrouched();
 		};
 	};
-	 void  SpawnOn( cClientHandle& a_Client) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Client, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsRiding( void )const {
+		if (push_method("IsRiding",  tolua_AllToLua_cEntity_IsRiding00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPawn:: SpawnOn(a_Client);
+			return ( bool ) cPawn:: IsRiding();
+		};
+	};
+	 bool  IsSprinting( void )const {
+		if (push_method("IsSprinting",  tolua_AllToLua_cEntity_IsSprinting00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPawn:: IsSprinting();
+		};
+	};
+	 bool  IsRclking( void )const {
+		if (push_method("IsRclking",  tolua_AllToLua_cEntity_IsRclking00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPawn:: IsRclking();
 		};
 	};
 
@@ -6515,14 +6720,20 @@ public:
 	 const char* cPawn__GetParentClass( void ) {
 		return ( const char* )cPawn::GetParentClass();
 	};
-	 void cPawn__Tick( float a_Dt, MTRand& a_TickRandom) {
-		return ( void )cPawn::Tick(a_Dt,a_TickRandom);
+	 bool cPawn__IsOnFire( void ) {
+		return ( bool )cPawn::IsOnFire();
 	};
-	 void cPawn__HandlePhysics( float a_Dt) {
-		return ( void )cPawn::HandlePhysics(a_Dt);
+	 bool cPawn__IsCrouched( void ) {
+		return ( bool )cPawn::IsCrouched();
 	};
-	 void cPawn__SpawnOn( cClientHandle& a_Client) {
-		return ( void )cPawn::SpawnOn(a_Client);
+	 bool cPawn__IsRiding( void ) {
+		return ( bool )cPawn::IsRiding();
+	};
+	 bool cPawn__IsSprinting( void ) {
+		return ( bool )cPawn::IsSprinting();
+	};
+	 bool cPawn__IsRclking( void ) {
+		return ( bool )cPawn::IsRclking();
 	};
 };
 
@@ -8439,29 +8650,54 @@ public:
 			return ( const char* ) cPlayer:: GetParentClass();
 		};
 	};
-	 void  Tick( float a_Dt, MTRand& a_TickRandom) {
-		if (push_method("Tick",  tolua_AllToLua_cEntity_Tick00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			tolua_pushusertype(lua_state, (void*)&a_TickRandom, "MTRand");
-			ToluaBase::dbcall(lua_state, 3, 0);
+	 bool  IsOnFire( void )const {
+		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPlayer:: Tick(a_Dt,a_TickRandom);
+			return ( bool ) cPlayer:: IsOnFire();
 		};
 	};
-	 void  HandlePhysics( float a_Dt) {
-		if (push_method("HandlePhysics",  tolua_AllToLua_cEntity_HandlePhysics00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsCrouched( void )const {
+		if (push_method("IsCrouched",  tolua_AllToLua_cEntity_IsCrouched00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPlayer:: HandlePhysics(a_Dt);
+			return ( bool ) cPlayer:: IsCrouched();
 		};
 	};
-	 void  SpawnOn( cClientHandle& a_Client) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Client, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsRiding( void )const {
+		if (push_method("IsRiding",  tolua_AllToLua_cEntity_IsRiding00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPlayer:: SpawnOn(a_Client);
+			return ( bool ) cPlayer:: IsRiding();
+		};
+	};
+	 bool  IsSprinting( void )const {
+		if (push_method("IsSprinting",  tolua_AllToLua_cEntity_IsSprinting00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlayer:: IsSprinting();
+		};
+	};
+	 bool  IsRclking( void )const {
+		if (push_method("IsRclking",  tolua_AllToLua_cEntity_IsRclking00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPlayer:: IsRclking();
 		};
 	};
 
@@ -8516,14 +8752,20 @@ public:
 	 const char* cPlayer__GetParentClass( void ) {
 		return ( const char* )cPlayer::GetParentClass();
 	};
-	 void cPlayer__Tick( float a_Dt, MTRand& a_TickRandom) {
-		return ( void )cPlayer::Tick(a_Dt,a_TickRandom);
+	 bool cPlayer__IsOnFire( void ) {
+		return ( bool )cPlayer::IsOnFire();
 	};
-	 void cPlayer__HandlePhysics( float a_Dt) {
-		return ( void )cPlayer::HandlePhysics(a_Dt);
+	 bool cPlayer__IsCrouched( void ) {
+		return ( bool )cPlayer::IsCrouched();
 	};
-	 void cPlayer__SpawnOn( cClientHandle& a_Client) {
-		return ( void )cPlayer::SpawnOn(a_Client);
+	 bool cPlayer__IsRiding( void ) {
+		return ( bool )cPlayer::IsRiding();
+	};
+	 bool cPlayer__IsSprinting( void ) {
+		return ( bool )cPlayer::IsSprinting();
+	};
+	 bool cPlayer__IsRclking( void ) {
+		return ( bool )cPlayer::IsRclking();
 	};
 };
 
@@ -13410,29 +13652,54 @@ public:
 			return ( const char* ) cPickup:: GetParentClass();
 		};
 	};
-	 void  Tick( float a_Dt, MTRand& a_TickRandom) {
-		if (push_method("Tick",  tolua_AllToLua_cEntity_Tick00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			tolua_pushusertype(lua_state, (void*)&a_TickRandom, "MTRand");
-			ToluaBase::dbcall(lua_state, 3, 0);
+	 bool  IsOnFire( void )const {
+		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPickup:: Tick(a_Dt,a_TickRandom);
+			return ( bool ) cPickup:: IsOnFire();
 		};
 	};
-	 void  HandlePhysics( float a_Dt) {
-		if (push_method("HandlePhysics",  tolua_AllToLua_cEntity_HandlePhysics00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_Dt);
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsCrouched( void )const {
+		if (push_method("IsCrouched",  tolua_AllToLua_cEntity_IsCrouched00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPickup:: HandlePhysics(a_Dt);
+			return ( bool ) cPickup:: IsCrouched();
 		};
 	};
-	 void  SpawnOn( cClientHandle& a_Client) {
-		if (push_method("SpawnOn",  tolua_AllToLua_cEntity_SpawnOn00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Client, "cClientHandle");
-			ToluaBase::dbcall(lua_state, 2, 0);
+	 bool  IsRiding( void )const {
+		if (push_method("IsRiding",  tolua_AllToLua_cEntity_IsRiding00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPickup:: SpawnOn(a_Client);
+			return ( bool ) cPickup:: IsRiding();
+		};
+	};
+	 bool  IsSprinting( void )const {
+		if (push_method("IsSprinting",  tolua_AllToLua_cEntity_IsSprinting00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPickup:: IsSprinting();
+		};
+	};
+	 bool  IsRclking( void )const {
+		if (push_method("IsRclking",  tolua_AllToLua_cEntity_IsRclking00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( bool ) cPickup:: IsRclking();
 		};
 	};
 
@@ -13448,14 +13715,20 @@ public:
 	 const char* cPickup__GetParentClass( void ) {
 		return ( const char* )cPickup::GetParentClass();
 	};
-	 void cPickup__Tick( float a_Dt, MTRand& a_TickRandom) {
-		return ( void )cPickup::Tick(a_Dt,a_TickRandom);
+	 bool cPickup__IsOnFire( void ) {
+		return ( bool )cPickup::IsOnFire();
 	};
-	 void cPickup__HandlePhysics( float a_Dt) {
-		return ( void )cPickup::HandlePhysics(a_Dt);
+	 bool cPickup__IsCrouched( void ) {
+		return ( bool )cPickup::IsCrouched();
 	};
-	 void cPickup__SpawnOn( cClientHandle& a_Client) {
-		return ( void )cPickup::SpawnOn(a_Client);
+	 bool cPickup__IsRiding( void ) {
+		return ( bool )cPickup::IsRiding();
+	};
+	 bool cPickup__IsSprinting( void ) {
+		return ( bool )cPickup::IsSprinting();
+	};
+	 bool cPickup__IsRclking( void ) {
+		return ( bool )cPickup::IsRclking();
 	};
 	 Lua__cPickup( int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem& a_Item, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f): cPickup(a_MicroPosX,a_MicroPosY,a_MicroPosZ,a_Item,a_SpeedX,a_SpeedY,a_SpeedZ){};
 };
@@ -21758,6 +22031,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsPlayer",tolua_AllToLua_cEntity_IsPlayer00);
    tolua_function(tolua_S,"IsPickup",tolua_AllToLua_cEntity_IsPickup00);
    tolua_function(tolua_S,"IsMob",tolua_AllToLua_cEntity_IsMob00);
+   tolua_function(tolua_S,"IsMinecart",tolua_AllToLua_cEntity_IsMinecart00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);
    tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cEntity_GetClassStatic00);
@@ -21791,9 +22065,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
    tolua_function(tolua_S,"Destroy",tolua_AllToLua_cEntity_Destroy00);
-   tolua_function(tolua_S,"Tick",tolua_AllToLua_cEntity_Tick00);
-   tolua_function(tolua_S,"HandlePhysics",tolua_AllToLua_cEntity_HandlePhysics00);
-   tolua_function(tolua_S,"SpawnOn",tolua_AllToLua_cEntity_SpawnOn00);
+   tolua_function(tolua_S,"IsOnFire",tolua_AllToLua_cEntity_IsOnFire00);
+   tolua_function(tolua_S,"IsCrouched",tolua_AllToLua_cEntity_IsCrouched00);
+   tolua_function(tolua_S,"IsRiding",tolua_AllToLua_cEntity_IsRiding00);
+   tolua_function(tolua_S,"IsSprinting",tolua_AllToLua_cEntity_IsSprinting00);
+   tolua_function(tolua_S,"IsRclking",tolua_AllToLua_cEntity_IsRclking00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Lua__cEntity","Lua__cEntity","cEntity",NULL);
   tolua_beginmodule(tolua_S,"Lua__cEntity");
@@ -21801,9 +22077,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cEntity__IsA",tolua_AllToLua_Lua__cEntity_cEntity__IsA00);
    tolua_function(tolua_S,"cEntity__GetClass",tolua_AllToLua_Lua__cEntity_cEntity__GetClass00);
    tolua_function(tolua_S,"cEntity__GetParentClass",tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00);
-   tolua_function(tolua_S,"cEntity__Tick",tolua_AllToLua_Lua__cEntity_cEntity__Tick00);
-   tolua_function(tolua_S,"cEntity__HandlePhysics",tolua_AllToLua_Lua__cEntity_cEntity__HandlePhysics00);
-   tolua_function(tolua_S,"cEntity__SpawnOn",tolua_AllToLua_Lua__cEntity_cEntity__SpawnOn00);
+   tolua_function(tolua_S,"cEntity__IsOnFire",tolua_AllToLua_Lua__cEntity_cEntity__IsOnFire00);
+   tolua_function(tolua_S,"cEntity__IsCrouched",tolua_AllToLua_Lua__cEntity_cEntity__IsCrouched00);
+   tolua_function(tolua_S,"cEntity__IsRiding",tolua_AllToLua_Lua__cEntity_cEntity__IsRiding00);
+   tolua_function(tolua_S,"cEntity__IsSprinting",tolua_AllToLua_Lua__cEntity_cEntity__IsSprinting00);
+   tolua_function(tolua_S,"cEntity__IsRclking",tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00);
   tolua_endmodule(tolua_S);
   tolua_constant(tolua_S,"dtAttack",dtAttack);
   tolua_constant(tolua_S,"dtLightning",dtLightning);
