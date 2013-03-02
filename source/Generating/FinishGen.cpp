@@ -441,6 +441,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 						break;
 					}
 					case E_BLOCK_AIR:
+					case E_BLOCK_FIRE:
 					case E_BLOCK_WATER:
 					case E_BLOCK_STATIONARY_WATER:
 					case E_BLOCK_LAVA:
