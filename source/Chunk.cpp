@@ -29,6 +29,7 @@
 #include "BlockArea.h"
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
+#include "Simulator/FluidSimulator.h"
 
 #include <json/json.h>
 
@@ -78,6 +79,8 @@ cChunk::cChunk(
 	, m_NeighborXP(a_NeighborXP)
 	, m_NeighborZM(a_NeighborZM)
 	, m_NeighborZP(a_NeighborZP)
+	, m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData())
+	, m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
 {
 	if (a_NeighborXM != NULL)
 	{
@@ -145,6 +148,8 @@ cChunk::~cChunk()
 	{
 		m_NeighborZP->m_NeighborZM = NULL;
 	}
+	delete m_WaterSimulatorData;
+	delete m_LavaSimulatorData;
 }
 
 

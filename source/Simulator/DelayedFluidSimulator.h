@@ -15,6 +15,21 @@
 
 
 
+class cDelayedFluidSimulatorChunkData :
+	public cFluidSimulatorData
+{
+public:
+	cDelayedFluidSimulatorChunkData(int a_TickDelay);
+	virtual ~cDelayedFluidSimulatorChunkData();
+	
+	/// Slots, one for each delay tick, each containing the blocks to simulate; relative coords. Int param not used.
+	cCoordWithIntList * m_Slots;
+} ;
+
+
+
+
+
 class cDelayedFluidSimulator :
 	public cFluidSimulator
 {
@@ -22,27 +37,29 @@ class cDelayedFluidSimulator :
 
 public:	
 	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
-	virtual ~cDelayedFluidSimulator();
 	
 	// cSimulator overrides:
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 	virtual void Simulate(float a_Dt) override;
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
 	
 protected:
-	typedef std::vector<Vector3i> CoordsArray;
+
+	int m_TickDelay;   // Count of the m_Slots array in each ChunkData
+	int m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
+	int m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
 	
-	int           m_TickDelay;       // Count of the m_Slots array
-	CoordsArray * m_Slots;           // Slots, one for each delay tick
-	int           m_CurrentSlotNum;  // Index into m_Slots[] where to insert new blocks
+	int m_TotalBlocks;  // Statistics only: the total number of blocks currently queued
 
 	/*
 	Slots:
-	| 0 | 1 | ... |     m_CurrentSlotNum | m_CurrentSlotNum + 1 | ... | m_TickDelay - 1 |
-	                adding blocks here ^ | ^ simulating here
+	| 0 | 1 | ... | m_AddSlotNum | m_SimSlotNum | ... | m_TickDelay - 1 |
+	        adding blocks here ^ | ^ simulating here
 	*/
-
-	/// Called from Simulate() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation.
-	virtual void SimulateBlock(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+	
+	/// Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation.
+	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) = 0;
 } ;
 
 

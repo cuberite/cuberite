@@ -47,6 +47,7 @@ class cPawn;
 class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
+class cFluidSimulatorData;
 
 typedef std::list<cClientHandle *>      cClientHandleList;
 typedef cItemCallback<cEntity>          cEntityCallback;
@@ -267,7 +268,9 @@ public:
 	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	// Simulator data:
-	cFireSimulatorChunkData & GetFireSimulatorData(void) { return m_FireSimulatorData; }
+	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
+	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
+	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 
 private:
 
@@ -312,7 +315,10 @@ private:
 	cChunk * m_NeighborZM;  // Neighbor at [X,     Z - 1]
 	cChunk * m_NeighborZP;  // Neighbor at [X,     Z + 1]
 	
+	// Per-chunk simulator data:
 	cFireSimulatorChunkData m_FireSimulatorData;
+	cFluidSimulatorData *   m_WaterSimulatorData;
+	cFluidSimulatorData *   m_LavaSimulatorData;
 
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);

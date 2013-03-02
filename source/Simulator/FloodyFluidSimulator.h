@@ -36,16 +36,16 @@ protected:
 	int        m_NumNeighborsForSource;
 	
 	// cDelayedFluidSimulator overrides:
-	virtual void SimulateBlock(int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override;
 	
 	/// Checks tributaries, if not fed, decreases the block's level and returns true
-	bool CheckTributaries(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockArea & a_Area, NIBBLETYPE a_MyMeta);
+	bool CheckTributaries(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_MyMeta);
 
 	/// Spreads into the specified block, if the blocktype there allows. a_Area is for checking.
-	void SpreadToNeighbor(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockArea & a_Area, NIBBLETYPE a_NewMeta);
+	void SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta);
 	
 	/// Checks if there are enough neighbors to create a source at the coords specified; turns into source and returns true if so
-	bool CheckNeighborsForSource(int a_BlockX, int a_BlockY, int a_BlockZ, const cBlockArea & a_Area);
+	bool CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
 } ;
 
 
