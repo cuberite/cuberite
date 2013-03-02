@@ -125,6 +125,23 @@ function HandleRequest_Chat( Request )
 	end
 	
 	if( Request.PostParams["ChatMessage"] ~= nil ) then
+		if( Request.PostParams["ChatMessage"] == "/help" ) then
+			Commands = "Available commands"
+			AddMessage(Commands, "<br>" .. "/help, /reload" )
+			return Commands
+		elseif( Request.PostParams["ChatMessage"] == "/reload" ) then
+			Server = cRoot:Get():GetServer()
+			Server:SendMessage( cChatColor.Green .. "Reloading all plugins." )
+			AddMessage("Reloading all plugins", "")
+			cRoot:Get():GetPluginManager():ReloadPlugins()
+			return ""
+		else
+			cmd = Request.PostParams["ChatMessage"]
+			if string.sub(cmd,1,string.len("/")) == "/" then
+				AddMessage('Unknown Command "' .. Request.PostParams["ChatMessage"] .. '"', "")
+				return ""
+			end
+		end
 		local Message = "[WebAdmin]: " .. Request.PostParams["ChatMessage"]
 		cRoot:Get():GetServer():SendMessage( Message )
 		AddMessage("WebAdmin", Request.PostParams["ChatMessage"] )

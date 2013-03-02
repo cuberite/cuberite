@@ -7,6 +7,9 @@ SHOW_PLUGIN_NAMES = true	-- If true, plugin name will be shown before commands
 PLUGIN = {}	-- Reference to own plugin object
 BannedPlayersIni = {}
 WhiteListIni = {}
+X = {}
+Y = {}
+Z = {}
 
 
 
@@ -27,6 +30,8 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
 
+	PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
+	PluginManager:BindCommand("/save-all",        "core.save-all",        HandleSaveAllCommand,         " - Saves all your worlds");
 	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " [Page] - Show available commands");
 	PluginManager:BindCommand("/pluginlist",      "core.pluginlist",      HandlePluginListCommand,      " - Show list of plugins");
 	PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " [Player] - Teleport yourself to a player");

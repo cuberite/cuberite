@@ -1,23 +1,26 @@
 function HandleTPCommand( Split, Player )
-	if( #Split ~= 2 ) then
-		Player:SendMessage( cChatColor.Green .. "Usage: /tp [PlayerName]" )
+	if( Split[2] == nil )  then
+		Player:SendMessage( cChatColor.Green .. "Usage: /tp [PlayerName] (-h)" )
 		return true
 	end
-	
-	World = Player:GetWorld()
 	
 	local TeleportDestination = function(OtherPlayer)
 		if( OtherPlayer == Player ) then
 			Player:SendMessage( cChatColor.Green .. "Already there :)" )
 		else
+			X[Player:GetName()] = Player:GetPosX()
+			Y[Player:GetName()] = Player:GetPosY()
+			Z[Player:GetName()] = Player:GetPosZ()
 			Player:TeleportToEntity( OtherPlayer )
 			Player:SendMessage( cChatColor.Green .. "You teleported to "..OtherPlayer:GetName().."!" )
-			OtherPlayer:SendMessage( cChatColor.Green .. Player:GetName().." teleported to you!" )
+			if Split[3] ~= "-h" then
+				OtherPlayer:SendMessage( cChatColor.Green .. Player:GetName().." teleported to you!" )
+			end
 		end
-    end
-	
-    if (not(World:DoWithPlayer(Split[2], TeleportDestination))) then
+	end
+	World = Player:GetWorld()
+	if (not(World:DoWithPlayer(Split[2], TeleportDestination))) then
 		Player:SendMessage( cChatColor.Green .. "Can't find player " .. Split[2] )
-    end
+	end
 	return true
 end
