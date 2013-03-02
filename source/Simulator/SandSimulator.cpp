@@ -246,7 +246,33 @@ void cSandSimulator::FinishFalling(
 
 void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	// TODO
+	// Remove the original block:
+	BLOCKTYPE  FallingBlockType;
+	NIBBLETYPE FallingBlockMeta;
+	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, FallingBlockType, FallingBlockMeta);
+	a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+	
+	// Search for a place to put it:
+	for (int y = a_RelY - 1; y >= 0; y--)
+	{
+		BLOCKTYPE BlockType = a_Chunk->GetBlock(a_RelX, y, a_RelZ);
+		if (
+			!DoesBreakFallingThrough(BlockType) &&
+			CanContinueFallThrough(BlockType)
+		)
+		{
+			// Can fall further down
+			continue;
+		}
+		
+		// Finish the fall at the found bottom:
+		int BlockX = a_RelX + a_Chunk->GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk->GetPosZ() * cChunkDef::Width;
+		FinishFalling(&m_World, BlockX, y + 1, BlockZ, FallingBlockType, FallingBlockMeta);
+		return;
+	}
+	
+	// The block just "fell off the world" without leaving a trace
 }
 
 
