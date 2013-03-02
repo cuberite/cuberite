@@ -91,10 +91,6 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 
 void cDelayedFluidSimulator::Simulate(float a_Dt)
 {
-	if (m_TotalBlocks > 0)
-	{
-		LOGD("DFS: %d blocks in queue", m_TotalBlocks);
-	}
 	m_AddSlotNum = m_SimSlotNum;
 	m_SimSlotNum += 1;
 	if (m_SimSlotNum >= m_TickDelay)
