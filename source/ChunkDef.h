@@ -526,12 +526,12 @@ public:
 	int z;
 	X   Data;
 	
-	cCoordWithData<typename X>(int a_X, int a_Y, int a_Z) :
+	cCoordWithData(int a_X, int a_Y, int a_Z) :
 		x(a_X), y(a_Y), z(a_Z)
 	{
 	}
 	
-	cCoordWithData<typename X>(int a_X, int a_Y, int a_Z, const X & a_Data) :
+	cCoordWithData(int a_X, int a_Y, int a_Z, const X & a_Data) :
 		x(a_X), y(a_Y), z(a_Z), Data(a_Data)
 	{
 	}
