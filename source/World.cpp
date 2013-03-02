@@ -250,10 +250,10 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager = new cSimulatorManager(*this);
+	m_SimulatorManager  = new cSimulatorManager(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = new cSandSimulator(*this);
+	m_SandSimulator     = new cSandSimulator(*this, IniFile);
 	m_FireSimulator     = new cFireSimulator(*this, IniFile);
 	m_RedstoneSimulator = new cRedstoneSimulator(*this);
 
@@ -1166,9 +1166,9 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		float SpeedY = (float)(a_FlyAwaySpeed *  r1.randInt(1000));
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		cPickup * Pickup = new cPickup(
-			(int)(a_BlockX * 32) + r1.randInt(16) + r1.randInt(16), 
-			(int)(a_BlockY * 32) + r1.randInt(16) + r1.randInt(16), 
-			(int)(a_BlockZ * 32) + r1.randInt(16) + r1.randInt(16),
+			(int)(a_BlockX * 32) + (r1.randInt(16) + r1.randInt(16) - 16),
+			(int)(a_BlockY * 32) + (r1.randInt(16) + r1.randInt(16) - 16),
+			(int)(a_BlockZ * 32) + (r1.randInt(16) + r1.randInt(16) - 16),
 			*itr, SpeedX, SpeedY, SpeedZ
 		);
 		Pickup->Initialize(this);

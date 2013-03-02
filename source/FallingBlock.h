@@ -23,9 +23,10 @@ class cFallingBlock :
 public:
 	CLASS_PROTODEF(cFallingBlock);
 
-	cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType);
+	cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
+	BLOCKTYPE  GetBlockType(void) const { return m_BlockType; }
+	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
 	
 	// cEntity overrides:
 	virtual void Initialize(cWorld * a_World) override;
@@ -33,13 +34,9 @@ public:
 	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 	
 private:
-	BLOCKTYPE m_BlockType;
-	Vector3i m_OriginalPosition;
-
-	static bool IsPassable(BLOCKTYPE a_BlockType)
-	{
-		return ((a_BlockType == E_BLOCK_AIR) || IsBlockLiquid(a_BlockType));
-	}
+	BLOCKTYPE  m_BlockType;
+	NIBBLETYPE m_BlockMeta;
+	Vector3i   m_OriginalPosition;
 } ;
 
 

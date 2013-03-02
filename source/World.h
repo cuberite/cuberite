@@ -479,7 +479,7 @@ private:
 	bool m_IsDeepSnowEnabled;
 
 	// The cRedstone class simulates redstone and needs access to m_RSList
-	friend class cRedstone;
+	// friend class cRedstone;
 	std::vector<int> m_RSList;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;

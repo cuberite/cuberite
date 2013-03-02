@@ -5,6 +5,7 @@
 #include "ChunkDef.h"
 
 #include "Simulator/FireSimulator.h"
+#include "Simulator/SandSimulator.h"
 
 
 
@@ -271,6 +272,7 @@ public:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
 	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
+	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
 private:
 
@@ -319,6 +321,7 @@ private:
 	cFireSimulatorChunkData m_FireSimulatorData;
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
+	cSandSimulatorChunkData m_SandSimulatorData;
 
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);

@@ -50,9 +50,9 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 
 cEntity::~cEntity()
 {
-	LOGD("Deleting entity %d at pos {%.2f, %.2f} ~ [%d, %d]; ptr %p", 
+	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p", 
 		m_UniqueID,
-		m_Pos.x, m_Pos.z,
+		m_Pos.x, m_Pos.y, m_Pos.z,
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
 		this
 	);
