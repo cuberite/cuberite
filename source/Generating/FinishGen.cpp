@@ -429,6 +429,7 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int LastY = -1;
+			int HeightY = 0;
 			for (int y = 0; y < cChunkDef::Height; y++)
 			{
 				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
@@ -438,16 +439,22 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 					{
 						// Set the last block onto which stuff can fall to this height:
 						LastY = y;
+						HeightY = y;
 						break;
 					}
 					case E_BLOCK_AIR:
+					{
+						// Do nothing
+						break;
+					}
 					case E_BLOCK_FIRE:
 					case E_BLOCK_WATER:
 					case E_BLOCK_STATIONARY_WATER:
 					case E_BLOCK_LAVA:
 					case E_BLOCK_STATIONARY_LAVA:
 					{
-						// Do nothing
+						// Do nothing, only remember this height as potentially highest
+						HeightY = y;
 						break;
 					}
 					case E_BLOCK_SAND:
@@ -459,11 +466,15 @@ void cFinishGenPreSimulator::CollapseSandGravel(
 							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 						}
 						LastY++;
+						if (LastY > HeightY)
+						{
+							HeightY = LastY;
+						}
 						break;
 					}
 				}  // switch (GetBlock)
 			}  // for y
-			cChunkDef::SetHeight(a_HeightMap, x, z, LastY);
+			cChunkDef::SetHeight(a_HeightMap, x, z, HeightY);
 		}  // for x
 	}  // for z
 }
@@ -525,7 +536,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	// Turn fluid at the chunk edges into non-stationary fluid:
 	for (int y = 0; y < cChunkDef::Height; y++)
 	{
-		for (int i = 1; i < cChunkDef::Width; i++)  // i stands for both x and z here
+		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{
 			if (cChunkDef::GetBlock(a_BlockTypes, 0, y, i) == a_StationaryFluid)
 			{
