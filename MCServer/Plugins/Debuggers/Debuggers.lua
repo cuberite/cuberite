@@ -1,7 +1,7 @@
 
 -- Global variables
 PLUGIN = {};	-- Reference to own plugin object
-ShouldDumpFunctions = false;  -- If set to true, all available functions are logged upon plugin initialization
+ShouldDumpFunctions = true;  -- If set to true, all available functions are logged upon plugin initialization
 
 
 
@@ -16,7 +16,9 @@ function Initialize(Plugin)
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
+
+	-- Enable the following line for BlockArea / Generator interface testing:
+	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
