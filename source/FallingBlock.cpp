@@ -64,12 +64,20 @@ void cFallingBlock::Tick(float a_Dt, MTRand & a_TickRandom)
 	
 	if (BlockY < cChunkDef::Height - 1)
 	{
-		BLOCKTYPE BlockBelow = GetWorld()->GetBlock(BlockX, BlockY, BlockZ);
-		if (
-			cSandSimulator::DoesBreakFallingThrough(BlockBelow) ||  // Fallen onto a block that breaks this into pickups (e. g. half-slab)
-			!cSandSimulator::CanContinueFallThrough(BlockBelow)     // Fallen onto a solid block
-		)
+		BLOCKTYPE BlockBelow;
+		NIBBLETYPE BelowMeta;
+		GetWorld()->GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockBelow, BelowMeta);
+		if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
 		{
+			// Fallen onto a block that breaks this into pickups (e. g. half-slab)
+			// Must finish the fall with coords one below the block:
+			cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
+			Destroy();
+			return;
+		}
+		else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
+		{
+			// Fallen onto a solid block
 			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 			Destroy();
 			return;

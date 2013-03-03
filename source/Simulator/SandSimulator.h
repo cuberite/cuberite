@@ -29,7 +29,7 @@ public:
 	static bool IsReplacedOnRematerialization(BLOCKTYPE a_BlockType);
 	
 	/// Returns true if the specified block breaks falling blocks while they fall through it (e. g. halfslabs)
-	static bool DoesBreakFallingThrough(BLOCKTYPE a_BlockType);
+	static bool DoesBreakFallingThrough(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
 	/** Called when a block finishes falling at the specified coords, either by insta-fall,
 	or through cFallingBlock entity.
