@@ -7,12 +7,13 @@
 #include "../World.h"
 #include "../BlockID.h"
 #include "../Torch.h"
+#include "../Chunk.h"
 
 
 
 
 
-cRedstoneSimulator::cRedstoneSimulator(cWorld & a_World )
+cRedstoneSimulator::cRedstoneSimulator(cWorld & a_World)
 	: super(a_World)
 {
 }
@@ -31,26 +32,62 @@ cRedstoneSimulator::~cRedstoneSimulator()
 
 void cRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	m_Blocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	if (a_Chunk == NULL)
+	{
+		return;
+	}
+	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
+	
+	// Check if any close neighbor is redstone-related:
+	int MinY = (a_BlockY > 0) ? -1 : 0;
+	int MaxY = (a_BlockY < cChunkDef::Height - 1) ? 1 : 0;
+	for (int y = MinY; y <= MaxY; y++) for (int x = -1; x < 2; x++) for (int z = -1; z < 2; z++)
+	{
+		BLOCKTYPE  BlockType;
+		NIBBLETYPE BlockMeta;
+		if (!a_Chunk->UnboundedRelGetBlock(RelX + x, a_BlockY + y, RelZ + z, BlockType, BlockMeta))
+		{
+			continue;
+		}
+		switch (BlockType)
+		{
+			case E_BLOCK_REDSTONE_LAMP_OFF:
+			case E_BLOCK_REDSTONE_LAMP_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_LEVER:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_TRIPWIRE_HOOK:
+			{
+				m_Blocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+				return;
+			}
+		}  // switch (BlockType)
+	}  // for y, x, z - neighbors
 }
 
 
 
 
 
-void cRedstoneSimulator::Simulate( float a_Dt )
+void cRedstoneSimulator::Simulate(float a_Dt)
 {
 	// Toggle torches on/off
-	while( !m_RefreshTorchesAround.empty() )
+	while (!m_RefreshTorchesAround.empty())
 	{
 		Vector3i pos = m_RefreshTorchesAround.front();
 		m_RefreshTorchesAround.pop_front();
 
-		RefreshTorchesAround( pos );
+		RefreshTorchesAround(pos);
 	}
 
 	// Set repeaters to correct values, and decrement ticks
-	for( RepeaterList::iterator itr = m_SetRepeaters.begin(); itr != m_SetRepeaters.end(); )
+	for (RepeaterList::iterator itr = m_SetRepeaters.begin(); itr != m_SetRepeaters.end();)
 	{
 		if (--itr->Ticks > 0)
 		{
@@ -87,7 +124,7 @@ void cRedstoneSimulator::Simulate( float a_Dt )
 
 	// Handle changed blocks
 	{
-		cCSLock Lock( m_CS );
+		cCSLock Lock(m_CS);
 		std::swap(m_Blocks, m_BlocksBuffer);
 	}
 	for (BlockList::iterator itr = m_BlocksBuffer.begin(); itr != m_BlocksBuffer.end(); ++itr)
@@ -101,35 +138,35 @@ void cRedstoneSimulator::Simulate( float a_Dt )
 
 
 
-void cRedstoneSimulator::RefreshTorchesAround( const Vector3i & a_BlockPos )
+void cRedstoneSimulator::RefreshTorchesAround(const Vector3i & a_BlockPos)
 {
 	static Vector3i Surroundings [] = {
 		Vector3i(-1, 0, 0),
-		Vector3i( 1, 0, 0),
-		Vector3i( 0, 0,-1),
-		Vector3i( 0, 0, 1),
-		Vector3i( 0, 1, 0), // Also toggle torch on top
+		Vector3i(1, 0, 0),
+		Vector3i(0, 0,-1),
+		Vector3i(0, 0, 1),
+		Vector3i(0, 1, 0), // Also toggle torch on top
 	};
 	BLOCKTYPE TargetBlockType = E_BLOCK_REDSTONE_TORCH_ON;
 	BLOCKTYPE TargetRepeaterType = E_BLOCK_REDSTONE_REPEATER_OFF;
-	if( IsPowered( a_BlockPos, true ) )
+	if (IsPowered(a_BlockPos, true))
 	{
 		TargetBlockType = E_BLOCK_REDSTONE_TORCH_OFF;
 		TargetRepeaterType = E_BLOCK_REDSTONE_REPEATER_ON;
-		//if( m_World.GetBlock( a_BlockPos ) == E_BLOCK_DIRT )
+		//if (m_World.GetBlock(a_BlockPos) == E_BLOCK_DIRT)
 		//{
-		//	m_World.FastSetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_STONE, 0 );
+		//	m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_STONE, 0);
 		//}
 	}
 	else
 	{
-		//if( m_World.GetBlock( a_BlockPos ) == E_BLOCK_STONE )
+		//if (m_World.GetBlock(a_BlockPos) == E_BLOCK_STONE)
 		//{
-		//	m_World.FastSetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_DIRT, 0 );
+		//	m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_DIRT, 0);
 		//}
 	}
 
-	for (unsigned int i = 0; i < ARRAYCOUNT( Surroundings ); ++i)
+	for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
 	{
 		Vector3i TorchPos = a_BlockPos + Surroundings[i];
 		BLOCKTYPE BlockType;
@@ -167,24 +204,24 @@ void cRedstoneSimulator::RefreshTorchesAround( const Vector3i & a_BlockPos )
 
 
 
-void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
+void cRedstoneSimulator::HandleChange(const Vector3i & a_BlockPos)
 {
 	std::deque< Vector3i > SpreadStack;
 
 	static const Vector3i Surroundings[] = {
-		Vector3i( 1, 0, 0 ),
-		Vector3i( 1, 1, 0 ),
-		Vector3i( 1,-1, 0 ),
-		Vector3i(-1, 0, 0 ),
-		Vector3i(-1, 1, 0 ),
-		Vector3i(-1,-1, 0 ),
-		Vector3i( 0, 0, 1 ),
-		Vector3i( 0, 1, 1 ),
-		Vector3i( 0,-1, 1 ),
-		Vector3i( 0, 0,-1 ),
-		Vector3i( 0, 1,-1 ),
-		Vector3i( 0,-1,-1 ),
-		Vector3i( 0,-1, 0 ),
+		Vector3i(1, 0, 0),
+		Vector3i(1, 1, 0),
+		Vector3i(1,-1, 0),
+		Vector3i(-1, 0, 0),
+		Vector3i(-1, 1, 0),
+		Vector3i(-1,-1, 0),
+		Vector3i(0, 0, 1),
+		Vector3i(0, 1, 1),
+		Vector3i(0,-1, 1),
+		Vector3i(0, 0,-1),
+		Vector3i(0, 1,-1),
+		Vector3i(0,-1,-1),
+		Vector3i(0,-1, 0),
 	};
 
 	BLOCKTYPE BlockType;
@@ -199,22 +236,22 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 		{
 			static const Vector3i Surroundings [] = {
 				Vector3i(-1, 0, 0),
-				Vector3i( 1, 0, 0),
-				Vector3i( 0, 0,-1),
-				Vector3i( 0, 0, 1),
-				Vector3i( 0,-1, 0),
+				Vector3i(1, 0, 0),
+				Vector3i(0, 0,-1),
+				Vector3i(0, 0, 1),
+				Vector3i(0,-1, 0),
 			};
-			for( unsigned int i = 0; i < ARRAYCOUNT( Surroundings ); ++i )
+			for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
 			{
 				Vector3i pos = a_BlockPos + Surroundings[i];
-				BLOCKTYPE OtherBlock = m_World.GetBlock( pos );
+				BLOCKTYPE OtherBlock = m_World.GetBlock(pos);
 				if (
 					(OtherBlock != E_BLOCK_AIR) &&
 					(OtherBlock != E_BLOCK_REDSTONE_TORCH_ON) &&
 					(OtherBlock != E_BLOCK_REDSTONE_TORCH_OFF)
 				)
 				{
-					RefreshTorchesAround( pos );
+					RefreshTorchesAround(pos);
 				}
 			}
 			m_World.GetBlockTypeMeta(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, BlockType, BlockMeta);
@@ -235,7 +272,7 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 				(OtherBlock != E_BLOCK_REDSTONE_WIRE)
 			)
 			{
-				RefreshTorchesAround( pos );
+				RefreshTorchesAround(pos);
 			}
 			else
 			{
@@ -260,16 +297,16 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 		{
 			// Repeater only spreads charge right in front, and up to one block up:
 			static const Vector3i Surroundings [] = {
-				Vector3i( 0, 0, 0),
-				Vector3i( 0, 1, 0),
+				Vector3i(0, 0, 0),
+				Vector3i(0, 1, 0),
 			};
 			Vector3i Direction = GetRepeaterDirection(BlockMeta);
-			for (unsigned int i = 0; i < ARRAYCOUNT( Surroundings ); ++i)
+			for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
 			{
 				Vector3i pos = a_BlockPos + Direction + Surroundings[i];
 				if (PowerBlock(pos, a_BlockPos, 0xf))
 				{
-					SpreadStack.push_back( pos );
+					SpreadStack.push_back(pos);
 				}
 			}
 			break;
@@ -290,8 +327,8 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 	if (BlockType != E_BLOCK_REDSTONE_REPEATER_ON)
 	{
 		BlockList NewSources = RemoveCurrent(a_BlockPos);
-		Sources.insert( Sources.end(), NewSources.begin(), NewSources.end() );
-		while(!Sources.empty())
+		Sources.insert(Sources.end(), NewSources.begin(), NewSources.end());
+		while (!Sources.empty())
 		{
 			Vector3i SourcePos = Sources.back();
 			Sources.pop_back();
@@ -307,9 +344,9 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 				{
 					static Vector3i Surroundings [] = {
 						Vector3i(-1, 0, 0),
-						Vector3i( 1, 0, 0),
-						Vector3i( 0, 0,-1),
-						Vector3i( 0, 0, 1),
+						Vector3i(1, 0, 0),
+						Vector3i(0, 0,-1),
+						Vector3i(0, 0, 1),
 					};
 					for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
 					{
@@ -326,8 +363,8 @@ void cRedstoneSimulator::HandleChange( const Vector3i & a_BlockPos )
 				case E_BLOCK_REDSTONE_REPEATER_ON:
 				{
 					static Vector3i Surroundings [] = {
-						Vector3i( 0, 0, 0),
-						Vector3i( 0, 1, 0),
+						Vector3i(0, 0, 0),
+						Vector3i(0, 1, 0),
 					};
 					Vector3i Direction = GetRepeaterDirection(BlockMeta);
 					for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
@@ -458,7 +495,7 @@ bool cRedstoneSimulator::PowerBlock(const Vector3i & a_BlockPos, const Vector3i 
 		{
 			if (IsRepeaterPointingAway(a_BlockPos, BlockMeta, a_FromBlock))
 			{
-				SetRepeater( a_BlockPos, 10, true );
+				SetRepeater(a_BlockPos, 10, true);
 			}
 			break;
 		}
@@ -488,7 +525,7 @@ bool cRedstoneSimulator::PowerBlock(const Vector3i & a_BlockPos, const Vector3i 
 
 
 
-int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3i & a_FromBlock)
+int cRedstoneSimulator::UnPowerBlock(const Vector3i & a_BlockPos, const Vector3i & a_FromBlock)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -501,7 +538,7 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 	{
 		case E_BLOCK_REDSTONE_WIRE:
 		{
-			if (BlockMeta > 0 )
+			if (BlockMeta > 0)
 			{
 				m_World.SetBlockMeta(a_BlockPos, 0);
 				return 1;
@@ -535,7 +572,7 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 		case E_BLOCK_REDSTONE_REPEATER_ON:
 		{
 			if (
-				IsRepeaterPointingTo(a_BlockPos, BlockMeta, a_FromBlock ) ||  // Repeater is next to wire
+				IsRepeaterPointingTo(a_BlockPos, BlockMeta, a_FromBlock) ||  // Repeater is next to wire
 				IsRepeaterPointingTo(a_BlockPos, BlockMeta, a_FromBlock - Vector3i(0, 1, 0))  // Repeater is below wire
 			)
 			{
@@ -584,7 +621,7 @@ int cRedstoneSimulator::UnPowerBlock( const Vector3i & a_BlockPos, const Vector3
 
 // Removes current from all powered redstone wires until it reaches an energy source.
 // Also returns all energy sources it encountered
-cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i & a_BlockPos )
+cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent(const Vector3i & a_BlockPos)
 {
 
 
@@ -592,19 +629,19 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 	std::deque< Vector3i > FoundSources;
 
 	Vector3i Surroundings[] = {
-		Vector3i( 1, 0, 0 ),
-		Vector3i( 1, 1, 0 ),
-		Vector3i( 1,-1, 0 ),
-		Vector3i(-1, 0, 0 ),
-		Vector3i(-1, 1, 0 ),
-		Vector3i(-1,-1, 0 ),
-		Vector3i( 0, 0, 1 ),
-		Vector3i( 0, 1, 1 ),
-		Vector3i( 0,-1, 1 ),
-		Vector3i( 0, 0,-1 ),
-		Vector3i( 0, 1,-1 ),
-		Vector3i( 0,-1,-1 ),
-		Vector3i( 0,-1, 0 ),
+		Vector3i(1, 0, 0),
+		Vector3i(1, 1, 0),
+		Vector3i(1,-1, 0),
+		Vector3i(-1, 0, 0),
+		Vector3i(-1, 1, 0),
+		Vector3i(-1,-1, 0),
+		Vector3i(0, 0, 1),
+		Vector3i(0, 1, 1),
+		Vector3i(0,-1, 1),
+		Vector3i(0, 0,-1),
+		Vector3i(0, 1,-1),
+		Vector3i(0,-1,-1),
+		Vector3i(0,-1, 0),
 	};
 
 	BLOCKTYPE BlockType;
@@ -617,8 +654,8 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 		{
 			// Repeaters only spread to their front front and 0 or 1 block up
 			static Vector3i Surroundings [] = {
-				Vector3i( 0, 0, 0),
-				Vector3i( 0, 1, 0),
+				Vector3i(0, 0, 0),
+				Vector3i(0, 1, 0),
 			};
 			Vector3i Direction = GetRepeaterDirection(BlockMeta);
 			for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
@@ -644,22 +681,22 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 		{
 			static Vector3i Surroundings [] = {	// Torches only spread on the same level
 				Vector3i(-1, 0, 0),
-				Vector3i( 1, 0, 0),
-				Vector3i( 0, 0,-1),
-				Vector3i( 0, 0, 1),
+				Vector3i(1, 0, 0),
+				Vector3i(0, 0,-1),
+				Vector3i(0, 0, 1),
 			};
 
-			for( unsigned int i = 0; i < ARRAYCOUNT( Surroundings ); ++i )
+			for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
 			{
-				Vector3i pos = Vector3i( a_BlockPos ) + Surroundings[i];
-				int RetVal = UnPowerBlock( pos, a_BlockPos );
-				if( RetVal == 1 )
+				Vector3i pos = Vector3i(a_BlockPos) + Surroundings[i];
+				int RetVal = UnPowerBlock(pos, a_BlockPos);
+				if (RetVal == 1)
 				{
-					SpreadStack.push_back( pos ); // Changed, so add to stack
+					SpreadStack.push_back(pos); // Changed, so add to stack
 				}
-				else if( RetVal == 2 )
+				else if (RetVal == 2)
 				{
-					FoundSources.push_back( pos );
+					FoundSources.push_back(pos);
 				}
 			}
 			break;
@@ -667,28 +704,28 @@ cRedstoneSimulator::BlockList cRedstoneSimulator::RemoveCurrent( const Vector3i 
 			
 		default:
 		{
-			SpreadStack.push_back( a_BlockPos );
+			SpreadStack.push_back(a_BlockPos);
 			break;
 		}
 	}  // switch (BlockType)
 
 
-	while( !SpreadStack.empty() )
+	while (!SpreadStack.empty())
 	{
 		Vector3i pos = SpreadStack.back();
 		SpreadStack.pop_back();
 
-		for( unsigned int i = 0; i < ARRAYCOUNT( Surroundings ); ++i )
+		for (unsigned int i = 0; i < ARRAYCOUNT(Surroundings); ++i)
 		{
 			Vector3i OtherPos =  pos + Surroundings[i];
-			int RetVal = UnPowerBlock( OtherPos, pos );
-			if( RetVal == 1 )
+			int RetVal = UnPowerBlock(OtherPos, pos);
+			if (RetVal == 1)
 			{
-				SpreadStack.push_back( OtherPos ); // Changed, so add to stack
+				SpreadStack.push_back(OtherPos); // Changed, so add to stack
 			}
-			else if( RetVal == 2 )
+			else if (RetVal == 2)
 			{
-				FoundSources.push_back( OtherPos );
+				FoundSources.push_back(OtherPos);
 			}
 		}
 	}
@@ -749,7 +786,7 @@ bool cRedstoneSimulator::IsPowering(const Vector3i & a_PowerPos, const Vector3i 
 
 
 
-bool cRedstoneSimulator::IsPowered( const Vector3i & a_BlockPos, bool a_bOnlyByWire /* = false */ )
+bool cRedstoneSimulator::IsPowered(const Vector3i & a_BlockPos, bool a_bOnlyByWire /* = false */)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
@@ -869,7 +906,7 @@ cRedstoneSimulator::eRedstoneDirection cRedstoneSimulator::GetWireDirection(int 
 			Dir ^= REDSTONE_X_POS;
 			Dir |= REDSTONE_X_NEG;
 		}
-		if( (Dir & REDSTONE_X_NEG) && !(Dir & REDSTONE_X_POS))  // corner
+		if ((Dir & REDSTONE_X_NEG) && !(Dir & REDSTONE_X_POS))  // corner
 		{
 			Dir ^= REDSTONE_X_NEG;
 			Dir |= REDSTONE_X_POS;
@@ -890,7 +927,7 @@ bool cRedstoneSimulator::IsRepeaterPointingTo(const Vector3i & a_RepeaterPos, ch
 	{
 		case 0x0:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 0, 0, 1 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(0, 0, 1)))
 			{
 				return true;
 			}
@@ -899,7 +936,7 @@ bool cRedstoneSimulator::IsRepeaterPointingTo(const Vector3i & a_RepeaterPos, ch
 		
 		case 0x1:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i(-1, 0, 0 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(-1, 0, 0)))
 			{
 				return true;
 			}
@@ -908,7 +945,7 @@ bool cRedstoneSimulator::IsRepeaterPointingTo(const Vector3i & a_RepeaterPos, ch
 		
 		case 0x2:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 0, 0,-1 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(0, 0,-1)))
 			{
 				return true;
 			}
@@ -917,7 +954,7 @@ bool cRedstoneSimulator::IsRepeaterPointingTo(const Vector3i & a_RepeaterPos, ch
 		
 		case 0x3:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 1, 0, 0 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(1, 0, 0)))
 			{
 				return true;
 			}
@@ -931,13 +968,13 @@ bool cRedstoneSimulator::IsRepeaterPointingTo(const Vector3i & a_RepeaterPos, ch
 
 
 
-bool cRedstoneSimulator::IsRepeaterPointingAway( const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos )
+bool cRedstoneSimulator::IsRepeaterPointingAway(const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos)
 {
 	switch (a_MetaData & 0x3)
 	{
 		case 0x0:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 0, 0,-1 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(0, 0,-1)))
 			{
 				return true;
 			}
@@ -946,7 +983,7 @@ bool cRedstoneSimulator::IsRepeaterPointingAway( const Vector3i & a_RepeaterPos,
 		
 		case 0x1:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 1, 0, 0 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(1, 0, 0)))
 			{
 				return true;
 			}
@@ -955,7 +992,7 @@ bool cRedstoneSimulator::IsRepeaterPointingAway( const Vector3i & a_RepeaterPos,
 		
 		case 0x2:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i( 0, 0, 1 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(0, 0, 1)))
 			{
 				return true;
 			}
@@ -964,7 +1001,7 @@ bool cRedstoneSimulator::IsRepeaterPointingAway( const Vector3i & a_RepeaterPos,
 		
 		case 0x3:
 		{
-			if( (a_RepeaterPos - a_BlockPos).Equals( Vector3i(-1, 0, 0 ) ) )
+			if ((a_RepeaterPos - a_BlockPos).Equals(Vector3i(-1, 0, 0)))
 			{
 				return true;
 			}
@@ -1012,9 +1049,9 @@ Vector3i cRedstoneSimulator::GetRepeaterDirection(NIBBLETYPE a_MetaData)
 {
 	switch (a_MetaData & 0x3)
 	{
-		case 0x0: return Vector3i( 0, 0,-1);
-		case 0x1: return Vector3i( 1, 0, 0);
-		case 0x2: return Vector3i( 0, 0, 1);
+		case 0x0: return Vector3i(0, 0,-1);
+		case 0x1: return Vector3i(1, 0, 0);
+		case 0x2: return Vector3i(0, 0, 1);
 		case 0x3: return Vector3i(-1, 0, 0);
 	}
 	return Vector3i();
@@ -1063,12 +1100,12 @@ bool cRedstoneSimulator::IsLeverOn(NIBBLETYPE a_BlockMeta)
 
 
 
-void cRedstoneSimulator::SetRepeater( const Vector3i & a_Position, int a_Ticks, bool a_bPowerOn )
+void cRedstoneSimulator::SetRepeater(const Vector3i & a_Position, int a_Ticks, bool a_bPowerOn)
 {
-	for( RepeaterList::iterator itr = m_SetRepeaters.begin(); itr != m_SetRepeaters.end(); ++itr )
+	for (RepeaterList::iterator itr = m_SetRepeaters.begin(); itr != m_SetRepeaters.end(); ++itr)
 	{
 		sRepeaterChange & Change = *itr;
-		if( Change.Position.Equals( a_Position ) )
+		if (Change.Position.Equals(a_Position))
 		{
 			if (Change.bPowerOn && !a_bPowerOn)
 			{
@@ -1088,7 +1125,7 @@ void cRedstoneSimulator::SetRepeater( const Vector3i & a_Position, int a_Ticks, 
 	RC.Ticks = a_Ticks;
 	RC.bPowerOn = a_bPowerOn;
 	RC.bPowerOffNextTime = false;
-	m_SetRepeaters.push_back( RC );
+	m_SetRepeaters.push_back(RC);
 }
 
 
