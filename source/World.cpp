@@ -219,7 +219,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
 
-	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode );
+	m_GameMode = (eGameMode)IniFile.GetValueSetI("GameMode", "GameMode", m_GameMode);
 
 	m_Lighting.Start(this);
 	m_Storage.Start(this, StorageSchema);
@@ -230,7 +230,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	cIniFile IniFile2("settings.ini");
 	if (IniFile2.ReadFile())
 	{
-		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true );
+		m_bAnimals = IniFile2.GetValueB("Monsters", "AnimalsOn", true);
 		m_SpawnMonsterRate = (Int64)(IniFile2.GetValueF("Monsters", "AnimalSpawnInterval", 10) * 20);  // Convert from secs to ticks
 		
 		// TODO: Move this into cServer instead:
@@ -238,7 +238,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 		m_Description = IniFile2.GetValue("Server", "Description", "MCServer! - In C++!").c_str();
 	}
 
-	m_ChunkMap = new cChunkMap(this );
+	m_ChunkMap = new cChunkMap(this);
 	
 	m_ChunkSender.Start(this);
 
@@ -277,11 +277,11 @@ cWorld::~cWorld()
 {
 	{
 		cCSLock Lock(m_CSEntities);
-		while( m_AllEntities.begin() != m_AllEntities.end() )
+		while (m_AllEntities.begin() != m_AllEntities.end())
 		{
 			cEntity* Entity = *m_AllEntities.begin();
-			m_AllEntities.remove( Entity );
-			if ( !Entity->IsDestroyed() )
+			m_AllEntities.remove(Entity);
+			if (!Entity->IsDestroyed())
 			{
 				Entity->Destroy();
 			}
@@ -368,7 +368,7 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cWorld::InitializeSpawn(void)
 {
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
-	BlockToChunk( (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ );
+	BlockToChunk((int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ);
 	
 	// For the debugging builds, don't make the server build too much world upon start:
 	#if defined(_DEBUG) || defined(ANDROID_NDK)
@@ -382,7 +382,7 @@ void cWorld::InitializeSpawn(void)
 	{
 		for (int z = 0; z < ViewDist; z++)
 		{
-			m_ChunkMap->TouchChunk( x + ChunkX-(ViewDist - 1) / 2, ZERO_CHUNK_Y, z + ChunkZ-(ViewDist - 1) / 2 );  // Queue the chunk in the generator / loader
+			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, ZERO_CHUNK_Y, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
 		}
 	}
 	
@@ -422,7 +422,7 @@ void cWorld::InitializeSpawn(void)
 	}
 	
 	// TODO: Better spawn detection - move spawn out of the water if it isn't set in the INI already
-	m_SpawnY = (double)GetHeight( (int)m_SpawnX, (int)m_SpawnZ ) + 1.6f; // +1.6f eye height
+	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // +1.6f eye height
 }
 
 
@@ -470,8 +470,8 @@ void cWorld::Tick(float a_Dt)
 			{
 				LOGD("Destroying entity #%i", (*itr)->GetUniqueID());
 				cEntity * RemoveMe = *itr;
-				itr = m_AllEntities.erase( itr );
-				m_RemoveEntityQueue.push_back( RemoveMe ); 
+				itr = m_AllEntities.erase(itr);
+				m_RemoveEntityQueue.push_back(RemoveMe); 
 				continue;
 			}
 			(*itr)->Tick(a_Dt, m_TickRand);
@@ -506,7 +506,7 @@ void cWorld::Tick(float a_Dt)
 		SaveAllChunks();
 	}
 
-	if (m_WorldAge - m_LastUnload > 10 * 20 ) // Unload every 10 seconds
+	if (m_WorldAge - m_LastUnload > 10 * 20) // Unload every 10 seconds
 	{
 		UnloadUnusedChunks();
 	}
@@ -532,13 +532,13 @@ void cWorld::Tick(float a_Dt)
 		int tempZ = *cii; cii++;
 		int state = *cii; cii++;
 		
-		if ( (state == 11111) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_OFF ) )
+		if ((state == 11111) && ((int)GetBlock(tempX, tempY, tempZ) == E_BLOCK_REDSTONE_TORCH_OFF))
 		{
-			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_ON, (int)GetBlockMeta( tempX, tempY, tempZ ) );
+			FastSetBlock(tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_ON, (int)GetBlockMeta(tempX, tempY, tempZ));
 		}
-		else if ( (state == 00000) && ( (int)GetBlock( tempX, tempY, tempZ ) == E_BLOCK_REDSTONE_TORCH_ON ) )
+		else if ((state == 00000) && ((int)GetBlock(tempX, tempY, tempZ) == E_BLOCK_REDSTONE_TORCH_ON))
 		{
-			FastSetBlock( tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta( tempX, tempY, tempZ ) );
+			FastSetBlock(tempX, tempY, tempZ, E_BLOCK_REDSTONE_TORCH_OFF, (int)GetBlockMeta(tempX, tempY, tempZ));
 		}
 	}
 	m_RSList_copy.erase(m_RSList_copy.begin(),m_RSList_copy.end());
@@ -608,13 +608,13 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	Vector3d SpawnPos;
 	{
 		cCSLock Lock(m_CSPlayers);
-		if ( m_Players.size() <= 0)
+		if (m_Players.size() <= 0)
 		{
 			return;
 		}
 		int RandomPlayerIdx = m_TickRand.randInt() & m_Players.size();
 		cPlayerList::iterator itr = m_Players.begin();
-		for( int i = 1; i < RandomPlayerIdx; i++ )
+		for (int i = 1; i < RandomPlayerIdx; i++)
 		{
 			itr++;
 		}
@@ -625,8 +625,8 @@ void cWorld::TickSpawnMobs(float a_Dt)
 	int dayRand   = m_TickRand.randInt() % 6;
 	int nightRand = m_TickRand.randInt() % 10;
 
-	SpawnPos += Vector3d( (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32 );
-	int Height = GetHeight( (int)SpawnPos.x, (int)SpawnPos.z );
+	SpawnPos += Vector3d((double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32);
+	int Height = GetHeight((int)SpawnPos.x, (int)SpawnPos.z);
 
 	if (m_TimeOfDay >= 12000 + 1000)
 	{
@@ -675,7 +675,7 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		//end random percent to spawn for day
 	}
 
-	if( Monster )
+	if (Monster)
 	{
 		Monster->Initialize(this);
 		Monster->TeleportTo(SpawnPos.x, (double)(Height) + 2, SpawnPos.z);
@@ -759,7 +759,7 @@ bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 
 
-void cWorld::GrowTree( int a_X, int a_Y, int a_Z )
+void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 {
 	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)
 	{
@@ -1046,7 +1046,7 @@ void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 
 
 
-void cWorld::FastSetBlock( int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )
+void cWorld::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CSFastSetBlock);
 	m_FastSetBlockQueue.push_back(sSetBlock(a_X, a_Y, a_Z, a_BlockType, a_BlockMeta)); 
@@ -1081,7 +1081,7 @@ BLOCKTYPE cWorld::GetBlock(int a_X, int a_Y, int a_Z)
 
 
 
-NIBBLETYPE cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
+NIBBLETYPE cWorld::GetBlockMeta(int a_X, int a_Y, int a_Z)
 {
 	// First check if it isn't queued in the m_FastSetBlockQueue:
 	{
@@ -1102,7 +1102,7 @@ NIBBLETYPE cWorld::GetBlockMeta( int a_X, int a_Y, int a_Z )
 
 
 
-void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData )
+void cWorld::SetBlockMeta(int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData)
 {
 	m_ChunkMap->SetBlockMeta(a_X, a_Y, a_Z, a_MetaData);
 }
@@ -1111,7 +1111,7 @@ void cWorld::SetBlockMeta( int a_X, int a_Y, int a_Z, NIBBLETYPE a_MetaData )
 
 
 
-NIBBLETYPE cWorld::GetBlockSkyLight( int a_X, int a_Y, int a_Z )
+NIBBLETYPE cWorld::GetBlockSkyLight(int a_X, int a_Y, int a_Z)
 {
 	return m_ChunkMap->GetBlockSkyLight(a_X, a_Y, a_Z);
 }
@@ -1216,7 +1216,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 
 
-bool cWorld::DigBlock( int a_X, int a_Y, int a_Z)
+bool cWorld::DigBlock(int a_X, int a_Y, int a_Z)
 {
 	cBlockHandler *Handler = cBlockHandler::GetBlockHandler(GetBlock(a_X, a_Y, a_Z));
 	Handler->OnDestroyed(this, a_X, a_Y, a_Z);
@@ -1227,7 +1227,7 @@ bool cWorld::DigBlock( int a_X, int a_Y, int a_Z)
 
 
 
-void cWorld::SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer * a_Player )
+void cWorld::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 {
 	m_ChunkMap->SendBlockTo(a_X, a_Y, a_Z, a_Player);
 }
@@ -1236,9 +1236,18 @@ void cWorld::SendBlockTo( int a_X, int a_Y, int a_Z, cPlayer * a_Player )
 
 
 
-int cWorld::GetHeight( int a_X, int a_Z )
+int cWorld::GetHeight(int a_X, int a_Z)
 {
 	return m_ChunkMap->GetHeight(a_X, a_Z);
+}
+
+
+
+
+
+void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	return m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
 }
 
 
@@ -1479,7 +1488,7 @@ void cWorld::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY
 
 
 
-void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude )
+void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
 }
@@ -1488,7 +1497,7 @@ void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_Bl
 
 
 
-void cWorld::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cWorld::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_ChunkMap->BroadcastUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
@@ -1636,7 +1645,7 @@ bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
 
 
 
-void cWorld::UnloadUnusedChunks(void )
+void cWorld::UnloadUnusedChunks(void)
 {
 	m_LastUnload = m_WorldAge;
 	m_ChunkMap->UnloadUnusedChunks();
@@ -1668,24 +1677,24 @@ void cWorld::SetMaxPlayers(int iMax)
 
 
 
-void cWorld::AddPlayer( cPlayer* a_Player )
+void cWorld::AddPlayer(cPlayer* a_Player)
 {
 	cCSLock Lock(m_CSPlayers);
 	
 	ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
 	
-	m_Players.remove( a_Player );  // Make sure the player is registered only once
-	m_Players.push_back( a_Player );
+	m_Players.remove(a_Player);  // Make sure the player is registered only once
+	m_Players.push_back(a_Player);
 }
 
 
 
 
 
-void cWorld::RemovePlayer( cPlayer* a_Player )
+void cWorld::RemovePlayer(cPlayer* a_Player)
 {
 	cCSLock Lock(m_CSPlayers);
-	m_Players.remove( a_Player );
+	m_Players.remove(a_Player);
 }
 
 
@@ -1859,12 +1868,12 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & 
 
 
 
-bool cWorld::DoWithEntityByID( int a_UniqueID, cEntityCallback & a_Callback )
+bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSEntities);
-	for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end(); ++itr )
+	for (cEntityList::iterator itr = m_AllEntities.begin(), end = m_AllEntities.end(); itr != end; ++itr)
 	{
-		if( (*itr)->GetUniqueID() == a_UniqueID )
+		if ((*itr)->GetUniqueID() == a_UniqueID)
 		{
 			return a_Callback.Item(*itr);
 		}
@@ -2056,7 +2065,7 @@ void cWorld::SaveAllChunks(void)
 void cWorld::AddEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSEntities);
-	m_AllEntities.push_back( a_Entity ); 
+	m_AllEntities.push_back(a_Entity); 
 }
 
 

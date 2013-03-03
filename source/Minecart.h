@@ -31,8 +31,6 @@ public:
 		// TODO: Other 1.5 features: hopper, tnt, dispenser, spawner
 	} ;
 	
-	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
-	
 	// cEntity overrides:
 	virtual void Initialize(cWorld * a_World) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
@@ -42,6 +40,62 @@ public:
 	
 protected:
 	ePayload m_Payload;
+	
+	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
+} ;
+
+
+
+
+
+class cEmptyMinecart :
+	public cMinecart
+{
+	typedef cMinecart super;
+	
+public:
+	CLASS_PROTODEF(cEmptyMinecart);
+	
+	cEmptyMinecart(double a_X, double a_Y, double a_Z);
+
+	// cEntity overrides:
+	virtual void OnRightClicked(cPlayer & a_Player) override;
+} ;
+
+
+
+
+
+class cMinecartWithChest :
+	public cMinecart
+{
+	typedef cMinecart super;
+	
+public:
+	CLASS_PROTODEF(cMinecartWithChest);
+	
+	cMinecartWithChest(double a_X, double a_Y, double a_Z);
+	
+	// cEntity overrides:
+	virtual void OnRightClicked(cPlayer & a_Player) override;
+} ;
+
+
+
+
+
+class cMinecartWithFurnace :
+	public cMinecart
+{
+	typedef cMinecart super;
+	
+public:
+	CLASS_PROTODEF(cMinecartWithFurnace);
+	
+	cMinecartWithFurnace(double a_X, double a_Y, double a_Z);
+	
+	// cEntity overrides:
+	virtual void OnRightClicked(cPlayer & a_Player) override;
 } ;
 
 

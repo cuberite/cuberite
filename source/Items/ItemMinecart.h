@@ -54,19 +54,21 @@ public:
 			}
 		}
 		
-		cMinecart::ePayload Payload = cMinecart::mpNone;
+		double x = (double)a_BlockX + 0.5;
+		double y = (double)a_BlockY + 0.5;
+		double z = (double)a_BlockZ + 0.5;
+		cMinecart * Minecart = NULL;
 		switch (m_ItemType)
 		{
-			case E_ITEM_MINECART:         Payload = cMinecart::mpNone; break;
-			case E_ITEM_CHEST_MINECART:   Payload = cMinecart::mpChest; break;
-			case E_ITEM_FURNACE_MINECART: Payload = cMinecart::mpFurnace; break;
+			case E_ITEM_MINECART:         Minecart = new cEmptyMinecart      (x, y, z); break;
+			case E_ITEM_CHEST_MINECART:   Minecart = new cMinecartWithChest  (x, y, z); break;
+			case E_ITEM_FURNACE_MINECART: Minecart = new cMinecartWithFurnace(x, y, z); break;
 			default:
 			{
 				ASSERT(!"Unhandled minecart item");
 				return false;
 			}
 		}  // switch (m_ItemType)
-		cMinecart * Minecart = new cMinecart(Payload, (double)a_BlockX + 0.5, a_BlockY, (double)a_BlockZ + 0.5);
 		a_World->AddEntity(Minecart);
 		Minecart->Initialize(a_World);
 		return true;

@@ -37,6 +37,7 @@
 class cWorld;
 class cReferenceManager;
 class cClientHandle;
+class cPlayer;
 class MTRand;
 
 
@@ -130,6 +131,8 @@ public:
 	void SetRotation(float a_Rotation);
 	void SetPitch   (float a_Pitch);
 	void SetRoll    (float a_Roll);
+	
+	void AddSpeed(const Vector3d & a_AddSpeed);
 	// tolua_end
 
 	inline int  GetUniqueID(void) const { return m_UniqueID; }								// tolua_export
@@ -147,6 +150,12 @@ public:
 	*/
 	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }
 	
+	/// Attaches to the specified entity; detaches from any previous one first
+	void AttachTo(cEntity * a_AttachTo);
+	
+	/// Detaches from the currently attached entity, if any
+	void Detach(void);
+	
 	void WrapRotation();
 	
 	// tolua_begin
@@ -159,11 +168,14 @@ public:
 	virtual bool IsRclking  (void) const {return false; }
 	
 	// tolua_end
+	
+	/// Called when the specified player right-clicks this entity
+	virtual void OnRightClicked(cPlayer & a_Player) {};
 
 protected:
-	virtual void Destroyed() {} // Called after the entity has been destroyed
+	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
-	void SetWorld( cWorld* a_World ) { m_World = a_World; }
+	void SetWorld(cWorld * a_World) { m_World = a_World; }
 	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);
 
 	friend class cReferenceManager;
@@ -175,6 +187,12 @@ protected:
 	static int m_EntityCount;
 	
 	int m_UniqueID;
+	
+	/// The entity to which this entity is attached (vehicle), NULL if none
+	cEntity * m_AttachedTo;
+	
+	/// The entity which is attached to this entity (rider), NULL if none
+	cEntity * m_Attachee;
 
 	cReferenceManager* m_Referencers;
 	cReferenceManager* m_References;

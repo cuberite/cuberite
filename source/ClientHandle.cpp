@@ -1048,9 +1048,24 @@ void cClientHandle::HandleUpdateSign(
 
 void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 {
+	// TODO: Let plugins interfere via a hook
+	
 	if (!a_IsLeftClick)
 	{
-		// TODO: we don't handle right-clicking yet
+		class cRclkEntity : public cEntityCallback
+		{
+			cPlayer & m_Player;
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				a_Entity->OnRightClicked(m_Player);
+				return true;
+			}
+		public:
+			cRclkEntity(cPlayer & a_Player) : m_Player(a_Player) {}
+		} Callback (*m_Player);
+		
+		cWorld * World = m_Player->GetWorld();
+		World->DoWithEntityByID(a_TargetEntityID, Callback);
 		return;
 	}
 
@@ -1443,6 +1458,15 @@ void cClientHandle::SendEntHeadLook(const cEntity & a_Entity)
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
 	
 	m_Protocol->SendEntHeadLook(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
 }
 
 

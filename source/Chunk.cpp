@@ -1900,9 +1900,9 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 			// For requests crossing both X and Z, the X-first way has been already tried
 		}
 		return NULL;
-	}																																																 
-	else if (a_RelZ >= cChunkDef::Width)																																	 
-	{																																																 
+	}
+	else if (a_RelZ >= cChunkDef::Width)
+	{
 		if (m_NeighborZP != NULL)
 		{
 			return m_NeighborZP->GetRelNeighborChunk(a_RelX, a_RelZ - cChunkDef::Width);
@@ -1912,6 +1912,18 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 	}
 	
 	return (ReturnThis ? this : NULL);
+}
+
+
+
+
+
+void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	{
+		(*itr)->SendAttachEntity(a_Entity, a_Vehicle);
+	}  // for itr - LoadedByClient[]
 }
 
 

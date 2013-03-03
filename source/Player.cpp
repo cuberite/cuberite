@@ -165,7 +165,7 @@ void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
 	}
 	
 	super::Tick(a_Dt, a_TickRandom);
-
+	
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		m_World->BroadcastEntLook(*this, m_ClientHandle);
@@ -558,6 +558,16 @@ void cPlayer::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
 
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
+	if (m_AttachedTo != NULL)
+	{
+		// When attached to an entity, the client sends position packets with weird coords:
+		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
+		Vector3d AddSpeed(a_NewPos);
+		AddSpeed.y = 0;
+		m_AttachedTo->AddSpeed(AddSpeed);
+		return;
+	}
+	
 	// TODO: should do some checks to see if player is not moving through terrain
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
 	

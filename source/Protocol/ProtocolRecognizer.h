@@ -52,6 +52,7 @@ public:
 	virtual void DataReceived(const char * a_Data, int a_Size) override;
 	
 	/// Sending stuff to clients (alphabetically sorted):
+	virtual void SendAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
 	virtual void SendBlockBreakAnim     (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange        (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;

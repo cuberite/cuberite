@@ -88,6 +88,16 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, int a_Size)
 
 
 
+void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
 	ASSERT(m_Protocol != NULL);

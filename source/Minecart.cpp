@@ -7,6 +7,7 @@
 #include "Minecart.h"
 #include "World.h"
 #include "ClientHandle.h"
+#include "Player.h"
 
 
 
@@ -56,6 +57,92 @@ void cMinecart::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	// TODO: the physics
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cEmptyMinecart:
+
+cEmptyMinecart::cEmptyMinecart(double a_X, double a_Y, double a_Z) :
+	super(mpNone, a_X, a_Y, a_Z)
+{
+}
+
+
+
+
+
+void cEmptyMinecart::OnRightClicked(cPlayer & a_Player)
+{
+	if (m_Attachee != NULL)
+	{
+		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
+		{
+			// This player is already sitting in, they want out.
+			a_Player.Detach();
+			return;
+		}
+		
+		if (m_Attachee->IsPlayer())
+		{
+			// Another player is already sitting in here, cannot attach
+			return;
+		}
+		
+		// Detach whatever is sitting in this minecart now:
+		m_Attachee->Detach();
+	}
+	
+	// Attach the player to this minecart
+	a_Player.AttachTo(this);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cMinecartWithChest:
+
+cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
+	super(mpChest, a_X, a_Y, a_Z)
+{
+}
+
+
+
+
+
+void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
+{
+	// Show the chest UI window to the player
+	// TODO
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cMinecartWithFurnace:
+
+cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
+	super(mpFurnace, a_X, a_Y, a_Z)
+{
+}
+
+
+
+
+
+void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
+{
+	// Try to power the furnace with whatever the player is holding
+	// TODO
+}
+
 
 
 

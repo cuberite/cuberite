@@ -63,6 +63,7 @@ enum
 	PACKET_ENT_TELEPORT              = 0x22,
 	PACKET_ENT_HEAD_LOOK             = 0x23,
 	PACKET_ENT_STATUS                = 0x26,
+	PACKET_ATTACH_ENTITY             = 0x27,
 	PACKET_METADATA                  = 0x28,
 	PACKET_PRE_CHUNK                 = 0x32,
 	PACKET_MAP_CHUNK                 = 0x33,
@@ -116,6 +117,19 @@ cProtocol125::cProtocol125(cClientHandle * a_Client) :
 	super(a_Client),
 	m_ReceivedData(32 KiB)
 {
+}
+
+
+
+
+
+void cProtocol125::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ATTACH_ENTITY);
+	WriteInt(a_Entity.GetUniqueID());
+	WriteInt((a_Vehicle == NULL) ? -1 : a_Vehicle->GetUniqueID());
+	Flush();
 }
 
 

@@ -82,6 +82,7 @@ public:
 	bool IsDestroyed (void) const { return (m_State == csDestroyed); }
 	bool IsDestroying(void) const { return (m_State == csDestroying); }
 
+	void SendAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void SendBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendBlockChange        (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void SendBlockChanges       (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);

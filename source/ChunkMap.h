@@ -45,6 +45,8 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
+	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle);
+	
 	/// Broadcasts an a_Player's animation to all clients in the chunk where a_Player is
 	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	

@@ -274,6 +274,21 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cChunkMap::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), a_Entity.GetChunkY(), a_Entity.GetChunkZ());
+	if (Chunk == NULL)
+	{
+		return;
+	}
+	// It's perfectly legal to broadcast packets even to invalid chunks!
+	Chunk->BroadcastAttachEntity(a_Entity, a_Vehicle);
+}
+
+
+
+
 void cChunkMap::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);

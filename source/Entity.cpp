@@ -23,19 +23,21 @@ cCriticalSection cEntity::m_CSCount;
 
 
 cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
-	: m_UniqueID( 0 )
-	, m_Referencers( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCERS ) )
-	, m_References( new cReferenceManager( cReferenceManager::RFMNGR_REFERENCES ) )
-	, m_ChunkX( 0 )
-	, m_ChunkY( 0 )
-	, m_ChunkZ( 0 )
-	, m_Pos( a_X, a_Y, a_Z )
-	, m_bDirtyPosition( true )
-	, m_bDirtyOrientation( true )
-	, m_bDestroyed( false )
+	: m_UniqueID(0)
+	, m_AttachedTo(NULL)
+	, m_Attachee(NULL)
+	, m_Referencers(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCERS))
+	, m_References(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCES))
+	, m_ChunkX(0)
+	, m_ChunkY(0)
+	, m_ChunkZ(0)
+	, m_Pos(a_X, a_Y, a_Z)
+	, m_bDirtyPosition(true)
+	, m_bDirtyOrientation(true)
+	, m_bDestroyed(false)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
-	, m_bRemovedFromChunk( false )
+	, m_bRemovedFromChunk(false)
 	, m_FireDamageInterval(0.f)
 	, m_BurnPeriod(0.f)
 {
@@ -56,6 +58,15 @@ cEntity::~cEntity()
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
 		this
 	);
+	
+	if (m_AttachedTo != NULL)
+	{
+		Detach();
+	}
+	if (m_Attachee != NULL)
+	{
+		m_Attachee->Detach();
+	}
 	
 	if (!m_bDestroyed || !m_bRemovedFromChunk)
 	{
@@ -100,7 +111,7 @@ const char * cEntity::GetParentClass(void) const
 void cEntity::Initialize(cWorld * a_World)
 {
 	m_World = a_World;
-	m_World->AddEntity( this );
+	m_World->AddEntity(this);
 
 	MoveToCorrectChunk(true);
 }
@@ -124,10 +135,10 @@ void cEntity::WrapRotation()
 void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 {
 	ASSERT(m_World != NULL);  // Entity needs a world to move to a chunk
-	if( !m_World ) return;
+	if (!m_World) return;
 
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
-	cWorld::BlockToChunk( (int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z, ChunkX, ChunkY, ChunkZ );
+	cWorld::BlockToChunk((int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z, ChunkX, ChunkY, ChunkZ);
 	if (!a_bIgnoreOldChunk && (m_ChunkX == ChunkX) && (m_ChunkY == ChunkY) && (m_ChunkZ == ChunkZ))
 	{
 		return;
@@ -213,7 +224,54 @@ void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	UNUSED(a_TickRandom);
 	
-	HandlePhysics(a_Dt);
+	if (m_AttachedTo != NULL)
+	{
+		if ((m_Pos - m_AttachedTo->GetPosition()).Length() > 0.5)
+		{
+			SetPosition(m_AttachedTo->GetPosition());
+		}
+	}
+	else
+	{
+		HandlePhysics(a_Dt);
+	}
+}
+
+
+
+
+
+void cEntity::AttachTo(cEntity * a_AttachTo)
+{
+	if (m_AttachedTo == a_AttachTo)
+	{
+		// Already attached to that entity, nothing to do here
+		return;
+	}
+	
+	// Detach from any previous entity:
+	Detach();
+	
+	// Attach to the new entity:
+	m_AttachedTo = a_AttachTo;
+	a_AttachTo->m_Attachee = this;
+	m_World->BroadcastAttachEntity(*this, a_AttachTo);
+}
+
+
+
+
+
+void cEntity::Detach(void)
+{
+	if (m_AttachedTo == NULL)
+	{
+		// Attached to no entity, our work is done
+		return;
+	}
+	m_AttachedTo->m_Attachee = NULL;
+	m_AttachedTo = NULL;
+	m_World->BroadcastAttachEntity(*this, NULL);
 }
 
 
@@ -231,7 +289,7 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 //////////////////////////////////////////////////////////////////////////
 // Set orientations
-void cEntity::SetRot( const Vector3f & a_Rot )
+void cEntity::SetRot(const Vector3f & a_Rot)
 {
 	m_Rot = a_Rot;
 	m_bDirtyOrientation = true;
@@ -241,7 +299,7 @@ void cEntity::SetRot( const Vector3f & a_Rot )
 
 
 
-void cEntity::SetRotation( float a_Rotation )
+void cEntity::SetRotation(float a_Rotation)
 {
 	m_Rot.x = a_Rotation;
 	m_bDirtyOrientation = true;
@@ -251,7 +309,7 @@ void cEntity::SetRotation( float a_Rotation )
 
 
 
-void cEntity::SetPitch( float a_Pitch )
+void cEntity::SetPitch(float a_Pitch)
 {
 	m_Rot.y = a_Pitch;
 	m_bDirtyOrientation = true;
@@ -261,10 +319,19 @@ void cEntity::SetPitch( float a_Pitch )
 
 
 
-void cEntity::SetRoll( float a_Roll )
+void cEntity::SetRoll(float a_Roll)
 {
 	m_Rot.z = a_Roll;
 	m_bDirtyOrientation = true;
+}
+
+
+
+
+
+void cEntity::AddSpeed(const Vector3d & a_AddSpeed)
+{
+	m_Speed += a_AddSpeed;
 }
 
 
@@ -276,8 +343,8 @@ void cEntity::SetRoll( float a_Roll )
 Vector3f cEntity::GetLookVector(void) const
 {
 	Matrix4f m;
-	m.Init( Vector3f(), 0, m_Rot.x, -m_Rot.y );
-	Vector3f Look = m.Transform( Vector3f(0, 0, 1) );
+	m.Init(Vector3f(), 0, m_Rot.x, -m_Rot.y);
+	Vector3f Look = m.Transform(Vector3f(0, 0, 1));
 	return Look;
 }
 
@@ -287,7 +354,7 @@ Vector3f cEntity::GetLookVector(void) const
 
 //////////////////////////////////////////////////////////////////////////
 // Set position
-void cEntity::SetPosition( const Vector3d & a_Pos )
+void cEntity::SetPosition(const Vector3d & a_Pos)
 {
 	m_Pos = a_Pos;
 	MoveToCorrectChunk();
@@ -346,8 +413,8 @@ void cEntity::SetPosZ(double a_PosZ)
 // Reference stuffs
 void cEntity::AddReference(cEntity * & a_EntityPtr)
 {
-	m_References->AddReference( a_EntityPtr );
-	a_EntityPtr->ReferencedBy( a_EntityPtr );
+	m_References->AddReference(a_EntityPtr);
+	a_EntityPtr->ReferencedBy(a_EntityPtr);
 }
 
 
@@ -356,16 +423,16 @@ void cEntity::AddReference(cEntity * & a_EntityPtr)
 
 void cEntity::ReferencedBy(cEntity * & a_EntityPtr)
 {
-	m_Referencers->AddReference( a_EntityPtr );
+	m_Referencers->AddReference(a_EntityPtr);
 }
 
 
 
 
 
-void cEntity::Dereference(cEntity*& a_EntityPtr)
+void cEntity::Dereference(cEntity * & a_EntityPtr)
 {
-	m_Referencers->Dereference( a_EntityPtr );
+	m_Referencers->Dereference(a_EntityPtr);
 }
 
 

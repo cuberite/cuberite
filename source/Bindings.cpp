@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/03/13 14:57:13.
+** Generated automatically by tolua++-1.0.92 on 03/03/13 20:02:17.
 */
 
 #ifndef __cplusplus
@@ -5041,6 +5041,39 @@ static int tolua_AllToLua_cEntity_SetRoll00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetRoll'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeed00
+static int tolua_AllToLua_cEntity_AddSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_AddSpeed = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddSpeed'", NULL);
+#endif
+  {
+   self->AddSpeed(*a_AddSpeed);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddSpeed'.",&tolua_err);
  return 0;
 #endif
 }
@@ -22073,6 +22106,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetRotation",tolua_AllToLua_cEntity_SetRotation00);
    tolua_function(tolua_S,"SetPitch",tolua_AllToLua_cEntity_SetPitch00);
    tolua_function(tolua_S,"SetRoll",tolua_AllToLua_cEntity_SetRoll00);
+   tolua_function(tolua_S,"AddSpeed",tolua_AllToLua_cEntity_AddSpeed00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
    tolua_function(tolua_S,"Destroy",tolua_AllToLua_cEntity_Destroy00);
