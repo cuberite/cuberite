@@ -60,6 +60,11 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 		return;
 	}
 	
+	if (a_Chunk == NULL)
+	{
+		return;
+	}
+	
 	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
