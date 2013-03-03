@@ -331,7 +331,11 @@ private:
 
 	void SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
 
+	/// Creates a block entity for each block that needs a block entity and doesn't have one in the list
 	void CreateBlockEntities(void);
+	
+	/// Wakes up each simulator for its specific blocks; through all the blocks in the chunk
+	void WakeUpSimulators(void);
 	
 	// Makes a copy of the list
 	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }

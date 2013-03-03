@@ -33,6 +33,8 @@ public:
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) = 0;
 
 protected:
+	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
+	
 	/// Called to simulate a new block
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) = 0;
 

@@ -308,6 +308,9 @@ void cChunk::SetAllData(
 	
 	// Create block entities that the loader didn't load; fill them with defaults
 	CreateBlockEntities();
+	
+	// Wake up all simulators for their respective blocks:
+	WakeUpSimulators();
 
 	m_HasLoadFailed = false;
 }
@@ -1040,6 +1043,42 @@ void cChunk::CreateBlockEntities(void)
 						{
 							m_BlockEntities.push_back(new cJukeboxEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
 						}
+						break;
+					}
+				}  // switch (BlockType)
+			}  // for y
+		}  // for z
+	}  // for x
+}
+
+
+
+
+
+void cChunk::WakeUpSimulators(void)
+{
+	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
+	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
+	int BaseX = m_PosX * cChunkDef::Width;
+	int BaseZ = m_PosZ * cChunkDef::Width;
+	for (int x = 0; x < Width; x++)
+	{
+		int BlockX = x + BaseX;
+		for (int z = 0; z < Width; z++)
+		{
+			int BlockZ = z + BaseZ;
+			for (int y = GetHeight(x, z); y >= 0; y--)
+			{
+				switch (cChunkDef::GetBlock(m_BlockTypes, x, y, z))
+				{
+					case E_BLOCK_WATER:
+					{
+						WaterSimulator->AddBlock(BlockX, y, BlockZ, this);
+						break;
+					}
+					case E_BLOCK_LAVA:
+					{
+						LavaSimulator->AddBlock(BlockX, y, BlockZ, this);
 						break;
 					}
 				}  // switch (BlockType)
