@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/01/13 16:38:13.
+** Generated automatically by tolua++-1.0.92 on 03/03/13 14:57:13.
 */
 
 #ifndef __cplusplus
@@ -21597,6 +21597,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_POTATOES",E_BLOCK_POTATOES);
   tolua_constant(tolua_S,"E_BLOCK_WOODEN_BUTTON",E_BLOCK_WOODEN_BUTTON);
   tolua_constant(tolua_S,"E_BLOCK_HEAD",E_BLOCK_HEAD);
+  tolua_constant(tolua_S,"E_BLOCK_ANVIL",E_BLOCK_ANVIL);
   tolua_constant(tolua_S,"E_BLOCK_TRAPPED_CHEST",E_BLOCK_TRAPPED_CHEST);
   tolua_constant(tolua_S,"E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE",E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE);
   tolua_constant(tolua_S,"E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE",E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE);
@@ -21747,12 +21748,22 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ITEM_WRITTEN_BOOK",E_ITEM_WRITTEN_BOOK);
   tolua_constant(tolua_S,"E_ITEM_EMERALD",E_ITEM_EMERALD);
   tolua_constant(tolua_S,"E_ITEM_FLOWER_POT",E_ITEM_FLOWER_POT);
+  tolua_constant(tolua_S,"E_ITEM_CARROT",E_ITEM_CARROT);
+  tolua_constant(tolua_S,"E_ITEM_POTATO",E_ITEM_POTATO);
+  tolua_constant(tolua_S,"E_ITEM_BAKED_POTATO",E_ITEM_BAKED_POTATO);
+  tolua_constant(tolua_S,"E_ITEM_POISONOUS_POTATO",E_ITEM_POISONOUS_POTATO);
+  tolua_constant(tolua_S,"E_ITEM_GOLDEN_CARROT",E_ITEM_GOLDEN_CARROT);
+  tolua_constant(tolua_S,"E_ITEM_HEAD",E_ITEM_HEAD);
+  tolua_constant(tolua_S,"E_ITEM_CARROT_ON_STICK",E_ITEM_CARROT_ON_STICK);
+  tolua_constant(tolua_S,"E_ITEM_PUMPKIN_PIE",E_ITEM_PUMPKIN_PIE);
   tolua_constant(tolua_S,"E_ITEM_FIREWORK_ROCKET",E_ITEM_FIREWORK_ROCKET);
   tolua_constant(tolua_S,"E_ITEM_FIREWORK_STAR",E_ITEM_FIREWORK_STAR);
   tolua_constant(tolua_S,"E_ITEM_ENCHANTED_BOOK",E_ITEM_ENCHANTED_BOOK);
   tolua_constant(tolua_S,"E_ITEM_COMPARATOR",E_ITEM_COMPARATOR);
   tolua_constant(tolua_S,"E_ITEM_NETHER_BRICK",E_ITEM_NETHER_BRICK);
   tolua_constant(tolua_S,"E_ITEM_NETHER_QUARTZ",E_ITEM_NETHER_QUARTZ);
+  tolua_constant(tolua_S,"E_ITEM_MINECART_WITH_TNT",E_ITEM_MINECART_WITH_TNT);
+  tolua_constant(tolua_S,"E_ITEM_MINECART_WITH_HOPPER",E_ITEM_MINECART_WITH_HOPPER);
   tolua_constant(tolua_S,"E_ITEM_NUMBER_OF_CONSECUTIVE_TYPES",E_ITEM_NUMBER_OF_CONSECUTIVE_TYPES);
   tolua_constant(tolua_S,"E_ITEM_MAX_CONSECUTIVE_TYPE_ID",E_ITEM_MAX_CONSECUTIVE_TYPE_ID);
   tolua_constant(tolua_S,"E_ITEM_FIRST_DISC",E_ITEM_FIRST_DISC);

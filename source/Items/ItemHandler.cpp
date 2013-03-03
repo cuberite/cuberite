@@ -344,6 +344,7 @@ char cItemHandler::GetMaxStackSize(void)
 
 bool cItemHandler::IsTool()
 {
+	// TODO: Rewrite this to list all tools specifically
 	return 
 		   (m_ItemType >= 256 && m_ItemType <= 259)
 		|| (m_ItemType == 261)
@@ -359,27 +360,46 @@ bool cItemHandler::IsTool()
 
 
 
-bool cItemHandler::IsFood()
+bool cItemHandler::IsFood(void)
 {
-	return 
-		   (m_ItemType == 260)
-		|| (m_ItemType == 282)
-		|| (m_ItemType == 297)
-		|| (m_ItemType >= 319 && m_ItemType <= 320)
-		|| (m_ItemType == 335)
-		|| (m_ItemType >= 349 && m_ItemType <= 350)
-		|| (m_ItemType == 357)
-		|| (m_ItemType == 360)
-		|| (m_ItemType >= 363 && m_ItemType <= 366);
+	switch (m_ItemType)
+	{
+		case E_ITEM_RED_APPLE:
+		case E_ITEM_GOLDEN_APPLE:
+		case E_ITEM_MUSHROOM_SOUP:
+		case E_ITEM_BREAD:
+		case E_ITEM_RAW_PORKCHOP:
+		case E_ITEM_COOKED_PORKCHOP:
+		case E_ITEM_MILK:
+		case E_ITEM_RAW_FISH:
+		case E_ITEM_COOKED_FISH:
+		case E_ITEM_COOKIE:
+		case E_ITEM_MELON_SLICE:
+		case E_ITEM_RAW_BEEF:
+		case E_ITEM_STEAK:
+		case E_ITEM_RAW_CHICKEN:
+		case E_ITEM_COOKED_CHICKEN:
+		case E_ITEM_ROTTEN_FLESH:
+		case E_ITEM_SPIDER_EYE:
+		case E_ITEM_CARROT:
+		case E_ITEM_POTATO:
+		case E_ITEM_BAKED_POTATO:
+		case E_ITEM_POISONOUS_POTATO:
+		{
+			return true;
+		}
+	}  // switch (m_ItemType)
+	return false;
 }
 
 
 
 
 
-bool cItemHandler::IsPlaceable()
+bool cItemHandler::IsPlaceable(void)
 {
-	return m_ItemType >= 1 && m_ItemType <= 136;
+	// We can place any block that has a corresponding E_BLOCK_TYPE:
+	return (m_ItemType >= 1) && (m_ItemType <= E_BLOCK_MAX_TYPE_ID);
 }
 
 
@@ -417,9 +437,6 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 		a_CursorX, a_CursorY, a_CursorZ,
 		a_BlockType, a_BlockMeta
 	);
-	a_BlockType = (BLOCKTYPE) m_ItemType;
-	a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);  // This keeps most textures. The few other items have to override this
-	return true;
 }
 
 
