@@ -441,14 +441,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\HeartBeat.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\HeartBeat.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\Inventory.cpp"
 				>
 			</File>
