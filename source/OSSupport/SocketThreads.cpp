@@ -433,11 +433,7 @@ bool cSocketThreads::cSocketThread::Start(void)
 		LOGERROR("Cannot create a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		return false;
 	}
-	cSocket::SockAddr_In Addr;
-	Addr.Family = cSocket::ADDRESS_FAMILY_INTERNET;
-	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST();
-	Addr.Port = 0;  // Any free port is okay
-	if (m_ControlSocket2.Bind(Addr) != 0)
+	if (m_ControlSocket2.BindToLocalhost(cSocket::ANY_PORT) != 0)
 	{
 		LOGERROR("Cannot bind a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		m_ControlSocket2.CloseSocket();

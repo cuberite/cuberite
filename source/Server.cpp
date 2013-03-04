@@ -188,12 +188,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 	int Port = a_SettingsIni.GetValueSetI("Server", "Port", 25565);
 
-	cSocket::SockAddr_In local;
-	local.Family = cSocket::ADDRESS_FAMILY_INTERNET;
-	local.Address = cSocket::INTERNET_ADDRESS_ANY;
-	local.Port = (unsigned short)Port;
-
-	if( m_pState->SListenClient.Bind( local ) != 0 )
+	if (m_pState->SListenClient.BindToAny(Port) != 0)
 	{
 		LOGERROR("bind fail (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
 		return false;

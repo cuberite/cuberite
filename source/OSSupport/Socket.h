@@ -62,8 +62,20 @@ public:
 	static const short ADDRESS_FAMILY_INTERNET = 2;
 	static const unsigned long INTERNET_ADDRESS_ANY = 0;
 	static unsigned long INTERNET_ADDRESS_LOCALHOST(void);  // 127.0.0.1 represented in network byteorder; must be a function due to GCC :(
+	static const unsigned short ANY_PORT = 0;  // When given to Bind() functions, they will find a free port
 
-	int Bind( SockAddr_In& a_Address );
+	/// Binds to the specified port on "any" interface (0.0.0.0)
+	int BindToAny(unsigned short a_Port);
+	
+	/*
+	// TODO:
+	/// Binds to the specified port
+	int BindToAny6(unsigned short a_Port);
+	*/
+	
+	/// Binds to the specified port on localhost interface (127.0.0.1) through IPv4
+	int BindToLocalhost(unsigned short a_Port);
+	
 	int Listen( int a_Backlog );
 	cSocket Accept();
 	int Connect(SockAddr_In & a_Address);  // Returns 0 on success, !0 on failure

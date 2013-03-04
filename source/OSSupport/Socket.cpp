@@ -207,14 +207,30 @@ unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST(void)
 
 
 
-int cSocket::Bind(SockAddr_In& a_Address)
+int cSocket::BindToAny(unsigned short a_Port)
 {
 	sockaddr_in local;
 	memset(&local, 0, sizeof(local));
 
-	local.sin_family = a_Address.Family;
-	local.sin_addr.s_addr = a_Address.Address;
-	local.sin_port = htons((u_short)a_Address.Port);
+	local.sin_family = AF_INET;
+	local.sin_addr.s_addr = 0;
+	local.sin_port = htons((u_short)a_Port);
+
+	return bind(m_Socket, (sockaddr*)&local, sizeof(local));
+}
+
+
+
+
+
+int cSocket::BindToLocalhost(unsigned short a_Port)
+{
+	sockaddr_in local;
+	memset(&local, 0, sizeof(local));
+
+	local.sin_family = AF_INET;;
+	local.sin_addr.s_addr = INTERNET_ADDRESS_LOCALHOST();
+	local.sin_port = htons((u_short)a_Port);
 
 	return bind(m_Socket, (sockaddr*)&local, sizeof(local));
 }
