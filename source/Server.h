@@ -14,6 +14,7 @@
 #include "OSSupport/SocketThreads.h"
 #include "CryptoPP/rsa.h"
 #include "CryptoPP/randpool.h"
+#include "ListenThread.h"
 
 
 
@@ -30,19 +31,18 @@ typedef std::list<cClientHandle *> cClientHandleList;
 
 
 class cServer										// tolua_export
+	: public cListenThread::cCallback
 {													// tolua_export
 public:												// tolua_export
 	bool InitServer(cIniFile & a_SettingsIni);
 
-	int GetPort() { return m_iServerPort; }
-	bool IsConnected(){return m_bIsConnected;} // returns connection status
-	void StartListenClient(); // Listen to client
-
+	bool IsConnected(void) const { return m_bIsConnected;} // returns connection status
+	
 	void BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude = NULL);  // tolua_export
 
 	bool Tick(float a_Dt);
 
-	void StartListenThread();
+	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, const AString & a_Cmd);
 	void ExecuteConsoleCommand(const AString & a_Cmd);
@@ -56,8 +56,6 @@ public:												// tolua_export
 	
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
-
-	static void ServerListenThread( void* a_Args );
 
 	const AString & GetServerID(void) const;
 	
@@ -106,6 +104,7 @@ private:
 	sServerState* m_pState;
 	
 	cNotifyWriteThread m_NotifyWriteThread;
+	cListenThread m_ListenThread;
 	
 	cCriticalSection  m_CSClients;  // Locks client list
 	cClientHandleList m_Clients;         // Clients that are connected to the server
@@ -126,11 +125,14 @@ private:
 	CryptoPP::RSA::PrivateKey      m_PrivateKey;
 	CryptoPP::RSA::PublicKey       m_PublicKey;
 
-	cServer();
+	cServer(void);
 	~cServer();
 
 	/// Loads, or generates, if missing, RSA keys for protocol encryption
 	void PrepareKeys(void);
+	
+	// cListenThread::cCallback overrides:
+	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 }; // tolua_export
 
 

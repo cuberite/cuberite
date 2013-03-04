@@ -62,34 +62,15 @@ typedef std::list< cClientHandle* > ClientList;
 struct cServer::sServerState
 {
 	sServerState()
-		: pListenThread( 0 )
-		, pTickThread( 0 )
-		, bStopListenThread( false )
-		, bStopTickThread( false )
+		: pTickThread(NULL)
+		, bStopTickThread(false)
 	{}
-	cSocket SListenClient; // socket listening for client calls
 
-	cThread* pListenThread;	bool bStopListenThread;
 	cThread* pTickThread;	bool bStopTickThread;
 
 	cEvent RestartEvent;
 	std::string ServerID;
 };
-
-
-
-
-
-void cServer::ServerListenThread( void *a_Args )
-{
-	LOG("ServerListenThread");
-	cServer* self = (cServer*)a_Args;
-	sServerState* m_pState = self->m_pState;
-	while( !m_pState->bStopListenThread )
-	{
-		self->StartListenClient();
-	}
-}
 
 
 
@@ -172,36 +153,13 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
-	m_pState->SListenClient = cSocket::CreateSocket();
-
-	if( !m_pState->SListenClient.IsValid() )
+	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
+	m_ListenThread.SetReuseAddr(true);
+	if (!m_ListenThread.Initialize(Ports))
 	{
-		LOGERROR("m_SListenClient==INVALID_SOCKET (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
 		return false;
 	}
 
-	if( m_pState->SListenClient.SetReuseAddress() == -1 )
-	{
-		LOGERROR("setsockopt == -1");
-		return false;
-	}
-
-	int Port = a_SettingsIni.GetValueSetI("Server", "Port", 25565);
-
-	if (m_pState->SListenClient.BindToAny(Port) != 0)
-	{
-		LOGERROR("bind fail (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
-		return false;
-	}
-	
-	if( m_pState->SListenClient.Listen( 10 ) != 0)
-	{
-		LOGERROR("listen fail (%s)", cSocket::GetErrorString( cSocket::GetLastError() ).c_str() );
-		return false;
-	}
-
-	m_iServerPort = Port;
-	LOG("Port %i has been bound", m_iServerPort);
 	m_bIsConnected = true;
 
 	m_pState->ServerID = "-";
@@ -241,13 +199,13 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 
 
-cServer::cServer()
-	: m_pState( new sServerState )
-	, m_Millisecondsf( 0 )
-	, m_Milliseconds( 0 )
-	, m_bIsConnected( false )
-	, m_iServerPort( 0 )
-	, m_bRestarting( false )
+cServer::cServer(void)
+	: m_pState(new sServerState)
+	, m_ListenThread(*this)
+	, m_Millisecondsf(0)
+	, m_Milliseconds(0)
+	, m_bIsConnected(false)
+	, m_bRestarting(false)
 {
 }
 
@@ -258,14 +216,6 @@ cServer::cServer()
 cServer::~cServer()
 {
 	// TODO: Shut down the server gracefully
-	if ( m_pState->SListenClient )
-	{
-		m_pState->SListenClient.CloseSocket();
-	}
-	m_pState->SListenClient = 0;
-
-	m_pState->bStopListenThread = true;
-	delete m_pState->pListenThread;	m_pState->pListenThread = NULL;
 	m_pState->bStopTickThread = true;
 	delete m_pState->pTickThread;	m_pState->pTickThread = NULL;
 
@@ -295,6 +245,41 @@ void cServer::PrepareKeys(void)
 
 
 
+void cServer::OnConnectionAccepted(cSocket & a_Socket)
+{
+	if (!a_Socket.IsValid())
+	{
+		return;
+	}
+	
+	const AString & ClientIP = a_Socket.GetIPString();
+	if (ClientIP.empty())
+	{
+		LOGWARN("cServer: A client connected, but didn't present its IP, disconnecting.");
+		a_Socket.CloseSocket();
+		return;
+	}
+
+	LOG("Client \"%s\" connected!", ClientIP.c_str());
+
+	cClientHandle * NewHandle = new cClientHandle(&a_Socket, m_ClientViewDistance);
+	if (!m_SocketThreads.AddClient(a_Socket, NewHandle))
+	{
+		// For some reason SocketThreads have rejected the handle, clean it up
+		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", ClientIP.c_str());
+		a_Socket.CloseSocket();
+		delete NewHandle;
+		return;
+	}
+	
+	cCSLock Lock(m_CSClients);
+	m_Clients.push_back(NewHandle);
+}
+
+
+
+
+
 void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSClients);
@@ -306,43 +291,6 @@ void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_E
 		}
 		(*itr)->SendChat(a_Message);
 	}
-}
-
-
-
-
-
-void cServer::StartListenClient()
-{
-	cSocket SClient = m_pState->SListenClient.Accept();
-
-	if (!SClient.IsValid())
-	{
-		return;
-	}
-	
-	const AString & ClientIP = SClient.GetIPString();
-	if (ClientIP.empty())
-	{
-		LOGWARN("cServer: A client connected, but didn't present its IP, disconnecting.");
-		SClient.CloseSocket();
-		return;
-	}
-
-	LOG("Client \"%s\" connected!", ClientIP.c_str());
-
-	cClientHandle * NewHandle = new cClientHandle(&SClient, m_ClientViewDistance);
-	if (!m_SocketThreads.AddClient(SClient, NewHandle))
-	{
-		// For some reason SocketThreads have rejected the handle, clean it up
-		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", SClient.GetIPString().c_str());
-		SClient.CloseSocket();
-		delete NewHandle;
-		return;
-	}
-	
-	cCSLock Lock(m_CSClients);
-	m_Clients.push_back( NewHandle );
 }
 
 
@@ -434,12 +382,15 @@ void ServerTickThread( void * a_Param )
 
 
 
-void cServer::StartListenThread()
+bool cServer::Start(void)
 {
-	m_pState->pListenThread = new cThread( ServerListenThread, this, "cServer::ServerListenThread" );
 	m_pState->pTickThread = new cThread( ServerTickThread, this, "cServer::ServerTickThread" );
-	m_pState->pListenThread->Start( true );
+	if (!m_ListenThread.Start())
+	{
+		return false;
+	}
 	m_pState->pTickThread->Start( true );
+	return true;
 }
 
 
@@ -532,6 +483,8 @@ void cServer::SendMessage(const AString & a_Message, cPlayer * a_Player /* = NUL
 
 void cServer::Shutdown()
 {
+	m_ListenThread.Stop();
+	
 	m_bRestarting = true;
 	m_pState->RestartEvent.Wait();
 

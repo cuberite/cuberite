@@ -63,6 +63,8 @@ extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AStr
 /// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
 extern AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_BytesPerLine);
 
+/// Removes whitespace at the beginning and left of the string
+extern AString Trim(const AString & a_Text);
 
 // If you have any other string helper functions, declare them here
 

@@ -163,28 +163,27 @@ void cRoot::Start(void)
 		StartWorlds();
 		
 		LOG("Starting server...");
-		m_Server->StartListenThread();
-		//cHeartBeat* HeartBeat = new cHeartBeat();
+		m_Server->Start();
 
-#if !defined(ANDROID_NDK)
+		#if !defined(ANDROID_NDK)
 		LOG("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );	//we should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
-#endif
+		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
+		#endif
 
 		LOG("Initialization done, server running now.");
-		while( !m_bStop && !m_bRestart ) // These are modified by external threads
+		while (!m_bStop && !m_bRestart)  // These are modified by external threads
 		{
-			cSleep::MilliSleep( 1000 );
+			cSleep::MilliSleep(1000);
 		}
 
-#if !defined(ANDROID_NDK)
-		delete m_InputThread; m_InputThread = 0;
-#endif
+		#if !defined(ANDROID_NDK)
+		delete m_InputThread; m_InputThread = NULL;
+		#endif
 
 		// Deallocate stuffs
 		LOG("Shutting down server...");
-		m_Server->Shutdown(); // This waits for threads to stop and d/c clients
+		m_Server->Shutdown();  // This waits for threads to stop and d/c clients
 		LOG("Stopping world threads...");
 		StopWorlds();
 		LOG("Stopping authenticator...");
