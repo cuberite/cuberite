@@ -92,6 +92,9 @@ typedef unsigned short     UInt16;
 // OS-dependent stuff:
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
+	
+	#define _WIN32_WINNT 0x501  // We want to target WinXP and higher
+	
 	#include <Windows.h>
 	#include <winsock2.h>
 	#include <Ws2tcpip.h>  // IPv6 stuff

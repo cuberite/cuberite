@@ -293,9 +293,23 @@ cSocket cSocket::AcceptIPv6(void)
 	// Get IP in string form:
 	if (SClient.IsValid())
 	{
-		char buffer[INET6_ADDRSTRLEN];
-		inet_ntop(AF_INET6, &(from.sin6_addr), buffer, sizeof(buffer));
-		SClient.m_IPString.assign(buffer);
+		#if defined(_WIN32)
+			// Windows XP doesn't have inet_ntop, so we need to improvise:
+			Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+				from.sin6_addr.u.Word[0],
+				from.sin6_addr.u.Word[1],
+				from.sin6_addr.u.Word[2],
+				from.sin6_addr.u.Word[3],
+				from.sin6_addr.u.Word[4],
+				from.sin6_addr.u.Word[5],
+				from.sin6_addr.u.Word[6],
+				from.sin6_addr.u.Word[7]
+			);
+		#else
+			char buffer[INET6_ADDRSTRLEN];
+			inet_ntop(AF_INET6, &(from.sin6_addr), buffer, sizeof(buffer));
+			SClient.m_IPString.assign(buffer);
+		#endif  // _WIN32
 	}
 	return SClient;
 }
