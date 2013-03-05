@@ -433,13 +433,13 @@ bool cSocketThreads::cSocketThread::Start(void)
 		LOGERROR("Cannot create a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		return false;
 	}
-	if (m_ControlSocket2.BindToLocalhostIPv4(cSocket::ANY_PORT) != 0)
+	if (!m_ControlSocket2.BindToLocalhostIPv4(cSocket::ANY_PORT))
 	{
 		LOGERROR("Cannot bind a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		m_ControlSocket2.CloseSocket();
 		return false;
 	}
-	if (m_ControlSocket2.Listen(1) != 0)
+	if (!m_ControlSocket2.Listen(1))
 	{
 		LOGERROR("Cannot listen on a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		m_ControlSocket2.CloseSocket();
