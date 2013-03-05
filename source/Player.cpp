@@ -558,13 +558,18 @@ void cPlayer::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
 
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
-	if (m_AttachedTo != NULL)
+	if ((a_NewPos.y < -990) && (m_Pos.y > -100))
 	{
 		// When attached to an entity, the client sends position packets with weird coords:
 		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
-		Vector3d AddSpeed(a_NewPos);
-		AddSpeed.y = 0;
-		m_AttachedTo->AddSpeed(AddSpeed);
+		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while 
+		// the client may still send more of these nonsensical packets.
+		if (m_AttachedTo != NULL)
+		{
+			Vector3d AddSpeed(a_NewPos);
+			AddSpeed.y = 0;
+			m_AttachedTo->AddSpeed(AddSpeed);
+		}
 		return;
 	}
 	
