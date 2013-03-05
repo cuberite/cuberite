@@ -500,14 +500,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\ListenThread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\source\ListenThread.h"
-				>
-			</File>
-			<File
 				RelativePath="..\source\Log.cpp"
 				>
 			</File>
@@ -1188,6 +1180,14 @@
 				</File>
 				<File
 					RelativePath="..\source\OSSupport\IsThread.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\OSSupport\ListenThread.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\OSSupport\ListenThread.h"
 					>
 				</File>
 				<File

@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include "OSSupport/IsThread.h"
-#include "OSSupport/Socket.h"
+#include "IsThread.h"
+#include "Socket.h"
 
 
 
