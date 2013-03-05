@@ -265,37 +265,40 @@ bool cSocket::Listen(int a_Backlog)
 
 
 
-cSocket cSocket::Accept()
+cSocket cSocket::AcceptIPv4(void)
 {
 	sockaddr_in from;
-	socklen_t fromlen=sizeof(from);
+	socklen_t fromlen = sizeof(from);
 
-	cSocket SClient = accept(m_Socket, (sockaddr*)&from, &fromlen);
+	cSocket SClient = accept(m_Socket, (sockaddr *)&from, &fromlen);
 
 	if (SClient.IsValid() && (from.sin_addr.s_addr != 0))  // Get IP in string form
 	{
 		SClient.m_IPString = inet_ntoa(from.sin_addr);
 	}
-
 	return SClient;
 }
 
- 
 
 
 
-/*
-int cSocket::Connect(SockAddr_In & a_Address)
+
+cSocket cSocket::AcceptIPv6(void)
 {
-	sockaddr_in local;
+	sockaddr_in6 from;
+	socklen_t fromlen = sizeof(from);
 
-	local.sin_family = a_Address.Family;
-	local.sin_addr.s_addr = a_Address.Address;
-	local.sin_port = htons((u_short)a_Address.Port);
+	cSocket SClient = accept(m_Socket, (sockaddr *)&from, &fromlen);
 
-	return connect(m_Socket, (sockaddr *)&local, sizeof(local));
+	// Get IP in string form:
+	if (SClient.IsValid())
+	{
+		char buffer[INET6_ADDRSTRLEN];
+		inet_ntop(AF_INET6, &(from.sin6_addr), buffer, sizeof(buffer));
+		SClient.m_IPString.assign(buffer);
+	}
+	return SClient;
 }
-*/
 
 
 

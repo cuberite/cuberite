@@ -214,7 +214,7 @@ void cListenThread::Execute(void)
 		{
 			if (FD_ISSET(itr->GetSocket(), &fdRead))
 			{
-				cSocket Client = itr->Accept();
+				cSocket Client = (m_Family == cSocket::IPv4) ? itr->AcceptIPv4() : itr->AcceptIPv6();
 				m_Callback.OnConnectionAccepted(Client);
 			}
 		}  // for itr - m_Sockets[]

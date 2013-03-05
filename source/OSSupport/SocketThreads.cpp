@@ -461,7 +461,7 @@ bool cSocketThreads::cSocketThread::Start(void)
 	}
 	
 	// Finish connecting the control socket by accepting connection from the thread's socket
-	cSocket tmp = m_ControlSocket2.Accept();
+	cSocket tmp = m_ControlSocket2.AcceptIPv4();
 	if (!tmp.IsValid())
 	{
 		LOGERROR("Cannot link Control sockets for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
