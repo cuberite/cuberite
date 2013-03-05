@@ -956,8 +956,10 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Pitch);
 	HANDLE_CLIENT_PACKET_READ(ReadChar,     char,   IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the client");
-
-	// TODO: list packet contents
+	Log("  Pos = {%.03f, %.03f, %.03f}", PosX, PosY, PosZ);
+	Log("  Stance = %.03f", Stance);
+	Log("  Y, P = %.03f, %.03f", Yaw, Pitch);
+	Log("  IsOnGround = %s", IsOnGround ? "true" : "false");
 	
 	COPY_TO_SERVER();
 	return true;
