@@ -8,6 +8,12 @@
 class cSocket
 {
 public:
+	enum eFamily
+	{
+		IPv4 = AF_INET,
+		IPv6 = AF_INET6,
+	} ;
+	
 #ifdef _WIN32
 	typedef SOCKET xSocket;
 #else
@@ -20,28 +26,31 @@ public:
 	~cSocket();
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
-	void CloseSocket();
+	void CloseSocket(void);
 
-	operator xSocket() const;
-	xSocket GetSocket() const;
+	operator xSocket(void) const;
+	xSocket GetSocket(void) const;
 	
 	bool operator == (const cSocket & a_Other) {return m_Socket == a_Other.m_Socket; }
 	
-	void SetSocket( xSocket a_Socket );
+	void SetSocket(xSocket a_Socket);
 
-	int SetReuseAddress();
-	static int WSAStartup();
+	/// Sets the address-reuse socket flag; returns true on success
+	bool SetReuseAddress(void);
+	
+	static int WSAStartup(void);
 
-	static AString GetErrorString( int a_ErrNo );
+	static AString GetErrorString(int a_ErrNo);
 	static int     GetLastError();
 	static AString GetLastErrorString(void)
 	{
 		return GetErrorString(GetLastError());
 	}
 	
-	static cSocket CreateSocket();
+	/// Creates a new socket of the specified address family
+	static cSocket CreateSocket(eFamily a_Family);
 
-	inline static bool IsSocketError( int a_ReturnedValue )
+	inline static bool IsSocketError(int a_ReturnedValue)
 	{
 		#ifdef _WIN32
 			return (a_ReturnedValue == SOCKET_ERROR || a_ReturnedValue == 0);
@@ -52,37 +61,31 @@ public:
 	
 	static bool IsValidSocket(xSocket a_Socket);
 
-	struct SockAddr_In
-	{
-		short Family;
-		unsigned short Port;
-		unsigned long Address;
-	};
-
-	static const short ADDRESS_FAMILY_INTERNET = 2;
-	static const unsigned long INTERNET_ADDRESS_ANY = 0;
 	static unsigned long INTERNET_ADDRESS_LOCALHOST(void);  // 127.0.0.1 represented in network byteorder; must be a function due to GCC :(
 	static const unsigned short ANY_PORT = 0;  // When given to Bind() functions, they will find a free port
 	static const int DEFAULT_BACKLOG = 10;
 
-	/// Binds to the specified port on "any" interface (0.0.0.0)
-	int BindToAny(unsigned short a_Port);
+	/// Binds to the specified port on "any" interface (0.0.0.0). Returns true if successful.
+	bool BindToAnyIPv4(unsigned short a_Port);
 	
-	/*
-	// TODO:
-	/// Binds to the specified port
-	int BindToAny6(unsigned short a_Port);
-	*/
+	/// Binds to the specified port on "any" interface (::/128). Returns true if successful.
+	bool BindToAnyIPv6(unsigned short a_Port);
 	
-	/// Binds to the specified port on localhost interface (127.0.0.1) through IPv4
-	int BindToLocalhost(unsigned short a_Port);
+	/// Binds to the specified port on localhost interface (127.0.0.1) through IPv4. Returns true if successful.
+	bool BindToLocalhostIPv4(unsigned short a_Port);
 	
-	int Listen(int a_Backlog = DEFAULT_BACKLOG);
+	/// Sets the socket to listen for incoming connections. Returns true if successful.
+	bool Listen(int a_Backlog = DEFAULT_BACKLOG);
+	
+	/// Accepts an incoming connection. Blocks if none available.
 	cSocket Accept();
 	
-	int Connect(SockAddr_In & a_Address);  // Returns 0 on success, !0 on failure
+	/// Connects to a localhost socket on the specified port using IPv4; returns true if successful.
+	bool ConnectToLocalhostIPv4(unsigned short a_Port);
 	
-	int Connect(const AString & a_HostNameOrAddr, unsigned short a_Port);  // Returns 0 on success, !0 on failure
+	/// Connects to the specified host or string IP address and port, using IPv4. Returns true if successful.
+	bool ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Port);
+	
 	int Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags);
 	int Send   (const char * a_Buffer, unsigned int a_Length);
 	

@@ -10,9 +10,10 @@
 
 
 
-cListenThread::cListenThread(cCallback & a_Callback) :
+cListenThread::cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family) :
 	super("ListenThread"),
-	m_Callback(a_Callback)
+	m_Callback(a_Callback),
+	m_Family(a_Family)
 {
 }
 
@@ -47,8 +48,12 @@ bool cListenThread::Initialize(const AString & a_PortsString)
 
 bool cListenThread::Start(void)
 {
-	ASSERT(!m_Sockets.empty());  // Has Initialize() been called?
-	
+	if (m_Sockets.empty())
+	{
+		// There are no sockets listening, either forgotten to initialize or the user specified no listening ports
+		// Report as successful, though
+		return true;
+	}
 	return super::Start();
 }
 
@@ -58,6 +63,12 @@ bool cListenThread::Start(void)
 
 void cListenThread::Stop(void)
 {
+	if (m_Sockets.empty())
+	{
+		// No sockets means no thread was running in the first place
+		return;
+	}
+
 	m_ShouldTerminate = true;
 	
 	// Close one socket to wake the thread up from the select() call
@@ -76,7 +87,7 @@ void cListenThread::Stop(void)
 
 void cListenThread::SetReuseAddr(bool a_Reuse)
 {
-	ASSERT(m_Sockets.empty());  // Must not be started
+	ASSERT(m_Sockets.empty());  // Must not have been Initialize()d yet
 	
 	m_ShouldReuseAddr = a_Reuse;
 }
@@ -94,6 +105,18 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		return false;
 	}
 	
+	const char * FamilyStr = "";
+	switch (m_Family)
+	{
+		case cSocket::IPv4: FamilyStr = "IPv4: "; break;
+		case cSocket::IPv6: FamilyStr = "IPv6: "; break;
+		default:
+		{
+			ASSERT(!"Unknown address family");
+			break;
+		}
+	}
+	
 	for (AStringVector::const_iterator itr = Ports.begin(), end = Ports.end(); itr != end; ++itr)
 	{
 		int Port = atoi(Trim(*itr).c_str());
@@ -102,7 +125,7 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 			LOGWARNING("Invalid port specified: \"%s\".", Trim(*itr).c_str());
 			continue;
 		}
-		m_Sockets.push_back(cSocket::CreateSocket());
+		m_Sockets.push_back(cSocket::CreateSocket(m_Family));
 		if (!m_Sockets.back().IsValid())
 		{
 			LOGERROR("Cannot create listening socket for port %d: \"%s\"", Port, cSocket::GetLastErrorString().c_str());
@@ -112,14 +135,39 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 
 		if (m_ShouldReuseAddr)
 		{
-			if (m_Sockets.back().SetReuseAddress() == -1)
+			if (!m_Sockets.back().SetReuseAddress())
 			{
 				LOG("Port %d cannot reuse addr, syscall failed: \"%s\".", Port, cSocket::GetLastErrorString().c_str());
 			}
 		}
-		m_Sockets.back().BindToAny(Port);
-		m_Sockets.back().Listen();
-		LOGD("Port %d is open for connections", Port);
+		
+		// Bind to port:
+		bool res = false;
+		switch (m_Family)
+		{
+			case cSocket::IPv4: res = m_Sockets.back().BindToAnyIPv4(Port); break;
+			case cSocket::IPv6: res = m_Sockets.back().BindToAnyIPv6(Port); break;
+			default:
+			{
+				ASSERT(!"Unknown address family");
+				res = false;
+			}
+		}
+		if (!res)
+		{
+			LOGWARNING("Cannot bind port %d: \"%s\".", Port, cSocket::GetLastErrorString().c_str());
+			m_Sockets.pop_back();
+			continue;
+		}
+		
+		if (!m_Sockets.back().Listen())
+		{
+			LOGWARNING("Cannot listen on port %d: \"%s\".", Port, cSocket::GetLastErrorString().c_str());
+			m_Sockets.pop_back();
+			continue;
+		}
+		
+		LOGD("%sPort %d is open for connections", FamilyStr, Port);
 	}  // for itr - Ports[]
 	
 	return !(m_Sockets.empty());
@@ -131,6 +179,12 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 
 void cListenThread::Execute(void)
 {
+	if (m_Sockets.empty())
+	{
+		LOGD("Empty cListenThread, ending thread now.");
+		return;
+	}
+	
 	// Find the highest socket number:
 	cSocket::xSocket Highest = m_Sockets[0].GetSocket();
 	for (cSockets::iterator itr = m_Sockets.begin(), end = m_Sockets.end(); itr != end; ++itr)

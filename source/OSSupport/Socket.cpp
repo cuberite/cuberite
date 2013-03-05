@@ -155,14 +155,14 @@ int cSocket::GetLastError()
 
 
 
-int cSocket::SetReuseAddress()
+bool cSocket::SetReuseAddress(void)
 {
-#if defined(_WIN32) || defined(ANDROID_NDK)
-	char yes = 1;
-#else
-	int yes = 1;
-#endif
-	return setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	#if defined(_WIN32) || defined(ANDROID_NDK)
+		char yes = 1;
+	#else
+		int yes = 1;
+	#endif
+	return (setsockopt(m_Socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == 0);
 }
 
 
@@ -184,9 +184,9 @@ int cSocket::WSAStartup()
 
 
 
-cSocket cSocket::CreateSocket()
+cSocket cSocket::CreateSocket(eFamily a_Family)
 {
-	return socket(AF_INET,SOCK_STREAM,0);
+	return socket((int)a_Family, SOCK_STREAM, 0);
 }
 
 
@@ -207,23 +207,40 @@ unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST(void)
 
 
 
-int cSocket::BindToAny(unsigned short a_Port)
+bool cSocket::BindToAnyIPv4(unsigned short a_Port)
 {
 	sockaddr_in local;
 	memset(&local, 0, sizeof(local));
 
 	local.sin_family = AF_INET;
-	local.sin_addr.s_addr = 0;
 	local.sin_port = htons((u_short)a_Port);
 
-	return bind(m_Socket, (sockaddr*)&local, sizeof(local));
+	return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
 }
 
 
 
 
 
-int cSocket::BindToLocalhost(unsigned short a_Port)
+bool cSocket::BindToAnyIPv6(unsigned short a_Port)
+{
+	// Cannot use socckaddr_in6, because it is not defined in the default VS2008 SDK
+	// Must jump through hoops here
+	
+	sockaddr_in6 local;
+	memset(&local, 0, sizeof(local));
+
+	local.sin6_family = AF_INET6;
+	local.sin6_port = htons((u_short)a_Port);
+
+	return (bind(m_Socket, (sockaddr *)&local, sizeof(local)) == 0);
+}
+
+
+
+
+
+bool cSocket::BindToLocalhostIPv4(unsigned short a_Port)
 {
 	sockaddr_in local;
 	memset(&local, 0, sizeof(local));
@@ -232,16 +249,16 @@ int cSocket::BindToLocalhost(unsigned short a_Port)
 	local.sin_addr.s_addr = INTERNET_ADDRESS_LOCALHOST();
 	local.sin_port = htons((u_short)a_Port);
 
-	return bind(m_Socket, (sockaddr*)&local, sizeof(local));
+	return (bind(m_Socket, (sockaddr*)&local, sizeof(local)) == 0);
 }
 
 
 
 
 
-int cSocket::Listen(int a_Backlog)
+bool cSocket::Listen(int a_Backlog)
 {
-	return listen(m_Socket, a_Backlog);
+	return (listen(m_Socket, a_Backlog) == 0);
 }
 
 
@@ -267,6 +284,7 @@ cSocket cSocket::Accept()
 
 
 
+/*
 int cSocket::Connect(SockAddr_In & a_Address)
 {
 	sockaddr_in local;
@@ -277,12 +295,26 @@ int cSocket::Connect(SockAddr_In & a_Address)
 
 	return connect(m_Socket, (sockaddr *)&local, sizeof(local));
 }
+*/
 
 
 
 
 
-int cSocket::Connect(const AString & a_HostNameOrAddr, unsigned short a_Port)
+bool cSocket::ConnectToLocalhostIPv4(unsigned short a_Port)
+{
+	sockaddr_in server;
+	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = INTERNET_ADDRESS_LOCALHOST();
+	server.sin_port = htons(a_Port);
+	return (connect(m_Socket, (sockaddr *)&server, sizeof(server)) == 0);
+}
+
+
+
+
+
+bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Port)
 {
 	// First try IP Address string to hostent conversion, because it's faster
 	unsigned long addr = inet_addr(a_HostNameOrAddr.c_str());
@@ -303,7 +335,7 @@ int cSocket::Connect(const AString & a_HostNameOrAddr, unsigned short a_Port)
 	server.sin_addr.s_addr = *((unsigned long*)hp->h_addr);
 	server.sin_family = AF_INET;
 	server.sin_port = htons( (unsigned short)a_Port );
-	return connect(m_Socket, (sockaddr *)&server, sizeof(server));
+	return (connect(m_Socket, (sockaddr *)&server, sizeof(server)) == 0);
 }
 
 

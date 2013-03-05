@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/03/13 20:02:17.
+** Generated automatically by tolua++-1.0.92 on 03/04/13 22:33:20.
 */
 
 #ifndef __cplusplus
@@ -42,7 +42,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "WebPlugin.h"
 #include "Pickup.h"
 #include "Root.h"
-#include "OSSupport/TCPLink.h"
 #include "Vector3f.h"
 #include "Vector3d.h"
 #include "Vector3i.h"
@@ -120,13 +119,6 @@ static int tolua_collect_cBlockArea (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cTCPLink (lua_State* tolua_S)
-{
- cTCPLink* self = (cTCPLink*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
 static int tolua_collect_Vector3d (lua_State* tolua_S)
 {
  Vector3d* self = (Vector3d*) tolua_tousertype(tolua_S,1,0);
@@ -146,26 +138,24 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockArea");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
- tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cChatColor");
- tolua_usertype(tolua_S,"cCuboid");
- tolua_usertype(tolua_S,"Vector3i");
+ tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cPawn");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
- tolua_usertype(tolua_S,"Lua__cTCPLink");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"Lua__cPlayer");
- tolua_usertype(tolua_S,"cTCPLink");
+ tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"cGroupManager");
@@ -14439,329 +14429,6 @@ static int tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00(lua_State* tolua
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: delete of class  cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cTCPLink_delete00
-static int tolua_AllToLua_cTCPLink_delete00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cTCPLink",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'", NULL);
-#endif
-  Mtolua_delete(self);
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Connect of class  cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cTCPLink_Connect00
-static int tolua_AllToLua_cTCPLink_Connect00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cTCPLink",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-  const AString a_Address = ((const AString)  tolua_tocppstring(tolua_S,2,0));
-  unsigned int a_Port = ((unsigned int)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Connect'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->Connect(a_Address,a_Port);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-   tolua_pushcppstring(tolua_S,(const char*)a_Address);
-  }
- }
- return 2;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Connect'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Send of class  cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cTCPLink_Send00
-static int tolua_AllToLua_cTCPLink_Send00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cTCPLink",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Data = ((const char*)  tolua_tostring(tolua_S,2,0));
-  unsigned int a_Size = ((unsigned int)  tolua_tonumber(tolua_S,3,0));
-  int a_Flags = ((int)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Send'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->Send(a_Data,a_Size,a_Flags);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Send'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SendMessage of class  cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cTCPLink_SendMessage00
-static int tolua_AllToLua_cTCPLink_SendMessage00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cTCPLink",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-  const char* a_Message = ((const char*)  tolua_tostring(tolua_S,2,0));
-  int a_Flags = ((int)  tolua_tonumber(tolua_S,3,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SendMessage'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->SendMessage(a_Message,a_Flags);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SendMessage'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: CloseSocket of class  cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cTCPLink_CloseSocket00
-static int tolua_AllToLua_cTCPLink_CloseSocket00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cTCPLink",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cTCPLink* self = (cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CloseSocket'", NULL);
-#endif
-  {
-   self->CloseSocket();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'CloseSocket'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
- class Lua__cTCPLink : public cTCPLink, public ToluaBase {
-public:
-	 void  ReceivedData( char* a_Data, int a_Size) {
-		if (push_method("ReceivedData",  NULL)) {
-			tolua_pushstring(lua_state, (const char*)a_Data);
-			tolua_pushnumber(lua_state, (lua_Number)a_Size);
-			ToluaBase::dbcall(lua_state, 3, 0);
-		} else {
-			if (lua_state)
-				LOG("pure-virtual method cTCPLink::ReceivedData not implemented.");
-			else {
-				LOG("pure-virtual method cTCPLink::ReceivedData called with no lua_state. Aborting");
-				::abort();
-			};
-			return ( void )0;
-		};
-	};
-
-	 Lua__cTCPLink( void ): cTCPLink(){};
-};
-
-/* method: tolua__set_instance of class  Lua__cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cTCPLink_tolua__set_instance00
-static int tolua_AllToLua_Lua__cTCPLink_tolua__set_instance00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cTCPLink",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cTCPLink* self = (Lua__cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-  lua_State* L =  tolua_S;
-  lua_Object lo = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'tolua__set_instance'", NULL);
-#endif
-  {
-   self->tolua__set_instance(L,lo);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'tolua__set_instance'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new of class  Lua__cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cTCPLink_new00
-static int tolua_AllToLua_Lua__cTCPLink_new00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"Lua__cTCPLink",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   Lua__cTCPLink* tolua_ret = (Lua__cTCPLink*)  Mtolua_new((Lua__cTCPLink)());
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cTCPLink");
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: new_local of class  Lua__cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cTCPLink_new00_local
-static int tolua_AllToLua_Lua__cTCPLink_new00_local(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertable(tolua_S,1,"Lua__cTCPLink",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  {
-   Lua__cTCPLink* tolua_ret = (Lua__cTCPLink*)  Mtolua_new((Lua__cTCPLink)());
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cTCPLink");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: delete of class  Lua__cTCPLink */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cTCPLink_delete00
-static int tolua_AllToLua_Lua__cTCPLink_delete00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cTCPLink",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cTCPLink* self = (Lua__cTCPLink*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'", NULL);
-#endif
-  Mtolua_delete(self);
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-
-/* function to release collected object via destructor */
-#ifdef __cplusplus
-
-static int tolua_collect_Lua__cTCPLink (lua_State* tolua_S)
-{
- Lua__cTCPLink* self = (Lua__cTCPLink*) tolua_tousertype(tolua_S,1,0);
-	delete self;
-	return 0;
-}
-#endif
-
 /* method: new of class  Vector3f */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_Vector3f_new00
 static int tolua_AllToLua_Vector3f_new00(lua_State* tolua_S)
@@ -22511,30 +22178,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetTotalChunkCount",tolua_AllToLua_cRoot_GetTotalChunkCount00);
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cRoot_SaveAllChunks00);
    tolua_function(tolua_S,"GetProtocolVersionTextFromInt",tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00);
-  tolua_endmodule(tolua_S);
-  #ifdef __cplusplus
-  tolua_cclass(tolua_S,"cTCPLink","cTCPLink","",tolua_collect_cTCPLink);
-  #else
-  tolua_cclass(tolua_S,"cTCPLink","cTCPLink","",NULL);
-  #endif
-  tolua_beginmodule(tolua_S,"cTCPLink");
-   tolua_function(tolua_S,"delete",tolua_AllToLua_cTCPLink_delete00);
-   tolua_function(tolua_S,"Connect",tolua_AllToLua_cTCPLink_Connect00);
-   tolua_function(tolua_S,"Send",tolua_AllToLua_cTCPLink_Send00);
-   tolua_function(tolua_S,"SendMessage",tolua_AllToLua_cTCPLink_SendMessage00);
-   tolua_function(tolua_S,"CloseSocket",tolua_AllToLua_cTCPLink_CloseSocket00);
-  tolua_endmodule(tolua_S);
-  #ifdef __cplusplus
-  tolua_cclass(tolua_S,"Lua__cTCPLink","Lua__cTCPLink","cTCPLink",tolua_collect_Lua__cTCPLink);
-  #else
-  tolua_cclass(tolua_S,"Lua__cTCPLink","Lua__cTCPLink","cTCPLink",NULL);
-  #endif
-  tolua_beginmodule(tolua_S,"Lua__cTCPLink");
-   tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cTCPLink_tolua__set_instance00);
-   tolua_function(tolua_S,"new",tolua_AllToLua_Lua__cTCPLink_new00);
-   tolua_function(tolua_S,"new_local",tolua_AllToLua_Lua__cTCPLink_new00_local);
-   tolua_function(tolua_S,".call",tolua_AllToLua_Lua__cTCPLink_new00_local);
-   tolua_function(tolua_S,"delete",tolua_AllToLua_Lua__cTCPLink_delete00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"Vector3f","Vector3f","",tolua_collect_Vector3f);

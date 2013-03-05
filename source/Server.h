@@ -101,10 +101,12 @@ private:
 	} ;
 	
 	struct sServerState;
-	sServerState* m_pState;
+	sServerState * m_pState;
 	
 	cNotifyWriteThread m_NotifyWriteThread;
-	cListenThread m_ListenThread;
+	
+	cListenThread m_ListenThreadIPv4;  // IPv4
+	cListenThread m_ListenThreadIPv6;  // IPv6
 	
 	cCriticalSection  m_CSClients;  // Locks client list
 	cClientHandleList m_Clients;         // Clients that are connected to the server

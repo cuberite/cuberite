@@ -153,10 +153,24 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
+	bool HasAnyPorts = false;
 	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
-	m_ListenThread.SetReuseAddr(true);
-	if (!m_ListenThread.Initialize(Ports))
+	m_ListenThreadIPv4.SetReuseAddr(true);
+	if (m_ListenThreadIPv4.Initialize(Ports))
 	{
+		HasAnyPorts = true;
+	}
+
+	Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
+	m_ListenThreadIPv6.SetReuseAddr(true);
+	if (m_ListenThreadIPv6.Initialize(Ports))
+	{
+		HasAnyPorts = true;
+	}
+	
+	if (!HasAnyPorts)
+	{
+		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
 
@@ -201,7 +215,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 cServer::cServer(void)
 	: m_pState(new sServerState)
-	, m_ListenThread(*this)
+	, m_ListenThreadIPv4(*this, cSocket::IPv4)
+	, m_ListenThreadIPv6(*this, cSocket::IPv6)
 	, m_Millisecondsf(0)
 	, m_Milliseconds(0)
 	, m_bIsConnected(false)
@@ -385,7 +400,11 @@ void ServerTickThread( void * a_Param )
 bool cServer::Start(void)
 {
 	m_pState->pTickThread = new cThread( ServerTickThread, this, "cServer::ServerTickThread" );
-	if (!m_ListenThread.Start())
+	if (!m_ListenThreadIPv4.Start())
+	{
+		return false;
+	}
+	if (!m_ListenThreadIPv6.Start())
 	{
 		return false;
 	}
@@ -483,7 +502,8 @@ void cServer::SendMessage(const AString & a_Message, cPlayer * a_Player /* = NUL
 
 void cServer::Shutdown()
 {
-	m_ListenThread.Stop();
+	m_ListenThreadIPv4.Stop();
+	m_ListenThreadIPv6.Stop();
 	
 	m_bRestarting = true;
 	m_pState->RestartEvent.Wait();

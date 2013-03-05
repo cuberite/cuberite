@@ -94,6 +94,7 @@ typedef unsigned short     UInt16;
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
 	#include <winsock2.h>
+	#include <Ws2tcpip.h>  // IPv6 stuff
 	
 	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
 	#undef min

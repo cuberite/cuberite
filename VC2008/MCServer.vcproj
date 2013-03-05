@@ -1231,14 +1231,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\TCPLink.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\OSSupport\TCPLink.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\OSSupport\Thread.cpp"
 					>
 				</File>

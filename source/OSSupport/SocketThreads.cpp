@@ -427,13 +427,13 @@ bool cSocketThreads::cSocketThread::QueueClose(const cCallback * a_Client)
 bool cSocketThreads::cSocketThread::Start(void)
 {
 	// Create the control socket listener
-	m_ControlSocket2 = cSocket::CreateSocket();
+	m_ControlSocket2 = cSocket::CreateSocket(cSocket::IPv4);
 	if (!m_ControlSocket2.IsValid())
 	{
 		LOGERROR("Cannot create a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		return false;
 	}
-	if (m_ControlSocket2.BindToLocalhost(cSocket::ANY_PORT) != 0)
+	if (m_ControlSocket2.BindToLocalhostIPv4(cSocket::ANY_PORT) != 0)
 	{
 		LOGERROR("Cannot bind a Control socket for a cSocketThread (\"%s\"); continuing, but server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		m_ControlSocket2.CloseSocket();
@@ -481,13 +481,9 @@ bool cSocketThreads::cSocketThread::Start(void)
 void cSocketThreads::cSocketThread::Execute(void)
 {
 	// Connect the "client" part of the Control socket:
-	m_ControlSocket1 = cSocket::CreateSocket();
-	cSocket::SockAddr_In Addr;
-	Addr.Family = cSocket::ADDRESS_FAMILY_INTERNET;
-	Addr.Address = cSocket::INTERNET_ADDRESS_LOCALHOST();
-	Addr.Port = m_ControlSocket2.GetPort();
-	ASSERT(Addr.Port != 0);  // We checked in the Start() method, but let's be sure
-	if (m_ControlSocket1.Connect(Addr) != 0)
+	m_ControlSocket1 = cSocket::CreateSocket(cSocket::IPv4);
+	ASSERT(m_ControlSocket2.GetPort() != 0);  // We checked in the Start() method, but let's be sure
+	if (!m_ControlSocket1.ConnectToLocalhostIPv4(m_ControlSocket2.GetPort()))
 	{
 		LOGERROR("Cannot connect Control sockets for a cSocketThread (\"%s\"); continuing, but the server may be unreachable from now on.", cSocket::GetLastErrorString().c_str());
 		m_ControlSocket2.CloseSocket();

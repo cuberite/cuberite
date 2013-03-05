@@ -37,7 +37,7 @@ public:
 		virtual void OnConnectionAccepted(cSocket & a_Socket) = 0;
 	} ;
 	
-	cListenThread(cCallback & a_Callback);
+	cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family);
 	~cListenThread();
 	
 	/// Creates all the sockets, returns trus if successful, false if not.
@@ -55,6 +55,9 @@ protected:
 
 	/// The callback which to notify of incoming connections	
 	cCallback & m_Callback;
+	
+	/// Socket address family to use
+	cSocket::eFamily m_Family;
 	
 	/// Sockets that are being monitored
 	cSockets m_Sockets;
