@@ -167,7 +167,7 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 			continue;
 		}
 		
-		LOGD("%sPort %d is open for connections", FamilyStr, Port);
+		LOGINFO("%sPort %d is open for connections", FamilyStr, Port);
 	}  // for itr - Ports[]
 	
 	return !(m_Sockets.empty());
