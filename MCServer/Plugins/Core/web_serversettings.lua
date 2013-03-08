@@ -43,6 +43,9 @@ local function ShowGeneralSettings( Request )
 		if( tonumber( Request.PostParams["Server_Port"] ) ~= nil ) then
 			SettingsIni:SetValue("Server", "Port", Request.PostParams["Server_Port"], false )
 		end
+		if( tonumber( Request.PostParams["Server_PortsIPv6"] ) ~= nil ) then
+			SettingsIni:SetValue("Server", "PortsIPv6", Request.PostParams["Server_PortsIPv6"], false )
+		end
 		if( tonumber( Request.PostParams["Server_Version"] ) ~= nil ) then
 			SettingsIni:SetValue("Server", "PrimaryServerVersion", Request.PostParams["Server_Version"],    false )
 		end
@@ -73,6 +76,8 @@ local function ShowGeneralSettings( Request )
 	<td><input type="text" name="Server_MaxPlayers" value="]] .. SettingsIni:GetValue("Server", "MaxPlayers") .. [["></td></tr>
 	<tr><td>Port:</td>
 	<td><input type="text" name="Server_Port" value="]] .. SettingsIni:GetValue("Server", "Port") .. [["></td></tr>
+	<tr><td>PortsIPv6:</td>
+	<td><input type="text" name="Server_PortsIPv6" value="]] .. SettingsIni:GetValue("Server", "PortsIPv6") .. [["></td></tr>
 	<tr><td>Shown Version:</td>
 	<td>]] .. HTML_Select_Version("Server_Version", SettingsIni:GetValueI("Server", "PrimaryServerVersion") ) .. [[</td></tr>
 	</table><br>
