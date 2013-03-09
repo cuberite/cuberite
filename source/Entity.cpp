@@ -6,7 +6,6 @@
 #include "Server.h"
 #include "Root.h"
 #include "Vector3d.h"
-#include "Vector3f.h"
 #include "Matrix4f.h"
 #include "ReferenceManager.h"
 #include "ClientHandle.h"
@@ -134,8 +133,11 @@ void cEntity::WrapRotation()
 
 void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 {
-	ASSERT(m_World != NULL);  // Entity needs a world to move to a chunk
-	if (!m_World) return;
+	if (!m_World)
+	{
+		// This is normal for entities being currently loaded
+		return;
+	}
 
 	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
 	cWorld::BlockToChunk((int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z, ChunkX, ChunkY, ChunkZ);
@@ -299,7 +301,7 @@ void cEntity::SetRot(const Vector3f & a_Rot)
 
 
 
-void cEntity::SetRotation(float a_Rotation)
+void cEntity::SetRotation(double a_Rotation)
 {
 	m_Rot.x = a_Rotation;
 	m_bDirtyOrientation = true;
@@ -309,7 +311,7 @@ void cEntity::SetRotation(float a_Rotation)
 
 
 
-void cEntity::SetPitch(float a_Pitch)
+void cEntity::SetPitch(double a_Pitch)
 {
 	m_Rot.y = a_Pitch;
 	m_bDirtyOrientation = true;
@@ -319,10 +321,19 @@ void cEntity::SetPitch(float a_Pitch)
 
 
 
-void cEntity::SetRoll(float a_Roll)
+void cEntity::SetRoll(double a_Roll)
 {
 	m_Rot.z = a_Roll;
 	m_bDirtyOrientation = true;
+}
+
+
+
+
+
+void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -340,11 +351,11 @@ void cEntity::AddSpeed(const Vector3d & a_AddSpeed)
 
 //////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
-Vector3f cEntity::GetLookVector(void) const
+Vector3d cEntity::GetLookVector(void) const
 {
-	Matrix4f m;
+	Matrix4d m;
 	m.Init(Vector3f(), 0, m_Rot.x, -m_Rot.y);
-	Vector3f Look = m.Transform(Vector3f(0, 0, 1));
+	Vector3d Look = m.Transform(Vector3d(0, 0, 1));
 	return Look;
 }
 

@@ -63,11 +63,12 @@ public:
 		etEntity,  // For all other types
 		etPlayer,
 		etPickup,
-		etMob,
+		etMonster,
+		etMob = etMonster,  // DEPRECATED, use etMonster instead!
 		etFallingBlock,
 		etMinecart,
 		
-		// Older constants, left over for compatibility reasons (plugins)
+		// DEPRECATED older constants, left over for compatibility reasons (plugins)
 		eEntityType_Entity = etEntity,
 		eEntityType_Player = etPlayer,
 		eEntityType_Pickup = etPickup,
@@ -108,11 +109,11 @@ public:
 	double           GetPosX      (void) const {return m_Pos.x; }
 	double           GetPosY      (void) const {return m_Pos.y; }
 	double           GetPosZ      (void) const {return m_Pos.z; }
-	const Vector3f & GetRot       (void) const {return m_Rot; }
-	float            GetRotation  (void) const {return m_Rot.x; }
-	float            GetPitch     (void) const {return m_Rot.y; }
-	float            GetRoll      (void) const {return m_Rot.z; }
-	Vector3f         GetLookVector(void) const;
+	const Vector3d & GetRot       (void) const {return m_Rot; }
+	double           GetRotation  (void) const {return m_Rot.x; }
+	double           GetPitch     (void) const {return m_Rot.y; }
+	double           GetRoll      (void) const {return m_Rot.z; }
+	Vector3d         GetLookVector(void) const;
 	const Vector3d & GetSpeed     (void) const { return m_Speed; }
 	double           GetSpeedX    (void) const { return m_Speed.x; }
 	double           GetSpeedY    (void) const { return m_Speed.y; }
@@ -128,11 +129,14 @@ public:
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
 	void SetPosition(const Vector3d & a_Pos);
 	void SetRot     (const Vector3f & a_Rot);
-	void SetRotation(float a_Rotation);
-	void SetPitch   (float a_Pitch);
-	void SetRoll    (float a_Roll);
+	void SetRotation(double a_Rotation);
+	void SetPitch   (double a_Pitch);
+	void SetRoll    (double a_Roll);
+	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	void SetSpeed   (const Vector3d & a_Speed) { m_Speed = a_Speed; }
 	
 	void AddSpeed(const Vector3d & a_AddSpeed);
+
 	// tolua_end
 
 	inline int  GetUniqueID(void) const { return m_UniqueID; }								// tolua_export
@@ -173,16 +177,6 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) {};
 
 protected:
-	virtual void Destroyed(void) {} // Called after the entity has been destroyed
-
-	void SetWorld(cWorld * a_World) { m_World = a_World; }
-	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);
-
-	friend class cReferenceManager;
-	void AddReference( cEntity*& a_EntityPtr );
-	void ReferencedBy( cEntity*& a_EntityPtr );
-	void Dereference( cEntity*& a_EntityPtr );
-
 	static cCriticalSection m_CSCount;
 	static int m_EntityCount;
 	
@@ -201,7 +195,7 @@ protected:
 	Vector3d m_Pos;
 	bool     m_bDirtyPosition;
 
-	Vector3f m_Rot;
+	Vector3d m_Rot;
 	bool     m_bDirtyOrientation;
 	
 	Vector3d m_Speed;
@@ -211,11 +205,21 @@ protected:
 
 	eEntityType m_EntityType;
 	
-	cWorld* m_World;
+	cWorld * m_World;
 	
 	float m_FireDamageInterval;
 	float m_BurnPeriod;
-}; // tolua_export
+
+	virtual void Destroyed(void) {} // Called after the entity has been destroyed
+
+	void SetWorld(cWorld * a_World) { m_World = a_World; }
+	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);
+
+	friend class cReferenceManager;
+	void AddReference( cEntity*& a_EntityPtr );
+	void ReferencedBy( cEntity*& a_EntityPtr );
+	void Dereference( cEntity*& a_EntityPtr );
+} ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
 

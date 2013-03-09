@@ -385,9 +385,10 @@ void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
 	m_Result.append(4, (char)0);
 	
 	++m_CurrentStack;
-	m_Stack[m_CurrentStack].m_Type  = TAG_List;
-	m_Stack[m_CurrentStack].m_Pos   = m_Result.size() - 4;
-	m_Stack[m_CurrentStack].m_Count = 0;
+	m_Stack[m_CurrentStack].m_Type     = TAG_List;
+	m_Stack[m_CurrentStack].m_Pos      = m_Result.size() - 4;
+	m_Stack[m_CurrentStack].m_Count    = 0;
+	m_Stack[m_CurrentStack].m_ItemType = a_ChildrenType;
 }
 
 

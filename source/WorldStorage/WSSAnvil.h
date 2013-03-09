@@ -111,6 +111,9 @@ protected:
 	/// Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1)
 	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag);
 	
+	/// Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag
+	bool LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx);
+	
 	void LoadChestFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDispenserFromNBT (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFurnaceFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -118,6 +121,20 @@ protected:
 	void LoadNoteFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadJukeboxFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
+	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength);
+	
+	void LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartRFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartCFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadMinecartFFromNBT   (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadPickupFromNBT      (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	
+	/// Loads entity common data from the NBT compound; returns true if successful
+	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);
+	
+	/// Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
+	bool LoadDoublesListFromNBT(double * a_Doubles, int a_NumDoubles, const cParsedNBT & a_NBT, int a_TagIdx);
+
 	/// Helper function for extracting the X, Y, and Z int subtags of a NBT compound; returns true if successful
 	bool GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int & a_X, int & a_Y, int & a_Z);
 	

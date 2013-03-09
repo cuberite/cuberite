@@ -33,7 +33,7 @@ public:
 
 	static bool IsRepeaterPointingTo  (const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
 	static bool IsRepeaterPointingAway(const Vector3i & a_RepeaterPos, char a_MetaData, const Vector3i & a_BlockPos);
-	static NIBBLETYPE RepeaterRotationToMetaData(float a_Rotation);
+	static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation);
 	static Vector3i GetRepeaterDirection(NIBBLETYPE a_MetaData);
 	static NIBBLETYPE LeverDirectionToMetaData(char a_Dir);
 	static bool IsLeverOn(cWorld * a_World, const Vector3i & a_BlockPos);

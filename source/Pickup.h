@@ -38,7 +38,13 @@ public:
 	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
 	virtual void HandlePhysics(float a_Dt) override;
 	
+	short GetHealth(void) const { return m_Health; }
+	
+	/// Returns the number of ticks that this entity has existed
+	short GetAge(void) const { return (short)(m_Timer / 50); }
+	
 private:
+	short m_Health;
 
 	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
 

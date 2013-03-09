@@ -41,7 +41,7 @@ public:
 		{
 			return false;
 		}
-		float rot = a_Player->GetRotation();
+		double rot = a_Player->GetRotation();
 		if (
 			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
 			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
@@ -79,7 +79,7 @@ public:
 			return;
 		}
 		
-		float rot = a_Player->GetRotation();
+		double rot = a_Player->GetRotation();
 		// Choose meta from player rotation, choose only between 2 or 3
 		NIBBLETYPE NewMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
 		if (
@@ -178,7 +178,7 @@ public:
 	
 	
 	/// Translates player rotation when placing a chest into the chest block metadata. Valid for single chests only
-	static NIBBLETYPE RotationToMetaData(float a_Rotation)
+	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis
 

@@ -204,13 +204,13 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 #define PI				3.14159265358979323846264338327950288419716939937510582097494459072381640628620899862803482534211706798f
 #define MIN(a,b) (((a)>(b))?(b):(a))
 #define MAX(a,b) (((a)>(b))?(a):(b))
-inline void EulerToVector( float a_Pan, float a_Pitch, float & a_X, float & a_Y, float & a_Z )
+inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a_Y, double & a_Z)
 {
 	// 	a_X = sinf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
 	// 	a_Y = -sinf ( a_Pitch / 180 * PI );
 	// 	a_Z = -cosf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
-	a_X = cos(a_Pan / 180 * PI)*cos(a_Pitch / 180 * PI);
-	a_Y = sin(a_Pan / 180 * PI)*cos(a_Pitch / 180 * PI);
+	a_X = cos(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
+	a_Y = sin(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
 	a_Z = sin(a_Pitch / 180 * PI);
 }
 
@@ -218,22 +218,26 @@ inline void EulerToVector( float a_Pan, float a_Pitch, float & a_X, float & a_Y,
 
 
 
-inline void VectorToEuler( float a_X, float a_Y, float a_Z, float & a_Pan, float & a_Pitch )
+inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, double & a_Pitch)
 {
-	if( a_X != 0 )
-		a_Pan = atan2( a_Z, a_X ) * 180 / PI - 90;
+	if (a_X != 0)
+	{
+		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
+	}
 	else
+	{
 		a_Pan = 0;
-	a_Pitch = atan2(a_Y, sqrtf((a_X * a_X) + (a_Z * a_Z))) * 180 / PI;
+	}
+	a_Pitch = atan2(a_Y, sqrt((a_X * a_X) + (a_Z * a_Z))) * 180 / PI;
 }
 
 
 
 
 
-inline float GetSignf( float a_Val )
+inline float GetSignf(float a_Val)
 {
-	return (a_Val < 0.f)?-1.f:1.f;
+	return (a_Val < 0.f) ? -1.f : 1.f;
 }
 
 
@@ -242,7 +246,7 @@ inline float GetSignf( float a_Val )
 
 inline float GetSpecialSignf( float a_Val )
 {
-	return (a_Val <= 0.f)?-1.f:1.f;
+	return (a_Val <= 0.f) ? -1.f : 1.f;
 }
 
 

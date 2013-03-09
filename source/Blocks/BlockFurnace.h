@@ -34,7 +34,10 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
+		
+		// FIXME: Do not use cPiston class for furnace placement!
 		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRotation(), 0);
+		
 		return true;
 	}
 } ;

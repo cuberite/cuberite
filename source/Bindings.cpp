@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/04/13 22:33:20.
+** Generated automatically by tolua++-1.0.92 on 03/09/13 15:33:58.
 */
 
 #ifndef __cplusplus
@@ -257,7 +257,7 @@ static int tolua_AllToLua_cStairs_RotationToMetaData00(lua_State* tolua_S)
  else
 #endif
  {
-  float a_Rotation = ((float)  tolua_tonumber(tolua_S,2,0));
+  double a_Rotation = ((double)  tolua_tonumber(tolua_S,2,0));
   {
    unsigned char tolua_ret = (unsigned char)  cStairs::RotationToMetaData(a_Rotation);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
@@ -4365,8 +4365,8 @@ static int tolua_AllToLua_cEntity_GetRot00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRot'", NULL);
 #endif
   {
-   const Vector3f& tolua_ret = (const Vector3f&)  self->GetRot();
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3f");
+   const Vector3d& tolua_ret = (const Vector3d&)  self->GetRot();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
   }
  }
  return 1;
@@ -4397,7 +4397,7 @@ static int tolua_AllToLua_cEntity_GetRotation00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRotation'", NULL);
 #endif
   {
-   float tolua_ret = (float)  self->GetRotation();
+   double tolua_ret = (double)  self->GetRotation();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -4429,7 +4429,7 @@ static int tolua_AllToLua_cEntity_GetPitch00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetPitch'", NULL);
 #endif
   {
-   float tolua_ret = (float)  self->GetPitch();
+   double tolua_ret = (double)  self->GetPitch();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -4461,7 +4461,7 @@ static int tolua_AllToLua_cEntity_GetRoll00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRoll'", NULL);
 #endif
   {
-   float tolua_ret = (float)  self->GetRoll();
+   double tolua_ret = (double)  self->GetRoll();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -4493,15 +4493,15 @@ static int tolua_AllToLua_cEntity_GetLookVector00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLookVector'", NULL);
 #endif
   {
-   Vector3f tolua_ret = (Vector3f)  self->GetLookVector();
+   Vector3d tolua_ret = (Vector3d)  self->GetLookVector();
    {
 #ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
@@ -4953,7 +4953,7 @@ static int tolua_AllToLua_cEntity_SetRotation00(lua_State* tolua_S)
 #endif
  {
   cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Rotation = ((float)  tolua_tonumber(tolua_S,2,0));
+  double a_Rotation = ((double)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRotation'", NULL);
 #endif
@@ -4986,7 +4986,7 @@ static int tolua_AllToLua_cEntity_SetPitch00(lua_State* tolua_S)
 #endif
  {
   cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Pitch = ((float)  tolua_tonumber(tolua_S,2,0));
+  double a_Pitch = ((double)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetPitch'", NULL);
 #endif
@@ -5019,7 +5019,7 @@ static int tolua_AllToLua_cEntity_SetRoll00(lua_State* tolua_S)
 #endif
  {
   cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
-  float a_Roll = ((float)  tolua_tonumber(tolua_S,2,0));
+  double a_Roll = ((double)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRoll'", NULL);
 #endif
@@ -5033,6 +5033,71 @@ static int tolua_AllToLua_cEntity_SetRoll00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'SetRoll'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetSpeed00
+static int tolua_AllToLua_cEntity_SetSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_SpeedX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_SpeedY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_SpeedZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSpeed'", NULL);
+#endif
+  {
+   self->SetSpeed(a_SpeedX,a_SpeedY,a_SpeedZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetSpeed01
+static int tolua_AllToLua_cEntity_SetSpeed01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_Speed = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSpeed'", NULL);
+#endif
+  {
+   self->SetSpeed(*a_Speed);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cEntity_SetSpeed00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -21731,6 +21796,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etEntity",cEntity::etEntity);
    tolua_constant(tolua_S,"etPlayer",cEntity::etPlayer);
    tolua_constant(tolua_S,"etPickup",cEntity::etPickup);
+   tolua_constant(tolua_S,"etMonster",cEntity::etMonster);
    tolua_constant(tolua_S,"etMob",cEntity::etMob);
    tolua_constant(tolua_S,"etFallingBlock",cEntity::etFallingBlock);
    tolua_constant(tolua_S,"etMinecart",cEntity::etMinecart);
@@ -21773,6 +21839,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetRotation",tolua_AllToLua_cEntity_SetRotation00);
    tolua_function(tolua_S,"SetPitch",tolua_AllToLua_cEntity_SetPitch00);
    tolua_function(tolua_S,"SetRoll",tolua_AllToLua_cEntity_SetRoll00);
+   tolua_function(tolua_S,"SetSpeed",tolua_AllToLua_cEntity_SetSpeed00);
+   tolua_function(tolua_S,"SetSpeed",tolua_AllToLua_cEntity_SetSpeed01);
    tolua_function(tolua_S,"AddSpeed",tolua_AllToLua_cEntity_AddSpeed00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);

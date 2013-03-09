@@ -296,6 +296,12 @@ void cChunk::SetAllData(
 		CalculateHeightmap();
 	}
 
+	// Initialize incoming entities:
+	for (cEntityList::iterator itr = a_Entities.begin(), end = a_Entities.end(); itr != end; ++itr)
+	{
+		(*itr)->Initialize(m_World);
+	}  // for itr - a_Entities[]
+	
 	// Append entities to current entity list:
 	m_Entities.splice(m_Entities.end(), a_Entities);
 	

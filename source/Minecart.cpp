@@ -115,6 +115,17 @@ cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
 
 
 
+void cMinecartWithChest::SetItem(int a_Idx, const cItem & a_Item)
+{
+	ASSERT((a_Idx >= 0) && (a_Idx < ARRAYCOUNT(m_Items)));
+	
+	m_Items[a_Idx] = a_Item;
+}
+
+
+
+
+
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
 	// Show the chest UI window to the player

@@ -47,14 +47,14 @@ public:
 
 
 	// Bed specific helper functions
-	static NIBBLETYPE RotationToMetaData(float a_Rotation)
+	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 180 + (180/4); // So its not aligned with axis
-		if( a_Rotation > 360.f ) a_Rotation -= 360.f;
+		if( a_Rotation > 360 ) a_Rotation -= 360;
 
-		a_Rotation = (a_Rotation/360) * 4;
+		a_Rotation = (a_Rotation / 360) * 4;
 
-		return ((char)a_Rotation+2) % 4;
+		return ((char)a_Rotation + 2) % 4;
 	}
 
 

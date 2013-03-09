@@ -145,10 +145,10 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 
 	ReplicateMovement();
 	
-	Vector3f Distance = m_Destination - Vector3f( m_Pos );
+	Vector3d Distance = m_Destination - Vector3f( m_Pos );
 	if (Distance.SqrLength() > 0.1f)
 	{
-		float Rotation, Pitch;
+		double Rotation, Pitch;
 		Distance.Normalize();
 		VectorToEuler( Distance.x, Distance.y, Distance.z, Rotation, Pitch );
 		SetRotation( Rotation );

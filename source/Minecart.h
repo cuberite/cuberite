@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "Item.h"
 
 
 
@@ -74,7 +75,20 @@ class cMinecartWithChest :
 public:
 	CLASS_PROTODEF(cMinecartWithChest);
 	
+	/// Number of item slots in the chest
+	static const int NumSlots = 9 * 3;
+	
 	cMinecartWithChest(double a_X, double a_Y, double a_Z);
+	
+	const cItem & GetItem(int a_Idx) const { return m_Items[a_Idx]; }
+	cItem &       GetItem(int a_Idx)       { return m_Items[a_Idx]; }
+	
+	void SetItem(int a_Idx, const cItem & a_Item);
+
+protected:
+
+	/// The chest contents:
+	cItem m_Items[NumSlots];
 	
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;

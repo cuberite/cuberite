@@ -5,7 +5,7 @@
 
 
 
-// fwd: "cWorld.h"
+// fwd: World.h
 class cWorld;
 
 
@@ -16,15 +16,15 @@ class cPiston
 {
 public:
 
-	cPiston( cWorld* a_World );
+	cPiston(cWorld * a_World);
 
-	static NIBBLETYPE RotationPitchToMetaData(float a_Rotation, float a_Pitch)
+	static NIBBLETYPE RotationPitchToMetaData(double a_Rotation, double a_Pitch)
 	{
-		if (a_Pitch >= 50.f)
+		if (a_Pitch >= 50)
 		{
 			return 0x1;
 		}
-		else if (a_Pitch <= -50.f)
+		else if (a_Pitch <= -50)
 		{
 			return 0x0;
 		}
@@ -32,11 +32,11 @@ public:
 		{
 			a_Rotation += 90 + 45;  // So its not aligned with axis
 
-			if (a_Rotation > 360.f)
+			if (a_Rotation > 360)
 			{
-				a_Rotation -= 360.f;
+				a_Rotation -= 360;
 			}
-			if ((a_Rotation >= 0.f) && (a_Rotation < 90.f))
+			if ((a_Rotation >= 0) && (a_Rotation < 90))
 			{
 				return 0x4;
 			}
@@ -58,13 +58,12 @@ public:
 	void ExtendPiston( int, int, int );
 	void RetractPiston( int, int, int );
 
-	cWorld* m_World;
+	cWorld * m_World;
 
 private:
 	void ChainMove( int, int, int, char, unsigned short * );
 	unsigned short FirstPassthroughBlock( int, int, int, char );
-
-};
+} ;
 
 
 

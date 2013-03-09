@@ -1635,6 +1635,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\WorldStorage\NBTChunkSerializer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\WorldStorage\NBTChunkSerializer.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\WorldStorage\WorldStorage.cpp"
 					>
 				</File>

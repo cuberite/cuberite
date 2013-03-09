@@ -247,6 +247,7 @@ protected:
 		int m_Type;   // TAG_Compound or TAG_List
 		int m_Pos;    // for TAG_List, the position of the list count
 		int m_Count;  // for TAG_List, the element count
+		eTagType m_ItemType;  // for TAG_List, the element type
 	} ;
 	
 	static const int MAX_STACK = 50;  // Highliy doubtful that an NBT would be constructed this many levels deep
@@ -263,6 +264,9 @@ protected:
 	
 	inline void TagCommon(const AString & a_Name, eTagType a_Type)
 	{
+		// If we're directly inside a list, check that the list is of the correct type:
+		ASSERT((m_Stack[m_CurrentStack].m_Type != TAG_List) || (m_Stack[m_CurrentStack].m_ItemType == a_Type));
+		
 		if (IsStackTopCompound())
 		{
 			// Compound: add the type and name:

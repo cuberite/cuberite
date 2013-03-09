@@ -556,8 +556,8 @@ void cProtocol125::SendPlayerMoveLook(void)
 	WriteDouble(Player->GetStance() + 0.03);  // Add a small amount so that the player doesn't start inside a block
 	WriteDouble(Player->GetPosY()   + 0.03);  // Add a small amount so that the player doesn't start inside a block
 	WriteDouble(Player->GetPosZ());
-	WriteFloat (Player->GetRotation());
-	WriteFloat (Player->GetPitch());
+	WriteFloat ((float)(Player->GetRotation()));
+	WriteFloat ((float)(Player->GetPitch()));
 	WriteBool  (Player->IsOnGround());
 	Flush();
 }
