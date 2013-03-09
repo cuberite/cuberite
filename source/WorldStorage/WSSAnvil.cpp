@@ -861,7 +861,12 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	// TODO
+	std::auto_ptr<cEmptyMinecart> Minecart(new cEmptyMinecart(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	a_Entities.push_back(Minecart.release());
 }
 
 
@@ -870,7 +875,30 @@ void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	// TODO
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
+	}
+	std::auto_ptr<cMinecartWithChest> Minecart(new cMinecartWithChest(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
+	{
+		int Slot = a_NBT.FindChildByName(Child, "Slot");
+		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
+		{
+			continue;
+		}
+		cItem Item;
+		if (LoadItemFromNBT(Item, a_NBT, Child))
+		{
+			Minecart->SetSlot(a_NBT.GetByte(Slot), Item);
+		}
+	}  // for itr - ItemDefs[]
+	a_Entities.push_back(Minecart.release());
 }
 
 
@@ -879,7 +907,15 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	// TODO
+	std::auto_ptr<cMinecartWithFurnace> Minecart(new cMinecartWithFurnace(0, 0, 0));
+	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	// TODO: Load the Push and Fuel tags
+	
+	a_Entities.push_back(Minecart.release());
 }
 
 

@@ -231,9 +231,9 @@ void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 	const char * EntityClass = NULL;
 	switch (a_Minecart->GetPayload())
 	{
-		case cMinecart::mpNone:    EntityClass = "MinecarRideable"; break;
-		case cMinecart::mpChest:   EntityClass = "MinecartChest";   break;
-		case cMinecart::mpFurnace: EntityClass = "MinecartFurnace"; break;
+		case cMinecart::mpNone:    EntityClass = "MinecartRideable"; break;
+		case cMinecart::mpChest:   EntityClass = "MinecartChest";    break;
+		case cMinecart::mpFurnace: EntityClass = "MinecartFurnace";  break;
 		default:
 		{
 			ASSERT(!"Unhandled minecart payload type");
@@ -293,7 +293,7 @@ void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Mineca
 	m_Writer.BeginList("Items", TAG_Compound);
 		for (int i = 0; i < cMinecartWithChest::NumSlots; i++)
 		{
-			const cItem & Item = a_Minecart->GetItem(i);
+			const cItem & Item = a_Minecart->GetSlot(i);
 			if (Item.IsEmpty())
 			{
 				continue;

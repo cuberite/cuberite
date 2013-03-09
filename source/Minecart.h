@@ -80,10 +80,10 @@ public:
 	
 	cMinecartWithChest(double a_X, double a_Y, double a_Z);
 	
-	const cItem & GetItem(int a_Idx) const { return m_Items[a_Idx]; }
-	cItem &       GetItem(int a_Idx)       { return m_Items[a_Idx]; }
+	const cItem & GetSlot(int a_Idx) const { return m_Items[a_Idx]; }
+	cItem &       GetSlot(int a_Idx)       { return m_Items[a_Idx]; }
 	
-	void SetItem(int a_Idx, const cItem & a_Item);
+	void SetSlot(int a_Idx, const cItem & a_Item);
 
 protected:
 
