@@ -151,9 +151,6 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Dat
 	{
 		return false;
 	}
-	LOGD("Saving chunk [%d, %d] into region file %s",
-		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, File->GetFileName().c_str()
-	);
 	return File->SetChunkData(a_Chunk, a_Data);
 }
 
