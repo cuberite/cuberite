@@ -326,7 +326,7 @@ void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteInt   (a_Player.GetUniqueID());  // EntityID of the player
 	WriteString("default");  // Level type
 	WriteByte  ((int)a_Player.GetGameMode());
-	WriteByte  (0);  // TODO: Dimension (Nether / Overworld / End)
+	WriteByte  ((Byte)(a_World.GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty
 	WriteByte  (0);  // Unused, used to be world height
 	WriteByte  (8);  // Client list width or something

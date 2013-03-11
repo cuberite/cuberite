@@ -54,12 +54,17 @@ typedef cItemCallback<cFurnaceEntity>   cFurnaceCallback;
 
 
 
-
-class cWorld													// tolua_export
-{																// tolua_export
+// tolua_begin
+class cWorld
+{
 public:
 
-	// tolua_begin
+	enum eDimension
+	{
+		dimNether = -1,
+		dimOverworld = 0,
+		dimEnd = 1,
+	} ;
 
 	static const char * GetClassStatic(void)
 	{
@@ -92,6 +97,8 @@ public:
 	eGameMode GetGameMode(void) const { return m_GameMode; }
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
+	
+	eDimension GetDimension(void) const { return m_Dimension; }
 
 	int GetHeight(int a_BlockX, int a_BlockZ);
 	
@@ -459,7 +466,10 @@ private:
 
 	friend class cRoot;
 
-	// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
+	/// The dimension of the world, used by the client to provide correct lighting scheme
+	eDimension m_Dimension;
+	
+	/// This random generator is to be used only in the Tick() method, and thus only in the World-Tick-thread (MTRand is not exactly thread-safe)
 	MTRand m_TickRand;
 
 	double m_SpawnX;

@@ -461,7 +461,7 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteString("");  // Username, not used
 	WriteString("default");  // Level type
 	WriteInt   ((int)a_Player.GetGameMode());
-	WriteInt   (0);  // TODO: Dimension (Nether / Overworld / End)
+	WriteInt   ((int)(a_World.GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty
 	WriteByte  (0);  // Unused
 	WriteByte  (60);  // Client list width or something
@@ -600,7 +600,7 @@ void cProtocol125::SendRespawn(void)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_RESPAWN);
-	WriteInt   (0);  // TODO: Dimension;  0 = Overworld
+	WriteInt   ((int)(m_Client->GetPlayer()->GetWorld()->GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
 	WriteByte  ((char)m_Client->GetPlayer()->GetGameMode());
 	WriteShort (256);  // Current world height

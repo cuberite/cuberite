@@ -152,3 +152,31 @@ protected:
 
 
 
+
+class cCompoGenNether :
+	public cTerrainCompositionGen
+{
+public:
+	cCompoGenNether(int a_Seed);
+	
+protected:
+	cNoise m_Noise1;
+	cNoise m_Noise2;
+	
+	int m_Threshold;
+	
+	// cTerrainCompositionGen overrides:
+	virtual void ComposeTerrain(
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
+		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
+		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
+		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
+		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
+	) override;
+} ;
+
+
+
+

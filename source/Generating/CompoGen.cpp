@@ -425,3 +425,101 @@ void cCompoGenBiomal::FillColumnPattern(int a_RelX, int a_RelZ, int a_Height, cC
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCompoGenNether:
+
+cCompoGenNether::cCompoGenNether(int a_Seed) :
+	m_Noise1(a_Seed + 10),
+	m_Noise2(a_Seed * a_Seed * 10 + a_Seed * 1000 + 6000),
+	m_Threshold(0)
+{
+}
+
+
+
+
+
+void cCompoGenNether::ComposeTerrain(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
+	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
+	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
+	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
+	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
+	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
+)
+{
+	HEIGHTTYPE MaxHeight = 0;
+	for (int i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
+	{
+		if (a_HeightMap[i] > MaxHeight)
+		{
+			MaxHeight = a_HeightMap[i];
+		}
+	}
+	
+	const int SEGMENT_HEIGHT = 8;
+	const int INTERPOL_X = 16;  // Must be a divisor of 16
+	const int INTERPOL_Z = 16;  // Must be a divisor of 16
+	// Interpolate the chunk in 16 * SEGMENT_HEIGHT * 16 "segments", each 8 blocks high and each linearly interpolated separately.
+	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
+	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
+	
+	int FloorBuf1[17 * 17];
+	int FloorBuf2[17 * 17];
+	int * FloorHi = FloorBuf1;
+	int * FloorLo = FloorBuf2;
+	int BaseX = a_ChunkX * cChunkDef::Width;
+	int BaseZ = a_ChunkZ * cChunkDef::Width;
+	
+	// Interpolate the lowest floor:
+	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+	{
+		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] = 
+			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) * 
+			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) /
+			256;
+	}  // for x, z - FloorLo[]
+	IntArrayLinearInterpolate2D(FloorLo, 17, 17, INTERPOL_X, INTERPOL_Z);
+	
+	// Interpolate segments:
+	for (int Segment = 0; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
+	{
+		// First update the high floor:
+		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+		{
+			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
+				256;
+		}  // for x, z - FloorLo[]
+		IntArrayLinearInterpolate2D(FloorHi, 17, 17, INTERPOL_X, INTERPOL_Z);
+		
+		// Interpolate between FloorLo and FloorHi:
+		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
+		{
+			int Lo = FloorLo[x + 17 * z] / 256;
+			int Hi = FloorHi[x + 17 * z] / 256;
+			for (int y = 0; y < SEGMENT_HEIGHT; y++)
+			{
+				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
+				cChunkDef::SetBlock(a_BlockTypes, x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_NETHERRACK : E_BLOCK_AIR);
+			}
+		}
+		
+		// Swap the floors:
+		std::swap(FloorLo, FloorHi);
+	}
+	
+	// Bedrock at the bottom and at the top:
+	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, x, 0, z, E_BLOCK_BEDROCK);
+		cChunkDef::SetBlock(a_BlockTypes, x, cChunkDef::GetHeight(a_HeightMap, x, z), z, E_BLOCK_BEDROCK);
+	}
+}
+
+
+
+

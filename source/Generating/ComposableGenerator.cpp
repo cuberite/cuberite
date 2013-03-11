@@ -283,6 +283,10 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 			BlockBeachBottom, BlockSea
 		);
 	}
+	else if (NoCaseCompare(CompoGenName, "nether") == 0)
+	{
+		m_CompositionGen = new cCompoGenNether(m_ChunkGenerator.GetSeed());
+	}
 	else
 	{
 		if (NoCaseCompare(CompoGenName, "biomal") != 0)

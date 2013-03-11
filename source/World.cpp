@@ -201,6 +201,22 @@ cWorld::cWorld(const AString & a_WorldName) :
 
 	cIniFile IniFile(m_IniFileName);
 	IniFile.ReadFile();
+	m_Dimension = (eDimension)(IniFile.GetValueSetI("General", "Dimension", 0));
+	switch (m_Dimension)
+	{
+		case dimNether:
+		case dimOverworld:
+		case dimEnd:
+		{
+			break;
+		}
+		default:
+		{
+			LOGWARNING("Unknown dimension: %d. Setting to Overworld (0)", m_Dimension);
+			m_Dimension = dimOverworld;
+			break;
+		}
+	}  // switch (m_Dimension)
 	m_SpawnX                    = IniFile.GetValueSetF("SpawnPosition", "X",                         m_SpawnX);
 	m_SpawnY                    = IniFile.GetValueSetF("SpawnPosition", "Y",                         m_SpawnY);
 	m_SpawnZ                    = IniFile.GetValueSetF("SpawnPosition", "Z",                         m_SpawnZ);
