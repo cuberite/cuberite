@@ -427,6 +427,11 @@ public:
 
       pHashEntry->Next = (AllocHashEntryType*) own_malloc(sizeof(AllocHashEntryType));
       pHashEntry = pHashEntry->Next;
+      if (pHashEntry == NULL)
+      {
+				// Exhausted the available memory?
+				return;
+      }
     }
     pHashEntry->key = key;
     pHashEntry->nDataSize = nDataSize;
