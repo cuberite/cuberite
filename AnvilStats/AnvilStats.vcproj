@@ -330,6 +330,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SpringStats.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SpringStats.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Statistics.cpp"
 				>
 			</File>

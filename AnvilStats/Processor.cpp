@@ -507,7 +507,7 @@ void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & 
 	// (One more thread can be in the file-read IO block while all other threads crunch the numbers)
 	int NumThreads = GetNumCores() + 1;
 	
-	//*
+	/*
 	// Limit the number of threads in DEBUG mode to 1 for easier debugging
 	#ifdef _DEBUG
 	NumThreads = 1;
