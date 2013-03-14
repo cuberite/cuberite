@@ -315,6 +315,9 @@ void cChunk::SetAllData(
 	// Create block entities that the loader didn't load; fill them with defaults
 	CreateBlockEntities();
 	
+	// Set the chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
+	SetValid();
+	
 	// Wake up all simulators for their respective blocks:
 	WakeUpSimulators();
 

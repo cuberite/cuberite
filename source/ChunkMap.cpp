@@ -738,7 +738,6 @@ void cChunkMap::SetChunkData(
 		return;
 	}
 	Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_BiomeMap, a_Entities, a_BlockEntities);
-	Chunk->SetValid();
 	
 	if (a_MarkDirty)
 	{
