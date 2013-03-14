@@ -489,14 +489,7 @@ void cChunk::BroadcastPendingBlockChanges(void)
 		{
 			return;
 		}
-		Changes.reserve(m_PendingSendBlocks.size());
-		for (std::vector<unsigned int>::iterator itr = m_PendingSendBlocks.begin(), end = m_PendingSendBlocks.end(); itr != end; ++itr)
-		{
-			unsigned int index = *itr;
-			Vector3i RelPos = IndexToCoordinate(index);
-			Changes.push_back(sSetBlock(m_PosX, m_PosZ, RelPos.x, RelPos.y, RelPos.z, GetBlock(index), GetMeta(index)));
-		}  // for itr - m_PendingSendBlocks[]
-		m_PendingSendBlocks.clear();
+		std::swap(Changes, m_PendingSendBlocks);
 	}
 	
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
@@ -1146,9 +1139,16 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 
 	MarkDirty();
 	
+	// The client doesn't need to distinguish between stationary and nonstationary fluids:
+	if (!(
+		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+	))
 	{
 		cCSLock Lock(m_CSBlockLists);
-		m_PendingSendBlocks.push_back( index );
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 
 	// ONLY recalculate lighting if it's necessary!
@@ -1276,16 +1276,16 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-void cChunk::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 {
-	ASSERT(!((a_X < 0 || a_X >= Width || a_Y < 0 || a_Y >= Height || a_Z < 0 || a_Z >= Width)));
+	ASSERT(!((a_RelX < 0) || (a_RelX >= Width) || (a_RelY < 0) || (a_RelY >= Height) || (a_RelZ < 0) || (a_RelZ >= Width)));
 
 	ASSERT(IsValid());
 	
-	const int index = MakeIndexNoCheck( a_X, a_Y, a_Z );
-	const BLOCKTYPE OldBlock = m_BlockTypes[index];
-	const BLOCKTYPE OldBlockMeta = GetNibble( m_BlockMeta, index );
-	if ((OldBlock == a_BlockType) && (OldBlockMeta == a_BlockMeta))
+	const int index = MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
+	const BLOCKTYPE OldBlockType = cChunkDef::GetBlock(m_BlockTypes, index);
+	const BLOCKTYPE OldBlockMeta = GetNibble(m_BlockMeta, index);
+	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
 		return;
 	}
@@ -1294,37 +1294,44 @@ void cChunk::FastSetBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, BLOC
 	
 	m_BlockTypes[index] = a_BlockType;
 
+	// The client doesn't need to distinguish between stationary and nonstationary fluids:
+	if (!(
+		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
+		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+	))
 	{
 		cCSLock Lock(m_CSBlockLists);
-		m_PendingSendBlocks.push_back( index );
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 	
-	SetNibble( m_BlockMeta, index, a_BlockMeta );
+	SetNibble(m_BlockMeta, index, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if(
-		(g_BlockLightValue[ OldBlock ] != g_BlockLightValue[ a_BlockType ]) ||
-		(g_BlockSpreadLightFalloff[ OldBlock ] != g_BlockSpreadLightFalloff[ a_BlockType ]) ||
-		(g_BlockTransparent[ OldBlock ] != g_BlockTransparent[ a_BlockType ] )
+		(g_BlockLightValue[OldBlockType ]        != g_BlockLightValue[a_BlockType]) ||
+		(g_BlockSpreadLightFalloff[OldBlockType] != g_BlockSpreadLightFalloff[a_BlockType]) ||
+		(g_BlockTransparent[OldBlockType]        != g_BlockTransparent[a_BlockType])
 	)
 	{
 		m_IsLightValid = false;
 	}
 
 	// Update heightmap, if needed:
-	if (a_Y >= m_HeightMap[a_X + a_Z * Width])
+	if (a_RelY >= m_HeightMap[a_RelX + a_RelZ * Width])
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_X + a_Z * Width] = (unsigned char)a_Y;
+			m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)a_RelY;
 		}
 		else
 		{
-			for (int y = a_Y - 1; y > 0; --y)
+			for (int y = a_RelY - 1; y > 0; --y)
 			{
-				if (m_BlockTypes[MakeIndexNoCheck(a_X, y, a_Z)] != E_BLOCK_AIR)
+				if (m_BlockTypes[MakeIndexNoCheck(a_RelX, y, a_RelZ)] != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_X + a_Z * Width] = (unsigned char)y;
+					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
 					break;
 				}
 			}  // for y - column in m_BlockData
@@ -1345,7 +1352,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	if (a_Client == NULL)
 	{
 		// Queue the block for all clients in the chunk (will be sent in Tick())
-		m_PendingSendBlocks.push_back(index);
+		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(index), GetMeta(index)));
 		return;
 	}
 

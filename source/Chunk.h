@@ -287,7 +287,7 @@ private:
 	
 	cCriticalSection            m_CSBlockLists;
 	std::deque< unsigned int >  m_ToTickBlocks;
-	std::vector< unsigned int > m_PendingSendBlocks;
+	sSetBlockVector             m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cClientHandleList  m_LoadedByClient;

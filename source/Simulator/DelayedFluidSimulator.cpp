@@ -76,18 +76,19 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 	void * ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = (cDelayedFluidSimulatorChunkData *)ChunkDataRaw;
 	cCoordWithIntVector & Blocks = ChunkData->m_Slots[m_AddSlotNum];
-		
+	
 	// Check for duplicates:
+	int Index = cChunkDef::MakeIndexNoCheck(RelX, a_BlockY, RelZ);
 	for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
+		if ((itr->Data == Index))
 		{
 			return;
 		}
 	}
 
 	++m_TotalBlocks;
-	Blocks.push_back(cCoordWithInt(RelX, a_BlockY, RelZ));
+	Blocks.push_back(cCoordWithInt(RelX, a_BlockY, RelZ, Index));
 }
 
 

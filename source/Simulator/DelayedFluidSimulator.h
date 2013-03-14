@@ -22,7 +22,9 @@ public:
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
 	virtual ~cDelayedFluidSimulatorChunkData();
 	
-	/// Slots, one for each delay tick, each containing the blocks to simulate; relative coords. Int param not used.
+	/** Slots, one for each delay tick, each containing the blocks to simulate; relative coords.
+	Int param is the block index (for faster duplicate comparison in cDelayedFluidSimulator::AddBlock())
+	*/
 	cCoordWithIntVector * m_Slots;
 } ;
 
