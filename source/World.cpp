@@ -19,6 +19,7 @@
 #include "Simulator/FloodyFluidSimulator.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
+#include "Simulator/NoopFluidSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/RedstoneSimulator.h"
 #include "Simulator/VaporizeFluidSimulator.h"
@@ -2251,6 +2252,15 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	)
 	{
 		res = new cVaporizeFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock);
+	}
+	else if (
+		(NoCaseCompare(SimulatorName, "noop") == 0) ||
+		(NoCaseCompare(SimulatorName, "nop") == 0) ||
+		(NoCaseCompare(SimulatorName, "null") == 0) ||
+		(NoCaseCompare(SimulatorName, "nil") == 0)
+	)
+	{
+		res = new cNoopFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock);
 	}
 	else
 	{

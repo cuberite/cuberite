@@ -1107,6 +1107,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Simulator\NoopFluidSimulator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Simulator\RedstoneSimulator.cpp"
 					>
 				</File>
