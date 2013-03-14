@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/09/13 15:33:58.
+** Generated automatically by tolua++-1.0.92 on 03/14/13 10:02:26.
 */
 
 #ifndef __cplusplus
@@ -9994,6 +9994,38 @@ static int tolua_AllToLua_cWorld_IsDeepSnowEnabled00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsDeepSnowEnabled'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetDimension of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetDimension00
+static int tolua_AllToLua_cWorld_GetDimension00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetDimension'", NULL);
+#endif
+  {
+   cWorld::eDimension tolua_ret = (cWorld::eDimension)  self->GetDimension();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetDimension'.",&tolua_err);
  return 0;
 #endif
 }
@@ -22059,6 +22091,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);
   tolua_beginmodule(tolua_S,"cWorld");
+   tolua_constant(tolua_S,"dimNether",cWorld::dimNether);
+   tolua_constant(tolua_S,"dimOverworld",cWorld::dimOverworld);
+   tolua_constant(tolua_S,"dimEnd",cWorld::dimEnd);
    tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cWorld_GetClassStatic00);
    tolua_function(tolua_S,"GetTime",tolua_AllToLua_cWorld_GetTime00);
    tolua_function(tolua_S,"GetWorldAge",tolua_AllToLua_cWorld_GetWorldAge00);
@@ -22068,6 +22103,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cWorld_GetGameMode00);
    tolua_function(tolua_S,"IsPVPEnabled",tolua_AllToLua_cWorld_IsPVPEnabled00);
    tolua_function(tolua_S,"IsDeepSnowEnabled",tolua_AllToLua_cWorld_IsDeepSnowEnabled00);
+   tolua_function(tolua_S,"GetDimension",tolua_AllToLua_cWorld_GetDimension00);
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cWorld_GetHeight00);
    tolua_function(tolua_S,"UnloadUnusedChunks",tolua_AllToLua_cWorld_UnloadUnusedChunks00);
    tolua_function(tolua_S,"GetMaxPlayers",tolua_AllToLua_cWorld_GetMaxPlayers00);

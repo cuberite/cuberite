@@ -98,7 +98,7 @@ void cListenThread::SetReuseAddr(bool a_Reuse)
 
 bool cListenThread::CreateSockets(const AString & a_PortsString)
 {
-	AStringVector Ports = StringSplit(a_PortsString, ",");
+	AStringVector Ports = StringSplitAndTrim(a_PortsString, ",");
 	
 	if (Ports.empty())
 	{
@@ -119,10 +119,10 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 	
 	for (AStringVector::const_iterator itr = Ports.begin(), end = Ports.end(); itr != end; ++itr)
 	{
-		int Port = atoi(Trim(*itr).c_str());
+		int Port = atoi(itr->c_str());
 		if ((Port <= 0) || (Port > 65535))
 		{
-			LOGWARNING("Invalid port specified: \"%s\".", Trim(*itr).c_str());
+			LOGWARNING("Invalid port specified: \"%s\".", itr->c_str());
 			continue;
 		}
 		m_Sockets.push_back(cSocket::CreateSocket(m_Family));

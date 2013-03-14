@@ -13,6 +13,18 @@
 #include "../Noise.h"
 #include "../BlockID.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
+#include "../World.h"
+
+
+
+
+
+#define DEF_NETHER_WATER_SPRINGS    "0, 0; 255, 0"
+#define DEF_NETHER_LAVA_SPRINGS     "0, 0; 30, 0; 31, 50; 120, 50; 127, 0"
+#define DEF_OVERWORLD_WATER_SPRINGS "0, 0; 10, 10; 11, 75; 16, 83; 20, 83; 24, 78; 32, 62; 40, 40; 44, 15; 48, 7; 56, 2; 64, 1; 255, 0"
+#define DEF_OVERWORLD_LAVA_SPRINGS  "0, 0; 10, 5; 11, 45; 48, 2; 64, 1; 255, 0"
+#define DEF_END_WATER_SPRINGS       "0, 0; 255, 0"
+#define DEF_END_LAVA_SPRINGS        "0, 0; 255, 0"
 
 
 
@@ -628,4 +640,167 @@ void cFinishGenDeadBushes::GenFinish(
 		}  // switch (GetBlock)
 	}  // for i
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenFluidSprings:
+
+cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, const cWorld & a_World) :
+	m_Noise(a_Seed + a_Fluid * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
+	m_HeightDistribution(255),
+	m_Fluid(a_Fluid)
+{
+	bool IsWater = (a_Fluid == E_BLOCK_WATER);
+	AString SectionName = IsWater ? "WaterSprings" : "LavaSprings";
+	AString DefaultHeightDistribution;
+	int DefaultChance;
+	switch (a_World.GetDimension())
+	{
+		case cWorld::dimNether:
+		{
+			DefaultHeightDistribution = IsWater ? DEF_NETHER_WATER_SPRINGS : DEF_NETHER_LAVA_SPRINGS;
+			DefaultChance = IsWater ? 0 : 15;
+			break;
+		}
+		case cWorld::dimOverworld:
+		{
+			DefaultHeightDistribution = IsWater ? DEF_OVERWORLD_WATER_SPRINGS : DEF_OVERWORLD_LAVA_SPRINGS;
+			DefaultChance = IsWater ? 24 : 9;
+			break;
+		}
+		case cWorld::dimEnd:
+		{
+			DefaultHeightDistribution = IsWater ? DEF_END_WATER_SPRINGS : DEF_END_LAVA_SPRINGS;
+			DefaultChance = 0;
+			break;
+		}
+		default:
+		{
+			ASSERT(!"Unhandled world dimension");
+			break;
+		}
+	}  // switch (dimension)
+	AString HeightDistribution = a_IniFile.GetValueSet(SectionName, "HeightDistribution", DefaultHeightDistribution);
+	m_HeightDistribution.SetDefString(HeightDistribution);
+	m_Chance = a_IniFile.GetValueSetI(SectionName, "Chance", DefaultChance);
+}
+
+
+
+
+
+void cFinishGenFluidSprings::GenFinish(
+	int a_ChunkX, int a_ChunkZ,
+	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+	cEntityList & a_Entities,                // Entities may be added or deleted
+	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
+)
+{
+	int ChanceRnd = (m_Noise.IntNoise3DInt(128 * a_ChunkX, 512, 256 * a_ChunkZ) / 13) % 100;
+	if (ChanceRnd > m_Chance)
+	{
+		// Not in this chunk
+		return;
+	}
+	
+	// Get the height at which to try:
+	int Height = m_Noise.IntNoise3DInt(128 * a_ChunkX, 512, 256 * a_ChunkZ) / 11;
+	Height %= m_HeightDistribution.GetSum();
+	Height = m_HeightDistribution.MapValue(Height);
+	
+	// Try adding the spring at the height, if unsuccessful, move lower:
+	for (int y = Height; y > 1; y--)
+	{
+		// TODO: randomize the order in which the coords are being checked
+		for (int z = 1; z < cChunkDef::Width - 1; z++)
+		{
+			for (int x = 1; x < cChunkDef::Width - 1; x++)
+			{
+				switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
+				{
+					case E_BLOCK_NETHERRACK:
+					{
+						if (m_Fluid != E_BLOCK_LAVA)
+						{
+							// Only lava springs in the netherrack
+							continue;
+						}
+						// fallthrough:
+					}
+					case E_BLOCK_STONE:
+					{
+						if (TryPlaceSpring(a_BlockTypes, a_BlockMeta, x, y, z))
+						{
+							// Succeeded, bail out
+							return;
+						}
+					}
+				}  // switch (BlockType)
+			}  // for x
+		}  // for y
+	}  // for y
+}
+
+
+
+
+
+bool cFinishGenFluidSprings::TryPlaceSpring(
+	cChunkDef::BlockTypes & a_BlockTypes,
+	cChunkDef::BlockNibbles & a_BlockMetas,
+	int x, int y, int z
+)
+{
+	// In order to place a spring, it needs exactly one of the XZ neighbors or a below neighbor to be air
+	// Also, its neighbor on top of it must be non-air
+	if (cChunkDef::GetBlock(a_BlockTypes, x, y + 1, z) == E_BLOCK_AIR)
+	{
+		return false;
+	}
+	
+	static const struct
+	{
+		int x, y, z;
+	} Coords[] =
+	{
+		{-1,  0,  0},
+		{ 1,  0,  0},
+		{ 0, -1,  0},
+		{ 0,  0, -1},
+		{ 0,  0,  1},
+	} ;
+	int NumAirNeighbors = 0;
+	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		switch (cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z))
+		{
+			case E_BLOCK_AIR:
+			{
+				NumAirNeighbors += 1;
+				if (NumAirNeighbors > 1)
+				{
+					return false;
+				}
+			}
+		}
+	}
+	if (NumAirNeighbors == 0)
+	{
+		return false;
+	}
+	
+	// Has exactly one air neighbor, place a spring:
+	cChunkDef::SetBlock(a_BlockTypes, x, y, z, m_Fluid);
+	cChunkDef::SetNibble(a_BlockMetas, x, y, z, 0);
+	return true;
+}
+
+
+
 

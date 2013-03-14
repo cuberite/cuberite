@@ -17,6 +17,7 @@
 
 #include "ComposableGenerator.h"
 #include "../Noise.h"
+#include "../ProbabDistrib.h"
 
 
 
@@ -219,6 +220,42 @@ protected:
 	) override;
 } ;
 
+
+
+
+
+
+class cFinishGenFluidSprings :
+	public cFinishGen
+{
+public:
+	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, const cWorld & a_World);
+	
+protected:
+
+	cNoise         m_Noise;
+	cProbabDistrib m_HeightDistribution;
+	BLOCKTYPE      m_Fluid;
+	int            m_Chance;  ///< Chance, [0..100], that a spring will be generated in a chunk
+
+	// cFinishGen override:
+	virtual void GenFinish(
+		int a_ChunkX, int a_ChunkZ,
+		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
+		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
+		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
+		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
+		cEntityList & a_Entities,                // Entities may be added or deleted
+		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
+	) override;
+
+	/// Tries to place a spring at the specified coords, checks neighbors. Returns true	if successful
+	bool TryPlaceSpring(
+		cChunkDef::BlockTypes & a_BlockTypes,
+		cChunkDef::BlockNibbles & a_BlockMetas,
+		int x, int y, int z
+	);
+} ;
 
 
 

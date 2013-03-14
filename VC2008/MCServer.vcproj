@@ -577,6 +577,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\ProbabDistrib.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ProbabDistrib.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\ReferenceManager.cpp"
 				>
 			</File>

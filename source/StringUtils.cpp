@@ -118,6 +118,26 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 
 
 
+AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
+{
+	AStringVector results;
+	size_t cutAt = 0;
+	size_t Prev = 0;
+	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
+	{
+		results.push_back(TrimString(str.substr(Prev, cutAt - Prev)));
+		Prev = cutAt + delim.length();
+	}
+	if (Prev < str.length())
+	{
+		results.push_back(TrimString(str.substr(Prev)));
+	}
+	return results;
+}
+
+
+
+
 AString TrimString(const AString & str)
 {
 	size_t len = str.length();
@@ -506,7 +526,11 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_
 			k = a_LineLength;
 		}
 		memset(line, ' ', sizeof(line));        
+		#ifdef _MSC_VER  // MSVC provides a "secure" version of sprintf()
+		line[sprintf_s(line, sizeof(line), "%08x:", i)] = 32;  // Remove the terminating NULL that sprintf puts there
+		#else
 		line[sprintf(line, "%08x:", i)] = 32;  // Remove the terminating NULL that sprintf puts there
+		#endif
 		p = line + 10;
 		q = p + 2 + a_LineLength * 3 + 1;
 		for (int j = 0; j < k; j++)

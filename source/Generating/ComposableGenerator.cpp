@@ -24,6 +24,11 @@
 
 
 
+
+
+
+
+
 cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 	super(a_ChunkGenerator),
 	m_BiomeGen(NULL),
@@ -308,7 +313,7 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Ravines,WormNestCaves,OreNests,Trees");
 
 	int Seed = m_ChunkGenerator.GetSeed();
-	AStringVector Str = StringSplit(Structures, ",");
+	AStringVector Str = StringSplitAndTrim(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		if (NoCaseCompare(*itr, "trees") == 0)
@@ -355,13 +360,14 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 	int Seed = m_ChunkGenerator.GetSeed();
 	AString Structures = a_IniFile.GetValueSet("Generator", "Finishers", "SprinkleFoliage,Ice,Snow,Lilypads,BottomLava,DeadBushes,PreSimulator");
 
-	AStringVector Str = StringSplit(Structures, ",");
+	AStringVector Str = StringSplitAndTrim(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		// Finishers, alpha-sorted:
 		if (NoCaseCompare(*itr, "BottomLava") == 0)
 		{
-			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", 10);
+			int DefaultBottomLavaLevel = (m_World->GetDimension() == cWorld::dimNether) ? 30 : 10;
+			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
 			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
 		}
 		else if (NoCaseCompare(*itr, "DeadBushes") == 0)
@@ -371,6 +377,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenIce);
+		}
+		else if (NoCaseCompare(*itr, "LavaSprings") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_LAVA, a_IniFile, *m_World));
 		}
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
@@ -387,6 +397,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "SprinkleFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
+		}
+		else if (NoCaseCompare(*itr, "WaterSprings") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenFluidSprings(Seed, E_BLOCK_WATER, a_IniFile, *m_World));
 		}
 	}  // for itr - Str[]
 }
