@@ -18,7 +18,7 @@
 // cDelayedFluidSimulatorChunkData:
 
 cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay) :
-	m_Slots(new cCoordWithIntList[a_TickDelay])
+	m_Slots(new cCoordWithIntVector[a_TickDelay])
 {
 }
 
@@ -75,10 +75,10 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 
 	void * ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = (cDelayedFluidSimulatorChunkData *)ChunkDataRaw;
-	cCoordWithIntList & Blocks = ChunkData->m_Slots[m_AddSlotNum];
+	cCoordWithIntVector & Blocks = ChunkData->m_Slots[m_AddSlotNum];
 		
 	// Check for duplicates:
-	for (cCoordWithIntList::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+	for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
 	{
 		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
 		{
@@ -112,10 +112,10 @@ void cDelayedFluidSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_Chunk
 {	
 	void * ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = (cDelayedFluidSimulatorChunkData *)ChunkDataRaw;
-	cCoordWithIntList & Blocks = ChunkData->m_Slots[m_SimSlotNum];
+	cCoordWithIntVector & Blocks = ChunkData->m_Slots[m_SimSlotNum];
 	
 	// Simulate the blocks in the scheduled slot:
-	for (cCoordWithIntList::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
+	for (cCoordWithIntVector::iterator itr = Blocks.begin(), end = Blocks.end(); itr != end; ++itr)
 	{
 		SimulateBlock(a_Chunk, itr->x, itr->y, itr->z);
 	}

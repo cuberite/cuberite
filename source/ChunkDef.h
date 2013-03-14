@@ -538,8 +538,9 @@ public:
 } ;
 
 // Illegal in C++03: typedef std::list< cCoordWithData<X> > cCoordWithDataList<X>;
-typedef cCoordWithData<int>      cCoordWithInt;
-typedef std::list<cCoordWithInt> cCoordWithIntList;
+typedef cCoordWithData<int>        cCoordWithInt;
+typedef std::list<cCoordWithInt>   cCoordWithIntList;
+typedef std::vector<cCoordWithInt> cCoordWithIntVector;
 
 
 
