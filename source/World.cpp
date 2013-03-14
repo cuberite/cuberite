@@ -2231,8 +2231,8 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("%s [Physics]:%s not present or empty, using the default of \"Classic\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
-		SimulatorName = "Classic";
+		LOGWARNING("%s [Physics]:%s not present or empty, using the default of \"Floody\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+		SimulatorName = "Floody";
 	}
 	
 	cFluidSimulator * res = NULL;
