@@ -2175,6 +2175,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Protocol\Protocol15x.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol\Protocol15x.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Protocol\ProtocolRecognizer.cpp"
 					>
 				</File>

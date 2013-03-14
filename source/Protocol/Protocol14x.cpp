@@ -44,12 +44,6 @@ Implements the 1.4.x protocol classes representing these protocols:
 
 
 
-typedef unsigned char Byte;
-
-
-
-
-
 enum
 {
 	PACKET_UPDATE_TIME           = 0x04,
