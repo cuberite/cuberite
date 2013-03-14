@@ -15,7 +15,6 @@
 
 // Simulators:
 #include "Simulator/SimulatorManager.h"
-#include "Simulator/ClassicFluidSimulator.h"
 #include "Simulator/FloodyFluidSimulator.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
@@ -2239,14 +2238,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	cFluidSimulator * res = NULL;
 	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	int Rate = 1;
-	if (NoCaseCompare(SimulatorName, "floody") == 0)
-	{
-		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
-		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
-		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
-		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
-	}
-	else if (
+	if (
 		(NoCaseCompare(SimulatorName, "vaporize") == 0) ||
 		(NoCaseCompare(SimulatorName, "vaporise") == 0)
 	)
@@ -2264,17 +2256,15 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	else
 	{
-		if (NoCaseCompare(SimulatorName, "classic") != 0)
+		if (NoCaseCompare(SimulatorName, "floody") != 0)
 		{
 			// The simulator name doesn't match anything we have, issue a warning:
-			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Classic\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
+			LOGWARNING("%s [Physics]:%s specifies an unknown simulator, using the default \"Floody\".", GetIniFileName().c_str(), SimulatorNameKey.c_str());
 		}
-		int DefaultFalloff   = IsWater ? 1 : 2;
-		int DefaultMaxHeight = IsWater ? 7 : 6;
-		int Falloff   = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",   DefaultFalloff);
-		int MaxHeight = a_IniFile.GetValueSetI(SimulatorSectionName, "MaxHeight", DefaultMaxHeight);
-		res = new cClassicFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, MaxHeight, Falloff);
-		Rate = IsWater ? 6 : 12;
+		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
+		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
+		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
+		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
 	}
 	
 	m_SimulatorManager->RegisterSimulator(res, Rate);

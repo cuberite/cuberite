@@ -1067,14 +1067,6 @@
 				Name="Simulator"
 				>
 				<File
-					RelativePath="..\source\Simulator\ClassicFluidSimulator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Simulator\ClassicFluidSimulator.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Simulator\DelayedFluidSimulator.cpp"
 					>
 				</File>
