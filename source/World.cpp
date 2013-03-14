@@ -21,6 +21,7 @@
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/RedstoneSimulator.h"
+#include "Simulator/VaporizeFluidSimulator.h"
 
 // Mobs:
 #include "Mobs/Bat.h"
@@ -2243,6 +2244,13 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
 		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
 		res = new cFloodyFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock, Falloff, TickDelay, NumNeighborsForSource);
+	}
+	else if (
+		(NoCaseCompare(SimulatorName, "vaporize") == 0) ||
+		(NoCaseCompare(SimulatorName, "vaporise") == 0)
+	)
+	{
+		res = new cVaporizeFluidSimulator(*this, a_SimulateBlock, a_StationaryBlock);
 	}
 	else
 	{

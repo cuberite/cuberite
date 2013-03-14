@@ -1138,6 +1138,14 @@
 					RelativePath="..\source\Simulator\SimulatorManager.h"
 					>
 				</File>
+				<File
+					RelativePath="..\source\Simulator\VaporizeFluidSimulator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Simulator\VaporizeFluidSimulator.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="OSSupport"
