@@ -69,20 +69,13 @@ public:
 	}
 
 
-	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if (LadderCanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
-		{
-			return true;
-		}
-		return (FindSuitableBlockFace(a_World, a_BlockX, a_BlockY, a_BlockZ) != BLOCK_FACE_BOTTOM);
-	}
-
-
-	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		char BlockFace = cLadder::MetaDataToDirection(a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ));
-		return CanBePlacedAt(a_World, a_BlockX, a_BlockY, a_BlockZ, BlockFace);
+		// TODO: Use cTorch::AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
+		char BlockFace = cLadder::MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
+		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+		return LadderCanBePlacedAt(a_Chunk.GetWorld(), BlockX, a_RelY, BlockZ, BlockFace);
 	}
 
 

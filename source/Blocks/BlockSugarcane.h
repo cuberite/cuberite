@@ -23,16 +23,46 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		switch (a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ))
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+		switch (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
 		{
 			case E_BLOCK_DIRT:
 			case E_BLOCK_GRASS:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_SAND:
 			{
-				return a_World->IsBlockDirectlyWatered(a_BlockX, a_BlockY - 1, a_BlockZ);
+				static const struct
+				{
+					int x, z;
+				} Coords[] =
+				{
+					{-1,  0},
+					{ 1,  0},
+					{ 0, -1},
+					{ 0,  1},
+				} ;
+				a_RelY -= 1;
+				for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+				{
+					BLOCKTYPE BlockType;
+					NIBBLETYPE BlockMeta;
+					if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+					{
+						// Too close to the edge, cannot simulate
+						return true;
+					}
+					if (IsBlockWater(BlockType))
+					{
+						return true;
+					}
+				}  // for i - Coords[]
+				// Not directly neighboring a water block
+				return false;
 			}
 			case E_BLOCK_SUGARCANE:
 			{

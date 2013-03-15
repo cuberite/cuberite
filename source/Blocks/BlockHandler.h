@@ -3,6 +3,7 @@
 
 #include "../Defines.h"
 #include "../Item.h"
+#include "../Chunk.h"
 
 
 
@@ -74,14 +75,14 @@ public:
 	/// Returns step sound name of block
 	virtual const char * GetStepSound(void);
 	
-	/// Checks if the block can stay at the specified coords in the world
-	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	/// Checks if the block can stay at the specified relative coords in the chunk
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);
 	
 	/** Checks if the block can be placed at this point.
 	Default: CanBeAt(...) 
 	NOTE: This call doesn't actually place the block
 	*/
-	virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
+	// virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
 	
 	/// Called when the player tries to place a block on top of this block (Only if he aims directly on this block); return false to disallow
 	virtual bool DoesAllowBlockOnTop(void);
@@ -109,7 +110,7 @@ public:
 	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
 	and wakes up all simulators on the block.
 	*/
-	virtual void Check(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 	
 
 	/// Get the blockhandler for a specific block id

@@ -509,18 +509,17 @@ void cChunk::CheckBlocks(void)
 	{
 		return;
 	}
-	std::deque< unsigned int > ToTickBlocks = m_ToTickBlocks;
-	m_ToTickBlocks.clear();
+	std::vector<unsigned int> ToTickBlocks;
+	std::swap(m_ToTickBlocks, ToTickBlocks);
 	Lock2.Unlock();
 	
-	for (std::deque< unsigned int >::const_iterator itr = ToTickBlocks.begin(); itr != ToTickBlocks.end(); ++itr)
+	for (std::vector<unsigned int>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
 		unsigned int index = (*itr);
 		Vector3i BlockPos = IndexToCoordinate(index);
-		Vector3i WorldPos = PositionToWorldPosition( BlockPos );
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(index));
-		Handler->Check(m_World, WorldPos.x, WorldPos.y, WorldPos.z);
+		Handler->Check(BlockPos.x, BlockPos.y, BlockPos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -827,9 +826,9 @@ void cChunk::GrowCactus(int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks)
 
 
 
-bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
-	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelGetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
@@ -1821,20 +1820,33 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 
 
-BLOCKTYPE cChunk::GetBlock( int a_X, int a_Y, int a_Z )
+BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if ((a_X < 0) || (a_X >= Width) || (a_Y < 0) || (a_Y >= Height) || (a_Z < 0) || (a_Z >= Width)) return 0; // Clip
+	if (
+		(a_RelX < 0) || (a_RelX >= Width) || 
+		(a_RelY < 0) || (a_RelY >= Height) ||
+		(a_RelZ < 0) || (a_RelZ >= Width)
+	)
+	{
+		ASSERT(!"GetBlock(x, y, z) out of bounds!");
+		return 0; // Clip
+	}
 
-	return m_BlockTypes[ MakeIndexNoCheck( a_X, a_Y, a_Z ) ];
+	return m_BlockTypes[MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ)];
 }
 
 
 
 
 
-BLOCKTYPE cChunk::GetBlock( int a_BlockIdx )
+BLOCKTYPE cChunk::GetBlock(int a_BlockIdx) const
 {
-	if( a_BlockIdx < 0 || a_BlockIdx >= NumBlocks ) return 0;
+	if ((a_BlockIdx < 0) || (a_BlockIdx >= NumBlocks))
+	{
+		ASSERT(!"GetBlock(idx) out of bounds!");
+		return 0;
+	}
+	
 	return m_BlockTypes[ a_BlockIdx ];
 }
 

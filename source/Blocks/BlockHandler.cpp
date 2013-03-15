@@ -351,16 +351,7 @@ const char * cBlockHandler::GetStepSound()
 
 
 
-bool cBlockHandler::CanBePlacedAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
-{
-	return CanBeAt(a_World, a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-
-bool cBlockHandler::CanBeAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cBlockHandler::CanBeAt(int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
 {
 	return true;
 }
@@ -423,21 +414,25 @@ bool cBlockHandler::DoesDropOnUnsuitable(void)
 
 
 
-void cBlockHandler::Check(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk)
 {
-	if (!CanBeAt(a_World, a_BlockX, a_BlockY, a_BlockZ))
+	if (!CanBeAt(a_RelX, a_RelY, a_RelZ, a_Chunk))
 	{
 		if (DoesDropOnUnsuitable())
 		{
-			DropBlock(a_World, NULL, a_BlockX, a_BlockY, a_BlockZ);
+			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+			DropBlock(a_Chunk.GetWorld(), NULL, BlockX, a_RelY, BlockZ);
 		}
 		
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+		a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 	}
 	else
 	{
 		// Wake up the simulators for this block:
-		a_World->WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
+		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+		a_Chunk.GetWorld()->GetSimulatorManager()->WakeUp(BlockX, a_RelY, BlockZ, &a_Chunk);
 	}
 }
 

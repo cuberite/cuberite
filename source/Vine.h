@@ -1,41 +1,42 @@
+
 #pragma once
 
-class cVine												// tolua_export
-{														// tolua_export
+
+
+
+
+// tolua_begin
+class cVine
+{
 public:
 	
-	static NIBBLETYPE DirectionToMetaData( char a_Direction )	// tolua_export
-	{													// tolua_export
-		switch (a_Direction)
+	static NIBBLETYPE DirectionToMetaData(char a_BlockFace)
+	{
+		switch (a_BlockFace)
 		{
-			case 0x2:
-				return 0x1;
-			case 0x3:
-				return 0x4;
-			case 0x4:
-				return 0x8;
-			case 0x5:
-				return 0x2;
-			default:
-				return 0x0;
-		};
-	}													// tolua_export
+			case BLOCK_FACE_NORTH: return 0x1;
+			case BLOCK_FACE_SOUTH: return 0x4;
+			case BLOCK_FACE_WEST:  return 0x8;
+			case BLOCK_FACE_EAST:  return 0x2;
+			default: return 0x0;
+		}
+	}
 
-	static char MetaDataToDirection(NIBBLETYPE a_MetaData )		// tolua_export
-	{														// tolua_export
+
+	static char MetaDataToDirection(NIBBLETYPE a_MetaData)
+	{
 		switch(a_MetaData)
 		{
-			case 0x1:
-				return 0x2;
-			case 0x4:
-				return 0x3;
-			case 0x8:
-				return 0x4;
-			case 0x2:
-				return 0x5;
-			default:
-				return 0x1;
-		};
-	}														// tolua_export
+			case 0x1: return BLOCK_FACE_NORTH;
+			case 0x4: return BLOCK_FACE_SOUTH;
+			case 0x8: return BLOCK_FACE_WEST;
+			case 0x2: return BLOCK_FACE_EAST;
+			default:  return BLOCK_FACE_TOP;
+		}
+	}
+} ;
+// tolua_end
 
-};														// tolua_export
+
+
+

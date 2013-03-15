@@ -22,9 +22,9 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)];
+		return ((a_RelY > 0) && g_BlockIsSolid[a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)]);
 	}
 	
 	

@@ -24,9 +24,16 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		switch (a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ))
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+		
+		// TODO: Cannot be at too much daylight
+		
+		switch (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
 		{
 			case E_BLOCK_GLASS:
 			case E_BLOCK_CACTUS:

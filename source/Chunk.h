@@ -127,10 +127,11 @@ public:
 	
 	void Tick(float a_Dt, MTRand & a_TickRandom);
 
-	int GetPosX() { return m_PosX; }
-	int GetPosY() { return m_PosY; }
-	int GetPosZ() { return m_PosZ; }
-	cWorld * GetWorld() { return m_World; }
+	int GetPosX(void) const { return m_PosX; }
+	int GetPosY(void) const { return m_PosY; }
+	int GetPosZ(void) const { return m_PosZ; }
+	
+	cWorld * GetWorld(void) const { return m_World; }
 
 	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
@@ -143,8 +144,8 @@ public:
 	void QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ);
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	BLOCKTYPE GetBlock( int a_X, int a_Y, int a_Z );
-	BLOCKTYPE GetBlock( int a_BlockIdx );
+	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const;
+	BLOCKTYPE GetBlock(int a_BlockIdx) const;
 	void      GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	void      GetBlockInfo    (int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 	
@@ -252,16 +253,16 @@ public:
 		m_BlockTickZ = a_RelZ;
 	}
 	
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ)                    {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetMeta(int a_BlockIdx)                                        {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
+	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const              {return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetMeta(int a_BlockIdx) const                                  {return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) {       cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_Meta); }
 	inline void       SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)                     {       cChunkDef::SetNibble(m_BlockMeta, a_BlockIdx, a_Meta); }
 
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ); }
 	
 	/// Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
-	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	
 	/// Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -285,9 +286,9 @@ private:
 	bool m_IsSaving;       // True if the chunk is being saved
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 	
-	cCriticalSection            m_CSBlockLists;
-	std::deque< unsigned int >  m_ToTickBlocks;
-	sSetBlockVector             m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
+	cCriticalSection          m_CSBlockLists;
+	std::vector<unsigned int> m_ToTickBlocks;
+	sSetBlockVector           m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 	
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	cClientHandleList  m_LoadedByClient;

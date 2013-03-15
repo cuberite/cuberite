@@ -8,19 +8,36 @@
 
 
 
+/// Meta values for the rail
 enum ENUM_RAIL_DIRECTIONS
 {
-	E_RAIL_NORTH_SOUTH = 0,
-	E_RAIL_EAST_WEST = 1,
-	E_RAIL_ASCEND_EAST = 2,
-	E_RAIL_ASCEND_WEST = 3,
-	E_RAIL_ASCEND_NORTH = 4,
-	E_RAIL_ASCEND_SOUTH = 5,
+	E_RAIL_NORTH_SOUTH       = 0,
+	E_RAIL_EAST_WEST         = 1,
+	E_RAIL_ASCEND_EAST       = 2,
+	E_RAIL_ASCEND_WEST       = 3,
+	E_RAIL_ASCEND_NORTH      = 4,
+	E_RAIL_ASCEND_SOUTH      = 5,
 	E_RAIL_CURVED_SOUTH_EAST = 6,
 	E_RAIL_CURVED_SOUTH_WEST = 7,
 	E_RAIL_CURVED_NORTH_WEST = 8,
-	E_RAIL_CURVED_NORTH_EAST = 9
-};
+	E_RAIL_CURVED_NORTH_EAST = 9,
+
+	// Some useful synonyms:
+	E_RAIL_DIR_X       = E_RAIL_EAST_WEST,
+	E_RAIL_DIR_Z       = E_RAIL_NORTH_SOUTH,
+	E_RAIL_ASCEND_XP   = E_RAIL_ASCEND_EAST,
+	E_RAIL_ASCEND_XM   = E_RAIL_ASCEND_WEST,
+	E_RAIL_ASCEND_ZM   = E_RAIL_ASCEND_NORTH,
+	E_RAIL_ASCEND_ZP   = E_RAIL_ASCEND_SOUTH,
+	E_RAIL_CURVED_XPZP = E_RAIL_CURVED_SOUTH_EAST,
+	E_RAIL_CURVED_XMZP = E_RAIL_CURVED_SOUTH_WEST,
+	E_RAIL_CURVED_XMZM = E_RAIL_CURVED_NORTH_WEST,
+	E_RAIL_CURVED_XPZM = E_RAIL_CURVED_NORTH_EAST,
+} ;
+
+
+
+
 
 enum ENUM_PURE
 {
@@ -65,46 +82,45 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual bool CanBeAt(int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if (!g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)])
+		if (a_RelY <= 0)
 		{
 			return false;
 		}
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+		if (!g_BlockIsSolid[a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)])
+		{
+			return false;
+		}
+
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		switch (Meta)
 		{
 			case E_RAIL_ASCEND_EAST:
-			{
-				if (!g_BlockIsSolid[a_World->GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ)])
-				{
-					return false;
-				}
-				break;
-			}
 			case E_RAIL_ASCEND_WEST:
-			{
-				if (!g_BlockIsSolid[a_World->GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ)])
-				{
-					return false;
-				}
-				break;
-			}
 			case E_RAIL_ASCEND_NORTH:
-			{
-				if (!g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ - 1)])
-				{
-					return false;
-				}
-				break;
-			}
 			case E_RAIL_ASCEND_SOUTH:
 			{
-				if (!g_BlockIsSolid[a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1)])
+				// Mapping between the meta and the neighbors that need checking
+				Meta -= E_RAIL_ASCEND_EAST;  // Base index at zero
+				static const struct
 				{
-					return false;
+					int x, z;
+				} Coords[] =
+				{
+					{ 1,  0},  // east,  XP
+					{-1,  0},  // west,  XM
+					{ 0, -1},  // north, ZM
+					{ 0,  1},  // south, ZP
+				} ;
+				BLOCKTYPE  BlockType;
+				NIBBLETYPE BlockMeta;
+				if (!a_Chunk.UnboundedRelGetBlock(a_RelX + Coords[Meta].x, a_RelY, a_RelZ + Coords[Meta].z, BlockType, BlockMeta))
+				{
+					// Too close to the edge, cannot simulate
+					return true;
 				}
-				break;
+				return g_BlockIsSolid[BlockType];
 			}
 		}
 		return true;
@@ -159,16 +175,16 @@ public:
 		}
 		if (RailsCnt > 1)
 		{
-			if (Neighbors[3] && Neighbors[0]) return E_RAIL_CURVED_SOUTH_EAST;
-			else if(Neighbors[3] && Neighbors[1]) return E_RAIL_CURVED_SOUTH_WEST;
-			else if(Neighbors[2] && Neighbors[0]) return E_RAIL_CURVED_NORTH_EAST;
-			else if(Neighbors[2] && Neighbors[1]) return E_RAIL_CURVED_NORTH_WEST;
-			else if(Neighbors[7] && Neighbors[2]) return E_RAIL_ASCEND_SOUTH;
-			else if(Neighbors[3] && Neighbors[6]) return E_RAIL_ASCEND_NORTH;
-			else if(Neighbors[5] && Neighbors[0]) return E_RAIL_ASCEND_WEST;
-			else if(Neighbors[4] && Neighbors[1]) return E_RAIL_ASCEND_EAST;
-			else if(Neighbors[0] && Neighbors[1]) return E_RAIL_EAST_WEST;
-			else if(Neighbors[2] && Neighbors[3]) return E_RAIL_NORTH_SOUTH;
+			if      (Neighbors[3] && Neighbors[0]) return E_RAIL_CURVED_SOUTH_EAST;
+			else if (Neighbors[3] && Neighbors[1]) return E_RAIL_CURVED_SOUTH_WEST;
+			else if (Neighbors[2] && Neighbors[0]) return E_RAIL_CURVED_NORTH_EAST;
+			else if (Neighbors[2] && Neighbors[1]) return E_RAIL_CURVED_NORTH_WEST;
+			else if (Neighbors[7] && Neighbors[2]) return E_RAIL_ASCEND_SOUTH;
+			else if (Neighbors[3] && Neighbors[6]) return E_RAIL_ASCEND_NORTH;
+			else if (Neighbors[5] && Neighbors[0]) return E_RAIL_ASCEND_WEST;
+			else if (Neighbors[4] && Neighbors[1]) return E_RAIL_ASCEND_EAST;
+			else if (Neighbors[0] && Neighbors[1]) return E_RAIL_EAST_WEST;
+			else if (Neighbors[2] && Neighbors[3]) return E_RAIL_NORTH_SOUTH;
 			ASSERT(!"Weird neighbor count");
 		}
 		return Meta;
@@ -177,68 +193,130 @@ public:
 
 	bool IsUnstable(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_RAIL) return false;
+		if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_RAIL)
+		{
+			return false;
+		}
 		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		switch (Meta)
 		{
 			case E_RAIL_NORTH_SOUTH:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_DOWN) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH, E_PURE_DOWN)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_DOWN) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH, E_PURE_DOWN)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_EAST_WEST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST, E_PURE_DOWN)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST, E_PURE_DOWN)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_ASCEND_EAST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_EAST) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_EAST) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_ASCEND_WEST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_WEST)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_WEST)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_ASCEND_NORTH:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_ASCEND_SOUTH:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_SOUTH)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_SOUTH)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_CURVED_SOUTH_EAST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_CURVED_SOUTH_WEST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_CURVED_NORTH_WEST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)
+				)
+				{
+					return true;
+				}
 				break;
 			}
+			
 			case E_RAIL_CURVED_NORTH_EAST:
 			{
-				if(IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
-				   IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST)) return true;
+				if (
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_World, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST)
+				)
+				{
+					return true;
+				}
 				break;
 			}
 		}
@@ -246,7 +324,7 @@ public:
 	}
 
 
-	bool IsNotConnected(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Pure = 0)
+	bool IsNotConnected(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Pure = 0)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 		NIBBLETYPE Meta;
