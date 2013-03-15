@@ -482,7 +482,7 @@ SORT_MEMBER_DOCS       = YES
 # by member name. If set to NO (the default) the members will appear in 
 # declaration order.
 
-SORT_BRIEF_DOCS        = NO
+SORT_BRIEF_DOCS        = YES
 
 # If the SORT_MEMBERS_CTORS_1ST tag is set to YES then doxygen 
 # will sort the (brief and detailed) documentation of class members so that 
@@ -732,7 +732,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is 
 # run.
 
-EXCLUDE = 
+EXCLUDE                = 
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
@@ -746,10 +746,10 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS = *StackWalker.* \
-                   *LeakFinder.* \
-                   *Bindings.* \
-                   *ManualBindings.*
+EXCLUDE_PATTERNS       = *StackWalker.* \
+                         *LeakFinder.* \
+                         *Bindings.* \
+                         *ManualBindings.*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 
@@ -758,8 +758,8 @@ EXCLUDE_PATTERNS = *StackWalker.* \
 # AClass::ANamespace, ANamespace::*Test
 
 EXCLUDE_SYMBOLS        = _* \
-  __* \
-  abstract
+                         __* \
+                         abstract
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
