@@ -69,14 +69,7 @@ protected:
 	);
 	
 	// cStructureGen override:
-	virtual void GenStructures(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMetas,  // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -94,16 +87,28 @@ protected:
 	int    m_Seed;
 	
 	// cStructureGen override:
-	virtual void GenStructures(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-		cEntityList & a_Entities,               // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-	) override;
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
 	
 	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq);
+} ;
+
+
+
+
+
+class cStructGenLakes :
+	public cStructureGen
+{
+public:
+	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid) : m_Noise(a_Seed), m_Seed(a_Seed), m_Fluid(a_Fluid) {}
+	
+protected:
+	cNoise    m_Noise;
+	int       m_Seed;
+	BLOCKTYPE m_Fluid;
+	
+	// cStructureGen override:
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

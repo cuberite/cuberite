@@ -70,68 +70,62 @@ static bool SortTreeBlocks(const sSetBlock & a_First, const sSetBlock & a_Second
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 
-void cStructGenTrees::GenStructures(
-	int a_ChunkX, int a_ChunkZ, 
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMetas,  // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-)
+void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
 {
-	cChunkDef::BlockTypes   WorkerBlockTypes;
-	cChunkDef::BlockNibbles WorkerBlockMeta;
-	cChunkDef::HeightMap    WorkerHeight;
-
-	cEntityList Entities;
-	cBlockEntityList BlockEntities;
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	
+	cChunkDesc WorkerDesc(ChunkX, ChunkZ);
 	
 	// Generate trees:
 	for (int x = 0; x <= 2; x++)
 	{
-		int BaseX = a_ChunkX + x - 1;
+		int BaseX = ChunkX + x - 1;
 		for (int z = 0; z <= 2; z++)
 		{
-			int BaseZ = a_ChunkZ + z - 1;
+			int BaseZ = ChunkZ + z - 1;
 			
 			cChunkDef::BlockTypes *   BlT;
 			cChunkDef::BlockNibbles * BlM;
 			cChunkDef::HeightMap *    Hei;
-			
-			cChunkDef::BiomeMap Biomes;
-			m_BiomeGen->GenBiomes(BaseX, BaseZ, Biomes);
+			cChunkDef::BiomeMap *     Bio;
+
 
 			if ((x != 1) || (z != 1))
 			{
-				BlT = &WorkerBlockTypes;
-				BlM = &WorkerBlockMeta;
-				Hei = &WorkerHeight;
+				BlT = &(WorkerDesc.GetBlockTypes());
+				BlM = &(WorkerDesc.GetBlockMetas());
+				Hei = &(WorkerDesc.GetHeightMap());
+				Bio = &(WorkerDesc.GetBiomeMap());
+				WorkerDesc.SetChunkCoords(BaseX, BaseZ);
 				
-				m_HeightGen->GenHeightMap       (BaseX, BaseZ, *Hei);
-				m_CompositionGen->ComposeTerrain(BaseX, BaseZ, *BlT, *BlM, *Hei, Biomes, Entities, BlockEntities);
+				m_BiomeGen->GenBiomes           (BaseX, BaseZ, WorkerDesc.GetBiomeMap());
+				m_HeightGen->GenHeightMap       (BaseX, BaseZ, WorkerDesc.GetHeightMap());
+				m_CompositionGen->ComposeTerrain(WorkerDesc);
 				// TODO: Free the entity lists
 			}
 			else
 			{
-				BlT = &a_BlockTypes;
-				BlM = &a_BlockMetas;
-				Hei = &a_HeightMap;
+				BlT = &(a_ChunkDesc.GetBlockTypes());
+				BlM = &(a_ChunkDesc.GetBlockMetas());
+				Hei = &(a_ChunkDesc.GetHeightMap());
+				Bio = &(a_ChunkDesc.GetBiomeMap());
 			}
 
-			int NumTrees = GetNumTrees(BaseX, BaseZ, Biomes);
+			int NumTrees = GetNumTrees(BaseX, BaseZ, *Bio);
 
 			sSetBlockVector OutsideLogs, OutsideOther;
 			for (int i = 0; i < NumTrees; i++)
 			{
-				GenerateSingleTree(BaseX, BaseZ, i, *BlT, *BlM, *Hei, Biomes, OutsideLogs, OutsideOther);
+				GenerateSingleTree(BaseX, BaseZ, i, *BlT, *BlM, *Hei, *Bio, OutsideLogs, OutsideOther);
 			}
 
 			sSetBlockVector IgnoredOverflow;
 			IgnoredOverflow.reserve(OutsideOther.size());
-			ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, OutsideOther, IgnoredOverflow);
+			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetBlockMetas(), OutsideOther, IgnoredOverflow);
 			IgnoredOverflow.clear();
 			IgnoredOverflow.reserve(OutsideLogs.size());
-			ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, OutsideLogs, IgnoredOverflow);
+			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetBlockMetas(), OutsideLogs, IgnoredOverflow);
 		}  // for z
 	}  // for x
 	
@@ -142,9 +136,9 @@ void cStructGenTrees::GenStructures(
 		{
 			for (int y = cChunkDef::Height - 1; y >= 0; y--)
 			{
-				if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) != E_BLOCK_AIR)
+				if (cChunkDef::GetBlock(a_ChunkDesc.GetBlockTypes(), x, y, z) != E_BLOCK_AIR)
 				{
-					cChunkDef::SetHeight(a_HeightMap, x, z, y);
+					cChunkDef::SetHeight(a_ChunkDesc.GetHeightMap(), x, z, y);
 					break;
 				}
 			}  // for y
@@ -306,23 +300,19 @@ int cStructGenTrees::GetNumTrees(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenOreNests:
 
-void cStructGenOreNests::GenStructures(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-	cEntityList & a_Entities,               // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-)
+void cStructGenOreNests::GenStructures(cChunkDesc & a_ChunkDesc)
 {
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_COAL_ORE,     MAX_HEIGHT_COAL,     NUM_NESTS_COAL,     NEST_SIZE_COAL,     a_BlockTypes, 1);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_IRON_ORE,     MAX_HEIGHT_IRON,     NUM_NESTS_IRON,     NEST_SIZE_IRON,     a_BlockTypes, 2);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_REDSTONE_ORE, MAX_HEIGHT_REDSTONE, NUM_NESTS_REDSTONE, NEST_SIZE_REDSTONE, a_BlockTypes, 3);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     a_BlockTypes, 4);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  a_BlockTypes, 5);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_LAPIS_ORE,    MAX_HEIGHT_LAPIS,    NUM_NESTS_LAPIS,    NEST_SIZE_LAPIS,    a_BlockTypes, 6);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_DIRT,         MAX_HEIGHT_DIRT,     NUM_NESTS_DIRT,     NEST_SIZE_DIRT,     a_BlockTypes, 10);
-	GenerateOre(a_ChunkX, a_ChunkZ, E_BLOCK_GRAVEL,       MAX_HEIGHT_GRAVEL,   NUM_NESTS_GRAVEL,   NEST_SIZE_GRAVEL,   a_BlockTypes, 11);
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_COAL_ORE,     MAX_HEIGHT_COAL,     NUM_NESTS_COAL,     NEST_SIZE_COAL,     BlockTypes, 1);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_IRON_ORE,     MAX_HEIGHT_IRON,     NUM_NESTS_IRON,     NEST_SIZE_IRON,     BlockTypes, 2);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_REDSTONE_ORE, MAX_HEIGHT_REDSTONE, NUM_NESTS_REDSTONE, NEST_SIZE_REDSTONE, BlockTypes, 3);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     BlockTypes, 4);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  BlockTypes, 5);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_LAPIS_ORE,    MAX_HEIGHT_LAPIS,    NUM_NESTS_LAPIS,    NEST_SIZE_LAPIS,    BlockTypes, 6);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_DIRT,         MAX_HEIGHT_DIRT,     NUM_NESTS_DIRT,     NEST_SIZE_DIRT,     BlockTypes, 10);
+	GenerateOre(ChunkX, ChunkZ, E_BLOCK_GRAVEL,       MAX_HEIGHT_GRAVEL,   NUM_NESTS_GRAVEL,   NEST_SIZE_GRAVEL,   BlockTypes, 11);
 }
 
 

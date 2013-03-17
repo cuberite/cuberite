@@ -33,6 +33,11 @@ public:
 
 	// tolua_begin
 
+	int GetChunkX(void) const { return m_ChunkX; }
+	int GetChunkZ(void) const { return m_ChunkZ; }
+	
+	void SetChunkCoords(int a_ChunkX, int a_ChunkZ);
+	
 	void       FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void       SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	void       GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
@@ -67,16 +72,19 @@ public:
 	/// Reads an area from the chunk into a cBlockArea
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
 
+	/// Returns the maximum height value in the heightmap
+	HEIGHTTYPE GetMaxHeight(void) const;
+	
 	// tolua_end
 	
 	
 	// Accessors used by cChunkGenerator::Generator descendants:
-	cChunkDef::BiomeMap &     GetBiomeMap     (void) { return m_BiomeMap; }
-	cChunkDef::BlockTypes &   GetBlockTypes   (void) { return m_BlockTypes; }
-	cChunkDef::BlockNibbles & GetBlockMetas   (void) { return m_BlockMeta; }
-	cChunkDef::HeightMap &    GetHeightMap    (void) { return m_HeightMap; }
-	cEntityList &             GetEntities     (void) { return m_Entities; }
-	cBlockEntityList &        GetBlockEntities(void) { return m_BlockEntities; }
+	inline cChunkDef::BiomeMap &     GetBiomeMap     (void) { return m_BiomeMap; }
+	inline cChunkDef::BlockTypes &   GetBlockTypes   (void) { return m_BlockTypes; }
+	inline cChunkDef::BlockNibbles & GetBlockMetas   (void) { return m_BlockMeta; }
+	inline cChunkDef::HeightMap &    GetHeightMap    (void) { return m_HeightMap; }
+	inline cEntityList &             GetEntities     (void) { return m_Entities; }
+	inline cBlockEntityList &        GetBlockEntities(void) { return m_BlockEntities; }
 	
 private:
 	int m_ChunkX;

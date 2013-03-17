@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/14/13 10:02:26.
+** Generated automatically by tolua++-1.0.92 on 03/17/13 18:47:08.
 */
 
 #ifndef __cplusplus
@@ -347,9 +347,9 @@ static int tolua_AllToLua_cVine_DirectionToMetaData00(lua_State* tolua_S)
  else
 #endif
  {
-  char a_Direction = ((char)  tolua_tonumber(tolua_S,2,0));
+  char a_BlockFace = ((char)  tolua_tonumber(tolua_S,2,0));
   {
-   unsigned char tolua_ret = (unsigned char)  cVine::DirectionToMetaData(a_Direction);
+   unsigned char tolua_ret = (unsigned char)  cVine::DirectionToMetaData(a_BlockFace);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -19595,6 +19595,105 @@ static int tolua_AllToLua_cBlockArea_HasBlockSkyLights00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetChunkX of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_GetChunkX00
+static int tolua_AllToLua_cChunkDesc_GetChunkX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cChunkDesc* self = (const cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetChunkX'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetChunkX();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetChunkX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetChunkZ of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_GetChunkZ00
+static int tolua_AllToLua_cChunkDesc_GetChunkZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cChunkDesc* self = (const cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetChunkZ'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetChunkZ();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetChunkZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetChunkCoords of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_SetChunkCoords00
+static int tolua_AllToLua_cChunkDesc_SetChunkCoords00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+  int a_ChunkX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_ChunkZ = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetChunkCoords'", NULL);
+#endif
+  {
+   self->SetChunkCoords(a_ChunkX,a_ChunkZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetChunkCoords'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: FillBlocks of class  cChunkDesc */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_FillBlocks00
 static int tolua_AllToLua_cChunkDesc_FillBlocks00(lua_State* tolua_S)
@@ -20418,6 +20517,38 @@ static int tolua_AllToLua_cChunkDesc_ReadBlockArea00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ReadBlockArea'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetMaxHeight of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_GetMaxHeight00
+static int tolua_AllToLua_cChunkDesc_GetMaxHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cChunkDesc* self = (const cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxHeight'", NULL);
+#endif
+  {
+   unsigned char tolua_ret = ( unsigned char)  self->GetMaxHeight();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxHeight'.",&tolua_err);
  return 0;
 #endif
 }
@@ -22505,6 +22636,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cChunkDesc","cChunkDesc","",NULL);
   tolua_beginmodule(tolua_S,"cChunkDesc");
+   tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cChunkDesc_GetChunkX00);
+   tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cChunkDesc_GetChunkZ00);
+   tolua_function(tolua_S,"SetChunkCoords",tolua_AllToLua_cChunkDesc_SetChunkCoords00);
    tolua_function(tolua_S,"FillBlocks",tolua_AllToLua_cChunkDesc_FillBlocks00);
    tolua_function(tolua_S,"SetBlockTypeMeta",tolua_AllToLua_cChunkDesc_SetBlockTypeMeta00);
    tolua_function(tolua_S,"GetBlockTypeMeta",tolua_AllToLua_cChunkDesc_GetBlockTypeMeta00);
@@ -22528,6 +22662,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsUsingDefaultFinish",tolua_AllToLua_cChunkDesc_IsUsingDefaultFinish00);
    tolua_function(tolua_S,"WriteBlockArea",tolua_AllToLua_cChunkDesc_WriteBlockArea00);
    tolua_function(tolua_S,"ReadBlockArea",tolua_AllToLua_cChunkDesc_ReadBlockArea00);
+   tolua_function(tolua_S,"GetMaxHeight",tolua_AllToLua_cChunkDesc_GetMaxHeight00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cCraftingGrid","cCraftingGrid","",tolua_collect_cCraftingGrid);

@@ -755,20 +755,15 @@ void cStructGenWormNestCaves::ClearCache(void)
 
 
 
-void cStructGenWormNestCaves::GenStructures(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-	cEntityList & a_Entities,               // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-)
+void cStructGenWormNestCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 {
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	cCaveSystems Caves;
-	GetCavesForChunk(a_ChunkX, a_ChunkZ, Caves);
+	GetCavesForChunk(ChunkX, ChunkZ, Caves);
 	for (cCaveSystems::const_iterator itr = Caves.begin(); itr != Caves.end(); ++itr)
 	{
-		(*itr)->ProcessChunk(a_ChunkX, a_ChunkZ, a_BlockTypes, a_HeightMap);
+		(*itr)->ProcessChunk(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
 	}  // for itr - Caves[]
 }
 
@@ -900,27 +895,20 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
 
 
 
-void cStructGenMarbleCaves::GenStructures(
-	int a_ChunkX, int a_ChunkZ, 
-	cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-	cEntityList & a_Entities,               // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-)
+void cStructGenMarbleCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 {
 	cNoise Noise(m_Seed);
 	for (int z = 0; z < cChunkDef::Width; z++) 
 	{
-		const float zz = (float)(a_ChunkZ * cChunkDef::Width + z);
+		const float zz = (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z);
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			const float xx = (float)(a_ChunkX * cChunkDef::Width + x);
+			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x);
 			
-			int Top = cChunkDef::GetHeight(a_HeightMap, x, z);
+			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y < Top; ++y )
 			{
-				if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) != E_BLOCK_STONE)
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_STONE)
 				{
 					continue;
 				}
@@ -929,7 +917,7 @@ void cStructGenMarbleCaves::GenStructures(
 				const float WaveNoise = 1;
 				if (cosf(GetMarbleNoise(xx, yy * 0.5f, zz, Noise)) * fabs(cosf(yy * 0.2f + WaveNoise * 2) * 0.75f + WaveNoise) > 0.0005f)
 				{
-					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
 				}
 			}  // for y
 		}  // for x
@@ -943,43 +931,27 @@ void cStructGenMarbleCaves::GenStructures(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenDualRidgeCaves:
 
-void cStructGenDualRidgeCaves::GenStructures(
-	int a_ChunkX, int a_ChunkZ, 
-	cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-	cEntityList & a_Entities,               // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-)
+void cStructGenDualRidgeCaves::GenStructures(cChunkDesc & a_ChunkDesc)
 {
-	cNoise Noise1(m_Seed);
-	cNoise Noise2(2 * m_Seed + 19999);
 	for (int z = 0; z < cChunkDef::Width; z++) 
 	{
-		const float zz = (float)(a_ChunkZ * cChunkDef::Width + z) / 10;
+		const float zz = (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			const float xx = (float)(a_ChunkX * cChunkDef::Width + x) / 10;
+			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10;
 			
-			int Top = cChunkDef::GetHeight(a_HeightMap, x, z);
+			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y <= Top; ++y)
 			{
-				/*
-				if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) != E_BLOCK_STONE)
-				{
-					continue;
-				}
-				*/
-
 				const float yy = (float)y / 10;
 				const float WaveNoise = 1;
-				float n1 = Noise1.CubicNoise3D(xx, yy, zz);
-				float n2 = Noise2.CubicNoise3D(xx, yy, zz);
-				float n3 = Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
-				float n4 = Noise2.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
+				float n1 = m_Noise1.CubicNoise3D(xx, yy, zz);
+				float n2 = m_Noise2.CubicNoise3D(xx, yy, zz);
+				float n3 = m_Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
+				float n4 = m_Noise2.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
 				if ((abs(n1 + n3) * abs(n2 + n4)) > m_Threshold)
 				{
-					cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
 				}
 			}  // for y
 		}  // for x

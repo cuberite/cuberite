@@ -117,20 +117,15 @@ void cStructGenRavines::ClearCache(void)
 
 
 
-void cStructGenRavines::GenStructures(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-	cEntityList & a_Entities,               // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-)
+void cStructGenRavines::GenStructures(cChunkDesc & a_ChunkDesc)
 {
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	cRavines Ravines;
-	GetRavinesForChunk(a_ChunkX, a_ChunkZ, Ravines);
-	for (cRavines::const_iterator itr = Ravines.begin(); itr != Ravines.end(); ++itr)
+	GetRavinesForChunk(ChunkX, ChunkZ, Ravines);
+	for (cRavines::const_iterator itr = Ravines.begin(), end = Ravines.end(); itr != end; ++itr)
 	{
-		(*itr)->ProcessChunk(a_ChunkX, a_ChunkZ, a_BlockTypes, a_HeightMap);
+		(*itr)->ProcessChunk(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
 	}  // for itr - Ravines[]
 }
 

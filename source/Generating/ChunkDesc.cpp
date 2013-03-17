@@ -39,6 +39,16 @@ cChunkDesc::~cChunkDesc()
 
 
 
+void cChunkDesc::SetChunkCoords(int a_ChunkX, int a_ChunkZ)
+{
+	m_ChunkX = a_ChunkX;
+	m_ChunkZ = a_ChunkZ;
+}
+
+
+
+
+
 void cChunkDesc::FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	const NIBBLETYPE CompressedMeta = a_BlockMeta | (a_BlockMeta << 4);
@@ -407,6 +417,22 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	}  // for y
 }
 
+
+
+
+
+HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
+{
+	HEIGHTTYPE MaxHeight = m_HeightMap[0];
+	for (int i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
+	{
+		if (m_HeightMap[i] > MaxHeight)
+		{
+			MaxHeight = m_HeightMap[i];
+		}
+	}
+	return MaxHeight;
+}
 
 
 

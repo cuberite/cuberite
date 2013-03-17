@@ -30,14 +30,7 @@ protected:
 	int m_Seed;
 	
 	// cStructureGen override:
-	virtual void GenStructures(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-		cEntityList & a_Entities,               // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-	) override;
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -49,25 +42,21 @@ class cStructGenDualRidgeCaves :
 {
 public:
 	cStructGenDualRidgeCaves(int a_Seed, float a_Threshold) :
+		m_Noise1(a_Seed),
+		m_Noise2(2 * a_Seed + 19999),
 		m_Seed(a_Seed),
 		m_Threshold(a_Threshold)
 	{
 	}
 	
 protected:
-
-	int m_Seed;
-	float m_Threshold;
+	cNoise m_Noise1;
+	cNoise m_Noise2;
+	int    m_Seed;
+	float  m_Threshold;
 	
 	// cStructureGen override:
-	virtual void GenStructures(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-		cEntityList & a_Entities,               // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-	) override;
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -105,14 +94,7 @@ protected:
 	void GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cCaveSystems & a_Caves);
 	
 	// cStructGen override:
-	virtual void GenStructures(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-		cEntityList & a_Entities,               // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-	) override;
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

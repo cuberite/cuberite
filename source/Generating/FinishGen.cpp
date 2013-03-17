@@ -42,12 +42,7 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
-bool cFinishGenSprinkleFoliage::TryAddSugarcane(
-	int a_ChunkX, int a_ChunkZ,
-	int a_RelX, int a_RelY, int a_RelZ,
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDef::BlockNibbles & a_BlockMeta
-)
+bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)
 {
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
 	if (
@@ -60,7 +55,7 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(
 	}
 
 	// Only allow dirt, grass or sand below sugarcane:
-	switch (cChunkDef::GetBlock(a_BlockTypes, a_RelX, a_RelY, a_RelZ))
+	switch (a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ))
 	{
 		case E_BLOCK_DIRT:
 		case E_BLOCK_GRASS:
@@ -76,17 +71,17 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(
 
 	// Water is required next to the block below the sugarcane:
 	if (
-		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX - 1, a_RelY, a_RelZ)) &&
-		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX + 1, a_RelY, a_RelZ)) &&
-		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX    , a_RelY, a_RelZ - 1)) &&
-		!IsWater(cChunkDef::GetBlock(a_BlockTypes, a_RelX    , a_RelY, a_RelZ + 1))
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX    , a_RelY, a_RelZ - 1)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX    , a_RelY, a_RelZ + 1))
 	)
 	{
 		return false;
 	}
 	
 	// All conditions met, place a sugarcane here:
-	cChunkDef::SetBlock(a_BlockTypes, a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
+	a_ChunkDesc.SetBlockType(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
 	return true;
 }
 
@@ -94,38 +89,29 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(
 
 
 
-void cFinishGenSprinkleFoliage::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	)
+void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Generate small foliage (1-block):
 	
 	// TODO: Update heightmap with 1-block-tall foliage
-	cNoise Noise(m_Seed);
 	for (int z = 0; z < cChunkDef::Width; z++) 
 	{
-		int BlockZ = a_ChunkZ * cChunkDef::Width + z;
+		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 		const float zz = (float)BlockZ;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int BlockX = a_ChunkX * cChunkDef::Width + x;
-			if (((Noise.IntNoise2DInt(BlockX, BlockZ) / 8) % 128) < 124)
+			int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
+			if (((m_Noise.IntNoise2DInt(BlockX, BlockZ) / 8) % 128) < 124)
 			{
 				continue;
 			}
-			int Top = cChunkDef::GetHeight(a_HeightMap, x, z);
+			int Top = a_ChunkDesc.GetHeight(x, z);
 			if (Top > 250)
 			{
 				// Nothing grows above Y=250
 				continue;
 			}
-			if (cChunkDef::GetBlock(a_BlockTypes, x, Top + 1, z) != E_BLOCK_AIR)
+			if (a_ChunkDesc.GetBlockType(x, Top + 1, z) != E_BLOCK_AIR)
 			{
 				// Space already taken by something else, don't grow here
 				// WEIRD, since we're using heightmap, so there should NOT be anything above it
@@ -133,43 +119,41 @@ void cFinishGenSprinkleFoliage::GenFinish(
 			}
 			
 			const float xx = (float)BlockX;
-			float val1 = Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
-			float val2 = Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
-			switch (cChunkDef::GetBlock(a_BlockTypes, x, Top, z))
+			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
+			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
+			switch (a_ChunkDesc.GetBlockType(x, Top, z))
 			{
 				case E_BLOCK_GRASS:
 				{
-					float val3 = Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10 );
-					float val4 = Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20 );
+					float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10 );
+					float val4 = m_Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20 );
 					if (val1 + val2 > 0.2f)
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_YELLOW_FLOWER);
+						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_YELLOW_FLOWER);
 					}
 					else if (val2 + val3 > 0.2f)
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_RED_ROSE);
+						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_RED_ROSE);
 					}
 					else if (val3 + val4 > 0.2f)
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_RED_MUSHROOM);
+						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_RED_MUSHROOM);
 					}
 					else if (val1 + val4 > 0.2f)
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_BROWN_MUSHROOM);
+						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_BROWN_MUSHROOM);
 					}
 					else if (val1 + val2 + val3 + val4 < -0.1)
 					{
-						cChunkDef::SetBlock (a_BlockTypes, x, ++Top, z, E_BLOCK_TALL_GRASS);
-						cChunkDef::SetNibble(a_BlockMeta,  x,   Top, z, E_META_TALL_GRASS_GRASS);
+						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
 					}
-					else if (TryAddSugarcane(a_ChunkX, a_ChunkZ, x, Top, z, a_BlockTypes, a_BlockMeta))
+					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
 						++Top;
 					}
 					else if ((val1 > 0.5) && (val2 < -0.5))
 					{
-						cChunkDef::SetBlock (a_BlockTypes, x, ++Top, z, E_BLOCK_PUMPKIN);
-						cChunkDef::SetNibble(a_BlockMeta,  x,   Top, z, (int)(val3 * 8) % 4);
+						a_ChunkDesc.SetBlockTypeMeta(x, ++Top, z, E_BLOCK_PUMPKIN, (int)(val3 * 8) % 4);
 					}
 					break;
 				}  // case E_BLOCK_GRASS
@@ -181,22 +165,22 @@ void cFinishGenSprinkleFoliage::GenFinish(
 						(x > 0) && (x < cChunkDef::Width - 1) &&
 						(z > 0) && (z < cChunkDef::Width - 1) &&
 						(val1 + val2 > 0.5f) &&
-						(cChunkDef::GetBlock(a_BlockTypes, x + 1, y, z)     == E_BLOCK_AIR) &&
-						(cChunkDef::GetBlock(a_BlockTypes, x - 1, y, z)     == E_BLOCK_AIR) &&
-						(cChunkDef::GetBlock(a_BlockTypes, x,     y, z + 1) == E_BLOCK_AIR) &&
-						(cChunkDef::GetBlock(a_BlockTypes, x,     y, z - 1) == E_BLOCK_AIR)
+						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
+						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
+						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
+						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR)
 					)
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, ++Top, z, E_BLOCK_CACTUS);
+						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
 					}
-					else if (TryAddSugarcane(a_ChunkX, a_ChunkZ, x, Top, z, a_BlockTypes, a_BlockMeta))
+					else if (TryAddSugarcane(a_ChunkDesc, x, Top, z))
 					{
 						++Top;
 					}
 					break;
 				}
 			}  // switch (TopBlock)
-			cChunkDef::SetHeight(a_HeightMap, x, z, Top);
+			a_ChunkDesc.SetHeight(x, z, Top);
 		}  // for y
 	}  // for z
 }
@@ -208,22 +192,14 @@ void cFinishGenSprinkleFoliage::GenFinish(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSnow:
 
-void cFinishGenSnow::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	)
+void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Add a snow block in snowy biomes onto blocks that can be snowed over
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+			switch (a_ChunkDesc.GetBiome(x, z))
 			{
 				case biIcePlains:
 				case biIceMountains:
@@ -232,11 +208,11 @@ void cFinishGenSnow::GenFinish(
 				case biFrozenRiver:
 				case biFrozenOcean:
 				{
-					int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
-					if (g_BlockIsSnowable[cChunkDef::GetBlock(a_BlockTypes, x, Height, z)])
+					int Height = a_ChunkDesc.GetHeight(x, z);
+					if (g_BlockIsSnowable[a_ChunkDesc.GetBlockType(x, Height, z)])
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, Height + 1, z, E_BLOCK_SNOW);
-						cChunkDef::SetHeight(a_HeightMap, x, z, Height + 1);
+						a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
+						a_ChunkDesc.SetHeight(x, z, Height + 1);
 					}
 					break;
 				}
@@ -252,22 +228,14 @@ void cFinishGenSnow::GenFinish(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenIce:
 
-void cFinishGenIce::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	)
+void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Turn surface water into ice in icy biomes
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+			switch (a_ChunkDesc.GetBiome(x, z))
 			{
 				case biIcePlains:
 				case biIceMountains:
@@ -276,13 +244,13 @@ void cFinishGenIce::GenFinish(
 				case biFrozenRiver:
 				case biFrozenOcean:
 				{
-					int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
-					switch (cChunkDef::GetBlock(a_BlockTypes, x, Height, z))
+					int Height = a_ChunkDesc.GetHeight(x, z);
+					switch (a_ChunkDesc.GetBlockType(x, Height, z))
 					{
 						case E_BLOCK_WATER:
 						case E_BLOCK_STATIONARY_WATER:
 						{
-							cChunkDef::SetBlock(a_BlockTypes, x, Height, z, E_BLOCK_ICE);
+							a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_ICE);
 							break;
 						}
 					}
@@ -300,68 +268,58 @@ void cFinishGenIce::GenFinish(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenLilypads:
 
-int cFinishGenLilypads::GetNumLilypads(const cChunkDef::BiomeMap & a_BiomeMap)
+int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	int res = 0;
 	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
-		if (a_BiomeMap[i] == biSwampland)
+		if (a_BiomeMap[i] == m_Biome)
 		{
 			res++;
 		}
 	}  // for i - a_BiomeMap[]
-	return res / 64;
+	return m_Amount * res / 256;
 }
 
 
 
 
 
-void cFinishGenLilypads::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-)
+void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Add Lilypads on top of water surface in Swampland
 
-	int NumLilypads = GetNumLilypads(a_BiomeMap);
-	for (int i = 0; i < NumLilypads; i++)
+	int NumToGen = GetNumToGen(a_ChunkDesc.GetBiomeMap());
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	for (int i = 0; i < NumToGen; i++)
 	{
-		int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, i) / 13) % cChunkDef::Width;
-		int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, i, a_ChunkZ) / 11) % cChunkDef::Width;
+		int x = (m_Noise.IntNoise3DInt(ChunkX + ChunkZ, ChunkZ, i) / 13) % cChunkDef::Width;
+		int z = (m_Noise.IntNoise3DInt(ChunkX - ChunkZ, i, ChunkZ) / 11) % cChunkDef::Width;
 
-		// Place a lily pad at {x, z} if possible (swampland, empty block, water below):
-		if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biSwampland)
+		// Place the block at {x, z} if possible:
+		if (a_ChunkDesc.GetBiome(x, z) != m_Biome)
 		{
-			// not swampland
+			// Incorrect biome
 			continue;
 		}
-		int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+		int Height = a_ChunkDesc.GetHeight(x, z);
 		if (Height >= cChunkDef::Height)
 		{
 			// Too high up
 			continue;
 		}
-		if (cChunkDef::GetBlock(a_BlockTypes, x, Height + 1, z) != E_BLOCK_AIR)
+		if (a_ChunkDesc.GetBlockType(x, Height + 1, z) != E_BLOCK_AIR)
 		{
-			// not empty block
+			// Not an empty block
 			continue;
 		}
-		switch (cChunkDef::GetBlock(a_BlockTypes, x, Height, z))
+		BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, Height, z);
+		if ((BlockBelow == m_AllowedBelow1) || (BlockBelow == m_AllowedBelow2))
 		{
-			case E_BLOCK_WATER:
-			case E_BLOCK_STATIONARY_WATER:
-			{
-				cChunkDef::SetBlock(a_BlockTypes, x, Height + 1, z, E_BLOCK_LILY_PAD);
-				cChunkDef::SetHeight(a_HeightMap, x, z, Height + 1);
-				break;
-			}
-		}  // switch (GetBlock)
+			a_ChunkDesc.SetBlockType(x, Height + 1, z, m_BlockType);
+			a_ChunkDesc.SetHeight(x, z, Height + 1);
+		}
 	}  // for i
 }
 
@@ -372,24 +330,17 @@ void cFinishGenLilypads::GenFinish(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenBottomLava:
 
-void cFinishGenBottomLava::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-)
+void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 {
+	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
 	for (int y = m_Level; y > 0; y--)
 	{
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
-			if (a_BlockTypes[Index] == E_BLOCK_AIR)
+			if (BlockTypes[Index] == E_BLOCK_AIR)
 			{
-				a_BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
+				BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
 			}
 		}  // for x, for z
 	}  // for y
@@ -411,19 +362,11 @@ cFinishGenPreSimulator::cFinishGenPreSimulator(void)
 
 
 
-void cFinishGenPreSimulator::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-)
+void cFinishGenPreSimulator::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	CollapseSandGravel(a_BlockTypes, a_HeightMap);
-	StationarizeFluid(a_BlockTypes, a_HeightMap, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	StationarizeFluid(a_BlockTypes, a_HeightMap, E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	CollapseSandGravel(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
+	StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
 	// TODO: other operations
 }
 
@@ -575,77 +518,6 @@ void cFinishGenPreSimulator::StationarizeFluid(
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cFinishGenDeadBushes:
-
-int cFinishGenDeadBushes::GetNumDeadBushes(const cChunkDef::BiomeMap & a_BiomeMap)
-{
-	int res = 0;
-	for (int i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
-	{
-		if (a_BiomeMap[i] == biDesert)
-		{
-			res++;
-		}
-	}  // for i - a_BiomeMap[]
-	return res / 128;
-}
-
-
-
-
-
-void cFinishGenDeadBushes::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-)
-{
-	// Add DeadBushes on top of sand surface in Desert
-
-	int NumDeadBushes = GetNumDeadBushes(a_BiomeMap);
-	for (int i = 0; i < NumDeadBushes; i++)
-	{
-		int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, i) / 13) % cChunkDef::Width;
-		int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, i, a_ChunkZ) / 11) % cChunkDef::Width;
-
-		// Place a dead bush at {x, z} if possible (desert, empty block, sand below):
-		if (cChunkDef::GetBiome(a_BiomeMap, x, z) != biDesert)
-		{
-			// not swampland
-			continue;
-		}
-		int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
-		if (Height >= cChunkDef::Height)
-		{
-			// Too high up
-			continue;
-		}
-		if (cChunkDef::GetBlock(a_BlockTypes, x, Height + 1, z) != E_BLOCK_AIR)
-		{
-			// not empty block
-			continue;
-		}
-		switch (cChunkDef::GetBlock(a_BlockTypes, x, Height, z))
-		{
-			case E_BLOCK_SAND:
-			{
-				cChunkDef::SetBlock(a_BlockTypes, x, Height + 1, z, E_BLOCK_DEAD_BUSH);
-				cChunkDef::SetHeight(a_HeightMap, x, z, Height + 1);
-				break;
-			}
-		}  // switch (GetBlock)
-	}  // for i
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenFluidSprings:
 
 cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, const cWorld & a_World) :
@@ -699,17 +571,9 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 
 
 
-void cFinishGenFluidSprings::GenFinish(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-	const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-	cEntityList & a_Entities,                // Entities may be added or deleted
-	cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-)
+void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	int ChanceRnd = (m_Noise.IntNoise3DInt(128 * a_ChunkX, 512, 256 * a_ChunkZ) / 13) % 100;
+	int ChanceRnd = (m_Noise.IntNoise3DInt(128 * a_ChunkDesc.GetChunkX(), 512, 256 * a_ChunkDesc.GetChunkZ()) / 13) % 100;
 	if (ChanceRnd > m_Chance)
 	{
 		// Not in this chunk
@@ -717,7 +581,7 @@ void cFinishGenFluidSprings::GenFinish(
 	}
 	
 	// Get the height at which to try:
-	int Height = m_Noise.IntNoise3DInt(128 * a_ChunkX, 512, 256 * a_ChunkZ) / 11;
+	int Height = m_Noise.IntNoise3DInt(128 * a_ChunkDesc.GetChunkX(), 1024, 256 * a_ChunkDesc.GetChunkZ()) / 11;
 	Height %= m_HeightDistribution.GetSum();
 	Height = m_HeightDistribution.MapValue(Height);
 	
@@ -729,20 +593,12 @@ void cFinishGenFluidSprings::GenFinish(
 		{
 			for (int x = 1; x < cChunkDef::Width - 1; x++)
 			{
-				switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
+				switch (a_ChunkDesc.GetBlockType(x, y, z))
 				{
 					case E_BLOCK_NETHERRACK:
-					{
-						if (m_Fluid != E_BLOCK_LAVA)
-						{
-							// Only lava springs in the netherrack
-							continue;
-						}
-						// fallthrough:
-					}
 					case E_BLOCK_STONE:
 					{
-						if (TryPlaceSpring(a_BlockTypes, a_BlockMeta, x, y, z))
+						if (TryPlaceSpring(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetBlockMetas(), x, y, z))
 						{
 							// Succeeded, bail out
 							return;

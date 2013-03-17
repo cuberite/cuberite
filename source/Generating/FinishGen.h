@@ -28,15 +28,7 @@ class cFinishGenSnow :
 {
 protected:
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -48,15 +40,7 @@ class cFinishGenIce :
 {
 protected:
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -67,59 +51,57 @@ class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {
 public:
-	cFinishGenSprinkleFoliage(int a_Seed) : m_Seed(a_Seed) {}
+	cFinishGenSprinkleFoliage(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
 	
 protected:
-	int m_Seed;
+	cNoise m_Noise;
+	int    m_Seed;
 	
 	/// Tries to place sugarcane at the coords specified, returns true if successful
-	bool TryAddSugarcane(
-		int a_ChunkX, int a_ChunkZ,
-		int a_RelX, int a_RelY, int a_RelZ,      // relative block coords of the sugarcane's base
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta    // Block meta to read and change
-	);
+	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);
 	
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
 
 
 
-class cFinishGenLilypads :
+/** This class adds a single top block in random positions in the specified biome on top of specified allowed blocks.
+Used for:
+- Lilypads finisher
+- DeadBushes finisher
+*/
+class cFinishGenSingleBiomeSingleTopBlock :
 	public cFinishGen
 {
 public:
-	cFinishGenLilypads(int a_Seed) :
-		m_Noise(a_Seed)
+	cFinishGenSingleBiomeSingleTopBlock(
+		int a_Seed, BLOCKTYPE a_BlockType, EMCSBiome a_Biome, int a_Amount,
+		BLOCKTYPE a_AllowedBelow1, BLOCKTYPE a_AllowedBelow2
+	) :
+		m_Noise(a_Seed),
+		m_BlockType(a_BlockType),
+		m_Biome(a_Biome),
+		m_Amount(a_Amount),
+		m_AllowedBelow1(a_AllowedBelow1),
+		m_AllowedBelow2(a_AllowedBelow2)
 	{
 	}
 	
 protected:
 	cNoise m_Noise;
+	BLOCKTYPE m_BlockType;
+	EMCSBiome m_Biome;
+	int       m_Amount;         ///< Relative amount of blocks to try adding. 1 = one block per 256 biome columns.
+	BLOCKTYPE m_AllowedBelow1;  ///< First  of the two blocktypes that are allowed below m_BlockType
+	BLOCKTYPE m_AllowedBelow2;  ///< Second of the two blocktypes that are allowed below m_BlockType
 	
-	int GetNumLilypads(const cChunkDef::BiomeMap & a_BiomeMap);
+	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
 	
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -139,15 +121,7 @@ protected:
 	int m_Level;
 	
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -179,47 +153,8 @@ protected:
 	);
 
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
-
-
-
-
-
-class cFinishGenDeadBushes :
-	public cFinishGen
-{
-public:
-	cFinishGenDeadBushes(int a_Seed) :
-		m_Noise(a_Seed)
-	{
-	}
-	
-protected:
-	cNoise m_Noise;
-	
-	int GetNumDeadBushes(const cChunkDef::BiomeMap & a_BiomeMap);
-	
-	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
-} ;
-
 
 
 
@@ -239,15 +174,7 @@ protected:
 	int            m_Chance;  ///< Chance, [0..100], that a spring will be generated in a chunk
 
 	// cFinishGen override:
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/// Tries to place a spring at the specified coords, checks neighbors. Returns true	if successful
 	bool TryPlaceSpring(

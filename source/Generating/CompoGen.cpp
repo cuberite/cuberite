@@ -18,18 +18,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenSameBlock:
 
-void cCompoGenSameBlock::ComposeTerrain(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
-	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
-	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
-	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
-	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
-	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
-)
+void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
-	memset(a_BlockTypes, E_BLOCK_AIR, sizeof(a_BlockTypes));
-	memset(a_BlockMeta, 0, sizeof(a_BlockMeta));
+	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
+	memset(a_ChunkDesc.GetBlockMetas(), 0, sizeof(a_ChunkDesc.GetBlockMetas()));
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -37,16 +29,16 @@ void cCompoGenSameBlock::ComposeTerrain(
 			int Start;
 			if (m_IsBedrocked)
 			{
-				a_BlockTypes[cChunkDef::MakeIndex(x, 0, z)] = E_BLOCK_BEDROCK;
+				a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 				Start = 1;
 			}
 			else
 			{
 				Start = 0;
 			}
-			for (int y = a_HeightMap[x + cChunkDef::Width * z]; y >= Start; y--)
+			for (int y = a_ChunkDesc.GetHeight(x, z); y >= Start; y--)
 			{
-				a_BlockTypes[cChunkDef::MakeIndex(x, y, z)] = m_BlockType;
+				a_ChunkDesc.SetBlockType(x, y, z, m_BlockType);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -59,15 +51,7 @@ void cCompoGenSameBlock::ComposeTerrain(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenDebugBiomes:
 
-void cCompoGenDebugBiomes::ComposeTerrain(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
-	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
-	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
-	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
-	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
-	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
-)
+void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
 	static BLOCKTYPE Blocks[] =
 	{
@@ -96,17 +80,17 @@ void cCompoGenDebugBiomes::ComposeTerrain(
 		E_BLOCK_BEDROCK,
 	} ;
 	
-	memset(a_BlockTypes, E_BLOCK_AIR, sizeof(a_BlockTypes));
-	memset(a_BlockMeta, 0, sizeof(a_BlockMeta));
+	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
+	memset(a_ChunkDesc.GetBlockMetas(), 0,           sizeof(a_ChunkDesc.GetBlockMetas()));
 
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			BLOCKTYPE BlockType = Blocks[cChunkDef::GetBiome(a_BiomeMap, x, z) % ARRAYCOUNT(Blocks)];
-			for (int y = a_HeightMap[x + cChunkDef::Width * z]; y >= 0; y--)
+			BLOCKTYPE BlockType = Blocks[a_ChunkDesc.GetBiome(x, z)];
+			for (int y = a_ChunkDesc.GetHeight(x, z); y >= 0; y--)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockType);
+				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -140,15 +124,7 @@ cCompoGenClassic::cCompoGenClassic(
 
 
 
-void cCompoGenClassic::ComposeTerrain(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
-	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
-	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
-	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
-	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
-	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
-)
+void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
 	/* The classic composition means:
 		- 1 layer of grass, 3 of dirt and the rest stone, if the height > sealevel + beachheight
@@ -158,13 +134,13 @@ void cCompoGenClassic::ComposeTerrain(
 		- bedrock at the bottom
 	*/
 
-	memset(a_BlockTypes, E_BLOCK_AIR, sizeof(a_BlockTypes));
-	memset(a_BlockMeta, 0, sizeof(a_BlockMeta));
+	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
+	memset(a_ChunkDesc.GetBlockMetas(), 0,           sizeof(a_ChunkDesc.GetBlockMetas()));
 
 	// The patterns to use for different situations, must be same length!
-	static const BLOCKTYPE PatternGround[] = {m_BlockTop, m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
-	static const BLOCKTYPE PatternBeach[]  = {m_BlockBeach,  m_BlockBeach, m_BlockBeach, m_BlockBeachBottom} ;
-	static const BLOCKTYPE PatternOcean[]  = {m_BlockMiddle,  m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
+	const BLOCKTYPE PatternGround[] = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
+	const BLOCKTYPE PatternBeach[]  = {m_BlockBeach,  m_BlockBeach,  m_BlockBeach,  m_BlockBeachBottom} ;
+	const BLOCKTYPE PatternOcean[]  = {m_BlockMiddle, m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
 	static int PatternLength = ARRAYCOUNT(PatternGround);
 	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternBeach));
 	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternOcean));
@@ -173,7 +149,7 @@ void cCompoGenClassic::ComposeTerrain(
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+			int Height = a_ChunkDesc.GetHeight(x, z);
 			const BLOCKTYPE * Pattern;
 			if (Height > m_SeaLevel + m_BeachHeight)
 			{
@@ -191,17 +167,17 @@ void cCompoGenClassic::ComposeTerrain(
 			// Fill water from sealevel down to height (if any):
 			for (int y = m_SeaLevel; y >= Height; --y)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, m_BlockSea);
+				a_ChunkDesc.SetBlockType(x, y, z, m_BlockSea);
 			}
 			
 			// Fill from height till the bottom:
 			for (int y = Height; y >= 1; y--)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : m_BlockBottom);
+				a_ChunkDesc.SetBlockType(x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : m_BlockBottom);
 			}
 			
 			// The last layer is always bedrock:
-			cChunkDef::SetBlock(a_BlockTypes, x, 0, z, E_BLOCK_BEDROCK);
+			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
 }
@@ -213,26 +189,21 @@ void cCompoGenClassic::ComposeTerrain(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCompoGenBiomal:
 
-void cCompoGenBiomal::ComposeTerrain(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
-	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
-	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
-	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
-	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
-	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
-)
+void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
-	memset(a_BlockTypes, 0, sizeof(a_BlockTypes));
-	memset(a_BlockMeta,  0, sizeof(a_BlockMeta));
+	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
+	memset(a_ChunkDesc.GetBlockMetas(), 0,           sizeof(a_ChunkDesc.GetBlockMetas()));
+
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Height = cChunkDef::GetHeight(a_HeightMap, x, z);
+			int Height = a_ChunkDesc.GetHeight(x, z);
 			if (Height > m_SeaLevel)
 			{
-				switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+				switch (a_ChunkDesc.GetBiome(x, z))
 				{
 					case biOcean:
 					case biPlains:
@@ -251,20 +222,20 @@ void cCompoGenBiomal::ComposeTerrain(
 					case biJungle:
 					case biJungleHills:
 					{
-						FillColumnGrass(x, z, Height, a_BlockTypes);
+						FillColumnGrass(x, z, Height, a_ChunkDesc.GetBlockTypes());
 						break;
 					}
 					case biDesertHills:
 					case biDesert:
 					case biBeach:
 					{
-						FillColumnSand(x, z, Height, a_BlockTypes);
+						FillColumnSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
 						break;
 					}
 					case biMushroomIsland:
 					case biMushroomShore:
 					{
-						FillColumnMycelium(x, z, Height, a_BlockTypes);
+						FillColumnMycelium(x, z, Height, a_ChunkDesc.GetBlockTypes());
 						break;
 					}
 					default:
@@ -277,24 +248,24 @@ void cCompoGenBiomal::ComposeTerrain(
 			}
 			else
 			{
-				switch (cChunkDef::GetBiome(a_BiomeMap, x, z))
+				switch (a_ChunkDesc.GetBiome(x, z))
 				{
 					case biDesert:
 					case biBeach:
 					{
 						// Fill with water, sand, sandstone and stone
-						FillColumnWaterSand(x, z, Height, a_BlockTypes);
+						FillColumnWaterSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
 						break;
 					}
 					default:
 					{
 						// Fill with water, sand/dirt/clay mix and stone
-						FillColumnWaterMix(a_ChunkX, a_ChunkZ, x, z, Height, a_BlockTypes);
+						FillColumnWaterMix(ChunkX, ChunkZ, x, z, Height, a_ChunkDesc.GetBlockTypes());
 						break;
 					}
 				}  // switch (biome)
 			}  // else (under water)
-			cChunkDef::SetBlock(a_BlockTypes, x, 0, z, E_BLOCK_BEDROCK);
+			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
 }
@@ -440,29 +411,14 @@ cCompoGenNether::cCompoGenNether(int a_Seed) :
 
 
 
-void cCompoGenNether::ComposeTerrain(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated
-	cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated
-	const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
-	const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
-	cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
-	cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
-)
+void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
-	HEIGHTTYPE MaxHeight = 0;
-	for (int i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
-	{
-		if (a_HeightMap[i] > MaxHeight)
-		{
-			MaxHeight = a_HeightMap[i];
-		}
-	}
+	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
 	
 	const int SEGMENT_HEIGHT = 8;
 	const int INTERPOL_X = 16;  // Must be a divisor of 16
 	const int INTERPOL_Z = 16;  // Must be a divisor of 16
-	// Interpolate the chunk in 16 * SEGMENT_HEIGHT * 16 "segments", each 8 blocks high and each linearly interpolated separately.
+	// Interpolate the chunk in 16 * SEGMENT_HEIGHT * 16 "segments", each SEGMENT_HEIGHT blocks high and each linearly interpolated separately.
 	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
 	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
 	
@@ -470,8 +426,8 @@ void cCompoGenNether::ComposeTerrain(
 	int FloorBuf2[17 * 17];
 	int * FloorHi = FloorBuf1;
 	int * FloorLo = FloorBuf2;
-	int BaseX = a_ChunkX * cChunkDef::Width;
-	int BaseZ = a_ChunkZ * cChunkDef::Width;
+	int BaseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int BaseZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	
 	// Interpolate the lowest floor:
 	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
@@ -504,7 +460,7 @@ void cCompoGenNether::ComposeTerrain(
 			for (int y = 0; y < SEGMENT_HEIGHT; y++)
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
-				cChunkDef::SetBlock(a_BlockTypes, x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_NETHERRACK : E_BLOCK_AIR);
+				a_ChunkDesc.SetBlockType(x, y + Segment, z, (Val < m_Threshold) ? E_BLOCK_NETHERRACK : E_BLOCK_AIR);
 			}
 		}
 		
@@ -515,8 +471,8 @@ void cCompoGenNether::ComposeTerrain(
 	// Bedrock at the bottom and at the top:
 	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 	{
-		cChunkDef::SetBlock(a_BlockTypes, x, 0, z, E_BLOCK_BEDROCK);
-		cChunkDef::SetBlock(a_BlockTypes, x, cChunkDef::GetHeight(a_HeightMap, x, z), z, E_BLOCK_BEDROCK);
+		a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
+		a_ChunkDesc.SetBlockType(x, a_ChunkDesc.GetHeight(x, z), z, E_BLOCK_BEDROCK);
 	}
 }
 

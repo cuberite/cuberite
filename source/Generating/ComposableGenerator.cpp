@@ -9,7 +9,6 @@
 #include "../World.h"
 #include "../../iniFile/iniFile.h"
 #include "../Root.h"
-#include "ChunkDesc.h"
 
 // Individual composed algorithms:
 #include "BioGen.h"
@@ -114,14 +113,14 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 	
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
-		m_CompositionGen->ComposeTerrain(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
+		m_CompositionGen->ComposeTerrain(a_ChunkDesc);
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultStructures())
 	{	
 		for (cStructureGenList::iterator itr = m_StructureGens.begin(); itr != m_StructureGens.end(); ++itr)
 		{
-			(*itr)->GenStructures(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, Entities, BlockEntities);
+			(*itr)->GenStructures(a_ChunkDesc);
 		}   // for itr - m_StructureGens[]
 	}
 	
@@ -129,7 +128,7 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 	{
 		for (cFinishGenList::iterator itr = m_FinishGens.begin(); itr != m_FinishGens.end(); ++itr)
 		{
-			(*itr)->GenFinish(a_ChunkX, a_ChunkZ, BlockTypes, BlockMeta, HeightMap, BiomeMap, Entities, BlockEntities);
+			(*itr)->GenFinish(a_ChunkDesc);
 		}  // for itr - m_FinishGens[]
 	}
 }
@@ -372,7 +371,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "DeadBushes") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenDeadBushes(Seed));
+			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, biDesert, 2, E_BLOCK_SAND, E_BLOCK_SAND));
 		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
@@ -384,7 +383,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenLilypads(Seed));
+			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_LILY_PAD, biSwampland, 4, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER));
 		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{

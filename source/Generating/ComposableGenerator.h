@@ -18,6 +18,7 @@ See http://forum.mc-server.org/showthread.php?tid=409 for details.
 #pragma once
 
 #include "ChunkGenerator.h"
+#include "ChunkDesc.h"
 
 
 
@@ -72,15 +73,7 @@ class cTerrainCompositionGen
 public:
 	virtual ~cTerrainCompositionGen() {}  // Force a virtual destructor in descendants
 	
-	virtual void ComposeTerrain(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,      // BlockTypes to be generated (the whole array gets initialized, even air)
-		cChunkDef::BlockNibbles & a_BlockMeta,     // BlockMetas to be generated (the whole array gets initialized)
-		const cChunkDef::HeightMap & a_HeightMap,  // The height map to fit
-		const cChunkDef::BiomeMap & a_BiomeMap,    // Biomes to adhere to
-		cEntityList & a_Entities,                  // Entitites may be generated along with the terrain
-		cBlockEntityList & a_BlockEntities         // Block entitites may be generated (chests / furnaces / ...)
-	) = 0;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
 
@@ -98,14 +91,7 @@ class cStructureGen
 public:
 	virtual ~cStructureGen() {}  // Force a virtual destructor in descendants
 	
-	virtual void GenStructures(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,   // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,  // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,     // Height map to read and change by the current data
-		cEntityList & a_Entities,               // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities      // Block entities may be added or deleted
-	) = 0;
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
 typedef std::list<cStructureGen *> cStructureGenList;
@@ -122,15 +108,7 @@ class cFinishGen
 public:
 	virtual ~cFinishGen() {}  // Force a virtual destructor in descendants
 	
-	virtual void GenFinish(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::BlockNibbles & a_BlockMeta,   // Block meta to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read and change by the current data
-		const cChunkDef::BiomeMap & a_BiomeMap,  // Biomes to adhere to
-		cEntityList & a_Entities,                // Entities may be added or deleted
-		cBlockEntityList & a_BlockEntities       // Block entities may be added or deleted
-	) = 0;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
 typedef std::list<cFinishGen *> cFinishGenList;
