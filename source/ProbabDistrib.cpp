@@ -31,10 +31,11 @@ void cProbabDistrib::SetPoints(const cProbabDistrib::cPoints & a_Points)
 	m_Cumulative.reserve(a_Points.size() + 1);
 	int ProbSum = 0;
 	int LastProb = 0;
-	int LastValue = 0;
+	int LastValue = -1;
 	if (a_Points[0].m_Value != 0)
 	{
 		m_Cumulative.push_back(cPoint(0, 0));  // Always push in the [0, 0] point for easier search algorithm bounds
+		LastValue = 0;
 	}
 	for (cPoints::const_iterator itr = a_Points.begin(), end = a_Points.end(); itr != end; ++itr)
 	{
