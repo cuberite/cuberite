@@ -119,12 +119,15 @@ bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
 // TODO Not working very well yet :s
 Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over)
 {
-	char BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
+	if ((a_Y < 0) || (a_Y >= cChunkDef::Height))
+	{
+		return NONE;
+	}
+	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
 	if (!IsAllowedBlock(BlockID))	// No Fluid -> No Flowing direction :D
 	{
 		return NONE;
 	}
-	
 
 	/*
 	Disabled because of causing problems and being useless atm
