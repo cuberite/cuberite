@@ -19,12 +19,12 @@
 
 
 
-#define DEF_NETHER_WATER_SPRINGS    "0, 0; 255, 0"
+#define DEF_NETHER_WATER_SPRINGS    "0, 1; 255, 1"
 #define DEF_NETHER_LAVA_SPRINGS     "0, 0; 30, 0; 31, 50; 120, 50; 127, 0"
 #define DEF_OVERWORLD_WATER_SPRINGS "0, 0; 10, 10; 11, 75; 16, 83; 20, 83; 24, 78; 32, 62; 40, 40; 44, 15; 48, 7; 56, 2; 64, 1; 255, 0"
 #define DEF_OVERWORLD_LAVA_SPRINGS  "0, 0; 10, 5; 11, 45; 48, 2; 64, 1; 255, 0"
-#define DEF_END_WATER_SPRINGS       "0, 0; 255, 0"
-#define DEF_END_LAVA_SPRINGS        "0, 0; 255, 0"
+#define DEF_END_WATER_SPRINGS       "0, 1; 255, 1"
+#define DEF_END_LAVA_SPRINGS        "0, 1; 255, 1"
 
 
 
@@ -684,7 +684,14 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 		}
 	}  // switch (dimension)
 	AString HeightDistribution = a_IniFile.GetValueSet(SectionName, "HeightDistribution", DefaultHeightDistribution);
-	m_HeightDistribution.SetDefString(HeightDistribution);
+	if (!m_HeightDistribution.SetDefString(HeightDistribution) || (m_HeightDistribution.GetSum() <= 0))
+	{
+		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".", 
+			(a_Fluid == E_BLOCK_WATER) ? "Water" : "Lava",
+			DefaultHeightDistribution.c_str()
+		);
+		m_HeightDistribution.SetDefString(DefaultHeightDistribution);
+	}
 	m_Chance = a_IniFile.GetValueSetI(SectionName, "Chance", DefaultChance);
 }
 
