@@ -272,7 +272,7 @@ void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int 
 				for (int x = 0; x < SizeX; x++)
 				{
 					int BAX = BAOffX + x;
-					int CDX = BAOffX + x;
+					int CDX = CDOffX + x;
 					cChunkDef::SetBlock(m_BlockTypes, CDX, CDY, CDZ, a_BlockArea.GetRelBlockType(BAX, BAY, BAZ));
 				}  // for x
 			}  // for z
@@ -292,7 +292,7 @@ void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int 
 				for (int x = 0; x < SizeX; x++)
 				{
 					int BAX = BAOffX + x;
-					int CDX = BAOffX + x;
+					int CDX = CDOffX + x;
 					cChunkDef::SetNibble(m_BlockMeta, CDX, CDY, CDZ, a_BlockArea.GetRelBlockMeta(BAX, BAY, BAZ));
 				}  // for x
 			}  // for z
