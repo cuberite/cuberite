@@ -93,6 +93,7 @@ public:
 	void SendDisconnect         (const AString & a_Reason);
 	void SendEntHeadLook        (const cEntity & a_Entity);
 	void SendEntLook            (const cEntity & a_Entity);
+	void SendEntVelocity        (const cEntity & a_Entity);
 	void SendEntRelMove         (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);

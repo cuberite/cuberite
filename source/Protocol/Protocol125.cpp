@@ -55,6 +55,7 @@ enum
 	PACKET_COLLECT_PICKUP            = 0x16,
 	PACKET_SPAWN_OBJECT              = 0x17,
 	PACKET_SPAWN_MOB                 = 0x18,
+	PACKET_ENTITY_VELOCITY           = 0x1c,
 	PACKET_DESTROY_ENTITY            = 0x1d,
 	PACKET_ENTITY                    = 0x1e,
 	PACKET_ENT_REL_MOVE              = 0x1f,
@@ -273,6 +274,21 @@ void cProtocol125::SendDisconnect(const AString & a_Reason)
 	Flush();
 }
 
+
+
+
+void cProtocol125::SendEntVelocity(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENTITY_VELOCITY);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteShort((short) (a_Entity.GetSpeedX() * 400)); //400 = 8000 / 20 
+	WriteShort((short) (a_Entity.GetSpeedY() * 400));
+	WriteShort((short) (a_Entity.GetSpeedZ() * 400));
+	Flush();
+}
 
 
 

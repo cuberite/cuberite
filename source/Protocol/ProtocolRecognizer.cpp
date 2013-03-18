@@ -197,6 +197,14 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 
 
 
+void cProtocolRecognizer::SendEntVelocity(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntVelocity(a_Entity);
+}
+
+
+
 
 void cProtocolRecognizer::SendEntHeadLook(const cEntity & a_Entity)
 {

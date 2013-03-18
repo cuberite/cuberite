@@ -39,6 +39,7 @@ public:
 	virtual void SendDisconnect         (const AString & a_Reason) override;
 	virtual void SendEntHeadLook        (const cEntity & a_Entity) override;
 	virtual void SendEntLook            (const cEntity & a_Entity) override;
+	virtual void SendEntVelocity        (const cEntity & a_Entity) override;
 	virtual void SendEntRelMove         (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;

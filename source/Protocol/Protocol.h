@@ -62,6 +62,7 @@ public:
 	virtual void SendDisconnect         (const AString & a_Reason) = 0;
 	virtual void SendEntHeadLook        (const cEntity & a_Entity) = 0;
 	virtual void SendEntLook            (const cEntity & a_Entity) = 0;
+	virtual void SendEntVelocity        (const cEntity & a_Entity) = 0;
 	virtual void SendEntRelMove         (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
 	virtual void SendEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) = 0;
 	virtual void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;

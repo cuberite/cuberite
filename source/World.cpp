@@ -1307,6 +1307,14 @@ void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 
 
+void cWorld::BroadcastEntVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntVelocity(a_Entity, a_Exclude);
+}
+
+
+
+
 void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);

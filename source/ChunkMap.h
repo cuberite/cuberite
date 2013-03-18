@@ -53,6 +53,9 @@ public:
 	/// Broadcasts an entity equipment change to all clients in the chunk where a_Entity is
 	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
 	
+	/// Broadcasts a EntVelocity packet to all clients in the chunk where a_Entity is. Velocity is measured in blocks/second
+	void BroadcastEntVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+
 	/// Broadcasts a RelEntMoveLook packet to all clients in the chunk where a_Entity is
 	void BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	

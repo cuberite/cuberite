@@ -1453,6 +1453,17 @@ void cClientHandle::SendEntLook(const cEntity & a_Entity)
 
 
 
+void cClientHandle::SendEntVelocity(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	m_Protocol->SendEntVelocity(a_Entity);
+}
+
+
+
+
+
 void cClientHandle::SendEntHeadLook(const cEntity & a_Entity)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
