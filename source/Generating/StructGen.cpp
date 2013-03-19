@@ -400,6 +400,11 @@ void cStructGenLakes::GenStructures(cChunkDesc & a_ChunkDesc)
 	
 	for (int z = -1; z < 2; z++) for (int x = -1; x < 2; x++)
 	{
+		if (((m_Noise.IntNoise2DInt(ChunkX + x, ChunkZ + z) / 17) % 100) > m_Probability)
+		{
+			continue;
+		}
+		
 		cBlockArea Lake;
 		CreateLakeImage(ChunkX + x, ChunkZ + z, Lake);
 		
@@ -420,19 +425,20 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 	a_Lake.Create(16, 8, 16);
 	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
 	
-	// Find the maximum height in this chunk:
+	// Find the minimum height in this chunk:
 	cChunkDef::HeightMap HeightMap;
 	m_HeiGen.GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
-	HEIGHTTYPE MaxHeight = HeightMap[0];
+	HEIGHTTYPE MinHeight = HeightMap[0];
 	for (int i = 1; i < ARRAYCOUNT(HeightMap); i++)
 	{
-		if (HeightMap[i] > MaxHeight)
+		if (HeightMap[i] < MinHeight)
 		{
-			MaxHeight = HeightMap[i];
+			MinHeight = HeightMap[i];
 		}
 	}
 	
-	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height
+	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height minus 6
+	MinHeight = std::max(MinHeight - 6, 2);
 	int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 128, a_ChunkZ) / 11;
 	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
 	int OffsetX = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
@@ -440,8 +446,9 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
 	int OffsetZ = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
 	Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 512, a_ChunkZ) / 13;
-	// Random height [0 .. MaxHeight] with preference to center heights
-	int HeightY = (((Rnd & 0x1ff) % (MaxHeight + 1)) + (((Rnd >> 9) & 0x1ff) % (MaxHeight + 1))) / 2;
+	// Random height [1 .. MinHeight] with preference to center heights
+	int HeightY = 1 + (((Rnd & 0x1ff) % MinHeight) + (((Rnd >> 9) & 0x1ff) % MinHeight)) / 2;
+	
 	a_Lake.SetOrigin(OffsetX, HeightY, OffsetZ);
 	
 	// Hollow out a few bubbles inside the blockarea:

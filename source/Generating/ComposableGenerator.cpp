@@ -335,11 +335,13 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "waterlakes") == 0)
 		{
-			m_StructureGens.push_back(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_HeightGen));
+			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
+			m_StructureGens.push_back(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_HeightGen, Probability));
 		}
 		else if (NoCaseCompare(*itr, "lavalakes") == 0)
 		{
-			m_StructureGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen));
+			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
+			m_StructureGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen, Probability));
 		}
 		else
 		{

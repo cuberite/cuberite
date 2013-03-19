@@ -96,11 +96,12 @@ class cStructGenLakes :
 	public cStructureGen
 {
 public:
-	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainHeightGen & a_HeiGen) :
+	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainHeightGen & a_HeiGen, int a_Probability) :
 		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_Fluid(a_Fluid),
-		m_HeiGen(a_HeiGen)
+		m_HeiGen(a_HeiGen),
+		m_Probability(a_Probability)
 	{
 	}
 	
@@ -109,6 +110,7 @@ protected:
 	int                 m_Seed;
 	BLOCKTYPE           m_Fluid;
 	cTerrainHeightGen & m_HeiGen;
+	int                 m_Probability;  ///< Chance, 0 .. 100, of a chunk having the lake
 	
 	// cStructureGen override:
 	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
