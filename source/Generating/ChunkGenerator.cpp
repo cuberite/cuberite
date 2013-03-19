@@ -271,9 +271,12 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
 	
+	cChunkDef::BlockNibbles BlockMetas;
+	ChunkDesc.CompressBlockMetas(BlockMetas);
+	
 	m_World->SetChunkData(
 		a_ChunkX, a_ChunkY, a_ChunkZ, 
-		ChunkDesc.GetBlockTypes(), ChunkDesc.GetBlockMetas(),
+		ChunkDesc.GetBlockTypes(), BlockMetas,
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
 		&ChunkDesc.GetHeightMap(), &ChunkDesc.GetBiomeMap(),
 		ChunkDesc.GetEntities(), ChunkDesc.GetBlockEntities(),

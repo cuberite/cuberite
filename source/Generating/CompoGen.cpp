@@ -20,8 +20,7 @@
 
 void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
-	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
-	memset(a_ChunkDesc.GetBlockMetas(), 0, sizeof(a_ChunkDesc.GetBlockMetas()));
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -80,8 +79,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		E_BLOCK_BEDROCK,
 	} ;
 	
-	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
-	memset(a_ChunkDesc.GetBlockMetas(), 0,           sizeof(a_ChunkDesc.GetBlockMetas()));
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -134,8 +132,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		- bedrock at the bottom
 	*/
 
-	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
-	memset(a_ChunkDesc.GetBlockMetas(), 0,           sizeof(a_ChunkDesc.GetBlockMetas()));
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 
 	// The patterns to use for different situations, must be same length!
 	const BLOCKTYPE PatternGround[] = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
@@ -191,8 +188,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
-	memset(a_ChunkDesc.GetBlockTypes(), E_BLOCK_AIR, sizeof(a_ChunkDesc.GetBlockTypes()));
-	memset(a_ChunkDesc.GetBlockMetas(), 0,           sizeof(a_ChunkDesc.GetBlockMetas()));
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();

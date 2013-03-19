@@ -20,8 +20,11 @@ cChunkDesc::cChunkDesc(int a_ChunkX, int a_ChunkZ) :
 	m_bUseDefaultStructures(true),
 	m_bUseDefaultFinish(true)
 {
+	m_BlockArea.Create(cChunkDef::Width, cChunkDef::Height, cChunkDef::Width);
+	/*
 	memset(m_BlockTypes, 0, sizeof(cChunkDef::BlockTypes));
 	memset(m_BlockMeta,  0, sizeof(cChunkDef::BlockNibbles));
+	*/
 	memset(m_BiomeMap,   0, sizeof(cChunkDef::BiomeMap));
 	memset(m_HeightMap,  0, sizeof(cChunkDef::HeightMap));
 }
@@ -51,9 +54,7 @@ void cChunkDesc::SetChunkCoords(int a_ChunkX, int a_ChunkZ)
 
 void cChunkDesc::FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	const NIBBLETYPE CompressedMeta = a_BlockMeta | (a_BlockMeta << 4);
-	memset(m_BlockTypes, a_BlockType,    sizeof(cChunkDef::BlockTypes));
-	memset(m_BlockMeta,  CompressedMeta, sizeof(cChunkDef::BlockNibbles));
+	m_BlockArea.Fill(cBlockArea::baTypes | cBlockArea::baMetas, a_BlockType, a_BlockMeta);
 }
 
 
@@ -62,9 +63,7 @@ void cChunkDesc::FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 
 void cChunkDesc::SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	int Index = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
-	cChunkDef::SetBlock(m_BlockTypes, Index, a_BlockType);
-	cChunkDef::SetNibble(m_BlockMeta, Index, a_BlockMeta);
+	m_BlockArea.SetRelBlockTypeMeta(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 }
 
 
@@ -73,9 +72,7 @@ void cChunkDesc::SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 void cChunkDesc::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
-	int Index = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
-	a_BlockType = cChunkDef::GetBlock(m_BlockTypes, Index);
-	a_BlockMeta = cChunkDef::GetNibble(m_BlockMeta, Index);
+	m_BlockArea.GetRelBlockTypeMeta(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 }
 
 
@@ -84,7 +81,7 @@ void cChunkDesc::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 void cChunkDesc::SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
-	cChunkDef::SetBlock(m_BlockTypes, a_RelX, a_RelY, a_RelZ, a_BlockType);
+	cChunkDef::SetBlock(m_BlockArea.GetBlockTypes(), a_RelX, a_RelY, a_RelZ, a_BlockType);
 }
 
 
@@ -93,7 +90,7 @@ void cChunkDesc::SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 
 BLOCKTYPE cChunkDesc::GetBlockType(int a_RelX, int a_RelY, int a_RelZ)
 {
-	return cChunkDef::GetBlock(m_BlockTypes, a_RelX, a_RelY, a_RelZ);
+	return cChunkDef::GetBlock(m_BlockArea.GetBlockTypes(), a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -102,7 +99,7 @@ BLOCKTYPE cChunkDesc::GetBlockType(int a_RelX, int a_RelY, int a_RelZ)
 
 NIBBLETYPE cChunkDesc::GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ)
 {
-	return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ);
+	return m_BlockArea.GetRelBlockMeta(a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -111,7 +108,7 @@ NIBBLETYPE cChunkDesc::GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ)
 
 void cChunkDesc::SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockMeta)
 {
-	cChunkDef::SetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ, a_BlockMeta);
+	m_BlockArea.SetRelBlockMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
 }
 
 
@@ -242,62 +239,9 @@ bool cChunkDesc::IsUsingDefaultFinish(void) const
 
 
 
-void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ)
+void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy)
 {
-	if (!a_BlockArea.HasBlockTypes() && !a_BlockArea.HasBlockMetas())
-	{
-		LOGWARNING("Request was made to write a block area without BlockTypes nor BlockMetas into cChunkDesc. Ignoring.");
-		return;
-	}
-	int BAOffX = std::max(0, -a_RelX);  // Offset in BA where to start reading
-	int CDOffX = std::max(0,  a_RelX);  // Offset in CD where to start writing
-	int SizeX  = std::min(a_BlockArea.GetSizeX() - BAOffX, cChunkDef::Width - CDOffX);  // Number of slices to write
-	int BAOffY = std::max(0, -a_RelY);  // Offset in BA where to start reading
-	int CDOffY = std::max(0,  a_RelY);  // Offset in CD where to start writing
-	int SizeY  = std::min(a_BlockArea.GetSizeY() - BAOffY, cChunkDef::Height - CDOffY);  // Number of layers to write
-	int BAOffZ = std::max(0, -a_RelZ);  // Offset in BA where to start reading
-	int CDOffZ = std::max(0,  a_RelZ);  // Offset in CD where to start writing
-	int SizeZ  = std::min(a_BlockArea.GetSizeZ() - BAOffZ, cChunkDef::Width - CDOffZ);  // Number of slices to write
-	
-	if (a_BlockArea.HasBlockTypes())
-	{
-		for (int y = 0; y < SizeY; y++)
-		{
-			int BAY = BAOffY + y;
-			int CDY = CDOffY + y;
-			for (int z = 0; z < SizeZ; z++)
-			{
-				int BAZ = BAOffZ + z;
-				int CDZ = CDOffZ + z;
-				for (int x = 0; x < SizeX; x++)
-				{
-					int BAX = BAOffX + x;
-					int CDX = CDOffX + x;
-					cChunkDef::SetBlock(m_BlockTypes, CDX, CDY, CDZ, a_BlockArea.GetRelBlockType(BAX, BAY, BAZ));
-				}  // for x
-			}  // for z
-		}  // for y
-	}  // HasBlockTypes()
-	
-	if (a_BlockArea.HasBlockMetas())
-	{
-		for (int y = 0; y < SizeY; y++)
-		{
-			int BAY = BAOffY + y;
-			int CDY = CDOffY + y;
-			for (int z = 0; z < SizeZ; z++)
-			{
-				int BAZ = BAOffZ + z;
-				int CDZ = CDOffZ + z;
-				for (int x = 0; x < SizeX; x++)
-				{
-					int BAX = BAOffX + x;
-					int CDX = CDOffX + x;
-					cChunkDef::SetNibble(m_BlockMeta, CDX, CDY, CDZ, a_BlockArea.GetRelBlockMeta(BAX, BAY, BAZ));
-				}  // for x
-			}  // for z
-		}  // for y
-	}  // HasBlockMetas()
+	m_BlockArea.Merge(a_BlockArea, a_RelX, a_RelY, a_RelZ, a_MergeStrategy);
 }
 
 
@@ -432,6 +376,19 @@ HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 		}
 	}
 	return MaxHeight;
+}
+
+
+
+
+
+void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
+{
+	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();
+	for (int i = 0; i < ARRAYCOUNT(a_DestMetas); i++)
+	{
+		a_DestMetas[i] = AreaMetas[2 * i] | (AreaMetas[2 * i + 1] << 4);
+	}
 }
 
 

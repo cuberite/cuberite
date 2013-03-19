@@ -94,21 +94,14 @@ void cComposableGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef:
 
 void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
-	cChunkDef::BiomeMap &     BiomeMap      = a_ChunkDesc.GetBiomeMap();
-	cChunkDef::BlockTypes &   BlockTypes    = a_ChunkDesc.GetBlockTypes();
-	cChunkDef::BlockNibbles & BlockMeta     = a_ChunkDesc.GetBlockMetas();
-	cChunkDef::HeightMap &    HeightMap     = a_ChunkDesc.GetHeightMap();
-	cEntityList &             Entities      = a_ChunkDesc.GetEntities();
-	cBlockEntityList &        BlockEntities = a_ChunkDesc.GetBlockEntities();
-
 	if (a_ChunkDesc.IsUsingDefaultBiomes())
 	{
-		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
+		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetBiomeMap());
 	}
 	
 	if (a_ChunkDesc.IsUsingDefaultHeight())
 	{
-		m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
+		m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetHeightMap());
 	}
 	
 	if (a_ChunkDesc.IsUsingDefaultComposition())
@@ -336,13 +329,18 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 		{
 			m_StructureGens.push_back(new cStructGenRavines(Seed, 128));
 		}
-		//*
-		// TODO: Not implemented yet; need a name
 		else if (NoCaseCompare(*itr, "wormnestcaves") == 0)
 		{
 			m_StructureGens.push_back(new cStructGenWormNestCaves(Seed));
 		}
-		//*/
+		else if (NoCaseCompare(*itr, "waterlakes") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_HeightGen));
+		}
+		else if (NoCaseCompare(*itr, "lavalakes") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen));
+		}
 		else
 		{
 			LOGWARNING("Unknown structure generator: \"%s\". Ignoring.", itr->c_str());

@@ -92,6 +92,70 @@ static void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, N
 
 
 
+/// Combinator used for cBlockArea::msLake merging
+static void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	// Sponge is the NOP block
+	if (a_SrcType == E_BLOCK_SPONGE)
+	{
+		return;
+	}
+
+	// Air is always hollowed out	
+	if (a_SrcType == E_BLOCK_AIR)
+	{
+		a_DstType = E_BLOCK_AIR;
+		a_DstMeta = 0;
+		return;
+	}
+	
+	// Water and lava are never overwritten
+	switch (a_DstType)
+	{
+		case E_BLOCK_WATER:
+		case E_BLOCK_STATIONARY_WATER:
+		case E_BLOCK_LAVA:
+		case E_BLOCK_STATIONARY_LAVA:
+		{
+			return;
+		}
+	}
+	
+	// Water and lava always overwrite
+	switch (a_SrcType)
+	{
+		case E_BLOCK_WATER:
+		case E_BLOCK_STATIONARY_WATER:
+		case E_BLOCK_LAVA:
+		case E_BLOCK_STATIONARY_LAVA:
+		{
+			a_DstType = a_SrcType;
+			a_DstMeta = a_DstMeta;
+			return;
+		}
+	}
+	
+	if (a_SrcType == E_BLOCK_STONE)
+	{
+		switch (a_DstType)
+		{
+			case E_BLOCK_DIRT:
+			case E_BLOCK_GRASS:
+			case E_BLOCK_MYCELIUM:
+			{
+				a_DstType = E_BLOCK_STONE;
+				a_DstMeta = 0;
+				return;
+			}
+		}
+	}
+	// Everything else is left as it is
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cBlockArea:
 
@@ -610,6 +674,21 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 			);
 			break;
 		}  // case msImprint
+		
+		case msLake:
+		{
+			InternalMergeBlocks(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_SizeX, m_SizeY, m_SizeZ,
+				MergeCombinatorLake
+			);
+			break;
+		}  // case msLake
 		
 		default:
 		{

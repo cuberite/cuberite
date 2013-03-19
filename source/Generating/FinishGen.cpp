@@ -598,7 +598,7 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 					case E_BLOCK_NETHERRACK:
 					case E_BLOCK_STONE:
 					{
-						if (TryPlaceSpring(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetBlockMetas(), x, y, z))
+						if (TryPlaceSpring(a_ChunkDesc, x, y, z))
 						{
 							// Succeeded, bail out
 							return;
@@ -614,15 +614,11 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenFluidSprings::TryPlaceSpring(
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDef::BlockNibbles & a_BlockMetas,
-	int x, int y, int z
-)
+bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z)
 {
 	// In order to place a spring, it needs exactly one of the XZ neighbors or a below neighbor to be air
 	// Also, its neighbor on top of it must be non-air
-	if (cChunkDef::GetBlock(a_BlockTypes, x, y + 1, z) == E_BLOCK_AIR)
+	if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
 	{
 		return false;
 	}
@@ -641,7 +637,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(
 	int NumAirNeighbors = 0;
 	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
-		switch (cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z))
+		switch (a_ChunkDesc.GetBlockType(x + Coords[i].x, y + Coords[i].y, z + Coords[i].z))
 		{
 			case E_BLOCK_AIR:
 			{
@@ -659,8 +655,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(
 	}
 	
 	// Has exactly one air neighbor, place a spring:
-	cChunkDef::SetBlock(a_BlockTypes, x, y, z, m_Fluid);
-	cChunkDef::SetNibble(a_BlockMetas, x, y, z, 0);
+	a_ChunkDesc.SetBlockTypeMeta(x, y, z, m_Fluid, 0);
 	return true;
 }
 

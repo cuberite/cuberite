@@ -10,6 +10,7 @@
 #pragma once
 
 #include "../ChunkDef.h"
+#include "../BlockArea.h"
 
 
 
@@ -67,7 +68,7 @@ public:
 	bool IsUsingDefaultFinish(void) const;
 
 	/// Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk.
-	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ);
+	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite);
 
 	/// Reads an area from the chunk into a cBlockArea
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
@@ -80,23 +81,25 @@ public:
 	
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap     (void) { return m_BiomeMap; }
-	inline cChunkDef::BlockTypes &   GetBlockTypes   (void) { return m_BlockTypes; }
-	inline cChunkDef::BlockNibbles & GetBlockMetas   (void) { return m_BlockMeta; }
+	inline cChunkDef::BlockTypes &   GetBlockTypes   (void) { return *((cChunkDef::BlockTypes *)m_BlockArea.GetBlockTypes()); }
+	// CANNOT, different compression! 
+	// inline cChunkDef::BlockNibbles & GetBlockMetas   (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
 	inline cChunkDef::HeightMap &    GetHeightMap    (void) { return m_HeightMap; }
 	inline cEntityList &             GetEntities     (void) { return m_Entities; }
 	inline cBlockEntityList &        GetBlockEntities(void) { return m_BlockEntities; }
+	
+	/// Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte)
+	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 	
 private:
 	int m_ChunkX;
 	int m_ChunkZ;
 	
 	cChunkDef::BiomeMap     m_BiomeMap;
-	cChunkDef::BlockTypes   m_BlockTypes;
-	cChunkDef::BlockNibbles m_BlockMeta;
+	cBlockArea              m_BlockArea;
 	cChunkDef::HeightMap    m_HeightMap;
 	cEntityList             m_Entities;       // Individual entities are NOT owned by this object!
 	cBlockEntityList        m_BlockEntities;  // Individual block entities are NOT owned by this object!
-
 
 	bool m_bUseDefaultBiomes;
 	bool m_bUseDefaultHeight;

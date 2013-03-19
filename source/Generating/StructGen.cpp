@@ -5,6 +5,7 @@
 #include "StructGen.h"
 #include "../BlockID.h"
 #include "Trees.h"
+#include "../BlockArea.h"
 
 
 
@@ -85,18 +86,11 @@ void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
 		{
 			int BaseZ = ChunkZ + z - 1;
 			
-			cChunkDef::BlockTypes *   BlT;
-			cChunkDef::BlockNibbles * BlM;
-			cChunkDef::HeightMap *    Hei;
-			cChunkDef::BiomeMap *     Bio;
-
+			cChunkDesc * Dest;
 
 			if ((x != 1) || (z != 1))
 			{
-				BlT = &(WorkerDesc.GetBlockTypes());
-				BlM = &(WorkerDesc.GetBlockMetas());
-				Hei = &(WorkerDesc.GetHeightMap());
-				Bio = &(WorkerDesc.GetBiomeMap());
+				Dest = &WorkerDesc;
 				WorkerDesc.SetChunkCoords(BaseX, BaseZ);
 				
 				m_BiomeGen->GenBiomes           (BaseX, BaseZ, WorkerDesc.GetBiomeMap());
@@ -106,26 +100,23 @@ void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
 			}
 			else
 			{
-				BlT = &(a_ChunkDesc.GetBlockTypes());
-				BlM = &(a_ChunkDesc.GetBlockMetas());
-				Hei = &(a_ChunkDesc.GetHeightMap());
-				Bio = &(a_ChunkDesc.GetBiomeMap());
+				Dest = &a_ChunkDesc;
 			}
 
-			int NumTrees = GetNumTrees(BaseX, BaseZ, *Bio);
+			int NumTrees = GetNumTrees(BaseX, BaseZ, Dest->GetBiomeMap());
 
 			sSetBlockVector OutsideLogs, OutsideOther;
 			for (int i = 0; i < NumTrees; i++)
 			{
-				GenerateSingleTree(BaseX, BaseZ, i, *BlT, *BlM, *Hei, *Bio, OutsideLogs, OutsideOther);
+				GenerateSingleTree(BaseX, BaseZ, i, *Dest, OutsideLogs, OutsideOther);
 			}
 
 			sSetBlockVector IgnoredOverflow;
 			IgnoredOverflow.reserve(OutsideOther.size());
-			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetBlockMetas(), OutsideOther, IgnoredOverflow);
+			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc, OutsideOther, IgnoredOverflow);
 			IgnoredOverflow.clear();
 			IgnoredOverflow.reserve(OutsideLogs.size());
-			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetBlockMetas(), OutsideLogs, IgnoredOverflow);
+			ApplyTreeImage(ChunkX, ChunkZ, a_ChunkDesc, OutsideLogs, IgnoredOverflow);
 		}  // for z
 	}  // for x
 	
@@ -136,9 +127,9 @@ void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
 		{
 			for (int y = cChunkDef::Height - 1; y >= 0; y--)
 			{
-				if (cChunkDef::GetBlock(a_ChunkDesc.GetBlockTypes(), x, y, z) != E_BLOCK_AIR)
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
 				{
-					cChunkDef::SetHeight(a_ChunkDesc.GetHeightMap(), x, z, y);
+					a_ChunkDesc.SetHeight(x, z, y);
 					break;
 				}
 			}  // for y
@@ -152,10 +143,7 @@ void cStructGenTrees::GenStructures(cChunkDesc & a_ChunkDesc)
 
 void cStructGenTrees::GenerateSingleTree(
 	int a_ChunkX, int a_ChunkZ, int a_Seq,
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDef::BlockNibbles & a_BlockMetas,
-	const cChunkDef::HeightMap & a_Height,
-	const cChunkDef::BiomeMap & a_Biomes,
+	cChunkDesc & a_ChunkDesc,
 	sSetBlockVector & a_OutsideLogs,
 	sSetBlockVector & a_OutsideOther
 )
@@ -163,7 +151,7 @@ void cStructGenTrees::GenerateSingleTree(
 	int x = (m_Noise.IntNoise3DInt(a_ChunkX + a_ChunkZ, a_ChunkZ, a_Seq) / 19) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise3DInt(a_ChunkX - a_ChunkZ, a_Seq, a_ChunkZ) / 19) % cChunkDef::Width;
 	
-	int Height = cChunkDef::GetHeight(a_Height, x, z);
+	int Height = a_ChunkDesc.GetHeight(x, z);
 	
 	if ((Height <= 0) || (Height > 240))
 	{
@@ -171,7 +159,7 @@ void cStructGenTrees::GenerateSingleTree(
 	}
 
 	// Check the block underneath the tree:
-	BLOCKTYPE TopBlock = cChunkDef::GetBlock(a_BlockTypes, x, Height, z);
+	BLOCKTYPE TopBlock = a_ChunkDesc.GetBlockType(x, Height, z);
 	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND))
 	{
 		return;
@@ -181,7 +169,7 @@ void cStructGenTrees::GenerateSingleTree(
 	GetTreeImageByBiome(
 		a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z,
 		m_Noise, a_Seq, 
-		cChunkDef::GetBiome(a_Biomes, x, z),
+		a_ChunkDesc.GetBiome(x, z),
 		TreeLogs, TreeOther
 	);
 
@@ -194,7 +182,7 @@ void cStructGenTrees::GenerateSingleTree(
 			continue;
 		}
 
-		BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, itr->x, itr->y, itr->z);
+		BLOCKTYPE Block = a_ChunkDesc.GetBlockType(itr->x, itr->y, itr->z);
 		switch (Block)
 		{
 			CASE_TREE_ALLOWED_BLOCKS:
@@ -209,8 +197,8 @@ void cStructGenTrees::GenerateSingleTree(
 		}
 	}
 	
-	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, TreeOther, a_OutsideOther);
-	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_BlockTypes, a_BlockMetas, TreeLogs,  a_OutsideLogs);	
+	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeOther, a_OutsideOther);
+	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeLogs,  a_OutsideLogs);	
 }
 
 
@@ -219,19 +207,18 @@ void cStructGenTrees::GenerateSingleTree(
 
 void cStructGenTrees::ApplyTreeImage(
 	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDef::BlockNibbles & a_BlockMetas,
+	cChunkDesc & a_ChunkDesc,
 	const sSetBlockVector & a_Image,
 	sSetBlockVector & a_Overflow
 )
 {
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
-	for (sSetBlockVector::const_iterator itr = a_Image.begin(); itr != a_Image.end(); ++itr)
+	for (sSetBlockVector::const_iterator itr = a_Image.begin(), end = a_Image.end(); itr != end; ++itr)
 	{
 		if ((itr->ChunkX == a_ChunkX) && (itr->ChunkZ == a_ChunkZ))
 		{
-			// Inside this chunk, integrate into a_BlockTypes:
-			switch (cChunkDef::GetBlock(a_BlockTypes, itr->x, itr->y, itr->z))
+			// Inside this chunk, integrate into a_ChunkDesc:
+			switch (a_ChunkDesc.GetBlockType(itr->x, itr->y, itr->z))
 			{
 				case E_BLOCK_LEAVES:
 				{
@@ -243,8 +230,7 @@ void cStructGenTrees::ApplyTreeImage(
 				}
 				CASE_TREE_OVERWRITTEN_BLOCKS:
 				{
-					cChunkDef::SetBlock (a_BlockTypes, itr->x, itr->y, itr->z, itr->BlockType);
-					cChunkDef::SetNibble(a_BlockMetas, itr->x, itr->y, itr->z, itr->BlockMeta);
+					a_ChunkDesc.SetBlockTypeMeta(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
 					break;
 				}
 				
@@ -271,22 +257,22 @@ int cStructGenTrees::GetNumTrees(
 	for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int Add = 0;
-		switch (a_Biomes[x + cChunkDef::Width * z])
+		switch (cChunkDef::GetBiome(a_Biomes, x, z))
 		{
-			case biPlains:           Add = 1;  break;
-			case biExtremeHills:     Add = 3;  break;
-			case biForest:           Add = 30; break;
-			case biTaiga:            Add = 30; break;
-			case biSwampland:        Add = 8;  break;
-			case biIcePlains:        Add = 1;  break;
-			case biIceMountains:     Add = 1;  break;
-			case biMushroomIsland:   Add = 3;  break;
-			case biMushroomShore:    Add = 3;  break;
-			case biForestHills:      Add = 20; break;
-			case biTaigaHills:       Add = 20; break;
-			case biExtremeHillsEdge: Add = 5;  break;
+			case biPlains:           Add =   1; break;
+			case biExtremeHills:     Add =   3; break;
+			case biForest:           Add =  30; break;
+			case biTaiga:            Add =  30; break;
+			case biSwampland:        Add =   8; break;
+			case biIcePlains:        Add =   1; break;
+			case biIceMountains:     Add =   1; break;
+			case biMushroomIsland:   Add =   3; break;
+			case biMushroomShore:    Add =   3; break;
+			case biForestHills:      Add =  20; break;
+			case biTaigaHills:       Add =  20; break;
+			case biExtremeHillsEdge: Add =   5; break;
 			case biJungle:           Add = 120; break;
-			case biJungleHills:      Add = 90; break;
+			case biJungleHills:      Add =  90; break;
 		}
 		NumTrees += Add;
 	}
@@ -399,6 +385,121 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 	}  // for i - NumNests
 }
 
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cStructGenLakes:
+
+void cStructGenLakes::GenStructures(cChunkDesc & a_ChunkDesc)
+{
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	
+	for (int z = -1; z < 2; z++) for (int x = -1; x < 2; x++)
+	{
+		cBlockArea Lake;
+		CreateLakeImage(ChunkX + x, ChunkZ + z, Lake);
+		
+		int OfsX = Lake.GetOriginX() + x * cChunkDef::Width;
+		int OfsZ = Lake.GetOriginZ() + z * cChunkDef::Width;
+		
+		// Merge the lake into the current data
+		a_ChunkDesc.WriteBlockArea(Lake, OfsX, Lake.GetOriginY(), OfsZ, cBlockArea::msLake);
+	}  // for x, z - neighbor chunks
+}
+
+
+
+
+
+void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a_Lake)
+{
+	a_Lake.Create(16, 8, 16);
+	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
+	
+	// Find the maximum height in this chunk:
+	cChunkDef::HeightMap HeightMap;
+	m_HeiGen.GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
+	HEIGHTTYPE MaxHeight = HeightMap[0];
+	for (int i = 1; i < ARRAYCOUNT(HeightMap); i++)
+	{
+		if (HeightMap[i] > MaxHeight)
+		{
+			MaxHeight = HeightMap[i];
+		}
+	}
+	
+	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height
+	int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 128, a_ChunkZ) / 11;
+	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
+	int OffsetX = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
+	Rnd >>= 12;
+	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
+	int OffsetZ = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
+	Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 512, a_ChunkZ) / 13;
+	// Random height [0 .. MaxHeight] with preference to center heights
+	int HeightY = (((Rnd & 0x1ff) % (MaxHeight + 1)) + (((Rnd >> 9) & 0x1ff) % (MaxHeight + 1))) / 2;
+	a_Lake.SetOrigin(OffsetX, HeightY, OffsetZ);
+	
+	// Hollow out a few bubbles inside the blockarea:
+	int NumBubbles = 4 + ((Rnd >> 18) & 0x03);  // 4 .. 7 bubbles
+	BLOCKTYPE * BlockTypes = a_Lake.GetBlockTypes();
+	for (int i = 0; i < NumBubbles; i++)
+	{
+		int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, i, a_ChunkZ) / 13;
+		const int BubbleR = 2 + (Rnd & 0x03);  // 2 .. 5
+		const int Range = 16 - 2 * BubbleR;
+		const int BubbleX = BubbleR + (Rnd % Range);
+		Rnd >>= 4;
+		const int BubbleY = 4 + (Rnd & 0x01);  // 4 .. 5
+		Rnd >>= 1;
+		const int BubbleZ = BubbleR + (Rnd % Range);
+		Rnd >>= 4;
+		const int HalfR = BubbleR / 2;  // 1 .. 2
+		const int RSquared = BubbleR * BubbleR;
+		for (int y = -HalfR; y <= HalfR; y++)
+		{
+			// BubbleY + y is in the [0, 7] bounds
+			int DistY = 4 * y * y / 3;
+			int IdxY = (BubbleY + y) * 16 * 16;
+			for (int z = -BubbleR; z <= BubbleR; z++)
+			{
+				int DistYZ = DistY + z * z;
+				if (DistYZ >= RSquared)
+				{
+					continue;
+				}
+				int IdxYZ = BubbleX + IdxY + (BubbleZ + z) * 16;
+				for (int x = -BubbleR; x <= BubbleR; x++) 
+				{
+					if (x * x + DistYZ < RSquared)
+					{
+						BlockTypes[x + IdxYZ] = E_BLOCK_AIR;
+					}
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // for i - bubbles
+
+	// Turn air in the bottom half into liquid:	
+	for (int y = 0; y < 4; y++)
+	{
+		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) 
+		{
+			if (BlockTypes[x + z * 16 + y * 16 * 16] == E_BLOCK_AIR)
+			{
+				BlockTypes[x + z * 16 + y * 16 * 16] = m_Fluid;
+			}
+		}  // for z, x
+	}  // for y
+	
+	// TODO: Turn sponge next to lava into stone
+	
+	// a_Lake.SaveToSchematicFile(Printf("Lake_%d_%d.schematic", a_ChunkX, a_ChunkZ));
+}
 
 
 

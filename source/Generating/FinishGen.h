@@ -177,11 +177,7 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/// Tries to place a spring at the specified coords, checks neighbors. Returns true	if successful
-	bool TryPlaceSpring(
-		cChunkDef::BlockTypes & a_BlockTypes,
-		cChunkDef::BlockNibbles & a_BlockMetas,
-		int x, int y, int z
-	);
+	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
 } ;
 
 

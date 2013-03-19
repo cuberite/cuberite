@@ -46,10 +46,7 @@ protected:
 	*/
 	void GenerateSingleTree(
 		int a_ChunkX, int a_ChunkZ, int a_Seq,
-		cChunkDef::BlockTypes & a_BlockTypes,
-		cChunkDef::BlockNibbles & a_BlockMetas,
-		const cChunkDef::HeightMap & a_Height,
-		const cChunkDef::BiomeMap & a_Biomes,
+		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
 		sSetBlockVector & a_OutsideOther
 	) ;
@@ -57,8 +54,7 @@ protected:
 	/// Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow
 	void ApplyTreeImage(
 		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,
-		cChunkDef::BlockNibbles & a_BlockMetas,
+		cChunkDesc & a_ChunkDesc,
 		const sSetBlockVector & a_Image,
 		sSetBlockVector & a_Overflow
 	);
@@ -100,15 +96,25 @@ class cStructGenLakes :
 	public cStructureGen
 {
 public:
-	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid) : m_Noise(a_Seed), m_Seed(a_Seed), m_Fluid(a_Fluid) {}
+	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainHeightGen & a_HeiGen) :
+		m_Noise(a_Seed),
+		m_Seed(a_Seed),
+		m_Fluid(a_Fluid),
+		m_HeiGen(a_HeiGen)
+	{
+	}
 	
 protected:
-	cNoise    m_Noise;
-	int       m_Seed;
-	BLOCKTYPE m_Fluid;
+	cNoise              m_Noise;
+	int                 m_Seed;
+	BLOCKTYPE           m_Fluid;
+	cTerrainHeightGen & m_HeiGen;
 	
 	// cStructureGen override:
 	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+	
+	/// Creates a lake image for the specified chunk into a_Lake
+	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a_Lake);
 } ;
 
 

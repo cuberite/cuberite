@@ -49,6 +49,7 @@ public:
 		msOverwrite,
 		msFillAir,
 		msImprint,
+		msLake,
 	} ;
 	
 	cBlockArea(void);
@@ -107,11 +108,29 @@ public:
 	| A    | air | air         | A         | A         |
 	| air  | B   | B           | B         | B         |
 	| A    | B   | B           | A         | B         |
-
+	
 	So to sum up:
 	- msOverwrite completely overwrites all blocks with the Src's blocks
 	- msFillAir overwrites only those blocks that were air
 	- msImprint overwrites with only those blocks that are non-air
+
+	Special strategies:
+	msLake (evaluate top-down, first match wins):
+	|    area block     |        |
+	|   this   | Src    | result |
+	+----------+--------+--------+
+	| A        | sponge | A      |  Sponge is the NOP block
+	| *        | air    | air    |  Air always gets hollowed out, even under the oceans
+	| water    | *      | water  |  Water is never overwritten
+	| lava     | *      | lava   |  Lava is never overwritten
+	| *        | water  | water  |  Water always overwrites anything
+	| *        | lava   | lava   |  Lava always overwrites anything
+	| dirt     | stone  | stone  |  Stone overwrites dirt
+	| grass    | stone  | stone  |    ... and grass
+	| mycelium | stone  | stone  |    ... and mycelium
+	| A        | stone  | A      |    ... but nothing else
+	| A        | *      | A      |  Everything else is left as it is
+
 	*/
 	void Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy);
 	
