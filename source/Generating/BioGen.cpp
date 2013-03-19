@@ -595,24 +595,27 @@ void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX
 
 void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_ChunkZ, IntMap & a_TemperatureMap, IntMap & a_HumidityMap)
 {
-	for (int z = 0; z < cChunkDef::Width; z++)
+	// Linear interpolation over 8x8 blocks
+	for (int z = 0; z < 17; z += 8)
 	{
 		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
-		for (int x = 0; x < cChunkDef::Width; x++)
+		for (int x = 0; x < 17; x += 8)
 		{
 			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
 		
 			double NoiseT = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 7000);
 			NoiseT += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 8000);
 			NoiseT += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 9000);
-			a_TemperatureMap[x + 16 * z] = std::max(0, std::min(255, (int)(128 + NoiseT * 128)));
+			a_TemperatureMap[x + 17 * z] = std::max(0, std::min(255, (int)(128 + NoiseT * 128)));
 
 			double NoiseH = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 9000);
 			NoiseH += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 5000);
 			NoiseH += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 1000);
-			a_HumidityMap[x + 16 * z] = std::max(0, std::min(255, (int)(128 + NoiseH * 128)));
+			a_HumidityMap[x + 17 * z] = std::max(0, std::min(255, (int)(128 + NoiseH * 128)));
 		}  // for x
 	}  // for z
+	IntArrayLinearInterpolate2D(a_TemperatureMap, 17, 17, 8, 8);
+	IntArrayLinearInterpolate2D(a_HumidityMap,    17, 17, 8, 8);
 }
 
 
@@ -643,6 +646,7 @@ void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, con
 	} ;
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
+		int idxZ = 17 * z;
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			if (cChunkDef::GetBiome(a_BiomeMap, x, z) != -1)
@@ -650,7 +654,7 @@ void cBioGenMultiStepMap::DecideLandBiomes(cChunkDef::BiomeMap & a_BiomeMap, con
 				// Already set before
 				continue;
 			}
-			int idx = x + 16 * z;
+			int idx = idxZ + x;
 			int Temperature = a_TemperatureMap[idx] / 16;  // -> [0..15] range
 			int Humidity    = a_HumidityMap[idx]    / 16;  // -> [0..15] range
 			cChunkDef::SetBiome(a_BiomeMap, x, z, BiomeMap[Temperature + 16 * Humidity]);
@@ -680,6 +684,7 @@ void cBioGenMultiStepMap::FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, co
 				case biOcean: cChunkDef::SetBiome(a_BiomeMap, x, z, biFrozenOcean); break;
 			}
 		}  // for x
+		idx += 1;
 	}  // for z
 }
 

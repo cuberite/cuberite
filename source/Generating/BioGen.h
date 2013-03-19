@@ -183,7 +183,7 @@ protected:
 	float  m_RiverWidthThreshold;
 	float m_LandBiomesSize;
 	
-	typedef int IntMap[256];  // x + 16 * z, expected trimmed into [0..255] range
+	typedef int IntMap[17 * 17];  // x + 17 * z, expected trimmed into [0..255] range
 		
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
