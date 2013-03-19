@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/17/13 18:47:08.
+** Generated automatically by tolua++-1.0.92 on 03/19/13 11:16:25.
 */
 
 #ifndef __cplusplus
@@ -20450,7 +20450,8 @@ static int tolua_AllToLua_cChunkDesc_WriteBlockArea00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20461,11 +20462,12 @@ static int tolua_AllToLua_cChunkDesc_WriteBlockArea00(lua_State* tolua_S)
   int a_RelX = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_RelY = ((int)  tolua_tonumber(tolua_S,4,0));
   int a_RelZ = ((int)  tolua_tonumber(tolua_S,5,0));
+  cBlockArea::eMergeStrategy a_MergeStrategy = ((cBlockArea::eMergeStrategy) (int)  tolua_tonumber(tolua_S,6,cBlockArea::msOverwrite));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'WriteBlockArea'", NULL);
 #endif
   {
-   self->WriteBlockArea(*a_BlockArea,a_RelX,a_RelY,a_RelZ);
+   self->WriteBlockArea(*a_BlockArea,a_RelX,a_RelY,a_RelZ,a_MergeStrategy);
   }
  }
  return 0;
@@ -22579,6 +22581,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"msOverwrite",cBlockArea::msOverwrite);
    tolua_constant(tolua_S,"msFillAir",cBlockArea::msFillAir);
    tolua_constant(tolua_S,"msImprint",cBlockArea::msImprint);
+   tolua_constant(tolua_S,"msLake",cBlockArea::msLake);
    tolua_function(tolua_S,"new",tolua_AllToLua_cBlockArea_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cBlockArea_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cBlockArea_new00_local);
