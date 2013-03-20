@@ -228,6 +228,31 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 		}  // for x
 	}  // for z
 	
+	/*
+	// Linearly interpolate 4x4 blocks of heightmap:
+	// This is fast, but really ugly! Do not use!
+	const int STEPZ = 4;  // Must be a divisor of 16
+	const int STEPX = 4;  // Must be a divisor of 16
+	int Height[17 * 17];
+	for (int z = 0; z < 17; z += STEPZ)
+	{
+		for (int x = 0; x < 17; x += STEPX)
+		{
+			Height[x + 17 * z] = GetHeightAt(x, z, a_ChunkX, a_ChunkZ, Biomes);
+		}
+	}
+	IntArrayLinearInterpolate2D(Height, 17, 17, STEPX, STEPZ);
+	
+	// Copy into the heightmap
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			cChunkDef::SetHeight(a_HeightMap, x, z, Height[x + 17 * z]);
+		}
+	}
+	*/
+	
 	// For each height, go through neighboring biomes and add up their idea of height:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
