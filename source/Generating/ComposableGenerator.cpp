@@ -308,40 +308,40 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 	AStringVector Str = StringSplitAndTrim(Structures, ",");
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
-		if (NoCaseCompare(*itr, "trees") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
-		}
-		else if (NoCaseCompare(*itr, "marblecaves") == 0)
-		{
-			m_StructureGens.push_back(new cStructGenMarbleCaves(Seed));
-		}
-		else if (NoCaseCompare(*itr, "dualridgecaves") == 0)
+		if (NoCaseCompare(*itr, "DualRidgeCaves") == 0)
 		{
 			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
 			m_StructureGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
 		}
-		else if (NoCaseCompare(*itr, "orenests") == 0)
+		else if (NoCaseCompare(*itr, "LavaLakes") == 0)
+		{
+			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
+			m_StructureGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen, Probability));
+		}
+		else if (NoCaseCompare(*itr, "MarbleCaves") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenMarbleCaves(Seed));
+		}
+		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
 			m_StructureGens.push_back(new cStructGenOreNests(Seed));
 		}
-		else if (NoCaseCompare(*itr, "ravines") == 0)
+		else if (NoCaseCompare(*itr, "Ravines") == 0)
 		{
 			m_StructureGens.push_back(new cStructGenRavines(Seed, 128));
 		}
-		else if (NoCaseCompare(*itr, "wormnestcaves") == 0)
+		else if (NoCaseCompare(*itr, "Trees") == 0)
 		{
-			m_StructureGens.push_back(new cStructGenWormNestCaves(Seed));
+			m_StructureGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
 		}
-		else if (NoCaseCompare(*itr, "waterlakes") == 0)
+		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
 			m_StructureGens.push_back(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, *m_HeightGen, Probability));
 		}
-		else if (NoCaseCompare(*itr, "lavalakes") == 0)
+		else if (NoCaseCompare(*itr, "WormNestCaves") == 0)
 		{
-			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
-			m_StructureGens.push_back(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, *m_HeightGen, Probability));
+			m_StructureGens.push_back(new cStructGenWormNestCaves(Seed));
 		}
 		else
 		{
