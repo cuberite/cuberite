@@ -19,13 +19,26 @@ class cDelayedFluidSimulatorChunkData :
 	public cFluidSimulatorData
 {
 public:
+	class cSlot
+	{
+	public:
+		/// Returns true if the specified block is stored
+		bool HasBlock(int a_RelX, int a_RelY, int a_RelZ);
+		
+		/// Adds the specified block unless already present; returns true if added, false if the block was already present
+		bool Add(int a_RelX, int a_RelY, int a_RelZ);
+		
+		/** Array of block containers, each item stores blocks for one Z coord
+		Int param is the block index (for faster duplicate comparison in Add())
+		*/
+		cCoordWithIntVector m_Blocks[16];
+	} ;
+	
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
 	virtual ~cDelayedFluidSimulatorChunkData();
 	
-	/** Slots, one for each delay tick, each containing the blocks to simulate; relative coords.
-	Int param is the block index (for faster duplicate comparison in cDelayedFluidSimulator::AddBlock())
-	*/
-	cCoordWithIntVector * m_Slots;
+	/// Slots, one for each delay tick, each containing the blocks to simulate
+	cSlot * m_Slots;
 } ;
 
 
