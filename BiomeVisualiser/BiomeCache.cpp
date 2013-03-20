@@ -34,8 +34,8 @@ static int GetNumCores(void)
 
 cBiomeCache::cBiomeCache(void) :
 	m_Source(NULL),
-	m_BaseX(MAXINT),
-	m_BaseZ(MAXINT),
+	m_BaseX(-100000),
+	m_BaseZ(-100000),
 	m_Available(NULL),
 	m_IsTerminatingThreads(false)
 {
@@ -222,8 +222,8 @@ void cBiomeCache::SetSource(cBiomeSource * a_Source)
 	
 	// Invalidate cache contents:
 	cCSLock Lock(m_CS);
-	m_BaseX = MAXINT;
-	m_BaseZ = MAXINT;
+	m_BaseX = -10000;
+	m_BaseZ = -10000;
 	m_Pool.splice(m_Pool.end(), m_Queue);
 }
 

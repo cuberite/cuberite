@@ -46,8 +46,8 @@ bool cBiomeRenderer::Render(cPixmap & a_Pixmap)
 	m_Cache.HintViewArea(MinBlockX / 16 - 1, MaxBlockX / 16 + 1, MinBlockZ / 16 - 1, MaxBlockZ / 16 + 1);
 	
 	// Hold one current chunk of biome data:
-	int CurChunkX = MAXINT32;
-	int CurChunkZ = MAXINT32;
+	int CurChunkX = -10000;
+	int CurChunkZ = -10000;
 	cChunkDef::BiomeMap CurBiomes;
 	
 	bool res = false;

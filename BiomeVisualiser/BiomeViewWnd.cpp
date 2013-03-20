@@ -44,7 +44,7 @@ bool cBiomeViewWnd::Create(HWND a_ParentWnd, LPCTSTR a_Title)
 	SetWindowLongPtr(m_Wnd, GWLP_WNDPROC, m_Thunk);
 	
 	cIniFile IniFile;
-	cBiomeGen * BioGen = new cBioGenMultiStepMap(0);
+	cBiomeGen * BioGen = new cBioGenMultiStepMap(2);
 	BioGen->Initialize(IniFile);
 	m_Renderer.SetSource(new cGeneratorBiomeSource(BioGen));
 	
