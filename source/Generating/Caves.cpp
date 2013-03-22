@@ -479,19 +479,19 @@ void cCaveTunnel::ProcessChunk(
 			continue;
 		}
 		
-		// Carve out a sphere around the xyz point, m_Radius in diameter:
+		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 20 % off the top and bottom:
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
-		int Bottom = std::max(itr->m_BlockY - itr->m_Radius, 1);
-		int Top    = std::min(itr->m_BlockY + itr->m_Radius, (int)(cChunkDef::Height));  // Stupid gcc needs int cast
+		int Bottom = std::max(itr->m_BlockY - 4 * itr->m_Radius / 5, 1);
+		int Top    = std::min(itr->m_BlockY + 4 * itr->m_Radius / 5, (int)(cChunkDef::Height));
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++) 
 		{
 			for (int y = Bottom; y <= Top; y++)
 			{
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
-				if (6 * SqDist <= SqRad)
+				if (SqDist <= SqRad)
 				{
 					switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
 					{
@@ -722,7 +722,7 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 	*/
 	
 	// The algorithm of choice: Divide a constant by the random number returned, thus producing a hyperbole-shaped noise distribution
-	int res = 4 + (32 / ((rnd & 0xff) + 2));
+	int res = 2 + (32 / ((rnd & 0xff) + 2));
 	return res;
 }
 
