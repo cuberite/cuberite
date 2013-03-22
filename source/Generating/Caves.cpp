@@ -42,6 +42,13 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 
 
+const int MIN_RADIUS = 3;
+const int MAX_RADIUS = 8;
+
+
+
+
+
 struct cCaveDefPoint
 {
 	int m_BlockX;
@@ -207,7 +214,7 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 			len += (PrevY - itr->m_BlockY) * (PrevY - itr->m_BlockY);
 			len += (PrevZ - itr->m_BlockZ) * (PrevZ - itr->m_BlockZ);
 			len = 3 * (int)sqrt((double)len) / 4;
-			int Rad = (PrevR + itr->m_Radius) / 2 + (Random % 3) - 1;
+			int Rad = std::min(MAX_RADIUS, std::max(MIN_RADIUS, (PrevR + itr->m_Radius) / 2 + (Random % 3) - 1));
 			Random /= 4;
 			int x = (itr->m_BlockX + PrevX) / 2 + (Random % (len + 1) - len / 2);
 			Random /= 256;
@@ -479,19 +486,19 @@ void cCaveTunnel::ProcessChunk(
 			continue;
 		}
 		
-		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 20 % off the top and bottom:
+		// Carve out a sphere around the xyz point, m_Radius in diameter; skip 3/7 off the top and bottom:
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
-		int Bottom = std::max(itr->m_BlockY - 4 * itr->m_Radius / 5, 1);
-		int Top    = std::min(itr->m_BlockY + 4 * itr->m_Radius / 5, (int)(cChunkDef::Height));
+		int Bottom = std::max(itr->m_BlockY - 3 * itr->m_Radius / 7, 1);
+		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, (int)(cChunkDef::Height));
 		int SqRad  = itr->m_Radius * itr->m_Radius;
 		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++) 
 		{
 			for (int y = Bottom; y <= Top; y++)
 			{
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
-				if (SqDist <= SqRad)
+				if (4 * SqDist <= SqRad)
 				{
 					switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
 					{
@@ -721,8 +728,8 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 	int res = 3 + abs((sum / 24) - 16);
 	*/
 	
-	// The algorithm of choice: Divide a constant by the random number returned, thus producing a hyperbole-shaped noise distribution
-	int res = 2 + (32 / ((rnd & 0xff) + 2));
+	// Algorithm of choice: random value in the range of zero to random value - heavily towards zero
+	int res = MIN_RADIUS + (rnd >> 8) % ((rnd % (MAX_RADIUS - MIN_RADIUS)) + 1);
 	return res;
 }
 
