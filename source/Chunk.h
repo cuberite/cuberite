@@ -270,6 +270,9 @@ public:
 
 	/// Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success; only usable in Tick()
 	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/// Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case), ignores unsuccessful attempts
+	void UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
 	// Simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }

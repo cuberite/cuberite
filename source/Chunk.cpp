@@ -966,6 +966,44 @@ bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 
 
+void cChunk::UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
+{
+	// Is it in this chunk?	
+	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
+	{
+		QueueTickBlock(a_RelX, a_RelY, a_RelZ);
+		return;
+	}
+
+	// Not in this chunk, try walking the neighbors first:
+	if ((a_RelX < 0) && (m_NeighborXM != NULL))
+	{
+		m_NeighborXM->UnboundedQueueTickBlock(a_RelX + cChunkDef::Width, a_RelY, a_RelZ);
+		return;
+	}
+	if ((a_RelX >= cChunkDef::Width) && (m_NeighborXP != NULL))
+	{
+		m_NeighborXP->UnboundedQueueTickBlock(a_RelX - cChunkDef::Width, a_RelY, a_RelZ);
+		return;
+	}
+	if ((a_RelZ < 0) && (m_NeighborZM != NULL))
+	{
+		m_NeighborZM->UnboundedQueueTickBlock(a_RelX, a_RelY, a_RelZ + cChunkDef::Width);
+		return;
+	}
+	if ((a_RelZ >= cChunkDef::Width) && (m_NeighborZP != NULL))
+	{
+		m_NeighborZP->UnboundedQueueTickBlock(a_RelX, a_RelY, a_RelZ - cChunkDef::Width);
+		return;
+	}
+
+	// Neighbors not available, ignore altogether
+}
+
+
+
+
+
 int cChunk::GetHeight( int a_X, int a_Z )
 {
 	ASSERT((a_X >= 0) && (a_X < Width) && (a_Z >= 0) && (a_Z < Width));
@@ -1139,12 +1177,15 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 	MarkDirty();
 	
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
-	if (!(
-		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
-	))
+	if (
+		(OldBlockMeta != a_BlockMeta) ||  // Different meta always gets updated
+		!(
+			((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+			((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+			((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
+			((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+		)
+	)
 	{
 		cCSLock Lock(m_CSBlockLists);
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
@@ -1263,11 +1304,7 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 	} ;
 	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
-		cChunk * ch = GetRelNeighborChunk(a_RelX + Coords[i].x, a_RelZ + Coords[i].z);
-		if (ch != NULL)
-		{
-			ch->QueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
-		}
+		UnboundedQueueTickBlock(a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z);
 	}  // for i - Coords[]
 }
 
@@ -1294,12 +1331,15 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	m_BlockTypes[index] = a_BlockType;
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
-	if (!(
-		((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-		((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-		((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-		((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
-	))
+	if (
+		(OldBlockMeta == a_BlockMeta) ||  // Different meta always gets sent to the client
+		!(
+			((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+			((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+			((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
+			((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+		)
+	)
 	{
 		cCSLock Lock(m_CSBlockLists);
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));

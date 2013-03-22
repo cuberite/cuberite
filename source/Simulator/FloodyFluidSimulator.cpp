@@ -47,10 +47,17 @@ cFloodyFluidSimulator::cFloodyFluidSimulator(
 
 void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
+	FLOG("Simulating block {%d, %d, %d}: block %d, meta %d", 
+		a_Chunk->GetPosX() * cChunkDef::Width + a_RelX, a_RelY, a_Chunk->GetPosZ() * cChunkDef::Width + a_RelZ,
+		a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ),
+		a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ)
+	);
+	
 	NIBBLETYPE MyMeta = a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ);
 	if (!IsAnyFluidBlock(a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ)))
 	{
 		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
+		FLOG("  BadBlockType exit");
 		return;
 	}
 
@@ -61,6 +68,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		{
 			// Has no tributary, has been decreased (in CheckTributaries()),
 			// no more processing needed (neighbors have been scheduled by the decrease)
+			FLOG("  CheckTributaries exit");
 			return;
 		}
 	}
@@ -118,6 +126,7 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 		if (IsAnyFluidBlock(a_Chunk->GetBlock(a_RelX, a_RelY + 1, a_RelZ)))
 		{
 			// This block is fed from above, no more processing needed
+			FLOG("  Fed from above");
 			return false;
 		}
 	}
@@ -143,6 +152,12 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 			if (IsAllowedBlock(BlockType) && IsHigherMeta(BlockMeta, a_MyMeta))
 			{
 				// This block is fed, no more processing needed
+				FLOG("  Fed from {%d, %d, %d}, type %d, meta %d",
+					a_Chunk->GetPosX() * cChunkDef::Width + a_RelX + Coords[i].x,
+					a_RelY,
+					a_Chunk->GetPosZ() * cChunkDef::Width + a_RelZ + Coords[i].z,
+					BlockType, BlockMeta
+				);
 				return false;
 			}
 		}  // for i - Coords[]
@@ -204,7 +219,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		{
 			// Lava flowing into water, change to stone / cobblestone based on direction:
 			BLOCKTYPE NewBlock = (a_NewMeta == 8) ? E_BLOCK_STONE : E_BLOCK_COBBLESTONE;
-			FLOG("  Lava flowing into water, turning water at {%d, %d, %d} into stone", 
+			FLOG("  Lava flowing into water, turning water at rel {%d, %d, %d} into stone", 
 				a_RelX, a_RelY, a_RelZ,
 				ItemTypeToString(NewBlock).c_str()
 			);
@@ -221,7 +236,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		{
 			// Water flowing into lava, change to cobblestone / obsidian based on dest block:
 			BLOCKTYPE NewBlock = (BlockMeta == 0) ? E_BLOCK_OBSIDIAN : E_BLOCK_COBBLESTONE;
-			FLOG("  Water flowing into lava, turning lava at {%d, %d, %d} into %s", 
+			FLOG("  Water flowing into lava, turning lava at rel {%d, %d, %d} into %s", 
 				a_RelX, a_RelY, a_RelZ, ItemTypeToString(NewBlock).c_str()
 			);
 			a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
@@ -258,7 +273,12 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	}  // if (CanWashAway)
 	
 	// Spread:
-	FLOG("  Spreading to {%d, %d, %d} with meta %d", a_RelX, a_RelY, a_RelZ, a_NewMeta);
+	FLOG("  Spreading to {%d, %d, %d} with meta %d", 
+		a_NearChunk->GetPosX() * cChunkDef::Width + a_RelX,
+		a_RelY,
+		a_NearChunk->GetPosZ() * cChunkDef::Width + a_RelZ,
+		a_NewMeta
+	);
 	a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
 }
 
@@ -291,21 +311,21 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 			// Neighbor not available, skip it
 			continue;
 		}
-		FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(BlockType, 1, BlockMeta)).c_str());
+		// FLOG("   Neighbor at {%d, %d, %d}: %s", x, y, z, ItemToFullString(cItem(BlockType, 1, BlockMeta)).c_str());
 		if ((BlockMeta == 0) && IsAnyFluidBlock(BlockType))
 		{
 			NumNeeded--;
-			FLOG("    Found a neighbor source at {%d, %d, %d}, NumNeeded := %d", x, y, z, NumNeeded);
+			// FLOG("    Found a neighbor source at {%d, %d, %d}, NumNeeded := %d", x, y, z, NumNeeded);
 			if (NumNeeded == 0)
 			{
 				// Found enough, turn into a source and bail out
-				FLOG("    Found enough neighbor sources, turning into a source");
+				// FLOG("    Found enough neighbor sources, turning into a source");
 				a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, 0);
 				return true;
 			}
 		}
 	}
-	FLOG("    Not enough neighbors for turning into a source, NumNeeded = %d", NumNeeded);
+	// FLOG("    Not enough neighbors for turning into a source, NumNeeded = %d", NumNeeded);
 	return false;
 }
 
