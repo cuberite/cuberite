@@ -33,7 +33,7 @@ cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem 
 	, m_Item(a_Item)
 	, m_bCollected( false )
 {
-	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
+	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -80,7 +80,7 @@ void cPickup::Tick(float a_Dt, MTRand & a_TickRandom)
 		return;
 	}
 
-	if (m_Pos.y < -8) // Out of this world and no more visible!
+	if (GetPosY() < -8) // Out of this world and no more visible!
 	{
 		Destroy();
 		return;
@@ -108,15 +108,15 @@ void cPickup::HandlePhysics(float a_Dt)
 
 	if (m_bOnGround) // check if it's still on the ground
 	{
-		int BlockX = (m_Pos.x < 0) ? (int)m_Pos.x - 1 : (int)m_Pos.x;
-		int BlockZ = (m_Pos.z < 0) ? (int)m_Pos.z - 1 : (int)m_Pos.z;
-		char BlockBelow = World->GetBlock(BlockX, (int)m_Pos.y - 1, BlockZ);
+		int BlockX = (GetPosX() < 0) ? (int)GetPosX() - 1 : (int)GetPosX();
+		int BlockZ = (GetPosZ() < 0) ? (int)GetPosZ() - 1 : (int)GetPosZ();
+		char BlockBelow = World->GetBlock(BlockX, (int)GetPosY() - 1, BlockZ);
 		if (BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow))
 		{
 			m_bOnGround = false;
 		}
-		char Block = World->GetBlock(BlockX, (int)m_Pos.y - (int)m_bOnGround, BlockZ );
-		char BlockIn = World->GetBlock(BlockX, (int)m_Pos.y, BlockZ );
+		char Block = World->GetBlock(BlockX, (int)GetPosY() - (int)m_bOnGround, BlockZ );
+		char BlockIn = World->GetBlock(BlockX, (int)GetPosY(), BlockZ );
 
 		if( IsBlockLava(Block) || Block == E_BLOCK_FIRE
 			|| IsBlockLava(BlockIn) || BlockIn == E_BLOCK_FIRE)
@@ -129,17 +129,17 @@ void cPickup::HandlePhysics(float a_Dt)
 		if( BlockIn != E_BLOCK_AIR && !IsBlockWater(BlockIn) ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;
-			m_Pos.y += 0.2;
+			SetPosY(GetPosY() + 0.2);
 			m_bReplicated = false;
 		}
-		m_Speed.x *= 0.7f / (1 + a_Dt);
-		if (fabs(m_Speed.x) < 0.05) m_Speed.x = 0;
-		m_Speed.z *= 0.7f / (1 + a_Dt);
-		if (fabs(m_Speed.z) < 0.05) m_Speed.z = 0;
+		SetSpeedX(GetSpeedX() * 0.7f/(1+a_Dt));
+		if( fabs(GetSpeedX()) < 0.05 ) SetSpeedX(0);
+		SetSpeedZ(GetSpeedZ() * 0.7f/(1+a_Dt));
+		if( fabs(GetSpeedZ()) < 0.05 ) SetSpeedZ(0);
 	}
 
 	// get flowing direction
-	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) m_Pos.x - 1, (int) m_Pos.y, (int) m_Pos.z - 1);
+	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) GetSpeedX() - 1, (int) GetSpeedY(), (int) GetSpeedZ() - 1);
 
 	m_WaterSpeed *= 0.9f;		//Keep old speed but lower it
 
@@ -176,10 +176,10 @@ void cPickup::HandlePhysics(float a_Dt)
 		{
 			Gravity = -3;
 		}
-		m_Speed.y += Gravity;
+		SetSpeedY(GetSpeedY() + Gravity);
 
 		// Set to hit position
-		m_ResultingSpeed += m_Speed;
+		m_ResultingSpeed += GetSpeed();
 		
 		/*
 		LOGD("Pickup #%d speed: {%.03f, %.03f, %.03f}, pos {%.02f, %.02f, %.02f}", 
@@ -190,38 +190,38 @@ void cPickup::HandlePhysics(float a_Dt)
 		*/
 
 		cTracer Tracer(GetWorld());
-		int Ret = Tracer.Trace(m_Pos, m_Speed, 2);
+		int Ret = Tracer.Trace(GetPosition(), GetSpeed(), 2);
 		if (Ret) // Oh noez! we hit something
 		{
-			if ((Tracer.RealHit - Vector3f(m_Pos)).SqrLength() <= ( m_ResultingSpeed * a_Dt ).SqrLength())
+			if ((Tracer.RealHit - Vector3f(GetPosition())).SqrLength() <= ( m_ResultingSpeed * a_Dt ).SqrLength())
 			{
 				m_bReplicated = false; // It's only interesting to replicate when we actually hit something...
 				if (Ret == 1)
 				{
 
-					if (Tracer.HitNormal.x != 0.f ) m_Speed.x = 0.f;
-					if (Tracer.HitNormal.y != 0.f ) m_Speed.y = 0.f;
-					if (Tracer.HitNormal.z != 0.f ) m_Speed.z = 0.f;
+					if( Tracer.HitNormal.x != 0.f ) SetSpeedX(0.f);
+					if( Tracer.HitNormal.y != 0.f ) SetSpeedY(0.f);
+					if( Tracer.HitNormal.z != 0.f ) SetSpeedZ(0.f);
 
 					if (Tracer.HitNormal.y > 0) // means on ground
 					{
 						m_bOnGround = true;
 					}
 				}
-				m_Pos = Tracer.RealHit;
-				m_Pos += Tracer.HitNormal * 0.2f;
+				SetPosition(Tracer.RealHit);
+				SetPosition(GetPosition() + (Tracer.HitNormal * 0.2f));
 
 			}
 			else
-				m_Pos += m_ResultingSpeed * a_Dt;
+				SetPosition(GetPosition() + (m_ResultingSpeed*a_Dt));
 		}
 		else
 		{	// We didn't hit anything, so move =]
-			m_Pos += m_ResultingSpeed * a_Dt;
+			SetPosition(GetPosition() + (m_ResultingSpeed*a_Dt));
 		}
 	}
 	// Usable for debugging
-	SetPosition(m_Pos.x, m_Pos.y, m_Pos.z);
+	//SetPosition(m_Pos.x, m_Pos.y, m_Pos.z);
 }
 
 
@@ -255,7 +255,7 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		{
 			cItems Pickup;
 			Pickup.push_back(cItem(m_Item));
-			m_World->SpawnItemPickups(Pickup, m_Pos.x, m_Pos.y, m_Pos.z);
+			m_World->SpawnItemPickups(Pickup, GetPosX(), GetPosY(), GetPosZ());
 		}
 		return true;
 	}

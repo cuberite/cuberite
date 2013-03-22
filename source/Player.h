@@ -61,7 +61,7 @@ public:
 	double GetEyeHeight();													// tolua_export
 	Vector3d GetEyePosition();												// tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
-	inline const double GetStance(void) const { return m_Pos.y + 1.62; }					// tolua_export  // TODO: Proper stance when crouching etc.
+	inline const double GetStance(void) const { return GetPosY() + 1.62; }					// tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 	

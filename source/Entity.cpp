@@ -31,9 +31,16 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_ChunkY(0)
 	, m_ChunkZ(0)
 	, m_Pos(a_X, a_Y, a_Z)
-	, m_bDirtyPosition(true)
 	, m_bDirtyOrientation(true)
+	, m_bDirtyPosition(true)
+	, m_bDirtySpeed(true)
 	, m_bDestroyed(false)
+	, m_LastPosX( 0.0 )
+	, m_LastPosY( 0.0 )
+	, m_LastPosZ( 0.0 )
+	, m_TimeLastTeleportPacket(0)
+	, m_TimeLastMoveReltPacket(0)
+	, m_TimeLastSpeedPacket(0)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
 	, m_bRemovedFromChunk(false)
@@ -125,6 +132,18 @@ void cEntity::WrapRotation()
 	while (m_Rot.x < -180.f) m_Rot.x+=360.f;
 	while (m_Rot.y > 180.f)  m_Rot.y-=360.f;
 	while (m_Rot.y < -180.f) m_Rot.y+=360.f;
+}
+
+void cEntity::WrapSpeed()
+{
+	//There shoudn't be a need for flipping the flag on because this function is called 
+	//after any update, so the flag is already turned on
+	if       (m_Speed.x > 20.0f)   m_Speed.x  =  20.0f;
+	else if  (m_Speed.x < -20.0f)  m_Speed.x  = -20.0f;
+	if       (m_Speed.y > 20.0f)   m_Speed.y  =  20.0f;
+	else if  (m_Speed.y < -20.0f)  m_Speed.y  = -20.0f;
+	if       (m_Speed.z > 20.0f)   m_Speed.z  =  20.0f;
+	else if  (m_Speed.z < -20.0f)  m_Speed.z  = -20.0f;
 }
 
 
@@ -243,6 +262,73 @@ void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
 
 
 
+void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
+{
+	if (m_bDirtyOrientation && !m_bDirtyPosition)
+	{
+		//LOGD("Sending (rot,yaw,roll) = (%f,%f,%f)",m_Rot.x,m_Rot.y,m_Rot.z);
+		m_World->BroadcastEntLook(*this,a_Exclude);
+		m_World->BroadcastEntHeadLook(*this,a_Exclude);
+		m_bDirtyOrientation = false;
+	}
+
+	if (m_bDirtyPosition)
+	{
+		float DiffX = (float)(GetPosX() - m_LastPosX);
+		float DiffY = (float)(GetPosY() - m_LastPosY);
+		float DiffZ = (float)(GetPosZ() - m_LastPosZ);
+		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
+		if (
+			(SqrDist > 16)  // 4 blocks is max Relative Move. 16 = 4 ^ 2
+			|| (m_World->GetWorldAge() - m_TimeLastTeleportPacket > 400)  // Send an absolute position every 20 seconds
+			)
+		{
+			//LOGD("Teleported from (%f,%f,%f) to (%f,%f,%f); Distance square: %f",m_LastPosX,m_LastPosY,m_LastPosZ, m_Pos.x,m_Pos.y,m_Pos.z,SqrDist );
+			m_World->BroadcastEntHeadLook(*this,a_Exclude);
+			m_World->BroadcastTeleportEntity(*this,a_Exclude);
+			m_TimeLastTeleportPacket = m_World->GetWorldAge();
+			m_LastPosX = GetPosX();
+			m_LastPosY = GetPosY();
+			m_LastPosZ = GetPosZ();
+			m_bDirtyPosition = false;
+		}
+		else
+		{
+			if ((m_World->GetWorldAge() - m_TimeLastMoveReltPacket > 60)) // Send relative movement every 3 seconds
+			{
+				//LOGD("Moved from (%f,%f,%f) to (%f,%f,%f)",m_LastPosX,m_LastPosY,m_LastPosZ, m_Pos.x,m_Pos.y,m_Pos.z );
+				if (m_bDirtyOrientation)
+				{
+					m_World->BroadcastEntHeadLook(*this,a_Exclude);
+					m_World->BroadcastEntRelMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32),a_Exclude);
+					m_bDirtyOrientation = false;
+				}
+				else
+				{
+					m_World->BroadcastEntHeadLook(*this,a_Exclude);
+					m_World->BroadcastEntRelMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32),a_Exclude);
+				}
+				m_TimeLastMoveReltPacket = m_World->GetWorldAge();
+				m_LastPosX = GetPosX();
+				m_LastPosY = GetPosY();
+				m_LastPosZ = GetPosZ();
+				m_bDirtyPosition = false;
+			}
+		}
+	}
+	//We need to keep updating the clients when there is movement or if there was a change in speed and after 1 tick
+	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 1))
+	{
+		m_World->BroadcastEntVelocity(*this,a_Exclude);
+		m_bDirtySpeed = false;
+		m_TimeLastSpeedPacket = m_World->GetWorldAge();
+	}
+}
+
+
+
+
+
 void cEntity::AttachTo(cEntity * a_AttachTo)
 {
 	if (m_AttachedTo == a_AttachTo)
@@ -334,8 +420,39 @@ void cEntity::SetRoll(double a_Roll)
 void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
 	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_bDirtySpeed = true;
+	WrapSpeed();
 }
 
+
+
+
+void cEntity::SetSpeedX(double a_SpeedX)
+{
+	m_Speed.x = a_SpeedX;
+	m_bDirtySpeed = true;
+	WrapSpeed();
+}
+
+
+
+
+void cEntity::SetSpeedY(double a_SpeedY)
+{
+	m_Speed.y = a_SpeedY;
+	m_bDirtySpeed = true;
+	WrapSpeed();
+}
+
+
+
+
+void cEntity::SetSpeedZ(double a_SpeedZ)
+{
+	m_Speed.z = a_SpeedZ;
+	m_bDirtySpeed = true;
+	WrapSpeed();
+}
 
 
 
@@ -343,6 +460,8 @@ void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 void cEntity::AddSpeed(const Vector3d & a_AddSpeed)
 {
 	m_Speed += a_AddSpeed;
+	m_bDirtySpeed = true;
+	WrapSpeed();
 }
 
 
@@ -365,17 +484,6 @@ Vector3d cEntity::GetLookVector(void) const
 
 //////////////////////////////////////////////////////////////////////////
 // Set position
-void cEntity::SetPosition(const Vector3d & a_Pos)
-{
-	m_Pos = a_Pos;
-	MoveToCorrectChunk();
-	m_bDirtyPosition = true;
-}
-
-
-
-
-
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
 	m_Pos.Set(a_PosX, a_PosY, a_PosZ);

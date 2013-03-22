@@ -127,13 +127,16 @@ public:
 	void SetPosY    (double a_PosY);
 	void SetPosZ    (double a_PosZ);
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
-	void SetPosition(const Vector3d & a_Pos);
+	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x,a_Pos.y,a_Pos.z);}
 	void SetRot     (const Vector3f & a_Rot);
 	void SetRotation(double a_Rotation);
 	void SetPitch   (double a_Pitch);
 	void SetRoll    (double a_Roll);
 	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
-	void SetSpeed   (const Vector3d & a_Speed) { m_Speed = a_Speed; }
+	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x,a_Speed.y,a_Speed.z); }
+	void SetSpeedX  (double a_SpeedX);
+	void SetSpeedY  (double a_SpeedY);
+	void SetSpeedZ  (double a_SpeedZ);
 	
 	void AddSpeed(const Vector3d & a_AddSpeed);
 
@@ -153,6 +156,9 @@ public:
 	Needs to have a default implementation due to Lua bindings.
 	*/
 	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }
+
+	//Updates clients of changes in the entity.
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
 	
 	/// Attaches to the specified entity; detaches from any previous one first
 	void AttachTo(cEntity * a_AttachTo);
@@ -160,7 +166,11 @@ public:
 	/// Detaches from the currently attached entity, if any
 	void Detach(void);
 	
+	//Makes sure rotation is not over the specified range.
 	void WrapRotation();
+
+	//Makes speed is not over 20. Max speed is 20 blocks / second
+	void WrapSpeed();
 	
 	// tolua_begin
 	
@@ -192,13 +202,17 @@ protected:
 	cReferenceManager* m_References;
 
 	int m_ChunkX, m_ChunkY, m_ChunkZ;
-	Vector3d m_Pos;
-	bool     m_bDirtyPosition;
-
-	Vector3d m_Rot;
-	bool     m_bDirtyOrientation;
 	
-	Vector3d m_Speed;
+	//Flags that signal that we haven't updated the clients with the latest.
+	bool     m_bDirtyOrientation;
+	bool     m_bDirtyPosition;
+	bool     m_bDirtySpeed;
+
+	//Last Position.
+	double m_LastPosX, m_LastPosY, m_LastPosZ;
+
+	//This variables keep track of the last time a packet was sent
+	Int64 m_TimeLastTeleportPacket,m_TimeLastMoveReltPacket,m_TimeLastSpeedPacket;  // In ticks
 
 	bool m_bDestroyed;
 	bool m_bRemovedFromChunk;
@@ -219,6 +233,10 @@ protected:
 	void AddReference( cEntity*& a_EntityPtr );
 	void ReferencedBy( cEntity*& a_EntityPtr );
 	void Dereference( cEntity*& a_EntityPtr );
+private:
+	Vector3d m_Speed;
+	Vector3d m_Rot;
+	Vector3d m_Pos;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;

@@ -163,8 +163,6 @@ protected:
 
 	MetaData m_MetaData;
 
-	double m_LastPosX, m_LastPosY, m_LastPosZ;
-	Int64 m_TimeLastTeleportPacket;  // In ticks
 }; // tolua_export
 
 

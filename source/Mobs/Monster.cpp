@@ -76,7 +76,7 @@ void cMonster::MoveToPosition( const Vector3f & a_Position )
 
 bool cMonster::ReachedDestination()
 {
-	Vector3f Distance = (m_Destination) - Vector3f( m_Pos );
+	Vector3f Distance = (m_Destination) - GetPosition();
 	if( Distance.SqrLength() < 2.f )
 		return true;
 
@@ -106,20 +106,20 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 
 	if (m_bMovingToDestination)
 	{
-		Vector3f Pos( m_Pos );
+		Vector3f Pos( GetPosition() );
 		Vector3f Distance = m_Destination - Pos;
 		if( !ReachedDestination() )
 		{
 			Distance.y = 0;
 			Distance.Normalize();
 			Distance *= 3;
-			m_Speed.x = Distance.x;
-			m_Speed.z = Distance.z;
+			SetSpeedX( Distance.x );
+			SetSpeedZ( Distance.z );
 
 			if (m_EMState == ESCAPING)
 			{	//Runs Faster when escaping :D otherwise they just walk away
-				m_Speed.x *= 2.f;
-				m_Speed.z *= 2.f;
+				SetSpeedX (GetSpeedX() * 2.f);
+				SetSpeedZ (GetSpeedZ() * 2.f);
 			}
 		}
 		else
@@ -127,25 +127,23 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 			m_bMovingToDestination = false;
 		}
 
-		if( m_Speed.SqrLength() > 0.f )
+		if( GetSpeed().SqrLength() > 0.f )
 		{
 			if( m_bOnGround )
 			{
-				Vector3f NormSpeed = m_Speed.NormalizeCopy();
-				Vector3f NextBlock = Vector3f( m_Pos ) + NormSpeed;
+				Vector3f NormSpeed = Vector3f(GetSpeed()).NormalizeCopy();
+				Vector3f NextBlock = Vector3f( GetPosition() ) + NormSpeed;
 				double NextHeight = (double)GetWorld()->GetHeight( (int)NextBlock.x, (int)NextBlock.z );
-				if( NextHeight > m_Pos.y - 1.2 && NextHeight - m_Pos.y < 2.5 )
+				if( NextHeight > (GetPosY() - 1.0) && (NextHeight - GetPosY()) < 2.5 )
 				{
 					m_bOnGround = false;
-					m_Speed.y = 7.f; // Jump!!
+					SetSpeedY(5.f); // Jump!!
 				}
 			}
 		}
 	}
-
-	ReplicateMovement();
 	
-	Vector3d Distance = m_Destination - Vector3f( m_Pos );
+	Vector3d Distance = m_Destination - GetPosition();
 	if (Distance.SqrLength() > 0.1f)
 	{
 		double Rotation, Pitch;
@@ -154,7 +152,11 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 		SetRotation( Rotation );
 		SetPitch( Pitch );
 	}
-	
+
+	HandlePhysics(a_Dt);
+	BroadcastMovementUpdate();
+	MoveToCorrectChunk();
+
 	switch (m_EMState)
 	{
 		case IDLE:
@@ -182,7 +184,7 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 
 
 
-
+//Not used. Will remove later when we implement the AI.
 void cMonster::ReplicateMovement()
 {
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
@@ -237,59 +239,59 @@ void cMonster::HandlePhysics(float a_Dt)
 	if( m_bOnGround ) // check if it's still on the ground
 	{
 		cWorld* World = GetWorld();
-		if( World->GetBlock( (int)m_Pos.x, (int)m_Pos.y -1, (int)m_Pos.z ) == E_BLOCK_AIR )
+		if( World->GetBlock( (int)GetPosX(), (int)GetPosY() -1, (int)GetPosZ() ) == E_BLOCK_AIR )
 		{
 			m_bOnGround = false;
 		}
-		if( World->GetBlock( (int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z ) != E_BLOCK_AIR ) // If in ground itself, push it out
+		if( World->GetBlock( (int)GetPosX(), (int)GetPosY(), (int)GetPosZ() ) != E_BLOCK_AIR ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;
-			m_Pos.y += 0.2;
+			SetPosY(GetPosY() + 0.2);
 			m_bDirtyPosition = true;
 		}
-		m_Speed.x *= 0.7f/(1+a_Dt);
-		if( fabs(m_Speed.x) < 0.05 ) m_Speed.x = 0;
-		m_Speed.z *= 0.7f/(1+a_Dt);
-		if( fabs(m_Speed.z) < 0.05 ) m_Speed.z = 0;
+		SetSpeedX(GetSpeedX() * 0.7f/(1+a_Dt));
+		if( fabs(GetSpeedX()) < 0.05 ) SetSpeedX(0);
+		SetSpeedZ(GetSpeedZ() * 0.7f/(1+a_Dt));
+		if( fabs(GetSpeedZ()) < 0.05 ) SetSpeedZ(0);
 	}
 
 	if( !m_bOnGround )
 	{
 		float Gravity = -9.81f*a_Dt;
-		m_Speed.y += Gravity;
+		SetSpeedY(GetSpeedY() + Gravity);
 	}
 
-	if( m_Speed.SqrLength() > 0.f )
+	if( GetSpeed().SqrLength() > 0.f )
 	{
 		cTracer Tracer( GetWorld() );
-		int Ret = Tracer.Trace( m_Pos, m_Speed, 2 );
+		int Ret = Tracer.Trace( GetPosition(), GetSpeed(), 2 );
 		if( Ret ) // Oh noez! we hit something
 		{
 			// Set to hit position
-			if( (Tracer.RealHit - Vector3f(m_Pos)).SqrLength() <= ( m_Speed * a_Dt ).SqrLength() )
+			if( (Tracer.RealHit - GetPosition()).SqrLength() <= ( GetSpeed() * a_Dt ).SqrLength() )
 			{
 				if( Ret == 1 )
 				{
 
-					if( Tracer.HitNormal.x != 0.f ) m_Speed.x = 0.f;
-					if( Tracer.HitNormal.y != 0.f ) m_Speed.y = 0.f;
-					if( Tracer.HitNormal.z != 0.f ) m_Speed.z = 0.f;
+					if( Tracer.HitNormal.x != 0.f ) SetSpeedX(0.f);
+					if( Tracer.HitNormal.y != 0.f ) SetSpeedY(0.f);
+					if( Tracer.HitNormal.z != 0.f ) SetSpeedZ(0.f);
 
 					if( Tracer.HitNormal.y > 0 ) // means on ground
 					{
 						m_bOnGround = true;
 					}
 				}
-				m_Pos = Tracer.RealHit;
-				m_Pos += Tracer.HitNormal * 0.2f;
-
+				SetPosition(Tracer.RealHit);
+				SetPosX(GetPosX() + (Tracer.HitNormal.x * 0.5f));
+				SetPosZ(GetPosZ() + (Tracer.HitNormal.z * 0.5f));
 			}
 			else
-				m_Pos += m_Speed*a_Dt;
+				SetPosition(GetPosition() + (GetSpeed()*a_Dt));
 		}
 		else
 		{	// We didn't hit anything, so move =]
-			m_Pos += m_Speed*a_Dt;
+			SetPosition(GetPosition() + (GetSpeed()*a_Dt));
 		}
 
 		m_bDirtyPosition = true;
@@ -303,7 +305,7 @@ void cMonster::HandlePhysics(float a_Dt)
 void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	super::DoTakeDamage(a_TDI);
-	if((m_SoundHurt != "") && (m_Health > 0)) m_World->BroadcastSoundEffect(m_SoundHurt, (int)(m_Pos.x * 8), (int)(m_Pos.y * 8), (int)(m_Pos.z * 8), 1.0f, 0.8f);
+	if((m_SoundHurt != "") && (m_Health > 0)) m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
 	if (a_TDI.Attacker != NULL)
 	{
 		m_Target = a_TDI.Attacker;
@@ -318,7 +320,7 @@ void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cMonster::KilledBy(cPawn * a_Killer)
 {
 	super::KilledBy(a_Killer);
-	if(m_SoundHurt != "") m_World->BroadcastSoundEffect(m_SoundDeath, (int)(m_Pos.x * 8), (int)(m_Pos.y * 8), (int)(m_Pos.z * 8), 1.0f, 0.8f);
+	if(m_SoundHurt != "") m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
 	m_DestroyTimer = 0;
 }
 
@@ -396,7 +398,7 @@ void cMonster::CheckEventLostPlayer(MTRand & a_TickRandom)
 	if (m_Target != NULL)
 	{
 		pos = m_Target->GetPosition();
-		if ((pos - m_Pos).Length() > m_SightDistance || LineOfSight.Trace(m_Pos,(pos - m_Pos), (int)(pos - m_Pos).Length()))
+		if ((pos - GetPosition()).Length() > m_SightDistance || LineOfSight.Trace(GetPosition(),(pos - GetPosition()), (int)(pos - GetPosition()).Length()))
 		{
 			EventLosePlayer();
 		}
@@ -451,8 +453,8 @@ void cMonster::InStateIdle(float a_Dt, MTRand & a_TickRandom)
 		Dist.z = (float)((a_TickRandom.randInt() % 11) - 5);
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
-			m_Destination.x = (float)(m_Pos.x + Dist.x);
-			m_Destination.z = (float)(m_Pos.z + Dist.z);
+			m_Destination.x = (float)(GetPosX() + Dist.x);
+			m_Destination.z = (float)(GetPosZ() + Dist.z);
 			m_Destination.y = (float)GetWorld()->GetHeight((int)m_Destination.x, (int)m_Destination.z) + 1.2f;
 			MoveToPosition(m_Destination);
 		}
@@ -483,7 +485,7 @@ void cMonster::InStateEscaping(float a_Dt, MTRand & a_TickRandom)
 	
 	if (m_Target != NULL)
 	{
-		Vector3d newloc = m_Pos;
+		Vector3d newloc = GetPosition();
 		newloc.x = (m_Target->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
 		newloc.z = (m_Target->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
 		MoveToPosition(newloc);
@@ -518,7 +520,7 @@ void cMonster::Attack(float a_Dt)
 // Checks for Players close by and if they are visible return the closest
 cPlayer * cMonster::FindClosestPlayer(void)
 {
-	return m_World->FindClosestPlayer(m_Pos, m_SightDistance);
+	return m_World->FindClosestPlayer(GetPosition(), m_SightDistance);
 }
 
 

@@ -80,17 +80,17 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	if (!LoadFromDisk())
 	{
 		m_Inventory.Clear();
-		m_Pos.x = cRoot::Get()->GetDefaultWorld()->GetSpawnX();
-		m_Pos.y = cRoot::Get()->GetDefaultWorld()->GetSpawnY();
-		m_Pos.z = cRoot::Get()->GetDefaultWorld()->GetSpawnZ();
+		SetPosX(cRoot::Get()->GetDefaultWorld()->GetSpawnX());
+		SetPosY(cRoot::Get()->GetDefaultWorld()->GetSpawnY());
+		SetPosZ(cRoot::Get()->GetDefaultWorld()->GetSpawnZ());
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
-			a_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z
+			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
 		);
 	}
-	m_LastJumpHeight = (float)(m_Pos.y);
-	m_LastGroundHeight = (float)(m_Pos.y);
-	m_Stance = m_Pos.y + 1.62;
+	m_LastJumpHeight = (float)(GetPosY());
+	m_LastGroundHeight = (float)(GetPosY());
+	m_Stance = GetPosY() + 1.62;
 }
 
 
@@ -267,9 +267,9 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 	if (!m_bTouchGround)
 	{
-		if(m_Pos.y > m_LastJumpHeight) m_LastJumpHeight = (float)m_Pos.y;
+		if(GetPosY() > m_LastJumpHeight) m_LastJumpHeight = (float)GetPosY();
 		cWorld* World = GetWorld();
-		char BlockID = World->GetBlock( float2int(m_Pos.x), float2int(m_Pos.y), float2int(m_Pos.z) );
+		char BlockID = World->GetBlock( float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()) );
 		if( BlockID != E_BLOCK_AIR )
 		{
 			// LOGD("TouchGround set to true by server");
@@ -278,22 +278,22 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		if( BlockID == E_BLOCK_WATER || BlockID == E_BLOCK_STATIONARY_WATER || BlockID == E_BLOCK_LADDER || BlockID == E_BLOCK_VINES )
 		{
 			// LOGD("Water / Ladder / Torch");
-			m_LastGroundHeight = (float)m_Pos.y;
+			m_LastGroundHeight = (float)GetPosY();
 		}
 	}
 
 	if (m_bTouchGround)
 	{
-		float Dist = (float)(m_LastGroundHeight - floor(m_Pos.y));
+		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
 		int Damage = (int)(Dist - 3.f);
 		if(m_LastJumpHeight > m_LastGroundHeight) Damage++;
-		m_LastJumpHeight = (float)m_Pos.y;
+		m_LastJumpHeight = (float)GetPosY();
 		if (Damage > 0)
 		{
 			super::TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 		}
 
-		m_LastGroundHeight = (float)m_Pos.y;
+		m_LastGroundHeight = (float)GetPosY();
 	}
 }
 
@@ -391,7 +391,7 @@ void cPlayer::KilledBy(cPawn * a_Killer)
 		}
 		Items[i].Empty();
 	}
-	m_World->SpawnItemPickups(Pickups, m_Pos.x, m_Pos.y, m_Pos.z, 10);
+	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk(); // Save it, yeah the world is a tough place !
 }
 
@@ -424,7 +424,7 @@ double cPlayer::GetEyeHeight()
 
 Vector3d cPlayer::GetEyePosition()
 {
-	return Vector3d( m_Pos.x, m_Stance, m_Pos.z );
+	return Vector3d( GetPosX(), m_Stance, GetPosZ() );
 }
 
 
@@ -558,7 +558,7 @@ void cPlayer::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
 
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
-	if ((a_NewPos.y < -990) && (m_Pos.y > -100))
+	if ((a_NewPos.y < -990) && (GetPosY() > -100))
 	{
 		// When attached to an entity, the client sends position packets with weird coords:
 		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
@@ -952,17 +952,17 @@ bool cPlayer::LoadFromDisk()
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if (JSON_PlayerPosition.size() == 3)
 	{
-		m_Pos.x = JSON_PlayerPosition[(unsigned int)0].asDouble();
-		m_Pos.y = JSON_PlayerPosition[(unsigned int)1].asDouble();
-		m_Pos.z = JSON_PlayerPosition[(unsigned int)2].asDouble();
+		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
+		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
+		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		m_Rot.x = (float)JSON_PlayerRotation[(unsigned int)0].asDouble();
-		m_Rot.y = (float)JSON_PlayerRotation[(unsigned int)1].asDouble();
-		m_Rot.z = (float)JSON_PlayerRotation[(unsigned int)2].asDouble();
+		SetRotation ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
+		SetPitch    ((float)JSON_PlayerRotation[(unsigned int)1].asDouble());
+		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
 	}
 
 	m_Health = (short)root.get("health", 0 ).asInt();
@@ -976,7 +976,7 @@ bool cPlayer::LoadFromDisk()
 	m_LoadedWorldName = root.get("world", "world").asString();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		m_PlayerName.c_str(), m_Pos.x, m_Pos.y, m_Pos.z, m_LoadedWorldName.c_str()
+		m_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
 	);
 	
 	return true;
@@ -992,14 +992,14 @@ bool cPlayer::SaveToDisk()
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
-	JSON_PlayerPosition.append( Json::Value( m_Pos.x ) );
-	JSON_PlayerPosition.append( Json::Value( m_Pos.y ) );
-	JSON_PlayerPosition.append( Json::Value( m_Pos.z ) );
+	JSON_PlayerPosition.append( Json::Value( GetPosX() ) );
+	JSON_PlayerPosition.append( Json::Value( GetPosY() ) );
+	JSON_PlayerPosition.append( Json::Value( GetPosZ() ) );
 
 	Json::Value JSON_PlayerRotation;
-	JSON_PlayerRotation.append( Json::Value( m_Rot.x ) );
-	JSON_PlayerRotation.append( Json::Value( m_Rot.y ) );
-	JSON_PlayerRotation.append( Json::Value( m_Rot.z ) );
+	JSON_PlayerRotation.append( Json::Value( GetRotation() ) );
+	JSON_PlayerRotation.append( Json::Value( GetPitch() ) );
+	JSON_PlayerRotation.append( Json::Value( GetRoll() ) );
 
 	Json::Value JSON_Inventory;
 	m_Inventory.SaveToJson( JSON_Inventory );

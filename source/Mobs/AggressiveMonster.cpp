@@ -39,7 +39,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt, MTRand & a_TickRandom)
 			}
 		}
 
-		Vector3f Pos = Vector3f( m_Pos );
+		Vector3f Pos = Vector3f( GetPosition() );
 		Vector3f Their = Vector3f( m_Target->GetPosition() );
 		if ((Their - Pos).Length() <= m_AttackRange)
 		{

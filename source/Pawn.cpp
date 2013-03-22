@@ -19,10 +19,6 @@ cPawn::cPawn(eEntityType a_EntityType)
 	: cEntity(a_EntityType, 0, 0, 0)
 	, m_Health(1)
 	, m_MaxHealth(1)
-	, m_LastPosX( 0.0 )
-	, m_LastPosY( 0.0 )
-	, m_LastPosZ( 0.0 )
-	, m_TimeLastTeleportPacket(0)
 	, m_bBurnable(true)
 	, m_MetaData(NORMAL)
 {
@@ -74,9 +70,9 @@ void cPawn::TakeDamage(eDamageType a_DamageType, cPawn * a_Attacker, int a_RawDa
 	TDI.RawDamage = a_RawDamage;
 	TDI.FinalDamage = a_FinalDamage;
 	Vector3d Heading;
-	Heading.x = sin(m_Rot.x);
+	Heading.x = sin(GetRotation());
 	Heading.y = 0.4;  // TODO: adjust the amount of "up" knockback when testing
-	Heading.z = cos(m_Rot.x);
+	Heading.z = cos(GetRotation());
 	TDI.Knockback = Heading * a_KnockbackAmount;
 	DoTakeDamage(TDI);
 }
@@ -134,7 +130,7 @@ void cPawn::KilledBy(cPawn * a_Killer)
 	// Drop loot:	
 	cItems Drops;
 	GetDrops(Drops, a_Killer);
-	m_World->SpawnItemPickups(Drops, m_Pos.x, m_Pos.y, m_Pos.z);
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 
 	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_DEAD);
 }
@@ -321,9 +317,9 @@ void cPawn::SetMetaData(MetaData a_MetaData)
 //----Change Entity MetaData
 void cPawn::CheckMetaDataBurn()
 {
-	BLOCKTYPE Block      = GetWorld()->GetBlock((int) m_Pos.x, (int) m_Pos.y, (int) m_Pos.z);
-	BLOCKTYPE BlockAbove = GetWorld()->GetBlock((int) m_Pos.x, (int) m_Pos.y + 1, (int) m_Pos.z);
-	BLOCKTYPE BlockBelow = GetWorld()->GetBlock((int) m_Pos.x, (int) m_Pos.y - 1, (int) m_Pos.z);
+	BLOCKTYPE Block      = GetWorld()->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ());
+	BLOCKTYPE BlockAbove = GetWorld()->GetBlock((int) GetPosX(), (int) GetPosY() + 1, (int) GetPosZ());
+	BLOCKTYPE BlockBelow = GetWorld()->GetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ());
 	
 	if (
 		(GetMetaData() == BURNING) &&
@@ -359,8 +355,8 @@ void cPawn::InStateBurning(float a_Dt)
 		return;
 	}
 
-	BLOCKTYPE Block      = GetWorld()->GetBlock((int)m_Pos.x, (int)m_Pos.y,     (int)m_Pos.z);
-	BLOCKTYPE BlockAbove = GetWorld()->GetBlock((int)m_Pos.x, (int)m_Pos.y + 1, (int)m_Pos.z);	
+	BLOCKTYPE Block      = GetWorld()->GetBlock((int)GetPosX(), (int)GetPosY(),     (int)GetPosZ());
+	BLOCKTYPE BlockAbove = GetWorld()->GetBlock((int)GetPosX(), (int)GetPosY() + 1, (int)GetPosZ());	
 	m_FireDamageInterval = 0;
 	TakeDamage(dtOnFire, NULL, 1, 0);
 

@@ -43,13 +43,13 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 void cFallingBlock::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	float MilliDt = a_Dt * 0.001f;
-	m_Speed.y -= MilliDt * 9.8f;
-	m_Pos.y += m_Speed.y * MilliDt;
+	SetSpeedY(GetSpeedY() - (MilliDt * 9.8f));
+	SetPosY(GetPosY() + (GetSpeedY() * MilliDt));
 
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 	
 	int BlockX = (int)m_OriginalPosition.x;
-	int BlockY = (int)(m_Pos.y - 0.5);
+	int BlockY = (int)(GetPosY() - 0.5);
 	int BlockZ = (int)m_OriginalPosition.z;
 	
 	if (BlockY < 0)
