@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="windows-1250"?>
+<VisualStudioUserFile
+	ProjectType="Visual C++"
+	Version="9,00"
+	ShowAllFiles="false"
+	>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			>
+			<DebugSettings
+				Command="$(TargetPath)"
+				WorkingDirectory="$(TargetDir)"
+				CommandArguments=""
+				Attach="false"
+				DebuggerType="3"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			>
+			<DebugSettings
+				Command="$(TargetPath)"
+				WorkingDirectory="$(TargetDir)"
+				CommandArguments=""
+				Attach="false"
+				DebuggerType="3"
+			/>
+		</Configuration>
+	</Configurations>
+</VisualStudioUserFile>
