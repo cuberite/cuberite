@@ -165,7 +165,7 @@ void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
 	}
 	
 	super::Tick(a_Dt, a_TickRandom);
-	
+	//TODO: Change this to use the BroadcastMovementUpdate function
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
 		m_World->BroadcastEntLook(*this, m_ClientHandle);

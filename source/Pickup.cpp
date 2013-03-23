@@ -129,7 +129,7 @@ void cPickup::HandlePhysics(float a_Dt)
 		if( BlockIn != E_BLOCK_AIR && !IsBlockWater(BlockIn) ) // If in ground itself, push it out
 		{
 			m_bOnGround = true;
-			SetPosY(GetPosY() + 0.2);
+			AddPosY(0.2);
 			m_bReplicated = false;
 		}
 		SetSpeedX(GetSpeedX() * 0.7f/(1+a_Dt));
@@ -176,7 +176,7 @@ void cPickup::HandlePhysics(float a_Dt)
 		{
 			Gravity = -3;
 		}
-		SetSpeedY(GetSpeedY() + Gravity);
+		AddSpeedY(Gravity);
 
 		// Set to hit position
 		m_ResultingSpeed += GetSpeed();
@@ -209,15 +209,15 @@ void cPickup::HandlePhysics(float a_Dt)
 					}
 				}
 				SetPosition(Tracer.RealHit);
-				SetPosition(GetPosition() + (Tracer.HitNormal * 0.2f));
+				AddPosition(Tracer.HitNormal * 0.2f);
 
 			}
 			else
-				SetPosition(GetPosition() + (m_ResultingSpeed*a_Dt));
+				AddPosition(m_ResultingSpeed*a_Dt);
 		}
 		else
 		{	// We didn't hit anything, so move =]
-			SetPosition(GetPosition() + (m_ResultingSpeed*a_Dt));
+			AddPosition(m_ResultingSpeed*a_Dt);
 		}
 	}
 	// Usable for debugging

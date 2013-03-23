@@ -142,7 +142,11 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 			}
 		}
 	}
-	
+
+	HandlePhysics(a_Dt);
+	BroadcastMovementUpdate();
+	MoveToCorrectChunk();
+
 	Vector3d Distance = m_Destination - GetPosition();
 	if (Distance.SqrLength() > 0.1f)
 	{
@@ -152,10 +156,6 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 		SetRotation( Rotation );
 		SetPitch( Pitch );
 	}
-
-	HandlePhysics(a_Dt);
-	BroadcastMovementUpdate();
-	MoveToCorrectChunk();
 
 	switch (m_EMState)
 	{

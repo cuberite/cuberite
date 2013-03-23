@@ -278,12 +278,10 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		float DiffY = (float)(GetPosY() - m_LastPosY);
 		float DiffZ = (float)(GetPosZ() - m_LastPosZ);
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
-		if (
-			(SqrDist > 16)  // 4 blocks is max Relative Move. 16 = 4 ^ 2
-			|| (m_World->GetWorldAge() - m_TimeLastTeleportPacket > 400)  // Send an absolute position every 20 seconds
-			)
+		
+		// 4 blocks is max Relative Move. 16 = 4 ^ 2. Send an absolute position every 20 seconds
+		if ((SqrDist > 16) || (m_World->GetWorldAge() - m_TimeLastTeleportPacket > 400))
 		{
-			//LOGD("Teleported from (%f,%f,%f) to (%f,%f,%f); Distance square: %f",m_LastPosX,m_LastPosY,m_LastPosZ, m_Pos.x,m_Pos.y,m_Pos.z,SqrDist );
 			m_World->BroadcastEntHeadLook(*this,a_Exclude);
 			m_World->BroadcastTeleportEntity(*this,a_Exclude);
 			m_TimeLastTeleportPacket = m_World->GetWorldAge();
@@ -294,9 +292,9 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		}
 		else
 		{
-			if ((m_World->GetWorldAge() - m_TimeLastMoveReltPacket > 60)) // Send relative movement every 3 seconds
+			// Send relative movement every 3 seconds
+			if ((m_World->GetWorldAge() - m_TimeLastMoveReltPacket > 60))
 			{
-				//LOGD("Moved from (%f,%f,%f) to (%f,%f,%f)",m_LastPosX,m_LastPosY,m_LastPosZ, m_Pos.x,m_Pos.y,m_Pos.z );
 				if (m_bDirtyOrientation)
 				{
 					m_World->BroadcastEntHeadLook(*this,a_Exclude);
@@ -305,7 +303,6 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 				}
 				else
 				{
-					m_World->BroadcastEntHeadLook(*this,a_Exclude);
 					m_World->BroadcastEntRelMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32),a_Exclude);
 				}
 				m_TimeLastMoveReltPacket = m_World->GetWorldAge();
@@ -457,9 +454,86 @@ void cEntity::SetSpeedZ(double a_SpeedZ)
 
 
 
-void cEntity::AddSpeed(const Vector3d & a_AddSpeed)
+void cEntity::AddPosX(double a_AddPosX)
 {
-	m_Speed += a_AddSpeed;
+	m_Pos.x += a_AddPosX;
+	MoveToCorrectChunk();
+	m_bDirtyPosition = true;
+}
+
+
+
+
+void cEntity::AddPosY(double a_AddPosY)
+{
+	m_Pos.y += a_AddPosY;
+	MoveToCorrectChunk();
+	m_bDirtyPosition = true;
+}
+
+
+
+
+void cEntity::AddPosZ(double a_AddPosZ)
+{
+	m_Pos.z += a_AddPosZ;
+	MoveToCorrectChunk();
+	m_bDirtyPosition = true;
+}
+
+
+
+
+void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
+{
+	m_Pos.x += a_AddPosX;
+	m_Pos.y += a_AddPosY;
+	m_Pos.z += a_AddPosZ;
+	MoveToCorrectChunk();
+	m_bDirtyPosition = true;
+}
+
+
+
+
+void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ)
+{
+	m_Speed.x += a_AddSpeedX;
+	m_Speed.y += a_AddSpeedY;
+	m_Speed.z += a_AddSpeedZ;
+	m_bDirtySpeed = true;
+	WrapSpeed();
+}
+
+
+
+
+
+void cEntity::AddSpeedX(double a_AddSpeedX)
+{
+	m_Speed.x += a_AddSpeedX;
+	m_bDirtySpeed = true;
+	WrapSpeed();
+}
+
+
+
+
+
+void cEntity::AddSpeedY(double a_AddSpeedY)
+{
+	m_Speed.y += a_AddSpeedY;
+	m_bDirtySpeed = true;
+	WrapSpeed();
+}
+
+
+
+
+
+void cEntity::AddSpeedZ(double a_AddSpeedZ)
+{
+	m_Speed.z += a_AddSpeedZ;
 	m_bDirtySpeed = true;
 	WrapSpeed();
 }

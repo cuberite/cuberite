@@ -138,7 +138,16 @@ public:
 	void SetSpeedY  (double a_SpeedY);
 	void SetSpeedZ  (double a_SpeedZ);
 	
-	void AddSpeed(const Vector3d & a_AddSpeed);
+	void AddPosX    (double a_AddPosX);
+	void AddPosY    (double a_AddPosY);
+	void AddPosZ    (double a_AddPosZ);
+	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ);
+	void AddPosition(const Vector3d & a_AddPos) { AddPosition(a_AddPos.x,a_AddPos.y,a_AddPos.z);}
+	void AddSpeed   (double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ);
+	void AddSpeed   (const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x,a_AddSpeed.y,a_AddSpeed.z);}
+	void AddSpeedX  (double a_AddSpeedX);
+	void AddSpeedY  (double a_AddSpeedY);
+	void AddSpeedZ  (double a_AddSpeedZ);
 
 	// tolua_end
 
