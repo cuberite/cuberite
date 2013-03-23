@@ -205,7 +205,10 @@ void cListenThread::Execute(void)
 			FD_SET(itr->GetSocket(), &fdRead);
 		}  // for itr - m_Sockets[]
 		
-		if (select(Highest + 1, &fdRead, NULL, NULL, NULL) == -1)
+		timeval tv;  // On Linux select() doesn't seem to wake up when socket is closed, so let's kinda busy-wait:
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+		if (select(Highest + 1, &fdRead, NULL, NULL, &tv) == -1)
 		{
 			LOG("select(R) call failed in cListenThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;
