@@ -98,7 +98,8 @@ protected:
   virtual void OnOutput(LPCSTR szText) { }
   virtual void OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr) { }
 
-  FILE *m_fXmlFile;
+  FILE * m_fXmlFile;
+  int m_Progress;
 };
 
 // C++ interface:

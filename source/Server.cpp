@@ -452,6 +452,14 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd)
 		DumpUsedMemory(&Output);
 		return;
 	}
+	
+	if (split[0].compare("killmem") == 0)
+	{
+		while (true)
+		{
+			new char[100 * 1024 * 1024];  // Allocate and leak 100 MiB in a loop -> fill memory and kill MCS
+		}
+	}
 	#endif
 	
 	if (cPluginManager::Get()->ExecuteConsoleCommand(split))

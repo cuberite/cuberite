@@ -252,7 +252,8 @@ LeakFinderXmlOutput::LeakFinderXmlOutput()
 
 
 
-LeakFinderXmlOutput::LeakFinderXmlOutput(LPCTSTR szFileName)
+LeakFinderXmlOutput::LeakFinderXmlOutput(LPCTSTR szFileName) :
+	m_Progress(10)
 {
 #if _MSC_VER < 1400
   m_fXmlFile = _tfopen(szFileName, _T("w"));
@@ -263,6 +264,10 @@ LeakFinderXmlOutput::LeakFinderXmlOutput(LPCTSTR szFileName)
   if (m_fXmlFile == NULL)
   {
     MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
+  }
+  else
+  {
+		fprintf(m_fXmlFile, "<MEMREPORT>\n");
   }
 }
 
@@ -297,7 +302,12 @@ void LeakFinderXmlOutput::OnLeakStartEntry(LPCSTR szKeyName, SIZE_T nDataSize)
 {
   if (m_fXmlFile != NULL)
   {
-    fprintf(m_fXmlFile, "  <LEAK requestID=\"%s\" size=\"%d\">\n", SimpleXMLEncode(szKeyName).c_str(), nDataSize);
+    fprintf(m_fXmlFile, "\t<LEAK requestID=\"%s\" size=\"%d\">\n", SimpleXMLEncode(szKeyName).c_str(), nDataSize);
+  }
+  if (--m_Progress == 0)
+  {
+		m_Progress = 100;
+		putc('.', stdout);
   }
 }
 
@@ -311,14 +321,14 @@ void LeakFinderXmlOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEn
   {
     if (eType != lastEntry)
     {
-      fprintf(m_fXmlFile, "    <STACKENTRY decl=\"%s\" decl_offset=\"%+ld\" ", SimpleXMLEncode(entry.undName).c_str(), entry.offsetFromSmybol);
+      fprintf(m_fXmlFile, "\t\t<STACKENTRY decl=\"%s\" decl_offset=\"%+ld\" ", SimpleXMLEncode(entry.undName).c_str(), entry.offsetFromSmybol);
       fprintf(m_fXmlFile, "srcfile=\"%s\" line=\"%d\" line_offset=\"%+ld\" ", SimpleXMLEncode(entry.lineFileName).c_str(), entry.lineNumber, entry.offsetFromLine);
       fprintf(m_fXmlFile, "module=\"%s\" base=\"%08lx\" ", SimpleXMLEncode(entry.moduleName).c_str(), entry.baseOfImage);
       fprintf(m_fXmlFile, "/>\n");
     }
     else
     {
-      fprintf(m_fXmlFile, "  </LEAK>\n");
+      fprintf(m_fXmlFile, "\t</LEAK>\n");
     }
   }
 }
@@ -754,6 +764,11 @@ typedef struct _CrtMemBlockHeader
 
 static CRTTable *g_pCRTTable = NULL;
 
+size_t g_CurrentMemUsage = 0;
+
+
+
+
 
 // MyAllocHook is Single-Threaded, that means the the calls are serialized in the calling function!
 static int MyAllocHook(int nAllocType, void *pvData, 
@@ -772,93 +787,131 @@ static int MyAllocHook(int nAllocType, void *pvData,
   if (_BLOCK_TYPE(nBlockUse) == _CRT_BLOCK)  // Ignore internal C runtime library allocations
     return TRUE;
 #endif
-  extern int _crtDbgFlag;
-  if  ( ((_CRTDBG_ALLOC_MEM_DF & _crtDbgFlag) == 0) && ( (nAllocType == _HOOK_ALLOC) || (nAllocType == _HOOK_REALLOC) ) )
-  {
-    // Someone has disabled that the runtime should log this allocation
-    // so we do not log this allocation
-    if (s_pfnOldCrtAllocHook != NULL)
-      s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
-    return TRUE;
-  }
+	extern int _crtDbgFlag;
+	if  ( ((_CRTDBG_ALLOC_MEM_DF & _crtDbgFlag) == 0) && ( (nAllocType == _HOOK_ALLOC) || (nAllocType == _HOOK_REALLOC) ) )
+	{
+		// Someone has disabled that the runtime should log this allocation
+		// so we do not log this allocation
+		if (s_pfnOldCrtAllocHook != NULL)
+			s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
+		return TRUE;
+	}
 
-  // Handle the Disable/Enable setting
-  if (InterlockedExchangeAdd(&s_CrtDisableCount, 0) != 0)
-    return TRUE;
+	// Handle the Disable/Enable setting
+	if (InterlockedExchangeAdd(&s_CrtDisableCount, 0) != 0)
+	{
+		return TRUE;
+	}
 
-  // Prevent from reentrat calls
-  if (InterlockedIncrement(&s_lMallocCalled) > 1) { // I was already called
-    InterlockedDecrement(&s_lMallocCalled);
-    // call the previous alloc hook
-    if (s_pfnOldCrtAllocHook != NULL)
-      s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
-    return TRUE;
-  }
+	// Prevent from reentrat calls
+	if (InterlockedIncrement(&s_lMallocCalled) > 1)
+	{
+		// I was already called
+		InterlockedDecrement(&s_lMallocCalled);
+		// call the previous alloc hook
+		if (s_pfnOldCrtAllocHook != NULL)
+			s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
+		return TRUE;
+	}
 
-  _ASSERT( (nAllocType == _HOOK_ALLOC) || (nAllocType == _HOOK_REALLOC) || (nAllocType == _HOOK_FREE) );
-  _ASSERT( ( _BLOCK_TYPE(nBlockUse) >= 0 ) && ( _BLOCK_TYPE(nBlockUse) < 5 ) );
+	_ASSERT( (nAllocType == _HOOK_ALLOC) || (nAllocType == _HOOK_REALLOC) || (nAllocType == _HOOK_FREE) );
+	_ASSERT( ( _BLOCK_TYPE(nBlockUse) >= 0 ) && ( _BLOCK_TYPE(nBlockUse) < 5 ) );
 
-  if (nAllocType == _HOOK_FREE) { // freeing
-    // Try to get the header information
-    if (_CrtIsValidHeapPointer(pvData)) {  // it is a valid Heap-Pointer
-      // get the ID
-      _CrtMemBlockHeader *pHead;
-      // get a pointer to memory block header
-      pHead = pHdr(pvData);
-      nSize = pHead->nDataSize;
-      lRequest = pHead->lRequest; // This is the ID!
+	if (nAllocType == _HOOK_FREE)
+	{
+		// freeing
+		// Try to get the header information
+		if (_CrtIsValidHeapPointer(pvData)) {  // it is a valid Heap-Pointer
+			// get the ID
+			_CrtMemBlockHeader *pHead;
+			// get a pointer to memory block header
+			pHead = pHdr(pvData);
+			nSize = pHead->nDataSize;
+			lRequest = pHead->lRequest; // This is the ID!
 
-      if (pHead->nBlockUse == _IGNORE_BLOCK)
-      {
-        InterlockedDecrement(&s_lMallocCalled);
-        if (s_pfnOldCrtAllocHook != NULL)
-          s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
-        return TRUE;
-      }
-    }
-    if (lRequest != 0) {  // RequestID was found
-      g_pCRTTable->Remove(lRequest);
-    }
-  }  // freeing
+			if (pHead->nBlockUse == _IGNORE_BLOCK)
+			{
+				InterlockedDecrement(&s_lMallocCalled);
+				if (s_pfnOldCrtAllocHook != NULL)
+				{
+					s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
+				}
+				return TRUE;
+			}
+		}
+		if (lRequest != 0)
+		{
+			// RequestID was found
+			g_CurrentMemUsage -= nSize;
+			g_pCRTTable->Remove(lRequest);
+		}
+	}  // freeing
 
-  if (nAllocType == _HOOK_REALLOC) { // re-allocating
-    // Try to get the header information
-    if (_CrtIsValidHeapPointer(pvData)) {  // it is a valid Heap-Pointer
-      BOOL bRet;
-      LONG lReallocRequest;
-      // get the ID
-      _CrtMemBlockHeader *pHead;
-      // get a pointer to memory block header
-      pHead = pHdr(pvData);
-      // Try to find the RequestID in the Hash-Table, mark it that it was freed
-      lReallocRequest = pHead->lRequest;
-      bRet = g_pCRTTable->Remove(lReallocRequest);
-    }  // ValidHeapPointer
-  }  // re-allocating
+	if (nAllocType == _HOOK_REALLOC)
+	{
+		// re-allocating
+		// Try to get the header information
+		if (_CrtIsValidHeapPointer(pvData)) {  // it is a valid Heap-Pointer
+			BOOL bRet;
+			LONG lReallocRequest;
+			// get the ID
+			_CrtMemBlockHeader *pHead;
+			// get a pointer to memory block header
+			pHead = pHdr(pvData);
+			// Try to find the RequestID in the Hash-Table, mark it that it was freed
+			lReallocRequest = pHead->lRequest;
+			g_CurrentMemUsage -= pHead->nDataSize;
+			bRet = g_pCRTTable->Remove(lReallocRequest);
+		}  // ValidHeapPointer
+	}  // re-allocating
 
-  //if ( (g_ulShowStackAtAlloc < 3) && (nAllocType == _HOOK_FREE) ) {
-  if (nAllocType == _HOOK_FREE) {
-    InterlockedDecrement(&s_lMallocCalled);
-    // call the previous alloc hook
-    if (s_pfnOldCrtAllocHook != NULL)
-      s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
-    return TRUE;
-  }
+	//if ( (g_ulShowStackAtAlloc < 3) && (nAllocType == _HOOK_FREE) ) {
+	if (nAllocType == _HOOK_FREE)
+	{
+		InterlockedDecrement(&s_lMallocCalled);
+		// call the previous alloc hook
+		if (s_pfnOldCrtAllocHook != NULL)
+		{
+			s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
+		}
+		return TRUE;
+	}
 
-  CONTEXT c;
-  GET_CURRENT_CONTEXT(c, CONTEXT_FULL);
+	CONTEXT c;
+	GET_CURRENT_CONTEXT(c, CONTEXT_FULL);
 
-  // Only insert in the Hash-Table if it is not a "freeing"
-  if (nAllocType != _HOOK_FREE) {
-    if(lRequest != 0) // Always a valid RequestID should be provided (see comments in the header)
-      g_pCRTTable->Insert(lRequest, c, nSize);
-  }
+	// Only insert in the Hash-Table if it is not a "freeing"
+	if (nAllocType != _HOOK_FREE)
+	{
+		if (lRequest != 0) // Always a valid RequestID should be provided (see comments in the header)
+		{
+			g_CurrentMemUsage += nSize;
+			
+			if (g_CurrentMemUsage > 1024 * 1024 * 1024)
+			{
+				printf("******************************************\n");
+				printf("** Server reached 1 GiB memory usage,   **\n");
+				printf("** something is probably wrong.         **\n");
+				printf("** Writing memory dump into memdump.xml **\n");
+				printf("******************************************\n");
+				printf("Please wait\n");
+				
+				LeakFinderXmlOutput Output("memdump.xml");
+				DumpUsedMemory(&Output);
+				
+				printf("\nMemory dump complete. Server will now abort.\n");
+				abort();
+			}
+			
+			g_pCRTTable->Insert(lRequest, c, nSize);
+		}
+	}
 
-  InterlockedDecrement(&s_lMallocCalled);
-  // call the previous alloc hook
-  if (s_pfnOldCrtAllocHook != NULL)
-    s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
-  return TRUE; // allow the memory operation to proceed
+	InterlockedDecrement(&s_lMallocCalled);
+	// call the previous alloc hook
+	if (s_pfnOldCrtAllocHook != NULL)
+		s_pfnOldCrtAllocHook(nAllocType, pvData, nSize, nBlockUse, lRequest, szFileName, nLine);
+	return TRUE; // allow the memory operation to proceed
 }  // MyAllocHook
 
 #endif  // _DEBUG
