@@ -32,6 +32,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
 	
+	PluginManager:BindCommand("/toggledownfall",  "core.toggledownfall",  HandleToggleDownfallCommand,  " - Toggles the weather");
 	PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
 	PluginManager:BindCommand("/save-all",        "core.save-all",        HandleSaveAllCommand,         " - Saves all your worlds");
 	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " [Page] - Show available commands");
