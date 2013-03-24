@@ -108,7 +108,7 @@
 #include "LeakFinder.h"
 
 // Currently only tested with MS VC++ 5 to 10
-#if (_MSC_VER < 1100) || (_MSC_VER > 1600)
+#if (_MSC_VER < 1100) || (_MSC_VER > 1700)
 #error Only MS VC++ 5/6/7/7.1/8/9 supported. Check if the '_CrtMemBlockHeader' has not changed with this compiler!
 #endif
 
@@ -887,7 +887,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 		{
 			g_CurrentMemUsage += nSize;
 			
-			if (g_CurrentMemUsage > 1024 * 1024 * 1024)
+			if (g_CurrentMemUsage > 65970823)//1024 * 1024 * 1024)
 			{
 				printf("******************************************\n");
 				printf("** Server reached 1 GiB memory usage,   **\n");
