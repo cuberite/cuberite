@@ -22,11 +22,13 @@ typedef std::set<AString> AStringSet;
 class cFunction
 {
 public:
-	int        m_Size;
+	int        m_Size;   ///< Sum of memory block sizes allocated by this function or its children
+	int        m_Count;  ///< Total number of memory blocks allocated by this function or its children
 	AStringSet m_ChildrenNames;
 	
 	cFunction(void) :
-		m_Size(0)
+		m_Size(0),
+		m_Count(0)
 	{
 	}
 } ;
@@ -126,6 +128,7 @@ void OnStartElement(void * a_Data, const char * a_Element, const char ** a_Attrs
 		AString FunctionName = fnName;
 		cFunction & Function = g_FnMap[FunctionName];
 		Function.m_Size += g_CurrentSize;
+		Function.m_Count += 1;
 		if (!g_PrevFunctionName.empty())
 		{
 			Function.m_ChildrenNames.insert(g_PrevFunctionName);
@@ -153,7 +156,7 @@ void OnEndElement(void * a_Data, const char * a_Element)
 
 
 
-bool CompareFnSize(const std::pair<AString, int> & a_First, const std::pair<AString, int> & a_Second)
+bool CompareFnInt(const std::pair<AString, int> & a_First, const std::pair<AString, int> & a_Second)
 {
 	return (a_First.second < a_Second.second);
 }
@@ -162,7 +165,7 @@ bool CompareFnSize(const std::pair<AString, int> & a_First, const std::pair<AStr
 
 
 
-void WriteTotalStatistics(void)
+void WriteSizeStatistics(void)
 {
 	typedef std::vector<std::pair<AString, int> > StringIntPairs;
 	StringIntPairs FnSizes;
@@ -178,9 +181,37 @@ void WriteTotalStatistics(void)
 	{
 		FnSizes.push_back(std::pair<AString, int>(itr->first, itr->second.m_Size));
 	}  // for itr - g_FnSizes[]
-	std::sort(FnSizes.begin(), FnSizes.end(), CompareFnSize);
+	std::sort(FnSizes.begin(), FnSizes.end(), CompareFnInt);
 	
 	for (StringIntPairs::const_iterator itr = FnSizes.begin(), end = FnSizes.end(); itr != end; ++itr)
+	{
+		f.Printf("%d\t%s\n", itr->second, itr->first.c_str());
+	}  // for itr - FnSizes[]
+}
+
+
+
+
+
+void WriteCountStatistics(void)
+{
+	typedef std::vector<std::pair<AString, int> > StringIntPairs;
+	StringIntPairs FnCounts;
+	
+	cFile f("memdump_counts.txt", cFile::fmWrite);
+	if (!f.IsOpen())
+	{
+		LOGERROR("Cannot open memdump_counts.txt");
+		return;
+	}
+
+	for (FunctionMap::iterator itr = g_FnMap.begin(), end = g_FnMap.end(); itr != end; ++itr)
+	{
+		FnCounts.push_back(std::pair<AString, int>(itr->first, itr->second.m_Count));
+	}  // for itr - g_FnSizes[]
+	std::sort(FnCounts.begin(), FnCounts.end(), CompareFnInt);
+	
+	for (StringIntPairs::const_iterator itr = FnCounts.begin(), end = FnCounts.end(); itr != end; ++itr)
 	{
 		f.Printf("%d\t%s\n", itr->second, itr->first.c_str());
 	}  // for itr - FnSizes[]
@@ -215,7 +246,7 @@ AString HTMLEscape(const AString & a_Text)
 
 
 
-void WriteDotStatistics(void)
+void WriteDotGraph(void)
 {
 	cFile f("memdump.dot", cFile::fmWrite);
 	if (!f.IsOpen())
@@ -227,11 +258,12 @@ void WriteDotStatistics(void)
 	f.Printf("digraph {\n\tnode [shape=plaintext]\n\n");
 	for (FunctionMap::const_iterator itrF = g_FnMap.begin(), endF = g_FnMap.end(); itrF != endF; ++itrF)
 	{
-		f.Printf("\t\"%s\" [label=<%s<BR/>%d bytes (%d KiB)>]\n",
+		f.Printf("\t\"%s\" [label=<%s<BR/>%d bytes (%d KiB)<BR/>%d blocks>]\n",
 			itrF->first.c_str(),
 			HTMLEscape(itrF->first).c_str(),
 			itrF->second.m_Size,
-			(itrF->second.m_Size + 1023) / 1024
+			(itrF->second.m_Size + 1023) / 1024,
+			itrF->second.m_Count
 		);
 		const AStringSet & Children = itrF->second.m_ChildrenNames;
 		for (AStringSet::const_iterator itrN = Children.begin(), endN = Children.end(); itrN != endN; ++itrN)
@@ -262,7 +294,7 @@ int main(int argc, char * argv[])
 	XML_SetElementHandler(Parser, OnStartElement, OnEndElement);
 	
 	// Feed the file through XML parser:
-	char Buffer[64 KiB];
+	char Buffer[512 KiB];
 	while (true)
 	{
 		int NumBytes = f.Read(Buffer, sizeof(Buffer));
@@ -277,8 +309,9 @@ int main(int argc, char * argv[])
 	f.Close();
 	
 	// Output the statistics
-	WriteTotalStatistics();
-	WriteDotStatistics();
+	WriteSizeStatistics();
+	WriteCountStatistics();
+	WriteDotGraph();
 	
 	return 0;
 }
