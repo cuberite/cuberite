@@ -19,7 +19,7 @@ function Initialize(Plugin)
 	PLUGIN = Plugin
 	
 	Plugin:SetName("Core")
-	Plugin:SetVersion(10)
+	Plugin:SetVersion(12)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
@@ -29,13 +29,17 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
-
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
+	
 	PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
 	PluginManager:BindCommand("/save-all",        "core.save-all",        HandleSaveAllCommand,         " - Saves all your worlds");
 	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " [Page] - Show available commands");
+	PluginManager:BindCommand("/rank",            "core.rank",            HandleRankCommand,            " [Player] [Rank] - to add someone to a group");
 	PluginManager:BindCommand("/pluginlist",      "core.pluginlist",      HandlePluginListCommand,      " - Show list of plugins");
 	PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " [Player] - Teleport yourself to a player");
 	PluginManager:BindCommand("/item",            "core.item",            HandleItemCommand,            " [ItemType/Name] <Amount> - Give yourself an item");
+	PluginManager:BindCommand("/i",               "core.item",            HandleItemCommand,            "");
 	PluginManager:BindCommand("/list",            "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
 	PluginManager:BindCommand("/who",             "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
 	PluginManager:BindCommand("/playerlist",      "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
@@ -55,10 +59,14 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
 	
 	InitConsoleCommands();
-	
-	local IniFile = cIniFile("settings.ini")
+		
+	-- Load the settings
+	IniFile = cIniFile("Settings.ini")
 	if ( IniFile:ReadFile() == true ) then
-		SHOW_PLUGIN_NAMES = IniFile:GetValueB("HelpPlugin", "ShowPluginNames", true )
+		HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
+		LimitWorld = IniFile:GetValueSetB("Worlds", "LimitWorld", true)
+		LimitWorldWidth = IniFile:GetValueSetI("Worlds", "LimitWorldWidth", 200)
+		SHOW_PLUGIN_NAMES = IniFile:GetValueSetB("HelpPlugin", "ShowPluginNames", true )
 	end
 	
 	-- Load whitelist, and add default values and stuff
@@ -96,6 +104,7 @@ function Initialize(Plugin)
 		end
 	end
 	
+	Plugin:AddWebTab("Manage Server",   HandleRequest_ManageServer);
 	Plugin:AddWebTab("Server Settings", HandleRequest_ServerSettings);
 	Plugin:AddWebTab("Chat",            HandleRequest_Chat);
 	Plugin:AddWebTab("Playerlist",      HandleRequest_PlayerList);
