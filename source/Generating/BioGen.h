@@ -180,10 +180,11 @@ protected:
 	int    m_OceanCellSize;
 	int    m_MushroomIslandSize;
 	int    m_RiverCellSize;
-	float  m_RiverWidthThreshold;
-	float m_LandBiomesSize;
+	double m_RiverWidthThreshold;
+	float  m_LandBiomesSize;
 	
-	typedef int IntMap[17 * 17];  // x + 17 * z, expected trimmed into [0..255] range
+	typedef int    IntMap[17 * 17];  // x + 17 * z, expected trimmed into [0..255] range
+	typedef double DblMap[17 * 17];  // x + 17 * z, expected trimmed into [0..1] range
 		
 	// cBiomeGen overrides:
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;

@@ -393,10 +393,10 @@ cBioGenMultiStepMap::cBioGenMultiStepMap(int a_Seed) :
 	m_Noise(a_Seed),
 	m_Seed(a_Seed),
 	m_OceanCellSize(384),
-	m_MushroomIslandSize(32),
-	m_RiverCellSize(128),
-	m_RiverWidthThreshold((float)0.05),
-	m_LandBiomesSize(192)
+	m_MushroomIslandSize(64),
+	m_RiverCellSize(384),
+	m_RiverWidthThreshold(0.125),
+	m_LandBiomesSize(1024)
 {
 }
 
@@ -409,7 +409,7 @@ void cBioGenMultiStepMap::Initialize(cIniFile & a_IniFile)
 	m_OceanCellSize       =        a_IniFile.GetValueSetI("Generator", "MultiStepMapOceanCellSize",      m_OceanCellSize);
 	m_MushroomIslandSize  =        a_IniFile.GetValueSetI("Generator", "MultiStepMapMushroomIslandSize", m_MushroomIslandSize);
 	m_RiverCellSize       =        a_IniFile.GetValueSetI("Generator", "MultiStepMapRiverCellSize",      m_RiverCellSize);
-	m_RiverWidthThreshold = (float)a_IniFile.GetValueSetF("Generator", "MultiStepMapRiverWidth",         m_RiverWidthThreshold);
+	m_RiverWidthThreshold =        a_IniFile.GetValueSetF("Generator", "MultiStepMapRiverWidth",         m_RiverWidthThreshold);
 	m_LandBiomesSize      = (float)a_IniFile.GetValueSetI("Generator", "MultiStepMapLandBiomeSize",      (int)m_LandBiomesSize);
 }
 
@@ -595,7 +595,9 @@ void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX
 
 void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_ChunkZ, IntMap & a_TemperatureMap, IntMap & a_HumidityMap)
 {
-	// Linear interpolation over 8x8 blocks
+	// Linear interpolation over 8x8 blocks; use double for better precision:
+	DblMap TemperatureMap;
+	DblMap HumidityMap;
 	for (int z = 0; z < 17; z += 8)
 	{
 		float NoiseCoordZ = (float)(a_ChunkZ * cChunkDef::Width + z) / m_LandBiomesSize;
@@ -606,16 +608,23 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 			double NoiseT = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 7000);
 			NoiseT += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 8000);
 			NoiseT += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 9000);
-			a_TemperatureMap[x + 17 * z] = std::max(0, std::min(255, (int)(128 + NoiseT * 128)));
+			TemperatureMap[x + 17 * z] = NoiseT;
 
 			double NoiseH = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 9000);
 			NoiseH += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 5000);
 			NoiseH += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 1000);
-			a_HumidityMap[x + 17 * z] = std::max(0, std::min(255, (int)(128 + NoiseH * 128)));
+			HumidityMap[x + 17 * z] = NoiseH;
 		}  // for x
 	}  // for z
-	IntArrayLinearInterpolate2D(a_TemperatureMap, 17, 17, 8, 8);
-	IntArrayLinearInterpolate2D(a_HumidityMap,    17, 17, 8, 8);
+	ArrayLinearInterpolate2D(TemperatureMap, 17, 17, 8, 8);
+	ArrayLinearInterpolate2D(HumidityMap,    17, 17, 8, 8);
+	
+	// Re-map into integral values in [0 .. 255] range:
+	for (int idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)
+	{
+		a_TemperatureMap[idx] = std::max(0, std::min(255, (int)(128 + TemperatureMap[idx] * 128)));
+		a_HumidityMap[idx]    = std::max(0, std::min(255, (int)(128 + HumidityMap[idx]    * 128)));
+	}
 }
 
 
