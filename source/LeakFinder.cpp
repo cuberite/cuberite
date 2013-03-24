@@ -847,7 +847,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 		if (lRequest != 0)
 		{
 			// RequestID was found
-			g_CurrentMemUsage -= nSize;
+			g_CurrentMemUsage -= nSize + CRTTable::AllocHashEntryTypeSize;
 			g_pCRTTable->Remove(lRequest);
 		}
 	}  // freeing
@@ -865,7 +865,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 			pHead = pHdr(pvData);
 			// Try to find the RequestID in the Hash-Table, mark it that it was freed
 			lReallocRequest = pHead->lRequest;
-			g_CurrentMemUsage -= pHead->nDataSize;
+			g_CurrentMemUsage -= pHead->nDataSize  + CRTTable::AllocHashEntryTypeSize;
 			bRet = g_pCRTTable->Remove(lReallocRequest);
 		}  // ValidHeapPointer
 	}  // re-allocating
