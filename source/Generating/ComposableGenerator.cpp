@@ -135,8 +135,8 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
 	if (BiomeGenName.empty())
 	{
-		LOGWARN("[Generator]::BiomeGen value not found in world.ini, using \"DistortedVoronoi\".");
-		BiomeGenName = "DistortedVoronoi";
+		LOGWARN("[Generator]::BiomeGen value not found in world.ini, using \"MultiStepMap\".");
+		BiomeGenName = "MultiStepMap";
 	}
 	
 	int Seed = m_ChunkGenerator.GetSeed();
@@ -155,17 +155,17 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	{
 		m_BiomeGen = new cBioGenVoronoi(Seed);
 	}
-	else if (NoCaseCompare(BiomeGenName, "multistepmap") == 0)
+	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
 	{
-		m_BiomeGen = new cBioGenMultiStepMap(Seed);
+		m_BiomeGen = new cBioGenDistortedVoronoi(Seed);
 	}
 	else
 	{
-		if (NoCaseCompare(BiomeGenName, "distortedvoronoi") != 0)
+		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
 		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"DistortedVoronoi\" instead.", BiomeGenName.c_str());
+			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
 		}
-		m_BiomeGen = new cBioGenDistortedVoronoi(Seed);
+		m_BiomeGen = new cBioGenMultiStepMap(Seed);
 	}
 	
 	// Add a cache, if requested:
@@ -302,7 +302,7 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 {
-	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Ravines,WormNestCaves,OreNests,Trees");
+	AString Structures = a_IniFile.GetValueSet("Generator", "Structures", "Ravines, WormNestCaves, WaterLakes, LavaLakes, OreNests, Trees");
 
 	int Seed = m_ChunkGenerator.GetSeed();
 	AStringVector Str = StringSplitAndTrim(Structures, ",");
