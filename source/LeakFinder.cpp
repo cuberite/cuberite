@@ -393,8 +393,8 @@ protected:
   virtual LONG Disable() = 0;
   // enables the leak-finder again...
   virtual LONG Enable() = 0;
-
-private:
+  
+protected:
   // Entry for each allocation
   typedef struct AllocHashEntryType {
     HASHTABLE_KEY             key;
@@ -678,6 +678,9 @@ static LONG s_CrtDisableCount = 0;
 static LONG s_lMallocCalled = 0;
 
 
+
+
+
 class CRTTable : public ContextHashtableBase<LONG>
 {
 public:
@@ -724,6 +727,8 @@ public:
     _snprintf_s(szName, nBufferLen, nBufferLen, "%d", key);
 #endif
   }
+
+  static const int AllocHashEntryTypeSize = sizeof(AllocHashEntryType);
 
 protected:
   CHAR *m_pBuffer;
@@ -885,9 +890,9 @@ static int MyAllocHook(int nAllocType, void *pvData,
 	{
 		if (lRequest != 0) // Always a valid RequestID should be provided (see comments in the header)
 		{
-			g_CurrentMemUsage += nSize;
+			g_CurrentMemUsage += nSize + CRTTable::AllocHashEntryTypeSize;
 			
-			if (g_CurrentMemUsage > 65970823)//1024 * 1024 * 1024)
+			if (g_CurrentMemUsage > 1024 * 1024 * 1024)
 			{
 				printf("******************************************\n");
 				printf("** Server reached 1 GiB memory usage,   **\n");
