@@ -113,8 +113,20 @@
 #endif
 
 
+/* _X: MSVC 2012 (MSC 1700) seems to use a different allocation scheme for STL containers,
+* allocating lots of small objects and running out of memory very soon
+* Thus for MSVC 2012 we cut the callstack buffer length in half
+*/
 // Controlling the callstack depth
-#define MAX_CALLSTACK_LEN_BUF 0x2000
+#if (_MSC_VER < 1700)
+	#define MAX_CALLSTACK_LEN_BUF 0x2000
+#else
+	#define MAX_CALLSTACK_LEN_BUF 0x1000
+#endif
+
+
+
+
 
 #define IGNORE_CRT_ALLOC
 
