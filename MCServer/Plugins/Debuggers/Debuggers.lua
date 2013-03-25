@@ -92,6 +92,18 @@ function Initialize(Plugin)
 		BA1:MirrorYZNoMeta();
 		BA1:SaveToSchematicFile("schematics/lt_YZ2.schematic");
 	end
+	
+	-- Debug block area rotation:
+	if (BA1:LoadFromSchematicFile("schematics/rot.schematic")) then
+		BA1:RotateCWNoMeta();
+		BA1:SaveToSchematicFile("schematics/rot1.schematic");
+		BA1:RotateCWNoMeta();
+		BA1:SaveToSchematicFile("schematics/rot2.schematic");
+		BA1:RotateCWNoMeta();
+		BA1:SaveToSchematicFile("schematics/rot3.schematic");
+		BA1:RotateCWNoMeta();
+		BA1:SaveToSchematicFile("schematics/rot4.schematic");
+	end
 
 	return true
 end

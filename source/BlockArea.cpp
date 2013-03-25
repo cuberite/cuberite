@@ -969,20 +969,90 @@ void cBlockArea::MirrorYZ(void)
 
 
 
-void cBlockArea::RotateCWNoMeta(void)
+void cBlockArea::RotateCCWNoMeta(void)
 {
-	ASSERT(!"Not implemented yet");
-	// TODO
+	if (HasBlockTypes())
+	{
+		BLOCKTYPE * NewTypes = new BLOCKTYPE[m_SizeX * m_SizeY * m_SizeZ];
+		for (int x = 0; x < m_SizeX; x++)
+		{
+			int NewZ = m_SizeX - x - 1;
+			for (int z = 0; z < m_SizeZ; z++)
+			{
+				int NewX = z;
+				for (int y = 0; y < m_SizeY; y++)
+				{
+					NewTypes[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockTypes[MakeIndex(x, y, z)];
+				}  // for y
+			}  // for z
+		}  // for x
+		std::swap(m_BlockTypes, NewTypes);
+		delete[] NewTypes;
+	}
+	if (HasBlockTypes())
+	{
+		NIBBLETYPE * NewMetas = new NIBBLETYPE[m_SizeX * m_SizeY * m_SizeZ];
+		for (int x = 0; x < m_SizeX; x++)
+		{
+			int NewZ = m_SizeX - x - 1;
+			for (int z = 0; z < m_SizeZ; z++)
+			{
+				int NewX = z;
+				for (int y = 0; y < m_SizeY; y++)
+				{
+					NewMetas[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockMetas[MakeIndex(x, y, z)];
+				}  // for y
+			}  // for z
+		}  // for x
+		std::swap(m_BlockMetas, NewMetas);
+		delete[] NewMetas;
+	}
+	std::swap(m_SizeX, m_SizeZ);
 }
 
 
 
 
 
-void cBlockArea::RotateCCWNoMeta(void)
+void cBlockArea::RotateCWNoMeta(void)
 {
-	ASSERT(!"Not implemented yet");
-	// TODO
+	if (HasBlockTypes())
+	{
+		BLOCKTYPE * NewTypes = new BLOCKTYPE[m_SizeX * m_SizeY * m_SizeZ];
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			int NewX = m_SizeZ - z - 1;
+			for (int x = 0; x < m_SizeX; x++)
+			{
+				int NewZ = x;
+				for (int y = 0; y < m_SizeY; y++)
+				{
+					NewTypes[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockTypes[MakeIndex(x, y, z)];
+				}  // for y
+			}  // for x
+		}  // for z
+		std::swap(m_BlockTypes, NewTypes);
+		delete[] NewTypes;
+	}
+	if (HasBlockTypes())
+	{
+		NIBBLETYPE * NewMetas = new NIBBLETYPE[m_SizeX * m_SizeY * m_SizeZ];
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			int NewX = m_SizeZ - z - 1;
+			for (int x = 0; x < m_SizeX; x++)
+			{
+				int NewZ = x;
+				for (int y = 0; y < m_SizeY; y++)
+				{
+					NewMetas[NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ] = m_BlockMetas[MakeIndex(x, y, z)];
+				}  // for y
+			}  // for x
+		}  // for z
+		std::swap(m_BlockMetas, NewMetas);
+		delete[] NewMetas;
+	}
+	std::swap(m_SizeX, m_SizeZ);
 }
 
 
