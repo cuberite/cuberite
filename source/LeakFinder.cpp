@@ -448,6 +448,7 @@ public:
       }
 
       pHashEntry->Next = (AllocHashEntryType*) own_malloc(sizeof(AllocHashEntryType));
+	  g_CurrentMemUsage += CRTTable::AllocHashEntryTypeSize;
       pHashEntry = pHashEntry->Next;
       if (pHashEntry == NULL)
       {
@@ -522,6 +523,7 @@ public:
             AllocHashEntryType *pTmp = pHashEntry->Next;
             *pHashEntry = *(pHashEntry->Next);
             own_free(pTmp);
+			g_CurrentMemUsage -= CRTTable::AllocHashEntryTypeSize;
           }
           return TRUE;
         }
@@ -529,6 +531,7 @@ public:
           // now, I am in an dynamic allocated entry (it was a collision)
           pHashEntryLast->Next = pHashEntry->Next;
           own_free(pHashEntry);
+		  g_CurrentMemUsage -= CRTTable::AllocHashEntryTypeSize;
           return TRUE;
         }
       }
@@ -859,8 +862,24 @@ static int MyAllocHook(int nAllocType, void *pvData,
 		if (lRequest != 0)
 		{
 			// RequestID was found
-			g_CurrentMemUsage -= nSize + CRTTable::AllocHashEntryTypeSize;
+			size_t temp = g_CurrentMemUsage;
+			g_CurrentMemUsage -= nSize ;
 			g_pCRTTable->Remove(lRequest);
+			if (g_CurrentMemUsage > temp)
+			{
+				printf("********************************************\n");
+				printf("** Server detected underflow in memory    **\n");
+				printf("** usage counter. Something is not right. **\n");
+				printf("** Writing memory dump into memdump.xml   **\n");
+				printf("********************************************\n");
+				printf("Please wait\n");
+				
+				LeakFinderXmlOutput Output("memdump.xml");
+				DumpUsedMemory(&Output);
+				
+				printf("\nMemory dump complete. Server will now abort.\n");
+				abort();
+			}
 		}
 	}  // freeing
 
@@ -877,8 +896,24 @@ static int MyAllocHook(int nAllocType, void *pvData,
 			pHead = pHdr(pvData);
 			// Try to find the RequestID in the Hash-Table, mark it that it was freed
 			lReallocRequest = pHead->lRequest;
-			g_CurrentMemUsage -= pHead->nDataSize  + CRTTable::AllocHashEntryTypeSize;
+			size_t temp = g_CurrentMemUsage;
+			g_CurrentMemUsage -= pHead->nDataSize;
 			bRet = g_pCRTTable->Remove(lReallocRequest);
+			if (g_CurrentMemUsage > temp)
+			{
+				printf("********************************************\n");
+				printf("** Server detected underflow in memory    **\n");
+				printf("** usage counter. Something is not right. **\n");
+				printf("** Writing memory dump into memdump.xml   **\n");
+				printf("********************************************\n");
+				printf("Please wait\n");
+				
+				LeakFinderXmlOutput Output("memdump.xml");
+				DumpUsedMemory(&Output);
+				
+				printf("\nMemory dump complete. Server will now abort.\n");
+				abort();
+			}
 		}  // ValidHeapPointer
 	}  // re-allocating
 
@@ -902,9 +937,12 @@ static int MyAllocHook(int nAllocType, void *pvData,
 	{
 		if (lRequest != 0) // Always a valid RequestID should be provided (see comments in the header)
 		{
-			g_CurrentMemUsage += nSize + CRTTable::AllocHashEntryTypeSize;
+			//No need to check for overflow since we are checking if we are getting higher than 1gb.
+			//If we change this, then we probably would want an overflow check.
+			g_CurrentMemUsage += nSize ;
+			g_pCRTTable->Insert(lRequest, c, nSize);
 			
-			if (g_CurrentMemUsage > 1024 * 1024 * 1024)
+			if (g_CurrentMemUsage > 1073741824) //This is 1 gb = 1024 * 1024* 1024.
 			{
 				printf("******************************************\n");
 				printf("** Server reached 1 GiB memory usage,   **\n");
@@ -919,8 +957,6 @@ static int MyAllocHook(int nAllocType, void *pvData,
 				printf("\nMemory dump complete. Server will now abort.\n");
 				abort();
 			}
-			
-			g_pCRTTable->Insert(lRequest, c, nSize);
 		}
 	}
 
