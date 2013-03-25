@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/19/13 11:16:25.
+** Generated automatically by tolua++-1.0.92 on 03/24/13 22:28:30.
 */
 
 #ifndef __cplusplus
@@ -5101,11 +5101,245 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: AddSpeed of class  cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeed00
-static int tolua_AllToLua_cEntity_AddSpeed00(lua_State* tolua_S)
+/* method: SetSpeedX of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetSpeedX00
+static int tolua_AllToLua_cEntity_SetSpeedX00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_SpeedX = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSpeedX'", NULL);
+#endif
+  {
+   self->SetSpeedX(a_SpeedX);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSpeedX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSpeedY of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetSpeedY00
+static int tolua_AllToLua_cEntity_SetSpeedY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_SpeedY = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSpeedY'", NULL);
+#endif
+  {
+   self->SetSpeedY(a_SpeedY);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSpeedY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSpeedZ of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetSpeedZ00
+static int tolua_AllToLua_cEntity_SetSpeedZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_SpeedZ = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSpeedZ'", NULL);
+#endif
+  {
+   self->SetSpeedZ(a_SpeedZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSpeedZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddPosX of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddPosX00
+static int tolua_AllToLua_cEntity_AddPosX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddPosX = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddPosX'", NULL);
+#endif
+  {
+   self->AddPosX(a_AddPosX);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddPosX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddPosY of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddPosY00
+static int tolua_AllToLua_cEntity_AddPosY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddPosY = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddPosY'", NULL);
+#endif
+  {
+   self->AddPosY(a_AddPosY);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddPosY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddPosZ of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddPosZ00
+static int tolua_AllToLua_cEntity_AddPosZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddPosZ = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddPosZ'", NULL);
+#endif
+  {
+   self->AddPosZ(a_AddPosZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddPosZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddPosition of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddPosition00
+static int tolua_AllToLua_cEntity_AddPosition00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddPosX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_AddPosY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_AddPosZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddPosition'", NULL);
+#endif
+  {
+   self->AddPosition(a_AddPosX,a_AddPosY,a_AddPosZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddPosition'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddPosition of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddPosition01
+static int tolua_AllToLua_cEntity_AddPosition01(lua_State* tolua_S)
+{
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
@@ -5114,7 +5348,71 @@ static int tolua_AllToLua_cEntity_AddSpeed00(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const Vector3d* a_AddPos = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddPosition'", NULL);
 #endif
+  {
+   self->AddPosition(*a_AddPos);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cEntity_AddPosition00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeed00
+static int tolua_AllToLua_cEntity_AddSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddSpeedX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_AddSpeedY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_AddSpeedZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddSpeed'", NULL);
+#endif
+  {
+   self->AddSpeed(a_AddSpeedX,a_AddSpeedY,a_AddSpeedZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddSpeed of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeed01
+static int tolua_AllToLua_cEntity_AddSpeed01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
  {
   cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
   const Vector3d* a_AddSpeed = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
@@ -5126,9 +5424,105 @@ static int tolua_AllToLua_cEntity_AddSpeed00(lua_State* tolua_S)
   }
  }
  return 0;
+tolua_lerror:
+ return tolua_AllToLua_cEntity_AddSpeed00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddSpeedX of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeedX00
+static int tolua_AllToLua_cEntity_AddSpeedX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddSpeedX = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddSpeedX'", NULL);
+#endif
+  {
+   self->AddSpeedX(a_AddSpeedX);
+  }
+ }
+ return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'AddSpeed'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'AddSpeedX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddSpeedY of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeedY00
+static int tolua_AllToLua_cEntity_AddSpeedY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddSpeedY = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddSpeedY'", NULL);
+#endif
+  {
+   self->AddSpeedY(a_AddSpeedY);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddSpeedY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddSpeedZ of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_AddSpeedZ00
+static int tolua_AllToLua_cEntity_AddSpeedZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_AddSpeedZ = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddSpeedZ'", NULL);
+#endif
+  {
+   self->AddSpeedZ(a_AddSpeedZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddSpeedZ'.",&tolua_err);
  return 0;
 #endif
 }
@@ -18459,6 +18853,316 @@ static int tolua_AllToLua_cBlockArea_RelLine00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: RotateCW of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCW00
+static int tolua_AllToLua_cBlockArea_RotateCW00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCW'", NULL);
+#endif
+  {
+   self->RotateCW();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RotateCW'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RotateCCW of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCCW00
+static int tolua_AllToLua_cBlockArea_RotateCCW00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCCW'", NULL);
+#endif
+  {
+   self->RotateCCW();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RotateCCW'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MirrorXY of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_MirrorXY00
+static int tolua_AllToLua_cBlockArea_MirrorXY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MirrorXY'", NULL);
+#endif
+  {
+   self->MirrorXY();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MirrorXY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MirrorXZ of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_MirrorXZ00
+static int tolua_AllToLua_cBlockArea_MirrorXZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MirrorXZ'", NULL);
+#endif
+  {
+   self->MirrorXZ();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MirrorXZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MirrorYZ of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_MirrorYZ00
+static int tolua_AllToLua_cBlockArea_MirrorYZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MirrorYZ'", NULL);
+#endif
+  {
+   self->MirrorYZ();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MirrorYZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RotateCWNoMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCWNoMeta00
+static int tolua_AllToLua_cBlockArea_RotateCWNoMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCWNoMeta'", NULL);
+#endif
+  {
+   self->RotateCWNoMeta();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RotateCWNoMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RotateCCWNoMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCCWNoMeta00
+static int tolua_AllToLua_cBlockArea_RotateCCWNoMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCCWNoMeta'", NULL);
+#endif
+  {
+   self->RotateCCWNoMeta();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RotateCCWNoMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MirrorXYNoMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_MirrorXYNoMeta00
+static int tolua_AllToLua_cBlockArea_MirrorXYNoMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MirrorXYNoMeta'", NULL);
+#endif
+  {
+   self->MirrorXYNoMeta();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MirrorXYNoMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MirrorXZNoMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_MirrorXZNoMeta00
+static int tolua_AllToLua_cBlockArea_MirrorXZNoMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MirrorXZNoMeta'", NULL);
+#endif
+  {
+   self->MirrorXZNoMeta();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MirrorXZNoMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: MirrorYZNoMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_MirrorYZNoMeta00
+static int tolua_AllToLua_cBlockArea_MirrorYZNoMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MirrorYZNoMeta'", NULL);
+#endif
+  {
+   self->MirrorYZNoMeta();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'MirrorYZNoMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetRelBlockType of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_SetRelBlockType00
 static int tolua_AllToLua_cBlockArea_SetRelBlockType00(lua_State* tolua_S)
@@ -22006,7 +22710,19 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetRoll",tolua_AllToLua_cEntity_SetRoll00);
    tolua_function(tolua_S,"SetSpeed",tolua_AllToLua_cEntity_SetSpeed00);
    tolua_function(tolua_S,"SetSpeed",tolua_AllToLua_cEntity_SetSpeed01);
+   tolua_function(tolua_S,"SetSpeedX",tolua_AllToLua_cEntity_SetSpeedX00);
+   tolua_function(tolua_S,"SetSpeedY",tolua_AllToLua_cEntity_SetSpeedY00);
+   tolua_function(tolua_S,"SetSpeedZ",tolua_AllToLua_cEntity_SetSpeedZ00);
+   tolua_function(tolua_S,"AddPosX",tolua_AllToLua_cEntity_AddPosX00);
+   tolua_function(tolua_S,"AddPosY",tolua_AllToLua_cEntity_AddPosY00);
+   tolua_function(tolua_S,"AddPosZ",tolua_AllToLua_cEntity_AddPosZ00);
+   tolua_function(tolua_S,"AddPosition",tolua_AllToLua_cEntity_AddPosition00);
+   tolua_function(tolua_S,"AddPosition",tolua_AllToLua_cEntity_AddPosition01);
    tolua_function(tolua_S,"AddSpeed",tolua_AllToLua_cEntity_AddSpeed00);
+   tolua_function(tolua_S,"AddSpeed",tolua_AllToLua_cEntity_AddSpeed01);
+   tolua_function(tolua_S,"AddSpeedX",tolua_AllToLua_cEntity_AddSpeedX00);
+   tolua_function(tolua_S,"AddSpeedY",tolua_AllToLua_cEntity_AddSpeedY00);
+   tolua_function(tolua_S,"AddSpeedZ",tolua_AllToLua_cEntity_AddSpeedZ00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
    tolua_function(tolua_S,"Destroy",tolua_AllToLua_cEntity_Destroy00);
@@ -22605,6 +23321,16 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Fill",tolua_AllToLua_cBlockArea_Fill00);
    tolua_function(tolua_S,"FillRelCuboid",tolua_AllToLua_cBlockArea_FillRelCuboid00);
    tolua_function(tolua_S,"RelLine",tolua_AllToLua_cBlockArea_RelLine00);
+   tolua_function(tolua_S,"RotateCW",tolua_AllToLua_cBlockArea_RotateCW00);
+   tolua_function(tolua_S,"RotateCCW",tolua_AllToLua_cBlockArea_RotateCCW00);
+   tolua_function(tolua_S,"MirrorXY",tolua_AllToLua_cBlockArea_MirrorXY00);
+   tolua_function(tolua_S,"MirrorXZ",tolua_AllToLua_cBlockArea_MirrorXZ00);
+   tolua_function(tolua_S,"MirrorYZ",tolua_AllToLua_cBlockArea_MirrorYZ00);
+   tolua_function(tolua_S,"RotateCWNoMeta",tolua_AllToLua_cBlockArea_RotateCWNoMeta00);
+   tolua_function(tolua_S,"RotateCCWNoMeta",tolua_AllToLua_cBlockArea_RotateCCWNoMeta00);
+   tolua_function(tolua_S,"MirrorXYNoMeta",tolua_AllToLua_cBlockArea_MirrorXYNoMeta00);
+   tolua_function(tolua_S,"MirrorXZNoMeta",tolua_AllToLua_cBlockArea_MirrorXZNoMeta00);
+   tolua_function(tolua_S,"MirrorYZNoMeta",tolua_AllToLua_cBlockArea_MirrorYZNoMeta00);
    tolua_function(tolua_S,"SetRelBlockType",tolua_AllToLua_cBlockArea_SetRelBlockType00);
    tolua_function(tolua_S,"SetBlockType",tolua_AllToLua_cBlockArea_SetBlockType00);
    tolua_function(tolua_S,"SetRelBlockMeta",tolua_AllToLua_cBlockArea_SetRelBlockMeta00);

@@ -919,6 +919,187 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 
 
 
+void cBlockArea::RotateCW(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::RotateCCW(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::MirrorXY(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::MirrorXZ(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::MirrorYZ(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::RotateCWNoMeta(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::RotateCCWNoMeta(void)
+{
+	ASSERT(!"Not implemented yet");
+	// TODO
+}
+
+
+
+
+
+void cBlockArea::MirrorXYNoMeta(void)
+{
+	int HalfZ = m_SizeZ / 2;
+	int MaxZ = m_SizeZ - 1;
+	if (HasBlockTypes())
+	{
+		for (int y = 0; y < m_SizeY; y++)
+		{
+			for (int z = 0; z < HalfZ; z++)
+			{
+				for (int x = 0; x < m_SizeX; x++)
+				{
+					std::swap(m_BlockTypes[MakeIndex(x, y, z)], m_BlockTypes[MakeIndex(x, y, MaxZ - z)]);
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // if (HasBlockTypes)
+	
+	if (HasBlockMetas())
+	{
+		for (int y = 0; y < m_SizeY; y++)
+		{
+			for (int z = 0; z < HalfZ; z++)
+			{
+				for (int x = 0; x < m_SizeX; x++)
+				{
+					std::swap(m_BlockMetas[MakeIndex(x, y, z)], m_BlockMetas[MakeIndex(x, y, MaxZ - z)]);
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // if (HasBlockTypes)
+}
+
+
+
+
+
+void cBlockArea::MirrorXZNoMeta(void)
+{
+	int HalfY = m_SizeY / 2;
+	int MaxY = m_SizeY - 1;
+	if (HasBlockTypes())
+	{
+		for (int y = 0; y < HalfY; y++)
+		{
+			for (int z = 0; z < m_SizeZ; z++)
+			{
+				for (int x = 0; x < m_SizeX; x++)
+				{
+					std::swap(m_BlockTypes[MakeIndex(x, y, z)], m_BlockTypes[MakeIndex(x, MaxY - y, z)]);
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // if (HasBlockTypes)
+	
+	if (HasBlockMetas())
+	{
+		for (int y = 0; y < HalfY; y++)
+		{
+			for (int z = 0; z < m_SizeZ; z++)
+			{
+				for (int x = 0; x < m_SizeX; x++)
+				{
+					std::swap(m_BlockMetas[MakeIndex(x, y, z)], m_BlockMetas[MakeIndex(x, MaxY - y, z)]);
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // if (HasBlockTypes)
+}
+
+
+
+
+
+void cBlockArea::MirrorYZNoMeta(void)
+{
+	int HalfX = m_SizeX / 2;
+	int MaxX = m_SizeX - 1;
+	if (HasBlockTypes())
+	{
+		for (int y = 0; y < m_SizeY; y++)
+		{
+			for (int z = 0; z < m_SizeZ; z++)
+			{
+				for (int x = 0; x < HalfX; x++)
+				{
+					std::swap(m_BlockTypes[MakeIndex(x, y, z)], m_BlockTypes[MakeIndex(MaxX - x, y, z)]);
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // if (HasBlockTypes)
+	
+	if (HasBlockMetas())
+	{
+		for (int y = 0; y < m_SizeY; y++)
+		{
+			for (int z = 0; z < m_SizeZ; z++)
+			{
+				for (int x = 0; x < HalfX; x++)
+				{
+					std::swap(m_BlockMetas[MakeIndex(x, y, z)], m_BlockMetas[MakeIndex(MaxX - x, y, z)]);
+				}  // for x
+			}  // for z
+		}  // for y
+	}  // if (HasBlockTypes)
+}
+
+
+
+
+
 void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
 	if (m_BlockTypes == NULL)
@@ -1642,6 +1823,7 @@ bool cBlockArea::LoadFromSchematicNBT(cParsedNBT & a_NBT)
 	}
 	bool AreMetasPresent = (TBlockMetas > 0) && (a_NBT.GetType(TBlockMetas) == TAG_ByteArray);
 	
+	Clear();
 	SetSize(SizeX, SizeY, SizeZ, AreMetasPresent ? (baTypes | baMetas) : baTypes);
 	
 	// Copy the block types and metas:

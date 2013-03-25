@@ -149,6 +149,36 @@ public:
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 	
+	/// Rotates the entire area clockwise around the Y axis
+	void RotateCW(void);
+	
+	/// Rotates the entire area counter-clockwise around the Y axis
+	void RotateCCW(void);
+	
+	/// Mirrors the entire area around the XY plane
+	void MirrorXY(void);
+	
+	/// Mirrors the entire area around the XZ plane
+	void MirrorXZ(void);
+	
+	/// Mirrors the entire area around the YZ plane
+	void MirrorYZ(void);
+	
+	/// Rotates the entire area clockwise around the Y axis, doesn't use blockhandlers for block meta
+	void RotateCWNoMeta(void);
+	
+	/// Rotates the entire area counter-clockwise around the Y axis, doesn't use blockhandlers for block meta
+	void RotateCCWNoMeta(void);
+	
+	/// Mirrors the entire area around the XY plane, doesn't use blockhandlers for block meta
+	void MirrorXYNoMeta(void);
+	
+	/// Mirrors the entire area around the XZ plane, doesn't use blockhandlers for block meta
+	void MirrorXZNoMeta(void);
+	
+	/// Mirrors the entire area around the YZ plane, doesn't use blockhandlers for block meta
+	void MirrorYZNoMeta(void);
+	
 	// Setters:
 	void SetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE  a_BlockType);
 	void SetBlockType       (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE  a_BlockType);

@@ -75,6 +75,24 @@ function Initialize(Plugin)
 	BA1:RelLine(2, 2, 2, 9, 8, 8, cBlockArea.baTypes or cBlockArea.baMetas, E_BLOCK_SAPLING, E_META_SAPLING_BIRCH);
 	BA1:SaveToSchematicFile("schematics/fillrel.schematic");
 
+	-- Debug block area mirroring:
+	if (BA1:LoadFromSchematicFile("schematics/lt.schematic")) then
+		BA1:MirrorXYNoMeta();
+		BA1:SaveToSchematicFile("schematics/lt_XY.schematic");
+		BA1:MirrorXYNoMeta();
+		BA1:SaveToSchematicFile("schematics/lt_XY2.schematic");
+		
+		BA1:MirrorXZNoMeta();
+		BA1:SaveToSchematicFile("schematics/lt_XZ.schematic");
+		BA1:MirrorXZNoMeta();
+		BA1:SaveToSchematicFile("schematics/lt_XZ2.schematic");
+		
+		BA1:MirrorYZNoMeta();
+		BA1:SaveToSchematicFile("schematics/lt_YZ.schematic");
+		BA1:MirrorYZNoMeta();
+		BA1:SaveToSchematicFile("schematics/lt_YZ2.schematic");
+	end
+
 	return true
 end
 
