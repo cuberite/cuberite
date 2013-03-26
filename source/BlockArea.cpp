@@ -9,6 +9,7 @@
 #include "World.h"
 #include "OSSupport/GZipFile.h"
 #include "WorldStorage/FastNBT.h"
+#include "Blocks/BlockHandler.h"
 
 
 
@@ -923,12 +924,41 @@ void cBlockArea::RotateCCW(void)
 {
 	if (!HasBlockTypes())
 	{
-		LOGWARNING("cBlockArea: Cannot rotate meta without blocktypes!");
+		LOGWARNING("cBlockArea: Cannot rotate blockmeta without blocktypes!");
 		return;
 	}
 	
-	ASSERT(!"Not implemented yet");
-	// TODO
+	if (!HasBlockMetas())
+	{
+		// There are no blockmetas to rotate, just use the NoMeta function
+		RotateCCWNoMeta();
+		return;
+	}
+	
+	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
+	BLOCKTYPE * NewTypes = new BLOCKTYPE[m_SizeX * m_SizeY * m_SizeZ];
+	NIBBLETYPE * NewMetas = new NIBBLETYPE[m_SizeX * m_SizeY * m_SizeZ];
+	for (int x = 0; x < m_SizeX; x++)
+	{
+		int NewZ = m_SizeX - x - 1;
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			int NewX = z;
+			for (int y = 0; y < m_SizeY; y++)
+			{
+				int NewIdx = NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ;
+				int OldIdx = MakeIndex(x, y, z);
+				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
+				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCCW(m_BlockMetas[OldIdx]);
+			}  // for y
+		}  // for z
+	}  // for x
+	std::swap(m_BlockTypes, NewTypes);
+	std::swap(m_BlockMetas, NewMetas);
+	delete[] NewTypes;
+	delete[] NewMetas;
+
+	std::swap(m_SizeX, m_SizeZ);
 }
 
 
@@ -939,12 +969,41 @@ void cBlockArea::RotateCW(void)
 {
 	if (!HasBlockTypes())
 	{
-		LOGWARNING("cBlockArea: Cannot rotate meta without blocktypes!");
+		LOGWARNING("cBlockArea: Cannot rotate blockmeta without blocktypes!");
 		return;
 	}
 
-	ASSERT(!"Not implemented yet");
-	// TODO
+	if (!HasBlockMetas())
+	{
+		// There are no blockmetas to rotate, just use the NoMeta function
+		RotateCWNoMeta();
+		return;
+	}
+	
+	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
+	BLOCKTYPE * NewTypes = new BLOCKTYPE[m_SizeX * m_SizeY * m_SizeZ];
+	NIBBLETYPE * NewMetas = new NIBBLETYPE[m_SizeX * m_SizeY * m_SizeZ];
+	for (int x = 0; x < m_SizeX; x++)
+	{
+		int NewZ = x;
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			int NewX = m_SizeZ - z - 1;
+			for (int y = 0; y < m_SizeY; y++)
+			{
+				int NewIdx = NewX + NewZ * m_SizeX + y * m_SizeX * m_SizeZ;
+				int OldIdx = MakeIndex(x, y, z);
+				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
+				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCW(m_BlockMetas[OldIdx]);
+			}  // for y
+		}  // for z
+	}  // for x
+	std::swap(m_BlockTypes, NewTypes);
+	std::swap(m_BlockMetas, NewMetas);
+	delete[] NewTypes;
+	delete[] NewMetas;
+
+	std::swap(m_SizeX, m_SizeZ);
 }
 
 
@@ -958,9 +1017,33 @@ void cBlockArea::MirrorXY(void)
 		LOGWARNING("cBlockArea: Cannot mirror meta without blocktypes!");
 		return;
 	}
+	
+	if (!HasBlockMetas())
+	{
+		// There are no blockmetas to mirror, just use the NoMeta function
+		MirrorXYNoMeta();
+		return;
+	}
 
-	ASSERT(!"Not implemented yet");
-	// TODO
+	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
+	int HalfZ = m_SizeZ / 2;
+	int MaxZ = m_SizeZ - 1;
+	for (int y = 0; y < m_SizeY; y++)
+	{
+		for (int z = 0; z < HalfZ; z++)
+		{
+			for (int x = 0; x < m_SizeX; x++)
+			{
+				int Idx1 = MakeIndex(x, y, z);
+				int Idx2 = MakeIndex(x, y, MaxZ - z);
+				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
+				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorXY(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorXY(m_BlockMetas[Idx2]);
+				m_BlockMetas[Idx1] = Meta2;
+				m_BlockMetas[Idx2] = Meta1;
+			}  // for x
+		}  // for z
+	}  // for y
 }
 
 
@@ -975,8 +1058,32 @@ void cBlockArea::MirrorXZ(void)
 		return;
 	}
 
-	ASSERT(!"Not implemented yet");
-	// TODO
+	if (!HasBlockMetas())
+	{
+		// There are no blockmetas to mirror, just use the NoMeta function
+		MirrorXZNoMeta();
+		return;
+	}
+
+	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
+	int HalfY = m_SizeY / 2;
+	int MaxY = m_SizeY - 1;
+	for (int y = 0; y < HalfY; y++)
+	{
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			for (int x = 0; x < m_SizeX; x++)
+			{
+				int Idx1 = MakeIndex(x, y, z);
+				int Idx2 = MakeIndex(x, MaxY - y, z);
+				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
+				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorXZ(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorXZ(m_BlockMetas[Idx2]);
+				m_BlockMetas[Idx1] = Meta2;
+				m_BlockMetas[Idx2] = Meta1;
+			}  // for x
+		}  // for z
+	}  // for y
 }
 
 
@@ -991,8 +1098,32 @@ void cBlockArea::MirrorYZ(void)
 		return;
 	}
 
-	ASSERT(!"Not implemented yet");
-	// TODO
+	if (!HasBlockMetas())
+	{
+		// There are no blockmetas to mirror, just use the NoMeta function
+		MirrorYZNoMeta();
+		return;
+	}
+
+	// We are guaranteed that both blocktypes and blockmetas exist; mirror both at the same time:
+	int HalfX = m_SizeX / 2;
+	int MaxX = m_SizeX - 1;
+	for (int y = 0; y < m_SizeY; y++)
+	{
+		for (int z = 0; z < m_SizeZ; z++)
+		{
+			for (int x = 0; x < HalfX; x++)
+			{
+				int Idx1 = MakeIndex(x, y, z);
+				int Idx2 = MakeIndex(MaxX - x, y, z);
+				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
+				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorYZ(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorYZ(m_BlockMetas[Idx2]);
+				m_BlockMetas[Idx1] = Meta2;
+				m_BlockMetas[Idx2] = Meta1;
+			}  // for x
+		}  // for z
+	}  // for y
 }
 
 

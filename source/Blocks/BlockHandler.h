@@ -112,6 +112,21 @@ public:
 	*/
 	virtual void Check(int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 	
+	/// Returns the meta for a block after rotating it counter-clockwise from the specified meta. Default: no change
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) { return a_Meta; }
+	
+	/// Returns the meta for a block after rotating it clockwise from the specified meta. Default: no change
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) { return a_Meta; }
+	
+	/// Returns the meta for a block after mirroring it around the XY plane. Default: no change
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) { return a_Meta; }
+
+	/// Returns the meta for a block after mirroring it around the XZ plane. Default: no change
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) { return a_Meta; }
+
+	/// Returns the meta for a block after mirroring it around the YZ plane. Default: no change
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) { return a_Meta; }
+
 
 	/// Get the blockhandler for a specific block id
 	static cBlockHandler * GetBlockHandler(BLOCKTYPE a_BlockType);

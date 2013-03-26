@@ -105,6 +105,37 @@ function Initialize(Plugin)
 		BA1:SaveToSchematicFile("schematics/rot4.schematic");
 	end
 
+	-- Debug block area rotation:
+	if (BA1:LoadFromSchematicFile("schematics/rotm.schematic")) then
+		BA1:RotateCCW();
+		BA1:SaveToSchematicFile("schematics/rotm1.schematic");
+		BA1:RotateCCW();
+		BA1:SaveToSchematicFile("schematics/rotm2.schematic");
+		BA1:RotateCCW();
+		BA1:SaveToSchematicFile("schematics/rotm3.schematic");
+		BA1:RotateCCW();
+		BA1:SaveToSchematicFile("schematics/rotm4.schematic");
+	end
+
+	-- Debug block area mirroring:
+	if (BA1:LoadFromSchematicFile("schematics/ltm.schematic")) then
+		BA1:MirrorXY();
+		BA1:SaveToSchematicFile("schematics/ltm_XY.schematic");
+		BA1:MirrorXY();
+		BA1:SaveToSchematicFile("schematics/ltm_XY2.schematic");
+		
+		BA1:MirrorXZ();
+		BA1:SaveToSchematicFile("schematics/ltm_XZ.schematic");
+		BA1:MirrorXZ();
+		BA1:SaveToSchematicFile("schematics/ltm_XZ2.schematic");
+		
+		BA1:MirrorYZ();
+		BA1:SaveToSchematicFile("schematics/ltm_YZ.schematic");
+		BA1:MirrorYZ();
+		BA1:SaveToSchematicFile("schematics/ltm_YZ2.schematic");
+	end
+	
+
 	return true
 end
 
