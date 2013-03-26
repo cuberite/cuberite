@@ -919,8 +919,14 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 
 
 
-void cBlockArea::RotateCW(void)
+void cBlockArea::RotateCCW(void)
 {
+	if (!HasBlockTypes())
+	{
+		LOGWARNING("cBlockArea: Cannot rotate meta without blocktypes!");
+		return;
+	}
+	
 	ASSERT(!"Not implemented yet");
 	// TODO
 }
@@ -929,8 +935,14 @@ void cBlockArea::RotateCW(void)
 
 
 
-void cBlockArea::RotateCCW(void)
+void cBlockArea::RotateCW(void)
 {
+	if (!HasBlockTypes())
+	{
+		LOGWARNING("cBlockArea: Cannot rotate meta without blocktypes!");
+		return;
+	}
+
 	ASSERT(!"Not implemented yet");
 	// TODO
 }
@@ -941,6 +953,12 @@ void cBlockArea::RotateCCW(void)
 
 void cBlockArea::MirrorXY(void)
 {
+	if (!HasBlockTypes())
+	{
+		LOGWARNING("cBlockArea: Cannot mirror meta without blocktypes!");
+		return;
+	}
+
 	ASSERT(!"Not implemented yet");
 	// TODO
 }
@@ -951,6 +969,12 @@ void cBlockArea::MirrorXY(void)
 
 void cBlockArea::MirrorXZ(void)
 {
+	if (!HasBlockTypes())
+	{
+		LOGWARNING("cBlockArea: Cannot mirror meta without blocktypes!");
+		return;
+	}
+
 	ASSERT(!"Not implemented yet");
 	// TODO
 }
@@ -961,6 +985,12 @@ void cBlockArea::MirrorXZ(void)
 
 void cBlockArea::MirrorYZ(void)
 {
+	if (!HasBlockTypes())
+	{
+		LOGWARNING("cBlockArea: Cannot mirror meta without blocktypes!");
+		return;
+	}
+
 	ASSERT(!"Not implemented yet");
 	// TODO
 }
@@ -989,7 +1019,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 		std::swap(m_BlockTypes, NewTypes);
 		delete[] NewTypes;
 	}
-	if (HasBlockTypes())
+	if (HasBlockMetas())
 	{
 		NIBBLETYPE * NewMetas = new NIBBLETYPE[m_SizeX * m_SizeY * m_SizeZ];
 		for (int x = 0; x < m_SizeX; x++)
@@ -1034,7 +1064,7 @@ void cBlockArea::RotateCWNoMeta(void)
 		std::swap(m_BlockTypes, NewTypes);
 		delete[] NewTypes;
 	}
-	if (HasBlockTypes())
+	if (HasBlockMetas())
 	{
 		NIBBLETYPE * NewMetas = new NIBBLETYPE[m_SizeX * m_SizeY * m_SizeZ];
 		for (int z = 0; z < m_SizeZ; z++)
@@ -1089,7 +1119,7 @@ void cBlockArea::MirrorXYNoMeta(void)
 				}  // for x
 			}  // for z
 		}  // for y
-	}  // if (HasBlockTypes)
+	}  // if (HasBlockMetas)
 }
 
 
@@ -1126,7 +1156,7 @@ void cBlockArea::MirrorXZNoMeta(void)
 				}  // for x
 			}  // for z
 		}  // for y
-	}  // if (HasBlockTypes)
+	}  // if (HasBlockMetas)
 }
 
 
@@ -1163,7 +1193,7 @@ void cBlockArea::MirrorYZNoMeta(void)
 				}  // for x
 			}  // for z
 		}  // for y
-	}  // if (HasBlockTypes)
+	}  // if (HasBlockMetas)
 }
 
 
