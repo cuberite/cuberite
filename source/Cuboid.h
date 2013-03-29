@@ -60,6 +60,8 @@ public:
 	/// Moves the cuboid by the specified offsets in each direction
 	void Move(int a_OfsX, int a_OfsY, int a_OfsZ);
 
+	/// Returns true if the coords are properly sorted (lesser in p1, greater in p2)
+	bool IsSorted(void) const;
 } ;
 // tolua_end
 

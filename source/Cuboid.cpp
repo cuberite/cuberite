@@ -13,7 +13,7 @@ static bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
 	return (
 		((a_Min1 >= a_Min2) && (a_Min1 <= a_Max2)) ||  // Start of first  interval is within the second interval
 		((a_Max1 >= a_Min2) && (a_Max1 <= a_Max2)) ||  // End   of first  interval is within the second interval
-		((a_Min2 >= a_Min2) && (a_Min2 <= a_Max2))     // Start of second interval is within the first interval
+		((a_Min2 >= a_Min1) && (a_Min2 <= a_Max1))     // Start of second interval is within the first interval
 	);
 }
 
@@ -68,6 +68,19 @@ void cCuboid::Move(int a_OfsX, int a_OfsY, int a_OfsZ)
 	p2.z += a_OfsZ;
 }
 
+
+
+
+
+
+bool cCuboid::IsSorted(void) const
+{
+	return (
+		(p1.x <= p2.x) &&
+		(p1.y <= p2.y) &&
+		(p1.z <= p2.z)
+	);
+}
 
 
 
