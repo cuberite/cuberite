@@ -108,8 +108,8 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 	const char * FamilyStr = "";
 	switch (m_Family)
 	{
-		case cSocket::IPv4: FamilyStr = "IPv4: "; break;
-		case cSocket::IPv6: FamilyStr = "IPv6: "; break;
+		case cSocket::IPv4: FamilyStr = "IPv4"; break;
+		case cSocket::IPv6: FamilyStr = "IPv6"; break;
 		default:
 		{
 			ASSERT(!"Unknown address family");
@@ -122,13 +122,13 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		int Port = atoi(itr->c_str());
 		if ((Port <= 0) || (Port > 65535))
 		{
-			LOGWARNING("Invalid port specified: \"%s\".", itr->c_str());
+			LOGWARNING("%s: Invalid port specified: \"%s\".", FamilyStr, itr->c_str());
 			continue;
 		}
 		m_Sockets.push_back(cSocket::CreateSocket(m_Family));
 		if (!m_Sockets.back().IsValid())
 		{
-			LOGERROR("Cannot create listening socket for port %d: \"%s\"", Port, cSocket::GetLastErrorString().c_str());
+			LOGWARNING("%s: Cannot create listening socket for port %d: \"%s\"", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
 			m_Sockets.pop_back();
 			continue;
 		}
@@ -137,7 +137,7 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		{
 			if (!m_Sockets.back().SetReuseAddress())
 			{
-				LOG("Port %d cannot reuse addr, syscall failed: \"%s\".", Port, cSocket::GetLastErrorString().c_str());
+				LOG("%s: Port %d cannot reuse addr, syscall failed: \"%s\".", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
 			}
 		}
 		
@@ -155,19 +155,19 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		}
 		if (!res)
 		{
-			LOGWARNING("Cannot bind port %d: \"%s\".", Port, cSocket::GetLastErrorString().c_str());
+			LOGWARNING("%s: Cannot bind port %d: \"%s\".", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
 			m_Sockets.pop_back();
 			continue;
 		}
 		
 		if (!m_Sockets.back().Listen())
 		{
-			LOGWARNING("Cannot listen on port %d: \"%s\".", Port, cSocket::GetLastErrorString().c_str());
+			LOGWARNING("%s: Cannot listen on port %d: \"%s\".", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
 			m_Sockets.pop_back();
 			continue;
 		}
 		
-		LOGINFO("%sPort %d is open for connections", FamilyStr, Port);
+		LOGINFO("%s: Port %d is open for connections", FamilyStr, Port);
 	}  // for itr - Ports[]
 	
 	return !(m_Sockets.empty());
