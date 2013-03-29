@@ -328,7 +328,7 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 		{
 			int GridSize      = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize", 96);
 			int MaxSystemSize = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize", 128);
-			m_StructureGens.push_back(new cStructGenMineShafts(Seed, GridSize, MaxSystemSize));
+			m_StructureGens.push_back(new cStructGenMineShafts(Seed, GridSize, MaxSystemSize, 600, 200, 200));
 		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{

@@ -24,7 +24,7 @@ in a depth-first processing. Each of the descendants will branch randomly, if no
 
 
 
-static const int NEIGHBORHOOD_SIZE = 3;
+static const int NEIGHBORHOOD_SIZE = 1;
 
 
 
@@ -51,6 +51,11 @@ public:
 	} ;
 	
 	
+	eKind   m_Kind;
+	cCuboid m_BoundingBox;
+	cStructGenMineShafts::cMineShaftSystem & m_ParentSystem;
+
+
 	cMineShaft(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, eKind a_Kind) :
 		m_ParentSystem(a_ParentSystem),
 		m_Kind(a_Kind)
@@ -58,7 +63,10 @@ public:
 	}
 	
 	/// Returns true if this mineshaft intersects the specified cuboid
-	bool DoesIntersect(const cCuboid & a_Other);
+	bool DoesIntersect(const cCuboid & a_Other)
+	{
+		return m_BoundingBox.DoesIntersect(a_Other);
+	}
 	
 	/** If recursion level is not too large, appends more branches to the parent system,
 	using exit points specific to this class.
@@ -67,14 +75,6 @@ public:
 	
 	/// Imprints this shape into the specified chunk's data
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) = 0;
-	
-protected:
-	eKind   m_Kind;
-	cCuboid m_BoundingBox;
-	
-	int   m_PivotX, m_PivotZ;
-	
-	cStructGenMineShafts::cMineShaftSystem & m_ParentSystem;
 } ;
 
 typedef std::vector<cMineShaft *> cMineShafts;
@@ -116,7 +116,24 @@ public:
 		cNoise & a_Noise
 	);
 	
-	// TODO
+protected:
+	int        m_NumSegments;
+	eDirection m_Direction;
+	
+	cMineShaftCorridor(
+		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
+		const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction
+	) :
+		super(a_ParentSystem, mskCorridor),
+		m_NumSegments(a_NumSegments),
+		m_Direction(a_Direction)
+	{
+		m_BoundingBox = a_BoundingBox;
+	}
+
+	// cMineShaft overrides:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -139,7 +156,12 @@ public:
 		cNoise & a_Noise
 	);
 	
+protected:
 	// TODO
+	
+	// cMineShaft overrides:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -162,7 +184,12 @@ public:
 		cNoise & a_Noise
 	);
 	
+protected:
 	// TODO
+
+	// cMineShaft overrides:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -181,7 +208,10 @@ public:
 	cMineShafts m_MineShafts;        ///< List of cMineShaft descendants that comprise this system
 
 	/// Creates and generates the entire system
-	cMineShaftSystem(int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise);
+	cMineShaftSystem(
+		int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise,
+		int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
+	);
 
 	~cMineShaftSystem();
 
@@ -196,6 +226,9 @@ public:
 		cMineShaft::eDirection a_Direction, cNoise & a_Noise,
 		int a_RecursionLevel
 	);
+	
+	/// Returns true if any of the objects in m_MineShafts intersects with the specified bounding box
+	bool DoIntersect(const cCuboid & a_BoundingBox);
 } ;
 
 
@@ -205,16 +238,28 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenMineShafts::cMineShaftSystem:
 
-cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise) :
+cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
+	int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise,
+	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
+) :
 	m_BlockX(a_BlockX),
 	m_BlockZ(a_BlockZ),
-	m_MaxSystemSize(a_MaxSystemSize)
+	m_MaxSystemSize(a_MaxSystemSize),
+	m_MaxRecursion(8),  // TODO: settable
+	m_ChanceCorridor(a_ChanceCorridor),
+	m_ChanceCrossing(a_ChanceCrossing),
+	m_ChanceStaircase(a_ChanceStaircase)
 {
 	m_MineShafts.reserve(100);
 	
 	cMineShaft * Start = new cMineShaftDirtRoom(*this, a_Noise);
 	m_MineShafts.push_back(Start);
 	Start->AppendBranches(0, a_Noise);
+	
+	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
+	{
+		ASSERT((*itr)->m_BoundingBox.IsSorted());
+	}  // for itr - m_MineShafts[]
 }
 
 
@@ -283,6 +328,22 @@ void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
 
 
 
+bool cStructGenMineShafts::cMineShaftSystem::DoIntersect(const cCuboid & a_BoundingBox)
+{
+	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
+	{
+		if ((*itr)->DoesIntersect(a_BoundingBox))
+		{
+			return true;
+		}
+	}  // for itr - m_MineShafts[]
+	return false;
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cMineShaftDirtRoom:
 
@@ -297,8 +358,8 @@ cMineShaftDirtRoom::cMineShaftDirtRoom(cStructGenMineShafts::cMineShaftSystem & 
 	m_BoundingBox.p1.z = a_Parent.m_BlockZ;
 	m_BoundingBox.p2.z = a_Parent.m_BlockZ + 10 + (rnd % 8);
 	rnd >>= 4;
-	m_BoundingBox.p1.y = 50;
-	m_BoundingBox.p2.y = 54 + rnd % 8;
+	m_BoundingBox.p1.y = 20;
+	m_BoundingBox.p2.y = 24 + rnd % 8;
 }
 
 
@@ -311,17 +372,17 @@ void cMineShaftDirtRoom::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 	for (int x = m_BoundingBox.p1.x + 1; x < m_BoundingBox.p2.x; x += 4)
 	{
 		int rnd = a_Noise.IntNoise3DInt(x, a_RecursionLevel, m_BoundingBox.p1.z) / 7;
-		m_ParentSystem.AppendBranch(x, m_BoundingBox.p1.y + (rnd % Height), m_BoundingBox.p1.z, dirZM, a_Noise, a_RecursionLevel);
+		m_ParentSystem.AppendBranch(x, m_BoundingBox.p1.y + (rnd % Height), m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
 		rnd >>= 4;
-		m_ParentSystem.AppendBranch(x, m_BoundingBox.p1.y + (rnd % Height), m_BoundingBox.p2.z, dirZP, a_Noise, a_RecursionLevel);
+		m_ParentSystem.AppendBranch(x, m_BoundingBox.p1.y + (rnd % Height), m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
 	}
 	
 	for (int z = m_BoundingBox.p1.z + 1; z < m_BoundingBox.p2.z; z += 4)
 	{
 		int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x, a_RecursionLevel, z) / 13;
-		m_ParentSystem.AppendBranch(m_BoundingBox.p1.x, m_BoundingBox.p1.y + (rnd % Height), z, dirXM, a_Noise, a_RecursionLevel);
+		m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, m_BoundingBox.p1.y + (rnd % Height), z, dirXM, a_Noise, a_RecursionLevel);
 		rnd >>= 4;
-		m_ParentSystem.AppendBranch(m_BoundingBox.p2.x, m_BoundingBox.p1.y + (rnd % Height), z, dirXP, a_Noise, a_RecursionLevel);
+		m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, m_BoundingBox.p1.y + (rnd % Height), z, dirXP, a_Noise, a_RecursionLevel);
 	}
 }
 
@@ -393,8 +454,48 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 	cNoise & a_Noise
 )
 {
+	cCuboid BoundingBox(a_PivotX, a_PivotY, a_PivotZ);
+	BoundingBox.p2.y += 4;
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	int NumSegments = 2 + (rnd) % 4;  // 2 .. 5
+	switch (a_Direction)
+	{
+		case dirXP: BoundingBox.p2.x += NumSegments * 5; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
+		case dirXM: BoundingBox.p1.x -= NumSegments * 5; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
+		case dirZP: BoundingBox.p2.z += NumSegments * 5; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
+		case dirZM: BoundingBox.p1.z -= NumSegments * 5; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
+	}
+	if (a_ParentSystem.DoIntersect(BoundingBox))
+	{
+		return NULL;
+	}
+	return new cMineShaftCorridor(a_ParentSystem, BoundingBox, NumSegments, a_Direction);
+}
+
+
+
+
+
+void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
+{
 	// TODO
-	return NULL;
+}
+
+
+
+
+
+void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
+{
+	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	cCuboid RelBoundingBox(m_BoundingBox);
+	RelBoundingBox.Move(-BlockX, 0, -BlockZ);
+	RelBoundingBox.p1.y += 1;
+	a_ChunkDesc.FillRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0);
+	RelBoundingBox.p1.y -= 1;
+	RelBoundingBox.p2.y = RelBoundingBox.p1.y;
+	a_ChunkDesc.ReplaceRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0, E_BLOCK_PLANKS, 0);
 }
 
 
@@ -438,10 +539,16 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenMineShafts:
 
-cStructGenMineShafts::cStructGenMineShafts(int a_Seed, int a_GridSize, int a_MaxSystemSize) :
+cStructGenMineShafts::cStructGenMineShafts(
+	int a_Seed, int a_GridSize, int a_MaxSystemSize,
+	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
+) :
 	m_Noise(a_Seed),
 	m_GridSize(a_GridSize),
-	m_MaxSystemSize(a_MaxSystemSize)
+	m_MaxSystemSize(a_MaxSystemSize),
+	m_ChanceCorridor(a_ChanceCorridor),
+	m_ChanceCrossing(a_ChanceCorridor + a_ChanceCrossing),
+	m_ChanceStaircase(a_ChanceCorridor + a_ChanceCrossing + a_ChanceStaircase)
 {
 }
 
@@ -529,7 +636,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 			}  // for itr - a_Mineshafts
 			if (!Found)
 			{
-				a_MineShafts.push_back(new cMineShaftSystem(RealX, RealZ, m_MaxSystemSize, m_Noise));
+				a_MineShafts.push_back(new cMineShaftSystem(RealX, RealZ, m_MaxSystemSize, m_Noise, m_ChanceCorridor, m_ChanceCrossing, m_ChanceStaircase));
 			}
 		}  // for z
 	}  // for x

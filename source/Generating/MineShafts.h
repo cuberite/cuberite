@@ -20,7 +20,10 @@ class cStructGenMineShafts :
 	public cStructureGen
 {
 public:
-	cStructGenMineShafts(int a_Seed, int a_GridSize, int a_MaxSystemSize);
+	cStructGenMineShafts(
+		int a_Seed, int a_GridSize, int a_MaxSystemSize,
+		int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
+	);
 	
 	virtual ~cStructGenMineShafts();
 	
@@ -34,9 +37,12 @@ protected:
 	typedef std::list<cMineShaftSystem *> cMineShaftSystems;
 	
 	cNoise            m_Noise;
-	int               m_GridSize;       ///< Average spacing of the systems
-	int               m_MaxSystemSize;  ///< Maximum blcok size of a mineshaft system
-	cMineShaftSystems m_Cache;          ///< Cache of the most recently used systems. MoveToFront used.
+	int               m_GridSize;          ///< Average spacing of the systems
+	int               m_MaxSystemSize;     ///< Maximum blcok size of a mineshaft system
+	int               m_ChanceCorridor;    ///< Chance (out of 1000) of a branch object being the corridor
+	int               m_ChanceCrossing;    ///< Chance (out of 1000) of a branch object being the crossing
+	int               m_ChanceStaircase;   ///< Chance (out of 1000) of a branch object being the staircase
+	cMineShaftSystems m_Cache;             ///< Cache of the most recently used systems. MoveToFront used.
 	
 	/// Clears everything from the cache
 	void ClearCache(void);
