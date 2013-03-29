@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/24/13 22:28:30.
+** Generated automatically by tolua++-1.0.92 on 03/29/13 17:37:21.
 */
 
 #ifndef __cplusplus
@@ -17185,6 +17185,66 @@ static int tolua_set_Vector3i_z(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: p1 of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_get_cCuboid_p1
+static int tolua_get_cCuboid_p1(lua_State* tolua_S)
+{
+  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p1'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->p1,"Vector3i");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: p1 of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_set_cCuboid_p1
+static int tolua_set_cCuboid_p1(lua_State* tolua_S)
+{
+  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p1'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3i",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->p1 = *((Vector3i*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: p2 of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_get_cCuboid_p2
+static int tolua_get_cCuboid_p2(lua_State* tolua_S)
+{
+  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p2'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->p2,"Vector3i");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: p2 of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_set_cCuboid_p2
+static int tolua_set_cCuboid_p2(lua_State* tolua_S)
+{
+  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p2'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3i",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->p2 = *((Vector3i*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cCuboid */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_new00
 static int tolua_AllToLua_cCuboid_new00(lua_State* tolua_S)
@@ -17348,66 +17408,6 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: p1 of class  cCuboid */
-#ifndef TOLUA_DISABLE_tolua_get_cCuboid_p1
-static int tolua_get_cCuboid_p1(lua_State* tolua_S)
-{
-  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p1'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)&self->p1,"Vector3i");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: p1 of class  cCuboid */
-#ifndef TOLUA_DISABLE_tolua_set_cCuboid_p1
-static int tolua_set_cCuboid_p1(lua_State* tolua_S)
-{
-  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p1'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3i",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->p1 = *((Vector3i*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: p2 of class  cCuboid */
-#ifndef TOLUA_DISABLE_tolua_get_cCuboid_p2
-static int tolua_get_cCuboid_p2(lua_State* tolua_S)
-{
-  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p2'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)&self->p2,"Vector3i");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: p2 of class  cCuboid */
-#ifndef TOLUA_DISABLE_tolua_set_cCuboid_p2
-static int tolua_set_cCuboid_p2(lua_State* tolua_S)
-{
-  cCuboid* self = (cCuboid*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'p2'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3i",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->p2 = *((Vector3i*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: Sort of class  cCuboid */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_Sort00
 static int tolua_AllToLua_cCuboid_Sort00(lua_State* tolua_S)
@@ -17434,6 +17434,102 @@ static int tolua_AllToLua_cCuboid_Sort00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Sort'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DifX of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_DifX00
+static int tolua_AllToLua_cCuboid_DifX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cCuboid* self = (const cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DifX'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->DifX();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DifX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DifY of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_DifY00
+static int tolua_AllToLua_cCuboid_DifY00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cCuboid* self = (const cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DifY'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->DifY();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DifY'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DifZ of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_DifZ00
+static int tolua_AllToLua_cCuboid_DifZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cCuboid* self = (const cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DifZ'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->DifZ();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DifZ'.",&tolua_err);
  return 0;
 #endif
 }
@@ -18853,37 +18949,6 @@ static int tolua_AllToLua_cBlockArea_RelLine00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: RotateCW of class  cBlockArea */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCW00
-static int tolua_AllToLua_cBlockArea_RotateCW00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCW'", NULL);
-#endif
-  {
-   self->RotateCW();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'RotateCW'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: RotateCCW of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCCW00
 static int tolua_AllToLua_cBlockArea_RotateCCW00(lua_State* tolua_S)
@@ -18910,6 +18975,37 @@ static int tolua_AllToLua_cBlockArea_RotateCCW00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'RotateCCW'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RotateCW of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCW00
+static int tolua_AllToLua_cBlockArea_RotateCW00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCW'", NULL);
+#endif
+  {
+   self->RotateCW();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RotateCW'.",&tolua_err);
  return 0;
 #endif
 }
@@ -19008,37 +19104,6 @@ static int tolua_AllToLua_cBlockArea_MirrorYZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: RotateCWNoMeta of class  cBlockArea */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCWNoMeta00
-static int tolua_AllToLua_cBlockArea_RotateCWNoMeta00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCWNoMeta'", NULL);
-#endif
-  {
-   self->RotateCWNoMeta();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'RotateCWNoMeta'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: RotateCCWNoMeta of class  cBlockArea */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCCWNoMeta00
 static int tolua_AllToLua_cBlockArea_RotateCCWNoMeta00(lua_State* tolua_S)
@@ -19065,6 +19130,37 @@ static int tolua_AllToLua_cBlockArea_RotateCCWNoMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'RotateCCWNoMeta'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RotateCWNoMeta of class  cBlockArea */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockArea_RotateCWNoMeta00
+static int tolua_AllToLua_cBlockArea_RotateCWNoMeta00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cBlockArea* self = (cBlockArea*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RotateCWNoMeta'", NULL);
+#endif
+  {
+   self->RotateCWNoMeta();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RotateCWNoMeta'.",&tolua_err);
  return 0;
 #endif
 }
@@ -23242,6 +23338,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cCuboid","cCuboid","",NULL);
   #endif
   tolua_beginmodule(tolua_S,"cCuboid");
+   tolua_variable(tolua_S,"p1",tolua_get_cCuboid_p1,tolua_set_cCuboid_p1);
+   tolua_variable(tolua_S,"p2",tolua_get_cCuboid_p2,tolua_set_cCuboid_p2);
    tolua_function(tolua_S,"new",tolua_AllToLua_cCuboid_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cCuboid_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cCuboid_new00_local);
@@ -23251,9 +23349,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cCuboid_new02);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cCuboid_new02_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cCuboid_new02_local);
-   tolua_variable(tolua_S,"p1",tolua_get_cCuboid_p1,tolua_set_cCuboid_p1);
-   tolua_variable(tolua_S,"p2",tolua_get_cCuboid_p2,tolua_set_cCuboid_p2);
    tolua_function(tolua_S,"Sort",tolua_AllToLua_cCuboid_Sort00);
+   tolua_function(tolua_S,"DifX",tolua_AllToLua_cCuboid_DifX00);
+   tolua_function(tolua_S,"DifY",tolua_AllToLua_cCuboid_DifY00);
+   tolua_function(tolua_S,"DifZ",tolua_AllToLua_cCuboid_DifZ00);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside00);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside01);
   tolua_endmodule(tolua_S);
@@ -23321,13 +23420,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Fill",tolua_AllToLua_cBlockArea_Fill00);
    tolua_function(tolua_S,"FillRelCuboid",tolua_AllToLua_cBlockArea_FillRelCuboid00);
    tolua_function(tolua_S,"RelLine",tolua_AllToLua_cBlockArea_RelLine00);
-   tolua_function(tolua_S,"RotateCW",tolua_AllToLua_cBlockArea_RotateCW00);
    tolua_function(tolua_S,"RotateCCW",tolua_AllToLua_cBlockArea_RotateCCW00);
+   tolua_function(tolua_S,"RotateCW",tolua_AllToLua_cBlockArea_RotateCW00);
    tolua_function(tolua_S,"MirrorXY",tolua_AllToLua_cBlockArea_MirrorXY00);
    tolua_function(tolua_S,"MirrorXZ",tolua_AllToLua_cBlockArea_MirrorXZ00);
    tolua_function(tolua_S,"MirrorYZ",tolua_AllToLua_cBlockArea_MirrorYZ00);
-   tolua_function(tolua_S,"RotateCWNoMeta",tolua_AllToLua_cBlockArea_RotateCWNoMeta00);
    tolua_function(tolua_S,"RotateCCWNoMeta",tolua_AllToLua_cBlockArea_RotateCCWNoMeta00);
+   tolua_function(tolua_S,"RotateCWNoMeta",tolua_AllToLua_cBlockArea_RotateCWNoMeta00);
    tolua_function(tolua_S,"MirrorXYNoMeta",tolua_AllToLua_cBlockArea_MirrorXYNoMeta00);
    tolua_function(tolua_S,"MirrorXZNoMeta",tolua_AllToLua_cBlockArea_MirrorXZNoMeta00);
    tolua_function(tolua_S,"MirrorYZNoMeta",tolua_AllToLua_cBlockArea_MirrorYZNoMeta00);
