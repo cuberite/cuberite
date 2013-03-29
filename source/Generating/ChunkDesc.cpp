@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "ChunkDesc.h"
 #include "../BlockArea.h"
+#include "../Cuboid.h"
 
 
 
@@ -376,6 +377,62 @@ HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 		}
 	}
 	return MaxHeight;
+}
+
+
+
+
+
+void cChunkDesc::FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	int MinX = std::max(a_RelCuboid.p1.x, 0);
+	int MinY = std::max(a_RelCuboid.p1.y, 0);
+	int MinZ = std::max(a_RelCuboid.p1.z, 0);
+	int MaxX = std::min(a_RelCuboid.p2.x, cChunkDef::Width - 1);
+	int MaxY = std::min(a_RelCuboid.p2.y, cChunkDef::Height - 1);
+	int MaxZ = std::min(a_RelCuboid.p2.z, cChunkDef::Width - 1);
+	
+	for (int y = MinY; y <= MaxY; y++)
+	{
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int x = MinX; x <= MaxX; x++)
+			{
+				SetBlockTypeMeta(x, y, z, a_BlockType, a_BlockMeta);
+			}
+		}  // for z
+	}  // for y
+}
+
+
+
+
+
+void cChunkDesc::ReplaceRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta, BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta)
+{
+	int MinX = std::max(a_RelCuboid.p1.x, 0);
+	int MinY = std::max(a_RelCuboid.p1.y, 0);
+	int MinZ = std::max(a_RelCuboid.p1.z, 0);
+	int MaxX = std::min(a_RelCuboid.p2.x, cChunkDef::Width - 1);
+	int MaxY = std::min(a_RelCuboid.p2.y, cChunkDef::Height - 1);
+	int MaxZ = std::min(a_RelCuboid.p2.z, cChunkDef::Width - 1);
+	
+	for (int y = MinY; y <= MaxY; y++)
+	{
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int x = MinX; x <= MaxX; x++)
+			{
+				BLOCKTYPE BlockType;
+				NIBBLETYPE BlockMeta;
+				GetBlockTypeMeta(x, y, z, BlockType, BlockMeta);
+				if ((BlockType == a_SrcType) && (BlockMeta == a_SrcMeta))
+				{
+					SetBlockTypeMeta(x, y, z, a_DstType, a_DstMeta);
+				}
+			}
+		}  // for z
+	}  // for y
 }
 
 

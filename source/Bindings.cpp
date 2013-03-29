@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/29/13 20:28:23.
+** Generated automatically by tolua++-1.0.92 on 03/29/13 21:47:35.
 */
 
 #ifndef __cplusplus
@@ -17832,6 +17832,38 @@ static int tolua_AllToLua_cCuboid_Move00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsSorted of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_IsSorted00
+static int tolua_AllToLua_cCuboid_IsSorted00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cCuboid* self = (const cCuboid*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSorted'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSorted();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSorted'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cTracer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cTracer_new00
 static int tolua_AllToLua_cTracer_new00(lua_State* tolua_S)
@@ -21590,6 +21622,84 @@ static int tolua_AllToLua_cChunkDesc_GetMaxHeight00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: FillRelCuboid of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_FillRelCuboid00
+static int tolua_AllToLua_cChunkDesc_FillRelCuboid00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+  const cCuboid* a_RelCuboid = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,3,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FillRelCuboid'", NULL);
+#endif
+  {
+   self->FillRelCuboid(*a_RelCuboid,a_BlockType,a_BlockMeta);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'FillRelCuboid'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ReplaceRelCuboid of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00
+static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+  const cCuboid* a_RelCuboid = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
+  unsigned char a_SrcType = (( unsigned char)  tolua_tonumber(tolua_S,3,0));
+  unsigned char a_SrcMeta = (( unsigned char)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a_DstType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_DstMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ReplaceRelCuboid'", NULL);
+#endif
+  {
+   self->ReplaceRelCuboid(*a_RelCuboid,a_SrcType,a_SrcMeta,a_DstType,a_DstMeta);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ReplaceRelCuboid'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cCraftingGrid */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cCraftingGrid_new00
 static int tolua_AllToLua_cCraftingGrid_new00(lua_State* tolua_S)
@@ -23598,6 +23708,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside01);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside02);
    tolua_function(tolua_S,"Move",tolua_AllToLua_cCuboid_Move00);
+   tolua_function(tolua_S,"IsSorted",tolua_AllToLua_cCuboid_IsSorted00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cTracer","cTracer","",tolua_collect_cTracer);
@@ -23734,6 +23845,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"WriteBlockArea",tolua_AllToLua_cChunkDesc_WriteBlockArea00);
    tolua_function(tolua_S,"ReadBlockArea",tolua_AllToLua_cChunkDesc_ReadBlockArea00);
    tolua_function(tolua_S,"GetMaxHeight",tolua_AllToLua_cChunkDesc_GetMaxHeight00);
+   tolua_function(tolua_S,"FillRelCuboid",tolua_AllToLua_cChunkDesc_FillRelCuboid00);
+   tolua_function(tolua_S,"ReplaceRelCuboid",tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cCraftingGrid","cCraftingGrid","",tolua_collect_cCraftingGrid);

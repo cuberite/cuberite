@@ -19,6 +19,9 @@
 // fwd: ../BlockArea.h
 class cBlockArea;
 
+// fwd: ../Cuboid.h
+class cCuboid;
+
 
 
 
@@ -75,6 +78,12 @@ public:
 
 	/// Returns the maximum height value in the heightmap
 	HEIGHTTYPE GetMaxHeight(void) const;
+	
+	/// Fills the relative cuboid with specified block; allows cuboid out of range of this chunk
+	void FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	
+	/// Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk
+	void ReplaceRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta, BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta);
 	
 	// tolua_end
 	
