@@ -24,7 +24,7 @@ in a depth-first processing. Each of the descendants will branch randomly, if no
 
 
 
-static const int NEIGHBORHOOD_SIZE = 1;
+static const int NEIGHBORHOOD_SIZE = 3;
 
 
 
@@ -51,14 +51,21 @@ public:
 	} ;
 	
 	
+	cStructGenMineShafts::cMineShaftSystem & m_ParentSystem;
 	eKind   m_Kind;
 	cCuboid m_BoundingBox;
-	cStructGenMineShafts::cMineShaftSystem & m_ParentSystem;
 
 
 	cMineShaft(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, eKind a_Kind) :
 		m_ParentSystem(a_ParentSystem),
 		m_Kind(a_Kind)
+	{
+	}
+	
+	cMineShaft(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, eKind a_Kind, const cCuboid & a_BoundingBox) :
+		m_ParentSystem(a_ParentSystem),
+		m_Kind(a_Kind),
+		m_BoundingBox(a_BoundingBox)
 	{
 	}
 	
@@ -155,7 +162,7 @@ public:
 	);
 	
 protected:
-	// TODO
+	cMineShaftCrossing(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, const cCuboid & a_BoundingBox);
 	
 	// cMineShaft overrides:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
@@ -451,11 +458,10 @@ cMineShaftCorridor::cMineShaftCorridor(
 	const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction,
 	cNoise & a_Noise
 ) :
-	super(a_ParentSystem, mskCorridor),
+	super(a_ParentSystem, mskCorridor, a_BoundingBox),
 	m_NumSegments(a_NumSegments),
 	m_Direction(a_Direction)
 {
-	m_BoundingBox = a_BoundingBox;
 	int rnd = a_Noise.IntNoise3DInt(a_BoundingBox.p1.x, a_BoundingBox.p1.y, a_BoundingBox.p1.z) / 7;
 	for (int i = 0; i < a_NumSegments; i++)
 	{
@@ -661,14 +667,133 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cMineShaftCrossing:
 
+cMineShaftCrossing::cMineShaftCrossing(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, const cCuboid & a_BoundingBox) :
+	super(a_ParentSystem, mskCrossing, a_BoundingBox)
+{
+}
+
+
+
+
+
 cMineShaft * cMineShaftCrossing::CreateAndFit(
 	cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
 	int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
 	cNoise & a_Noise
 )
 {
-	// TODO
-	return NULL;
+	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
+	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
+	BoundingBox.p2.y += 3;
+	if ((rnd % 4) < 2)
+	{
+		// 2-level crossing:
+		BoundingBox.p2.y += 4;
+		rnd >>= 2;
+		if ((rnd % 4) < 2)
+		{
+			// This is the higher level:
+			BoundingBox.p1.y -= 4;
+			BoundingBox.p2.y -= 4;
+		}
+	}
+	rnd >>= 2;
+	switch (a_Direction)
+	{
+		case dirXP: BoundingBox.p2.x += 4; BoundingBox.p1.z -= 2; BoundingBox.p2.z += 2; break;
+		case dirXM: BoundingBox.p1.x -= 4; BoundingBox.p1.z -= 2; BoundingBox.p2.z += 2; break;
+		case dirZP: BoundingBox.p2.z += 4; BoundingBox.p1.x -= 2; BoundingBox.p2.x += 2; break;
+		case dirZM: BoundingBox.p1.z -= 4; BoundingBox.p1.x -= 2; BoundingBox.p2.x += 2; break;
+	}
+	if (a_ParentSystem.DoIntersect(BoundingBox))
+	{
+		return NULL;
+	}
+	return new cMineShaftCrossing(a_ParentSystem, BoundingBox);
+}
+
+
+
+
+
+void cMineShaftCrossing::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
+{
+	struct
+	{
+		int x, y, z;
+		eDirection dir;
+	} Exits[] =
+	{
+		// Bottom level:
+		{-1, 1,  2, dirXM},
+		{ 2, 1, -1, dirZM},
+		{ 5, 1,  2, dirXP},
+		{ 2, 1,  5, dirZP},
+		// Top level:
+		{-1, 5,  2, dirXM},
+		{ 2, 5, -1, dirZM},
+		{ 5, 5,  2, dirXP},
+		{ 2, 5,  5, dirZP},
+	} ;
+	for (int i = 0; i < ARRAYCOUNT(Exits); i++)
+	{
+		if (m_BoundingBox.p1.y + Exits[i].y >= m_BoundingBox.p2.y)
+		{
+			// This exit is not available (two-level exit on a one-level crossing)
+			continue;
+		}
+		
+		int Height = m_BoundingBox.p1.y + Exits[i].y;
+		m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Exits[i].x, Height, m_BoundingBox.p1.z + Exits[i].z, Exits[i].dir, a_Noise, a_RecursionLevel);
+	}  // for i
+}
+
+
+
+
+
+void cMineShaftCrossing::ProcessChunk(cChunkDesc & a_ChunkDesc)
+{
+	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	cCuboid box(m_BoundingBox);
+	box.Move(-BlockX, 0, -BlockZ);
+	if ((box.p2.x < 0) || (box.p2.z < 0) || (box.p1.x >= cChunkDef::Width) || (box.p1.z > cChunkDef::Width))
+	{
+		// Does not intersect this chunk
+		return;
+	}
+	int Floor = box.p1.y + 1;
+	int Ceil = box.p2.y;
+
+	// The supports:
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p1.x + 1, Floor, Ceil, box.p1.z + 1, box.p1.z + 1, E_BLOCK_PLANKS, 0);
+	a_ChunkDesc.FillRelCuboid(box.p2.x - 1, box.p2.x - 1, Floor, Ceil, box.p1.z + 1, box.p1.z + 1, E_BLOCK_PLANKS, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p1.x + 1, Floor, Ceil, box.p2.z - 1, box.p2.z - 1, E_BLOCK_PLANKS, 0);
+	a_ChunkDesc.FillRelCuboid(box.p2.x - 1, box.p2.x - 1, Floor, Ceil, box.p2.z - 1, box.p2.z - 1, E_BLOCK_PLANKS, 0);
+
+	// The air in between:
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 2, box.p1.x + 2, Floor, Ceil, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Ceil, box.p1.z + 2, box.p1.z + 2, E_BLOCK_AIR, 0);
+
+	// The air on the edges:
+	int Mid = Floor + 2;
+	a_ChunkDesc.FillRelCuboid(box.p1.x,     box.p1.x,     Floor, Mid, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillRelCuboid(box.p2.x,     box.p2.x,     Floor, Mid, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Mid, box.p1.z,     box.p1.z,     E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Mid, box.p2.z,     box.p2.z,     E_BLOCK_AIR, 0);
+	Mid += 2;
+	if (Mid < Ceil)
+	{
+		a_ChunkDesc.FillRelCuboid(box.p1.x,     box.p1.x,     Mid, Ceil, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
+		a_ChunkDesc.FillRelCuboid(box.p2.x,     box.p2.x,     Mid, Ceil, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
+		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p1.z,     box.p1.z,     E_BLOCK_AIR, 0);
+		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p2.z,     box.p2.z,     E_BLOCK_AIR, 0);
+	}
+	
+	// The floor, if needed:
+	box.p2.y = box.p1.y;
+	a_ChunkDesc.ReplaceRelCuboid(box, E_BLOCK_AIR, 0, E_BLOCK_PLANKS, 0);
 }
 
 
