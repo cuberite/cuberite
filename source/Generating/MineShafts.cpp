@@ -454,8 +454,8 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 	cNoise & a_Noise
 )
 {
-	cCuboid BoundingBox(a_PivotX, a_PivotY, a_PivotZ);
-	BoundingBox.p2.y += 4;
+	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
+	BoundingBox.p2.y += 3;
 	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
 	int NumSegments = 2 + (rnd) % 4;  // 2 .. 5
 	switch (a_Direction)
@@ -478,7 +478,71 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 
 void cMineShaftCorridor::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 {
-	// TODO
+	int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 7;
+	// Prefer the same height, but allow for up to one block height displacement:
+	int Height = m_BoundingBox.p1.y + ((rnd % 4) + ((rnd >> 3) % 3)) / 2;
+	switch (m_Direction)
+	{
+		case dirXM:
+		{
+			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, Height, m_BoundingBox.p1.z + 1, dirXM, a_Noise, a_RecursionLevel);
+			for (int i = m_NumSegments; i >= 0; i--)
+			{
+				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
+				int Height = m_BoundingBox.p1.y + ((rnd % 4) + ((rnd >> 3) % 3)) / 2;
+				rnd >>= 6;
+				int Ofs = 1 + rnd % (m_NumSegments * 5 - 2);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Ofs, Height, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Ofs, Height, m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
+			}
+			break;
+		}
+
+		case dirXP:
+		{
+			m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, Height, m_BoundingBox.p1.z + 1, dirXP, a_Noise, a_RecursionLevel);
+			for (int i = m_NumSegments; i >= 0; i--)
+			{
+				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
+				int Height = m_BoundingBox.p1.y + ((rnd % 4) + ((rnd >> 3) % 3)) / 2;
+				rnd >>= 6;
+				int Ofs = 1 + rnd % (m_NumSegments * 5 - 2);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Ofs, Height, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + Ofs, Height, m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
+			}
+			break;
+		}
+		
+		case dirZM:
+		{
+			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel);
+			for (int i = m_NumSegments; i >= 0; i--)
+			{
+				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
+				int Height = m_BoundingBox.p1.y + ((rnd % 4) + ((rnd >> 3) % 3)) / 2;
+				rnd >>= 6;
+				int Ofs = 1 + rnd % (m_NumSegments * 5 - 2);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, Height, m_BoundingBox.p1.z + Ofs, dirXM, a_Noise, a_RecursionLevel);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, Height, m_BoundingBox.p1.z + Ofs, dirXP, a_Noise, a_RecursionLevel);
+			}
+			break;
+		}
+
+		case dirZP:
+		{
+			m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel);
+			for (int i = m_NumSegments; i >= 0; i--)
+			{
+				int rnd = a_Noise.IntNoise3DInt(m_BoundingBox.p1.x + i + 10, m_BoundingBox.p1.y + a_RecursionLevel, m_BoundingBox.p1.z) / 11;
+				int Height = m_BoundingBox.p1.y + ((rnd % 4) + ((rnd >> 3) % 3)) / 2;
+				rnd >>= 6;
+				int Ofs = 1 + rnd % (m_NumSegments * 5 - 2);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, Height, m_BoundingBox.p1.z + Ofs, dirXM, a_Noise, a_RecursionLevel);
+				m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, Height, m_BoundingBox.p1.z + Ofs, dirXP, a_Noise, a_RecursionLevel);
+			}
+			break;
+		}
+	}  // switch (m_Direction)
 }
 
 
