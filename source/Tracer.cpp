@@ -99,17 +99,33 @@ void cTracer::SetValues( const Vector3f & a_Start, const Vector3f & a_Direction 
 	}
 }
 
+
+
+
+
 int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance)
 {
-	SetValues( a_Start, a_Direction );
+	if (a_Start.y < 0)
+	{
+		LOGD("%s: Start is below the world", __FUNCTION__);
+		return 0;
+	}
+	
+	SetValues(a_Start, a_Direction);
 
-	const Vector3f End = a_Start + (dir * (float)a_Distance);
+	Vector3f End = a_Start + (dir * (float)a_Distance);
+	
+	if (End.y < 0)
+	{
+		float dist = -a_Start.y / dir.y;
+		End = a_Start + (dir * dist);
+	}
 
 	// end voxel coordinates
 	end1.x = (int)floorf(End.x);
 	end1.y = (int)floorf(End.y);
 	end1.z = (int)floorf(End.z);
-
+	
 	// check if first is occupied
 	if( pos.Equals( end1 ) )
 	{
@@ -180,9 +196,9 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			return false;
 		}
 		
-		char BlockID = m_World->GetBlock( pos.x, pos.y, pos.z );
-		//No collision with water ;)
-		if ( BlockID != E_BLOCK_AIR || IsBlockWater(BlockID))
+		BLOCKTYPE BlockID = m_World->GetBlock( pos.x, pos.y, pos.z );
+		// No collision with water ;)
+		if ((BlockID != E_BLOCK_AIR) || IsBlockWater(BlockID))  // _X 2013_03_29: Why is the IsBlockWater condition here? water equals air?
 		{
 			BlockHitPosition = pos;
 			int Normal = GetHitNormal(a_Start, End, pos );
@@ -195,6 +211,10 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	}
 	return 0;
 }
+
+
+
+
 
 // return 1 = hit, other is not hit
 int LinesCross(float x0,float y0,float x1,float y1,float x2,float y2,float x3,float y3)
