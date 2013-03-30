@@ -383,14 +383,19 @@ HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 
 
 
-void cChunkDesc::FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cChunkDesc::FillRelCuboid(
+	int a_MinX, int a_MaxX,
+	int a_MinY, int a_MaxY,
+	int a_MinZ, int a_MaxZ,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+)
 {
-	int MinX = std::max(a_RelCuboid.p1.x, 0);
-	int MinY = std::max(a_RelCuboid.p1.y, 0);
-	int MinZ = std::max(a_RelCuboid.p1.z, 0);
-	int MaxX = std::min(a_RelCuboid.p2.x, cChunkDef::Width - 1);
-	int MaxY = std::min(a_RelCuboid.p2.y, cChunkDef::Height - 1);
-	int MaxZ = std::min(a_RelCuboid.p2.z, cChunkDef::Width - 1);
+	int MinX = std::max(a_MinX, 0);
+	int MinY = std::max(a_MinY, 0);
+	int MinZ = std::max(a_MinZ, 0);
+	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
+	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
+	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
 	
 	for (int y = MinY; y <= MaxY; y++)
 	{
@@ -408,14 +413,20 @@ void cChunkDesc::FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockTyp
 
 
 
-void cChunkDesc::ReplaceRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta, BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta)
+void cChunkDesc::ReplaceRelCuboid(
+	int a_MinX, int a_MaxX,
+	int a_MinY, int a_MaxY,
+	int a_MinZ, int a_MaxZ,
+	BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
+	BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+)
 {
-	int MinX = std::max(a_RelCuboid.p1.x, 0);
-	int MinY = std::max(a_RelCuboid.p1.y, 0);
-	int MinZ = std::max(a_RelCuboid.p1.z, 0);
-	int MaxX = std::min(a_RelCuboid.p2.x, cChunkDef::Width - 1);
-	int MaxY = std::min(a_RelCuboid.p2.y, cChunkDef::Height - 1);
-	int MaxZ = std::min(a_RelCuboid.p2.z, cChunkDef::Width - 1);
+	int MinX = std::max(a_MinX, 0);
+	int MinY = std::max(a_MinY, 0);
+	int MinZ = std::max(a_MinZ, 0);
+	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
+	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
+	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
 	
 	for (int y = MinY; y <= MaxY; y++)
 	{

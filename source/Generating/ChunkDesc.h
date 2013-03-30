@@ -9,8 +9,9 @@
 
 #pragma once
 
-#include "../ChunkDef.h"
 #include "../BlockArea.h"
+#include "../ChunkDef.h"
+#include "../Cuboid.h"
 
 
 
@@ -18,9 +19,6 @@
 
 // fwd: ../BlockArea.h
 class cBlockArea;
-
-// fwd: ../Cuboid.h
-class cCuboid;
 
 
 
@@ -80,11 +78,49 @@ public:
 	HEIGHTTYPE GetMaxHeight(void) const;
 	
 	/// Fills the relative cuboid with specified block; allows cuboid out of range of this chunk
-	void FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void FillRelCuboid(
+		int a_MinX, int a_MaxX,
+		int a_MinY, int a_MaxY,
+		int a_MinZ, int a_MaxZ,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	);
+	
+	/// Fills the relative cuboid with specified block; allows cuboid out of range of this chunk
+	void FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		FillRelCuboid(
+			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
+			a_BlockType, a_BlockMeta
+		);
+	}
 	
 	/// Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk
-	void ReplaceRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta, BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta);
+	void ReplaceRelCuboid(
+		int a_MinX, int a_MaxX,
+		int a_MinY, int a_MaxY,
+		int a_MinZ, int a_MaxZ,
+		BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
+		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+	);
 	
+	/// Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk
+	void ReplaceRelCuboid(
+		const cCuboid & a_RelCuboid,
+		BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
+		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+	)
+	{
+		ReplaceRelCuboid(
+			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
+			a_SrcType, a_SrcMeta,
+			a_DstType, a_DstMeta
+		);
+	}
+
 	// tolua_end
 	
 	

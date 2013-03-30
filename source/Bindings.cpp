@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/29/13 21:47:35.
+** Generated automatically by tolua++-1.0.92 on 03/30/13 20:10:21.
 */
 
 #ifndef __cplusplus
@@ -21630,6 +21630,52 @@ static int tolua_AllToLua_cChunkDesc_FillRelCuboid00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+  int a_MinX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_MaxX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_MinY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_MaxY = ((int)  tolua_tonumber(tolua_S,5,0));
+  int a_MinZ = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_MaxZ = ((int)  tolua_tonumber(tolua_S,7,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,8,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,9,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FillRelCuboid'", NULL);
+#endif
+  {
+   self->FillRelCuboid(a_MinX,a_MaxX,a_MinY,a_MaxY,a_MinZ,a_MaxZ,a_BlockType,a_BlockMeta);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'FillRelCuboid'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: FillRelCuboid of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_FillRelCuboid01
+static int tolua_AllToLua_cChunkDesc_FillRelCuboid01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
@@ -21637,7 +21683,6 @@ static int tolua_AllToLua_cChunkDesc_FillRelCuboid00(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
-#endif
  {
   cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
   const cCuboid* a_RelCuboid = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
@@ -21651,11 +21696,8 @@ static int tolua_AllToLua_cChunkDesc_FillRelCuboid00(lua_State* tolua_S)
   }
  }
  return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'FillRelCuboid'.",&tolua_err);
- return 0;
-#endif
+tolua_lerror:
+ return tolua_AllToLua_cChunkDesc_FillRelCuboid00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -21664,6 +21706,56 @@ static int tolua_AllToLua_cChunkDesc_FillRelCuboid00(lua_State* tolua_S)
 static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,10,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,11,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,12,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
+  int a_MinX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_MaxX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_MinY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_MaxY = ((int)  tolua_tonumber(tolua_S,5,0));
+  int a_MinZ = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_MaxZ = ((int)  tolua_tonumber(tolua_S,7,0));
+  unsigned char a_SrcType = (( unsigned char)  tolua_tonumber(tolua_S,8,0));
+  unsigned char a_SrcMeta = (( unsigned char)  tolua_tonumber(tolua_S,9,0));
+  unsigned char a_DstType = (( unsigned char)  tolua_tonumber(tolua_S,10,0));
+  unsigned char a_DstMeta = (( unsigned char)  tolua_tonumber(tolua_S,11,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ReplaceRelCuboid'", NULL);
+#endif
+  {
+   self->ReplaceRelCuboid(a_MinX,a_MaxX,a_MinY,a_MaxY,a_MinZ,a_MaxZ,a_SrcType,a_SrcMeta,a_DstType,a_DstMeta);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ReplaceRelCuboid'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ReplaceRelCuboid of class  cChunkDesc */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cChunkDesc_ReplaceRelCuboid01
+static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid01(lua_State* tolua_S)
+{
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
@@ -21676,7 +21768,6 @@ static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00(lua_State* tolua_S)
  )
   goto tolua_lerror;
  else
-#endif
  {
   cChunkDesc* self = (cChunkDesc*)  tolua_tousertype(tolua_S,1,0);
   const cCuboid* a_RelCuboid = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
@@ -21692,11 +21783,8 @@ static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00(lua_State* tolua_S)
   }
  }
  return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'ReplaceRelCuboid'.",&tolua_err);
- return 0;
-#endif
+tolua_lerror:
+ return tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -23846,7 +23934,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"ReadBlockArea",tolua_AllToLua_cChunkDesc_ReadBlockArea00);
    tolua_function(tolua_S,"GetMaxHeight",tolua_AllToLua_cChunkDesc_GetMaxHeight00);
    tolua_function(tolua_S,"FillRelCuboid",tolua_AllToLua_cChunkDesc_FillRelCuboid00);
+   tolua_function(tolua_S,"FillRelCuboid",tolua_AllToLua_cChunkDesc_FillRelCuboid01);
    tolua_function(tolua_S,"ReplaceRelCuboid",tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00);
+   tolua_function(tolua_S,"ReplaceRelCuboid",tolua_AllToLua_cChunkDesc_ReplaceRelCuboid01);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cCraftingGrid","cCraftingGrid","",tolua_collect_cCraftingGrid);
