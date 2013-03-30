@@ -117,20 +117,18 @@ public:
 	);
 	
 protected:
+	static const int MAX_SEGMENTS = 5;
+	
 	int        m_NumSegments;
 	eDirection m_Direction;
+	bool       m_HasFullBeam[MAX_SEGMENTS];  // If true, segment at that index has a full beam support (planks in the top center block)
 	
 	cMineShaftCorridor(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
-		const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction
-	) :
-		super(a_ParentSystem, mskCorridor),
-		m_NumSegments(a_NumSegments),
-		m_Direction(a_Direction)
-	{
-		m_BoundingBox = a_BoundingBox;
-	}
-
+		const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction,
+		cNoise & a_Noise
+	);
+	
 	// cMineShaft overrides:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
@@ -448,6 +446,28 @@ void cMineShaftDirtRoom::ProcessChunk(cChunkDesc & a_ChunkDesc)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cMineShaftCorridor:
 
+cMineShaftCorridor::cMineShaftCorridor(
+	cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
+	const cCuboid & a_BoundingBox, int a_NumSegments, eDirection a_Direction,
+	cNoise & a_Noise
+) :
+	super(a_ParentSystem, mskCorridor),
+	m_NumSegments(a_NumSegments),
+	m_Direction(a_Direction)
+{
+	m_BoundingBox = a_BoundingBox;
+	int rnd = a_Noise.IntNoise3DInt(a_BoundingBox.p1.x, a_BoundingBox.p1.y, a_BoundingBox.p1.z) / 7;
+	for (int i = 0; i < a_NumSegments; i++)
+	{
+		m_HasFullBeam[i] = (rnd % 4) < 3;  // 75 % chance of full beam
+		rnd >>= 2;
+	}
+}
+
+
+
+
+
 cMineShaft * cMineShaftCorridor::CreateAndFit(
 	cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
 	int a_PivotX, int a_PivotY, int a_PivotZ, eDirection a_Direction,
@@ -457,7 +477,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 	cCuboid BoundingBox(a_PivotX, a_PivotY - 1, a_PivotZ);
 	BoundingBox.p2.y += 3;
 	int rnd = a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_ParentSystem.m_MineShafts.size(), a_PivotZ) / 7;
-	int NumSegments = 2 + (rnd) % 4;  // 2 .. 5
+	int NumSegments = 2 + (rnd) % (MAX_SEGMENTS - 1);  // 2 .. MAX_SEGMENTS
 	switch (a_Direction)
 	{
 		case dirXP: BoundingBox.p2.x += NumSegments * 5; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
@@ -469,7 +489,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 	{
 		return NULL;
 	}
-	return new cMineShaftCorridor(a_ParentSystem, BoundingBox, NumSegments, a_Direction);
+	return new cMineShaftCorridor(a_ParentSystem, BoundingBox, NumSegments, a_Direction, a_Noise);
 }
 
 
@@ -560,6 +580,78 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	RelBoundingBox.p1.y -= 1;
 	RelBoundingBox.p2.y = RelBoundingBox.p1.y;
 	a_ChunkDesc.ReplaceRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0, E_BLOCK_PLANKS, 0);
+	switch (m_Direction)
+	{
+		case dirXM:
+		case dirXP:
+		{
+			int y1 = m_BoundingBox.p1.y + 1;
+			int y2 = m_BoundingBox.p1.y + 2;
+			int y3 = m_BoundingBox.p1.y + 3;
+			int z1 = m_BoundingBox.p1.z - BlockZ;
+			int z2 = m_BoundingBox.p2.z - BlockZ;
+			for (int i = 0; i < m_NumSegments; i++)
+			{
+				int x = m_BoundingBox.p1.x + i * 5 + 3 - BlockX;
+				if ((x < 0) || (x >= cChunkDef::Width))
+				{
+					continue;
+				}
+				if ((z1 >= 0) && (z1 < cChunkDef::Width))
+				{
+					a_ChunkDesc.SetBlockTypeMeta(x, y1, z1, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x, y2, z1, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1, E_BLOCK_PLANKS, 0);
+				}
+				if ((z2 >= 0) && (z2 < cChunkDef::Width))
+				{
+					a_ChunkDesc.SetBlockTypeMeta(x, y1, z2, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x, y2, z2, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x, y3, z2, E_BLOCK_PLANKS, 0);
+				}
+				if ((z1 > -1) && (z1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
+				{
+					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1 + 1, E_BLOCK_PLANKS, 0);
+				}
+			}  // for i - NumSegments
+			break;
+		}
+		
+		case dirZM:
+		case dirZP:
+		{
+			int y1 = m_BoundingBox.p1.y + 1;
+			int y2 = m_BoundingBox.p1.y + 2;
+			int y3 = m_BoundingBox.p1.y + 3;
+			int x1 = m_BoundingBox.p1.x - BlockX;
+			int x2 = m_BoundingBox.p2.x - BlockX;
+			for (int i = 0; i < m_NumSegments; i++)
+			{
+				int z = m_BoundingBox.p1.z + i * 5 + 3 - BlockZ;
+				if ((z < 0) || (z >= cChunkDef::Width))
+				{
+					continue;
+				}
+				if ((x1 >= 0) && (x1 < cChunkDef::Width))
+				{
+					a_ChunkDesc.SetBlockTypeMeta(x1, y1, z, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x1, y2, z, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x1, y3, z, E_BLOCK_PLANKS, 0);
+				}
+				if ((x2 >= 0) && (x2 < cChunkDef::Width))
+				{
+					a_ChunkDesc.SetBlockTypeMeta(x2, y1, z, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x2, y2, z, E_BLOCK_FENCE, 0);
+					a_ChunkDesc.SetBlockTypeMeta(x2, y3, z, E_BLOCK_PLANKS, 0);
+				}
+				if ((x1 > -1) && (x1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
+				{
+					a_ChunkDesc.SetBlockTypeMeta(x1 + 1, y3, z, E_BLOCK_PLANKS, 0);
+				}
+			}  // for i - NumSegments
+			break;
+		}  // case dirZ?
+	}  // for i
 }
 
 
