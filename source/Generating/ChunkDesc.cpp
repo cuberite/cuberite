@@ -7,6 +7,7 @@
 #include "ChunkDesc.h"
 #include "../BlockArea.h"
 #include "../Cuboid.h"
+#include "../Noise.h"
 
 
 
@@ -481,6 +482,42 @@ void cChunkDesc::FloorRelCuboid(
 					}
 				}  // switch (GetBlockType)
 			}  // for x
+		}  // for z
+	}  // for y
+}
+
+
+
+
+
+void cChunkDesc::RandomFillRelCuboid(
+	int a_MinX, int a_MaxX,
+	int a_MinY, int a_MaxY,
+	int a_MinZ, int a_MaxZ,
+	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	int a_RandomSeed, int a_ChanceOutOf10k
+)
+{
+	cNoise Noise(a_RandomSeed);
+	int MinX = std::max(a_MinX, 0);
+	int MinY = std::max(a_MinY, 0);
+	int MinZ = std::max(a_MinZ, 0);
+	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
+	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
+	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
+	
+	for (int y = MinY; y <= MaxY; y++)
+	{
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int x = MinX; x <= MaxX; x++)
+			{
+				int rnd = (Noise.IntNoise3DInt(x, y, z) / 7) % 10000;
+				if (rnd <= a_ChanceOutOf10k)
+				{
+					SetBlockTypeMeta(x, y, z, a_BlockType, a_BlockMeta);
+				}
+			}
 		}  // for z
 	}  // for y
 }

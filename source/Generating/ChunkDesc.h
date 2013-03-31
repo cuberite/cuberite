@@ -142,7 +142,31 @@ public:
 			a_DstType, a_DstMeta
 		);
 	}
-
+	
+	/// Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk
+	void RandomFillRelCuboid(
+		int a_MinX, int a_MaxX,
+		int a_MinY, int a_MaxY,
+		int a_MinZ, int a_MaxZ,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+		int a_RandomSeed, int a_ChanceOutOf10k
+	);
+	
+	/// Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk
+	void RandomFillRelCuboid(
+		const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+		int a_RandomSeed, int a_ChanceOutOf10k
+	)
+	{
+		RandomFillRelCuboid(
+			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
+			a_BlockType, a_BlockMeta,
+			a_RandomSeed, a_ChanceOutOf10k
+		);
+	}
+	
 	// tolua_end
 	
 	
