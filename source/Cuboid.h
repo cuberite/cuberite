@@ -59,6 +59,9 @@ public:
 		);
 	}
 	
+	/// Returns true if this cuboid is completely inside the specifie cuboid (in all 6 coords)
+	bool IsCompletelyInside(const cCuboid & a_Outer) const;
+	
 	/// Moves the cuboid by the specified offsets in each direction
 	void Move(int a_OfsX, int a_OfsY, int a_OfsZ);
 

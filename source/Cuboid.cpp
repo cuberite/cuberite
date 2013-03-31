@@ -72,6 +72,22 @@ bool cCuboid::DoesIntersect(const cCuboid & a_Other) const
 
 
 
+bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
+{
+	return (
+		(p1.x >= a_Outer.p1.x) &&
+		(p2.x <= a_Outer.p2.x) &&
+		(p1.y >= a_Outer.p1.y) &&
+		(p2.y <= a_Outer.p2.y) &&
+		(p1.z >= a_Outer.p1.z) &&
+		(p2.z <= a_Outer.p2.z)
+	);
+}
+
+
+
+
+
 void cCuboid::Move(int a_OfsX, int a_OfsY, int a_OfsZ)
 {
 	p1.x += a_OfsX;

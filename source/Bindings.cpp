@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/31/13 18:21:23.
+** Generated automatically by tolua++-1.0.92 on 03/31/13 20:21:16.
 */
 
 #ifndef __cplusplus
@@ -17838,6 +17838,40 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsCompletelyInside of class  cCuboid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_IsCompletelyInside00
+static int tolua_AllToLua_cCuboid_IsCompletelyInside00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cCuboid* self = (const cCuboid*)  tolua_tousertype(tolua_S,1,0);
+  const cCuboid* a_Outer = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsCompletelyInside'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsCompletelyInside(*a_Outer);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsCompletelyInside'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Move of class  cCuboid */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cCuboid_Move00
 static int tolua_AllToLua_cCuboid_Move00(lua_State* tolua_S)
@@ -23918,6 +23952,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside00);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside01);
    tolua_function(tolua_S,"IsInside",tolua_AllToLua_cCuboid_IsInside02);
+   tolua_function(tolua_S,"IsCompletelyInside",tolua_AllToLua_cCuboid_IsCompletelyInside00);
    tolua_function(tolua_S,"Move",tolua_AllToLua_cCuboid_Move00);
    tolua_function(tolua_S,"IsSorted",tolua_AllToLua_cCuboid_IsSorted00);
   tolua_endmodule(tolua_S);
