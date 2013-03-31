@@ -219,18 +219,18 @@ protected:
 class cStructGenMineShafts::cMineShaftSystem
 {
 public:
-	int         m_BlockX, m_BlockZ;  ///< The pivot point on which the system is generated
-	int         m_MaxSystemSize;     ///< Maximum size of a system (initialized from cStructGenMineShafts::m_MaxSystemSize)
-	int         m_MaxRecursion;      ///< Maximum recursion level (initialized from cStructGenMineShafts::m_MaxRecursion)
-	int         m_ChanceCorridor;    ///< Chance (out of 1000) of the next branch object being the corridor
-	int         m_ChanceCrossing;    ///< Chance (out of 1000) of the next branch object being the crossing
-	int         m_ChanceStaircase;   ///< Chance (out of 1000) of the next branch object being the staircase
-	cMineShafts m_MineShafts;        ///< List of cMineShaft descendants that comprise this system
+	int         m_BlockX, m_BlockZ;    ///< The pivot point on which the system is generated
+	int         m_MaxSystemSize;       ///< Maximum size of a system (initialized from cStructGenMineShafts::m_MaxSystemSize)
+	int         m_MaxRecursion;        ///< Maximum recursion level (initialized from cStructGenMineShafts::m_MaxRecursion)
+	int         m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
+	int         m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
+	int         m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing
+	cMineShafts m_MineShafts;          ///< List of cMineShaft descendants that comprise this system
 
 	/// Creates and generates the entire system
 	cMineShaftSystem(
 		int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise,
-		int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
+		int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 	);
 
 	~cMineShaftSystem();
@@ -260,15 +260,15 @@ public:
 
 cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise,
-	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
+	int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 ) :
 	m_BlockX(a_BlockX),
 	m_BlockZ(a_BlockZ),
 	m_MaxSystemSize(a_MaxSystemSize),
 	m_MaxRecursion(8),  // TODO: settable
-	m_ChanceCorridor(a_ChanceCorridor),
-	m_ChanceCrossing(a_ChanceCrossing),
-	m_ChanceStaircase(a_ChanceStaircase)
+	m_ProbLevelCorridor(a_ProbLevelCorridor),
+	m_ProbLevelCrossing(a_ProbLevelCrossing),
+	m_ProbLevelStaircase(a_ProbLevelStaircase + 1)
 {
 	m_MineShafts.reserve(100);
 	
@@ -323,16 +323,16 @@ void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
 	}
 	
 	cMineShaft * Next = NULL;
-	int rnd = (a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_RecursionLevel * 16, a_PivotZ) / 13) % 1000;
-	if (rnd < m_ChanceCorridor)
+	int rnd = (a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_RecursionLevel * 16, a_PivotZ) / 13) % m_ProbLevelStaircase;
+	if (rnd < m_ProbLevelCorridor)
 	{
 		Next = cMineShaftCorridor::CreateAndFit(*this, a_PivotX, a_PivotY, a_PivotZ, a_Direction, a_Noise);
 	}
-	else if (rnd < m_ChanceCrossing)
+	else if (rnd < m_ProbLevelCrossing)
 	{
 		Next = cMineShaftCrossing::CreateAndFit(*this, a_PivotX, a_PivotY, a_PivotZ, a_Direction, a_Noise);
 	}
-	else if (rnd < m_ChanceStaircase)
+	else
 	{
 		Next = cMineShaftStaircase::CreateAndFit(*this, a_PivotX, a_PivotY, a_PivotZ, a_Direction, a_Noise);
 	}
@@ -1003,9 +1003,9 @@ cStructGenMineShafts::cStructGenMineShafts(
 	m_Noise(a_Seed),
 	m_GridSize(a_GridSize),
 	m_MaxSystemSize(a_MaxSystemSize),
-	m_ChanceCorridor(a_ChanceCorridor),
-	m_ChanceCrossing(a_ChanceCorridor + a_ChanceCrossing),
-	m_ChanceStaircase(a_ChanceCorridor + a_ChanceCrossing + a_ChanceStaircase)
+	m_ProbLevelCorridor(std::max(0, a_ChanceCorridor)),
+	m_ProbLevelCrossing(std::max(0, a_ChanceCorridor + a_ChanceCrossing)),
+	m_ProbLevelStaircase(std::max(0, a_ChanceCorridor + a_ChanceCrossing + a_ChanceStaircase))
 {
 }
 
@@ -1093,7 +1093,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 			}  // for itr - a_Mineshafts
 			if (!Found)
 			{
-				a_MineShafts.push_back(new cMineShaftSystem(RealX, RealZ, m_MaxSystemSize, m_Noise, m_ChanceCorridor, m_ChanceCrossing, m_ChanceStaircase));
+				a_MineShafts.push_back(new cMineShaftSystem(RealX, RealZ, m_MaxSystemSize, m_Noise, m_ProbLevelCorridor, m_ProbLevelCrossing, m_ProbLevelStaircase));
 			}
 		}  // for z
 	}  // for x

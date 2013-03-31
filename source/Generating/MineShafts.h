@@ -37,12 +37,12 @@ protected:
 	typedef std::list<cMineShaftSystem *> cMineShaftSystems;
 	
 	cNoise            m_Noise;
-	int               m_GridSize;          ///< Average spacing of the systems
-	int               m_MaxSystemSize;     ///< Maximum blcok size of a mineshaft system
-	int               m_ChanceCorridor;    ///< Chance (out of 1000) of a branch object being the corridor
-	int               m_ChanceCrossing;    ///< Chance (out of 1000) of a branch object being the crossing
-	int               m_ChanceStaircase;   ///< Chance (out of 1000) of a branch object being the staircase
-	cMineShaftSystems m_Cache;             ///< Cache of the most recently used systems. MoveToFront used.
+	int               m_GridSize;            ///< Average spacing of the systems
+	int               m_MaxSystemSize;       ///< Maximum blcok size of a mineshaft system
+	int               m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
+	int               m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
+	int               m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing
+	cMineShaftSystems m_Cache;               ///< Cache of the most recently used systems. MoveToFront used.
 	
 	/// Clears everything from the cache
 	void ClearCache(void);
