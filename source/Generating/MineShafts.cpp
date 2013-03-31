@@ -884,7 +884,14 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 
 void cMineShaftStaircase::AppendBranches(int a_RecursionLevel, cNoise & a_Noise)
 {
-	// TODO
+	int Height = m_BoundingBox.p1.y + ((m_Slope == sDown) ? 1 : 5);
+	switch (m_Direction)
+	{
+		case dirXM: m_ParentSystem.AppendBranch(m_BoundingBox.p1.x - 1, Height, m_BoundingBox.p1.z + 1, dirXM, a_Noise, a_RecursionLevel); break;
+		case dirXP: m_ParentSystem.AppendBranch(m_BoundingBox.p2.x + 1, Height, m_BoundingBox.p1.z + 1, dirXP, a_Noise, a_RecursionLevel); break;
+		case dirZM: m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p1.z - 1, dirZM, a_Noise, a_RecursionLevel); break;
+		case dirZP: m_ParentSystem.AppendBranch(m_BoundingBox.p1.x + 1, Height, m_BoundingBox.p2.z + 1, dirZP, a_Noise, a_RecursionLevel); break;
+	}
 }
 
 
