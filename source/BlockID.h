@@ -473,8 +473,6 @@ enum
 
 
 
-
-
 enum
 {
 	// E_ITEM_COAL metas:
@@ -484,7 +482,11 @@ enum
 	// E_ITEM_GOLDEN_APPLE metas:
 	E_META_GOLDEN_APPLE_NORMAL = 0,
 	E_META_GOLDEN_APPLE_ENCHANTED = 1,
-	
+
+	// E_ITEM_MINECART_TRACKS metas:
+	E_META_TRACKS_X = 1,
+	E_META_TRACKS_Z = 0,
+		
 	// E_ITEM_DYE metas:
 	E_META_DYE_BLACK      = 0,
 	E_META_DYE_RED        = 1,

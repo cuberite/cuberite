@@ -131,6 +131,7 @@ protected:
 	bool       m_HasFullBeam[MAX_SEGMENTS];  ///< If true, segment at that index has a full beam support (planks in the top center block)
 	int        m_ChestPosition;              ///< If <0, no chest; otherwise an offset from m_BoundingBox's p1.x or p1.z, depenging on m_Direction
 	int        m_SpawnerPosition;            ///< If <0, no spawner; otherwise an offset from m_BoundingBox's p1.x or p1.z, depenging on m_Direction
+	bool       m_HasTracks;                  ///< If true, random tracks will be placed on the floor
 	
 	cMineShaftCorridor(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
@@ -144,6 +145,9 @@ protected:
 
 	/// Places a chest, if the corridor has one
 	void PlaceChest(cChunkDesc & a_ChunkDesc);
+	
+	/// If this corridor has tracks, places them randomly
+	void PlaceTracks(cChunkDesc & a_ChunkDesc);
 } ;
 
 
@@ -505,6 +509,7 @@ cMineShaftCorridor::cMineShaftCorridor(
 		m_HasFullBeam[i] = (rnd % 4) < 3;  // 75 % chance of full beam
 		rnd >>= 2;
 	}
+	m_HasTracks = ((rnd % 4) < 2);  // 50 % chance of tracks
 	
 	rnd = a_Noise.IntNoise3DInt(a_BoundingBox.p1.z, a_BoundingBox.p1.x, a_BoundingBox.p1.y) / 7;
 	int ChestCheck = rnd % 250;
@@ -630,13 +635,17 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 {
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	BLOCKTYPE FillBlock = (m_SpawnerPosition >= 0) ? E_BLOCK_COBWEB : E_BLOCK_AIR;
 	cCuboid RelBoundingBox(m_BoundingBox);
 	RelBoundingBox.Move(-BlockX, 0, -BlockZ);
 	RelBoundingBox.p1.y += 1;
-	BLOCKTYPE FillBlock = (m_SpawnerPosition >= 0) ? E_BLOCK_COBWEB : E_BLOCK_AIR;
+	RelBoundingBox.p2.y -= 1;
 	a_ChunkDesc.FillRelCuboid(RelBoundingBox, FillBlock, 0);
-	RelBoundingBox.p1.y -= 1;
-	RelBoundingBox.p2.y = RelBoundingBox.p1.y;
+	RelBoundingBox.p2.y += 1;
+	RelBoundingBox.p1.y = RelBoundingBox.p2.y;
+	a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, FillBlock, 0, BlockX ^ BlockZ + BlockX, 8000);
+	RelBoundingBox.p1.y = m_BoundingBox.p1.y;
+	RelBoundingBox.p2.y = m_BoundingBox.p1.y;
 	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, E_BLOCK_PLANKS, 0);
 	switch (m_Direction)
 	{
@@ -711,8 +720,9 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 		}  // case dirZ?
 	}  // for i
 	
-	// Place the chest, if present:
 	PlaceChest(a_ChunkDesc);
+	PlaceTracks(a_ChunkDesc);
+	// TODO: Place spawner (must be after Tracks!
 }
 
 
@@ -762,6 +772,43 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 			break;
 		}
 	}  // switch (Dir)
+}
+
+
+
+
+
+void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
+{
+	if (!m_HasTracks)
+	{
+		return;
+	}
+	cCuboid Box(m_BoundingBox);
+	Box.Move(-a_ChunkDesc.GetChunkX() * cChunkDef::Width, 1, -a_ChunkDesc.GetChunkZ() * cChunkDef::Width);
+	Box.p2.y = Box.p1.y;
+	Box.p1.x += 1;
+	Box.p2.x -= 1;
+	Box.p1.z += 1;
+	Box.p2.z -= 1;
+	NIBBLETYPE Meta = 0;
+	switch (m_Direction)
+	{
+		case dirXM:
+		case dirXP:
+		{
+			Meta = E_META_TRACKS_X;
+			break;
+		}
+		
+		case dirZM:
+		case dirZP:
+		{
+			Meta = E_META_TRACKS_Z;
+			break;
+		}
+	}  // switch (direction)
+	a_ChunkDesc.RandomFillRelCuboid(Box, E_BLOCK_MINECART_TRACKS, Meta, a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
 }
 
 

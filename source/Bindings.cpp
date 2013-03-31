@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 03/31/13 20:59:24.
+** Generated automatically by tolua++-1.0.92 on 03/31/13 21:21:48.
 */
 
 #ifndef __cplusplus
@@ -23264,6 +23264,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_COAL_CHARCOAL",E_META_COAL_CHARCOAL);
   tolua_constant(tolua_S,"E_META_GOLDEN_APPLE_NORMAL",E_META_GOLDEN_APPLE_NORMAL);
   tolua_constant(tolua_S,"E_META_GOLDEN_APPLE_ENCHANTED",E_META_GOLDEN_APPLE_ENCHANTED);
+  tolua_constant(tolua_S,"E_META_TRACKS_X",E_META_TRACKS_X);
+  tolua_constant(tolua_S,"E_META_TRACKS_Z",E_META_TRACKS_Z);
   tolua_constant(tolua_S,"E_META_DYE_BLACK",E_META_DYE_BLACK);
   tolua_constant(tolua_S,"E_META_DYE_RED",E_META_DYE_RED);
   tolua_constant(tolua_S,"E_META_DYE_GREEN",E_META_DYE_GREEN);
