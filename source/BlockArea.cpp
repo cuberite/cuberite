@@ -1636,6 +1636,13 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 
 int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 {
+	ASSERT(a_RelX >= 0);
+	ASSERT(a_RelX < m_SizeX);
+	ASSERT(a_RelY >= 0);
+	ASSERT(a_RelY < m_SizeY);
+	ASSERT(a_RelZ >= 0);
+	ASSERT(a_RelZ < m_SizeZ);
+	
 	return a_RelX + a_RelZ * m_SizeX + a_RelY * m_SizeX * m_SizeZ;
 }
 
