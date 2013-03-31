@@ -225,7 +225,6 @@ class cStructGenMineShafts::cMineShaftSystem
 {
 public:
 	int         m_BlockX, m_BlockZ;    ///< The pivot point on which the system is generated
-	int         m_MaxSystemSize;       ///< Maximum size of a system (initialized from cStructGenMineShafts::m_MaxSystemSize)
 	int         m_MaxRecursion;        ///< Maximum recursion level (initialized from cStructGenMineShafts::m_MaxRecursion)
 	int         m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
 	int         m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
@@ -233,6 +232,7 @@ public:
 	int         m_ChanceChest;         ///< Chance [0 .. 250] that a corridor has a chest in it
 	int         m_ChanceSpawner;       ///< Chance [0 .. 250] that a corridor has a spawner in it
 	cMineShafts m_MineShafts;          ///< List of cMineShaft descendants that comprise this system
+	cCuboid     m_BoundingBox;         ///< Bounding box into which all of the components need to fit
 
 	/// Creates and generates the entire system
 	cMineShaftSystem(
@@ -254,8 +254,8 @@ public:
 		int a_RecursionLevel
 	);
 	
-	/// Returns true if any of the objects in m_MineShafts intersects with the specified bounding box
-	bool DoIntersect(const cCuboid & a_BoundingBox);
+	/// Returns true if none of the objects in m_MineShafts intersect with the specified bounding box and the bounding box is valid
+	bool CanAppend(const cCuboid & a_BoundingBox);
 } ;
 
 
@@ -271,7 +271,6 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 ) :
 	m_BlockX(a_BlockX),
 	m_BlockZ(a_BlockZ),
-	m_MaxSystemSize(a_MaxSystemSize),
 	m_MaxRecursion(8),  // TODO: settable
 	m_ProbLevelCorridor(a_ProbLevelCorridor),
 	m_ProbLevelCrossing(a_ProbLevelCrossing),
@@ -279,6 +278,11 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	m_ChanceChest(12),  // TODO: settable
 	m_ChanceSpawner(12)  // TODO: settable
 {
+	m_BoundingBox.Assign(
+		a_BlockX - a_MaxSystemSize / 2, 2,  a_BlockZ - a_MaxSystemSize / 2,
+		a_BlockX + a_MaxSystemSize / 2, 50, a_BlockZ + a_MaxSystemSize / 2
+	);
+	
 	m_MineShafts.reserve(100);
 	
 	cMineShaft * Start = new cMineShaftDirtRoom(*this, a_Noise);
@@ -357,16 +361,23 @@ void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
 
 
 
-bool cStructGenMineShafts::cMineShaftSystem::DoIntersect(const cCuboid & a_BoundingBox)
+bool cStructGenMineShafts::cMineShaftSystem::CanAppend(const cCuboid & a_BoundingBox)
 {
+	if (!a_BoundingBox.IsCompletelyInside(m_BoundingBox))
+	{
+		// Too far away, or too low / too high
+		return false;
+	}
+		
+	// Check intersections:
 	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
 	{
 		if ((*itr)->DoesIntersect(a_BoundingBox))
 		{
-			return true;
+			return false;
 		}
 	}  // for itr - m_MineShafts[]
-	return false;
+	return true;
 }
 
 
@@ -531,7 +542,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 		case dirZP: BoundingBox.p2.z += NumSegments * 5; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
 		case dirZM: BoundingBox.p1.z -= NumSegments * 5; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
 	}
-	if (a_ParentSystem.DoIntersect(BoundingBox))
+	if (!a_ParentSystem.CanAppend(BoundingBox))
 	{
 		return NULL;
 	}
@@ -798,7 +809,7 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 		case dirZP: BoundingBox.p2.z += 4; BoundingBox.p1.x -= 2; BoundingBox.p2.x += 2; break;
 		case dirZM: BoundingBox.p1.z -= 4; BoundingBox.p1.x -= 2; BoundingBox.p2.x += 2; break;
 	}
-	if (a_ParentSystem.DoIntersect(BoundingBox))
+	if (!a_ParentSystem.CanAppend(BoundingBox))
 	{
 		return NULL;
 	}
@@ -949,7 +960,7 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 		Slope = sDown;
 		Box.Move(0, -4, 0);
 	}
-	if (a_ParentSystem.DoIntersect(Box))
+	if (!a_ParentSystem.CanAppend(Box))
 	{
 		return NULL;
 	}
