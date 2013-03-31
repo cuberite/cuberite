@@ -128,7 +128,9 @@ protected:
 	
 	int        m_NumSegments;
 	eDirection m_Direction;
-	bool       m_HasFullBeam[MAX_SEGMENTS];  // If true, segment at that index has a full beam support (planks in the top center block)
+	bool       m_HasFullBeam[MAX_SEGMENTS];  ///< If true, segment at that index has a full beam support (planks in the top center block)
+	int        m_ChestPosition;              ///< If <0, no chest; otherwise an offset from m_BoundingBox's p1.x or p1.z, depenging on m_Direction
+	int        m_SpawnerPosition;            ///< If <0, no spawner; otherwise an offset from m_BoundingBox's p1.x or p1.z, depenging on m_Direction
 	
 	cMineShaftCorridor(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
@@ -139,6 +141,9 @@ protected:
 	// cMineShaft overrides:
 	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
 	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
+
+	/// Places a chest, if the corridor has one
+	void PlaceChest(cChunkDesc & a_ChunkDesc);
 } ;
 
 
@@ -225,6 +230,8 @@ public:
 	int         m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
 	int         m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
 	int         m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing
+	int         m_ChanceChest;         ///< Chance [0 .. 250] that a corridor has a chest in it
+	int         m_ChanceSpawner;       ///< Chance [0 .. 250] that a corridor has a spawner in it
 	cMineShafts m_MineShafts;          ///< List of cMineShaft descendants that comprise this system
 
 	/// Creates and generates the entire system
@@ -268,7 +275,9 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	m_MaxRecursion(8),  // TODO: settable
 	m_ProbLevelCorridor(a_ProbLevelCorridor),
 	m_ProbLevelCrossing(a_ProbLevelCrossing),
-	m_ProbLevelStaircase(a_ProbLevelStaircase + 1)
+	m_ProbLevelStaircase(a_ProbLevelStaircase + 1),
+	m_ChanceChest(12),  // TODO: settable
+	m_ChanceSpawner(12)  // TODO: settable
 {
 	m_MineShafts.reserve(100);
 	
@@ -475,13 +484,29 @@ cMineShaftCorridor::cMineShaftCorridor(
 ) :
 	super(a_ParentSystem, mskCorridor, a_BoundingBox),
 	m_NumSegments(a_NumSegments),
-	m_Direction(a_Direction)
+	m_Direction(a_Direction),
+	m_ChestPosition(-1),
+	m_SpawnerPosition(-1)
 {
 	int rnd = a_Noise.IntNoise3DInt(a_BoundingBox.p1.x, a_BoundingBox.p1.y, a_BoundingBox.p1.z) / 7;
 	for (int i = 0; i < a_NumSegments; i++)
 	{
 		m_HasFullBeam[i] = (rnd % 4) < 3;  // 75 % chance of full beam
 		rnd >>= 2;
+	}
+	
+	rnd = a_Noise.IntNoise3DInt(a_BoundingBox.p1.z, a_BoundingBox.p1.x, a_BoundingBox.p1.y) / 7;
+	int ChestCheck = rnd % 250;
+	rnd >>= 8;
+	int SpawnerCheck = rnd % 250;
+	rnd >>= 8;
+	if (ChestCheck < a_ParentSystem.m_ChanceChest)
+	{
+		m_ChestPosition = rnd % (a_NumSegments * 5);
+	}
+	if ((a_NumSegments < 4) && (SpawnerCheck < a_ParentSystem.m_ChanceSpawner))
+	{
+		m_SpawnerPosition = rnd % (a_NumSegments * 5);
 	}
 }
 
@@ -597,7 +622,8 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	cCuboid RelBoundingBox(m_BoundingBox);
 	RelBoundingBox.Move(-BlockX, 0, -BlockZ);
 	RelBoundingBox.p1.y += 1;
-	a_ChunkDesc.FillRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0);
+	BLOCKTYPE FillBlock = (m_SpawnerPosition >= 0) ? E_BLOCK_COBWEB : E_BLOCK_AIR;
+	a_ChunkDesc.FillRelCuboid(RelBoundingBox, FillBlock, 0);
 	RelBoundingBox.p1.y -= 1;
 	RelBoundingBox.p2.y = RelBoundingBox.p1.y;
 	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, E_BLOCK_PLANKS, 0);
@@ -673,6 +699,58 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			break;
 		}  // case dirZ?
 	}  // for i
+	
+	// Place the chest, if present:
+	PlaceChest(a_ChunkDesc);
+}
+
+
+
+
+
+void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
+{
+	if (m_ChestPosition < 0)
+	{
+		return;
+	}
+	
+	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	switch (m_Direction)
+	{
+		case dirXM:
+		case dirXP:
+		{
+			int x = m_BoundingBox.p1.x + m_ChestPosition - BlockX;
+			int z = m_BoundingBox.p1.z - BlockZ;
+			if (
+				(x >= 0) && (x < cChunkDef::Width) &&
+				(z >= 0) && (z < cChunkDef::Width)
+			)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, 0);
+				// TODO: Fill the chest with loot
+			}
+			break;
+		}
+		
+		case dirZM:
+		case dirZP:
+		{
+			int x = m_BoundingBox.p1.x - BlockX;
+			int z = m_BoundingBox.p1.z + m_ChestPosition - BlockZ;
+			if (
+				(x >= 0) && (x < cChunkDef::Width) &&
+				(z >= 0) && (z < cChunkDef::Width)
+			)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, 0);
+				// TODO: Fill the chest with loot
+			}
+			break;
+		}
+	}  // switch (Dir)
 }
 
 
