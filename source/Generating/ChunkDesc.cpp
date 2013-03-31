@@ -450,6 +450,45 @@ void cChunkDesc::ReplaceRelCuboid(
 
 
 
+void cChunkDesc::FloorRelCuboid(
+	int a_MinX, int a_MaxX,
+	int a_MinY, int a_MaxY,
+	int a_MinZ, int a_MaxZ,
+	BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+)
+{
+	int MinX = std::max(a_MinX, 0);
+	int MinY = std::max(a_MinY, 0);
+	int MinZ = std::max(a_MinZ, 0);
+	int MaxX = std::min(a_MaxX, cChunkDef::Width - 1);
+	int MaxY = std::min(a_MaxY, cChunkDef::Height - 1);
+	int MaxZ = std::min(a_MaxZ, cChunkDef::Width - 1);
+	
+	for (int y = MinY; y <= MaxY; y++)
+	{
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int x = MinX; x <= MaxX; x++)
+			{
+				switch (GetBlockType(x, y, z))
+				{
+					case E_BLOCK_AIR:
+					case E_BLOCK_WATER:
+					case E_BLOCK_STATIONARY_WATER:
+					{
+						SetBlockTypeMeta(x, y, z, a_DstType, a_DstMeta);
+						break;
+					}
+				}  // switch (GetBlockType)
+			}  // for x
+		}  // for z
+	}  // for y
+}
+
+
+
+
+
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();

@@ -121,6 +121,28 @@ public:
 		);
 	}
 
+	/// Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk
+	void FloorRelCuboid(
+		int a_MinX, int a_MaxX,
+		int a_MinY, int a_MaxY,
+		int a_MinZ, int a_MaxZ,
+		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+	);
+	
+	/// Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk
+	void FloorRelCuboid(
+		const cCuboid & a_RelCuboid,
+		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+	)
+	{
+		FloorRelCuboid(
+			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
+			a_DstType, a_DstMeta
+		);
+	}
+
 	// tolua_end
 	
 	

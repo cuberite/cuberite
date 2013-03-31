@@ -24,6 +24,20 @@ static bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCuboid:
 
+void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
+{
+	p1.x = a_X1;
+	p1.y = a_Y1;
+	p1.z = a_Z1;
+	p2.x = a_X2;
+	p2.y = a_Y2;
+	p2.z = a_Z2;
+}
+
+
+
+
+
 void cCuboid::Sort(void)
 {
 	if (p1.x > p2.x)

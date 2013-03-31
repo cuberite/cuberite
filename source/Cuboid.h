@@ -21,6 +21,8 @@ public:
 	cCuboid(int a_X1, int a_Y1, int a_Z1) : p1(a_X1, a_Y1, a_Z1), p2(a_X1, a_Y1, a_Z1) {}
 	cCuboid(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2) : p1(a_X1, a_Y1, a_Z1), p2(a_X2, a_Y2, a_Z2) {}
 
+	void Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2);
+
 	void Sort(void);
 	
 	int DifX(void) const { return p2.x - p1.x; }
