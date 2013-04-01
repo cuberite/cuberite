@@ -367,6 +367,7 @@ public:
 		g_BlockSpreadLightFalloff[E_BLOCK_AIR]              = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_CAKE]             = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_CHEST]            = 1;
+		g_BlockSpreadLightFalloff[E_BLOCK_COBWEB]           = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_CROPS]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_FENCE]            = 1;
 		g_BlockSpreadLightFalloff[E_BLOCK_FENCE_GATE]       = 1;
