@@ -70,6 +70,8 @@ NetherBrick      = netherbrickitem, 1:1, 1:2, 2:1, 2:2
 Glowstone        = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
 Wool             = String,    1:1, 1:2, 2:1, 2:2
 TNT              = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3:2, 2:3
+PillarQuartzBlock = QuartzSlab, 1:1, 1:2
+ChiseledQuartzBlock, 2 = QuartzBlock, 1:1, 1:2
 
 # Slabs:
 StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
@@ -79,6 +81,7 @@ CobblestoneSlab, 6  = Cobblestone,       1:1, 2:1, 3:1
 BrickSlab,       6  = BrickBlock,        1:1, 2:1, 3:1
 StonebrickSlab,  6  = StoneBrick,        1:1, 2:1, 3:1
 NetherbrickSlab, 6  = NetherBrick,       1:1, 2:1, 3:1
+Quartzslab,      6  = QuartzBlock,       1:1, 2:1, 3:1
 snow,			 6  = SnowBlock,         1:1, 2:1, 3:1
 
 # Stairs:
@@ -91,7 +94,7 @@ BrickStairs, 4       = BrickBlock,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 SandstoneStairs, 4   = Sandstone,   1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 SandstoneStairs, 4   = Sandstone,   3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 NetherBrickStairs, 4 = NetherBrick, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
-quartzstairs, 4      = Quartzblock, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
+quartzstairs, 4      = QuartzBlock, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 SnowBlock          = SnowBall,  1:1, 1:2, 2:1, 2:2
 ClayBlock          = Clay,      1:1, 1:2, 2:1, 2:2
 BrickBlock         = Brick,     1:1, 1:2, 2:1, 2:2
