@@ -30,17 +30,13 @@ public:
 	virtual ~cDispenserEntity();
 	virtual void Destroy();
 
-	bool LoadFromFile(cFile & a_File);  // deprecated format
-
-	bool LoadFromJson(const Json::Value& a_Value );
-	virtual void SaveToJson(Json::Value& a_Value ) override;
-
+	bool LoadFromJson(const Json::Value & a_Value);
+	
+	// cBlockEntity overrides:
+	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
-	
-	// Returns true if there's any change, forcing the chunk to go dirty.
-	bool Tick( float a_Dt );
-	
-	virtual void UsedBy( cPlayer * a_Player ) override;
+	virtual bool Tick(float a_Dt) override;
+	virtual void UsedBy(cPlayer * a_Player) override;
 	
 	const cItem * GetSlot(int i) const { return &(m_Items[i]); }
 	

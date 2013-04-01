@@ -32,19 +32,15 @@ public:
 
 	static const char * GetClassStatic() { return "cFurnaceEntity"; }
 
-	bool LoadFromFile(cFile & a_File);  // deprecated format
-
-	bool LoadFromJson(const Json::Value& a_Value );
-	virtual void SaveToJson(Json::Value& a_Value ) override;
-
+	bool LoadFromJson(const Json::Value & a_Value);
+	
+	// cBlockEntity overrides:
+	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
-	
-	// Returns true if there's any change, forcing the chunk to go dirty.
-	bool Tick( float a_Dt );
-	
-	virtual void UsedBy( cPlayer * a_Player ) override;
+	virtual bool Tick(float a_Dt) override;
+	virtual void UsedBy(cPlayer * a_Player) override;
 
-	bool StartCooking();
+	bool StartCooking(void);
 	
 	/// Restarts cooking. Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active. Returns true if cooking.
 	bool ContinueCooking(void);

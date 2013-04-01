@@ -261,37 +261,6 @@ void cDispenserEntity::SetSlot(int a_Slot, const cItem & a_Item)
 
 
 
-#define READ(File, Var) \
-	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
-	{ \
-		LOGERROR("ERROR READING cDispenserEntity %s FROM FILE (line %d)", #Var, __LINE__); \
-		return false; \
-	}
-
-bool cDispenserEntity::LoadFromFile(cFile & f)
-{
-	READ(f, m_PosX);
-	READ(f, m_PosY);
-	READ(f, m_PosZ);
-
-	unsigned int NumSlots = 0;
-	READ(f, NumSlots);
-	m_Items = new cItem[ NumSlots ];
-	for(unsigned int i = 0; i < NumSlots; i++)
-	{
-		cItem & Item = m_Items[i];
-		READ(f, Item.m_ItemType);
-		READ(f, Item.m_ItemCount);
-		READ(f, Item.m_ItemDamage);
-	}
-
-	return true;
-}
-
-
-
-
-
 bool cDispenserEntity::LoadFromJson( const Json::Value& a_Value )
 {
 	m_PosX = a_Value.get("x", 0).asInt();

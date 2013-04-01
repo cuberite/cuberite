@@ -355,7 +355,7 @@ private:
 	void TickBlocks  (MTRand & a_TickRandom);
 	
 	/// Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes
-	void ApplyWeatherToTop(MTRand & a_TickRandom);
+	void ApplyWeatherToTop(void);
 	
 	/// Grows sugarcane by the specified number of blocks, but no more than 3 blocks high (used by both bonemeal and ticking)
 	void GrowSugarcane   (int a_RelX, int a_RelY, int a_RelZ, int a_NumBlocks);

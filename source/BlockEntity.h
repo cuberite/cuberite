@@ -43,18 +43,18 @@ protected:
 	{}
 public:
 	virtual ~cBlockEntity() {};
-	virtual void Destroy() {};
+	virtual void Destroy(void) {};
 	
 	// Position, in absolute block coordinates:
-	int GetPosX() { return m_PosX; }
-	int GetPosY() { return m_PosY; }
-	int GetPosZ() { return m_PosZ; }
+	int GetPosX(void) const { return m_PosX; }
+	int GetPosY(void) const { return m_PosY; }
+	int GetPosZ(void) const { return m_PosZ; }
 
-	ENUM_BLOCK_ID GetBlockType() { return m_BlockType; }
+	ENUM_BLOCK_ID GetBlockType(void) const { return m_BlockType; }
 	
 	cWorld * GetWorld(void) const {return m_World; }
 
-	virtual void SaveToJson  (Json::Value & a_Value ) = 0;
+	virtual void SaveToJson  (Json::Value & a_Value) = 0;
 	
 	virtual void UsedBy( cPlayer * a_Player ) = 0;
 	
@@ -62,6 +62,9 @@ public:
 	To send to all eligible clients, use cWorld::BroadcastBlockEntity()
 	*/
 	virtual void SendTo(cClientHandle & a_Client) = 0;
+	
+	/// Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing.
+	virtual bool Tick(float a_Dt) { return false; }
 
 protected:
 	int m_PosX; // Position in absolute block coordinates

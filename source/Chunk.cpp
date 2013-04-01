@@ -296,14 +296,8 @@ void cChunk::SetAllData(
 		CalculateHeightmap();
 	}
 
-	// Initialize incoming entities:
-	for (cEntityList::iterator itr = a_Entities.begin(), end = a_Entities.end(); itr != end; ++itr)
-	{
-		(*itr)->Initialize(m_World);
-	}  // for itr - a_Entities[]
-	
 	// Append entities to current entity list:
-	m_Entities.splice(m_Entities.end(), a_Entities);
+	m_Entities.insert(m_Entities.end(), a_Entities.begin(), a_Entities.end());
 	
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -456,24 +450,13 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 	
 	TickBlocks(a_TickRandom);
 
-	// Tick block entities (furnaces)
+	// Tick all block entities in this chunk:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
-		if ((*itr)->GetBlockType() == E_BLOCK_FURNACE)
-		{
-			m_IsDirty = ((cFurnaceEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
-		}
+		m_IsDirty = (*itr)->Tick(a_Dt) | m_IsDirty;
 	}
-
-	// Tick block entities (dispensers)
-	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
-	{
-		if ((*itr)->GetBlockType() == E_BLOCK_DISPENSER)
-		{
-			m_IsDirty = ((cDispenserEntity *)(*itr))->Tick( a_Dt ) | m_IsDirty;
-		}
-	}
-	ApplyWeatherToTop(a_TickRandom);
+	
+	ApplyWeatherToTop();
 }
 
 
@@ -570,10 +553,10 @@ void cChunk::TickBlocks(MTRand & a_TickRandom)
 
 
 
-void cChunk::ApplyWeatherToTop(MTRand & a_TickRandom)
+void cChunk::ApplyWeatherToTop()
 {
 	if (
-		(a_TickRandom.randInt(100) != 0) ||
+		(m_World->GetTickRandomNumber(100) != 0) ||
 		(
 			(m_World->GetWeather() != eWeather_Rain) &&
 			(m_World->GetWeather() != eWeather_ThunderStorm)
@@ -584,8 +567,8 @@ void cChunk::ApplyWeatherToTop(MTRand & a_TickRandom)
 		return;
 	}
 	
-	int X = a_TickRandom.randInt(15);
-	int Z = a_TickRandom.randInt(15);
+	int X = m_World->GetTickRandomNumber(15);
+	int Z = m_World->GetTickRandomNumber(15);
 	switch (GetBiomeAt(X, Z))
 	{
 		case biTaiga:

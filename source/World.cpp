@@ -1599,18 +1599,18 @@ void cWorld::SetChunkData(
 		m_Generator.GenerateBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
 	}
 	
+	m_ChunkMap->SetChunkData(
+		a_ChunkX, a_ChunkY, a_ChunkZ, 
+		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
+		a_HeightMap, *Biomes,
+		a_Entities, a_BlockEntities,
+		a_MarkDirty
+	);
+	
+	// Initialize the entities (outside the m_ChunkMap's CS, to fix FS #347):
+	for (cEntityList::iterator itr = a_Entities.begin(), end = a_Entities.end(); itr != end; ++itr)
 	{
-		// _X: 2013_04_01: Hotfix for FS #347 - deadlock between the anvil loader thread and the tick thread
-		// By locking the entities here, we break one of the 3 conditions needed for the deadlock
-		cCSLock Lock(m_CSEntities);
-		
-		m_ChunkMap->SetChunkData(
-			a_ChunkX, a_ChunkY, a_ChunkZ, 
-			a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
-			a_HeightMap, *Biomes,
-			a_Entities, a_BlockEntities,
-			a_MarkDirty
-		);
+		(*itr)->Initialize(this);
 	}
 	
 	// If a client is requesting this chunk, send it to them:
