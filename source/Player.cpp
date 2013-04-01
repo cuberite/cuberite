@@ -267,18 +267,29 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 	if (!m_bTouchGround)
 	{
-		if(GetPosY() > m_LastJumpHeight) m_LastJumpHeight = (float)GetPosY();
-		cWorld* World = GetWorld();
-		char BlockID = World->GetBlock( float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()) );
-		if( BlockID != E_BLOCK_AIR )
+		if (GetPosY() > m_LastJumpHeight)
 		{
-			// LOGD("TouchGround set to true by server");
-			m_bTouchGround = true;
+			m_LastJumpHeight = (float)GetPosY();
 		}
-		if( BlockID == E_BLOCK_WATER || BlockID == E_BLOCK_STATIONARY_WATER || BlockID == E_BLOCK_LADDER || BlockID == E_BLOCK_VINES )
+		cWorld * World = GetWorld();
+		if ((GetPosY() >= 0) && (GetPosY() < 256))
 		{
-			// LOGD("Water / Ladder / Torch");
-			m_LastGroundHeight = (float)GetPosY();
+			BLOCKTYPE BlockType = World->GetBlock( float2int(GetPosX()), float2int(GetPosY()), float2int(GetPosZ()) );
+			if (BlockType != E_BLOCK_AIR)
+			{
+				// LOGD("TouchGround set to true by server");
+				m_bTouchGround = true;
+			}
+			if (
+				(BlockType == E_BLOCK_WATER) ||
+				(BlockType == E_BLOCK_STATIONARY_WATER) ||
+				(BlockType == E_BLOCK_LADDER) ||
+				(BlockType == E_BLOCK_VINES)
+			)
+			{
+				// LOGD("Water / Ladder / Torch");
+				m_LastGroundHeight = (float)GetPosY();
+			}
 		}
 	}
 

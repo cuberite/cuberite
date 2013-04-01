@@ -315,8 +315,14 @@ void cPawn::SetMetaData(MetaData a_MetaData)
 
 
 //----Change Entity MetaData
-void cPawn::CheckMetaDataBurn()
+void cPawn::CheckMetaDataBurn(void)
 {
+	if ((GetPosY() < 1) || (GetPosY() >= 254))
+	{
+		// Y coord out of range
+		return;
+	}
+	
 	BLOCKTYPE Block      = GetWorld()->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ());
 	BLOCKTYPE BlockAbove = GetWorld()->GetBlock((int) GetPosX(), (int) GetPosY() + 1, (int) GetPosZ());
 	BLOCKTYPE BlockBelow = GetWorld()->GetBlock((int) GetPosX(), (int) GetPosY() - 1, (int) GetPosZ());
