@@ -148,6 +148,9 @@ protected:
 	
 	/// If this corridor has tracks, places them randomly
 	void PlaceTracks(cChunkDesc & a_ChunkDesc);
+	
+	/// Randomly places torches around the central beam block
+	void PlaceTorches(cChunkDesc & a_ChunkDesc);
 } ;
 
 
@@ -235,6 +238,7 @@ public:
 	int         m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing
 	int         m_ChanceChest;         ///< Chance [0 .. 250] that a corridor has a chest in it
 	int         m_ChanceSpawner;       ///< Chance [0 .. 250] that a corridor has a spawner in it
+	int         m_ChanceTorch;         ///< Chance [0 .. 10k] for a torch appearing attached to a corridor's beam
 	cMineShafts m_MineShafts;          ///< List of cMineShaft descendants that comprise this system
 	cCuboid     m_BoundingBox;         ///< Bounding box into which all of the components need to fit
 
@@ -280,7 +284,8 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	m_ProbLevelCrossing(a_ProbLevelCrossing),
 	m_ProbLevelStaircase(a_ProbLevelStaircase + 1),
 	m_ChanceChest(12),  // TODO: settable
-	m_ChanceSpawner(12)  // TODO: settable
+	m_ChanceSpawner(12),  // TODO: settable
+	m_ChanceTorch(1000)  // TODO: settable
 {
 	m_BoundingBox.Assign(
 		a_BlockX - a_MaxSystemSize / 2, 2,  a_BlockZ - a_MaxSystemSize / 2,
@@ -542,10 +547,10 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 	int NumSegments = 2 + (rnd) % (MAX_SEGMENTS - 1);  // 2 .. MAX_SEGMENTS
 	switch (a_Direction)
 	{
-		case dirXP: BoundingBox.p2.x += NumSegments * 5; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
-		case dirXM: BoundingBox.p1.x -= NumSegments * 5; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
-		case dirZP: BoundingBox.p2.z += NumSegments * 5; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
-		case dirZM: BoundingBox.p1.z -= NumSegments * 5; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
+		case dirXP: BoundingBox.p2.x += NumSegments * 5 - 1; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
+		case dirXM: BoundingBox.p1.x -= NumSegments * 5 - 1; BoundingBox.p1.z -= 1; BoundingBox.p2.z += 1; break;
+		case dirZP: BoundingBox.p2.z += NumSegments * 5 - 1; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
+		case dirZM: BoundingBox.p1.z -= NumSegments * 5 - 1; BoundingBox.p1.x -= 1; BoundingBox.p2.x += 1; break;
 	}
 	if (!a_ParentSystem.CanAppend(BoundingBox))
 	{
@@ -659,7 +664,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			int z2 = m_BoundingBox.p2.z - BlockZ;
 			for (int i = 0; i < m_NumSegments; i++)
 			{
-				int x = m_BoundingBox.p1.x + i * 5 + 3 - BlockX;
+				int x = m_BoundingBox.p1.x + i * 5 + 2 - BlockX;
 				if ((x < 0) || (x >= cChunkDef::Width))
 				{
 					continue;
@@ -676,7 +681,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 					a_ChunkDesc.SetBlockTypeMeta(x, y2, z2, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x, y3, z2, E_BLOCK_PLANKS, 0);
 				}
-				if ((z1 > -1) && (z1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
+				if ((z1 >= -1) && (z1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1 + 1, E_BLOCK_PLANKS, 0);
 				}
@@ -694,7 +699,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			int x2 = m_BoundingBox.p2.x - BlockX;
 			for (int i = 0; i < m_NumSegments; i++)
 			{
-				int z = m_BoundingBox.p1.z + i * 5 + 3 - BlockZ;
+				int z = m_BoundingBox.p1.z + i * 5 + 2 - BlockZ;
 				if ((z < 0) || (z >= cChunkDef::Width))
 				{
 					continue;
@@ -711,7 +716,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 					a_ChunkDesc.SetBlockTypeMeta(x2, y2, z, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x2, y3, z, E_BLOCK_PLANKS, 0);
 				}
-				if ((x1 > -1) && (x1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
+				if ((x1 >= -1) && (x1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x1 + 1, y3, z, E_BLOCK_PLANKS, 0);
 				}
@@ -723,6 +728,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	PlaceChest(a_ChunkDesc);
 	PlaceTracks(a_ChunkDesc);
 	// TODO: Place spawner (must be after Tracks!
+	PlaceTorches(a_ChunkDesc);
 }
 
 
@@ -809,6 +815,87 @@ void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
 		}
 	}  // switch (direction)
 	a_ChunkDesc.RandomFillRelCuboid(Box, E_BLOCK_MINECART_TRACKS, Meta, a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
+}
+
+
+
+
+
+void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
+{
+	cNoise Noise(m_BoundingBox.p1.x);
+	switch (m_Direction)
+	{
+		case dirXM:
+		case dirXP:
+		{
+			int z = m_BoundingBox.p1.z + 1 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+			if ((z < 0) || (z >= cChunkDef::Width))
+			{
+				return;
+			}
+			int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+			for (int i = 0; i < m_NumSegments; i++)
+			{
+				if (!m_HasFullBeam[i])
+				{
+					continue;
+				}
+				int x = m_BoundingBox.p1.x + i * 5 + 1 - BlockX;
+				if ((x >= 0) && (x < cChunkDef::Width))
+				{
+					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
+					{
+						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_XP);
+					}
+				}
+				x += 2;
+				if ((x >= 0) && (x < cChunkDef::Width))
+				{
+					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
+					{
+						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_XM);
+					}
+				}
+			}  // for i
+			break;
+		}
+		
+		case dirZM:
+		case dirZP:
+		{
+			int x = m_BoundingBox.p1.x + 1 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+			if ((x < 0) || (x >= cChunkDef::Width))
+			{
+				return;
+			}
+			int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+			for (int i = 0; i < m_NumSegments; i++)
+			{
+				if (!m_HasFullBeam[i])
+				{
+					continue;
+				}
+				int z = m_BoundingBox.p1.z + i * 5 + 1 - BlockZ;
+				if ((z >= 0) && (z < cChunkDef::Width))
+				{
+					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
+					{
+						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_ZP);
+					}
+				}
+				z += 2;
+				if ((z >= 0) && (z < cChunkDef::Width))
+				{
+					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
+					{
+						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_ZM);
+					}
+				}
+			}  // for i
+			break;
+		}
+	}  // switch (direction)
 }
 
 

@@ -424,6 +424,10 @@ enum
 	E_META_TORCH_SOUTH = 3,
 	E_META_TORCH_NORTH = 4,
 	E_META_TORCH_FLOOR = 5,
+	E_META_TORCH_XM = 1,  // Torch attached to the XM side of its block
+	E_META_TORCH_XP = 2,  // Torch attached to the XP side of its block
+	E_META_TORCH_ZM = 3,  // Torch attached to the ZM side of its block
+	E_META_TORCH_ZP = 4,  // Torch attached to the ZP side of its block
 
 	// E_BLOCK_DOUBLE_STEP metas:
 	E_META_DOUBLE_STEP_STONE = 0,
