@@ -105,6 +105,7 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
+	double           GetHeadYaw   (void) const {return m_HeadYaw; }
 	const Vector3d & GetPosition  (void) const {return m_Pos; }
 	double           GetPosX      (void) const {return m_Pos.x; }
 	double           GetPosY      (void) const {return m_Pos.y; }
@@ -123,6 +124,7 @@ public:
 	int GetChunkY(void) const {return m_ChunkY; }
 	int GetChunkZ(void) const {return m_ChunkZ; }
 
+	void SetHeadYaw (double a_HeadYaw);
 	void SetPosX    (double a_PosX);
 	void SetPosY    (double a_PosY);
 	void SetPosZ    (double a_PosZ);
@@ -175,6 +177,9 @@ public:
 	/// Detaches from the currently attached entity, if any
 	void Detach(void);
 	
+	//Makes sure head yaw is not over the specified range.
+	void WrapHeadYaw();
+
 	//Makes sure rotation is not over the specified range.
 	void WrapRotation();
 
@@ -213,6 +218,7 @@ protected:
 	int m_ChunkX, m_ChunkY, m_ChunkZ;
 	
 	//Flags that signal that we haven't updated the clients with the latest.
+	bool     m_bDirtyHead;
 	bool     m_bDirtyOrientation;
 	bool     m_bDirtyPosition;
 	bool     m_bDirtySpeed;
@@ -243,6 +249,7 @@ protected:
 	void ReferencedBy( cEntity*& a_EntityPtr );
 	void Dereference( cEntity*& a_EntityPtr );
 private:
+	double   m_HeadYaw;
 	Vector3d m_Speed;
 	Vector3d m_Rot;
 	Vector3d m_Pos;

@@ -918,6 +918,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
 	m_Player->SetRotation   (a_Rotation);
+	m_Player->SetHeadYaw    (a_Rotation);
 	m_Player->SetPitch      (a_Pitch);
 	m_Player->SetTouchGround(a_IsOnGround);
 	m_Player->WrapRotation();
@@ -945,6 +946,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 			m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
 			m_Player->SetStance     (a_Stance);
 			m_Player->SetTouchGround(a_IsOnGround);
+			m_Player->SetHeadYaw    (a_Rotation);
 			m_Player->SetRotation   (a_Rotation);
 			m_Player->SetPitch      (a_Pitch);
 			m_Player->WrapRotation();

@@ -153,6 +153,7 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 		double Rotation, Pitch;
 		Distance.Normalize();
 		VectorToEuler( Distance.x, Distance.y, Distance.z, Rotation, Pitch );
+		SetHeadYaw (Rotation);
 		SetRotation( Rotation );
 		SetPitch( Pitch );
 	}

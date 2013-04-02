@@ -300,7 +300,7 @@ void cProtocol125::SendEntHeadLook(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_HEAD_LOOK);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetHeadYaw() / 360.f) * 256));
 	Flush();
 }
 

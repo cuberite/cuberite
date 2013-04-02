@@ -30,7 +30,9 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_ChunkX(0)
 	, m_ChunkY(0)
 	, m_ChunkZ(0)
+	, m_HeadYaw( 0.0 )
 	, m_Pos(a_X, a_Y, a_Z)
+	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
 	, m_bDirtySpeed(true)
@@ -63,8 +65,8 @@ cEntity::~cEntity()
 		m_Pos.x, m_Pos.y, m_Pos.z,
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
 		this
-	);
-	
+		);
+
 	if (m_AttachedTo != NULL)
 	{
 		Detach();
@@ -73,7 +75,7 @@ cEntity::~cEntity()
 	{
 		m_Attachee->Detach();
 	}
-	
+
 	if (!m_bDestroyed || !m_bRemovedFromChunk)
 	{
 		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk);
@@ -126,6 +128,16 @@ void cEntity::Initialize(cWorld * a_World)
 
 
 
+void cEntity::WrapHeadYaw()
+{
+	while (m_HeadYaw > 180.f)  m_HeadYaw -=360.f; // Wrap it
+	while (m_HeadYaw < -180.f) m_HeadYaw +=360.f;
+}
+
+
+
+
+
 void cEntity::WrapRotation()
 {
 	while (m_Rot.x > 180.f)  m_Rot.x-=360.f; // Wrap it
@@ -164,7 +176,7 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 	{
 		return;
 	}
-	
+
 	class cMover :
 		public cClientDiffCallback
 	{
@@ -176,7 +188,7 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 			}
 			a_Client->SendDestroyEntity(*m_Entity);
 		}
-		
+
 		virtual void Added(cClientHandle * a_Client) override
 		{
 			m_Entity->SpawnOn(*a_Client);
@@ -184,17 +196,17 @@ void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
 
 		bool      m_IgnoreOldChunk;
 		cEntity * m_Entity;
-		
+
 	public:
 		cMover(cEntity * a_Entity, bool a_IgnoreOldChunk) :
 			m_IgnoreOldChunk(a_IgnoreOldChunk),
 			m_Entity(a_Entity)
 		{}
 	} Mover(this, a_bIgnoreOldChunk);
-	
+
 	m_World->CompareChunkClients(m_ChunkX, m_ChunkY, m_ChunkZ, ChunkX, ChunkY, ChunkZ, Mover);
 	m_World->MoveEntityToChunk(this, ChunkX, ChunkY, ChunkZ);
-	
+
 	m_ChunkX = ChunkX;
 	m_ChunkY = ChunkY;
 	m_ChunkZ = ChunkZ;
@@ -214,9 +226,9 @@ void cEntity::Destroy()
 	{
 		RemoveFromChunk();
 	}
-	
+
 	m_World->BroadcastDestroyEntity(*this);
-	
+
 	m_bDestroyed = true;
 
 	Destroyed();
@@ -232,7 +244,7 @@ void cEntity::RemoveFromChunk(void)
 	{
 		return;
 	}
-	
+
 	m_World->RemoveEntityFromChunk(this, m_ChunkX, m_ChunkY, m_ChunkZ);
 	m_bRemovedFromChunk = true;
 }
@@ -244,7 +256,7 @@ void cEntity::RemoveFromChunk(void)
 void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
 {
 	UNUSED(a_TickRandom);
-	
+
 	if (m_AttachedTo != NULL)
 	{
 		if ((m_Pos - m_AttachedTo->GetPosition()).Length() > 0.5)
@@ -264,57 +276,68 @@ void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	if (m_bDirtyOrientation && !m_bDirtyPosition)
+	int DiffX = (int)((GetPosX() - m_LastPosX) * 32.0);
+	int DiffY = (int)((GetPosY() - m_LastPosY) * 32.0);
+	int DiffZ = (int)((GetPosZ() - m_LastPosZ) * 32.0);
+	Int64 DiffTeleportPacket = m_World->GetWorldAge() - m_TimeLastTeleportPacket;
+	
+	//Have to process this every two ticks
+	if (m_World->GetWorldAge() % 2 == 0)
 	{
-		//LOGD("Sending (rot,yaw,roll) = (%f,%f,%f)",m_Rot.x,m_Rot.y,m_Rot.z);
-		m_World->BroadcastEntLook(*this,a_Exclude);
-		m_World->BroadcastEntHeadLook(*this,a_Exclude);
-		m_bDirtyOrientation = false;
-	}
-
-	if (m_bDirtyPosition)
-	{
-		float DiffX = (float)(GetPosX() - m_LastPosX);
-		float DiffY = (float)(GetPosY() - m_LastPosY);
-		float DiffZ = (float)(GetPosZ() - m_LastPosZ);
-		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
-		
-		// 4 blocks is max Relative Move. 16 = 4 ^ 2. Send an absolute position every 20 seconds
-		if ((SqrDist > 16) || (m_World->GetWorldAge() - m_TimeLastTeleportPacket > 400))
+		// 4 blocks is max Relative So if the Diff is greater than 127 or. Send an absolute position every 20 seconds
+		if (DiffTeleportPacket >= 400 || 
+			((DiffX > 127) || (DiffX < -128) ||
+			(DiffY > 127) || (DiffY < -128) ||
+			(DiffZ > 127) || (DiffZ < -128)))
 		{
-			m_World->BroadcastEntHeadLook(*this,a_Exclude);
+			//
 			m_World->BroadcastTeleportEntity(*this,a_Exclude);
 			m_TimeLastTeleportPacket = m_World->GetWorldAge();
+			m_TimeLastMoveReltPacket = m_TimeLastTeleportPacket; //Must synchronize.
 			m_LastPosX = GetPosX();
 			m_LastPosY = GetPosY();
 			m_LastPosZ = GetPosZ();
 			m_bDirtyPosition = false;
+			m_bDirtyOrientation = false;
 		}
 		else
 		{
-			// Send relative movement every 3 seconds
-			if ((m_World->GetWorldAge() - m_TimeLastMoveReltPacket > 60))
+			Int64 DiffMoveRelPacket = m_World->GetWorldAge() - m_TimeLastMoveReltPacket;
+			//if the change is big enough.
+			if ((abs(DiffX) >= 4 || abs(DiffY) >= 4 || abs(DiffZ) >= 4 || DiffMoveRelPacket >= 60) && m_bDirtyPosition)
 			{
 				if (m_bDirtyOrientation)
 				{
-					m_World->BroadcastEntHeadLook(*this,a_Exclude);
-					m_World->BroadcastEntRelMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32),a_Exclude);
+					m_World->BroadcastEntRelMoveLook(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
 					m_bDirtyOrientation = false;
 				}
 				else
 				{
-					m_World->BroadcastEntRelMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32),a_Exclude);
+					m_World->BroadcastEntRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
 				}
-				m_TimeLastMoveReltPacket = m_World->GetWorldAge();
 				m_LastPosX = GetPosX();
 				m_LastPosY = GetPosY();
 				m_LastPosZ = GetPosZ();
 				m_bDirtyPosition = false;
+				m_TimeLastMoveReltPacket = m_World->GetWorldAge();
 			}
+			else
+			{
+				if (m_bDirtyOrientation)
+				{
+					m_World->BroadcastEntLook(*this,a_Exclude);
+					m_bDirtyOrientation = false;
+				}
+			}		
+		}
+		if (m_bDirtyHead)
+		{
+			m_World->BroadcastEntHeadLook(*this,a_Exclude);
+			m_bDirtyHead = false;
 		}
 	}
-	//We need to keep updating the clients when there is movement or if there was a change in speed and after 1 tick
-	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 1))
+	//We need to keep updating the clients when there is movement or if there was a change in speed and after 2 ticks
+	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 2))
 	{
 		m_World->BroadcastEntVelocity(*this,a_Exclude);
 		m_bDirtySpeed = false;
@@ -333,10 +356,10 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 		// Already attached to that entity, nothing to do here
 		return;
 	}
-	
+
 	// Detach from any previous entity:
 	Detach();
-	
+
 	// Attach to the new entity:
 	m_AttachedTo = a_AttachTo;
 	a_AttachTo->m_Attachee = this;
@@ -378,6 +401,17 @@ void cEntity::SetRot(const Vector3f & a_Rot)
 {
 	m_Rot = a_Rot;
 	m_bDirtyOrientation = true;
+}
+
+
+
+
+
+void cEntity::SetHeadYaw(double a_HeadYaw)
+{
+	m_HeadYaw = a_HeadYaw;
+	m_bDirtyHead = true;
+	WrapHeadYaw();
 }
 
 
