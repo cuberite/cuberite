@@ -715,6 +715,11 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_GRASS:
 		case E_BLOCK_FARMLAND:
 		{
+			// DEBUG: This is here to catch FS #349 - melons growing over other crops.
+			LOG("Growing melon/pumpkin overwriting %s, growing on %s",
+				ItemTypeToString(BlockType[CheckType]).c_str(),
+				ItemTypeToString(Soil).c_str()
+			);
 			// Place a randomly-facing produce:
 			UnboundedRelFastSetBlock(a_RelX + x, a_RelY, a_RelZ + z, ProduceType, (NIBBLETYPE)(a_TickRandom.randInt(4) % 4));
 			break;
