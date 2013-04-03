@@ -18,19 +18,15 @@ public:
 	}
 
 
-	virtual void OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_Meta) override
 	{
 		MTRand rand;
-		NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-		cItems Drops;
-
-		if (Meta == 0x7)  // Is fully grown
+		if (a_Meta == 0x7)  // Is fully grown
 		{
-			Drops.push_back(cItem(E_ITEM_WHEAT, 1, 0));
+			a_Pickups.push_back(cItem(E_ITEM_WHEAT, 1, 0));
 		}
-		Drops.push_back(cItem(E_ITEM_SEEDS, (rand.randInt(3) == 0) ? 2 : 1, 0));
-		a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
+		a_Pickups.push_back(cItem(E_ITEM_SEEDS, (rand.randInt(3) == 0) ? 2 : 1, 0));
 	}	
 	
 	
