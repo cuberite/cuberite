@@ -314,17 +314,14 @@ void cServer::BroadcastChat(const AString & a_Message, const cClientHandle * a_E
 
 bool cServer::Tick(float a_Dt)
 {
-    //LOG("1. Tick %0.2f", a_Dt);
-	if( a_Dt > 100.f ) a_Dt = 100.f; // Don't go over 1/10 second
-
 	m_Millisecondsf += a_Dt;
-	if( m_Millisecondsf > 1.f )
+	if (m_Millisecondsf > 1.f)
 	{
 		m_Milliseconds += (int)m_Millisecondsf;
 		m_Millisecondsf = m_Millisecondsf - (int)m_Millisecondsf;
 	}
 
-	cRoot::Get()->TickWorlds( a_Dt ); // TODO - Maybe give all worlds their own thread?
+	cRoot::Get()->TickWorlds(a_Dt); // TODO - Maybe give all worlds their own thread?
 
 	cClientHandleList RemoveClients;
 	{
@@ -346,9 +343,9 @@ bool cServer::Tick(float a_Dt)
 		delete *itr;
 	} // for itr - RemoveClients[]
 
-	cRoot::Get()->GetPluginManager()->Tick( a_Dt );
+	cRoot::Get()->GetPluginManager()->Tick(a_Dt);
 
-	if( !m_bRestarting )
+	if (!m_bRestarting)
 	{
 		return true;
 	}
