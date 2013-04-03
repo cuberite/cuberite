@@ -18,6 +18,7 @@ function InitConsoleCommands()
 	PluginMgr:BindConsoleCommand("say",                  HandleConsoleSay,                  "Sends a chat message to all players");
 	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               "Unloads all unused chunks");
 	PluginMgr:BindConsoleCommand("rank",                 HandleConsoleRank,                 " [Player] [Rank] - to add someone to a group");
+	PluginMgr:BindConsoleCommand("listgroups",           HandleConsoleListGroups,           "Shows a list of all the groups");
 end
 
 
@@ -167,6 +168,11 @@ function HandleConsoleUnload(Split)
 	return true;
 end
 
+
+
+
+
+
 function HandleConsoleRank(Split)
 	if Split[2] == nil or Split[3] == nil then
 		LOG("Usage: /rank [Player] [Group]")
@@ -200,6 +206,27 @@ function HandleConsoleRank(Split)
 	LOG("Player " .. Split[2] .. " Was moved to " .. Split[3])
 	return true
 end
+
+
+
+
+
+
+function HandleConsoleListGroups(Split)
+	local GroupsIni = cIniFile("groups.ini")
+	if GroupsIni:ReadFile() == false then
+		LOG( "No groups found" )
+	end
+	Number = GroupsIni:NumKeys()
+	Groups = {}
+	for i=0, Number do
+		table.insert( Groups, GroupsIni:KeyName(i) )
+	end
+	LOGINFO( "Groups:" )
+	LOGINFO( table.concat( Groups, ", " ) )
+	return true
+end
+
 
 
 function HandleConsole(Split)
