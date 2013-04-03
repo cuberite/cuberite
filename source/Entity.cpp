@@ -422,6 +422,7 @@ void cEntity::SetRotation(double a_Rotation)
 {
 	m_Rot.x = a_Rotation;
 	m_bDirtyOrientation = true;
+	WrapRotation();
 }
 
 
@@ -432,6 +433,7 @@ void cEntity::SetPitch(double a_Pitch)
 {
 	m_Rot.y = a_Pitch;
 	m_bDirtyOrientation = true;
+	WrapRotation();
 }
 
 
