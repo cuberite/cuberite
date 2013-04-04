@@ -538,6 +538,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_
 			unsigned char c = ((unsigned char *)a_Data)[i + j];
 			p[0] = HEX(c >> 4);
 			p[1] = HEX(c & 0xf);
+			p[2] = ' ';
 			if (c >= ' ')
 			{
 				q[0] = (char)c;
