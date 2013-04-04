@@ -96,7 +96,7 @@ public:
 	virtual void SendWeather            (eWeather a_Weather) = 0;
 	virtual void SendWholeInventory     (const cInventory & a_Inventory) = 0;
 	virtual void SendWholeInventory     (const cWindow    & a_Window) = 0;
-	virtual void SendWindowClose        (char a_WindowID) = 0;
+	virtual void SendWindowClose        (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) = 0;
 
 	/// Returns the ServerID used for authentication through session.minecraft.net

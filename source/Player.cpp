@@ -455,27 +455,8 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 
 void cPlayer::CloseWindow(char a_WindowType)
 {
-	if (m_CurrentWindow == m_InventoryWindow)
-	{
-		// The inventory window must not be closed and must not be even sent a close packet
-		if (IsDraggingItem()) // But we need to check if player is holding anything
-		{
-			LOGD("Player holds item in inventory window! Dropping it...");
-			TossItem(true, GetDraggingItem().m_ItemCount);
-		}
-		return;
-	}
-	
 	if (m_CurrentWindow != NULL)
 	{
-		// TODO: This code should be in cChestWindow instead
-		if ((a_WindowType == 1) && (m_CurrentWindow->GetWindowType() == cWindow::Chest))
-		{
-			int x, y, z;
-			m_CurrentWindow->GetOwner()->GetBlockPos(x, y, z);
-			m_World->BroadcastBlockAction(x, y, z, 1, 0, E_BLOCK_CHEST);
-		}
-		
 		m_CurrentWindow->ClosedByPlayer(*this);
 	}
 	m_CurrentWindow = m_InventoryWindow;

@@ -125,7 +125,7 @@ public:
 	void SendWeather            (eWeather a_Weather);
 	void SendWholeInventory     (const cInventory & a_Inventory);
 	void SendWholeInventory     (const cWindow    & a_Window);
-	void SendWindowClose        (char a_WindowID);
+	void SendWindowClose        (const cWindow    & a_Window);
 	void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots);
 	void SendUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 

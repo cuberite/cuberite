@@ -1359,18 +1359,18 @@ void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNu
 
 
 
-void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+void cClientHandle::SendWindowClose(const cWindow & a_Window)
 {
-	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
+	m_Protocol->SendWindowClose(a_Window);
 }
 
 
 
 
 
-void cClientHandle::SendWindowClose(char a_WindowID)
+void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
 {
-	m_Protocol->SendWindowClose(a_WindowID);
+	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
 }
 
 

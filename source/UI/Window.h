@@ -62,7 +62,7 @@ public:
 	char GetWindowID(void) const { return m_WindowID; }
 	int GetWindowType(void) const { return m_WindowType; }
 
-	cWindowOwner * GetOwner() { return m_Owner; }
+	cWindowOwner * GetOwner(void) { return m_Owner; }
 	void SetOwner( cWindowOwner * a_Owner ) { m_Owner = a_Owner; }
 	
 	int GetNumSlots(void) const;

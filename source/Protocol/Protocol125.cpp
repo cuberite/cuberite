@@ -863,11 +863,17 @@ void cProtocol125::SendWholeInventory(const cWindow & a_Window)
 
 
 
-void cProtocol125::SendWindowClose(char a_WindowID)
+void cProtocol125::SendWindowClose(const cWindow & a_Window)
 {
+	if (a_Window.GetWindowType() == cWindow::Inventory)
+	{
+		// Do not send inventory-window-close
+		return;
+	}
+	
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_WINDOW_CLOSE);
-	WriteByte(a_WindowID);
+	WriteByte(a_Window.GetWindowID());
 	Flush();
 }
 

@@ -556,10 +556,10 @@ void cProtocolRecognizer::SendWholeInventory(const cWindow & a_Window)
 
 
 
-void cProtocolRecognizer::SendWindowClose(char a_WindowID)
+void cProtocolRecognizer::SendWindowClose(const cWindow & a_Window)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendWindowClose(a_WindowID);
+	m_Protocol->SendWindowClose(a_Window);
 }
 
 

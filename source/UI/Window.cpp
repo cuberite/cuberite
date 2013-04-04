@@ -165,8 +165,6 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 
 void cWindow::ClosedByPlayer(cPlayer & a_Player)
 {
-	ASSERT(m_WindowType != Inventory);  // Inventory windows must not be closed (the client would repeat the close packet, looping forever)
-	
 	// Checks whether the player is still holding an item
 	if (a_Player.IsDraggingItem())
 	{
@@ -177,7 +175,7 @@ void cWindow::ClosedByPlayer(cPlayer & a_Player)
 	cClientHandle * ClientHandle = a_Player.GetClientHandle();
 	if (ClientHandle != NULL)
 	{
-		ClientHandle->SendWindowClose(m_WindowID);
+		ClientHandle->SendWindowClose(*this);
 	}
 
 	{
@@ -189,7 +187,8 @@ void cWindow::ClosedByPlayer(cPlayer & a_Player)
 		}  // for itr - m_SlotAreas[]
 
 		m_OpenedBy.remove(&a_Player);
-		if (m_OpenedBy.empty())
+		
+		if ((m_WindowType != Inventory) && m_OpenedBy.empty())
 		{
 			Destroy();
 		}

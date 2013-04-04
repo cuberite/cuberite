@@ -100,7 +100,7 @@ public:
 	virtual void SendWeather            (eWeather a_Weather) override;
 	virtual void SendWholeInventory     (const cInventory & a_Inventory) override;
 	virtual void SendWholeInventory     (const cWindow    & a_Window) override;
-	virtual void SendWindowClose        (char a_WindowID) override;
+	virtual void SendWindowClose        (const cWindow    & a_Window) override;
 	virtual void SendWindowOpen         (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) override;
 	
 	virtual AString GetAuthServerID(void) override;
