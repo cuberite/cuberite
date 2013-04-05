@@ -524,15 +524,17 @@ private:
 	
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
+	bool m_IsCactusBonemealable;
+	bool m_IsCarrotsBonemealable;
 	bool m_IsCropsBonemealable;
 	bool m_IsGrassBonemealable;
-	bool m_IsSaplingBonemealable;
 	bool m_IsMelonStemBonemealable;
 	bool m_IsMelonBonemealable;
+	bool m_IsPotatoesBonemealable;
 	bool m_IsPumpkinStemBonemealable;
 	bool m_IsPumpkinBonemealable;
+	bool m_IsSaplingBonemealable;
 	bool m_IsSugarcaneBonemealable;
-	bool m_IsCactusBonemealable;
 	
 	cEntityList       m_RemoveEntityQueue;
 	cEntityList       m_AllEntities;

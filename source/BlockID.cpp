@@ -393,6 +393,7 @@ public:
 		// Transparent blocks
 		g_BlockTransparent[E_BLOCK_AIR]                   = true;
 		g_BlockTransparent[E_BLOCK_BROWN_MUSHROOM]        = true;
+		g_BlockTransparent[E_BLOCK_CARROTS]               = true;
 		g_BlockTransparent[E_BLOCK_CHEST]                 = true;
 		g_BlockTransparent[E_BLOCK_COBWEB]                = true;
 		g_BlockTransparent[E_BLOCK_CROPS]                 = true;
@@ -406,8 +407,11 @@ public:
 		g_BlockTransparent[E_BLOCK_IRON_DOOR]             = true;
 		g_BlockTransparent[E_BLOCK_LEAVES]                = true;
 		g_BlockTransparent[E_BLOCK_LEVER]                 = true;
+		g_BlockTransparent[E_BLOCK_MELON_STEM]            = true;
 		g_BlockTransparent[E_BLOCK_NETHER_BRICK_FENCE]    = true;
+		g_BlockTransparent[E_BLOCK_POTATOES]              = true;
 		g_BlockTransparent[E_BLOCK_POWERED_RAIL]          = true;
+		g_BlockTransparent[E_BLOCK_PUMPKIN_STEM]          = true;
 		g_BlockTransparent[E_BLOCK_RAIL]                  = true;
 		g_BlockTransparent[E_BLOCK_RED_MUSHROOM]          = true;
 		g_BlockTransparent[E_BLOCK_RED_ROSE]              = true;
@@ -426,10 +430,14 @@ public:
 
 		// One hit break blocks
 		g_BlockOneHitDig[E_BLOCK_BROWN_MUSHROOM]        = true;
+		g_BlockOneHitDig[E_BLOCK_CARROTS]               = true;
 		g_BlockOneHitDig[E_BLOCK_CROPS]                 = true;
 		g_BlockOneHitDig[E_BLOCK_FIRE]                  = true;
 		g_BlockOneHitDig[E_BLOCK_FLOWER_POT]            = true;
 		g_BlockOneHitDig[E_BLOCK_LOCKED_CHEST]          = true;
+		g_BlockOneHitDig[E_BLOCK_MELON_STEM]            = true;
+		g_BlockOneHitDig[E_BLOCK_POTATOES]              = true;
+		g_BlockOneHitDig[E_BLOCK_PUMPKIN_STEM]          = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_OFF] = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_REPEATER_ON]  = true;
 		g_BlockOneHitDig[E_BLOCK_REDSTONE_TORCH_OFF]    = true;

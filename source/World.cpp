@@ -224,15 +224,17 @@ cWorld::cWorld(const AString & a_WorldName) :
 	StorageSchema               = IniFile.GetValueSet ("Storage",       "Schema",                    StorageSchema);
 	m_MaxCactusHeight           = IniFile.GetValueSetI("Plants",        "MaxCactusHeight",           3);
 	m_MaxSugarcaneHeight        = IniFile.GetValueSetI("Plants",        "MaxSugarcaneHeight",        3);
+	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
+	m_IsCarrotsBonemealable     = IniFile.GetValueSetB("Plants",        "IsCarrotsBonemealable",     true);
 	m_IsCropsBonemealable       = IniFile.GetValueSetB("Plants",        "IsCropsBonemealable",       true);
 	m_IsGrassBonemealable       = IniFile.GetValueSetB("Plants",        "IsGrassBonemealable",       true);
-	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
 	m_IsMelonStemBonemealable   = IniFile.GetValueSetB("Plants",        "IsMelonStemBonemealable",   true);
 	m_IsMelonBonemealable       = IniFile.GetValueSetB("Plants",        "IsMelonBonemealable",       false);
+	m_IsPotatoesBonemealable    = IniFile.GetValueSetB("Plants",        "IsPotatoesBonemealable",    true);
 	m_IsPumpkinStemBonemealable = IniFile.GetValueSetB("Plants",        "IsPumpkinStemBonemealable", true);
 	m_IsPumpkinBonemealable     = IniFile.GetValueSetB("Plants",        "IsPumpkinBonemealable",     false);
+	m_IsSaplingBonemealable     = IniFile.GetValueSetB("Plants",        "IsSaplingBonemealable",     true);
 	m_IsSugarcaneBonemealable   = IniFile.GetValueSetB("Plants",        "IsSugarcaneBonemealable",   false);
-	m_IsCactusBonemealable      = IniFile.GetValueSetB("Plants",        "IsCactusBonemealable",      false);
 	m_bEnabledPVP               = IniFile.GetValueSetB("PVP",           "Enabled",                   true);
 	m_IsDeepSnowEnabled         = IniFile.GetValueSetB("Physics",       "DeepSnow",                  false);
 
@@ -879,9 +881,22 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 	switch (BlockType)
 	{
+		case E_BLOCK_CARROTS:
+		{
+			if (a_IsByBonemeal && !m_IsCarrotsBonemealable)
+			{
+				return false;
+			}
+			if (BlockMeta < 7)
+			{
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
+			}
+			return true;
+		}
+		
 		case E_BLOCK_CROPS:
 		{
-			if (a_IsByBonemeal && !m_IsGrassBonemealable)
+			if (a_IsByBonemeal && !m_IsCropsBonemealable)
 			{
 				return false;
 			}
@@ -909,6 +924,19 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 					return false;
 				}
 				GrowMelonPumpkin(a_BlockX, a_BlockY, a_BlockZ, BlockType);
+			}
+			return true;
+		}
+		
+		case E_BLOCK_POTATOES:
+		{
+			if (a_IsByBonemeal && !m_IsPotatoesBonemealable)
+			{
+				return false;
+			}
+			if (BlockMeta < 7)
+			{
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, 7);
 			}
 			return true;
 		}

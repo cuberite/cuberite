@@ -143,8 +143,10 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemBucketHandler(a_ItemType);
 		}
 		
-		case E_ITEM_PUMPKIN_SEEDS:
+		case E_ITEM_CARROT:
 		case E_ITEM_MELON_SEEDS:
+		case E_ITEM_POTATO:
+		case E_ITEM_PUMPKIN_SEEDS:
 		case E_ITEM_SEEDS:
 		{
 			return new cItemSeedsHandler(a_ItemType);

@@ -1,9 +1,17 @@
+
 #pragma once
+
 #include "BlockHandler.h"
 #include "../MersenneTwister.h"
 #include "../World.h"
 
-class cBlockCropsHandler : public cBlockHandler
+
+
+
+
+/// Common class that takes care of carrots, potatoes and wheat
+class cBlockCropsHandler :
+	public cBlockHandler
 {
 public:
 	cBlockCropsHandler(BLOCKTYPE a_BlockType)
@@ -22,11 +30,54 @@ public:
 	{
 		MTRand rand;
 
-		if (a_Meta == 0x7)  // Is fully grown
+		if (a_Meta == 0x7)
 		{
-			a_Pickups.push_back(cItem(E_ITEM_WHEAT, 1, 0));
+			// Is fully grown, drop the entire produce:
+			switch (m_BlockType)
+			{
+				case E_BLOCK_CROPS:
+				{
+					a_Pickups.push_back(cItem(E_ITEM_WHEAT, 1, 0));
+					a_Pickups.push_back(cItem(E_ITEM_SEEDS, 1 + (int)(rand.randInt(2) + rand.randInt(2)) / 2, 0));  // [1 .. 3] with high preference of 2
+					break;
+				}
+				case E_BLOCK_CARROTS:
+				{
+					a_Pickups.push_back(cItem(E_ITEM_CARROT, 1 + (int)(rand.randInt(2) + rand.randInt(2)) / 2, 0));  // [1 .. 3] with high preference of 2
+					break;
+				}
+				case E_BLOCK_POTATOES:
+				{
+					a_Pickups.push_back(cItem(E_ITEM_POTATO, 1 + (int)(rand.randInt(2) + rand.randInt(2)) / 2, 0));  // [1 .. 3] with high preference of 2
+					if (rand.randInt(20) == 0)
+					{
+						// With a 5% chance, drop a poisonous potato as well
+						a_Pickups.push_back(cItem(E_ITEM_POISONOUS_POTATO, 1, 0));
+					}
+					break;
+				}
+				default:
+				{
+					ASSERT(!"Unhandled block type");
+					break;
+				}
+			}  // switch (m_BlockType)
 		}
-		a_Pickups.push_back(cItem(E_ITEM_SEEDS, (rand.randInt(3) == 0) ? 2 : 1, 0));
+		else
+		{
+			// Drop 1 item of whatever is growing
+			switch (m_BlockType)
+			{
+				case E_BLOCK_CROPS:    a_Pickups.push_back(cItem(E_ITEM_SEEDS,  1, 0)); break;
+				case E_BLOCK_CARROTS:  a_Pickups.push_back(cItem(E_ITEM_CARROT, 1, 0)); break;
+				case E_BLOCK_POTATOES: a_Pickups.push_back(cItem(E_ITEM_POTATO, 1, 0)); break;
+				default:
+				{
+					ASSERT(!"Unhandled block type");
+					break;
+				}
+			}
+		}
 	}	
 	
 	
