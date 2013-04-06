@@ -640,15 +640,20 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 {
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
-	BLOCKTYPE FillBlock = (m_SpawnerPosition >= 0) ? E_BLOCK_COBWEB : E_BLOCK_AIR;
 	cCuboid RelBoundingBox(m_BoundingBox);
 	RelBoundingBox.Move(-BlockX, 0, -BlockZ);
 	RelBoundingBox.p1.y += 1;
 	RelBoundingBox.p2.y -= 1;
-	a_ChunkDesc.FillRelCuboid(RelBoundingBox, FillBlock, 0);
-	RelBoundingBox.p2.y += 1;
-	RelBoundingBox.p1.y = RelBoundingBox.p2.y;
-	a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, FillBlock, 0, BlockX ^ BlockZ + BlockX, 8000);
+	cCuboid Top(RelBoundingBox);
+	Top.p2.y += 1;
+	Top.p1.y = Top.p2.y;
+	a_ChunkDesc.FillRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0);
+	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_AIR, 0, BlockX ^ BlockZ + BlockX, 8000);
+	if (m_SpawnerPosition >= 0)
+	{
+		a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockZ, 8000);
+		a_ChunkDesc.RandomFillRelCuboid(Top,            E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockX, 5000);
+	}
 	RelBoundingBox.p1.y = m_BoundingBox.p1.y;
 	RelBoundingBox.p2.y = m_BoundingBox.p1.y;
 	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, E_BLOCK_PLANKS, 0);
