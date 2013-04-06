@@ -236,6 +236,7 @@ class cStructGenMineShafts::cMineShaftSystem
 {
 public:
 	int         m_BlockX, m_BlockZ;    ///< The pivot point on which the system is generated
+	int         m_GridSize;            ///< Maximum offset of the dirtroom from grid center, * 2, in each direction
 	int         m_MaxRecursion;        ///< Maximum recursion level (initialized from cStructGenMineShafts::m_MaxRecursion)
 	int         m_ProbLevelCorridor;   ///< Probability level of a branch object being the corridor
 	int         m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
@@ -248,7 +249,7 @@ public:
 
 	/// Creates and generates the entire system
 	cMineShaftSystem(
-		int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise,
+		int a_BlockX, int a_BlockZ, int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
 		int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 	);
 
@@ -278,11 +279,12 @@ public:
 // cStructGenMineShafts::cMineShaftSystem:
 
 cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
-	int a_BlockX, int a_BlockZ, int a_MaxSystemSize, cNoise & a_Noise,
+	int a_BlockX, int a_BlockZ, int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
 	int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 ) :
 	m_BlockX(a_BlockX),
 	m_BlockZ(a_BlockZ),
+	m_GridSize(a_GridSize),
 	m_MaxRecursion(8),  // TODO: settable
 	m_ProbLevelCorridor(a_ProbLevelCorridor),
 	m_ProbLevelCrossing(a_ProbLevelCrossing),
@@ -291,15 +293,16 @@ cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
 	m_ChanceSpawner(12),  // TODO: settable
 	m_ChanceTorch(1000)  // TODO: settable
 {
-	m_BoundingBox.Assign(
-		a_BlockX - a_MaxSystemSize / 2, 2,  a_BlockZ - a_MaxSystemSize / 2,
-		a_BlockX + a_MaxSystemSize / 2, 50, a_BlockZ + a_MaxSystemSize / 2
-	);
-	
 	m_MineShafts.reserve(100);
 	
 	cMineShaft * Start = new cMineShaftDirtRoom(*this, a_Noise);
 	m_MineShafts.push_back(Start);
+
+	m_BoundingBox.Assign(
+		Start->m_BoundingBox.p1.x - a_MaxSystemSize / 2, 2,  Start->m_BoundingBox.p1.z - a_MaxSystemSize / 2,
+		Start->m_BoundingBox.p2.x + a_MaxSystemSize / 2, 50, Start->m_BoundingBox.p2.z + a_MaxSystemSize / 2
+	);
+	
 	Start->AppendBranches(0, a_Noise);
 	
 	for (cMineShafts::const_iterator itr = m_MineShafts.begin(), end = m_MineShafts.end(); itr != end; ++itr)
@@ -405,11 +408,15 @@ cMineShaftDirtRoom::cMineShaftDirtRoom(cStructGenMineShafts::cMineShaftSystem & 
 {
 	// Make the room of random size, min 10 x 4 x 10; max 18 x 12 x 18:
 	int rnd = a_Noise.IntNoise3DInt(a_Parent.m_BlockX, 0, a_Parent.m_BlockZ) / 7;
-	m_BoundingBox.p1.x = a_Parent.m_BlockX;
-	m_BoundingBox.p2.x = a_Parent.m_BlockX + 10 + (rnd % 8);
+	int OfsX = (rnd % a_Parent.m_GridSize) - a_Parent.m_GridSize / 2;
+	rnd >>= 12;
+	int OfsZ = (rnd % a_Parent.m_GridSize) - a_Parent.m_GridSize / 2;
+	rnd = a_Noise.IntNoise3DInt(a_Parent.m_BlockX, 1000, a_Parent.m_BlockZ) / 11;
+	m_BoundingBox.p1.x = a_Parent.m_BlockX + OfsX;
+	m_BoundingBox.p2.x = m_BoundingBox.p1.x + 10 + (rnd % 8);
 	rnd >>= 4;
-	m_BoundingBox.p1.z = a_Parent.m_BlockZ;
-	m_BoundingBox.p2.z = a_Parent.m_BlockZ + 10 + (rnd % 8);
+	m_BoundingBox.p1.z = a_Parent.m_BlockZ + OfsZ;
+	m_BoundingBox.p2.z = m_BoundingBox.p1.z + 10 + (rnd % 8);
 	rnd >>= 4;
 	m_BoundingBox.p1.y = 20;
 	m_BoundingBox.p2.y = 24 + rnd % 8;
@@ -479,19 +486,6 @@ void cMineShaftDirtRoom::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			}
 		}  // for x
 	}  // for z
-	
-	// DEBUG: To find the rooms easily, add a glass column to the top of the world:
-	if (
-		(m_BoundingBox.p1.x >= BlockX) && (m_BoundingBox.p1.x < BlockX + cChunkDef::Width) &&
-		(m_BoundingBox.p1.z >= BlockZ) && (m_BoundingBox.p1.z < BlockZ + cChunkDef::Width)
-	)
-	{
-		int Height = a_ChunkDesc.GetHeight(BlockX - m_BoundingBox.p1.x, BlockZ - m_BoundingBox.p1.z);
-		for (int y = m_BoundingBox.p2.y; y < 256; y++)
-		{
-			a_ChunkDesc.SetBlockType(BlockX - m_BoundingBox.p1.x, y, BlockZ - m_BoundingBox.p1.z, (y < Height) ? E_BLOCK_AIR : E_BLOCK_GLASS);
-		}
-	}
 }
 
 
@@ -1383,7 +1377,7 @@ void cStructGenMineShafts::GetMineShaftSystemsForChunk(
 			}  // for itr - a_Mineshafts
 			if (!Found)
 			{
-				a_MineShafts.push_back(new cMineShaftSystem(RealX, RealZ, m_MaxSystemSize, m_Noise, m_ProbLevelCorridor, m_ProbLevelCrossing, m_ProbLevelStaircase));
+				a_MineShafts.push_back(new cMineShaftSystem(RealX, RealZ, m_GridSize, m_MaxSystemSize, m_Noise, m_ProbLevelCorridor, m_ProbLevelCrossing, m_ProbLevelStaircase));
 			}
 		}  // for z
 	}  // for x

@@ -326,8 +326,8 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "MineShafts") == 0)
 		{
-			int GridSize        = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize",        256);
-			int MaxSystemSize   = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize",   128);
+			int GridSize        = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize",        512);
+			int MaxSystemSize   = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize",   160);
 			int ChanceCorridor  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCorridor",  600);
 			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
 			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
