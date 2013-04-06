@@ -149,6 +149,9 @@ protected:
 	/// If this corridor has tracks, places them randomly
 	void PlaceTracks(cChunkDesc & a_ChunkDesc);
 	
+	/// If this corridor has a spawner, places the spawner
+	void PlaceSpawner(cChunkDesc & a_ChunkDesc);
+	
 	/// Randomly places torches around the central beam block
 	void PlaceTorches(cChunkDesc & a_ChunkDesc);
 } ;
@@ -651,9 +654,11 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_AIR, 0, BlockX ^ BlockZ + BlockX, 8000);
 	if (m_SpawnerPosition >= 0)
 	{
+		// Cobwebs around the spider spawner
 		a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockZ, 8000);
 		a_ChunkDesc.RandomFillRelCuboid(Top,            E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockX, 5000);
 	}
+	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_COBWEB, 0, BlockX ^ BlockZ + BlockX + 10, 500);
 	RelBoundingBox.p1.y = m_BoundingBox.p1.y;
 	RelBoundingBox.p2.y = m_BoundingBox.p1.y;
 	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, E_BLOCK_PLANKS, 0);
@@ -732,7 +737,7 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	
 	PlaceChest(a_ChunkDesc);
 	PlaceTracks(a_ChunkDesc);
-	// TODO: Place spawner (must be after Tracks!
+	PlaceSpawner(a_ChunkDesc); // (must be after Tracks!)
 	PlaceTorches(a_ChunkDesc);
 }
 
@@ -820,6 +825,44 @@ void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
 		}
 	}  // switch (direction)
 	a_ChunkDesc.RandomFillRelCuboid(Box, E_BLOCK_MINECART_TRACKS, Meta, a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
+}
+
+
+
+
+
+void cMineShaftCorridor::PlaceSpawner(cChunkDesc & a_ChunkDesc)
+{
+	if (m_SpawnerPosition < 0)
+	{
+		// No spawner in this corridor
+		return;
+	}
+	int SpawnerRelX = m_BoundingBox.p1.x + 1 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int SpawnerRelZ = m_BoundingBox.p1.z + 1 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	switch (m_Direction)
+	{
+		case dirXM:
+		case dirXP:
+		{
+			SpawnerRelX += m_SpawnerPosition - 1;
+			break;
+		}
+		case dirZM:
+		case dirZP:
+		{
+			SpawnerRelZ += m_SpawnerPosition - 1;
+			break;
+		}
+	}
+	if (
+		(SpawnerRelX >= 0) && (SpawnerRelX < cChunkDef::Width) &&
+		(SpawnerRelZ >= 0) && (SpawnerRelZ < cChunkDef::Width)
+	)
+	{
+		a_ChunkDesc.SetBlockTypeMeta(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ, E_BLOCK_MOB_SPAWNER, 0);
+		// TODO: The spawner needs its accompanying cMobSpawnerEntity, when implemented
+	}
 }
 
 
