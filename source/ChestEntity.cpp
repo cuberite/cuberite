@@ -9,6 +9,7 @@
 #include "World.h"
 #include "Root.h"
 #include "Pickup.h"
+#include "Noise.h"
 #include <json/json.h>
 
 
@@ -22,11 +23,20 @@ class cRoot;
 
 
 
-cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	cBlockEntity(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World)
+cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ)
 {
-	m_Content = new cItem[ c_ChestHeight * c_ChestWidth ];
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
+	cBlockEntityWindowOwner::SetBlockEntity(this);
+}
+
+
+
+
+
+cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World)
+{
+	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
 
 
@@ -40,8 +50,6 @@ cChestEntity::~cChestEntity()
 	{
 		Window->OwnerDestroyed();
 	}
-
-	delete [] m_Content;
 }
 
 
@@ -92,13 +100,37 @@ void cChestEntity::SetSlot(int a_Slot, const cItem & a_Item)
 
 
 
-#define READ(File, Var) \
-	if (File.Read(&Var, sizeof(Var)) != sizeof(Var)) \
-	{ \
-		LOGERROR("ERROR READING cChestEntity %s FROM FILE (line %d)", #Var, __LINE__); \
-		return false; \
+void cChestEntity::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, int a_CountLootProbabs, int a_NumSlots, int a_Seed)
+{
+	// Calculate the total weight:
+	int TotalProbab = 1;
+	for (int i = 0; i < a_CountLootProbabs; i++)
+	{
+		TotalProbab += a_LootProbabs[i].m_Weight;
 	}
-
+	
+	// Pick the loot items:
+	cNoise Noise(a_Seed);
+	for (int i = 0; i < a_NumSlots; i++)
+	{
+		int Rnd = (Noise.IntNoise1DInt(i) / 7);
+		int LootRnd = Rnd % TotalProbab;
+		Rnd >>= 8;
+		cItem CurrentLoot = cItem(E_ITEM_BOOK, 1, 0);  // TODO: enchantment
+		for (int j = 0; j < a_CountLootProbabs; j++)
+		{
+			LootRnd -= a_LootProbabs[i].m_Weight;
+			if (LootRnd < 0)
+			{
+				CurrentLoot = a_LootProbabs[i].m_Item;
+				CurrentLoot.m_ItemCount = a_LootProbabs[i].m_MinAmount + (Rnd % (a_LootProbabs[i].m_MaxAmount - a_LootProbabs[i].m_MinAmount));
+				Rnd >>= 8;
+				break;
+			}
+		}  // for j - a_LootProbabs[]
+		SetSlot(Rnd % ARRAYCOUNT(m_Content), CurrentLoot);
+	}  // for i - NumSlots
+}
 
 
 

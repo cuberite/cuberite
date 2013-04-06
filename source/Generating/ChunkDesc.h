@@ -169,6 +169,7 @@ public:
 	
 	// tolua_end
 	
+	void AddBlockEntity(cBlockEntity * a_BlockEntity);
 	
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap     (void) { return m_BiomeMap; }

@@ -8,23 +8,12 @@
 
 
 
-#ifndef _WIN32
-#include "BlockID.h"
-#else
-enum ENUM_BLOCK_ID;
-#endif
-
-
-
-
-
 namespace Json
 {
 	class Value;
 };
 
 class cPlayer;
-class cWorld;
 class cPacket;
 
 
@@ -34,23 +23,41 @@ class cPacket;
 class cBlockEntity
 {
 protected:
-	cBlockEntity(ENUM_BLOCK_ID a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) 
-		: m_PosX( a_BlockX )
-		, m_PosY( a_BlockY )
-		, m_PosZ( a_BlockZ )
-		, m_BlockType( a_BlockType ) 
-		, m_World( a_World )
-	{}
+	cBlockEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ) :  // Used when generating
+		m_PosX(a_BlockX),
+		m_PosY(a_BlockY),
+		m_PosZ(a_BlockZ),
+		m_BlockType(a_BlockType),
+		m_World(NULL)
+	{
+	}
+	
+	
+	cBlockEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+		m_PosX(a_BlockX),
+		m_PosY(a_BlockY),
+		m_PosZ(a_BlockZ),
+		m_BlockType(a_BlockType),
+		m_World(a_World)
+	{
+	}
+
 public:
-	virtual ~cBlockEntity() {};
+	virtual ~cBlockEntity() {};  // force a virtual destructor in all descendants
+	
 	virtual void Destroy(void) {};
+	
+	void SetWorld(cWorld * a_World)
+	{
+		m_World = a_World;
+	}
 	
 	// Position, in absolute block coordinates:
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosY(void) const { return m_PosY; }
 	int GetPosZ(void) const { return m_PosZ; }
 
-	ENUM_BLOCK_ID GetBlockType(void) const { return m_BlockType; }
+	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
 	
 	cWorld * GetWorld(void) const {return m_World; }
 
@@ -71,7 +78,7 @@ protected:
 	int m_PosY;
 	int m_PosZ;
 
-	ENUM_BLOCK_ID m_BlockType;
+	BLOCKTYPE m_BlockType;
 	
 	cWorld * m_World;
 };

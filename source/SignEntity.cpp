@@ -14,7 +14,7 @@
 
 
 
-cSignEntity::cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World)
+cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World)
 	: cBlockEntity(a_BlockType, a_X, a_Y, a_Z, a_World)
 {
 }

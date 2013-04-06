@@ -17,7 +17,7 @@ class cSignEntity :
 	public cBlockEntity
 {
 public:
-	cSignEntity(ENUM_BLOCK_ID a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
+	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cSignEntity();
 
 	bool LoadFromJson( const Json::Value& a_Value );

@@ -526,6 +526,15 @@ void cChunkDesc::RandomFillRelCuboid(
 
 
 
+void cChunkDesc::AddBlockEntity(cBlockEntity * a_BlockEntity)
+{
+	m_BlockEntities.push_back(a_BlockEntity);
+}
+
+
+
+
+
 void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 {
 	const NIBBLETYPE * AreaMetas = m_BlockArea.GetBlockMetas();

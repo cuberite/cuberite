@@ -152,3 +152,17 @@ public:
 
 
 
+
+/// Used to store loot probability tables
+class cLootProbab
+{
+public:
+	cItem m_Item;
+	int   m_MinAmount;
+	int   m_MaxAmount;
+	int   m_Weight;
+} ;
+
+
+
+

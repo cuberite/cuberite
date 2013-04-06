@@ -306,6 +306,12 @@ void cChunk::SetAllData(
 	}
 	std::swap(a_BlockEntities, m_BlockEntities);
 	
+	// Set all block entities' World variable:
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+	{
+		(*itr)->SetWorld(m_World);
+	}
+	
 	// Create block entities that the loader didn't load; fill them with defaults
 	CreateBlockEntities();
 	
@@ -1015,8 +1021,8 @@ void cChunk::CreateBlockEntities(void)
 		{
 			for (int y = 0; y < Height; y++)
 			{
-				ENUM_BLOCK_ID BlockType = (ENUM_BLOCK_ID)cChunkDef::GetBlock(m_BlockTypes, x, y, z);
-				switch ( BlockType )
+				BLOCKTYPE BlockType = cChunkDef::GetBlock(m_BlockTypes, x, y, z);
+				switch (BlockType)
 				{
 					case E_BLOCK_CHEST:
 					{

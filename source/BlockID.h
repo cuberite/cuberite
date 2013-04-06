@@ -428,6 +428,12 @@ enum
 	E_META_TORCH_XP = 2,  // Torch attached to the XP side of its block
 	E_META_TORCH_ZM = 3,  // Torch attached to the ZM side of its block
 	E_META_TORCH_ZP = 4,  // Torch attached to the ZP side of its block
+	
+	// E_BLOCK_CHEST metas:
+	E_META_CHEST_FACING_ZM = 2,
+	E_META_CHEST_FACING_ZP = 3,
+	E_META_CHEST_FACING_XM = 4,
+	E_META_CHEST_FACING_XP = 5,
 
 	// E_BLOCK_DOUBLE_STEP metas:
 	E_META_DOUBLE_STEP_STONE = 0,
