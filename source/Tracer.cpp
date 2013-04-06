@@ -17,8 +17,12 @@
 	#include <stdlib.h> // abs()
 #endif
 
-cTracer::cTracer(cWorld* a_World)
-	: m_World( a_World )
+
+
+
+
+cTracer::cTracer(cWorld * a_World)
+	: m_World(a_World)
 {
 	m_NormalTable[0].Set(-1, 0, 0);
 	m_NormalTable[1].Set( 0, 0,-1);
@@ -28,9 +32,17 @@ cTracer::cTracer(cWorld* a_World)
 	m_NormalTable[5].Set( 0,-1, 0);
 }
 
+
+
+
+
 cTracer::~cTracer()
 {
 }
+
+
+
+
 
 float cTracer::SigNum( float a_Num )
 {
@@ -39,7 +51,11 @@ float cTracer::SigNum( float a_Num )
 	return 0.f;
 }
 
-void cTracer::SetValues( const Vector3f & a_Start, const Vector3f & a_Direction )
+
+
+
+
+void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 {
 	// calculate the direction of the ray (linear algebra)
 	dir = a_Direction;
@@ -55,23 +71,38 @@ void cTracer::SetValues( const Vector3f & a_Start, const Vector3f & a_Direction 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
 	// same but y-direction
-	if( dir.x != 0.f ) tDelta.x = 1/fabs(dir.x);
-	else tDelta.x = 0;
-	if( dir.y != 0.f ) tDelta.y = 1/fabs(dir.y);
-	else tDelta.y = 0;
-	if( dir.z != 0.f )	tDelta.z = 1/fabs(dir.z);
-	else tDelta.z = 0;
+	if (dir.x != 0.f)
+	{
+		tDelta.x = 1 / fabs(dir.x);
+	}
+	else
+	{
+		tDelta.x = 0;
+	}
+	if (dir.y != 0.f)
+	{
+		tDelta.y = 1 / fabs(dir.y);
+	}
+	else
+	{
+		tDelta.y = 0;
+	}
+	if (dir.z != 0.f)
+	{
+		tDelta.z = 1 / fabs(dir.z);
+	}
+	else
+	{
+		tDelta.z = 0;
+	}
 
 	// start voxel coordinates
-	// use your
-	// transformer
-	// function here
 	pos.x = (int)floorf(a_Start.x);
 	pos.y = (int)floorf(a_Start.y);
 	pos.z = (int)floorf(a_Start.z);
 
 	// calculate distance to first intersection in the voxel we start from
-	if(dir.x < 0)
+	if (dir.x < 0)
 	{
 		tMax.x = ((float)pos.x - a_Start.x) / dir.x;
 	}
@@ -80,7 +111,7 @@ void cTracer::SetValues( const Vector3f & a_Start, const Vector3f & a_Direction 
 		tMax.x = (((float)pos.x + 1) - a_Start.x) / dir.x;
 	}
 
-	if(dir.y < 0)
+	if (dir.y < 0)
 	{
 		tMax.y = ((float)pos.y - a_Start.y) / dir.y;
 	}
@@ -89,7 +120,7 @@ void cTracer::SetValues( const Vector3f & a_Start, const Vector3f & a_Direction 
 		tMax.y = (((float)pos.y + 1) - a_Start.y) / dir.y;
 	}
 
-	if(dir.z < 0)
+	if (dir.z < 0)
 	{
 		tMax.z = ((float)pos.z - a_Start.z) / dir.z;
 	}
@@ -127,24 +158,23 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	end1.z = (int)floorf(End.z);
 	
 	// check if first is occupied
-	if( pos.Equals( end1 ) )
+	if (pos.Equals(end1))
 	{
-		LOG("WARNING: cTracer: Start and end in same block");
 		return 0;
 	}
 
 	bool reachedX = false, reachedY = false, reachedZ = false;
 
 	int Iterations = 0;
-	while ( Iterations < a_Distance )
+	while (Iterations < a_Distance)
 	{
 		Iterations++;
-		if(tMax.x < tMax.y && tMax.x < tMax.z)
+		if ((tMax.x < tMax.y) && (tMax.x < tMax.z))
 		{
 			tMax.x += tDelta.x;
 			pos.x += step.x;
 		}
-		else if(tMax.y < tMax.z)
+		else if (tMax.y < tMax.z)
 		{
 			tMax.y += tDelta.y;
 			pos.y += step.y;
@@ -155,38 +185,38 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			pos.z += step.z;
 		}
 
-		if(step.x > 0.0f)
+		if (step.x > 0.0f)
 		{
-			if(pos.x >= end1.x)
+			if (pos.x >= end1.x)
 			{
 				reachedX = true;
 			}
 		}
-		else if(pos.x <= end1.x)
+		else if (pos.x <= end1.x)
 		{
 			reachedX = true;
 		}
 
-		if(step.y > 0.0f)
+		if (step.y > 0.0f)
 		{
 			if(pos.y >= end1.y)
 			{
 				reachedY = true;
 			}
 		}
-		else if(pos.y <= end1.y)
+		else if (pos.y <= end1.y)
 		{
 			reachedY = true;
 		}
 
-		if(step.z > 0.0f)
+		if (step.z > 0.0f)
 		{
-			if(pos.z >= end1.z)
+			if (pos.z >= end1.z)
 			{
 				reachedZ = true;
 			}
 		}
-		else if(pos.z <= end1.z)
+		else if (pos.z <= end1.z)
 		{
 			reachedZ = true;
 		}
@@ -196,7 +226,7 @@ int cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			return false;
 		}
 		
-		BLOCKTYPE BlockID = m_World->GetBlock( pos.x, pos.y, pos.z );
+		BLOCKTYPE BlockID = m_World->GetBlock(pos.x, pos.y, pos.z);
 		// No collision with water ;)
 		if ((BlockID != E_BLOCK_AIR) || IsBlockWater(BlockID))  // _X 2013_03_29: Why is the IsBlockWater condition here? water equals air?
 		{
