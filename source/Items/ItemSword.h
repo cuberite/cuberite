@@ -16,6 +16,6 @@ public:
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		return a_BlockType == E_BLOCK_COBWEB;
+		return (a_BlockType == E_BLOCK_COBWEB);
 	}
 };

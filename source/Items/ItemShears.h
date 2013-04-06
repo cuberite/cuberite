@@ -53,7 +53,7 @@ public:
 			{
 				return true;
 			}
-		}  // switch (a_BlockType
+		}  // switch (a_BlockType)
 		return false;
 	}
 } ;

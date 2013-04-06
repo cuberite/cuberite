@@ -1811,6 +1811,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockCobWeb.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockCrops.h"
 					>
 				</File>

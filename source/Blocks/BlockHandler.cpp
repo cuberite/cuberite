@@ -55,6 +55,7 @@
 #include "BlockFlowerPot.h"
 #include "BlockCauldron.h"
 #include "BlockBrewingStand.h"
+#include "BlockCobWeb.h"
 
 
 
@@ -104,6 +105,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COAL_ORE:              return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_COBBLESTONE:           return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
 		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
