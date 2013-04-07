@@ -447,7 +447,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 	{
 		return NULL;
 	}
-	if (a_NBT.GetDataLength(a_TagIdx) != sizeof(*a_BiomeMap))
+	if (a_NBT.GetDataLength(a_TagIdx) != 16 * 16)
 	{
 		// The biomes stored don't match in size
 		return NULL;
