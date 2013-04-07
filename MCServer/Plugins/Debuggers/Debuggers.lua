@@ -54,6 +54,7 @@ function Initialize(Plugin)
 			f:write(n, "\n");
 		end
 		f:close();
+		LOG("API.txt written.");
 	end
 	
 	
@@ -135,6 +136,35 @@ function Initialize(Plugin)
 		BA1:SaveToSchematicFile("schematics/ltm_YZ2.schematic");
 	end
 	
+
+	-- Debug SQLite binding
+	local TestDB, ErrCode, ErrMsg = sqlite3.open("test.sqlite");
+	if (TestDB ~= nil) then
+		local function ShowRow(UserData, NumCols, Values, Names)
+			assert(UserData == 'UserData');
+			LOG("New row");
+			for i = 1, NumCols do
+				LOG("  " .. Names[i] .. " = " .. Values[i]);
+			end
+			return 0;
+		end
+		local sql = [=[
+			CREATE TABLE numbers(num1,num2,str);
+			INSERT INTO numbers VALUES(1, 11, "ABC");
+			INSERT INTO numbers VALUES(2, 22, "DEF");
+			INSERT INTO numbers VALUES(3, 33, "UVW");
+			INSERT INTO numbers VALUES(4, 44, "XYZ");
+			SELECT * FROM numbers;
+		]=]
+		local Res = TestDB:exec(sql, ShowRow, 'UserData');
+		if (Res ~= sqlite3.OK) then
+			LOG("TestDB:exec() failed: " .. Res .. " (" .. TestDB:errmsg() .. ")");
+		end;
+		TestDB:close();
+	else
+		-- This happens if for example SQLite cannot open the file (eg. a folder with the same name exists)
+		LOG("SQLite3 failed to open DB! (" .. ErrCode .. ", " .. ErrMsg ..")");
+	end
 
 	return true
 end

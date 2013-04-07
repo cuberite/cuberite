@@ -18,6 +18,16 @@ extern "C"
 
 
 
+// fwd: SQLite/lsqlite3.c
+extern "C"
+{
+	LUALIB_API int luaopen_lsqlite3(lua_State * L);
+}
+
+
+
+
+
 bool report_errors(lua_State * lua, int status)
 {
 	if (status == 0)
@@ -73,6 +83,7 @@ bool cPlugin_NewLua::Initialize(void)
 		luaL_openlibs(m_LuaState);
 		tolua_AllToLua_open(m_LuaState);
 		ManualBindings::Bind(m_LuaState);
+		luaopen_lsqlite3(m_LuaState);
 		
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);

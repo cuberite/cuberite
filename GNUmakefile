@@ -41,7 +41,7 @@ ifeq ($(release),1)
 ################
 CC_OPTIONS = -s -g -O3 -DNDEBUG
 CXX_OPTIONS = -s -g -O3 -DNDEBUG
-LNK_OPTIONS = -lstdc++ -pthread -O3
+LNK_OPTIONS = -lstdc++ -ldl -pthread -O3
 BUILDDIR = build/release/
 
 else
@@ -51,7 +51,7 @@ ifeq ($(profile),1)
 ################
 CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-LNK_OPTIONS = -lstdc++ -pthread -ggdb -O3 -pg
+LNK_OPTIONS = -lstdc++ -ldl -pthread -ggdb -O3 -pg
 BUILDDIR = build/profile/
 
 else
@@ -61,7 +61,7 @@ ifeq ($(pedantic),1)
 ################
 CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-LNK_OPTIONS = -lstdc++ -pthread -ggdb
+LNK_OPTIONS = -lstdc++ -ldl -pthread -ggdb
 BUILDDIR = build/pedantic/
 
 else
@@ -71,7 +71,7 @@ else
 ################
 CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG
-LNK_OPTIONS = -lstdc++ -pthread -g -ggdb
+LNK_OPTIONS = -lstdc++ -ldl -pthread -g -ggdb
 BUILDDIR = build/debug/
 endif
 endif
