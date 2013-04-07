@@ -725,7 +725,9 @@ void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_ENT_TELEPORT);
 	WriteInt    (a_Entity.GetUniqueID());
-	WriteVectorI((Vector3i)(a_Entity.GetPosition() * 32));
+	WriteInt    ((int)(floor(a_Entity.GetPosX() * 32)));
+	WriteInt    ((int)(floor(a_Entity.GetPosY() * 32)));
+	WriteInt    ((int)(floor(a_Entity.GetPosZ() * 32)));
 	WriteByte   ((char)((a_Entity.GetRotation() / 360.f) * 256));
 	WriteByte   ((char)((a_Entity.GetPitch() / 360.f) * 256));
 	Flush();

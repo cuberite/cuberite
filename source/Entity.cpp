@@ -276,14 +276,21 @@ void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
 
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
-	int DiffX = (int)((GetPosX() - m_LastPosX) * 32.0);
-	int DiffY = (int)((GetPosY() - m_LastPosY) * 32.0);
-	int DiffZ = (int)((GetPosZ() - m_LastPosZ) * 32.0);
-	Int64 DiffTeleportPacket = m_World->GetWorldAge() - m_TimeLastTeleportPacket;
-	
-	//Have to process this every two ticks
+	//We need to keep updating the clients when there is movement or if there was a change in speed and after 2 ticks
+	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 2))
+	{
+		m_World->BroadcastEntVelocity(*this,a_Exclude);
+		m_bDirtySpeed = false;
+		m_TimeLastSpeedPacket = m_World->GetWorldAge();
+	}
+
+	//Have to process position related packets this every two ticks
 	if (m_World->GetWorldAge() % 2 == 0)
 	{
+		int DiffX = (int) (floor(GetPosX() * 32.0) - floor(m_LastPosX * 32.0));
+		int DiffY = (int) (floor(GetPosY() * 32.0) - floor(m_LastPosY * 32.0));
+		int DiffZ = (int) (floor(GetPosZ() * 32.0) - floor(m_LastPosZ * 32.0));
+		Int64 DiffTeleportPacket = m_World->GetWorldAge() - m_TimeLastTeleportPacket;
 		// 4 blocks is max Relative So if the Diff is greater than 127 or. Send an absolute position every 20 seconds
 		if (DiffTeleportPacket >= 400 || 
 			((DiffX > 127) || (DiffX < -128) ||
@@ -335,13 +342,6 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			m_World->BroadcastEntHeadLook(*this,a_Exclude);
 			m_bDirtyHead = false;
 		}
-	}
-	//We need to keep updating the clients when there is movement or if there was a change in speed and after 2 ticks
-	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 2))
-	{
-		m_World->BroadcastEntVelocity(*this,a_Exclude);
-		m_bDirtySpeed = false;
-		m_TimeLastSpeedPacket = m_World->GetWorldAge();
 	}
 }
 
