@@ -33,7 +33,11 @@ all: MCServer/MCServer
 # CC_OPTIONS  ... options for the C code compiler
 # CXX_OPTIONS ... options for the C++ code compiler
 # LNK_OPTIONS ... options for the linker
+# LNK_LIBS    ... libraries to link in
+#   -- according to http://stackoverflow.com/questions/6183899/undefined-reference-to-dlopen, libs must come after all sources
 # BUILDDIR    ... folder where the intermediate object files are built
+
+LNK_LIBS = -lstdc++ -ldl
 
 ifeq ($(release),1)
 ################
@@ -41,7 +45,7 @@ ifeq ($(release),1)
 ################
 CC_OPTIONS = -s -g -O3 -DNDEBUG
 CXX_OPTIONS = -s -g -O3 -DNDEBUG
-LNK_OPTIONS = -lstdc++ -ldl -pthread -O3
+LNK_OPTIONS = -pthread -O3
 BUILDDIR = build/release/
 
 else
@@ -51,7 +55,7 @@ ifeq ($(profile),1)
 ################
 CC_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
 CXX_OPTIONS = -s -g -ggdb -O3 -pg -DNDEBUG
-LNK_OPTIONS = -lstdc++ -ldl -pthread -ggdb -O3 -pg
+LNK_OPTIONS = -pthread -ggdb -O3 -pg
 BUILDDIR = build/profile/
 
 else
@@ -61,7 +65,7 @@ ifeq ($(pedantic),1)
 ################
 CC_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
 CXX_OPTIONS = -s -g -ggdb -D_DEBUG -Wall -Wextra -pedantic -ansi -Wno-long-long
-LNK_OPTIONS = -lstdc++ -ldl -pthread -ggdb
+LNK_OPTIONS = -pthread -ggdb
 BUILDDIR = build/pedantic/
 
 else
@@ -71,7 +75,7 @@ else
 ################
 CC_OPTIONS = -s -ggdb -g -D_DEBUG -O3
 CXX_OPTIONS = -s -ggdb -g -D_DEBUG
-LNK_OPTIONS = -lstdc++ -ldl -pthread -g -ggdb
+LNK_OPTIONS = -pthread -g -ggdb
 BUILDDIR = build/debug/
 endif
 endif
@@ -123,7 +127,7 @@ OBJECTS := $(patsubst %.cpp,$(BUILDDIR)%.o,$(OBJECTS))
 -include $(patsubst %.o,%.d,$(OBJECTS))
 
 MCServer/MCServer : $(OBJECTS)
-	$(CC) $(LNK_OPTIONS) $(OBJECTS) -o MCServer/MCServer
+	$(CC) $(LNK_OPTIONS) $(OBJECTS) $(LNK_LIBS) -o MCServer/MCServer
 
 clean : 
 		rm -rf $(BUILDDIR) MCServer/MCServer
