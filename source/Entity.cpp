@@ -36,7 +36,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
 	, m_bDirtySpeed(true)
-	, m_bDestroyed(false)
+	, m_bDestroyed(true)
 	, m_LastPosX( 0.0 )
 	, m_LastPosY( 0.0 )
 	, m_LastPosZ( 0.0 )
@@ -45,7 +45,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_TimeLastSpeedPacket(0)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
-	, m_bRemovedFromChunk(false)
+	, m_bRemovedFromChunk(true)
 	, m_FireDamageInterval(0.f)
 	, m_BurnPeriod(0.f)
 {
@@ -118,6 +118,9 @@ const char * cEntity::GetParentClass(void) const
 
 void cEntity::Initialize(cWorld * a_World)
 {
+	m_bDestroyed = false;
+	m_bRemovedFromChunk = false;
+	
 	m_World = a_World;
 	m_World->AddEntity(this);
 
