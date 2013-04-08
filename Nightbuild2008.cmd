@@ -101,8 +101,25 @@ if errorlevel 1 goto haderror
 
 
 
-:: upload to FTP using the upload_win.ftp (.template) script
-ftp -n -s:Install\upload_win.ftp xoft.cz
+:: upload to the FTP:
+:upload
+if "a%ftppass%" == "a" (
+	echo You need to set FTP password in the ftppass environment variable to upload the files
+	goto end
+)
+if "a%ftpuser%" == "a" (
+	echo You need to set FTP username in the ftpuser environment variable to upload the files
+	goto end
+)
+if "a%ftpsite%" == "a" (
+	echo You need to set FTP server in the ftpsite environment variable to upload the files
+	goto end
+)
+ncftpput -p %ftppass% -u %ftpuser% -T temp_ %ftpsite% / Install\MCServer_Win_%WCREV%.7z
+if errorlevel 1 goto haderror
+ncftpput -p %ftppass% -u %ftpuser% -T temp_ %ftpsite% /PDBs Install\MCServer_Win_%WCREV%_PDBs.7z
+if errorlevel 1 goto haderror
+echo Upload finished.
 
 
 
