@@ -1,7 +1,0 @@
-user Username
-Password
-binary
-put ..\MCServer_Win_$WCREV$.7z
-cd PDBs
-put ..\MCServer_Win_$WCREV$_PDBs.7z
-quit
