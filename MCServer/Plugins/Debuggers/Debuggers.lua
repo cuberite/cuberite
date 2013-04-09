@@ -69,6 +69,8 @@ function Initialize(Plugin)
 			BA1:Merge(BA2, 1, 10, 1, cBlockArea.msImprint);
 			BA1:SaveToSchematicFile("schematics/merge.schematic");
 		end
+	else
+		BA1:Create(16, 16, 16);
 	end
 	
 	-- Debug block area cuboid filling:
@@ -165,6 +167,31 @@ function Initialize(Plugin)
 		-- This happens if for example SQLite cannot open the file (eg. a folder with the same name exists)
 		LOG("SQLite3 failed to open DB! (" .. ErrCode .. ", " .. ErrMsg ..")");
 	end
+
+
+	-- Debug LuaExpat binding:
+	local count = 0
+	callbacks = {
+	    StartElement = function (parser, name)
+	        LOG("+ " .. string.rep(" ", count) .. name);
+	        count = count + 1;
+	    end,
+	    EndElement = function (parser, name)
+	        count = count - 1;
+	        LOG("- " .. string.rep(" ", count) .. name);
+	    end
+	}
+
+	local p = lxp.new(callbacks);
+	p:parse("<elem1>\nnext line\nanother line");
+	p:parse("text\n");
+	p:parse("<elem2/>\n");
+	p:parse("more text");
+	p:parse("</elem1>");
+	p:parse("\n");
+	p:parse()  -- finishes the document
+	p:close()  -- closes the parser
+
 
 	return true
 end

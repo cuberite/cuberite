@@ -9,6 +9,7 @@ MCServer*debug.cmd
 banned.example.ini
 groups.example.ini
 Lua-LICENSE.txt
+LuaExpat-license.html
 LuaSQLite3-LICENSE.txt
 MersenneTwister-LICENSE.txt
 settings.example.ini

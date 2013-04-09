@@ -24,6 +24,12 @@ extern "C"
 	LUALIB_API int luaopen_lsqlite3(lua_State * L);
 }
 
+// fwd: LuaExpat/lxplib.c:
+extern "C"
+{
+	int luaopen_lxp(lua_State * L);
+}
+
 
 
 
@@ -84,6 +90,7 @@ bool cPlugin_NewLua::Initialize(void)
 		tolua_AllToLua_open(m_LuaState);
 		ManualBindings::Bind(m_LuaState);
 		luaopen_lsqlite3(m_LuaState);
+		luaopen_lxp(m_LuaState);
 		
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);

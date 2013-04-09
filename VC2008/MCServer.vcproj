@@ -42,8 +42,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;.."
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -120,7 +120,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;.."
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -198,7 +198,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;.."
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -2260,6 +2260,42 @@
 				</File>
 				<File
 					RelativePath="..\source\sqlite\urls.txt"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="LuaExpat"
+				>
+				<File
+					RelativePath="..\source\LuaExpat\lxplib.c"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release profiled|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							UsePrecompiledHeader="0"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\source\LuaExpat\lxplib.h"
 					>
 				</File>
 			</Filter>
