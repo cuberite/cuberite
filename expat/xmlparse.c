@@ -8,6 +8,9 @@
 
 #define XML_BUILDING_EXPAT 1
 
+// 2013_04_09 _X: Quick and dirty "fix" for expat compilation under Linux:
+#define HAVE_MEMMOVE
+
 #ifdef COMPILED_FROM_DSP
 #include "winconfig.h"
 #elif defined(MACOS_CLASSIC)
