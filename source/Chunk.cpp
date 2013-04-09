@@ -831,6 +831,10 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 	// Is it in this chunk?
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
+		if (!IsValid())
+		{
+			return false;
+		}
 		int BlockIdx = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY, a_RelZ);
 		a_BlockType = GetBlock(BlockIdx);
 		a_BlockMeta = GetMeta(BlockIdx);
@@ -879,6 +883,10 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 	// Is it in this chunk?
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
+		if (!IsValid())
+		{
+			return false;
+		}
 		SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 		return true;
 	}
@@ -925,6 +933,10 @@ bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 	// Is it in this chunk?	
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
+		if (!IsValid())
+		{
+			return false;
+		}
 		FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 		return true;
 	}
