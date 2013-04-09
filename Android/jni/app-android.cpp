@@ -105,7 +105,7 @@ extern "C" void Java_com_mcserver_MCServerActivity_NativeCleanUp( JNIEnv*  env, 
 	__android_log_print(ANDROID_LOG_ERROR,"MCServer", "pRoot: %p", pRoot);
 	if( pRoot != NULL )
 	{
-		pRoot->ServerCommand("stop");
+		pRoot->ExecuteConsoleCommand("stop");
 	}
 }
 
