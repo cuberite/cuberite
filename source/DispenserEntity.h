@@ -3,7 +3,7 @@
 
 #include "BlockEntity.h"
 #include "UI/WindowOwner.h"
-#include "Item.h"
+#include "ItemGrid.h"
 
 
 
@@ -28,7 +28,7 @@ class cDispenserEntity :
 public:
 	cDispenserEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cDispenserEntity();
-	virtual void Destroy();
+	virtual void Destroy(void);
 
 	bool LoadFromJson(const Json::Value & a_Value);
 	
@@ -38,17 +38,21 @@ public:
 	virtual bool Tick(float a_Dt) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 	
-	const cItem * GetSlot(int i) const { return &(m_Items[i]); }
+	const cItem & GetSlot(int a_SlotNum) const { return m_Contents.GetSlot(a_SlotNum); }
 	
-	void SetSlot(int a_Slot, const cItem & a_Item);
+	void SetSlot(int a_SlotNum, const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
 
-	void Activate();
+	/// Sets the dispenser to dispense an item in the next tick
+	void Activate(void);
+	
+	const cItemGrid & GetContents(void) const { return m_Contents; }
+	cItemGrid & GetContents(void) { return m_Contents; }
 	
 private:
-	cItem * m_Items;
-	bool m_CanDispense;
+	cItemGrid m_Contents;
+	bool      m_ShouldDispense;  ///< If true, the dispenser will dispense an item in the next tick
 
-	void Dispense();
+	void Dispense(void);
 };
 
 

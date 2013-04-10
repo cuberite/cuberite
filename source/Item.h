@@ -27,12 +27,14 @@ public:
 		}
 	}
 	
-	void Empty()
+	
+	void Empty(void)
 	{
 		m_ItemType = E_ITEM_EMPTY;
 		m_ItemCount = 0;
 		m_ItemDamage = 0;
 	}
+	
 	
 	void Clear(void)
 	{
@@ -41,21 +43,28 @@ public:
 		m_ItemDamage = 0;
 	}
 	
+	
 	bool IsEmpty(void) const
 	{
-		return (m_ItemType <= 0 || m_ItemCount <= 0);
+		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
 	}
+	
 	
 	bool IsEqual(const cItem & a_Item) const
 	{
 		return (IsSameType(a_Item) && (m_ItemDamage == a_Item.m_ItemDamage));
 	}
 	
+	
 	bool IsSameType(const cItem & a_Item) const
 	{
 		return (m_ItemType == a_Item.m_ItemType) || (IsEmpty() && a_Item.IsEmpty());
 	}
+	
 
+	/// Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items
+	cItem CopyOne(void) const;
+	
 	// TODO Sorry for writing the functions in the header. But somehow it doesn´t worked when I put them into the cpp File :s
 
 	inline int GetMaxDuration(void) const

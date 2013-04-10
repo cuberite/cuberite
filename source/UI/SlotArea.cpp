@@ -493,7 +493,7 @@ void cSlotAreaDispenser::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRig
 
 const cItem * cSlotAreaDispenser::GetSlot(int a_SlotNum, cPlayer & a_Player)
 {
-	return m_Dispenser->GetSlot(a_SlotNum);
+	return &(m_Dispenser->GetSlot(a_SlotNum));
 }
 
 

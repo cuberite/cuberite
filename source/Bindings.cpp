@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 04/10/13 23:01:46.
+** Generated automatically by tolua++-1.0.92 on 04/10/13 23:35:42.
 */
 
 #ifndef __cplusplus
@@ -13064,6 +13064,48 @@ static int tolua_AllToLua_cItem_IsSameType00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: CopyOne of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_CopyOne00
+static int tolua_AllToLua_cItem_CopyOne00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cItem* self = (const cItem*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CopyOne'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->CopyOne();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CopyOne'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetMaxDuration of class  cItem */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_GetMaxDuration00
 static int tolua_AllToLua_cItem_GetMaxDuration00(lua_State* tolua_S)
@@ -24769,6 +24811,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cItem_IsEmpty00);
    tolua_function(tolua_S,"IsEqual",tolua_AllToLua_cItem_IsEqual00);
    tolua_function(tolua_S,"IsSameType",tolua_AllToLua_cItem_IsSameType00);
+   tolua_function(tolua_S,"CopyOne",tolua_AllToLua_cItem_CopyOne00);
    tolua_function(tolua_S,"GetMaxDuration",tolua_AllToLua_cItem_GetMaxDuration00);
    tolua_function(tolua_S,"DamageItem",tolua_AllToLua_cItem_DamageItem00);
    tolua_function(tolua_S,"HasDuration",tolua_AllToLua_cItem_HasDuration00);

@@ -123,15 +123,7 @@ void cNBTChunkSerializer::AddDispenserEntity(cDispenserEntity * a_Entity)
 	m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_Entity, "Trap");
 		m_Writer.BeginList("Items", TAG_Compound);
-			for (int i = 0; i < 9; i++)
-			{
-				const cItem * Item = a_Entity->GetSlot(i);
-				if ((Item == NULL) || Item->IsEmpty())
-				{
-					continue;
-				}
-				AddItem(*Item, i);
-			}  // for i - contents[]
+			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
 	m_Writer.EndCompound();
 }

@@ -8,6 +8,17 @@
 
 
 
+cItem cItem::CopyOne(void) const
+{
+	cItem res(*this);
+	res.m_ItemCount = 1;
+	return res;
+}
+
+
+
+
+
 bool cItem::IsStackableWith(const cItem & a_OtherStack)
 {
 	if (a_OtherStack.m_ItemType != m_ItemType)
