@@ -83,6 +83,16 @@ endif
 
 
 
+################
+# 32-bit build override in 64-bit build environments
+#   - so that BearBin doesn't need to modify his makefile after each makefile change :)
+################
+ifeq ($(addm32),1)
+CC_OPTIONS += -m32
+CXX_OPTIONS += -m32
+LNK_OPTIONS += -m32
+endif
+
 
 
 ###################################################
