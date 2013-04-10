@@ -41,8 +41,8 @@ public:
 	static const char * GetClassStatic() { return "cChestEntity"; }
 
 	// tolua_begin
-	const cItem & GetSlot(int a_Slot) const { return m_Contents.GetItem(a_Slot); }
-	void          SetSlot(int a_Slot, const cItem & a_Item ) { m_Contents.SetItem(a_Slot, a_Item); }
+	const cItem & GetSlot(int a_Slot) const { return m_Contents.GetSlot(a_Slot); }
+	void          SetSlot(int a_Slot, const cItem & a_Item ) { m_Contents.SetSlot(a_Slot, a_Item); }
 	// tolua_end
 	
 	bool LoadFromJson( const Json::Value& a_Value );

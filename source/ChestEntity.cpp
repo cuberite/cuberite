@@ -100,10 +100,10 @@ void cChestEntity::SaveToJson(Json::Value & a_Value)
 	a_Value["z"] = m_PosZ;
 
 	Json::Value AllSlots;
-	for (int i = m_Contents.GetNumSlots(); i >= 0; i--)
+	for (int i = m_Contents.GetNumSlots() - 1; i >= 0; i--)
 	{
 		Json::Value Slot;
-		m_Contents.GetItem(i).GetJson(Slot);
+		m_Contents.GetSlot(i).GetJson(Slot);
 		AllSlots.append(Slot);
 	}
 	a_Value["Slots"] = AllSlots;

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 04/10/13 21:35:56.
+** Generated automatically by tolua++-1.0.92 on 04/10/13 23:01:46.
 */
 
 #ifndef __cplusplus
@@ -13710,9 +13710,9 @@ static int tolua_AllToLua_cItemGrid_GetSlotNum00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetItem00
-static int tolua_AllToLua_cItemGrid_GetItem00(lua_State* tolua_S)
+/* method: GetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetSlot00
+static int tolua_AllToLua_cItemGrid_GetSlot00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -13730,25 +13730,25 @@ static int tolua_AllToLua_cItemGrid_GetItem00(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSlot'", NULL);
 #endif
   {
-   const cItem& tolua_ret = (const cItem&)  self->GetItem(a_X,a_Y);
+   const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_X,a_Y);
     tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetItem'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetSlot'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetItem01
-static int tolua_AllToLua_cItemGrid_GetItem01(lua_State* tolua_S)
+/* method: GetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetSlot01
+static int tolua_AllToLua_cItemGrid_GetSlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -13764,22 +13764,22 @@ static int tolua_AllToLua_cItemGrid_GetItem01(lua_State* tolua_S)
   int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSlot'", NULL);
 #endif
   {
-   cItem& tolua_ret = (cItem&)  self->GetItem(a_X,a_Y);
+   cItem& tolua_ret = (cItem&)  self->GetSlot(a_X,a_Y);
     tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
   }
  }
  return 1;
 tolua_lerror:
- return tolua_AllToLua_cItemGrid_GetItem00(tolua_S);
+ return tolua_AllToLua_cItemGrid_GetSlot00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetItem02
-static int tolua_AllToLua_cItemGrid_GetItem02(lua_State* tolua_S)
+/* method: GetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetSlot02
+static int tolua_AllToLua_cItemGrid_GetSlot02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -13793,22 +13793,22 @@ static int tolua_AllToLua_cItemGrid_GetItem02(lua_State* tolua_S)
   const cItemGrid* self = (const cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSlot'", NULL);
 #endif
   {
-   const cItem& tolua_ret = (const cItem&)  self->GetItem(a_SlotNum);
+   const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_SlotNum);
     tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
 tolua_lerror:
- return tolua_AllToLua_cItemGrid_GetItem01(tolua_S);
+ return tolua_AllToLua_cItemGrid_GetSlot01(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetItem03
-static int tolua_AllToLua_cItemGrid_GetItem03(lua_State* tolua_S)
+/* method: GetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_GetSlot03
+static int tolua_AllToLua_cItemGrid_GetSlot03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -13822,22 +13822,22 @@ static int tolua_AllToLua_cItemGrid_GetItem03(lua_State* tolua_S)
   cItemGrid* self = (cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSlot'", NULL);
 #endif
   {
-   cItem& tolua_ret = (cItem&)  self->GetItem(a_SlotNum);
+   cItem& tolua_ret = (cItem&)  self->GetSlot(a_SlotNum);
     tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
   }
  }
  return 1;
 tolua_lerror:
- return tolua_AllToLua_cItemGrid_GetItem02(tolua_S);
+ return tolua_AllToLua_cItemGrid_GetSlot02(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetItem00
-static int tolua_AllToLua_cItemGrid_SetItem00(lua_State* tolua_S)
+/* method: SetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetSlot00
+static int tolua_AllToLua_cItemGrid_SetSlot00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -13857,24 +13857,24 @@ static int tolua_AllToLua_cItemGrid_SetItem00(lua_State* tolua_S)
   int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
   const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
 #endif
   {
-   self->SetItem(a_X,a_Y,*a_Item);
+   self->SetSlot(a_X,a_Y,*a_Item);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetItem'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'SetSlot'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetItem01
-static int tolua_AllToLua_cItemGrid_SetItem01(lua_State* tolua_S)
+/* method: SetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetSlot01
+static int tolua_AllToLua_cItemGrid_SetSlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -13896,21 +13896,21 @@ static int tolua_AllToLua_cItemGrid_SetItem01(lua_State* tolua_S)
   char a_ItemCount = ((char)  tolua_tonumber(tolua_S,5,0));
   short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,6,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
 #endif
   {
-   self->SetItem(a_X,a_Y,a_ItemType,a_ItemCount,a_ItemDamage);
+   self->SetSlot(a_X,a_Y,a_ItemType,a_ItemCount,a_ItemDamage);
   }
  }
  return 0;
 tolua_lerror:
- return tolua_AllToLua_cItemGrid_SetItem00(tolua_S);
+ return tolua_AllToLua_cItemGrid_SetSlot00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetItem02
-static int tolua_AllToLua_cItemGrid_SetItem02(lua_State* tolua_S)
+/* method: SetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetSlot02
+static int tolua_AllToLua_cItemGrid_SetSlot02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -13926,21 +13926,21 @@ static int tolua_AllToLua_cItemGrid_SetItem02(lua_State* tolua_S)
   int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
   const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
 #endif
   {
-   self->SetItem(a_SlotNum,*a_Item);
+   self->SetSlot(a_SlotNum,*a_Item);
   }
  }
  return 0;
 tolua_lerror:
- return tolua_AllToLua_cItemGrid_SetItem01(tolua_S);
+ return tolua_AllToLua_cItemGrid_SetSlot01(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetItem of class  cItemGrid */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetItem03
-static int tolua_AllToLua_cItemGrid_SetItem03(lua_State* tolua_S)
+/* method: SetSlot of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_SetSlot03
+static int tolua_AllToLua_cItemGrid_SetSlot03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
@@ -13960,15 +13960,15 @@ static int tolua_AllToLua_cItemGrid_SetItem03(lua_State* tolua_S)
   char a_ItemCount = ((char)  tolua_tonumber(tolua_S,4,0));
   short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,5,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
 #endif
   {
-   self->SetItem(a_SlotNum,a_ItemType,a_ItemCount,a_ItemDamage);
+   self->SetSlot(a_SlotNum,a_ItemType,a_ItemCount,a_ItemDamage);
   }
  }
  return 0;
 tolua_lerror:
- return tolua_AllToLua_cItemGrid_SetItem02(tolua_S);
+ return tolua_AllToLua_cItemGrid_SetSlot02(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -24795,14 +24795,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cItemGrid_GetHeight00);
    tolua_function(tolua_S,"GetNumSlots",tolua_AllToLua_cItemGrid_GetNumSlots00);
    tolua_function(tolua_S,"GetSlotNum",tolua_AllToLua_cItemGrid_GetSlotNum00);
-   tolua_function(tolua_S,"GetItem",tolua_AllToLua_cItemGrid_GetItem00);
-   tolua_function(tolua_S,"GetItem",tolua_AllToLua_cItemGrid_GetItem01);
-   tolua_function(tolua_S,"GetItem",tolua_AllToLua_cItemGrid_GetItem02);
-   tolua_function(tolua_S,"GetItem",tolua_AllToLua_cItemGrid_GetItem03);
-   tolua_function(tolua_S,"SetItem",tolua_AllToLua_cItemGrid_SetItem00);
-   tolua_function(tolua_S,"SetItem",tolua_AllToLua_cItemGrid_SetItem01);
-   tolua_function(tolua_S,"SetItem",tolua_AllToLua_cItemGrid_SetItem02);
-   tolua_function(tolua_S,"SetItem",tolua_AllToLua_cItemGrid_SetItem03);
+   tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cItemGrid_GetSlot00);
+   tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cItemGrid_GetSlot01);
+   tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cItemGrid_GetSlot02);
+   tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cItemGrid_GetSlot03);
+   tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cItemGrid_SetSlot00);
+   tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cItemGrid_SetSlot01);
+   tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cItemGrid_SetSlot02);
+   tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cItemGrid_SetSlot03);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cItemGrid_Clear00);
    tolua_function(tolua_S,"HowManyCanFit",tolua_AllToLua_cItemGrid_HowManyCanFit00);
    tolua_function(tolua_S,"AddItem",tolua_AllToLua_cItemGrid_AddItem00);

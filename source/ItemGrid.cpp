@@ -16,7 +16,7 @@ cItemGrid::cItemGrid(int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
 	m_NumSlots(a_Width * a_Height),
-	m_Items(new cItem[a_Width * a_Height])
+	m_Slots(new cItem[a_Width * a_Height])
 {
 }
 
@@ -26,7 +26,7 @@ cItemGrid::cItemGrid(int a_Width, int a_Height) :
 
 cItemGrid::~cItemGrid()
 {
-	delete[] m_Items;
+	delete[] m_Slots;
 }
 
 
@@ -71,75 +71,75 @@ void cItemGrid::GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const
 
 
 
-const cItem & cItemGrid::GetItem(int a_X, int a_Y) const
+const cItem & cItemGrid::GetSlot(int a_X, int a_Y) const
 {
-	return GetItem(GetSlotNum(a_X, a_Y));
+	return GetSlot(GetSlotNum(a_X, a_Y));
 }
 
 
 
 
 
-cItem & cItemGrid::GetItem(int a_X, int a_Y)
+cItem & cItemGrid::GetSlot(int a_X, int a_Y)
 {
-	return GetItem(GetSlotNum(a_X, a_Y));
+	return GetSlot(GetSlotNum(a_X, a_Y));
 }
 
 
 
 
 
-const cItem & cItemGrid::GetItem(int a_SlotNum) const
-{
-	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
-	{
-		LOGWARNING("%s: Invalid slot number, %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_NumSlots
-		);
-		return m_Items[0];
-	}
-	return m_Items[a_SlotNum];
-}
-
-
-
-
-
-cItem & cItemGrid::GetItem(int a_SlotNum)
+const cItem & cItemGrid::GetSlot(int a_SlotNum) const
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
 	{
 		LOGWARNING("%s: Invalid slot number, %d out of %d slots",
 			__FUNCTION__, a_SlotNum, m_NumSlots
 		);
-		return m_Items[0];
+		return m_Slots[0];
 	}
-	return m_Items[a_SlotNum];
+	return m_Slots[a_SlotNum];
 }
 
 
 
 
 
-void cItemGrid::SetItem(int a_X, int a_Y, const cItem & a_Item)
+cItem & cItemGrid::GetSlot(int a_SlotNum)
 {
-	SetItem(GetSlotNum(a_X, a_Y), a_Item);
+	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
+	{
+		LOGWARNING("%s: Invalid slot number, %d out of %d slots",
+			__FUNCTION__, a_SlotNum, m_NumSlots
+		);
+		return m_Slots[0];
+	}
+	return m_Slots[a_SlotNum];
 }
 
 
 
 
 
-void cItemGrid::SetItem(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItemGrid::SetSlot(int a_X, int a_Y, const cItem & a_Item)
 {
-	SetItem(GetSlotNum(a_X, a_Y), cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+	SetSlot(GetSlotNum(a_X, a_Y), a_Item);
 }
 
 
 
 
 
-void cItemGrid::SetItem(int a_SlotNum, const cItem & a_Item)
+void cItemGrid::SetSlot(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+{
+	SetSlot(GetSlotNum(a_X, a_Y), cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+}
+
+
+
+
+
+void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
 	{
@@ -148,16 +148,16 @@ void cItemGrid::SetItem(int a_SlotNum, const cItem & a_Item)
 		);
 		return;
 	}
-	m_Items[a_SlotNum] = a_Item;
+	m_Slots[a_SlotNum] = a_Item;
 }
 
 
 
 
 
-void cItemGrid::SetItem(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItemGrid::SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage)
 {
-	SetItem(a_SlotNum, cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+	SetSlot(a_SlotNum, cItem(a_ItemType, a_ItemCount, a_ItemDamage));
 }
 
 
@@ -168,7 +168,7 @@ void cItemGrid::Clear(void)
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
-		m_Items[i].Empty();
+		m_Slots[i].Empty();
 	}
 }
 
@@ -182,20 +182,20 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack)
 	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
-		if (m_Items[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
 			NumLeft -= MaxStack;
 		}
-		else if (m_Items[i].IsStackableWith(a_ItemStack))
+		else if (m_Slots[i].IsStackableWith(a_ItemStack))
 		{
-			NumLeft -= MaxStack - m_Items[i].m_ItemCount;
+			NumLeft -= MaxStack - m_Slots[i].m_ItemCount;
 		}
 		if (NumLeft <= 0)
 		{
 			// All items fit
 			return a_ItemStack.m_ItemCount;
 		}
-	}  // for i - m_Items[]
+	}  // for i - m_Slots[]
 	return a_ItemStack.m_ItemCount - NumLeft;
 }
 
@@ -209,24 +209,24 @@ bool cItemGrid::AddItem(cItem & a_ItemStack)
 	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
-		if (m_Items[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
-			m_Items[i] = a_ItemStack;
-			m_Items[i].m_ItemCount = std::min(MaxStack, NumLeft);
-			NumLeft -= m_Items[i].m_ItemCount;
+			m_Slots[i] = a_ItemStack;
+			m_Slots[i].m_ItemCount = std::min(MaxStack, NumLeft);
+			NumLeft -= m_Slots[i].m_ItemCount;
 		}
-		else if (m_Items[i].IsStackableWith(a_ItemStack))
+		else if (m_Slots[i].IsStackableWith(a_ItemStack))
 		{
-			int PrevCount = m_Items[i].m_ItemCount;
-			m_Items[i].m_ItemCount = std::min(MaxStack, PrevCount + NumLeft);
-			NumLeft -= m_Items[i].m_ItemCount - PrevCount;
+			int PrevCount = m_Slots[i].m_ItemCount;
+			m_Slots[i].m_ItemCount = std::min(MaxStack, PrevCount + NumLeft);
+			NumLeft -= m_Slots[i].m_ItemCount - PrevCount;
 		}
 		if (NumLeft <= 0)
 		{
 			// All items fit
 			return true;
 		}
-	}  // for i - m_Items[]
+	}  // for i - m_Slots[]
 	return (a_ItemStack.m_ItemCount > NumLeft);
 }
 
@@ -269,7 +269,7 @@ int cItemGrid::GetLastEmptySlot(void) const
 {
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
-		if (m_Items[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
 			return i;
 		}
@@ -285,7 +285,7 @@ int cItemGrid::GetNextEmptySlot(int a_StartFrom) const
 {
 	for (int i = a_StartFrom + 1; i < m_NumSlots; i++)
 	{
-		if (m_Items[i].IsEmpty())
+		if (m_Slots[i].IsEmpty())
 		{
 			return i;
 		}
@@ -301,11 +301,11 @@ void cItemGrid::CopyToItems(cItems & a_Items) const
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
-		if (!m_Items[i].IsEmpty())
+		if (!m_Slots[i].IsEmpty())
 		{
-			a_Items.push_back(m_Items[i]);
+			a_Items.push_back(m_Slots[i]);
 		}
-	}  // for i - m_Items[]
+	}  // for i - m_Slots[]
 }
 
 
@@ -340,7 +340,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, i
 				break;
 			}
 		}  // for j - a_LootProbabs[]
-		SetItem(Rnd % m_NumSlots, CurrentLoot);
+		SetSlot(Rnd % m_NumSlots, CurrentLoot);
 	}  // for i - NumSlots
 }
 

@@ -79,7 +79,7 @@ void cNBTChunkSerializer::AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotN
 	int NumSlots = a_Grid.GetNumSlots();
 	for (int i = 0; i < NumSlots; i++)
 	{
-		const cItem & Item = a_Grid.GetItem(i);
+		const cItem & Item = a_Grid.GetSlot(i);
 		if (Item.IsEmpty())
 		{
 			continue;

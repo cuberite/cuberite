@@ -36,17 +36,17 @@ public:
 	void GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const;
 	// tolua_begin
 	
-	// Retrieve items by coords or slot number; Logs warning and returns the first item on invalid coords / slotnum
-	const cItem & GetItem(int a_X, int a_Y) const;
-	cItem &       GetItem(int a_X, int a_Y);
-	const cItem & GetItem(int a_SlotNum) const;
-	cItem &       GetItem(int a_SlotNum);
+	// Retrieve slots by coords or slot number; Logs warning and returns the first slot on invalid coords / slotnum
+	const cItem & GetSlot(int a_X, int a_Y) const;
+	cItem &       GetSlot(int a_X, int a_Y);
+	const cItem & GetSlot(int a_SlotNum) const;
+	cItem &       GetSlot(int a_SlotNum);
 	
-	// Set item by coords or slot number; Logs warning and doesn't set on invalid coords / slotnum
-	void SetItem(int a_X, int a_Y, const cItem & a_Item);
-	void SetItem(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage);
-	void SetItem(int a_SlotNum, const cItem & a_Item);
-	void SetItem(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	// Set slot by coords or slot number; Logs warning and doesn't set on invalid coords / slotnum
+	void SetSlot(int a_X, int a_Y, const cItem & a_Item);
+	void SetSlot(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void SetSlot(int a_SlotNum, const cItem & a_Item);
+	void SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage);
 	
 	/// Sets all items as empty
 	void Clear(void);
@@ -86,7 +86,7 @@ protected:
 	int     m_Width;
 	int     m_Height;
 	int     m_NumSlots;  // m_Width * m_Height, for easier validity checking in the access functions
-	cItem * m_Items;  // x + m_Width * y
+	cItem * m_Slots;  // x + m_Width * y
 } ;
 // tolua_end
 
