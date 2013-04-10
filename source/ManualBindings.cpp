@@ -1111,18 +1111,20 @@ static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 		goto tolua_lerror;
 	}
 
-	const cItemGrid * self = (const cItemGrid *)tolua_tousertype(L, 1, 0);
-	int SlotNum = (int)tolua_tonumber(L, 2, 0);
-	if (self == NULL)
 	{
-		tolua_error(L, "invalid 'self' in function 'cItemGrid:GetSlotCoords'", NULL);
-		return 0;
+		const cItemGrid * self = (const cItemGrid *)tolua_tousertype(L, 1, 0);
+		int SlotNum = (int)tolua_tonumber(L, 2, 0);
+		if (self == NULL)
+		{
+			tolua_error(L, "invalid 'self' in function 'cItemGrid:GetSlotCoords'", NULL);
+			return 0;
+		}
+		int X, Y;
+		self->GetSlotCoords(SlotNum, X, Y);
+		tolua_pushnumber(L, (lua_Number)X);
+		tolua_pushnumber(L, (lua_Number)Y);
+		return 2;
 	}
-	int X, Y;
-	self->GetSlotCoords(SlotNum, X, Y);
-	tolua_pushnumber(L, (lua_Number)X);
-	tolua_pushnumber(L, (lua_Number)Y);
-	return 2;
 	
 tolua_lerror:
 	tolua_error(L, "#ferror in function 'FindKey'.", &tolua_err);
