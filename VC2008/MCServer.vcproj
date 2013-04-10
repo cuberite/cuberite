@@ -457,6 +457,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\ItemGrid.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\ItemGrid.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\LeakFinder.cpp"
 				>
 				<FileConfiguration

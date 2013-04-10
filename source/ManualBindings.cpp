@@ -968,6 +968,10 @@ static int copy_lua_values(lua_State * a_Source, lua_State * a_Destination, int 
 	return 1;
 }
 
+
+
+
+
 static int tolua_cPlugin_Call(lua_State* tolua_S)
 {
 	cPlugin_NewLua * self = (cPlugin_NewLua *) tolua_tousertype(tolua_S, 1, 0);
@@ -1095,6 +1099,40 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 
 
 
+static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
+{
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype(L, 1, "const cItemGrid", 0, &tolua_err) ||
+		!tolua_isnumber  (L, 2, 0, &tolua_err) ||
+		!tolua_isnoobj   (L, 3, &tolua_err)
+	)
+	{
+		goto tolua_lerror;
+	}
+
+	const cItemGrid * self = (const cItemGrid *)tolua_tousertype(L, 1, 0);
+	int SlotNum = (int)tolua_tonumber(L, 2, 0);
+	if (self == NULL)
+	{
+		tolua_error(L, "invalid 'self' in function 'cItemGrid:GetSlotCoords'", NULL);
+		return 0;
+	}
+	int X, Y;
+	self->GetSlotCoords(SlotNum, X, Y);
+	tolua_pushnumber(L, (lua_Number)X);
+	tolua_pushnumber(L, (lua_Number)Y);
+	return 2;
+	
+tolua_lerror:
+	tolua_error(L, "#ferror in function 'FindKey'.", &tolua_err);
+	return 0;
+}
+
+
+
+
+
 void ManualBindings::Bind( lua_State* tolua_S )
 {
 	tolua_beginmodule(tolua_S,NULL);
@@ -1156,6 +1194,10 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_beginmodule(tolua_S, "cClientHandle");
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cItemGrid");
+			tolua_function(tolua_S, "GetSlotCoords", Lua_ItemGrid_GetSlotCoords);
 		tolua_endmodule(tolua_S);
 
 		tolua_function(tolua_S, "md5", tolua_md5);

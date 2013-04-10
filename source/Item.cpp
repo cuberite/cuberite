@@ -8,6 +8,21 @@
 
 
 
+bool cItem::IsStackableWith(const cItem & a_OtherStack)
+{
+	if (a_OtherStack.m_ItemType != m_ItemType)
+	{
+		return false;
+	}
+	
+	// TODO: match enchantments etc.
+	return true;
+}
+
+
+
+
+
 void cItem::GetJson( Json::Value & a_OutValue ) const
 {
 	a_OutValue["ID"] = m_ItemType;

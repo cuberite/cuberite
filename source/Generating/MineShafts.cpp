@@ -798,7 +798,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(x, z);
-		ChestEntity->GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
 		a_ChunkDesc.AddBlockEntity(ChestEntity);
 	}
 }

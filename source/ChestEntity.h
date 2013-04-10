@@ -3,6 +3,7 @@
 
 #include "BlockEntity.h"
 #include "UI/WindowOwner.h"
+#include "ItemGrid.h"
 
 
 
@@ -15,8 +16,6 @@ namespace Json
 
 class cClientHandle;
 class cServer;
-class cItem;
-class cLootProbab;
 class cNBTData;
 
 
@@ -41,14 +40,11 @@ public:
 
 	static const char * GetClassStatic() { return "cChestEntity"; }
 
-	const cItem * GetSlot(int a_Slot) const;                   // tolua_export
-	void          SetSlot(int a_Slot, const cItem & a_Item );  // tolua_export
+	// tolua_begin
+	const cItem & GetSlot(int a_Slot) const { return m_Contents.GetItem(a_Slot); }
+	void          SetSlot(int a_Slot, const cItem & a_Item ) { m_Contents.SetItem(a_Slot, a_Item); }
+	// tolua_end
 	
-	/** Generates random loot from the specified loot probability table, with a chance of enchanted books added.
-	A total of a_NumSlots are taken by the loot
-	*/
-	void GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, int a_CountLootProbabs, int a_NumSlots, int a_Seed);
-
 	bool LoadFromJson( const Json::Value& a_Value );
 	
 	// cBlockEntity overrides:
@@ -59,14 +55,16 @@ public:
 	/// Opens a new chest window for this chests. Scans for neighbors to open a double chest window, if appropriate.
 	void OpenNewWindow(void);
 
-	cItem * GetContents(void) { return m_Content; }
+	const cItemGrid & GetContents(void) const { return m_Contents; }
+	
+	cItemGrid & GetContents(void) { return m_Contents; }  // tolua_export
 
 	static const int c_ChestWidth = 9;
 	static const int c_ChestHeight = 3;
 	
 private:
 
-	cItem m_Content[c_ChestWidth * c_ChestHeight];  // TODO: replace this by a generic ItemGridHolder
+	cItemGrid m_Contents;
 } ;  // tolua_export
 
 

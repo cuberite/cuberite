@@ -11,7 +11,7 @@
 #include "../SignEntity.h"
 #include "../NoteEntity.h"
 #include "../JukeboxEntity.h"
-#include "../Item.h"
+#include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "../Entity.h"
 #include "../OSSupport/MakeDir.h"
@@ -74,6 +74,24 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 
 
 
+void cNBTChunkSerializer::AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum)
+{
+	int NumSlots = a_Grid.GetNumSlots();
+	for (int i = 0; i < NumSlots; i++)
+	{
+		const cItem & Item = a_Grid.GetItem(i);
+		if (Item.IsEmpty())
+		{
+			continue;
+		}
+		AddItem(Item, i + a_BeginSlotNum);
+	}  // for i - chest slots[]
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID)
 {
 	m_Writer.AddInt   ("x",  a_Entity->GetPosX());
@@ -91,15 +109,7 @@ void cNBTChunkSerializer::AddChestEntity(cChestEntity * a_Entity)
 	m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_Entity, "Chest");
 		m_Writer.BeginList("Items", TAG_Compound);
-			for (int i = 0; i < cChestEntity::c_ChestHeight * cChestEntity::c_ChestWidth; i++)
-			{
-				const cItem * Item = a_Entity->GetSlot(i);
-				if ((Item == NULL) || Item->IsEmpty())
-				{
-					continue;
-				}
-				AddItem(*Item, i);
-			}  // for i - chest slots[]
+			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
 	m_Writer.EndCompound();
 }

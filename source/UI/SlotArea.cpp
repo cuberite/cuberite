@@ -224,7 +224,7 @@ cSlotAreaChest::cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow)
 const cItem * cSlotAreaChest::GetSlot(int a_SlotNum, cPlayer & a_Player)
 {
 	// a_SlotNum ranges from 0 to 26, use that to index the chest entity's inventory directly:
-	return m_Chest->GetSlot(a_SlotNum);
+	return &(m_Chest->GetSlot(a_SlotNum));
 }
 
 
@@ -259,11 +259,11 @@ const cItem * cSlotAreaDoubleChest::GetSlot(int a_SlotNum, cPlayer & a_Player)
 	// a_SlotNum ranges from 0 to 53, use that to index the correct chest's inventory:
 	if (a_SlotNum < 27)
 	{
-		return m_TopChest->GetSlot(a_SlotNum);
+		return &(m_TopChest->GetSlot(a_SlotNum));
 	}
 	else
 	{
-		return m_BottomChest->GetSlot(a_SlotNum - 27);
+		return &(m_BottomChest->GetSlot(a_SlotNum - 27));
 	}
 }
 

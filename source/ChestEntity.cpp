@@ -24,7 +24,8 @@ class cRoot;
 
 
 cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ)
+	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ),
+	m_Contents(c_ChestWidth, c_ChestHeight)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
@@ -34,7 +35,8 @@ cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World)
+	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	m_Contents(c_ChestWidth, c_ChestHeight)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
@@ -60,76 +62,9 @@ void cChestEntity::Destroy(void)
 {
 	// Drop items
 	cItems Pickups;
-	for (int i = 0; i < c_ChestHeight * c_ChestWidth; ++i)
-	{
-		if (!m_Content[i].IsEmpty())
-		{
-			Pickups.push_back(m_Content[i]);
-			m_Content[i].Empty();
-		}
-	}
+	m_Contents.CopyToItems(Pickups);
+	m_Contents.Clear();
 	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
-}
-
-
-
-
-
-const cItem * cChestEntity::GetSlot(int a_Slot) const
-{
-	if ((a_Slot > -1) && (a_Slot < c_ChestHeight * c_ChestWidth))
-	{
-		return &m_Content[a_Slot];
-	}
-	return NULL;
-}
-
-
-
-
-
-void cChestEntity::SetSlot(int a_Slot, const cItem & a_Item)
-{
-	if ((a_Slot > -1) && (a_Slot < c_ChestHeight * c_ChestWidth))
-	{
-		m_Content[a_Slot] = a_Item;
-	}
-}
-
-
-
-
-
-void cChestEntity::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, int a_CountLootProbabs, int a_NumSlots, int a_Seed)
-{
-	// Calculate the total weight:
-	int TotalProbab = 1;
-	for (int i = 0; i < a_CountLootProbabs; i++)
-	{
-		TotalProbab += a_LootProbabs[i].m_Weight;
-	}
-	
-	// Pick the loot items:
-	cNoise Noise(a_Seed);
-	for (int i = 0; i < a_NumSlots; i++)
-	{
-		int Rnd = (Noise.IntNoise1DInt(i) / 7);
-		int LootRnd = Rnd % TotalProbab;
-		Rnd >>= 8;
-		cItem CurrentLoot = cItem(E_ITEM_BOOK, 1, 0);  // TODO: enchantment
-		for (int j = 0; j < a_CountLootProbabs; j++)
-		{
-			LootRnd -= a_LootProbabs[i].m_Weight;
-			if (LootRnd < 0)
-			{
-				CurrentLoot = a_LootProbabs[i].m_Item;
-				CurrentLoot.m_ItemCount = a_LootProbabs[i].m_MinAmount + (Rnd % (a_LootProbabs[i].m_MaxAmount - a_LootProbabs[i].m_MinAmount));
-				Rnd >>= 8;
-				break;
-			}
-		}  // for j - a_LootProbabs[]
-		SetSlot(Rnd % ARRAYCOUNT(m_Content), CurrentLoot);
-	}  // for i - NumSlots
 }
 
 
@@ -164,16 +99,11 @@ void cChestEntity::SaveToJson(Json::Value & a_Value)
 	a_Value["y"] = m_PosY;
 	a_Value["z"] = m_PosZ;
 
-	unsigned int NumSlots = c_ChestHeight*c_ChestWidth;
 	Json::Value AllSlots;
-	for (unsigned int i = 0; i < NumSlots; i++)
+	for (int i = m_Contents.GetNumSlots(); i >= 0; i--)
 	{
 		Json::Value Slot;
-		const cItem * Item = GetSlot(i);
-		if (Item != NULL)
-		{
-			Item->GetJson(Slot);
-		}
+		m_Contents.GetItem(i).GetJson(Slot);
 		AllSlots.append(Slot);
 	}
 	a_Value["Slots"] = AllSlots;

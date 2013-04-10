@@ -106,6 +106,9 @@ public:
 	}
 
 	inline bool HasDuration() { return GetMaxDuration() > 0; }
+	
+	/// Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
+	bool IsStackableWith(const cItem & a_OtherStack);
 
 	// tolua_end
 	void GetJson( Json::Value & a_OutValue ) const;

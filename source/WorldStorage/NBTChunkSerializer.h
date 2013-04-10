@@ -31,6 +31,8 @@ class cMinecartWithChest;
 class cMinecartWithFurnace;
 class cMonster;
 class cPickup;
+class cItemGrid;
+
 
 
 
@@ -70,6 +72,9 @@ protected:
 
 	/// Writes an item into the writer, if slot >= 0, adds the Slot tag. The compound is named as requested.
 	void AddItem(const cItem & a_Item, int a_Slot, const AString & a_CompoundName = "");
+	
+	/// Writes an item grid into the writer; begins the stored slot numbers with a_BeginSlotNum
+	void AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum = 0);
 	
 	// Block entities:
 	void AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID);
