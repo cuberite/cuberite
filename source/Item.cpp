@@ -19,6 +19,62 @@ cItem cItem::CopyOne(void) const
 
 
 
+short cItem::GetMaxDamage(void) const
+{
+	switch (m_ItemType)
+	{
+		case E_ITEM_DIAMOND_AXE:     return 1563;
+		case E_ITEM_DIAMOND_HOE:     return 1563;
+		case E_ITEM_DIAMOND_PICKAXE: return 1563;
+		case E_ITEM_DIAMOND_SHOVEL:  return 1563;
+		case E_ITEM_DIAMOND_SWORD:   return 1563;
+		case E_ITEM_FLINT_AND_STEEL: return 65;
+		case E_ITEM_GOLD_AXE:        return 32;
+		case E_ITEM_GOLD_HOE:        return 32;
+		case E_ITEM_GOLD_PICKAXE:    return 32;
+		case E_ITEM_GOLD_SHOVEL:     return 32;
+		case E_ITEM_GOLD_SWORD:      return 32;
+		case E_ITEM_IRON_AXE:        return 251;
+		case E_ITEM_IRON_HOE:        return 251;
+		case E_ITEM_IRON_PICKAXE:    return 251;
+		case E_ITEM_IRON_SHOVEL:     return 251;
+		case E_ITEM_IRON_SWORD:      return 251;
+		case E_ITEM_SHEARS:          return 251;
+		case E_ITEM_STONE_AXE:       return 132;
+		case E_ITEM_STONE_HOE:       return 132;
+		case E_ITEM_STONE_PICKAXE:   return 132;
+		case E_ITEM_STONE_SHOVEL:    return 132;
+		case E_ITEM_STONE_SWORD:     return 132;
+		case E_ITEM_WOODEN_AXE:      return 60;
+		case E_ITEM_WOODEN_HOE:      return 60;
+		case E_ITEM_WOODEN_PICKAXE:  return 60;
+		case E_ITEM_WOODEN_SHOVEL:   return 60;
+		case E_ITEM_WOODEN_SWORD:    return 60;
+	}
+	return 0;
+}
+
+
+
+
+
+bool cItem::DamageItem(void)
+{
+	short MaxDamage = GetMaxDamage();
+	if (MaxDamage == 0)
+	{
+		// Item doesn't have damage
+		return false;
+	}
+
+	m_ItemDamage++;
+	return (m_ItemDamage >= MaxDamage);
+}
+
+
+
+
+
 bool cItem::IsStackableWith(const cItem & a_OtherStack)
 {
 	if (a_OtherStack.m_ItemType != m_ItemType)

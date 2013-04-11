@@ -65,56 +65,13 @@ public:
 	/// Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items
 	cItem CopyOne(void) const;
 	
-	// TODO Sorry for writing the functions in the header. But somehow it doesn´t worked when I put them into the cpp File :s
+	/// Returns the maximum damage value that this item can have; zero if damage is not applied
+	short GetMaxDamage(void) const;
+	
+	/// Damages a weapon / tool. Returns true when damage reaches max value and the item should be destroyed
+	bool DamageItem(void);
 
-	inline int GetMaxDuration(void) const
-	{
-		switch (m_ItemType)
-		{
-			case 256: return 251;
-			case 257: return 251;
-			case 258: return 251;
-			case 259: return 65;	//Lighter / Flint and Steel
-			case 267: return 251;
-			case 268: return 60;
-			case 269: return 60;
-			case 270: return 60;
-			case 271: return 60;
-			case 272: return 132;
-			case 273: return 132;
-			case 274: return 132;
-			case 275: return 132;
-			case 276: return 1563;
-			case 277: return 1563;
-			case 278: return 1563;
-			case 279: return 1563;
-			case 283: return 32;
-			case 284: return 32;
-			case 285: return 32;
-			case 286: return 32;
-			case 290: return 60;
-			case 291: return 132;
-			case 292: return 251;
-			case 293: return 1563;
-			case 294: return 32;
-			case 359: return 251;
-			default: return 0;
-		}
-	}
-
-	/// Damages a weapon / tool. Returns true when destroyed
-	inline bool DamageItem()
-	{
-		if (HasDuration())
-		{
-			m_ItemDamage++;
-			if (m_ItemDamage >= GetMaxDuration())
-				return true;
-		}
-		return false;
-	}
-
-	inline bool HasDuration() { return GetMaxDuration() > 0; }
+	inline bool IsDamageable(void) const { return (GetMaxDamage() > 0); }
 	
 	/// Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
 	bool IsStackableWith(const cItem & a_OtherStack);
