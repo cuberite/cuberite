@@ -16,13 +16,13 @@ cSkeleton::cSkeleton(void) :
 
 
 
-void cSkeleton::Tick(float a_Dt, MTRand & a_TickRandom)
+void cSkeleton::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	cMonster::Tick(a_Dt, a_TickRandom);
+	cMonster::Tick(a_Dt, a_Chunk);
 
 	// TODO Outsource
 	// TODO should do SkyLight check, mobs in the dark don´t burn 
-	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsBurning())
 	{
 		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
 	}

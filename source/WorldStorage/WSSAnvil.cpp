@@ -113,10 +113,12 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 	AString ChunkData;
 	if (!SaveChunkToData(a_Chunk, ChunkData))
 	{
+		LOGWARNING("Cannot serialize chunk [%d, %d] into data", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	if (!SetChunkData(a_Chunk, ChunkData))
 	{
+		LOGWARNING("Cannot store chunk [%d, %d] data", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	
@@ -252,6 +254,7 @@ bool cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk, AString & a_Data)
 	cFastNBTWriter Writer;
 	if (!SaveChunkToNBT(a_Chunk, Writer))
 	{
+		LOGWARNING("Cannot save chunk [%d, %d] to NBT", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	Writer.Finish();
@@ -360,7 +363,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	//*/
 	
 	m_World->SetChunkData(
-		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
+		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockTypes, MetaData, 
 		IsLightValid ? BlockLight : NULL,
 		IsLightValid ? SkyLight : NULL,
@@ -393,8 +396,9 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	a_Writer.AddInt("xPos", a_Chunk.m_ChunkX);
 	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
 	cNBTChunkSerializer Serializer(a_Writer);
-	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
+	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
 	{
+		LOGWARNING("Cannot get chunk [%d, %d] data for NBT saving", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	Serializer.Finish();  // Close NBT tags

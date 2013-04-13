@@ -22,7 +22,7 @@
 
 void cNotifyChunkSender::Call(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkSender->ChunkReady(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	m_ChunkSender->ChunkReady(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -76,12 +76,12 @@ void cChunkSender::Stop(void)
 
 
 
-void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkZ)
 {
 	// This is probably never gonna be called twice for the same chunk, and if it is, we don't mind, so we don't check
 	{
 		cCSLock Lock(m_CS);
-		m_ChunksReady.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+		m_ChunksReady.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
 	}
 	m_evtQueue.Set();
 }
@@ -90,17 +90,17 @@ void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
 	ASSERT(a_Client != NULL);
 	{
 		cCSLock Lock(m_CS);
-		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client)) != m_SendChunks.end())
+		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ, a_Client)) != m_SendChunks.end())
 		{
 			// Already queued, bail out
 			return;
 		}
-		m_SendChunks.push_back(sSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client));
+		m_SendChunks.push_back(sSendChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ, a_Client));
 	}
 	m_evtQueue.Set();
 }
@@ -200,13 +200,13 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 	}
 	
 	// If the chunk has no clients, no need to packetize it:
-	if (!m_World->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ))
+	if (!m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ))
 	{
 		return;
 	}
 	
 	// If the chunk is not valid, do nothing - whoever needs it has queued it for loading / generating
-	if (!m_World->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
+	if (!m_World->IsChunkValid(a_ChunkX, a_ChunkZ))
 	{
 		return;
 	}
@@ -219,7 +219,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHa
 	}
 	
 	// Query and prepare chunk data:
-	if( !m_World->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, *this) )
+	if (!m_World->GetChunkData(a_ChunkX, a_ChunkZ, *this))
 	{
 		return;
 	}

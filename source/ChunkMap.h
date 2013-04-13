@@ -105,9 +105,9 @@ public:
 	/// Wakes up simulators for the specified block
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	void MarkChunkDirty     (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaving    (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaved     (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the chunk data as either loaded from the storage or generated.
 	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
@@ -116,14 +116,13 @@ public:
 	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
 	*/
 	void SetChunkData(
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+		int a_ChunkX, int a_ChunkZ, 
 		const BLOCKTYPE * a_BlockTypes,
 		const NIBBLETYPE * a_BlockMeta,
 		const NIBBLETYPE * a_BlockLight,
 		const NIBBLETYPE * a_BlockSkyLight,
 		const cChunkDef::HeightMap * a_HeightMap,
 		const cChunkDef::BiomeMap &  a_BiomeMap,
-		cEntityList & a_Entities,
 		cBlockEntityList & a_BlockEntities,
 		bool a_MarkDirty
 	);
@@ -134,14 +133,15 @@ public:
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 	
-	bool GetChunkData       (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
+	bool GetChunkData       (int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback);
 	
 	/// Copies the chunk's blocktypes into a_Blocks; returns true if successful
-	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_Blocks);
+	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 	
-	bool      IsChunkValid       (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	int       GetHeight          (int a_BlockX, int a_BlockZ);
+	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
+	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
+	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
+	bool      TryGetHeight       (int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
 	void      FastSetBlocks      (sSetBlockList & a_BlockList);
 	void      CollectPickupsByPlayer(cPlayer * a_Player);
 	
@@ -169,25 +169,40 @@ public:
 	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player);
 	
 	/// Compares clients of two chunks, calls the callback accordingly
-	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
+	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
 	
+	/// Compares clients of two chunks, calls the callback accordingly
+	void CompareChunkClients(cChunk * a_Chunk1, cChunk * a_Chunk2, cClientDiffCallback & a_Callback);
+
 	/// Adds client to a chunk, if not already present; returns true if added, false if present
-	bool AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 
 	/// Removes the client from the chunk
-	void RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Removes the client from all chunks it is present in
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 
 	/// Moves the entity from its current chunk to the new chunk specified
-	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ);
 
 	/// Removes the entity from the chunk specified
-	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ);
 	
+	/// Adds the entity to its appropriate chunk, takes ownership of the entity pointer
+	void AddEntity(cEntity * a_Entity);
+	
+	/// Returns true if the entity with specified ID is present in the chunks
+	bool HasEntity(int a_EntityID);
+	
+	/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
+	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
 	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
+	
+	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false.
+	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Lua-accessible
 
 	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Lua-accessible
@@ -253,12 +268,12 @@ public:
 		/// Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	void Tick( float a_Dt, MTRand & a_TickRand );
+	void Tick(float a_Dt);
 
-	void UnloadUnusedChunks();
-	void SaveAllChunks();
+	void UnloadUnusedChunks(void);
+	void SaveAllChunks(void);
 
-	cWorld * GetWorld() { return m_World; }
+	cWorld * GetWorld(void) { return m_World; }
 
 	int GetNumChunks(void);
 	
@@ -293,9 +308,18 @@ private:
 		void Save(void);
 		void UnloadUnusedChunks(void);
 		
-		void Tick( float a_Dt, MTRand & a_TickRand );
+		void Tick(float a_Dt);
 		
 		void RemoveClient(cClientHandle * a_Client);
+		
+		/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
+		bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
+		/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
+		bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn);  // Lua-accessible
+
+		/// Returns true if there is an entity with the specified ID within this layer's chunks
+		bool HasEntity(int a_EntityID);
 		
 	protected:
 	

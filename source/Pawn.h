@@ -83,7 +83,7 @@ public:
 
 	cPawn(eEntityType a_EntityType);
 
-	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 	// tolua_begin
 	
@@ -150,10 +150,12 @@ public:
 
 	virtual void InStateBurning(float a_Dt);
 
-	virtual void CheckMetaDataBurn(void);
+	virtual void CheckMetaDataBurn(cChunk & a_Chunk);
 
 	virtual void SetMaxHealth(short a_MaxHealth);
 	virtual short GetMaxHealth() { return m_MaxHealth; }
+	
+	bool IsBurning(void) const { return (m_MetaData == BURNING); }
 
 protected:
 	short m_Health;

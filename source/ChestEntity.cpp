@@ -144,9 +144,9 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 	// Instead of marking the chunk as dirty upon chest contents change, we mark it dirty now
 	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
 	// The few false positives aren't much to worry about
-	int ChunkX, ChunkY = 0, ChunkZ;
+	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosY, m_PosZ, ChunkX, ChunkZ);
-	m_World->MarkChunkDirty(ChunkX, ChunkY, ChunkZ);
+	m_World->MarkChunkDirty(ChunkX, ChunkZ);
 }
 
 

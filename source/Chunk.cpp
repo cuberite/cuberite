@@ -118,19 +118,15 @@ cChunk::~cChunk()
 
 	// Remove and destroy all entities that are not players:
 	cEntityList Entities;
-	for (cEntityList::const_iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	std::swap(Entities, m_Entities);  // Need another list because cEntity destructors check if they've been removed from chunk
+	for (cEntityList::const_iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
 	{
 		if (!(*itr)->IsPlayer())
 		{
-			Entities.push_back(*itr);
+			(*itr)->Destroy();
+			delete *itr;
 		}
 	}
-	for (cEntityList::iterator itr = Entities.begin(); itr != Entities.end(); ++itr)
-	{
-		(*itr)->RemoveFromChunk();
-		(*itr)->Destroy();
-	}
-	m_Entities.clear();
 	
 	if (m_NeighborXM != NULL)
 	{
@@ -267,7 +263,6 @@ void cChunk::SetAllData(
 	const NIBBLETYPE * a_BlockSkyLight,
 	const HeightMap *  a_HeightMap,
 	const BiomeMap &   a_BiomeMap,
-	cEntityList & a_Entities, 
 	cBlockEntityList & a_BlockEntities
 )
 {
@@ -296,9 +291,6 @@ void cChunk::SetAllData(
 		CalculateHeightmap();
 	}
 
-	// Append entities to current entity list:
-	m_Entities.insert(m_Entities.end(), a_Entities.begin(), a_Entities.end());
-	
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
@@ -438,7 +430,7 @@ void cChunk::Stay(bool a_Stay)
 
 
 
-void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
+void cChunk::Tick(float a_Dt)
 {
 	BroadcastPendingBlockChanges();
 
@@ -454,7 +446,7 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 	// Tick simulators:
 	m_World->GetSimulatorManager()->SimulateChunk(a_Dt, m_PosX, m_PosZ, this);
 	
-	TickBlocks(a_TickRandom);
+	TickBlocks();
 
 	// Tick all block entities in this chunk:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -462,7 +454,84 @@ void cChunk::Tick(float a_Dt, MTRand & a_TickRandom)
 		m_IsDirty = (*itr)->Tick(a_Dt) | m_IsDirty;
 	}
 	
+	// Tick all entities in this chunk:
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	{
+		(*itr)->Tick(a_Dt, *this);
+	}  // for itr - m_Entitites[]
+	
+	// Remove all entities that were scheduled for removal:
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	{
+			if ((*itr)->IsDestroyed())
+			{
+				LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+				cEntity * ToDelete = *itr;
+				itr = m_Entities.erase(itr);
+				delete ToDelete;
+				continue;
+			}
+			itr++;
+	}  // for itr - m_Entitites[]
+	
+	// If any entity moved out of the chunk, move it to the neighbor:
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	{
+		if (
+			((*itr)->GetChunkX() != m_PosX) ||
+			((*itr)->GetChunkZ() != m_PosZ)
+		)
+		{
+			MoveEntityToNewChunk(*itr);
+			itr = m_Entities.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
+	}
+	
 	ApplyWeatherToTop();
+}
+
+
+
+
+
+void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
+{
+	cChunk * Neighbor = GetNeighborChunk((int)a_Entity->GetPosX(), (int)a_Entity->GetPosZ());
+	if (Neighbor == NULL)
+	{
+		// TODO: What to do with this?
+		LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
+		return;
+	}
+
+	Neighbor->AddEntity(a_Entity);
+
+	class cMover :
+		public cClientDiffCallback
+	{
+		virtual void Removed(cClientHandle * a_Client) override
+		{
+			a_Client->SendDestroyEntity(*m_Entity);
+		}
+
+		virtual void Added(cClientHandle * a_Client) override
+		{
+			m_Entity->SpawnOn(*a_Client);
+		}
+
+		cEntity * m_Entity;
+
+	public:
+		cMover(cEntity * a_Entity) :
+			m_Entity(a_Entity)
+		{}
+	} Mover(a_Entity);
+	
+	m_ChunkMap->CompareChunkClients(this, Neighbor, Mover);
 }
 
 
@@ -516,13 +585,13 @@ void cChunk::CheckBlocks(void)
 
 
 
-void cChunk::TickBlocks(MTRand & a_TickRandom)
+void cChunk::TickBlocks(void)
 {
 	// Tick dem blocks
 	// _X: We must limit the random number or else we get a nasty int overflow bug ( http://forum.mc-server.org/showthread.php?tid=457 )
-	int RandomX = a_TickRandom.randInt(0x00ffffff);
-	int RandomY = a_TickRandom.randInt(0x00ffffff);
-	int RandomZ = a_TickRandom.randInt(0x00ffffff);
+	int RandomX = m_World->GetTickRandomNumber(0x00ffffff);
+	int RandomY = m_World->GetTickRandomNumber(0x00ffffff);
+	int RandomZ = m_World->GetTickRandomNumber(0x00ffffff);
 	int TickX = m_BlockTickX;
 	int TickY = m_BlockTickY;
 	int TickZ = m_BlockTickZ;
@@ -1609,6 +1678,9 @@ void cChunk::AddEntity(cEntity * a_Entity)
 	{
 		MarkDirty();
 	}
+	
+	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
+	
 	m_Entities.push_back(a_Entity);
 }
 
@@ -1636,6 +1708,22 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 
 
+bool cChunk::HasEntity(int a_EntityID)
+{
+	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
+	{
+		if ((*itr)->GetUniqueID() == a_EntityID)
+		{
+			return true;
+		}
+	}  // for itr - m_Entities[]
+	return false;
+}
+
+
+
+
+
 bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 {
 	// The entity list is locked by the parent chunkmap's CS
@@ -1648,6 +1736,24 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 		}
 	}  // for itr - m_Entitites[]
 	return true;
+}
+
+
+
+
+
+bool cChunk::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
+{
+	// The entity list is locked by the parent chunkmap's CS
+	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
+	{
+		if ((*itr)->GetUniqueID() == a_EntityID)
+		{
+			a_CallbackResult = a_Callback.Item(*itr);
+			return true;
+		}
+	}  // for itr - m_Entitites[]
+	return false;
 }
 
 

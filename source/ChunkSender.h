@@ -80,10 +80,10 @@ public:
 	void Stop(void);
 	
 	/// Notifies that a chunk has become ready and it should be sent to all its clients
-	void ChunkReady(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkReady(int a_ChunkX, int a_ChunkZ);
 	
 	/// Queues a chunk to be sent to a specific client
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Removes the a_Client from all waiting chunk send operations
 	void RemoveClient(cClientHandle * a_Client);

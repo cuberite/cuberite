@@ -16,12 +16,12 @@ cZombie::cZombie(void) :
 
 
 
-void cZombie::Tick(float a_Dt, MTRand & a_TickRandom)
+void cZombie::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_TickRandom);
+	super::Tick(a_Dt, a_Chunk);
 
 	// TODO Same as in cSkeleton :D
-	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && (GetMetaData() != BURNING))
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsBurning())
 	{
 		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
 	}

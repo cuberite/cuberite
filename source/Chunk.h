@@ -104,7 +104,6 @@ public:
 		const NIBBLETYPE * a_BlockSkyLight,
 		const cChunkDef::HeightMap * a_HeightMap,
 		const cChunkDef::BiomeMap &  a_BiomeMap,
-		cEntityList & a_Entities, 
 		cBlockEntityList & a_BlockEntities
 	);
 	
@@ -125,7 +124,7 @@ public:
 	/// Sets or resets the internal flag that prevents chunk from being unloaded
 	void Stay(bool a_Stay = true);
 	
-	void Tick(float a_Dt, MTRand & a_TickRandom);
+	void Tick(float a_Dt);
 
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosY(void) const { return m_PosY; }
@@ -176,11 +175,15 @@ public:
 	bool HasClient    (cClientHandle* a_Client );
 	bool HasAnyClients(void);  // Returns true if theres any client in the chunk; false otherwise
 
-	void AddEntity( cEntity * a_Entity);
-	void RemoveEntity( cEntity * a_Entity);
+	void AddEntity(cEntity * a_Entity);
+	void RemoveEntity(cEntity * a_Entity);
+	bool HasEntity(int a_EntityID);
 	
 	/// Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
+	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
+	bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
 
 	/// Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChest(cChestCallback & a_Callback);  // Lua-accessible
@@ -352,7 +355,8 @@ private:
 	/// Checks the block scheduled for checking in m_ToTickBlocks[]
 	void CheckBlocks(void);
 	
-	void TickBlocks  (MTRand & a_TickRandom);
+	/// Ticks several random blocks in the chunk
+	void TickBlocks(void);
 	
 	/// Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes
 	void ApplyWeatherToTop(void);
@@ -368,6 +372,9 @@ private:
 	
 	/// Checks if a leaves block at the specified coords has a log up to 4 blocks away connected by other leaves blocks (false if no log)
 	bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/// Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients
+	void MoveEntityToNewChunk(cEntity * a_Entity);
 };
 
 typedef cChunk * cChunkPtr;

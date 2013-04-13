@@ -137,7 +137,10 @@ cClientHandle::~cClientHandle()
 		if (World != NULL)
 		{
 			World->RemovePlayer(m_Player);
+			m_Player->Destroy();
 		}
+		delete m_Player;
+		m_Player = NULL;
 	}
 
 	if (!m_HasSentDC)
@@ -145,12 +148,6 @@ cClientHandle::~cClientHandle()
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
 	
-	if (m_Player != NULL)
-	{
-		m_Player->Destroy();
-		m_Player = NULL;
-	}
-
 	// Queue all remaining outgoing packets to cSocketThreads:
 	{
 		cCSLock Lock(m_CSOutgoingData);
@@ -325,7 +322,7 @@ void cClientHandle::StreamChunks(void)
 	}
 	for (cChunkCoordsList::iterator itr = RemoveChunks.begin(); itr != RemoveChunks.end(); ++itr)
 	{
-		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkY, itr->m_ChunkZ, this);
+		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - RemoveChunks[]
 	
@@ -336,13 +333,13 @@ void cClientHandle::StreamChunks(void)
 		// For each distance add chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
 		{
-			StreamChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
-			StreamChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			StreamChunk(ChunkPosX + d, ChunkPosZ + i);
+			StreamChunk(ChunkPosX - d, ChunkPosZ + i);
 		}  // for i
 		for (int i = -d + 1; i < d; ++i)
 		{
-			StreamChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
-			StreamChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
+			StreamChunk(ChunkPosX + i, ChunkPosZ + d);
+			StreamChunk(ChunkPosX + i, ChunkPosZ - d);
 		}  // for i
 	}  // for d
 	
@@ -366,7 +363,7 @@ void cClientHandle::StreamChunks(void)
 
 
 
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 {
 	if (m_State >= csDestroying)
 	{
@@ -377,14 +374,14 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	cWorld * World = m_Player->GetWorld();
 	ASSERT(World != NULL);
 
-	if (World->AddChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, this))
+	if (World->AddChunkClient(a_ChunkX, a_ChunkZ, this))
 	{
 		{
 			cCSLock Lock(m_CSChunkLists);
-			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
-			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
 		}
-		World->SendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, this);
+		World->SendChunkTo(a_ChunkX, a_ChunkZ, this);
 	}
 }
 
@@ -1128,6 +1125,7 @@ void cClientHandle::HandleDisconnect(const AString & a_Reason)
 		Printf(DisconnectMessage, "%s disconnected: %s", m_Username.c_str(), a_Reason.c_str());
 		m_Player->GetWorld()->BroadcastChat(DisconnectMessage, this);
 	}
+	m_HasSentDC = true;
 	Destroy();
 }
 

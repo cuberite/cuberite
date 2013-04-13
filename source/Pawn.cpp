@@ -288,11 +288,11 @@ void cPawn::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
 
 
 
-void cPawn::Tick(float a_Dt, MTRand & a_TickRandom)
+void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	CheckMetaDataBurn();  // Check to see if pawn should burn based on block they are on
+	CheckMetaDataBurn(a_Chunk);  // Check to see if pawn should burn based on block they are on
 	
-	if (GetMetaData() == BURNING)
+	if (IsBurning())
 	{
 		InStateBurning(a_Dt);
 	}
@@ -315,8 +315,10 @@ void cPawn::SetMetaData(MetaData a_MetaData)
 
 
 //----Change Entity MetaData
-void cPawn::CheckMetaDataBurn(void)
+void cPawn::CheckMetaDataBurn(cChunk & a_Chunk)
 {
+	// TODO: Rewrite this function to use a_Chunk instead of m_World
+	
 	if ((GetPosY() < 1) || (GetPosY() >= 254))
 	{
 		// Y coord out of range

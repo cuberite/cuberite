@@ -59,9 +59,9 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPickup::Tick(float a_Dt, MTRand & a_TickRandom)
+void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_TickRandom);
+	super::Tick(a_Dt, a_Chunk);
 	
 	m_Timer += a_Dt;
 	a_Dt = a_Dt / 1000.f;
@@ -88,7 +88,6 @@ void cPickup::Tick(float a_Dt, MTRand & a_TickRandom)
 
 	if (!m_bReplicated || m_bDirtyPosition)
 	{
-		MoveToCorrectChunk();
 		m_bReplicated = true;
 		m_bDirtyPosition = false;
 		GetWorld()->BroadcastTeleportEntity(*this);
@@ -99,8 +98,10 @@ void cPickup::Tick(float a_Dt, MTRand & a_TickRandom)
 
 
 
-void cPickup::HandlePhysics(float a_Dt)
+void cPickup::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
+	// TODO: Rewrite this function to use a_Chunk instead of m_World
+	
 	m_ResultingSpeed.Set(0.f, 0.f, 0.f);
 	cWorld * World = GetWorld();
 	

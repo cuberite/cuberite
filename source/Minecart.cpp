@@ -53,7 +53,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cMinecart::Tick(float a_Dt, MTRand & a_TickRandom)
+void cMinecart::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	// TODO: the physics
 }

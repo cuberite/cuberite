@@ -209,7 +209,7 @@ private:
 
 	cPlayer * m_Player;
 	
-	bool m_HasSentDC;
+	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
 	
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
@@ -267,7 +267,7 @@ private:
 	void SendConfirmPosition(void);
 	
 	/// Adds a single chunk to be streamed to the client; used by StreamChunks()
-	void StreamChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/// Handles the DIG_STARTED dig packet:
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);

@@ -87,9 +87,9 @@ bool cMonster::ReachedDestination()
 
 
 
-void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
+void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_TickRandom);
+	super::Tick(a_Dt, a_Chunk);
 
 	if (m_Health <= 0)
 	{
@@ -145,7 +145,6 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 
 	HandlePhysics(a_Dt);
 	BroadcastMovementUpdate();
-	MoveToCorrectChunk();
 
 	Vector3d Distance = m_Destination - GetPosition();
 	if (Distance.SqrLength() > 0.1f)
@@ -163,20 +162,20 @@ void cMonster::Tick(float a_Dt, MTRand & a_TickRandom)
 		case IDLE:
 		{
 			// If enemy passive we ignore checks for player visibility
-			InStateIdle(a_Dt, a_TickRandom);
+			InStateIdle(a_Dt);
 			break;
 		}
 	
 		case CHASING:
 		{
 			// If we do not see a player anymore skip chasing action
-			InStateChasing(a_Dt, a_TickRandom);
+			InStateChasing(a_Dt);
 			break;
 		}
 	
 		case ESCAPING:
 		{
-			InStateEscaping(a_Dt, a_TickRandom);
+			InStateEscaping(a_Dt);
 			break;
 		}
 	}  // switch (m_EMState)
@@ -227,8 +226,6 @@ void cMonster::ReplicateMovement()
 		m_LastPosZ = GetPosZ();
 		m_bDirtyPosition = false;
 	}
-
-	MoveToCorrectChunk();
 }
 
 
@@ -374,14 +371,14 @@ void cMonster::SetState(const AString & a_State)
 
 //Checks to see if EventSeePlayer should be fired
 //monster sez: Do I see the player
-void cMonster::CheckEventSeePlayer(MTRand & a_TickRandom)
+void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
 	cPlayer * Closest = FindClosestPlayer();
 
 	if (Closest != NULL)
 	{
-		EventSeePlayer(Closest, a_TickRandom);
+		EventSeePlayer(Closest);
 	}
 }
 
@@ -389,10 +386,8 @@ void cMonster::CheckEventSeePlayer(MTRand & a_TickRandom)
 
 
 
-void cMonster::CheckEventLostPlayer(MTRand & a_TickRandom)
+void cMonster::CheckEventLostPlayer(void)
 {
-	UNUSED(a_TickRandom);
-	
 	Vector3f pos;
 	cTracer LineOfSight(GetWorld());
 	
@@ -416,12 +411,10 @@ void cMonster::CheckEventLostPlayer(MTRand & a_TickRandom)
 
 // What to do if player is seen
 // default to change state to chasing
-void cMonster::EventSeePlayer(cEntity * a_SeenPlayer, MTRand & a_TickRandom)
+void cMonster::EventSeePlayer(cEntity * a_SeenPlayer)
 {
-	UNUSED(a_TickRandom);
-	
 	m_Target = a_SeenPlayer;
-	AddReference( m_Target );
+	AddReference(m_Target);
 }
 
 
@@ -431,7 +424,7 @@ void cMonster::EventSeePlayer(cEntity * a_SeenPlayer, MTRand & a_TickRandom)
 void cMonster::EventLosePlayer(void)
 {
 	Dereference(m_Target);
-	m_Target = 0;
+	m_Target = NULL;
 	m_EMState = IDLE;
 }
 
@@ -440,24 +433,28 @@ void cMonster::EventLosePlayer(void)
 
 
 // What to do if in Idle State
-void cMonster::InStateIdle(float a_Dt, MTRand & a_TickRandom)
+void cMonster::InStateIdle(float a_Dt)
 {
 	idle_interval += a_Dt;
 	if (idle_interval > 1)
 	{
 		// at this interval the results are predictable
-		int rem = (a_TickRandom.randInt() % 6) + 1;
+		int rem = m_World->GetTickRandomNumber(6) + 1;
 		// LOGD("Moving: int: %3.3f rem: %i",idle_interval,rem);
 		idle_interval -= 1;		// So nothing gets dropped when the server hangs for a few seconds
 		Vector3f Dist;
-		Dist.x = (float)((a_TickRandom.randInt() % 11) - 5);
-		Dist.z = (float)((a_TickRandom.randInt() % 11) - 5);
+		Dist.x = (float)(m_World->GetTickRandomNumber(10) - 5);
+		Dist.z = (float)(m_World->GetTickRandomNumber(10) - 5);
 		if ((Dist.SqrLength() > 2)  && (rem >= 3))
 		{
 			m_Destination.x = (float)(GetPosX() + Dist.x);
 			m_Destination.z = (float)(GetPosZ() + Dist.z);
-			m_Destination.y = (float)GetWorld()->GetHeight((int)m_Destination.x, (int)m_Destination.z) + 1.2f;
-			MoveToPosition(m_Destination);
+			int PosY;
+			if (m_World->TryGetHeight((int)m_Destination.x, (int)m_Destination.z, PosY))
+			{
+				m_Destination.y = (float)PosY + 1.2f;
+				MoveToPosition(m_Destination);
+			}
 		}
 	}
 }
@@ -468,10 +465,9 @@ void cMonster::InStateIdle(float a_Dt, MTRand & a_TickRandom)
 
 // What to do if in Chasing State
 // This state should always be defined in each child class
-void cMonster::InStateChasing(float a_Dt, MTRand & a_TickRandom)
+void cMonster::InStateChasing(float a_Dt)
 {
 	UNUSED(a_Dt);
-	UNUSED(a_TickRandom);
 }
 
 
@@ -479,10 +475,9 @@ void cMonster::InStateChasing(float a_Dt, MTRand & a_TickRandom)
 
 
 // What to do if in Escaping State
-void cMonster::InStateEscaping(float a_Dt, MTRand & a_TickRandom)
+void cMonster::InStateEscaping(float a_Dt)
 {
 	UNUSED(a_Dt);
-	UNUSED(a_TickRandom);
 	
 	if (m_Target != NULL)
 	{

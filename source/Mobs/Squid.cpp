@@ -27,14 +27,15 @@ void cSquid::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 
 
 
-void cSquid::Tick(float a_Dt, MTRand & a_TickRandom)
+void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_TickRandom);
+	// TODO: Rewrite this function to use a_Chunk instead of m_World
+	super::Tick(a_Dt, a_Chunk);
 	
 	Vector3d Pos = GetPosition();
 
 	// TODO: Not a real behavior, but cool :D
-	if (!IsBlockWater(GetWorld()->GetBlock((int) Pos.x, (int) Pos.y, (int) Pos.z)) && GetMetaData() != BURNING)
+	if (!IsBlockWater(GetWorld()->GetBlock((int) Pos.x, (int) Pos.y, (int) Pos.z)) && !IsBurning())
 	{
 		SetMetaData(BURNING);
 	}

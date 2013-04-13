@@ -4,6 +4,7 @@
 #include "World.h"
 #include "ClientHandle.h"
 #include "Simulator/SandSimulator.h"
+#include "Chunk.h"
 
 
 
@@ -40,7 +41,7 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cFallingBlock::Tick(float a_Dt, MTRand & a_TickRandom)
+void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	float MilliDt = a_Dt * 0.001f;
 	AddSpeedY(MilliDt * -9.8f);
@@ -62,26 +63,29 @@ void cFallingBlock::Tick(float a_Dt, MTRand & a_TickRandom)
 		return;
 	}
 	
-	if (BlockY < cChunkDef::Height - 1)
+	if (BlockY >= cChunkDef::Height)
 	{
-		BLOCKTYPE BlockBelow;
-		NIBBLETYPE BelowMeta;
-		GetWorld()->GetBlockTypeMeta(BlockX, BlockY, BlockZ, BlockBelow, BelowMeta);
-		if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
-		{
-			// Fallen onto a block that breaks this into pickups (e. g. half-slab)
-			// Must finish the fall with coords one below the block:
-			cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
-			Destroy();
-			return;
-		}
-		else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
-		{
-			// Fallen onto a solid block
-			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
-			Destroy();
-			return;
-		}
+		// Above the world, just wait for it to fall back down
+		return;
+	}
+	
+	int idx = a_Chunk.MakeIndexNoCheck(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
+	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(idx);
+	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(idx);
+	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
+	{
+		// Fallen onto a block that breaks this into pickups (e. g. half-slab)
+		// Must finish the fall with coords one below the block:
+		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
+		Destroy();
+		return;
+	}
+	else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
+	{
+		// Fallen onto a solid block
+		cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
+		Destroy();
+		return;
 	}
 }
 

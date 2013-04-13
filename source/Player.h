@@ -35,11 +35,11 @@ public:
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();
 
-	virtual void Initialize( cWorld* a_World );								// tolua_export
+	virtual void Initialize(cWorld * a_World);  // tolua_export
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 	/// Returns the curently equipped weapon; empty item if none
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }

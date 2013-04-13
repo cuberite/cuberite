@@ -338,7 +338,7 @@ bool cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		for (int x = 0; x < 3; x++)
 		{
 			Reader.m_ReadingChunkX = x;
-			if (!m_World->GetChunkData(a_ChunkX + x - 1, ZERO_CHUNK_Y, a_ChunkZ + z - 1, Reader))
+			if (!m_World->GetChunkData(a_ChunkX + x - 1, a_ChunkZ + z - 1, Reader))
 			{
 				return false;
 			}

@@ -38,7 +38,7 @@ class cWorld;
 class cReferenceManager;
 class cClientHandle;
 class cPlayer;
-class MTRand;
+class cChunk;
 
 
 
@@ -120,9 +120,8 @@ public:
 	double           GetSpeedY    (void) const { return m_Speed.y; }
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
 	
-	int GetChunkX(void) const {return m_ChunkX; }
-	int GetChunkY(void) const {return m_ChunkY; }
-	int GetChunkZ(void) const {return m_ChunkZ; }
+	int GetChunkX(void) const {return FAST_FLOOR_DIV(((int)m_Pos.x), cChunkDef::Width); }
+	int GetChunkZ(void) const {return FAST_FLOOR_DIV(((int)m_Pos.z), cChunkDef::Width); }
 
 	void SetHeadYaw (double a_HeadYaw);
 	void SetPosX    (double a_PosX);
@@ -135,7 +134,7 @@ public:
 	void SetPitch   (double a_Pitch);
 	void SetRoll    (double a_Roll);
 	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
-	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x,a_Speed.y,a_Speed.z); }
+	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 	void SetSpeedX  (double a_SpeedX);
 	void SetSpeedY  (double a_SpeedY);
 	void SetSpeedZ  (double a_SpeedZ);
@@ -151,16 +150,15 @@ public:
 	void AddSpeedY  (double a_AddSpeedY);
 	void AddSpeedZ  (double a_AddSpeedZ);
 
+	inline int  GetUniqueID(void) const { return m_UniqueID; }
+	inline bool IsDestroyed(void) const { return !m_IsInitialized; }
+
+	void Destroy(void);
+
 	// tolua_end
 
-	inline int  GetUniqueID(void) const { return m_UniqueID; }								// tolua_export
-	inline bool IsDestroyed(void) const { return m_bDestroyed; }							// tolua_export
-
-	void Destroy();																			// tolua_export
-	void RemoveFromChunk(void); // for internal use in cChunk
-
-	virtual void Tick(float a_Dt, MTRand & a_TickRandom);
-	virtual void HandlePhysics(float a_Dt) {}
+	virtual void Tick(float a_Dt, cChunk & a_Chunk);
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) {}
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
@@ -215,22 +213,19 @@ protected:
 	cReferenceManager* m_Referencers;
 	cReferenceManager* m_References;
 
-	int m_ChunkX, m_ChunkY, m_ChunkZ;
-	
-	//Flags that signal that we haven't updated the clients with the latest.
+	// Flags that signal that we haven't updated the clients with the latest.
 	bool     m_bDirtyHead;
 	bool     m_bDirtyOrientation;
 	bool     m_bDirtyPosition;
 	bool     m_bDirtySpeed;
 
-	//Last Position.
+	// Last Position.
 	double m_LastPosX, m_LastPosY, m_LastPosZ;
 
-	//This variables keep track of the last time a packet was sent
+	// This variables keep track of the last time a packet was sent
 	Int64 m_TimeLastTeleportPacket,m_TimeLastMoveReltPacket,m_TimeLastSpeedPacket;  // In ticks
 
-	bool m_bDestroyed;
-	bool m_bRemovedFromChunk;
+	bool m_IsInitialized;  // Is set to true when it's initialized, until it's destroyed (Initialize() till Destroy() )
 
 	eEntityType m_EntityType;
 	
@@ -242,8 +237,7 @@ protected:
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	void SetWorld(cWorld * a_World) { m_World = a_World; }
-	void MoveToCorrectChunk(bool a_bIgnoreOldChunk = false);
-
+	
 	friend class cReferenceManager;
 	void AddReference( cEntity*& a_EntityPtr );
 	void ReferencedBy( cEntity*& a_EntityPtr );

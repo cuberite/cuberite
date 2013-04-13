@@ -16,11 +16,11 @@ cCavespider::cCavespider(void) :
 
 
 
-void cCavespider::Tick(float a_Dt, MTRand & a_TickRandom)
+void cCavespider::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_TickRandom);
+	super::Tick(a_Dt, a_Chunk);
 
-	// TODO: Check vanilla if cavespiders really get passive during the day
+	// TODO: Check vanilla if cavespiders really get passive during the day / in daylight
 	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
 }
 

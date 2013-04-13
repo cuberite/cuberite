@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 04/11/13 11:57:58.
+** Generated automatically by tolua++-1.0.92 on 04/13/13 22:59:55.
 */
 
 #ifndef __cplusplus
@@ -4712,38 +4712,6 @@ static int tolua_AllToLua_cEntity_GetChunkX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetChunkX'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetChunkY of class  cEntity */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetChunkY00
-static int tolua_AllToLua_cEntity_GetChunkY00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetChunkY'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetChunkY();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetChunkY'.",&tolua_err);
  return 0;
 #endif
 }
@@ -24470,7 +24438,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpeedY",tolua_AllToLua_cEntity_GetSpeedY00);
    tolua_function(tolua_S,"GetSpeedZ",tolua_AllToLua_cEntity_GetSpeedZ00);
    tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cEntity_GetChunkX00);
-   tolua_function(tolua_S,"GetChunkY",tolua_AllToLua_cEntity_GetChunkY00);
    tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cEntity_GetChunkZ00);
    tolua_function(tolua_S,"SetHeadYaw",tolua_AllToLua_cEntity_SetHeadYaw00);
    tolua_function(tolua_S,"SetPosX",tolua_AllToLua_cEntity_SetPosX00);

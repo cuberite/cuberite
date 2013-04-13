@@ -27,16 +27,13 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_Attachee(NULL)
 	, m_Referencers(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCERS))
 	, m_References(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCES))
-	, m_ChunkX(0)
-	, m_ChunkY(0)
-	, m_ChunkZ(0)
 	, m_HeadYaw( 0.0 )
 	, m_Pos(a_X, a_Y, a_Z)
 	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
 	, m_bDirtySpeed(true)
-	, m_bDestroyed(true)
+	, m_IsInitialized(false)
 	, m_LastPosX( 0.0 )
 	, m_LastPosY( 0.0 )
 	, m_LastPosZ( 0.0 )
@@ -45,7 +42,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_TimeLastSpeedPacket(0)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
-	, m_bRemovedFromChunk(true)
 	, m_FireDamageInterval(0.f)
 	, m_BurnPeriod(0.f)
 {
@@ -60,6 +56,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 
 cEntity::~cEntity()
 {
+	ASSERT(!m_World->HasEntity(m_UniqueID));  // Before deleting, the entity needs to have been removed from the world
+	
 	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p", 
 		m_UniqueID,
 		m_Pos.x, m_Pos.y, m_Pos.z,
@@ -76,9 +74,9 @@ cEntity::~cEntity()
 		m_Attachee->Detach();
 	}
 
-	if (!m_bDestroyed || !m_bRemovedFromChunk)
+	if (m_IsInitialized)
 	{
-		LOGERROR("ERROR: Entity deallocated without being destroyed %i or unlinked %i", m_bDestroyed, m_bRemovedFromChunk);
+		LOGWARNING("ERROR: Entity deallocated without being destroyed");
 		ASSERT(!"Entity deallocated without being destroyed or unlinked");
 	}
 	delete m_Referencers;
@@ -118,41 +116,43 @@ const char * cEntity::GetParentClass(void) const
 
 void cEntity::Initialize(cWorld * a_World)
 {
-	m_bDestroyed = false;
-	m_bRemovedFromChunk = false;
-	
+	LOGD("Initializing entity #%d (%s) at {%.02f, %.02f, %.02f}",
+		m_UniqueID, GetClass(), m_Pos.x, m_Pos.y, m_Pos.z
+	);
+	m_IsInitialized = true;
 	m_World = a_World;
 	m_World->AddEntity(this);
-
-	MoveToCorrectChunk(true);
 }
 
 
 
 
 
-void cEntity::WrapHeadYaw()
+void cEntity::WrapHeadYaw(void)
 {
-	while (m_HeadYaw > 180.f)  m_HeadYaw -=360.f; // Wrap it
-	while (m_HeadYaw < -180.f) m_HeadYaw +=360.f;
+	while (m_HeadYaw > 180.f)  m_HeadYaw -= 360.f; // Wrap it
+	while (m_HeadYaw < -180.f) m_HeadYaw += 360.f;
 }
 
 
 
 
 
-void cEntity::WrapRotation()
+void cEntity::WrapRotation(void)
 {
-	while (m_Rot.x > 180.f)  m_Rot.x-=360.f; // Wrap it
-	while (m_Rot.x < -180.f) m_Rot.x+=360.f;
-	while (m_Rot.y > 180.f)  m_Rot.y-=360.f;
-	while (m_Rot.y < -180.f) m_Rot.y+=360.f;
+	while (m_Rot.x > 180.f)  m_Rot.x -= 360.f; // Wrap it
+	while (m_Rot.x < -180.f) m_Rot.x += 360.f;
+	while (m_Rot.y > 180.f)  m_Rot.y -= 360.f;
+	while (m_Rot.y < -180.f) m_Rot.y += 360.f;
 }
 
-void cEntity::WrapSpeed()
+
+
+
+void cEntity::WrapSpeed(void)
 {
-	//There shoudn't be a need for flipping the flag on because this function is called 
-	//after any update, so the flag is already turned on
+	// There shoudn't be a need for flipping the flag on because this function is called 
+	// after any update, so the flag is already turned on
 	if       (m_Speed.x > 20.0f)   m_Speed.x  =  20.0f;
 	else if  (m_Speed.x < -20.0f)  m_Speed.x  = -20.0f;
 	if       (m_Speed.y > 20.0f)   m_Speed.y  =  20.0f;
@@ -165,74 +165,15 @@ void cEntity::WrapSpeed()
 
 
 
-void cEntity::MoveToCorrectChunk(bool a_bIgnoreOldChunk)
+void cEntity::Destroy(void)
 {
-	if (!m_World)
-	{
-		// This is normal for entities being currently loaded
-		return;
-	}
-
-	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
-	cWorld::BlockToChunk((int)m_Pos.x, (int)m_Pos.y, (int)m_Pos.z, ChunkX, ChunkY, ChunkZ);
-	if (!a_bIgnoreOldChunk && (m_ChunkX == ChunkX) && (m_ChunkY == ChunkY) && (m_ChunkZ == ChunkZ))
+	if (!m_IsInitialized)
 	{
 		return;
 	}
-
-	class cMover :
-		public cClientDiffCallback
-	{
-		virtual void Removed(cClientHandle * a_Client) override
-		{
-			if (m_IgnoreOldChunk)
-			{
-				return;
-			}
-			a_Client->SendDestroyEntity(*m_Entity);
-		}
-
-		virtual void Added(cClientHandle * a_Client) override
-		{
-			m_Entity->SpawnOn(*a_Client);
-		}
-
-		bool      m_IgnoreOldChunk;
-		cEntity * m_Entity;
-
-	public:
-		cMover(cEntity * a_Entity, bool a_IgnoreOldChunk) :
-			m_IgnoreOldChunk(a_IgnoreOldChunk),
-			m_Entity(a_Entity)
-		{}
-	} Mover(this, a_bIgnoreOldChunk);
-
-	m_World->CompareChunkClients(m_ChunkX, m_ChunkY, m_ChunkZ, ChunkX, ChunkY, ChunkZ, Mover);
-	m_World->MoveEntityToChunk(this, ChunkX, ChunkY, ChunkZ);
-
-	m_ChunkX = ChunkX;
-	m_ChunkY = ChunkY;
-	m_ChunkZ = ChunkZ;
-}
-
-
-
-
-
-void cEntity::Destroy()
-{
-	if (m_bDestroyed)
-	{
-		return;
-	}
-	if (!m_bRemovedFromChunk)
-	{
-		RemoveFromChunk();
-	}
-
 	m_World->BroadcastDestroyEntity(*this);
 
-	m_bDestroyed = true;
+	m_IsInitialized = false;
 
 	Destroyed();
 }
@@ -241,25 +182,8 @@ void cEntity::Destroy()
 
 
 
-void cEntity::RemoveFromChunk(void)
+void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	if (m_World == NULL)
-	{
-		return;
-	}
-
-	m_World->RemoveEntityFromChunk(this, m_ChunkX, m_ChunkY, m_ChunkZ);
-	m_bRemovedFromChunk = true;
-}
-
-
-
-
-
-void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
-{
-	UNUSED(a_TickRandom);
-
 	if (m_AttachedTo != NULL)
 	{
 		if ((m_Pos - m_AttachedTo->GetPosition()).Length() > 0.5)
@@ -269,7 +193,7 @@ void cEntity::Tick(float a_Dt, MTRand & a_TickRandom)
 	}
 	else
 	{
-		HandlePhysics(a_Dt);
+		HandlePhysics(a_Dt, a_Chunk);
 	}
 }
 
@@ -496,7 +420,6 @@ void cEntity::SetSpeedZ(double a_SpeedZ)
 void cEntity::AddPosX(double a_AddPosX)
 {
 	m_Pos.x += a_AddPosX;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -506,7 +429,6 @@ void cEntity::AddPosX(double a_AddPosX)
 void cEntity::AddPosY(double a_AddPosY)
 {
 	m_Pos.y += a_AddPosY;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -516,7 +438,6 @@ void cEntity::AddPosY(double a_AddPosY)
 void cEntity::AddPosZ(double a_AddPosZ)
 {
 	m_Pos.z += a_AddPosZ;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -528,7 +449,6 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
 	m_Pos.z += a_AddPosZ;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -600,7 +520,6 @@ Vector3d cEntity::GetLookVector(void) const
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
 	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -611,7 +530,6 @@ void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 void cEntity::SetPosX(double a_PosX)
 {
 	m_Pos.x = a_PosX;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -622,7 +540,6 @@ void cEntity::SetPosX(double a_PosX)
 void cEntity::SetPosY(double a_PosY)
 {
 	m_Pos.y = a_PosY;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 
@@ -633,7 +550,6 @@ void cEntity::SetPosY(double a_PosY)
 void cEntity::SetPosZ(double a_PosZ)
 {
 	m_Pos.z = a_PosZ;
-	MoveToCorrectChunk();
 	m_bDirtyPosition = true;
 }
 

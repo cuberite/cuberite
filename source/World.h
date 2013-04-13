@@ -100,9 +100,13 @@ public:
 	
 	eDimension GetDimension(void) const { return m_Dimension; }
 
+	/// Returns the world height at the specified coords; waits for the chunk to get loaded / generated
 	int GetHeight(int a_BlockX, int a_BlockZ);
 	
 	// tolua_end
+
+	/// Retrieves the world height at the specified coords; returns false if chunk not loaded / generated
+	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // TODO: Export in ManualBindings.cpp
 
 	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void BroadcastChat               (const AString & a_Message, const cClientHandle * a_Exclude = NULL);
@@ -136,9 +140,9 @@ public:
 	/// If there is a block entity at the specified coords, sends it to the client specified
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 	
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	void MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the chunk data as either loaded from the storage or generated.
 	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
@@ -147,7 +151,7 @@ public:
 	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
 	*/
 	void SetChunkData(
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+		int a_ChunkX, int a_ChunkZ, 
 		const BLOCKTYPE *  a_BlockTypes,
 		const NIBBLETYPE * a_BlockMeta,
 		const NIBBLETYPE * a_BlockLight,
@@ -165,13 +169,13 @@ public:
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 	
-	bool GetChunkData      (int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback);
+	bool GetChunkData      (int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback);
 	
 	/// Gets the chunk's blocks, only the block types
-	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
+	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 	
-	bool IsChunkValid      (int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
-	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const;
+	bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) const;
+	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
 	void UnloadUnusedChunks(void);    // tolua_export
 	
@@ -203,13 +207,12 @@ public:
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
-	void AddEntity( cEntity* a_Entity );
+	void AddEntity(cEntity * a_Entity);
+	
+	bool HasEntity(int a_UniqueID);
 	
 	/// Removes the entity from the chunk specified
-	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	
-	/// Moves the entity from its current chunk to the new chunk specified
-	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ);
 	
 	/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -217,23 +220,23 @@ public:
 	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
-	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param
+	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false.
 	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // TODO: Exported in ManualBindings.cpp
 
 	/// Compares clients of two chunks, calls the callback accordingly
-	void CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
+	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
 	
 	/// Adds client to a chunk, if not already present; returns true if added, false if present
-	bool AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	bool AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Removes client from the chunk specified
-	void RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	void RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Removes the client from all chunks it is present in
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 	
 	/// Sends the chunk to the client specified, if the chunk is valid. If not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid+lighted)
-	void SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 	
 	/// Removes client from ChunkSender's queue of chunks to be sent
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
@@ -461,7 +464,7 @@ public:
 	int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityType);  // tolua_export
 	
 	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
-	unsigned GetTickRandomNumber(unsigned a_Range) { return m_TickRand.randInt(a_Range); }
+	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
 	
 private:
 
@@ -505,7 +508,6 @@ private:
 	cRedstoneSimulator * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSClients;
-	cCriticalSection m_CSEntities;
 	cCriticalSection m_CSPlayers;
 
 	cWorldStorage     m_Storage;
@@ -536,8 +538,6 @@ private:
 	bool m_IsSaplingBonemealable;
 	bool m_IsSugarcaneBonemealable;
 	
-	cEntityList       m_RemoveEntityQueue;
-	cEntityList       m_AllEntities;
 	cClientHandleList m_Clients;
 	cPlayerList       m_Players;
 

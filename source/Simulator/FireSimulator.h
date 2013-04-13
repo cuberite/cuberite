@@ -38,10 +38,10 @@ protected:
 	unsigned m_BurnStepTimeNonfuel;
 
 	/// Chance [0..100000] of an adjacent fuel to catch fire on each tick
-	unsigned m_Flammability;
+	int m_Flammability;
 	
 	/// Chance [0..100000] of a fuel burning out being replaced by a new fire block instead of an air block
-	unsigned m_ReplaceFuelChance;
+	int m_ReplaceFuelChance;
 	
 	
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;

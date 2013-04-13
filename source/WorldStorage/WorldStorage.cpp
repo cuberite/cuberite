@@ -349,16 +349,12 @@ bool cWorldStorage::SaveOneChunk(void)
 		LOGINFO("Saved all chunks in world %s", m_World->GetName().c_str());
 		return HasMore;
 	}
-	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ))
+	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkZ))
 	{
-		m_World->MarkChunkSaving(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
+		m_World->MarkChunkSaving(Save.m_ChunkX, Save.m_ChunkZ);
 		if (m_SaveSchema->SaveChunk(Save))
 		{
-			m_World->MarkChunkSaved(Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
-		}
-		else
-		{
-			LOGWARNING("Cannot save chunk [%d, %d, %d]", Save.m_ChunkX, Save.m_ChunkY, Save.m_ChunkZ);
+			m_World->MarkChunkSaved(Save.m_ChunkX, Save.m_ChunkZ);
 		}
 	}
 	return HasMore;
@@ -370,7 +366,7 @@ bool cWorldStorage::SaveOneChunk(void)
 
 bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	if (m_World->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ))
+	if (m_World->IsChunkValid(a_ChunkX, a_ChunkZ))
 	{
 		// Already loaded (can happen, since the queue is async)
 		return true;

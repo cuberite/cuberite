@@ -875,7 +875,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int & a_Uncomp
 	NIBBLETYPE * SkyLight   = (NIBBLETYPE *)(BlockData + cChunkDef::SkyLightOffset);
 	
 	a_World->SetChunkData(
-		a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ,
+		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockData, MetaData,
 		IsLightValid ? BlockLight : NULL,
 		IsLightValid ? SkyLight : NULL,
@@ -919,7 +919,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 {
 	// Serialize the chunk:
 	cJsonChunkSerializer Serializer;
-	if (!a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ, Serializer))
+	if (!a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
 	{
 		// Chunk not valid
 		LOG("cWSSCompact: Trying to save chunk [%d, %d, %d] that has no data, ignoring request.", a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);

@@ -23,9 +23,9 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, char a_Prot
 
 
 // What to do if in Chasing State
-void cAggressiveMonster::InStateChasing(float a_Dt, MTRand & a_TickRandom)
+void cAggressiveMonster::InStateChasing(float a_Dt)
 {
-	super::InStateChasing(a_Dt, a_TickRandom);
+	super::InStateChasing(a_Dt);
 	m_ChaseTime += a_Dt;
 	if (m_Target != NULL)
 	{
@@ -58,9 +58,9 @@ void cAggressiveMonster::InStateChasing(float a_Dt, MTRand & a_TickRandom)
 
 
 
-void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity, MTRand & a_TickRandom)
+void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
 {
-	super::EventSeePlayer(a_Entity, a_TickRandom);
+	super::EventSeePlayer(a_Entity);
 	m_EMState = CHASING;
 }
 
@@ -68,26 +68,26 @@ void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity, MTRand & a_TickRando
 
 
 
-void cAggressiveMonster::Tick(float a_Dt, MTRand & a_TickRandom)
+void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_TickRandom);
+	super::Tick(a_Dt, a_Chunk);
 
 	m_SeePlayerInterval += a_Dt;
 
 	if (m_SeePlayerInterval > 1)
 	{
-		int rem = a_TickRandom.randInt() % 3 + 1;  // Check most of the time but miss occasionally
+		int rem = m_World->GetTickRandomNumber(3) + 1;  // Check most of the time but miss occasionally
 
 		m_SeePlayerInterval = 0.0;
 		if (rem >= 2)
 		{
 			if (m_EMState == CHASING)
 			{
-				CheckEventLostPlayer(a_TickRandom);
+				CheckEventLostPlayer();
 			}
 			else
 			{
-				CheckEventSeePlayer(a_TickRandom);
+				CheckEventSeePlayer();
 			}
 		}
 	}

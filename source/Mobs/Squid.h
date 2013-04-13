@@ -15,7 +15,7 @@ class cSquid :
 public:
 	cSquid();
 
-	virtual void Tick(float a_Dt, MTRand & a_TickRandom) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 	CLASS_PROTODEF(cSquid);
 	

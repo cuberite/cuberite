@@ -294,20 +294,6 @@ cWorld::cWorld(const AString & a_WorldName) :
 
 cWorld::~cWorld()
 {
-	{
-		cCSLock Lock(m_CSEntities);
-		while (m_AllEntities.begin() != m_AllEntities.end())
-		{
-			cEntity* Entity = *m_AllEntities.begin();
-			m_AllEntities.remove(Entity);
-			if (!Entity->IsDestroyed())
-			{
-				Entity->Destroy();
-			}
-			delete Entity;
-		}
-	}
-
 	delete m_SimulatorManager;
 	delete m_SandSimulator;
 	delete m_WaterSimulator;
@@ -480,25 +466,7 @@ void cWorld::Tick(float a_Dt)
 		m_LastTimeUpdate = m_WorldAge;
 	}
 
-	// Remove entities scheduled for removal:
-	{
-		cCSLock Lock(m_CSEntities);
-		for (cEntityList::iterator itr = m_AllEntities.begin(); itr != m_AllEntities.end();)
-		{
-			if ((*itr)->IsDestroyed())
-			{
-				LOGD("Destroying entity #%i", (*itr)->GetUniqueID());
-				cEntity * RemoveMe = *itr;
-				itr = m_AllEntities.erase(itr);
-				m_RemoveEntityQueue.push_back(RemoveMe); 
-				continue;
-			}
-			(*itr)->Tick(a_Dt, m_TickRand);
-			itr++;
-		}
-	}
-
-	m_ChunkMap->Tick(a_Dt, m_TickRand);
+	m_ChunkMap->Tick(a_Dt);
 
 	TickQueuedBlocks(a_Dt);
 	
@@ -529,13 +497,6 @@ void cWorld::Tick(float a_Dt)
 	{
 		UnloadUnusedChunks();
 	}
-
-	// Delete entities queued for removal:
-	for (cEntityList::iterator itr = m_RemoveEntityQueue.begin(); itr != m_RemoveEntityQueue.end(); ++itr)
-	{
-		delete *itr;
-	}
-	m_RemoveEntityQueue.clear();
 
 	TickSpawnMobs(a_Dt);
 
@@ -1290,6 +1251,15 @@ int cWorld::GetHeight(int a_X, int a_Z)
 
 
 
+bool cWorld::TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height)
+{
+	return m_ChunkMap->TryGetHeight(a_BlockX, a_BlockZ, a_Height);
+}
+
+
+
+
+
 void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
 	return m_ChunkMap->BroadcastAttachEntity(a_Entity, a_Vehicle);
@@ -1577,27 +1547,27 @@ void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 
 
 
-void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkZ);
 }
 
 
 
 
 
-void cWorld::MarkChunkSaving(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::MarkChunkSaving(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkChunkSaving(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->MarkChunkSaving(a_ChunkX, a_ChunkZ);
 }
 
 
 
 
 
-void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkChunkSaved (a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->MarkChunkSaved (a_ChunkX, a_ChunkZ);
 }
 
 
@@ -1605,7 +1575,7 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 void cWorld::SetChunkData(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	int a_ChunkX, int a_ChunkZ,
 	const BLOCKTYPE * a_BlockTypes,
 	const NIBBLETYPE * a_BlockMeta,
 	const NIBBLETYPE * a_BlockLight,
@@ -1628,10 +1598,10 @@ void cWorld::SetChunkData(
 	}
 	
 	m_ChunkMap->SetChunkData(
-		a_ChunkX, a_ChunkY, a_ChunkZ, 
+		a_ChunkX, a_ChunkZ, 
 		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
 		a_HeightMap, *Biomes,
-		a_Entities, a_BlockEntities,
+		a_BlockEntities,
 		a_MarkDirty
 	);
 	
@@ -1642,9 +1612,9 @@ void cWorld::SetChunkData(
 	}
 	
 	// If a client is requesting this chunk, send it to them:
-	if (m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ))
+	if (m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkZ))
 	{
-		m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkY, a_ChunkZ);
+		m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkZ);
 	}
 	
 	// Notify the lighting thread that the chunk has become valid (in case it is a neighbor of a postponed chunk):
@@ -1668,36 +1638,36 @@ void cWorld::ChunkLighted(
 
 
 
-bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cChunkDataCallback & a_Callback)
+bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Callback)
 {
-	return m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkY, a_ChunkZ, a_Callback);
+	return m_ChunkMap->GetChunkData(a_ChunkX, a_ChunkZ, a_Callback);
 }
 
 
 
 
 
-bool cWorld::GetChunkBlockTypes(int a_ChunkX, int a_ChunkY, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
+bool cWorld::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
 {
-	return m_ChunkMap->GetChunkBlockTypes(a_ChunkX, a_ChunkY, a_ChunkZ, a_BlockTypes);
+	return m_ChunkMap->GetChunkBlockTypes(a_ChunkX, a_ChunkZ, a_BlockTypes);
 }
 
 
 
 
 
-bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
+bool cWorld::IsChunkValid(int a_ChunkX, int a_ChunkZ) const
 {
-	return m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkY, a_ChunkZ);
+	return m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkY, int a_ChunkZ) const
+bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 {
-	return m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkY, a_ChunkZ);
+	return m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -1736,7 +1706,7 @@ void cWorld::SetMaxPlayers(int iMax)
 
 
 
-void cWorld::AddPlayer(cPlayer* a_Player)
+void cWorld::AddPlayer(cPlayer * a_Player)
 {
 	cCSLock Lock(m_CSPlayers);
 	
@@ -1750,8 +1720,9 @@ void cWorld::AddPlayer(cPlayer* a_Player)
 
 
 
-void cWorld::RemovePlayer(cPlayer* a_Player)
+void cWorld::RemovePlayer(cPlayer * a_Player)
 {
+	m_ChunkMap->RemoveEntityFromChunk(a_Player, a_Player->GetChunkX(), a_Player->GetChunkZ());
 	cCSLock Lock(m_CSPlayers);
 	m_Players.remove(a_Player);
 }
@@ -1882,18 +1853,9 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 
 
 
-void cWorld::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->RemoveEntityFromChunk(a_Entity, a_ChunkX, a_ChunkY, a_ChunkZ);
-}
-
-
-
-
-
-void cWorld::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, int a_ChunkZ)
-{
-	m_ChunkMap->MoveEntityToChunk(a_Entity, a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->RemoveEntityFromChunk(a_Entity, a_ChunkX, a_ChunkZ);
 }
 
 
@@ -1902,16 +1864,7 @@ void cWorld::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkY, i
 
 bool cWorld::ForEachEntity(cEntityCallback & a_Callback)
 {
-	cCSLock Lock(m_CSEntities);
-	for (cEntityList::iterator itr = m_AllEntities.begin(), itr2 = itr; itr != m_AllEntities.end(); itr = itr2)
-	{
-		++itr2;
-		if (a_Callback.Item(*itr))
-		{
-			return false;
-		}
-	} // for itr - m_AllEntities[]
-	return false;
+	return m_ChunkMap->ForEachEntity(a_Callback);
 }
 
 
@@ -1929,42 +1882,34 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & 
 
 bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
-	cCSLock Lock(m_CSEntities);
-	for (cEntityList::iterator itr = m_AllEntities.begin(), end = m_AllEntities.end(); itr != end; ++itr)
-	{
-		if ((*itr)->GetUniqueID() == a_UniqueID)
-		{
-			return a_Callback.Item(*itr);
-		}
-	} // for itr - m_AllEntities[]
-	return false;
+	return m_ChunkMap->DoWithEntityByID(a_UniqueID, a_Callback);
 }
 
 
 
 
 
-void cWorld::CompareChunkClients(int a_ChunkX1, int a_ChunkY1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkY2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
+void cWorld::CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
 {
-	m_ChunkMap->CompareChunkClients(a_ChunkX1, a_ChunkY1, a_ChunkZ1, a_ChunkX2, a_ChunkY2, a_ChunkZ2, a_Callback);
+	m_ChunkMap->CompareChunkClients(a_ChunkX1, a_ChunkZ1, a_ChunkX2, a_ChunkZ2, a_Callback);
 }
 
 
 
 
 
-bool cWorld::AddChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+bool cWorld::AddChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
-	return m_ChunkMap->AddChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+	return m_ChunkMap->AddChunkClient(a_ChunkX, a_ChunkZ, a_Client);
 }
 
 
 
 
 
-void cWorld::RemoveChunkClient(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::RemoveChunkClient(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
-	m_ChunkMap->RemoveChunkClient(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+	m_ChunkMap->RemoveChunkClient(a_ChunkX, a_ChunkZ, a_Client);
 }
 
 
@@ -1980,9 +1925,9 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkY, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
 }
 
 
@@ -2123,8 +2068,16 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::AddEntity(cEntity * a_Entity)
 {
-	cCSLock Lock(m_CSEntities);
-	m_AllEntities.push_back(a_Entity); 
+	m_ChunkMap->AddEntity(a_Entity);
+}
+
+
+
+
+
+bool cWorld::HasEntity(int a_UniqueID)
+{
+	return m_ChunkMap->HasEntity(a_UniqueID);
 }
 
 
@@ -2254,8 +2207,8 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 			return -1;
 		}
 	}
+	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	Monster->Initialize(this);
-	Monster->TeleportTo(a_PosX, a_PosY, a_PosZ);
 	BroadcastSpawn(*Monster);
 	return Monster->GetUniqueID();
 }

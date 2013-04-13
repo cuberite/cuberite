@@ -238,16 +238,16 @@ void cChunkGenerator::Execute(void)
 		}
 
 		// Hack for regenerating chunks: if Y != 0, the chunk is considered invalid, even if it has its data set
-		if ((coords.m_ChunkY == 0) && m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
+		if ((coords.m_ChunkY == 0) && m_World->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
 			// Already generated, ignore request
 			continue;
 		}
 		
-		if (SkipEnabled && !m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ))
+		if (SkipEnabled && !m_World->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
 		{
-			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
+			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
 			continue;
 		}
 		
@@ -275,7 +275,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	ChunkDesc.CompressBlockMetas(BlockMetas);
 	
 	m_World->SetChunkData(
-		a_ChunkX, a_ChunkY, a_ChunkZ, 
+		a_ChunkX, a_ChunkZ, 
 		ChunkDesc.GetBlockTypes(), BlockMetas,
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
 		&ChunkDesc.GetHeightMap(), &ChunkDesc.GetBiomeMap(),

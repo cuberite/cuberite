@@ -99,7 +99,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 cPlayer::~cPlayer(void)
 {
-	LOG("Deleting cPlayer \"%s\" at %p, ID %d; inv win %p", m_PlayerName.c_str(), this, GetUniqueID(), m_InventoryWindow);
+	LOG("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	
 	SaveToDisk();
 
@@ -109,7 +109,7 @@ cPlayer::~cPlayer(void)
 	
 	delete m_InventoryWindow;
 	
-	LOG("Player %p deleted", this);
+	LOGD("Player %p deleted", this);
 }
 
 
@@ -119,7 +119,7 @@ cPlayer::~cPlayer(void)
 void cPlayer::Initialize( cWorld* a_World )
 {
 	cPawn::Initialize( a_World );
-	GetWorld()->AddPlayer( this );
+	GetWorld()->AddPlayer(this);
 }
 
 
@@ -156,7 +156,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
+void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	if (!m_ClientHandle->IsPlaying())
 	{
@@ -164,7 +164,7 @@ void cPlayer::Tick(float a_Dt, MTRand & a_TickRandom)
 		return;
 	}
 	
-	super::Tick(a_Dt, a_TickRandom);
+	super::Tick(a_Dt, a_Chunk);
 	//TODO: Change this to use the BroadcastMovementUpdate function
 	if (m_bDirtyOrientation && !m_bDirtyPosition)
 	{
@@ -853,12 +853,11 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 		/* Remove all links to the old world */
 		m_World->RemovePlayer( this );
 		m_ClientHandle->RemoveFromAllChunks();
-		m_World->RemoveEntityFromChunk(this, m_ChunkX, m_ChunkY, m_ChunkZ);
+		m_World->RemoveEntityFromChunk(this, GetChunkX(), GetChunkZ());
 
 		/* Add player to all the necessary parts of the new world */
 		SetWorld( World );
-		GetWorld()->AddPlayer( this );
-		MoveToCorrectChunk(true);
+		GetWorld()->AddPlayer(this);
 		GetClientHandle()->StreamChunks();
 
 		return true;
