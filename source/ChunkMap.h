@@ -183,17 +183,14 @@ public:
 	/// Removes the client from all chunks it is present in
 	void RemoveClientFromChunks(cClientHandle * a_Client);
 
-	/// Moves the entity from its current chunk to the new chunk specified
-	void MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ);
-
-	/// Removes the entity from the chunk specified
-	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ);
-	
 	/// Adds the entity to its appropriate chunk, takes ownership of the entity pointer
 	void AddEntity(cEntity * a_Entity);
 	
 	/// Returns true if the entity with specified ID is present in the chunks
 	bool HasEntity(int a_EntityID);
+	
+	/// Removes the entity from its appropriate chunk
+	void RemoveEntity(cEntity * a_Entity);
 	
 	/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible

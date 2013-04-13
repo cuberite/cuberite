@@ -1370,41 +1370,6 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-// TODO: This function should not be needed, remove?
-void cChunkMap::MoveEntityToChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr OldChunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
-	if (OldChunk != NULL)
-	{
-		OldChunk->RemoveEntity(a_Entity);
-	}
-	cChunkPtr NewChunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if (NewChunk != NULL)
-	{
-		NewChunk->AddEntity(a_Entity);
-	}
-}
-
-
-
-
-
-void cChunkMap::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ)
-{
-	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
-	if ((Chunk == NULL) && !Chunk->IsValid())
-	{
-		return;
-	}
-	Chunk->RemoveEntity(a_Entity);
-}
-
-
-
-
-
 void cChunkMap::AddEntity(cEntity * a_Entity)
 {
 	cCSLock Lock(m_CSLayers);
@@ -1431,6 +1396,21 @@ bool cChunkMap::HasEntity(int a_UniqueID)
 		}
 	}
 	return false;
+}
+
+
+
+
+
+void cChunkMap::RemoveEntity(cEntity * a_Entity)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
+	if ((Chunk == NULL) && !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->RemoveEntity(a_Entity);
 }
 
 

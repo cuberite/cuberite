@@ -207,12 +207,13 @@ public:
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
+	/// Adds the entity into its appropriate chunk; takes ownership of the entity ptr
 	void AddEntity(cEntity * a_Entity);
 	
 	bool HasEntity(int a_UniqueID);
 	
-	/// Removes the entity from the chunk specified
-	void RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ);
+	/// Removes the entity, the entity ptr ownership is assumed taken by the caller
+	void RemoveEntity(cEntity * a_Entity);
 	
 	/// Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -557,8 +558,6 @@ private:
 
 	void TickWeather(float a_Dt);  // Handles weather each tick
 	void TickSpawnMobs(float a_Dt);  // Handles mob spawning each tick
-	
-	void RemoveEntity( cEntity * a_Entity );
 	
 	/// Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section)
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);

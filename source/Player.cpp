@@ -853,7 +853,7 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 		/* Remove all links to the old world */
 		m_World->RemovePlayer( this );
 		m_ClientHandle->RemoveFromAllChunks();
-		m_World->RemoveEntityFromChunk(this, GetChunkX(), GetChunkZ());
+		m_World->RemoveEntity(this);
 
 		/* Add player to all the necessary parts of the new world */
 		SetWorld( World );

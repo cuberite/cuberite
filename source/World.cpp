@@ -1722,7 +1722,7 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
-	m_ChunkMap->RemoveEntityFromChunk(a_Player, a_Player->GetChunkX(), a_Player->GetChunkZ());
+	m_ChunkMap->RemoveEntity(a_Player);
 	cCSLock Lock(m_CSPlayers);
 	m_Players.remove(a_Player);
 }
@@ -1847,15 +1847,6 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), true);
 		}
 	}
-}
-
-
-
-
-
-void cWorld::RemoveEntityFromChunk(cEntity * a_Entity, int a_ChunkX, int a_ChunkZ)
-{
-	m_ChunkMap->RemoveEntityFromChunk(a_Entity, a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2078,6 +2069,15 @@ void cWorld::AddEntity(cEntity * a_Entity)
 bool cWorld::HasEntity(int a_UniqueID)
 {
 	return m_ChunkMap->HasEntity(a_UniqueID);
+}
+
+
+
+
+
+void cWorld::RemoveEntity(cEntity * a_Entity)
+{
+	m_ChunkMap->RemoveEntity(a_Entity);
 }
 
 
