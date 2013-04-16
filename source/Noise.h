@@ -4,6 +4,12 @@
 #define NOISE_USE_INLINE 1
 #define NOISE_USE_SSE 0
 
+#define NOISE_DATATYPE double
+
+
+
+
+
 // Do not touch
 #if NOISE_USE_INLINE
 	#ifdef _MSC_VER
@@ -16,7 +22,7 @@
 #endif
 
 #if NOISE_USE_SSE
-# include <emmintrin.h>
+	#include <emmintrin.h>
 #endif
 
 
@@ -27,7 +33,6 @@ class cNoise
 {
 public:
 	cNoise( unsigned int a_Seed );
-	~cNoise();
 
 #if NOISE_USE_SSE
 	__m128 SSE_IntNoise2D( int a_X1, int a_Y1, int a_X2, int a_Y2, int a_X3, int a_Y3, int a_X4, int a_Y4 ) const;
@@ -57,9 +62,9 @@ public:
 
 	void SetSeed( unsigned int a_Seed ) { m_Seed = a_Seed; }
 
-	__NOISE_INLINE__ static float CubicInterpolate( float a_A, float a_B, float a_C, float a_D, float a_Pct );
-	__NOISE_INLINE__ static float CosineInterpolate( float a_A, float a_B, float a_Pct );
-	__NOISE_INLINE__ static float LinearInterpolate( float a_A, float a_B, float a_Pct );
+	__NOISE_INLINE__ static float CubicInterpolate (float a_A, float a_B, float a_C, float a_D, float a_Pct);
+	__NOISE_INLINE__ static float CosineInterpolate(float a_A, float a_B, float a_Pct);
+	__NOISE_INLINE__ static float LinearInterpolate(float a_A, float a_B, float a_Pct);
 
 private:
 
@@ -136,6 +141,102 @@ template<typename TYPE> void ArrayLinearInterpolate2D(
 #if NOISE_USE_INLINE
 	#include "Noise.inc"
 #endif
+
+
+
+
+
+class cCubicNoise
+{
+public:
+	static const int MAX_SIZE = 512;  ///< Maximum size of each dimension of the query arrays.
+	
+	
+	cCubicNoise(int a_Seed);
+	
+	
+	void Generate1D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
+		int a_SizeX,                                     ///< Count of the array
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	);
+	
+	
+	void Generate2D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	);
+	
+	
+	void Generate3D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	);
+	
+protected:
+	typedef NOISE_DATATYPE Workspace1D[4];
+	typedef NOISE_DATATYPE Workspace2D[4][4];
+	
+	cNoise m_Noise;  // Used for integral rnd values
+	
+	/// Calculates the integral and fractional parts along one axis.
+	void CalcFloorFrac(
+		int a_Size,
+		NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
+		int * a_Floor, NOISE_DATATYPE * a_Frac,
+		int * a_Same, int & a_NumSame
+	);
+	
+	void UpdateWorkRnds2DX(
+		Workspace2D & a_WorkRnds,
+		Workspace1D & a_Interps,
+		int a_LastFloorX, int a_NewFloorX,
+		int a_FloorY,
+		NOISE_DATATYPE a_FractionY
+	);
+} ;
+
+
+
+
+
+class cPerlinNoise
+{
+public:
+	void Generate1D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
+		int a_SizeX,                                     ///< Count of the array
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	);
+	
+	
+	void Generate2D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	);
+	
+	
+	void Generate3D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	);
+} ;
 
 
 
