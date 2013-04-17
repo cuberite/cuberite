@@ -43,7 +43,7 @@ clock_t TestCubicNoise(void)
 	clock_t Begin = clock();
 	for (int i = 0; i < 1000; i++)
 	{
-		Cubic.Generate2D(Values, 256, 256, 0, 25.6, 0, 25.6);
+		Cubic.Generate2D(Values, 256, 256, 0, (NOISE_DATATYPE)25.6, 0, (NOISE_DATATYPE)25.6);
 	}
 	clock_t Ticks = clock() - Begin;
 	LOG("cCubicNoise generating 1000 * 256x256 values took %d ticks (%.02f sec)", Ticks, (double)Ticks / CLOCKS_PER_SEC);
@@ -96,5 +96,6 @@ int main(int argc, char * argv[])
 	clock_t NewTicks = TestCubicNoise();
 	clock_t OldTicks = TestOldNoise();
 	LOG("New method is %.02fx faster", (double)OldTicks / NewTicks);
+	LOG("Press Enter to quit program");
 	getchar();
 }

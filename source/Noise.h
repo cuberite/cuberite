@@ -1,28 +1,21 @@
+
+// Noise.h
+
+// Declares the cNoise, cCubicNoise and cPerlinNoise classes for generating noise
+
 #pragma once
 
 // Some settings
-#define NOISE_USE_INLINE 1
-#define NOISE_USE_SSE 0
-
 #define NOISE_DATATYPE float
 
 
 
 
 
-// Do not touch
-#if NOISE_USE_INLINE
-	#ifdef _MSC_VER
-		#define __NOISE_INLINE__ __forceinline
-	#else
-		#define __NOISE_INLINE__ inline
-	#endif  // _MSC_VER
+#ifdef _MSC_VER
+	#define INLINE __forceinline
 #else
-	#define __NOISE_INLINE__
-#endif
-
-#if NOISE_USE_SSE
-	#include <emmintrin.h>
+	#define INLINE inline
 #endif
 
 
@@ -32,48 +25,36 @@
 class cNoise
 {
 public:
-	cNoise( unsigned int a_Seed );
+	cNoise(unsigned int a_Seed);
 
-#if NOISE_USE_SSE
-	__m128 SSE_IntNoise2D( int a_X1, int a_Y1, int a_X2, int a_Y2, int a_X3, int a_Y3, int a_X4, int a_Y4 ) const;
-#endif
-
-	__NOISE_INLINE__ float IntNoise( int a_X ) const;
-	__NOISE_INLINE__ float IntNoise2D( int a_X, int a_Y ) const;
-	__NOISE_INLINE__ float IntNoise3D( int a_X, int a_Y, int a_Z ) const;
+	// The following functions, if not marked INLINE, are about 20 % slower
+	INLINE NOISE_DATATYPE IntNoise1D(int a_X) const;
+	INLINE NOISE_DATATYPE IntNoise2D(int a_X, int a_Y) const;
+	INLINE NOISE_DATATYPE IntNoise3D(int a_X, int a_Y, int a_Z) const;
 
 	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of occurrence. Divide by 8 to rectify.
-	__NOISE_INLINE__ int IntNoise1DInt( int a_X ) const;
-	__NOISE_INLINE__ int IntNoise2DInt( int a_X, int a_Y ) const;
-	__NOISE_INLINE__ int IntNoise3DInt( int a_X, int a_Y, int a_Z ) const;
+	INLINE int IntNoise1DInt(int a_X) const;
+	INLINE int IntNoise2DInt(int a_X, int a_Y) const;
+	INLINE int IntNoise3DInt(int a_X, int a_Y, int a_Z) const;
 
-	float LinearNoise1D( float a_X ) const;
-	float CosineNoise1D( float a_X ) const;
-	float CubicNoise1D( float a_X ) const;
-	float SmoothNoise1D( int a_X ) const;
+	NOISE_DATATYPE LinearNoise1D(NOISE_DATATYPE a_X) const;
+	NOISE_DATATYPE CosineNoise1D(NOISE_DATATYPE a_X) const;
+	NOISE_DATATYPE CubicNoise1D (NOISE_DATATYPE a_X) const;
+	NOISE_DATATYPE SmoothNoise1D(int a_X) const;
 
-	float LinearNoise2D( float a_X, float a_Y ) const;
-	float CosineNoise2D( float a_X, float a_Y ) const;
-	float CubicNoise2D( float a_X, float a_Y ) const;
-	float SSE_CubicNoise2D( float a_X, float a_Y ) const;
+	NOISE_DATATYPE CubicNoise2D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) const;
 
-	float CosineNoise3D( float a_X, float a_Y, float a_Z ) const;
-	float CubicNoise3D( float a_X, float a_Y, float a_Z ) const;
+	NOISE_DATATYPE CubicNoise3D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const;
 
-	void SetSeed( unsigned int a_Seed ) { m_Seed = a_Seed; }
+	void SetSeed(unsigned int a_Seed) { m_Seed = a_Seed; }
 
-	__NOISE_INLINE__ static float CubicInterpolate (float a_A, float a_B, float a_C, float a_D, float a_Pct);
-	__NOISE_INLINE__ static float CosineInterpolate(float a_A, float a_B, float a_Pct);
-	__NOISE_INLINE__ static float LinearInterpolate(float a_A, float a_B, float a_Pct);
+	INLINE static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
+	INLINE static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
+	INLINE static NOISE_DATATYPE LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
 
 private:
-
-#if NOISE_USE_SSE
-	__m128 CubicInterpolate4( const __m128 & a_A, const __m128 & a_B, const __m128 & a_C, const __m128 & a_D, float a_Pct ) const;
-#endif
-
 	unsigned int m_Seed;
-};
+} ;
 
 
 
@@ -237,6 +218,111 @@ public:
 		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
 	);
 } ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Inline function definitions:
+// These need to be in the header, otherwise linker error occur in MSVC
+
+NOISE_DATATYPE cNoise::IntNoise1D(int a_X) const
+{
+	int x = ((a_X * m_Seed) << 13) ^ a_X;
+	return (1 - (NOISE_DATATYPE)((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
+	// returns a float number in the range of [-1, 1]
+}
+
+
+
+
+
+NOISE_DATATYPE cNoise::IntNoise2D(int a_X, int a_Y) const
+{
+	int n = a_X + a_Y * 57 + m_Seed * 57 * 57;
+	n = (n << 13) ^ n;
+	return (1 - (NOISE_DATATYPE)((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824);
+	// returns a float number in the range of [-1, 1]
+}
+
+
+
+
+
+NOISE_DATATYPE cNoise::IntNoise3D(int a_X, int a_Y, int a_Z) const
+{
+	int n = a_X + a_Y * 57 + a_Z * 57 * 57 + m_Seed * 57 * 57 * 57;
+	n = (n << 13) ^ n;
+	return ((NOISE_DATATYPE)1 - (NOISE_DATATYPE)((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
+	// returns a float number in the range of [-1, 1]
+}
+
+
+
+
+
+int cNoise::IntNoise1DInt(int a_X) const
+{
+	int x = ((a_X * m_Seed) << 13) ^ a_X;
+	return ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff);
+}
+
+
+
+
+
+int cNoise::IntNoise2DInt(int a_X, int a_Y) const
+{
+	int n = a_X + a_Y * 57 + m_Seed * 57 * 57;
+	n = (n << 13) ^ n;
+	return ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
+}
+
+
+
+
+
+int cNoise::IntNoise3DInt(int a_X, int a_Y, int a_Z) const
+{
+	int n = a_X + a_Y * 57 + a_Z * 57 * 57 + m_Seed * 57 * 57 * 57;
+	n = (n << 13) ^ n;
+	return ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff);
+}
+
+
+
+
+
+NOISE_DATATYPE cNoise::CubicInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct)
+{
+	NOISE_DATATYPE P = (a_D - a_C) - (a_A - a_B);
+	NOISE_DATATYPE Q = (a_A - a_B) - P;
+	NOISE_DATATYPE R = a_C - a_A;
+	NOISE_DATATYPE S = a_B;
+
+	return ((P * a_Pct + Q) * a_Pct + R) * a_Pct + S;
+}
+
+
+
+
+
+NOISE_DATATYPE cNoise::CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct)
+{
+	const NOISE_DATATYPE ft = a_Pct * (NOISE_DATATYPE)3.1415927;
+	const NOISE_DATATYPE f = (1 - cos(ft)) * (NOISE_DATATYPE)0.5;
+	return  a_A * (1 - f) + a_B * f;
+}
+
+
+
+
+
+NOISE_DATATYPE cNoise::LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct)
+{
+	return  a_A * (1 - a_Pct) + a_B * a_Pct;
+}
 
 
 

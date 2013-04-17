@@ -573,10 +573,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\source\Noise.inc"
-				>
-			</File>
-			<File
 				RelativePath="..\source\Piston.cpp"
 				>
 			</File>
