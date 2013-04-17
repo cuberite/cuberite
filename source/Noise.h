@@ -4,7 +4,7 @@
 #define NOISE_USE_INLINE 1
 #define NOISE_USE_SSE 0
 
-#define NOISE_DATATYPE double
+#define NOISE_DATATYPE float
 
 
 
