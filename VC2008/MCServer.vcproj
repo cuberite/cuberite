@@ -1035,6 +1035,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\TNTEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\TNTEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Torch.h"
 					>
 				</File>
