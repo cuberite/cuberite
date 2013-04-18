@@ -67,6 +67,7 @@ public:
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!
 		etFallingBlock,
 		etMinecart,
+		etTNT,
 		
 		// DEPRECATED older constants, left over for compatibility reasons (plugins)
 		eEntityType_Entity = etEntity,

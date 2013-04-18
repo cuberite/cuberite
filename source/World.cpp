@@ -703,6 +703,68 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 
 
+void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	//TODO implement explosion using cBlockArea, add damage to pawns, add support for pickups, and implement block hardiness
+	Vector3d explosion_pos = Vector3d(a_BlockX,a_BlockY,a_BlockZ);
+	cVector3iList BlocksAffected;
+	for (int i=0;i<a_ExplosionSize;i++)
+	{
+		for (int j=0;j<a_ExplosionSize;j++)
+		{
+			for (int k=0;k<a_ExplosionSize;k++)
+			{
+				DigBlock(a_BlockX+i,a_BlockY+j,a_BlockZ+k);
+				DigBlock(a_BlockX+i,a_BlockY-j,a_BlockZ+k);
+				DigBlock(a_BlockX-i,a_BlockY-j,a_BlockZ-k);
+				DigBlock(a_BlockX-i,a_BlockY+j,a_BlockZ-k);
+				DigBlock(a_BlockX+i,a_BlockY+j,a_BlockZ-k);
+				DigBlock(a_BlockX+i,a_BlockY-j,a_BlockZ-k);
+				DigBlock(a_BlockX-i,a_BlockY+j,a_BlockZ+k);
+				DigBlock(a_BlockX-i,a_BlockY-j,a_BlockZ+k);
+				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY+j,a_BlockZ+k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY-j,a_BlockZ+k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY-j,a_BlockZ-k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY+j,a_BlockZ-k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY+j,a_BlockZ-k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY-j,a_BlockZ-k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY+j,a_BlockZ+k));
+				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY-j,a_BlockZ+k));
+			}
+		}
+		
+	}
+	BroadcastSoundEffect("random.explode", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.6f);
+	{
+		cCSLock Lock(m_CSPlayers);
+		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+		{
+			cClientHandle * ch = (*itr)->GetClientHandle();
+			if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+			{
+				continue;
+			}
+			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
+			if (distance_explosion.SqrLength() < 4096.0)
+			{
+				double real_distance = sqrt( distance_explosion.SqrLength());
+				if (real_distance <= 0.0004)
+					real_distance = 0.0004;
+				double power = a_ExplosionSize / real_distance;
+				if (power <= 1)
+					power = 0;
+				distance_explosion.Normalize();
+				distance_explosion *= power;
+				ch->SendExplosion(a_BlockX,a_BlockY,a_BlockZ,a_ExplosionSize,BlocksAffected,(float)distance_explosion.x,(float)distance_explosion.y,(float)distance_explosion.z);
+			}
+		}
+	}
+}
+
+
+
+
+
 bool cWorld::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithChestAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);

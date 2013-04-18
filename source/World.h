@@ -338,6 +338,9 @@ public:
 	/// Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
+	/// Does an explosion with the specified strength at the specified coordinate
+	void DoExplosiontAt  (float a_ExplosionSzie, int a_BlockX, int a_BlockY, int a_BlockZ);  //
+
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
 

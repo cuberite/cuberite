@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 04/13/13 22:59:55.
+** Generated automatically by tolua++-1.0.92 on 04/17/13 19:40:39.
 */
 
 #ifndef __cplusplus
@@ -24409,6 +24409,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"etMob",cEntity::etMob);
    tolua_constant(tolua_S,"etFallingBlock",cEntity::etFallingBlock);
    tolua_constant(tolua_S,"etMinecart",cEntity::etMinecart);
+   tolua_constant(tolua_S,"etTNT",cEntity::etTNT);
    tolua_constant(tolua_S,"eEntityType_Entity",cEntity::eEntityType_Entity);
    tolua_constant(tolua_S,"eEntityType_Player",cEntity::eEntityType_Player);
    tolua_constant(tolua_S,"eEntityType_Pickup",cEntity::eEntityType_Pickup);

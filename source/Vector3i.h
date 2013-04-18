@@ -36,3 +36,6 @@ public:			// tolua_export
 
 	int x, y, z;	// tolua_export
 };	// tolua_export
+
+
+typedef std::list< Vector3i * > cVector3iList;

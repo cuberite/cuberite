@@ -1552,6 +1552,15 @@ void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 
 
+void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iList a_BlocksAffected, float a_PlayerMotionX, float a_PlayerMotionY, float a_PlayerMotionZ)
+{
+	m_Protocol->SendExplosion(a_BlockX,a_BlockY,a_BlockZ,a_Radius, a_BlocksAffected, a_PlayerMotionX, a_PlayerMotionY,a_PlayerMotionZ);
+}
+
+
+
+
+
 void cClientHandle::SendMetadata(const cPawn & a_Pawn)
 {
 	m_Protocol->SendMetadata(a_Pawn);

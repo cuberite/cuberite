@@ -352,6 +352,34 @@ void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 
 
+void cProtocol125::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iList a_BlocksAffected, float a_PlayerMotionX, float a_PlayerMotionY, float a_PlayerMotionZ)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_EXPLOSION);
+	WriteDouble (a_BlockX);
+	WriteDouble (a_BlockY);
+	WriteDouble (a_BlockZ);
+	WriteFloat  (a_Radius);
+	WriteInt    (a_BlocksAffected.size());//it should be a_RecordCount
+	/*WriteByte   (0); //It should be the record
+	WriteByte   (0);
+	WriteByte   (0);*/
+	for (cVector3iList::iterator itr = a_BlocksAffected.begin(); itr != a_BlocksAffected.end(); ++itr)
+	{
+		WriteByte   ((Byte)((*itr)->x - a_BlockX));
+		WriteByte   ((Byte)((*itr)->y - a_BlockY));
+		WriteByte   ((Byte)((*itr)->z - a_BlockZ));
+	}
+	WriteFloat  (a_PlayerMotionX);
+	WriteFloat  (a_PlayerMotionY);
+	WriteFloat  (a_PlayerMotionZ);
+	Flush();
+}
+
+
+
+
+
 void cProtocol125::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
 	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
