@@ -708,11 +708,13 @@ void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, i
 	// TODO: implement explosion using cBlockArea / in cChunkMap, add damage to entities, add support for pickups, and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX,a_BlockY,a_BlockZ);
 	cVector3iArray BlocksAffected;
-	for (int x = 0; x < a_ExplosionSize; x++)
+	int ExplosionSizeInt = (int)a_ExplosionSize;
+	BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
+	for (int x = 0; x < ExplosionSizeInt; x++)
 	{
-		for (int y = 0; y < a_ExplosionSize; y++)
+		for (int y = 0; y < ExplosionSizeInt; y++)
 		{
-			for (int z = 0; z < a_ExplosionSize; z++)
+			for (int z = 0; z < ExplosionSizeInt; z++)
 			{
 				DigBlock(a_BlockX + x, a_BlockY + y, a_BlockZ + z);
 				DigBlock(a_BlockX + x, a_BlockY - y, a_BlockZ + z);
