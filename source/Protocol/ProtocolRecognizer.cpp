@@ -266,10 +266,10 @@ void cProtocolRecognizer::SendEntityStatus(const cEntity & a_Entity, char a_Stat
 
 
 
-void cProtocolRecognizer::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iList a_BlocksAffected, float a_PlayerMotionX, float a_PlayerMotionY, float a_PlayerMotionZ)
+void cProtocolRecognizer::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iArray a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendExplosion(a_BlockX,a_BlockY,a_BlockZ,a_Radius, a_BlocksAffected, a_PlayerMotionX, a_PlayerMotionY,a_PlayerMotionZ);
+	m_Protocol->SendExplosion(a_BlockX,a_BlockY,a_BlockZ,a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
 
 

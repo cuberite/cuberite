@@ -705,31 +705,31 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	//TODO implement explosion using cBlockArea, add damage to pawns, add support for pickups, and implement block hardiness
+	// TODO: implement explosion using cBlockArea / in cChunkMap, add damage to entities, add support for pickups, and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX,a_BlockY,a_BlockZ);
-	cVector3iList BlocksAffected;
-	for (int i=0;i<a_ExplosionSize;i++)
+	cVector3iArray BlocksAffected;
+	for (int x = 0; x < a_ExplosionSize; x++)
 	{
-		for (int j=0;j<a_ExplosionSize;j++)
+		for (int y = 0; y < a_ExplosionSize; y++)
 		{
-			for (int k=0;k<a_ExplosionSize;k++)
+			for (int z = 0; z < a_ExplosionSize; z++)
 			{
-				DigBlock(a_BlockX+i,a_BlockY+j,a_BlockZ+k);
-				DigBlock(a_BlockX+i,a_BlockY-j,a_BlockZ+k);
-				DigBlock(a_BlockX-i,a_BlockY-j,a_BlockZ-k);
-				DigBlock(a_BlockX-i,a_BlockY+j,a_BlockZ-k);
-				DigBlock(a_BlockX+i,a_BlockY+j,a_BlockZ-k);
-				DigBlock(a_BlockX+i,a_BlockY-j,a_BlockZ-k);
-				DigBlock(a_BlockX-i,a_BlockY+j,a_BlockZ+k);
-				DigBlock(a_BlockX-i,a_BlockY-j,a_BlockZ+k);
-				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY+j,a_BlockZ+k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY-j,a_BlockZ+k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY-j,a_BlockZ-k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY+j,a_BlockZ-k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY+j,a_BlockZ-k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX+i,a_BlockY-j,a_BlockZ-k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY+j,a_BlockZ+k));
-				BlocksAffected.push_back(&Vector3i(a_BlockX-i,a_BlockY-j,a_BlockZ+k));
+				DigBlock(a_BlockX + x, a_BlockY + y, a_BlockZ + z);
+				DigBlock(a_BlockX + x, a_BlockY - y, a_BlockZ + z);
+				DigBlock(a_BlockX - x, a_BlockY - y, a_BlockZ - z);
+				DigBlock(a_BlockX - x, a_BlockY + y, a_BlockZ - z);
+				DigBlock(a_BlockX + x, a_BlockY + y, a_BlockZ - z);
+				DigBlock(a_BlockX + x, a_BlockY - y, a_BlockZ - z);
+				DigBlock(a_BlockX - x, a_BlockY + y, a_BlockZ + z);
+				DigBlock(a_BlockX - x, a_BlockY - y, a_BlockZ + z);
+				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY - y, a_BlockZ + z));
+				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY - y, a_BlockZ - z));
+				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY + y, a_BlockZ - z));
+				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ - z));
+				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY - y, a_BlockZ - z));
+				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY + y, a_BlockZ + z));
+				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY - y, a_BlockZ + z));
 			}
 		}
 		
@@ -747,15 +747,15 @@ void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, i
 			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
 			if (distance_explosion.SqrLength() < 4096.0)
 			{
-				double real_distance = sqrt( distance_explosion.SqrLength());
-				if (real_distance <= 0.0004)
-					real_distance = 0.0004;
+				double real_distance = std::max(0.004, sqrt(distance_explosion.SqrLength()));
 				double power = a_ExplosionSize / real_distance;
 				if (power <= 1)
+				{
 					power = 0;
+				}
 				distance_explosion.Normalize();
 				distance_explosion *= power;
-				ch->SendExplosion(a_BlockX,a_BlockY,a_BlockZ,a_ExplosionSize,BlocksAffected,(float)distance_explosion.x,(float)distance_explosion.y,(float)distance_explosion.z);
+				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_ExplosionSize, BlocksAffected, distance_explosion);
 			}
 		}
 	}
