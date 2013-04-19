@@ -165,49 +165,15 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	
 	super::Tick(a_Dt, a_Chunk);
-	//TODO: Change this to use the BroadcastMovementUpdate function
-	if (m_bDirtyOrientation && !m_bDirtyPosition)
-	{
-		m_World->BroadcastEntLook(*this, m_ClientHandle);
-		m_World->BroadcastEntHeadLook(*this, m_ClientHandle);
-		m_bDirtyOrientation = false;
-	}
-	else if (m_bDirtyPosition)
+	if (m_bDirtyPosition)
 	{
 		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
-
-		float DiffX = (float)(GetPosX() - m_LastPosX );
-		float DiffY = (float)(GetPosY() - m_LastPosY );
-		float DiffZ = (float)(GetPosZ() - m_LastPosZ );
-		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
-		if (
-			(SqrDist > 4 * 4) ||  // 4 blocks is max Relative Move
-			(m_World->GetWorldAge() - m_TimeLastTeleportPacket > 40)  // Send an absolute position every 2 seconds
-		)
-		{
-			// LOG("Teleported %f", sqrtf(SqrDist) );
-			m_World->BroadcastTeleportEntity(*this, m_ClientHandle);
-			m_TimeLastTeleportPacket = m_World->GetWorldAge();
-		}
-		else
-		{
-			// Relative move sucks balls! It's always wrong wtf!
-			if (m_bDirtyOrientation)
-			{
-				m_World->BroadcastEntRelMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
-				m_World->BroadcastEntHeadLook(*this, m_ClientHandle);
-				m_bDirtyOrientation = false;
-			}
-			else
-			{
-				m_World->BroadcastEntRelMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32), m_ClientHandle);
-			}
-		}
-		m_LastPosX = GetPosX();
-		m_LastPosY = GetPosY();
-		m_LastPosZ = GetPosZ();
-		m_bDirtyPosition = false;
+		BroadcastMovementUpdate(m_ClientHandle);
 		m_ClientHandle->StreamChunks();
+	}
+	else
+	{
+		BroadcastMovementUpdate(m_ClientHandle);
 	}
 
 	if (m_Health > 0) // make sure player is alive
