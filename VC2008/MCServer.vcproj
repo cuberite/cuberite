@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MCServer"
 	ProjectGUID="{32012054-0C96-4C43-AB27-174FF8E72D66}"
 	RootNamespace="MCServer"
@@ -199,7 +199,7 @@
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="Globals.h"
