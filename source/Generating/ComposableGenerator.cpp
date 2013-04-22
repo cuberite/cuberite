@@ -226,6 +226,19 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 			LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
 		}
 		m_HeightGen = new cHeiGenBiomal(Seed, *m_BiomeGen);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cHeiGenBiomal...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 500; x++)
+		{
+			cChunkDef::HeightMap Heights;
+			m_HeightGen->GenHeightMap(x * 5, x * 5, Heights);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("HeightGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
 	}
 	
 	// Add a cache, if requested:
@@ -295,6 +308,21 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		int SeaLevel = a_IniFile.GetValueSetI("Generator", "BiomalSeaLevel", 62);
 		int Seed = m_ChunkGenerator.GetSeed();
 		m_CompositionGen = new cCompoGenBiomal(Seed, SeaLevel);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cCompoGenBiomal...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 500; x++)
+		{
+			cChunkDesc Desc(200 + x * 8, 200 + x * 8);
+			m_BiomeGen->GenBiomes(Desc.GetChunkX(), Desc.GetChunkZ(), Desc.GetBiomeMap());
+			m_HeightGen->GenHeightMap(Desc.GetChunkX(), Desc.GetChunkZ(), Desc.GetHeightMap());
+			m_CompositionGen->ComposeTerrain(Desc);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("CompositionGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
 	}
 }
 
