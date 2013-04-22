@@ -74,7 +74,7 @@ class cCubicCell2D
 {
 public:
 	cCubicCell2D(
-		cNoise & a_Noise,          ///< Noise to use for generating the random values
+		const cNoise & a_Noise,    ///< Noise to use for generating the random values
 		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
 		int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
 		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
@@ -96,7 +96,7 @@ public:
 protected:
 	typedef NOISE_DATATYPE Workspace[4][4];
 	
-	cNoise & m_Noise;
+	const cNoise & m_Noise;
 	
 	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
@@ -115,7 +115,7 @@ protected:
 
 
 cCubicCell2D::cCubicCell2D(
-	cNoise & a_Noise,          ///< Noise to use for generating the random values
+	const cNoise & a_Noise,    ///< Noise to use for generating the random values
 	NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
 	int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
 	const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
@@ -221,6 +221,15 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 
 cNoise::cNoise(unsigned int a_Seed) :
 	m_Seed(a_Seed)
+{
+}
+
+
+
+
+
+cNoise::cNoise(const cNoise & a_Noise) :
+	m_Seed(a_Noise.m_Seed)
 {
 }
 
@@ -370,6 +379,13 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cCubicNoise:
 
+#ifdef _DEBUG
+	int cCubicNoise::m_NumSingleX = 0;
+	int cCubicNoise::m_NumSingleXY = 0;
+	int cCubicNoise::m_NumSingleY = 0;
+	int cCubicNoise::m_NumCalls = 0;
+#endif  // _DEBUG
+
 cCubicNoise::cCubicNoise(int a_Seed) :
 	m_Noise(a_Seed)
 {
@@ -383,9 +399,8 @@ void cCubicNoise::Generate2D(
 	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
 	int a_SizeX, int a_SizeY,                        ///< Size of the array (num doubles), in each direction
 	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
-)
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
+) const
 {
 	ASSERT(a_SizeX < MAX_SIZE);
 	ASSERT(a_SizeY < MAX_SIZE);
@@ -406,6 +421,23 @@ void cCubicNoise::Generate2D(
 	cCubicCell2D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
 	
 	Cell.InitWorkRnds(FloorX[0], FloorY[0]);
+	
+	#ifdef _DEBUG
+		// Statistics on the noise-space coords:	
+		if (NumSameX == 1)
+		{
+			m_NumSingleX++;
+			if (NumSameY == 1)
+			{
+				m_NumSingleXY++;
+			}
+		}
+		if (NumSameY == 1)
+		{
+			m_NumSingleY++;
+		}
+		m_NumCalls++;
+	#endif _DEBUG
 	
 	// Calculate query values using Cell:
 	int FromY = 0;
@@ -435,7 +467,7 @@ void cCubicNoise::CalcFloorFrac(
 	NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
 	int * a_Floor, NOISE_DATATYPE * a_Frac,
 	int * a_Same, int & a_NumSame
-)
+) const
 {
 	NOISE_DATATYPE val = a_Start;
 	NOISE_DATATYPE dif = (a_End - a_Start) / a_Size;
@@ -464,6 +496,105 @@ void cCubicNoise::CalcFloorFrac(
 	{
 		a_Same[a_NumSame] = a_Size - LastSame;
 		a_NumSame += 1;
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cPerlinNoise:
+
+cPerlinNoise::cPerlinNoise(void) :
+	m_Seed(0)
+{
+}
+
+
+
+
+
+cPerlinNoise::cPerlinNoise(int a_Seed) :
+	m_Seed(a_Seed)
+{
+}
+
+
+
+
+
+void cPerlinNoise::SetSeed(int a_Seed)
+{
+	m_Seed = a_Seed;
+}
+
+
+
+
+
+void cPerlinNoise::AddOctave(float a_Frequency, float a_Amplitude)
+{
+	m_Octaves.push_back(cOctave(m_Seed * (m_Octaves.size() + 4) * 4 + 1024, a_Frequency, a_Amplitude));
+}
+
+
+
+
+
+void cPerlinNoise::Generate2D(
+	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
+) const
+{
+	if (m_Octaves.empty())
+	{
+		// No work to be done
+		return;
+	}
+	
+	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	int ArrayCount = a_SizeX * a_SizeY;
+	if (ShouldFreeWorkspace)
+	{
+		a_Workspace = new NOISE_DATATYPE[ArrayCount];
+	}
+	
+	// Generate the first octave directly into array:
+	m_Octaves.front().m_Noise.Generate2D(
+		a_Workspace, a_SizeX, a_SizeY,
+		a_StartX * m_Octaves.front().m_Frequency, a_EndX * m_Octaves.front().m_Frequency,
+		a_StartY * m_Octaves.front().m_Frequency, a_EndY * m_Octaves.front().m_Frequency
+	);
+	NOISE_DATATYPE Amplitude = m_Octaves.front().m_Amplitude;
+	for (int i = 0; i < ArrayCount; i++)
+	{
+		a_Array[i] *= Amplitude;
+	}
+	
+	// Add each octave:
+	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
+	{
+		// Generate cubic noise for the octave:
+		itr->m_Noise.Generate2D(
+			a_Workspace, a_SizeX, a_SizeY,
+			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
+			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency
+		);
+		// Add the cubic noise into the output:
+		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
+		for (int i = 0; i < ArrayCount; i++)
+		{
+			a_Array[i] += a_Workspace[i] * Amplitude;
+		}
+	}
+	
+	if (ShouldFreeWorkspace)
+	{
+		delete[] a_Workspace;
 	}
 }
 

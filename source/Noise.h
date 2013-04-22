@@ -26,6 +26,7 @@ class cNoise
 {
 public:
 	cNoise(unsigned int a_Seed);
+	cNoise(const cNoise & a_Noise);
 
 	// The following functions, if not marked INLINE, are about 20 % slower
 	INLINE NOISE_DATATYPE IntNoise1D(int a_X) const;
@@ -139,18 +140,16 @@ public:
 	void Generate1D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
 		int a_SizeX,                                     ///< Count of the array
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
-		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
-	);
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX   ///< Noise-space coords of the array
+	) const;
 	
 	
 	void Generate2D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
 		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
-	);
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
+	) const;
 	
 	
 	void Generate3D(
@@ -158,15 +157,22 @@ public:
 		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
-	);
+		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Z direction
+	) const;
 	
 protected:
 	typedef NOISE_DATATYPE Workspace1D[4];
 	typedef NOISE_DATATYPE Workspace2D[4][4];
 	
 	cNoise m_Noise;  // Used for integral rnd values
+
+	#ifdef _DEBUG
+		// Statistics on the noise-space coords:	
+		static int m_NumSingleX;
+		static int m_NumSingleXY;
+		static int m_NumSingleY;
+		static int m_NumCalls;
+	#endif  // _DEBUG
 	
 	/// Calculates the integral and fractional parts along one axis.
 	void CalcFloorFrac(
@@ -174,7 +180,7 @@ protected:
 		NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
 		int * a_Floor, NOISE_DATATYPE * a_Frac,
 		int * a_Same, int & a_NumSame
-	);
+	) const;
 	
 	void UpdateWorkRnds2DX(
 		Workspace2D & a_WorkRnds,
@@ -182,7 +188,7 @@ protected:
 		int a_LastFloorX, int a_NewFloorX,
 		int a_FloorY,
 		NOISE_DATATYPE a_FractionY
-	);
+	) const;
 } ;
 
 
@@ -192,12 +198,20 @@ protected:
 class cPerlinNoise
 {
 public:
+	cPerlinNoise(void);
+	cPerlinNoise(int a_Seed);
+	
+	
+	void SetSeed(int a_Seed);
+	
+	void AddOctave(NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude);
+	
 	void Generate1D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
 		int a_SizeX,                                     ///< Count of the array
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
 		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
-	);
+	) const;
 	
 	
 	void Generate2D(
@@ -206,7 +220,7 @@ public:
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
 		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
-	);
+	) const;
 	
 	
 	void Generate3D(
@@ -216,7 +230,29 @@ public:
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
 		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
 		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
-	);
+	) const;
+	
+protected:
+	class cOctave
+	{
+	public:
+		cCubicNoise m_Noise;
+		
+		NOISE_DATATYPE m_Frequency;  // Coord multiplier
+		NOISE_DATATYPE m_Amplitude;  // Value multiplier
+		
+		cOctave(int a_Seed, NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude) :
+			m_Noise(a_Seed),
+			m_Frequency(a_Frequency),
+			m_Amplitude(a_Amplitude)
+		{
+		}
+	} ;
+	
+	typedef std::vector<cOctave> cOctaves;
+	
+	int      m_Seed;
+	cOctaves m_Octaves;
 } ;
 
 
