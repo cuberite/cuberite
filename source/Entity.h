@@ -159,7 +159,7 @@ public:
 	// tolua_end
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk);
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) {}
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk);
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
@@ -220,6 +220,9 @@ protected:
 	bool     m_bDirtyPosition;
 	bool     m_bDirtySpeed;
 
+	bool     m_bOnGround;
+	float    m_Gravity;
+
 	// Last Position.
 	double m_LastPosX, m_LastPosY, m_LastPosZ;
 
@@ -248,6 +251,7 @@ private:
 	Vector3d m_Speed;
 	Vector3d m_Rot;
 	Vector3d m_Pos;
+	Vector3d m_WaterSpeed;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;

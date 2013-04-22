@@ -9,6 +9,9 @@
 #include "Matrix4f.h"
 #include "ReferenceManager.h"
 #include "ClientHandle.h"
+#include "Tracer.h"
+#include "Chunk.h"
+#include "Simulator/FluidSimulator.h"
 
 
 
@@ -33,6 +36,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
 	, m_bDirtySpeed(true)
+	, m_bOnGround( false )
+	, m_Gravity( -9.81f )
 	, m_IsInitialized(false)
 	, m_LastPosX( 0.0 )
 	, m_LastPosY( 0.0 )
@@ -44,6 +49,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_World(NULL)
 	, m_FireDamageInterval(0.f)
 	, m_BurnPeriod(0.f)
+	, m_WaterSpeed( 0.0 , 0.0 , 0.0 )
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -194,6 +200,160 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	else
 	{
 		HandlePhysics(a_Dt, a_Chunk);
+	}
+}
+
+
+
+
+
+void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+{
+	//TODO Add collision detection with entities.
+	a_Dt /= 1000;
+	Vector3d NextPos = Vector3d(GetPosX(),GetPosY(),GetPosZ());
+	Vector3d NextSpeed = Vector3d(GetSpeedX(),GetSpeedY(),GetSpeedZ());
+	int BlockX = (int) floor(NextPos.x);
+	int BlockY = (int) floor(NextPos.y);
+	int BlockZ = (int) floor(NextPos.z);
+	//Make sure we got the correct chunk and a valid one. No one ever knows...
+	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
+	if (NextChunk != NULL)
+	{
+		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
+		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
+		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+		if( BlockIn == E_BLOCK_AIR || IsBlockWater(BlockIn) || BlockIn == E_BLOCK_FIRE || IsBlockLava(BlockIn) ) // If not in ground itself or in water or in fire or in lava
+		{
+			if( m_bOnGround ) // check if it's still on the ground
+			{
+				BLOCKTYPE BlockBelow = NextChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
+				if(BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow) || BlockBelow == E_BLOCK_FIRE || IsBlockLava(BlockBelow)) //Check if block below is air or water.
+				{
+					m_bOnGround = false;
+				}
+			}
+		}
+		else
+		{
+			//Push out entity.
+			m_bOnGround = true;
+			NextPos.y += 0.2;
+			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
+				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
+		}
+
+		if (!m_bOnGround)
+		{
+			float fallspeed;
+			if (!IsBlockWater(BlockIn))
+			{
+				fallspeed = m_Gravity * a_Dt;
+			}
+			else
+			{
+				fallspeed = -3.0f * a_Dt; //Fall slower in water.
+			}
+			NextSpeed.y += fallspeed;
+		}
+		else
+		{
+			//Friction
+			if (NextSpeed.SqrLength() > 0.0004f)
+			{
+				NextSpeed.x *= 0.7f/(1+a_Dt);
+				if ( fabs(NextSpeed.x) < 0.05 ) NextSpeed.x = 0;
+				NextSpeed.z *= 0.7f/(1+a_Dt);
+				if ( fabs(NextSpeed.z) < 0.05 ) NextSpeed.z = 0;
+			}
+		}
+		
+		//Get water direction
+		Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+
+		m_WaterSpeed *= 0.9f;		//Reduce speed each tick
+
+		switch(WaterDir)
+		{
+			case X_PLUS:
+				m_WaterSpeed.x = 1.f;
+				m_bOnGround = false;
+				break;
+			case X_MINUS:
+				m_WaterSpeed.x = -1.f;
+				m_bOnGround = false;
+				break;
+			case Z_PLUS:
+				m_WaterSpeed.z = 1.f;
+				m_bOnGround = false;
+				break;
+			case Z_MINUS:
+				m_WaterSpeed.z = -1.f;
+				m_bOnGround = false;
+				break;
+			
+		default:
+			break;
+		}
+
+		if (fabs(m_WaterSpeed.x) < 0.05)
+		{
+			m_WaterSpeed.x = 0;
+		}
+
+		if (fabs(m_WaterSpeed.z) < 0.05)
+		{
+			m_WaterSpeed.z = 0;
+		}
+
+		NextSpeed += m_WaterSpeed;
+
+		if( NextSpeed.SqrLength() > 0.f )
+		{
+			cTracer Tracer( GetWorld() );
+			int Ret = Tracer.Trace( NextPos, NextSpeed, 2 );
+			if( Ret ) // Oh noez! we hit something
+			{
+				// Set to hit position
+				if( (Tracer.RealHit - NextPos).SqrLength() <= ( NextSpeed * a_Dt ).SqrLength() )
+				{
+					if( Ret == 1 )
+					{
+
+						if( Tracer.HitNormal.x != 0.f ) NextSpeed.x = 0.f;
+						if( Tracer.HitNormal.y != 0.f ) NextSpeed.y = 0.f;
+						if( Tracer.HitNormal.z != 0.f ) NextSpeed.z = 0.f;
+
+						if( Tracer.HitNormal.y > 0 ) // means on ground
+						{
+							m_bOnGround = true;
+						}
+					}
+					NextPos.Set(Tracer.RealHit.x,Tracer.RealHit.y,Tracer.RealHit.z);
+					NextPos.x += Tracer.HitNormal.x * 0.5f;
+					NextPos.z += Tracer.HitNormal.z * 0.5f;
+				}
+				else
+					NextPos += (NextSpeed * a_Dt);
+			}
+			else
+			{	// We didn't hit anything, so move =]
+				NextPos += (NextSpeed * a_Dt);
+			}
+		}
+		BlockX = (int) floor(NextPos.x);
+	    BlockZ = (int) floor(NextPos.z);
+		NextChunk = NextChunk->GetNeighborChunk(BlockX,BlockZ);
+		//See if we can commit our changes. If not, we will discard them.
+		if (NextChunk != NULL)
+		{
+			if (NextPos.x != GetPosX()) SetPosX(NextPos.x);
+			if (NextPos.y != GetPosY()) SetPosY(NextPos.y);
+			if (NextPos.z != GetPosZ()) SetPosZ(NextPos.z);
+			if (NextSpeed.x != GetSpeedX()) SetSpeedX(NextSpeed.x);
+			if (NextSpeed.y != GetSpeedY()) SetSpeedY(NextSpeed.y);
+			if (NextSpeed.z != GetSpeedZ()) SetSpeedZ(NextSpeed.z);
+		}
 	}
 }
 

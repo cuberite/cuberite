@@ -14,8 +14,8 @@
 #include "../Vector3f.h"
 #include "../Vector3i.h"
 #include "../Vector3d.h"
-
 #include "../Tracer.h"
+
 // #include "../../iniFile/iniFile.h"
 
 
@@ -27,8 +27,6 @@ cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const A
 	, m_Target(NULL)
 	, m_bMovingToDestination(false)
 	, m_DestinationTime( 0 )
-	, m_Gravity( -9.81f)
-	, m_bOnGround( false )
 	, m_DestroyTimer( 0 )
 	, m_Jump(0)
 	, m_MobType(a_ProtocolMobType)
@@ -102,6 +100,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
+	HandlePhysics(a_Dt,a_Chunk);
+	BroadcastMovementUpdate();
+
 	a_Dt /= 1000;
 
 	if (m_bMovingToDestination)
@@ -143,9 +144,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	HandlePhysics(a_Dt);
-	BroadcastMovementUpdate();
-
 	Vector3d Distance = m_Destination - GetPosition();
 	if (Distance.SqrLength() > 0.1f)
 	{
@@ -154,7 +152,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		VectorToEuler( Distance.x, Distance.y, Distance.z, Rotation, Pitch );
 		SetHeadYaw (Rotation);
 		SetRotation( Rotation );
-		SetPitch( Pitch );
+		SetPitch( -Pitch );
 	}
 
 	switch (m_EMState)
@@ -181,120 +179,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	}  // switch (m_EMState)
 }
 
-
-
-
-//Not used. Will remove later when we implement the AI.
-void cMonster::ReplicateMovement()
-{
-	if (m_bDirtyOrientation && !m_bDirtyPosition)
-	{
-		m_World->BroadcastEntLook(*this);
-		m_bDirtyOrientation = false;
-	}
-	
-	if (m_bDirtyPosition)
-	{
-		float DiffX = (float)(GetPosX() - m_LastPosX);
-		float DiffY = (float)(GetPosY() - m_LastPosY);
-		float DiffZ = (float)(GetPosZ() - m_LastPosZ);
-		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
-		if (
-			(SqrDist > 4 * 4)  // 4 blocks is max Relative Move
-			|| (m_World->GetWorldAge() - m_TimeLastTeleportPacket > 40)  // Send an absolute position every 2 seconds
-		)
-		{
-			// LOGD("Teleported %f", sqrtf(SqrDist) );
-			m_World->BroadcastTeleportEntity(*this);
-			m_TimeLastTeleportPacket = m_World->GetWorldAge();
-		}
-		else
-		{
-			// Relative move sucks balls! It's always wrong wtf!
-			if (m_bDirtyOrientation)
-			{
-				m_World->BroadcastEntRelMoveLook(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32));
-				m_bDirtyOrientation = false;
-			}
-			else
-			{
-				m_World->BroadcastEntRelMove(*this, (char)(DiffX * 32), (char)(DiffY * 32), (char)(DiffZ * 32));
-			}
-		}
-		m_LastPosX = GetPosX();
-		m_LastPosY = GetPosY();
-		m_LastPosZ = GetPosZ();
-		m_bDirtyPosition = false;
-	}
-}
-
-
-
-
-
-void cMonster::HandlePhysics(float a_Dt)
-{
-	if( m_bOnGround ) // check if it's still on the ground
-	{
-		cWorld* World = GetWorld();
-		if( World->GetBlock( (int)GetPosX(), (int)GetPosY() -1, (int)GetPosZ() ) == E_BLOCK_AIR )
-		{
-			m_bOnGround = false;
-		}
-		if( World->GetBlock( (int)GetPosX(), (int)GetPosY(), (int)GetPosZ() ) != E_BLOCK_AIR ) // If in ground itself, push it out
-		{
-			m_bOnGround = true;
-			SetPosY(GetPosY() + 0.2);
-			m_bDirtyPosition = true;
-		}
-		SetSpeedX(GetSpeedX() * 0.7f/(1+a_Dt));
-		if( fabs(GetSpeedX()) < 0.05 ) SetSpeedX(0);
-		SetSpeedZ(GetSpeedZ() * 0.7f/(1+a_Dt));
-		if( fabs(GetSpeedZ()) < 0.05 ) SetSpeedZ(0);
-	}
-
-	if( !m_bOnGround )
-	{
-		float Gravity = -9.81f*a_Dt;
-		SetSpeedY(GetSpeedY() + Gravity);
-	}
-
-	if( GetSpeed().SqrLength() > 0.f )
-	{
-		cTracer Tracer( GetWorld() );
-		int Ret = Tracer.Trace( GetPosition(), GetSpeed(), 2 );
-		if( Ret ) // Oh noez! we hit something
-		{
-			// Set to hit position
-			if( (Tracer.RealHit - GetPosition()).SqrLength() <= ( GetSpeed() * a_Dt ).SqrLength() )
-			{
-				if( Ret == 1 )
-				{
-
-					if( Tracer.HitNormal.x != 0.f ) SetSpeedX(0.f);
-					if( Tracer.HitNormal.y != 0.f ) SetSpeedY(0.f);
-					if( Tracer.HitNormal.z != 0.f ) SetSpeedZ(0.f);
-
-					if( Tracer.HitNormal.y > 0 ) // means on ground
-					{
-						m_bOnGround = true;
-					}
-				}
-				SetPosition(Tracer.RealHit);
-				SetPosX(GetPosX() + (Tracer.HitNormal.x * 0.5f));
-				SetPosZ(GetPosZ() + (Tracer.HitNormal.z * 0.5f));
-			}
-			else
-				SetPosition(GetPosition() + (GetSpeed()*a_Dt));
-		}
-		else
-		{	// We didn't hit anything, so move =]
-			SetPosition(GetPosition() + (GetSpeed()*a_Dt));
-		}
-
-		m_bDirtyPosition = true;
-	}
-}
 
 
 

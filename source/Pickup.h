@@ -36,7 +36,6 @@ public:
 	virtual bool CollectedBy(cPlayer * a_Dest);					// tolua_export
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 	
 	short GetHealth(void) const { return m_Health; }
 	
@@ -49,8 +48,6 @@ private:
 	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
 
 	Vector3d   m_WaterSpeed;
-	bool       m_bOnGround;
-	bool       m_bReplicated;
 
 	float m_Timer;
 

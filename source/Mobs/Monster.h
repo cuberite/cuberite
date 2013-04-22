@@ -38,9 +38,6 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
-	
-	virtual void HandlePhysics(float a_Dt);
-	virtual void ReplicateMovement(void);
 
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	
@@ -90,9 +87,6 @@ protected:
 	bool m_bPassiveAggressive;
 
 	float m_DestinationTime;
-
-	float m_Gravity;
-	bool m_bOnGround;
 
 	float m_DestroyTimer;
 	float m_Jump;

@@ -16,6 +16,7 @@
 #include "Item.h"
 #include "Root.h"
 #include "Tracer.h"
+#include "Chunk.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -27,13 +28,12 @@
 cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem & a_Item, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	:	cEntity(etPickup, ((double)(a_MicroPosX)) / 32, ((double)(a_MicroPosY)) / 32, ((double)(a_MicroPosZ)) / 32)
 	, m_Health(5)
-	, m_bOnGround( false )
-	, m_bReplicated( false )
 	, m_Timer( 0.f )
 	, m_Item(a_Item)
 	, m_bCollected( false )
 {
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_Gravity = -3.0;
 }
 
 
@@ -62,10 +62,40 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	
+	BroadcastMovementUpdate(); //Notify clients of position
+
 	m_Timer += a_Dt;
-	a_Dt = a_Dt / 1000.f;
-	if (m_bCollected)
+	
+	if (!m_bCollected)
+	{
+		int BlockX = (int) floor(GetPosX());
+		int BlockY = (int) floor(GetPosY());
+		int BlockZ = (int) floor(GetPosZ());
+		//Position might have changed due to physics. So we have to make sure we have the correct chunk.
+		cChunk * CurrentChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
+		if (CurrentChunk != NULL) //Making sure the chunk is loaded
+		{
+			int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
+			int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
+
+			BLOCKTYPE BlockBelow = CurrentChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
+			BLOCKTYPE BlockIn = CurrentChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+
+			if( IsBlockLava(BlockBelow) || BlockBelow == E_BLOCK_FIRE
+					|| IsBlockLava(BlockIn) || BlockIn == E_BLOCK_FIRE )
+			{
+					m_bCollected = true;
+					m_Timer = 0; //We have to reset the timer.
+					m_Timer += a_Dt; //In case we have to destroy the pickup in the same tick.
+					if (m_Timer > 500.f)  
+					{
+						Destroy();
+						return;
+					}
+			}
+		}
+	}
+	else
 	{
 		if (m_Timer > 500.f)  // 0.5 second
 		{
@@ -85,144 +115,6 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 		Destroy();
 		return;
 	}
-
-	if (!m_bReplicated || m_bDirtyPosition)
-	{
-		m_bReplicated = true;
-		m_bDirtyPosition = false;
-		GetWorld()->BroadcastTeleportEntity(*this);
-	}
-}
-
-
-
-
-
-void cPickup::HandlePhysics(float a_Dt, cChunk & a_Chunk)
-{
-	// TODO: Rewrite this function to use a_Chunk instead of m_World
-	
-	m_ResultingSpeed.Set(0.f, 0.f, 0.f);
-	cWorld * World = GetWorld();
-	
-	a_Dt /= 1000;  // Go from msec to sec, so that physics formulas work
-
-	if (m_bOnGround) // check if it's still on the ground
-	{
-		int BlockX = (GetPosX() < 0) ? (int)GetPosX() - 1 : (int)GetPosX();
-		int BlockZ = (GetPosZ() < 0) ? (int)GetPosZ() - 1 : (int)GetPosZ();
-		char BlockBelow = World->GetBlock(BlockX, (int)GetPosY() - 1, BlockZ);
-		if (BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow))
-		{
-			m_bOnGround = false;
-		}
-		char Block = World->GetBlock(BlockX, (int)GetPosY() - (int)m_bOnGround, BlockZ );
-		char BlockIn = World->GetBlock(BlockX, (int)GetPosY(), BlockZ );
-
-		if( IsBlockLava(Block) || Block == E_BLOCK_FIRE
-			|| IsBlockLava(BlockIn) || BlockIn == E_BLOCK_FIRE)
-		{
-			m_bCollected = true;
-			m_Timer = 0;
-			return;
-		}
-
-		if( BlockIn != E_BLOCK_AIR && !IsBlockWater(BlockIn) ) // If in ground itself, push it out
-		{
-			m_bOnGround = true;
-			AddPosY(0.2);
-			m_bReplicated = false;
-		}
-		SetSpeedX(GetSpeedX() * 0.7f/(1+a_Dt));
-		if( fabs(GetSpeedX()) < 0.05 ) SetSpeedX(0);
-		SetSpeedZ(GetSpeedZ() * 0.7f/(1+a_Dt));
-		if( fabs(GetSpeedZ()) < 0.05 ) SetSpeedZ(0);
-	}
-
-	// get flowing direction
-	Direction WaterDir = World->GetWaterSimulator()->GetFlowingDirection((int) GetSpeedX() - 1, (int) GetSpeedY(), (int) GetSpeedZ() - 1);
-
-	m_WaterSpeed *= 0.9f;		//Keep old speed but lower it
-
-	switch(WaterDir)
-	{
-		case X_PLUS:
-			m_WaterSpeed.x = 1.f;
-			m_bOnGround = false;
-			break;
-		case X_MINUS:
-			m_WaterSpeed.x = -1.f;
-			m_bOnGround = false;
-			break;
-		case Z_PLUS:
-			m_WaterSpeed.z = 1.f;
-			m_bOnGround = false;
-			break;
-		case Z_MINUS:
-			m_WaterSpeed.z = -1.f;
-			m_bOnGround = false;
-			break;
-		
-	default:
-		break;
-	}
-
-	m_ResultingSpeed += m_WaterSpeed;
-
-	if (!m_bOnGround)
-	{
-
-		float Gravity = -9.81f * a_Dt;
-		if (Gravity < -3)  // Cap gravity-caused speed at 3 m / sec
-		{
-			Gravity = -3;
-		}
-		AddSpeedY(Gravity);
-
-		// Set to hit position
-		m_ResultingSpeed += GetSpeed();
-		
-		/*
-		LOGD("Pickup #%d speed: {%.03f, %.03f, %.03f}, pos {%.02f, %.02f, %.02f}", 
-			m_UniqueID,
-			m_ResultingSpeed.x, m_ResultingSpeed.y, m_ResultingSpeed.z,
-			m_Pos.x, m_Pos.y, m_Pos.z
-		);
-		*/
-
-		cTracer Tracer(GetWorld());
-		int Ret = Tracer.Trace(GetPosition(), GetSpeed(), 2);
-		if (Ret) // Oh noez! we hit something
-		{
-			if ((Tracer.RealHit - Vector3f(GetPosition())).SqrLength() <= ( m_ResultingSpeed * a_Dt ).SqrLength())
-			{
-				m_bReplicated = false; // It's only interesting to replicate when we actually hit something...
-				if (Ret == 1)
-				{
-
-					if( Tracer.HitNormal.x != 0.f ) SetSpeedX(0.f);
-					if( Tracer.HitNormal.y != 0.f ) SetSpeedY(0.f);
-					if( Tracer.HitNormal.z != 0.f ) SetSpeedZ(0.f);
-
-					if (Tracer.HitNormal.y > 0) // means on ground
-					{
-						m_bOnGround = true;
-					}
-				}
-				SetPosition(Tracer.RealHit);
-				AddPosition(Tracer.HitNormal * 0.2f);
-
-			}
-			else
-				AddPosition(m_ResultingSpeed*a_Dt);
-		}
-		else
-		{	// We didn't hit anything, so move =]
-			AddPosition(m_ResultingSpeed*a_Dt);
-		}
-	}
-	// Usable for debugging
-	//SetPosition(m_Pos.x, m_Pos.y, m_Pos.z);
 }
 
 
