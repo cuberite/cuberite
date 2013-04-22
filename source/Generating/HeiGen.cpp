@@ -234,12 +234,12 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 	resulting in speed DEcrease.
 	*/
 	
-	/*
+	//*
 	// Linearly interpolate 4x4 blocks of heightmap:
-	// This is fast, but really ugly! Do not use!
+	// Must be done on a floating point datatype, else the results are ugly!
 	const int STEPZ = 4;  // Must be a divisor of 16
 	const int STEPX = 4;  // Must be a divisor of 16
-	int Height[17 * 17];
+	NOISE_DATATYPE Height[17 * 17];
 	for (int z = 0; z < 17; z += STEPZ)
 	{
 		for (int x = 0; x < 17; x += STEPX)
@@ -247,18 +247,19 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 			Height[x + 17 * z] = GetHeightAt(x, z, a_ChunkX, a_ChunkZ, Biomes);
 		}
 	}
-	IntArrayLinearInterpolate2D(Height, 17, 17, STEPX, STEPZ);
+	ArrayLinearInterpolate2D(Height, 17, 17, STEPX, STEPZ);
 	
 	// Copy into the heightmap
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			cChunkDef::SetHeight(a_HeightMap, x, z, Height[x + 17 * z]);
+			cChunkDef::SetHeight(a_HeightMap, x, z, (int)Height[x + 17 * z]);
 		}
 	}
-	*/
+	//*/
 	
+	/*
 	// For each height, go through neighboring biomes and add up their idea of height:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -267,13 +268,14 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 			cChunkDef::SetHeight(a_HeightMap, x, z, GetHeightAt(x, z, a_ChunkX, a_ChunkZ, Biomes));
 		}  // for x
 	}
+	//*/
 }
 
 
 
 
 
-HEIGHTTYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors)
+NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors)
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
 	int BiomeCounts[biNumBiomes];
@@ -304,7 +306,7 @@ HEIGHTTYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int 
 	// For each biome type that has a nonzero count, calc its height and add it:
 	if (Sum > 0)
 	{
-		int Height = 0;
+		NOISE_DATATYPE Height = 0;
 		int BlockX = a_ChunkX * cChunkDef::Width + a_RelX;
 		int BlockZ = a_ChunkZ * cChunkDef::Width + a_RelZ;
 		for (int i = 0; i < ARRAYCOUNT(BiomeCounts); i++)
@@ -313,13 +315,13 @@ HEIGHTTYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int 
 			{
 				continue;
 			}
-			float oct1 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq1, BlockZ * m_GenParam[i].m_HeightFreq1) * m_GenParam[i].m_HeightAmp1;
-			float oct2 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq2, BlockZ * m_GenParam[i].m_HeightFreq2) * m_GenParam[i].m_HeightAmp2;
-			float oct3 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq3, BlockZ * m_GenParam[i].m_HeightFreq3) * m_GenParam[i].m_HeightAmp3;
-			Height += BiomeCounts[i] * (int)(m_GenParam[i].m_BaseHeight + oct1 + oct2 + oct3);
+			NOISE_DATATYPE oct1 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq1, BlockZ * m_GenParam[i].m_HeightFreq1) * m_GenParam[i].m_HeightAmp1;
+			NOISE_DATATYPE oct2 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq2, BlockZ * m_GenParam[i].m_HeightFreq2) * m_GenParam[i].m_HeightAmp2;
+			NOISE_DATATYPE oct3 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq3, BlockZ * m_GenParam[i].m_HeightFreq3) * m_GenParam[i].m_HeightAmp3;
+			Height += BiomeCounts[i] * (m_GenParam[i].m_BaseHeight + oct1 + oct2 + oct3);
 		}
-		int res = (HEIGHTTYPE)(Height / Sum);
-		return std::min(250, std::max(res, 5));
+		NOISE_DATATYPE res = Height / Sum;
+		return std::min((NOISE_DATATYPE)250, std::max(res, (NOISE_DATATYPE)5));
 	}
 	
 	// No known biome around? Weird. Return a bogus value:
