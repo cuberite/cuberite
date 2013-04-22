@@ -263,7 +263,7 @@ void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 					default:
 					{
 						// Fill with water, sand/dirt/clay mix and stone
-						if (m_Noise.CubicNoise2D(0.1f * (cChunkDef::Width * ChunkX + x), 0.1f * (cChunkDef::Width * ChunkZ + z)) < 0)
+						if (m_Noise.CubicNoise2D(0.3f * (cChunkDef::Width * ChunkX + x), 0.3f * (cChunkDef::Width * ChunkZ + z)) < 0)
 						{
 							FillColumnWaterSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
 						}
