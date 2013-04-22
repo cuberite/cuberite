@@ -229,6 +229,12 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 	}  // for z
 	
 	/*
+	_X 2013_04_22:
+	There's no point in precalculating the entire perlin noise arrays, too many values are calculated uselessly,
+	resulting in speed DEcrease.
+	*/
+	
+	/*
 	// Linearly interpolate 4x4 blocks of heightmap:
 	// This is fast, but really ugly! Do not use!
 	const int STEPZ = 4;  // Must be a divisor of 16

@@ -192,6 +192,13 @@ void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	
+	/*
+	_X 2013_04_22:
+	There's no point in generating the whole cubic noise at once, because the noise values are used in
+	only about 20 % of the cases, so the speed gained by precalculating is lost by precalculating too much data
+	*/
+	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -256,7 +263,14 @@ void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 					default:
 					{
 						// Fill with water, sand/dirt/clay mix and stone
-						FillColumnWaterMix(ChunkX, ChunkZ, x, z, Height, a_ChunkDesc.GetBlockTypes());
+						if (m_Noise.CubicNoise2D(0.1f * (cChunkDef::Width * ChunkX + x), 0.1f * (cChunkDef::Width * ChunkZ + z)) < 0)
+						{
+							FillColumnWaterSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
+						}
+						else
+						{
+							FillColumnWaterDirt(x, z, Height, a_ChunkDesc.GetBlockTypes());
+						}
 						break;
 					}
 				}  // switch (biome)
@@ -347,32 +361,25 @@ void cCompoGenBiomal::FillColumnWaterSand(int a_RelX, int a_RelZ, int a_Height, 
 
 
 
-void cCompoGenBiomal::FillColumnWaterMix(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
+void cCompoGenBiomal::FillColumnWaterDirt(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
 {
-	if (m_Noise.CubicNoise2D(0.5f * (cChunkDef::Width * a_ChunkX + a_RelX), 0.5f * (cChunkDef::Width * a_ChunkZ + a_RelZ)) < 0)
+	// Dirt
+	BLOCKTYPE Pattern[] =
 	{
-		FillColumnWaterSand(a_RelX, a_RelZ, a_Height, a_BlockTypes);
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+		E_BLOCK_DIRT,
+	} ;
+	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
+
+	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
+	{
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
 	}
-	else
+	for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
 	{
-		// Dirt
-		BLOCKTYPE Pattern[] =
-		{
-			E_BLOCK_DIRT,
-			E_BLOCK_DIRT,
-			E_BLOCK_DIRT,
-			E_BLOCK_DIRT,
-		} ;
-		FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
-	
-		for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
-		{
-			cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-		}
-		for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
-		{
-			cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
-		}
+		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
 	}
 }
 
