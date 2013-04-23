@@ -1,7 +1,7 @@
 function HandleTimeCommand( Split, Player )
-	if( #Split ~= 3 ) then
+	if Split[2] == nil then 
 		Player:SendMessage( cChatColor.Green .. "Usage: /time [Day/Night/Set/Add]" )
-		return true;
+		return true
 	end
 	local Server = cRoot:Get():GetServer()
 	if( string.upper( Split[2] ) == "DAY") then
@@ -19,6 +19,5 @@ function HandleTimeCommand( Split, Player )
 	else
 		Player:SendMessage( cChatColor.Green .. "Usage: /time [Day/Night/Set/Add]" )
 	end
-	
 	return true
 end
