@@ -356,6 +356,10 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
 			m_StructureGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
 		}
+		else if (NoCaseCompare(*itr, "DirectOverhangs") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenDirectOverhangs(Seed));
+		}
 		else if (NoCaseCompare(*itr, "LavaLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);

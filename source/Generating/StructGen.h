@@ -123,3 +123,23 @@ protected:
 
 
 
+
+class cStructGenDirectOverhangs :
+	public cStructureGen
+{
+public:
+	cStructGenDirectOverhangs(int a_Seed);
+
+protected:
+	cNoise    m_Noise1;
+	cNoise    m_Noise2;
+	
+	// cStructureGen override:
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+
+	bool HasWantedBiome(cChunkDesc & a_ChunkDesc) const;
+} ;
+
+
+
+

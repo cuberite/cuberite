@@ -511,3 +511,117 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cStructGenBiomeOverhangs:
+
+cStructGenDirectOverhangs::cStructGenDirectOverhangs(int a_Seed) :
+	m_Noise1(a_Seed),
+	m_Noise2(a_Seed + 1000)
+{
+}
+
+
+
+
+
+void cStructGenDirectOverhangs::GenStructures(cChunkDesc & a_ChunkDesc)
+{
+	// If there is no column of the wanted biome, bail out:
+	if (!HasWantedBiome(a_ChunkDesc))
+	{
+		return;
+	}
+	
+	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
+
+	const int SEGMENT_HEIGHT = 8;
+	const int INTERPOL_X = 16;  // Must be a divisor of 16
+	const int INTERPOL_Z = 16;  // Must be a divisor of 16
+	// Interpolate the chunk in 16 * SEGMENT_HEIGHT * 16 "segments", each SEGMENT_HEIGHT blocks high and each linearly interpolated separately.
+	// Have two buffers, one for the lowest floor and one for the highest floor, so that Y-interpolation can be done between them
+	// Then swap the buffers and use the previously-top one as the current-bottom, without recalculating it.
+	
+	int FloorBuf1[17 * 17];
+	int FloorBuf2[17 * 17];
+	int * FloorHi = FloorBuf1;
+	int * FloorLo = FloorBuf2;
+	int BaseX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int BaseZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	int BaseY = 63;
+	
+	// Interpolate the lowest floor:
+	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+	{
+		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] = 
+			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) * 
+			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) /
+			256;
+	}  // for x, z - FloorLo[]
+	IntArrayLinearInterpolate2D(FloorLo, 17, 17, INTERPOL_X, INTERPOL_Z);
+	
+	// Interpolate segments:
+	for (int Segment = BaseY; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
+	{
+		// First update the high floor:
+		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
+		{
+			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
+				256;
+		}  // for x, z - FloorLo[]
+		IntArrayLinearInterpolate2D(FloorHi, 17, 17, INTERPOL_X, INTERPOL_Z);
+		
+		// Interpolate between FloorLo and FloorHi:
+		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
+		{
+			switch (a_ChunkDesc.GetBiome(x, z))
+			{
+				case biExtremeHills:
+				case biExtremeHillsEdge:
+				{
+					int Lo = FloorLo[x + 17 * z] / 256;
+					int Hi = FloorHi[x + 17 * z] / 256;
+					for (int y = 0; y < SEGMENT_HEIGHT; y++)
+					{
+						int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
+						if (Val < 0)
+						{
+							a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_AIR);
+						}
+					}  // for y
+					break;
+				}
+			}  // switch (biome)
+		}  // for z, x
+		
+		// Swap the floors:
+		std::swap(FloorLo, FloorHi);
+	}
+}
+
+
+
+
+
+bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
+{
+	cChunkDef::BiomeMap & Biomes = a_ChunkDesc.GetBiomeMap();
+	for (int i = 0; i < ARRAYCOUNT(Biomes); i++)
+	{
+		switch (Biomes[i])
+		{
+			case biExtremeHills:
+			case biExtremeHillsEdge:
+			{
+				return true;
+			}
+		}
+	}  // for i
+	return false;
+}
+
+
+
+
