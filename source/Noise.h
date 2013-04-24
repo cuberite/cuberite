@@ -120,14 +120,6 @@ template<typename TYPE> void ArrayLinearInterpolate2D(
 
 
 
-#if NOISE_USE_INLINE
-	#include "Noise.inc"
-#endif
-
-
-
-
-
 class cCubicNoise
 {
 public:
