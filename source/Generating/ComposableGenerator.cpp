@@ -168,6 +168,19 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
 		}
 		m_BiomeGen = new cBioGenMultiStepMap(Seed);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 5000; x++)
+		{
+			cChunkDef::BiomeMap Biomes;
+			m_BiomeGen->GenBiomes(x * 5, x * 5, Biomes);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
 	}
 	
 	// Add a cache, if requested:
