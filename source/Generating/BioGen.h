@@ -175,7 +175,14 @@ public:
 	cBioGenMultiStepMap(int a_Seed);
 	
 protected:
-	cNoise m_Noise;
+	// Noises used for composing the perlin-noise:
+	cNoise m_Noise1;
+	cNoise m_Noise2;
+	cNoise m_Noise3;
+	cNoise m_Noise4;
+	cNoise m_Noise5;
+	cNoise m_Noise6;
+	
 	int    m_Seed;
 	int    m_OceanCellSize;
 	int    m_MushroomIslandSize;

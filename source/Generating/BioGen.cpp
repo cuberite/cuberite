@@ -390,7 +390,12 @@ void cBioGenDistortedVoronoi::Distort(int a_BlockX, int a_BlockZ, int & a_Distor
 // cBioGenMultiStepMap :
 
 cBioGenMultiStepMap::cBioGenMultiStepMap(int a_Seed) :
-	m_Noise(a_Seed),
+	m_Noise1(a_Seed + 1000),
+	m_Noise2(a_Seed + 2000),
+	m_Noise3(a_Seed + 3000),
+	m_Noise4(a_Seed + 4000),
+	m_Noise5(a_Seed + 5000),
+	m_Noise6(a_Seed + 6000),
 	m_Seed(a_Seed),
 	m_OceanCellSize(384),
 	m_MushroomIslandSize(64),
@@ -461,11 +466,11 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 		{
 			int RealCellZ = zc + CellZ - NEIGHBORHOOD_SIZE;
 			int CellBlockZ = RealCellZ * m_OceanCellSize;
-			int OffsetX = (m_Noise.IntNoise3DInt(RealCellX, 16 * RealCellX + 32 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
-			int OffsetZ = (m_Noise.IntNoise3DInt(RealCellX, 32 * RealCellX - 16 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
+			int OffsetX = (m_Noise2.IntNoise3DInt(RealCellX, 16 * RealCellX + 32 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
+			int OffsetZ = (m_Noise4.IntNoise3DInt(RealCellX, 32 * RealCellX - 16 * RealCellZ, RealCellZ) / 8) % m_OceanCellSize;
 			SeedX[xc][zc] = CellBlockX + OffsetX;
 			SeedZ[xc][zc] = CellBlockZ + OffsetZ;
-			SeedV[xc][zc] = (((m_Noise.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : ((EMCSBiome)(-1));
+			SeedV[xc][zc] = (((m_Noise6.IntNoise3DInt(RealCellX, RealCellX - RealCellZ + 1000, RealCellZ) / 11) % 256) > 90) ? biOcean : ((EMCSBiome)(-1));
 		}  // for z
 	}  // for x
 	
@@ -546,9 +551,9 @@ void cBioGenMultiStepMap::AddRivers(int a_ChunkX, int a_ChunkZ, cChunkDef::Biome
 			
 			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_RiverCellSize;
 		
-			double Noise = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 4000);
-			Noise += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 5000);
-			Noise += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 6000);
+			double Noise = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
+			Noise += 0.5 * m_Noise3.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
+			Noise += 0.1 * m_Noise5.CubicNoise2D(8 * NoiseCoordX, 8 * NoiseCoordZ);
 			
 			if ((Noise > 0) && (Noise < m_RiverWidthThreshold))
 			{
@@ -578,12 +583,12 @@ void cBioGenMultiStepMap::ApplyTemperatureHumidity(int a_ChunkX, int a_ChunkZ, c
 
 void cBioGenMultiStepMap::Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ, int a_CellSize)
 {
-	double NoiseX = m_Noise.CubicNoise3D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize, 1000);
-	NoiseX += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize, 2000);
-	NoiseX += 0.1 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize, 3000);
-	double NoiseZ = m_Noise.CubicNoise3D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize, 4000);
-	NoiseZ += 0.5 * m_Noise.CubicNoise3D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize, 5000);
-	NoiseZ += 0.1 * m_Noise.CubicNoise3D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize, 6000);
+	double NoiseX = m_Noise3.CubicNoise2D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize);
+	NoiseX += 0.5 * m_Noise2.CubicNoise2D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize);
+	NoiseX += 0.1 * m_Noise1.CubicNoise2D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize);
+	double NoiseZ = m_Noise6.CubicNoise2D(     (float)a_BlockX / a_CellSize,      (float)a_BlockZ / a_CellSize);
+	NoiseZ += 0.5 * m_Noise5.CubicNoise2D(2 *  (float)a_BlockX / a_CellSize, 2 *  (float)a_BlockZ / a_CellSize);
+	NoiseZ += 0.1 * m_Noise4.CubicNoise2D(16 * (float)a_BlockX / a_CellSize, 16 * (float)a_BlockZ / a_CellSize);
 	
 	a_DistortedX = a_BlockX + (int)(a_CellSize * 0.5 * NoiseX);
 	a_DistortedZ = a_BlockZ + (int)(a_CellSize * 0.5 * NoiseZ);
@@ -605,14 +610,14 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 		{
 			float NoiseCoordX = (float)(a_ChunkX * cChunkDef::Width + x) / m_LandBiomesSize;
 		
-			double NoiseT = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 7000);
-			NoiseT += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 8000);
-			NoiseT += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 9000);
+			double NoiseT = m_Noise1.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
+			NoiseT += 0.5 * m_Noise2.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
+			NoiseT += 0.1 * m_Noise3.CubicNoise2D(8 * NoiseCoordX, 8 * NoiseCoordZ);
 			TemperatureMap[x + 17 * z] = NoiseT;
 
-			double NoiseH = m_Noise.CubicNoise3D(    NoiseCoordX,     NoiseCoordZ, 9000);
-			NoiseH += 0.5 * m_Noise.CubicNoise3D(2 * NoiseCoordX, 2 * NoiseCoordZ, 5000);
-			NoiseH += 0.1 * m_Noise.CubicNoise3D(8 * NoiseCoordX, 8 * NoiseCoordZ, 1000);
+			double NoiseH = m_Noise4.CubicNoise2D(    NoiseCoordX,     NoiseCoordZ);
+			NoiseH += 0.5 * m_Noise5.CubicNoise2D(2 * NoiseCoordX, 2 * NoiseCoordZ);
+			NoiseH += 0.1 * m_Noise6.CubicNoise2D(8 * NoiseCoordX, 8 * NoiseCoordZ);
 			HumidityMap[x + 17 * z] = NoiseH;
 		}  // for x
 	}  // for z
