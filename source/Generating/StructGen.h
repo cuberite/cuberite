@@ -143,3 +143,23 @@ protected:
 
 
 
+
+class cStructGenDistortedMembraneOverhangs :
+	public cStructureGen
+{
+public:
+	cStructGenDistortedMembraneOverhangs(int a_Seed);
+
+protected:
+	cNoise m_NoiseX;
+	cNoise m_NoiseY;
+	cNoise m_NoiseZ;
+	cNoise m_NoiseH;
+	
+	// cStructureGen override:
+	virtual void GenStructures(cChunkDesc & a_ChunkDesc) override;
+} ;
+
+
+
+

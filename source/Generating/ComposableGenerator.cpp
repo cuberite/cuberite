@@ -360,6 +360,10 @@ void cComposableGenerator::InitStructureGens(cIniFile & a_IniFile)
 		{
 			m_StructureGens.push_back(new cStructGenDirectOverhangs(Seed));
 		}
+		else if (NoCaseCompare(*itr, "DistortedMembraneOverhangs") == 0)
+		{
+			m_StructureGens.push_back(new cStructGenDistortedMembraneOverhangs(Seed));
+		}
 		else if (NoCaseCompare(*itr, "LavaLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
