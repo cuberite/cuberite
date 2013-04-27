@@ -472,6 +472,8 @@ void cNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
 	
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+	
 	// Make basic terrain composition:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -479,9 +481,9 @@ void cNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		{
 			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
 			bool HasHadWater = false;
-			for (int y = LastAir; y < cChunkDef::Height; y++)
+			for (int y = LastAir; y < m_SeaLevel; y++)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
 			}
 			for (int y = LastAir - 1; y > 0; y--)
 			{
