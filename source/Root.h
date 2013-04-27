@@ -62,7 +62,7 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 
-	/// Executes a console command through the cServer class; does special handling for "stop" and "restart".
+	/// Queues a console command for execution through the cServer class; does special handling for "stop" and "restart".
 	void ExecuteConsoleCommand(const AString & a_Cmd);						// tolua_export
 	
 	/// Kicks the user, no matter in what world they are. Used from cAuthenticator
@@ -89,19 +89,14 @@ public:
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);  // tolua_export
 	
 private:
-	void LoadGlobalSettings();
+	typedef std::map< AString, cWorld* > WorldMap;
+	cWorld*  m_pDefaultWorld;
+	WorldMap m_WorldsByName;
+	
+	cCriticalSection m_CSPendingCommands;
+	AStringVector    m_PendingCommands;
 
-	/// Loads the worlds from settings.ini, creates the worldmap
-	void LoadWorlds(void);
-	
-	/// Starts each world's life
-	void StartWorlds(void);
-	
-	/// Stops each world's threads, so that it's safe to unload them
-	void StopWorlds(void);
-	
-	/// Unloads all worlds from memory
-	void UnloadWorlds(void);
+	cThread * m_InputThread;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -118,11 +113,23 @@ private:
 	bool m_bStop;
 	bool m_bRestart;
 
-	typedef std::map< AString, cWorld* > WorldMap;
-	cWorld*  m_pDefaultWorld;
-	WorldMap m_WorldsByName;
+	void LoadGlobalSettings();
 
-	cThread* m_InputThread;
+	/// Loads the worlds from settings.ini, creates the worldmap
+	void LoadWorlds(void);
+	
+	/// Starts each world's life
+	void StartWorlds(void);
+	
+	/// Stops each world's threads, so that it's safe to unload them
+	void StopWorlds(void);
+	
+	/// Unloads all worlds from memory
+	void UnloadWorlds(void);
+	
+	/// Does the actual work of executing a command
+	void DoExecuteConsoleCommand(const AString & a_Cmd);
+
 	static void InputThread(void* a_Params);
 
 	static cRoot*	s_Root;

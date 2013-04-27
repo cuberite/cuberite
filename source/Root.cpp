@@ -349,6 +349,18 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 
 void cRoot::TickWorlds(float a_Dt)
 {
+	// Execute any pending commands:
+	AStringVector PendingCommands;
+	{
+		cCSLock Lock(m_CSPendingCommands);
+		std::swap(PendingCommands, m_PendingCommands);
+	}
+	for (AStringVector::iterator itr = PendingCommands.begin(), end = PendingCommands.end(); itr != end; ++itr)
+	{
+		DoExecuteConsoleCommand(*itr);
+	}
+	
+	// Tick the worlds:
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		itr->second->Tick(a_Dt);
@@ -360,6 +372,17 @@ void cRoot::TickWorlds(float a_Dt)
 
 
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd)
+{
+	// Put the command into a queue (Alleviates FS #363):
+	cCSLock Lock(m_CSPendingCommands);
+	m_PendingCommands.push_back(a_Cmd);
+}
+
+
+
+
+
+void cRoot::DoExecuteConsoleCommand(const AString & a_Cmd)
 {
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
 	m_Server->ExecuteConsoleCommand(a_Cmd);
