@@ -479,6 +479,10 @@ void cNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		{
 			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
 			bool HasHadWater = false;
+			for (int y = LastAir; y < cChunkDef::Height; y++)
+			{
+				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+			}
 			for (int y = LastAir - 1; y > 0; y--)
 			{
 				if (m_NoiseArray[x + 17 * z + 17 * 17 * y] > m_AirThreshold)
