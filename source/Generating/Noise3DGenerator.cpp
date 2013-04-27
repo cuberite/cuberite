@@ -55,18 +55,23 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
+	// Parameters, TODO: Make some settable in the INI file
 	const int INTERPOL_X = 8;
 	const int INTERPOL_Y = 4;
 	const int INTERPOL_Z = 8;
 	const NOISE_DATATYPE FrequencyX = 20;
 	const NOISE_DATATYPE FrequencyY = 20;
 	const NOISE_DATATYPE FrequencyZ = 20;
+	const NOISE_DATATYPE MidPoint = 75;  // Where the vertical "center" of the noise should be
+	const NOISE_DATATYPE AirThreshold = (NOISE_DATATYPE)0.5;
+	const int SeaLevel = 62;
+
 	NOISE_DATATYPE Noise[257 * 17 * 17];  // x + 17 * z + 17 * 17 * y
 	int idx = 0;
 	for (int y = 0; y < 257; y += INTERPOL_Y)
 	{
 		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / FrequencyY;
-		NOISE_DATATYPE AddHeight = NoiseY - ((NOISE_DATATYPE)128 / FrequencyY);
+		NOISE_DATATYPE AddHeight = NoiseY - (MidPoint / FrequencyY);
 		AddHeight *= AddHeight * AddHeight * AddHeight * AddHeight;
 		NOISE_DATATYPE * CurFloor = &(Noise[y * 17 * 17]);
 		for (int z = 0; z < 17; z += INTERPOL_Z)
@@ -159,7 +164,17 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 			int idx = y * 17 * 17 + z * 17;
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, (Noise[idx++] > 0.5) ? E_BLOCK_AIR : E_BLOCK_STONE);
+				NOISE_DATATYPE n = Noise[idx++];
+				BLOCKTYPE BlockType;
+				if (n > AirThreshold)
+				{
+					BlockType = (y > SeaLevel) ? E_BLOCK_AIR : E_BLOCK_STATIONARY_WATER;
+				}
+				else
+				{
+					BlockType = E_BLOCK_STONE;
+				}
+				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
 			}
 		}
 	}
