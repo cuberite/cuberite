@@ -32,6 +32,24 @@ public:
 protected:
 	cNoise m_Noise1;
 	cNoise m_Noise2;
+	cNoise m_Noise3;
+	
+	int            m_SeaLevel;
+	NOISE_DATATYPE m_HeightAmplification;
+	NOISE_DATATYPE m_MidPoint;  // Where the vertical "center" of the noise should be
+	NOISE_DATATYPE m_FrequencyX;
+	NOISE_DATATYPE m_FrequencyY;
+	NOISE_DATATYPE m_FrequencyZ;
+	NOISE_DATATYPE m_AirThreshold;
+	
+	/// Generates the 3D noise array used for terrain generation
+	void GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_Noise);
+	
+	/// Updates heightmap based on the chunk's contents
+	void UpdateHeightmap(cChunkDesc & a_ChunkDesc);
+	
+	/// Composes terrain - adds dirt, grass and sand
+	void ComposeTerrain(cChunkDesc & a_ChunkDesc);
 } ;
 
 

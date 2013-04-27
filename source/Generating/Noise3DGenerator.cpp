@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Noise3DGenerator.h"
 #include "../OSSupport/File.h"
+#include "../../iniFile/iniFile.h"
 
 
 
@@ -13,8 +14,9 @@
 
 cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	super(a_ChunkGenerator),
-	m_Noise1(0),
-	m_Noise2(0)
+	m_Noise1(1000),
+	m_Noise2(2000),
+	m_Noise3(3000)
 {
 }
 
@@ -34,7 +36,15 @@ cNoise3DGenerator::~cNoise3DGenerator()
 void cNoise3DGenerator::Initialize(cWorld * a_World, cIniFile & a_IniFile)
 {
 	m_World = a_World;
-	// TODO: params
+	
+	// Params:
+	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
+	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);
+	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 75);
+	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 10);
+	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 10);
+	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 10);
+	m_AirThreshold        = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DAirThreshold", 0.5);
 }
 
 
@@ -55,35 +65,78 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
-	// Parameters, TODO: Make some settable in the INI file
+	NOISE_DATATYPE Noise[257 * 17 * 17];  // x + 17 * z + 17 * 17 * y
+	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
+	
+	// Output noise into chunk:
+	for (int y = 0; y < cChunkDef::Height; y++)
+	{
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int idx = y * 17 * 17 + z * 17;
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				NOISE_DATATYPE n = Noise[idx++];
+				BLOCKTYPE BlockType;
+				if (n > m_AirThreshold)
+				{
+					BlockType = (y > m_SeaLevel) ? E_BLOCK_AIR : E_BLOCK_STATIONARY_WATER;
+				}
+				else
+				{
+					BlockType = E_BLOCK_STONE;
+				}
+				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
+			}
+		}
+	}
+	
+	UpdateHeightmap(a_ChunkDesc);
+	ComposeTerrain (a_ChunkDesc);
+}
+
+
+
+
+
+void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_Noise)
+{
+	// Parameters:
 	const int INTERPOL_X = 8;
 	const int INTERPOL_Y = 4;
 	const int INTERPOL_Z = 8;
-	const NOISE_DATATYPE FrequencyX = 20;
-	const NOISE_DATATYPE FrequencyY = 20;
-	const NOISE_DATATYPE FrequencyZ = 20;
-	const NOISE_DATATYPE MidPoint = 75;  // Where the vertical "center" of the noise should be
-	const NOISE_DATATYPE AirThreshold = (NOISE_DATATYPE)0.5;
-	const int SeaLevel = 62;
 
-	NOISE_DATATYPE Noise[257 * 17 * 17];  // x + 17 * z + 17 * 17 * y
+	// Precalculate a "height" array:
+	NOISE_DATATYPE Height[17 * 17];  // x + 17 * z
+	for (int z = 0; z < 17; z += INTERPOL_Z)
+	{
+		NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
+		for (int x = 0; x < 17; x += INTERPOL_X)
+		{
+			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
+			NOISE_DATATYPE val = abs(m_Noise1.CubicNoise2D(NoiseX / 5, NoiseZ / 5)) * m_HeightAmplification + 1;
+			Height[x + 17 * z] = val * val * val;
+		}
+	}
+		
 	int idx = 0;
 	for (int y = 0; y < 257; y += INTERPOL_Y)
 	{
-		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / FrequencyY;
-		NOISE_DATATYPE AddHeight = NoiseY - (MidPoint / FrequencyY);
-		AddHeight *= AddHeight * AddHeight * AddHeight * AddHeight;
-		NOISE_DATATYPE * CurFloor = &(Noise[y * 17 * 17]);
+		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / m_FrequencyY;
+		NOISE_DATATYPE AddHeight = (y - m_MidPoint) / 20;
+		AddHeight *= AddHeight * AddHeight;  // * AddHeight * AddHeight;
+		NOISE_DATATYPE * CurFloor = &(a_Noise[y * 17 * 17]);
 		for (int z = 0; z < 17; z += INTERPOL_Z)
 		{
-			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / FrequencyZ;
+			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
 			for (int x = 0; x < 17; x += INTERPOL_X)
 			{
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / FrequencyX;
+				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
 				CurFloor[x + 17 * z] = 
-					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) +
+					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
 					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
-					AddHeight;
+					m_Noise3.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2 +
+					AddHeight / Height[x + 17 * z];
 			}
 		}
 		// Linear-interpolate this XZ floor:
@@ -100,9 +153,9 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 		}
 		int LoFloorY = (y / INTERPOL_Y) * INTERPOL_Y;
 		int HiFloorY = LoFloorY + INTERPOL_Y;
-		NOISE_DATATYPE * LoFloor  = &(Noise[LoFloorY * 17 * 17]);
-		NOISE_DATATYPE * HiFloor  = &(Noise[HiFloorY * 17 * 17]);
-		NOISE_DATATYPE * CurFloor = &(Noise[y * 17 * 17]);
+		NOISE_DATATYPE * LoFloor  = &(a_Noise[LoFloorY * 17 * 17]);
+		NOISE_DATATYPE * HiFloor  = &(a_Noise[HiFloorY * 17 * 17]);
+		NOISE_DATATYPE * CurFloor = &(a_Noise[y * 17 * 17]);
 		NOISE_DATATYPE Ratio = ((NOISE_DATATYPE)(y % INTERPOL_Y)) / INTERPOL_Y;
 		int idx = 0;
 		for (int z = 0; z < cChunkDef::Width; z++)
@@ -130,7 +183,7 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 				unsigned char buf[16];
 				for (int x = 0; x < cChunkDef::Width; x++)
 				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * Noise[idx++]))));
+					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * a_Noise[idx++]))));
 				}
 				f1.Write(buf, 16);
 			}  // for y
@@ -148,38 +201,21 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 				unsigned char buf[16];
 				for (int x = 0; x < cChunkDef::Width; x++)
 				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * Noise[idx++]))));
+					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * a_Noise[idx++]))));
 				}
 				f2.Write(buf, 16);
 			}  // for z
 		}  // for y
 	}  // if (XZ file open)
 	*/
-	
-	// Output into chunk:
-	for (int y = 0; y < cChunkDef::Height; y++)
-	{
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			int idx = y * 17 * 17 + z * 17;
-			for (int x = 0; x < cChunkDef::Width; x++)
-			{
-				NOISE_DATATYPE n = Noise[idx++];
-				BLOCKTYPE BlockType;
-				if (n > AirThreshold)
-				{
-					BlockType = (y > SeaLevel) ? E_BLOCK_AIR : E_BLOCK_STATIONARY_WATER;
-				}
-				else
-				{
-					BlockType = E_BLOCK_STONE;
-				}
-				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
-			}
-		}
-	}
-	
-	// Update the heightmap:
+}
+
+
+
+
+
+void cNoise3DGenerator::UpdateHeightmap(cChunkDesc & a_ChunkDesc)
+{
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -192,6 +228,57 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 					break;
 				}
 			}  // for y
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+{
+	// Make basic terrain composition:
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
+			bool HasHadWater = false;
+			for (int y = LastAir - 1; y > 0; y--)
+			{
+				switch (a_ChunkDesc.GetBlockType(x, y, z))
+				{
+					case E_BLOCK_AIR:
+					{
+						LastAir = y;
+						break;
+					}
+					case E_BLOCK_STONE:
+					{
+						if (LastAir - y > 3)
+						{
+							break;
+						}
+						if (HasHadWater)
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
+						}
+						else
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, (LastAir == y + 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
+						}
+						break;
+					}
+					case E_BLOCK_STATIONARY_WATER:
+					{
+						LastAir = y;
+						HasHadWater = true;
+						break;
+					}
+				}  // switch (GetBlockType())
+			}  // for y
+			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
 }
