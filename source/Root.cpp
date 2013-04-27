@@ -373,6 +373,16 @@ void cRoot::TickWorlds(float a_Dt)
 
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd)
 {
+	// Some commands are built-in:
+	if (a_Cmd == "stop")
+	{
+		m_bStop = true;
+	}
+	else if (a_Cmd == "restart")
+	{
+		m_bRestart = true;
+	}
+
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.push_back(a_Cmd);
@@ -386,16 +396,6 @@ void cRoot::DoExecuteConsoleCommand(const AString & a_Cmd)
 {
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
 	m_Server->ExecuteConsoleCommand(a_Cmd);
-	
-	// Some commands are built-in:
-	if (a_Cmd == "stop")
-	{
-		m_bStop = true;
-	}
-	else if (a_Cmd == "restart")
-	{
-		m_bRestart = true;
-	}
 }
 
 
