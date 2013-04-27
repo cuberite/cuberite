@@ -8,6 +8,7 @@
 #include "../PluginManager.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
+#include "Noise3DGenerator.h"
 
 
 
@@ -53,9 +54,9 @@ bool cChunkGenerator::Start(cWorld * a_World, cIniFile & a_IniFile)
 	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", rnd.randInt());
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
 	
-	if (NoCaseCompare(GeneratorName, "RoughHills") == 0)
+	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
 	{
-		// TODO
+		m_Generator = new cNoise3DGenerator(*this);
 	}
 	else
 	{

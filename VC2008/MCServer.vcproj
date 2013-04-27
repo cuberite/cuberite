@@ -1769,6 +1769,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Generating\Noise3DGenerator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Generating\Noise3DGenerator.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Generating\Ravines.cpp"
 					>
 				</File>
