@@ -100,6 +100,8 @@ void cPluginManager::ReloadPluginsNow(void)
 
 	FindPlugins();
 
+	cServer::BindBuiltInConsoleCommands();
+
 	cIniFile IniFile("settings.ini");
 	if (!IniFile.ReadFile())
 	{
@@ -138,7 +140,6 @@ void cPluginManager::ReloadPluginsNow(void)
 	{
 		LOG("Loaded %i plugin(s)", GetNumPlugins());
 	}
-	cServer::BindBuiltInConsoleCommands();
 }
 
 
@@ -1048,6 +1049,8 @@ void cPluginManager::UnloadPluginsNow()
 		RemovePlugin(m_Plugins.begin()->second);
 	}
 
+	m_Commands.clear();
+	m_ConsoleCommands.clear();
 	//SquirrelVM::Shutdown(); // This breaks shit
 }
 
@@ -1251,7 +1254,14 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Command);
 	if (cmd != m_ConsoleCommands.end())
 	{
-		LOGWARNING("Console command \"%s\" is already bound to plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str());
+		if (cmd->second.m_Plugin == NULL)
+		{
+			LOGWARNING("Console command \"%s\" is already bound internally by MCServer.", a_Command.c_str());
+		}
+		else
+		{
+			LOGWARNING("Console command \"%s\" is already bound to plugin \"%s\".", a_Command.c_str(), cmd->second.m_Plugin->GetName().c_str());
+		}
 		return false;
 	}
 	
