@@ -24,6 +24,13 @@ See http://forum.mc-server.org/showthread.php?tid=409 for details.
 
 
 
+// fwd: Noise3DGenerator.h
+class cNoise3DComposable;
+
+
+
+
+
 /** The interface that a biome generator must implement
 A biome generator takes chunk coords on input and outputs an array of biome indices for that chunk on output.
 The output array is sequenced in the same way as the MapChunk packet's biome data.
@@ -137,6 +144,10 @@ protected:
 	cTerrainCompositionGen * m_CompositionGen;
 	cStructureGenList        m_StructureGens;
 	cFinishGenList           m_FinishGens;
+	
+	// Specific generators that can be reused for different purposes - we don't want to create multiple objects for them
+	cNoise3DComposable * m_Noise3DComposable;
+	int                  m_NumNoise3DComposableUses;  // How many times is it actually used?
 
 	/// Reads the biome gen settings from the ini and initializes m_BiomeGen accordingly
 	void InitBiomeGen(cIniFile & a_IniFile);
