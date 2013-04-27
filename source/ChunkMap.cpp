@@ -39,10 +39,11 @@ cChunkMap::cChunkMap(cWorld * a_World )
 cChunkMap::~cChunkMap()
 {
 	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	while (!m_Layers.empty())
 	{
-		delete *itr;
-	}  // for itr - m_Layers[]
+		delete m_Layers.back();
+		m_Layers.pop_back();  // Must pop, because further chunk deletions query the chunkmap for entities and that would touch deleted data
+	}
 }
 
 
@@ -1973,6 +1974,7 @@ cChunkMap::cChunkLayer::~cChunkLayer()
 	for (int i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
 		delete m_Chunks[i];
+		m_Chunks[i] = NULL;  // // Must zero out, because further chunk deletions query the chunkmap for entities and that would touch deleted data
 	}  // for i - m_Chunks[]
 }
 
