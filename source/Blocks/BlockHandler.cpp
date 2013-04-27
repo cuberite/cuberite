@@ -288,7 +288,10 @@ void cBlockHandler::OnDestroyed(cWorld *a_World, int a_BlockX, int a_BlockY, int
 
 void cBlockHandler::NeighborChanged(cWorld *a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	GetBlockHandler(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ);
+	if ((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height))
+	{
+		GetBlockHandler(a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_World, a_BlockX, a_BlockY, a_BlockZ);
+	}
 }
 
 

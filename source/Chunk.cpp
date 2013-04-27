@@ -1043,6 +1043,12 @@ bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 
 void cChunk::UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
+	{
+		// Outside of chunkmap
+		return;
+	}
+	
 	// Is it in this chunk?	
 	if ((a_RelX >= 0) && (a_RelX < cChunkDef::Width) && (a_RelZ >= 0) && (a_RelZ < cChunkDef::Width))
 	{
@@ -1350,6 +1356,12 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 
 void cChunk::QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
+	ASSERT (
+		(a_RelX >= 0) && (a_RelX < Width) &&
+		(a_RelY >= 0) && (a_RelY < Height) &&
+		(a_RelZ >= 0) && (a_RelZ < Width)
+	);  // Coords need to be valid
+
 	if (!IsValid())
 	{
 		return;
