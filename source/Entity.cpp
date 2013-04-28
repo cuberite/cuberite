@@ -33,6 +33,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_HeadYaw( 0.0 )
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
+	, m_Mass (0.001) //Default 1g
 	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
 	, m_bDirtyPosition(true)
@@ -500,6 +501,25 @@ void cEntity::SetHeadYaw(double a_HeadYaw)
 	m_HeadYaw = a_HeadYaw;
 	m_bDirtyHead = true;
 	WrapHeadYaw();
+}
+
+
+
+
+
+void cEntity::SetMass(double a_Mass)
+{
+	if (a_Mass > 0)
+	{
+		m_Mass = a_Mass;
+	}
+	else
+	{
+		//Make sure that mass is not zero. 1g is the default because we 
+		//have to choose a number. It's perfectly legal to have a mass 
+		//less than 1g as long as is NOT equal or less than zero.
+		m_Mass = 0.001;
+	}
 }
 
 

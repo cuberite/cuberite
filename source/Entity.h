@@ -107,6 +107,7 @@ public:
 	cWorld * GetWorld(void) const { return m_World; }
 
 	double           GetHeadYaw   (void) const {return m_HeadYaw; }
+	double           GetMass      (void) const {return m_Mass; }
 	const Vector3d & GetPosition  (void) const {return m_Pos; }
 	double           GetPosX      (void) const {return m_Pos.x; }
 	double           GetPosY      (void) const {return m_Pos.y; }
@@ -125,6 +126,7 @@ public:
 	int GetChunkZ(void) const {return FAST_FLOOR_DIV(((int)m_Pos.z), cChunkDef::Width); }
 
 	void SetHeadYaw (double a_HeadYaw);
+	void SetMass    (double a_Mass);
 	void SetPosX    (double a_PosX);
 	void SetPosY    (double a_PosY);
 	void SetPosZ    (double a_PosZ);
@@ -247,11 +249,18 @@ protected:
 	void ReferencedBy( cEntity*& a_EntityPtr );
 	void Dereference( cEntity*& a_EntityPtr );
 private:
+	//Measured in degrees (MAX 360°)
 	double   m_HeadYaw;
+	//Measured in meter/second (m/s)
 	Vector3d m_Speed;
+	//Measured in degrees (MAX 360°)
 	Vector3d m_Rot;
+	//Measured in meters (1 meter = 1 block) (m)
 	Vector3d m_Pos;
+	//Measured in meter/second
 	Vector3d m_WaterSpeed;
+	//Measured in Kilograms (Kg)
+	double m_Mass
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
