@@ -68,30 +68,35 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 	
 	if (!m_bCollected)
 	{
-		int BlockX = (int) floor(GetPosX());
 		int BlockY = (int) floor(GetPosY());
-		int BlockZ = (int) floor(GetPosZ());
-		//Position might have changed due to physics. So we have to make sure we have the correct chunk.
-		cChunk * CurrentChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
-		if (CurrentChunk != NULL) //Making sure the chunk is loaded
+		if (BlockY < cChunkDef::Height)  // Don't do anything except for falling when above the world
 		{
-			int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
-			int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
-
-			BLOCKTYPE BlockBelow = CurrentChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
-			BLOCKTYPE BlockIn = CurrentChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
-
-			if( IsBlockLava(BlockBelow) || BlockBelow == E_BLOCK_FIRE
-					|| IsBlockLava(BlockIn) || BlockIn == E_BLOCK_FIRE )
+			int BlockX = (int) floor(GetPosX());
+			int BlockZ = (int) floor(GetPosZ());
+			//Position might have changed due to physics. So we have to make sure we have the correct chunk.
+			cChunk * CurrentChunk = a_Chunk.GetNeighborChunk(BlockX, BlockZ);
+			if (CurrentChunk != NULL)  // Make sure the chunk is loaded
 			{
+				int RelBlockX = BlockX - (CurrentChunk->GetPosX() * cChunkDef::Width);
+				int RelBlockZ = BlockZ - (CurrentChunk->GetPosZ() * cChunkDef::Width);
+				
+				BLOCKTYPE BlockBelow = CurrentChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ);
+				BLOCKTYPE BlockIn = CurrentChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
+
+				if (
+					IsBlockLava(BlockBelow) || (BlockBelow == E_BLOCK_FIRE) ||
+					IsBlockLava(BlockIn) || (BlockIn == E_BLOCK_FIRE)
+				)
+				{
 					m_bCollected = true;
-					m_Timer = 0; //We have to reset the timer.
-					m_Timer += a_Dt; //In case we have to destroy the pickup in the same tick.
+					m_Timer = 0;  // We have to reset the timer.
+					m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
 					if (m_Timer > 500.f)  
 					{
 						Destroy();
 						return;
 					}
+				}
 			}
 		}
 	}
