@@ -238,8 +238,8 @@ void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	WriteInt ((int)(a_Vehicle.GetPosX() * 32));
 	WriteInt ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt ((int)(a_Vehicle.GetPosZ() * 32));
-	WriteByte ((BYTE)((a_Vehicle.GetPitch() / 360.f) * 256));
-	WriteByte ((BYTE)((a_Vehicle.GetRotation() / 360.f) * 256));
+	WriteByte ((Byte)((a_Vehicle.GetPitch() / 360.f) * 256));
+	WriteByte ((Byte)((a_Vehicle.GetRotation() / 360.f) * 256));
 	WriteInt (1);
 	WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
 	WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
