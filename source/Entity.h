@@ -260,7 +260,7 @@ private:
 	//Measured in meter/second
 	Vector3d m_WaterSpeed;
 	//Measured in Kilograms (Kg)
-	double m_Mass
+	double m_Mass;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
