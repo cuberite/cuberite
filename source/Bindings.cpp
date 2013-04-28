@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 04/17/13 19:40:39.
+** Generated automatically by tolua++-1.0.92 on 04/28/13 20:39:37.
 */
 
 #ifndef __cplusplus
@@ -24499,6 +24499,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dtFireContact",dtFireContact);
   tolua_constant(tolua_S,"dtInVoid",dtInVoid);
   tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
+  tolua_constant(tolua_S,"dtAdmin",dtAdmin);
   tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
   tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
   tolua_constant(tolua_S,"dtMob",dtMob);
@@ -24515,6 +24516,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dtPoison",dtPoison);
   tolua_constant(tolua_S,"dtBurning",dtBurning);
   tolua_constant(tolua_S,"dtInFire",dtInFire);
+  tolua_constant(tolua_S,"dtPlugin",dtPlugin);
   tolua_cclass(tolua_S,"TakeDamageInfo","TakeDamageInfo","",NULL);
   tolua_beginmodule(tolua_S,"TakeDamageInfo");
    tolua_variable(tolua_S,"DamageType",tolua_get_TakeDamageInfo_DamageType,tolua_set_TakeDamageInfo_DamageType);

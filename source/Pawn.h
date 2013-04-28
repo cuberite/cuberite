@@ -32,6 +32,7 @@ enum eDamageType
 	dtFireContact,      // Standing inside a fire block
 	dtInVoid,           // Falling into the Void (Y < 0)
 	dtPotionOfHarming,
+	dtAdmin,            // Damage applied by an admin command
 	
 	// Some common synonyms:
 	dtPawnAttack   = dtAttack,
@@ -50,6 +51,7 @@ enum eDamageType
 	dtPoison       = dtPoisoning,
 	dtBurning      = dtOnFire,
 	dtInFire       = dtFireContact,
+	dtPlugin       = dtAdmin,
 } ;
 
 
