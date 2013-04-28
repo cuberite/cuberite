@@ -1419,7 +1419,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
 	if (
-		(OldBlockMeta == a_BlockMeta) ||  // Different meta always gets sent to the client
+		(OldBlockMeta != a_BlockMeta) ||  // Different meta always gets sent to the client
 		!(
 			((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
 			((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
