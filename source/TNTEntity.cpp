@@ -54,6 +54,8 @@ void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cTNTEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	super::Tick(a_Dt,a_Chunk);
+	BroadcastMovementUpdate();
 	float delta_time = a_Dt / 1000; //Convert miliseconds to seconds
 	m_Counter += delta_time;
 	if (m_Counter > m_MaxFuseTime) //Check if we go KABOOOM
