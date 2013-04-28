@@ -69,7 +69,6 @@ public:
 				return false;
 			}
 		}  // switch (m_ItemType)
-		a_World->AddEntity(Minecart);
 		Minecart->Initialize(a_World);
 		return true;
 	}
