@@ -406,12 +406,12 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 	WriteInt    (a_Mob.GetUniqueID());
 	WriteByte   (a_Mob.GetMobType());
 	WriteVectorI((Vector3i)(a_Mob.GetPosition() * 32));
-	WriteByte   (0);  // yaw
-	WriteByte   (0);  // pitch
-	WriteByte   (0);  // head yaw
-	WriteShort  (0);  // Velocity Z
-	WriteShort  (0);  // Velocity X
-	WriteShort  (0);  // Velocity Y
+	WriteByte   ((BYTE)((a_Mob.GetRotation() / 360.f) * 256));
+	WriteByte   ((BYTE)((a_Mob.GetPitch() / 360.f) * 256));
+	WriteByte   ((BYTE)((a_Mob.GetHeadYaw() / 360.f) * 256));
+	WriteShort  ((short)(a_Mob.GetSpeedX() * 400));
+	WriteShort  ((short)(a_Mob.GetSpeedY() * 400));
+	WriteShort  ((short)(a_Mob.GetSpeedZ() * 400));
 	AString MetaData = GetEntityMetaData(a_Mob);
 	SendData (MetaData.data(), MetaData.size());
 	Flush();

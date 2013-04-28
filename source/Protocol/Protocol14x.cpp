@@ -191,12 +191,12 @@ void cProtocol146::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	WriteInt ((int)(a_FallingBlock.GetPosX() * 32));
 	WriteInt ((int)(a_FallingBlock.GetPosY() * 32));
 	WriteInt ((int)(a_FallingBlock.GetPosZ() * 32));
-	WriteByte (0);  // Yaw
 	WriteByte (0);  // Pitch
+	WriteByte (0);  // Yaw
 	WriteInt (a_FallingBlock.GetBlockType());  // data indicator = blocktype
-	WriteShort(0);  // SpeedX
-	WriteShort(0);  // SpeedY
-	WriteShort(0);  // SpeedZ
+	WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
+	WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
+	WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
 	Flush();
 }
 
@@ -213,15 +213,14 @@ void cProtocol146::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	WriteInt ((int)(a_Entity.GetPosX() * 32));
 	WriteInt ((int)(a_Entity.GetPosY() * 32));
 	WriteInt ((int)(a_Entity.GetPosZ() * 32));
+	WriteByte(a_Pitch);
+	WriteByte(a_Yaw);
 	WriteInt (a_ObjectData);
 	if (a_ObjectData != 0)
 	{
-		// TODO: Proper speed units
-		WriteShort((short)a_Entity.GetSpeedX());
-		WriteShort((short)a_Entity.GetSpeedY());
-		WriteShort((short)a_Entity.GetSpeedZ());
-		WriteByte(a_Yaw);
-		WriteByte(a_Pitch);
+		WriteShort((short)(a_Entity.GetSpeedX() * 400));
+		WriteShort((short)(a_Entity.GetSpeedY() * 400));
+		WriteShort((short)(a_Entity.GetSpeedZ() * 400));
 	}
 	Flush();
 }
@@ -239,12 +238,12 @@ void cProtocol146::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	WriteInt ((int)(a_Vehicle.GetPosX() * 32));
 	WriteInt ((int)(a_Vehicle.GetPosY() * 32));
 	WriteInt ((int)(a_Vehicle.GetPosZ() * 32));
+	WriteByte ((BYTE)((a_Vehicle.GetPitch() / 360.f) * 256));
+	WriteByte ((BYTE)((a_Vehicle.GetRotation() / 360.f) * 256));
 	WriteInt (1);
-	WriteShort(0);  // TODO: SpeedX
-	WriteShort(0);  // TODO: SpeedY
-	WriteShort(0);  // TODO: SpeedZ
-	WriteByte (0);  // TODO: Yaw
-	WriteByte (0);  // TODO: Pitch
+	WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
+	WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
+	WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
 	Flush();
 }
 
