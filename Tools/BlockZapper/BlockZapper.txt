@@ -1,0 +1,19 @@
+
+// BlockZapper.txt
+
+/*
+This project implements a simple tool that can "zap" blocks out of an Anvil-stored MineCraft world.
+It is usually used by server admins when their servers fail with a bug and store an invalid block in the world.
+This tool takes a coord triplet and a radius triplet and replaces all blocks within the (new york-metric) radius of the coords with air.
+The triplets pair is given on stdin, and multiple such specifiers are allowed, each on a separate file.
+If the specifier line ends with an additional " E", entities within that radius are zapped instead of blocks
+If the specifier line ends with an additional " BE", both blocks and entities are zapped.
+
+The tool is aware of extended blocktypes (256 .. 4096).
+
+The source code for this tool is public domain, but note that it depends on a few shared sources in MCServer that may be under other licenses.
+*/
+
+
+
+
