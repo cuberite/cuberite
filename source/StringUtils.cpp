@@ -106,7 +106,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
 		results.push_back(str.substr(Prev, cutAt - Prev));
-		Prev = cutAt + delim.length();
+		Prev = cutAt + 1;
 	}
 	if (Prev < str.length())
 	{
@@ -114,6 +114,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	}
 	return results;
 }
+
 
 
 
@@ -126,7 +127,7 @@ AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
 		results.push_back(TrimString(str.substr(Prev, cutAt - Prev)));
-		Prev = cutAt + delim.length();
+		Prev = cutAt + 1;
 	}
 	if (Prev < str.length())
 	{

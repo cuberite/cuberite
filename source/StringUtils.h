@@ -33,10 +33,10 @@ extern AString Printf(const char * format, ...);
 /// Add the formatted string to the existing data in the string
 extern AString & AppendPrintf (AString & str, const char * format, ...);
 
-/// Split the string at delimiters, return as a stringvector
+/// Split the string at any of the listed delimiters, return as a stringvector
 extern AStringVector StringSplit(const AString & str, const AString & delim);
 
-/// Split the string at delimiters and trim each value, return as a stringvector
+/// Split the string at any of the listed delimiters and trim each value, return as a stringvector
 extern AStringVector StringSplitAndTrim(const AString & str, const AString & delim);
 
 /// Trime whitespace at both ends of the string
