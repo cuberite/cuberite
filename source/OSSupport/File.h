@@ -93,6 +93,12 @@ public:
 	/// Returns true if the file specified exists
 	static bool Exists(const AString & a_FileName);
 	
+	/// Deletes a file, returns true if successful
+	static bool Delete(const AString & a_FileName);
+	
+	/// Renames a file, returns true if successful. May fail if dest already exists (libc-dependant)!
+	static bool Rename(const AString & a_OrigFileName, const AString & a_NewFileName);
+	
 	int Printf(const char * a_Fmt, ...);
 	
 private:

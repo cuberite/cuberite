@@ -269,6 +269,24 @@ bool cFile::Exists(const AString & a_FileName)
 
 
 
+bool cFile::Delete(const AString & a_FileName)
+{
+	return (remove(a_FileName.c_str()) == 0);
+}
+
+
+
+
+
+bool cFile::Rename(const AString & a_OrigFileName, const AString & a_NewFileName)
+{
+	return (rename(a_OrigFileName.c_str(), a_NewFileName.c_str()) == 0);
+}
+
+
+
+
+
 int cFile::Printf(const char * a_Fmt, ...)
 {
 	AString buf;
