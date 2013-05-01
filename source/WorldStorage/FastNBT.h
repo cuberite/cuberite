@@ -190,6 +190,13 @@ public:
 		return res;
 	}
 	
+	inline AString GetName(int a_Tag) const
+	{
+		AString res;
+		res.assign(m_Data + m_Tags[a_Tag].m_NameStart, m_Tags[a_Tag].m_NameLength);
+		return res;
+	}
+	
 protected:
 	const char *             m_Data;
 	int                      m_Length;

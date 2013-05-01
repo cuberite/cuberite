@@ -505,6 +505,7 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const int * a_Value, si
 	Int32 len = htonl(a_NumElements);
 	m_Result.append((const char *)&len, 4);
 #if defined(ANDROID_NDK)
+	// Android has alignment issues - cannot byteswap (htonl) an int that is not 32-bit-aligned, which happens in the regular version
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
 		int Element = htonl(a_Value[i]);
