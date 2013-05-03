@@ -249,6 +249,14 @@ local function HTML_Select_Dimension( name, defaultValue )
 		.. [[</select>]]
 end
 
+local function HTML_Select_Scheme( name, defaultValue )
+	return [[<select name="]] .. name .. [[">]]
+		.. HTML_Option("Default", "Default",  defaultValue == "Default" )
+		.. HTML_Option("Forgetful", "Forgetful", defaultValue == "Forgetful" )
+		.. HTML_Option("Compact", "Compact",  defaultValue == "Compact" )
+		.. [[</select>]]
+end
+
 local function HTML_Select_GameMode( name, defaultValue )
 	return [[<select name="]] .. name .. [[">]]
 		.. HTML_Option("0", "Survival", defaultValue == 0 )
@@ -277,6 +285,7 @@ end
 
 local function HTML_Select_HeightGen( name, defaultValue )
 	return [[<select name="]] .. name .. [[">]]
+		.. HTML_Option("Noise3D", "Noise3D", defaultValue == "Noise3D" )
 		.. HTML_Option("Biomal", "Biomal", defaultValue == "Biomal" )
 		.. HTML_Option("Classic", "Classic",  defaultValue == "Classic" )
 		.. HTML_Option("Flat", "Flat",  defaultValue == "Flat" )
@@ -285,6 +294,7 @@ end
 
 local function HTML_Select_CompositionGen( name, defaultValue )
 	return [[<select name="]] .. name .. [[">]]
+		.. HTML_Option("Noise3D", "Noise3D", defaultValue == "Noise3D" )
 		.. HTML_Option("Biomal", "Biomal", defaultValue == "Biomal" )
 		.. HTML_Option("Classic", "Classic",  defaultValue == "Classic" )
 		.. HTML_Option("SameBlock", "SameBlock",  defaultValue == "SameBlock" )
@@ -295,6 +305,33 @@ end
 local function HTML_Select_Generator( name, defaultValue )
 	return [[<select name="]] .. name .. [[">]]
 		.. HTML_Option("Composable", "Composable", defaultValue == "Composable" )
+		.. [[</select>]]
+end
+
+local function HTML_Select_Biome( name, defaultValue )
+	return [[<select name="]] .. name .. [[">]]
+		.. HTML_Option("Ocean", "Ocean", defaultValue == "Ocean" )
+		.. HTML_Option("Plains", "Plains",  defaultValue == "Plains" )
+		.. HTML_Option("Extreme Hills", "Extreme Hills",  defaultValue == "Extreme Hills" )
+		.. HTML_Option("Forest", "Forest",  defaultValue == "Forest" )
+		.. HTML_Option("Taiga", "Taiga",  defaultValue == "Taiga" )
+		.. HTML_Option("Swampland", "Swampland",  defaultValue == "Swampland" )
+		.. HTML_Option("River", "River",  defaultValue == "River" )
+		.. HTML_Option("Hell", "Hell",  defaultValue == "Hell" )
+		.. HTML_Option("Sky", "Sky",  defaultValue == "Sky" )
+		.. HTML_Option("FrozenOcean", "FrozenOcean",  defaultValue == "FrozenOcean" )
+		.. HTML_Option("FrozenRiver", "FrozenRiver",  defaultValue == "FrozenRiver" )
+		.. HTML_Option("Ice Plains", "Ice Plains",  defaultValue == "Ice Plains" )
+		.. HTML_Option("Ice Mountains", "Ice Mountains",  defaultValue == "Ice Mountains" )
+		.. HTML_Option("MushroomIsland", "MushroomIsland",  defaultValue == "MushroomIsland" )
+		.. HTML_Option("MushroomIslandShore", "MushroomIslandShore",  defaultValue == "MushroomIslandShore" )
+		.. HTML_Option("Beach", "Beach",  defaultValue == "Beach" )
+		.. HTML_Option("DesertHills", "DesertHills",  defaultValue == "DesertHills" )
+		.. HTML_Option("ForestHills", "ForestHills",  defaultValue == "ForestHills" )
+		.. HTML_Option("TaigaHills", "TaigaHills",  defaultValue == "TaigaHills" )
+		.. HTML_Option("Extreme Hills Edge", "Extreme Hills Edge",  defaultValue == "Extreme Hills Edge" )
+		.. HTML_Option("Jungle", "Jungle",  defaultValue == "Jungle" )
+		.. HTML_Option("JungleHills", "JungleHills",  defaultValue == "JungleHills" )
 		.. [[</select>]]
 end
 
@@ -318,6 +355,10 @@ function ShowWorldSettings( Request )
 		if( tonumber( Request.PostParams["World_Dimension"] ) ~= nil ) then
 			WorldIni:DeleteValue( "General", "Dimension" )
 			WorldIni:SetValue( "General", "Dimension", Request.PostParams["World_Dimension"] )
+		end
+		if( tonumber( Request.PostParams["World_Schema"] ) ~= nil ) then
+			WorldIni:DeleteValue( "General", "Schema" )
+			WorldIni:SetValue( "General", "Schema", Request.PostParams["World_Schema"] )
 		end
 		if( tonumber( Request.PostParams["World_SpawnX"] ) ~= nil ) then
 			WorldIni:DeleteValue( "SpawnPosition", "X" )
@@ -415,14 +456,138 @@ function ShowWorldSettings( Request )
 			WorldIni:DeleteValue( "Generator", "BiomeGen" )
 			WorldIni:SetValue( "Generator", "BiomeGen", Request.PostParams["World_BiomeGen"] )
 		end
+			if( ( Request.PostParams["World_Biome"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ConstantBiome" )
+				WorldIni:SetValue( "Generator", "ConstantBiome", Request.PostParams["World_Biome"] )
+			end
+			if( ( Request.PostParams["World_MultiStepMapOceanCellSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "MultiStepMapOceanCellSize" )
+				WorldIni:SetValue( "Generator", "MultiStepMapOceanCellSize", Request.PostParams["World_MultiStepMapOceanCellSize"] )
+			end
+			if( ( Request.PostParams["World_MultiStepMapMushroomIslandSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "MultiStepMapMushroomIslandSize" )
+				WorldIni:SetValue( "Generator", "MultiStepMapMushroomIslandSize", Request.PostParams["World_MultiStepMapMushroomIslandSize"] )
+			end
+			if( ( Request.PostParams["World_MultiStepMapRiverCellSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "MultiStepMapRiverCellSize" )
+				WorldIni:SetValue( "Generator", "MultiStepMapRiverCellSize", Request.PostParams["World_MultiStepMapRiverCellSize"] )
+			end
+			if( ( Request.PostParams["World_MultiStepMapRiverWidth"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "MultiStepMapRiverWidth" )
+				WorldIni:SetValue( "Generator", "MultiStepMapRiverWidth", Request.PostParams["World_MultiStepMapRiverWidth"] )
+			end
+			if( ( Request.PostParams["World_MultiStepMapLandBiomeSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "MultiStepMapLandBiomeSize" )
+				WorldIni:SetValue( "Generator", "MultiStepMapLandBiomeSize", Request.PostParams["World_MultiStepMapLandBiomeSize"] )
+			end
+			if( ( Request.PostParams["World_DistortedVoronoiCellSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "DistortedVoronoiCellSize" )
+				WorldIni:SetValue( "Generator", "DistortedVoronoiCellSize", Request.PostParams["World_DistortedVoronoiCellSize"] )
+			end
+			if( ( Request.PostParams["World_DistortedVoronoiBiomes"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "DistortedVoronoiBiomes" )
+				WorldIni:SetValue( "Generator", "DistortedVoronoiBiomes", Request.PostParams["World_DistortedVoronoiBiomes"] )
+			end
+			if( ( Request.PostParams["World_VoronoiCellSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "VoronoiCellSize" )
+				WorldIni:SetValue( "Generator", "VoronoiCellSize", Request.PostParams["World_VoronoiCellSize"] )
+			end
+			if( ( Request.PostParams["World_VoronoiBiomesdVoronoiBiomes"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "VoronoiBiomes" )
+				WorldIni:SetValue( "Generator", "VoronoiBiomes", Request.PostParams["World_VoronoiBiomes"] )
+			end
+			if( ( Request.PostParams["World_CheckerBoardBiomes"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "CheckerBoardBiomes" )
+				WorldIni:SetValue( "Generator", "CheckerBoardBiomes", Request.PostParams["World_CheckerBoardBiomes"] )
+			end
+			if( ( Request.PostParams["World_CheckerBoardBiomeSize"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "CheckerBoardBiomeSize" )
+				WorldIni:SetValue( "Generator", "CheckerBoardBiomeSize", Request.PostParams["World_CheckerBoardBiomeSize"] )
+			end
 		if( ( Request.PostParams["World_HeightGen"] ) ~= nil ) then
 			WorldIni:DeleteValue( "Generator", "HeightGen" )
 			WorldIni:SetValue( "Generator", "HeightGen", Request.PostParams["World_HeightGen"] )
 		end
+			if( ( Request.PostParams["World_FlatHeight"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "FlatHeight" )
+				WorldIni:SetValue( "Generator", "FlatHeight", Request.PostParams["World_FlatHeight"] )
+			end
 		if( ( Request.PostParams["World_CompositionGen"] ) ~= nil ) then
 			WorldIni:DeleteValue( "Generator", "CompositionGen" )
 			WorldIni:SetValue( "Generator", "CompositionGen", Request.PostParams["World_CompositionGen"] )
 		end
+			if( ( Request.PostParams["World_Noise3DSeaLevel"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DSeaLevel" )
+				WorldIni:SetValue( "Generator", "Noise3DSeaLevel", Request.PostParams["World_Noise3DSeaLevel"] )
+			end
+			if( ( Request.PostParams["World_Noise3DHeightAmplification"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DHeightAmplification" )
+				WorldIni:SetValue( "Generator", "Noise3DHeightAmplification", Request.PostParams["World_Noise3DHeightAmplification"] )
+			end
+			if( ( Request.PostParams["World_Noise3DMidPoint"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DMidPoint" )
+				WorldIni:SetValue( "Generator", "Noise3DMidPoint", Request.PostParams["World_Noise3DMidPoint"] )
+			end
+			if( ( Request.PostParams["World_Noise3DFrequencyX"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DFrequencyX" )
+				WorldIni:SetValue( "Generator", "Noise3DFrequencyX", Request.PostParams["World_Noise3DFrequencyX"] )
+			end
+			if( ( Request.PostParams["World_Noise3DFrequencyY"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DFrequencyY" )
+				WorldIni:SetValue( "Generator", "Noise3DFrequencyY", Request.PostParams["World_Noise3DFrequencyY"] )
+			end
+			if( ( Request.PostParams["World_Noise3DFrequencyZ"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DFrequencyZ" )
+				WorldIni:SetValue( "Generator", "Noise3DFrequencyZ", Request.PostParams["World_Noise3DFrequencyZ"] )
+			end
+			if( ( Request.PostParams["World_Noise3DAirThreshold"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "Noise3DAirThreshold" )
+				WorldIni:SetValue( "Generator", "Noise3DAirThreshold", Request.PostParams["World_Noise3DAirThreshold"] )
+			end
+			if( ( Request.PostParams["World_ClassicSeaLevel"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicSeaLevel" )
+				WorldIni:SetValue( "Generator", "ClassicSeaLevel", Request.PostParams["World_ClassicSeaLevel"] )
+			end
+			if( ( Request.PostParams["World_ClassicBeachHeight"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBeachHeight" )
+				WorldIni:SetValue( "Generator", "ClassicBeachHeight", Request.PostParams["World_ClassicBeachHeight"] )
+			end
+			if( ( Request.PostParams["World_ClassicBeachDepth"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBeachDepth" )
+				WorldIni:SetValue( "Generator", "ClassicBeachDepth", Request.PostParams["World_ClassicBeachDepth"] )
+			end
+			if( ( Request.PostParams["World_ClassicBlockTop"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBlockTop" )
+				WorldIni:SetValue( "Generator", "ClassicBlockTop", Request.PostParams["World_ClassicBlockTop"] )
+			end
+			if( ( Request.PostParams["World_ClassicBlockMiddle"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBlockMiddle" )
+				WorldIni:SetValue( "Generator", "ClassicBlockMiddle", Request.PostParams["World_ClassicBlockMiddle"] )
+			end
+			if( ( Request.PostParams["World_ClassicBlockBottom"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBlockBottom" )
+				WorldIni:SetValue( "Generator", "ClassicBlockBottom", Request.PostParams["World_ClassicBlockBottom"] )
+			end
+			if( ( Request.PostParams["World_ClassicBlockBeach"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBlockBeach" )
+				WorldIni:SetValue( "Generator", "ClassicBlockBeach", Request.PostParams["World_ClassicBlockBeach"] )
+			end
+			if( ( Request.PostParams["World_ClassicBlockBeachBottom"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBlockBeachBottom" )
+				WorldIni:SetValue( "Generator", "ClassicBlockBeachBottom", Request.PostParams["World_ClassicBlockBeachBottom"] )
+			end
+			if( ( Request.PostParams["World_ClassicBlockSea"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "ClassicBlockSea" )
+				WorldIni:SetValue( "Generator", "ClassicBlockSea", Request.PostParams["World_ClassicBlockSea"] )
+			end
+			if( ( Request.PostParams["World_SameBlockType"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "SameBlockType" )
+				WorldIni:SetValue( "Generator", "SameBlockType", Request.PostParams["World_SameBlockType"] )
+			end
+			if( ( Request.PostParams["World_SameBlockBedrocked"] ) ~= nil ) then
+				WorldIni:DeleteValue( "Generator", "SameBlockBedrocked" )
+				WorldIni:SetValue( "Generator", "SameBlockBedrocked", Request.PostParams["World_SameBlockBedrocked"] )
+			end
 		if( ( Request.PostParams["World_Structures"] ) ~= nil ) then
 			WorldIni:DeleteValue( "Generator", "Structures" )
 			WorldIni:SetValue( "Generator", "Structures", Request.PostParams["World_Structures"] )
@@ -435,6 +600,39 @@ function ShowWorldSettings( Request )
 			WorldIni:DeleteValue( "Generator", "Generator" )
 			WorldIni:SetValue( "Generator", "Generator", Request.PostParams["World_Generator"] )
 		end
+		if( ( Request.PostParams["World_MineShaftsGridSize"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "MineShaftsGridSize" )
+			WorldIni:SetValue( "Generator", "MineShaftsGridSize", Request.PostParams["World_MineShaftsGridSize"] )
+		end
+		if( ( Request.PostParams["World_MineShaftsMaxSystemSize"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "MineShaftsMaxSystemSize" )
+			WorldIni:SetValue( "Generator", "MineShaftsMaxSystemSize", Request.PostParams["World_MineShaftsMaxSystemSize"] )
+		end
+		if( ( Request.PostParams["World_MineShaftsChanceCorridor"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "MineShaftsChanceCorridor" )
+			WorldIni:SetValue( "Generator", "MineShaftsChanceCorridor", Request.PostParams["World_MineShaftsChanceCorridor"] )
+		end
+		if( ( Request.PostParams["World_MineShaftsChanceCrossing"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "MineShaftsChanceCrossing" )
+			WorldIni:SetValue( "Generator", "MineShaftsChanceCrossing", Request.PostParams["World_MineShaftsChanceCrossing"] )
+		end
+		if( ( Request.PostParams["World_MineShaftsChanceStaircase"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "MineShaftsChanceStaircase" )
+			WorldIni:SetValue( "Generator", "MineShaftsChanceStaircase", Request.PostParams["World_MineShaftsChanceStaircase"] )
+		end
+		if( ( Request.PostParams["World_LavaLakesProbability"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "LavaLakesProbability" )
+			WorldIni:SetValue( "Generator", "LavaLakesProbability", Request.PostParams["World_LavaLakesProbability"] )
+		end
+		if( ( Request.PostParams["World_WaterLakesProbability"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "WaterLakesProbability" )
+			WorldIni:SetValue( "Generator", "WaterLakesProbability", Request.PostParams["World_WaterLakesProbability"] )
+		end
+		if( ( Request.PostParams["World_BottomLavaLevel"] ) ~= nil ) then
+			WorldIni:DeleteValue( "Generator", "BottomLavaLevel" )
+			WorldIni:SetValue( "Generator", "BottomLavaLevel", Request.PostParams["World_BottomLavaLevel"] )
+		end
+		
 		WorldIni:WriteFile()
 	end
 	Content = Content .. "<h4>World for operations: " .. WORLD .. "</h4>"
@@ -458,6 +656,12 @@ function ShowWorldSettings( Request )
 	<th colspan="2">General</th>
 	<tr><td>Dimension:</td>
 	<td>]] .. HTML_Select_Dimension("World_Dimension", WorldIni:GetValueI("General", "Dimension") ) .. [[</td></tr>
+	</table>
+	<br />
+	<table>
+	<th colspan="2">Storage</th>
+	<tr><td>Schema:</td>
+	<td>]] .. HTML_Select_Scheme("World_Schema", WorldIni:GetValueI("Storage", "Schema") ) .. [[</td></tr>
 	</table>
 	<br />
 	<table>
@@ -546,8 +750,138 @@ function ShowWorldSettings( Request )
 	<td>]] .. HTML_Select_Generator("World_Generator", WorldIni:GetValue("Generator", "Generator") ) .. [[</td></tr>
 
 	</table>
-	]]
+	<br />
+	<table>
+	<th colspan="1">Finetuning</th><br />
+	</table>
+	<table>
+	]]	
+	if WorldIni:GetValue( "Generator", "BiomeGen" ) ==  "Constant" then
+		Content = Content .. [[
+		<th colspan="2">Biome Generator</th>
+		<tr><td style="width: 50%;">ConstantBiome:</td>
+		<td>]] .. HTML_Select_Biome( "World_Biome", WorldIni:GetValue("Generator", "ConstantBiome" ) ) .. [[</td></tr>]]
+	elseif WorldIni:GetValue( "Generator", "BiomeGen" ) == "MultiStepMap" then
+		Content = Content .. [[
+		<th colspan="2">Biome Generator</th>
+		<tr><td>MultiStepMapOceanCellSize:</td>
+		<td><input type="text" name="World_MultiStepMapOceanCellSize" value="]] .. WorldIni:GetValue("Generator", "MultiStepMapOceanCellSize") .. [["></td></tr>
+		<tr><td>MultiStepMapOceanCellSize:</td>
+		<td><input type="text" name="World_MultiStepMapMushroomIslandSize" value="]] .. WorldIni:GetValue("Generator", "MultiStepMapMushroomIslandSize") .. [["></td></tr>
+		<tr><td>MultiStepMapOceanCellSize:</td>
+		<td><input type="text" name="World_MultiStepMapRiverCellSize" value="]] .. WorldIni:GetValue("Generator", "MultiStepMapRiverCellSize") .. [["></td></tr>
+		<tr><td>MultiStepMapOceanCellSize:</td>
+		<td><input type="text" name="World_MultiStepMapRiverWidth" value="]] .. WorldIni:GetValue("Generator", "MultiStepMapRiverWidth") .. [["></td></tr>
+		<tr><td>MultiStepMapOceanCellSize:</td>
+		<td><input type="text" name="World_MultiStepMapLandBiomeSize" value="]] .. WorldIni:GetValue("Generator", "MultiStepMapLandBiomeSize") .. [["></td></tr>]]
+	elseif WorldIni:GetValue( "Generator", "BiomeGen" ) == "DistortedVoronoi" then
+		Content = Content .. [[
+		<th colspan="2">Biome Generator</th>
+		<tr><td>DistortedVoronoiCellSize:</td>
+		<td><input type="text" name="World_DistortedVoronoiCellSize" value="]] .. WorldIni:GetValue("Generator", "DistortedVoronoiCellSize") .. [["></td></tr>
+		<tr><td>DistortedVoronoiBiomes:</td>
+		<td><input type="text" name="World_DistortedVoronoiBiomes" value="]] .. WorldIni:GetValue("Generator", "DistortedVoronoiBiomes") .. [["></td></tr>]]
+	elseif WorldIni:GetValue( "Generator", "BiomeGen" ) == "Voronoi" then
+		Content = Content .. [[
+		<th colspan="2">Biome Generator</th>
+		<tr><td>VoronoiCellSize:</td>
+		<td><input type="text" name="World_VoronoiCellSize" value="]] .. WorldIni:GetValue("Generator", "VoronoiCellSize") .. [["></td></tr>
+		<tr><td>VoronoiBiomes:</td>
+		<td><input type="text" name="World_VoronoiBiomes" value="]] .. WorldIni:GetValue("Generator", "VoronoiBiomes") .. [["></td></tr>]]
+	elseif WorldIni:GetValue( "Generator", "BiomeGen" ) == "CheckerBoard" then
+		Content = Content .. [[
+		<th colspan="2">Biome Generator</th>
+		<tr><td>CheckerBoardBiomes:</td>
+		<td><input type="text" name="World_CheckerBoardBiomes" value="]] .. WorldIni:GetValue("Generator", "CheckerBoardBiomes") .. [["></td></tr>
+		<tr><td>CheckerBoardBiomeSize:</td>
+		<td><input type="text" name="World_CheckerBoardBiomeSize" value="]] .. WorldIni:GetValue("Generator", "CheckerBoardBiomeSize") .. [["></td></tr>]]
+	end
 	
+	if WorldIni:GetValue( "Generator", "CompositionGen" ) == "Noise3D" then
+		Content = Content .. [[
+		<th colspan="2">Composition Generator</th>
+		<tr><td>Noise3DSeaLevel:</td>
+		<td><input type="text" name="World_Noise3DSeaLevel" value="]] .. WorldIni:GetValue("Generator", "Noise3DSeaLevel") .. [["></td></tr>
+		<tr><td>Noise3DHeightAmplification:</td>
+		<td><input type="text" name="World_Noise3DHeightAmplification" value="]] .. WorldIni:GetValue("Generator", "Noise3DHeightAmplification") .. [["></td></tr>
+		<tr><td>Noise3DMidPoint:</td>
+		<td><input type="text" name="World_Noise3DMidPoint" value="]] .. WorldIni:GetValue("Generator", "Noise3DMidPoint") .. [["></td></tr>
+		<tr><td>Noise3DFrequencyX:</td>
+		<td><input type="text" name="World_Noise3DFrequencyX" value="]] .. WorldIni:GetValue("Generator", "Noise3DFrequencyX") .. [["></td></tr>
+		<tr><td>Noise3DFrequencyY:</td>
+		<td><input type="text" name="World_Noise3DFrequencyY" value="]] .. WorldIni:GetValue("Generator", "Noise3DFrequencyY") .. [["></td></tr>
+		<tr><td>Noise3DFrequencyZ:</td>
+		<td><input type="text" name="World_Noise3DFrequencyZ" value="]] .. WorldIni:GetValue("Generator", "Noise3DFrequencyZ") .. [["></td></tr>
+		<tr><td>Noise3DAirThreshold:</td>
+		<td><input type="text" name="World_Noise3DAirThreshold" value="]] .. WorldIni:GetValue("Generator", "Noise3DAirThreshold") .. [["></td></tr>]]
+	elseif WorldIni:GetValue( "Generator", "CompositionGen" ) == "Classic" then
+		Content = Content .. [[
+		<th colspan="2">Composition Generator</th>
+		<tr><td>ClassicSeaLevel:</td>
+		<td><input type="text" name="World_ClassicSeaLevel" value="]] .. WorldIni:GetValue("Generator", "ClassicSeaLevel") .. [["></td></tr>
+		<tr><td>ClassicBeachHeight:</td>
+		<td><input type="text" name="World_ClassicBeachHeight" value="]] .. WorldIni:GetValue("Generator", "ClassicBeachHeight") .. [["></td></tr>
+		<tr><td>ClassicBeachDepth:</td>
+		<td><input type="text" name="World_ClassicBeachDepth" value="]] .. WorldIni:GetValue("Generator", "ClassicBeachDepth") .. [["></td></tr>
+		<tr><td>ClassicBlockTop:</td>
+		<td><input type="text" name="World_ClassicBlockTop" value="]] .. WorldIni:GetValue("Generator", "ClassicBlockTop") .. [["></td></tr>
+		<tr><td>ClassicBlockMiddle:</td>
+		<td><input type="text" name="World_ClassicBlockMiddle" value="]] .. WorldIni:GetValue("Generator", "ClassicBlockMiddle") .. [["></td></tr>
+		<tr><td>ClassicBlockBottom:</td>
+		<td><input type="text" name="World_ClassicBlockBottom" value="]] .. WorldIni:GetValue("Generator", "ClassicBlockBottom") .. [["></td></tr>
+		<tr><td>ClassicBlockBeach:</td>
+		<td><input type="text" name="World_ClassicBlockBeach" value="]] .. WorldIni:GetValue("Generator", "ClassicBlockBeach") .. [["></td></tr>
+		<tr><td>ClassicBlockBeachBottom:</td>
+		<td><input type="text" name="World_ClassicBlockBeachBottom" value="]] .. WorldIni:GetValue("Generator", "ClassicBlockBeachBottom") .. [["></td></tr>
+		<tr><td>ClassicBlockSea:</td>
+		<td><input type="text" name="World_ClassicBlockSea" value="]] .. WorldIni:GetValue("Generator", "ClassicBlockSea") .. [["></td></tr>]]
+	elseif WorldIni:GetValue( "Generator", "CompositionGen" ) == "SameBlock" then
+		Content = Content .. [[
+		<th colspan="2">Composition Generator</th>
+		<tr><td>SameBlockType:</td>
+		<td><input type="text" name="World_SameBlockType" value="]] .. WorldIni:GetValue("Generator", "SameBlockType") .. [["></td></tr>
+		<tr><td>SameBlockBedrocked:</td>
+		<td><input type="text" name="World_SameBlockBedrocked" value="]] .. WorldIni:GetValue("Generator", "SameBlockBedrocked") .. [["></td></tr>]]		
+	end
+	if WorldIni:GetValue( "Generator", "HeightGen" ) == "Flat" then
+		Content = Content .. [[
+		<th colspan="2">Height Generator</th>
+		<tr><td>FlatHeight:</td>
+		<td><input type="text" name="World_FlatHeight" value="]] .. WorldIni:GetValue("Generator", "FlatHeight") .. [["></td></tr>]]
+	end
+	if string.find( WorldIni:GetValue( "Generator", "Structures" ), "MineShafts" ) ~= nil then
+		Content = Content .. [[
+		<th colspan="2">MineShafts</th>
+		<tr><td>MineShaftsGridSize:</td>
+		<td><input type="text" name="World_MineShaftsGridSize" value="]] .. WorldIni:GetValue("Generator", "MineShaftsGridSize") .. [["></td></tr>
+		<tr><td>MineShaftsMaxSystemSize:</td>
+		<td><input type="text" name="World_MineShaftsMaxSystemSize" value="]] .. WorldIni:GetValue("Generator", "MineShaftsMaxSystemSize") .. [["></td></tr>
+		<tr><td>MineShaftsChanceCorridor:</td>
+		<td><input type="text" name="World_MineShaftsChanceCorridor" value="]] .. WorldIni:GetValue("Generator", "MineShaftsChanceCorridor") .. [["></td></tr>
+		<tr><td>MineShaftsChanceCrossing:</td>
+		<td><input type="text" name="World_MineShaftsChanceCrossing" value="]] .. WorldIni:GetValue("Generator", "MineShaftsChanceCrossing") .. [["></td></tr>
+		<tr><td>MineShaftsChanceStaircase:</td>
+		<td><input type="text" name="World_MineShaftsChanceStaircase" value="]] .. WorldIni:GetValue("Generator", "MineShaftsChanceStaircase") .. [["></td></tr>]]
+	end
+	if string.find( WorldIni:GetValue( "Generator", "Structures" ), "LavaLakes" ) ~= nil then
+		Content = Content .. [[
+		<th colspan="2">LavaLakes</th>
+		<tr><td>LavaLakesProbability:</td>
+		<td><input type="text" name="World_LavaLakesProbability" value="]] .. WorldIni:GetValue("Generator", "LavaLakesProbability") .. [["></td></tr>]]
+	end
+	if string.find( WorldIni:GetValue( "Generator", "Structures" ), "WaterLakes" ) ~= nil then
+			Content = Content .. [[
+		<th colspan="2">WaterLakes</th>
+		<tr><td>WaterLakesProbability:</td>
+		<td><input type="text" name="World_WaterLakesProbability" value="]] .. WorldIni:GetValue("Generator", "WaterLakesProbability") .. [["></td></tr>]]
+	end
+	if string.find( WorldIni:GetValue( "Generator", "Finishers" ), "BottomLava" ) ~= nil then
+		Content = Content .. [[
+		<th colspan="2">BottomLavaLevel</th>
+		<tr><td>BottomLavaLevel:</td>
+		<td><input type="text" name="World_BottomLavaLevel" value="]] .. WorldIni:GetValue("Generator", "BottomLavaLevel") .. [["></td></tr>]]
+	end
+	Content = Content .. [[</table>]]
 	
 	Content = Content .. [[ <br />
 	<input type="submit" value="Save Settings" name="world_submit"> </form>WARNING: Any changes made here might require a server restart in order to be applied!
