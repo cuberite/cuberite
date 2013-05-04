@@ -197,6 +197,9 @@ public:
 
 	/// Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
+
+	// Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates
+	cVector3iArray * DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false.
 	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Lua-accessible

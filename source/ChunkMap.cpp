@@ -1450,6 +1450,36 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 
 
+cVector3iArray *cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cBlockArea area;
+	cVector3iArray *BlocksAffected = new cVector3iArray();
+	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
+	BlocksAffected->reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
+	area.Read(m_World,a_BlockX - ExplosionSizeInt,a_BlockX + ExplosionSizeInt,a_BlockY - ExplosionSizeInt,a_BlockY + ExplosionSizeInt,a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
+	for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
+	{
+		for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
+		{
+			for (int z = -ExplosionSizeInt; z < ExplosionSizeInt; z++)
+			{
+				if ((x*x + y*y + z*z) < (ExplosionSizeInt * ExplosionSizeInt))
+				{
+					area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z,E_BLOCK_AIR);
+					BlocksAffected->push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+				}
+			}
+		}
+		
+	}
+	area.Write(m_World,a_BlockX - ExplosionSizeInt,a_BlockY - ExplosionSizeInt,a_BlockZ - ExplosionSizeInt);
+	return BlocksAffected;
+}
+
+
+
+
+
 bool cChunkMap::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);

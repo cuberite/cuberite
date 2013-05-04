@@ -705,37 +705,9 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 
 void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	// TODO: implement explosion using cBlockArea / in cChunkMap, add damage to entities, add support for pickups, and implement block hardiness
+	// TODO: Add damage to entities, add support for pickups, and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX,a_BlockY,a_BlockZ);
-	cVector3iArray BlocksAffected;
-	int ExplosionSizeInt = (int)a_ExplosionSize;
-	BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-	for (int x = 0; x < ExplosionSizeInt; x++)
-	{
-		for (int y = 0; y < ExplosionSizeInt; y++)
-		{
-			for (int z = 0; z < ExplosionSizeInt; z++)
-			{
-				DigBlock(a_BlockX + x, a_BlockY + y, a_BlockZ + z);
-				DigBlock(a_BlockX + x, a_BlockY - y, a_BlockZ + z);
-				DigBlock(a_BlockX - x, a_BlockY - y, a_BlockZ - z);
-				DigBlock(a_BlockX - x, a_BlockY + y, a_BlockZ - z);
-				DigBlock(a_BlockX + x, a_BlockY + y, a_BlockZ - z);
-				DigBlock(a_BlockX + x, a_BlockY - y, a_BlockZ - z);
-				DigBlock(a_BlockX - x, a_BlockY + y, a_BlockZ + z);
-				DigBlock(a_BlockX - x, a_BlockY - y, a_BlockZ + z);
-				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
-				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY - y, a_BlockZ + z));
-				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY - y, a_BlockZ - z));
-				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY + y, a_BlockZ - z));
-				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ - z));
-				BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY - y, a_BlockZ - z));
-				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY + y, a_BlockZ + z));
-				BlocksAffected.push_back(Vector3i(a_BlockX - x, a_BlockY - y, a_BlockZ + z));
-			}
-		}
-		
-	}
+	cVector3iArray * BlocksAffected = m_ChunkMap->DoExplosiontAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ);
 	BroadcastSoundEffect("random.explode", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.6f);
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -757,10 +729,11 @@ void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, i
 				}
 				distance_explosion.Normalize();
 				distance_explosion *= power;
-				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_ExplosionSize, BlocksAffected, distance_explosion);
+				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_ExplosionSize, *BlocksAffected, distance_explosion);
 			}
 		}
 	}
+	delete BlocksAffected;
 }
 
 
