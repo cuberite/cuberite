@@ -118,7 +118,7 @@ public:
 
 	static const unsigned int INDEX_OUT_OF_RANGE = 0xffffffff;
 
-	/// The type used for any heightmap operations and storage; idx = x + Width * z
+	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
 	
 	/** The type used for any biomemap operations and storage inside MCServer, 

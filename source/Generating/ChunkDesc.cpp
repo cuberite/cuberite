@@ -547,3 +547,30 @@ void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 
 
 
+
+#ifdef _DEBUG
+
+void cChunkDesc::VerifyHeightmap(void)
+{
+	for (int x = 0; x < cChunkDef::Width; x++)
+	{
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			{
+				if (GetBlockType(x, y, z) != E_BLOCK_AIR)
+				{
+					ASSERT(GetHeight(x, z) == y);
+					break;
+				}
+			}  // for y
+		}  // for z
+	}  // for x
+}
+
+#endif  // _DEBUG
+
+
+
+
+
