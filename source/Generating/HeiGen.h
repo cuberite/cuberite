@@ -47,6 +47,9 @@ public:
 	cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize);  // Takes ownership of a_HeiGenToCache
 	~cHeiGenCache();
 	
+	// cTerrainHeightGen override:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	
 protected:
 
 	cTerrainHeightGen * m_HeiGenToCache;
@@ -67,8 +70,6 @@ protected:
 	int m_NumHits;
 	int m_NumMisses;
 	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
-	
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
 } ;
 
 

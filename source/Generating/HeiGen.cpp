@@ -62,11 +62,13 @@ cHeiGenCache::~cHeiGenCache()
 
 void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
+	/*
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
 		LOGD("HeiGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
 		LOGD("HeiGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
 	}
+	//*/
 	
 	for (int i = 0; i < m_CacheSize; i++)
 	{

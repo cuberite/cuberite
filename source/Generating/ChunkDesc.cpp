@@ -558,9 +558,11 @@ void cChunkDesc::VerifyHeightmap(void)
 		{
 			for (int y = cChunkDef::Height - 1; y > 0; y--)
 			{
-				if (GetBlockType(x, y, z) != E_BLOCK_AIR)
+				BLOCKTYPE BlockType = GetBlockType(x, y, z);
+				if (BlockType != E_BLOCK_AIR)
 				{
-					ASSERT(GetHeight(x, z) == y);
+					int Height = GetHeight(x, z);
+					ASSERT(Height == y);
 					break;
 				}
 			}  // for y

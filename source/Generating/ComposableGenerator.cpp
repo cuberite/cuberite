@@ -18,6 +18,7 @@
 #include "FinishGen.h"
 
 #include "Caves.h"
+#include "DistortedHeightmap.h"
 #include "MineShafts.h"
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
@@ -37,7 +38,9 @@ cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_HeightGen(NULL),
 	m_CompositionGen(NULL),
 	m_Noise3DComposable(NULL),
-	m_NumNoise3DComposableUses(0)
+	m_NumNoise3DComposableUses(0),
+	m_DistortedHeightmap(NULL),
+	m_NumDistortedHeightmapUses(0)
 {
 }
 
@@ -60,7 +63,16 @@ cComposableGenerator::~cComposableGenerator()
 	m_StructureGens.clear();
 
 	// CompositionGen must not be freed if it is shared between HeightGenCache and CompositionGen:
-	if ((m_NumNoise3DComposableUses < 2) || (m_CompositionGen != m_Noise3DComposable))
+	int NumUsed = 1;
+	if (m_CompositionGen == m_Noise3DComposable)
+	{
+		NumUsed = m_NumNoise3DComposableUses;
+	}
+	else if (m_CompositionGen == m_DistortedHeightmap)
+	{
+		NumUsed = m_NumDistortedHeightmapUses;
+	}
+	if (NumUsed == 1)
 	{
 		delete m_CompositionGen;
 	}
@@ -241,6 +253,17 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 		float HeightAmp3  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3",  0.5);
 		m_HeightGen = new cHeiGenClassic(Seed, HeightFreq1, HeightAmp1, HeightFreq2, HeightAmp2, HeightFreq3, HeightAmp3);
 	}
+	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
+	{
+		if (m_DistortedHeightmap == NULL)
+		{
+			m_DistortedHeightmap = new cDistortedHeightmap(Seed, *m_BiomeGen);
+			m_DistortedHeightmap->Initialize(a_IniFile);
+		}
+		m_HeightGen = m_DistortedHeightmap;
+		m_NumDistortedHeightmapUses++;
+		// TODO: Optimize by sharing with CompoGen
+	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
 		if (m_Noise3DComposable == NULL)
@@ -326,6 +349,16 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 			SeaLevel, BeachHeight, BeachDepth, BlockTop, BlockMiddle, BlockBottom, BlockBeach,
 			BlockBeachBottom, BlockSea
 		);
+	}
+	else if (NoCaseCompare(CompoGenName, "DistortedHeightmap") == 0)
+	{
+		if (m_DistortedHeightmap == NULL)
+		{
+			m_DistortedHeightmap = new cDistortedHeightmap(m_ChunkGenerator.GetSeed(), *m_BiomeGen);
+			m_DistortedHeightmap->Initialize(a_IniFile);
+		}
+		m_CompositionGen = m_DistortedHeightmap;
+		m_NumDistortedHeightmapUses++;
 	}
 	else if (NoCaseCompare(CompoGenName, "nether") == 0)
 	{

@@ -27,6 +27,9 @@ See http://forum.mc-server.org/showthread.php?tid=409 for details.
 // fwd: Noise3DGenerator.h
 class cNoise3DComposable;
 
+// fwd: DistortedHeightmap.h
+class cDistortedHeightmap;
+
 
 
 
@@ -146,8 +149,11 @@ protected:
 	cFinishGenList           m_FinishGens;
 	
 	// Specific generators that can be reused for different purposes - we don't want to create multiple objects for them
-	cNoise3DComposable * m_Noise3DComposable;
-	int                  m_NumNoise3DComposableUses;  // How many times is it actually used?
+	cNoise3DComposable *  m_Noise3DComposable;
+	int                   m_NumNoise3DComposableUses;  ///< How many times is it actually used?
+	cDistortedHeightmap * m_DistortedHeightmap;
+	int                   m_NumDistortedHeightmapUses;  ///< How many times is it actually used?
+	
 
 	/// Reads the biome gen settings from the ini and initializes m_BiomeGen accordingly
 	void InitBiomeGen(cIniFile & a_IniFile);

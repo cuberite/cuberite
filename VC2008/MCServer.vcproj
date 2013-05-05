@@ -1745,6 +1745,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Generating\DistortedHeightmap.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Generating\DistortedHeightmap.h"
 					>
 				</File>
