@@ -274,6 +274,7 @@ void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 						break;
 					}
 				}  // switch (biome)
+				a_ChunkDesc.SetHeight(x, z, m_SeaLevel + 1);
 			}  // else (under water)
 			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
