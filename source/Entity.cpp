@@ -238,23 +238,37 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			//Push out entity.
-			m_bOnGround = true;
-			NextPos.y += 0.2;
-			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
-				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
+			if (BlockIn == E_BLOCK_COBWEB)
+			{
+				NextSpeed.x *= 0.25;
+				NextSpeed.z *= 0.25;
+			}
+			else
+			{
+				//Push out entity.
+				m_bOnGround = true;
+				NextPos.y += 0.2;
+				LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
+					m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
+			}
 		}
 
 		if (!m_bOnGround)
 		{
 			float fallspeed;
-			if (!IsBlockWater(BlockIn))
+			if (IsBlockWater(BlockIn))
 			{
-				fallspeed = m_Gravity * a_Dt;
+				fallspeed = -3.0f * a_Dt; //Fall slower in water.
+			}
+			else if (BlockIn == E_BLOCK_COBWEB)
+			{
+				NextSpeed.y *= 0.05; //Reduce overall falling speed
+				fallspeed = 0; //No falling.
 			}
 			else
 			{
-				fallspeed = -3.0f * a_Dt; //Fall slower in water.
+				//Normal gravity
+				fallspeed = m_Gravity * a_Dt;
 			}
 			NextSpeed.y += fallspeed;
 		}
