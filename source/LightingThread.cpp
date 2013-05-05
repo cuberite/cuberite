@@ -279,39 +279,65 @@ void cLightingThread::LightChunk(cLightingThread::sItem & a_Item)
 	CalcLight(m_BlockLight);
 	
 	PrepareSkyLight();
+	
+	/*
+	// DEBUG: Save chunk data with highlighted seeds for visual inspection:
+	cFile f4;
+	if (
+		f4.Open(Printf("Chunk_%d_%d_seeds.grab", a_Item.x, a_Item.z), cFile::fmWrite)
+	)
+	{
+		for (int z = 0; z < cChunkDef::Width * 3; z++)
+		{
+			for (int y = cChunkDef::Height / 2; y >= 0; y--)
+			{
+				unsigned char Seeds     [cChunkDef::Width * 3];
+				memcpy(Seeds, m_BlockTypes + y * BlocksPerYLayer + z * cChunkDef::Width * 3, cChunkDef::Width * 3);
+				for (int x = 0; x < cChunkDef::Width * 3; x++)
+				{
+					if (m_IsSeed1[y * BlocksPerYLayer + z * cChunkDef::Width * 3 + x])
+					{
+						Seeds[x] = E_BLOCK_DIAMOND_BLOCK;
+					}
+				}
+				f4.Write(Seeds, cChunkDef::Width * 3);
+			}
+		}
+	}
+	//*/
+	
 	CalcLight(m_SkyLight);
+	
+	/*
+	// DEBUG: Save XY slices of the chunk data and lighting for visual inspection:
+	cFile f1, f2, f3;
+	if (
+		f1.Open(Printf("Chunk_%d_%d_data.grab",  a_Item.x, a_Item.z), cFile::fmWrite) &&
+		f2.Open(Printf("Chunk_%d_%d_sky.grab",   a_Item.x, a_Item.z), cFile::fmWrite) &&
+		f3.Open(Printf("Chunk_%d_%d_glow.grab",  a_Item.x, a_Item.z), cFile::fmWrite)
+	)
+	{
+		for (int z = 0; z < cChunkDef::Width * 3; z++)
+		{
+			for (int y = cChunkDef::Height / 2; y >= 0; y--)
+			{
+				f1.Write(m_BlockTypes + y * BlocksPerYLayer + z * cChunkDef::Width * 3, cChunkDef::Width * 3);
+				unsigned char SkyLight  [cChunkDef::Width * 3];
+				unsigned char BlockLight[cChunkDef::Width * 3];
+				for (int x = 0; x < cChunkDef::Width * 3; x++)
+				{
+					SkyLight[x]   = m_SkyLight  [y * BlocksPerYLayer + z * cChunkDef::Width * 3 + x] << 4;
+					BlockLight[x] = m_BlockLight[y * BlocksPerYLayer + z * cChunkDef::Width * 3 + x] << 4;
+				}
+				f2.Write(SkyLight,   cChunkDef::Width * 3);
+				f3.Write(BlockLight, cChunkDef::Width * 3);
+			}
+		}
+	}
+	//*/
 	
 	CompressLight(m_BlockLight, BlockLight);
 	CompressLight(m_SkyLight, SkyLight);
-	
-	/*
-	// DEBUG:
-	{
-		cFile f("chunk_BlockTypes.dat", cFile::fmWrite);
-		if (f.IsOpen())
-		{
-			f.Write(m_BlockTypes, sizeof(m_BlockTypes));
-		}
-	}
-	
-	// DEBUG:
-	{
-		cFile f("Chunk_SkyLight.dat", cFile::fmWrite);
-		if (f.IsOpen())
-		{
-			f.Write(m_SkyLight, sizeof(m_SkyLight));
-		}
-	}
-	
-	// DEBUG:
-	{
-		cFile f("Chunk_BlockLight.dat", cFile::fmWrite);
-		if (f.IsOpen())
-		{
-			f.Write(m_BlockLight, sizeof(m_BlockLight));
-		}
-	}
-	*/
 	
 	m_World->ChunkLighted(a_Item.x, a_Item.z, BlockLight, SkyLight);
 
@@ -374,25 +400,22 @@ void cLightingThread::PrepareSkyLight(void)
 			int Neighbor4 = m_HeightMap[idx - cChunkDef::Width * 3] + 1;  // Z - 1
 			int MaxNeighbor = MAX(MAX(Neighbor1, Neighbor2), MAX(Neighbor3, Neighbor4));  // Maximum of the four neighbors
 			
-			// TODO: The following cycle can be transofrmed into two separate cycles with no condition inside them, one lighting and the other seeding
-			for (int y = Current, Index = idx + y * BlocksPerYLayer; y < cChunkDef::Height; y++, Index += BlocksPerYLayer)
+			// Fill the column from the top down to Current with all-light:
+			for (int y = cChunkDef::Height - 1, Index = idx + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)
 			{
-				// If all the XZ neighbors are lower than y, abort for the current column (but light up the rest of it):
-				if (y >= MaxNeighbor)
-				{
-					for (int y2 = y; y2 < cChunkDef::Height; y2++, Index += BlocksPerYLayer)
-					{
-						m_SkyLight[Index] = 15;
-					}  // for y2
-					break;  // for y
-				}
-
-				// Add current block as a seed:
+				m_SkyLight[Index] = 15;
+			}
+			
+			// Add Current as a seed:
+			int CurrentIdx = idx + Current * BlocksPerYLayer;
+			m_IsSeed1[CurrentIdx] = true;
+			m_SeedIdx1[m_NumSeeds++] = CurrentIdx;
+			
+			// Add seed from Current up to the highest neighbor:
+			for (int y = Current + 1, Index = idx + y * BlocksPerYLayer; y < MaxNeighbor; y++, Index += BlocksPerYLayer)
+			{
 				m_IsSeed1[Index] = true;
 				m_SeedIdx1[m_NumSeeds++] = Index;
-
-				// Light it up to full skylight:
-				m_SkyLight[Index] = 15;
 			}
 		}
 	}

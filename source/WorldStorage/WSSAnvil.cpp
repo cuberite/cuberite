@@ -29,6 +29,11 @@
 
 
 
+/** If defined, the BlockSkyLight values will be copied over to BlockLight upon chunk saving,
+thus making skylight visible in Minutor's Lighting mode
+*/
+// #define DEBUG_SKYLIGHT
+
 /** Maximum number of MCA files that are cached in memory. 
 Since only the header is actually in the memory, this number can be high, but still, each file means an OS FS handle.
 */
@@ -416,7 +421,11 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	int SliceSizeNibble = SliceSizeBlock / 2;
 	const char * BlockTypes    = (const char *)(Serializer.m_BlockTypes);
 	const char * BlockMetas    = (const char *)(Serializer.m_BlockMetas);
-	const char * BlockLight    = (const char *)(Serializer.m_BlockLight);
+	#ifdef DEBUG_SKYLIGHT
+		const char * BlockLight  = (const char *)(Serializer.m_BlockSkyLight);
+	#else
+		const char * BlockLight  = (const char *)(Serializer.m_BlockLight);
+	#endif 
 	const char * BlockSkyLight = (const char *)(Serializer.m_BlockSkyLight);
 	for (int Y = 0; Y < 16; Y++)
 	{

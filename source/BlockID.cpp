@@ -385,10 +385,10 @@ public:
 		g_BlockSpreadLightFalloff[E_BLOCK_WOODEN_DOOR]      = 1;
 
 		// Light in water and lava dissapears faster:
-		g_BlockSpreadLightFalloff[E_BLOCK_LAVA]             = 2;
-		g_BlockSpreadLightFalloff[E_BLOCK_STATIONARY_LAVA]  = 2;
-		g_BlockSpreadLightFalloff[E_BLOCK_STATIONARY_WATER] = 2;
-		g_BlockSpreadLightFalloff[E_BLOCK_WATER]            = 2;
+		g_BlockSpreadLightFalloff[E_BLOCK_LAVA]             = 3;
+		g_BlockSpreadLightFalloff[E_BLOCK_STATIONARY_LAVA]  = 3;
+		g_BlockSpreadLightFalloff[E_BLOCK_STATIONARY_WATER] = 3;
+		g_BlockSpreadLightFalloff[E_BLOCK_WATER]            = 3;
 
 		// Transparent blocks
 		g_BlockTransparent[E_BLOCK_AIR]                   = true;
