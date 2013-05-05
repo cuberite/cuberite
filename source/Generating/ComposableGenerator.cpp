@@ -37,10 +37,9 @@ cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_BiomeGen(NULL),
 	m_HeightGen(NULL),
 	m_CompositionGen(NULL),
-	m_Noise3DComposable(NULL),
-	m_NumNoise3DComposableUses(0),
-	m_DistortedHeightmap(NULL),
-	m_NumDistortedHeightmapUses(0)
+	m_UnderlyingBiomeGen(NULL),
+	m_UnderlyingHeightGen(NULL),
+	m_UnderlyingCompositionGen(NULL)
 {
 }
 
@@ -62,26 +61,18 @@ cComposableGenerator::~cComposableGenerator()
 	}
 	m_StructureGens.clear();
 
-	// CompositionGen must not be freed if it is shared between HeightGenCache and CompositionGen:
-	int NumUsed = 1;
-	if (m_CompositionGen == m_Noise3DComposable)
-	{
-		NumUsed = m_NumNoise3DComposableUses;
-	}
-	else if (m_CompositionGen == m_DistortedHeightmap)
-	{
-		NumUsed = m_NumDistortedHeightmapUses;
-	}
-	if (NumUsed == 1)
-	{
-		delete m_CompositionGen;
-	}
-	
+	delete m_CompositionGen;
 	m_CompositionGen = NULL;
 	delete m_HeightGen;
 	m_HeightGen = NULL;
 	delete m_BiomeGen;
 	m_BiomeGen = NULL;
+	delete m_UnderlyingCompositionGen;
+	m_UnderlyingCompositionGen = NULL;
+	delete m_UnderlyingHeightGen;
+	m_UnderlyingHeightGen = NULL;
+	delete m_UnderlyingBiomeGen;
+	m_UnderlyingBiomeGen = NULL;
 }
 
 
@@ -216,7 +207,8 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 			CacheSize = 4;
 		}
 		LOGINFO("Using a cache for biomegen of size %d.", CacheSize);
-		m_BiomeGen = new cBioGenCache(m_BiomeGen, CacheSize);
+		m_UnderlyingBiomeGen = m_BiomeGen;
+		m_BiomeGen = new cBioGenCache(m_UnderlyingBiomeGen, CacheSize);
 	}
 	m_BiomeGen->Initialize(a_IniFile);
 }
@@ -255,24 +247,13 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
 	{
-		if (m_DistortedHeightmap == NULL)
-		{
-			m_DistortedHeightmap = new cDistortedHeightmap(Seed, *m_BiomeGen);
-			m_DistortedHeightmap->Initialize(a_IniFile);
-		}
-		m_HeightGen = m_DistortedHeightmap;
-		m_NumDistortedHeightmapUses++;
-		// TODO: Optimize by sharing with CompoGen
+		m_HeightGen = new cDistortedHeightmap(Seed, *m_BiomeGen);
+		((cDistortedHeightmap *)m_HeightGen)->Initialize(a_IniFile);
 	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
-		if (m_Noise3DComposable == NULL)
-		{
-			m_Noise3DComposable = new cNoise3DComposable(Seed);
-			m_Noise3DComposable->Initialize(a_IniFile);
-		}
-		m_HeightGen = m_Noise3DComposable;
-		m_NumNoise3DComposableUses++;
+		m_HeightGen = new cNoise3DComposable(Seed);
+		((cNoise3DComposable *)m_HeightGen)->Initialize(a_IniFile);
 	}
 	else  // "biomal" or <not found>
 	{
@@ -308,7 +289,8 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 			CacheSize = 4;
 		}
 		LOGINFO("Using a cache for Heightgen of size %d.", CacheSize);
-		m_HeightGen = new cHeiGenCache(m_HeightGen, CacheSize);
+		m_UnderlyingHeightGen = m_HeightGen;
+		m_HeightGen = new cHeiGenCache(m_UnderlyingHeightGen, CacheSize);
 	}
 }
 
@@ -352,13 +334,8 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(CompoGenName, "DistortedHeightmap") == 0)
 	{
-		if (m_DistortedHeightmap == NULL)
-		{
-			m_DistortedHeightmap = new cDistortedHeightmap(m_ChunkGenerator.GetSeed(), *m_BiomeGen);
-			m_DistortedHeightmap->Initialize(a_IniFile);
-		}
-		m_CompositionGen = m_DistortedHeightmap;
-		m_NumDistortedHeightmapUses++;
+		m_CompositionGen = new cDistortedHeightmap(m_ChunkGenerator.GetSeed(), *m_BiomeGen);
+		((cDistortedHeightmap *)m_CompositionGen)->Initialize(a_IniFile);
 	}
 	else if (NoCaseCompare(CompoGenName, "nether") == 0)
 	{
@@ -366,13 +343,8 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	}
 	else if (NoCaseCompare(CompoGenName, "Noise3D") == 0)
 	{
-		if (m_Noise3DComposable == NULL)
-		{
-			m_Noise3DComposable = new cNoise3DComposable(m_ChunkGenerator.GetSeed());
-			m_Noise3DComposable->Initialize(a_IniFile);
-		}
-		m_CompositionGen = m_Noise3DComposable;
-		m_NumNoise3DComposableUses++;
+		m_CompositionGen = new cNoise3DComposable(m_ChunkGenerator.GetSeed());
+		((cNoise3DComposable *)m_CompositionGen)->Initialize(a_IniFile);
 	}
 	else
 	{
@@ -398,6 +370,13 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 		clock_t Duration = clock() - BeginTick;
 		LOGINFO("CompositionGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
 		//*/
+	}
+	
+	int CompoGenCacheSize = a_IniFile.GetValueSetI("Generator", "CompositionGenCacheSize", 64);
+	if (CompoGenCacheSize > 1)
+	{
+		m_UnderlyingCompositionGen = m_CompositionGen;
+		m_CompositionGen = new cCompoGenCache(m_UnderlyingCompositionGen, 32);
 	}
 }
 

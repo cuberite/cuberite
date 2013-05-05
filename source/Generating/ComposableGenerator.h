@@ -148,13 +148,12 @@ protected:
 	cStructureGenList        m_StructureGens;
 	cFinishGenList           m_FinishGens;
 	
-	// Specific generators that can be reused for different purposes - we don't want to create multiple objects for them
-	cNoise3DComposable *  m_Noise3DComposable;
-	int                   m_NumNoise3DComposableUses;  ///< How many times is it actually used?
-	cDistortedHeightmap * m_DistortedHeightmap;
-	int                   m_NumDistortedHeightmapUses;  ///< How many times is it actually used?
+	// Generators underlying the caches:
+	cBiomeGen *              m_UnderlyingBiomeGen;
+	cTerrainHeightGen *      m_UnderlyingHeightGen;
+	cTerrainCompositionGen * m_UnderlyingCompositionGen;
 	
-
+	
 	/// Reads the biome gen settings from the ini and initializes m_BiomeGen accordingly
 	void InitBiomeGen(cIniFile & a_IniFile);
 	

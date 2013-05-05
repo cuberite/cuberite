@@ -30,6 +30,9 @@ class cChunkDesc
 public:
 	// tolua_end
 	
+	/// Uncompressed block metas, 1 meta per byte
+	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
+	
 	cChunkDesc(int a_ChunkX, int a_ChunkZ);
 	~cChunkDesc();
 
@@ -172,13 +175,14 @@ public:
 	void AddBlockEntity(cBlockEntity * a_BlockEntity);
 	
 	// Accessors used by cChunkGenerator::Generator descendants:
-	inline cChunkDef::BiomeMap &     GetBiomeMap     (void) { return m_BiomeMap; }
-	inline cChunkDef::BlockTypes &   GetBlockTypes   (void) { return *((cChunkDef::BlockTypes *)m_BlockArea.GetBlockTypes()); }
+	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }
+	inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *((cChunkDef::BlockTypes *)m_BlockArea.GetBlockTypes()); }
 	// CANNOT, different compression! 
-	// inline cChunkDef::BlockNibbles & GetBlockMetas   (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
-	inline cChunkDef::HeightMap &    GetHeightMap    (void) { return m_HeightMap; }
-	inline cEntityList &             GetEntities     (void) { return m_Entities; }
-	inline cBlockEntityList &        GetBlockEntities(void) { return m_BlockEntities; }
+	// inline cChunkDef::BlockNibbles & GetBlockMetas            (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
+	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *((BlockNibbleBytes *)m_BlockArea.GetBlockMetas()); }
+	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }
+	inline cEntityList &             GetEntities              (void) { return m_Entities; }
+	inline cBlockEntityList &        GetBlockEntities         (void) { return m_BlockEntities; }
 	
 	/// Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte)
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);

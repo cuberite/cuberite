@@ -483,3 +483,99 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCompoGenCache:
+
+cCompoGenCache::cCompoGenCache(cTerrainCompositionGen * a_Underlying, int a_CacheSize) :
+	m_Underlying(a_Underlying),
+	m_CacheSize(a_CacheSize),
+	m_CacheOrder(new int[a_CacheSize]),
+	m_CacheData(new sCacheData[a_CacheSize]),
+	m_NumHits(0),
+	m_NumMisses(0),
+	m_TotalChain(0)
+{
+	for (int i = 0; i < m_CacheSize; i++)
+	{
+		m_CacheOrder[i] = i;
+		m_CacheData[i].m_ChunkX = 0x7fffffff;
+		m_CacheData[i].m_ChunkZ = 0x7fffffff;
+	}
+}
+
+
+
+
+
+cCompoGenCache::~cCompoGenCache()
+{
+	delete[] m_CacheData;
+	delete[] m_CacheOrder;
+}
+
+
+
+
+
+void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+{
+	//*
+	if (((m_NumHits + m_NumMisses) % 1024) == 10)
+	{
+		LOGD("CompoGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
+		LOGD("CompoGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
+	}
+	//*/
+	
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	
+	for (int i = 0; i < m_CacheSize; i++)
+	{
+		if (
+			(m_CacheData[m_CacheOrder[i]].m_ChunkX != ChunkX) ||
+			(m_CacheData[m_CacheOrder[i]].m_ChunkZ != ChunkZ)
+		)
+		{
+			continue;
+		}
+		// Found it in the cache
+		int Idx = m_CacheOrder[i];
+		
+		// Move to front:
+		for (int j = i; j > 0; j--)
+		{
+			m_CacheOrder[j] = m_CacheOrder[j - 1];
+		}
+		m_CacheOrder[0] = Idx;
+		
+		// Use the cached data:
+		memcpy(a_ChunkDesc.GetBlockTypes(),             m_CacheData[Idx].m_BlockTypes, sizeof(a_ChunkDesc.GetBlockTypes()));
+		memcpy(a_ChunkDesc.GetBlockMetasUncompressed(), m_CacheData[Idx].m_BlockMetas, sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
+		
+		m_NumHits++;
+		m_TotalChain += i;
+		return;
+	}  // for i - cache
+	
+	// Not in the cache:
+	m_NumMisses++;
+	m_Underlying->ComposeTerrain(a_ChunkDesc);
+	
+	// Insert it as the first item in the MRU order:
+	int Idx = m_CacheOrder[m_CacheSize - 1];
+	for (int i = m_CacheSize - 1; i > 0; i--)
+	{
+		m_CacheOrder[i] = m_CacheOrder[i - 1];
+	}  // for i - m_CacheOrder[]
+	m_CacheOrder[0] = Idx;
+	memcpy(m_CacheData[Idx].m_BlockTypes, a_ChunkDesc.GetBlockTypes(),             sizeof(a_ChunkDesc.GetBlockTypes()));
+	memcpy(m_CacheData[Idx].m_BlockMetas, a_ChunkDesc.GetBlockMetasUncompressed(), sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
+	m_CacheData[Idx].m_ChunkX = ChunkX;
+	m_CacheData[Idx].m_ChunkZ = ChunkZ;
+}
+
+
+
+

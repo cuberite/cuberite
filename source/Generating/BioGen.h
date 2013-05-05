@@ -47,7 +47,7 @@ class cBioGenCache :
 	typedef cBiomeGen super;
 	
 public:
-	cBioGenCache(cBiomeGen * a_BioGenToCache, int a_CacheSize);  // Takes ownership of a_BioGenToCache
+	cBioGenCache(cBiomeGen * a_BioGenToCache, int a_CacheSize);  // Doesn't take ownership of a_BioGenToCache
 	~cBioGenCache();
 	
 protected:

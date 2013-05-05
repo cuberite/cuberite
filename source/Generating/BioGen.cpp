@@ -69,7 +69,6 @@ cBioGenCache::~cBioGenCache()
 {
 	delete[] m_CacheData;
 	delete[] m_CacheOrder;
-	delete m_BioGenToCache;
 }
 
 

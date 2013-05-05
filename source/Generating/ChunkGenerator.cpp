@@ -272,6 +272,11 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);
 	cRoot::Get()->GetPluginManager()->CallHookChunkGenerated(m_World, a_ChunkX, a_ChunkZ, &ChunkDesc);
 	
+	#ifdef _DEBUG
+	// Verify that the generator has produced valid data:
+	ChunkDesc.VerifyHeightmap();
+	#endif
+	
 	cChunkDef::BlockNibbles BlockMetas;
 	ChunkDesc.CompressBlockMetas(BlockMetas);
 	

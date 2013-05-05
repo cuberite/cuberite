@@ -44,7 +44,7 @@ class cHeiGenCache :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize);  // Takes ownership of a_HeiGenToCache
+	cHeiGenCache(cTerrainHeightGen * a_HeiGenToCache, int a_CacheSize);  // Doesn't take ownership of a_HeiGenToCache
 	~cHeiGenCache();
 	
 	// cTerrainHeightGen override:

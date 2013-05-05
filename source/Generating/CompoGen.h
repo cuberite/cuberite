@@ -6,6 +6,8 @@
 	- cCompoGenDebugBiomes
 	- cCompoGenClassic
 	- cCompoGenBiomal
+	- cCompoGenNether
+	- cCompoGenCache
 */
 
 
@@ -134,6 +136,44 @@ protected:
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+} ;
+
+
+
+
+
+/// Caches most-recently-used chunk composition of another composition generator. Caches only the types and metas
+class cCompoGenCache :
+	public cTerrainCompositionGen
+{
+public:
+	cCompoGenCache(cTerrainCompositionGen * a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
+	~cCompoGenCache();
+	
+	// cTerrainCompositionGen override:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	
+protected:
+
+	cTerrainCompositionGen * m_Underlying;
+	
+	struct sCacheData
+	{
+		int m_ChunkX;
+		int m_ChunkZ;
+		cChunkDef::BlockTypes        m_BlockTypes;
+		cChunkDesc::BlockNibbleBytes m_BlockMetas;  // The metas are uncompressed, 1 meta per byte
+	} ;
+	
+	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
+	int          m_CacheSize;
+	int *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	
+	// Cache statistics
+	int m_NumHits;
+	int m_NumMisses;
+	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 } ;
 
 
