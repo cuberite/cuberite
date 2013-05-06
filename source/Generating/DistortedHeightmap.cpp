@@ -55,7 +55,8 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_NoiseArrayX(m_NoiseArray),
 	m_NoiseArrayZ(m_NoiseArray + 17 * 17 * 32),
 	m_BiomeGen(a_BiomeGen),
-	m_HeightGen(new cHeiGenBiomal(a_Seed, a_BiomeGen), 64)
+	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
+	m_HeightGen(&m_UnderlyingHeiGen, 64)
 {
 }
 
@@ -243,6 +244,16 @@ int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 	{
 		return cChunkDef::GetHeight(m_CurChunkHeights, RelX, RelZ);
 	}
+	
+	// Ask the cache:
+	HEIGHTTYPE res = 0;
+	if (m_HeightGen.GetHeightAt(ChunkX, ChunkZ, RelX, RelZ, res))
+	{
+		// The height was in the cache
+		return res;
+	}
+	
+	// The height is not in the cache, generate full heightmap and get it there:
 	cChunkDef::HeightMap Heightmap;
 	m_HeightGen.GenHeightMap(ChunkX, ChunkZ, Heightmap);
 	return cChunkDef::GetHeight(Heightmap, RelX, RelZ);

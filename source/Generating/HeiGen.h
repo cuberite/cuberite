@@ -50,6 +50,9 @@ public:
 	// cTerrainHeightGen override:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
 	
+	/// Retrieves height at the specified point in the cache, returns true if found, false if not found
+	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
+	
 protected:
 
 	cTerrainHeightGen * m_HeiGenToCache;

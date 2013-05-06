@@ -116,6 +116,23 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 
 
 
+bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height)
+{
+	for (int i = 0; i < m_CacheSize; i++)
+	{
+		if ((m_CacheData[i].m_ChunkX == a_ChunkX) && (m_CacheData[i].m_ChunkZ == a_ChunkZ))
+		{
+			a_Height = cChunkDef::GetHeight(m_CacheData[i].m_HeightMap, a_RelX, a_RelZ);
+			return true;
+		}
+	}  // for i - m_CacheData[]
+	return false;
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cHeiGenClassic:
 
