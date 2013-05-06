@@ -1,11 +1,11 @@
 function HandleRequest_ManageServer( Request )
 	local Content = "" 
 	if( Request.PostParams["RestartServer"] ~= nil ) then
-		cRoot:Get():ServerCommand("restart")
+		cRoot:Get():ExecuteConsoleCommand("restart")
 	elseif( Request.PostParams["ReloadServer"] ~= nil ) then
 		cRoot:Get():GetPluginManager():ReloadPlugins()
 	elseif( Request.PostParams["StopServer"] ~= nil ) then
-		cRoot:Get():ServerCommand("stop")
+		cRoot:Get():ExecuteConsoleCommand("stop")
 	end
 	Content = Content .. [[
 	<form method="POST">]]
