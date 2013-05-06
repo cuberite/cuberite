@@ -48,11 +48,9 @@ protected:
 
 	int m_CurChunkX;
 	int m_CurChunkZ;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * NOISE_SIZE_Y];
-	NOISE_DATATYPE * m_NoiseArrayX;
-	NOISE_DATATYPE * m_NoiseArrayZ;
+	NOISE_DATATYPE m_DistortedHeightmap[17 * 17 * 257];
 
-	cBiomeGen &  m_BiomeGen;
+	cBiomeGen &   m_BiomeGen;
 	cHeiGenBiomal m_UnderlyingHeiGen;  // This generator provides us with base heightmap (before distortion)
 	cHeiGenCache  m_HeightGen;         // Cache above m_UnderlyingHeiGen
 	
@@ -74,14 +72,11 @@ protected:
 	/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap)
 	void PrepareState(int a_ChunkX, int a_ChunkZ);
 	
-	/// Generates the 3D noise array using the specified noise objects
-	void GenerateNoiseArray(NOISE_DATATYPE * a_NoiseArray, cNoise & a_Noise1, cNoise & a_Noise2, cNoise & a_Noise3);
+	/// Generates the m_DistortedHeightmap array for the current chunk
+	void GenerateHeightArray(void);
 	
 	/// Calculates the heightmap value (before distortion) at the specified (floating-point) coords
 	int GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z);
-	
-	/// Calculates the height (after distortion)
-	int GetValue(int a_NoiseArrayIdx, int a_RelX, int a_RelZ);
 	
 	/// Updates m_DistortAmpX/Z[] based on m_CurChunkX and m_CurChunkZ
 	void UpdateDistortAmps(void);
