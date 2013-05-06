@@ -85,6 +85,7 @@ void cDistortedHeightmap::PrepareState(int a_ChunkX, int a_ChunkZ)
 	m_CurChunkX = a_ChunkX;
 	m_CurChunkZ = a_ChunkZ;
 	
+	m_HeightGen.GenHeightMap(a_ChunkX, a_ChunkZ, m_CurChunkHeights);
 	GenerateNoiseArray(m_NoiseArrayX, m_Noise1, m_Noise2, m_Noise3);
 	UpdateDistortAmps();
 }
@@ -236,6 +237,12 @@ int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 	int ChunkZ = (int)floor(a_Z / (NOISE_DATATYPE)16);
 	int RelX = (int)(a_X - (NOISE_DATATYPE)ChunkX * cChunkDef::Width);
 	int RelZ = (int)(a_Z - (NOISE_DATATYPE)ChunkZ * cChunkDef::Width);
+
+	// If we're withing the same chunk, return the pre-cached heightmap:
+	if ((ChunkX == m_CurChunkX) && (ChunkZ == m_CurChunkZ))
+	{
+		return cChunkDef::GetHeight(m_CurChunkHeights, RelX, RelZ);
+	}
 	cChunkDef::HeightMap Heightmap;
 	m_HeightGen.GenHeightMap(ChunkX, ChunkZ, Heightmap);
 	return cChunkDef::GetHeight(Heightmap, RelX, RelZ);

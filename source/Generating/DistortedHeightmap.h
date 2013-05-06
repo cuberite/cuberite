@@ -55,6 +55,9 @@ protected:
 	cBiomeGen &  m_BiomeGen;
 	cHeiGenCache m_HeightGen;  // This generator provides us with base heightmap (before distortion)
 	
+	/// Heightmap for the current chunk, before distortion (from m_HeightGen). Used for optimization.
+	cChunkDef::HeightMap m_CurChunkHeights;
+	
 	// Per-biome terrain generator parameters:
 	struct sGenParam
 	{
@@ -84,6 +87,7 @@ protected:
 	
 	/// Calculates the X and Z distortion amplitudes based on the neighbors' biomes
 	void GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
+	
 	
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
