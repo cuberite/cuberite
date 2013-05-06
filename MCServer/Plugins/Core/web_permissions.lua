@@ -1,3 +1,11 @@
+local function HTML_Option( value, text, selected )
+	if( selected == true ) then
+		return [[<option value="]] .. value .. [[" selected>]] .. text .. [[</option>]]
+	else
+		return [[<option value="]] .. value .. [[">]] .. text .. [[</option>"]]
+	end
+end
+
 local function ShowUsersTable()
 	local Content = "<h4>Users</h4>"
 
@@ -59,8 +67,18 @@ local function ShowGroupsTable()
 	return Content
 end
 
+local function HTML_Select_Group( name, defaultValue )
+	Groups = ""
+	for I=0, GroupsIni:GetNumKeys() - 1 do
+		Groups = Groups .. 
+		HTML_Option(GroupsIni:KeyName(I), GroupsIni:KeyName(I),  defaultValue == GroupsIni:KeyName(I) )
+	end
+	return [[<select name="]] .. name .. [[">]] .. Groups .. [[</select>]]
+end
+
+
 local function AddPlayers( Request )
-	local Content = "<h4>Add Players</h4>"
+	local Content = "<h4>Add or change Players</h4>"
 	if( Request.PostParams["AddPlayerToGroup"] ~= nil ) then
 		if Request.PostParams["AddPlayer"] ~= "" then
 			if Request.PostParams["AddGroups"] ~= "" then
@@ -89,9 +107,10 @@ local function AddPlayers( Request )
 	<tr><td style="width: 20%;">Player:</td>
 	<td><input type="text" name="AddPlayer" value=""></td></tr><br>
 	<tr><td style="width: 20%;">Group:</td>
-	<td><input type="text" name="AddGroup" value=""></td></tr>
+	<td>]] .. HTML_Select_Group("AddGroup", GroupsIni:KeyName(0) ) .. [[</td></tr>
 	</table>
 	<input type="submit" value="Add Player" name="AddPlayerToGroup">]]
+	
 	return Content
 end
 
