@@ -503,9 +503,13 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	cChunk * Neighbor = GetNeighborChunk((int)a_Entity->GetPosX(), (int)a_Entity->GetPosZ());
 	if (Neighbor == NULL)
 	{
-		// TODO: What to do with this?
-		LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
-		return;
+		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
+		if (Neighbor == NULL)
+		{
+			// TODO: What to do with this?
+			LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
+			return;
+		}
 	}
 
 	Neighbor->AddEntity(a_Entity);
