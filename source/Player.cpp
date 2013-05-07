@@ -207,7 +207,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 			else
 			{
-				m_FoodLevel = MAX(m_FoodLevel - 1, 0);
+				m_FoodLevel = std::max(m_FoodLevel - 1, 0);
 			}
 
 			SendHealth();
@@ -278,13 +278,11 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 
 
 
-void cPlayer::Heal( int a_Health )
+void cPlayer::Heal(int a_Health)
 {
-	if( m_Health < GetMaxHealth() )
+	if (m_Health < GetMaxHealth())
 	{
-		m_Health = (short) MIN(a_Health + m_Health, GetMaxHealth());
-
-		
+		m_Health = (short)std::min((int)a_Health + m_Health, (int)GetMaxHealth());
 		SendHealth();
 	}
 }
@@ -300,8 +298,8 @@ bool cPlayer::Feed(short a_Food, float a_Saturation)
 		return false;
 	}
 	
-	m_FoodLevel = MIN(a_Food + m_FoodLevel, GetMaxFoodLevel());
-	m_FoodSaturationLevel = MIN(m_FoodSaturationLevel + a_Saturation, GetMaxFoodSaturationLevel());
+	m_FoodLevel = std::min((short)(a_Food + m_FoodLevel), GetMaxFoodLevel());
+	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, GetMaxFoodSaturationLevel());
 	
 	SendHealth();
 	return true;
@@ -774,7 +772,7 @@ void cPlayer::TossItem(
 			if (!Item.IsEmpty())
 			{
 				char OriginalItemAmount = Item.m_ItemCount;
-				Item.m_ItemCount = MIN(OriginalItemAmount, a_Amount);
+				Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
 				Drops.push_back(Item);
 				if (OriginalItemAmount > a_Amount)
 				{
