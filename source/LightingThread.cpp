@@ -398,7 +398,7 @@ void cLightingThread::PrepareSkyLight(void)
 			int Neighbor2 = m_HeightMap[idx - 1] + 1;  // X - 1
 			int Neighbor3 = m_HeightMap[idx + cChunkDef::Width * 3] + 1;  // Z + 1
 			int Neighbor4 = m_HeightMap[idx - cChunkDef::Width * 3] + 1;  // Z - 1
-			int MaxNeighbor = MAX(MAX(Neighbor1, Neighbor2), MAX(Neighbor3, Neighbor4));  // Maximum of the four neighbors
+			int MaxNeighbor = std::max(std::max(Neighbor1, Neighbor2), std::max(Neighbor3, Neighbor4));  // Maximum of the four neighbors
 			
 			// Fill the column from the top down to Current with all-light:
 			for (int y = cChunkDef::Height - 1, Index = idx + y * BlocksPerYLayer; y >= Current; y--, Index -= BlocksPerYLayer)

@@ -583,10 +583,10 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	{
 		if (!a_CraftingGrid[x + y * a_GridWidth].IsEmpty())
 		{
-			GridRight  = MAX(x, GridRight);
-			GridBottom = MAX(y, GridBottom);
-			GridLeft   = MIN(x, GridLeft);
-			GridTop    = MIN(y, GridTop);
+			GridRight  = std::max(x, GridRight);
+			GridBottom = std::max(y, GridBottom);
+			GridLeft   = std::min(x, GridLeft);
+			GridTop    = std::min(y, GridTop);
 		}
 	}
 	int GridWidth = GridRight - GridLeft + 1;
