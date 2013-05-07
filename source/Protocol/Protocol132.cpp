@@ -67,7 +67,10 @@ enum
 	PACKET_BLOCK_ACTION          = 0x36,
 	PACKET_BLOCK_BREAK_ANIM      = 0x37,
 	PACKET_SOUND_EFFECT          = 0x3e,
-	PACKET_SOUND_PARTICLE_EFFECT = 0x3d
+	PACKET_SOUND_PARTICLE_EFFECT = 0x3d,
+	PACKET_LOCALE_VIEW_DISTANCE  = 0xcc,
+	PACKET_CLIENT_STATUSES       = 0xcd,
+	PACKET_ENCRYPTION_KEY_RESP   = 0xfc,
 } ;
 
 
@@ -468,10 +471,10 @@ int cProtocol132::ParsePacket(unsigned char a_PacketType)
 {
 	switch (a_PacketType)
 	{
-		default:   return super::ParsePacket(a_PacketType);  // off-load previously known packets into cProtocol125
-		case 0xcc: return ParseLocaleViewDistance();
-		case 0xcd: return ParseClientStatuses();
-		case 0xfc: return ParseEncryptionKeyResponse();
+		default:                          return super::ParsePacket(a_PacketType);  // off-load previously known packets into cProtocol125
+		case PACKET_LOCALE_VIEW_DISTANCE: return ParseLocaleViewDistance();
+		case PACKET_CLIENT_STATUSES:      return ParseClientStatuses();
+		case PACKET_ENCRYPTION_KEY_RESP:  return ParseEncryptionKeyResponse();
 	}
 }
 
