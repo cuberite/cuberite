@@ -125,6 +125,7 @@ bool cSandSimulator::CanStartFallingThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_WATER:
+		case E_BLOCK_SNOW:
 		{
 			return true;
 		}
@@ -176,6 +177,7 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WOODEN_BUTTON:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_YELLOW_FLOWER:
+		case E_BLOCK_SNOW:
 		{
 			return true;
 		}
@@ -199,6 +201,7 @@ bool cSandSimulator::IsReplacedOnRematerialization(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_TALL_GRASS:
 		case E_BLOCK_WATER:
+		case E_BLOCK_SNOW:
 		{
 			return true;
 		}
