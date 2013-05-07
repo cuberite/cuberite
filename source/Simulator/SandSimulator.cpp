@@ -117,15 +117,16 @@ void cSandSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 
 bool cSandSimulator::CanStartFallingThrough(BLOCKTYPE a_BlockType)
 {
+	// Please keep the list alpha-sorted
 	switch (a_BlockType)
 	{
 		case E_BLOCK_AIR:
 		case E_BLOCK_FIRE:
 		case E_BLOCK_LAVA:
+		case E_BLOCK_SNOW:
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_WATER:
-		case E_BLOCK_SNOW:
 		{
 			return true;
 		}
@@ -139,6 +140,7 @@ bool cSandSimulator::CanStartFallingThrough(BLOCKTYPE a_BlockType)
 
 bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 {
+	// Please keep the list alpha-sorted
 	switch (a_BlockType)
 	{
 		case E_BLOCK_AIR:
@@ -163,6 +165,7 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RED_MUSHROOM:
 		case E_BLOCK_RED_ROSE:
 		case E_BLOCK_SIGN_POST:
+		case E_BLOCK_SNOW:
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_STONE_BUTTON:
@@ -177,7 +180,6 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WOODEN_BUTTON:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_YELLOW_FLOWER:
-		case E_BLOCK_SNOW:
 		{
 			return true;
 		}
@@ -191,17 +193,18 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 
 bool cSandSimulator::IsReplacedOnRematerialization(BLOCKTYPE a_BlockType)
 {
+	// Please keep the list alpha-sorted
 	switch (a_BlockType)
 	{
 		case E_BLOCK_AIR:
 		case E_BLOCK_DEAD_BUSH:
 		case E_BLOCK_FIRE:
 		case E_BLOCK_LAVA:
+		case E_BLOCK_SNOW:
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_TALL_GRASS:
 		case E_BLOCK_WATER:
-		case E_BLOCK_SNOW:
 		{
 			return true;
 		}
