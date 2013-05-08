@@ -31,7 +31,7 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 
 
 
-void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
+void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	/*
 	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s", 
@@ -50,94 +50,105 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, 
 		return;
 	}
 	
-	if (a_IsShiftPressed)
+	if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
 	{
 		if (!a_Player.IsDraggingItem())
 		{
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
 			return;
 		}
-		LOGD("Shift clicked, but the player is draggint an item: %s", ItemToFullString(a_Player.GetDraggingItem()).c_str());
+		LOGD("Shift clicked, but the player is dragging an item: %s", ItemToFullString(a_Player.GetDraggingItem()).c_str());
 		return;
 	}
 	
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
-		LOGD("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
-		LOGD("My item:    %s", ItemToFullString(Slot).c_str());
-		LOGD("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 		bAsync = true;
 	}
 	cItem & DraggingItem = a_Player.GetDraggingItem();
-	if (a_IsRightClick)
+	switch (a_ClickAction)
 	{
-		// Right clicked
-		if (DraggingItem.m_ItemType <= 0) // Empty-handed?
+		case caRightClick:
 		{
-			DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
-			Slot.m_ItemCount -= DraggingItem.m_ItemCount;
-			DraggingItem.m_ItemType = Slot.m_ItemType;
-			DraggingItem.m_ItemDamage = Slot.m_ItemDamage;
+			if (DraggingItem.m_ItemType <= 0) // Empty-handed?
+			{
+				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
+				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
+				DraggingItem.m_ItemType = Slot.m_ItemType;
+				DraggingItem.m_ItemDamage = Slot.m_ItemDamage;
 
-			if (Slot.m_ItemCount <= 0)
-			{
-				Slot.Empty();
+				if (Slot.m_ItemCount <= 0)
+				{
+					Slot.Empty();
+				}
 			}
+			else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
+			{
+				// Drop one item in slot
+				cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
+				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
+				{
+					Slot.m_ItemType = DraggingItem.m_ItemType;
+					Slot.m_ItemCount++;
+					Slot.m_ItemDamage = DraggingItem.m_ItemDamage;
+					DraggingItem.m_ItemCount--;
+				}
+				if (DraggingItem.m_ItemCount <= 0)
+				{
+					DraggingItem.Empty();
+				}
+			}
+			else if (!DraggingItem.IsEqual(Slot))
+			{
+				// Swap contents
+				cItem tmp(DraggingItem);
+				DraggingItem = Slot;
+				Slot = tmp;
+			}
+			break;
 		}
-		else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
+		
+		case caLeftClick:
 		{
-			// Drop one item in slot
-			cItemHandler * Handler = ItemHandler(Slot.m_ItemType);
-			if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Handler->GetMaxStackSize()))
+			// Left-clicked
+			if (!DraggingItem.IsEqual(Slot))
 			{
-				Slot.m_ItemType = DraggingItem.m_ItemType;
-				Slot.m_ItemCount++;
-				Slot.m_ItemDamage = DraggingItem.m_ItemDamage;
-				DraggingItem.m_ItemCount--;
+				// Switch contents
+				cItem tmp(DraggingItem);
+				DraggingItem = Slot;
+				Slot = tmp;
 			}
-			if (DraggingItem.m_ItemCount <= 0)
+			else
 			{
-				DraggingItem.Empty();
+				// Same type, add items:
+				cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
+				int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
+				if (FreeSlots < 0)
+				{
+					ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
+					FreeSlots = 0;
+				}
+				int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
+				Slot.m_ItemCount += (char)Filling;
+				DraggingItem.m_ItemCount -= (char)Filling;
+				if (DraggingItem.m_ItemCount <= 0)
+				{
+					DraggingItem.Empty();
+				}
 			}
+			break;
 		}
-		else if (!DraggingItem.IsEqual(Slot))
+		default:
 		{
-			// Swap contents
-			cItem tmp(DraggingItem);
-			DraggingItem = Slot;
-			Slot = tmp;
+			LOGWARNING("SlotArea: Unhandled click action: %d (%s)", a_ClickAction, ClickActionToString(a_ClickAction));
+			m_ParentWindow.BroadcastWholeWindow();
+			return;
 		}
-	}
-	else
-	{
-		// Left-clicked
-		if (!DraggingItem.IsEqual(Slot))
-		{
-			// Switch contents
-			cItem tmp(DraggingItem);
-			DraggingItem = Slot;
-			Slot = tmp;
-		}
-		else
-		{
-			// Same type, add items:
-			cItemHandler * Handler = ItemHandler(DraggingItem.m_ItemType);
-			int FreeSlots = Handler->GetMaxStackSize() - Slot.m_ItemCount;
-			if (FreeSlots < 0)
-			{
-				ASSERT(!"Bad item stack size - where did we get more items in a slot than allowed?");
-				FreeSlots = 0;
-			}
-			int Filling = (FreeSlots > DraggingItem.m_ItemCount) ? DraggingItem.m_ItemCount : FreeSlots;
-			Slot.m_ItemCount += (char)Filling;
-			DraggingItem.m_ItemCount -= (char)Filling;
-			if (DraggingItem.m_ItemCount <= 0)
-			{
-				DraggingItem.Empty();
-			}
-		}
-	}
+	}  // switch (a_ClickAction
 	
 	SetSlot(a_SlotNum, a_Player, Slot);
 	if (bAsync)
@@ -301,12 +312,12 @@ cSlotAreaCrafting::cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow) :
 
 
 
-void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
+void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	// Override for craft result slot
 	if (a_SlotNum == 0)
 	{
-		if (a_IsShiftPressed)
+		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
 		{
 			ShiftClickedResult(a_Player);
 		}
@@ -316,7 +327,7 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRigh
 		}
 		return;
 	}
-	super::Clicked(a_Player, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	UpdateRecipe(a_Player);
 }
 
@@ -475,9 +486,9 @@ cSlotAreaDispenser::cSlotAreaDispenser(cDispenserEntity * a_Dispenser, cWindow &
 
 
 
-void cSlotAreaDispenser::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
+void cSlotAreaDispenser::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	super::Clicked(a_Player, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	
 	if (m_Dispenser == NULL)
 	{
@@ -522,11 +533,11 @@ cSlotAreaFurnace::cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_Paren
 
 
 
-void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
+void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	cItem Fuel = *GetSlot(0, a_Player);
 
-	super::Clicked(a_Player, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	
 	if (m_Furnace == NULL)
 	{
@@ -582,7 +593,7 @@ cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset,
 
 
 
-void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem)
+void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	if ((a_Player.GetGameMode() == eGameMode_Creative) && (m_ParentWindow.GetWindowType() == cWindow::Inventory))
 	{
@@ -592,7 +603,7 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, bool a_I
 	}
 	
 	// Survival inventory and all other windows' inventory has the same handling as normal slot areas
-	super::Clicked(a_Player, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	return;
 }
 

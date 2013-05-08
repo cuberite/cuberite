@@ -38,7 +38,7 @@ public:
 	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) = 0;
 	
 	/// Called when a player clicks in the window. Parameters taken from the click packet.
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem);
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem);
 	
 	/// Called from Clicked if it is a valid shiftclick
 	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem);
@@ -76,7 +76,7 @@ public:
 	cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow);
 	
 	// Creative inventory's click handling is somewhat different from survival inventory's, handle that here:
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
@@ -185,7 +185,7 @@ public:
 	cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow);
 
 	// cSlotAreaTemporary overrides:
-	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem) override;
+	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 	
 	// Distributing items into this area is completely disabled
@@ -258,7 +258,7 @@ class cSlotAreaDispenser :
 public:
 	cSlotAreaDispenser(cDispenserEntity * a_Dispenser, cWindow & a_ParentWindow);
 	
-	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem) override;
+	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
@@ -278,7 +278,7 @@ class cSlotAreaFurnace :
 public:
 	cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow);
 	
-	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_ClickedItem) override;
+	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	

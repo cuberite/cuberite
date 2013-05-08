@@ -72,7 +72,7 @@ public:
 
 	void Clicked(
 		cPlayer & a_Player, int a_WindowID, 
-		short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed,
+		short a_SlotNum, eClickAction a_ClickAction,
 		const cItem & a_ClickedItem
 	);
 

@@ -1381,7 +1381,47 @@ int cProtocol125::ParseWindowClick(void)
 	{
 		return res;
 	}
-	m_Client->HandleWindowClick(WindowID, SlotNum, IsRightClick, IsShiftPressed, HeldItem);
+	
+	// Convert IsShiftPressed, IsRightClick, SlotNum and HeldItem into eClickAction used in the newer protocols:
+	eClickAction Action;
+	if (IsRightClick)
+	{
+		if (IsShiftPressed)
+		{
+			Action = caShiftRightClick;
+		}
+		else
+		{
+			if (SlotNum == -999)
+			{
+				Action = (HeldItem.IsEmpty()) ? caRightClickOutsideHoldNothing : caRightClickOutside;
+			}
+			else
+			{
+				Action = caRightClick;
+			}
+		}
+	}
+	else
+	{
+		// IsLeftClick
+		if (IsShiftPressed)
+		{
+			Action = caShiftLeftClick;
+		}
+		else
+		{
+			if (SlotNum == -999)
+			{
+				Action = (HeldItem.IsEmpty()) ? caLeftClickOutsideHoldNothing : caRightClickOutside;
+			}
+			else
+			{
+				Action = caLeftClick;
+			}
+		}
+	}
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, HeldItem);
 	return PARSE_OK;
 }
 

@@ -96,7 +96,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 
 void cWindow::Clicked(
 	cPlayer & a_Player, 
-	int a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, 
+	int a_WindowID, short a_SlotNum, eClickAction a_ClickAction,
 	const cItem & a_ClickedItem
 )
 {
@@ -106,16 +106,31 @@ void cWindow::Clicked(
 		return;
 	}
 
-	if (a_SlotNum < 0)  // Outside window click
+	switch (a_ClickAction)
 	{
-		if (a_IsRightClick)
+		case caRightClickOutside:
 		{
+			// Toss one of the dragged items:
 			a_Player.TossItem(true);
+			return;
 		}
-		else
+		case caLeftClickOutside:
 		{
+			// Toss all dragged items:
 			a_Player.TossItem(true, a_Player.GetDraggingItem().m_ItemCount);
+			return;
 		}
+		case caLeftClickOutsideHoldNothing:
+		case caRightClickOutsideHoldNothing:
+		{
+			// Nothing needed
+			return;
+		}
+	}
+	
+	if (a_SlotNum < 0)
+	{
+		// TODO: Other click actions with irrelevant slot number (FS #371)
 		return;
 	}
 
@@ -125,7 +140,7 @@ void cWindow::Clicked(
 	{
 		if (LocalSlotNum < (*itr)->GetNumSlots())
 		{
-			(*itr)->Clicked(a_Player, LocalSlotNum, a_IsRightClick, a_IsShiftPressed, a_ClickedItem);
+			(*itr)->Clicked(a_Player, LocalSlotNum, a_ClickAction, a_ClickedItem);
 			return;
 		}
 		LocalSlotNum -= (*itr)->GetNumSlots();

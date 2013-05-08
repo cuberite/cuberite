@@ -462,7 +462,7 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 		return;
 	}
 	
-	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, false, false, a_HeldItem);
+	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, (a_SlotNum >= 0) ? caLeftClick : caLeftClickOutside, a_HeldItem);
 }
 
 
@@ -1010,10 +1010,10 @@ void cClientHandle::HandleWindowClose(char a_WindowID)
 
 
 
-void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem)
+void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
 {
-	LOGD("WindowClick: WinID %d, SlotNum %d, IsRclk %d, IsShift %d, Item %s x %d",
-		a_WindowID, a_SlotNum, a_IsRightClick, a_IsShiftPressed,
+	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
+		a_WindowID, a_SlotNum, ClickActionToString(a_ClickAction),
 		ItemToString(a_HeldItem).c_str(), a_HeldItem.m_ItemCount
 	);
 	
@@ -1024,7 +1024,7 @@ void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, bool a_I
 		return;
 	}
 	
-	Window->Clicked(*m_Player, a_WindowID, a_SlotNum, a_IsRightClick, a_IsShiftPressed, a_HeldItem);
+	Window->Clicked(*m_Player, a_WindowID, a_SlotNum, a_ClickAction, a_HeldItem);
 }
 
 

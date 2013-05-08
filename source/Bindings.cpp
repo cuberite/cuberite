@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 04/28/13 20:39:37.
+** Generated automatically by tolua++-1.0.92 on 05/08/13 11:35:08.
 */
 
 #ifndef __cplusplus
@@ -2858,6 +2858,35 @@ static int tolua_set_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* function: ClickActionToString */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ClickActionToString00
+static int tolua_AllToLua_ClickActionToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  eClickAction a_ClickAction = ((eClickAction) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   const char* tolua_ret = (const char*)  ClickActionToString(a_ClickAction);
+   tolua_pushstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ClickActionToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: IsValidBlock */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_IsValidBlock00
 static int tolua_AllToLua_IsValidBlock00(lua_State* tolua_S)
@@ -4259,6 +4288,38 @@ static int tolua_AllToLua_cEntity_GetHeadYaw00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetMass of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetMass00
+static int tolua_AllToLua_cEntity_GetMass00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMass'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetMass();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMass'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetPosition of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetPosition00
 static int tolua_AllToLua_cEntity_GetPosition00(lua_State* tolua_S)
@@ -4777,6 +4838,39 @@ static int tolua_AllToLua_cEntity_SetHeadYaw00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetHeadYaw'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetMass of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetMass00
+static int tolua_AllToLua_cEntity_SetMass00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_Mass = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetMass'", NULL);
+#endif
+  {
+   self->SetMass(a_Mass);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetMass'.",&tolua_err);
  return 0;
 #endif
 }
@@ -24323,6 +24417,50 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"DIG_STATUS_FINISHED",DIG_STATUS_FINISHED);
   tolua_constant(tolua_S,"DIG_STATUS_DROP_HELD",DIG_STATUS_DROP_HELD);
   tolua_constant(tolua_S,"DIG_STATUS_SHOOT_EAT",DIG_STATUS_SHOOT_EAT);
+  tolua_constant(tolua_S,"caLeftClick",caLeftClick);
+  tolua_constant(tolua_S,"caRightClick",caRightClick);
+  tolua_constant(tolua_S,"caShiftLeftClick",caShiftLeftClick);
+  tolua_constant(tolua_S,"caShiftRightClick",caShiftRightClick);
+  tolua_constant(tolua_S,"caNumber1",caNumber1);
+  tolua_constant(tolua_S,"caNumber2",caNumber2);
+  tolua_constant(tolua_S,"caNumber3",caNumber3);
+  tolua_constant(tolua_S,"caNumber4",caNumber4);
+  tolua_constant(tolua_S,"caNumber5",caNumber5);
+  tolua_constant(tolua_S,"caNumber6",caNumber6);
+  tolua_constant(tolua_S,"caNumber7",caNumber7);
+  tolua_constant(tolua_S,"caNumber8",caNumber8);
+  tolua_constant(tolua_S,"caNumber9",caNumber9);
+  tolua_constant(tolua_S,"caMiddleClick",caMiddleClick);
+  tolua_constant(tolua_S,"caDropKey",caDropKey);
+  tolua_constant(tolua_S,"caCtrlDropKey",caCtrlDropKey);
+  tolua_constant(tolua_S,"caLeftClickOutside",caLeftClickOutside);
+  tolua_constant(tolua_S,"caRightClickOutside",caRightClickOutside);
+  tolua_constant(tolua_S,"caLeftClickOutsideHoldNothing",caLeftClickOutsideHoldNothing);
+  tolua_constant(tolua_S,"caRightClickOutsideHoldNothing",caRightClickOutsideHoldNothing);
+  tolua_constant(tolua_S,"caLeftPaintBegin",caLeftPaintBegin);
+  tolua_constant(tolua_S,"caRightPaintBegin",caRightPaintBegin);
+  tolua_constant(tolua_S,"caLeftPaintProgress",caLeftPaintProgress);
+  tolua_constant(tolua_S,"caRightPaintProgress",caRightPaintProgress);
+  tolua_constant(tolua_S,"caLeftPaintEnd",caLeftPaintEnd);
+  tolua_constant(tolua_S,"caRightPaintEnd",caRightPaintEnd);
+  tolua_constant(tolua_S,"caDblClick",caDblClick);
+  tolua_constant(tolua_S,"caUnknown",caUnknown);
+  tolua_constant(tolua_S,"eGameMode_NotSet",eGameMode_NotSet);
+  tolua_constant(tolua_S,"eGameMode_Survival",eGameMode_Survival);
+  tolua_constant(tolua_S,"eGameMode_Creative",eGameMode_Creative);
+  tolua_constant(tolua_S,"eGameMode_Adventure",eGameMode_Adventure);
+  tolua_constant(tolua_S,"gmNotSet",gmNotSet);
+  tolua_constant(tolua_S,"gmSurvival",gmSurvival);
+  tolua_constant(tolua_S,"gmCreative",gmCreative);
+  tolua_constant(tolua_S,"gmAdventure",gmAdventure);
+  tolua_constant(tolua_S,"eWeather_Sunny",eWeather_Sunny);
+  tolua_constant(tolua_S,"eWeather_Rain",eWeather_Rain);
+  tolua_constant(tolua_S,"eWeather_ThunderStorm",eWeather_ThunderStorm);
+  tolua_constant(tolua_S,"wSunny",wSunny);
+  tolua_constant(tolua_S,"wRain",wRain);
+  tolua_constant(tolua_S,"wThunderstorm",wThunderstorm);
+  tolua_constant(tolua_S,"wStorm",wStorm);
+  tolua_function(tolua_S,"ClickActionToString",tolua_AllToLua_ClickActionToString00);
   tolua_function(tolua_S,"IsValidBlock",tolua_AllToLua_IsValidBlock00);
   tolua_function(tolua_S,"IsValidItem",tolua_AllToLua_IsValidItem00);
   tolua_function(tolua_S,"AddFaceDirection",tolua_AllToLua_AddFaceDirection00);
@@ -24339,13 +24477,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsLeggings",tolua_AllToLua_ItemCategory_IsLeggings00);
    tolua_function(tolua_S,"IsBoots",tolua_AllToLua_ItemCategory_IsBoots00);
   tolua_endmodule(tolua_S);
-  tolua_constant(tolua_S,"eGameMode_NotSet",eGameMode_NotSet);
-  tolua_constant(tolua_S,"eGameMode_Survival",eGameMode_Survival);
-  tolua_constant(tolua_S,"eGameMode_Creative",eGameMode_Creative);
-  tolua_constant(tolua_S,"eGameMode_Adventure",eGameMode_Adventure);
-  tolua_constant(tolua_S,"eWeather_Sunny",eWeather_Sunny);
-  tolua_constant(tolua_S,"eWeather_Rain",eWeather_Rain);
-  tolua_constant(tolua_S,"eWeather_ThunderStorm",eWeather_ThunderStorm);
   tolua_function(tolua_S,"GetTime",tolua_AllToLua_GetTime00);
   tolua_function(tolua_S,"GetChar",tolua_AllToLua_GetChar00);
   tolua_cclass(tolua_S,"cStringMap","cStringMap","",NULL);
@@ -24425,6 +24556,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetParentClass",tolua_AllToLua_cEntity_GetParentClass00);
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cEntity_GetWorld00);
    tolua_function(tolua_S,"GetHeadYaw",tolua_AllToLua_cEntity_GetHeadYaw00);
+   tolua_function(tolua_S,"GetMass",tolua_AllToLua_cEntity_GetMass00);
    tolua_function(tolua_S,"GetPosition",tolua_AllToLua_cEntity_GetPosition00);
    tolua_function(tolua_S,"GetPosX",tolua_AllToLua_cEntity_GetPosX00);
    tolua_function(tolua_S,"GetPosY",tolua_AllToLua_cEntity_GetPosY00);
@@ -24441,6 +24573,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cEntity_GetChunkX00);
    tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cEntity_GetChunkZ00);
    tolua_function(tolua_S,"SetHeadYaw",tolua_AllToLua_cEntity_SetHeadYaw00);
+   tolua_function(tolua_S,"SetMass",tolua_AllToLua_cEntity_SetMass00);
    tolua_function(tolua_S,"SetPosX",tolua_AllToLua_cEntity_SetPosX00);
    tolua_function(tolua_S,"SetPosY",tolua_AllToLua_cEntity_SetPosY00);
    tolua_function(tolua_S,"SetPosZ",tolua_AllToLua_cEntity_SetPosZ00);

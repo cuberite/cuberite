@@ -5,6 +5,10 @@
 
 typedef unsigned char Byte;
 
+
+
+
+
 // tolua_begin
 
 /// How much light do the blocks emit on their own?
@@ -23,7 +27,7 @@ extern bool g_BlockOneHitDig[];
 
 
 
-// Block face constants, used in PlayerDigging and PlayerBlockPlacement packets
+/// Block face constants, used in PlayerDigging and PlayerBlockPlacement packets
 enum
 {
 	BLOCK_FACE_NONE   = -1,  // Interacting with no block face - swinging the item in the air
@@ -35,7 +39,11 @@ enum
 	BLOCK_FACE_EAST   = 5,   // Interacting with the eastern  face of the block
 } ;
 
-// PlayerDigging status constants:
+
+
+
+
+/// PlayerDigging status constants
 enum
 {
 	DIG_STATUS_STARTED   = 0,
@@ -44,14 +52,131 @@ enum
 	DIG_STATUS_DROP_HELD = 4,
 	DIG_STATUS_SHOOT_EAT = 5,
 } ;
-// tolua_end
 
 
 
 
 
-inline bool IsValidBlock(int a_BlockType)	// tolua_export
-{											// tolua_export
+/// Individual actions sent in the WindowClick packet
+enum eClickAction
+{
+	// Sorted by occurrence in the 1.5 protocol
+	caLeftClick,
+	caRightClick,
+	caShiftLeftClick,
+	caShiftRightClick,
+	caNumber1,
+	caNumber2,
+	caNumber3,
+	caNumber4,
+	caNumber5,
+	caNumber6,
+	caNumber7,
+	caNumber8,
+	caNumber9,
+	caMiddleClick,
+	caDropKey,
+	caCtrlDropKey,
+	caLeftClickOutside,
+	caRightClickOutside,
+	caLeftClickOutsideHoldNothing,
+	caRightClickOutsideHoldNothing,
+	caLeftPaintBegin,
+	caRightPaintBegin,
+	caLeftPaintProgress,
+	caRightPaintProgress,
+	caLeftPaintEnd,
+	caRightPaintEnd,
+	caDblClick,
+	// Add new actions here
+	caUnknown = 255,
+	
+	// Keep this list in sync with ClickActionToString() function below!
+} ;
+
+
+
+
+
+enum eGameMode
+{
+	eGameMode_NotSet    = -1,
+	eGameMode_Survival  = 0,
+	eGameMode_Creative  = 1,
+	eGameMode_Adventure = 2,
+	
+	// Easier-to-use synonyms:
+	gmNotSet    = eGameMode_NotSet,
+	gmSurvival  = eGameMode_Survival,
+	gmCreative  = eGameMode_Creative,
+	gmAdventure = eGameMode_Adventure,
+} ;
+
+
+
+
+
+enum eWeather
+{
+	eWeather_Sunny        = 0,
+	eWeather_Rain         = 1,
+	eWeather_ThunderStorm = 2,
+	
+	// Easier-to-use synonyms:
+	wSunny        = eWeather_Sunny,
+	wRain         = eWeather_Rain,
+	wThunderstorm = eWeather_ThunderStorm,
+	wStorm        = wThunderstorm,
+} ;
+
+
+
+
+
+inline const char * ClickActionToString(eClickAction a_ClickAction)
+{
+	switch (a_ClickAction)
+	{
+		case caLeftClick:                    return "caLeftClick";
+		case caRightClick:                   return "caRightClick";
+		case caShiftLeftClick:               return "caShiftLeftClick";
+		case caShiftRightClick:              return "caShiftRightClick";
+		case caNumber1:                      return "caNumber1";
+		case caNumber2:                      return "caNumber2";
+		case caNumber3:                      return "caNumber3";
+		case caNumber4:                      return "caNumber4";
+		case caNumber5:                      return "caNumber5";
+		case caNumber6:                      return "caNumber6";
+		case caNumber7:                      return "caNumber7";
+		case caNumber8:                      return "caNumber8";
+		case caNumber9:                      return "caNumber9";
+		case caMiddleClick:                  return "caMiddleClick";
+		case caDropKey:                      return "caDropKey";
+		case caCtrlDropKey:                  return "caCtrlDropKey";
+		case caLeftClickOutside:             return "caLeftClickOutside";
+		case caRightClickOutside:            return "caRightClickOutside";
+		case caLeftClickOutsideHoldNothing:  return "caLeftClickOutsideHoldNothing";
+		case caRightClickOutsideHoldNothing: return "caRightClickOutsideHoldNothing";
+		case caLeftPaintBegin:               return "caLeftPaintBegin";
+		case caRightPaintBegin:              return "caRightPaintBegin";
+		case caLeftPaintProgress:            return "caLeftPaintProgress";
+		case caRightPaintProgress:           return "caRightPaintProgress";
+		case caLeftPaintEnd:                 return "caLeftPaintEnd";
+		case caRightPaintEnd:                return "caRightPaintEnd";
+		case caDblClick:                     return "caDblClick";
+		
+		case caUnknown:                      return "caUnknown";
+	}
+	ASSERT(!"Unknown click action");
+	return "caUnknown";
+}
+
+
+
+
+
+inline bool IsValidBlock(int a_BlockType)
+{
 	if (
 		(a_BlockType > -1) &&
 		(a_BlockType <= E_BLOCK_MAX_TYPE_ID) &&
@@ -62,14 +187,14 @@ inline bool IsValidBlock(int a_BlockType)	// tolua_export
 		return true;
 	}
 	return false;
-}											// tolua_export
+}
 
 
 
 
 
-inline bool IsValidItem(int a_ItemType)		// tolua_export
-{											// tolua_export
+inline bool IsValidItem(int a_ItemType)
+{
 	if (
 		((a_ItemType >= E_ITEM_FIRST) && (a_ItemType <= E_ITEM_MAX_CONSECUTIVE_TYPE_ID)) ||  // Basic items range
 		((a_ItemType >= E_ITEM_FIRST_DISC) && (a_ItemType <= E_ITEM_LAST_DISC))   // Music discs' special range
@@ -84,7 +209,9 @@ inline bool IsValidItem(int a_ItemType)		// tolua_export
 	}
 
 	return IsValidBlock(a_ItemType);
-}											// tolua_export
+}
+
+// tolua_end
 
 
 
@@ -202,8 +329,7 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 
 #include <math.h>
 #define PI				3.14159265358979323846264338327950288419716939937510582097494459072381640628620899862803482534211706798f
-#define MIN(a,b) (((a)>(b))?(b):(a))
-#define MAX(a,b) (((a)>(b))?(a):(b))
+
 inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a_Y, double & a_Z)
 {
 	// 	a_X = sinf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
@@ -381,30 +507,6 @@ inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
 }
 
 
-// tolua_begin
-enum eGameMode
-{
-	eGameMode_NotSet    = -1,
-	eGameMode_Survival  = 0,
-	eGameMode_Creative  = 1,
-	eGameMode_Adventure = 2
-};
-
-
-
-
-
-enum eWeather
-{
-	eWeather_Sunny        = 0,
-	eWeather_Rain         = 1,
-	eWeather_ThunderStorm = 2
-};
-
-
-
-
-// tolua_end
 
 
 

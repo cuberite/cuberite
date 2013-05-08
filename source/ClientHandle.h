@@ -163,7 +163,7 @@ public:
 	void HandleAnimation        (char a_Animation);
 	void HandleSlotSelected     (short a_SlotNum);
 	void HandleWindowClose      (char a_WindowID);
-	void HandleWindowClick      (char a_WindowID, short a_SlotNum, bool a_IsRightClick, bool a_IsShiftPressed, const cItem & a_HeldItem);
+	void HandleWindowClick      (char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleUpdateSign       (
 		int a_BlockX, int a_BlockY, int a_BlockZ, 
 		const AString & a_Line1, const AString & a_Line2, 
