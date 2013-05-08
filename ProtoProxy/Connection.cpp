@@ -200,7 +200,8 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_ServerState(csUnencrypted),
 	m_ClientBuffer(1024 KiB),
 	m_ServerBuffer(1024 KiB),
-	m_Nonce(0)
+	m_Nonce(0),
+	m_HasClientPinged(false)
 {
 	AString fnam;
 	Printf(fnam, "Log_%d.log", (int)time(NULL));
@@ -829,6 +830,12 @@ bool cConnection::HandleClientHandshake(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEInt,           int,     ServerPort);
 	m_ClientBuffer.CommitRead();
 	
+	Log("Received a PACKET_HANDSHAKE from the client:");
+	Log("  ProtocolVersion = %d", ProtocolVersion);
+	Log("  Username = \"%s\"", Username.c_str());
+	Log("  ServerHost = \"%s\"", ServerHost.c_str());
+	Log("  ServerPort = %d", ServerPort);
+
 	// Send the same packet to the server, but with our port:
 	cByteBuffer ToServer(512);
 	ToServer.WriteByte           (PACKET_HANDSHAKE);
@@ -837,6 +844,7 @@ bool cConnection::HandleClientHandshake(void)
 	ToServer.WriteBEUTF16String16(ServerHost);
 	ToServer.WriteBEInt          (m_Server.GetConnectPort());
 	SERVERSEND(ToServer);
+	
 	return true;
 }
 
@@ -874,6 +882,7 @@ bool cConnection::HandleClientLocaleAndView(void)
 
 bool cConnection::HandleClientPing(void)
 {
+	m_HasClientPinged = true;
 	Log("Received a PACKET_PING from the client");
 	m_ClientBuffer.ResetRead();
 	SERVERSEND(m_ClientBuffer);
@@ -1455,7 +1464,39 @@ bool cConnection::HandleServerKick(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Reason);
 	Log("Received PACKET_KICK from the SERVER:");
-	Log("  Reason = \"%s\"", Reason.c_str());
+	if (m_HasClientPinged)
+	{
+		Log("  This was a std reply to client's PING");
+		AStringVector Split;
+		
+		// Split by NULL chars (StringSplit() won't work here):
+		size_t Last = 0;
+		for (size_t i = 0; i < Reason.size(); i++)
+		{
+			if (Reason[i] == 0)
+			{
+				Split.push_back(Reason.substr(Last, i - Last));
+				Last = i + 1;
+			}
+		}
+		
+		if (Split.size() == 5)
+		{
+			Log("  Protocol version: \"%s\"", Split[0].c_str());
+			Log("  Server version: \"%s\"", Split[1].c_str());
+			Log("  MOTD: \"%s\"", Split[2].c_str());
+			Log("  Cur players: \"%s\"", Split[3].c_str());
+			Log("  Max players: \"%s\"", Split[4].c_str());
+		}
+		else
+		{
+			DataLog(Reason.data(), Reason.size(), "  Unknown reply format, dumping hex:");
+		}
+	}
+	else
+	{
+		Log("  Reason = \"%s\"", Reason.c_str());
+	}
 	COPY_TO_CLIENT();
 	return true;
 }

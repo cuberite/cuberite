@@ -66,6 +66,9 @@ protected:
 
 	Decryptor m_ClientDecryptor;
 	Encryptor m_ClientEncryptor;
+	
+	/// Set to true when PACKET_PING is received from the client; will cause special parsing for server kick
+	bool m_HasClientPinged;
 
 	bool ConnectToServer(void);
 	
