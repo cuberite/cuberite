@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5"
-#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60"
+#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2"
+#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60, 61"
 
 
 
@@ -39,6 +39,7 @@ public:
 		PROTO_VERSION_1_4_4 = 49,
 		PROTO_VERSION_1_4_6 = 51,
 		PROTO_VERSION_1_5_0 = 60,
+		PROTO_VERSION_1_5_2 = 61,
 		
 		PROTO_VERSION_NEXT,
 		PROTO_VERSION_LATEST = PROTO_VERSION_NEXT - 1,  ///< Automatically assigned to the last protocol version, this serves as the default for PrimaryServerVersion

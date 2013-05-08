@@ -4,8 +4,8 @@
 /*
 Declares the 1.5.x protocol classes:
 	- cProtocol150
-		- release 1.5 protocol (#60)
-(others may be added later in the future for the 1.5 release series)
+		- release 1.5 and 1.5.1 protocol (#60)
+		- release 1.5.2 protocol (#61; no relevant changes found)
 */
 
 
