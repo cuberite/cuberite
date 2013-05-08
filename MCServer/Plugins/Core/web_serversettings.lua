@@ -17,10 +17,12 @@ end
 local function HTML_Select_Version( name, defaultValue )
 	return [[<select name="]] .. name .. [[">]]
 		.. HTML_Option("0",  "Latest Version", defaultValue == 0 )
-		.. HTML_Option("49", "1.4.5", defaultValue == 1 )
-		.. HTML_Option("47", "1.4.2", defaultValue == 2 )
-		.. HTML_Option("39", "1.3.2", defaultValue == 3 )
-		.. HTML_Option("29", "1.2.5", defaultValue == 4 )
+		.. HTML_Option("61", "1.5.2", defaultValue == 1 )
+		.. HTML_Option("60", "1.5.0", defaultValue == 2 )
+		.. HTML_Option("49", "1.4.5", defaultValue == 3 )
+		.. HTML_Option("47", "1.4.2", defaultValue == 4 )
+		.. HTML_Option("39", "1.3.2", defaultValue == 5 )
+		.. HTML_Option("29", "1.2.5", defaultValue == 6 )
 		.. [[</select>]]
 end
 
