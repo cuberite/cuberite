@@ -34,11 +34,14 @@ public:
 		}
 		
 		// Grass becomes dirt if there is something on top of it:
-		BLOCKTYPE Above = a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
-		if (!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above])
+		if (a_BlockY < cChunkDef::Height - 1)
 		{
-			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
-			return;
+			BLOCKTYPE Above = a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
+			if (!g_BlockTransparent[Above] && !g_BlockOneHitDig[Above])
+			{
+				a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
+				return;
+			}
 		}
 		
 		// Grass spreads to adjacent blocks:
@@ -51,6 +54,11 @@ public:
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
+			if ((a_BlockY + OfsY < 0) || (a_BlockY + OfsY >= cChunkDef::Height - 1))
+			{
+				// Y Coord out of range
+				continue;
+			}
 			bool IsValid = a_World->GetBlockTypeMeta(a_BlockX + OfsX, a_BlockY + OfsY, a_BlockZ + OfsZ, DestBlock, DestMeta);
 			if (!IsValid || (DestBlock != E_BLOCK_DIRT))
 			{

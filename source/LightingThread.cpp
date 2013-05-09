@@ -407,9 +407,12 @@ void cLightingThread::PrepareSkyLight(void)
 			}
 			
 			// Add Current as a seed:
-			int CurrentIdx = idx + Current * BlocksPerYLayer;
-			m_IsSeed1[CurrentIdx] = true;
-			m_SeedIdx1[m_NumSeeds++] = CurrentIdx;
+			if (Current < cChunkDef::Height)
+			{
+				int CurrentIdx = idx + Current * BlocksPerYLayer;
+				m_IsSeed1[CurrentIdx] = true;
+				m_SeedIdx1[m_NumSeeds++] = CurrentIdx;
+			}
 			
 			// Add seed from Current up to the highest neighbor:
 			for (int y = Current + 1, Index = idx + y * BlocksPerYLayer; y < MaxNeighbor; y++, Index += BlocksPerYLayer)
