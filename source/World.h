@@ -301,11 +301,17 @@ public:
 	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 	
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities:
+	
+	// tolua_begin
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0);
+	// tolua_end
 	
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified:
-	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
+	// tolua_begin
+	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	// tolua_end
+
 	/// Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType
 	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
 	

@@ -99,6 +99,8 @@ class cItems  // tolua_export
 {  // tolua_export
 public:
 	// tolua_begin
+	/// Need a Lua-accessible constructor
+	cItems(void) {}
 	cItem & Get   (int a_Idx) {return at(a_Idx); }
 	void    Set   (int a_Idx, const cItem & a_Item) {at(a_Idx) = a_Item; }
 	void    Add   (const cItem & a_Item) {push_back(a_Item); }
