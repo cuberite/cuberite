@@ -1,10 +1,6 @@
 /*
 ** Lua binding: AllToLua
-<<<<<<< .mine
-** Generated automatically by tolua++-1.0.92 on 05/09/13 14:14:47.
-=======
-** Generated automatically by tolua++-1.0.92 on 05/08/13 11:35:08.
->>>>>>> .r1462
+** Generated automatically by tolua++-1.0.92 on 05/09/13 16:34:30.
 */
 
 #ifndef __cplusplus
@@ -89,17 +85,9 @@ static int tolua_collect_cPickup (lua_State* tolua_S)
 	return 0;
 }
 
-<<<<<<< .mine
 static int tolua_collect_cItems (lua_State* tolua_S)
-=======
-static int tolua_collect_cChestEntity (lua_State* tolua_S)
->>>>>>> .r1462
 {
-<<<<<<< .mine
  cItems* self = (cItems*) tolua_tousertype(tolua_S,1,0);
-=======
- cChestEntity* self = (cChestEntity*) tolua_tousertype(tolua_S,1,0);
->>>>>>> .r1462
 	Mtolua_delete(self);
 	return 0;
 }
@@ -11601,6 +11589,45 @@ static int tolua_AllToLua_cWorld_GetSpawnZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetSpawnZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DoExplosiontAt of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosiontAt00
+static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  float a_ExplosionSzie = ((float)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosiontAt'", NULL);
+#endif
+  {
+   self->DoExplosiontAt(a_ExplosionSzie,a_BlockX,a_BlockY,a_BlockZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DoExplosiontAt'.",&tolua_err);
  return 0;
 #endif
 }
@@ -25015,6 +25042,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnX",tolua_AllToLua_cWorld_GetSpawnX00);
    tolua_function(tolua_S,"GetSpawnY",tolua_AllToLua_cWorld_GetSpawnY00);
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
+   tolua_function(tolua_S,"DoExplosiontAt",tolua_AllToLua_cWorld_DoExplosiontAt00);
    tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
