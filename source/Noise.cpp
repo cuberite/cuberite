@@ -217,6 +217,189 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCubicCell3D:
+
+class cCubicCell3D
+{
+public:
+	cCubicCell3D(
+		const cNoise & a_Noise,                 ///< Noise to use for generating the random values
+		NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
+		const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
+		const NOISE_DATATYPE * a_FracY,         ///< Pointer to the attay that stores the Y fractional values
+		const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
+	);
+	
+	/// Uses current m_WorkRnds[] to generate part of the array
+	void Generate(
+		int a_FromX, int a_ToX,
+		int a_FromY, int a_ToY,
+		int a_FromZ, int a_ToZ
+	);
+	
+	/// Initializes m_WorkRnds[] with the specified Floor values
+	void InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ);
+	
+	/// Updates m_WorkRnds[] for the new Floor values.
+	void Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ);
+
+protected:
+	typedef NOISE_DATATYPE Workspace[4][4][4];
+	
+	const cNoise & m_Noise;
+	
+	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
+	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
+	Workspace m_Workspace2;  ///< Buffer 2 for workspace doublebuffering, used in Move()
+	int m_CurFloorX;
+	int m_CurFloorY;
+	int m_CurFloorZ;
+	
+	NOISE_DATATYPE * m_Array;
+	int m_SizeX, m_SizeY, m_SizeZ;
+	const NOISE_DATATYPE * m_FracX;
+	const NOISE_DATATYPE * m_FracY;
+	const NOISE_DATATYPE * m_FracZ;
+} ;
+
+
+
+
+
+cCubicCell3D::cCubicCell3D(
+	const cNoise & a_Noise,                 ///< Noise to use for generating the random values
+	NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
+	const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
+	const NOISE_DATATYPE * a_FracY,         ///< Pointer to the attay that stores the Y fractional values
+	const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
+) :
+	m_Noise(a_Noise),
+	m_WorkRnds(&m_Workspace1),
+	m_Array(a_Array),
+	m_SizeX(a_SizeX),
+	m_SizeY(a_SizeY),
+	m_SizeZ(a_SizeZ),
+	m_FracX(a_FracX),
+	m_FracY(a_FracY),
+	m_FracZ(a_FracZ)
+{
+}
+
+
+
+
+
+void cCubicCell3D::Generate(
+	int a_FromX, int a_ToX,
+	int a_FromY, int a_ToY,
+	int a_FromZ, int a_ToZ
+)
+{
+	for (int z = a_FromZ; z < a_ToZ; z++)
+	{
+		int idxZ = z * m_SizeX * m_SizeY;
+		NOISE_DATATYPE Interp2[4][4];
+		NOISE_DATATYPE FracZ = m_FracZ[z];
+		for (int x = 0; x < 4; x++)
+		{
+			for (int y = 0; y < 4; y++)
+			{
+				Interp2[x][y] = cNoise::CubicInterpolate((*m_WorkRnds)[x][y][0], (*m_WorkRnds)[x][y][1], (*m_WorkRnds)[x][y][2], (*m_WorkRnds)[x][y][3], FracZ);
+			}
+		}
+		for (int y = a_FromY; y < a_ToY; y++)
+		{
+			NOISE_DATATYPE Interp[4];
+			NOISE_DATATYPE FracY = m_FracY[y];
+			Interp[0] = cNoise::CubicInterpolate(Interp2[0][0], Interp2[0][1], Interp2[0][2], Interp2[0][3], FracY);
+			Interp[1] = cNoise::CubicInterpolate(Interp2[1][0], Interp2[1][1], Interp2[1][2], Interp2[1][3], FracY);
+			Interp[2] = cNoise::CubicInterpolate(Interp2[2][0], Interp2[2][1], Interp2[2][2], Interp2[2][3], FracY);
+			Interp[3] = cNoise::CubicInterpolate(Interp2[3][0], Interp2[3][1], Interp2[3][2], Interp2[3][3], FracY);
+			int idx = idxZ + y * m_SizeX + a_FromX;
+			for (int x = a_FromX; x < a_ToX; x++)
+			{
+				m_Array[idx++] = cNoise::CubicInterpolate(Interp[0], Interp[1], Interp[2], Interp[3], m_FracX[x]);
+			}  // for x
+		}  // for y
+	}  // for z
+}
+
+
+
+
+
+void cCubicCell3D::InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ)
+{
+	m_CurFloorX = a_FloorX;
+	m_CurFloorY = a_FloorY;
+	m_CurFloorZ = a_FloorZ;
+	for (int x = 0; x < 4; x++)
+	{
+		int cx = a_FloorX + x - 1;
+		for (int y = 0; y < 4; y++)
+		{
+			int cy = a_FloorY + y - 1;
+			for (int z = 0; z < 4; z++)
+			{
+				int cz = a_FloorZ + z - 1;
+				(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+			}
+		}
+	}
+}
+
+
+
+
+
+void cCubicCell3D::Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ)
+{
+	// Swap the doublebuffer:
+	int OldFloorX = m_CurFloorX;
+	int OldFloorY = m_CurFloorY;
+	int OldFloorZ = m_CurFloorZ;
+	Workspace * OldWorkRnds = m_WorkRnds;
+	m_WorkRnds = (m_WorkRnds == &m_Workspace1) ? &m_Workspace2 : &m_Workspace1;
+	
+	// Reuse as much of the old workspace as possible:
+	int DiffX = OldFloorX - a_NewFloorX;
+	int DiffY = OldFloorY - a_NewFloorY;
+	int DiffZ = OldFloorZ - a_NewFloorZ;
+	for (int x = 0; x < 4; x++)
+	{
+		int cx = a_NewFloorX + x - 1;
+		int OldX = x - DiffX;  // Where would this X be in the old grid?
+		for (int y = 0; y < 4; y++)
+		{
+			int cy = a_NewFloorY + y - 1;
+			int OldY = y - DiffY;  // Where would this Y be in the old grid?
+			for (int z = 0; z < 4; z++)
+			{
+				int cz = a_NewFloorZ + z - 1;
+				int OldZ = z - DiffZ;
+				if ((OldX >= 0) && (OldX < 4) && (OldY >= 0) && (OldY < 4) && (OldZ >= 0) && (OldZ < 4))
+				{
+					(*m_WorkRnds)[x][y][z] = (*OldWorkRnds)[OldX][OldY][OldZ];
+				}
+				else
+				{
+					(*m_WorkRnds)[x][y][z] = (NOISE_DATATYPE)m_Noise.IntNoise3D(cx, cy, cz);
+				}
+			}  // for z
+		}  // for y
+	}  // for x
+	m_CurFloorX = a_NewFloorX;
+	m_CurFloorY = a_NewFloorY;
+	m_CurFloorZ = a_NewFloorZ;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cNoise:
 
 cNoise::cNoise(unsigned int a_Seed) :
@@ -456,6 +639,75 @@ void cCubicNoise::Generate2D(
 		Cell.Move(FloorX[0], FloorY[ToY]);
 		FromY = ToY;
 	}
+}
+
+
+
+
+
+void cCubicNoise::Generate3D(
+	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Size of the array (num doubles), in each direction
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Y direction
+) const
+{
+	ASSERT(a_SizeX < MAX_SIZE);
+	ASSERT(a_SizeY < MAX_SIZE);
+	ASSERT(a_SizeZ < MAX_SIZE);
+	ASSERT(a_StartX < a_EndX);
+	ASSERT(a_StartY < a_EndY);
+	ASSERT(a_StartZ < a_EndZ);
+	
+	// Calculate the integral and fractional parts of each coord:
+	int FloorX[MAX_SIZE];
+	int FloorY[MAX_SIZE];
+	int FloorZ[MAX_SIZE];
+	NOISE_DATATYPE FracX[MAX_SIZE];
+	NOISE_DATATYPE FracY[MAX_SIZE];
+	NOISE_DATATYPE FracZ[MAX_SIZE];
+	int SameX[MAX_SIZE];
+	int SameY[MAX_SIZE];
+	int SameZ[MAX_SIZE];
+	int NumSameX, NumSameY, NumSameZ;
+	CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
+	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
+	CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);
+	
+	cCubicCell3D Cell(
+		m_Noise, a_Array,
+		a_SizeX, a_SizeY, a_SizeZ,
+		FracX, FracY, FracZ
+	);
+	
+	Cell.InitWorkRnds(FloorX[0], FloorY[0], FloorZ[0]);
+	
+	// Calculate query values using Cell:
+	int FromZ = 0;
+	for (int z = 0; z < NumSameZ; z++)
+	{
+		int ToZ = FromZ + SameZ[z];
+		int CurFloorZ = FloorZ[FromZ];
+		int FromY = 0;
+		for (int y = 0; y < NumSameY; y++)
+		{
+			int ToY = FromY + SameY[y];
+			int CurFloorY = FloorY[FromY];
+			int FromX = 0;
+			for (int x = 0; x < NumSameX; x++)
+			{
+				int ToX = FromX + SameX[x];
+				Cell.Generate(FromX, ToX, FromY, ToY, FromZ, ToZ);
+				Cell.Move(FloorX[ToX], CurFloorY, CurFloorZ);
+				FromX = ToX;
+			}
+			Cell.Move(FloorX[0], FloorY[ToY], CurFloorZ);
+			FromY = ToY;
+		}  // for y
+		Cell.Move(FloorX[0], FloorY[0], FloorZ[ToZ]);
+		FromZ = ToZ;
+	}  // for z
 }
 
 
