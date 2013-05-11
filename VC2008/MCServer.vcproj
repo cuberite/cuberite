@@ -510,6 +510,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\LinearInterpolation.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\LinearInterpolation.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Log.cpp"
 				>
 			</File>
