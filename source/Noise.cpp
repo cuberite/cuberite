@@ -722,7 +722,7 @@ void cCubicNoise::CalcFloorFrac(
 ) const
 {
 	NOISE_DATATYPE val = a_Start;
-	NOISE_DATATYPE dif = (a_End - a_Start) / a_Size;
+	NOISE_DATATYPE dif = (a_End - a_Start) / (a_Size - 1);
 	for (int i = 0; i < a_Size; i++)
 	{
 		a_Floor[i] = FAST_FLOOR(val);
@@ -835,6 +835,69 @@ void cPerlinNoise::Generate2D(
 			a_Workspace, a_SizeX, a_SizeY,
 			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
 			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency
+		);
+		// Add the cubic noise into the output:
+		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
+		for (int i = 0; i < ArrayCount; i++)
+		{
+			a_Array[i] += a_Workspace[i] * Amplitude;
+		}
+	}
+	
+	if (ShouldFreeWorkspace)
+	{
+		delete[] a_Workspace;
+	}
+}
+
+
+
+
+
+void cPerlinNoise::Generate3D(
+	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
+	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
+) const
+{
+	if (m_Octaves.empty())
+	{
+		// No work to be done
+		return;
+	}
+	
+	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
+	if (ShouldFreeWorkspace)
+	{
+		a_Workspace = new NOISE_DATATYPE[ArrayCount];
+	}
+	
+	// Generate the first octave directly into array:
+	m_Octaves.front().m_Noise.Generate3D(
+		a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
+		a_StartX * m_Octaves.front().m_Frequency, a_EndX * m_Octaves.front().m_Frequency,
+		a_StartY * m_Octaves.front().m_Frequency, a_EndY * m_Octaves.front().m_Frequency,
+		a_StartZ * m_Octaves.front().m_Frequency, a_EndZ * m_Octaves.front().m_Frequency
+	);
+	NOISE_DATATYPE Amplitude = m_Octaves.front().m_Amplitude;
+	for (int i = 0; i < ArrayCount; i++)
+	{
+		a_Array[i] = a_Workspace[i] * Amplitude;
+	}
+	
+	// Add each octave:
+	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
+	{
+		// Generate cubic noise for the octave:
+		itr->m_Noise.Generate3D(
+			a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
+			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
+			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency,
+			a_StartZ * itr->m_Frequency, a_EndZ * itr->m_Frequency
 		);
 		// Add the cubic noise into the output:
 		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
