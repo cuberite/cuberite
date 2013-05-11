@@ -29,9 +29,13 @@ public:
 	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
 	
 protected:
-	cNoise m_Noise1;
-	cNoise m_Noise2;
-	cNoise m_Noise3;
+	// Linear interpolation dimensions:
+	static const int DIMX = 5;
+	static const int DIMY = 65;
+	static const int DIMZ = 5;
+
+	cPerlinNoise m_Perlin;   // The base 3D noise source for the actual composition
+	cCubicNoise  m_Cubic;    // The noise used for heightmap directing
 	
 	int            m_SeaLevel;
 	NOISE_DATATYPE m_HeightAmplification;
@@ -41,7 +45,7 @@ protected:
 	NOISE_DATATYPE m_FrequencyZ;
 	NOISE_DATATYPE m_AirThreshold;
 	
-	/// Generates the 3D noise array used for terrain generation
+	/// Generates the 3D noise array used for terrain generation; a_Noise is of ChunkData-size
 	void GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_Noise);
 	
 	/// Updates heightmap based on the chunk's contents
