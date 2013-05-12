@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "HeiGen.h"
+#include "../LinearUpscale.h"
 
 
 
@@ -265,7 +266,7 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 			Height[x + 17 * z] = GetHeightAt(x, z, a_ChunkX, a_ChunkZ, Biomes);
 		}
 	}
-	ArrayLinearInterpolate2D(Height, 17, 17, STEPX, STEPZ);
+	ArrayLinearUpscale2D(Height, 17, 17, STEPX, STEPZ);
 	
 	// Copy into the heightmap
 	for (int z = 0; z < cChunkDef::Width; z++)

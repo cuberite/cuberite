@@ -8,6 +8,7 @@
 #include "DistortedHeightmap.h"
 #include "../OSSupport/File.h"
 #include "../../iniFile/iniFile.h"
+#include "../LinearUpscale.h"
 
 
 
@@ -157,7 +158,7 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 				CurFloor[idx + x * INTERPOL_X] = (NOISE_DATATYPE)GetHeightmapAt(DistX, DistZ) + (NOISE_DATATYPE)0.5;
 			}  // for x
 		}  // for z
-		ArrayLinearInterpolate2D(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
+		ArrayLinearUpscale2D(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
 	}  // for y
 	
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
@@ -344,8 +345,8 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 			GetDistortAmpsAt(Biomes, x, z, m_DistortAmpX[x + 17 * z], m_DistortAmpZ[x + 17 * z]);
 		}
 	}
-	ArrayLinearInterpolate2D(m_DistortAmpX, 17, 17, STEPX, STEPZ);
-	ArrayLinearInterpolate2D(m_DistortAmpZ, 17, 17, STEPX, STEPZ);
+	ArrayLinearUpscale2D(m_DistortAmpX, 17, 17, STEPX, STEPZ);
+	ArrayLinearUpscale2D(m_DistortAmpZ, 17, 17, STEPX, STEPZ);
 }	
 
 

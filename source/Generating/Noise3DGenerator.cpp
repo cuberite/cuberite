@@ -8,6 +8,7 @@
 #include "../OSSupport/File.h"
 #include "../../iniFile/iniFile.h"
 #include "../LinearInterpolation.h"
+#include "../LinearUpscale.h"
 
 
 
@@ -439,7 +440,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			}
 		}
 		// Linear-interpolate this XZ floor:
-		ArrayLinearInterpolate2D(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
+		ArrayLinearUpscale2D(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
 	}
 	
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis

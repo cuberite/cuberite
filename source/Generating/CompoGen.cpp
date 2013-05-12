@@ -10,6 +10,7 @@
 #include "Globals.h"
 #include "CompoGen.h"
 #include "../BlockID.h"
+#include "../LinearUpscale.h"
 
 
 
@@ -441,7 +442,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) /
 			256;
 	}  // for x, z - FloorLo[]
-	IntArrayLinearInterpolate2D(FloorLo, 17, 17, INTERPOL_X, INTERPOL_Z);
+	ArrayLinearUpscale2D(FloorLo, 17, 17, INTERPOL_X, INTERPOL_Z);
 	
 	// Interpolate segments:
 	for (int Segment = 0; Segment < MaxHeight; Segment += SEGMENT_HEIGHT)
@@ -454,7 +455,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
 				256;
 		}  // for x, z - FloorLo[]
-		IntArrayLinearInterpolate2D(FloorHi, 17, 17, INTERPOL_X, INTERPOL_Z);
+		ArrayLinearUpscale2D(FloorHi, 17, 17, INTERPOL_X, INTERPOL_Z);
 		
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)

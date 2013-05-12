@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "BioGen.h"
 #include "../../iniFile/iniFile.h"
+#include "../LinearUpscale.h"
 
 
 
@@ -339,8 +340,8 @@ void cBioGenDistortedVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::B
 		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z]);
 	}
 	
-	IntArrayLinearInterpolate2D(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	IntArrayLinearInterpolate2D(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	ArrayLinearUpscale2D(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	ArrayLinearUpscale2D(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
 	
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -446,8 +447,8 @@ void cBioGenMultiStepMap::DecideOceanLandMushroom(int a_ChunkX, int a_ChunkZ, cC
 	{
 		Distort(BaseX + x * 4, BaseZ + z * 4, DistortX[4 * x][4 * z], DistortZ[4 * x][4 * z], DistortSize);
 	}
-	IntArrayLinearInterpolate2D(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
-	IntArrayLinearInterpolate2D(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	ArrayLinearUpscale2D(&DistortX[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
+	ArrayLinearUpscale2D(&DistortZ[0][0], cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4);
 	
 	// Prepare a 9x9 area of neighboring cell seeds
 	// (assuming that 7x7 cell area is larger than a chunk being generated)
@@ -620,8 +621,8 @@ void cBioGenMultiStepMap::BuildTemperatureHumidityMaps(int a_ChunkX, int a_Chunk
 			HumidityMap[x + 17 * z] = NoiseH;
 		}  // for x
 	}  // for z
-	ArrayLinearInterpolate2D(TemperatureMap, 17, 17, 8, 8);
-	ArrayLinearInterpolate2D(HumidityMap,    17, 17, 8, 8);
+	ArrayLinearUpscale2D(TemperatureMap, 17, 17, 8, 8);
+	ArrayLinearUpscale2D(HumidityMap,    17, 17, 8, 8);
 	
 	// Re-map into integral values in [0 .. 255] range:
 	for (int idx = 0; idx < ARRAYCOUNT(a_TemperatureMap); idx++)

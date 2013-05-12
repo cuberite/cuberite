@@ -518,6 +518,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\LinearUpscale.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Log.cpp"
 				>
 			</File>
