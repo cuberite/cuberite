@@ -15,13 +15,19 @@ However, upscaling usually requires generating the "1 +" in each direction.
 
 Upscaling is implemented in templates, so that it's compatible with multiple datatypes.
 Therefore, there is no cpp file.
+
+InPlace upscaling works on a single array and assumes that the values to work on have already
+been interspersed into the array to the cell boundaries.
+Specifically, a_Array[x * a_AnchorStepX + y * a_AnchorStepY] contains the anchor value.
+
+Regular upscaling takes two arrays and "moves" the input from src to dst; src is expected packed.
 */
 
 
 
 
 /// Linearly interpolates values in the array between the equidistant anchor points; universal data type
-template<typename TYPE> void ArrayLinearUpscale2D(
+template<typename TYPE> void ArrayLinearUpscale2DInPlace(
 	TYPE * a_Array, 
 	int a_SizeX, int a_SizeY,  // Dimensions of the array
 	int a_AnchorStepX, int a_AnchorStepY  // Distances between the anchor points in each direction
