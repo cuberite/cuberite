@@ -13,9 +13,16 @@
 
 
 
+/** This table assigns a relative maximum overhang size in each direction to biomes.
+Both numbers indicate a number which will multiply the noise value for each coord;
+this means that you can have different-sized overhangs in each direction.
+Usually you'd want to keep both numbers the same.
+The numbers are "relative", not absolute maximum; overhangs of a slightly larger size are possible
+due to the way that noise is calculated.
+*/
 const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[biNumBiomes] =
 {
-	/* Biome              |    AmpX | AmpZ */
+	/* Biome              |   AmpX | AmpZ */
 	/* biOcean            */ { 1.5f,  1.5f},
 	/* biPlains           */ { 0.5f,  0.5f},
 	/* biDesert           */ { 0.5f,  0.5f},
