@@ -270,18 +270,54 @@ void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 				// "ground" part:
-				if (LastAir - y > 4)
+				if (y < LastAir - 4)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STONE);
 					continue;
 				}
 				if (HasHadWater)
 				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
+					// TODO: Decide between sand and dirt
+					a_ChunkDesc.SetBlockType(x, y, z, (y < LastAir - 3) ? E_BLOCK_SANDSTONE : E_BLOCK_SAND);
 				}
 				else
 				{
-					a_ChunkDesc.SetBlockType(x, y, z, (LastAir == y + 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
+					switch (a_ChunkDesc.GetBiome(x, z))
+					{
+						case biOcean:
+						case biPlains:
+						case biExtremeHills:
+						case biForest:
+						case biTaiga:
+						case biSwampland:
+						case biRiver:
+						case biFrozenOcean:
+						case biFrozenRiver:
+						case biIcePlains:
+						case biIceMountains:
+						case biForestHills:
+						case biTaigaHills:
+						case biExtremeHillsEdge:
+						case biJungle:
+						case biJungleHills:
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, (y == LastAir - 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
+							break;
+						}
+						case biDesertHills:
+						case biDesert:
+						case biBeach:
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, (y < LastAir - 3) ? E_BLOCK_SANDSTONE : E_BLOCK_SAND);
+							break;
+						}
+						case biMushroomIsland:
+						case biMushroomShore:
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, (y == LastAir - 1) ? E_BLOCK_MYCELIUM : E_BLOCK_DIRT);
+							break;
+						}
+					}
 				}
 			}  // for y
 			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
