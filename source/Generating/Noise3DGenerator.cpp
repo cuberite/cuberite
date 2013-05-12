@@ -401,17 +401,21 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	m_LastChunkX = a_ChunkX;
 	m_LastChunkZ = a_ChunkZ;
 	
-	// Parameters:
-	const int INTERPOL_X = 8;
-	const int INTERPOL_Y = 4;
-	const int INTERPOL_Z = 8;
+	// Upscaling parameters:
+	const int UPSCALE_X = 8;
+	const int UPSCALE_Y = 4;
+	const int UPSCALE_Z = 8;
+	
+	const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;
+	const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
+	const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
 
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[17 * 17];  // x + 17 * z
-	for (int z = 0; z < 17; z += INTERPOL_Z)
+	for (int z = 0; z < 17; z += UPSCALE_Z)
 	{
 		NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
-		for (int x = 0; x < 17; x += INTERPOL_X)
+		for (int x = 0; x < 17; x += UPSCALE_X)
 		{
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
 			NOISE_DATATYPE val = abs(m_Noise1.CubicNoise2D(NoiseX / 5, NoiseZ / 5)) * m_HeightAmplification + 1;
@@ -420,16 +424,16 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	}
 		
 	int idx = 0;
-	for (int y = 0; y < 257; y += INTERPOL_Y)
+	for (int y = 0; y < 257; y += UPSCALE_Y)
 	{
 		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / m_FrequencyY;
 		NOISE_DATATYPE AddHeight = (y - m_MidPoint) / 20;
 		AddHeight *= AddHeight * AddHeight;
 		NOISE_DATATYPE * CurFloor = &(m_NoiseArray[y * 17 * 17]);
-		for (int z = 0; z < 17; z += INTERPOL_Z)
+		for (int z = 0; z < 17; z += UPSCALE_Z)
 		{
 			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
-			for (int x = 0; x < 17; x += INTERPOL_X)
+			for (int x = 0; x < 17; x += UPSCALE_X)
 			{
 				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
 				CurFloor[x + 17 * z] = 
@@ -440,23 +444,23 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			}
 		}
 		// Linear-interpolate this XZ floor:
-		ArrayLinearUpscale2D(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
+		ArrayLinearUpscale2D(CurFloor, 17, 17, UPSCALE_X, UPSCALE_Z);
 	}
 	
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
 	for (int y = 1; y < cChunkDef::Height; y++)
 	{
-		if ((y % INTERPOL_Y) == 0)
+		if ((y % UPSCALE_Y) == 0)
 		{
 			// This is the interpolation source floor, already calculated
 			continue;
 		}
-		int LoFloorY = (y / INTERPOL_Y) * INTERPOL_Y;
-		int HiFloorY = LoFloorY + INTERPOL_Y;
+		int LoFloorY = (y / UPSCALE_Y) * UPSCALE_Y;
+		int HiFloorY = LoFloorY + UPSCALE_Y;
 		NOISE_DATATYPE * LoFloor  = &(m_NoiseArray[LoFloorY * 17 * 17]);
 		NOISE_DATATYPE * HiFloor  = &(m_NoiseArray[HiFloorY * 17 * 17]);
 		NOISE_DATATYPE * CurFloor = &(m_NoiseArray[y * 17 * 17]);
-		NOISE_DATATYPE Ratio = ((NOISE_DATATYPE)(y % INTERPOL_Y)) / INTERPOL_Y;
+		NOISE_DATATYPE Ratio = ((NOISE_DATATYPE)(y % UPSCALE_Y)) / UPSCALE_Y;
 		int idx = 0;
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
