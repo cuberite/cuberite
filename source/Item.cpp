@@ -138,3 +138,62 @@ bool cItem::IsEnchantable(short item)
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cItems:
+
+cItem * cItems::Get(int a_Idx)
+{
+	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	{
+		LOGWARNING("cItems: Attempt to get an out-of-bounds item at index %d; there are currently %d items. Returning a nil.", a_Idx, size());
+		return NULL;
+	}
+	return &at(a_Idx);
+}
+
+
+
+
+
+void cItems::Set(int a_Idx, const cItem & a_Item)
+{
+	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	{
+		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %d items. Not setting.", a_Idx, size());
+		return;
+	}
+	at(a_Idx) = a_Item;
+}
+
+
+
+
+
+void cItems::Delete(int a_Idx)
+{
+	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	{
+		LOGWARNING("cItems: Attempt to delete an item at an out-of-bounds index %d; there are currently %d items. Ignoring.", a_Idx, size());
+		return;
+	}
+	erase(begin() + a_Idx);
+}
+
+
+
+
+
+void cItems::Set(int a_Idx, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemDamage)
+{
+	if ((a_Idx < 0) || (a_Idx >= (int)size()))
+	{
+		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %d items. Not setting.", a_Idx, size());
+		return;
+	}
+	at(a_Idx) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);
+}
+
+
+
+

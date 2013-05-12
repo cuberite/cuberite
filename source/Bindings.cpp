@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/09/13 16:34:30.
+** Generated automatically by tolua++-1.0.92 on 05/12/13 17:56:56.
 */
 
 #ifndef __cplusplus
@@ -11594,45 +11594,6 @@ static int tolua_AllToLua_cWorld_GetSpawnZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: DoExplosiontAt of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_DoExplosiontAt00
-static int tolua_AllToLua_cWorld_DoExplosiontAt00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  float a_ExplosionSzie = ((float)  tolua_tonumber(tolua_S,2,0));
-  int a_BlockX = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_BlockY = ((int)  tolua_tonumber(tolua_S,4,0));
-  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,5,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoExplosiontAt'", NULL);
-#endif
-  {
-   self->DoExplosiontAt(a_ExplosionSzie,a_BlockX,a_BlockY,a_BlockZ);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'DoExplosiontAt'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: GetSignLines of class  cWorld */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_GetSignLines00
 static int tolua_AllToLua_cWorld_GetSignLines00(lua_State* tolua_S)
@@ -13623,8 +13584,8 @@ static int tolua_AllToLua_cItems_Get00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Get'", NULL);
 #endif
   {
-   cItem& tolua_ret = (cItem&)  self->Get(a_Idx);
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+   cItem* tolua_ret = (cItem*)  self->Get(a_Idx);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
  return 1;
@@ -13800,38 +13761,6 @@ static int tolua_AllToLua_cItems_Size00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: Add of class  cItems */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Add01
-static int tolua_AllToLua_cItems_Add01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
-  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0));
-  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
-  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
-#endif
-  {
-   self->Add(a_ItemType,a_ItemCount,a_ItemDamage);
-  }
- }
- return 0;
-tolua_lerror:
- return tolua_AllToLua_cItems_Add00(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: Set of class  cItems */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Set01
 static int tolua_AllToLua_cItems_Set01(lua_State* tolua_S)
@@ -13863,6 +13792,38 @@ static int tolua_AllToLua_cItems_Set01(lua_State* tolua_S)
  return 0;
 tolua_lerror:
  return tolua_AllToLua_cItems_Set00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Add of class  cItems */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItems_Add01
+static int tolua_AllToLua_cItems_Add01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cItems* self = (cItems*)  tolua_tousertype(tolua_S,1,0);
+  ENUM_ITEM_ID a_ItemType = ((ENUM_ITEM_ID) (int)  tolua_tonumber(tolua_S,2,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Add'", NULL);
+#endif
+  {
+   self->Add(a_ItemType,a_ItemCount,a_ItemDamage);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cItems_Add00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -25042,7 +25003,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnX",tolua_AllToLua_cWorld_GetSpawnX00);
    tolua_function(tolua_S,"GetSpawnY",tolua_AllToLua_cWorld_GetSpawnY00);
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
-   tolua_function(tolua_S,"DoExplosiontAt",tolua_AllToLua_cWorld_DoExplosiontAt00);
    tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
@@ -25126,8 +25086,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Delete",tolua_AllToLua_cItems_Delete00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cItems_Clear00);
    tolua_function(tolua_S,"Size",tolua_AllToLua_cItems_Size00);
-   tolua_function(tolua_S,"Add",tolua_AllToLua_cItems_Add01);
    tolua_function(tolua_S,"Set",tolua_AllToLua_cItems_Set01);
+   tolua_function(tolua_S,"Add",tolua_AllToLua_cItems_Add01);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cItemGrid","cItemGrid","",NULL);
   tolua_beginmodule(tolua_S,"cItemGrid");
