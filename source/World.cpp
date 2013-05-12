@@ -1208,6 +1208,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		float SpeedX = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
 		float SpeedY = (float)(a_FlyAwaySpeed *  r1.randInt(1000));
 		float SpeedZ = (float)(a_FlyAwaySpeed * (r1.randInt(1000) - 500));
+		
+		// TODO 2013_05_12 _X: Because spawning pickups with nonzero speed causes them to bug (FS #338),
+		// I decided to temporarily reset the speed to zero to fix it, until we have proper pickup physics
+		SpeedX = SpeedY = SpeedZ = 0;
+		
 		cPickup * Pickup = new cPickup(
 			(int)(a_BlockX * 32) + (r1.randInt(16) + r1.randInt(16) - 16),
 			(int)(a_BlockY * 32) + (r1.randInt(16) + r1.randInt(16) - 16),
@@ -1227,6 +1232,10 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	MTRand r1;
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
+		// TODO 2013_05_12 _X: Because spawning pickups with nonzero speed causes them to bug (FS #338),
+		// I decided to temporarily reset the speed to zero to fix it, until we have proper pickup physics
+		a_SpeedX = a_SpeedY = a_SpeedZ = 0;
+		
 		cPickup * Pickup = new cPickup(
 			(int)(a_BlockX * 32) + r1.randInt(16) + r1.randInt(16), 
 			(int)(a_BlockY * 32) + r1.randInt(16) + r1.randInt(16), 
