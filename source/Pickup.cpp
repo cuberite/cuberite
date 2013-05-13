@@ -128,19 +128,24 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 
 bool cPickup::CollectedBy(cPlayer * a_Dest)
 {
+	ASSERT(a_Dest != NULL);
+	
 	if (m_bCollected)
 	{
+		LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", a_Dest->GetName().c_str(), m_UniqueID);
 		return false; // It's already collected!
 	}
 	
 	// 800 is to long
 	if (m_Timer < 500.f)
 	{
+		LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", a_Dest->GetName().c_str(), m_UniqueID);
 		return false; // Not old enough
 	}
 
 	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))
 	{
+		LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", a_Dest->GetName().c_str(), m_UniqueID);
 		return false;
 	}
 
@@ -158,6 +163,7 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		return true;
 	}
 
+	LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);
 	return false;
 }
 
