@@ -1565,8 +1565,17 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
+			LOG("Pickup %d being collected by player \"%s\", distance %f",
+				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
+			);
 			MarkDirty();
 			(reinterpret_cast<cPickup *>(*itr))->CollectedBy( a_Player );
+		}
+		else if (SqrDist < 5 * 5)
+		{
+			LOG("Pickup %d close to player \"%s\", but still too far to collect: %f",
+				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
+			);
 		}
 	}
 }
