@@ -31,7 +31,7 @@ void Debug3DNoise(NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_Size
 				unsigned char buf[BUF_SIZE];
 				for (int x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+					buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
 				}
 				f1.Write(buf, a_SizeX);
 			}  // for y
@@ -52,7 +52,7 @@ void Debug3DNoise(NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_Size
 				unsigned char buf[BUF_SIZE];
 				for (int x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+					buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
 				}
 				f2.Write(buf, a_SizeX);
 			}  // for z
@@ -64,6 +64,37 @@ void Debug3DNoise(NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_Size
 	//*/
 
 }
+
+
+
+
+
+/*
+// Perform an automatic test of upscaling upon program start (use breakpoints to debug):
+
+class Test
+{
+public:
+	Test(void)
+	{
+		DoTest1();
+	}
+	
+	
+	void DoTest1(void)
+	{
+		float In[3 * 3 * 3];
+		for (int i = 0; i < ARRAYCOUNT(In); i++)
+		{
+			In[i] = (float)(i % 5);
+		}
+		Debug3DNoise(In, 3, 3, 3, "Upscale in");
+		float Out[17 * 33 * 35];
+		LinearUpscale3DArray(In, 3, 3, 3, Out, 8, 16, 17);
+		Debug3DNoise(Out, 17, 33, 35, "Upscale test");
+	}
+} gTest;
+//*/
 
 
 
@@ -190,15 +221,15 @@ void cNoise3DGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::Bi
 
 void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc)
 {
-	NOISE_DATATYPE Noise[cChunkDef::Width * cChunkDef::Height * cChunkDef::Width];
+	NOISE_DATATYPE Noise[17 * 257 * 17];
 	GenerateNoiseArray(a_ChunkX, a_ChunkZ, Noise);
 	
 	// Output noise into chunk:
-	int idx = 0;
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int y = 0; y < cChunkDef::Height; y++)
 		{
+			int idx = z * 17 * 257 + y * 17;
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				NOISE_DATATYPE n = Noise[idx++];
@@ -226,8 +257,8 @@ void cNoise3DGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_Ch
 
 void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DATATYPE * a_OutNoise)
 {
-	NOISE_DATATYPE NoiseO[DIMX * DIMY * DIMZ];  // Output for the Perlin noise
-	NOISE_DATATYPE NoiseW[DIMX * DIMY * DIMZ];  // Workspace that the noise calculation can use and trash
+	NOISE_DATATYPE NoiseO[DIM_X * DIM_Y * DIM_Z];  // Output for the Perlin noise
+	NOISE_DATATYPE NoiseW[DIM_X * DIM_Y * DIM_Z];  // Workspace that the noise calculation can use and trash
 
 	// Our noise array has different layout, XZY, instead of regular chunk's XYZ, that's why the coords are "renamed"
 	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(a_ChunkX       * cChunkDef::Width))     / m_FrequencyX;
@@ -237,51 +268,42 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)256) / m_FrequencyY;
 	
-	m_Perlin.Generate3D(NoiseO, DIMX, DIMY, DIMZ, StartX, EndX, StartY, EndY, StartZ, EndZ, NoiseW);
+	m_Perlin.Generate3D(NoiseO, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, NoiseW);
 	
-	// DEBUG: Debug3DNoise(NoiseO, DIMX, DIMY, DIMZ, Printf("Chunk_%d_%d_orig", a_ChunkX, a_ChunkZ));
-	
-	// Linearly interpolate the Perlin noise into full-blown chunk dimensions:
-	LinearInterpolate3DArray(
-		NoiseO, DIMX, DIMY, DIMZ,
-		a_OutNoise, cChunkDef::Width, cChunkDef::Height, cChunkDef::Width
-	);
-	
-	// DEBUG: Debug3DNoise(a_OutNoise, cChunkDef::Width, cChunkDef::Height, cChunkDef::Width, Printf("Chunk_%d_%d_lerp", a_ChunkX, a_ChunkZ));
-	
-	// Modify the noise to account for the wanted elevation:
+	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_orig", a_ChunkX, a_ChunkZ));
 	
 	// Precalculate a "height" array:
-	NOISE_DATATYPE Test1 = 0;
-	NOISE_DATATYPE HeightS[DIMX * DIMZ];                         // Output for the cubic noise heightmap ("source")
-	NOISE_DATATYPE Test2 = 0;
-	NOISE_DATATYPE Height[cChunkDef::Width * cChunkDef::Width];  // Lerp-ed heightmap [x + Width * z]
-	m_Cubic.Generate2D(HeightS, DIMX, DIMZ, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
-	LinearInterpolate2DArray(
-		HeightS, DIMX, DIMZ,
-		Height, cChunkDef::Width, cChunkDef::Width
-	);
+	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
+	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
 	for (int i = 0; i < ARRAYCOUNT(Height); i++)
 	{
 		Height[i] = abs(Height[i]) * m_HeightAmplification + 1;
 	}
 	
-	// Modify noise by height data	
-	for (int y = 0; y < cChunkDef::Height; y++)
+	// Modify the noise by height data:
+	for (int y = 0; y < DIM_Y; y++)
 	{
-		NOISE_DATATYPE AddHeight = (y - m_MidPoint) / 20;
+		NOISE_DATATYPE AddHeight = (y * UPSCALE_Y - m_MidPoint) / 20;
 		AddHeight *= AddHeight * AddHeight;
-		for (int z = 0; z < cChunkDef::Width; z++)
+		for (int z = 0; z < DIM_Z; z++)
 		{
-			NOISE_DATATYPE * CurRow = &(a_OutNoise[y * cChunkDef::Width + z * cChunkDef::Width * cChunkDef::Height]);
-			for (int x = 0; x < cChunkDef::Width; x++)
+			NOISE_DATATYPE * CurRow = &(NoiseO[y * DIM_X + z * DIM_X * DIM_Y]);
+			for (int x = 0; x < DIM_X; x++)
 			{
-				CurRow[x] += AddHeight / Height[x + cChunkDef::Width * z];
+				CurRow[x] += AddHeight / Height[x + DIM_X * z];
 			}
 		}
 	}
+
+	// DEBUG: Debug3DNoise(NoiseO, DIM_X, DIM_Y, DIM_Z, Printf("Chunk_%d_%d_hei", a_ChunkX, a_ChunkZ));
 	
-	// DEBUG: Debug3DNoise(a_OutNoise, cChunkDef::Width, cChunkDef::Height, cChunkDef::Width, Printf("Chunk_%d_%d", a_ChunkX, a_ChunkZ);
+	// Upscale the Perlin noise into full-blown chunk dimensions:
+	LinearUpscale3DArray(
+		NoiseO, DIM_X, DIM_Y, DIM_Z,
+		a_OutNoise, UPSCALE_X, UPSCALE_Y, UPSCALE_Z
+	);
+	
+	// DEBUG: Debug3DNoise(a_OutNoise, 17, 257, 17, Printf("Chunk_%d_%d_lerp", a_ChunkX, a_ChunkZ));
 }
 
 
@@ -444,7 +466,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			}
 		}
 		// Linear-interpolate this XZ floor:
-		ArrayLinearUpscale2DInPlace(CurFloor, 17, 17, UPSCALE_X, UPSCALE_Z);
+		LinearUpscale2DArrayInPlace(CurFloor, 17, 17, UPSCALE_X, UPSCALE_Z);
 	}
 	
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis

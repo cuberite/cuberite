@@ -29,10 +29,15 @@ public:
 	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
 	
 protected:
-	// Linear interpolation dimensions:
-	static const int DIMX = 5;
-	static const int DIMY = 65;
-	static const int DIMZ = 5;
+	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
+	static const int UPSCALE_X = 8;
+	static const int UPSCALE_Y = 4;
+	static const int UPSCALE_Z = 8;
+	
+	// Linear interpolation buffer dimensions, calculated from the step sizes:
+	static const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;
+	static const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
+	static const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
 
 	cPerlinNoise m_Perlin;   // The base 3D noise source for the actual composition
 	cCubicNoise  m_Cubic;    // The noise used for heightmap directing

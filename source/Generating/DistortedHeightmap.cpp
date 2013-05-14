@@ -158,7 +158,7 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 				CurFloor[idx + x * INTERPOL_X] = (NOISE_DATATYPE)GetHeightmapAt(DistX, DistZ) + (NOISE_DATATYPE)0.5;
 			}  // for x
 		}  // for z
-		ArrayLinearUpscale2DInPlace(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
+		LinearUpscale2DArrayInPlace(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
 	}  // for y
 	
 	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
@@ -381,8 +381,8 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 			GetDistortAmpsAt(Biomes, x, z, m_DistortAmpX[x + 17 * z], m_DistortAmpZ[x + 17 * z]);
 		}
 	}
-	ArrayLinearUpscale2DInPlace(m_DistortAmpX, 17, 17, STEPX, STEPZ);
-	ArrayLinearUpscale2DInPlace(m_DistortAmpZ, 17, 17, STEPX, STEPZ);
+	LinearUpscale2DArrayInPlace(m_DistortAmpX, 17, 17, STEPX, STEPZ);
+	LinearUpscale2DArrayInPlace(m_DistortAmpZ, 17, 17, STEPX, STEPZ);
 }	
 
 
