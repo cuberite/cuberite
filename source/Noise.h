@@ -296,3 +296,13 @@ NOISE_DATATYPE cNoise::LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B,
 
 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Global functions:
+
+extern void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase);
+extern void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_SizeZ, const AString & a_FileNameBase);
+
+
+
+
