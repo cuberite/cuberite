@@ -88,49 +88,59 @@ template<typename TYPE> void LinearUpscale2DArray(
 	int a_UpscaleX, int a_UpscaleY   ///< Upscale factor for each direction
 )
 {
+	// For optimization reasons, we're storing the upscaling ratios in a fixed-size arrays of these sizes
+	// Feel free to enlarge them if needed, but keep in mind that they're on the stack
+	const int MAX_UPSCALE_X = 128;
+	const int MAX_UPSCALE_Y = 128;
+	
 	ASSERT(a_Src != NULL);
 	ASSERT(a_Dst != NULL);
 	ASSERT(a_SrcSizeX > 0);
 	ASSERT(a_SrcSizeY > 0);
 	ASSERT(a_UpscaleX > 0);
 	ASSERT(a_UpscaleY > 0);
+	ASSERT(a_UpscaleX <= MAX_UPSCALE_X);
+	ASSERT(a_UpscaleY <= MAX_UPSCALE_Y);
 	
-	// First interpolate columns (same-Y) where the anchor points are:
-	int idx = 0;
-	for (int y = 0; y < a_SrcSizeY; y++)
+	// Pre-calculate the upscaling ratios:
+	TYPE RatioX[MAX_UPSCALE_X];
+	TYPE RatioY[MAX_UPSCALE_Y];
+	for (int x = 0; x <= a_UpscaleX; x++)
+	{
+		RatioX[x] = (TYPE)x / a_UpscaleX;
+	}
+	for (int y = 0; y <= a_UpscaleY; y++)
+	{
+		RatioY[y] = (TYPE)y / a_UpscaleY;
+	}
+	
+	// Interpolate each XY cell:
+	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
+	int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
+	for (int y = 0; y < (a_SrcSizeY - 1); y++)
 	{
 		int DstY = y * a_UpscaleY;
-		for (int x = 0; x < a_SrcSizeX; x++)
+		int idx = y * a_SrcSizeX;
+		for (int x = 0; x < (a_SrcSizeX - 1); x++, idx++)
 		{
 			int DstX = x * a_UpscaleX;
-			TYPE StartValue = a_Src[idx];               // [x, y]
-			TYPE EndValue   = a_Src[idx + a_SrcSizeX];  // [x, y + 1]
-			TYPE Diff = EndValue - StartValue;
+			TYPE LoXLoY = a_Src[idx];
+			TYPE LoXHiY = a_Src[idx + a_SrcSizeX];
+			TYPE HiXLoY = a_Src[idx + 1];
+			TYPE HiXHiY = a_Src[idx + 1 + a_SrcSizeX];
 			for (int CellY = 0; CellY <= a_UpscaleY; CellY++)
 			{
-				a_Dst[DstX + (DstY + CellY) * a_SizeY] = StartValue + Diff * CellY / a_AnchorStepY;
+				int DestIdx = (DstY + CellY) * DstSizeX + DstX;
+				ASSERT(DestIdx + a_UpscaleX < DstSizeX * DstSizeY);
+				TYPE LoXInY = LoXLoY + (LoXHiY - LoXLoY) * RatioY[CellY];
+				TYPE HiXInY = HiXLoY + (HiXHiY - HiXLoY) * RatioY[CellY];
+				for (int CellX = 0; CellX <= a_UpscaleX; CellX++, DestIdx++)
+				{
+					a_Dst[DestIdx] = LoXInY + (HiXInY - LoXInY) * RatioX[CellX];
+				}
 			}  // for CellY
 		}  // for x
 	}  // for y
-	
-	// Now interpolate in rows (same-X), each row already has valid values in the anchor columns
-	int DstSizeY = a_SizeY * a_UpscaleY;
-	int DstSizeX = a_SizeX * a_UpscaleX;
-	for (int y = 0; y < DstSizeY; y++)
-	{
-		int Idx = y * DstSizeX;
-		for (int x = 0; x < a_SizeX; x++)
-		{
-			TYPE StartValue = a_Dst[Idx];               // [x,     y] in the src coords
-			TYPE EndValue   = a_Dst[Idx + a_UpscaleX];  // [x + 1, y] in the src coords
-			TYPE Diff = EndValue - StartValue;
-			for (int CellX = 0; CellX <= a_UpscaleX; CellX++)
-			{
-				a_Dst[Idx + CellX] = StartValue + CellX * Diff / a_UpscaleX;
-			}  // for CellY
-			Idx += a_UpscaleX;
-		}
-	}
 }
 
 

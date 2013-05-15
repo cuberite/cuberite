@@ -61,10 +61,32 @@ void Debug3DNoise(NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_Size
 			f2.Write(buf, a_SizeX);
 		}  // for y
 	}  // if (XZ file open)
-	//*/
-
 }
 
+
+
+
+
+void Debug2DNoise(NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase)
+{
+	const int BUF_SIZE = 512;
+	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
+	
+	cFile f1;
+	if (f1.Open(Printf("%s (%d).grab", a_FileNameBase.c_str(), a_SizeX), cFile::fmWrite))
+	{
+		for (int y = 0; y < a_SizeY; y++)
+		{
+			int idx = y * a_SizeX;
+			unsigned char buf[BUF_SIZE];
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+			}
+			f1.Write(buf, a_SizeX);
+		}  // for y
+	}  // if (file open)
+}
 
 
 
@@ -78,6 +100,7 @@ public:
 	Test(void)
 	{
 		DoTest1();
+		DoTest2();
 	}
 	
 	
@@ -88,11 +111,26 @@ public:
 		{
 			In[i] = (float)(i % 5);
 		}
-		Debug3DNoise(In, 3, 3, 3, "Upscale in");
+		Debug3DNoise(In, 3, 3, 3, "Upscale3D in");
 		float Out[17 * 33 * 35];
 		LinearUpscale3DArray(In, 3, 3, 3, Out, 8, 16, 17);
-		Debug3DNoise(Out, 17, 33, 35, "Upscale test");
+		Debug3DNoise(Out, 17, 33, 35, "Upscale3D test");
 	}
+	
+	
+	void DoTest2(void)
+	{
+		float In[3 * 3];
+		for (int i = 0; i < ARRAYCOUNT(In); i++)
+		{
+			In[i] = (float)(i % 5);
+		}
+		Debug2DNoise(In, 3, 3, "Upscale2D in");
+		float Out[17 * 33];
+		LinearUpscale2DArray(In, 3, 3, Out, 8, 16);
+		Debug2DNoise(Out, 17, 33, "Upscale2D test");
+	}
+	
 } gTest;
 //*/
 

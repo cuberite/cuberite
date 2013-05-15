@@ -570,7 +570,7 @@ void cCubicNoise::Generate2D(
 			m_NumSingleY++;
 		}
 		m_NumCalls++;
-	#endif _DEBUG
+	#endif  // _DEBUG
 	
 	// Calculate query values using Cell:
 	int FromY = 0;
