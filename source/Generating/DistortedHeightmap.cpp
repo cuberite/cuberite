@@ -55,15 +55,19 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[biNumBiomes
 
 
 cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
-	m_Noise1(a_Seed + 1000),
-	m_Noise2(a_Seed + 2000),
-	m_Noise3(a_Seed + 3000),
-	m_Noise4(a_Seed + 4000),
-	m_Noise5(a_Seed + 5000),
+	m_NoiseDistortX(a_Seed + 1000),
+	m_NoiseDistortZ(a_Seed + 2000),
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
 	m_HeightGen(&m_UnderlyingHeiGen, 64)
 {
+	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
+	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
+	m_NoiseDistortX.AddOctave((NOISE_DATATYPE)0.25, (NOISE_DATATYPE)2);
+
+	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
+	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
+	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.25, (NOISE_DATATYPE)2);
 }
 
 
@@ -104,113 +108,49 @@ void cDistortedHeightmap::PrepareState(int a_ChunkX, int a_ChunkZ)
 
 void cDistortedHeightmap::GenerateHeightArray(void)
 {
-	// Parameters:
-	static const int INTERPOL_X = 8;
-	static const int INTERPOL_Y = 4;
-	static const int INTERPOL_Z = 8;
-	static const int DIM_X = 1 +  (17 / INTERPOL_X);
-	static const int DIM_Y = 1 + (257 / INTERPOL_Y);
-	static const int DIM_Z = 1 +  (17 / INTERPOL_Z);
-	NOISE_DATATYPE DistortNoiseX[DIM_X * DIM_Z * DIM_Y];
-	NOISE_DATATYPE DistortNoiseZ[DIM_X * DIM_Z * DIM_Y];
-
-	// TODO: This triple-loop should really be moved into the cPerlinNoise class for optimization
-	int idx = 0;
-	for (int y = 0; y < DIM_Y; y++)
-	{
-		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(y * INTERPOL_X)) / m_FrequencyY;
-		for (int z = 0; z < DIM_Z; z++)
-		{
-			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + z * INTERPOL_Z)) / m_FrequencyZ;
-			for (int x = 0; x < DIM_X; x++)
-			{
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + x * INTERPOL_X)) / m_FrequencyX;
-				DistortNoiseX[idx] =
-					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
-					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
-					m_Noise3.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2;
-					
-				DistortNoiseZ[idx] =
-					m_Noise3.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
-					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
-					m_Noise1.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2;
-				idx += 1;
-			}  // for x
-		}  // for z
-	}  // for y
+	// Generate distortion noise:
+	NOISE_DATATYPE DistortNoiseX[DIM_X * DIM_Y * DIM_Z];
+	NOISE_DATATYPE DistortNoiseZ[DIM_X * DIM_Y * DIM_Z];
+	NOISE_DATATYPE Workspace[DIM_X * DIM_Y * DIM_Z];
+	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width)) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((m_CurChunkX + 1) * cChunkDef::Width - 1)) / m_FrequencyX;
+	NOISE_DATATYPE StartY = 0;
+	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)(257)) / m_FrequencyY;
+	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width)) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((m_CurChunkZ + 1) * cChunkDef::Width - 1)) / m_FrequencyZ;
 	
-	// Convert from distortion into real height values:
-	for (int y = 0; y < DIM_Y; y++)
+	m_NoiseDistortX.Generate3D(DistortNoiseX, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
+	m_NoiseDistortZ.Generate3D(DistortNoiseZ, DIM_X, DIM_Y, DIM_Z, StartX, EndX, StartY, EndY, StartZ, EndZ, Workspace);
+
+	// The distorted heightmap, before linear upscaling
+	NOISE_DATATYPE DistHei[DIM_X * DIM_Y * DIM_Z];
+	
+	// Distort the heightmap using the distortion:
+	for (int z = 0; z < DIM_Z; z++)
 	{
-		NOISE_DATATYPE * CurFloor = m_DistortedHeightmap + 17 * 17 * y * INTERPOL_Y;
-		for (int z = 0; z < DIM_Z; z++)
+		int AmpIdx = z * DIM_X;
+		for (int y = 0; y < DIM_Y; y++)
 		{
-			int idx = 17 * z * INTERPOL_Z;
-			int AmpIdx = 17 * z * INTERPOL_Z;
-			int NoiseArrayIdx = z * DIM_X + y * DIM_X * DIM_Z;
+			int NoiseArrayIdx = z * DIM_X * DIM_Y + y * DIM_X;
 			for (int x = 0; x < DIM_X; x++)
 			{
-				NOISE_DATATYPE DistX = DistortNoiseX[NoiseArrayIdx + x] * m_DistortAmpX[AmpIdx + x * INTERPOL_X];
-				NOISE_DATATYPE DistZ = DistortNoiseZ[NoiseArrayIdx + x] * m_DistortAmpZ[AmpIdx + x * INTERPOL_X];
+				NOISE_DATATYPE DistX = DistortNoiseX[NoiseArrayIdx + x] * m_DistortAmpX[AmpIdx + x];
+				NOISE_DATATYPE DistZ = DistortNoiseZ[NoiseArrayIdx + x] * m_DistortAmpZ[AmpIdx + x];
 				DistX += (NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + x * INTERPOL_X);
 				DistZ += (NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + z * INTERPOL_Z);
 				// Adding 0.5 helps alleviate the interpolation artifacts
-				CurFloor[idx + x * INTERPOL_X] = (NOISE_DATATYPE)GetHeightmapAt(DistX, DistZ) + (NOISE_DATATYPE)0.5;
-			}  // for x
-		}  // for z
-		LinearUpscale2DArrayInPlace(CurFloor, 17, 17, INTERPOL_X, INTERPOL_Z);
-	}  // for y
-	
-	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
-	for (int y = 1; y < cChunkDef::Height; y++)
-	{
-		if ((y % INTERPOL_Y) == 0)
-		{
-			// This is the interpolation source floor, already calculated
-			continue;
-		}
-		int LoFloorY = (y / INTERPOL_Y) * INTERPOL_Y;
-		int HiFloorY = LoFloorY + INTERPOL_Y;
-		NOISE_DATATYPE * LoFloor  = &(m_DistortedHeightmap[LoFloorY * 17 * 17]);
-		NOISE_DATATYPE * HiFloor  = &(m_DistortedHeightmap[HiFloorY * 17 * 17]);
-		NOISE_DATATYPE * CurFloor = &(m_DistortedHeightmap[y * 17 * 17]);
-		NOISE_DATATYPE Ratio = ((NOISE_DATATYPE)(y % INTERPOL_Y)) / INTERPOL_Y;
-		int idx = 0;
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (int x = 0; x < cChunkDef::Width; x++)
-			{
-				CurFloor[idx] = LoFloor[idx] + (HiFloor[idx] - LoFloor[idx]) * Ratio;
-				idx += 1;
+				DistHei[NoiseArrayIdx + x] = (NOISE_DATATYPE)GetHeightmapAt(DistX, DistZ) + (NOISE_DATATYPE)0.5;
 			}
-			idx += 1;  // Skipping one X column
-		}  // for z
-	}  // for y
-	
-	/*
-	// DEBUG: Dump the distorted heightmap to a file for visual inspection
-	cFile f;
-	if (f.Open(Printf("DistortedHeightmap_%d_%d.grab", m_CurChunkX, m_CurChunkZ), cFile::fmWrite))
-	{
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (int y = cChunkDef::Height - 1; y >= 0; y--)
-			{
-				unsigned char Line[cChunkDef::Width];
-				int idx = z * 17 + y * 17 * 17;
-				for (int x = 0; x < cChunkDef::Width; x++)
-				{
-					Line[x] = (unsigned char)m_DistortedHeightmap[idx + x];
-				}
-				f.Write(Line, sizeof(Line));
-			}  // for y
-			unsigned char Interrupt[2 * cChunkDef::Width];
-			memset(Interrupt, 0, cChunkDef::Width);
-			memset(Interrupt + cChunkDef::Width, 0xff, cChunkDef::Width);
-			f.Write(Interrupt, sizeof(Interrupt));
 		}
 	}
-	//*/
+	
+	// Upscale the distorted heightmap into full dimensions:
+	LinearUpscale3DArray(
+		DistHei, DIM_X, DIM_Y, DIM_Z,
+		m_DistortedHeightmap, INTERPOL_X, INTERPOL_Y, INTERPOL_Z
+	);
+
+	// DEBUG: Debug3DNoise(m_DistortedHeightmap, 17, 257, 17, Printf("DistortedHeightmap_%d_%d", m_CurChunkX, m_CurChunkZ));
 }
 
 
@@ -224,11 +164,11 @@ void cDistortedHeightmap::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::He
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int NoiseArrayIdx = x + 17 * z;
+			int NoiseArrayIdx = x + 17 * 257 * z;
 			cChunkDef::SetHeight(a_HeightMap, x, z, m_SeaLevel - 1);
 			for (int y = cChunkDef::Height - 1; y > m_SeaLevel - 1; y--)
 			{
-				int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * 17 * y];
+				int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * y];
 				if (y < HeightMapHeight)
 				{
 					cChunkDef::SetHeight(a_HeightMap, x, z, y);
@@ -251,12 +191,12 @@ void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int NoiseArrayIdx = x + 17 * z;
+			int NoiseArrayIdx = x + 17 * 257 * z;
 			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
 			bool HasHadWater = false;
 			for (int y = LastAir - 1; y > 0; y--)
 			{
-				int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * 17 * y];
+				int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * y];
 
 				if (y >= HeightMapHeight)
 				{
@@ -371,18 +311,13 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 		}  // for x
 	}  // for z
 
-	// Linearly interpolate 4x4 blocks of Amps:
-	const int STEPZ = 4;  // Must be a divisor of 16
-	const int STEPX = 4;  // Must be a divisor of 16
-	for (int z = 0; z < 17; z += STEPZ)
+	for (int z = 0; z < DIM_Z; z++)
 	{
-		for (int x = 0; x < 17; x += STEPX)
+		for (int x = 0; x < DIM_Z; x++)
 		{
-			GetDistortAmpsAt(Biomes, x, z, m_DistortAmpX[x + 17 * z], m_DistortAmpZ[x + 17 * z]);
+			GetDistortAmpsAt(Biomes, x * INTERPOL_X, z * INTERPOL_Z, m_DistortAmpX[x + DIM_X * z], m_DistortAmpZ[x + DIM_X * z]);
 		}
 	}
-	LinearUpscale2DArrayInPlace(m_DistortAmpX, 17, 17, STEPX, STEPZ);
-	LinearUpscale2DArrayInPlace(m_DistortAmpZ, 17, 17, STEPX, STEPZ);
 }	
 
 

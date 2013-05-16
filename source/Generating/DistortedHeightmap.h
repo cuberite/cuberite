@@ -35,11 +35,18 @@ public:
 protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
 
-	cNoise m_Noise1;
-	cNoise m_Noise2;
-	cNoise m_Noise3;
-	cNoise m_Noise4;
-	cNoise m_Noise5;
+	// Linear upscaling step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
+	static const int INTERPOL_X = 8;
+	static const int INTERPOL_Y = 4;
+	static const int INTERPOL_Z = 8;
+
+	// Linear upscaling buffer dimensions, calculated from the step sizes:
+	static const int DIM_X = 1 +  (17 / INTERPOL_X);
+	static const int DIM_Y = 1 + (257 / INTERPOL_Y);
+	static const int DIM_Z = 1 +  (17 / INTERPOL_Z);
+
+	cPerlinNoise m_NoiseDistortX;
+	cPerlinNoise m_NoiseDistortZ;
 	
 	int m_SeaLevel;
 	NOISE_DATATYPE m_FrequencyX;
@@ -48,7 +55,7 @@ protected:
 
 	int m_CurChunkX;
 	int m_CurChunkZ;
-	NOISE_DATATYPE m_DistortedHeightmap[17 * 17 * 257];
+	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
 
 	cBiomeGen &   m_BiomeGen;
 	cHeiGenBiomal m_UnderlyingHeiGen;  // This generator provides us with base heightmap (before distortion)
@@ -65,8 +72,9 @@ protected:
 	} ;
 	static const sGenParam m_GenParam[biNumBiomes];
 	
-	NOISE_DATATYPE m_DistortAmpX[17 * 17];
-	NOISE_DATATYPE m_DistortAmpZ[17 * 17];
+	// Distortion amplitudes for each direction, before linear upscaling
+	NOISE_DATATYPE m_DistortAmpX[DIM_X * DIM_Z];
+	NOISE_DATATYPE m_DistortAmpZ[DIM_X * DIM_Z];
 	
 
 	/// Unless the LastChunk coords are equal to coords given, prepares the internal state (noise arrays, heightmap)
