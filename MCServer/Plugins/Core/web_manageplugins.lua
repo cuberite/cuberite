@@ -122,13 +122,27 @@ function HandleRequest_ManagePlugins( Request )
 	
 	Content = Content .. "<h4>Currently installed plugins</h4>"
 	Content = Content .. "<table>"
+	ActivePluginsName = {}
+	ActivePluginVersion = {}
+	InactivePlugins = {}
 	for k, Plugin in pairs(PluginList) do
-		Content = Content .. "<tr><td>".. k .."</td>"
-		if( Plugin ) then 
-			Content = Content .. "<td>" .. Plugin:GetName() .. " V. " .. Plugin:GetVersion() .. "</td><td>" .. Button_DisablePlugin(k) .. "</td>"
+		if( Plugin ) then
+			table.insert( ActivePluginsName, k )
+			table.insert( ActivePluginVersion, Plugin:GetVersion() )
 		else
-			Content = Content .. "<td></td><td>" .. Button_EnablePlugin(k) .. "</td>"
+			table.insert( InactivePlugins, k )
 		end
+	end
+	table.sort( ActivePluginsName )
+	table.sort( InactivePlugins )
+	for i = 1, #ActivePluginsName do
+		Content = Content .. "<tr><td>".. ActivePluginsName[i] .."</td>"
+		Content = Content .. "<td>" .. ActivePluginsName[i] .. " V. " .. ActivePluginVersion[i] .. "</td><td>" .. Button_DisablePlugin(ActivePluginsName[i]) .. "</td>"
+		Content = Content .. "</tr>"
+	end
+	for i = 1, #InactivePlugins do
+		Content = Content .. "<tr><td>".. InactivePlugins[i] .."</td>"
+		Content = Content .. "<td></td><td>" .. Button_EnablePlugin(InactivePlugins[i]) .. "</td>"
 		Content = Content .. "</tr>"
 	end
 	Content = Content .. "</table>"
