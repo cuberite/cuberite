@@ -613,8 +613,14 @@ bool cPlayer::CanUseCommand( const AString & a_Command )
 
 
 
-bool cPlayer::HasPermission( const AString & a_Permission )
+bool cPlayer::HasPermission(const AString & a_Permission)
 {
+	if (a_Permission.empty())
+	{
+		// Empty permission request is always granted
+		return true;
+	}
+	
 	AStringVector Split = StringSplit( a_Permission, "." );
 	PermissionMap Possibilities = m_ResolvedPermissions;
 	// Now search the namespaces
