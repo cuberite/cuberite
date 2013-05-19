@@ -17,8 +17,9 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
 	
-	PluginManager:BindCommand("/le", "debuggers", HandleListEntitiesCmd, " - Shows a list of all the loaded entities");
-	PluginManager:BindCommand("/ke", "debuggers", HandleKillEntitiesCmd, " - Kills all the loaded entities");
+	PluginManager:BindCommand("/le",   "debuggers", HandleListEntitiesCmd, " - Shows a list of all the loaded entities");
+	PluginManager:BindCommand("/ke",   "debuggers", HandleKillEntitiesCmd, " - Kills all the loaded entities");
+	PluginManager:BindCommand("/wool", "debuggers", HandleWoolCmd, " - Sets all your armor to blue wool");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -452,3 +453,12 @@ end
 
 
 
+
+function HandleWoolCmd(Split, Player)
+	local Wool = cItem(E_BLOCK_WOOL, 1, E_META_WOOL_BLUE);
+	Player:GetInventory():SetSlot(5, Wool);
+	Player:GetInventory():SetSlot(6, Wool);
+	Player:GetInventory():SetSlot(7, Wool);
+	Player:GetInventory():SetSlot(8, Wool);
+	return true;
+end
