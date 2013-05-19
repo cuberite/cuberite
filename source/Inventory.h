@@ -53,7 +53,7 @@ public:
 	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
 	
 	/// Adds the specified damage to the specified item; deletes the item and returns true if the item broke.
-	bool cInventory::DamageItem(int a_SlotNum, short a_Amount);
+	bool DamageItem(int a_SlotNum, short a_Amount);
 
 	/// Adds the specified damage to the currently held item; deletes the item and returns true if the item broke.
 	bool DamageEquippedItem(short a_Amount = 1);
