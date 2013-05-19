@@ -16,47 +16,72 @@ function Initialize(Plugin)
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
+	
+	PluginManager:BindCommand("/le", "debuggers", HandleListEntitiesCmd, " - Shows a list of all the loaded entities");
+	PluginManager:BindCommand("/ke", "debuggers", HandleKillEntitiesCmd, " - Kills all the loaded entities");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	-- dump all available functions to console:
+	-- dump all available API functions and objects:
 	if (ShouldDumpFunctions) then
-		LOG("Dumping all available functions:");
-		function dump (prefix, a, Output)
-			for i, v in pairs (a) do
-				if (type(v) == "table") then
-					if (GetChar(i, 1) ~= ".") then
-						if (v == _G) then
-							LOG(prefix .. i .. " == _G, CYCLE, ignoring");
-						elseif (v == _G.package) then
-							LOG(prefix .. i .. " == _G.package, ignoring");
-						else
-							dump(prefix .. i .. ".", v, Output)
-						end
+		DumpAPI();
+	end
+	
+	
+	-- TestBlockAreas();
+	-- TestSQLiteBindings();
+	-- TestExpatBindings();
+
+	return true
+end;
+
+
+
+
+
+function DumpAPI()
+	LOG("Dumping all available functions to API.txt...");
+	function dump (prefix, a, Output)
+		for i, v in pairs (a) do
+			if (type(v) == "table") then
+				if (GetChar(i, 1) ~= ".") then
+					if (v == _G) then
+						LOG(prefix .. i .. " == _G, CYCLE, ignoring");
+					elseif (v == _G.package) then
+						LOG(prefix .. i .. " == _G.package, ignoring");
+					else
+						dump(prefix .. i .. ".", v, Output)
 					end
-				elseif (type(v) == "function") then
-					if (string.sub(i, 1, 2) ~= "__") then
-						table.insert(Output, prefix .. i .. "()");
-					end
+				end
+			elseif (type(v) == "function") then
+				if (string.sub(i, 1, 2) ~= "__") then
+					table.insert(Output, prefix .. i .. "()");
 				end
 			end
 		end
-
-		local Output = {};
-		dump("", _G, Output);
-
-		table.sort(Output);
-		local f = io.open("API.txt", "w");
-		for i, n in ipairs(Output) do
-			f:write(n, "\n");
-		end
-		f:close();
-		LOG("API.txt written.");
 	end
-	
+
+	local Output = {};
+	dump("", _G, Output);
+
+	table.sort(Output);
+	local f = io.open("API.txt", "w");
+	for i, n in ipairs(Output) do
+		f:write(n, "\n");
+	end
+	f:close();
+	LOG("API.txt written.");
+end
+
+
+
+
+
+function TestBlockAreas()
+	LOG("Testing block areas...");
 	
 	-- Debug block area merging:
 	local BA1 = cBlockArea();
@@ -138,7 +163,17 @@ function Initialize(Plugin)
 		BA1:SaveToSchematicFile("schematics/ltm_YZ2.schematic");
 	end
 	
+	LOG("Block areas test ended");
+end
 
+
+	
+
+
+
+function TestSQLiteBindings()
+	LOG("Testing SQLite bindings...");
+	
 	-- Debug SQLite binding
 	local TestDB, ErrCode, ErrMsg = sqlite3.open("test.sqlite");
 	if (TestDB ~= nil) then
@@ -167,9 +202,18 @@ function Initialize(Plugin)
 		-- This happens if for example SQLite cannot open the file (eg. a folder with the same name exists)
 		LOG("SQLite3 failed to open DB! (" .. ErrCode .. ", " .. ErrMsg ..")");
 	end
+	
+	LOG("SQLite bindings test ended");
+end
 
 
-	-- Debug LuaExpat binding:
+
+
+
+function TestExpatBindings()
+	LOG("Testing Expat bindings...");
+	
+	-- Debug LuaExpat bindings:
 	local count = 0
 	callbacks = {
 	    StartElement = function (parser, name)
@@ -189,11 +233,10 @@ function Initialize(Plugin)
 	p:parse("more text");
 	p:parse("</elem1>");
 	p:parse("\n");
-	p:parse()  -- finishes the document
-	p:close()  -- closes the parser
-
-
-	return true
+	p:parse();  -- finishes the document
+	p:close();  -- closes the parser
+	
+	LOG("Expat bindings test ended");
 end
 
 
@@ -350,6 +393,60 @@ function OnChunkGenerated(World, ChunkX, ChunkZ, ChunkDesc)
 
 	ChunkDesc:WriteBlockArea(BlockArea, 5, 115, 5);
 	return false;
+end
+
+
+
+
+
+-- Function "round" copied from http://lua-users.org/wiki/SimpleRound
+function round(num, idp)
+	local mult = 10^(idp or 0)
+	if num >= 0 then return math.floor(num * mult + 0.5) / mult
+	else return math.ceil(num * mult - 0.5) / mult end
+end
+
+
+
+
+
+function HandleListEntitiesCmd(Split, Player)
+	local NumEntities = 0;
+	
+	local ListEntity = function(Entity)
+		if (Entity:IsDestroyed()) then
+			-- The entity has already been destroyed, don't list it
+			return false;
+		end;
+		Player:SendMessage("  " .. Entity:GetUniqueID() .. ": " .. Entity:GetClass() .. "   {" .. round(Entity:GetPosX(), 2) .. ", " .. round(Entity:GetPosY(), 2) .. ", " .. round(Entity:GetPosZ(), 2) .."}");
+		NumEntities = NumEntities + 1;
+	end
+	
+	Player:SendMessage("Listing all entities...");
+	Player:GetWorld():ForEachEntity(ListEntity);
+	Player:SendMessage("List finished, " .. NumEntities .. " entities listed");
+	return true;
+end
+
+
+
+
+
+function HandleKillEntitiesCmd(Split, Player)
+	local NumEntities = 0;
+	
+	local KillEntity = function(Entity)
+		-- kill everything except for players:
+		if (Entity:GetEntityType() ~= cEntity.etPlayer) then
+			Entity:Destroy();
+			NumEntities = NumEntities + 1;
+		end;
+	end
+	
+	Player:SendMessage("Killing all entities...");
+	Player:GetWorld():ForEachEntity(KillEntity);
+	Player:SendMessage("Killed " .. NumEntities .. " entities.");
+	return true;
 end
 
 
