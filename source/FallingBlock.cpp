@@ -49,9 +49,9 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 	
-	int BlockX = (int)m_OriginalPosition.x;
+	int BlockX = m_OriginalPosition.x;
 	int BlockY = (int)(GetPosY() - 0.5);
-	int BlockZ = (int)m_OriginalPosition.z;
+	int BlockZ = m_OriginalPosition.z;
 	
 	if (BlockY < 0)
 	{
@@ -83,6 +83,15 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 	else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
 	{
 		// Fallen onto a solid block
+		/*
+		LOGD(
+			"Sand: Checked below at {%d, %d, %d} (rel {%d, %d, %d}), it's %s, finishing the fall.",
+			BlockX, BlockY, BlockZ,
+			BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width,
+			ItemTypeToString(BlockBelow).c_str()
+		);
+		*/
+
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
 		Destroy();
 		return;

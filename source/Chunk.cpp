@@ -500,7 +500,7 @@ void cChunk::Tick(float a_Dt)
 
 void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 {
-	cChunk * Neighbor = GetNeighborChunk((int)a_Entity->GetPosX(), (int)a_Entity->GetPosZ());
+	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == NULL)
 	{
 		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
@@ -512,6 +512,8 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 		}
 	}
 
+	ASSERT(Neighbor != this);  // Moving into the same chunk? wtf?
+	
 	Neighbor->AddEntity(a_Entity);
 
 	class cMover :
