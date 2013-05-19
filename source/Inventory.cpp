@@ -197,6 +197,8 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 	{
 		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, SlotNumToEntityEquipmentID(a_SlotNum), a_Item, m_Owner.GetClientHandle());
 	}
+	
+	SendSlot(a_SlotNum);
 }
 
 

@@ -460,5 +460,6 @@ function HandleWoolCmd(Split, Player)
 	Player:GetInventory():SetSlot(6, Wool);
 	Player:GetInventory():SetSlot(7, Wool);
 	Player:GetInventory():SetSlot(8, Wool);
+	Player:SendMessage("You have been bluewooled :)");
 	return true;
 end
