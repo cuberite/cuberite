@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/12/13 17:56:56.
+** Generated automatically by tolua++-1.0.92 on 05/19/13 20:19:49.
 */
 
 #ifndef __cplusplus
@@ -8057,20 +8057,20 @@ static int tolua_AllToLua_cPlayer_GetEquippedItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedItem'", NULL);
 #endif
   {
-   cItem& tolua_ret = (cItem&)  self->GetEquippedItem();
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+   const cItem& tolua_ret = (const cItem&)  self->GetEquippedItem();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -12664,7 +12664,7 @@ static int tolua_AllToLua_cInventory_GetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -12672,14 +12672,14 @@ static int tolua_AllToLua_cInventory_GetSlot00(lua_State* tolua_S)
  else
 #endif
  {
-  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  const cInventory* self = (const cInventory*)  tolua_tousertype(tolua_S,1,0);
   int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSlot'", NULL);
 #endif
   {
-   cItem* tolua_ret = (cItem*)  self->GetSlot(a_SlotNum);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+   const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_SlotNum);
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -12691,14 +12691,14 @@ static int tolua_AllToLua_cInventory_GetSlot00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetFromHotBar of class  cInventory */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_GetFromHotBar00
-static int tolua_AllToLua_cInventory_GetFromHotBar00(lua_State* tolua_S)
+/* method: GetHotBarSlot of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_GetHotBarSlot00
+static int tolua_AllToLua_cInventory_GetHotBarSlot00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
@@ -12706,20 +12706,20 @@ static int tolua_AllToLua_cInventory_GetFromHotBar00(lua_State* tolua_S)
  else
 #endif
  {
-  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  const cInventory* self = (const cInventory*)  tolua_tousertype(tolua_S,1,0);
   int a_HotBarSlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFromHotBar'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHotBarSlot'", NULL);
 #endif
   {
-   cItem* tolua_ret = (cItem*)  self->GetFromHotBar(a_HotBarSlotNum);
-    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+   const cItem& tolua_ret = (const cItem&)  self->GetHotBarSlot(a_HotBarSlotNum);
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetFromHotBar'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetHotBarSlot'.",&tolua_err);
  return 0;
 #endif
 }
@@ -12732,20 +12732,20 @@ static int tolua_AllToLua_cInventory_GetEquippedItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  const cInventory* self = (const cInventory*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedItem'", NULL);
 #endif
   {
-   cItem& tolua_ret = (cItem&)  self->GetEquippedItem();
-    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+   const cItem& tolua_ret = (const cItem&)  self->GetEquippedItem();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -12757,9 +12757,79 @@ static int tolua_AllToLua_cInventory_GetEquippedItem00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetEquippedSlot of class  cInventory */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_SetEquippedSlot00
-static int tolua_AllToLua_cInventory_SetEquippedSlot00(lua_State* tolua_S)
+/* method: SetSlot of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_SetSlot00
+static int tolua_AllToLua_cInventory_SetSlot00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
+#endif
+  {
+   self->SetSlot(a_SlotNum,*a_Item);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSlot'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetHotBarSlot of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_SetHotBarSlot00
+static int tolua_AllToLua_cInventory_SetHotBarSlot00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  int a_HotBarSlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetHotBarSlot'", NULL);
+#endif
+  {
+   self->SetHotBarSlot(a_HotBarSlotNum,*a_Item);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetHotBarSlot'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetEquippedSlotNum of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_SetEquippedSlotNum00
+static int tolua_AllToLua_cInventory_SetEquippedSlotNum00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12775,24 +12845,24 @@ static int tolua_AllToLua_cInventory_SetEquippedSlot00(lua_State* tolua_S)
   cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
   int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetEquippedSlot'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetEquippedSlotNum'", NULL);
 #endif
   {
-   self->SetEquippedSlot(a_SlotNum);
+   self->SetEquippedSlotNum(a_SlotNum);
   }
  }
  return 0;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetEquippedSlot'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'SetEquippedSlotNum'.",&tolua_err);
  return 0;
 #endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetEquippedSlot of class  cInventory */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_GetEquippedSlot00
-static int tolua_AllToLua_cInventory_GetEquippedSlot00(lua_State* tolua_S)
+/* method: GetEquippedSlotNum of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_GetEquippedSlotNum00
+static int tolua_AllToLua_cInventory_GetEquippedSlotNum00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12806,17 +12876,87 @@ static int tolua_AllToLua_cInventory_GetEquippedSlot00(lua_State* tolua_S)
  {
   cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedSlot'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedSlotNum'", NULL);
 #endif
   {
-   short tolua_ret = (short)  self->GetEquippedSlot();
+   int tolua_ret = (int)  self->GetEquippedSlotNum();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEquippedSlot'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'GetEquippedSlotNum'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cInventory::DamageItem of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_cInventory__DamageItem00
+static int tolua_AllToLua_cInventory_cInventory__DamageItem00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+  short a_Amount = ((short)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cInventory::DamageItem'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->cInventory::DamageItem(a_SlotNum,a_Amount);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cInventory__DamageItem'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: DamageEquippedItem of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_DamageEquippedItem00
+static int tolua_AllToLua_cInventory_DamageEquippedItem00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  short a_Amount = ((short)  tolua_tonumber(tolua_S,2,1));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DamageEquippedItem'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->DamageEquippedItem(a_Amount);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DamageEquippedItem'.",&tolua_err);
  return 0;
 #endif
 }
@@ -13296,18 +13436,20 @@ static int tolua_AllToLua_cItem_DamageItem00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
+  short a_Amount = ((short)  tolua_tonumber(tolua_S,2,1));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DamageItem'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->DamageItem();
+   bool tolua_ret = (bool)  self->DamageItem(a_Amount);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -25037,10 +25179,14 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"AddItemAnyAmount",tolua_AllToLua_cInventory_AddItemAnyAmount00);
    tolua_function(tolua_S,"RemoveItem",tolua_AllToLua_cInventory_RemoveItem00);
    tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cInventory_GetSlot00);
-   tolua_function(tolua_S,"GetFromHotBar",tolua_AllToLua_cInventory_GetFromHotBar00);
+   tolua_function(tolua_S,"GetHotBarSlot",tolua_AllToLua_cInventory_GetHotBarSlot00);
    tolua_function(tolua_S,"GetEquippedItem",tolua_AllToLua_cInventory_GetEquippedItem00);
-   tolua_function(tolua_S,"SetEquippedSlot",tolua_AllToLua_cInventory_SetEquippedSlot00);
-   tolua_function(tolua_S,"GetEquippedSlot",tolua_AllToLua_cInventory_GetEquippedSlot00);
+   tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cInventory_SetSlot00);
+   tolua_function(tolua_S,"SetHotBarSlot",tolua_AllToLua_cInventory_SetHotBarSlot00);
+   tolua_function(tolua_S,"SetEquippedSlotNum",tolua_AllToLua_cInventory_SetEquippedSlotNum00);
+   tolua_function(tolua_S,"GetEquippedSlotNum",tolua_AllToLua_cInventory_GetEquippedSlotNum00);
+   tolua_function(tolua_S,"cInventory__DamageItem",tolua_AllToLua_cInventory_cInventory__DamageItem00);
+   tolua_function(tolua_S,"DamageEquippedItem",tolua_AllToLua_cInventory_DamageEquippedItem00);
    tolua_function(tolua_S,"GetEquippedHelmet",tolua_AllToLua_cInventory_GetEquippedHelmet00);
    tolua_function(tolua_S,"GetEquippedChestplate",tolua_AllToLua_cInventory_GetEquippedChestplate00);
    tolua_function(tolua_S,"GetEquippedLeggings",tolua_AllToLua_cInventory_GetEquippedLeggings00);

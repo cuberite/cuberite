@@ -22,13 +22,13 @@ public:
 	cItemHandler(int a_ItemType);
 	
 	/// Called when the player tries to use the item. Return false to make the item unusable. DEFAULT: False
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, cItem *a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);	//eg for fishing or hoes
+	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);	//eg for fishing or hoes
 	
 	/// Called while the player diggs a block using this item
-	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
+	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace);
 	
 	/// Called when the player destroys a block using this item. This also calls the drop function for the destroyed block
-	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, cItem *a_Item, int a_X, int a_Y, int a_Z);
+	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_X, int a_Y, int a_Z);
 	
 	/// Called after the player has eaten this item.
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);

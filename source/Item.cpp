@@ -58,7 +58,7 @@ short cItem::GetMaxDamage(void) const
 
 
 
-bool cItem::DamageItem(void)
+bool cItem::DamageItem(short a_Amount)
 {
 	short MaxDamage = GetMaxDamage();
 	if (MaxDamage == 0)
@@ -67,7 +67,7 @@ bool cItem::DamageItem(void)
 		return false;
 	}
 
-	m_ItemDamage++;
+	m_ItemDamage += a_Amount;
 	return (m_ItemDamage >= MaxDamage);
 }
 

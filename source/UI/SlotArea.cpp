@@ -614,7 +614,7 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, cPlayer & a_Player)
 {
 	// a_SlotNum ranges from 0 to 35, map that to the player's inventory slots 9 to 44
-	return a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset);
+	return &a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset);
 }
 
 
@@ -623,7 +623,7 @@ const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, cPlayer & a_Player)
 
 void cSlotAreaInventoryBase::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	*(a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset)) = a_Item;
+	a_Player.GetInventory().SetSlot(a_SlotNum + m_SlotOffset, a_Item);
 }
 
 

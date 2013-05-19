@@ -149,6 +149,10 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 		a_Client.SendPlayerSpawn(*this);
 		a_Client.SendEntHeadLook(*this);
 		a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
+		a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
+		a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
+		a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
+		a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
 	}
 }
 
@@ -356,16 +360,16 @@ void cPlayer::KilledBy(cPawn * a_Killer)
 	m_bVisible = false; // So new clients don't see the player
 
 	// Puke out all the items
-	cItem * Items = m_Inventory.GetSlots();
+	const cItem * Items = m_Inventory.GetSlots();
 	cItems Pickups;
 	for (unsigned int i = 1; i < m_Inventory.c_NumSlots; ++i)
 	{
-		if( !Items[i].IsEmpty() )
+		if (!Items[i].IsEmpty())
 		{
 			Pickups.push_back(Items[i]);
 		}
-		Items[i].Empty();
 	}
+	m_Inventory.Clear();
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk(); // Save it, yeah the world is a tough place !
 }
@@ -793,7 +797,7 @@ void cPlayer::TossItem(
 		else
 		{
 			// Else drop equipped item
-			cItem DroppedItem = GetInventory().GetEquippedItem();
+			cItem DroppedItem(GetInventory().GetEquippedItem());
 			if (!DroppedItem.IsEmpty())
 			{
 				DroppedItem.m_ItemCount = 1;
@@ -1026,14 +1030,12 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 void cPlayer::UseEquippedItem()
 {
-	if(GetGameMode() != 1)		//No damage in creative
+	if (GetGameMode() == gmCreative)  // No damage in creative
 	{
-		if (GetInventory().GetEquippedItem().DamageItem()) 
-		{
-			LOG("Player %s Broke ID: %i", GetClientHandle()->GetUsername().c_str(), GetInventory().GetEquippedItem().m_ItemType);
-			GetInventory().RemoveItem( GetInventory().GetEquippedItem());
-		}
+		return;
 	}
+	
+	GetInventory().DamageEquippedItem();
 }
 
 

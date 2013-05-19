@@ -27,8 +27,8 @@ public:
 
 	void Clear();										// tolua_export
 
-	cItem* GetSlotsForType( int a_Type );
-	int GetSlotCountForType( int a_Type );
+	// cItem * GetSlotsForType( int a_Type );
+	// int GetSlotCountForType( int a_Type );
 
 	bool AddItem( cItem & a_Item );						// tolua_export
 	bool AddItemAnyAmount( cItem & a_Item );			// tolua_export
@@ -39,21 +39,30 @@ public:
 
 	void SendWholeInventory(cClientHandle & a_Client);
 
-	cItem *       GetSlot(int a_SlotNum );					// tolua_export
-	cItem *       GetSlots(void)       { return m_Slots; }
 	const cItem * GetSlots(void) const { return m_Slots; }
-	cItem *       GetFromHotBar(int a_HotBarSlotNum);				// tolua_export
 
-	cItem &       GetEquippedItem(void);							// tolua_export
-	const cItem & GetEquippedItem(void) const;
-	void          SetEquippedSlot(int a_SlotNum);				// tolua_export
-	short         GetEquippedSlot(void) { return m_EquippedSlot; }	// tolua_export
-	
 	// tolua_begin
+	
+	const cItem & GetSlot(int a_SlotNum) const;
+	const cItem & GetHotBarSlot(int a_HotBarSlotNum) const;
+	const cItem & GetEquippedItem(void) const;
+	void          SetSlot(int a_SlotNum, const cItem & a_Item);
+	void          SetHotBarSlot(int a_HotBarSlotNum, const cItem & a_Item);
+	
+	void          SetEquippedSlotNum(int a_SlotNum);
+	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
+	
+	/// Adds the specified damage to the specified item; deletes the item and returns true if the item broke.
+	bool cInventory::DamageItem(int a_SlotNum, short a_Amount);
+
+	/// Adds the specified damage to the currently held item; deletes the item and returns true if the item broke.
+	bool DamageEquippedItem(short a_Amount = 1);
+	
 	const cItem & GetEquippedHelmet    (void) const { return m_Slots[c_ArmorOffset]; }
 	const cItem & GetEquippedChestplate(void) const { return m_Slots[c_ArmorOffset + 1]; }
 	const cItem & GetEquippedLeggings  (void) const { return m_Slots[c_ArmorOffset + 2]; }
 	const cItem & GetEquippedBoots     (void) const { return m_Slots[c_ArmorOffset + 3]; }
+
 	// tolua_end
 
 	void SendSlot( int a_SlotNum );						// tolua_export
@@ -74,6 +83,9 @@ public:
 	static const unsigned int c_ArmorOffset = 5;
 	static const unsigned int c_MainOffset = 9;
 	static const unsigned int c_HotOffset = 36;
+	
+	/// Converts a slot number into the ID for the EntityEquipment packet
+	static int SlotNumToEntityEquipmentID(short a_SlotNum);
 
 protected:
 	bool AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode = 0 );
@@ -85,8 +97,7 @@ protected:
 	cItem * m_ArmorSlots;
 	cItem * m_HotSlots;
 
-	cItem * m_EquippedItem;
-	short m_EquippedSlot;
+	int m_EquippedSlotNum;
 
 	cPlayer & m_Owner;
 };	// tolua_export

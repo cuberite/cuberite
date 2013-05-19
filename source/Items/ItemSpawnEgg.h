@@ -19,7 +19,7 @@ public:
 	}
 
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
 	{
 		if (a_BlockFace < 0)
 		{
@@ -33,12 +33,13 @@ public:
 			a_BlockY--;
 		}
 
-		if (a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, a_Item->m_ItemDamage) >= 0)
+		if (a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, a_Item.m_ItemDamage) >= 0)
 		{
 			if (a_Player->GetGameMode() != 1)
 			{
 				// The mob was spawned, "use" the item:
-				a_Player->GetInventory().RemoveItem(a_Player->GetInventory().GetEquippedItem());
+				cItem Equipped(a_Player->GetEquippedItem());
+				a_Player->GetInventory().RemoveItem(Equipped);
 			}
 			return true;
 		}

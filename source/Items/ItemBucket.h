@@ -20,7 +20,7 @@ public:
 
 	}
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir) override
 	{
 		switch (m_ItemType)
 		{
@@ -37,7 +37,7 @@ public:
 	
 	
 	
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
 		if (a_BlockFace < 0)
 		{
@@ -54,7 +54,7 @@ public:
 			return false;
 		}
 		
-		if (a_Player->GetGameMode() == eGameMode_Creative)
+		if (a_Player->GetGameMode() == gmCreative)
 		{
 			// In creative mode don't modify the inventory, just remove the fluid:
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
@@ -81,7 +81,7 @@ public:
 		}
 		
 		// Remove the bucket from the inventory
-		cItem Item(a_Item->m_ItemType, 1);
+		cItem Item(a_Item.m_ItemType, 1);
 		if (!a_Player->GetInventory().RemoveItem(Item))
 		{
 			LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
@@ -100,7 +100,7 @@ public:
 	}
 
 
-	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_FluidBlock)
+	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_FluidBlock)
 	{			
 		if (a_BlockFace < 0)
 		{
@@ -128,10 +128,10 @@ public:
 			return false;
 		}
 		
-		if (a_Player->GetGameMode() != eGameMode_Creative)
+		if (a_Player->GetGameMode() != gmCreative)
 		{
 			// Remove fluid bucket, add empty bucket:
-			cItem Item(a_Item->m_ItemType, 1);
+			cItem Item(a_Item.m_ItemType, 1);
 			if (!a_Player->GetInventory().RemoveItem(Item))
 			{
 				LOG("Clicked with a full bucket, but cannot remove one from the inventory? WTF?");

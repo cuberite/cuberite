@@ -69,7 +69,7 @@ public:
 	short GetMaxDamage(void) const;
 	
 	/// Damages a weapon / tool. Returns true when damage reaches max value and the item should be destroyed
-	bool DamageItem(void);
+	bool DamageItem(short a_Amount = 1);
 
 	inline bool IsDamageable(void) const { return (GetMaxDamage() > 0); }
 	

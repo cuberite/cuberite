@@ -67,8 +67,7 @@ public:
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 	
-	inline cItem &       GetEquippedItem(void)       { return GetInventory().GetEquippedItem(); }  // tolua_export
-	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }
+	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
 	virtual void TeleportTo(double a_PosX, double a_PosY, double a_PosZ) override;
 

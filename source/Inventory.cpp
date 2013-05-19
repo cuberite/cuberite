@@ -7,10 +7,26 @@
 #include "UI/Window.h"
 #include "Item.h"
 #include "Root.h"
+#include "World.h"
 
 #include <json/json.h>
 
 #include "Items/ItemHandler.h"
+
+
+
+
+
+cInventory::cInventory(cPlayer & a_Owner) :
+	m_Owner(a_Owner)
+{
+	m_CraftSlots = m_Slots + c_CraftOffset;
+	m_ArmorSlots = m_Slots + c_ArmorOffset;
+	m_MainSlots  = m_Slots + c_MainOffset;
+	m_HotSlots   = m_Slots + c_HotOffset;
+
+	SetEquippedSlotNum(0);
+}
 
 
 
@@ -27,26 +43,6 @@ cInventory::~cInventory()
 	}
 	CloseWindow();
 	*/
-}
-
-
-
-
-
-cInventory::cInventory(cPlayer & a_Owner) :
-	m_Owner(a_Owner)
-{
-	for (unsigned int i = 0; i < c_NumSlots; i++)
-	{
-		m_Slots[i].Empty();
-	}
-
-	m_CraftSlots = m_Slots + c_CraftOffset;
-	m_ArmorSlots = m_Slots + c_ArmorOffset;
-	m_MainSlots  = m_Slots + c_MainOffset;
-	m_HotSlots   = m_Slots + c_HotOffset;
-
-	SetEquippedSlot(0);
 }
 
 
@@ -120,25 +116,25 @@ bool cInventory::AddItemAnyAmount( cItem & a_Item )
 
 
 // TODO: Right now if you dont have enough items, the items you did have are removed, and the function returns false anyway
-bool cInventory::RemoveItem( cItem & a_Item )
+bool cInventory::RemoveItem(cItem & a_Item)
 {
 	// First check equipped slot
-	if ((m_EquippedSlot >= 0) && (m_EquippedSlot < 9))
+	if ((m_EquippedSlotNum >= 0) && (m_EquippedSlotNum < 9))
 	{
-		if (m_HotSlots[m_EquippedSlot].m_ItemType == a_Item.m_ItemType)
+		if (m_HotSlots[m_EquippedSlotNum].m_ItemType == a_Item.m_ItemType)
 		{
-			cItem & Item = m_HotSlots[m_EquippedSlot];
-			if(Item.m_ItemCount > a_Item.m_ItemCount)
+			cItem & Item = m_HotSlots[m_EquippedSlotNum];
+			if (Item.m_ItemCount > a_Item.m_ItemCount)
 			{
 				Item.m_ItemCount -= a_Item.m_ItemCount;
-				SendSlot( m_EquippedSlot + c_HotOffset );
+				SendSlot(m_EquippedSlotNum + c_HotOffset);
 				return true;
 			}
-			else if(Item.m_ItemCount > 0 )
+			else if (Item.m_ItemCount > 0)
 			{
 				a_Item.m_ItemCount -= Item.m_ItemCount;
 				Item.Empty();
-				SendSlot( m_EquippedSlot + c_HotOffset );
+				SendSlot(m_EquippedSlotNum + c_HotOffset);
 			}
 		}
 	}
@@ -146,22 +142,22 @@ bool cInventory::RemoveItem( cItem & a_Item )
 	// Then check other slotz
 	if (a_Item.m_ItemCount > 0)
 	{
-		for(int i = 0; i < 36; i++)
+		for (int i = 0; i < c_MainSlots; i++)
 		{
 			cItem & Item = m_MainSlots[i];
-			if( Item.m_ItemType == a_Item.m_ItemType )
+			if (Item.m_ItemType == a_Item.m_ItemType)
 			{
-				if(Item.m_ItemCount > a_Item.m_ItemCount)
+				if (Item.m_ItemCount > a_Item.m_ItemCount)
 				{
 					Item.m_ItemCount -= a_Item.m_ItemCount;
-					SendSlot( i + c_MainOffset );
+					SendSlot(i + c_MainOffset);
 					return true;
 				}
-				else if(Item.m_ItemCount > 0 )
+				else if (Item.m_ItemCount > 0)
 				{
 					a_Item.m_ItemCount -= Item.m_ItemCount;
 					Item.Empty();
-					SendSlot( i + c_MainOffset );
+					SendSlot(i + c_MainOffset);
 				}
 			}
 		}
@@ -176,104 +172,69 @@ bool cInventory::RemoveItem( cItem & a_Item )
 
 void cInventory::Clear()
 {
-	for(unsigned int i = 0; i < c_NumSlots; i++)
+	for (unsigned int i = 0; i < ARRAYCOUNT(m_Slots); i++)
+	{
 		m_Slots[i].Empty();
-}
-
-
-
-
-
-cItem * cInventory::GetSlotsForType( int a_Type )
-{
-	switch( a_Type )
-	{
-	case -1:
-		return m_MainSlots;
-	case -2:
-		return m_CraftSlots;
-	case -3:
-		return m_ArmorSlots;
 	}
-	return 0;
+	// TODO: Broadcast / send the changes to wherever needed
 }
 
 
 
 
 
-/*
-int cInventory::GetSlotCountForType( int a_Type )
+void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 {
-	switch (a_Type)
+	if ((a_SlotNum < 0) || (a_SlotNum >= ARRAYCOUNT(m_Slots)))
 	{
-		case -1:
-			return 36;
-		case -2:
-		case -3:
-			return 4;
+		LOGWARNING("%s requesting an invalid slot index: %d out of %d. Ignoring.", __FUNCTION__, a_SlotNum, ARRAYCOUNT(m_Slots));
+		return;
 	}
-	return 0;
-}
-*/
-
-
-
-
-
-cItem* cInventory::GetSlot( int a_SlotNum )
-{
-	if( a_SlotNum < 0 || a_SlotNum >= (short)c_NumSlots ) return 0;
-	return &m_Slots[a_SlotNum];
-}
-
-
-
-
-
-cItem* cInventory::GetFromHotBar( int a_SlotNum )
-{
-	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
+	m_Slots[a_SlotNum] = a_Item;
+	
+	// If an armor slot was touched, broadcast an EntityEquipment packet
+	if ((a_SlotNum >= c_ArmorOffset) && (a_SlotNum < c_MainOffset))
 	{
-		return NULL;
+		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, SlotNumToEntityEquipmentID(a_SlotNum), a_Item, m_Owner.GetClientHandle());
 	}
-	return &m_HotSlots[a_SlotNum];
 }
 
 
 
 
 
-void cInventory::SetEquippedSlot(int a_SlotNum)
+void cInventory::SetHotBarSlot(int a_HotBarSlotNum, const cItem & a_Item)
+{
+	SetSlot(a_HotBarSlotNum + c_HotSlots, a_Item);
+}
+
+
+
+
+
+const cItem & cInventory::GetSlot(int a_SlotNum) const
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= ARRAYCOUNT(m_Slots)))
+	{
+		LOGWARNING("%s requesting an invalid slot index: %d out of %d. Returning the first one instead.", __FUNCTION__, a_SlotNum, ARRAYCOUNT(m_Slots));
+		return m_Slots[0];
+	}
+	
+	return m_Slots[a_SlotNum];
+}
+
+
+
+
+
+const cItem & cInventory::GetHotBarSlot(int a_SlotNum) const
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
 	{
-		m_EquippedSlot = 0;
+		LOGWARNING("%s requesting an invalid slot index: %d out of 9. Returning the first one instead", __FUNCTION__, a_SlotNum);
+		return m_HotSlots[0];
 	}
-	else
-	{
-		m_EquippedSlot = (short)a_SlotNum;
-	}
-	m_EquippedItem = GetFromHotBar(m_EquippedSlot);
-}
-
-
-
-
-
-cItem & cInventory::GetEquippedItem(void)
-{
-	cItem* Item = GetFromHotBar( m_EquippedSlot );
-	if( Item )
-	{
-		*m_EquippedItem = *Item;
-		return *Item;
-	}
-	else
-	{
-		m_EquippedItem->Empty();
-	}
-	return *m_EquippedItem;
+	return m_HotSlots[a_SlotNum];
 }
 
 
@@ -282,7 +243,58 @@ cItem & cInventory::GetEquippedItem(void)
 
 const cItem & cInventory::GetEquippedItem(void) const
 {
-	return *m_EquippedItem;
+	return GetHotBarSlot(m_EquippedSlotNum);
+}
+
+
+
+
+
+void cInventory::SetEquippedSlotNum(int a_SlotNum)
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
+	{
+		LOGWARNING("%s requesting invalid slot index: %d out of 9. Setting 0 instead.", __FUNCTION__, a_SlotNum);
+		m_EquippedSlotNum = 0;
+	}
+	else
+	{
+		m_EquippedSlotNum = (short)a_SlotNum;
+	}
+}
+
+
+
+
+
+bool cInventory::DamageEquippedItem(short a_Amount)
+{
+	return DamageItem(c_HotOffset + m_EquippedSlotNum, a_Amount);
+}
+
+
+
+
+
+bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= ARRAYCOUNT(m_Slots)))
+	{
+		LOGWARNING("%s requesting an invalid slot index: %d out of %d", __FUNCTION__, a_SlotNum, ARRAYCOUNT(m_Slots));
+		return false;
+	}
+	
+	if (!m_Slots[a_SlotNum].DamageItem(a_Amount))
+	{
+		return false;
+	}
+	
+	// The item has broken, remove it:
+	m_Slots[a_SlotNum].Empty();
+	SendSlot(a_SlotNum);
+	
+	// TODO: If it was a special slot (armor / equipped), broadcast the change
+	return true;
 }
 
 
@@ -300,16 +312,13 @@ void cInventory::SendWholeInventory(cClientHandle & a_Client)
 
 void cInventory::SendSlot(int a_SlotNum)
 {
-	cItem * Item = GetSlot(a_SlotNum);
-	if (Item != NULL)
+	cItem Item(GetSlot(a_SlotNum));
+	if (Item.IsEmpty())
 	{
-		if (Item->IsEmpty())
-		{
-			// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
-			Item->Empty();
-		}
-		m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum, *Item);
+		// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
+		Item.Empty();
 	}
+	m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum, Item);
 }
 
 
@@ -366,6 +375,23 @@ int cInventory::MoveItem(short a_ItemType, short a_ItemDamage, int a_Count, int 
 	}  // for i - m_Slots[]
 	// No more space to distribute to
 	return res;
+}
+
+
+
+
+
+int cInventory::SlotNumToEntityEquipmentID(short a_SlotNum)
+{
+	switch (a_SlotNum)
+	{
+		case 5: return 4;  // Helmet
+		case 6: return 3;  // Chestplate
+		case 7: return 2;  // Leggings
+		case 8: return 1;  // Boots
+	}
+	LOGWARN("%s: invalid slot number: %d", __FUNCTION__, a_SlotNum);
+	return 0;
 }
 
 
@@ -442,13 +468,14 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
 	int SlotIdx = 0;
 	
-	// TODO: Limit the number of slots written to the actual number of slots, 
-	// otherwise an invalid json will crash the server!
-	
 	for( Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr )
 	{
 		m_Slots[SlotIdx].FromJson( *itr );
 		SlotIdx++;
+		if (SlotIdx >= ARRAYCOUNT(m_Slots))
+		{
+			break;
+		}
 	}
 	return true;
 }

@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace) override
 	{
 		if (a_BlockFace < 0)
 		{
@@ -29,7 +29,7 @@ public:
 
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);	//0 -> new fire TODO: Make Firesimulator use this
+		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);	//0 -> new fire
 
 		return false;
 	}

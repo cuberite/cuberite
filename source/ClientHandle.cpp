@@ -641,7 +641,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	Handler->OnDigging(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-	ItemHandler->OnDiggingBlock(World, m_Player, &m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
 	// Check for clickthrough-blocks:
 	if (a_BlockFace != BLOCK_FACE_NONE)
@@ -701,7 +701,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	ItemHandler->OnBlockDestroyed(World, m_Player, &m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
+	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	
 	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(2001, a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, a_OldBlock, this);
@@ -738,7 +738,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		return;
 	}
 	
-	cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
+	const cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
 
 	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType) && (a_HeldItem.m_ItemType != -1))
 	{
@@ -802,7 +802,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 			// A plugin doesn't agree with using the item, abort
 			return;
 		}
-		ItemHandler->OnItemUse(World, m_Player, &Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		ItemHandler->OnItemUse(World, m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 	}
 }
@@ -993,7 +993,7 @@ void cClientHandle::HandleAnimation(char a_Animation)
 
 void cClientHandle::HandleSlotSelected(short a_SlotNum)
 {
-	m_Player->GetInventory().SetEquippedSlot(a_SlotNum);
+	m_Player->GetInventory().SetEquippedSlotNum(a_SlotNum);
 	m_Player->GetWorld()->BroadcastEntityEquipment(*m_Player, 0, m_Player->GetInventory().GetEquippedItem(), this);
 }
 

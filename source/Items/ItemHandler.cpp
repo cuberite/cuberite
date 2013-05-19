@@ -214,7 +214,7 @@ cItemHandler::cItemHandler(int a_ItemType)
 
 
 
-bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
 {
 	return false;
 }
@@ -223,7 +223,7 @@ bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, cItem * a_Ite
 
 
 
-bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
+bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir)
 {
 	return false;
 }
@@ -232,12 +232,12 @@ bool cItemHandler::OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, cItem * 
 
 
 
-void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, cItem * a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(Block);
 
-	if (a_Player->GetGameMode() == eGameMode_Survival)
+	if (a_Player->GetGameMode() == gmSurvival)
 	{
 		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
 		{
