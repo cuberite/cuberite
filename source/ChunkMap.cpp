@@ -1423,7 +1423,7 @@ bool cChunkMap::ForEachEntity(cEntityCallback & a_Callback)
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
-		if ((*itr)->ForEachEntity(a_Callback))
+		if (!(*itr)->ForEachEntity(a_Callback))
 		{
 			return false;
 		}
