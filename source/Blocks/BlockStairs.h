@@ -38,7 +38,7 @@ public:
 			case BLOCK_FACE_WEST:
 			{
 				// When placing onto a sideways face, check cursor, if in top half, make it an upside-down stairs block
-				if (a_CursorY < 8)
+				if (a_CursorY > 8)
 				{
 					a_BlockMeta |= 0x4;
 				}
