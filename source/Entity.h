@@ -106,26 +106,29 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	double           GetHeadYaw   (void) const {return m_HeadYaw; }
-	double           GetMass      (void) const {return m_Mass; }
-	const Vector3d & GetPosition  (void) const {return m_Pos; }
-	double           GetPosX      (void) const {return m_Pos.x; }
-	double           GetPosY      (void) const {return m_Pos.y; }
-	double           GetPosZ      (void) const {return m_Pos.z; }
-	const Vector3d & GetRot       (void) const {return m_Rot; }
-	double           GetRotation  (void) const {return m_Rot.x; }
-	double           GetPitch     (void) const {return m_Rot.y; }
-	double           GetRoll      (void) const {return m_Rot.z; }
+	double           GetHeadYaw   (void) const { return m_HeadYaw; }
+	double           GetHeight    (void) const { return m_Height;  }
+	double           GetMass      (void) const { return m_Mass;    }
+	const Vector3d & GetPosition  (void) const { return m_Pos;     }
+	double           GetPosX      (void) const { return m_Pos.x;   }
+	double           GetPosY      (void) const { return m_Pos.y;   }
+	double           GetPosZ      (void) const { return m_Pos.z;   }
+	const Vector3d & GetRot       (void) const { return m_Rot;     }
+	double           GetRotation  (void) const { return m_Rot.x;   }
+	double           GetPitch     (void) const { return m_Rot.y;   }
+	double           GetRoll      (void) const { return m_Rot.z;   }
 	Vector3d         GetLookVector(void) const;
-	const Vector3d & GetSpeed     (void) const { return m_Speed; }
+	const Vector3d & GetSpeed     (void) const { return m_Speed;   }
 	double           GetSpeedX    (void) const { return m_Speed.x; }
 	double           GetSpeedY    (void) const { return m_Speed.y; }
 	double           GetSpeedZ    (void) const { return m_Speed.z; }
+	double           GetWidth     (void) const { return m_Width;   }
 	
 	int GetChunkX(void) const {return (int)floor(m_Pos.x / cChunkDef::Width); }
 	int GetChunkZ(void) const {return (int)floor(m_Pos.z / cChunkDef::Width); }
 
 	void SetHeadYaw (double a_HeadYaw);
+	void SetHeight  (double a_Height);
 	void SetMass    (double a_Mass);
 	void SetPosX    (double a_PosX);
 	void SetPosY    (double a_PosY);
@@ -141,6 +144,7 @@ public:
 	void SetSpeedX  (double a_SpeedX);
 	void SetSpeedY  (double a_SpeedY);
 	void SetSpeedZ  (double a_SpeedZ);
+	void SetWidth   (double a_Width);
 	
 	void AddPosX    (double a_AddPosX);
 	void AddPosY    (double a_AddPosY);
@@ -261,6 +265,10 @@ private:
 	Vector3d m_WaterSpeed;
 	//Measured in Kilograms (Kg)
 	double m_Mass;
+	//It's Width.
+	double m_Width;
+	//It's height
+	double m_Height;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;
