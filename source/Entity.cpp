@@ -498,8 +498,6 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 
 
-//////////////////////////////////////////////////////////////////////////
-// Set orientations
 void cEntity::SetRot(const Vector3f & a_Rot)
 {
 	m_Rot = a_Rot;
@@ -515,6 +513,15 @@ void cEntity::SetHeadYaw(double a_HeadYaw)
 	m_HeadYaw = a_HeadYaw;
 	m_bDirtyHead = true;
 	WrapHeadYaw();
+}
+
+
+
+
+
+void cEntity::SetHeight(double a_Height)
+{
+	m_Height = a_Height;
 }
 
 
@@ -608,6 +615,16 @@ void cEntity::SetSpeedZ(double a_SpeedZ)
 	m_bDirtySpeed = true;
 	WrapSpeed();
 }
+
+
+
+
+
+void cEntity::SetWidth(double a_Width)
+{
+	m_Width = a_Width;
+}
+
 
 
 

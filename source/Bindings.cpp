@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/19/13 20:19:49.
+** Generated automatically by tolua++-1.0.92 on 05/21/13 14:54:10.
 */
 
 #ifndef __cplusplus
@@ -4295,6 +4295,38 @@ static int tolua_AllToLua_cEntity_GetHeadYaw00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetHeight of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetHeight00
+static int tolua_AllToLua_cEntity_GetHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHeight'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetHeight();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetHeight'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetMass of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetMass00
 static int tolua_AllToLua_cEntity_GetMass00(lua_State* tolua_S)
@@ -4753,6 +4785,38 @@ static int tolua_AllToLua_cEntity_GetSpeedZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetWidth of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetWidth00
+static int tolua_AllToLua_cEntity_GetWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWidth'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetWidth();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWidth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetChunkX of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetChunkX00
 static int tolua_AllToLua_cEntity_GetChunkX00(lua_State* tolua_S)
@@ -4845,6 +4909,39 @@ static int tolua_AllToLua_cEntity_SetHeadYaw00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetHeadYaw'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetHeight of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetHeight00
+static int tolua_AllToLua_cEntity_SetHeight00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_Height = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetHeight'", NULL);
+#endif
+  {
+   self->SetHeight(a_Height);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetHeight'.",&tolua_err);
  return 0;
 #endif
 }
@@ -5338,6 +5435,39 @@ static int tolua_AllToLua_cEntity_SetSpeedZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetSpeedZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetWidth of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetWidth00
+static int tolua_AllToLua_cEntity_SetWidth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_Width = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWidth'", NULL);
+#endif
+  {
+   self->SetWidth(a_Width);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetWidth'.",&tolua_err);
  return 0;
 #endif
 }
@@ -12892,9 +13022,9 @@ static int tolua_AllToLua_cInventory_GetEquippedSlotNum00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: cInventory::DamageItem of class  cInventory */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_cInventory__DamageItem00
-static int tolua_AllToLua_cInventory_cInventory__DamageItem00(lua_State* tolua_S)
+/* method: DamageItem of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_DamageItem00
+static int tolua_AllToLua_cInventory_DamageItem00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -12912,17 +13042,17 @@ static int tolua_AllToLua_cInventory_cInventory__DamageItem00(lua_State* tolua_S
   int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
   short a_Amount = ((short)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cInventory::DamageItem'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DamageItem'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->cInventory::DamageItem(a_SlotNum,a_Amount);
+   bool tolua_ret = (bool)  self->DamageItem(a_SlotNum,a_Amount);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cInventory__DamageItem'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'DamageItem'.",&tolua_err);
  return 0;
 #endif
 }
@@ -24843,6 +24973,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetParentClass",tolua_AllToLua_cEntity_GetParentClass00);
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cEntity_GetWorld00);
    tolua_function(tolua_S,"GetHeadYaw",tolua_AllToLua_cEntity_GetHeadYaw00);
+   tolua_function(tolua_S,"GetHeight",tolua_AllToLua_cEntity_GetHeight00);
    tolua_function(tolua_S,"GetMass",tolua_AllToLua_cEntity_GetMass00);
    tolua_function(tolua_S,"GetPosition",tolua_AllToLua_cEntity_GetPosition00);
    tolua_function(tolua_S,"GetPosX",tolua_AllToLua_cEntity_GetPosX00);
@@ -24857,9 +24988,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpeedX",tolua_AllToLua_cEntity_GetSpeedX00);
    tolua_function(tolua_S,"GetSpeedY",tolua_AllToLua_cEntity_GetSpeedY00);
    tolua_function(tolua_S,"GetSpeedZ",tolua_AllToLua_cEntity_GetSpeedZ00);
+   tolua_function(tolua_S,"GetWidth",tolua_AllToLua_cEntity_GetWidth00);
    tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cEntity_GetChunkX00);
    tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cEntity_GetChunkZ00);
    tolua_function(tolua_S,"SetHeadYaw",tolua_AllToLua_cEntity_SetHeadYaw00);
+   tolua_function(tolua_S,"SetHeight",tolua_AllToLua_cEntity_SetHeight00);
    tolua_function(tolua_S,"SetMass",tolua_AllToLua_cEntity_SetMass00);
    tolua_function(tolua_S,"SetPosX",tolua_AllToLua_cEntity_SetPosX00);
    tolua_function(tolua_S,"SetPosY",tolua_AllToLua_cEntity_SetPosY00);
@@ -24875,6 +25008,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetSpeedX",tolua_AllToLua_cEntity_SetSpeedX00);
    tolua_function(tolua_S,"SetSpeedY",tolua_AllToLua_cEntity_SetSpeedY00);
    tolua_function(tolua_S,"SetSpeedZ",tolua_AllToLua_cEntity_SetSpeedZ00);
+   tolua_function(tolua_S,"SetWidth",tolua_AllToLua_cEntity_SetWidth00);
    tolua_function(tolua_S,"AddPosX",tolua_AllToLua_cEntity_AddPosX00);
    tolua_function(tolua_S,"AddPosY",tolua_AllToLua_cEntity_AddPosY00);
    tolua_function(tolua_S,"AddPosZ",tolua_AllToLua_cEntity_AddPosZ00);
@@ -25185,7 +25319,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetHotBarSlot",tolua_AllToLua_cInventory_SetHotBarSlot00);
    tolua_function(tolua_S,"SetEquippedSlotNum",tolua_AllToLua_cInventory_SetEquippedSlotNum00);
    tolua_function(tolua_S,"GetEquippedSlotNum",tolua_AllToLua_cInventory_GetEquippedSlotNum00);
-   tolua_function(tolua_S,"cInventory__DamageItem",tolua_AllToLua_cInventory_cInventory__DamageItem00);
+   tolua_function(tolua_S,"DamageItem",tolua_AllToLua_cInventory_DamageItem00);
    tolua_function(tolua_S,"DamageEquippedItem",tolua_AllToLua_cInventory_DamageEquippedItem00);
    tolua_function(tolua_S,"GetEquippedHelmet",tolua_AllToLua_cInventory_GetEquippedHelmet00);
    tolua_function(tolua_S,"GetEquippedChestplate",tolua_AllToLua_cInventory_GetEquippedChestplate00);
