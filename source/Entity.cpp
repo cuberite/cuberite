@@ -225,12 +225,12 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
-		if( BlockIn == E_BLOCK_AIR || IsBlockWater(BlockIn) || BlockIn == E_BLOCK_FIRE || IsBlockLava(BlockIn) ) // If not in ground itself or in water or in fire or in lava
+		if(!g_BlockIsSolid[BlockIn]) // Making sure we are not inside a solid block
 		{
 			if( m_bOnGround ) // check if it's still on the ground
 			{
 				BLOCKTYPE BlockBelow = NextChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
-				if(BlockBelow == E_BLOCK_AIR || IsBlockWater(BlockBelow) || BlockBelow == E_BLOCK_FIRE || IsBlockLava(BlockBelow)) //Check if block below is air or water.
+				if(!g_BlockIsSolid[BlockBelow]) //Check if block below is air or water.
 				{
 					m_bOnGround = false;
 				}
@@ -238,19 +238,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			if (BlockIn == E_BLOCK_COBWEB)
-			{
-				NextSpeed.x *= 0.25;
-				NextSpeed.z *= 0.25;
-			}
-			else
-			{
-				//Push out entity.
-				m_bOnGround = true;
-				NextPos.y += 0.2;
-				LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
-					m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
-			}
+			//Push out entity.
+			m_bOnGround = true;
+			NextPos.y += 0.2;
+			LOGD("Entity #%d (%s) is inside a block at {%d,%d,%d}",
+				m_UniqueID, GetClass(), BlockX, BlockY, BlockZ);
 		}
 
 		if (!m_bOnGround)
@@ -283,7 +275,15 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				if ( fabs(NextSpeed.z) < 0.05 ) NextSpeed.z = 0;
 			}
 		}
-		
+
+		//Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
+		//might have different speed modifiers according to terrain.
+		if (BlockIn == E_BLOCK_COBWEB)
+		{
+			NextSpeed.x *= 0.25;
+			NextSpeed.z *= 0.25;
+		}
+					
 		//Get water direction
 		Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
