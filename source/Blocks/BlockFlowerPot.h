@@ -86,10 +86,9 @@ public:
 			}
 		}
 		
-		if (a_Player->GetGameMode() != eGameMode_Creative)
+		if (a_Player->GetGameMode() != gmCreative)
 		{
-			cItem Item(a_Player->GetEquippedItem().m_ItemType, 1);
-			a_Player->GetInventory().RemoveItem(Item);
+			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
 		a_World->SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
 	}

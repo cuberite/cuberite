@@ -16,7 +16,8 @@ cItemGrid::cItemGrid(int a_Width, int a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
 	m_NumSlots(a_Width * a_Height),
-	m_Slots(new cItem[a_Width * a_Height])
+	m_Slots(new cItem[a_Width * a_Height]),
+	m_IsInTriggerListeners(false)
 {
 }
 
@@ -149,6 +150,7 @@ void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 		return;
 	}
 	m_Slots[a_SlotNum] = a_Item;
+	TriggerListeners(a_SlotNum);
 }
 
 
@@ -164,11 +166,46 @@ void cItemGrid::SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short
 
 
 
+void cItemGrid::EmptySlot(int a_X, int a_Y)
+{
+	EmptySlot(GetSlotNum(a_X, a_Y));
+}
+
+
+
+
+
+void cItemGrid::EmptySlot(int a_SlotNum)
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
+	{
+		LOGWARNING("%s: Invalid slot number %d out of %d slots",
+			__FUNCTION__, a_SlotNum, m_NumSlots
+		);
+		return;
+	}
+	
+	// Check if already empty:
+	if (m_Slots[a_SlotNum].IsEmpty())
+	{
+		return;
+	}
+	
+	// Empty and notify
+	m_Slots[a_SlotNum].Empty();
+	TriggerListeners(a_SlotNum);
+}
+
+
+
+
+
 void cItemGrid::Clear(void)
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
 		m_Slots[i].Empty();
+		TriggerListeners(i);
 	}
 }
 
@@ -203,10 +240,33 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack)
 
 
 
-bool cItemGrid::AddItem(cItem & a_ItemStack)
+int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	
+	// Scan existing stacks:
+	for (int i = m_NumSlots - 1; i >= 0; i--)
+	{
+		if (m_Slots[i].IsStackableWith(a_ItemStack))
+		{
+			int PrevCount = m_Slots[i].m_ItemCount;
+			m_Slots[i].m_ItemCount = std::min(MaxStack, PrevCount + NumLeft);
+			NumLeft -= m_Slots[i].m_ItemCount - PrevCount;
+			TriggerListeners(i);
+		}
+		if (NumLeft <= 0)
+		{
+			// All items fit
+			return a_ItemStack.m_ItemCount;
+		}
+	}  // for i - m_Slots[]
+	
+	if (!a_AllowNewStacks)
+	{
+		return (a_ItemStack.m_ItemCount - NumLeft);
+	}
+	
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
 		if (m_Slots[i].IsEmpty())
@@ -214,42 +274,99 @@ bool cItemGrid::AddItem(cItem & a_ItemStack)
 			m_Slots[i] = a_ItemStack;
 			m_Slots[i].m_ItemCount = std::min(MaxStack, NumLeft);
 			NumLeft -= m_Slots[i].m_ItemCount;
-		}
-		else if (m_Slots[i].IsStackableWith(a_ItemStack))
-		{
-			int PrevCount = m_Slots[i].m_ItemCount;
-			m_Slots[i].m_ItemCount = std::min(MaxStack, PrevCount + NumLeft);
-			NumLeft -= m_Slots[i].m_ItemCount - PrevCount;
+			TriggerListeners(i);
 		}
 		if (NumLeft <= 0)
 		{
 			// All items fit
-			return true;
+			return a_ItemStack.m_ItemCount;
 		}
 	}  // for i - m_Slots[]
-	return (a_ItemStack.m_ItemCount > NumLeft);
+	return (a_ItemStack.m_ItemCount - NumLeft);
 }
 
 
 
 
 
-bool cItemGrid::AddItems(cItems & a_ItemStackList)
+int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 {
-	bool res;
+	int TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		res = AddItem(*itr) | res;
-		if (itr->IsEmpty())
+		int NumAdded = AddItem(*itr, a_AllowNewStacks);
+		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);
 		}
 		else
 		{
+			itr->m_ItemCount -= NumAdded;
 			++itr;
+		}
+		TotalAdded += NumAdded;
+	}
+	return TotalAdded;
+}
+
+
+
+
+
+int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
+	{
+		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning empty item",
+			__FUNCTION__, a_SlotNum, m_NumSlots
+		);
+		return 0;
+	}
+
+	if (m_Slots[a_SlotNum].IsEmpty())
+	{
+		// The item is empty, it's not gonna change
+		return 0;
+	}
+	
+	if (m_Slots[a_SlotNum].m_ItemCount < -a_AddToCount)
+	{
+		// Trying to remove more items than there already are, make the item empty
+		m_Slots[a_SlotNum].Empty();
+		TriggerListeners(a_SlotNum);
+		return 0;
+	}
+	
+	m_Slots[a_SlotNum].m_ItemCount += a_AddToCount;
+	TriggerListeners(a_SlotNum);
+	return m_Slots[a_SlotNum].m_ItemCount;
+}
+
+
+
+
+
+int cItemGrid::HowManyItems(const cItem & a_Item)
+{
+	int res = 0;
+	for (int i = 0; i < m_NumSlots; i++)
+	{
+		if (m_Slots[i].IsStackableWith(a_Item))
+		{
+			res += m_Slots[i].m_ItemCount;
 		}
 	}
 	return res;
+}
+
+
+
+
+
+bool cItemGrid::HasItems(const cItem & a_ItemStack)
+{
+	int CurrentlyHave = HowManyItems(a_ItemStack);
+	return (CurrentlyHave >= a_ItemStack.m_ItemCount);
 }
 
 
@@ -312,6 +429,20 @@ void cItemGrid::CopyToItems(cItems & a_Items) const
 
 
 
+bool cItemGrid::DamageItem(int a_SlotNum, short a_Amount)
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
+	{
+		LOGWARNING("%s: invalid slot number %d out of %d slots, ignoring.", __FUNCTION__, a_SlotNum, m_NumSlots);
+		return false;
+	}
+	return m_Slots[a_SlotNum].DamageItem(a_Amount);
+}
+
+
+
+
+
 void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, int a_CountLootProbabs, int a_NumSlots, int a_Seed)
 {
 	// Calculate the total weight:
@@ -342,6 +473,50 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, i
 		}  // for j - a_LootProbabs[]
 		SetSlot(Rnd % m_NumSlots, CurrentLoot);
 	}  // for i - NumSlots
+}
+
+
+
+
+
+void cItemGrid::AddListener(cListener & a_Listener)
+{
+	cCSLock Lock(m_CSListeners);
+	ASSERT(!m_IsInTriggerListeners);  // Must not call this while in TriggerListeners()
+	m_Listeners.push_back(&a_Listener);
+}
+
+
+
+
+
+void cItemGrid::RemoveListener(cListener & a_Listener)
+{
+	cCSLock Lock(m_CSListeners);
+	ASSERT(!m_IsInTriggerListeners);  // Must not call this while in TriggerListeners()
+	for (cListeners::iterator itr = m_Listeners.begin(), end = m_Listeners.end(); itr != end; ++itr)
+	{
+		if (*itr == &a_Listener)
+		{
+			m_Listeners.erase(itr);
+			return;
+		}
+	}  // for itr - m_Listeners[]
+}
+
+
+
+
+
+void cItemGrid::TriggerListeners(int a_SlotNum)
+{
+	cCSLock Lock(m_CSListeners);
+	m_IsInTriggerListeners = true;
+	for (cListeners::iterator itr = m_Listeners.begin(), end = m_Listeners.end(); itr != end; ++itr)
+	{
+		(*itr)->OnSlotChanged(this, a_SlotNum);
+	}  // for itr - m_Listeners[]
+	m_IsInTriggerListeners = false;
 }
 
 

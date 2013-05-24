@@ -149,17 +149,17 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		return false;
 	}
 
-	if (a_Dest->GetInventory().AddItemAnyAmount(m_Item))
+	int NumAdded = a_Dest->GetInventory().AddItem(m_Item);
+	if (NumAdded > 0)
 	{
+		m_Item.m_ItemCount -= NumAdded;
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
-		m_bCollected = true;
-		m_Timer = 0;
-		if (m_Item.m_ItemCount != 0)
+		if (m_Item.m_ItemCount == 0)
 		{
-			cItems Pickup;
-			Pickup.push_back(cItem(m_Item));
-			m_World->SpawnItemPickups(Pickup, GetPosX(), GetPosY(), GetPosZ());
+			// All of the pickup has been collected, schedule the pickup for destroying
+			m_bCollected = true;
 		}
+		m_Timer = 0;
 		return true;
 	}
 

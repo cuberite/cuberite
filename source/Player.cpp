@@ -360,25 +360,18 @@ void cPlayer::KilledBy(cPawn * a_Killer)
 	m_bVisible = false; // So new clients don't see the player
 
 	// Puke out all the items
-	const cItem * Items = m_Inventory.GetSlots();
 	cItems Pickups;
-	for (unsigned int i = 1; i < m_Inventory.c_NumSlots; ++i)
-	{
-		if (!Items[i].IsEmpty())
-		{
-			Pickups.push_back(Items[i]);
-		}
-	}
+	m_Inventory.CopyToItems(Pickups);
 	m_Inventory.Clear();
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
-	SaveToDisk(); // Save it, yeah the world is a tough place !
+	SaveToDisk();  // Save it, yeah the world is a tough place !
 }
 
 
 
 
 
-void cPlayer::Respawn()
+void cPlayer::Respawn(void)
 {
 	m_Health = GetMaxHealth();
 
@@ -768,7 +761,7 @@ void cPlayer::TossItem(
 )
 {
 	cItems Drops;
-	if (a_CreateType)
+	if (a_CreateType != 0)
 	{
 		// Just create item without touching the inventory (used in creative mode)
 		Drops.push_back(cItem(a_CreateType, a_Amount, a_CreateHealth));
@@ -800,8 +793,7 @@ void cPlayer::TossItem(
 			cItem DroppedItem(GetInventory().GetEquippedItem());
 			if (!DroppedItem.IsEmpty())
 			{
-				DroppedItem.m_ItemCount = 1;
-				if (GetInventory().RemoveItem(DroppedItem))
+				if (GetInventory().RemoveOneEquippedItem())
 				{
 					DroppedItem.m_ItemCount = 1; // RemoveItem decreases the count, so set it to 1 again
 					Drops.push_back(DroppedItem);

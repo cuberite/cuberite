@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "../Item.h"
+#include "../Inventory.h"
 
 
 
@@ -97,7 +97,7 @@ class cSlotAreaInventory :
 	
 public:
 	cSlotAreaInventory(cWindow & a_ParentWindow) :
-		cSlotAreaInventoryBase(27, 9, a_ParentWindow)  // 27 slots, starting at inventory index 9
+		cSlotAreaInventoryBase(cInventory::invInventoryCount, cInventory::invInventoryOffset, a_ParentWindow)
 	{
 	}
 } ;
@@ -114,7 +114,7 @@ class cSlotAreaHotBar :
 	
 public:
 	cSlotAreaHotBar(cWindow & a_ParentWindow)	:
-		cSlotAreaInventoryBase(9, 36, a_ParentWindow)
+		cSlotAreaInventoryBase(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
 	{
 	}
 } ;
@@ -129,7 +129,7 @@ class cSlotAreaArmor :
 {
 public:
 	cSlotAreaArmor(cWindow & a_ParentWindow)	:
-		cSlotAreaInventoryBase(4, 5, a_ParentWindow)
+		cSlotAreaInventoryBase(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
 	{
 	}
 

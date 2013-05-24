@@ -81,8 +81,7 @@ public:
 		}
 		
 		// Remove the bucket from the inventory
-		cItem Item(a_Item.m_ItemType, 1);
-		if (!a_Player->GetInventory().RemoveItem(Item))
+		if (!a_Player->GetInventory().RemoveOneEquippedItem())
 		{
 			LOG("Clicked with an empty bucket, but cannot remove one from the inventory? WTF?");
 			ASSERT(!"Inventory bucket mismatch");
@@ -90,8 +89,7 @@ public:
 		}
 		
 		// Give new bucket, filled with fluid:
-		Item.m_ItemType = NewItem;
-		Item.m_ItemCount = 1;
+		cItem Item(NewItem, 1);
 		a_Player->GetInventory().AddItem(Item);
 
 		// Remove water / lava block
@@ -131,15 +129,13 @@ public:
 		if (a_Player->GetGameMode() != gmCreative)
 		{
 			// Remove fluid bucket, add empty bucket:
-			cItem Item(a_Item.m_ItemType, 1);
-			if (!a_Player->GetInventory().RemoveItem(Item))
+			if (!a_Player->GetInventory().RemoveOneEquippedItem())
 			{
 				LOG("Clicked with a full bucket, but cannot remove one from the inventory? WTF?");
 				ASSERT(!"Inventory bucket mismatch");
 				return false;
 			}
-			Item.m_ItemType = E_ITEM_BUCKET;
-			Item.m_ItemCount = 1;
+			cItem Item(E_ITEM_BUCKET, 1);
 			if (!a_Player->GetInventory().AddItem(Item))
 			{
 				return false;

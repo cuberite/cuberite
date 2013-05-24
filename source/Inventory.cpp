@@ -18,13 +18,16 @@
 
 
 cInventory::cInventory(cPlayer & a_Owner) :
+	m_ArmorSlots    (1, 4),  // 1 x 4 slots
+	m_InventorySlots(9, 3),  // 9 x 3 slots
+	m_HotbarSlots   (9, 1),  // 9 x 1 slots
 	m_Owner(a_Owner)
 {
-	m_CraftSlots = m_Slots + c_CraftOffset;
-	m_ArmorSlots = m_Slots + c_ArmorOffset;
-	m_MainSlots  = m_Slots + c_MainOffset;
-	m_HotSlots   = m_Slots + c_HotOffset;
-
+	// Ask each ItemGrid to report changes to us:
+	m_ArmorSlots.AddListener(*this);
+	m_InventorySlots.AddListener(*this);
+	m_HotbarSlots.AddListener(*this);
+	
 	SetEquippedSlotNum(0);
 }
 
@@ -32,82 +35,130 @@ cInventory::cInventory(cPlayer & a_Owner) :
 
 
 
-cInventory::~cInventory()
+void cInventory::Clear(void)
 {
-	/*
-	// TODO
-	cWindow wnd = GetWindow();
-	if (wnd != NULL)
-	{
-		wnd->Close(*m_Owner);
-	}
-	CloseWindow();
-	*/
+	m_ArmorSlots.Clear();
+	m_InventorySlots.Clear();
+	m_HotbarSlots.Clear();
 }
 
 
 
 
 
-bool cInventory::AddItem( cItem & a_Item )
+int cInventory::HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlots)
 {
-	cItem BackupSlots[c_NumSlots];
-	memcpy( BackupSlots, m_Slots, c_NumSlots * sizeof( cItem ) );
+	return HowManyCanFit(a_ItemStack, 0, invNumSlots - 1, a_ConsiderEmptySlots);
+}
 
-	bool ChangedSlots[c_NumSlots];
-	memset( ChangedSlots, false, c_NumSlots * sizeof( bool ) );
 
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_HotOffset,  c_HotSlots,  ChangedSlots, 0 );
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_MainOffset, c_MainSlots, ChangedSlots, 0 );
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_HotOffset,  c_HotSlots,  ChangedSlots, 2 );
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_MainOffset, c_MainSlots, ChangedSlots, 2 );
 
-	if( a_Item.m_ItemCount > 0 ) // Could not add all items
+
+
+int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots)
+{
+	if ((a_BeginSlotNum < 0) || (a_BeginSlotNum >= invNumSlots))
 	{
-		// retore backup
-		memcpy( m_Slots, BackupSlots, c_NumSlots * sizeof( cItem ) );
-		return false;
+		LOGWARNING("%s: Bad BeginSlotNum, got %d, there are %d slots; correcting to 0.", __FUNCTION__, a_BeginSlotNum, invNumSlots - 1);
+		a_BeginSlotNum = 0;
+	}
+	if ((a_EndSlotNum < 0) || (a_EndSlotNum >= invNumSlots))
+	{
+		LOGWARNING("%s: Bad EndSlotNum, got %d, there are %d slots; correcting to %d.", __FUNCTION__, a_BeginSlotNum, invNumSlots, invNumSlots - 1);
+		a_EndSlotNum = invNumSlots - 1;
+	}
+	if (a_BeginSlotNum > a_EndSlotNum)
+	{
+		std::swap(a_BeginSlotNum, a_EndSlotNum);
 	}
 
-	for (unsigned int i = 0; i < c_NumSlots; i++)
+	char NumLeft = a_ItemStack.m_ItemCount;
+	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	for (int i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
 	{
-		if (ChangedSlots[i])
+		const cItem & Slot = GetSlot(i);
+		if (Slot.IsEmpty())
 		{
-			LOGD("cInventory::AddItem(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemType, m_Slots[i].m_ItemCount);
-			SendSlot(i);
+			NumLeft -= MaxStack;
+		}
+		else if (Slot.IsStackableWith(a_ItemStack))
+		{
+			NumLeft -= MaxStack - Slot.m_ItemCount;
+		}
+		if (NumLeft <= 0)
+		{
+			// All items fit
+			return a_ItemStack.m_ItemCount;
+		}
+	}  // for i - m_Slots[]
+	return a_ItemStack.m_ItemCount - NumLeft;
+}
+
+
+
+
+
+int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
+{
+	cItem ToAdd(a_Item);
+	int res = 0;
+	if (ItemCategory::IsArmor(a_Item.m_ItemType))
+	{
+		res = m_ArmorSlots.AddItem(ToAdd, a_AllowNewStacks);
+		ToAdd.m_ItemCount -= res;
+		if (ToAdd.m_ItemCount == 0)
+		{
+			return res;
 		}
 	}
 
-	return (a_Item.m_ItemCount == 0);
-}
-
-
-
-
-
-bool cInventory::AddItemAnyAmount( cItem & a_Item )
-{
-	bool ChangedSlots[c_NumSlots];
-	memset( ChangedSlots, false, c_NumSlots * sizeof( bool ) );
-
-	char StartCount = a_Item.m_ItemCount;
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_HotOffset,  c_HotSlots,  ChangedSlots, 0 );
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_MainOffset, c_MainSlots, ChangedSlots, 0 );
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_HotOffset,  c_HotSlots,  ChangedSlots, 2 );
-	if( a_Item.m_ItemCount > 0 ) AddToBar( a_Item, c_MainOffset, c_MainSlots, ChangedSlots, 2 );
+	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
+	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
+	if (ToAdd.m_ItemCount == 0)
+	{
+		return res;
+	}
 	
-	if (a_Item.m_ItemCount == StartCount)
-		return false;
+	res += m_InventorySlots.AddItem(ToAdd, a_AllowNewStacks);
+	return res;
+}
 
-	for (unsigned int i = 0; i < c_NumSlots; i++)
+
+
+
+
+int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
+{
+	int TotalAdded = 0;
+	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		if (ChangedSlots[i])
+		int NumAdded = AddItem(*itr, a_AllowNewStacks);
+		if (itr->m_ItemCount == NumAdded)
 		{
-			LOGD("cInventory::AddItemAnyAmount(): Item was added to %i ID:%i Count:%i", i, m_Slots[i].m_ItemType, m_Slots[i].m_ItemCount);
-			SendSlot(i);
+			itr = a_ItemStackList.erase(itr);
 		}
+		else
+		{
+			itr->m_ItemCount -= NumAdded;
+			++itr;
+		}
+		TotalAdded += NumAdded;
 	}
+	return TotalAdded;
+}
 
+
+
+
+
+bool cInventory::RemoveOneEquippedItem(void)
+{
+	if (m_HotbarSlots.GetSlot(m_EquippedSlotNum).IsEmpty())
+	{
+		return false;
+	}
+	
+	m_HotbarSlots.ChangeSlotCount(m_EquippedSlotNum, -1);
 	return true;
 }
 
@@ -115,68 +166,22 @@ bool cInventory::AddItemAnyAmount( cItem & a_Item )
 
 
 
-// TODO: Right now if you dont have enough items, the items you did have are removed, and the function returns false anyway
-bool cInventory::RemoveItem(cItem & a_Item)
+int cInventory::HowManyItems(const cItem & a_Item)
 {
-	// First check equipped slot
-	if ((m_EquippedSlotNum >= 0) && (m_EquippedSlotNum < 9))
-	{
-		if (m_HotSlots[m_EquippedSlotNum].m_ItemType == a_Item.m_ItemType)
-		{
-			cItem & Item = m_HotSlots[m_EquippedSlotNum];
-			if (Item.m_ItemCount > a_Item.m_ItemCount)
-			{
-				Item.m_ItemCount -= a_Item.m_ItemCount;
-				SendSlot(m_EquippedSlotNum + c_HotOffset);
-				return true;
-			}
-			else if (Item.m_ItemCount > 0)
-			{
-				a_Item.m_ItemCount -= Item.m_ItemCount;
-				Item.Empty();
-				SendSlot(m_EquippedSlotNum + c_HotOffset);
-			}
-		}
-	}
-
-	// Then check other slotz
-	if (a_Item.m_ItemCount > 0)
-	{
-		for (int i = 0; i < c_MainSlots; i++)
-		{
-			cItem & Item = m_MainSlots[i];
-			if (Item.m_ItemType == a_Item.m_ItemType)
-			{
-				if (Item.m_ItemCount > a_Item.m_ItemCount)
-				{
-					Item.m_ItemCount -= a_Item.m_ItemCount;
-					SendSlot(i + c_MainOffset);
-					return true;
-				}
-				else if (Item.m_ItemCount > 0)
-				{
-					a_Item.m_ItemCount -= Item.m_ItemCount;
-					Item.Empty();
-					SendSlot(i + c_MainOffset);
-				}
-			}
-		}
-	}
-
-	return (a_Item.m_ItemCount == 0);
+	return
+		m_ArmorSlots.HowManyItems(a_Item) +
+		m_InventorySlots.HowManyItems(a_Item) +
+		m_HotbarSlots.HowManyItems(a_Item);
 }
 
 
 
 
 
-void cInventory::Clear()
+bool cInventory::HasItems(const cItem & a_ItemStack)
 {
-	for (unsigned int i = 0; i < ARRAYCOUNT(m_Slots); i++)
-	{
-		m_Slots[i].Empty();
-	}
-	// TODO: Broadcast / send the changes to wherever needed
+	int CurrentlyHave = HowManyItems(a_ItemStack);
+	return (CurrentlyHave >= a_ItemStack.m_ItemCount);
 }
 
 
@@ -185,29 +190,47 @@ void cInventory::Clear()
 
 void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= ARRAYCOUNT(m_Slots)))
+	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
 	{
-		LOGWARNING("%s requesting an invalid slot index: %d out of %d. Ignoring.", __FUNCTION__, a_SlotNum, ARRAYCOUNT(m_Slots));
+		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Ignoring.", __FUNCTION__, a_SlotNum, invNumSlots - 1);
 		return;
 	}
-	m_Slots[a_SlotNum] = a_Item;
-	
-	// If an armor slot was touched, broadcast an EntityEquipment packet
-	if ((a_SlotNum >= c_ArmorOffset) && (a_SlotNum < c_MainOffset))
+
+	int GridSlotNum = 0;
+	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
+	if (Grid == NULL)
 	{
-		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, SlotNumToEntityEquipmentID(a_SlotNum), a_Item, m_Owner.GetClientHandle());
+		LOGWARNING("%s(%d): requesting an invalid itemgrid. Ignoring.", __FUNCTION__, a_SlotNum);
+		return;
 	}
-	
-	SendSlot(a_SlotNum);
+	Grid->SetSlot(GridSlotNum, a_Item);
 }
 
 
 
 
 
-void cInventory::SetHotBarSlot(int a_HotBarSlotNum, const cItem & a_Item)
+void cInventory::SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item)
 {
-	SetSlot(a_HotBarSlotNum + c_HotSlots, a_Item);
+	m_ArmorSlots.SetSlot(a_ArmorSlotNum, a_Item);
+}
+
+
+
+
+
+void cInventory::SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item)
+{
+	m_InventorySlots.SetSlot(a_InventorySlotNum, a_Item);
+}
+
+
+
+
+
+void cInventory::SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item)
+{
+	m_HotbarSlots.SetSlot(a_HotBarSlotNum, a_Item);
 }
 
 
@@ -216,27 +239,62 @@ void cInventory::SetHotBarSlot(int a_HotBarSlotNum, const cItem & a_Item)
 
 const cItem & cInventory::GetSlot(int a_SlotNum) const
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= ARRAYCOUNT(m_Slots)))
+	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
 	{
-		LOGWARNING("%s requesting an invalid slot index: %d out of %d. Returning the first one instead.", __FUNCTION__, a_SlotNum, ARRAYCOUNT(m_Slots));
-		return m_Slots[0];
+		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first inventory slot instead.", __FUNCTION__, a_SlotNum, invNumSlots - 1);
+		return m_InventorySlots.GetSlot(0);
 	}
-	
-	return m_Slots[a_SlotNum];
+	int GridSlotNum = 0;
+	const cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
+	if (Grid == NULL)
+	{
+		// Something went wrong, but we don't know what. We must return a value, so return the first inventory slot
+		LOGWARNING("%s(%d): requesting an invalid ItemGrid, returning the first inventory slot instead.", __FUNCTION__, a_SlotNum);
+		return m_InventorySlots.GetSlot(0);
+	}
+	return Grid->GetSlot(GridSlotNum);
 }
 
 
 
 
 
-const cItem & cInventory::GetHotBarSlot(int a_SlotNum) const
+const cItem & cInventory::GetArmorSlot(int a_ArmorSlotNum) const
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
+	if ((a_ArmorSlotNum < 0) || (a_ArmorSlotNum >= invArmorCount))
 	{
-		LOGWARNING("%s requesting an invalid slot index: %d out of 9. Returning the first one instead", __FUNCTION__, a_SlotNum);
-		return m_HotSlots[0];
+		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first one instead", __FUNCTION__, a_ArmorSlotNum, invArmorCount - 1);
+		return m_ArmorSlots.GetSlot(0);
 	}
-	return m_HotSlots[a_SlotNum];
+	return m_ArmorSlots.GetSlot(a_ArmorSlotNum);
+}
+
+
+
+
+
+const cItem & cInventory::GetInventorySlot(int a_InventorySlotNum) const
+{
+	if ((a_InventorySlotNum < 0) || (a_InventorySlotNum >= invInventoryCount))
+	{
+		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first one instead", __FUNCTION__, a_InventorySlotNum, invInventoryCount - 1);
+		return m_InventorySlots.GetSlot(0);
+	}
+	return m_InventorySlots.GetSlot(a_InventorySlotNum);
+}
+
+
+
+
+
+const cItem & cInventory::GetHotbarSlot(int a_SlotNum) const
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= invHotbarCount))
+	{
+		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first one instead", __FUNCTION__, a_SlotNum, invHotbarCount - 1);
+		return m_HotbarSlots.GetSlot(0);
+	}
+	return m_HotbarSlots.GetSlot(a_SlotNum);
 }
 
 
@@ -245,7 +303,7 @@ const cItem & cInventory::GetHotBarSlot(int a_SlotNum) const
 
 const cItem & cInventory::GetEquippedItem(void) const
 {
-	return GetHotBarSlot(m_EquippedSlotNum);
+	return GetHotbarSlot(m_EquippedSlotNum);
 }
 
 
@@ -254,14 +312,14 @@ const cItem & cInventory::GetEquippedItem(void) const
 
 void cInventory::SetEquippedSlotNum(int a_SlotNum)
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= 9))
+	if ((a_SlotNum < 0) || (a_SlotNum >= invHotbarCount))
 	{
-		LOGWARNING("%s requesting invalid slot index: %d out of 9. Setting 0 instead.", __FUNCTION__, a_SlotNum);
+		LOGWARNING("%s: requesting invalid slot index: %d out of %d. Setting 0 instead.", __FUNCTION__, a_SlotNum, invHotbarCount - 1);
 		m_EquippedSlotNum = 0;
 	}
 	else
 	{
-		m_EquippedSlotNum = (short)a_SlotNum;
+		m_EquippedSlotNum = a_SlotNum;
 	}
 }
 
@@ -271,7 +329,7 @@ void cInventory::SetEquippedSlotNum(int a_SlotNum)
 
 bool cInventory::DamageEquippedItem(short a_Amount)
 {
-	return DamageItem(c_HotOffset + m_EquippedSlotNum, a_Amount);
+	return DamageItem(invHotbarOffset + m_EquippedSlotNum, a_Amount);
 }
 
 
@@ -280,23 +338,39 @@ bool cInventory::DamageEquippedItem(short a_Amount)
 
 bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= ARRAYCOUNT(m_Slots)))
+	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
 	{
-		LOGWARNING("%s requesting an invalid slot index: %d out of %d", __FUNCTION__, a_SlotNum, ARRAYCOUNT(m_Slots));
+		LOGWARNING("%s: requesting an invalid slot index: %d out of %d", __FUNCTION__, a_SlotNum, invNumSlots - 1);
 		return false;
 	}
 	
-	if (!m_Slots[a_SlotNum].DamageItem(a_Amount))
+	int GridSlotNum = 0;
+	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
+	if (Grid == NULL)
 	{
+		LOGWARNING("%s(%d, %d): requesting an invalid grid, ignoring.", __FUNCTION__, a_SlotNum, a_Amount);
+		return false;
+	}
+	if (!Grid->DamageItem(GridSlotNum, a_Amount))
+	{
+		// The item has been damaged, but did not break yet
 		return false;
 	}
 	
 	// The item has broken, remove it:
-	m_Slots[a_SlotNum].Empty();
-	SendSlot(a_SlotNum);
-	
-	// TODO: If it was a special slot (armor / equipped), broadcast the change
+	Grid->EmptySlot(a_SlotNum);
 	return true;
+}
+
+
+
+
+
+void cInventory::CopyToItems(cItems & a_Items)
+{
+	m_ArmorSlots.CopyToItems(a_Items);
+	m_InventorySlots.CopyToItems(a_Items);
+	m_HotbarSlots.CopyToItems(a_Items);
 }
 
 
@@ -320,35 +394,14 @@ void cInventory::SendSlot(int a_SlotNum)
 		// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
 		Item.Empty();
 	}
-	m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum, Item);
+	m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum + 5, Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
 }
 
 
 
 
 
-int cInventory::HowManyCanFit(short a_ItemType, short a_ItemDamage, int a_BeginSlot, int a_EndSlot)
-{
-	int res = 0;
-	for (int i = a_BeginSlot; i <= a_EndSlot; i++)
-	{
-		if (
-			m_Slots[i].IsEmpty() ||
-			((m_Slots[i].m_ItemType == a_ItemType) && (m_Slots[i].m_ItemDamage == a_ItemDamage))
-		)
-		{
-			int MaxCount = ItemHandler(a_ItemType)->GetMaxStackSize();
-			ASSERT(m_Slots[i].m_ItemCount <= MaxCount);
-			res += MaxCount - m_Slots[i].m_ItemCount;
-		}
-	}  // for i - m_Slots[]
-	return res;
-}
-
-
-
-
-
+/*
 int cInventory::MoveItem(short a_ItemType, short a_ItemDamage, int a_Count, int a_BeginSlot, int a_EndSlot)
 {
 	int res = 0;
@@ -378,21 +431,22 @@ int cInventory::MoveItem(short a_ItemType, short a_ItemDamage, int a_Count, int 
 	// No more space to distribute to
 	return res;
 }
+*/
 
 
 
 
 
-int cInventory::SlotNumToEntityEquipmentID(short a_SlotNum)
+int cInventory::ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum)
 {
-	switch (a_SlotNum)
+	switch (a_ArmorSlotNum)
 	{
-		case 5: return 4;  // Helmet
-		case 6: return 3;  // Chestplate
-		case 7: return 2;  // Leggings
-		case 8: return 1;  // Boots
+		case 0: return 4;  // Helmet
+		case 1: return 3;  // Chestplate
+		case 2: return 2;  // Leggings
+		case 3: return 1;  // Boots
 	}
-	LOGWARN("%s: invalid slot number: %d", __FUNCTION__, a_SlotNum);
+	LOGWARN("%s: invalid armor slot number: %d", __FUNCTION__, a_ArmorSlotNum);
 	return 0;
 }
 
@@ -400,6 +454,7 @@ int cInventory::SlotNumToEntityEquipmentID(short a_SlotNum)
 
 
 
+#if 0
 bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */ )
 {
 	// Fill already present stacks
@@ -447,6 +502,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 
 	return true;
 }
+#endif
 
 
 
@@ -454,11 +510,37 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 
 void cInventory::SaveToJson(Json::Value & a_Value)
 {
-	for(unsigned int i = 0; i < c_NumSlots; i++)
+	// The JSON originally included the 4 crafting slots and the result, so we have to put empty items there, too:
+	cItem EmptyItem;
+	Json::Value EmptyItemJson;
+	EmptyItem.GetJson(EmptyItemJson);
+	for (int i = 0; i < 5; i++)
+	{
+		a_Value.append(EmptyItemJson);
+	}
+	
+	// The 4 armor slots follow:
+	for (int i = 0; i < invArmorCount; i++)
 	{
 		Json::Value JSON_Item;
-		m_Slots[i].GetJson( JSON_Item );
-		a_Value.append( JSON_Item );
+		m_ArmorSlots.GetSlot(i).GetJson(JSON_Item);
+		a_Value.append(JSON_Item);
+	}
+
+	// Next comes the main inventory:
+	for (int i = 0; i < invInventoryCount; i++)
+	{
+		Json::Value JSON_Item;
+		m_InventorySlots.GetSlot(i).GetJson(JSON_Item);
+		a_Value.append(JSON_Item);
+	}
+
+	// The hotbar is the last:
+	for (int i = 0; i < invHotbarCount; i++)
+	{
+		Json::Value JSON_Item;
+		m_HotbarSlots.GetSlot(i).GetJson(JSON_Item);
+		a_Value.append(JSON_Item);
 	}
 }
 
@@ -470,16 +552,122 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
 	int SlotIdx = 0;
 	
-	for( Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr )
+	for (Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr, SlotIdx++)
 	{
-		m_Slots[SlotIdx].FromJson( *itr );
-		SlotIdx++;
-		if (SlotIdx >= ARRAYCOUNT(m_Slots))
+		cItem Item;
+		Item.FromJson(*itr);
+		
+		// The JSON originally included the 4 crafting slots and the result slot, so we need to skip the first 5 items:
+		if (SlotIdx < 5)
+		{
+			continue;
+		}
+		
+		// If we loaded all the slots, stop now, even if the JSON has more:
+		if (SlotIdx - 5 >= invNumSlots)
 		{
 			break;
 		}
-	}
+		
+		int GridSlotNum = 0;
+		cItemGrid * Grid = GetGridForSlotNum(SlotIdx - 5, GridSlotNum);
+		ASSERT(Grid != NULL);
+		Grid->SetSlot(GridSlotNum, Item);
+	}  // for itr - a_Value[]
 	return true;
+}
+
+
+
+
+
+const cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const
+{
+	ASSERT(a_SlotNum >= 0);
+	
+	if (a_SlotNum < invArmorCount)
+	{
+		a_GridSlotNum = a_SlotNum;
+		return &m_ArmorSlots;
+	}
+	a_SlotNum -= invArmorCount;
+	if (a_SlotNum < invInventoryCount)
+	{
+		a_GridSlotNum = a_SlotNum;
+		return &m_InventorySlots;
+	}
+	a_GridSlotNum = a_SlotNum - invInventoryCount;
+	return &m_HotbarSlots;
+}
+
+
+
+
+
+cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum)
+{
+	ASSERT(a_SlotNum >= 0);
+	
+	if (a_SlotNum < invArmorCount)
+	{
+		a_GridSlotNum = a_SlotNum;
+		return &m_ArmorSlots;
+	}
+	a_SlotNum -= invArmorCount;
+	if (a_SlotNum < invInventoryCount)
+	{
+		a_GridSlotNum = a_SlotNum;
+		return &m_InventorySlots;
+	}
+	a_GridSlotNum = a_SlotNum - invInventoryCount;
+	return &m_HotbarSlots;
+}
+
+
+
+
+
+void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	// Send the neccessary updates to whoever needs them
+	
+	if (m_Owner.IsDestroyed())
+	{
+		// Owner is not (yet) valid, skip for now
+		return;
+	}
+	
+	// Armor update needs broadcast to other players:
+	cWorld * World = m_Owner.GetWorld();
+	if ((a_ItemGrid == &m_ArmorSlots) && (World != NULL))
+	{
+		World->BroadcastEntityEquipment(
+			m_Owner, ArmorSlotNumToEntityEquipmentID(a_SlotNum),
+			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
+		);
+	}
+	
+	// Convert the grid-local a_SlotNum to our global SlotNum:
+	int Base = 0;
+	if (a_ItemGrid == &m_ArmorSlots)
+	{
+		Base = invArmorOffset;
+	}
+	else if (a_ItemGrid == &m_InventorySlots)
+	{
+		Base = invInventoryOffset;
+	}
+	else if (a_ItemGrid == &m_HotbarSlots)
+	{
+		Base = invHotbarOffset;
+	}
+	else
+	{
+		ASSERT(!"Unknown ItemGrid calling OnSlotChanged()");
+		return;
+	}
+	
+	SendSlot(Base + a_SlotNum);
 }
 
 

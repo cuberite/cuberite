@@ -874,8 +874,7 @@ void cProtocol125::SendWeather(eWeather a_Weather)
 
 void cProtocol125::SendWholeInventory(const cInventory & a_Inventory)
 {
-	cCSLock Lock(m_CSPacket);
-	SendWindowSlots(0, a_Inventory.c_NumSlots, a_Inventory.GetSlots());
+	SendWholeInventory(*(a_Inventory.GetOwner().GetWindow()));
 }
 
 

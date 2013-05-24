@@ -29,8 +29,7 @@ public:
 			case E_ITEM_WATER_BUCKET:
 			{
 				a_World->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, 3 );
-				cItem Item(a_Player->GetEquippedItem().m_ItemType, 1);
-				a_Player->GetInventory().RemoveItem(Item);
+				a_Player->GetInventory().RemoveOneEquippedItem();
 				cItem NewItem(E_ITEM_BUCKET, 1);
 				a_Player->GetInventory().AddItem(NewItem);
 				break;
@@ -39,9 +38,8 @@ public:
 			{
 				if( Meta > 0 )
 				{
-					a_World->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, --Meta );
-					cItem Item(a_Player->GetEquippedItem().m_ItemType, 1);
-					a_Player->GetInventory().RemoveItem(Item);
+					a_World->SetBlockMeta( a_BlockX, a_BlockY, a_BlockZ, --Meta);
+					a_Player->GetInventory().RemoveOneEquippedItem();
 					cItem NewItem(E_ITEM_POTIONS, 1, 0);
 					a_Player->GetInventory().AddItem(NewItem);
 				}

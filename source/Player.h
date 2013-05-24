@@ -81,10 +81,12 @@ public:
 	void LoginSetGameMode( eGameMode a_GameMode );
 	void SetIP(const AString & a_IP);
 
-	// Tries to move to a new position, with collision checks and stuff
+	/// Tries to move to a new position, with collision checks and stuff
 	virtual void MoveTo( const Vector3d & a_NewPos );													// tolua_export
 
-	cWindow* GetWindow() { return m_CurrentWindow; }
+	cWindow * GetWindow(void) { return m_CurrentWindow; }
+	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
+	
 	void OpenWindow( cWindow* a_Window );
 	void CloseWindow(char a_WindowType);
 

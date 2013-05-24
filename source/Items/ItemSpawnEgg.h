@@ -38,8 +38,7 @@ public:
 			if (a_Player->GetGameMode() != 1)
 			{
 				// The mob was spawned, "use" the item:
-				cItem Equipped(a_Player->GetEquippedItem());
-				a_Player->GetInventory().RemoveItem(Equipped);
+				a_Player->GetInventory().RemoveOneEquippedItem();
 			}
 			return true;
 		}

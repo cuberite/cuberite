@@ -74,7 +74,7 @@ public:
 	inline bool IsDamageable(void) const { return (GetMaxDamage() > 0); }
 	
 	/// Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
-	bool IsStackableWith(const cItem & a_OtherStack);
+	bool IsStackableWith(const cItem & a_OtherStack) const;
 
 	// tolua_end
 	void GetJson( Json::Value & a_OutValue ) const;

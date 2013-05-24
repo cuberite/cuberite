@@ -438,14 +438,24 @@ void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 {
 	// 1.3.2 requires player inventory slots to be sent as SetSlot packets, 
 	// otherwise it sometimes fails to update the window
+	
+	// Send the entire window:
 	super::SendWholeInventory(a_Window);
-	const cItem * Slots = m_Client->GetPlayer()->GetInventory().GetSlots();
-	int BaseOffset = a_Window.GetNumSlots() - cInventory::c_NumSlots + cInventory::c_MainOffset;  // the number of non-inventory slots the window has; inventory follows
+	
+	// Send the player inventory and hotbar:
+	const cInventory & Inventory = m_Client->GetPlayer()->GetInventory();
+	int BaseOffset = a_Window.GetNumSlots() - (cInventory::invNumSlots - cInventory::invInventoryOffset);  // Number of non-inventory slots
 	char WindowID = a_Window.GetWindowID();
-	for (int i = 0; i < cInventory::c_NumSlots - cInventory::c_MainOffset; i++)
+	for (int i = 0; i < cInventory::invInventoryCount; i++)
 	{
-		SendInventorySlot(WindowID, BaseOffset + i, Slots[i + cInventory::c_MainOffset]);
-	}  // for i - Slots[]
+		SendInventorySlot(WindowID, BaseOffset + i, Inventory.GetInventorySlot(i));
+	}  // for i - Inventory[]
+	BaseOffset += cInventory::invInventoryCount;
+	for (int i = 0; i < cInventory::invHotbarCount; i++)
+	{
+		SendInventorySlot(WindowID, BaseOffset + i, Inventory.GetHotbarSlot(i));
+	}  // for i - Hotbar[]
+	
 	// Send even the item being dragged:
 	SendInventorySlot(-1, -1, m_Client->GetPlayer()->GetDraggingItem());
 }

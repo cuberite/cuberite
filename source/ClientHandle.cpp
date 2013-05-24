@@ -791,7 +791,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 		if (ItemHandler->EatItem(m_Player, &Item))
 		{
 			ItemHandler->OnFoodEaten(World, m_Player, &Item);
-			m_Player->GetInventory().RemoveItem(Item);
+			m_Player->GetInventory().RemoveOneEquippedItem();
 			return;
 		}
 	}
@@ -877,10 +877,9 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	// The actual block placement:
 	World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	if (m_Player->GetGameMode() == eGameMode_Survival)
+	if (m_Player->GetGameMode() != gmCreative)
 	{
-		cItem Item(m_Player->GetEquippedItem().m_ItemType, 1);
-		m_Player->GetInventory().RemoveItem(Item);
+		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
 	NewBlock->OnPlacedByPlayer(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	

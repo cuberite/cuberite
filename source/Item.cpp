@@ -75,7 +75,7 @@ bool cItem::DamageItem(short a_Amount)
 
 
 
-bool cItem::IsStackableWith(const cItem & a_OtherStack)
+bool cItem::IsStackableWith(const cItem & a_OtherStack) const
 {
 	if (a_OtherStack.m_ItemType != m_ItemType)
 	{

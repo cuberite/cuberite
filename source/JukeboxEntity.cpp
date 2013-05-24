@@ -40,8 +40,7 @@ void cJukeboxEntity::UsedBy(cPlayer * a_Player)
 		if (HeldItem.m_ItemType >= 2256 && HeldItem.m_ItemType <= 2267)
 		{
 			m_Record = HeldItem.m_ItemType;
-			cItem Equipped(a_Player->GetInventory().GetEquippedItem());
-			a_Player->GetInventory().RemoveItem(Equipped);
+			a_Player->GetInventory().RemoveOneEquippedItem();
 			PlayRecord();
 		}
 	}
