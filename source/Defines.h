@@ -496,6 +496,18 @@ namespace ItemCategory
 			(a_ItemType == E_ITEM_DIAMOND_BOOTS)
 		);
 	}
+	
+	
+	
+	inline bool IsArmor(short a_ItemType)
+	{
+		return (
+			IsHelmet(a_ItemType) ||
+			IsChestPlate(a_ItemType) ||
+			IsLeggings(a_ItemType) ||
+			IsBoots(a_ItemType)
+		);
+	}
 }
 // tolua_end
 
