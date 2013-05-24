@@ -346,6 +346,15 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 
 
 
+int cItemGrid::ChangeSlotCount(int a_X, int a_Y, int a_AddToCount)
+{
+	return ChangeSlotCount(GetSlotNum(a_X, a_Y), a_AddToCount);
+}
+
+
+
+
+
 int cItemGrid::HowManyItems(const cItem & a_Item)
 {
 	int res = 0;
@@ -437,6 +446,15 @@ bool cItemGrid::DamageItem(int a_SlotNum, short a_Amount)
 		return false;
 	}
 	return m_Slots[a_SlotNum].DamageItem(a_Amount);
+}
+
+
+
+
+
+bool cItemGrid::DamageItem(int a_X, int a_Y, short a_Amount)
+{
+	return DamageItem(GetSlotNum(a_X, a_Y), a_Amount);
 }
 
 

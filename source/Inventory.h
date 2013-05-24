@@ -135,11 +135,11 @@ public:
 	const cItem & GetEquippedLeggings  (void) const { return m_ArmorSlots.GetSlot(2); }
 	const cItem & GetEquippedBoots     (void) const { return m_ArmorSlots.GetSlot(3); }
 
+	// tolua_end
+	
 	/// Sends the slot contents to the owner
 	void SendSlot(int a_SlotNum);
 
-	// tolua_end
-	
 	/// Converts an armor slot number into the ID for the EntityEquipment packet
 	static int ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum);
 

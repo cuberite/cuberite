@@ -1127,7 +1127,7 @@ static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 	}
 	
 tolua_lerror:
-	tolua_error(L, "#ferror in function 'FindKey'.", &tolua_err);
+	tolua_error(L, "#ferror in function 'cItemGrid:GetSlotCoords'.", &tolua_err);
 	return 0;
 }
 

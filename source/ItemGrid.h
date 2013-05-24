@@ -42,15 +42,18 @@ public:
 	int GetSlotNum(int a_X, int a_Y) const;
 	
 	// tolua_end
+
 	/// Converts slot number into XY coords; sets coords to -1 on invalid slot number. Exported in ManualBindings.cpp
 	void GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const;
+
+	cItem & GetSlot(int a_X, int a_Y);  // TODO: This will be removed!
+	cItem & GetSlot(int a_SlotNum);  // TODO: This will be removed!
+
 	// tolua_begin
 	
 	// Retrieve slots by coords or slot number; Logs warning and returns the first slot on invalid coords / slotnum
 	const cItem & GetSlot(int a_X, int a_Y) const;
-	cItem &       GetSlot(int a_X, int a_Y);
 	const cItem & GetSlot(int a_SlotNum) const;
-	cItem &       GetSlot(int a_SlotNum);
 	
 	// Set slot by coords or slot number; Logs warning and doesn't set on invalid coords / slotnum
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item);
@@ -89,6 +92,12 @@ public:
 	*/
 	int ChangeSlotCount(int a_SlotNum, int a_AddToCount);
 	
+	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
+	If the slot is empty, ignores the call.
+	Returns the new count.
+	*/
+	int ChangeSlotCount(int a_X, int a_Y, int a_AddToCount);
+	
 	/// Returns the number of items of type a_Item that are stored
 	int HowManyItems(const cItem & a_Item);
 	
@@ -109,6 +118,9 @@ public:
 
 	/// Adds the specified damage to the specified item; returns true if the item broke (but the item is left intact)
 	bool DamageItem(int a_SlotNum, short a_Amount);
+	
+	/// Adds the specified damage to the specified item; returns true if the item broke (but the item is left intact)
+	bool DamageItem(int a_X, int a_Y, short a_Amount);
 	
 	// tolua_end
 	
