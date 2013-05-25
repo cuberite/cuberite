@@ -294,17 +294,32 @@ cSocket cSocket::AcceptIPv6(void)
 	if (SClient.IsValid())
 	{
 		#if defined(_WIN32)
-			// Windows XP doesn't have inet_ntop, so we need to improvise:
-			Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
-				from.sin6_addr.u.Word[0],
-				from.sin6_addr.u.Word[1],
-				from.sin6_addr.u.Word[2],
-				from.sin6_addr.u.Word[3],
-				from.sin6_addr.u.Word[4],
-				from.sin6_addr.u.Word[5],
-				from.sin6_addr.u.Word[6],
-				from.sin6_addr.u.Word[7]
-			);
+			// Windows XP doesn't have inet_ntop, so we need to improvise. And MSVC has different headers than GCC
+			#ifdef _MSC_VER
+				// MSVC version
+				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+					from.sin6_addr.u.Word[0],
+					from.sin6_addr.u.Word[1],
+					from.sin6_addr.u.Word[2],
+					from.sin6_addr.u.Word[3],
+					from.sin6_addr.u.Word[4],
+					from.sin6_addr.u.Word[5],
+					from.sin6_addr.u.Word[6],
+					from.sin6_addr.u.Word[7]
+				);
+			#else  // _MSC_VER
+				// MinGW
+				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+					from.sin6_addr.s6_addr16[0],
+					from.sin6_addr.s6_addr16[1],
+					from.sin6_addr.s6_addr16[2],
+					from.sin6_addr.s6_addr16[3],
+					from.sin6_addr.s6_addr16[4],
+					from.sin6_addr.s6_addr16[5],
+					from.sin6_addr.s6_addr16[6],
+					from.sin6_addr.s6_addr16[7]
+				);
+			#endif  // else _MSC_VER
 		#else
 			char buffer[INET6_ADDRSTRLEN];
 			inet_ntop(AF_INET6, &(from.sin6_addr), buffer, sizeof(buffer));

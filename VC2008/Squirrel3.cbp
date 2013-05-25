@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Squirrel3" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug Win32/Squirrel3" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add option="-O0" />
+					<Add directory="../squirrel_3_0_1_stable/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../squirrel_3_0_1_stable/include" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release Win32/Squirrel3" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add directory="../squirrel_3_0_1_stable/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../squirrel_3_0_1_stable/include" />
+				</ResourceCompiler>
+			</Target>
+			<Target title="Release profiled Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release profiled Win32/Squirrel3" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-W" />
+					<Add directory="../squirrel_3_0_1_stable/include" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../squirrel_3_0_1_stable/include" />
+				</ResourceCompiler>
+			</Target>
+		</Build>
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdaux.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdblob.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdblobimpl.h" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdio.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdmath.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdrex.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdstream.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdstream.h" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdstring.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/sqstdlib/sqstdsystem.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqapi.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqarray.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqbaselib.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqclass.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqclass.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqclosure.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqcompiler.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqcompiler.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqdebug.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqfuncproto.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqfuncstate.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqfuncstate.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqlexer.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqlexer.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqmem.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqobject.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqobject.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqopcodes.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqpcheader.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqstate.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqstate.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqstring.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqtable.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqtable.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/squserdata.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/squtils.h" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqvm.cpp" />
+		<Unit filename="../squirrel_3_0_1_stable/squirrel/sqvm.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

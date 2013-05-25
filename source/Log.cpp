@@ -70,7 +70,7 @@ void cLog::CloseLog()
 void cLog::OpenLog( const char* a_FileName )
 {
 	if(m_File) fclose (m_File);
-	#ifdef _WIN32
+	#ifdef _MSC_VER
 	fopen_s( &m_File, a_FileName, "a+" );
 	#else
 	m_File = fopen(a_FileName, "a+" );
@@ -83,7 +83,7 @@ void cLog::OpenLog( const char* a_FileName )
 
 void cLog::ClearLog()
 {
-	#ifdef _WIN32
+	#ifdef _MSC_VER
 	if( fopen_s( &m_File, "log.txt", "w" ) == 0)
 		fclose (m_File);
 	#else
@@ -107,7 +107,7 @@ void cLog::Log(const char * a_Format, va_list argList)
 	time ( &rawtime );
 	
 	struct tm* timeinfo;
-#ifdef _WIN32
+#ifdef _MSC_VER
 	struct tm timeinforeal;
 	timeinfo = &timeinforeal;
 	localtime_s(timeinfo, &rawtime );

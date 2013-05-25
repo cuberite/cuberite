@@ -11,9 +11,9 @@
 #include "squirrelbindings/SquirrelBindings.h"
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 	#include <dbghelp.h>
-#endif  // _WIN32
+#endif  // _MSC_VER
 
 
 
@@ -51,7 +51,7 @@ void ShowCrashReport(int)
 
 
 
-#if defined(_WIN32) && !defined(_WIN64)
+#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Windows 32-bit stuff: when the server crashes, create a "dump file" containing the callstack of each thread and some variables; let the user send us that crash file for analysis
 
@@ -128,7 +128,7 @@ int main( int argc, char **argv )
 	#endif
 	
 	// Magic code to produce dump-files on Windows if the server crashes:
-	#if defined(_WIN32) && !defined(_WIN64)
+	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)
 	HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
 	g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
 	if (g_WriteMiniDump != NULL)
