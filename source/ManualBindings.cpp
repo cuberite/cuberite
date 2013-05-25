@@ -14,6 +14,7 @@
 #include "StringMap.h"
 #include "ClientHandle.h"
 #include "ChestEntity.h"
+#include "DispenserEntity.h"
 #include "FurnaceEntity.h"
 #include "md5/md5.h"
 
@@ -211,8 +212,15 @@ static int tolua_DoWith(lua_State* tolua_S)
 			} 
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0); 
-			report_errors(LuaState, s); 
-			return true; 
+			if (report_errors(LuaState, s))
+			{
+				return true;  // Abort enumeration
+			}
+			if (lua_isboolean(LuaState, -1)) 
+			{ 
+				return (tolua_toboolean(LuaState, -1, 0) > 0); 
+			} 
+			return false;  /* Continue enumeration */ 
 		} 
 		lua_State * LuaState; 
 		int FuncRef; 
@@ -299,8 +307,15 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 			} 
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0); 
-			report_errors(LuaState, s); 
-			return true; 
+			if (report_errors(LuaState, s))
+			{
+				return true;  // Abort enumeration
+			}
+			if (lua_isboolean(LuaState, -1)) 
+			{ 
+				return (tolua_toboolean(LuaState, -1, 0) > 0); 
+			} 
+			return false;  /* Continue enumeration */ 
 		} 
 		lua_State * LuaState; 
 		int FuncRef; 
@@ -392,7 +407,7 @@ static int tolua_ForEachInChunk(lua_State* tolua_S)
 
 			if (lua_isboolean(LuaState, -1)) 
 			{ 
-				return (tolua_toboolean( LuaState, -1, 0) > 0); 
+				return (tolua_toboolean(LuaState, -1, 0) > 0); 
 			} 
 			return false;  /* Continue enumeration */ 
 		} 
@@ -1160,6 +1175,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_function(tolua_S, "DoWithPlayer",          tolua_DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",   tolua_DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "DoWithChestAt",         tolua_DoWithXYZ<cWorld, cChestEntity, &cWorld::DoWithChestAt>);
+			tolua_function(tolua_S, "DoWithDispenserAt",     tolua_DoWithXYZ<cWorld, cDispenserEntity, &cWorld::DoWithDispenserAt>);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");

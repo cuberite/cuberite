@@ -216,10 +216,10 @@ public:
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Lua-acessible
 
-	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords, true if found
+	/// Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found
 	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);
 
-	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords, true if found
+	/// Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
 
 	/// Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found
