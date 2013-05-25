@@ -107,11 +107,20 @@ public:
 	/// Returns the index of the first empty slot; -1 if all full
 	int GetFirstEmptySlot(void) const;
 
+	/// Returns the index of the first non-empty slot; -1 if all empty
+	int GetFirstUsedSlot(void) const;
+
 	/// Returns the index of the last empty slot; -1 if all full
 	int GetLastEmptySlot(void) const;
 	
+	/// Returns the index of the last used slot; -1 if all empty
+	int GetLastUsedSlot(void) const;
+
 	/// Returns the index of the first empty slot following a_StartFrom (a_StartFrom is not checked)
 	int GetNextEmptySlot(int a_StartFrom) const;
+	
+	/// Returns the index of the first used slot following a_StartFrom (a_StartFrom is not checked)
+	int GetNextUsedSlot(int a_StartFrom) const;
 	
 	/// Copies the contents into a cItems object; preserves the original a_Items contents
 	void CopyToItems(cItems & a_Items) const;

@@ -1,9 +1,8 @@
 
 #pragma once
 
-#include "BlockEntity.h"
+#include "BlockEntityWithItems.h"
 #include "UI/WindowOwner.h"
-#include "ItemGrid.h"
 
 
 
@@ -21,14 +20,29 @@ class cServer;
 
 
 
+// tolua_begin
 class cDispenserEntity :
-	public cBlockEntity,
+	public cBlockEntityWithItems,
 	public cBlockEntityWindowOwner
 {
+	typedef cBlockEntityWithItems super;
+	
 public:
-	cDispenserEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
+	enum {
+		ContentsHeight = 3,
+		ContentsWidth  = 3,
+	} ;
+
+	/// Constructor used while generating a chunk; sets m_World to NULL
+	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	// tolua_end
+	
+	/// Constructor used for normal operation
+	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cDispenserEntity();
-	virtual void Destroy(void);
+
+	static const char * GetClassStatic(void) { return "cDispenserEntity"; }
 
 	bool LoadFromJson(const Json::Value & a_Value);
 	
@@ -38,22 +52,18 @@ public:
 	virtual bool Tick(float a_Dt) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 	
-	const cItem & GetSlot(int a_SlotNum) const { return m_Contents.GetSlot(a_SlotNum); }
+	// tolua_begin
 	
-	void SetSlot(int a_SlotNum, const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
-
 	/// Sets the dispenser to dispense an item in the next tick
 	void Activate(void);
 	
-	const cItemGrid & GetContents(void) const { return m_Contents; }
-	cItemGrid & GetContents(void) { return m_Contents; }
-	
+	// tolua_end
+
 private:
-	cItemGrid m_Contents;
-	bool      m_ShouldDispense;  ///< If true, the dispenser will dispense an item in the next tick
+	bool m_ShouldDispense;  ///< If true, the dispenser will dispense an item in the next tick
 
 	void Dispense(void);
-};
+} ;  // tolua_export
 
 
 

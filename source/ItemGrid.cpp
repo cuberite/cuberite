@@ -391,6 +391,15 @@ int cItemGrid::GetFirstEmptySlot(void) const
 
 
 
+int cItemGrid::GetFirstUsedSlot(void) const
+{
+	return GetNextUsedSlot(-1);
+}
+
+
+
+
+
 int cItemGrid::GetLastEmptySlot(void) const
 {
 	for (int i = m_NumSlots - 1; i >= 0; i--)
@@ -407,11 +416,43 @@ int cItemGrid::GetLastEmptySlot(void) const
 
 
 
+int cItemGrid::GetLastUsedSlot(void) const
+{
+	for (int i = m_NumSlots - 1; i >= 0; i--)
+	{
+		if (!m_Slots[i].IsEmpty())
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+
+
+
 int cItemGrid::GetNextEmptySlot(int a_StartFrom) const
 {
 	for (int i = a_StartFrom + 1; i < m_NumSlots; i++)
 	{
 		if (m_Slots[i].IsEmpty())
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+
+
+
+
+int cItemGrid::GetNextUsedSlot(int a_StartFrom) const
+{
+	for (int i = a_StartFrom + 1; i < m_NumSlots; i++)
+	{
+		if (!m_Slots[i].IsEmpty())
 		{
 			return i;
 		}

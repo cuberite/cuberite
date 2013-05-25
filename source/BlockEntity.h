@@ -20,19 +20,10 @@ class cPacket;
 
 
 
+// tolua_begin
 class cBlockEntity
 {
 protected:
-	cBlockEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ) :  // Used when generating
-		m_PosX(a_BlockX),
-		m_PosY(a_BlockY),
-		m_PosZ(a_BlockZ),
-		m_BlockType(a_BlockType),
-		m_World(NULL)
-	{
-	}
-	
-	
 	cBlockEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 		m_PosX(a_BlockX),
 		m_PosY(a_BlockY),
@@ -43,6 +34,8 @@ protected:
 	}
 
 public:
+	// tolua_end
+	
 	virtual ~cBlockEntity() {};  // force a virtual destructor in all descendants
 	
 	virtual void Destroy(void) {};
@@ -52,6 +45,8 @@ public:
 		m_World = a_World;
 	}
 	
+	// tolua_begin
+	
 	// Position, in absolute block coordinates:
 	int GetPosX(void) const { return m_PosX; }
 	int GetPosY(void) const { return m_PosY; }
@@ -60,6 +55,8 @@ public:
 	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
 	
 	cWorld * GetWorld(void) const {return m_World; }
+	
+	// tolua_end
 
 	virtual void SaveToJson  (Json::Value & a_Value) = 0;
 	
@@ -81,7 +78,7 @@ protected:
 	BLOCKTYPE m_BlockType;
 	
 	cWorld * m_World;
-};
+} ;  // tolua_export
 
 
 

@@ -933,26 +933,6 @@
 				Name="Entities"
 				>
 				<File
-					RelativePath="..\source\BlockEntity.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\ChestEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\ChestEntity.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\DispenserEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\DispenserEntity.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Doors.h"
 					>
 				</File>
@@ -973,22 +953,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\FurnaceEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\FurnaceEntity.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\JukeboxEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\JukeboxEntity.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\Ladder.h"
 					>
 				</File>
@@ -998,14 +962,6 @@
 				</File>
 				<File
 					RelativePath="..\source\Minecart.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\NoteEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\NoteEntity.h"
 					>
 				</File>
 				<File
@@ -1034,14 +990,6 @@
 				</File>
 				<File
 					RelativePath="..\source\Sign.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SignEntity.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SignEntity.h"
 					>
 				</File>
 				<File
@@ -2342,6 +2290,66 @@
 				</File>
 				<File
 					RelativePath="..\source\LuaExpat\lxplib.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="BlockEntities"
+				>
+				<File
+					RelativePath="..\source\BlockEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\BlockEntityWithItems.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\ChestEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\ChestEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DispenserEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DispenserEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\FurnaceEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\FurnaceEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\JukeboxEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\JukeboxEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\NoteEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\NoteEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\SignEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\SignEntity.h"
 					>
 				</File>
 			</Filter>

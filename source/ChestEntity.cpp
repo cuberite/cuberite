@@ -24,8 +24,7 @@ class cRoot;
 
 
 cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ),
-	m_Contents(c_ChestWidth, c_ChestHeight)
+	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
@@ -35,8 +34,7 @@ cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World),
-	m_Contents(c_ChestWidth, c_ChestHeight)
+	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
@@ -52,19 +50,6 @@ cChestEntity::~cChestEntity()
 	{
 		Window->OwnerDestroyed();
 	}
-}
-
-
-
-
-
-void cChestEntity::Destroy(void)
-{
-	// Drop items
-	cItems Pickups;
-	m_Contents.CopyToItems(Pickups);
-	m_Contents.Clear();
-	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
 }
 
 

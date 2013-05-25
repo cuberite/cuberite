@@ -31,9 +31,19 @@
 
 
 
-cDispenserEntity::cDispenserEntity(int a_X, int a_Y, int a_Z, cWorld * a_World) :
-	cBlockEntity(E_BLOCK_DISPENSER, a_X, a_Y, a_Z, a_World),
-	m_Contents(3, 3),
+cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	super(E_BLOCK_DISPENSER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
+	m_ShouldDispense(false)
+{
+	SetBlockEntity(this);  // cBlockEntityWindowOwner
+}
+
+
+
+
+
+cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_DISPENSER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_ShouldDispense(false)
 {
 	SetBlockEntity(this);  // cBlockEntityWindowOwner
@@ -51,19 +61,6 @@ cDispenserEntity::~cDispenserEntity()
 	{
 		Window->OwnerDestroyed();
 	}
-}
-
-
-
-
-
-void cDispenserEntity::Destroy(void)
-{
-	// Drop items
-	cItems Pickups;
-	m_Contents.CopyToItems(Pickups);
-	m_Contents.Clear();
-	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
 }
 
 
@@ -97,7 +94,7 @@ void cDispenserEntity::Dispense(void)
 	
 	// Pick an item to dispense:
 	MTRand r1;
-	int RandomSlot = r1.randInt(SlotsCnt);
+	int RandomSlot = r1.randInt(SlotsCnt - 1);
 	cItem & Drop = m_Contents.GetSlot(OccupiedSlots[RandomSlot]);
 	
 	// Dispense the item:
