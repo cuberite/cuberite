@@ -9,15 +9,16 @@
 			<Target title="Debug Win32">
 				<Option output="C:/Programovani/Programy/cizi/mc-server/VC2008/../MCServer/MCServer_debug" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug" />
+				<Option external_deps="lib.a;lib.a;lib.a;lib.a;lib.a;lib.a;lib.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-W" />
+					<Add option="-O0" />
 					<Add option="-DWIN32" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_CONSOLE" />
 					<Add option="-DXML_STATIC" />
-					<Add option="-W" />
-					<Add option="-O0" />
 					<Add directory="../zlib-1.2.7" />
 					<Add directory="../jsoncpp-src-0.5.0/include" />
 					<Add directory="../lua-5.1.4/src" />
@@ -40,13 +41,16 @@
 					<Add directory="../expat" />
 				</ResourceCompiler>
 				<Linker>
+					<Add option="-s" />
 					<Add library="ws2_32" />
 					<Add library="Psapi" />
+					<Add library="lib.a" />
 				</Linker>
 			</Target>
 			<Target title="Release Win32">
 				<Option output="C:/Programovani/Programy/cizi/mc-server/VC2008/../MCServer/MCServer" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release" />
+				<Option external_deps="lib.a;lib.a;lib.a;lib.a;lib.a;lib.a;lib.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -80,11 +84,13 @@
 				<Linker>
 					<Add library="ws2_32" />
 					<Add library="Psapi" />
+					<Add library="lib.a" />
 				</Linker>
 			</Target>
 			<Target title="Release profiled Win32">
 				<Option output="C:/Programovani/Programy/cizi/mc-server/VC2008/../MCServer/MCServer_profiled" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release profiled Win32" />
+				<Option external_deps="lib.a;lib.a;lib.a;lib.a;lib.a;" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -118,9 +124,14 @@
 				<Linker>
 					<Add library="ws2_32" />
 					<Add library="Psapi" />
+					<Add library="lib.a" />
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-fpermissive" />
+			<Add directory="../source" />
+		</Compiler>
 		<Unit filename="../Android/jni/Android.mk">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -361,9 +372,6 @@
 		<Unit filename="../source/JukeboxEntity.cpp" />
 		<Unit filename="../source/JukeboxEntity.h" />
 		<Unit filename="../source/Ladder.h" />
-		<Unit filename="../source/LeakFinder.cpp">
-			<Option target="Debug Win32" />
-		</Unit>
 		<Unit filename="../source/LeakFinder.h" />
 		<Unit filename="../source/LightingThread.cpp" />
 		<Unit filename="../source/LightingThread.h" />
@@ -540,9 +548,6 @@
 		<Unit filename="../source/Simulator/VaporizeFluidSimulator.h" />
 		<Unit filename="../source/SquirrelCommandBinder.cpp" />
 		<Unit filename="../source/SquirrelCommandBinder.h" />
-		<Unit filename="../source/StackWalker.cpp">
-			<Option target="Debug Win32" />
-		</Unit>
 		<Unit filename="../source/StackWalker.h" />
 		<Unit filename="../source/Stairs.h" />
 		<Unit filename="../source/StringCompression.cpp" />
