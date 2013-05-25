@@ -111,9 +111,9 @@ public:
 
 	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override
 	{
-		a_BlockX = (int)(m_Entity->GetPosX());
-		a_BlockY = (int)(m_Entity->GetPosY());
-		a_BlockZ = (int)(m_Entity->GetPosZ());
+		a_BlockX = (int)floor(m_Entity->GetPosX() + 0.5);
+		a_BlockY = (int)floor(m_Entity->GetPosY() + 0.5);
+		a_BlockZ = (int)floor(m_Entity->GetPosZ() + 0.5);
 	}
 	
 private:
