@@ -1043,7 +1043,7 @@ bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_
 	tolua_pushnumber  (m_LuaState, a_BlockType);
 	tolua_pushnumber  (m_LuaState, a_BlockMeta);
 
-	if (!CallFunction(10, 1, "OnPlayerUsingBlock"))
+	if (!CallFunction(10, 1, FnName))
 	{
 		return false;
 	}
