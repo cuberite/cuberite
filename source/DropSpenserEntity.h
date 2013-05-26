@@ -67,13 +67,16 @@ public:
 	
 	// tolua_end
 
-private:
+protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
 
 	void DropSpense(void);
 	
 	/// Override this function to provide the specific behavior for item dropspensing (drop / shoot / pour / ...)
 	virtual void DropSpenseFromSlot(int a_SlotNum) = 0;
+	
+	/// Helper function, drops one item from the specified slot (like a dropper)
+	void DropFromSlot(int a_SlotNum);
 } ;  // tolua_export
 
 

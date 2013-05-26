@@ -37,90 +37,149 @@ void cDispenserEntity::DropSpenseFromSlot(int a_SlotNum)
 	NIBBLETYPE Meta = m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ);
 	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
 
-	cItem & Drop = m_Contents.GetSlot(a_SlotNum);
-	
 	// Dispense the item:
-	switch (Drop.m_ItemType)
+	switch (m_Contents.GetSlot(a_SlotNum).m_ItemType)
 	{
 		case E_ITEM_BUCKET:
 		{
 			BLOCKTYPE DispBlock = m_World->GetBlock(DispX, DispY, DispZ);
-			if (DispBlock == E_BLOCK_STATIONARY_WATER)
+			switch (DispBlock)
 			{
-				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
-				Drop.m_ItemType = E_ITEM_WATER_BUCKET;  // TODO: Duplication glitch - bucket stacking allows you to duplicate water
-			}
-			else if (DispBlock == E_BLOCK_STATIONARY_LAVA)
-			{
-				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
-				Drop.m_ItemType = E_ITEM_LAVA_BUCKET;  // TODO: Duplication glitch - bucket stacking allows you to duplicate lava
-			}
-			else
-			{
-				cItems Pickups;
-				Pickups.push_back(Drop.CopyOne());
-				m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
-				Drop.m_ItemCount--;
+				case E_BLOCK_STATIONARY_WATER:
+				case E_BLOCK_WATER:
+				{
+					if (ScoopUpLiquid(a_SlotNum, E_ITEM_WATER_BUCKET))
+					{
+						m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
+					}
+					break;
+				}
+				case E_BLOCK_STATIONARY_LAVA:
+				case E_BLOCK_LAVA:
+				{
+					if (ScoopUpLiquid(a_SlotNum, E_ITEM_LAVA_BUCKET))
+					{
+						m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
+					}
+					break;
+				}
+				default:
+				{
+					DropFromSlot(a_SlotNum);
+					break;
+				}
 			}
 			break;
-		}
+		}  // E_ITEM_BUCKET
 		
 		case E_ITEM_WATER_BUCKET:
 		{
 			BLOCKTYPE DispBlock = m_World->GetBlock(DispX, DispY, DispZ);
-			if ((DispBlock == E_BLOCK_AIR) || IsBlockLiquid(DispBlock) || cFluidSimulator::CanWashAway(DispBlock))
+			if (PlaceLiquid(DispBlock, a_SlotNum))
 			{
-				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_STATIONARY_WATER, 0);
-				Drop.m_ItemType = E_ITEM_BUCKET;
+				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_WATER, 0);
 			}
 			else
 			{
-				cItems Pickups;
-				Pickups.push_back(Drop.CopyOne());
-				m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
-				Drop.m_ItemCount--;
+				DropFromSlot(a_SlotNum);
 			}
 			break;
 		}
 		
 		case E_ITEM_LAVA_BUCKET:
 		{
-			BLOCKTYPE DispBlock = m_World->GetBlock( DispX, DispY, DispZ );
-			if ((DispBlock == E_BLOCK_AIR) || IsBlockLiquid(DispBlock) || cFluidSimulator::CanWashAway(DispBlock))
+			BLOCKTYPE DispBlock = m_World->GetBlock(DispX, DispY, DispZ);
+			if (PlaceLiquid(DispBlock, a_SlotNum))
 			{
-				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_STATIONARY_LAVA, 0);
-				Drop.m_ItemType = E_ITEM_BUCKET;
+				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_LAVA, 0);
 			}
 			else
 			{
-				cItems Pickups;
-				Pickups.push_back(Drop.CopyOne());
-				m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
-				Drop.m_ItemCount--;
+				DropFromSlot(a_SlotNum);
 			}
 			break;
 		}
 		
 		case E_ITEM_SPAWN_EGG:
 		{
-			if (m_World->SpawnMob(DispX + 0.5, DispY, DispZ + 0.5, Drop.m_ItemDamage) >= 0)
+			if (m_World->SpawnMob(DispX + 0.5, DispY, DispZ + 0.5, m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
 			{
-				Drop.m_ItemCount--;
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
 			break;
 		}
 		
 		default:
 		{
-			cItems Pickups;
-			Pickups.push_back(Drop.CopyOne());
-			m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
-			Drop.m_ItemCount--;
+			DropFromSlot(a_SlotNum);
 			break;
 		}
 	}  // switch (ItemType)
 }
 
+
+
+
+
+
+bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
+{
+	cItem LiquidBucket(a_BucketItemType, 1);
+	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
+	{
+		// Special case: replacing one empty bucket with one full bucket
+		m_Contents.SetSlot(a_SlotNum, LiquidBucket);
+		return true;
+	}
+	
+	// There are stacked buckets at the selected slot, see if a full bucket will fit somewhere else
+	if (m_Contents.HowManyCanFit(LiquidBucket) < 1)
+	{
+		// Cannot fit into m_Contents
+		return false;
+	}
+	
+	m_Contents.ChangeSlotCount(a_SlotNum, -1);
+	m_Contents.AddItem(LiquidBucket);
+	return true;
+}
+
+
+
+
+
+bool cDispenserEntity::PlaceLiquid(BLOCKTYPE a_BlockInFront, int a_SlotNum)
+{
+	if (
+		(a_BlockInFront != E_BLOCK_AIR) &&
+		!IsBlockLiquid(a_BlockInFront) &&
+		!cFluidSimulator::CanWashAway(a_BlockInFront)
+	)
+	{
+		// Not a suitable block in front
+		return false;
+	}
+	
+	cItem EmptyBucket(E_ITEM_BUCKET, 1);
+	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
+	{
+		// Change the single full bucket present into a single empty bucket
+		m_Contents.SetSlot(a_SlotNum, EmptyBucket);
+		return true;
+	}
+	
+	// There are full buckets stacked at this slot, check if we can fit in the empty bucket
+	if (m_Contents.HowManyCanFit(EmptyBucket) < 1)
+	{
+		// The empty bucket wouldn't fit into m_Contents
+		return false;
+	}
+	
+	// The empty bucket fits in, remove one full bucket and add the empty one
+	m_Contents.ChangeSlotCount(a_SlotNum, -1);
+	m_Contents.AddItem(EmptyBucket);
+	return true;
+}
 
 
 

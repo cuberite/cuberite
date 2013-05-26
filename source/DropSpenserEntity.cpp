@@ -146,8 +146,14 @@ bool cDropSpenserEntity::LoadFromJson(const Json::Value & a_Value)
 	int SlotIdx = 0;
 	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
 	{
-		m_Contents.GetSlot(SlotIdx).FromJson(*itr);
+		cItem Contents;
+		Contents.FromJson(*itr);
+		m_Contents.SetSlot(SlotIdx, Contents);
 		SlotIdx++;
+		if (SlotIdx >= m_Contents.GetNumSlots())
+		{
+			return true;
+		}
 	}
 
 	return true;
@@ -205,6 +211,23 @@ void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 			Window->SendWholeWindow(*a_Player->GetClientHandle());
 		}
 	}
+}
+
+
+
+
+
+void cDropSpenserEntity::DropFromSlot(int a_SlotNum)
+{
+	int DispX = m_PosX;
+	int DispY = m_PosY;
+	int DispZ = m_PosZ;
+	NIBBLETYPE Meta = m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ);
+	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
+
+	cItems Pickups;
+	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
+	m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
 }
 
 

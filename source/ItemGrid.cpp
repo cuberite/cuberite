@@ -81,32 +81,7 @@ const cItem & cItemGrid::GetSlot(int a_X, int a_Y) const
 
 
 
-cItem & cItemGrid::GetSlot(int a_X, int a_Y)
-{
-	return GetSlot(GetSlotNum(a_X, a_Y));
-}
-
-
-
-
-
 const cItem & cItemGrid::GetSlot(int a_SlotNum) const
-{
-	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
-	{
-		LOGWARNING("%s: Invalid slot number, %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_NumSlots
-		);
-		return m_Slots[0];
-	}
-	return m_Slots[a_SlotNum];
-}
-
-
-
-
-
-cItem & cItemGrid::GetSlot(int a_SlotNum)
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
 	{

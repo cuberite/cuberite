@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/26/13 17:28:14.
+** Generated automatically by tolua++-1.0.92 on 05/26/13 22:51:07.
 */
 
 #ifndef __cplusplus
@@ -15038,7 +15038,7 @@ static int tolua_AllToLua_cItemGrid_AddItem00(lua_State* tolua_S)
  if (
      !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
-     !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -15047,7 +15047,7 @@ static int tolua_AllToLua_cItemGrid_AddItem00(lua_State* tolua_S)
  {
   cItemGrid* self = (cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   cItem* a_ItemStack = ((cItem*)  tolua_tousertype(tolua_S,2,0));
-  bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,0));
+  bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItem'", NULL);
 #endif
@@ -15074,7 +15074,7 @@ static int tolua_AllToLua_cItemGrid_AddItems00(lua_State* tolua_S)
  if (
      !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
-     !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
      !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
@@ -15083,7 +15083,7 @@ static int tolua_AllToLua_cItemGrid_AddItems00(lua_State* tolua_S)
  {
   cItemGrid* self = (cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   cItems* a_ItemStackList = ((cItems*)  tolua_tousertype(tolua_S,2,0));
-  bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,0));
+  bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItems'", NULL);
 #endif

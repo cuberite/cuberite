@@ -34,15 +34,7 @@ cDropperEntity::cDropperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld 
 
 void cDropperEntity::DropSpenseFromSlot(int a_SlotNum)
 {
-	int DispX = m_PosX;
-	int DispY = m_PosY;
-	int DispZ = m_PosZ;
-	NIBBLETYPE Meta = m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ);
-	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
-
-	cItems Pickups;
-	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum).CopyOne());
-	m_World->SpawnItemPickups(Pickups, DispX, DispY, DispZ);
+	DropFromSlot(a_SlotNum);
 }
 
 

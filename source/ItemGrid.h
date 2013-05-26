@@ -46,9 +46,6 @@ public:
 	/// Converts slot number into XY coords; sets coords to -1 on invalid slot number. Exported in ManualBindings.cpp
 	void GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const;
 
-	cItem & GetSlot(int a_X, int a_Y);  // TODO: This will be removed!
-	cItem & GetSlot(int a_SlotNum);  // TODO: This will be removed!
-
 	// tolua_begin
 	
 	// Retrieve slots by coords or slot number; Logs warning and returns the first slot on invalid coords / slotnum
@@ -76,7 +73,7 @@ public:
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest
 	Returns the number of items that fit.
 	*/
-	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks);
+	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true);
 	
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
@@ -84,7 +81,7 @@ public:
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest
 	Returns the total number of items that fit.
 	*/
-	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks);
+	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true);
 	
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
