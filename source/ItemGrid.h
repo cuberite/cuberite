@@ -98,10 +98,14 @@ public:
 	*/
 	int ChangeSlotCount(int a_X, int a_Y, int a_AddToCount);
 	
-	/// Removes one item from the specified slot, and returns it. If the slot was empty, returns an empty item
+	/** Removes one item from the stack in the specified slot, and returns it.
+	If the slot was empty, returns an empty item
+	*/
 	cItem RemoveOneItem(int a_SlotNum);
 	
-	/// Removes one item from the specified slot, and returns it. If the slot was empty, returns an empty item
+	/** Removes one item from the stack in the specified slot, and returns it.
+	If the slot was empty, returns an empty item
+	*/
 	cItem RemoveOneItem(int a_X, int a_Y);
 	
 	/// Returns the number of items of type a_Item that are stored
