@@ -7,7 +7,7 @@
 #include "SlotArea.h"
 #include "../Player.h"
 #include "../ChestEntity.h"
-#include "../DispenserEntity.h"
+#include "../DropSpenserEntity.h"
 #include "../FurnaceEntity.h"
 #include "../Items/ItemHandler.h"
 #include "Window.h"
@@ -474,11 +474,11 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cSlotAreaFurnace:
+// cSlotAreaDropSpenser:
 
-cSlotAreaDispenser::cSlotAreaDispenser(cDispenserEntity * a_Dispenser, cWindow & a_ParentWindow) :
+cSlotAreaDropSpenser::cSlotAreaDropSpenser(cDropSpenserEntity * a_DropSpenser, cWindow & a_ParentWindow) :
 	cSlotArea(9, a_ParentWindow),
-	m_Dispenser(a_Dispenser)
+	m_DropSpenser(a_DropSpenser)
 {
 }
 
@@ -486,34 +486,18 @@ cSlotAreaDispenser::cSlotAreaDispenser(cDispenserEntity * a_Dispenser, cWindow &
 
 
 
-void cSlotAreaDispenser::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+const cItem * cSlotAreaDropSpenser::GetSlot(int a_SlotNum, cPlayer & a_Player)
 {
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-	
-	if (m_Dispenser == NULL)
-	{
-		LOGERROR("cSlotAreaDispenser::Clicked(): m_Dispenser == NULL");
-		ASSERT(!"cSlotAreaDispenser::Clicked(): m_Dispenser == NULL");
-		return;
-	}
+	return &(m_DropSpenser->GetSlot(a_SlotNum));
 }
 
 
 
 
 
-const cItem * cSlotAreaDispenser::GetSlot(int a_SlotNum, cPlayer & a_Player)
+void cSlotAreaDropSpenser::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	return &(m_Dispenser->GetSlot(a_SlotNum));
-}
-
-
-
-
-
-void cSlotAreaDispenser::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
-{
-	m_Dispenser->SetSlot(a_SlotNum, a_Item);
+	m_DropSpenser->SetSlot(a_SlotNum, a_Item);
 }
 
 

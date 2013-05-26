@@ -1,20 +1,19 @@
 
+// BlockDropSpenser.h
+
+// Declares the cBlockDropSpenserHandler class representing the BlockHandler for Dropper and Dispenser blocks
+
 #pragma once
 
-#include "BlockEntity.h"
-#include "../World.h"
-#include "../Piston.h"
-#include "../Player.h"
 
 
 
 
-
-class cBlockDispenserHandler :
+class cBlockDropSpenserHandler :
 	public cBlockEntityHandler
 {
 public:
-	cBlockDispenserHandler(BLOCKTYPE a_BlockType) :
+	cBlockDropSpenserHandler(BLOCKTYPE a_BlockType) :
 		cBlockEntityHandler(a_BlockType)
 	{
 	}

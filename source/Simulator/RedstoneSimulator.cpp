@@ -425,32 +425,27 @@ void cRedstoneSimulator::HandleChange(const Vector3i & a_BlockPos)
 		}  // switch (BlockType)
 	}  // while (m_RefreshPistons[])
 
-	while (!m_RefreshDispensers.empty())
+	while (!m_RefreshDropSpensers.empty())
 	{
-		Vector3i pos = m_RefreshDispensers.back();
-		m_RefreshDispensers.pop_back();
+		Vector3i pos = m_RefreshDropSpensers.back();
+		m_RefreshDropSpensers.pop_back();
 
 		BLOCKTYPE BlockType = m_World.GetBlock(pos);
-		if (BlockType == E_BLOCK_DISPENSER)
+		if ((BlockType == E_BLOCK_DISPENSER) || (BlockType == E_BLOCK_DROPPER))
 		{
 			if (IsPowered(pos))
 			{
-				class cActivateDispenser :
-					public cDispenserCallback
+				class cActivateDropSpenser :
+					public cDropSpenserCallback
 				{
-				public:
-					cActivateDispenser()
+					virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
 					{
-					}
-					
-					virtual bool Item(cDispenserEntity * a_Dispenser) override
-					{
-						a_Dispenser->Activate();
+						a_DropSpenser->Activate();
 						return false;
 					}
 				} ;
-				cActivateDispenser DispAct;
-				m_World.DoWithDispenserAt(pos.x, pos.y, pos.z, DispAct);
+				cActivateDropSpenser DrSpAct;
+				m_World.DoWithDropSpenserAt(pos.x, pos.y, pos.z, DrSpAct);
 			}
 		}
 	}
@@ -485,8 +480,9 @@ bool cRedstoneSimulator::PowerBlock(const Vector3i & a_BlockPos, const Vector3i 
 		}
 
 		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:
 		{
-			m_RefreshDispensers.push_back(a_BlockPos);
+			m_RefreshDropSpensers.push_back(a_BlockPos);
 			break;
 		}
 		

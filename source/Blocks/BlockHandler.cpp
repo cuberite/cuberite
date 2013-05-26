@@ -28,7 +28,7 @@
 #include "BlockFluid.h"
 #include "BlockChest.h"
 #include "BlockFurnace.h"
-#include "BlockDispenser.h"
+#include "BlockDropSpenser.h"
 #include "BlockStairs.h"
 #include "BlockLadder.h"
 #include "BlockLever.h"
@@ -110,9 +110,10 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
-		case E_BLOCK_DISPENSER:             return new cBlockDispenserHandler       (a_BlockType);
+		case E_BLOCK_DISPENSER:             return new cBlockDropSpenserHandler     (a_BlockType);
 		case E_BLOCK_DOUBLE_STONE_SLAB:     return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
 		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
 		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler;

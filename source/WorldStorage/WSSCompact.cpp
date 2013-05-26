@@ -74,6 +74,7 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 	{
 		case E_BLOCK_CHEST:      SaveInto = "Chests";      break;
 		case E_BLOCK_DISPENSER:  SaveInto = "Dispensers";  break;
+		case E_BLOCK_DROPPER:    SaveInto = "Droppers";    break;
 		case E_BLOCK_FURNACE:    SaveInto = "Furnaces";    break;
 		case E_BLOCK_SIGN_POST:  SaveInto = "Signs";       break;
 		case E_BLOCK_WALLSIGN:   SaveInto = "Signs";       break;

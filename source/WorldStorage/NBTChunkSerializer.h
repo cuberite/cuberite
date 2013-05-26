@@ -22,6 +22,7 @@ class cBlockEntity;
 class cChestEntity;
 class cFurnaceEntity;
 class cDispenserEntity;
+class cDropperEntity;
 class cSignEntity;
 class cNoteEntity;
 class cJukeboxEntity;
@@ -80,6 +81,7 @@ protected:
 	void AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID);
 	void AddChestEntity(cChestEntity * a_Entity);
 	void AddDispenserEntity(cDispenserEntity * a_Entity);
+	void AddDropperEntity(cDropperEntity * a_Entity);
 	void AddFurnaceEntity(cFurnaceEntity * a_Furnace);
 	void AddSignEntity(cSignEntity * a_Sign);
 	void AddNoteEntity(cNoteEntity * a_Note);

@@ -482,12 +482,12 @@ cChestWindow::~cChestWindow()
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cDispenserWindow:
+// cDropSpenserWindow:
 
-cDispenserWindow::cDispenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserEntity * a_Dispenser) :
-	cWindow(cWindow::Dispenser, "MCS-Dispenser")
+cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
+	cWindow(cWindow::DropSpenser, "MCS-DropSpenser")
 {
-	m_SlotAreas.push_back(new cSlotAreaDispenser(a_Dispenser, *this));
+	m_SlotAreas.push_back(new cSlotAreaDropSpenser(a_DropSpenser, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }

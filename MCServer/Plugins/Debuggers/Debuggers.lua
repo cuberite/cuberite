@@ -3,8 +3,7 @@
 PLUGIN = {};	-- Reference to own plugin object
 ShouldDumpFunctions = true;  -- If set to true, all available functions are logged upon plugin initialization
 
-g_DispensersToActivate = {};  -- A list of dispensers (as {World, X, Y Z} quadruplets) that are to be activated every tick
-g_DroppersToActivate   = {};  -- A list of droppers   (as {World, X, Y Z} quadruplets) that are to be activated every tick
+g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 
 
 
@@ -366,11 +365,11 @@ function OnUsingRedstoneTorch(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX
 	-- Redstone torch activates a rapid dispenser / dropper discharge (at every tick):
 	local BlockType = Player:GetWorld():GetBlock(BlockX, BlockY, BlockZ);
 	if (BlockType == E_BLOCK_DISPENSER) then
-		table.insert(g_DispensersToActivate, {World = Player:GetWorld(), x = BlockX, y = BlockY, z = BlockZ});
+		table.insert(g_DropSpensersToActivate, {World = Player:GetWorld(), x = BlockX, y = BlockY, z = BlockZ});
 		Player:SendMessage("Dispenser at {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "} discharging");
 		return true;
 	elseif (BlockType == E_BLOCK_DROPPER) then
-		table.insert(g_DroppersToActivate, {World = Player:GetWorld(), x = BlockX, y = BlockY, z = BlockZ});
+		table.insert(g_DropSpensersToActivate, {World = Player:GetWorld(), x = BlockX, y = BlockY, z = BlockZ});
 		Player:SendMessage("Dropper at {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "} discharging");
 		return true;
 	else
@@ -445,20 +444,20 @@ end
 
 
 function OnTick()
-	-- Activate all dispensers in the g_DispensersToActivate list:
-	local ActivateDisp = function(Dispenser)
-		if (Dispenser:GetContents():GetFirstUsedSlot() == -1) then
+	-- Activate all dropspensers in the g_DropSpensersToActivate list:
+	local ActivateDrSp = function(DropSpenser)
+		if (DropSpenser:GetContents():GetFirstUsedSlot() == -1) then
 			return true;
 		end
-		Dispenser:Activate();
+		DropSpenser:Activate();
 		return false;
 	end
-	
-	local idx = #g_DispensersToActivate;
+	-- Walk the list backwards, because we're removing some items
+	local idx = #g_DropSpensersToActivate;
 	for i = idx, 1, -1 do
-		local Disp = g_DispensersToActivate[i];
-		if not(Disp.World:DoWithDispenserAt(Disp.x, Disp.y, Disp.z, ActivateDisp)) then
-			table.remove(g_DispensersToActivate, i);
+		local DrSp = g_DropSpensersToActivate[i];
+		if not(DrSp.World:DoWithDropSpenserAt(DrSp.x, DrSp.y, DrSp.z, ActivateDrSp)) then
+			table.remove(g_DropSpensersToActivate, i);
 		end
 	end
 	

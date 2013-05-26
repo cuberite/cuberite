@@ -15,6 +15,7 @@
 #include "ClientHandle.h"
 #include "ChestEntity.h"
 #include "DispenserEntity.h"
+#include "DropperEntity.h"
 #include "FurnaceEntity.h"
 #include "md5/md5.h"
 
@@ -1174,8 +1175,11 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "DoWithPlayer",          tolua_DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",   tolua_DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
-			tolua_function(tolua_S, "DoWithChestAt",         tolua_DoWithXYZ<cWorld, cChestEntity, &cWorld::DoWithChestAt>);
-			tolua_function(tolua_S, "DoWithDispenserAt",     tolua_DoWithXYZ<cWorld, cDispenserEntity, &cWorld::DoWithDispenserAt>);
+			tolua_function(tolua_S, "DoWithChestAt",         tolua_DoWithXYZ<cWorld, cChestEntity,       &cWorld::DoWithChestAt>);
+			tolua_function(tolua_S, "DoWithDispenserAt",     tolua_DoWithXYZ<cWorld, cDispenserEntity,   &cWorld::DoWithDispenserAt>);
+			tolua_function(tolua_S, "DoWithDropperAt",       tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
+			tolua_function(tolua_S, "DoWithDropSpenserAt",   tolua_DoWithXYZ<cWorld, cDropSpenserEntity, &cWorld::DoWithDropSpenserAt>);
+			tolua_function(tolua_S, "DoWithFurnaceAt",       tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");

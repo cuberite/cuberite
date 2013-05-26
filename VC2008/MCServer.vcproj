@@ -269,7 +269,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\resource.h"
+				RelativePath=".\resource_MCServer.h"
 				>
 			</File>
 			<File
@@ -1813,15 +1813,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\blocks\BlockDispenser.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockDoor.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\blocks\BlockDoor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\blocks\BlockDropSpenser.h"
 					>
 				</File>
 				<File
@@ -2318,6 +2318,22 @@
 				</File>
 				<File
 					RelativePath="..\source\DispenserEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DropperEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DropperEntity.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DropSpenserEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\DropSpenserEntity.h"
 					>
 				</File>
 				<File

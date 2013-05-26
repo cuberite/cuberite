@@ -14,6 +14,7 @@
 #include "Defines.h"
 #include "ChestEntity.h"
 #include "DispenserEntity.h"
+#include "DropperEntity.h"
 #include "FurnaceEntity.h"
 #include "SignEntity.h"
 #include "NoteEntity.h"
@@ -1135,6 +1136,15 @@ void cChunk::CreateBlockEntities(void)
 						break;
 					}
 					
+					case E_BLOCK_DROPPER:
+					{
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						{
+							m_BlockEntities.push_back(new cDropperEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
+						}
+						break;
+					}
+					
 					case E_BLOCK_FURNACE:
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
@@ -1330,6 +1340,11 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 		case E_BLOCK_DISPENSER:
 		{
 			AddBlockEntity( new cDispenserEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			break;
+		}
+		case E_BLOCK_DROPPER:
+		{
+			AddBlockEntity( new cDropperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
 			break;
 		}
 		case E_BLOCK_FURNACE:
@@ -1835,6 +1850,50 @@ bool cChunk::ForEachDispenser(cDispenserCallback & a_Callback)
 
 
 
+bool cChunk::ForEachDropper(cDropperCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if ((*itr)->GetBlockType() != E_BLOCK_DROPPER)
+		{
+			continue;
+		}
+		if (a_Callback.Item((cDropperEntity *)*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_BlockEntitites[]
+	return true;
+}
+
+
+
+
+
+bool cChunk::ForEachDropSpenser(cDropSpenserCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetBlockType() != E_BLOCK_DISPENSER) && ((*itr)->GetBlockType() != E_BLOCK_DROPPER))
+		{
+			continue;
+		}
+		if (a_Callback.Item((cDropSpenserEntity *)*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_BlockEntitites[]
+	return true;
+}
+
+
+
+
+
 bool cChunk::ForEachFurnace(cFurnaceCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
@@ -1915,6 +1974,70 @@ bool cChunk::DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispen
 		
 		// The correct block entity is here
 		if (a_Callback.Item((cDispenserEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_DROPPER)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here
+		if (a_Callback.Item((cDropperEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
+bool cChunk::DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if (((*itr)->GetBlockType() != E_BLOCK_DISPENSER) && ((*itr)->GetBlockType() != E_BLOCK_DROPPER))
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here
+		if (a_Callback.Item((cDropSpenserEntity *)*itr))
 		{
 			return false;
 		}

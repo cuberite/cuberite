@@ -19,7 +19,7 @@ class cPlayer;
 class cWindowOwner;
 class cClientHandle;
 class cChestEntity;
-class cDispenserEntity;
+class cDropSpenserEntity;
 class cFurnaceEntity;
 class cSlotArea;
 class cWorld;
@@ -49,9 +49,13 @@ public:
 		Chest       = 0,
 		Workbench   = 1,
 		Furnace     = 2,
-		Dispenser   = 3,
+		DropSpenser = 3,  // Dropper or Dispenser
 		Enchantment = 4,
-		Brewery     = 5
+		Brewery     = 5,
+		NPCTrade    = 6,
+		Beacon      = 7,
+		Anvil       = 8,
+		Hopper      = 9,
 	};
 	
 	static const int c_NumInventorySlots = 36;
@@ -149,11 +153,11 @@ public:
 
 
 
-class cDispenserWindow :
+class cDropSpenserWindow :
 	public cWindow
 {
 public:
-	cDispenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserEntity * a_Dispenser);
+	cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_Dispenser);
 } ;
 
 

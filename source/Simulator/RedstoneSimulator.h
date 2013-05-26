@@ -71,7 +71,7 @@ private:
 	BlockList m_BlocksBuffer;
 
 	BlockList m_RefreshPistons;
-	BlockList m_RefreshDispensers;
+	BlockList m_RefreshDropSpensers;
 
 	BlockList m_RefreshTorchesAround;
 	

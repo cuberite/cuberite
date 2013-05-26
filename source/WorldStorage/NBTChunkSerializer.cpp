@@ -7,6 +7,7 @@
 #include "../BlockID.h"
 #include "../ChestEntity.h"
 #include "../DispenserEntity.h"
+#include "../DropperEntity.h"
 #include "../FurnaceEntity.h"
 #include "../SignEntity.h"
 #include "../NoteEntity.h"
@@ -122,6 +123,20 @@ void cNBTChunkSerializer::AddDispenserEntity(cDispenserEntity * a_Entity)
 {
 	m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_Entity, "Trap");
+		m_Writer.BeginList("Items", TAG_Compound);
+			AddItemGrid(a_Entity->GetContents());
+		m_Writer.EndList();
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddDropperEntity(cDropperEntity * a_Entity)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Entity, "Dropper");
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
@@ -401,6 +416,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	{
 		case E_BLOCK_CHEST:      AddChestEntity     ((cChestEntity *)     a_Entity); break;
 		case E_BLOCK_DISPENSER:  AddDispenserEntity ((cDispenserEntity *) a_Entity); break;
+		case E_BLOCK_DROPPER:    AddDropperEntity   ((cDropperEntity *)   a_Entity); break;
 		case E_BLOCK_FURNACE:    AddFurnaceEntity   ((cFurnaceEntity *)   a_Entity); break;
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:   AddSignEntity      ((cSignEntity *)      a_Entity); break;
