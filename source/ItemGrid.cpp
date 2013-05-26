@@ -355,6 +355,53 @@ int cItemGrid::ChangeSlotCount(int a_X, int a_Y, int a_AddToCount)
 
 
 
+cItem cItemGrid::RemoveOneItem(int a_SlotNum)
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
+	{
+		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning empty item",
+			__FUNCTION__, a_SlotNum, m_NumSlots
+		);
+		return cItem();
+	}
+	
+	// If the slot is empty, return an empty item
+	if (m_Slots[a_SlotNum].IsEmpty())
+	{
+		return cItem();
+	}
+	
+	// Make a copy of the item in slot, set count to 1 and remove one from the slot
+	cItem res = m_Slots[a_SlotNum];
+	res.m_ItemCount = 1;
+	m_Slots[a_SlotNum].m_ItemCount -= 1;
+	
+	// Emptying the slot correctly if appropriate
+	if (m_Slots[a_SlotNum].m_ItemCount == 0)
+	{
+		m_Slots[a_SlotNum].Empty();
+	}
+	
+	// Notify everyone of the change
+	TriggerListeners(a_SlotNum);
+	
+	// Return the stored one item
+	return res;
+}
+
+
+
+
+
+cItem cItemGrid::RemoveOneItem(int a_X, int a_Y)
+{
+	return RemoveOneItem(GetSlotNum(a_X, a_Y));
+}
+
+
+
+
+
 int cItemGrid::HowManyItems(const cItem & a_Item)
 {
 	int res = 0;
