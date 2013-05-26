@@ -24,7 +24,7 @@ function OnDisconnect(a_Player, a_Reason)
 	g_PlayerAreas[a_Player:GetName()] = nil;
 	
 	-- If the player is a VIP, they had a command state, remove that as well
-	CommandStates[a_Player:GetUniqueID()] = nil;
+	g_CommandStates[a_Player:GetUniqueID()] = nil;
 	
 	return false;
 end;
