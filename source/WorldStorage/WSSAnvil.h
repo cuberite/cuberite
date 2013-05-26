@@ -15,6 +15,13 @@
 
 
 
+// fwd: ItemGrid.h
+class cItemGrid;
+
+
+
+
+
 enum
 {
 	/// Maximum number of chunks in an MCA file - also the count of the header items
@@ -114,8 +121,15 @@ protected:
 	/// Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag
 	bool LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx);
 	
+	/** Loads contentents of an Items[] list tag into a cItemGrid
+	ItemGrid begins at the specified slot offset
+	Slots outside the ItemGrid range are ignored
+	*/
+	void LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int s_SlotOffset = 0);
+	
 	void LoadChestFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDispenserFromNBT (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadDropperFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFurnaceFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSignFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadNoteFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);

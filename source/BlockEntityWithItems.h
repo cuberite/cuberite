@@ -19,6 +19,10 @@
 // tolua_begin
 class cBlockEntityWithItems :
 	public cBlockEntity
+	// tolua_end
+	// tolua doesn't seem to support multiple inheritance?
+	, public cItemGrid::cListener
+	// tolua_begin
 {
 	typedef cBlockEntity super;
 	
@@ -34,6 +38,7 @@ public:
 		super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, a_World),
 		m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 	{
+		m_Contents.AddListener(*this);
 	}
 	
 	virtual void Destroy(void) override
@@ -64,6 +69,14 @@ public:
 
 protected:
 	cItemGrid m_Contents;
+	
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+	{
+		ASSERT(a_Grid == &m_Contents);
+		ASSERT(m_World != NULL);
+		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+	}
 } ;  // tolua_export
 
 

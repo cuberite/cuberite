@@ -56,6 +56,9 @@ public:
 	
 	cWorld * GetWorld(void) const {return m_World; }
 	
+	int GetChunkX(void) const { return FAST_FLOOR_DIV(m_PosX, cChunkDef::Width); }
+	int GetChunkZ(void) const { return FAST_FLOOR_DIV(m_PosZ, cChunkDef::Width); }
+	
 	// tolua_end
 
 	virtual void SaveToJson  (Json::Value & a_Value) = 0;

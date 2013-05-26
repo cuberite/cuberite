@@ -11,11 +11,13 @@
 #include "../BlockID.h"
 #include "../ChestEntity.h"
 #include "../DispenserEntity.h"
+#include "../DropperEntity.h"
 #include "../FurnaceEntity.h"
 #include "../SignEntity.h"
 #include "../NoteEntity.h"
 #include "../JukeboxEntity.h"
 #include "../Item.h"
+#include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "../Entity.h"
 #include "../OSSupport/MakeDir.h"
@@ -558,17 +560,13 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
 		}
-		else if (strncmp(a_NBT.GetData(sID), "Trap", a_NBT.GetDataLength(sID)) == 0)
+		else if (strncmp(a_NBT.GetData(sID), "Dropper", a_NBT.GetDataLength(sID)) == 0)
 		{
-			LoadDispenserFromNBT(a_BlockEntities, a_NBT, Child);
+			LoadDropperFromNBT(a_BlockEntities, a_NBT, Child);
 		}
 		else if (strncmp(a_NBT.GetData(sID), "Furnace", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child);
-		}
-		else if (strncmp(a_NBT.GetData(sID), "Sign", a_NBT.GetDataLength(sID)) == 0)
-		{
-			LoadSignFromNBT(a_BlockEntities, a_NBT, Child);
 		}
 		else if (strncmp(a_NBT.GetData(sID), "Music", a_NBT.GetDataLength(sID)) == 0)
 		{
@@ -577,6 +575,14 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		else if (strncmp(a_NBT.GetData(sID), "RecordPlayer", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadJukeboxFromNBT(a_BlockEntities, a_NBT, Child);
+		}
+		else if (strncmp(a_NBT.GetData(sID), "Sign", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadSignFromNBT(a_BlockEntities, a_NBT, Child);
+		}
+		else if (strncmp(a_NBT.GetData(sID), "Trap", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadDispenserFromNBT(a_BlockEntities, a_NBT, Child);
 		}
 		// TODO: Other block entities
 	}  // for Child - tag children
@@ -617,6 +623,34 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 
 
 
+void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int a_SlotOffset)
+{
+	int NumSlots = a_ItemGrid.GetNumSlots();
+	for (int Child = a_NBT.GetFirstChild(a_ItemsTagIdx); Child != -1; Child = a_NBT.GetNextSibling(Child))
+	{
+		int SlotTag = a_NBT.FindChildByName(Child, "Slot");
+		if ((SlotTag < 0) || (a_NBT.GetType(SlotTag) != TAG_Byte))
+		{
+			continue;
+		}
+		int SlotNum = (int)(a_NBT.GetByte(SlotTag)) - a_SlotOffset;
+		if ((SlotNum < 0) || (SlotNum >= NumSlots))
+		{
+			// SlotNum outside of the range
+			continue;
+		}
+		cItem Item;
+		if (LoadItemFromNBT(Item, a_NBT, Child))
+		{
+			a_ItemGrid.SetSlot(SlotNum, Item);
+		}
+	}  // for itr - ItemDefs[]
+}
+
+
+
+
+
 void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
@@ -631,19 +665,7 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
 	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World));
-	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
-	{
-		int Slot = a_NBT.FindChildByName(Child, "Slot");
-		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
-		{
-			continue;
-		}
-		cItem Item;
-		if (LoadItemFromNBT(Item, a_NBT, Child))
-		{
-			Chest->SetSlot(a_NBT.GetByte(Slot), Item);
-		}
-	}  // for itr - ItemDefs[]
+	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
 	a_BlockEntities.push_back(Chest.release());
 }
 
@@ -665,20 +687,30 @@ void cWSSAnvil::LoadDispenserFromNBT(cBlockEntityList & a_BlockEntities, const c
 		return;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
 	}
 	std::auto_ptr<cDispenserEntity> Dispenser(new cDispenserEntity(x, y, z, m_World));
-	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
-	{
-		int Slot = a_NBT.FindChildByName(Child, "Slot");
-		if ((Slot < 0) || (a_NBT.GetType(Slot) != TAG_Byte))
-		{
-			continue;
-		}
-		cItem Item;
-		if (LoadItemFromNBT(Item, a_NBT, Child))
-		{
-			Dispenser->SetSlot(a_NBT.GetByte(Slot), Item);
-		}
-	}  // for itr - ItemDefs[]
+	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
 	a_BlockEntities.push_back(Dispenser.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadDropperFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
+	}
+	std::auto_ptr<cDropperEntity> Dropper(new cDropperEntity(x, y, z, m_World));
+	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
+	a_BlockEntities.push_back(Dropper.release());
 }
 
 

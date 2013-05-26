@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/26/13 16:21:49.
+** Generated automatically by tolua++-1.0.92 on 05/26/13 17:28:14.
 */
 
 #ifndef __cplusplus
@@ -15781,6 +15781,70 @@ static int tolua_AllToLua_cBlockEntity_GetWorld00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetChunkX of class  cBlockEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntity_GetChunkX00
+static int tolua_AllToLua_cBlockEntity_GetChunkX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockEntity* self = (const cBlockEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetChunkX'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetChunkX();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetChunkX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetChunkZ of class  cBlockEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntity_GetChunkZ00
+static int tolua_AllToLua_cBlockEntity_GetChunkZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockEntity* self = (const cBlockEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetChunkZ'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetChunkZ();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetChunkZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetSlot of class  cBlockEntityWithItems */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntityWithItems_GetSlot00
 static int tolua_AllToLua_cBlockEntityWithItems_GetSlot00(lua_State* tolua_S)
@@ -26560,6 +26624,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetPosZ",tolua_AllToLua_cBlockEntity_GetPosZ00);
    tolua_function(tolua_S,"GetBlockType",tolua_AllToLua_cBlockEntity_GetBlockType00);
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cBlockEntity_GetWorld00);
+   tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cBlockEntity_GetChunkX00);
+   tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cBlockEntity_GetChunkZ00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cBlockEntityWithItems","cBlockEntityWithItems","cBlockEntity",NULL);
   tolua_beginmodule(tolua_S,"cBlockEntityWithItems");
