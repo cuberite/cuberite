@@ -433,20 +433,20 @@ void cRedstoneSimulator::HandleChange(const Vector3i & a_BlockPos)
 		BLOCKTYPE BlockType = m_World.GetBlock(pos);
 		if ((BlockType == E_BLOCK_DISPENSER) || (BlockType == E_BLOCK_DROPPER))
 		{
-			if (IsPowered(pos))
+			class cSetPowerToDropSpenser :
+				public cDropSpenserCallback
 			{
-				class cActivateDropSpenser :
-					public cDropSpenserCallback
+				bool m_IsPowered;
+			public:
+				cSetPowerToDropSpenser(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
+				
+				virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
 				{
-					virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
-					{
-						a_DropSpenser->Activate();
-						return false;
-					}
-				} ;
-				cActivateDropSpenser DrSpAct;
-				m_World.DoWithDropSpenserAt(pos.x, pos.y, pos.z, DrSpAct);
-			}
+					a_DropSpenser->Activate();
+					return false;
+				}
+			} DrSpSP(IsPowered(pos));
+			m_World.DoWithDropSpenserAt(pos.x, pos.y, pos.z, DrSpSP);
 		}
 	}
 }

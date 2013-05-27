@@ -65,11 +65,16 @@ public:
 	/// Sets the dropspenser to dropspense an item in the next tick
 	void Activate(void);
 	
+	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
+	void SetRedstonePower(bool a_IsPowered);
+	
 	// tolua_end
 
 protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
-
+	bool m_IsPowered;         ///< Set to true when the dropspenser receives redstone power.
+	
+	/// Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke / sound effects
 	void DropSpense(void);
 	
 	/// Override this function to provide the specific behavior for item dropspensing (drop / shoot / pour / ...)

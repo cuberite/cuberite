@@ -14,7 +14,8 @@
 
 cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
-	m_ShouldDropSpense(false)
+	m_ShouldDropSpense(false),
+	m_IsPowered(false)
 {
 	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
@@ -114,6 +115,19 @@ void cDropSpenserEntity::DropSpense(void)
 void cDropSpenserEntity::Activate(void)
 {
 	m_ShouldDropSpense = true;
+}
+
+
+
+
+
+void cDropSpenserEntity::SetRedstonePower(bool a_IsPowered)
+{
+	if (a_IsPowered && !m_IsPowered)
+	{
+		Activate();
+	}
+	m_IsPowered = a_IsPowered;
 }
 
 
