@@ -159,6 +159,13 @@ public:
 	*/
 	cChunk * GetRelNeighborChunk(int a_RelX, int a_RelZ);
 	
+	/**
+	Returns the chunk into which the relatively-specified block belongs, by walking the neighbors.
+	Also modifies the relative coords from this-relative to return-relative.
+	Will return self if appropriate. Returns NULL if not reachable through neighbors.
+	*/
+	cChunk * GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ);
+	
 	EMCSBiome GetBiomeAt(int a_RelX, int a_RelZ) const {return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ); }
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);

@@ -2354,6 +2354,72 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 
 
 
+cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ)
+{
+	bool ReturnThis = true;
+	int RelX = a_RelX;
+	int RelZ = a_RelZ;
+	if (a_RelX < 0)
+	{
+		if (m_NeighborXM != NULL)
+		{
+			RelX = a_RelX + cChunkDef::Width;
+			cChunk * Candidate = m_NeighborXM->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
+			if (Candidate != NULL)
+			{
+				a_RelX = RelX;
+				a_RelZ = RelZ;
+				return Candidate;
+			}
+		}
+		// Going X-first failed, but if the request is crossing Z as well, let's try the Z-first later on.
+		ReturnThis = false;
+	}
+	else if (a_RelX >= cChunkDef::Width)
+	{
+		if (m_NeighborXP != NULL)
+		{
+			RelX = a_RelX - cChunkDef::Width;
+			cChunk * Candidate = m_NeighborXP->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
+			if (Candidate != NULL)
+			{
+				a_RelX = RelX;
+				a_RelZ = RelZ;
+				return Candidate;
+			}
+		}
+		// Going X-first failed, but if the request is crossing Z as well, let's try the Z-first later on.
+		ReturnThis = false;
+	}
+	
+	if (a_RelZ < 0)
+	{
+		if (m_NeighborZM != NULL)
+		{
+			a_RelZ += cChunkDef::Width;
+			return m_NeighborZM->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
+			// For requests crossing both X and Z, the X-first way has been already tried
+		}
+		return NULL;
+	}
+	else if (a_RelZ >= cChunkDef::Width)
+	{
+		if (m_NeighborZP != NULL)
+		{
+			a_RelZ -= cChunkDef::Width;
+			return m_NeighborZP->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
+			// For requests crossing both X and Z, the X-first way has been already tried
+		}
+		return NULL;
+	}
+	
+	return (ReturnThis ? this : NULL);
+}
+
+
+
+
+
 void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
