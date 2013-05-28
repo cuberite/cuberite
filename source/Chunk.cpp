@@ -452,7 +452,7 @@ void cChunk::Tick(float a_Dt)
 	// Tick all block entities in this chunk:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
-		m_IsDirty = (*itr)->Tick(a_Dt) | m_IsDirty;
+		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 	
 	// Tick all entities in this chunk:

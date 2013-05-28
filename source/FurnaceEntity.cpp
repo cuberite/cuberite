@@ -103,7 +103,7 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 
 
 
-bool cFurnaceEntity::Tick( float a_Dt )
+bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	/*
 	// DEBUG:

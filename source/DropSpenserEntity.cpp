@@ -7,6 +7,7 @@
 #include "Globals.h"
 #include "DropSpenserEntity.h"
 #include "Player.h"
+#include "Chunk.h"
 
 
 
@@ -57,13 +58,8 @@ void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int &
 
 
 
-void cDropSpenserEntity::DropSpense(void)
+void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 {
-	int Disp_X = m_PosX;
-	int Disp_Y = m_PosY;
-	int Disp_Z = m_PosZ;
-	NIBBLETYPE Meta = m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ);
-	
 	// Pick one of the occupied slots:
 	int OccupiedSlots[9];
 	int SlotsCnt = 0;
@@ -86,16 +82,17 @@ void cDropSpenserEntity::DropSpense(void)
 	int RandomSlot = 	m_World->GetTickRandomNumber(SlotsCnt - 1);
 	
 	// DropSpense the item, using the specialized behavior in the subclasses:
-	DropSpenseFromSlot(OccupiedSlots[RandomSlot]);
+	DropSpenseFromSlot(a_Chunk, OccupiedSlots[RandomSlot]);
 	
 	// Broadcast a smoke and click effects:
-	NIBBLETYPE SmokeDir = 0;
+	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
+	int SmokeDir = 0;
 	switch (Meta)
 	{
-		case 2: SmokeDir = 1; break;
-		case 3: SmokeDir = 7; break;
-		case 4: SmokeDir = 3; break;
-		case 5: SmokeDir = 5; break;
+		case E_META_DISPENSER_FACING_XM: SmokeDir = 3; break;
+		case E_META_DISPENSER_FACING_XP: SmokeDir = 5; break;
+		case E_META_DISPENSER_FACING_ZM: SmokeDir = 1; break;
+		case E_META_DISPENSER_FACING_ZP: SmokeDir = 7; break;
 	}
 	m_World->BroadcastSoundParticleEffect(2000, m_PosX * 8, m_PosY * 8, m_PosZ * 8, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
@@ -134,7 +131,7 @@ void cDropSpenserEntity::SetRedstonePower(bool a_IsPowered)
 
 
 
-bool cDropSpenserEntity::Tick(float a_Dt)
+bool cDropSpenserEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	if (!m_ShouldDropSpense)
 	{
@@ -142,7 +139,7 @@ bool cDropSpenserEntity::Tick(float a_Dt)
 	}
 	
 	m_ShouldDropSpense = false;
-	DropSpense();
+	DropSpense(a_Chunk);
 	return true;
 }
 
@@ -231,12 +228,12 @@ void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cDropSpenserEntity::DropFromSlot(int a_SlotNum)
+void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
 	int DispX = m_PosX;
 	int DispY = m_PosY;
 	int DispZ = m_PosZ;
-	NIBBLETYPE Meta = m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ);
+	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
 
 	cItems Pickups;

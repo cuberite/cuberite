@@ -28,6 +28,8 @@ protected:
 		m_PosX(a_BlockX),
 		m_PosY(a_BlockY),
 		m_PosZ(a_BlockZ),
+		m_RelX(a_BlockX - cChunkDef::Width * FAST_FLOOR_DIV(a_BlockX, cChunkDef::Width)),
+		m_RelZ(a_BlockZ - cChunkDef::Width * FAST_FLOOR_DIV(a_BlockZ, cChunkDef::Width)),
 		m_BlockType(a_BlockType),
 		m_World(a_World)
 	{
@@ -59,10 +61,14 @@ public:
 	int GetChunkX(void) const { return FAST_FLOOR_DIV(m_PosX, cChunkDef::Width); }
 	int GetChunkZ(void) const { return FAST_FLOOR_DIV(m_PosZ, cChunkDef::Width); }
 	
+	int GetRelX(void) const { return m_RelX; }
+	int GetRelZ(void) const { return m_RelZ; }
+	
 	// tolua_end
 
 	virtual void SaveToJson  (Json::Value & a_Value) = 0;
 	
+	/// Called when a player uses this entity; should open the UI window
 	virtual void UsedBy( cPlayer * a_Player ) = 0;
 	
 	/** Sends the packet defining the block entity to the client specified.
@@ -71,12 +77,14 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) = 0;
 	
 	/// Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing.
-	virtual bool Tick(float a_Dt) { return false; }
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) { return false; }
 
 protected:
-	int m_PosX; // Position in absolute block coordinates
-	int m_PosY;
-	int m_PosZ;
+	/// Position in absolute block coordinates
+	int m_PosX, m_PosY, m_PosZ;
+	
+	/// Position relative to the chunk, used to speed up ticking
+	int m_RelX, m_RelZ;
 
 	BLOCKTYPE m_BlockType;
 	

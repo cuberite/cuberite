@@ -37,7 +37,7 @@ public:
 	// cBlockEntity overrides:
 	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual bool Tick(float a_Dt) override;
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 
 	bool StartCooking(void);

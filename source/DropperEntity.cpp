@@ -32,9 +32,9 @@ cDropperEntity::cDropperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld 
 
 
 
-void cDropperEntity::DropSpenseFromSlot(int a_SlotNum)
+void cDropperEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
-	DropFromSlot(a_SlotNum);
+	DropFromSlot(a_Chunk, a_SlotNum);
 }
 
 

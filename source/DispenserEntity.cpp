@@ -4,6 +4,7 @@
 #include "DispenserEntity.h"
 #include "Player.h"
 #include "Simulator/FluidSimulator.h"
+#include "Chunk.h"
 
 
 
@@ -29,20 +30,27 @@ cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWo
 
 
 
-void cDispenserEntity::DropSpenseFromSlot(int a_SlotNum)
+void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 {
-	int DispX = m_PosX;
+	int DispX = m_RelX;
 	int DispY = m_PosY;
-	int DispZ = m_PosZ;
-	NIBBLETYPE Meta = m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ);
+	int DispZ = m_RelZ;
+	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
+	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+	if (DispChunk == NULL)
+	{
+		// Would dispense into / interact with a non-loaded chunk, ignore the tick
+		return;
+	}
+	BLOCKTYPE DispBlock = DispChunk->GetBlock(DispX, DispY, DispZ);
 
 	// Dispense the item:
 	switch (m_Contents.GetSlot(a_SlotNum).m_ItemType)
 	{
 		case E_ITEM_BUCKET:
 		{
-			BLOCKTYPE DispBlock = m_World->GetBlock(DispX, DispY, DispZ);
+			LOGD("Dispensing empty bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
 			switch (DispBlock)
 			{
 				case E_BLOCK_STATIONARY_WATER:
@@ -50,7 +58,7 @@ void cDispenserEntity::DropSpenseFromSlot(int a_SlotNum)
 				{
 					if (ScoopUpLiquid(a_SlotNum, E_ITEM_WATER_BUCKET))
 					{
-						m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
+						DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
 					}
 					break;
 				}
@@ -59,13 +67,13 @@ void cDispenserEntity::DropSpenseFromSlot(int a_SlotNum)
 				{
 					if (ScoopUpLiquid(a_SlotNum, E_ITEM_LAVA_BUCKET))
 					{
-						m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
+						DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_AIR, 0);
 					}
 					break;
 				}
 				default:
 				{
-					DropFromSlot(a_SlotNum);
+					DropFromSlot(a_Chunk, a_SlotNum);
 					break;
 				}
 			}
@@ -74,35 +82,37 @@ void cDispenserEntity::DropSpenseFromSlot(int a_SlotNum)
 		
 		case E_ITEM_WATER_BUCKET:
 		{
-			BLOCKTYPE DispBlock = m_World->GetBlock(DispX, DispY, DispZ);
-			if (PlaceLiquid(DispBlock, a_SlotNum))
+			LOGD("Dispensing water bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
+			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
 			{
-				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_WATER, 0);
+				DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_WATER, 0);
 			}
 			else
 			{
-				DropFromSlot(a_SlotNum);
+				DropFromSlot(a_Chunk, a_SlotNum);
 			}
 			break;
 		}
 		
 		case E_ITEM_LAVA_BUCKET:
 		{
-			BLOCKTYPE DispBlock = m_World->GetBlock(DispX, DispY, DispZ);
-			if (PlaceLiquid(DispBlock, a_SlotNum))
+			LOGD("Dispensing lava bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
+			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
 			{
-				m_World->SetBlock(DispX, DispY, DispZ, E_BLOCK_LAVA, 0);
+				DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_LAVA, 0);
 			}
 			else
 			{
-				DropFromSlot(a_SlotNum);
+				DropFromSlot(a_Chunk, a_SlotNum);
 			}
 			break;
 		}
 		
 		case E_ITEM_SPAWN_EGG:
 		{
-			if (m_World->SpawnMob(DispX + 0.5, DispY, DispZ + 0.5, m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
+			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+			if (m_World->SpawnMob(MobX, DispY, MobZ, m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -111,7 +121,7 @@ void cDispenserEntity::DropSpenseFromSlot(int a_SlotNum)
 		
 		default:
 		{
-			DropFromSlot(a_SlotNum);
+			DropFromSlot(a_Chunk, a_SlotNum);
 			break;
 		}
 	}  // switch (ItemType)
@@ -148,7 +158,7 @@ bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
 
 
 
-bool cDispenserEntity::PlaceLiquid(BLOCKTYPE a_BlockInFront, int a_SlotNum)
+bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum)
 {
 	if (
 		(a_BlockInFront != E_BLOCK_AIR) &&

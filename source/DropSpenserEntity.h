@@ -53,7 +53,7 @@ public:
 	
 	// cBlockEntity overrides:
 	virtual void SaveToJson(Json::Value & a_Value) override;
-	virtual bool Tick(float a_Dt) override;
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 	
@@ -75,13 +75,13 @@ protected:
 	bool m_IsPowered;         ///< Set to true when the dropspenser receives redstone power.
 	
 	/// Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke / sound effects
-	void DropSpense(void);
+	void DropSpense(cChunk & a_Chunk);
 	
 	/// Override this function to provide the specific behavior for item dropspensing (drop / shoot / pour / ...)
-	virtual void DropSpenseFromSlot(int a_SlotNum) = 0;
+	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) = 0;
 	
 	/// Helper function, drops one item from the specified slot (like a dropper)
-	void DropFromSlot(int a_SlotNum);
+	void DropFromSlot(cChunk & a_Chunk, int a_SlotNum);
 } ;  // tolua_export
 
 
