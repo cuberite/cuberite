@@ -549,6 +549,13 @@ int cRedstoneSimulator::UnPowerBlock(const Vector3i & a_BlockPos, const Vector3i
 			break;
 		}
 
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:
+		{
+			m_RefreshDropSpensers.push_back(a_BlockPos);
+			break;
+		}
+		
 		case E_BLOCK_REDSTONE_TORCH_ON:
 		{
 			return 2;
