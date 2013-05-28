@@ -12,8 +12,7 @@
 #include "../World.h"
 #include "../Generating/ChunkGenerator.h"
 #include "../Entity.h"
-#include "../BlockEntity.h"
-#include "../BlockID.h"
+#include "../BlockEntities/BlockEntity.h"
 
 
 

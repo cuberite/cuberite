@@ -10,7 +10,7 @@
 #include "Globals.h"
 #include "ChunkSender.h"
 #include "World.h"
-#include "BlockEntity.h"
+#include "BlockEntities/BlockEntity.h"
 #include "Protocol/ChunkDataSerializer.h"
 
 
