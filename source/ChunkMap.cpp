@@ -203,6 +203,8 @@ cChunkPtr cChunkMap::GetChunkNoLoad( int a_ChunkX, int a_ChunkY, int a_ChunkZ )
 bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	// We already have m_CSLayers locked since this can be called only from within the tick thread
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+
 	int ChunkX, ChunkZ;
 	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
@@ -213,6 +215,50 @@ bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	
 	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
 	a_BlockType = Chunk->GetBlock(Index);
+	a_BlockMeta = Chunk->GetMeta(Index);
+	return true;
+}
+
+
+
+
+
+bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType)
+{
+	// We already have m_CSLayers locked since this can be called only from within the tick thread
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	
+	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
+	a_BlockType = Chunk->GetBlock(Index);
+	return true;
+}
+
+
+
+
+
+bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE & a_BlockMeta)
+{
+	// We already have m_CSLayers locked since this can be called only from within the tick thread
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+	
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	
+	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
 	a_BlockMeta = Chunk->GetMeta(Index);
 	return true;
 }
