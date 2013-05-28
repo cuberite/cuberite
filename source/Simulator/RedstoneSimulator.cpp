@@ -442,7 +442,7 @@ void cRedstoneSimulator::HandleChange(const Vector3i & a_BlockPos)
 				
 				virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
 				{
-					a_DropSpenser->Activate();
+					a_DropSpenser->SetRedstonePower(m_IsPowered);
 					return false;
 				}
 			} DrSpSP(IsPowered(pos));
