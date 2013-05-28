@@ -13,10 +13,10 @@
 #include "WebAdmin.h"
 #include "StringMap.h"
 #include "ClientHandle.h"
-#include "ChestEntity.h"
-#include "DispenserEntity.h"
-#include "DropperEntity.h"
-#include "FurnaceEntity.h"
+#include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/DispenserEntity.h"
+#include "BlockEntities/DropperEntity.h"
+#include "BlockEntities/FurnaceEntity.h"
 #include "md5/md5.h"
 
 

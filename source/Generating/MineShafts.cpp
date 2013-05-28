@@ -19,7 +19,7 @@ in a depth-first processing. Each of the descendants will branch randomly, if no
 #include "Globals.h"
 #include "MineShafts.h"
 #include "../Cuboid.h"
-#include "../ChestEntity.h"
+#include "../BlockEntities/ChestEntity.h"
 
 
 

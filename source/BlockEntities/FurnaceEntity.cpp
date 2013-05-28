@@ -2,16 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "FurnaceEntity.h"
-#include "BlockID.h"
-#include "Item.h"
-#include "UI/Window.h"
-#include "Player.h"
-#include "World.h"
-#include "ClientHandle.h"
-#include "FurnaceRecipe.h"
-#include "Server.h"
-#include "Pickup.h"
-#include "Root.h"
+#include "../UI/Window.h"
+#include "../Player.h"
+#include "../FurnaceRecipe.h"
+#include "../Root.h"
 #include <json/json.h>
 
 

@@ -2,15 +2,15 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Window.h"
+#include "WindowOwner.h"
+#include "SlotArea.h"
 #include "../Item.h"
 #include "../ClientHandle.h"
 #include "../Player.h"
 #include "../Pickup.h"
 #include "../Inventory.h"
-#include "WindowOwner.h"
 #include "../Items/ItemHandler.h"
-#include "SlotArea.h"
-#include "../ChestEntity.h"
+#include "../BlockEntities/ChestEntity.h"
 
 
 

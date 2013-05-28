@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Simulator.h"
-#include "../BlockEntity.h"
+#include "../BlockEntities/BlockEntity.h"
 
 
 

@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "ClientHandle.h"
-#include "World.h"
+#include "../ClientHandle.h"
+#include "../World.h"
 
 
 

@@ -9,7 +9,7 @@
 #include "World.h"
 #include "Pickup.h"
 #include "PluginManager.h"
-#include "BlockEntity.h"
+#include "BlockEntities/BlockEntity.h"
 #include "GroupManager.h"
 #include "Group.h"
 #include "ChatColor.h"

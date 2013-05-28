@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/28/13 14:04:23.
+** Generated automatically by tolua++-1.0.92 on 05/28/13 21:11:42.
 */
 
 #ifndef __cplusplus
@@ -38,12 +38,12 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Inventory.h"
 #include "Item.h"
 #include "ItemGrid.h"
-#include "BlockEntity.h"
-#include "BlockEntityWithItems.h"
-#include "ChestEntity.h"
-#include "DropSpenserEntity.h"
-#include "DispenserEntity.h"
-#include "DropperEntity.h"
+#include "BlockEntities/BlockEntity.h"
+#include "BlockEntities/BlockEntityWithItems.h"
+#include "BlockEntities/ChestEntity.h"
+#include "BlockEntities/DropSpenserEntity.h"
+#include "BlockEntities/DispenserEntity.h"
+#include "BlockEntities/DropperEntity.h"
 #include "WebAdmin.h"
 #include "WebPlugin.h"
 #include "Pickup.h"
@@ -15845,6 +15845,70 @@ static int tolua_AllToLua_cBlockEntity_GetChunkZ00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetRelX of class  cBlockEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntity_GetRelX00
+static int tolua_AllToLua_cBlockEntity_GetRelX00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockEntity* self = (const cBlockEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRelX'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetRelX();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetRelX'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetRelZ of class  cBlockEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntity_GetRelZ00
+static int tolua_AllToLua_cBlockEntity_GetRelZ00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cBlockEntity* self = (const cBlockEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRelZ'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetRelZ();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetRelZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetSlot of class  cBlockEntityWithItems */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cBlockEntityWithItems_GetSlot00
 static int tolua_AllToLua_cBlockEntityWithItems_GetSlot00(lua_State* tolua_S)
@@ -26659,6 +26723,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetWorld",tolua_AllToLua_cBlockEntity_GetWorld00);
    tolua_function(tolua_S,"GetChunkX",tolua_AllToLua_cBlockEntity_GetChunkX00);
    tolua_function(tolua_S,"GetChunkZ",tolua_AllToLua_cBlockEntity_GetChunkZ00);
+   tolua_function(tolua_S,"GetRelX",tolua_AllToLua_cBlockEntity_GetRelX00);
+   tolua_function(tolua_S,"GetRelZ",tolua_AllToLua_cBlockEntity_GetRelZ00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cBlockEntityWithItems","cBlockEntityWithItems","cBlockEntity",NULL);
   tolua_beginmodule(tolua_S,"cBlockEntityWithItems");

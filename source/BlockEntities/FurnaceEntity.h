@@ -2,8 +2,8 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "UI/WindowOwner.h"
-#include "Item.h"
+#include "../UI/WindowOwner.h"
+#include "../Item.h"
 
 
 

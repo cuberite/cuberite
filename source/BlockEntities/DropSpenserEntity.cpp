@@ -6,8 +6,8 @@
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
-#include "Player.h"
-#include "Chunk.h"
+#include "../Player.h"
+#include "../Chunk.h"
 
 
 

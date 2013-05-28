@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../BlockEntity.h"
+#include "../BlockEntities/BlockEntity.h"
 #include "../Entity.h"
 #include "Window.h"
 

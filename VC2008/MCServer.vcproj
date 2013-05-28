@@ -2297,75 +2297,75 @@
 				Name="BlockEntities"
 				>
 				<File
-					RelativePath="..\source\BlockEntity.h"
+					RelativePath="..\source\BlockEntities\BlockEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockEntityWithItems.h"
+					RelativePath="..\source\BlockEntities\BlockEntityWithItems.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ChestEntity.cpp"
+					RelativePath="..\source\BlockEntities\ChestEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ChestEntity.h"
+					RelativePath="..\source\BlockEntities\ChestEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\DispenserEntity.cpp"
+					RelativePath="..\source\BlockEntities\DispenserEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\DispenserEntity.h"
+					RelativePath="..\source\BlockEntities\DispenserEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\DropperEntity.cpp"
+					RelativePath="..\source\BlockEntities\DropperEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\DropperEntity.h"
+					RelativePath="..\source\BlockEntities\DropperEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\DropSpenserEntity.cpp"
+					RelativePath="..\source\BlockEntities\DropSpenserEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\DropSpenserEntity.h"
+					RelativePath="..\source\BlockEntities\DropSpenserEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FurnaceEntity.cpp"
+					RelativePath="..\source\BlockEntities\FurnaceEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\FurnaceEntity.h"
+					RelativePath="..\source\BlockEntities\FurnaceEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\JukeboxEntity.cpp"
+					RelativePath="..\source\BlockEntities\JukeboxEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\JukeboxEntity.h"
+					RelativePath="..\source\BlockEntities\JukeboxEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\NoteEntity.cpp"
+					RelativePath="..\source\BlockEntities\NoteEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\NoteEntity.h"
+					RelativePath="..\source\BlockEntities\NoteEntity.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\SignEntity.cpp"
+					RelativePath="..\source\BlockEntities\SignEntity.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\SignEntity.h"
+					RelativePath="..\source\BlockEntities\SignEntity.h"
 					>
 				</File>
 			</Filter>

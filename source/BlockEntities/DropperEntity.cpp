@@ -5,8 +5,8 @@
 
 #include "Globals.h"
 #include "DropperEntity.h"
-#include "Player.h"
-#include "Simulator/FluidSimulator.h"
+#include "../Player.h"
+#include "../Simulator/FluidSimulator.h"
 
 
 

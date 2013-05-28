@@ -2,22 +2,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ChestEntity.h"
-#include "Item.h"
-#include "ClientHandle.h"
-#include "Player.h"
-#include "UI/Window.h"
-#include "World.h"
-#include "Root.h"
-#include "Pickup.h"
-#include "Noise.h"
+#include "../Item.h"
+#include "../Player.h"
+#include "../UI/Window.h"
+#include "../Noise.h"
 #include <json/json.h>
-
-
-
-
-
-class cWorld;
-class cRoot;
 
 
 

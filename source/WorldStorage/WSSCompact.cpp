@@ -9,13 +9,12 @@
 #include "zlib.h"
 #include <json/json.h>
 #include "../StringCompression.h"
-#include "../ChestEntity.h"
-#include "../SignEntity.h"
-#include "../DispenserEntity.h"
-#include "../FurnaceEntity.h"
-#include "../NoteEntity.h"
-#include "../JukeboxEntity.h"
-#include "../BlockID.h"
+#include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/DispenserEntity.h"
+#include "../BlockEntities/FurnaceEntity.h"
+#include "../BlockEntities/JukeboxEntity.h"
+#include "../BlockEntities/NoteEntity.h"
+#include "../BlockEntities/SignEntity.h"
 
 
 

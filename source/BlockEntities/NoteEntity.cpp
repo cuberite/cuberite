@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "NoteEntity.h"
-#include "World.h"
+#include "../World.h"
 #include <json/json.h>
 
 

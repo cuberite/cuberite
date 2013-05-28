@@ -10,7 +10,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "ItemGrid.h"
+#include "../ItemGrid.h"
 
 
 

@@ -3,10 +3,10 @@
 
 #include "SignEntity.h"
 
-#include "Player.h"
-#include "ClientHandle.h"
-#include "World.h"
-#include "Root.h"
+#include "../Player.h"
+// #include "ClientHandle.h"
+// #include "World.h"
+// #include "Root.h"
 
 #include <json/json.h>
 
