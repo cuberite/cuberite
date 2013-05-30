@@ -89,7 +89,7 @@ protected:
 
 
 
-/// Handles the "inner" inventory of each player, excluding the armor and hotbar
+/// Handles the main inventory of each player, excluding the armor and hotbar
 class cSlotAreaInventory :
 	public cSlotAreaInventoryBase
 {
@@ -106,7 +106,7 @@ public:
 
 
 
-/// Handles the "outer" inevntory of each player - the hotbar
+/// Handles the hotbar of each player
 class cSlotAreaHotBar :
 	public cSlotAreaInventoryBase
 {
@@ -123,7 +123,7 @@ public:
 
 
 
-/// Handles the armor area of the inventory
+/// Handles the armor area of the player's inventory
 class cSlotAreaArmor :
 	public cSlotAreaInventoryBase
 {
@@ -135,6 +135,26 @@ public:
 
 	// Distributing the stack is allowed only for compatible items (helmets into helmet slot etc.)
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+} ;
+
+
+
+
+
+/// Handles any slot area that is representing a cItemGrid; same items for all the players
+class cSlotAreaItemGrid :
+	public cSlotArea
+{
+	typedef cSlotArea super;
+	
+public:
+	cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow);
+	
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+protected:
+	cItemGrid & m_ItemGrid;
 } ;
 
 

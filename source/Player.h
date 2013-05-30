@@ -85,18 +85,28 @@ public:
 	/// Tries to move to a new position, with collision checks and stuff
 	virtual void MoveTo( const Vector3d & a_NewPos );													// tolua_export
 
-	cWindow * GetWindow(void) { return m_CurrentWindow; }
+	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
 	
-	void OpenWindow( cWindow* a_Window );
-	void CloseWindow(char a_WindowType);
+	/// Opens the specified window; closes the current one first using CloseWindow()
+	void OpenWindow(cWindow * a_Window);  // Exported in ManualBindings.cpp
+	
+	// tolua_begin
+	
+	/// Closes the current window, resets current window to m_InventoryWindow
+	void CloseWindow(void);
+	
+	/// Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow
+	void CloseWindowIfID(char a_WindowID);
 
-	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }			// tolua_export
+	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }
 
-	void SendMessage(const AString & a_Message);								// tolua_export
+	void SendMessage(const AString & a_Message);
 
-	const AString & GetName(void) const { return m_PlayerName; }			// tolua_export
-	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }			// tolua_export
+	const AString & GetName(void) const { return m_PlayerName; }
+	void SetName(const AString & a_Name) { m_PlayerName = a_Name; }
+	
+	// tolua_end
 
 	typedef std::list< cGroup* > GroupList;
 	typedef std::list< std::string > StringList;

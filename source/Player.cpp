@@ -128,7 +128,7 @@ void cPlayer::Initialize( cWorld* a_World )
 
 void cPlayer::Destroyed()
 {
-	CloseWindow(-1);
+	CloseWindow();
 	m_ClientHandle = NULL;
 }
 
@@ -433,9 +433,9 @@ Vector3d cPlayer::GetEyePosition()
 
 
 
-void cPlayer::OpenWindow( cWindow* a_Window )
+void cPlayer::OpenWindow(cWindow * a_Window)
 {
-	CloseWindow(m_CurrentWindow ? (char)m_CurrentWindow->GetWindowType() : 0);
+	CloseWindow();
 	a_Window->OpenedByPlayer(*this);
 	m_CurrentWindow = a_Window;
 }
@@ -444,12 +444,29 @@ void cPlayer::OpenWindow( cWindow* a_Window )
 
 
 
-void cPlayer::CloseWindow(char a_WindowType)
+void cPlayer::CloseWindow(void)
 {
-	if (m_CurrentWindow != NULL)
+	if (m_CurrentWindow == NULL)
 	{
-		m_CurrentWindow->ClosedByPlayer(*this);
+		m_CurrentWindow = m_InventoryWindow;
+		return;
 	}
+	
+	m_CurrentWindow->ClosedByPlayer(*this);
+	m_CurrentWindow = m_InventoryWindow;
+}
+
+
+
+
+
+void cPlayer::CloseWindowIfID(char a_WindowID)
+{
+	if ((m_CurrentWindow == NULL) || (m_CurrentWindow->GetWindowID() != a_WindowID))
+	{
+		return;
+	}
+	m_CurrentWindow->ClosedByPlayer(*this);
 	m_CurrentWindow = m_InventoryWindow;
 }
 

@@ -1,7 +1,7 @@
 
 -- Global variables
 PLUGIN = {};	-- Reference to own plugin object
-ShouldDumpFunctions = true;  -- If set to true, all available functions are logged upon plugin initialization
+ShouldDumpFunctions = true;  -- If set to true, all available functions are written to the API.txt file upon plugin initialization
 
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 
@@ -21,9 +21,11 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK);
 	
-	PluginManager:BindCommand("/le",   "debuggers", HandleListEntitiesCmd, "Shows a list of all the loaded entities");
-	PluginManager:BindCommand("/ke",   "debuggers", HandleKillEntitiesCmd, "Kills all the loaded entities");
-	PluginManager:BindCommand("/wool", "debuggers", HandleWoolCmd,         "Sets all your armor to blue wool");
+	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "Shows a list of all the loaded entities");
+	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "Kills all the loaded entities");
+	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "Sets all your armor to blue wool");
+	PluginManager:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "Opens up a window using plugin API");
+	PluginManager:BindCommand("/gc",      "debuggers", HandleGCCmd,           "Activates the Lua garbage collector");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -443,6 +445,13 @@ end
 
 
 
+--- When set to a positive number, the following OnTick() will perform GC and decrease until 0 again
+GCOnTick = 0;
+
+
+
+
+
 function OnTick()
 	-- Activate all dropspensers in the g_DropSpensersToActivate list:
 	local ActivateDrSp = function(DropSpenser)
@@ -459,6 +468,13 @@ function OnTick()
 		if not(DrSp.World:DoWithDropSpenserAt(DrSp.x, DrSp.y, DrSp.z, ActivateDrSp)) then
 			table.remove(g_DropSpensersToActivate, i);
 		end
+	end
+	
+	
+	-- If GCOnTick > 0, do a garbage-collect and decrease by one
+	if (GCOnTick > 0) then
+		collectgarbage();
+		GCOnTick = GCOnTick - 1;
 	end
 	
 	return false;
@@ -546,3 +562,46 @@ function HandleWoolCmd(Split, Player)
 	Player:SendMessage("You have been bluewooled :)");
 	return true;
 end
+
+
+
+
+
+function HandleTestWndCmd(a_Split, a_Player)
+	local WindowType  = cWindow.Hopper;
+	local WindowSizeX = 5;
+	local WindowSizeY = 1;
+	if (#a_Split == 4) then
+		WindowType  = tonumber(a_Split[2]);
+		WindowSizeX = tonumber(a_Split[3]);
+		WindowSizeY = tonumber(a_Split[4]);
+	elseif (#a_Split ~= 1) then
+		a_Player:SendMessage("Usage: /testwnd [WindowType WindowSizeX WindowSizeY]");
+		return true;
+	end
+	
+	local Window = cLuaWindow(WindowType, WindowSizeX, WindowSizeY, "TestWnd");
+	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
+	
+	a_Player:OpenWindow(Window);
+	
+	-- To make sure that the object has the correct life-management in Lua,
+	-- let's garbage-collect in the following few ticks
+	GCOnTick = 10;
+	
+	return true;
+end
+
+
+
+
+
+function HandleGCCmd(a_Split, a_Player)
+	collectgarbage();
+	return true;
+end
+
+
+
+
+

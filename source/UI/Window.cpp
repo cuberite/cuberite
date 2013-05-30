@@ -101,6 +101,39 @@ void cWindow::SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item)
 
 
 
+bool cWindow::IsSlotInPlayerMainInventory(int a_SlotNum) const
+{
+	// Returns true if the specified slot is in the Player Main Inventory slotarea
+	// The player main inventory is always 27 slots, 9 slots from the end of the inventory
+	return ((a_SlotNum >= GetNumSlots() - 36) && (a_SlotNum < GetNumSlots() - 9));
+}
+
+
+
+
+
+bool cWindow::IsSlotInPlayerHotbar(int a_SlotNum) const
+{
+	// Returns true if the specified slot is in the Player Hotbar slotarea
+	// The hotbar is always the last 9 slots
+	return ((a_SlotNum >= GetNumSlots() - 9) && (a_SlotNum < GetNumSlots()));
+}
+
+
+
+
+
+bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
+{
+	// Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor.
+	// The player combined inventory is always the last 36 slots
+	return ((a_SlotNum >= GetNumSlots() - 36) && (a_SlotNum < GetNumSlots()));
+}
+
+
+
+
+
 void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 {
 	a_Slots.clear();
@@ -264,9 +297,9 @@ void cWindow::OwnerDestroyed()
 	// Close window for each player. Note that the last one needs special handling
 	while (m_OpenedBy.size() > 1)
 	{
-		(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
+		(*m_OpenedBy.begin() )->CloseWindow();
 	}
-	(*m_OpenedBy.begin() )->CloseWindow((char)GetWindowType());
+	(*m_OpenedBy.begin() )->CloseWindow();
 }
 
 

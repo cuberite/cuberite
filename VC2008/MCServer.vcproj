@@ -1458,6 +1458,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\LuaWindow.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\LuaWindow.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\ManualBindings.cpp"
 					>
 				</File>
@@ -2554,6 +2562,14 @@
 				>
 				<File
 					RelativePath="..\MCServer\Plugins\ChatLog\plugin.lua"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Debuggers"
+				>
+				<File
+					RelativePath="..\MCServer\Plugins\Debuggers\Debuggers.lua"
 					>
 				</File>
 			</Filter>

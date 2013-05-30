@@ -1002,7 +1002,7 @@ void cClientHandle::HandleSlotSelected(short a_SlotNum)
 
 void cClientHandle::HandleWindowClose(char a_WindowID)
 {
-	m_Player->CloseWindow(a_WindowID);
+	m_Player->CloseWindowIfID(a_WindowID);
 }
 
 

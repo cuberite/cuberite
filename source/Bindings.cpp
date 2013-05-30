@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/28/13 21:11:42.
+** Generated automatically by tolua++-1.0.92 on 05/30/13 21:32:45.
 */
 
 #ifndef __cplusplus
@@ -58,9 +58,18 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "BlockArea.h"
 #include "Generating/ChunkDesc.h"
 #include "CraftingRecipes.h"
+#include "UI/Window.h"
+#include "LuaWindow.h"
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
+
+static int tolua_collect_cIniFile (lua_State* tolua_S)
+{
+ cIniFile* self = (cIniFile*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
 
 static int tolua_collect_cCraftingGrid (lua_State* tolua_S)
 {
@@ -153,9 +162,9 @@ static int tolua_collect_cTracer (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_cIniFile (lua_State* tolua_S)
+static int tolua_collect_cLuaWindow (lua_State* tolua_S)
 {
- cIniFile* self = (cIniFile*) tolua_tousertype(tolua_S,1,0);
+ cLuaWindow* self = (cLuaWindow*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -175,10 +184,12 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin_NewLua");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cLuaWindow");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cStairs");
@@ -8526,6 +8537,102 @@ static int tolua_AllToLua_cPlayer_MoveTo00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'MoveTo'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetWindow of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetWindow00
+static int tolua_AllToLua_cPlayer_GetWindow00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWindow'", NULL);
+#endif
+  {
+   cWindow* tolua_ret = (cWindow*)  self->GetWindow();
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWindow");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWindow'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CloseWindow of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_CloseWindow00
+static int tolua_AllToLua_cPlayer_CloseWindow00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CloseWindow'", NULL);
+#endif
+  {
+   self->CloseWindow();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CloseWindow'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: CloseWindowIfID of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_CloseWindowIfID00
+static int tolua_AllToLua_cPlayer_CloseWindowIfID00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  char a_WindowID = ((char)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CloseWindowIfID'", NULL);
+#endif
+  {
+   self->CloseWindowIfID(a_WindowID);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'CloseWindowIfID'.",&tolua_err);
  return 0;
 #endif
 }
@@ -25478,6 +25585,447 @@ static int tolua_AllToLua_cCraftingRecipe_Dump00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetWindowID of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_GetWindowID00
+static int tolua_AllToLua_cWindow_GetWindowID00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWindowID'", NULL);
+#endif
+  {
+   char tolua_ret = (char)  self->GetWindowID();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWindowID'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetWindowType of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_GetWindowType00
+static int tolua_AllToLua_cWindow_GetWindowType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWindowType'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetWindowType();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWindowType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetSlot of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_GetSlot00
+static int tolua_AllToLua_cWindow_GetSlot00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSlot'", NULL);
+#endif
+  {
+   const cItem* tolua_ret = (const cItem*)  self->GetSlot(*a_Player,a_SlotNum);
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"const cItem");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetSlot'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSlot of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_SetSlot00
+static int tolua_AllToLua_cWindow_SetSlot00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWindow* self = (cWindow*)  tolua_tousertype(tolua_S,1,0);
+  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,2,0));
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,3,0));
+  const cItem* a_Item = ((const cItem*)  tolua_tousertype(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSlot'", NULL);
+#endif
+  {
+   self->SetSlot(*a_Player,a_SlotNum,*a_Item);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSlot'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsSlotInPlayerMainInventory of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_IsSlotInPlayerMainInventory00
+static int tolua_AllToLua_cWindow_IsSlotInPlayerMainInventory00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSlotInPlayerMainInventory'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSlotInPlayerMainInventory(a_SlotNum);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSlotInPlayerMainInventory'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsSlotInPlayerHotbar of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_IsSlotInPlayerHotbar00
+static int tolua_AllToLua_cWindow_IsSlotInPlayerHotbar00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSlotInPlayerHotbar'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSlotInPlayerHotbar(a_SlotNum);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSlotInPlayerHotbar'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsSlotInPlayerInventory of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_IsSlotInPlayerInventory00
+static int tolua_AllToLua_cWindow_IsSlotInPlayerInventory00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSlotInPlayerInventory'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSlotInPlayerInventory(a_SlotNum);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSlotInPlayerInventory'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetWindowTitle of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_GetWindowTitle00
+static int tolua_AllToLua_cWindow_GetWindowTitle00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWindow* self = (const cWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetWindowTitle'", NULL);
+#endif
+  {
+   const AString tolua_ret = (const AString)  self->GetWindowTitle();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetWindowTitle'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetWindowTitle of class  cWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWindow_SetWindowTitle00
+static int tolua_AllToLua_cWindow_SetWindowTitle00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWindow* self = (cWindow*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_WindowTitle = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetWindowTitle'", NULL);
+#endif
+  {
+   self->SetWindowTitle(a_WindowTitle);
+   tolua_pushcppstring(tolua_S,(const char*)a_WindowTitle);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetWindowTitle'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cLuaWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaWindow_new00
+static int tolua_AllToLua_cLuaWindow_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWindow::WindowType a_WindowType = ((cWindow::WindowType) (int)  tolua_tonumber(tolua_S,2,0));
+  int a_SlotsX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_SlotsY = ((int)  tolua_tonumber(tolua_S,4,0));
+  const AString a_Title = ((const AString)  tolua_tocppstring(tolua_S,5,0));
+  {
+   cLuaWindow* tolua_ret = (cLuaWindow*)  Mtolua_new((cLuaWindow)(a_WindowType,a_SlotsX,a_SlotsY,a_Title));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cLuaWindow");
+   tolua_pushcppstring(tolua_S,(const char*)a_Title);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cLuaWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaWindow_new00_local
+static int tolua_AllToLua_cLuaWindow_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWindow::WindowType a_WindowType = ((cWindow::WindowType) (int)  tolua_tonumber(tolua_S,2,0));
+  int a_SlotsX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_SlotsY = ((int)  tolua_tonumber(tolua_S,4,0));
+  const AString a_Title = ((const AString)  tolua_tocppstring(tolua_S,5,0));
+  {
+   cLuaWindow* tolua_ret = (cLuaWindow*)  Mtolua_new((cLuaWindow)(a_WindowType,a_SlotsX,a_SlotsY,a_Title));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cLuaWindow");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+   tolua_pushcppstring(tolua_S,(const char*)a_Title);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: delete of class  cLuaWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaWindow_delete00
+static int tolua_AllToLua_cLuaWindow_delete00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaWindow* self = (cLuaWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'delete'", NULL);
+#endif
+  Mtolua_delete(self);
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'delete'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetContents of class  cLuaWindow */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cLuaWindow_GetContents00
+static int tolua_AllToLua_cLuaWindow_GetContents00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cLuaWindow* self = (cLuaWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetContents'", NULL);
+#endif
+  {
+   cItemGrid& tolua_ret = (cItemGrid&)  self->GetContents();
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetContents'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
 {
@@ -26421,6 +26969,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetLastBlockActionTime",tolua_AllToLua_cPlayer_SetLastBlockActionTime00);
    tolua_function(tolua_S,"SetGameMode",tolua_AllToLua_cPlayer_SetGameMode00);
    tolua_function(tolua_S,"MoveTo",tolua_AllToLua_cPlayer_MoveTo00);
+   tolua_function(tolua_S,"GetWindow",tolua_AllToLua_cPlayer_GetWindow00);
+   tolua_function(tolua_S,"CloseWindow",tolua_AllToLua_cPlayer_CloseWindow00);
+   tolua_function(tolua_S,"CloseWindowIfID",tolua_AllToLua_cPlayer_CloseWindowIfID00);
    tolua_function(tolua_S,"GetClientHandle",tolua_AllToLua_cPlayer_GetClientHandle00);
    tolua_function(tolua_S,"SendMessage",tolua_AllToLua_cPlayer_SendMessage00);
    tolua_function(tolua_S,"GetName",tolua_AllToLua_cPlayer_GetName00);
@@ -27155,6 +27706,41 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetIngredient",tolua_AllToLua_cCraftingRecipe_SetIngredient01);
    tolua_function(tolua_S,"ConsumeIngredients",tolua_AllToLua_cCraftingRecipe_ConsumeIngredients00);
    tolua_function(tolua_S,"Dump",tolua_AllToLua_cCraftingRecipe_Dump00);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cWindow","cWindow","",NULL);
+  tolua_beginmodule(tolua_S,"cWindow");
+   tolua_constant(tolua_S,"Inventory",cWindow::Inventory);
+   tolua_constant(tolua_S,"Chest",cWindow::Chest);
+   tolua_constant(tolua_S,"Workbench",cWindow::Workbench);
+   tolua_constant(tolua_S,"Furnace",cWindow::Furnace);
+   tolua_constant(tolua_S,"DropSpenser",cWindow::DropSpenser);
+   tolua_constant(tolua_S,"Enchantment",cWindow::Enchantment);
+   tolua_constant(tolua_S,"Brewery",cWindow::Brewery);
+   tolua_constant(tolua_S,"NPCTrade",cWindow::NPCTrade);
+   tolua_constant(tolua_S,"Beacon",cWindow::Beacon);
+   tolua_constant(tolua_S,"Anvil",cWindow::Anvil);
+   tolua_constant(tolua_S,"Hopper",cWindow::Hopper);
+   tolua_function(tolua_S,"GetWindowID",tolua_AllToLua_cWindow_GetWindowID00);
+   tolua_function(tolua_S,"GetWindowType",tolua_AllToLua_cWindow_GetWindowType00);
+   tolua_function(tolua_S,"GetSlot",tolua_AllToLua_cWindow_GetSlot00);
+   tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cWindow_SetSlot00);
+   tolua_function(tolua_S,"IsSlotInPlayerMainInventory",tolua_AllToLua_cWindow_IsSlotInPlayerMainInventory00);
+   tolua_function(tolua_S,"IsSlotInPlayerHotbar",tolua_AllToLua_cWindow_IsSlotInPlayerHotbar00);
+   tolua_function(tolua_S,"IsSlotInPlayerInventory",tolua_AllToLua_cWindow_IsSlotInPlayerInventory00);
+   tolua_function(tolua_S,"GetWindowTitle",tolua_AllToLua_cWindow_GetWindowTitle00);
+   tolua_function(tolua_S,"SetWindowTitle",tolua_AllToLua_cWindow_SetWindowTitle00);
+  tolua_endmodule(tolua_S);
+  #ifdef __cplusplus
+  tolua_cclass(tolua_S,"cLuaWindow","cLuaWindow","cWindow",tolua_collect_cLuaWindow);
+  #else
+  tolua_cclass(tolua_S,"cLuaWindow","cLuaWindow","cWindow",NULL);
+  #endif
+  tolua_beginmodule(tolua_S,"cLuaWindow");
+   tolua_function(tolua_S,"new",tolua_AllToLua_cLuaWindow_new00);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cLuaWindow_new00_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cLuaWindow_new00_local);
+   tolua_function(tolua_S,"delete",tolua_AllToLua_cLuaWindow_delete00);
+   tolua_function(tolua_S,"GetContents",tolua_AllToLua_cLuaWindow_GetContents00);
   tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;

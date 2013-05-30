@@ -18,6 +18,7 @@
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FurnaceEntity.h"
 #include "md5/md5.h"
+#include "LuaWindow.h"
 
 
 
@@ -150,6 +151,25 @@ static int tolua_LOGERROR(lua_State* tolua_S)
 
 
 
+cPlugin_NewLua * GetLuaPlugin(lua_State * L)
+{
+	// Get the plugin identification out of LuaState:
+	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
+	if (!lua_islightuserdata(L, -1))
+	{
+		LOGERROR("%s: cannot get plugin instance, what have you done to my Lua state?", __FUNCTION__);
+		return NULL;
+	}
+	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
+	lua_pop(L, 1);
+	
+	return Plugin;
+}
+
+
+
+
+	
 template<
 	class Ty1,
 	class Ty2,
@@ -710,15 +730,11 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 static int tolua_cPluginManager_BindCommand(lua_State * L)
 {
 	// Function signature: cPluginManager:BindCommand(Command, Permission, Function, HelpString)
-	
-	// Get the plugin identification out of LuaState:
-	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
-	if (!lua_islightuserdata(L, -1))
+	cPlugin_NewLua * Plugin = GetLuaPlugin(L);
+	if (Plugin == NULL)
 	{
-		LOGERROR("cPluginManager:BindCommand() cannot get plugin instance, what have you done to my Lua state? Command-binding aborted.");
+		return 0;
 	}
-	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
-	lua_pop(L, 1);
 	
 	// Read the arguments to this API call:
 	tolua_Error tolua_err;
@@ -867,6 +883,55 @@ static int tolua_cPlayer_GetResolvedPermissions(lua_State* tolua_S)
 		++index;
 	}
 	return 1;
+}
+
+
+
+
+
+static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
+{
+	// Function signature: cPlayer:OpenWindow(Window)
+
+	// Retrieve the plugin instance from the Lua state
+	cPlugin_NewLua * Plugin = GetLuaPlugin(tolua_S);
+	if (Plugin == NULL)
+	{
+		return 0;
+	}
+
+	// Get the parameters:
+	cPlayer * self = (cPlayer *)tolua_tousertype(tolua_S, 1, NULL);
+	cWindow * wnd  = (cWindow *)tolua_tousertype(tolua_S, 2, NULL);
+	if ((self == NULL) || (wnd == NULL))
+	{
+		LOGWARNING("%s: invalid self (%p) or wnd (%p)", __FUNCTION__, self, wnd);
+		return 0;
+	}
+	
+	// If cLuaWindow, add a reference, so that Lua won't delete the cLuaWindow object mid-processing
+	tolua_Error err;
+	if (tolua_isusertype(tolua_S, 2, "cLuaWindow", 0, &err))
+	{
+		cLuaWindow * LuaWnd = (cLuaWindow *)wnd;
+		// Only if not already referenced
+		if (!LuaWnd->IsLuaReferenced())
+		{
+			int LuaRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
+			if (LuaRef == LUA_REFNIL)
+			{
+				LOGWARNING("%s: Cannot create a window reference. Cannot open window \"%s\".",
+					__FUNCTION__, wnd->GetWindowTitle().c_str()
+				);
+				return 0;
+			}
+			LuaWnd->SetLuaRef(Plugin, LuaRef);
+		}
+	}
+	
+	// Open the window
+	self->OpenWindow(wnd);
+	return 0;
 }
 
 
@@ -1197,6 +1262,7 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetGroups",              tolua_cPlayer_GetGroups);
 			tolua_function(tolua_S, "GetResolvedPermissions", tolua_cPlayer_GetResolvedPermissions);
+			tolua_function(tolua_S, "OpenWindow",             tolua_cPlayer_OpenWindow);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin_NewLua");

@@ -59,3 +59,9 @@ $cfile "Group.h"
 $cfile "BlockArea.h"
 $cfile "Generating/ChunkDesc.h"
 $cfile "CraftingRecipes.h"
+$cfile "UI/Window.h"
+$cfile "LuaWindow.h"
+
+
+
+

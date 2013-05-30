@@ -68,7 +68,7 @@ public:
 	cWindow(WindowType a_WindowType, const AString & a_WindowTitle);
 	virtual ~cWindow();
 
-	char GetWindowID(void) const { return m_WindowID; }
+	char GetWindowID(void) const { return m_WindowID; }  // tolua_export
 	int GetWindowType(void) const { return m_WindowType; }  // tolua_export
 
 	cWindowOwner * GetOwner(void) { return m_Owner; }
@@ -83,6 +83,15 @@ public:
 	
 	/// Sets the item to the specified slot for the specified player
 	void SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item);
+	
+	/// Returns true if the specified slot is in the Player Main Inventory slotarea
+	bool IsSlotInPlayerMainInventory(int a_SlotNum) const;
+	
+	/// Returns true if the specified slot is in the Player Hotbar slotarea
+	bool IsSlotInPlayerHotbar(int a_SlotNum) const;
+	
+	/// Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor.
+	bool IsSlotInPlayerInventory(int a_SlotNum) const;
 	
 	// tolua_end
 	
@@ -144,7 +153,8 @@ protected:
 	
 	static char m_WindowIDCounter;
 
-	void Destroy(void);
+	/// Sets the internal flag as "destroyed"; notifies the owner that the window is destroying
+	virtual void Destroy(void);
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
@@ -173,7 +183,7 @@ protected:
 	
 	/// Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed
 	int DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums);
-} ;
+} ;  // tolua_export
 
 
 
@@ -240,27 +250,6 @@ protected:
 
 } ;
 
-
-
-
-
-
-// tolua_begin
-
-/// A window that has been created by a Lua plugin and is handled entirely by that plugin
-class cLuaWindow :
-	public cWindow
-{
-public:
-	/// Create a window of the specified type, with a slot grid of a_SlotsX * a_SlotsY size
-	cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title);
-	
-	// tolua_end
-	
-protected:
-	/// Contents of the non-inventory part
-	cItemGrid m_Contents;
-} ;
 
 
 

@@ -1655,6 +1655,16 @@ void cPlugin_NewLua::BindConsoleCommand(const AString & a_Command, int a_FnRef)
 
 
 
+void cPlugin_NewLua::Unreference(int a_LuaRef)
+{
+	cCSLock Lock(m_CriticalSection);
+	luaL_unref(m_LuaState, LUA_REGISTRYINDEX, a_LuaRef);
+}
+
+
+
+
+
 // Helper functions
 bool cPlugin_NewLua::PushFunction(const char * a_FunctionName, bool a_bLogError /* = true */)
 {

@@ -94,9 +94,12 @@ public:
 	/// Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap.
 	void BindConsoleCommand(const AString & a_Command, int a_FnRef);
 
-	lua_State* GetLuaState() { return m_LuaState; }
+	lua_State * GetLuaState(void) { return m_LuaState; }
 
-	cCriticalSection & GetCriticalSection() { return m_CriticalSection; }
+	cCriticalSection & GetCriticalSection(void) { return m_CriticalSection; }
+	
+	/// Removes a previously referenced object (luaL_unref())
+	void Unreference(int a_LuaRef);
 	
 protected:
 	cCriticalSection m_CriticalSection;

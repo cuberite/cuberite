@@ -658,6 +658,37 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaItemGrid:
+
+cSlotAreaItemGrid::cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow) :
+	super(a_ItemGrid.GetNumSlots(), a_ParentWindow),
+	m_ItemGrid(a_ItemGrid)
+{
+}
+
+
+
+
+
+const cItem * cSlotAreaItemGrid::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	return &m_ItemGrid.GetSlot(a_SlotNum);
+}
+
+
+
+
+
+void cSlotAreaItemGrid::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	m_ItemGrid.SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaTemporary:
 
 cSlotAreaTemporary::cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow) :
