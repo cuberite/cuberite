@@ -170,6 +170,9 @@ protected:
 
 	/// Processes the entire action stored in the internal structures for inventory painting; distributes one item into each slot
 	void OnRightPaintEnd(cPlayer & a_Player);
+	
+	/// Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed
+	int DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums);
 } ;
 
 

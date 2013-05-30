@@ -482,45 +482,9 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	
-	if ((size_t)(ToDistribute.m_ItemCount) < SlotNums.size())
-	{
-		LOGWARNING("%s: Distributing less items (%d) than slots (%u)", __FUNCTION__, (int)ToDistribute.m_ItemCount, SlotNums.size());
-		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
-	}
-	
-	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
-	int NumDistributed = 0;
 	int ToEachSlot = (int)ToDistribute.m_ItemCount / SlotNums.size();
-	for (cSlotNums::const_iterator itr = SlotNums.begin(), end = SlotNums.end(); itr != end; ++itr)
-	{
-		int LocalSlotNum = 0;
-		cSlotArea * Area = GetSlotArea(*itr, LocalSlotNum);
-		if (Area == NULL)
-		{
-			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, *itr);
-			continue;
-		}
-		
-		// Modify the item at the slot
-		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
-		int MaxStack = ItemHandler(AtSlot.m_ItemType)->GetMaxStackSize();
-		if (AtSlot.IsEmpty())
-		{
-			// Empty, just move all of it there:
-			cItem ToStore(ToDistribute);
-			ToStore.m_ItemCount = std::min(ToEachSlot, (int)MaxStack);
-			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
-			NumDistributed += ToStore.m_ItemCount;
-		}
-		else
-		{
-			int CanStore = std::min(ToEachSlot, (int)MaxStack - AtSlot.m_ItemCount);
-			AtSlot.m_ItemCount += CanStore;
-			Area->SetSlot(LocalSlotNum, a_Player, AtSlot);
-			NumDistributed += CanStore;
-		}
-	}  // for itr - SlotNums[]
+	
+	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 	
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
@@ -540,6 +504,68 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 {
 	// Process the entire action stored in the internal structures for inventory painting
 	// distribute one item into each slot
+
+	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
+	cItem ToDistribute(a_Player.GetDraggingItem());
+	
+	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
+	
+	// Remove the items distributed from the dragging item:
+	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
+	if (a_Player.GetDraggingItem().m_ItemCount == 0)
+	{
+		a_Player.GetDraggingItem().Empty();
+	}
+	
+	SendWholeWindow(*a_Player.GetClientHandle());
+}
+
+
+
+
+
+int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums)
+{
+	if ((size_t)(a_Item.m_ItemCount) < a_SlotNums.size())
+	{
+		LOGWARNING("%s: Distributing less items (%d) than slots (%u)", __FUNCTION__, (int)a_Item.m_ItemCount, a_SlotNums.size());
+		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
+		return 0;
+	}
+	
+	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
+	int NumDistributed = 0;
+	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
+	{
+		int LocalSlotNum = 0;
+		cSlotArea * Area = GetSlotArea(*itr, LocalSlotNum);
+		if (Area == NULL)
+		{
+			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, *itr);
+			continue;
+		}
+		
+		// Modify the item at the slot
+		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
+		int MaxStack = ItemHandler(AtSlot.m_ItemType)->GetMaxStackSize();
+		if (AtSlot.IsEmpty())
+		{
+			// Empty, just move all of it there:
+			cItem ToStore(a_Item);
+			ToStore.m_ItemCount = std::min(a_NumToEachSlot, (int)MaxStack);
+			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
+			NumDistributed += ToStore.m_ItemCount;
+		}
+		else
+		{
+			// Occupied, add and cap at MaxStack:
+			int CanStore = std::min(a_NumToEachSlot, (int)MaxStack - AtSlot.m_ItemCount);
+			AtSlot.m_ItemCount += CanStore;
+			Area->SetSlot(LocalSlotNum, a_Player, AtSlot);
+			NumDistributed += CanStore;
+		}
+	}  // for itr - SlotNums[]
+	return NumDistributed;
 }
 
 
