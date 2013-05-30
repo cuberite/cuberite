@@ -1,9 +1,15 @@
 
 #pragma once
 
-#include "BlockID.h"
+
+
+
 
 typedef unsigned char Byte;
+
+/// List of slot numbers, used for inventory-painting
+typedef std::vector<int> cSlotNums;
+
 
 
 

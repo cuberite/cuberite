@@ -32,7 +32,7 @@ public:
 	int GetNumSlots(void) const { return m_NumSlots; }
 	
 	/// Called to retrieve an item in the specified slot for the specified player. Must return a valid cItem.
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) = 0;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const = 0;
 	
 	/// Called to set an item in the specified slot for the specified player
 	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) = 0;
@@ -78,7 +78,7 @@ public:
 	// Creative inventory's click handling is somewhat different from survival inventory's, handle that here:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 protected:
@@ -154,7 +154,7 @@ public:
 	cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow);
 	
 	// cSlotArea overrides:
-	virtual const cItem * GetSlot        (int a_SlotNum, cPlayer & a_Player) override;
+	virtual const cItem * GetSlot        (int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot        (int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	virtual void          OnPlayerAdded  (cPlayer & a_Player) override;
 	virtual void          OnPlayerRemoved(cPlayer & a_Player) override;
@@ -221,7 +221,7 @@ class cSlotAreaChest :
 public:
 	cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow);
 	
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 protected:
@@ -238,7 +238,7 @@ class cSlotAreaDoubleChest :
 public:
 	cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEntity * a_BottomChest, cWindow & a_ParentWindow);
 	
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 protected:
@@ -258,7 +258,7 @@ class cSlotAreaDropSpenser :
 public:
 	cSlotAreaDropSpenser(cDropSpenserEntity * a_DropSpenser, cWindow & a_ParentWindow);
 	
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 protected:
@@ -278,7 +278,7 @@ public:
 	cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow);
 	
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 protected:

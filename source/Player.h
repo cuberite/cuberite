@@ -31,6 +31,7 @@ public:
 	// tolua_end
 	
 	CLASS_PROTODEF(cPlayer)
+	
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
 	virtual ~cPlayer();
@@ -144,15 +145,23 @@ public:
 
 	void UseEquippedItem(void);
 	
-	void SendHealth();
+	void SendHealth(void);
 	
 	// In UI windows, the item that the player is dragging:
 	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }
+	
+	// In UI windows, when inventory-painting:
+	/// Clears the list of slots that are being inventory-painted. To be used by cWindow only
+	void ClearInventoryPaintSlots(void);
+	
+	/// Adds a slot to the list for inventory painting. To be used by cWindow only
+	void AddInventoryPaintSlot(int a_SlotNum);
+	
+	/// Returns the list of slots currently stored for inventory painting. To be used by cWindow only
+	const cSlotNums & GetInventoryPaintSlots(void) const;
 
 protected:
-	virtual void Destroyed();
-
 	typedef std::map< std::string, bool > PermissionMap;
 	PermissionMap m_ResolvedPermissions;
 	PermissionMap m_Permissions;
@@ -197,7 +206,12 @@ protected:
 	long long m_LastPlayerListTime;
 	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second
 
-	cClientHandle* m_ClientHandle;
+	cClientHandle * m_ClientHandle;
+	
+	cSlotNums m_InventoryPaintSlots;
+
+
+	virtual void Destroyed(void);
 
 	/// Filters out damage for creative mode
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;

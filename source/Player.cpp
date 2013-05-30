@@ -325,6 +325,36 @@ void cPlayer::SendHealth()
 
 
 
+void cPlayer::ClearInventoryPaintSlots(void)
+{
+	// Clear the list of slots that are being inventory-painted. Used by cWindow only
+	m_InventoryPaintSlots.clear();
+}
+
+
+
+
+
+void cPlayer::AddInventoryPaintSlot(int a_SlotNum)
+{
+	// Add a slot to the list for inventory painting. Used by cWindow only
+	m_InventoryPaintSlots.push_back(a_SlotNum);
+}
+
+
+
+
+
+const cSlotNums & cPlayer::GetInventoryPaintSlots(void) const
+{
+	// Return the list of slots currently stored for inventory painting. Used by cWindow only
+	return m_InventoryPaintSlots;
+}
+
+
+
+
+
 void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (m_GameMode == eGameMode_Creative)

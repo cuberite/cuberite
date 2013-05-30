@@ -232,7 +232,7 @@ cSlotAreaChest::cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow)
 
 
 
-const cItem * cSlotAreaChest::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 26, use that to index the chest entity's inventory directly:
 	return &(m_Chest->GetSlot(a_SlotNum));
@@ -265,7 +265,7 @@ cSlotAreaDoubleChest::cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEnti
 
 
 
-const cItem * cSlotAreaDoubleChest::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaDoubleChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 53, use that to index the correct chest's inventory:
 	if (a_SlotNum < 27)
@@ -486,7 +486,7 @@ cSlotAreaDropSpenser::cSlotAreaDropSpenser(cDropSpenserEntity * a_DropSpenser, c
 
 
 
-const cItem * cSlotAreaDropSpenser::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaDropSpenser::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	return &(m_DropSpenser->GetSlot(a_SlotNum));
 }
@@ -545,7 +545,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 
 
-const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 2, query the items from the underlying furnace:
 	return m_Furnace->GetSlot(a_SlotNum);
@@ -595,7 +595,7 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 
 
 
-const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaInventoryBase::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 35, map that to the player's inventory slots according to the internal offset
 	return &a_Player.GetInventory().GetSlot(a_SlotNum + m_SlotOffset);
@@ -669,9 +669,9 @@ cSlotAreaTemporary::cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow)
 
 
 
-const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player)
+const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
-	cItemMap::iterator itr = m_Items.find(a_Player.GetUniqueID());
+	cItemMap::const_iterator itr = m_Items.find(a_Player.GetUniqueID());
 	if (itr == m_Items.end())
 	{
 		LOGERROR("cSlotAreaTemporary: player \"%s\" not found for slot %d!", a_Player.GetName().c_str(), a_SlotNum);
