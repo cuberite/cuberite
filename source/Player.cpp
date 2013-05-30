@@ -438,6 +438,7 @@ void cPlayer::OpenWindow(cWindow * a_Window)
 	CloseWindow();
 	a_Window->OpenedByPlayer(*this);
 	m_CurrentWindow = a_Window;
+	a_Window->SendWholeWindow(*GetClientHandle());
 }
 
 

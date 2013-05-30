@@ -88,7 +88,6 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 		if (a_Player->GetWindow() != GetWindow())
 		{
 			a_Player->OpenWindow(GetWindow());
-			GetWindow()->SendWholeWindow(*a_Player->GetClientHandle());
 		}
 	}
 }

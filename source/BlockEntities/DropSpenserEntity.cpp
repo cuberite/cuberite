@@ -219,7 +219,6 @@ void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 		if (a_Player->GetWindow() != Window)
 		{
 			a_Player->OpenWindow(Window);
-			Window->SendWholeWindow(*a_Player->GetClientHandle());
 		}
 	}
 }
