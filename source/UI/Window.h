@@ -106,7 +106,9 @@ public:
 	);
 
 	void OpenedByPlayer(cPlayer & a_Player);
-	void ClosedByPlayer(cPlayer & a_Player);
+	
+	/// Called when a player closes this window; notifies all slot areas. Returns true if close accepted
+	virtual bool ClosedByPlayer(cPlayer & a_Player);
 
 	void SendWholeWindow(cClientHandle & a_Client);
 	void BroadcastWholeWindow(void);

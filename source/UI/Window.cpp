@@ -251,7 +251,7 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 
 
 
-void cWindow::ClosedByPlayer(cPlayer & a_Player)
+bool cWindow::ClosedByPlayer(cPlayer & a_Player)
 {
 	// Checks whether the player is still holding an item
 	if (a_Player.IsDraggingItem())
@@ -285,6 +285,8 @@ void cWindow::ClosedByPlayer(cPlayer & a_Player)
 	{
 		delete this;
 	}
+	
+	return true;
 }
 
 

@@ -7,6 +7,7 @@
 #include "LuaWindow.h"
 #include "UI/SlotArea.h"
 #include "Plugin_NewLua.h"
+#include "Player.h"
 #include "lauxlib.h"  // Needed for LUA_REFNIL
 
 
@@ -20,7 +21,9 @@ cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_Slo
 	super(a_WindowType, a_Title),
 	m_Contents(a_SlotsX, a_SlotsY),
 	m_Plugin(NULL),
-	m_LuaRef(LUA_REFNIL)
+	m_LuaRef(LUA_REFNIL),
+	m_OnClosingFnRef(LUA_REFNIL),
+	m_OnSlotChangedFnRef(LUA_REFNIL)
 {
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(m_Contents, *this));
 	
@@ -53,7 +56,8 @@ cLuaWindow::~cLuaWindow()
 
 void cLuaWindow::SetLuaRef(cPlugin_NewLua * a_Plugin, int a_LuaRef)
 {
-	ASSERT(m_Plugin == NULL);
+	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
+	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
 	ASSERT(m_LuaRef == LUA_REFNIL);
 	m_Plugin = a_Plugin;
 	m_LuaRef = a_LuaRef;
@@ -66,6 +70,46 @@ void cLuaWindow::SetLuaRef(cPlugin_NewLua * a_Plugin, int a_LuaRef)
 bool cLuaWindow::IsLuaReferenced(void) const
 {
 	return ((m_Plugin != NULL) && (m_LuaRef != LUA_REFNIL));
+}
+
+
+
+
+
+void cLuaWindow::SetOnClosing(cPlugin_NewLua * a_Plugin, int a_FnRef)
+{
+	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
+	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
+	
+	// If there already was a function, unreference it first
+	if (m_OnClosingFnRef != LUA_REFNIL)
+	{
+		m_Plugin->Unreference(m_OnClosingFnRef);
+	}
+	
+	// Store the new reference
+	m_Plugin = a_Plugin;
+	m_OnClosingFnRef = a_FnRef;
+}
+
+
+
+
+
+bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player)
+{
+	// First notify the plugin through the registered callback:
+	if (m_OnClosingFnRef != LUA_REFNIL)
+	{
+		ASSERT(m_Plugin != NULL);
+		if (m_Plugin->CallbackWindowClosing(m_OnClosingFnRef, *this, a_Player))
+		{
+			// The callback disagrees
+			return false;
+		}
+	}
+	
+	return super::ClosedByPlayer(a_Player);
 }
 
 

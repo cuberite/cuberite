@@ -1665,6 +1665,30 @@ void cPlugin_NewLua::Unreference(int a_LuaRef)
 
 
 
+bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player)
+{
+	cCSLock Lock(m_CriticalSection);
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // Push the function to be called
+	tolua_pushusertype(m_LuaState, &a_Window, "cWindow");
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+
+	// Call function:
+	int s = lua_pcall(m_LuaState, 2, 1, 0);
+	if (report_errors(m_LuaState, s))
+	{
+		LOGERROR("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, false) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
 // Helper functions
 bool cPlugin_NewLua::PushFunction(const char * a_FunctionName, bool a_bLogError /* = true */)
 {

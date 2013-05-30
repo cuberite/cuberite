@@ -58,6 +58,12 @@ public:
 	/// Returns true if SetLuaRef() has been called
 	bool IsLuaReferenced(void) const;
 	
+	/// Sets the callback function (Lua reference) to call when the window is about to close
+	void SetOnClosing(cPlugin_NewLua * a_Plugin, int a_FnRef);
+	
+	/// Sets the callback function (Lua reference) to call when a slot is changed
+	void SetOnSlotChanged(cPlugin_NewLua * a_Plugin, int a_FnRef);
+	
 protected:
 	/// Contents of the non-inventory part
 	cItemGrid m_Contents;
@@ -68,7 +74,14 @@ protected:
 	/// The Lua object reference, used for keeping the object alive as long as any player has the window open
 	int m_LuaRef;
 	
+	/// The Lua reference for the callback to call when the window is closing for any player
+	int m_OnClosingFnRef;
+	
+	/// The Lua reference for the callback to call when a slot has changed
+	int m_OnSlotChangedFnRef;
+	
 	// cWindow overrides:
+	virtual bool ClosedByPlayer(cPlayer & a_Player) override;
 	virtual void Destroy(void) override;
 } ;  // tolua_export
 

@@ -580,8 +580,17 @@ function HandleTestWndCmd(a_Split, a_Player)
 		return true;
 	end
 	
+	-- Test out the OnClosing callback's ability to refuse to close the window
+	local attempt = 1;
+	local OnClosing = function(Window, Player)
+		Player:SendMessage("Window closing attempt #" .. attempt);
+		attempt = attempt + 1;
+		return (attempt <= 3);  -- refuse twice, then allow
+	end
+	
 	local Window = cLuaWindow(WindowType, WindowSizeX, WindowSizeY, "TestWnd");
 	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
+	Window:SetOnClosing(OnClosing);
 	
 	a_Player:OpenWindow(Window);
 	

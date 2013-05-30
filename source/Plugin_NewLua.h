@@ -11,7 +11,11 @@
 
 
 
+// fwd: Lua
 typedef struct lua_State lua_State;
+
+// fwd: UI/Window.h
+class cWindow;
 
 
 
@@ -100,6 +104,9 @@ public:
 	
 	/// Removes a previously referenced object (luaL_unref())
 	void Unreference(int a_LuaRef);
+	
+	/// Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true
+	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player);
 	
 protected:
 	cCriticalSection m_CriticalSection;

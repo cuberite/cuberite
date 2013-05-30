@@ -938,6 +938,41 @@ static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 
 
 
+static int tolua_cLuaWindow_SetOnClosing(lua_State * tolua_S)
+{
+	// Function signature: cPlayer:SetOnClosing(CallbackFunction)
+
+	// Retrieve the plugin instance from the Lua state
+	cPlugin_NewLua * Plugin = GetLuaPlugin(tolua_S);
+	if (Plugin == NULL)
+	{
+		// Warning message has already been printed by GetLuaPlugin(), bail out silently
+		return 0;
+	}
+
+	// Get the parameters:
+	cLuaWindow * self = (cLuaWindow *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		return 0;
+	}
+	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);  // Store function reference
+	if (FnRef == LUA_REFNIL)
+	{
+		LOGERROR("%s: Cannot create a function reference. Callback not set.", __FUNCTION__);
+		return 0;
+	}
+	
+	// Set the callback
+	self->SetOnClosing(Plugin, FnRef);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPlugin_NewLua_AddWebTab(lua_State * tolua_S)
 {
 	cPlugin_NewLua * self = (cPlugin_NewLua*)tolua_tousertype(tolua_S,1,0);
@@ -1265,6 +1300,10 @@ void ManualBindings::Bind( lua_State* tolua_S )
 			tolua_function(tolua_S, "OpenWindow",             tolua_cPlayer_OpenWindow);
 		tolua_endmodule(tolua_S);
 		
+		tolua_beginmodule(tolua_S, "cLuaWindow");
+			tolua_function(tolua_S, "SetOnClosing", tolua_cLuaWindow_SetOnClosing);
+		tolua_endmodule(tolua_S);
+
 		tolua_beginmodule(tolua_S, "cPlugin_NewLua");
 			tolua_function(tolua_S, "AddWebTab", tolua_cPlugin_NewLua_AddWebTab);
 			tolua_function(tolua_S, "AddTab", tolua_cPlugin_NewLua_AddTab);

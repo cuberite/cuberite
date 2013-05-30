@@ -435,7 +435,10 @@ Vector3d cPlayer::GetEyePosition()
 
 void cPlayer::OpenWindow(cWindow * a_Window)
 {
-	CloseWindow();
+	if (a_Window != m_CurrentWindow)
+	{
+		CloseWindow();
+	}
 	a_Window->OpenedByPlayer(*this);
 	m_CurrentWindow = a_Window;
 	a_Window->SendWholeWindow(*GetClientHandle());
@@ -453,8 +456,17 @@ void cPlayer::CloseWindow(void)
 		return;
 	}
 	
-	m_CurrentWindow->ClosedByPlayer(*this);
-	m_CurrentWindow = m_InventoryWindow;
+	if (m_CurrentWindow->ClosedByPlayer(*this))
+	{
+		// Close accepted, go back to inventory window (the default):
+		m_CurrentWindow = m_InventoryWindow;
+	}
+	else
+	{
+		// Re-open the window
+		m_CurrentWindow->OpenedByPlayer(*this);
+		m_CurrentWindow->SendWholeWindow(*GetClientHandle());
+	}
 }
 
 
@@ -467,8 +479,7 @@ void cPlayer::CloseWindowIfID(char a_WindowID)
 	{
 		return;
 	}
-	m_CurrentWindow->ClosedByPlayer(*this);
-	m_CurrentWindow = m_InventoryWindow;
+	CloseWindow();
 }
 
 
