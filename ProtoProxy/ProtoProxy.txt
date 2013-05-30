@@ -15,9 +15,11 @@ This project is currently Windows-only and I don't plan on making it multi-platf
 
 The proxy only works on the localhost connection. It listens on port 25564 and expects the underlying MC server to run on port 25565. Ports can be changed by cmdline args: ProtoProxy <listen-port> <server-port>.
 
+You need to set the server *not* to verify usernames ("online-mode=false" in server.properties) in order to be able to connect through ProtoProxy - since the full server name, including the port, is used for verification, the client uses different servername than the server and thus the verification fails.
 
 
-ProtoProxy is not much dependent on the protocol - it will work with unknown packets, it just won't parse them, into human-readable format.
+
+ProtoProxy is not much dependent on the protocol - it will work with unknown packets, it just won't parse them into human-readable format.
 The latest protocol which has been tested is 1.5.2 (#61).
 
 
