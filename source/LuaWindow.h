@@ -10,6 +10,7 @@
 #pragma once
 
 #include "UI/Window.h"
+#include "ItemGrid.h"
 
 
 
@@ -35,7 +36,8 @@ cPlayer:OpenWindow check if the window is of this class, and if so, make a globa
 This reference needs to be unreferenced in the Destroy() function.
 */
 class cLuaWindow :
-	public cWindow
+	public cWindow,
+	public cItemGrid::cListener
 {
 	typedef cWindow super;
 	
@@ -83,6 +85,9 @@ protected:
 	// cWindow overrides:
 	virtual bool ClosedByPlayer(cPlayer & a_Player) override;
 	virtual void Destroy(void) override;
+	
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 } ;  // tolua_export
 
 

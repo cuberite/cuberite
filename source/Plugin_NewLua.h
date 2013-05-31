@@ -108,6 +108,9 @@ public:
 	/// Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true
 	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player);
 	
+	/// Calls the plugin-specified "cLuaWindow slot changed" callback.
+	void CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum);
+	
 protected:
 	cCriticalSection m_CriticalSection;
 	lua_State * m_LuaState;

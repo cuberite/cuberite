@@ -25,6 +25,7 @@ cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_Slo
 	m_OnClosingFnRef(LUA_REFNIL),
 	m_OnSlotChangedFnRef(LUA_REFNIL)
 {
+	m_Contents.AddListener(*this);
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(m_Contents, *this));
 	
 	// If appropriate, add an Armor slot area:
@@ -96,6 +97,26 @@ void cLuaWindow::SetOnClosing(cPlugin_NewLua * a_Plugin, int a_FnRef)
 
 
 
+void cLuaWindow::SetOnSlotChanged(cPlugin_NewLua * a_Plugin, int a_FnRef)
+{
+	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
+	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
+	
+	// If there already was a function, unreference it first
+	if (m_OnSlotChangedFnRef != LUA_REFNIL)
+	{
+		m_Plugin->Unreference(m_OnSlotChangedFnRef);
+	}
+	
+	// Store the new reference
+	m_Plugin = a_Plugin;
+	m_OnSlotChangedFnRef = a_FnRef;
+}
+
+
+
+
+
 bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player)
 {
 	// First notify the plugin through the registered callback:
@@ -128,6 +149,25 @@ void cLuaWindow::Destroy(void)
 	
 	// Lua will take care of this object, it will garbage-collect it, so we *must not* delete it!
 	m_IsDestroyed = false;
+}
+
+
+
+
+
+void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	if (a_ItemGrid != &m_Contents)
+	{
+		ASSERT(!"Invalid ItemGrid in callback");
+		return;
+	}
+	
+	// If an OnSlotChanged callback has been registered, call it:
+	if (m_OnSlotChangedFnRef != LUA_REFNIL)
+	{
+		m_Plugin->CallbackWindowSlotChanged(m_OnSlotChangedFnRef, *this, a_SlotNum);
+	}
 }
 
 

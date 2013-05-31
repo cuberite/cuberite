@@ -1667,6 +1667,8 @@ void cPlugin_NewLua::Unreference(int a_LuaRef)
 
 bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player)
 {
+	ASSERT(a_FnRef != LUA_REFNIL);
+	
 	cCSLock Lock(m_CriticalSection);
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // Push the function to be called
 	tolua_pushusertype(m_LuaState, &a_Window, "cWindow");
@@ -1683,6 +1685,27 @@ bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPla
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, false) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
+}
+
+
+
+
+
+void cPlugin_NewLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum)
+{
+	ASSERT(a_FnRef != LUA_REFNIL);
+	
+	cCSLock Lock(m_CriticalSection);
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // Push the function to be called
+	tolua_pushusertype(m_LuaState, &a_Window, "cWindow");
+	tolua_pushnumber  (m_LuaState, a_SlotNum);
+
+	// Call function:
+	int s = lua_pcall(m_LuaState, 2, 0, 0);
+	if (report_errors(m_LuaState, s))
+	{
+		LOGERROR("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
+	}
 }
 
 

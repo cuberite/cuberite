@@ -588,9 +588,15 @@ function HandleTestWndCmd(a_Split, a_Player)
 		return (attempt <= 3);  -- refuse twice, then allow
 	end
 	
+	-- Log the slot changes
+	local OnSlotChanged = function(Window, SlotNum)
+		LOG("Window \"" .. Window:GetWindowTitle() .. "\" slot " .. SlotNum .. " changed.");
+	end
+	
 	local Window = cLuaWindow(WindowType, WindowSizeX, WindowSizeY, "TestWnd");
 	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
 	Window:SetOnClosing(OnClosing);
+	Window:SetOnSlotChanged(OnSlotChanged);
 	
 	a_Player:OpenWindow(Window);
 	

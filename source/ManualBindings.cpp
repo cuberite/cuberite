@@ -938,9 +938,13 @@ static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 
 
 
-static int tolua_cLuaWindow_SetOnClosing(lua_State * tolua_S)
+template <
+	class OBJTYPE,
+	void (OBJTYPE::*SetCallback)(cPlugin_NewLua * a_Plugin, int a_FnRef)
+>
+static int tolua_SetObjectCallback(lua_State * tolua_S)
 {
-	// Function signature: cPlayer:SetOnClosing(CallbackFunction)
+	// Function signature: OBJTYPE:SetWhateverCallback(CallbackFunction)
 
 	// Retrieve the plugin instance from the Lua state
 	cPlugin_NewLua * Plugin = GetLuaPlugin(tolua_S);
@@ -950,14 +954,14 @@ static int tolua_cLuaWindow_SetOnClosing(lua_State * tolua_S)
 		return 0;
 	}
 
-	// Get the parameters:
-	cLuaWindow * self = (cLuaWindow *)tolua_tousertype(tolua_S, 1, NULL);
+	// Get the parameters - self and the function reference:
+	OBJTYPE * self = (OBJTYPE *)tolua_tousertype(tolua_S, 1, NULL);
 	if (self == NULL)
 	{
 		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
 		return 0;
 	}
-	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);  // Store function reference
+	int FnRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);  // Store function reference for later retrieval
 	if (FnRef == LUA_REFNIL)
 	{
 		LOGERROR("%s: Cannot create a function reference. Callback not set.", __FUNCTION__);
@@ -965,7 +969,7 @@ static int tolua_cLuaWindow_SetOnClosing(lua_State * tolua_S)
 	}
 	
 	// Set the callback
-	self->SetOnClosing(Plugin, FnRef);
+	(self->*SetCallback)(Plugin, FnRef);
 	return 0;
 }
 
@@ -1301,7 +1305,8 @@ void ManualBindings::Bind( lua_State* tolua_S )
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cLuaWindow");
-			tolua_function(tolua_S, "SetOnClosing", tolua_cLuaWindow_SetOnClosing);
+			tolua_function(tolua_S, "SetOnClosing",     tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnClosing>);
+			tolua_function(tolua_S, "SetOnSlotChanged", tolua_SetObjectCallback<cLuaWindow, &cLuaWindow::SetOnSlotChanged>);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlugin_NewLua");
