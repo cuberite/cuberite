@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 05/30/13 21:32:45.
+** Generated automatically by tolua++-1.0.92 on 06/01/13 09:50:23.
 */
 
 #ifndef __cplusplus
@@ -13836,20 +13836,14 @@ static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,E_ITEM_EMPTY));
-  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
-  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
   {
-   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage));
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)());
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
@@ -13870,20 +13864,14 @@ static int tolua_AllToLua_cItem_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,E_ITEM_EMPTY));
-  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
-  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
   {
-   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage));
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)());
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
@@ -13894,6 +13882,65 @@ static int tolua_AllToLua_cItem_new00_local(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new01
+static int tolua_AllToLua_cItem_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,1));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
+  {
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cItem_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new01_local
+static int tolua_AllToLua_cItem_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,1));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
+  {
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cItem_new00_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -26026,6 +26073,23 @@ static int tolua_AllToLua_cLuaWindow_GetContents00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: __cItemGrid of class  cLuaWindow */
+#ifndef TOLUA_DISABLE_tolua_get_cLuaWindow___cItemGrid__cListener__
+static int tolua_get_cLuaWindow___cItemGrid__cListener__(lua_State* tolua_S)
+{
+  cLuaWindow* self = (cLuaWindow*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cItemGrid'",NULL);
+#endif
+#ifdef __cplusplus
+   tolua_pushusertype(tolua_S,(void*)static_cast<cItemGrid::cListener*>(self), "cItemGrid::cListener");
+#else
+   tolua_pushusertype(tolua_S,(void*)((cItemGrid::cListener*)self), "cItemGrid::cListener");
+#endif
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* Open function */
 TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
 {
@@ -27194,6 +27258,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cItem_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cItem_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cItem_new00_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cItem_new01);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cItem_new01_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cItem_new01_local);
    tolua_function(tolua_S,"Empty",tolua_AllToLua_cItem_Empty00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cItem_Clear00);
    tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cItem_IsEmpty00);
@@ -27741,6 +27808,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,".call",tolua_AllToLua_cLuaWindow_new00_local);
    tolua_function(tolua_S,"delete",tolua_AllToLua_cLuaWindow_delete00);
    tolua_function(tolua_S,"GetContents",tolua_AllToLua_cLuaWindow_GetContents00);
+   tolua_variable(tolua_S,"__cItemGrid__cListener__",tolua_get_cLuaWindow___cItemGrid__cListener__,NULL);
   tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;

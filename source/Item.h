@@ -16,14 +16,29 @@ namespace Json
 class cItem
 {
 public:
-	cItem(short a_ItemType = E_ITEM_EMPTY, char a_ItemCount = 0, short a_ItemDamage = 0)
-		: m_ItemType  (a_ItemType)
-		, m_ItemCount (a_ItemCount)
-		, m_ItemDamage(a_ItemDamage)
+	/// Creates an empty item
+	cItem(void) :
+		m_ItemType(E_ITEM_EMPTY),
+		m_ItemCount(0),
+		m_ItemDamage(0)
+	{
+	}
+	
+	
+	/// Creates an item of the specified type, by default 1 piece with no damage
+	cItem(
+		short a_ItemType,
+		char a_ItemCount = 1,
+		short a_ItemDamage = 0
+	) :
+		m_ItemType  (a_ItemType),
+		m_ItemCount (a_ItemCount),
+		m_ItemDamage(a_ItemDamage)
 	{
 		if (!IsValidItem(m_ItemType))
 		{
-			m_ItemType = E_ITEM_EMPTY;
+			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
+			Empty();
 		}
 	}
 	
