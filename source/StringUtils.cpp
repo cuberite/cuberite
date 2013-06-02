@@ -526,12 +526,14 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_
 		{
 			k = a_LineLength;
 		}
-		memset(line, ' ', sizeof(line));        
-		#ifdef _MSC_VER  // MSVC provides a "secure" version of sprintf()
-		line[sprintf_s(line, sizeof(line), "%08x:", i)] = 32;  // Remove the terminating NULL that sprintf puts there
+		#ifdef _MSC_VER
+		// MSVC provides a "secure" version of sprintf()
+		int Count = sprintf_s(line, sizeof(line), "%08x:", i);
 		#else
-		line[sprintf(line, "%08x:", i)] = 32;  // Remove the terminating NULL that sprintf puts there
+		int Count = sprintf(line, "%08x:", i);
 		#endif
+		// Remove the terminating NULL / leftover garbage in line, after the sprintf-ed value
+		memset(line + Count, 32, sizeof(line) - Count);
 		p = line + 10;
 		q = p + 2 + a_LineLength * 3 + 1;
 		for (int j = 0; j < k; j++)
