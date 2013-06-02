@@ -191,20 +191,22 @@ enum
 // cConnection:
 
 cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
-	m_Server(a_Server),
+	m_ItemIdx(0),
 	m_LogFile(NULL),
+	m_Server(a_Server),
 	m_ClientSocket(a_ClientSocket),
 	m_ServerSocket(-1),
 	m_BeginTick(clock()),
 	m_ClientState(csUnencrypted),
 	m_ServerState(csUnencrypted),
+	m_Nonce(0),
 	m_ClientBuffer(1024 KiB),
 	m_ServerBuffer(1024 KiB),
-	m_Nonce(0),
 	m_HasClientPinged(false)
 {
-	AString fnam;
-	Printf(fnam, "Log_%d.log", (int)time(NULL));
+	Printf(m_LogNameBase, "Log_%d", (int)time(NULL));
+	AString fnam(m_LogNameBase);
+	fnam.append(".log");
 	m_LogFile = fopen(fnam.c_str(), "w");
 	Log("Log file created");
 }
@@ -2001,6 +2003,9 @@ bool cConnection::HandleServerWindowContents(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadChar, char, WindowID);
 	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, NumSlots);
+	Log("Received a PACKET_WINDOW_CONTENTS from the server:");
+	Log("  WindowID = %d", WindowID);
+	Log("  NumSlots = %d", NumSlots);
 	AStringVector Items;
 	for (short i = 0; i < NumSlots; i++)
 	{
@@ -2009,14 +2014,9 @@ bool cConnection::HandleServerWindowContents(void)
 		{
 			return false;
 		}
-		Items.push_back(Item);
+		Log("    %d: %s", i, Item.c_str());
 	}
-	Log("Received a PACKET_WINDOW_CONTENTS from the server:");
-	Log("  WindowID = %d", WindowID);
-	Log("  NumSlots = %d", NumSlots);
 
-	// TODO: list items
-	
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2031,10 +2031,11 @@ bool cConnection::HandleServerWindowOpen(void)
 	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowType);
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Title);
 	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    NumSlots);
+	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    UseProvidedTitle);
 	Log("Received a PACKET_WINDOW_OPEN from the server:");
 	Log("  WindowID = %d", WindowID);
 	Log("  WindowType = %d", WindowType);
-	Log("  Title = \"%s\"", Title.c_str());
+	Log("  Title = \"%s\", Use = %d", Title.c_str(), UseProvidedTitle);
 	Log("  NumSlots = %d", NumSlots);
 	COPY_TO_CLIENT();
 	return true;
@@ -2071,11 +2072,27 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	{
 		return true;
 	}
-	AppendPrintf(a_ItemDesc, " (%d bytes of meta)", MetadataLength);
-	if (!a_Buffer.SkipRead(MetadataLength))
+	AString Metadata;
+	Metadata.resize(MetadataLength);
+	if (!a_Buffer.ReadBuf((void *)Metadata.data(), MetadataLength))
 	{
 		return false;
 	}
+	AString MetaHex;
+	CreateHexDump(MetaHex, Metadata.data(), Metadata.size(), 16);
+	AppendPrintf(a_ItemDesc, "; %d bytes of meta:\n%s", MetadataLength, MetaHex.c_str());
+
+	// Save metadata to a file:
+	AString fnam;
+	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	FILE * f = fopen(fnam.c_str(), "wb");
+	if (f != NULL)
+	{
+		fwrite(Metadata.data(), 1, Metadata.size(), f);
+		fclose(f);
+		AppendPrintf(a_ItemDesc, "\n    (saved to file \"%s\")", fnam.c_str());
+	}
+	
 	return true;
 }
 

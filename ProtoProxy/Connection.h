@@ -24,6 +24,10 @@ class cServer;
 
 class cConnection
 {
+	AString m_LogNameBase;  ///< Base for the log filename and all files connected to this log
+	
+	int m_ItemIdx;  ///< Index for the next file into which item metadata should be written (ParseSlot() function)
+	
 	cCriticalSection m_CSLog;
 	FILE * m_LogFile;
 	

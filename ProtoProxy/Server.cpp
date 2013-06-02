@@ -58,7 +58,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 
 void cServer::Run(void)
 {
-	printf("Server running\n");
+	printf("Server running.\n");
 	while (true)
 	{
 		sockaddr_in Addr;
@@ -67,11 +67,13 @@ void cServer::Run(void)
 		SOCKET client = accept(m_ListenSocket, (sockaddr *)&Addr, &AddrSize);
 		if (client == INVALID_SOCKET)
 		{
-			printf("accept returned an error: %d; bailing out", WSAGetLastError());
+			printf("accept returned an error: %d; bailing out.\n", WSAGetLastError());
 			return;
 		}
+		printf("Client connected, proxying...\n");
 		cConnection Connection(client, *this);
 		Connection.Run();
+		printf("Client disconnected. Ready for another connection.\n");
 	}
 }
 
