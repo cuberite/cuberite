@@ -594,8 +594,16 @@ function HandleTestWndCmd(a_Split, a_Player)
 	end
 	
 	local Window = cLuaWindow(WindowType, WindowSizeX, WindowSizeY, "TestWnd");
+	local Item2 = cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "1=1");
+	local Item3 = cItem(E_ITEM_DIAMOND_SHOVEL);
+	Item3.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 4);
+	local Item4 = cItem(E_ITEM_DIAMOND_PICKAXE);
+	Item4.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 5);
+	Item4.m_Enchantments:SetLevel(cEnchantments.enchEfficiency, 3);
 	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
-	Window:SetSlot(a_Player, 1, cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "1=1"));
+	Window:SetSlot(a_Player, 1, Item2);
+	Window:SetSlot(a_Player, 2, Item3);
+	Window:SetSlot(a_Player, 3, Item4);
 	Window:SetOnClosing(OnClosing);
 	Window:SetOnSlotChanged(OnSlotChanged);
 	

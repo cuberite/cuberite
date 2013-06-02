@@ -90,23 +90,34 @@ bool cItem::IsStackableWith(const cItem & a_OtherStack) const
 
 
 
-void cItem::GetJson( Json::Value & a_OutValue ) const
+void cItem::GetJson(Json::Value & a_OutValue) const
 {
 	a_OutValue["ID"] = m_ItemType;
-	if( m_ItemType > 0 )
+	if (m_ItemType > 0)
 	{
 		a_OutValue["Count"] = m_ItemCount;
 		a_OutValue["Health"] = m_ItemDamage;
+		AString Enchantments(m_Enchantments.ToString());
+		if (!Enchantments.empty())
+		{
+			a_OutValue["ench"] = Enchantments;
+		}
 	}
 }
 
-void cItem::FromJson( const Json::Value & a_Value )
+
+
+
+
+void cItem::FromJson(const Json::Value & a_Value)
 {
 	m_ItemType = (ENUM_ITEM_ID)a_Value.get("ID", -1 ).asInt();
-	if( m_ItemType > 0 )
+	if (m_ItemType > 0)
 	{
 		m_ItemCount = (char)a_Value.get("Count", -1 ).asInt();
 		m_ItemDamage = (short)a_Value.get("Health", -1 ).asInt();
+		m_Enchantments.Clear();
+		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 	}
 }
 

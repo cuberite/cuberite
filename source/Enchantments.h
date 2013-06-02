@@ -90,7 +90,7 @@ public:
 	void WriteToNBTCompound(cFastNBTWriter & a_Writer, const AString & a_ListTagName) const;
 	
 	/// Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments)
-	void ParseFromNBT(cParsedNBT & a_NBT, int a_EnchListTagIdx);
+	void ParseFromNBT(const cParsedNBT & a_NBT, int a_EnchListTagIdx);
 	
 protected:
 	/// Maps enchantment ID -> enchantment level

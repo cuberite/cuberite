@@ -615,7 +615,22 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 	}
 	a_Item.m_ItemCount = a_NBT.GetByte(Count);
 	
-	// TODO: enchantments and other item properties
+	// Find the "tag" tag, used for enchantments and other extra data
+	int TagTag = a_NBT.FindChildByName(a_TagIdx, "tag");
+	if (TagTag <= 0)
+	{
+		// No extra data
+		return true;
+	}
+
+	// Load enchantments:
+	const char * EnchName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+	int EnchTag = a_NBT.FindChildByName(TagTag, EnchName);
+	if (EnchTag > 0)
+	{
+		a_Item.m_Enchantments.ParseFromNBT(a_NBT, EnchTag);
+	}
+	
 	return true;
 }
 

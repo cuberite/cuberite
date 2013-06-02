@@ -165,7 +165,7 @@ void cEnchantments::WriteToNBTCompound(cFastNBTWriter & a_Writer, const AString 
 
 
 
-void cEnchantments::ParseFromNBT(cParsedNBT & a_NBT, int a_EnchListTagIdx)
+void cEnchantments::ParseFromNBT(const cParsedNBT & a_NBT, int a_EnchListTagIdx)
 {
 	// Read the enchantments from the specified NBT list tag (ench or StoredEnchantments)
 
