@@ -106,7 +106,7 @@ public:
 	void Unreference(int a_LuaRef);
 	
 	/// Calls the plugin-specified "cLuaWindow closing" callback. Returns true only if the callback returned true
-	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player);
+	bool CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer & a_Player, bool a_CanRefuse);
 	
 	/// Calls the plugin-specified "cLuaWindow slot changed" callback.
 	void CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int a_SlotNum);

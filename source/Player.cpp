@@ -128,7 +128,7 @@ void cPlayer::Initialize( cWorld* a_World )
 
 void cPlayer::Destroyed()
 {
-	CloseWindow();
+	CloseWindow(false);
 	m_ClientHandle = NULL;
 }
 
@@ -437,7 +437,7 @@ void cPlayer::OpenWindow(cWindow * a_Window)
 {
 	if (a_Window != m_CurrentWindow)
 	{
-		CloseWindow();
+		CloseWindow(false);
 	}
 	a_Window->OpenedByPlayer(*this);
 	m_CurrentWindow = a_Window;
@@ -448,7 +448,7 @@ void cPlayer::OpenWindow(cWindow * a_Window)
 
 
 
-void cPlayer::CloseWindow(void)
+void cPlayer::CloseWindow(bool a_CanRefuse)
 {
 	if (m_CurrentWindow == NULL)
 	{
@@ -456,7 +456,7 @@ void cPlayer::CloseWindow(void)
 		return;
 	}
 	
-	if (m_CurrentWindow->ClosedByPlayer(*this))
+	if (m_CurrentWindow->ClosedByPlayer(*this, a_CanRefuse) || !a_CanRefuse)
 	{
 		// Close accepted, go back to inventory window (the default):
 		m_CurrentWindow = m_InventoryWindow;
@@ -473,7 +473,7 @@ void cPlayer::CloseWindow(void)
 
 
 
-void cPlayer::CloseWindowIfID(char a_WindowID)
+void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 {
 	if ((m_CurrentWindow == NULL) || (m_CurrentWindow->GetWindowID() != a_WindowID))
 	{

@@ -117,20 +117,20 @@ void cLuaWindow::SetOnSlotChanged(cPlugin_NewLua * a_Plugin, int a_FnRef)
 
 
 
-bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player)
+bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 {
 	// First notify the plugin through the registered callback:
 	if (m_OnClosingFnRef != LUA_REFNIL)
 	{
 		ASSERT(m_Plugin != NULL);
-		if (m_Plugin->CallbackWindowClosing(m_OnClosingFnRef, *this, a_Player))
+		if (m_Plugin->CallbackWindowClosing(m_OnClosingFnRef, *this, a_Player, a_CanRefuse))
 		{
-			// The callback disagrees
+			// The callback disagrees (the higher levels check the CanRefuse flag compliance)
 			return false;
 		}
 	}
 	
-	return super::ClosedByPlayer(a_Player);
+	return super::ClosedByPlayer(a_Player, a_CanRefuse);
 }
 
 

@@ -582,10 +582,10 @@ function HandleTestWndCmd(a_Split, a_Player)
 	
 	-- Test out the OnClosing callback's ability to refuse to close the window
 	local attempt = 1;
-	local OnClosing = function(Window, Player)
-		Player:SendMessage("Window closing attempt #" .. attempt);
+	local OnClosing = function(Window, Player, CanRefuse)
+		Player:SendMessage("Window closing attempt #" .. attempt .. "; CanRefuse = " .. tostring(CanRefuse));
 		attempt = attempt + 1;
-		return (attempt <= 3);  -- refuse twice, then allow
+		return CanRefuse and (attempt <= 3);  -- refuse twice, then allow, unless CanRefuse is set to true
 	end
 	
 	-- Log the slot changes

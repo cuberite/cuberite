@@ -83,7 +83,7 @@ protected:
 	int m_OnSlotChangedFnRef;
 	
 	// cWindow overrides:
-	virtual bool ClosedByPlayer(cPlayer & a_Player) override;
+	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 	virtual void Destroy(void) override;
 	
 	// cItemGrid::cListener overrides:

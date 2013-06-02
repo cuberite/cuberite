@@ -93,11 +93,11 @@ public:
 	
 	// tolua_begin
 	
-	/// Closes the current window, resets current window to m_InventoryWindow
-	void CloseWindow(void);
+	/// Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true
+	void CloseWindow(bool a_CanRefuse = true);
 	
 	/// Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow
-	void CloseWindowIfID(char a_WindowID);
+	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
 	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }
 
