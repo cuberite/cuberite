@@ -204,7 +204,8 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 		}
 		if (a_Apply)
 		{
-			cItem NewSlot(a_ItemStack.m_ItemType, Slot->m_ItemCount + NumFit, a_ItemStack.m_ItemDamage);
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
 			SetSlot(i, a_Player, NewSlot);
 		}
 		a_ItemStack.m_ItemCount -= NumFit;
@@ -623,7 +624,7 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 	{
 		if (a_ShouldApply)
 		{
-			SetSlot(0, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+			SetSlot(0, a_Player, a_ItemStack.CopyOne());
 		}
 		a_ItemStack.m_ItemCount -= 1;
 	}
@@ -631,7 +632,7 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 	{
 		if (a_ShouldApply)
 		{
-			SetSlot(1, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+			SetSlot(1, a_Player, a_ItemStack.CopyOne());
 		}
 		a_ItemStack.m_ItemCount -= 1;
 	}
@@ -639,7 +640,7 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 	{
 		if (a_ShouldApply)
 		{
-			SetSlot(2, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+			SetSlot(2, a_Player, a_ItemStack.CopyOne());
 		}
 		a_ItemStack.m_ItemCount -= 1;
 	}
@@ -647,7 +648,7 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 	{
 		if (a_ShouldApply)
 		{
-			SetSlot(3, a_Player, cItem(a_ItemStack.m_ItemType, 1, a_ItemStack.m_ItemDamage));
+			SetSlot(3, a_Player, a_ItemStack.CopyOne());
 		}
 		a_ItemStack.m_ItemCount -= 1;
 	}
