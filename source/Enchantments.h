@@ -26,9 +26,9 @@ class cParsedNBT;
 /** Class that stores item enchantments or stored-enchantments
 The enchantments may be serialized to a stringspec and read back from such stringspec.
 The format for the stringspec is "id=lvl;id=lvl;id=lvl...", with an optional semicolon at the end,
-mapping each enchantment's id onto its level.
+mapping each enchantment's id onto its level. ID may be either a number or the enchantment name.
 Level value of 0 means no such enchantment, and it will not be stored in the m_Enchantments.
-Serialization will never put zero-level enchantments into the stringspec.
+Serialization will never put zero-level enchantments into the stringspec and will always use numeric IDs.
 */
 class cEnchantments
 {
@@ -83,6 +83,9 @@ public:
 	
 	/// Returns true if there are no enchantments
 	bool IsEmpty(void) const;
+	
+	/// Converts enchantment name to the numeric representation; returns -1 if enchantment name not found; case insensitive
+	static int StringToEnchantmentID(const AString & a_EnchantmentName);
 	
 	// tolua_end
 	

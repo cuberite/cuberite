@@ -51,9 +51,13 @@ void cEnchantments::AddFromString(const AString & a_StringSpec)
 			continue;
 		}
 		int id = atoi(Split[0].c_str());
+		if ((id == 0) && (Split[0] != "0"))
+		{
+			id = StringToEnchantmentID(Split[0]);
+		}
 		int lvl = atoi(Split[1].c_str());
 		if (
-			((id  == 0) && (Split[0] != "0")) ||
+			((id  <= 0) && (Split[0] != "0")) ||
 			((lvl == 0) && (Split[1] != "0"))
 		)
 		{
@@ -139,6 +143,51 @@ void cEnchantments::Clear(void)
 bool cEnchantments::IsEmpty(void) const
 {
 	return m_Enchantments.empty();
+}
+
+
+
+
+
+int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
+{
+	struct
+	{
+		int m_Value;
+		const char * m_Name;
+	} EnchantmentNames[] =
+	{
+		{ enchProtection,           "Protection"},
+		{ enchFireProtection,       "FireProtection"},
+		{ enchFeatherFalling,       "FeatherFalling"},
+		{ enchBlastProtection,      "BlastProtection"},
+		{ enchProjectileProtection, "ProjectileProtection"},
+		{ enchRespiration,          "Respiration"},
+		{ enchAquaAffinity,         "AquaAffinity"},
+		{ enchThorns,               "Thorns"},
+		{ enchSharpness,            "Sharpness"},
+		{ enchSmite,                "Smite"},
+		{ enchBaneOfArthropods,     "BaneOfArthropods"},
+		{ enchKnockback,            "Knockback"},
+		{ enchFireAspect,           "FireAspect"},
+		{ enchLooting,              "Looting"},
+		{ enchEfficiency,           "Efficiency"},
+		{ enchSilkTouch,            "SilkTouch"},
+		{ enchUnbreaking,           "Unbreaking"},
+		{ enchFortune,              "Fortune"},
+		{ enchPower,                "Power"},
+		{ enchPunch,                "Punch"},
+		{ enchFlame,                "Flame"},
+		{ enchInfinity,             "Infinity"},
+	} ;
+	for (int i = 0; i < ARRAYCOUNT(EnchantmentNames); i++)
+	{
+		if (NoCaseCompare(EnchantmentNames[i].m_Name, a_EnchantmentName) == 0)
+		{
+			return EnchantmentNames[i].m_Value;
+		}
+	}  // for i - EnchantmentNames[]
+	return -1;
 }
 
 

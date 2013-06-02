@@ -600,10 +600,12 @@ function HandleTestWndCmd(a_Split, a_Player)
 	local Item4 = cItem(E_ITEM_DIAMOND_PICKAXE);
 	Item4.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 5);
 	Item4.m_Enchantments:SetLevel(cEnchantments.enchEfficiency, 3);
+	local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
 	Window:SetSlot(a_Player, 1, Item2);
 	Window:SetSlot(a_Player, 2, Item3);
 	Window:SetSlot(a_Player, 3, Item4);
+	Window:SetSlot(a_Player, 4, Item5);
 	Window:SetOnClosing(OnClosing);
 	Window:SetOnSlotChanged(OnSlotChanged);
 	

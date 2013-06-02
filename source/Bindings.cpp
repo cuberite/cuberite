@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/02/13 12:36:50.
+** Generated automatically by tolua++-1.0.92 on 06/02/13 23:42:02.
 */
 
 #ifndef __cplusplus
@@ -14145,6 +14145,37 @@ static int tolua_AllToLua_cEnchantments_IsEmpty00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: StringToEnchantmentID of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_StringToEnchantmentID00
+static int tolua_AllToLua_cEnchantments_StringToEnchantmentID00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_EnchantmentName = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   int tolua_ret = (int)  cEnchantments::StringToEnchantmentID(a_EnchantmentName);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_EnchantmentName);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StringToEnchantmentID'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cItem */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new00
 static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
@@ -27701,6 +27732,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetLevel",tolua_AllToLua_cEnchantments_SetLevel00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cEnchantments_Clear00);
    tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cEnchantments_IsEmpty00);
+   tolua_function(tolua_S,"StringToEnchantmentID",tolua_AllToLua_cEnchantments_StringToEnchantmentID00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cItem","cItem","",tolua_collect_cItem);
