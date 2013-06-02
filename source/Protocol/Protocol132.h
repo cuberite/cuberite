@@ -82,6 +82,9 @@ protected:
 	virtual void WriteItem(const cItem & a_Item) override;
 	virtual int  ParseItem(cItem & a_Item) override;
 	
+	/// Parses the metadata that may come with the item.
+	int ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+
 	virtual void SendCompass(const cWorld & a_World);
 	virtual void SendEncryptionKeyRequest(void);
 	

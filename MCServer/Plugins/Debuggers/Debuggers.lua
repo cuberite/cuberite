@@ -595,6 +595,7 @@ function HandleTestWndCmd(a_Split, a_Player)
 	
 	local Window = cLuaWindow(WindowType, WindowSizeX, WindowSizeY, "TestWnd");
 	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
+	Window:SetSlot(a_Player, 1, cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "1=1"));
 	Window:SetOnClosing(OnClosing);
 	Window:SetOnSlotChanged(OnSlotChanged);
 	

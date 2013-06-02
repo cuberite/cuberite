@@ -1,7 +1,20 @@
+
+// Item.h
+
+// Declares the cItem class representing an item (in the inventory sense)
+
+
+
+
+
 #pragma once
 
 #include "Defines.h"
-#include "BlockID.h"
+#include "Enchantments.h"
+
+
+
+
 
 namespace Json
 {
@@ -25,15 +38,17 @@ public:
 	}
 	
 	
-	/// Creates an item of the specified type, by default 1 piece with no damage
+	/// Creates an item of the specified type, by default 1 piece with no damage and no enchantments
 	cItem(
 		short a_ItemType,
 		char a_ItemCount = 1,
-		short a_ItemDamage = 0
+		short a_ItemDamage = 0,
+		const AString & a_Enchantments = ""
 	) :
-		m_ItemType  (a_ItemType),
-		m_ItemCount (a_ItemCount),
-		m_ItemDamage(a_ItemDamage)
+		m_ItemType    (a_ItemType),
+		m_ItemCount   (a_ItemCount),
+		m_ItemDamage  (a_ItemDamage),
+		m_Enchantments(a_Enchantments)
 	{
 		if (!IsValidItem(m_ItemType))
 		{
@@ -48,6 +63,7 @@ public:
 		m_ItemType = E_ITEM_EMPTY;
 		m_ItemCount = 0;
 		m_ItemDamage = 0;
+		m_Enchantments.Clear();
 	}
 	
 	
@@ -98,9 +114,10 @@ public:
 	
 	static bool IsEnchantable(short a_ItemType);
 
-	short m_ItemType;
-	char  m_ItemCount;
-	short m_ItemDamage;
+	short         m_ItemType;
+	char          m_ItemCount;
+	short         m_ItemDamage;
+	cEnchantments m_Enchantments;
 };
 // tolua_end
 

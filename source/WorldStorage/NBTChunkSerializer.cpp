@@ -68,6 +68,16 @@ void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AStrin
 	{
 		m_Writer.AddByte ("Slot", (unsigned char)a_Slot);
 	}
+	
+	// Write the enchantments:
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+		m_Writer.BeginCompound("tag");
+			a_Item.m_Enchantments.WriteToNBTCompound(m_Writer, TagName);
+		m_Writer.EndCompound();
+	}
+	
 	m_Writer.EndCompound();
 }
 

@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/01/13 09:50:23.
+** Generated automatically by tolua++-1.0.92 on 06/02/13 12:36:50.
 */
 
 #ifndef __cplusplus
@@ -36,6 +36,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Server.h"
 #include "World.h"
 #include "Inventory.h"
+#include "Enchantments.h"
 #include "Item.h"
 #include "ItemGrid.h"
 #include "BlockEntities/BlockEntity.h"
@@ -64,20 +65,6 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 /* function to release collected object via destructor */
 #ifdef __cplusplus
 
-static int tolua_collect_cIniFile (lua_State* tolua_S)
-{
- cIniFile* self = (cIniFile*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
-static int tolua_collect_cCraftingGrid (lua_State* tolua_S)
-{
- cCraftingGrid* self = (cCraftingGrid*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
 static int tolua_collect_cItem (lua_State* tolua_S)
 {
  cItem* self = (cItem*) tolua_tousertype(tolua_S,1,0);
@@ -88,34 +75,6 @@ static int tolua_collect_cItem (lua_State* tolua_S)
 static int tolua_collect_Vector3f (lua_State* tolua_S)
 {
  Vector3f* self = (Vector3f*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
-static int tolua_collect_cDropperEntity (lua_State* tolua_S)
-{
- cDropperEntity* self = (cDropperEntity*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
-static int tolua_collect_cPickup (lua_State* tolua_S)
-{
- cPickup* self = (cPickup*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
-static int tolua_collect_cItems (lua_State* tolua_S)
-{
- cItems* self = (cItems*) tolua_tousertype(tolua_S,1,0);
-	Mtolua_delete(self);
-	return 0;
-}
-
-static int tolua_collect_cBlockArea (lua_State* tolua_S)
-{
- cBlockArea* self = (cBlockArea*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -148,16 +107,16 @@ static int tolua_collect_cBlockEntity (lua_State* tolua_S)
 	return 0;
 }
 
-static int tolua_collect_Vector3i (lua_State* tolua_S)
+static int tolua_collect_cBlockArea (lua_State* tolua_S)
 {
- Vector3i* self = (Vector3i*) tolua_tousertype(tolua_S,1,0);
+ cBlockArea* self = (cBlockArea*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
 
-static int tolua_collect_cTracer (lua_State* tolua_S)
+static int tolua_collect_cEnchantments (lua_State* tolua_S)
 {
- cTracer* self = (cTracer*) tolua_tousertype(tolua_S,1,0);
+ cEnchantments* self = (cEnchantments*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -165,6 +124,55 @@ static int tolua_collect_cTracer (lua_State* tolua_S)
 static int tolua_collect_cLuaWindow (lua_State* tolua_S)
 {
  cLuaWindow* self = (cLuaWindow*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_cDropperEntity (lua_State* tolua_S)
+{
+ cDropperEntity* self = (cDropperEntity*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_cPickup (lua_State* tolua_S)
+{
+ cPickup* self = (cPickup*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_cItems (lua_State* tolua_S)
+{
+ cItems* self = (cItems*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_cCraftingGrid (lua_State* tolua_S)
+{
+ cCraftingGrid* self = (cCraftingGrid*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_Vector3i (lua_State* tolua_S)
+{
+ Vector3i* self = (Vector3i*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_cIniFile (lua_State* tolua_S)
+{
+ cIniFile* self = (cIniFile*) tolua_tousertype(tolua_S,1,0);
+	Mtolua_delete(self);
+	return 0;
+}
+
+static int tolua_collect_cTracer (lua_State* tolua_S)
+{
+ cTracer* self = (cTracer*) tolua_tousertype(tolua_S,1,0);
 	Mtolua_delete(self);
 	return 0;
 }
@@ -182,13 +190,14 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
- tolua_usertype(tolua_S,"cCraftingRecipe");
- tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cCraftingRecipe");
+ tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cBlockArea");
- tolua_usertype(tolua_S,"cWindow");
+ tolua_usertype(tolua_S,"cEnchantments");
  tolua_usertype(tolua_S,"cLuaWindow");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
@@ -221,12 +230,12 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
  tolua_usertype(tolua_S,"cDropperEntity");
- tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cLadder");
- tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
+ tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cIniFile");
  tolua_usertype(tolua_S,"cListeners");
  tolua_usertype(tolua_S,"AStringVector");
@@ -234,8 +243,8 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cTorch");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cServer");
  tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"Vector3d");
@@ -13828,6 +13837,314 @@ static int tolua_AllToLua_cInventory_GetEquippedBoots00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: new of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_new00
+static int tolua_AllToLua_cEnchantments_new00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)());
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_new00_local
+static int tolua_AllToLua_cEnchantments_new00_local(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)());
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_new01
+static int tolua_AllToLua_cEnchantments_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const AString a_StringSpec = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)(a_StringSpec));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+   tolua_pushcppstring(tolua_S,(const char*)a_StringSpec);
+  }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_AllToLua_cEnchantments_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_new01_local
+static int tolua_AllToLua_cEnchantments_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const AString a_StringSpec = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)(a_StringSpec));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+   tolua_pushcppstring(tolua_S,(const char*)a_StringSpec);
+  }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_AllToLua_cEnchantments_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: AddFromString of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_AddFromString00
+static int tolua_AllToLua_cEnchantments_AddFromString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEnchantments* self = (cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+  const AString a_StringSpec = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddFromString'", NULL);
+#endif
+  {
+   self->AddFromString(a_StringSpec);
+   tolua_pushcppstring(tolua_S,(const char*)a_StringSpec);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddFromString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ToString of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_ToString00
+static int tolua_AllToLua_cEnchantments_ToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEnchantments* self = (const cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ToString'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->ToString();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetLevel of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_GetLevel00
+static int tolua_AllToLua_cEnchantments_GetLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEnchantments* self = (const cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+  int a_EnchantmentID = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLevel'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetLevel(a_EnchantmentID);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetLevel of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_SetLevel00
+static int tolua_AllToLua_cEnchantments_SetLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEnchantments* self = (cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+  int a_EnchantmentID = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Level = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetLevel'", NULL);
+#endif
+  {
+   self->SetLevel(a_EnchantmentID,a_Level);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Clear of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_Clear00
+static int tolua_AllToLua_cEnchantments_Clear00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEnchantments* self = (cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Clear'", NULL);
+#endif
+  {
+   self->Clear();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Clear'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsEmpty of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments_IsEmpty00
+static int tolua_AllToLua_cEnchantments_IsEmpty00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEnchantments* self = (const cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEmpty'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsEmpty();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsEmpty'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cItem */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new00
 static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
@@ -13941,6 +14258,71 @@ static int tolua_AllToLua_cItem_new01_local(lua_State* tolua_S)
  return 1;
 tolua_lerror:
  return tolua_AllToLua_cItem_new00_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new02
+static int tolua_AllToLua_cItem_new02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
+  const AString a_Enchantments = ((const AString)  tolua_tocppstring(tolua_S,5,0));
+  {
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage,a_Enchantments));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+   tolua_pushcppstring(tolua_S,(const char*)a_Enchantments);
+  }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_AllToLua_cItem_new01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new02_local
+static int tolua_AllToLua_cItem_new02_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  short a_ItemType = ((short)  tolua_tonumber(tolua_S,2,0));
+  char a_ItemCount = ((char)  tolua_tonumber(tolua_S,3,0));
+  short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
+  const AString a_Enchantments = ((const AString)  tolua_tocppstring(tolua_S,5,0));
+  {
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage,a_Enchantments));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+   tolua_pushcppstring(tolua_S,(const char*)a_Enchantments);
+  }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_AllToLua_cItem_new01_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -14395,6 +14777,36 @@ static int tolua_set_cItem_m_ItemDamage(lua_State* tolua_S)
    tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
 #endif
   self->m_ItemDamage = ((short)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: m_Enchantments of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_get_cItem_m_Enchantments
+static int tolua_get_cItem_m_Enchantments(lua_State* tolua_S)
+{
+  cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_Enchantments'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->m_Enchantments,"cEnchantments");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: m_Enchantments of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_set_cItem_m_Enchantments
+static int tolua_set_cItem_m_Enchantments(lua_State* tolua_S)
+{
+  cItem* self = (cItem*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'm_Enchantments'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEnchantments",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->m_Enchantments = *((cEnchantments*)  tolua_tousertype(tolua_S,2,0))
 ;
  return 0;
 }
@@ -27250,6 +27662,47 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetEquippedBoots",tolua_AllToLua_cInventory_GetEquippedBoots00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
+  tolua_cclass(tolua_S,"cEnchantments","cEnchantments","",tolua_collect_cEnchantments);
+  #else
+  tolua_cclass(tolua_S,"cEnchantments","cEnchantments","",NULL);
+  #endif
+  tolua_beginmodule(tolua_S,"cEnchantments");
+   tolua_constant(tolua_S,"enchProtection",cEnchantments::enchProtection);
+   tolua_constant(tolua_S,"enchFireProtection",cEnchantments::enchFireProtection);
+   tolua_constant(tolua_S,"enchFeatherFalling",cEnchantments::enchFeatherFalling);
+   tolua_constant(tolua_S,"enchBlastProtection",cEnchantments::enchBlastProtection);
+   tolua_constant(tolua_S,"enchProjectileProtection",cEnchantments::enchProjectileProtection);
+   tolua_constant(tolua_S,"enchRespiration",cEnchantments::enchRespiration);
+   tolua_constant(tolua_S,"enchAquaAffinity",cEnchantments::enchAquaAffinity);
+   tolua_constant(tolua_S,"enchThorns",cEnchantments::enchThorns);
+   tolua_constant(tolua_S,"enchSharpness",cEnchantments::enchSharpness);
+   tolua_constant(tolua_S,"enchSmite",cEnchantments::enchSmite);
+   tolua_constant(tolua_S,"enchBaneOfArthropods",cEnchantments::enchBaneOfArthropods);
+   tolua_constant(tolua_S,"enchKnockback",cEnchantments::enchKnockback);
+   tolua_constant(tolua_S,"enchFireAspect",cEnchantments::enchFireAspect);
+   tolua_constant(tolua_S,"enchLooting",cEnchantments::enchLooting);
+   tolua_constant(tolua_S,"enchEfficiency",cEnchantments::enchEfficiency);
+   tolua_constant(tolua_S,"enchSilkTouch",cEnchantments::enchSilkTouch);
+   tolua_constant(tolua_S,"enchUnbreaking",cEnchantments::enchUnbreaking);
+   tolua_constant(tolua_S,"enchFortune",cEnchantments::enchFortune);
+   tolua_constant(tolua_S,"enchPower",cEnchantments::enchPower);
+   tolua_constant(tolua_S,"enchPunch",cEnchantments::enchPunch);
+   tolua_constant(tolua_S,"enchFlame",cEnchantments::enchFlame);
+   tolua_constant(tolua_S,"enchInfinity",cEnchantments::enchInfinity);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cEnchantments_new00);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cEnchantments_new00_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cEnchantments_new00_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cEnchantments_new01);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cEnchantments_new01_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cEnchantments_new01_local);
+   tolua_function(tolua_S,"AddFromString",tolua_AllToLua_cEnchantments_AddFromString00);
+   tolua_function(tolua_S,"ToString",tolua_AllToLua_cEnchantments_ToString00);
+   tolua_function(tolua_S,"GetLevel",tolua_AllToLua_cEnchantments_GetLevel00);
+   tolua_function(tolua_S,"SetLevel",tolua_AllToLua_cEnchantments_SetLevel00);
+   tolua_function(tolua_S,"Clear",tolua_AllToLua_cEnchantments_Clear00);
+   tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cEnchantments_IsEmpty00);
+  tolua_endmodule(tolua_S);
+  #ifdef __cplusplus
   tolua_cclass(tolua_S,"cItem","cItem","",tolua_collect_cItem);
   #else
   tolua_cclass(tolua_S,"cItem","cItem","",NULL);
@@ -27261,6 +27714,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cItem_new01);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cItem_new01_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cItem_new01_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cItem_new02);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cItem_new02_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cItem_new02_local);
    tolua_function(tolua_S,"Empty",tolua_AllToLua_cItem_Empty00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cItem_Clear00);
    tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cItem_IsEmpty00);
@@ -27275,6 +27731,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_variable(tolua_S,"m_ItemType",tolua_get_cItem_m_ItemType,tolua_set_cItem_m_ItemType);
    tolua_variable(tolua_S,"m_ItemCount",tolua_get_cItem_m_ItemCount,tolua_set_cItem_m_ItemCount);
    tolua_variable(tolua_S,"m_ItemDamage",tolua_get_cItem_m_ItemDamage,tolua_set_cItem_m_ItemDamage);
+   tolua_variable(tolua_S,"m_Enchantments",tolua_get_cItem_m_Enchantments,tolua_set_cItem_m_Enchantments);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cItems","cItems","",tolua_collect_cItems);

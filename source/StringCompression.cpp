@@ -5,13 +5,12 @@
 
 #include "Globals.h"
 #include "StringCompression.h"
-#include "zlib.h"
 
 
 
 
 
-/// Compresses a_Data into a_Compressed; return Z_XXX error constants same as zlib's compress2()
+/// Compresses a_Data into a_Compressed; returns Z_XXX error constants same as zlib's compress2()
 int CompressString(const char * a_Data, int a_Length, AString & a_Compressed)
 {
 	uLongf CompressedSize = compressBound(a_Length);
@@ -48,6 +47,132 @@ int UncompressString(const char * a_Data, int a_Length, AString & a_Uncompressed
 	}
 	a_Uncompressed.resize(UncompressedSize);
 	return Z_OK;
+}
+
+
+
+
+
+int CompressStringGZIP(const char * a_Data, int a_Length, AString & a_Compressed)
+{
+	// Compress a_Data into a_Compressed using GZIP; return Z_XXX error constants same as zlib's compress2()
+
+	a_Compressed.reserve(a_Length);
+
+	char Buffer[64 KiB];
+	z_stream strm;
+	memset(&strm, 0, sizeof(strm));
+	strm.next_in = (Bytef *)a_Data;
+	strm.avail_in = a_Length;
+	strm.next_out = (Bytef *)Buffer;
+	strm.avail_out = sizeof(Buffer);
+	
+	int res = deflateInit2(&strm, 9, Z_DEFLATED, 31, 9, Z_DEFAULT_STRATEGY);
+	if (res != Z_OK)
+	{
+		LOG("%s: compression initialization failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
+		return res;
+	}
+	
+	while (true)
+	{
+		res = deflate(&strm, Z_FINISH);
+		switch (res)
+		{
+			case Z_OK:
+			{
+				// Some data has been compressed. Consume the buffer and continue compressing
+				a_Compressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				strm.avail_out = sizeof(Buffer);
+				if (strm.avail_in == 0)
+				{
+					// All data has been compressed
+					deflateEnd(&strm);
+					return Z_OK;
+				}
+				break;
+			}
+			
+			case Z_STREAM_END:
+			{
+				// Finished compressing. Consume the rest of the buffer and return
+				a_Compressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				deflateEnd(&strm);
+				return Z_OK;
+			}
+			
+			default:
+			{
+				// An error has occurred, log it and return the error value
+				LOG("%s: compression failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
+				deflateEnd(&strm);
+				return res;
+			}
+		}  // switch (res)
+	}  // while (true)
+}
+
+
+
+
+
+extern int UncompressStringGZIP(const char * a_Data, int a_Length, AString & a_Uncompressed)
+{
+	// Uncompresses a_Data into a_Uncompressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib
+
+	a_Uncompressed.reserve(a_Length);
+
+	char Buffer[64 KiB];
+	z_stream strm;
+	memset(&strm, 0, sizeof(strm));
+	strm.next_in = (Bytef *)a_Data;
+	strm.avail_in = a_Length;
+	strm.next_out = (Bytef *)Buffer;
+	strm.avail_out = sizeof(Buffer);
+	
+	int res = inflateInit2(&strm, 31);  // Force GZIP decoding
+	if (res != Z_OK)
+	{
+		LOG("%s: uncompression initialization failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
+		return res;
+	}
+	
+	while (true)
+	{
+		res = inflate(&strm, Z_FINISH);
+		switch (res)
+		{
+			case Z_OK:
+			{
+				// Some data has been uncompressed. Consume the buffer and continue uncompressing
+				a_Uncompressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				strm.avail_out = sizeof(Buffer);
+				if (strm.avail_in == 0)
+				{
+					// All data has been uncompressed
+					inflateEnd(&strm);
+					return Z_OK;
+				}
+				break;
+			}
+			
+			case Z_STREAM_END:
+			{
+				// Finished uncompressing. Consume the rest of the buffer and return
+				a_Uncompressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				inflateEnd(&strm);
+				return Z_OK;
+			}
+			
+			default:
+			{
+				// An error has occurred, log it and return the error value
+				LOG("%s: uncompression failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
+				inflateEnd(&strm);
+				return res;
+			}
+		}  // switch (res)
+	}  // while (true)
 }
 
 

@@ -15,6 +15,8 @@
 #include "../Mobs/Monster.h"
 #include "../UI/Window.h"
 #include "../Pickup.h"
+#include "../WorldStorage/FastNBT.h"
+#include "../StringCompression.h"
 
 
 
@@ -693,8 +695,21 @@ void cProtocol132::WriteItem(const cItem & a_Item)
 	WriteByte (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
-	// TODO: Implement enchantments
-	WriteShort(-1);
+	if (a_Item.m_Enchantments.IsEmpty())
+	{
+		WriteShort(-1);
+		return;
+	}
+
+	// Send the enchantments:
+	cFastNBTWriter Writer;
+	const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
+	a_Item.m_Enchantments.WriteToNBTCompound(Writer, TagName);
+	Writer.Finish();
+	AString Compressed;
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort(Compressed.size());
+	SendData(Compressed.data(), Compressed.size());
 }
 
 
@@ -721,16 +736,62 @@ int cProtocol132::ParseItem(cItem & a_Item)
 		a_Item.Empty();
 	}
 
-	HANDLE_PACKET_READ(ReadBEShort, short, EnchantNumBytes);
-	if (EnchantNumBytes <= 0)
+	HANDLE_PACKET_READ(ReadBEShort, short, MetadataLength);
+	if (MetadataLength <= 0)
 	{
 		return PARSE_OK;
 	}
 		
-	// TODO: Enchantment not implemented yet!
-	if (!m_ReceivedData.SkipRead(EnchantNumBytes))
+	// Read the metadata
+	AString Metadata;
+	Metadata.resize(MetadataLength);
+	if (!m_ReceivedData.ReadBuf((void *)Metadata.data(), MetadataLength))
 	{
 		return PARSE_INCOMPLETE;
+	}
+	
+	return ParseItemMetadata(a_Item, Metadata);
+}
+
+
+
+
+
+int cProtocol132::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+{
+	// Uncompress the GZIPped data:
+	AString Uncompressed;
+	if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Uncompressed) != Z_OK)
+	{
+		AString HexDump;
+		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
+		LOG("Cannot unGZIP item metadata:\n%s", HexDump.c_str());
+		return PARSE_ERROR;
+	}
+	
+	// Parse into NBT:
+	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
+	if (!NBT.IsValid())
+	{
+		AString HexDump;
+		CreateHexDump(HexDump, Uncompressed.data(), Uncompressed.size(), 16);
+		LOG("Cannot parse NBT item metadata:\n%s", HexDump.c_str());
+		return PARSE_ERROR;
+	}
+	
+	// Load enchantments from the NBT:
+	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
+	{
+		if (
+			(NBT.GetType(tag) == TAG_List) &&
+			(
+				(NBT.GetName(tag) == "ench") ||
+				(NBT.GetName(tag) == "StoredEnchantments")
+			)
+		)
+		{
+			a_Item.m_Enchantments.ParseFromNBT(NBT, tag);
+		}
 	}
 	
 	return PARSE_OK;

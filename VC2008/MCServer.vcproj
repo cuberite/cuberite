@@ -383,6 +383,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\Enchantments.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\Enchantments.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\Endianness.h"
 				>
 			</File>
