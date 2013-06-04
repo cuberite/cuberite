@@ -74,8 +74,10 @@ protected:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	{
 		ASSERT(a_Grid == &m_Contents);
-		ASSERT(m_World != NULL);
-		m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+		if (m_World != NULL)
+		{
+			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+		}
 	}
 } ;  // tolua_export
 
