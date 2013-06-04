@@ -593,7 +593,7 @@ enum
 	E_ENTITY_TYPE_IRON_GOLEM    = 99,
 	E_ENTITY_TYPE_VILLAGER      = 120,
 } ;
-//tolua_end
+// tolua_end
 
 
 

@@ -1316,8 +1316,8 @@ void ManualBindings::Bind( lua_State* tolua_S )
 
 		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);
 		tolua_beginmodule(tolua_S,"HTTPRequest");
-			//tolua_variable(tolua_S,"Method",tolua_get_HTTPRequest_Method,tolua_set_HTTPRequest_Method);
-			//tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
+			// tolua_variable(tolua_S,"Method",tolua_get_HTTPRequest_Method,tolua_set_HTTPRequest_Method);
+			// tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
 			tolua_variable(tolua_S,"Params",tolua_get_HTTPRequest_Params,0);
 			tolua_variable(tolua_S,"PostParams",tolua_get_HTTPRequest_PostParams,0);
 			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
