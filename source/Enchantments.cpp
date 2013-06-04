@@ -203,6 +203,15 @@ bool cEnchantments::operator ==(const cEnchantments & a_Other) const
 
 
 
+bool cEnchantments::operator !=(const cEnchantments & a_Other) const
+{
+	return m_Enchantments != a_Other.m_Enchantments;
+}
+
+
+
+
+
 void cEnchantments::WriteToNBTCompound(cFastNBTWriter & a_Writer, const AString & a_ListTagName) const
 {
 	// Write the enchantments into the specified NBT writer

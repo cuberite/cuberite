@@ -81,8 +81,15 @@ bool cItem::IsStackableWith(const cItem & a_OtherStack) const
 	{
 		return false;
 	}
+	if (a_OtherStack.m_ItemDamage != m_ItemDamage)
+	{
+		return false;
+	}
+	if (a_OtherStack.m_Enchantments != m_Enchantments)
+	{
+		return false;
+	}
 	
-	// TODO: match enchantments etc.
 	return true;
 }
 
