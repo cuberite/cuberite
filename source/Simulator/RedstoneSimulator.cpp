@@ -3,10 +3,10 @@
 
 #include "RedstoneSimulator.h"
 #include "../BlockEntities/DropSpenserEntity.h"
+#include "../Blocks/BlockTorch.h"
 #include "../Piston.h"
 #include "../World.h"
 #include "../BlockID.h"
-#include "../Torch.h"
 #include "../Chunk.h"
 
 
@@ -179,7 +179,7 @@ void cRedstoneSimulator::RefreshTorchesAround(const Vector3i & a_BlockPos)
 			{
 				if (BlockType != TargetBlockType)
 				{
-					if (cTorch::IsAttachedTo(TorchPos, BlockMeta, a_BlockPos))
+					if (cBlockTorchHandler::IsAttachedTo(TorchPos, BlockMeta, a_BlockPos))
 					{
 						m_World.FastSetBlock(TorchPos.x, TorchPos.y, TorchPos.z, TargetBlockType, BlockMeta);
 						m_Blocks.push_back(TorchPos);

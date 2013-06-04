@@ -90,10 +90,10 @@ public:
 	/// Returns true if a_Other contains exactly the same enchantments and levels
 	bool operator ==(const cEnchantments & a_Other) const;
 	
+	// tolua_end
+	
 	/// Returns true if a_Other doesn't contain exactly the same enchantments and levels
 	bool operator !=(const cEnchantments & a_Other) const;
-	
-	// tolua_end
 	
 	/// Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments")
 	void WriteToNBTCompound(cFastNBTWriter & a_Writer, const AString & a_ListTagName) const;

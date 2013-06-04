@@ -3,7 +3,6 @@
 
 #include "BlockRedstone.h"
 #include "BlockTorch.h"
-#include "../Torch.h"
 
 
 

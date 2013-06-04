@@ -15,11 +15,6 @@ typedef unsigned short     UInt16;
 
 $cfile "ChunkDef.h"
 
-$cfile "Torch.h"
-$cfile "Stairs.h"
-$cfile "Ladder.h"
-$cfile "Vine.h"
-
 $cfile "../iniFile/iniFile.h"
 
 $cfile "BlockID.h"

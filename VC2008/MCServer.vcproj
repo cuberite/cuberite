@@ -1001,23 +1001,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Stairs.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\TNTEntity.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\TNTEntity.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Torch.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Vine.h"
 					>
 				</File>
 			</Filter>

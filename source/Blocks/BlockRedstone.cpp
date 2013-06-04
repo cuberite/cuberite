@@ -3,7 +3,6 @@
 #include "BlockRedstone.h"
 #include "../Item.h"
 #include "../World.h"
-#include "../Torch.h"
 
 
 

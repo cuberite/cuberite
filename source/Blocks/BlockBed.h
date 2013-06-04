@@ -3,7 +3,6 @@
 
 #include "BlockHandler.h"
 #include "../World.h"
-#include "../Sign.h"
 #include "../Player.h"
 
 
@@ -44,13 +43,11 @@ public:
 	}
 
 
-
-
 	// Bed specific helper functions
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
-		a_Rotation += 180 + (180/4); // So its not aligned with axis
-		if( a_Rotation > 360 ) a_Rotation -= 360;
+		a_Rotation += 180 + (180 / 4);  // So its not aligned with axis
+		if (a_Rotation > 360) a_Rotation -= 360;
 
 		a_Rotation = (a_Rotation / 360) * 4;
 
@@ -62,15 +59,11 @@ public:
 	{
 		switch (a_MetaData)
 		{
-			case 0: // south  +z
-				return Vector3i(0, 0, 1);
-			case 1: // west   -x
-				return Vector3i(-1, 0, 0);
-			case 2: // north  -z
-				return Vector3i(0, 0, -1);
-			case 3: // east   +x
-				return Vector3i(1, 0, 0);
-		};
+			case 0: return Vector3i(0, 0, 1);
+			case 1: return Vector3i(-1, 0, 0);
+			case 2: return Vector3i(0, 0, -1);
+			case 3: return Vector3i(1, 0, 0);
+		}
 		return Vector3i();
 	}
 } ;

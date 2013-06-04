@@ -3,7 +3,7 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Sign.h"
+#include "../Blocks/BlockSign.h"
 
 
 
@@ -34,12 +34,12 @@ public:
 	{
 		if (a_BlockFace == BLOCK_FACE_TOP)
 		{
-			a_BlockMeta = cSign::RotationToMetaData(a_Player->GetRotation());
+			a_BlockMeta = cBlockSignHandler::RotationToMetaData(a_Player->GetRotation());
 			a_BlockType = E_BLOCK_SIGN_POST;
 		}
 		else
 		{
-			a_BlockMeta = cSign::DirectionToMetaData(a_BlockFace);
+			a_BlockMeta = cBlockSignHandler::DirectionToMetaData(a_BlockFace);
 			a_BlockType = E_BLOCK_WALLSIGN;
 		}
 		return true;

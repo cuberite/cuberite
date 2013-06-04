@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../Stairs.h"
 
 
 
@@ -27,7 +26,7 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		a_BlockMeta = cStairs::RotationToMetaData(a_Player->GetRotation());
+		a_BlockMeta = RotationToMetaData(a_Player->GetRotation());
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_TOP:    break;
@@ -51,6 +50,33 @@ public:
 	// TODO: step sound
 	
 	
+	static NIBBLETYPE RotationToMetaData(double a_Rotation)
+	{
+		a_Rotation += 90 + 45; // So its not aligned with axis
+		NIBBLETYPE result = 0x0;
+		if (a_Rotation > 360)
+		{
+			a_Rotation -= 360;
+		}
+		if ((a_Rotation >= 0) && (a_Rotation < 90))
+		{
+			return 0x0;
+		}
+		else if ((a_Rotation >= 180) && (a_Rotation < 270))
+		{
+			return 0x1;
+		}
+		else if ((a_Rotation >= 90) && (a_Rotation < 180))
+		{
+			return 0x2;
+		}
+		else
+		{
+			return 0x3;
+		}
+	}
+
+
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		// Bits 3 and 4 stay, the rest is swapped around according to a table:

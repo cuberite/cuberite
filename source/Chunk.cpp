@@ -19,8 +19,6 @@
 #include "BlockEntities/JukeboxEntity.h"
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
-#include "Torch.h"
-#include "Ladder.h"
 #include "Pickup.h"
 #include "Item.h"
 #include "Noise.h"
