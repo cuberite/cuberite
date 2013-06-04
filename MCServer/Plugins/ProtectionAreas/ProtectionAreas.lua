@@ -10,6 +10,7 @@ function Initialize(a_Plugin)
 	a_Plugin:SetName("ProtectionAreas");
 	a_Plugin:SetVersion(1);
 	
+	InitializeStorage();
 	InitializeHooks(a_Plugin);
 	InitializeCommandHandlers();
 	

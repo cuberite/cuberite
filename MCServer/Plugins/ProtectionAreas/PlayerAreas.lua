@@ -11,7 +11,7 @@ A player can interact with a block if either one of these is true:
 2, There is at least one area covering the block with IsAllowed set to true
 The OOP class implementation follows the PiL 16.1
 
-Also, a global table g_PlayerAreas is the actual map of PlayerName -> cPlayerAreas
+Also, a global table g_PlayerAreas is the actual map of PlayerID -> cPlayerAreas
 --]]
 
 
@@ -37,7 +37,7 @@ end
 
 -- Adds a new cuboid to the area list, where the player is either allowed or not, depending on the IsAllowed param
 function cPlayerAreas:AddArea(a_Cuboid, a_IsAllowed)
-	table.add(self, {Cuboid = a_Cuboid, IsAllowed = a_IsAllowed});
+	table.insert(self, {Cuboid = a_Cuboid, IsAllowed = a_IsAllowed});
 end
 
 
@@ -45,7 +45,7 @@ end
 
 
 --- returns true if the player owning this object can interact with the specified block
-function cPlayerAreas:CanInteract(a_BlockX, a_BlockY, a_BlockZ)
+function cPlayerAreas:CanInteractWithBlock(a_BlockX, a_BlockY, a_BlockZ)
 	-- iterate through all the stored areas:
 	local IsInsideAnyArea = false;
 	for idx, Area in ipairs(self) do

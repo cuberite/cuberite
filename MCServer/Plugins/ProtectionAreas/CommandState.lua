@@ -40,7 +40,7 @@ end
 
 
 --- Returns the current coord pair as a cCuboid object
-function cCommandState.GetCurrentCuboid()
+function cCommandState:GetCurrentCuboid()
 	local res = cCuboid(
 		self.Coords1.x, self.Coords1.y, self.Coords1.z,
 		self.Coords2.x, self.Coords2.y, self.Coords2.z
