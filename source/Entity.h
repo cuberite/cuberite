@@ -173,7 +173,7 @@ public:
 	*/
 	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }
 
-	//Updates clients of changes in the entity.
+	/// Updates clients of changes in the entity.
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
 	
 	/// Attaches to the specified entity; detaches from any previous one first
@@ -182,13 +182,13 @@ public:
 	/// Detaches from the currently attached entity, if any
 	void Detach(void);
 	
-	//Makes sure head yaw is not over the specified range.
+	/// Makes sure head yaw is not over the specified range.
 	void WrapHeadYaw();
 
-	//Makes sure rotation is not over the specified range.
+	/// Makes sure rotation is not over the specified range.
 	void WrapRotation();
 
-	//Makes speed is not over 20. Max speed is 20 blocks / second
+	/// Makes speed is not over 20. Max speed is 20 blocks / second
 	void WrapSpeed();
 	
 	// tolua_begin
