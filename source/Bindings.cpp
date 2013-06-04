@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/02/13 23:42:02.
+** Generated automatically by tolua++-1.0.92 on 06/04/13 13:50:42.
 */
 
 #ifndef __cplusplus
@@ -8591,18 +8591,20 @@ static int tolua_AllToLua_cPlayer_CloseWindow00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_CanRefuse = ((bool)  tolua_toboolean(tolua_S,2,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CloseWindow'", NULL);
 #endif
   {
-   self->CloseWindow();
+   self->CloseWindow(a_CanRefuse);
   }
  }
  return 0;
@@ -8623,7 +8625,8 @@ static int tolua_AllToLua_cPlayer_CloseWindowIfID00(lua_State* tolua_S)
  if (
      !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8631,11 +8634,12 @@ static int tolua_AllToLua_cPlayer_CloseWindowIfID00(lua_State* tolua_S)
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
   char a_WindowID = ((char)  tolua_tonumber(tolua_S,2,0));
+  bool a_CanRefuse = ((bool)  tolua_toboolean(tolua_S,3,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'CloseWindowIfID'", NULL);
 #endif
   {
-   self->CloseWindowIfID(a_WindowID);
+   self->CloseWindowIfID(a_WindowID,a_CanRefuse);
   }
  }
  return 0;
@@ -14176,6 +14180,40 @@ static int tolua_AllToLua_cEnchantments_StringToEnchantmentID00(lua_State* tolua
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: operator== of class  cEnchantments */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEnchantments__eq00
+static int tolua_AllToLua_cEnchantments__eq00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEnchantments",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEnchantments* self = (const cEnchantments*)  tolua_tousertype(tolua_S,1,0);
+  const cEnchantments* a_Other = ((const cEnchantments*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'operator=='", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->operator==(*a_Other);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function '.eq'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: new of class  cItem */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new00
 static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
@@ -14354,6 +14392,57 @@ static int tolua_AllToLua_cItem_new02_local(lua_State* tolua_S)
  return 2;
 tolua_lerror:
  return tolua_AllToLua_cItem_new01_local(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new03
+static int tolua_AllToLua_cItem_new03(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cItem* a_CopyFrom = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
+  {
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(*a_CopyFrom));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cItem_new02(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cItem */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItem_new03_local
+static int tolua_AllToLua_cItem_new03_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cItem* a_CopyFrom = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
+  {
+   cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(*a_CopyFrom));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cItem_new02_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -27733,6 +27822,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cEnchantments_Clear00);
    tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cEnchantments_IsEmpty00);
    tolua_function(tolua_S,"StringToEnchantmentID",tolua_AllToLua_cEnchantments_StringToEnchantmentID00);
+   tolua_function(tolua_S,".eq",tolua_AllToLua_cEnchantments__eq00);
   tolua_endmodule(tolua_S);
   #ifdef __cplusplus
   tolua_cclass(tolua_S,"cItem","cItem","",tolua_collect_cItem);
@@ -27749,6 +27839,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cItem_new02);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cItem_new02_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cItem_new02_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cItem_new03);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cItem_new03_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cItem_new03_local);
    tolua_function(tolua_S,"Empty",tolua_AllToLua_cItem_Empty00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cItem_Clear00);
    tolua_function(tolua_S,"IsEmpty",tolua_AllToLua_cItem_IsEmpty00);

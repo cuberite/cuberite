@@ -58,6 +58,16 @@ public:
 	}
 	
 	
+	/// Creates an exact copy of the item
+	cItem(const cItem & a_CopyFrom) :
+		m_ItemType    (a_CopyFrom.m_ItemType),
+		m_ItemCount   (a_CopyFrom.m_ItemCount),
+		m_ItemDamage  (a_CopyFrom.m_ItemDamage),
+		m_Enchantments(a_CopyFrom.m_Enchantments)
+	{
+	}
+	
+	
 	void Empty(void)
 	{
 		m_ItemType = E_ITEM_EMPTY;
@@ -83,7 +93,11 @@ public:
 	
 	bool IsEqual(const cItem & a_Item) const
 	{
-		return (IsSameType(a_Item) && (m_ItemDamage == a_Item.m_ItemDamage));
+		return (
+			IsSameType(a_Item) &&
+			(m_ItemDamage == a_Item.m_ItemDamage) &&
+			(m_Enchantments == a_Item.m_Enchantments)
+		);
 	}
 	
 	

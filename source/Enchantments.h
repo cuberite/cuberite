@@ -87,6 +87,9 @@ public:
 	/// Converts enchantment name to the numeric representation; returns -1 if enchantment name not found; case insensitive
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
 	
+	/// Returns true if a_Other contains exactly the same enchantments and levels
+	bool operator ==(const cEnchantments & a_Other) const;
+	
 	// tolua_end
 	
 	/// Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments")

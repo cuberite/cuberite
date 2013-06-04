@@ -597,9 +597,9 @@ function HandleTestWndCmd(a_Split, a_Player)
 	local Item2 = cItem(E_ITEM_DIAMOND_SWORD, 1, 0, "1=1");
 	local Item3 = cItem(E_ITEM_DIAMOND_SHOVEL);
 	Item3.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 4);
-	local Item4 = cItem(E_ITEM_DIAMOND_PICKAXE);
-	Item4.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 5);
-	Item4.m_Enchantments:SetLevel(cEnchantments.enchEfficiency, 3);
+	local Item4 = cItem(Item3);  -- Copy
+	Item4.m_Enchantments:SetLevel(cEnchantments.enchEfficiency, 3);  -- Add enchantment
+	Item4.m_Enchantments:SetLevel(cEnchantments.enchUnbreaking, 5);  -- Overwrite existing level
 	local Item5 = cItem(E_ITEM_DIAMOND_CHESTPLATE, 1, 0, "thorns=1;unbreaking=3");
 	Window:SetSlot(a_Player, 0, cItem(E_ITEM_DIAMOND, 64));
 	Window:SetSlot(a_Player, 1, Item2);
