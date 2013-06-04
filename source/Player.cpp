@@ -50,6 +50,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_ClientHandle( a_Client )
 	, m_FoodExhaustionLevel(0.f)
 	, m_FoodTickTimer(0)
+	, m_IsCrouched(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -349,6 +350,23 @@ const cSlotNums & cPlayer::GetInventoryPaintSlots(void) const
 {
 	// Return the list of slots currently stored for inventory painting. Used by cWindow only
 	return m_InventoryPaintSlots;
+}
+
+
+
+
+
+void cPlayer::SetCrouch(bool a_IsCrouched)
+{
+	// Set the crouch status, broadcast to all visible players
+	
+	if (a_IsCrouched == m_IsCrouched)
+	{
+		// No change
+		return;
+	}
+	m_IsCrouched = a_IsCrouched;
+	m_World->BroadcastMetadata(*this);
 }
 
 

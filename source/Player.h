@@ -170,6 +170,12 @@ public:
 	
 	/// Returns the list of slots currently stored for inventory painting. To be used by cWindow only
 	const cSlotNums & GetInventoryPaintSlots(void) const;
+	
+	/// Sets the crouch status, broadcasts to all visible players
+	void SetCrouch(bool a_IsCrouched);
+	
+	// cEntity overrides:
+	virtual bool IsCrouched(void) const { return m_IsCrouched; }
 
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
@@ -219,6 +225,8 @@ protected:
 	cClientHandle * m_ClientHandle;
 	
 	cSlotNums m_InventoryPaintSlots;
+	
+	bool m_IsCrouched;
 
 
 	virtual void Destroyed(void);

@@ -1170,9 +1170,23 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 		return;
 	}
 
-	if( a_ActionID == 3 ) // Leave bed
+	switch (a_ActionID)
 	{
-		m_Player->GetWorld()->BroadcastPlayerAnimation( *m_Player, 3 );
+		case 1:  // crouch
+		{
+			m_Player->SetCrouch(true);
+			break;
+		}
+		case 2:  // uncrouch
+		{
+			m_Player->SetCrouch(false);
+			break;
+		}
+		case 3:  // Leave bed
+		{
+			m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, 3);
+			break;
+		}
 	}
 }
 
@@ -1560,9 +1574,9 @@ void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_Blo
 
 
 
-void cClientHandle::SendMetadata(const cPawn & a_Pawn)
+void cClientHandle::SendMetadata(const cEntity & a_Entity)
 {
-	m_Protocol->SendMetadata(a_Pawn);
+	m_Protocol->SendMetadata(a_Entity);
 }
 
 

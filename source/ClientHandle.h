@@ -103,7 +103,7 @@ public:
 	void SendHealth             (void);
 	void SendInventoryProgress  (char a_WindowID, short a_Progressbar, short a_Value);
 	void SendInventorySlot      (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendMetadata           (const cPawn & a_Entity);
+	void SendMetadata           (const cEntity & a_Entity);
 	void SendPickupSpawn        (const cPickup & a_Pickup);
 	void SendPlayerAnimation    (const cPlayer & a_Player, char a_Animation);
 	void SendPlayerListItem     (const cPlayer & a_Player, bool a_IsOnline);

@@ -2592,7 +2592,7 @@ void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, cons
 
 
 
-void cChunk::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude)
+void cChunk::BroadcastMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
@@ -2600,7 +2600,7 @@ void cChunk::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exc
 		{
 			continue;
 		}
-		(*itr)->SendMetadata(a_Pawn);
+		(*itr)->SendMetadata(a_Entity);
 	}  // for itr - LoadedByClient[]
 }
 
