@@ -304,7 +304,7 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 		return 0;
 	}
 	
-	if (m_Slots[a_SlotNum].m_ItemCount < -a_AddToCount)
+	if (m_Slots[a_SlotNum].m_ItemCount <= -a_AddToCount)
 	{
 		// Trying to remove more items than there already are, make the item empty
 		m_Slots[a_SlotNum].Empty();
