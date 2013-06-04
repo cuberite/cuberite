@@ -47,7 +47,8 @@ protected:
 
 	cPerlinNoise m_NoiseDistortX;
 	cPerlinNoise m_NoiseDistortZ;
-	
+	cNoise       m_OceanFloorSelect;  ///< Used for selecting between dirt and sand on the ocean floor
+
 	int m_SeaLevel;
 	NOISE_DATATYPE m_FrequencyX;
 	NOISE_DATATYPE m_FrequencyY;

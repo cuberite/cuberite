@@ -57,6 +57,7 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[biNumBiomes
 cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_NoiseDistortX(a_Seed + 1000),
 	m_NoiseDistortZ(a_Seed + 2000),
+	m_OceanFloorSelect(a_Seed + 3000),
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
 	m_HeightGen(&m_UnderlyingHeiGen, 64)
@@ -185,7 +186,14 @@ void cDistortedHeightmap::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::He
 
 void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
+	// Frequencies for the ocean floor selecting noise:
+	NOISE_DATATYPE FrequencyX = 3;
+	NOISE_DATATYPE FrequencyZ = 3;
+
+	// Prepare the internal state for generating this chunk:
 	PrepareState(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
+	
+	// Compose:
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -217,8 +225,42 @@ void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 				}
 				if (HasHadWater)
 				{
-					// TODO: Decide between sand and dirt
-					a_ChunkDesc.SetBlockType(x, y, z, (y < LastAir - 3) ? E_BLOCK_SANDSTONE : E_BLOCK_SAND);
+					// Decide between clay, sand and dirt
+					NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + x)) / FrequencyX;
+					NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + z)) / FrequencyZ;
+					NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
+					if (Val < -0.95)
+					{
+						// Clay:
+						switch (LastAir - y)
+						{
+							case 0:
+							case 1:
+							{
+								a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_CLAY);
+								break;
+							}
+							case 2:
+							case 3:
+							{
+								a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
+								break;
+							}
+							case 4:
+							{
+								a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SANDSTONE);
+								break;
+							}
+						}  // switch (floor depth)
+					}
+					else if (Val < 0)
+					{
+						a_ChunkDesc.SetBlockType(x, y, z, (y < LastAir - 3) ? E_BLOCK_SANDSTONE : E_BLOCK_SAND);
+					}
+					else
+					{
+						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_DIRT);
+					}
 				}
 				else
 				{
