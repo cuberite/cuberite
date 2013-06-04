@@ -114,8 +114,9 @@ enum
 	PACKET_BLOCK_DIG                 = 0x0e,
 	PACKET_BLOCK_PLACE               = 0x0f,
 	PACKET_SLOT_SELECT               = 0x10,
-	PACKET_ANIMATION                 = 0x12,
+	PACKET_PLAYER_ANIMATION          = 0x12,
 	PACKET_ENTITY_ACTION             = 0x13,
+	PACKET_SPAWN_NAMED_ENTITY        = 0x14,
 	PACKET_SPAWN_PICKUP              = 0x15,
 	PACKET_COLLECT_PICKUP            = 0x16,
 	PACKET_SPAWN_OBJECT_VEHICLE      = 0x17,
@@ -309,6 +310,15 @@ void cConnection::DataLog(const void * a_Data, int a_Size, const char * a_Format
 	// Log to screen:
 	std::cout << FullMsg;
 	//*/
+}
+
+
+
+
+
+void cConnection::LogFlush(void)
+{
+	fflush(m_LogFile);
 }
 
 
@@ -509,7 +519,6 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 		m_ClientBuffer.ReadByte(PacketType);
 		switch (PacketType)
 		{
-			case PACKET_ANIMATION:                 HANDLE_CLIENT_READ(HandleClientAnimation); break;
 			case PACKET_BLOCK_DIG:                 HANDLE_CLIENT_READ(HandleClientBlockDig); break;
 			case PACKET_BLOCK_PLACE:               HANDLE_CLIENT_READ(HandleClientBlockPlace); break;
 			case PACKET_CHAT_MESSAGE:              HANDLE_CLIENT_READ(HandleClientChatMessage); break;
@@ -522,6 +531,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_LOCALE_AND_VIEW:           HANDLE_CLIENT_READ(HandleClientLocaleAndView); break;
 			case PACKET_PING:                      HANDLE_CLIENT_READ(HandleClientPing); break;
 			case PACKET_PLAYER_ABILITIES:          HANDLE_CLIENT_READ(HandleClientPlayerAbilities); break;
+			case PACKET_PLAYER_ANIMATION:          HANDLE_CLIENT_READ(HandleClientAnimation); break;
 			case PACKET_PLAYER_LOOK:               HANDLE_CLIENT_READ(HandleClientPlayerLook); break;
 			case PACKET_PLAYER_ON_GROUND:          HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
 			case PACKET_PLAYER_POSITION:           HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
@@ -589,6 +599,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		unsigned char PacketType;
 		m_ServerBuffer.ReadByte(PacketType);
 		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%x", m_ServerBuffer.GetReadableSpace(), PacketType);
+		LogFlush();
 		switch (PacketType)
 		{
 			case PACKET_ATTACH_ENTITY:             HANDLE_SERVER_READ(HandleServerAttachEntity); break;
@@ -620,6 +631,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_MULTI_BLOCK_CHANGE:        HANDLE_SERVER_READ(HandleServerMultiBlockChange); break;
 			case PACKET_NAMED_SOUND_EFFECT:        HANDLE_SERVER_READ(HandleServerNamedSoundEffect); break;
 			case PACKET_PLAYER_ABILITIES:          HANDLE_SERVER_READ(HandleServerPlayerAbilities); break;
+			case PACKET_PLAYER_ANIMATION:          HANDLE_SERVER_READ(HandleServerPlayerAnimation); break;
 			case PACKET_PLAYER_LIST_ITEM:          HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
 			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
 			case PACKET_SET_EXPERIENCE:            HANDLE_SERVER_READ(HandleServerSetExperience); break;
@@ -627,6 +639,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_SLOT_SELECT:               HANDLE_SERVER_READ(HandleServerSlotSelect); break;
 			case PACKET_SOUND_EFFECT:              HANDLE_SERVER_READ(HandleServerSoundEffect); break;
 			case PACKET_SPAWN_MOB:                 HANDLE_SERVER_READ(HandleServerSpawnMob); break;
+			case PACKET_SPAWN_NAMED_ENTITY:        HANDLE_SERVER_READ(HandleServerSpawnNamedEntity); break;
 			case PACKET_SPAWN_OBJECT_VEHICLE:      HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
 			case PACKET_SPAWN_PAINTING:            HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
 			case PACKET_SPAWN_PICKUP:              HANDLE_SERVER_READ(HandleServerSpawnPickup); break;
@@ -1277,7 +1290,7 @@ bool cConnection::HandleServerEntityMetadata(void)
 	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_ENTITY_METADATA from the server:");
 	Log("  EntityID = %d", EntityID);
-	Log("  Metadata, length = %d (0x%x): %s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
 	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
 	return true;
@@ -1649,6 +1662,21 @@ bool cConnection::HandleServerPlayerAbilities(void)
 
 
 
+bool cConnection::HandleServerPlayerAnimation(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  PlayerID);
+	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, AnimationID);
+	Log("Received a PACKET_PLAYER_ANIMATION from the server:");
+	Log("  PlayerID: %d (0x%x)", PlayerID, PlayerID);
+	Log("  Animation: %d", AnimationID);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
 bool cConnection::HandleServerPlayerListItem(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, PlayerName);
@@ -1776,13 +1804,49 @@ bool cConnection::HandleServerSpawnMob(void)
 	{
 		return false;
 	}
+	AString HexDump;
+	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_SPAWN_MOB from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  MobType = %d", MobType);
 	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
 	Log("  Angles = [%d, %d, %d]", Yaw, Pitch, HeadYaw);
 	Log("  Velocity = <%d, %d, %d>", VelocityX, VelocityY, VelocityZ);
-	Log("  Metadata size = %d", Metadata.size());
+	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	LogMetadata(Metadata, 4);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerSpawnNamedEntity(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, EntityName);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   CurrentItem);
+	AString Metadata;
+	if (!ParseMetadata(m_ServerBuffer, Metadata))
+	{
+		return false;
+	}
+	AString HexDump;
+	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
+	Log("Received a PACKET_SPAWN_NAMED_ENTITY from the server:");
+	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
+	Log("  Name = %s", EntityName.c_str());
+	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
+	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
+	Log("  CurrentItem = %d", CurrentItem);
+	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
 	return true;
 }

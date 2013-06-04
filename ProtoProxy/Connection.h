@@ -57,6 +57,7 @@ public:
 	
 	void Log(const char * a_Format, ...);
 	void DataLog(const void * a_Data, int a_Size, const char * a_Format, ...);
+	void LogFlush(void);
 	
 protected:
 	typedef CFB_Mode<AES>::Encryption Encryptor;
@@ -157,6 +158,7 @@ protected:
 	bool HandleServerMultiBlockChange(void);
 	bool HandleServerNamedSoundEffect(void);
 	bool HandleServerPlayerAbilities(void);
+	bool HandleServerPlayerAnimation(void);
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
 	bool HandleServerSetExperience(void);
@@ -164,6 +166,7 @@ protected:
 	bool HandleServerSlotSelect(void);
 	bool HandleServerSoundEffect(void);
 	bool HandleServerSpawnMob(void);
+	bool HandleServerSpawnNamedEntity(void);
 	bool HandleServerSpawnObjectVehicle(void);
 	bool HandleServerSpawnPainting(void);
 	bool HandleServerSpawnPickup(void);
