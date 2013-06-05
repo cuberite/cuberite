@@ -1255,15 +1255,15 @@ tolua_lerror:
 
 
 
-void ManualBindings::Bind( lua_State* tolua_S )
+void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S,NULL);
 		tolua_function(tolua_S, "StringSplit", tolua_StringSplit);
 		tolua_function(tolua_S, "LOG",         tolua_LOG);
 		tolua_function(tolua_S, "LOGINFO",     tolua_LOGINFO);
 		tolua_function(tolua_S, "LOGWARN",     tolua_LOGWARN);
+		tolua_function(tolua_S, "LOGWARNING",  tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",    tolua_LOGERROR);
-		tolua_function(tolua_S, "Log",         tolua_LOG); // Deprecated
 		
 		tolua_beginmodule(tolua_S, "cRoot");
 			tolua_function(tolua_S, "ForEachWorld",        tolua_ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
