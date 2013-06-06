@@ -42,8 +42,8 @@ end
 --- Returns the current coord pair as a cCuboid object
 function cCommandState:GetCurrentCuboid()
 	local res = cCuboid(
-		self.Coords1.x, self.Coords1.y, self.Coords1.z,
-		self.Coords2.x, self.Coords2.y, self.Coords2.z
+		self.m_Coords1.x, self.m_Coords1.y, self.m_Coords1.z,
+		self.m_Coords2.x, self.m_Coords2.y, self.m_Coords2.z
 	);
 	res:Sort();
 	return res;

@@ -72,7 +72,7 @@ function cStorage:OpenDB()
 	end
 	
 	if (
-		not(self:CreateTable("Area", {"ID INTEGER PRIMARY KEY AUTOINCREMENT", "MinX", "MaxX", "MinZ", "MaxZ", "CreatorUserName"})) or
+		not(self:CreateTable("Areas", {"ID INTEGER PRIMARY KEY AUTOINCREMENT", "MinX", "MaxX", "MinZ", "MaxZ", "CreatorUserName"})) or
 		not(self:CreateTable("AllowedUsers", {"AreaID", "UserName"}))
 	) then
 		LOGWARNING(PluginPrefix .. "Cannot create DB tables!");
@@ -151,10 +151,58 @@ end
 
 
 
-
-function cStorage:AddArea(a_Cuboid, a_Creator, a_AllowedPlayers)
-	-- TODO
+--- Adds a new area into the DB. a_AllowedNames is a table listing all the players that are allowed in the area
+function cStorage:AddArea(a_Cuboid, a_CreatorName, a_AllowedNames)
+	-- Store the area in the DB
+	local ID = -1;
+	local function RememberID(UserData, NumCols, Values, Names)
+		for i = 1, NumCols do
+			if (Names[i] == "ID") then
+				ID = Values[i];
+			end
+		end
+		return 0;
+	end
+	local sql = 
+		"INSERT INTO Areas (ID, MinX, MaxX, MinZ, MaxZ, CreatorUserName) VALUES (NULL, " ..
+		a_Cuboid.p1.x .. ", " .. a_Cuboid.p2.x .. ", " .. a_Cuboid.p1.z .. ", " .. a_Cuboid.p2.z .. ", '" .. a_CreatorName .. 
+		"'); SELECT last_insert_rowid() as ID";
+	if (not(self:DBExec(sql, RememberID))) then
+		LOGWARNING(PluginPrefix .. "SQL Error while inserting new area");
+		return false;
+	end
+	if (ID == -1) then
+		LOGWARNING(PluginPrefix .. "SQL Error while retrieving INSERTion ID");
+		return false;
+	end
+	
+	-- Store each allowed player in the DB
+	for idx, Name in ipairs(a_AllowedNames) do
+		local sql = "INSERT INTO AllowedUsers (AreaID, UserName) VALUES (" .. ID .. ", '" .. Name .. "')";
+		if (not(self:DBExec(sql))) then
+			LOGWARNING(PluginPrefix .. "SQL Error while inserting new area's allowed player " .. Name);
+		end;
+	end
 end
+
+
+
+
+
+--- Executes the SQL command given, calling the a_Callback for each result
+-- If the SQL command fails, prints it out on the server console and returns false
+-- Returns true on success
+function cStorage:DBExec(a_SQL, a_Callback, a_CallbackParam)
+	local ErrCode = self.DB:exec(a_SQL, a_Callback, a_CallbackParam);
+	if (ErrCode ~= sqlite3.OK) then
+		LOGWARNING(PluginPrefix .. "Error " .. ErrCode .. " (" .. self.DB:errmsg() .. 
+			") while processing SQL command >>" .. a_SQL .. "<<"
+		);
+		return false;
+	end
+	return true;
+end
+
 
 
 

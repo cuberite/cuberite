@@ -25,7 +25,38 @@ function HandleAddArea(a_Split, a_Player)
 		return true;
 	end
 	
-	-- TODO: Add the area to the storage and reload all currently logged in players
+	-- Get the cuboid that the player had selected
+	local CmdState = GetCommandStateForPlayer(a_Player);
+	if (CmdState == nil) then
+		a_Player:SendMessage("Cannot add area, internal plugin error (CmdState == nil)");
+		return true;
+	end
+	local Cuboid = CmdState:GetCurrentCuboid();
+	if (Cuboid == nil) then
+		a_Player:SendMessage("Cannot add area, internal plugin error (Cuboid == nil)");
+		return true;
+	end
+	
+	-- If the cuboid hasn't been assigned, give the player an error message and bail out
+	if (
+		(Cuboid.p1.x == 0) and (Cuboid.p1.y == 0) and (Cuboid.p1.z == 0) and
+		(Cuboid.p1.x == 0) and (Cuboid.p1.y == 0) and (Cuboid.p1.z == 0)
+	) then
+		a_Player:SendMessage("Cannot add area, no area has been selected. Use a ProtWand lclk / rclk to select area first");
+		return true;
+	end
+	
+	-- Put all allowed players into a table:
+	AllowedNames = {};
+	for i = 2, #a_Split do
+		table.insert(AllowedNames, a_Split[i]);
+	end
+	
+	-- Add the area to the storage
+	g_Storage:AddArea(Cuboid, a_Player:GetName(), AllowedNames);
+	a_Player:SendMessage("Area added");
+	
+	-- TODO: Reload all currently logged in players
 	
 	return true;
 end
