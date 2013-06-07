@@ -35,10 +35,8 @@ end;
 
 function OnPlayerJoined(a_Player)
 	-- Create a new cPlayerAreas object for this player
-	local PlayerName = a_Player:GetName();
-	local PlayerID = a_Player:GetUniqueID();
-	if (g_PlayerAreas[PlayerID] == nil) then
-		g_PlayerAreas[PlayerID] = g_Storage:LoadPlayerAreas(PlayerName);
+	if (g_PlayerAreas[a_Player:GetUniqueID()] == nil) then
+		LoadPlayerAreas(a_Player);
 	end;
 
 	return false;
@@ -60,8 +58,8 @@ function OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
 		a_BlockX, a_BlockY, a_BlockZ = AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
 		-- Set the coords in the CommandState
-		GetCommandStateForPlayer(a_Player):SetCoords1(a_BlockX, a_BlockY, a_BlockZ);
-		a_Player:SendMessage("Coords1 set as {" .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .."}.");
+		GetCommandStateForPlayer(a_Player):SetCoords1(a_BlockX, a_BlockZ);
+		a_Player:SendMessage("Coords1 set as {" .. a_BlockX .. ", " .. a_BlockZ .."}.");
 		return true;
 	end;
 	
@@ -91,14 +89,14 @@ function OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 		a_BlockX, a_BlockY, a_BlockZ = AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		
 		-- Set the coords in the CommandState
-		GetCommandStateForPlayer(a_Player):SetCoords2(a_BlockX, a_BlockY, a_BlockZ);
-		a_Player:SendMessage("Coords2 set as {" .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .."}.");
+		GetCommandStateForPlayer(a_Player):SetCoords2(a_BlockX, a_BlockZ);
+		a_Player:SendMessage("Coords2 set as {" .. a_BlockX .. ", " .. a_BlockZ .."}.");
 		return true;
 	end;
 	
 	-- Check the player areas to see whether to disable this action
 	local Areas = g_PlayerAreas[a_Player:GetUniqueID()];
-	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockY, a_BlockZ)) then
+	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockZ)) then
 		return true;
 	end
 

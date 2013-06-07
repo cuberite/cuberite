@@ -37,7 +37,7 @@ end
 
 -- Adds a new cuboid to the area list, where the player is either allowed or not, depending on the IsAllowed param
 function cPlayerAreas:AddArea(a_Cuboid, a_IsAllowed)
-	table.insert(self, {Cuboid = a_Cuboid, IsAllowed = a_IsAllowed});
+	table.insert(self, {m_Cuboid = a_Cuboid, m_IsAllowed = a_IsAllowed});
 end
 
 
@@ -45,12 +45,12 @@ end
 
 
 --- returns true if the player owning this object can interact with the specified block
-function cPlayerAreas:CanInteractWithBlock(a_BlockX, a_BlockY, a_BlockZ)
+function cPlayerAreas:CanInteractWithBlock(a_BlockX, a_BlockZ)
 	-- iterate through all the stored areas:
 	local IsInsideAnyArea = false;
 	for idx, Area in ipairs(self) do
-		if (Area.Cuboid:IsInside(a_BlockX, a_BlockY, a_BlockZ)) then
-			if (Area.IsAllowed) then
+		if (Area.m_Cuboid:IsInside(a_BlockX, 1, a_BlockZ)) then  -- We don't care about Y coords, so use a dummy value
+			if (Area.m_IsAllowed) then
 				return true;
 			end
 			-- The coords are inside a cuboid for which the player doesn't have access, take a note of it
@@ -65,6 +65,22 @@ function cPlayerAreas:CanInteractWithBlock(a_BlockX, a_BlockY, a_BlockZ)
 	
 	-- The coords are not inside any area
 	-- TODO: Have a config saying whether a player can build in the non-areated space or not
+	return true;
+end
+
+
+
+
+
+--- Calls the specified callback for each area contained within
+-- a_Callback has a signature: function(a_Cuboid, a_IsAllowed)
+-- Returns true if all areas have been enumerated, false if the callback has aborted by returning true
+function cPlayerAreas:ForEachArea(a_Callback)
+	for idx, Area in ipairs(self) do
+		if (a_Callback(Area.m_Cuboid, Area.m_IsAllowed)) then
+			return false;
+		end
+	end
 	return true;
 end
 

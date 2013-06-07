@@ -1,6 +1,6 @@
 
 -- ProtectionAreas.lua
--- Defines the main plugin entrypoint
+-- Defines the main plugin entrypoint, as well as some utility functions
 
 
 
@@ -26,8 +26,38 @@ function Initialize(a_Plugin)
 	InitializeHooks(a_Plugin);
 	InitializeCommandHandlers();
 	
-	-- TODO: We might be reloading, so there may be players already present in the server
-	-- Reload areas for all present players
+	-- We might be reloading, so there may be players already present in the server; reload all of them
+	local function ReloadPlayers(a_World)
+		ReloadAllPlayersInWorld(a_World:GetName());
+	end
+	cRoot:Get():ForEachWorld(ReloadPlayers);
 	
 	return true;
 end
+
+
+
+
+
+--- Loads a cPlayerAreas object from the DB for the player, and assigns it to the player map
+function LoadPlayerAreas(a_Player)
+	local PlayerID = a_Player:GetUniqueID();
+	local PlayerX = math.floor(a_Player:GetPosX());
+	local PlayerZ = math.floor(a_Player:GetPosZ());
+	local WorldName = a_Player:GetWorld():GetName();
+	g_PlayerAreas[PlayerID] = g_Storage:LoadPlayerAreas(a_Player:GetName(), PlayerX, PlayerZ, WorldName);
+end
+
+
+
+
+
+function ReloadAllPlayersInWorld(a_WorldName)
+	local World = cRoot:Get():GetWorld(a_WorldName);
+	World:ForEachPlayer(LoadPlayerAreas);
+end
+
+
+
+
+
