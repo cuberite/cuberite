@@ -152,17 +152,57 @@ end
 
 
 
+--- Returns true if the specified area is allowed for the specified player
+function cStorage:IsAreaAllowed(a_AreaID, a_PlayerName, a_WorldName)
+	local res = false;
+	local sql = "SELECT COUNT(*) FROM AllowedUsers WHERE (AreaID = " .. a_AreaID .. 
+		") AND (UserName ='" .. a_PlayerName .. "')";
+	local function SetResTrue(UserData, NumValues, Values, Names)
+		res = (tonumber(Values[1]) > 0);
+		return 0;
+	end
+	if (not(self:DBExec(sql, SetResTrue))) then
+		LOGWARNING("SQL error while determining area allowance");
+		return false;
+	end
+	return res;
+end
+
+
+
+
+
 --- Loads cPlayerAreas for the specified player from the DB. Returns a cPlayerAreas object
 function cStorage:LoadPlayerAreas(a_PlayerName, a_PlayerX, a_PlayerZ, a_WorldName)
-	local res = cPlayerAreas:new();
+	res = cPlayerAreas:new();
 
-	-- TODO: Load the areas from the DB, based on the player's location
-	-- local sql = "SELECT MinX, MaxX, MinZ, MaxZ FROM Areas WHERE";
+	-- Bounds for which the areas are loaded
+	local BoundsMinX = a_PlayerX - g_AreaBounds;
+	local BoundsMaxX = a_PlayerX + g_AreaBounds;
+	local BoundsMinZ = a_PlayerZ - g_AreaBounds;
+	local BoundsMaxZ = a_PlayerZ + g_AreaBounds;
+
+	-- Load the areas from the DB, based on the player's location
+	local sql = 
+		"SELECT ID, MinX, MaxX, MinZ, MaxZ FROM Areas WHERE " ..
+		"MinX < " .. BoundsMaxX .. " AND MaxX > " .. BoundsMinX .. " AND " ..
+		"MinZ < " .. BoundsMaxZ .. " AND MaxZ > " .. BoundsMinZ .. " AND " ..
+		"WorldName='" .. a_WorldName .."'";
 	
-	LOGWARNING("cStorage:LoadPlayerAreas(): Not implemented yet!");
-
-	-- DEBUG: Insert a dummy area for testing purposes:
-	res:AddArea(cCuboid(10, 0, 10, 20, 255, 20), false);
+	local function AddAreas(UserData, NumValues, Values, Names)
+		if ((NumValues < 5) or ((Values[1] and Values[2] and Values[3] and Values[4] and Values[5]) == nil)) then
+			LOGWARNING("SQL query didn't return all data");
+			return 0;
+		end
+		res:AddArea(cCuboid(Values[2], 0, Values[4], Values[3], 255, Values[5]), self:IsAreaAllowed(Values[1], a_PlayerName, a_WorldName));
+		return 0;
+	end
+	
+	if (not(self:DBExec(sql, AddAreas))) then
+		LOGWARNING("SQL error while querying areas");
+		return res;
+	end
+	
 	return res;
 end
 
@@ -186,7 +226,7 @@ function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
 		"INSERT INTO Areas (ID, MinX, MaxX, MinZ, MaxZ, WorldName, CreatorUserName) VALUES (NULL, " ..
 		a_Cuboid.p1.x .. ", " .. a_Cuboid.p2.x .. ", " .. a_Cuboid.p1.z .. ", " .. a_Cuboid.p2.z .. 
 		", '"  .. a_WorldName .. "', '" .. a_CreatorName ..
-		"'); SELECT last_insert_rowid() as ID";
+		"'); SELECT last_insert_rowid() AS ID";
 	if (not(self:DBExec(sql, RememberID))) then
 		LOGWARNING(PluginPrefix .. "SQL Error while inserting new area");
 		return false;

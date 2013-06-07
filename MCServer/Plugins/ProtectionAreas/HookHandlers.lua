@@ -9,9 +9,9 @@
 function InitializeHooks(a_Plugin)
 	local PlgMgr = cRoot:Get():GetPluginManager();
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_DISCONNECT);
-	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_JOINED);
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_LEFT_CLICK);
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICK);
+	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_SPAWNED);
 end
 
 
@@ -33,7 +33,7 @@ end;
 
 
 
-function OnPlayerJoined(a_Player)
+function OnPlayerSpawned(a_Player)
 	-- Create a new cPlayerAreas object for this player
 	if (g_PlayerAreas[a_Player:GetUniqueID()] == nil) then
 		LoadPlayerAreas(a_Player);

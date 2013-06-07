@@ -9,6 +9,9 @@
 --- Prefix for all messages logged to the server console
 PluginPrefix = "ProtectionAreas: ";
 
+--- Bounds for the area loading. Areas less this far in any direction from the player will be loaded into cPlayerAreas
+g_AreaBounds = 48;
+
 
 
 
@@ -27,10 +30,11 @@ function Initialize(a_Plugin)
 	InitializeCommandHandlers();
 	
 	-- We might be reloading, so there may be players already present in the server; reload all of them
-	local function ReloadPlayers(a_World)
-		ReloadAllPlayersInWorld(a_World:GetName());
-	end
-	cRoot:Get():ForEachWorld(ReloadPlayers);
+	cRoot:Get():ForEachWorld(
+		function(a_World)
+			ReloadAllPlayersInWorld(a_World:GetName());
+		end
+	);
 	
 	return true;
 end
