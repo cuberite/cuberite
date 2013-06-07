@@ -21,7 +21,8 @@ cCommandState = {
 	m_Coords1 = {x = 0, z = 0};  -- lclk coords
 	m_Coords2 = {x = 0, z = 0};  -- rclk coords
 	m_LastCoords = 0;  -- When Coords1 or Coords2 is set, this gets set to 1 or 2, signifying the last changed set of coords
-	m_HasCoords = 1;  -- Set to 0, 1, 2 or 3, based on which set of coords has been set (bitmask)
+	m_HasCoords1 = false;  -- Set to true when m_Coords1 has been set by the user
+	m_HasCoords2 = false;  -- Set to true when m_Coords2 has been set by the user
 };
 
 g_CommandStates = {};
@@ -43,14 +44,14 @@ end
 
 --- Returns the current coord pair as a cCuboid object
 function cCommandState:GetCurrentCuboid()
-	if (self.m_HasCoords ~= 3) then
+	if (not(self.m_HasCoords1) or not(self.m_HasCoords2)) then
 		-- Some of the coords haven't been set yet
 		return nil;
 	end
 	
 	local res = cCuboid(
-		self.m_Coords1.x, self.m_Coords1.y, self.m_Coords1.z,
-		self.m_Coords2.x, self.m_Coords2.y, self.m_Coords2.z
+		self.m_Coords1.x, 0,   self.m_Coords1.z,
+		self.m_Coords2.x, 255, self.m_Coords2.z
 	);
 	res:Sort();
 	return res;
@@ -86,6 +87,7 @@ function cCommandState:SetCoords1(a_BlockX, a_BlockZ)
 	self.m_Coords1.x = a_BlockX;
 	self.m_Coords1.z = a_BlockZ;
 	self.m_LastCoords = 1;
+	self.m_HasCoords1 = true;
 end
 
 
@@ -97,6 +99,7 @@ function cCommandState:SetCoords2(a_BlockX, a_BlockZ)
 	self.m_Coords2.x = a_BlockX;
 	self.m_Coords2.z = a_BlockZ;
 	self.m_LastCoords = 2;
+	self.m_HasCoords2 = true;
 end
 
 
