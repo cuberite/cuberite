@@ -18,6 +18,7 @@ function CommandReg()
 		{HandleDelArea,       "/ProtDelID",      "Prot.Del",     "Deletes a protected area by ID"},
 		{HandleGiveWand,      "/ProtWand",       "Prot.Wand",    "Gives you the wand used for protection"},
 		{HandleListAreas,     "/ProtList",       "Prot.List",    "Lists all areas for the marked block"},
+		{HandleListUsers,     "/ProtUsers",      "Prot.List",    "Lists all allowed users for a given area ID"},
 		{HandleRemoveUser,    "/ProtRemUser",    "Prot.RemUser", "Removes a user from the protected area"},
 		{HandleRemoveUserAll, "/ProtRemUserAll", "Prot.RemUser", "Removes a user from all protected areas"},
 	};

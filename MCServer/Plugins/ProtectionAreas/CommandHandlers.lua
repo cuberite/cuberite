@@ -219,6 +219,48 @@ end
 
 
 
+--- Lists all allowed users for a particular area
+function HandleListUsers(a_Split, a_Player)
+	-- Command syntax: ProtListUsers AreaID
+	if (#a_Split ~= 2) then
+		a_Player:SendMessage("Expected AreaID as a parameter");
+	end
+	
+	-- Get the general info about the area
+	local AreaID = a_Split[2];
+	local WorldName = a_Player:GetWorld():GetName();
+	local MinX, MinZ, MaxX, MaxZ, CreatorName = g_Storage:GetArea(AreaID, WorldName);
+	if (MinX == nil) then
+		a_Player:SendMessage("No such area: " .. AreaID);
+		return true;
+	end
+	
+	-- Send the header
+	a_Player:SendMessage(
+		"Area ID " .. AreaID .. ": {" .. 
+		MinX .. ", " .. MinZ .. "} - {" .. 
+		MaxX .. ", " .. MaxZ .. "} " ..
+		"Created by " .. CreatorName .. "; allowed users:"
+	);
+	
+	-- List and count the allowed users
+	local NumUsers = 0;
+	g_Storage:ForEachUserInArea(AreaID, WorldName, 
+		function(UserName)
+			a_Player:SendMessage("  " .. UserName);
+			NumUsers = NumUsers + 1;
+		end
+	);
+	
+	-- Send the footer
+	a_Player:SendMessage("End of area " .. AreaID .. " user list, total " .. NumUsers .. " users");
+	
+	return true;
+end
+
+
+
+
 
 function HandleRemoveUser(a_Split, a_Player)
 	-- Command syntax: ProtRemUser AreaID UserName
@@ -235,7 +277,12 @@ function HandleRemoveUser(a_Split, a_Player)
 	end
 	
 	-- Remove the user from the DB
-	g_Storage:RemoveUser(AreaID, a_Split[3], a_Player:GetWorld():GetName());
+	local UserName = a_Split[3];
+	g_Storage:RemoveUser(AreaID, UserName, a_Player:GetWorld():GetName());
+	
+	-- Send confirmation
+	a_Player:SendMessage("Removed " .. UserName .. " from area " .. AreaID);
+	
 	return true;
 end
 

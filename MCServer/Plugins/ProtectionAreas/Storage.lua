@@ -258,7 +258,7 @@ function cStorage:DelArea(a_WorldName, a_AreaID)
 	-- Delete from both tables simultaneously
 	local sql = 
 		"DELETE FROM Areas          WHERE ID="     .. a_AreaID .. ";" ..
-		"DELETE FROM AllowedPlayers WHERE AreaID=" .. a_AreaID;
+		"DELETE FROM AllowedUsers WHERE AreaID=" .. a_AreaID;
 	if (not(self:DBExec(sql))) then
 		LOGWARNING(PluginPrefix .. "SQL error while deleting area " .. a_AreaID .. " from world \"" .. a_WorldName .. "\"");
 		return false;
@@ -273,8 +273,14 @@ end
 
 --- Removes the user from the specified area
 function cStorage:RemoveUser(a_AreaID, a_UserName, a_WorldName)
-	-- TODO
-	LOGWARNING("cStorage:RemoveUser(): Not implemented yet!");
+	-- WorldName is not used yet, because all the worlds share the same DB in this version
+	local sql = "DELETE FROM AllowedUsers WHERE " .. 
+		"AreaID = " ..  a_AreaID .. " AND UserName = '" .. a_UserName .. "'";
+	if (not(self:DBExec(sql))) then	
+		LOGWARNING("SQL error while removing user " .. a_UserName .. " from area ID " .. a_AreaID);
+		return false;
+	end
+	return true;
 end
 
 
@@ -303,8 +309,8 @@ function cStorage:ForEachArea(a_BlockX, a_BlockZ, a_WorldName, a_Callback)
 		end
 		local ID          = Values[1];
 		local MinX        = Values[2];
-		local MaxX        = Values[3];
-		local MinZ        = Values[4];
+		local MinZ        = Values[3];
+		local MaxX        = Values[4];
 		local MaxZ        = Values[5];
 		local CreatorName = Values[6];
 		a_Callback(ID, MinX, MinZ, MaxX, MaxZ, CreatorName);
@@ -313,9 +319,80 @@ function cStorage:ForEachArea(a_BlockX, a_BlockZ, a_WorldName, a_Callback)
 	
 	local sql = "SELECT ID, MinX, MinZ, MaxX, MaxZ, CreatorUserName FROM Areas WHERE " ..
 		"MinX <= " .. a_BlockX .. " AND MaxX >= " .. a_BlockX .. " AND " ..
-		"MinZ <= " .. a_BlockZ .. " AND MaxZ >= " .. a_BlockZ;
+		"MinZ <= " .. a_BlockZ .. " AND MaxZ >= " .. a_BlockZ .. " AND " ..
+		"WorldName = '" .. a_WorldName .. "'";
 	if (not(self:DBExec(sql, CallCallback))) then
 		LOGWARNING("SQL Error while iterating through areas (cStorage:ForEachArea())");
+		return false;
+	end
+	return true;
+end
+
+
+
+
+
+--- Returns the info on the specified area
+-- Returns MinX, MinZ, MaxX, MaxZ, CreatorName on success, or nothing on failure
+function cStorage:GetArea(a_AreaID, a_WorldName)
+
+	local MinX, MinZ, MaxX, MaxZ, CreatorName;
+	local HasValues = false;
+	
+	-- SQL callback that parses the values and remembers them in variables
+	function RememberValues(UserData, NumValues, Values, Names)
+		if (NumValues ~= 5) then
+			-- Not enough values returned, skip this row
+			return 0;
+		end
+		MinX        = Values[1];
+		MinZ        = Values[2];
+		MaxX        = Values[3];
+		MaxZ        = Values[4];
+		CreatorName = Values[5];
+		HasValues = true;
+		return 0;
+	end
+	
+	local sql = "SELECT MinX, MinZ, MaxX, MaxZ, CreatorUserName FROM Areas WHERE " ..
+		"ID = " .. a_AreaID .. " AND WorldName = '" .. a_WorldName .. "'";
+	if (not(self:DBExec(sql, RememberValues))) then
+		LOGWARNING("SQL Error while getting area info (cStorage:ForEachArea())");
+		return;
+	end
+	
+	-- If no data has been retrieved, return nothing
+	if (not(HasValues)) then
+		return;
+	end
+	
+	return MinX, MinZ, MaxX, MaxZ, CreatorName;
+end
+
+
+
+
+
+--- Calls the callback for each allowed user for the specified area
+-- Callback signature: function(UserName)
+function cStorage:ForEachUserInArea(a_AreaID, a_WorldName, a_Callback)
+	assert(a_AreaID);
+	assert(a_WorldName);
+	assert(a_Callback);
+	
+	-- Since in this version all the worlds share a single DB, the a_WorldName parameter is not actually used
+	-- But this may change in the future, when we have a per-world DB
+	
+	local function CallCallback(UserData, NumValues, Values)
+		if (NumValues ~= 1) then
+			return 0;
+		end
+		a_Callback(Values[1]);
+		return 0;
+	end
+	local sql = "SELECT UserName FROM AllowedUsers WHERE AreaID = " .. a_AreaID;
+	if (not(self:DBExec(sql, CallCallback))) then
+		LOGWARNING("SQL error while iterating area users for AreaID" .. a_AreaID);
 		return false;
 	end
 	return true;
