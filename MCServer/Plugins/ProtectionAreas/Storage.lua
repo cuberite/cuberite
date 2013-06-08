@@ -379,6 +379,7 @@ function cStorage:ForEachUserInArea(a_AreaID, a_WorldName, a_Callback)
 	assert(a_AreaID);
 	assert(a_WorldName);
 	assert(a_Callback);
+	assert(self);
 	
 	-- Since in this version all the worlds share a single DB, the a_WorldName parameter is not actually used
 	-- But this may change in the future, when we have a per-world DB
@@ -395,6 +396,51 @@ function cStorage:ForEachUserInArea(a_AreaID, a_WorldName, a_Callback)
 		LOGWARNING("SQL error while iterating area users for AreaID" .. a_AreaID);
 		return false;
 	end
+	return true;
+end
+
+
+
+
+
+--- Adds the specified usernames to the specified area, if not already present
+-- a_Users is an array table of usernames to add
+function cStorage:AddAreaUsers(a_AreaID, a_WorldName, a_AddedBy, a_Users)
+	assert(a_AreaID);
+	assert(a_WorldName);
+	assert(a_Users);
+	assert(self);
+	
+	-- Remove from a_Users the usernames already present in the area
+	local sql = "SELECT UserName FROM AllowedUsers WHERE AreaID = " .. a_AreaID;
+	local function Remove(UserData, NumValues, Values, Names)
+		if (NumValues ~= 1) then
+			-- Invalid response format
+			return 0;
+		end
+		local DBName = Values[1];
+		-- Remove the name from a_Users, if exists
+		for idx, Name in ipairs(a_Users) do
+			if (Name == DBName) then
+				table.remove(a_Users, idx);
+				return 0;
+			end
+		end
+		return 0;
+	end
+	if (not(self:DBExec(sql, Remove))) then
+		LOGWARNING("SQL error while iterating through users");
+		return false;
+	end
+	
+	-- Add the users
+	for idx, Name in ipairs(a_Users) do
+		local sql = "INSERT INTO AllowedUsers (AreaID, UserName) VALUES (" .. a_AreaID .. ", '" .. Name .. "')";
+		if (not(self:DBExec(sql))) then
+			LOGWARNING("SQL error while adding user " .. Name .. " to area " .. a_AreaID);
+		end
+	end
+	
 	return true;
 end
 

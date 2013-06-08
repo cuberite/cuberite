@@ -108,8 +108,18 @@ function HandleAddAreaUser(a_Split, a_Player)
 	end
 	
 	-- Add the area to the storage
-	g_Storage:AddAreaUsers(tonumber(a_Split[2]), a_Player:GetWorld():GetName(), a_Player:GetName(), AllowedNames);
-	a_Player:SendMessage("Users added: " .. table.concat(AllowedNames, ", "));
+	if (not(g_Storage:AddAreaUsers(
+		tonumber(a_Split[2]), a_Player:GetWorld():GetName(), a_Player:GetName(), AllowedNames))
+	) then
+		LOGWARNING("g_Storage:AddAreaUsers failed");
+		a_Player:SendMessage("Cannot add users, DB failure");
+		return true;
+	end
+	if (#AllowedNames == 0) then
+		a_Player:SendMessage("All the specified users were already allowed.");
+	else
+		a_Player:SendMessage("Users added: " .. table.concat(AllowedNames, ", "));
+	end
 	
 	-- Reload all currently logged in players
 	ReloadAllPlayersInWorld(a_Player:GetWorld():GetName());
