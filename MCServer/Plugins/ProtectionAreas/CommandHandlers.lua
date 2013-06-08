@@ -308,7 +308,7 @@ function HandleRemoveUserAll(a_Split, a_Player)
 	end
 	
 	-- Remove the user from the DB
-	g_Storage.RemoveUserAll(a_Split[2], a_Player:GetWorld():GetName());
+	g_Storage:RemoveUserAll(a_Split[2], a_Player:GetWorld():GetName());
 	return true;
 end
 

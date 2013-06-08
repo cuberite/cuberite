@@ -289,8 +289,16 @@ end
 
 --- Removes the user from all areas in the specified world
 function cStorage:RemoveUserAll(a_UserName, a_WorldName)
-	-- TODO
-	LOGWARNING("cStorage:RemoveUserAll(): Not implemented yet!");
+	assert(a_UserName);
+	assert(a_WorldName);
+	assert(self);
+	
+	local sql = "DELETE FROM AllowedUsers WHERE UserName = '" .. a_UserName .."'";
+	if (not(self:DBExec(sql))) then
+		LOGWARNING("SQL error while removing user " .. a_UserName .. " from all areas");
+		return false;
+	end
+	return true;
 end
 
 
