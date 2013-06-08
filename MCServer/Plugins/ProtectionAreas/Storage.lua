@@ -93,7 +93,7 @@ end
 --- Creates the table of the specified name and columns[]
 -- If the table exists, any columns missing are added; existing data is kept
 function cStorage:CreateTable(a_TableName, a_Columns)
-
+	-- Try to create the table first
 	local sql = "CREATE TABLE IF NOT EXISTS '" .. a_TableName .. "' (";
 	sql = sql .. table.concat(a_Columns, ", ");
 	sql = sql .. ")";
@@ -101,6 +101,7 @@ function cStorage:CreateTable(a_TableName, a_Columns)
 		LOGWARNING(PluginPrefix .. "Cannot create DB Table " .. a_TableName);
 		return false;
 	end
+	-- SQLite doesn't inform us if it created the table or not, so we have to continue anyway
 	
 	-- Check each column whether it exists
 	-- Remove all the existing columns from a_Columns:
@@ -154,6 +155,11 @@ end
 
 --- Returns true if the specified area is allowed for the specified player
 function cStorage:IsAreaAllowed(a_AreaID, a_PlayerName, a_WorldName)
+	assert(a_AreaID);
+	assert(a_PlayerName);
+	assert(a_WorldName);
+	assert(self);
+	
 	local res = false;
 	local sql = "SELECT COUNT(*) FROM AllowedUsers WHERE (AreaID = " .. a_AreaID .. 
 		") AND (UserName ='" .. a_PlayerName .. "')";
@@ -174,6 +180,12 @@ end
 
 --- Loads cPlayerAreas for the specified player from the DB. Returns a cPlayerAreas object
 function cStorage:LoadPlayerAreas(a_PlayerName, a_PlayerX, a_PlayerZ, a_WorldName)
+	assert(a_PlayerName);
+	assert(a_PlayerX);
+	assert(a_PlayerZ);
+	assert(a_WorldName);
+	assert(self);
+	
 	res = cPlayerAreas:new();
 
 	-- Bounds for which the areas are loaded
@@ -213,6 +225,12 @@ end
 --- Adds a new area into the DB. a_AllowedNames is a table listing all the players that are allowed in the area
 -- Returns the ID of the new area, or -1 on failure
 function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
+	assert(a_Cuboid);
+	assert(a_WorldName);
+	assert(a_CreatorName);
+	assert(a_AllowedNames);
+	assert(self);
+	
 	-- Store the area in the DB
 	local ID = -1;
 	local function RememberID(UserData, NumCols, Values, Names)
@@ -252,6 +270,10 @@ end
 
 
 function cStorage:DelArea(a_WorldName, a_AreaID)
+	assert(a_WorldName);
+	assert(a_AreaID);
+	assert(self);
+	
 	-- Since all areas are stored in a single DB (for now), the worldname parameter isn't used at all
 	-- Later if we change to a per-world DB, we'll need the world name
 	
@@ -273,6 +295,11 @@ end
 
 --- Removes the user from the specified area
 function cStorage:RemoveUser(a_AreaID, a_UserName, a_WorldName)
+	assert(a_AreaID);
+	assert(a_UserName);
+	assert(a_WorldName);
+	assert(self);
+	
 	-- WorldName is not used yet, because all the worlds share the same DB in this version
 	local sql = "DELETE FROM AllowedUsers WHERE " .. 
 		"AreaID = " ..  a_AreaID .. " AND UserName = '" .. a_UserName .. "'";
@@ -308,6 +335,11 @@ end
 --- Calls the callback for each area intersecting the specified coords
 -- Callback signature: function(ID, MinX, MinZ, MaxX, MaxZ, CreatorName)
 function cStorage:ForEachArea(a_BlockX, a_BlockZ, a_WorldName, a_Callback)
+	assert(a_BlockX);
+	assert(a_BlockZ);
+	assert(a_WorldName);
+	assert(a_Callback);
+	assert(self);
 
 	-- SQL callback that parses the values and calls our callback
 	function CallCallback(UserData, NumValues, Values, Names)
@@ -343,6 +375,9 @@ end
 --- Returns the info on the specified area
 -- Returns MinX, MinZ, MaxX, MaxZ, CreatorName on success, or nothing on failure
 function cStorage:GetArea(a_AreaID, a_WorldName)
+	assert(a_AreaID);
+	assert(a_WorldName);
+	assert(self);
 
 	local MinX, MinZ, MaxX, MaxZ, CreatorName;
 	local HasValues = false;
