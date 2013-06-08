@@ -211,6 +211,7 @@ end
 
 
 --- Adds a new area into the DB. a_AllowedNames is a table listing all the players that are allowed in the area
+-- Returns the ID of the new area, or -1 on failure
 function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
 	-- Store the area in the DB
 	local ID = -1;
@@ -229,11 +230,11 @@ function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
 		"'); SELECT last_insert_rowid() AS ID";
 	if (not(self:DBExec(sql, RememberID))) then
 		LOGWARNING(PluginPrefix .. "SQL Error while inserting new area");
-		return false;
+		return -1;
 	end
 	if (ID == -1) then
 		LOGWARNING(PluginPrefix .. "SQL Error while retrieving INSERTion ID");
-		return false;
+		return -1;
 	end
 	
 	-- Store each allowed player in the DB
@@ -243,7 +244,7 @@ function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
 			LOGWARNING(PluginPrefix .. "SQL Error while inserting new area's allowed player " .. Name);
 		end
 	end
-	return true;
+	return ID;
 end
 
 
@@ -285,6 +286,41 @@ function cStorage:RemoveUserAll(a_UserName, a_WorldName)
 	-- TODO
 	LOGWARNING("cStorage:RemoveUserAll(): Not implemented yet!");
 end
+
+
+
+
+
+--- Calls the callback for each area intersecting the specified coords
+-- Callback signature: function(ID, MinX, MinZ, MaxX, MaxZ, CreatorName)
+function cStorage:ForEachArea(a_BlockX, a_BlockZ, a_WorldName, a_Callback)
+
+	-- SQL callback that parses the values and calls our callback
+	function CallCallback(UserData, NumValues, Values, Names)
+		if (NumValues ~= 6) then
+			-- Not enough values returned, skip this row
+			return 0;
+		end
+		local ID          = Values[1];
+		local MinX        = Values[2];
+		local MaxX        = Values[3];
+		local MinZ        = Values[4];
+		local MaxZ        = Values[5];
+		local CreatorName = Values[6];
+		a_Callback(ID, MinX, MinZ, MaxX, MaxZ, CreatorName);
+		return 0;
+	end
+	
+	local sql = "SELECT ID, MinX, MinZ, MaxX, MaxZ, CreatorUserName FROM Areas WHERE " ..
+		"MinX <= " .. a_BlockX .. " AND MaxX >= " .. a_BlockX .. " AND " ..
+		"MinZ <= " .. a_BlockZ .. " AND MaxZ >= " .. a_BlockZ;
+	if (not(self:DBExec(sql, CallCallback))) then
+		LOGWARNING("SQL Error while iterating through areas (cStorage:ForEachArea())");
+		return false;
+	end
+	return true;
+end
+
 
 
 

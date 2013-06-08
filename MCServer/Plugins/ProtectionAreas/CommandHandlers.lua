@@ -44,8 +44,8 @@ function HandleAddArea(a_Split, a_Player)
 	end
 	
 	-- Add the area to the storage
-	g_Storage:AddArea(Cuboid, a_Player:GetWorld():GetName(), a_Player:GetName(), AllowedNames);
-	a_Player:SendMessage("Area added");
+	local AreaID = g_Storage:AddArea(Cuboid, a_Player:GetWorld():GetName(), a_Player:GetName(), AllowedNames);
+	a_Player:SendMessage("Area added, ID " .. AreaID);
 	
 	-- Reload all currently logged in players
 	ReloadAllPlayersInWorld(a_Player:GetWorld():GetName());
@@ -81,8 +81,8 @@ function HandleAddAreaCoords(a_Split, a_Player)
 	end
 	
 	-- Add the area to the storage
-	g_Storage:AddArea(Cuboid, a_Player:GetWorld():GetName(), a_Player:GetName(), AllowedNames);
-	a_Player:SendMessage("Area added");
+	local AreaID = g_Storage:AddArea(Cuboid, a_Player:GetWorld():GetName(), a_Player:GetName(), AllowedNames);
+	a_Player:SendMessage("Area added, ID = " .. AreaID);
 	
 	-- Reload all currently logged in players
 	ReloadAllPlayersInWorld(a_Player:GetWorld():GetName());
@@ -195,24 +195,20 @@ function HandleListAreas(a_Split, a_Player)
 	a_Player:SendMessage("Listing protection areas intersecting block column {" .. x .. ", " .. z .. "}:");
 	
 	-- List areas intersecting the coords
-	local Areas = g_PlayerAreas[a_Player:GetUniqueID()]
-	Areas:ForEachArea(
-		function(a_Cuboid, a_IsAllowed)
-			if (not(a_Cuboid:IsInside(x, 1, z))) then
-				-- This cuboid doesn't intersect the column
-				return;
-			end
-			-- Column intersected, send to the player
-			local Coords = "{" ..
-				a_Cuboid.p1.x .. ", " .. a_Cuboid.p1.z .. "} - {" ..
-				a_Cuboid.p2.x .. ", " .. a_Cuboid.p2.z .. "} ";
+	local PlayerName = a_Player:GetName();
+	local WorldName = a_Player:GetWorld():GetName();
+	g_Storage:ForEachArea(x, z, WorldName,
+		function(AreaID, MinX, MinZ, MaxX, MaxZ, CreatorName)
+			local Coords = AreaID .. ": {" ..
+				MinX .. ", " .. MinZ .. "} - {" ..
+				MaxX .. ", " .. MaxZ .. "} ";
 			local Allowance;
-			if (a_IsAllowed) then
+			if (g_Storage:IsAreaAllowed(AreaID, PlayerName, WorldName)) then
 				Allowance = "Allowed";
 			else
 				Allowance = "NOT allowed";
 			end
-			a_Player:SendMessage("  " .. Coords .. Allowance);
+			a_Player:SendMessage("  " .. Coords .. Allowance .. ", Created by " .. CreatorName);
 		end
 	);
 	
