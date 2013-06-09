@@ -78,9 +78,15 @@ public:
 		return 0;
 	}
 	
+	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 	Int64 GetWorldAge(void)  const { return m_WorldAge; }
 	Int64 GetTimeOfDay(void) const { return m_TimeOfDay; }
 	
+	void SetTicksUntilWeatherChange(int a_WeatherInterval)
+	{
+		m_WeatherInterval = a_WeatherInterval;
+	}
+
 	void SetTimeOfDay(Int64 a_TimeOfDay)
 	{
 		m_TimeOfDay = a_TimeOfDay;
@@ -188,8 +194,8 @@ public:
 	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					// tolua_export
 	void SetMaxPlayers(int iMax);													// tolua_export
 
-	void AddPlayer( cPlayer* a_Player );
-	void RemovePlayer( cPlayer* a_Player );
+	void AddPlayer( cPlayer* a_Player ); // tolua_export
+	void RemovePlayer( cPlayer* a_Player ); // tolua_export
 
 	/// Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true
  	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
