@@ -1813,6 +1813,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockDeadBush.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockDirt.h"
 					>
 				</File>

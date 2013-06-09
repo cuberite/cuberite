@@ -57,6 +57,7 @@
 #include "BlockBrewingStand.h"
 #include "BlockCobWeb.h"
 #include "BlockTNT.h"
+#include "BlockDeadBush.h"
 
 
 
@@ -149,6 +150,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_POTATOES:              return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
+        case E_BLOCK_DEAD_BUSH:             return new cBlockDeadBushHandler        (a_BlockType);
 		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
