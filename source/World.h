@@ -194,8 +194,8 @@ public:
 	unsigned int GetMaxPlayers(void) const {return m_MaxPlayers; }					// tolua_export
 	void SetMaxPlayers(int iMax);													// tolua_export
 
-	void AddPlayer( cPlayer* a_Player ); // tolua_export
-	void RemovePlayer( cPlayer* a_Player ); // tolua_export
+	void AddPlayer( cPlayer* a_Player );
+	void RemovePlayer( cPlayer* a_Player );
 
 	/// Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true
  	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
