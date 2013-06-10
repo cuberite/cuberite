@@ -73,8 +73,7 @@ function cPlayerAreas:CanInteractWithBlock(a_BlockX, a_BlockZ)
 	end
 	
 	-- The coords are not inside any area
-	-- TODO: Have a config saying whether a player can build in the non-areated space or not
-	return true;
+	return cConfig.m_AllowInteractNoArea;
 end
 
 

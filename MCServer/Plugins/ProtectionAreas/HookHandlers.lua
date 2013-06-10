@@ -23,7 +23,6 @@ end
 --- Called by MCS when a player's connectino is lost - either they disconnected or timed out
 function OnDisconnect(a_Player, a_Reason)
 	-- Remove the player's cProtectionArea object
-	-- TODO: What if there are two players with the same name? need to check
 	g_PlayerAreas[a_Player:GetUniqueID()] = nil;
 	
 	-- If the player is a VIP, they had a command state, remove that as well

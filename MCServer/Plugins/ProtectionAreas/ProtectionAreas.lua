@@ -25,6 +25,7 @@ function Initialize(a_Plugin)
 	a_Plugin:SetName("ProtectionAreas");
 	a_Plugin:SetVersion(1);
 	
+	InitializeConfig();
 	if (not(InitializeStorage())) then
 		LOGWARNING(PluginPrefix .. "failed to initialize Storage, plugin is disabled");
 		return false;
