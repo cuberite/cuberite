@@ -9,7 +9,8 @@ The code can then ask each object, whether the player can interact with a certai
 A player can interact with a block if either one of these is true:
 1, There are no areas covering the block
 2, There is at least one area covering the block with IsAllowed set to true
-The OOP class implementation follows the PiL 16.1
+The object also has a m_SafeCuboid object that specified the area within which the player may move
+without the PlayerAreas needing a re-query.
 
 Also, a global table g_PlayerAreas is the actual map of PlayerID -> cPlayerAreas
 --]]
@@ -25,10 +26,16 @@ g_PlayerAreas = {};
 
 
 
-function cPlayerAreas:new(obj)
-	obj = obj or {};
+function cPlayerAreas:new(a_SafeMinX, a_SafeMinZ, a_SafeMaxX, a_SafeMaxZ)
+	assert(a_SafeMinX);
+	assert(a_SafeMinZ);
+	assert(a_SafeMaxX);
+	assert(a_SafeMaxZ);
+	
+	local obj = {};
 	setmetatable(obj, self);
 	self.__index = self;
+	self.m_SafeCuboid = cCuboid(a_SafeMinX, 0, a_SafeMinZ, a_SafeMaxX, 255, a_SafeMaxZ);
 	return obj;
 end
 
@@ -46,6 +53,8 @@ end
 
 --- returns true if the player owning this object can interact with the specified block
 function cPlayerAreas:CanInteractWithBlock(a_BlockX, a_BlockZ)
+	assert(self);
+	
 	-- iterate through all the stored areas:
 	local IsInsideAnyArea = false;
 	for idx, Area in ipairs(self) do
@@ -76,12 +85,24 @@ end
 -- a_Callback has a signature: function(a_Cuboid, a_IsAllowed)
 -- Returns true if all areas have been enumerated, false if the callback has aborted by returning true
 function cPlayerAreas:ForEachArea(a_Callback)
+	assert(self);
+	
 	for idx, Area in ipairs(self) do
 		if (a_Callback(Area.m_Cuboid, Area.m_IsAllowed)) then
 			return false;
 		end
 	end
 	return true;
+end
+
+
+
+
+
+--- Returns true if the player is withing the safe cuboid (no need to re-query the areas)
+function cPlayerAreas:IsInSafe(a_BlockX, a_BlockZ)
+	assert(self);
+	return self.m_SafeCuboid:IsInside(a_BlockX, 0, a_BlockZ);
 end
 
 

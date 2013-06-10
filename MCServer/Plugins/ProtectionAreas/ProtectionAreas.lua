@@ -12,6 +12,9 @@ PluginPrefix = "ProtectionAreas: ";
 --- Bounds for the area loading. Areas less this far in any direction from the player will be loaded into cPlayerAreas
 g_AreaBounds = 48;
 
+--- If a player moves this close to the PlayerAreas bounds, the PlayerAreas will be re-queried
+g_AreaSafeEdge = 12;
+
 
 
 

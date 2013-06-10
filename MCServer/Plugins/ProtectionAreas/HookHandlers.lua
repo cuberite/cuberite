@@ -6,10 +6,12 @@
 
 
 
+--- Registers all the hooks that the plugin needs to know about
 function InitializeHooks(a_Plugin)
 	local PlgMgr = cRoot:Get():GetPluginManager();
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_DISCONNECT);
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_LEFT_CLICK);
+	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_MOVING);
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICK);
 	PlgMgr:AddHook(a_Plugin, cPluginManager.HOOK_PLAYER_SPAWNED);
 end
@@ -18,6 +20,7 @@ end
 
 
 
+--- Called by MCS when a player's connectino is lost - either they disconnected or timed out
 function OnDisconnect(a_Player, a_Reason)
 	-- Remove the player's cProtectionArea object
 	-- TODO: What if there are two players with the same name? need to check
@@ -33,6 +36,7 @@ end;
 
 
 
+--- Called by MCS whenever a player enters a world (is spawned)
 function OnPlayerSpawned(a_Player)
 	-- Create a new cPlayerAreas object for this player
 	if (g_PlayerAreas[a_Player:GetUniqueID()] == nil) then
@@ -46,6 +50,29 @@ end
 
 
 
+--- Called by MCS whenever a player is moving (at most once every tick)
+function OnPlayerMoving(a_Player)
+	local PlayerID = a_Player:GetUniqueID();
+	
+	-- If for some reason we don't have a cPlayerAreas object for this player, load it up
+	local PlayerAreas = g_PlayerAreas[PlayerID];
+	if (PlayerAreas == nil) then
+		LoadPlayerAreas(a_Player);
+		return false;
+	end;
+	
+	-- If the player is outside their areas' safe space, reload
+	if (not(PlayerAreas:IsInSafe(a_Player:GetPosX(), a_Player:GetPosZ()))) then
+		LoadPlayerAreas(a_Player);
+	end
+	return false;
+end
+
+
+
+
+
+--- Called by MCS when a player left-clicks
 function OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status)
 	-- If the player has lclked with the wand; regardless of their permissions, let's set the coords:
 	if (cConfig:IsWand(a_Player:GetEquippedItem())) then
@@ -65,7 +92,8 @@ function OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
 	
 	-- Check the player areas to see whether to disable this action
 	local Areas = g_PlayerAreas[a_Player:GetUniqueID()];
-	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockY, a_BlockZ)) then
+	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockZ)) then
+		a_Player:SendMessage("You are not allowed to dig here!");
 		return true;
 	end
 	
@@ -77,17 +105,19 @@ end
 
 
 
+--- Called by MCS when a player right-clicks
 function OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_Status)
+
+	-- BlockFace < 0 means "use item", for which the coords are not given by the client
+	if (a_BlockFace < 0) then
+		return true;
+	end
+
+	-- Convert the clicked coords into the block space
+	a_BlockX, a_BlockY, a_BlockZ = AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+	
 	-- If the player has rclked with the wand; regardless of their permissions, let's set the coords
 	if (cConfig:IsWand(a_Player:GetEquippedItem())) then
-		-- BlockFace < 0 means "use item", for which the coords are not given by the client
-		if (a_BlockFace < 0) then
-			return true;
-		end
-
-		-- Convert the clicked coords into the block space
-		a_BlockX, a_BlockY, a_BlockZ = AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		
 		-- Set the coords in the CommandState
 		GetCommandStateForPlayer(a_Player):SetCoords2(a_BlockX, a_BlockZ);
 		a_Player:SendMessage("Coords2 set as {" .. a_BlockX .. ", " .. a_BlockZ .."}.");
@@ -97,6 +127,7 @@ function OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 	-- Check the player areas to see whether to disable this action
 	local Areas = g_PlayerAreas[a_Player:GetUniqueID()];
 	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockZ)) then
+		a_Player:SendMessage("You are not allowed to build here!");
 		return true;
 	end
 

@@ -192,7 +192,17 @@ function cStorage:LoadPlayerAreas(a_PlayerName, a_PlayerX, a_PlayerZ, a_WorldNam
 	local BoundsMinZ = a_PlayerZ - g_AreaBounds;
 	local BoundsMaxZ = a_PlayerZ + g_AreaBounds;
 
-	local res = cPlayerAreas:new();
+	local res = cPlayerAreas:new(
+		BoundsMinX + g_AreaSafeEdge, BoundsMinZ + g_AreaSafeEdge,
+		BoundsMaxX - g_AreaSafeEdge, BoundsMaxZ - g_AreaSafeEdge
+	);
+	
+	--[[
+	LOG("Loading protection areas for player " .. a_PlayerName .. " centered around {" .. a_PlayerX .. ", " .. a_PlayerZ ..
+		"}, bounds are {" .. BoundsMinX .. ", " .. BoundsMinZ .. "} - {" ..
+		BoundsMaxX .. ", " .. BoundsMaxZ .. "}"
+	);
+	--]]
 
 	-- Load the areas from the DB, based on the player's location
 	local sql = 
