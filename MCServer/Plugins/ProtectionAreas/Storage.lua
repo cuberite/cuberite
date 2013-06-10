@@ -186,13 +186,13 @@ function cStorage:LoadPlayerAreas(a_PlayerName, a_PlayerX, a_PlayerZ, a_WorldNam
 	assert(a_WorldName);
 	assert(self);
 	
-	res = cPlayerAreas:new();
-
 	-- Bounds for which the areas are loaded
 	local BoundsMinX = a_PlayerX - g_AreaBounds;
 	local BoundsMaxX = a_PlayerX + g_AreaBounds;
 	local BoundsMinZ = a_PlayerZ - g_AreaBounds;
 	local BoundsMaxZ = a_PlayerZ + g_AreaBounds;
+
+	local res = cPlayerAreas:new();
 
 	-- Load the areas from the DB, based on the player's location
 	local sql = 

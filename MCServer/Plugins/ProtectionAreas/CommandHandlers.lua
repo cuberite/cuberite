@@ -293,6 +293,9 @@ function HandleRemoveUser(a_Split, a_Player)
 	-- Send confirmation
 	a_Player:SendMessage("Removed " .. UserName .. " from area " .. AreaID);
 	
+	-- Reload all currently logged in players
+	ReloadAllPlayersInWorld(a_Player:GetWorld():GetName());
+	
 	return true;
 end
 
@@ -309,6 +312,10 @@ function HandleRemoveUserAll(a_Split, a_Player)
 	
 	-- Remove the user from the DB
 	g_Storage:RemoveUserAll(a_Split[2], a_Player:GetWorld():GetName());
+
+	-- Reload all currently logged in players
+	ReloadAllPlayersInWorld(a_Player:GetWorld():GetName());
+	
 	return true;
 end
 
