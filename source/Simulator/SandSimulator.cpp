@@ -79,6 +79,7 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SAND:
 		case E_BLOCK_GRAVEL:
 		case E_BLOCK_ANVIL:
+		case E_BLOCK_DRAGON_EGG:
 		{
 			return true;
 		}
