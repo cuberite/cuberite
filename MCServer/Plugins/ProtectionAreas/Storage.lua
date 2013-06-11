@@ -160,9 +160,10 @@ function cStorage:IsAreaAllowed(a_AreaID, a_PlayerName, a_WorldName)
 	assert(a_WorldName);
 	assert(self);
 	
+	local lcPlayerName = string.lower(a_PlayerName);
 	local res = false;
 	local sql = "SELECT COUNT(*) FROM AllowedUsers WHERE (AreaID = " .. a_AreaID .. 
-		") AND (UserName ='" .. a_PlayerName .. "')";
+		") AND (UserName ='" .. lcPlayerName .. "')";
 	local function SetResTrue(UserData, NumValues, Values, Names)
 		res = (tonumber(Values[1]) > 0);
 		return 0;
@@ -203,13 +204,14 @@ function cStorage:LoadPlayerAreas(a_PlayerName, a_PlayerX, a_PlayerZ, a_WorldNam
 		BoundsMaxX .. ", " .. BoundsMaxZ .. "}"
 	);
 	--]]
-
+	
 	-- Load the areas from the DB, based on the player's location
+	local lcWorldName = string.lower(a_WorldName);
 	local sql = 
 		"SELECT ID, MinX, MaxX, MinZ, MaxZ FROM Areas WHERE " ..
 		"MinX < " .. BoundsMaxX .. " AND MaxX > " .. BoundsMinX .. " AND " ..
 		"MinZ < " .. BoundsMaxZ .. " AND MaxZ > " .. BoundsMinZ .. " AND " ..
-		"WorldName='" .. a_WorldName .."'";
+		"WorldName = '" .. lcWorldName .."'";
 	
 	local function AddAreas(UserData, NumValues, Values, Names)
 		if ((NumValues < 5) or ((Values[1] and Values[2] and Values[3] and Values[4] and Values[5]) == nil)) then
@@ -251,10 +253,12 @@ function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
 		end
 		return 0;
 	end
+	local lcWorldName = string.lower(a_WorldName);
+	local lcCreatorName = string.lower(a_CreatorName);
 	local sql = 
 		"INSERT INTO Areas (ID, MinX, MaxX, MinZ, MaxZ, WorldName, CreatorUserName) VALUES (NULL, " ..
 		a_Cuboid.p1.x .. ", " .. a_Cuboid.p2.x .. ", " .. a_Cuboid.p1.z .. ", " .. a_Cuboid.p2.z .. 
-		", '"  .. a_WorldName .. "', '" .. a_CreatorName ..
+		", '"  .. lcWorldName .. "', '" .. lcCreatorName ..
 		"'); SELECT last_insert_rowid() AS ID";
 	if (not(self:DBExec(sql, RememberID))) then
 		LOGWARNING(PluginPrefix .. "SQL Error while inserting new area");
@@ -267,7 +271,8 @@ function cStorage:AddArea(a_Cuboid, a_WorldName, a_CreatorName, a_AllowedNames)
 	
 	-- Store each allowed player in the DB
 	for idx, Name in ipairs(a_AllowedNames) do
-		local sql = "INSERT INTO AllowedUsers (AreaID, UserName) VALUES (" .. ID .. ", '" .. Name .. "')";
+		local lcName = string.lower(Name);
+		local sql = "INSERT INTO AllowedUsers (AreaID, UserName) VALUES (" .. ID .. ", '" .. lcName .. "')";
 		if (not(self:DBExec(sql))) then
 			LOGWARNING(PluginPrefix .. "SQL Error while inserting new area's allowed player " .. Name);
 		end
@@ -289,8 +294,8 @@ function cStorage:DelArea(a_WorldName, a_AreaID)
 	
 	-- Delete from both tables simultaneously
 	local sql = 
-		"DELETE FROM Areas          WHERE ID="     .. a_AreaID .. ";" ..
-		"DELETE FROM AllowedUsers WHERE AreaID=" .. a_AreaID;
+		"DELETE FROM Areas          WHERE ID = "     .. a_AreaID .. ";" ..
+		"DELETE FROM AllowedUsers WHERE AreaID = " .. a_AreaID;
 	if (not(self:DBExec(sql))) then
 		LOGWARNING(PluginPrefix .. "SQL error while deleting area " .. a_AreaID .. " from world \"" .. a_WorldName .. "\"");
 		return false;
@@ -311,8 +316,10 @@ function cStorage:RemoveUser(a_AreaID, a_UserName, a_WorldName)
 	assert(self);
 	
 	-- WorldName is not used yet, because all the worlds share the same DB in this version
+	
+	local lcUserName = string.lower(a_UserName);
 	local sql = "DELETE FROM AllowedUsers WHERE " .. 
-		"AreaID = " ..  a_AreaID .. " AND UserName = '" .. a_UserName .. "'";
+		"AreaID = " ..  a_AreaID .. " AND UserName = '" .. lcUserName .. "'";
 	if (not(self:DBExec(sql))) then	
 		LOGWARNING("SQL error while removing user " .. a_UserName .. " from area ID " .. a_AreaID);
 		return false;
@@ -330,7 +337,8 @@ function cStorage:RemoveUserAll(a_UserName, a_WorldName)
 	assert(a_WorldName);
 	assert(self);
 	
-	local sql = "DELETE FROM AllowedUsers WHERE UserName = '" .. a_UserName .."'";
+	local lcUserName = string.lower(a_UserName);
+	local sql = "DELETE FROM AllowedUsers WHERE UserName = '" .. lcUserName .."'";
 	if (not(self:DBExec(sql))) then
 		LOGWARNING("SQL error while removing user " .. a_UserName .. " from all areas");
 		return false;
@@ -367,10 +375,11 @@ function cStorage:ForEachArea(a_BlockX, a_BlockZ, a_WorldName, a_Callback)
 		return 0;
 	end
 	
+	local lcWorldName = string.lower(a_WorldName);
 	local sql = "SELECT ID, MinX, MinZ, MaxX, MaxZ, CreatorUserName FROM Areas WHERE " ..
 		"MinX <= " .. a_BlockX .. " AND MaxX >= " .. a_BlockX .. " AND " ..
 		"MinZ <= " .. a_BlockZ .. " AND MaxZ >= " .. a_BlockZ .. " AND " ..
-		"WorldName = '" .. a_WorldName .. "'";
+		"WorldName = '" .. lcWorldName .. "'";
 	if (not(self:DBExec(sql, CallCallback))) then
 		LOGWARNING("SQL Error while iterating through areas (cStorage:ForEachArea())");
 		return false;
@@ -407,8 +416,9 @@ function cStorage:GetArea(a_AreaID, a_WorldName)
 		return 0;
 	end
 	
+	local lcWorldName = string.lower(a_WorldName);
 	local sql = "SELECT MinX, MinZ, MaxX, MaxZ, CreatorUserName FROM Areas WHERE " ..
-		"ID = " .. a_AreaID .. " AND WorldName = '" .. a_WorldName .. "'";
+		"ID = " .. a_AreaID .. " AND WorldName = '" .. lcWorldName .. "'";
 	if (not(self:DBExec(sql, RememberValues))) then
 		LOGWARNING("SQL Error while getting area info (cStorage:ForEachArea())");
 		return;
@@ -464,9 +474,14 @@ function cStorage:AddAreaUsers(a_AreaID, a_WorldName, a_AddedBy, a_Users)
 	assert(a_Users);
 	assert(self);
 	
+	-- Convert all usernames to lowercase
+	for idx, Name in ipairs(a_Users) do
+		a_Users[idx] = string.lower(Name);
+	end
+	
 	-- Remove from a_Users the usernames already present in the area
 	local sql = "SELECT UserName FROM AllowedUsers WHERE AreaID = " .. a_AreaID;
-	local function Remove(UserData, NumValues, Values, Names)
+	local function RemovePresent(UserData, NumValues, Values, Names)
 		if (NumValues ~= 1) then
 			-- Invalid response format
 			return 0;
@@ -481,7 +496,7 @@ function cStorage:AddAreaUsers(a_AreaID, a_WorldName, a_AddedBy, a_Users)
 		end
 		return 0;
 	end
-	if (not(self:DBExec(sql, Remove))) then
+	if (not(self:DBExec(sql, RemovePresent))) then
 		LOGWARNING("SQL error while iterating through users");
 		return false;
 	end
