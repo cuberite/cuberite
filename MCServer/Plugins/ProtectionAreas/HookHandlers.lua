@@ -85,14 +85,14 @@ function OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
 
 		-- Set the coords in the CommandState
 		GetCommandStateForPlayer(a_Player):SetCoords1(a_BlockX, a_BlockZ);
-		a_Player:SendMessage("Coords1 set as {" .. a_BlockX .. ", " .. a_BlockZ .."}.");
+		a_Player:SendMessage(string.format(g_Msgs.Coords1Set, a_BlockX, a_BlockZ));
 		return true;
 	end;
 	
 	-- Check the player areas to see whether to disable this action
 	local Areas = g_PlayerAreas[a_Player:GetUniqueID()];
 	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockZ)) then
-		a_Player:SendMessage("You are not allowed to dig here!");
+		a_Player:SendMessage(g_Msgs.NotAllowedToDig);
 		return true;
 	end
 	
@@ -119,14 +119,14 @@ function OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 	if (cConfig:IsWand(a_Player:GetEquippedItem())) then
 		-- Set the coords in the CommandState
 		GetCommandStateForPlayer(a_Player):SetCoords2(a_BlockX, a_BlockZ);
-		a_Player:SendMessage("Coords2 set as {" .. a_BlockX .. ", " .. a_BlockZ .."}.");
+		a_Player:SendMessage(string.format(g_Msgs.Coords2Set, a_BlockX, a_BlockZ));
 		return true;
 	end;
 	
 	-- Check the player areas to see whether to disable this action
 	local Areas = g_PlayerAreas[a_Player:GetUniqueID()];
 	if not(Areas:CanInteractWithBlock(a_BlockX, a_BlockZ)) then
-		a_Player:SendMessage("You are not allowed to build here!");
+		a_Player:SendMessage(g_Msgs.NotAllowedToBuild);
 		return true;
 	end
 
