@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/12/13 10:17:24.
+** Generated automatically by tolua++-1.0.92 on 06/12/13 14:28:57.
 */
 
 #ifndef __cplusplus
@@ -16665,23 +16665,6 @@ static int tolua_AllToLua_cChestEntity_new00_local(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: __cBlockEntityWindowOwner__ of class  cChestEntity */
-#ifndef TOLUA_DISABLE_tolua_get_cChestEntity___cBlockEntityWindowOwner__
-static int tolua_get_cChestEntity___cBlockEntityWindowOwner__(lua_State* tolua_S)
-{
-  cChestEntity* self = (cChestEntity*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable '__cBlockEntityWindowOwner__'",NULL);
-#endif
-#ifdef __cplusplus
-   tolua_pushusertype(tolua_S,(void*)static_cast<cBlockEntityWindowOwner*>(self), "cBlockEntityWindowOwner");
-#else
-   tolua_pushusertype(tolua_S,(void*)((cBlockEntityWindowOwner*)self), "cBlockEntityWindowOwner");
-#endif
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: AddDropSpenserDir of class  cDropSpenserEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00
 static int tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00(lua_State* tolua_S)
@@ -27770,7 +27753,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cChestEntity_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cChestEntity_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cChestEntity_new00_local);
-   tolua_variable(tolua_S,"__cBlockEntityWindowOwner__",tolua_get_cChestEntity___cBlockEntityWindowOwner__,NULL);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cDropSpenserEntity","cDropSpenserEntity","cBlockEntityWithItems",NULL);
   tolua_beginmodule(tolua_S,"cDropSpenserEntity");
