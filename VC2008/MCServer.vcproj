@@ -1889,6 +1889,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockHopper.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\blocks\BlockIce.h"
 					>
 				</File>

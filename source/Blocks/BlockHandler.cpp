@@ -58,6 +58,7 @@
 #include "BlockCobWeb.h"
 #include "BlockTNT.h"
 #include "BlockDeadBush.h"
+#include "BlockHopper.h"
 
 
 
@@ -109,6 +110,8 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
 		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
+		case E_BLOCK_DEAD_BUSH:             return new cBlockDeadBushHandler        (a_BlockType);
+		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_DISPENSER:             return new cBlockDropSpenserHandler     (a_BlockType);
@@ -127,6 +130,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLASS:                 return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
+		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_IRON_DOOR:             return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_IRON_ORE:              return new cBlockOreHandler             (a_BlockType);
@@ -150,8 +154,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_POTATOES:              return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);
-		case E_BLOCK_DEAD_BUSH:             return new cBlockDeadBushHandler        (a_BlockType);
-		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_REPEATER_OFF: return new cBlockRedstoneRepeaterHandler(a_BlockType);

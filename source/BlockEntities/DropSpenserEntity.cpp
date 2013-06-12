@@ -43,12 +43,12 @@ void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int &
 {
 	switch (a_Direction)
 	{
-		case E_META_DISPENSER_FACING_YM: a_BlockY--; return;
-		case E_META_DISPENSER_FACING_YP: a_BlockY++; return;
-		case E_META_DISPENSER_FACING_ZM: a_BlockZ--; return;
-		case E_META_DISPENSER_FACING_ZP: a_BlockZ++; return;
-		case E_META_DISPENSER_FACING_XM: a_BlockX--; return;
-		case E_META_DISPENSER_FACING_XP: a_BlockX++; return;
+		case E_META_DROPSPENSER_FACING_YM: a_BlockY--; return;
+		case E_META_DROPSPENSER_FACING_YP: a_BlockY++; return;
+		case E_META_DROPSPENSER_FACING_ZM: a_BlockZ--; return;
+		case E_META_DROPSPENSER_FACING_ZP: a_BlockZ++; return;
+		case E_META_DROPSPENSER_FACING_XM: a_BlockX--; return;
+		case E_META_DROPSPENSER_FACING_XP: a_BlockX++; return;
 	}
 	LOGWARNING("%s: Unhandled direction: %d", __FUNCTION__, a_Direction);
 	return;
@@ -89,10 +89,10 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	int SmokeDir = 0;
 	switch (Meta)
 	{
-		case E_META_DISPENSER_FACING_XM: SmokeDir = 3; break;
-		case E_META_DISPENSER_FACING_XP: SmokeDir = 5; break;
-		case E_META_DISPENSER_FACING_ZM: SmokeDir = 1; break;
-		case E_META_DISPENSER_FACING_ZP: SmokeDir = 7; break;
+		case E_META_DROPSPENSER_FACING_XM: SmokeDir = 3; break;
+		case E_META_DROPSPENSER_FACING_XP: SmokeDir = 5; break;
+		case E_META_DROPSPENSER_FACING_ZM: SmokeDir = 1; break;
+		case E_META_DROPSPENSER_FACING_ZP: SmokeDir = 7; break;
 	}
 	m_World->BroadcastSoundParticleEffect(2000, m_PosX * 8, m_PosY * 8, m_PosZ * 8, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);

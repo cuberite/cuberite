@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/12/13 09:09:44.
+** Generated automatically by tolua++-1.0.92 on 06/12/13 10:17:24.
 */
 
 #ifndef __cplusplus
@@ -26902,13 +26902,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_CHEST_FACING_ZP",E_META_CHEST_FACING_ZP);
   tolua_constant(tolua_S,"E_META_CHEST_FACING_XM",E_META_CHEST_FACING_XM);
   tolua_constant(tolua_S,"E_META_CHEST_FACING_XP",E_META_CHEST_FACING_XP);
-  tolua_constant(tolua_S,"E_META_DISPENSER_FACING_YM",E_META_DISPENSER_FACING_YM);
-  tolua_constant(tolua_S,"E_META_DISPENSER_FACING_YP",E_META_DISPENSER_FACING_YP);
-  tolua_constant(tolua_S,"E_META_HOPPER_UNATTACHED",E_META_HOPPER_UNATTACHED);
-  tolua_constant(tolua_S,"E_META_DISPENSER_FACING_ZM",E_META_DISPENSER_FACING_ZM);
-  tolua_constant(tolua_S,"E_META_DISPENSER_FACING_ZP",E_META_DISPENSER_FACING_ZP);
-  tolua_constant(tolua_S,"E_META_DISPENSER_FACING_XM",E_META_DISPENSER_FACING_XM);
-  tolua_constant(tolua_S,"E_META_DISPENSER_FACING_XP",E_META_DISPENSER_FACING_XP);
+  tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_YM",E_META_DROPSPENSER_FACING_YM);
+  tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_YP",E_META_DROPSPENSER_FACING_YP);
+  tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_ZM",E_META_DROPSPENSER_FACING_ZM);
+  tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_ZP",E_META_DROPSPENSER_FACING_ZP);
+  tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_XM",E_META_DROPSPENSER_FACING_XM);
+  tolua_constant(tolua_S,"E_META_DROPSPENSER_FACING_XP",E_META_DROPSPENSER_FACING_XP);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE",E_META_DOUBLE_STEP_STONE);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_SANDSTONE",E_META_DOUBLE_STEP_SANDSTONE);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_WOODEN",E_META_DOUBLE_STEP_WOODEN);
@@ -26917,6 +26916,12 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE_BRICK",E_META_DOUBLE_STEP_STONE_BRICK);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_NETHER_BRICK",E_META_DOUBLE_STEP_NETHER_BRICK);
   tolua_constant(tolua_S,"E_META_DOUBLE_STEP_STONE_SECRET",E_META_DOUBLE_STEP_STONE_SECRET);
+  tolua_constant(tolua_S,"E_META_HOPPER_FACING_YM",E_META_HOPPER_FACING_YM);
+  tolua_constant(tolua_S,"E_META_HOPPER_UNATTACHED",E_META_HOPPER_UNATTACHED);
+  tolua_constant(tolua_S,"E_META_HOPPER_FACING_ZM",E_META_HOPPER_FACING_ZM);
+  tolua_constant(tolua_S,"E_META_HOPPER_FACING_ZP",E_META_HOPPER_FACING_ZP);
+  tolua_constant(tolua_S,"E_META_HOPPER_FACING_XM",E_META_HOPPER_FACING_XM);
+  tolua_constant(tolua_S,"E_META_HOPPER_FACING_XP",E_META_HOPPER_FACING_XP);
   tolua_constant(tolua_S,"E_META_LEAVES_APPLE",E_META_LEAVES_APPLE);
   tolua_constant(tolua_S,"E_META_LEAVES_CONIFER",E_META_LEAVES_CONIFER);
   tolua_constant(tolua_S,"E_META_LEAVES_BIRCH",E_META_LEAVES_BIRCH);
