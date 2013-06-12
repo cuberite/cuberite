@@ -1794,17 +1794,17 @@ void cChunkMap::ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cChunkMap::UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+bool cChunkMap::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_X, a_Y, a_Z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
-		return;
+		return false;
 	}
-	Chunk->UpdateSign(a_X, a_Y, a_Z, a_Line1, a_Line2, a_Line3, a_Line4);
+	return Chunk->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
 

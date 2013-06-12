@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/09/13 19:45:13.
+** Generated automatically by tolua++-1.0.92 on 06/12/13 09:09:44.
 */
 
 #ifndef __cplusplus
@@ -10926,57 +10926,6 @@ static int tolua_AllToLua_cWorld_GetNumPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetNumPlayers'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: UpdateSign of class  cWorld */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_UpdateSign00
-static int tolua_AllToLua_cWorld_UpdateSign00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,9,"cPlayer",1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,10,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
-  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
-  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
-  int a_Z = ((int)  tolua_tonumber(tolua_S,4,0));
-  const AString a_Line1 = ((const AString)  tolua_tocppstring(tolua_S,5,0));
-  const AString a_Line2 = ((const AString)  tolua_tocppstring(tolua_S,6,0));
-  const AString a_Line3 = ((const AString)  tolua_tocppstring(tolua_S,7,0));
-  const AString a_Line4 = ((const AString)  tolua_tocppstring(tolua_S,8,0));
-  cPlayer* a_Player = ((cPlayer*)  tolua_tousertype(tolua_S,9,NULL));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'UpdateSign'", NULL);
-#endif
-  {
-   self->UpdateSign(a_X,a_Y,a_Z,a_Line1,a_Line2,a_Line3,a_Line4,a_Player);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line1);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line2);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line3);
-   tolua_pushcppstring(tolua_S,(const char*)a_Line4);
-  }
- }
- return 4;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'UpdateSign'.",&tolua_err);
  return 0;
 #endif
 }
@@ -27563,7 +27512,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetMaxPlayers",tolua_AllToLua_cWorld_GetMaxPlayers00);
    tolua_function(tolua_S,"SetMaxPlayers",tolua_AllToLua_cWorld_SetMaxPlayers00);
    tolua_function(tolua_S,"GetNumPlayers",tolua_AllToLua_cWorld_GetNumPlayers00);
-   tolua_function(tolua_S,"UpdateSign",tolua_AllToLua_cWorld_UpdateSign00);
    tolua_function(tolua_S,"RegenerateChunk",tolua_AllToLua_cWorld_RegenerateChunk00);
    tolua_function(tolua_S,"GenerateChunk",tolua_AllToLua_cWorld_GenerateChunk00);
    tolua_function(tolua_S,"SetBlock",tolua_AllToLua_cWorld_SetBlock00);

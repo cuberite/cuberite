@@ -1705,7 +1705,7 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 
 
 
-void cChunk::UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	// Also sends update packets to all clients in the chunk
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -1723,8 +1723,10 @@ void cChunk::UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Li
 			MarkDirty();
 			(reinterpret_cast<cSignEntity *>(*itr))->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
 			m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
+			return true;
 		}
 	}  // for itr - m_BlockEntities[]
+	return false;
 }
 
 

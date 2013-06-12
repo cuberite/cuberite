@@ -250,10 +250,11 @@ public:
 	/// Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid()
 	void LoadChunks(const cChunkCoordsList & a_Chunks);
 
-	/// Marks the chunk as failed-to-load:
+	/// Marks the chunk as failed-to-load
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	void UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	/// Sets the sign text. Returns true if sign text changed.
+	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
 	/// Marks (a_Stay == true) or unmarks (a_Stay == false) chunks as non-unloadable; to be used only by cChunkStay!
 	void ChunksStay(const cChunkCoordsList & a_Chunks, bool a_Stay = true);

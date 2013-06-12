@@ -169,7 +169,9 @@ public:
 	EMCSBiome GetBiomeAt(int a_RelX, int a_RelZ) const {return cChunkDef::GetBiome(m_BiomeMap, a_RelX, a_RelZ); }
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
-	void UpdateSign(int a_PosX, int a_PosY, int a_PosZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);  // Also sends update packets to all clients in the chunk
+	
+	/// Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk
+	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	int  GetHeight( int a_X, int a_Z );
 

@@ -543,6 +543,59 @@ static int tolua_ForEach(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
+{
+	// Exported manually, because tolua would generate useless additional return values (a_Line1 .. a_Line4)
+	#ifndef TOLUA_RELEASE
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype (tolua_S, 1, "cWorld", 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 2, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 3, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 4, 0, &tolua_err) ||
+		!tolua_iscppstring(tolua_S, 5, 0, &tolua_err) ||
+		!tolua_iscppstring(tolua_S, 6, 0, &tolua_err) ||
+		!tolua_iscppstring(tolua_S, 7, 0, &tolua_err) ||
+		!tolua_iscppstring(tolua_S, 8, 0, &tolua_err) ||
+		!tolua_isusertype (tolua_S, 9, "cPlayer", 1, &tolua_err) ||
+		!tolua_isnoobj    (tolua_S, 10, &tolua_err)
+		)
+		goto tolua_lerror;
+	else
+	#endif
+	{
+		cWorld * self       = (cWorld *) tolua_tousertype (tolua_S, 1, 0);
+		int BlockX          = (int)      tolua_tonumber   (tolua_S, 2, 0);
+		int BlockY          = (int)      tolua_tonumber   (tolua_S, 3, 0);
+		int BlockZ          = (int)      tolua_tonumber   (tolua_S, 4, 0);
+		const AString Line1 =            tolua_tocppstring(tolua_S, 5, 0);
+		const AString Line2 =            tolua_tocppstring(tolua_S, 6, 0);
+		const AString Line3 =            tolua_tocppstring(tolua_S, 7, 0);
+		const AString Line4 =            tolua_tocppstring(tolua_S, 8, 0);
+		cPlayer * Player    = (cPlayer *)tolua_tousertype (tolua_S, 9, NULL);
+		#ifndef TOLUA_RELEASE
+		if (self == NULL)
+		{
+			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", NULL);
+		}
+		#endif
+		{
+			bool res = self->UpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			tolua_pushboolean(tolua_S, res ? 1 : 0);
+		}
+	}
+	return 1;
+	
+	#ifndef TOLUA_RELEASE
+tolua_lerror:
+	tolua_error(tolua_S, "#ferror in function 'SetSignLines' / 'UpdateSign'.", &tolua_err);
+	return 0;
+	#endif
+}
+
+
+
+
 static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 {
 	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
@@ -1284,6 +1337,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithDropperAt",       tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
 			tolua_function(tolua_S, "DoWithDropSpenserAt",   tolua_DoWithXYZ<cWorld, cDropSpenserEntity, &cWorld::DoWithDropSpenserAt>);
 			tolua_function(tolua_S, "DoWithFurnaceAt",       tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "UpdateSign",            tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlugin");
