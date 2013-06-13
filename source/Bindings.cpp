@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/12/13 14:28:57.
+** Generated automatically by tolua++-1.0.92 on 06/13/13 08:12:33.
 */
 
 #ifndef __cplusplus
@@ -15487,6 +15487,71 @@ tolua_lerror:
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsSlotEmpty of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_IsSlotEmpty00
+static int tolua_AllToLua_cItemGrid_IsSlotEmpty00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cItemGrid* self = (const cItemGrid*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSlotEmpty'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSlotEmpty(a_SlotNum);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSlotEmpty'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsSlotEmpty of class  cItemGrid */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_IsSlotEmpty01
+static int tolua_AllToLua_cItemGrid_IsSlotEmpty01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const cItemGrid* self = (const cItemGrid*)  tolua_tousertype(tolua_S,1,0);
+  int a_X = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_Y = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSlotEmpty'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSlotEmpty(a_X,a_Y);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_AllToLua_cItemGrid_IsSlotEmpty00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Clear of class  cItemGrid */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cItemGrid_Clear00
 static int tolua_AllToLua_cItemGrid_Clear00(lua_State* tolua_S)
@@ -27698,6 +27763,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetSlot",tolua_AllToLua_cItemGrid_SetSlot03);
    tolua_function(tolua_S,"EmptySlot",tolua_AllToLua_cItemGrid_EmptySlot00);
    tolua_function(tolua_S,"EmptySlot",tolua_AllToLua_cItemGrid_EmptySlot01);
+   tolua_function(tolua_S,"IsSlotEmpty",tolua_AllToLua_cItemGrid_IsSlotEmpty00);
+   tolua_function(tolua_S,"IsSlotEmpty",tolua_AllToLua_cItemGrid_IsSlotEmpty01);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cItemGrid_Clear00);
    tolua_function(tolua_S,"HowManyCanFit",tolua_AllToLua_cItemGrid_HowManyCanFit00);
    tolua_function(tolua_S,"AddItem",tolua_AllToLua_cItemGrid_AddItem00);

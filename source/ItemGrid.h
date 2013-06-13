@@ -62,6 +62,12 @@ public:
 	void EmptySlot(int a_X, int a_Y);
 	void EmptySlot(int a_SlotNum);
 	
+	/// Returns true if the specified slot is empty or the slot doesn't exist
+	bool IsSlotEmpty(int a_SlotNum) const;
+	
+	/// Returns true if the specified slot is empty or the slot doesn't exist
+	bool IsSlotEmpty(int a_X, int a_Y) const;
+	
 	/// Sets all items as empty
 	void Clear(void);
 	

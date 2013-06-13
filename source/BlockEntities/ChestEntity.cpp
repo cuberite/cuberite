@@ -101,15 +101,20 @@ void cChestEntity::SendTo(cClientHandle & a_Client)
 
 void cChestEntity::UsedBy(cPlayer * a_Player)
 {
-	if (GetWindow() == NULL)
+	// If the window is not created, open it anew:
+	cWindow * Window = GetWindow();
+	if (Window == NULL)
 	{
 		OpenNewWindow();
+		Window = GetWindow();
 	}
-	if (GetWindow())
+	
+	// Open the window for the player:
+	if (Window != NULL)
 	{
-		if( a_Player->GetWindow() != GetWindow() )
+		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow( GetWindow() );
+			a_Player->OpenWindow(Window);
 		}
 	}
 

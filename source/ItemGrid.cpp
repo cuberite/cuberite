@@ -175,6 +175,31 @@ void cItemGrid::EmptySlot(int a_SlotNum)
 
 
 
+bool cItemGrid::IsSlotEmpty(int a_SlotNum) const
+{
+	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
+	{
+		LOGWARNING("%s: Invalid slot number %d out of %d slots",
+			__FUNCTION__, a_SlotNum, m_NumSlots
+		);
+		return true;
+	}
+	return m_Slots[a_SlotNum].IsEmpty();
+}
+
+
+
+
+
+bool cItemGrid::IsSlotEmpty(int a_X, int a_Y) const
+{
+	return IsSlotEmpty(GetSlotNum(a_X, a_Y));
+}
+
+
+
+
+
 void cItemGrid::Clear(void)
 {
 	for (int i = 0; i < m_NumSlots; i++)
