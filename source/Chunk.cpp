@@ -16,6 +16,7 @@
 #include "BlockEntities/DispenserEntity.h"
 #include "BlockEntities/DropperEntity.h"
 #include "BlockEntities/FurnaceEntity.h"
+#include "BlockEntities/HopperEntity.h"
 #include "BlockEntities/JukeboxEntity.h"
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
@@ -1222,7 +1223,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cChestEntity( x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+							m_BlockEntities.push_back(new cChestEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
 						}
 						break;
 					}
@@ -1231,7 +1232,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cDispenserEntity( x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+							m_BlockEntities.push_back(new cDispenserEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
 						}
 						break;
 					}
@@ -1249,9 +1250,17 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cFurnaceEntity( x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+							m_BlockEntities.push_back(new cFurnaceEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
 						}
 						break;
+					}
+					
+					case E_BLOCK_HOPPER:
+					{
+						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						{
+							m_BlockEntities.push_back(new cHopperEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
+						}
 					}
 					
 					case E_BLOCK_SIGN_POST:
@@ -1259,7 +1268,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back( new cSignEntity( BlockType, x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+							m_BlockEntities.push_back( new cSignEntity(BlockType, x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
 						}
 						break;
 					}
@@ -1268,7 +1277,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back(new cNoteEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+							m_BlockEntities.push_back(new cNoteEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
 						}
 						break;
 					}
@@ -1277,7 +1286,7 @@ void cChunk::CreateBlockEntities(void)
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back(new cJukeboxEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World) );
+							m_BlockEntities.push_back(new cJukeboxEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
 						}
 						break;
 					}
@@ -1434,28 +1443,33 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 	{
 		case E_BLOCK_CHEST:
 		{
-			AddBlockEntity( new cChestEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			AddBlockEntity(new cChestEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_DISPENSER:
 		{
-			AddBlockEntity( new cDispenserEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			AddBlockEntity(new cDispenserEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_DROPPER:
 		{
-			AddBlockEntity( new cDropperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			AddBlockEntity(new cDropperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_FURNACE:
 		{
-			AddBlockEntity( new cFurnaceEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			AddBlockEntity(new cFurnaceEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			break;
+		}
+		case E_BLOCK_HOPPER:
+		{
+			AddBlockEntity(new cHopperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:
 		{
-			AddBlockEntity( new cSignEntity( (ENUM_BLOCK_ID)a_BlockType, WorldPos.x, WorldPos.y, WorldPos.z, m_World) );
+			AddBlockEntity(new cSignEntity(a_BlockType, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
 		case E_BLOCK_NOTE_BLOCK:

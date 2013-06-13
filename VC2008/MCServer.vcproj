@@ -2357,6 +2357,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\BlockEntities\HopperEntity.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\BlockEntities\HopperEntity.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\BlockEntities\JukeboxEntity.cpp"
 					>
 				</File>

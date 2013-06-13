@@ -131,9 +131,10 @@ protected:
 	void LoadDispenserFromNBT (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDropperFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFurnaceFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadSignFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadNoteFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadHopperFromNBT    (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadJukeboxFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadNoteFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSignFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, int a_IDTagLength);
 	

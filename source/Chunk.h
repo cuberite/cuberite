@@ -310,6 +310,9 @@ public:
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
+	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
+
 private:
 
 	friend class cChunkMap;
@@ -362,8 +365,6 @@ private:
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);
-	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
-	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
 
 	void SpreadLightOfBlock(NIBBLETYPE * a_LightBuffer, int a_X, int a_Y, int a_Z, char a_Falloff);
 

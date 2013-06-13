@@ -11,6 +11,7 @@
 #include "../Inventory.h"
 #include "../Items/ItemHandler.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/HopperEntity.h"
 
 
 
@@ -607,6 +608,40 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 
 
 
+void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
+{
+	// Translate local slot num into global slot num:
+	int SlotNum = 0;
+	bool HasFound = false;
+	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		if (a_Area == *itr)
+		{
+			SlotNum += a_LocalSlotNum;
+			HasFound = true;
+			break;
+		}
+		SlotNum += (*itr)->GetNumSlots();
+	}  // for itr - m_SlotAreas[]
+	if (!HasFound)
+	{
+		LOGWARNING("%s: Invalid slot area parameter", __FUNCTION__);
+		ASSERT(!"Invalid slot area");
+		return;
+	}
+	
+	// Broadcast the update packet:
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, SlotNum, *a_Area->GetSlot(a_LocalSlotNum, **itr));
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
 void cWindow::SendWholeWindow(cClientHandle & a_Client)
 {
 	a_Client.SendWholeInventory(*this);
@@ -741,7 +776,24 @@ cChestWindow::~cChestWindow()
 cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
 	cWindow(cWindow::DropSpenser, "MCS-DropSpenser")
 {
+	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaDropSpenser(a_DropSpenser, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cHopperWindow:
+
+cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper) :
+	super(cWindow::Hopper, "MCS-Hopper")
+{
+	m_ShouldDistributeToHotbarFirst = false;
+	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
@@ -756,6 +808,7 @@ cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ,
 cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :
 	cWindow(cWindow::Furnace, "MCS-Furnace")
 {
+	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));

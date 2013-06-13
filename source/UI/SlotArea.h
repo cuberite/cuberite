@@ -143,18 +143,24 @@ public:
 
 /// Handles any slot area that is representing a cItemGrid; same items for all the players
 class cSlotAreaItemGrid :
-	public cSlotArea
+	public cSlotArea,
+	public cItemGrid::cListener
 {
 	typedef cSlotArea super;
 	
 public:
 	cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow);
 	
+	virtual ~cSlotAreaItemGrid();
+	
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
 protected:
 	cItemGrid & m_ItemGrid;
+	
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 } ;
 
 

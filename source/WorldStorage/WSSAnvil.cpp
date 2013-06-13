@@ -13,6 +13,7 @@
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
+#include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
@@ -568,6 +569,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "Hopper", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadHopperFromNBT(a_BlockEntities, a_NBT, Child);
+		}
 		else if (strncmp(a_NBT.GetData(sID), "Music", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadNoteFromNBT(a_BlockEntities, a_NBT, Child);
@@ -721,7 +726,7 @@ void cWSSAnvil::LoadDropperFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
+		return;  // Make it an empty dropper - the chunk loader will provide an empty cDropperEntity for this
 	}
 	std::auto_ptr<cDropperEntity> Dropper(new cDropperEntity(x, y, z, m_World));
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
@@ -781,6 +786,70 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 
 
 
+void cWSSAnvil::LoadHopperFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
+	{
+		return;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
+	}
+	std::auto_ptr<cHopperEntity> Hopper(new cHopperEntity(x, y, z, m_World));
+	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
+	a_BlockEntities.push_back(Hopper.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadJukeboxFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cJukeboxEntity> Jukebox(new cJukeboxEntity(x, y, z, m_World));
+	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
+	if (Record >= 0)
+	{
+		Jukebox->SetRecord(a_NBT.GetInt(Record));
+	}
+	a_BlockEntities.push_back(Jukebox.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadNoteFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cNoteEntity> Note(new cNoteEntity(x, y, z, m_World));
+	int note = a_NBT.FindChildByName(a_TagIdx, "note");
+	if (note >= 0)
+	{
+		Note->SetPitch(a_NBT.GetByte(note));
+	}
+	a_BlockEntities.push_back(Note.release());
+}
+
+
+
+
+
 void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
@@ -816,47 +885,6 @@ void cWSSAnvil::LoadSignFromNBT(cBlockEntityList & a_BlockEntities, const cParse
 	}
 
 	a_BlockEntities.push_back(Sign.release());
-}
-
-
-
-
-void cWSSAnvil::LoadNoteFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
-	int x, y, z;
-	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
-	{
-		return;
-	}
-	std::auto_ptr<cNoteEntity> Note(new cNoteEntity(x, y, z, m_World));
-	int note = a_NBT.FindChildByName(a_TagIdx, "note");
-	if (note >= 0)
-	{
-		Note->SetPitch(a_NBT.GetByte(note));
-	}
-	a_BlockEntities.push_back(Note.release());
-}
-
-
-
-
-
-void cWSSAnvil::LoadJukeboxFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
-{
-	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
-	int x, y, z;
-	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
-	{
-		return;
-	}
-	std::auto_ptr<cJukeboxEntity> Jukebox(new cJukeboxEntity(x, y, z, m_World));
-	int Record = a_NBT.FindChildByName(a_TagIdx, "Record");
-	if (Record >= 0)
-	{
-		Jukebox->SetRecord(a_NBT.GetInt(Record));
-	}
-	a_BlockEntities.push_back(Jukebox.release());
 }
 
 

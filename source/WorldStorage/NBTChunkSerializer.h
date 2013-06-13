@@ -20,12 +20,13 @@ class cFastNBTWriter;
 class cEntity;
 class cBlockEntity;
 class cChestEntity;
-class cFurnaceEntity;
 class cDispenserEntity;
 class cDropperEntity;
-class cSignEntity;
-class cNoteEntity;
+class cFurnaceEntity;
+class cHopperEntity;
 class cJukeboxEntity;
+class cNoteEntity;
+class cSignEntity;
 class cFallingBlock;
 class cMinecart;
 class cMinecartWithChest;
@@ -78,17 +79,18 @@ protected:
 	void AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum = 0);
 	
 	// Block entities:
-	void AddBasicTileEntity(cBlockEntity * a_Entity, const char * a_EntityTypeID);
-	void AddChestEntity(cChestEntity * a_Entity);
+	void AddBasicTileEntity(cBlockEntity *     a_Entity, const char * a_EntityTypeID);
+	void AddChestEntity    (cChestEntity *     a_Entity);
 	void AddDispenserEntity(cDispenserEntity * a_Entity);
-	void AddDropperEntity(cDropperEntity * a_Entity);
-	void AddFurnaceEntity(cFurnaceEntity * a_Furnace);
-	void AddSignEntity(cSignEntity * a_Sign);
-	void AddNoteEntity(cNoteEntity * a_Note);
-	void AddJukeboxEntity(cJukeboxEntity * a_Jukebox);
-	void AddBasicEntity(cEntity * a_Entity, const AString & a_ClassName);
+	void AddDropperEntity  (cDropperEntity *   a_Entity);
+	void AddFurnaceEntity  (cFurnaceEntity *   a_Furnace);
+	void AddHopperEntity   (cHopperEntity *    a_Entity);
+	void AddJukeboxEntity  (cJukeboxEntity *   a_Jukebox);
+	void AddNoteEntity     (cNoteEntity *      a_Note);
+	void AddSignEntity     (cSignEntity *      a_Sign);
 	
 	// Entities:
+	void AddBasicEntity       (cEntity * a_Entity, const AString & a_ClassName);
 	void AddFallingBlockEntity(cFallingBlock * a_FallingBlock);
 	void AddMinecartEntity    (cMinecart * a_Minecart);
 	void AddMonsterEntity     (cMonster * a_Monster);

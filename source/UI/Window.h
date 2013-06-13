@@ -21,6 +21,7 @@ class cClientHandle;
 class cChestEntity;
 class cDropSpenserEntity;
 class cFurnaceEntity;
+class cHopperEntity;
 class cSlotArea;
 class cWorld;
 
@@ -110,8 +111,16 @@ public:
 	/// Called when a player closes this window; notifies all slot areas. Returns true if close accepted
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse);
 
+	/// Sends the specified slot's contents to all clients of this window; the slot is specified as local in an area
+	void BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum);
+	
+	/// Sends the contents of the whole window to the specified client
 	void SendWholeWindow(cClientHandle & a_Client);
+	
+	/// Sends the contents of the whole window to all clients of this window.
 	void BroadcastWholeWindow(void);
+	
+	/// Sends the progressbar to all clients of this window
 	void BroadcastInventoryProgress(short a_Progressbar, short a_Value);
 
 	// tolua_begin
@@ -194,6 +203,7 @@ protected:
 class cCraftingWindow :
 	public cWindow
 {
+	typedef cWindow super;
 public:
 	cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
 } ;
@@ -205,6 +215,7 @@ public:
 class cFurnaceWindow :
 	public cWindow
 {
+	typedef cWindow super;
 public:
 	cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace);
 } ;
@@ -216,8 +227,21 @@ public:
 class cDropSpenserWindow :
 	public cWindow
 {
+	typedef cWindow super;
 public:
 	cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_Dispenser);
+} ;
+
+
+
+
+
+class cHopperWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper);
 } ;
 
 

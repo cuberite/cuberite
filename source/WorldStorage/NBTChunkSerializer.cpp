@@ -9,6 +9,7 @@
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
+#include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
@@ -175,14 +176,25 @@ void cNBTChunkSerializer::AddFurnaceEntity(cFurnaceEntity * a_Furnace)
 
 
 
-void cNBTChunkSerializer::AddSignEntity(cSignEntity * a_Sign)
+void cNBTChunkSerializer::AddHopperEntity(cHopperEntity * a_Entity)
 {
 	m_Writer.BeginCompound("");
-	AddBasicTileEntity(a_Sign, "Sign");
-	m_Writer.AddString("Text1",   a_Sign->GetLine(0));
-	m_Writer.AddString("Text2",   a_Sign->GetLine(1));
-	m_Writer.AddString("Text3",   a_Sign->GetLine(2));
-	m_Writer.AddString("Text4",   a_Sign->GetLine(3));
+		AddBasicTileEntity(a_Entity, "Hopper");
+		m_Writer.BeginList("Items", TAG_Compound);
+			AddItemGrid(a_Entity->GetContents());
+		m_Writer.EndList();
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Jukebox, "RecordPlayer");
+		m_Writer.AddInt("Record", a_Jukebox->GetRecord());
 	m_Writer.EndCompound();
 }
 
@@ -202,11 +214,14 @@ void cNBTChunkSerializer::AddNoteEntity(cNoteEntity * a_Note)
 
 
 
-void cNBTChunkSerializer::AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
+void cNBTChunkSerializer::AddSignEntity(cSignEntity * a_Sign)
 {
 	m_Writer.BeginCompound("");
-		AddBasicTileEntity(a_Jukebox, "RecordPlayer");
-		m_Writer.AddInt("Record", a_Jukebox->GetRecord());
+	AddBasicTileEntity(a_Sign, "Sign");
+	m_Writer.AddString("Text1",   a_Sign->GetLine(0));
+	m_Writer.AddString("Text2",   a_Sign->GetLine(1));
+	m_Writer.AddString("Text3",   a_Sign->GetLine(2));
+	m_Writer.AddString("Text4",   a_Sign->GetLine(3));
 	m_Writer.EndCompound();
 }
 
@@ -428,6 +443,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		case E_BLOCK_DISPENSER:  AddDispenserEntity ((cDispenserEntity *) a_Entity); break;
 		case E_BLOCK_DROPPER:    AddDropperEntity   ((cDropperEntity *)   a_Entity); break;
 		case E_BLOCK_FURNACE:    AddFurnaceEntity   ((cFurnaceEntity *)   a_Entity); break;
+		case E_BLOCK_HOPPER:     AddHopperEntity    ((cHopperEntity *)    a_Entity); break;
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_WALLSIGN:   AddSignEntity      ((cSignEntity *)      a_Entity); break;
 		case E_BLOCK_NOTE_BLOCK: AddNoteEntity      ((cNoteEntity *)      a_Entity); break;

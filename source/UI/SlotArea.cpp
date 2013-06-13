@@ -665,6 +665,16 @@ cSlotAreaItemGrid::cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentW
 	super(a_ItemGrid.GetNumSlots(), a_ParentWindow),
 	m_ItemGrid(a_ItemGrid)
 {
+	m_ItemGrid.AddListener(*this);
+}
+
+
+
+
+
+cSlotAreaItemGrid::~cSlotAreaItemGrid()
+{
+	m_ItemGrid.RemoveListener(*this);
 }
 
 
@@ -683,6 +693,16 @@ const cItem * cSlotAreaItemGrid::GetSlot(int a_SlotNum, cPlayer & a_Player) cons
 void cSlotAreaItemGrid::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	m_ItemGrid.SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cSlotAreaItemGrid::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	ASSERT(a_ItemGrid == &m_ItemGrid);
+	m_ParentWindow.BroadcastSlot(this, a_SlotNum);
 }
 
 

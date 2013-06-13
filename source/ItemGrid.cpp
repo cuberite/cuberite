@@ -616,9 +616,13 @@ void cItemGrid::RemoveListener(cListener & a_Listener)
 
 void cItemGrid::TriggerListeners(int a_SlotNum)
 {
-	cCSLock Lock(m_CSListeners);
-	m_IsInTriggerListeners = true;
-	for (cListeners::iterator itr = m_Listeners.begin(), end = m_Listeners.end(); itr != end; ++itr)
+	cListeners Listeners;
+	{
+		cCSLock Lock(m_CSListeners);
+		m_IsInTriggerListeners = true;
+		Listeners = m_Listeners;
+	}
+	for (cListeners::iterator itr = Listeners.begin(), end = Listeners.end(); itr != end; ++itr)
 	{
 		(*itr)->OnSlotChanged(this, a_SlotNum);
 	}  // for itr - m_Listeners[]
