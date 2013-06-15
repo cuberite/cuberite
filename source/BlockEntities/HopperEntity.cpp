@@ -279,7 +279,8 @@ bool cHopperEntity::MoveItemsFromGrid(cItemGrid & a_Grid)
 /// Moves one of the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
 bool cHopperEntity::MoveItemsFromSlot(const cItem & a_ItemStack, bool a_AllowNewStacks)
 {
-	if (m_Contents.AddItem(a_ItemStack.CopyOne(), a_AllowNewStacks) > 0)
+	cItem One(a_ItemStack.CopyOne());
+	if (m_Contents.AddItem(One, a_AllowNewStacks) > 0)
 	{
 		return true;
 	}
