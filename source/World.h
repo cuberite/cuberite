@@ -66,6 +66,19 @@ public:
 		dimEnd = 1,
 	} ;
 
+	// tolua_end
+	
+	/// A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor
+	class cLock :
+		public cCSLock
+	{
+		typedef cCSLock super;
+	public:
+		cLock(cWorld & a_World);
+	} ;
+
+	// tolua_begin
+
 	static const char * GetClassStatic(void)
 	{
 		return "cWorld";

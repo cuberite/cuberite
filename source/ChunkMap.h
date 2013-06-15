@@ -298,6 +298,9 @@ public:
 	
 	/// Queues the specified block for ticking (block update)
 	void QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	/// Returns the CS for locking the chunkmap; only cWorld::cLock may use this function!
+	cCriticalSection & GetCS(void) { return m_CSLayers; }
 
 private:
 

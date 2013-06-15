@@ -1957,7 +1957,17 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 {
 	// Data is received from the client, hand it off to the protocol:
-	m_Protocol->DataReceived(a_Data, a_Size);
+	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
+	{
+		// Lock the world, so that plugins reacting to protocol events have already the chunkmap locked
+		cWorld::cLock(*m_Player->GetWorld());
+		
+		m_Protocol->DataReceived(a_Data, a_Size);
+	}
+	else
+	{
+		m_Protocol->DataReceived(a_Data, a_Size);
+	}
 	m_TimeSinceLastPacket = 0;
 }
 
