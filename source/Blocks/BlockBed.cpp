@@ -75,7 +75,7 @@ void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, i
 				}
 			}
 		} else {
-			a_Player->SendMessageA("You can only sleep at night");
+			a_Player->SendMessage("You can only sleep at night");
 		}
 	}
 }
