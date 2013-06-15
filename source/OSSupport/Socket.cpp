@@ -193,20 +193,6 @@ cSocket cSocket::CreateSocket(eFamily a_Family)
 
 
 
-unsigned long cSocket::INTERNET_ADDRESS_LOCALHOST(void)
-{
-	static unsigned long LocalHost = 0;
-	if (LocalHost == 0)
-	{
-		LocalHost = inet_addr("127.0.0.1");  // GCC won't accept this as a global var assignment
-	}
-	return LocalHost;
-}
-
-
-
-
-
 bool cSocket::BindToAnyIPv4(unsigned short a_Port)
 {
 	sockaddr_in local;
@@ -246,7 +232,7 @@ bool cSocket::BindToLocalhostIPv4(unsigned short a_Port)
 	memset(&local, 0, sizeof(local));
 
 	local.sin_family = AF_INET;;
-	local.sin_addr.s_addr = INTERNET_ADDRESS_LOCALHOST();
+	local.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	local.sin_port = htons((u_short)a_Port);
 
 	return (bind(m_Socket, (sockaddr*)&local, sizeof(local)) == 0);
@@ -337,7 +323,7 @@ bool cSocket::ConnectToLocalhostIPv4(unsigned short a_Port)
 {
 	sockaddr_in server;
 	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = INTERNET_ADDRESS_LOCALHOST();
+	server.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	server.sin_port = htons(a_Port);
 	return (connect(m_Socket, (sockaddr *)&server, sizeof(server)) == 0);
 }

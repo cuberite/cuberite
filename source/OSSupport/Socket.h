@@ -61,7 +61,6 @@ public:
 	
 	static bool IsValidSocket(xSocket a_Socket);
 
-	static unsigned long INTERNET_ADDRESS_LOCALHOST(void);  // 127.0.0.1 represented in network byteorder; must be a function due to GCC :(
 	static const unsigned short ANY_PORT = 0;  // When given to Bind() functions, they will find a free port
 	static const int DEFAULT_BACKLOG = 10;
 
