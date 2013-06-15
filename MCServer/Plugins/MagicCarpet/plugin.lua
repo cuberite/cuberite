@@ -13,7 +13,7 @@ function Initialize( Plugin )
 	
 	PluginManager:BindCommand("/mc", "magiccarpet", HandleCarpetCommand, " - Spawns a magical carpet");
 
-	Log( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
+	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
 end
 
@@ -22,7 +22,7 @@ end
 
 
 function OnDisable()
-	Log( PLUGIN:GetName() .. " v." .. PLUGIN:GetVersion() .. " is shutting down..." )
+	LOG( PLUGIN:GetName() .. " v." .. PLUGIN:GetVersion() .. " is shutting down..." )
 	for i, Carpet in pairs( Carpets ) do
 		Carpet:remove()
 	end
