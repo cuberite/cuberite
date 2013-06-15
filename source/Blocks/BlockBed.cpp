@@ -53,19 +53,29 @@ void cBlockBedHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY,
 
 void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-	if (Meta & 0x8)
+	if (a_World->GetDimension() != 0)
 	{
-		// Is pillow	
-		a_World->BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
-	}
-	else
-	{
-		// Is foot end
-		Vector3i Direction = MetaDataToDirection( Meta & 0x7 );
-		if (a_World->GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
+		a_World->DoExplosiontAt(5, a_BlockX, a_BlockY, a_BlockZ);
+	} else {
+		if (a_World->GetTimeOfDay() > 13000)
 		{
-			a_World->BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
+			NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+			if (Meta & 0x8)
+			{
+				// Is pillow	
+				a_World->BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			}
+			else
+			{
+				// Is foot end
+				Vector3i Direction = MetaDataToDirection( Meta & 0x7 );
+				if (a_World->GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
+				{
+					a_World->BroadcastUseBed(*a_Player, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z);
+				}
+			}
+		} else {
+			a_Player->SendMessageA("You can only sleep at night");
 		}
 	}
 }
