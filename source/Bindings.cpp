@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/13/13 08:12:33.
+** Generated automatically by tolua++-1.0.92 on 06/15/13 20:05:13.
 */
 
 #ifndef __cplusplus
@@ -4004,6 +4004,38 @@ static int tolua_AllToLua_cEntity_IsMinecart00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsMinecart'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsTNT of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsTNT00
+static int tolua_AllToLua_cEntity_IsTNT00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsTNT'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsTNT();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsTNT'.",&tolua_err);
  return 0;
 #endif
 }
@@ -27271,6 +27303,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsPickup",tolua_AllToLua_cEntity_IsPickup00);
    tolua_function(tolua_S,"IsMob",tolua_AllToLua_cEntity_IsMob00);
    tolua_function(tolua_S,"IsMinecart",tolua_AllToLua_cEntity_IsMinecart00);
+   tolua_function(tolua_S,"IsTNT",tolua_AllToLua_cEntity_IsTNT00);
    tolua_function(tolua_S,"IsA",tolua_AllToLua_cEntity_IsA00);
    tolua_function(tolua_S,"GetClass",tolua_AllToLua_cEntity_GetClass00);
    tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cEntity_GetClassStatic00);
