@@ -16,6 +16,9 @@
 
 
 
+// fwd:
+class cItemHandler;
+
 namespace Json
 {
 	class Value;
@@ -110,6 +113,9 @@ public:
 	/// Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items
 	cItem CopyOne(void) const;
 	
+	/// Adds the specified count to this object and returns the reference to self (useful for chaining)
+	cItem & AddCount(char a_AmountToAdd);
+	
 	/// Returns the maximum damage value that this item can have; zero if damage is not applied
 	short GetMaxDamage(void) const;
 	
@@ -120,14 +126,26 @@ public:
 	
 	/// Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.) ItemCounts are ignored!
 	bool IsStackableWith(const cItem & a_OtherStack) const;
+	
+	/// Returns true if the item is stacked up to its maximum stacking.
+	bool IsFullStack(void) const;
 
 	// tolua_end
-	void GetJson( Json::Value & a_OutValue ) const;
-	void FromJson( const Json::Value & a_Value );
-	// tolua_begin
 	
+	/// Returns the cItemHandler responsible for this item type
+	cItemHandler * GetHandler(void) const;
+	
+	/// Saves the item data into JSON representation
+	void GetJson(Json::Value & a_OutValue) const;
+	
+	/// Loads the item data from JSON representation
+	void FromJson(const Json::Value & a_Value);
+	
+	/// Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements)
 	static bool IsEnchantable(short a_ItemType);
 
+	// tolua_begin
+	
 	short         m_ItemType;
 	char          m_ItemCount;
 	short         m_ItemDamage;

@@ -3,6 +3,7 @@
 
 #include "Item.h"
 #include <json/json.h>
+#include "Items/ItemHandler.h"
 
 
 
@@ -13,6 +14,20 @@ cItem cItem::CopyOne(void) const
 	cItem res(*this);
 	res.m_ItemCount = 1;
 	return res;
+}
+
+
+
+
+
+cItem & cItem::AddCount(char a_AmountToAdd)
+{
+	m_ItemCount += a_AmountToAdd;
+	if (m_ItemCount <= 0)
+	{
+		Empty();
+	}
+	return *this;
 }
 
 
@@ -91,6 +106,25 @@ bool cItem::IsStackableWith(const cItem & a_OtherStack) const
 	}
 	
 	return true;
+}
+
+
+
+
+
+bool cItem::IsFullStack(void) const
+{
+	return (m_ItemCount >= ItemHandler(m_ItemType)->GetMaxStackSize());
+}
+
+
+
+
+
+/// Returns the cItemHandler responsible for this item type
+cItemHandler * cItem::GetHandler(void) const
+{
+	return ItemHandler(m_ItemType);
 }
 
 
