@@ -4,7 +4,7 @@ function HandleItemCommand(Split, Player)
 		return true;
 	end
 
-	local Item = cItem(E_ITEM_EMPTY, 1);
+	local Item = cItem();
 	local FoundItem = StringToItem(Split[2], Item);
 	
 	if not(IsValidItem(Item.m_ItemType)) then  -- StringToItem does not check if item is valid
