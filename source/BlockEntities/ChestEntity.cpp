@@ -56,8 +56,8 @@ bool cChestEntity::LoadFromJson(const Json::Value & a_Value)
 	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
 	{
 		cItem Item;
-		Item.FromJson( *itr );
-		SetSlot( SlotIdx, Item );
+		Item.FromJson(*itr);
+		SetSlot(SlotIdx, Item);
 		SlotIdx++;
 	}
 	return true;

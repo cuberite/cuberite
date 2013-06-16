@@ -276,32 +276,16 @@ protected:
 
 
 
-class cSlotAreaDropSpenser :
-	public cSlotArea
-{
-	typedef cSlotArea super;
-	
-public:
-	cSlotAreaDropSpenser(cDropSpenserEntity * a_DropSpenser, cWindow & a_ParentWindow);
-	
-	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
-	
-protected:
-	cDropSpenserEntity * m_DropSpenser;
-} ;
-
-
-
-
-
 class cSlotAreaFurnace :
-	public cSlotArea
+	public cSlotArea,
+	public cItemGrid::cListener
 {
 	typedef cSlotArea super;
 	
 public:
 	cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow);
+	
+	virtual ~cSlotAreaFurnace();
 	
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
@@ -309,6 +293,9 @@ public:
 	
 protected:
 	cFurnaceEntity * m_Furnace;
+
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 } ;
 
 

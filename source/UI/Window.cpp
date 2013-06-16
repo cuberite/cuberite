@@ -11,6 +11,7 @@
 #include "../Inventory.h"
 #include "../Items/ItemHandler.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 
 
@@ -777,7 +778,7 @@ cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ,
 	cWindow(cWindow::DropSpenser, "MCS-DropSpenser")
 {
 	m_ShouldDistributeToHotbarFirst = false;
-	m_SlotAreas.push_back(new cSlotAreaDropSpenser(a_DropSpenser, *this));
+	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }

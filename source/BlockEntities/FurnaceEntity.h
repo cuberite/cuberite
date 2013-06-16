@@ -1,9 +1,9 @@
 
 #pragma once
 
-#include "BlockEntity.h"
+#include "BlockEntityWithItems.h"
 #include "../UI/WindowOwner.h"
-#include "../Item.h"
+#include "../FurnaceRecipe.h"
 
 
 
@@ -21,14 +21,33 @@ class cServer;
 
 
 
-class cFurnaceEntity :
-	public cBlockEntity,
-	public cBlockEntityWindowOwner
+class cFurnaceEntity :  // tolua_export
+	public cBlockEntityWindowOwner,
+	// tolua_begin
+	public cBlockEntityWithItems
 {
+	typedef cBlockEntityWithItems super;
+	
 public:
-	cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
+	enum
+	{
+		fsInput  = 0,  // Input slot number
+		fsFuel   = 1,  // Fuel slot number
+		fsOutput = 2,  // Output slot number
+		
+		ContentsWidth  = 3,
+		ContentsHeight = 1,
+	};
+	
+	/// Constructor used while generating a chunk; sets m_World to NULL
+	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	// tolua_end
+	
+	/// Constructor used for normal operation
+	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	
 	virtual ~cFurnaceEntity();
-	virtual void Destroy();
 
 	static const char * GetClassStatic() { return "cFurnaceEntity"; }
 
@@ -40,36 +59,97 @@ public:
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 
-	bool StartCooking(void);
-	
 	/// Restarts cooking. Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active. Returns true if cooking.
 	bool ContinueCooking(void);
 
 	void ResetCookTimer();
 	
-	const cItem * GetSlot(int i) const { return &(m_Items[i]); }
+	// tolua_begin
 	
-	void SetSlot(int a_Slot, const cItem & a_Item);
+	/// Returns the item in the input slot
+	const cItem & GetInputSlot(void) const { return GetSlot(fsInput); }
 	
-	float GetTimeCooked(void) const {return m_TimeCooked; }
-	float GetTimeToBurn(void) const {return m_BurnTime - m_TimeBurned; }
+	/// Returns the item in the fuel slot
+	const cItem & GetFuelSlot(void) const { return GetSlot(fsFuel); }
 	
-	void SetBurnTimes(float a_BurnTime, float a_TimeBurned) {m_BurnTime = a_BurnTime; m_TimeBurned = 0; }
-	void SetCookTimes(float a_CookTime, float a_TimeCooked) {m_CookTime = a_CookTime; m_TimeCooked = a_TimeCooked; }
+	/// Returns the item in the output slot
+	const cItem & GetOutputSlot(void) const { return GetSlot(fsOutput); }
 	
-private:
+	/// Sets the item in the input slot
+	void SetInputSlot(const cItem & a_Item) { SetSlot(fsInput, a_Item); }
+	
+	/// Sets the item in the fuel slot
+	void SetFuelSlot(const cItem & a_Item) { SetSlot(fsFuel, a_Item); }
+	
+	/// Sets the item in the output slot
+	void SetOutputSlot(const cItem & a_Item) { SetSlot(fsOutput, a_Item); }
+	
+	/// Returns the time that the current item has been cooking, in ticks
+	int GetTimeCooked(void) const {return m_TimeCooked; }
+	
+	/// Returns the time until the current item finishes cooking, in ticks
+	int GetCookTimeLeft(void) const { return m_NeedCookTime - m_TimeCooked; }
+	
+	/// Returns the time until the current fuel is depleted, in ticks
+	int GetFuelBurnTimeLeft(void) const {return m_FuelBurnTime - m_TimeBurned; }
+	
+	/// Returns true if there's time left before the current fuel is depleted
+	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
+	
+	// tolua_end
+	
+	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned) {m_FuelBurnTime = a_FuelBurnTime; m_TimeBurned = 0; }
+	void SetCookTimes(int a_NeedCookTime, int a_TimeCooked) {m_NeedCookTime = a_NeedCookTime; m_TimeCooked = a_TimeCooked; }
+	
+protected:
 
-	cItem * m_Items;
-	cItem * m_CookingItem;
+	/// The recipe for the current input slot
+	const cFurnaceRecipe::Recipe * m_CurrentRecipe;
 	
-	// All timers are in 1 ms
-	float   m_CookTime;    // Amount of time needed to fully cook current item
-	float   m_TimeCooked;  // Amount of time that the current item has been cooking
-	float   m_BurnTime;    // Amount of time that the current fuel can burn (in total); zero if no fuel burning
-	float   m_TimeBurned;  // Amount of time that the current fuel has been burning
+	/// The item that is being smelted
+	cItem m_LastInput;
+	
+	bool m_IsCooking;  ///< Set to true if the furnace is cooking an item
+	
+	// All timers are in ticks
+	int m_NeedCookTime;  ///< Amount of time needed to fully cook current item
+	int m_TimeCooked;    ///< Amount of time that the current item has been cooking
+	int m_FuelBurnTime;  ///< Amount of time that the current fuel can burn (in total); zero if no fuel burning
+	int m_TimeBurned;    ///< Amount of time that the current fuel has been burning
+	
+	int m_LastProgressFuel;  ///< Last value sent as the progress for the fuel
+	int m_LastProgressCook;  ///< Last value sent as the progress for the cooking
 	
 	void BroadcastProgress(int a_ProgressbarID, short a_Value);
-};
+	
+	/// One item finished cooking
+	void FinishOne(cChunk & a_Chunk);
+	
+	/// Starts burning a new fuel, if possible
+	void BurnNewFuel(void);
+	
+	/// Updates the recipe, based on the current input
+	void UpdateInput(void);
+	
+	/// Called when the fuel slot changes or when the fuel is spent, burns another piece of fuel if appropriate
+	void UpdateFuel(void);
+	
+	/// Called when the output slot changes
+	void UpdateOutput(void);
+	
+	/// Updates the m_IsCooking, based on the input slot, output slot and m_FuelBurnTime / m_TimeBurned
+	void UpdateIsCooking(void);
+	
+	/// Returns true if the input can be cooked into output and the item counts allow for another cooking operation
+	bool CanCookInputToOutput(void) const;
+	
+	/// Broadcasts progressbar updates, if needed
+	void UpdateProgressBars(void);
+	
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	
+} ;  // tolua_export
 
 
 

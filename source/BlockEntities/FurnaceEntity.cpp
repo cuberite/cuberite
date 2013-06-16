@@ -4,7 +4,6 @@
 #include "FurnaceEntity.h"
 #include "../UI/Window.h"
 #include "../Player.h"
-#include "../FurnaceRecipe.h"
 #include "../Root.h"
 #include <json/json.h>
 
@@ -23,16 +22,36 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
-	: cBlockEntity( E_BLOCK_FURNACE, a_X, a_Y, a_Z, a_World )
-	, m_Items( new cItem[3] )
-	, m_CookingItem( 0 )
-	, m_CookTime( 0 )
-	, m_TimeCooked( 0 )
-	, m_BurnTime( 0 )
-	, m_TimeBurned( 0 )
+cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
+	m_IsCooking(false),
+	m_NeedCookTime(0),
+	m_TimeCooked(0),
+	m_FuelBurnTime(0),
+	m_TimeBurned(0),
+	m_LastProgressFuel(0),
+	m_LastProgressCook(0)
 {
 	SetBlockEntity(this);  // cBlockEntityWindowOwner
+	m_Contents.AddListener(*this);
+}
+
+
+
+
+
+cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+	m_IsCooking(false),
+	m_NeedCookTime(0),
+	m_TimeCooked(0),
+	m_FuelBurnTime(0),
+	m_TimeBurned(0),
+	m_LastProgressFuel(0),
+	m_LastProgressCook(0)
+{
+	SetBlockEntity(this);  // cBlockEntityWindowOwner
+	m_Contents.AddListener(*this);
 }
 
 
@@ -42,35 +61,11 @@ cFurnaceEntity::cFurnaceEntity(int a_X, int a_Y, int a_Z, cWorld * a_World)
 cFurnaceEntity::~cFurnaceEntity()
 {
 	// Tell window its owner is destroyed
-	if( GetWindow() )
+	cWindow * Window = GetWindow();
+	if (Window != NULL)
 	{
-		GetWindow()->OwnerDestroyed();
+		Window->OwnerDestroyed();
 	}
-
-	// Clean up items
-	if( m_Items )
-	{
-		delete [] m_Items;
-	}
-}
-
-
-
-
-
-void cFurnaceEntity::Destroy()
-{
-	// Drop items
-	cItems Pickups;
-	for( int i = 0; i < 3; i++)
-	{
-		if( !m_Items[i].IsEmpty() )
-		{
-			Pickups.push_back(m_Items[i]);
-			m_Items[i].Empty();
-		}
-	}
-	m_World->SpawnItemPickups(Pickups, m_PosX, m_PosY, m_PosZ);
 }
 
 
@@ -83,13 +78,26 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 	{
 		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
 	}
-	if (GetWindow() != NULL)
+	cWindow * Window = GetWindow();
+	if (Window != NULL)
 	{
-		if (a_Player->GetWindow() != GetWindow())
+		if (a_Player->GetWindow() != Window)
 		{
-			a_Player->OpenWindow(GetWindow());
+			a_Player->OpenWindow(Window);
 		}
 	}
+}
+
+
+
+
+
+/// Restarts cooking. Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active. Returns true if cooking.
+bool cFurnaceEntity::ContinueCooking(void)
+{
+	UpdateInput();
+	UpdateFuel();
+	return m_IsCooking;
 }
 
 
@@ -98,175 +106,36 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 
 bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	/*
-	// DEBUG:
-	Int16 BurnTime = (Int16)(GetTimeToBurn() / 50.0);
-	Int16 CookTime = (Int16)(GetTimeCooked() / 50.0);
-	LOGD("Furnace: BurnTime %d, CookTime %d", BurnTime, CookTime);
-	*/
-
-	if (m_BurnTime <= 0)
+	if (m_FuelBurnTime <= 0)
 	{
-		if (m_TimeCooked > 0)
+		// No fuel is burning, reset progressbars and bail out
+		if ((m_LastProgressCook > 0) || (m_LastProgressFuel > 0))
 		{
-			// We have just finished smelting, reset the progress bar:
-			BroadcastProgress(PROGRESSBAR_SMELTING, 0);
-			m_TimeCooked = 0;
-			m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_FURNACE, m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ));
+			UpdateProgressBars();
 		}
-		// There is no fuel and no flame, no need to tick at all
 		return false;
 	}
+
+	if (m_IsCooking)
+	{
+		m_TimeCooked++;
+		if (m_TimeCooked >= m_NeedCookTime)
+		{
+			// Finished smelting one item
+			FinishOne(a_Chunk);
+		}
+	}
 	
-	// DEBUG: LOGD("Furnace: Left: %0.1f Burned: %0.1f Burn time: %0.1f", m_CookTime - m_TimeCooked, m_TimeBurned, m_BurnTime );
+	m_TimeBurned++;
+	if (m_TimeBurned >= m_FuelBurnTime)
+	{
+		// The current fuel has been exhausted, use another one, if possible
+		BurnNewFuel();
+	}
 	
-	short SmeltingProgress = 0;
-	if ((m_CookingItem != NULL) && ((m_TimeBurned < m_BurnTime) || (m_TimeCooked + a_Dt >= m_CookTime)))
-	{
-		if (m_CookingItem->IsEqual(m_Items[2]) || m_Items[2].IsEmpty())
-		{
-			m_TimeCooked += a_Dt;
-			if ( m_TimeCooked >= m_CookTime )
-			{
-				m_Items[0].m_ItemCount--;
-				if( m_Items[0].IsEmpty() ) m_Items[0].Empty();
-
-				m_Items[2].m_ItemDamage = m_CookingItem->m_ItemDamage;
-				m_Items[2].m_ItemType = m_CookingItem->m_ItemType;
-				m_Items[2].m_ItemCount += m_CookingItem->m_ItemCount;
-				delete m_CookingItem;
-				m_CookingItem = NULL;
-
-				cWindow * Window = GetWindow();
-				if (Window != NULL)
-				{
-					Window->BroadcastWholeWindow();
-				}
-
-				m_TimeCooked -= m_CookTime;
-				StartCooking();
-			}
-			SmeltingProgress = (short)( m_TimeCooked * (180.f / m_CookTime));
-			if (SmeltingProgress > 180) SmeltingProgress = 180;
-			if (SmeltingProgress < 0)   SmeltingProgress = 0;
-		}
-	}
-	BroadcastProgress(PROGRESSBAR_SMELTING, SmeltingProgress);
-
-	m_TimeBurned += a_Dt;
-
-	cWindow * Window = GetWindow();
-	if (m_TimeBurned >= m_BurnTime)
-	{
-		m_TimeBurned -= m_BurnTime;
-		m_BurnTime = 0;
-		if (StartCooking() && (Window != NULL))
-		{
-			Window->BroadcastWholeWindow();
-		}
-	}
-	short Value = 0;
-	if (m_BurnTime > 0.f)
-	{
-		Value = 250 - (short)( m_TimeBurned * (250.f / m_BurnTime));
-		if (Value > 250) Value = 250;
-		if (Value < 0)   Value = 0;
-	}
-	BroadcastProgress(PROGRESSBAR_FUEL, Value);
+	UpdateProgressBars();
 	
-	return ((m_CookingItem != NULL) || (m_TimeBurned < m_BurnTime)) && (m_BurnTime > 0.0); // Keep on ticking, if there's more to cook, or if it's cooking
-}
-
-
-
-
-
-bool cFurnaceEntity::StartCooking(void)
-{
-	cFurnaceRecipe* FR = cRoot::Get()->GetFurnaceRecipe();
-	float BurnTime = FR->GetBurnTime( m_Items[1] );
-	if( (m_TimeBurned < m_BurnTime) || BurnTime > 0.f ) // burnable material
-	{
-		const cFurnaceRecipe::Recipe* R = FR->GetRecipeFrom( m_Items[0] );
-		if (R != NULL) // cook able ingredient
-		{
-			if (m_Items[2].IsEqual(*R->Out) || m_Items[2].IsEmpty())
-			{
-				// good to go
-				m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_LIT_FURNACE, m_World->GetBlockMeta(m_PosX, m_PosY, m_PosZ));
-
-				if( m_TimeBurned >= m_BurnTime ) // burn new material
-				{
-					m_Items[1].m_ItemCount--;
-					if( m_Items[1].m_ItemCount <= 0 ) m_Items[1].Empty();
-					m_TimeBurned = 0;
-					m_BurnTime = BurnTime;
-				}
-
-				if( !m_CookingItem ) // Only cook new item if not already cooking
-				{
-					m_CookingItem = new cItem( *R->Out ); // Resulting item
-					m_TimeCooked = 0.f;
-					m_CookTime = R->CookTime;
-				}
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-
-
-
-
-bool cFurnaceEntity::ContinueCooking(void)
-{
-	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
-	float BurnTime = FR->GetBurnTime( m_Items[1] );
-	if( (m_TimeBurned < m_BurnTime) || BurnTime > 0.f ) // burnable material
-	{
-		const cFurnaceRecipe::Recipe * R = FR->GetRecipeFrom( m_Items[0] );
-		if (R != NULL) // cook able ingredient
-		{
-			if (m_Items[2].IsEqual(*R->Out) || m_Items[2].IsEmpty())
-			{
-				// good to go
-				if (m_CookingItem == NULL) // Only cook new item if not already cooking
-				{
-					m_CookingItem = new cItem( *R->Out ); // Resulting item
-				}
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-
-
-
-
-void cFurnaceEntity::ResetCookTimer()
-{
-	delete m_CookingItem;
-	m_CookingItem = NULL;
-	m_TimeCooked = 0.f;
-	m_CookTime = 0.f;
-}
-
-
-
-
-
-void cFurnaceEntity::SetSlot(int a_Slot, const cItem & a_Item)
-{
-	if ((a_Slot < 0) || (a_Slot >= 3))
-	{
-		ASSERT(!"Furnace: slot number out of range");
-		return;
-	}
-	m_Items[a_Slot] = a_Item;
+	return true;
 }
 
 
@@ -281,28 +150,18 @@ bool cFurnaceEntity::LoadFromJson(const Json::Value & a_Value)
 
 	Json::Value AllSlots = a_Value.get("Slots", 0);
 	int SlotIdx = 0;
-	for( Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr )
+	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
 	{
-		m_Items[ SlotIdx ].FromJson( *itr );
+		cItem Item;
+		Item.FromJson(*itr);
+		SetSlot(SlotIdx, Item);
 		SlotIdx++;
 	}
 
-	// Get currently cooking item
-	Json::Value JsonItem = a_Value.get("Cooking", Json::nullValue );
-	if( !JsonItem.empty() )
-	{
-		cItem Item;
-		Item.FromJson( JsonItem );
-		if( !Item.IsEmpty() )
-		{
-			m_CookingItem = new cItem( Item );
-		}
-	}
-
-	m_CookTime   = (float)a_Value.get("CookTime",   0).asDouble();
-	m_TimeCooked = (float)a_Value.get("TimeCooked", 0).asDouble();
-	m_BurnTime   = (float)a_Value.get("BurnTime",   0).asDouble();
-	m_TimeBurned = (float)a_Value.get("TimeBurned", 0).asDouble();
+	m_NeedCookTime = (int)(a_Value.get("CookTime",   0).asDouble() / 50);
+	m_TimeCooked   = (int)(a_Value.get("TimeCooked", 0).asDouble() / 50);
+	m_FuelBurnTime = (int)(a_Value.get("BurnTime",   0).asDouble() / 50);
+	m_TimeBurned   = (int)(a_Value.get("TimeBurned", 0).asDouble() / 50);
 
 	return true;
 }
@@ -318,26 +177,19 @@ void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
 	a_Value["z"] = m_PosZ;
 
 	Json::Value AllSlots;
-	for(unsigned int i = 0; i < 3; i++)
+	int NumSlots = m_Contents.GetNumSlots();
+	for (int i = 0; i < NumSlots; i++)
 	{
 		Json::Value Slot;
-		m_Items[ i ].GetJson( Slot );
-		AllSlots.append( Slot );
+		m_Contents.GetSlot(i).GetJson(Slot);
+		AllSlots.append(Slot);
 	}
 	a_Value["Slots"] = AllSlots;
 
-	// Currently cooking item
-	if( m_CookingItem )
-	{
-		Json::Value JsonItem;
-		m_CookingItem->GetJson( JsonItem );
-		a_Value["Cooking"] = JsonItem;
-	}
-
-	a_Value["CookTime"] = m_CookTime;
-	a_Value["TimeCooked"] = m_TimeCooked;
-	a_Value["BurnTime"] = m_BurnTime;
-	a_Value["TimeBurned"] = m_TimeBurned;
+	a_Value["CookTime"]   = m_NeedCookTime * 50;
+	a_Value["TimeCooked"] = m_TimeCooked   * 50;
+	a_Value["BurnTime"]   = m_FuelBurnTime * 50;
+	a_Value["TimeBurned"] = m_TimeBurned   * 50;
 }
 
 
@@ -360,6 +212,260 @@ void cFurnaceEntity::BroadcastProgress(int a_ProgressbarID, short a_Value)
 	if (Window != NULL)
 	{
 		Window->BroadcastInventoryProgress(a_ProgressbarID, a_Value);
+	}
+}
+
+
+
+
+
+/// One item finished cooking
+void cFurnaceEntity::FinishOne(cChunk & a_Chunk)
+{
+	m_TimeCooked = 0;
+
+	if (m_Contents.GetSlot(fsOutput).IsEmpty())
+	{
+		m_Contents.SetSlot(fsOutput, *m_CurrentRecipe->Out);
+	}
+	else
+	{
+		m_Contents.ChangeSlotCount(fsOutput, m_CurrentRecipe->Out->m_ItemCount);
+	}
+	m_Contents.ChangeSlotCount(fsInput, -m_CurrentRecipe->In->m_ItemCount);
+	
+	UpdateIsCooking();
+}
+
+
+
+
+
+void cFurnaceEntity::BurnNewFuel(void)
+{
+	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
+	int NewTime = FR->GetBurnTime(m_Contents.GetSlot(fsFuel));
+	if (NewTime == 0)
+	{
+		// The item in the fuel slot is not suitable
+		m_FuelBurnTime = 0;
+		m_TimeBurned = 0;
+		m_IsCooking = false;
+		return;
+	}
+	
+	// Is the input and output ready for cooking?
+	if (!CanCookInputToOutput())
+	{
+		return;
+	}
+
+	// Burn one new fuel:
+	m_FuelBurnTime = NewTime;
+	m_TimeBurned = 0;
+	m_IsCooking = true;
+	if (m_Contents.GetSlot(fsFuel).m_ItemType == E_ITEM_LAVA_BUCKET)
+	{
+		m_Contents.SetSlot(fsFuel, cItem(E_ITEM_BUCKET));
+	}
+	else
+	{
+		m_Contents.ChangeSlotCount(fsFuel, -1);
+	}
+}
+
+
+
+
+
+void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
+	
+	if (m_World == NULL)
+	{
+		// The furnace isn't initialized yet, do no processing
+		return;
+	}
+	
+	ASSERT(a_ItemGrid == &m_Contents);
+	switch (a_SlotNum)
+	{
+		case fsInput:
+		{
+			UpdateInput();
+			break;
+		}
+		
+		case fsFuel:
+		{
+			UpdateFuel();
+			break;
+		}
+		
+		case fsOutput:
+		{
+			UpdateOutput();
+			break;
+		}
+	}
+}
+
+
+
+
+
+
+/// Updates the current recipe, based on the current input
+void cFurnaceEntity::UpdateInput(void)
+{
+	if (!m_Contents.GetSlot(fsInput).IsStackableWith(m_LastInput))
+	{
+		// The input is different from what we had before, reset the cooking time
+		m_TimeCooked = 0;
+	}
+	m_LastInput = m_Contents.GetSlot(fsInput);
+	
+	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
+	m_CurrentRecipe = FR->GetRecipeFrom(m_Contents.GetSlot(fsInput));
+	if (!CanCookInputToOutput())
+	{
+		// This input cannot be cooked
+		m_NeedCookTime = 0;
+		m_IsCooking = false;
+	}
+	else
+	{
+		m_NeedCookTime = m_CurrentRecipe->CookTime;
+		m_IsCooking = true;
+		
+		// Start burning new fuel if there's no flame now:
+		if (GetFuelBurnTimeLeft() <= 0)
+		{
+			BurnNewFuel();
+		}
+	}
+}
+
+
+
+
+
+/// Called when the fuel slot changes or when the fuel is spent, burns another piece of fuel if appropriate
+void cFurnaceEntity::UpdateFuel(void)
+{
+	if (m_FuelBurnTime > m_TimeBurned)
+	{
+		// The current fuel is still burning, don't modify anything:
+		return;
+	}
+	
+	// The current fuel is spent, try to burn some more:
+	BurnNewFuel();
+}
+
+
+
+
+
+/// Called when the output slot changes; starts burning if space became available
+void cFurnaceEntity::UpdateOutput(void)
+{
+	if (!CanCookInputToOutput())
+	{
+		// Cannot cook anymore:
+		m_TimeCooked = 0;
+		m_NeedCookTime = 0;
+		m_IsCooking = false;
+		return;
+	}
+	
+	// No need to burn new fuel, the Tick() function will take care of that
+
+	// Can cook, start cooking if not already underway:
+	m_NeedCookTime = m_CurrentRecipe->CookTime;
+	m_IsCooking = true;
+}
+
+
+
+
+
+/// Updates the m_IsCooking, based on the input slot, output slot and m_FuelBurnTime / m_TimeBurned
+void cFurnaceEntity::UpdateIsCooking(void)
+{
+	if (
+		!CanCookInputToOutput() ||        // Cannot cook this
+		(m_FuelBurnTime <= 0) ||          // No fuel
+		(m_TimeBurned >= m_FuelBurnTime)  // Fuel burnt out
+	)
+	{
+		// Reset everything
+		m_IsCooking = false;
+		m_TimeCooked = 0;
+		m_NeedCookTime = 0;
+		return;
+	}
+	
+	m_IsCooking = true;
+}
+
+
+
+
+
+/// Returns true if the input can be cooked into output and the item counts allow for another cooking operation
+bool cFurnaceEntity::CanCookInputToOutput(void) const
+{
+	if (m_CurrentRecipe == NULL)
+	{
+		// This input cannot be cooked
+		return false;
+	}
+	
+	if (m_Contents.GetSlot(fsOutput).IsEmpty())
+	{
+		// The output is empty, can cook
+		return true;
+	}
+
+	if (!m_Contents.GetSlot(fsOutput).IsStackableWith(*m_CurrentRecipe->Out))
+	{
+		// The output slot is blocked with something that cannot be stacked with the recipe's output
+		return false;
+	}
+	
+	if (m_Contents.GetSlot(fsOutput).IsFullStack())
+	{
+		// Cannot add any more items to the output slot
+		return false;
+	}
+	
+	return true;
+}
+
+
+
+
+
+/// Broadcasts progressbar updates, if needed
+void cFurnaceEntity::UpdateProgressBars(void)
+{
+	// In order to preserve bandwidth, an update is sent only every 10th tick
+	// That's why the comparisons use the division by eight
+	
+	int CurFuel = (m_FuelBurnTime > 0) ? (200 - 200 * m_TimeBurned / m_FuelBurnTime) : 0;
+	if ((CurFuel / 8) != (m_LastProgressFuel / 8))
+	{
+		BroadcastProgress(PROGRESSBAR_FUEL, CurFuel);
+		m_LastProgressFuel = CurFuel;
+	}
+	
+	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;
+	if ((CurCook / 8) != (m_LastProgressCook / 8))
+	{
+		BroadcastProgress(PROGRESSBAR_SMELTING, CurCook);
+		m_LastProgressCook = CurCook;
 	}
 }
 

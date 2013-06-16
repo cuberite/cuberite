@@ -475,43 +475,22 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cSlotAreaDropSpenser:
-
-cSlotAreaDropSpenser::cSlotAreaDropSpenser(cDropSpenserEntity * a_DropSpenser, cWindow & a_ParentWindow) :
-	cSlotArea(9, a_ParentWindow),
-	m_DropSpenser(a_DropSpenser)
-{
-}
-
-
-
-
-
-const cItem * cSlotAreaDropSpenser::GetSlot(int a_SlotNum, cPlayer & a_Player) const
-{
-	return &(m_DropSpenser->GetSlot(a_SlotNum));
-}
-
-
-
-
-
-void cSlotAreaDropSpenser::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
-{
-	m_DropSpenser->SetSlot(a_SlotNum, a_Item);
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaFurnace:
 
 cSlotAreaFurnace::cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow) :
 	cSlotArea(3, a_ParentWindow),
 	m_Furnace(a_Furnace)
 {
+	m_Furnace->GetContents().AddListener(*this);
+}
+
+
+
+
+
+cSlotAreaFurnace::~cSlotAreaFurnace()
+{
+	m_Furnace->GetContents().RemoveListener(*this);
 }
 
 
@@ -520,8 +499,6 @@ cSlotAreaFurnace::cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_Paren
 
 void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	cItem Fuel = *GetSlot(0, a_Player);
-
 	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	
 	if (m_Furnace == NULL)
@@ -529,16 +506,6 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		LOGERROR("cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
 		ASSERT(!"cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
 		return;
-	}
-	
-	if (Fuel.m_ItemType != GetSlot(0, a_Player)->m_ItemType)
-	{
-		m_Furnace->ResetCookTimer();
-	}
-
-	if (m_Furnace->StartCooking())
-	{
-		m_ParentWindow.SendWholeWindow(*(a_Player.GetClientHandle()));
 	}
 }
 
@@ -549,7 +516,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	// a_SlotNum ranges from 0 to 2, query the items from the underlying furnace:
-	return m_Furnace->GetSlot(a_SlotNum);
+	return &(m_Furnace->GetSlot(a_SlotNum));
 }
 
 
@@ -559,6 +526,18 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	// Something has changed in the window, broadcast the entire window to all clients
+	ASSERT(a_ItemGrid == &(m_Furnace->GetContents()));
+	
+	m_ParentWindow.BroadcastWholeWindow();
 }
 
 

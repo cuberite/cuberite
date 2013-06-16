@@ -9,6 +9,7 @@
 #include "../Player.h"
 #include "ChestEntity.h"
 #include "DropSpenserEntity.h"
+#include "FurnaceEntity.h"
 
 
 
@@ -229,7 +230,28 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 /// Moves items from a furnace above the hopper into this hopper. Returns true if contents have changed.
 bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 {
-	// TODO
+	cFurnaceEntity * Furnace = (cFurnaceEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ);
+	ASSERT(Furnace != NULL);
+	
+	// Try move from the output slot:
+	if (MoveItemsFromSlot(Furnace->GetOutputSlot(), true))
+	{
+		cItem NewOutput(Furnace->GetOutputSlot());
+		Furnace->SetOutputSlot(NewOutput.AddCount(-1));
+		return true;
+	}
+	
+	// No output moved, check if we can move an empty bucket out of the fuel slot:
+	if (Furnace->GetFuelSlot().m_ItemType == E_ITEM_BUCKET)
+	{
+		if (MoveItemsFromSlot(Furnace->GetFuelSlot(), true))
+		{
+			Furnace->SetFuelSlot(cItem());
+			return true;
+		}
+	}
+	
+	// Nothing can be moved
 	return false;
 }
 

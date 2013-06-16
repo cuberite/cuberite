@@ -161,14 +161,12 @@ void cNBTChunkSerializer::AddDropperEntity(cDropperEntity * a_Entity)
 void cNBTChunkSerializer::AddFurnaceEntity(cFurnaceEntity * a_Furnace)
 {
 	m_Writer.BeginCompound("");
-	AddBasicTileEntity(a_Furnace, "Furnace");
-	m_Writer.BeginList("Items", TAG_Compound);
-	AddItem(*(a_Furnace->GetSlot(0)), 0);
-	AddItem(*(a_Furnace->GetSlot(1)), 1);
-	AddItem(*(a_Furnace->GetSlot(2)), 2);
-	m_Writer.EndList();
-	m_Writer.AddShort("BurnTime", (Int16)(a_Furnace->GetTimeToBurn() / 50.0));
-	m_Writer.AddShort("CookTime", (Int16)(a_Furnace->GetTimeCooked() / 50.0));
+		AddBasicTileEntity(a_Furnace, "Furnace");
+		m_Writer.BeginList("Items", TAG_Compound);
+			AddItemGrid(a_Furnace->GetContents());
+		m_Writer.EndList();
+		m_Writer.AddShort("BurnTime", a_Furnace->GetFuelBurnTimeLeft());
+		m_Writer.AddShort("CookTime", a_Furnace->GetTimeCooked());
 	m_Writer.EndCompound();
 }
 

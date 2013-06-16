@@ -769,14 +769,14 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 	{
 		Int16 bt = a_NBT.GetShort(BurnTime);
 		// Anvil doesn't store the time that the fuel can burn. We simply "reset" the current value to be the 100%
-		Furnace->SetBurnTimes((float)(bt * 50.0), (float)(bt * 50.0));
+		Furnace->SetBurnTimes(bt, 0);
 	}
 	int CookTime = a_NBT.FindChildByName(a_TagIdx, "CookTime");
 	if (CookTime >= 0)
 	{
 		Int16 ct = a_NBT.GetShort(CookTime);
-		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds
-		Furnace->SetCookTimes(10000.0, (float)(ct * 50.0));
+		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds (200 ticks)
+		Furnace->SetCookTimes(200, ct);
 	}
 	Furnace->ContinueCooking();
 	a_BlockEntities.push_back(Furnace.release());
