@@ -1,1 +1,1 @@
-cloc --by-file-by-lang --exclude-dir=source/SQLite,source/LuaExpat --exclude-list-file=cloc-exclude.txt --xml --xsl=1 --report-file=cloc.xml --ignored=cloc-ignored.txt source 
+cloc --by-file-by-lang --exclude-dir=source/SQLite,source/LuaExpat,doxy,tolua..-1.0.93,jsoncpp.*,lua-5.1.4,squirrel_3.* --exclude-list-file=cloc-exclude.txt --xml --xsl=1 --report-file=cloc.xml --ignored=cloc-ignored.txt .
