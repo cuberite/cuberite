@@ -1959,7 +1959,18 @@ void cClientHandle::DataReceived(const char * a_Data, int a_Size)
 	// Data is received from the client, hand it off to the protocol:
 	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
 	{
-		// Lock the world, so that plugins reacting to protocol events have already the chunkmap locked
+		/*
+		_X: Lock the world, so that plugins reacting to protocol events have already the chunkmap locked.
+		There was a possibility of a deadlock between SocketThreads and TickThreads, resulting from each
+		holding one CS an requesting the other one (ChunkMap CS vs Plugin CS) (FS #375). To break this, it's 
+		sufficient to break any of the four Coffman conditions for a deadlock. We'll solve this by requiring
+		the ChunkMap CS for all SocketThreads operations before they lock the PluginCS - thus creating a kind
+		of a lock hierarchy. However, this incurs a performance penalty, we're de facto locking the chunkmap
+		for each incoming packet. A better, but more involved solutin would be to lock the chunkmap only when
+		the incoming packet really has a plugin CS lock request.
+		Also, it is still possible for a packet to slip through - when a player still doesn't have their world
+		assigned and several packets arrive at once.
+		*/
 		cWorld::cLock(*m_Player->GetWorld());
 		
 		m_Protocol->DataReceived(a_Data, a_Size);
