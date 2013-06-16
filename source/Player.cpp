@@ -901,8 +901,9 @@ bool cPlayer::MoveToWorld( const char* a_WorldName )
 		/* Add player to all the necessary parts of the new world */
 		SetWorld( World );
 		GetWorld()->AddPlayer(this);
-		GetClientHandle()->StreamChunks();
 
+		m_ClientHandle->HandleRespawn();
+		m_ClientHandle->StreamChunks();
 		return true;
 	}
 
