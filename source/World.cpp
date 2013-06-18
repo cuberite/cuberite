@@ -736,8 +736,8 @@ bool cWorld::ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback 
 void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// TODO: Add damage to entities, add support for pickups, and implement block hardiness
-	Vector3d explosion_pos = Vector3d(a_BlockX,a_BlockY,a_BlockZ);
-	cVector3iArray * BlocksAffected = m_ChunkMap->DoExplosiontAt(a_ExplosionSize,a_BlockX,a_BlockY,a_BlockZ);
+	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
+	cVector3iArray * BlocksAffected = m_ChunkMap->DoExplosiontAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ);
 	BroadcastSoundEffect("random.explode", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.6f);
 	{
 		cCSLock Lock(m_CSPlayers);

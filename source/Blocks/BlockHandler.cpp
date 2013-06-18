@@ -56,7 +56,6 @@
 #include "BlockCauldron.h"
 #include "BlockBrewingStand.h"
 #include "BlockCobWeb.h"
-#include "BlockTNT.h"
 #include "BlockDeadBush.h"
 #include "BlockHopper.h"
 
@@ -177,7 +176,6 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STONE_SLAB:            return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_SUGARCANE:             return new cBlockSugarcaneHandler       (a_BlockType);
 		case E_BLOCK_TALL_GRASS:            return new cBlockTallGrassHandler       (a_BlockType);
-		case E_BLOCK_TNT:                   return new cBlockTNTHandler             (a_BlockType);
 		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);

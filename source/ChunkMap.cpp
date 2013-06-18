@@ -12,6 +12,7 @@
 #include "Generating/Trees.h"  // used in cChunkMap::ReplaceTreeBlocks() for tree block discrimination
 #include "BlockArea.h"
 #include "PluginManager.h"
+#include "TNTEntity.h"
 
 #ifndef _WIN32
 	#include <cstdlib> // abs
@@ -1496,23 +1497,55 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 
 
-cVector3iArray *cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
+cVector3iArray * cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cBlockArea area;
-	cVector3iArray *BlocksAffected = new cVector3iArray();
+	cVector3iArray * BlocksAffected = new cVector3iArray();
 	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
+	int ExplosionSizeSq =  ExplosionSizeInt * ExplosionSizeInt;
 	BlocksAffected->reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-	area.Read(m_World,a_BlockX - ExplosionSizeInt,a_BlockX + ExplosionSizeInt,a_BlockY - ExplosionSizeInt,a_BlockY + ExplosionSizeInt,a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
+	area.Read(m_World, a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt, a_BlockY - ExplosionSizeInt, a_BlockY + ExplosionSizeInt, a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
 	for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
 	{
 		for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
 		{
+			if ((a_BlockY + y >= cChunkDef::Height) || (a_BlockY + y < 0))
+			{
+				// Outside of the world
+				continue;
+			}
 			for (int z = -ExplosionSizeInt; z < ExplosionSizeInt; z++)
 			{
-				if ((x*x + y*y + z*z) < (ExplosionSizeInt * ExplosionSizeInt))
+				if ((x * x + y * y + z * z) < ExplosionSizeSq)
 				{
-					area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z,E_BLOCK_AIR);
-					BlocksAffected->push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+					switch (area.GetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z))
+					{
+						case E_BLOCK_TNT:
+						{
+							// Activate the TNT, with a random fuse between 10 to 30 game ticks
+							float FuseTime = (float)(10 + m_World->GetTickRandomNumber(20)) / 20;
+							cTNTEntity * TNT = new cTNTEntity(a_BlockX, a_BlockY, a_BlockZ, FuseTime);
+							TNT->Initialize(m_World);
+							area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
+							BlocksAffected->push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+							break;
+						}
+						case E_BLOCK_OBSIDIAN:
+						case E_BLOCK_BEDROCK:
+						case E_BLOCK_WATER:
+						case E_BLOCK_STATIONARY_WATER:
+						case E_BLOCK_STATIONARY_LAVA:
+						case E_BLOCK_LAVA:
+						{
+							// These blocks are not affected by explosions
+							break;
+						}
+						default:
+						{
+							area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
+							BlocksAffected->push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+						}
+					}
 				}
 			}
 		}

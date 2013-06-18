@@ -2009,10 +2009,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Blocks\BlockTNT.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\blocks\BlockTorch.h"
 					>
 				</File>

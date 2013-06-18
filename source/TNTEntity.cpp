@@ -41,7 +41,7 @@ void cTNTEntity::Initialize(cWorld * a_World)
 
 void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnObject(*this,50,1,0,0); //50 means TNT
+	a_ClientHandle.SendSpawnObject(*this, 50, 1, 0, 0);  // 50 means TNT
 	m_bDirtyPosition = false;
 	m_bDirtySpeed = false;
 	m_bDirtyOrientation = false;
@@ -54,15 +54,15 @@ void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 
 void cTNTEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt,a_Chunk);
+	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();
-	float delta_time = a_Dt / 1000; //Convert miliseconds to seconds
+	float delta_time = a_Dt / 1000;  // Convert miliseconds to seconds
 	m_Counter += delta_time;
-	if (m_Counter > m_MaxFuseTime) //Check if we go KABOOOM
+	if (m_Counter > m_MaxFuseTime)  // Check if we go KABOOOM
 	{
 		Destroy();
-		LOGD("BOOM at {%f,%f,%f}",GetPosX(),GetPosY(),GetPosZ());
-		m_World->DoExplosiontAt(4.0,(int)floor(GetPosX()),(int)floor(GetPosY()),(int)floor(GetPosZ()));
+		LOGD("BOOM at {%f,%f,%f}", GetPosX(), GetPosY(), GetPosZ());
+		m_World->DoExplosiontAt(4.0, (int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
 		return;
 	}
 }

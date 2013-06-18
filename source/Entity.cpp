@@ -211,26 +211,35 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 {
-	//TODO Add collision detection with entities.
+	// TODO Add collision detection with entities.
 	a_Dt /= 1000;
 	Vector3d NextPos = Vector3d(GetPosX(),GetPosY(),GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(),GetSpeedY(),GetSpeedZ());
 	int BlockX = (int) floor(NextPos.x);
 	int BlockY = (int) floor(NextPos.y);
 	int BlockZ = (int) floor(NextPos.z);
-	//Make sure we got the correct chunk and a valid one. No one ever knows...
+	
+	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
+	{
+		// Outside of the world
+		// TODO: Current speed should still be added to the entity position
+		// Otherwise TNT explosions in the void will still effect the bottommost layers of the world
+		return;
+	}
+	
+	// Make sure we got the correct chunk and a valid one. No one ever knows...
 	cChunk * NextChunk = a_Chunk.GetNeighborChunk(BlockX,BlockZ);
 	if (NextChunk != NULL)
 	{
 		int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 		int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
 		BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
-		if(!g_BlockIsSolid[BlockIn]) // Making sure we are not inside a solid block
+		if (!g_BlockIsSolid[BlockIn])  // Making sure we are not inside a solid block
 		{
-			if( m_bOnGround ) // check if it's still on the ground
+			if (m_bOnGround)  // check if it's still on the ground
 			{
 				BLOCKTYPE BlockBelow = NextChunk->GetBlock( RelBlockX, BlockY - 1, RelBlockZ );
-				if(!g_BlockIsSolid[BlockBelow]) //Check if block below is air or water.
+				if (!g_BlockIsSolid[BlockBelow])  // Check if block below is air or water.
 				{
 					m_bOnGround = false;
 				}
@@ -353,14 +362,15 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 					NextPos += (NextSpeed * a_Dt);
 			}
 			else
-			{	// We didn't hit anything, so move =]
+			{
+				// We didn't hit anything, so move =]
 				NextPos += (NextSpeed * a_Dt);
 			}
 		}
 		BlockX = (int) floor(NextPos.x);
-	    BlockZ = (int) floor(NextPos.z);
+		BlockZ = (int) floor(NextPos.z);
 		NextChunk = NextChunk->GetNeighborChunk(BlockX,BlockZ);
-		//See if we can commit our changes. If not, we will discard them.
+		// See if we can commit our changes. If not, we will discard them.
 		if (NextChunk != NULL)
 		{
 			if (NextPos.x != GetPosX()) SetPosX(NextPos.x);

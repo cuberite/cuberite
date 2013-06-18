@@ -4,6 +4,7 @@
 #include "ItemHandler.h"
 #include "../World.h"
 #include "../Player.h"
+#include "../TNTEntity.h"
 
 
 
@@ -27,9 +28,25 @@ public:
 		
 		a_Player->UseEquippedItem();
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);	//0 -> new fire
+		switch (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
+		{
+			case E_BLOCK_TNT:
+			{
+				// Activate the TNT:
+				a_World->BroadcastSoundEffect("random.fuse", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
+				cTNTEntity * TNT = new cTNTEntity(a_BlockX, a_BlockY, a_BlockZ, 4);  // 4 seconds to boom
+				TNT->Initialize(a_World);
+				a_World->SetBlock(a_BlockX,a_BlockY,a_BlockZ, E_BLOCK_AIR, 0);
+				break;
+			}
+			default:
+			{
+				// Light a fire next to the block:
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
+				break;
+			}
+		}
 
 		return false;
 	}
