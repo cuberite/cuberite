@@ -34,8 +34,7 @@ public:
 			{
 				// Activate the TNT:
 				a_World->BroadcastSoundEffect("random.fuse", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, 0.6f);
-				cTNTEntity * TNT = new cTNTEntity(a_BlockX, a_BlockY, a_BlockZ, 4);  // 4 seconds to boom
-				TNT->Initialize(a_World);
+				a_World->SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 4);  // 4 seconds to boom
 				a_World->SetBlock(a_BlockX,a_BlockY,a_BlockZ, E_BLOCK_AIR, 0);
 				break;
 			}

@@ -55,6 +55,7 @@
 #include "PluginManager.h"
 #include "Blocks/BlockHandler.h"
 #include "Vector3d.h"
+#include "TNTEntity.h"
 
 #include "tolua++.h"
 
@@ -737,7 +738,8 @@ void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, i
 {
 	// TODO: Add damage to entities, add support for pickups, and implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
-	cVector3iArray * BlocksAffected = m_ChunkMap->DoExplosiontAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ);
+	cVector3iArray BlocksAffected;
+	m_ChunkMap->DoExplosiontAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("random.explode", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.6f);
 	{
 		cCSLock Lock(m_CSPlayers);
@@ -759,11 +761,10 @@ void cWorld::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, i
 				}
 				distance_explosion.Normalize();
 				distance_explosion *= power;
-				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_ExplosionSize, *BlocksAffected, distance_explosion);
+				ch->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_ExplosionSize, BlocksAffected, distance_explosion);
 			}
 		}
 	}
-	delete BlocksAffected;
 }
 
 
@@ -1308,6 +1309,17 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 		);
 		Pickup->Initialize(this);
 	}
+}
+
+
+
+
+
+void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec)
+{
+	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
+	TNT->Initialize(this);
+	// TODO: Add a bit of speed in horiz and vert axes
 }
 
 

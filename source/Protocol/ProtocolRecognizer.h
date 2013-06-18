@@ -72,7 +72,7 @@ public:
 	virtual void SendEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityStatus       (const cEntity & a_Entity, char a_Status) override;
-	virtual void SendExplosion          (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iArray a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
+	virtual void SendExplosion          (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode           (eGameMode a_GameMode) override;
 	virtual void SendHealth             (void) override;
 	virtual void SendInventoryProgress  (char a_WindowID, short a_Progressbar, short a_Value) override;

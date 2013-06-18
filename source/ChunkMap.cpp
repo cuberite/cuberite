@@ -1497,13 +1497,12 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 
 
-cVector3iArray * cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
 	cBlockArea area;
-	cVector3iArray * BlocksAffected = new cVector3iArray();
 	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
 	int ExplosionSizeSq =  ExplosionSizeInt * ExplosionSizeInt;
-	BlocksAffected->reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
+	a_BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
 	area.Read(m_World, a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt, a_BlockY - ExplosionSizeInt, a_BlockY + ExplosionSizeInt, a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
 	for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
 	{
@@ -1516,43 +1515,42 @@ cVector3iArray * cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, 
 			}
 			for (int z = -ExplosionSizeInt; z < ExplosionSizeInt; z++)
 			{
-				if ((x * x + y * y + z * z) < ExplosionSizeSq)
+				if ((x * x + y * y + z * z) > ExplosionSizeSq)
 				{
-					switch (area.GetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z))
-					{
-						case E_BLOCK_TNT:
-						{
-							// Activate the TNT, with a random fuse between 10 to 30 game ticks
-							float FuseTime = (float)(10 + m_World->GetTickRandomNumber(20)) / 20;
-							cTNTEntity * TNT = new cTNTEntity(a_BlockX, a_BlockY, a_BlockZ, FuseTime);
-							TNT->Initialize(m_World);
-							area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
-							BlocksAffected->push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
-							break;
-						}
-						case E_BLOCK_OBSIDIAN:
-						case E_BLOCK_BEDROCK:
-						case E_BLOCK_WATER:
-						case E_BLOCK_STATIONARY_WATER:
-						case E_BLOCK_STATIONARY_LAVA:
-						case E_BLOCK_LAVA:
-						{
-							// These blocks are not affected by explosions
-							break;
-						}
-						default:
-						{
-							area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
-							BlocksAffected->push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
-						}
-					}
+					// Too far away
+					continue;
 				}
-			}
-		}
-		
-	}
-	area.Write(m_World,a_BlockX - ExplosionSizeInt,a_BlockY - ExplosionSizeInt,a_BlockZ - ExplosionSizeInt);
-	return BlocksAffected;
+				switch (area.GetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z))
+				{
+					case E_BLOCK_TNT:
+					{
+						// Activate the TNT, with a random fuse between 10 to 30 game ticks
+						float FuseTime = (float)(10 + m_World->GetTickRandomNumber(20)) / 20;
+						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
+						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
+						a_BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+						break;
+					}
+					case E_BLOCK_OBSIDIAN:
+					case E_BLOCK_BEDROCK:
+					case E_BLOCK_WATER:
+					case E_BLOCK_STATIONARY_WATER:
+					case E_BLOCK_STATIONARY_LAVA:
+					case E_BLOCK_LAVA:
+					{
+						// These blocks are not affected by explosions
+						break;
+					}
+					default:
+					{
+						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
+						a_BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+					}
+				}  // switch (BlockType)
+			}  // for z
+		}  // for y
+	}  // for x
+	area.Write(m_World, a_BlockX - ExplosionSizeInt, a_BlockY - ExplosionSizeInt, a_BlockZ - ExplosionSizeInt);
 }
 
 

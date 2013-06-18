@@ -352,7 +352,7 @@ void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 
 
 
-void cProtocol125::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iArray a_BlocksAffected, const Vector3d & a_PlayerMotion)
+void cProtocol125::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_EXPLOSION);

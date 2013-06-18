@@ -98,7 +98,7 @@ public:
 	void SendEntRelMoveLook     (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityStatus       (const cEntity & a_Entity, char a_Status);
-	void SendExplosion          (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, cVector3iArray a_BlocksAffected, const Vector3d & a_PlayerMotion);
+	void SendExplosion          (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
 	void SendGameMode           (eGameMode a_GameMode);
 	void SendHealth             (void);
 	void SendInventoryProgress  (char a_WindowID, short a_Progressbar, short a_Value);
