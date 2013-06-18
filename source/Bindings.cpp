@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/16/13 22:21:21.
+** Generated automatically by tolua++-1.0.92 on 06/18/13 21:08:59.
 */
 
 #ifndef __cplusplus
@@ -11607,6 +11607,45 @@ static int tolua_AllToLua_cWorld_SpawnItemPickups01(lua_State* tolua_S)
  return 0;
 tolua_lerror:
  return tolua_AllToLua_cWorld_SpawnItemPickups00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SpawnPrimedTNT of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_SpawnPrimedTNT00
+static int tolua_AllToLua_cWorld_SpawnPrimedTNT00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  double a_X = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_Z = ((double)  tolua_tonumber(tolua_S,4,0));
+  float a_FuseTimeInSec = ((float)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnPrimedTNT'", NULL);
+#endif
+  {
+   self->SpawnPrimedTNT(a_X,a_Y,a_Z,a_FuseTimeInSec);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SpawnPrimedTNT'.",&tolua_err);
+ return 0;
+#endif
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -28052,6 +28091,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetBlockMeta",tolua_AllToLua_cWorld_SetBlockMeta01);
    tolua_function(tolua_S,"SpawnItemPickups",tolua_AllToLua_cWorld_SpawnItemPickups00);
    tolua_function(tolua_S,"SpawnItemPickups",tolua_AllToLua_cWorld_SpawnItemPickups01);
+   tolua_function(tolua_S,"SpawnPrimedTNT",tolua_AllToLua_cWorld_SpawnPrimedTNT00);
    tolua_function(tolua_S,"DigBlock",tolua_AllToLua_cWorld_DigBlock00);
    tolua_function(tolua_S,"SendBlockTo",tolua_AllToLua_cWorld_SendBlockTo00);
    tolua_function(tolua_S,"GetSpawnX",tolua_AllToLua_cWorld_GetSpawnX00);
