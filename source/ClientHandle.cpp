@@ -769,7 +769,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 	cBlockHandler * Handler = cBlockHandler::GetBlockHandler(BlockType);
 	
-	if (Handler->IsUseable())
+	if (Handler->IsUseable() && !m_Player->IsCrouched())
 	{
 		if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 		{
@@ -783,7 +783,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable())
+	if (ItemHandler->IsPlaceable() || m_Player->IsCrouched())
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
