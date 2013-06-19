@@ -1499,8 +1499,8 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
+	// Don't explode if the explosion center is inside a liquid block:
 	switch (m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
-	// Check if the explosion is in a liquid.
 	{
 		case E_BLOCK_WATER:
 		case E_BLOCK_STATIONARY_WATER:
@@ -1510,6 +1510,7 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 			return;
 		}
 	}
+	
 	cBlockArea area;
 	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
 	int ExplosionSizeSq =  ExplosionSizeInt * ExplosionSizeInt;
