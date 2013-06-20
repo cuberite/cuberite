@@ -91,6 +91,8 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 		if (a_Player->GetWindow() != Window)
 		{
 			a_Player->OpenWindow(Window);
+			BroadcastProgress(PROGRESSBAR_FUEL,     m_LastProgressFuel);
+			BroadcastProgress(PROGRESSBAR_SMELTING, m_LastProgressCook);
 		}
 	}
 }

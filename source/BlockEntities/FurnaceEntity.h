@@ -126,6 +126,8 @@ protected:
 	int m_LastProgressFuel;  ///< Last value sent as the progress for the fuel
 	int m_LastProgressCook;  ///< Last value sent as the progress for the cooking
 	
+	
+	/// Sends the specified progressbar value to all clients of the window
 	void BroadcastProgress(int a_ProgressbarID, short a_Value);
 	
 	/// One item finished cooking
