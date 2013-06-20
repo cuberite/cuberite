@@ -24,6 +24,7 @@ enum
 
 cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
 	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
+	m_CurrentRecipe(NULL),
 	m_IsCooking(false),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
@@ -42,6 +43,7 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+	m_CurrentRecipe(NULL),
 	m_IsCooking(false),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
