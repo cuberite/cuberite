@@ -16,7 +16,9 @@
 
 
 cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL)
+	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
+	m_LastMoveItemsInTick(0),
+	m_LastMoveItemsOutTick(0)
 {
 }
 
@@ -25,8 +27,37 @@ cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 cHopperEntity::cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World)
+	super(E_BLOCK_HOPPER, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+	m_LastMoveItemsInTick(0),
+	m_LastMoveItemsOutTick(0)
 {
+}
+
+
+
+
+
+/** Returns the block coords of the block receiving the output items, based on the meta
+Returns false if unattached
+*/
+bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, int & a_OutputY, int & a_OutputZ)
+{
+	a_OutputX = m_PosX;
+	a_OutputY = m_PosY;
+	a_OutputZ = m_PosZ;
+	switch (a_BlockMeta)
+	{
+		case E_META_HOPPER_FACING_XM: a_OutputX--; return true;
+		case E_META_HOPPER_FACING_XP: a_OutputX++; return true;
+		case E_META_HOPPER_FACING_YM: a_OutputY--; return true;
+		case E_META_HOPPER_FACING_ZM: a_OutputZ--; return true;
+		case E_META_HOPPER_FACING_ZP: a_OutputZ++; return true;
+		default:
+		{
+			// Not attached
+			return false;
+		}
+	}
 }
 
 
@@ -171,8 +202,47 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 		return false;
 	}
 	
-	// TODO
-	return false;
+	int bx, by, bz;
+	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
+	if (!GetOutputBlockPos(Meta, bx, by, bz))
+	{
+		// Not attached to another container
+		return false;
+	}
+	if (by < 0)
+	{
+		// Cannot output below the zero-th block level
+		return false;
+	}
+	
+	// Convert coords to relative:
+	int rx = bx - a_Chunk.GetPosX() * cChunkDef::Width;
+	int rz = bz - a_Chunk.GetPosZ() * cChunkDef::Width;
+	cChunk * DestChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(rx, rz);
+	if (DestChunk == NULL)
+	{
+		// The destination chunk has been unloaded, don't tick
+		return false;
+	}
+	
+	// Call proper moving function, based on the blocktype present at the coords:
+	bool res = false;
+	switch (DestChunk->GetBlock(rx, by, rz))
+	{
+		case E_BLOCK_CHEST:     res = MoveItemsToChest(*DestChunk, bx, by, bz); break;
+		case E_BLOCK_FURNACE:   res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta); break;
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:   res = MoveItemsToGrid(((cDropSpenserEntity *)DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
+		case E_BLOCK_HOPPER:    res = MoveItemsToGrid(((cHopperEntity *)     DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
+	}
+	
+	// If the item has been moved, reset the last tick:
+	if (res)
+	{
+		m_LastMoveItemsOutTick = a_CurrentTick;
+	}
+	
+	return res;
 }
 
 
@@ -307,6 +377,143 @@ bool cHopperEntity::MoveItemsFromSlot(const cItem & a_ItemStack, bool a_AllowNew
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+/// Moves items to the chest at the specified coords. Returns true if contents have changed
+bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// Try the chest directly connected to the hopper:
+	if (MoveItemsToGrid(((cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ))->GetContents()))
+	{
+		return true;
+	}
+
+	// Check if the chest is a double-chest, if so, try to move into the other half:
+	static const struct
+	{
+		int x, z;
+	}
+	Coords [] =
+	{
+		{1, 0},
+		{-1, 0},
+		{0, 1},
+		{0, -1},
+	} ;
+	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		int x = m_RelX + Coords[i].x;
+		int z = m_RelZ + Coords[i].z;
+		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
+		if (
+			(Neighbor == NULL) ||
+			(Neighbor->GetBlock(x, m_PosY + 1, z) != E_BLOCK_CHEST)
+		)
+		{
+			continue;
+		}
+		if (MoveItemsToGrid(((cChestEntity *)Neighbor->GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ))->GetContents()))
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	// The chest was single and nothing could be moved
+	return false;
+}
+
+
+
+
+
+/// Moves items to the furnace at the specified coords. Returns true if contents have changed
+bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_HopperMeta)
+{
+	cFurnaceEntity * Furnace = (cFurnaceEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (a_HopperMeta == E_META_HOPPER_FACING_YM)
+	{
+		// Feed the input slot of the furnace
+		return MoveItemsToSlot(Furnace->GetContents(), cFurnaceEntity::fsInput);
+	}
+	else
+	{
+		// Feed the fuel slot of the furnace
+		return MoveItemsToSlot(Furnace->GetContents(), cFurnaceEntity::fsFuel);
+	}
+	return false;
+}
+
+
+
+
+
+/// Moves items to the specified ItemGrid. Returns true if contents have changed
+bool cHopperEntity::MoveItemsToGrid(cItemGrid & a_ItemGrid)
+{
+	// Iterate through our slots, try to move from each one:
+	for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+	{
+		const cItem & SrcItem = m_Contents.GetSlot(i);
+		if (SrcItem.IsEmpty())
+		{
+			continue;
+		}
+		
+		cItem ToAdd = SrcItem.CopyOne();
+		if (a_ItemGrid.AddItem(ToAdd) > 0)
+		{
+			m_Contents.ChangeSlotCount(i, -1);
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+/// Moves one piece to the specified ItemGrid's slot. Returns true if contents have changed.
+bool cHopperEntity::MoveItemsToSlot(cItemGrid & a_ItemGrid, int a_DestSlotNum)
+{
+	if (a_ItemGrid.IsSlotEmpty(a_DestSlotNum))
+	{
+		// The slot is empty, move the first non-empty slot from our contents:
+		for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+		{
+			if (!m_Contents.IsSlotEmpty(i))
+			{
+				a_ItemGrid.SetSlot(a_DestSlotNum, m_Contents.GetSlot(i).CopyOne());
+				m_Contents.ChangeSlotCount(i, -1);
+				return true;
+			}
+		}
+		return false;
+	}
+	else
+	{
+		// The slot is taken, try to top it up:
+		const cItem & DestSlot = a_ItemGrid.GetSlot(a_DestSlotNum);
+		if (DestSlot.IsFullStack())
+		{
+			return false;
+		}
+		for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+		{
+			if (m_Contents.GetSlot(i).IsStackableWith(DestSlot))
+			{
+				a_ItemGrid.ChangeSlotCount(a_DestSlotNum, 1);
+				m_Contents.ChangeSlotCount(i, -1);
+				return true;
+			}
+		}
+		return false;
+	}
 }
 
 

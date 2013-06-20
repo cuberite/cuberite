@@ -38,6 +38,15 @@ public:
 	/// Constructor used for normal operation
 	cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	
+	// tolua_begin
+	
+	/** Returns the block coords of the block receiving the output items, based on the meta
+	Returns false if unattached
+	*/
+	bool GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, int & a_OutputY, int & a_OutputZ);
+	
+	// tolua_end
+	
 	static const char * GetClassStatic(void) { return "cHopperEntity"; }
 	
 protected:
@@ -72,8 +81,20 @@ protected:
 	/// Moves items from the specified ItemGrid into this hopper. Returns true if contents have changed.
 	bool MoveItemsFromGrid(cItemGrid & a_Grid);
 	
-	/// Moves one of the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
+	/// Moves one piece from the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack.
 	bool MoveItemsFromSlot(const cItem & a_ItemStack, bool a_AllowNewStacks);
+	
+	/// Moves items to the chest at the specified coords. Returns true if contents have changed
+	bool MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	/// Moves items to the furnace at the specified coords. Returns true if contents have changed
+	bool MoveItemsToFurnace(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_HopperMeta);
+	
+	/// Moves items to the specified ItemGrid. Returns true if contents have changed
+	bool MoveItemsToGrid(cItemGrid & a_ItemGrid);
+
+	/// Moves one piece to the specified ItemGrid's slot. Returns true if contents have changed.
+	bool MoveItemsToSlot(cItemGrid & a_ItemGrid, int a_DestSlotNum);
 } ;
 
 
