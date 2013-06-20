@@ -5,6 +5,7 @@
 #include "../UI/Window.h"
 #include "../Player.h"
 #include "../Root.h"
+#include "../Chunk.h"
 #include <json/json.h>
 
 
@@ -22,8 +23,10 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
+cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, NULL),
+	m_BlockType(a_BlockType),
+	m_BlockMeta(a_BlockMeta),
 	m_CurrentRecipe(NULL),
 	m_IsCooking(false),
 	m_NeedCookTime(0),
@@ -41,10 +44,12 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 
-cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
+cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World) :
 	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+	m_BlockType(a_BlockType),
+	m_BlockMeta(a_BlockMeta),
 	m_CurrentRecipe(NULL),
-	m_IsCooking(false),
+	m_IsCooking((a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_LIT_FURNACE)),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
@@ -252,7 +257,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 		// The item in the fuel slot is not suitable
 		m_FuelBurnTime = 0;
 		m_TimeBurned = 0;
-		m_IsCooking = false;
+		SetIsCooking(false);
 		return;
 	}
 	
@@ -265,7 +270,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 	// Burn one new fuel:
 	m_FuelBurnTime = NewTime;
 	m_TimeBurned = 0;
-	m_IsCooking = true;
+	SetIsCooking(true);
 	if (m_Contents.GetSlot(fsFuel).m_ItemType == E_ITEM_LAVA_BUCKET)
 	{
 		m_Contents.SetSlot(fsFuel, cItem(E_ITEM_BUCKET));
@@ -334,12 +339,12 @@ void cFurnaceEntity::UpdateInput(void)
 	{
 		// This input cannot be cooked
 		m_NeedCookTime = 0;
-		m_IsCooking = false;
+		SetIsCooking(false);
 	}
 	else
 	{
 		m_NeedCookTime = m_CurrentRecipe->CookTime;
-		m_IsCooking = true;
+		SetIsCooking(true);
 		
 		// Start burning new fuel if there's no flame now:
 		if (GetFuelBurnTimeLeft() <= 0)
@@ -378,7 +383,7 @@ void cFurnaceEntity::UpdateOutput(void)
 		// Cannot cook anymore:
 		m_TimeCooked = 0;
 		m_NeedCookTime = 0;
-		m_IsCooking = false;
+		SetIsCooking(false);
 		return;
 	}
 	
@@ -386,7 +391,7 @@ void cFurnaceEntity::UpdateOutput(void)
 
 	// Can cook, start cooking if not already underway:
 	m_NeedCookTime = m_CurrentRecipe->CookTime;
-	m_IsCooking = true;
+	SetIsCooking(m_FuelBurnTime > 0);
 }
 
 
@@ -403,13 +408,13 @@ void cFurnaceEntity::UpdateIsCooking(void)
 	)
 	{
 		// Reset everything
-		m_IsCooking = false;
+		SetIsCooking(false);
 		m_TimeCooked = 0;
 		m_NeedCookTime = 0;
 		return;
 	}
 	
-	m_IsCooking = true;
+	SetIsCooking(true);
 }
 
 
@@ -474,3 +479,20 @@ void cFurnaceEntity::UpdateProgressBars(void)
 
 
 
+
+void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
+{
+	if (a_IsCooking == m_IsCooking)
+	{
+		return;
+	}
+
+	m_IsCooking = a_IsCooking;
+		
+	// Light or extinguish the furnace:
+	m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, m_IsCooking ? E_BLOCK_LIT_FURNACE : E_BLOCK_FURNACE, m_BlockMeta);
+}
+
+
+
+	

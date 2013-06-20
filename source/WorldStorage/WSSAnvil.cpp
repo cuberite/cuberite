@@ -331,7 +331,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	cEntityList      Entities;
 	cBlockEntityList BlockEntities;
 	LoadEntitiesFromNBT     (Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
-	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"));
+	LoadBlockEntitiesFromNBT(BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), BlockTypes, MetaData);
 	
 	bool IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
 	
@@ -539,7 +539,7 @@ void cWSSAnvil::LoadEntitiesFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 
 
-void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas)
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_List))
 	{
@@ -567,7 +567,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		}
 		else if (strncmp(a_NBT.GetData(sID), "Furnace", a_NBT.GetDataLength(sID)) == 0)
 		{
-			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child);
+			LoadFurnaceFromNBT(a_BlockEntities, a_NBT, Child, a_BlockTypes, a_BlockMetas);
 		}
 		else if (strncmp(a_NBT.GetData(sID), "Hopper", a_NBT.GetDataLength(sID)) == 0)
 		{
@@ -737,7 +737,7 @@ void cWSSAnvil::LoadDropperFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 
 
 
-void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas)
 {
 	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
 	int x, y, z;
@@ -750,7 +750,19 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 	{
 		return;  // Make it an empty furnace - the chunk loader will provide an empty cFurnaceEntity for this
 	}
-	std::auto_ptr<cFurnaceEntity> Furnace(new cFurnaceEntity(x, y, z, m_World));
+	
+	// Convert coords to relative:
+	int RelX = x;
+	int RelZ = z;
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(RelX, y, RelZ, ChunkX, ChunkZ);
+	
+	// Create the furnace entity, with proper BlockType and BlockMeta info:
+	BLOCKTYPE  BlockType = cChunkDef::GetBlock(a_BlockTypes, RelX, y, RelZ);
+	NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, RelX, y, RelZ);
+	std::auto_ptr<cFurnaceEntity> Furnace(new cFurnaceEntity(x, y, z, BlockType, BlockMeta, m_World));
+	
+	// Load slots:
 	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
 		int Slot = a_NBT.FindChildByName(Child, "Slot");
@@ -764,6 +776,8 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 			Furnace->SetSlot(a_NBT.GetByte(Slot), Item);
 		}
 	}  // for itr - ItemDefs[]
+	
+	// Load burn time:
 	int BurnTime = a_NBT.FindChildByName(a_TagIdx, "BurnTime");
 	if (BurnTime >= 0)
 	{
@@ -771,6 +785,8 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 		// Anvil doesn't store the time that the fuel can burn. We simply "reset" the current value to be the 100%
 		Furnace->SetBurnTimes(bt, 0);
 	}
+	
+	// Load cook time:
 	int CookTime = a_NBT.FindChildByName(a_TagIdx, "CookTime");
 	if (CookTime >= 0)
 	{
@@ -778,6 +794,8 @@ void cWSSAnvil::LoadFurnaceFromNBT(cBlockEntityList & a_BlockEntities, const cPa
 		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds (200 ticks)
 		Furnace->SetCookTimes(200, ct);
 	}
+	
+	// Restart cooking:
 	Furnace->ContinueCooking();
 	a_BlockEntities.push_back(Furnace.release());
 }

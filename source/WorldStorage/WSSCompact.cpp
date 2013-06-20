@@ -310,15 +310,16 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 		for( Json::Value::iterator itr = AllFurnaces.begin(); itr != AllFurnaces.end(); ++itr )
 		{
 			Json::Value & Furnace = *itr;
-			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0,0,0, a_World);
-			if( !FurnaceEntity->LoadFromJson( Furnace ) )
+			// TODO: The block type and meta aren't correct, there's no way to get them here
+			cFurnaceEntity * FurnaceEntity = new cFurnaceEntity(0, 0, 0, E_BLOCK_FURNACE, 0, a_World);
+			if (!FurnaceEntity->LoadFromJson(Furnace))
 			{
 				LOGERROR("ERROR READING FURNACE FROM JSON!" );
 				delete FurnaceEntity;
 			}
 			else
 			{
-				a_BlockEntities.push_back( FurnaceEntity );
+				a_BlockEntities.push_back(FurnaceEntity);
 			}
 		}  // for itr - AllFurnaces[]
 	}

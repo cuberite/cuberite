@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/18/13 21:08:59.
+** Generated automatically by tolua++-1.0.92 on 06/20/13 13:33:05.
 */
 
 #ifndef __cplusplus
@@ -17118,7 +17118,9 @@ static int tolua_AllToLua_cFurnaceEntity_new00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17127,8 +17129,10 @@ static int tolua_AllToLua_cFurnaceEntity_new00(lua_State* tolua_S)
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
   {
-   cFurnaceEntity* tolua_ret = (cFurnaceEntity*)  Mtolua_new((cFurnaceEntity)(a_BlockX,a_BlockY,a_BlockZ));
+   cFurnaceEntity* tolua_ret = (cFurnaceEntity*)  Mtolua_new((cFurnaceEntity)(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_BlockMeta));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceEntity");
   }
  }
@@ -17152,7 +17156,9 @@ static int tolua_AllToLua_cFurnaceEntity_new00_local(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17161,8 +17167,10 @@ static int tolua_AllToLua_cFurnaceEntity_new00_local(lua_State* tolua_S)
   int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
   int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+  unsigned char a_BlockType = (( unsigned char)  tolua_tonumber(tolua_S,5,0));
+  unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
   {
-   cFurnaceEntity* tolua_ret = (cFurnaceEntity*)  Mtolua_new((cFurnaceEntity)(a_BlockX,a_BlockY,a_BlockZ));
+   cFurnaceEntity* tolua_ret = (cFurnaceEntity*)  Mtolua_new((cFurnaceEntity)(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_BlockMeta));
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceEntity");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }

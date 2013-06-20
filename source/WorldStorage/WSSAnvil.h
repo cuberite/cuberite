@@ -116,7 +116,7 @@ protected:
 	void LoadEntitiesFromNBT(cEntityList & a_Entitites, const cParsedNBT & a_NBT, int a_Tag);
 	
 	/// Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1)
-	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag);
+	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
 	
 	/// Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag
 	bool LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -130,7 +130,7 @@ protected:
 	void LoadChestFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDispenserFromNBT (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDropperFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadFurnaceFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadFurnaceFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
 	void LoadHopperFromNBT    (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadJukeboxFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadNoteFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);

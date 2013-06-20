@@ -40,12 +40,12 @@ public:
 	};
 	
 	/// Constructor used while generating a chunk; sets m_World to NULL
-	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
+	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
 	// tolua_end
 	
 	/// Constructor used for normal operation
-	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
+	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
 	
 	virtual ~cFurnaceEntity();
 
@@ -103,6 +103,12 @@ public:
 	
 protected:
 
+	/// Block type of the block currently represented by this entity (changes when furnace lights up)
+	BLOCKTYPE m_BlockType;
+	
+	/// Block meta of the block currently represented by this entity
+	NIBBLETYPE m_BlockMeta;
+
 	/// The recipe for the current input slot
 	const cFurnaceRecipe::Recipe * m_CurrentRecipe;
 	
@@ -145,6 +151,9 @@ protected:
 	
 	/// Broadcasts progressbar updates, if needed
 	void UpdateProgressBars(void);
+	
+	/// Sets the m_IsCooking variable, updates the furnace block type based on the value
+	void SetIsCooking(bool a_IsCooking);
 	
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;

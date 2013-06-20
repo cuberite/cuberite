@@ -162,11 +162,12 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (a_Chunk.GetBlock(m_RelX, m_PosY + 1, m_RelZ))
 	{
-		case E_BLOCK_CHEST:     res = MoveItemsFromChest(a_Chunk); break;
-		case E_BLOCK_FURNACE:   res = MoveItemsFromFurnace(a_Chunk); break;
+		case E_BLOCK_CHEST:       res = MoveItemsFromChest(a_Chunk); break;
+		case E_BLOCK_FURNACE:     res = MoveItemsFromFurnace(a_Chunk); break;
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:   res = MoveItemsFromGrid(((cDropSpenserEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()); break;
-		case E_BLOCK_HOPPER:    res = MoveItemsFromGrid(((cHopperEntity *)     a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()); break;
+		case E_BLOCK_DROPPER:     res = MoveItemsFromGrid(((cDropSpenserEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()); break;
+		case E_BLOCK_HOPPER:      res = MoveItemsFromGrid(((cHopperEntity *)     a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ))->GetContents()); break;
+		case E_BLOCK_LIT_FURNACE: res = MoveItemsFromFurnace(a_Chunk); break;
 	}
 	
 	// If the item has been moved, reset the last tick:
@@ -229,11 +230,12 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (DestChunk->GetBlock(rx, by, rz))
 	{
-		case E_BLOCK_CHEST:     res = MoveItemsToChest(*DestChunk, bx, by, bz); break;
-		case E_BLOCK_FURNACE:   res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta); break;
+		case E_BLOCK_CHEST:       res = MoveItemsToChest(*DestChunk, bx, by, bz); break;
+		case E_BLOCK_FURNACE:     res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta); break;
 		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:   res = MoveItemsToGrid(((cDropSpenserEntity *)DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
-		case E_BLOCK_HOPPER:    res = MoveItemsToGrid(((cHopperEntity *)     DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
+		case E_BLOCK_DROPPER:     res = MoveItemsToGrid(((cDropSpenserEntity *)DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
+		case E_BLOCK_HOPPER:      res = MoveItemsToGrid(((cHopperEntity *)     DestChunk->GetBlockEntity(bx, by, bz))->GetContents()); break;
+		case E_BLOCK_LIT_FURNACE: res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta); break;
 	}
 	
 	// If the item has been moved, reset the last tick:

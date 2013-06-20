@@ -1246,11 +1246,13 @@ void cChunk::CreateBlockEntities(void)
 						break;
 					}
 					
+					case E_BLOCK_LIT_FURNACE:
 					case E_BLOCK_FURNACE:
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
 						{
-							m_BlockEntities.push_back(new cFurnaceEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World));
+							NIBBLETYPE BlockMeta = cChunkDef::GetNibble(m_BlockMeta, x, y, z);
+							m_BlockEntities.push_back(new cFurnaceEntity(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, BlockType, BlockMeta, m_World));
 						}
 						break;
 					}
@@ -1456,9 +1458,10 @@ void cChunk::SetBlock( int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType
 			AddBlockEntity(new cDropperEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
 		}
+		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
 		{
-			AddBlockEntity(new cFurnaceEntity( WorldPos.x, WorldPos.y, WorldPos.z, m_World));
+			AddBlockEntity(new cFurnaceEntity( WorldPos.x, WorldPos.y, WorldPos.z, a_BlockType, a_BlockMeta, m_World));
 			break;
 		}
 		case E_BLOCK_HOPPER:
