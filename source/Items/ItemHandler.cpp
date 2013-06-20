@@ -272,6 +272,7 @@ char cItemHandler::GetMaxStackSize(void)
 	switch (m_ItemType) //sorted by id
 	{
 		case E_ITEM_ARROW:                return 64;
+		case E_ITEM_BAKED_POTATO:         return 64;
 		case E_ITEM_BLAZE_POWDER:         return 64;
 		case E_ITEM_BLAZE_ROD:            return 64;
 		case E_ITEM_BONE:                 return 64;
@@ -281,10 +282,13 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_BREAD:                return 64;
 		case E_ITEM_BREWING_STAND:        return 64;
 		case E_ITEM_BUCKET:               return 1;  // TODO: change this to 16 when turning compatibility to 1.3
+		case E_ITEM_CARROT:               return 64;
+		case E_ITEM_CAULDRON:             return 64;
 		case E_ITEM_CLAY:                 return 64;
 		case E_ITEM_CLAY_BRICK:           return 64;
 		case E_ITEM_CLOCK:                return 64;
 		case E_ITEM_COAL:                 return 64;
+		case E_ITEM_COMPARATOR:           return 64;
 		case E_ITEM_COMPASS:              return 64;
 		case E_ITEM_COOKED_CHICKEN:       return 64;
 		case E_ITEM_COOKED_FISH:          return 64;
@@ -299,22 +303,33 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_FEATHER:              return 64;
 		case E_ITEM_FERMENTED_SPIDER_EYE: return 64;
 		case E_ITEM_FIRE_CHARGE:          return 64;
+		case E_ITEM_FIREWORK_ROCKET:      return 64;
+		case E_ITEM_FIREWORK_STAR:        return 64;
 		case E_ITEM_FLINT:                return 64;
+		case E_ITEM_FLOWER_POT:           return 64;
 		case E_ITEM_GHAST_TEAR:           return 64;
 		case E_ITEM_GLASS_BOTTLE:         return 64;
 		case E_ITEM_GLISTERING_MELON:     return 64;
 		case E_ITEM_GLOWSTONE_DUST:       return 64;
 		case E_ITEM_GOLD:                 return 64;
 		case E_ITEM_GOLDEN_APPLE:         return 64;
+		case E_ITEM_GOLDEN_CARROT:        return 64;
 		case E_ITEM_GOLD_NUGGET:          return 64;
 		case E_ITEM_GUNPOWDER:            return 64;
+		case E_ITEM_HEAD:                 return 64;
 		case E_ITEM_IRON:                 return 64;
 		case E_ITEM_LEATHER:              return 64;
 		case E_ITEM_MAGMA_CREAM:          return 64;
+		case E_ITEM_MAP:                  return 64;
 		case E_ITEM_MELON_SEEDS:          return 64;
 		case E_ITEM_MELON_SLICE:          return 64;
+		case E_ITEM_NETHER_BRICK:         return 64;
+		case E_ITEM_NETHER_WART:          return 64;
 		case E_ITEM_PAINTINGS:            return 64;
 		case E_ITEM_PAPER:                return 64;
+		case E_ITEM_POISONOUS_POTATO:     return 64;
+		case E_ITEM_POTATO:               return 64;
+		case E_ITEM_PUMPKIN_PIE:          return 64;
 		case E_ITEM_PUMPKIN_SEEDS:        return 64;
 		case E_ITEM_RAW_BEEF:             return 64;
 		case E_ITEM_RAW_CHICKEN:          return 64;
@@ -328,6 +343,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_SIGN:                 return 16;
 		case E_ITEM_SLIMEBALL:            return 64;
 		case E_ITEM_SNOWBALL:             return 16;
+		case E_ITEM_SPAWN_EGG:            return 64;
 		case E_ITEM_SPIDER_EYE:           return 64;
 		case E_ITEM_STEAK:                return 64;
 		case E_ITEM_STICK:                return 64;

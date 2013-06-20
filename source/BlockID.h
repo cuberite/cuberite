@@ -317,16 +317,17 @@ enum ENUM_ITEM_ID
 	E_ITEM_BOOK_AND_QUILL = 386,
 	E_ITEM_WRITTEN_BOOK = 387,
 	E_ITEM_EMERALD = 388,
+	// TODO: missing an item: item frame
 	E_ITEM_FLOWER_POT = 390,
 	E_ITEM_CARROT = 391,
 	E_ITEM_POTATO = 392,
 	E_ITEM_BAKED_POTATO = 393,
 	E_ITEM_POISONOUS_POTATO = 394,
-	// TODO: missing an item
+	// TODO: missing an item: empty map
 	E_ITEM_GOLDEN_CARROT = 396,
 	E_ITEM_HEAD = 397,
 	E_ITEM_CARROT_ON_STICK = 398,
-	// TODO: missing an item
+	// TODO: missing an item: nether star
 	E_ITEM_PUMPKIN_PIE = 400,
 	E_ITEM_FIREWORK_ROCKET = 401,
 	E_ITEM_FIREWORK_STAR = 402,
@@ -336,6 +337,7 @@ enum ENUM_ITEM_ID
 	E_ITEM_NETHER_QUARTZ = 406,
 	E_ITEM_MINECART_WITH_TNT = 407,
 	E_ITEM_MINECART_WITH_HOPPER = 408,
+	// TODO: Add horse armour/horse paraphernalia
 	
 	// Keep these two as the last values of the consecutive list, without a number - they will get their correct number assigned automagically by C++
 	// IsValidItem() depends on this!
