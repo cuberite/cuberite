@@ -1537,6 +1537,12 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
+	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
+	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	{
+		return;
+	}
+	
 	// Don't explode if the explosion center is inside a liquid block:
 	switch (m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
 	{
@@ -1615,7 +1621,7 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 			}  // for z
 		}  // for y
 	}  // for x
-	area.Write(m_World, a_BlockX - ExplosionSizeInt, a_BlockY - ExplosionSizeInt, a_BlockZ - ExplosionSizeInt);
+	area.Write(m_World, a_BlockX - ExplosionSizeInt, MinY, a_BlockZ - ExplosionSizeInt);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	WakeUpSimulatorsInArea(

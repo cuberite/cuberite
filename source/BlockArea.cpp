@@ -282,22 +282,22 @@ bool cBlockArea::Read(cWorld * a_World, int a_MinBlockX, int a_MaxBlockX, int a_
 	// Check coords validity:
 	if (a_MinBlockY < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero");
+		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MinBlockY = 0;
 	}
 	else if (a_MinBlockY >= cChunkDef::Height)
 	{
-		LOGWARNING("cBlockArea::Read(): MinBlockY more than chunk height, adjusting to chunk height");
+		LOGWARNING("%s: MinBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MinBlockY = cChunkDef::Height - 1;
 	}
 	if (a_MaxBlockY < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero");
+		LOGWARNING("%s: MaxBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxBlockY = 0;
 	}
-	else if (a_MinBlockY >= cChunkDef::Height)
+	else if (a_MaxBlockY >= cChunkDef::Height)
 	{
-		LOGWARNING("cBlockArea::Read(): MaxBlockY more than chunk height, adjusting to chunk height");
+		LOGWARNING("%s: MaxBlockY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MaxBlockY = cChunkDef::Height - 1;
 	}
 	
@@ -340,12 +340,12 @@ bool cBlockArea::Write(cWorld * a_World, int a_MinBlockX, int a_MinBlockY, int a
 	// Check coords validity:
 	if (a_MinBlockY < 0)
 	{
-		LOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero");
+		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MinBlockY = 0;
 	}
 	else if (a_MinBlockY >= cChunkDef::Height - m_SizeY)
 	{
-		LOGWARNING("cBlockArea::Read(): MinBlockY + m_SizeY more than chunk height, adjusting to chunk height");
+		LOGWARNING("%s: MinBlockY + m_SizeY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MinBlockY = cChunkDef::Height - m_SizeY - 1;
 	}
 
