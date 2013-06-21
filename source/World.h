@@ -348,6 +348,13 @@ public:
 	double GetSpawnX(void) const { return m_SpawnX; }
 	double GetSpawnY(void) const { return m_SpawnY; }
 	double GetSpawnZ(void) const { return m_SpawnZ; }
+
+	/// Wakes up the simulators for the specified block
+	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
+	
+	/// Wakes up the simulators for the specified area of blocks
+	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
+
 	// tolua_end
 
 	inline cSimulatorManager * GetSimulatorManager(void) { return m_SimulatorManager; }
@@ -355,9 +362,6 @@ public:
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
 	
-	/// Wakes up the simulators for the specified block
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
-
 	/// Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true
 	bool ForEachChestInChunk  (int a_ChunkX, int a_ChunkZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp
 

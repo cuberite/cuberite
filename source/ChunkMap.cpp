@@ -737,6 +737,44 @@ void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+/// Wakes up the simulators for the specified area of blocks
+void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ)
+{
+	cSimulatorManager * SimMgr = m_World->GetSimulatorManager();
+	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
+	cChunkDef::BlockToChunk(a_MinBlockX, ZERO_CHUNK_Y, a_MinBlockZ, MinChunkX, MinChunkZ);
+	cChunkDef::BlockToChunk(a_MaxBlockX, ZERO_CHUNK_Y, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
+	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
+	{
+		int MinZ = std::max(a_MinBlockZ, z * cChunkDef::Width);
+		int MaxZ = std::min(a_MaxBlockZ, z * cChunkDef::Width + cChunkDef::Width - 1);
+		for (int x = MinChunkX; x <= MaxChunkX; x++)
+		{
+			cChunkPtr Chunk = GetChunkNoGen(x, 0, z);
+			if ((Chunk == NULL) || !Chunk->IsValid())
+			{
+				continue;
+			}
+			int MinX = std::max(a_MinBlockX, x * cChunkDef::Width);
+			int MaxX = std::min(a_MaxBlockX, x * cChunkDef::Width + cChunkDef::Width - 1);
+			for (int BlockY = a_MinBlockY; BlockY <= a_MaxBlockY; BlockY++)
+			{
+				for (int BlockZ = MinZ; BlockZ <= MaxZ; BlockZ++)
+				{
+					for (int BlockX = MinX; BlockX <= MaxX; BlockX++)
+					{
+						SimMgr->WakeUp(BlockX, BlockY, BlockZ, Chunk);
+					}  // for BlockX
+				}  // for BlockZ
+			}  // for BlockY
+		}  // for x - chunks
+	}  // for z = chunks
+}
+
+
+
+
+
 void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
@@ -1515,7 +1553,9 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
 	int ExplosionSizeSq =  ExplosionSizeInt * ExplosionSizeInt;
 	a_BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-	area.Read(m_World, a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt, a_BlockY - ExplosionSizeInt, a_BlockY + ExplosionSizeInt, a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
+	int MinY = std::max(a_BlockY - ExplosionSizeInt, 0);
+	int MaxY = std::min(a_BlockY + ExplosionSizeInt, cChunkDef::Height - 1);
+	area.Read(m_World, a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt, MinY, MaxY, a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
 	for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
 	{
 		for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
@@ -1546,13 +1586,26 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 					case E_BLOCK_OBSIDIAN:
 					case E_BLOCK_BEDROCK:
 					case E_BLOCK_WATER:
-					case E_BLOCK_STATIONARY_WATER:
-					case E_BLOCK_STATIONARY_LAVA:
 					case E_BLOCK_LAVA:
 					{
 						// These blocks are not affected by explosions
 						break;
 					}
+
+					case E_BLOCK_STATIONARY_WATER:
+					{
+						// Turn into simulated water:
+						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_WATER);
+						break;
+					}
+					
+					case E_BLOCK_STATIONARY_LAVA:
+					{
+						// Turn into simulated lava:
+						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_LAVA);
+						break;
+					}
+					
 					default:
 					{
 						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
@@ -1563,6 +1616,13 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 		}  // for y
 	}  // for x
 	area.Write(m_World, a_BlockX - ExplosionSizeInt, a_BlockY - ExplosionSizeInt, a_BlockZ - ExplosionSizeInt);
+
+	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
+	WakeUpSimulatorsInArea(
+		a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt,
+		MinY, MaxY,
+		a_BlockZ - ExplosionSizeInt, a_BlockZ + ExplosionSizeInt
+	);
 }
 
 

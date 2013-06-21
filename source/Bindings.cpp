@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/20/13 13:33:05.
+** Generated automatically by tolua++-1.0.92 on 06/21/13 22:48:20.
 */
 
 #ifndef __cplusplus
@@ -11817,6 +11817,86 @@ static int tolua_AllToLua_cWorld_GetSpawnZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetSpawnZ'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: WakeUpSimulators of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_WakeUpSimulators00
+static int tolua_AllToLua_cWorld_WakeUpSimulators00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_BlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_BlockY = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'WakeUpSimulators'", NULL);
+#endif
+  {
+   self->WakeUpSimulators(a_BlockX,a_BlockY,a_BlockZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'WakeUpSimulators'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: WakeUpSimulatorsInArea of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00
+static int tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cWorld* self = (cWorld*)  tolua_tousertype(tolua_S,1,0);
+  int a_MinBlockX = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_MaxBlockX = ((int)  tolua_tonumber(tolua_S,3,0));
+  int a_MinBlockY = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_MaxBlockY = ((int)  tolua_tonumber(tolua_S,5,0));
+  int a_MinBlockZ = ((int)  tolua_tonumber(tolua_S,6,0));
+  int a_MaxBlockZ = ((int)  tolua_tonumber(tolua_S,7,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'WakeUpSimulatorsInArea'", NULL);
+#endif
+  {
+   self->WakeUpSimulatorsInArea(a_MinBlockX,a_MaxBlockX,a_MinBlockY,a_MaxBlockY,a_MinBlockZ,a_MaxBlockZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'WakeUpSimulatorsInArea'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28105,6 +28185,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetSpawnX",tolua_AllToLua_cWorld_GetSpawnX00);
    tolua_function(tolua_S,"GetSpawnY",tolua_AllToLua_cWorld_GetSpawnY00);
    tolua_function(tolua_S,"GetSpawnZ",tolua_AllToLua_cWorld_GetSpawnZ00);
+   tolua_function(tolua_S,"WakeUpSimulators",tolua_AllToLua_cWorld_WakeUpSimulators00);
+   tolua_function(tolua_S,"WakeUpSimulatorsInArea",tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00);
    tolua_function(tolua_S,"GetSignLines",tolua_AllToLua_cWorld_GetSignLines00);
    tolua_function(tolua_S,"GrowTree",tolua_AllToLua_cWorld_GrowTree00);
    tolua_function(tolua_S,"GrowTreeFromSapling",tolua_AllToLua_cWorld_GrowTreeFromSapling00);
