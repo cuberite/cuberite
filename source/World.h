@@ -330,8 +330,8 @@ public:
 	/// Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified:
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
-	/// Spawns a new primed TNT entity at the specified block coords and specified fuse duration
-	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec);
+	/// Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided
+	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec, double a_InitialVelocityCoeff = 1);
 
 	// tolua_end
 

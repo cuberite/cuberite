@@ -119,6 +119,19 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			break;
 		}
 		
+		case E_BLOCK_TNT:
+		{
+			// Spawn a primed TNT entity, if space allows:
+			if (DispChunk->GetBlock(DispX, DispY, DispZ) == E_BLOCK_AIR)
+			{
+				double TNTX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+				double TNTZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+				m_World->SpawnPrimedTNT(TNTX, DispY + 0.5, TNTZ, 4, 0);  // 4 seconds fuse, no initial velocity
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			}
+			break;
+		}
+		
 		default:
 		{
 			DropFromSlot(a_Chunk, a_SlotNum);

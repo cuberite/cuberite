@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/21/13 22:48:20.
+** Generated automatically by tolua++-1.0.92 on 06/21/13 23:03:07.
 */
 
 #ifndef __cplusplus
@@ -11622,7 +11622,8 @@ static int tolua_AllToLua_cWorld_SpawnPrimedTNT00(lua_State* tolua_S)
      !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
      !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11633,11 +11634,12 @@ static int tolua_AllToLua_cWorld_SpawnPrimedTNT00(lua_State* tolua_S)
   double a_Y = ((double)  tolua_tonumber(tolua_S,3,0));
   double a_Z = ((double)  tolua_tonumber(tolua_S,4,0));
   float a_FuseTimeInSec = ((float)  tolua_tonumber(tolua_S,5,0));
+  double a_InitialVelocityCoeff = ((double)  tolua_tonumber(tolua_S,6,1));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SpawnPrimedTNT'", NULL);
 #endif
   {
-   self->SpawnPrimedTNT(a_X,a_Y,a_Z,a_FuseTimeInSec);
+   self->SpawnPrimedTNT(a_X,a_Y,a_Z,a_FuseTimeInSec,a_InitialVelocityCoeff);
   }
  }
  return 0;

@@ -1325,11 +1325,11 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec)
+void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTimeInSec);
 	TNT->Initialize(this);
-	// TODO: Add a bit of speed in horiz and vert axes
+	// TODO: Add a bit of speed in horiz and vert axes, based on the a_InitialVelocityCoeff
 }
 
 
