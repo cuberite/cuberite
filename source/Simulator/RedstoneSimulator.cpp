@@ -8,6 +8,7 @@
 #include "../World.h"
 #include "../BlockID.h"
 #include "../Chunk.h"
+#include "../TNTEntity.h"
 
 
 
@@ -153,6 +154,13 @@ void cRedstoneSimulator::RefreshTorchesAround(const Vector3i & a_BlockPos)
 	{
 		TargetBlockType = E_BLOCK_REDSTONE_TORCH_OFF;
 		TargetRepeaterType = E_BLOCK_REDSTONE_REPEATER_ON;
+		//Make TNT Explode when it gets powered.
+		if (m_World.GetBlock(a_BlockPos) == E_BLOCK_TNT) 
+		{
+			m_World.BroadcastSoundEffect("random.fuse", a_BlockPos.x * 8, a_BlockPos.y * 8, a_BlockPos.z * 8, 0.5f, 0.6f);
+			m_World.SpawnPrimedTNT(a_BlockPos.x + 0.5, a_BlockPos.y + 0.5, a_BlockPos.z + 0.5, 4);  // 4 seconds to boom
+			m_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_AIR, 0);
+		}
 		//if (m_World.GetBlock(a_BlockPos) == E_BLOCK_DIRT)
 		//{
 		//	m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_STONE, 0);
