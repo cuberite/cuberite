@@ -161,6 +161,11 @@ void cRedstoneSimulator::RefreshTorchesAround(const Vector3i & a_BlockPos)
 			m_World.SpawnPrimedTNT(a_BlockPos.x + 0.5, a_BlockPos.y + 0.5, a_BlockPos.z + 0.5, 4);  // 4 seconds to boom
 			m_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_AIR, 0);
 		}
+		//Turn a redstone lamp on when it gets powered.
+		if (m_World.GetBlock(a_BlockPos) == E_BLOCK_REDSTONE_LAMP_OFF) 
+		{
+			m_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_REDSTONE_LAMP_ON, 0);
+		}
 		//if (m_World.GetBlock(a_BlockPos) == E_BLOCK_DIRT)
 		//{
 		//	m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_STONE, 0);
@@ -168,6 +173,11 @@ void cRedstoneSimulator::RefreshTorchesAround(const Vector3i & a_BlockPos)
 	}
 	else
 	{
+		//Turn a redstone lamp off when it gets powered.
+		if (m_World.GetBlock(a_BlockPos) == E_BLOCK_REDSTONE_LAMP_ON) 
+		{
+			m_World.SetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_REDSTONE_LAMP_OFF, 0);
+		}
 		//if (m_World.GetBlock(a_BlockPos) == E_BLOCK_STONE)
 		//{
 		//	m_World.FastSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_DIRT, 0);
