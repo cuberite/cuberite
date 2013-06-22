@@ -131,6 +131,22 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
+
+		case E_ITEM_FLINT_AND_STEEL:
+		{
+			// Spawn fire if the block in front is air.
+			if (DispChunk->GetBlock(DispX, DispY, DispZ) == E_BLOCK_AIR)
+			{
+				DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_FIRE, 0);
+				m_Contents.SetSlot(a_SlotNum, m_Contents.GetSlot(a_SlotNum).m_ItemType, m_Contents.GetSlot(a_SlotNum).m_ItemCount, m_Contents.GetSlot(a_SlotNum).m_ItemDamage + 1);
+				// If the durability has run out destroy the item.
+				if (m_Contents.GetSlot(a_SlotNum).m_ItemDamage > 64)
+				{				
+					m_Contents.ChangeSlotCount(a_SlotNum, -1);
+				}
+			}
+			break;
+		}
 		
 		default:
 		{
