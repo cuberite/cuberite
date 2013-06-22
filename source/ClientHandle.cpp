@@ -898,14 +898,15 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 void cClientHandle::HandleChat(const AString & a_Message)
 {
-	if (!cRoot::Get()->GetServer()->Command(*this, a_Message))
+	AString Message(a_Message);
+	if (!cRoot::Get()->GetServer()->Command(*this, Message))
 	{
 		AString Msg;
 		Printf(Msg, "<%s%s%s> %s",
 			m_Player->GetColor().c_str(),
 			m_Player->GetName().c_str(),
 			cChatColor::White.c_str(),
-			a_Message.c_str()
+			Message.c_str()
 		);
 		m_Player->GetWorld()->BroadcastChat(Msg);
 	}

@@ -44,7 +44,7 @@ public:												// tolua_export
 
 	bool Start(void);
 
-	bool Command(cClientHandle & a_Client, const AString & a_Cmd);
+	bool Command(cClientHandle & a_Client, AString & a_Cmd);
 	void ExecuteConsoleCommand(const AString & a_Cmd);
 
 	/// Binds the built-in console commands with the plugin manager

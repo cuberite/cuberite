@@ -49,7 +49,7 @@ public:
 	 * You can also return false, so default behavior is used.
 	 **/
 	virtual bool OnBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
-	virtual bool OnChat               (cPlayer * a_Player, const AString & a_Message);
+	virtual bool OnChat               (cPlayer * a_Player, AString & a_Message);
 	virtual bool OnChunkAvailable     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	virtual bool OnChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
 	virtual bool OnChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);

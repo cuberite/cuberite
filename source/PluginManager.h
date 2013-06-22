@@ -112,7 +112,7 @@ public:																	// tolua_export
 	unsigned int GetNumPlugins() const;									// tolua_export
 
 	bool CallHookBlockToPickups     (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
-	bool CallHookChat               (cPlayer * a_Player, const AString & a_Message);
+	bool CallHookChat               (cPlayer * a_Player, AString & a_Message);
 	bool CallHookChunkAvailable     (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookChunkGenerated     (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
 	bool CallHookChunkGenerating    (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);

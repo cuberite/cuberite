@@ -228,7 +228,7 @@ bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int 
 
 
 
-bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
+bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHAT);
@@ -241,13 +241,17 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, const AString & a_Message)
 	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 	tolua_pushstring  (m_LuaState, a_Message.c_str());
 
-	if (!CallFunction(2, 1, FnName))
+	if (!CallFunction(2, 2, FnName))
 	{
 		return false;
 	}
 
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
+	bool bRetVal = (tolua_toboolean(m_LuaState, -2, 0) > 0);
+	if (lua_isstring(m_LuaState, -1))
+	{
+		a_Message = tolua_tostring(m_LuaState, -1, "");
+	}
+	lua_pop(m_LuaState, 2);
 	return bRetVal;
 }
 

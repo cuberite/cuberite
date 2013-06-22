@@ -20,6 +20,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
 	
 	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "Shows a list of all the loaded entities");
 	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "Kills all the loaded entities");
@@ -627,6 +628,14 @@ function HandleGCCmd(a_Split, a_Player)
 	return true;
 end
 
+
+
+
+
+
+function OnChat(a_Player, a_Message)
+	return false, "blabla " .. a_Message;
+end
 
 
 

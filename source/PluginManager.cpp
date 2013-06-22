@@ -198,7 +198,7 @@ bool cPluginManager::CallHookBlockToPickups(
 
 
 
-bool cPluginManager::CallHookChat(cPlayer * a_Player, const AString & a_Message)
+bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 {
 	if (ExecuteCommand(a_Player, a_Message))
 	{

@@ -57,7 +57,7 @@ bool cPlugin::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_Block
 
 
 
-bool cPlugin::OnChat(cPlayer * a_Player, const AString & a_Message)
+bool cPlugin::OnChat(cPlayer * a_Player, AString & a_Message)
 {
 	UNUSED(a_Player);
 	UNUSED(a_Message);
