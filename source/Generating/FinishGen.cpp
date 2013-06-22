@@ -531,19 +531,19 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	int DefaultChance;
 	switch (a_World.GetDimension())
 	{
-		case cWorld::dimNether:
+		case dimNether:
 		{
 			DefaultHeightDistribution = IsWater ? DEF_NETHER_WATER_SPRINGS : DEF_NETHER_LAVA_SPRINGS;
 			DefaultChance = IsWater ? 0 : 15;
 			break;
 		}
-		case cWorld::dimOverworld:
+		case dimOverworld:
 		{
 			DefaultHeightDistribution = IsWater ? DEF_OVERWORLD_WATER_SPRINGS : DEF_OVERWORLD_LAVA_SPRINGS;
 			DefaultChance = IsWater ? 24 : 9;
 			break;
 		}
-		case cWorld::dimEnd:
+		case dimEnd:
 		{
 			DefaultHeightDistribution = IsWater ? DEF_END_WATER_SPRINGS : DEF_END_LAVA_SPRINGS;
 			DefaultChance = 0;

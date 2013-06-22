@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/21/13 23:03:07.
+** Generated automatically by tolua++-1.0.92 on 06/22/13 19:31:23.
 */
 
 #ifndef __cplusplus
@@ -2527,6 +2527,66 @@ static int tolua_AllToLua_ItemToFullString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'ItemToFullString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StringToBiome */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_StringToBiome00
+static int tolua_AllToLua_StringToBiome00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_BiomeString = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   EMCSBiome tolua_ret = (EMCSBiome)  StringToBiome(a_BiomeString);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_BiomeString);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StringToBiome'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StringToDimension */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_StringToDimension00
+static int tolua_AllToLua_StringToDimension00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_DimensionString = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   eDimension tolua_ret = (eDimension)  StringToDimension(a_DimensionString);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_DimensionString);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StringToDimension'.",&tolua_err);
  return 0;
 #endif
 }
@@ -10795,7 +10855,7 @@ static int tolua_AllToLua_cWorld_GetDimension00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetDimension'", NULL);
 #endif
   {
-   cWorld::eDimension tolua_ret = (cWorld::eDimension)  self->GetDimension();
+   eDimension tolua_ret = (eDimension)  self->GetDimension();
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -27713,11 +27773,16 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_ENTITY_TYPE_OCELOT",E_ENTITY_TYPE_OCELOT);
   tolua_constant(tolua_S,"E_ENTITY_TYPE_IRON_GOLEM",E_ENTITY_TYPE_IRON_GOLEM);
   tolua_constant(tolua_S,"E_ENTITY_TYPE_VILLAGER",E_ENTITY_TYPE_VILLAGER);
+  tolua_constant(tolua_S,"dimNether",dimNether);
+  tolua_constant(tolua_S,"dimOverworld",dimOverworld);
+  tolua_constant(tolua_S,"dimEnd",dimEnd);
   tolua_function(tolua_S,"BlockStringToType",tolua_AllToLua_BlockStringToType00);
   tolua_function(tolua_S,"StringToItem",tolua_AllToLua_StringToItem00);
   tolua_function(tolua_S,"ItemToString",tolua_AllToLua_ItemToString00);
   tolua_function(tolua_S,"ItemTypeToString",tolua_AllToLua_ItemTypeToString00);
   tolua_function(tolua_S,"ItemToFullString",tolua_AllToLua_ItemToFullString00);
+  tolua_function(tolua_S,"StringToBiome",tolua_AllToLua_StringToBiome00);
+  tolua_function(tolua_S,"StringToDimension",tolua_AllToLua_StringToDimension00);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);
@@ -28144,9 +28209,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cWorld","cWorld","",NULL);
   tolua_beginmodule(tolua_S,"cWorld");
-   tolua_constant(tolua_S,"dimNether",cWorld::dimNether);
-   tolua_constant(tolua_S,"dimOverworld",cWorld::dimOverworld);
-   tolua_constant(tolua_S,"dimEnd",cWorld::dimEnd);
    tolua_function(tolua_S,"GetClassStatic",tolua_AllToLua_cWorld_GetClassStatic00);
    tolua_function(tolua_S,"GetTime",tolua_AllToLua_cWorld_GetTime00);
    tolua_function(tolua_S,"GetTicksUntilWeatherChange",tolua_AllToLua_cWorld_GetTicksUntilWeatherChange00);

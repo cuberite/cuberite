@@ -1717,6 +1717,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Generating\EndGen.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Generating\EndGen.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Generating\FinishGen.cpp"
 					>
 				</File>

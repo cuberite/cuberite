@@ -59,13 +59,6 @@ class cWorld
 {
 public:
 
-	enum eDimension
-	{
-		dimNether = -1,
-		dimOverworld = 0,
-		dimEnd = 1,
-	} ;
-
 	// tolua_end
 	
 	/// A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor

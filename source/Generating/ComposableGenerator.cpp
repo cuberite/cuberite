@@ -19,6 +19,7 @@
 
 #include "Caves.h"
 #include "DistortedHeightmap.h"
+#include "EndGen.h"
 #include "MineShafts.h"
 #include "Noise3DGenerator.h"
 #include "Ravines.h"
@@ -250,6 +251,11 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 		m_HeightGen = new cDistortedHeightmap(Seed, *m_BiomeGen);
 		((cDistortedHeightmap *)m_HeightGen)->Initialize(a_IniFile);
 	}
+	else if (NoCaseCompare(HeightGenName, "End") == 0)
+	{
+		m_HeightGen = new cEndGen(Seed);
+		((cEndGen *)m_HeightGen)->Initialize(a_IniFile);
+	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
 		m_HeightGen = new cNoise3DComposable(Seed);
@@ -336,6 +342,11 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 	{
 		m_CompositionGen = new cDistortedHeightmap(m_ChunkGenerator.GetSeed(), *m_BiomeGen);
 		((cDistortedHeightmap *)m_CompositionGen)->Initialize(a_IniFile);
+	}
+	else if (NoCaseCompare(CompoGenName, "end") == 0)
+	{
+		m_CompositionGen = new cEndGen(m_ChunkGenerator.GetSeed());
+		((cEndGen *)m_CompositionGen)->Initialize(a_IniFile);
 	}
 	else if (NoCaseCompare(CompoGenName, "nether") == 0)
 	{
@@ -469,7 +480,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		// Finishers, alpha-sorted:
 		if (NoCaseCompare(*itr, "BottomLava") == 0)
 		{
-			int DefaultBottomLavaLevel = (m_World->GetDimension() == cWorld::dimNether) ? 30 : 10;
+			int DefaultBottomLavaLevel = (m_World->GetDimension() == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
 			m_FinishGens.push_back(new cFinishGenBottomLava(BottomLavaLevel));
 		}

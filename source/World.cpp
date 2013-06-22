@@ -215,7 +215,8 @@ cWorld::cWorld(const AString & a_WorldName) :
 
 	cIniFile IniFile(m_IniFileName);
 	IniFile.ReadFile();
-	m_Dimension = (eDimension)(IniFile.GetValueSetI("General", "Dimension", 0));
+	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
+	m_Dimension = StringToDimension(Dimension);
 	switch (m_Dimension)
 	{
 		case dimNether:
@@ -226,7 +227,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 		}
 		default:
 		{
-			LOGWARNING("Unknown dimension: %d. Setting to Overworld (0)", m_Dimension);
+			LOGWARNING("Unknown dimension: \"%s\". Setting to Overworld", Dimension.c_str());
 			m_Dimension = dimOverworld;
 			break;
 		}

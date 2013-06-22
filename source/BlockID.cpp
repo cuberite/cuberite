@@ -290,6 +290,7 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 		{biHell,             "Hell"},
 		{biHell,             "Nether"},
 		{biSky,              "Sky"},
+		{biSky,              "End"},
 		{biFrozenOcean,      "FrozenOcean"},
 		{biFrozenRiver,      "FrozenRiver"},
 		{biIcePlains,        "IcePlains"},
@@ -314,6 +315,46 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 		}
 	}  // for i - BiomeMap[]
 	return (EMCSBiome)-1;
+}
+
+
+
+
+
+eDimension StringToDimension(const AString & a_DimensionString)
+{
+	int res = atoi(a_DimensionString.c_str());
+	if ((res != 0) || (a_DimensionString == "0"))
+	{
+		// It was a valid number
+		return (eDimension)res;
+	}
+	
+	// Convert using a built-in map:
+	static struct
+	{
+		eDimension m_Dimension;
+		const char * m_String;
+	} DimensionMap [] =
+	{
+		{ dimOverworld, "Overworld"},
+		{ dimOverworld, "Normal"},
+		{ dimOverworld, "World"},
+		{ dimNether,    "Nether"},
+		{ dimNether,    "Hell"},  // Alternate name for End
+		{ dimEnd,       "End"},
+		{ dimEnd,       "Sky"},  // Old name for End
+	} ;
+	for (int i = 0; i < ARRAYCOUNT(DimensionMap); i++)
+	{
+		if (NoCaseCompare(DimensionMap[i].m_String, a_DimensionString) == 0)
+		{
+			return DimensionMap[i].m_Dimension;
+		}
+	}  // for i - DimensionMap[]
+	
+	// Not found
+	return (eDimension)-1000;
 }
 
 

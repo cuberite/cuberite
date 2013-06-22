@@ -602,6 +602,18 @@ enum
 	E_ENTITY_TYPE_IRON_GOLEM    = 99,
 	E_ENTITY_TYPE_VILLAGER      = 120,
 } ;
+
+
+
+
+enum eDimension
+{
+	dimNether    = -1,
+	dimOverworld = 0,
+	dimEnd       = 1,
+} ;
+
+
 // tolua_end
 
 
@@ -614,23 +626,30 @@ class cItem;
 
 
 
+// tolua_begin
+
 /// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
-extern BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString);  // tolua_export
+extern BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString);
 
 /// Translates an itemtype string into an item. Takes either a number, number^number, number:number or an items.ini alias as input. Returns true if successful.
-extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);  // tolua_export
+extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);
 
 /// Translates a full item into a string. If the ItemType is not recognized, the ItemType number is output into the string.
-extern AString ItemToString(const cItem & a_Item);  // tolua_export
+extern AString ItemToString(const cItem & a_Item);
 
 /// Translates itemtype into a string. If the type is not recognized, the itemtype number is output into the string.
-extern AString ItemTypeToString(short a_ItemType);  // tolua_export
+extern AString ItemTypeToString(short a_ItemType);
 
 /// Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string.
-extern AString ItemToFullString(const cItem & a_Item);  // tolua_export
+extern AString ItemToFullString(const cItem & a_Item);
 
 /// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);
+
+/// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns -1000 on failure
+extern eDimension StringToDimension(const AString & a_DimensionString);
+
+// tolua_end
 
 
 
