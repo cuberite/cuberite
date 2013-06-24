@@ -544,6 +544,12 @@ void cWorld::Tick(float a_Dt)
 
 void cWorld::TickWeather(float a_Dt)
 {
+	// There are no weather changes anywhere but in the Overworld:
+	if (GetDimension() != dimOverworld)
+	{
+		return;
+	}
+
 	if (m_WeatherInterval > 0)
 	{
 		// Not yet, wait for the weather period to end
