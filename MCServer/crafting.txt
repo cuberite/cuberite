@@ -253,7 +253,7 @@ Repeater         = Stone,  1:2, 2:2, 3:2            | RedstoneTorchOn, 1:1, 3:1 
 Comparator       = RedstoneTorchOn, 2:1, 1:2, 3:2   | NetherQuartz, 2:2 | Stone, 1:3, 2:3, 3:3
 DaylightSensor   = Glass, 1:1, 2:1, 3:1             | NetherQuartz, 1:2, 2:2, 3:2 | Woodslab, 1:3, 2:3, 3:3
 Hopper           = Ironbars, 1:1, 3:1, 1:2, 3:2, 2:3 | Chest, 2:2
-Piston           = Planks, 1:1, 2:1, 3:1            | RedstoneDust, 2:2         | Cobblestone, 1:2, 3:2, 1:3, 2:3, 3:3
+Piston           = Planks, 1:1, 2:1, 3:1            | RedstoneDust, 2:3         | Cobblestone, 1:2, 3:2, 1:3, 3:3         | IronIngot, 2:2
 StickyPiston     = Piston, *         | SlimeBall, *
 RedstoneLamp     = RedstoneDust, 2:1, 1:2, 3:2, 2:3 | Glowstone, 2:2
 tripwirehook, 2  = planks, 2:3 | stick, 2:2 | ironbar, 2:1
@@ -292,6 +292,7 @@ GoldIngot, 9    = GoldBlock, *
 Diamond, 9      = DiamondBlock, *
 LapisLazuli, 9  = LapisBlock, *
 Emerald, 9      = EmeraldBlock, *
+RedstoneDust, 9 = RedstoneBlock, *
 
 Painting            = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Wool, 2:2
 ItemFrame           = Stick, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3   | Leather, 2:2
