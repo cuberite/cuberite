@@ -1462,6 +1462,9 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
 	if ((Chunk == NULL) && !Chunk->IsValid())
 	{
+		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
+			a_Entity, a_Entity->GetClass(), a_Entity->GetUniqueID()
+		);
 		return;
 	}
 	Chunk->AddEntity(a_Entity);
