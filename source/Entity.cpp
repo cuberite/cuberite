@@ -173,13 +173,17 @@ void cEntity::WrapSpeed(void)
 
 
 
-void cEntity::Destroy(void)
+void cEntity::Destroy(bool a_ShouldBroadcast)
 {
 	if (!m_IsInitialized)
 	{
 		return;
 	}
-	m_World->BroadcastDestroyEntity(*this);
+	
+	if (a_ShouldBroadcast)
+	{
+		m_World->BroadcastDestroyEntity(*this);
+	}
 
 	m_IsInitialized = false;
 

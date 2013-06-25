@@ -161,7 +161,8 @@ public:
 	inline int  GetUniqueID(void) const { return m_UniqueID; }
 	inline bool IsDestroyed(void) const { return !m_IsInitialized; }
 
-	void Destroy(void);
+	/// Schedules the entity for destroying; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet
+	void Destroy(bool a_ShouldBroadcast = true);
 
 	// tolua_end
 

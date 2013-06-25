@@ -95,7 +95,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		m_DestroyTimer += a_Dt / 1000;
 		if (m_DestroyTimer > 1)
 		{
-			Destroy();
+			Destroy(true);
 		}
 		return;
 	}
@@ -134,7 +134,12 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				Vector3f NormSpeed = Vector3f(GetSpeed()).NormalizeCopy();
 				Vector3f NextBlock = Vector3f( GetPosition() ) + NormSpeed;
-				double NextHeight = (double)GetWorld()->GetHeight( (int)NextBlock.x, (int)NextBlock.z );
+				int NextHeight;
+				if (!m_World->TryGetHeight((int)NextBlock.x, (int)NextBlock.z, NextHeight))
+				{
+					// The chunk at NextBlock is not loaded
+					return;
+				}
 				if( NextHeight > (GetPosY() - 1.0) && (NextHeight - GetPosY()) < 2.5 )
 				{
 					m_bOnGround = false;

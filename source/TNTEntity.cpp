@@ -60,7 +60,7 @@ void cTNTEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	m_Counter += delta_time;
 	if (m_Counter > m_MaxFuseTime)  // Check if we go KABOOOM
 	{
-		Destroy();
+		Destroy(true);
 		LOGD("BOOM at {%f,%f,%f}", GetPosX(), GetPosY(), GetPosZ());
 		m_World->DoExplosiontAt(4.0, (int)floor(GetPosX()), (int)floor(GetPosY()), (int)floor(GetPosZ()));
 		return;

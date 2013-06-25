@@ -621,65 +621,55 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		SpawnPos = (*itr)->GetPosition();
 	}
 
-	cMonster * Monster = NULL;
-	int dayRand   = m_TickRand.randInt() % 6;
-	int nightRand = m_TickRand.randInt() % 10;
+	int dayRand   = (m_TickRand.randInt() /  7) %  6;
+	int nightRand = (m_TickRand.randInt() / 11) % 10;
 
 	SpawnPos += Vector3d((double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32, (double)(m_TickRand.randInt() % 64) - 32);
 	int Height = GetHeight((int)SpawnPos.x, (int)SpawnPos.z);
 
+	int MobType = -1;
 	if (m_TimeOfDay >= 12000 + 1000)
 	{
 		if (GetBiomeAt((int)SpawnPos.x, (int)SpawnPos.z) == biHell) // Spawn nether mobs
 		{
-			if (nightRand == 1)
-				Monster = new cZombie();
-			else if (nightRand == 5)
-				Monster = new cGhast();
-			else if (nightRand == 6)
-				Monster = new cZombiepigman();
+			switch (nightRand)
+			{
+				case 1: MobType = E_ENTITY_TYPE_ZOMBIE;        break;  // _X 2013_06_25: Really? Zombies in the Nether?
+				case 5: MobType = E_ENTITY_TYPE_GHAST;         break;
+				case 6: MobType = E_ENTITY_TYPE_ZOMBIE_PIGMAN; break;
+			}
 		}
 		else
 		{
-			if (nightRand == 0) //random percent to spawn for night
-				Monster = new cSpider();
-			else if (nightRand == 2)
-				Monster = new cEnderman();
-			else if (nightRand == 3)
-				Monster = new cCreeper();
-			else if (nightRand == 4)
-				Monster = new cCavespider();
-			else if (nightRand == 7)
-				Monster = new cSlime();
-			else if (nightRand == 8)
-				Monster = new cSilverfish();
-			else if (nightRand == 9)
-				Monster = new cSkeleton();
+			switch (nightRand)
+			{
+				case 0: MobType = E_ENTITY_TYPE_SPIDER;      break;
+				case 2: MobType = E_ENTITY_TYPE_ENDERMAN;    break;
+				case 3: MobType = E_ENTITY_TYPE_CREEPER;     break;
+				case 4: MobType = E_ENTITY_TYPE_CAVE_SPIDER; break;
+				case 7: MobType = E_ENTITY_TYPE_SLIME;       break;
+				case 8: MobType = E_ENTITY_TYPE_SILVERFISH;  break;
+				case 9: MobType = E_ENTITY_TYPE_SKELETON;    break;
+			}
 		}
-		//end random percent to spawn for night
 	}
 	else
 	{
-		if (dayRand == 0) //random percent to spawn for day
-			Monster = new cChicken();
-		else if (dayRand == 1)
-			Monster = new cCow();
-		else if (dayRand == 2)
-			Monster = new cPig();
-		else if (dayRand == 3)
-			Monster = new cSheep();
-		else if (dayRand == 4)
-			Monster = new cSquid();
-		else if (dayRand == 5)
-			Monster = new cWolf();
-		//end random percent to spawn for day
+		switch (dayRand)
+		{
+			case 0: MobType = E_ENTITY_TYPE_CHICKEN; break;
+			case 1: MobType = E_ENTITY_TYPE_COW;     break;
+			case 2: MobType = E_ENTITY_TYPE_PIG;     break;
+			case 3: MobType = E_ENTITY_TYPE_SHEEP;   break;
+			case 4: MobType = E_ENTITY_TYPE_SQUID;   break;
+			case 5: MobType = E_ENTITY_TYPE_WOLF;    break;
+		}
 	}
 
-	if (Monster)
+	if (MobType >= 0)
 	{
-		Monster->Initialize(this);
-		Monster->TeleportTo(SpawnPos.x, (double)(Height) + 2, SpawnPos.z);
-		BroadcastSpawn(*Monster);
+		// A proper mob type was selected, now spawn the mob:
+		SpawnMob(SpawnPos.x, SpawnPos.y, SpawnPos.z, MobType);
 	}
 }
 

@@ -93,7 +93,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 					m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
 					if (m_Timer > 500.f)  
 					{
-						Destroy();
+						Destroy(true);
 						return;
 					}
 				}
@@ -104,20 +104,20 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_Timer > 500.f)  // 0.5 second
 		{
-			Destroy();
+			Destroy(true);
 			return;
 		}
 	}
 
 	if (m_Timer > 1000 * 60 * 5)  // 5 minutes
 	{
-		Destroy();
+		Destroy(true);
 		return;
 	}
 
 	if (GetPosY() < -8) // Out of this world and no more visible!
 	{
-		Destroy();
+		Destroy(true);
 		return;
 	}
 }

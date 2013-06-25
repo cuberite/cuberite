@@ -123,7 +123,7 @@ cChunk::~cChunk()
 	{
 		if (!(*itr)->IsPlayer())
 		{
-			(*itr)->Destroy();
+			(*itr)->Destroy(false);
 			delete *itr;
 		}
 	}

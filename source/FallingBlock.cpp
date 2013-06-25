@@ -58,7 +58,7 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
 		if (BlockY < 100)
 		{
-			Destroy();
+			Destroy(true);
 		}
 		return;
 	}
@@ -77,7 +77,7 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)
 		// Must finish the fall with coords one below the block:
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY, BlockZ, m_BlockType, m_BlockMeta);
-		Destroy();
+		Destroy(true);
 		return;
 	}
 	else if (!cSandSimulator::CanContinueFallThrough(BlockBelow))
@@ -93,7 +93,7 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 		*/
 
 		cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
-		Destroy();
+		Destroy(true);
 		return;
 	}
 }
