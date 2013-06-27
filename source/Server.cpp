@@ -174,6 +174,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
+	m_RCONServer.Initialize(a_SettingsIni);
+
 	m_bIsConnected = true;
 
 	m_pState->ServerID = "-";
@@ -215,12 +217,13 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 cServer::cServer(void)
 	: m_pState(new sServerState)
-	, m_ListenThreadIPv4(*this, cSocket::IPv4)
-	, m_ListenThreadIPv6(*this, cSocket::IPv6)
+	, m_ListenThreadIPv4(*this, cSocket::IPv4, "Client")
+	, m_ListenThreadIPv6(*this, cSocket::IPv6, "Client")
 	, m_Millisecondsf(0)
 	, m_Milliseconds(0)
 	, m_bIsConnected(false)
 	, m_bRestarting(false)
+	, m_RCONServer(*this)
 {
 }
 

@@ -611,6 +611,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\RCONServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\RCONServer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\ReferenceManager.cpp"
 				>
 			</File>

@@ -37,7 +37,7 @@ public:
 		virtual void OnConnectionAccepted(cSocket & a_Socket) = 0;
 	} ;
 	
-	cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family);
+	cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family, const AString & a_ServiceName = "");
 	~cListenThread();
 	
 	/// Creates all the sockets, returns trus if successful, false if not.
@@ -62,7 +62,12 @@ protected:
 	/// Sockets that are being monitored
 	cSockets m_Sockets;
 	
+	/// If set to true, the SO_REUSEADDR socket option is set to true
 	bool m_ShouldReuseAddr;
+	
+	/// Name of the service that's listening on the ports; for logging purposes only
+	AString m_ServiceName;
+	
 	
 	/** Fills in m_Sockets with individual sockets, each for one port specified in a_PortsString.
 	Returns true if successful and at least one socket has been created

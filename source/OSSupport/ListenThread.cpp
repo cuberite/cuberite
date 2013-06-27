@@ -10,10 +10,11 @@
 
 
 
-cListenThread::cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family) :
-	super("ListenThread"),
+cListenThread::cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family, const AString & a_ServiceName) :
+	super(Printf("ListenThread %s", a_ServiceName.c_str())),
 	m_Callback(a_Callback),
-	m_Family(a_Family)
+	m_Family(a_Family),
+	m_ServiceName(a_ServiceName)
 {
 }
 
@@ -105,11 +106,11 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		return false;
 	}
 	
-	const char * FamilyStr = "";
+	AString FamilyStr = m_ServiceName;
 	switch (m_Family)
 	{
-		case cSocket::IPv4: FamilyStr = "IPv4"; break;
-		case cSocket::IPv6: FamilyStr = "IPv6"; break;
+		case cSocket::IPv4: FamilyStr.append(" IPv4"); break;
+		case cSocket::IPv6: FamilyStr.append(" IPv6"); break;
 		default:
 		{
 			ASSERT(!"Unknown address family");
@@ -122,13 +123,13 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		int Port = atoi(itr->c_str());
 		if ((Port <= 0) || (Port > 65535))
 		{
-			LOGWARNING("%s: Invalid port specified: \"%s\".", FamilyStr, itr->c_str());
+			LOGWARNING("%s: Invalid port specified: \"%s\".", FamilyStr.c_str(), itr->c_str());
 			continue;
 		}
 		m_Sockets.push_back(cSocket::CreateSocket(m_Family));
 		if (!m_Sockets.back().IsValid())
 		{
-			LOGWARNING("%s: Cannot create listening socket for port %d: \"%s\"", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
+			LOGWARNING("%s: Cannot create listening socket for port %d: \"%s\"", FamilyStr.c_str(), Port, cSocket::GetLastErrorString().c_str());
 			m_Sockets.pop_back();
 			continue;
 		}
@@ -137,7 +138,7 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		{
 			if (!m_Sockets.back().SetReuseAddress())
 			{
-				LOG("%s: Port %d cannot reuse addr, syscall failed: \"%s\".", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
+				LOG("%s: Port %d cannot reuse addr, syscall failed: \"%s\".", FamilyStr.c_str(), Port, cSocket::GetLastErrorString().c_str());
 			}
 		}
 		
@@ -155,19 +156,19 @@ bool cListenThread::CreateSockets(const AString & a_PortsString)
 		}
 		if (!res)
 		{
-			LOGWARNING("%s: Cannot bind port %d: \"%s\".", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
+			LOGWARNING("%s: Cannot bind port %d: \"%s\".", FamilyStr.c_str(), Port, cSocket::GetLastErrorString().c_str());
 			m_Sockets.pop_back();
 			continue;
 		}
 		
 		if (!m_Sockets.back().Listen())
 		{
-			LOGWARNING("%s: Cannot listen on port %d: \"%s\".", FamilyStr, Port, cSocket::GetLastErrorString().c_str());
+			LOGWARNING("%s: Cannot listen on port %d: \"%s\".", FamilyStr.c_str(), Port, cSocket::GetLastErrorString().c_str());
 			m_Sockets.pop_back();
 			continue;
 		}
 		
-		LOGINFO("%s: Port %d is open for connections", FamilyStr, Port);
+		LOGINFO("%s: Port %d is open for connections", FamilyStr.c_str(), Port);
 	}  // for itr - Ports[]
 	
 	return !(m_Sockets.empty());

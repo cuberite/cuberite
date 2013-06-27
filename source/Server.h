@@ -8,13 +8,12 @@
 
 
 #pragma once
-#ifndef CSERVER_H_INCLUDED
-#define CSERVER_H_INCLUDED
 
 #include "OSSupport/SocketThreads.h"
 #include "OSSupport/ListenThread.h"
 #include "CryptoPP/rsa.h"
 #include "CryptoPP/randpool.h"
+#include "RCONServer.h"
 
 
 
@@ -105,11 +104,11 @@ private:
 	
 	cNotifyWriteThread m_NotifyWriteThread;
 	
-	cListenThread m_ListenThreadIPv4;  // IPv4
-	cListenThread m_ListenThreadIPv6;  // IPv6
+	cListenThread m_ListenThreadIPv4;
+	cListenThread m_ListenThreadIPv6;
 	
 	cCriticalSection  m_CSClients;  // Locks client list
-	cClientHandleList m_Clients;         // Clients that are connected to the server
+	cClientHandleList m_Clients;    // Clients that are connected to the server
 	
 	cSocketThreads m_SocketThreads;
 	
@@ -120,12 +119,14 @@ private:
 	unsigned int m_Milliseconds;
 
 	bool m_bIsConnected; // true - connected false - not connected
-	int m_iServerPort;
 
 	bool m_bRestarting;
 	
-	CryptoPP::RSA::PrivateKey      m_PrivateKey;
-	CryptoPP::RSA::PublicKey       m_PublicKey;
+	CryptoPP::RSA::PrivateKey m_PrivateKey;
+	CryptoPP::RSA::PublicKey  m_PublicKey;
+	
+	cRCONServer m_RCONServer;
+	
 
 	cServer(void);
 	~cServer();
@@ -136,12 +137,6 @@ private:
 	// cListenThread::cCallback overrides:
 	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 }; // tolua_export
-
-
-
-
-
-#endif  // CSERVER_H_INCLUDED
 
 
 
