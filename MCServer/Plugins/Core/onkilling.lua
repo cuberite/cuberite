@@ -1,5 +1,6 @@
 function OnKilling(Victim, Killer)
 	if Victim:IsPlayer() then
+		SetBackCoordinates( Victim )
 		Server = cRoot:Get():GetServer()
 		if Killer == nil then
 			if Victim:IsOnFire() then

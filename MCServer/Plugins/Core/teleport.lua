@@ -8,9 +8,7 @@ function HandleTPCommand( Split, Player )
 		if( OtherPlayer == Player ) then
 			Player:SendMessage( cChatColor.Green .. "Already there :)" )
 		else
-			X[Player:GetName()] = Player:GetPosX()
-			Y[Player:GetName()] = Player:GetPosY()
-			Z[Player:GetName()] = Player:GetPosZ()
+			SetBackCoordinates( Player )
 			Player:TeleportToEntity( OtherPlayer )
 			Player:SendMessage( cChatColor.Green .. "You teleported to "..OtherPlayer:GetName().."!" )
 			if Split[3] ~= "-h" then
