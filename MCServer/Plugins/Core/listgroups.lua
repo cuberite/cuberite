@@ -3,7 +3,7 @@ function HandleListGroupsCommand( Split, Player )
 	if GroupsIni:ReadFile() == false then
 		Player:SendMessage( cChatColor.Green .. "No groups found" )
 	end
-	Number = GroupsIni:NumKeys()
+	Number = GroupsIni:NumKeys() - 1
 	Groups = {}
 	for i=0, Number do
 		table.insert( Groups, GroupsIni:KeyName(i) )

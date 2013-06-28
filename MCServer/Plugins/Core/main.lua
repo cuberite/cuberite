@@ -32,6 +32,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
 	
+	PluginManager:BindCommand("/listworlds",      "core.listworlds",      HandleListWorldsCommand,      " - Shows a list of all the worlds");
 	PluginManager:BindCommand("/listgroups",      "core.listgroups",      HandleListGroupsCommand,      " - Shows a list of all the groups");
 	PluginManager:BindCommand("/toggledownfall",  "core.toggledownfall",  HandleToggleDownfallCommand,  " - Toggles the weather");
 	PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
