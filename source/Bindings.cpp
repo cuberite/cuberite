@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/22/13 19:31:23.
+** Generated automatically by tolua++-1.0.92 on 06/29/13 17:21:35.
 */
 
 #ifndef __cplusplus
@@ -195,7 +195,7 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cCraftingRecipe");
- tolua_usertype(tolua_S,"cEntity");
+ tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cBlockArea");
@@ -205,48 +205,47 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cCuboid");
  tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cPlugin_NewLua");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
  tolua_usertype(tolua_S,"Lua__cPawn");
- tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
- tolua_usertype(tolua_S,"cCraftingRecipes");
+ tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
  tolua_usertype(tolua_S,"Lua__cPlayer");
- tolua_usertype(tolua_S,"cItemGrid::cListener");
+ tolua_usertype(tolua_S,"cCraftingRecipes");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cDispenserEntity");
- tolua_usertype(tolua_S,"Lua__cPickup");
+ tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
+ tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cFurnaceEntity");
- tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"cPluginManager");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cDropperEntity");
  tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"cPlugin");
- tolua_usertype(tolua_S,"AStringVector");
+ tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cListeners");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
  tolua_usertype(tolua_S,"cGroupManager");
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
- tolua_usertype(tolua_S,"cBlockEntityWithItems");
+ tolua_usertype(tolua_S,"cItemGrid::cListener");
  tolua_usertype(tolua_S,"cServer");
- tolua_usertype(tolua_S,"cListeners");
+ tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"Vector3d");
 }
@@ -5878,18 +5877,20 @@ static int tolua_AllToLua_cEntity_Destroy00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  bool a_ShouldBroadcast = ((bool)  tolua_toboolean(tolua_S,2,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Destroy'", NULL);
 #endif
   {
-   self->Destroy();
+   self->Destroy(a_ShouldBroadcast);
   }
  }
  return 0;
@@ -10164,40 +10165,6 @@ static int tolua_AllToLua_cPluginManager_IsConsoleCommandBound00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'IsConsoleCommandBound'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: ExecuteConsoleCommand of class  cPluginManager */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPluginManager_ExecuteConsoleCommand00
-static int tolua_AllToLua_cPluginManager_ExecuteConsoleCommand00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const AStringVector",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
-  const AStringVector* a_Split = ((const AStringVector*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ExecuteConsoleCommand'", NULL);
-#endif
-  {
-   bool tolua_ret = (bool)  self->ExecuteConsoleCommand(*a_Split);
-   tolua_pushboolean(tolua_S,(bool)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'ExecuteConsoleCommand'.",&tolua_err);
  return 0;
 #endif
 }
@@ -18771,9 +18738,9 @@ static int tolua_AllToLua_cRoot_GetPluginManager00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: ExecuteConsoleCommand of class  cRoot */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_ExecuteConsoleCommand00
-static int tolua_AllToLua_cRoot_ExecuteConsoleCommand00(lua_State* tolua_S)
+/* method: QueueExecuteConsoleCommand of class  cRoot */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00
+static int tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
@@ -18789,17 +18756,17 @@ static int tolua_AllToLua_cRoot_ExecuteConsoleCommand00(lua_State* tolua_S)
   cRoot* self = (cRoot*)  tolua_tousertype(tolua_S,1,0);
   const AString a_Cmd = ((const AString)  tolua_tocppstring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ExecuteConsoleCommand'", NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'QueueExecuteConsoleCommand'", NULL);
 #endif
   {
-   self->ExecuteConsoleCommand(a_Cmd);
+   self->QueueExecuteConsoleCommand(a_Cmd);
    tolua_pushcppstring(tolua_S,(const char*)a_Cmd);
   }
  }
  return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'ExecuteConsoleCommand'.",&tolua_err);
+ tolua_error(tolua_S,"#ferror in function 'QueueExecuteConsoleCommand'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28187,7 +28154,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"ExecuteCommand",tolua_AllToLua_cPluginManager_ExecuteCommand00);
    tolua_function(tolua_S,"ForceExecuteCommand",tolua_AllToLua_cPluginManager_ForceExecuteCommand00);
    tolua_function(tolua_S,"IsConsoleCommandBound",tolua_AllToLua_cPluginManager_IsConsoleCommandBound00);
-   tolua_function(tolua_S,"ExecuteConsoleCommand",tolua_AllToLua_cPluginManager_ExecuteConsoleCommand00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPlugin","cPlugin","",NULL);
   tolua_beginmodule(tolua_S,"cPlugin");
@@ -28599,7 +28565,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetFurnaceRecipe",tolua_AllToLua_cRoot_GetFurnaceRecipe00);
    tolua_function(tolua_S,"GetWebAdmin",tolua_AllToLua_cRoot_GetWebAdmin00);
    tolua_function(tolua_S,"GetPluginManager",tolua_AllToLua_cRoot_GetPluginManager00);
-   tolua_function(tolua_S,"ExecuteConsoleCommand",tolua_AllToLua_cRoot_ExecuteConsoleCommand00);
+   tolua_function(tolua_S,"QueueExecuteConsoleCommand",tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00);
    tolua_function(tolua_S,"GetTotalChunkCount",tolua_AllToLua_cRoot_GetTotalChunkCount00);
    tolua_function(tolua_S,"SaveAllChunks",tolua_AllToLua_cRoot_SaveAllChunks00);
    tolua_function(tolua_S,"GetProtocolVersionTextFromInt",tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00);

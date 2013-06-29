@@ -19,9 +19,11 @@
 
 
 
+// fwd:
 class cPlayer;
 class cClientHandle;
 class cIniFile;
+class cCommandOutputCallback ;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 
@@ -44,7 +46,9 @@ public:												// tolua_export
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
-	void ExecuteConsoleCommand(const AString & a_Cmd);
+	
+	/// Executes the console command, sends output through the specified callback
+	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 
 	/// Binds the built-in console commands with the plugin manager
 	static void BindBuiltInConsoleCommands(void);

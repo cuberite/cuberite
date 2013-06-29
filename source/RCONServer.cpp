@@ -8,6 +8,7 @@
 #include "RCONServer.h"
 #include "Server.h"
 #include "Root.h"
+#include "CommandOutput.h"
 
 
 
@@ -31,6 +32,41 @@ enum
 	
 	// Server -> Client:
 	RCON_PACKET_RESPONSE = 2,
+} ;
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cRCONCommandOutput:
+
+class cRCONCommandOutput :
+	public cCommandOutputCallback
+{
+public:
+	cRCONCommandOutput(cRCONServer::cConnection & a_Connection, int a_RequestID) :
+		m_Connection(a_Connection),
+		m_RequestID(a_RequestID)
+	{
+	}
+	
+	// cCommandOutputCallback overrides:
+	virtual void Out(const AString & a_Text) override
+	{
+		m_Buffer.append(a_Text);
+	}
+	
+	virtual void Finished(void) override
+	{
+		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, m_Buffer.size(), m_Buffer.c_str());
+		delete this;
+	}
+	
+protected:
+	cRCONServer::cConnection & m_Connection;
+	int m_RequestID;
+	AString m_Buffer;
 } ;
 
 
@@ -218,9 +254,16 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 		
 		case RCON_PACKET_COMMAND:
 		{
+			if (!m_IsAuthenticated)
+			{
+				char AuthNeeded[] = "You need to authenticate first!";
+				SendResponse(a_RequestID, RCON_PACKET_RESPONSE, sizeof(AuthNeeded), AuthNeeded);
+				return false;
+			}
+			
 			AString cmd(a_Payload, a_PayloadLength);
 			LOGD("RCON command from %s: \"%s\"", m_IPAddress.c_str(), cmd.c_str());
-			cRoot::Get()->ExecuteConsoleCommand(cmd);
+			cRoot::Get()->ExecuteConsoleCommand(cmd, *(new cRCONCommandOutput(*this, a_RequestID)));
 			
 			// Send an empty response:
 			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, NULL);

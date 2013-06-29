@@ -77,7 +77,7 @@ public:
 	
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player) override;
 	
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split) override;
+	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) override;
 
 	virtual void ClearCommands(void) override;
 	

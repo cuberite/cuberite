@@ -17,26 +17,30 @@ function HandleKickCommand( Split, Player )
 end
 
 
-function KickPlayer( PlayerName, Reason )
-	local RealName = ""
-	local FoundPlayerCallback = function( OtherPlayer )
-		if( Reason == nil ) then
-			Reason = "You have been kicked"
-		end
-		
-		RealName = OtherPlayer:GetName()
+
+
+
+--- Kicks a player by name, with the specified reason; returns bool whether found and player's real name
+function KickPlayer(PlayerName, Reason)
+	local RealName = "";
+	if (Reason == nil) then
+		Reason = "You have been kicked";
+	end
+	
+	local FoundPlayerCallback = function(a_Player)
+		RealName = a_Player:GetName()
 
 		local Server = cRoot:Get():GetServer()
 		LOGINFO( "'" .. RealName .. "' is being kicked for ( "..Reason..") " )
-		Server:SendMessage( "Kicking " .. RealName )
+		Server:SendMessage("Kicking " .. RealName)
 
-		local ClientHandle = OtherPlayer:GetClientHandle()
-		ClientHandle:Kick( Reason )
+		a_Player:GetClientHandle():Kick(Reason);
 	end
 
-	if( cRoot:Get():FindAndDoWithPlayer( PlayerName, FoundPlayerCallback ) == false ) then
-		return false -- could not find player
+	if (not(cRoot:Get():FindAndDoWithPlayer( PlayerName, FoundPlayerCallback))) then
+		-- Could not find player
+		return false;
 	end
 	
-	return true, RealName -- player should be kicked now
+	return true, RealName;  -- Player has been kicked
 end

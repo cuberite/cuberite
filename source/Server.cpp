@@ -21,6 +21,7 @@
 #include "Tracer.h"
 #include "WebAdmin.h"
 #include "Protocol/ProtocolRecognizer.h"
+#include "CommandOutput.h"
 
 #include "MersenneTwister.h"
 
@@ -425,7 +426,7 @@ bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 
 
 
-void cServer::ExecuteConsoleCommand(const AString & a_Cmd)
+void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
 	AStringVector split = StringSplit(a_Cmd, " ");
 	if (split.empty())
@@ -442,7 +443,8 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd)
 	// There is currently no way a plugin can do these (and probably won't ever be):
 	if (split[0].compare("chunkstats") == 0)
 	{
-		cRoot::Get()->LogChunkStats();
+		cRoot::Get()->LogChunkStats(a_Output);
+		a_Output.Finished();
 		return;
 	}
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
@@ -462,12 +464,14 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd)
 	}
 	#endif
 	
-	if (cPluginManager::Get()->ExecuteConsoleCommand(split))
+	if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
 	{
+		a_Output.Finished();
 		return;
 	}
 	
-	LOG("Unknown command, type 'help' for all commands.\n");
+	a_Output.Out("Unknown command, type 'help' for all commands.");
+	a_Output.Finished();
 }
 
 

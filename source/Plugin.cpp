@@ -5,6 +5,7 @@
 #include "Pawn.h"
 #include "Player.h"
 #include "World.h"
+#include "CommandOutput.h"
 
 
 
@@ -546,9 +547,10 @@ bool cPlugin::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
 
 
 
-bool cPlugin::HandleConsoleCommand(const AStringVector & a_Split)
+bool cPlugin::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
 	UNUSED(a_Split);
+	UNUSED(a_Output);
 	return false;
 }
 

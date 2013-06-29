@@ -15,6 +15,7 @@
 #include "Items/ItemHandler.h"
 #include "Chunk.h"
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
+#include "CommandOutput.h"
 
 #ifdef USE_SQUIRREL
 	#include "squirrelbindings/SquirrelFunctions.h"
@@ -69,11 +70,13 @@ void cRoot::InputThread(void * a_Params)
 {
 	cRoot & self = *(cRoot*)a_Params;
 
+	cLogCommandOutputCallback Output;
+	
 	while (!(self.m_bStop || self.m_bRestart))
 	{
 		std::string Command;
 		std::getline(std::cin, Command);
-		self.ExecuteConsoleCommand(Command);
+		self.ExecuteConsoleCommand(Command, Output);
 	}
 }
 
@@ -350,14 +353,14 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 void cRoot::TickWorlds(float a_Dt)
 {
 	// Execute any pending commands:
-	AStringVector PendingCommands;
+	cCommandQueue PendingCommands;
 	{
 		cCSLock Lock(m_CSPendingCommands);
 		std::swap(PendingCommands, m_PendingCommands);
 	}
-	for (AStringVector::iterator itr = PendingCommands.begin(), end = PendingCommands.end(); itr != end; ++itr)
+	for (cCommandQueue::iterator itr = PendingCommands.begin(), end = PendingCommands.end(); itr != end; ++itr)
 	{
-		DoExecuteConsoleCommand(*itr);
+		ExecuteConsoleCommand(itr->m_Command, *(itr->m_Output));
 	}
 	
 	// Tick the worlds:
@@ -371,7 +374,7 @@ void cRoot::TickWorlds(float a_Dt)
 
 
 
-void cRoot::ExecuteConsoleCommand(const AString & a_Cmd)
+void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
 	// Some commands are built-in:
 	if (a_Cmd == "stop")
@@ -385,17 +388,48 @@ void cRoot::ExecuteConsoleCommand(const AString & a_Cmd)
 
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
-	m_PendingCommands.push_back(a_Cmd);
+	m_PendingCommands.push_back(cCommand(a_Cmd, &a_Output));
 }
 
 
 
 
 
-void cRoot::DoExecuteConsoleCommand(const AString & a_Cmd)
+void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 {
+	// Some commands are built-in:
+	if (a_Cmd == "stop")
+	{
+		m_bStop = true;
+	}
+	else if (a_Cmd == "restart")
+	{
+		m_bRestart = true;
+	}
+
+	// Put the command into a queue (Alleviates FS #363):
+	cCSLock Lock(m_CSPendingCommands);
+	m_PendingCommands.push_back(cCommand(a_Cmd, new cLogCommandDeleteSelfOutputCallback));
+}
+
+
+
+
+
+void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
+{
+	// Some commands are built-in:
+	if (a_Cmd == "stop")
+	{
+		m_bStop = true;
+	}
+	else if (a_Cmd == "restart")
+	{
+		m_bRestart = true;
+	}
+
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
-	m_Server->ExecuteConsoleCommand(a_Cmd);
+	m_Server->ExecuteConsoleCommand(a_Cmd, a_Output);
 }
 
 
@@ -524,7 +558,7 @@ AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
 
 
 
-void cRoot::LogChunkStats(void)
+void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 {
 	int SumNumValid = 0;
 	int SumNumDirty = 0;
@@ -541,35 +575,35 @@ void cRoot::LogChunkStats(void)
 		int NumDirty = 0;
 		int NumInLighting = 0;
 		World->GetChunkStats(NumValid, NumDirty, NumInLighting);
-		LOG("World %s:", World->GetName().c_str());
-		LOG("  Num loaded chunks: %d", NumValid);
-		LOG("  Num dirty chunks: %d", NumDirty);
-		LOG("  Num chunks in lighting queue: %d", NumInLighting);
-		LOG("  Num chunks in generator queue: %d", NumInGenerator);
-		LOG("  Num chunks in storage load queue: %d", NumInLoadQueue);
-		LOG("  Num chunks in storage save queue: %d", NumInSaveQueue);
+		a_Output.Out("World %s:", World->GetName().c_str());
+		a_Output.Out("  Num loaded chunks: %d", NumValid);
+		a_Output.Out("  Num dirty chunks: %d", NumDirty);
+		a_Output.Out("  Num chunks in lighting queue: %d", NumInLighting);
+		a_Output.Out("  Num chunks in generator queue: %d", NumInGenerator);
+		a_Output.Out("  Num chunks in storage load queue: %d", NumInLoadQueue);
+		a_Output.Out("  Num chunks in storage save queue: %d", NumInSaveQueue);
 		int Mem = NumValid * sizeof(cChunk);
-		LOG("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
-		LOG("  Per-chunk memory size breakdown:");
-		LOG("    block types:    %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
-		LOG("    block metadata: %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		LOG("    block lighting: %6d bytes (%3d KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
-		LOG("    heightmap:      %6d bytes (%3d KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
-		LOG("    biomemap:       %6d bytes (%3d KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
+		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+		a_Output.Out("  Per-chunk memory size breakdown:");
+		a_Output.Out("    block types:    %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024);
+		a_Output.Out("    block metadata: %6d bytes (%3d KiB)", sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		a_Output.Out("    block lighting: %6d bytes (%3d KiB)", 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      %6d bytes (%3d KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       %6d bytes (%3d KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		int Rest = sizeof(cChunk) - sizeof(cChunkDef::BlockTypes) - 3 * sizeof(cChunkDef::BlockNibbles) - sizeof(cChunkDef::HeightMap) - sizeof(cChunkDef::BiomeMap);
-		LOG("    other:          %6d bytes (%3d KiB)", Rest, (Rest + 1023) / 1024);
+		a_Output.Out("    other:          %6d bytes (%3d KiB)", Rest, (Rest + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;
 		SumNumInGenerator += NumInGenerator;
 		SumMem += Mem;
 	}
-	LOG("Totals:");
-	LOG("  Num loaded chunks: %d", SumNumValid);
-	LOG("  Num dirty chunks: %d", SumNumDirty);
-	LOG("  Num chunks in lighting queue: %d", SumNumInLighting);
-	LOG("  Num chunks in generator queue: %d", SumNumInGenerator);
-	LOG("  Memory used by chunks: %d KiB (%d MiB)", (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024));
+	a_Output.Out("Totals:");
+	a_Output.Out("  Num loaded chunks: %d", SumNumValid);
+	a_Output.Out("  Num dirty chunks: %d", SumNumDirty);
+	a_Output.Out("  Num chunks in lighting queue: %d", SumNumInLighting);
+	a_Output.Out("  Num chunks in generator queue: %d", SumNumInGenerator);
+	a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024));
 }
 
 

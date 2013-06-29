@@ -92,8 +92,10 @@ public:
 	*/
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player);
 	
-	/// Handles the console command split into a_Split. Returns true if command handled successfully.
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split);
+	/** Handles the console command split into a_Split.
+	Returns true if command handled successfully. Output is to be sent to the a_Output callback.
+	*/
+	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
 	
 	/// All bound commands are to be removed, do any language-dependent cleanup here
 	virtual void ClearCommands(void) {} ;

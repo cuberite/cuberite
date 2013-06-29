@@ -29,6 +29,9 @@ class cPickup;
 struct TakeDamageInfo;
 class cPawn;
 
+// fwd: CommandOutput.h
+class cCommandOutputCallback;
+
 
 
 
@@ -191,8 +194,8 @@ public:																	// tolua_export
 	/// Returns true if the console command is in the command map
 	bool IsConsoleCommandBound(const AString & a_Command);  // tolua_export
 	
-	/// Executes the command split into a_Split, as if it was given on the console. Returns true if executed.
-	bool ExecuteConsoleCommand(const AStringVector & a_Split);  // tolua_export
+	/// Executes the command split into a_Split, as if it was given on the console. Returns true if executed. Output is sent to the a_Output callback
+	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
 	
 private:
 	friend class cRoot;

@@ -363,6 +363,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\CommandOutput.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\CommandOutput.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\CraftingRecipes.cpp"
 				>
 			</File>

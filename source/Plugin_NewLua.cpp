@@ -3,7 +3,7 @@
 
 #define LUA_USE_POSIX
 #include "Plugin_NewLua.h"
-#include "MCLogger.h"
+#include "CommandOutput.h"
 
 extern "C"
 {
@@ -1378,13 +1378,15 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 
 
 
-bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split)
+bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
 	if (cmd == m_ConsoleCommands.end())
 	{
-		LOGWARNING("Console command handler is registered in cPluginManager but not in cPlugin, wtf? Console command \"%s\".", a_Split[0].c_str());
+		LOGWARNING("Console command handler is registered in cPluginManager but not in cPlugin, wtf? Console command \"%s\", plugin \"%s\".",
+			a_Split[0].c_str(), GetName().c_str()
+		);
 		return false;
 	}
 	
@@ -1407,16 +1409,21 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split)
 	}
 	
 	// Call function:
-	int s = lua_pcall(m_LuaState, 1, 1, 0);
+	int s = lua_pcall(m_LuaState, 1, 2, 0);
 	if (report_errors(m_LuaState, s))
 	{
 		LOGERROR("Lua error. Stack size: %i", lua_gettop(m_LuaState));
 		return false;
 	}
 	
-	// Handle return value:
-	bool RetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);  // Pop return value
+	// Handle return values:
+	if (lua_isstring(m_LuaState, -1))
+	{
+		AString str = tolua_tocppstring(m_LuaState, -1, "");
+		a_Output.Out(str);
+	}
+	bool RetVal = (tolua_toboolean(m_LuaState, -2, 0) > 0);
+	lua_pop(m_LuaState, 2);  // Pop return values
 	
 	return RetVal;
 }

@@ -34,6 +34,8 @@ public:
 	void Initialize(cIniFile & a_IniFile);
 	
 protected:
+	friend class cRCONCommandOutput;
+	
 	class cConnection :
 		public cSocketThreads::cCallback
 	{
@@ -41,6 +43,7 @@ protected:
 		cConnection(cRCONServer & a_RCONServer, cSocket & a_Socket);
 		
 	protected:
+		friend class cRCONCommandOutput;
 	
 		/// Set to true if the client has successfully authenticated
 		bool m_IsAuthenticated;

@@ -1,13 +1,13 @@
 function HandleRequest_ManageServer( Request )
 	local Content = "" 
-	if( Request.PostParams["RestartServer"] ~= nil ) then
-		cRoot:Get():ExecuteConsoleCommand("restart")
-	elseif( Request.PostParams["ReloadServer"] ~= nil ) then
-		cRoot:Get():GetPluginManager():ReloadPlugins()
-	elseif( Request.PostParams["StopServer"] ~= nil ) then
-		cRoot:Get():ExecuteConsoleCommand("stop")
-	elseif( Request.PostParams["WorldSaveAllChunks"] ~= nil ) then
-		cRoot:Get():GetWorld(Request.PostParams["WorldSaveAllChunks"]):SaveAllChunks()
+	if (Request.PostParams["RestartServer"] ~= nil) then
+		cRoot:Get():QueueExecuteConsoleCommand("restart");
+	elseif (Request.PostParams["ReloadServer"] ~= nil) then
+		cRoot:Get():GetPluginManager():ReloadPlugins();
+	elseif (Request.PostParams["StopServer"] ~= nil) then
+		cRoot:Get():QueueExecuteConsoleCommand("stop");
+	elseif (Request.PostParams["WorldSaveAllChunks"] ~= nil) then
+		cRoot:Get():GetWorld(Request.PostParams["WorldSaveAllChunks"]):SaveAllChunks();
 	end
 	Content = Content .. [[
 	<form method="POST">

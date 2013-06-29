@@ -8,6 +8,7 @@
 #include "Item.h"
 #include "Root.h"
 #include "Server.h"
+#include "CommandOutput.h"
 
 #include "../iniFile/iniFile.h"
 #include "tolua++.h"
@@ -1300,7 +1301,7 @@ bool cPluginManager::IsConsoleCommandBound(const AString & a_Command)
 
 
 
-bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split)
+bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
 {
 	if (a_Split.empty())
 	{
@@ -1323,11 +1324,11 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split)
 	// Ask plugins first if a command is okay to execute the console command:
 	if (CallHookExecuteCommand(NULL, a_Split))
 	{
-		LOGINFO("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
+		a_Output.Out("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
 		return false;
 	}
 
-	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split);	
+	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output);	
 }
 
 

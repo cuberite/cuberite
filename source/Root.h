@@ -1,15 +1,13 @@
 
 #pragma once
 
-
-
-
 #include "Authenticator.h"
 
 
 
 
 
+// fwd:
 class cThread;
 class cMonsterConfig;
 class cGroupManager;
@@ -20,6 +18,8 @@ class cPluginManager;
 class cServer;
 class cWorld;
 class cPlayer;
+class cCommandOutputCallback ;
+
 typedef cItemCallback<cPlayer> cPlayerListCallback;
 typedef cItemCallback<cWorld>  cWorldListCallback;
 
@@ -27,6 +27,7 @@ typedef cItemCallback<cWorld>  cWorldListCallback;
 
 
 
+/// The root of the object hierarchy
 class cRoot	// tolua_export
 {			// tolua_export
 public:
@@ -47,8 +48,8 @@ public:
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
 	
-	/// Logs chunkstats for each world and totals
-	void LogChunkStats(void);
+	/// Writes chunkstats, for each world and totals, to the output callback
+	void LogChunkStats(cCommandOutputCallback & a_Output);
 	
 	int GetPrimaryServerVersion(void) const { return m_PrimaryServerVersion; }  // tolua_export
 	void SetPrimaryServerVersion(int a_Version) { m_PrimaryServerVersion = a_Version; }  // tolua_export
@@ -62,8 +63,22 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 
-	/// Queues a console command for execution through the cServer class; does special handling for "stop" and "restart".
-	void ExecuteConsoleCommand(const AString & a_Cmd);						// tolua_export
+	/** Queues a console command for execution through the cServer class.
+	The command will be executed in the tick thread
+	The command's output will be written to the a_Output callback
+	"stop" and "restart" commands have special handling.
+	*/
+	void QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+	
+	/** Queues a console command for execution through the cServer class.
+	The command will be executed in the tick thread
+	The command's output will be sent to console
+	"stop" and "restart" commands have special handling.
+	*/
+	void QueueExecuteConsoleCommand(const AString & a_Cmd);  // tolua_export
+	
+	/// Executes a console command through the cServer class; does special handling for "stop" and "restart".
+	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 	
 	/// Kicks the user, no matter in what world they are. Used from cAuthenticator
 	void KickUser(int a_ClientID, const AString & a_Reason);
@@ -89,12 +104,27 @@ public:
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);  // tolua_export
 	
 private:
-	typedef std::map< AString, cWorld* > WorldMap;
-	cWorld*  m_pDefaultWorld;
+	class cCommand
+	{
+	public:
+		cCommand(const AString & a_Command, cCommandOutputCallback * a_Output) :
+			m_Command(a_Command),
+			m_Output(a_Output)
+		{
+		}
+		
+		AString m_Command;
+		cCommandOutputCallback * m_Output;
+	} ;
+	
+	typedef std::map<AString, cWorld *> WorldMap;
+	typedef std::vector<cCommand> cCommandQueue;
+	
+	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
 	
 	cCriticalSection m_CSPendingCommands;
-	AStringVector    m_PendingCommands;
+	cCommandQueue    m_PendingCommands;
 
 	cThread * m_InputThread;
 
@@ -131,7 +161,7 @@ private:
 	void DoExecuteConsoleCommand(const AString & a_Cmd);
 
 	static void InputThread(void* a_Params);
-
+	
 	static cRoot*	s_Root;
 };	// tolua_export
 

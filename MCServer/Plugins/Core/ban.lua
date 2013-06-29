@@ -18,23 +18,27 @@ function HandleBanCommand( Split, Player )
 	return true
 end
 
-function BanPlayer( PlayerName, Reason )
-	if( Reason == nil ) then
+
+
+
+
+function BanPlayer(PlayerName, Reason)
+	-- Ban the player in the banned.ini:
+	BannedPlayersIni:SetValueB("Banned", PlayerName, true)
+	BannedPlayersIni:WriteFile()
+	
+	-- Kick the player:
+	if (Reason == nil) then
 		Reason = "You have been banned"
 	end
-		
-	local Success, RealName = KickPlayer( PlayerName, Reason )
-	if( Success == false ) then
-		return false
+	local Success = KickPlayer(PlayerName, Reason)
+	if (not(Success)) then
+		return false;
 	end
 	
-	LOGINFO( "'" .. RealName .. "' is being banned for ( "..Reason..") " )
-	
-	local Server = cRoot:Get():GetServer()
-	Server:SendMessage( "Banning " .. RealName )
-	
-	BannedPlayersIni:SetValueB("Banned", RealName, true)
-	BannedPlayersIni:WriteFile()
+	LOGINFO("'" .. PlayerName .. "' has been banned (\"" .. Reason .. "\") ");
+	local Server = cRoot:Get():GetServer();
+	Server:SendMessage("Banned " .. PlayerName);
 	
 	return true
 end

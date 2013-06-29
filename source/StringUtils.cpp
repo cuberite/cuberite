@@ -569,26 +569,3 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_
 
 
 
-
-AString Trim(const AString & a_Text)
-{
-	if (a_Text.empty())
-	{
-		return "";
-	}
-	size_t Beginning = a_Text.find_first_not_of(" \r\n\t");
-	if (Beginning == AString::npos)
-	{
-		Beginning = 0;
-	}
-	size_t End = a_Text.find_last_not_of(" \r\n\t");
-	if (End == AString::npos)
-	{
-		End = a_Text.length();
-	}
-	return a_Text.substr(Beginning, End - Beginning + 1);
-}
-
-
-
-
