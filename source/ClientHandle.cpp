@@ -783,7 +783,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
-	if (ItemHandler->IsPlaceable() || m_Player->IsCrouched())
+	if (ItemHandler->IsPlaceable())
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
