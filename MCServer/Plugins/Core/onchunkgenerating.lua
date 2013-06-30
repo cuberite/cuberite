@@ -1,17 +1,12 @@
 function OnChunkGenerating(World, ChunkX, ChunkZ, ChunkDesc)
-	if LimitWorld == true then
-		SpawnX = math.floor(World:GetSpawnX() / 16)
-		SpawnZ = math.floor(World:GetSpawnZ() / 16)
-		if ( (SpawnX + LimitWorldWidth) < ChunkX ) or ( (SpawnX - LimitWorldWidth) > ChunkX ) then
-			FillBlocks(World, ChunkX, ChunkZ, ChunkDesc)
-		end
-		if ( (SpawnZ + LimitWorldWidth) < ChunkZ ) or ( (SpawnZ - LimitWorldWidth) > ChunkZ ) then
-			FillBlocks(World, ChunkX, ChunkZ, ChunkDesc)
+	if (LimitWorld == true) then
+		if not LimitWorldsCuboid[World:GetName()]:IsInside( Vector3i(ChunkX, 128, ChunkZ) ) then
+			FillBlocks(ChunkDesc)
 		end
 	end
 end
 
-function FillBlocks(World, ChunkX, ChunkZ, ChunkDesc)
+function FillBlocks(ChunkDesc)
 	ChunkDesc:FillBlocks(0,0)
 	ChunkDesc:SetUseDefaultBiomes(false)
 	ChunkDesc:SetUseDefaultHeight(false)

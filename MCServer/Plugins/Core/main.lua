@@ -10,7 +10,7 @@ WhiteListIni = {}
 X = {}
 Y = {}
 Z = {}
-
+LimitWorldsCuboid = {}
 
 
 
@@ -19,7 +19,7 @@ function Initialize(Plugin)
 	PLUGIN = Plugin
 	
 	Plugin:SetName("Core")
-	Plugin:SetVersion(12)
+	Plugin:SetVersion(13)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
@@ -68,10 +68,19 @@ function Initialize(Plugin)
 	if ( IniFile:ReadFile() == true ) then
 		HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
 		LimitWorld = IniFile:GetValueSetB("Worlds", "LimitWorld", true)
-		LimitWorldWidth = IniFile:GetValueSetI("Worlds", "LimitWorldWidth", 200)
+		LimitWorldWidth = IniFile:GetValueSetI("Worlds", "LimitWorldWidth", 10)
 		SHOW_PLUGIN_NAMES = IniFile:GetValueSetB("HelpPlugin", "ShowPluginNames", true )
+		IniFile:WriteFile()
 	end
 	
+	cRoot:Get():ForEachWorld(
+		function( World )
+			LimitWorldsCuboid[World:GetName()] = cCuboid()
+			LimitWorldsCuboid[World:GetName()].p1 = Vector3i( math.floor(World:GetSpawnX() / 16) + LimitWorldWidth, 0, math.floor(World:GetSpawnZ() / 16) +  LimitWorldWidth)
+			LimitWorldsCuboid[World:GetName()].p2 = Vector3i( math.floor(World:GetSpawnX() / 16) - LimitWorldWidth, 256, math.floor(World:GetSpawnZ() / 16) -  LimitWorldWidth)
+			LimitWorldsCuboid[World:GetName()]:Sort()
+		end
+	)
 	-- Load whitelist, and add default values and stuff
 	WhiteListIni = cIniFile( Plugin:GetLocalDirectory() .. "/whitelist.ini" )
 	if ( WhiteListIni:ReadFile() == true ) then
