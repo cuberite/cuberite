@@ -13,11 +13,17 @@ class cMagmacube :
 	typedef cAggressiveMonster super;
 	
 public:
-	cMagmacube();
+	/// Creates a magmacube of the specified size; size is 1 .. 3, with 1 being the smallest
+	cMagmacube(int a_Size);
 
 	CLASS_PROTODEF(cMagmacube);
 
-	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	
+protected:
+
+	/// Size of the magmacube, 1 .. 3, with 1 being the smallest
+	int m_Size;
 } ;
 
 

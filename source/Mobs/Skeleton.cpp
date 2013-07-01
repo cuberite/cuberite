@@ -8,7 +8,7 @@
 
 
 cSkeleton::cSkeleton(void) :
-	super("Skeleton", 51, "mob.skeleton.hurt", "mob.skeleton.death")
+	super("Skeleton", 51, "mob.skeleton.hurt", "mob.skeleton.death", 0.6, 1.8)
 {
 }
 
@@ -22,9 +22,10 @@ void cSkeleton::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// TODO Outsource
 	// TODO should do SkyLight check, mobs in the dark don´t burn 
-	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsBurning())
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
 	{
-		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
+		// Burn for 10 ticks, then decide again
+		StartBurning(10);
 	}
 }
 
@@ -32,7 +33,7 @@ void cSkeleton::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cSkeleton::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_ARROW);
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_BONE);

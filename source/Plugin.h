@@ -13,7 +13,6 @@ class cPlayer;
 class cPickup;
 class cItem;
 class cEntity;
-class cPawn;
 class cWorld;
 class cChunkDesc;
 struct TakeDamageInfo;
@@ -60,7 +59,7 @@ public:
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason);
 	virtual bool OnExecuteCommand     (cPlayer * a_Player, const AStringVector & a_Split);
 	virtual bool OnHandshake          (cClientHandle * a_Client, const AString & a_Username);
-	virtual bool OnKilling            (cPawn & a_Victim, cEntity * a_Killer);
+	virtual bool OnKilling            (cEntity & a_Victim, cEntity * a_Killer);
 	virtual bool OnLogin              (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	virtual bool OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	virtual bool OnPlayerBrokenBlock  (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -80,7 +79,7 @@ public:
 	virtual bool OnPlayerUsingItem    (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	virtual bool OnPostCrafting       (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	virtual bool OnPreCrafting        (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	virtual bool OnTakeDamage         (cPawn & a_Receiver, TakeDamageInfo & a_TakeDamageInfo);
+	virtual bool OnTakeDamage         (cEntity & a_Receiver, TakeDamageInfo & a_TakeDamageInfo);
 	virtual bool OnUpdatedSign        (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	virtual bool OnUpdatingSign       (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	virtual bool OnWeatherChanged     (cWorld & a_World);

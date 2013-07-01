@@ -14,7 +14,8 @@ class cOcelot :
 	
 public:
 	cOcelot(void) :
-		super("Ocelot", 98, "mob.cat.hitt", "mob.cat.hitt")
+		// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
+		super("Ocelot", 98, "mob.cat.hitt", "mob.cat.hitt", 0.9, 0.5)
 	{
 	}
 

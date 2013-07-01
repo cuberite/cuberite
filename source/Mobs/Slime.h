@@ -13,11 +13,17 @@ class cSlime :
 	typedef cAggressiveMonster super;
 	
 public:
-	cSlime(void);
+	/// Creates a slime of the specified size; size is 1 .. 3, with 1 being the smallest
+	cSlime(int a_Size);
 
 	CLASS_PROTODEF(cSlime);
 
-	virtual void GetDrops(cItems & a_Drops, cPawn * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	
+protected:
+
+	/// Size of the slime, 1 .. 3, with 1 being the smallest
+	int m_Size;
 } ;
 
 

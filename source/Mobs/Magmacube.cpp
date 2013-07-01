@@ -7,8 +7,9 @@
 
 
 
-cMagmacube::cMagmacube(void) :
-	super("Magmacube", 62, "mob.magmacube.big", "mob.magmacube.big")
+cMagmacube::cMagmacube(int a_Size) :
+	super("Magmacube", 62, "mob.magmacube.big", "mob.magmacube.big", 0.6 * a_Size, 0.6 * a_Size),
+	m_Size(a_Size)
 {
 }
 
@@ -16,7 +17,7 @@ cMagmacube::cMagmacube(void) :
 
 
 
-void cMagmacube::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cMagmacube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_MAGMA_CREAM);
 }

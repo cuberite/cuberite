@@ -14,7 +14,8 @@ class cBat :
 	
 public:
 	cBat(void) :
-		super("Bat", 65, "mob.bat.hurt", "mob.bat.death")
+		// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
+		super("Bat", 65, "mob.bat.hurt", "mob.bat.death", 0.7, 0.7)
 	{
 	}
 

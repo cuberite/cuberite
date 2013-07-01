@@ -12,6 +12,7 @@
 #include "Tracer.h"
 #include "Chunk.h"
 #include "Simulator/FluidSimulator.h"
+#include "PluginManager.h"
 
 
 
@@ -24,8 +25,10 @@ cCriticalSection cEntity::m_CSCount;
 
 
 
-cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
+cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height)
 	: m_UniqueID(0)
+	, m_Health(1)
+	, m_MaxHealth(1)
 	, m_AttachedTo(NULL)
 	, m_Attachee(NULL)
 	, m_Referencers(new cReferenceManager(cReferenceManager::RFMNGR_REFERENCERS))
@@ -49,9 +52,13 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z)
 	, m_TimeLastSpeedPacket(0)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
-	, m_FireDamageInterval(0.f)
-	, m_BurnPeriod(0.f)
-	, m_WaterSpeed( 0.0 , 0.0 , 0.0 )
+	, m_TicksSinceLastBurnDamage(0)
+	, m_TicksSinceLastLavaDamage(0)
+	, m_TicksSinceLastFireDamage(0)
+	, m_TicksLeftBurning(0)
+	, m_WaterSpeed(0, 0, 0)
+	, m_Width(a_Width)
+	, m_Height(a_Height)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -194,6 +201,236 @@ void cEntity::Destroy(bool a_ShouldBroadcast)
 
 
 
+void cEntity::TakeDamage(cEntity & a_Attacker)
+{
+	int RawDamage = a_Attacker.GetRawDamageAgainst(*this);
+	
+	TakeDamage(dtAttack, &a_Attacker, RawDamage, a_Attacker.GetKnockbackAmountAgainst(*this));
+}
+
+
+
+
+
+void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount)
+{
+	int FinalDamage = a_RawDamage - GetArmorCoverAgainst(a_Attacker, a_DamageType, a_RawDamage);
+	cEntity::TakeDamage(a_DamageType, a_Attacker, a_RawDamage, FinalDamage, a_KnockbackAmount);
+}
+
+
+
+
+
+void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount)
+{
+	TakeDamageInfo TDI;
+	TDI.DamageType = a_DamageType;
+	TDI.Attacker = a_Attacker;
+	TDI.RawDamage = a_RawDamage;
+	TDI.FinalDamage = a_FinalDamage;
+	Vector3d Heading;
+	Heading.x = sin(GetRotation());
+	Heading.y = 0.4;  // TODO: adjust the amount of "up" knockback when testing
+	Heading.z = cos(GetRotation());
+	TDI.Knockback = Heading * a_KnockbackAmount;
+	DoTakeDamage(TDI);
+}
+
+
+
+
+
+void cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
+{
+	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
+	{
+		return;
+	}
+
+	if (m_Health <= 0)
+	{
+		// Can't take damage if already dead
+		return;
+	}
+
+	m_Health -= (short)a_TDI.FinalDamage;
+	
+	// TODO: Apply damage to armor
+	
+	if (m_Health < 0)
+	{
+		m_Health = 0;
+	}
+
+	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_HURT);
+
+	if (m_Health <= 0)
+	{
+		KilledBy(a_TDI.Attacker);
+	}
+}
+
+
+
+
+
+int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
+{
+	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
+	// Ref: http://www.minecraftwiki.net/wiki/Damage#Dealing_damage as of 2012_12_20
+	switch (this->GetEquippedWeapon().m_ItemType)
+	{
+		case E_ITEM_WOODEN_SWORD:    return 4;
+		case E_ITEM_GOLD_SWORD:      return 4;
+		case E_ITEM_STONE_SWORD:     return 5;
+		case E_ITEM_IRON_SWORD:      return 6;
+		case E_ITEM_DIAMOND_SWORD:   return 7;
+
+		case E_ITEM_WOODEN_AXE:      return 3;
+		case E_ITEM_GOLD_AXE:        return 3;
+		case E_ITEM_STONE_AXE:       return 4;
+		case E_ITEM_IRON_AXE:        return 5;
+		case E_ITEM_DIAMOND_AXE:     return 6;
+
+		case E_ITEM_WOODEN_PICKAXE:  return 2;
+		case E_ITEM_GOLD_PICKAXE:    return 2;
+		case E_ITEM_STONE_PICKAXE:   return 3;
+		case E_ITEM_IRON_PICKAXE:    return 4;
+		case E_ITEM_DIAMOND_PICKAXE: return 5;
+
+		case E_ITEM_WOODEN_SHOVEL:   return 1;
+		case E_ITEM_GOLD_SHOVEL:     return 1;
+		case E_ITEM_STONE_SHOVEL:    return 2;
+		case E_ITEM_IRON_SHOVEL:     return 3;
+		case E_ITEM_DIAMOND_SHOVEL:  return 4;
+	}
+	// All other equipped items give a damage of 1:
+	return 1;
+}
+
+
+
+
+
+int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_Damage)
+{
+	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
+	
+	// Filter out damage types that are not protected by armor:
+	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Effects as of 2012_12_20
+	switch (a_DamageType)
+	{
+		case dtOnFire:
+		case dtSuffocating:
+		case dtDrowning:  // TODO: This one could be a special case - in various MC versions (PC vs XBox) it is and isn't armor-protected
+		case dtStarving:
+		case dtInVoid:
+		case dtPoisoning:
+		case dtPotionOfHarming:
+		case dtFalling:
+		case dtLightning:
+		{
+			return 0;
+		}
+	}
+	
+	// Add up all armor points:
+	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Defense_points as of 2012_12_20
+	int ArmorValue = 0;
+	switch (GetEquippedHelmet().m_ItemType)
+	{
+		case E_ITEM_LEATHER_CAP:    ArmorValue += 1; break;
+		case E_ITEM_GOLD_HELMET:    ArmorValue += 2; break;
+		case E_ITEM_CHAIN_HELMET:   ArmorValue += 2; break;
+		case E_ITEM_IRON_HELMET:    ArmorValue += 2; break;
+		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; break;
+	}
+	switch (GetEquippedChestplate().m_ItemType)
+	{
+		case E_ITEM_LEATHER_TUNIC:      ArmorValue += 3; break;
+		case E_ITEM_GOLD_CHESTPLATE:    ArmorValue += 5; break;
+		case E_ITEM_CHAIN_CHESTPLATE:   ArmorValue += 5; break;
+		case E_ITEM_IRON_CHESTPLATE:    ArmorValue += 6; break;
+		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; break;
+	}
+	switch (GetEquippedLeggings().m_ItemType)
+	{
+		case E_ITEM_LEATHER_PANTS:    ArmorValue += 2; break;
+		case E_ITEM_GOLD_LEGGINGS:    ArmorValue += 3; break;
+		case E_ITEM_CHAIN_LEGGINGS:   ArmorValue += 4; break;
+		case E_ITEM_IRON_LEGGINGS:    ArmorValue += 5; break;
+		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; break;
+	}
+	switch (GetEquippedBoots().m_ItemType)
+	{
+		case E_ITEM_LEATHER_BOOTS: ArmorValue += 1; break;
+		case E_ITEM_GOLD_BOOTS:    ArmorValue += 1; break;
+		case E_ITEM_CHAIN_BOOTS:   ArmorValue += 1; break;
+		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
+		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; break;
+	}
+	
+	// TODO: Special armor cases, such as wool, saddles, dog's collar
+	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Mob_armor as of 2012_12_20
+	
+	// Now ArmorValue is in [0, 20] range, which corresponds to [0, 80%] protection. Calculate the hitpoints from that:
+	return a_Damage * (ArmorValue * 4) / 100;
+}
+
+
+
+
+
+double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
+{
+	// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
+	
+	// TODO: Enchantments
+	return 1;
+}
+
+
+
+
+
+void cEntity::KilledBy(cEntity * a_Killer)
+{
+	m_Health = 0;
+
+	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_Killer);
+	
+	if (m_Health > 0)
+	{
+		// Plugin wants to 'unkill' the pawn. Abort
+		return;
+	}
+
+	// Drop loot:	
+	cItems Drops;
+	GetDrops(Drops, a_Killer);
+	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
+
+	m_World->BroadcastEntityStatus(*this, ENTITY_STATUS_DEAD);
+}
+
+
+
+
+
+void cEntity::Heal(int a_HitPoints)
+{
+	m_Health += a_HitPoints;
+	if (m_Health > m_MaxHealth)
+	{
+		m_Health = m_MaxHealth;
+	}
+}
+
+
+
+
+
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	if (m_AttachedTo != NULL)
@@ -207,6 +444,7 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		HandlePhysics(a_Dt, a_Chunk);
 	}
+	TickBurning(a_Chunk);
 }
 
 
@@ -385,6 +623,226 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			if (NextSpeed.z != GetSpeedZ()) SetSpeedZ(NextSpeed.z);
 		}
 	}
+}
+
+
+
+
+
+void cEntity::TickBurning(cChunk & a_Chunk)
+{
+	// Do the burning damage:
+	if (m_TicksLeftBurning > 0)
+	{
+		m_TicksSinceLastBurnDamage++;
+		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
+		{
+			TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0, 0);
+			m_TicksSinceLastFireDamage = 0;
+		}
+		m_TicksLeftBurning--;
+		if (m_TicksLeftBurning == 0)
+		{
+			OnFinishedBurning();
+		}
+	}
+	
+	// Remember the current burning state:
+	bool HasBeenBurning = (m_TicksLeftBurning > 0);
+	
+	// Update the burning times, based on surroundings:
+	int MinRelX = (int)floor(GetPosX() - m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int MaxRelX = (int)floor(GetPosX() + m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int MinRelZ = (int)floor(GetPosZ() - m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int MaxRelZ = (int)floor(GetPosZ() + m_Width / 2) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int MinY = std::max(0, std::min(cChunkDef::Height - 1, (int)floor(GetPosY())));
+	int MaxY = std::max(0, std::min(cChunkDef::Height - 1, (int)ceil (GetPosY() + m_Height)));
+	bool HasWater = false;
+	bool HasLava = false;
+	bool HasFire = false;
+	
+	for (int x = MinRelX; x <= MaxRelX; x++)
+	{
+		for (int z = MinRelZ; z <= MaxRelZ; z++)
+		{
+			int RelX = x;
+			int RelZ = z;
+			cChunk * CurChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelX, RelZ);
+			if (CurChunk == NULL)
+			{
+				continue;
+			}
+			for (int y = MinY; y <= MaxY; y++)
+			{
+				switch (CurChunk->GetBlock(RelX, y, RelZ))
+				{
+					case E_BLOCK_FIRE:
+					{
+						HasFire = true;
+						break;
+					}
+					case E_BLOCK_LAVA:
+					case E_BLOCK_STATIONARY_LAVA:
+					{
+						HasLava = true;
+						break;
+					}
+					case E_BLOCK_STATIONARY_WATER:
+					case E_BLOCK_WATER:
+					{
+						HasWater = true;
+						break;
+					}
+				}  // switch (BlockType)
+			}  // for y
+		}  // for z
+	}  // for x
+	
+	if (HasWater)
+	{
+		// Extinguish the fire
+		m_TicksLeftBurning = 0;
+	}
+	
+	if (HasLava)
+	{
+		// Burn:
+		m_TicksLeftBurning = BURN_TICKS;
+		
+		// Periodically damage:
+		m_TicksSinceLastLavaDamage++;
+		if (m_TicksSinceLastLavaDamage >= 10)
+		{
+			TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
+			m_TicksSinceLastLavaDamage = 0;
+		}
+	}
+	else
+	{
+		m_TicksSinceLastLavaDamage = 0;
+	}
+	
+	if (HasFire)
+	{
+		// Burn:
+		m_TicksLeftBurning = BURN_TICKS;
+		
+		// Periodically damage:
+		m_TicksSinceLastFireDamage++;
+		if (m_TicksSinceLastFireDamage >= FIRE_TICKS_PER_DAMAGE)
+		{
+			TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+		}
+	}
+	else
+	{
+		m_TicksSinceLastFireDamage = 0;
+	}
+	
+	// If just started / finished burning, notify descendants:
+	if ((m_TicksLeftBurning > 0) && !HasBeenBurning)
+	{
+		OnStartedBurning();
+	}
+	else if ((m_TicksLeftBurning <= 0) && HasBeenBurning)
+	{
+		OnFinishedBurning();
+	}
+}
+
+
+
+
+
+/// Called when the entity starts burning
+void cEntity::OnStartedBurning(void)
+{
+	// Broadcast the change:
+	m_World->BroadcastMetadata(*this);
+}
+
+
+
+
+
+/// Called when the entity finishes burning
+void cEntity::OnFinishedBurning(void)
+{
+	// Broadcast the change:
+	m_World->BroadcastMetadata(*this);
+}
+
+
+
+
+
+/// Sets the maximum value for the health
+void cEntity::SetMaxHealth(int a_MaxHealth)
+{
+	m_MaxHealth = a_MaxHealth;
+
+	// Reset health, if too high:
+	if (m_Health > a_MaxHealth)
+	{
+		m_Health = a_MaxHealth;
+	}
+}
+
+
+
+
+
+/// Puts the entity on fire for the specified amount of ticks
+void cEntity::StartBurning(int a_TicksLeftBurning)
+{
+	if (m_TicksLeftBurning > 0)
+	{
+		// Already burning, top up the ticks left burning and bail out:
+		m_TicksLeftBurning = std::max(m_TicksLeftBurning, a_TicksLeftBurning);
+		return;
+	}
+	
+	m_TicksLeftBurning = a_TicksLeftBurning;
+	OnStartedBurning();
+}
+
+
+
+
+
+/// Stops the entity from burning, resets all burning timers
+void cEntity::StopBurning(void)
+{
+	bool HasBeenBurning = (m_TicksLeftBurning > 0);
+	m_TicksLeftBurning = 0;
+	m_TicksSinceLastBurnDamage = 0;
+	m_TicksSinceLastFireDamage = 0;
+	m_TicksSinceLastLavaDamage = 0;
+	
+	// Notify if the entity has stopped burning
+	if (HasBeenBurning)
+	{
+		OnFinishedBurning();
+	}
+}
+
+
+
+
+
+void cEntity::TeleportToEntity(cEntity & a_Entity)
+{
+	TeleportToCoords(a_Entity.GetPosX(), a_Entity.GetPosY(), a_Entity.GetPosZ());
+}
+
+
+
+
+
+void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
+{
+	SetPosition(a_PosX, a_PosY, a_PosZ);
+	m_World->BroadcastTeleportEntity(*this);
 }
 
 

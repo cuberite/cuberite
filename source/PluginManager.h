@@ -126,7 +126,7 @@ public:																	// tolua_export
 	bool CallHookDisconnect         (cPlayer * a_Player, const AString & a_Reason);
 	bool CallHookExecuteCommand     (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
 	bool CallHookHandshake          (cClientHandle * a_ClientHandle, const AString & a_Username);
-	bool CallHookKilling            (cPawn & a_Victim, cEntity * a_Killer);
+	bool CallHookKilling            (cEntity & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin              (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock  (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -146,7 +146,7 @@ public:																	// tolua_export
 	bool CallHookPlayerUsingItem    (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPostCrafting       (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting        (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	bool CallHookTakeDamage         (cPawn & a_Receiver, TakeDamageInfo & a_TDI);
+	bool CallHookTakeDamage         (cEntity & a_Receiver, TakeDamageInfo & a_TDI);
 	bool CallHookUpdatedSign        (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	bool CallHookUpdatingSign       (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
 	bool CallHookWeatherChanged     (cWorld & a_World);

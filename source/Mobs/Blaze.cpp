@@ -8,7 +8,8 @@
 
 
 cBlaze::cBlaze(void) :
-	super("Blaze", 61, "mob.blaze.hit", "mob.blaze.death")
+	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
+	super("Blaze", 61, "mob.blaze.hit", "mob.blaze.death", 0.7, 1.8)
 {
 }
 
@@ -16,7 +17,7 @@ cBlaze::cBlaze(void) :
 
 
 
-void cBlaze::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_BLAZE_ROD);
 }

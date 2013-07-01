@@ -510,16 +510,16 @@ void cChunkMap::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, c
 
 
 
-void cChunkMap::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
-	cChunkPtr Chunk = GetChunkNoGen(a_Pawn.GetChunkX(), ZERO_CHUNK_Y, a_Pawn.GetChunkZ());
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity.GetChunkX(), ZERO_CHUNK_Y, a_Entity.GetChunkZ());
 	if (Chunk == NULL)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastMetadata(a_Pawn, a_Exclude);
+	Chunk->BroadcastMetadata(a_Entity, a_Exclude);
 }
 
 

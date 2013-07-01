@@ -33,7 +33,7 @@
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: super(etPlayer)
+	: super(etPlayer, 0.6, 1.8)
 	, m_GameMode(eGameMode_NotSet)
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
@@ -197,7 +197,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 			else if (m_FoodLevel == 0)
 			{
-				super::TakeDamage(dtStarving, NULL, 1, 1, 0);
+				TakeDamage(dtStarving, NULL, 1, 1, 0);
 			}
 		}
 
@@ -272,7 +272,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		m_LastJumpHeight = (float)GetPosY();
 		if (Damage > 0)
 		{
-			super::TakeDamage(dtFalling, NULL, Damage, Damage, 0);
+			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
 		}
 
 		m_LastGroundHeight = (float)GetPosY();
@@ -396,9 +396,9 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::KilledBy(cPawn * a_Killer)
+void cPlayer::KilledBy(cEntity * a_Killer)
 {
-	cPawn::KilledBy(a_Killer);
+	super::KilledBy(a_Killer);
 
 	if (m_Health > 0)
 	{
@@ -425,10 +425,10 @@ void cPlayer::Respawn(void)
 
 	m_ClientHandle->SendRespawn();
 	
-	// Set non Burning
-	SetMetaData(NORMAL);
+	// Extinguish the fire:
+	StopBurning();
 
-	TeleportTo(GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ());
+	TeleportToCoords(GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ());
 
 	SetVisible(true);
 }
@@ -437,12 +437,15 @@ void cPlayer::Respawn(void)
 
 
 
-double cPlayer::GetEyeHeight()
+double cPlayer::GetEyeHeight(void) const
 {
 	return m_Stance;
 }
 
-Vector3d cPlayer::GetEyePosition()
+
+
+
+Vector3d cPlayer::GetEyePosition(void) const
 {
 	return Vector3d( GetPosX(), m_Stance, GetPosZ() );
 }
@@ -574,7 +577,7 @@ void cPlayer::SendMessage(const AString & a_Message)
 
 
 
-void cPlayer::TeleportTo(double a_PosX, double a_PosY, double a_PosZ)
+void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	SetPosition( a_PosX, a_PosY, a_PosZ );
 

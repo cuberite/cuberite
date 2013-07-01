@@ -8,7 +8,7 @@
 
 
 cZombie::cZombie(void) :
-	super("Zombie", 54, "mob.zombie.hurt", "mob.zombie.death")
+	super("Zombie", 54, "mob.zombie.hurt", "mob.zombie.death", 0.6, 1.8)
 {
 }
 
@@ -21,9 +21,10 @@ void cZombie::Tick(float a_Dt, cChunk & a_Chunk)
 	super::Tick(a_Dt, a_Chunk);
 
 	// TODO Same as in cSkeleton :D
-	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsBurning())
+	if ((GetWorld()->GetTimeOfDay() < (12000 + 1000)) && !IsOnFire())
 	{
-		SetMetaData(BURNING); // BURN, BABY, BURN!  >:D
+		// Burn for 10 ticks, then decide again
+		StartBurning(10);
 	}
 }
 
@@ -31,7 +32,7 @@ void cZombie::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cZombie::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cZombie::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_ROTTEN_FLESH);
 	

@@ -31,7 +31,7 @@ public:
 	* a_ProtocolMobType is the ID of the mob used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22)
 	* a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath);
+	cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
 	CLASS_PROTODEF(cMonster);
 	
@@ -41,7 +41,7 @@ public:
 
 	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	
-	virtual void KilledBy(cPawn * a_Killer) override;
+	virtual void KilledBy(cEntity * a_Killer) override;
 
 	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual bool ReachedDestination(void);

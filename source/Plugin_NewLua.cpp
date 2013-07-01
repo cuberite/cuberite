@@ -549,7 +549,7 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 
 
 
-bool cPlugin_NewLua::OnKilling(cPawn & a_Victim, cEntity * a_Killer)
+bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_KILLING);
@@ -559,7 +559,7 @@ bool cPlugin_NewLua::OnKilling(cPawn & a_Victim, cEntity * a_Killer)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Victim, "cPawn");
+	tolua_pushusertype(m_LuaState, &a_Victim, "cEntity");
 	tolua_pushusertype(m_LuaState, a_Killer,  "cEntity");
 
 	if (!CallFunction(2, 1, FnName))
@@ -1150,7 +1150,7 @@ bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid
 
 
 
-bool cPlugin_NewLua::OnTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
+bool cPlugin_NewLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_TAKE_DAMAGE);
@@ -1160,7 +1160,7 @@ bool cPlugin_NewLua::OnTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Receiver, "cPawn");
+	tolua_pushusertype(m_LuaState, &a_Receiver, "cEntity");
 	tolua_pushusertype(m_LuaState, &a_TDI,      "TakeDamageInfo");
 
 	if (!CallFunction(2, 1, FnName))

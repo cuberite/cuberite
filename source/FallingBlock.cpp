@@ -11,7 +11,7 @@
 
 
 cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-	super(etFallingBlock, a_BlockPosition.x + 0.5f, a_BlockPosition.y + 0.5f, a_BlockPosition.z + 0.5f),
+	super(etFallingBlock, a_BlockPosition.x + 0.5f, a_BlockPosition.y + 0.5f, a_BlockPosition.z + 0.5f, 0.98, 0.98),
 	m_BlockType(a_BlockType),
 	m_BlockMeta(a_BlockMeta),
 	m_OriginalPosition(a_BlockPosition)

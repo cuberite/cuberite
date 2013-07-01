@@ -1523,9 +1523,9 @@ void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, cons
 
 
 
-void cWorld::BroadcastMetadata(const cPawn & a_Pawn, const cClientHandle * a_Exclude)
+void cWorld::BroadcastMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastMetadata(a_Pawn, a_Exclude);
+	m_ChunkMap->BroadcastMetadata(a_Entity, a_Exclude);
 }
 
 
@@ -2317,31 +2317,33 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 {
 	cMonster * Monster = NULL;
 
+	int Size = GetTickRandomNumber(2) + 1;  // 1 .. 3
+	
 	switch (a_EntityType)
 	{
-		case E_ENTITY_TYPE_BAT:           Monster = new cBat();          break;
-		case E_ENTITY_TYPE_BLAZE:         Monster = new cBlaze();        break;
-		case E_ENTITY_TYPE_CAVE_SPIDER:   Monster = new cCavespider();   break;
-		case E_ENTITY_TYPE_CHICKEN:       Monster = new cChicken();      break;
-		case E_ENTITY_TYPE_COW:           Monster = new cCow();          break;
-		case E_ENTITY_TYPE_CREEPER:       Monster = new cCreeper();      break;
-		case E_ENTITY_TYPE_ENDERMAN:      Monster = new cEnderman();     break;
-		case E_ENTITY_TYPE_GHAST:         Monster = new cGhast();        break;
-		case E_ENTITY_TYPE_MAGMA_CUBE:    Monster = new cMagmacube();    break;
-		case E_ENTITY_TYPE_MOOSHROOM:     Monster = new cMooshroom();    break;
-		case E_ENTITY_TYPE_OCELOT:        Monster = new cOcelot();       break;
-		case E_ENTITY_TYPE_PIG:           Monster = new cPig();          break;
-		case E_ENTITY_TYPE_SHEEP:         Monster = new cSheep();        break;
-		case E_ENTITY_TYPE_SILVERFISH:    Monster = new cSilverfish();   break;
-		case E_ENTITY_TYPE_SKELETON:      Monster = new cSkeleton();     break;
-		case E_ENTITY_TYPE_SLIME:         Monster = new cSlime();        break;
-		case E_ENTITY_TYPE_SPIDER:        Monster = new cSpider();       break;
-		case E_ENTITY_TYPE_SQUID:         Monster = new cSquid();        break;
-		case E_ENTITY_TYPE_VILLAGER:      Monster = new cVillager();     break;
-		case E_ENTITY_TYPE_WITCH:         Monster = new cWitch();        break;
-		case E_ENTITY_TYPE_WOLF:          Monster = new cWolf();         break;
-		case E_ENTITY_TYPE_ZOMBIE:        Monster = new cZombie();       break;
-		case E_ENTITY_TYPE_ZOMBIE_PIGMAN: Monster = new cZombiepigman(); break;
+		case E_ENTITY_TYPE_BAT:           Monster = new cBat();           break;
+		case E_ENTITY_TYPE_BLAZE:         Monster = new cBlaze();         break;
+		case E_ENTITY_TYPE_CAVE_SPIDER:   Monster = new cCavespider();    break;
+		case E_ENTITY_TYPE_CHICKEN:       Monster = new cChicken();       break;
+		case E_ENTITY_TYPE_COW:           Monster = new cCow();           break;
+		case E_ENTITY_TYPE_CREEPER:       Monster = new cCreeper();       break;
+		case E_ENTITY_TYPE_ENDERMAN:      Monster = new cEnderman();      break;
+		case E_ENTITY_TYPE_GHAST:         Monster = new cGhast();         break;
+		case E_ENTITY_TYPE_MAGMA_CUBE:    Monster = new cMagmacube(Size); break;
+		case E_ENTITY_TYPE_MOOSHROOM:     Monster = new cMooshroom();     break;
+		case E_ENTITY_TYPE_OCELOT:        Monster = new cOcelot();        break;
+		case E_ENTITY_TYPE_PIG:           Monster = new cPig();           break;
+		case E_ENTITY_TYPE_SHEEP:         Monster = new cSheep();         break;
+		case E_ENTITY_TYPE_SILVERFISH:    Monster = new cSilverfish();    break;
+		case E_ENTITY_TYPE_SKELETON:      Monster = new cSkeleton();      break;
+		case E_ENTITY_TYPE_SLIME:         Monster = new cSlime(Size);     break;
+		case E_ENTITY_TYPE_SPIDER:        Monster = new cSpider();        break;
+		case E_ENTITY_TYPE_SQUID:         Monster = new cSquid();         break;
+		case E_ENTITY_TYPE_VILLAGER:      Monster = new cVillager();      break;
+		case E_ENTITY_TYPE_WITCH:         Monster = new cWitch();         break;
+		case E_ENTITY_TYPE_WOLF:          Monster = new cWolf();          break;
+		case E_ENTITY_TYPE_ZOMBIE:        Monster = new cZombie();        break;
+		case E_ENTITY_TYPE_ZOMBIE_PIGMAN: Monster = new cZombiepigman();  break;
 		
 		default:
 		{

@@ -8,7 +8,7 @@
 
 
 cWitch::cWitch(void) :
-	super("Witch", 66, "", "")
+	super("Witch", 66, "", "", 0.6, 1.8)
 {
 }
 
@@ -16,7 +16,7 @@ cWitch::cWitch(void) :
 
 
 
-void cWitch::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_GLASS_BOTTLE);
 	AddRandomDropItem(a_Drops, 0, 6, E_ITEM_GLOWSTONE_DUST);

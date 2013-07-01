@@ -9,7 +9,7 @@
 
 
 cSheep::cSheep(void) :
-	super("Sheep", 91, "mob.sheep.say", "mob.sheep.say"),
+	super("Sheep", 91, "mob.sheep.say", "mob.sheep.say", 0.6, 1.3),
 	m_IsSheared(false),
 	m_WoolColor(E_META_WOOL_WHITE)
 {
@@ -19,7 +19,7 @@ cSheep::cSheep(void) :
 
 
 
-void cSheep::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	if (!m_IsSheared)
 	{

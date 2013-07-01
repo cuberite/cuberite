@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Plugin.h"
-#include "Pawn.h"
+// #include "Pawn.h"
 #include "Player.h"
 #include "World.h"
 #include "CommandOutput.h"
@@ -187,7 +187,7 @@ bool cPlugin::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
 
 
 
-bool cPlugin::OnKilling(cPawn & a_Victim, cEntity * a_Killer)
+bool cPlugin::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	UNUSED(a_Victim);
 	UNUSED(a_Killer);
@@ -468,9 +468,9 @@ bool cPlugin::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Gr
 
 
 
-bool cPlugin::OnTakeDamage(cPawn & a_Pawn, TakeDamageInfo & a_TakeDamageInfo)
+bool cPlugin::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TakeDamageInfo)
 {
-	UNUSED(a_Pawn);
+	UNUSED(a_Receiver);
 	UNUSED(a_TakeDamageInfo);
 	return false;
 }

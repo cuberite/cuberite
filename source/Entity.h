@@ -1,9 +1,7 @@
 
 #pragma once
 
-
-
-
+#include "Item.h"
 #include "Vector3d.h"
 #include "Vector3f.h"
 
@@ -43,6 +41,65 @@ class cChunk;
 
 
 
+
+// tolua_begin
+enum eDamageType
+{
+	// Canonical names for the types (as documented in the plugin wiki):
+	dtAttack,           // Being attacked by a mob
+	dtLightning,        // Hit by a lightning strike
+	dtFalling,          // Falling down; dealt when hitting the ground
+	dtDrowning,         // Drowning in water / lava
+	dtSuffocating,      // Suffocating inside a block
+	dtStarving,         // Hunger
+	dtCactusContact,    // Contact with a cactus block
+	dtLavaContact,      // Contact with a lava block
+	dtPoisoning,        // Having the poison effect
+	dtOnFire,           // Being on fire
+	dtFireContact,      // Standing inside a fire block
+	dtInVoid,           // Falling into the Void (Y < 0)
+	dtPotionOfHarming,
+	dtAdmin,            // Damage applied by an admin command
+	
+	// Some common synonyms:
+	dtPawnAttack   = dtAttack,
+	dtEntityAttack = dtAttack,
+	dtMob          = dtAttack,
+	dtMobAttack    = dtAttack,
+	dtFall         = dtFalling,
+	dtDrown        = dtDrowning,
+	dtSuffocation  = dtSuffocating,
+	dtStarvation   = dtStarving,
+	dtHunger       = dtStarving,
+	dtCactus       = dtCactusContact,
+	dtCactuses     = dtCactusContact,
+	dtCacti        = dtCactusContact,
+	dtLava         = dtLavaContact,
+	dtPoison       = dtPoisoning,
+	dtBurning      = dtOnFire,
+	dtInFire       = dtFireContact,
+	dtPlugin       = dtAdmin,
+} ;
+
+
+
+
+
+struct TakeDamageInfo
+{
+	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
+	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
+	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
+	int         FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
+	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
+} ;
+// tolua_end
+
+
+
+
+
 // tolua_begin
 class cEntity
 {
@@ -56,6 +113,17 @@ public:
 		ENTITY_STATUS_WOLF_SHAKING    = 8,
 		ENTITY_STATUS_EATING_ACCEPTED = 9,
 		ENTITY_STATUS_SHEEP_EATING    = 10,
+	} ;
+	
+	enum
+	{
+		FIRE_TICKS_PER_DAMAGE = 10,  ///< How many ticks to wait between damaging an entity when it stands in fire
+		FIRE_DAMAGE = 1,             ///< How much damage to deal when standing in fire
+		LAVA_TICKS_PER_DAMAGE = 10,  ///< How many ticks to wait between damaging an entity when it stands in lava
+		LAVA_DAMAGE = 5,             ///< How much damage to deal when standing in lava
+		BURN_TICKS_PER_DAMAGE = 20,  ///< How many ticks to wait between damaging an entity when it is burning
+		BURN_DAMAGE = 1,             ///< How much damage to deal when the entity is burning
+		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
 	} ;
 	
 	enum eEntityType
@@ -78,7 +146,7 @@ public:
 	
 	// tolua_end
 
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z);
+	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
 
 	virtual void Initialize(cWorld * a_World);
@@ -164,10 +232,85 @@ public:
 	/// Schedules the entity for destroying; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet
 	void Destroy(bool a_ShouldBroadcast = true);
 
+	/// Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called
+	void TakeDamage(cEntity & a_Attacker);
+	
+	/// Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount);
+
+	/// Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage()
+	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, int a_FinalDamage, double a_KnockbackAmount);
+	
+	// tolua_end
+	
+	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied
+	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
+	
+	// tolua_begin
+
+	/// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
+	virtual int GetRawDamageAgainst(const cEntity & a_Receiver);
+	
+	/// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
+	virtual int GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_DamageType, int a_RawDamage);
+	
+	/// Returns the knockback amount that the currently equipped items would cause to a_Receiver on a hit
+	virtual double GetKnockbackAmountAgainst(const cEntity & a_Receiver);
+	
+	/// Returns the curently equipped weapon; empty item if none
+	virtual cItem GetEquippedWeapon(void) const { return cItem(); }
+	
+	/// Returns the currently equipped helmet; empty item if nonte
+	virtual cItem GetEquippedHelmet(void) const { return cItem(); }
+	
+	/// Returns the currently equipped chestplate; empty item if nonte
+	virtual cItem GetEquippedChestplate(void) const { return cItem(); }
+
+	/// Returns the currently equipped leggings; empty item if nonte
+	virtual cItem GetEquippedLeggings(void) const { return cItem(); }
+	
+	/// Returns the currently equipped boots; empty item if nonte
+	virtual cItem GetEquippedBoots(void) const { return cItem(); }
+
+	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)
+	virtual void KilledBy(cEntity * a_Killer);
+
+	/// Heals the specified amount of HPs
+	void Heal(int a_HitPoints);
+	
+	/// Returns the health of this pawn
+	int GetHealth(void) const { return m_Health; }
+	
 	// tolua_end
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk);
+	
+	/// Handles the physics of the entity - updates position based on speed, updates speed based on environment
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk);
+	
+	/// Updates the state related to this entity being on fire
+	virtual void TickBurning(cChunk & a_Chunk);
+
+	/// Called when the entity starts burning
+	virtual void OnStartedBurning(void);
+	
+	/// Called when the entity finishes burning
+	virtual void OnFinishedBurning(void);
+	
+	// tolua_begin
+	
+	/// Sets the maximum value for the health
+	void SetMaxHealth(int a_MaxHealth);
+
+	int GetMaxHealth(void) const { return m_MaxHealth; }
+	
+	/// Puts the entity on fire for the specified amount of ticks
+	void StartBurning(int a_TicksLeftBurning);
+	
+	/// Stops the entity from burning, resets all burning timers
+	void StopBurning(void);
+	
+	// tolua_end
 
 	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
@@ -175,6 +318,16 @@ public:
 	*/
 	virtual void SpawnOn(cClientHandle & a_Client) {ASSERT(!"SpawnOn() unimplemented!"); }
 
+	// tolua_begin
+	
+	/// Teleports to the entity specified
+	virtual void TeleportToEntity(cEntity & a_Entity);
+	
+	/// Teleports to the coordinates specified
+	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
+	
+	// tolua_end
+	
 	/// Updates clients of changes in the entity.
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
 	
@@ -196,7 +349,7 @@ public:
 	// tolua_begin
 	
 	// Metadata flags; descendants may override the defaults:
-	virtual bool IsOnFire   (void) const {return (m_BurnPeriod > 0); }
+	virtual bool IsOnFire   (void) const {return (m_TicksLeftBurning > 0); }
 	virtual bool IsCrouched (void) const {return false; }
 	virtual bool IsRiding   (void) const {return false; }
 	virtual bool IsSprinting(void) const {return false; }
@@ -207,11 +360,17 @@ public:
 	/// Called when the specified player right-clicks this entity
 	virtual void OnRightClicked(cPlayer & a_Player) {};
 
+	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) {}
+
 protected:
 	static cCriticalSection m_CSCount;
 	static int m_EntityCount;
 	
 	int m_UniqueID;
+	
+	int m_Health;
+	int m_MaxHealth;
 	
 	/// The entity to which this entity is attached (vehicle), NULL if none
 	cEntity * m_AttachedTo;
@@ -243,8 +402,17 @@ protected:
 	
 	cWorld * m_World;
 	
-	float m_FireDamageInterval;
-	float m_BurnPeriod;
+	/// Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire())
+	int m_TicksSinceLastBurnDamage;
+	
+	/// Time, in ticks, since the last damage dealt by standing in lava. Reset to zero when moving out of lava.
+	int m_TicksSinceLastLavaDamage;
+	
+	/// Time, in ticks, since the last damage dealt by standing in fire. Reset to zero when moving out of fire.
+	int m_TicksSinceLastFireDamage;
+	
+	/// Time, in ticks, until the entity extinguishes its fire
+	int m_TicksLeftBurning;
 
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
@@ -254,22 +422,28 @@ protected:
 	void AddReference( cEntity*& a_EntityPtr );
 	void ReferencedBy( cEntity*& a_EntityPtr );
 	void Dereference( cEntity*& a_EntityPtr );
+	
 private:
-	//Measured in degrees (MAX 360°)
+	// Measured in degrees (MAX 360°)
 	double   m_HeadYaw;
-	//Measured in meter/second (m/s)
+	// Measured in meter/second (m/s)
 	Vector3d m_Speed;
-	//Measured in degrees (MAX 360°)
+	// Measured in degrees (MAX 360°)
 	Vector3d m_Rot;
-	//Measured in meters (1 meter = 1 block) (m)
+	
+	/// Position of the entity's XZ center and Y bottom
 	Vector3d m_Pos;
-	//Measured in meter/second
+	
+	// Measured in meter / second
 	Vector3d m_WaterSpeed;
-	//Measured in Kilograms (Kg)
+	
+	// Measured in Kilograms (Kg)
 	double m_Mass;
-	//It's Width.
+	
+	/// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
 	double m_Width;
-	//It's height
+	
+	/// Height of the entity (Y axis)
 	double m_Height;
 } ;  // tolua_export
 

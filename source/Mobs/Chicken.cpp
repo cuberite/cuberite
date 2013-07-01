@@ -14,7 +14,7 @@
 
 
 cChicken::cChicken(void) :
-	super("Chicken", 93, "mob.chicken.hurt", "mob.chicken.hurt")
+	super("Chicken", 93, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4)
 {
 }
 
@@ -22,10 +22,10 @@ cChicken::cChicken(void) :
 
 
 
-void cChicken::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_FEATHER);
-	a_Drops.push_back(cItem((GetMetaData() == BURNING) ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN, 1));
+	a_Drops.push_back(cItem(IsOnFire() ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN, 1));
 }
 
 

@@ -49,7 +49,7 @@ public:
 	virtual bool OnDisconnect         (cPlayer * a_Player, const AString & a_Reason) override;
 	virtual bool OnExecuteCommand     (cPlayer * a_Player, const AStringVector & a_Split) override;
 	virtual bool OnHandshake          (cClientHandle * a_Client, const AString & a_Username) override;
-	virtual bool OnKilling            (cPawn & a_Victim, cEntity * a_Killer) override;
+	virtual bool OnKilling            (cEntity & a_Victim, cEntity * a_Killer) override;
 	virtual bool OnLogin              (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;
 	virtual bool OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerBrokenBlock  (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
@@ -69,7 +69,7 @@ public:
 	virtual bool OnPlayerUsingItem    (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual bool OnPostCrafting       (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnPreCrafting        (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
-	virtual bool OnTakeDamage         (cPawn & a_Receiver, TakeDamageInfo & a_TakeDamageInfo) override;
+	virtual bool OnTakeDamage         (cEntity & a_Receiver, TakeDamageInfo & a_TakeDamageInfo) override;
 	virtual bool OnUpdatedSign        (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnUpdatingSign       (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnWeatherChanged     (cWorld & a_World) override;

@@ -8,7 +8,7 @@
 
 
 cGhast::cGhast(void) :
-	super("Ghast", 56, "mob.ghast.scream", "mob.ghast.death")
+	super("Ghast", 56, "mob.ghast.scream", "mob.ghast.death", 4, 4)
 {
 }
 
@@ -16,7 +16,7 @@ cGhast::cGhast(void) :
 
 
 
-void cGhast::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_GUNPOWDER);
 	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_GHAST_TEAR);

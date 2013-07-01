@@ -22,8 +22,8 @@
 
 
 
-cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath)
-	: super(etMob)
+cMonster::cMonster(const AString & a_ConfigName, char a_ProtocolMobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
+	: super(etMob, a_Width, a_Height)
 	, m_Target(NULL)
 	, m_bMovingToDestination(false)
 	, m_DestinationTime( 0 )
@@ -204,10 +204,13 @@ void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cMonster::KilledBy(cPawn * a_Killer)
+void cMonster::KilledBy(cEntity * a_Killer)
 {
 	super::KilledBy(a_Killer);
-	if(m_SoundHurt != "") m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+	if (m_SoundHurt != "")
+	{
+		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+	}
 	m_DestroyTimer = 0;
 }
 

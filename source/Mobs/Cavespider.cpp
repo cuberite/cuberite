@@ -8,7 +8,8 @@
 
 
 cCavespider::cCavespider(void) :
-	super("Cavespider", 59, "mob.spider.say", "mob.spider.death")
+	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
+	super("Cavespider", 59, "mob.spider.say", "mob.spider.death", 0.9, 0.6)
 {
 }
 
@@ -28,7 +29,7 @@ void cCavespider::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cCavespider::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cCavespider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_STRING);
 	AddRandomDropItem(a_Drops, 0, 1, E_ITEM_SPIDER_EYE);

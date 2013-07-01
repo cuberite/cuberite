@@ -61,8 +61,8 @@ public:
 
 	void SetTouchGround( bool a_bTouchGround );
 	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
-	double GetEyeHeight();													// tolua_export
-	Vector3d GetEyePosition();												// tolua_export
+	double GetEyeHeight(void) const;													// tolua_export
+	Vector3d GetEyePosition(void) const;												// tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline const double GetStance(void) const { return GetPosY() + 1.62; }					// tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
@@ -70,7 +70,7 @@ public:
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
-	virtual void TeleportTo(double a_PosX, double a_PosY, double a_PosZ) override;
+	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	eGameMode GetGameMode(void) const { return m_GameMode; }														// tolua_export
 	std::string GetIP() { return m_IP; }																// tolua_export
@@ -138,7 +138,7 @@ public:
 
 	void AddFoodExhaustion(float a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }	// tolua_export
 	
-	virtual void KilledBy(cPawn * a_Killer) override;
+	virtual void KilledBy(cEntity * a_Killer) override;
 	
 	void Respawn(void);															// tolua_export
 

@@ -14,7 +14,7 @@
 
 
 cCow::cCow(void) :
-	super("Cow", 92, "mob.cow.hurt", "mob.cow.hurt")
+	super("Cow", 92, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
 {
 }
 
@@ -22,10 +22,10 @@ cCow::cCow(void) :
 
 
 
-void cCow::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cCow::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_LEATHER);
-	AddRandomDropItem(a_Drops, 1, 3, (GetMetaData() == BURNING) ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
+	AddRandomDropItem(a_Drops, 1, 3, IsOnFire() ? E_ITEM_STEAK : E_ITEM_RAW_BEEF);
 }
 
 

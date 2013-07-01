@@ -3,13 +3,14 @@
 
 #include "Squid.h"
 #include "../Vector3d.h"
+#include "../Chunk.h"
 
 
 
 
 
 cSquid::cSquid(void) :
-	super("Squid", 94, "", "")
+	super("Squid", 94, "", "", 0.95, 0.95)
 {
 }
 
@@ -17,7 +18,7 @@ cSquid::cSquid(void) :
 
 
 
-void cSquid::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	// Drops 0-3 Ink Sacs
 	AddRandomDropItem(a_Drops, 0, 3, E_ITEM_DYE, E_META_DYE_BLACK);
@@ -29,15 +30,17 @@ void cSquid::GetDrops(cItems & a_Drops, cPawn * a_Killer)
 
 void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	// TODO: Rewrite this function to use a_Chunk instead of m_World
 	super::Tick(a_Dt, a_Chunk);
 	
 	Vector3d Pos = GetPosition();
 
 	// TODO: Not a real behavior, but cool :D
-	if (!IsBlockWater(GetWorld()->GetBlock((int) Pos.x, (int) Pos.y, (int) Pos.z)) && !IsBurning())
+	int RelX = (int)floor(Pos.x + 0.5) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = (int)floor(Pos.z + 0.5) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	if (!IsBlockWater(a_Chunk.GetBlock(RelX, (int)Pos.y, RelZ)) && !IsOnFire())
 	{
-		SetMetaData(BURNING);
+		// Burn for 10 ticks, then decide again
+		StartBurning(10);
 	}
 }
 

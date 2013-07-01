@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 06/29/13 17:21:35.
+** Generated automatically by tolua++-1.0.92 on 07/01/13 09:49:28.
 */
 
 #ifndef __cplusplus
@@ -204,19 +204,18 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
  tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cPickup");
  tolua_usertype(tolua_S,"cItems");
- tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cTracer");
+ tolua_usertype(tolua_S,"cGroup");
  tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cCuboid");
- tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
- tolua_usertype(tolua_S,"Lua__cPawn");
+ tolua_usertype(tolua_S,"Vector3i");
  tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
@@ -3917,6 +3916,156 @@ static int tolua_AllToLua_cClientHandle_GetUniqueID00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* get function: DamageType of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_DamageType
+static int tolua_get_TakeDamageInfo_DamageType(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'DamageType'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->DamageType);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: DamageType of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_DamageType
+static int tolua_set_TakeDamageInfo_DamageType(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'DamageType'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Attacker of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_Attacker_ptr
+static int tolua_get_TakeDamageInfo_Attacker_ptr(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Attacker'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)self->Attacker,"cEntity");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Attacker of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_Attacker_ptr
+static int tolua_set_TakeDamageInfo_Attacker_ptr(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Attacker'",NULL);
+  if (!tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Attacker = ((cEntity*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: RawDamage of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_RawDamage
+static int tolua_get_TakeDamageInfo_RawDamage(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RawDamage'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->RawDamage);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: RawDamage of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_RawDamage
+static int tolua_set_TakeDamageInfo_RawDamage(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RawDamage'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->RawDamage = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: FinalDamage of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_FinalDamage
+static int tolua_get_TakeDamageInfo_FinalDamage(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FinalDamage'",NULL);
+#endif
+  tolua_pushnumber(tolua_S,(lua_Number)self->FinalDamage);
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: FinalDamage of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_FinalDamage
+static int tolua_set_TakeDamageInfo_FinalDamage(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FinalDamage'",NULL);
+  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->FinalDamage = ((int)  tolua_tonumber(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* get function: Knockback of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_Knockback
+static int tolua_get_TakeDamageInfo_Knockback(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Knockback'",NULL);
+#endif
+   tolua_pushusertype(tolua_S,(void*)&self->Knockback,"Vector3d");
+ return 1;
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* set function: Knockback of class  TakeDamageInfo */
+#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_Knockback
+static int tolua_set_TakeDamageInfo_Knockback(lua_State* tolua_S)
+{
+  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  tolua_Error tolua_err;
+  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Knockback'",NULL);
+  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3d",0,&tolua_err)))
+   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
+#endif
+  self->Knockback = *((Vector3d*)  tolua_tousertype(tolua_S,2,0))
+;
+ return 0;
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: GetEntityType of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetEntityType00
 static int tolua_AllToLua_cEntity_GetEntityType00(lua_State* tolua_S)
@@ -5902,6 +6051,722 @@ static int tolua_AllToLua_cEntity_Destroy00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: TakeDamage of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_TakeDamage00
+static int tolua_AllToLua_cEntity_TakeDamage00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  cEntity* a_Attacker = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TakeDamage'", NULL);
+#endif
+  {
+   self->TakeDamage(*a_Attacker);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TakeDamage'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: TakeDamage of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_TakeDamage01
+static int tolua_AllToLua_cEntity_TakeDamage01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,2,0));
+  cEntity* a_Attacker = ((cEntity*)  tolua_tousertype(tolua_S,3,0));
+  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
+  double a_KnockbackAmount = ((double)  tolua_tonumber(tolua_S,5,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TakeDamage'", NULL);
+#endif
+  {
+   self->TakeDamage(a_DamageType,a_Attacker,a_RawDamage,a_KnockbackAmount);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cEntity_TakeDamage00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: TakeDamage of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_TakeDamage02
+static int tolua_AllToLua_cEntity_TakeDamage02(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,2,0));
+  cEntity* a_Attacker = ((cEntity*)  tolua_tousertype(tolua_S,3,0));
+  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
+  int a_FinalDamage = ((int)  tolua_tonumber(tolua_S,5,0));
+  double a_KnockbackAmount = ((double)  tolua_tonumber(tolua_S,6,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TakeDamage'", NULL);
+#endif
+  {
+   self->TakeDamage(a_DamageType,a_Attacker,a_RawDamage,a_FinalDamage,a_KnockbackAmount);
+  }
+ }
+ return 0;
+tolua_lerror:
+ return tolua_AllToLua_cEntity_TakeDamage01(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetRawDamageAgainst of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetRawDamageAgainst00
+static int tolua_AllToLua_cEntity_GetRawDamageAgainst00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* a_Receiver = ((const cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRawDamageAgainst'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetRawDamageAgainst(*a_Receiver);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetRawDamageAgainst'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetArmorCoverAgainst of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetArmorCoverAgainst00
+static int tolua_AllToLua_cEntity_GetArmorCoverAgainst00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* a_Attacker = ((const cEntity*)  tolua_tousertype(tolua_S,2,0));
+  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,3,0));
+  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetArmorCoverAgainst'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetArmorCoverAgainst'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetKnockbackAmountAgainst of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00
+static int tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* a_Receiver = ((const cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetKnockbackAmountAgainst'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetKnockbackAmountAgainst(*a_Receiver);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetKnockbackAmountAgainst'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetEquippedWeapon of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetEquippedWeapon00
+static int tolua_AllToLua_cEntity_GetEquippedWeapon00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedWeapon'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->GetEquippedWeapon();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEquippedWeapon'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetEquippedHelmet of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetEquippedHelmet00
+static int tolua_AllToLua_cEntity_GetEquippedHelmet00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedHelmet'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->GetEquippedHelmet();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEquippedHelmet'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetEquippedChestplate of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetEquippedChestplate00
+static int tolua_AllToLua_cEntity_GetEquippedChestplate00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedChestplate'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->GetEquippedChestplate();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEquippedChestplate'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetEquippedLeggings of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetEquippedLeggings00
+static int tolua_AllToLua_cEntity_GetEquippedLeggings00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedLeggings'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->GetEquippedLeggings();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEquippedLeggings'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetEquippedBoots of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetEquippedBoots00
+static int tolua_AllToLua_cEntity_GetEquippedBoots00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedBoots'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->GetEquippedBoots();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetEquippedBoots'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: KilledBy of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_KilledBy00
+static int tolua_AllToLua_cEntity_KilledBy00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  cEntity* a_Killer = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'KilledBy'", NULL);
+#endif
+  {
+   self->KilledBy(a_Killer);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'KilledBy'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Heal of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_Heal00
+static int tolua_AllToLua_cEntity_Heal00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  int a_HitPoints = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Heal'", NULL);
+#endif
+  {
+   self->Heal(a_HitPoints);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Heal'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetHealth of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetHealth00
+static int tolua_AllToLua_cEntity_GetHealth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHealth'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetHealth();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetHealth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetMaxHealth of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetMaxHealth00
+static int tolua_AllToLua_cEntity_SetMaxHealth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  int a_MaxHealth = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetMaxHealth'", NULL);
+#endif
+  {
+   self->SetMaxHealth(a_MaxHealth);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetMaxHealth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetMaxHealth of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_GetMaxHealth00
+static int tolua_AllToLua_cEntity_GetMaxHealth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cEntity* self = (const cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxHealth'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetMaxHealth();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxHealth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: StartBurning of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_StartBurning00
+static int tolua_AllToLua_cEntity_StartBurning00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  int a_TicksLeftBurning = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'StartBurning'", NULL);
+#endif
+  {
+   self->StartBurning(a_TicksLeftBurning);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StartBurning'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: StopBurning of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_StopBurning00
+static int tolua_AllToLua_cEntity_StopBurning00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'StopBurning'", NULL);
+#endif
+  {
+   self->StopBurning();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StopBurning'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: TeleportToEntity of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_TeleportToEntity00
+static int tolua_AllToLua_cEntity_TeleportToEntity00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportToEntity'", NULL);
+#endif
+  {
+   self->TeleportToEntity(*a_Entity);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TeleportToEntity'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: TeleportToCoords of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_TeleportToCoords00
+static int tolua_AllToLua_cEntity_TeleportToCoords00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_PosX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_PosY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_PosZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportToCoords'", NULL);
+#endif
+  {
+   self->TeleportToCoords(a_PosX,a_PosY,a_PosZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TeleportToCoords'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: IsOnFire of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_IsOnFire00
 static int tolua_AllToLua_cEntity_IsOnFire00(lua_State* tolua_S)
@@ -6095,6 +6960,117 @@ public:
 			return ( const char* ) cEntity:: GetParentClass();
 		};
 	};
+	 int  GetRawDamageAgainst( const cEntity& a_Receiver) {
+		if (push_method("GetRawDamageAgainst",  tolua_AllToLua_cEntity_GetRawDamageAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cEntity");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( int ) cEntity:: GetRawDamageAgainst(a_Receiver);
+		};
+	};
+	 int  GetArmorCoverAgainst( const cEntity* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
+		if (push_method("GetArmorCoverAgainst",  tolua_AllToLua_cEntity_GetArmorCoverAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)a_Attacker, "const cEntity");
+			tolua_pushnumber(lua_state, (lua_Number)a_DamageType);
+			tolua_pushnumber(lua_state, (lua_Number)a_RawDamage);
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( int ) cEntity:: GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+		};
+	};
+	 double  GetKnockbackAmountAgainst( const cEntity& a_Receiver) {
+		if (push_method("GetKnockbackAmountAgainst",  tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cEntity");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 double  tolua_ret = ( double )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( double ) cEntity:: GetKnockbackAmountAgainst(a_Receiver);
+		};
+	};
+	 cItem  GetEquippedWeapon( void )const {
+		if (push_method("GetEquippedWeapon",  tolua_AllToLua_cEntity_GetEquippedWeapon00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cEntity:: GetEquippedWeapon();
+		};
+	};
+	 cItem  GetEquippedHelmet( void )const {
+		if (push_method("GetEquippedHelmet",  tolua_AllToLua_cEntity_GetEquippedHelmet00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cEntity:: GetEquippedHelmet();
+		};
+	};
+	 cItem  GetEquippedChestplate( void )const {
+		if (push_method("GetEquippedChestplate",  tolua_AllToLua_cEntity_GetEquippedChestplate00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cEntity:: GetEquippedChestplate();
+		};
+	};
+	 cItem  GetEquippedLeggings( void )const {
+		if (push_method("GetEquippedLeggings",  tolua_AllToLua_cEntity_GetEquippedLeggings00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cEntity:: GetEquippedLeggings();
+		};
+	};
+	 cItem  GetEquippedBoots( void )const {
+		if (push_method("GetEquippedBoots",  tolua_AllToLua_cEntity_GetEquippedBoots00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cEntity:: GetEquippedBoots();
+		};
+	};
+	 void  KilledBy( cEntity* a_Killer) {
+		if (push_method("KilledBy",  tolua_AllToLua_cEntity_KilledBy00)) {
+			tolua_pushusertype(lua_state, (void*)a_Killer, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cEntity:: KilledBy(a_Killer);
+		};
+	};
+	 void  TeleportToEntity( cEntity& a_Entity) {
+		if (push_method("TeleportToEntity",  tolua_AllToLua_cEntity_TeleportToEntity00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Entity, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cEntity:: TeleportToEntity(a_Entity);
+		};
+	};
+	 void  TeleportToCoords( double a_PosX, double a_PosY, double a_PosZ) {
+		if (push_method("TeleportToCoords",  tolua_AllToLua_cEntity_TeleportToCoords00)) {
+			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
+			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
+			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
+			ToluaBase::dbcall(lua_state, 4, 0);
+		} else {
+			return ( void ) cEntity:: TeleportToCoords(a_PosX,a_PosY,a_PosZ);
+		};
+	};
 	 bool  IsOnFire( void )const {
 		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
@@ -6154,6 +7130,39 @@ public:
 	};
 	 const char* cEntity__GetParentClass( void ) {
 		return ( const char* )cEntity::GetParentClass();
+	};
+	 int cEntity__GetRawDamageAgainst( const cEntity& a_Receiver) {
+		return ( int )cEntity::GetRawDamageAgainst(a_Receiver);
+	};
+	 int cEntity__GetArmorCoverAgainst( const cEntity* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
+		return ( int )cEntity::GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+	};
+	 double cEntity__GetKnockbackAmountAgainst( const cEntity& a_Receiver) {
+		return ( double )cEntity::GetKnockbackAmountAgainst(a_Receiver);
+	};
+	 cItem cEntity__GetEquippedWeapon( void ) {
+		return ( cItem )cEntity::GetEquippedWeapon();
+	};
+	 cItem cEntity__GetEquippedHelmet( void ) {
+		return ( cItem )cEntity::GetEquippedHelmet();
+	};
+	 cItem cEntity__GetEquippedChestplate( void ) {
+		return ( cItem )cEntity::GetEquippedChestplate();
+	};
+	 cItem cEntity__GetEquippedLeggings( void ) {
+		return ( cItem )cEntity::GetEquippedLeggings();
+	};
+	 cItem cEntity__GetEquippedBoots( void ) {
+		return ( cItem )cEntity::GetEquippedBoots();
+	};
+	 void cEntity__KilledBy( cEntity* a_Killer) {
+		return ( void )cEntity::KilledBy(a_Killer);
+	};
+	 void cEntity__TeleportToEntity( cEntity& a_Entity) {
+		return ( void )cEntity::TeleportToEntity(a_Entity);
+	};
+	 void cEntity__TeleportToCoords( double a_PosX, double a_PosY, double a_PosZ) {
+		return ( void )cEntity::TeleportToCoords(a_PosX,a_PosY,a_PosZ);
 	};
 	 bool cEntity__IsOnFire( void ) {
 		return ( bool )cEntity::IsOnFire();
@@ -6298,6 +7307,425 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'cEntity__GetParentClass'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetRawDamageAgainst of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetRawDamageAgainst00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetRawDamageAgainst00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* a_Receiver = ((const cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetRawDamageAgainst'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->cEntity__GetRawDamageAgainst(*a_Receiver);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetRawDamageAgainst'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetArmorCoverAgainst of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetArmorCoverAgainst00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetArmorCoverAgainst00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* a_Attacker = ((const cEntity*)  tolua_tousertype(tolua_S,2,0));
+  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,3,0));
+  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetArmorCoverAgainst'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->cEntity__GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetArmorCoverAgainst'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetKnockbackAmountAgainst of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetKnockbackAmountAgainst00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetKnockbackAmountAgainst00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+  const cEntity* a_Receiver = ((const cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetKnockbackAmountAgainst'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->cEntity__GetKnockbackAmountAgainst(*a_Receiver);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetKnockbackAmountAgainst'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetEquippedWeapon of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedWeapon00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedWeapon00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetEquippedWeapon'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->cEntity__GetEquippedWeapon();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetEquippedWeapon'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetEquippedHelmet of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedHelmet00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedHelmet00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetEquippedHelmet'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->cEntity__GetEquippedHelmet();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetEquippedHelmet'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetEquippedChestplate of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedChestplate00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedChestplate00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetEquippedChestplate'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->cEntity__GetEquippedChestplate();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetEquippedChestplate'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetEquippedLeggings of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedLeggings00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedLeggings00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetEquippedLeggings'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->cEntity__GetEquippedLeggings();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetEquippedLeggings'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__GetEquippedBoots of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedBoots00
+static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedBoots00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__GetEquippedBoots'", NULL);
+#endif
+  {
+   cItem tolua_ret = (cItem)  self->cEntity__GetEquippedBoots();
+   {
+#ifdef __cplusplus
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#else
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+#endif
+   }
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__GetEquippedBoots'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__KilledBy of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__KilledBy00
+static int tolua_AllToLua_Lua__cEntity_cEntity__KilledBy00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+  cEntity* a_Killer = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__KilledBy'", NULL);
+#endif
+  {
+   self->cEntity__KilledBy(a_Killer);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__KilledBy'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__TeleportToEntity of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__TeleportToEntity00
+static int tolua_AllToLua_Lua__cEntity_cEntity__TeleportToEntity00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+  cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__TeleportToEntity'", NULL);
+#endif
+  {
+   self->cEntity__TeleportToEntity(*a_Entity);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__TeleportToEntity'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: cEntity__TeleportToCoords of class  Lua__cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cEntity_cEntity__TeleportToCoords00
+static int tolua_AllToLua_Lua__cEntity_cEntity__TeleportToCoords00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  Lua__cEntity* self = (Lua__cEntity*)  tolua_tousertype(tolua_S,1,0);
+  double a_PosX = ((double)  tolua_tonumber(tolua_S,2,0));
+  double a_PosY = ((double)  tolua_tonumber(tolua_S,3,0));
+  double a_PosZ = ((double)  tolua_tonumber(tolua_S,4,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cEntity__TeleportToCoords'", NULL);
+#endif
+  {
+   self->cEntity__TeleportToCoords(a_PosX,a_PosY,a_PosZ);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'cEntity__TeleportToCoords'.",&tolua_err);
  return 0;
 #endif
 }
@@ -6463,1526 +7891,6 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* get function: DamageType of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_DamageType
-static int tolua_get_TakeDamageInfo_DamageType(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'DamageType'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->DamageType);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: DamageType of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_DamageType
-static int tolua_set_TakeDamageInfo_DamageType(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'DamageType'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: Attacker of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_Attacker_ptr
-static int tolua_get_TakeDamageInfo_Attacker_ptr(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Attacker'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)self->Attacker,"cPawn");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Attacker of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_Attacker_ptr
-static int tolua_set_TakeDamageInfo_Attacker_ptr(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Attacker'",NULL);
-  if (!tolua_isusertype(tolua_S,2,"cPawn",0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Attacker = ((cPawn*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: RawDamage of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_RawDamage
-static int tolua_get_TakeDamageInfo_RawDamage(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RawDamage'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->RawDamage);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: RawDamage of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_RawDamage
-static int tolua_set_TakeDamageInfo_RawDamage(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'RawDamage'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->RawDamage = ((int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: FinalDamage of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_FinalDamage
-static int tolua_get_TakeDamageInfo_FinalDamage(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FinalDamage'",NULL);
-#endif
-  tolua_pushnumber(tolua_S,(lua_Number)self->FinalDamage);
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: FinalDamage of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_FinalDamage
-static int tolua_set_TakeDamageInfo_FinalDamage(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'FinalDamage'",NULL);
-  if (!tolua_isnumber(tolua_S,2,0,&tolua_err))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->FinalDamage = ((int)  tolua_tonumber(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* get function: Knockback of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_get_TakeDamageInfo_Knockback
-static int tolua_get_TakeDamageInfo_Knockback(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Knockback'",NULL);
-#endif
-   tolua_pushusertype(tolua_S,(void*)&self->Knockback,"Vector3d");
- return 1;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* set function: Knockback of class  TakeDamageInfo */
-#ifndef TOLUA_DISABLE_tolua_set_TakeDamageInfo_Knockback
-static int tolua_set_TakeDamageInfo_Knockback(lua_State* tolua_S)
-{
-  TakeDamageInfo* self = (TakeDamageInfo*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  tolua_Error tolua_err;
-  if (!self) tolua_error(tolua_S,"invalid 'self' in accessing variable 'Knockback'",NULL);
-  if ((tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3d",0,&tolua_err)))
-   tolua_error(tolua_S,"#vinvalid type in variable assignment.",&tolua_err);
-#endif
-  self->Knockback = *((Vector3d*)  tolua_tousertype(tolua_S,2,0))
-;
- return 0;
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: TeleportToEntity of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TeleportToEntity00
-static int tolua_AllToLua_cPawn_TeleportToEntity00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportToEntity'", NULL);
-#endif
-  {
-   self->TeleportToEntity(*a_Entity);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'TeleportToEntity'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: TeleportTo of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TeleportTo00
-static int tolua_AllToLua_cPawn_TeleportTo00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  double a_PosX = ((double)  tolua_tonumber(tolua_S,2,0));
-  double a_PosY = ((double)  tolua_tonumber(tolua_S,3,0));
-  double a_PosZ = ((double)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TeleportTo'", NULL);
-#endif
-  {
-   self->TeleportTo(a_PosX,a_PosY,a_PosZ);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'TeleportTo'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Heal of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_Heal00
-static int tolua_AllToLua_cPawn_Heal00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  int a_HitPoints = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Heal'", NULL);
-#endif
-  {
-   self->Heal(a_HitPoints);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Heal'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetHealth of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetHealth00
-static int tolua_AllToLua_cPawn_GetHealth00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPawn* self = (const cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetHealth'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetHealth();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetHealth'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: TakeDamage of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TakeDamage00
-static int tolua_AllToLua_cPawn_TakeDamage00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPawn",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  cPawn* a_Attacker = ((cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TakeDamage'", NULL);
-#endif
-  {
-   self->TakeDamage(*a_Attacker);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'TakeDamage'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: TakeDamage of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TakeDamage01
-static int tolua_AllToLua_cPawn_TakeDamage01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,6,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,2,0));
-  cPawn* a_Attacker = ((cPawn*)  tolua_tousertype(tolua_S,3,0));
-  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
-  double a_KnockbackAmount = ((double)  tolua_tonumber(tolua_S,5,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TakeDamage'", NULL);
-#endif
-  {
-   self->TakeDamage(a_DamageType,a_Attacker,a_RawDamage,a_KnockbackAmount);
-  }
- }
- return 0;
-tolua_lerror:
- return tolua_AllToLua_cPawn_TakeDamage00(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: TakeDamage of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_TakeDamage02
-static int tolua_AllToLua_cPawn_TakeDamage02(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,3,"cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,7,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,2,0));
-  cPawn* a_Attacker = ((cPawn*)  tolua_tousertype(tolua_S,3,0));
-  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
-  int a_FinalDamage = ((int)  tolua_tonumber(tolua_S,5,0));
-  double a_KnockbackAmount = ((double)  tolua_tonumber(tolua_S,6,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'TakeDamage'", NULL);
-#endif
-  {
-   self->TakeDamage(a_DamageType,a_Attacker,a_RawDamage,a_FinalDamage,a_KnockbackAmount);
-  }
- }
- return 0;
-tolua_lerror:
- return tolua_AllToLua_cPawn_TakeDamage01(tolua_S);
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: DoTakeDamage of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_DoTakeDamage00
-static int tolua_AllToLua_cPawn_DoTakeDamage00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"TakeDamageInfo",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  TakeDamageInfo* a_TDI = ((TakeDamageInfo*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'DoTakeDamage'", NULL);
-#endif
-  {
-   self->DoTakeDamage(*a_TDI);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'DoTakeDamage'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: KilledBy of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_KilledBy00
-static int tolua_AllToLua_cPawn_KilledBy00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  cPawn* a_Killer = ((cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'KilledBy'", NULL);
-#endif
-  {
-   self->KilledBy(a_Killer);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'KilledBy'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetRawDamageAgainst of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetRawDamageAgainst00
-static int tolua_AllToLua_cPawn_GetRawDamageAgainst00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cPawn",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  const cPawn* a_Receiver = ((const cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetRawDamageAgainst'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetRawDamageAgainst(*a_Receiver);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetRawDamageAgainst'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetArmorCoverAgainst of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetArmorCoverAgainst00
-static int tolua_AllToLua_cPawn_GetArmorCoverAgainst00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  const cPawn* a_Attacker = ((const cPawn*)  tolua_tousertype(tolua_S,2,0));
-  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,3,0));
-  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetArmorCoverAgainst'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetArmorCoverAgainst'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetKnockbackAmountAgainst of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetKnockbackAmountAgainst00
-static int tolua_AllToLua_cPawn_GetKnockbackAmountAgainst00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cPawn",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPawn* self = (cPawn*)  tolua_tousertype(tolua_S,1,0);
-  const cPawn* a_Receiver = ((const cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetKnockbackAmountAgainst'", NULL);
-#endif
-  {
-   double tolua_ret = (double)  self->GetKnockbackAmountAgainst(*a_Receiver);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetKnockbackAmountAgainst'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetEquippedWeapon of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetEquippedWeapon00
-static int tolua_AllToLua_cPawn_GetEquippedWeapon00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPawn* self = (const cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedWeapon'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->GetEquippedWeapon();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEquippedWeapon'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetEquippedHelmet of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetEquippedHelmet00
-static int tolua_AllToLua_cPawn_GetEquippedHelmet00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPawn* self = (const cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedHelmet'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->GetEquippedHelmet();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEquippedHelmet'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetEquippedChestplate of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetEquippedChestplate00
-static int tolua_AllToLua_cPawn_GetEquippedChestplate00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPawn* self = (const cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedChestplate'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->GetEquippedChestplate();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEquippedChestplate'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetEquippedLeggings of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetEquippedLeggings00
-static int tolua_AllToLua_cPawn_GetEquippedLeggings00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPawn* self = (const cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedLeggings'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->GetEquippedLeggings();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEquippedLeggings'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetEquippedBoots of class  cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPawn_GetEquippedBoots00
-static int tolua_AllToLua_cPawn_GetEquippedBoots00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const cPawn* self = (const cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEquippedBoots'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->GetEquippedBoots();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetEquippedBoots'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
- class Lua__cPawn : public cPawn, public ToluaBase {
-public:
-	 void  TeleportToEntity( cEntity& a_Entity) {
-		if (push_method("TeleportToEntity",  tolua_AllToLua_cPawn_TeleportToEntity00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Entity, "cEntity");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPawn:: TeleportToEntity(a_Entity);
-		};
-	};
-	 void  TeleportTo( double a_PosX, double a_PosY, double a_PosZ) {
-		if (push_method("TeleportTo",  tolua_AllToLua_cPawn_TeleportTo00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
-			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
-			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
-			ToluaBase::dbcall(lua_state, 4, 0);
-		} else {
-			return ( void ) cPawn:: TeleportTo(a_PosX,a_PosY,a_PosZ);
-		};
-	};
-	 void  DoTakeDamage( TakeDamageInfo& a_TDI) {
-		if (push_method("DoTakeDamage",  tolua_AllToLua_cPawn_DoTakeDamage00)) {
-			tolua_pushusertype(lua_state, (void*)&a_TDI, "TakeDamageInfo");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPawn:: DoTakeDamage(a_TDI);
-		};
-	};
-	 void  KilledBy( cPawn* a_Killer) {
-		if (push_method("KilledBy",  tolua_AllToLua_cPawn_KilledBy00)) {
-			tolua_pushusertype(lua_state, (void*)a_Killer, "cPawn");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPawn:: KilledBy(a_Killer);
-		};
-	};
-	 int  GetRawDamageAgainst( const cPawn& a_Receiver) {
-		if (push_method("GetRawDamageAgainst",  tolua_AllToLua_cPawn_GetRawDamageAgainst00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cPawn");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( int ) cPawn:: GetRawDamageAgainst(a_Receiver);
-		};
-	};
-	 int  GetArmorCoverAgainst( const cPawn* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
-		if (push_method("GetArmorCoverAgainst",  tolua_AllToLua_cPawn_GetArmorCoverAgainst00)) {
-			tolua_pushusertype(lua_state, (void*)a_Attacker, "const cPawn");
-			tolua_pushnumber(lua_state, (lua_Number)a_DamageType);
-			tolua_pushnumber(lua_state, (lua_Number)a_RawDamage);
-			ToluaBase::dbcall(lua_state, 4, 1);
-			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( int ) cPawn:: GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
-		};
-	};
-	 double  GetKnockbackAmountAgainst( const cPawn& a_Receiver) {
-		if (push_method("GetKnockbackAmountAgainst",  tolua_AllToLua_cPawn_GetKnockbackAmountAgainst00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cPawn");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 double  tolua_ret = ( double )tolua_tonumber(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( double ) cPawn:: GetKnockbackAmountAgainst(a_Receiver);
-		};
-	};
-	 cItem  GetEquippedWeapon( void )const {
-		if (push_method("GetEquippedWeapon",  tolua_AllToLua_cPawn_GetEquippedWeapon00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPawn:: GetEquippedWeapon();
-		};
-	};
-	 cItem  GetEquippedHelmet( void )const {
-		if (push_method("GetEquippedHelmet",  tolua_AllToLua_cPawn_GetEquippedHelmet00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPawn:: GetEquippedHelmet();
-		};
-	};
-	 cItem  GetEquippedChestplate( void )const {
-		if (push_method("GetEquippedChestplate",  tolua_AllToLua_cPawn_GetEquippedChestplate00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPawn:: GetEquippedChestplate();
-		};
-	};
-	 cItem  GetEquippedLeggings( void )const {
-		if (push_method("GetEquippedLeggings",  tolua_AllToLua_cPawn_GetEquippedLeggings00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPawn:: GetEquippedLeggings();
-		};
-	};
-	 cItem  GetEquippedBoots( void )const {
-		if (push_method("GetEquippedBoots",  tolua_AllToLua_cPawn_GetEquippedBoots00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPawn:: GetEquippedBoots();
-		};
-	};
-	 bool  IsA( const char* a_ClassName)const {
-		if (push_method("IsA",  tolua_AllToLua_cEntity_IsA00)) {
-			tolua_pushstring(lua_state, (const char*)a_ClassName);
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPawn:: IsA(a_ClassName);
-		};
-	};
-	 const char*  GetClass( void )const {
-		if (push_method("GetClass",  tolua_AllToLua_cEntity_GetClass00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( const char* ) cPawn:: GetClass();
-		};
-	};
-	 const char*  GetParentClass( void )const {
-		if (push_method("GetParentClass",  tolua_AllToLua_cEntity_GetParentClass00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 const char*  tolua_ret = ( const char* )tolua_tostring(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( const char* ) cPawn:: GetParentClass();
-		};
-	};
-	 bool  IsOnFire( void )const {
-		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPawn:: IsOnFire();
-		};
-	};
-	 bool  IsCrouched( void )const {
-		if (push_method("IsCrouched",  tolua_AllToLua_cEntity_IsCrouched00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPawn:: IsCrouched();
-		};
-	};
-	 bool  IsRiding( void )const {
-		if (push_method("IsRiding",  tolua_AllToLua_cEntity_IsRiding00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPawn:: IsRiding();
-		};
-	};
-	 bool  IsSprinting( void )const {
-		if (push_method("IsSprinting",  tolua_AllToLua_cEntity_IsSprinting00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPawn:: IsSprinting();
-		};
-	};
-	 bool  IsRclking( void )const {
-		if (push_method("IsRclking",  tolua_AllToLua_cEntity_IsRclking00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( bool ) cPawn:: IsRclking();
-		};
-	};
-
-	 void cPawn__TeleportToEntity( cEntity& a_Entity) {
-		return ( void )cPawn::TeleportToEntity(a_Entity);
-	};
-	 void cPawn__TeleportTo( double a_PosX, double a_PosY, double a_PosZ) {
-		return ( void )cPawn::TeleportTo(a_PosX,a_PosY,a_PosZ);
-	};
-	 void cPawn__DoTakeDamage( TakeDamageInfo& a_TDI) {
-		return ( void )cPawn::DoTakeDamage(a_TDI);
-	};
-	 void cPawn__KilledBy( cPawn* a_Killer) {
-		return ( void )cPawn::KilledBy(a_Killer);
-	};
-	 int cPawn__GetRawDamageAgainst( const cPawn& a_Receiver) {
-		return ( int )cPawn::GetRawDamageAgainst(a_Receiver);
-	};
-	 int cPawn__GetArmorCoverAgainst( const cPawn* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
-		return ( int )cPawn::GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
-	};
-	 double cPawn__GetKnockbackAmountAgainst( const cPawn& a_Receiver) {
-		return ( double )cPawn::GetKnockbackAmountAgainst(a_Receiver);
-	};
-	 cItem cPawn__GetEquippedWeapon( void ) {
-		return ( cItem )cPawn::GetEquippedWeapon();
-	};
-	 cItem cPawn__GetEquippedHelmet( void ) {
-		return ( cItem )cPawn::GetEquippedHelmet();
-	};
-	 cItem cPawn__GetEquippedChestplate( void ) {
-		return ( cItem )cPawn::GetEquippedChestplate();
-	};
-	 cItem cPawn__GetEquippedLeggings( void ) {
-		return ( cItem )cPawn::GetEquippedLeggings();
-	};
-	 cItem cPawn__GetEquippedBoots( void ) {
-		return ( cItem )cPawn::GetEquippedBoots();
-	};
-	 bool cPawn__IsA( const char* a_ClassName) {
-		return ( bool )cPawn::IsA(a_ClassName);
-	};
-	 const char* cPawn__GetClass( void ) {
-		return ( const char* )cPawn::GetClass();
-	};
-	 const char* cPawn__GetParentClass( void ) {
-		return ( const char* )cPawn::GetParentClass();
-	};
-	 bool cPawn__IsOnFire( void ) {
-		return ( bool )cPawn::IsOnFire();
-	};
-	 bool cPawn__IsCrouched( void ) {
-		return ( bool )cPawn::IsCrouched();
-	};
-	 bool cPawn__IsRiding( void ) {
-		return ( bool )cPawn::IsRiding();
-	};
-	 bool cPawn__IsSprinting( void ) {
-		return ( bool )cPawn::IsSprinting();
-	};
-	 bool cPawn__IsRclking( void ) {
-		return ( bool )cPawn::IsRclking();
-	};
-};
-
-/* method: tolua__set_instance of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_tolua__set_instance00
-static int tolua_AllToLua_Lua__cPawn_tolua__set_instance00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  lua_State* L =  tolua_S;
-  lua_Object lo = ((lua_Object)  tolua_tovalue(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'tolua__set_instance'", NULL);
-#endif
-  {
-   self->tolua__set_instance(L,lo);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'tolua__set_instance'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__TeleportToEntity of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__TeleportToEntity00
-static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportToEntity00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  cEntity* a_Entity = ((cEntity*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__TeleportToEntity'", NULL);
-#endif
-  {
-   self->cPawn__TeleportToEntity(*a_Entity);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__TeleportToEntity'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__TeleportTo of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00
-static int tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  double a_PosX = ((double)  tolua_tonumber(tolua_S,2,0));
-  double a_PosY = ((double)  tolua_tonumber(tolua_S,3,0));
-  double a_PosZ = ((double)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__TeleportTo'", NULL);
-#endif
-  {
-   self->cPawn__TeleportTo(a_PosX,a_PosY,a_PosZ);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__TeleportTo'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__DoTakeDamage of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__DoTakeDamage00
-static int tolua_AllToLua_Lua__cPawn_cPawn__DoTakeDamage00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"TakeDamageInfo",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  TakeDamageInfo* a_TDI = ((TakeDamageInfo*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__DoTakeDamage'", NULL);
-#endif
-  {
-   self->cPawn__DoTakeDamage(*a_TDI);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__DoTakeDamage'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__KilledBy of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__KilledBy00
-static int tolua_AllToLua_Lua__cPawn_cPawn__KilledBy00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  cPawn* a_Killer = ((cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__KilledBy'", NULL);
-#endif
-  {
-   self->cPawn__KilledBy(a_Killer);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__KilledBy'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetRawDamageAgainst of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetRawDamageAgainst00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetRawDamageAgainst00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cPawn",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  const cPawn* a_Receiver = ((const cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetRawDamageAgainst'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->cPawn__GetRawDamageAgainst(*a_Receiver);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetRawDamageAgainst'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetArmorCoverAgainst of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetArmorCoverAgainst00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetArmorCoverAgainst00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isusertype(tolua_S,2,"const cPawn",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  const cPawn* a_Attacker = ((const cPawn*)  tolua_tousertype(tolua_S,2,0));
-  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,3,0));
-  int a_RawDamage = ((int)  tolua_tonumber(tolua_S,4,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetArmorCoverAgainst'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->cPawn__GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetArmorCoverAgainst'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetKnockbackAmountAgainst of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetKnockbackAmountAgainst00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetKnockbackAmountAgainst00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cPawn",0,&tolua_err)) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-  const cPawn* a_Receiver = ((const cPawn*)  tolua_tousertype(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetKnockbackAmountAgainst'", NULL);
-#endif
-  {
-   double tolua_ret = (double)  self->cPawn__GetKnockbackAmountAgainst(*a_Receiver);
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetKnockbackAmountAgainst'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetEquippedWeapon of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedWeapon00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedWeapon00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetEquippedWeapon'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->cPawn__GetEquippedWeapon();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetEquippedWeapon'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetEquippedHelmet of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedHelmet00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedHelmet00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetEquippedHelmet'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->cPawn__GetEquippedHelmet();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetEquippedHelmet'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetEquippedChestplate of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedChestplate00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedChestplate00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetEquippedChestplate'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->cPawn__GetEquippedChestplate();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetEquippedChestplate'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetEquippedLeggings of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedLeggings00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedLeggings00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetEquippedLeggings'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->cPawn__GetEquippedLeggings();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetEquippedLeggings'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: cPawn__GetEquippedBoots of class  Lua__cPawn */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedBoots00
-static int tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedBoots00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"Lua__cPawn",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  Lua__cPawn* self = (Lua__cPawn*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPawn__GetEquippedBoots'", NULL);
-#endif
-  {
-   cItem tolua_ret = (cItem)  self->cPawn__GetEquippedBoots();
-   {
-#ifdef __cplusplus
-    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
-#endif
-   }
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'cPawn__GetEquippedBoots'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: Initialize of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_Initialize00
 static int tolua_AllToLua_cPlayer_Initialize00(lua_State* tolua_S)
@@ -8023,14 +7931,14 @@ static int tolua_AllToLua_cPlayer_GetEyeHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEyeHeight'", NULL);
 #endif
@@ -8055,14 +7963,14 @@ static int tolua_AllToLua_cPlayer_GetEyePosition00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetEyePosition'", NULL);
 #endif
@@ -9361,125 +9269,6 @@ public:
 			return ( void ) cPlayer:: MoveTo(a_NewPos);
 		};
 	};
-	 void  TeleportToEntity( cEntity& a_Entity) {
-		if (push_method("TeleportToEntity",  tolua_AllToLua_cPawn_TeleportToEntity00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Entity, "cEntity");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPlayer:: TeleportToEntity(a_Entity);
-		};
-	};
-	 void  TeleportTo( double a_PosX, double a_PosY, double a_PosZ) {
-		if (push_method("TeleportTo",  tolua_AllToLua_cPawn_TeleportTo00)) {
-			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
-			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
-			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
-			ToluaBase::dbcall(lua_state, 4, 0);
-		} else {
-			return ( void ) cPlayer:: TeleportTo(a_PosX,a_PosY,a_PosZ);
-		};
-	};
-	 void  DoTakeDamage( TakeDamageInfo& a_TDI) {
-		if (push_method("DoTakeDamage",  tolua_AllToLua_cPawn_DoTakeDamage00)) {
-			tolua_pushusertype(lua_state, (void*)&a_TDI, "TakeDamageInfo");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPlayer:: DoTakeDamage(a_TDI);
-		};
-	};
-	 void  KilledBy( cPawn* a_Killer) {
-		if (push_method("KilledBy",  tolua_AllToLua_cPawn_KilledBy00)) {
-			tolua_pushusertype(lua_state, (void*)a_Killer, "cPawn");
-			ToluaBase::dbcall(lua_state, 2, 0);
-		} else {
-			return ( void ) cPlayer:: KilledBy(a_Killer);
-		};
-	};
-	 int  GetRawDamageAgainst( const cPawn& a_Receiver) {
-		if (push_method("GetRawDamageAgainst",  tolua_AllToLua_cPawn_GetRawDamageAgainst00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cPawn");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( int ) cPlayer:: GetRawDamageAgainst(a_Receiver);
-		};
-	};
-	 int  GetArmorCoverAgainst( const cPawn* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
-		if (push_method("GetArmorCoverAgainst",  tolua_AllToLua_cPawn_GetArmorCoverAgainst00)) {
-			tolua_pushusertype(lua_state, (void*)a_Attacker, "const cPawn");
-			tolua_pushnumber(lua_state, (lua_Number)a_DamageType);
-			tolua_pushnumber(lua_state, (lua_Number)a_RawDamage);
-			ToluaBase::dbcall(lua_state, 4, 1);
-			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( int ) cPlayer:: GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
-		};
-	};
-	 double  GetKnockbackAmountAgainst( const cPawn& a_Receiver) {
-		if (push_method("GetKnockbackAmountAgainst",  tolua_AllToLua_cPawn_GetKnockbackAmountAgainst00)) {
-			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cPawn");
-			ToluaBase::dbcall(lua_state, 2, 1);
-			 double  tolua_ret = ( double )tolua_tonumber(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( double ) cPlayer:: GetKnockbackAmountAgainst(a_Receiver);
-		};
-	};
-	 cItem  GetEquippedWeapon( void )const {
-		if (push_method("GetEquippedWeapon",  tolua_AllToLua_cPawn_GetEquippedWeapon00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPlayer:: GetEquippedWeapon();
-		};
-	};
-	 cItem  GetEquippedHelmet( void )const {
-		if (push_method("GetEquippedHelmet",  tolua_AllToLua_cPawn_GetEquippedHelmet00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPlayer:: GetEquippedHelmet();
-		};
-	};
-	 cItem  GetEquippedChestplate( void )const {
-		if (push_method("GetEquippedChestplate",  tolua_AllToLua_cPawn_GetEquippedChestplate00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPlayer:: GetEquippedChestplate();
-		};
-	};
-	 cItem  GetEquippedLeggings( void )const {
-		if (push_method("GetEquippedLeggings",  tolua_AllToLua_cPawn_GetEquippedLeggings00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPlayer:: GetEquippedLeggings();
-		};
-	};
-	 cItem  GetEquippedBoots( void )const {
-		if (push_method("GetEquippedBoots",  tolua_AllToLua_cPawn_GetEquippedBoots00)) {
-			ToluaBase::dbcall(lua_state, 1, 1);
-			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
-			lua_pop(lua_state, 1);
-			return tolua_ret;
-		} else {
-			return ( cItem ) cPlayer:: GetEquippedBoots();
-		};
-	};
 	 bool  IsA( const char* a_ClassName)const {
 		if (push_method("IsA",  tolua_AllToLua_cEntity_IsA00)) {
 			tolua_pushstring(lua_state, (const char*)a_ClassName);
@@ -9509,6 +9298,117 @@ public:
 			return tolua_ret;
 		} else {
 			return ( const char* ) cPlayer:: GetParentClass();
+		};
+	};
+	 int  GetRawDamageAgainst( const cEntity& a_Receiver) {
+		if (push_method("GetRawDamageAgainst",  tolua_AllToLua_cEntity_GetRawDamageAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cEntity");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( int ) cPlayer:: GetRawDamageAgainst(a_Receiver);
+		};
+	};
+	 int  GetArmorCoverAgainst( const cEntity* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
+		if (push_method("GetArmorCoverAgainst",  tolua_AllToLua_cEntity_GetArmorCoverAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)a_Attacker, "const cEntity");
+			tolua_pushnumber(lua_state, (lua_Number)a_DamageType);
+			tolua_pushnumber(lua_state, (lua_Number)a_RawDamage);
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( int ) cPlayer:: GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+		};
+	};
+	 double  GetKnockbackAmountAgainst( const cEntity& a_Receiver) {
+		if (push_method("GetKnockbackAmountAgainst",  tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cEntity");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 double  tolua_ret = ( double )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( double ) cPlayer:: GetKnockbackAmountAgainst(a_Receiver);
+		};
+	};
+	 cItem  GetEquippedWeapon( void )const {
+		if (push_method("GetEquippedWeapon",  tolua_AllToLua_cEntity_GetEquippedWeapon00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPlayer:: GetEquippedWeapon();
+		};
+	};
+	 cItem  GetEquippedHelmet( void )const {
+		if (push_method("GetEquippedHelmet",  tolua_AllToLua_cEntity_GetEquippedHelmet00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPlayer:: GetEquippedHelmet();
+		};
+	};
+	 cItem  GetEquippedChestplate( void )const {
+		if (push_method("GetEquippedChestplate",  tolua_AllToLua_cEntity_GetEquippedChestplate00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPlayer:: GetEquippedChestplate();
+		};
+	};
+	 cItem  GetEquippedLeggings( void )const {
+		if (push_method("GetEquippedLeggings",  tolua_AllToLua_cEntity_GetEquippedLeggings00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPlayer:: GetEquippedLeggings();
+		};
+	};
+	 cItem  GetEquippedBoots( void )const {
+		if (push_method("GetEquippedBoots",  tolua_AllToLua_cEntity_GetEquippedBoots00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPlayer:: GetEquippedBoots();
+		};
+	};
+	 void  KilledBy( cEntity* a_Killer) {
+		if (push_method("KilledBy",  tolua_AllToLua_cEntity_KilledBy00)) {
+			tolua_pushusertype(lua_state, (void*)a_Killer, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cPlayer:: KilledBy(a_Killer);
+		};
+	};
+	 void  TeleportToEntity( cEntity& a_Entity) {
+		if (push_method("TeleportToEntity",  tolua_AllToLua_cEntity_TeleportToEntity00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Entity, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cPlayer:: TeleportToEntity(a_Entity);
+		};
+	};
+	 void  TeleportToCoords( double a_PosX, double a_PosY, double a_PosZ) {
+		if (push_method("TeleportToCoords",  tolua_AllToLua_cEntity_TeleportToCoords00)) {
+			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
+			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
+			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
+			ToluaBase::dbcall(lua_state, 4, 0);
+		} else {
+			return ( void ) cPlayer:: TeleportToCoords(a_PosX,a_PosY,a_PosZ);
 		};
 	};
 	 bool  IsOnFire( void )const {
@@ -9568,25 +9468,22 @@ public:
 	 void cPlayer__MoveTo( const Vector3d& a_NewPos) {
 		return ( void )cPlayer::MoveTo(a_NewPos);
 	};
-	 void cPlayer__TeleportToEntity( cEntity& a_Entity) {
-		return ( void )cPlayer::TeleportToEntity(a_Entity);
+	 bool cPlayer__IsA( const char* a_ClassName) {
+		return ( bool )cPlayer::IsA(a_ClassName);
 	};
-	 void cPlayer__TeleportTo( double a_PosX, double a_PosY, double a_PosZ) {
-		return ( void )cPlayer::TeleportTo(a_PosX,a_PosY,a_PosZ);
+	 const char* cPlayer__GetClass( void ) {
+		return ( const char* )cPlayer::GetClass();
 	};
-	 void cPlayer__DoTakeDamage( TakeDamageInfo& a_TDI) {
-		return ( void )cPlayer::DoTakeDamage(a_TDI);
+	 const char* cPlayer__GetParentClass( void ) {
+		return ( const char* )cPlayer::GetParentClass();
 	};
-	 void cPlayer__KilledBy( cPawn* a_Killer) {
-		return ( void )cPlayer::KilledBy(a_Killer);
-	};
-	 int cPlayer__GetRawDamageAgainst( const cPawn& a_Receiver) {
+	 int cPlayer__GetRawDamageAgainst( const cEntity& a_Receiver) {
 		return ( int )cPlayer::GetRawDamageAgainst(a_Receiver);
 	};
-	 int cPlayer__GetArmorCoverAgainst( const cPawn* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
+	 int cPlayer__GetArmorCoverAgainst( const cEntity* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
 		return ( int )cPlayer::GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
 	};
-	 double cPlayer__GetKnockbackAmountAgainst( const cPawn& a_Receiver) {
+	 double cPlayer__GetKnockbackAmountAgainst( const cEntity& a_Receiver) {
 		return ( double )cPlayer::GetKnockbackAmountAgainst(a_Receiver);
 	};
 	 cItem cPlayer__GetEquippedWeapon( void ) {
@@ -9604,14 +9501,14 @@ public:
 	 cItem cPlayer__GetEquippedBoots( void ) {
 		return ( cItem )cPlayer::GetEquippedBoots();
 	};
-	 bool cPlayer__IsA( const char* a_ClassName) {
-		return ( bool )cPlayer::IsA(a_ClassName);
+	 void cPlayer__KilledBy( cEntity* a_Killer) {
+		return ( void )cPlayer::KilledBy(a_Killer);
 	};
-	 const char* cPlayer__GetClass( void ) {
-		return ( const char* )cPlayer::GetClass();
+	 void cPlayer__TeleportToEntity( cEntity& a_Entity) {
+		return ( void )cPlayer::TeleportToEntity(a_Entity);
 	};
-	 const char* cPlayer__GetParentClass( void ) {
-		return ( const char* )cPlayer::GetParentClass();
+	 void cPlayer__TeleportToCoords( double a_PosX, double a_PosY, double a_PosZ) {
+		return ( void )cPlayer::TeleportToCoords(a_PosX,a_PosY,a_PosZ);
 	};
 	 bool cPlayer__IsOnFire( void ) {
 		return ( bool )cPlayer::IsOnFire();
@@ -18111,6 +18008,117 @@ public:
 			return ( const char* ) cPickup:: GetParentClass();
 		};
 	};
+	 int  GetRawDamageAgainst( const cEntity& a_Receiver) {
+		if (push_method("GetRawDamageAgainst",  tolua_AllToLua_cEntity_GetRawDamageAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cEntity");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( int ) cPickup:: GetRawDamageAgainst(a_Receiver);
+		};
+	};
+	 int  GetArmorCoverAgainst( const cEntity* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
+		if (push_method("GetArmorCoverAgainst",  tolua_AllToLua_cEntity_GetArmorCoverAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)a_Attacker, "const cEntity");
+			tolua_pushnumber(lua_state, (lua_Number)a_DamageType);
+			tolua_pushnumber(lua_state, (lua_Number)a_RawDamage);
+			ToluaBase::dbcall(lua_state, 4, 1);
+			 int  tolua_ret = ( int )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( int ) cPickup:: GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+		};
+	};
+	 double  GetKnockbackAmountAgainst( const cEntity& a_Receiver) {
+		if (push_method("GetKnockbackAmountAgainst",  tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Receiver, "const cEntity");
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 double  tolua_ret = ( double )tolua_tonumber(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( double ) cPickup:: GetKnockbackAmountAgainst(a_Receiver);
+		};
+	};
+	 cItem  GetEquippedWeapon( void )const {
+		if (push_method("GetEquippedWeapon",  tolua_AllToLua_cEntity_GetEquippedWeapon00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPickup:: GetEquippedWeapon();
+		};
+	};
+	 cItem  GetEquippedHelmet( void )const {
+		if (push_method("GetEquippedHelmet",  tolua_AllToLua_cEntity_GetEquippedHelmet00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPickup:: GetEquippedHelmet();
+		};
+	};
+	 cItem  GetEquippedChestplate( void )const {
+		if (push_method("GetEquippedChestplate",  tolua_AllToLua_cEntity_GetEquippedChestplate00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPickup:: GetEquippedChestplate();
+		};
+	};
+	 cItem  GetEquippedLeggings( void )const {
+		if (push_method("GetEquippedLeggings",  tolua_AllToLua_cEntity_GetEquippedLeggings00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPickup:: GetEquippedLeggings();
+		};
+	};
+	 cItem  GetEquippedBoots( void )const {
+		if (push_method("GetEquippedBoots",  tolua_AllToLua_cEntity_GetEquippedBoots00)) {
+			ToluaBase::dbcall(lua_state, 1, 1);
+			 cItem  tolua_ret = ( cItem )*(cItem*)tolua_tousertype(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
+		} else {
+			return ( cItem ) cPickup:: GetEquippedBoots();
+		};
+	};
+	 void  KilledBy( cEntity* a_Killer) {
+		if (push_method("KilledBy",  tolua_AllToLua_cEntity_KilledBy00)) {
+			tolua_pushusertype(lua_state, (void*)a_Killer, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cPickup:: KilledBy(a_Killer);
+		};
+	};
+	 void  TeleportToEntity( cEntity& a_Entity) {
+		if (push_method("TeleportToEntity",  tolua_AllToLua_cEntity_TeleportToEntity00)) {
+			tolua_pushusertype(lua_state, (void*)&a_Entity, "cEntity");
+			ToluaBase::dbcall(lua_state, 2, 0);
+		} else {
+			return ( void ) cPickup:: TeleportToEntity(a_Entity);
+		};
+	};
+	 void  TeleportToCoords( double a_PosX, double a_PosY, double a_PosZ) {
+		if (push_method("TeleportToCoords",  tolua_AllToLua_cEntity_TeleportToCoords00)) {
+			tolua_pushnumber(lua_state, (lua_Number)a_PosX);
+			tolua_pushnumber(lua_state, (lua_Number)a_PosY);
+			tolua_pushnumber(lua_state, (lua_Number)a_PosZ);
+			ToluaBase::dbcall(lua_state, 4, 0);
+		} else {
+			return ( void ) cPickup:: TeleportToCoords(a_PosX,a_PosY,a_PosZ);
+		};
+	};
 	 bool  IsOnFire( void )const {
 		if (push_method("IsOnFire",  tolua_AllToLua_cEntity_IsOnFire00)) {
 			ToluaBase::dbcall(lua_state, 1, 1);
@@ -18173,6 +18181,39 @@ public:
 	};
 	 const char* cPickup__GetParentClass( void ) {
 		return ( const char* )cPickup::GetParentClass();
+	};
+	 int cPickup__GetRawDamageAgainst( const cEntity& a_Receiver) {
+		return ( int )cPickup::GetRawDamageAgainst(a_Receiver);
+	};
+	 int cPickup__GetArmorCoverAgainst( const cEntity* a_Attacker, eDamageType a_DamageType, int a_RawDamage) {
+		return ( int )cPickup::GetArmorCoverAgainst(a_Attacker,a_DamageType,a_RawDamage);
+	};
+	 double cPickup__GetKnockbackAmountAgainst( const cEntity& a_Receiver) {
+		return ( double )cPickup::GetKnockbackAmountAgainst(a_Receiver);
+	};
+	 cItem cPickup__GetEquippedWeapon( void ) {
+		return ( cItem )cPickup::GetEquippedWeapon();
+	};
+	 cItem cPickup__GetEquippedHelmet( void ) {
+		return ( cItem )cPickup::GetEquippedHelmet();
+	};
+	 cItem cPickup__GetEquippedChestplate( void ) {
+		return ( cItem )cPickup::GetEquippedChestplate();
+	};
+	 cItem cPickup__GetEquippedLeggings( void ) {
+		return ( cItem )cPickup::GetEquippedLeggings();
+	};
+	 cItem cPickup__GetEquippedBoots( void ) {
+		return ( cItem )cPickup::GetEquippedBoots();
+	};
+	 void cPickup__KilledBy( cEntity* a_Killer) {
+		return ( void )cPickup::KilledBy(a_Killer);
+	};
+	 void cPickup__TeleportToEntity( cEntity& a_Entity) {
+		return ( void )cPickup::TeleportToEntity(a_Entity);
+	};
+	 void cPickup__TeleportToCoords( double a_PosX, double a_PosY, double a_PosZ) {
+		return ( void )cPickup::TeleportToCoords(a_PosX,a_PosY,a_PosZ);
 	};
 	 bool cPickup__IsOnFire( void ) {
 		return ( bool )cPickup::IsOnFire();
@@ -27875,6 +27916,45 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetViewDistance",tolua_AllToLua_cClientHandle_GetViewDistance00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cClientHandle_GetUniqueID00);
   tolua_endmodule(tolua_S);
+  tolua_constant(tolua_S,"dtAttack",dtAttack);
+  tolua_constant(tolua_S,"dtLightning",dtLightning);
+  tolua_constant(tolua_S,"dtFalling",dtFalling);
+  tolua_constant(tolua_S,"dtDrowning",dtDrowning);
+  tolua_constant(tolua_S,"dtSuffocating",dtSuffocating);
+  tolua_constant(tolua_S,"dtStarving",dtStarving);
+  tolua_constant(tolua_S,"dtCactusContact",dtCactusContact);
+  tolua_constant(tolua_S,"dtLavaContact",dtLavaContact);
+  tolua_constant(tolua_S,"dtPoisoning",dtPoisoning);
+  tolua_constant(tolua_S,"dtOnFire",dtOnFire);
+  tolua_constant(tolua_S,"dtFireContact",dtFireContact);
+  tolua_constant(tolua_S,"dtInVoid",dtInVoid);
+  tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
+  tolua_constant(tolua_S,"dtAdmin",dtAdmin);
+  tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
+  tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
+  tolua_constant(tolua_S,"dtMob",dtMob);
+  tolua_constant(tolua_S,"dtMobAttack",dtMobAttack);
+  tolua_constant(tolua_S,"dtFall",dtFall);
+  tolua_constant(tolua_S,"dtDrown",dtDrown);
+  tolua_constant(tolua_S,"dtSuffocation",dtSuffocation);
+  tolua_constant(tolua_S,"dtStarvation",dtStarvation);
+  tolua_constant(tolua_S,"dtHunger",dtHunger);
+  tolua_constant(tolua_S,"dtCactus",dtCactus);
+  tolua_constant(tolua_S,"dtCactuses",dtCactuses);
+  tolua_constant(tolua_S,"dtCacti",dtCacti);
+  tolua_constant(tolua_S,"dtLava",dtLava);
+  tolua_constant(tolua_S,"dtPoison",dtPoison);
+  tolua_constant(tolua_S,"dtBurning",dtBurning);
+  tolua_constant(tolua_S,"dtInFire",dtInFire);
+  tolua_constant(tolua_S,"dtPlugin",dtPlugin);
+  tolua_cclass(tolua_S,"TakeDamageInfo","TakeDamageInfo","",NULL);
+  tolua_beginmodule(tolua_S,"TakeDamageInfo");
+   tolua_variable(tolua_S,"DamageType",tolua_get_TakeDamageInfo_DamageType,tolua_set_TakeDamageInfo_DamageType);
+   tolua_variable(tolua_S,"Attacker",tolua_get_TakeDamageInfo_Attacker_ptr,tolua_set_TakeDamageInfo_Attacker_ptr);
+   tolua_variable(tolua_S,"RawDamage",tolua_get_TakeDamageInfo_RawDamage,tolua_set_TakeDamageInfo_RawDamage);
+   tolua_variable(tolua_S,"FinalDamage",tolua_get_TakeDamageInfo_FinalDamage,tolua_set_TakeDamageInfo_FinalDamage);
+   tolua_variable(tolua_S,"Knockback",tolua_get_TakeDamageInfo_Knockback,tolua_set_TakeDamageInfo_Knockback);
+  tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cEntity","cEntity","",NULL);
   tolua_beginmodule(tolua_S,"cEntity");
    tolua_constant(tolua_S,"ENTITY_STATUS_HURT",cEntity::ENTITY_STATUS_HURT);
@@ -27884,6 +27964,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"ENTITY_STATUS_WOLF_SHAKING",cEntity::ENTITY_STATUS_WOLF_SHAKING);
    tolua_constant(tolua_S,"ENTITY_STATUS_EATING_ACCEPTED",cEntity::ENTITY_STATUS_EATING_ACCEPTED);
    tolua_constant(tolua_S,"ENTITY_STATUS_SHEEP_EATING",cEntity::ENTITY_STATUS_SHEEP_EATING);
+   tolua_constant(tolua_S,"FIRE_TICKS_PER_DAMAGE",cEntity::FIRE_TICKS_PER_DAMAGE);
+   tolua_constant(tolua_S,"FIRE_DAMAGE",cEntity::FIRE_DAMAGE);
+   tolua_constant(tolua_S,"LAVA_TICKS_PER_DAMAGE",cEntity::LAVA_TICKS_PER_DAMAGE);
+   tolua_constant(tolua_S,"LAVA_DAMAGE",cEntity::LAVA_DAMAGE);
+   tolua_constant(tolua_S,"BURN_TICKS_PER_DAMAGE",cEntity::BURN_TICKS_PER_DAMAGE);
+   tolua_constant(tolua_S,"BURN_DAMAGE",cEntity::BURN_DAMAGE);
+   tolua_constant(tolua_S,"BURN_TICKS",cEntity::BURN_TICKS);
    tolua_constant(tolua_S,"etEntity",cEntity::etEntity);
    tolua_constant(tolua_S,"etPlayer",cEntity::etPlayer);
    tolua_constant(tolua_S,"etPickup",cEntity::etPickup);
@@ -27957,6 +28044,26 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cEntity_GetUniqueID00);
    tolua_function(tolua_S,"IsDestroyed",tolua_AllToLua_cEntity_IsDestroyed00);
    tolua_function(tolua_S,"Destroy",tolua_AllToLua_cEntity_Destroy00);
+   tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage00);
+   tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage01);
+   tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cEntity_TakeDamage02);
+   tolua_function(tolua_S,"GetRawDamageAgainst",tolua_AllToLua_cEntity_GetRawDamageAgainst00);
+   tolua_function(tolua_S,"GetArmorCoverAgainst",tolua_AllToLua_cEntity_GetArmorCoverAgainst00);
+   tolua_function(tolua_S,"GetKnockbackAmountAgainst",tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00);
+   tolua_function(tolua_S,"GetEquippedWeapon",tolua_AllToLua_cEntity_GetEquippedWeapon00);
+   tolua_function(tolua_S,"GetEquippedHelmet",tolua_AllToLua_cEntity_GetEquippedHelmet00);
+   tolua_function(tolua_S,"GetEquippedChestplate",tolua_AllToLua_cEntity_GetEquippedChestplate00);
+   tolua_function(tolua_S,"GetEquippedLeggings",tolua_AllToLua_cEntity_GetEquippedLeggings00);
+   tolua_function(tolua_S,"GetEquippedBoots",tolua_AllToLua_cEntity_GetEquippedBoots00);
+   tolua_function(tolua_S,"KilledBy",tolua_AllToLua_cEntity_KilledBy00);
+   tolua_function(tolua_S,"Heal",tolua_AllToLua_cEntity_Heal00);
+   tolua_function(tolua_S,"GetHealth",tolua_AllToLua_cEntity_GetHealth00);
+   tolua_function(tolua_S,"SetMaxHealth",tolua_AllToLua_cEntity_SetMaxHealth00);
+   tolua_function(tolua_S,"GetMaxHealth",tolua_AllToLua_cEntity_GetMaxHealth00);
+   tolua_function(tolua_S,"StartBurning",tolua_AllToLua_cEntity_StartBurning00);
+   tolua_function(tolua_S,"StopBurning",tolua_AllToLua_cEntity_StopBurning00);
+   tolua_function(tolua_S,"TeleportToEntity",tolua_AllToLua_cEntity_TeleportToEntity00);
+   tolua_function(tolua_S,"TeleportToCoords",tolua_AllToLua_cEntity_TeleportToCoords00);
    tolua_function(tolua_S,"IsOnFire",tolua_AllToLua_cEntity_IsOnFire00);
    tolua_function(tolua_S,"IsCrouched",tolua_AllToLua_cEntity_IsCrouched00);
    tolua_function(tolua_S,"IsRiding",tolua_AllToLua_cEntity_IsRiding00);
@@ -27969,86 +28076,25 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"cEntity__IsA",tolua_AllToLua_Lua__cEntity_cEntity__IsA00);
    tolua_function(tolua_S,"cEntity__GetClass",tolua_AllToLua_Lua__cEntity_cEntity__GetClass00);
    tolua_function(tolua_S,"cEntity__GetParentClass",tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00);
+   tolua_function(tolua_S,"cEntity__GetRawDamageAgainst",tolua_AllToLua_Lua__cEntity_cEntity__GetRawDamageAgainst00);
+   tolua_function(tolua_S,"cEntity__GetArmorCoverAgainst",tolua_AllToLua_Lua__cEntity_cEntity__GetArmorCoverAgainst00);
+   tolua_function(tolua_S,"cEntity__GetKnockbackAmountAgainst",tolua_AllToLua_Lua__cEntity_cEntity__GetKnockbackAmountAgainst00);
+   tolua_function(tolua_S,"cEntity__GetEquippedWeapon",tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedWeapon00);
+   tolua_function(tolua_S,"cEntity__GetEquippedHelmet",tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedHelmet00);
+   tolua_function(tolua_S,"cEntity__GetEquippedChestplate",tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedChestplate00);
+   tolua_function(tolua_S,"cEntity__GetEquippedLeggings",tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedLeggings00);
+   tolua_function(tolua_S,"cEntity__GetEquippedBoots",tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedBoots00);
+   tolua_function(tolua_S,"cEntity__KilledBy",tolua_AllToLua_Lua__cEntity_cEntity__KilledBy00);
+   tolua_function(tolua_S,"cEntity__TeleportToEntity",tolua_AllToLua_Lua__cEntity_cEntity__TeleportToEntity00);
+   tolua_function(tolua_S,"cEntity__TeleportToCoords",tolua_AllToLua_Lua__cEntity_cEntity__TeleportToCoords00);
    tolua_function(tolua_S,"cEntity__IsOnFire",tolua_AllToLua_Lua__cEntity_cEntity__IsOnFire00);
    tolua_function(tolua_S,"cEntity__IsCrouched",tolua_AllToLua_Lua__cEntity_cEntity__IsCrouched00);
    tolua_function(tolua_S,"cEntity__IsRiding",tolua_AllToLua_Lua__cEntity_cEntity__IsRiding00);
    tolua_function(tolua_S,"cEntity__IsSprinting",tolua_AllToLua_Lua__cEntity_cEntity__IsSprinting00);
    tolua_function(tolua_S,"cEntity__IsRclking",tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00);
   tolua_endmodule(tolua_S);
-  tolua_constant(tolua_S,"dtAttack",dtAttack);
-  tolua_constant(tolua_S,"dtLightning",dtLightning);
-  tolua_constant(tolua_S,"dtFalling",dtFalling);
-  tolua_constant(tolua_S,"dtDrowning",dtDrowning);
-  tolua_constant(tolua_S,"dtSuffocating",dtSuffocating);
-  tolua_constant(tolua_S,"dtStarving",dtStarving);
-  tolua_constant(tolua_S,"dtCactusContact",dtCactusContact);
-  tolua_constant(tolua_S,"dtLavaContact",dtLavaContact);
-  tolua_constant(tolua_S,"dtPoisoning",dtPoisoning);
-  tolua_constant(tolua_S,"dtOnFire",dtOnFire);
-  tolua_constant(tolua_S,"dtFireContact",dtFireContact);
-  tolua_constant(tolua_S,"dtInVoid",dtInVoid);
-  tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
-  tolua_constant(tolua_S,"dtAdmin",dtAdmin);
-  tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
-  tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
-  tolua_constant(tolua_S,"dtMob",dtMob);
-  tolua_constant(tolua_S,"dtMobAttack",dtMobAttack);
-  tolua_constant(tolua_S,"dtFall",dtFall);
-  tolua_constant(tolua_S,"dtDrown",dtDrown);
-  tolua_constant(tolua_S,"dtSuffocation",dtSuffocation);
-  tolua_constant(tolua_S,"dtStarvation",dtStarvation);
-  tolua_constant(tolua_S,"dtHunger",dtHunger);
-  tolua_constant(tolua_S,"dtCactus",dtCactus);
-  tolua_constant(tolua_S,"dtCactuses",dtCactuses);
-  tolua_constant(tolua_S,"dtCacti",dtCacti);
-  tolua_constant(tolua_S,"dtLava",dtLava);
-  tolua_constant(tolua_S,"dtPoison",dtPoison);
-  tolua_constant(tolua_S,"dtBurning",dtBurning);
-  tolua_constant(tolua_S,"dtInFire",dtInFire);
-  tolua_constant(tolua_S,"dtPlugin",dtPlugin);
-  tolua_cclass(tolua_S,"TakeDamageInfo","TakeDamageInfo","",NULL);
-  tolua_beginmodule(tolua_S,"TakeDamageInfo");
-   tolua_variable(tolua_S,"DamageType",tolua_get_TakeDamageInfo_DamageType,tolua_set_TakeDamageInfo_DamageType);
-   tolua_variable(tolua_S,"Attacker",tolua_get_TakeDamageInfo_Attacker_ptr,tolua_set_TakeDamageInfo_Attacker_ptr);
-   tolua_variable(tolua_S,"RawDamage",tolua_get_TakeDamageInfo_RawDamage,tolua_set_TakeDamageInfo_RawDamage);
-   tolua_variable(tolua_S,"FinalDamage",tolua_get_TakeDamageInfo_FinalDamage,tolua_set_TakeDamageInfo_FinalDamage);
-   tolua_variable(tolua_S,"Knockback",tolua_get_TakeDamageInfo_Knockback,tolua_set_TakeDamageInfo_Knockback);
-  tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPawn","cPawn","cEntity",NULL);
   tolua_beginmodule(tolua_S,"cPawn");
-   tolua_function(tolua_S,"TeleportToEntity",tolua_AllToLua_cPawn_TeleportToEntity00);
-   tolua_function(tolua_S,"TeleportTo",tolua_AllToLua_cPawn_TeleportTo00);
-   tolua_function(tolua_S,"Heal",tolua_AllToLua_cPawn_Heal00);
-   tolua_function(tolua_S,"GetHealth",tolua_AllToLua_cPawn_GetHealth00);
-   tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cPawn_TakeDamage00);
-   tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cPawn_TakeDamage01);
-   tolua_function(tolua_S,"TakeDamage",tolua_AllToLua_cPawn_TakeDamage02);
-   tolua_function(tolua_S,"DoTakeDamage",tolua_AllToLua_cPawn_DoTakeDamage00);
-   tolua_function(tolua_S,"KilledBy",tolua_AllToLua_cPawn_KilledBy00);
-   tolua_function(tolua_S,"GetRawDamageAgainst",tolua_AllToLua_cPawn_GetRawDamageAgainst00);
-   tolua_function(tolua_S,"GetArmorCoverAgainst",tolua_AllToLua_cPawn_GetArmorCoverAgainst00);
-   tolua_function(tolua_S,"GetKnockbackAmountAgainst",tolua_AllToLua_cPawn_GetKnockbackAmountAgainst00);
-   tolua_function(tolua_S,"GetEquippedWeapon",tolua_AllToLua_cPawn_GetEquippedWeapon00);
-   tolua_function(tolua_S,"GetEquippedHelmet",tolua_AllToLua_cPawn_GetEquippedHelmet00);
-   tolua_function(tolua_S,"GetEquippedChestplate",tolua_AllToLua_cPawn_GetEquippedChestplate00);
-   tolua_function(tolua_S,"GetEquippedLeggings",tolua_AllToLua_cPawn_GetEquippedLeggings00);
-   tolua_function(tolua_S,"GetEquippedBoots",tolua_AllToLua_cPawn_GetEquippedBoots00);
-  tolua_endmodule(tolua_S);
-  tolua_cclass(tolua_S,"Lua__cPawn","Lua__cPawn","cPawn",NULL);
-  tolua_beginmodule(tolua_S,"Lua__cPawn");
-   tolua_function(tolua_S,"tolua__set_instance",tolua_AllToLua_Lua__cPawn_tolua__set_instance00);
-   tolua_function(tolua_S,"cPawn__TeleportToEntity",tolua_AllToLua_Lua__cPawn_cPawn__TeleportToEntity00);
-   tolua_function(tolua_S,"cPawn__TeleportTo",tolua_AllToLua_Lua__cPawn_cPawn__TeleportTo00);
-   tolua_function(tolua_S,"cPawn__DoTakeDamage",tolua_AllToLua_Lua__cPawn_cPawn__DoTakeDamage00);
-   tolua_function(tolua_S,"cPawn__KilledBy",tolua_AllToLua_Lua__cPawn_cPawn__KilledBy00);
-   tolua_function(tolua_S,"cPawn__GetRawDamageAgainst",tolua_AllToLua_Lua__cPawn_cPawn__GetRawDamageAgainst00);
-   tolua_function(tolua_S,"cPawn__GetArmorCoverAgainst",tolua_AllToLua_Lua__cPawn_cPawn__GetArmorCoverAgainst00);
-   tolua_function(tolua_S,"cPawn__GetKnockbackAmountAgainst",tolua_AllToLua_Lua__cPawn_cPawn__GetKnockbackAmountAgainst00);
-   tolua_function(tolua_S,"cPawn__GetEquippedWeapon",tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedWeapon00);
-   tolua_function(tolua_S,"cPawn__GetEquippedHelmet",tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedHelmet00);
-   tolua_function(tolua_S,"cPawn__GetEquippedChestplate",tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedChestplate00);
-   tolua_function(tolua_S,"cPawn__GetEquippedLeggings",tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedLeggings00);
-   tolua_function(tolua_S,"cPawn__GetEquippedBoots",tolua_AllToLua_Lua__cPawn_cPawn__GetEquippedBoots00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cPlayer","cPlayer","cPawn",NULL);
   tolua_beginmodule(tolua_S,"cPlayer");

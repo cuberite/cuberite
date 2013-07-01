@@ -447,7 +447,7 @@ bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const ASt
 
 
 
-bool cPluginManager::CallHookKilling(cPawn & a_Victim, cEntity * a_Killer)
+bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_KILLING);
 	if (Plugins == m_Hooks.end())
@@ -867,7 +867,7 @@ bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCrafti
 
 
 
-bool cPluginManager::CallHookTakeDamage(cPawn & a_Receiver, TakeDamageInfo & a_TDI)
+bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_TAKE_DAMAGE);
 	if (Plugins == m_Hooks.end())

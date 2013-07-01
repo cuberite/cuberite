@@ -8,7 +8,7 @@
 
 
 cVillager::cVillager(void) :
-	super("Villager", 120, "", "")
+	super("Villager", 120, "", "", 0.6, 1.8)
 {
 }
 

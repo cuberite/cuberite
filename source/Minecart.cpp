@@ -14,7 +14,7 @@
 
 
 cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
-	super(etMinecart, a_X, a_Y, a_Z),
+	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
 	m_Payload(a_Payload)
 {
 }

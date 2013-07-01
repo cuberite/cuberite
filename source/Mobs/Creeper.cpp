@@ -8,7 +8,7 @@
 
 
 cCreeper::cCreeper(void) :
-	super("Creeper", 50, "mob.creeper.say", "mob.creeper.say")
+	super("Creeper", 50, "mob.creeper.say", "mob.creeper.say", 0.6, 1.8)
 {
 }
 
@@ -16,7 +16,7 @@ cCreeper::cCreeper(void) :
 
 
 
-void cCreeper::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 0, 2, E_ITEM_GUNPOWDER);
 

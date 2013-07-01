@@ -8,7 +8,7 @@
 
 
 cPig::cPig(void) :
-	super("Pig", 90, "mob.pig.say", "mob.pig.death")
+	super("Pig", 90, "mob.pig.say", "mob.pig.death", 0.9, 0.9)
 {
 }
 
@@ -16,9 +16,9 @@ cPig::cPig(void) :
 
 
 
-void cPig::GetDrops(cItems & a_Drops, cPawn * a_Killer)
+void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 1, 3, (GetMetaData() == BURNING) ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
+	AddRandomDropItem(a_Drops, 1, 3, IsOnFire() ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
 }
 
 
