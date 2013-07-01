@@ -640,7 +640,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		m_TicksSinceLastBurnDamage++;
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
-			TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0, 0);
+			TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0);
 			m_TicksSinceLastBurnDamage = 0;
 		}
 		m_TicksLeftBurning--;
