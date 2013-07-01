@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/01/13 09:49:28.
+** Generated automatically by tolua++-1.0.92 on 07/01/13 20:42:05.
 */
 
 #ifndef __cplusplus
@@ -2585,6 +2585,65 @@ static int tolua_AllToLua_StringToDimension00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StringToDimension'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: DamageTypeToString */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_DamageTypeToString00
+static int tolua_AllToLua_DamageTypeToString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  eDamageType a_DamageType = ((eDamageType) (int)  tolua_tonumber(tolua_S,1,0));
+  {
+   AString tolua_ret = (AString)  DamageTypeToString(a_DamageType);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'DamageTypeToString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StringToDamageType */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_StringToDamageType00
+static int tolua_AllToLua_StringToDamageType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_DamageString = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   eDamageType tolua_ret = (eDamageType)  StringToDamageType(a_DamageString);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_DamageString);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StringToDamageType'.",&tolua_err);
  return 0;
 #endif
 }
@@ -27784,6 +27843,37 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"dimNether",dimNether);
   tolua_constant(tolua_S,"dimOverworld",dimOverworld);
   tolua_constant(tolua_S,"dimEnd",dimEnd);
+  tolua_constant(tolua_S,"dtAttack",dtAttack);
+  tolua_constant(tolua_S,"dtLightning",dtLightning);
+  tolua_constant(tolua_S,"dtFalling",dtFalling);
+  tolua_constant(tolua_S,"dtDrowning",dtDrowning);
+  tolua_constant(tolua_S,"dtSuffocating",dtSuffocating);
+  tolua_constant(tolua_S,"dtStarving",dtStarving);
+  tolua_constant(tolua_S,"dtCactusContact",dtCactusContact);
+  tolua_constant(tolua_S,"dtLavaContact",dtLavaContact);
+  tolua_constant(tolua_S,"dtPoisoning",dtPoisoning);
+  tolua_constant(tolua_S,"dtOnFire",dtOnFire);
+  tolua_constant(tolua_S,"dtFireContact",dtFireContact);
+  tolua_constant(tolua_S,"dtInVoid",dtInVoid);
+  tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
+  tolua_constant(tolua_S,"dtAdmin",dtAdmin);
+  tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
+  tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
+  tolua_constant(tolua_S,"dtMob",dtMob);
+  tolua_constant(tolua_S,"dtMobAttack",dtMobAttack);
+  tolua_constant(tolua_S,"dtFall",dtFall);
+  tolua_constant(tolua_S,"dtDrown",dtDrown);
+  tolua_constant(tolua_S,"dtSuffocation",dtSuffocation);
+  tolua_constant(tolua_S,"dtStarvation",dtStarvation);
+  tolua_constant(tolua_S,"dtHunger",dtHunger);
+  tolua_constant(tolua_S,"dtCactus",dtCactus);
+  tolua_constant(tolua_S,"dtCactuses",dtCactuses);
+  tolua_constant(tolua_S,"dtCacti",dtCacti);
+  tolua_constant(tolua_S,"dtLava",dtLava);
+  tolua_constant(tolua_S,"dtPoison",dtPoison);
+  tolua_constant(tolua_S,"dtBurning",dtBurning);
+  tolua_constant(tolua_S,"dtInFire",dtInFire);
+  tolua_constant(tolua_S,"dtPlugin",dtPlugin);
   tolua_function(tolua_S,"BlockStringToType",tolua_AllToLua_BlockStringToType00);
   tolua_function(tolua_S,"StringToItem",tolua_AllToLua_StringToItem00);
   tolua_function(tolua_S,"ItemToString",tolua_AllToLua_ItemToString00);
@@ -27791,6 +27881,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"ItemToFullString",tolua_AllToLua_ItemToFullString00);
   tolua_function(tolua_S,"StringToBiome",tolua_AllToLua_StringToBiome00);
   tolua_function(tolua_S,"StringToDimension",tolua_AllToLua_StringToDimension00);
+  tolua_function(tolua_S,"DamageTypeToString",tolua_AllToLua_DamageTypeToString00);
+  tolua_function(tolua_S,"StringToDamageType",tolua_AllToLua_StringToDamageType00);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);
@@ -27916,37 +28008,6 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetViewDistance",tolua_AllToLua_cClientHandle_GetViewDistance00);
    tolua_function(tolua_S,"GetUniqueID",tolua_AllToLua_cClientHandle_GetUniqueID00);
   tolua_endmodule(tolua_S);
-  tolua_constant(tolua_S,"dtAttack",dtAttack);
-  tolua_constant(tolua_S,"dtLightning",dtLightning);
-  tolua_constant(tolua_S,"dtFalling",dtFalling);
-  tolua_constant(tolua_S,"dtDrowning",dtDrowning);
-  tolua_constant(tolua_S,"dtSuffocating",dtSuffocating);
-  tolua_constant(tolua_S,"dtStarving",dtStarving);
-  tolua_constant(tolua_S,"dtCactusContact",dtCactusContact);
-  tolua_constant(tolua_S,"dtLavaContact",dtLavaContact);
-  tolua_constant(tolua_S,"dtPoisoning",dtPoisoning);
-  tolua_constant(tolua_S,"dtOnFire",dtOnFire);
-  tolua_constant(tolua_S,"dtFireContact",dtFireContact);
-  tolua_constant(tolua_S,"dtInVoid",dtInVoid);
-  tolua_constant(tolua_S,"dtPotionOfHarming",dtPotionOfHarming);
-  tolua_constant(tolua_S,"dtAdmin",dtAdmin);
-  tolua_constant(tolua_S,"dtPawnAttack",dtPawnAttack);
-  tolua_constant(tolua_S,"dtEntityAttack",dtEntityAttack);
-  tolua_constant(tolua_S,"dtMob",dtMob);
-  tolua_constant(tolua_S,"dtMobAttack",dtMobAttack);
-  tolua_constant(tolua_S,"dtFall",dtFall);
-  tolua_constant(tolua_S,"dtDrown",dtDrown);
-  tolua_constant(tolua_S,"dtSuffocation",dtSuffocation);
-  tolua_constant(tolua_S,"dtStarvation",dtStarvation);
-  tolua_constant(tolua_S,"dtHunger",dtHunger);
-  tolua_constant(tolua_S,"dtCactus",dtCactus);
-  tolua_constant(tolua_S,"dtCactuses",dtCactuses);
-  tolua_constant(tolua_S,"dtCacti",dtCacti);
-  tolua_constant(tolua_S,"dtLava",dtLava);
-  tolua_constant(tolua_S,"dtPoison",dtPoison);
-  tolua_constant(tolua_S,"dtBurning",dtBurning);
-  tolua_constant(tolua_S,"dtInFire",dtInFire);
-  tolua_constant(tolua_S,"dtPlugin",dtPlugin);
   tolua_cclass(tolua_S,"TakeDamageInfo","TakeDamageInfo","",NULL);
   tolua_beginmodule(tolua_S,"TakeDamageInfo");
    tolua_variable(tolua_S,"DamageType",tolua_get_TakeDamageInfo_DamageType,tolua_set_TakeDamageInfo_DamageType);

@@ -323,6 +323,7 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 
 eDimension StringToDimension(const AString & a_DimensionString)
 {
+	// First try decoding as a number
 	int res = atoi(a_DimensionString.c_str());
 	if ((res != 0) || (a_DimensionString == "0"))
 	{
@@ -330,7 +331,7 @@ eDimension StringToDimension(const AString & a_DimensionString)
 		return (eDimension)res;
 	}
 	
-	// Convert using a built-in map:
+	// Decode using a built-in map:
 	static struct
 	{
 		eDimension m_Dimension;
@@ -355,6 +356,105 @@ eDimension StringToDimension(const AString & a_DimensionString)
 	
 	// Not found
 	return (eDimension)-1000;
+}
+
+
+
+
+
+/// Translates damage type constant to a string representation (built-in).
+AString DamageTypeToString(eDamageType a_DamageType)
+{
+	switch (a_DamageType)
+	{
+		case dtAttack:          return "dtAttack";
+		case dtLightning:       return "dtLightning";
+		case dtFalling:         return "dtFalling";
+		case dtDrowning:        return "dtDrowning";
+		case dtSuffocating:     return "dtSuffocation";
+		case dtStarving:        return "dtStarving";
+		case dtCactusContact:   return "dtCactusContact";
+		case dtLavaContact:     return "dtLavaContact";
+		case dtPoisoning:       return "dtPoisoning";
+		case dtOnFire:          return "dtOnFire";
+		case dtFireContact:     return "dtFireContact";
+		case dtInVoid:          return "dtInVoid";
+		case dtPotionOfHarming: return "dtPotionOfHarming";
+		case dtAdmin:           return "dtAdmin";
+	}
+	
+	// Unknown damage type:
+	ASSERT(!"Unknown DamageType");
+	return Printf("dtUnknown_%d", (int)a_DamageType);
+}
+
+
+
+
+
+/// Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure
+eDamageType StringToDamageType(const AString & a_DamageTypeString)
+{
+	// First try decoding as a number:
+	int res = atoi(a_DamageTypeString.c_str());
+	if ((res != 0) || (a_DamageTypeString == "0"))
+	{
+		// It was a valid number
+		return (eDamageType)res;
+	}
+	
+	// Decode using a built-in map:
+	static struct
+	{
+		eDamageType  m_DamageType;
+		const char * m_String;
+	} DamageTypeMap [] =
+	{
+		// Cannonical names:
+		{ dtAttack,          "dtAttack"},
+		{ dtLightning,       "dtLightning"},
+		{ dtFalling,         "dtFalling"},
+		{ dtDrowning,        "dtDrowning"},
+		{ dtSuffocating,     "dtSuffocation"},
+		{ dtStarving,        "dtStarving"},
+		{ dtCactusContact,   "dtCactusContact"},
+		{ dtLavaContact,     "dtLavaContact"},
+		{ dtPoisoning,       "dtPoisoning"},
+		{ dtOnFire,          "dtOnFire"},
+		{ dtFireContact,     "dtFireContact"},
+		{ dtInVoid,          "dtInVoid"},
+		{ dtPotionOfHarming, "dtPotionOfHarming"},
+		{ dtAdmin,           "dtAdmin"},
+
+		// Common synonyms:
+		{ dtPawnAttack,   "dtAttack"},
+		{ dtEntityAttack, "dtAttack"},
+		{ dtMob,          "dtAttack"},
+		{ dtMobAttack,    "dtAttack"},
+		{ dtFall,         "dtFalling"},
+		{ dtDrown,        "dtDrowning"},
+		{ dtSuffocation,  "dtSuffocating"},
+		{ dtStarvation,   "dtStarving"},
+		{ dtHunger,       "dtStarving"},
+		{ dtCactus,       "dtCactusContact"},
+		{ dtCactuses,     "dtCactusContact"},
+		{ dtCacti,        "dtCactusContact"},
+		{ dtLava,         "dtLavaContact"},
+		{ dtPoison,       "dtPoisoning"},
+		{ dtBurning,      "dtOnFire"},
+		{ dtInFire,       "dtFireContact"},
+		{ dtPlugin,       "dtAdmin"},
+	} ;
+	for (int i = 0; i < ARRAYCOUNT(DamageTypeMap); i++)
+	{
+		if (NoCaseCompare(DamageTypeMap[i].m_String, a_DamageTypeString) == 0)
+		{
+			return DamageTypeMap[i].m_DamageType;
+		}
+	}  // for i - DamageTypeMap[]
+	
+	// Not found:
+	return (eDamageType)-1;
 }
 
 

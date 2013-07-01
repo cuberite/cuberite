@@ -43,48 +43,6 @@ class cChunk;
 
 
 // tolua_begin
-enum eDamageType
-{
-	// Canonical names for the types (as documented in the plugin wiki):
-	dtAttack,           // Being attacked by a mob
-	dtLightning,        // Hit by a lightning strike
-	dtFalling,          // Falling down; dealt when hitting the ground
-	dtDrowning,         // Drowning in water / lava
-	dtSuffocating,      // Suffocating inside a block
-	dtStarving,         // Hunger
-	dtCactusContact,    // Contact with a cactus block
-	dtLavaContact,      // Contact with a lava block
-	dtPoisoning,        // Having the poison effect
-	dtOnFire,           // Being on fire
-	dtFireContact,      // Standing inside a fire block
-	dtInVoid,           // Falling into the Void (Y < 0)
-	dtPotionOfHarming,
-	dtAdmin,            // Damage applied by an admin command
-	
-	// Some common synonyms:
-	dtPawnAttack   = dtAttack,
-	dtEntityAttack = dtAttack,
-	dtMob          = dtAttack,
-	dtMobAttack    = dtAttack,
-	dtFall         = dtFalling,
-	dtDrown        = dtDrowning,
-	dtSuffocation  = dtSuffocating,
-	dtStarvation   = dtStarving,
-	dtHunger       = dtStarving,
-	dtCactus       = dtCactusContact,
-	dtCactuses     = dtCactusContact,
-	dtCacti        = dtCactusContact,
-	dtLava         = dtLavaContact,
-	dtPoison       = dtPoisoning,
-	dtBurning      = dtOnFire,
-	dtInFire       = dtFireContact,
-	dtPlugin       = dtAdmin,
-} ;
-
-
-
-
-
 struct TakeDamageInfo
 {
 	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...

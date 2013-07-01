@@ -614,6 +614,48 @@ enum eDimension
 } ;
 
 
+
+
+
+/// Damage type, used in the TakeDamageInfo structure and related functions
+enum eDamageType
+{
+	// Canonical names for the types (as documented in the plugin wiki):
+	dtAttack,           // Being attacked by a mob
+	dtLightning,        // Hit by a lightning strike
+	dtFalling,          // Falling down; dealt when hitting the ground
+	dtDrowning,         // Drowning in water / lava
+	dtSuffocating,      // Suffocating inside a block
+	dtStarving,         // Hunger
+	dtCactusContact,    // Contact with a cactus block
+	dtLavaContact,      // Contact with a lava block
+	dtPoisoning,        // Having the poison effect
+	dtOnFire,           // Being on fire
+	dtFireContact,      // Standing inside a fire block
+	dtInVoid,           // Falling into the Void (Y < 0)
+	dtPotionOfHarming,
+	dtAdmin,            // Damage applied by an admin command
+	
+	// Some common synonyms:
+	dtPawnAttack   = dtAttack,
+	dtEntityAttack = dtAttack,
+	dtMob          = dtAttack,
+	dtMobAttack    = dtAttack,
+	dtFall         = dtFalling,
+	dtDrown        = dtDrowning,
+	dtSuffocation  = dtSuffocating,
+	dtStarvation   = dtStarving,
+	dtHunger       = dtStarving,
+	dtCactus       = dtCactusContact,
+	dtCactuses     = dtCactusContact,
+	dtCacti        = dtCactusContact,
+	dtLava         = dtLavaContact,
+	dtPoison       = dtPoisoning,
+	dtBurning      = dtOnFire,
+	dtInFire       = dtFireContact,
+	dtPlugin       = dtAdmin,
+} ;
+
 // tolua_end
 
 
@@ -648,6 +690,12 @@ extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 
 /// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns -1000 on failure
 extern eDimension StringToDimension(const AString & a_DimensionString);
+
+/// Translates damage type constant to a string representation (built-in).
+extern AString DamageTypeToString(eDamageType a_DamageType);
+
+/// Translates a damage type string to damage type. Takes either a number or a damage type alias (built-in). Returns -1 on failure
+extern eDamageType StringToDamageType(const AString & a_DamageString);
 
 // tolua_end
 
