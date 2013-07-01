@@ -631,6 +631,9 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 void cEntity::TickBurning(cChunk & a_Chunk)
 {
+	// Remember the current burning state:
+	bool HasBeenBurning = (m_TicksLeftBurning > 0);
+	
 	// Do the burning damage:
 	if (m_TicksLeftBurning > 0)
 	{
@@ -638,17 +641,10 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
 			TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0, 0);
-			m_TicksSinceLastFireDamage = 0;
+			m_TicksSinceLastBurnDamage = 0;
 		}
 		m_TicksLeftBurning--;
-		if (m_TicksLeftBurning == 0)
-		{
-			OnFinishedBurning();
-		}
 	}
-	
-	// Remember the current burning state:
-	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 	
 	// Update the burning times, based on surroundings:
 	int MinRelX = (int)floor(GetPosX() - m_Width / 2) - a_Chunk.GetPosX() * cChunkDef::Width;
@@ -711,7 +707,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		
 		// Periodically damage:
 		m_TicksSinceLastLavaDamage++;
-		if (m_TicksSinceLastLavaDamage >= 10)
+		if (m_TicksSinceLastLavaDamage >= LAVA_TICKS_PER_DAMAGE)
 		{
 			TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
 			m_TicksSinceLastLavaDamage = 0;
@@ -732,6 +728,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		if (m_TicksSinceLastFireDamage >= FIRE_TICKS_PER_DAMAGE)
 		{
 			TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+			m_TicksSinceLastFireDamage = 0;
 		}
 	}
 	else
