@@ -117,9 +117,9 @@ cPlayer::~cPlayer(void)
 
 
 
-void cPlayer::Initialize( cWorld* a_World )
+void cPlayer::Initialize(cWorld * a_World)
 {
-	cPawn::Initialize( a_World );
+	super::Initialize(a_World);
 	GetWorld()->AddPlayer(this);
 }
 
@@ -891,26 +891,37 @@ void cPlayer::TossItem(
 
 
 
-bool cPlayer::MoveToWorld( const char* a_WorldName )
+bool cPlayer::MoveToWorld(const char * a_WorldName)
 {
-	cWorld * World = cRoot::Get()->GetWorld( a_WorldName );
-	if ( World )
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == NULL)
 	{
-		/* Remove all links to the old world */
-		m_World->RemovePlayer( this );
-		m_ClientHandle->RemoveFromAllChunks();
-		m_World->RemoveEntity(this);
-
-		/* Add player to all the necessary parts of the new world */
-		SetWorld( World );
-		GetWorld()->AddPlayer(this);
-
-		m_ClientHandle->HandleRespawn();
-		m_ClientHandle->StreamChunks();
-		return true;
+		LOG("%s: Couldn't find world \"%s\".", a_WorldName);
+		return false;
 	}
+	
+	eDimension OldDimension = m_World->GetDimension();
+	
+	// Remove all links to the old world
+	m_World->RemovePlayer(this);
+	m_ClientHandle->RemoveFromAllChunks();
+	m_World->RemoveEntity(this);
 
-	return false;
+	// Add player to all the necessary parts of the new world
+	SetWorld(World);
+	World->AddEntity(this);
+	World->AddPlayer(this);
+
+	// If the dimension is different, we can send the respawn packet
+	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
+	if (OldDimension != World->GetDimension())
+	{
+		m_ClientHandle->SendRespawn();
+	}
+	
+	// Stream the new chunks:
+	m_ClientHandle->StreamChunks();
+	return true;
 }
 
 

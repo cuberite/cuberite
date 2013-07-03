@@ -406,6 +406,11 @@ void cClientHandle::RemoveFromAllChunks()
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
+		
+		// Also reset the LastStreamedChunk coords to bogus coords,
+		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
+		m_LastStreamedChunkX = 0x7fffffff;
+		m_LastStreamedChunkZ = 0x7fffffff;
 	}
 }
 
@@ -898,18 +903,11 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 void cClientHandle::HandleChat(const AString & a_Message)
 {
-	AString Message(a_Message);
-	if (!cRoot::Get()->GetServer()->Command(*this, Message))
-	{
-		AString Msg;
-		Printf(Msg, "<%s%s%s> %s",
-			m_Player->GetColor().c_str(),
-			m_Player->GetName().c_str(),
-			cChatColor::White.c_str(),
-			Message.c_str()
-		);
-		m_Player->GetWorld()->BroadcastChat(Msg);
-	}
+	// We need to process messages in the Tick thread, to avoid deadlocks resulting from player-commands being processed
+	// in the SocketThread and waiting for acquiring the ChunkMap CS with Plugin CS locked
+	
+	cCSLock Lock(m_CSMessages);
+	m_PendingMessages.push_back(a_Message);
 }
 
 
@@ -1292,8 +1290,8 @@ void cClientHandle::Tick(float a_Dt)
 		m_ShouldCheckDownloaded = false;
 	}
 	
+	// Send a ping packet:
 	cTimer t1;
-	// Send ping packet
 	if (
 		(m_Player != NULL) &&  // Is logged in?
 		(m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime())
@@ -1324,6 +1322,9 @@ void cClientHandle::Tick(float a_Dt)
 	m_CurrentExplosionTick = (m_CurrentExplosionTick + 1) % ARRAYCOUNT(m_NumExplosionsPerTick);
 	m_RunningSumExplosions -= m_NumExplosionsPerTick[m_CurrentExplosionTick];
 	m_NumExplosionsPerTick[m_CurrentExplosionTick] = 0;
+	
+	// Process the queued messages:
+	ProcessPendingMessages();
 }
 
 
@@ -1938,6 +1939,46 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
 	}
+}
+
+
+
+
+
+void cClientHandle::ProcessPendingMessages(void)
+{
+	while (true)
+	{
+		AString Message;
+		
+		// Extract one message from the PendingMessages buffer:
+		{
+			cCSLock Lock(m_CSMessages);
+			if (m_PendingMessages.empty())
+			{
+				// No more messages in the buffer, bail out
+				return;
+			}
+			Message = m_PendingMessages.front();
+			m_PendingMessages.pop_front();
+		}  // Lock(m_CSMessages)
+		
+		// If a command, perform it:
+		if (cRoot::Get()->GetServer()->Command(*this, Message))
+		{
+			continue;
+		}
+		
+		// Not a command, broadcast as a simple message:
+		AString Msg;
+		Printf(Msg, "<%s%s%s> %s",
+			m_Player->GetColor().c_str(),
+			m_Player->GetName().c_str(),
+			cChatColor::White.c_str(),
+			Message.c_str()
+		);
+		m_Player->GetWorld()->BroadcastChat(Msg);
+	}  // while (true)
 }
 
 

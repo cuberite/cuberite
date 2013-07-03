@@ -1843,6 +1843,8 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 	
 	m_Players.remove(a_Player);  // Make sure the player is registered only once
 	m_Players.push_back(a_Player);
+	
+	// The player has already been added to the chunkmap as the entity, do NOT add again!
 }
 
 

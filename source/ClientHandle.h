@@ -185,6 +185,7 @@ public:
 	bool HandleLogin(int a_ProtocolVersion, const AString & a_Username);
 	
 	void SendData(const char * a_Data, int a_Size);
+	
 private:
 
 	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
@@ -270,6 +271,12 @@ private:
 	/// Running sum of m_NumExplosionsPerTick[]
 	int m_RunningSumExplosions;
 	
+	/// Lock for the m_PendingMessages buffer
+	cCriticalSection m_CSMessages;
+	
+	/// Buffer for received messages to be processed in the Tick thread
+	AStringList m_PendingMessages;
+	
 
 
 	/// Returns true if the rate block interactions is within a reasonable limit (bot protection)
@@ -292,6 +299,9 @@ private:
 
 	/// Handles the block placing packet when it is a real block placement (not block-using, item-using or eating)
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
+	
+	/// Processes the messages in m_PendingMessages; called from the Tick thread
+	void ProcessPendingMessages(void);
 
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
