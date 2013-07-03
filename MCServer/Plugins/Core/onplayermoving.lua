@@ -6,16 +6,16 @@ function OnPlayerMoving( Player )
 		local X = math.floor(Player:GetPosX() / 16)
 		local Z = math.floor(Player:GetPosZ() / 16)
 		if ( (SpawnX + LimitWorldWidth - 1) < X ) then 
-			Player:TeleportTo(Player:GetPosX() - 1, Player:GetPosY(), Player:GetPosZ()) 
+			Player:TeleportToCoords(Player:GetPosX() - 1, Player:GetPosY(), Player:GetPosZ()) 
 		end
 		if ( (SpawnX - LimitWorldWidth + 1) > X ) then
-			Player:TeleportTo(Player:GetPosX() + 1, Player:GetPosY(), Player:GetPosZ()) 
+			Player:TeleportToCoords(Player:GetPosX() + 1, Player:GetPosY(), Player:GetPosZ()) 
 		end
 		if ( (SpawnZ + LimitWorldWidth - 1) < Z ) then 
-			Player:TeleportTo(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() - 1) 
+			Player:TeleportToCoords(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() - 1) 
 		end
 		if ( (SpawnZ - LimitWorldWidth + 1) > Z ) then
-			Player:TeleportTo(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() + 1) 
+			Player:TeleportToCoords(Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() + 1) 
 		end
 	end
 end
