@@ -90,7 +90,7 @@ public:
 		
 		// Give new bucket, filled with fluid:
 		cItem Item(NewItem, 1);
-		a_Player->GetInventory().AddItem(Item);
+		a_Player->GetInventory().AddItem(Item, true, true);
 
 		// Remove water / lava block
 		a_Player->GetWorld()->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
@@ -136,7 +136,7 @@ public:
 				return false;
 			}
 			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item))
+			if (!a_Player->GetInventory().AddItem(Item,true,true))
 			{
 				return false;
 			}

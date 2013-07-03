@@ -12978,7 +12978,7 @@ static int tolua_AllToLua_cInventory_AddItems00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItems'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddItems(*a_ItemStackList,a_AllowNewStacks);
+    int tolua_ret = (int)  self->AddItems(*a_ItemStackList,a_AllowNewStacks,false);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -15821,7 +15821,7 @@ static int tolua_AllToLua_cItemGrid_AddItem00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItem'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddItem(*a_ItemStack,a_AllowNewStacks);
+   int tolua_ret = (int)  self->AddItem(*a_ItemStack,a_AllowNewStacks, false);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }

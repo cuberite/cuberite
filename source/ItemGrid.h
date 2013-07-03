@@ -76,18 +76,24 @@ public:
 	
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
-	if a_AllowNewStacks is set to true, empty slots can be used for the rest
+	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
+	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used in
+	first (if empty or compatible with added items)
+	if a_PrioritarySlot is set to -1, regular order apply
 	Returns the number of items that fit.
 	*/
-	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true);
+	int AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
 	
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
-	if a_AllowNewStacks is set to true, empty slots can be used for the rest
+	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
+	If a_PrioritarySlot is set to a positive value, then the corresponding slot will be used in
+	first (if empty or compatible with added items)
+	if a_PrioritarySlot is set to -1, regular order apply
 	Returns the total number of items that fit.
 	*/
-	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true);
+	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
 	
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
@@ -160,7 +166,7 @@ public:
 	void RemoveListener(cListener & a_Listener);
 
 	// tolua_begin
-	
+
 protected:
 	int     m_Width;
 	int     m_Height;
@@ -173,6 +179,11 @@ protected:
 	
 	/// Calls all m_Listeners for the specified slot number
 	void TriggerListeners(int a_SlotNum);
+
+	/** Adds up to a_Num items out of a_ItemStack, as many as can fit, in specified slot
+	Returns the number of items that did fit.
+	*/
+	int AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack);
 } ;
 // tolua_end
 

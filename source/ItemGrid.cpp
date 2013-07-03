@@ -240,20 +240,51 @@ int cItemGrid::HowManyCanFit(const cItem & a_ItemStack)
 
 
 
-int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks)
+int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack)
+{
+	int PrevCount = 0;
+	if (m_Slots[a_Slot].IsEmpty())
+	{
+		m_Slots[a_Slot] = a_ItemStack;
+		PrevCount = 0;
+	}
+	else
+	{
+		PrevCount = m_Slots[a_Slot].m_ItemCount;
+	}
+	m_Slots[a_Slot].m_ItemCount = std::min(a_MaxStack, PrevCount + a_Num);
+	int toReturn = m_Slots[a_Slot].m_ItemCount - PrevCount;
+	TriggerListeners(a_Slot);
+	return toReturn;
+}
+
+
+
+
+
+int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritarySlot)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
 	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
-	
+
+	// Try prioritarySlot first:
+	if (
+		(a_PrioritarySlot != -1) &&
+		(
+			m_Slots[a_PrioritarySlot].IsEmpty() ||
+			m_Slots[a_PrioritarySlot].IsStackableWith(a_ItemStack)
+		)
+	)
+	{
+		NumLeft -= AddItemToSlot(a_ItemStack, a_PrioritarySlot, NumLeft, MaxStack);
+	}
+
 	// Scan existing stacks:
 	for (int i = m_NumSlots - 1; i >= 0; i--)
 	{
 		if (m_Slots[i].IsStackableWith(a_ItemStack))
 		{
-			int PrevCount = m_Slots[i].m_ItemCount;
-			m_Slots[i].m_ItemCount = std::min(MaxStack, PrevCount + NumLeft);
-			NumLeft -= m_Slots[i].m_ItemCount - PrevCount;
-			TriggerListeners(i);
+			NumLeft -= AddItemToSlot(a_ItemStack, i, NumLeft, MaxStack);
 		}
 		if (NumLeft <= 0)
 		{
@@ -271,10 +302,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks)
 	{
 		if (m_Slots[i].IsEmpty())
 		{
-			m_Slots[i] = a_ItemStack;
-			m_Slots[i].m_ItemCount = std::min(MaxStack, NumLeft);
-			NumLeft -= m_Slots[i].m_ItemCount;
-			TriggerListeners(i);
+			NumLeft -= AddItemToSlot(a_ItemStack, i, NumLeft, MaxStack);
 		}
 		if (NumLeft <= 0)
 		{
@@ -289,12 +317,12 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks)
 
 
 
-int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
+int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_PrioritarySlot)
 {
 	int TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		int NumAdded = AddItem(*itr, a_AllowNewStacks);
+		int NumAdded = AddItem(*itr, a_AllowNewStacks, a_PrioritarySlot);
 		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);
