@@ -6,7 +6,6 @@ Implements the 1.5.x protocol classes:
 	- cProtocol150
 		- release 1.5 protocol (#60)
 		- release 1.5.2 protocol (#61, no relevant changes found)
-(others may be added later in the future for the 1.5 release series)
 */
 
 #include "Globals.h"

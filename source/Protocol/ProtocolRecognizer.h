@@ -40,6 +40,7 @@ public:
 		PROTO_VERSION_1_4_6 = 51,
 		PROTO_VERSION_1_5_0 = 60,
 		PROTO_VERSION_1_5_2 = 61,
+		PROTO_VERSION_1_6_1 = 73,
 		
 		PROTO_VERSION_NEXT,
 		PROTO_VERSION_LATEST = PROTO_VERSION_NEXT - 1,  ///< Automatically assigned to the last protocol version, this serves as the default for PrimaryServerVersion

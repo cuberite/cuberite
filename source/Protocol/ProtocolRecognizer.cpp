@@ -11,6 +11,7 @@
 #include "Protocol132.h"
 #include "Protocol14x.h"
 #include "Protocol15x.h"
+#include "Protocol16x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../World.h"
@@ -51,6 +52,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_4_6: return "1.4.6";
 		case PROTO_VERSION_1_5_0: return "1.5";
 		case PROTO_VERSION_1_5_2: return "1.5.2";
+		case PROTO_VERSION_1_6_1: return "1.6.1";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -656,6 +658,11 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 			m_Protocol = new cProtocol150(m_Client);
 			return true;
 		}
+		case PROTO_VERSION_1_6_1:
+		{
+			m_Protocol = new cProtocol161(m_Client);
+			return true;
+		}
 	}
 	m_Protocol = new cProtocol125(m_Client);
 	return true;
@@ -689,6 +696,7 @@ void cProtocolRecognizer::HandleServerPing(void)
 		case PROTO_VERSION_1_4_6:
 		case PROTO_VERSION_1_5_0:
 		case PROTO_VERSION_1_5_2:
+		case PROTO_VERSION_1_6_1:
 		{
 			// The server list ping now has 1 more byte of "magic". Mojang just loves to complicate stuff.
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3101#Server_List_Ping_.280xFE.29

@@ -2213,6 +2213,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Protocol\Protocol16x.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\Protocol\Protocol16x.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Protocol\ProtocolRecognizer.cpp"
 					>
 				</File>
