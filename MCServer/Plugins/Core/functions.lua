@@ -1,5 +1,3 @@
 function SetBackCoordinates( Player )
-	X[Player:GetName()] = Player:GetPosX()
-	Y[Player:GetName()] = Player:GetPosY()
-	Z[Player:GetName()] = Player:GetPosZ()
+	BackCoords[Player:GetName()] = Vector3i( Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() )
 end

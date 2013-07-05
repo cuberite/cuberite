@@ -7,9 +7,7 @@ SHOW_PLUGIN_NAMES = true	-- If true, plugin name will be shown before commands
 PLUGIN = {}	-- Reference to own plugin object
 BannedPlayersIni = {}
 WhiteListIni = {}
-X = {}
-Y = {}
-Z = {}
+BackCoords = {}
 LimitWorldsCuboid = {}
 
 
