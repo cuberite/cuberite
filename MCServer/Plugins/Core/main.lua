@@ -8,6 +8,7 @@ PLUGIN = {}	-- Reference to own plugin object
 BannedPlayersIni = {}
 WhiteListIni = {}
 BackCoords = {}
+Messages = {}
 LimitWorldsCuboid = {}
 
 
@@ -122,6 +123,7 @@ function Initialize(Plugin)
 	Plugin:AddWebTab("Permissions",     HandleRequest_Permissions);
 	Plugin:AddWebTab("Manage Plugins",  HandleRequest_ManagePlugins);
 	
+	LoadMotd()
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 	return true
 end
