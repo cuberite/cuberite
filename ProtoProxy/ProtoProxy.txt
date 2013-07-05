@@ -20,7 +20,7 @@ You need to set the server *not* to verify usernames ("online-mode=false" in ser
 
 
 ProtoProxy is not much dependent on the protocol - it will work with unknown packets, it just won't parse them into human-readable format.
-The latest protocol which has been tested is 1.5.2 (#61).
+The latest protocol which has been tested is 1.6.1 (#73).
 
 
 */

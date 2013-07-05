@@ -140,10 +140,11 @@ protected:
 	bool HandleServerEncryptionKeyRequest(void);
 	bool HandleServerEncryptionKeyResponse(void);
 	bool HandleServerEntity(void);
-	bool HandleServerEntityHeadLook(void);
-	bool HandleServerEntityMetadata(void);
 	bool HandleServerEntityEquipment(void);
+	bool HandleServerEntityHeadLook(void);
 	bool HandleServerEntityLook(void);
+	bool HandleServerEntityMetadata(void);
+	bool HandleServerEntityProperties(void);
 	bool HandleServerEntityRelativeMove(void);
 	bool HandleServerEntityRelativeMoveLook(void);
 	bool HandleServerEntityStatus(void);
