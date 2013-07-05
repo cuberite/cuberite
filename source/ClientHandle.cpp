@@ -1200,6 +1200,19 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 
 
 
+void cClientHandle::HandleUnmount(void)
+{
+	if (m_Player == NULL)
+	{
+		return;
+	}
+	m_Player->Detach();
+}
+
+
+
+
+
 void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
 	{

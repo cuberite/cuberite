@@ -37,6 +37,7 @@ enum
 {
 	PACKET_CHAT              = 0x03,
 	PACKET_UPDATE_HEALTH     = 0x08,
+	PACKET_STEER_VEHICLE     = 0x1b,
 	PACKET_ATTACH_ENTITY     = 0x27,
 	PACKET_ENTITY_PROPERTIES = 0x2c,
 	PACKET_WINDOW_OPEN       = 0x64,
@@ -156,6 +157,37 @@ int cProtocol161::ParsePlayerAbilities(void)
 	HANDLE_PACKET_READ(ReadBEFloat, float, WalkingSpeed);
 	// TODO: m_Client->HandlePlayerAbilities(...);
 	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol161::ParseSteerVehicle(void)
+{
+	HANDLE_PACKET_READ(ReadBEFloat, float, Sideways);
+	HANDLE_PACKET_READ(ReadBEFloat, float, Forward);
+	HANDLE_PACKET_READ(ReadBool,    bool,  Jump);
+	HANDLE_PACKET_READ(ReadBool,    bool,  Unmount);
+	// TODO: m_Client->HandleSteerVehicle(...);
+	if (Unmount)
+	{
+		m_Client->HandleUnmount();
+	}
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol161::ParsePacket(unsigned char a_PacketType)
+{
+	switch (a_PacketType)
+	{
+		case PACKET_STEER_VEHICLE: return ParseSteerVehicle();
+		default:                   return super::ParsePacket(a_PacketType);
+	}
 }
 
 

@@ -178,6 +178,7 @@ public:
 	void HandleKeepAlive        (int a_KeepAliveID);
 	bool HandleHandshake        (const AString & a_Username);
 	void HandleEntityAction     (int a_EntityID, char a_ActionID);
+	void HandleUnmount          (void);
 	
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.

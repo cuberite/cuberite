@@ -37,6 +37,12 @@ public:
 	
 	virtual int ParseEntityAction   (void) override;
 	virtual int ParsePlayerAbilities(void) override;
+	
+	// New packets:
+	virtual int ParseSteerVehicle(void);
+
+	// Enable new packets' handling
+	virtual int ParsePacket(unsigned char a_PacketType) override;
 } ;
 
 
