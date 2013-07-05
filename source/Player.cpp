@@ -896,7 +896,7 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
 	if (World == NULL)
 	{
-		LOG("%s: Couldn't find world \"%s\".", a_WorldName);
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
 		return false;
 	}
 	
