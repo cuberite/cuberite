@@ -35,10 +35,12 @@ Implements the 1.6.x protocol classes:
 
 enum
 {
-	PACKET_CHAT          = 0x03,
-	PACKET_UPDATE_HEALTH = 0x08,
-	PACKET_ATTACH_ENTITY = 0x27,
-	PACKET_WINDOW_OPEN   = 0x64,
+	PACKET_CHAT              = 0x03,
+	PACKET_UPDATE_HEALTH     = 0x08,
+	PACKET_ATTACH_ENTITY     = 0x27,
+	PACKET_ENTITY_PROPERTIES = 0x2c,
+	PACKET_WINDOW_OPEN       = 0x64,
+	PACKET_PLAYER_ABILITIES  = 0xca,
 } ;
 
 
@@ -73,6 +75,24 @@ void cProtocol161::SendChat(const AString & a_Message)
 {
 	super::SendChat(Printf("{\"text\":\"%s\"}", a_Message.c_str()));
 }
+
+
+
+
+void cProtocol161::SendGameMode(eGameMode a_GameMode)
+{
+	super::SendGameMode(a_GameMode);
+	
+	// Also send the EntityProperties packet specifying the movementSpeed:
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENTITY_PROPERTIES);
+	WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	WriteInt(1);
+	WriteString("generic.movementSpeed");
+	WriteDouble(0.1);
+	Flush();
+}
+
 
 
 

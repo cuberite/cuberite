@@ -254,6 +254,9 @@ void cClientHandle::Authenticate(void)
 	// Send health
 	m_Player->SendHealth();
 	
+	// Send gamemode (1.6.1 movementSpeed):
+	SendGameMode(m_Player->GetGameMode());
+	
 	m_Player->Initialize(World);
 	StreamChunks();
 	m_State = csDownloadingWorld;
