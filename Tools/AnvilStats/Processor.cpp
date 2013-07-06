@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "Processor.h"
 #include "Callback.h"
-#include "../source/WorldStorage/FastNBT.h"
+#include "../../source/WorldStorage/FastNBT.h"
 #include "zlib.h"
 #include "Utils.h"
 

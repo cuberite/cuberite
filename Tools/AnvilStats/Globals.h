@@ -162,12 +162,12 @@ typedef unsigned short     UInt16;
 
 
 // Common headers (part 1, without macros):
-#include "../source/StringUtils.h"
-#include "../source/OSSupport/CriticalSection.h"
-#include "../source/OSSupport/Semaphore.h"
-#include "../source/OSSupport/Event.h"
-#include "../source/OSSupport/IsThread.h"
-#include "../source/OSSupport/File.h"
+#include "../../source/StringUtils.h"
+#include "../../source/OSSupport/CriticalSection.h"
+#include "../../source/OSSupport/Semaphore.h"
+#include "../../source/OSSupport/Event.h"
+#include "../../source/OSSupport/IsThread.h"
+#include "../../source/OSSupport/File.h"
 
 
 
@@ -220,8 +220,8 @@ public:
 
 
 // Common headers (part 2, with macros):
-#include "../source/ChunkDef.h"
-#include "../source/BlockID.h"
+#include "../../source/ChunkDef.h"
+#include "../../source/BlockID.h"
 
 
 
