@@ -12,31 +12,14 @@ function LoadMotd()
 	else
 		File:close()
 	end
-	local Lines = 0
-	for _ in io.lines'motd.txt' do
-	  Lines = Lines + 1
-	end
 	for line in io.lines("motd.txt") do
-		Split = StringSplit( line, " " )
-		local TempMessage = ""
-		for i=1, #Split do
-			if string.find( Split[i], "@" ) ~= nil then
-				local TempWord = ""
-				for I=1, string.len(Split[i]) do	
-					if string.sub( Split[i], I, I ) == "@" then
-						local Color, Char = ReturnColor( string.sub( Split[i], I + 1, I + 1 ), 0 )
-						TempWord = TempWord .. Color
-						StopNextChar = true
-					else
-						if StopNextChar ~= true then
-							TempWord = TempWord .. string.sub( Split[i], I, I )							
-						end
-						StopNextChar = false
-					end
+		local TempMessage = line
+		for I=1, string.len(TempMessage) do
+			if string.sub(TempMessage, I, I) == "@" then
+				local Color, Char = ReturnColor(TempMessage, I + 1)
+				if (Color ~= "") then
+					TempMessage = string.gsub(TempMessage, "@" .. Char, Color)
 				end
-				TempMessage = TempMessage .. TempWord .. " "
-			else
-				TempMessage = TempMessage .. Split[i] .. " "
 			end
 		end
 		Messages[#Messages + 1] = TempMessage
@@ -50,37 +33,37 @@ function ShowMOTDTo( Player )
 end
 
 function ReturnColor( Split, char )
-	if string.sub( Split, char + 1, char + 1 ) == "0" then
+	if string.sub( Split, char, char ) == "0" then
 		return cChatColor.Black, 0
-	elseif string.sub( Split, char + 1, char + 1 ) == "1" then
+	elseif string.sub( Split, char, char ) == "1" then
 		return cChatColor.Navy, 1
-	elseif string.sub( Split, char + 1, char + 1 ) == "2" then
+	elseif string.sub( Split, char, char ) == "2" then
 		return cChatColor.Green, 2
-	elseif string.sub( Split, char + 1, char + 1 ) == "3" then
+	elseif string.sub( Split, char, char ) == "3" then
 		return cChatColor.Blue, 3
-	elseif string.sub( Split, char + 1, char + 1 ) == "4" then
+	elseif string.sub( Split, char, char ) == "4" then
 		return cChatColor.Red, 4
-	elseif string.sub( Split, char + 1, char + 1 ) == "5" then
+	elseif string.sub( Split, char, char ) == "5" then
 		return cChatColor.Purple, 5
-	elseif string.sub( Split, char + 1, char + 1 ) == "6" then
+	elseif string.sub( Split, char, char ) == "6" then
 		return cChatColor.Gold, 6
-	elseif string.sub( Split, char + 1, char + 1 ) == "7" then
+	elseif string.sub( Split, char, char ) == "7" then
 		return cChatColor.LightGray, 7
-	elseif string.sub( Split, char + 1, char + 1 ) == "8" then
+	elseif string.sub( Split, char, char ) == "8" then
 		return cChatColor.Gray, 8
-	elseif string.sub( Split, char + 1, char + 1 ) == "9" then
+	elseif string.sub( Split, char, char ) == "9" then
 		return cChatColor.DarkPurple, 9
-	elseif string.sub( Split, char + 1, char + 1 ) == "a" then
+	elseif string.sub( Split, char, char ) == "a" then
 		return cChatColor.LightGreen, "a"
-	elseif string.sub( Split, char + 1, char + 1 ) == "b" then
+	elseif string.sub( Split, char, char ) == "b" then
 		return cChatColor.LightBlue, "b"
-	elseif string.sub( Split, char + 1, char + 1 ) == "c" then
+	elseif string.sub( Split, char, char ) == "c" then
 		return cChatColor.Rose, "c"
-	elseif string.sub( Split, char + 1, char + 1 ) == "d" then
+	elseif string.sub( Split, char, char ) == "d" then
 		return cChatColor.LightPurple, "d"
-	elseif string.sub( Split, char + 1, char + 1 ) == "e" then
+	elseif string.sub( Split, char, char ) == "e" then
 		return cChatColor.Yellow, "e"
-	elseif string.sub( Split, char + 1, char + 1 ) == "f" then
+	elseif string.sub( Split, char, char ) == "f" then
 		return cChatColor.White, "f"
 	else
 		return ""
