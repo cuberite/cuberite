@@ -211,67 +211,47 @@
 			Name="expat"
 			>
 			<File
-				RelativePath=".\expat\ascii.h"
+				RelativePath="..\..\expat\ascii.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\asciitab.h"
+				RelativePath="..\..\expat\asciitab.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\expat.h"
+				RelativePath="..\..\expat\expat.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\expat_external.h"
+				RelativePath="..\..\expat\expat_external.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\iasciitab.h"
+				RelativePath="..\..\expat\iasciitab.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\internal.h"
+				RelativePath="..\..\expat\internal.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\latin1tab.h"
+				RelativePath="..\..\expat\latin1tab.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\nametab.h"
+				RelativePath="..\..\expat\nametab.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\utf8tab.h"
+				RelativePath="..\..\expat\utf8tab.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\winconfig.h"
+				RelativePath="..\..\expat\winconfig.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\xmlparse.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\expat\xmlrole.c"
+				RelativePath="..\..\expat\xmlparse.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -291,11 +271,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\expat\xmlrole.h"
-				>
-			</File>
-			<File
-				RelativePath=".\expat\xmltok.c"
+				RelativePath="..\..\expat\xmlrole.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -315,11 +291,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\expat\xmltok.h"
+				RelativePath="..\..\expat\xmlrole.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\xmltok_impl.c"
+				RelativePath="..\..\expat\xmltok.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -339,11 +315,35 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\expat\xmltok_impl.h"
+				RelativePath="..\..\expat\xmltok.h"
 				>
 			</File>
 			<File
-				RelativePath=".\expat\xmltok_ns.c"
+				RelativePath="..\..\expat\xmltok_impl.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\expat\xmltok_impl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\expat\xmltok_ns.c"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -373,62 +373,62 @@
 			Name="shared"
 			>
 			<File
-				RelativePath="..\source\Log.cpp"
+				RelativePath="..\..\source\Log.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\Log.h"
+				RelativePath="..\..\source\Log.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MCLogger.cpp"
+				RelativePath="..\..\source\MCLogger.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\MCLogger.h"
+				RelativePath="..\..\source\MCLogger.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringUtils.cpp"
+				RelativePath="..\..\source\StringUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringUtils.h"
+				RelativePath="..\..\source\StringUtils.h"
 				>
 			</File>
 			<Filter
 				Name="OSSupport"
 				>
 				<File
-					RelativePath="..\source\OSSupport\CriticalSection.cpp"
+					RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\CriticalSection.h"
+					RelativePath="..\..\source\OSSupport\CriticalSection.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\File.cpp"
+					RelativePath="..\..\source\OSSupport\File.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\File.h"
+					RelativePath="..\..\source\OSSupport\File.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\IsThread.cpp"
+					RelativePath="..\..\source\OSSupport\IsThread.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\IsThread.h"
+					RelativePath="..\..\source\OSSupport\IsThread.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\MakeDir.cpp"
+					RelativePath="..\..\source\OSSupport\MakeDir.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\OSSupport\MakeDir.h"
+					RelativePath="..\..\source\OSSupport\MakeDir.h"
 					>
 				</File>
 			</Filter>

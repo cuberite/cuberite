@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../source/Globals.h"
+#include "../../source/Globals.h"
 
 /*
 // System headers:
@@ -28,7 +28,7 @@
 */
 
 // Libraries:
-#include "expat/expat.h"
+#include "../../expat/expat.h"
 
 
 
