@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..;../source"
+				AdditionalIncludeDirectories="../..;../../source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..;../source"
+				AdditionalIncludeDirectories="../..;../../source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -225,35 +225,35 @@
 			Name="shared"
 			>
 			<File
-				RelativePath="..\source\ByteBuffer.cpp"
+				RelativePath="..\..\source\ByteBuffer.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\ByteBuffer.h"
+				RelativePath="..\..\source\ByteBuffer.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\OSSupport\CriticalSection.cpp"
+				RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\OSSupport\CriticalSection.h"
+				RelativePath="..\..\source\OSSupport\CriticalSection.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\OSSupport\IsThread.cpp"
+				RelativePath="..\..\source\OSSupport\IsThread.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\OSSupport\IsThread.h"
+				RelativePath="..\..\source\OSSupport\IsThread.h"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringUtils.cpp"
+				RelativePath="..\..\source\StringUtils.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\source\StringUtils.h"
+				RelativePath="..\..\source\StringUtils.h"
 				>
 			</File>
 		</Filter>
