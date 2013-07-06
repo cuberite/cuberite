@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../source"
+				AdditionalIncludeDirectories="../../source"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -119,7 +119,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../source"
+				AdditionalIncludeDirectories="../../source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -199,7 +199,7 @@
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../source"
+				AdditionalIncludeDirectories="../../source"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -320,19 +320,19 @@
 				Name="Shared"
 				>
 				<File
-					RelativePath="..\source\BlockID.cpp"
+					RelativePath="..\..\source\BlockID.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\BlockID.h"
+					RelativePath="..\..\source\BlockID.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\ChunkDef.h"
+					RelativePath="..\..\source\ChunkDef.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Globals.cpp"
+					RelativePath="..\..\source\Globals.cpp"
 					>
 					<FileConfiguration
 						Name="Debug|Win32"
@@ -360,90 +360,90 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="..\source\Globals.h"
+					RelativePath="..\..\source\Globals.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Log.cpp"
+					RelativePath="..\..\source\Log.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Log.h"
+					RelativePath="..\..\source\Log.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\MCLogger.cpp"
+					RelativePath="..\..\source\MCLogger.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\MCLogger.h"
+					RelativePath="..\..\source\MCLogger.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Noise.cpp"
+					RelativePath="..\..\source\Noise.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Noise.h"
+					RelativePath="..\..\source\Noise.h"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Noise.inc"
+					RelativePath="..\..\source\Noise.inc"
 					>
 				</File>
 				<File
-					RelativePath="..\source\StringUtils.cpp"
+					RelativePath="..\..\source\StringUtils.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\StringUtils.h"
+					RelativePath="..\..\source\StringUtils.h"
 					>
 				</File>
 				<Filter
 					Name="OSSupport"
 					>
 					<File
-						RelativePath="..\source\OSSupport\CriticalSection.cpp"
+						RelativePath="..\..\source\OSSupport\CriticalSection.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\CriticalSection.h"
+						RelativePath="..\..\source\OSSupport\CriticalSection.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\Event.cpp"
+						RelativePath="..\..\source\OSSupport\Event.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\Event.h"
+						RelativePath="..\..\source\OSSupport\Event.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\File.cpp"
+						RelativePath="..\..\source\OSSupport\File.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\File.h"
+						RelativePath="..\..\source\OSSupport\File.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\IsThread.cpp"
+						RelativePath="..\..\source\OSSupport\IsThread.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\IsThread.h"
+						RelativePath="..\..\source\OSSupport\IsThread.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\MakeDir.cpp"
+						RelativePath="..\..\source\OSSupport\MakeDir.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\MakeDir.h"
+						RelativePath="..\..\source\OSSupport\MakeDir.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\OSSupport\Sleep.h"
+						RelativePath="..\..\source\OSSupport\Sleep.h"
 						>
 					</File>
 				</Filter>
@@ -451,15 +451,15 @@
 					Name="Generating"
 					>
 					<File
-						RelativePath="..\source\Generating\BioGen.cpp"
+						RelativePath="..\..\source\Generating\BioGen.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\source\Generating\BioGen.h"
+						RelativePath="..\..\source\Generating\BioGen.h"
 						>
 					</File>
 					<File
-						RelativePath="..\source\Generating\ComposableGenerator.h"
+						RelativePath="..\..\source\Generating\ComposableGenerator.h"
 						>
 					</File>
 				</Filter>
@@ -467,11 +467,11 @@
 					Name="iniFile"
 					>
 					<File
-						RelativePath="..\iniFile\iniFile.cpp"
+						RelativePath="..\..\iniFile\iniFile.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\iniFile\iniFile.h"
+						RelativePath="..\..\iniFile\iniFile.h"
 						>
 					</File>
 				</Filter>
