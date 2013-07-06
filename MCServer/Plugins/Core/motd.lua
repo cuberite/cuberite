@@ -16,7 +16,7 @@ function LoadMotd()
 		local TempMessage = line
 		for I=1, string.len(TempMessage) do
 			if string.sub(TempMessage, I, I) == "@" then
-				local Color, Char = ReturnColor(TempMessage, I + 1)
+				local Color, Char = ReturnColor(TempMessage, string.sub( TempMessage, I + 1, I + 1 ))
 				if (Color ~= "") then
 					TempMessage = string.gsub(TempMessage, "@" .. Char, Color)
 				end
@@ -33,37 +33,37 @@ function ShowMOTDTo( Player )
 end
 
 function ReturnColor( Split, char )
-	if string.sub( Split, char, char ) == "0" then
+	if char == "0" then
 		return cChatColor.Black, 0
-	elseif string.sub( Split, char, char ) == "1" then
+	elseif char == "1" then
 		return cChatColor.Navy, 1
-	elseif string.sub( Split, char, char ) == "2" then
+	elseif char == "2" then
 		return cChatColor.Green, 2
-	elseif string.sub( Split, char, char ) == "3" then
+	elseif char == "3" then
 		return cChatColor.Blue, 3
-	elseif string.sub( Split, char, char ) == "4" then
+	elseif char == "4" then
 		return cChatColor.Red, 4
-	elseif string.sub( Split, char, char ) == "5" then
+	elseif char == "5" then
 		return cChatColor.Purple, 5
-	elseif string.sub( Split, char, char ) == "6" then
+	elseif char == "6" then
 		return cChatColor.Gold, 6
-	elseif string.sub( Split, char, char ) == "7" then
+	elseif char == "7" then
 		return cChatColor.LightGray, 7
-	elseif string.sub( Split, char, char ) == "8" then
+	elseif char == "8" then
 		return cChatColor.Gray, 8
-	elseif string.sub( Split, char, char ) == "9" then
+	elseif char == "9" then
 		return cChatColor.DarkPurple, 9
-	elseif string.sub( Split, char, char ) == "a" then
+	elseif char == "a" then
 		return cChatColor.LightGreen, "a"
-	elseif string.sub( Split, char, char ) == "b" then
+	elseif char == "b" then
 		return cChatColor.LightBlue, "b"
-	elseif string.sub( Split, char, char ) == "c" then
+	elseif char == "c" then
 		return cChatColor.Rose, "c"
-	elseif string.sub( Split, char, char ) == "d" then
+	elseif char == "d" then
 		return cChatColor.LightPurple, "d"
-	elseif string.sub( Split, char, char ) == "e" then
+	elseif char == "e" then
 		return cChatColor.Yellow, "e"
-	elseif string.sub( Split, char, char ) == "f" then
+	elseif char == "f" then
 		return cChatColor.White, "f"
 	else
 		return ""
