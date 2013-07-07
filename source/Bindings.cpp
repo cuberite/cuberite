@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/01/13 20:42:05.
+** Generated automatically by tolua++-1.0.92 on 07/07/13 15:41:32.
 */
 
 #ifndef __cplusplus
@@ -9310,6 +9310,234 @@ static int tolua_AllToLua_cPlayer_LoadPermissionsFromDisk00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetMaxSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetMaxSpeed00
+static int tolua_AllToLua_cPlayer_GetMaxSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxSpeed'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetMaxSpeed();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetMaxSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetNormalMaxSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetNormalMaxSpeed00
+static int tolua_AllToLua_cPlayer_GetNormalMaxSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetNormalMaxSpeed'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetNormalMaxSpeed();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetNormalMaxSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetSprintingMaxSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetSprintingMaxSpeed00
+static int tolua_AllToLua_cPlayer_GetSprintingMaxSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetSprintingMaxSpeed'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetSprintingMaxSpeed();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetSprintingMaxSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetNormalMaxSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetNormalMaxSpeed00
+static int tolua_AllToLua_cPlayer_SetNormalMaxSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  double a_Speed = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetNormalMaxSpeed'", NULL);
+#endif
+  {
+   self->SetNormalMaxSpeed(a_Speed);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetNormalMaxSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSprintingMaxSpeed of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetSprintingMaxSpeed00
+static int tolua_AllToLua_cPlayer_SetSprintingMaxSpeed00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  double a_Speed = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSprintingMaxSpeed'", NULL);
+#endif
+  {
+   self->SetSprintingMaxSpeed(a_Speed);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSprintingMaxSpeed'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetCrouch of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetCrouch00
+static int tolua_AllToLua_cPlayer_SetCrouch00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_IsCrouched = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetCrouch'", NULL);
+#endif
+  {
+   self->SetCrouch(a_IsCrouched);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetCrouch'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetSprint of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetSprint00
+static int tolua_AllToLua_cPlayer_SetSprint00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  bool a_IsSprinting = ((bool)  tolua_toboolean(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetSprint'", NULL);
+#endif
+  {
+   self->SetSprint(a_IsSprinting);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetSprint'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
  class Lua__cPlayer : public cPlayer, public ToluaBase {
 public:
 	 void  Initialize( cWorld* a_World) {
@@ -12929,7 +13157,8 @@ static int tolua_AllToLua_cInventory_AddItem00(lua_State* tolua_S)
      !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
      !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12938,11 +13167,12 @@ static int tolua_AllToLua_cInventory_AddItem00(lua_State* tolua_S)
   cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
   const cItem* a_ItemStack = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
   bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,true));
+  bool a_tryToFillEquippedFirst = ((bool)  tolua_toboolean(tolua_S,4,false));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItem'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddItem(*a_ItemStack,a_AllowNewStacks);
+   int tolua_ret = (int)  self->AddItem(*a_ItemStack,a_AllowNewStacks,a_tryToFillEquippedFirst);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -12965,7 +13195,8 @@ static int tolua_AllToLua_cInventory_AddItems00(lua_State* tolua_S)
      !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
      !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isboolean(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12974,11 +13205,12 @@ static int tolua_AllToLua_cInventory_AddItems00(lua_State* tolua_S)
   cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
   cItems* a_ItemStackList = ((cItems*)  tolua_tousertype(tolua_S,2,0));
   bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,0));
+  bool a_tryToFillEquippedFirst = ((bool)  tolua_toboolean(tolua_S,4,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItems'", NULL);
 #endif
   {
-    int tolua_ret = (int)  self->AddItems(*a_ItemStackList,a_AllowNewStacks,false);
+   int tolua_ret = (int)  self->AddItems(*a_ItemStackList,a_AllowNewStacks,a_tryToFillEquippedFirst);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -15808,7 +16040,8 @@ static int tolua_AllToLua_cItemGrid_AddItem00(lua_State* tolua_S)
      !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
      !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15817,11 +16050,12 @@ static int tolua_AllToLua_cItemGrid_AddItem00(lua_State* tolua_S)
   cItemGrid* self = (cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   cItem* a_ItemStack = ((cItem*)  tolua_tousertype(tolua_S,2,0));
   bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,true));
+  int a_PrioritarySlot = ((int)  tolua_tonumber(tolua_S,4,-1));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItem'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddItem(*a_ItemStack,a_AllowNewStacks, false);
+   int tolua_ret = (int)  self->AddItem(*a_ItemStack,a_AllowNewStacks,a_PrioritarySlot);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -15844,7 +16078,8 @@ static int tolua_AllToLua_cItemGrid_AddItems00(lua_State* tolua_S)
      !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
      (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
      !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15853,11 +16088,12 @@ static int tolua_AllToLua_cItemGrid_AddItems00(lua_State* tolua_S)
   cItemGrid* self = (cItemGrid*)  tolua_tousertype(tolua_S,1,0);
   cItems* a_ItemStackList = ((cItems*)  tolua_tousertype(tolua_S,2,0));
   bool a_AllowNewStacks = ((bool)  tolua_toboolean(tolua_S,3,true));
+  int a_PrioritarySlot = ((int)  tolua_tonumber(tolua_S,4,-1));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddItems'", NULL);
 #endif
   {
-   int tolua_ret = (int)  self->AddItems(*a_ItemStackList,a_AllowNewStacks);
+   int tolua_ret = (int)  self->AddItems(*a_ItemStackList,a_AllowNewStacks,a_PrioritarySlot);
    tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
   }
  }
@@ -28201,6 +28437,13 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);
    tolua_function(tolua_S,"MoveToWorld",tolua_AllToLua_cPlayer_MoveToWorld00);
    tolua_function(tolua_S,"LoadPermissionsFromDisk",tolua_AllToLua_cPlayer_LoadPermissionsFromDisk00);
+   tolua_function(tolua_S,"GetMaxSpeed",tolua_AllToLua_cPlayer_GetMaxSpeed00);
+   tolua_function(tolua_S,"GetNormalMaxSpeed",tolua_AllToLua_cPlayer_GetNormalMaxSpeed00);
+   tolua_function(tolua_S,"GetSprintingMaxSpeed",tolua_AllToLua_cPlayer_GetSprintingMaxSpeed00);
+   tolua_function(tolua_S,"SetNormalMaxSpeed",tolua_AllToLua_cPlayer_SetNormalMaxSpeed00);
+   tolua_function(tolua_S,"SetSprintingMaxSpeed",tolua_AllToLua_cPlayer_SetSprintingMaxSpeed00);
+   tolua_function(tolua_S,"SetCrouch",tolua_AllToLua_cPlayer_SetCrouch00);
+   tolua_function(tolua_S,"SetSprint",tolua_AllToLua_cPlayer_SetSprint00);
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"Lua__cPlayer","Lua__cPlayer","cPlayer",NULL);
   tolua_beginmodule(tolua_S,"Lua__cPlayer");

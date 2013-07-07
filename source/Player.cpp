@@ -50,7 +50,10 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_ClientHandle( a_Client )
 	, m_FoodExhaustionLevel(0.f)
 	, m_FoodTickTimer(0)
+	, m_NormalMaxSpeed(0.1)
+	, m_SprintingMaxSpeed(0.13)
 	, m_IsCrouched(false)
+	, m_IsSprinting(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -356,6 +359,41 @@ const cSlotNums & cPlayer::GetInventoryPaintSlots(void) const
 
 
 
+double cPlayer::GetMaxSpeed(void) const
+{
+	return m_IsSprinting ? m_SprintingMaxSpeed : m_NormalMaxSpeed;
+}
+
+
+
+
+
+void cPlayer::SetNormalMaxSpeed(double a_Speed)
+{
+	m_NormalMaxSpeed = a_Speed;
+	if (!m_IsSprinting)
+	{
+		m_ClientHandle->SendPlayerMaxSpeed();
+	}
+}
+
+
+
+
+
+void cPlayer::SetSprintingMaxSpeed(double a_Speed)
+{
+	m_SprintingMaxSpeed = a_Speed;
+	if (m_IsSprinting)
+	{
+		m_ClientHandle->SendPlayerMaxSpeed();
+	}
+}
+
+
+
+
+
 void cPlayer::SetCrouch(bool a_IsCrouched)
 {
 	// Set the crouch status, broadcast to all visible players
@@ -367,6 +405,22 @@ void cPlayer::SetCrouch(bool a_IsCrouched)
 	}
 	m_IsCrouched = a_IsCrouched;
 	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+void cPlayer::SetSprint(bool a_IsSprinting)
+{
+	if (a_IsSprinting == m_IsSprinting)
+	{
+		// No change
+		return;
+	}
+	
+	m_IsSprinting = a_IsSprinting;
+	m_ClientHandle->SendPlayerMaxSpeed();
 }
 
 

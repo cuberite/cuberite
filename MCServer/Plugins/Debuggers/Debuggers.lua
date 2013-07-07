@@ -27,6 +27,8 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "Sets all your armor to blue wool");
 	PluginManager:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "Opens up a window using plugin API");
 	PluginManager:BindCommand("/gc",      "debuggers", HandleGCCmd,           "Activates the Lua garbage collector");
+	PluginManager:BindCommand("/fast",    "debuggers", HandleFastCmd,         "Switches between fast and normal movement speed");
+	PluginManager:BindCommand("/dash",    "debuggers", HandleDashCmd,         "Switches between fast and normal sprinting speed");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -628,6 +630,40 @@ function HandleGCCmd(a_Split, a_Player)
 	return true;
 end
 
+
+
+
+
+
+function HandleFastCmd(a_Split, a_Player)
+	if (a_Player:GetNormalMaxSpeed() <= 0.11) then
+		-- The player has normal speed, set double speed:
+		a_Player:SetNormalMaxSpeed(0.2);
+		a_Player:SendMessage("You are now fast");
+	else
+		-- The player has fast speed, set normal speed:
+		a_Player:SetNormalMaxSpeed(0.1);
+		a_Player:SendMessage("Back to normal speed");
+	end
+	return true;
+end
+
+
+
+
+
+function HandleDashCmd(a_Split, a_Player)
+	if (a_Player:GetSprintingMaxSpeed() <= 0.14) then
+		-- The player has normal sprinting speed, set double Sprintingspeed:
+		a_Player:SetSprintingMaxSpeed(0.4);
+		a_Player:SendMessage("You can now sprint very fast");
+	else
+		-- The player has fast sprinting speed, set normal sprinting speed:
+		a_Player:SetSprintingMaxSpeed(0.13);
+		a_Player:SendMessage("Back to normal sprinting");
+	end
+	return true;
+end;
 
 
 

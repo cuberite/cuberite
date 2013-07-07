@@ -1193,6 +1193,17 @@ void cClientHandle::HandleEntityAction(int a_EntityID, char a_ActionID)
 			m_Player->GetWorld()->BroadcastPlayerAnimation(*m_Player, 3);
 			break;
 		}
+		case 4:  // Start sprinting
+		{
+			m_Player->SetSprint(true);
+			break;
+		}
+		case 5:  // Stop sprinting
+		{
+			m_Player->SetSprint(false);
+			SendPlayerMaxSpeed();
+			break;
+		}
 	}
 }
 

@@ -171,11 +171,34 @@ public:
 	/// Returns the list of slots currently stored for inventory painting. To be used by cWindow only
 	const cSlotNums & GetInventoryPaintSlots(void) const;
 	
+	// tolua_begin
+	
+	/// Returns the current maximum speed, as reported in the 1.6.1+ protocol (takes current sprinting state into account)
+	double GetMaxSpeed(void) const;
+	
+	/// Gets the normal maximum speed, as reported in the 1.6.1+ protocol, in the protocol units
+	double GetNormalMaxSpeed(void) const { return m_NormalMaxSpeed; }
+	
+	/// Gets the sprinting maximum speed, as reported in the 1.6.1+ protocol, in the protocol units
+	double GetSprintingMaxSpeed(void) const { return m_SprintingMaxSpeed; }
+	
+	/// Sets the normal maximum speed, as reported in the 1.6.1+ protocol. Sends the update to player, if needed.
+	void SetNormalMaxSpeed(double a_Speed);
+	
+	/// Sets the sprinting maximum speed, as reported in the 1.6.1+ protocol. Sends the update to player, if needed.
+	void SetSprintingMaxSpeed(double a_Speed);
+	
 	/// Sets the crouch status, broadcasts to all visible players
 	void SetCrouch(bool a_IsCrouched);
 	
+	/// Starts or stops sprinting, sends the max speed update to the client, if needed
+	void SetSprint(bool a_IsSprinting);
+	
+	// tolua_end
+	
 	// cEntity overrides:
-	virtual bool IsCrouched(void) const { return m_IsCrouched; }
+	virtual bool IsCrouched (void) const { return m_IsCrouched; }
+	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
@@ -226,7 +249,14 @@ protected:
 	
 	cSlotNums m_InventoryPaintSlots;
 	
+	/// Max speed, in ENTITY_PROPERTIES packet's units, when the player is walking. 0.1 by default
+	double m_NormalMaxSpeed;
+	
+	/// Max speed, in ENTITY_PROPERTIES packet's units, when the player is sprinting. 0.13 by default
+	double m_SprintingMaxSpeed;
+	
 	bool m_IsCrouched;
+	bool m_IsSprinting;
 
 
 	virtual void Destroyed(void);

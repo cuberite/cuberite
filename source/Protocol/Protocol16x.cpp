@@ -74,7 +74,7 @@ void cProtocol161::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_
 
 void cProtocol161::SendChat(const AString & a_Message)
 {
-	super::SendChat(Printf("{\"text\":\"%s\"}", a_Message.c_str()));
+	super::SendChat(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
 }
 
 
@@ -83,15 +83,7 @@ void cProtocol161::SendChat(const AString & a_Message)
 void cProtocol161::SendGameMode(eGameMode a_GameMode)
 {
 	super::SendGameMode(a_GameMode);
-	
-	// Also send the EntityProperties packet specifying the movementSpeed:
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENTITY_PROPERTIES);
-	WriteInt(m_Client->GetPlayer()->GetUniqueID());
-	WriteInt(1);
-	WriteString("generic.movementSpeed");
-	WriteDouble(0.1);
-	Flush();
+	SendPlayerMaxSpeed();
 }
 
 
@@ -105,6 +97,21 @@ void cProtocol161::SendHealth(void)
 	WriteFloat((float)m_Client->GetPlayer()->GetHealth());
 	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
 	WriteFloat(m_Client->GetPlayer()->GetFoodSaturationLevel());
+	Flush();
+}
+
+
+
+
+
+void cProtocol161::SendPlayerMaxSpeed(void)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENTITY_PROPERTIES);
+	WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	WriteInt(1);
+	WriteString("generic.movementSpeed");
+	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
 	Flush();
 }
 

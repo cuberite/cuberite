@@ -569,3 +569,40 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_
 
 
 
+
+AString EscapeString(const AString & a_Message)
+{
+	AString EscapedMsg;
+	size_t len = a_Message.size();
+	size_t last = 0;
+	EscapedMsg.reserve(len);
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = a_Message[i];
+		switch (ch)
+		{
+			case '\'':
+			case '\"':
+			case '\\':
+			{
+				if (i > last)
+				{
+					EscapedMsg.append(a_Message, last, i - last);
+				}
+				EscapedMsg.push_back('\\');
+				EscapedMsg.push_back(ch);
+				last = i + 1;
+				break;
+			}
+		}
+	}
+	if (len > last)
+	{
+		EscapedMsg.append(a_Message, last, len - last);
+	}
+	return EscapedMsg;
+}
+
+
+
+
