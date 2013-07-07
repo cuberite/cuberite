@@ -30,18 +30,21 @@ void cSquid::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	// We must first process current location, and only then tick, otherwise we risk processing a location in a chunk
+	// that is not where the entity currently resides (FS #411)
 	
 	Vector3d Pos = GetPosition();
 
 	// TODO: Not a real behavior, but cool :D
-	int RelX = (int)floor(Pos.x + 0.5) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelZ = (int)floor(Pos.z + 0.5) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	if (!IsBlockWater(a_Chunk.GetBlock(RelX, (int)Pos.y, RelZ)) && !IsOnFire())
+	int RelX = (int)floor(Pos.x) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = (int)floor(Pos.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	if (!IsBlockWater(a_Chunk.GetBlock(RelX, (int)floor(Pos.y), RelZ)) && !IsOnFire())
 	{
 		// Burn for 10 ticks, then decide again
 		StartBurning(10);
 	}
+
+	super::Tick(a_Dt, a_Chunk);
 }
 
 
