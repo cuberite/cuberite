@@ -43,8 +43,6 @@ public:
 	short GetAge(void) const { return (short)(m_Timer / 50); }
 	
 private:
-	short m_Health;
-
 	Vector3d   m_ResultingSpeed;	 //Can be used to modify the resulting speed for the current tick ;)
 
 	Vector3d   m_WaterSpeed;

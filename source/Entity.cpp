@@ -431,6 +431,15 @@ void cEntity::Heal(int a_HitPoints)
 
 
 
+void cEntity::SetHealth(int a_Health)
+{
+	m_Health = std::max(0, std::min(m_MaxHealth, a_Health));
+}
+
+
+
+
+
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	if (m_AttachedTo != NULL)

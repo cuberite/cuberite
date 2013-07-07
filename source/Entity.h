@@ -236,8 +236,11 @@ public:
 	/// Heals the specified amount of HPs
 	void Heal(int a_HitPoints);
 	
-	/// Returns the health of this pawn
+	/// Returns the health of this entity
 	int GetHealth(void) const { return m_Health; }
+	
+	/// Sets the health of this entity; doesn't broadcast any hurt animation
+	void SetHealth(int a_Health);
 	
 	// tolua_end
 

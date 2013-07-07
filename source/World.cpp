@@ -2354,6 +2354,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 		}
 	}
 	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
+	Monster->SetHealth(Monster->GetMaxHealth());
 	Monster->Initialize(this);
 	BroadcastSpawnEntity(*Monster);
 	return Monster->GetUniqueID();

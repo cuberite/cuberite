@@ -12,11 +12,11 @@
 
 struct cMonsterConfig::sAttributesStruct
 {
-	AString m_name;
-	float   m_SightDistance;
-	float   m_AttackDamage;
-	float   m_AttackRange;
-	float   m_AttackRate;
+	AString m_Name;
+	double  m_SightDistance;
+	double  m_AttackDamage;
+	double  m_AttackRange;
+	double  m_AttackRate;
 	int     m_MaxHealth;
 };
 
@@ -55,37 +55,25 @@ cMonsterConfig::~cMonsterConfig()
 
 void cMonsterConfig::Initialize()
 {
-	sAttributesStruct Attributes;
-	cIniFile SettingsIniFile("settings.ini");
 	cIniFile MonstersIniFile("monsters.ini");
 	
-	if (!SettingsIniFile.ReadFile() || !MonstersIniFile.ReadFile())
+	if (!MonstersIniFile.ReadFile())
 	{
-		LOGWARNING("cMonsterConfig: Must have both settings.ini and monsters.ini to configure attributes\n\tusing default attributes \n");
+		LOGWARNING("%s: Cannot read monsters.ini file, monster attributes not available", __FUNCTION__);
 		return;
 	}
 	
-	m_pState->MonsterTypes = SettingsIniFile.GetValue("Monsters", "Types", "");
-	
-	if ( m_pState->MonsterTypes.empty() )
+	for (int i = (int)MonstersIniFile.NumKeys(); i >= 0; i--)
 	{
-		LOGWARNING("cMonsterConfig: No Monster types listed in config file, using default attributes \n");
-		return;
-	}
-	
-	AStringVector SplitList = StringSplit(m_pState->MonsterTypes, ",");
-	for (unsigned int i = 0; i < SplitList.size(); ++i)
-	{
-		if (!SplitList[i].empty())
-		{
-			Attributes.m_name = SplitList[i];
-			Attributes.m_AttackDamage  = (float)MonstersIniFile.GetValueF(SplitList[i], "AttackDamage",  0);
-			Attributes.m_AttackRange   = (float)MonstersIniFile.GetValueF(SplitList[i], "AttackRange",   0);
-			Attributes.m_SightDistance = (float)MonstersIniFile.GetValueF(SplitList[i], "SightDistance", 0);
-			Attributes.m_AttackRate    = (float)MonstersIniFile.GetValueF(SplitList[i], "AttackRate",    0);
-			Attributes.m_MaxHealth     =        MonstersIniFile.GetValueI(SplitList[i], "MaxHealth",     0);
-			m_pState->AttributesList.push_front(Attributes);
-		}
+		sAttributesStruct Attributes;
+		AString Name = MonstersIniFile.KeyName(i);
+		Attributes.m_Name = Name;
+		Attributes.m_AttackDamage  = MonstersIniFile.GetValueF(Name, "AttackDamage",  0);
+		Attributes.m_AttackRange   = MonstersIniFile.GetValueF(Name, "AttackRange",   0);
+		Attributes.m_SightDistance = MonstersIniFile.GetValueF(Name, "SightDistance", 0);
+		Attributes.m_AttackRate    = MonstersIniFile.GetValueF(Name, "AttackRate",    0);
+		Attributes.m_MaxHealth     = MonstersIniFile.GetValueI(Name, "MaxHealth",     1);
+		m_pState->AttributesList.push_front(Attributes);
 	}  // for i - SplitList[]
 }
 
@@ -98,13 +86,13 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	std::list<sAttributesStruct>::const_iterator itr;
 	for (itr = m_pState->AttributesList.begin(); itr != m_pState->AttributesList.end(); ++itr)
 	{
-		if (itr->m_name.compare(a_Name) == 0)
+		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			a_Monster->SetAttackDamage (itr->m_AttackDamage);
-			a_Monster->SetAttackRange  (itr->m_AttackRange);
-			a_Monster->SetSightDistance(itr->m_SightDistance);
+			a_Monster->SetAttackDamage ((float)itr->m_AttackDamage);
+			a_Monster->SetAttackRange  ((float)itr->m_AttackRange);
+			a_Monster->SetSightDistance((float)itr->m_SightDistance);
 			a_Monster->SetAttackRate   ((int)itr->m_AttackRate);
-			a_Monster->SetMaxHealth    ((short)itr->m_MaxHealth);
+			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
 			return;
 		}
 	}  // for itr - m_pState->AttributesList[]
