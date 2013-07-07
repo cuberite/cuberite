@@ -715,7 +715,6 @@ public:
 		g_BlockIsSolid[E_BLOCK_FENCE]                 = false;
 		g_BlockIsSolid[E_BLOCK_FIRE]                  = false;
 		g_BlockIsSolid[E_BLOCK_GLASS]                 = false;
-		g_BlockIsSolid[E_BLOCK_ICE]                   = false;
 		g_BlockIsSolid[E_BLOCK_IRON_DOOR]             = false;
 		g_BlockIsSolid[E_BLOCK_JUNGLE_WOOD_STAIRS]    = false;
 		g_BlockIsSolid[E_BLOCK_LADDER]                = false;
