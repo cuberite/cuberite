@@ -549,7 +549,6 @@ private:
 	cFireSimulator *     m_FireSimulator;
 	cRedstoneSimulator * m_RedstoneSimulator;
 	
-	cCriticalSection m_CSClients;
 	cCriticalSection m_CSPlayers;
 
 	cWorldStorage     m_Storage;
