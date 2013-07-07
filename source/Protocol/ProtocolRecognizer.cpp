@@ -200,55 +200,6 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 
 
 
-void cProtocolRecognizer::SendEntVelocity(const cEntity & a_Entity)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntVelocity(a_Entity);
-}
-
-
-
-
-void cProtocolRecognizer::SendEntHeadLook(const cEntity & a_Entity)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntHeadLook(a_Entity);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntLook(const cEntity & a_Entity)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntLook(a_Entity);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cProtocolRecognizer::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
 void cProtocolRecognizer::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_Protocol != NULL);
@@ -259,10 +210,80 @@ void cProtocolRecognizer::SendEntityEquipment(const cEntity & a_Entity, short a_
 
 
 
+void cProtocolRecognizer::SendEntityHeadLook(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityHeadLook(a_Entity);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityLook(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityLook(a_Entity);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityMetadata(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityMetadata(a_Entity);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityProperties(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityProperties(a_Entity);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendEntityStatus(a_Entity, a_Status);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendEntityVelocity(const cEntity & a_Entity)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEntityVelocity(a_Entity);
 }
 
 
@@ -339,16 +360,6 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 
 
-void cProtocolRecognizer::SendMetadata(const cEntity & a_Entity)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendMetadata(a_Entity);
-}
-
-
-
-
-
 void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	ASSERT(m_Protocol != NULL);
@@ -373,6 +384,16 @@ void cProtocolRecognizer::SendPlayerListItem(const cPlayer & a_Player, bool a_Is
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerMaxSpeed(void)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerMaxSpeed();
 }
 
 

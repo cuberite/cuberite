@@ -262,7 +262,7 @@ void cClientHandle::Authenticate(void)
 	m_State = csDownloadingWorld;
 	
 	// Broadcast this player's spawning to all other players in the same chunk
-	m_Player->GetWorld()->BroadcastSpawn(*m_Player, this);
+	m_Player->GetWorld()->BroadcastSpawnEntity(*m_Player, this);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -1347,174 +1347,6 @@ void cClientHandle::Tick(float a_Dt)
 
 
 
-void cClientHandle::SendDisconnect(const AString & a_Reason)
-{
-	if (!m_HasSentDC)
-	{
-		LOGD("Sending a DC: \"%s\"", a_Reason.c_str());
-		m_Protocol->SendDisconnect(a_Reason);
-		m_HasSentDC = true;
-	}
-}
-
-
-
-
-
-void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
-{
-	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
-}
-
-
-
-
-
-void cClientHandle::SendChat(const AString & a_Message)
-{
-	m_Protocol->SendChat(a_Message);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
-{
-	m_Protocol->SendPlayerAnimation(a_Player, a_Animation);
-}
-
-
-
-
-
-void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
-{
-	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
-}
-
-
-
-
-
-void cClientHandle::SendWindowClose(const cWindow & a_Window)
-{
-	m_Protocol->SendWindowClose(a_Window);
-}
-
-
-
-
-
-void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
-{
-	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
-}
-
-
-
-
-
-void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
-{
-	m_Protocol->SendWholeInventory(a_Inventory);
-}
-
-
-
-
-
-void cClientHandle::SendWholeInventory(const cWindow & a_Window)
-{
-	m_Protocol->SendWholeInventory(a_Window);
-}
-
-
-
-
-
-void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
-{
-	m_Protocol->SendTeleportEntity(a_Entity);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
-{
-	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerPosition(void)
-{
-	m_Protocol->SendPlayerPosition();
-}
-
-
-
-
-
-void cClientHandle::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
-	m_Protocol->SendEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cClientHandle::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
-	m_Protocol->SendEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
-}
-
-
-
-
-
-void cClientHandle::SendEntLook(const cEntity & a_Entity)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
-	m_Protocol->SendEntLook(a_Entity);
-}
-
-
-
-
-
-void cClientHandle::SendEntVelocity(const cEntity & a_Entity)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
-	m_Protocol->SendEntVelocity(a_Entity);
-}
-
-
-
-
-
-void cClientHandle::SendEntHeadLook(const cEntity & a_Entity)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
-	
-	m_Protocol->SendEntHeadLook(a_Entity);
-}
-
-
-
-
-
 void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
@@ -1533,169 +1365,9 @@ void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 
 
 
-void cClientHandle::SendHealth(void)
+void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
-	m_Protocol->SendHealth();
-}
-
-
-
-
-
-void cClientHandle::SendRespawn(void)
-{
-	m_Protocol->SendRespawn();
-}
-
-
-
-
-
-void cClientHandle::SendGameMode(eGameMode a_GameMode)
-{
-	m_Protocol->SendGameMode(a_GameMode);
-}
-
-
-
-
-
-void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
-{
-	m_Protocol->SendDestroyEntity(a_Entity);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerMoveLook(void)
-{
-	/*
-	LOGD("Sending PlayerMoveLook: {%0.2f, %0.2f, %0.2f}, stance %0.2f, OnGround: %d",
-		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
-	);
-	*/
-	m_Protocol->SendPlayerMoveLook();
-}
-
-
-
-
-
-void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
-{
-	m_Protocol->SendEntityStatus(a_Entity, a_Status);
-}
-
-
-
-
-
-void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
-{
-	if (
-		(m_NumExplosionsPerTick[m_CurrentExplosionTick] > MAX_EXPLOSIONS_PER_TICK) ||  // Too many explosions in this tick
-		(m_RunningSumExplosions > MAX_RUNNING_SUM_EXPLOSIONS)  // Too many explosions in the recent history
-	)
-	{
-		LOGD("Dropped %u explosions", a_BlocksAffected.size());
-		return;
-	}
-	
-	// Update the statistics:
-	m_NumExplosionsPerTick[m_CurrentExplosionTick] += a_BlocksAffected.size();
-	m_RunningSumExplosions += a_BlocksAffected.size();
-	
-	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
-}
-
-
-
-
-
-void cClientHandle::SendMetadata(const cEntity & a_Entity)
-{
-	m_Protocol->SendMetadata(a_Entity);
-}
-
-
-
-
-
-void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
-{
-	m_Protocol->SendInventoryProgress(a_WindowID, a_ProgressBar, a_Value);
-}
-
-
-
-
-
-void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
-{
-	if (a_Player.GetUniqueID() == m_Player->GetUniqueID())
-	{
-		// Do NOT send this packet to myself
-		return;
-	}
-	
-	LOGD("Spawning player \"%s\" on client \"%s\" @ %s", 
-		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
-	);
-	
-	m_Protocol->SendPlayerSpawn(a_Player);
-}
-
-
-
-
-
-void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
-{
-	m_Protocol->SendPickupSpawn(a_Pickup);
-}
-
-
-
-
-
-void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
-{
-	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
-}
-
-
-
-
-
-void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
-{
-	m_Protocol->SendSpawnMob(a_Mob);
-}
-
-
-
-
-
-void cClientHandle::SendUpdateSign(
-	int a_BlockX, int a_BlockY, int a_BlockZ,
-	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
-)
-{
-	m_Protocol->SendUpdateSign(
-		a_BlockX, a_BlockY, a_BlockZ,
-		a_Line1, a_Line2, a_Line3, a_Line4
-	);
-}
-
-
-
-
-
-void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
-{
-	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+	m_Protocol->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
 }
 
 
@@ -1720,89 +1392,9 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 
 
-void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
+void cClientHandle::SendChat(const AString & a_Message)
 {
-	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
-void cClientHandle::SendWeather(eWeather a_Weather)
-{
-	m_Protocol->SendWeather(a_Weather);
-}
-
-
-
-
-
-void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
-{
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
-}
-
-
-
-
-
-void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-
-void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
-{
-	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
-}
-
-
-
-
-
-void cClientHandle::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
-{
-	m_Protocol->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
-}
-
-
-
-
-
-void cClientHandle::SendBlockBreakAnim(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage)
-{
-	m_Protocol->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);
-}
-
-
-
-
-
-void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
-{
-	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
-}
-
-
-
-
-void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
-{
-	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
-}
-
-
-
-
-
-void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
-{
-	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType);
+	m_Protocol->SendChat(a_Message);
 }
 
 
@@ -1839,6 +1431,423 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	}
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+}
+
+
+
+
+
+void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+{
+	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendDestroyEntity(const cEntity & a_Entity)
+{
+	m_Protocol->SendDestroyEntity(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendDisconnect(const AString & a_Reason)
+{
+	if (!m_HasSentDC)
+	{
+		LOGD("Sending a DC: \"%s\"", a_Reason.c_str());
+		m_Protocol->SendDisconnect(a_Reason);
+		m_HasSentDC = true;
+	}
+}
+
+
+
+
+
+void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
+{
+	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cClientHandle::SendEntityHeadLook(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	m_Protocol->SendEntityHeadLook(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendEntityLook(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	m_Protocol->SendEntityLook(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendEntityMetadata(const cEntity & a_Entity)
+{
+	m_Protocol->SendEntityMetadata(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	m_Protocol->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
+}
+
+
+
+
+
+void cClientHandle::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	m_Protocol->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
+}
+
+
+
+
+
+void cClientHandle::SendEntityStatus(const cEntity & a_Entity, char a_Status)
+{
+	m_Protocol->SendEntityStatus(a_Entity, a_Status);
+}
+
+
+
+
+
+void cClientHandle::SendEntityVelocity(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Player->GetUniqueID());  // Must not send for self
+	
+	m_Protocol->SendEntityVelocity(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
+{
+	if (
+		(m_NumExplosionsPerTick[m_CurrentExplosionTick] > MAX_EXPLOSIONS_PER_TICK) ||  // Too many explosions in this tick
+		(m_RunningSumExplosions > MAX_RUNNING_SUM_EXPLOSIONS)  // Too many explosions in the recent history
+	)
+	{
+		LOGD("Dropped %u explosions", a_BlocksAffected.size());
+		return;
+	}
+	
+	// Update the statistics:
+	m_NumExplosionsPerTick[m_CurrentExplosionTick] += a_BlocksAffected.size();
+	m_RunningSumExplosions += a_BlocksAffected.size();
+	
+	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
+}
+
+
+
+
+
+void cClientHandle::SendGameMode(eGameMode a_GameMode)
+{
+	m_Protocol->SendGameMode(a_GameMode);
+}
+
+
+
+
+
+void cClientHandle::SendHealth(void)
+{
+	m_Protocol->SendHealth();
+}
+
+
+
+
+
+void cClientHandle::SendInventoryProgress(char a_WindowID, short a_ProgressBar, short a_Value)
+{
+	m_Protocol->SendInventoryProgress(a_WindowID, a_ProgressBar, a_Value);
+}
+
+
+
+
+
+void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
+{
+	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
+{
+	m_Protocol->SendPickupSpawn(a_Pickup);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerAnimation(const cPlayer & a_Player, char a_Animation)
+{
+	m_Protocol->SendPlayerAnimation(a_Player, a_Animation);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+{
+	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerMaxSpeed(void)
+{
+	m_Protocol->SendPlayerMaxSpeed();
+}
+
+
+
+
+
+void cClientHandle::SendPlayerMoveLook(void)
+{
+	/*
+	LOGD("Sending PlayerMoveLook: {%0.2f, %0.2f, %0.2f}, stance %0.2f, OnGround: %d",
+		m_Player->GetPosX(), m_Player->GetPosY(), m_Player->GetPosZ(), m_Player->GetStance(), m_Player->IsOnGround() ? 1 : 0
+	);
+	*/
+	m_Protocol->SendPlayerMoveLook();
+}
+
+
+
+
+
+void cClientHandle::SendPlayerPosition(void)
+{
+	m_Protocol->SendPlayerPosition();
+}
+
+
+
+
+
+void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	if (a_Player.GetUniqueID() == m_Player->GetUniqueID())
+	{
+		// Do NOT send this packet to myself
+		return;
+	}
+	
+	LOGD("Spawning player \"%s\" on client \"%s\" @ %s", 
+		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
+	);
+	
+	m_Protocol->SendPlayerSpawn(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendRespawn(void)
+{
+	m_Protocol->SendRespawn();
+}
+
+
+
+
+
+void cClientHandle::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+{
+	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+}
+
+
+
+
+
+void cClientHandle::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+{
+	m_Protocol->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
+}
+
+
+
+
+
+void cClientHandle::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
+{
+	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
+}
+
+
+
+
+
+void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
+{
+	m_Protocol->SendSpawnMob(a_Mob);
+}
+
+
+
+
+
+void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+{
+	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
+}
+
+
+
+
+
+void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
+{
+	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType);
+}
+
+
+
+
+
+void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
+{
+	m_Protocol->SendTeleportEntity(a_Entity);
+}
+
+
+
+
+
+void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+{
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
+}
+
+
+
+
+
+void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
+{
+	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cClientHandle::SendUpdateSign(
+	int a_BlockX, int a_BlockY, int a_BlockZ,
+	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4
+)
+{
+	m_Protocol->SendUpdateSign(
+		a_BlockX, a_BlockY, a_BlockZ,
+		a_Line1, a_Line2, a_Line3, a_Line4
+	);
+}
+
+
+
+
+
+void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+{
+	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+void cClientHandle::SendWeather(eWeather a_Weather)
+{
+	m_Protocol->SendWeather(a_Weather);
+}
+
+
+
+
+
+void cClientHandle::SendWindowClose(const cWindow & a_Window)
+{
+	m_Protocol->SendWindowClose(a_Window);
+}
+
+
+
+
+
+void cClientHandle::SendWindowOpen(char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots)
+{
+	m_Protocol->SendWindowOpen(a_WindowID, a_WindowType, a_WindowTitle, a_NumSlots);
+}
+
+
+
+
+
+void cClientHandle::SendWholeInventory(const cInventory & a_Inventory)
+{
+	m_Protocol->SendWholeInventory(a_Inventory);
+}
+
+
+
+
+
+void cClientHandle::SendWholeInventory(const cWindow & a_Window)
+{
+	m_Protocol->SendWholeInventory(a_Window);
 }
 
 

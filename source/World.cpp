@@ -1398,6 +1398,33 @@ void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_V
 
 
 
+void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
@@ -1416,125 +1443,9 @@ void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Ex
 
 
 
-void cWorld::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastPlayerAnimation(a_Player, a_Animation, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityEquipment(a_Entity, a_SlotNum, a_Item, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntVelocity(a_Entity, a_Exclude);
-}
-
-
-
-
-void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendTeleportEntity(a_Entity);
-	}
-}
-
-
-
-
-
-void cWorld::BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntRelMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntLook(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntHeadLook(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastEntityStatus(a_Entity, a_Status, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastMetadata(a_Entity, a_Exclude);
-}
-
-
-
-
-
-void cWorld::BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastSpawn(a_Entity, a_Exclude);
+	m_ChunkMap->BroadcastChunkData(a_ChunkX, a_ChunkZ, a_Serializer, a_Exclude);
 }
 
 
@@ -1550,54 +1461,89 @@ void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_
 
 
 
-void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
+void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendWeather(a_Weather);
-	}
+	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
 }
 
 
 
 
 
-void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+	m_ChunkMap->BroadcastEntityEquipment(a_Entity, a_SlotNum, a_Item, a_Exclude);
 }
 
 
 
 
 
-void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay);
-	}
+	m_ChunkMap->BroadcastEntityHeadLook(a_Entity, a_Exclude);
 }
 
 
 
 
 
-void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastChunkData(a_ChunkX, a_ChunkZ, a_Serializer, a_Exclude);
+	m_ChunkMap->BroadcastEntityLook(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityMetadata(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityStatus(a_Entity, a_Status, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastEntityVelocity(a_Entity, a_Exclude);
+}
+
+
+
+
+void cWorld::BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastPlayerAnimation(a_Player, a_Animation, a_Exclude);
 }
 
 
@@ -1640,9 +1586,54 @@ void cWorld::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY
 
 
 
-void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
+	m_ChunkMap->BroadcastSpawnEntity(a_Entity, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendTeleportEntity(a_Entity);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastThunderbolt(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+}
+
+
+
+
+
+void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay);
+	}
 }
 
 
@@ -1658,9 +1649,18 @@ void cWorld::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_Block
 
 
 
-void cWorld::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
+void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_Exclude);
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendWeather(a_Weather);
+	}
 }
 
 
@@ -2355,7 +2355,7 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 	}
 	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	Monster->Initialize(this);
-	BroadcastSpawn(*Monster);
+	BroadcastSpawnEntity(*Monster);
 	return Monster->GetUniqueID();
 }
 

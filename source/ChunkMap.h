@@ -49,56 +49,29 @@ public:
 	cChunkMap(cWorld* a_World );
 	~cChunkMap();
 
+	// Broadcast respective packets to all clients of the chunk where the event is taking place
+	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle);
-	
-	/// Broadcasts an a_Player's animation to all clients in the chunk where a_Player is
-	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts an entity equipment change to all clients in the chunk where a_Entity is
-	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts a EntVelocity packet to all clients in the chunk where a_Entity is. Velocity is measured in blocks/second
-	void BroadcastEntVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-
-	/// Broadcasts a RelEntMoveLook packet to all clients in the chunk where a_Entity is
-	void BroadcastEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts a RelEntMove packet to all clients in the chunk where a_Entity is
-	void BroadcastEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts a EntLook packet to all clients in the chunk where a_Entity is
-	void BroadcastEntLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts a EntHeadLook packet to all clients in the chunk where a_Entity is
-	void BroadcastEntHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	
-	/// Broadcasts a BlockAction packet to all clients who are in the specified chunk
 	void BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastSpawn(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	
-	void BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // a_Src coords are Block * 8
-	
-	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
-
 	void BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude = NULL);
-
-	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
-
-	void BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
-
-	/// Broadcasts the block entity, if it is at the coords specified, to all clients except a_Exclude
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
+	void BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerAnimation(const cPlayer & a_Player, char a_Animation, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // a_Src coords are Block * 8
+	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
+	void BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
 	
 	/// Sends the block entity, if it is at the coords specified, to a_Client
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);

@@ -148,7 +148,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	if (m_bVisible && (m_ClientHandle != (&a_Client)))
 	{
 		a_Client.SendPlayerSpawn(*this);
-		a_Client.SendEntHeadLook(*this);
+		a_Client.SendEntityHeadLook(*this);
 		a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
 		a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
 		a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
@@ -366,7 +366,7 @@ void cPlayer::SetCrouch(bool a_IsCrouched)
 		return;
 	}
 	m_IsCrouched = a_IsCrouched;
-	m_World->BroadcastMetadata(*this);
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -622,7 +622,7 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (a_bVisible && !m_bVisible) // Make visible
 	{
 		m_bVisible = true;
-		m_World->BroadcastSpawn(*this);
+		m_World->BroadcastSpawnEntity(*this);
 	}
 	if (!a_bVisible && m_bVisible)
 	{

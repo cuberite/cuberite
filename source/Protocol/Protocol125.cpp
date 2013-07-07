@@ -277,53 +277,6 @@ void cProtocol125::SendDisconnect(const AString & a_Reason)
 
 
 
-void cProtocol125::SendEntVelocity(const cEntity & a_Entity)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENTITY_VELOCITY);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteShort((short) (a_Entity.GetSpeedX() * 400)); //400 = 8000 / 20 
-	WriteShort((short) (a_Entity.GetSpeedY() * 400));
-	WriteShort((short) (a_Entity.GetSpeedZ() * 400));
-	Flush();
-}
-
-
-
-
-void cProtocol125::SendEntHeadLook(const cEntity & a_Entity)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENT_HEAD_LOOK);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte((char)((a_Entity.GetHeadYaw() / 360.f) * 256));
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendEntLook(const cEntity & a_Entity)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENT_LOOK);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
-	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
-	Flush();
-}
-
-
-
-
-
 void cProtocol125::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	cCSLock Lock(m_CSPacket);
@@ -339,12 +292,119 @@ void cProtocol125::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 
 
 
+void cProtocol125::SendEntityHeadLook(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENT_HEAD_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte((char)((a_Entity.GetHeadYaw() / 360.f) * 256));
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendEntityLook(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENT_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendEntityMetadata(const cEntity & a_Entity)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_METADATA);
+	WriteInt (a_Entity.GetUniqueID());
+	AString MetaData = GetEntityMetaData(a_Entity);
+	SendData(MetaData.data(), MetaData.size());
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendEntityProperties(const cEntity & a_Entity)
+{
+	// Not supported in this protocol version
+}
+
+
+
+
+
+void cProtocol125::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENT_REL_MOVE);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_RelX);
+	WriteByte(a_RelY);
+	WriteByte(a_RelZ);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENT_REL_MOVE_LOOK);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteByte(a_RelX);
+	WriteByte(a_RelY);
+	WriteByte(a_RelZ);
+	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
+	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
+	Flush();
+}
+
+
+
+
+
 void cProtocol125::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENT_STATUS);
 	WriteInt (a_Entity.GetUniqueID());
 	WriteByte(a_Status);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendEntityVelocity(const cEntity & a_Entity)
+{
+	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENTITY_VELOCITY);
+	WriteInt (a_Entity.GetUniqueID());
+	WriteShort((short) (a_Entity.GetSpeedX() * 400)); //400 = 8000 / 20 
+	WriteShort((short) (a_Entity.GetSpeedY() * 400));
+	WriteShort((short) (a_Entity.GetSpeedZ() * 400));
 	Flush();
 }
 
@@ -370,42 +430,6 @@ void cProtocol125::SendExplosion(double a_BlockX, double a_BlockY, double a_Bloc
 	WriteFloat  ((float)a_PlayerMotion.x);
 	WriteFloat  ((float)a_PlayerMotion.y);
 	WriteFloat  ((float)a_PlayerMotion.z);
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendEntRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENT_REL_MOVE);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_RelX);
-	WriteByte(a_RelY);
-	WriteByte(a_RelZ);
-	Flush();
-}
-
-
-
-
-
-void cProtocol125::SendEntRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
-{
-	ASSERT(a_Entity.GetUniqueID() != m_Client->GetPlayer()->GetUniqueID());  // Must not send for self
-	
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_ENT_REL_MOVE_LOOK);
-	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(a_RelX);
-	WriteByte(a_RelY);
-	WriteByte(a_RelZ);
-	WriteByte((char)((a_Entity.GetRotation() / 360.f) * 256));
-	WriteByte((char)((a_Entity.GetPitch()    / 360.f) * 256));
 	Flush();
 }
 
@@ -513,20 +537,6 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
-void cProtocol125::SendMetadata(const cEntity & a_Entity)
-{
-	cCSLock Lock(m_CSPacket);
-	WriteByte(PACKET_METADATA);
-	WriteInt (a_Entity.GetUniqueID());
-	AString MetaData = GetEntityMetaData(a_Entity);
-	SendData(MetaData.data(), MetaData.size());
-	Flush();
-}
-
-
-
-
-
 void cProtocol125::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	cCSLock Lock(m_CSPacket);
@@ -575,6 +585,15 @@ void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 	WriteBool  (a_IsOnline);
 	WriteShort (a_Player.GetClientHandle()->GetPing());
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerMaxSpeed(void)
+{
+	// Not supported by this protocol version
 }
 
 

@@ -25,7 +25,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 void cMinecart::Initialize(cWorld * a_World)
 {
 	super::Initialize(a_World);
-	a_World->BroadcastSpawn(*this);
+	a_World->BroadcastSpawnEntity(*this);
 }
 
 

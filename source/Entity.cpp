@@ -755,7 +755,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 void cEntity::OnStartedBurning(void)
 {
 	// Broadcast the change:
-	m_World->BroadcastMetadata(*this);
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -766,7 +766,7 @@ void cEntity::OnStartedBurning(void)
 void cEntity::OnFinishedBurning(void)
 {
 	// Broadcast the change:
-	m_World->BroadcastMetadata(*this);
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 
@@ -851,7 +851,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 	//We need to keep updating the clients when there is movement or if there was a change in speed and after 2 ticks
 	if( (m_Speed.SqrLength() > 0.0004f || m_bDirtySpeed) && (m_World->GetWorldAge() - m_TimeLastSpeedPacket >= 2))
 	{
-		m_World->BroadcastEntVelocity(*this,a_Exclude);
+		m_World->BroadcastEntityVelocity(*this,a_Exclude);
 		m_bDirtySpeed = false;
 		m_TimeLastSpeedPacket = m_World->GetWorldAge();
 	}
@@ -887,12 +887,12 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			{
 				if (m_bDirtyOrientation)
 				{
-					m_World->BroadcastEntRelMoveLook(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
+					m_World->BroadcastEntityRelMoveLook(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
 					m_bDirtyOrientation = false;
 				}
 				else
 				{
-					m_World->BroadcastEntRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
+					m_World->BroadcastEntityRelMove(*this, (char)DiffX, (char)DiffY, (char)DiffZ,a_Exclude);
 				}
 				m_LastPosX = GetPosX();
 				m_LastPosY = GetPosY();
@@ -904,14 +904,14 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			{
 				if (m_bDirtyOrientation)
 				{
-					m_World->BroadcastEntLook(*this,a_Exclude);
+					m_World->BroadcastEntityLook(*this,a_Exclude);
 					m_bDirtyOrientation = false;
 				}
 			}		
 		}
 		if (m_bDirtyHead)
 		{
-			m_World->BroadcastEntHeadLook(*this,a_Exclude);
+			m_World->BroadcastEntityHeadLook(*this,a_Exclude);
 			m_bDirtyHead = false;
 		}
 	}

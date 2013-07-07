@@ -25,7 +25,7 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 void cFallingBlock::Initialize(cWorld * a_World)
 {
 	super::Initialize(a_World);
-	a_World->BroadcastSpawn(*this);
+	a_World->BroadcastSpawnEntity(*this);
 }
 
 

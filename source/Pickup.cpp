@@ -43,7 +43,7 @@ cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem 
 void cPickup::Initialize(cWorld * a_World)
 {
 	super::Initialize(a_World);
-	a_World->BroadcastSpawn(*this);
+	a_World->BroadcastSpawnEntity(*this);
 }
 
 
