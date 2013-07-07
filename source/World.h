@@ -550,6 +550,7 @@ private:
 	cRedstoneSimulator * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSPlayers;
+	cPlayerList      m_Players;
 
 	cWorldStorage     m_Storage;
 	
@@ -579,9 +580,6 @@ private:
 	bool m_IsSaplingBonemealable;
 	bool m_IsSugarcaneBonemealable;
 	
-	cClientHandleList m_Clients;
-	cPlayerList       m_Players;
-
 	cCriticalSection m_CSFastSetBlock;
 	sSetBlockList    m_FastSetBlockQueue;
 
