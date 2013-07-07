@@ -594,13 +594,32 @@ AString EscapeString(const AString & a_Message)
 				last = i + 1;
 				break;
 			}
-		}
-	}
+		}  // switch (ch)
+	}  // for i - a_Message[]
 	if (len > last)
 	{
 		EscapedMsg.append(a_Message, last, len - last);
 	}
 	return EscapedMsg;
+}
+
+
+
+
+
+AString StripColorCodes(const AString & a_Message)
+{
+	AString res(a_Message);
+	size_t idx = 0;
+	while (true)
+	{
+		idx = res.find("\xc2\xa7", idx);
+		if (idx == AString::npos)
+		{
+			return res;
+		}
+		res.erase(idx, 3);
+	}
 }
 
 

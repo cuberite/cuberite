@@ -18,6 +18,7 @@ $cfile "ChunkDef.h"
 $cfile "../iniFile/iniFile.h"
 
 $cfile "BlockID.h"
+$cfile "StringUtils.h"
 $cfile "Defines.h"
 $cfile "LuaFunctions.h"
 $cfile "StringMap.h"

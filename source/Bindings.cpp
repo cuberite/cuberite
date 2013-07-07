@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/07/13 15:41:32.
+** Generated automatically by tolua++-1.0.92 on 07/07/13 16:40:05.
 */
 
 #ifndef __cplusplus
@@ -18,6 +18,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "ChunkDef.h"
 #include "../iniFile/iniFile.h"
 #include "BlockID.h"
+#include "StringUtils.h"
 #include "Defines.h"
 #include "LuaFunctions.h"
 #include "StringMap.h"
@@ -2644,6 +2645,164 @@ static int tolua_AllToLua_StringToDamageType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StringToDamageType'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: TrimString */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_TrimString00
+static int tolua_AllToLua_TrimString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString str = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   AString tolua_ret = (AString)  TrimString(str);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)str);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'TrimString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: NoCaseCompare */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_NoCaseCompare00
+static int tolua_AllToLua_NoCaseCompare00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString s1 = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  const AString s2 = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  {
+   int tolua_ret = (int)  NoCaseCompare(s1,s2);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)s1);
+   tolua_pushcppstring(tolua_S,(const char*)s2);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'NoCaseCompare'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: ReplaceString */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_ReplaceString00
+static int tolua_AllToLua_ReplaceString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  AString iHayStack = ((AString)  tolua_tocppstring(tolua_S,1,0));
+  const AString iNeedle = ((const AString)  tolua_tocppstring(tolua_S,2,0));
+  const AString iReplaceWith = ((const AString)  tolua_tocppstring(tolua_S,3,0));
+  {
+   ReplaceString(iHayStack,iNeedle,iReplaceWith);
+   tolua_pushcppstring(tolua_S,(const char*)iHayStack);
+   tolua_pushcppstring(tolua_S,(const char*)iNeedle);
+   tolua_pushcppstring(tolua_S,(const char*)iReplaceWith);
+  }
+ }
+ return 3;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ReplaceString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: EscapeString */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_EscapeString00
+static int tolua_AllToLua_EscapeString00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   AString tolua_ret = (AString)  EscapeString(a_Message);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Message);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'EscapeString'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StripColorCodes */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_StripColorCodes00
+static int tolua_AllToLua_StripColorCodes00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_Message = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   AString tolua_ret = (AString)  StripColorCodes(a_Message);
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_Message);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StripColorCodes'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28119,6 +28278,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"StringToDimension",tolua_AllToLua_StringToDimension00);
   tolua_function(tolua_S,"DamageTypeToString",tolua_AllToLua_DamageTypeToString00);
   tolua_function(tolua_S,"StringToDamageType",tolua_AllToLua_StringToDamageType00);
+  tolua_function(tolua_S,"TrimString",tolua_AllToLua_TrimString00);
+  tolua_function(tolua_S,"NoCaseCompare",tolua_AllToLua_NoCaseCompare00);
+  tolua_function(tolua_S,"ReplaceString",tolua_AllToLua_ReplaceString00);
+  tolua_function(tolua_S,"EscapeString",tolua_AllToLua_EscapeString00);
+  tolua_function(tolua_S,"StripColorCodes",tolua_AllToLua_StripColorCodes00);
   tolua_array(tolua_S,"g_BlockLightValue",tolua_get_AllToLua_g_BlockLightValue,tolua_set_AllToLua_g_BlockLightValue);
   tolua_array(tolua_S,"g_BlockSpreadLightFalloff",tolua_get_AllToLua_g_BlockSpreadLightFalloff,tolua_set_AllToLua_g_BlockSpreadLightFalloff);
   tolua_array(tolua_S,"g_BlockTransparent",tolua_get_AllToLua_g_BlockTransparent,tolua_set_AllToLua_g_BlockTransparent);

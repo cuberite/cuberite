@@ -40,19 +40,19 @@ extern AStringVector StringSplit(const AString & str, const AString & delim);
 extern AStringVector StringSplitAndTrim(const AString & str, const AString & delim);
 
 /// Trime whitespace at both ends of the string
-extern AString TrimString(const AString & str);
+extern AString TrimString(const AString & str);  // tolua_export
 
 /// In-place string conversion to uppercase; returns the same string
 extern AString & StrToUpper(AString & s);
 
 /// Case-insensitive string comparison; returns 0 if the strings are the same
-extern int NoCaseCompare(const AString & s1, const AString & s2);
+extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
 
 /// Case-insensitive string comparison that returns a rating of equal-ness between [0 - s1.length()]
 extern unsigned int RateCompareString(const AString & s1, const AString & s2 );
 
 /// Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith
-extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);
+extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
 /// Returns the list of all items in the specified directory (files, folders, nix pipes, whatever's there)
 extern AStringList GetDirectoryContents(const char * a_Directory);
@@ -67,7 +67,10 @@ extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AStr
 extern AString & CreateHexDump(AString & a_Out, const void * a_Data, int a_Size, int a_BytesPerLine);
 
 /// Returns a copy of a_Message with all quotes and backslashes escaped by a backslash
-extern AString EscapeString(const AString & a_Message);
+extern AString EscapeString(const AString & a_Message);  // tolua_export
+
+/// Removes all control codes used by MC for colors and styles
+extern AString StripColorCodes(const AString & a_Message);  // tolua_export
 
 // If you have any other string helper functions, declare them here
 
