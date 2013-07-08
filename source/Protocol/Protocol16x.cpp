@@ -100,7 +100,7 @@ void cProtocol161::SendHealth(void)
 	WriteByte (PACKET_UPDATE_HEALTH);
 	WriteFloat((float)m_Client->GetPlayer()->GetHealth());
 	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
-	WriteFloat(m_Client->GetPlayer()->GetFoodSaturationLevel());
+	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
 	Flush();
 }
 
@@ -117,6 +117,17 @@ void cProtocol161::SendPlayerMaxSpeed(void)
 	WriteString("generic.movementSpeed");
 	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
 	Flush();
+}
+
+
+
+
+
+void cProtocol161::SendRespawn(void)
+{
+	// Besides sending the respawn, we need to also send the player max speed, otherwise the client reverts to super-fast
+	super::SendRespawn();
+	SendPlayerMaxSpeed();
 }
 
 

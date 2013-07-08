@@ -38,6 +38,7 @@ protected:
 	virtual void SendGameMode      (eGameMode a_GameMode) override;
 	virtual void SendHealth        (void) override;
 	virtual void SendPlayerMaxSpeed(void) override;
+	virtual void SendRespawn       (void) override;
 	virtual void SendWindowOpen    (char a_WindowID, char a_WindowType, const AString & a_WindowTitle, char a_NumSlots) override;
 	
 	virtual int ParseEntityAction   (void) override;
