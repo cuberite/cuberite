@@ -31,8 +31,8 @@ cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem 
 	, m_Item(a_Item)
 	, m_bCollected( false )
 {
-	m_MaxHealth = 1;
-	m_Health = 1;
+	m_MaxHealth = 5;
+	m_Health = 5;
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 	m_Gravity = -3.0;
 }
