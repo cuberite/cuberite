@@ -12,6 +12,16 @@
 
 
 
+#ifdef _DEBUG
+	#define DebugSleep Sleep
+#else
+	#define DebugSleep(X)
+#endif  // else _DEBUG
+
+
+
+
+
 #define HANDLE_CLIENT_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
 	{ \
@@ -47,6 +57,7 @@
 		{ \
 			SERVERENCRYPTSEND(ToServer.data(), ToServer.size()); \
 		} \
+		DebugSleep(50); \
 	}
 
 #define COPY_TO_CLIENT() \
@@ -61,6 +72,7 @@
 		{ \
 			CLIENTENCRYPTSEND(ToClient.data(), ToClient.size()); \
 		} \
+		DebugSleep(50); \
 	}
 
 #define HANDLE_CLIENT_READ(Proc) \
@@ -159,6 +171,7 @@ enum
 	PACKET_INCREMENT_STATISTIC       = 0xc8,
 	PACKET_LOCALE_AND_VIEW           = 0xcc,
 	PACKET_CLIENT_STATUSES           = 0xcd,
+	PACKET_PLUGIN_MESSAGE            = 0xfa,
 	PACKET_ENCRYPTION_KEY_RESPONSE   = 0xfc,
 	PACKET_ENCRYPTION_KEY_REQUEST    = 0xfd,
 	PACKET_PING                      = 0xfe,
@@ -211,6 +224,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	fnam.append(".log");
 	m_LogFile = fopen(fnam.c_str(), "w");
 	Log("Log file created");
+	printf("Connection is logged to file \"%s\"\n", fnam.c_str());
 }
 
 
@@ -537,6 +551,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_ON_GROUND:          HANDLE_CLIENT_READ(HandleClientPlayerOnGround); break;
 			case PACKET_PLAYER_POSITION:           HANDLE_CLIENT_READ(HandleClientPlayerPosition); break;
 			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
+			case PACKET_PLUGIN_MESSAGE:            HANDLE_CLIENT_READ(HandleClientPluginMessage); break;
 			case PACKET_SLOT_SELECT:               HANDLE_CLIENT_READ(HandleClientSlotSelect); break;
 			case PACKET_UPDATE_SIGN:               HANDLE_CLIENT_READ(HandleClientUpdateSign); break;
 			case PACKET_USE_ENTITY:                HANDLE_CLIENT_READ(HandleClientUseEntity); break;
@@ -636,6 +651,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_ANIMATION:          HANDLE_SERVER_READ(HandleServerPlayerAnimation); break;
 			case PACKET_PLAYER_LIST_ITEM:          HANDLE_SERVER_READ(HandleServerPlayerListItem); break;
 			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_SERVER_READ(HandleServerPlayerPositionLook); break;
+			case PACKET_PLUGIN_MESSAGE:            HANDLE_SERVER_READ(HandleServerPluginMessage); break;
 			case PACKET_SET_EXPERIENCE:            HANDLE_SERVER_READ(HandleServerSetExperience); break;
 			case PACKET_SET_SLOT:                  HANDLE_SERVER_READ(HandleServerSetSlot); break;
 			case PACKET_SLOT_SELECT:               HANDLE_SERVER_READ(HandleServerSlotSelect); break;
@@ -989,6 +1005,26 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 	Log("  Y, P = %.03f, %.03f", Yaw, Pitch);
 	Log("  IsOnGround = %s", IsOnGround ? "true" : "false");
 	
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientPluginMessage(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, ChannelName);
+	HANDLE_CLIENT_PACKET_READ(ReadBEShort,         short,   Length);
+	AString Data;
+	if (!m_ClientBuffer.ReadString(Data, Length))
+	{
+		return false;
+	}
+	Log("Received a PACKET_PLUGIN_MESSAGE from the client");
+	Log("  ChannelName = \"%s\"", ChannelName.c_str());
+	DataLog(Data.data(), Length, "  Data: %d bytes", Length);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1351,11 +1387,23 @@ bool cConnection::HandleServerEntityProperties(void)
 	Log("Received a PACKET_ENTITY_PROPERTIES from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  Count = %d", Count);
+	
 	for (int i = 0; i < Count; i++)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Key);
 		HANDLE_SERVER_PACKET_READ(ReadBEDouble,        double,  Value);
 		Log(" \"%s\" = %f", Key.c_str(), Value);
+	}  // for i
+	
+	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ListLength);
+	Log("  ListLength = %d", ListLength);
+	for (int i = 0; i < ListLength; i++)
+	{
+		HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDHi);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDLo);
+		HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
+		HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   ByteVal);
+		Log("  [%d] = {0x%08llx%08llx, %f, %i}", i, UUIDHi, UUIDLo, DblVal, ByteVal);
 	}  // for i
 	COPY_TO_CLIENT();
 	return true;
@@ -1734,6 +1782,26 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 	// TODO: list packet contents
 	
 	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerPluginMessage(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, ChannelName);
+	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   Length);
+	AString Data;
+	if (!m_ServerBuffer.ReadString(Data, Length))
+	{
+		return false;
+	}
+	Log("Received a PACKET_PLUGIN_MESSAGE from the server");
+	Log("  ChannelName = \"%s\"", ChannelName.c_str());
+	DataLog(Data.data(), Length, "  Data: %d bytes", Length);
+	COPY_TO_SERVER();
 	return true;
 }
 

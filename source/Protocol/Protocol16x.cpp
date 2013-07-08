@@ -5,6 +5,8 @@
 Implements the 1.6.x protocol classes:
 	- cProtocol161
 		- release 1.6.1 protocol (#73)
+	- cProtocol162
+		- release 1.6.2 protocol (#74)
 (others may be added later in the future for the 1.6 release series)
 */
 
@@ -48,6 +50,8 @@ enum
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol161:
 
 cProtocol161::cProtocol161(cClientHandle * a_Client) :
 	super(a_Client)
@@ -195,6 +199,34 @@ int cProtocol161::ParsePacket(unsigned char a_PacketType)
 		case PACKET_STEER_VEHICLE: return ParseSteerVehicle();
 		default:                   return super::ParsePacket(a_PacketType);
 	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cProtocol162:
+
+cProtocol162::cProtocol162(cClientHandle * a_Client) :
+	super(a_Client)
+{
+}
+
+
+
+
+
+void cProtocol162::SendPlayerMaxSpeed(void)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_ENTITY_PROPERTIES);
+	WriteInt(m_Client->GetPlayer()->GetUniqueID());
+	WriteInt(1);
+	WriteString("generic.movementSpeed");
+	WriteDouble(m_Client->GetPlayer()->GetMaxSpeed());
+	WriteShort(0);
+	Flush();
 }
 
 

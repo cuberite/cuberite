@@ -5,6 +5,8 @@
 Declares the 1.6.x protocol classes:
 	- cProtocol161
 		- release 1.6.1 protocol (#73)
+	- cProtocol162
+		- release 1.6.2 protocol (#74)
 (others may be added later in the future for the 1.6 release series)
 */
 
@@ -28,6 +30,8 @@ class cProtocol161 :
 public:
 	cProtocol161(cClientHandle * a_Client);
 	
+protected:
+
 	// cProtocol150 overrides:
 	virtual void SendAttachEntity  (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendChat          (const AString & a_Message) override;
@@ -44,6 +48,23 @@ public:
 
 	// Enable new packets' handling
 	virtual int ParsePacket(unsigned char a_PacketType) override;
+} ;
+
+
+
+
+
+class cProtocol162 :
+	public cProtocol161
+{
+	typedef cProtocol161 super;
+	
+public:
+	cProtocol162(cClientHandle * a_Client);
+
+protected:
+	// cProtocol161 overrides:
+	virtual void SendPlayerMaxSpeed(void) override;
 } ;
 
 

@@ -86,6 +86,7 @@ enum
 	PACKET_UPDATE_SIGN               = 0x82,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
+	PACKET_PLUGIN_MESSAGE            = 0xfa,
 	PACKET_PING                      = 0xfe,
 	PACKET_DISCONNECT                = 0xff
 } ;
@@ -1039,6 +1040,7 @@ int cProtocol125::ParsePacket(unsigned char a_PacketType)
 		case PACKET_PLAYER_MOVE_LOOK:          return ParsePlayerMoveLook();
 		case PACKET_PLAYER_ON_GROUND:          return ParsePlayerOnGround();
 		case PACKET_PLAYER_POS:                return ParsePlayerPosition();
+		case PACKET_PLUGIN_MESSAGE:            return ParsePluginMessage();
 		case PACKET_RESPAWN:                   return ParseRespawn();
 		case PACKET_SLOT_SELECTED:             return ParseSlotSelected();
 		case PACKET_UPDATE_SIGN:               return ParseUpdateSign();
@@ -1323,6 +1325,28 @@ int cProtocol125::ParsePlayerPosition(void)
 	HANDLE_PACKET_READ(ReadBEDouble, double, PosZ);
 	HANDLE_PACKET_READ(ReadBool,     bool,   IsOnGround);
 	m_Client->HandlePlayerPos(PosX, PosY, PosZ, Stance, IsOnGround);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol125::ParsePluginMessage(void)
+{
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, ChannelName);
+	HANDLE_PACKET_READ(ReadBEShort,         short,   Length);
+	AString Data;
+	if (!m_ReceivedData.ReadString(Data, Length))
+	{
+		m_ReceivedData.CheckValid();
+		return PARSE_INCOMPLETE;
+	}
+	m_ReceivedData.CheckValid();
+	
+	// TODO: Process the data
+	LOGD("Received %d bytes of plugin data on channel \"%s\".", Length, ChannelName.c_str());
+	
 	return PARSE_OK;
 }
 

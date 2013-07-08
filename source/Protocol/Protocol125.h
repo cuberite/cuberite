@@ -119,6 +119,7 @@ protected:
 	virtual int ParsePlayerMoveLook         (void);
 	virtual int ParsePlayerOnGround         (void);
 	virtual int ParsePlayerPosition         (void);
+	virtual int ParsePluginMessage          (void);
 	virtual int ParseRespawn                (void);
 	virtual int ParseSlotSelected           (void);
 	virtual int ParseUpdateSign             (void);

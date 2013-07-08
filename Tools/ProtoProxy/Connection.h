@@ -122,6 +122,7 @@ protected:
 	bool HandleClientPlayerOnGround(void);
 	bool HandleClientPlayerPosition(void);
 	bool HandleClientPlayerPositionLook(void);
+	bool HandleClientPluginMessage(void);
 	bool HandleClientSlotSelect(void);
 	bool HandleClientUpdateSign(void);
 	bool HandleClientUseEntity(void);
@@ -162,6 +163,7 @@ protected:
 	bool HandleServerPlayerAnimation(void);
 	bool HandleServerPlayerListItem(void);
 	bool HandleServerPlayerPositionLook(void);
+	bool HandleServerPluginMessage(void);
 	bool HandleServerSetExperience(void);
 	bool HandleServerSetSlot(void);
 	bool HandleServerSlotSelect(void);
