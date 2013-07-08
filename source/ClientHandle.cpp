@@ -1470,7 +1470,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 {
 	if (!m_HasSentDC)
 	{
-		LOGD("Sending a DC: \"%s\"", a_Reason.c_str());
+		LOGD("Sending a DC: \"%s\"", StripColorCodes(a_Reason).c_str());
 		m_Protocol->SendDisconnect(a_Reason);
 		m_HasSentDC = true;
 	}
