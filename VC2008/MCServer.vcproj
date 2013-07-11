@@ -403,6 +403,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\FastRandom.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\FastRandom.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\FurnaceRecipe.cpp"
 				>
 			</File>
