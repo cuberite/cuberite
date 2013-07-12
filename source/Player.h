@@ -27,6 +27,7 @@ public:
 	enum
 	{
 		MAX_HEALTH = 20,
+		MAX_FOOD_LEVEL = 20,
 	} ;
 	// tolua_end
 	
@@ -127,16 +128,30 @@ public:
 
 	void Heal( int a_Health );												// tolua_export
 	
-	/// Returns true if any food has been consumed, false if player "full"
-	bool Feed(short a_Food, float a_Saturation);							// tolua_export
+	// tolua_begin
+	
+	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
+	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
+	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
+	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
+	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
+	
+	void SetFoodLevel                 (int a_FoodLevel);
+	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
+	void SetFoodTickTimer             (int a_FoodTickTimer);
+	void SetFoodExhaustionLevel       (double a_FoodSaturationLevel);
+	void SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining);
 
-	short GetMaxFoodLevel() { return m_MaxFoodLevel; }						// tolua_export
-	short GetFoodLevel() { return m_FoodLevel; }							// tolua_export
+	/// Adds to FoodLevel and FoodSaturationLevel, returns true if any food has been consumed, false if player "full"
+	bool Feed(int a_Food, double a_Saturation);
 
-	float GetMaxFoodSaturationLevel() { return m_MaxFoodSaturationLevel; }	// tolua_export
-	float GetFoodSaturationLevel() { return m_FoodSaturationLevel; }		// tolua_export
-
-	void AddFoodExhaustion(float a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }	// tolua_export
+	/// Adds the specified exhaustion to m_FoodExhaustion. Expects only positive values.
+	void AddFoodExhaustion(double a_Exhaustion) { m_FoodExhaustionLevel += a_Exhaustion; }
+	
+	/// Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two
+	void FoodPoison(int a_NumTicks);
+	
+	// tolua_end
 	
 	virtual void KilledBy(cEntity * a_Killer) override;
 	
@@ -213,13 +228,25 @@ protected:
 
 	bool m_bVisible;
 
-	short m_FoodLevel;
-	short m_MaxFoodLevel;
-	float m_FoodSaturationLevel;
-	float m_MaxFoodSaturationLevel;
-	float m_FoodExhaustionLevel;
-	char m_FoodTickTimer;
-
+	// Food-related variables:
+	/// Represents the food bar, one point equals half a "drumstick"
+	int m_FoodLevel;
+	
+	/// "Overcharge" for the m_FoodLevel; is depleted before m_FoodLevel
+	double m_FoodSaturationLevel;
+	
+	/// Count-up to the healing or damaging action, based on m_FoodLevel
+	int   m_FoodTickTimer;
+	
+	/// A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little
+	double m_FoodExhaustionLevel;
+	
+	/// Number of ticks remaining for the foodpoisoning effect; zero if not foodpoisoned
+	int m_FoodPoisonedTicksRemaining;
+	
+	/// Last position that has been recorded for food-related processing:
+	Vector3d m_LastFoodPos;
+	
 	float m_LastJumpHeight;
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
@@ -264,6 +291,11 @@ protected:
 	/// Filters out damage for creative mode
 	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
 	
+	/// Called in each tick to handle food-related processing
+	void HandleFood(void);
+	
+	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
+	void ApplyFoodExhaustionFromMovement(cChunk & a_Chunk);
 } ; // tolua_export
 
 

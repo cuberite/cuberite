@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/07/13 16:40:05.
+** Generated automatically by tolua++-1.0.92 on 07/09/13 09:51:25.
 */
 
 #ifndef __cplusplus
@@ -6786,6 +6786,39 @@ static int tolua_AllToLua_cEntity_GetHealth00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: SetHealth of class  cEntity */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetHealth00
+static int tolua_AllToLua_cEntity_SetHealth00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cEntity* self = (cEntity*)  tolua_tousertype(tolua_S,1,0);
+  int a_Health = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetHealth'", NULL);
+#endif
+  {
+   self->SetHealth(a_Health);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetHealth'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetMaxHealth of class  cEntity */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cEntity_SetMaxHealth00
 static int tolua_AllToLua_cEntity_SetMaxHealth00(lua_State* tolua_S)
@@ -9111,6 +9144,331 @@ static int tolua_AllToLua_cPlayer_Heal00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: GetFoodLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodLevel00
+static int tolua_AllToLua_cPlayer_GetFoodLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodLevel'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetFoodLevel();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFoodLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetFoodSaturationLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodSaturationLevel00
+static int tolua_AllToLua_cPlayer_GetFoodSaturationLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodSaturationLevel'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetFoodSaturationLevel();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFoodSaturationLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetFoodTickTimer of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodTickTimer00
+static int tolua_AllToLua_cPlayer_GetFoodTickTimer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodTickTimer'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetFoodTickTimer();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFoodTickTimer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetFoodExhaustionLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodExhaustionLevel00
+static int tolua_AllToLua_cPlayer_GetFoodExhaustionLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodExhaustionLevel'", NULL);
+#endif
+  {
+   double tolua_ret = (double)  self->GetFoodExhaustionLevel();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFoodExhaustionLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetFoodPoisonedTicksRemaining of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodPoisonedTicksRemaining00
+static int tolua_AllToLua_cPlayer_GetFoodPoisonedTicksRemaining00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodPoisonedTicksRemaining'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetFoodPoisonedTicksRemaining();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetFoodPoisonedTicksRemaining'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetFoodLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFoodLevel00
+static int tolua_AllToLua_cPlayer_SetFoodLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  int a_FoodLevel = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFoodLevel'", NULL);
+#endif
+  {
+   self->SetFoodLevel(a_FoodLevel);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFoodLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetFoodSaturationLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFoodSaturationLevel00
+static int tolua_AllToLua_cPlayer_SetFoodSaturationLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  double a_FoodSaturationLevel = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFoodSaturationLevel'", NULL);
+#endif
+  {
+   self->SetFoodSaturationLevel(a_FoodSaturationLevel);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFoodSaturationLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetFoodTickTimer of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFoodTickTimer00
+static int tolua_AllToLua_cPlayer_SetFoodTickTimer00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  int a_FoodTickTimer = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFoodTickTimer'", NULL);
+#endif
+  {
+   self->SetFoodTickTimer(a_FoodTickTimer);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFoodTickTimer'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetFoodExhaustionLevel of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFoodExhaustionLevel00
+static int tolua_AllToLua_cPlayer_SetFoodExhaustionLevel00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  double a_FoodSaturationLevel = ((double)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFoodExhaustionLevel'", NULL);
+#endif
+  {
+   self->SetFoodExhaustionLevel(a_FoodSaturationLevel);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFoodExhaustionLevel'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: SetFoodPoisonedTicksRemaining of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFoodPoisonedTicksRemaining00
+static int tolua_AllToLua_cPlayer_SetFoodPoisonedTicksRemaining00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  int a_FoodPoisonedTicksRemaining = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetFoodPoisonedTicksRemaining'", NULL);
+#endif
+  {
+   self->SetFoodPoisonedTicksRemaining(a_FoodPoisonedTicksRemaining);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'SetFoodPoisonedTicksRemaining'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: Feed of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_Feed00
 static int tolua_AllToLua_cPlayer_Feed00(lua_State* tolua_S)
@@ -9128,8 +9486,8 @@ static int tolua_AllToLua_cPlayer_Feed00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  short a_Food = ((short)  tolua_tonumber(tolua_S,2,0));
-  float a_Saturation = ((float)  tolua_tonumber(tolua_S,3,0));
+  int a_Food = ((int)  tolua_tonumber(tolua_S,2,0));
+  double a_Saturation = ((double)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Feed'", NULL);
 #endif
@@ -9142,134 +9500,6 @@ static int tolua_AllToLua_cPlayer_Feed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Feed'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetMaxFoodLevel of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetMaxFoodLevel00
-static int tolua_AllToLua_cPlayer_GetMaxFoodLevel00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxFoodLevel'", NULL);
-#endif
-  {
-   short tolua_ret = (short)  self->GetMaxFoodLevel();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetMaxFoodLevel'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetFoodLevel of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodLevel00
-static int tolua_AllToLua_cPlayer_GetFoodLevel00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodLevel'", NULL);
-#endif
-  {
-   short tolua_ret = (short)  self->GetFoodLevel();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetFoodLevel'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetMaxFoodSaturationLevel of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetMaxFoodSaturationLevel00
-static int tolua_AllToLua_cPlayer_GetMaxFoodSaturationLevel00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMaxFoodSaturationLevel'", NULL);
-#endif
-  {
-   float tolua_ret = (float)  self->GetMaxFoodSaturationLevel();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetMaxFoodSaturationLevel'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetFoodSaturationLevel of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetFoodSaturationLevel00
-static int tolua_AllToLua_cPlayer_GetFoodSaturationLevel00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetFoodSaturationLevel'", NULL);
-#endif
-  {
-   float tolua_ret = (float)  self->GetFoodSaturationLevel();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetFoodSaturationLevel'.",&tolua_err);
  return 0;
 #endif
 }
@@ -9291,7 +9521,7 @@ static int tolua_AllToLua_cPlayer_AddFoodExhaustion00(lua_State* tolua_S)
 #endif
  {
   cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  float a_Exhaustion = ((float)  tolua_tonumber(tolua_S,2,0));
+  double a_Exhaustion = ((double)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddFoodExhaustion'", NULL);
 #endif
@@ -9303,6 +9533,39 @@ static int tolua_AllToLua_cPlayer_AddFoodExhaustion00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'AddFoodExhaustion'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: FoodPoison of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_FoodPoison00
+static int tolua_AllToLua_cPlayer_FoodPoison00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
+  int a_NumTicks = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FoodPoison'", NULL);
+#endif
+  {
+   self->FoodPoison(a_NumTicks);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'FoodPoison'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28519,6 +28782,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"KilledBy",tolua_AllToLua_cEntity_KilledBy00);
    tolua_function(tolua_S,"Heal",tolua_AllToLua_cEntity_Heal00);
    tolua_function(tolua_S,"GetHealth",tolua_AllToLua_cEntity_GetHealth00);
+   tolua_function(tolua_S,"SetHealth",tolua_AllToLua_cEntity_SetHealth00);
    tolua_function(tolua_S,"SetMaxHealth",tolua_AllToLua_cEntity_SetMaxHealth00);
    tolua_function(tolua_S,"GetMaxHealth",tolua_AllToLua_cEntity_GetMaxHealth00);
    tolua_function(tolua_S,"StartBurning",tolua_AllToLua_cEntity_StartBurning00);
@@ -28560,6 +28824,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_cclass(tolua_S,"cPlayer","cPlayer","cPawn",NULL);
   tolua_beginmodule(tolua_S,"cPlayer");
    tolua_constant(tolua_S,"MAX_HEALTH",cPlayer::MAX_HEALTH);
+   tolua_constant(tolua_S,"MAX_FOOD_LEVEL",cPlayer::MAX_FOOD_LEVEL);
    tolua_function(tolua_S,"Initialize",tolua_AllToLua_cPlayer_Initialize00);
    tolua_function(tolua_S,"GetEyeHeight",tolua_AllToLua_cPlayer_GetEyeHeight00);
    tolua_function(tolua_S,"GetEyePosition",tolua_AllToLua_cPlayer_GetEyePosition00);
@@ -28590,12 +28855,19 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetColor",tolua_AllToLua_cPlayer_GetColor00);
    tolua_function(tolua_S,"TossItem",tolua_AllToLua_cPlayer_TossItem00);
    tolua_function(tolua_S,"Heal",tolua_AllToLua_cPlayer_Heal00);
-   tolua_function(tolua_S,"Feed",tolua_AllToLua_cPlayer_Feed00);
-   tolua_function(tolua_S,"GetMaxFoodLevel",tolua_AllToLua_cPlayer_GetMaxFoodLevel00);
    tolua_function(tolua_S,"GetFoodLevel",tolua_AllToLua_cPlayer_GetFoodLevel00);
-   tolua_function(tolua_S,"GetMaxFoodSaturationLevel",tolua_AllToLua_cPlayer_GetMaxFoodSaturationLevel00);
    tolua_function(tolua_S,"GetFoodSaturationLevel",tolua_AllToLua_cPlayer_GetFoodSaturationLevel00);
+   tolua_function(tolua_S,"GetFoodTickTimer",tolua_AllToLua_cPlayer_GetFoodTickTimer00);
+   tolua_function(tolua_S,"GetFoodExhaustionLevel",tolua_AllToLua_cPlayer_GetFoodExhaustionLevel00);
+   tolua_function(tolua_S,"GetFoodPoisonedTicksRemaining",tolua_AllToLua_cPlayer_GetFoodPoisonedTicksRemaining00);
+   tolua_function(tolua_S,"SetFoodLevel",tolua_AllToLua_cPlayer_SetFoodLevel00);
+   tolua_function(tolua_S,"SetFoodSaturationLevel",tolua_AllToLua_cPlayer_SetFoodSaturationLevel00);
+   tolua_function(tolua_S,"SetFoodTickTimer",tolua_AllToLua_cPlayer_SetFoodTickTimer00);
+   tolua_function(tolua_S,"SetFoodExhaustionLevel",tolua_AllToLua_cPlayer_SetFoodExhaustionLevel00);
+   tolua_function(tolua_S,"SetFoodPoisonedTicksRemaining",tolua_AllToLua_cPlayer_SetFoodPoisonedTicksRemaining00);
+   tolua_function(tolua_S,"Feed",tolua_AllToLua_cPlayer_Feed00);
    tolua_function(tolua_S,"AddFoodExhaustion",tolua_AllToLua_cPlayer_AddFoodExhaustion00);
+   tolua_function(tolua_S,"FoodPoison",tolua_AllToLua_cPlayer_FoodPoison00);
    tolua_function(tolua_S,"Respawn",tolua_AllToLua_cPlayer_Respawn00);
    tolua_function(tolua_S,"SetVisible",tolua_AllToLua_cPlayer_SetVisible00);
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);

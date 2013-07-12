@@ -469,7 +469,7 @@ void cProtocol125::SendHealth(void)
 	WriteByte (PACKET_UPDATE_HEALTH);
 	WriteShort((short)m_Client->GetPlayer()->GetHealth());
 	WriteShort(m_Client->GetPlayer()->GetFoodLevel());
-	WriteFloat(m_Client->GetPlayer()->GetFoodSaturationLevel());
+	WriteFloat((float)m_Client->GetPlayer()->GetFoodSaturationLevel());
 	Flush();
 }
 

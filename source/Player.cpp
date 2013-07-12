@@ -19,6 +19,7 @@
 #include "OSSupport/MakeDir.h"
 #include "OSSupport/Timer.h"
 #include "MersenneTwister.h"
+#include "Chunk.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -48,8 +49,11 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_TimeLastPickupCheck( 0.f )
 	, m_Color('-')
 	, m_ClientHandle( a_Client )
-	, m_FoodExhaustionLevel(0.f)
+	, m_FoodLevel(20)
+	, m_FoodSaturationLevel(5)
 	, m_FoodTickTimer(0)
+	, m_FoodExhaustionLevel(0)
+	, m_FoodPoisonedTicksRemaining(0)
 	, m_NormalMaxSpeed(0.1)
 	, m_SprintingMaxSpeed(0.13)
 	, m_IsCrouched(false)
@@ -66,12 +70,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 	SetMaxHealth(20);
 	
-	m_MaxFoodLevel = 20;
-	m_MaxFoodSaturationLevel = 20.f;
-	
-	m_FoodLevel = m_MaxFoodLevel;
-	m_FoodSaturationLevel = 5.f;
-
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
 
@@ -175,6 +173,9 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	super::Tick(a_Dt, a_Chunk);
 	if (m_bDirtyPosition)
 	{
+		// Apply food exhaustion from movement:
+		ApplyFoodExhaustionFromMovement(a_Chunk);
+		
 		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
 		BroadcastMovementUpdate(m_ClientHandle);
 		m_ClientHandle->StreamChunks();
@@ -184,46 +185,15 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		BroadcastMovementUpdate(m_ClientHandle);
 	}
 
-	if (m_Health > 0) // make sure player is alive
+	if (m_Health > 0)  // make sure player is alive
 	{
 		m_World->CollectPickupsByPlayer(this);
 
-		// Handle Health:
-		m_FoodTickTimer++;
-		if (m_FoodTickTimer >= 80)
-		{
-			m_FoodTickTimer = 0;
-
-			if (m_FoodLevel >= 17)
-			{
-				Heal(1);
-			}
-			else if (m_FoodLevel == 0)
-			{
-				TakeDamage(dtStarving, NULL, 1, 1, 0);
-			}
-		}
-
-		// TODO: Increase Exhaustion level http://www.minecraftwiki.net/wiki/Hunger#Exhaustion_level_increase
-		if (m_FoodExhaustionLevel >= 4.f)
-		{
-			m_FoodExhaustionLevel -= 4.f;
-
-			if (m_FoodSaturationLevel >= 1.f)
-			{
-				m_FoodSaturationLevel--;
-			}
-			else
-			{
-				m_FoodLevel = std::max(m_FoodLevel - 1, 0);
-			}
-
-			SendHealth();
-		}
+		HandleFood();
 	}
 	
-	cTimer t1;
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
+	cTimer t1;
 	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
 		m_World->SendPlayerList(this);
@@ -237,6 +207,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
+	// If just
 	m_bTouchGround = a_bTouchGround;
 
 	if (!m_bTouchGround)
@@ -299,15 +270,61 @@ void cPlayer::Heal(int a_Health)
 
 
 
-bool cPlayer::Feed(short a_Food, float a_Saturation)
+void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	if (m_FoodLevel >= GetMaxFoodLevel())
+	m_FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	SendHealth();
+}
+
+
+
+
+
+void cPlayer::SetFoodSaturationLevel(double a_FoodSaturationLevel)
+{
+	m_FoodSaturationLevel = std::max(0.0, std::min(a_FoodSaturationLevel, (double)m_FoodLevel));
+}
+
+
+
+
+
+void cPlayer::SetFoodTickTimer(int a_FoodTickTimer)
+{
+	m_FoodTickTimer = a_FoodTickTimer;
+}
+
+
+
+
+
+void cPlayer::SetFoodExhaustionLevel(double a_FoodSaturationLevel)
+{
+	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodSaturationLevel, 4.0));
+}
+
+
+
+
+
+void cPlayer::SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining)
+{
+	m_FoodPoisonedTicksRemaining = a_FoodPoisonedTicksRemaining;
+}
+
+
+
+
+
+bool cPlayer::Feed(int a_Food, double a_Saturation)
+{
+	if (m_FoodLevel >= MAX_FOOD_LEVEL)
 	{
 		return false;
 	}
 	
-	m_FoodLevel = std::min((short)(a_Food + m_FoodLevel), GetMaxFoodLevel());
-	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, GetMaxFoodSaturationLevel());
+	m_FoodLevel = std::min(a_Food + m_FoodLevel, (int)MAX_FOOD_LEVEL);
+	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, (double)m_FoodLevel);
 	
 	SendHealth();
 	return true;
@@ -317,7 +334,22 @@ bool cPlayer::Feed(short a_Food, float a_Saturation)
 
 
 
-void cPlayer::SendHealth()
+void cPlayer::FoodPoison(int a_NumTicks)
+{
+	bool HasBeenFoodPoisoned = (m_FoodPoisonedTicksRemaining > 0);
+	m_FoodPoisonedTicksRemaining = std::max(m_FoodPoisonedTicksRemaining, a_NumTicks);
+	if (!HasBeenFoodPoisoned)
+	{
+		// TODO: Send the poisoning indication to the client - how?
+		SendHealth();
+	}
+}
+
+
+
+
+
+void cPlayer::SendHealth(void)
 {
 	if (m_ClientHandle != NULL)
 	{
@@ -437,11 +469,8 @@ void cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 	
 	super::DoTakeDamage(a_TDI);
 	
-	if (a_TDI.Attacker != NULL)
-	{
-		// Only increase hunger if being attacked by a mob
-		AddFoodExhaustion(0.3f);
-	}
+	// Any kind of damage adds food exhaustion
+	AddFoodExhaustion(0.3f);
 	
 	SendHealth();
 }
@@ -1034,13 +1063,14 @@ bool cPlayer::LoadFromDisk()
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
 	{
+		LOGWARNING("Cannot open player data file \"%s\" for reading", SourceFile.c_str()); 
 		return false;
 	}
 
 	AString buffer;
 	if (f.ReadRestOfFile(buffer) != f.GetSize())
 	{
-		LOGERROR("ERROR READING FROM FILE \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Cannot read player data from file \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
 	f.Close();
@@ -1049,7 +1079,7 @@ bool cPlayer::LoadFromDisk()
 	Json::Reader reader;
 	if (!reader.parse(buffer, root, false))
 	{
-		LOGERROR("ERROR WHILE PARSING JSON FROM FILE %s", SourceFile.c_str());
+		LOGWARNING("Cannot parse player data in file \"%s\", player will be reset", SourceFile.c_str());
 	}
 
 	Json::Value & JSON_PlayerPosition = root["position"];
@@ -1058,6 +1088,10 @@ bool cPlayer::LoadFromDisk()
 		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
 		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
 		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
+		m_LastPosX = GetPosX();
+		m_LastPosY = GetPosY();
+		m_LastPosZ = GetPosZ();
+		m_LastFoodPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
@@ -1068,9 +1102,12 @@ bool cPlayer::LoadFromDisk()
 		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
 	}
 
-	m_Health = (short)root.get("health", 0 ).asInt();
-	m_FoodLevel = (short)root.get("food", m_MaxFoodLevel ).asInt();
-	m_FoodSaturationLevel = (float)root.get("foodSaturation", m_MaxFoodSaturationLevel ).asDouble();
+	m_Health = root.get("health", 0).asInt();
+	
+	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
+	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
+	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
+	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 	
@@ -1095,25 +1132,27 @@ bool cPlayer::SaveToDisk()
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
-	JSON_PlayerPosition.append( Json::Value( GetPosX() ) );
-	JSON_PlayerPosition.append( Json::Value( GetPosY() ) );
-	JSON_PlayerPosition.append( Json::Value( GetPosZ() ) );
+	JSON_PlayerPosition.append(Json::Value(GetPosX()));
+	JSON_PlayerPosition.append(Json::Value(GetPosY()));
+	JSON_PlayerPosition.append(Json::Value(GetPosZ()));
 
 	Json::Value JSON_PlayerRotation;
-	JSON_PlayerRotation.append( Json::Value( GetRotation() ) );
-	JSON_PlayerRotation.append( Json::Value( GetPitch() ) );
-	JSON_PlayerRotation.append( Json::Value( GetRoll() ) );
+	JSON_PlayerRotation.append(Json::Value(GetRotation()));
+	JSON_PlayerRotation.append(Json::Value(GetPitch()));
+	JSON_PlayerRotation.append(Json::Value(GetRoll()));
 
 	Json::Value JSON_Inventory;
-	m_Inventory.SaveToJson( JSON_Inventory );
+	m_Inventory.SaveToJson(JSON_Inventory);
 
 	Json::Value root;
-	root["position"] = JSON_PlayerPosition;
-	root["rotation"] = JSON_PlayerRotation;
-	root["inventory"] = JSON_Inventory;
-	root["health"] = m_Health;
-	root["food"] = m_FoodLevel;
+	root["position"]       = JSON_PlayerPosition;
+	root["rotation"]       = JSON_PlayerRotation;
+	root["inventory"]      = JSON_Inventory;
+	root["health"]         = m_Health;
+	root["food"]           = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;
+	root["foodTickTimer"]  = m_FoodTickTimer;
+	root["foodExhaustion"] = m_FoodExhaustionLevel;
 	root["world"] = GetWorld()->GetName();
 
 	if (m_GameMode == GetWorld()->GetGameMode())
@@ -1126,7 +1165,7 @@ bool cPlayer::SaveToDisk()
 	}
 
 	Json::StyledWriter writer;
-	std::string JsonData = writer.write( root );
+	std::string JsonData = writer.write(root);
 
 	AString SourceFile;
 	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
@@ -1174,6 +1213,112 @@ void cPlayer::UseEquippedItem()
 	}
 	
 	GetInventory().DamageEquippedItem();
+}
+
+
+
+
+
+void cPlayer::HandleFood(void)
+{
+	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
+	
+	// Remember the food level before processing, for later comparison
+	int LastFoodLevel = m_FoodLevel;
+	
+	// Heal or damage, based on the food level, using the m_FoodTickTimer:
+	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
+	{
+		m_FoodTickTimer++;
+		if (m_FoodTickTimer >= 80)
+		{
+			m_FoodTickTimer = 0;
+
+			if (m_FoodLevel >= 17)
+			{
+				// Regenerate health from food, incur 3 pts of food exhaustion:
+				Heal(1);
+				m_FoodExhaustionLevel += 3;
+			}
+			else if (m_FoodLevel <= 0)
+			{
+				// Damage from starving
+				TakeDamage(dtStarving, NULL, 1, 1, 0);
+			}
+		}
+	}
+	
+	// Apply food poisoning food exhaustion:
+	if (m_FoodPoisonedTicksRemaining > 0)
+	{
+		m_FoodPoisonedTicksRemaining--;
+		m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
+	}
+
+	// Apply food exhaustion that has accumulated:
+	if (m_FoodExhaustionLevel >= 4)
+	{
+		m_FoodExhaustionLevel -= 4;
+
+		if (m_FoodSaturationLevel >= 1)
+		{
+			m_FoodSaturationLevel -= 1;
+		}
+		else
+		{
+			m_FoodLevel = std::max(m_FoodLevel - 1, 0);
+		}
+	}
+	
+	if (m_FoodLevel != LastFoodLevel)
+	{
+		SendHealth();
+	}
+}
+
+
+
+
+
+void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
+{
+	// Calculate the distance travelled, update the last pos:
+	Vector3d Movement(GetPosition() - m_LastFoodPos);
+	m_LastFoodPos = GetPosition();
+	
+	// If riding anything, apply no food exhaustion
+	if (m_AttachedTo != NULL)
+	{
+		return;
+	}
+
+	// Get the type of block the player's standing in:
+	BLOCKTYPE BlockIn;
+	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelY = (int)floor(m_LastPosY + 0.1);
+	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
+
+	// Apply the exhaustion based on distance travelled:
+	double BaseExhaustion = Movement.Length();
+	LOGD("Movement: %.03f m", BaseExhaustion);
+	if (IsSprinting())
+	{
+		// 0.1 pt per meter sprinted
+		BaseExhaustion = BaseExhaustion * 0.1;
+	}
+	else if (IsBlockWater(BlockIn))
+	{
+		// 0.015 pt per meter swum
+		BaseExhaustion = BaseExhaustion * 0.015;
+	}
+	else
+	{
+		// 0.01 pt per meter walked / sneaked
+		BaseExhaustion = BaseExhaustion * 0.01;
+	}
+	m_FoodExhaustionLevel += BaseExhaustion;
 }
 
 

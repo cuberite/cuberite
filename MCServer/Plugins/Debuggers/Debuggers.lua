@@ -5,6 +5,8 @@ ShouldDumpFunctions = true;  -- If set to true, all available functions are writ
 
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 
+g_HungerReportTick = 10;
+
 
 
 
@@ -29,6 +31,8 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/gc",      "debuggers", HandleGCCmd,           "Activates the Lua garbage collector");
 	PluginManager:BindCommand("/fast",    "debuggers", HandleFastCmd,         "Switches between fast and normal movement speed");
 	PluginManager:BindCommand("/dash",    "debuggers", HandleDashCmd,         "Switches between fast and normal sprinting speed");
+	PluginManager:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "Lists the current hunger-related variables");
+	PluginManager:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "Sets food-poisoning for 15 seconds");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -480,6 +484,19 @@ function OnTick()
 		GCOnTick = GCOnTick - 1;
 	end
 	
+	--[[
+	if (g_HungerReportTick > 0) then
+		g_HungerReportTick = g_HungerReportTick - 1;
+	else
+		g_HungerReportTick = 10;
+		cRoot:Get():GetDefaultWorld():ForEachPlayer(
+			function(a_Player)
+				a_Player:SendMessage("FoodStat: " .. a_Player:GetFoodLevel() .. " / " .. a_Player:GetFoodExhaustionLevel());
+			end
+		);
+	end
+	]]
+	
 	return false;
 end
 
@@ -496,6 +513,14 @@ function OnChunkGenerated(World, ChunkX, ChunkZ, ChunkDesc)
 
 	ChunkDesc:WriteBlockArea(BlockArea, 5, 115, 5);
 	return false;
+end
+
+
+
+
+
+function OnChat(a_Player, a_Message)
+	return false, "blabla " .. a_Message;
 end
 
 
@@ -669,8 +694,22 @@ end;
 
 
 
-function OnChat(a_Player, a_Message)
-	return false, "blabla " .. a_Message;
+function HandleHungerCmd(a_Split, a_Player)
+	a_Player:SendMessage("FoodLevel: " .. a_Player:GetFoodLevel());
+	a_Player:SendMessage("FoodSaturationLevel: " .. a_Player:GetFoodSaturationLevel());
+	a_Player:SendMessage("FoodTickTimer: " .. a_Player:GetFoodTickTimer());
+	a_Player:SendMessage("FoodExhaustionLevel: " .. a_Player:GetFoodExhaustionLevel());
+	a_Player:SendMessage("FoodPoisonedTicksRemaining: " .. a_Player:GetFoodPoisonedTicksRemaining());
+	return true;
+end
+
+
+
+
+
+function HandlePoisonCmd(a_Split, a_Player)
+	a_Player:FoodPoison(15 * 20);
+	return true;
 end
 
 

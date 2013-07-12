@@ -501,6 +501,13 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		SendPlayerMoveLook();
 		return;
 	}
+	
+	// If a jump just started, process food exhaustion:
+	if ((a_PosY > m_Player->GetPosY()) && !a_IsOnGround && m_Player->IsOnGround())
+	{
+		m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
+	}
+	
 	m_Player->MoveTo(Pos);
 	m_Player->SetStance(a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
@@ -1054,6 +1061,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 {
 	// TODO: Let plugins interfere via a hook
 	
+	// If it is a right click, call the entity's OnRightClicked() handler:
 	if (!a_IsLeftClick)
 	{
 		class cRclkEntity : public cEntityCallback
@@ -1062,7 +1070,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 			virtual bool Item(cEntity * a_Entity) override
 			{
 				a_Entity->OnRightClicked(m_Player);
-				return true;
+				return false;
 			}
 		public:
 			cRclkEntity(cPlayer & a_Player) : m_Player(a_Player) {}
@@ -1073,24 +1081,22 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 		return;
 	}
 
+	// If it is a left click, attack the entity:
 	class cDamageEntity : public cEntityCallback
 	{
 		virtual bool Item(cEntity * a_Entity) override
 		{
 			if (!a_Entity->GetWorld()->IsPVPEnabled())
 			{
-				// PVP is disabled
-				if (a_Entity->IsA("cPlayer") && m_Attacker->IsA("cPlayer"))
+				// PVP is disabled, disallow players hurting other players:
+				if (a_Entity->IsPlayer())
 				{
 					// Player is hurting another player which is not allowed when PVP is disabled so ignore it
 					return true;
 				}
 			}
-			if (a_Entity->IsA("cPawn"))
-			{
-				reinterpret_cast<cPawn *>(a_Entity)->TakeDamage(*m_Attacker);
-			}
-			return true;
+			a_Entity->TakeDamage(*m_Attacker);
+			return false;
 		}
 	public:
 		cPawn * m_Attacker;
@@ -1099,7 +1105,11 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 	Callback.m_Attacker = m_Player;
 
 	cWorld * World = m_Player->GetWorld();
-	World->DoWithEntityByID(a_TargetEntityID, Callback);
+	if (World->DoWithEntityByID(a_TargetEntityID, Callback))
+	{
+		// Any kind of an attack implies food exhaustion
+		m_Player->AddFoodExhaustion(0.3);
+	}
 }
 
 
