@@ -321,6 +321,56 @@ EMCSBiome StringToBiome(const AString & a_BiomeString)
 
 
 
+int StringToMobType(const AString & a_MobString)
+{
+	static struct {
+		int m_MobType;
+		const char * m_String;
+	} MobMap [] =
+	{
+		{E_ENTITY_TYPE_CREEPER,       "Creeper"},
+		{E_ENTITY_TYPE_SKELETON,      "Skeleton"},
+		{E_ENTITY_TYPE_SPIDER,        "Spider"},
+		{E_ENTITY_TYPE_GIANT,         "Giant"},
+		{E_ENTITY_TYPE_ZOMBIE,        "Zombie"},
+		{E_ENTITY_TYPE_SLIME,         "Slime"},
+		{E_ENTITY_TYPE_GHAST,         "Ghast"},
+		{E_ENTITY_TYPE_ZOMBIE_PIGMAN, "ZombiePigman"},
+		{E_ENTITY_TYPE_ENDERMAN,      "Enderman"},
+		{E_ENTITY_TYPE_CAVE_SPIDER,   "CaveSpider"},
+		{E_ENTITY_TYPE_SILVERFISH,    "SilverFish"},
+		{E_ENTITY_TYPE_BLAZE,         "Blaze"},
+		{E_ENTITY_TYPE_MAGMA_CUBE,    "MagmaCube"},
+		{E_ENTITY_TYPE_ENDER_DRAGON,  "EnderDragon"},
+		{E_ENTITY_TYPE_WITHER,        "Wither"},
+		{E_ENTITY_TYPE_BAT,           "Bat"},
+		{E_ENTITY_TYPE_WITCH,         "Witch"},
+		{E_ENTITY_TYPE_PIG,           "Pig"},
+		{E_ENTITY_TYPE_SHEEP,         "Sheep"},
+		{E_ENTITY_TYPE_COW,           "Cow"},
+		{E_ENTITY_TYPE_CHICKEN,       "Chicken"},
+		{E_ENTITY_TYPE_SQUID,         "Squid"},
+		{E_ENTITY_TYPE_WOLF,          "Wolf"},
+		{E_ENTITY_TYPE_MOOSHROOM,     "Mushroom"},
+		{E_ENTITY_TYPE_SNOW_GOLEM,    "SnowGolem"},
+		{E_ENTITY_TYPE_OCELOT,        "Ocelot"},
+		{E_ENTITY_TYPE_IRON_GOLEM,    "IronGolem"}, 
+		{E_ENTITY_TYPE_VILLAGER,      "Villager"},
+	};
+	for (int i = 0; i < ARRAYCOUNT(MobMap); i++)
+	{
+		if (NoCaseCompare(MobMap[i].m_String, a_MobString) == 0)
+		{
+			return MobMap[i].m_MobType;
+		}
+	}  // for i - MobMap[]
+	return (int)-1;
+}
+
+
+
+
+
 eDimension StringToDimension(const AString & a_DimensionString)
 {
 	// First try decoding as a number

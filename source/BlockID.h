@@ -688,6 +688,9 @@ extern AString ItemToFullString(const cItem & a_Item);
 /// Translates a biome string to biome enum. Takes either a number or a biome alias (built-in). Returns -1 on failure.
 extern EMCSBiome StringToBiome(const AString & a_BiomeString);
 
+/// Translates a mob string ("ocelot") to mobtype (E_ENTITY_TYPE_OCELOT)
+extern int StringToMobType(const AString & a_MobString);
+
 /// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns -1000 on failure
 extern eDimension StringToDimension(const AString & a_DimensionString);
 

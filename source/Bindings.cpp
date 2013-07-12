@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/09/13 09:51:25.
+** Generated automatically by tolua++-1.0.92 on 07/12/13 22:26:52.
 */
 
 #ifndef __cplusplus
@@ -2556,6 +2556,36 @@ static int tolua_AllToLua_StringToBiome00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'StringToBiome'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: StringToMobType */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_StringToMobType00
+static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const AString a_MobString = ((const AString)  tolua_tocppstring(tolua_S,1,0));
+  {
+   int tolua_ret = (int)  StringToMobType(a_MobString);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   tolua_pushcppstring(tolua_S,(const char*)a_MobString);
+  }
+ }
+ return 2;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'StringToMobType'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28538,6 +28568,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_function(tolua_S,"ItemTypeToString",tolua_AllToLua_ItemTypeToString00);
   tolua_function(tolua_S,"ItemToFullString",tolua_AllToLua_ItemToFullString00);
   tolua_function(tolua_S,"StringToBiome",tolua_AllToLua_StringToBiome00);
+  tolua_function(tolua_S,"StringToMobType",tolua_AllToLua_StringToMobType00);
   tolua_function(tolua_S,"StringToDimension",tolua_AllToLua_StringToDimension00);
   tolua_function(tolua_S,"DamageTypeToString",tolua_AllToLua_DamageTypeToString00);
   tolua_function(tolua_S,"StringToDamageType",tolua_AllToLua_StringToDamageType00);
