@@ -1,0 +1,15 @@
+digraph
+{
+rankdir=LR
+
+cBlockEntity -> cBlockEntityWithItems
+cBlockEntity -> cJukeboxEntity
+cBlockEntity -> cNoteEntity
+cBlockEntity -> cSignEntity
+cBlockEntityWithItems -> cChestEntity
+cBlockEntityWithItems -> cDropSpenserEntity
+cBlockEntityWithItems -> cFurnaceEntity
+cBlockEntityWithItems -> cHopperEntity
+cDropSpenserEntity -> cDropperEntity
+cDropSpenserEntity -> cDispenserEntity
+}

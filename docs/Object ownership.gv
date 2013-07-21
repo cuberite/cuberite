@@ -1,0 +1,29 @@
+digraph
+{
+rankdir=LR
+Root -> Server
+Root -> MonsterConfig
+Root -> GroupManager
+Root -> CraftingRecipes
+Root -> FurnaceRecipe
+Root -> PluginManager
+Root -> Authenticator
+Root -> World
+Server -> ListenThreadIPv4
+Server -> ListenThreadIPv6
+Server -> ClientHandle
+Server -> RCONServer
+PluginManager -> Plugin_NewLua
+PluginManager -> Plugin
+World -> SimulatorManager
+World -> SandSimulator
+World -> WaterSimulator
+World -> LavaSimulator
+World -> FireSimulator
+World -> RedstoneSimulator
+World -> WorldStorage
+World -> Player
+World -> Generator
+World -> ChunkSender
+World -> LightingThread
+}

@@ -1,0 +1,43 @@
+digraph
+{
+rankdir=LR
+
+# Entities:
+cEntity -> cFallingBlock
+cEntity -> cMinecart
+cEntity -> cPawn
+cEntity -> cPickup
+cEntity -> cTNT
+cMinecart -> cEmptyMinecart
+cMinecart -> cMinecartWithChest
+cMinecart -> cMinecartWithFurnace
+
+# Mobs:
+cPawn -> cMonster
+cMonster -> cAggressiveMonster
+cMonster -> cPassiveMonster
+cAggressiveMonster -> cPassiveAggressiveMonster
+cPassiveMonster -> cBat
+cAggressiveMonster -> cBlaze
+cAggressiveMonster -> cCaveSpider
+cPassiveMonster -> cChicken
+cPassiveMonster -> cCow
+cAggressiveMonster -> cCreeper
+cPassiveAggressiveMonster -> cEnderman
+cAggressiveMonster -> cGhast
+cAggressiveMonster -> cMagmaCube
+cPassiveMonster -> cMooshroom
+cPassiveMonster -> cOcelot
+cPassiveMonster -> cPig
+cPassiveMonster -> cSheep
+cAggressiveMonster -> cSilverfish
+cAggressiveMonster -> cSkeleton
+cAggressiveMonster -> cSlime
+cAggressiveMonster -> cSpider
+cPassiveMonster -> cSquid
+cPassiveMonster -> cVillager
+cAggressiveMonster -> cWitch
+cPassiveAggressiveMonster -> cWolf
+cAggressiveMonster -> cZombie
+cPassiveAggressiveMonster -> cZombiePigman
+}

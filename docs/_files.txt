@@ -1,0 +1,7 @@
+
+Contents of this folder:
+
+API class inheritance - blockentities.gv - a GraphViz file to visualise inheritance in the API classes in the Wiki for the cBlockEntity class' descendants
+API class inheritance - entities.gv - a GraphViz file to visualise inheritance in the API classes in the Wiki for the cEntity class' descendants
+Object ownership.gv - a GraphViz file to visualise ownership relations in the MCServer code architecture
+Springs.ods - a spreadsheet with collected statistics about the occurrence of lava / water springs based on height.
