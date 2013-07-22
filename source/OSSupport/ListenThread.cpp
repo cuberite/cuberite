@@ -14,6 +14,7 @@ cListenThread::cListenThread(cCallback & a_Callback, cSocket::eFamily a_Family, 
 	super(Printf("ListenThread %s", a_ServiceName.c_str())),
 	m_Callback(a_Callback),
 	m_Family(a_Family),
+	m_ShouldReuseAddr(false),
 	m_ServiceName(a_ServiceName)
 {
 }
