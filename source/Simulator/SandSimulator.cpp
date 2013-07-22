@@ -93,7 +93,7 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 
 void cSandSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	if (a_Chunk == NULL)
+	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
 	{
 		return;
 	}

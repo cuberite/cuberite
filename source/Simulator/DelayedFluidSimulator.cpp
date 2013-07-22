@@ -86,7 +86,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 		return;
 	}
 	
-	if (a_Chunk == NULL)
+	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
 	{
 		return;
 	}
