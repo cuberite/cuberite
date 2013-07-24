@@ -451,9 +451,15 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		HandlePhysics(a_Dt, a_Chunk);
+		if (a_Chunk.IsValid())
+		{
+			HandlePhysics(a_Dt, a_Chunk);
+		}
 	}
-	TickBurning(a_Chunk);
+	if (a_Chunk.IsValid())
+	{
+		TickBurning(a_Chunk);
+	}
 }
 
 
