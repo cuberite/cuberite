@@ -72,11 +72,20 @@ void cRoot::InputThread(void * a_Params)
 
 	cLogCommandOutputCallback Output;
 	
-	while (!(self.m_bStop || self.m_bRestart))
+	while (!(self.m_bStop || self.m_bRestart) && std::cin.good())
 	{
 		std::string Command;
 		std::getline(std::cin, Command);
-		self.ExecuteConsoleCommand(Command, Output);
+		if (!Command.empty())
+		{
+			self.ExecuteConsoleCommand(Command, Output);
+		}
+	}
+	
+	if (!(self.m_bStop || self.m_bRestart))
+	{
+		// We have come here because the std::cin has received an EOF and the server is still running; stop the server:
+		self.m_bStop = true;
 	}
 }
 
