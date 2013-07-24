@@ -40,4 +40,5 @@ cAggressiveMonster -> cWitch
 cPassiveAggressiveMonster -> cWolf
 cAggressiveMonster -> cZombie
 cPassiveAggressiveMonster -> cZombiePigman
+cPawn -> cPlayer
 }
