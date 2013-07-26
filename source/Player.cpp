@@ -1302,7 +1302,6 @@ void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
 
 	// Apply the exhaustion based on distance travelled:
 	double BaseExhaustion = Movement.Length();
-	LOGD("Movement: %.03f m", BaseExhaustion);
 	if (IsSprinting())
 	{
 		// 0.1 pt per meter sprinted
