@@ -345,10 +345,10 @@ int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning empty item",
+		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning -1",
 			__FUNCTION__, a_SlotNum, m_NumSlots
 		);
-		return 0;
+		return -1;
 	}
 
 	if (m_Slots[a_SlotNum].IsEmpty())
