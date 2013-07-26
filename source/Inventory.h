@@ -130,6 +130,12 @@ public:
 	void          SetEquippedSlotNum(int a_SlotNum);
 	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
 	
+	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
+	If the slot is empty, ignores the call.
+	Returns the new count, or -1 if the slot number is invalid.
+	*/
+	int ChangeSlotCount(int a_SlotNum, int a_AddToCount);
+	
 	/// Adds the specified damage to the specified item; deletes the item and returns true if the item broke.
 	bool DamageItem(int a_SlotNum, short a_Amount);
 

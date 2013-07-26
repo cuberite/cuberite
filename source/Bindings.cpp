@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/12/13 22:26:52.
+** Generated automatically by tolua++-1.0.92 on 07/26/13 21:48:46.
 */
 
 #ifndef __cplusplus
@@ -14304,6 +14304,42 @@ static int tolua_AllToLua_cInventory_GetEquippedSlotNum00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetEquippedSlotNum'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: ChangeSlotCount of class  cInventory */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cInventory_ChangeSlotCount00
+static int tolua_AllToLua_cInventory_ChangeSlotCount00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cInventory* self = (cInventory*)  tolua_tousertype(tolua_S,1,0);
+  int a_SlotNum = ((int)  tolua_tonumber(tolua_S,2,0));
+  int a_AddToCount = ((int)  tolua_tonumber(tolua_S,3,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ChangeSlotCount'", NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->ChangeSlotCount(a_SlotNum,a_AddToCount);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'ChangeSlotCount'.",&tolua_err);
  return 0;
 #endif
 }
@@ -29094,6 +29130,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetHotbarSlot",tolua_AllToLua_cInventory_SetHotbarSlot00);
    tolua_function(tolua_S,"SetEquippedSlotNum",tolua_AllToLua_cInventory_SetEquippedSlotNum00);
    tolua_function(tolua_S,"GetEquippedSlotNum",tolua_AllToLua_cInventory_GetEquippedSlotNum00);
+   tolua_function(tolua_S,"ChangeSlotCount",tolua_AllToLua_cInventory_ChangeSlotCount00);
    tolua_function(tolua_S,"DamageItem",tolua_AllToLua_cInventory_DamageItem00);
    tolua_function(tolua_S,"DamageEquippedItem",tolua_AllToLua_cInventory_DamageEquippedItem00);
    tolua_function(tolua_S,"GetEquippedHelmet",tolua_AllToLua_cInventory_GetEquippedHelmet00);

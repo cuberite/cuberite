@@ -336,6 +336,22 @@ bool cInventory::DamageEquippedItem(short a_Amount)
 
 
 
+int cInventory::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
+{
+	int GridSlotNum = 0;
+	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
+	if (Grid == NULL)
+	{
+		LOGWARNING("%s: invalid slot number, expected 0 .. %d, got %d; ignoring", __FUNCTION__, invNumSlots, a_SlotNum);
+		return -1;
+	}
+	return Grid->ChangeSlotCount(GridSlotNum, a_AddToCount);
+}
+
+
+
+
+
 bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
