@@ -13,10 +13,10 @@ LOGTOFILE = false
 --COMMENCE AWESOMENESS!
 function Initialize(Plugin)
 	PLUGIN = Plugin
-	
+
 	Plugin:SetName("Core")
 	Plugin:SetVersion(13)
-	
+
     --ADD HOOKS    
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
@@ -28,7 +28,7 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
-	
+
     --PLEASE ALPHA SORT http://elmosaukko.com/sort-alphabetically/ THIS LIST
     --BIND COMMANDS    
     PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
@@ -52,17 +52,18 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/stop",            "core.stop",            HandleStopCommand,            " - Stops the server");
 	PluginManager:BindCommand("/time",            "core.time",            HandleTimeCommand,            " ~ Sets the time of day");
 	PluginManager:BindCommand("/toggledownfall",  "core.toggledownfall",  HandleToggleDownfallCommand,  " - Toggles the weather");
+        PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
 	PluginManager:BindCommand("/top",             "core.top",             HandleTopCommand,             " - Teleport yourself to the top most block");
-    PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
-    PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");
+        PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
+        PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");
 	PluginManager:BindCommand("/tpaccept",        "core.teleport",        HandleTPAcceptCommand,        " ~ Accept a teleportation request");
 	PluginManager:BindCommand("/unban",           "core.unban",           HandleUnbanCommand,           " ~ Unban a player");
 	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
 	PluginManager:BindCommand("/who",             "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
 	PluginManager:BindCommand("/worlds",          "core.worlds",          HandleWorldsCommand,          " - Shows a list of all the worlds");
-	
+
 	InitConsoleCommands();
-		
+
 	--LOAD SETTINGS
 	IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
@@ -74,7 +75,7 @@ function Initialize(Plugin)
         LOGTOFILE = IniFile:GetValueSetB("SpawnProtect", "LogToFile", false)
 		IniFile:WriteFile()
 	end
-	
+
     if LimitWorldWidth ~= nil then
 	    cRoot:Get():ForEachWorld(
 		    function( World )            
@@ -104,7 +105,7 @@ function Initialize(Plugin)
 			LOGWARN("WARNING: Could not write to whitelist.ini")
 		end
 	end
-	
+
 	--LOAD BANNED (BAD LUCK, BRO)
 	BannedPlayersIni = cIniFile( Plugin:GetLocalDirectory() .. "/banned.ini" )
 	if ( BannedPlayersIni:ReadFile() == true ) then
@@ -119,7 +120,7 @@ function Initialize(Plugin)
 			LOGWARN("WARNING: Could not write to banned.ini")
 		end
 	end
-	
+
     --ADD WEB INTERFACE TABULATES (CURRENTLY DEPRECATED DUE TO LIST FORMAT BREAKING CSS)
 	Plugin:AddWebTab("Manage Server",   HandleRequest_ManageServer);
 	Plugin:AddWebTab("Server Settings", HandleRequest_ServerSettings);
@@ -128,7 +129,7 @@ function Initialize(Plugin)
 	Plugin:AddWebTab("Whitelist",       HandleRequest_WhiteList);
 	Plugin:AddWebTab("Permissions",     HandleRequest_Permissions);
 	Plugin:AddWebTab("Manage Plugins",  HandleRequest_ManagePlugins);
-	
+
 	LoadMotd()
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 
