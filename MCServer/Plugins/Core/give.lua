@@ -1,6 +1,6 @@
 function HandleGiveCommand(Split, Player)
 	if ((#Split ~= 2) and (#Split ~=3)) then
-		Player:SendMessage(cChatColor.Green .. "Usage: /item [ItemType/Name:Dmg] <Amount>");
+		Player:SendMessage(cChatColor.Green .. "Usage: /give [ItemType/Name:Dmg] <Amount>");
 		return true;
 	end
 
