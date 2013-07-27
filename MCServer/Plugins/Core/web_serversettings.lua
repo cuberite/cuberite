@@ -43,13 +43,15 @@ local function ShowGeneralSettings( Request )
 			SettingsIni:SetValue("Server", "MaxPlayers", Request.PostParams["Server_MaxPlayers"], false )
 		end
 		if( tonumber( Request.PostParams["Server_Port"] ) ~= nil ) then
-			SettingsIni:SetValue("Server", "Port", Request.PostParams["Server_Port"], false )
+            if( tonumber( Request.PostParams["Server_Port"] ) > 0 ) then
+                SettingsIni:SetValue("Server", "Port", Request.PostParams["Server_Port"], false )
+			end
 		end
 		if( tonumber( Request.PostParams["Server_PortsIPv6"] ) ~= nil ) then
 			SettingsIni:SetValue("Server", "PortsIPv6", Request.PostParams["Server_PortsIPv6"], false )
 		end
 		if( tonumber( Request.PostParams["Server_Version"] ) ~= nil ) then
-			SettingsIni:SetValue("Server", "PrimaryServerVersion", Request.PostParams["Server_Version"],    false )
+			SettingsIni:SetValue("Server", "PrimaryServerVersion", Request.PostParams["Server_Version"], false )
 		end
 		if( tonumber( Request.PostParams["Authentication_Authenticate"] ) ~= nil ) then
 			SettingsIni:SetValue("Authentication", "Authenticate", Request.PostParams["Authentication_Authenticate"], false )
