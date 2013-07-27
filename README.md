@@ -12,7 +12,7 @@ To install MCServer, you can either download the repository and compile it, or d
 
 Compilation instructions are available in the COMPILING file.
 
-Linux builds can be downloaded from [the Berboe CI server](http://ci.berboe.co.uk) and windows from xoft's [nightly build service](mc-server.xoft.cz).
+Linux builds can be downloaded from [the Berboe CI server](http://ci.berboe.co.uk) and windows from xoft's [nightly build service](http://mc-server.xoft.cz).
 
 After you've extracted the files, simply run the MCServer executable.
 
