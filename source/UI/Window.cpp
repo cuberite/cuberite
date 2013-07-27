@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Window.h"
@@ -682,7 +681,7 @@ void cWindow::BroadcastInventoryProgress(short a_Progressbar, short a_Value)
 // cInventoryWindow:
 
 cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
-	cWindow(cWindow::Inventory, "MCS-Inventory"),
+	cWindow(cWindow::Inventory, "Inventory"),
 	m_Player(a_Player)
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(2, *this));  // The creative inventory doesn't display it, but it's still counted into slot numbers
@@ -699,7 +698,7 @@ cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
 // cCraftingWindow:
 
 cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	cWindow(cWindow::Workbench, "MCS-Workbench")
+	cWindow(cWindow::Workbench, "Crafting Table")
 {
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -714,7 +713,7 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 // cChestWindow:
 
 cChestWindow::cChestWindow(cChestEntity * a_Chest) :
-	cWindow(cWindow::Chest, "MCS-SingleChest"),
+	cWindow(cWindow::Chest, "Chest"),
 	m_World(a_Chest->GetWorld()),
 	m_BlockX(a_Chest->GetPosX()),
 	m_BlockY(a_Chest->GetPosY()),
@@ -736,7 +735,7 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 
 
 cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest) :
-	cWindow(cWindow::Chest, "MCS-DoubleChest"),
+	cWindow(cWindow::Chest, "Double Chest"),
 	m_World(a_PrimaryChest->GetWorld()),
 	m_BlockX(a_PrimaryChest->GetPosX()),
 	m_BlockY(a_PrimaryChest->GetPosY()),
@@ -775,7 +774,7 @@ cChestWindow::~cChestWindow()
 // cDropSpenserWindow:
 
 cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
-	cWindow(cWindow::DropSpenser, "MCS-DropSpenser")
+	cWindow(cWindow::DropSpenser, "Dropspenser")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
@@ -791,7 +790,7 @@ cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ,
 // cHopperWindow:
 
 cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper) :
-	super(cWindow::Hopper, "MCS-Hopper")
+	super(cWindow::Hopper, "Hopper")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));
@@ -807,7 +806,7 @@ cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEn
 // cFurnaceWindow:
 
 cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :
-	cWindow(cWindow::Furnace, "MCS-Furnace")
+	cWindow(cWindow::Furnace, "Furnace")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
