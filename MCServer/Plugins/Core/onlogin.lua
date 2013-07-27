@@ -4,7 +4,7 @@ function OnLogin(Client, ProtocolVersion, Username)
 			local Server = cRoot:Get():GetServer()
 			Server:SendMessage( Username .. " tried to join, but is banned!" )
 			LOGINFO( Username .. " tried to join, but is banned!")
-			return true	-- Player is banned, return true to deny access
+            return true -- Player is banned, return true to deny access
 		end
 		if( WhiteListIni:GetValueB("WhiteListSettings", "WhiteListOn", false ) == true ) then
 			if( WhiteListIni:GetValueB("WhiteList", Username, false ) == false ) then -- not on whitelist
@@ -14,7 +14,6 @@ function OnLogin(Client, ProtocolVersion, Username)
 				return true -- Deny access to the server
 			end
 		end
-	end
-	
+	end	
 	return false
 end

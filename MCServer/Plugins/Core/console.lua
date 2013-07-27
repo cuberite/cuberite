@@ -1,17 +1,11 @@
-
--- console.lua
-
 -- Implements things related to console commands
-
-
-
-
 
 function InitConsoleCommands()
 	local PluginMgr = cPluginManager:Get();
 	
 	-- Please keep the list alpha-sorted
 	PluginMgr:BindConsoleCommand("ban",                  HandleConsoleBan,                  "Bans a player by name");
+    PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                "Unbans a player by name");
 	PluginMgr:BindConsoleCommand("banlist",              HandleConsoleBanList,              "Lists all players banned by name");
 	PluginMgr:BindConsoleCommand("banlist ips",          HandleConsoleBanList,              "Lists all players banned by IP");
 	PluginMgr:BindConsoleCommand("help",                 HandleConsoleHelp,                 "Lists all commands");
@@ -27,13 +21,9 @@ function InitConsoleCommands()
 	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               "Unloads all unused chunks");
 end
 
-
-
-
-
 function HandleConsoleBan(Split)
 	if (#Split < 2) then
-		return true, cChatColor.Green .. "Usage: /ban [Player] <Reason>";
+		return true, "Usage: ban [Player] <Reason>";
 	end
 
 	local Reason = "You have been banned"
@@ -43,15 +33,27 @@ function HandleConsoleBan(Split)
 	
 	
 	if (not(BanPlayer(Split[2], Reason))) then
-		return true, cChatColor.Green .. "Could not find player " .. Split[2];
+		return true, "Could not find player " .. Split[2];
 	end
 
 	return true, "Player " .. Split[2] .. " has been banned.";
 end
 
+function HandleConsoleUnban(Split)
+    if( #Split < 2 ) then		
+		return true, "Usage: /unban [Player]"
+	end
+	
+	if( BannedPlayersIni:GetValueB("Banned", Split[2], false) == false ) then
+		return true, Split[2] .. " is not banned!"
+	end
+	
+	BannedPlayersIni:SetValueB("Banned", Split[2], false, false)
+	BannedPlayersIni:WriteFile()
 
-
-
+	local Server = cRoot:Get():GetServer()
+	return true, "Unbanned " .. Split[2]
+end
 
 function HandleConsoleBanList(Split)
 	if (#Split == 1) then
@@ -64,10 +66,6 @@ function HandleConsoleBanList(Split)
 	
 	return true, "Unknown banlist subcommand";
 end
-
-
-
-
 
 function HandleConsoleHelp(Split)
 	local Commands = {};   -- {index => {"Command", "HelpString"} }
@@ -96,10 +94,6 @@ function HandleConsoleHelp(Split)
 	return true, Out;
 end
 
-
-
-
-
 function HandleConsoleList(Split)
 	-- Get a list of all players, one playername per line
 	local Out = "";
@@ -114,10 +108,6 @@ function HandleConsoleList(Split)
 	);
 	return true, Out;
 end
-
-
-
-
 
 function HandleConsoleListGroups(Split)
 	-- Read the groups.ini file:
@@ -139,10 +129,6 @@ function HandleConsoleListGroups(Split)
 	return true, Out;
 end
 
-
-
-
-
 function HandleConsoleNumChunks(Split)
 	local Output = {};
 	local AddNumChunks = function(World)
@@ -161,10 +147,6 @@ function HandleConsoleNumChunks(Split)
 	
 	return true, Out;
 end
-
-
-
-
 
 function HandleConsolePlayers(Split)
 	local PlayersInWorlds = {};    -- "WorldName" => [players array]
@@ -189,10 +171,6 @@ function HandleConsolePlayers(Split)
 	return true, Out;
 end
 
-
-
-
-
 function HandleConsolePrimaryServerVersion(Split)
 	if (#Split == 1) then
 		-- Display current version:
@@ -205,10 +183,6 @@ function HandleConsolePrimaryServerVersion(Split)
 	local Version = cRoot:Get():GetPrimaryServerVersion();
 	return true, "Primary server version is now #" .. Version .. ", " .. cRoot:GetProtocolVersionTextFromInt(Version);
 end
-
-
-
-
 
 function HandleConsoleRank(Split)
 	if (Split[2] == nil) or (Split[3] == nil) then
@@ -255,10 +229,6 @@ function HandleConsoleRank(Split)
 	return true, Out .. "Player " .. Split[2] .. " was moved to " .. Split[3];
 end
 
-
-
-
-
 function HandleConsoleReload(Split)
 	Server = cRoot:Get():GetServer();
 	Server:SendMessage(cChatColor.Green .. "Reloading all plugins.");
@@ -266,18 +236,10 @@ function HandleConsoleReload(Split)
 	return true;
 end
 
-
-
-
-
 function HandleConsoleSaveAll(Split)
 	cRoot:Get():SaveAllChunks();
 	return true;
 end
-
-
-
-
 
 function HandleConsoleSay(Split)
 	table.remove(Split, 1);
@@ -289,10 +251,6 @@ function HandleConsoleSay(Split)
 	cRoot:Get():GetServer():BroadcastChat(cChatColor.Purple .. "[SERVER] " .. Message);
 	return true;
 end
-
-
-
-
 
 function HandleConsoleUnload(Split)
 	local UnloadChunks = function(World)
@@ -306,11 +264,6 @@ function HandleConsoleUnload(Split)
 end
 
 
-
-
-
-
--------------------------------------------------------------------------------------------
 -- Helper functions:
 
 --- Returns the list of players banned by name, separated by ", "
@@ -328,16 +281,8 @@ function BanListByName()
 	return table.concat(Banned, ", ");
 end
 
-
-
-
-
 --- Returns the list of players banned by IP, separated by ", "
 function BanListByIPs()
 	-- TODO: No IP ban implemented yet
 	return "";
 end
-
-
-
-

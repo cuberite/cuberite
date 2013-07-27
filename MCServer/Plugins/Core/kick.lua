@@ -16,10 +16,6 @@ function HandleKickCommand( Split, Player )
 	return true
 end
 
-
-
-
-
 --- Kicks a player by name, with the specified reason; returns bool whether found and player's real name
 function KickPlayer(PlayerName, Reason)
 	local RealName = "";
