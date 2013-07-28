@@ -33,6 +33,8 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/dash",    "debuggers", HandleDashCmd,         "Switches between fast and normal sprinting speed");
 	PluginManager:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "Lists the current hunger-related variables");
 	PluginManager:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "Sets food-poisoning for 15 seconds");
+	PluginManager:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "Sets the food level to zero");
+	PluginManager:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "Sets the food level to the given value");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -709,6 +711,31 @@ end
 
 function HandlePoisonCmd(a_Split, a_Player)
 	a_Player:FoodPoison(15 * 20);
+	return true;
+end
+
+
+
+
+
+function HandleStarveCmd(a_Split, a_Player)
+	a_Player:SetFoodLevel(0);
+	a_Player:SendMessage("You are now starving");
+	return true;
+end
+
+
+
+
+
+function HandleFoodLevelCmd(a_Split, a_Player)
+	if (#a_Split ~= 2) then
+		a_Player:SendMessage("Missing an argument: the food level to set");
+		return true;
+	end
+	
+	a_Player:SetFoodLevel(tonumber(a_Split[2]));
+	a_Player:SendMessage("Food level set to " .. a_Player:GetFoodLevel());
 	return true;
 end
 
