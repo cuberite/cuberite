@@ -1323,6 +1323,7 @@ void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
 	
 	// Calculate the distance travelled, update the last pos:
 	Vector3d Movement(GetPosition() - m_LastFoodPos);
+	Movement.y = 0;  // Only take XZ movement into account
 	m_LastFoodPos = GetPosition();
 	
 	// If riding anything, apply no food exhaustion
