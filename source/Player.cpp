@@ -505,6 +505,10 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 void cPlayer::Respawn(void)
 {
 	m_Health = GetMaxHealth();
+	
+	// Reset food level:
+	m_FoodLevel = 20;
+	m_FoodSaturationLevel = 5;
 
 	m_ClientHandle->SendRespawn();
 	
