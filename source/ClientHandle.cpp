@@ -801,6 +801,11 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	}
 	else if (ItemHandler->IsFood())
 	{
+		if (m_Player->IsSatiated())
+		{
+			// The player is satiated, they cannot eat
+			return;
+		}
 		m_Player->StartEating();
 		if (PlgMgr->CallHookPlayerEating(*m_Player))
 		{

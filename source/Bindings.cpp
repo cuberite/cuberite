@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/26/13 21:48:46.
+** Generated automatically by tolua++-1.0.92 on 07/28/13 22:51:46.
 */
 
 #ifndef __cplusplus
@@ -8439,166 +8439,6 @@ static int tolua_AllToLua_cPlayer_GetGameMode00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetIP of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetIP00
-static int tolua_AllToLua_cPlayer_GetIP00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetIP'", NULL);
-#endif
-  {
-   std::string tolua_ret = (std::string)  self->GetIP();
-   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetIP'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetLastBlockActionTime of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetLastBlockActionTime00
-static int tolua_AllToLua_cPlayer_GetLastBlockActionTime00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLastBlockActionTime'", NULL);
-#endif
-  {
-   float tolua_ret = (float)  self->GetLastBlockActionTime();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetLastBlockActionTime'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: GetLastBlockActionCnt of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetLastBlockActionCnt00
-static int tolua_AllToLua_cPlayer_GetLastBlockActionCnt00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetLastBlockActionCnt'", NULL);
-#endif
-  {
-   int tolua_ret = (int)  self->GetLastBlockActionCnt();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'GetLastBlockActionCnt'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SetLastBlockActionCnt of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetLastBlockActionCnt00
-static int tolua_AllToLua_cPlayer_SetLastBlockActionCnt00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-  int tolua_var_1 = ((int)  tolua_tonumber(tolua_S,2,0));
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetLastBlockActionCnt'", NULL);
-#endif
-  {
-   self->SetLastBlockActionCnt(tolua_var_1);
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetLastBlockActionCnt'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: SetLastBlockActionTime of class  cPlayer */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetLastBlockActionTime00
-static int tolua_AllToLua_cPlayer_SetLastBlockActionTime00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cPlayer* self = (cPlayer*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetLastBlockActionTime'", NULL);
-#endif
-  {
-   self->SetLastBlockActionTime();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'SetLastBlockActionTime'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* method: SetGameMode of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetGameMode00
 static int tolua_AllToLua_cPlayer_SetGameMode00(lua_State* tolua_S)
@@ -8627,6 +8467,134 @@ static int tolua_AllToLua_cPlayer_SetGameMode00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'SetGameMode'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsGameModeCreative of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsGameModeCreative00
+static int tolua_AllToLua_cPlayer_IsGameModeCreative00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsGameModeCreative'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsGameModeCreative();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsGameModeCreative'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsGameModeSurvival of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsGameModeSurvival00
+static int tolua_AllToLua_cPlayer_IsGameModeSurvival00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsGameModeSurvival'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsGameModeSurvival();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsGameModeSurvival'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsGameModeAdventure of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsGameModeAdventure00
+static int tolua_AllToLua_cPlayer_IsGameModeAdventure00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsGameModeAdventure'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsGameModeAdventure();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsGameModeAdventure'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetIP of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_GetIP00
+static int tolua_AllToLua_cPlayer_GetIP00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetIP'", NULL);
+#endif
+  {
+   AString tolua_ret = (AString)  self->GetIP();
+   tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetIP'.",&tolua_err);
  return 0;
 #endif
 }
@@ -9334,6 +9302,38 @@ static int tolua_AllToLua_cPlayer_GetFoodPoisonedTicksRemaining00(lua_State* tol
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: IsSatiated of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsSatiated00
+static int tolua_AllToLua_cPlayer_IsSatiated00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsSatiated'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsSatiated();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsSatiated'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: SetFoodLevel of class  cPlayer */
 #ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_SetFoodLevel00
 static int tolua_AllToLua_cPlayer_SetFoodLevel00(lua_State* tolua_S)
@@ -9596,6 +9596,38 @@ static int tolua_AllToLua_cPlayer_FoodPoison00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'FoodPoison'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsEating of class  cPlayer */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cPlayer_IsEating00
+static int tolua_AllToLua_cPlayer_IsEating00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cPlayer* self = (const cPlayer*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsEating'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsEating();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsEating'.",&tolua_err);
  return 0;
 #endif
 }
@@ -11370,6 +11402,102 @@ static int tolua_AllToLua_cWorld_GetGameMode00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetGameMode'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsGameModeCreative of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsGameModeCreative00
+static int tolua_AllToLua_cWorld_IsGameModeCreative00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsGameModeCreative'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsGameModeCreative();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsGameModeCreative'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsGameModeSurvival of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsGameModeSurvival00
+static int tolua_AllToLua_cWorld_IsGameModeSurvival00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsGameModeSurvival'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsGameModeSurvival();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsGameModeSurvival'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsGameModeAdventure of class  cWorld */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cWorld_IsGameModeAdventure00
+static int tolua_AllToLua_cWorld_IsGameModeAdventure00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const cWorld* self = (const cWorld*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsGameModeAdventure'", NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsGameModeAdventure();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsGameModeAdventure'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28665,6 +28793,8 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"gmSurvival",gmSurvival);
   tolua_constant(tolua_S,"gmCreative",gmCreative);
   tolua_constant(tolua_S,"gmAdventure",gmAdventure);
+  tolua_constant(tolua_S,"gmMax",gmMax);
+  tolua_constant(tolua_S,"gmMin",gmMin);
   tolua_constant(tolua_S,"eWeather_Sunny",eWeather_Sunny);
   tolua_constant(tolua_S,"eWeather_Rain",eWeather_Rain);
   tolua_constant(tolua_S,"eWeather_ThunderStorm",eWeather_ThunderStorm);
@@ -28892,6 +29022,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_beginmodule(tolua_S,"cPlayer");
    tolua_constant(tolua_S,"MAX_HEALTH",cPlayer::MAX_HEALTH);
    tolua_constant(tolua_S,"MAX_FOOD_LEVEL",cPlayer::MAX_FOOD_LEVEL);
+   tolua_constant(tolua_S,"EATING_TICKS",cPlayer::EATING_TICKS);
    tolua_function(tolua_S,"Initialize",tolua_AllToLua_cPlayer_Initialize00);
    tolua_function(tolua_S,"GetEyeHeight",tolua_AllToLua_cPlayer_GetEyeHeight00);
    tolua_function(tolua_S,"GetEyePosition",tolua_AllToLua_cPlayer_GetEyePosition00);
@@ -28900,12 +29031,11 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetInventory",tolua_AllToLua_cPlayer_GetInventory00);
    tolua_function(tolua_S,"GetEquippedItem",tolua_AllToLua_cPlayer_GetEquippedItem00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cPlayer_GetGameMode00);
-   tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);
-   tolua_function(tolua_S,"GetLastBlockActionTime",tolua_AllToLua_cPlayer_GetLastBlockActionTime00);
-   tolua_function(tolua_S,"GetLastBlockActionCnt",tolua_AllToLua_cPlayer_GetLastBlockActionCnt00);
-   tolua_function(tolua_S,"SetLastBlockActionCnt",tolua_AllToLua_cPlayer_SetLastBlockActionCnt00);
-   tolua_function(tolua_S,"SetLastBlockActionTime",tolua_AllToLua_cPlayer_SetLastBlockActionTime00);
    tolua_function(tolua_S,"SetGameMode",tolua_AllToLua_cPlayer_SetGameMode00);
+   tolua_function(tolua_S,"IsGameModeCreative",tolua_AllToLua_cPlayer_IsGameModeCreative00);
+   tolua_function(tolua_S,"IsGameModeSurvival",tolua_AllToLua_cPlayer_IsGameModeSurvival00);
+   tolua_function(tolua_S,"IsGameModeAdventure",tolua_AllToLua_cPlayer_IsGameModeAdventure00);
+   tolua_function(tolua_S,"GetIP",tolua_AllToLua_cPlayer_GetIP00);
    tolua_function(tolua_S,"MoveTo",tolua_AllToLua_cPlayer_MoveTo00);
    tolua_function(tolua_S,"GetWindow",tolua_AllToLua_cPlayer_GetWindow00);
    tolua_function(tolua_S,"CloseWindow",tolua_AllToLua_cPlayer_CloseWindow00);
@@ -28927,6 +29057,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"GetFoodTickTimer",tolua_AllToLua_cPlayer_GetFoodTickTimer00);
    tolua_function(tolua_S,"GetFoodExhaustionLevel",tolua_AllToLua_cPlayer_GetFoodExhaustionLevel00);
    tolua_function(tolua_S,"GetFoodPoisonedTicksRemaining",tolua_AllToLua_cPlayer_GetFoodPoisonedTicksRemaining00);
+   tolua_function(tolua_S,"IsSatiated",tolua_AllToLua_cPlayer_IsSatiated00);
    tolua_function(tolua_S,"SetFoodLevel",tolua_AllToLua_cPlayer_SetFoodLevel00);
    tolua_function(tolua_S,"SetFoodSaturationLevel",tolua_AllToLua_cPlayer_SetFoodSaturationLevel00);
    tolua_function(tolua_S,"SetFoodTickTimer",tolua_AllToLua_cPlayer_SetFoodTickTimer00);
@@ -28935,6 +29066,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"Feed",tolua_AllToLua_cPlayer_Feed00);
    tolua_function(tolua_S,"AddFoodExhaustion",tolua_AllToLua_cPlayer_AddFoodExhaustion00);
    tolua_function(tolua_S,"FoodPoison",tolua_AllToLua_cPlayer_FoodPoison00);
+   tolua_function(tolua_S,"IsEating",tolua_AllToLua_cPlayer_IsEating00);
    tolua_function(tolua_S,"Respawn",tolua_AllToLua_cPlayer_Respawn00);
    tolua_function(tolua_S,"SetVisible",tolua_AllToLua_cPlayer_SetVisible00);
    tolua_function(tolua_S,"IsVisible",tolua_AllToLua_cPlayer_IsVisible00);
@@ -29037,6 +29169,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetTimeOfDay",tolua_AllToLua_cWorld_SetTimeOfDay00);
    tolua_function(tolua_S,"SetWorldTime",tolua_AllToLua_cWorld_SetWorldTime00);
    tolua_function(tolua_S,"GetGameMode",tolua_AllToLua_cWorld_GetGameMode00);
+   tolua_function(tolua_S,"IsGameModeCreative",tolua_AllToLua_cWorld_IsGameModeCreative00);
+   tolua_function(tolua_S,"IsGameModeSurvival",tolua_AllToLua_cWorld_IsGameModeSurvival00);
+   tolua_function(tolua_S,"IsGameModeAdventure",tolua_AllToLua_cWorld_IsGameModeAdventure00);
    tolua_function(tolua_S,"IsPVPEnabled",tolua_AllToLua_cWorld_IsPVPEnabled00);
    tolua_function(tolua_S,"IsDeepSnowEnabled",tolua_AllToLua_cWorld_IsDeepSnowEnabled00);
    tolua_function(tolua_S,"GetDimension",tolua_AllToLua_cWorld_GetDimension00);

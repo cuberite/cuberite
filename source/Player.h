@@ -66,7 +66,7 @@ public:
 	double GetEyeHeight(void) const;													// tolua_export
 	Vector3d GetEyePosition(void) const;												// tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
-	inline const double GetStance(void) const { return GetPosY() + 1.62; }					// tolua_export  // TODO: Proper stance when crouching etc.
+	inline const double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 	
@@ -74,9 +74,17 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	/// Returns the current gamemode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
-	eGameMode GetGameMode(void) const { return m_GameMode; }  // tolua_export
+	// tolua_begin
 	
+	/// Returns the current gamemode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
+	eGameMode GetGameMode(void) const { return m_GameMode; }
+	
+	/** Sets the gamemode for the player.
+	The gamemode may be gmNotSet, in that case the player inherits the world's gamemode.
+	Updates the gamemode on the client (sends the packet)
+	*/
+	void SetGameMode(eGameMode a_GameMode);
+
 	/// Returns true if the player is in Creative mode, either explicitly, or by inheriting from current world
 	bool IsGameModeCreative(void) const;
 	
@@ -86,17 +94,22 @@ public:
 	/// Returns true if the player is in Adventure mode, either explicitly, or by inheriting from current world
 	bool IsGameModeAdventure(void) const;
 	
-	std::string GetIP() { return m_IP; }																// tolua_export
-	float GetLastBlockActionTime() { return m_LastBlockActionTime; }									// tolua_export
-	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }										// tolua_export
-	void SetLastBlockActionCnt( int );																	// tolua_export
-	void SetLastBlockActionTime();																		// tolua_export
-	void SetGameMode( eGameMode a_GameMode );															// tolua_export
-	void LoginSetGameMode( eGameMode a_GameMode );
+	AString GetIP(void) const { return m_IP; }  // tolua_export
+
+	// tolua_end
+	
 	void SetIP(const AString & a_IP);
 
+	float GetLastBlockActionTime() { return m_LastBlockActionTime; }
+	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }
+	void SetLastBlockActionCnt( int );
+	void SetLastBlockActionTime();
+	
+	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
+	void LoginSetGameMode(eGameMode a_GameMode);
+
 	/// Tries to move to a new position, with collision checks and stuff
-	virtual void MoveTo( const Vector3d & a_NewPos );													// tolua_export
+	virtual void MoveTo( const Vector3d & a_NewPos );  // tolua_export
 
 	cWindow * GetWindow(void) { return m_CurrentWindow; }  // tolua_export
 	const cWindow * GetWindow(void) const { return m_CurrentWindow; }
@@ -148,6 +161,9 @@ public:
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
 	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
 	
+	/// Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore
+	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
+	
 	void SetFoodLevel                 (int a_FoodLevel);
 	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
 	void SetFoodTickTimer             (int a_FoodTickTimer);
@@ -162,6 +178,9 @@ public:
 	
 	/// Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two
 	void FoodPoison(int a_NumTicks);
+	
+	/// Returns true if the player is currently in the process of eating the currently equipped item
+	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
 	
 	// tolua_end
 	
@@ -235,6 +254,7 @@ public:
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
+	virtual bool IsRclking  (void) const { return IsEating(); }
 
 protected:
 	typedef std::map< std::string, bool > PermissionMap;

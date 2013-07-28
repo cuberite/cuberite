@@ -705,7 +705,7 @@ void cPlayer::SetLastBlockActionCnt( int a_LastBlockActionCnt )
 
 void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
-	if ((a_GameMode >= 3) || (a_GameMode < 0))
+	if ((a_GameMode >= gmMin) || (a_GameMode < gmMax))
 	{
 		LOGWARNING("%s: Setting invalid gamemode: %d", GetName().c_str(), a_GameMode);
 		return;
