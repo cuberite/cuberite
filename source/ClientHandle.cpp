@@ -555,11 +555,8 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 			cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 			if (ItemHandler->IsFood())
 			{
-				if (PlgMgr->CallHookPlayerEating(*m_Player))
-				{
-					// A plugin doesn't agree with the action. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
-					return;
-				}
+				m_Player->AbortEating();
+				return;
 			}
 			else
 			{
@@ -569,7 +566,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 					return;
 				}
 			}
-			LOGINFO("%s: Status SHOOT / EAT not implemented", __FUNCTION__);
+			LOGINFO("%s: Status SHOOT not implemented", __FUNCTION__);
 			return;
 		}
 		
@@ -804,15 +801,14 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	}
 	else if (ItemHandler->IsFood())
 	{
-		cItem Item;
-		Item.m_ItemType = Equipped.m_ItemType;
-		Item.m_ItemCount = 1;
-		if (ItemHandler->EatItem(m_Player, &Item))
+		m_Player->StartEating();
+		if (PlgMgr->CallHookPlayerEating(*m_Player))
 		{
-			ItemHandler->OnFoodEaten(World, m_Player, &Item);
-			m_Player->GetInventory().RemoveOneEquippedItem();
+			// A plugin won't let us eat, abort (send the proper packets to the client, too):
+			m_Player->AbortEating();
 			return;
 		}
+		return;
 	}
 	else
 	{

@@ -20,6 +20,7 @@
 #include "OSSupport/Timer.h"
 #include "MersenneTwister.h"
 #include "Chunk.h"
+#include "Items/ItemHandler.h"
 
 #include "Vector3d.h"
 #include "Vector3f.h"
@@ -58,6 +59,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_SprintingMaxSpeed(0.13)
 	, m_IsCrouched(false)
 	, m_IsSprinting(false)
+	, m_EatingFinishTick(-1)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -189,6 +191,11 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		m_World->CollectPickupsByPlayer(this);
 
+		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
+		{
+			FinishEating();
+		}
+		
 		HandleFood();
 	}
 	
@@ -343,6 +350,57 @@ void cPlayer::FoodPoison(int a_NumTicks)
 		// TODO: Send the poisoning indication to the client - how?
 		SendHealth();
 	}
+}
+
+
+
+
+
+void cPlayer::StartEating(void)
+{
+	// Set the timer:
+	m_EatingFinishTick = m_World->GetWorldAge() + EATING_TICKS;
+	
+	// Send the packets:
+	m_World->BroadcastPlayerAnimation(*this, 5);
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+void cPlayer::FinishEating(void)
+{
+	// Reset the timer:
+	m_EatingFinishTick = -1;
+	
+	// Send the packets:
+	m_ClientHandle->SendEntityStatus(*this, ENTITY_STATUS_EATING_ACCEPTED);
+	m_World->BroadcastPlayerAnimation(*this, 0);
+	m_World->BroadcastEntityMetadata(*this);
+
+	// consume the item:
+	cItem Item(GetEquippedItem());
+	Item.m_ItemCount = 1;
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Item.m_ItemType);
+	if (!ItemHandler->EatItem(this, &Item))
+	{
+		return;
+	}
+	ItemHandler->OnFoodEaten(m_World, this, &Item);
+	GetInventory().RemoveOneEquippedItem();
+}
+
+
+
+
+
+void cPlayer::AbortEating(void)
+{
+	m_EatingFinishTick = -1;
+	m_World->BroadcastPlayerAnimation(*this, 0);
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 

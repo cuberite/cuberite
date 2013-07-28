@@ -28,6 +28,7 @@ public:
 	{
 		MAX_HEALTH = 20,
 		MAX_FOOD_LEVEL = 20,
+		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
 	} ;
 	// tolua_end
 	
@@ -164,6 +165,15 @@ public:
 	
 	// tolua_end
 	
+	/// Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet
+	void StartEating(void);
+	
+	/// Finishes eating the currently equipped item. Consumes the item, updates health and broadcasts the packets
+	void FinishEating(void);
+	
+	/// Aborts the current eating operation
+	void AbortEating(void);
+	
 	virtual void KilledBy(cEntity * a_Killer) override;
 	
 	void Respawn(void);															// tolua_export
@@ -295,6 +305,9 @@ protected:
 	
 	bool m_IsCrouched;
 	bool m_IsSprinting;
+
+	/// The world tick in which eating will be finished. -1 if not eating
+	Int64 m_EatingFinishTick;
 
 
 	virtual void Destroyed(void);
