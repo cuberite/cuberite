@@ -73,7 +73,18 @@ public:
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
-	eGameMode GetGameMode(void) const { return m_GameMode; }														// tolua_export
+	/// Returns the current gamemode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
+	eGameMode GetGameMode(void) const { return m_GameMode; }  // tolua_export
+	
+	/// Returns true if the player is in Creative mode, either explicitly, or by inheriting from current world
+	bool IsGameModeCreative(void) const;
+	
+	/// Returns true if the player is in Survival mode, either explicitly, or by inheriting from current world
+	bool IsGameModeSurvival(void) const;
+	
+	/// Returns true if the player is in Adventure mode, either explicitly, or by inheriting from current world
+	bool IsGameModeAdventure(void) const;
+	
 	std::string GetIP() { return m_IP; }																// tolua_export
 	float GetLastBlockActionTime() { return m_LastBlockActionTime; }									// tolua_export
 	int GetLastBlockActionCnt() { return m_LastBlockActionCnt; }										// tolua_export

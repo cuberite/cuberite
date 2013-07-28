@@ -505,7 +505,6 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 void cPlayer::Respawn(void)
 {
 	m_Health = GetMaxHealth();
-	m_FoodLevel = 20;
 
 	m_ClientHandle->SendRespawn();
 	
@@ -532,6 +531,36 @@ double cPlayer::GetEyeHeight(void) const
 Vector3d cPlayer::GetEyePosition(void) const
 {
 	return Vector3d( GetPosX(), m_Stance, GetPosZ() );
+}
+
+
+
+
+
+bool cPlayer::IsGameModeCreative(void) const
+{
+	return (m_GameMode == gmCreative) ||  // Either the player is explicitly in Creative
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeCreative());  // or they inherit from the world and the world is Creative
+}
+
+
+
+
+
+bool cPlayer::IsGameModeSurvival(void) const
+{
+	return (m_GameMode == gmSurvival) ||  // Either the player is explicitly in Survival
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSurvival());  // or they inherit from the world and the world is Survival
+}
+
+
+
+
+
+bool cPlayer::IsGameModeAdventure(void) const
+{
+	return (m_GameMode == gmCreative) ||  // Either the player is explicitly in Adventure
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeCreative());  // or they inherit from the world and the world is Adventure
 }
 
 
@@ -1283,6 +1312,11 @@ void cPlayer::HandleFood(void)
 
 void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
 {
+	if (IsGameModeCreative())
+	{
+		return;
+	}
+	
 	// Calculate the distance travelled, update the last pos:
 	Vector3d Movement(GetPosition() - m_LastFoodPos);
 	m_LastFoodPos = GetPosition();
