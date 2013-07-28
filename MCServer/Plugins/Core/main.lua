@@ -68,7 +68,7 @@ function Initialize(Plugin)
 	IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
 		HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
-		LimitWorld = IniFile:GetValueSetB("Worlds", "LimitWorld", true)
+		LimitWorld = IniFile:GetValueSetB("Worlds", "LimitWorld", false)
 		LimitWorldWidth = IniFile:GetValueSetI("Worlds", "LimitWorldWidth", 10)
         SPAWNPROTECT = IniFile:GetValueSetB("SpawnProtect", "Enable", true)
         PROTECTRADIUS = IniFile:GetValueSetI("SpawnProtect", "ProtectRadius", 20)
@@ -76,7 +76,7 @@ function Initialize(Plugin)
 		IniFile:WriteFile()
 	end
 
-    if LimitWorldWidth ~= nil then
+    if LimitWorld == true then
 	    cRoot:Get():ForEachWorld(
 		    function( World )            
                 LimitWorldsCuboid[World:GetName()] = cCuboid()
@@ -139,8 +139,6 @@ end
 
 --BEGIN SPAWNPROTECT LOGFILE CODE (COURTSEY OF BEARBIN)
 function WriteLog(breakPlace, X, Y, Z, player, id, meta)
-    PLUGIN = Plugin
-
 	local logText = {}
 
     table.insert(logText, player)
@@ -179,6 +177,6 @@ function WarnPlayer(Player)
 end
 
 function OnDisable()
-    LOG( "Disabled " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
+    LOG( "Disabled Core!")
 end
 --END AWESOMENESS :'(
