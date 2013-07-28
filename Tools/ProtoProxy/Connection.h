@@ -39,9 +39,10 @@ class cConnection
 	
 	enum eConnectionState
 	{
-		csUnencrypted,          // The connection is not encrypted. Packets must be decoded in order to be able to start decryption.
-		csEncryptedUnderstood,  // The communication is encrypted and so far all packets have been understood, so they can be still decoded
-		csEncryptedUnknown,     // The communication is encrypted, but an unknown packet has been received, so packets cannot be decoded anymore
+		csUnencrypted,           // The connection is not encrypted. Packets must be decoded in order to be able to start decryption.
+		csEncryptedUnderstood,   // The communication is encrypted and so far all packets have been understood, so they can be still decoded
+		csEncryptedUnknown,      // The communication is encrypted, but an unknown packet has been received, so packets cannot be decoded anymore
+		csWaitingForEncryption,  // The communication is waiting for the other line to establish encryption
 	};
 	
 	eConnectionState m_ClientState;
@@ -71,6 +72,9 @@ protected:
 
 	Decryptor m_ClientDecryptor;
 	Encryptor m_ClientEncryptor;
+	
+	AString m_ClientEncryptionBuffer;  // Buffer for the data to be sent to the client once encryption is established
+	AString m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
 	
 	/// Set to true when PACKET_PING is received from the client; will cause special parsing for server kick
 	bool m_HasClientPinged;

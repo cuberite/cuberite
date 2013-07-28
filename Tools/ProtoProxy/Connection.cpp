@@ -49,13 +49,25 @@
 	{ \
 		AString ToServer; \
 		m_ClientBuffer.ReadAgain(ToServer); \
-		if (m_ServerState == csUnencrypted) \
+		switch (m_ServerState) \
 		{ \
-			SERVERSEND(ToServer.data(), ToServer.size()); \
-		} \
-		else \
-		{ \
-			SERVERENCRYPTSEND(ToServer.data(), ToServer.size()); \
+			case csUnencrypted: \
+			{ \
+				SERVERSEND(ToServer.data(), ToServer.size()); \
+				break; \
+			} \
+			case csEncryptedUnderstood: \
+			case csEncryptedUnknown: \
+			{ \
+				SERVERENCRYPTSEND(ToServer.data(), ToServer.size()); \
+				break; \
+			} \
+			case csWaitingForEncryption: \
+			{ \
+				Log("Waiting for server encryption, queued %u bytes", ToServer.size()); \
+				m_ServerEncryptionBuffer.append(ToServer.data(), ToServer.size()); \
+				break; \
+			} \
 		} \
 		DebugSleep(50); \
 	}
@@ -64,13 +76,25 @@
 	{ \
 		AString ToClient; \
 		m_ServerBuffer.ReadAgain(ToClient); \
-		if (m_ClientState == csUnencrypted) \
+		switch (m_ClientState) \
 		{ \
-			CLIENTSEND(ToClient.data(), ToClient.size()); \
-		} \
-		else \
-		{ \
-			CLIENTENCRYPTSEND(ToClient.data(), ToClient.size()); \
+			case csUnencrypted: \
+			{ \
+				CLIENTSEND(ToClient.data(), ToClient.size()); \
+				break; \
+			} \
+			case csEncryptedUnderstood: \
+			case csEncryptedUnknown: \
+			{ \
+				CLIENTENCRYPTSEND(ToClient.data(), ToClient.size()); \
+				break; \
+			} \
+			case csWaitingForEncryption: \
+			{ \
+				Log("Waiting for client encryption, queued %u bytes", ToClient.size()); \
+				m_ClientEncryptionBuffer.append(ToClient.data(), ToClient.size()); \
+				break; \
+			} \
 		} \
 		DebugSleep(50); \
 	}
@@ -379,6 +403,7 @@ bool cConnection::RelayFromServer(void)
 	switch (m_ServerState)
 	{
 		case csUnencrypted:
+		case csWaitingForEncryption:
 		{
 			return DecodeServersPackets(Buffer, res);
 		}
@@ -419,6 +444,7 @@ bool cConnection::RelayFromClient(void)
 	switch (m_ClientState)
 	{
 		case csUnencrypted:
+		case csWaitingForEncryption:
 		{
 			return DecodeClientsPackets(Buffer, res);
 		}
@@ -1543,6 +1569,9 @@ bool cConnection::HandleServerEncryptionKeyResponse(void)
 	}
 	Log("Server communication is now encrypted");
 	m_ServerState = csEncryptedUnderstood;
+	DataLog(m_ServerEncryptionBuffer.data(), m_ServerEncryptionBuffer.size(), "Sending the queued data to server (%u bytes):", m_ServerEncryptionBuffer.size());
+	SERVERENCRYPTSEND(m_ServerEncryptionBuffer.data(), m_ServerEncryptionBuffer.size());
+	m_ServerEncryptionBuffer.clear();
 	return true;
 }
 
@@ -2459,6 +2488,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	ToServer.WriteBEShort(EncryptedLength);
 	ToServer.WriteBuf(EncryptedNonce, EncryptedLength);
 	SERVERSEND(ToServer);
+	m_ServerState = csWaitingForEncryption;
 }
 
 
@@ -2506,6 +2536,11 @@ void cConnection::StartClientEncryption(const AString & a_EncKey, const AString 
 	m_ClientDecryptor.SetKey(SharedSecret, 16, MakeParameters(Name::IV(), ConstByteArrayParameter(SharedSecret, 16))(Name::FeedbackSize(), 1));
 	Log("Client connection is now encrypted");
 	m_ClientState = csEncryptedUnderstood;
+	
+	// Send the queued data:
+	DataLog(m_ClientEncryptionBuffer.data(), m_ClientEncryptionBuffer.size(), "Sending the queued data to client (%u bytes):", m_ClientEncryptionBuffer.size());
+	CLIENTENCRYPTSEND(m_ClientEncryptionBuffer.data(), m_ClientEncryptionBuffer.size());
+	m_ClientEncryptionBuffer.clear();
 	
 	// Handle all postponed server data
 	DecodeServersPackets(NULL, 0);
