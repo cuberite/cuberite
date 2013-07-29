@@ -60,7 +60,7 @@ public:												// tolua_export
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	void AuthenticateUser(int a_ClientID);  // Called by cAuthenticator to auth the specified user
 
-	const AString & GetServerID(void) const;
+	const AString & GetServerID(void) const; // tolua_export
 	
 	void ClientDestroying(const cClientHandle * a_Client);  // Called by cClientHandle::Destroy(); stop m_SocketThreads from calling back into a_Client
 	
