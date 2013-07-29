@@ -1,4 +1,8 @@
 
+// LuaScript.cpp
+
+// Implements the cLuaScript class that loads a Lua script file to produce a web template out of it
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "LuaScript.h"
@@ -186,10 +190,14 @@ bool cLuaScript::CallFunction( const char* a_Function, AString& ReturnedString )
 
 	// Push the desired function on the stack
 	if (!LuaPushFunction(a_Function))
+	{
 		return false;
+	}
 
 	if (!LuaCallFunction(0, 1, a_Function))
+	{
 		return false;
+	}
 
 	if (lua_isstring(m_LuaState, -1))
 	{
@@ -211,12 +219,16 @@ bool cLuaScript::CallFunction( const char* a_Function, const sLuaUsertype& a_Use
 
 	// Push the desired function on the stack
 	if (!LuaPushFunction(a_Function))
+	{
 		return false;
+	}
 
 	tolua_pushusertype(m_LuaState, a_UserType.Object, a_UserType.ClassName);
 
 	if (!LuaCallFunction(1, 1, a_Function))
+	{
 		return false;
+	}
 
 	if (lua_isstring(m_LuaState, -1))
 	{
@@ -238,13 +250,17 @@ bool cLuaScript::CallFunction( const char* a_Function, const sLuaUsertype& a_Use
 
 	// Push the desired function on the stack
 	if (!LuaPushFunction(a_Function))
+	{
 		return false;
+	}
 
 	tolua_pushusertype(m_LuaState, a_UserType1.Object, a_UserType1.ClassName);
 	tolua_pushusertype(m_LuaState, a_UserType2.Object, a_UserType2.ClassName);
 
 	if (!LuaCallFunction(2, 1, a_Function))
+	{
 		return false;
+	}
 
 	if (lua_isstring(m_LuaState, -1))
 	{

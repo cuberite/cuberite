@@ -1,14 +1,31 @@
+
+// LuaScript.h
+
+// Declares the cLuaScript class that loads a Lua script file to produce a web template out of it
+
+
+
+
+
 #pragma once
 
 struct lua_State;
+
+
+
+
 
 struct sLuaUsertype
 {
 	sLuaUsertype(void* a_pObject, const char* a_pClassName) : Object(a_pObject), ClassName(a_pClassName) {}
 	//
 	void*       Object;
-    const char* ClassName;
-};
+	const char* ClassName;
+} ;
+
+
+
+
 
 class cLuaScript
 {
@@ -39,4 +56,8 @@ protected:
 	bool        LuaCallFunction(int a_NumArgs, int a_NumResults, const char * a_FunctionName );  // a_FunctionName is only used for error messages, nothing else
 private:
 	lua_State*  m_LuaState;
-};
+} ;
+
+
+
+
