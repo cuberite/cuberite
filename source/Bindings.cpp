@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 07/29/13 09:54:50.
+** Generated automatically by tolua++-1.0.92 on 07/29/13 10:58:05.
 */
 
 #ifndef __cplusplus
@@ -18883,19 +18883,15 @@ static int tolua_AllToLua_cWebAdmin_GetMemoryUsage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"const cWebAdmin",0,&tolua_err) ||
+     !tolua_isusertable(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const cWebAdmin* self = (const cWebAdmin*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetMemoryUsage'", NULL);
-#endif
   {
-   AString tolua_ret = (AString)  self->GetMemoryUsage();
+   AString tolua_ret = (AString)  cWebAdmin::GetMemoryUsage();
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }

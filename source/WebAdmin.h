@@ -63,13 +63,13 @@ public:         // tolua_export
 
 	static void         Request_Handler(webserver::http_request* r);
 
-	int                 GetPort() { return m_Port; } // tolua_export
+	int                 GetPort() { return m_Port; }  // tolua_export
 
-	sWebAdminPage       GetPage(const HTTPRequest& a_Request); // tolua_export
-	AString             GetBaseURL(const AString& a_URL); // tolua_export
+	sWebAdminPage       GetPage(const HTTPRequest& a_Request);  // tolua_export
+	AString             GetBaseURL(const AString& a_URL);  // tolua_export
 	AString             GetBaseURL(const AStringVector& a_URLSplit);
 
-	AString             GetMemoryUsage() const; // tolua_export
+	static AString      GetMemoryUsage(void);  // tolua_export
 private:
 
 #ifdef _WIN32

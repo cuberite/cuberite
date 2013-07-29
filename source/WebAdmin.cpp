@@ -243,36 +243,13 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 				Content += "\n<p><a href='" + BaseURL + "'>Go back</a></p>";
 			}
 
-			// mem usage
-#ifndef _WIN32
-			rusage resource_usage;
-			if (getrusage(RUSAGE_SELF, &resource_usage) != 0)
-			{
-				ReplaceString( Template, AString("{MEM}"), "Error :(" );
-			}
-			else
-			{
-				AString MemUsage;
-				Printf(MemUsage, "%0.2f", ((double)resource_usage.ru_maxrss / 1024 / 1024) );
-				ReplaceString(Template, AString("{MEM}"), MemUsage);
-			}
-#else
-			HANDLE hProcess = GetCurrentProcess();
-			PROCESS_MEMORY_COUNTERS pmc;
-			if( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc) ) )
-			{
-				AString MemUsage;
-				Printf(MemUsage, "%0.2f", (pmc.WorkingSetSize / 1024.f / 1024.f) );
-				ReplaceString( Template, "{MEM}", MemUsage );
-			}
-#endif
-			// end mem usage
-
-			ReplaceString( Template, "{USERNAME}",    r->username_ );
-			ReplaceString( Template, "{MENU}",        Menu );
-			ReplaceString( Template, "{PLUGIN_NAME}", FoundPlugin );
-			ReplaceString( Template, "{CONTENT}",     Content );
-			ReplaceString( Template, "{TITLE}",       "MCServer" );
+			AString MemUsage = GetMemoryUsage();
+			ReplaceString(Template, "{MEM}",         MemUsage);
+			ReplaceString(Template, "{USERNAME}",    r->username_);
+			ReplaceString(Template, "{MENU}",        Menu);
+			ReplaceString(Template, "{PLUGIN_NAME}", FoundPlugin);
+			ReplaceString(Template, "{CONTENT}",     Content);
+			ReplaceString(Template, "{TITLE}",       "MCServer");
 
 			AString NumChunks;
 			Printf(NumChunks, "%d", cRoot::Get()->GetTotalChunkCount());
@@ -436,7 +413,7 @@ AString cWebAdmin::GetBaseURL( const AStringVector& a_URLSplit )
 
 
 
-AString cWebAdmin::GetMemoryUsage() const
+AString cWebAdmin::GetMemoryUsage(void)
 {
 	AString MemUsage;
 #ifndef _WIN32
