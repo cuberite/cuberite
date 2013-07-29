@@ -18,3 +18,5 @@ memdump.xml
 ProtectionAreas.ini
 ProtectionAreas.sqlite
 helgrind.log
+settings.ini
+webadmin.ini
