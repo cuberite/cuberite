@@ -3,10 +3,11 @@ MCServer/MCServer
 ChunkWorxSave.ini
 doxy/
 Profiling
-SymSrv
+Symbols
 cloc-ignored.txt
 cloc.xml
 cloc.xsl
 *.ncb
 *.user
 *.suo
+/EveryNight.cmd
