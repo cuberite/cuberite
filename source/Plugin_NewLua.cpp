@@ -1565,7 +1565,7 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 
 
 
-AString cPlugin_NewLua::HandleWebRequest( HTTPRequest * a_Request )
+AString cPlugin_NewLua::HandleWebRequest(const HTTPRequest * a_Request )
 {
 	cCSLock Lock(m_CriticalSection);
 	std::string RetVal = "";
@@ -1592,7 +1592,7 @@ AString cPlugin_NewLua::HandleWebRequest( HTTPRequest * a_Request )
 
 		//LOGINFO("2. Stack size: %i", lua_gettop(m_LuaState) );
 		// Push HTTPRequest
-		tolua_pushusertype( m_LuaState, a_Request, "HTTPRequest" );
+		tolua_pushusertype( m_LuaState, (void*)a_Request, "const HTTPRequest" );
 		//LOGINFO("Calling bound function! :D");
 		int s = lua_pcall( m_LuaState, 1, 1, 0);
 
