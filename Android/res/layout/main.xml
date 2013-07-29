@@ -11,11 +11,11 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
+
         <Button
             android:id="@+id/stop_server"
             android:layout_width="wrap_content"
@@ -23,14 +23,14 @@
             android:layout_weight="1"
             android:enabled="true"
             android:text="@string/stop" />
-
+
         <Button
             android:id="@+id/start_server"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/start" />
-
+
         <Button
             android:id="@+id/configure_server"
             android:layout_width="wrap_content"
