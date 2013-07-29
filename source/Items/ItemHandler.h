@@ -38,16 +38,17 @@ public:
 
 	struct FoodInfo
 	{
-		FoodInfo(short a_FoodLevel, float a_Saturation, char a_PoisionChance = 0)
+		int    FoodLevel;
+		double Saturation;
+		int    PoisonChance;	 // 0 - 100, in percent. 0 = no chance of poisoning, 100 = sure poisoning
+
+		FoodInfo(int a_FoodLevel, double a_Saturation, int a_PoisonChance = 0) :
+			FoodLevel(a_FoodLevel),
+			Saturation(a_Saturation),
+			PoisonChance(a_PoisonChance)
 		{
-			FoodLevel = a_FoodLevel;
-			Saturation = a_Saturation;
-			PoisionChance = a_PoisionChance;
 		}
-		short FoodLevel;
-		float Saturation;
-		char PoisionChance;	//0 - 100
-	};
+	} ;
 
 	/// Returns the FoodInfo for this item. (FoodRecovery, Saturation and PoisionChance)
 	virtual FoodInfo GetFoodInfo();

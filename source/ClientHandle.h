@@ -281,6 +281,9 @@ private:
 	
 	/// Buffer for received messages to be processed in the Tick thread
 	AStringList m_PendingMessages;
+
+	static int s_ClientCount;
+	int m_UniqueID;
 	
 
 
@@ -307,14 +310,11 @@ private:
 	
 	/// Processes the messages in m_PendingMessages; called from the Tick thread
 	void ProcessPendingMessages(void);
-
+	
 	// cSocketThreads::cCallback overrides:
 	virtual void DataReceived   (const char * a_Data, int a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
-
-	static int s_ClientCount;
-	int m_UniqueID;
 };										// tolua_export
 
 
