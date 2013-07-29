@@ -86,10 +86,10 @@ public:
 	virtual bool CanAddHook(cPluginManager::PluginHook a_Hook) override;
 	
 	// cWebPlugin override
-	virtual const AString & GetWebTitle(void) const {return GetName(); }
+	virtual const AString GetWebTitle(void) const {return GetName(); }
 
 	// cWebPlugin and WebAdmin stuff
-	virtual AString HandleWebRequest( HTTPRequest * a_Request ) override;
+	virtual AString HandleWebRequest(const HTTPRequest * a_Request ) override;
 	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);	// >> EXPORTED IN MANUALBINDINGS <<
 	
 	/// Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap.

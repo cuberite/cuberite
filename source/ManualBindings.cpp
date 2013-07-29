@@ -1272,6 +1272,59 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 
 
 
+static int tolua_cWebAdmin_GetPlugins(lua_State * tolua_S)
+{
+	cWebAdmin* self = (cWebAdmin*)  tolua_tousertype(tolua_S,1,0);
+
+	const cWebAdmin::PluginList & AllPlugins = self->GetPlugins();
+
+	lua_createtable(tolua_S, AllPlugins.size(), 0);
+	int newTable = lua_gettop(tolua_S);
+	int index = 1;
+	cWebAdmin::PluginList::const_iterator iter = AllPlugins.begin();
+	while(iter != AllPlugins.end())
+	{
+		const cWebPlugin* Plugin = *iter;
+		tolua_pushusertype( tolua_S, (void*)Plugin, "const cWebPlugin" );
+		lua_rawseti(tolua_S, newTable, index);
+		++iter;
+		++index;
+	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
+{
+	cWebPlugin* self = (cWebPlugin*)  tolua_tousertype(tolua_S,1,0);
+
+	const cWebPlugin::TabNameList & TabNames = self->GetTabNames();
+
+	lua_newtable(tolua_S);
+	int newTable = lua_gettop(tolua_S);
+	int index = 1;
+	cWebPlugin::TabNameList::const_iterator iter = TabNames.begin();
+	while(iter != TabNames.end())
+	{
+		const AString & FancyName = iter->first;
+		const AString & WebName = iter->second;
+		tolua_pushstring( tolua_S, WebName.c_str() ); // Because the WebName is supposed to be unique, use it as key
+		tolua_pushstring( tolua_S, FancyName.c_str() );
+		//
+		lua_rawset(tolua_S, -3);
+		++iter;
+		++index;
+	}
+	return 1;
+}
+
+
+
+
+
 static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 {
 	tolua_Error tolua_err;
@@ -1376,6 +1429,14 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_variable(tolua_S,"Params",tolua_get_HTTPRequest_Params,0);
 			tolua_variable(tolua_S,"PostParams",tolua_get_HTTPRequest_PostParams,0);
 			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cWebAdmin");
+			tolua_function(tolua_S, "GetPlugins", tolua_cWebAdmin_GetPlugins);
+		tolua_endmodule(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cWebPlugin");
+			tolua_function(tolua_S, "GetTabNames", tolua_cWebPlugin_GetTabNames);
 		tolua_endmodule(tolua_S);
 			
 		tolua_beginmodule(tolua_S, "cClientHandle");
