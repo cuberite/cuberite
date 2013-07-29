@@ -59,7 +59,7 @@ std::list<std::pair<AString, AString> > cWebPlugin::GetTabNames(void)
 
 
 
-std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(HTTPRequest * a_Request)
+std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest * a_Request)
 {
 	std::pair< AString, AString > Names;
 	AStringVector Split = StringSplit(a_Request->Path, "/");
