@@ -60,6 +60,7 @@ public:
 	virtual void SendCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity      (const cEntity & a_Entity) = 0;
 	virtual void SendDisconnect         (const AString & a_Reason) = 0;
+	virtual void SendEditSign           (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendEntityHeadLook     (const cEntity & a_Entity) = 0;
 	virtual void SendEntityLook         (const cEntity & a_Entity) = 0;

@@ -278,6 +278,19 @@ void cProtocol125::SendDisconnect(const AString & a_Reason)
 
 
 
+
+void cProtocol125::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// This protocol version doesn't support this packet, sign editor is invoked by the client automatically
+	UNUSED(a_BlockX);
+	UNUSED(a_BlockY);
+	UNUSED(a_BlockZ);
+}
+
+
+
+
+
 void cProtocol125::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	cCSLock Lock(m_CSPacket);

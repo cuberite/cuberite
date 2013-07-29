@@ -66,6 +66,17 @@ public:
 		}
 		return 0x2;
 	}	
+
+
+	virtual void OnPlacedByPlayer(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	) override
+	{
+		a_Player->GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+	}
 } ;
 
 

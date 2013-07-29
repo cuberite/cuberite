@@ -1491,6 +1491,15 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 
 
 
+void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 void cClientHandle::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);

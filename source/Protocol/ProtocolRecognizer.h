@@ -67,6 +67,7 @@ public:
 	virtual void SendCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity      (const cEntity & a_Entity) override;
 	virtual void SendDisconnect         (const AString & a_Reason) override;
+	virtual void SendEditSign           (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook     (const cEntity & a_Entity) override;
 	virtual void SendEntityLook         (const cEntity & a_Entity) override;

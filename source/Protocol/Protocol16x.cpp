@@ -43,6 +43,7 @@ enum
 	PACKET_ATTACH_ENTITY     = 0x27,
 	PACKET_ENTITY_PROPERTIES = 0x2c,
 	PACKET_WINDOW_OPEN       = 0x64,
+	PACKET_TILE_EDITOR_OPEN  = 0x85,
 	PACKET_PLAYER_ABILITIES  = 0xca,
 } ;
 
@@ -80,6 +81,22 @@ void cProtocol161::SendChat(const AString & a_Message)
 {
 	super::SendChat(Printf("{\"text\":\"%s\"}", EscapeString(a_Message).c_str()));
 }
+
+
+
+
+
+void cProtocol161::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_TILE_EDITOR_OPEN);
+	WriteByte(0);
+	WriteInt(a_BlockX);
+	WriteInt(a_BlockY);
+	WriteInt(a_BlockZ);
+	Flush();
+}
+
 
 
 

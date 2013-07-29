@@ -201,6 +201,16 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 
 
 
+void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_Protocol != NULL);

@@ -97,6 +97,7 @@ public:
 	void SendCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player);
 	void SendDestroyEntity      (const cEntity & a_Entity);
 	void SendDisconnect         (const AString & a_Reason);
+	void SendEditSign           (int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook     (const cEntity & a_Entity);
 	void SendEntityLook         (const cEntity & a_Entity);
