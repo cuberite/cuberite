@@ -116,6 +116,10 @@ enum eGameMode
 	gmSurvival  = eGameMode_Survival,
 	gmCreative  = eGameMode_Creative,
 	gmAdventure = eGameMode_Adventure,
+	
+	// These two are used to check GameMode for validity when converting from integers.
+	gmMax,  // Gets automatically assigned
+	gmMin = 0,
 } ;
 
 

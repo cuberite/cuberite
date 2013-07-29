@@ -6,7 +6,7 @@ banned.ini
 logs
 players
 whitelist.ini
-world
+world*
 API.txt
 *.dat
 schematics

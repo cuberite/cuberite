@@ -4,6 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Player.h"
+#include "../FastRandom.h"
 
 // Handlers:
 #include "ItemBed.h"
@@ -465,15 +466,17 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	FoodInfo Info = GetFoodInfo();
 
-	if(Info.FoodLevel > 0 || Info.Saturation > 0.f)
+	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
 	{
 		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
-		if(Success && Info.PoisionChance > 0)
+		
+		// If consumed and there's chance of foodpoisoning, do it:
+		if (Success && (Info.PoisonChance > 0))
 		{
-			MTRand r1;
-			if((r1.randInt(100) - Info.PoisionChance) <= 0)
-			{	//Unlucky guy :D
-				//TODO: Make player ill
+			cFastRandom r1;
+			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
+			{
+				a_Player->FoodPoison(300);
 			}
 		}
 

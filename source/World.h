@@ -106,7 +106,18 @@ public:
 		SetTimeOfDay(a_TimeOfDay);
 	}
 	
+	/// Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable
 	eGameMode GetGameMode(void) const { return m_GameMode; }
+
+	/// Returns true if the world is in Creative mode
+	bool IsGameModeCreative(void) const { return (m_GameMode == gmCreative); }
+	
+	/// Returns true if the world is in Survival mode
+	bool IsGameModeSurvival(void) const { return (m_GameMode == gmSurvival); }
+	
+	/// Returns true if the world is in Adventure mode
+	bool IsGameModeAdventure(void) const { return (m_GameMode == gmAdventure); }
+	
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 	

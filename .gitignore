@@ -7,3 +7,6 @@ SymSrv
 cloc-ignored.txt
 cloc.xml
 cloc.xsl
+*.ncb
+*.user
+*.suo
