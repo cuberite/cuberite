@@ -1,15 +1,8 @@
 
 -- Global variables
 PLUGIN = {};	-- Reference to own plugin object
-ShouldDumpFunctions = true;  -- If set to true, all available functions are written to the API.txt file upon plugin initialization
-
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
-
 g_HungerReportTick = 10;
-
-
-
-
 
 function Initialize(Plugin)
 	PLUGIN = Plugin
@@ -41,60 +34,12 @@ function Initialize(Plugin)
 	
 	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
 
-	-- dump all available API functions and objects:
-	if (ShouldDumpFunctions) then
-		DumpAPI();
-	end
-	
-	
 	-- TestBlockAreas();
 	-- TestSQLiteBindings();
 	-- TestExpatBindings();
 
 	return true
 end;
-
-
-
-
-
-function DumpAPI()
-	LOG("Dumping all available functions to API.txt...");
-	function dump (prefix, a, Output)
-		for i, v in pairs (a) do
-			if (type(v) == "table") then
-				if (GetChar(i, 1) ~= ".") then
-					if (v == _G) then
-						LOG(prefix .. i .. " == _G, CYCLE, ignoring");
-					elseif (v == _G.package) then
-						LOG(prefix .. i .. " == _G.package, ignoring");
-					else
-						dump(prefix .. i .. ".", v, Output)
-					end
-				end
-			elseif (type(v) == "function") then
-				if (string.sub(i, 1, 2) ~= "__") then
-					table.insert(Output, prefix .. i .. "()");
-				end
-			end
-		end
-	end
-
-	local Output = {};
-	dump("", _G, Output);
-
-	table.sort(Output);
-	local f = io.open("API.txt", "w");
-	for i, n in ipairs(Output) do
-		f:write(n, "\n");
-	end
-	f:close();
-	LOG("API.txt written.");
-end
-
-
-
-
 
 function TestBlockAreas()
 	LOG("Testing block areas...");
