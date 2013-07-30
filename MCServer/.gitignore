@@ -20,3 +20,4 @@ ProtectionAreas.sqlite
 helgrind.log
 settings.ini
 webadmin.ini
+motd.txt
