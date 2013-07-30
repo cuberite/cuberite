@@ -1235,6 +1235,23 @@ void cClientHandle::HandleUnmount(void)
 
 
 
+void cClientHandle::HandleTabCompletion(const AString & a_Text)
+{
+	AStringVector Results;
+	m_Player->GetWorld()->TabCompleteUserName(a_Text, Results);
+	cRoot::Get()->GetPluginManager()->TabCompleteCommand(a_Text, Results);
+	if (Results.empty())
+	{
+		return;
+	}
+	std::sort(Results.begin(), Results.end());
+	SendTabCompletionResults(Results);
+}
+
+
+
+
+
 void cClientHandle::SendData(const char * a_Data, int a_Size)
 {
 	{
@@ -1775,6 +1792,15 @@ void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType,
 void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType)
 {
 	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType);
+}
+
+
+
+
+
+void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
+{
+	m_Protocol->SendTabCompletionResults(a_Results);
 }
 
 

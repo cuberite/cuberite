@@ -2364,6 +2364,20 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 
 
 
+void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Results)
+{
+	// TODO
+	// DEBUG:
+	LOGWARNING("%s: Not implemented yet!", __FUNCTION__);
+	a_Results.push_back(a_Text + "_world1");
+	a_Results.push_back(a_Text + "_world3");
+	a_Results.push_back(a_Text + "_world2");
+}
+
+
+
+
+
 cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock)
 {
 	AString SimulatorNameKey;

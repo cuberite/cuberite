@@ -70,6 +70,7 @@ enum
 	PACKET_BLOCK_BREAK_ANIM      = 0x37,
 	PACKET_SOUND_EFFECT          = 0x3e,
 	PACKET_SOUND_PARTICLE_EFFECT = 0x3d,
+	PACKET_TAB_COMPLETION        = 0xcb,
 	PACKET_LOCALE_VIEW_DISTANCE  = 0xcc,
 	PACKET_CLIENT_STATUSES       = 0xcd,
 	PACKET_ENCRYPTION_KEY_RESP   = 0xfc,
@@ -426,6 +427,31 @@ void cProtocol132::SendSpawnMob(const cMonster & a_Mob)
 
 
 
+void cProtocol132::SendTabCompletionResults(const AStringVector & a_Results)
+{
+	if (a_Results.empty())
+	{
+		// No results to send
+		return;
+	}
+	
+	AString Serialized(a_Results[0]);
+	for (AStringVector::const_iterator itr = a_Results.begin() + 1, end = a_Results.end(); itr != end; ++itr)
+	{
+		Serialized.push_back(0);
+		Serialized.append(*itr);
+	}  // for itr - a_Results[]
+	
+	cCSLock Lock(m_CSPacket);
+	WriteByte(PACKET_TAB_COMPLETION);
+	WriteString(Serialized);
+	Flush();
+}
+
+
+
+
+
 void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	// Not used in 1.3.2
@@ -484,9 +510,10 @@ int cProtocol132::ParsePacket(unsigned char a_PacketType)
 	switch (a_PacketType)
 	{
 		default:                          return super::ParsePacket(a_PacketType);  // off-load previously known packets into cProtocol125
-		case PACKET_LOCALE_VIEW_DISTANCE: return ParseLocaleViewDistance();
 		case PACKET_CLIENT_STATUSES:      return ParseClientStatuses();
 		case PACKET_ENCRYPTION_KEY_RESP:  return ParseEncryptionKeyResponse();
+		case PACKET_LOCALE_VIEW_DISTANCE: return ParseLocaleViewDistance();
+		case PACKET_TAB_COMPLETION:       return ParseTabCompletion();
 	}
 }
 
@@ -625,6 +652,17 @@ int cProtocol132::ParsePlayerAbilities(void)
 	HANDLE_PACKET_READ(ReadChar, char, FlyingSpeed);
 	HANDLE_PACKET_READ(ReadChar, char, WalkingSpeed);
 	// TODO: m_Client->HandlePlayerAbilities(...);
+	return PARSE_OK;
+}
+
+
+
+
+
+int cProtocol132::ParseTabCompletion(void)
+{
+	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Text);
+	m_Client->HandleTabCompletion(Text);
 	return PARSE_OK;
 }
 

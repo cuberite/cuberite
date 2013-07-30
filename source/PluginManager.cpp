@@ -1335,6 +1335,20 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 
 
 
+void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & a_Results)
+{
+	// TODO
+	// DEBUG:
+	LOGWARNING("%s: Not implemented yet!", __FUNCTION__);
+	a_Results.push_back(a_Text + "_plgmgr1");
+	a_Results.push_back(a_Text + "_plgmgr3");
+	a_Results.push_back(a_Text + "_plgmgr2");
+}
+
+
+
+
+
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
 	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;

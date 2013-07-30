@@ -197,6 +197,9 @@ public:																	// tolua_export
 	/// Executes the command split into a_Split, as if it was given on the console. Returns true if executed. Output is sent to the a_Output callback
 	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
 	
+	/// Appends all commands beginning with a_Text (case-insensitive) into a_Results
+	void TabCompleteCommand(const AString & a_Text, AStringVector & a_Results);
+	
 private:
 	friend class cRoot;
 	

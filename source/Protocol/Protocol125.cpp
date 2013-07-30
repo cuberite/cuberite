@@ -782,6 +782,16 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 
 
 
+void cProtocol125::SendTabCompletionResults(const AStringVector & a_Results)
+{
+	// This protocol version doesn't support tab completion
+	UNUSED(a_Results);
+}
+
+
+
+
+
 void cProtocol125::SendTeleportEntity(const cEntity & a_Entity)
 {
 	cCSLock Lock(m_CSPacket);
