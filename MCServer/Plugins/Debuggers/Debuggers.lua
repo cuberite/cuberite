@@ -1,8 +1,13 @@
-
 -- Global variables
 PLUGIN = {};	-- Reference to own plugin object
+
 g_DropSpensersToActivate = {};  -- A list of dispensers and droppers (as {World, X, Y Z} quadruplets) that are to be activated every tick
 g_HungerReportTick = 10;
+
+
+
+
+
 
 function Initialize(Plugin)
 	PLUGIN = Plugin
@@ -40,6 +45,11 @@ function Initialize(Plugin)
 
 	return true
 end;
+
+
+
+
+
 
 function TestBlockAreas()
 	LOG("Testing block areas...");

@@ -1,11 +1,15 @@
-
 -- Global variables
 PLUGIN = {};	-- Reference to own plugin object
+
+
+
+
+
 
 function Initialize(Plugin)
 	PLUGIN = Plugin
 	
-	Plugin:SetName("DumpAPI")
+	Plugin:SetName("APIDump")
 	Plugin:SetVersion(1)
 	
 	PluginManager = cRoot:Get():GetPluginManager()
@@ -16,6 +20,11 @@ function Initialize(Plugin)
 
 	return true
 end
+
+
+
+
+
 
 function DumpAPI()
 	LOG("Dumping all available functions to API.txt...");
