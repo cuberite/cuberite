@@ -4,10 +4,12 @@ function OnPlayerPlacingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX
 		return false
 	end
 
-	if( Player:HasPermission("core.build") == false ) then
+    local PROTECTRADIUS = WorldsSpawnProtect[Player:GetWorld():GetName()];
+
+	if not (Player:HasPermission("core.build")) then
 		return true
 	else
-        if Player:HasPermission("core.spawnprotect.bypass") == false and SPAWNPROTECT == true then
+        if not (Player:HasPermission("core.spawnprotect.bypass")) and not (PROTECTRADIUS == 0) then
     	    local World = Player:GetWorld()
             local xcoord = World:GetSpawnX()
             local ycoord = World:GetSpawnY()
@@ -83,10 +85,12 @@ function OnPlayerBreakingBlock(Player, BlockX, BlockY, BlockZ, BlockFace, Status
     -- dont check if the direction is in the air
 	if (BlockFace ~= -1) then
 
-		if (Player:HasPermission("core.build") == false) then
+    local PROTECTRADIUS = WorldsSpawnProtect[Player:GetWorld():GetName()];
+
+		if not (Player:HasPermission("core.build")) then
 			return true
 		else
-            if Player:HasPermission("core.spawnprotect.bypass") == false and SPAWNPROTECT == true then
+            if not (Player:HasPermission("core.spawnprotect.bypass")) and not (PROTECTRADIUS == 0) then
     	        local World = Player:GetWorld()
 	            local xcoord = World:GetSpawnX()
 	            local ycoord = World:GetSpawnY()

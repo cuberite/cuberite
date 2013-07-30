@@ -5,9 +5,6 @@ WhiteListIni = {}
 BackCoords = {}
 Messages = {}
 LimitWorldsCuboid = {}
-SPAWNPROTECT = true
-PROTECTRADIUS = 20
-LOGTOFILE = false
 --END VARIABLES
 
 --COMMENCE AWESOMENESS!
@@ -52,10 +49,10 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/stop",            "core.stop",            HandleStopCommand,            " - Stops the server");
 	PluginManager:BindCommand("/time",            "core.time",            HandleTimeCommand,            " ~ Sets the time of day");
 	PluginManager:BindCommand("/toggledownfall",  "core.toggledownfall",  HandleToggleDownfallCommand,  " - Toggles the weather");
-        PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
+    PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
 	PluginManager:BindCommand("/top",             "core.top",             HandleTopCommand,             " - Teleport yourself to the top most block");
-        PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
-        PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");
+    PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
+    PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");
 	PluginManager:BindCommand("/tpaccept",        "core.teleport",        HandleTPAcceptCommand,        " ~ Accept a teleportation request");
 	PluginManager:BindCommand("/unban",           "core.unban",           HandleUnbanCommand,           " ~ Unban a player");
 	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
@@ -70,11 +67,19 @@ function Initialize(Plugin)
 		HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
 		LimitWorld = IniFile:GetValueSetB("Worlds", "LimitWorld", false)
 		LimitWorldWidth = IniFile:GetValueSetI("Worlds", "LimitWorldWidth", 10)
-        SPAWNPROTECT = IniFile:GetValueSetB("SpawnProtect", "Enable", true)
-        PROTECTRADIUS = IniFile:GetValueSetI("SpawnProtect", "ProtectRadius", 20)
-        LOGTOFILE = IniFile:GetValueSetB("SpawnProtect", "LogToFile", false)
 		IniFile:WriteFile()
 	end
+    
+    WorldsSpawnProtect = {}
+    local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
+    local NumValues = (IniFile:GetNumValues( KeyIdx ) - 2) --(TAKE AWAY TWO OPTIONS FOR WORLD LIMITER)
+	for i = 0, NumValues - 1 do --(FOR EVERY WORLD KEY, TAKING ACCOUNT OF OFF BY ONE ERRORS)
+        WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
+        if WorldIni:ReadFile() == true then
+            WorldsSpawnProtect[IniFile:GetValue(KeyIdx, i)]  = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", 10)
+            WorldIni:WriteFile()
+        end
+    end
 
     if LimitWorld == true then
 	    cRoot:Get():ForEachWorld(
@@ -86,6 +91,7 @@ function Initialize(Plugin)
 		    end
 	    )
     end
+
 	--LOAD WHITELIST
 	WhiteListIni = cIniFile( Plugin:GetLocalDirectory() .. "/whitelist.ini" )
 	if ( WhiteListIni:ReadFile() == true ) then
@@ -121,7 +127,7 @@ function Initialize(Plugin)
 		end
 	end
 
-    --ADD WEB INTERFACE TABULATES (CURRENTLY DEPRECATED DUE TO LIST FORMAT BREAKING CSS)
+    --ADD WEB INTERFACE TABULATES
 	Plugin:AddWebTab("Manage Server",   HandleRequest_ManageServer);
 	Plugin:AddWebTab("Server Settings", HandleRequest_ServerSettings);
 	Plugin:AddWebTab("Chat",            HandleRequest_Chat);
