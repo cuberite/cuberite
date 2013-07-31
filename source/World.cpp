@@ -2366,12 +2366,16 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 
 void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Results)
 {
-	// TODO
-	// DEBUG:
-	LOGWARNING("%s: Not implemented yet!", __FUNCTION__);
-	a_Results.push_back(a_Text + "_world1");
-	a_Results.push_back(a_Text + "_world3");
-	a_Results.push_back(a_Text + "_world2");
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
+	{
+		if (NoCaseCompare((*itr)->GetName().substr(0, a_Text.length()), a_Text) != 0)
+		{
+			// Player name doesn't match
+			continue;
+		}
+		a_Results.push_back((*itr)->GetName());
+	}
 }
 
 

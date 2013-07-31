@@ -1335,14 +1335,22 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 
 
 
-void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & a_Results)
+void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & a_Results, cPlayer * a_Player)
 {
-	// TODO
-	// DEBUG:
-	LOGWARNING("%s: Not implemented yet!", __FUNCTION__);
-	a_Results.push_back(a_Text + "_plgmgr1");
-	a_Results.push_back(a_Text + "_plgmgr3");
-	a_Results.push_back(a_Text + "_plgmgr2");
+	for (CommandMap::iterator itr = m_Commands.begin(), end = m_Commands.end(); itr != end; ++itr)
+	{
+		if (NoCaseCompare(itr->first.substr(0, a_Text.length()), a_Text) != 0)
+		{
+			// Command name doesn't match
+			continue;
+		}
+		if ((a_Player != NULL) && !a_Player->HasPermission(itr->second.m_Permission))
+		{
+			// Player doesn't have permission for the command
+			continue;
+		}
+		a_Results.push_back(itr->first);
+	}
 }
 
 
