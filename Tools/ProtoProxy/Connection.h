@@ -128,6 +128,7 @@ protected:
 	bool HandleClientPlayerPositionLook(void);
 	bool HandleClientPluginMessage(void);
 	bool HandleClientSlotSelect(void);
+	bool HandleClientTabCompletion(void);
 	bool HandleClientUpdateSign(void);
 	bool HandleClientUseEntity(void);
 	bool HandleClientWindowClick(void);
@@ -177,6 +178,7 @@ protected:
 	bool HandleServerSpawnObjectVehicle(void);
 	bool HandleServerSpawnPainting(void);
 	bool HandleServerSpawnPickup(void);
+	bool HandleServerTabCompletion(void);
 	bool HandleServerTimeUpdate(void);
 	bool HandleServerUpdateHealth(void);
 	bool HandleServerUpdateSign(void);
