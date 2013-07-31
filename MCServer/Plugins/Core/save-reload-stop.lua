@@ -1,19 +1,22 @@
 function HandleSaveAllCommand( Split, Player )
 	cRoot:Get():SaveAllChunks();
-	Player:SendMessage(cChatColor.Green .. "All the worlds are saved")
+    local Server = cRoot:Get():GetServer()
+	Server:SendMessage(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Saving all worlds!")
 	return true;
 end
 
 function HandleStopCommand( Split, Player )
     Server = cRoot:Get():GetServer()
-	Server:SendMessage( cChatColor.Green .. "Stopping the server..." )
+    local Server = cRoot:Get():GetServer()
+	Server:SendMessage(cChatColor.Red .. "[WARNING] " .. cChatColor.White .. "Server is terminating!" )
 	cRoot:Get():QueueExecuteConsoleCommand("stop")
 	return true
 end
 
 function HandleReloadCommand( Split, Player )
     Server = cRoot:Get():GetServer()
-	Server:SendMessage( cChatColor.Green .. "Reloading all plugins." )
+    local Server = cRoot:Get():GetServer()
+	Server:SendMessage(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Reloading all plugins!" )
 	cRoot:Get():GetPluginManager():ReloadPlugins()
 	return true
 end

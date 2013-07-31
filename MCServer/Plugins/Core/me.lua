@@ -5,11 +5,11 @@ function HandleMeCommand( Split, Player )
 		Message = Message .. " " .. Text;
 	end
     if  (Split[1] == nil) then
-        Player:SendMessage("Usage: /me <action>")
+        Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /me <action>")
         return true
     end
     if (Split[1] ~= nil) then
-        cRoot:Get():GetServer():BroadcastChat(Player:GetName().. ""..Message);
+        cRoot:Get():GetServer():BroadcastChat(Player:GetName() .. "" .. Message);
         return true
     end
 end

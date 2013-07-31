@@ -1,6 +1,6 @@
 function HandleKickCommand( Split, Player )
 	if( #Split < 2 ) then
-		Player:SendMessage( cChatColor.Green .. "Usage: /kick [Player] <Reason>" )
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /kick [Player] <Reason>" )
 		return true
 	end
 	
@@ -10,7 +10,7 @@ function HandleKickCommand( Split, Player )
 	end
 	
 	if( KickPlayer( Split[2], Reason ) == false ) then
-		Player:SendMessage( cChatColor.Green .. "Could not find player " .. Split[2] )
+		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Could not find player " .. Split[2] )
 	end
 
 	return true

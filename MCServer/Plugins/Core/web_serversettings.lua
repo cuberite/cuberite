@@ -56,12 +56,6 @@ local function ShowGeneralSettings( Request )
 		if( tonumber( Request.PostParams["Authentication_Authenticate"] ) ~= nil ) then
 			SettingsIni:SetValue("Authentication", "Authenticate", Request.PostParams["Authentication_Authenticate"], false )
 		end
-		if( tonumber( Request.PostParams["Limit_World"] ) ~= nil ) then
-			SettingsIni:SetValue("Worlds", "LimitWorld", Request.PostParams["Limit_World"], false )
-		end
-		if( tonumber( Request.PostParams["LimitWorldWidth"] ) ~= nil ) then
-			SettingsIni:SetValue("Worlds", "LimitWorldWidth", Request.PostParams["LimitWorldWidth"], false )
-		end
 
 		if( SettingsIni:WriteFile() == false ) then
 			InfoMsg =  [[<b style="color: red;">ERROR: Could not write to settings.ini!</b>]]
@@ -99,13 +93,6 @@ local function ShowGeneralSettings( Request )
 	<td>]] .. HTML_Select_On_Off("Authentication_Authenticate", SettingsIni:GetValueI("Authentication", "Authenticate") ) .. [[</td></tr>
 	</table><br />
 	
-	<table>
-	<th colspan="2">LimitWorld</th>
-	<tr><td style="width: 50%;">Limit World:</td>
-	<td>]] .. HTML_Select_On_Off("Limit_World", SettingsIni:GetValueI("Worlds", "LimitWorld") ) .. [[</td></tr>
-	<tr><td>Max Chunks from spawn:</td>
-	<td><input type="text" name="LimitWorldWidth" value="]] .. SettingsIni:GetValue("Worlds", "LimitWorldWidth") .. [["></td></tr>
-	</table><br />
 	<input type="submit" value="Save Settings" name="general_submit"> WARNING: Any changes made here might require a server restart in order to be applied!
 	</form>]]
 	
@@ -375,6 +362,10 @@ function ShowWorldSettings( Request )
 		if( tonumber( Request.PostParams["World_SpawnZ"] ) ~= nil ) then
 			WorldIni:DeleteValue( "SpawnPosition", "Z" )
 			WorldIni:SetValue( "SpawnPosition", "Z", Request.PostParams["World_SpawnZ"] )
+		end
+        if( tonumber( Request.PostParams["LimitWorldWidth"] ) ~= nil ) then
+			WorldIni:DeleteValue( "WorldLimit", "LimitRadius" )
+			WorldIni:SetValue( "WorldLimit", "LimitRadius", Request.PostParams["LimitWorldWidth"] )
 		end
 		if( tonumber( Request.PostParams["World_Seed"] ) ~= nil ) then
 			WorldIni:DeleteValue( "Seed", "Seed" )
@@ -678,6 +669,11 @@ function ShowWorldSettings( Request )
 	<td><input type="text" name="World_SpawnZ" value="]] .. WorldIni:GetValue("SpawnPosition", "Z") .. [["></td></tr>
 	</table>
 	<br />
+    <table>
+    <th colspan="2">LimitWorld</th>
+	<tr><td>Max chunks from spawn (0 to disable):</td>
+	<td><input type="text" name="LimitWorldWidth" value="]] .. WorldIni:GetValue("WorldLimit", "LimitRadius") .. [["></td></tr>
+	</table><br />    
 	<table>
 	<th colspan="2">Seed</th>
 	<tr><td>Seed:</td>

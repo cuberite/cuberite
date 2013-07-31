@@ -1,6 +1,6 @@
 function HandleBanCommand( Split, Player )
 	if( #Split < 2 ) then
-		Player:SendMessage( cChatColor.Green .. "Usage: /ban [Player] <Reason>" )
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /ban [Player] <Reason>" )
 		return true
 	end
 
@@ -10,7 +10,7 @@ function HandleBanCommand( Split, Player )
 	end
 		
 	if( BanPlayer(Split[2], Reason) == false ) then
-		Player:SendMessage( cChatColor.Green .. "Could not find player " .. Split[2] )
+		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Could not find player " .. Split[2] )
 		return true
 	end
 
@@ -40,12 +40,12 @@ end
 
 function HandleUnbanCommand( Split, Player )
     if( #Split < 2 ) then
-		Player:SendMessage( cChatColor.Green .. "Usage: /unban [Player]" )
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /unban [Player]" )
 		return true
 	end
 	
 	if( BannedPlayersIni:GetValueB("Banned", Split[2], false) == false ) then
-		Player:SendMessage( cChatColor.Green .. Split[2] .. " is not banned!" )
+		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. " is not banned!" )
 		return true
 	end
 	

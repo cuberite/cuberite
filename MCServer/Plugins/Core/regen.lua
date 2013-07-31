@@ -1,6 +1,6 @@
 function HandleRegenCommand(Split, Player)
 	if ((#Split == 2) or (#Split > 3)) then
-		Player:SendMessage( cChatColor.Green .. "Usage: '/regeneratechunk' or '/regeneratechunk [X] [Z]'");
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: '/regeneratechunk' or '/regeneratechunk [X] [Z]'");
 		return true;
 	end
 	
@@ -12,7 +12,7 @@ function HandleRegenCommand(Split, Player)
 		Z = Split[3];
 	end
 	
-	Player:SendMessage(cChatColor.Green .. "Regenerating chunk ["..X..", "..Z.."]");
+	Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Regenerating chunk ["..X..", "..Z.."]");
 	Player:GetWorld():RegenerateChunk(X, Z);
 	return true;
 end

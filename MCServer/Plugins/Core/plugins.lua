@@ -9,7 +9,7 @@ function HandlePluginsCommand( Split, Player )
 		end
 	end
 
-	Player:SendMessage( cChatColor.Green .. "Loaded plugins: (" .. #PluginTable .. ")" )
-	Player:SendMessage( cChatColor.Gold .. table.concat(PluginTable, cChatColor.Gold.." ") )
+	Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "There are " .. #PluginTable .. " loaded plugins")
+	Player:SendMessage(cChatColor.Gold .. table.concat(PluginTable, cChatColor.Gold.." ") )
 	return true
 end

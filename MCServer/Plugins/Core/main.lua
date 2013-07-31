@@ -4,7 +4,6 @@ BannedPlayersIni = {}
 WhiteListIni = {}
 BackCoords = {}
 Messages = {}
-LimitWorldsCuboid = {}
 --END VARIABLES
 
 --COMMENCE AWESOMENESS!
@@ -17,13 +16,13 @@ function Initialize(Plugin)
     --ADD HOOKS    
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
+    PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_BREAKING_BLOCK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACING_BLOCK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_KILLING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CRAFTING_NO_RECIPE)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
-	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATING)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
 
     --PLEASE ALPHA SORT http://elmosaukko.com/sort-alphabetically/ THIS LIST
@@ -34,11 +33,9 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/gm",              "core.changegm",        HandleChangeGMCommand,        " ~ Change your gamemode");
 	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " ~ Show available commands");
 	PluginManager:BindCommand("/kick",            "core.kick",            HandleKickCommand,            " ~ Kick a player");
-	PluginManager:BindCommand("/list",            "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
-	PluginManager:BindCommand("/listgroups",      "core.listgroups",      HandleListGroupsCommand,      " - Shows a list of all the groups");
+	PluginManager:BindCommand("/groups",          "core.groups",          HandleGroupsCommand,          " - Shows a list of all the groups");
 	PluginManager:BindCommand("/locate",          "core.locate",          HandleLocateCommand,          " - Show your current server coordinates");
 	PluginManager:BindCommand("/motd",            "core.motd",            HandleMOTDCommand,            " - Show message of the day");
-	PluginManager:BindCommand("/playerlist",      "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
 	PluginManager:BindCommand("/plugins",         "core.plugins",         HandlePluginsCommand,         " - Show list of plugins");
 	PluginManager:BindCommand("/portal",          "core.portal",          HandlePortalCommand,          " ~ Move to a different world");  
 	PluginManager:BindCommand("/rank",            "core.rank",            HandleRankCommand,            " ~ Add someone to a group");
@@ -48,7 +45,7 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/spawn",           "core.spawn",           HandleSpawnCommand,           " - Return to the spawn");
 	PluginManager:BindCommand("/stop",            "core.stop",            HandleStopCommand,            " - Stops the server");
 	PluginManager:BindCommand("/time",            "core.time",            HandleTimeCommand,            " ~ Sets the time of day");
-	PluginManager:BindCommand("/toggledownfall",  "core.toggledownfall",  HandleToggleDownfallCommand,  " - Toggles the weather");
+	PluginManager:BindCommand("/downfall",        "core.downfall",        HandleDownfallCommand,        " - Toggles the weather");
     PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
 	PluginManager:BindCommand("/top",             "core.top",             HandleTopCommand,             " - Teleport yourself to the top most block");
     PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
@@ -56,7 +53,6 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/tpaccept",        "core.teleport",        HandleTPAcceptCommand,        " ~ Accept a teleportation request");
 	PluginManager:BindCommand("/unban",           "core.unban",           HandleUnbanCommand,           " ~ Unban a player");
 	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
-	PluginManager:BindCommand("/who",             "core.playerlist",      HandlePlayerListCommand,      " - Shows list of connected players");
 	PluginManager:BindCommand("/worlds",          "core.worlds",          HandleWorldsCommand,          " - Shows a list of all the worlds");
 
 	InitConsoleCommands();
@@ -65,14 +61,12 @@ function Initialize(Plugin)
 	IniFile = cIniFile("settings.ini")
 	if ( IniFile:ReadFile() == true ) then
 		HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
-		LimitWorld = IniFile:GetValueSetB("Worlds", "LimitWorld", false)
-		LimitWorldWidth = IniFile:GetValueSetI("Worlds", "LimitWorldWidth", 10)
 		IniFile:WriteFile()
 	end
     
     WorldsSpawnProtect = {}
     local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
-    local NumValues = (IniFile:GetNumValues( KeyIdx ) - 2) --(TAKE AWAY TWO OPTIONS FOR WORLD LIMITER)
+    local NumValues = (IniFile:GetNumValues( KeyIdx )) --(HOW MANY VALUES ARE THERE?)
 	for i = 0, NumValues - 1 do --(FOR EVERY WORLD KEY, TAKING ACCOUNT OF OFF BY ONE ERRORS)
         WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
         if WorldIni:ReadFile() == true then
@@ -80,16 +74,15 @@ function Initialize(Plugin)
             WorldIni:WriteFile()
         end
     end
-
-    if LimitWorld == true then
-	    cRoot:Get():ForEachWorld(
-		    function( World )            
-                LimitWorldsCuboid[World:GetName()] = cCuboid()
-			    LimitWorldsCuboid[World:GetName()].p1 = Vector3i( math.floor(World:GetSpawnX() / 16) + LimitWorldWidth, 0, math.floor(World:GetSpawnZ() / 16) +  LimitWorldWidth)
-			    LimitWorldsCuboid[World:GetName()].p2 = Vector3i( math.floor(World:GetSpawnX() / 16) - LimitWorldWidth, 256, math.floor(World:GetSpawnZ() / 16) -  LimitWorldWidth)
-			    LimitWorldsCuboid[World:GetName()]:Sort()
-		    end
-	    )
+    WorldsWorldLimit = {}
+    local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
+    local NumValues = (IniFile:GetNumValues( KeyIdx )) --(HOW MANY VALUES ARE THERE?)
+    for i = 0, NumValues - 1 do --(FOR EVERY WORLD KEY, TAKING ACCOUNT OF OFF BY ONE ERRORS)
+       WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
+       if WorldIni:ReadFile() == true then
+            WorldsWorldLimit[IniFile:GetValue(KeyIdx, i)]  = WorldIni:GetValueSetI("WorldLimit", "LimitRadius", 0)
+            WorldIni:WriteFile()
+        end
     end
 
 	--LOAD WHITELIST
@@ -178,7 +171,7 @@ function WriteLog(breakPlace, X, Y, Z, player, id, meta)
 end
     
 function WarnPlayer(Player)
-	Player:SendMessage("Go further from spawn to build")
+	Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Go further from spawn to build")
 	return
 end
 

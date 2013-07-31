@@ -3,9 +3,6 @@ function HandleMOTDCommand( Split, Player )
 	return true
 end
 
-
-
-
 function LoadMotd()
 	local File = io.open("motd.txt", "r")
 	-- Check if the file 'motd.txt' exists, else create it.
@@ -35,17 +32,11 @@ function LoadMotd()
 	end
 end
 
-
-
-
 function ShowMOTDTo( Player )
 	for I=1, #Messages do
 		Player:SendMessage(Messages[I])
 	end
 end
-
-
-
 
 function ReturnColorFromChar( Split, char )
 	-- Check if the char represents a color. Else return nil.

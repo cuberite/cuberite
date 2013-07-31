@@ -1,6 +1,6 @@
 function HandleRankCommand( Split, Player )
 	if Split[2] == nil or Split[3] == nil then
-		Player:SendMessage(cChatColor.Rose .. "Usage: /rank [Player] [Group]")
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /rank [Player] [Group]")
 		return true
 	end
 	local GroupsIni = cIniFile("groups.ini")
@@ -8,7 +8,7 @@ function HandleRankCommand( Split, Player )
 		LOG("Could not read groups.ini!")
 	end
 	if GroupsIni:FindKey(Split[3]) == -1 then
-		Player:SendMessage(cChatColor.Rose .. "Group does not exist")
+		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Group does not exist")
 		return true
 	end
 	local UsersIni = cIniFile("users.ini")
@@ -20,7 +20,7 @@ function HandleRankCommand( Split, Player )
 	UsersIni:WriteFile()
 	local loopPlayers = function( Player )
 		if Player:GetName() == Split[2] then
-			Player:SendMessage( cChatColor.Green .. "You were moved to group " .. Split[3] )
+			Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You were moved to group " .. Split[3] )
 			Player:LoadPermissionsFromDisk()
 		end
 	end
@@ -28,21 +28,21 @@ function HandleRankCommand( Split, Player )
 		World:ForEachPlayer( loopPlayers )
 	end
 	cRoot:Get():ForEachWorld( loopWorlds )
-	Player:SendMessage(cChatColor.Green .. "Player " .. Split[2] .. " Was moved to " .. Split[3])
+	Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Player " .. Split[2] .. " Was moved to " .. Split[3])
 	return true
 end
 
-function HandleListGroupsCommand( Split, Player )
+function HandleGroupsCommand( Split, Player )
     local GroupsIni = cIniFile("groups.ini")
 	if GroupsIni:ReadFile() == false then
-		Player:SendMessage( cChatColor.Green .. "No groups found" )
+		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "No groups found" )
 	end
 	Number = GroupsIni:NumKeys() - 1
 	Groups = {}
 	for i=0, Number do
 		table.insert( Groups, GroupsIni:KeyName(i) )
 	end
-	Player:SendMessage( cChatColor.Green .. "Groups:" )
-	Player:SendMessage( cChatColor.Green .. table.concat( Groups, ", " ) )
+	Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Found " .. #Groups .. " groups" )
+	Player:SendMessage(cChatColor.Gold .. table.concat( Groups, " " ) )
 	return true
 end
