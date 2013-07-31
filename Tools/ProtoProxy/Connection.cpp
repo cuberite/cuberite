@@ -2135,6 +2135,10 @@ bool cConnection::HandleServerTabCompletion(void)
 			last = i + 1;
 		}
 	}
+	if (last < len)
+	{
+		Log("  \"%s\"", Results.substr(last, len - last).c_str());
+	}
 	COPY_TO_CLIENT();
 	return true;
 }
