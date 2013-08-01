@@ -50,7 +50,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_TimeLastPickupCheck( 0.f )
 	, m_Color('-')
 	, m_ClientHandle( a_Client )
-	, m_FoodLevel(20)
+	, m_FoodLevel(MAX_FOOD_LEVEL)
 	, m_FoodSaturationLevel(5)
 	, m_FoodTickTimer(0)
 	, m_FoodExhaustionLevel(0)
@@ -70,7 +70,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
 
-	SetMaxHealth(20);
+	SetMaxHealth(MAX_HEALTH);
+	m_Health = MAX_HEALTH;
 	
 	cTimer t1;
 	m_LastPlayerListTime = t1.GetNowTime();
@@ -565,7 +566,7 @@ void cPlayer::Respawn(void)
 	m_Health = GetMaxHealth();
 	
 	// Reset food level:
-	m_FoodLevel = 20;
+	m_FoodLevel = MAX_FOOD_LEVEL;
 	m_FoodSaturationLevel = 5;
 
 	m_ClientHandle->SendRespawn();
@@ -1155,7 +1156,7 @@ bool cPlayer::LoadFromDisk()
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
 	{
-		LOGWARNING("Cannot open player data file \"%s\" for reading", SourceFile.c_str()); 
+		// This is a new player whom we haven't seen yet, bail out, let them have the defaults
 		return false;
 	}
 
