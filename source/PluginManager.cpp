@@ -1335,6 +1335,28 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 
 
 
+void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & a_Results, cPlayer * a_Player)
+{
+	for (CommandMap::iterator itr = m_Commands.begin(), end = m_Commands.end(); itr != end; ++itr)
+	{
+		if (NoCaseCompare(itr->first.substr(0, a_Text.length()), a_Text) != 0)
+		{
+			// Command name doesn't match
+			continue;
+		}
+		if ((a_Player != NULL) && !a_Player->HasPermission(itr->second.m_Permission))
+		{
+			// Player doesn't have permission for the command
+			continue;
+		}
+		a_Results.push_back(itr->first);
+	}
+}
+
+
+
+
+
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
 	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;

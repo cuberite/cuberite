@@ -511,6 +511,16 @@ void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Veh
 
 
 
+void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Results)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendTabCompletionResults(a_Results);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendTeleportEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_Protocol != NULL);

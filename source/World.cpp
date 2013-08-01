@@ -2364,6 +2364,24 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 
 
 
+void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Results)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
+	{
+		if (NoCaseCompare((*itr)->GetName().substr(0, a_Text.length()), a_Text) != 0)
+		{
+			// Player name doesn't match
+			continue;
+		}
+		a_Results.push_back((*itr)->GetName());
+	}
+}
+
+
+
+
+
 cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock)
 {
 	AString SimulatorNameKey;

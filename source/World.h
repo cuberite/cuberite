@@ -519,6 +519,9 @@ public:
 	/// Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread!
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
 	
+	/// Appends all usernames starting with a_Text (case-insensitive) into Results
+	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
+	
 private:
 
 	friend class cRoot;

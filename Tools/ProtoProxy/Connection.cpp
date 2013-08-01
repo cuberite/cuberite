@@ -193,6 +193,7 @@ enum
 	PACKET_PLAYER_LIST_ITEM          = 0xc9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
 	PACKET_INCREMENT_STATISTIC       = 0xc8,
+	PACKET_TAB_COMPLETION            = 0xcb,
 	PACKET_LOCALE_AND_VIEW           = 0xcc,
 	PACKET_CLIENT_STATUSES           = 0xcd,
 	PACKET_PLUGIN_MESSAGE            = 0xfa,
@@ -579,6 +580,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			case PACKET_PLAYER_POSITION_LOOK:      HANDLE_CLIENT_READ(HandleClientPlayerPositionLook); break;
 			case PACKET_PLUGIN_MESSAGE:            HANDLE_CLIENT_READ(HandleClientPluginMessage); break;
 			case PACKET_SLOT_SELECT:               HANDLE_CLIENT_READ(HandleClientSlotSelect); break;
+			case PACKET_TAB_COMPLETION:            HANDLE_CLIENT_READ(HandleClientTabCompletion); break;
 			case PACKET_UPDATE_SIGN:               HANDLE_CLIENT_READ(HandleClientUpdateSign); break;
 			case PACKET_USE_ENTITY:                HANDLE_CLIENT_READ(HandleClientUseEntity); break;
 			case PACKET_WINDOW_CLICK:              HANDLE_CLIENT_READ(HandleClientWindowClick); break;
@@ -687,6 +689,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 			case PACKET_SPAWN_OBJECT_VEHICLE:      HANDLE_SERVER_READ(HandleServerSpawnObjectVehicle); break;
 			case PACKET_SPAWN_PAINTING:            HANDLE_SERVER_READ(HandleServerSpawnPainting); break;
 			case PACKET_SPAWN_PICKUP:              HANDLE_SERVER_READ(HandleServerSpawnPickup); break;
+			case PACKET_TAB_COMPLETION:            HANDLE_SERVER_READ(HandleServerTabCompletion); break;
 			case PACKET_TIME_UPDATE:               HANDLE_SERVER_READ(HandleServerTimeUpdate); break;
 			case PACKET_UPDATE_HEALTH:             HANDLE_SERVER_READ(HandleServerUpdateHealth); break;
 			case PACKET_UPDATE_SIGN:               HANDLE_SERVER_READ(HandleServerUpdateSign); break;
@@ -1064,6 +1067,19 @@ bool cConnection::HandleClientSlotSelect(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
 	Log("Received a PACKET_SLOT_SELECT from the client");
 	Log("  SlotNum = %d", SlotNum);
+	COPY_TO_SERVER();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleClientTabCompletion(void)
+{
+	HANDLE_CLIENT_PACKET_READ(ReadBEUTF16String16, AString, Query);
+	Log("Received a PACKET_TAB_COMPLETION query from the client");
+	Log("  Query = \"%s\"", Query.c_str());
 	COPY_TO_SERVER();
 	return true;
 }
@@ -2095,6 +2111,34 @@ bool cConnection::HandleServerSpawnPickup(void)
 	Log("  Item = %s", ItemDesc.c_str());
 	Log("  Pos = <%d, %d, %d> ~ {%d, %d, %d}", PosX, PosY, PosZ, PosX / 32, PosY / 32, PosZ / 32);
 	Log("  Angles = [%d, %d, %d]", Rotation, Pitch, Roll);
+	COPY_TO_CLIENT();
+	return true;
+}
+
+
+
+
+
+bool cConnection::HandleServerTabCompletion(void)
+{
+	HANDLE_SERVER_PACKET_READ(ReadBEUTF16String16, AString, Results);
+	Log("Received a PACKET_TAB_COMPLETION from the server, results given:");
+
+	// Parse the zero-terminated list of results:
+	size_t len = Results.size();
+	size_t last = 0;
+	for (size_t i = 0; i < len; i++)
+	{
+		if (Results[i] == 0)
+		{
+			Log("  \"%s\"", Results.substr(last, i - last).c_str());
+			last = i + 1;
+		}
+	}
+	if (last < len)
+	{
+		Log("  \"%s\"", Results.substr(last, len - last).c_str());
+	}
 	COPY_TO_CLIENT();
 	return true;
 }
