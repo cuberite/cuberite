@@ -161,32 +161,32 @@ public:
 	void PacketError(unsigned char a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
-	void HandlePing             (void);
-	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
-	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
-	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
+	void HandleAnimation        (char a_Animation);
 	void HandleChat             (const AString & a_Message);
+	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
+	void HandleDisconnect       (const AString & a_Reason);
+	void HandleEntityAction     (int a_EntityID, char a_ActionID);
+	bool HandleHandshake        (const AString & a_Username);
+	void HandleKeepAlive        (int a_KeepAliveID);
+	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
+	void HandlePing             (void);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
 	void HandlePlayerMoveLook   (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround);  // While m_bPositionConfirmed (normal gameplay)
-	void HandleAnimation        (char a_Animation);
+	void HandlePlayerPos        (double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround);
+	void HandleRespawn          (void);
+	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
 	void HandleSlotSelected     (short a_SlotNum);
-	void HandleWindowClose      (char a_WindowID);
-	void HandleWindowClick      (char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
+	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
 		int a_BlockX, int a_BlockY, int a_BlockZ, 
 		const AString & a_Line1, const AString & a_Line2, 
 		const AString & a_Line3, const AString & a_Line4
 	);
-	void HandleUseEntity        (int a_TargetEntityID, bool a_IsLeftClick);
-	void HandleRespawn          (void);
-	void HandleDisconnect       (const AString & a_Reason);
-	void HandleKeepAlive        (int a_KeepAliveID);
-	bool HandleHandshake        (const AString & a_Username);
-	void HandleEntityAction     (int a_EntityID, char a_ActionID);
 	void HandleUnmount          (void);
-	void HandleTabCompletion    (const AString & a_Text);
-	
+	void HandleUseEntity        (int a_TargetEntityID, bool a_IsLeftClick);
+	void HandleWindowClick      (char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
+	void HandleWindowClose      (char a_WindowID);
+
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.
 	*/
