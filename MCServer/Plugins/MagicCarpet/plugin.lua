@@ -36,12 +36,12 @@ function HandleCarpetCommand( Split, Player )
 	Carpet = Carpets[ Player ]
 	if( Carpet == nil ) then
 		Carpets[ Player ] = cCarpet:new()
-		Player:SendMessage("You're on a magic carpet!" )
-        Player:SendMessage("Look straight down to descend. Jump to ascend!" )
+		Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You're on a magic carpet!" )
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Look straight down to descend. Jump to ascend!" )
 	else
 		Carpet:remove()
 		Carpets[ Player ] = nil
-		Player:SendMessage("The carpet vanished!" )
+		Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "The carpet vanished!" )
 	end
 
 	return true
@@ -73,11 +73,8 @@ function OnPlayerMoving(Player)
 		Carpet:moveTo( cLocation:new( Player:GetPosX(), Player:GetPosY() - 1, Player:GetPosZ() ) )
 	else
 		if( Player:GetPosY() < Carpet:getY() ) then
-            Player:TeleportToCoords(Player:GetPosX(), Carpet:getY(), Player:GetPosZ())
+			Player:TeleportToCoords(Player:GetPosX(), Carpet:getY() + 0.2, Player:GetPosZ())
 		end
 		Carpet:moveTo( cLocation:new( Player:GetPosX(), Player:GetPosY(), Player:GetPosZ() ) )
 	end
 end
-
-
-
