@@ -1,5 +1,5 @@
 function OnPlayerMoving( Player )
-    LimitWorldWidth = WorldsWorldLimit[Player:GetWorld():GetName()]
+	LimitWorldWidth = WorldsWorldLimit[Player:GetWorld():GetName()]
 	if LimitWorldWidth > 0 then
 		local World = Player:GetWorld()
 		local SpawnX = math.floor(World:GetSpawnX() / 16)

@@ -39,7 +39,7 @@ function BanPlayer(PlayerName, Reason)
 end
 
 function HandleUnbanCommand( Split, Player )
-    if( #Split < 2 ) then
+	if( #Split < 2 ) then
 		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /unban [Player]" )
 		return true
 	end

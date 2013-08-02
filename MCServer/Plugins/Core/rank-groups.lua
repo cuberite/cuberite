@@ -33,7 +33,7 @@ function HandleRankCommand( Split, Player )
 end
 
 function HandleGroupsCommand( Split, Player )
-    local GroupsIni = cIniFile("groups.ini")
+	local GroupsIni = cIniFile("groups.ini")
 	if GroupsIni:ReadFile() == false then
 		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "No groups found" )
 	end

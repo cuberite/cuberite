@@ -16,45 +16,45 @@ function HandleTPCommand(a_Split, a_Player)
 end
 
 function HandleTPACommand( Split, Player )
-    if Split[2] == nil then
-        Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /tpa [Player]" )
-        return true
-    end
-    local loopPlayer = function( OtherPlayer )
-        if OtherPlayer:GetName() == Split[2] then
-            OtherPlayer:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. Player:GetName() .. " send a teleport request" )
-            Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You send a teleport request to " .. OtherPlayer:GetName() )
-            Destination[OtherPlayer:GetName()] = Player:GetName()
-        end
-    end
-    local loopWorlds = function( World )
-        World:ForEachPlayer( loopPlayer )
-    end
-    cRoot:Get():ForEachWorld( loopWorlds )
-    return true
+	if Split[2] == nil then
+		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "Usage: /tpa [Player]" )
+		return true
+	end
+	local loopPlayer = function( OtherPlayer )
+		if OtherPlayer:GetName() == Split[2] then
+			OtherPlayer:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. Player:GetName() .. " send a teleport request" )
+			Player:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You send a teleport request to " .. OtherPlayer:GetName() )
+			Destination[OtherPlayer:GetName()] = Player:GetName()
+		end
+	end
+	local loopWorlds = function( World )
+		World:ForEachPlayer( loopPlayer )
+	end
+	cRoot:Get():ForEachWorld( loopWorlds )
+	return true
 end
 
 function HandleTPAcceptCommand( Split, Player )
-    if Destination[Player:GetName()] == nil then
-        Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Nobody has send you a teleport request" )
-        return true
-    end
-    local loopPlayer = function( OtherPlayer )
-        if Destination[Player:GetName()] == OtherPlayer:GetName() then
-            if OtherPlayer:GetWorld():GetName() ~= Player:GetWorld():GetName() then
-                OtherPlayer:MoveToWorld( Player:GetWorld():GetName() )
-            end
-            OtherPlayer:TeleportToEntity( Player )
-            Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. OtherPlayer:GetName() .. " teleported to you" )
-            OtherPlayer:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You teleported to " .. Player:GetName() )
-            Destination[Player:GetName()] = nil
-        end
-    end
-    local loopWorlds = function( World )
-        World:ForEachPlayer( loopPlayer )
-    end
-    cRoot:Get():ForEachWorld( loopWorlds )
-    return true
+	if Destination[Player:GetName()] == nil then
+		Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Nobody has send you a teleport request" )
+		return true
+	end
+	local loopPlayer = function( OtherPlayer )
+		if Destination[Player:GetName()] == OtherPlayer:GetName() then
+			if OtherPlayer:GetWorld():GetName() ~= Player:GetWorld():GetName() then
+				OtherPlayer:MoveToWorld( Player:GetWorld():GetName() )
+			end
+			OtherPlayer:TeleportToEntity( Player )
+			Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. OtherPlayer:GetName() .. " teleported to you" )
+			OtherPlayer:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "You teleported to " .. Player:GetName() )
+			Destination[Player:GetName()] = nil
+		end
+	end
+	local loopWorlds = function( World )
+		World:ForEachPlayer( loopPlayer )
+	end
+	cRoot:Get():ForEachWorld( loopWorlds )
+	return true
 end
 
 -- Teleports a_SrcPlayer to a player named a_DstPlayerName; if a_TellDst is true, will send a notice to the destination player
@@ -73,8 +73,8 @@ function TeleportToPlayer(a_SrcPlayer, a_DstPlayerName, a_TellDst)
 		end
 	end
 	
-    local World = a_SrcPlayer:GetWorld();
-    if (not(World:DoWithPlayer(a_DstPlayerName, teleport))) then
-	    a_SrcPlayer:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Can't find player " .. a_DstPlayerName);
+	local World = a_SrcPlayer:GetWorld();
+	if (not(World:DoWithPlayer(a_DstPlayerName, teleport))) then
+		a_SrcPlayer:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Can't find player " .. a_DstPlayerName);
 	end
 end

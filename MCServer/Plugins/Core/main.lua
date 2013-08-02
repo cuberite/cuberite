@@ -13,10 +13,10 @@ function Initialize(Plugin)
 	Plugin:SetName("Core")
 	Plugin:SetVersion(13)
 
-    --ADD HOOKS    
+	--ADD HOOKS    
 	PluginManager = cRoot:Get():GetPluginManager()
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_JOINED)
-    PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_DISCONNECT)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_BREAKING_BLOCK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_PLACING_BLOCK)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_LOGIN)
@@ -25,9 +25,9 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT) -- used in web_chat.lua
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_MOVING)
 
-    --PLEASE ALPHA SORT http://elmosaukko.com/sort-alphabetically/ THIS LIST
-    --BIND COMMANDS    
-    PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
+	--PLEASE ALPHA SORT http://elmosaukko.com/sort-alphabetically/ THIS LIST
+	--BIND COMMANDS    
+	PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
 	PluginManager:BindCommand("/ban",             "core.ban",             HandleBanCommand,             " ~ Ban a player");
 	PluginManager:BindCommand("/give",            "core.give",            HandleGiveCommand,            " ~ Give yourself an item");
 	PluginManager:BindCommand("/gm",              "core.changegm",        HandleChangeGMCommand,        " ~ Change your gamemode");
@@ -46,10 +46,10 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/stop",            "core.stop",            HandleStopCommand,            " - Stops the server");
 	PluginManager:BindCommand("/time",            "core.time",            HandleTimeCommand,            " ~ Sets the time of day");
 	PluginManager:BindCommand("/downfall",        "core.downfall",        HandleDownfallCommand,        " - Toggles the weather");
-    PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
+	PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
 	PluginManager:BindCommand("/top",             "core.top",             HandleTopCommand,             " - Teleport yourself to the top most block");
-    PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
-    PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");
+	PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
+	PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");
 	PluginManager:BindCommand("/tpaccept",        "core.teleport",        HandleTPAcceptCommand,        " ~ Accept a teleportation request");
 	PluginManager:BindCommand("/unban",           "core.unban",           HandleUnbanCommand,           " ~ Unban a player");
 	PluginManager:BindCommand("/viewdistance",    "core.viewdistance",    HandleViewDistanceCommand,    " [".. cClientHandle.MIN_VIEW_DISTANCE .."-".. cClientHandle.MAX_VIEW_DISTANCE .."] - Change your view distance")
@@ -63,27 +63,27 @@ function Initialize(Plugin)
 		HardCore = IniFile:GetValueSet("GameMode", "Hardcore", "false")
 		IniFile:WriteFile()
 	end
-    
-    WorldsSpawnProtect = {}
-    local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
-    local NumValues = (IniFile:GetNumValues( KeyIdx )) --(HOW MANY VALUES ARE THERE?)
+	
+	WorldsSpawnProtect = {}
+	local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
+	local NumValues = (IniFile:GetNumValues( KeyIdx )) --(HOW MANY VALUES ARE THERE?)
 	for i = 0, NumValues - 1 do --(FOR EVERY WORLD KEY, TAKING ACCOUNT OF OFF BY ONE ERRORS)
-        WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
-        if WorldIni:ReadFile() == true then
-            WorldsSpawnProtect[IniFile:GetValue(KeyIdx, i)]  = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", 10)
-            WorldIni:WriteFile()
-        end
-    end
-    WorldsWorldLimit = {}
-    local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
-    local NumValues = (IniFile:GetNumValues( KeyIdx )) --(HOW MANY VALUES ARE THERE?)
-    for i = 0, NumValues - 1 do --(FOR EVERY WORLD KEY, TAKING ACCOUNT OF OFF BY ONE ERRORS)
-       WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
-       if WorldIni:ReadFile() == true then
-            WorldsWorldLimit[IniFile:GetValue(KeyIdx, i)]  = WorldIni:GetValueSetI("WorldLimit", "LimitRadius", 0)
-            WorldIni:WriteFile()
-        end
-    end
+		WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
+		if WorldIni:ReadFile() == true then
+			WorldsSpawnProtect[IniFile:GetValue(KeyIdx, i)]  = WorldIni:GetValueSetI("SpawnProtect", "ProtectRadius", 10)
+			WorldIni:WriteFile()
+		end
+	end
+	WorldsWorldLimit = {}
+	local KeyIdx = IniFile:FindKey("Worlds") --(FIND WHERE 'WORLDS' KEY IS LOCATED)
+	local NumValues = (IniFile:GetNumValues( KeyIdx )) --(HOW MANY VALUES ARE THERE?)
+	for i = 0, NumValues - 1 do --(FOR EVERY WORLD KEY, TAKING ACCOUNT OF OFF BY ONE ERRORS)
+	   WorldIni = cIniFile(IniFile:GetValue(KeyIdx, i) .. "/world.ini")
+	   if WorldIni:ReadFile() == true then
+			WorldsWorldLimit[IniFile:GetValue(KeyIdx, i)]  = WorldIni:GetValueSetI("WorldLimit", "LimitRadius", 0)
+			WorldIni:WriteFile()
+		end
+	end
 
 	--LOAD WHITELIST
 	WhiteListIni = cIniFile( Plugin:GetLocalDirectory() .. "/whitelist.ini" )
@@ -120,7 +120,7 @@ function Initialize(Plugin)
 		end
 	end
 
-    --ADD WEB INTERFACE TABULATES
+	--ADD WEB INTERFACE TABULATES
 	Plugin:AddWebTab("Manage Server",   HandleRequest_ManageServer);
 	Plugin:AddWebTab("Server Settings", HandleRequest_ServerSettings);
 	Plugin:AddWebTab("Chat",            HandleRequest_Chat);
@@ -132,7 +132,7 @@ function Initialize(Plugin)
 	LoadMotd()
 	LOG( "Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion() )
 
-    return true
+	return true
 end
 --AWESOMENESS STILL GOING!
 
@@ -140,12 +140,12 @@ end
 function WriteLog(breakPlace, X, Y, Z, player, id, meta)
 	local logText = {}
 
-    table.insert(logText, player)
+	table.insert(logText, player)
 	table.insert(logText, " tried to ")
 
 	if breakPlace == 0 then
-	    table.insert(logText, "break ")
-    else
+		table.insert(logText, "break ")
+	else
 		table.insert(logText, "place ")
 	end
 
@@ -159,23 +159,23 @@ function WriteLog(breakPlace, X, Y, Z, player, id, meta)
 	table.insert(logText, tostring(Z))
 	table.insert(logText, ".")
 
-    LOGINFO(table.concat(logText,''))
+	LOGINFO(table.concat(logText,''))
 
 	if LOGTOFILE then
-	    local logFile = io.open( Plugin:GetLocalDirectory() .. '/blocks.log', 'a')
-	    logFile:write(table.concat(logText,'').."\n")
-	    logFile:close()
-    end
+		local logFile = io.open( Plugin:GetLocalDirectory() .. '/blocks.log', 'a')
+		logFile:write(table.concat(logText,'').."\n")
+		logFile:close()
+	end
 
 	return
 end
-    
+	
 function WarnPlayer(Player)
 	Player:SendMessage(cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Go further from spawn to build")
 	return
 end
 
 function OnDisable()
-    LOG( "Disabled Core!")
+	LOG( "Disabled Core!")
 end
 --END AWESOMENESS :'(

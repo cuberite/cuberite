@@ -15,7 +15,7 @@ function HandlePortalCommand( Split, Player )
 end
 
 function HandleWorldsCommand( Split, Player )
-    local SettingsIni = cIniFile("settings.ini")
+	local SettingsIni = cIniFile("settings.ini")
 	if SettingsIni:ReadFile() == false then
 		Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "No worlds found" )
 	end

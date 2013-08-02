@@ -5,7 +5,7 @@ function InitConsoleCommands()
 	
 	-- Please keep the list alpha-sorted
 	PluginMgr:BindConsoleCommand("ban",                  HandleConsoleBan,                  "Bans a player by name");
-    PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                "Unbans a player by name");
+	PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                "Unbans a player by name");
 	PluginMgr:BindConsoleCommand("banlist",              HandleConsoleBanList,              "Lists all players banned by name");
 	PluginMgr:BindConsoleCommand("banlist ips",          HandleConsoleBanList,              "Lists all players banned by IP");
 	PluginMgr:BindConsoleCommand("help",                 HandleConsoleHelp,                 "Lists all commands");
@@ -40,7 +40,7 @@ function HandleConsoleBan(Split)
 end
 
 function HandleConsoleUnban(Split)
-    if( #Split < 2 ) then		
+	if( #Split < 2 ) then		
 		return true, "Usage: /unban [Player]"
 	end
 	

@@ -3,7 +3,7 @@ function OnKilling(Victim, Killer)
 		SetBackCoordinates( Victim )
 		Server = cRoot:Get():GetServer()
 		if Killer == nil then
-            if Victim:GetWorld():GetBlock(Victim:GetPosX(), Victim:GetPosY(), Victim:GetPosZ()) == 10 or Victim:GetWorld():GetBlock(Victim:GetPosX(), Victim:GetPosY(), Victim:GetPosZ()) == 11 then
+			if Victim:GetWorld():GetBlock(Victim:GetPosX(), Victim:GetPosY(), Victim:GetPosZ()) == 10 or Victim:GetWorld():GetBlock(Victim:GetPosX(), Victim:GetPosY(), Victim:GetPosZ()) == 11 then
 				Server:SendMessage( cChatColor.Red ..  "[FATALITY] " .. cChatColor.White .. Victim:GetName() .. " tried to swim in lava (and failed)" )
 				CheckHardcore(Victim)
 				return false

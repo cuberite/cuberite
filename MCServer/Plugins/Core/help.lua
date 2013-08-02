@@ -32,7 +32,7 @@ function HandleHelpCommand(Split, Player)
 	-- CurrentPage now contains the total number of pages, and Output has the individual help lines to be sent
 
 	Player:SendMessage(cChatColor.Purple .. "---------- [COMMANDS HELP " .. cChatColor.Gold .. "(Page " .. PageRequested .. " / " .. CurrentPage .. ")" .. cChatColor.Purple .. "] -----------");
-    Player:SendMessage(cChatColor.Purple .. "'-' means no prefix, '~' means a value is required.");
+	Player:SendMessage(cChatColor.Purple .. "'-' means no prefix, '~' means a value is required.");
 	for idx, msg in ipairs(Output) do
 		Player:SendMessage(msg);
 	end;

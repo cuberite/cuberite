@@ -43,8 +43,8 @@ local function ShowGeneralSettings( Request )
 			SettingsIni:SetValue("Server", "MaxPlayers", Request.PostParams["Server_MaxPlayers"], false )
 		end
 		if( tonumber( Request.PostParams["Server_Port"] ) ~= nil ) then
-            if( tonumber( Request.PostParams["Server_Port"] ) > 0 ) then
-                SettingsIni:SetValue("Server", "Port", Request.PostParams["Server_Port"], false )
+			if( tonumber( Request.PostParams["Server_Port"] ) > 0 ) then
+				SettingsIni:SetValue("Server", "Port", Request.PostParams["Server_Port"], false )
 			end
 		end
 		if( tonumber( Request.PostParams["Server_PortsIPv6"] ) ~= nil ) then
@@ -363,7 +363,7 @@ function ShowWorldSettings( Request )
 			WorldIni:DeleteValue( "SpawnPosition", "Z" )
 			WorldIni:SetValue( "SpawnPosition", "Z", Request.PostParams["World_SpawnZ"] )
 		end
-        if( tonumber( Request.PostParams["LimitWorldWidth"] ) ~= nil ) then
+		if( tonumber( Request.PostParams["LimitWorldWidth"] ) ~= nil ) then
 			WorldIni:DeleteValue( "WorldLimit", "LimitRadius" )
 			WorldIni:SetValue( "WorldLimit", "LimitRadius", Request.PostParams["LimitWorldWidth"] )
 		end
@@ -669,8 +669,8 @@ function ShowWorldSettings( Request )
 	<td><input type="text" name="World_SpawnZ" value="]] .. WorldIni:GetValue("SpawnPosition", "Z") .. [["></td></tr>
 	</table>
 	<br />
-    <table>
-    <th colspan="2">LimitWorld</th>
+	<table>
+	<th colspan="2">LimitWorld</th>
 	<tr><td>Max chunks from spawn (0 to disable):</td>
 	<td><input type="text" name="LimitWorldWidth" value="]] .. WorldIni:GetValue("WorldLimit", "LimitRadius") .. [["></td></tr>
 	</table><br />    
