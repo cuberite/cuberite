@@ -187,7 +187,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 	for (int i = 0; i < m_NumSlots; i++)
 	{
 		const cItem * Slot = GetSlot(i, a_Player);
-		if (!Slot->IsSameType(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		if (!Slot->IsStackableWith(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
 		{
 			// Different items
 			continue;
