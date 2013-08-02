@@ -1070,6 +1070,10 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 			cPlayer & m_Player;
 			virtual bool Item(cEntity * a_Entity) override
 			{
+				if (cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity))
+				{
+					return false;
+				}
 				a_Entity->OnRightClicked(m_Player);
 				return false;
 			}

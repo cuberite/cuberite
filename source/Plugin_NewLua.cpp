@@ -880,6 +880,33 @@ bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_
 
 
 
+bool cPlugin_NewLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
+	ASSERT(FnName != NULL);
+	if (!PushFunction(FnName))
+	{
+		return false;
+	}
+
+	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, &a_Entity, "cEntity");
+
+	if (!CallFunction(2, 1, FnName))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
 bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1519,44 +1546,45 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 {
 	switch (a_Hook)
 	{
-		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:      return "OnBlockToPickups";
-		case cPluginManager::HOOK_CHAT:                  return "OnChat";
-		case cPluginManager::HOOK_CHUNK_AVAILABLE:       return "OnChunkAvailable";
-		case cPluginManager::HOOK_CHUNK_GENERATED:       return "OnChunkGenerated";
-		case cPluginManager::HOOK_CHUNK_GENERATING:      return "OnChunkGenerating";
-		case cPluginManager::HOOK_CHUNK_UNLOADED:        return "OnChunkUnloaded";
-		case cPluginManager::HOOK_CHUNK_UNLOADING:       return "OnChunkUnloading";
-		case cPluginManager::HOOK_COLLECTING_PICKUP:     return "OnCollectingPickup";
-		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:    return "OnCraftingNoRecipe";
-		case cPluginManager::HOOK_DISCONNECT:            return "OnDisconnect";
-		case cPluginManager::HOOK_EXECUTE_COMMAND:       return "OnExecuteCommand";
-		case cPluginManager::HOOK_HANDSHAKE:             return "OnHandshake";
-		case cPluginManager::HOOK_KILLING:               return "OnKilling";
-		case cPluginManager::HOOK_LOGIN:                 return "OnLogin";
-		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK: return "OnPlayerBreakingBlock";
-		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:   return "OnPlayerBrokenBlock";
-		case cPluginManager::HOOK_PLAYER_EATING:         return "OnPlayerEating";
-		case cPluginManager::HOOK_PLAYER_JOINED:         return "OnPlayerJoined";
-		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:     return "OnPlayerLeftClick";
-		case cPluginManager::HOOK_PLAYER_MOVING:         return "OnPlayerMoving";
-		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:   return "OnPlayerPlacedBlock";
-		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:  return "OnPlayerPlacingBlock";
-		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:    return "OnPlayerRightClick";
-		case cPluginManager::HOOK_PLAYER_SHOOTING:       return "OnPlayerShooting";
-		case cPluginManager::HOOK_PLAYER_SPAWNED:        return "OnPlayerSpawned";
-		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:   return "OnPlayerTossingItem";
-		case cPluginManager::HOOK_PLAYER_USED_BLOCK:     return "OnPlayerUsedBlock";
-		case cPluginManager::HOOK_PLAYER_USED_ITEM:      return "OnPlayerUsedItem";
-		case cPluginManager::HOOK_PLAYER_USING_BLOCK:    return "OnPlayerUsingBlock";
-		case cPluginManager::HOOK_PLAYER_USING_ITEM:     return "OnPlayerUsingItem";
-		case cPluginManager::HOOK_POST_CRAFTING:         return "OnPostCrafting";
-		case cPluginManager::HOOK_PRE_CRAFTING:          return "OnPreCrafting";
-		case cPluginManager::HOOK_TAKE_DAMAGE:           return "OnTakeDamage";
-		case cPluginManager::HOOK_TICK:                  return "OnTick";
-		case cPluginManager::HOOK_UPDATED_SIGN:          return "OnUpdatedSign";
-		case cPluginManager::HOOK_UPDATING_SIGN:         return "OnUpdatingSign";
-		case cPluginManager::HOOK_WEATHER_CHANGED:       return "OnWeatherChanged";
-		case cPluginManager::HOOK_WEATHER_CHANGING:      return "OnWeatherChanging";
+		case cPluginManager::HOOK_BLOCK_TO_PICKUPS:             return "OnBlockToPickups";
+		case cPluginManager::HOOK_CHAT:                         return "OnChat";
+		case cPluginManager::HOOK_CHUNK_AVAILABLE:              return "OnChunkAvailable";
+		case cPluginManager::HOOK_CHUNK_GENERATED:              return "OnChunkGenerated";
+		case cPluginManager::HOOK_CHUNK_GENERATING:             return "OnChunkGenerating";
+		case cPluginManager::HOOK_CHUNK_UNLOADED:               return "OnChunkUnloaded";
+		case cPluginManager::HOOK_CHUNK_UNLOADING:              return "OnChunkUnloading";
+		case cPluginManager::HOOK_COLLECTING_PICKUP:            return "OnCollectingPickup";
+		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:           return "OnCraftingNoRecipe";
+		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
+		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";
+		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
+		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
+		case cPluginManager::HOOK_LOGIN:                        return "OnLogin";
+		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
+		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
+		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";
+		case cPluginManager::HOOK_PLAYER_JOINED:                return "OnPlayerJoined";
+		case cPluginManager::HOOK_PLAYER_LEFT_CLICK:            return "OnPlayerLeftClick";
+		case cPluginManager::HOOK_PLAYER_MOVING:                return "OnPlayerMoving";
+		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
+		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
+		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
+		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
+		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";
+		case cPluginManager::HOOK_PLAYER_SPAWNED:               return "OnPlayerSpawned";
+		case cPluginManager::HOOK_PLAYER_TOSSING_ITEM:          return "OnPlayerTossingItem";
+		case cPluginManager::HOOK_PLAYER_USED_BLOCK:            return "OnPlayerUsedBlock";
+		case cPluginManager::HOOK_PLAYER_USED_ITEM:             return "OnPlayerUsedItem";
+		case cPluginManager::HOOK_PLAYER_USING_BLOCK:           return "OnPlayerUsingBlock";
+		case cPluginManager::HOOK_PLAYER_USING_ITEM:            return "OnPlayerUsingItem";
+		case cPluginManager::HOOK_POST_CRAFTING:                return "OnPostCrafting";
+		case cPluginManager::HOOK_PRE_CRAFTING:                 return "OnPreCrafting";
+		case cPluginManager::HOOK_TAKE_DAMAGE:                  return "OnTakeDamage";
+		case cPluginManager::HOOK_TICK:                         return "OnTick";
+		case cPluginManager::HOOK_UPDATED_SIGN:                 return "OnUpdatedSign";
+		case cPluginManager::HOOK_UPDATING_SIGN:                return "OnUpdatingSign";
+		case cPluginManager::HOOK_WEATHER_CHANGED:              return "OnWeatherChanged";
+		case cPluginManager::HOOK_WEATHER_CHANGING:             return "OnWeatherChanging";
 		default: return NULL;
 	}  // switch (a_Hook)
 }

@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Plugin.h"
-// #include "Pawn.h"
 #include "Player.h"
 #include "World.h"
 #include "CommandOutput.h"
@@ -335,6 +334,17 @@ bool cPlugin::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY,
 	UNUSED(a_CursorX);
 	UNUSED(a_CursorY);
 	UNUSED(a_CursorZ);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
+{
+	UNUSED(a_Player);
+	UNUSED(a_Entity);
 	return false;
 }
 

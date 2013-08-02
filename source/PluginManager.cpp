@@ -678,6 +678,27 @@ bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, 
 
 
 
+bool cPluginManager::CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerRightClickingEntity(a_Player, a_Entity))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerShooting(cPlayer & a_Player)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_SHOOTING);

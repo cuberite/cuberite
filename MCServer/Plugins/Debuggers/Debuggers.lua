@@ -21,7 +21,8 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TICK);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
-	
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
+
 	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "Shows a list of all the loaded entities");
 	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "Kills all the loaded entities");
 	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "Sets all your armor to blue wool");
@@ -478,6 +479,15 @@ end
 
 function OnChat(a_Player, a_Message)
 	return false, "blabla " .. a_Message;
+end
+
+
+
+
+
+function OnPlayerRightClickingEntity(a_Player, a_Entity)
+	LOG("Player " .. a_Player:GetName() .. " right-clicking entity ID " .. a_Entity:GetUniqueID() .. ", a " .. a_Entity:GetClass());
+	return false;
 end
 
 
