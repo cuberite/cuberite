@@ -832,6 +832,15 @@ bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 
 
 
+bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithChunk(a_ChunkX, a_ChunkZ, a_Callback);
+}
+
+
+
+
+
 void cWorld::GrowTree(int a_X, int a_Y, int a_Z)
 {
 	if (GetBlock(a_X, a_Y, a_Z) == E_BLOCK_SAPLING)

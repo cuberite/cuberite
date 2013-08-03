@@ -35,6 +35,7 @@ typedef cItemCallback<cDispenserEntity>   cDispenserCallback;
 typedef cItemCallback<cDropperEntity>     cDropperCallback;
 typedef cItemCallback<cDropSpenserEntity> cDropSpenserCallback;
 typedef cItemCallback<cFurnaceEntity>     cFurnaceCallback;
+typedef cItemCallback<cChunk>             cChunkCallback;
 
 
 
@@ -79,6 +80,9 @@ public:
 	/// a_Player rclked block entity at the coords specified, handle it
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
 	
+	/// Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback
+	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
+
 	/// Wakes up simulators for the specified block
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
 

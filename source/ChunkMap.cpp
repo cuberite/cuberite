@@ -713,6 +713,21 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, i
 
 
 
+bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	return a_Callback.Item(Chunk);
+}
+
+
+
+
+
 void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cCSLock Lock(m_CSLayers);
