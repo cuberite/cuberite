@@ -1,4 +1,3 @@
-
 // ReDucTor is an awesome guy who helped me a lot
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
@@ -481,11 +480,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 void cServer::BindBuiltInConsoleCommands(void)
 {
 	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("restart", NULL, "Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop", NULL, "Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats", NULL, "Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("restart", NULL, " - Restarts the server cleanly");
+	PlgMgr->BindConsoleCommand("stop", NULL, " - Stops the server cleanly");
+	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	PlgMgr->BindConsoleCommand("dumpmem", NULL, "Dumps all used memory blocks together with their callstacks into memdump.xml");
+	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif	
 }
 
