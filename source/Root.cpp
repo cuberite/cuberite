@@ -105,14 +105,14 @@ void cRoot::Start(void)
 
 		LoadGlobalSettings();
 
-		LOG("Creating new server instance...");
+		LOG("-- Creating new server instance --");
 		m_Server = new cServer();
 
-		LOG("Reading server config...");
+		LOG("-- Reading server configuration --");
 		cIniFile IniFile("settings.ini");
 		if (!IniFile.ReadFile())
 		{
-			LOGINFO("settings.ini inaccessible, using settings.example.ini for defaults!");
+			LOGINFO("-- settings.ini inaccessible, using settings.example.ini for defaults --");
 			IniFile.Path("settings.example.ini");
 			IniFile.ReadFile();
 			IniFile.Path("settings.ini");
@@ -128,10 +128,10 @@ void cRoot::Start(void)
 			LOGINFO("settings.ini: [Server].PrimaryServerVersion set to %d.", m_PrimaryServerVersion);
 		}
 
-		LOG("Starting server...");
+		LOG("-- Starting MCServer --");
 		if (!m_Server->InitServer(IniFile))
 		{
-			LOGERROR("Failed to start server, shutting down.");
+			LOGERROR("-- Failure starting server! Shutting down. --");
 			return;
 		}
 		IniFile.WriteFile();
@@ -139,7 +139,7 @@ void cRoot::Start(void)
 		cIniFile WebIniFile("webadmin.ini");
 		if (!WebIniFile.ReadFile())
 		{
-			LOGINFO("webadmin.ini inaccessible, using webadmin.example.ini for defaults!");
+			LOGINFO("-- webadmin.ini inaccessible, using webadmin.example.ini for defaults --");
 			WebIniFile.Path("webadmin.example.ini");
 			WebIniFile.ReadFile();
 			WebIniFile.Path("webadmin.ini");
@@ -148,42 +148,42 @@ void cRoot::Start(void)
 
 		if (WebIniFile.GetValueB("WebAdmin", "Enabled", false ))
 		{
-			LOG("Creating WebAdmin...");
+			LOG("-- Creating WebAdmin Panel --");
 			m_WebAdmin = new cWebAdmin(8080);
 		}
 
-		LOG("Loading settings...");
+		LOG("-- Loading peripheral settings --");
 		m_GroupManager	= new cGroupManager();
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe = new cFurnaceRecipe();
 		
-		LOG("Loading worlds...");
+		LOG("-- Loading preliminary world data --");
 		LoadWorlds();
 
-		LOG("Loading plugin manager...");
+		LOG("-- Starting plugin manager --");
 		m_PluginManager = new cPluginManager();
 		m_PluginManager->ReloadPluginsNow();
 		
-		LOG("Loading MonsterConfig...");
+		LOG("-- Loading mob configuration --");
 		m_MonsterConfig = new cMonsterConfig;
 
 		// This sets stuff in motion
-		LOG("Starting Authenticator...");
+		LOG("-- Starting Authenticator --");
 		m_Authenticator.Start();
 		
-		LOG("Starting worlds...");
+		LOG("-- Loading main world data --");
 		StartWorlds();
 		
-		LOG("Starting server...");
+		LOG("-- Finishing startup sequence --");
 		m_Server->Start();
 
 		#if !defined(ANDROID_NDK)
-		LOG("Starting InputThread...");
+		LOG("-- Starting InputThread --");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
 		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can´t stop the server from other threads than the input thread
 		#endif
 
-		LOG("Initialization done, server running now.");
+		LOG("--- Initialisation done, server is running ---");
 		while (!m_bStop && !m_bRestart)  // These are modified by external threads
 		{
 			cSleep::MilliSleep(1000);
@@ -194,39 +194,40 @@ void cRoot::Start(void)
 		#endif
 
 		// Deallocate stuffs
-		LOG("Shutting down server...");
+		LOG("--- Commencing shutdown sequence ---");
 		m_Server->Shutdown();  // This waits for threads to stop and d/c clients
-		LOG("Stopping world threads...");
+		LOG("-- Stopping world threads --");
 		StopWorlds();
-		LOG("Stopping authenticator...");
+		LOG("-- Stopping Authenticator --");
 		m_Authenticator.Stop();
 		
 
 		#ifdef USE_SQUIRREL
 		CloseSquirrelVM();
 		#endif
-		LOG("Freeing MonsterConfig...");
+		LOG("-- Freeing mob configuration --");
 		delete m_MonsterConfig; m_MonsterConfig = 0;
-		LOG("Stopping WebAdmin...");
+		LOG("-- Stopping WebAdmin Panel --");
 		delete m_WebAdmin; m_WebAdmin = 0;
-		LOG("Unloading recipes...");
+		LOG("-- Unloading recipes --");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
-		LOG("Forgetting groups...");
+		LOG("-- Unloading groups --");
 		delete m_GroupManager; m_GroupManager = 0;
-		LOG("Unloading worlds...");
+		LOG("-- Unloading worlds --");
 		UnloadWorlds();
 		
-		LOG("Stopping plugin manager...");
+		LOG("-- Stopping plugin manager --");
 		delete m_PluginManager; m_PluginManager = NULL;
 
 		cItemHandler::Deinit();
 		cBlockHandler::Deinit();
 
-		LOG("Destroying server...");
+		LOG("-- Commencing final cleanup --");
 		//delete HeartBeat; HeartBeat = 0;
 		delete m_Server; m_Server = 0;
-		LOG("Shutdown done.");
+		LOG("--- Shutdown done ---");
+		printf("\n")
 	}
 
 	delete m_Log; m_Log = 0;

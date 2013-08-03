@@ -86,7 +86,7 @@ bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName)
 
 void cWorldStorage::WaitForFinish(void)
 {
-	LOG("Waiting for the world storage to finish saving");
+	LOG("-- Waiting for the world storage to finish saving --");
 	
 	{
 		// Cancel all loading requests:
@@ -102,7 +102,7 @@ void cWorldStorage::WaitForFinish(void)
 	m_Event.Set();
 	m_evtRemoved.Set();  // Wake up anybody waiting in the WaitForQueuesEmpty() method
 	super::Wait();
-	LOG("World storage thread finished");
+	LOG("-- World storage thread stopped --");
 }
 
 
@@ -345,7 +345,7 @@ bool cWorldStorage::SaveOneChunk(void)
 	}
 	if (Save.m_ChunkY == CHUNK_Y_MESSAGE)
 	{
-		LOGINFO("Saved all chunks in world %s", m_World->GetName().c_str());
+		LOGINFO("-- Saved all chunks in world %s --", m_World->GetName().c_str());
 		return HasMore;
 	}
 	if (ShouldSave && m_World->IsChunkValid(Save.m_ChunkX, Save.m_ChunkZ))

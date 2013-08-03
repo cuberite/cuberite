@@ -129,9 +129,10 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		return false;
 	}
 
-	LOG("Starting up server.");
+	printf("\n")
+	LOG("--- Commencing Initialisation Sequence ---");
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
-	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
+	LOGINFO("Compatible protocol versions: %s", MCS_PROTOCOL_VERSIONS);
 
 	if (cSocket::WSAStartup() != 0) // Only does anything on Windows, but whatever
 	{
@@ -352,7 +353,7 @@ bool cServer::Tick(float a_Dt)
 
 void ServerTickThread( void * a_Param )
 {
-	LOG("ServerTickThread");
+	LOG("-- Starting ServerTickThread --");
 	cServer *CServerObj = (cServer*)a_Param;
 
 	cTimer Timer;

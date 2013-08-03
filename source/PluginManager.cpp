@@ -95,7 +95,7 @@ void cPluginManager::FindPlugins(void)
 
 void cPluginManager::ReloadPluginsNow(void)
 {
-	LOG("Loading plugins");
+	LOG("-- Loading plugins --");
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
@@ -106,7 +106,14 @@ void cPluginManager::ReloadPluginsNow(void)
 	cIniFile IniFile("settings.ini");
 	if (!IniFile.ReadFile())
 	{
-		LOGWARNING("cPluginManager: Can't find settings.ini, so can't load any plugins.");
+		LOGWARNING("-- cPluginManager: can't find settings.ini, using settings.example.ini --");
+		IniFile.Path("settings.example.ini");
+		if (!IniFile.ReadFile())
+		{
+			LOGWARNING("-- cPluginManager: can't find settings.ini, no plugins loaded --");
+		}
+		IniFile.Path("settings.ini");
+		
 	}
 		
 	unsigned int KeyNum = IniFile.FindKey("Plugins");
@@ -135,11 +142,11 @@ void cPluginManager::ReloadPluginsNow(void)
 
 	if (GetNumPlugins() == 0)
 	{
-		LOG("No plugins loaded");
+		LOG("-- No plugins loaded --");
 	}
 	else
 	{
-		LOG("Loaded %i plugin(s)", GetNumPlugins());
+		LOG("-- Loaded %i plugin(s) --", GetNumPlugins());
 	}
 }
 
