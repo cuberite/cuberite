@@ -1,4 +1,3 @@
-
 // ReDucTor is an awesome guy who helped me a lot
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
@@ -129,20 +128,6 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		LOGERROR("ERROR: Trying to initialize server while server is already running!");
 		return false;
 	}
-
-	printf("/============================\\\n");
-	printf("|   Custom Minecraft Server  |\n");
-	printf("|  Created by Kevin Bansberg |\n");
-	printf("|       A.K.A. FakeTruth     |\n");
-	printf("| Monsters by Alex Sonek     |\n");
-	printf("|       A.K.A. Duralex       |\n");
-	printf("| Stuff by Mattes D          |\n");
-	printf("|       A.K.A. _Xoft(o)      |\n");
-	printf("\\============================/\n");
-	printf("More info: WWW.MC-SERVER.ORG\n");
-	printf("           WWW.AE-C.NET\n");
-	printf("           WWW.RBTHINKTANK.COM\n");
-	printf("email: faketruth@gmail.com\n\n");
 
 	LOG("Starting up server.");
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
@@ -481,11 +466,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 void cServer::BindBuiltInConsoleCommands(void)
 {
 	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("restart", NULL, "Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop", NULL, "Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats", NULL, "Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("restart", NULL, " - Restarts the server cleanly");
+	PlgMgr->BindConsoleCommand("stop", NULL, " - Stops the server cleanly");
+	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	PlgMgr->BindConsoleCommand("dumpmem", NULL, "Dumps all used memory blocks together with their callstacks into memdump.xml");
+	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif	
 }
 

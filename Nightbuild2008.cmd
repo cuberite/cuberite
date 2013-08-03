@@ -92,6 +92,9 @@ if errorlevel 1 goto haderror
 
 
 
+:: Copy all the example ini files into the Install folder for zipping:
+copy MCServer\*.example.ini Install\*.example.ini
+
 :: Use 7-zip to compress the resulting files into a single file:
 set FILESUFFIX=%MYYEAR%_%MYMONTH%_%MYDAY%_%MYTIME%_%COMMITID%
 echo FILESUFFIX=%FILESUFFIX%

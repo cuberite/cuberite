@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "GroupManager.h"
@@ -88,7 +87,7 @@ cGroupManager::cGroupManager()
 			for( unsigned int i = 0; i < Split.size(); i++)
 			{
 				Group->AddPermission( Split[i] );
-				LOGINFO("Permission: %s", Split[i].c_str() );
+				//LOGINFO("Permission: %s", Split[i].c_str() );
 			}
 		}
 
@@ -102,7 +101,7 @@ cGroupManager::cGroupManager()
 			}
 		}
 	}
-	LOG("-- Done Loading Groups --");
+	LOG("-- Groups Successfully Loaded --");
 }
 
 
