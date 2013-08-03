@@ -4,39 +4,47 @@ function InitConsoleCommands()
 	local PluginMgr = cPluginManager:Get();
 	
 	-- Please keep the list alpha-sorted
-	PluginMgr:BindConsoleCommand("ban",                  HandleConsoleBan,                  "Bans a player by name");
-	PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                "Unbans a player by name");
-	PluginMgr:BindConsoleCommand("banlist",              HandleConsoleBanList,              "Lists all players banned by name");
-	PluginMgr:BindConsoleCommand("banlist ips",          HandleConsoleBanList,              "Lists all players banned by IP");
-	PluginMgr:BindConsoleCommand("help",                 HandleConsoleHelp,                 "Lists all commands");
-	PluginMgr:BindConsoleCommand("list",                 HandleConsoleList,                 "Lists all players in a machine-readable format");
-	PluginMgr:BindConsoleCommand("listgroups",           HandleConsoleListGroups,           "Shows a list of all the groups");
-	PluginMgr:BindConsoleCommand("numchunks",            HandleConsoleNumChunks,            "Shows number of chunks currently loaded");
-	PluginMgr:BindConsoleCommand("players",              HandleConsolePlayers,              "Lists all connected players");
-	PluginMgr:BindConsoleCommand("primaryserverversion", HandleConsolePrimaryServerVersion, "Gets or sets server version reported to 1.4+ clients");
-	PluginMgr:BindConsoleCommand("rank",                 HandleConsoleRank,                 " [Player] [Group] - add a player to a group");
-	PluginMgr:BindConsoleCommand("reload",               HandleConsoleReload,               "Reloads all plugins");
-	PluginMgr:BindConsoleCommand("save-all",             HandleConsoleSaveAll,              "Saves all chunks");
-	PluginMgr:BindConsoleCommand("say",                  HandleConsoleSay,                  "Sends a chat message to all players");
-	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               "Unloads all unused chunks");
+	PluginMgr:BindConsoleCommand("ban",                  HandleConsoleBan,                  " ~ Bans a player by name");
+	PluginMgr:BindConsoleCommand("unban",                HandleConsoleUnban,                " ~ Unbans a player by name");
+	PluginMgr:BindConsoleCommand("banlist",              HandleConsoleBanList,              " - Lists all players banned by name");
+	PluginMgr:BindConsoleCommand("banlist ips",          HandleConsoleBanList,              " - Lists all players banned by IP");
+	PluginMgr:BindConsoleCommand("help",                 HandleConsoleHelp,                 " - Lists all commands");
+	PluginMgr:BindConsoleCommand("list",                 HandleConsoleList,                 " - Lists all players in a machine-readable format");
+	PluginMgr:BindConsoleCommand("listgroups",           HandleConsoleListGroups,           " - Shows a list of all the groups");
+	PluginMgr:BindConsoleCommand("numchunks",            HandleConsoleNumChunks,            " - Shows number of chunks currently loaded");
+	PluginMgr:BindConsoleCommand("players",              HandleConsolePlayers,              " - Lists all connected players");
+	PluginMgr:BindConsoleCommand("getversion",           HandleConsoleVersion,              " - Gets server version reported to 1.4+ clients");
+	PluginMgr:BindConsoleCommand("setversion",           HandleConsoleVersion,              " ~ Sets server version reported to 1.4+ clients");
+	PluginMgr:BindConsoleCommand("rank",                 HandleConsoleRank,                 " ~ Add a player to a group");
+	PluginMgr:BindConsoleCommand("reload",               HandleConsoleReload,               " - Reloads all plugins");
+	PluginMgr:BindConsoleCommand("save-all",             HandleConsoleSaveAll,              " - Saves all chunks");
+	PluginMgr:BindConsoleCommand("say",                  HandleConsoleSay,                  " - Sends a chat message to all players");
+	PluginMgr:BindConsoleCommand("unload",               HandleConsoleUnload,               " - Unloads all unused chunks");
 end
 
 function HandleConsoleBan(Split)
 	if (#Split < 2) then
 		return true, "Usage: ban [Player] <Reason>";
-	end
-
-	local Reason = "You have been banned"
-	if (#Split > 2) then
-		Reason = table.concat(Split, " ", 3);
+	end	
+	
+	local Reason = cChatColor.Red .. "You have been banned." .. cChatColor.White .. " Did you do something illegal?"
+	if( #Split > 2 ) then
+		Reason = table.concat(Split, " ", 3)
 	end
 	
-	
-	if (not(BanPlayer(Split[2], Reason))) then
-		return true, "Could not find player " .. Split[2];
+	if KickPlayer(Split[2], Reason) == false then
+		BannedPlayersIni:DeleteValue("Banned", Split[2])
+		BannedPlayersIni:SetValueB("Banned", Split[2], true)
+		BannedPlayersIni:WriteFile()
+		LOGINFO("Could not find player, but banned anyway" )
+	else
+		BannedPlayersIni:DeleteValue("Banned", Split[2])
+		BannedPlayersIni:SetValueB("Banned", Split[2], true)
+		BannedPlayersIni:WriteFile()
+		LOGINFO("Successfully kicked and banned player" )
 	end
 
-	return true, "Player " .. Split[2] .. " has been banned.";
+	return true
 end
 
 function HandleConsoleUnban(Split)
@@ -87,9 +95,10 @@ function HandleConsoleHelp(Split)
 	table.sort(Commands, CompareCommands);
 	
 	local Out = "";
+	Out = "'-' denotes no prefix, '~' denotes that a value is required.\n"
 	for i, Command in ipairs(Commands) do
 		Out = Out .. Command[1] .. string.rep(" ", MaxLength - Command[1]:len());  -- Align to a table
-		Out = Out .. " - " .. Command[2] .. "\n";
+		Out = Out .. Command[2] .. "\n";
 	end
 	return true, Out;
 end
@@ -171,7 +180,7 @@ function HandleConsolePlayers(Split)
 	return true, Out;
 end
 
-function HandleConsolePrimaryServerVersion(Split)
+function HandleConsoleVersion(Split)
 	if (#Split == 1) then
 		-- Display current version:
 		local Version = cRoot:Get():GetPrimaryServerVersion();
@@ -218,7 +227,7 @@ function HandleConsoleRank(Split)
 			World:ForEachPlayer(
 				function (Player)
 					if (Player:GetName() == Split[2]) then
-						Player:SendMessage(cChatColor.Green .. "You were moved to group " .. Split[3]);
+						Player:SendMessage(cChatColor.Yellow .. "[INFO] " .. cChatColor.White .. "You were moved to group " .. Split[3]);
 						Player:LoadPermissionsFromDisk();
 					end
 				end
@@ -231,12 +240,14 @@ end
 
 function HandleConsoleReload(Split)
 	Server = cRoot:Get():GetServer();
-	Server:SendMessage(cChatColor.Green .. "Reloading all plugins.");
+	Server:SendMessage(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Reloading all plugins!");
 	cPluginManager:Get():ReloadPlugins();
 	return true;
 end
 
 function HandleConsoleSaveAll(Split)
+	Server = cRoot:Get():GetServer();
+	Server:SendMessage(cChatColor.Rose .. "[WARNING] " .. cChatColor.White .. "Saving all chunks!");
 	cRoot:Get():SaveAllChunks();
 	return true;
 end
@@ -248,7 +259,7 @@ function HandleConsoleSay(Split)
 		Message = Message .. " " .. Text;
 	end
 	Message = Message:sub(2);  -- Cut off the first space
-	cRoot:Get():GetServer():BroadcastChat(cChatColor.Purple .. "[SERVER] " .. Message);
+	cRoot:Get():GetServer():BroadcastChat(cChatColor.Gold .. "[SERVER] " .. cChatColor.Yellow .. Message);
 	return true;
 end
 

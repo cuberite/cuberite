@@ -1,8 +1,6 @@
 function OnLogin(Client, ProtocolVersion, Username)
 	if( Username ~= "" ) then
 		if( BannedPlayersIni:GetValueB("Banned", Username, false) == true ) then
-			local Server = cRoot:Get():GetServer()
-			Server:SendMessage( Username .. " tried to join, but is banned!" )
 			LOGINFO( Username .. " tried to join, but is banned!")
 			return true -- Player is banned, return true to deny access
 		end
