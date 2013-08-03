@@ -6,13 +6,10 @@
 ..\MCServer\items.ini
 ..\MCServer\monsters.ini
 MCServer*debug.cmd
-banned.example.ini
-groups.example.ini
+*.example.ini
 Lua-LICENSE.txt
 LuaExpat-license.html
 LuaSQLite3-LICENSE.txt
 MersenneTwister-LICENSE.txt
 settings.example.ini
-users.example.ini
 webadmin.example.ini
-whitelist.example.ini
