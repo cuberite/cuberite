@@ -115,7 +115,6 @@ void cRoot::Start(void)
 			LOGINFO("-- settings.ini inaccessible, using settings.example.ini for defaults --");
 			IniFile.Path("settings.example.ini");
 			IniFile.ReadFile();
-			IniFile.Path("settings.ini");
 		}
 		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
 		if (m_PrimaryServerVersion == 0)
@@ -125,7 +124,7 @@ void cRoot::Start(void)
 		else
 		{
 			// Make a note in the log that the primary server version is explicitly set in the ini file
-			LOGINFO("settings.ini: [Server].PrimaryServerVersion set to %d.", m_PrimaryServerVersion);
+			LOGINFO("-- settings.ini: [Server].PrimaryServerVersion set to %d. --", m_PrimaryServerVersion);
 		}
 
 		LOG("-- Starting MCServer --");
@@ -142,8 +141,6 @@ void cRoot::Start(void)
 			LOGINFO("-- webadmin.ini inaccessible, using webadmin.example.ini for defaults --");
 			WebIniFile.Path("webadmin.example.ini");
 			WebIniFile.ReadFile();
-			WebIniFile.Path("webadmin.ini");
-			WebIniFile.WriteFile();
 		}
 
 		if (WebIniFile.GetValueB("WebAdmin", "Enabled", false ))

@@ -111,9 +111,7 @@ void cPluginManager::ReloadPluginsNow(void)
 		if (!IniFile.ReadFile())
 		{
 			LOGWARNING("-- cPluginManager: can't find settings.ini, no plugins loaded --");
-		}
-		IniFile.Path("settings.ini");
-		
+		}		
 	}
 		
 	unsigned int KeyNum = IniFile.FindKey("Plugins");
