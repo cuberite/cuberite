@@ -103,7 +103,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%d chunks to load, %d chunks to generate", 
+			LOG("-- %d chunks to load, %d chunks to generate --", 
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
@@ -152,7 +152,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("%d chunks remaining to light", m_Lighting->GetQueueLength()
+			LOG("-- %d chunks remaining to light --", m_Lighting->GetQueueLength()
 			);
 			
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
@@ -396,7 +396,7 @@ void cWorld::InitializeSpawn(void)
 	int ViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is
 	#endif  // _DEBUG
 	
-	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("-- Preparing spawn area in world \"%s\" --", m_WorldName.c_str());
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)
@@ -419,7 +419,7 @@ void cWorld::InitializeSpawn(void)
 	}
 	
 	// Light all chunks that have been newly generated:
-	LOG("Lighting spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("-- Lighting spawn area in world \"%s\" --", m_WorldName.c_str());
 	
 	for (int x = 0; x < ViewDist; x++)
 	{
@@ -2191,7 +2191,7 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 void cWorld::SaveAllChunks(void)
 {
-	LOGINFO("Saving all chunks...");
+	LOGINFO("-- Saving all chunks --");
 	m_LastSave = m_WorldAge;
 	m_ChunkMap->SaveAllChunks();
 	m_Storage.QueueSavedMessage();
