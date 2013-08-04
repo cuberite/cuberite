@@ -19,13 +19,14 @@
 #include "BlockEntities/FurnaceEntity.h"
 #include "md5/md5.h"
 #include "LuaWindow.h"
+#include "LuaState.h"
 
 
 
 
 
 // fwd: LuaCommandBinder.cpp
-bool report_errors(lua_State* lua, int status);
+// bool cLuaState::ReportErrors(lua_State* lua, int status);
 
 
 
@@ -233,7 +234,7 @@ static int tolua_DoWith(lua_State* tolua_S)
 			} 
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0); 
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  // Abort enumeration
 			}
@@ -328,7 +329,7 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 			} 
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0); 
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  // Abort enumeration
 			}
@@ -421,7 +422,7 @@ static int tolua_ForEachInChunk(lua_State* tolua_S)
 			} 
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0); 
-			if (report_errors(LuaState, s)) 
+			if (cLuaState::ReportErrors(LuaState, s)) 
 			{ 
 				return true;  /* Abort enumeration */ 
 			} 
@@ -512,7 +513,7 @@ static int tolua_ForEach(lua_State * tolua_S)
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -677,7 +678,7 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 			tolua_pushcppstring(LuaState, a_HelpString);
 
 			int s = lua_pcall(LuaState, 3, 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -751,7 +752,7 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 			tolua_pushcppstring(LuaState, a_HelpString);
 
 			int s = lua_pcall(LuaState, 2, 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -1171,8 +1172,8 @@ static int tolua_cPlugin_Call(lua_State* tolua_S)
 		return 0;
 	}
 	
-	int s = lua_pcall(targetState, top-2, LUA_MULTRET, 0);
-	if( report_errors( targetState, s ) )
+	int s = lua_pcall(targetState, top - 2, LUA_MULTRET, 0);
+	if (cLuaState::ReportErrors(targetState, s))
 	{
 		LOGWARN("Error while calling function '%s' in plugin '%s'", funcName.c_str(), self->GetName().c_str() );
 		return 0;

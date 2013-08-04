@@ -1498,6 +1498,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\LuaState.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\LuaState.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\LuaWindow.cpp"
 					>
 				</File>
