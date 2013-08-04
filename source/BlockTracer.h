@@ -36,7 +36,7 @@ public:
 		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) {}
+		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) { return false; }
 		
 		/** Called when the path goes out of world, either below (a_BlockY < 0) or above (a_BlockY >= cChunkDef::Height)
 		The coords specify the exact point at which the path exited the world.
@@ -44,7 +44,7 @@ public:
 		Note that some paths can go out of the world and come back again (parabola),
 		in such a case this callback is followed by OnIntoWorld() and further OnNextBlock() calls
 		*/
-		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) {}
+		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) { return false; }
 		
 		/** Called when the path goes into the world, from either below (a_BlockY < 0) or above (a_BlockY >= cChunkDef::Height)
 		The coords specify the exact point at which the path entered the world.
@@ -52,7 +52,7 @@ public:
 		Note that some paths can go out of the world and come back again (parabola),
 		in such a case this callback is followed by further OnNextBlock() calls
 		*/
-		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) {}
+		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) { return false; }
 		
 		/** Called when the path is sure not to hit any more blocks.
 		Note that for some shapes this might never happen (line with constant Y)

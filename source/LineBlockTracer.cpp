@@ -148,8 +148,11 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	if (abs(m_DiffX) > EPS)
 	{
 		double DestX = (m_DirX > 0) ? (m_CurrentX + 1) : m_CurrentX;
-		Coeff = (m_EndX - DestX) / m_DiffX;
-		Direction = dirX;
+		Coeff = (DestX - m_StartX) / m_DiffX;
+		if (Coeff <= 1)
+		{
+			Direction = dirX;
+		}
 	}
 	if (abs(m_DiffY) > EPS)
 	{
@@ -205,8 +208,8 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 		{
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			int RelX = FAST_FLOOR_DIV(m_CurrentX, cChunkDef::Width);
-			int RelZ = FAST_FLOOR_DIV(m_CurrentZ, cChunkDef::Width);
+			int RelX = m_CurrentX - a_Chunk->GetPosX() * cChunkDef::Width;
+			int RelZ = m_CurrentZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 			a_Chunk->GetBlockTypeMeta(RelX, m_CurrentY, RelZ, BlockType, BlockMeta);
 			if (m_Callbacks->OnNextBlock(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta))
 			{
