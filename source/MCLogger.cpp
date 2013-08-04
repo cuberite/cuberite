@@ -10,6 +10,9 @@
 
 cMCLogger * cMCLogger::s_MCLogger = NULL;
 
+#ifdef _WIN32
+	HANDLE g_Console = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
 
 
 
@@ -145,8 +148,7 @@ void cMCLogger::Error(const char* a_Format, va_list a_ArgList)
 void cMCLogger::SetColor( unsigned char a_Color )
 {
 #ifdef _WIN32
-	HANDLE  hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
-	SetConsoleTextAttribute( hConsole, a_Color );
+	SetConsoleTextAttribute(g_Console, a_Color);
 #else
 	(void)a_Color;
 #endif
