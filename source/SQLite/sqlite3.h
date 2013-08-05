@@ -1085,7 +1085,7 @@ struct sqlite3_vfs {
   const char *zName;       /* Name of this virtual file system */
   void *pAppData;          /* Pointer to application-specific data */
   int (*xOpen)(sqlite3_vfs*, const char *zName, sqlite3_file*,
-               int flags, int *pOutFlags);
+			   int flags, int *pOutFlags);
   int (*xDelete)(sqlite3_vfs*, const char *zName, int syncDir);
   int (*xAccess)(sqlite3_vfs*, const char *zName, int flags, int *pResOut);
   int (*xFullPathname)(sqlite3_vfs*, const char *zName, int nOut, char *zOut);
@@ -3999,7 +3999,7 @@ SQLITE_API SQLITE_DEPRECATED int sqlite3_transfer_bindings(sqlite3_stmt*, sqlite
 SQLITE_API SQLITE_DEPRECATED int sqlite3_global_recover(void);
 SQLITE_API SQLITE_DEPRECATED void sqlite3_thread_cleanup(void);
 SQLITE_API SQLITE_DEPRECATED int sqlite3_memory_alarm(void(*)(void*,sqlite3_int64,int),
-                      void*,sqlite3_int64);
+					  void*,sqlite3_int64);
 #endif
 
 /*
@@ -5108,18 +5108,18 @@ typedef struct sqlite3_module sqlite3_module;
 struct sqlite3_module {
   int iVersion;
   int (*xCreate)(sqlite3*, void *pAux,
-               int argc, const char *const*argv,
-               sqlite3_vtab **ppVTab, char**);
+			   int argc, const char *const*argv,
+			   sqlite3_vtab **ppVTab, char**);
   int (*xConnect)(sqlite3*, void *pAux,
-               int argc, const char *const*argv,
-               sqlite3_vtab **ppVTab, char**);
+			   int argc, const char *const*argv,
+			   sqlite3_vtab **ppVTab, char**);
   int (*xBestIndex)(sqlite3_vtab *pVTab, sqlite3_index_info*);
   int (*xDisconnect)(sqlite3_vtab *pVTab);
   int (*xDestroy)(sqlite3_vtab *pVTab);
   int (*xOpen)(sqlite3_vtab *pVTab, sqlite3_vtab_cursor **ppCursor);
   int (*xClose)(sqlite3_vtab_cursor*);
   int (*xFilter)(sqlite3_vtab_cursor*, int idxNum, const char *idxStr,
-                int argc, sqlite3_value **argv);
+				int argc, sqlite3_value **argv);
   int (*xNext)(sqlite3_vtab_cursor*);
   int (*xEof)(sqlite3_vtab_cursor*);
   int (*xColumn)(sqlite3_vtab_cursor*, sqlite3_context*, int);
@@ -5130,8 +5130,8 @@ struct sqlite3_module {
   int (*xCommit)(sqlite3_vtab *pVTab);
   int (*xRollback)(sqlite3_vtab *pVTab);
   int (*xFindFunction)(sqlite3_vtab *pVtab, int nArg, const char *zName,
-                       void (**pxFunc)(sqlite3_context*,int,sqlite3_value**),
-                       void **ppArg);
+					   void (**pxFunc)(sqlite3_context*,int,sqlite3_value**),
+					   void **ppArg);
   int (*xRename)(sqlite3_vtab *pVtab, const char *zNew);
   /* The methods above are in version 1 of the sqlite_module object. Those 
   ** below are for version 2 and greater. */
@@ -5197,20 +5197,20 @@ struct sqlite3_index_info {
   /* Inputs */
   int nConstraint;           /* Number of entries in aConstraint */
   struct sqlite3_index_constraint {
-     int iColumn;              /* Column on left-hand side of constraint */
-     unsigned char op;         /* Constraint operator */
-     unsigned char usable;     /* True if this constraint is usable */
-     int iTermOffset;          /* Used internally - xBestIndex should ignore */
+	 int iColumn;              /* Column on left-hand side of constraint */
+	 unsigned char op;         /* Constraint operator */
+	 unsigned char usable;     /* True if this constraint is usable */
+	 int iTermOffset;          /* Used internally - xBestIndex should ignore */
   } *aConstraint;            /* Table of WHERE clause constraints */
   int nOrderBy;              /* Number of terms in the ORDER BY clause */
   struct sqlite3_index_orderby {
-     int iColumn;              /* Column number */
-     unsigned char desc;       /* True for DESC.  False for ASC. */
+	 int iColumn;              /* Column number */
+	 unsigned char desc;       /* True for DESC.  False for ASC. */
   } *aOrderBy;               /* The ORDER BY clause */
   /* Outputs */
   struct sqlite3_index_constraint_usage {
-    int argvIndex;           /* if >0, constraint is part of argv to xFilter */
-    unsigned char omit;      /* Do not code a test for this constraint */
+	int argvIndex;           /* if >0, constraint is part of argv to xFilter */
+	unsigned char omit;      /* Do not code a test for this constraint */
   } *aConstraintUsage;
   int idxNum;                /* Number used to identify the index */
   char *idxStr;              /* String, possibly obtained from sqlite3_malloc */
@@ -6448,7 +6448,7 @@ struct sqlite3_pcache_methods2 {
   sqlite3_pcache_page *(*xFetch)(sqlite3_pcache*, unsigned key, int createFlag);
   void (*xUnpin)(sqlite3_pcache*, sqlite3_pcache_page*, int discard);
   void (*xRekey)(sqlite3_pcache*, sqlite3_pcache_page*, 
-      unsigned oldKey, unsigned newKey);
+	  unsigned oldKey, unsigned newKey);
   void (*xTruncate)(sqlite3_pcache*, unsigned iLimit);
   void (*xDestroy)(sqlite3_pcache*);
   void (*xShrink)(sqlite3_pcache*);
