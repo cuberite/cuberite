@@ -1372,24 +1372,24 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGERROR",    tolua_LOGERROR);
 		
 		tolua_beginmodule(tolua_S, "cRoot");
-			tolua_function(tolua_S, "ForEachWorld",        tolua_ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_DoWith <cRoot, cPlayer, &cRoot::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachPlayer",       tolua_ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
+			tolua_function(tolua_S, "ForEachWorld",        tolua_ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
-			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<cWorld, cPlayer, &cWorld::ForEachPlayer>);
-			tolua_function(tolua_S, "ForEachEntity",         tolua_ForEach<cWorld, cEntity, &cWorld::ForEachEntity>);
-			tolua_function(tolua_S, "ForEachEntityInChunk",  tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
-			tolua_function(tolua_S, "ForEachChestInChunk",   tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
-			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
-			tolua_function(tolua_S, "DoWithPlayer",          tolua_DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
-			tolua_function(tolua_S, "FindAndDoWithPlayer",   tolua_DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "DoWithChestAt",         tolua_DoWithXYZ<cWorld, cChestEntity,       &cWorld::DoWithChestAt>);
 			tolua_function(tolua_S, "DoWithDispenserAt",     tolua_DoWithXYZ<cWorld, cDispenserEntity,   &cWorld::DoWithDispenserAt>);
-			tolua_function(tolua_S, "DoWithDropperAt",       tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
 			tolua_function(tolua_S, "DoWithDropSpenserAt",   tolua_DoWithXYZ<cWorld, cDropSpenserEntity, &cWorld::DoWithDropSpenserAt>);
+			tolua_function(tolua_S, "DoWithDropperAt",       tolua_DoWithXYZ<cWorld, cDropperEntity,     &cWorld::DoWithDropperAt>);
 			tolua_function(tolua_S, "DoWithFurnaceAt",       tolua_DoWithXYZ<cWorld, cFurnaceEntity,     &cWorld::DoWithFurnaceAt>);
+			tolua_function(tolua_S, "DoWithPlayer",          tolua_DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
+			tolua_function(tolua_S, "FindAndDoWithPlayer",   tolua_DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "ForEachChestInChunk",   tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
+			tolua_function(tolua_S, "ForEachEntity",         tolua_ForEach<cWorld, cEntity, &cWorld::ForEachEntity>);
+			tolua_function(tolua_S, "ForEachEntityInChunk",  tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
+			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
+			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<cWorld, cPlayer, &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "UpdateSign",            tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
@@ -1399,11 +1399,11 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPluginManager");
-			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 			tolua_function(tolua_S, "BindCommand",           tolua_cPluginManager_BindCommand);
 			tolua_function(tolua_S, "BindConsoleCommand",    tolua_cPluginManager_BindConsoleCommand);
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
+			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
@@ -1418,17 +1418,17 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cPlugin_NewLua");
-			tolua_function(tolua_S, "AddWebTab", tolua_cPlugin_NewLua_AddWebTab);
 			tolua_function(tolua_S, "AddTab", tolua_cPlugin_NewLua_AddTab);
+			tolua_function(tolua_S, "AddWebTab", tolua_cPlugin_NewLua_AddWebTab);
 		tolua_endmodule(tolua_S);
 
 		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);
 		tolua_beginmodule(tolua_S,"HTTPRequest");
 			// tolua_variable(tolua_S,"Method",tolua_get_HTTPRequest_Method,tolua_set_HTTPRequest_Method);
 			// tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
+			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
 			tolua_variable(tolua_S,"Params",tolua_get_HTTPRequest_Params,0);
 			tolua_variable(tolua_S,"PostParams",tolua_get_HTTPRequest_PostParams,0);
-			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebAdmin");
@@ -1440,8 +1440,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 			
 		tolua_beginmodule(tolua_S, "cClientHandle");
-			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE", cClientHandle::MAX_VIEW_DISTANCE);
+			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE", cClientHandle::MIN_VIEW_DISTANCE);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cItemGrid");
