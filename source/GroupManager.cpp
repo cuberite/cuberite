@@ -47,11 +47,8 @@ cGroupManager::cGroupManager()
 	cIniFile IniFile("groups.ini");
 	if (!IniFile.ReadFile())
 	{
-		LOGINFO("groups.ini inaccessible, using groups.example.ini for defaults!");
-		IniFile.Path("groups.example.ini");
-		IniFile.ReadFile();
-		IniFile.Path("groups.ini");
-		IniFile.WriteFile();
+		LOGWARNING("groups.ini inaccessible, no groups are defined");
+		return;
 	}
 
 	unsigned int NumKeys = IniFile.GetNumKeys();

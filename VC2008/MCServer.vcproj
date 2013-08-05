@@ -1853,6 +1853,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\source\Blocks\BlockCarpet.h"
+					>
+				</File>
+				<File
 					RelativePath="..\source\Blocks\BlockCauldron.h"
 					>
 				</File>
