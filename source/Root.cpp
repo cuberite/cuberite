@@ -112,10 +112,7 @@ void cRoot::Start(void)
 		cIniFile IniFile("settings.ini");
 		if (!IniFile.ReadFile())
 		{
-			LOGINFO("settings.ini inaccessible, using settings.example.ini for defaults!");
-			IniFile.Path("settings.example.ini");
-			IniFile.ReadFile();
-			IniFile.Path("settings.ini");
+			LOGWARNING("settings.ini inaccessible, all settings are reset to default values");
 		}
 		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
 		if (m_PrimaryServerVersion == 0)
@@ -139,23 +136,19 @@ void cRoot::Start(void)
 		cIniFile WebIniFile("webadmin.ini");
 		if (!WebIniFile.ReadFile())
 		{
-			LOGINFO("webadmin.ini inaccessible, using webadmin.example.ini for defaults!");
-			WebIniFile.Path("webadmin.example.ini");
-			WebIniFile.ReadFile();
-			WebIniFile.Path("webadmin.ini");
-			WebIniFile.WriteFile();
+			LOGWARNING("webadmin.ini inaccessible, wabadmin is disabled");
 		}
 
-		if (WebIniFile.GetValueB("WebAdmin", "Enabled", false ))
+		if (WebIniFile.GetValueB("WebAdmin", "Enabled", false))
 		{
 			LOG("Creating WebAdmin...");
 			m_WebAdmin = new cWebAdmin(8080);
 		}
 
 		LOG("Loading settings...");
-		m_GroupManager	= new cGroupManager();
+		m_GroupManager    = new cGroupManager();
 		m_CraftingRecipes = new cCraftingRecipes;
-		m_FurnaceRecipe = new cFurnaceRecipe();
+		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
 		LOG("Loading worlds...");
 		LoadWorlds();

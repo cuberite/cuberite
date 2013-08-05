@@ -12,17 +12,13 @@
 //////////////////////////////////////////////////////////////////////
 
 /*
-	!! MODIFIED BY FAKETRUTH !!
+!! MODIFIED BY FAKETRUTH and xoft !!
 */
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 // C++ Includes
-#include <iostream>
 #include <fstream>
-#include <sstream>
-
-using namespace std;
 
 // C Includes
 #include <ctype.h>
@@ -31,26 +27,32 @@ using namespace std;
 #include "iniFile.h"
 
 #if defined(WIN32)
-#define iniEOL endl
+	#define iniEOL endl
 #else
-#define iniEOL '\r' << endl
+	#define iniEOL '\r' << endl
 #endif
 
 #ifndef _WIN32
-#define	sscanf_s(buffer, stringbuffer, ...) (sscanf(buffer, stringbuffer, __VA_ARGS__))
+	#define sscanf_s(buffer, stringbuffer, ...) (sscanf(buffer, stringbuffer, __VA_ARGS__))
 #endif
 
+using namespace std;
 
 
 
 
-cIniFile::cIniFile( const string iniPath)
+
+cIniFile::cIniFile(const string & a_Path) :
+	m_IsCaseInsensitive(true)
 {
-  Path( iniPath);
-  caseInsensitive = true;
+	Path(a_Path);
 }
 
-bool cIniFile::ReadFile()
+
+
+
+
+bool cIniFile::ReadFile(bool a_AllowExampleRedirect)
 {
 	// Normally you would use ifstream, but the SGI CC compiler has
 	// a few bugs with ifstream. So ... fstream used.
@@ -58,12 +60,31 @@ bool cIniFile::ReadFile()
 	string   line;
 	string   keyname, valuename, value;
 	string::size_type pLeft, pRight;
+	bool IsFromExampleRedirect = false;
+	
+	f.open((FILE_IO_PREFIX + m_Path).c_str(), ios::in);
+	if (f.fail())
+	{
+		f.clear();
+		if (a_AllowExampleRedirect)
+		{
+			// Retry with the .example.ini file instead of .ini:
+			string ExPath(m_Path.substr(0, m_Path.length() - 4));
+			ExPath.append(".example.ini");
+			f.open((FILE_IO_PREFIX + ExPath).c_str(), ios::in);
+			if (f.fail())
+			{
+				return false;
+			}
+			IsFromExampleRedirect = true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-	f.open( (FILE_IO_PREFIX + path).c_str(), ios::in);
-	if ( f.fail())
-		return false;
-
-	while (getline( f, line))
+	while (getline(f, line))
 	{
 		// To be compatible with Win32, check for existence of '\r'.
 		// Win32 files have the '\r' and Unix files don't at the end of a line.
@@ -75,49 +96,49 @@ bool cIniFile::ReadFile()
 		{
 			continue;
 		}
-		if ( line[lineLength - 1] == '\r')
+		if (line[lineLength - 1] == '\r')
 		{
-			line = line.substr( 0, lineLength - 1);
+			line = line.substr(0, lineLength - 1);
 		}
 
 		if (line.length() == 0)
 		{
 			continue;
 		}
-		
+
 		// Check that the user hasn't opened a binary file by checking the first
 		// character of each line!
-		if ( !isprint( line[0]))
+		if (!isprint(line[0]))
 		{
-			printf( "Failing on char %d\n", line[0]);
+			printf("%s: Binary-check failed on char %d\n", __FUNCTION__, line[0]);
 			f.close();
 			return false;
 		}
-		if (( pLeft = line.find_first_of(";#[=")) == string::npos)
+		if ((pLeft = line.find_first_of(";#[=")) == string::npos)
 		{
 			continue;
 		}
-		
-		switch ( line[pLeft])
+
+		switch (line[pLeft])
 		{
 			case '[':
 			{
 				if (
 					((pRight = line.find_last_of("]")) != string::npos) &&
 					(pRight > pLeft)
-				)
+					)
 				{
-					keyname = line.substr( pLeft + 1, pRight - pLeft - 1);
-					AddKeyName( keyname);
+					keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
+					AddKeyName(keyname);
 				}
 				break;
 			}
 
 			case '=':
 			{
-				valuename = line.substr( 0, pLeft);
-				value = line.substr( pLeft + 1);
-				SetValue( keyname, valuename, value);
+				valuename = line.substr(0, pLeft);
+				value = line.substr(pLeft + 1);
+				SetValue(keyname, valuename, value);
 				break;
 			}
 
@@ -126,11 +147,11 @@ bool cIniFile::ReadFile()
 			{
 				if (names.size() == 0)
 				{
-					HeaderComment( line.substr( pLeft + 1));
+					HeaderComment(line.substr(pLeft + 1));
 				}
 				else
 				{
-					KeyComment( keyname, line.substr( pLeft + 1));
+					KeyComment(keyname, line.substr(pLeft + 1));
 				}
 				break;
 			}
@@ -138,9 +159,197 @@ bool cIniFile::ReadFile()
 	}  // while (getline())
 
 	f.close();
-	if (names.size() > 0)
+	if (names.size() == 0)
 	{
-		return true;
+		return false;
+	}
+	
+	if (IsFromExampleRedirect)
+	{
+		WriteFile();
+	}
+	return true;
+}
+
+
+
+
+
+bool cIniFile::WriteFile(void) const
+{
+	unsigned commentID, keyID, valueID;
+	// Normally you would use ofstream, but the SGI CC compiler has
+	// a few bugs with ofstream. So ... fstream used.
+	fstream f;
+
+	f.open((FILE_IO_PREFIX + m_Path).c_str(), ios::out);
+	if (f.fail())
+	{
+		return false;
+	}
+
+	// Write header comments.
+	for (commentID = 0; commentID < comments.size(); ++commentID)
+	{
+		f << ';' << comments[commentID] << iniEOL;
+	}
+	if (comments.size())
+	{
+		f << iniEOL;
+	}
+
+	// Write keys and values.
+	for (keyID = 0; keyID < keys.size(); ++keyID)
+	{
+		f << '[' << names[keyID] << ']' << iniEOL;
+		
+		// Comments.
+		for (commentID = 0; commentID < keys[keyID].comments.size(); ++commentID)
+		{
+			f << ';' << keys[keyID].comments[commentID] << iniEOL;
+		}
+		
+		// Values.
+		for (valueID = 0; valueID < keys[keyID].names.size(); ++valueID)
+		{
+			f << keys[keyID].names[valueID] << '=' << keys[keyID].values[valueID] << iniEOL;
+		}
+		f << iniEOL;
+	}
+	f.close();
+
+	return true;
+}
+
+
+
+
+
+long cIniFile::FindKey(const string & a_KeyName) const
+{
+	string CaseKeyName = CheckCase(a_KeyName);
+	for (unsigned keyID = 0; keyID < names.size(); ++keyID)
+	{
+		if (CheckCase(names[keyID]) == CaseKeyName)
+		{
+			return long(keyID);
+		}
+	}
+	return noID;
+}
+
+
+
+
+
+long cIniFile::FindValue(unsigned const keyID, const string & a_ValueName) const
+{
+	if (!keys.size() || (keyID >= keys.size()))
+	{
+		return noID;
+	}
+
+	string CaseValueName = CheckCase(a_ValueName);
+	for (unsigned valueID = 0; valueID < keys[keyID].names.size(); ++valueID)
+	{
+		if (CheckCase(keys[keyID].names[valueID]) == CaseValueName)
+		{
+			return long(valueID);
+		}
+	}
+	return noID;
+}
+
+
+
+
+
+unsigned cIniFile::AddKeyName(const string & keyname)
+{
+	names.resize(names.size() + 1, keyname);
+	keys.resize(keys.size() + 1);
+	return names.size() - 1;
+}
+
+
+
+
+
+string cIniFile::KeyName(unsigned const keyID) const
+{
+	if (keyID < names.size())
+	{
+		return names[keyID];
+	}
+	else
+	{
+		return "";
+	}
+}
+
+
+
+
+
+unsigned cIniFile::NumValues(unsigned const keyID)
+{
+	if (keyID < keys.size())
+	{
+		return keys[keyID].names.size();
+	}
+	return 0;
+}
+
+
+
+
+
+unsigned cIniFile::NumValues(const string & keyname)
+{
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return 0;
+	}
+	return keys[keyID].names.size();
+}
+
+
+
+
+
+string cIniFile::ValueName(unsigned const keyID, unsigned const valueID) const
+{
+	if (keyID < keys.size() && valueID < keys[keyID].names.size())
+	{
+		return keys[keyID].names[valueID];
+	}
+	return "";
+}
+
+
+
+
+
+string cIniFile::ValueName(const string & keyname, unsigned const valueID) const
+{
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return "";
+	}
+	return ValueName(keyID, valueID);
+}
+
+
+
+
+
+bool cIniFile::SetValue(unsigned const keyID, unsigned const valueID, const string & value)
+{
+	if ((keyID < keys.size()) && (valueID < keys[keyID].names.size()))
+	{
+		keys[keyID].values[valueID] = value;
 	}
 	return false;
 }
@@ -149,245 +358,116 @@ bool cIniFile::ReadFile()
 
 
 
-bool cIniFile::WriteFile()
+bool cIniFile::SetValue(const string & keyname, const string & valuename, const string & value, bool const create)
 {
-  unsigned commentID, keyID, valueID;
-  // Normally you would use ofstream, but the SGI CC compiler has
-  // a few bugs with ofstream. So ... fstream used.
-  fstream f;
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		if (create)
+		{
+			keyID = long(AddKeyName(keyname));
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-  f.open( (FILE_IO_PREFIX + path).c_str(), ios::out);
-  if ( f.fail())
-    return false;
+	long valueID = FindValue(unsigned(keyID), valuename);
+	if (valueID == noID)
+	{
+		if (!create)
+		{
+			return false;
+		}
+		keys[keyID].names.resize(keys[keyID].names.size() + 1, valuename);
+		keys[keyID].values.resize(keys[keyID].values.size() + 1, value);
+	}
+	else
+	{
+		if (!create)
+		{
+			keys[keyID].values[valueID] = value;
+		}
+		else
+		{
+			keys[keyID].names.resize(keys[keyID].names.size() + 1, valuename);
+			keys[keyID].values.resize(keys[keyID].values.size() + 1, value);
+		}
+	}
 
-  // Write header comments.
-  for ( commentID = 0; commentID < comments.size(); ++commentID)
-    f << ';' << comments[commentID] << iniEOL;
-  if ( comments.size())
-    f << iniEOL;
-
-  // Write keys and values.
-  for ( keyID = 0; keyID < keys.size(); ++keyID) {
-    f << '[' << names[keyID] << ']' << iniEOL;
-    // Comments.
-    for ( commentID = 0; commentID < keys[keyID].comments.size(); ++commentID)
-      f << ';' << keys[keyID].comments[commentID] << iniEOL;
-    // Values.
-    for ( valueID = 0; valueID < keys[keyID].names.size(); ++valueID)
-      f << keys[keyID].names[valueID] << '=' << keys[keyID].values[valueID] << iniEOL;
-    f << iniEOL;
-  }
-  f.close();
-
-  return true;
+	return true;
 }
 
 
 
 
 
-long cIniFile::FindKey( const string & keyname) const
+bool cIniFile::SetValueI(const string & keyname, const string & valuename, int const value, bool const create)
 {
-  for ( unsigned keyID = 0; keyID < names.size(); ++keyID)
-    if ( CheckCase( names[keyID]) == CheckCase( keyname))
-      return long(keyID);
-  return noID;
+	AString Data;
+	Printf(Data, "%d", value);
+	return SetValue(keyname, valuename, Data, create);
 }
 
 
 
 
 
-long cIniFile::FindValue( unsigned const keyID, const string & valuename) const
+bool cIniFile::SetValueF(const string & keyname, const string & valuename, double const value, bool const create)
 {
-  if ( !keys.size() || keyID >= keys.size())
-    return noID;
-
-  for ( unsigned valueID = 0; valueID < keys[keyID].names.size(); ++valueID)
-    if ( CheckCase( keys[keyID].names[valueID]) == CheckCase( valuename))
-      return long(valueID);
-  return noID;
+	AString Data;
+	Printf(Data, "%f", value);
+	return SetValue(keyname, valuename, Data, create);
 }
 
 
 
 
 
-unsigned cIniFile::AddKeyName( const string & keyname)
+bool cIniFile::SetValueV(const string & keyname, const string & valuename, char * format, ...)
 {
-  names.resize( names.size() + 1, keyname);
-  keys.resize( keys.size() + 1);
-  return names.size() - 1;
+	va_list args;
+	va_start(args, format);
+
+	AString Data;
+	AppendVPrintf(Data, format, args);
+	va_end(args);
+	return SetValue(keyname, valuename, Data);
 }
 
 
 
 
 
-string cIniFile::KeyName( unsigned const keyID) const
+string cIniFile::GetValue(unsigned const keyID, unsigned const valueID, const string & defValue) const
 {
-  if ( keyID < names.size())
-    return names[keyID];
-  else
-    return "";
+	if ((keyID < keys.size()) && (valueID < keys[keyID].names.size()))
+	{
+		return keys[keyID].values[valueID];
+	}
+	return defValue;
 }
 
 
 
 
 
-unsigned cIniFile::NumValues( unsigned const keyID)
+string cIniFile::GetValue(const string & keyname, const string & valuename, const string & defValue) const
 {
-  if ( keyID < keys.size())
-    return keys[keyID].names.size();
-  return 0;
-}
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return defValue;
+	}
 
+	long valueID = FindValue(unsigned(keyID), valuename);
+	if (valueID == noID)
+	{
+		return defValue;
+	}
 
-
-
-
-unsigned cIniFile::NumValues( const string & keyname)
-{
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return 0;
-  return keys[keyID].names.size();
-}
-
-
-
-
-
-string cIniFile::ValueName( unsigned const keyID, unsigned const valueID) const
-{
-  if ( keyID < keys.size() && valueID < keys[keyID].names.size())
-    return keys[keyID].names[valueID];
-  return "";
-}
-
-
-
-
-
-string cIniFile::ValueName( const string & keyname, unsigned const valueID) const
-{
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return "";
-  return ValueName( keyID, valueID);
-}
-
-
-
-
-
-bool cIniFile::SetValue( unsigned const keyID, unsigned const valueID, const string & value)
-{
-  if ( keyID < keys.size() && valueID < keys[keyID].names.size())
-    keys[keyID].values[valueID] = value;
-
-  return false;
-}
-
-
-
-
-
-bool cIniFile::SetValue( const string & keyname, const string & valuename, const string & value, bool const create)
-{
-  long keyID = FindKey( keyname);
-  if ( keyID == noID) {
-    if ( create)
-      keyID = long( AddKeyName( keyname));
-    else
-      return false;
-  }
-
-  long valueID = FindValue( unsigned(keyID), valuename);
-  if ( valueID == noID) {
-    if ( !create)
-      return false;
-    keys[keyID].names.resize( keys[keyID].names.size() + 1, valuename);
-    keys[keyID].values.resize( keys[keyID].values.size() + 1, value);
-  } else
-  {
-	  if(!create)
-		keys[keyID].values[valueID] = value;
-	  else
-	  {
-		  keys[keyID].names.resize( keys[keyID].names.size() + 1, valuename);
-		  keys[keyID].values.resize( keys[keyID].values.size() + 1, value);
-	  }
-  }
-
-  return true;
-}
-
-
-
-
-
-bool cIniFile::SetValueI( const string & keyname, const string & valuename, int const value, bool const create)
-{
-  AString Data;
-  Printf(Data, "%d", value);
-  return SetValue( keyname, valuename, Data, create);
-}
-
-
-
-
-
-bool cIniFile::SetValueF( const string & keyname, const string & valuename, double const value, bool const create)
-{
-  AString Data;
-  Printf(Data, "%f", value);
-  return SetValue( keyname, valuename, Data, create);
-}
-
-
-
-
-
-bool cIniFile::SetValueV( const string & keyname, const string & valuename, char *format, ...)
-{
-  va_list args;
-
-  va_start( args, format);
-  
-  AString Data;
-  AppendVPrintf(Data, format, args);
-  va_end( args);
-  return SetValue( keyname, valuename, Data);
-}
-
-
-
-
-
-string cIniFile::GetValue( unsigned const keyID, unsigned const valueID, const string & defValue) const
-{
-  if ( keyID < keys.size() && valueID < keys[keyID].names.size())
-    return keys[keyID].values[valueID];
-  return defValue;
-}
-
-
-
-
-
-string cIniFile::GetValue( const string & keyname, const string & valuename, const string & defValue) const
-{
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return defValue;
-
-  long valueID = FindValue( unsigned(keyID), valuename);
-  if ( valueID == noID)
-    return defValue;
-
-  return keys[keyID].values[valueID];
+	return keys[keyID].values[valueID];
 }
 
 
@@ -398,7 +478,7 @@ int cIniFile::GetValueI(const string & keyname, const string & valuename, int co
 {
 	AString Data;
 	Printf(Data, "%d", defValue);
-  return atoi( GetValue( keyname, valuename, Data).c_str());
+	return atoi(GetValue(keyname, valuename, Data).c_str());
 }
 
 
@@ -407,9 +487,9 @@ int cIniFile::GetValueI(const string & keyname, const string & valuename, int co
 
 double cIniFile::GetValueF(const string & keyname, const string & valuename, double const defValue) const
 {
-  AString Data;
-  Printf(Data, "%f", defValue);
-  return atof( GetValue( keyname, valuename, Data).c_str());
+	AString Data;
+	Printf(Data, "%f", defValue);
+	return atof(GetValue(keyname, valuename, Data).c_str());
 }
 
 
@@ -418,15 +498,15 @@ double cIniFile::GetValueF(const string & keyname, const string & valuename, dou
 
 AString cIniFile::GetValueSet(const AString & keyname, const AString & valuename, const AString & defValue)
 {
-	long keyID = FindKey( keyname);
-	if ( keyID == noID)
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
 	{
 		SetValue(keyname, valuename, defValue);
 		return defValue;
 	}
 
-	long valueID = FindValue( unsigned(keyID), valuename);
-	if ( valueID == noID)
+	long valueID = FindValue(unsigned(keyID), valuename);
+	if (valueID == noID)
 	{
 		SetValue(keyname, valuename, defValue);
 		return defValue;
@@ -441,9 +521,9 @@ AString cIniFile::GetValueSet(const AString & keyname, const AString & valuename
 
 double cIniFile::GetValueSetF(const AString & keyname, const AString & valuename, const double defValue)
 {
-  AString Data;
-  Printf(Data, "%f", defValue);
-  return atof(GetValueSet(keyname, valuename, Data).c_str());
+	AString Data;
+	Printf(Data, "%f", defValue);
+	return atof(GetValueSet(keyname, valuename, Data).c_str());
 }
 
 
@@ -454,182 +534,273 @@ int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, c
 {
 	AString Data;
 	Printf(Data, "%d", defValue);
-  return atoi(GetValueSet(keyname, valuename, Data).c_str());
+	return atoi(GetValueSet(keyname, valuename, Data).c_str());
 }
 
 
 
 
 
-bool cIniFile::DeleteValueByID( const unsigned keyID, const unsigned valueID )
+bool cIniFile::DeleteValueByID(const unsigned keyID, const unsigned valueID)
 {
-	if ( keyID < keys.size() && valueID < keys[keyID].names.size())
+	if (keyID < keys.size() && valueID < keys[keyID].names.size())
 	{
 		// This looks strange, but is neccessary.
 		vector<string>::iterator npos = keys[keyID].names.begin() + valueID;
 		vector<string>::iterator vpos = keys[keyID].values.begin() + valueID;
-		keys[keyID].names.erase( npos, npos + 1);
-		keys[keyID].values.erase( vpos, vpos + 1);
+		keys[keyID].names.erase(npos, npos + 1);
+		keys[keyID].values.erase(vpos, vpos + 1);
 		return true;
 	}
 	return false;
 }
 
-bool cIniFile::DeleteValue( const string & keyname, const string & valuename)
+
+
+
+
+bool cIniFile::DeleteValue(const string & keyname, const string & valuename)
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return false;
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return false;
+	}
 
-  long valueID = FindValue( unsigned(keyID), valuename);
-  if ( valueID == noID)
-    return false;
+	long valueID = FindValue(unsigned(keyID), valuename);
+	if (valueID == noID)
+	{
+		return false;
+	}
 
-  return DeleteValueByID( keyID, valueID );
+	return DeleteValueByID(keyID, valueID);
 }
 
-bool cIniFile::DeleteKey( const string & keyname)
+
+
+
+
+bool cIniFile::DeleteKey(const string & keyname)
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return false;
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return false;
+	}
 
-  // Now hopefully this destroys the vector lists within keys.
-  // Looking at <vector> source, this should be the case using the destructor.
-  // If not, I may have to do it explicitly. Memory leak check should tell.
-  // memleak_test.cpp shows that the following not required.
-  //keys[keyID].names.clear();
-  //keys[keyID].values.clear();
+	vector<string>::iterator npos = names.begin() + keyID;
+	vector<key>::iterator    kpos = keys.begin() + keyID;
+	names.erase(npos, npos + 1);
+	keys.erase(kpos, kpos + 1);
 
-  vector<string>::iterator npos = names.begin() + keyID;
-  vector<key>::iterator    kpos = keys.begin() + keyID;
-  names.erase( npos, npos + 1);
-  keys.erase( kpos, kpos + 1);
-
-  return true;
+	return true;
 }
 
-void cIniFile::Erase()
+
+
+
+
+void cIniFile::Clear(void)
 {
-  // This loop not needed. The vector<> destructor seems to do
-  // all the work itself. memleak_test.cpp shows this.
-  //for ( unsigned i = 0; i < keys.size(); ++i) {
-  //  keys[i].names.clear();
-  //  keys[i].values.clear();
-  //}
-  names.clear();
-  keys.clear();
-  comments.clear();
+	names.clear();
+	keys.clear();
+	comments.clear();
 }
 
-void cIniFile::HeaderComment( const string & comment)
+
+
+
+
+void cIniFile::HeaderComment(const string & comment)
 {
-  comments.resize( comments.size() + 1, comment);
+	comments.push_back(comment);
+	// comments.resize(comments.size() + 1, comment);
 }
 
-string cIniFile::HeaderComment( unsigned const commentID) const
+
+
+
+
+string cIniFile::HeaderComment(unsigned const commentID) const
 {
-  if ( commentID < comments.size())
-    return comments[commentID];
-  return "";
+	if (commentID < comments.size())
+	{
+		return comments[commentID];
+	}
+	return "";
 }
 
-bool cIniFile::DeleteHeaderComment( unsigned commentID)
+
+
+
+
+bool cIniFile::DeleteHeaderComment(unsigned commentID)
 {
-  if ( commentID < comments.size()) {
-    vector<string>::iterator cpos = comments.begin() + commentID;
-    comments.erase( cpos, cpos + 1);
-    return true;
-  }
-  return false;
+	if (commentID < comments.size())
+	{
+		vector<string>::iterator cpos = comments.begin() + commentID;
+		comments.erase(cpos, cpos + 1);
+		return true;
+	}
+	return false;
 }
 
-unsigned cIniFile::NumKeyComments( unsigned const keyID) const
+
+
+
+
+unsigned cIniFile::NumKeyComments(unsigned const keyID) const
 {
-  if ( keyID < keys.size())
-    return keys[keyID].comments.size();
-  return 0;
+	if (keyID < keys.size())
+	{
+		return keys[keyID].comments.size();
+	}
+	return 0;
 }
 
-unsigned cIniFile::NumKeyComments( const string & keyname) const
+
+
+
+
+unsigned cIniFile::NumKeyComments(const string & keyname) const
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return 0;
-  return keys[keyID].comments.size();
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+		return 0;
+	return keys[keyID].comments.size();
 }
 
-bool cIniFile::KeyComment( unsigned const keyID, const string & comment)
+
+
+
+
+bool cIniFile::KeyComment(unsigned const keyID, const string & comment)
 {
-  if ( keyID < keys.size()) {
-    keys[keyID].comments.resize( keys[keyID].comments.size() + 1, comment);
-    return true;
-  }
-  return false;
+	if (keyID < keys.size())
+	{
+		keys[keyID].comments.resize(keys[keyID].comments.size() + 1, comment);
+		return true;
+	}
+	return false;
 }
 
-bool cIniFile::KeyComment( const string & keyname, const string & comment)
+
+
+
+
+bool cIniFile::KeyComment(const string & keyname, const string & comment)
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return false;
-  return KeyComment( unsigned(keyID), comment);
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return false;
+	}
+	return KeyComment(unsigned(keyID), comment);
 }
 
-string cIniFile::KeyComment( unsigned const keyID, unsigned const commentID) const
+
+
+
+
+string cIniFile::KeyComment(unsigned const keyID, unsigned const commentID) const
 {
-  if ( keyID < keys.size() && commentID < keys[keyID].comments.size())
-    return keys[keyID].comments[commentID];
-  return "";
+	if ((keyID < keys.size()) && (commentID < keys[keyID].comments.size()))
+	{
+		return keys[keyID].comments[commentID];
+	}
+	return "";
 }
 
-string cIniFile::KeyComment( const string & keyname, unsigned const commentID) const
+
+
+
+
+string cIniFile::KeyComment(const string & keyname, unsigned const commentID) const
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return "";
-  return KeyComment( unsigned(keyID), commentID);
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return "";
+	}
+	return KeyComment(unsigned(keyID), commentID);
 }
 
-bool cIniFile::DeleteKeyComment( unsigned const keyID, unsigned const commentID)
+
+
+
+
+bool cIniFile::DeleteKeyComment(unsigned const keyID, unsigned const commentID)
 {
-  if ( keyID < keys.size() && commentID < keys[keyID].comments.size()) {
-    vector<string>::iterator cpos = keys[keyID].comments.begin() + commentID;
-    keys[keyID].comments.erase( cpos, cpos + 1);
-    return true;
-  }
-  return false;
+	if ((keyID < keys.size()) && (commentID < keys[keyID].comments.size()))
+	{
+		vector<string>::iterator cpos = keys[keyID].comments.begin() + commentID;
+		keys[keyID].comments.erase(cpos, cpos + 1);
+		return true;
+	}
+	return false;
 }
 
-bool cIniFile::DeleteKeyComment( const string & keyname, unsigned const commentID)
+
+
+
+
+bool cIniFile::DeleteKeyComment(const string & keyname, unsigned const commentID)
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return false;
-  return DeleteKeyComment( unsigned(keyID), commentID);
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return false;
+	}
+	return DeleteKeyComment(unsigned(keyID), commentID);
 }
 
-bool cIniFile::DeleteKeyComments( unsigned const keyID)
+
+
+
+
+bool cIniFile::DeleteKeyComments(unsigned const keyID)
 {
-  if ( keyID < keys.size()) {
-    keys[keyID].comments.clear();
-    return true;
-  }
-  return false;
+	if (keyID < keys.size())
+	{
+		keys[keyID].comments.clear();
+		return true;
+	}
+	return false;
 }
 
-bool cIniFile::DeleteKeyComments( const string & keyname)
+
+
+
+
+bool cIniFile::DeleteKeyComments(const string & keyname)
 {
-  long keyID = FindKey( keyname);
-  if ( keyID == noID)
-    return false;
-  return DeleteKeyComments( unsigned(keyID));
+	long keyID = FindKey(keyname);
+	if (keyID == noID)
+	{
+		return false;
+	}
+	return DeleteKeyComments(unsigned(keyID));
 }
 
-string cIniFile::CheckCase( string s) const
+
+
+
+
+string cIniFile::CheckCase(const string & s) const
 {
-  if ( caseInsensitive)
-    for ( string::size_type i = 0; i < s.length(); ++i)
-      s[i] = (char)tolower(s[i]);
-  return s;
+	if (!m_IsCaseInsensitive)
+	{
+		return s;
+	}
+	string res(s);
+	size_t len = res.length();
+	for (size_t i = 0; i < len; i++)
+	{
+		res[i] = tolower(res[i]);
+	}
+	return res;
 }
+
+
+
+
