@@ -686,6 +686,52 @@ tolua_lerror:
 
 
 
+static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
+{
+	// Exported manually, because tolua would require the out-only param a_Height to be used when calling
+	// Takes (a_World,) a_BlockX, a_BlockZ
+	// Returns Height, IsValid
+	#ifndef TOLUA_RELEASE
+	tolua_Error tolua_err;
+	if (
+		!tolua_isusertype (tolua_S, 1, "cWorld", 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 2, 0, &tolua_err) ||
+		!tolua_isnumber   (tolua_S, 3, 0, &tolua_err) ||
+		!tolua_isnoobj    (tolua_S, 4, &tolua_err)
+		)
+		goto tolua_lerror;
+	else
+	#endif
+	{
+		cWorld * self       = (cWorld *) tolua_tousertype (tolua_S, 1, 0);
+		int BlockX          = (int)      tolua_tonumber   (tolua_S, 2, 0);
+		int BlockZ          = (int)      tolua_tonumber   (tolua_S, 3, 0);
+		#ifndef TOLUA_RELEASE
+		if (self == NULL)
+		{
+			tolua_error(tolua_S, "Invalid 'self' in function 'TryGetHeight'", NULL);
+		}
+		#endif
+		{
+			int Height = 0;
+			bool res = self->TryGetHeight(BlockX, BlockZ, Height);
+			tolua_pushnumber(tolua_S, Height);
+			tolua_pushboolean(tolua_S, res ? 1 : 0);
+		}
+	}
+	return 1;
+	
+	#ifndef TOLUA_RELEASE
+tolua_lerror:
+	tolua_error(tolua_S, "#ferror in function 'TryGetHeight'.", &tolua_err);
+	return 0;
+	#endif
+}
+
+
+
+
+
 static int tolua_cPluginManager_GetAllPlugins(lua_State * tolua_S)
 {
 	cPluginManager* self = (cPluginManager*)  tolua_tousertype(tolua_S,1,0);
@@ -1482,6 +1528,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachFurnaceInChunk", tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",         tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "SetSignLines",          tolua_cWorld_SetSignLines);
+			tolua_function(tolua_S, "TryGetHeight",          tolua_cWorld_TryGetHeight);
 			tolua_function(tolua_S, "UpdateSign",            tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
 		
