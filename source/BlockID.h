@@ -169,6 +169,8 @@ enum ENUM_BLOCK_ID
 	
 	E_BLOCK_DROPPER = 158,
 	
+	E_BLOCK_CARPET = 171,
+	
 	// Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
 	// IsValidBlock() depends on this
 	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
