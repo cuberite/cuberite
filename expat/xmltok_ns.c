@@ -21,8 +21,8 @@ NS(XmlGetUtf16InternalEncoding)(void)
 #else
   const short n = 1;
   return (*(const char *)&n
-		  ? &ns(internal_little2_encoding).enc
-		  : &ns(internal_big2_encoding).enc);
+          ? &ns(internal_little2_encoding).enc
+          : &ns(internal_big2_encoding).enc);
 #endif
 }
 
@@ -38,27 +38,27 @@ static const ENCODING * const NS(encodings)[] = {
 
 static int PTRCALL
 NS(initScanProlog)(const ENCODING *enc, const char *ptr, const char *end,
-				   const char **nextTokPtr)
+                   const char **nextTokPtr)
 {
   return initScan(NS(encodings), (const INIT_ENCODING *)enc,
-				  XML_PROLOG_STATE, ptr, end, nextTokPtr);
+                  XML_PROLOG_STATE, ptr, end, nextTokPtr);
 }
 
 static int PTRCALL
 NS(initScanContent)(const ENCODING *enc, const char *ptr, const char *end,
-					const char **nextTokPtr)
+                    const char **nextTokPtr)
 {
   return initScan(NS(encodings), (const INIT_ENCODING *)enc,
-				  XML_CONTENT_STATE, ptr, end, nextTokPtr);
+                  XML_CONTENT_STATE, ptr, end, nextTokPtr);
 }
 
 int
 NS(XmlInitEncoding)(INIT_ENCODING *p, const ENCODING **encPtr,
-					const char *name)
+                    const char *name)
 {
   int i = getEncodingIndex(name);
   if (i == UNKNOWN_ENC)
-	return 0;
+    return 0;
   SET_INIT_ENC_INDEX(p, i);
   p->initEnc.scanners[XML_PROLOG_STATE] = NS(initScanProlog);
   p->initEnc.scanners[XML_CONTENT_STATE] = NS(initScanContent);
@@ -77,39 +77,39 @@ NS(findEncoding)(const ENCODING *enc, const char *ptr, const char *end)
   int i;
   XmlUtf8Convert(enc, &ptr, end, &p, p + ENCODING_MAX - 1);
   if (ptr != end)
-	return 0;
+    return 0;
   *p = 0;
   if (streqci(buf, KW_UTF_16) && enc->minBytesPerChar == 2)
-	return enc;
+    return enc;
   i = getEncodingIndex(buf);
   if (i == UNKNOWN_ENC)
-	return 0;
+    return 0;
   return NS(encodings)[i];
 }
 
 int
 NS(XmlParseXmlDecl)(int isGeneralTextEntity,
-					const ENCODING *enc,
-					const char *ptr,
-					const char *end,
-					const char **badPtr,
-					const char **versionPtr,
-					const char **versionEndPtr,
-					const char **encodingName,
-					const ENCODING **encoding,
-					int *standalone)
+                    const ENCODING *enc,
+                    const char *ptr,
+                    const char *end,
+                    const char **badPtr,
+                    const char **versionPtr,
+                    const char **versionEndPtr,
+                    const char **encodingName,
+                    const ENCODING **encoding,
+                    int *standalone)
 {
   return doParseXmlDecl(NS(findEncoding),
-						isGeneralTextEntity,
-						enc,
-						ptr,
-						end,
-						badPtr,
-						versionPtr,
-						versionEndPtr,
-						encodingName,
-						encoding,
-						standalone);
+                        isGeneralTextEntity,
+                        enc,
+                        ptr,
+                        end,
+                        badPtr,
+                        versionPtr,
+                        versionEndPtr,
+                        encodingName,
+                        encoding,
+                        standalone);
 }
 
 #else /* XML_TOK_NS_C */

@@ -266,9 +266,9 @@ static int tolua_AllToLua_cIniFile_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -277,7 +277,7 @@ static int tolua_AllToLua_cIniFile_new00(lua_State* tolua_S)
   const std::string iniPath = ((const std::string)  tolua_tocppstring(tolua_S,2,""));
   {
    cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(iniPath));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
   }
  }
  return 1;
@@ -296,9 +296,9 @@ static int tolua_AllToLua_cIniFile_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -307,8 +307,8 @@ static int tolua_AllToLua_cIniFile_new00_local(lua_State* tolua_S)
   const std::string iniPath = ((const std::string)  tolua_tocppstring(tolua_S,2,""));
   {
    cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(iniPath));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -327,8 +327,8 @@ static int tolua_AllToLua_cIniFile_CaseSensitive00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -358,8 +358,8 @@ static int tolua_AllToLua_cIniFile_CaseInsensitive00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -389,9 +389,9 @@ static int tolua_AllToLua_cIniFile_Path00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -422,8 +422,8 @@ static int tolua_AllToLua_cIniFile_Path01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -450,9 +450,9 @@ static int tolua_AllToLua_cIniFile_SetPath00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -484,8 +484,8 @@ static int tolua_AllToLua_cIniFile_ReadFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -516,8 +516,8 @@ static int tolua_AllToLua_cIniFile_WriteFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -548,8 +548,8 @@ static int tolua_AllToLua_cIniFile_Erase00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -579,8 +579,8 @@ static int tolua_AllToLua_cIniFile_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -610,8 +610,8 @@ static int tolua_AllToLua_cIniFile_Reset00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -641,9 +641,9 @@ static int tolua_AllToLua_cIniFile_FindKey00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -676,10 +676,10 @@ static int tolua_AllToLua_cIniFile_FindValue00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -713,8 +713,8 @@ static int tolua_AllToLua_cIniFile_NumKeys00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -745,8 +745,8 @@ static int tolua_AllToLua_cIniFile_GetNumKeys00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -777,9 +777,9 @@ static int tolua_AllToLua_cIniFile_AddKeyName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -812,9 +812,9 @@ static int tolua_AllToLua_cIniFile_KeyName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -846,9 +846,9 @@ static int tolua_AllToLua_cIniFile_GetKeyName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -880,9 +880,9 @@ static int tolua_AllToLua_cIniFile_NumValues00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -915,9 +915,9 @@ static int tolua_AllToLua_cIniFile_GetNumValues00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -949,9 +949,9 @@ static int tolua_AllToLua_cIniFile_NumValues01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -978,9 +978,9 @@ static int tolua_AllToLua_cIniFile_GetNumValues01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1008,10 +1008,10 @@ static int tolua_AllToLua_cIniFile_ValueName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1045,10 +1045,10 @@ static int tolua_AllToLua_cIniFile_GetValueName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1081,10 +1081,10 @@ static int tolua_AllToLua_cIniFile_ValueName01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1112,10 +1112,10 @@ static int tolua_AllToLua_cIniFile_GetValueName01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1144,10 +1144,10 @@ static int tolua_AllToLua_cIniFile_GetValue00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1181,11 +1181,11 @@ static int tolua_AllToLua_cIniFile_GetValue01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1217,10 +1217,10 @@ static int tolua_AllToLua_cIniFile_GetValue02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1248,11 +1248,11 @@ static int tolua_AllToLua_cIniFile_GetValue03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1283,11 +1283,11 @@ static int tolua_AllToLua_cIniFile_GetValueF00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1323,11 +1323,11 @@ static int tolua_AllToLua_cIniFile_GetValueI00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1363,11 +1363,11 @@ static int tolua_AllToLua_cIniFile_GetValueB00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1403,10 +1403,10 @@ static int tolua_AllToLua_cIniFile_GetValueSet00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1440,11 +1440,11 @@ static int tolua_AllToLua_cIniFile_GetValueSet01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1477,11 +1477,11 @@ static int tolua_AllToLua_cIniFile_GetValueSetF00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1517,11 +1517,11 @@ static int tolua_AllToLua_cIniFile_GetValueSetI00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1557,11 +1557,11 @@ static int tolua_AllToLua_cIniFile_GetValueSetB00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1597,11 +1597,11 @@ static int tolua_AllToLua_cIniFile_SetValue00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1635,12 +1635,12 @@ static int tolua_AllToLua_cIniFile_SetValue01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1674,12 +1674,12 @@ static int tolua_AllToLua_cIniFile_SetValueI00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1716,12 +1716,12 @@ static int tolua_AllToLua_cIniFile_SetValueB00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1758,12 +1758,12 @@ static int tolua_AllToLua_cIniFile_SetValueF00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1800,10 +1800,10 @@ static int tolua_AllToLua_cIniFile_DeleteValueByID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1836,10 +1836,10 @@ static int tolua_AllToLua_cIniFile_DeleteValue00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1874,9 +1874,9 @@ static int tolua_AllToLua_cIniFile_DeleteKey00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1909,8 +1909,8 @@ static int tolua_AllToLua_cIniFile_NumHeaderComments00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1941,9 +1941,9 @@ static int tolua_AllToLua_cIniFile_HeaderComment00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -1974,9 +1974,9 @@ static int tolua_AllToLua_cIniFile_HeaderComment01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2004,9 +2004,9 @@ static int tolua_AllToLua_cIniFile_DeleteHeaderComment00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2038,8 +2038,8 @@ static int tolua_AllToLua_cIniFile_DeleteHeaderComments00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2069,9 +2069,9 @@ static int tolua_AllToLua_cIniFile_NumKeyComments00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2102,9 +2102,9 @@ static int tolua_AllToLua_cIniFile_NumKeyComments01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2133,10 +2133,10 @@ static int tolua_AllToLua_cIniFile_KeyComment00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2169,10 +2169,10 @@ static int tolua_AllToLua_cIniFile_KeyComment01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2202,10 +2202,10 @@ static int tolua_AllToLua_cIniFile_KeyComment02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2233,10 +2233,10 @@ static int tolua_AllToLua_cIniFile_KeyComment03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2266,10 +2266,10 @@ static int tolua_AllToLua_cIniFile_DeleteKeyComment00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2301,10 +2301,10 @@ static int tolua_AllToLua_cIniFile_DeleteKeyComment01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2334,9 +2334,9 @@ static int tolua_AllToLua_cIniFile_DeleteKeyComments00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2367,9 +2367,9 @@ static int tolua_AllToLua_cIniFile_DeleteKeyComments01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2398,8 +2398,8 @@ static int tolua_AllToLua_BlockStringToType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2428,9 +2428,9 @@ static int tolua_AllToLua_StringToItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2460,8 +2460,8 @@ static int tolua_AllToLua_ItemToString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 (tolua_isvaluenil(tolua_S,1,&tolua_err) || !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     (tolua_isvaluenil(tolua_S,1,&tolua_err) || !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2489,8 +2489,8 @@ static int tolua_AllToLua_ItemTypeToString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2518,8 +2518,8 @@ static int tolua_AllToLua_ItemToFullString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 (tolua_isvaluenil(tolua_S,1,&tolua_err) || !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     (tolua_isvaluenil(tolua_S,1,&tolua_err) || !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2547,8 +2547,8 @@ static int tolua_AllToLua_StringToBiome00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2577,8 +2577,8 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2607,8 +2607,8 @@ static int tolua_AllToLua_StringToDimension00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2637,8 +2637,8 @@ static int tolua_AllToLua_DamageTypeToString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2666,8 +2666,8 @@ static int tolua_AllToLua_StringToDamageType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2696,8 +2696,8 @@ static int tolua_AllToLua_TrimString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2726,9 +2726,9 @@ static int tolua_AllToLua_NoCaseCompare00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2759,10 +2759,10 @@ static int tolua_AllToLua_ReplaceString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2794,8 +2794,8 @@ static int tolua_AllToLua_EscapeString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -2824,8 +2824,8 @@ static int tolua_AllToLua_StripColorCodes00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3030,8 +3030,8 @@ static int tolua_AllToLua_ClickActionToString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3059,8 +3059,8 @@ static int tolua_AllToLua_IsValidBlock00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3088,8 +3088,8 @@ static int tolua_AllToLua_IsValidItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3117,12 +3117,12 @@ static int tolua_AllToLua_AddFaceDirection00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3156,8 +3156,8 @@ static int tolua_AllToLua_ItemCategory_IsPickaxe00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3185,8 +3185,8 @@ static int tolua_AllToLua_ItemCategory_IsAxe00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3214,8 +3214,8 @@ static int tolua_AllToLua_ItemCategory_IsSword00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3243,8 +3243,8 @@ static int tolua_AllToLua_ItemCategory_IsHoe00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3272,8 +3272,8 @@ static int tolua_AllToLua_ItemCategory_IsShovel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3301,8 +3301,8 @@ static int tolua_AllToLua_ItemCategory_IsTool00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3330,8 +3330,8 @@ static int tolua_AllToLua_ItemCategory_IsHelmet00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3359,8 +3359,8 @@ static int tolua_AllToLua_ItemCategory_IsChestPlate00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3388,8 +3388,8 @@ static int tolua_AllToLua_ItemCategory_IsLeggings00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3417,8 +3417,8 @@ static int tolua_AllToLua_ItemCategory_IsBoots00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3446,8 +3446,8 @@ static int tolua_AllToLua_ItemCategory_IsArmor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3475,7 +3475,7 @@ static int tolua_AllToLua_GetTime00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isnoobj(tolua_S,1,&tolua_err)
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3502,9 +3502,9 @@ static int tolua_AllToLua_GetChar00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3534,8 +3534,8 @@ static int tolua_AllToLua_cStringMap_clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cStringMap",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cStringMap",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3565,8 +3565,8 @@ static int tolua_AllToLua_cStringMap_size00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cStringMap",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cStringMap",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3597,9 +3597,9 @@ static int tolua_AllToLua_cStringMap_get00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cStringMap",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cStringMap",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3848,9 +3848,9 @@ static int tolua_AllToLua_cChatColor_MakeColor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cChatColor",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cChatColor",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3878,8 +3878,8 @@ static int tolua_AllToLua_cClientHandle_GetPlayer00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3891,7 +3891,7 @@ static int tolua_AllToLua_cClientHandle_GetPlayer00(lua_State* tolua_S)
 #endif
   {
    cPlayer* tolua_ret = (cPlayer*)  self->GetPlayer();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPlayer");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPlayer");
   }
  }
  return 1;
@@ -3910,9 +3910,9 @@ static int tolua_AllToLua_cClientHandle_Kick00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3944,13 +3944,13 @@ static int tolua_AllToLua_cClientHandle_SendBlockChange00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -3985,8 +3985,8 @@ static int tolua_AllToLua_cClientHandle_GetUsername00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4017,9 +4017,9 @@ static int tolua_AllToLua_cClientHandle_SetUsername00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4051,8 +4051,8 @@ static int tolua_AllToLua_cClientHandle_GetPing00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4083,9 +4083,9 @@ static int tolua_AllToLua_cClientHandle_SetViewDistance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cClientHandle",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4116,8 +4116,8 @@ static int tolua_AllToLua_cClientHandle_GetViewDistance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4148,8 +4148,8 @@ static int tolua_AllToLua_cClientHandle_GetUniqueID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cClientHandle",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4330,8 +4330,8 @@ static int tolua_AllToLua_cEntity_GetEntityType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4362,8 +4362,8 @@ static int tolua_AllToLua_cEntity_IsPlayer00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4394,8 +4394,8 @@ static int tolua_AllToLua_cEntity_IsPickup00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4426,8 +4426,8 @@ static int tolua_AllToLua_cEntity_IsMob00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4458,8 +4458,8 @@ static int tolua_AllToLua_cEntity_IsMinecart00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4490,8 +4490,8 @@ static int tolua_AllToLua_cEntity_IsTNT00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4522,9 +4522,9 @@ static int tolua_AllToLua_cEntity_IsA00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4556,8 +4556,8 @@ static int tolua_AllToLua_cEntity_GetClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4588,8 +4588,8 @@ static int tolua_AllToLua_cEntity_GetClassStatic00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4616,8 +4616,8 @@ static int tolua_AllToLua_cEntity_GetParentClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4648,8 +4648,8 @@ static int tolua_AllToLua_cEntity_GetWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4661,7 +4661,7 @@ static int tolua_AllToLua_cEntity_GetWorld00(lua_State* tolua_S)
 #endif
   {
    cWorld* tolua_ret = (cWorld*)  self->GetWorld();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
   }
  }
  return 1;
@@ -4680,8 +4680,8 @@ static int tolua_AllToLua_cEntity_GetHeadYaw00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4712,8 +4712,8 @@ static int tolua_AllToLua_cEntity_GetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4744,8 +4744,8 @@ static int tolua_AllToLua_cEntity_GetMass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4776,8 +4776,8 @@ static int tolua_AllToLua_cEntity_GetPosition00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4789,7 +4789,7 @@ static int tolua_AllToLua_cEntity_GetPosition00(lua_State* tolua_S)
 #endif
   {
    const Vector3d& tolua_ret = (const Vector3d&)  self->GetPosition();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
   }
  }
  return 1;
@@ -4808,8 +4808,8 @@ static int tolua_AllToLua_cEntity_GetPosX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4840,8 +4840,8 @@ static int tolua_AllToLua_cEntity_GetPosY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4872,8 +4872,8 @@ static int tolua_AllToLua_cEntity_GetPosZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4904,8 +4904,8 @@ static int tolua_AllToLua_cEntity_GetRot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4917,7 +4917,7 @@ static int tolua_AllToLua_cEntity_GetRot00(lua_State* tolua_S)
 #endif
   {
    const Vector3d& tolua_ret = (const Vector3d&)  self->GetRot();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
   }
  }
  return 1;
@@ -4936,8 +4936,8 @@ static int tolua_AllToLua_cEntity_GetRotation00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -4968,8 +4968,8 @@ static int tolua_AllToLua_cEntity_GetPitch00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5000,8 +5000,8 @@ static int tolua_AllToLua_cEntity_GetRoll00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5032,8 +5032,8 @@ static int tolua_AllToLua_cEntity_GetLookVector00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5047,13 +5047,13 @@ static int tolua_AllToLua_cEntity_GetLookVector00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->GetLookVector();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -5074,8 +5074,8 @@ static int tolua_AllToLua_cEntity_GetSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5087,7 +5087,7 @@ static int tolua_AllToLua_cEntity_GetSpeed00(lua_State* tolua_S)
 #endif
   {
    const Vector3d& tolua_ret = (const Vector3d&)  self->GetSpeed();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const Vector3d");
   }
  }
  return 1;
@@ -5106,8 +5106,8 @@ static int tolua_AllToLua_cEntity_GetSpeedX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5138,8 +5138,8 @@ static int tolua_AllToLua_cEntity_GetSpeedY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5170,8 +5170,8 @@ static int tolua_AllToLua_cEntity_GetSpeedZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5202,8 +5202,8 @@ static int tolua_AllToLua_cEntity_GetWidth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5234,8 +5234,8 @@ static int tolua_AllToLua_cEntity_GetChunkX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5266,8 +5266,8 @@ static int tolua_AllToLua_cEntity_GetChunkZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5298,9 +5298,9 @@ static int tolua_AllToLua_cEntity_SetHeadYaw00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5331,9 +5331,9 @@ static int tolua_AllToLua_cEntity_SetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5364,9 +5364,9 @@ static int tolua_AllToLua_cEntity_SetMass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5397,9 +5397,9 @@ static int tolua_AllToLua_cEntity_SetPosX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5430,9 +5430,9 @@ static int tolua_AllToLua_cEntity_SetPosY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5463,9 +5463,9 @@ static int tolua_AllToLua_cEntity_SetPosZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5496,11 +5496,11 @@ static int tolua_AllToLua_cEntity_SetPosition00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5532,9 +5532,9 @@ static int tolua_AllToLua_cEntity_SetPosition01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5561,9 +5561,9 @@ static int tolua_AllToLua_cEntity_SetRot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5594,9 +5594,9 @@ static int tolua_AllToLua_cEntity_SetRotation00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5627,9 +5627,9 @@ static int tolua_AllToLua_cEntity_SetPitch00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5660,9 +5660,9 @@ static int tolua_AllToLua_cEntity_SetRoll00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5693,11 +5693,11 @@ static int tolua_AllToLua_cEntity_SetSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5729,9 +5729,9 @@ static int tolua_AllToLua_cEntity_SetSpeed01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5758,9 +5758,9 @@ static int tolua_AllToLua_cEntity_SetSpeedX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5791,9 +5791,9 @@ static int tolua_AllToLua_cEntity_SetSpeedY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5824,9 +5824,9 @@ static int tolua_AllToLua_cEntity_SetSpeedZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5857,9 +5857,9 @@ static int tolua_AllToLua_cEntity_SetWidth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5890,9 +5890,9 @@ static int tolua_AllToLua_cEntity_AddPosX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5923,9 +5923,9 @@ static int tolua_AllToLua_cEntity_AddPosY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5956,9 +5956,9 @@ static int tolua_AllToLua_cEntity_AddPosZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -5989,11 +5989,11 @@ static int tolua_AllToLua_cEntity_AddPosition00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6025,9 +6025,9 @@ static int tolua_AllToLua_cEntity_AddPosition01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6054,11 +6054,11 @@ static int tolua_AllToLua_cEntity_AddSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6090,9 +6090,9 @@ static int tolua_AllToLua_cEntity_AddSpeed01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6119,9 +6119,9 @@ static int tolua_AllToLua_cEntity_AddSpeedX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6152,9 +6152,9 @@ static int tolua_AllToLua_cEntity_AddSpeedY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6185,9 +6185,9 @@ static int tolua_AllToLua_cEntity_AddSpeedZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6218,8 +6218,8 @@ static int tolua_AllToLua_cEntity_GetUniqueID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6250,8 +6250,8 @@ static int tolua_AllToLua_cEntity_IsDestroyed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6282,9 +6282,9 @@ static int tolua_AllToLua_cEntity_Destroy00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6315,9 +6315,9 @@ static int tolua_AllToLua_cEntity_TakeDamage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6347,12 +6347,12 @@ static int tolua_AllToLua_cEntity_TakeDamage01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6381,13 +6381,13 @@ static int tolua_AllToLua_cEntity_TakeDamage02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6418,9 +6418,9 @@ static int tolua_AllToLua_cEntity_GetRawDamageAgainst00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6452,11 +6452,11 @@ static int tolua_AllToLua_cEntity_GetArmorCoverAgainst00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6490,9 +6490,9 @@ static int tolua_AllToLua_cEntity_GetKnockbackAmountAgainst00(lua_State* tolua_S
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6524,8 +6524,8 @@ static int tolua_AllToLua_cEntity_GetEquippedWeapon00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6539,13 +6539,13 @@ static int tolua_AllToLua_cEntity_GetEquippedWeapon00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->GetEquippedWeapon();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -6566,8 +6566,8 @@ static int tolua_AllToLua_cEntity_GetEquippedHelmet00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6581,13 +6581,13 @@ static int tolua_AllToLua_cEntity_GetEquippedHelmet00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->GetEquippedHelmet();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -6608,8 +6608,8 @@ static int tolua_AllToLua_cEntity_GetEquippedChestplate00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6623,13 +6623,13 @@ static int tolua_AllToLua_cEntity_GetEquippedChestplate00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->GetEquippedChestplate();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -6650,8 +6650,8 @@ static int tolua_AllToLua_cEntity_GetEquippedLeggings00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6665,13 +6665,13 @@ static int tolua_AllToLua_cEntity_GetEquippedLeggings00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->GetEquippedLeggings();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -6692,8 +6692,8 @@ static int tolua_AllToLua_cEntity_GetEquippedBoots00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6707,13 +6707,13 @@ static int tolua_AllToLua_cEntity_GetEquippedBoots00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->GetEquippedBoots();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -6734,9 +6734,9 @@ static int tolua_AllToLua_cEntity_KilledBy00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6767,9 +6767,9 @@ static int tolua_AllToLua_cEntity_Heal00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6800,8 +6800,8 @@ static int tolua_AllToLua_cEntity_GetHealth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6832,9 +6832,9 @@ static int tolua_AllToLua_cEntity_SetHealth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6865,9 +6865,9 @@ static int tolua_AllToLua_cEntity_SetMaxHealth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6898,8 +6898,8 @@ static int tolua_AllToLua_cEntity_GetMaxHealth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6930,9 +6930,9 @@ static int tolua_AllToLua_cEntity_StartBurning00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6963,8 +6963,8 @@ static int tolua_AllToLua_cEntity_StopBurning00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -6994,9 +6994,9 @@ static int tolua_AllToLua_cEntity_TeleportToEntity00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7027,11 +7027,11 @@ static int tolua_AllToLua_cEntity_TeleportToCoords00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7064,8 +7064,8 @@ static int tolua_AllToLua_cEntity_IsOnFire00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7096,8 +7096,8 @@ static int tolua_AllToLua_cEntity_IsCrouched00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7128,8 +7128,8 @@ static int tolua_AllToLua_cEntity_IsRiding00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7160,8 +7160,8 @@ static int tolua_AllToLua_cEntity_IsSprinting00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7192,8 +7192,8 @@ static int tolua_AllToLua_cEntity_IsRclking00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7478,8 +7478,8 @@ static int tolua_AllToLua_Lua__cEntity_tolua__set_instance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7511,9 +7511,9 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsA00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7545,8 +7545,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetClass00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7577,8 +7577,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetParentClass00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7609,9 +7609,9 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetRawDamageAgainst00(lua_State*
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7643,11 +7643,11 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetArmorCoverAgainst00(lua_State
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7681,9 +7681,9 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetKnockbackAmountAgainst00(lua_
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7715,8 +7715,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedWeapon00(lua_State* t
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7730,13 +7730,13 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedWeapon00(lua_State* t
    cItem tolua_ret = (cItem)  self->cEntity__GetEquippedWeapon();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -7757,8 +7757,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedHelmet00(lua_State* t
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7772,13 +7772,13 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedHelmet00(lua_State* t
    cItem tolua_ret = (cItem)  self->cEntity__GetEquippedHelmet();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -7799,8 +7799,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedChestplate00(lua_Stat
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7814,13 +7814,13 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedChestplate00(lua_Stat
    cItem tolua_ret = (cItem)  self->cEntity__GetEquippedChestplate();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -7841,8 +7841,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedLeggings00(lua_State*
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7856,13 +7856,13 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedLeggings00(lua_State*
    cItem tolua_ret = (cItem)  self->cEntity__GetEquippedLeggings();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -7883,8 +7883,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedBoots00(lua_State* to
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7898,13 +7898,13 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__GetEquippedBoots00(lua_State* to
    cItem tolua_ret = (cItem)  self->cEntity__GetEquippedBoots();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -7925,9 +7925,9 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__KilledBy00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7958,9 +7958,9 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__TeleportToEntity00(lua_State* to
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cEntity",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -7991,11 +7991,11 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__TeleportToCoords00(lua_State* to
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8028,8 +8028,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsOnFire00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8060,8 +8060,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsCrouched00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8092,8 +8092,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsRiding00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8124,8 +8124,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsSprinting00(lua_State* tolua_S
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8156,8 +8156,8 @@ static int tolua_AllToLua_Lua__cEntity_cEntity__IsRclking00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8188,9 +8188,9 @@ static int tolua_AllToLua_cPlayer_Initialize00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8221,8 +8221,8 @@ static int tolua_AllToLua_cPlayer_GetEyeHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8253,8 +8253,8 @@ static int tolua_AllToLua_cPlayer_GetEyePosition00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8268,13 +8268,13 @@ static int tolua_AllToLua_cPlayer_GetEyePosition00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->GetEyePosition();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -8295,8 +8295,8 @@ static int tolua_AllToLua_cPlayer_IsOnGround00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8327,8 +8327,8 @@ static int tolua_AllToLua_cPlayer_GetStance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8359,8 +8359,8 @@ static int tolua_AllToLua_cPlayer_GetInventory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8372,7 +8372,7 @@ static int tolua_AllToLua_cPlayer_GetInventory00(lua_State* tolua_S)
 #endif
   {
    cInventory& tolua_ret = (cInventory&)  self->GetInventory();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cInventory");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cInventory");
   }
  }
  return 1;
@@ -8391,8 +8391,8 @@ static int tolua_AllToLua_cPlayer_GetEquippedItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8404,7 +8404,7 @@ static int tolua_AllToLua_cPlayer_GetEquippedItem00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetEquippedItem();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -8423,8 +8423,8 @@ static int tolua_AllToLua_cPlayer_GetGameMode00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8455,9 +8455,9 @@ static int tolua_AllToLua_cPlayer_SetGameMode00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8488,8 +8488,8 @@ static int tolua_AllToLua_cPlayer_IsGameModeCreative00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8520,8 +8520,8 @@ static int tolua_AllToLua_cPlayer_IsGameModeSurvival00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8552,8 +8552,8 @@ static int tolua_AllToLua_cPlayer_IsGameModeAdventure00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8584,8 +8584,8 @@ static int tolua_AllToLua_cPlayer_GetIP00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8616,9 +8616,9 @@ static int tolua_AllToLua_cPlayer_MoveTo00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8649,8 +8649,8 @@ static int tolua_AllToLua_cPlayer_GetWindow00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8662,7 +8662,7 @@ static int tolua_AllToLua_cPlayer_GetWindow00(lua_State* tolua_S)
 #endif
   {
    cWindow* tolua_ret = (cWindow*)  self->GetWindow();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWindow");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWindow");
   }
  }
  return 1;
@@ -8681,9 +8681,9 @@ static int tolua_AllToLua_cPlayer_CloseWindow00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8714,10 +8714,10 @@ static int tolua_AllToLua_cPlayer_CloseWindowIfID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8749,8 +8749,8 @@ static int tolua_AllToLua_cPlayer_GetClientHandle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8762,7 +8762,7 @@ static int tolua_AllToLua_cPlayer_GetClientHandle00(lua_State* tolua_S)
 #endif
   {
    cClientHandle* tolua_ret = (cClientHandle*)  self->GetClientHandle();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cClientHandle");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cClientHandle");
   }
  }
  return 1;
@@ -8781,9 +8781,9 @@ static int tolua_AllToLua_cPlayer_SendMessage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8815,8 +8815,8 @@ static int tolua_AllToLua_cPlayer_GetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8847,9 +8847,9 @@ static int tolua_AllToLua_cPlayer_SetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8881,9 +8881,9 @@ static int tolua_AllToLua_cPlayer_AddToGroup00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8915,9 +8915,9 @@ static int tolua_AllToLua_cPlayer_RemoveFromGroup00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8949,9 +8949,9 @@ static int tolua_AllToLua_cPlayer_CanUseCommand00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -8984,9 +8984,9 @@ static int tolua_AllToLua_cPlayer_HasPermission00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9019,9 +9019,9 @@ static int tolua_AllToLua_cPlayer_IsInGroup00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9054,8 +9054,8 @@ static int tolua_AllToLua_cPlayer_GetColor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9086,12 +9086,12 @@ static int tolua_AllToLua_cPlayer_TossItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9125,9 +9125,9 @@ static int tolua_AllToLua_cPlayer_Heal00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9158,8 +9158,8 @@ static int tolua_AllToLua_cPlayer_GetFoodLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9190,8 +9190,8 @@ static int tolua_AllToLua_cPlayer_GetFoodSaturationLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9222,8 +9222,8 @@ static int tolua_AllToLua_cPlayer_GetFoodTickTimer00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9254,8 +9254,8 @@ static int tolua_AllToLua_cPlayer_GetFoodExhaustionLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9286,8 +9286,8 @@ static int tolua_AllToLua_cPlayer_GetFoodPoisonedTicksRemaining00(lua_State* tol
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9318,8 +9318,8 @@ static int tolua_AllToLua_cPlayer_IsSatiated00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9350,9 +9350,9 @@ static int tolua_AllToLua_cPlayer_SetFoodLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9383,9 +9383,9 @@ static int tolua_AllToLua_cPlayer_SetFoodSaturationLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9416,9 +9416,9 @@ static int tolua_AllToLua_cPlayer_SetFoodTickTimer00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9449,9 +9449,9 @@ static int tolua_AllToLua_cPlayer_SetFoodExhaustionLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9482,9 +9482,9 @@ static int tolua_AllToLua_cPlayer_SetFoodPoisonedTicksRemaining00(lua_State* tol
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9515,10 +9515,10 @@ static int tolua_AllToLua_cPlayer_Feed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9551,9 +9551,9 @@ static int tolua_AllToLua_cPlayer_AddFoodExhaustion00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9584,9 +9584,9 @@ static int tolua_AllToLua_cPlayer_FoodPoison00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9617,8 +9617,8 @@ static int tolua_AllToLua_cPlayer_IsEating00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9649,8 +9649,8 @@ static int tolua_AllToLua_cPlayer_Respawn00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9680,9 +9680,9 @@ static int tolua_AllToLua_cPlayer_SetVisible00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9713,8 +9713,8 @@ static int tolua_AllToLua_cPlayer_IsVisible00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9745,9 +9745,9 @@ static int tolua_AllToLua_cPlayer_MoveToWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9779,8 +9779,8 @@ static int tolua_AllToLua_cPlayer_LoadPermissionsFromDisk00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9810,8 +9810,8 @@ static int tolua_AllToLua_cPlayer_GetMaxSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9842,8 +9842,8 @@ static int tolua_AllToLua_cPlayer_GetNormalMaxSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9874,8 +9874,8 @@ static int tolua_AllToLua_cPlayer_GetSprintingMaxSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9906,9 +9906,9 @@ static int tolua_AllToLua_cPlayer_SetNormalMaxSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9939,9 +9939,9 @@ static int tolua_AllToLua_cPlayer_SetSprintingMaxSpeed00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -9972,9 +9972,9 @@ static int tolua_AllToLua_cPlayer_SetCrouch00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10005,9 +10005,9 @@ static int tolua_AllToLua_cPlayer_SetSprint00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlayer",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10314,8 +10314,8 @@ static int tolua_AllToLua_Lua__cPlayer_tolua__set_instance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10347,9 +10347,9 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__Initialize00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10380,9 +10380,9 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__MoveTo00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cPlayer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10413,8 +10413,8 @@ static int tolua_AllToLua_cPluginManager_Get00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10422,7 +10422,7 @@ static int tolua_AllToLua_cPluginManager_Get00(lua_State* tolua_S)
  {
   {
    cPluginManager* tolua_ret = (cPluginManager*)  cPluginManager::Get();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPluginManager");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPluginManager");
   }
  }
  return 1;
@@ -10441,9 +10441,9 @@ static int tolua_AllToLua_cPluginManager_GetPlugin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPluginManager",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10456,7 +10456,7 @@ static int tolua_AllToLua_cPluginManager_GetPlugin00(lua_State* tolua_S)
 #endif
   {
    cPlugin* tolua_ret = (cPlugin*)  self->GetPlugin(a_Plugin);
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPlugin");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPlugin");
    tolua_pushcppstring(tolua_S,(const char*)a_Plugin);
   }
  }
@@ -10476,8 +10476,8 @@ static int tolua_AllToLua_cPluginManager_FindPlugins00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10507,8 +10507,8 @@ static int tolua_AllToLua_cPluginManager_ReloadPlugins00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10538,10 +10538,10 @@ static int tolua_AllToLua_cPluginManager_AddHook00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cPlugin",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlugin",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10573,8 +10573,8 @@ static int tolua_AllToLua_cPluginManager_GetNumPlugins00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPluginManager",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPluginManager",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10605,9 +10605,9 @@ static int tolua_AllToLua_cPluginManager_DisablePlugin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10640,9 +10640,9 @@ static int tolua_AllToLua_cPluginManager_LoadPlugin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10675,9 +10675,9 @@ static int tolua_AllToLua_cPluginManager_IsCommandBound00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10710,9 +10710,9 @@ static int tolua_AllToLua_cPluginManager_GetCommandPermission00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10745,10 +10745,10 @@ static int tolua_AllToLua_cPluginManager_ExecuteCommand00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10782,10 +10782,10 @@ static int tolua_AllToLua_cPluginManager_ForceExecuteCommand00(lua_State* tolua_
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10819,9 +10819,9 @@ static int tolua_AllToLua_cPluginManager_IsConsoleCommandBound00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPluginManager",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10854,8 +10854,8 @@ static int tolua_AllToLua_cPlugin_GetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10886,9 +10886,9 @@ static int tolua_AllToLua_cPlugin_SetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10920,8 +10920,8 @@ static int tolua_AllToLua_cPlugin_GetVersion00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10952,9 +10952,9 @@ static int tolua_AllToLua_cPlugin_SetVersion00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPlugin",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -10985,8 +10985,8 @@ static int tolua_AllToLua_cPlugin_GetDirectory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11017,8 +11017,8 @@ static int tolua_AllToLua_cPlugin_GetLocalDirectory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11066,10 +11066,10 @@ static int tolua_AllToLua_cServer_BroadcastChat00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,3,"const cClientHandle",1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"const cClientHandle",1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11102,11 +11102,11 @@ static int tolua_AllToLua_cServer_SendMessage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,3,"cPlayer",1,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cServer",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,3,"cPlayer",1,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11140,8 +11140,8 @@ static int tolua_AllToLua_cServer_GetServerID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cServer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cServer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11172,8 +11172,8 @@ static int tolua_AllToLua_cWorld_GetClassStatic00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11200,8 +11200,8 @@ static int tolua_AllToLua_cWorld_GetTime00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11228,8 +11228,8 @@ static int tolua_AllToLua_cWorld_GetTicksUntilWeatherChange00(lua_State* tolua_S
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11260,8 +11260,8 @@ static int tolua_AllToLua_cWorld_GetWorldAge00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11292,8 +11292,8 @@ static int tolua_AllToLua_cWorld_GetTimeOfDay00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11324,9 +11324,9 @@ static int tolua_AllToLua_cWorld_SetTicksUntilWeatherChange00(lua_State* tolua_S
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11357,9 +11357,9 @@ static int tolua_AllToLua_cWorld_SetTimeOfDay00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11390,9 +11390,9 @@ static int tolua_AllToLua_cWorld_SetWorldTime00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11423,8 +11423,8 @@ static int tolua_AllToLua_cWorld_GetGameMode00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11455,8 +11455,8 @@ static int tolua_AllToLua_cWorld_IsGameModeCreative00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11487,8 +11487,8 @@ static int tolua_AllToLua_cWorld_IsGameModeSurvival00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11519,8 +11519,8 @@ static int tolua_AllToLua_cWorld_IsGameModeAdventure00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11551,8 +11551,8 @@ static int tolua_AllToLua_cWorld_IsPVPEnabled00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11583,8 +11583,8 @@ static int tolua_AllToLua_cWorld_IsDeepSnowEnabled00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11615,8 +11615,8 @@ static int tolua_AllToLua_cWorld_GetDimension00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11647,10 +11647,10 @@ static int tolua_AllToLua_cWorld_GetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11683,8 +11683,8 @@ static int tolua_AllToLua_cWorld_UnloadUnusedChunks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11714,8 +11714,8 @@ static int tolua_AllToLua_cWorld_GetMaxPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11746,9 +11746,9 @@ static int tolua_AllToLua_cWorld_SetMaxPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11779,8 +11779,8 @@ static int tolua_AllToLua_cWorld_GetNumPlayers00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11811,10 +11811,10 @@ static int tolua_AllToLua_cWorld_RegenerateChunk00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11846,10 +11846,10 @@ static int tolua_AllToLua_cWorld_GenerateChunk00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11881,13 +11881,13 @@ static int tolua_AllToLua_cWorld_SetBlock00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11922,13 +11922,13 @@ static int tolua_AllToLua_cWorld_FastSetBlock00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -11963,11 +11963,11 @@ static int tolua_AllToLua_cWorld_GetBlock00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12001,11 +12001,11 @@ static int tolua_AllToLua_cWorld_GetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12039,12 +12039,12 @@ static int tolua_AllToLua_cWorld_SetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12078,11 +12078,11 @@ static int tolua_AllToLua_cWorld_GetBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12116,11 +12116,11 @@ static int tolua_AllToLua_cWorld_GetBlockBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12154,13 +12154,13 @@ static int tolua_AllToLua_cWorld_GetBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12198,15 +12198,15 @@ static int tolua_AllToLua_cWorld_GetBlockInfo00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12247,11 +12247,11 @@ static int tolua_AllToLua_cWorld_FastSetBlock01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12279,9 +12279,9 @@ static int tolua_AllToLua_cWorld_GetBlock01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12308,9 +12308,9 @@ static int tolua_AllToLua_cWorld_GetBlockMeta01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12337,10 +12337,10 @@ static int tolua_AllToLua_cWorld_SetBlockMeta01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12368,13 +12368,13 @@ static int tolua_AllToLua_cWorld_SpawnItemPickups00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItems",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItems",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12408,15 +12408,15 @@ static int tolua_AllToLua_cWorld_SpawnItemPickups01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItems",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItems",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12449,13 +12449,13 @@ static int tolua_AllToLua_cWorld_SpawnPrimedTNT00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12490,11 +12490,11 @@ static int tolua_AllToLua_cWorld_DigBlock00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12528,12 +12528,12 @@ static int tolua_AllToLua_cWorld_SendBlockTo00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,5,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,5,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12567,8 +12567,8 @@ static int tolua_AllToLua_cWorld_GetSpawnX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12599,8 +12599,8 @@ static int tolua_AllToLua_cWorld_GetSpawnY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12631,8 +12631,8 @@ static int tolua_AllToLua_cWorld_GetSpawnZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12663,11 +12663,11 @@ static int tolua_AllToLua_cWorld_WakeUpSimulators00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12700,14 +12700,14 @@ static int tolua_AllToLua_cWorld_WakeUpSimulatorsInArea00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12743,15 +12743,15 @@ static int tolua_AllToLua_cWorld_GetSignLines00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,6,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,7,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12793,11 +12793,11 @@ static int tolua_AllToLua_cWorld_GrowTree00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12830,12 +12830,12 @@ static int tolua_AllToLua_cWorld_GrowTreeFromSapling00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12869,11 +12869,11 @@ static int tolua_AllToLua_cWorld_GrowTreeByBiome00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12906,12 +12906,12 @@ static int tolua_AllToLua_cWorld_GrowRipePlant00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12946,12 +12946,12 @@ static int tolua_AllToLua_cWorld_GrowCactus00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -12985,12 +12985,12 @@ static int tolua_AllToLua_cWorld_GrowMelonPumpkin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13024,12 +13024,12 @@ static int tolua_AllToLua_cWorld_GrowSugarcane00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13063,10 +13063,10 @@ static int tolua_AllToLua_cWorld_GetBiomeAt00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13099,8 +13099,8 @@ static int tolua_AllToLua_cWorld_GetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13131,8 +13131,8 @@ static int tolua_AllToLua_cWorld_SaveAllChunks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13162,8 +13162,8 @@ static int tolua_AllToLua_cWorld_GetNumChunks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13194,8 +13194,8 @@ static int tolua_AllToLua_cWorld_GetGeneratorQueueLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13226,8 +13226,8 @@ static int tolua_AllToLua_cWorld_GetLightingQueueLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13258,8 +13258,8 @@ static int tolua_AllToLua_cWorld_GetStorageLoadQueueLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13290,8 +13290,8 @@ static int tolua_AllToLua_cWorld_GetStorageSaveQueueLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13322,12 +13322,12 @@ static int tolua_AllToLua_cWorld_QueueBlockForTick00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13361,11 +13361,11 @@ static int tolua_AllToLua_cWorld_CastThunderbolt00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13398,9 +13398,9 @@ static int tolua_AllToLua_cWorld_SetWeather00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13431,8 +13431,8 @@ static int tolua_AllToLua_cWorld_ChangeWeather00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13462,8 +13462,8 @@ static int tolua_AllToLua_cWorld_GetWeather00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13494,11 +13494,11 @@ static int tolua_AllToLua_cWorld_SetNextBlockTick00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13531,8 +13531,8 @@ static int tolua_AllToLua_cWorld_GetMaxSugarcaneHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13563,8 +13563,8 @@ static int tolua_AllToLua_cWorld_GetMaxCactusHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13595,11 +13595,11 @@ static int tolua_AllToLua_cWorld_IsBlockDirectlyWatered00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13633,12 +13633,12 @@ static int tolua_AllToLua_cWorld_SpawnMob00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13673,8 +13673,8 @@ static int tolua_AllToLua_cInventory_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13704,10 +13704,10 @@ static int tolua_AllToLua_cInventory_HowManyCanFit00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13739,12 +13739,12 @@ static int tolua_AllToLua_cInventory_HowManyCanFit01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13775,11 +13775,11 @@ static int tolua_AllToLua_cInventory_AddItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13813,11 +13813,11 @@ static int tolua_AllToLua_cInventory_AddItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
-	 !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
+     !tolua_isboolean(tolua_S,3,0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13851,8 +13851,8 @@ static int tolua_AllToLua_cInventory_RemoveOneEquippedItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13883,9 +13883,9 @@ static int tolua_AllToLua_cInventory_HowManyItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13917,9 +13917,9 @@ static int tolua_AllToLua_cInventory_HasItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13951,8 +13951,8 @@ static int tolua_AllToLua_cInventory_GetArmorGrid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13964,7 +13964,7 @@ static int tolua_AllToLua_cInventory_GetArmorGrid00(lua_State* tolua_S)
 #endif
   {
    cItemGrid& tolua_ret = (cItemGrid&)  self->GetArmorGrid();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
   }
  }
  return 1;
@@ -13983,8 +13983,8 @@ static int tolua_AllToLua_cInventory_GetInventoryGrid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -13996,7 +13996,7 @@ static int tolua_AllToLua_cInventory_GetInventoryGrid00(lua_State* tolua_S)
 #endif
   {
    cItemGrid& tolua_ret = (cItemGrid&)  self->GetInventoryGrid();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
   }
  }
  return 1;
@@ -14015,8 +14015,8 @@ static int tolua_AllToLua_cInventory_GetHotbarGrid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14028,7 +14028,7 @@ static int tolua_AllToLua_cInventory_GetHotbarGrid00(lua_State* tolua_S)
 #endif
   {
    cItemGrid& tolua_ret = (cItemGrid&)  self->GetHotbarGrid();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
   }
  }
  return 1;
@@ -14047,8 +14047,8 @@ static int tolua_AllToLua_cInventory_GetOwner00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14060,7 +14060,7 @@ static int tolua_AllToLua_cInventory_GetOwner00(lua_State* tolua_S)
 #endif
   {
    cPlayer& tolua_ret = (cPlayer&)  self->GetOwner();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cPlayer");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cPlayer");
   }
  }
  return 1;
@@ -14079,9 +14079,9 @@ static int tolua_AllToLua_cInventory_CopyToItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14112,9 +14112,9 @@ static int tolua_AllToLua_cInventory_GetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14127,7 +14127,7 @@ static int tolua_AllToLua_cInventory_GetSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_SlotNum);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14146,9 +14146,9 @@ static int tolua_AllToLua_cInventory_GetArmorSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14161,7 +14161,7 @@ static int tolua_AllToLua_cInventory_GetArmorSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetArmorSlot(a_ArmorSlotNum);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14180,9 +14180,9 @@ static int tolua_AllToLua_cInventory_GetInventorySlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14195,7 +14195,7 @@ static int tolua_AllToLua_cInventory_GetInventorySlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetInventorySlot(a_InventorySlotNum);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14214,9 +14214,9 @@ static int tolua_AllToLua_cInventory_GetHotbarSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14229,7 +14229,7 @@ static int tolua_AllToLua_cInventory_GetHotbarSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetHotbarSlot(a_HotBarSlotNum);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14248,8 +14248,8 @@ static int tolua_AllToLua_cInventory_GetEquippedItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14261,7 +14261,7 @@ static int tolua_AllToLua_cInventory_GetEquippedItem00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetEquippedItem();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14280,10 +14280,10 @@ static int tolua_AllToLua_cInventory_SetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14315,10 +14315,10 @@ static int tolua_AllToLua_cInventory_SetArmorSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14350,10 +14350,10 @@ static int tolua_AllToLua_cInventory_SetInventorySlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14385,10 +14385,10 @@ static int tolua_AllToLua_cInventory_SetHotbarSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14420,9 +14420,9 @@ static int tolua_AllToLua_cInventory_SetEquippedSlotNum00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14453,8 +14453,8 @@ static int tolua_AllToLua_cInventory_GetEquippedSlotNum00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14485,10 +14485,10 @@ static int tolua_AllToLua_cInventory_ChangeSlotCount00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14521,10 +14521,10 @@ static int tolua_AllToLua_cInventory_DamageItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14557,9 +14557,9 @@ static int tolua_AllToLua_cInventory_DamageEquippedItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cInventory",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14591,8 +14591,8 @@ static int tolua_AllToLua_cInventory_GetEquippedHelmet00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14604,7 +14604,7 @@ static int tolua_AllToLua_cInventory_GetEquippedHelmet00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetEquippedHelmet();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14623,8 +14623,8 @@ static int tolua_AllToLua_cInventory_GetEquippedChestplate00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14636,7 +14636,7 @@ static int tolua_AllToLua_cInventory_GetEquippedChestplate00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetEquippedChestplate();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14655,8 +14655,8 @@ static int tolua_AllToLua_cInventory_GetEquippedLeggings00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14668,7 +14668,7 @@ static int tolua_AllToLua_cInventory_GetEquippedLeggings00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetEquippedLeggings();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14687,8 +14687,8 @@ static int tolua_AllToLua_cInventory_GetEquippedBoots00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cInventory",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14700,7 +14700,7 @@ static int tolua_AllToLua_cInventory_GetEquippedBoots00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetEquippedBoots();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -14719,8 +14719,8 @@ static int tolua_AllToLua_cEnchantments_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14728,7 +14728,7 @@ static int tolua_AllToLua_cEnchantments_new00(lua_State* tolua_S)
  {
   {
    cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
   }
  }
  return 1;
@@ -14747,8 +14747,8 @@ static int tolua_AllToLua_cEnchantments_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14756,8 +14756,8 @@ static int tolua_AllToLua_cEnchantments_new00_local(lua_State* tolua_S)
  {
   {
    cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -14775,9 +14775,9 @@ static int tolua_AllToLua_cEnchantments_new01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14785,7 +14785,7 @@ static int tolua_AllToLua_cEnchantments_new01(lua_State* tolua_S)
   const AString a_StringSpec = ((const AString)  tolua_tocppstring(tolua_S,2,0));
   {
    cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)(a_StringSpec));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
    tolua_pushcppstring(tolua_S,(const char*)a_StringSpec);
   }
  }
@@ -14801,9 +14801,9 @@ static int tolua_AllToLua_cEnchantments_new01_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14811,8 +14811,8 @@ static int tolua_AllToLua_cEnchantments_new01_local(lua_State* tolua_S)
   const AString a_StringSpec = ((const AString)  tolua_tocppstring(tolua_S,2,0));
   {
    cEnchantments* tolua_ret = (cEnchantments*)  Mtolua_new((cEnchantments)(a_StringSpec));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cEnchantments");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
    tolua_pushcppstring(tolua_S,(const char*)a_StringSpec);
   }
  }
@@ -14829,9 +14829,9 @@ static int tolua_AllToLua_cEnchantments_AddFromString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14863,8 +14863,8 @@ static int tolua_AllToLua_cEnchantments_ToString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14895,9 +14895,9 @@ static int tolua_AllToLua_cEnchantments_GetLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14929,10 +14929,10 @@ static int tolua_AllToLua_cEnchantments_SetLevel00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14964,8 +14964,8 @@ static int tolua_AllToLua_cEnchantments_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -14995,8 +14995,8 @@ static int tolua_AllToLua_cEnchantments_IsEmpty00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15027,9 +15027,9 @@ static int tolua_AllToLua_cEnchantments_StringToEnchantmentID00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cEnchantments",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15058,9 +15058,9 @@ static int tolua_AllToLua_cEnchantments__eq00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEnchantments",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cEnchantments",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cEnchantments",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15092,8 +15092,8 @@ static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15101,7 +15101,7 @@ static int tolua_AllToLua_cItem_new00(lua_State* tolua_S)
  {
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
  return 1;
@@ -15120,8 +15120,8 @@ static int tolua_AllToLua_cItem_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15129,8 +15129,8 @@ static int tolua_AllToLua_cItem_new00_local(lua_State* tolua_S)
  {
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -15148,11 +15148,11 @@ static int tolua_AllToLua_cItem_new01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15162,7 +15162,7 @@ static int tolua_AllToLua_cItem_new01(lua_State* tolua_S)
   short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
  return 1;
@@ -15177,11 +15177,11 @@ static int tolua_AllToLua_cItem_new01_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15191,8 +15191,8 @@ static int tolua_AllToLua_cItem_new01_local(lua_State* tolua_S)
   short a_ItemDamage = ((short)  tolua_tonumber(tolua_S,4,0));
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -15207,12 +15207,12 @@ static int tolua_AllToLua_cItem_new02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15223,7 +15223,7 @@ static int tolua_AllToLua_cItem_new02(lua_State* tolua_S)
   const AString a_Enchantments = ((const AString)  tolua_tocppstring(tolua_S,5,0));
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage,a_Enchantments));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
    tolua_pushcppstring(tolua_S,(const char*)a_Enchantments);
   }
  }
@@ -15239,12 +15239,12 @@ static int tolua_AllToLua_cItem_new02_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15255,8 +15255,8 @@ static int tolua_AllToLua_cItem_new02_local(lua_State* tolua_S)
   const AString a_Enchantments = ((const AString)  tolua_tocppstring(tolua_S,5,0));
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(a_ItemType,a_ItemCount,a_ItemDamage,a_Enchantments));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
    tolua_pushcppstring(tolua_S,(const char*)a_Enchantments);
   }
  }
@@ -15272,9 +15272,9 @@ static int tolua_AllToLua_cItem_new03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15282,7 +15282,7 @@ static int tolua_AllToLua_cItem_new03(lua_State* tolua_S)
   const cItem* a_CopyFrom = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(*a_CopyFrom));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
  return 1;
@@ -15297,9 +15297,9 @@ static int tolua_AllToLua_cItem_new03_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15307,8 +15307,8 @@ static int tolua_AllToLua_cItem_new03_local(lua_State* tolua_S)
   const cItem* a_CopyFrom = ((const cItem*)  tolua_tousertype(tolua_S,2,0));
   {
    cItem* tolua_ret = (cItem*)  Mtolua_new((cItem)(*a_CopyFrom));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -15324,8 +15324,8 @@ static int tolua_AllToLua_cItem_Empty00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15355,8 +15355,8 @@ static int tolua_AllToLua_cItem_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15386,8 +15386,8 @@ static int tolua_AllToLua_cItem_IsEmpty00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15418,9 +15418,9 @@ static int tolua_AllToLua_cItem_IsEqual00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15452,9 +15452,9 @@ static int tolua_AllToLua_cItem_IsSameType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15486,8 +15486,8 @@ static int tolua_AllToLua_cItem_CopyOne00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15501,13 +15501,13 @@ static int tolua_AllToLua_cItem_CopyOne00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->CopyOne();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -15528,9 +15528,9 @@ static int tolua_AllToLua_cItem_AddCount00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15543,7 +15543,7 @@ static int tolua_AllToLua_cItem_AddCount00(lua_State* tolua_S)
 #endif
   {
    cItem& tolua_ret = (cItem&)  self->AddCount(a_AmountToAdd);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
   }
  }
  return 1;
@@ -15562,8 +15562,8 @@ static int tolua_AllToLua_cItem_GetMaxDamage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15594,9 +15594,9 @@ static int tolua_AllToLua_cItem_DamageItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItem",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15628,8 +15628,8 @@ static int tolua_AllToLua_cItem_IsDamageable00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15660,9 +15660,9 @@ static int tolua_AllToLua_cItem_IsStackableWith00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15694,8 +15694,8 @@ static int tolua_AllToLua_cItem_IsFullStack00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItem",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15846,8 +15846,8 @@ static int tolua_AllToLua_cItems_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15855,7 +15855,7 @@ static int tolua_AllToLua_cItems_new00(lua_State* tolua_S)
  {
   {
    cItems* tolua_ret = (cItems*)  Mtolua_new((cItems)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItems");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItems");
   }
  }
  return 1;
@@ -15874,8 +15874,8 @@ static int tolua_AllToLua_cItems_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15883,8 +15883,8 @@ static int tolua_AllToLua_cItems_new00_local(lua_State* tolua_S)
  {
   {
    cItems* tolua_ret = (cItems*)  Mtolua_new((cItems)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItems");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItems");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -15903,9 +15903,9 @@ static int tolua_AllToLua_cItems_Get00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15918,7 +15918,7 @@ static int tolua_AllToLua_cItems_Get00(lua_State* tolua_S)
 #endif
   {
    cItem* tolua_ret = (cItem*)  self->Get(a_Idx);
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cItem");
   }
  }
  return 1;
@@ -15937,10 +15937,10 @@ static int tolua_AllToLua_cItems_Set00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -15972,9 +15972,9 @@ static int tolua_AllToLua_cItems_Add00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16005,9 +16005,9 @@ static int tolua_AllToLua_cItems_Delete00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16038,8 +16038,8 @@ static int tolua_AllToLua_cItems_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16069,8 +16069,8 @@ static int tolua_AllToLua_cItems_Size00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16100,12 +16100,12 @@ static int tolua_AllToLua_cItems_Set01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16134,11 +16134,11 @@ static int tolua_AllToLua_cItems_Add01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16167,8 +16167,8 @@ static int tolua_AllToLua_cItemGrid_GetWidth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16199,8 +16199,8 @@ static int tolua_AllToLua_cItemGrid_GetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16231,8 +16231,8 @@ static int tolua_AllToLua_cItemGrid_GetNumSlots00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16263,10 +16263,10 @@ static int tolua_AllToLua_cItemGrid_GetSlotNum00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16299,10 +16299,10 @@ static int tolua_AllToLua_cItemGrid_GetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16316,7 +16316,7 @@ static int tolua_AllToLua_cItemGrid_GetSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_X,a_Y);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -16334,9 +16334,9 @@ static int tolua_AllToLua_cItemGrid_GetSlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16348,7 +16348,7 @@ static int tolua_AllToLua_cItemGrid_GetSlot01(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_SlotNum);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -16364,11 +16364,11 @@ static int tolua_AllToLua_cItemGrid_SetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16400,13 +16400,13 @@ static int tolua_AllToLua_cItemGrid_SetSlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16436,10 +16436,10 @@ static int tolua_AllToLua_cItemGrid_SetSlot02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16466,12 +16466,12 @@ static int tolua_AllToLua_cItemGrid_SetSlot03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16501,10 +16501,10 @@ static int tolua_AllToLua_cItemGrid_EmptySlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16535,9 +16535,9 @@ static int tolua_AllToLua_cItemGrid_EmptySlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16564,9 +16564,9 @@ static int tolua_AllToLua_cItemGrid_IsSlotEmpty00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16597,10 +16597,10 @@ static int tolua_AllToLua_cItemGrid_IsSlotEmpty01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16629,8 +16629,8 @@ static int tolua_AllToLua_cItemGrid_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16660,9 +16660,9 @@ static int tolua_AllToLua_cItemGrid_HowManyCanFit00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16694,11 +16694,11 @@ static int tolua_AllToLua_cItemGrid_AddItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
-	 !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItem",0,&tolua_err)) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16732,11 +16732,11 @@ static int tolua_AllToLua_cItemGrid_AddItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
-	 !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
+     !tolua_isboolean(tolua_S,3,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16770,10 +16770,10 @@ static int tolua_AllToLua_cItemGrid_ChangeSlotCount00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16805,11 +16805,11 @@ static int tolua_AllToLua_cItemGrid_ChangeSlotCount01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16839,9 +16839,9 @@ static int tolua_AllToLua_cItemGrid_RemoveOneItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16856,13 +16856,13 @@ static int tolua_AllToLua_cItemGrid_RemoveOneItem00(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->RemoveOneItem(a_SlotNum);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -16882,10 +16882,10 @@ static int tolua_AllToLua_cItemGrid_RemoveOneItem01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16900,13 +16900,13 @@ static int tolua_AllToLua_cItemGrid_RemoveOneItem01(lua_State* tolua_S)
    cItem tolua_ret = (cItem)  self->RemoveOneItem(a_X,a_Y);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((cItem)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
-	 tolua_pushusertype(tolua_S,tolua_obj,"cItem");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(cItem));
+     tolua_pushusertype(tolua_S,tolua_obj,"cItem");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -16924,9 +16924,9 @@ static int tolua_AllToLua_cItemGrid_HowManyItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16958,9 +16958,9 @@ static int tolua_AllToLua_cItemGrid_HasItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -16992,8 +16992,8 @@ static int tolua_AllToLua_cItemGrid_GetFirstEmptySlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17024,8 +17024,8 @@ static int tolua_AllToLua_cItemGrid_GetFirstUsedSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17056,8 +17056,8 @@ static int tolua_AllToLua_cItemGrid_GetLastEmptySlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17088,8 +17088,8 @@ static int tolua_AllToLua_cItemGrid_GetLastUsedSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17120,9 +17120,9 @@ static int tolua_AllToLua_cItemGrid_GetNextEmptySlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17154,9 +17154,9 @@ static int tolua_AllToLua_cItemGrid_GetNextUsedSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17188,9 +17188,9 @@ static int tolua_AllToLua_cItemGrid_CopyToItems00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cItemGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cItems",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17221,10 +17221,10 @@ static int tolua_AllToLua_cItemGrid_DamageItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17256,11 +17256,11 @@ static int tolua_AllToLua_cItemGrid_DamageItem01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cItemGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17290,8 +17290,8 @@ static int tolua_AllToLua_cBlockEntity_GetPosX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17322,8 +17322,8 @@ static int tolua_AllToLua_cBlockEntity_GetPosY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17354,8 +17354,8 @@ static int tolua_AllToLua_cBlockEntity_GetPosZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17386,8 +17386,8 @@ static int tolua_AllToLua_cBlockEntity_GetBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17418,8 +17418,8 @@ static int tolua_AllToLua_cBlockEntity_GetWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17431,7 +17431,7 @@ static int tolua_AllToLua_cBlockEntity_GetWorld00(lua_State* tolua_S)
 #endif
   {
    cWorld* tolua_ret = (cWorld*)  self->GetWorld();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
   }
  }
  return 1;
@@ -17450,8 +17450,8 @@ static int tolua_AllToLua_cBlockEntity_GetChunkX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17482,8 +17482,8 @@ static int tolua_AllToLua_cBlockEntity_GetChunkZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17514,8 +17514,8 @@ static int tolua_AllToLua_cBlockEntity_GetRelX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17546,8 +17546,8 @@ static int tolua_AllToLua_cBlockEntity_GetRelZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17578,9 +17578,9 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntityWithItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntityWithItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17593,7 +17593,7 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_SlotNum);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -17611,10 +17611,10 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetSlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockEntityWithItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockEntityWithItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17627,7 +17627,7 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetSlot01(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetSlot(a_X,a_Y);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -17643,10 +17643,10 @@ static int tolua_AllToLua_cBlockEntityWithItems_SetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockEntityWithItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockEntityWithItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17677,11 +17677,11 @@ static int tolua_AllToLua_cBlockEntityWithItems_SetSlot01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockEntityWithItems",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockEntityWithItems",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17710,8 +17710,8 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetContents00(lua_State* tolua_S
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockEntityWithItems",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockEntityWithItems",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17723,7 +17723,7 @@ static int tolua_AllToLua_cBlockEntityWithItems_GetContents00(lua_State* tolua_S
 #endif
   {
    cItemGrid& tolua_ret = (cItemGrid&)  self->GetContents();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
   }
  }
  return 1;
@@ -17742,11 +17742,11 @@ static int tolua_AllToLua_cChestEntity_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cChestEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cChestEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17757,7 +17757,7 @@ static int tolua_AllToLua_cChestEntity_new00(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cChestEntity* tolua_ret = (cChestEntity*)  Mtolua_new((cChestEntity)(a_BlockX,a_BlockY,a_BlockZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cChestEntity");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cChestEntity");
   }
  }
  return 1;
@@ -17776,11 +17776,11 @@ static int tolua_AllToLua_cChestEntity_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cChestEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cChestEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17791,8 +17791,8 @@ static int tolua_AllToLua_cChestEntity_new00_local(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cChestEntity* tolua_ret = (cChestEntity*)  Mtolua_new((cChestEntity)(a_BlockX,a_BlockY,a_BlockZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cChestEntity");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cChestEntity");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -17811,12 +17811,12 @@ static int tolua_AllToLua_cDropSpenserEntity_AddDropSpenserDir00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cDropSpenserEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cDropSpenserEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17853,8 +17853,8 @@ static int tolua_AllToLua_cDropSpenserEntity_Activate00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cDropSpenserEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cDropSpenserEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17884,9 +17884,9 @@ static int tolua_AllToLua_cDropSpenserEntity_SetRedstonePower00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cDropSpenserEntity",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cDropSpenserEntity",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17934,11 +17934,11 @@ static int tolua_AllToLua_cDispenserEntity_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cDispenserEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cDispenserEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17949,7 +17949,7 @@ static int tolua_AllToLua_cDispenserEntity_new00(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cDispenserEntity* tolua_ret = (cDispenserEntity*)  Mtolua_new((cDispenserEntity)(a_BlockX,a_BlockY,a_BlockZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDispenserEntity");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDispenserEntity");
   }
  }
  return 1;
@@ -17968,11 +17968,11 @@ static int tolua_AllToLua_cDispenserEntity_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cDispenserEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cDispenserEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -17983,8 +17983,8 @@ static int tolua_AllToLua_cDispenserEntity_new00_local(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cDispenserEntity* tolua_ret = (cDispenserEntity*)  Mtolua_new((cDispenserEntity)(a_BlockX,a_BlockY,a_BlockZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDispenserEntity");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDispenserEntity");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -18003,11 +18003,11 @@ static int tolua_AllToLua_cDropperEntity_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cDropperEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cDropperEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18018,7 +18018,7 @@ static int tolua_AllToLua_cDropperEntity_new00(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cDropperEntity* tolua_ret = (cDropperEntity*)  Mtolua_new((cDropperEntity)(a_BlockX,a_BlockY,a_BlockZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDropperEntity");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDropperEntity");
   }
  }
  return 1;
@@ -18037,11 +18037,11 @@ static int tolua_AllToLua_cDropperEntity_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cDropperEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cDropperEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18052,8 +18052,8 @@ static int tolua_AllToLua_cDropperEntity_new00_local(lua_State* tolua_S)
   int a_BlockZ = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cDropperEntity* tolua_ret = (cDropperEntity*)  Mtolua_new((cDropperEntity)(a_BlockX,a_BlockY,a_BlockZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDropperEntity");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cDropperEntity");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -18072,13 +18072,13 @@ static int tolua_AllToLua_cFurnaceEntity_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18091,7 +18091,7 @@ static int tolua_AllToLua_cFurnaceEntity_new00(lua_State* tolua_S)
   unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
   {
    cFurnaceEntity* tolua_ret = (cFurnaceEntity*)  Mtolua_new((cFurnaceEntity)(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_BlockMeta));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceEntity");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceEntity");
   }
  }
  return 1;
@@ -18110,13 +18110,13 @@ static int tolua_AllToLua_cFurnaceEntity_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18129,8 +18129,8 @@ static int tolua_AllToLua_cFurnaceEntity_new00_local(lua_State* tolua_S)
   unsigned char a_BlockMeta = (( unsigned char)  tolua_tonumber(tolua_S,6,0));
   {
    cFurnaceEntity* tolua_ret = (cFurnaceEntity*)  Mtolua_new((cFurnaceEntity)(a_BlockX,a_BlockY,a_BlockZ,a_BlockType,a_BlockMeta));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceEntity");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceEntity");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -18149,8 +18149,8 @@ static int tolua_AllToLua_cFurnaceEntity_GetInputSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18162,7 +18162,7 @@ static int tolua_AllToLua_cFurnaceEntity_GetInputSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetInputSlot();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -18181,8 +18181,8 @@ static int tolua_AllToLua_cFurnaceEntity_GetFuelSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18194,7 +18194,7 @@ static int tolua_AllToLua_cFurnaceEntity_GetFuelSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetFuelSlot();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -18213,8 +18213,8 @@ static int tolua_AllToLua_cFurnaceEntity_GetOutputSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18226,7 +18226,7 @@ static int tolua_AllToLua_cFurnaceEntity_GetOutputSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetOutputSlot();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -18245,9 +18245,9 @@ static int tolua_AllToLua_cFurnaceEntity_SetInputSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18278,9 +18278,9 @@ static int tolua_AllToLua_cFurnaceEntity_SetFuelSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18311,9 +18311,9 @@ static int tolua_AllToLua_cFurnaceEntity_SetOutputSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cFurnaceEntity",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18344,8 +18344,8 @@ static int tolua_AllToLua_cFurnaceEntity_GetTimeCooked00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18376,8 +18376,8 @@ static int tolua_AllToLua_cFurnaceEntity_GetCookTimeLeft00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18408,8 +18408,8 @@ static int tolua_AllToLua_cFurnaceEntity_GetFuelBurnTimeLeft00(lua_State* tolua_
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18440,8 +18440,8 @@ static int tolua_AllToLua_cFurnaceEntity_HasFuelTimeLeft00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cFurnaceEntity",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18772,8 +18772,8 @@ static int tolua_AllToLua_cWebAdmin_GetPort00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18804,9 +18804,9 @@ static int tolua_AllToLua_cWebAdmin_GetPage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const HTTPRequest",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const HTTPRequest",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18821,13 +18821,13 @@ static int tolua_AllToLua_cWebAdmin_GetPage00(lua_State* tolua_S)
    sWebAdminPage tolua_ret = (sWebAdminPage)  self->GetPage(*a_Request);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((sWebAdminPage)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"sWebAdminPage");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((sWebAdminPage)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"sWebAdminPage");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(sWebAdminPage));
-	 tolua_pushusertype(tolua_S,tolua_obj,"sWebAdminPage");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(sWebAdminPage));
+     tolua_pushusertype(tolua_S,tolua_obj,"sWebAdminPage");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -18848,9 +18848,9 @@ static int tolua_AllToLua_cWebAdmin_GetBaseURL00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18883,8 +18883,8 @@ static int tolua_AllToLua_cWebAdmin_GetMemoryUsage00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cWebAdmin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18911,8 +18911,8 @@ static int tolua_AllToLua_cWebPlugin_GetWebTitle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWebPlugin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWebPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18943,9 +18943,9 @@ static int tolua_AllToLua_cWebPlugin_HandleWebRequest00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const HTTPRequest",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const HTTPRequest",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -18977,9 +18977,9 @@ static int tolua_AllToLua_cWebPlugin_SafeString00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cWebPlugin",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19046,8 +19046,8 @@ static int tolua_AllToLua_Lua__cWebPlugin_tolua__set_instance00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cWebPlugin",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cWebPlugin",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19079,15 +19079,15 @@ static int tolua_AllToLua_cPickup_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19102,7 +19102,7 @@ static int tolua_AllToLua_cPickup_new00(lua_State* tolua_S)
   float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
   {
    cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
   }
  }
  return 1;
@@ -19121,15 +19121,15 @@ static int tolua_AllToLua_cPickup_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"const cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19144,8 +19144,8 @@ static int tolua_AllToLua_cPickup_new00_local(lua_State* tolua_S)
   float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
   {
    cPickup* tolua_ret = (cPickup*)  Mtolua_new((cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPickup");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -19164,8 +19164,8 @@ static int tolua_AllToLua_cPickup_GetItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19177,7 +19177,7 @@ static int tolua_AllToLua_cPickup_GetItem00(lua_State* tolua_S)
 #endif
   {
    cItem& tolua_ret = (cItem&)  self->GetItem();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
   }
  }
  return 1;
@@ -19196,9 +19196,9 @@ static int tolua_AllToLua_cPickup_CollectedBy00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cPickup",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19499,8 +19499,8 @@ static int tolua_AllToLua_Lua__cPickup_tolua__set_instance00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19532,9 +19532,9 @@ static int tolua_AllToLua_Lua__cPickup_cPickup__CollectedBy00(lua_State* tolua_S
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19566,15 +19566,15 @@ static int tolua_AllToLua_Lua__cPickup_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"cItem",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19589,7 +19589,7 @@ static int tolua_AllToLua_Lua__cPickup_new00(lua_State* tolua_S)
   float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
   {
    Lua__cPickup* tolua_ret = (Lua__cPickup*)  Mtolua_new((Lua__cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cPickup");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cPickup");
   }
  }
  return 1;
@@ -19608,15 +19608,15 @@ static int tolua_AllToLua_Lua__cPickup_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"cItem",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Lua__cPickup",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,5,&tolua_err) || !tolua_isusertype(tolua_S,5,"cItem",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19631,8 +19631,8 @@ static int tolua_AllToLua_Lua__cPickup_new00_local(lua_State* tolua_S)
   float a_SpeedZ = ((float)  tolua_tonumber(tolua_S,8,0.f));
   {
    Lua__cPickup* tolua_ret = (Lua__cPickup*)  Mtolua_new((Lua__cPickup)(a_MicroPosX,a_MicroPosY,a_MicroPosZ,*a_Item,a_SpeedX,a_SpeedY,a_SpeedZ));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cPickup");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Lua__cPickup");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -19693,8 +19693,8 @@ static int tolua_AllToLua_cRoot_Get00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19702,7 +19702,7 @@ static int tolua_AllToLua_cRoot_Get00(lua_State* tolua_S)
  {
   {
    cRoot* tolua_ret = (cRoot*)  cRoot::Get();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cRoot");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cRoot");
   }
  }
  return 1;
@@ -19721,8 +19721,8 @@ static int tolua_AllToLua_cRoot_GetServer00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19734,7 +19734,7 @@ static int tolua_AllToLua_cRoot_GetServer00(lua_State* tolua_S)
 #endif
   {
    cServer* tolua_ret = (cServer*)  self->GetServer();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cServer");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cServer");
   }
  }
  return 1;
@@ -19753,8 +19753,8 @@ static int tolua_AllToLua_cRoot_GetDefaultWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19766,7 +19766,7 @@ static int tolua_AllToLua_cRoot_GetDefaultWorld00(lua_State* tolua_S)
 #endif
   {
    cWorld* tolua_ret = (cWorld*)  self->GetDefaultWorld();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
   }
  }
  return 1;
@@ -19785,9 +19785,9 @@ static int tolua_AllToLua_cRoot_GetWorld00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19800,7 +19800,7 @@ static int tolua_AllToLua_cRoot_GetWorld00(lua_State* tolua_S)
 #endif
   {
    cWorld* tolua_ret = (cWorld*)  self->GetWorld(a_WorldName);
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWorld");
    tolua_pushcppstring(tolua_S,(const char*)a_WorldName);
   }
  }
@@ -19820,8 +19820,8 @@ static int tolua_AllToLua_cRoot_GetPrimaryServerVersion00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19852,9 +19852,9 @@ static int tolua_AllToLua_cRoot_SetPrimaryServerVersion00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19885,8 +19885,8 @@ static int tolua_AllToLua_cRoot_GetGroupManager00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19898,7 +19898,7 @@ static int tolua_AllToLua_cRoot_GetGroupManager00(lua_State* tolua_S)
 #endif
   {
    cGroupManager* tolua_ret = (cGroupManager*)  self->GetGroupManager();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cGroupManager");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cGroupManager");
   }
  }
  return 1;
@@ -19917,8 +19917,8 @@ static int tolua_AllToLua_cRoot_GetCraftingRecipes00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19930,7 +19930,7 @@ static int tolua_AllToLua_cRoot_GetCraftingRecipes00(lua_State* tolua_S)
 #endif
   {
    cCraftingRecipes* tolua_ret = (cCraftingRecipes*)  self->GetCraftingRecipes();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCraftingRecipes");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCraftingRecipes");
   }
  }
  return 1;
@@ -19949,8 +19949,8 @@ static int tolua_AllToLua_cRoot_GetFurnaceRecipe00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19962,7 +19962,7 @@ static int tolua_AllToLua_cRoot_GetFurnaceRecipe00(lua_State* tolua_S)
 #endif
   {
    cFurnaceRecipe* tolua_ret = (cFurnaceRecipe*)  self->GetFurnaceRecipe();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceRecipe");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cFurnaceRecipe");
   }
  }
  return 1;
@@ -19981,8 +19981,8 @@ static int tolua_AllToLua_cRoot_GetWebAdmin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -19994,7 +19994,7 @@ static int tolua_AllToLua_cRoot_GetWebAdmin00(lua_State* tolua_S)
 #endif
   {
    cWebAdmin* tolua_ret = (cWebAdmin*)  self->GetWebAdmin();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWebAdmin");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cWebAdmin");
   }
  }
  return 1;
@@ -20013,8 +20013,8 @@ static int tolua_AllToLua_cRoot_GetPluginManager00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20026,7 +20026,7 @@ static int tolua_AllToLua_cRoot_GetPluginManager00(lua_State* tolua_S)
 #endif
   {
    cPluginManager* tolua_ret = (cPluginManager*)  self->GetPluginManager();
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPluginManager");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cPluginManager");
   }
  }
  return 1;
@@ -20045,9 +20045,9 @@ static int tolua_AllToLua_cRoot_QueueExecuteConsoleCommand00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20079,8 +20079,8 @@ static int tolua_AllToLua_cRoot_GetTotalChunkCount00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20111,8 +20111,8 @@ static int tolua_AllToLua_cRoot_SaveAllChunks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20142,9 +20142,9 @@ static int tolua_AllToLua_cRoot_GetProtocolVersionTextFromInt00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cRoot",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20172,9 +20172,9 @@ static int tolua_AllToLua_Vector3f_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20183,7 +20183,7 @@ static int tolua_AllToLua_Vector3f_new00(lua_State* tolua_S)
   const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
   }
  }
  return 1;
@@ -20202,9 +20202,9 @@ static int tolua_AllToLua_Vector3f_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20213,8 +20213,8 @@ static int tolua_AllToLua_Vector3f_new00_local(lua_State* tolua_S)
   const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -20232,9 +20232,9 @@ static int tolua_AllToLua_Vector3f_new01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20242,7 +20242,7 @@ static int tolua_AllToLua_Vector3f_new01(lua_State* tolua_S)
   const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
   }
  }
  return 1;
@@ -20257,9 +20257,9 @@ static int tolua_AllToLua_Vector3f_new01_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20267,8 +20267,8 @@ static int tolua_AllToLua_Vector3f_new01_local(lua_State* tolua_S)
   const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -20283,9 +20283,9 @@ static int tolua_AllToLua_Vector3f_new02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20293,7 +20293,7 @@ static int tolua_AllToLua_Vector3f_new02(lua_State* tolua_S)
   const Vector3i* v = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
   }
  }
  return 1;
@@ -20308,9 +20308,9 @@ static int tolua_AllToLua_Vector3f_new02_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20318,8 +20318,8 @@ static int tolua_AllToLua_Vector3f_new02_local(lua_State* tolua_S)
   const Vector3i* v = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -20334,9 +20334,9 @@ static int tolua_AllToLua_Vector3f_new03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20344,7 +20344,7 @@ static int tolua_AllToLua_Vector3f_new03(lua_State* tolua_S)
   const Vector3i* v = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
   }
  }
  return 1;
@@ -20359,9 +20359,9 @@ static int tolua_AllToLua_Vector3f_new03_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20369,8 +20369,8 @@ static int tolua_AllToLua_Vector3f_new03_local(lua_State* tolua_S)
   const Vector3i* v = ((const Vector3i*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -20385,15 +20385,15 @@ static int tolua_AllToLua_Vector3f_new04(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
   }
  }
  return 1;
@@ -20408,16 +20408,16 @@ static int tolua_AllToLua_Vector3f_new04_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -20432,11 +20432,11 @@ static int tolua_AllToLua_Vector3f_new05(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20446,7 +20446,7 @@ static int tolua_AllToLua_Vector3f_new05(lua_State* tolua_S)
   float a_z = ((float)  tolua_tonumber(tolua_S,4,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(a_x,a_y,a_z));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
   }
  }
  return 1;
@@ -20461,11 +20461,11 @@ static int tolua_AllToLua_Vector3f_new05_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20475,8 +20475,8 @@ static int tolua_AllToLua_Vector3f_new05_local(lua_State* tolua_S)
   float a_z = ((float)  tolua_tonumber(tolua_S,4,0));
   {
    Vector3f* tolua_ret = (Vector3f*)  Mtolua_new((Vector3f)(a_x,a_y,a_z));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -20492,11 +20492,11 @@ static int tolua_AllToLua_Vector3f_Set00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20529,8 +20529,8 @@ static int tolua_AllToLua_Vector3f_Normalize00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20560,8 +20560,8 @@ static int tolua_AllToLua_Vector3f_NormalizeCopy00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20575,13 +20575,13 @@ static int tolua_AllToLua_Vector3f_NormalizeCopy00(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->NormalizeCopy();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -20601,9 +20601,9 @@ static int tolua_AllToLua_Vector3f_NormalizeCopy01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20630,8 +20630,8 @@ static int tolua_AllToLua_Vector3f_Length00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20662,8 +20662,8 @@ static int tolua_AllToLua_Vector3f_SqrLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20694,9 +20694,9 @@ static int tolua_AllToLua_Vector3f_Dot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20728,9 +20728,9 @@ static int tolua_AllToLua_Vector3f_Cross00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20745,13 +20745,13 @@ static int tolua_AllToLua_Vector3f_Cross00(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->Cross(*v);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -20772,9 +20772,9 @@ static int tolua_AllToLua_Vector3f_Equals00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20806,9 +20806,9 @@ static int tolua_AllToLua_Vector3f__add00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20823,13 +20823,13 @@ static int tolua_AllToLua_Vector3f__add00(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->operator+(*v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -20849,9 +20849,9 @@ static int tolua_AllToLua_Vector3f__add01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20865,13 +20865,13 @@ static int tolua_AllToLua_Vector3f__add01(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->operator+(v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -20889,9 +20889,9 @@ static int tolua_AllToLua_Vector3f__sub00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20906,13 +20906,13 @@ static int tolua_AllToLua_Vector3f__sub00(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->operator-(*v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -20932,9 +20932,9 @@ static int tolua_AllToLua_Vector3f__sub01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20948,13 +20948,13 @@ static int tolua_AllToLua_Vector3f__sub01(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->operator-(v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -20972,9 +20972,9 @@ static int tolua_AllToLua_Vector3f__mul00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -20989,13 +20989,13 @@ static int tolua_AllToLua_Vector3f__mul00(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->operator*(f);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21015,9 +21015,9 @@ static int tolua_AllToLua_Vector3f__mul01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3f",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21031,13 +21031,13 @@ static int tolua_AllToLua_Vector3f__mul01(lua_State* tolua_S)
    Vector3f tolua_ret = (Vector3f)  self->operator*(*v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3f)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3f));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3f");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21145,9 +21145,9 @@ static int tolua_AllToLua_Vector3d_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21156,7 +21156,7 @@ static int tolua_AllToLua_Vector3d_new00(lua_State* tolua_S)
   const Vector3f* v = ((const Vector3f*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
   }
  }
  return 1;
@@ -21175,9 +21175,9 @@ static int tolua_AllToLua_Vector3d_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21186,8 +21186,8 @@ static int tolua_AllToLua_Vector3d_new00_local(lua_State* tolua_S)
   const Vector3f* v = ((const Vector3f*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -21205,9 +21205,9 @@ static int tolua_AllToLua_Vector3d_new01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21215,7 +21215,7 @@ static int tolua_AllToLua_Vector3d_new01(lua_State* tolua_S)
   const Vector3f* v = ((const Vector3f*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)(v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
   }
  }
  return 1;
@@ -21230,9 +21230,9 @@ static int tolua_AllToLua_Vector3d_new01_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21240,8 +21240,8 @@ static int tolua_AllToLua_Vector3d_new01_local(lua_State* tolua_S)
   const Vector3f* v = ((const Vector3f*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)(v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -21256,15 +21256,15 @@ static int tolua_AllToLua_Vector3d_new02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
   }
  }
  return 1;
@@ -21279,16 +21279,16 @@ static int tolua_AllToLua_Vector3d_new02_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -21303,11 +21303,11 @@ static int tolua_AllToLua_Vector3d_new03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21317,7 +21317,7 @@ static int tolua_AllToLua_Vector3d_new03(lua_State* tolua_S)
   double a_z = ((double)  tolua_tonumber(tolua_S,4,0));
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)(a_x,a_y,a_z));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
   }
  }
  return 1;
@@ -21332,11 +21332,11 @@ static int tolua_AllToLua_Vector3d_new03_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21346,8 +21346,8 @@ static int tolua_AllToLua_Vector3d_new03_local(lua_State* tolua_S)
   double a_z = ((double)  tolua_tonumber(tolua_S,4,0));
   {
    Vector3d* tolua_ret = (Vector3d*)  Mtolua_new((Vector3d)(a_x,a_y,a_z));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -21363,11 +21363,11 @@ static int tolua_AllToLua_Vector3d_Set00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21400,8 +21400,8 @@ static int tolua_AllToLua_Vector3d_Normalize00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21431,8 +21431,8 @@ static int tolua_AllToLua_Vector3d_NormalizeCopy00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21446,13 +21446,13 @@ static int tolua_AllToLua_Vector3d_NormalizeCopy00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->NormalizeCopy();
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21472,9 +21472,9 @@ static int tolua_AllToLua_Vector3d_NormalizeCopy01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21501,8 +21501,8 @@ static int tolua_AllToLua_Vector3d_Length00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21533,8 +21533,8 @@ static int tolua_AllToLua_Vector3d_SqrLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21565,9 +21565,9 @@ static int tolua_AllToLua_Vector3d_Dot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21599,9 +21599,9 @@ static int tolua_AllToLua_Vector3d_Cross00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21616,13 +21616,13 @@ static int tolua_AllToLua_Vector3d_Cross00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->Cross(*v);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21643,9 +21643,9 @@ static int tolua_AllToLua_Vector3d_Equals00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21677,9 +21677,9 @@ static int tolua_AllToLua_Vector3d__add00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21694,13 +21694,13 @@ static int tolua_AllToLua_Vector3d__add00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->operator+(*v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21720,9 +21720,9 @@ static int tolua_AllToLua_Vector3d__add01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21736,13 +21736,13 @@ static int tolua_AllToLua_Vector3d__add01(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->operator+(v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21760,9 +21760,9 @@ static int tolua_AllToLua_Vector3d__sub00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21777,13 +21777,13 @@ static int tolua_AllToLua_Vector3d__sub00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->operator-(*v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21803,9 +21803,9 @@ static int tolua_AllToLua_Vector3d__sub01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21819,13 +21819,13 @@ static int tolua_AllToLua_Vector3d__sub01(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->operator-(v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21843,9 +21843,9 @@ static int tolua_AllToLua_Vector3d__mul00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21860,13 +21860,13 @@ static int tolua_AllToLua_Vector3d__mul00(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->operator*(f);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -21886,9 +21886,9 @@ static int tolua_AllToLua_Vector3d__mul01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3d",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -21902,13 +21902,13 @@ static int tolua_AllToLua_Vector3d__mul01(lua_State* tolua_S)
    Vector3d tolua_ret = (Vector3d)  self->operator*(*v2);
    {
 #ifdef __cplusplus
-	void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = Mtolua_new((Vector3d)(tolua_ret));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #else
-	void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
-	 tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(Vector3d));
+     tolua_pushusertype(tolua_S,tolua_obj,"Vector3d");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
 #endif
    }
   }
@@ -22016,9 +22016,9 @@ static int tolua_AllToLua_Vector3i_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22027,7 +22027,7 @@ static int tolua_AllToLua_Vector3i_new00(lua_State* tolua_S)
   const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3i* tolua_ret = (Vector3i*)  Mtolua_new((Vector3i)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
   }
  }
  return 1;
@@ -22046,9 +22046,9 @@ static int tolua_AllToLua_Vector3i_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22057,8 +22057,8 @@ static int tolua_AllToLua_Vector3i_new00_local(lua_State* tolua_S)
   const Vector3d* v = ((const Vector3d*)  tolua_tousertype(tolua_S,2,0));
   {
    Vector3i* tolua_ret = (Vector3i*)  Mtolua_new((Vector3i)(*v));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22076,15 +22076,15 @@ static int tolua_AllToLua_Vector3i_new01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   {
    Vector3i* tolua_ret = (Vector3i*)  Mtolua_new((Vector3i)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
   }
  }
  return 1;
@@ -22099,16 +22099,16 @@ static int tolua_AllToLua_Vector3i_new01_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
  {
   {
    Vector3i* tolua_ret = (Vector3i*)  Mtolua_new((Vector3i)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22123,11 +22123,11 @@ static int tolua_AllToLua_Vector3i_new02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22137,7 +22137,7 @@ static int tolua_AllToLua_Vector3i_new02(lua_State* tolua_S)
   int a_z = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    Vector3i* tolua_ret = (Vector3i*)  Mtolua_new((Vector3i)(a_x,a_y,a_z));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
   }
  }
  return 1;
@@ -22152,11 +22152,11 @@ static int tolua_AllToLua_Vector3i_new02_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22166,8 +22166,8 @@ static int tolua_AllToLua_Vector3i_new02_local(lua_State* tolua_S)
   int a_z = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    Vector3i* tolua_ret = (Vector3i*)  Mtolua_new((Vector3i)(a_x,a_y,a_z));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"Vector3i");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22183,11 +22183,11 @@ static int tolua_AllToLua_Vector3i_Set00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"Vector3i",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"Vector3i",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22220,8 +22220,8 @@ static int tolua_AllToLua_Vector3i_Length00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22252,8 +22252,8 @@ static int tolua_AllToLua_Vector3i_SqrLength00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22284,9 +22284,9 @@ static int tolua_AllToLua_Vector3i_Equals00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22317,9 +22317,9 @@ static int tolua_AllToLua_Vector3i_Equals01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const Vector3i",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22497,8 +22497,8 @@ static int tolua_AllToLua_cCuboid_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22506,7 +22506,7 @@ static int tolua_AllToLua_cCuboid_new00(lua_State* tolua_S)
  {
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
   }
  }
  return 1;
@@ -22525,8 +22525,8 @@ static int tolua_AllToLua_cCuboid_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22534,8 +22534,8 @@ static int tolua_AllToLua_cCuboid_new00_local(lua_State* tolua_S)
  {
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22553,9 +22553,9 @@ static int tolua_AllToLua_cCuboid_new01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22563,7 +22563,7 @@ static int tolua_AllToLua_cCuboid_new01(lua_State* tolua_S)
   const cCuboid* a_Cuboid = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(*a_Cuboid));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
   }
  }
  return 1;
@@ -22578,9 +22578,9 @@ static int tolua_AllToLua_cCuboid_new01_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22588,8 +22588,8 @@ static int tolua_AllToLua_cCuboid_new01_local(lua_State* tolua_S)
   const cCuboid* a_Cuboid = ((const cCuboid*)  tolua_tousertype(tolua_S,2,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(*a_Cuboid));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22604,10 +22604,10 @@ static int tolua_AllToLua_cCuboid_new02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22616,7 +22616,7 @@ static int tolua_AllToLua_cCuboid_new02(lua_State* tolua_S)
   const Vector3i* a_p2 = ((const Vector3i*)  tolua_tousertype(tolua_S,3,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(*a_p1,*a_p2));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
   }
  }
  return 1;
@@ -22631,10 +22631,10 @@ static int tolua_AllToLua_cCuboid_new02_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22643,8 +22643,8 @@ static int tolua_AllToLua_cCuboid_new02_local(lua_State* tolua_S)
   const Vector3i* a_p2 = ((const Vector3i*)  tolua_tousertype(tolua_S,3,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(*a_p1,*a_p2));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22659,11 +22659,11 @@ static int tolua_AllToLua_cCuboid_new03(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22673,7 +22673,7 @@ static int tolua_AllToLua_cCuboid_new03(lua_State* tolua_S)
   int a_Z1 = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(a_X1,a_Y1,a_Z1));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
   }
  }
  return 1;
@@ -22688,11 +22688,11 @@ static int tolua_AllToLua_cCuboid_new03_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22702,8 +22702,8 @@ static int tolua_AllToLua_cCuboid_new03_local(lua_State* tolua_S)
   int a_Z1 = ((int)  tolua_tonumber(tolua_S,4,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(a_X1,a_Y1,a_Z1));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22718,14 +22718,14 @@ static int tolua_AllToLua_cCuboid_new04(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22738,7 +22738,7 @@ static int tolua_AllToLua_cCuboid_new04(lua_State* tolua_S)
   int a_Z2 = ((int)  tolua_tonumber(tolua_S,7,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(a_X1,a_Y1,a_Z1,a_X2,a_Y2,a_Z2));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
   }
  }
  return 1;
@@ -22753,14 +22753,14 @@ static int tolua_AllToLua_cCuboid_new04_local(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22773,8 +22773,8 @@ static int tolua_AllToLua_cCuboid_new04_local(lua_State* tolua_S)
   int a_Z2 = ((int)  tolua_tonumber(tolua_S,7,0));
   {
    cCuboid* tolua_ret = (cCuboid*)  Mtolua_new((cCuboid)(a_X1,a_Y1,a_Z1,a_X2,a_Y2,a_Z2));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCuboid");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -22790,14 +22790,14 @@ static int tolua_AllToLua_cCuboid_Assign00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22833,8 +22833,8 @@ static int tolua_AllToLua_cCuboid_Sort00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22864,8 +22864,8 @@ static int tolua_AllToLua_cCuboid_DifX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22896,8 +22896,8 @@ static int tolua_AllToLua_cCuboid_DifY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22928,8 +22928,8 @@ static int tolua_AllToLua_cCuboid_DifZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22960,9 +22960,9 @@ static int tolua_AllToLua_cCuboid_DoesIntersect00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -22994,9 +22994,9 @@ static int tolua_AllToLua_cCuboid_IsInside00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3i",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23027,11 +23027,11 @@ static int tolua_AllToLua_cCuboid_IsInside01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23060,9 +23060,9 @@ static int tolua_AllToLua_cCuboid_IsInside02(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3d",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23090,9 +23090,9 @@ static int tolua_AllToLua_cCuboid_IsCompletelyInside00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23124,11 +23124,11 @@ static int tolua_AllToLua_cCuboid_Move00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCuboid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCuboid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23161,8 +23161,8 @@ static int tolua_AllToLua_cCuboid_IsSorted00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCuboid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23193,9 +23193,9 @@ static int tolua_AllToLua_cTracer_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cTracer",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cTracer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23204,7 +23204,7 @@ static int tolua_AllToLua_cTracer_new00(lua_State* tolua_S)
   cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
   {
    cTracer* tolua_ret = (cTracer*)  Mtolua_new((cTracer)(a_World));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cTracer");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cTracer");
   }
  }
  return 1;
@@ -23223,9 +23223,9 @@ static int tolua_AllToLua_cTracer_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cTracer",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cTracer",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23234,8 +23234,8 @@ static int tolua_AllToLua_cTracer_new00_local(lua_State* tolua_S)
   cWorld* a_World = ((cWorld*)  tolua_tousertype(tolua_S,2,0));
   {
    cTracer* tolua_ret = (cTracer*)  Mtolua_new((cTracer)(a_World));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cTracer");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cTracer");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -23254,8 +23254,8 @@ static int tolua_AllToLua_cTracer_delete00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23283,11 +23283,11 @@ static int tolua_AllToLua_cTracer_Trace00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23321,10 +23321,10 @@ static int tolua_AllToLua_cTracer_SetValues00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
-	 (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3f",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cTracer",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const Vector3f",0,&tolua_err)) ||
+     (tolua_isvaluenil(tolua_S,3,&tolua_err) || !tolua_isusertype(tolua_S,3,"const Vector3f",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23446,9 +23446,9 @@ static int tolua_AllToLua_cGroup_SetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23479,8 +23479,8 @@ static int tolua_AllToLua_cGroup_GetName00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cGroup",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cGroup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23511,9 +23511,9 @@ static int tolua_AllToLua_cGroup_SetColor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23544,9 +23544,9 @@ static int tolua_AllToLua_cGroup_AddCommand00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23577,9 +23577,9 @@ static int tolua_AllToLua_cGroup_AddPermission00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23610,9 +23610,9 @@ static int tolua_AllToLua_cGroup_InheritFrom00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cGroup",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cGroup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23643,9 +23643,9 @@ static int tolua_AllToLua_cGroup_HasCommand00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cGroup",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23677,8 +23677,8 @@ static int tolua_AllToLua_cGroup_GetColor00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cGroup",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cGroup",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23709,8 +23709,8 @@ static int tolua_AllToLua_cBlockArea_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23718,7 +23718,7 @@ static int tolua_AllToLua_cBlockArea_new00(lua_State* tolua_S)
  {
   {
    cBlockArea* tolua_ret = (cBlockArea*)  Mtolua_new((cBlockArea)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockArea");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockArea");
   }
  }
  return 1;
@@ -23737,8 +23737,8 @@ static int tolua_AllToLua_cBlockArea_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23746,8 +23746,8 @@ static int tolua_AllToLua_cBlockArea_new00_local(lua_State* tolua_S)
  {
   {
    cBlockArea* tolua_ret = (cBlockArea*)  Mtolua_new((cBlockArea)());
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockArea");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cBlockArea");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -23766,8 +23766,8 @@ static int tolua_AllToLua_cBlockArea_delete00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23795,8 +23795,8 @@ static int tolua_AllToLua_cBlockArea_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23826,11 +23826,11 @@ static int tolua_AllToLua_cBlockArea_Create00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23862,12 +23862,12 @@ static int tolua_AllToLua_cBlockArea_Create01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23897,11 +23897,11 @@ static int tolua_AllToLua_cBlockArea_SetOrigin00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23934,15 +23934,15 @@ static int tolua_AllToLua_cBlockArea_Read00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -23979,16 +23979,16 @@ static int tolua_AllToLua_cBlockArea_Read01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24023,12 +24023,12 @@ static int tolua_AllToLua_cBlockArea_Write00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24062,13 +24062,13 @@ static int tolua_AllToLua_cBlockArea_Write01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"cWorld",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24100,9 +24100,9 @@ static int tolua_AllToLua_cBlockArea_CopyTo00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBlockArea",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBlockArea",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24133,9 +24133,9 @@ static int tolua_AllToLua_cBlockArea_CopyFrom00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24166,9 +24166,9 @@ static int tolua_AllToLua_cBlockArea_DumpToRawFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24200,9 +24200,9 @@ static int tolua_AllToLua_cBlockArea_LoadFromSchematicFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24235,9 +24235,9 @@ static int tolua_AllToLua_cBlockArea_SaveToSchematicFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24270,14 +24270,14 @@ static int tolua_AllToLua_cBlockArea_Crop00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24313,14 +24313,14 @@ static int tolua_AllToLua_cBlockArea_Expand00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,8,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,8,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24356,13 +24356,13 @@ static int tolua_AllToLua_cBlockArea_Merge00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24397,13 +24397,13 @@ static int tolua_AllToLua_cBlockArea_Fill00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24438,19 +24438,19 @@ static int tolua_AllToLua_cBlockArea_FillRelCuboid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,10,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,11,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,12,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,13,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,10,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,11,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,12,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,13,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24491,19 +24491,19 @@ static int tolua_AllToLua_cBlockArea_RelLine00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,10,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,11,1,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,12,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,13,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,10,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,11,1,&tolua_err) ||
+     !tolua_isnumber(tolua_S,12,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,13,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24544,8 +24544,8 @@ static int tolua_AllToLua_cBlockArea_RotateCCW00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24575,8 +24575,8 @@ static int tolua_AllToLua_cBlockArea_RotateCW00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24606,8 +24606,8 @@ static int tolua_AllToLua_cBlockArea_MirrorXY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24637,8 +24637,8 @@ static int tolua_AllToLua_cBlockArea_MirrorXZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24668,8 +24668,8 @@ static int tolua_AllToLua_cBlockArea_MirrorYZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24699,8 +24699,8 @@ static int tolua_AllToLua_cBlockArea_RotateCCWNoMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24730,8 +24730,8 @@ static int tolua_AllToLua_cBlockArea_RotateCWNoMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24761,8 +24761,8 @@ static int tolua_AllToLua_cBlockArea_MirrorXYNoMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24792,8 +24792,8 @@ static int tolua_AllToLua_cBlockArea_MirrorXZNoMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24823,8 +24823,8 @@ static int tolua_AllToLua_cBlockArea_MirrorYZNoMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24854,12 +24854,12 @@ static int tolua_AllToLua_cBlockArea_SetRelBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24893,12 +24893,12 @@ static int tolua_AllToLua_cBlockArea_SetBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24932,12 +24932,12 @@ static int tolua_AllToLua_cBlockArea_SetRelBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -24971,12 +24971,12 @@ static int tolua_AllToLua_cBlockArea_SetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25010,12 +25010,12 @@ static int tolua_AllToLua_cBlockArea_SetRelBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25049,12 +25049,12 @@ static int tolua_AllToLua_cBlockArea_SetBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25088,12 +25088,12 @@ static int tolua_AllToLua_cBlockArea_SetRelBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25127,12 +25127,12 @@ static int tolua_AllToLua_cBlockArea_SetBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25166,11 +25166,11 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25204,11 +25204,11 @@ static int tolua_AllToLua_cBlockArea_GetBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25242,11 +25242,11 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25280,11 +25280,11 @@ static int tolua_AllToLua_cBlockArea_GetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25318,11 +25318,11 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25356,11 +25356,11 @@ static int tolua_AllToLua_cBlockArea_GetBlockLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25394,11 +25394,11 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25432,11 +25432,11 @@ static int tolua_AllToLua_cBlockArea_GetBlockSkyLight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25470,13 +25470,13 @@ static int tolua_AllToLua_cBlockArea_SetBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25511,13 +25511,13 @@ static int tolua_AllToLua_cBlockArea_SetRelBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25552,13 +25552,13 @@ static int tolua_AllToLua_cBlockArea_GetBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25595,13 +25595,13 @@ static int tolua_AllToLua_cBlockArea_GetRelBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25638,8 +25638,8 @@ static int tolua_AllToLua_cBlockArea_GetSizeX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25670,8 +25670,8 @@ static int tolua_AllToLua_cBlockArea_GetSizeY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25702,8 +25702,8 @@ static int tolua_AllToLua_cBlockArea_GetSizeZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25734,8 +25734,8 @@ static int tolua_AllToLua_cBlockArea_GetOriginX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25766,8 +25766,8 @@ static int tolua_AllToLua_cBlockArea_GetOriginY00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25798,8 +25798,8 @@ static int tolua_AllToLua_cBlockArea_GetOriginZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25830,8 +25830,8 @@ static int tolua_AllToLua_cBlockArea_GetDataTypes00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25862,8 +25862,8 @@ static int tolua_AllToLua_cBlockArea_HasBlockTypes00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25894,8 +25894,8 @@ static int tolua_AllToLua_cBlockArea_HasBlockMetas00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25926,8 +25926,8 @@ static int tolua_AllToLua_cBlockArea_HasBlockLights00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25958,8 +25958,8 @@ static int tolua_AllToLua_cBlockArea_HasBlockSkyLights00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cBlockArea",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -25990,8 +25990,8 @@ static int tolua_AllToLua_cChunkDesc_GetChunkX00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26022,8 +26022,8 @@ static int tolua_AllToLua_cChunkDesc_GetChunkZ00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26054,10 +26054,10 @@ static int tolua_AllToLua_cChunkDesc_SetChunkCoords00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26089,10 +26089,10 @@ static int tolua_AllToLua_cChunkDesc_FillBlocks00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26124,13 +26124,13 @@ static int tolua_AllToLua_cChunkDesc_SetBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26165,13 +26165,13 @@ static int tolua_AllToLua_cChunkDesc_GetBlockTypeMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26208,12 +26208,12 @@ static int tolua_AllToLua_cChunkDesc_SetBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26247,11 +26247,11 @@ static int tolua_AllToLua_cChunkDesc_GetBlockType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26285,12 +26285,12 @@ static int tolua_AllToLua_cChunkDesc_SetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26324,11 +26324,11 @@ static int tolua_AllToLua_cChunkDesc_GetBlockMeta00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26362,11 +26362,11 @@ static int tolua_AllToLua_cChunkDesc_SetBiome00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26399,10 +26399,10 @@ static int tolua_AllToLua_cChunkDesc_GetBiome00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26435,11 +26435,11 @@ static int tolua_AllToLua_cChunkDesc_SetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26472,10 +26472,10 @@ static int tolua_AllToLua_cChunkDesc_GetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26508,9 +26508,9 @@ static int tolua_AllToLua_cChunkDesc_SetUseDefaultBiomes00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26541,8 +26541,8 @@ static int tolua_AllToLua_cChunkDesc_IsUsingDefaultBiomes00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26573,9 +26573,9 @@ static int tolua_AllToLua_cChunkDesc_SetUseDefaultHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26606,8 +26606,8 @@ static int tolua_AllToLua_cChunkDesc_IsUsingDefaultHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26638,9 +26638,9 @@ static int tolua_AllToLua_cChunkDesc_SetUseDefaultComposition00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26671,8 +26671,8 @@ static int tolua_AllToLua_cChunkDesc_IsUsingDefaultComposition00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26703,9 +26703,9 @@ static int tolua_AllToLua_cChunkDesc_SetUseDefaultStructures00(lua_State* tolua_
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26736,8 +26736,8 @@ static int tolua_AllToLua_cChunkDesc_IsUsingDefaultStructures00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26768,9 +26768,9 @@ static int tolua_AllToLua_cChunkDesc_SetUseDefaultFinish00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isboolean(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26801,8 +26801,8 @@ static int tolua_AllToLua_cChunkDesc_IsUsingDefaultFinish00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26833,13 +26833,13 @@ static int tolua_AllToLua_cChunkDesc_WriteBlockArea00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cBlockArea",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26874,15 +26874,15 @@ static int tolua_AllToLua_cChunkDesc_ReadBlockArea00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBlockArea",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,9,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cBlockArea",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,9,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26919,8 +26919,8 @@ static int tolua_AllToLua_cChunkDesc_GetMaxHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cChunkDesc",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26951,16 +26951,16 @@ static int tolua_AllToLua_cChunkDesc_FillRelCuboid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -26997,11 +26997,11 @@ static int tolua_AllToLua_cChunkDesc_FillRelCuboid01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27030,18 +27030,18 @@ static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,10,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,11,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,12,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,10,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,11,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,12,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27080,13 +27080,13 @@ static int tolua_AllToLua_cChunkDesc_ReplaceRelCuboid01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27117,16 +27117,16 @@ static int tolua_AllToLua_cChunkDesc_FloorRelCuboid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,10,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,10,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27163,11 +27163,11 @@ static int tolua_AllToLua_cChunkDesc_FloorRelCuboid01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27196,18 +27196,18 @@ static int tolua_AllToLua_cChunkDesc_RandomFillRelCuboid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,10,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,11,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,12,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,7,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,8,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,9,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,10,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,11,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,12,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27246,13 +27246,13 @@ static int tolua_AllToLua_cChunkDesc_RandomFillRelCuboid01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cChunkDesc",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCuboid",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27283,10 +27283,10 @@ static int tolua_AllToLua_cCraftingGrid_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27296,7 +27296,7 @@ static int tolua_AllToLua_cCraftingGrid_new00(lua_State* tolua_S)
   int a_Height = ((int)  tolua_tonumber(tolua_S,3,0));
   {
    cCraftingGrid* tolua_ret = (cCraftingGrid*)  Mtolua_new((cCraftingGrid)(a_Width,a_Height));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCraftingGrid");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCraftingGrid");
   }
  }
  return 1;
@@ -27315,10 +27315,10 @@ static int tolua_AllToLua_cCraftingGrid_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27328,8 +27328,8 @@ static int tolua_AllToLua_cCraftingGrid_new00_local(lua_State* tolua_S)
   int a_Height = ((int)  tolua_tonumber(tolua_S,3,0));
   {
    cCraftingGrid* tolua_ret = (cCraftingGrid*)  Mtolua_new((cCraftingGrid)(a_Width,a_Height));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCraftingGrid");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cCraftingGrid");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
  }
  return 1;
@@ -27348,8 +27348,8 @@ static int tolua_AllToLua_cCraftingGrid_GetWidth00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27380,8 +27380,8 @@ static int tolua_AllToLua_cCraftingGrid_GetHeight00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27412,10 +27412,10 @@ static int tolua_AllToLua_cCraftingGrid_GetItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27429,7 +27429,7 @@ static int tolua_AllToLua_cCraftingGrid_GetItem00(lua_State* tolua_S)
 #endif
   {
    cItem& tolua_ret = (cItem&)  self->GetItem(x,y);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
   }
  }
  return 1;
@@ -27448,13 +27448,13 @@ static int tolua_AllToLua_cCraftingGrid_SetItem00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27488,11 +27488,11 @@ static int tolua_AllToLua_cCraftingGrid_SetItem01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27521,8 +27521,8 @@ static int tolua_AllToLua_cCraftingGrid_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27552,9 +27552,9 @@ static int tolua_AllToLua_cCraftingGrid_ConsumeGrid00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCraftingGrid",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cCraftingGrid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27585,8 +27585,8 @@ static int tolua_AllToLua_cCraftingGrid_Dump00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingGrid",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27616,8 +27616,8 @@ static int tolua_AllToLua_cCraftingRecipe_Clear00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27647,8 +27647,8 @@ static int tolua_AllToLua_cCraftingRecipe_GetIngredientsWidth00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27679,8 +27679,8 @@ static int tolua_AllToLua_cCraftingRecipe_GetIngredientsHeight00(lua_State* tolu
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27711,10 +27711,10 @@ static int tolua_AllToLua_cCraftingRecipe_GetIngredient00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27728,7 +27728,7 @@ static int tolua_AllToLua_cCraftingRecipe_GetIngredient00(lua_State* tolua_S)
 #endif
   {
    cItem& tolua_ret = (cItem&)  self->GetIngredient(x,y);
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItem");
   }
  }
  return 1;
@@ -27747,8 +27747,8 @@ static int tolua_AllToLua_cCraftingRecipe_GetResult00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27760,7 +27760,7 @@ static int tolua_AllToLua_cCraftingRecipe_GetResult00(lua_State* tolua_S)
 #endif
   {
    const cItem& tolua_ret = (const cItem&)  self->GetResult();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -27779,11 +27779,11 @@ static int tolua_AllToLua_cCraftingRecipe_SetResult00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27815,9 +27815,9 @@ static int tolua_AllToLua_cCraftingRecipe_SetResult01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27844,13 +27844,13 @@ static int tolua_AllToLua_cCraftingRecipe_SetIngredient00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,7,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,6,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,7,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27884,11 +27884,11 @@ static int tolua_AllToLua_cCraftingRecipe_SetIngredient01(lua_State* tolua_S)
 {
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27917,9 +27917,9 @@ static int tolua_AllToLua_cCraftingRecipe_ConsumeIngredients00(lua_State* tolua_
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cCraftingGrid",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cCraftingGrid",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27950,8 +27950,8 @@ static int tolua_AllToLua_cCraftingRecipe_Dump00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cCraftingRecipe",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -27981,8 +27981,8 @@ static int tolua_AllToLua_cWindow_GetWindowID00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28013,8 +28013,8 @@ static int tolua_AllToLua_cWindow_GetWindowType00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28045,10 +28045,10 @@ static int tolua_AllToLua_cWindow_GetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,4,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28062,7 +28062,7 @@ static int tolua_AllToLua_cWindow_GetSlot00(lua_State* tolua_S)
 #endif
   {
    const cItem* tolua_ret = (const cItem*)  self->GetSlot(*a_Player,a_SlotNum);
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"const cItem");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"const cItem");
   }
  }
  return 1;
@@ -28081,11 +28081,11 @@ static int tolua_AllToLua_cWindow_SetSlot00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err)) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
-	 !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,2,&tolua_err) || !tolua_isusertype(tolua_S,2,"cPlayer",0,&tolua_err)) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     (tolua_isvaluenil(tolua_S,4,&tolua_err) || !tolua_isusertype(tolua_S,4,"const cItem",0,&tolua_err)) ||
+     !tolua_isnoobj(tolua_S,5,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28118,9 +28118,9 @@ static int tolua_AllToLua_cWindow_IsSlotInPlayerMainInventory00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28152,9 +28152,9 @@ static int tolua_AllToLua_cWindow_IsSlotInPlayerHotbar00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28186,9 +28186,9 @@ static int tolua_AllToLua_cWindow_IsSlotInPlayerInventory00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28220,8 +28220,8 @@ static int tolua_AllToLua_cWindow_GetWindowTitle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"const cWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28252,9 +28252,9 @@ static int tolua_AllToLua_cWindow_SetWindowTitle00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cWindow",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28286,12 +28286,12 @@ static int tolua_AllToLua_cLuaWindow_new00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28303,7 +28303,7 @@ static int tolua_AllToLua_cLuaWindow_new00(lua_State* tolua_S)
   const AString a_Title = ((const AString)  tolua_tocppstring(tolua_S,5,0));
   {
    cLuaWindow* tolua_ret = (cLuaWindow*)  Mtolua_new((cLuaWindow)(a_WindowType,a_SlotsX,a_SlotsY,a_Title));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cLuaWindow");
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cLuaWindow");
    tolua_pushcppstring(tolua_S,(const char*)a_Title);
   }
  }
@@ -28323,12 +28323,12 @@ static int tolua_AllToLua_cLuaWindow_new00_local(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertable(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-	 !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-	 !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,6,&tolua_err)
+     !tolua_isusertable(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,5,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,6,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28340,8 +28340,8 @@ static int tolua_AllToLua_cLuaWindow_new00_local(lua_State* tolua_S)
   const AString a_Title = ((const AString)  tolua_tocppstring(tolua_S,5,0));
   {
    cLuaWindow* tolua_ret = (cLuaWindow*)  Mtolua_new((cLuaWindow)(a_WindowType,a_SlotsX,a_SlotsY,a_Title));
-	tolua_pushusertype(tolua_S,(void*)tolua_ret,"cLuaWindow");
-	tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cLuaWindow");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
    tolua_pushcppstring(tolua_S,(const char*)a_Title);
   }
  }
@@ -28361,8 +28361,8 @@ static int tolua_AllToLua_cLuaWindow_delete00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28390,8 +28390,8 @@ static int tolua_AllToLua_cLuaWindow_GetContents00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-	 !tolua_isusertype(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
-	 !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isusertype(tolua_S,1,"cLuaWindow",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
@@ -28403,7 +28403,7 @@ static int tolua_AllToLua_cLuaWindow_GetContents00(lua_State* tolua_S)
 #endif
   {
    cItemGrid& tolua_ret = (cItemGrid&)  self->GetContents();
-	tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
+    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"cItemGrid");
   }
  }
  return 1;

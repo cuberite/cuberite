@@ -49,18 +49,18 @@ cSemaphore::~cSemaphore()
 #ifdef _WIN32
 	CloseHandle( m_Handle );
 #else
-	if( m_bNamed )
-	{
-		if( sem_close( (sem_t*)m_Handle ) != 0 )
-		{
-			LOG("ERROR: Could not close cSemaphore. (%i)", errno);
-		}
-	}
-	else
-	{
-		sem_destroy( (sem_t*)m_Handle );
-		delete (sem_t*)m_Handle;
-	}
+    if( m_bNamed )
+    {
+        if( sem_close( (sem_t*)m_Handle ) != 0 )
+        {
+            LOG("ERROR: Could not close cSemaphore. (%i)", errno);
+        }
+    }
+    else
+    {
+        sem_destroy( (sem_t*)m_Handle );
+        delete (sem_t*)m_Handle;
+    }
 	m_Handle = 0;
 
 #endif
@@ -69,10 +69,10 @@ cSemaphore::~cSemaphore()
 void cSemaphore::Wait()
 {
 #ifndef _WIN32
-	if( sem_wait( (sem_t*)m_Handle ) != 0)
-	{
-		LOG("ERROR: Could not wait for cSemaphore. (%i)", errno);
-	}
+    if( sem_wait( (sem_t*)m_Handle ) != 0)
+    {
+        LOG("ERROR: Could not wait for cSemaphore. (%i)", errno);
+    }
 #else
 	WaitForSingleObject( m_Handle, INFINITE);
 #endif
@@ -83,7 +83,7 @@ void cSemaphore::Signal()
 #ifndef _WIN32
 	if( sem_post( (sem_t*)m_Handle ) != 0 )
 	{
-		LOG("ERROR: Could not signal cSemaphore. (%i)", errno);
+        LOG("ERROR: Could not signal cSemaphore. (%i)", errno);
 	}
 #else
 	ReleaseSemaphore( m_Handle, 1, NULL );

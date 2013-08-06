@@ -27,7 +27,7 @@ public:
 	static const std::string Rose;
 	static const std::string LightPurple;
 	static const std::string Yellow;
-	static const std::string White;
+ 	static const std::string White;
 
   // Styles ( source: http://wiki.vg/Chat )
   static const std::string Random;

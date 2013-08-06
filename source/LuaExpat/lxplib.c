@@ -71,7 +71,7 @@ static void lxpclose (lua_State *L, lxp_userdata *xpu) {
   luaL_unref(L, LUA_REGISTRYINDEX, xpu->tableref);
   xpu->tableref = LUA_REFNIL;
   if (xpu->parser)
-	XML_ParserFree(xpu->parser);
+    XML_ParserFree(xpu->parser);
   xpu->parser = NULL;
 }
 
@@ -85,9 +85,9 @@ static void docall (lxp_userdata *xpu, int nargs, int nres) {
   lua_State *L = xpu->L;
   assert(xpu->state == XPSok);
   if (lua_pcall(L, nargs + 1, nres, 0) != 0) {
-	xpu->state = XPSerror;
-	luaL_unref(L, LUA_REGISTRYINDEX, xpu->tableref);
-	xpu->tableref = luaL_ref(L, LUA_REGISTRYINDEX);  /* error message */
+    xpu->state = XPSerror;
+    luaL_unref(L, LUA_REGISTRYINDEX, xpu->tableref);
+    xpu->tableref = luaL_ref(L, LUA_REGISTRYINDEX);  /* error message */
   }
 }
 
@@ -111,15 +111,15 @@ static int getHandle (lxp_userdata *xpu, const char *handle) {
   lua_State *L = xpu->L;
   if (xpu->state == XPSstring) dischargestring(xpu);
   if (xpu->state == XPSerror)
-	return 0;  /* some error happened before; skip all handles */
+    return 0;  /* some error happened before; skip all handles */
   lua_pushstring(L, handle);
   lua_gettable(L, 3);
   if (lua_toboolean(L, -1) == 0) {
-	lua_pop(L, 1);
-	return 0;
+    lua_pop(L, 1);
+    return 0;
   }
   if (!lua_isfunction(L, -1)) {
-	luaL_error(L, "lxp `%s' callback is not a function", handle);
+    luaL_error(L, "lxp `%s' callback is not a function", handle);
   }
   lua_pushvalue(L, 1);  /* first argument in every call (self) */
   return 1;
@@ -151,12 +151,12 @@ static void f_EndCdataKey (void *ud) {
 static void f_CharData (void *ud, const char *s, int len) {
   lxp_userdata *xpu = (lxp_userdata *)ud;
   if (xpu->state == XPSok) {
-	if (getHandle(xpu, CharDataKey) == 0) return;  /* no handle */
-	xpu->state = XPSstring;
-	luaL_buffinit(xpu->L, xpu->b);
+    if (getHandle(xpu, CharDataKey) == 0) return;  /* no handle */
+    xpu->state = XPSstring;
+    luaL_buffinit(xpu->L, xpu->b);
   }
   if (xpu->state == XPSstring)
-	luaL_addlstring(xpu->b, s, len);
+    luaL_addlstring(xpu->b, s, len);
 }
 
 
@@ -193,14 +193,14 @@ static void f_StartElement (void *ud, const char *name, const char **attrs) {
   lua_pushstring(L, name);
   lua_newtable(L);
   while (*attrs) {
-	if (i <= lastspec) {
-	  lua_pushnumber(L, i++);
-	  lua_pushstring(L, *attrs);
-	  lua_settable(L, -3);
-	}
-	lua_pushstring(L, *attrs++);
-	lua_pushstring(L, *attrs++);
-	lua_settable(L, -3);
+    if (i <= lastspec) {
+      lua_pushnumber(L, i++);
+      lua_pushstring(L, *attrs);
+      lua_settable(L, -3);
+    }
+    lua_pushstring(L, *attrs++);
+    lua_pushstring(L, *attrs++);
+    lua_settable(L, -3);
   }
   docall(xpu, 2, 0);  /* call function with self, name, and attributes */
 }
@@ -215,9 +215,9 @@ static void f_EndElement (void *ud, const char *name) {
 
 
 static int f_ExternaEntity (XML_Parser p, const char *context,
-										  const char *base,
-										  const char *systemId,
-										  const char *publicId) {
+                                          const char *base,
+                                          const char *systemId,
+                                          const char *publicId) {
   lxp_userdata *xpu = (lxp_userdata *)XML_GetUserData(p);
   lua_State *L = xpu->L;
   lxp_userdata *child;
@@ -226,7 +226,7 @@ static int f_ExternaEntity (XML_Parser p, const char *context,
   child = createlxp(L);
   child->parser = XML_ExternalEntityParserCreate(p, context, NULL);
   if (!child->parser)
-	luaL_error(L, "XML_ParserCreate failed");
+    luaL_error(L, "XML_ParserCreate failed");
   lua_rawgeti(L, LUA_REGISTRYINDEX, xpu->tableref); /*lua_getref(L, xpu->tableref); */ /* child uses the same table of its father */
   child->tableref = luaL_ref(L, LUA_REGISTRYINDEX);
   lua_pushstring(L, base);
@@ -241,7 +241,7 @@ static int f_ExternaEntity (XML_Parser p, const char *context,
 
 
 static void f_StartNamespaceDecl (void *ud, const char *prefix,
-											const char *uri) {
+                                            const char *uri) {
   lxp_userdata *xpu = (lxp_userdata *)ud;
   lua_State *L = xpu->L;
   if (getHandle(xpu, StartNamespaceDeclKey) == 0) return;  /* no handle */
@@ -260,9 +260,9 @@ static void f_EndNamespaceDecl (void *ud, const char *prefix) {
 
 
 static void f_NotationDecl (void *ud, const char *notationName,
-									  const char *base,
-									  const char *systemId,
-									  const char *publicId) {
+                                      const char *base,
+                                      const char *systemId,
+                                      const char *publicId) {
   lxp_userdata *xpu = (lxp_userdata *)ud;
   lua_State *L = xpu->L;
   if (getHandle(xpu, NotationDeclKey) == 0) return;  /* no handle */
@@ -287,7 +287,7 @@ static int f_NotStandalone (void *ud) {
 
 
 static void f_ProcessingInstruction (void *ud, const char *target,
-											   const char *data) {
+                                               const char *data) {
   lxp_userdata *xpu = (lxp_userdata *)ud;
   lua_State *L = xpu->L;
   if (getHandle(xpu, ProcessingInstructionKey) == 0) return;  /* no handle */
@@ -298,10 +298,10 @@ static void f_ProcessingInstruction (void *ud, const char *target,
 
 
 static void f_UnparsedEntityDecl (void *ud, const char *entityName,
-											const char *base,
-											const char *systemId,
-											const char *publicId,
-											const char *notationName) {
+                                            const char *base,
+                                            const char *systemId,
+                                            const char *publicId,
+                                            const char *notationName) {
   lxp_userdata *xpu = (lxp_userdata *)ud;
   lua_State *L = xpu->L;
   if (getHandle(xpu, UnparsedEntityDeclKey) == 0) return;  /* no handle */
@@ -314,9 +314,9 @@ static void f_UnparsedEntityDecl (void *ud, const char *entityName,
 }
 
 static void f_StartDoctypeDecl (void *ud, const XML_Char *doctypeName,
-										  const XML_Char *sysid,
-										  const XML_Char *pubid,
-										  int has_internal_subset) {
+                                          const XML_Char *sysid,
+                                          const XML_Char *pubid,
+                                          int has_internal_subset) {
   lxp_userdata *xpu = (lxp_userdata *)ud;
   if (getHandle(xpu, StartDoctypeDeclKey) == 0) return;  /* no handle */
   lua_pushstring(xpu->L, doctypeName);
@@ -342,21 +342,21 @@ static int hasfield (lua_State *L, const char *fname) {
 
 static void checkcallbacks (lua_State *L) {
   static const char *const validkeys[] = {
-	"StartCdataSection", "EndCdataSection", "CharacterData", "Comment",
-	"Default", "DefaultExpand", "StartElement", "EndElement",
-	"ExternalEntityRef", "StartNamespaceDecl", "EndNamespaceDecl",
-	"NotationDecl", "NotStandalone", "ProcessingInstruction",
-	"UnparsedEntityDecl", "StartDoctypeDecl", NULL};
+    "StartCdataSection", "EndCdataSection", "CharacterData", "Comment",
+    "Default", "DefaultExpand", "StartElement", "EndElement",
+    "ExternalEntityRef", "StartNamespaceDecl", "EndNamespaceDecl",
+    "NotationDecl", "NotStandalone", "ProcessingInstruction",
+    "UnparsedEntityDecl", "StartDoctypeDecl", NULL};
   if (hasfield(L, "_nonstrict")) return;
   lua_pushnil(L);
   while (lua_next(L, 1)) {
-	lua_pop(L, 1);  /* remove value */
+    lua_pop(L, 1);  /* remove value */
 #if ! defined (LUA_VERSION_NUM) || LUA_VERSION_NUM < 501
-	if (lua_type(L, -1) != LUA_TSTRING ||
-		luaL_findstring(lua_tostring(L, -1), validkeys) < 0)
-	  luaL_error(L, "invalid key `%s' in callback table", lua_tostring(L, -1));
+    if (lua_type(L, -1) != LUA_TSTRING ||
+        luaL_findstring(lua_tostring(L, -1), validkeys) < 0)
+      luaL_error(L, "invalid key `%s' in callback table", lua_tostring(L, -1));
 #else
-	luaL_checkoption(L, -1, NULL, validkeys);
+    luaL_checkoption(L, -1, NULL, validkeys);
 #endif
   }
 }
@@ -367,40 +367,40 @@ static int lxp_make_parser (lua_State *L) {
   char sep = *luaL_optstring(L, 2, "");
   lxp_userdata *xpu = createlxp(L);
   p = xpu->parser = (sep == '\0') ? XML_ParserCreate(NULL) :
-									XML_ParserCreateNS(NULL, sep);
+                                    XML_ParserCreateNS(NULL, sep);
   if (!p)
-	luaL_error(L, "XML_ParserCreate failed");
+    luaL_error(L, "XML_ParserCreate failed");
   luaL_checktype(L, 1, LUA_TTABLE);
   checkcallbacks(L);
   lua_pushvalue(L, 1);
   xpu->tableref = luaL_ref(L, LUA_REGISTRYINDEX);
   XML_SetUserData(p, xpu);
   if (hasfield(L, StartCdataKey) || hasfield(L, EndCdataKey))
-	XML_SetCdataSectionHandler(p, f_StartCdata, f_EndCdataKey);
+    XML_SetCdataSectionHandler(p, f_StartCdata, f_EndCdataKey);
   if (hasfield(L, CharDataKey))
-	XML_SetCharacterDataHandler(p, f_CharData);
+    XML_SetCharacterDataHandler(p, f_CharData);
   if (hasfield(L, CommentKey))
-	XML_SetCommentHandler(p, f_Comment);
+    XML_SetCommentHandler(p, f_Comment);
   if (hasfield(L, DefaultKey))
-	XML_SetDefaultHandler(p, f_Default);
+    XML_SetDefaultHandler(p, f_Default);
   if (hasfield(L, DefaultExpandKey))
-	XML_SetDefaultHandlerExpand(p, f_DefaultExpand);
+    XML_SetDefaultHandlerExpand(p, f_DefaultExpand);
   if (hasfield(L, StartElementKey) || hasfield(L, EndElementKey))
-	XML_SetElementHandler(p, f_StartElement, f_EndElement);
+    XML_SetElementHandler(p, f_StartElement, f_EndElement);
   if (hasfield(L, ExternalEntityKey))
-	XML_SetExternalEntityRefHandler(p, f_ExternaEntity);
+    XML_SetExternalEntityRefHandler(p, f_ExternaEntity);
   if (hasfield(L, StartNamespaceDeclKey) || hasfield(L, EndNamespaceDeclKey))
-	XML_SetNamespaceDeclHandler(p, f_StartNamespaceDecl, f_EndNamespaceDecl);
+    XML_SetNamespaceDeclHandler(p, f_StartNamespaceDecl, f_EndNamespaceDecl);
   if (hasfield(L, NotationDeclKey))
-	XML_SetNotationDeclHandler(p, f_NotationDecl);
+    XML_SetNotationDeclHandler(p, f_NotationDecl);
   if (hasfield(L, NotStandaloneKey))
-	XML_SetNotStandaloneHandler(p, f_NotStandalone);
+    XML_SetNotStandaloneHandler(p, f_NotStandalone);
   if (hasfield(L, ProcessingInstructionKey))
-	XML_SetProcessingInstructionHandler(p, f_ProcessingInstruction);
+    XML_SetProcessingInstructionHandler(p, f_ProcessingInstruction);
   if (hasfield(L, UnparsedEntityDeclKey))
-	XML_SetUnparsedEntityDeclHandler(p, f_UnparsedEntityDecl);
+    XML_SetUnparsedEntityDeclHandler(p, f_UnparsedEntityDecl);
   if (hasfield(L, StartDoctypeDeclKey))
-	XML_SetStartDoctypeDeclHandler(p, f_StartDoctypeDecl);
+    XML_SetStartDoctypeDeclHandler(p, f_StartDoctypeDecl);
   return 1;
 }
 
@@ -424,7 +424,7 @@ static int parser_gc (lua_State *L) {
 static int setbase (lua_State *L) {
   lxp_userdata *xpu = checkparser(L, 1);
   if (XML_SetBase(xpu->parser, luaL_checkstring(L, 2)) == 0)
-	luaL_error(L, "no memory to store base");
+    luaL_error(L, "no memory to store base");
   return 0;
 }
 
@@ -444,7 +444,7 @@ static int getcallbacks (lua_State *L) {
 
 
 static int parse_aux (lua_State *L, lxp_userdata *xpu, const char *s,
-					  size_t len) {
+                      size_t len) {
   luaL_Buffer b;
   int status;
   xpu->L = L;
@@ -455,16 +455,16 @@ static int parse_aux (lua_State *L, lxp_userdata *xpu, const char *s,
   status = XML_Parse(xpu->parser, s, (int)len, s == NULL);
   if (xpu->state == XPSstring) dischargestring(xpu);
   if (xpu->state == XPSerror) {  /* callback error? */
-	lua_rawgeti(L, LUA_REGISTRYINDEX, xpu->tableref);  /* get original msg. */
-	lua_error(L);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, xpu->tableref);  /* get original msg. */
+    lua_error(L);
   }
   if (s == NULL) xpu->state = XPSfinished;
   if (status) {
-	lua_pushboolean(L, 1);
-	return 1;
+    lua_pushboolean(L, 1);
+    return 1;
   }
   else { /* error */
-	return reporterror(xpu);
+    return reporterror(xpu);
   }
 }
 
@@ -474,9 +474,9 @@ static int lxp_parse (lua_State *L) {
   size_t len;
   const char *s = luaL_optlstring(L, 2, NULL, &len);
   if (xpu->state == XPSfinished && s != NULL) {
-	lua_pushnil(L);
-	lua_pushliteral(L, "cannot parse - document is finished");
-	return 2;
+    lua_pushnil(L);
+    lua_pushliteral(L, "cannot parse - document is finished");
+    return 2;
   }
   return parse_aux(L, xpu, s, len);
 }
@@ -487,10 +487,10 @@ static int lxp_close (lua_State *L) {
   lxp_userdata *xpu = (lxp_userdata *)luaL_checkudata(L, 1, ParserType);
   luaL_argcheck(L, xpu, 1, "expat parser expected");
   if (xpu->state != XPSfinished)
-	status = parse_aux(L, xpu, NULL, 0);
+    status = parse_aux(L, xpu, NULL, 0);
   lxpclose(L, xpu);
   if (status > 1) luaL_error(L, "error closing parser: %s",
-								lua_tostring(L, -status+1));
+                                lua_tostring(L, -status+1));
   return 0;
 }
 
@@ -566,12 +566,12 @@ static void set_info (lua_State *L) {
 static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
   luaL_checkstack(L, nup, "too many upvalues");
   for (; l->name != NULL; l++) {  /* fill the table with given functions */
-	int i;
-	for (i = 0; i < nup; i++)  /* copy upvalues to the top */
-	  lua_pushvalue(L, -nup);
-	lua_pushstring(L, l->name);
-	lua_pushcclosure(L, l->func, nup);  /* closure with those upvalues */
-	lua_settable(L, -(nup + 3));
+    int i;
+    for (i = 0; i < nup; i++)  /* copy upvalues to the top */
+      lua_pushvalue(L, -nup);
+    lua_pushstring(L, l->name);
+    lua_pushcclosure(L, l->func, nup);  /* closure with those upvalues */
+    lua_settable(L, -(nup + 3));
   }
   lua_pop(L, nup);  /* remove upvalues */
 }

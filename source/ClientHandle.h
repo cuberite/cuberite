@@ -255,7 +255,7 @@ private:
 		csConnected,         // The client has just connected, waiting for their handshake / login
 		csAuthenticating,    // The client has logged in, waiting for external authentication
 		csDownloadingWorld,  // The client is waiting for chunks, we're waiting for the loader to provide and send them
-		csConfirmingPos,     // The client has been sent the position packet, waiting for them to repeat the position back
+ 		csConfirmingPos,     // The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           // Normal gameplay
 		csDestroying,        // The client is being destroyed, don't queue any more packets / don't add to chunks
 		csDestroyed,         // The client has been destroyed, the destructor is to be called from the owner thread

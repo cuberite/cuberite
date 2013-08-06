@@ -63,7 +63,7 @@ public:
 		int c;
 		for ( c = 0; c < 4; c++ ) for ( int r = 0; r < 4; r++ )
 			res.cell[r * 4 + c] = cell[r * 4] * m2.cell[c] +
-								  cell[r * 4 + 1] * m2.cell[c + 4] +
+				  				  cell[r * 4 + 1] * m2.cell[c + 4] +
 								  cell[r * 4 + 2] * m2.cell[c + 8] +
 								  cell[r * 4 + 3] * m2.cell[c + 12];
 		for ( c = 0; c < 16; c++ ) cell[c] = res.cell[c];
@@ -173,7 +173,7 @@ public:
 		int c;
 		for ( c = 0; c < 4; c++ ) for ( int r = 0; r < 4; r++ )
 			res.cell[r * 4 + c] = cell[r * 4] * m2.cell[c] +
-								  cell[r * 4 + 1] * m2.cell[c + 4] +
+				  				  cell[r * 4 + 1] * m2.cell[c + 4] +
 								  cell[r * 4 + 2] * m2.cell[c + 8] +
 								  cell[r * 4 + 3] * m2.cell[c + 12];
 		for ( c = 0; c < 16; c++ ) cell[c] = res.cell[c];

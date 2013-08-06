@@ -37,16 +37,16 @@ public class MCServerActivity extends Activity {
 	
 	final private int MENU_REINSTALL = 0;
 	
-	/** Called when the activity is first created. */
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		
-		//Log.e("MCServer", "p id: " + android.os.Process.myPid() );
-		
-		
-		((Button)findViewById(R.id.start_server)).setOnClickListener( new View.OnClickListener() {
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        //Log.e("MCServer", "p id: " + android.os.Process.myPid() );
+        
+        
+        ((Button)findViewById(R.id.start_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
 				mbEnabledLogging = true;
 				if( mThread == null || mThread.isAlive() == false ) {
@@ -55,57 +55,57 @@ public class MCServerActivity extends Activity {
 				}
 			}
 		});
-		
-		((Button)findViewById(R.id.stop_server)).setOnClickListener( new View.OnClickListener() {
+        
+        ((Button)findViewById(R.id.stop_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
 				mbEnabledLogging = true;
 				NativeCleanUp();
 			}
 		});
-		
-		((Button)findViewById(R.id.configure_server)).setOnClickListener( new View.OnClickListener() {
+        
+        ((Button)findViewById(R.id.configure_server)).setOnClickListener( new View.OnClickListener() {
 			public void onClick(View v) {
 				Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://localhost:" + NativeGetWebAdminPort() + "/webadmin/"));
 				startActivity( myIntent );
 			}
 		});
-		
-		
-		
-		ListView lv = (ListView)this.findViewById(R.id.listView1);
-		mAdapter = new ArrayAdapter<String>(this,
-				R.layout.list_item,
-				mLogList);
-		lv.setAdapter(mAdapter);
-		
-		
-		mLogList.add("---- LOG ----");
-		
-		ServerStatusThread = new Thread( new Runnable() {
+        
+        
+        
+        ListView lv = (ListView)this.findViewById(R.id.listView1);
+        mAdapter = new ArrayAdapter<String>(this,
+        	    R.layout.list_item,
+        	    mLogList);
+        lv.setAdapter(mAdapter);
+        
+        
+        mLogList.add("---- LOG ----");
+        
+        ServerStatusThread = new Thread( new Runnable() {
 			public void run() {
 				for(;;)
 				{
 					try {
-						runOnUiThread( new Runnable() {
+				        runOnUiThread( new Runnable() {
 							public void run() {
 								UpdateServerStatus();
 							}
-						});
-						Thread.sleep(1000);
+				        });
+				        Thread.sleep(1000);
 					} catch (InterruptedException e) {
 					}
 				}
 			}
-		});
-		ServerStatusThread.start();
-		
-		
-		
+        });
+        ServerStatusThread.start();
+        
+        
+        
 
-		
-		
+        
+        
 
-		Thread loggerThread = new Thread( new Runnable() {
+        Thread loggerThread = new Thread( new Runnable() {
 			public void run() {
 				Process process = null;
 
@@ -138,42 +138,42 @@ public class MCServerActivity extends Activity {
 				} catch (IOException e) {
 				}
 			}
-		});
-		loggerThread.start();
+        });
+        loggerThread.start();
 
-		((TextView)findViewById(R.id.ip_address)).setText("Connect to: " + getLocalIpAddress());
-		
-		
-		mInstaller = new MCServerInstaller(this);
-		if( mInstaller.NeedsUpdate() )
-		{
-			mInstaller.ShowFirstRunDialog();
-		}
-	}
-	
-	
-	
-	public String getLocalIpAddress() {
-		try {
-			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-				NetworkInterface intf = en.nextElement();
-				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-					InetAddress inetAddress = enumIpAddr.nextElement();
-					if (!inetAddress.isLoopbackAddress()) {
-						return inetAddress.getHostAddress().toString();
-					}
-				}
-			}
-		} catch (SocketException ex) {
-			Log.e("MCServer", ex.toString());
-		}
-		return null;
-	}
-	
-	
-	
-	public void UpdateServerStatus()
-	{
+        ((TextView)findViewById(R.id.ip_address)).setText("Connect to: " + getLocalIpAddress());
+        
+        
+        mInstaller = new MCServerInstaller(this);
+        if( mInstaller.NeedsUpdate() )
+        {
+        	mInstaller.ShowFirstRunDialog();
+        }
+    }
+    
+    
+    
+    public String getLocalIpAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress()) {
+                        return inetAddress.getHostAddress().toString();
+                    }
+                }
+            }
+        } catch (SocketException ex) {
+            Log.e("MCServer", ex.toString());
+        }
+        return null;
+    }
+    
+    
+    
+    public void UpdateServerStatus()
+    {
 		if( NativeIsServerRunning() ) {
 			((TextView)findViewById(R.id.server_status_text)).setText(R.string.mcserver_is_running);
 			((TextView)findViewById(R.id.server_status_text)).setTextColor(Color.GREEN);
@@ -187,40 +187,40 @@ public class MCServerActivity extends Activity {
 			((Button)findViewById(R.id.start_server)).setEnabled(true);
 			((Button)findViewById(R.id.configure_server)).setEnabled(false);
 		}
-	}
-	
-	
-	
-	
-	
-	public boolean onKeyDown(int keyCode, KeyEvent event) { 
-		if(keyCode==KeyEvent.KEYCODE_BACK) 
-		{ 
-			//android.os.Process.killProcess(android.os.Process.myPid());
-			NativeCleanUp();
-			return super.onKeyDown(keyCode, event); 
-		} 
-		return false; 
-	}
-	
-	
-	
-	
-	public void onDestroy() {
-		mbExiting = true;
-		super.onDestroy();
-	}
-	
-	
-	
-	
-	
-	public void AddToLog( final String logMessage ) {
-		final ListView lv = ((ListView)findViewById(R.id.listView1));
-		lv.post(new Runnable() {
-			public void run() {
+    }
+    
+    
+    
+    
+    
+    public boolean onKeyDown(int keyCode, KeyEvent event) { 
+	    if(keyCode==KeyEvent.KEYCODE_BACK) 
+	    { 
+		    //android.os.Process.killProcess(android.os.Process.myPid());
+	    	NativeCleanUp();
+		    return super.onKeyDown(keyCode, event); 
+	    } 
+	    return false; 
+    }
+    
+    
+    
+    
+    public void onDestroy() {
+    	mbExiting = true;
+    	super.onDestroy();
+    }
+    
+    
+    
+    
+    
+    public void AddToLog( final String logMessage ) {
+    	final ListView lv = ((ListView)findViewById(R.id.listView1));
+    	lv.post(new Runnable() {
+            public void run() {
 				//final boolean bAutoscroll = lv.getLastVisiblePosition() >= mAdapter.getCount() - 1 ? true : false;
-				
+            	
 				mLogList.add(logMessage);
 				while( mLogList.size() > 100 ) // only allow 100 messages in the list, otherwise it might slow the GUI down
 				{
@@ -234,50 +234,50 @@ public class MCServerActivity extends Activity {
 				{
 					lv.setSelection(mAdapter.getCount() - 1);
 				}
-			}
-		});
-	}
-	
-	
-	
-	
-	
+            }
+        });
+    }
+    
+    
+    
+    
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, MENU_REINSTALL, 0, "Reinstall MCServer" );
+        return super.onCreateOptionsMenu(menu);
+    }
+    
+    
+    
+    
+    
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, MENU_REINSTALL, 0, "Reinstall MCServer" );
-		return super.onCreateOptionsMenu(menu);
-	}
-	
-	
-	
-	
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		
-		switch( item.getItemId() )
-		{
-		case MENU_REINSTALL:
-			mInstaller.ShowPluginInstallDialog(true);
-			return true;
-		}
-		return false;
-	}
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	
+    	switch( item.getItemId() )
+    	{
+    	case MENU_REINSTALL:
+    		mInstaller.ShowPluginInstallDialog(true);
+    		return true;
+    	}
+        return false;
+    }
 
-	
-	
-	
-	
-	static {
-		System.loadLibrary("mcserver");
-	}
-	
-	
-	public native void    NativeOnCreate();
-	public native void    NativeCleanUp();
-	public native boolean NativeIsServerRunning();
-	public native int     NativeGetWebAdminPort();
-	
+    
+    
+    
+    
+    static {
+        System.loadLibrary("mcserver");
+    }
+    
+    
+    public native void    NativeOnCreate();
+    public native void    NativeCleanUp();
+    public native boolean NativeIsServerRunning();
+    public native int     NativeGetWebAdminPort();
+    
 }
 
 
@@ -285,13 +285,13 @@ class MainThread extends Thread {
 	MCServerActivity mContext = null;
 	int numlogs = 0;
 	
-	MainThread( MCServerActivity aContext ) {
-		mContext = aContext;
-	}
-	
-	public void run() {
-		mContext.NativeOnCreate();
-	}
+    MainThread( MCServerActivity aContext ) {
+    	mContext = aContext;
+    }
+    
+    public void run() {
+    	mContext.NativeOnCreate();
+    }
 
 }
 
