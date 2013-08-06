@@ -492,18 +492,18 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 
 /* ---------------------------------------------------------------------
 
-    Note A.
-    The fall-through switches in UTF-8 reading code save a
-    temp variable, some decrements & conditionals.  The switches
-    are equivalent to the following loop:
-    {
-        int tmpBytesToRead = extraBytesToRead+1;
-        do {
-        ch += *source++;
-        --tmpBytesToRead;
-        if (tmpBytesToRead) ch <<= 6;
-        } while (tmpBytesToRead > 0);
-    }
+	Note A.
+	The fall-through switches in UTF-8 reading code save a
+	temp variable, some decrements & conditionals.  The switches
+	are equivalent to the following loop:
+	{
+		int tmpBytesToRead = extraBytesToRead+1;
+		do {
+		ch += *source++;
+		--tmpBytesToRead;
+		if (tmpBytesToRead) ch <<= 6;
+		} while (tmpBytesToRead > 0);
+	}
 
    --------------------------------------------------------------------- */
    

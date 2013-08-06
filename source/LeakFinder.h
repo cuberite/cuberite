@@ -62,10 +62,10 @@ class LeakFinderOutput : public StackWalker
 public:
   typedef enum LeakFinderOptions
   {
-    // No addition info will be retrived 
-    // (only the address is available)
-    LeakFinderNone = 0,
-    LeakFinderShowCompleteCallstack = 0x1000
+	// No addition info will be retrived 
+	// (only the address is available)
+	LeakFinderNone = 0,
+	LeakFinderShowCompleteCallstack = 0x1000
   } LeakFinderOptions;
 
   LeakFinderOutput(int options = OptionsAll,  LPCSTR szSymPath = NULL);
@@ -75,13 +75,13 @@ protected:
   virtual void OnCallstackEntry(CallstackEntryType eType, CallstackEntry &entry);
   virtual void OnOutput(LPCSTR szText) 
   { 
-    printf(szText); 
-    StackWalker::OnOutput(szText); 
+	printf(szText); 
+	StackWalker::OnOutput(szText); 
   }
   virtual void OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr)
   {
-    if (strcmp(szFuncName, "SymGetLineFromAddr64") == 0) return;
-    StackWalker::OnDbgHelpErr(szFuncName, gle, addr);
+	if (strcmp(szFuncName, "SymGetLineFromAddr64") == 0) return;
+	StackWalker::OnDbgHelpErr(szFuncName, gle, addr);
   }
 };
 
@@ -110,16 +110,16 @@ class ZZZ_LeakFinder
 public:
   ZZZ_LeakFinder()
   {
-    m_pXml = NULL;
+	m_pXml = NULL;
 #ifdef XML_LEAK_FINDER
-    m_pXml = new LeakFinderXmlOutput();
+	m_pXml = new LeakFinderXmlOutput();
 #endif
-    InitLeakFinder();
+	InitLeakFinder();
   }
   ~ZZZ_LeakFinder()
   {
-    DeinitLeakFinder(m_pXml);
-    if (m_pXml != NULL) delete m_pXml;
+	DeinitLeakFinder(m_pXml);
+	if (m_pXml != NULL) delete m_pXml;
   }
 protected:
   LeakFinderXmlOutput *m_pXml;
