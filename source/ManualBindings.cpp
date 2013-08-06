@@ -25,13 +25,6 @@
 
 
 
-// fwd: LuaCommandBinder.cpp
-// bool cLuaState::ReportErrors(lua_State* lua, int status);
-
-
-
-
-
 /****************************
  * Better error reporting for Lua
  **/
@@ -84,23 +77,14 @@ int lua_do_error(lua_State* L, const char * a_pFormat, ...)
  * Lua bound functions with special return types
  **/
 
-static int tolua_StringSplit(lua_State* tolua_S)
+static int tolua_StringSplit(lua_State * tolua_S)
 {
-	std::string str = ((std::string)  tolua_tocppstring(tolua_S,1,0));
-	std::string delim = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+	cLuaState LuaState(tolua_S);
+	std::string str   = (std::string)tolua_tocppstring(LuaState, 1, 0);
+	std::string delim = (std::string)tolua_tocppstring(LuaState, 2, 0);
 
-	AStringVector Split = StringSplit( str, delim );
-
-	lua_createtable(tolua_S, Split.size(), 0);
-	int newTable = lua_gettop(tolua_S);
-	int index = 1;
-	std::vector<std::string>::const_iterator iter = Split.begin();
-	while(iter != Split.end()) {
-		tolua_pushstring( tolua_S, (*iter).c_str() );
-		lua_rawseti(tolua_S, newTable, index);
-		++iter;
-		++index;
-	}
+	AStringVector Split = StringSplit(str, delim);
+	LuaState.PushStringVector(Split);
 	return 1;
 }
 
@@ -158,7 +142,8 @@ cPlugin_NewLua * GetLuaPlugin(lua_State * L)
 	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
 	if (!lua_islightuserdata(L, -1))
 	{
-		LOGERROR("%s: cannot get plugin instance, what have you done to my Lua state?", __FUNCTION__);
+		LOGWARNING("%s: cannot get plugin instance, what have you done to my Lua state?", __FUNCTION__);
+		lua_pop(L);
 		return NULL;
 	}
 	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
