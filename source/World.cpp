@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -278,7 +277,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_LastSave = 0;
 	m_LastUnload = 0;
 
-	// preallocate some memory for ticking blocks so we don´t need to allocate that often
+	// preallocate some memory for ticking blocks so we donï¿½t need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
 
@@ -634,7 +633,6 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		{
 			switch (nightRand)
 			{
-				case 1: MobType = E_ENTITY_TYPE_ZOMBIE;        break;  // _X 2013_06_25: Really? Zombies in the Nether?
 				case 5: MobType = E_ENTITY_TYPE_GHAST;         break;
 				case 6: MobType = E_ENTITY_TYPE_ZOMBIE_PIGMAN; break;
 			}
@@ -642,8 +640,9 @@ void cWorld::TickSpawnMobs(float a_Dt)
 		else
 		{
 			switch (nightRand)
-			{
+			{			
 				case 0: MobType = E_ENTITY_TYPE_SPIDER;      break;
+				case 1: MobType = E_ENTITY_TYPE_ZOMBIE;      break;				
 				case 2: MobType = E_ENTITY_TYPE_ENDERMAN;    break;
 				case 3: MobType = E_ENTITY_TYPE_CREEPER;     break;
 				case 4: MobType = E_ENTITY_TYPE_CAVE_SPIDER; break;
