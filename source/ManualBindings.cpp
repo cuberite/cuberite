@@ -143,7 +143,7 @@ cPlugin_NewLua * GetLuaPlugin(lua_State * L)
 	if (!lua_islightuserdata(L, -1))
 	{
 		LOGWARNING("%s: cannot get plugin instance, what have you done to my Lua state?", __FUNCTION__);
-		lua_pop(L);
+		lua_pop(L, 1);
 		return NULL;
 	}
 	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
