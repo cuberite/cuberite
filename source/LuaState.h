@@ -3,6 +3,12 @@
 
 // Declares the cLuaState class representing the wrapper over lua_State *, provides associated helper functions
 
+/*
+The contained lua_State can be either owned or attached.
+Owned lua_State is created by calling Create() and the cLuaState automatically closes the state
+Or, lua_State can be attached by calling Attach(), the cLuaState doesn't close such a state
+Attaching a state will automatically close an owned state.
+*/
 
 
 
@@ -29,15 +35,27 @@ public:
 	*/
 	cLuaState(const AString & a_SubsystemName);
 	
+	/** Creates a new instance. The a_AttachState is attached.
+	Subsystem name is set to "<attached>".
+	*/
+	explicit cLuaState(lua_State * a_AttachState);
+	
 	~cLuaState();
 	
+	/// Allows this object to be used in the same way as a lua_State *, for example in the LuaLib functions
 	operator lua_State * (void) { return m_LuaState; }
 	
-	/// Creates the m_LuaState, if not closed already
+	/// Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor
 	void Create(void);
 	
 	/// Closes the m_LuaState, if not closed already
 	void Close(void);
+	
+	/// Attaches the specified state. Operations will be carried out on this state, but it will not be closed in the destructor
+	void Attach(lua_State * a_State);
+	
+	/// Detaches a previously attached state.
+	void Detach(void);
 	
 	/// Returns true if the m_LuaState is valid
 	bool IsValid(void) const { return (m_LuaState != NULL); }
@@ -78,6 +96,9 @@ public:
 	
 protected:
 	lua_State * m_LuaState;
+	
+	/// If true, the state is owned by this object and will be auto-Closed. False => attached state
+	bool m_IsOwned;
 	
 	/** The subsystem name is used for reporting errors to the console, it is either "plugin %s" or "LuaScript"
 	whatever is given to the constructor

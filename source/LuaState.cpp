@@ -37,7 +37,19 @@ extern "C"
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
 	m_LuaState(NULL),
+	m_IsOwned(false),
 	m_SubsystemName(a_SubsystemName)
+{
+}
+
+
+
+
+
+cLuaState::cLuaState(lua_State * a_AttachState) :
+	m_LuaState(a_AttachState),
+	m_IsOwned(false),
+	m_SubsystemName("<attached>")
 {
 }
 
@@ -70,6 +82,7 @@ void cLuaState::Create(void)
 	ManualBindings::Bind(m_LuaState);
 	luaopen_lsqlite3(m_LuaState);
 	luaopen_lxp(m_LuaState);
+	m_IsOwned = true;
 }
 
 
@@ -83,7 +96,61 @@ void cLuaState::Close(void)
 		LOGWARNING("%s: Trying to close an invalid LuaState, ignoring.", __FUNCTION__);
 		return;
 	}
+	if (!m_IsOwned)
+	{
+		LOGWARNING(
+			"%s: Detected mis-use, calling Close() on an attached state (0x%p). Detaching instead.",
+			__FUNCTION__, m_LuaState
+		);
+		Detach();
+		return;
+	}
 	lua_close(m_LuaState);
+	m_LuaState = NULL;
+	m_IsOwned = false;
+}
+
+
+
+
+
+void cLuaState::Attach(lua_State * a_State)
+{
+	if (m_LuaState != NULL)
+	{
+		LOGINFO("%s: Already contains a LuaState (0x%p), will be closed / detached.", __FUNCTION__, m_LuaState);
+		if (m_IsOwned)
+		{
+			Close();
+		}
+		else
+		{
+			Detach();
+		}
+	}
+	m_LuaState = a_State;
+	m_IsOwned = false;
+}
+
+
+
+
+
+void cLuaState::Detach(void)
+{
+	if (m_LuaState == NULL)
+	{
+		return;
+	}
+	if (m_IsOwned)
+	{
+		LOGWARNING(
+			"%s: Detected a mis-use, calling Detach() when the state is owned. Closing the owned state (0x%p).",
+			__FUNCTION__, m_LuaState
+		);
+		Close();
+		return;
+	}
 	m_LuaState = NULL;
 }
 
