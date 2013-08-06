@@ -420,7 +420,7 @@ bool cLuaState::CallFunction(int a_NumResults)
 	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, 0);
 	if (ReportErrors(s))
 	{
-		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName);
+		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName.c_str());
 		m_NumCurrentFunctionArgs = -1;
 		m_CurrentFunctionName.clear();
 		return false;

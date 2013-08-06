@@ -178,7 +178,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 		if (!bDontShowTemplate)
 		{
 			// New Lua web template
-			bLuaTemplateSuccessful = WebAdmin->m_pTemplate->CallFunction("ShowPage", sLuaUsertype(WebAdmin, "cWebAdmin"), sLuaUsertype(&TemplateRequest, "HTTPTemplateRequest"), Template);
+			bLuaTemplateSuccessful = WebAdmin->m_pTemplate->CallShowPage(*WebAdmin, TemplateRequest, Template);
 		}
 		
 		if (!bLuaTemplateSuccessful)
@@ -274,14 +274,14 @@ bool cWebAdmin::Init( int a_Port )
 	m_Port = a_Port;
 
 	m_IniFile = new cIniFile("webadmin.ini");
-	if( m_IniFile->ReadFile() )
+	if (m_IniFile->ReadFile())
 	{
-		m_Port = m_IniFile->GetValueI("WebAdmin", "Port", 8080 );
+		m_Port = m_IniFile->GetValueI("WebAdmin", "Port", 8080);
 	}
 
 	// Initialize the WebAdmin template script and load the file
 	m_pTemplate->Initialize();
-	if (!m_pTemplate->LoadFile( FILE_IO_PREFIX "webadmin/template.lua") || !m_pTemplate->Execute())
+	if (!m_pTemplate->LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
 		LOGWARN("Could not load WebAdmin template.");
 	}
