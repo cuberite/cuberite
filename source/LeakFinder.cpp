@@ -150,26 +150,26 @@ static std::string SimpleXMLEncode(LPCSTR szText)
   std::string szRet;
   for (size_t i=0; i<strlen(szText); i++)
   {
-    switch(szText[i])
-    {
-    case '&':
-      szRet.append("&amp;");
-      break;
-    case '<':
-      szRet.append("&lt;");
-      break;
-    case '>':
-      szRet.append("&gt;");
-      break;
-    case '"':
-      szRet.append("&quot;");
-      break;
-    case '\'':
-      szRet.append("&apos;");
-      break;
-    default:
-      szRet += szText[i];
-    }
+	switch(szText[i])
+	{
+	case '&':
+	  szRet.append("&amp;");
+	  break;
+	case '<':
+	  szRet.append("&lt;");
+	  break;
+	case '>':
+	  szRet.append("&gt;");
+	  break;
+	case '"':
+	  szRet.append("&quot;");
+	  break;
+	case '\'':
+	  szRet.append("&apos;");
+	  break;
+	default:
+	  szRet += szText[i];
+	}
   }
   return szRet;
 }
@@ -213,17 +213,17 @@ void LeakFinderOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEntry
 {
   if ( (eType != lastEntry) && (entry.offset != 0) )
   {
-    if ( ((this->m_options & LeakFinderShowCompleteCallstack) == 0) && ( 
-      (strstr(entry.lineFileName, "afxmem.cpp") != NULL) ||
-      (strstr(entry.lineFileName, "dbgheap.c") != NULL) ||
-      (strstr(entry.lineFileName, "new.cpp") != NULL) ||
-      (strstr(entry.lineFileName, "newop.cpp") != NULL) ||
-      (strstr(entry.lineFileName, "leakfinder.cpp") != NULL) ||
-      (strstr(entry.lineFileName, "stackwalker.cpp") != NULL) 
-      ) )
-    {
-      return;
-    }
+	if ( ((this->m_options & LeakFinderShowCompleteCallstack) == 0) && ( 
+	  (strstr(entry.lineFileName, "afxmem.cpp") != NULL) ||
+	  (strstr(entry.lineFileName, "dbgheap.c") != NULL) ||
+	  (strstr(entry.lineFileName, "new.cpp") != NULL) ||
+	  (strstr(entry.lineFileName, "newop.cpp") != NULL) ||
+	  (strstr(entry.lineFileName, "leakfinder.cpp") != NULL) ||
+	  (strstr(entry.lineFileName, "stackwalker.cpp") != NULL) 
+	  ) )
+	{
+	  return;
+	}
   }
   StackWalker::OnCallstackEntry(eType, entry);
 }
@@ -248,15 +248,15 @@ LeakFinderXmlOutput::LeakFinderXmlOutput()
 #endif
   if (m_fXmlFile != NULL)
   {
-    SYSTEMTIME st;
-    GetLocalTime(&st);
-    fprintf(m_fXmlFile, "<MEMREPORT date=\"%.2d/%.2d/%.4d\" time=\"%.2d:%.2d:%.2d\">\n",
-      st.wMonth, st.wDay, st.wYear,
-      st.wHour, st.wMinute, st.wSecond);
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	fprintf(m_fXmlFile, "<MEMREPORT date=\"%.2d/%.2d/%.4d\" time=\"%.2d:%.2d:%.2d\">\n",
+	  st.wMonth, st.wDay, st.wYear,
+	  st.wHour, st.wMinute, st.wSecond);
   }
   else
   {
-    MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
+	MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
   }
 }
 
@@ -275,7 +275,7 @@ LeakFinderXmlOutput::LeakFinderXmlOutput(LPCTSTR szFileName) :
 #endif
   if (m_fXmlFile == NULL)
   {
-    MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
+	MessageBox(NULL, _T("Could not open xml-logfile for leakfinder!"), _T("Warning"), MB_ICONHAND);
   }
   else
   {
@@ -291,9 +291,9 @@ LeakFinderXmlOutput::~LeakFinderXmlOutput()
 {
   if (m_fXmlFile != NULL) 
   {
-    // Write the ending-tags and close the file
-    fprintf(m_fXmlFile, "</MEMREPORT>\n");
-    fclose(m_fXmlFile);
+	// Write the ending-tags and close the file
+	fprintf(m_fXmlFile, "</MEMREPORT>\n");
+	fclose(m_fXmlFile);
   }
   m_fXmlFile = NULL;
 }
@@ -314,7 +314,7 @@ void LeakFinderXmlOutput::OnLeakStartEntry(LPCSTR szKeyName, SIZE_T nDataSize)
 {
   if (m_fXmlFile != NULL)
   {
-    fprintf(m_fXmlFile, "\t<LEAK requestID=\"%s\" size=\"%d\">\n", SimpleXMLEncode(szKeyName).c_str(), nDataSize);
+	fprintf(m_fXmlFile, "\t<LEAK requestID=\"%s\" size=\"%d\">\n", SimpleXMLEncode(szKeyName).c_str(), nDataSize);
   }
   if (--m_Progress == 0)
   {
@@ -331,17 +331,17 @@ void LeakFinderXmlOutput::OnCallstackEntry(CallstackEntryType eType, CallstackEn
 {
   if (m_fXmlFile != NULL)
   {
-    if (eType != lastEntry)
-    {
-      fprintf(m_fXmlFile, "\t\t<STACKENTRY decl=\"%s\" decl_offset=\"%+ld\" ", SimpleXMLEncode(entry.undName).c_str(), entry.offsetFromSmybol);
-      fprintf(m_fXmlFile, "srcfile=\"%s\" line=\"%d\" line_offset=\"%+ld\" ", SimpleXMLEncode(entry.lineFileName).c_str(), entry.lineNumber, entry.offsetFromLine);
-      fprintf(m_fXmlFile, "module=\"%s\" base=\"%08lx\" ", SimpleXMLEncode(entry.moduleName).c_str(), entry.baseOfImage);
-      fprintf(m_fXmlFile, "/>\n");
-    }
-    else
-    {
-      fprintf(m_fXmlFile, "\t</LEAK>\n");
-    }
+	if (eType != lastEntry)
+	{
+	  fprintf(m_fXmlFile, "\t\t<STACKENTRY decl=\"%s\" decl_offset=\"%+ld\" ", SimpleXMLEncode(entry.undName).c_str(), entry.offsetFromSmybol);
+	  fprintf(m_fXmlFile, "srcfile=\"%s\" line=\"%d\" line_offset=\"%+ld\" ", SimpleXMLEncode(entry.lineFileName).c_str(), entry.lineNumber, entry.offsetFromLine);
+	  fprintf(m_fXmlFile, "module=\"%s\" base=\"%08lx\" ", SimpleXMLEncode(entry.moduleName).c_str(), entry.baseOfImage);
+	  fprintf(m_fXmlFile, "/>\n");
+	}
+	else
+	{
+	  fprintf(m_fXmlFile, "\t</LEAK>\n");
+	}
   }
 }
 
@@ -358,47 +358,47 @@ template <typename HASHTABLE_KEY> class ContextHashtableBase
 public:
   ContextHashtableBase(SIZE_T sizeOfHastable, LPCSTR finderName)
   {
-    SIZE_T s = sizeOfHastable*sizeof(AllocHashEntryType);
-    m_hHeap = HeapCreate(0, 10*1024 + s, 0);
-    if (m_hHeap == NULL)
-      throw;
-    pAllocHashTable = (AllocHashEntryType*) own_malloc(s);
-    sAllocEntries = sizeOfHastable;
-    m_finderName = own_strdup(finderName);
+	SIZE_T s = sizeOfHastable*sizeof(AllocHashEntryType);
+	m_hHeap = HeapCreate(0, 10*1024 + s, 0);
+	if (m_hHeap == NULL)
+	  throw;
+	pAllocHashTable = (AllocHashEntryType*) own_malloc(s);
+	sAllocEntries = sizeOfHastable;
+	m_finderName = own_strdup(finderName);
   }
 
 protected:
   virtual ~ContextHashtableBase()
   {
-    if (pAllocHashTable != NULL)
-      own_free(pAllocHashTable);
-    pAllocHashTable = NULL;
+	if (pAllocHashTable != NULL)
+	  own_free(pAllocHashTable);
+	pAllocHashTable = NULL;
 
-    own_free(m_finderName);
-    m_finderName = NULL;
+	own_free(m_finderName);
+	m_finderName = NULL;
 
-    if (m_hHeap != NULL)
-      HeapDestroy(m_hHeap);
+	if (m_hHeap != NULL)
+	  HeapDestroy(m_hHeap);
   }
 
   __inline LPVOID own_malloc(SIZE_T size)
   {
-    return HeapAlloc(m_hHeap, HEAP_ZERO_MEMORY, size);
+	return HeapAlloc(m_hHeap, HEAP_ZERO_MEMORY, size);
   }
   __inline VOID own_free(LPVOID memblock)
   {
-    HeapFree(m_hHeap, 0, memblock);
+	HeapFree(m_hHeap, 0, memblock);
   }
   __inline CHAR *own_strdup(const char *str)
   {
-    size_t len = strlen(str)+1;
-    CHAR *c = (CHAR*)own_malloc(len);
+	size_t len = strlen(str)+1;
+	CHAR *c = (CHAR*)own_malloc(len);
 #if _MSC_VER >= 1400
-    strcpy_s(c, len, str);
+	strcpy_s(c, len, str);
 #else
-    strcpy(c, str);
+	strcpy(c, str);
 #endif
-    return c;
+	return c;
   }
 
   // Disables this leak-finder
@@ -409,16 +409,16 @@ protected:
 protected:
   // Entry for each allocation
   typedef struct AllocHashEntryType {
-    HASHTABLE_KEY             key;
-    SIZE_T                    nDataSize;     // Size of the allocated memory
-    struct AllocHashEntryType *Next;
-    CONTEXT c;
-    PVOID                     pStackBaseAddr;
-    SIZE_T                    nMaxStackSize;
+	HASHTABLE_KEY             key;
+	SIZE_T                    nDataSize;     // Size of the allocated memory
+	struct AllocHashEntryType *Next;
+	CONTEXT c;
+	PVOID                     pStackBaseAddr;
+	SIZE_T                    nMaxStackSize;
 
-    PVOID                     pCallstackOffset;
-    SIZE_T                    nCallstackLen;
-    char                      pcCallstackAddr[MAX_CALLSTACK_LEN_BUF];  // min of both values...
+	PVOID                     pCallstackOffset;
+	SIZE_T                    nCallstackLen;
+	char                      pcCallstackAddr[MAX_CALLSTACK_LEN_BUF];  // min of both values...
   } AllocHashEntryType;
 
 protected:
@@ -431,216 +431,216 @@ protected:
 public:
   VOID Insert(HASHTABLE_KEY &key, CONTEXT &context, SIZE_T nDataSize)
   {
-    SIZE_T HashIdx;
-    AllocHashEntryType *pHashEntry;
+	SIZE_T HashIdx;
+	AllocHashEntryType *pHashEntry;
 
-    // generate hash-value
-    HashIdx = HashFunction(key);
+	// generate hash-value
+	HashIdx = HashFunction(key);
 
-    pHashEntry = &pAllocHashTable[HashIdx];
-    if (IsKeyEmpty(pHashEntry->key) != FALSE) {
-      // Entry is empty...
-    }
-    else {
-      // Entry is not empy! make a list of entries for this hash value...
-      while(pHashEntry->Next != NULL) {
-        pHashEntry = pHashEntry->Next;
-      }
+	pHashEntry = &pAllocHashTable[HashIdx];
+	if (IsKeyEmpty(pHashEntry->key) != FALSE) {
+	  // Entry is empty...
+	}
+	else {
+	  // Entry is not empy! make a list of entries for this hash value...
+	  while(pHashEntry->Next != NULL) {
+		pHashEntry = pHashEntry->Next;
+	  }
 
-      pHashEntry->Next = (AllocHashEntryType*) own_malloc(sizeof(AllocHashEntryType));
+	  pHashEntry->Next = (AllocHashEntryType*) own_malloc(sizeof(AllocHashEntryType));
 	  g_CurrentMemUsage += CRTTable::AllocHashEntryTypeSize;
-      pHashEntry = pHashEntry->Next;
-      if (pHashEntry == NULL)
-      {
+	  pHashEntry = pHashEntry->Next;
+	  if (pHashEntry == NULL)
+	  {
 				// Exhausted the available memory?
 				return;
-      }
-    }
-    pHashEntry->key = key;
-    pHashEntry->nDataSize = nDataSize;
-    pHashEntry->Next = NULL;
+	  }
+	}
+	pHashEntry->key = key;
+	pHashEntry->nDataSize = nDataSize;
+	pHashEntry->Next = NULL;
 #ifdef _M_IX86
-    pHashEntry->pCallstackOffset = (LPVOID) min(context.Ebp, context.Esp);
+	pHashEntry->pCallstackOffset = (LPVOID) min(context.Ebp, context.Esp);
 #elif _M_X64
-    pHashEntry->pCallstackOffset = (LPVOID) min(context.Rdi, context.Rsp);
+	pHashEntry->pCallstackOffset = (LPVOID) min(context.Rdi, context.Rsp);
 #elif _M_IA64
-    pHashEntry->pCallstackOffset = (LPVOID) min(context.IntSp, context.RsBSP);
+	pHashEntry->pCallstackOffset = (LPVOID) min(context.IntSp, context.RsBSP);
 #else
 #error "Platform not supported!"
 #endif
-    pHashEntry->c = context;
+	pHashEntry->c = context;
 
-    // Query the max. stack-area:
-    MEMORY_BASIC_INFORMATION MemBuffer;
-    if(VirtualQuery((LPCVOID) pHashEntry->pCallstackOffset, &MemBuffer, sizeof(MemBuffer)) > 0)
-    {
-      pHashEntry->pStackBaseAddr = MemBuffer.BaseAddress;
-      pHashEntry->nMaxStackSize = MemBuffer.RegionSize;
-    }
-    else
-    {
-      pHashEntry->pStackBaseAddr = 0;
-      pHashEntry->nMaxStackSize = 0;
-    }
+	// Query the max. stack-area:
+	MEMORY_BASIC_INFORMATION MemBuffer;
+	if(VirtualQuery((LPCVOID) pHashEntry->pCallstackOffset, &MemBuffer, sizeof(MemBuffer)) > 0)
+	{
+	  pHashEntry->pStackBaseAddr = MemBuffer.BaseAddress;
+	  pHashEntry->nMaxStackSize = MemBuffer.RegionSize;
+	}
+	else
+	{
+	  pHashEntry->pStackBaseAddr = 0;
+	  pHashEntry->nMaxStackSize = 0;
+	}
 
-    SIZE_T bytesToRead = MAX_CALLSTACK_LEN_BUF;
-    if (pHashEntry->nMaxStackSize > 0)
-    {
-      SIZE_T len = ((SIZE_T) pHashEntry->pStackBaseAddr + pHashEntry->nMaxStackSize) - (SIZE_T)pHashEntry->pCallstackOffset;
-      bytesToRead = min(len, MAX_CALLSTACK_LEN_BUF);
-    }
-    // Now read the callstack:
-    if (ReadProcessMemory(GetCurrentProcess(), (LPCVOID) pHashEntry->pCallstackOffset, &(pHashEntry->pcCallstackAddr), bytesToRead, &(pHashEntry->nCallstackLen)) == 0) 
-    {
-      // Could not read memory...
-      pHashEntry->nCallstackLen = 0;
-      pHashEntry->pCallstackOffset = 0;
-    }  // read callstack
+	SIZE_T bytesToRead = MAX_CALLSTACK_LEN_BUF;
+	if (pHashEntry->nMaxStackSize > 0)
+	{
+	  SIZE_T len = ((SIZE_T) pHashEntry->pStackBaseAddr + pHashEntry->nMaxStackSize) - (SIZE_T)pHashEntry->pCallstackOffset;
+	  bytesToRead = min(len, MAX_CALLSTACK_LEN_BUF);
+	}
+	// Now read the callstack:
+	if (ReadProcessMemory(GetCurrentProcess(), (LPCVOID) pHashEntry->pCallstackOffset, &(pHashEntry->pcCallstackAddr), bytesToRead, &(pHashEntry->nCallstackLen)) == 0) 
+	{
+	  // Could not read memory...
+	  pHashEntry->nCallstackLen = 0;
+	  pHashEntry->pCallstackOffset = 0;
+	}  // read callstack
   }  // Insert
 
   BOOL Remove(HASHTABLE_KEY &key)
   {
-    SIZE_T HashIdx;
-    AllocHashEntryType *pHashEntry, *pHashEntryLast;
+	SIZE_T HashIdx;
+	AllocHashEntryType *pHashEntry, *pHashEntryLast;
 
-    // get the Hash-Value
-    HashIdx = HashFunction(key);
+	// get the Hash-Value
+	HashIdx = HashFunction(key);
 
-    pHashEntryLast = NULL;
-    pHashEntry = &pAllocHashTable[HashIdx];
-    while(pHashEntry != NULL) {
-      if (pHashEntry->key == key) {
-        // release my memory
-        if (pHashEntryLast == NULL) {
-          // It is an entry in the table, so do not release this memory
-          if (pHashEntry->Next == NULL) {
-            // It was the last entry, so empty the table entry
-            SetEmptyKey(pAllocHashTable[HashIdx].key);
-            //memset(&pAllocHashTable[HashIdx], 0, sizeof(pAllocHashTable[HashIdx]));
-          }
-          else {
-            // There are some more entries, so shorten the list
-            AllocHashEntryType *pTmp = pHashEntry->Next;
-            *pHashEntry = *(pHashEntry->Next);
-            own_free(pTmp);
+	pHashEntryLast = NULL;
+	pHashEntry = &pAllocHashTable[HashIdx];
+	while(pHashEntry != NULL) {
+	  if (pHashEntry->key == key) {
+		// release my memory
+		if (pHashEntryLast == NULL) {
+		  // It is an entry in the table, so do not release this memory
+		  if (pHashEntry->Next == NULL) {
+			// It was the last entry, so empty the table entry
+			SetEmptyKey(pAllocHashTable[HashIdx].key);
+			//memset(&pAllocHashTable[HashIdx], 0, sizeof(pAllocHashTable[HashIdx]));
+		  }
+		  else {
+			// There are some more entries, so shorten the list
+			AllocHashEntryType *pTmp = pHashEntry->Next;
+			*pHashEntry = *(pHashEntry->Next);
+			own_free(pTmp);
 			g_CurrentMemUsage -= CRTTable::AllocHashEntryTypeSize;
-          }
-          return TRUE;
-        }
-        else {
-          // now, I am in an dynamic allocated entry (it was a collision)
-          pHashEntryLast->Next = pHashEntry->Next;
-          own_free(pHashEntry);
+		  }
+		  return TRUE;
+		}
+		else {
+		  // now, I am in an dynamic allocated entry (it was a collision)
+		  pHashEntryLast->Next = pHashEntry->Next;
+		  own_free(pHashEntry);
 		  g_CurrentMemUsage -= CRTTable::AllocHashEntryTypeSize;
-          return TRUE;
-        }
-      }
-      pHashEntryLast = pHashEntry;
-      pHashEntry = pHashEntry->Next;
-    }
+		  return TRUE;
+		}
+	  }
+	  pHashEntryLast = pHashEntry;
+	  pHashEntry = pHashEntry->Next;
+	}
 
-    // if we are here, we could not find the RequestID
-    return FALSE;
+	// if we are here, we could not find the RequestID
+	return FALSE;
   }
 
   AllocHashEntryType *Find(HASHTABLE_KEY &key)
   {
-    SIZE_T HashIdx;
-    AllocHashEntryType *pHashEntry;
+	SIZE_T HashIdx;
+	AllocHashEntryType *pHashEntry;
 
-    // get the Hash-Value
-    HashIdx = HashFunction(key);
+	// get the Hash-Value
+	HashIdx = HashFunction(key);
 
-    pHashEntry = &pAllocHashTable[HashIdx];
-    while(pHashEntry != NULL) {
-      if (pHashEntry->key == key) {
-        return pHashEntry;
-      }
-      pHashEntry = pHashEntry->Next;
-    }
+	pHashEntry = &pAllocHashTable[HashIdx];
+	while(pHashEntry != NULL) {
+	  if (pHashEntry->key == key) {
+		return pHashEntry;
+	  }
+	  pHashEntry = pHashEntry->Next;
+	}
 
-    // entry was not found!
-    return NULL;
+	// entry was not found!
+	return NULL;
   }
 
   // For the followong static-var See comment in "ShowCallstack"...
   static BOOL CALLBACK ReadProcessMemoryFromHashEntry64(
-    HANDLE hProcess, // hProcess must be a pointer to an hash-entry!
-    DWORD64 lpBaseAddress, 
-    PVOID lpBuffer, 
-    DWORD nSize, 
-    LPDWORD lpNumberOfBytesRead,
-    LPVOID pUserData  // optional data, which was passed in "ShowCallstack"
-    )
+	HANDLE hProcess, // hProcess must be a pointer to an hash-entry!
+	DWORD64 lpBaseAddress, 
+	PVOID lpBuffer, 
+	DWORD nSize, 
+	LPDWORD lpNumberOfBytesRead,
+	LPVOID pUserData  // optional data, which was passed in "ShowCallstack"
+	)
   {
-    *lpNumberOfBytesRead = 0;
-    AllocHashEntryType *pHashEntry = (AllocHashEntryType*) pUserData;
-    if (pHashEntry == NULL)
-    {
-      return FALSE;
-    }
+	*lpNumberOfBytesRead = 0;
+	AllocHashEntryType *pHashEntry = (AllocHashEntryType*) pUserData;
+	if (pHashEntry == NULL)
+	{
+	  return FALSE;
+	}
 
-    if ( ( (DWORD64)lpBaseAddress >= (DWORD64)pHashEntry->pCallstackOffset) && ((DWORD64)lpBaseAddress <= ((DWORD64)pHashEntry->pCallstackOffset+pHashEntry->nCallstackLen)) ) {
-      // Memory is located in saved Callstack:
-      // Calculate the offset
-      DWORD dwOffset = (DWORD) ((DWORD64)lpBaseAddress - (DWORD64)pHashEntry->pCallstackOffset);
-      DWORD dwSize = __min(nSize, MAX_CALLSTACK_LEN_BUF-dwOffset);
-      memcpy(lpBuffer, &(pHashEntry->pcCallstackAddr[dwOffset]), dwSize);
-      *lpNumberOfBytesRead = dwSize;
-      if (dwSize != nSize)
-      {
-        return FALSE;
-      }
-      *lpNumberOfBytesRead = nSize;
-      return TRUE;
-    }
+	if ( ( (DWORD64)lpBaseAddress >= (DWORD64)pHashEntry->pCallstackOffset) && ((DWORD64)lpBaseAddress <= ((DWORD64)pHashEntry->pCallstackOffset+pHashEntry->nCallstackLen)) ) {
+	  // Memory is located in saved Callstack:
+	  // Calculate the offset
+	  DWORD dwOffset = (DWORD) ((DWORD64)lpBaseAddress - (DWORD64)pHashEntry->pCallstackOffset);
+	  DWORD dwSize = __min(nSize, MAX_CALLSTACK_LEN_BUF-dwOffset);
+	  memcpy(lpBuffer, &(pHashEntry->pcCallstackAddr[dwOffset]), dwSize);
+	  *lpNumberOfBytesRead = dwSize;
+	  if (dwSize != nSize)
+	  {
+		return FALSE;
+	  }
+	  *lpNumberOfBytesRead = nSize;
+	  return TRUE;
+	}
 
-    if (*lpNumberOfBytesRead == 0)  // Memory could not be found
-    {
-      if ( ( (DWORD64)lpBaseAddress < (DWORD64)pHashEntry->pStackBaseAddr) || ((DWORD64)lpBaseAddress > ((DWORD64)pHashEntry->pStackBaseAddr+pHashEntry->nMaxStackSize)) )
-      {
-        // Stackwalking is done by reading the "real memory" (normally this happens when the StackWalk64 tries to read some code)
-        SIZE_T st = 0;
-        BOOL bRet = ReadProcessMemory(hProcess, (LPCVOID) lpBaseAddress, lpBuffer, nSize, &st);
-        *lpNumberOfBytesRead = (DWORD) st;
-        return bRet;
-      }
-    }
+	if (*lpNumberOfBytesRead == 0)  // Memory could not be found
+	{
+	  if ( ( (DWORD64)lpBaseAddress < (DWORD64)pHashEntry->pStackBaseAddr) || ((DWORD64)lpBaseAddress > ((DWORD64)pHashEntry->pStackBaseAddr+pHashEntry->nMaxStackSize)) )
+	  {
+		// Stackwalking is done by reading the "real memory" (normally this happens when the StackWalk64 tries to read some code)
+		SIZE_T st = 0;
+		BOOL bRet = ReadProcessMemory(hProcess, (LPCVOID) lpBaseAddress, lpBuffer, nSize, &st);
+		*lpNumberOfBytesRead = (DWORD) st;
+		return bRet;
+	  }
+	}
 
-    return TRUE;
+	return TRUE;
   }
 
   VOID ShowLeaks(LeakFinderOutput &leakFinderOutput)
   {
-    SIZE_T ulTemp;
-    AllocHashEntryType *pHashEntry;
-    ULONG ulCount = 0;
-    SIZE_T ulLeaksByte = 0;
+	SIZE_T ulTemp;
+	AllocHashEntryType *pHashEntry;
+	ULONG ulCount = 0;
+	SIZE_T ulLeaksByte = 0;
 
-    leakFinderOutput.OnLeakSearchStart(this->m_finderName);
+	leakFinderOutput.OnLeakSearchStart(this->m_finderName);
 
-    // Move throu every entry
-    CHAR keyName[1024];
-    for(ulTemp = 0; ulTemp < this->sAllocEntries; ulTemp++) {
-      pHashEntry = &pAllocHashTable[ulTemp];
-      if (IsKeyEmpty(pHashEntry->key) == FALSE) {
-        while(pHashEntry != NULL) {
-          ulCount++;
-          CONTEXT c;
-          memcpy(&c, &(pHashEntry->c), sizeof(CONTEXT));
+	// Move throu every entry
+	CHAR keyName[1024];
+	for(ulTemp = 0; ulTemp < this->sAllocEntries; ulTemp++) {
+	  pHashEntry = &pAllocHashTable[ulTemp];
+	  if (IsKeyEmpty(pHashEntry->key) == FALSE) {
+		while(pHashEntry != NULL) {
+		  ulCount++;
+		  CONTEXT c;
+		  memcpy(&c, &(pHashEntry->c), sizeof(CONTEXT));
 
-          this->GetKeyAsString(pHashEntry->key, keyName, 1024);
+		  this->GetKeyAsString(pHashEntry->key, keyName, 1024);
 
-          leakFinderOutput.OnLeakStartEntry(keyName, pHashEntry->nDataSize);
-          leakFinderOutput.ShowCallstack(GetCurrentThread(), &c, ReadProcessMemoryFromHashEntry64, pHashEntry);
+		  leakFinderOutput.OnLeakStartEntry(keyName, pHashEntry->nDataSize);
+		  leakFinderOutput.ShowCallstack(GetCurrentThread(), &c, ReadProcessMemoryFromHashEntry64, pHashEntry);
 
-          // Count the number of leaky bytes
-          ulLeaksByte += pHashEntry->nDataSize;
+		  // Count the number of leaky bytes
+		  ulLeaksByte += pHashEntry->nDataSize;
 
-          pHashEntry = pHashEntry->Next;
-        }  // while
-      }
-    }
+		  pHashEntry = pHashEntry->Next;
+		}  // while
+	  }
+	}
   }
 
   AllocHashEntryType *pAllocHashTable;
@@ -701,45 +701,45 @@ class CRTTable : public ContextHashtableBase<LONG>
 public:
   CRTTable() : ContextHashtableBase<LONG>(1021, "CRT-Leaks")
   {
-    // save the previous alloc hook
-    s_pfnOldCrtAllocHook = _CrtSetAllocHook(MyAllocHook);
+	// save the previous alloc hook
+	s_pfnOldCrtAllocHook = _CrtSetAllocHook(MyAllocHook);
   }
 
   virtual ~CRTTable()
   {
-    _CrtSetAllocHook(s_pfnOldCrtAllocHook);
+	_CrtSetAllocHook(s_pfnOldCrtAllocHook);
   }
 
   virtual LONG Disable()
   {
-    return InterlockedIncrement(&s_CrtDisableCount);
+	return InterlockedIncrement(&s_CrtDisableCount);
   }
   virtual LONG Enable()
   {
-    return InterlockedDecrement(&s_CrtDisableCount);
+	return InterlockedDecrement(&s_CrtDisableCount);
   }
 
   virtual SIZE_T HashFunction(LONG &key)
   {
-    // I couldn´t find any better and faster
-    return key % sAllocEntries;
+	// I couldn´t find any better and faster
+	return key % sAllocEntries;
   }
   virtual BOOL IsKeyEmpty(LONG &key)
   {
-    if (key == 0)
-      return TRUE;
-    return FALSE;
+	if (key == 0)
+	  return TRUE;
+	return FALSE;
   }
   virtual VOID SetEmptyKey(LONG &key)
   {
-    key = 0;
+	key = 0;
   }
   virtual VOID GetKeyAsString(LONG &key, CHAR *szName, SIZE_T nBufferLen)
   {
 #if _MSC_VER < 1400
-    _snprintf_s(szName, nBufferLen, "%d", key);
+	_snprintf_s(szName, nBufferLen, "%d", key);
 #else
-    _snprintf_s(szName, nBufferLen, nBufferLen, "%d", key);
+	_snprintf_s(szName, nBufferLen, nBufferLen, "%d", key);
 #endif
   }
 
@@ -805,7 +805,7 @@ static int MyAllocHook(int nAllocType, void *pvData,
 
 #ifdef IGNORE_CRT_ALLOC
   if (_BLOCK_TYPE(nBlockUse) == _CRT_BLOCK)  // Ignore internal C runtime library allocations
-    return TRUE;
+	return TRUE;
 #endif
 	extern int _crtDbgFlag;
 	if  ( ((_CRTDBG_ALLOC_MEM_DF & _crtDbgFlag) == 0) && ( (nAllocType == _HOOK_ALLOC) || (nAllocType == _HOOK_REALLOC) ) )
