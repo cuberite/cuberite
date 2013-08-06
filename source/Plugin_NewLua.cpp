@@ -78,9 +78,9 @@ bool cPlugin_NewLua::Initialize(void)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, this, "cPlugin_NewLua");
+	m_LuaState.PushUserType(this, "cPlugin_NewLua");
 	
-	if (!m_LuaState.CallFunction(1, 1, "Initialize"))
+	if (!m_LuaState.CallFunction(1))
 	{
 		m_LuaState.Close();
 		return false;
@@ -109,7 +109,7 @@ void cPlugin_NewLua::OnDisable()
 		return;
 	}
 
-	m_LuaState.CallFunction(0, 0, "OnDisable");
+	m_LuaState.CallFunction(0);
 }
 
 
@@ -124,10 +124,8 @@ void cPlugin_NewLua::Tick(float a_Dt)
 	{
 		return;
 	}
-
-	tolua_pushnumber( m_LuaState, a_Dt );
-
-	m_LuaState.CallFunction(1, 0, FnName);
+	m_LuaState.PushNumber(a_Dt);
+	m_LuaState.CallFunction(0);
 }
 
 
@@ -144,16 +142,16 @@ bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int 
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	tolua_pushusertype(m_LuaState, a_Digger, "cEntity");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
-	tolua_pushusertype(m_LuaState, &a_Pickups, "cItems");
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushObject(a_Digger);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
+	m_LuaState.PushObject(&a_Pickups);
 
-	if (!m_LuaState.CallFunction(8, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -177,10 +175,10 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushstring  (m_LuaState, a_Message.c_str());
+	m_LuaState.PushObject(a_Player);
+	m_LuaState.PushString(a_Message.c_str());
 
-	if (!m_LuaState.CallFunction(2, 2, FnName))
+	if (!m_LuaState.CallFunction(2))
 	{
 		return false;
 	}
@@ -208,11 +206,11 @@ bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_Chun
 		return false;
 	}
 	
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_ChunkX);
+	m_LuaState.PushNumber(a_ChunkZ);
 	
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -236,12 +234,12 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 		return false;
 	}
 	
-	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
-	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_ChunkX);
+	m_LuaState.PushNumber(a_ChunkZ);
+	m_LuaState.PushUserType(a_ChunkDesc, "cChunkDesc");
 	
-	if (!m_LuaState.CallFunction(4, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -255,7 +253,7 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 
 
 
-bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_pLuaChunk)
+bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING);
@@ -265,12 +263,12 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_World,     "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
-	tolua_pushusertype(m_LuaState, a_pLuaChunk, "cChunkDesc");
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_ChunkX);
+	m_LuaState.PushNumber(a_ChunkZ);
+	m_LuaState.PushUserType(a_ChunkDesc, "cChunkDesc");
 
-	if (!m_LuaState.CallFunction(4, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -294,11 +292,11 @@ bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_Chunk
 		return false;
 	}
 	
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_ChunkX);
+	m_LuaState.PushNumber(a_ChunkZ);
 	
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -322,11 +320,11 @@ bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_Chun
 		return false;
 	}
 	
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_ChunkX);
-	tolua_pushnumber  (m_LuaState, a_ChunkZ);
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_ChunkX);
+	m_LuaState.PushNumber(a_ChunkZ);
 	
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -350,10 +348,10 @@ bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
+	m_LuaState.PushObject(a_Player);
+	m_LuaState.PushObject(a_Pickup);
 
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -377,11 +375,11 @@ bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftin
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+	m_LuaState.PushUserType((void *)a_Player, "cPlayer");
+	m_LuaState.PushUserType((void *)a_Grid,   "cCraftingGrid");
+	m_LuaState.PushUserType((void *)a_Recipe, "cCraftingRecipe");
 
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -405,10 +403,10 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
-	tolua_pushstring  (m_LuaState, a_Reason.c_str());
+	m_LuaState.PushObject(a_Player);
+	m_LuaState.PushString(a_Reason.c_str());
 
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -432,22 +430,10 @@ bool cPlugin_NewLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & 
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	m_LuaState.PushObject(a_Player);
+	m_LuaState.PushStringVector(a_Split);
 
-	// Push the split:
-	lua_createtable(m_LuaState, a_Split.size(), 0);
-	int newTable = lua_gettop(m_LuaState);
-	int index = 1;
-	std::vector<std::string>::const_iterator iter = a_Split.begin(), end = a_Split.end();
-	while(iter != end)
-	{
-		tolua_pushstring(m_LuaState, (*iter).c_str());
-		lua_rawseti(m_LuaState, newTable, index);
-		++iter;
-		++index;
-	}
-
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -471,10 +457,10 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
-	tolua_pushstring  (m_LuaState, a_Username.c_str());
+	m_LuaState.PushUserType(a_Client, "cClientHandle");
+	m_LuaState.PushString  (a_Username.c_str());
 
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -498,10 +484,10 @@ bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Victim, "cEntity");
-	tolua_pushusertype(m_LuaState, a_Killer,  "cEntity");
+	m_LuaState.PushObject(&a_Victim);
+	m_LuaState.PushObject(a_Killer);
 
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -525,11 +511,11 @@ bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, co
 		return false;
 	}
 
-	tolua_pushusertype (m_LuaState, a_Client, "cClientHandle");
-	tolua_pushnumber   (m_LuaState, a_ProtocolVersion);
-	tolua_pushcppstring(m_LuaState, a_Username);
+	m_LuaState.PushObject(a_Client);
+	m_LuaState.PushNumber(a_ProtocolVersion);
+	m_LuaState.PushString(a_Username.c_str());
 
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -553,15 +539,15 @@ bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
 
-	if (!m_LuaState.CallFunction(7, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -585,15 +571,15 @@ bool cPlugin_NewLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
 
-	if (!m_LuaState.CallFunction(7, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -617,9 +603,9 @@ bool cPlugin_NewLua::OnPlayerEating(cPlayer & a_Player)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	m_LuaState.PushObject(&a_Player);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -643,9 +629,9 @@ bool cPlugin_NewLua::OnPlayerJoined(cPlayer & a_Player)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	m_LuaState.PushObject(&a_Player);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -669,14 +655,14 @@ bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_B
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_Status);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_Status);
 
-	if (!m_LuaState.CallFunction(6, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -700,9 +686,9 @@ bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	m_LuaState.PushObject(&a_Player);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -726,18 +712,18 @@ bool cPlugin_NewLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
 
-	if (!m_LuaState.CallFunction(10, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -761,18 +747,18 @@ bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int 
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
 
-	if (!m_LuaState.CallFunction(10, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -796,16 +782,16 @@ bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
 
-	if (!m_LuaState.CallFunction(8, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -829,10 +815,10 @@ bool cPlugin_NewLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, &a_Entity, "cEntity");
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushObject(&a_Entity);
 
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -856,9 +842,9 @@ bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	m_LuaState.PushObject(&a_Player);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -882,9 +868,9 @@ bool cPlugin_NewLua::OnPlayerSpawned(cPlayer & a_Player)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	m_LuaState.PushObject(&a_Player);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -908,9 +894,9 @@ bool cPlugin_NewLua::OnPlayerTossingItem(cPlayer & a_Player)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
+	m_LuaState.PushObject(&a_Player);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -934,18 +920,18 @@ bool cPlugin_NewLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_B
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
 
-	if (!m_LuaState.CallFunction(10, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -969,16 +955,16 @@ bool cPlugin_NewLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_Bl
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
 
-	if (!m_LuaState.CallFunction(8, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1002,18 +988,18 @@ bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
-	tolua_pushnumber  (m_LuaState, a_BlockType);
-	tolua_pushnumber  (m_LuaState, a_BlockMeta);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
+	m_LuaState.PushNumber(a_BlockType);
+	m_LuaState.PushNumber(a_BlockMeta);
 
-	if (!m_LuaState.CallFunction(10, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1037,16 +1023,16 @@ bool cPlugin_NewLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_B
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushnumber  (m_LuaState, a_BlockFace);
-	tolua_pushnumber  (m_LuaState, a_CursorX);
-	tolua_pushnumber  (m_LuaState, a_CursorY);
-	tolua_pushnumber  (m_LuaState, a_CursorZ);
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushNumber(a_BlockFace);
+	m_LuaState.PushNumber(a_CursorX);
+	m_LuaState.PushNumber(a_CursorY);
+	m_LuaState.PushNumber(a_CursorZ);
 
-	if (!m_LuaState.CallFunction(8, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1070,11 +1056,11 @@ bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGri
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+	m_LuaState.PushUserType((void *)a_Player, "cPlayer");
+	m_LuaState.PushUserType((void *)a_Grid,   "cCraftingGrid");
+	m_LuaState.PushUserType((void *)a_Recipe, "cCraftingRecipe");
 
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1098,11 +1084,11 @@ bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
-	tolua_pushusertype(m_LuaState, (void *)a_Grid,   "cCraftingGrid");
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+	m_LuaState.PushUserType((void *)a_Player, "cPlayer");
+	m_LuaState.PushUserType((void *)a_Grid,   "cCraftingGrid");
+	m_LuaState.PushUserType((void *)a_Recipe, "cCraftingRecipe");
 
-	if (!m_LuaState.CallFunction(3, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1126,10 +1112,10 @@ bool cPlugin_NewLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_Receiver, "cEntity");
-	tolua_pushusertype(m_LuaState, &a_TDI,      "TakeDamageInfo");
+	m_LuaState.PushObject(&a_Receiver);
+	m_LuaState.PushUserType(&a_TDI, "TakeDamageInfo");
 
-	if (!m_LuaState.CallFunction(2, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1158,17 +1144,17 @@ bool cPlugin_NewLua::OnUpdatedSign(
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushstring  (m_LuaState, a_Line1.c_str());
-	tolua_pushstring  (m_LuaState, a_Line2.c_str());
-	tolua_pushstring  (m_LuaState, a_Line3.c_str());
-	tolua_pushstring  (m_LuaState, a_Line4.c_str());
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushString(a_Line1.c_str());
+	m_LuaState.PushString(a_Line2.c_str());
+	m_LuaState.PushString(a_Line3.c_str());
+	m_LuaState.PushString(a_Line4.c_str());
+	m_LuaState.PushObject(a_Player);
 
-	if (!m_LuaState.CallFunction(9, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1197,17 +1183,17 @@ bool cPlugin_NewLua::OnUpdatingSign(
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, (void *)a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_BlockX);
-	tolua_pushnumber  (m_LuaState, a_BlockY);
-	tolua_pushnumber  (m_LuaState, a_BlockZ);
-	tolua_pushstring  (m_LuaState, a_Line1.c_str());
-	tolua_pushstring  (m_LuaState, a_Line2.c_str());
-	tolua_pushstring  (m_LuaState, a_Line3.c_str());
-	tolua_pushstring  (m_LuaState, a_Line4.c_str());
-	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	m_LuaState.PushObject(a_World);
+	m_LuaState.PushNumber(a_BlockX);
+	m_LuaState.PushNumber(a_BlockY);
+	m_LuaState.PushNumber(a_BlockZ);
+	m_LuaState.PushString(a_Line1.c_str());
+	m_LuaState.PushString(a_Line2.c_str());
+	m_LuaState.PushString(a_Line3.c_str());
+	m_LuaState.PushString(a_Line4.c_str());
+	m_LuaState.PushObject(a_Player);
 
-	if (!m_LuaState.CallFunction(9, 5, "OnUpdatingSign"))
+	if (!m_LuaState.CallFunction(5))
 	{
 		return false;
 	}
@@ -1247,9 +1233,9 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld & a_World)
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_World, "cWorld");
+	m_LuaState.PushObject(&a_World);
 
-	if (!m_LuaState.CallFunction(1, 1, FnName))
+	if (!m_LuaState.CallFunction(1))
 	{
 		return false;
 	}
@@ -1273,10 +1259,10 @@ bool cPlugin_NewLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather
 		return false;
 	}
 
-	tolua_pushusertype(m_LuaState, &a_World, "cWorld");
-	tolua_pushnumber  (m_LuaState, a_NewWeather);
+	m_LuaState.PushObject(&a_World);
+	m_LuaState.PushNumber(a_NewWeather);
 
-	if (!m_LuaState.CallFunction(2, 2, FnName))
+	if (!m_LuaState.CallFunction(2))
 	{
 		return false;
 	}
@@ -1313,14 +1299,11 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 		return false;
 	}
 	
-	// Push the split:
 	m_LuaState.PushStringVector(a_Split);
-	
-	// Push player:
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	m_LuaState.PushObject(a_Player);
 	
 	// Call function:
-	if (!m_LuaState.CallFunction(2, 1, __FUNCTION__))
+	if (!m_LuaState.CallFunction(1))
 	{
 		LOGWARNING("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
 		return false;
@@ -1352,23 +1335,12 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split, cComman
 	cCSLock Lock(m_CriticalSection);
 	
 	// Push the function to be called:
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, cmd->second);  // same as lua_getref()
+	m_LuaState.PushFunctionFromRegistry(cmd->second);
 	
-	// Push the split:
-	lua_createtable(m_LuaState, a_Split.size(), 0);
-	int newTable = lua_gettop(m_LuaState);
-	int index = 1;
-	std::vector<std::string>::const_iterator iter = a_Split.begin(), end = a_Split.end();
-	while(iter != end)
-	{
-		tolua_pushstring(m_LuaState, (*iter).c_str());
-		lua_rawseti(m_LuaState, newTable, index);
-		++iter;
-		++index;
-	}
+	m_LuaState.PushStringVector(a_Split);
 	
 	// Call function:
-	if (!m_LuaState.CallFunction(1, 2, __FUNCTION__))
+	if (!m_LuaState.CallFunction(2))
 	{
 		LOGWARNING("Lua error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
 		return false;
@@ -1546,29 +1518,21 @@ AString cPlugin_NewLua::HandleWebRequest(const HTTPRequest * a_Request )
 
 	if( Tab )
 	{
-		// LOGINFO("1. Stack size: %i", lua_gettop(m_LuaState) );
-		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, Tab->UserData); // same as lua_getref()
+		m_LuaState.PushFunctionFromRegistry(Tab->UserData);
 
-		// LOGINFO("2. Stack size: %i", lua_gettop(m_LuaState) );
 		// Push HTTPRequest
-		tolua_pushusertype( m_LuaState, (void*)a_Request, "const HTTPRequest" );
-		// LOGINFO("Calling bound function! :D");
-		int s = lua_pcall( m_LuaState, 1, 1, 0);
-
-		if ( s != 0 )
+		m_LuaState.PushUserType((void*)a_Request, "const HTTPRequest");
+		
+		if (!m_LuaState.CallFunction(1))
 		{
-			std::string err = lua_tostring(m_LuaState, -1);
-			LOGERROR("-- %s", err.c_str() );
-			lua_pop(m_LuaState, 1);
-			LOGINFO("error. Stack size: %i", lua_gettop(m_LuaState) );
-			return err;	// Show the error message in the web page, looks cool
+			return "Lua encountered error while processing the page request";
 		}
 
-		if( !lua_isstring( m_LuaState, -1 ) )
+		if (!lua_isstring(m_LuaState, -1))
 		{
-			LOGWARN("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str() );
-			lua_pop(m_LuaState, 1); // Pop return value
-			return std::string("WARNING: WebPlugin tab '") + Tab->Title + std::string("' did not return a string!");
+			LOGWARNING("WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
+			lua_pop(m_LuaState, 1);  // Pop return value
+			return Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
 		}
 
 		RetVal += tolua_tostring(m_LuaState, -1, 0);
@@ -1640,13 +1604,13 @@ bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPla
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
 	cCSLock Lock(m_CriticalSection);
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // Push the function to be called
-	tolua_pushusertype(m_LuaState, &a_Window, "cWindow");
-	tolua_pushusertype(m_LuaState, &a_Player, "cPlayer");
-	tolua_pushboolean (m_LuaState, a_CanRefuse ? 1 : 0);
+	m_LuaState.PushFunctionFromRegistry(a_FnRef);
+	m_LuaState.PushUserType(&a_Window, "cWindow");
+	m_LuaState.PushObject(&a_Player);
+	m_LuaState.PushBool(a_CanRefuse);
 
 	// Call function:
-	if (!m_LuaState.CallFunction(3, 1, __FUNCTION__))
+	if (!m_LuaState.CallFunction(1))
 	{
 		LOGWARNING("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
 		return false;
@@ -1666,12 +1630,12 @@ void cPlugin_NewLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, 
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
 	cCSLock Lock(m_CriticalSection);
-	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // Push the function to be called
-	tolua_pushusertype(m_LuaState, &a_Window, "cWindow");
-	tolua_pushnumber  (m_LuaState, a_SlotNum);
+	m_LuaState.PushFunctionFromRegistry(a_FnRef);
+	m_LuaState.PushUserType(&a_Window, "cWindow");
+	m_LuaState.PushNumber(a_SlotNum);
 
 	// Call function:
-	if (!m_LuaState.CallFunction(2, 0, __FUNCTION__))
+	if (!m_LuaState.CallFunction(0))
 	{
 		LOGWARNING("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
 	}

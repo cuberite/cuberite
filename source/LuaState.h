@@ -8,6 +8,11 @@ The contained lua_State can be either owned or attached.
 Owned lua_State is created by calling Create() and the cLuaState automatically closes the state
 Or, lua_State can be attached by calling Attach(), the cLuaState doesn't close such a state
 Attaching a state will automatically close an owned state.
+
+Calling a Lua function is done by pushing the function, either by PushFunction() or PushFunctionFromRegistry(),
+then pushing the arguments (PushString(), PushNumber(), PushUserData() etc.) and finally
+executing CallFunction(). cLuaState automatically keeps track of the number of arguments and the name of the
+function (for logging purposes), which makes the call less error-prone.
 */
 
 
@@ -21,6 +26,14 @@ Attaching a state will automatically close an owned state.
 
 // fwd: lua.h
 struct lua_State;
+
+class cWorld;
+class cPlayer;
+class cEntity;
+class cItem;
+class cItems;
+class cClientHandle;
+class cPickup;
 
 
 
@@ -80,13 +93,36 @@ public:
 	/// Pushes a string vector, as a table, onto the stack
 	void PushStringVector(const AStringVector & a_Vector);
 	
+	/// Pushes a usertype of the specified class type onto the stack
+	void PushUserType(void * a_Object, const char * a_Type);
+	
+	/// Pushes an integer onto the stack
+	void PushNumber(int a_Value);
+	
+	/// Pushes a double onto the stack
+	void PushNumber(double a_Value);
+	
+	/// Pushes a string onto the stack
+	void PushString(const char * a_Value);
+	
+	/// Pushes a bool onto the stack
+	void PushBool(bool a_Value);
+	
+	// Special family of functions that do PushUserType internally, but require one less parameter
+	void PushObject(cWorld * a_World);
+	void PushObject(cPlayer * a_Player);
+	void PushObject(cEntity * a_Entity);
+	void PushObject(cItem * a_Item);
+	void PushObject(cItems * a_Items);
+	void PushObject(cClientHandle * a_ClientHandle);
+	void PushObject(cPickup * a_Pickup);
+	
 	/**
-	Calls the function that has been pushed onto the stack by PushFunction.
+	Calls the function that has been pushed onto the stack by PushFunction(),
+	with arguments pushed by PushXXX().
 	Returns true if successful, logs a warning on failure.
-	a_FunctionName is used only for the warning log message, the function
-	to be called must be pushed by PushFunction() beforehand.
 	*/
-	bool CallFunction(int a_NumArgs, int a_NumResults, const char * a_FunctionName);
+	bool CallFunction(int a_NumReturnValues);
 
 	/// If the status is nonzero, prints the text on the top of Lua stack and returns true
 	bool ReportErrors(int status);
@@ -104,6 +140,12 @@ protected:
 	whatever is given to the constructor
 	*/
 	AString m_SubsystemName;
+	
+	/// Name of the currently pushed function (for the Push / Call chain)
+	AString m_CurrentFunctionName;
+	
+	/// Number of arguments currently pushed (for the Push / Call chain)
+	int m_NumCurrentFunctionArgs;
 } ;
 
 

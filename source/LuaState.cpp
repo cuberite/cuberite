@@ -38,7 +38,8 @@ extern "C"
 cLuaState::cLuaState(const AString & a_SubsystemName) :
 	m_LuaState(NULL),
 	m_IsOwned(false),
-	m_SubsystemName(a_SubsystemName)
+	m_SubsystemName(a_SubsystemName),
+	m_NumCurrentFunctionArgs(-1)
 {
 }
 
@@ -49,7 +50,8 @@ cLuaState::cLuaState(const AString & a_SubsystemName) :
 cLuaState::cLuaState(lua_State * a_AttachState) :
 	m_LuaState(a_AttachState),
 	m_IsOwned(false),
-	m_SubsystemName("<attached>")
+	m_SubsystemName("<attached>"),
+	m_NumCurrentFunctionArgs(-1)
 {
 }
 
@@ -187,6 +189,8 @@ bool cLuaState::LoadFile(const AString & a_FileName)
 
 bool cLuaState::PushFunction(const char * a_FunctionName, bool a_ShouldLogFailure /* = true */)
 {
+	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
+
 	if (!IsValid())
 	{
 		// This happens if cPlugin::Initialize() fails with an error
@@ -203,6 +207,8 @@ bool cLuaState::PushFunction(const char * a_FunctionName, bool a_ShouldLogFailur
 		lua_pop(m_LuaState, 1);
 		return false;
 	}
+	m_CurrentFunctionName.assign(a_FunctionName);
+	m_NumCurrentFunctionArgs = 0;
 	return true;
 }
 
@@ -212,12 +218,17 @@ bool cLuaState::PushFunction(const char * a_FunctionName, bool a_ShouldLogFailur
 
 bool cLuaState::PushFunctionFromRegistry(int a_FnRef)
 {
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
+	
 	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_FnRef);  // same as lua_getref()
 	if (!lua_isfunction(m_LuaState, -1))
 	{
 		lua_pop(m_LuaState, 1);
 		return false;
 	}
+	m_CurrentFunctionName = "<callback>";
+	m_NumCurrentFunctionArgs = 0;
 	return true;
 }
 
@@ -227,6 +238,9 @@ bool cLuaState::PushFunctionFromRegistry(int a_FnRef)
 
 void cLuaState::PushStringVector(const AStringVector & a_Vector)
 {
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
 	lua_createtable(m_LuaState, a_Vector.size(), 0);
 	int newTable = lua_gettop(m_LuaState);
 	int index = 1;
@@ -235,22 +249,184 @@ void cLuaState::PushStringVector(const AStringVector & a_Vector)
 		tolua_pushstring(m_LuaState, itr->c_str());
 		lua_rawseti(m_LuaState, newTable, index);
 	}
+	m_NumCurrentFunctionArgs += 1;
 }
 
 
 
 
 
-bool cLuaState::CallFunction(int a_NumArgs, int a_NumResults, const char * a_FunctionName)
+void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 {
-	ASSERT(lua_isfunction(m_LuaState, -a_NumArgs - 1));
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Object, a_Type);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushNumber(int a_Value)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushNumber(double a_Value)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushString(const char * a_Value)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushstring(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushBool(bool a_Value)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushboolean(m_LuaState, a_Value ? 1 : 0);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cWorld * a_World)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cPlayer * a_Player)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cEntity * a_Entity)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cItem * a_Item)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Item, "cItem");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cItems * a_Items)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Items, "cItems");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cClientHandle * a_Client)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::PushObject(cPickup * a_Pickup)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+bool cLuaState::CallFunction(int a_NumResults)
+{
+	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+	ASSERT(lua_isfunction(m_LuaState, -m_NumCurrentFunctionArgs - 1));
 	
-	int s = lua_pcall(m_LuaState, a_NumArgs, a_NumResults, 0);
+	int s = lua_pcall(m_LuaState, m_NumCurrentFunctionArgs, a_NumResults, 0);
 	if (ReportErrors(s))
 	{
-		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), a_FunctionName);
+		LOGWARNING("Error in %s calling function %s()", m_SubsystemName.c_str(), m_CurrentFunctionName);
+		m_NumCurrentFunctionArgs = -1;
+		m_CurrentFunctionName.clear();
 		return false;
 	}
+	m_NumCurrentFunctionArgs = -1;
+	m_CurrentFunctionName.clear();
 	return true;
 }
 
