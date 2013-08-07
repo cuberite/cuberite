@@ -21,7 +21,7 @@ extern "C"
 
 cPlugin_NewLua::cPlugin_NewLua(const AString & a_PluginDirectory) :
 	cPlugin(a_PluginDirectory),
-	m_LuaState(Printf("plugin %s", GetName().c_str()))
+	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str()))
 {
 }
 
