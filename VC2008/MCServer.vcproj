@@ -1538,27 +1538,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin_Squirrel.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Plugin_Squirrel.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\PluginManager.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\PluginManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SquirrelCommandBinder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SquirrelCommandBinder.h"
 					>
 				</File>
 				<File
@@ -1585,38 +1569,6 @@
 					RelativePath="..\source\WebPlugin.h"
 					>
 				</File>
-				<Filter
-					Name="Squirrel"
-					>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelArray.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelBaseClass.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelBindings.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelBindings.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelFunctions.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelFunctions.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelObject.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="External"
