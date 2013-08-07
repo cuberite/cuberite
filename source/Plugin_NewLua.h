@@ -3,6 +3,7 @@
 
 #include "Plugin.h"
 #include "WebPlugin.h"
+#include "LuaState.h"
 
 // Names for the global variables through which the plugin is identified in its LuaState
 #define LUA_PLUGIN_NAME_VAR_NAME     "_MCServerInternal_PluginName"
@@ -10,9 +11,6 @@
 
 
 
-
-// fwd: Lua
-typedef struct lua_State lua_State;
 
 // fwd: UI/Window.h
 class cWindow;
@@ -99,7 +97,7 @@ public:
 	/// Binds the console command to call the function specified by a Lua function reference. Simply adds to CommandMap.
 	void BindConsoleCommand(const AString & a_Command, int a_FnRef);
 
-	lua_State * GetLuaState(void) { return m_LuaState; }
+	cLuaState & GetLuaState(void) { return m_LuaState; }
 
 	cCriticalSection & GetCriticalSection(void) { return m_CriticalSection; }
 	
@@ -114,7 +112,7 @@ public:
 	
 protected:
 	cCriticalSection m_CriticalSection;
-	lua_State * m_LuaState;
+	cLuaState m_LuaState;
 	
 	/// Maps command name into Lua function reference
 	typedef std::map<AString, int> CommandMap;
@@ -122,9 +120,6 @@ protected:
 	CommandMap m_Commands;
 	CommandMap m_ConsoleCommands;
 
-	bool PushFunction(const char * a_FunctionName, bool a_bLogError = true);
-	bool CallFunction(int a_NumArgs, int a_NumResults, const char * a_FunctionName );  // a_FunctionName is only used for error messages, nothing else
-	
 	/// Returns the name of Lua function that should handle the specified hook
 	const char * GetHookFnName(cPluginManager::PluginHook a_Hook);
 } ;  // tolua_export

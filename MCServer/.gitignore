@@ -1,11 +1,8 @@
 *.exe
-ChunkWorx.ini
-ChunkWorxSave.ini
+*.ini
 MCServer
-banned.ini
 logs
 players
-whitelist.ini
 world*
 API.txt
 *.dat
@@ -15,9 +12,6 @@ schematics
 *.pdb
 memdump.xml
 *.grab
-ProtectionAreas.ini
 ProtectionAreas.sqlite
 helgrind.log
-settings.ini
-webadmin.ini
 motd.txt

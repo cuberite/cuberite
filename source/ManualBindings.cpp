@@ -19,13 +19,8 @@
 #include "BlockEntities/FurnaceEntity.h"
 #include "md5/md5.h"
 #include "LuaWindow.h"
-
-
-
-
-
-// fwd: LuaCommandBinder.cpp
-bool report_errors(lua_State* lua, int status);
+#include "LuaState.h"
+#include "LineBlockTracer.h"
 
 
 
@@ -83,23 +78,14 @@ int lua_do_error(lua_State* L, const char * a_pFormat, ...)
  * Lua bound functions with special return types
  **/
 
-static int tolua_StringSplit(lua_State* tolua_S)
+static int tolua_StringSplit(lua_State * tolua_S)
 {
-	std::string str = ((std::string)  tolua_tocppstring(tolua_S,1,0));
-	std::string delim = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+	cLuaState LuaState(tolua_S);
+	std::string str   = (std::string)tolua_tocppstring(LuaState, 1, 0);
+	std::string delim = (std::string)tolua_tocppstring(LuaState, 2, 0);
 
-	AStringVector Split = StringSplit( str, delim );
-
-	lua_createtable(tolua_S, Split.size(), 0);
-	int newTable = lua_gettop(tolua_S);
-	int index = 1;
-	std::vector<std::string>::const_iterator iter = Split.begin();
-	while(iter != Split.end()) {
-		tolua_pushstring( tolua_S, (*iter).c_str() );
-		lua_rawseti(tolua_S, newTable, index);
-		++iter;
-		++index;
-	}
+	AStringVector Split = StringSplit(str, delim);
+	LuaState.PushStringVector(Split);
 	return 1;
 }
 
@@ -157,7 +143,8 @@ cPlugin_NewLua * GetLuaPlugin(lua_State * L)
 	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
 	if (!lua_islightuserdata(L, -1))
 	{
-		LOGERROR("%s: cannot get plugin instance, what have you done to my Lua state?", __FUNCTION__);
+		LOGWARNING("%s: cannot get plugin instance, what have you done to my Lua state?", __FUNCTION__);
+		lua_pop(L, 1);
 		return NULL;
 	}
 	cPlugin_NewLua * Plugin = (cPlugin_NewLua *)lua_topointer(L, -1);
@@ -233,7 +220,7 @@ static int tolua_DoWith(lua_State* tolua_S)
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  // Abort enumeration
 			}
@@ -323,7 +310,7 @@ static int tolua_DoWithID(lua_State* tolua_S)
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  // Abort enumeration
 			}
@@ -354,9 +341,11 @@ static int tolua_DoWithID(lua_State* tolua_S)
 
 
 
-template< class Ty1,
-          class Ty2,
-          bool (Ty1::*Func1)(int, int, int, cItemCallback<Ty2> &) >
+template<
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(int, int, int, cItemCallback<Ty2> &)
+>
 static int tolua_DoWithXYZ(lua_State* tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
@@ -418,7 +407,7 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  // Abort enumeration
 			}
@@ -511,7 +500,7 @@ static int tolua_ForEachInChunk(lua_State* tolua_S)
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -602,7 +591,7 @@ static int tolua_ForEach(lua_State * tolua_S)
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -813,7 +802,7 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 			tolua_pushcppstring(LuaState, a_HelpString);
 
 			int s = lua_pcall(LuaState, 3, 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -887,7 +876,7 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 			tolua_pushcppstring(LuaState, a_HelpString);
 
 			int s = lua_pcall(LuaState, 2, 1, 0);
-			if (report_errors(LuaState, s))
+			if (cLuaState::ReportErrors(LuaState, s))
 			{
 				return true;  /* Abort enumeration */
 			}
@@ -1307,8 +1296,8 @@ static int tolua_cPlugin_Call(lua_State* tolua_S)
 		return 0;
 	}
 	
-	int s = lua_pcall(targetState, top-2, LUA_MULTRET, 0);
-	if( report_errors( targetState, s ) )
+	int s = lua_pcall(targetState, top - 2, LUA_MULTRET, 0);
+	if (cLuaState::ReportErrors(targetState, s))
 	{
 		LOGWARN("Error while calling function '%s' in plugin '%s'", funcName.c_str(), self->GetName().c_str() );
 		return 0;
@@ -1497,15 +1486,184 @@ tolua_lerror:
 
 
 
+/// Provides interface between a Lua table of callbacks and the cBlockTracer::cCallbacks
+class cLuaBlockTracerCallbacks :
+	public cBlockTracer::cCallbacks
+{
+public:
+	cLuaBlockTracerCallbacks(cLuaState & a_LuaState, int a_ParamNum) :
+		m_LuaState(a_LuaState),
+		m_TableRef(a_LuaState, a_ParamNum)
+	{
+	}
+	
+	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	{
+		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlock"))
+		{
+			// No such function in the table, skip the callback
+			return false;
+		}
+		m_LuaState.PushNumber(a_BlockX);
+		m_LuaState.PushNumber(a_BlockY);
+		m_LuaState.PushNumber(a_BlockZ);
+		m_LuaState.PushNumber(a_BlockType);
+		m_LuaState.PushNumber(a_BlockMeta);
+		if (!m_LuaState.CallFunction(1))
+		{
+			return false;
+		}
+		bool res = false;
+		if (lua_isboolean(m_LuaState, -1))
+		{
+			res = (lua_toboolean(m_LuaState, -1) != 0);
+		}
+		lua_pop(m_LuaState, 1);
+		return res;
+	}
+	
+	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNextBlockNoData"))
+		{
+			// No such function in the table, skip the callback
+			return false;
+		}
+		m_LuaState.PushNumber(a_BlockX);
+		m_LuaState.PushNumber(a_BlockY);
+		m_LuaState.PushNumber(a_BlockZ);
+		if (!m_LuaState.CallFunction(1))
+		{
+			return false;
+		}
+		bool res = false;
+		if (lua_isboolean(m_LuaState, -1))
+		{
+			res = (lua_toboolean(m_LuaState, -1) != 0);
+		}
+		lua_pop(m_LuaState, 1);
+		return res;
+	}
+	
+	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+	{
+		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnOutOfWorld"))
+		{
+			// No such function in the table, skip the callback
+			return false;
+		}
+		m_LuaState.PushNumber(a_BlockX);
+		m_LuaState.PushNumber(a_BlockY);
+		m_LuaState.PushNumber(a_BlockZ);
+		if (!m_LuaState.CallFunction(1))
+		{
+			return false;
+		}
+		bool res = false;
+		if (lua_isboolean(m_LuaState, -1))
+		{
+			res = (lua_toboolean(m_LuaState, -1) != 0);
+		}
+		lua_pop(m_LuaState, 1);
+		return res;
+	}
+	
+	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+	{
+		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnIntoWorld"))
+		{
+			// No such function in the table, skip the callback
+			return false;
+		}
+		m_LuaState.PushNumber(a_BlockX);
+		m_LuaState.PushNumber(a_BlockY);
+		m_LuaState.PushNumber(a_BlockZ);
+		if (!m_LuaState.CallFunction(1))
+		{
+			return false;
+		}
+		bool res = false;
+		if (lua_isboolean(m_LuaState, -1))
+		{
+			res = (lua_toboolean(m_LuaState, -1) != 0);
+		}
+		lua_pop(m_LuaState, 1);
+		return res;
+	}
+	
+	virtual void OnNoMoreHits(void) override
+	{
+		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNoMoreHits"))
+		{
+			// No such function in the table, skip the callback
+			return;
+		}
+		m_LuaState.CallFunction(0);
+	}
+	
+	virtual void OnNoChunk(void) override
+	{
+		if (!m_LuaState.PushFunctionFromRefTable(m_TableRef, "OnNoChunk"))
+		{
+			// No such function in the table, skip the callback
+			return;
+		}
+		m_LuaState.CallFunction(0);
+	}
+
+protected:
+	cLuaState & m_LuaState;
+	cLuaState::cRef m_TableRef;
+} ;
+
+
+
+
+
+static int tolua_cLineBlockTracer_Trace(lua_State * tolua_S)
+{
+	// cLineBlockTracer.Trace(World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ)
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamTable   (2) ||
+		!L.CheckParamNumber  (3, 8) ||
+		!L.CheckParamEnd     (9)
+	)
+	{
+		return 0;
+	}
+
+	cWorld * World = (cWorld *)tolua_tousertype(L, 1, NULL);
+	cLuaBlockTracerCallbacks Callbacks(L, 2);
+	double StartX = tolua_tonumber(L, 3, 0);
+	double StartY = tolua_tonumber(L, 4, 0);
+	double StartZ = tolua_tonumber(L, 5, 0);
+	double EndX   = tolua_tonumber(L, 6, 0);
+	double EndY   = tolua_tonumber(L, 7, 0);
+	double EndZ   = tolua_tonumber(L, 8, 0);
+	bool res = cLineBlockTracer::Trace(*World, Callbacks, StartX, StartY, StartZ, EndX, EndY, EndZ);
+	tolua_pushboolean(L, res ? 1 : 0);
+	return 1;
+}
+
+
+
+
+
 void ManualBindings::Bind(lua_State * tolua_S)
 {
-	tolua_beginmodule(tolua_S,NULL);
+	tolua_beginmodule(tolua_S, NULL);
 		tolua_function(tolua_S, "StringSplit", tolua_StringSplit);
 		tolua_function(tolua_S, "LOG",         tolua_LOG);
 		tolua_function(tolua_S, "LOGINFO",     tolua_LOGINFO);
 		tolua_function(tolua_S, "LOGWARN",     tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGWARNING",  tolua_LOGWARN);
 		tolua_function(tolua_S, "LOGERROR",    tolua_LOGERROR);
+		
+		tolua_beginmodule(tolua_S, "cLineBlockTracer");
+			tolua_function(tolua_S, "Trace", tolua_cLineBlockTracer_Trace);
+		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cRoot");
 			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_DoWith <cRoot, cPlayer, &cRoot::FindAndDoWithPlayer>);
