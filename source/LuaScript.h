@@ -15,20 +15,6 @@
 
 
 
-/*
-struct sLuaUsertype
-{
-	sLuaUsertype(void* a_pObject, const char* a_pClassName) : Object(a_pObject), ClassName(a_pClassName) {}
-	//
-	void*       Object;
-	const char* ClassName;
-} ;
-*/
-
-
-
-
-
 // fwd:
 class cWebAdmin;
 struct HTTPTemplateRequest;
