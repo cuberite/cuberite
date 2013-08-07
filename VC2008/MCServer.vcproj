@@ -307,6 +307,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\source\BlockTracer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\source\ByteBuffer.cpp"
 				>
 			</File>
@@ -543,6 +547,14 @@
 			</File>
 			<File
 				RelativePath="..\source\LinearUpscale.h"
+				>
+			</File>
+			<File
+				RelativePath="..\source\LineBlockTracer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\source\LineBlockTracer.h"
 				>
 			</File>
 			<File
@@ -1483,6 +1495,14 @@
 				</File>
 				<File
 					RelativePath="..\source\LuaScript.h"
+					>
+				</File>
+				<File
+					RelativePath="..\source\LuaState.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\source\LuaState.h"
 					>
 				</File>
 				<File

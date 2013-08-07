@@ -154,7 +154,12 @@ public:
 		return SetValueI( keyname, valuename, int(value), create);
 	}
 	bool SetValueF( const std::string & keyname, const std::string & valuename, const double value, const bool create = true);
+	
+	// tolua_end
+	
 	bool SetValueV( const std::string & keyname, const std::string & valuename, char *format, ...);
+	
+	// tolua_begin
 
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.

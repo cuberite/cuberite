@@ -4,6 +4,10 @@ function Output(String)
 	table.insert(SiteContent, String)
 end
 
+
+
+
+
 function GetTableSize(Table)
 	local Size = 0
 	for key,value in pairs(Table) do
@@ -11,6 +15,10 @@ function GetTableSize(Table)
 	end
 	return Size
 end
+
+
+
+
 
 function GetDefaultPage()
 	local PM = cRoot:Get():GetPluginManager()
@@ -42,11 +50,15 @@ function GetDefaultPage()
 	return Content, SubTitle
 end
 
+
+
+
+
 function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
 	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
 	local Title = "MCServer"
-	local MemoryUsage = WebAdmin:GetMemoryUsage()
+	local MemoryUsage = cWebAdmin:GetMemoryUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
 	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
 	local PageContent = PluginPage.Content
@@ -408,6 +420,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 				<div id="sidebar">
 					<ul class="sideNav">
 	]])
+
 	
 	local AllPlugins = WebAdmin:GetPlugins()
 	for key,value in pairs(AllPlugins) do
@@ -421,6 +434,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 			end
 		end
 	end
+
 	
 	Output([[
 					</ul>

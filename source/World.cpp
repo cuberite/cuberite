@@ -58,6 +58,9 @@
 
 #include "tolua++.h"
 
+// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
+#include "LineBlockTracer.h"
+
 #ifndef _WIN32
 	#include <stdlib.h>
 #endif
@@ -441,6 +444,60 @@ void cWorld::InitializeSpawn(void)
 	
 	// TODO: Better spawn detection - move spawn out of the water if it isn't set in the INI already
 	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // +1.6f eye height
+	
+	
+	#ifdef TEST_LINEBLOCKTRACER
+	// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
+	class cTracerCallbacks :
+		public cBlockTracer::cCallbacks
+	{
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+		{
+			LOGD("Block {%d, %d, %d}: %d:%d (%s)",
+				a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta,
+				ItemToString(cItem(a_BlockType, 1, a_BlockMeta)).c_str()
+			);
+			return false;
+		}
+		
+		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
+		{
+			LOGD("Block {%d, %d, %d}: no data available",
+				a_BlockX, a_BlockY, a_BlockZ
+			);
+			return false;
+		}
+
+		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+		{
+			LOGD("Out of world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
+			return false;
+		}
+
+		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+		{
+			LOGD("Into world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
+			return false;
+		}
+
+		virtual void OnNoMoreHits(void) override
+		{
+			LOGD("No more hits");
+		}
+	} Callbacks;
+	LOGD("Spawn is at {%f, %f, %f}", m_SpawnX, m_SpawnY, m_SpawnZ);
+	LOGD("Tracing a line along +X:");
+	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 10, m_SpawnY, m_SpawnZ, m_SpawnX + 10, m_SpawnY, m_SpawnZ);
+	LOGD("Tracing a line along -Z:");
+	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX, m_SpawnY, m_SpawnZ + 10, m_SpawnX, m_SpawnY, m_SpawnZ - 10);
+	LOGD("Tracing a line along -Y, out of world:");
+	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX, 260, m_SpawnZ, m_SpawnX, -5, m_SpawnZ);
+	LOGD("Tracing a line along XY:");
+	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 10, m_SpawnY - 10, m_SpawnZ, m_SpawnX + 10, m_SpawnY + 10, m_SpawnZ);
+	LOGD("Tracing a line in generic direction:");
+	cLineBlockTracer::Trace(*this, Callbacks, m_SpawnX - 15, m_SpawnY - 5, m_SpawnZ + 7.5, m_SpawnX + 13, m_SpawnY - 10, m_SpawnZ + 8.5);
+	LOGD("Tracing tests done");
+	#endif  // TEST_LINEBLOCKTRACER
 }
 
 
@@ -825,6 +882,15 @@ bool cWorld::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 bool cWorld::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4)
 {
 	return m_ChunkMap->GetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
+}
+
+
+
+
+
+bool cWorld::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback)
+{
+	return m_ChunkMap->DoWithChunk(a_ChunkX, a_ChunkZ, a_Callback);
 }
 
 
