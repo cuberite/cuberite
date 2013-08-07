@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/02/13 08:41:18.
+** Generated automatically by tolua++-1.0.92 on 08/07/13 12:06:03.
 */
 
 #ifndef __cplusplus
@@ -202,8 +202,11 @@ static int tolua_collect_Vector3d (lua_State* tolua_S)
 static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
- tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin_NewLua");
+ tolua_usertype(tolua_S,"cCraftingGrid");
+ tolua_usertype(tolua_S,"cCraftingRecipe");
+ tolua_usertype(tolua_S,"cPlugin");
+ tolua_usertype(tolua_S,"cWindow");
  tolua_usertype(tolua_S,"cStringMap");
  tolua_usertype(tolua_S,"cItemGrid");
  tolua_usertype(tolua_S,"cBlockArea");
@@ -211,42 +214,42 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cLuaWindow");
  tolua_usertype(tolua_S,"cInventory");
  tolua_usertype(tolua_S,"cRoot");
- tolua_usertype(tolua_S,"cWindow");
- tolua_usertype(tolua_S,"cCraftingGrid");
- tolua_usertype(tolua_S,"cTracer");
- tolua_usertype(tolua_S,"cPickup");
- tolua_usertype(tolua_S,"cItems");
+ tolua_usertype(tolua_S,"cCuboid");
+ tolua_usertype(tolua_S,"std::vector<cIniFile::key>");
  tolua_usertype(tolua_S,"cGroup");
+ tolua_usertype(tolua_S,"cPickup");
+ tolua_usertype(tolua_S,"std::vector<std::string>");
+ tolua_usertype(tolua_S,"cTracer");
  tolua_usertype(tolua_S,"cClientHandle");
  tolua_usertype(tolua_S,"cChunkDesc");
  tolua_usertype(tolua_S,"cFurnaceRecipe");
- tolua_usertype(tolua_S,"cCuboid");
- tolua_usertype(tolua_S,"cChatColor");
  tolua_usertype(tolua_S,"Vector3i");
- tolua_usertype(tolua_S,"cEntity");
+ tolua_usertype(tolua_S,"cChatColor");
+ tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"Lua__cPickup");
  tolua_usertype(tolua_S,"Lua__cWebPlugin");
- tolua_usertype(tolua_S,"cPlugin");
  tolua_usertype(tolua_S,"cCraftingRecipes");
+ tolua_usertype(tolua_S,"cEntity");
  tolua_usertype(tolua_S,"cItem");
  tolua_usertype(tolua_S,"Vector3f");
- tolua_usertype(tolua_S,"Lua__cPickup");
+ tolua_usertype(tolua_S,"cWebPlugin");
  tolua_usertype(tolua_S,"cDropSpenserEntity");
  tolua_usertype(tolua_S,"Lua__cPlayer");
- tolua_usertype(tolua_S,"cWebPlugin");
+ tolua_usertype(tolua_S,"cWebAdmin");
  tolua_usertype(tolua_S,"cChestEntity");
  tolua_usertype(tolua_S,"cDispenserEntity");
- tolua_usertype(tolua_S,"cWebAdmin");
+ tolua_usertype(tolua_S,"sWebAdminPage");
  tolua_usertype(tolua_S,"cBlockEntity");
  tolua_usertype(tolua_S,"cCriticalSection");
  tolua_usertype(tolua_S,"HTTPTemplateRequest");
- tolua_usertype(tolua_S,"sWebAdminPage");
  tolua_usertype(tolua_S,"HTTPRequest");
  tolua_usertype(tolua_S,"HTTPFormData");
  tolua_usertype(tolua_S,"cFurnaceEntity");
- tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cDropperEntity");
+ tolua_usertype(tolua_S,"cLineBlockTracer");
+ tolua_usertype(tolua_S,"cPluginManager");
  tolua_usertype(tolua_S,"cIniFile");
- tolua_usertype(tolua_S,"cWorld");
+ tolua_usertype(tolua_S,"cBlockEntityWithItems");
  tolua_usertype(tolua_S,"cListeners");
  tolua_usertype(tolua_S,"cPawn");
  tolua_usertype(tolua_S,"cPlayer");
@@ -254,7 +257,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"cBlockEntityWindowOwner");
  tolua_usertype(tolua_S,"cItemGrid::cListener");
  tolua_usertype(tolua_S,"cServer");
- tolua_usertype(tolua_S,"cBlockEntityWithItems");
+ tolua_usertype(tolua_S,"cItems");
  tolua_usertype(tolua_S,"Lua__cEntity");
  tolua_usertype(tolua_S,"Vector3d");
 }
@@ -267,16 +270,14 @@ static int tolua_AllToLua_cIniFile_new00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const std::string iniPath = ((const std::string)  tolua_tocppstring(tolua_S,2,""));
   {
-   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(iniPath));
+   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)());
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
   }
  }
@@ -297,16 +298,14 @@ static int tolua_AllToLua_cIniFile_new00_local(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_iscppstring(tolua_S,2,1,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  const std::string iniPath = ((const std::string)  tolua_tocppstring(tolua_S,2,""));
   {
-   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(iniPath));
+   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)());
     tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
     tolua_register_gc(tolua_S,lua_gettop(tolua_S));
   }
@@ -317,6 +316,59 @@ static int tolua_AllToLua_cIniFile_new00_local(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'new'.",&tolua_err);
  return 0;
 #endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_new01
+static int tolua_AllToLua_cIniFile_new01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const std::string a_Path = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  {
+   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(a_Path));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
+   tolua_pushcppstring(tolua_S,(const char*)a_Path);
+  }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_AllToLua_cIniFile_new00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: new_local of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_new01_local
+static int tolua_AllToLua_cIniFile_new01_local(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertable(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_iscppstring(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  const std::string a_Path = ((const std::string)  tolua_tocppstring(tolua_S,2,0));
+  {
+   cIniFile* tolua_ret = (cIniFile*)  Mtolua_new((cIniFile)(a_Path));
+    tolua_pushusertype(tolua_S,(void*)tolua_ret,"cIniFile");
+    tolua_register_gc(tolua_S,lua_gettop(tolua_S));
+   tolua_pushcppstring(tolua_S,(const char*)a_Path);
+  }
+ }
+ return 2;
+tolua_lerror:
+ return tolua_AllToLua_cIniFile_new00_local(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -433,7 +485,7 @@ static int tolua_AllToLua_cIniFile_Path01(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Path'", NULL);
 #endif
   {
-   std::string tolua_ret = (std::string)  self->Path();
+   const std::string tolua_ret = (const std::string)  self->Path();
    tolua_pushcppstring(tolua_S,(const char*)tolua_ret);
   }
  }
@@ -485,18 +537,20 @@ static int tolua_AllToLua_cIniFile_ReadFile00(lua_State* tolua_S)
  tolua_Error tolua_err;
  if (
      !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
+     !tolua_isboolean(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
   cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  bool a_AllowExampleRedirect = ((bool)  tolua_toboolean(tolua_S,2,true));
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ReadFile'", NULL);
 #endif
   {
-   bool tolua_ret = (bool)  self->ReadFile();
+   bool tolua_ret = (bool)  self->ReadFile(a_AllowExampleRedirect);
    tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
@@ -516,14 +570,14 @@ static int tolua_AllToLua_cIniFile_WriteFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,1,"const cIniFile",0,&tolua_err) ||
      !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+  const cIniFile* self = (const cIniFile*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'WriteFile'", NULL);
 #endif
@@ -536,37 +590,6 @@ static int tolua_AllToLua_cIniFile_WriteFile00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'WriteFile'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* method: Erase of class  cIniFile */
-#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_Erase00
-static int tolua_AllToLua_cIniFile_Erase00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
-#ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Erase'", NULL);
-#endif
-  {
-   self->Erase();
-  }
- }
- return 0;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'Erase'.",&tolua_err);
  return 0;
 #endif
 }
@@ -629,6 +652,37 @@ static int tolua_AllToLua_cIniFile_Reset00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Reset'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: Erase of class  cIniFile */
+#ifndef TOLUA_DISABLE_tolua_AllToLua_cIniFile_Erase00
+static int tolua_AllToLua_cIniFile_Erase00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"cIniFile",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  cIniFile* self = (cIniFile*)  tolua_tousertype(tolua_S,1,0);
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Erase'", NULL);
+#endif
+  {
+   self->Erase();
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'Erase'.",&tolua_err);
  return 0;
 #endif
 }
@@ -28476,6 +28530,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"new",tolua_AllToLua_cIniFile_new00);
    tolua_function(tolua_S,"new_local",tolua_AllToLua_cIniFile_new00_local);
    tolua_function(tolua_S,".call",tolua_AllToLua_cIniFile_new00_local);
+   tolua_function(tolua_S,"new",tolua_AllToLua_cIniFile_new01);
+   tolua_function(tolua_S,"new_local",tolua_AllToLua_cIniFile_new01_local);
+   tolua_function(tolua_S,".call",tolua_AllToLua_cIniFile_new01_local);
    tolua_function(tolua_S,"CaseSensitive",tolua_AllToLua_cIniFile_CaseSensitive00);
    tolua_function(tolua_S,"CaseInsensitive",tolua_AllToLua_cIniFile_CaseInsensitive00);
    tolua_function(tolua_S,"Path",tolua_AllToLua_cIniFile_Path00);
@@ -28483,9 +28540,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"SetPath",tolua_AllToLua_cIniFile_SetPath00);
    tolua_function(tolua_S,"ReadFile",tolua_AllToLua_cIniFile_ReadFile00);
    tolua_function(tolua_S,"WriteFile",tolua_AllToLua_cIniFile_WriteFile00);
-   tolua_function(tolua_S,"Erase",tolua_AllToLua_cIniFile_Erase00);
    tolua_function(tolua_S,"Clear",tolua_AllToLua_cIniFile_Clear00);
    tolua_function(tolua_S,"Reset",tolua_AllToLua_cIniFile_Reset00);
+   tolua_function(tolua_S,"Erase",tolua_AllToLua_cIniFile_Erase00);
    tolua_function(tolua_S,"FindKey",tolua_AllToLua_cIniFile_FindKey00);
    tolua_function(tolua_S,"FindValue",tolua_AllToLua_cIniFile_FindValue00);
    tolua_function(tolua_S,"NumKeys",tolua_AllToLua_cIniFile_NumKeys00);
@@ -28699,6 +28756,7 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
   tolua_constant(tolua_S,"E_BLOCK_QUARTZ_BLOCK",E_BLOCK_QUARTZ_BLOCK);
   tolua_constant(tolua_S,"E_BLOCK_ACTIVATOR_RAIL",E_BLOCK_ACTIVATOR_RAIL);
   tolua_constant(tolua_S,"E_BLOCK_DROPPER",E_BLOCK_DROPPER);
+  tolua_constant(tolua_S,"E_BLOCK_CARPET",E_BLOCK_CARPET);
   tolua_constant(tolua_S,"E_BLOCK_NUMBER_OF_TYPES",E_BLOCK_NUMBER_OF_TYPES);
   tolua_constant(tolua_S,"E_BLOCK_MAX_TYPE_ID",E_BLOCK_MAX_TYPE_ID);
   tolua_constant(tolua_S,"E_ITEM_EMPTY",E_ITEM_EMPTY);
@@ -30282,6 +30340,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"delete",tolua_AllToLua_cLuaWindow_delete00);
    tolua_function(tolua_S,"GetContents",tolua_AllToLua_cLuaWindow_GetContents00);
    tolua_variable(tolua_S,"__cItemGrid__cListener__",tolua_get_cLuaWindow___cItemGrid__cListener__,NULL);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
+  tolua_beginmodule(tolua_S,"cLineBlockTracer");
   tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;
