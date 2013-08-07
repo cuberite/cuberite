@@ -1,23 +1,70 @@
-Core Plugin (Forked)
-===========
+MCServer Core Plugin
+====================
 
-A fork of MCServer's Core plugin.
+The Core plugin for MCServer provides the default utility commands and also a lot of WebAdmin goodness.
 
-**New Features:**
-* Simplified commands, such as 'gotoworld' -> 'portal'
-* Simplified and combined LUA files, such as 'listworlds.lua & gotoworld.lua' -> 'worlds-portal.lua'
-* Fixed 'tp' command not working due to typography errors
-* Fixed 'arithmetic on nil value' on startup due to inactivation of world limiter
-* Massive overhaul / redesign of webadmin GUI interface.
-  * Added jQuery transition effect
-  * Completely redesigned CSS
-  * Added new logo
-  * Made HTML5 compliant
-* Beautified 'help' menu
-* Rewrite of death messages - fixed strange grammar and edited to more faithfully reflect Vanilla
-* Added 'unban' console command
+Commands
+--------
 
-**How to Use**
+ * /back
+ * /ban
+ * /downfall
+ * /give
+ * /gm
+ * /groups
+ * /help
+ * /i
+ * /item
+ * /kick
+ * /locate
+ * /me
+ * /motd
+ * /plugins
+ * /portal
+ * /rank
+ * /regen
+ * /reload
+ * /save-all
+ * /spawn
+ * /stop
+ * /time
+ * /top
+ * /tp
+ * /tpa
+ * /tpaccept
+ * /unban
+ * /viewdistance
+ * /worlds
 
-Simply copy all LUA files into Plugins/Core (delete existing files first, except banned.ini and whitelist.ini!)
-Then, copy webadmin to MCServer root directory (delete existing directory first!)
+**Also, console commands:**
+
+ * ban
+ * banlist
+ * getversion
+ * help
+ * list
+ * listgroups
+ * numchunks
+ * players
+ * rank
+ * reload
+ * say
+ * setversion
+ * unban  
+ * unload 
+
+Contributors
+------------
+
+FakeTruth
+xoft
+tigerw
+bearbin
+tonibm19
+
+(If you want your name here, please submit a PR after you've done your contributions.)
+
+How to Use
+----------
+
+Core should be installed in MCServer by default.

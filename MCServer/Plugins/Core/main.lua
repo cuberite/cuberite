@@ -29,12 +29,16 @@ function Initialize(Plugin)
 	--BIND COMMANDS    
 	PluginManager:BindCommand("/back",            "core.back",            HandleBackCommand,            " - Return to your last position");
 	PluginManager:BindCommand("/ban",             "core.ban",             HandleBanCommand,             " ~ Ban a player");
-	PluginManager:BindCommand("/give",            "core.give",            HandleGiveCommand,            " ~ Give yourself an item");
+	PluginManager:BindCommand("/downfall",        "core.downfall",        HandleDownfallCommand,        " - Toggles the weather");
+	PluginManager:BindCommand("/give",            "core.give",            HandleGiveCommand,            " ~ Give someone an item");
 	PluginManager:BindCommand("/gm",              "core.changegm",        HandleChangeGMCommand,        " ~ Change your gamemode");
-	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " ~ Show available commands");
-	PluginManager:BindCommand("/kick",            "core.kick",            HandleKickCommand,            " ~ Kick a player");
 	PluginManager:BindCommand("/groups",          "core.groups",          HandleGroupsCommand,          " - Shows a list of all the groups");
+	PluginManager:BindCommand("/help",            "core.help",            HandleHelpCommand,            " ~ Show available commands");
+	PluginManager:BindCommand("/i",               "core.give",            HandleItemCommand,            "")
+	PluginManager:BindCommand("/item",            "core.give",            HandleItemCommand,            " - Give yourself an item.")
+	PluginManager:BindCommand("/kick",            "core.kick",            HandleKickCommand,            " ~ Kick a player");
 	PluginManager:BindCommand("/locate",          "core.locate",          HandleLocateCommand,          " - Show your current server coordinates");
+	PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
 	PluginManager:BindCommand("/motd",            "core.motd",            HandleMOTDCommand,            " - Show message of the day");
 	PluginManager:BindCommand("/plugins",         "core.plugins",         HandlePluginsCommand,         " - Show list of plugins");
 	PluginManager:BindCommand("/portal",          "core.portal",          HandlePortalCommand,          " ~ Move to a different world");  
@@ -45,8 +49,6 @@ function Initialize(Plugin)
 	PluginManager:BindCommand("/spawn",           "core.spawn",           HandleSpawnCommand,           " - Return to the spawn");
 	PluginManager:BindCommand("/stop",            "core.stop",            HandleStopCommand,            " - Stops the server");
 	PluginManager:BindCommand("/time",            "core.time",            HandleTimeCommand,            " ~ Sets the time of day");
-	PluginManager:BindCommand("/downfall",        "core.downfall",        HandleDownfallCommand,        " - Toggles the weather");
-	PluginManager:BindCommand("/me",              "core.me",              HandleMeCommand,              " ~ Tell what you are doing");
 	PluginManager:BindCommand("/top",             "core.top",             HandleTopCommand,             " - Teleport yourself to the top most block");
 	PluginManager:BindCommand("/tp",              "core.teleport",        HandleTPCommand,              " ~ Teleport yourself to a player");
 	PluginManager:BindCommand("/tpa",             "core.teleport",        HandleTPACommand,             " ~ Ask to teleport yourself to a player");

@@ -9,7 +9,7 @@ function HandleTimeCommand( Split, Player )
 		Server:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Time was set to daytime" )
 	elseif( string.upper( Split[2] ) == "NIGHT") then
 		Player:GetWorld():SetTimeOfDay( 12000 + 1000 )
-		Server:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Time was set to nighttime" )
+		Server:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Time was set to night time" )
 	elseif( string.upper(Split[2]) == "SET" ) and ( tonumber(Split[3]) ~= nil) then
 		Player:GetWorld():SetTimeOfDay( tonumber(Split[3]) )
 		Server:SendMessage(cChatColor.Green .. "[INFO] " .. cChatColor.White .. "Time was set to " .. Split[3] )
