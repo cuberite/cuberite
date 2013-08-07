@@ -13,6 +13,10 @@ Calling a Lua function is done by pushing the function, either by PushFunction()
 then pushing the arguments (PushString(), PushNumber(), PushUserData() etc.) and finally
 executing CallFunction(). cLuaState automatically keeps track of the number of arguments and the name of the
 function (for logging purposes), which makes the call less error-prone.
+
+Reference management is provided by the cLuaState::cRef class. This is used when you need to hold a reference to
+any Lua object across several function calls; usually this is used for callbacks. The class is RAII-like, with
+automatic resource management.
 */
 
 
@@ -20,12 +24,14 @@ function (for logging purposes), which makes the call less error-prone.
 
 #pragma once
 
+extern "C"
+{
+	#include "lauxlib.h"
+}
 
 
 
 
-// fwd: lua.h
-struct lua_State;
 
 class cWorld;
 class cPlayer;
@@ -39,9 +45,31 @@ class cPickup;
 
 
 
+/// Encapsulates a Lua state and provides some syntactic sugar for common operations
 class cLuaState
 {
 public:
+
+	/// Used for storing references to object in the global registry
+	class cRef
+	{
+	public:
+		/// Creates a reference in the specified LuaState for object at the specified StackPos
+		cRef(cLuaState & a_LuaState, int a_StackPos);
+		~cRef();
+		
+		/// Returns true if the reference is valid
+		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
+		
+		/// Allows to use this class wherever an int (i. e. ref) is to be used
+		operator int(void) { return m_Ref; }
+		
+	protected:
+		cLuaState & m_LuaState;
+		int m_Ref;
+	} ;
+
+
 	/** Creates a new instance. The LuaState is not initialized.
 	a_SubsystemName is used for reporting problems in the console, it is "plugin %s" for plugins, 
 	or "LuaScript" for the cLuaScript template
@@ -90,6 +118,11 @@ public:
 	*/
 	bool PushFunctionFromRegistry(int a_FnRef);
 	
+	/** Pushes a function that is stored in a table ref.
+	Returns true if successful, false on failure. Doesn't log failure.
+	*/
+	bool PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnName);
+	
 	/// Pushes a string vector, as a table, onto the stack
 	void PushStringVector(const AStringVector & a_Vector);
 	
@@ -123,7 +156,19 @@ public:
 	Returns true if successful, logs a warning on failure.
 	*/
 	bool CallFunction(int a_NumReturnValues);
-
+	
+	/// Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not
+	bool CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam = -1);
+	
+	/// Returns true if the specified parameters on the stack are a table; also logs warning if not
+	bool CheckParamTable(int a_StartParam, int a_EndParam = -1);
+	
+	/// Returns true if the specified parameters on the stack are a number; also logs warning if not
+	bool CheckParamNumber(int a_StartParam, int a_EndParam = -1);
+	
+	/// Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters)
+	bool CheckParamEnd(int a_Param);
+	
 	/// If the status is nonzero, prints the text on the top of Lua stack and returns true
 	bool ReportErrors(int status);
 	

@@ -63,7 +63,14 @@ cLuaState::~cLuaState()
 {
 	if (IsValid())
 	{
-		Close();
+		if (m_IsOwned)
+		{
+			Close();
+		}
+		else
+		{
+			Detach();
+		}
 	}
 }
 
@@ -228,6 +235,35 @@ bool cLuaState::PushFunctionFromRegistry(int a_FnRef)
 		return false;
 	}
 	m_CurrentFunctionName = "<callback>";
+	m_NumCurrentFunctionArgs = 0;
+	return true;
+}
+
+
+
+
+
+bool cLuaState::PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnName)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
+
+	lua_rawgeti(m_LuaState, LUA_REGISTRYINDEX, a_TableRef);  // Get the table ref
+	if (!lua_istable(m_LuaState, -1))
+	{
+		// Not a table, bail out
+		lua_pop(m_LuaState, 1);
+		return false;
+	}
+	lua_getfield(m_LuaState, -1, a_FnName);
+	if (lua_isnil(m_LuaState, -1) || !lua_isfunction(m_LuaState, -1))
+	{
+		// Not a valid function, bail out
+		lua_pop(m_LuaState, 2);
+		return false;
+	}
+	lua_remove(m_LuaState, -2);  // Remove the table ref from the stack
+	m_CurrentFunctionName = "<table_callback>";
 	m_NumCurrentFunctionArgs = 0;
 	return true;
 }
@@ -434,6 +470,125 @@ bool cLuaState::CallFunction(int a_NumResults)
 
 
 
+bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	tolua_Error tolua_err;
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (tolua_isusertype(m_LuaState, i, a_UserType, 0, &tolua_err))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	tolua_Error tolua_err;
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (tolua_istable(m_LuaState, i, 0, &tolua_err))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
+{
+	ASSERT(IsValid());
+	
+	if (a_EndParam < 0)
+	{
+		a_EndParam = a_StartParam;
+	}
+	
+	tolua_Error tolua_err;
+	for (int i = a_StartParam; i <= a_EndParam; i++)
+	{
+		if (tolua_isnumber(m_LuaState, i, 0, &tolua_err))
+		{
+			continue;
+		}
+		// Not the correct parameter
+		lua_Debug entry;
+		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+		return false;
+	}  // for i - Param
+	
+	// All params checked ok
+	return true;
+}
+
+
+
+
+
+bool cLuaState::CheckParamEnd(int a_Param)
+{
+	tolua_Error tolua_err;
+	if (tolua_isnoobj(m_LuaState, a_Param, &tolua_err))
+	{
+		return true;
+	}
+	// Not the correct parameter
+	lua_Debug entry;
+	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
+	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
+	AString ErrMsg = Printf("#ferror in function '%s': Too many arguments.", (entry.name != NULL) ? entry.name : "?");
+	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
+	return false;
+}
+
+
+
+
+
 bool cLuaState::ReportErrors(int a_Status)
 {
 	return ReportErrors(m_LuaState, a_Status);
@@ -454,6 +609,36 @@ bool cLuaState::ReportErrors(lua_State * a_LuaState, int a_Status)
 	LOGWARNING("LUA: %d - %s", a_Status, lua_tostring(a_LuaState, -1));
 	lua_pop(a_LuaState, 1);
 	return true;
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cLuaState::cRef:
+
+cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
+	m_LuaState(a_LuaState)
+{
+	ASSERT(m_LuaState.IsValid());
+	
+	lua_pushvalue(m_LuaState, a_StackPos);  // Push a copy of the value at a_StackPos onto the stack
+	m_Ref = luaL_ref(m_LuaState, LUA_REGISTRYINDEX);
+}
+
+
+
+
+
+cLuaState::cRef::~cRef()
+{
+	ASSERT(m_LuaState.IsValid());
+	
+	if (IsValid())
+	{
+		luaL_unref(m_LuaState, LUA_REGISTRYINDEX, m_Ref);
+	}
 }
 
 
