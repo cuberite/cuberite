@@ -129,7 +129,7 @@ public:
 	// tolua_end
 
 	/// Retrieves the world height at the specified coords; returns false if chunk not loaded / generated
-	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // TODO: Export in ManualBindings.cpp
+	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// (Please keep these alpha-sorted)
@@ -174,7 +174,7 @@ public:
 	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
 	*/
 	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ, 
+		int a_ChunkX, int a_ChunkZ,
 		const BLOCKTYPE *  a_BlockTypes,
 		const NIBBLETYPE * a_BlockMeta,
 		const NIBBLETYPE * a_BlockLight,
@@ -245,7 +245,7 @@ public:
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false.
-	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // TODO: Exported in ManualBindings.cpp
+	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/// Compares clients of two chunks, calls the callback accordingly
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -319,8 +319,8 @@ public:
 	void       SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); }
 	// tolua_end
 	
-	/** Writes the block area into the specified coords. 
-	Returns true if all chunks have been processed. 
+	/** Writes the block area into the specified coords.
+	Returns true if all chunks have been processed.
 	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
 	*/
@@ -404,6 +404,9 @@ public:
 	
 	/// a_Player is using block entity at [x, y, z], handle that:
 	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {m_ChunkMap->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ); }
+	
+	/// Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback
+	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback);
 
 	void GrowTree           (int a_BlockX, int a_BlockY, int a_BlockZ);                           // tolua_export
 	void GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, char a_SaplingMeta);       // tolua_export

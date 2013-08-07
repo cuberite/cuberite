@@ -23,17 +23,18 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHAT);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
 
-	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "Shows a list of all the loaded entities");
-	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "Kills all the loaded entities");
-	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "Sets all your armor to blue wool");
-	PluginManager:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "Opens up a window using plugin API");
-	PluginManager:BindCommand("/gc",      "debuggers", HandleGCCmd,           "Activates the Lua garbage collector");
-	PluginManager:BindCommand("/fast",    "debuggers", HandleFastCmd,         "Switches between fast and normal movement speed");
-	PluginManager:BindCommand("/dash",    "debuggers", HandleDashCmd,         "Switches between fast and normal sprinting speed");
-	PluginManager:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "Lists the current hunger-related variables");
-	PluginManager:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "Sets food-poisoning for 15 seconds");
-	PluginManager:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "Sets the food level to zero");
-	PluginManager:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "Sets the food level to the given value");
+	PluginManager:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
+	PluginManager:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
+	PluginManager:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
+	PluginManager:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "- Opens up a window using plugin API");
+	PluginManager:BindCommand("/gc",      "debuggers", HandleGCCmd,           "- Activates the Lua garbage collector");
+	PluginManager:BindCommand("/fast",    "debuggers", HandleFastCmd,         "- Switches between fast and normal movement speed");
+	PluginManager:BindCommand("/dash",    "debuggers", HandleDashCmd,         "- Switches between fast and normal sprinting speed");
+	PluginManager:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "- Lists the current hunger-related variables");
+	PluginManager:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "- Sets food-poisoning for 15 seconds");
+	PluginManager:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "- Sets the food level to zero");
+	PluginManager:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "- Sets the food level to the given value");
+	PluginManager:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
@@ -701,6 +702,37 @@ function HandleFoodLevelCmd(a_Split, a_Player)
 	
 	a_Player:SetFoodLevel(tonumber(a_Split[2]));
 	a_Player:SendMessage("Food level set to " .. a_Player:GetFoodLevel());
+	return true;
+end
+
+
+
+
+
+function HandleSpideyCmd(a_Split, a_Player)
+	-- Place a line of cobwebs from the player's eyes until non-air block, in the line-of-sight of the player
+	local World = a_Player:GetWorld();
+
+	local Callbacks = {
+		OnNextBlock = function(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)
+			if (a_BlockType ~= E_BLOCK_AIR) then
+				-- abort the trace
+				return true;
+			end
+			World:SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COBWEB, 0);
+		end
+	};
+	
+	local EyePos = a_Player:GetEyePosition();
+	local LookVector = a_Player:GetLookVector();
+	LookVector:Normalize();
+	
+	-- Start cca 2 blocks away from the eyes
+	local Start = EyePos + LookVector + LookVector;
+	local End = EyePos + LookVector * 50;
+	
+	cLineBlockTracer.Trace(World, Callbacks, Start.x, Start.y, Start.z, End.x, End.y, End.z);
+	
 	return true;
 end
 

@@ -55,7 +55,10 @@ public:
 	{
 		if (!IsValidItem(m_ItemType))
 		{
-			LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
+			if (m_ItemType != E_BLOCK_AIR)
+			{
+				LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
+			}
 			Empty();
 		}
 	}

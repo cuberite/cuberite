@@ -63,3 +63,11 @@ $cfile "LuaWindow.h"
 
 
 
+
+// Need to declare this class so that the usertype is properly registered in Bindings.cpp - 
+// it seems impossible to register a usertype in ManualBindings.cpp
+class cLineBlockTracer;
+
+
+
+

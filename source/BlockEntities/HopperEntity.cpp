@@ -125,7 +125,7 @@ void cHopperEntity::UsedBy(cPlayer * a_Player)
 	// We cannot properly detect contents change, but such a change doesn't happen without a player opening the chest first.
 	// The few false positives aren't much to worry about
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(m_PosX, m_PosY, m_PosZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
 	m_World->MarkChunkDirty(ChunkX, ChunkZ);
 }
 

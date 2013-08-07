@@ -345,7 +345,7 @@ void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, c
 	x = a_BlockX;
 	y = a_BlockY;
 	z = a_BlockZ;
-	cChunkDef::BlockToChunk(x, y, z, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(x, z, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -364,7 +364,7 @@ void cChunkMap::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_blockX, a_blockY, a_blockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_blockX, a_blockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -382,7 +382,7 @@ void cChunkMap::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, c
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
@@ -592,7 +592,7 @@ void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, in
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_SrcX / 8, a_SrcY / 8, a_SrcZ / 8, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_SrcX / 8, a_SrcZ / 8, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -611,7 +611,7 @@ void cChunkMap::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_S
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_SrcX / 8, a_SrcY / 8, a_SrcZ / 8, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_SrcX / 8, a_SrcZ / 8, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -645,7 +645,7 @@ void cChunkMap::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, c
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -664,7 +664,7 @@ void cChunkMap::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bl
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
@@ -682,7 +682,7 @@ void cChunkMap::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClien
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
@@ -700,7 +700,7 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, i
 	// a_Player rclked block entity at the coords specified, handle it
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
@@ -713,11 +713,26 @@ void cChunkMap::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, i
 
 
 
+bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if (Chunk == NULL)
+	{
+		return false;
+	}
+	return a_Callback.Item(Chunk);
+}
+
+
+
+
+
 void cChunkMap::WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{
@@ -735,8 +750,8 @@ void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_M
 {
 	cSimulatorManager * SimMgr = m_World->GetSimulatorManager();
 	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
-	cChunkDef::BlockToChunk(a_MinBlockX, ZERO_CHUNK_Y, a_MinBlockZ, MinChunkX, MinChunkZ);
-	cChunkDef::BlockToChunk(a_MaxBlockX, ZERO_CHUNK_Y, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
+	cChunkDef::BlockToChunk(a_MinBlockX, a_MinBlockZ, MinChunkX, MinChunkZ);
+	cChunkDef::BlockToChunk(a_MaxBlockX, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
 	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
 	{
 		int MinZ = std::max(a_MinBlockZ, z * cChunkDef::Width);
@@ -1903,7 +1918,7 @@ bool cChunkMap::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const ASt
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	if ((Chunk == NULL) || !Chunk->IsValid())
 	{

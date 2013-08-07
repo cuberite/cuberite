@@ -3,6 +3,7 @@
 
 #include "BlockEntity.h"
 #include "../World.h"
+#include "../BlockArea.h"
 #include "../Player.h"
 
 

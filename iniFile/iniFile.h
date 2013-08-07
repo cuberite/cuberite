@@ -30,135 +30,160 @@
 
 
 
-class cIniFile							// tolua_export
-{										// tolua_export
+// tolua_begin
+
+class cIniFile
+{
 private:
-	bool   caseInsensitive;
-	std::string path;
-	struct key {
+	bool        m_IsCaseInsensitive;
+	std::string m_Path;
+	
+	struct key
+	{
 		std::vector<std::string> names;
 		std::vector<std::string> values; 
 		std::vector<std::string> comments;
-	};
-	std::vector<key>    keys; 
-	std::vector<std::string> names; 
+	} ;
+	
+	std::vector<key>         keys;
+	std::vector<std::string> names;
 	std::vector<std::string> comments;
-	std::string CheckCase( std::string s) const;
+	
+	/// If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is
+	std::string CheckCase(const std::string & s) const;
 
 public:
-	enum errors{ noID = -1};									// tolua_export
-	cIniFile( const std::string iniPath = "");				// tolua_export
-	virtual ~cIniFile()                            {}
+	enum errors
+	{
+		noID = -1,
+	};
+	
+	/// Creates a new instance; sets m_Path to a_Path, but doesn't read the file
+	cIniFile(const std::string & a_Path = "");
 
 	// Sets whether or not keynames and valuenames should be case sensitive.
 	// The default is case insensitive.
-	void CaseSensitive()                           {caseInsensitive = false;}	// tolua_export
-	void CaseInsensitive()                         {caseInsensitive = true;}	// tolua_export
+	void CaseSensitive  (void) { m_IsCaseInsensitive = false; }
+	void CaseInsensitive(void) { m_IsCaseInsensitive = true; }
 
 	// Sets path of ini file to read and write from.
-	void Path(const std::string & newPath)                {path = newPath;}	// tolua_export
-	std::string Path() const                            {return path;}	// tolua_export
-	void SetPath(const std::string & newPath)             {Path( newPath);}	// tolua_export
+	void Path(const std::string & newPath)    {m_Path = newPath;}
+	const std::string & Path(void) const      {return m_Path;}
+	void SetPath(const std::string & newPath) {Path(newPath);}
 
-	// Reads ini file specified using path.
-	// Returns true if successful, false otherwise.
-	bool ReadFile();														// tolua_export
+	/** Reads the ini file specified in m_Path
+	If the file doesn't exist and a_AllowExampleRedirect is true, tries to read <basename>.example.ini, and
+	writes its contents as <basename>.ini, if successful.
+	Returns true if successful, false otherwise.
+	*/
+	bool ReadFile(bool a_AllowExampleRedirect = true);
 
-	// Writes data stored in class to ini file.
-	bool WriteFile();														// tolua_export
+	/// Writes data stored in class to ini file specified in m_Path
+	bool WriteFile(void) const;
 
-	// Deletes all stored ini data.
-	void Erase();															// tolua_export
-	void Clear()                                   {Erase();}				// tolua_export
-	void Reset()                                   {Erase();}				// tolua_export
+	/// Deletes all stored ini data (but doesn't touch the file)
+	void Clear(void);
+	void Reset(void) { Clear(); }
+	void Erase(void) { Clear(); }  // OBSOLETE, this name is misguiding and will be removed from the interface
 
-	// Returns index of specified key, or noID if not found.
-	long FindKey( const std::string & keyname) const;						// tolua_export
+	/// Returns index of specified key, or noID if not found
+	long FindKey(const std::string & keyname) const;
 
-	// Returns index of specified value, in the specified key, or noID if not found.
-	long FindValue( const unsigned keyID, const std::string & valuename) const;		// tolua_export
+	/// Returns index of specified value, in the specified key, or noID if not found
+	long FindValue(const unsigned keyID, const std::string & valuename) const;
 
-	// Returns number of keys currently in the ini.
-	unsigned NumKeys() const                       {return names.size();}			// tolua_export
-	unsigned GetNumKeys() const                    {return NumKeys();}			// tolua_export
+	/// Returns number of keys currently in the ini
+	unsigned NumKeys   (void) const {return names.size();}
+	unsigned GetNumKeys(void) const {return NumKeys();}
 
-	// Add a key name.
-	unsigned AddKeyName( const std::string & keyname);								// tolua_export
+	/// Add a key name
+	unsigned AddKeyName(const std::string & keyname);
 
 	// Returns key names by index.
-	std::string KeyName( const unsigned keyID) const;								// tolua_export
-	std::string GetKeyName( const unsigned keyID) const {return KeyName(keyID);}	// tolua_export
+	std::string KeyName(const unsigned keyID) const;
+	std::string GetKeyName(const unsigned keyID) const {return KeyName(keyID);}
 
 	// Returns number of values stored for specified key.
-	unsigned NumValues( const std::string & keyname);									// tolua_export
-	unsigned GetNumValues( const std::string & keyname)   {return NumValues( keyname);}	// tolua_export
-	unsigned NumValues( const unsigned keyID);										// tolua_export
-	unsigned GetNumValues( const unsigned keyID)   {return NumValues( keyID);}		// tolua_export
+	unsigned NumValues   (const std::string & keyname);
+	unsigned GetNumValues(const std::string & keyname) {return NumValues(keyname);}
+	unsigned NumValues   (const unsigned keyID);
+	unsigned GetNumValues(const unsigned keyID) {return NumValues(keyID);}
 
 	// Returns value name by index for a given keyname or keyID.
-	std::string ValueName( const std::string & keyname, const unsigned valueID) const;	// tolua_export
-	std::string GetValueName( const std::string & keyname, const unsigned valueID) const {	// tolua_export
-		return ValueName( keyname, valueID);
-	}																						// tolua_export
-	std::string ValueName( const unsigned keyID, const unsigned valueID) const;		// tolua_export
-	std::string GetValueName( const unsigned keyID, const unsigned valueID) const {	// tolua_export
-		return ValueName( keyID, valueID);
-	}																					// tolua_export
+	std::string ValueName( const std::string & keyname, const unsigned valueID) const;
+	std::string GetValueName( const std::string & keyname, const unsigned valueID) const
+	{
+		return ValueName(keyname, valueID);
+	}
+	std::string ValueName   (const unsigned keyID, const unsigned valueID) const;
+	std::string GetValueName(const unsigned keyID, const unsigned valueID) const
+	{
+		return ValueName(keyID, valueID);
+	}
 
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
 	// Returns defValue if key/value not found.
-	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const;   // tolua_export
-	AString GetValue (const unsigned keyID,    const unsigned valueID,    const AString & defValue = "")    const;   // tolua_export
-	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;   // tolua_export
-	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;   // tolua_export
-	bool    GetValueB(const AString & keyname, const AString & valuename, const bool      defValue = false) const {  // tolua_export
-		return ( GetValueI( keyname, valuename, int( defValue)) > 0);
-	}  // tolua_export
+	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const;
+	AString GetValue (const unsigned keyID,    const unsigned valueID,    const AString & defValue = "")    const;
+	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;
+	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;
+	bool    GetValueB(const AString & keyname, const AString & valuename, const bool      defValue = false) const
+	{
+		return (GetValueI(keyname, valuename, int(defValue)) > 0);
+	}
 	
 	// Gets the value; if not found, write the default to the INI file
-	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "");      // tolua_export
-	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);     // tolua_export
-	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0);       // tolua_export
-	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false) {  // tolua_export
+	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "");
+	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);
+	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0);
+	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false)
+	{
 		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) > 0);
-	}  // tolua_export
+	}
 
 	// Sets value of [keyname] valuename =.
 	// Specify the optional paramter as false (0) if you do not want it to create
 	// the key if it doesn't exist. Returns true if data entered, false otherwise.
 	// Overloaded to accept string, int, and double.
-	bool SetValue( const unsigned keyID, const unsigned valueID, const std::string & value);											// tolua_export
-	bool SetValue( const std::string & keyname, const std::string & valuename, const std::string & value, const bool create = true);		// tolua_export
-	bool SetValueI( const std::string & keyname, const std::string & valuename, const int value, const bool create = true);				// tolua_export
-	bool SetValueB( const std::string & keyname, const std::string & valuename, const bool value, const bool create = true) {				// tolua_export
+	bool SetValue( const unsigned keyID, const unsigned valueID, const std::string & value);
+	bool SetValue( const std::string & keyname, const std::string & valuename, const std::string & value, const bool create = true);
+	bool SetValueI( const std::string & keyname, const std::string & valuename, const int value, const bool create = true);
+	bool SetValueB( const std::string & keyname, const std::string & valuename, const bool value, const bool create = true)
+	{
 		return SetValueI( keyname, valuename, int(value), create);
-	}																																	// tolua_export
-	bool SetValueF( const std::string & keyname, const std::string & valuename, const double value, const bool create = true);			// tolua_export
+	}
+	bool SetValueF( const std::string & keyname, const std::string & valuename, const double value, const bool create = true);
+	
+	// tolua_end
+	
 	bool SetValueV( const std::string & keyname, const std::string & valuename, char *format, ...);
+	
+	// tolua_begin
 
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
-	bool DeleteValueByID( const unsigned keyID, const unsigned valueID );																	// tolua_export
-	bool DeleteValue( const std::string & keyname, const std::string & valuename);														// tolua_export
+	bool DeleteValueByID( const unsigned keyID, const unsigned valueID );
+	bool DeleteValue( const std::string & keyname, const std::string & valuename);
 
 	// Deletes specified key and all values contained within.
 	// Returns true if key existed and deleted, false otherwise.
-	bool DeleteKey(const std::string & keyname);																								// tolua_export
+	bool DeleteKey(const std::string & keyname);
 
 	// Header comment functions.
 	// Header comments are those comments before the first key.
 	//
 	// Number of header comments.
-	unsigned NumHeaderComments()                  {return comments.size();}															// tolua_export
+	unsigned NumHeaderComments(void) {return comments.size();}
 	// Add a header comment.
-	void     HeaderComment( const std::string & comment);																				// tolua_export
+	void     HeaderComment(const std::string & comment);
 	// Return a header comment.
-	std::string   HeaderComment( const unsigned commentID) const;																		// tolua_export
+	std::string   HeaderComment(const unsigned commentID) const;
 	// Delete a header comment.
-	bool     DeleteHeaderComment( unsigned commentID);																				// tolua_export
+	bool     DeleteHeaderComment(unsigned commentID);
 	// Delete all header comments.
-	void     DeleteHeaderComments()               {comments.clear();}																	// tolua_export
+	void     DeleteHeaderComments(void) {comments.clear();}
+
 
 	// Key comment functions.
 	// Key comments are those comments within a key. Any comments
@@ -167,20 +192,26 @@ public:
 	// the CIniFile::WriteFile() is called.
 	//
 	// Number of key comments.
-	unsigned NumKeyComments( const unsigned keyID) const;																				// tolua_export
-	unsigned NumKeyComments( const std::string & keyname) const;																		// tolua_export
+	unsigned NumKeyComments( const unsigned keyID) const;
+	unsigned NumKeyComments( const std::string & keyname) const;
+	
 	// Add a key comment.
-	bool     KeyComment( const unsigned keyID, const std::string & comment);															// tolua_export
-	bool     KeyComment( const std::string & keyname, const std::string & comment);														// tolua_export
+	bool     KeyComment(const unsigned keyID, const std::string & comment);
+	bool     KeyComment(const std::string & keyname, const std::string & comment);
+	
 	// Return a key comment.
-	std::string   KeyComment( const unsigned keyID, const unsigned commentID) const;													// tolua_export
-	std::string   KeyComment( const std::string & keyname, const unsigned commentID) const;												// tolua_export
+	std::string   KeyComment(const unsigned keyID, const unsigned commentID) const;
+	std::string   KeyComment(const std::string & keyname, const unsigned commentID) const;
+	
 	// Delete a key comment.
-	bool     DeleteKeyComment( const unsigned keyID, const unsigned commentID);														// tolua_export
-	bool     DeleteKeyComment( const std::string & keyname, const unsigned commentID);													// tolua_export
+	bool     DeleteKeyComment(const unsigned keyID, const unsigned commentID);
+	bool     DeleteKeyComment(const std::string & keyname, const unsigned commentID);
+	
 	// Delete all comments for a key.
-	bool     DeleteKeyComments( const unsigned keyID);																				// tolua_export
-	bool     DeleteKeyComments( const std::string & keyname);																			// tolua_export
-};	// tolua_export
+	bool     DeleteKeyComments(const unsigned keyID);
+	bool     DeleteKeyComments(const std::string & keyname);
+};
+
+// tolua_end
 
 #endif

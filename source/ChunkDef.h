@@ -137,7 +137,7 @@ public:
 	/// Converts absolute block coords into relative (chunk + block) coords:
 	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
 	{
-		BlockToChunk(a_X, a_Y, a_Z, a_ChunkX, a_ChunkZ);
+		BlockToChunk(a_X, a_Z, a_ChunkX, a_ChunkZ);
 
 		a_X = a_X - a_ChunkX * Width;
 		a_Z = a_Z - a_ChunkZ * Width;
@@ -145,9 +145,8 @@ public:
 	
 	
 	/// Converts absolute block coords to chunk coords:
-	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkZ )
+	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{
-		(void)a_Y;
 		a_ChunkX = a_X / Width;
 		if ((a_X < 0) && (a_X % Width != 0))
 		{
