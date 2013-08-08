@@ -131,12 +131,6 @@ typedef unsigned short     UInt16;
 #endif
 #endif
 
-#if !defined(ANDROID_NDK)
-	// 2012_11_08 _X: Disabled SquirrelVM, because it would crash the server from time to time.
-	// For details see: http://forum.mc-server.org/showthread.php?tid=610
-	// #define USE_SQUIRREL
-#endif
-
 #if defined(ANDROID_NDK)
 	#define FILE_IO_PREFIX "/sdcard/mcserver/"
 #else

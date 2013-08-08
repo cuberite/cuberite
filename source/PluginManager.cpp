@@ -1155,7 +1155,6 @@ void cPluginManager::UnloadPluginsNow()
 
 	m_Commands.clear();
 	m_ConsoleCommands.clear();
-	//SquirrelVM::Shutdown(); // This breaks shit
 }
 
 

@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;XML_STATIC"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
@@ -121,7 +121,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -200,7 +200,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;../squirrel_3_0_1_stable/include;../squirrel_3_0_1_stable;../squirrel_3_0_1_stable/sqrat;..;../expat"
+				AdditionalIncludeDirectories="&quot;../zlib-1.2.7&quot;;&quot;../jsoncpp-src-0.5.0/include&quot;;&quot;../lua-5.1.4/src&quot;;&quot;../tolua++-1.0.93/include&quot;;..;../expat"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;XML_STATIC"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -1538,27 +1538,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin_Squirrel.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\Plugin_Squirrel.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\PluginManager.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\source\PluginManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SquirrelCommandBinder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\SquirrelCommandBinder.h"
 					>
 				</File>
 				<File
@@ -1585,38 +1569,6 @@
 					RelativePath="..\source\WebPlugin.h"
 					>
 				</File>
-				<Filter
-					Name="Squirrel"
-					>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelArray.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelBaseClass.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelBindings.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelBindings.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelFunctions.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelFunctions.h"
-						>
-					</File>
-					<File
-						RelativePath="..\source\squirrelbindings\SquirrelObject.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="External"
