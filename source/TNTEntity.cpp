@@ -29,10 +29,14 @@ cTNTEntity::cTNTEntity(const Vector3d & a_Pos, float a_FuseTimeInSec) :
 
 
 
-void cTNTEntity::Initialize(cWorld * a_World)
+bool cTNTEntity::Initialize(cWorld * a_World)
 {
-	super::Initialize(a_World);
-	a_World->BroadcastSpawnEntity(*this);
+	if (super::Initialize(a_World))
+	{
+		a_World->BroadcastSpawnEntity(*this);
+		return true;
+	}
+	return false;
 }
 
 

@@ -107,7 +107,8 @@ public:
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
 
-	virtual void Initialize(cWorld * a_World);
+	/// Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed)
+	virtual bool Initialize(cWorld * a_World);
 
 	// tolua_begin
 	

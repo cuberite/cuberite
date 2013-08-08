@@ -121,10 +121,14 @@ cPlayer::~cPlayer(void)
 
 
 
-void cPlayer::Initialize(cWorld * a_World)
+bool cPlayer::Initialize(cWorld * a_World)
 {
-	super::Initialize(a_World);
-	GetWorld()->AddPlayer(this);
+	if (super::Initialize(a_World))
+	{
+		GetWorld()->AddPlayer(this);
+		return true;
+	}
+	return false;
 }
 
 

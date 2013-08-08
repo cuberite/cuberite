@@ -129,14 +129,22 @@ const char * cEntity::GetParentClass(void) const
 
 
 
-void cEntity::Initialize(cWorld * a_World)
+bool cEntity::Initialize(cWorld * a_World)
 {
+	if (cPluginManager::Get()->CallHookSpawningEntity(*a_World, *this))
+	{
+		return false;
+	}
+	
 	LOGD("Initializing entity #%d (%s) at {%.02f, %.02f, %.02f}",
 		m_UniqueID, GetClass(), m_Pos.x, m_Pos.y, m_Pos.z
 	);
 	m_IsInitialized = true;
 	m_World = a_World;
 	m_World->AddEntity(this);
+	
+	cPluginManager::Get()->CallHookSpawnedEntity(*a_World, *this);
+	return true;
 }
 
 

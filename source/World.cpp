@@ -2414,14 +2414,24 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, int a_EntityTy
 		
 		default:
 		{
-			LOGWARNING("cWorld::SpawnMob(): Unhandled entity type: %d. Not spawning.", a_EntityType);
+			LOGWARNING("%s: Unhandled entity type: %d. Not spawning.", __FUNCTION__, a_EntityType);
 			return -1;
 		}
 	}
 	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	Monster->SetHealth(Monster->GetMaxHealth());
-	Monster->Initialize(this);
+	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *Monster))
+	{
+		delete Monster;
+		return -1;
+	}
+	if (!Monster->Initialize(this))
+	{
+		delete Monster;
+		return -1;
+	}
 	BroadcastSpawnEntity(*Monster);
+	cPluginManager::Get()->CallHookSpawnedMonster(*this, *Monster);
 	return Monster->GetUniqueID();
 }
 

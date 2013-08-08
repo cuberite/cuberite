@@ -1102,6 +1102,117 @@ bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid
 
 
 
+bool cPlugin_NewLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNED_ENTITY);
+	ASSERT(FnName != NULL);
+	if (!m_LuaState.PushFunction(FnName))
+	{
+		return false;
+	}
+
+	m_LuaState.PushObject(&a_World);
+	m_LuaState.PushObject(&a_Entity);
+
+	if (!m_LuaState.CallFunction(1))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNED_MONSTER);
+	ASSERT(FnName != NULL);
+	if (!m_LuaState.PushFunction(FnName))
+	{
+		return false;
+	}
+
+	m_LuaState.PushObject(&a_World);
+	m_LuaState.PushObject(&a_Monster);
+
+	if (!m_LuaState.CallFunction(1))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+	return false;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNING_ENTITY);
+	ASSERT(FnName != NULL);
+	if (!m_LuaState.PushFunction(FnName))
+	{
+		return false;
+	}
+
+	m_LuaState.PushObject(&a_World);
+	m_LuaState.PushObject(&a_Entity);
+
+	if (!m_LuaState.CallFunction(1))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+	return false;
+}
+
+
+
+
+
+bool cPlugin_NewLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
+{
+	cCSLock Lock(m_CriticalSection);
+	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNING_MONSTER);
+	ASSERT(FnName != NULL);
+	if (!m_LuaState.PushFunction(FnName))
+	{
+		return false;
+	}
+
+	m_LuaState.PushObject(&a_World);
+	m_LuaState.PushObject(&a_Monster);
+
+	if (!m_LuaState.CallFunction(1))
+	{
+		return false;
+	}
+
+	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
+	lua_pop(m_LuaState, 1);
+	return bRetVal;
+	return false;
+}
+
+
+
+
+
 bool cPlugin_NewLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1482,6 +1593,10 @@ const char * cPlugin_NewLua::GetHookFnName(cPluginManager::PluginHook a_Hook)
 		case cPluginManager::HOOK_PLAYER_USING_ITEM:            return "OnPlayerUsingItem";
 		case cPluginManager::HOOK_POST_CRAFTING:                return "OnPostCrafting";
 		case cPluginManager::HOOK_PRE_CRAFTING:                 return "OnPreCrafting";
+		case cPluginManager::HOOK_SPAWNED_ENTITY:               return "OnSpawnedEntity";
+		case cPluginManager::HOOK_SPAWNED_MONSTER:              return "OnSpawnedMonster";
+		case cPluginManager::HOOK_SPAWNING_ENTITY:              return "OnSpawningEntity";
+		case cPluginManager::HOOK_SPAWNING_MONSTER:             return "OnSpawningMonster";
 		case cPluginManager::HOOK_TAKE_DAMAGE:                  return "OnTakeDamage";
 		case cPluginManager::HOOK_TICK:                         return "OnTick";
 		case cPluginManager::HOOK_UPDATED_SIGN:                 return "OnUpdatedSign";

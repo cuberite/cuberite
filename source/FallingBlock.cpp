@@ -22,10 +22,14 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 
 
 
-void cFallingBlock::Initialize(cWorld * a_World)
+bool cFallingBlock::Initialize(cWorld * a_World)
 {
-	super::Initialize(a_World);
-	a_World->BroadcastSpawnEntity(*this);
+	if (super::Initialize(a_World))
+	{
+		a_World->BroadcastSpawnEntity(*this);
+		return true;
+	}
+	return false;
 }
 
 

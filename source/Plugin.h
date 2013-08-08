@@ -80,6 +80,10 @@ public:
 	virtual bool OnPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	virtual bool OnPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	virtual bool OnSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
+	virtual bool OnSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
+	virtual bool OnSpawningEntity           (cWorld & a_World, cEntity & a_Entity);
+	virtual bool OnSpawningMonster          (cWorld & a_World, cMonster & a_Monster);
 	virtual bool OnTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TakeDamageInfo);
 	virtual bool OnUpdatedSign              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	virtual bool OnUpdatingSign             (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);

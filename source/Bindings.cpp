@@ -1,6 +1,6 @@
 /*
 ** Lua binding: AllToLua
-** Generated automatically by tolua++-1.0.92 on 08/07/13 12:06:03.
+** Generated automatically by tolua++-1.0.92 on 08/08/13 09:04:23.
 */
 
 #ifndef __cplusplus
@@ -59,6 +59,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "CraftingRecipes.h"
 #include "UI/Window.h"
 #include "LuaWindow.h"
+#include "Mobs/Monster.h"
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -203,6 +204,7 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
  tolua_usertype(tolua_S,"TakeDamageInfo");
  tolua_usertype(tolua_S,"cPlugin_NewLua");
+ tolua_usertype(tolua_S,"cMonster");
  tolua_usertype(tolua_S,"cCraftingGrid");
  tolua_usertype(tolua_S,"cCraftingRecipe");
  tolua_usertype(tolua_S,"cPlugin");
@@ -8256,10 +8258,11 @@ static int tolua_AllToLua_cPlayer_Initialize00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Initialize'", NULL);
 #endif
   {
-   self->Initialize(a_World);
+   bool tolua_ret = (bool)  self->Initialize(a_World);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Initialize'.",&tolua_err);
@@ -10087,12 +10090,15 @@ static int tolua_AllToLua_cPlayer_SetSprint00(lua_State* tolua_S)
 
  class Lua__cPlayer : public cPlayer, public ToluaBase {
 public:
-	 void  Initialize( cWorld* a_World) {
+	 bool  Initialize( cWorld* a_World) {
 		if (push_method("Initialize",  tolua_AllToLua_cPlayer_Initialize00)) {
 			tolua_pushusertype(lua_state, (void*)a_World, "cWorld");
-			ToluaBase::dbcall(lua_state, 2, 0);
+			ToluaBase::dbcall(lua_state, 2, 1);
+			 bool  tolua_ret = ( bool )tolua_toboolean(lua_state, -1, 0);
+			lua_pop(lua_state, 1);
+			return tolua_ret;
 		} else {
-			return ( void ) cPlayer:: Initialize(a_World);
+			return ( bool ) cPlayer:: Initialize(a_World);
 		};
 	};
 	 void  MoveTo( const Vector3d& a_NewPos) {
@@ -10296,8 +10302,8 @@ public:
 		};
 	};
 
-	 void cPlayer__Initialize( cWorld* a_World) {
-		return ( void )cPlayer::Initialize(a_World);
+	 bool cPlayer__Initialize( cWorld* a_World) {
+		return ( bool )cPlayer::Initialize(a_World);
 	};
 	 void cPlayer__MoveTo( const Vector3d& a_NewPos) {
 		return ( void )cPlayer::MoveTo(a_NewPos);
@@ -10415,10 +10421,11 @@ static int tolua_AllToLua_Lua__cPlayer_cPlayer__Initialize00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'cPlayer__Initialize'", NULL);
 #endif
   {
-   self->cPlayer__Initialize(a_World);
+   bool tolua_ret = (bool)  self->cPlayer__Initialize(a_World);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
- return 0;
+ return 1;
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'cPlayer__Initialize'.",&tolua_err);
@@ -29527,6 +29534,10 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"HOOK_PLAYER_USING_ITEM",cPluginManager::HOOK_PLAYER_USING_ITEM);
    tolua_constant(tolua_S,"HOOK_POST_CRAFTING",cPluginManager::HOOK_POST_CRAFTING);
    tolua_constant(tolua_S,"HOOK_PRE_CRAFTING",cPluginManager::HOOK_PRE_CRAFTING);
+   tolua_constant(tolua_S,"HOOK_SPAWNED_ENTITY",cPluginManager::HOOK_SPAWNED_ENTITY);
+   tolua_constant(tolua_S,"HOOK_SPAWNED_MONSTER",cPluginManager::HOOK_SPAWNED_MONSTER);
+   tolua_constant(tolua_S,"HOOK_SPAWNING_ENTITY",cPluginManager::HOOK_SPAWNING_ENTITY);
+   tolua_constant(tolua_S,"HOOK_SPAWNING_MONSTER",cPluginManager::HOOK_SPAWNING_MONSTER);
    tolua_constant(tolua_S,"HOOK_TAKE_DAMAGE",cPluginManager::HOOK_TAKE_DAMAGE);
    tolua_constant(tolua_S,"HOOK_TICK",cPluginManager::HOOK_TICK);
    tolua_constant(tolua_S,"HOOK_UPDATED_SIGN",cPluginManager::HOOK_UPDATED_SIGN);
@@ -30340,6 +30351,9 @@ TOLUA_API int tolua_AllToLua_open (lua_State* tolua_S)
    tolua_function(tolua_S,"delete",tolua_AllToLua_cLuaWindow_delete00);
    tolua_function(tolua_S,"GetContents",tolua_AllToLua_cLuaWindow_GetContents00);
    tolua_variable(tolua_S,"__cItemGrid__cListener__",tolua_get_cLuaWindow___cItemGrid__cListener__,NULL);
+  tolua_endmodule(tolua_S);
+  tolua_cclass(tolua_S,"cMonster","cMonster","cPawn",NULL);
+  tolua_beginmodule(tolua_S,"cMonster");
   tolua_endmodule(tolua_S);
   tolua_cclass(tolua_S,"cLineBlockTracer","cLineBlockTracer","",NULL);
   tolua_beginmodule(tolua_S,"cLineBlockTracer");

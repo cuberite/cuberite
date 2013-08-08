@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "World.h"
 #include "CommandOutput.h"
+#include "Mobs/Monster.h"
 
 
 
@@ -471,6 +472,50 @@ bool cPlugin::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Gr
 	UNUSED(a_Player);
 	UNUSED(a_Grid);
 	UNUSED(a_Recipe);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
+{
+	UNUSED(a_World);
+	UNUSED(a_Entity);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
+{
+	UNUSED(a_World);
+	UNUSED(a_Monster);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
+{
+	UNUSED(a_World);
+	UNUSED(a_Entity);
+	return false;
+}
+
+
+
+
+
+bool cPlugin::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
+{
+	UNUSED(a_World);
+	UNUSED(a_Monster);
 	return false;
 }
 

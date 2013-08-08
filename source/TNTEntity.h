@@ -20,7 +20,7 @@ public:
 	cTNTEntity(const Vector3d & a_Pos, float a_FuseTimeInSec);
 	
 	// cEntity overrides:
-	virtual void Initialize(cWorld * a_World) override;
+	virtual bool Initialize(cWorld * a_World) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	

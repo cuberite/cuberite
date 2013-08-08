@@ -396,6 +396,19 @@ void cLuaState::PushObject(cEntity * a_Entity)
 
 
 
+void cLuaState::PushObject(cMonster * a_Monster)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Monster, "cMonster");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::PushObject(cItem * a_Item)
 {
 	ASSERT(IsValid());

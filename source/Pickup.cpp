@@ -41,10 +41,14 @@ cPickup::cPickup(int a_MicroPosX, int a_MicroPosY, int a_MicroPosZ, const cItem 
 
 
 
-void cPickup::Initialize(cWorld * a_World)
+bool cPickup::Initialize(cWorld * a_World)
 {
-	super::Initialize(a_World);
-	a_World->BroadcastSpawnEntity(*this);
+	if (super::Initialize(a_World))
+	{
+		a_World->BroadcastSpawnEntity(*this);
+		return true;
+	}
+	return false;
 }
 
 

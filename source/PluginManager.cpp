@@ -888,6 +888,88 @@ bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCrafti
 
 
 
+bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNED_ENTITY);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnSpawnedEntity(a_World, a_Entity))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNED_MONSTER);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnSpawnedMonster(a_World, a_Monster))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+bool cPluginManager::CallHookSpawningEntity(cWorld & a_World, cEntity & a_Entity)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNING_ENTITY);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnSpawningEntity(a_World, a_Entity))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookSpawningMonster(cWorld & a_World, cMonster & a_Monster)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNING_MONSTER);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnSpawningMonster(a_World, a_Monster))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_TAKE_DAMAGE);

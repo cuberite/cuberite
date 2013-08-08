@@ -30,7 +30,7 @@ public:
 	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
 	
 	// cEntity overrides:
-	virtual void Initialize(cWorld * a_World) override;
+	virtual bool Initialize(cWorld * a_World) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	

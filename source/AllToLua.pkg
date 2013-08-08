@@ -59,6 +59,7 @@ $cfile "Generating/ChunkDesc.h"
 $cfile "CraftingRecipes.h"
 $cfile "UI/Window.h"
 $cfile "LuaWindow.h"
+$cfile "Mobs/Monster.h"
 
 
 

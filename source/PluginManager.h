@@ -15,8 +15,11 @@ class cWorld;
 // fwd: ChunkDesc.h
 class cChunkDesc;
 
-// fwd: Entityes/Entity.h
+// fwd: Entities/Entity.h
 class cEntity;
+
+// fwd: Mobs/Monster.h
+class cMonster;
 
 // fwd: Player.h
 class cPlayer;
@@ -82,6 +85,10 @@ public:																	// tolua_export
 		HOOK_PLAYER_USING_ITEM,
 		HOOK_POST_CRAFTING,
 		HOOK_PRE_CRAFTING,
+		HOOK_SPAWNED_ENTITY,
+		HOOK_SPAWNED_MONSTER,
+		HOOK_SPAWNING_ENTITY,
+		HOOK_SPAWNING_MONSTER,
 		HOOK_TAKE_DAMAGE,
 		HOOK_TICK,
 		HOOK_UPDATED_SIGN,
@@ -116,8 +123,9 @@ public:																	// tolua_export
 	void ReloadPlugins();												// tolua_export
 	void AddHook( cPlugin* a_Plugin, PluginHook a_Hook );				// tolua_export
 
-	unsigned int GetNumPlugins() const;									// tolua_export
-
+	unsigned int GetNumPlugins() const;  // tolua_export
+	
+	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
 	bool CallHookChat                     (cPlayer * a_Player, AString & a_Message);
 	bool CallHookChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
@@ -151,6 +159,10 @@ public:																	// tolua_export
 	bool CallHookPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
+	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
+	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
+	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);
+	bool CallHookSpawningMonster          (cWorld & a_World, cMonster & a_Monster);
 	bool CallHookTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TDI);
 	bool CallHookUpdatedSign              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
 	bool CallHookUpdatingSign             (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);

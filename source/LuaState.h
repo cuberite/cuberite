@@ -36,6 +36,7 @@ extern "C"
 class cWorld;
 class cPlayer;
 class cEntity;
+class cMonster;
 class cItem;
 class cItems;
 class cClientHandle;
@@ -145,6 +146,7 @@ public:
 	void PushObject(cWorld * a_World);
 	void PushObject(cPlayer * a_Player);
 	void PushObject(cEntity * a_Entity);
+	void PushObject(cMonster * a_Monster);
 	void PushObject(cItem * a_Item);
 	void PushObject(cItems * a_Items);
 	void PushObject(cClientHandle * a_ClientHandle);

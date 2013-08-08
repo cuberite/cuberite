@@ -45,6 +45,10 @@ function Initialize(Plugin)
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PLAYER_USING_ITEM);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_POST_CRAFTING);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_PRE_CRAFTING);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_SPAWNED_ENTITY);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_SPAWNED_MONSTER);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_SPAWNING_ENTITY);
+	PluginManager:AddHook(Plugin, cPluginManager.HOOK_SPAWNING_MONSTER);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_TAKE_DAMAGE);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_UPDATED_SIGN);
 	PluginManager:AddHook(Plugin, cPluginManager.HOOK_UPDATING_SIGN);
@@ -352,6 +356,38 @@ end
 
 function OnPreCrafting(...)
 	LogHook("OnPreCrafting", unpack(arg));
+end
+
+
+
+
+
+function OnSpawnedEntity(...)
+	LogHook("OnSpawnedEntity", unpack(arg));
+end
+
+
+
+
+
+function OnSpawnedMonster(...)
+	LogHook("OnSpawnedMonster", unpack(arg));
+end
+
+
+
+
+
+function OnSpawningEntity(...)
+	LogHook("OnSpawningEntity", unpack(arg));
+end
+
+
+
+
+
+function OnSpawningMonster(...)
+	LogHook("OnSpawningMonster", unpack(arg));
 end
 
 
