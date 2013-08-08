@@ -400,7 +400,14 @@ void cPlayer::FinishEating(void)
 		return;
 	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
+
 	GetInventory().RemoveOneEquippedItem();
+
+	//if the food is mushroom soup, return a bowl to the inventory
+	if( Item.m_ItemType == E_ITEM_MUSHROOM_SOUP ) {
+		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
+		GetInventory().AddItem(emptyBowl, true, true);
+	}
 }
 
 

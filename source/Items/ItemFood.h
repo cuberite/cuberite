@@ -50,6 +50,7 @@ public:
 			case E_ITEM_ROTTEN_FLESH:     return FoodInfo(4, 0.8, 80);
 			case E_ITEM_SPIDER_EYE:       return FoodInfo(2, 3.2, 100);
 			case E_ITEM_STEAK:            return FoodInfo(8, 12.8);
+			case E_ITEM_MUSHROOM_SOUP:    return FoodInfo(6, 7.2);
 		}
 		LOGWARNING("%s: Unknown food item (%d), returning zero nutrition", __FUNCTION__, m_ItemType);
 		return FoodInfo(0, 0.f);
