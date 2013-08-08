@@ -45,6 +45,9 @@ class cChunkDesc;
 class cCraftingGrid;
 class cCraftingRecipe;
 struct TakeDamageInfo;
+class cWindow;
+class cPlugin_NewLua;
+struct HTTPRequest;
 
 
 
@@ -120,16 +123,18 @@ public:
 	*/
 	bool LoadFile(const AString & a_FileName);
 	
+	/// Returns true if a_FunctionName is a valid Lua function that can be called
+	bool HasFunction(const char * a_FunctionName);
+	
 	/** Pushes the function of the specified name onto the stack.
-	Returns true if successful.
-	If a_ShouldLogFail is true, logs a warning on failure (incl. m_SubsystemName)
+	Returns true if successful. Logs a warning on failure (incl. m_SubsystemName)
 	*/
-	bool PushFunction(const char * a_FunctionName, bool a_ShouldLogFailure = true);
+	bool PushFunction(const char * a_FunctionName);
 	
 	/** Pushes a function that has been saved into the global registry, identified by a_FnRef.
 	Returns true if successful. Logs a warning on failure
 	*/
-	bool PushFunctionFromRegistry(int a_FnRef);
+	bool PushFunction(int a_FnRef);
 	
 	/** Pushes a function that is stored in a table ref.
 	Returns true if successful, false on failure. Doesn't log failure.
@@ -159,12 +164,27 @@ public:
 	void Push(const cCraftingGrid * a_Grid);
 	void Push(const cCraftingRecipe * a_Recipe);
 	void Push(TakeDamageInfo * a_TDI);
+	void Push(cWindow * a_Window);
+	void Push(cPlugin_NewLua * a_Plugin);
+	void Push(const HTTPRequest * a_Request);
 	
+	/// Call any 0-param 0-return Lua function in a single line:
+	template <typename FnT>
+	bool Call(FnT a_FnName)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		return CallFunction(0);
+	}
+
 	/// Call any 1-param 0-return Lua function in a single line:
 	template<
+		typename FnT,
 		typename ArgT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -174,11 +194,26 @@ public:
 		return CallFunction(0);
 	}
 
+	/// Call any 2-param 0-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		return CallFunction(0);
+	}
+
 	/// Call any 1-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename RetT1
+		typename FnT, typename ArgT1, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -196,9 +231,9 @@ public:
 
 	/// Call any 2-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename RetT1
+		typename FnT, typename ArgT1, typename ArgT2, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -217,9 +252,9 @@ public:
 
 	/// Call any 3-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename RetT1
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -239,9 +274,9 @@ public:
 	
 	/// Call any 4-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename RetT1
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -262,9 +297,9 @@ public:
 	
 	/// Call any 5-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename RetT1
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -286,10 +321,10 @@ public:
 	
 	/// Call any 6-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -312,10 +347,10 @@ public:
 	
 	/// Call any 7-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -339,10 +374,10 @@ public:
 	
 	/// Call any 8-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename ArgT8, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -367,10 +402,10 @@ public:
 	
 	/// Call any 9-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename ArgT8, typename ArgT9, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -396,10 +431,10 @@ public:
 	
 	/// Call any 10-param 1-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
 		typename ArgT7, typename ArgT8, typename ArgT9, typename ArgT10, typename RetT1
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, ArgT10 a_Arg10, const cRet & a_Mark, RetT1 & a_Ret1)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, ArgT10 a_Arg10, const cRet & a_Mark, RetT1 & a_Ret1)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -424,11 +459,32 @@ public:
 		return true;
 	}
 	
+	/// Call any 1-param 2-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename RetT1, typename RetT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
 	/// Call any 2-param 2-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename RetT1, typename RetT2
+		typename FnT, typename ArgT1, typename ArgT2, typename RetT1, typename RetT2
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -448,11 +504,11 @@ public:
 
 	/// Call any 9-param 5-return Lua function in a single line:
 	template<
-		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
 		typename ArgT6, typename ArgT7, typename ArgT8, typename ArgT9, 
 		typename RetT1, typename RetT2, typename RetT3, typename RetT4, typename RetT5
 	>
-	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3, RetT4 & a_Ret4, RetT5 & a_Ret5)
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3, RetT4 & a_Ret4, RetT5 & a_Ret5)
 	{
 		if (!PushFunction(a_FnName))
 		{
@@ -479,6 +535,7 @@ public:
 		lua_pop(m_LuaState, 5);
 		return true;
 	}
+
 
 	/// Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged
 	void GetReturn(int a_StackPos, bool & a_ReturnedVal);

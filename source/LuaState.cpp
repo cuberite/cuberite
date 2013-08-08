@@ -200,7 +200,25 @@ bool cLuaState::LoadFile(const AString & a_FileName)
 
 
 
-bool cLuaState::PushFunction(const char * a_FunctionName, bool a_ShouldLogFailure /* = true */)
+bool cLuaState::HasFunction(const char * a_FunctionName)
+{
+	if (!IsValid())
+	{
+		// This happens if cPlugin::Initialize() fails with an error
+		return false;
+	}
+
+	lua_getglobal(m_LuaState, a_FunctionName);
+	bool res = (!lua_isnil(m_LuaState, -1) && lua_isfunction(m_LuaState, -1));
+	lua_pop(m_LuaState, 1);
+	return res;
+}
+
+
+
+
+
+bool cLuaState::PushFunction(const char * a_FunctionName)
 {
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
 
@@ -213,10 +231,7 @@ bool cLuaState::PushFunction(const char * a_FunctionName, bool a_ShouldLogFailur
 	lua_getglobal(m_LuaState, a_FunctionName);
 	if (!lua_isfunction(m_LuaState, -1))
 	{
-		if (a_ShouldLogFailure)
-		{
-			LOGWARNING("Error in %s: Could not find function %s()", m_SubsystemName.c_str(), a_FunctionName);
-		}
+		LOGWARNING("Error in %s: Could not find function %s()", m_SubsystemName.c_str(), a_FunctionName);
 		lua_pop(m_LuaState, 1);
 		return false;
 	}
@@ -229,7 +244,7 @@ bool cLuaState::PushFunction(const char * a_FunctionName, bool a_ShouldLogFailur
 
 
 
-bool cLuaState::PushFunctionFromRegistry(int a_FnRef)
+bool cLuaState::PushFunction(int a_FnRef)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs == -1);  // If not, there's already something pushed onto the stack
@@ -538,6 +553,45 @@ void cLuaState::Push(TakeDamageInfo * a_TDI)
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
 
 	tolua_pushusertype(m_LuaState, a_TDI, "TakeDamageInfo");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cWindow * a_Window)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Window, "cWindow");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cPlugin_NewLua * a_Plugin)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Plugin, "cPlugin_NewLua");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const HTTPRequest * a_Request)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPRequest");
 	m_NumCurrentFunctionArgs += 1;
 }
 

@@ -72,29 +72,22 @@ bool cPlugin_NewLua::Initialize(void)
 	}  // for itr - Files[]
 
 	// Call intialize function
-	if (!m_LuaState.PushFunction("Initialize"))
+	bool res = false;
+	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
+		LOGWARNING("Error in plugin %s: Cannot call the Initialize() function. Plugin is temporarily disabled.", GetName().c_str());
 		m_LuaState.Close();
 		return false;
 	}
 
-	m_LuaState.PushUserType(this, "cPlugin_NewLua");
-	
-	if (!m_LuaState.CallFunction(1))
+	if (!res)
 	{
+		LOGINFO("Plugin %s: Initialize() call failed, plugin is temporarily disabled.", GetName().c_str());
 		m_LuaState.Close();
 		return false;
 	}
 
-	if (!lua_isboolean(m_LuaState, -1))
-	{
-		LOGWARNING("Error in plugin %s: Initialize() must return a boolean value!", GetName().c_str());
-		m_LuaState.Close();
-		return false;
-	}
-
-	bool bSuccess = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	return bSuccess;
+	return true;
 }
 
 
@@ -104,12 +97,11 @@ bool cPlugin_NewLua::Initialize(void)
 void cPlugin_NewLua::OnDisable(void)
 {
 	cCSLock Lock(m_CriticalSection);
-	if (!m_LuaState.PushFunction("OnDisable", false)) // false = don't log error if not found
+	if (!m_LuaState.HasFunction("OnDisable"))
 	{
 		return;
 	}
-
-	m_LuaState.CallFunction(0);
+	m_LuaState.Call("OnDisable");
 }
 
 
@@ -144,31 +136,6 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 	bool res = false;
 	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHAT), a_Player, a_Message, cLuaState::Return, res, a_Message);
 	return res;
-	
-	/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHAT);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_Player);
-	m_LuaState.PushString(a_Message.c_str());
-
-	if (!m_LuaState.CallFunction(2))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -2, 0) > 0);
-	if (lua_isstring(m_LuaState, -1))
-	{
-		a_Message = tolua_tostring(m_LuaState, -1, "");
-	}
-	lua_pop(m_LuaState, 2);
-	return bRetVal;
-	*/
 }
 
 
@@ -179,33 +146,8 @@ bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_Chun
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
-	{
-		return false;
-	}
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 	return res;
-
-	/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-	
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_ChunkX);
-	m_LuaState.PushNumber(a_ChunkZ);
-	
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	*/
 }
 
 
@@ -218,29 +160,6 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 	bool res = false;
 	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
 	return res;
-
-	/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-	
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_ChunkX);
-	m_LuaState.PushNumber(a_ChunkZ);
-	m_LuaState.PushUserType(a_ChunkDesc, "cChunkDesc");
-	
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	*/
 }
 
 
@@ -253,29 +172,6 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 	bool res = false;
 	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
 	return res;
-
-	/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_ChunkX);
-	m_LuaState.PushNumber(a_ChunkZ);
-	m_LuaState.PushUserType(a_ChunkDesc, "cChunkDesc");
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	*/
 }
 
 
@@ -286,33 +182,8 @@ bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_Chunk
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
-	{
-		return false;
-	}
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 	return res;
-
-	/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-	
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_ChunkX);
-	m_LuaState.PushNumber(a_ChunkZ);
-	
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	*/
 }
 
 
@@ -323,34 +194,9 @@ bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_Chun
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
-	{
-		return false;
-	}
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 	return res;
 }
-/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-	
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_ChunkX);
-	m_LuaState.PushNumber(a_ChunkZ);
-	
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-}
-*/
 
 
 
@@ -362,27 +208,6 @@ bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 	bool res = false;
 	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_COLLECTING_PICKUP), a_Player, a_Pickup, cLuaState::Return, res);
 	return res;
-	
-	/*
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_COLLECTING_PICKUP);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_Player);
-	m_LuaState.PushObject(a_Pickup);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	*/
 }
 
 
@@ -393,10 +218,7 @@ bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftin
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CRAFTING_NO_RECIPE), (cPlayer *)a_Player, a_Grid, a_Recipe, cLuaState::Return, res))
-	{
-		return false;
-	}
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CRAFTING_NO_RECIPE), (cPlayer *)a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
 	return res;
 }
 
@@ -823,29 +645,9 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 	}
 	
 	cCSLock Lock(m_CriticalSection);
-	
-	// Push the function to be called:
-	if (!m_LuaState.PushFunctionFromRegistry(cmd->second))
-	{
-		LOGWARNING("Command handler function for \"%s\" is invalid", cmd->first.c_str());
-		return false;
-	}
-	
-	m_LuaState.Push(a_Split);
-	m_LuaState.Push(a_Player);
-	
-	// Call function:
-	if (!m_LuaState.CallFunction(1))
-	{
-		LOGWARNING("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
-		return false;
-	}
-	
-	// Handle return value:
-	bool RetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);  // Pop return value
-	
-	return RetVal;
+	bool res = false;
+	m_LuaState.Call(cmd->second, a_Split, a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -865,29 +667,14 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split, cComman
 	}
 	
 	cCSLock Lock(m_CriticalSection);
-	
-	// Push the function to be called:
-	m_LuaState.PushFunctionFromRegistry(cmd->second);
-	
-	m_LuaState.Push(a_Split);
-	
-	// Call function:
-	if (!m_LuaState.CallFunction(2))
+	bool res = false;
+	AString str;
+	m_LuaState.Call(cmd->second, a_Split, cLuaState::Return, res, str);
+	if (res && !str.empty())
 	{
-		LOGWARNING("Lua error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
-		return false;
-	}
-	
-	// Handle return values:
-	if (lua_isstring(m_LuaState, -1))
-	{
-		AString str = tolua_tocppstring(m_LuaState, -1, "");
 		a_Output.Out(str);
 	}
-	bool RetVal = (tolua_toboolean(m_LuaState, -2, 0) > 0);
-	lua_pop(m_LuaState, 2);  // Pop return values
-	
-	return RetVal;
+	return res;
 }
 
 
@@ -943,11 +730,7 @@ bool cPlugin_NewLua::CanAddHook(cPluginManager::PluginHook a_Hook)
 	}
 	
 	// Check if the function is available
-	lua_getglobal(m_LuaState, FnName);
-	bool res = lua_isfunction(m_LuaState, -1);
-	lua_pop(m_LuaState, 1);
-	
-	if (res)
+	if (m_LuaState.HasFunction(FnName))
 	{
 		return true;
 	}
@@ -1039,10 +822,12 @@ AString cPlugin_NewLua::HandleWebRequest(const HTTPRequest * a_Request )
 
 	std::pair< std::string, std::string > TabName = GetTabNameForRequest(a_Request);
 	std::string SafeTabName = TabName.second;
-	if( SafeTabName.empty() )
+	if (SafeTabName.empty())
+	{
 		return "";
+	}
 
-	sWebPluginTab* Tab = 0;
+	sWebPluginTab * Tab = 0;
 	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
 		if ((*itr)->SafeTitle.compare(SafeTabName) == 0) // This is the one! Rawr
@@ -1052,28 +837,15 @@ AString cPlugin_NewLua::HandleWebRequest(const HTTPRequest * a_Request )
 		}
 	}
 
-	if( Tab )
+	if (Tab != NULL)
 	{
-		m_LuaState.PushFunctionFromRegistry(Tab->UserData);
-
-		// Push HTTPRequest
-		m_LuaState.PushUserType((void*)a_Request, "const HTTPRequest");
-		
-		if (!m_LuaState.CallFunction(1))
+		AString Contents = Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
+		if (!m_LuaState.Call(Tab->UserData, a_Request, cLuaState::Return, Contents))
 		{
 			return "Lua encountered error while processing the page request";
 		}
 
-		if (!lua_isstring(m_LuaState, -1))
-		{
-			LOGWARNING("WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
-			lua_pop(m_LuaState, 1);  // Pop return value
-			return Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
-		}
-
-		RetVal += tolua_tostring(m_LuaState, -1, 0);
-		lua_pop(m_LuaState, 1); // Pop return value
-		// LOGINFO("ok. Stack size: %i", lua_gettop(m_LuaState) );
+		RetVal += Contents;
 	}
 
 	return RetVal;
@@ -1140,21 +912,9 @@ bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPla
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
 	cCSLock Lock(m_CriticalSection);
-	m_LuaState.PushFunctionFromRegistry(a_FnRef);
-	m_LuaState.PushUserType(&a_Window, "cWindow");
-	m_LuaState.Push(&a_Player);
-	m_LuaState.Push(a_CanRefuse);
-
-	// Call function:
-	if (!m_LuaState.CallFunction(1))
-	{
-		LOGWARNING("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, false) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res;
+	m_LuaState.Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1166,15 +926,7 @@ void cPlugin_NewLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, 
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
 	cCSLock Lock(m_CriticalSection);
-	m_LuaState.PushFunctionFromRegistry(a_FnRef);
-	m_LuaState.PushUserType(&a_Window, "cWindow");
-	m_LuaState.Push(a_SlotNum);
-
-	// Call function:
-	if (!m_LuaState.CallFunction(0))
-	{
-		LOGWARNING("LUA error in %s. Stack size: %i", __FUNCTION__, lua_gettop(m_LuaState));
-	}
+	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
 }
 
 
