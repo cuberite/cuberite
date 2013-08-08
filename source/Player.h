@@ -29,8 +29,8 @@ public:
 		MAX_HEALTH = 20,
 		MAX_FOOD_LEVEL = 20,
 		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
-                MAX_AIR_LEVEL = 300,
-                DROWNING_TICKS = 10, //number of ticks per heart of damage
+		MAX_AIR_LEVEL = 300,
+		DROWNING_TICKS = 10, //number of ticks per heart of damage
 	} ;
 	// tolua_end
 	
@@ -271,10 +271,10 @@ protected:
 	std::string m_PlayerName;
 	std::string m_LoadedWorldName;
 
-        //Player's air level (for swimming)
-        int m_AirLevel;
-        //used to time ticks between damage taken via drowning/suffocation
-        int m_AirTickTimer;
+	//Player's air level (for swimming)
+	int m_AirLevel;
+	//used to time ticks between damage taken via drowning/suffocation
+	int m_AirTickTimer;
 
 	bool m_bVisible;
 
@@ -346,8 +346,8 @@ protected:
 	/// Called in each tick to handle food-related processing
 	void HandleFood(void);
 	
-        /// Called in each tick to handle air-related processing i.e. drowning
-        void HandleAir(cChunk & a_Chunk);
+	/// Called in each tick to handle air-related processing i.e. drowning
+	void HandleAir(cChunk & a_Chunk);
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
 	void ApplyFoodExhaustionFromMovement(cChunk & a_Chunk);

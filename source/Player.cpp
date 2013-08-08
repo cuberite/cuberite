@@ -40,8 +40,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_IP("")
 	, m_LastBlockActionTime( 0 )
 	, m_LastBlockActionCnt( 0 )
-        , m_AirLevel( MAX_AIR_LEVEL )
-        , m_AirTickTimer( DROWNING_TICKS )
+	, m_AirLevel( MAX_AIR_LEVEL )
+	, m_AirTickTimer( DROWNING_TICKS )
 	, m_bVisible( true )
 	, m_LastGroundHeight( 0 )
 	, m_bTouchGround( false )
@@ -181,8 +181,8 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	
 	super::Tick(a_Dt, a_Chunk);
 
-        //handle air drowning stuff
-        HandleAir(a_Chunk);
+	//handle air drowning stuff
+	HandleAir(a_Chunk);
 
 	if (m_bDirtyPosition)
 	{
@@ -1252,7 +1252,7 @@ bool cPlayer::SaveToDisk()
 	root["rotation"]       = JSON_PlayerRotation;
 	root["inventory"]      = JSON_Inventory;
 	root["health"]         = m_Health;
-        root["air"]            = m_AirLevel;
+	root["air"]            = m_AirLevel;
 	root["food"]           = m_FoodLevel;
 	root["foodSaturation"] = m_FoodSaturationLevel;
 	root["foodTickTimer"]  = m_FoodTickTimer;
@@ -1322,10 +1322,9 @@ void cPlayer::UseEquippedItem()
 
 void cPlayer::HandleAir(cChunk & a_Chunk)
 {
-        //Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
-
-        //see if the player is /submerged/ water (block above is water)
-        // Get the type of block the player's standing in:
+	//Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	//see if the player is /submerged/ water (block above is water)
+	// Get the type of block the player's standing in:
 	BLOCKTYPE BlockIn;
 	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelY = (int)floor(m_LastPosY + 1.1);
@@ -1333,29 +1332,29 @@ void cPlayer::HandleAir(cChunk & a_Chunk)
 	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
 	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
 
-        if (IsBlockWater(BlockIn))
+	if (IsBlockWater(BlockIn))
 	{
-            //either reduce air level or damage player
-            if(m_AirLevel < 1)
-            {
-                if(m_AirTickTimer < 1)
-                {
-                    //damage player 
-		    TakeDamage(dtDrowning, NULL, 1, 1, 0);
-                    //reset timer
-                    m_AirTickTimer = DROWNING_TICKS;
-                }else{
-                    m_AirTickTimer -= 1;
-                }
-            }else{
-                //reduce air supply
-                m_AirLevel -= 1;
-            }
+		//either reduce air level or damage player
+		if(m_AirLevel < 1)
+		{
+			if(m_AirTickTimer < 1)
+			{
+				//damage player 
+				TakeDamage(dtDrowning, NULL, 1, 1, 0);
+				//reset timer
+				m_AirTickTimer = DROWNING_TICKS;
+			}else{
+				m_AirTickTimer -= 1;
+			}
+		}else{
+			//reduce air supply
+			m_AirLevel -= 1;
+		}
 	}else{
-                //set the air back to maximum
-                m_AirLevel = MAX_AIR_LEVEL;
-                m_AirTickTimer = DROWNING_TICKS;
-        }
+		//set the air back to maximum
+		m_AirLevel = MAX_AIR_LEVEL;
+		m_AirTickTimer = DROWNING_TICKS;
+	}
 }
 
 
