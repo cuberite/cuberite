@@ -1322,8 +1322,8 @@ void cPlayer::UseEquippedItem()
 
 void cPlayer::HandleAir(cChunk & a_Chunk)
 {
-	//Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
-	//see if the player is /submerged/ water (block above is water)
+	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
+	// see if the player is /submerged/ water (block above is water)
 	// Get the type of block the player's standing in:
 	BLOCKTYPE BlockIn;
 	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
@@ -1334,24 +1334,24 @@ void cPlayer::HandleAir(cChunk & a_Chunk)
 
 	if (IsBlockWater(BlockIn))
 	{
-		//either reduce air level or damage player
+		// either reduce air level or damage player
 		if(m_AirLevel < 1)
 		{
 			if(m_AirTickTimer < 1)
 			{
-				//damage player 
+				// damage player 
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
-				//reset timer
+				// reset timer
 				m_AirTickTimer = DROWNING_TICKS;
 			}else{
 				m_AirTickTimer -= 1;
 			}
 		}else{
-			//reduce air supply
+			// reduce air supply
 			m_AirLevel -= 1;
 		}
 	}else{
-		//set the air back to maximum
+		// set the air back to maximum
 		m_AirLevel = MAX_AIR_LEVEL;
 		m_AirTickTimer = DROWNING_TICKS;
 	}

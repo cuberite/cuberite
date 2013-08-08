@@ -271,9 +271,9 @@ protected:
 	std::string m_PlayerName;
 	std::string m_LoadedWorldName;
 
-	//Player's air level (for swimming)
+	/// Player's air level (for swimming)
 	int m_AirLevel;
-	//used to time ticks between damage taken via drowning/suffocation
+	/// used to time ticks between damage taken via drowning/suffocation
 	int m_AirTickTimer;
 
 	bool m_bVisible;
