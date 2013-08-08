@@ -11,10 +11,11 @@
 
 
 
-cPlugin::cPlugin( const AString & a_PluginDirectory )
-	: m_Version(0)
-	, m_Language(E_CPP)
-	, m_Directory(a_PluginDirectory)
+cPlugin::cPlugin(const AString & a_PluginDirectory) :
+	m_Language(E_CPP),
+	m_Name(a_PluginDirectory),
+	m_Version(0),
+	m_Directory(a_PluginDirectory)
 {
 }
 
