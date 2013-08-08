@@ -48,6 +48,8 @@ struct TakeDamageInfo;
 class cWindow;
 class cPlugin_NewLua;
 struct HTTPRequest;
+class cWebAdmin;
+struct HTTPTemplateRequest;
 
 
 
@@ -167,6 +169,8 @@ public:
 	void Push(cWindow * a_Window);
 	void Push(cPlugin_NewLua * a_Plugin);
 	void Push(const HTTPRequest * a_Request);
+	void Push(cWebAdmin * a_WebAdmin);
+	void Push(const HTTPTemplateRequest * a_Request);
 	
 	/// Call any 0-param 0-return Lua function in a single line:
 	template <typename FnT>

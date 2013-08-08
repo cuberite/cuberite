@@ -1490,14 +1490,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\LuaScript.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\source\LuaScript.h"
-					>
-				</File>
-				<File
 					RelativePath="..\source\LuaState.cpp"
 					>
 				</File>

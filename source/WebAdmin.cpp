@@ -13,7 +13,6 @@
 #include "Player.h"
 #include "Server.h"
 #include "Root.h"
-#include "LuaScript.h"
 
 #include "../iniFile/iniFile.h"
 
@@ -54,13 +53,13 @@ cWebAdmin * WebAdmin = NULL;
 
 
 
-cWebAdmin::cWebAdmin( int a_Port /* = 8080 */ )
-	: m_Port( a_Port )
-	, m_bConnected( false )
+cWebAdmin::cWebAdmin( int a_Port /* = 8080 */ ) :
+	m_Port(a_Port),
+	m_bConnected(false),
+	m_TemplateScript("<webadmin_template>")
 {
 	WebAdmin = this;
 	m_Event = new cEvent();
-	m_pTemplate = new cLuaScript();
 	Init( m_Port );
 }
 
@@ -75,7 +74,6 @@ cWebAdmin::~cWebAdmin()
 	m_WebServer->Stop();
 
 	delete m_WebServer;
-	delete m_pTemplate;
 	delete m_IniFile;
 
 	m_Event->Wait();
@@ -174,11 +172,11 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 			TemplateRequest.Request.FormData[ fd.name_ ] = HTTPfd;
 		}
 
+		// Try to get the template from the Lua template script
 		bool bLuaTemplateSuccessful = false;
 		if (!bDontShowTemplate)
 		{
-			// New Lua web template
-			bLuaTemplateSuccessful = WebAdmin->m_pTemplate->CallShowPage(*WebAdmin, TemplateRequest, Template);
+			bLuaTemplateSuccessful = WebAdmin->m_TemplateScript.Call("ShowPage", WebAdmin, &TemplateRequest, cLuaState::Return, Template);
 		}
 		
 		if (!bLuaTemplateSuccessful)
@@ -269,7 +267,7 @@ void cWebAdmin::Request_Handler(webserver::http_request* r)
 
 
 
-bool cWebAdmin::Init( int a_Port )
+bool cWebAdmin::Init(int a_Port)
 {
 	m_Port = a_Port;
 
@@ -280,10 +278,11 @@ bool cWebAdmin::Init( int a_Port )
 	}
 
 	// Initialize the WebAdmin template script and load the file
-	m_pTemplate->Initialize();
-	if (!m_pTemplate->LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
+	m_TemplateScript.Create();
+	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
-		LOGWARN("Could not load WebAdmin template.");
+		LOGWARN("Could not load WebAdmin template \"%s\", using default template.", FILE_IO_PREFIX "webadmin/template.lua");
+		m_TemplateScript.Close();
 	}
 
 
