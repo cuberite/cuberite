@@ -17,11 +17,6 @@
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 #include "CommandOutput.h"
 
-#ifdef USE_SQUIRREL
-	#include "squirrelbindings/SquirrelFunctions.h"
-	#include "squirrelbindings/SquirrelBindings.h"
-#endif
-
 #include "../iniFile/iniFile.h"
 
 #include <iostream>
@@ -195,9 +190,6 @@ void cRoot::Start(void)
 		m_Authenticator.Stop();
 		
 
-		#ifdef USE_SQUIRREL
-		CloseSquirrelVM();
-		#endif
 		LOG("Freeing MonsterConfig...");
 		delete m_MonsterConfig; m_MonsterConfig = 0;
 		LOG("Stopping WebAdmin...");

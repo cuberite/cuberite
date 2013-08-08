@@ -115,12 +115,6 @@ INCLUDE = -I.\
 		-Iexpat
 
 
-# 2012_11_08 _X: Removed, see Globals.h
-#		-Isquirrel_3_0_1_stable/include\
-#		-Isquirrel_3_0_1_stable\
-#		-Isquirrel_3_0_1_stable/sqrat
-
-
 
 
 

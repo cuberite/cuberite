@@ -6,10 +6,6 @@
 #include <exception> //std::exception
 #include <csignal>   //std::signal
 #include <stdlib.h>  //exit()
-#ifdef USE_SQUIRREL
-#include "squirrelbindings/SquirrelFunctions.h"
-#include "squirrelbindings/SquirrelBindings.h"
-#endif
 
 #ifdef _MSC_VER
 	#include <dbghelp.h>
