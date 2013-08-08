@@ -41,6 +41,10 @@ class cItem;
 class cItems;
 class cClientHandle;
 class cPickup;
+class cChunkDesc;
+class cCraftingGrid;
+class cCraftingRecipe;
+struct TakeDamageInfo;
 
 
 
@@ -69,6 +73,14 @@ public:
 		cLuaState & m_LuaState;
 		int m_Ref;
 	} ;
+	
+	
+	/// A dummy class that's used only to delimit function args from return values for cLuaState::Call()
+	class cRet
+	{
+	} ;
+	
+	static const cRet Return;  // Use this constant to delimit function args from return values for cLuaState::Call()
 
 
 	/** Creates a new instance. The LuaState is not initialized.
@@ -124,33 +136,358 @@ public:
 	*/
 	bool PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnName);
 	
-	/// Pushes a string vector, as a table, onto the stack
-	void PushStringVector(const AStringVector & a_Vector);
-	
 	/// Pushes a usertype of the specified class type onto the stack
 	void PushUserType(void * a_Object, const char * a_Type);
+
+	// Push a value onto the stack
+	void Push(const AString & a_String);
+	void Push(const AStringVector & a_Vector);
+	void Push(int a_Value);
+	void Push(double a_Value);
+	void Push(const char * a_Value);
+	void Push(bool a_Value);
+	void Push(cWorld * a_World);
+	void Push(cPlayer * a_Player);
+	void Push(const cPlayer * a_Player);
+	void Push(cEntity * a_Entity);
+	void Push(cMonster * a_Monster);
+	void Push(cItem * a_Item);
+	void Push(cItems * a_Items);
+	void Push(cClientHandle * a_ClientHandle);
+	void Push(cPickup * a_Pickup);
+	void Push(cChunkDesc * a_ChunkDesc);
+	void Push(const cCraftingGrid * a_Grid);
+	void Push(const cCraftingRecipe * a_Recipe);
+	void Push(TakeDamageInfo * a_TDI);
 	
-	/// Pushes an integer onto the stack
-	void PushNumber(int a_Value);
+	/// Call any 1-param 0-return Lua function in a single line:
+	template<
+		typename ArgT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		return CallFunction(0);
+	}
+
+	/// Call any 1-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+
+	/// Call any 2-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+
+	/// Call any 3-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
 	
-	/// Pushes a double onto the stack
-	void PushNumber(double a_Value);
+	/// Call any 4-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
 	
-	/// Pushes a string onto the stack
-	void PushString(const char * a_Value);
+	/// Call any 5-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
 	
-	/// Pushes a bool onto the stack
-	void PushBool(bool a_Value);
+	/// Call any 6-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
 	
-	// Special family of functions that do PushUserType internally, but require one less parameter
-	void PushObject(cWorld * a_World);
-	void PushObject(cPlayer * a_Player);
-	void PushObject(cEntity * a_Entity);
-	void PushObject(cMonster * a_Monster);
-	void PushObject(cItem * a_Item);
-	void PushObject(cItems * a_Items);
-	void PushObject(cClientHandle * a_ClientHandle);
-	void PushObject(cPickup * a_Pickup);
+	/// Call any 7-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename ArgT7, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+	
+	/// Call any 8-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename ArgT7, typename ArgT8, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		Push(a_Arg8);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+	
+	/// Call any 9-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename ArgT7, typename ArgT8, typename ArgT9, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		Push(a_Arg8);
+		Push(a_Arg9);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+	
+	/// Call any 10-param 1-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
+		typename ArgT7, typename ArgT8, typename ArgT9, typename ArgT10, typename RetT1
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, ArgT10 a_Arg10, const cRet & a_Mark, RetT1 & a_Ret1)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		Push(a_Arg8);
+		Push(a_Arg9);
+		Push(a_Arg10);
+		if (!CallFunction(1))
+		{
+			return false;
+		}
+		GetReturn(-1, a_Ret1);
+		lua_pop(m_LuaState, 1);
+		return true;
+	}
+	
+	/// Call any 2-param 2-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename RetT1, typename RetT2
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
+	/// Call any 9-param 5-return Lua function in a single line:
+	template<
+		typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename ArgT6, typename ArgT7, typename ArgT8, typename ArgT9, 
+		typename RetT1, typename RetT2, typename RetT3, typename RetT4, typename RetT5
+	>
+	bool Call(const char * a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3, RetT4 & a_Ret4, RetT5 & a_Ret5)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		Push(a_Arg8);
+		Push(a_Arg9);
+		if (!CallFunction(5))
+		{
+			return false;
+		}
+		GetReturn(-5, a_Ret1);
+		GetReturn(-4, a_Ret2);
+		GetReturn(-3, a_Ret3);
+		GetReturn(-2, a_Ret4);
+		GetReturn(-1, a_Ret5);
+		lua_pop(m_LuaState, 5);
+		return true;
+	}
+
+	/// Retrieve value returned at a_StackPos, if it is a valid bool. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, bool & a_ReturnedVal);
+	
+	/// Retrieve value returned at a_StackPos, if it is a valid string. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, AString & a_ReturnedVal);
+	
+	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, int & a_ReturnedVal);
 	
 	/**
 	Calls the function that has been pushed onto the stack by PushFunction(),

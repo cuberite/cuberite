@@ -85,7 +85,7 @@ static int tolua_StringSplit(lua_State * tolua_S)
 	std::string delim = (std::string)tolua_tocppstring(LuaState, 2, 0);
 
 	AStringVector Split = StringSplit(str, delim);
-	LuaState.PushStringVector(Split);
+	LuaState.Push(Split);
 	return 1;
 }
 
@@ -1504,11 +1504,11 @@ public:
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.PushNumber(a_BlockX);
-		m_LuaState.PushNumber(a_BlockY);
-		m_LuaState.PushNumber(a_BlockZ);
-		m_LuaState.PushNumber(a_BlockType);
-		m_LuaState.PushNumber(a_BlockMeta);
+		m_LuaState.Push(a_BlockX);
+		m_LuaState.Push(a_BlockY);
+		m_LuaState.Push(a_BlockZ);
+		m_LuaState.Push(a_BlockType);
+		m_LuaState.Push(a_BlockMeta);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;
@@ -1529,9 +1529,9 @@ public:
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.PushNumber(a_BlockX);
-		m_LuaState.PushNumber(a_BlockY);
-		m_LuaState.PushNumber(a_BlockZ);
+		m_LuaState.Push(a_BlockX);
+		m_LuaState.Push(a_BlockY);
+		m_LuaState.Push(a_BlockZ);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;
@@ -1552,9 +1552,9 @@ public:
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.PushNumber(a_BlockX);
-		m_LuaState.PushNumber(a_BlockY);
-		m_LuaState.PushNumber(a_BlockZ);
+		m_LuaState.Push(a_BlockX);
+		m_LuaState.Push(a_BlockY);
+		m_LuaState.Push(a_BlockZ);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;
@@ -1575,9 +1575,9 @@ public:
 			// No such function in the table, skip the callback
 			return false;
 		}
-		m_LuaState.PushNumber(a_BlockX);
-		m_LuaState.PushNumber(a_BlockY);
-		m_LuaState.PushNumber(a_BlockZ);
+		m_LuaState.Push(a_BlockX);
+		m_LuaState.Push(a_BlockY);
+		m_LuaState.Push(a_BlockZ);
 		if (!m_LuaState.CallFunction(1))
 		{
 			return false;

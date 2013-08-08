@@ -32,6 +32,12 @@ extern "C"
 
 
 
+const cLuaState::cRet cLuaState::Return;
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
@@ -272,7 +278,20 @@ bool cLuaState::PushFunctionFromRefTable(cRef & a_TableRef, const char * a_FnNam
 
 
 
-void cLuaState::PushStringVector(const AStringVector & a_Vector)
+void cLuaState::Push(const AString & a_String)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushcppstring(m_LuaState, a_String);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const AStringVector & a_Vector)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -305,7 +324,7 @@ void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 
 
 
-void cLuaState::PushNumber(int a_Value)
+void cLuaState::Push(int a_Value)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -318,7 +337,7 @@ void cLuaState::PushNumber(int a_Value)
 
 
 
-void cLuaState::PushNumber(double a_Value)
+void cLuaState::Push(double a_Value)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -331,7 +350,7 @@ void cLuaState::PushNumber(double a_Value)
 
 
 
-void cLuaState::PushString(const char * a_Value)
+void cLuaState::Push(const char * a_Value)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -344,7 +363,7 @@ void cLuaState::PushString(const char * a_Value)
 
 
 
-void cLuaState::PushBool(bool a_Value)
+void cLuaState::Push(bool a_Value)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -357,7 +376,7 @@ void cLuaState::PushBool(bool a_Value)
 
 
 
-void cLuaState::PushObject(cWorld * a_World)
+void cLuaState::Push(cWorld * a_World)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -370,7 +389,7 @@ void cLuaState::PushObject(cWorld * a_World)
 
 
 
-void cLuaState::PushObject(cPlayer * a_Player)
+void cLuaState::Push(cPlayer * a_Player)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -383,7 +402,20 @@ void cLuaState::PushObject(cPlayer * a_Player)
 
 
 
-void cLuaState::PushObject(cEntity * a_Entity)
+void cLuaState::Push(const cPlayer * a_Player)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, (void *)a_Player, "cPlayer");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -396,7 +428,7 @@ void cLuaState::PushObject(cEntity * a_Entity)
 
 
 
-void cLuaState::PushObject(cMonster * a_Monster)
+void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -409,7 +441,7 @@ void cLuaState::PushObject(cMonster * a_Monster)
 
 
 
-void cLuaState::PushObject(cItem * a_Item)
+void cLuaState::Push(cItem * a_Item)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -422,7 +454,7 @@ void cLuaState::PushObject(cItem * a_Item)
 
 
 
-void cLuaState::PushObject(cItems * a_Items)
+void cLuaState::Push(cItems * a_Items)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -435,7 +467,7 @@ void cLuaState::PushObject(cItems * a_Items)
 
 
 
-void cLuaState::PushObject(cClientHandle * a_Client)
+void cLuaState::Push(cClientHandle * a_Client)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -448,13 +480,98 @@ void cLuaState::PushObject(cClientHandle * a_Client)
 
 
 
-void cLuaState::PushObject(cPickup * a_Pickup)
+void cLuaState::Push(cPickup * a_Pickup)
 {
 	ASSERT(IsValid());
 	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
 
 	tolua_pushusertype(m_LuaState, a_Pickup, "cPickup");
 	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cChunkDesc * a_ChunkDesc)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const cCraftingGrid * a_Grid)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, (void *)a_Grid, "cCraftingGrid");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const cCraftingRecipe * a_Recipe)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(TakeDamageInfo * a_TDI)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_TDI, "TakeDamageInfo");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
+{
+	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
+}
+
+
+
+
+
+void cLuaState::GetReturn(int a_StackPos, AString & a_ReturnedVal)
+{
+	if (lua_isstring(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = tolua_tocppstring(m_LuaState, a_StackPos, a_ReturnedVal.c_str());
+	}
+}
+
+
+
+
+
+void cLuaState::GetReturn(int a_StackPos, int & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = (int)tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
+	}
 }
 
 

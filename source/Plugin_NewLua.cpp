@@ -101,7 +101,7 @@ bool cPlugin_NewLua::Initialize(void)
 
 
 
-void cPlugin_NewLua::OnDisable()
+void cPlugin_NewLua::OnDisable(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.PushFunction("OnDisable", false)) // false = don't log error if not found
@@ -119,13 +119,7 @@ void cPlugin_NewLua::OnDisable()
 void cPlugin_NewLua::Tick(float a_Dt)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_TICK);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return;
-	}
-	m_LuaState.PushNumber(a_Dt);
-	m_LuaState.CallFunction(0);
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_TICK), a_Dt);
 }
 
 
@@ -135,30 +129,9 @@ void cPlugin_NewLua::Tick(float a_Dt)
 bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_BLOCK_TO_PICKUPS);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushObject(a_Digger);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-	m_LuaState.PushObject(&a_Pickups);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_BLOCK_TO_PICKUPS), a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -168,6 +141,11 @@ bool cPlugin_NewLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int 
 bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHAT), a_Player, a_Message, cLuaState::Return, res, a_Message);
+	return res;
+	
+	/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHAT);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -190,6 +168,7 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 	}
 	lua_pop(m_LuaState, 2);
 	return bRetVal;
+	*/
 }
 
 
@@ -199,6 +178,14 @@ bool cPlugin_NewLua::OnChat(cPlayer * a_Player, AString & a_Message)
 bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
+	{
+		return false;
+	}
+	return res;
+
+	/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_AVAILABLE);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -218,6 +205,7 @@ bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_Chun
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
+	*/
 }
 
 
@@ -227,6 +215,11 @@ bool cPlugin_NewLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_Chun
 bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
+	return res;
+
+	/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATED);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -247,6 +240,7 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
+	*/
 }
 
 
@@ -256,6 +250,11 @@ bool cPlugin_NewLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_Chun
 bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
+	return res;
+
+	/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_GENERATING);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -276,6 +275,7 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
+	*/
 }
 
 
@@ -285,6 +285,14 @@ bool cPlugin_NewLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_Chu
 bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
+	{
+		return false;
+	}
+	return res;
+
+	/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADED);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -304,6 +312,7 @@ bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_Chunk
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
+	*/
 }
 
 
@@ -313,6 +322,14 @@ bool cPlugin_NewLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_Chunk
 bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
+	{
+		return false;
+	}
+	return res;
+}
+/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_CHUNK_UNLOADING);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -333,6 +350,7 @@ bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_Chun
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
 }
+*/
 
 
 
@@ -341,6 +359,11 @@ bool cPlugin_NewLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_Chun
 bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 {
 	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_COLLECTING_PICKUP), a_Player, a_Pickup, cLuaState::Return, res);
+	return res;
+	
+	/*
 	const char * FnName = GetHookFnName(cPluginManager::HOOK_COLLECTING_PICKUP);
 	ASSERT(FnName != NULL);
 	if (!m_LuaState.PushFunction(FnName))
@@ -359,6 +382,7 @@ bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
 	lua_pop(m_LuaState, 1);
 	return bRetVal;
+	*/
 }
 
 
@@ -368,25 +392,12 @@ bool cPlugin_NewLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_CRAFTING_NO_RECIPE);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
+	bool res = false;
+	if (!m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_CRAFTING_NO_RECIPE), (cPlayer *)a_Player, a_Grid, a_Recipe, cLuaState::Return, res))
 	{
 		return false;
 	}
-
-	m_LuaState.PushUserType((void *)a_Player, "cPlayer");
-	m_LuaState.PushUserType((void *)a_Grid,   "cCraftingGrid");
-	m_LuaState.PushUserType((void *)a_Recipe, "cCraftingRecipe");
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	return res;
 }
 
 
@@ -396,24 +407,9 @@ bool cPlugin_NewLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftin
 bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_DISCONNECT);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_Player);
-	m_LuaState.PushString(a_Reason.c_str());
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_DISCONNECT), a_Player, a_Reason, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -423,24 +419,9 @@ bool cPlugin_NewLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
 bool cPlugin_NewLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_EXECUTE_COMMAND);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_Player);
-	m_LuaState.PushStringVector(a_Split);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_EXECUTE_COMMAND), a_Player, a_Split, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -450,24 +431,9 @@ bool cPlugin_NewLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & 
 bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_HANDSHAKE);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushUserType(a_Client, "cClientHandle");
-	m_LuaState.PushString  (a_Username.c_str());
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_HANDSHAKE), a_Client, a_Username, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -477,24 +443,9 @@ bool cPlugin_NewLua::OnHandshake(cClientHandle * a_Client, const AString & a_Use
 bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_KILLING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Victim);
-	m_LuaState.PushObject(a_Killer);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_KILLING), &a_Victim, a_Killer, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -504,25 +455,9 @@ bool cPlugin_NewLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
 bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_LOGIN);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_Client);
-	m_LuaState.PushNumber(a_ProtocolVersion);
-	m_LuaState.PushString(a_Username.c_str());
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_LOGIN), a_Client, a_ProtocolVersion, a_Username, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -532,29 +467,9 @@ bool cPlugin_NewLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, co
 bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -564,29 +479,9 @@ bool cPlugin_NewLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int
 bool cPlugin_NewLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -596,23 +491,9 @@ bool cPlugin_NewLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a
 bool cPlugin_NewLua::OnPlayerEating(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_EATING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_EATING), &a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -622,23 +503,9 @@ bool cPlugin_NewLua::OnPlayerEating(cPlayer & a_Player)
 bool cPlugin_NewLua::OnPlayerJoined(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_JOINED);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_JOINED), &a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -648,28 +515,9 @@ bool cPlugin_NewLua::OnPlayerJoined(cPlayer & a_Player)
 bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_LEFT_CLICK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_Status);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_EATING), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -679,23 +527,9 @@ bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_B
 bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_MOVING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-	
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_MOVING), &a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -705,32 +539,9 @@ bool cPlugin_NewLua::OnPlayerMoved(cPlayer & a_Player)
 bool cPlugin_NewLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_PLACED_BLOCK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_PLACED_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -740,32 +551,9 @@ bool cPlugin_NewLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a
 bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_PLACING_BLOCK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_PLACING_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -775,30 +563,9 @@ bool cPlugin_NewLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int 
 bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -808,24 +575,9 @@ bool cPlugin_NewLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_
 bool cPlugin_NewLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushObject(&a_Entity);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY), &a_Player, &a_Entity, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -835,23 +587,9 @@ bool cPlugin_NewLua::OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a
 bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_SHOOTING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-	
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_SHOOTING), &a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -861,23 +599,9 @@ bool cPlugin_NewLua::OnPlayerShooting(cPlayer & a_Player)
 bool cPlugin_NewLua::OnPlayerSpawned(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_SPAWNED);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-	
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_SPAWNED), &a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -887,23 +611,9 @@ bool cPlugin_NewLua::OnPlayerSpawned(cPlayer & a_Player)
 bool cPlugin_NewLua::OnPlayerTossingItem(cPlayer & a_Player)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_TOSSING_ITEM);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_TOSSING_ITEM), &a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -913,32 +623,9 @@ bool cPlugin_NewLua::OnPlayerTossingItem(cPlayer & a_Player)
 bool cPlugin_NewLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USED_BLOCK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USED_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -948,30 +635,9 @@ bool cPlugin_NewLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_B
 bool cPlugin_NewLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USED_ITEM);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USED_ITEM), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -981,32 +647,9 @@ bool cPlugin_NewLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_Bl
 bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USING_BLOCK);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-	m_LuaState.PushNumber(a_BlockType);
-	m_LuaState.PushNumber(a_BlockMeta);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USING_BLOCK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1016,30 +659,9 @@ bool cPlugin_NewLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_
 bool cPlugin_NewLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PLAYER_USING_ITEM);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushNumber(a_BlockFace);
-	m_LuaState.PushNumber(a_CursorX);
-	m_LuaState.PushNumber(a_CursorY);
-	m_LuaState.PushNumber(a_CursorZ);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_USING_ITEM), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1049,25 +671,9 @@ bool cPlugin_NewLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_B
 bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_POST_CRAFTING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushUserType((void *)a_Player, "cPlayer");
-	m_LuaState.PushUserType((void *)a_Grid,   "cCraftingGrid");
-	m_LuaState.PushUserType((void *)a_Recipe, "cCraftingRecipe");
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_POST_CRAFTING), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1077,25 +683,9 @@ bool cPlugin_NewLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGri
 bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_PRE_CRAFTING);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushUserType((void *)a_Player, "cPlayer");
-	m_LuaState.PushUserType((void *)a_Grid,   "cCraftingGrid");
-	m_LuaState.PushUserType((void *)a_Recipe, "cCraftingRecipe");
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PRE_CRAFTING), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1105,24 +695,9 @@ bool cPlugin_NewLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid
 bool cPlugin_NewLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNED_ENTITY);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_World);
-	m_LuaState.PushObject(&a_Entity);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNED_ENTITY), &a_World, &a_Entity, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1132,25 +707,9 @@ bool cPlugin_NewLua::OnSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 bool cPlugin_NewLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNED_MONSTER);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_World);
-	m_LuaState.PushObject(&a_Monster);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	return false;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNED_MONSTER), &a_World, &a_Monster, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1160,25 +719,9 @@ bool cPlugin_NewLua::OnSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 bool cPlugin_NewLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNING_ENTITY);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_World);
-	m_LuaState.PushObject(&a_Entity);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	return false;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNING_ENTITY), &a_World, &a_Entity, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1188,25 +731,9 @@ bool cPlugin_NewLua::OnSpawningEntity(cWorld & a_World, cEntity & a_Entity)
 bool cPlugin_NewLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_SPAWNING_MONSTER);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_World);
-	m_LuaState.PushObject(&a_Monster);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
-	return false;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_SPAWNING_MONSTER), &a_World, &a_Monster, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1216,24 +743,9 @@ bool cPlugin_NewLua::OnSpawningMonster(cWorld & a_World, cMonster & a_Monster)
 bool cPlugin_NewLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_TAKE_DAMAGE);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_Receiver);
-	m_LuaState.PushUserType(&a_TDI, "TakeDamageInfo");
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) != 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_TAKE_DAMAGE), &a_Receiver, &a_TDI, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1248,31 +760,9 @@ bool cPlugin_NewLua::OnUpdatedSign(
 )
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_UPDATED_SIGN);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushString(a_Line1.c_str());
-	m_LuaState.PushString(a_Line2.c_str());
-	m_LuaState.PushString(a_Line3.c_str());
-	m_LuaState.PushString(a_Line4.c_str());
-	m_LuaState.PushObject(a_Player);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_UPDATED_SIGN), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1287,47 +777,9 @@ bool cPlugin_NewLua::OnUpdatingSign(
 )
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_UPDATING_SIGN);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(a_World);
-	m_LuaState.PushNumber(a_BlockX);
-	m_LuaState.PushNumber(a_BlockY);
-	m_LuaState.PushNumber(a_BlockZ);
-	m_LuaState.PushString(a_Line1.c_str());
-	m_LuaState.PushString(a_Line2.c_str());
-	m_LuaState.PushString(a_Line3.c_str());
-	m_LuaState.PushString(a_Line4.c_str());
-	m_LuaState.PushObject(a_Player);
-
-	if (!m_LuaState.CallFunction(5))
-	{
-		return false;
-	}
-
-	
-	bool bRetVal = (tolua_toboolean(m_LuaState, -5, 0) > 0);
-	if (lua_isstring(m_LuaState, -4))
-	{
-		a_Line1 = tolua_tostring(m_LuaState, -4, "");
-	}
-	if (lua_isstring(m_LuaState, -3))
-	{
-		a_Line2 = tolua_tostring(m_LuaState, -3, "");
-	}
-	if (lua_isstring(m_LuaState, -2))
-	{
-		a_Line3 = tolua_tostring(m_LuaState, -2, "");
-	}
-	if (lua_isstring(m_LuaState, -1))
-	{
-		a_Line4 = tolua_tostring(m_LuaState, -1, "");
-	}
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_UPDATING_SIGN), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res, a_Line1, a_Line2, a_Line3, a_Line4);
+	return res;
 }
 
 
@@ -1337,23 +789,9 @@ bool cPlugin_NewLua::OnUpdatingSign(
 bool cPlugin_NewLua::OnWeatherChanged(cWorld & a_World)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_World);
-
-	if (!m_LuaState.CallFunction(1))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED), &a_World, cLuaState::Return, res);
+	return res;
 }
 
 
@@ -1363,28 +801,11 @@ bool cPlugin_NewLua::OnWeatherChanged(cWorld & a_World)
 bool cPlugin_NewLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 {
 	cCSLock Lock(m_CriticalSection);
-	const char * FnName = GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGED);
-	ASSERT(FnName != NULL);
-	if (!m_LuaState.PushFunction(FnName))
-	{
-		return false;
-	}
-
-	m_LuaState.PushObject(&a_World);
-	m_LuaState.PushNumber(a_NewWeather);
-
-	if (!m_LuaState.CallFunction(2))
-	{
-		return false;
-	}
-
-	bool bRetVal = (tolua_toboolean(m_LuaState, -1, 0) > 0);
-	if (lua_isnumber(m_LuaState, -2))
-	{
-		a_NewWeather = (eWeather)lua_tointeger(m_LuaState, -2);
-	}
-	lua_pop(m_LuaState, 1);
-	return bRetVal;
+	bool res = false;
+	int NewWeather = a_NewWeather;
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_WEATHER_CHANGING), &a_World, a_NewWeather, cLuaState::Return, res, NewWeather);
+	a_NewWeather = (eWeather)NewWeather;
+	return res;
 }
 
 
@@ -1410,8 +831,8 @@ bool cPlugin_NewLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Pl
 		return false;
 	}
 	
-	m_LuaState.PushStringVector(a_Split);
-	m_LuaState.PushObject(a_Player);
+	m_LuaState.Push(a_Split);
+	m_LuaState.Push(a_Player);
 	
 	// Call function:
 	if (!m_LuaState.CallFunction(1))
@@ -1448,7 +869,7 @@ bool cPlugin_NewLua::HandleConsoleCommand(const AStringVector & a_Split, cComman
 	// Push the function to be called:
 	m_LuaState.PushFunctionFromRegistry(cmd->second);
 	
-	m_LuaState.PushStringVector(a_Split);
+	m_LuaState.Push(a_Split);
 	
 	// Call function:
 	if (!m_LuaState.CallFunction(2))
@@ -1721,8 +1142,8 @@ bool cPlugin_NewLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPla
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.PushFunctionFromRegistry(a_FnRef);
 	m_LuaState.PushUserType(&a_Window, "cWindow");
-	m_LuaState.PushObject(&a_Player);
-	m_LuaState.PushBool(a_CanRefuse);
+	m_LuaState.Push(&a_Player);
+	m_LuaState.Push(a_CanRefuse);
 
 	// Call function:
 	if (!m_LuaState.CallFunction(1))
@@ -1747,7 +1168,7 @@ void cPlugin_NewLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, 
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.PushFunctionFromRegistry(a_FnRef);
 	m_LuaState.PushUserType(&a_Window, "cWindow");
-	m_LuaState.PushNumber(a_SlotNum);
+	m_LuaState.Push(a_SlotNum);
 
 	// Call function:
 	if (!m_LuaState.CallFunction(0))
