@@ -29,6 +29,8 @@ public:
 		MAX_HEALTH = 20,
 		MAX_FOOD_LEVEL = 20,
 		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
+		MAX_AIR_LEVEL = 300,
+		DROWNING_TICKS = 10, //number of ticks per heart of damage
 	} ;
 	// tolua_end
 	
@@ -160,6 +162,8 @@ public:
 	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
 	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
+
+        int GetAirLevel                     (void) const { return m_AirLevel; }
 	
 	/// Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
@@ -267,6 +271,11 @@ protected:
 	std::string m_PlayerName;
 	std::string m_LoadedWorldName;
 
+	/// Player's air level (for swimming)
+	int m_AirLevel;
+	/// used to time ticks between damage taken via drowning/suffocation
+	int m_AirTickTimer;
+
 	bool m_bVisible;
 
 	// Food-related variables:
@@ -329,7 +338,6 @@ protected:
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;
 
-
 	virtual void Destroyed(void);
 
 	/// Filters out damage for creative mode
@@ -338,6 +346,9 @@ protected:
 	/// Called in each tick to handle food-related processing
 	void HandleFood(void);
 	
+	/// Called in each tick to handle air-related processing i.e. drowning
+	void HandleAir(cChunk & a_Chunk);
+
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
 	void ApplyFoodExhaustionFromMovement(cChunk & a_Chunk);
 } ; // tolua_export
