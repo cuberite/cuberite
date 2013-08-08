@@ -338,7 +338,7 @@ bool cPlugin_NewLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_B
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_EATING), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, cLuaState::Return, res);
+	m_LuaState.Call(GetHookFnName(cPluginManager::HOOK_PLAYER_LEFT_CLICK), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, cLuaState::Return, res);
 	return res;
 }
 
