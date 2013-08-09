@@ -61,8 +61,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_SprintingMaxSpeed(0.13)
 	, m_IsCrouched(false)
 	, m_IsSprinting(false)
-        , m_IsSwimming(false)
-        , m_IsSubmerged(false)
+	, m_IsSwimming(false)
+	, m_IsSubmerged(false)
 	, m_EatingFinishTick(-1)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
@@ -182,9 +182,9 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	
 	super::Tick(a_Dt, a_Chunk);
-
-        // set player swimming state
-        SetSwimState( a_Chunk);
+	
+	// set player swimming state
+	SetSwimState( a_Chunk);
 
 	// handle air drowning stuff
 	HandleAir();
@@ -1338,18 +1338,19 @@ void cPlayer::SetSwimState(cChunk & a_Chunk)
 	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelY = (int)floor(m_LastPosY + 0.1);
 	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
-        // first we check if the player is swimming
+	
+	// first we check if the player is swimming
 
 	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
 	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
 
-        m_IsSwimming = IsBlockWater(BlockIn);
-        
-        // now we check if the player is submerged
+	m_IsSwimming = IsBlockWater(BlockIn);
 
-      	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
+	// now we check if the player is submerged
 
-        m_IsSubmerged = IsBlockWater(BlockIn);
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
+
+	m_IsSubmerged = IsBlockWater(BlockIn);
 }
 
 void cPlayer::HandleAir()
