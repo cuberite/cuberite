@@ -26,11 +26,20 @@ public:																// tolua_export
 
 	static cMCLogger* GetInstance();
 private:
-	void SetColor( unsigned char a_Color );
-
+	enum eColorScheme
+	{
+		csGrayOnBlack,
+		csYellowOnBlack,
+		csRedOnBlack,
+		csBlackOnRed,
+	} ;
+	
+	/// Sets the specified color scheme in the terminal (TODO: if coloring available)
+	void SetColor(eColorScheme a_Scheme);
+	
 	cCriticalSection m_CriticalSection;
-	cLog* m_Log;
-	static cMCLogger* s_MCLogger;
+	cLog * m_Log;
+	static cMCLogger * s_MCLogger;
 };																	// tolua_export
 
 extern void LOG(const char* a_Format, ...);

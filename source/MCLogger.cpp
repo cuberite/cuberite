@@ -87,71 +87,73 @@ void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
 
 
 
-void cMCLogger::Log(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Log(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor( 0x7 );	 // 0x7 is default grey color
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csGrayOnBlack);
+	m_Log->Log(a_Format, a_ArgList);
 }
 
 
 
 
 
-void cMCLogger::Info(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Info(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-// 	for( int i = 0; i < 16; i++)
-// 	{
-// 		for( int j = 0; j < 16; j++ )
-// 		{
-// 			SetConsoleTextAttribute( hConsole, i | (j<<4) );
-// 			printf("0x%x", (i|j<<4));
-// 		}
-// 		printf("\n");
-// 	}
-
-	SetColor( 0xe );	 // 0xe is yellow
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csYellowOnBlack);
+	m_Log->Log(a_Format, a_ArgList);
 }
 
 
 
 
 
-void cMCLogger::Warn(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Warn(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor( 0xc );	 // 0xc is red
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csRedOnBlack);
+	m_Log->Log(a_Format, a_ArgList);
 }
 
 
 
 
 
-void cMCLogger::Error(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Error(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor( 0xc0 );	// 0xc0 is red bg and black text
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csBlackOnRed);
+	m_Log->Log(a_Format, a_ArgList);
 }
 
 
 
 
 
-void cMCLogger::SetColor( unsigned char a_Color )
+void cMCLogger::SetColor(eColorScheme a_Scheme)
 {
-#ifdef _WIN32
-	SetConsoleTextAttribute(g_Console, a_Color);
-#else
-	(void)a_Color;
-#endif
+	#ifdef _WIN32
+		WORD Attrib = 0x07;  // by default, gray on black
+		switch (a_Scheme)
+		{
+			case csGrayOnBlack:   Attrib = 0x07; break;
+			case csYellowOnBlack: Attrib = 0x0e; break;
+			case csRedOnBlack:    Attrib = 0x0c; break;
+			case csBlackOnRed:    Attrib = 0xc0; break;
+			default: ASSERT(!"Unhandled color scheme");
+		}
+		SetConsoleTextAttribute(g_Console, Attrib);
+	#elif defined(LINUX) && !defined(ANDROID_NDK)
+		switch (a_Scheme)
+		{
+			case csGrayOnBlack:   puts("\x1b[0m");    break;
+			case csYellowOnBlack: puts("\x1b[33;1m"); break;
+			case csRedOnBlack:    puts("\x1b[31;1m"); break;
+			case csBlackOnRed:    puts("\x1b[7;31;1m"); break;
+			default: ASSERT(!"Unhandled color scheme");
+		}
+	#endif
 }
 
 
