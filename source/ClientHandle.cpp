@@ -505,7 +505,12 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	// If a jump just started, process food exhaustion:
 	if ((a_PosY > m_Player->GetPosY()) && !a_IsOnGround && m_Player->IsOnGround())
 	{
-		m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
+		// we only add this exhaustion if the player is not swimming - otherwise we end up with both jump + swim exhaustion
+
+		if(! m_Player->IsSwimming() )
+		{
+			m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
+		}
 	}
 	
 	m_Player->MoveTo(Pos);

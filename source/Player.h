@@ -253,12 +253,20 @@ public:
 	/// Starts or stops sprinting, sends the max speed update to the client, if needed
 	void SetSprint(bool a_IsSprinting);
 	
+	/// Returns whether the player is swimming or not
+	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+
+	/// Return whether the player is under water or not
+	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+
 	// tolua_end
 	
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
+
+
 
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
@@ -335,6 +343,9 @@ protected:
 	bool m_IsCrouched;
 	bool m_IsSprinting;
 
+	bool m_IsSwimming;
+	bool m_IsSubmerged;
+
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;
 
@@ -347,10 +358,13 @@ protected:
 	void HandleFood(void);
 	
 	/// Called in each tick to handle air-related processing i.e. drowning
-	void HandleAir(cChunk & a_Chunk);
+	void HandleAir();
+
+	/// Called once per tick to set IsSwimming and IsSubmerged
+	void SetSwimState(cChunk & a_Chunk);
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
-	void ApplyFoodExhaustionFromMovement(cChunk & a_Chunk);
+	void ApplyFoodExhaustionFromMovement();
 } ; // tolua_export
 
 
