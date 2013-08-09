@@ -765,7 +765,7 @@ void cPlayer::SendMessage(const AString & a_Message)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	m_LastGroundHeight = (float)a_PosY();
+	m_LastGroundHeight = (float)a_PosY;
 	SetPosition( a_PosX, a_PosY, a_PosZ );
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
