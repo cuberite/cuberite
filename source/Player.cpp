@@ -61,6 +61,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_SprintingMaxSpeed(0.13)
 	, m_IsCrouched(false)
 	, m_IsSprinting(false)
+        , m_IsSwimming(false)
+        , m_IsSubmerged(false)
 	, m_EatingFinishTick(-1)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
@@ -181,8 +183,11 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	
 	super::Tick(a_Dt, a_Chunk);
 
-	//handle air drowning stuff
-	HandleAir(a_Chunk);
+        // set player swimming state
+        SetSwimState( a_Chunk);
+
+	// handle air drowning stuff
+	HandleAir();
 
 	if (m_bDirtyPosition)
 	{
@@ -1326,20 +1331,34 @@ void cPlayer::UseEquippedItem()
 	GetInventory().DamageEquippedItem();
 }
 
+void cPlayer::SetSwimState(cChunk & a_Chunk)
+{
 
-void cPlayer::HandleAir(cChunk & a_Chunk)
+	BLOCKTYPE BlockIn;
+	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelY = (int)floor(m_LastPosY + 0.1);
+	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
+        // first we check if the player is swimming
+
+	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
+	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
+
+        m_IsSwimming = IsBlockWater(BlockIn);
+        
+        // now we check if the player is submerged
+
+      	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
+
+        m_IsSubmerged = IsBlockWater(BlockIn);
+}
+
+void cPlayer::HandleAir()
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
 	// see if the player is /submerged/ water (block above is water)
 	// Get the type of block the player's standing in:
-	BLOCKTYPE BlockIn;
-	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelY = (int)floor(m_LastPosY + 1.1);
-	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
 
-	if (IsBlockWater(BlockIn))
+	if (IsSubmerged())
 	{
 		// either reduce air level or damage player
 		if(m_AirLevel < 1)

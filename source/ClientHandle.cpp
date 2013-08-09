@@ -32,7 +32,6 @@
 
 #include "Protocol/ProtocolRecognizer.h"
 
-#define float2int(x) ((x)<0 ? ((int)(x))-1 : (int)(x))
 
 
 #define AddPistonDir(x, y, z, dir, amount) switch (dir) { case 0: (y)-=(amount); break; case 1: (y)+=(amount); break;\
@@ -505,9 +504,8 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 	if ((a_PosY > m_Player->GetPosY()) && !a_IsOnGround && m_Player->IsOnGround())
 	{
 		// we only add this exhaustion if the player is not swimming - otherwise we end up with both jump + swim exhaustion
-		cWorld * World = m_Player->GetWorld();
-		BLOCKTYPE BlockType = World->GetBlock( float2int(m_Player->GetPosX()), float2int(m_Player->GetPosY()), float2int(m_Player->GetPosZ()) );
-		if(! IsBlockWater(BlockType) )
+
+		if(! m_Player->IsSwimming() )
 		{
 			m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
 		}

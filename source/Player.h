@@ -260,6 +260,12 @@ public:
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
 
+	/// Returns whether the player is swimming or not
+	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+
+	/// Return whether the player is under water or not
+	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
 	PermissionMap m_ResolvedPermissions;
@@ -335,6 +341,9 @@ protected:
 	bool m_IsCrouched;
 	bool m_IsSprinting;
 
+	bool m_IsSwimming;
+	bool m_IsSubmerged;
+
 	/// The world tick in which eating will be finished. -1 if not eating
 	Int64 m_EatingFinishTick;
 
@@ -347,7 +356,10 @@ protected:
 	void HandleFood(void);
 	
 	/// Called in each tick to handle air-related processing i.e. drowning
-	void HandleAir(cChunk & a_Chunk);
+	void HandleAir();
+
+	/// Called once per tick to set IsSwimming and IsSubmerged
+	void SetSwimState(cChunk & a_Chunk);
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
 	void ApplyFoodExhaustionFromMovement(cChunk & a_Chunk);
