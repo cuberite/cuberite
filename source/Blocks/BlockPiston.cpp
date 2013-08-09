@@ -35,7 +35,7 @@ cBlockPistonHandler::cBlockPistonHandler(BLOCKTYPE a_BlockType)
 
 void cBlockPistonHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	char OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+	NIBBLETYPE OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	int newX = a_BlockX;
 	int newY = a_BlockY;
@@ -63,6 +63,39 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 	a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetRotation(), a_Player->GetPitch());
 	return true;
 }
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cBlockPistonHeadHandler:
+
+cBlockPistonHeadHandler::cBlockPistonHeadHandler(void) :
+	super(E_BLOCK_PISTON_EXTENSION)
+{
+}
+
+
+
+
+
+void cBlockPistonHeadHandler::OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	NIBBLETYPE OldMeta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+
+	int newX = a_BlockX;
+	int newY = a_BlockY;
+	int newZ = a_BlockZ;
+	AddPistonDir(newX, newY, newZ, OldMeta & ~(8), -1);
+
+	BLOCKTYPE Block = a_World->GetBlock(newX, newY, newZ);
+	if ((Block == E_BLOCK_STICKY_PISTON) || (Block == E_BLOCK_PISTON))
+	{
+		a_World->DigBlock(newX, newY, newZ);
+	}
+}
+
 
 
 

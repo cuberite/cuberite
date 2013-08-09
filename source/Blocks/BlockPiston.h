@@ -26,3 +26,18 @@ public:
 
 
 
+
+class cBlockPistonHeadHandler :
+	public cBlockHandler
+{
+	typedef cBlockHandler super;
+	
+public:
+	cBlockPistonHeadHandler(void);
+	
+	virtual void OnDestroyedByPlayer(cWorld * a_World, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+} ;
+
+
+
+
