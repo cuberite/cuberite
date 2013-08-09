@@ -625,6 +625,58 @@ void cLuaState::Push(const HTTPTemplateRequest * a_Request)
 
 
 
+void cLuaState::Push(cTNTEntity * a_TNTEntity)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_TNTEntity, "cTNTEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cCreeper * a_Creeper)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Creeper, "cCreeper");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(Vector3i * a_Vector)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	tolua_pushusertype(m_LuaState, a_Vector, "Vector3i");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(void * a_Ptr)
+{
+	ASSERT(IsValid());
+	ASSERT(m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
+
+	lua_pushnil(m_LuaState);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::GetReturn(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
@@ -651,6 +703,18 @@ void cLuaState::GetReturn(int a_StackPos, int & a_ReturnedVal)
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_ReturnedVal = (int)tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
+	}
+}
+
+
+
+
+
+void cLuaState::GetReturn(int a_StackPos, double & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
 	}
 }
 

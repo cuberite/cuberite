@@ -50,6 +50,9 @@ class cPlugin_NewLua;
 struct HTTPRequest;
 class cWebAdmin;
 struct HTTPTemplateRequest;
+class cTNTEntity;
+class cCreeper;
+class Vector3i;
 
 
 
@@ -171,6 +174,10 @@ public:
 	void Push(const HTTPRequest * a_Request);
 	void Push(cWebAdmin * a_WebAdmin);
 	void Push(const HTTPTemplateRequest * a_Request);
+	void Push(cTNTEntity * a_TNTEntity);
+	void Push(cCreeper * a_Creeper);
+	void Push(Vector3i * a_Vector);
+	void Push(void * a_Ptr);
 	
 	/// Call any 0-param 0-return Lua function in a single line:
 	template <typename FnT>
@@ -506,6 +513,199 @@ public:
 		return true;
 	}
 
+	/// Call any 3-param 2-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3,
+		typename RetT1, typename RetT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
+	/// Call any 4-param 2-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4,
+		typename RetT1, typename RetT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
+	/// Call any 5-param 2-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename RetT1, typename RetT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
+	/// Call any 6-param 2-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename ArgT6,
+		typename RetT1, typename RetT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
+	/// Call any 7-param 2-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename ArgT6, typename ArgT7,
+		typename RetT1, typename RetT2
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		if (!CallFunction(2))
+		{
+			return false;
+		}
+		GetReturn(-2, a_Ret1);
+		GetReturn(-1, a_Ret2);
+		lua_pop(m_LuaState, 2);
+		return true;
+	}
+
+	/// Call any 7-param 3-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename ArgT6, typename ArgT7,
+		typename RetT1, typename RetT2, typename RetT3
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		if (!CallFunction(3))
+		{
+			return false;
+		}
+		GetReturn(-3, a_Ret1);
+		GetReturn(-2, a_Ret2);
+		GetReturn(-1, a_Ret3);
+		lua_pop(m_LuaState, 3);
+		return true;
+	}
+
+	/// Call any 8-param 3-return Lua function in a single line:
+	template<
+		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
+		typename ArgT6, typename ArgT7, typename ArgT8,
+		typename RetT1, typename RetT2, typename RetT3
+	>
+	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
+	{
+		if (!PushFunction(a_FnName))
+		{
+			return false;
+		}
+		Push(a_Arg1);
+		Push(a_Arg2);
+		Push(a_Arg3);
+		Push(a_Arg4);
+		Push(a_Arg5);
+		Push(a_Arg6);
+		Push(a_Arg7);
+		Push(a_Arg8);
+		if (!CallFunction(3))
+		{
+			return false;
+		}
+		GetReturn(-3, a_Ret1);
+		GetReturn(-2, a_Ret2);
+		GetReturn(-1, a_Ret3);
+		lua_pop(m_LuaState, 3);
+		return true;
+	}
+
 	/// Call any 9-param 5-return Lua function in a single line:
 	template<
 		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
@@ -549,6 +749,9 @@ public:
 	
 	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
 	void GetReturn(int a_StackPos, int & a_ReturnedVal);
+	
+	/// Retrieve value returned at a_StackPos, if it is a valid number. If not, a_ReturnedVal is unchanged
+	void GetReturn(int a_StackPos, double & a_ReturnedVal);
 	
 	/**
 	Calls the function that has been pushed onto the stack by PushFunction(),

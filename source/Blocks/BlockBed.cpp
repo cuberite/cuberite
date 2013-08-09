@@ -53,10 +53,13 @@ void cBlockBedHandler::OnDestroyed(cWorld * a_World, int a_BlockX, int a_BlockY,
 
 void cBlockBedHandler::OnUse(cWorld *a_World, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	if (a_World->GetDimension() != 0)
+	if (a_World->GetDimension() != dimOverworld)
 	{
-		a_World->DoExplosiontAt(5, a_BlockX, a_BlockY, a_BlockZ);
-	} else {
+		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
+		a_World->DoExplosiontAt(5, a_BlockX, a_BlockY, a_BlockZ, true, esBed, &Coords);
+	}
+	else
+	{
 		if (a_World->GetTimeOfDay() > 13000)
 		{
 			NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);

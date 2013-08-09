@@ -63,6 +63,8 @@ public:																	// tolua_export
 		HOOK_CRAFTING_NO_RECIPE,
 		HOOK_DISCONNECT,
 		HOOK_EXECUTE_COMMAND,
+		HOOK_EXPLODED,
+		HOOK_EXPLODING,
 		HOOK_HANDSHAKE,
 		HOOK_KILLING,
 		HOOK_LOGIN,
@@ -137,6 +139,8 @@ public:																	// tolua_export
 	bool CallHookCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect               (cPlayer * a_Player, const AString & a_Reason);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
+	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
+	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle * a_ClientHandle, const AString & a_Username);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);

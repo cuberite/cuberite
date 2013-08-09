@@ -1546,16 +1546,16 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 
 
-void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY, int a_BlockZ, cVector3iArray & a_BlocksAffected)
+void cChunkMap::DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
-	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	if ((a_BlockY < 0) || (a_BlockY > cChunkDef::Height - 1))
 	{
 		return;
 	}
 	
 	// Don't explode if the explosion center is inside a liquid block:
-	switch (m_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
+	switch (m_World->GetBlock((int)floor(a_BlockX), (int)floor(a_BlockY), (int)floor(a_BlockZ)))
 	{
 		case E_BLOCK_WATER:
 		case E_BLOCK_STATIONARY_WATER:
@@ -1567,17 +1567,20 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 	}
 	
 	cBlockArea area;
+	int bx = (int)floor(a_BlockX);
+	int by = (int)floor(a_BlockY);
+	int bz = (int)floor(a_BlockZ);
 	int ExplosionSizeInt = (int) ceil(a_ExplosionSize);
 	int ExplosionSizeSq =  ExplosionSizeInt * ExplosionSizeInt;
 	a_BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-	int MinY = std::max(a_BlockY - ExplosionSizeInt, 0);
-	int MaxY = std::min(a_BlockY + ExplosionSizeInt, cChunkDef::Height - 1);
-	area.Read(m_World, a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt, MinY, MaxY, a_BlockZ - ExplosionSizeInt,a_BlockZ + ExplosionSizeInt);
+	int MinY = std::max((int)floor(a_BlockY - ExplosionSizeInt), 0);
+	int MaxY = std::min((int)ceil(a_BlockY + ExplosionSizeInt), cChunkDef::Height - 1);
+	area.Read(m_World, bx - ExplosionSizeInt, (int)ceil(a_BlockX + ExplosionSizeInt), MinY, MaxY, bz - ExplosionSizeInt, (int)ceil(a_BlockZ + ExplosionSizeInt));
 	for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
 	{
 		for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
 		{
-			if ((a_BlockY + y >= cChunkDef::Height) || (a_BlockY + y < 0))
+			if ((by + y >= cChunkDef::Height) || (by + y < 0))
 			{
 				// Outside of the world
 				continue;
@@ -1589,15 +1592,15 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 					// Too far away
 					continue;
 				}
-				switch (area.GetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z))
+				switch (area.GetBlockType(bx + x, by + y, bz + z))
 				{
 					case E_BLOCK_TNT:
 					{
 						// Activate the TNT, with a random fuse between 10 to 30 game ticks
-						float FuseTime = (float)(10 + m_World->GetTickRandomNumber(20)) / 20;
+						double FuseTime = (double)(10 + m_World->GetTickRandomNumber(20)) / 20;
 						m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
-						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 						break;
 					}
 					case E_BLOCK_OBSIDIAN:
@@ -1612,33 +1615,33 @@ void cChunkMap::DoExplosiontAt(float a_ExplosionSize, int a_BlockX, int a_BlockY
 					case E_BLOCK_STATIONARY_WATER:
 					{
 						// Turn into simulated water:
-						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_WATER);
+						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
 						break;
 					}
 					
 					case E_BLOCK_STATIONARY_LAVA:
 					{
 						// Turn into simulated lava:
-						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_LAVA);
+						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
 						break;
 					}
 					
 					default:
 					{
-						area.SetBlockType(a_BlockX + x, a_BlockY + y, a_BlockZ + z, E_BLOCK_AIR);
-						a_BlocksAffected.push_back(Vector3i(a_BlockX + x, a_BlockY + y, a_BlockZ + z));
+						area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+						a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 					}
 				}  // switch (BlockType)
 			}  // for z
 		}  // for y
 	}  // for x
-	area.Write(m_World, a_BlockX - ExplosionSizeInt, MinY, a_BlockZ - ExplosionSizeInt);
+	area.Write(m_World, bx - ExplosionSizeInt, MinY, bz - ExplosionSizeInt);
 
 	// Wake up all simulators for the area, so that water and lava flows and sand falls into the blasted holes (FS #391):
 	WakeUpSimulatorsInArea(
-		a_BlockX - ExplosionSizeInt, a_BlockX + ExplosionSizeInt,
+		bx - ExplosionSizeInt, bx + ExplosionSizeInt + 1,
 		MinY, MaxY,
-		a_BlockZ - ExplosionSizeInt, a_BlockZ + ExplosionSizeInt
+		bz - ExplosionSizeInt, bz + ExplosionSizeInt + 1
 	);
 }
 

@@ -335,7 +335,7 @@ public:
 	void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
 	/// Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided
-	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, float a_FuseTimeInSec, double a_InitialVelocityCoeff = 1);
+	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, double a_FuseTimeInSec, double a_InitialVelocityCoeff = 1);
 
 	// tolua_end
 
@@ -381,8 +381,20 @@ public:
 	/// Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Exported in ManualBindings.cpp
 	
-	/// Does an explosion with the specified strength at the specified coordinate
-	void DoExplosiontAt  (float a_ExplosionSzie, int a_BlockX, int a_BlockY, int a_BlockZ);  //
+	/** Does an explosion with the specified strength at the specified coordinate
+	a_SourceData exact type depends on the a_Source:
+	| esOther | void * |
+	| esPrimedTNT | cTNTEntity * |
+	| esCreeper | cCreeper * |
+	| esBed | cVector3i * |
+	| esEnderCrystal | Vector3i * |
+	| esGhastFireball | TBD |
+	| esWitherSkullBlack | TBD |
+	| esWitherSkullBlue | TBD |
+	| esWitherBirth | TBD |
+	| esPlugin | void * |
+	*/
+	void DoExplosiontAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData);
 
 	/// Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found
 	bool DoWithChestAt  (int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback &   a_Callback);  // Exported in ManualBindings.cpp

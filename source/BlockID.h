@@ -658,6 +658,24 @@ enum eDamageType
 	dtPlugin       = dtAdmin,
 } ;
 
+
+
+
+
+enum eExplosionSource
+{
+	esOther,
+	esPrimedTNT,
+	esCreeper,
+	esBed,
+	esEnderCrystal,
+	esGhastFireball,
+	esWitherSkullBlack,
+	esWitherSkullBlue,
+	esWitherBirth,
+	esPlugin
+} ;
+
 // tolua_end
 
 
