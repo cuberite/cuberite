@@ -253,6 +253,12 @@ public:
 	/// Starts or stops sprinting, sends the max speed update to the client, if needed
 	void SetSprint(bool a_IsSprinting);
 	
+	/// Returns whether the player is swimming or not
+	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
+
+	/// Return whether the player is under water or not
+	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
+
 	// tolua_end
 	
 	// cEntity overrides:
@@ -260,11 +266,7 @@ public:
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating(); }
 
-	/// Returns whether the player is swimming or not
-	virtual bool IsSwimming(void) const{ return m_IsSwimming; }
 
-	/// Return whether the player is under water or not
-	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 
 protected:
 	typedef std::map< std::string, bool > PermissionMap;
@@ -362,7 +364,7 @@ protected:
 	void SetSwimState(cChunk & a_Chunk);
 
 	/// Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block)
-	void ApplyFoodExhaustionFromMovement(cChunk & a_Chunk);
+	void ApplyFoodExhaustionFromMovement();
 } ; // tolua_export
 
 

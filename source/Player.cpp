@@ -192,7 +192,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	if (m_bDirtyPosition)
 	{
 		// Apply food exhaustion from movement:
-		ApplyFoodExhaustionFromMovement(a_Chunk);
+		ApplyFoodExhaustionFromMovement();
 		
 		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
 		BroadcastMovementUpdate(m_ClientHandle);
@@ -1445,7 +1445,7 @@ void cPlayer::HandleFood(void)
 
 
 
-void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
+void cPlayer::ApplyFoodExhaustionFromMovement()
 {
 	if (IsGameModeCreative())
 	{
@@ -1463,14 +1463,6 @@ void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
 		return;
 	}
 
-	// Get the type of block the player's standing in:
-	BLOCKTYPE BlockIn;
-	int RelX = (int)floor(m_LastPosX) - a_Chunk.GetPosX() * cChunkDef::Width;
-	int RelY = (int)floor(m_LastPosY + 0.1);
-	int RelZ = (int)floor(m_LastPosZ) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	// Use Unbounded, because we're being called *after* processing super::Tick(), which could have changed our chunk
-	VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY, RelZ, BlockIn));
-
 	// Apply the exhaustion based on distance travelled:
 	double BaseExhaustion = Movement.Length();
 	if (IsSprinting())
@@ -1478,7 +1470,7 @@ void cPlayer::ApplyFoodExhaustionFromMovement(cChunk & a_Chunk)
 		// 0.1 pt per meter sprinted
 		BaseExhaustion = BaseExhaustion * 0.1;
 	}
-	else if (IsBlockWater(BlockIn))
+	else if (IsSwimming())
 	{
 		// 0.015 pt per meter swum
 		BaseExhaustion = BaseExhaustion * 0.015;
