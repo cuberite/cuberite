@@ -181,6 +181,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_RED_APPLE:
 		case E_ITEM_GOLDEN_APPLE:
 		case E_ITEM_ROTTEN_FLESH:
+		case E_ITEM_MUSHROOM_SOUP:
 		case E_ITEM_SPIDER_EYE:
 		{
 			return new cItemFoodHandler(a_ItemType);
