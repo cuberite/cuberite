@@ -29,7 +29,7 @@ TOLUA_API int  tolua_AllToLua_open (lua_State* tolua_S);
 #include "Player.h"
 #include "PluginManager.h"
 #include "Plugin.h"
-#include "Plugin_NewLua.h"
+#include "PluginLua.h"
 #include "Server.h"
 #include "World.h"
 #include "Inventory.h"

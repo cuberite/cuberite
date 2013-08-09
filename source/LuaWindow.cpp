@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "LuaWindow.h"
 #include "UI/SlotArea.h"
-#include "Plugin_NewLua.h"
+#include "PluginLua.h"
 #include "Player.h"
 #include "lauxlib.h"  // Needed for LUA_REFNIL
 

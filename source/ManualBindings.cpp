@@ -7,7 +7,7 @@
 #include "Root.h"
 #include "World.h"
 #include "Plugin.h"
-#include "Plugin_NewLua.h"
+#include "PluginLua.h"
 #include "PluginManager.h"
 #include "Player.h"
 #include "WebAdmin.h"
@@ -19,7 +19,6 @@
 #include "BlockEntities/FurnaceEntity.h"
 #include "md5/md5.h"
 #include "LuaWindow.h"
-#include "LuaState.h"
 #include "LineBlockTracer.h"
 
 

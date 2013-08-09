@@ -1,8 +1,12 @@
 
+// PluginLua.cpp
+
+// Implements the cPluginLua class representing a plugin written in Lua
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #define LUA_USE_POSIX
-#include "Plugin_NewLua.h"
+#include "PluginLua.h"
 #include "CommandOutput.h"
 
 extern "C"

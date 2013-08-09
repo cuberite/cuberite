@@ -1522,11 +1522,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin_NewLua.cpp"
+					RelativePath="..\source\PluginLua.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\source\Plugin_NewLua.h"
+					RelativePath="..\source\PluginLua.h"
 					>
 				</File>
 				<File
