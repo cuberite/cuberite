@@ -36,9 +36,14 @@ void cSquid::Tick(float a_Dt, cChunk & a_Chunk)
 	Vector3d Pos = GetPosition();
 
 	// TODO: Not a real behavior, but cool :D
+	int RelY = (int)floor(Pos.y);
+	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	{
+		return;
+	}
 	int RelX = (int)floor(Pos.x) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = (int)floor(Pos.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
-	if (!IsBlockWater(a_Chunk.GetBlock(RelX, (int)floor(Pos.y), RelZ)) && !IsOnFire())
+	if (!IsBlockWater(a_Chunk.GetBlock(RelX, RelY, RelZ)) && !IsOnFire())
 	{
 		// Burn for 10 ticks, then decide again
 		StartBurning(10);
