@@ -3,7 +3,7 @@
 
 #include "PluginManager.h"
 #include "Plugin.h"
-#include "Plugin_NewLua.h"
+#include "PluginLua.h"
 #include "WebAdmin.h"
 #include "Item.h"
 #include "Root.h"

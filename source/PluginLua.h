@@ -1,4 +1,12 @@
 
+// PluginLua.h
+
+// Declares the cPluginLua class representing a plugin written in Lua
+
+
+
+
+
 #pragma once
 
 #include "Plugin.h"
