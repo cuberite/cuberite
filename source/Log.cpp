@@ -117,13 +117,13 @@ void cLog::Log(const char * a_Format, va_list argList)
 
 	AString Line;
 	#ifdef _DEBUG
-	Printf(Line, "[%04x|%02d:%02d:%02d] %s\n", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	Printf(Line, "[%04x|%02d:%02d:%02d] %s", cIsThread::GetCurrentID(), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#else
-	Printf(Line, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
+	Printf(Line, "[%02d:%02d:%02d] %s", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, Message.c_str());
 	#endif
 	if (m_File)
 	{
-		fputs(Line.c_str(), m_File);
+		fprintf(m_File, "%s\n", Line.c_str(), m_File);
 		fflush(m_File);
 	}
 

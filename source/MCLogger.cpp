@@ -9,15 +9,22 @@
 
 
 cMCLogger * cMCLogger::s_MCLogger = NULL;
+bool g_ShouldColorOutput = false;
 
 #ifdef _WIN32
+	#include <io.h>  // Needed for _isatty(), not available on Linux
+	
 	HANDLE g_Console = GetStdHandle(STD_OUTPUT_HANDLE);
+	WORD g_DefaultConsoleAttrib = 0x07;
+#elif defined (__linux) && !defined(ANDROID_NDK)
+	#include <unistd.h>  // Needed for isatty() on Linux
 #endif
 
 
 
 
-cMCLogger* cMCLogger::GetInstance()
+
+cMCLogger * cMCLogger::GetInstance(void)
 {
 	return s_MCLogger;
 }
@@ -31,9 +38,23 @@ cMCLogger::cMCLogger(void)
 	AString FileName;
 	Printf(FileName, "LOG_%d.txt", (int)time(NULL));
 	m_Log = new cLog(FileName);
-	m_Log->Log("--- Started Log ---");
+	m_Log->Log("--- Started Log ---\n");
 
 	s_MCLogger = this;
+
+	#ifdef _WIN32
+		// See whether we are writing to a console the default console attrib:
+		g_ShouldColorOutput = (_isatty(_fileno(stdin)) != 0);
+		if (g_ShouldColorOutput)
+		{
+			CONSOLE_SCREEN_BUFFER_INFO sbi;
+			GetConsoleScreenBufferInfo(g_Console, &sbi);
+			g_DefaultConsoleAttrib = sbi.wAttributes;
+		}
+	#elif defined (__linux) && !defined(ANDROID_NDK)
+		g_ShouldColorOutput = isatty(fileno(stdout));
+		// TODO: Check if the terminal supports colors, somehow?
+	#endif
 }
 
 
@@ -51,7 +72,7 @@ cMCLogger::cMCLogger(const AString & a_FileName)
 
 cMCLogger::~cMCLogger()
 {
-	m_Log->Log("--- Stopped Log ---");
+	m_Log->Log("--- Stopped Log ---\n");
 	delete m_Log;
 	if (this == s_MCLogger)
 		s_MCLogger = NULL;
@@ -87,71 +108,102 @@ void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
 
 
 
-void cMCLogger::Log(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Log(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor( 0x7 );	 // 0x7 is default grey color
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csRegular);
+	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
+	puts("");
 }
 
 
 
 
 
-void cMCLogger::Info(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Info(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-// 	for( int i = 0; i < 16; i++)
-// 	{
-// 		for( int j = 0; j < 16; j++ )
-// 		{
-// 			SetConsoleTextAttribute( hConsole, i | (j<<4) );
-// 			printf("0x%x", (i|j<<4));
-// 		}
-// 		printf("\n");
-// 	}
-
-	SetColor( 0xe );	 // 0xe is yellow
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csInfo);
+	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
+	puts("");
 }
 
 
 
 
 
-void cMCLogger::Warn(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Warn(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor( 0xc );	 // 0xc is red
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csWarning);
+	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
+	puts("");
 }
 
 
 
 
 
-void cMCLogger::Error(const char* a_Format, va_list a_ArgList)
+void cMCLogger::Error(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor( 0xc0 );	// 0xc0 is red bg and black text
-	m_Log->Log( a_Format, a_ArgList );
-	SetColor(0x07);  // revert color back
+	SetColor(csError);
+	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
+	puts("");
 }
 
 
 
 
 
-void cMCLogger::SetColor( unsigned char a_Color )
+void cMCLogger::SetColor(eColorScheme a_Scheme)
 {
-#ifdef _WIN32
-	SetConsoleTextAttribute(g_Console, a_Color);
-#else
-	(void)a_Color;
-#endif
+	if (!g_ShouldColorOutput)
+	{
+		return;
+	}
+	#ifdef _WIN32
+		WORD Attrib = 0x07;  // by default, gray on black
+		switch (a_Scheme)
+		{
+			case csRegular: Attrib = 0x07; break;  // Gray on black
+			case csInfo:    Attrib = 0x0e; break;  // Yellow on black
+			case csWarning: Attrib = 0x0c; break;  // Read on black
+			case csError:   Attrib = 0xc0; break;  // Black on red
+			default: ASSERT(!"Unhandled color scheme");
+		}
+		SetConsoleTextAttribute(g_Console, Attrib);
+	#elif defined(__linux) && !defined(ANDROID_NDK)
+		switch (a_Scheme)
+		{
+			case csRegular: printf("\x1b[0m");         break;  // Whatever the console default is
+			case csInfo:    printf("\x1b[33;1m");      break;  // Yellow on black
+			case csWarning: printf("\x1b[31;1m");      break;  // Red on black
+			case csError:   printf("\x1b[1;33;41;1m"); break;  // Yellow on red
+			default: ASSERT(!"Unhandled color scheme");
+		}
+	#endif
+}
+
+
+
+
+
+void cMCLogger::ResetColor(void)
+{
+	if (!g_ShouldColorOutput)
+	{
+		return;
+	}
+	#ifdef _WIN32
+		SetConsoleTextAttribute(g_Console, g_DefaultConsoleAttrib);
+	#elif defined(__linux) && !defined(ANDROID_NDK)
+		printf("\x1b[0m");
+	#endif
 }
 
 
@@ -160,6 +212,7 @@ void cMCLogger::SetColor( unsigned char a_Color )
 
 //////////////////////////////////////////////////////////////////////////
 // Global functions
+
 void LOG(const char* a_Format, ...)
 {
 	va_list argList;
