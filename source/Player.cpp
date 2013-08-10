@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
@@ -108,7 +107,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 cPlayer::~cPlayer(void)
 {
-	LOG("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
+	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", m_PlayerName.c_str(), this, GetUniqueID());
 	
 	SaveToDisk();
 
