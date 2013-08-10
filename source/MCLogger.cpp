@@ -17,6 +17,8 @@ bool g_ShouldColorOutput = false;
 	HANDLE g_Console = GetStdHandle(STD_OUTPUT_HANDLE);
 	WORD g_DefaultConsoleAttrib = 0x07;
 #elif defined (__linux) && !defined(ANDROID_NDK)
+	#include <unistd.h>  // Needed for isatty() on Linux
+	
 	bool g_ShouldColorOutput;
 #endif
 
