@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include <time.h>
+#include <io.h>
 #include "Log.h"
 
 
@@ -9,15 +10,20 @@
 
 
 cMCLogger * cMCLogger::s_MCLogger = NULL;
+bool g_ShouldColorOutput = false;
 
 #ifdef _WIN32
 	HANDLE g_Console = GetStdHandle(STD_OUTPUT_HANDLE);
+	WORD g_DefaultConsoleAttrib = 0x07;
+#elif defined (__linux) && !defined(ANDROID_NDK)
+	bool g_ShouldColorOutput;
 #endif
 
 
 
 
-cMCLogger* cMCLogger::GetInstance()
+
+cMCLogger * cMCLogger::GetInstance(void)
 {
 	return s_MCLogger;
 }
@@ -34,6 +40,20 @@ cMCLogger::cMCLogger(void)
 	m_Log->Log("--- Started Log ---");
 
 	s_MCLogger = this;
+
+	#ifdef _WIN32
+		// See whether we are writing to a console the default console attrib:
+		g_ShouldColorOutput = (_isatty(_fileno(stdin)) != 0);
+		if (g_ShouldColorOutput)
+		{
+			CONSOLE_SCREEN_BUFFER_INFO sbi;
+			GetConsoleScreenBufferInfo(g_Console, &sbi);
+			g_DefaultConsoleAttrib = sbi.wAttributes;
+		}
+	#elif defined (__linux) && !defined(ANDROID_NDK)
+		g_ShouldColorOutput = isatty(fileno(stdin));
+		// TODO: Check if the terminal supports colors, somehow?
+	#endif
 }
 
 
@@ -90,8 +110,9 @@ void cMCLogger::LogSimple(const char* a_Text, int a_LogType /* = 0 */ )
 void cMCLogger::Log(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor(csGrayOnBlack);
+	SetColor(csRegular);
 	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
 }
 
 
@@ -101,8 +122,9 @@ void cMCLogger::Log(const char * a_Format, va_list a_ArgList)
 void cMCLogger::Info(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor(csYellowOnBlack);
+	SetColor(csInfo);
 	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
 }
 
 
@@ -112,8 +134,9 @@ void cMCLogger::Info(const char * a_Format, va_list a_ArgList)
 void cMCLogger::Warn(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor(csRedOnBlack);
+	SetColor(csWarning);
 	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
 }
 
 
@@ -123,8 +146,9 @@ void cMCLogger::Warn(const char * a_Format, va_list a_ArgList)
 void cMCLogger::Error(const char * a_Format, va_list a_ArgList)
 {
 	cCSLock Lock(m_CriticalSection);
-	SetColor(csBlackOnRed);
+	SetColor(csError);
 	m_Log->Log(a_Format, a_ArgList);
+	ResetColor();
 }
 
 
@@ -133,24 +157,28 @@ void cMCLogger::Error(const char * a_Format, va_list a_ArgList)
 
 void cMCLogger::SetColor(eColorScheme a_Scheme)
 {
+	if (!g_ShouldColorOutput)
+	{
+		return;
+	}
 	#ifdef _WIN32
 		WORD Attrib = 0x07;  // by default, gray on black
 		switch (a_Scheme)
 		{
-			case csGrayOnBlack:   Attrib = 0x07; break;
-			case csYellowOnBlack: Attrib = 0x0e; break;
-			case csRedOnBlack:    Attrib = 0x0c; break;
-			case csBlackOnRed:    Attrib = 0xc0; break;
+			case csRegular: Attrib = 0x07; break;  // Gray on black
+			case csInfo:    Attrib = 0x0e; break;  // Yellow on black
+			case csWarning: Attrib = 0x0c; break;  // Read on black
+			case csError:   Attrib = 0xc0; break;  // Black on red
 			default: ASSERT(!"Unhandled color scheme");
 		}
 		SetConsoleTextAttribute(g_Console, Attrib);
 	#elif defined(__linux) && !defined(ANDROID_NDK)
 		switch (a_Scheme)
 		{
-			case csGrayOnBlack:   printf("\x1b[0m");    break;
-			case csYellowOnBlack: printf("\x1b[33;1m"); break;
-			case csRedOnBlack:    printf("\x1b[31;1m"); break;
-			case csBlackOnRed:    printf("\x1b[7;31;1m"); break;
+			case csRegular: printf("\x1b[0m");         break;  // Whatever the console default is
+			case csInfo:    printf("\x1b[33;1m");      break;  // Yellow on black
+			case csWarning: printf("\x1b[31;1m");      break;  // Red on black
+			case csError:   printf("\x1b[1;33;41;1m"); break;  // Yellow on red
 			default: ASSERT(!"Unhandled color scheme");
 		}
 	#endif
@@ -160,8 +188,26 @@ void cMCLogger::SetColor(eColorScheme a_Scheme)
 
 
 
+void cMCLogger::ResetColor(void)
+{
+	if (!g_ShouldColorOutput)
+	{
+		return;
+	}
+	#ifdef _WIN32
+		SetConsoleTextAttribute(g_Console, g_DefaultConsoleAttrib);
+	#elif defined(__linux) && !defined(ANDROID_NDK)
+		printf("\x1b[0m");
+	#endif
+}
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////
 // Global functions
+
 void LOG(const char* a_Format, ...)
 {
 	va_list argList;

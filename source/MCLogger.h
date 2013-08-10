@@ -28,14 +28,17 @@ public:																// tolua_export
 private:
 	enum eColorScheme
 	{
-		csGrayOnBlack,
-		csYellowOnBlack,
-		csRedOnBlack,
-		csBlackOnRed,
+		csRegular,
+		csInfo,
+		csWarning,
+		csError,
 	} ;
 	
 	/// Sets the specified color scheme in the terminal (TODO: if coloring available)
 	void SetColor(eColorScheme a_Scheme);
+	
+	/// Resets the color back to whatever is the default in the terminal
+	void ResetColor(void);
 	
 	cCriticalSection m_CriticalSection;
 	cLog * m_Log;
