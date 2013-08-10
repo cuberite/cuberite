@@ -1349,7 +1349,7 @@ void cPlayer::SetSwimState(cChunk & a_Chunk)
 
 	
         //lazy theoretical fix for y>255 server crash
-        if ((abs RelY)<255){
+        if (RelY<=255 && RelY>= 0){
                 // now we check if the player is submerged
                 VERIFY(a_Chunk.UnboundedRelGetBlockType(RelX, RelY+1, RelZ, BlockIn));
         }      
