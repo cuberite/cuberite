@@ -67,7 +67,7 @@ function HandleConsoleGive(Split)
 			LOG("Gave " .. newPlayer:GetName() .. " " .. Item.m_ItemCount .. " times " .. Item.m_ItemType .. ":" .. Item.m_ItemDamage)
 		else
 			Player:SendMessage( cChatColor.Rose .. "[INFO] " .. cChatColor.White .. "Not enough space in inventory, only gave " .. ItemsGiven)
-			return true, "Only " .. Item.m_ItemCount .. " out of " .. ItemsGiven .. "items could be delivered.")
+			return true, "Only " .. Item.m_ItemCount .. " out of " .. ItemsGiven .. "items could be delivered."
 		end
 	end
 
@@ -81,7 +81,6 @@ function HandleConsoleGive(Split)
 
 	return true
 
-end
 end
 
 function HandleConsoleBan(Split)
