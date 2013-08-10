@@ -1,4 +1,3 @@
-
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ClientHandle.h"
@@ -133,10 +132,6 @@ cClientHandle::~cClientHandle()
 		{
 			// Send the Offline PlayerList packet:
 			World->BroadcastPlayerListItem(*m_Player, false, this);
-
-			// Send the Chat packet:
-			AString Left(m_Username + " left the game!");
-			World->BroadcastChat(Left, this);
 		}
 		if (World != NULL)
 		{
