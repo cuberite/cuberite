@@ -52,7 +52,7 @@ cMCLogger::cMCLogger(void)
 			g_DefaultConsoleAttrib = sbi.wAttributes;
 		}
 	#elif defined (__linux) && !defined(ANDROID_NDK)
-		g_ShouldColorOutput = isatty(fileno(stdin));
+		g_ShouldColorOutput = isatty(fileno(stdout));
 		// TODO: Check if the terminal supports colors, somehow?
 	#endif
 }
